@@ -214,54 +214,67 @@
     $(document).ready(function(){
       $(".pathChooser").each(function(){
         var self = $(this);
-        self.after(getFileBrowseButton(self));
+        % if select_folder:
+            self.after(getFileBrowseButton(self, true));
+        % else:
+            self.after(getFileBrowseButton(self));
+        % endif
       });
-
-      function getFileBrowseButton(inputElement) {
-        return $("<button>").addClass("btn").addClass("fileChooserBtn").text("..").click(function(e){
-          e.preventDefault();
-          // check if it's a relative path
-          var pathAddition = "";
-          if ($.trim(inputElement.val()) != ""){
-            $.getJSON("/filebrowser/chooser${ workflow.deployment_dir }" + inputElement.val(), function (data) {
-              pathAddition = "${ workflow.deployment_dir }";
-              callFileChooser();
-            }).error(function(){
-              callFileChooser();
-            });
-          }
-          else {
-            callFileChooser();
-          }
-
-          function callFileChooser() {
-            $("#fileChooserModal").jHueFileChooser({
-              % if select_folder:
-              selectFolder: true,
-              onFolderChoose: function(filePath) {
-              % else:
-              onFileChoose: function(filePath) {
-              % endif
-                if (filePath.indexOf("${ workflow.deployment_dir }") > -1){
-                  filePath = filePath.substring("${ workflow.deployment_dir }".length);
-                  if (filePath == ""){
-                    filePath = "/";
-                  }
-                }
-                inputElement.val(filePath);
-                inputElement.change();
-                $("#chooseFile").modal("hide");
-              },
-              createFolder: false,
-              uploadFile: false,
-              initialPath: $.trim(inputElement.val()) != "" ? pathAddition + inputElement.val() : "${ workflow.deployment_dir }",
-              errorRedirectPath: "${ workflow.deployment_dir }"
-            });
-            $("#chooseFile").modal("show");
-          }
-        });
-      }
     });
+
+    function getFileBrowseButton(inputElement, selectFolder) {
+      return $("<button>").addClass("btn").addClass("fileChooserBtn").text("..").click(function (e) {
+        e.preventDefault();
+        // check if it's a relative path
+        var pathAddition = "";
+        if ($.trim(inputElement.val()) != "") {
+          var checkPath = "/filebrowser/chooser${ workflow.deployment_dir }" + "/" + inputElement.val();
+          $.getJSON(checkPath, function (data) {
+            pathAddition = "${ workflow.deployment_dir }/";
+            callFileChooser();
+          }).error(function () {
+            callFileChooser();
+          });
+        }
+        else {
+          callFileChooser();
+        }
+
+        function callFileChooser() {
+          $("#fileChooserModal").jHueFileChooser({
+            selectFolder:(selectFolder) ? true : false,
+            onFolderChoose:function (filePath) {
+              handleChoice(filePath);
+              if (selectFolder) {
+                $("#chooseFile").modal("hide");
+              }
+            },
+            onFileChoose:function (filePath) {
+              handleChoice(filePath);
+              if (selectFolder == undefined || !selectFolder) {
+                $("#chooseFile").modal("hide");
+              }
+            },
+            createFolder:false,
+            uploadFile:false,
+            initialPath:$.trim(inputElement.val()) != "" ? pathAddition + inputElement.val() : "${ workflow.deployment_dir }",
+            errorRedirectPath:"${ workflow.deployment_dir }"
+          });
+          $("#chooseFile").modal("show");
+        }
+
+        function handleChoice(filePath) {
+          if (filePath.indexOf("${ workflow.deployment_dir }") > -1) {
+            filePath = filePath.substring("${ workflow.deployment_dir }".length);
+            if (filePath == "") {
+              filePath = "/";
+            }
+          }
+          inputElement.val(filePath);
+          inputElement.change();
+        }
+      });
+    }
   </script>
 </%def>
 
