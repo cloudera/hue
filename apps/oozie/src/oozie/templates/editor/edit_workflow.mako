@@ -609,7 +609,7 @@ var ModalModule = function($, ko) {
   module.prototype.addDecorations = function () {
     $(".popover").remove();
 
-    $("input[name='job_xml']:not(.pathChooser)").addClass("pathChooser").after(getFileBrowseButton($("input[name='job_xml']")));
+    $("input[name='job_xml']:not(.pathChooser)").addClass("pathChooser").after(getFileBrowseButton($("input[name='job_xml']:not(.pathChooser)")));
     $("input[name='jar_path']").addClass("pathChooser").after(getFileBrowseButton($("input[name='jar_path']")));
     $("input[name='script_path']").addClass("pathChooser").after(getFileBrowseButton($("input[name='script_path']")));
     $("input[name='command']").addClass("pathChooser").after(getFileBrowseButton($("input[name='command']")));

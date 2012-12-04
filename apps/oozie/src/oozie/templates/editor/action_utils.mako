@@ -174,7 +174,7 @@
           % endif
 
           % if 'job_xml' in action_form.fields:
-            ${ utils.render_field(action_form['job_xml'], extra_attrs={'data-bind': 'value: %s' % field.name}) }
+            ${ utils.render_field(action_form['job_xml'], extra_attrs={'data-bind': 'value: %s' % action_form['job_xml'].name}) }
           % endif
 
         </fieldset>

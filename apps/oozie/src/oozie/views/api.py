@@ -119,7 +119,6 @@ def update_workflow(json_workflow):
 
 def update_workflow_nodes(workflow, json_nodes, id_map):
   validate_json_nodes(json_nodes)
-
   nodes = []
 
   for json_node in json_nodes:
