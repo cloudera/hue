@@ -23,29 +23,21 @@
 <%namespace name="layout" file="layout.mako" />
 
 <%def name="query()">
-    <h1>${_('Query Editor')}</h1>
-    <fieldset>
-        % if design and not design.is_auto and design.name:
-            <legend>${design.name}</legend>
-            % if design.desc:
-              <p>${design.desc}</p>
-            % endif
+    % if design and not design.is_auto and design.name:
+      <h1>${_('Query Editor')} : ${design.name}</h1>
+      % if design.desc:
+        <p>${design.desc}</p>
+      % endif
+    % else:
+      <h1>${_('Query Editor')}</h1>
+    % endif
 
-          % else:
-            <legend>${_('Query')}</legend>
-          % endif
-
-      <div class="clearfix">
-        <div class="input">
-            <textarea class="span9" rows="18" placeholder="${_('Example: SELECT * FROM tablename')}" name="${form.query["query"].html_name | n}" id="queryField">${extract_field_data(form.query["query"]) or ''}</textarea>
-            <div id="validationResults">
-            % if len(form.query["query"].errors):
-                ${unicode(form.query["query"].errors) | n}
-             % endif
-            </div>
-        </div>
-      </div>
-    </fieldset>
+    <textarea class="span9" rows="18" placeholder="${_('Example: SELECT * FROM tablename')}" name="${form.query["query"].html_name | n}" id="queryField">${extract_field_data(form.query["query"]) or ''}</textarea>
+    <div id="validationResults">
+    % if len(form.query["query"].errors):
+        ${unicode(form.query["query"].errors) | n}
+     % endif
+    </div>
 
     <div class="actions">
         <a id="executeQuery" class="btn btn-primary">${_('Execute')}</a>
@@ -218,7 +210,7 @@ ${layout.menubar(section='query')}
             % if error_message:
                 <div class="alert alert-error">
                     <p><strong>${_('Your query has the following error(s):')}</strong></p>
-                    <p>${error_message}</p>
+                    <p class="queryErrorMessage">${error_message}</p>
                     % if log:
                         <small>${_('click the')} <b>${_('Error Log')}</b> ${_('tab below for details')}</small>
                     % endif
@@ -308,42 +300,81 @@ ${layout.menubar(section='query')}
     </div>
 </div>
 
+<link rel="stylesheet" href="/static/ext/css/jquery-linedtextarea.css" type="text/css" media="screen" title="no title" charset="utf-8" />
+<script src="/static/ext/js/jquery/plugins/jquery-linedtextarea.js" type="text/javascript" charset="utf-8"></script>
+
 <style>
-    #filechooser {
-        min-height:100px;
-        overflow-y:scroll;
-    }
-    .control-group label {
-        float: left;
-        padding-top: 5px;
-        text-align: left;
-        width: 40px;
-    }
-    .nav-list {
-        padding:0;
-    }
-    .param {
-        background:#FDFDFD;
-        padding: 8px 8px 1px 8px;
-        border-radius: 4px;
-        -webkit-border-radius: 4px;
-        -moz-border-radius: 4px;
-        margin-bottom:5px;
-        border:1px solid #EEE;
-    }
-    .remove {
-        float:right;
-    }
-    .file_resourcesField {
-        border-radius: 3px 0 0 3px;
-        border-right:0;
-    }
-    .fileChooserBtn {
-        border-radius: 0 3px 3px 0;
-    }
+  h1 {
+    margin-bottom: 5px;
+  }
+  #filechooser {
+    min-height: 100px;
+    overflow-y: scroll;
+  }
+
+  .control-group label {
+    float: left;
+    padding-top: 5px;
+    text-align: left;
+    width: 40px;
+  }
+
+  .nav-list {
+    padding: 0;
+  }
+
+  .param {
+    background: #FDFDFD;
+    padding: 8px 8px 1px 8px;
+    border-radius: 4px;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    margin-bottom: 5px;
+    border: 1px solid #EEE;
+  }
+
+  .remove {
+    float: right;
+  }
+
+  .file_resourcesField {
+    border-radius: 3px 0 0 3px;
+    border-right: 0;
+  }
+
+  .fileChooserBtn {
+    border-radius: 0 3px 3px 0;
+  }
+
+  .linedwrap {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    background-color: #ffffff;
+    border: 1px solid #cccccc;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    -webkit-transition: border linear 0.2s, box-shadow linear 0.2s;
+    -moz-transition: border linear 0.2s, box-shadow linear 0.2s;
+    -o-transition: border linear 0.2s, box-shadow linear 0.2s;
+    transition: border linear 0.2s, box-shadow linear 0.2s;
+  }
+
+  .linedtextarea textarea {
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+  }
+
+  .linedwrap .codelines .lineselect {
+    color: #B94A48;
+    background-color: #F2DEDE;
+  }
 
 </style>
-
 
 <script type="text/javascript" charset="utf-8">
     $(document).ready(function(){
@@ -433,6 +464,22 @@ ${layout.menubar(section='query')}
             $(this).removeClass("fieldError");
             $("#validationResults").empty();
         });
+
+        var selectedLine = -1;
+        if ($(".queryErrorMessage")){
+          var err = $(".queryErrorMessage").text().toLowerCase();
+          var firstPos = err.indexOf("line");
+          selectedLine = $.trim(err.substring(err.indexOf(" ", firstPos), err.indexOf(":", firstPos)))*1;
+        }
+
+        if (selectedLine > -1){
+          $("#queryField").linedtextarea({
+            selectedLine: selectedLine
+          });
+        }
+        else {
+          $("#queryField").linedtextarea();
+        }
 
         function checkAndSubmit(){
             $(".query").val($("#queryField").val());
