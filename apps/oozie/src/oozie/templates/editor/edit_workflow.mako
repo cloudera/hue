@@ -597,22 +597,6 @@ ko.bindingHandlers.fileChooser = {
 
 ko.applyBindings(workflow, $('#workflow')[0]);
 
-function getFileBrowseButton(inputElement) {
-  return $("<button>").addClass("btn").addClass("fileChooserBtn").text("..").click(function(e){
-    e.preventDefault();
-    $("#fileChooserModal").jHueFileChooser({
-      onFileChoose: function(filePath) {
-          inputElement.val(filePath);
-          inputElement.change();
-          $("#chooseFile").modal("hide");
-      },
-      createFolder: false,
-      initialPath: "${ workflow.deployment_dir }"
-    });
-    $("#chooseFile").modal("show");
-  })
-}
-
 // Handles adding autocomplete to job properties.
 // We need to propagate the selected value to knockoutjs.
 var addAutoComplete = function(i, elem) {
