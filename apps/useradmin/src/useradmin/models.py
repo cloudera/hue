@@ -52,7 +52,7 @@ onto actions which may not relate to database models.
 from enum import Enum
 import logging
 
-from django.db import models
+from django.db import connection, models
 from django.contrib.auth import models as auth_models
 from django.utils.translation import ugettext_lazy as _t
 
@@ -222,14 +222,14 @@ def update_app_permissions(**kwargs):
   # The HuePermission model needs to be sync'd for the following code to work.
   # Since all apps should have been sync'd before useradmin, referencing them
   # here is functional.
-  if kwargs['app'].__name__.startswith('useradmin'):
+  if u'useradmin_huepermission' in connection.introspection.table_names():
+    current = {}
+
     try:
       for dp in HuePermission.objects.all():
         current.setdefault(dp.app, {})[dp.action] = dp
     except:
       return
-
-    current = {}
 
     updated = 0
     uptodate = 0
@@ -273,4 +273,3 @@ def update_app_permissions(**kwargs):
 
 models.signals.post_syncdb.connect(update_app_permissions)
 models.signals.post_syncdb.connect(get_default_user_group)
-
