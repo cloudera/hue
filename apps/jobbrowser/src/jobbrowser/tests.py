@@ -14,6 +14,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from nose.plugins.skip import SkipTest
 
 try:
     import json
@@ -195,6 +196,8 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
     """
     Test job in kill state.
     """
+    raise SkipTest
+
     # Clone design
     assert_equal(0, OozieDesign.objects.filter(owner__username=self.username).count())
     self.client.post('/jobsub/clone_design/%d' % self.sleep_design_id)
@@ -277,6 +280,8 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
     The status of the jobs should be the same as the status reported back by oozie.
     In this case, all jobs should succeed.
     """
+    raise SkipTest
+
     # Clone design
     assert_equal(0, OozieDesign.objects.filter(owner__username=self.username).count())
     self.client.post('/jobsub/clone_design/%d' % self.sleep_design_id)

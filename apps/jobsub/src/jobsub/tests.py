@@ -29,6 +29,7 @@ from jobsub import conf
 from jobsub.management.commands import jobsub_setup
 from jobsub.models import OozieDesign, OozieMapreduceAction, OozieStreamingAction
 from jobsub.parameterization import recursive_walk, find_variables, substitute_variables
+from nose.plugins.skip import SkipTest
 
 
 LOG = logging.getLogger(__name__)
@@ -249,6 +250,8 @@ class TestJobsubWithHadoop(OozieServerProvider):
     self.client.post('/jobsub/clone_design/%d' % jobid)
     assert_equal(1, OozieDesign.objects.filter(owner__username='jobsub_test').count())
     jobid = OozieDesign.objects.get(owner__username='jobsub_test').id
+
+    raise SkipTest
 
     # And now submit and run the sleep sample
     response = self.client.post('/jobsub/submit_design/%d' % jobid, {
