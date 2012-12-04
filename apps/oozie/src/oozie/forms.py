@@ -52,9 +52,9 @@ class WorkflowForm(forms.ModelForm):
     exclude = ('owner', 'start', 'end')
     widgets = {
       'description': forms.TextInput(attrs={'class': 'span5'}),
-      'deployment_dir': forms.TextInput(attrs={'class': 'pathChooser', 'style': "width:535px"}),
+      'deployment_dir': forms.TextInput(attrs={'class': 'pathChooser span7'}),
       'parameters': forms.widgets.HiddenInput(),
-      'job_xml': forms.widgets.TextInput(attrs={'class': 'span5'}),
+      'job_xml': forms.widgets.TextInput(attrs={'class': 'pathChooser span7'}),
       'job_properties': forms.widgets.HiddenInput(),
       'schema_version': forms.widgets.HiddenInput(),
     }
@@ -64,6 +64,7 @@ class WorkflowForm(forms.ModelForm):
 
 
 SCHEMA_VERSION_CHOICES = ['0.4']
+
 class ImportWorkflowForm(WorkflowForm):
   definition = forms.CharField(widget=forms.Textarea())
   schema_version = forms.ChoiceField(choices=[(version, version) for version in SCHEMA_VERSION_CHOICES])

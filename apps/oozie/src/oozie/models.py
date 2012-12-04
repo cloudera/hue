@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import logging
+import time
 
 try:
   import json
@@ -117,7 +118,7 @@ class Job(models.Model):
     super(Job, self).save()
 
     if not self.deployment_dir:
-      default_dir = Hdfs.join(REMOTE_SAMPLE_DIR.get(), '_%s_-oozie-%s' % (self.owner.username, self.id))
+      default_dir = Hdfs.join(REMOTE_SAMPLE_DIR.get(), '_%s_-oozie-%s-%s' % (self.owner.username, self.id, time.time()))
       self.deployment_dir = default_dir
       super(Job, self).save()
 

@@ -20,14 +20,8 @@ from django.conf.urls.defaults import patterns, url
 
 IS_URL_NAMESPACED = True
 
+
 urlpatterns = patterns(
-  'oozie.views.api',
-
-  url(r'^workflows/(?P<workflow>\d+)$', 'workflow', name='workflow'),
-  url(r'^workflows/(?P<workflow>\d+)/save$', 'workflow_save', name='workflow_save'),
-)
-
-urlpatterns += patterns(
   'oozie.views.editor',
 
   url(r'^list_workflows/$', 'list_workflows', name='list_workflows'),
@@ -56,6 +50,15 @@ urlpatterns += patterns(
   url(r'^list_history/(?P<record_id>[-\w]+)$', 'list_history_record', name='list_history_record'),
   url(r'^setup_app/$', 'setup_app', name='setup_app'),
 )
+
+
+urlpatterns += patterns(
+  'oozie.views.api',
+
+  url(r'^workflows/(?P<workflow>\d+)$', 'workflow', name='workflow'),
+  url(r'^workflows/(?P<workflow>\d+)/save$', 'workflow_save', name='workflow_save'),
+)
+
 
 urlpatterns += patterns(
   'oozie.views.dashboard',
