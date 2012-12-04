@@ -555,17 +555,6 @@ class Node(models.Model):
   def is_visible(self):
     return True
 
-  def clone(self):
-    copy = self
-    copy.pk = None
-    copy.id = None
-    copy.name += '-copy'
-    copy.save()
-    return copy
-
-  def is_editable(self):
-    return False
-
 
 class Action(Node):
   """
@@ -576,9 +565,6 @@ class Action(Node):
   class Meta:
     # Cloning does not work anymore if not abstract
     abstract = True
-
-  def is_editable(self):
-    return True
 
 # The fields with '[]' as default value are JSON dictionaries
 # When adding a new action, also update
@@ -913,12 +899,6 @@ class ControlFlow(Node):
   def is_visible(self):
     return False
 
-  def can_move(self):
-    return False
-
-  def get_edit_link(self):
-    return ''
-
 
 # Could not make this abstract
 class Start(ControlFlow):
@@ -947,9 +927,6 @@ class Fork(ControlFlow):
   def get_child_join(self):
     return Link.objects.get(parent=self, name='related').child.get_full_node()
 
-  def is_editable(self):
-    return False
-
   def convert_to_decision(self):
     self.remove_join()
 
@@ -971,10 +948,6 @@ class Fork(ControlFlow):
     self.delete()
 
     return decision
-
-  def update_description(self):
-    self.description = ', '.join(self.get_children_links().values_list('comment', flat=True))
-    self.save()
 
   def remove_join(self):
     join = self.get_child_join()
@@ -1011,9 +984,6 @@ class Decision(ControlFlow):
 
   def is_visible(self):
     return True
-
-  def is_editable(self):
-    return False
 
   def update_description(self):
     self.description = ', '.join(self.get_children_links().values_list('comment', flat=True))

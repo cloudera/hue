@@ -39,7 +39,6 @@ from liboozie.submittion import Submission
 
 from oozie.conf import SHARE_JOBS
 from oozie.decorators import check_job_access_permission, check_job_edition_permission,\
-                             check_action_access_permission, check_action_edition_permission,\
                              check_dataset_access_permission, check_dataset_edition_permission
 from oozie.import_workflow import import_workflow as _import_workflow
 from oozie.import_jobsub import convert_jobsub_design
@@ -240,50 +239,6 @@ def import_action(request, workflow, parent_action_id):
     'available_actions': available_actions,
     'form_url': reverse('oozie:import_action', kwargs={'workflow': workflow.id, 'parent_action_id': parent_action_id}),
   })
-
-
-@check_action_access_permission
-@check_action_edition_permission
-def delete_action(request, action):
-  if request.method == 'POST':
-    action.workflow.delete_action(action)
-    return redirect(reverse('oozie:edit_workflow', kwargs={'workflow': action.workflow.id}))
-  else:
-    raise PopupException(_('A POST request is required.'))
-
-
-@check_action_access_permission
-@check_action_edition_permission
-def clone_action(request, action):
-  if request.method == 'POST':
-    # Really weird: action is like a clone object with the old id here
-    action_id = action.id
-    workflow = action.workflow
-    clone = action.clone()
-    workflow.add_action(clone, action_id)
-    return redirect(reverse('oozie:edit_workflow', kwargs={'workflow': workflow.id}))
-  else:
-    raise PopupException(_('A POST request is required.'))
-
-
-@check_action_access_permission
-@check_action_edition_permission
-def move_up_action(request, action):
-  if request.method == 'POST':
-    action.workflow.move_action_up(action)
-    return redirect(reverse('oozie:edit_workflow', kwargs={'workflow': action.workflow.id}))
-  else:
-    raise PopupException(_('A POST request is required.'))
-
-
-@check_action_access_permission
-@check_action_edition_permission
-def move_down_action(request, action):
-  if request.method == 'POST':
-    action.workflow.move_action_down(action)
-    return redirect(reverse('oozie:edit_workflow', kwargs={'workflow': action.workflow.id}))
-  else:
-    raise PopupException(_('A POST request is required.'))
 
 
 @check_job_access_permission()
