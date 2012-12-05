@@ -248,23 +248,6 @@ class WebHdfs(Hdfs):
     if not success:
       raise IOError("Mkdir failed: %s" % (smart_str(path),))
 
-  def mktemp(self, subdir='', prefix='tmp'):
-    """
-    mktemp(subdir, prefix) ->  <temp_dir>/subdir/prefix.<rand>
-    Return a unique temporary filename with prefix in the cluster's temp dir.
-    """
-    RANDOM_BITS = 64
-
-    base = self.join(self._temp_dir, subdir)
-    if not self.isdir(base):
-      self.mkdir(base)
-
-    while True:
-      name = "%s.%s" % (prefix, random.getrandbits(RANDOM_BITS))
-      candidate = self.join(base, name)
-      if not self.exists(candidate):
-        return candidate
-
   def rename(self, old, new):
     """rename(old, new)"""
     old = Hdfs.normpath(old)

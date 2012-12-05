@@ -916,9 +916,10 @@ from django.utils.translation import ugettext as _
 
             self.uploadFile = (function() {
                 var num_of_pending_uploads = 0;
+                var action = "/filebrowser/upload/file";
                 var uploader = new qq.FileUploader({
                     element: document.getElementById("fileUploader"),
-                    action: "/filebrowser/upload/file",
+                    action: action,
                     template: '<div class="qq-uploader">' +
                             '<div class="qq-upload-drop-area"><span>${_('Drop files here to upload')}</span></div>' +
                             '<div class="qq-upload-button">${_('Upload a file')}</div>' +
@@ -947,7 +948,7 @@ from django.utils.translation import ugettext as _
                     debug: false
                 });
 
-                $("#archiveUploader").on('fb:updatePath', function(e, options) {
+                $("#fileUploader").on('fb:updatePath', function(e, options) {
                     uploader.setParams({
                         dest: options.dest,
                         fileFieldLabel: "hdfs_file"

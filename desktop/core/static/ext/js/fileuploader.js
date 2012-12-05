@@ -1231,7 +1231,8 @@ qq.extend(qq.UploadHandlerXhr.prototype, {
         formData.append(params.fileFieldLabel, file);
         formData.append('dest', params.dest);
 
-        xhr.open("POST", this._options.action, true);
+        var action = this._options.action + "?dest=" + params.dest;
+        xhr.open("POST", action, true);
         xhr.send(formData);
     },
     _onComplete: function(id, xhr){

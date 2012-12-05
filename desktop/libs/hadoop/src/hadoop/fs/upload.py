@@ -46,7 +46,7 @@ class HDFStemporaryUploadedFile(object):
   A temporary HDFS file to store upload data.
   This class does not have any file read methods.
   """
-  def __init__(self, request, name):
+  def __init__(self, request, name, destination):
     self.name = name
     self.size = None
     self._do_cleanup = False
@@ -65,12 +65,8 @@ class HDFStemporaryUploadedFile(object):
     self._fs.setuser(self._fs.DEFAULT_USER)
     self._fs.setuser(self._fs.superuser)
 
-    self._path = self._fs.mktemp(
-        subdir='hue-uploads',
-        prefix='tmp.%s' % (request.environ['REMOTE_ADDR'],))
+    self._path = self._fs.mkswap(name, suffix='tmp', basedir=destination)
 
-    # Make the tmp dir 0777
-    self._fs.chmod(self._fs.dirname(self._path), 0777)
     self._file = self._fs.open(self._path, 'w')
     self._do_cleanup = True
 
@@ -122,6 +118,7 @@ class HDFSfileUploadHandler(FileUploadHandler):
     self._file = None
     self._starttime = 0
     self._activated = False
+    self._destination = request.GET.get('dest', None)
     # Need to directly modify FileUploadHandler.chunk_size
     FileUploadHandler.chunk_size = UPLOAD_CHUNK_SIZE.get()
 
@@ -132,7 +129,7 @@ class HDFSfileUploadHandler(FileUploadHandler):
     #       running the auth middleware.
     if field_name.upper().startswith('HDFS'):
       try:
-        self._file = HDFStemporaryUploadedFile(self.request, file_name)
+        self._file = HDFStemporaryUploadedFile(self.request, file_name, self._destination)
       except (HDFSerror, IOError), ex:
         LOG.error("Not using HDFS upload handler: %s" % (ex,))
         return
