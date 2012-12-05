@@ -20,9 +20,6 @@ import traceback
 
 from thrift.transport.TTransport import TTransportException
 
-# Need full import statement
-import desktop.lib.django_util
-
 
 class StructuredException(Exception):
   """
@@ -63,30 +60,6 @@ class MessageException(StructuredException):
       message=msg,
       data=dict(filename=filename),
       error_code=error_code)
-
-class PopupException(Exception):
-  """
-  Middleware will render this exception; and the template
-  renders it as a pop-up.
-  """
-  def __init__(self, message, title="Error", detail=None, error_code=500):
-    Exception.__init__(self, message)
-    self.message = message
-    self.title = title
-    self.detail = detail
-    self.error_code = error_code
-
-    # Traceback is only relevant if an exception was thrown, caught, and we reraise with this exception.
-    (type, value, tb) = sys.exc_info()
-    self.traceback = traceback.extract_tb(tb)
-
-  def response(self, request):
-    data = dict(title=self.title, message=self.message, detail=self.detail, traceback=self.traceback)
-    if not request.ajax:
-      data['request'] = request
-    response = desktop.lib.django_util.render("popup_error.mako", request, data)
-    response.status_code = self.error_code
-    return response
 
 class StructuredThriftTransportException(StructuredException, TTransportException):
   def __init__(self, ex, *args, **kwargs):

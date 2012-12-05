@@ -16,7 +16,7 @@
 # limitations under the License.
 
 from desktop.lib.django_util import render
-from desktop.lib.exceptions import PopupException
+from desktop.lib.exceptions_renderable import PopupException
 from desktop import appmanager
 from hadoop.fs import LocalSubFileSystem
 

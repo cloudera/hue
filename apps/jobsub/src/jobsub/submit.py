@@ -23,7 +23,7 @@ import errno
 import logging
 
 from desktop.lib import django_mako
-from desktop.lib.exceptions import PopupException
+from desktop.lib.exceptions_renderable import PopupException
 import hadoop.cluster
 from hadoop.fs.hadoopfs import Hdfs
 

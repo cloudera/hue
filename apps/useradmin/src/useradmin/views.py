@@ -28,7 +28,7 @@ import django.contrib.auth.forms
 from django import forms
 from django.contrib.auth.models import User, Group
 from desktop.lib.django_util import get_username_re_rule, get_groupname_re_rule, render
-from desktop.lib.exceptions import PopupException
+from desktop.lib.exceptions_renderable import PopupException
 from django.core.urlresolvers import reverse
 from django.forms.util import ErrorList
 from django.shortcuts import redirect

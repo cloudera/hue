@@ -27,7 +27,7 @@ from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
 from enum import Enum
 
-from desktop.lib.exceptions import PopupException
+from desktop.lib.exceptions_renderable import PopupException
 
 from beeswax.conf import SERVER_INTERFACE
 from beeswaxd.ttypes import QueryHandle as BeeswaxdQueryHandle, QueryState
