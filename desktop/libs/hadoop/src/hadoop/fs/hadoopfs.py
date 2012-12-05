@@ -287,6 +287,38 @@ class Hdfs(object):
     else:
       LOG.info(_('Skipping %s (not a file).') % local_src)
 
+  @_coerce_exceptions
+  def mktemp(self, subdir='', prefix='tmp', basedir=None):
+    """
+    mktemp(prefix) ->  <temp_dir or basedir>/<subdir>/prefix.<rand>
+    Return a unique temporary filename with prefix in the cluster's temp dir.
+    """
+    RANDOM_BITS = 64
+
+    base = self.join(basedir or self._temp_dir, subdir)
+    if not self.isdir(base):
+      self.mkdir(base)
+
+    while True:
+      name = prefix + '.' + str(random.getrandbits(RANDOM_BITS))
+      candidate = self.join(base, name)
+      if not self.exists(candidate):
+        return candidate
+
+  def mkswap(self, filename, subdir='', suffix='swp', basedir=None):
+    """
+    mkswap(filename, suffix) ->  <temp_dir or basedir>/<subdir>/filename.<suffix>
+    Return a unique temporary filename with prefix in the cluster's temp dir.
+    """
+    RANDOM_BITS = 64
+
+    base = self.join(basedir or self._temp_dir, subdir)
+    if not self.isdir(base):
+      self.mkdir(base)
+
+    candidate = self.join(base, "%s.%s" % (filename, suffix))
+    return candidate
+
   def exists(self):
     raise NotImplementedError(_("%(function)s has not been implemented.") % {'function': 'exists'})
 
@@ -547,24 +579,6 @@ class HadoopFileSystem(Hdfs):
   def chown(self, path, user, group):
     path = encode_fs_path(path)
     self.nn_client.chown(self.request_context, normpath(path), user, group)
-
-  @_coerce_exceptions
-  def mktemp(self, subdir='', prefix='tmp'):
-    """
-    mktemp(prefix) ->  <temp_dir>/subdir/prefix.<rand>
-    Return a unique temporary filename with prefix in the cluster's temp dir.
-    """
-    RANDOM_BITS = 64
-
-    base = self.join(self._temp_dir, subdir)
-    if not self.isdir(base):
-      self.mkdir(base)
-
-    while True:
-      name = prefix + '.' + str(random.getrandbits(RANDOM_BITS))
-      candidate = self.join(base, name)
-      if not self.exists(candidate):
-        return candidate
 
   @_coerce_exceptions
   def get_namenode_info(self):
