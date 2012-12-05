@@ -28,7 +28,7 @@ from django.utils.translation import ugettext as _
 from desktop.context_processors import get_app_name
 from desktop.lib import django_mako, i18n
 from desktop.lib.django_util import render
-from desktop.lib.exceptions import PopupException
+from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.django_forms import MultiForm
 from hadoop.fs import hadoopfs
 

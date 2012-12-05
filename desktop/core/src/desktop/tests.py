@@ -31,7 +31,7 @@ import desktop.conf
 import logging
 import time
 from desktop.lib.django_util import TruncatingModel
-from desktop.lib.exceptions import PopupException
+from desktop.lib.exceptions_renderable import PopupException
 import desktop.views as views
 import proxy.conf
 

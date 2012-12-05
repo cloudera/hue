@@ -35,7 +35,7 @@ from django.core import urlresolvers
 from django.shortcuts import redirect
 
 from desktop.lib.django_util import render, extract_field_data
-from desktop.lib.exceptions import PopupException
+from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.rest.http_client import RestException
 from desktop.log.access import access_warn
 

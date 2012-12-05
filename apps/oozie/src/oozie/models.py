@@ -35,7 +35,7 @@ from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
 from desktop.log.access import access_warn
 from desktop.lib import django_mako
-from desktop.lib.exceptions import PopupException
+from desktop.lib.exceptions_renderable import PopupException
 from hadoop.fs.exceptions import WebHdfsException
 
 from hadoop.fs.hadoopfs import Hdfs

@@ -28,7 +28,7 @@ from cStringIO import StringIO
 from time import mktime
 
 from desktop.lib import i18n
-from desktop.lib.exceptions import PopupException
+from desktop.lib.exceptions_renderable import PopupException
 from desktop.log.access import access_warn
 
 import hadoop.confparse

@@ -57,7 +57,7 @@ from django.contrib.auth import models as auth_models
 from django.utils.translation import ugettext_lazy as _t
 
 from desktop import appmanager
-from desktop.lib.exceptions import PopupException
+from desktop.lib.exceptions_renderable import PopupException
 
 import useradmin.conf
 
