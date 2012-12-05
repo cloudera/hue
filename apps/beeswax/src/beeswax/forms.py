@@ -41,12 +41,26 @@ class QueryForm(MultiForm):
       saveform=SaveForm)
 
 
+class DbForm(forms.Form):
+  """For 'show tables'"""
+  database = forms.ChoiceField(required=False,
+                           label='',
+                           choices=(('default', 'default'),),
+                           initial=0,
+                           widget=forms.widgets.Select(attrs={'class': 'span6'}))
+
+  def __init__(self, *args, **kwargs):
+    databases = kwargs.pop('databases')
+    super(DbForm, self).__init__(*args, **kwargs)
+    self.fields['database'].choices = ((db, db) for db in databases)
+
+
 class SaveForm(forms.Form):
   """Used for saving query design."""
   name = forms.CharField(required=False,
-                        max_length=64,
-                        initial=SavedQuery.DEFAULT_NEW_DESIGN_NAME,
-                        help_text=_t('Change the name to save as a new design.'))
+                         max_length=64,
+                         initial=SavedQuery.DEFAULT_NEW_DESIGN_NAME,
+                         help_text=_t('Change the name to save as a new design.'))
   desc = forms.CharField(required=False, max_length=1024, label=_t("Description"))
   save = forms.BooleanField(widget=SubmitButton, required=False)
   saveas = forms.BooleanField(widget=SubmitButton, required=False)
@@ -121,6 +135,11 @@ class HQLForm(forms.Form):
   is_parameterized = forms.BooleanField(required=False, initial=True)
   email_notify = forms.BooleanField(required=False, initial=False)
   type = forms.IntegerField(required=False, initial=0)
+  database = forms.ChoiceField(required=False,
+                           label='',
+                           choices=(('default', 'default'),),
+                           initial=0,
+                           widget=forms.widgets.Select(attrs={'class': 'span6'}))
 
   def clean_query(self):
     return _strip_trailing_semicolon(self.cleaned_data['query'])

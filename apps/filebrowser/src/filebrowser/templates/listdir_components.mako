@@ -674,7 +674,7 @@ from django.utils.translation import ugettext as _
 
             self.page = ko.observable(new Page(page));
             self.recordsPerPageChoices = ["15", "30", "45", "60", "100", "200"],
-                    self.recordsPerPage = ko.observable("30");
+            self.recordsPerPage = ko.observable("30");
             self.targetPageNum = ko.observable(1);
             self.targetPath = ko.observable("${current_request_path}");
 

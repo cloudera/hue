@@ -23,14 +23,17 @@
 <%namespace name="layout" file="layout.mako" />
 
 <%def name="query()">
-    % if design and not design.is_auto and design.name:
-      <h1>${_('Query Editor')} : ${design.name}</h1>
-      % if design.desc:
-        <p>${design.desc}</p>
-      % endif
-    % else:
-      <h1>${_('Query Editor')}</h1>
-    % endif
+
+
+            % if error_message:
+                <div class="alert alert-error">
+                    <p><strong>${_('Your query has the following error(s):')}</strong></p>
+                    <p class="queryErrorMessage">${error_message}</p>
+                    % if log:
+                        <small>${_('click the')} <b>${_('Error Log')}</b> ${_('tab below for details')}</small>
+                    % endif
+                </div>
+            % endif
 
     <textarea class="span9" rows="18" placeholder="${_('Example: SELECT * FROM tablename')}" name="${form.query["query"].html_name | n}" id="queryField">${extract_field_data(form.query["query"]) or ''}</textarea>
     <div id="validationResults">
@@ -62,6 +65,10 @@ ${layout.menubar(section='query')}
             <div class="well sidebar-nav">
                 <form id="advancedSettingsForm" action="${action}" method="POST" class="form form-horizontal noPadding">
                     <ul class="nav nav-list">
+                        <li class="nav-header">${_('database')}</li>
+                        <li>
+                          ${ form.query['database'] }
+                        </li>
                         <li class="nav-header">${_('settings')}</li>
                         <li>
                             % for i, f in enumerate(form.settings.forms):
@@ -207,18 +214,17 @@ ${layout.menubar(section='query')}
             </div>
         </div>
         <div class="span9">
-            % if error_message:
-                <div class="alert alert-error">
-                    <p><strong>${_('Your query has the following error(s):')}</strong></p>
-                    <p class="queryErrorMessage">${error_message}</p>
-                    % if log:
-                        <small>${_('click the')} <b>${_('Error Log')}</b> ${_('tab below for details')}</small>
-                    % endif
-                </div>
-            % endif
-
             % if on_success_url:
               <input type="hidden" name="on_success_url" value="${on_success_url}"/>
+            % endif
+
+            % if design and not design.is_auto and design.name:
+              <h1>${_('Query Editor')} : ${design.name}</h1>
+              % if design.desc:
+                <p>${design.desc}</p>
+              % endif
+            % else:
+              <h1>${_('Query Editor')}</h1>
             % endif
 
             % if error_messages or log:
@@ -376,6 +382,9 @@ ${layout.menubar(section='query')}
 
 </style>
 
+<script src="/static/ext/js/jquery/plugins/jquery.cookie.js"></script>
+
+
 <script type="text/javascript" charset="utf-8">
     $(document).ready(function(){
         $("*[rel=tooltip]").tooltip({
@@ -422,6 +431,17 @@ ${layout.menubar(section='query')}
                 $("#chooseFile").modal("show");
             })
         }
+
+        $("#id_query-database").change(function(){
+             $.cookie("hueBeeswaxLastDatabase", $(this).val(), {expires: 90});
+        });
+
+        ## If no particular query is loaded
+        % if design is None or design.id is None:
+            if ($.cookie("hueBeeswaxLastDatabase") != null) {
+                $("#id_query-database").val($.cookie("hueBeeswaxLastDatabase"));
+            }
+        % endif
 
         $("#executeQuery").click(function(){
             $("<input>").attr("type","hidden").attr("name","button-submit").attr("value","Execute").appendTo($("#advancedSettingsForm"));
