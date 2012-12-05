@@ -108,6 +108,7 @@ ${layout.menubar(section='saved queries')}
             "bLengthChange": false,
             "bInfo": false,
             "bFilter": false,
+            "aaSorting": [[0, 'asc']],
             "aoColumns": [
                 null,
                 null,

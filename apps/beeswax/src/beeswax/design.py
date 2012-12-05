@@ -32,16 +32,17 @@ from desktop.lib.django_mako import render_to_string
 
 LOG = logging.getLogger(__name__)
 
-SERIALIZATION_VERSION = '0.4.0'
+SERIALIZATION_VERSION = '0.4.1'
 
 
-def hql_query(hql):
-  data_dict = simplejson.loads('{"query": {"email_notify": null, "query": null, "type": 0, "is_parameterized": true}, '
-                               '"functions": [], "VERSION": "0.4.0", "file_resources": [], "settings": []}')
+def hql_query(hql, database='default'):
+  data_dict = simplejson.loads('{"query": {"email_notify": null, "query": null, "type": 0, "is_parameterized": true, "database": "default"}, '
+                               '"functions": [], "VERSION": "0.4.1", "file_resources": [], "settings": []}')
   if not (isinstance(hql, str) or isinstance(hql, unicode)):
     raise Exception('Requires a SQL text query of type <str>, <unicode> and not %s' % type(hql))
 
   data_dict['query']['query'] = _strip_trailing_semicolon(hql)
+  data_dict['query']['database'] = database
   hql_design = HQLdesign()
   hql_design._data_dict = data_dict
 
@@ -57,7 +58,7 @@ class HQLdesign(object):
   want to use "$" natively, but we leave that as an advanced
   option to turn off.
   """
-  _QUERY_ATTRS = [ 'query', 'type', 'is_parameterized', 'email_notify' ]
+  _QUERY_ATTRS = [ 'query', 'type', 'is_parameterized', 'email_notify', 'database' ]
   _SETTINGS_ATTRS = [ 'key', 'value' ]
   _FILE_RES_ATTRS = [ 'type', 'path' ]
   _FUNCTIONS_ATTRS = [ 'name', 'class_name' ]
@@ -114,8 +115,7 @@ class HQLdesign(object):
 
   def get_query_dict(self):
     """get_query_dict() -> QueryDict"""
-    # We construct the mform to use its structure and prefix. We don't actually bind
-    # data to the forms.
+    # We construct the mform to use its structure and prefix. We don't actually bind data to the forms.
     from beeswax.forms import QueryForm
     mform = QueryForm()
     mform.bind()
@@ -136,12 +136,16 @@ class HQLdesign(object):
     """Returns an HQLdesign from the serialized form"""
     dic = simplejson.loads(data)
     if dic['VERSION'] != SERIALIZATION_VERSION:
-      LOG.error('Design version mismatch. Found %s; expect %s' %
-                (dic['VERSION'], SERIALIZATION_VERSION))
-      return None
-    del dic['VERSION']
+      LOG.error('Design version mismatch. Found %s; expect %s' % (dic['VERSION'], SERIALIZATION_VERSION))
 
-    design = HQLdesign.__new__(HQLdesign)
+    # Convert to latest version
+    del dic['VERSION']
+    if 'type' not in dic['query'] or dic['query']['type'] is None:
+      dic['query']['type'] = 0
+    if 'database' not in dic['query']:
+      dic['query']['database'] = 'default'
+
+    design = HQLdesign()
     design._data_dict = dic
     return design
 

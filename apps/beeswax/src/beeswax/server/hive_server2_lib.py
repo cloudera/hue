@@ -24,7 +24,7 @@ from cli_service import TCLIService
 from cli_service.ttypes import TOpenSessionReq, TGetTablesReq, TFetchResultsReq,\
   TStatusCode, TGetResultSetMetadataReq, TGetColumnsReq, TType,\
   TExecuteStatementReq, TGetOperationStatusReq, TFetchOrientation,\
-  TCloseSessionReq
+  TCloseSessionReq, TGetCatalogsReq
 
 from beeswax import conf
 from beeswax.models import Session, HiveServerQueryHandle, HiveServerQueryHistory
@@ -281,6 +281,15 @@ class HiveServerClient:
     return self._client.CloseSession(req)
 
 
+  def get_databases(self):
+    req = TGetCatalogsReq()
+    res = self.call(self._client.GetCatalogs, req)
+
+    results, schema = self.fetch_result(res.operationHandle)
+
+    return HiveServerTRowSet(results.results, schema.schema).cols(('TABLE_CATALOG',))
+
+
   def get_tables(self, database, table_names):
     req = TGetTablesReq(schemaName=database, tableName=table_names)
     res = self.call(self._client.GetTables, req)
@@ -394,7 +403,6 @@ class HiveServerClientCompatible:
     operationHandle = handle.get_rpc_handle()
 
     res = self._client.get_operation_status(operationHandle)
-    print res
     return HiveServerQueryHistory.STATE_MAP[res.operationState]
 
 
@@ -429,6 +437,10 @@ class HiveServerClientCompatible:
 
   def get_log(self, *args, **kwargs):
     return 'No logs retrieval implemented'
+
+
+  def get_databases(self, database, table_names):
+    return [table['TABLE_CAT'] for table in self._client.get_databases()]
 
 
   def get_tables(self, database, table_names):

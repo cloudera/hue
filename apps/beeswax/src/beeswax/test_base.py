@@ -201,7 +201,7 @@ def wait_for_query_to_finish(client, response, max=30.0):
 def make_query(client, query, submission_type="Execute",
                udfs=None, settings=None, resources=None,
                wait=False, name=None, desc=None, local=True,
-               is_parameterized=True, max=30.0, **kwargs):
+               is_parameterized=True, max=30.0, database='default', **kwargs):
   """
   Prepares arguments for the execute view.
 
@@ -217,7 +217,8 @@ def make_query(client, query, submission_type="Execute",
   # Prepares arguments for the execute view.
   parameters = {
     'query-query': query,
-    'query-is_parameterized': is_parameterized and "on"
+    'query-is_parameterized': is_parameterized and "on",
+    'query-database': database,
   }
 
   if submission_type == 'Execute':
@@ -305,6 +306,8 @@ class BeeswaxSampleProvider(object):
     global _INITIALIZED
     if _INITIALIZED:
       return
+
+    make_query(cls.client, 'CREATE DATABASE other_db', wait=True)
 
     data_file = u'/tmp/beeswax/sample_data_échantillon_%d.tsv'
 

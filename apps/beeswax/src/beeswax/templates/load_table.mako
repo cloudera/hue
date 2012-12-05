@@ -17,17 +17,24 @@
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
+
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="util" file="util.mako" />
-${commonheader(_('Load Data into %(table)s') % dict(table=table), app_name, user, '100px')}
+
+${commonheader(_('Load Data into %(table)s') % {'table': table}, app_name, user, '100px')}
+
 ${layout.menubar()}
+
 <div class="container-fluid">
-  <h1>${_('Load Data into %(table)s') % dict(table=table)}</h1>
+  <h1>${_('Load Data into %(table)s') % {'table': table}}</h1>
+
   <div class="prompt_popup">
     <form action="${action}" method="POST">
       <dl>
         ${util.render_field(form["path"])}
-        <a class="hue-chooseFile" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height': 16, 'top': 6, 'left': 6 }" data-chooseFor="path">${_('Open File Chooser')} </a>
+        <a class="hue-chooseFile" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height': 16, 'top': 6, 'left': 6 }" data-chooseFor="path">
+          ${_('Open File Chooser')}
+        </a>
         ## Path (on HDFS) of files to load.
         ${util.render_field(form["overwrite"])}
         ## Any existing data will be erased!
@@ -45,4 +52,5 @@ ${layout.menubar()}
     </form>
   </div>
 </div>
+
 ${commonfooter(messages)}

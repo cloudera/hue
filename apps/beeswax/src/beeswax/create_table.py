@@ -44,12 +44,7 @@ from beeswax.views import execute_directly
 LOG = logging.getLogger(__name__)
 
 
-def index(request):
-  """Main create table entry point, to divert into manual creation vs create from file."""
-  return render("create_table_index.mako", request, {})
-
-
-def create_table(request):
+def create_table(request, database='default'):
   """Create a table by specifying its attributes manually"""
   db = dbms.get(request.user)
 
@@ -68,6 +63,7 @@ def create_table(request):
         partition_columns = [ f.cleaned_data for f in form.partitions.forms ]
         proposed_query = django_mako.render_to_string("create_table_statement.mako",
           {
+            'database': database,
             'table': form.table.cleaned_data,
             'columns': columns,
             'partition_columns': partition_columns
@@ -76,17 +72,18 @@ def create_table(request):
         # Mako outputs bytestring in utf8
         proposed_query = proposed_query.decode('utf-8')
         table_name = form.table.cleaned_data['name']
-        return _submit_create_and_load(request, proposed_query, table_name, None, False)
+        return _submit_create_and_load(request, proposed_query, table_name, None, False, database=database)
   else:
     form.bind()
 
-  return render("create_table_manually.mako", request, dict(
-    action="#",
-    table_form=form.table,
-    columns_form=form.columns,
-    partitions_form=form.partitions,
-    has_tables=len(dbms.get(request.user).get_tables()) > 0
-  ))
+  return render("create_table_manually.mako", request, {
+    'action': "#",
+    'table_form': form.table,
+    'columns_form': form.columns,
+    'partitions_form': form.partitions,
+    'has_tables': len(dbms.get(request.user).get_tables()) > 0,
+    'database': database,
+  })
 
 
 IMPORT_PEEK_SIZE = 8192
@@ -100,7 +97,7 @@ DELIMITER_READABLE = {'\\001' : _('ctrl-As'),
                       ' '     : _('spaces')}
 FILE_READERS = [ ]
 
-def import_wizard(request):
+def import_wizard(request, database='default'):
   """
   Help users define table and based on a file they want to import to Hive.
   Limitations:
@@ -194,16 +191,17 @@ def import_wizard(request):
                                               (s2_delim_form.cleaned_data['delimiter'],))
 
       if do_s2_auto_delim or do_s2_user_delim or cancel_s3_column_def:
-        return render('choose_delimiter.mako', request, dict(
-          action=reverse(app_name + ':import_wizard'),
-          delim_readable=DELIMITER_READABLE.get(s2_delim_form['delimiter'].data[0], s2_delim_form['delimiter'].data[1]),
-          initial=delim_is_auto,
-          file_form=s1_file_form,
-          delim_form=s2_delim_form,
-          fields_list=fields_list,
-          delimiter_choices=TERMINATOR_CHOICES,
-          n_cols=n_cols,
-        ))
+        return render('choose_delimiter.mako', request, {
+          'action': reverse(app_name + ':import_wizard', kwargs={'database': database}),
+          'delim_readable': DELIMITER_READABLE.get(s2_delim_form['delimiter'].data[0], s2_delim_form['delimiter'].data[1]),
+          'initial': delim_is_auto,
+          'file_form': s1_file_form,
+          'delim_form': s2_delim_form,
+          'fields_list': fields_list,
+          'delimiter_choices': TERMINATOR_CHOICES,
+          'n_cols': n_cols,
+          'database': database,
+        })
 
       #
       # Go to step 3: Define column.
@@ -217,14 +215,15 @@ def import_wizard(request):
                 column_type='string',
             ))
           s3_col_formset = ColumnTypeFormSet(prefix='cols', initial=columns)
-        return render('define_columns.mako', request, dict(
-          action=reverse(app_name + ':import_wizard'),
-          file_form=s1_file_form,
-          delim_form=s2_delim_form,
-          column_formset=s3_col_formset,
-          fields_list=fields_list,
-          n_cols=n_cols,
-        ))
+        return render('define_columns.mako', request, {
+          'action': reverse(app_name + ':import_wizard', kwargs={'database': database}),
+          'file_form': s1_file_form,
+          'delim_form': s2_delim_form,
+          'column_formset': s3_col_formset,
+          'fields_list': fields_list,
+          'n_cols': n_cols,
+           'database': database,
+        })
 
       #
       # Finale: Execute
@@ -239,23 +238,25 @@ def import_wizard(request):
                           row_format='Delimited',
                           field_terminator=delim),
             'columns': [ f.cleaned_data for f in s3_col_formset.forms ],
-            'partition_columns': []
+            'partition_columns': [],
+            'database': database,
           }
         )
 
         do_load_data = s1_file_form.cleaned_data.get('do_import')
         path = s1_file_form.cleaned_data['path']
-        return _submit_create_and_load(request, proposed_query, table_name, path, do_load_data)
+        return _submit_create_and_load(request, proposed_query, table_name, path, do_load_data, database=database)
   else:
     s1_file_form = CreateByImportFileForm()
 
-  return render('choose_file.mako', request, dict(
-    action=reverse(app_name + ':import_wizard'),
-    file_form=s1_file_form,
-  ))
+  return render('choose_file.mako', request, {
+    'action': reverse(app_name + ':import_wizard', kwargs={'database': database}),
+    'file_form': s1_file_form,
+    'database': database,
+  })
 
 
-def _submit_create_and_load(request, create_hql, table_name, path, do_load):
+def _submit_create_and_load(request, create_hql, table_name, path, do_load, database):
   """
   Submit the table creation, and setup the load to happen (if ``do_load``).
   """
@@ -265,11 +266,11 @@ def _submit_create_and_load(request, create_hql, table_name, path, do_load):
   if do_load:
     on_success_params['table'] = table_name
     on_success_params['path'] = path
-    on_success_url = reverse(app_name + ':load_after_create')
+    on_success_url = reverse(app_name + ':load_after_create', kwargs={'database': database})
   else:
-    on_success_url = reverse(app_name + ':describe_table', kwargs={'table': table_name})
+    on_success_url = reverse(app_name + ':describe_table', kwargs={'database': database, 'table': table_name})
 
-  query = hql_query(create_hql)
+  query = hql_query(create_hql, database=database)
   return execute_directly(request, query,
                           on_success_url=on_success_url,
                           on_success_params=on_success_params)
@@ -440,7 +441,7 @@ class TextFileReader(object):
 FILE_READERS.append(TextFileReader)
 
 
-def load_after_create(request):
+def load_after_create(request, database):
   """
   Automatically load data into a newly created table.
 
@@ -449,15 +450,16 @@ def load_after_create(request):
   """
   tablename = request.REQUEST.get('table')
   path = request.REQUEST.get('path')
+
   if not tablename or not path:
     msg = _('Internal error: Missing needed parameter to load data into table')
     LOG.error(msg)
     raise PopupException(msg)
 
   LOG.debug("Auto loading data from %s into table %s" % (path, tablename))
-  hql = "LOAD DATA INPATH '%s' INTO TABLE `%s`" % (path, tablename)
+  hql = "LOAD DATA INPATH '%s' INTO TABLE `%s.%s`" % (path, database, tablename)
   query = hql_query(hql)
   app_name = get_app_name(request)
-  on_success_url = reverse(app_name + ':describe_table', kwargs={'table': tablename})
+  on_success_url = reverse(app_name + ':describe_table', kwargs={'database': database, 'table': tablename})
 
   return execute_directly(request, query, on_success_url=on_success_url)

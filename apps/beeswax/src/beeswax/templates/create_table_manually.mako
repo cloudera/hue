@@ -31,11 +31,12 @@ ${layout.menubar(section='tables')}
     <div class="well sidebar-nav">
         <ul class="nav nav-list">
             <li class="nav-header">${_('Actions')}</li>
-            <li><a href="${ url(app_name + ':import_wizard')}">${_('Create a new table from a file')}</a></li>
-            <li><a href="${ url(app_name + ':create_table')}">${_('Create a new table manually')}</a></li>
+            <li><a href="${ url(app_name + ':import_wizard', database=database)}">${_('Create a new table from a file')}</a></li>
+            <li><a href="${ url(app_name + ':create_table', database=database)}">${_('Create a new table manually')}</a></li>
         </ul>
     </div>
 </div>
+
 <div class="span9">
 <ul class="nav nav-pills">
     <li class="active"><a href="#step1" class="step">${_('Step 1: Name')}</a></li>
@@ -45,6 +46,7 @@ ${layout.menubar(section='tables')}
     <li><a href="#step5" class="step">${_('Step 5: Location')}</a></li>
     <li><a href="#step6" class="step">${_('Step 6: Columns')}</a></li>
 </ul>
+
 <form action="#" method="POST" id="mainForm" class="form-horizontal">
 <div class="steps">
 
@@ -478,18 +480,22 @@ $(document).ready(function () {
       $(this).parent().addClass("active");
     }
   });
+
   $("#nextBtn").click(function () {
     $("ul.nav-pills li.active").next().find("a").click();
   });
+
   $("#backBtn").click(function () {
     $("ul.nav-pills li.active").prev().find("a").click();
   });
+
   $("#submit").click(function (event) {
     // validate step 6
-    if (!validateStep6()) {
+    if (! validateStep6()) {
       event.preventDefault();
     }
   });
+
   var _url = location.href;
   if (_url.indexOf("#") > -1) {
     $(".step[href='" + _url.substring(_url.indexOf("#"), _url.length) + "']").click();
@@ -726,4 +732,5 @@ $(document).ready(function () {
   }
 });
 </script>
+
 ${commonfooter(messages)}

@@ -45,7 +45,7 @@ import beeswax.design
 import beeswax.management.commands.beeswax_install_examples
 
 from beeswax import common, data_export, models, conf
-from beeswax.forms import LoadDataForm, QueryForm
+from beeswax.forms import LoadDataForm, QueryForm, DbForm
 from beeswax.design import HQLdesign, hql_query
 from beeswax.models import SavedQuery
 from beeswax.server import dbms
@@ -252,7 +252,7 @@ def list_query_history(request):
                           Default to "-date".
     auto_query=<bool>   - Show auto generated actions (drop table, read data, etc). Default False
   """
-  DEFAULT_PAGE_SIZE = 10
+  DEFAULT_PAGE_SIZE = 20
 
   share_queries = conf.SHARE_SAVED_QUERIES.get() or request.user.is_superuser
 
@@ -277,22 +277,40 @@ def list_query_history(request):
 Table Views
 """
 
-def show_tables(request):
-  tables = dbms.get(request.user).get_tables()
+def show_tables(request, database=None):
+  if database is None:
+    database = request.COOKIES.get('hueBeeswaxLastDatabase', 'default') # Assume always 'default'
+  db = dbms.get(request.user)
+
+  databases = db.get_databases()
+
+  if request.method == 'POST':
+    db_form = DbForm(request.POST, databases=databases)
+    if db_form.is_valid():
+      database = db_form.cleaned_data['database']
+  else:
+    db_form = DbForm(initial={'database': database}, databases=databases)
+
+  tables = db.get_tables(database=database)
   examples_installed = beeswax.models.MetaInstall.get().installed_example
 
-  return render("show_tables.mako", request, dict(tables=tables, examples_installed=examples_installed))
+  return render("show_tables.mako", request, {
+      'tables': tables,
+      'examples_installed': examples_installed,
+      'db_form': db_form,
+      'database': database,
+  })
 
 
-def describe_table(request, table):
+def describe_table(request, database, table):
   db = dbms.get(request.user)
   error_message = ''
   table_data = ''
 
-  table = db.get_table('default', table)
+  table = db.get_table(database, table)
 
   try:
-    table_data = db.get_sample(table)
+    table_data = db.get_sample(database, table)
   except BeeswaxException, ex:
     error_message, logs = expand_exception(ex, db)
 
@@ -303,17 +321,18 @@ def describe_table(request, table):
       'sample': table_data and table_data.rows(),
       'load_form': load_form,
       'error_message': error_message,
+      'database': database,
   })
 
 
-def drop_table(request, table):
+def drop_table(request, database, table):
   db = dbms.get(request.user)
 
-  table = db.get_table('default', table)
+  table = db.get_table(database, table)
 
   if request.method == 'POST':
     try:
-      query_history = db.drop_table(table)
+      query_history = db.drop_table(database, table)
       url = reverse(get_app_name(request) + ':watch_query', args=[query_history.id]) + '?on_success_url=' + reverse(get_app_name(request) + ':show_tables')
       return redirect(url)
     except BeeswaxException, ex:
@@ -328,23 +347,23 @@ def drop_table(request, table):
     return render('confirm.html', request, dict(url=request.path, title=title))
 
 
-def read_table(request, table):
+def read_table(request, database, table):
   db = dbms.get(request.user)
 
-  table = db.get_table('default', table)
+  table = db.get_table(database, table)
 
   try:
-    history = db.select_star_from(table)
+    history = db.select_star_from(database, table)
     get = request.GET.copy()
-    get['context'] = 'table:%s' % table.name
+    get['context'] = 'table:%s:%s' % (table.name, database)
     request.GET = get
     return watch_query(request, history.id)
   except Exception, e:
     raise PopupException(_('Can read table'), detail=e)
 
 
-def load_table(request, table):
-  table_obj = dbms.get(request.user).get_table('default', table)
+def load_table(request, database, table):
+  table_obj = dbms.get(request.user).get_table(database, table)
 
   if request.method == "POST":
     form = beeswax.forms.LoadDataForm(table_obj, request.POST)
@@ -356,7 +375,7 @@ def load_table(request, table):
       if form.cleaned_data['overwrite']:
         hql += " OVERWRITE"
       hql += " INTO TABLE "
-      hql += "`%s`" % (table,)
+      hql += "`%s.%s`" % (database, table,)
       if form.partition_columns:
         hql += " PARTITION ("
         vals = []
@@ -365,21 +384,21 @@ def load_table(request, table):
         hql += ", ".join(vals)
         hql += ")"
 
-      on_success_url = reverse(get_app_name(request) + ':describe_table', kwargs={'table': table})
+      on_success_url = reverse(get_app_name(request) + ':describe_table', kwargs={'database': database, 'table': table})
       return confirm_query(request, hql, on_success_url)
   else:
     form = beeswax.forms.LoadDataForm(table_obj)
-    return render("load_table.mako", request, dict(form=form, table=table, action=request.get_full_path()))
+    return render("load_table.mako", request, {'form': form, 'table': table, 'action': request.get_full_path()})
 
 
-def describe_partitions(request, table):
+def describe_partitions(request, database, table):
   db = dbms.get(request.user)
 
-  table_obj = db.get_table('default', table)
+  table_obj = db.get_table(database, table)
   if not table_obj.partition_keys:
     raise PopupException(_("Table '%(table)s' is not partitioned.") % {'table': table})
 
-  partitions = db.get_partitions("default", table_obj, max_parts=None)
+  partitions = db.get_partitions(database, table_obj, max_parts=None)
 
   return render("describe_partitions.mako", request,
                 dict(table=table_obj, partitions=partitions, request=request))
@@ -420,8 +439,13 @@ def execute_query(request, design_id=None):
   design = safe_get_design(request, query_type, design_id)
   on_success_url = request.REQUEST.get('on_success_url')
 
+  query_server = get_query_server_config(app_name, requires_ddl=False)
+  db = dbms.get(request.user, query_server)
+  databases = ((db, db) for db in db.get_databases())
+
   if request.method == 'POST':
     form.bind(request.POST)
+    form.query.fields['database'].choices =  databases # Could not do it in the form
 
     to_explain = request.POST.has_key('button-explain')
     to_submit = request.POST.has_key('button-submit')
@@ -442,7 +466,6 @@ def execute_query(request, design_id=None):
 
       if to_explain or to_submit:
         query_str = form.query.cleaned_data["query"]
-        query_server = get_query_server_config(app_name, requires_ddl=False)
 
         # (Optional) Parameterization.
         parameterization = get_parameterization(request, query_str, form, design, to_explain)
@@ -459,7 +482,6 @@ def execute_query(request, design_id=None):
         except BeeswaxException, ex:
           print ex.errorCode
           print ex.SQLState
-          db = dbms.get(request.user, query_server)
           error_message, log = expand_exception(ex, db)
   else:
     if design.id is not None:
@@ -469,6 +491,7 @@ def execute_query(request, design_id=None):
     else:
       # New design
       form.bind()
+    form.query.fields['database'].choices = databases # Could not do it in the form
 
   return render('execute.mako', request, {
     'action': action,
@@ -809,12 +832,14 @@ def confirm_query(request, query, on_success_url=None):
   mform = QueryForm()
   mform.bind()
   mform.query.initial = dict(query=query)
+
   return render('execute.mako', request, {
     'form': mform,
     'action': reverse(get_app_name(request) + ':execute_query'),
     'error_message': None,
     'design': None,
     'on_success_url': on_success_url,
+    'design': None,
   })
 
 
@@ -954,8 +979,10 @@ def safe_get_design(request, design_type, design_id=None):
       design = models.SavedQuery.get(design_id, request.user, design_type)
     except models.SavedQuery.DoesNotExist:
       messages.error(request, _('Design does not exist'))
+
   if design is None:
     design = models.SavedQuery(owner=request.user, type=design_type)
+
   return design
 
 def get_parameterization(request, query_str, form, design, is_explain):
@@ -1043,7 +1070,7 @@ def execute_directly(request, query, query_server=None, design=None, tablename=N
   """
   execute_directly(request, query_msg, tablename, design) -> HTTP response for execution
 
-  This method wraps around dbms.execute_directly() to take care of the HTTP response
+  This method wraps around dbms.execute_query() to take care of the HTTP response
   after the execution.
 
     query
@@ -1074,7 +1101,12 @@ def execute_directly(request, query, query_server=None, design=None, tablename=N
   if design is not None:
     authorized_get_design(request, design.id)
 
-  history_obj = dbms.get(request.user, query_server).execute_query(query, design)
+  db = dbms.get(request.user, query_server)
+
+  database = query.query.get('database', 'default')
+  db.use(database)
+
+  history_obj = db.execute_query(query, design)
   watch_url = reverse(get_app_name(request) + ':watch_query', kwargs={'id': history_obj.id})
 
   # Prepare the GET params for the watch_url
@@ -1083,7 +1115,7 @@ def execute_directly(request, query, query_server=None, design=None, tablename=N
   if design:
     get_dict['context'] = make_query_context('design', design.id)
   elif tablename:
-    get_dict['context'] = make_query_context('table', tablename)
+    get_dict['context'] = make_query_context('table', '%s:%s' % (tablename, database))
 
   # (2) on_success_url
   if on_success_url:

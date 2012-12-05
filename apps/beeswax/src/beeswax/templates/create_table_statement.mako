@@ -50,7 +50,7 @@ CREATE \
 % if not table.get("use_default_location", True):
 EXTERNAL \
 % endif
-TABLE `${ table["name"] | n }`
+TABLE `${ '%s.%s' % (database, table["name"]) | n }`
 ${column_list(columns)|n}
 % if table["comment"]:
 COMMENT "${table["comment"] | n}"

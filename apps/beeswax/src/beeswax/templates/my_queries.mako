@@ -176,6 +176,7 @@ ${layout.menubar(section='my queries')}
             "bPaginate": false,
             "bLengthChange": false,
             "bInfo": false,
+            "aaSorting": [[3, 'desc']],
             "aoColumns": [
                 null,
                 null,
@@ -190,6 +191,7 @@ ${layout.menubar(section='my queries')}
             "bPaginate": false,
             "bLengthChange": false,
             "bInfo": false,
+            "aaSorting": [[0, 'desc']],
             "aoColumns": [
                 { "sSortDataType": "dom-sort-value", "sType": "numeric" },
                 null,

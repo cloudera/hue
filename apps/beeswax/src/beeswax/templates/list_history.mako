@@ -92,7 +92,6 @@ ${layout.menubar(section='history')}
             <thead>
               <tr>
                 <th width="10%">${_('Time')}</th>
-                <th width="10%">${_('Query Server')}</th>
                 <th width="15%">${_('Name')}</th>
                 <th width="45%">${_('Query')}</th>
                 <th width="10%">${_('User')}</th>
@@ -115,7 +114,6 @@ ${layout.menubar(section='history')}
               %>
               <tr class="histRow">
                 <td data-sort-value="${time.mktime(query.submission_date.timetuple())}">${query.submission_date.strftime("%x %X")}</td>
-                <td>${query.server_name}</td>
                 <td>${show_saved_query(design, query)}</td>
                 <td>
                   <p>
@@ -157,9 +155,9 @@ ${layout.menubar(section='history')}
                 null,
                 null,
                 null,
-                null,
                 { "bSortable": false }
             ],
+            "aaSorting": [[0, 'desc']],
             "oLanguage": {
                 "sEmptyTable":     "${_('No data available in table')}",
                 "sInfo":           "${_('Showing _START_ to _END_ of _TOTAL_ entries')}",

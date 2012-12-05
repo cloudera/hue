@@ -32,14 +32,14 @@ ${layout.menubar(section='tables')}
             <div class="well sidebar-nav">
                 <ul class="nav nav-list">
                     <li class="nav-header">${_('Actions')}</li>
-                    <li><a href="${ url(app_name + ':import_wizard')}">${_('Create a new table from a file')}</a></li>
-                    <li><a href="${ url(app_name + ':create_table')}">${_('Create a new table manually')}</a></li>
+                    <li><a href="${ url(app_name + ':import_wizard', database=database)}">${_('Create a new table from a file')}</a></li>
+                    <li><a href="${ url(app_name + ':create_table', database=database)}">${_('Create a new table manually')}</a></li>
                 </ul>
             </div>
         </div>
         <div class="span9">
             <ul class="nav nav-pills">
-                <li class="active"><a href="${ url(app_name + ':import_wizard') }">${_('Step 1: Choose File')}</a></li>
+                <li class="active"><a href="${ url(app_name + ':import_wizard', database=database) }">${_('Step 1: Choose File')}</a></li>
                 <li><a id="step2" href="#">${_('Step 2: Choose Delimiter')}</a></li>
                 <li><a href="#">${_('Step 3: Define Columns')}</a></li>
             </ul>

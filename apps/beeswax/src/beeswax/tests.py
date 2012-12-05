@@ -61,11 +61,11 @@ CSV_LINK_PAT = re.compile('/beeswax/download/\d+/csv')
 def _make_query(client, query, submission_type="Execute",
                 udfs=None, settings=None, resources=[],
                 wait=False, name=None, desc=None, local=True,
-                is_parameterized=True, max=30.0, **kwargs):
+                is_parameterized=True, max=30.0, database='default', **kwargs):
   """Wrapper around the real make_query"""
   res = make_query(client, query, submission_type,
                    udfs, settings, resources,
-                   wait, name, desc, local, is_parameterized, max, **kwargs)
+                   wait, name, desc, local, is_parameterized, max, database, **kwargs)
 
   # Should be in the history if it's submitted.
   if submission_type == 'Execute':
@@ -123,17 +123,17 @@ class TestBeeswaxWithHadoop(BeeswaxSampleProvider):
     assert_true("A base for other temporary directories" in response_verbose.content)
 
   def test_describe_partitions(self):
-    response = self.client.get("/beeswax/table/test_partitions/partitions")
+    response = self.client.get("/beeswax/table/default/test_partitions/partitions")
     assert_true("baz_one" in response.content)
     assert_true("boom_two" in response.content)
-    response = self.client.get("/beeswax/table/test/partitions")
+    response = self.client.get("/beeswax/table/default/test/partitions")
     assert_true("is not partitioned." in response.content)
 
   def test_browse_partitions_with_limit(self):
     # Limit to 90
     finish = beeswax.conf.BROWSE_PARTITIONED_TABLE_LIMIT.set_for_testing("90")
     try:
-      response = self.client.get("/beeswax/table/test_partitions")
+      response = self.client.get("/beeswax/table/default/test_partitions")
       assert_true("0x%x" % 89 in response.content, response.content)
       assert_false("0x%x" % 90 in response.content, response.content)
     finally:
@@ -181,18 +181,25 @@ for x in sys.stdin:
     assert_equal("echo", self.db.echo("echo"))
 
     # Table should have been created
-    response = self.client.get("/beeswax/tables")
+    response = self.client.get("/beeswax/tables/")
     assert_true("test" in response.context["tables"])
 
+    # Switch databases
+    response = self.client.get("/beeswax/tables/default")
+    assert_true("test" in response.context["tables"])
+
+    response = self.client.get("/beeswax/tables/not_there")
+    assert_false("test" in response.context["tables"])
+
     # And have detail
-    response = self.client.get("/beeswax/table/test")
+    response = self.client.get("/beeswax/table/default/test")
     assert_true("foo" in response.content)
 
     # Remember the number of history items. Use a generic fragment 'test' to pass verification.
     history_cnt = verify_history(self.client, fragment='test')
 
     # Show table data.
-    response = self.client.get("/beeswax/table/test/read", follow=True)
+    response = self.client.get("/beeswax/table/default/test/read", follow=True)
     response = wait_for_query_to_finish(self.client, response, max=30.0)
     # Note that it may not return all rows at once. But we expect at least 10.
     assert_true(len(response.context['results']) > 10)
@@ -203,7 +210,7 @@ for x in sys.stdin:
     assert_equal(verify_history(self.client, fragment='test'), history_cnt,
                  'Implicit queries should not be saved in the history')
     assert_equal(str(response.context['query_context'][0]), 'table')
-    assert_equal(str(response.context['query_context'][1]), 'test')
+    assert_equal(str(response.context['query_context'][1]), 'test:default')
 
     # Query the data
     # We use a semicolon here for kicks; the code strips it out.
@@ -383,12 +390,12 @@ for x in sys.stdin:
     design_id = response.context["design"].id
 
     # Don't fill out the form
-    response = self.client.post("/beeswax/execute_parameterized/%d" % design_id, { 'query_servers-server': 'default' })
+    response = self.client.post("/beeswax/execute_parameterized/%d" % design_id)
     assert_true("parameterization.mako", response.template)
 
     # Now fill it out
     response = self.client.post("/beeswax/execute_parameterized/%d" % design_id,
-      { "parameterization-x": str(1), "parameterization-y": str(2), 'query_servers-server': 'default' }, follow=True)
+      { "parameterization-x": str(1), "parameterization-y": str(2)}, follow=True)
 
     assert_true("watch_wait.mako" in response.template)
     # Check that substitution happened!
@@ -397,7 +404,7 @@ for x in sys.stdin:
 
     # Check that error handling is reasonable
     response = self.client.post("/beeswax/execute_parameterized/%d" % design_id,
-      { "parameterization-x": "'_this_is_not SQL ", "parameterization-y": str(2), 'query_servers-server': 'default' },
+      { "parameterization-x": "'_this_is_not SQL ", "parameterization-y": str(2) },
       follow=True)
     assert_true("execute.mako" in response.template)
     log = response.context["log"]
@@ -440,7 +447,7 @@ for x in sys.stdin:
                 "selecting from latin1 table should not blow up")
 
     # Describe table should be fine with non-ascii comment
-    response = self.client.get('/beeswax/table/test_utf8')
+    response = self.client.get('/beeswax/table/default/test_utf8')
     assert_equal(response.context['table'].parameters['comment'], self.get_i18n_table_comment())
 
   def _parallel_query_helper(self, i, result_holder, lock, num_tasks):
@@ -536,18 +543,19 @@ for x in sys.stdin:
     nplus_designs = len(resp.context['page'].object_list)
     assert_true(nplus_designs == n_designs, 'Auto design should not show up in list_designs')
 
-    # Test explicit save
+    # Test explicit save and use another DB
     query = 'MORE BOGUS JUNKS FROM test'
-    exe_resp = _make_query(self.client, query, name='rubbish', submission_type='Save')
+    exe_resp = _make_query(self.client, query, name='rubbish', submission_type='Save', database='other_db')
     assert_true("error_message" not in exe_resp.context)
     resp = cli.get('/beeswax/list_designs')
-    assert_true('rubbish' in resp.content)
+    assert_true('rubbish' in resp.content, resp.content)
     nplusplus_designs = len(resp.context['page'].object_list)
     assert_true(nplusplus_designs > nplus_designs)
 
-    # Retrieve that design
+    # Retrieve that design and check correct DB is selected
     design = beeswax.models.SavedQuery.objects.filter(name='rubbish')[0]
     resp = cli.get('/beeswax/execute/%s' % (design.id,))
+    assert_true('selected="selected">other_db</option>' in resp.content)
     assert_similar_pages(resp.content, exe_resp.content)
 
     # Clone the rubbish design
@@ -673,20 +681,20 @@ for x in sys.stdin:
     about whether a table is partitioned.
     """
     # Check that view works
-    resp = self.client.get("/beeswax/table/test/load")
+    resp = self.client.get("/beeswax/table/default/test/load")
     assert_true(resp.context["form"])
 
     # Try the submission
-    resp = self.client.post("/beeswax/table/test/load", dict(path="/tmp/foo", overwrite=True))
-    assert_equal_mod_whitespace("LOAD DATA INPATH '/tmp/foo' OVERWRITE INTO TABLE `test`",
+    resp = self.client.post("/beeswax/table/default/test/load", dict(path="/tmp/foo", overwrite=True))
+    assert_equal_mod_whitespace("LOAD DATA INPATH '/tmp/foo' OVERWRITE INTO TABLE `default.test`",
         resp.context["form"].query.initial["query"])
-    resp = self.client.post("/beeswax/table/test/load", dict(path="/tmp/foo", overwrite=False))
-    assert_equal_mod_whitespace("LOAD DATA INPATH '/tmp/foo' INTO TABLE `test`",
+    resp = self.client.post("/beeswax/table/default/test/load", dict(path="/tmp/foo", overwrite=False))
+    assert_equal_mod_whitespace("LOAD DATA INPATH '/tmp/foo' INTO TABLE `default.test`",
         resp.context["form"].query.initial["query"])
 
     # Try it with partitions
-    resp = self.client.post("/beeswax/table/test_partitions/load", dict(path="/tmp/foo", partition_0="alpha", partition_1="beta"))
-    assert_equal_mod_whitespace("LOAD DATA INPATH '/tmp/foo' INTO TABLE `test_partitions` PARTITION (baz='alpha', boom='beta')",
+    resp = self.client.post("/beeswax/table/default/test_partitions/load", dict(path="/tmp/foo", partition_0="alpha", partition_1="beta"))
+    assert_equal_mod_whitespace("LOAD DATA INPATH '/tmp/foo' INTO TABLE `default.test_partitions` PARTITION (baz='alpha', boom='beta')",
         resp.context["form"].query.initial["query"])
 
 
@@ -788,7 +796,7 @@ for x in sys.stdin:
     self.client.post('/beeswax/install_examples')
 
     # New tables exists
-    resp = self.client.get('/beeswax/tables')
+    resp = self.client.get('/beeswax/tables/')
     assert_true('sample_08' in resp.content)
     assert_true('sample_07' in resp.content)
 
@@ -822,10 +830,10 @@ for x in sys.stdin:
     NOT TESTED/DONE: Validation checks for the inputs.
     """
     # Make sure we get a form
-    resp = self.client.get("/beeswax/create/create_table")
+    resp = self.client.get("/beeswax/create/create_table/default")
     assert_true("Field terminator" in resp.content)
     # Make a submission
-    resp = self.client.post("/beeswax/create/create_table", {
+    resp = self.client.post("/beeswax/create/create_table/default", {
       'table-name': 'my_table',
       'table-comment': 'Yo>>>>dude',  # Make sure escaping is sort of ok.
       'table-row_format': 'Delimited',
@@ -844,7 +852,7 @@ for x in sys.stdin:
     }, follow=True)
 
     assert_equal_mod_whitespace("""
-        CREATE EXTERNAL TABLE `my_table`
+        CREATE EXTERNAL TABLE `default.my_table`
         (
          `my_col` string
         )
@@ -856,11 +864,11 @@ for x in sys.stdin:
           STORED AS TextFile LOCATION "/tmp/foo"
     """, resp.context['query'].query)
 
-    assert_true('on_success_url=%2Fbeeswax%2Ftable%2Fmy_table' in resp.context['fwd_params'])
+    assert_true('on_success_url=%2Fbeeswax%2Ftable%2Fdefault%2Fmy_table' in resp.context['fwd_params'], resp.context['fwd_params'])
 
   def test_create_table_timestamp(self):
     # Check form
-    response = self.client.get('/beeswax/create/create_table')
+    response = self.client.get('/beeswax/create/create_table/default')
     assert_true('<option value="timestamp">timestamp</option>' in response.content, response.content)
 
     # Check creation
@@ -870,14 +878,14 @@ for x in sys.stdin:
     self._make_custom_data_file(filename, [0, 0, 0])
     self._make_table('timestamp_invalid_data', 'CREATE TABLE timestamp_invalid_data (timestamp1 TIMESTAMP)', filename)
 
-    response = self.client.get("/beeswax/table/timestamp_invalid_data")
+    response = self.client.get("/beeswax/table/default/timestamp_invalid_data")
     assert_true('Error!' in response.content, response.content)
 
     # Good format
     self._make_custom_data_file(filename, ['2012-01-01 10:11:30', '2012-01-01 10:11:31'])
     self._make_table('timestamp_valid_data', 'CREATE TABLE timestamp_valid_data (timestamp1 TIMESTAMP)', filename)
 
-    response = self.client.get("/beeswax/table/timestamp_valid_data")
+    response = self.client.get("/beeswax/table/default/timestamp_valid_data")
     assert_true('2012-01-01 10:11:30' in response.content, response.content)
 
   def test_partitioned_create_table(self):
@@ -885,10 +893,10 @@ for x in sys.stdin:
     Test HQL generation of create table with partition columns
     """
     # Make sure we get a form
-    resp = self.client.get("/beeswax/create/create_table")
+    resp = self.client.get("/beeswax/create/create_table/default")
     assert_true("Field terminator" in resp.content)
     # Make a submission
-    resp = self.client.post("/beeswax/create/create_table", {
+    resp = self.client.post("/beeswax/create/create_table/default", {
       'table-name': 'my_table2',
       'table-row_format': 'Delimited',
       'table-field_terminator_0': r'\001',
@@ -908,7 +916,7 @@ for x in sys.stdin:
     }, follow=True)
 
     assert_equal_mod_whitespace("""
-        CREATE TABLE `my_table2`
+        CREATE TABLE `default.my_table2`
         (
          `my_col` string
         )
@@ -928,7 +936,7 @@ for x in sys.stdin:
     """
     Test field dependency in the create table form
     """
-    resp = self.client.post("/beeswax/create/create_table", {
+    resp = self.client.post("/beeswax/create/create_table/default", {
       'table-name': 'my_table',
       'table-row_format': 'SerDe',
       # Missing SerDe fields!
@@ -985,7 +993,7 @@ for x in sys.stdin:
     write_file('/tmp/comma.dat.gz', RAW_FIELDS, ',', do_gzip=True)
 
     # Test auto delim selection
-    resp = self.client.post('/beeswax/create/import_wizard', {
+    resp = self.client.post('/beeswax/create/import_wizard/default', {
       'submit_file': 'on',
       'path': '/tmp/comma.dat',
       'name': 'test_create_import',
@@ -993,7 +1001,7 @@ for x in sys.stdin:
     assert_equal(resp.context['fields_list'], RAW_FIELDS)
 
     # Test same with gzip
-    resp = self.client.post('/beeswax/create/import_wizard', {
+    resp = self.client.post('/beeswax/create/import_wizard/default', {
       'submit_file': 'on',
       'path': '/tmp/comma.dat.gz',
       'name': 'test_create_import',
@@ -1001,7 +1009,7 @@ for x in sys.stdin:
     assert_equal(resp.context['fields_list'], RAW_FIELDS)
 
     # Make sure space works
-    resp = self.client.post('/beeswax/create/import_wizard', {
+    resp = self.client.post('/beeswax/create/import_wizard/default', {
       'submit_preview': 'on',
       'path': '/tmp/spacé.dat',
       'name': 'test_create_import',
@@ -1012,7 +1020,7 @@ for x in sys.stdin:
     assert_equal(len(resp.context['fields_list'][0]), 4)
 
     # Make sure custom delimiters work
-    resp = self.client.post('/beeswax/create/import_wizard', {
+    resp = self.client.post('/beeswax/create/import_wizard/default', {
       'submit_preview': 'on',
       'path': '/tmp/pipes.dat',
       'name': 'test_create_import',
@@ -1023,7 +1031,7 @@ for x in sys.stdin:
     assert_equal(len(resp.context['fields_list'][0]), 3)
 
     # Test column definition
-    resp = self.client.post('/beeswax/create/import_wizard', {
+    resp = self.client.post('/beeswax/create/import_wizard/default', {
       'submit_delim': 'on',
       'path': '/tmp/comma.dat.gz',
       'name': 'test_create_import',
@@ -1035,7 +1043,7 @@ for x in sys.stdin:
     assert_equal(len(resp.context['column_formset'].forms), 3)
 
     # Test table creation and data loading
-    resp = self.client.post('/beeswax/create/import_wizard', {
+    resp = self.client.post('/beeswax/create/import_wizard/default', {
       'submit_create': 'on',
       'path': '/tmp/comma.dat.gz',
       'name': 'test_create_import',
@@ -1058,7 +1066,7 @@ for x in sys.stdin:
     resp = wait_for_query_to_finish(self.client, resp, max=180.0)
 
     # Check data is in the table (by describing it)
-    resp = self.client.get('/beeswax/table/test_create_import')
+    resp = self.client.get('/beeswax/table/default/test_create_import')
     cols = resp.context['table'].cols
     assert_equal(len(cols), 3)
     assert_equal([ col.name for col in cols ], [ 'col_a', 'col_b', 'col_c' ])
@@ -1066,7 +1074,7 @@ for x in sys.stdin:
     assert_true("sp ace</td>" in resp.content)
 
   def test_describe_view(self):
-    resp = self.client.get('/beeswax/table/myview')
+    resp = self.client.get('/beeswax/table/default/myview')
     assert_equal(None, resp.context['sample'])
     assert_true(resp.context['table'].is_view)
     assert_true("View Metadata" in resp.content)
@@ -1075,12 +1083,26 @@ for x in sys.stdin:
 
   def test_select_query_server(self):
     c = make_logged_in_client()
-    _make_query(c, 'SELECT bogus FROM test', server='beeswax') # Improvement: mock another server
+    _make_query(c, 'SELECT bogus FROM test') # Improvement: mock another server
 
     history = beeswax.models.QueryHistory.objects.latest('id')
     assert_equal('beeswax', history.server_name)
     assert_equal('localhost', history.server_host)
     assert_equal(BEESWAXD_TEST_PORT, history.server_port)
+
+
+  def test_select_multi_db(self):
+    response = _make_query(self.client, 'SELECT * FROM test LIMIT 5', local=False, database='default')
+    response = wait_for_query_to_finish(self.client, response)
+    assert_true('Query Results' in response.content, response.content)
+
+    response = _make_query(self.client, 'SHOW TABLES', local=False, database='other_db')
+    response = wait_for_query_to_finish(self.client, response)
+    assert_true('Query Results' in response.content, response.content)
+
+    response = _make_query(self.client, 'SELECT * FROM test LIMIT 5', local=False, database='not_there')
+    response = wait_for_query_to_finish(self.client, response)
+    assert_true('Error' in response.content, response.content)
 
 
 def test_import_gzip_reader():

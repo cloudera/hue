@@ -92,12 +92,16 @@ class Dbms:
     return self.client.get_tables(database, table_names)
 
 
+  def get_databases(self):
+    return self.client.get_databases()
+
+
   def execute_query(self, query, design):
     return self.execute_and_watch(query, design=design)
 
 
-  def select_star_from(self, table):
-    hql = "SELECT * FROM `%s` %s" % (table.name, self._get_browse_limit_clause(table))
+  def select_star_from(self, database, table):
+    hql = "SELECT * FROM `%s.%s` %s" % (database, table.name, self._get_browse_limit_clause(table))
     return self.execute_statement(hql)
 
 
@@ -116,11 +120,11 @@ class Dbms:
     return self.client.fetch(query_handle, start_over, rows)
 
 
-  def get_sample(self, table):
+  def get_sample(self, database, table):
     """No samples if it's a view (HUE-526)"""
     if not table.is_view:
       limit = min(100, BROWSE_PARTITIONED_TABLE_LIMIT.get())
-      hql = "SELECT * FROM `%s` LIMIT %s" % (table.name, limit)
+      hql = "SELECT * FROM `%s.%s` LIMIT %s" % (database, table.name, limit)
       query = hql_query(hql)
       handle = self.execute_and_wait(query, timeout_sec=5.0)
 
@@ -128,13 +132,20 @@ class Dbms:
         return self.fetch(handle)
 
 
-  def drop_table(self, table):
+  def drop_table(self, database, table):
     if table.is_view:
-      hql = "DROP VIEW `%s`" % (table.name,)
+      hql = "DROP VIEW `%s.%s`" % (database, table.name,)
     else:
-      hql = "DROP TABLE `%s`" % (table.name,)
+      hql = "DROP TABLE `%s.%s`" % (database, table.name,)
 
     return self.execute_statement(hql)
+
+
+  def use(self, database):
+    """Beeswax does not support use directly."""
+    if SERVER_INTERFACE.get() == HIVE_SERVER2:
+      query = hql_query('USE %s' % database)
+      return self.execute_and_wait(query)
 
 
   def get_log(self, query_handle):

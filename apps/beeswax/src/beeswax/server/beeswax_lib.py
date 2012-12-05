@@ -109,9 +109,17 @@ class BeeswaxClient:
     self.meta_client = self.meta_client()
 
   def make_query(self, hql_query):
-    thrift_query = BeeswaxService.Query(query=hql_query.query['query'], configuration=hql_query.get_configuration())
+    # HUE-535 without having to modify Beeswaxd, add 'use database' as first option
+    configuration = ['use ' + hql_query.query.get('database', 'default')]
+    configuration.extend(hql_query.get_configuration())
+
+    thrift_query = BeeswaxService.Query(query=hql_query.query['query'], configuration=configuration)
     thrift_query.hadoop_user = self.user.username
     return thrift_query
+
+
+  def get_databases(self, *args, **kwargs):
+    return self.meta_client.get_all_databases()
 
 
   def get_tables(self, *args, **kwargs):

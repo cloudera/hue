@@ -20,12 +20,12 @@ from django.conf.urls.defaults import patterns, url
 urlpatterns = patterns('beeswax.views',
   url(r'^$', 'index', name='index'),
 
-  url(r'^tables$', 'show_tables', name='show_tables'),
-  url(r'^table/(?P<table>\w+)$', 'describe_table', name='describe_table'),
-  url(r'^table/(?P<table>\w+)/partitions$', 'describe_partitions', name='describe_partitions'),
-  url(r'^table/(?P<table>\w+)/load$', 'load_table', name='load_table'),
-  url(r'^table/(?P<table>\w+)/read$', 'read_table', name='read_table'),
-  url(r'^table/(?P<table>\w+)/drop$', 'drop_table', name='drop_table'),
+  url(r'^tables/(?P<database>\w+)?$', 'show_tables', name='show_tables'),
+  url(r'^table/(?P<database>\w+)/(?P<table>\w+)$', 'describe_table', name='describe_table'),
+  url(r'^table/(?P<database>\w+)/(?P<table>\w+)/partitions$', 'describe_partitions', name='describe_partitions'),
+  url(r'^table/(?P<database>\w+)/(?P<table>\w+)/load$', 'load_table', name='load_table'),
+  url(r'^table/(?P<database>\w+)/(?P<table>\w+)/read$', 'read_table', name='read_table'),
+  url(r'^table/(?P<database>\w+)/(?P<table>\w+)/drop$', 'drop_table', name='drop_table'),
 
   url(r'^execute/(?P<design_id>\d+)?$', 'execute_query', name='execute_query'),
   url(r'^explain_parameterized/(?P<design_id>\d+)$', 'explain_parameterized_query', name='explain_parameterized_query'),
@@ -50,8 +50,7 @@ urlpatterns = patterns('beeswax.views',
 urlpatterns += patterns(
   'beeswax.create_table',
 
-  url(r'^create$', 'index'),
-  url(r'^create/create_table$', 'create_table', name='create_table'),
-  url(r'^create/import_wizard$', 'import_wizard', name='import_wizard'),
-  url(r'^create/auto_load$', 'load_after_create', name='load_after_create'),
+  url(r'^create/create_table/(?P<database>\w+)$', 'create_table', name='create_table'),
+  url(r'^create/import_wizard/(?P<database>\w+)$', 'import_wizard', name='import_wizard'),
+  url(r'^create/auto_load/(?P<database>\w+)$', 'load_after_create', name='load_after_create'),
 )

@@ -25,87 +25,100 @@ ${layout.menubar(section='tables')}
 
 
 <div class="container-fluid">
-	<h1>${_('Table List')}</h1>
-	<div class="row-fluid">
-		<div class="span3">
-			<div class="well sidebar-nav">
-				<ul class="nav nav-list">
-					<li class="nav-header">${_('Actions')}</li>
-					% if not examples_installed:
-		        	<li><a href="#installSamples" data-toggle="modal">${_('Install samples')}</a></li>
-		      		% endif
-		      		<li><a href="${ url(app_name + ':import_wizard') }">${_('Create a new table from a file')}</a></li>
-					<li><a href="${ url(app_name + ':create_table') }">${_('Create a new table manually')}</a></li>
-				</ul>
-			</div>
-		</div>
-		<div class="span9">
-			<table class="table table-condensed table-striped datatables">
-				<thead>
-					<tr>
-						<th>${_('Table Name')}</th>
-						<th>&nbsp;</th>
-					</tr>
-				</thead>
-				<tbody>
-				% for table in tables:
-					<tr>
-						<td>
-							<a href="${ url(app_name + ':describe_table', table=table) }" data-row-selector="true">${ table }</a>
-						</td>
-						<td><a href="${ url(app_name + ':read_table', table=table) }" class="btn">${_('Browse Data')}</a></td>
-					</tr>
-				% endfor
-				</tbody>
-			</table>
-		</div>
-	</div>
+    <h1>${_('Table List')}</h1>
+    <div class="row-fluid">
+        <div class="span3">
+            <div class="well sidebar-nav">
+                <ul class="nav nav-list">
+                    <li class="nav-header">${_('database')}</li>
+                    <li>
+                       <form action="${ url(app_name + ':show_tables') }" id="db_form" method="POST">
+                         ${ db_form }
+                       </form>
+                    </li>
+                    <li class="nav-header">${_('Actions')}</li>
+                    % if not examples_installed:
+                    <li><a href="#installSamples" data-toggle="modal">${_('Install samples')}</a></li>
+                      % endif
+                      <li><a href="${ url(app_name + ':import_wizard', database=database) }">${_('Create a new table from a file')}</a></li>
+                    <li><a href="${ url(app_name + ':create_table', database=database) }">${_('Create a new table manually')}</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="span9">
+            <table class="table table-condensed table-striped datatables">
+                <thead>
+                    <tr>
+                        <th>${_('Table Name')}</th>
+                        <th>&nbsp;</th>
+                    </tr>
+                </thead>
+                <tbody>
+                % for table in tables:
+                    <tr>
+                        <td>
+                            <a href="${ url(app_name + ':describe_table', database=database, table=table) }" data-row-selector="true">${ table }</a>
+                        </td>
+                        <td><a href="${ url(app_name + ':read_table', database=database, table=table) }" class="btn">${_('Browse Data')}</a></td>
+                    </tr>
+                % endfor
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
 
 
 % if not examples_installed:
 <div id="installSamples" class="modal hide fade">
-	<div class="modal-header">
-		<a href="#" class="close" data-dismiss="modal">&times;</a>
-		<h3>${_('Install samples')}</h3>
-	</div>
-	<div class="modal-body">
-	  <div id="installSamplesMessage">
+    <div class="modal-header">
+        <a href="#" class="close" data-dismiss="modal">&times;</a>
+        <h3>${_('Install samples')}</h3>
+    </div>
+    <div class="modal-body">
+      <div id="installSamplesMessage">
 
-	  </div>
-	</div>
-	<div class="modal-footer">
-		<a href="#" class="btn" data-dismiss="modal">${_('Cancel')}</a>
-		<a href="#" id="installSamplesBtn" class="btn btn-primary">${_('Yes, install samples')}</a>
-	</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+        <a href="#" class="btn" data-dismiss="modal">${_('Cancel')}</a>
+        <a href="#" id="installSamplesBtn" class="btn btn-primary">${_('Yes, install samples')}</a>
+    </div>
 </div>
 % endif
 
+<script src="/static/ext/js/jquery/plugins/jquery.cookie.js"></script>
+
 <script type="text/javascript" charset="utf-8">
-	$(document).ready(function(){
-		$(".datatables").dataTable({
-			"bPaginate": false,
-		    "bLengthChange": false,
-			"bInfo": false,
-			"bFilter": false,
-			"aoColumns": [
-				null,
-				{ "sWidth": "130px", "bSortable" : false }
-			 ]
-		});
+    $(document).ready(function(){
+        $(".datatables").dataTable({
+            "bPaginate": false,
+            "bLengthChange": false,
+            "bInfo": false,
+            "bFilter": false,
+            "aoColumns": [
+                null,
+                { "sWidth": "130px", "bSortable" : false }
+             ]
+        });
 
-		$("a[data-row-selector='true']").jHueRowSelector();
+        $("a[data-row-selector='true']").jHueRowSelector();
 
-		% if not examples_installed:
-		$.getJSON("${ url(app_name + ':install_examples') }",function(data){
-			$("#installSamplesMessage").text(data.title);
-		});
+        $("#id_database").change(function(){
+             $.cookie("hueBeeswaxLastDatabase", $(this).val(), {expires: 90});
+             $('#db_form').submit();
+        });
+
+        % if not examples_installed:
+        $.getJSON("${ url(app_name + ':install_examples') }", function(data){
+            $("#installSamplesMessage").text(data.title);
+        });
 
         $("#installSamplesBtn").click(function(){
             $.post(
                 "${ url(app_name + ':install_examples') }",
-                { submit:"Submit" },
+                { submit: "Submit" },
                 function(result){
                     if (result.creationSucceeded){
                         window.location.href = "${ url(app_name + ':show_tables') }";
@@ -117,8 +130,8 @@ ${layout.menubar(section='tables')}
                 }
             );
         });
-		% endif
-	});
+        % endif
+    });
 </script>
 
 ${commonfooter(messages)}
