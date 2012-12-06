@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-09-11 13:36-0700\n"
+"POT-Creation-Date: 2012-12-05 21:32-0800\n"
 "PO-Revision-Date: 2012-07-30 18:56-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -17,14 +17,13 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/shell/shellmanager.py:147
-#, python-format
-msgid "bin/hadoop return non-zero %(retcode)d while trying to merge credentials"
+#: src/shell/shellmanager.py:153
+#, fuzzy, python-format
+msgid "bin/hadoop return non-zero %(retcode)d while trying to merge credentials."
 msgstr "尝试合并凭据期间，bin/hadoop 返回了非零 %(retcode)d。"
 
 #: src/shell/templates/failed_to_create.mako:21
-#: src/shell/templates/index.mako:22 src/shell/templates/index.mako:24
-#: src/shell/templates/no_such_user.mako:21
+#: src/shell/templates/index.mako:22 src/shell/templates/no_such_user.mako:21
 #: src/shell/templates/not_running_spawning.mako:21
 msgid "Hue Shell"
 msgstr "Hue Shell"
@@ -55,26 +54,29 @@ msgstr "不存在该名称的 shell。"
 msgid "There is no Unix user account for you."
 msgstr "您没有 Unix 用户帐户。"
 
-#: src/shell/templates/index.mako:111
-msgid "Please select one of the available shells from the toolbar above."
+#: src/shell/templates/index.mako:86
+#, fuzzy
+msgid "Select one of the available shells from the toolbar above."
 msgstr "请从上面的工具栏中选择其中一个可用 shell。"
 
-#: src/shell/templates/index.mako:113
+#: src/shell/templates/index.mako:88
 msgid ""
 "You do not have permission to access any shell or there is no configured "
 "shell."
 msgstr "您无权访问任何 shell，或者不存在配置 shell。"
 
 #: src/shell/templates/no_such_user.mako:24
+#, fuzzy
 msgid ""
 "The Shell application requires a Unix user account for every user of Hue "
-"on the remote webserver."
+"on the remote web server."
 msgstr "对于远程 Web 服务器上的每个 Hue 用户，Shell 应用程序都需要一个 Unix 用户帐户。"
 
 #: src/shell/templates/no_such_user.mako:26
+#, fuzzy
 msgid ""
-"Please ask your administrator to create a user account for you on the "
-"remote webserver as described in the Shell documentation."
+"Ask your administrator to create a user account for you on the remote web"
+" server as described in the Shell documentation."
 msgstr "请要求您的管理员根据 Shell 文档中的描述，为您在远程 Web 服务器上创建一个用户帐户。"
 
 #: src/shell/templates/not_running_spawning.mako:24

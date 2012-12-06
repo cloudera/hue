@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-09-11 13:35-0700\n"
+"POT-Creation-Date: 2012-12-05 21:32-0800\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -17,19 +17,203 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/about/templates/index.mako:20
-msgid "About Hue"
-msgstr "Hue 정보"
+#: src/impala/conf.py:25
+msgid "Host of the Impala Server."
+msgstr ""
 
-#: src/about/templates/index.mako:25
-msgid "Configuration"
-msgstr "구성"
+#: src/impala/conf.py:31
+msgid "Port of the Impala Server."
+msgstr ""
 
-#: src/about/templates/index.mako:26
-msgid "Check for misconfiguration"
-msgstr "잘못된 구성 검사"
+#: src/impala/templates/beeswax_components.mako:198
+msgid "Beginning of List"
+msgstr ""
 
-#: src/about/templates/index.mako:27
-msgid "Server Logs"
+#: src/impala/templates/beeswax_components.mako:199
+msgid "Previous Page"
+msgstr ""
+
+#: src/impala/templates/beeswax_components.mako:200
+msgid "Next page"
+msgstr ""
+
+#: src/impala/templates/beeswax_components.mako:200
+msgid "Next Page"
+msgstr ""
+
+#: src/impala/templates/beeswax_components.mako:201
+msgid "End of List"
+msgstr ""
+
+#: src/impala/templates/beeswax_components.mako:203
+#, python-format
+msgid ""
+"Showing %(start)s to %(end)s of %(count)s items, page %(page)s of "
+"%(pages)s"
+msgstr ""
+
+#: src/impala/templates/execute.mako:26 src/impala/templates/layout.mako:34
+msgid "Query Editor"
+msgstr ""
+
+#: src/impala/templates/execute.mako:35
+msgid "Query 2"
+msgstr ""
+
+#: src/impala/templates/execute.mako:40
+msgid "Example: SELECT * FROM tablename"
+msgstr ""
+
+#: src/impala/templates/execute.mako:51
+msgid "Execute"
+msgstr ""
+
+#: src/impala/templates/execute.mako:53 src/impala/templates/execute.mako:289
+msgid "Save"
+msgstr ""
+
+#: src/impala/templates/execute.mako:55
+msgid "Save as..."
+msgstr ""
+
+#: src/impala/templates/execute.mako:56
+msgid "Explain"
+msgstr ""
+
+#: src/impala/templates/execute.mako:57
+msgid "or create a"
+msgstr ""
+
+#: src/impala/templates/execute.mako:57
+msgid "New query"
+msgstr ""
+
+#: src/impala/templates/execute.mako:62 src/impala/templates/execute.mako:217
+msgid "Query"
+msgstr ""
+
+#: src/impala/templates/execute.mako:71
+msgid "Query server"
+msgstr ""
+
+#: src/impala/templates/execute.mako:75
+msgid "settings"
+msgstr ""
+
+#: src/impala/templates/execute.mako:82 src/impala/templates/execute.mako:117
+#: src/impala/templates/execute.mako:152
+msgid "Delete this setting"
+msgstr ""
+
+#: src/impala/templates/execute.mako:107 src/impala/templates/execute.mako:142
+#: src/impala/templates/execute.mako:177
+msgid "Add"
+msgstr ""
+
+#: src/impala/templates/execute.mako:110
+msgid "File Resources"
+msgstr ""
+
+#: src/impala/templates/execute.mako:145
+msgid "User-defined Functions"
+msgstr ""
+
+#: src/impala/templates/execute.mako:160
+msgid "myFunction"
+msgstr ""
+
+#: src/impala/templates/execute.mako:180
+msgid "Parameterization"
+msgstr ""
+
+#: src/impala/templates/execute.mako:182
+msgid ""
+"If checked (the default), you can include parameters like $parameter_name"
+" in your query, and users will be prompted for a value when the query is "
+"run."
+msgstr ""
+
+#: src/impala/templates/execute.mako:184
+msgid "Enable Parameterization"
+msgstr ""
+
+#: src/impala/templates/execute.mako:187
+msgid "Email Notification"
+msgstr ""
+
+#: src/impala/templates/execute.mako:189
+msgid ""
+"If checked, you will receive an email notification when the query "
+"completes."
+msgstr ""
+
+#: src/impala/templates/execute.mako:191
+msgid "Email me on completion"
+msgstr ""
+
+#: src/impala/templates/execute.mako:202
+msgid "Your query has the following error(s):"
+msgstr ""
+
+#: src/impala/templates/execute.mako:205
+msgid "click the"
+msgstr ""
+
+#: src/impala/templates/execute.mako:205 src/impala/templates/execute.mako:223
+#, fuzzy
+msgid "Error Log"
 msgstr "서버 로그"
+
+#: src/impala/templates/execute.mako:205
+msgid "tab below for details"
+msgstr ""
+
+#: src/impala/templates/execute.mako:256
+msgid "Choose a file"
+msgstr ""
+
+#: src/impala/templates/execute.mako:269
+msgid "Choose a name"
+msgstr ""
+
+#: src/impala/templates/execute.mako:274
+msgid "Name"
+msgstr ""
+
+#: src/impala/templates/execute.mako:280
+msgid "Description"
+msgstr ""
+
+#: src/impala/templates/execute.mako:288
+msgid "Cancel"
+msgstr ""
+
+#: src/impala/templates/layout.mako:35
+msgid "My Queries"
+msgstr ""
+
+#: src/impala/templates/layout.mako:36
+msgid "Saved Queries"
+msgstr ""
+
+#: src/impala/templates/layout.mako:37
+msgid "History"
+msgstr ""
+
+#: src/impala/templates/layout.mako:38
+msgid "Tables"
+msgstr ""
+
+#: src/impala/templates/layout.mako:39
+msgid "Settings"
+msgstr ""
+
+#~ msgid "About Hue"
+#~ msgstr "Hue 정보"
+
+#~ msgid "Configuration"
+#~ msgstr "구성"
+
+#~ msgid "Check for misconfiguration"
+#~ msgstr "잘못된 구성 검사"
 
