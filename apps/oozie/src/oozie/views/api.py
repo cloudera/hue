@@ -26,6 +26,7 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions import StructuredException
 
+from oozie.forms import WorkflowForm, design_form_by_type
 from oozie.models import Workflow, Node, Link, NODE_TYPES, ACTION_TYPES
 from oozie.decorators import check_job_access_permission, check_job_edition_permission
 from oozie.utils import model_to_dict
@@ -34,54 +35,43 @@ from oozie.utils import model_to_dict
 LOG = logging.getLogger(__name__)
 
 
-def validate_json_node(json):
-  assert 'id' in json, "Member 'id' not in node."
-  assert 'node_type' in json, "Member 'node_type' not in node."
-  if json['node_type'] in ACTION_TYPES.keys():
-    assert 'name' in json, "Member 'name' not in node."
-    # assert 'description' in json, "Member 'description' not in node."
-  if 'child_links' not in json:
-    raise AssertionError("Member 'child_links' is missing.")
-
-  validate_json_links(json['child_links'])
+JSON_FIELDS = ('parameters', 'job_properties', 'files', 'archives', 'prepares', 'params')
+def format_field_value(field, value):
+  if field in JSON_FIELDS:
+    if not isinstance(value, basestring):
+      return json.dumps(value)
+  return value
 
 
-def validate_json_nodes(json):
-  if not isinstance(json, list):
-    raise AssertionError("Member 'nodes' is not a list.")
-
-  for node in json:
-    validate_json_node(node)
+def format_dict_field_values(dictionary):
+  for key in dictionary:
+    dictionary[key] = format_field_value(key, dictionary[key])
+  return dictionary
 
 
-def validate_json_link(json):
-  assert 'name' in json, "Member 'name' not in link."
-  assert 'comment' in json, "Member 'comment' not in link."
-  assert 'parent' in json, "Member 'parent' not in link."
-  assert 'child' in json, "Member 'child' not in link."
+def workflow_validate_action_json(node_type, node_dict, errors={}):
+  """
+  Validates a single action.
+  node_type is the node type of the action information passed.
+  node_dict is a dictionary describing the node.
+  errors is a dictionary that will be populated with any found errors.
+  Returns Boolean.
+  """
+  assert isinstance(errors, dict), "errors must be a dict."
+  form_class = design_form_by_type(node_type)
+  form = form_class(data=node_dict)
 
+  if form.is_valid():
+    for field in form.fields:
+      errors[field] = []
 
-def validate_json_links(json):
-  if not isinstance(json, list):
-    raise AssertionError("Member 'child_links' is not a list.")
+    return True
 
-  for node in json:
-    validate_json_link(node)
+  else:
+    for field in form.fields:
+      errors[field] = form[field].errors
 
-
-def validate_json_workflow(json):
-  assert 'name' in json, "Member 'name' not in link."
-  assert 'description' in json, "Member 'description' not in link."
-  assert 'job_properties' in json, "Member 'job_properties' not in link."
-  assert 'parameters' in json, "Member 'parameters' not in link."
-  assert 'is_shared' in json, "Member 'is_shared' not in link."
-  assert 'job_xml' in json, "Member 'job_xml' not in link."
-  assert 'deployment_dir' in json, "Member 'deployment_dir' not in link."
-
-  if 'nodes' not in json:
-    raise AssertionError(_("Member 'nodes' is missing."))
-
-  validate_json_nodes(json['nodes'])
+    return False
 
 
 def get_or_create_node(workflow, node_data):
@@ -107,10 +97,7 @@ def update_workflow(json_workflow):
 
   for key in json_workflow:
     if key not in ('nodes', 'start', 'end'):
-      if key in ('parameters', 'job_properties', 'files', 'archives', 'prepares', 'params'):
-        setattr(workflow, key, json.dumps(json_workflow[key]))
-      else:
-        setattr(workflow, key, json_workflow[key])
+      setattr(workflow, key, json_workflow[key])
 
   workflow.save()
 
@@ -118,7 +105,11 @@ def update_workflow(json_workflow):
 
 
 def update_workflow_nodes(workflow, json_nodes, id_map):
-  validate_json_nodes(json_nodes)
+  for json_node in json_nodes:
+    errors = {}
+    if json_node['node_type'] in ACTION_TYPES and not workflow_validate_action_json(json_node['node_type'], format_dict_field_values(json_node), errors):
+      raise StructuredException(code="INVALID_REQUEST_ERROR", message=_('Invalid action'), data={'errors': errors}, error_code=400)
+
   nodes = []
 
   for json_node in json_nodes:
@@ -130,13 +121,7 @@ def update_workflow_nodes(workflow, json_nodes, id_map):
 
     for key in json_node:
       if key not in ('node_ptr', 'child_nodes', 'workflow', 'id'):
-        if key in ('parameters', 'job_properties', 'files', 'archives', 'prepares', 'params'):
-          if isinstance(json_node[key], basestring):
-            setattr(node, key, json_node[key])
-          else:
-            setattr(node, key, json.dumps(json_node[key]))
-        else:
-          setattr(node, key, json_node[key])
+        setattr(node, key, format_field_value(key, json_node[key]))
 
     node.workflow = workflow
     node.save()
@@ -154,16 +139,31 @@ def update_workflow_nodes(workflow, json_nodes, id_map):
   return nodes
 
 
+@check_job_access_permission(exception_class=(lambda x: StructuredException(code="UNAUTHORIZED_REQUEST_ERROR", message=x, data=None, error_code=401)))
+@check_job_edition_permission(exception_class=(lambda x: StructuredException(code="UNAUTHORIZED_REQUEST_ERROR", message=x, data=None, error_code=401)))
+def workflow_validate_action(request, workflow, node_type):
+  response = {'status': -1, 'data': {}}
+
+  action_dict = format_dict_field_values(json.loads(str(request.POST.get('node'))))
+
+  if workflow_validate_action_json(node_type, action_dict, response['data']):
+    response['status'] = 0
+  else:
+    response['status'] = -1
+
+  return HttpResponse(json.dumps(response), mimetype="application/json")
+
+
 # Workflow and child links are SPECIAL.
 @check_job_access_permission(exception_class=(lambda x: StructuredException(code="UNAUTHORIZED_REQUEST_ERROR", message=x, data=None, error_code=401)))
 @check_job_edition_permission(exception_class=(lambda x: StructuredException(code="UNAUTHORIZED_REQUEST_ERROR", message=x, data=None, error_code=401)))
 def workflow_save(request, workflow):
-  json_workflow = json.loads(str(request.POST.get('workflow')))
+  json_workflow = format_dict_field_values(json.loads(str(request.POST.get('workflow'))))
+  json_workflow.setdefault('schema_version', workflow.schema_version)
 
-  try:
-    validate_json_workflow(json_workflow)
-  except AssertionError, e:
-    raise StructuredException(code="INVALID_REQUEST_ERROR", message=_('Error saving workflow'), data={'more': str(e)}, error_code=400)
+  form = WorkflowForm(data=json_workflow)
+  if not form.is_valid():
+    raise StructuredException(code="INVALID_REQUEST_ERROR", message=_('Error saving workflow'), data={'errors': form.errors}, error_code=400)
 
   json_nodes = json_workflow['nodes']
   id_map = {}

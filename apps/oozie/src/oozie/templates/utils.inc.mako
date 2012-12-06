@@ -184,6 +184,24 @@
 </%def>
 
 
+<%def name="render_field_with_error_js(field, error_name, show_label=True, extra_attrs={})">
+  % if not field.is_hidden:
+    <div class="control-group" rel="popover" data-original-title="${ field.label }" data-content="${ field.help_text }" data-bind="attr: {'class': ( errors.${ error_name }().length > 0 ) ? 'control-group error' : 'control-group'}">
+      % if show_label:
+        <label class="control-label">${ field.label | h }</label>
+      % endif
+      <div class="controls">
+        <% field.field.widget.attrs.update(extra_attrs) %>
+        ${ field }
+        <ul class="help-inline" data-bind="foreach: errors.${ error_name }()">
+          <li class="error" data-bind="html: $data"></li>
+        </ul>
+      </div>
+    </div>
+  %endif
+</%def>
+
+
 <%def name="render_constant(label, value)">
   <div class="control-group">
     <label class="control-label">${ label | h }</label>

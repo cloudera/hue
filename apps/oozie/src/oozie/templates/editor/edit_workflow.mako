@@ -552,20 +552,38 @@ var workflow = new Workflow({
   model: workflow_model,
   registry: registry
 });
-var modal = new Modal("#node-modal");
+var modal = new Modal($('#node-modal'));
 workflow.load();
 
 $('#workflow').on('click', '.edit-node-link', function(e) {
-  var context = ko.contextFor(this).$data;
-  modal.setTemplate(context.edit_template);
-  modal.show(context);
+  var node = ko.contextFor(this).$data;
+  var backup = ko.mapping.toJS(node);
+  normalize_model_fields(backup);
+
+  modal.setTemplate(node.edit_template);
+  modal.show(node);
   modal.recenter(280, 250);
   modal.addDecorations();
-});
 
-$('.doneButton').live('click', function(){
-  workflow.model.is_dirty = true;
-})
+  var cancel_edit = function(e) {
+    ko.mapping.fromJS(backup, node);
+    modal.hide();
+
+    // Prevent event propagation
+    return false;
+  };
+
+  var try_save = function(e) {
+    if (node.validate()) {
+      workflow.model.is_dirty = true;
+      modal.hide();
+    }
+  };
+
+  $('.modal-backdrop').on('click', cancel_edit);
+  modal.el.on('click', '.close', cancel_edit);
+  modal.el.on('click', '.doneButton', try_save);
+});
 
 $('#workflow').on('click', '.new-node-link', function(e) {
   var node_type = $(this).attr('data-node-type');
@@ -575,22 +593,40 @@ $('#workflow').on('click', '.new-node-link', function(e) {
     id: IdGeneratorTable[node_type].nextId(),
     node_type: node_type
   });
-  var node = new Node(self, model, registry);
+  var node = new Node(workflow, model, registry);
 
   self.registry.add(model.id, node);
-
-  workflow.nodes()[workflow.nodes().length - 2].append(node);
-
-  $('#workflow').trigger('workflow:rebuild');
 
   modal.setTemplate(template);
   modal.show(node);
   modal.recenter(280, 250);
   modal.addDecorations();
+
+  var cancel_edit = function(e) {
+    // Didn't save, erase node.
+    node.erase();
+    modal.hide();
+  };
+
+  var try_save = function(e) {
+    if (node.validate()) {
+      workflow.model.is_dirty = true;
+      modal.hide();
+      // save, add node to workflow.
+      workflow.nodes()[workflow.nodes().length - 2].append(node);
+      $('#workflow').trigger('workflow:rebuild');
+    }
+  };
+
+  $('.modal-backdrop').on('click', cancel_edit);
+  modal.el.on('click', '.close', cancel_edit);
+  modal.el.on('click', '.doneButton', try_save);
+
+  workflow.model.is_dirty = true;
 });
 
 ko.bindingHandlers.fileChooser = {
-    init: function(element, valueAccessor, allBindings, model) {
+  init: function(element, valueAccessor, allBindings, model) {
     var self = $(element);
     self.after(getFileBrowseButton(self));
   }

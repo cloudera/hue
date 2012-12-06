@@ -57,6 +57,7 @@ urlpatterns += patterns(
 
   url(r'^workflows/(?P<workflow>\d+)$', 'workflow', name='workflow'),
   url(r'^workflows/(?P<workflow>\d+)/save$', 'workflow_save', name='workflow_save'),
+  url(r'^workflows/(?P<workflow>\d+)/actions/(?P<node_type>\w+)/validate$', 'workflow_validate_action', name='workflow_validate_action'),
 )
 
 

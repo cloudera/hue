@@ -339,6 +339,85 @@ class TestAPI(OozieMockBase):
 
     assert_equal(0, test_response_json_object['status'])
 
+  def test_workflow_validate_action(self):
+    data = {"files":"[\"hive-site.xml\"]","job_xml":"hive-site.xml","description":"Show databases","workflow":17,"child_links":[{"comment":"","name":"ok","id":106,"parent":76,"child":74},{"comment":"","name":"error","id":107,"parent":76,"child":73}],"job_properties":"[{\"name\":\"oozie.hive.defaults\",\"value\":\"hive-site.xml\"}]","node_type":"hive","params":"[{\"value\":\"INPUT=/user/hue/oozie/workspaces/data\",\"type\":\"param\"}]","archives":"[]","node_ptr":76,"prepares":"[]","script_path":"hive.sql","id":76,"name":"Hive"}
+    response = self.c.post(reverse('oozie:workflow_validate_action', kwargs={'workflow': self.wf.pk, 'node_type': 'hive'}), data={'node': json.dumps(data)}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+    test_response_json = response.content
+    test_response_json_object = json.loads(test_response_json)
+
+    assert_equal(0, test_response_json_object['status'])
+    assert_true('name' in test_response_json_object['data'], test_response_json_object['data'])
+    assert_equal(0, len(test_response_json_object['data']['name']), test_response_json_object['data'])
+    assert_true('description' in test_response_json_object['data'], test_response_json_object['data'])
+    assert_equal(0, len(test_response_json_object['data']['description']), test_response_json_object['data'])
+    assert_true('script_path' in test_response_json_object['data'], test_response_json_object['data'])
+    assert_equal(0, len(test_response_json_object['data']['script_path']), test_response_json_object['data'])
+    assert_true('job_xml' in test_response_json_object['data'], test_response_json_object['data'])
+    assert_equal(0, len(test_response_json_object['data']['job_xml']), test_response_json_object['data'])
+    assert_true('job_properties' in test_response_json_object['data'], test_response_json_object['data'])
+    assert_equal(0, len(test_response_json_object['data']['job_properties']), test_response_json_object['data'])
+    assert_true('files' in test_response_json_object['data'], test_response_json_object['data'])
+    assert_equal(0, len(test_response_json_object['data']['files']), test_response_json_object['data'])
+    assert_true('params' in test_response_json_object['data'], test_response_json_object['data'])
+    assert_equal(0, len(test_response_json_object['data']['params']), test_response_json_object['data'])
+    assert_true('prepares' in test_response_json_object['data'], test_response_json_object['data'])
+    assert_equal(0, len(test_response_json_object['data']['prepares']), test_response_json_object['data'])
+    assert_true('archives' in test_response_json_object['data'], test_response_json_object['data'])
+    assert_equal(0, len(test_response_json_object['data']['archives']), test_response_json_object['data'])
+
+  def test_workflow_validate_action_fail(self):
+    # Empty files field
+    data = {"job_xml":"hive-site.xml","description":"Show databases","workflow":17,"child_links":[{"comment":"","name":"ok","id":106,"parent":76,"child":74},{"comment":"","name":"error","id":107,"parent":76,"child":73}],"job_properties":"[{\"name\":\"oozie.hive.defaults\",\"value\":\"hive-site.xml\"}]","node_type":"hive","params":"[{\"value\":\"INPUT=/user/hue/oozie/workspaces/data\",\"type\":\"param\"}]","archives":"[]","node_ptr":76,"prepares":"[]","script_path":"hive.sql","id":76,"name":"Hive"}
+    response = self.c.post(reverse('oozie:workflow_validate_action', kwargs={'workflow': self.wf.pk, 'node_type': 'hive'}), data={'node': json.dumps(data)}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+    test_response_json = response.content
+    test_response_json_object = json.loads(test_response_json)
+
+    assert_equal(-1, test_response_json_object['status'])
+    assert_true('name' in test_response_json_object['data'], test_response_json_object['data'])
+    assert_equal(0, len(test_response_json_object['data']['name']), test_response_json_object['data'])
+    assert_true('description' in test_response_json_object['data'], test_response_json_object['data'])
+    assert_equal(0, len(test_response_json_object['data']['description']), test_response_json_object['data'])
+    assert_true('script_path' in test_response_json_object['data'], test_response_json_object['data'])
+    assert_equal(0, len(test_response_json_object['data']['script_path']), test_response_json_object['data'])
+    assert_true('job_xml' in test_response_json_object['data'], test_response_json_object['data'])
+    assert_equal(0, len(test_response_json_object['data']['job_xml']), test_response_json_object['data'])
+    assert_true('job_properties' in test_response_json_object['data'], test_response_json_object['data'])
+    assert_equal(0, len(test_response_json_object['data']['job_properties']), test_response_json_object['data'])
+    assert_true('files' in test_response_json_object['data'], test_response_json_object['data'])
+    assert_equal(1, len(test_response_json_object['data']['files']), test_response_json_object['data'])
+    assert_true('params' in test_response_json_object['data'], test_response_json_object['data'])
+    assert_equal(0, len(test_response_json_object['data']['params']), test_response_json_object['data'])
+    assert_true('prepares' in test_response_json_object['data'], test_response_json_object['data'])
+    assert_equal(0, len(test_response_json_object['data']['prepares']), test_response_json_object['data'])
+    assert_true('archives' in test_response_json_object['data'], test_response_json_object['data'])
+    assert_equal(0, len(test_response_json_object['data']['archives']), test_response_json_object['data'])
+
+    # Empty script path
+    data = {"files":"[\"hive-site.xml\"]","job_xml":"hive-site.xml","description":"Show databases","workflow":17,"child_links":[{"comment":"","name":"ok","id":106,"parent":76,"child":74},{"comment":"","name":"error","id":107,"parent":76,"child":73}],"job_properties":"[{\"name\":\"oozie.hive.defaults\",\"value\":\"hive-site.xml\"}]","node_type":"hive","params":"[{\"value\":\"INPUT=/user/hue/oozie/workspaces/data\",\"type\":\"param\"}]","archives":"[]","node_ptr":76,"prepares":"[]","script_path":"","id":76,"name":"Hive"}
+    response = self.c.post(reverse('oozie:workflow_validate_action', kwargs={'workflow': self.wf.pk, 'node_type': 'hive'}), data={'node': json.dumps(data)}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+    test_response_json = response.content
+    test_response_json_object = json.loads(test_response_json)
+
+    assert_equal(-1, test_response_json_object['status'])
+    assert_true('name' in test_response_json_object['data'], test_response_json_object['data'])
+    assert_equal(0, len(test_response_json_object['data']['name']), test_response_json_object['data'])
+    assert_true('description' in test_response_json_object['data'], test_response_json_object['data'])
+    assert_equal(0, len(test_response_json_object['data']['description']), test_response_json_object['data'])
+    assert_true('script_path' in test_response_json_object['data'], test_response_json_object['data'])
+    assert_equal(1, len(test_response_json_object['data']['script_path']), test_response_json_object['data'])
+    assert_true('job_xml' in test_response_json_object['data'], test_response_json_object['data'])
+    assert_equal(0, len(test_response_json_object['data']['job_xml']), test_response_json_object['data'])
+    assert_true('job_properties' in test_response_json_object['data'], test_response_json_object['data'])
+    assert_equal(0, len(test_response_json_object['data']['job_properties']), test_response_json_object['data'])
+    assert_true('files' in test_response_json_object['data'], test_response_json_object['data'])
+    assert_equal(0, len(test_response_json_object['data']['files']), test_response_json_object['data'])
+    assert_true('params' in test_response_json_object['data'], test_response_json_object['data'])
+    assert_equal(0, len(test_response_json_object['data']['params']), test_response_json_object['data'])
+    assert_true('prepares' in test_response_json_object['data'], test_response_json_object['data'])
+    assert_equal(0, len(test_response_json_object['data']['prepares']), test_response_json_object['data'])
+    assert_true('archives' in test_response_json_object['data'], test_response_json_object['data'])
+    assert_equal(0, len(test_response_json_object['data']['archives']), test_response_json_object['data'])
+
 
 class TestApiPermissionsWithOozie(OozieBase):
 
