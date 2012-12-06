@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-09-11 13:36-0700\n"
+"POT-Creation-Date: 2012-12-05 21:32-0800\n"
 "PO-Revision-Date: 2012-07-30 18:47-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -17,228 +17,228 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/useradmin/models.py:124
+#: src/useradmin/models.py:125
 #, python-format
 msgid "You do not have permissions to %(description)s."
 msgstr "%(description)s のためのパーミッションがありません。"
 
-#: src/useradmin/views.py:58
+#: src/useradmin/views.py:59
 msgid "You must be a superuser to delete users."
 msgstr "ユーザーを削除するにはスーパーユーザーであることが必要です。"
 
-#: src/useradmin/views.py:65
+#: src/useradmin/views.py:66
 msgid "You cannot remove yourself."
 msgstr "自分自身を削除することはできません。"
 
-#: src/useradmin/views.py:73
-msgid "The user was deleted !"
+#: src/useradmin/views.py:74
+msgid "The user was deleted."
 msgstr ""
 
-#: src/useradmin/views.py:76
+#: src/useradmin/views.py:77
 msgid "User not found."
 msgstr "ユーザーが見つかりません。"
 
-#: src/useradmin/views.py:82
+#: src/useradmin/views.py:83
 msgid "You must be a superuser to delete groups."
 msgstr "グループを削除するにはスーパーユーザーであることが必要です。"
 
-#: src/useradmin/views.py:94
+#: src/useradmin/views.py:95
 msgid "The default user group may not be deleted."
 msgstr "デフォルトのユーザーグループは削除できません。"
 
-#: src/useradmin/views.py:99
-msgid "The group was deleted !"
+#: src/useradmin/views.py:100
+msgid "The group was deleted."
 msgstr ""
 
-#: src/useradmin/views.py:102
+#: src/useradmin/views.py:103
 msgid "Group not found."
 msgstr "グループが見つかりません。"
 
-#: src/useradmin/views.py:112 src/useradmin/views.py:296
-#: src/useradmin/templates/list_users.mako:44
+#: src/useradmin/views.py:113 src/useradmin/views.py:302
+#: src/useradmin/templates/list_users.mako:52
 msgid "Username"
 msgstr "ユーザー名"
 
-#: src/useradmin/views.py:115 src/useradmin/views.py:299
+#: src/useradmin/views.py:116 src/useradmin/views.py:305
 msgid "Required. 30 characters or fewer. No whitespaces or colons."
 msgstr "必須。文字数は 30以下。スペースとコロンは使用できません。"
 
-#: src/useradmin/views.py:116 src/useradmin/views.py:300
-#: src/useradmin/views.py:365
+#: src/useradmin/views.py:117 src/useradmin/views.py:306
+#: src/useradmin/views.py:371
 msgid "Whitespaces and ':' not allowed"
 msgstr "スペースと '.' は使用できません。"
 
-#: src/useradmin/views.py:117
+#: src/useradmin/views.py:118
 msgid "Password"
 msgstr "パスワード"
 
-#: src/useradmin/views.py:118
+#: src/useradmin/views.py:119
 msgid "Password confirmation"
 msgstr "パスワードの設定"
 
-#: src/useradmin/views.py:119 src/useradmin/views.py:306
+#: src/useradmin/views.py:120 src/useradmin/views.py:312
 msgid "Create home directory"
 msgstr ""
 
-#: src/useradmin/views.py:120
+#: src/useradmin/views.py:121
 msgid "Create home directory if one doesn't already exist."
 msgstr ""
 
-#: src/useradmin/views.py:131
+#: src/useradmin/views.py:132
 msgid "Passwords do not match."
 msgstr "パスワードが一致しません。"
 
-#: src/useradmin/views.py:137
+#: src/useradmin/views.py:138
 msgid "You must specify a password when creating a new user."
 msgstr "新規ユーザーの作成ではパスワードを指定する必要があります。"
 
-#: src/useradmin/views.py:179
+#: src/useradmin/views.py:180
 msgid "You must be a superuser to add or edit another user."
 msgstr "別のユーザーを追加または編集するにはスーパーユーザーであることが必要です。"
 
-#: src/useradmin/views.py:203
+#: src/useradmin/views.py:204
 msgid "You cannot make yourself inactive."
 msgstr "自分自身を非アクティブにすることはできません。"
 
-#: src/useradmin/views.py:215
+#: src/useradmin/views.py:216
 msgid "You cannot make yourself a superuser."
 msgstr "自分自身をスーパーユーザーにすることはできません。"
 
-#: src/useradmin/views.py:219
+#: src/useradmin/views.py:220
 msgid "User information updated"
 msgstr ""
 
-#: src/useradmin/views.py:228 src/useradmin/views.py:347
+#: src/useradmin/views.py:229 src/useradmin/views.py:353
 #, python-format
-msgid "Cannot make home directory for user %s"
+msgid "Cannot make home directory for user %s."
 msgstr ""
 
-#: src/useradmin/views.py:246
+#: src/useradmin/views.py:252
 msgid "You must be a superuser to add or edit a group."
 msgstr "グループを追加または編集するにはスーパーユーザーであることが必要です。"
 
-#: src/useradmin/views.py:257
+#: src/useradmin/views.py:263
 msgid "Group information updated"
 msgstr ""
 
-#: src/useradmin/views.py:278
+#: src/useradmin/views.py:284
 msgid "You must be a superuser to change permissions."
 msgstr "パーミッションを変更するにはスーパーユーザーであることが必要です。"
 
-#: src/useradmin/views.py:286
+#: src/useradmin/views.py:292
 msgid "Permission information updated"
 msgstr ""
 
-#: src/useradmin/views.py:301 src/useradmin/views.py:366
+#: src/useradmin/views.py:307 src/useradmin/views.py:372
 msgid "Distinguished name"
 msgstr "識別名"
 
-#: src/useradmin/views.py:302
+#: src/useradmin/views.py:308
 #: src/useradmin/management/commands/import_ldap_group.py:35
 #: src/useradmin/management/commands/import_ldap_user.py:33
 msgid "Whether or not the user should be imported by distinguished name."
 msgstr "ユーザーを識別名指定でインポートするかどうかの指定です。"
 
-#: src/useradmin/views.py:307
+#: src/useradmin/views.py:313
 msgid "Create home directory for user if one doesn't already exist."
 msgstr ""
 
-#: src/useradmin/views.py:318
+#: src/useradmin/views.py:324
 #, python-format
 msgid "Too long: 30 characters or fewer and not %(username)s"
 msgstr "長すぎます。30 文字以下で %(username)s ではないことが必要です。"
 
-#: src/useradmin/views.py:335
+#: src/useradmin/views.py:341
 msgid "You must be a superuser to add another user."
 msgstr "別のユーザーを追加するにはスーパーユーザーであることが必要です。"
 
-#: src/useradmin/views.py:351
-#, python-format
-msgid "Could not get LDAP details for user %(username)s"
+#: src/useradmin/views.py:357
+#, fuzzy, python-format
+msgid "Could not get LDAP details for user %(username)s."
 msgstr "ユーザー %(username)s の LDAP 詳細を取得できませんでした。"
 
-#: src/useradmin/views.py:363
+#: src/useradmin/views.py:369
 msgid ""
 "Required. 30 characters or fewer. May only contain letters, numbers, "
 "hyphens or underscores."
 msgstr "必須。文字数は 30 以下。文字、数字、ハイフン、またはアンダースコアのみが使用可能です。"
 
-#: src/useradmin/views.py:367
+#: src/useradmin/views.py:373
 msgid "Whether or not the group should be imported by distinguished name."
 msgstr "グループを識別名指定でインポートするかどうかの指定です。"
 
-#: src/useradmin/views.py:371
+#: src/useradmin/views.py:377
 msgid "Import new members"
 msgstr "新規メンバのインポート"
 
-#: src/useradmin/views.py:372
+#: src/useradmin/views.py:378
 msgid "Import unimported or new users from the group."
 msgstr "未インポートユーザーまたは新規ユーザーをグループからインポートします。"
 
-#: src/useradmin/views.py:375
+#: src/useradmin/views.py:381
 msgid "Create home directories"
 msgstr ""
 
-#: src/useradmin/views.py:376
+#: src/useradmin/views.py:382
 msgid ""
 "Create home directories for every member imported, if members are being "
 "imported."
 msgstr ""
 
-#: src/useradmin/views.py:387
+#: src/useradmin/views.py:393
 #, python-format
 msgid "Too long: 30 characters or fewer and not %(name)s"
 msgstr "長すぎます。30 文字以下で %(name)s ではないことが必要です。"
 
-#: src/useradmin/views.py:405
+#: src/useradmin/views.py:411
 msgid "You must be a superuser to add another group."
 msgstr "別のグループを追加するにはスーパーユーザーであることが必要です。"
 
-#: src/useradmin/views.py:417
+#: src/useradmin/views.py:423
 #, python-format
 msgid "Could not get LDAP details for group %(groupname)s"
 msgstr "グループ %(groupname)s の LDAP 詳細を取得できませんでした。"
 
-#: src/useradmin/views.py:433
+#: src/useradmin/views.py:439
 msgid "You must be a superuser to sync the LDAP users/groups."
 msgstr "LDAP ユーザー/グループの同期化ではスーパーユーザーであることが必要です。"
 
-#: src/useradmin/views.py:447
-msgid "The import may not be complete, sync again"
+#: src/useradmin/views.py:453
+msgid "The import may not be complete, sync again."
 msgstr ""
 
-#: src/useradmin/views.py:471
+#: src/useradmin/views.py:477
 msgid "No active superuser configured."
 msgstr "アクティブなスーパーユーザーが未設定です。"
 
-#: src/useradmin/views.py:473
+#: src/useradmin/views.py:479
 msgid "You cannot remove the last active superuser from the configuration."
 msgstr "最後に残った 1 人のアクティブなスーパーユーザーは設定から削除できません。"
 
-#: src/useradmin/views.py:656
+#: src/useradmin/views.py:662
 msgid "Group name may only contain letters, numbers, hyphens or underscores."
 msgstr "グループ名には文字、数字、ハイフン、またはアンダースコアのみを使用できます。"
 
-#: src/useradmin/views.py:671
+#: src/useradmin/views.py:677
 #, fuzzy
 msgid "members"
 msgstr "メンバ"
 
-#: src/useradmin/views.py:672
+#: src/useradmin/views.py:678
 #, fuzzy
 msgid "permissions"
 msgstr "パーミッション"
 
-#: src/useradmin/views.py:714
+#: src/useradmin/views.py:720
 #, fuzzy
 msgid "groups"
 msgstr "グループ"
 
-#: src/useradmin/views.py:748
+#: src/useradmin/views.py:754
 msgid "Create Home Directories"
 msgstr ""
 
-#: src/useradmin/views.py:749
+#: src/useradmin/views.py:755
 msgid "Create home directory for every user, if one doesn't already exist."
 msgstr ""
 
@@ -279,8 +279,8 @@ msgid "Confirm"
 msgstr "確認"
 
 #: src/useradmin/templates/confirm.mako:25
-#: src/useradmin/templates/delete_group.mako:25
-#: src/useradmin/templates/delete_user.mako:25
+#: src/useradmin/templates/delete_group.mako:26
+#: src/useradmin/templates/delete_user.mako:26
 msgid "Yes"
 msgstr "はい"
 
@@ -294,8 +294,8 @@ msgstr "%(group_name)s を削除していいですか。"
 msgid "?"
 msgstr ""
 
-#: src/useradmin/templates/delete_group.mako:26
-#: src/useradmin/templates/delete_user.mako:26
+#: src/useradmin/templates/delete_group.mako:25
+#: src/useradmin/templates/delete_user.mako:25
 msgid "No"
 msgstr "いいえ"
 
@@ -305,8 +305,8 @@ msgid "Are you sure you want to delete "
 msgstr "%(group_name)s を削除していいですか。"
 
 #: src/useradmin/templates/edit_group.mako:26
-#: src/useradmin/templates/list_groups.mako:24
-#: src/useradmin/templates/list_groups.mako:28
+#: src/useradmin/templates/list_groups.mako:25
+#: src/useradmin/templates/list_groups.mako:29
 msgid "Hue Groups"
 msgstr "Hue グループ"
 
@@ -323,43 +323,57 @@ msgstr "Hue グループ - LDAP グループの追加./同期"
 msgid "Hue Groups - Create group"
 msgstr "Hue グループ - グループの作成"
 
-#: src/useradmin/templates/edit_group.mako:65
+#: src/useradmin/templates/edit_group.mako:67
 msgid "Update group"
 msgstr "グループの更新"
 
-#: src/useradmin/templates/edit_group.mako:68
+#: src/useradmin/templates/edit_group.mako:70
 msgid "Add/Sync group"
 msgstr "グループの追加/同期"
 
-#: src/useradmin/templates/edit_group.mako:70
-#: src/useradmin/templates/list_groups.mako:32
+#: src/useradmin/templates/edit_group.mako:72
+#: src/useradmin/templates/list_groups.mako:39
 msgid "Add group"
 msgstr "グループの追加"
 
-#: src/useradmin/templates/edit_group.mako:73
+#: src/useradmin/templates/edit_group.mako:75
 #: src/useradmin/templates/edit_permissions.mako:53
-#: src/useradmin/templates/edit_user.mako:70
+#: src/useradmin/templates/edit_user.mako:95
 #: src/useradmin/templates/sync_ldap_users_groups.mako:49
 msgid "Cancel"
 msgstr "キャンセル"
 
-#: src/useradmin/templates/edit_group.mako:82
-#: src/useradmin/templates/edit_group.mako:87
-#: src/useradmin/templates/edit_permissions.mako:62
-#: src/useradmin/templates/edit_user.mako:77
+#: src/useradmin/templates/edit_group.mako:83
+#: src/useradmin/templates/edit_group.mako:90
+#: src/useradmin/templates/edit_permissions.mako:61
+#: src/useradmin/templates/edit_user.mako:102
 msgid "Select all"
 msgstr "すべて選択"
 
-#: src/useradmin/templates/edit_group.mako:83
-#: src/useradmin/templates/edit_group.mako:88
-#: src/useradmin/templates/edit_permissions.mako:63
-#: src/useradmin/templates/edit_user.mako:78
+#: src/useradmin/templates/edit_group.mako:84
+#: src/useradmin/templates/edit_group.mako:91
+#: src/useradmin/templates/edit_permissions.mako:62
+#: src/useradmin/templates/edit_user.mako:103
 msgid "Search"
 msgstr "検索"
 
+#: src/useradmin/templates/edit_group.mako:85
+#, fuzzy
+msgid "No users found."
+msgstr "ユーザーが見つかりません。"
+
+#: src/useradmin/templates/edit_group.mako:85
+msgid "Create a new user now"
+msgstr ""
+
+#: src/useradmin/templates/edit_group.mako:92
+#, fuzzy
+msgid "No permissions found."
+msgstr "パーミッション"
+
 #: src/useradmin/templates/edit_permissions.mako:23
-#: src/useradmin/templates/list_permissions.mako:25
-#: src/useradmin/templates/list_permissions.mako:29
+#: src/useradmin/templates/list_permissions.mako:26
+#: src/useradmin/templates/list_permissions.mako:30
 msgid "Hue Permissions"
 msgstr "Hue のパーミッション"
 
@@ -372,9 +386,15 @@ msgstr "Hue のパーミッション - アプリケーションの編集：%(app
 msgid "Update permission"
 msgstr "パーミッションの更新"
 
+#: src/useradmin/templates/edit_permissions.mako:63
+#: src/useradmin/templates/edit_user.mako:104
+#, fuzzy
+msgid "No groups found."
+msgstr "グループが見つかりません。"
+
 #: src/useradmin/templates/edit_user.mako:24
-#: src/useradmin/templates/list_users.mako:24
-#: src/useradmin/templates/list_users.mako:28
+#: src/useradmin/templates/list_users.mako:25
+#: src/useradmin/templates/list_users.mako:29
 msgid "Hue Users"
 msgstr "Hue ユーザー"
 
@@ -391,138 +411,112 @@ msgstr "Hue ユーザー - LDAP ユーザーの追加/同期"
 msgid "Hue Users - Create user"
 msgstr "Hue ユーザー - ユーザーの作成"
 
-#: src/useradmin/templates/edit_user.mako:62
+#: src/useradmin/templates/edit_user.mako:87
 msgid "Update user"
 msgstr "ユーザーの更新"
 
-#: src/useradmin/templates/edit_user.mako:65
+#: src/useradmin/templates/edit_user.mako:90
 msgid "Add/Sync user"
 msgstr "ユーザーの追加/同期"
 
-#: src/useradmin/templates/edit_user.mako:67
-#: src/useradmin/templates/list_users.mako:32
+#: src/useradmin/templates/edit_user.mako:92
+#: src/useradmin/templates/list_users.mako:39
 msgid "Add user"
 msgstr "ユーザーの追加"
+
+#: src/useradmin/templates/edit_user.mako:104
+msgid "Create a new group now"
+msgstr ""
 
 #: src/useradmin/templates/layout.mako:32
 msgid "Users"
 msgstr "ユーザー"
 
 #: src/useradmin/templates/layout.mako:33
-#: src/useradmin/templates/list_permissions.mako:40
-#: src/useradmin/templates/list_users.mako:48
+#: src/useradmin/templates/list_permissions.mako:38
+#: src/useradmin/templates/list_users.mako:56
 msgid "Groups"
 msgstr "グループ"
 
 #: src/useradmin/templates/layout.mako:34
-#: src/useradmin/templates/list_groups.mako:45
+#: src/useradmin/templates/list_groups.mako:53
 msgid "Permissions"
 msgstr "パーミッション"
 
-#: src/useradmin/templates/list_groups.mako:33
+#: src/useradmin/templates/list_groups.mako:34
+#: src/useradmin/templates/list_users.mako:34
+msgid "Delete"
+msgstr "削除"
+
+#: src/useradmin/templates/list_groups.mako:40
 msgid "Add/Sync LDAP group"
 msgstr "LDAP グループの追加/同期"
 
-#: src/useradmin/templates/list_groups.mako:37
-#: src/useradmin/templates/list_permissions.mako:32
-#: src/useradmin/templates/list_users.mako:38
-msgid "Filter: "
-msgstr "フィルタ： "
-
-#: src/useradmin/templates/list_groups.mako:37
-msgid "Search for group name, members, etc..."
-msgstr "グループ名、メンバなどを検索"
-
-#: src/useradmin/templates/list_groups.mako:43
+#: src/useradmin/templates/list_groups.mako:51
 msgid "Group Name"
 msgstr "グループ名"
 
-#: src/useradmin/templates/list_groups.mako:44
+#: src/useradmin/templates/list_groups.mako:52
 msgid "Members"
 msgstr "メンバ"
 
-#: src/useradmin/templates/list_groups.mako:59
+#: src/useradmin/templates/list_groups.mako:66
 #, python-format
 msgid "Edit %(groupname)s"
 msgstr "%(groupname)s の編集"
 
-#: src/useradmin/templates/list_groups.mako:59
-#: src/useradmin/templates/list_permissions.mako:54
-#: src/useradmin/templates/list_users.mako:68
-msgid "Edit"
-msgstr "編集"
+#: src/useradmin/templates/list_groups.mako:80
+msgid "There are no groups matching the search criteria."
+msgstr ""
 
-#: src/useradmin/templates/list_groups.mako:60
-#, python-format
-msgid "Delete %(groupname)s"
-msgstr "%(groupname)s の削除"
-
-#: src/useradmin/templates/list_groups.mako:60
-#, python-format
-msgid "Are you sure you want to delete %(group_name)s?"
-msgstr "%(group_name)s を削除していいですか。"
-
-#: src/useradmin/templates/list_groups.mako:60
-#: src/useradmin/templates/list_users.mako:69
-msgid "Delete"
-msgstr "削除"
-
-#: src/useradmin/templates/list_permissions.mako:32
-msgid "Search for application name, description, etc..."
-msgstr "アプリケーション名、説明などを検索"
-
-#: src/useradmin/templates/list_permissions.mako:38
+#: src/useradmin/templates/list_permissions.mako:36
 msgid "Application"
 msgstr "アプリケーション"
 
-#: src/useradmin/templates/list_permissions.mako:39
+#: src/useradmin/templates/list_permissions.mako:37
 msgid "Permission"
 msgstr "パーミッション"
 
-#: src/useradmin/templates/list_permissions.mako:54
+#: src/useradmin/templates/list_permissions.mako:46
 msgid "Edit permission"
 msgstr "パーミッションの編集"
 
-#: src/useradmin/templates/list_users.mako:33
+#: src/useradmin/templates/list_permissions.mako:60
+msgid "There are no permissions matching the search criteria."
+msgstr ""
+
+#: src/useradmin/templates/list_users.mako:40
 msgid "Add/Sync LDAP user"
 msgstr "LDAP ユーザーの追加/同期"
 
-#: src/useradmin/templates/list_users.mako:34
+#: src/useradmin/templates/list_users.mako:41
 msgid "Sync LDAP users/groups"
 msgstr "LDAP ユーザー/グループの同期"
 
-#: src/useradmin/templates/list_users.mako:38
-msgid "Search for username, name, e-mail, etc..."
-msgstr "ユーザー名、名前、電子メールなどを検索"
-
-#: src/useradmin/templates/list_users.mako:45
+#: src/useradmin/templates/list_users.mako:53
 msgid "First Name"
 msgstr "姓"
 
-#: src/useradmin/templates/list_users.mako:46
+#: src/useradmin/templates/list_users.mako:54
 msgid "Last Name"
 msgstr "名"
 
-#: src/useradmin/templates/list_users.mako:47
+#: src/useradmin/templates/list_users.mako:55
 msgid "E-mail"
 msgstr "電子メール"
 
-#: src/useradmin/templates/list_users.mako:49
+#: src/useradmin/templates/list_users.mako:57
 msgid "Last Login"
 msgstr "前回のログイン"
 
-#: src/useradmin/templates/list_users.mako:64
-#: src/useradmin/templates/list_users.mako:68
-#: src/useradmin/templates/list_users.mako:72
+#: src/useradmin/templates/list_users.mako:70
 #, python-format
 msgid "Edit %(username)s"
 msgstr "%(username)s の編集"
 
-#: src/useradmin/templates/list_users.mako:65
-#: src/useradmin/templates/list_users.mako:69
-#, python-format
-msgid "Delete %(username)s"
-msgstr "%(username)s の削除"
+#: src/useradmin/templates/list_users.mako:87
+msgid "There are no users matching the search criteria."
+msgstr ""
 
 #: src/useradmin/templates/sync_ldap_users_groups.mako:37
 msgid "Sync LDAP users and groups"
@@ -544,6 +538,39 @@ msgstr "LDAP サーバーの現在の状態に基づいて、すべてのユー�
 msgid "Sync"
 msgstr "同期"
 
-#~ msgid "Create Home Directory"
+#~ msgid "The user was deleted !"
 #~ msgstr ""
+
+#~ msgid "The group was deleted !"
+#~ msgstr ""
+
+#~ msgid "Cannot make home directory for user %s"
+#~ msgstr ""
+
+#~ msgid "The import may not be complete, sync again"
+#~ msgstr ""
+
+#~ msgid "Filter: "
+#~ msgstr "フィルタ： "
+
+#~ msgid "Search for group name, members, etc..."
+#~ msgstr "グループ名、メンバなどを検索"
+
+#~ msgid "Edit"
+#~ msgstr "編集"
+
+#~ msgid "Delete %(groupname)s"
+#~ msgstr "%(groupname)s の削除"
+
+#~ msgid "Are you sure you want to delete %(group_name)s?"
+#~ msgstr "%(group_name)s を削除していいですか。"
+
+#~ msgid "Search for application name, description, etc..."
+#~ msgstr "アプリケーション名、説明などを検索"
+
+#~ msgid "Search for username, name, e-mail, etc..."
+#~ msgstr "ユーザー名、名前、電子メールなどを検索"
+
+#~ msgid "Delete %(username)s"
+#~ msgstr "%(username)s の削除"
 

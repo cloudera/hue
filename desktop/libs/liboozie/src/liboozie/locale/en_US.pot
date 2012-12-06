@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-11-07 13:08-0800\n"
+"POT-Creation-Date: 2012-12-05 21:32-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,53 +18,53 @@ msgstr ""
 "Generated-By: Babel 0.9.6\n"
 
 #: src/liboozie/conf.py:25
-msgid "URL to Oozie server. This is required for job submission."
+msgid "URL of Oozie server. This is required for job submission."
 msgstr ""
 
 #: src/liboozie/conf.py:31
-msgid "Whether Oozie requires client to perform Kerberos authentication"
+msgid "Whether Oozie requires client to perform Kerberos authentication."
 msgstr ""
 
 #: src/liboozie/conf.py:38
 msgid ""
-"Location on HDFS where the workflows/coordinator are deployed when "
-"submitted by a non owner."
+"Location on HDFS where the workflows/coordinators are deployed when "
+"submitted by a non-owner."
 msgstr ""
 
-#: src/liboozie/conf.py:59
+#: src/liboozie/conf.py:69
 msgid ""
-"The deployment directory of Oozie workflows does not exist. Please run "
-"\"Setup App\" on the Oozie workflow page."
+"The deployment directory of Oozie workflows does not exist. Run \"Setup "
+"App\" on the Oozie workflow page."
 msgstr ""
 
-#: src/liboozie/conf.py:62
+#: src/liboozie/conf.py:72
 msgid "Oozie Share Lib not installed in default location."
 msgstr ""
 
-#: src/liboozie/submittion.py:60
+#: src/liboozie/submittion.py:69
 #, python-format
 msgid "Submission already submitted (Oozie job id %s)"
 msgstr ""
 
-#: src/liboozie/submittion.py:84
-msgid "Failed to access deployment directory"
+#: src/liboozie/submittion.py:117
+msgid "Failed to access deployment directory."
 msgstr ""
 
-#: src/liboozie/submittion.py:123
+#: src/liboozie/submittion.py:162
 #, python-format
-msgid "Path is not a directory: %s"
+msgid "Path is not a directory: %s."
 msgstr ""
 
-#: src/liboozie/submittion.py:128
+#: src/liboozie/submittion.py:167
 #, python-format
-msgid "Error accessing directory '%s': %s"
+msgid "Error accessing directory '%s': %s."
 msgstr ""
 
-#: src/liboozie/types.py:273
-msgid "Insufficient permission"
+#: src/liboozie/types.py:285
+msgid "Insufficient permission."
 msgstr ""
 
-#: src/liboozie/types.py:274
+#: src/liboozie/types.py:286
 #, python-format
 msgid "Permission denied. User %(username)s cannot modify user %(user)s's job."
 msgstr ""

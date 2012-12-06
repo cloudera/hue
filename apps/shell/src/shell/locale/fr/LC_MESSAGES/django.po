@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-09-11 13:36-0700\n"
+"POT-Creation-Date: 2012-12-05 21:32-0800\n"
 "PO-Revision-Date: 2012-07-30 18:56-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -17,16 +17,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/shell/shellmanager.py:147
-#, python-format
-msgid "bin/hadoop return non-zero %(retcode)d while trying to merge credentials"
+#: src/shell/shellmanager.py:153
+#, fuzzy, python-format
+msgid "bin/hadoop return non-zero %(retcode)d while trying to merge credentials."
 msgstr ""
 "bin/hadoop renvoient %(retcode)d différent de zéro lors de la tentative "
 "de fusion des informations de connexion"
 
 #: src/shell/templates/failed_to_create.mako:21
-#: src/shell/templates/index.mako:22 src/shell/templates/index.mako:24
-#: src/shell/templates/no_such_user.mako:21
+#: src/shell/templates/index.mako:22 src/shell/templates/no_such_user.mako:21
 #: src/shell/templates/not_running_spawning.mako:21
 msgid "Hue Shell"
 msgstr "Shell Hue"
@@ -59,11 +58,12 @@ msgstr "Aucun shell ne porte ce nom."
 msgid "There is no Unix user account for you."
 msgstr "Aucun compte utilisateur Unix ne vous a été attribué."
 
-#: src/shell/templates/index.mako:111
-msgid "Please select one of the available shells from the toolbar above."
+#: src/shell/templates/index.mako:86
+#, fuzzy
+msgid "Select one of the available shells from the toolbar above."
 msgstr "Sélectionnez l'un des shells disponibles dans la barre d'outils ci-dessus."
 
-#: src/shell/templates/index.mako:113
+#: src/shell/templates/index.mako:88
 msgid ""
 "You do not have permission to access any shell or there is no configured "
 "shell."
@@ -72,17 +72,19 @@ msgstr ""
 "configuré."
 
 #: src/shell/templates/no_such_user.mako:24
+#, fuzzy
 msgid ""
 "The Shell application requires a Unix user account for every user of Hue "
-"on the remote webserver."
+"on the remote web server."
 msgstr ""
 "L'application Shell nécessite un compte utilisateur Unix pour chaque "
 "utilisateur Hue sur le serveur Web distant."
 
 #: src/shell/templates/no_such_user.mako:26
+#, fuzzy
 msgid ""
-"Please ask your administrator to create a user account for you on the "
-"remote webserver as described in the Shell documentation."
+"Ask your administrator to create a user account for you on the remote web"
+" server as described in the Shell documentation."
 msgstr ""
 "Demandez à votre administrateur de vous créer un compte utilisateur sur "
 "le serveur Web distant comme décrit dans la documentation relative à "
