@@ -253,7 +253,7 @@ ${ commonheader(_('Search'), "search", user) }
 <script>
   $(document).ready(function(){
     $("a[data-dt]").each(function(){
-      $(this).text(moment($(this).data("dt")).add("hours", 7).fromNow());
+      $(this).text(moment($(this).data("dt")).add("hours", 8).fromNow());
     });
     $(".text").click(function(e){
       if ($(e.target).is("div")){
