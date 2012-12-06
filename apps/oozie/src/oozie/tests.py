@@ -21,6 +21,7 @@ except ImportError:
   import simplejson as json
 import logging
 import re
+import os
 
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal
@@ -1212,6 +1213,26 @@ class TestEditorWithOozie(OozieBase):
     node = Node.objects.all()[len(Node.objects.all())-1].get_full_node()
     for field in node.PARAM_FIELDS:
       assert_equal(translation_regex.sub(r'${\1}', getattr(jobsub_design.get_root_action(), field)), getattr(node, field))
+
+
+  def test_import_workflow(self):
+    workflow_count = Workflow.objects.count()
+
+    # Create
+    filename = os.path.abspath(os.path.dirname(__file__) + "/test_data/0.4/test-mapreduce.xml")
+    fh = open(filename)
+    response = self.c.post(reverse('oozie:import_workflow'), {
+      'job_xml': [''],
+      'name': ['test_workflow'],
+      'parameters': ['[{"name":"oozie.use.system.libpath","value":"true"}]'],
+      'deployment_dir': [''],
+      'job_properties': ['[]'],
+      'schema_version': ['0.4'],
+      'definition_file': [fh],
+      'description': ['']
+    }, follow=True)
+    fh.close()
+    assert_equal(workflow_count + 1, Workflow.objects.count(), response)
 
 
 class TestOozieSubmissions(OozieBase):

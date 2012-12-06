@@ -30,11 +30,11 @@ ${ layout.menubar(section='workflows') }
   <h1>${ _('Import Workflow') }</h1>
 
     <div class="well">
-      <br/>
+      <div class="alert alert-info"><h3>${_('Import an Oozie workflow')}</h3>${_("You can import an external Oozie workflow by providing the workflow definition file.")}</div>
     </div>
 
     <div style="min-height:300px">
-      <form class="form-horizontal" id="workflowForm" action="${ url('oozie:import_workflow') }" method="POST">
+      <form class="form-horizontal" id="workflowForm" action="${ url('oozie:import_workflow') }" method="POST" enctype="multipart/form-data">
 
       <div class="row-fluid">
         <div class="span2">
@@ -44,6 +44,7 @@ ${ layout.menubar(section='workflows') }
           ${ utils.render_field(workflow_form['name']) }
           ${ utils.render_field(workflow_form['description']) }
           ${ utils.render_field(workflow_form['definition']) }
+          ${ utils.render_field(workflow_form['definition_file']) }
           ${ utils.render_field(workflow_form['schema_version']) }
 
           <div class="control-group ">

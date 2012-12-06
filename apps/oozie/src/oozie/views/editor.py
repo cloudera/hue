@@ -541,12 +541,12 @@ def import_workflow(request):
   workflow = Workflow.objects.new_workflow(request.user)
 
   if request.method == 'POST':
-    workflow_form = ImportWorkflowForm(request.POST, instance=workflow)
+    workflow_form = ImportWorkflowForm(request.POST, request.FILES, instance=workflow)
 
     if workflow_form.is_valid():
       workflow.save()
 
-      workflow_definition = workflow_form.cleaned_data['definition']
+      workflow_definition = workflow_form.cleaned_data['definition_file'].read()
       schema_version = workflow_form.cleaned_data['schema_version']
 
       try:

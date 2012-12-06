@@ -19,6 +19,7 @@ import logging
 
 from django import forms
 from django.db.models import Q
+from django.utils.translation import ugettext_lazy as _t
 
 from desktop.lib.django_forms import MultiForm, SplitDateTimeWidget
 from oozie.models import Workflow, Node, Java, Mapreduce, Streaming, Coordinator,\
@@ -66,7 +67,7 @@ class WorkflowForm(forms.ModelForm):
 SCHEMA_VERSION_CHOICES = ['0.4']
 
 class ImportWorkflowForm(WorkflowForm):
-  definition = forms.CharField(widget=forms.Textarea())
+  definition_file = forms.FileField(label=_t("Local workflow.xml file"))
   schema_version = forms.ChoiceField(choices=[(version, version) for version in SCHEMA_VERSION_CHOICES])
 
 
