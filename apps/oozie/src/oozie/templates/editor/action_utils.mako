@@ -28,7 +28,7 @@
   <div data-bind="with: context">
     <form class="form-horizontal" id="${node_type}-action-form" method="POST">
       <div class="modal-header">
-        <a href="#" class="close" data-dismiss="modal">&times;</a>
+        <a href="#" class="close">&times;</a>
         <h3 class="message" data-bind="text: '${_('Edit Node: ')}' + name()"></h3>
       </div>
 
@@ -36,7 +36,7 @@
         <fieldset class="span12">
           % for field in action_form:
             % if field.html_name in ('name', 'description'):
-              ${ utils.render_field(field, extra_attrs={'data-bind': 'value: %s' % field.name}) }
+              ${ utils.render_field_with_error_js(field, field.name, extra_attrs={'data-bind': 'value: %s' % field.name}) }
             % endif
           % endfor
 
@@ -62,7 +62,7 @@
 
           % for field in action_form:
             % if field.html_name not in ('name', 'description', 'node_type', 'job_xml'):
-              ${ utils.render_field(field, extra_attrs={'data-bind': 'value: %s' % field.name}) }
+              ${ utils.render_field_with_error_js(field, field.name, extra_attrs={'data-bind': 'value: %s' % field.name}) }
             % endif
           % endfor
 
@@ -174,14 +174,14 @@
           % endif
 
           % if 'job_xml' in action_form.fields:
-            ${ utils.render_field(action_form['job_xml'], extra_attrs={'data-bind': 'value: %s' % action_form['job_xml'].name}) }
+            ${ utils.render_field_with_error_js(action_form['job_xml'], action_form['job_xml'].name, extra_attrs={'data-bind': 'value: %s' % action_form['job_xml'].name}) }
           % endif
 
         </fieldset>
       </div>
 
       <div class="modal-footer">
-        <button data-dismiss="modal" class="btn btn-primary doneButton">${ _('Done')}</button>
+        <button class="btn btn-primary doneButton" type="button">${ _('Done')}</button>
       </div>
 
     </form>

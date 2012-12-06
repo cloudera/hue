@@ -25,6 +25,20 @@ if (!('filter' in Array.prototype)) {
   };
 }
 
+// Since knockout maps arrays without calling "update" nor "create"
+// Provide a JSON string that will be parsed in custom 'create' and 'update' functions.
+var normalize_model_fields = (function() {
+  var FIELDS = ['parameters', 'job_properties', 'files', 'archives', 'prepares', 'params'];
+  function fn(node_model) {
+    $.each(FIELDS, function(index, field) {
+      if (field in node_model && $.isArray(node_model[field])) {
+        node_model[field] = JSON.stringify(node_model[field]);
+      }
+    });
+  }
+  return fn;
+})();
+
 /**
  * Registry of models
  *  - Each model should have an ID attribute.
@@ -92,7 +106,7 @@ var ModalModule = function($, ko) {
   var module = function(modal, template) {
     var self = this;
 
-    self.modal = $(modal);
+    self.el = self.modal = $(modal);
     self.context = ko.observable();
     self.template = ko.observable(template || '');
     self.bound = false;
@@ -107,6 +121,12 @@ var ModalModule = function($, ko) {
 
     ko.applyBindings(self, self.modal[0]);
     self.modal.modal('show');
+  };
+
+  module.prototype.hide = function(context) {
+    var self = this;
+
+    self.el.modal('hide');
   };
 
   module.prototype.setTemplate = function(template) {
@@ -473,6 +493,21 @@ var NodeModule = function($, IdGeneratorTable) {
     self.children = ko.observableArray([]);
     self.model = model;
 
+    var errors = {};
+    for(var key in model) {
+      switch(key) {
+        case 'child_links':
+        case 'node_ptr':
+        case 'initialize':
+        case 'toString':
+        break;
+        default:
+          errors[key] = [];
+        break;
+      }
+    }
+    self.errors = ko.mapping.fromJS(errors);
+
     self.edit_template = model.node_type + 'EditTemplate';
     switch(model.node_type) {
     case 'start':
@@ -702,15 +737,44 @@ var NodeModule = function($, IdGeneratorTable) {
             };
 
             return map_params(options, subscribe);
+          },
+          update: function(options) {
+            var parent = options.parent;
+            var subscribe = function(mapping) {
+              mapping.name.subscribe(function(value) {
+                parent.job_properties.valueHasMutated();
+              });
+              mapping.value.subscribe(function(value) {
+                parent.job_properties.valueHasMutated();
+              });
+            };
+
+            return map_params(options, subscribe);
           }
         },
         files: {
           create: function(options) {
             return map_params(options, function() {});
+          },
+          update: function(options) {
+            return map_params(options, function() {});
           }
         },
         archives: {
           create: function(options) {
+            var parent = options.parent;
+            var subscribe = function(mapping) {
+              mapping.name.subscribe(function(value) {
+                parent.archives.valueHasMutated();
+              });
+              mapping.dummy.subscribe(function(value) {
+                parent.archives.valueHasMutated();
+              });
+            };
+
+            return map_params(options, subscribe);
+          },
+          update: function(options) {
             var parent = options.parent;
             var subscribe = function(mapping) {
               mapping.name.subscribe(function(value) {
@@ -737,10 +801,36 @@ var NodeModule = function($, IdGeneratorTable) {
             };
 
             return map_params(options, subscribe);
+          },
+          update: function(options) {
+            var parent = options.parent;
+            var subscribe = function(mapping) {
+              mapping.value.subscribe(function(value) {
+                parent.params.valueHasMutated();
+              });
+              mapping.type.subscribe(function(value) {
+                parent.params.valueHasMutated();
+              });
+            };
+
+            return map_params(options, subscribe);
           }
         },
         prepares: {
           create: function(options) {
+            var parent = options.parent;
+            var subscribe = function(mapping) {
+              mapping.value.subscribe(function(value) {
+                parent.prepares.valueHasMutated();
+              });
+              mapping.type.subscribe(function(value) {
+                parent.prepares.valueHasMutated();
+              });
+            };
+
+            return map_params(options, subscribe);
+          },
+          update: function(options) {
             var parent = options.parent;
             var subscribe = function(mapping) {
               mapping.value.subscribe(function(value) {
@@ -777,6 +867,30 @@ var NodeModule = function($, IdGeneratorTable) {
         });
       });
 
+    },
+
+    validate: function( ) {
+      var self = this;
+
+      var options = {};
+
+      data = $.extend(true, {}, self.model);
+
+      var success = false;
+      var request = $.extend({
+        url: '/oozie/workflows/' + self._workflow.id() + '/actions/' + self.node_type() + '/validate',
+        type: 'POST',
+        data: { node: JSON.stringify(data) },
+        success: function(data) {
+          ko.mapping.fromJS(data.data, self.errors);
+          success = data.status == 0;
+        },
+        async: false,
+      }, options);
+
+      $.ajax(request);
+
+      return success;
     },
 
     // Hierarchy manipulation.
@@ -1322,6 +1436,17 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
             parent.job_properties.valueHasMutated();
           });
           return mapping;
+        },
+        update: function(options) {
+          var mapping = ko.mapping.fromJS($.parseJSON(options.data) || options.data);
+          var parent = options.parent;
+          mapping.name.subscribe(function(value) {
+            parent.job_properties.valueHasMutated();
+          });
+          mapping.value.subscribe(function(value) {
+            parent.job_properties.valueHasMutated();
+          });
+          return mapping;
         }
       },
       parameters: {
@@ -1337,7 +1462,18 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
             parent.parameters.valueHasMutated();
           });
           return mapping;
-        }
+        },
+        update: function(options) {
+          var mapping =  ko.mapping.fromJS($.parseJSON(options.data) || options.data);
+          var parent = options.parent;
+          mapping.name.subscribe(function(value) {
+            parent.parameters.valueHasMutated();
+          });
+          mapping.value.subscribe(function(value) {
+            parent.parameters.valueHasMutated();
+          });
+          return mapping;
+        },
       }
     });
 
@@ -1413,9 +1549,6 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
               break;
             }
 
-            if ('main_class' in temp) {
-              console.log(temp.main_class());
-            }
             self.registry.add(temp.id(), temp);
           });
         }
