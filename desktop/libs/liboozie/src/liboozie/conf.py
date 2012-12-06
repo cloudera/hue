@@ -46,7 +46,7 @@ def config_validator():
   Called by core check_config() view.
   """
   from hadoop.cluster import get_all_hdfs
-  from liboozie.oozie_api import get_oozie
+#  from liboozie.oozie_api import get_oozie
 
   res = []
 

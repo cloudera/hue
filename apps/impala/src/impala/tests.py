@@ -19,7 +19,13 @@ import re
 
 from nose.tools import assert_true, assert_equal, assert_false
 
+from beeswax.server import dbms
 from desktop.lib.django_test_util import make_logged_in_client
+
+
+class MockDbms:
+  def get_databases(self):
+    return ['db1', 'db2']
 
 
 class TestImpala:
@@ -27,9 +33,16 @@ class TestImpala:
     self.client = make_logged_in_client()
 
   def test_basic_flow(self):
-    response = self.client.get("/impala/")
-    assert_true(re.search('<li id="impalaIcon"\W+class="active', response.content), response.content)
-    assert_true('Query Editor' in response.content)
+    try:
+      # Mock DB calls as we don't need the real ones
+      self.prev_dbms = dbms.get
+      dbms.get = lambda a, b: MockDbms()
+  
+      response = self.client.get("/impala/")
+      assert_true(re.search('<li id="impalaIcon"\W+class="active', response.content), response.content)
+      assert_true('Query Editor' in response.content)
 
-    response = self.client.get("/impala/execute/")
-    assert_true('Query Editor' in response.content)
+      response = self.client.get("/impala/execute/")
+      assert_true('Query Editor' in response.content)
+    finally:
+      dbms.get = self.prev_dbms
