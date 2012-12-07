@@ -306,8 +306,7 @@ ${ layout.menubar(section='workflows') }
 }
 
 .ribbon {
-  font: bold 15px Sans-Serif;
-  color: #333;
+  font: bold 15px sans-serif;
   text-align: center;
   text-shadow: rgba(255,255,255,0.5) 0px 1px 0px;
   -webkit-transform: rotate(45deg);
@@ -319,13 +318,15 @@ ${ layout.menubar(section='workflows') }
   left: -5px;
   top: 15px;
   width: 120px;
-  background-color: #fcf8e3;
-  background-image: -webkit-gradient(linear, left top, left bottom, from(#fcf8e3), to(#fcf8e3));
-  background-image: -webkit-linear-gradient(top, #fcf8e3, #fcf8e3);
-  background-image:    -moz-linear-gradient(top, #fcf8e3, #fcf8e3);
-  background-image:     -ms-linear-gradient(top, #fcf8e3, #fcf8e3);
-  background-image:      -o-linear-gradient(top, #fcf8e3, #fcf8e3);
-  color: #c09853;
+  background-color: #da4f49;
+  *background-color: #bd362f;
+  background-image: -moz-linear-gradient(top, #ee5f5b, #bd362f);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ee5f5b), to(#bd362f));
+  background-image: -webkit-linear-gradient(top, #ee5f5b, #bd362f);
+  background-image: -o-linear-gradient(top, #ee5f5b, #bd362f);
+  background-image: linear-gradient(to bottom, #ee5f5b, #bd362f);
+  background-repeat: repeat-x;
+  color: #ffffff;
   -webkit-box-shadow: 0px 0px 3px rgba(0,0,0,0.3);
   -moz-box-shadow:    0px 0px 3px rgba(0,0,0,0.3);
   box-shadow:         0px 0px 3px rgba(0,0,0,0.3);
@@ -560,9 +561,11 @@ $('#workflow').on('click', '.edit-node-link', function(e) {
   modal.show(context);
   modal.recenter(280, 250);
   modal.addDecorations();
-
-  workflow.model.is_dirty = true;
 });
+
+$('.doneButton').live('click', function(){
+  workflow.model.is_dirty = true;
+})
 
 $('#workflow').on('click', '.new-node-link', function(e) {
   var node_type = $(this).attr('data-node-type');
@@ -570,7 +573,7 @@ $('#workflow').on('click', '.new-node-link', function(e) {
   var NodeModel = nodeModelChooser(node_type);
   var model = new NodeModel({
     id: IdGeneratorTable[node_type].nextId(),
-    node_type: node_type,
+    node_type: node_type
   });
   var node = new Node(self, model, registry);
 
@@ -584,8 +587,6 @@ $('#workflow').on('click', '.new-node-link', function(e) {
   modal.show(node);
   modal.recenter(280, 250);
   modal.addDecorations();
-
-  workflow.model.is_dirty = true;
 });
 
 ko.bindingHandlers.fileChooser = {
