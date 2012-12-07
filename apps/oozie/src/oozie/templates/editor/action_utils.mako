@@ -181,6 +181,7 @@
       </div>
 
       <div class="modal-footer">
+        <a class="btn cancelButton" href="javascript:void(0);">Cancel</a>
         <button class="btn btn-primary doneButton" type="button">${ _('Done')}</button>
       </div>
 
