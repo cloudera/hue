@@ -43,7 +43,6 @@ ${ layout.menubar(section='workflows') }
           <fieldset>
           ${ utils.render_field(workflow_form['name']) }
           ${ utils.render_field(workflow_form['description']) }
-          ${ utils.render_field(workflow_form['definition']) }
           ${ utils.render_field(workflow_form['definition_file']) }
           ${ utils.render_field(workflow_form['schema_version']) }
 
