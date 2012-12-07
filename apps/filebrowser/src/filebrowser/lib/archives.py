@@ -82,7 +82,10 @@ class ZipArchive(Archive):
     """
     for directory in dirs:
       directory = os.path.join(basepath, directory)
-      os.mkdir(directory)
+      try:
+        os.makedirs(directory)
+      except OSError:
+        pass
 
   def _create_files(self, basepath, files=[]):
     """
