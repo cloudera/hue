@@ -512,6 +512,10 @@ class WebHdfs(Hdfs):
 
   def get_delegation_token(self, renewer):
     """get_delegation_token(user) -> Delegation token"""
+    # Workaround for HDFS-3988
+    if self._security_enabled:
+      self.get_home_dir()
+
     params = self._getparams()
     params['op'] = 'GETDELEGATIONTOKEN'
     params['renewer'] = renewer
