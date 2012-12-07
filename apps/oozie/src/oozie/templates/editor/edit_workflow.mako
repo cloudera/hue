@@ -582,6 +582,7 @@ $('#workflow').on('click', '.edit-node-link', function(e) {
 
   $('.modal-backdrop').on('click', cancel_edit);
   modal.el.on('click', '.close', cancel_edit);
+  modal.el.on('click', '.cancelButton', cancel_edit);
   modal.el.on('click', '.doneButton', try_save);
 });
 
@@ -620,6 +621,7 @@ $('#workflow').on('click', '.new-node-link', function(e) {
 
   $('.modal-backdrop').on('click', cancel_edit);
   modal.el.on('click', '.close', cancel_edit);
+  modal.el.on('click', '.cancelButton', cancel_edit);
   modal.el.on('click', '.doneButton', try_save);
 
   workflow.model.is_dirty = true;
