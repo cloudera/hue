@@ -9,7 +9,7 @@ from useradmin.models import create_profile_for_user
 from useradmin.models import UserProfile
 
 class Migration(DataMigration):
-    
+
     def forwards(self, orm):
         """
         This migration has been customized to support upgrades from Cloudera
@@ -19,7 +19,7 @@ class Migration(DataMigration):
           db.rename_table('userman_ldapgroup', 'useradmin_ldapgroup')
           db.delete_column('useradmin_ldapgroup', 'hidden')
         except Exception, e:
-          db.rollback_transaction()  
+          db.rollback_transaction()
           db.start_transaction()
 
           # Adding model 'LdapGroup'
@@ -37,23 +37,23 @@ class Migration(DataMigration):
           # table may have been migrated from Cloudera Enterprise, in which case
           # this column would already exist.
           pass
-    
+
         for user in User.objects.all():
           try:
             orm.UserProfile.objects.get(user=user)
           except orm.UserProfile.DoesNotExist:
             create_profile_for_user(user)
 
-    
+
     def backwards(self, orm):
-        
+
         # Deleting model 'LdapGroup'
         db.delete_table('useradmin_ldapgroup')
 
         # Deleting field 'UserProfile.creation_method'
         db.delete_column('useradmin_userprofile', 'creation_method')
-    
-    
+
+
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},
@@ -118,5 +118,5 @@ class Migration(DataMigration):
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']", 'unique': 'True'})
         }
     }
-    
+
     complete_apps = ['useradmin']

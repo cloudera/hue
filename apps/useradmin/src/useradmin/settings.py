@@ -13,8 +13,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 DJANGO_APPS = [ "useradmin" ]
 NICE_NAME = "User Admin"
 REQUIRES_HADOOP = False
 ICON = "/useradmin/static/art/icon_useradmin_24.png"
 MENU_INDEX = 60
+
+PERMISSION_ACTIONS = (
+  ("access_view:useradmin:edit_user", "Access to profile page on User Admin"),
+)

@@ -34,7 +34,7 @@ class Migration(DataMigration):
       return tuple(dependent_migrations)
 
     depends_on = classproperty(_depends_on)
-    
+
     def forwards(self, orm):
         """
         This migration has been customized to support upgrades from Cloudera
@@ -47,7 +47,7 @@ class Migration(DataMigration):
           db.delete_table('userman_grouprelations')
         except Exception:
          pass
-        
+
         try:
           db.rename_table('userman_userprofile', 'useradmin_userprofile')
           db.delete_column('useradmin_userprofile', 'primary_group_id')
@@ -64,7 +64,7 @@ class Migration(DataMigration):
               up.creation_method = UserProfile.CreationMethod.HUE
             up.save()
         except Exception:
-          db.rollback_transaction()  
+          db.rollback_transaction()
           db.start_transaction()
 
           # Adding model 'UserProfile'
@@ -83,7 +83,7 @@ class Migration(DataMigration):
           db.create_index('useradmin_grouppermission', ['group_id'])
           db.create_index('useradmin_grouppermission', ['hue_permission_id'])
         except Exception:
-          db.rollback_transaction()  
+          db.rollback_transaction()
           db.start_transaction()
 
           # Adding model 'GroupPermission'
@@ -99,7 +99,7 @@ class Migration(DataMigration):
         try:
           db.rename_table('userman_desktoppermission', 'useradmin_huepermission')
         except Exception:
-          db.rollback_transaction()  
+          db.rollback_transaction()
           db.start_transaction()
 
           # Adding model 'HuePermission'
@@ -112,9 +112,9 @@ class Migration(DataMigration):
           db.commit_transaction()
           db.start_transaction()
           db.send_create_signal('useradmin', ['HuePermission'])
-    
+
     def backwards(self, orm):
-        
+
         # Deleting model 'UserProfile'
         db.delete_table('useradmin_userprofile')
 
@@ -123,8 +123,8 @@ class Migration(DataMigration):
 
         # Deleting model 'HuePermission'
         db.delete_table('useradmin_huepermission')
-    
-    
+
+
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},
@@ -183,5 +183,5 @@ class Migration(DataMigration):
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']", 'unique': 'True'})
         }
     }
-    
+
     complete_apps = ['useradmin']
