@@ -14,12 +14,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
-# Tests for Desktop-specific middleware
 
 from desktop.lib.django_test_util import make_logged_in_client
+from desktop.lib.test_utils import add_permission
 
 from nose.tools import assert_equal
+
 
 def test_jframe_middleware():
   c = make_logged_in_client()
@@ -41,3 +41,27 @@ def test_jframe_middleware():
 
   response = c.get("/about/?")
   assert_equal("/about/", response["X-Hue-JFrame-Path"])
+
+
+def test_view_perms():
+  # Super user
+  c = make_logged_in_client()
+
+  response = c.get("/useradmin/")
+  assert_equal(200, response.status_code)
+
+  response = c.get("/useradmin/users/edit/test")
+  assert_equal(200, response.status_code)
+
+  # Normal user
+  c = make_logged_in_client('user', is_superuser=False)
+  add_permission('user', 'test-view-group', 'access_view:useradmin:edit_user', 'useradmin')
+
+  response = c.get("/useradmin/")
+  assert_equal(401, response.status_code)
+
+  response = c.get("/useradmin/users/edit/test")
+  assert_equal(401, response.status_code)
+
+  response = c.get("/useradmin/users/edit/user") # Can access his profile page
+  assert_equal(200, response.status_code, response.content)

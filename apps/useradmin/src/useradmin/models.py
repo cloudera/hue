@@ -160,7 +160,7 @@ models.signals.post_save.connect(create_user_signal_handler, sender=auth_models.
 
 class LdapGroup(models.Model):
   """
-  Groups that come from LDAP originally will have an LdapGroup 
+  Groups that come from LDAP originally will have an LdapGroup
   record generated at creation time.
   """
   group = models.ForeignKey(auth_models.Group, related_name="group")
@@ -261,7 +261,8 @@ def update_app_permissions(**kwargs):
     default_group = get_default_user_group()
     if default_group:
       for new_dp in added:
-        GroupPermission.objects.create(group=default_group, hue_permission=new_dp)
+        if not (new_dp.app == 'useradmin' and new_dp.action == 'access'):
+          GroupPermission.objects.create(group=default_group, hue_permission=new_dp)
 
     available = HuePermission.objects.count()
 

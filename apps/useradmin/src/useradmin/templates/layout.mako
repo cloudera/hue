@@ -25,6 +25,21 @@ def is_selected(section, matcher):
     return ""
 %>
 
+<%def name="render_field(field)">
+  %if not field.is_hidden:
+    <% group_class = len(field.errors) and "error" or "" %>
+    <div class="control-group ${group_class}">
+      <label class="control-label" for="id_${field.html_name}">${field.label}</label>
+      <div class="controls">
+        ${unicode(field) | n}
+        % if len(field.errors):
+          <span class="help-inline">${unicode(field.errors) | n}</span>
+        % endif
+      </div>
+    </div>
+  %endif
+</%def>
+
 <%def name="menubar(section='', _=None)">
 	<div class="subnav subnav-fixed">
 		<div class="container-fluid">

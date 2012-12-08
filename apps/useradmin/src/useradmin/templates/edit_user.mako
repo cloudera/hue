@@ -19,92 +19,86 @@ from desktop.lib.django_util import extract_field_data
 import urllib
 from django.utils.translation import ugettext as _
 %>
+
 <%namespace name="layout" file="layout.mako" />
 
 ${commonheader(_('Hue Users'), "useradmin", user, "100px")}
-${layout.menubar(section='users', _=_)}
 
-<%def name="render_field(field)">
-  %if not field.is_hidden:
-    <% group_class = len(field.errors) and "error" or "" %>
-    <div class="control-group ${group_class}">
-      <label class="control-label" for="id_${field.html_name}">${_(field.label)}</label>
-      <div class="controls">
-		${unicode(field) | n}
-        % if len(field.errors):
-          <span class="help-inline">${unicode(field.errors) | n}</span>
-        % endif
-      </div>
-    </div>
-  %endif
-</%def>
+% if user.is_superuser:
+  ${layout.menubar(section='users', _=_)}
+% endif
 
 <div class="container-fluid">
-	% if username:
-		<h1>${_('Hue Users - Edit user: %(username)s') % dict(username=username)}</h1>
-	% else:
-		% if ldap:
-			<h1>${_('Hue Users - Add/Sync LDAP user')}</h1>
-		% else:
-			<h1>${_('Hue Users - Create user')}</h1>
-		% endif
-	% endif
+    % if username:
+        <h1>${_('Hue Users - Edit user: %(username)s') % dict(username=username)}</h1>
+    % else:
+        <h1>${_('Hue Users - Create user')}</h1>
+    % endif
 
     <br/>
 
-	<form id="editForm" action="${urllib.quote(action)}" method="POST" class="form form-horizontal">
-		<fieldset>
-			% for field in form:
-                %if field.name == "username" and "password1" in form.fields:
-                    ${render_field(form["username"])}
-                    <div class="row">
-                        <div class="span5">
-                        ${render_field(form["password1"])}
-                        </div>
-                        <div class="span4">
-                        ${render_field(form["password2"])}
-                        </div>
-                    </div>
-                %elif field.name == "first_name":
-                    <div class="row">
-                        <div class="span5">
-                        ${render_field(form["first_name"])}
-                        </div>
-                        <div class="span4">
-                        ${render_field(form["last_name"])}
-                        </div>
-                    </div>
-                %elif field.name == "last_name" or field.name == "password1" or field.name == "password2":
-                    ## skip rendering
-                %else:
-				    ${render_field(field)}
-                %endif
-			% endfor
-		</fieldset>
-		<br/>
-		<div class="form-actions">
-			% if username:
-				<input type="submit" class="btn btn-primary" value="${_('Update user')}"/>
-			% else:
-				% if ldap:
-					<input type="submit" class="btn btn-primary" value="${_('Add/Sync user')}"/>
-				% else:
-					<input type="submit" class="btn btn-primary" value="${_('Add user')}"/>
-				% endif
-			% endif
-			<a href="/useradmin/users" class="btn">${_('Cancel')}</a>
-		</div>
-	</form>
+    <form id="editForm" method="POST" class="form form-horizontal">
+        <fieldset>
+            <h3>${ _('Information') }<h3>
+
+            ${layout.render_field(form["username"])}
+
+            % if "password1" in form.fields:
+            <div class="row">
+                <div class="span5">
+                ${layout.render_field(form["password1"])}
+                </div>
+                <div class="span4">
+                ${layout.render_field(form["password2"])}
+                </div>
+            </div>
+            % endif
+
+            <h3>${ _('Optional') }<h3>
+
+            % if "first_name" in form.fields:
+            <div class="row">
+                <div class="span5">
+                ${layout.render_field(form["first_name"])}
+                </div>
+                <div class="span4">
+                ${layout.render_field(form["last_name"])}
+                </div>
+            </div>
+            % endif
+
+            ${layout.render_field(form["email"])}
+            % if user.is_superuser:
+              ${layout.render_field(form["groups"])}
+              ${layout.render_field(form["is_active"])}
+            % endif
+            ${layout.render_field(form["ensure_home_directory"])}
+            % if user.is_superuser:
+              ${'is_superuser' in form.fields and layout.render_field(form["is_superuser"])}
+            % endif
+        </fieldset>
+        <br/>
+        <div class="form-actions">
+            % if username:
+                <input type="submit" class="btn btn-primary" value="${_('Update user')}"/>
+            % else:
+                <input type="submit" class="btn btn-primary" value="${_('Add user')}"/>
+            % endif
+            <a class="btn" onclick="history.back()">${ _('Cancel') }</a>
+        </div>
+    </form>
 </div>
+
 <script type="text/javascript" charset="utf-8">
-	$(document).ready(function(){
-		$("#id_groups").jHueSelector({
+    $(document).ready(function(){
+        $("#id_groups").jHueSelector({
             selectAllLabel: "${_('Select all')}",
             searchPlaceholder: "${_('Search')}",
             noChoicesFound: "${_('No groups found.')} <a href='${url('useradmin.views.edit_group')}'>${_('Create a new group now')} &raquo;</a>",
             width:618,
             height:240
         });
-	});
+    });
 </script>
+
 ${commonfooter(messages)}

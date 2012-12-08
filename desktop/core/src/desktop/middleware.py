@@ -27,7 +27,9 @@ from django.contrib.auth import REDIRECT_FIELD_NAME, BACKEND_SESSION_KEY, authen
 from django.contrib.auth.middleware import RemoteUserMiddleware
 from django.core import exceptions, urlresolvers
 import django.db
+from django.core.urlresolvers import resolve
 from django.http import HttpResponseRedirect, HttpResponse
+from django.utils.translation import ugettext as _
 from django.utils.http import urlquote
 from django.utils.encoding import iri_to_uri
 import django.views.static
@@ -43,7 +45,6 @@ from desktop import appmanager
 from hadoop import cluster
 import simplejson
 
-from django.utils.translation import ugettext as _
 
 LOG = logging.getLogger(__name__)
 
@@ -295,11 +296,21 @@ class LoginAndPermissionMiddleware(object):
     # app.
     if request.user.is_active and request.user.is_authenticated():
       AppSpecificMiddleware.augment_request_with_app(request, view_func)
+
+      # Until we get Django 1.3 and resolve returning the URL name, we just do a match of the name of the view
+      try:
+        access_view = 'access_view:%s:%s' % (request._desktop_app, resolve(request.path)[0].__name__)
+      except Exception, e:
+        access_log(request, 'error checking view perm: %s', e, level=access_log_level)
+        access_view =''
+
       if request._desktop_app and \
           request._desktop_app != "desktop" and \
-          not request.user.has_hue_permission(action="access", app=request._desktop_app):
+          not (request.user.has_hue_permission(action="access", app=request._desktop_app) or
+               request.user.has_hue_permission(action=access_view, app=request._desktop_app)):
         access_log(request, 'permission denied', level=access_log_level)
-        return PopupException(_("You do not have permission to access the %(app_name)s application.") % {'app_name': request._desktop_app.capitalize()}).response(request)
+        return PopupException(_("You do not have permission to access the %(app_name)s application.") %
+                              {'app_name': request._desktop_app.capitalize()}, error_code=401).response(request)
       else:
         log_page_hit(request, view_func, level=access_log_level)
         return None
@@ -314,9 +325,7 @@ class LoginAndPermissionMiddleware(object):
       response[MIDDLEWARE_HEADER] = 'LOGIN_REQUIRED'
       return response
     else:
-      return HttpResponseRedirect("%s?%s=%s" % (settings.LOGIN_URL,
-        REDIRECT_FIELD_NAME,
-        urlquote(request.get_full_path())))
+      return HttpResponseRedirect("%s?%s=%s" % (settings.LOGIN_URL, REDIRECT_FIELD_NAME, urlquote(request.get_full_path())))
 
 
 class SessionOverPostMiddleware(object):
@@ -443,7 +452,7 @@ class HtmlValidationMiddleware(object):
 
     # Write the two versions of html out for offline debugging
     filename = os.path.join(self._outdir, fn_name)
-    
+
     result = "HTML tidy result: %s [%s]:" \
              "\n\t%s" \
              "\nPlease see %s.orig %s.tidy\n-------" % \
