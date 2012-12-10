@@ -857,6 +857,12 @@ class TestEditor(OozieMockBase):
                  coord.find_all_parameters())
 
 
+  def test_workflow_data_binds(self):
+    response = self.c.get(reverse('oozie:edit_workflow', args=[self.wf.id]))
+    assert_equal(1, response.content.count('checked: is_shared'), response.content)
+    assert_true('checked: capture_output' in response.content, response.content)
+
+
   def test_import_workflow_basic(self):
     workflow = Workflow.objects.new_workflow(self.user)
     workflow.save()
