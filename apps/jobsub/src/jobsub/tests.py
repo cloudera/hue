@@ -27,7 +27,7 @@ from liboozie.oozie_api_test import OozieServerProvider
 
 from jobsub import conf
 from jobsub.management.commands import jobsub_setup
-from jobsub.models import OozieDesign, OozieMapreduceAction, OozieStreamingAction
+from jobsub.models import OozieDesign, OozieMapreduceAction, OozieStreamingAction, CheckForSetup
 from jobsub.parameterization import recursive_walk, find_variables, substitute_variables
 
 
@@ -190,6 +190,10 @@ class TestJobsubWithHadoop(OozieServerProvider):
 
     # Ensure access to MR folder
     self.cluster.fs.do_as_superuser(self.cluster.fs.chmod, '/tmp', 0777, recursive=True)
+
+  def tearDown(self):
+    OozieDesign.objects.all().delete()
+    CheckForSetup.objects.all().delete()
 
   def test_jobsub_setup(self):
     # User 'test' triggers the setup of the examples.

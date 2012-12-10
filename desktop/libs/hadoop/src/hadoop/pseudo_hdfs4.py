@@ -23,6 +23,7 @@ import os
 import shutil
 import signal
 import subprocess
+import socket
 import tempfile
 import textwrap
 import time
@@ -79,13 +80,17 @@ class PseudoHdfs4(object):
     self._dn_proc = None
     self._jt_proc = None
     self._tt_proc = None
+    self._fqdn = socket.getfqdn()
 
     self.shutdown_hook = None
 
   def __str__(self):
-    return "PseudoHdfs4 (%s) at %s --- MR1 (%s) at http://localhost:%s" % \
-        (self._fs_default_name, self._tmpdir,
-         self.mapred_job_tracker, self._jt_http_port)
+    return "PseudoHdfs4 (%(name)s) at %(dir)s --- MR1 (%(mapreduce)s) at http://%(fqdn)s:%(port)s" % {
+      'name': self._fs_default_name,
+      'dir': self._tmpdir,
+      'mapreduce': self.mapred_job_tracker,
+      'fqdn': self._fqdn,
+      'port': self._jt_http_port}
 
   @property
   def superuser(self):
@@ -121,11 +126,11 @@ class PseudoHdfs4(object):
 
   @property
   def mapred_job_tracker(self):
-    return "localhost:%s" % (self._jt_port,)
+    return "%s:%s" % (self._fqdn, self._jt_port,)
 
   @property
   def mapred_job_tracker_http_address(self):
-    return "localhost:%s" % (self._jt_http_port,)
+    return "%s:%s" % (self._fqdn, self._jt_http_port,)
 
   @property
   def fs(self):
@@ -143,7 +148,7 @@ class PseudoHdfs4(object):
   def jt(self):
     """Returns a LiveJobTracker object configured for this cluster."""
     if self._jt is None:
-      self._jt = LiveJobTracker("localhost", self.jt_thrift_port)
+      self._jt = LiveJobTracker(self._fqdn, self.jt_thrift_port)
     return self._jt
 
   def stop(self):
@@ -392,17 +397,17 @@ class PseudoHdfs4(object):
 
   def _write_hdfs_site(self):
     self._dfs_http_port = find_unused_port()
-    self._dfs_http_address = 'localhost:%s' % (self._dfs_http_port,)
+    self._dfs_http_address = '%s:%s' % (self._fqdn, self._dfs_http_port)
 
     hdfs_configs = {
       'dfs.webhdfs.enabled': 'true',
       'dfs.http.address': self._dfs_http_address,
       'dfs.namenode.safemode.extension': 1,
       'dfs.namenode.safemode.threshold-pct': 0,
-      'dfs.datanode.address': 'localhost:0',
+      'dfs.datanode.address': '%s:0' % self._fqdn,
       # Work around webhdfs redirect bug -- bind to all interfaces
       'dfs.datanode.http.address': '0.0.0.0:0',
-      'dfs.datanode.ipc.address': 'localhost:0',
+      'dfs.datanode.ipc.address': '%s:0' % self._fqdn,
       'dfs.replication': 1,
       'dfs.safemode.min.datanodes': 1,
     }
@@ -413,7 +418,7 @@ class PseudoHdfs4(object):
     ugm_properties = self._tmppath('ugm.properties')
     self._write_static_group_mapping(ugm_properties)
     self._namenode_port = find_unused_port()
-    self._fs_default_name = 'hdfs://localhost:%s' % (self._namenode_port,)
+    self._fs_default_name = 'hdfs://%s:%s' % (self._fqdn, self._namenode_port,)
 
     core_configs = {
       'fs.default.name': self._fs_default_name,
@@ -434,11 +439,11 @@ class PseudoHdfs4(object):
     self._tt_http_port = find_unused_port()
 
     mapred_configs = {
-      'mapred.job.tracker': 'localhost:%s' % (self._jt_port,),
-      'mapred.job.tracker.http.address': 'localhost:%s' % (self._jt_http_port,),
-      'jobtracker.thrift.address': 'localhost:%s' % (self._jt_thrift_port,),
+      'mapred.job.tracker': '%s:%s' % (self._fqdn, self._jt_port,),
+      'mapred.job.tracker.http.address': '%s:%s' % (self._fqdn, self._jt_http_port,),
+      'jobtracker.thrift.address': '%s:%s' % (self._fqdn, self._jt_thrift_port,),
       'mapred.jobtracker.plugins': 'org.apache.hadoop.thriftfs.ThriftJobTrackerPlugin',
-      'mapred.task.tracker.http.address': 'localhost:%s' % (self._tt_http_port,),
+      'mapred.task.tracker.http.address': '%s:%s' % (self._fqdn, self._tt_http_port,),
     }
     write_config(mapred_configs, self._tmppath('conf/mapred-site.xml'))
 
@@ -475,11 +480,12 @@ def shared_cluster():
       LOG.exception("Failed to fully bring up test cluster: %s" % (ex,))
 
     # Fix config to reflect the cluster setup.
-    webhdfs_url = "http://localhost:%s/webhdfs/v1" % (cluster.dfs_http_port,)
+    fqdn = socket.getfqdn()
+    webhdfs_url = "http://%s:%s/webhdfs/v1" % (fqdn, cluster.dfs_http_port,)
     closers = [
       hadoop.conf.HDFS_CLUSTERS['default'].FS_DEFAULTFS.set_for_testing(cluster.fs_default_name),
       hadoop.conf.HDFS_CLUSTERS['default'].WEBHDFS_URL.set_for_testing(webhdfs_url),
-      hadoop.conf.MR_CLUSTERS['default'].HOST.set_for_testing('localhost'),
+      hadoop.conf.MR_CLUSTERS['default'].HOST.set_for_testing(fqdn),
       hadoop.conf.MR_CLUSTERS['default'].PORT.set_for_testing(cluster._jt_port),
       hadoop.conf.MR_CLUSTERS['default'].JT_THRIFT_PORT.set_for_testing(cluster.jt_thrift_port),
     ]
