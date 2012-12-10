@@ -28,7 +28,7 @@ from nose.tools import assert_true, assert_false, assert_equal
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
-from jobsub.models import OozieDesign
+from jobsub.models import OozieDesign, CheckForSetup
 from liboozie.oozie_api_test import OozieServerProvider
 
 from jobbrowser import models, views
@@ -88,6 +88,11 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
       jobsub_setup.Command().handle()
 
     cls.sleep_design_id = OozieDesign.objects.get(name='sleep_job').id
+
+  @classmethod
+  def teardown_class(cls):
+    OozieDesign.objects.all().delete()
+    CheckForSetup.objects.all().delete()
 
   def setUp(self):
     TestJobBrowserWithHadoop.user_count += 1

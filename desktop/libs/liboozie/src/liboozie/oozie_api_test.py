@@ -19,6 +19,7 @@ import atexit
 import getpass
 import logging
 import os
+import socket
 import subprocess
 import threading
 import time
@@ -123,7 +124,7 @@ class OozieServerProvider(object):
       LOG.info('See https://issues.cloudera.org/browse/HUE-861\n')
 
       finish = (
-        OOZIE_URL.set_for_testing("http://localhost:%s/oozie" % OozieServerProvider.OOZIE_TEST_PORT),
+        OOZIE_URL.set_for_testing("http://%s:%s/oozie" % (socket.getfqdn(), OozieServerProvider.OOZIE_TEST_PORT)),
       )
 
       # Setup
