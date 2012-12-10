@@ -62,7 +62,11 @@
 
           % for field in action_form:
             % if field.html_name not in ('name', 'description', 'node_type', 'job_xml'):
-              ${ utils.render_field_with_error_js(field, field.name, extra_attrs={'data-bind': 'value: %s' % field.name}) }
+              % if field.html_name in ('capture_output', 'is_single'):
+                ${ utils.render_field_with_error_js(field, field.name, extra_attrs={'data-bind': 'checked: %s' % field.name}) }
+              % else:
+                ${ utils.render_field_with_error_js(field, field.name, extra_attrs={'data-bind': 'value: %s' % field.name}) }
+              % endif
             % endif
           % endfor
 
