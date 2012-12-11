@@ -606,6 +606,7 @@ class TestEditor(OozieMockBase):
         '    <end name="end"/>\n'
         '</workflow-app>'.split(), self.wf.to_xml().split())
 
+
   def test_workflow_shell_gen_xml(self):
     self.wf.node_set.filter(name='action-name-1').delete()
 
@@ -650,6 +651,41 @@ class TestEditor(OozieMockBase):
               <argument>World!</argument>
             <file>hello.py#hello.py</file>
         </shell>""" in xml, xml)
+
+
+  def test_workflow_fs_gen_xml(self):
+    self.wf.node_set.filter(name='action-name-1').delete()
+
+    action1 = add_node(self.wf, 'action-name-1', 'fs', [self.wf.start], {
+        u'name': 'MyFs',
+        u'description': 'Execute a Fs action that manage files',
+        u'deletes': '[{"name":"/to/delete"},{"name":"to/delete2"}]',
+        u'mkdirs': '[{"name":"/to/mkdir"},{"name":"${mkdir2}"}]',
+        u'moves': '[{"source":"/to/move/source","destination":"/to/move/destination"},{"source":"/to/move/source2","destination":"/to/move/destination2"}]',
+        u'chmods': '[{"path":"/to/chmod","recursive":true,"permissions":"-rwxrw-rw-"},{"path":"/to/chmod2","recursive":false,"permissions":"755"}]',
+        u'touchzs': '[{"name":"/to/touchz"},{"name":"/to/touchz2"}]'
+    })
+    Link(parent=action1, child=self.wf.end, name="ok").save()
+
+    xml = self.wf.to_xml()
+
+    assert_true("""
+    <action name="MyFs">
+        <fs>
+              <delete path='${nameNode}/to/delete'/>
+              <delete path='${nameNode}/user/${wf:user()}/to/delete2'/>
+              <mkdir path='${nameNode}/to/mkdir'/>
+              <mkdir path='${nameNode}${mkdir2}'/>
+              <move source='${nameNode}/to/move/source' target='${nameNode}/to/move/destination'/>
+              <move source='${nameNode}/to/move/source2' target='${nameNode}/to/move/destination2'/>
+              <chmod path='${nameNode}/to/chmod' permissions='-rwxrw-rw-' dir-files='true'/>
+              <chmod path='${nameNode}/to/chmod2' permissions='755' dir-files='false'/>
+              <touchz path='${nameNode}/to/touchz'/>
+              <touchz path='${nameNode}/to/touchz2'/>
+        </fs>
+        <ok to="end"/>
+        <error to="kill"/>
+    </action>""" in xml, xml)
 
 
   def test_workflow_flatten_list(self):

@@ -463,6 +463,8 @@ class Node(models.Model):
       node = self.shell
     elif self.node_type == DistCp.node_type:
       node = self.distcp
+    elif self.node_type == Fs.node_type:
+      node = self.fs
     elif self.node_type == Streaming.node_type:
       node = self.streaming
     elif self.node_type == Java.node_type:
@@ -505,6 +507,7 @@ class Node(models.Model):
   # Can't use through relation directly with this Django version?
   # https://docs.djangoproject.com/en/1.2/topics/db/models/#intermediary-manytomany
   def get_link(self, name=None):
+    a = Link.objects.filter(parent=self)
     if name is None:
       return Link.objects.exclude(name__in=Link.META_LINKS).get(parent=self)
     else:
@@ -882,8 +885,43 @@ class DistCp(Action):
     return json.loads(self.prepares)
 
 
+class Fs(Action):
+  PARAM_FIELDS = ('deletes', 'mkdirs', 'moves', 'chmods', 'touchzs')
+  node_type = 'fs'
+
+  deletes = models.TextField(default="[]", verbose_name=_t('Delete path'), blank=True,
+                            help_text=_t('Delete the specified path, if it is a directory it deletes recursively all its content and '
+                                         'then deletes the directory.'))
+  mkdirs = models.TextField(default="[]", verbose_name=_t('Create directory'), blank=True,
+                            help_text=_t('Create the specified directory, it creates all missing directories in the path. '
+                                         'If the directory already exist it does a no-op.'))
+  moves = models.TextField(default="[]", verbose_name=_t('Move file'), blank=True,
+                            help_text=_t('Move a file or directory to another path.'))
+  chmods = models.TextField(default="[]", verbose_name=_t('Change permissions'), blank=True,
+                            help_text=_t('Change the permissions for the specified path. Permissions can be specified using the Unix Symbolic '
+                                         'representation (e.g. -rwxrw-rw-) or an octal representation (755).'))
+  touchzs = models.TextField(default="[]", verbose_name=_t('Create or touch a file'), blank=True,
+                            help_text=_t('Creates a zero length file in the specified path if none exists or touch it.'))
+
+
+  def get_deletes(self):
+    return json.loads(self.deletes)
+
+  def get_mkdirs(self):
+    return json.loads(self.mkdirs)
+
+  def get_moves(self):
+    return json.loads(self.moves)
+
+  def get_chmods(self):
+    return json.loads(self.chmods)
+
+  def get_touchzs(self):
+    return json.loads(self.touchzs)
+
+
 Action.types = (Mapreduce.node_type, Streaming.node_type, Java.node_type, Pig.node_type, Hive.node_type, Sqoop.node_type, Ssh.node_type, Shell.node_type,
-                DistCp.node_type)
+                DistCp.node_type, Fs.node_type)
 
 
 class ControlFlow(Node):
@@ -965,7 +1003,7 @@ class Fork(ControlFlow):
 class Decision(ControlFlow):
   """
   Essentially a fork where the end is not a join, but another node.
-  If two decisions share an end, the decision with the higher level takes the end 
+  If two decisions share an end, the decision with the higher level takes the end
   and the lower level decision will not have an end.
   IE:     D
         D   N
@@ -1350,7 +1388,9 @@ ACTION_TYPES = {
   Ssh.node_type: Ssh,
   Shell.node_type: Shell,
   DistCp.node_type: DistCp,
+  Fs.node_type: Fs,
 }
+
 NODE_TYPES = ACTION_TYPES.copy()
 NODE_TYPES.update({
   Fork.node_type: Fork,

@@ -35,7 +35,8 @@ from oozie.utils import model_to_dict
 LOG = logging.getLogger(__name__)
 
 
-JSON_FIELDS = ('parameters', 'job_properties', 'files', 'archives', 'prepares', 'params')
+JSON_FIELDS = ('parameters', 'job_properties', 'files', 'archives', 'prepares', 'params',
+               'deletes', 'mkdirs', 'moves', 'chmods', 'touchzs')
 def format_field_value(field, value):
   if field in JSON_FIELDS:
     if not isinstance(value, basestring):
@@ -158,10 +159,12 @@ def workflow_validate_action(request, workflow, node_type):
 @check_job_access_permission(exception_class=(lambda x: StructuredException(code="UNAUTHORIZED_REQUEST_ERROR", message=x, data=None, error_code=401)))
 @check_job_edition_permission(exception_class=(lambda x: StructuredException(code="UNAUTHORIZED_REQUEST_ERROR", message=x, data=None, error_code=401)))
 def workflow_save(request, workflow):
+  print request.POST
   json_workflow = format_dict_field_values(json.loads(str(request.POST.get('workflow'))))
   json_workflow.setdefault('schema_version', workflow.schema_version)
 
   form = WorkflowForm(data=json_workflow)
+
   if not form.is_valid():
     raise StructuredException(code="INVALID_REQUEST_ERROR", message=_('Error saving workflow'), data={'errors': form.errors}, error_code=400)
 

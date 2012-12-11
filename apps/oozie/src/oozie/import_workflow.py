@@ -98,7 +98,7 @@ def _save_links(workflow, root):
         for case in switch:
           to = case.attrib['to']
           child = Node.objects.get(workflow=workflow, name=to)
-          
+
           if case.tag == 'default':
             name = 'default'
             obj = Link.objects.create(name=name, parent=parent, child=child)
@@ -107,7 +107,7 @@ def _save_links(workflow, root):
             name = 'start'
             comment = case.text.strip()
             obj = Link.objects.create(name=name, parent=parent, child=child, comment=comment)
-          
+
           obj.save()
 
     else:
@@ -258,13 +258,13 @@ def import_workflow(workflow, workflow_definition, schema_version=0.4):
     'xslt_dir': DEFINITION_XSLT_DIR.get(),
     'schema_version': schema_version
   })
-  
+
   # Remove namespace from definition
   workflow_definition = re.sub(r'\s*xmlns=".*?"', '', workflow_definition, count=1)
 
   # Parse Workflow Definition
   xml = etree.fromstring(workflow_definition)
-  
+
   # Get XSLT
   xslt = etree.parse(xslt_definition_fh)
   xslt_definition_fh.close()

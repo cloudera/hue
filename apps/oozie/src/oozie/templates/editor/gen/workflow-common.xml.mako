@@ -15,7 +15,8 @@
 ## limitations under the License.
 
 <%!
-import posixpath
+  import posixpath
+  from oozie.utils import smart_path
 %>
 
 
@@ -27,18 +28,10 @@ import posixpath
             <prepare>
                 % for p in prepares:
                   <%
-                    # Same as Fs action convention. No change if path is just a parameter.
                     operation = p['type']
                     path = p['value']
-
-                    if not path.startswith('/') and not path.startswith('$') and not path.startswith('hdfs://'):
-                      path = '/user/%(username)s/%(path)s' % {'username': '${wf:user()}', 'path': path}
-
-                    if not path.startswith('hdfs://'):
-                      path = '%(nameNode)s%(path)s' % {'nameNode': '${nameNode}', 'path': path}
                   %>
-
-                  <${ operation } path="${ path }"/>
+                  <${ operation } path="${ smart_path(path) }"/>
                 % endfor
             </prepare>
         % endif

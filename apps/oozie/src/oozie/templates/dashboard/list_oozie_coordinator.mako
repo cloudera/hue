@@ -98,7 +98,7 @@ ${ layout.menubar(section='dashboard') }
               % if oozie_coordinator.is_running():
                 <a title="${_('Kill %(coordinator)s') % dict(coordinator=oozie_coordinator.id)}"
                   id="kill-coordinator"
-                  class="btn small confirmationModal"
+                  class="btn btn-danger small confirmationModal"
                   alt="${ _('Are you sure you want to kill coordinator %s?') % oozie_coordinator.id }"
                   href="javascript:void(0)"
                   data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='kill') }"
@@ -120,10 +120,10 @@ ${ layout.menubar(section='dashboard') }
 
     <ul class="nav nav-tabs">
       <li class="active"><a href="#calendar" data-toggle="tab">${ _('Calendar') }</a></li>
-    <li><a href="#actions" data-toggle="tab">${ _('Actions') }</a></li>
-    <li><a href="#configuration" data-toggle="tab">${ _('Configuration') }</a></li>
-    <li><a href="#log" data-toggle="tab">${ _('Log') }</a></li>
-    <li><a href="#definition" data-toggle="tab">${ _('Definition') }</a></li>
+      <li><a href="#actions" data-toggle="tab">${ _('Actions') }</a></li>
+      <li><a href="#configuration" data-toggle="tab">${ _('Configuration') }</a></li>
+      <li><a href="#log" data-toggle="tab">${ _('Log') }</a></li>
+      <li><a href="#definition" data-toggle="tab">${ _('Definition') }</a></li>
     </ul>
 
     <div class="tab-content" style="padding-bottom:200px">

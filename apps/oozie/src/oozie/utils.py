@@ -42,3 +42,15 @@ def workflow_to_dict(workflow):
   workflow_dict['nodes'] = nodes
 
   return workflow_dict
+
+
+def smart_path(path):
+  # Try to prepend home_dir and FS scheme. No change if path starts by a parameter.
+
+  if not path.startswith('/') and not path.startswith('$') and not path.startswith('hdfs://'):
+    path = '/user/%(username)s/%(path)s' % {'username': '${wf:user()}', 'path': path}
+
+  if not path.startswith('hdfs://'):
+    path = '%(nameNode)s%(path)s' % {'nameNode': '${nameNode}', 'path': path}
+
+  return path

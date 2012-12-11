@@ -28,7 +28,8 @@ if (!('filter' in Array.prototype)) {
 // Since knockout maps arrays without calling "update" nor "create"
 // Provide a JSON string that will be parsed in custom 'create' and 'update' functions.
 var normalize_model_fields = (function() {
-  var FIELDS = ['parameters', 'job_properties', 'files', 'archives', 'prepares', 'params'];
+  var FIELDS = ['parameters', 'job_properties', 'files', 'archives', 'prepares', 'params',
+                'deletes', 'mkdirs', 'moves', 'chmods', 'touchzs'];
   function fn(node_model) {
     $.each(FIELDS, function(index, field) {
       if (field in node_model && $.isArray(node_model[field])) {
@@ -403,6 +404,21 @@ $.extend(SshModel.prototype, {
   child_links: []
 });
 
+var FsModel = ModelModule($);
+$.extend(FsModel.prototype, {
+  id: 0,
+  name: '',
+  description: '',
+  node_type: 'fs',
+  workflow: 0,
+  deletes: '[]',
+  mkdirs: '[]',
+  moves: '[]',
+  chmods: '[]',
+  touchzs: '[]',
+  child_links: []
+});
+
 function nodeModelChooser(node_type) {
   switch(node_type) {
     case 'mapreduce':
@@ -423,6 +439,8 @@ function nodeModelChooser(node_type) {
       return SshModel;
     case 'distcp':
       return DistCPModel;
+    case 'fs':
+        return FsModel;
     case 'fork':
       return ForkModel;
     case 'decision':
@@ -442,6 +460,7 @@ var IdGeneratorTable = {
   shell: new IdGenerator({prefix: 'shell'}),
   ssh: new IdGenerator({prefix: 'ssh'}),
   distcp: new IdGenerator({prefix: 'distcp'}),
+  fs: new IdGenerator({prefix: 'fs'}),
   fork: new IdGenerator({prefix: 'fork'}),
   decision: new IdGenerator({prefix: 'decision'}),
   join: new IdGenerator({prefix: 'join'}),
@@ -673,6 +692,90 @@ var NodeModule = function($, IdGeneratorTable) {
       };
     }
 
+    if ('deletes' in model) {
+
+        self.addDelete = function() {
+          var prop = { name: ko.observable("") };
+          prop.name.subscribe(function(value) {
+            self.deletes.valueHasMutated();
+          });
+          self.deletes.push(prop);
+        };
+
+        self.removeDelete = function(val) {
+          self.deletes.remove(val);
+        };
+      }
+
+    if ('mkdirs' in model) {
+
+        self.addMkdir = function() {
+          var prop = { name: ko.observable("") };
+          prop.name.subscribe(function(value) {
+            self.mkdirs.valueHasMutated();
+          });
+          self.mkdirs.push(prop);
+        };
+
+        self.removeMkdir = function(val) {
+          self.mkdirs.remove(val);
+        };
+      }
+
+    if ('moves' in model) {
+
+        self.addMove = function() {
+          var prop = { source: ko.observable(""), destination: ko.observable("") };
+          prop.source.subscribe(function(value) {
+            self.moves.valueHasMutated();
+          });
+          prop.destination.subscribe(function(value) {
+            self.moves.valueHasMutated();
+          });
+          self.moves.push(prop);
+        };
+
+        self.removeMove = function(val) {
+          self.moves.remove(val);
+        };
+      }
+
+    if ('chmods' in model) {
+
+        self.addChmod = function() {
+          var prop = { path: ko.observable(""), permissions: ko.observable(""), recursive: ko.observable("") };
+          prop.path.subscribe(function(value) {
+            self.chmods.valueHasMutated();
+          });
+          prop.permissions.subscribe(function(value) {
+            self.chmods.valueHasMutated();
+          });
+          prop.recursive.subscribe(function(value) {
+            self.chmods.valueHasMutated();
+          });
+          self.chmods.push(prop);
+        };
+
+        self.removeChmod = function(val) {
+          self.chmods.remove(val);
+        };
+      }
+
+    if ('touchzs' in model) {
+
+        self.addTouchz = function() {
+          var prop = { name: ko.observable("") };
+          prop.name.subscribe(function(value) {
+            self.touchzs.valueHasMutated();
+          });
+          self.touchzs.push(prop);
+        };
+
+        self.removeTouchz = function(val) {
+          self.touchzs.remove(val);
+        };
+      }
+
     self.initialize.apply(self, arguments);
 
     return self;
@@ -724,7 +827,7 @@ var NodeModule = function($, IdGeneratorTable) {
 
       // @see http://knockoutjs.com/documentation/plugins-mapping.html
       var mapping = ko.mapping.fromJS(model, {
-        ignore: ['initialize','toString'],
+        ignore: ['initialize', 'toString'],
         job_properties: {
           create: function(options) {
             var parent = options.parent;
@@ -844,7 +947,93 @@ var NodeModule = function($, IdGeneratorTable) {
 
             return map_params(options, subscribe);
           }
-        }
+        },
+        deletes: {
+          create: function(options) {
+            return map_params(options, function() {});
+          },
+          update: function(options) {
+            return map_params(options, function() {});
+          }
+        },
+        mkdirs: {
+          create: function(options) {
+            return map_params(options, function() {});
+          },
+          update: function(options) {
+            return map_params(options, function() {});
+          }
+        },
+        moves: {
+          create: function(options) {
+            var parent = options.parent;
+            var subscribe = function(mapping) {
+              mapping.source.subscribe(function(value) {
+                parent.moves.valueHasMutated();
+              });
+              mapping.destination.subscribe(function(value) {
+                parent.moves.valueHasMutated();
+              });
+            };
+
+            return map_params(options, subscribe);
+          },
+          update: function(options) {
+            var parent = options.parent;
+            var subscribe = function(mapping) {
+              mapping.source.subscribe(function(value) {
+                parent.moves.valueHasMutated();
+              });
+              mapping.destination.subscribe(function(value) {
+                parent.moves.valueHasMutated();
+              });
+            };
+
+             return map_params(options, subscribe);
+           }
+         },
+         chmods: {
+           create: function(options) {
+             var parent = options.parent;
+             var subscribe = function(mapping) {
+               mapping.path.subscribe(function(value) {
+                 parent.chmods.valueHasMutated();
+               });
+               mapping.permissions.subscribe(function(value) {
+                 parent.chmods.valueHasMutated();
+               });
+               mapping.recursive.subscribe(function(value) {
+                 parent.chmods.valueHasMutated();
+               });
+             };
+
+             return map_params(options, subscribe);
+           },
+           update: function(options) {
+             var parent = options.parent;
+             var subscribe = function(mapping) {
+               mapping.path.subscribe(function(value) {
+                 parent.chmods.valueHasMutated();
+               });
+               mapping.permissions.subscribe(function(value) {
+                 parent.chmods.valueHasMutated();
+               });
+               mapping.recursive.subscribe(function(value) {
+                 parent.chmods.valueHasMutated();
+               });
+             };
+
+             return map_params(options, subscribe);
+           }
+         },
+         touchzs: {
+           create: function(options) {
+             return map_params(options, function() {});
+           },
+           update: function(options) {
+             return map_params(options, function() {});
+           }
+         },
       });
 
       $.extend(self, mapping);
@@ -1463,7 +1652,7 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
 
     // @see http://knockoutjs.com/documentation/plugins-mapping.html
     var mapping = ko.mapping.fromJS(options.model, {
-      ignore: ['initialize','toString'],
+      ignore: ['initialize', 'toString'],
       job_properties: {
         create: function(options) {
           var mapping = ko.mapping.fromJS($.parseJSON(options.data) || options.data);
