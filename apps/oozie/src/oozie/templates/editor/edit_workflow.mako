@@ -509,7 +509,7 @@ $.extend(Workflow.prototype, {
       data: { workflow: JSON.stringify(data) },
       success: function() {
         $.jHueNotify.info("${ _('Workflow saved') }");
-        workflow.model.is_dirty = false;
+        workflow.is_dirty = false;
       },
       error: function() {
         $.jHueNotify.error("${ _('Could not save workflow') }");
@@ -575,7 +575,7 @@ $('#workflow').on('click', '.edit-node-link', function(e) {
 
   var try_save = function(e) {
     if (node.validate()) {
-      workflow.model.is_dirty = true;
+      workflow.is_dirty = true;
       modal.hide();
     }
   };
@@ -611,7 +611,7 @@ $('#workflow').on('click', '.new-node-link', function(e) {
 
   var try_save = function(e) {
     if (node.validate()) {
-      workflow.model.is_dirty = true;
+      workflow.is_dirty = true;
       modal.hide();
       // save, add node to workflow.
       workflow.nodes()[workflow.nodes().length - 2].append(node);
@@ -623,8 +623,6 @@ $('#workflow').on('click', '.new-node-link', function(e) {
   modal.el.on('click', '.close', cancel_edit);
   modal.el.on('click', '.cancelButton', cancel_edit);
   modal.el.on('click', '.doneButton', try_save);
-
-  workflow.model.is_dirty = true;
 });
 
 ko.bindingHandlers.fileChooser = {
@@ -650,7 +648,7 @@ var addAutoComplete = function(i, elem) {
 };
 
 window.onbeforeunload = function (e) {
-  if (workflow.model.is_dirty) {
+  if (workflow.is_dirty) {
     var message = "${ _('You have unsaved changes in this workflow.') }";
 
     if (!e) e = window.event;
@@ -676,7 +674,7 @@ $(document).ready(function () {
 });
 
 function checkModelDirtiness() {
-  if (workflow.model.is_dirty) {
+  if (workflow.is_dirty) {
     $(".ribbon-wrapper").fadeIn();
   }
   else {

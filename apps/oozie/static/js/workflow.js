@@ -1481,7 +1481,7 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
     $.each(mapping['__ko_mapping__'].mappedProperties, function(key, value) {
       var key = key;
       self[key].subscribe(function(value) {
-        workflow.model.is_dirty = true;
+        workflow.is_dirty = true;
         self.model[key] = ko.mapping.toJS(value);
       });
     });
@@ -1584,7 +1584,7 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
             }
           }
         });
-        workflow.model.is_dirty = false;
+        workflow.is_dirty = false;
       }
     },
 
@@ -1626,7 +1626,7 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
 
       // $(".propKey").each(addAutoComplete);
 
-      workflow.model.is_dirty = true;
+      workflow.is_dirty = true;
     },
 
     removeNode: function(node, event) {
@@ -1637,7 +1637,7 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
 
       self.rebuild();
 
-      workflow.model.is_dirty = true;
+      workflow.is_dirty = true;
     },
 
     save: function( options ) {},
@@ -1910,7 +1910,7 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
               // End of decision tree is being dragged to the bottom of a branch
               draggable.detach();
               newParent.append(draggable);
-              workflow.model.is_dirty = true;
+              workflow.is_dirty = true;
               self.rebuild();
             }
           } else {
@@ -1944,7 +1944,7 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
               newParent.append(draggable);
             break;
             }
-            workflow.model.is_dirty = true;
+            workflow.is_dirty = true;
             self.rebuild();
           }
         }
