@@ -24,12 +24,14 @@ import logging
 from desktop.lib.django_util import render
 
 from search.forms import QueryForm
+from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.rest.http_client import HttpClient, RestException
 from desktop.lib.rest.resource import Resource
 
 
+
 # http://lucene.apache.org/solr/api-4_0_0-BETA/doc-files/tutorial.html#Getting+Started
-SOLR_URL = 'http://c1328.hal.cloudera.com:8983/solr/'
+SOLR_URL = 'http://c1328.halxg.cloudera.com:8983/solr/'
 
 LOG = logging.getLogger(__name__)
 
@@ -66,7 +68,7 @@ class SolrApi(object):
                 ('rows', solr_query['rows']),
                 ('start', solr_query['start']),
 
-                ('facet', 'true' if solr_query['facets'] == 1 else 'false'),
+                ('facet', solr_query['facets'] == 1 and 'true' or 'false'),
                 ('facet.limit', 10),
                 ('facet.mincount', 1),
                 ('facet.sort', 'count'),
@@ -92,8 +94,7 @@ class SolrApi(object):
 
       return self._root.get('collection1/browse', params)
     except RestException, e:
-      print e
-      return '{"responseHeader":{"status":0,"QTime":1,"params":{"wt":"json"}},"response":{"numFound":0,"start":0,"maxScore":0.0,"docs":[]},"highlighting":{}}'
+      raise PopupException('Error while accessing Solr: %s' % e)
 
 
 
