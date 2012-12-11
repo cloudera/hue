@@ -23,7 +23,7 @@ import subprocess
 import threading
 import time
 
-from nose.tools import assert_equal
+from nose.tools import assert_equal, assert_true
 
 from desktop.lib.paths import get_run_root
 from hadoop import pseudo_hdfs4
@@ -105,8 +105,10 @@ class OozieServerProvider(object):
 
   @classmethod
   def _setup_sharelib(cls):
+    LOG.info("Copying Oozie sharelib")
     cls.cluster.fs.do_as_user('oozie', cls.cluster.fs.create_home_dir, '/user/oozie')
-    cls.cluster.fs.do_as_user('oozie', cls.cluster.fs.copyFromLocal, OozieServerProvider.OOZIE_HOME + '/share', '/user/oozie/')
+    cls.cluster.fs.do_as_user('oozie', cls.cluster.fs.copyFromLocal, OozieServerProvider.OOZIE_HOME + '/share', '/user/oozie/share')
+    LOG.info("Oozie sharelib copied to /user/oozie/share")
 
   @classmethod
   def _get_shared_oozie_server(cls):
@@ -174,3 +176,5 @@ class TestMiniOozie(OozieServerProvider):
 
   def test_oozie_status(self):
     assert_equal(get_oozie().get_oozie_status()['systemMode'], 'NORMAL')
+
+    assert_true(self.cluster.fs.exists('/user/oozie/share/lib'))
