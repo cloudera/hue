@@ -18,11 +18,12 @@
 from desktop.lib import django_mako
 
 from nose.tools import assert_true, assert_equal, assert_not_equal
-from desktop.lib.django_test_util import make_logged_in_client
 from django.conf.urls.defaults import patterns, url
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.db.models import query, CharField, SmallIntegerField
+from django.test.client import Client
+from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.paginator import Paginator
 from desktop.lib.conf import validate_path
 import desktop
@@ -290,6 +291,32 @@ def test_error_handling():
       desktop.urls.urlpatterns.remove(i)
     restore_django_debug()
     restore_500_debug()
+
+
+def test_error_handling_failure():
+  # Change rewrite_user to call has_hue_permission
+  # Try to get filebrowser page
+  # test for werkzeug debugger
+  # Restore rewrite_user
+
+  restore_django_debug = desktop.conf.DJANGO_DEBUG_MODE.set_for_testing(False)
+  restore_500_debug = desktop.conf.HTTP_500_DEBUG_MODE.set_for_testing(False)
+
+  # Add an error view
+  setattr(views.serve_500_error, 'login_notrequired', True)
+  error_url_pat = patterns('', url('^500_internal_error$', views.serve_500_error))
+  desktop.urls.urlpatterns.extend(error_url_pat)
+  try:
+    c = Client()
+    response = c.get('/500_internal_error')
+    assert_true('AttributeError at /500_internal_error' in response.content, response)
+  finally:
+    # Restore the world
+    for i in error_url_pat:
+      desktop.urls.urlpatterns.remove(i)
+    restore_django_debug()
+    restore_500_debug()
+    delattr(views.serve_500_error, 'login_notrequired')
 
 
 def test_404_handling():
