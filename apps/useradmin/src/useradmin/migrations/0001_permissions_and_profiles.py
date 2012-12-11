@@ -1,39 +1,12 @@
 # encoding: utf-8
-import datetime
 from south.db import db
 from south.v2 import DataMigration
 from django.db import models
 
-from desktop.lib.classes import classproperty
-
 from useradmin.models import UserProfile
 
+
 class Migration(DataMigration):
-    depends_on = (
-      # List of dependencies filled by the depends_on classproperty
-    )
-
-    def _depends_on(cls):
-      """
-      Ensure useradmin is migrated last by placing its migrations after all other migrations
-      """
-      from desktop.appmanager import DESKTOP_MODULES
-      import pkgutil
-
-      dependent_migrations = []
-      for module in DESKTOP_MODULES:
-        if module.name not in __name__:
-          try:
-            package = module.module.migrations
-            for importer, modname, ispkg in pkgutil.iter_modules(package.__path__):
-              dependent_migrations.append((module.name, modname))
-          except AttributeError:
-            # No migrations for this iteration
-            pass
-
-      return tuple(dependent_migrations)
-
-    depends_on = classproperty(_depends_on)
 
     def forwards(self, orm):
         """
