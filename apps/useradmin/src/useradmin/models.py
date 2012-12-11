@@ -213,15 +213,14 @@ def update_app_permissions(**kwargs):
   the best thing we can do, since some apps might not
   have models, but nonetheless, "syncdb" is typically
   run when apps are installed.
-
-  This code executes when useradmin is sync'd since useradmin should be sync'd last.
   """
   # Map app->action->HuePermission.
 
-  # Only execute for useradmin app since useradmin is sync'd last.
-  # The HuePermission model needs to be sync'd for the following code to work.
-  # Since all apps should have been sync'd before useradmin, referencing them
-  # here is functional.
+  # The HuePermission model needs to be sync'd for the following code to work
+  # The point of 'if u'useradmin_huepermission' in connection.introspection.table_names():'
+  # is to check if Useradmin has been installed.
+  # It is okay to follow appmanager.DESKTOP_APPS before they've been sync'd
+  # because apps are referenced by app name in Hue permission and not by model ID.
   if u'useradmin_huepermission' in connection.introspection.table_names():
     current = {}
 
