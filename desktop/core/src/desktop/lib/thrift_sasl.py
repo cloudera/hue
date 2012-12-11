@@ -1,7 +1,5 @@
 #!/usr/bin/env python
-
-#
-# Licensed to the Apache Software Foundation (ASF) under one
+# Licensed to Cloudera, Inc. under one
 # or more contributor license agreements. See the NOTICE file
 # distributed with this work for additional information
 # regarding copyright ownership. The ASF licenses this file
@@ -19,8 +17,6 @@
 # under the License.
 #
 """ SASL transports for Thrift. """
-
-import sys
 
 from cStringIO import StringIO
 from thrift.transport import TTransport
