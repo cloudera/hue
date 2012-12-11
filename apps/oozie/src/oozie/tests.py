@@ -1371,10 +1371,11 @@ class TestOozieSubmissions(OozieBase):
     wf = Workflow.objects.get(name='DistCp')
 
     response = self.c.post(reverse('oozie:submit_workflow', args=[wf.id]),
-                           data={u'form-MAX_NUM_FORMS': [u''],
-                                u'form-0-name': [u'MAP_NUMBER'], u'form-0-value': [u'5'],
-                                u'form-1-name': [u'OUTPUT '], u'form-1-value': [u'${nameNode}/user/test/out/distcp'],
-                                u'form-INITIAL_FORMS': [u'2'], u'form-TOTAL_FORMS': [u'2']},
+                           data= {u'form-MAX_NUM_FORMS': [u''], u'form-TOTAL_FORMS': [u'3'], u'form-INITIAL_FORMS': [u'3'],
+                                  u'form-0-name': [u'oozie.use.system.libpath'], u'form-0-value': [u'true'],
+                                  u'form-1-name': [u'OUTPUT'], u'form-1-value': [u'${nameNode}/user/test/out/distcp'],
+                                  u'form-2-name': [u'MAP_NUMBER'], u'form-2-value': [u'5'],
+                                  },
                            follow=True)
     job = OozieServerProvider.wait_until_completion(response.context['oozie_workflow'].id)
     assert_equal('SUCCEEDED', job.status)
