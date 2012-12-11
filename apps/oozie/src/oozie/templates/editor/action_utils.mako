@@ -181,6 +181,56 @@
             ${ utils.render_field_with_error_js(action_form['job_xml'], action_form['job_xml'].name, extra_attrs={'data-bind': 'value: %s' % action_form['job_xml'].name}) }
           % endif
 
+          % if 'deletes' in action_form.fields:
+            <%
+            file_field(action_form['deletes'], {
+              'name': 'deletes',
+              'add': 'addDelete',
+              'remove': '$parent.removeDelete'
+            })
+            %>
+          % endif
+
+          % if 'mkdirs' in action_form.fields:
+            <%
+            file_field(action_form['mkdirs'], {
+              'name': 'mkdirs',
+              'add': 'addMkdir',
+              'remove': '$parent.removeMkdir'
+            })
+            %>
+          % endif
+
+          % if 'moves' in action_form.fields:
+            <%
+            move_field(action_form['moves'], {
+              'name': 'moves',
+              'add': 'addMove',
+              'remove': '$parent.removeMove'
+            })
+            %>
+          % endif
+
+          % if 'chmods' in action_form.fields:
+            <%
+            chmod_field(action_form['chmods'], {
+              'name': 'chmods',
+              'add': 'addChmod',
+              'remove': '$parent.removeChmod'
+            })
+            %>
+          % endif
+
+          % if 'touchzs' in action_form.fields:
+            <%
+            file_field(action_form['touchzs'], {
+              'name': 'touchzs',
+              'add': 'addTouchz',
+              'remove': '$parent.removeTouchz'
+            })
+            %>
+          % endif
+
         </fieldset>
       </div>
 
@@ -198,7 +248,7 @@
 
 <%def name="file_field(field, javascript_attrs={})">
 <div class="control-group" rel="popover" data-original-title="${ field.label }" data-content="${ field.help_text }">
-  <label class="control-label">${ _('Files') }</label>
+  <label class="control-label">${ field.label }</label>
   <div class="controls">
     % if 'name' in javascript_attrs:
       <table class="table-condensed designTable" data-bind="visible: ${ javascript_attrs['name'] }().length > 0">
@@ -217,7 +267,7 @@
       </table>
 
       % if 'add' in javascript_attrs:
-        <button class="btn" data-bind="click: ${ javascript_attrs['add'] }">${ _('Add File') }</button>
+        <button class="btn" data-bind="click: ${ javascript_attrs['add'] }">${ _('Add Path') }</button>
       % endif
     % endif
   </div>
@@ -253,7 +303,7 @@
 </%def>
 
 <%def name="job_properties_field(field, javascript_attrs={})">
-<div class="control-group" rel="popover" data-original-title="${ field.label }" data-content="${ field.label }">
+<div class="control-group" rel="popover" data-original-title="${ field.label }" data-content="${ field.help_text }">
   <label class="control-label">${ _('Job Properties') }</label>
   <div class="controls">
     % if 'name' in javascript_attrs:
@@ -280,6 +330,76 @@
 
       % if 'add' in javascript_attrs:
         <button class="btn" data-bind="click: ${ javascript_attrs['add'] }">${ _('Add Property') }</button>
+      % endif
+    % endif
+  </div>
+</div>
+</%def>
+
+<%def name="move_field(field, javascript_attrs={})">
+<div class="control-group" rel="popover" data-original-title="${ field.label }" data-content="${ field.help_text }">
+  <label class="control-label">${ field.label }</label>
+  <div class="controls">
+    % if 'name' in javascript_attrs:
+      <table class="table-condensed designTable" data-bind="visible: ${ javascript_attrs['name'] }().length > 0">
+        <thead>
+          <tr>
+            <th>${ _('Source') }</th>
+            <th>${ _('Destination') }</th>
+            <th/>
+          </tr>
+        </thead>
+        <tbody data-bind="foreach: ${ javascript_attrs['name'] }">
+          <tr>
+            <td><input type="text" class="span4 required propKey" data-bind="fileChooser: $data, value: source, uniqueName: false" /></td>
+            <td><input type="text" class="span4 required pathChooserKo" data-bind="fileChooser: $data, value: destination, uniqueName: false" /></td>
+            <td>
+            % if 'remove' in javascript_attrs:
+              <a class="btn" href="#" data-bind="click: ${ javascript_attrs['remove'] }">${ _('Delete') }</a>
+            % endif
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      % if 'add' in javascript_attrs:
+        <button class="btn" data-bind="click: ${ javascript_attrs['add'] }">${ _('Add move') }</button>
+      % endif
+    % endif
+  </div>
+</div>
+</%def>
+
+<%def name="chmod_field(field, javascript_attrs={})">
+<div class="control-group" rel="popover" data-original-title="${ field.label }" data-content="${ field.help_text }">
+  <label class="control-label">${ field.label }</label>
+  <div class="controls">
+    % if 'name' in javascript_attrs:
+      <table class="table-condensed designTable" data-bind="visible: ${ javascript_attrs['name'] }().length > 0">
+        <thead>
+          <tr>
+            <th>${ _('Path') }</th>
+            <th>${ _('Permissions') }</th>
+            <th>${ _('Recursive') }</th>
+            <th/>
+          </tr>
+        </thead>
+        <tbody data-bind="foreach: ${ javascript_attrs['name'] }">
+          <tr>
+            <td><input type="text" class="span4 required pathChooserKo" data-bind="fileChooser: $data, value: path, uniqueName: false" /></td>
+            <td><input type="text" class="span2 required propKey" data-bind="value: permissions, uniqueName: false" /></td>
+            <td><input type="checkbox" class="span1 required" data-bind="checked: recursive, uniqueName: false" /></td>
+            <td>
+            % if 'remove' in javascript_attrs:
+              <a class="btn" href="#" data-bind="click: ${ javascript_attrs['remove'] }">${ _('Delete') }</a>
+            % endif
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      % if 'add' in javascript_attrs:
+        <button class="btn" data-bind="click: ${ javascript_attrs['add'] }">${ _('Add chmod') }</button>
       % endif
     % endif
   </div>

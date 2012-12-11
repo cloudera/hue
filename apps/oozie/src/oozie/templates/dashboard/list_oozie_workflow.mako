@@ -119,7 +119,7 @@ ${ layout.menubar(section='dashboard') }
       % if oozie_workflow.is_running():
         <a title="${_('Kill %(workflow)s') % dict(workflow=oozie_workflow.id)}"
           id="kill-workflow"
-          class="btn small confirmationModal"
+          class="btn btn-danger small confirmationModal"
           alt="${ _('Are you sure you want to kill workflow %s?') %  oozie_workflow.id }"
           href="javascript:void(0)"
           data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_workflow.id, action='kill') }"

@@ -83,15 +83,15 @@ ${ layout.menubar(section='dashboard') }
             <td><a href="${ job.get_absolute_url() }" data-row-selector="true"></a>${ job.id }</td>
             <td>
               % if has_job_edition_permission(job, user):
-	            <a title="${_('Kill %(workflow)s') % dict(workflow=job.id)}"
-	              class="btn small confirmationModal"
-	              alt="${ _('Are you sure you want to kill workflow %s?') %  job.id }"
-	              href="javascript:void(0)"
-	              data-url="${ url('oozie:manage_oozie_jobs', job_id=job.id, action='kill') }"
-	              data-message="${ _('The workflow was killed!') }"
-	              data-confirmation-message="${ _('Are you sure you\'d like to kill this job?') }">
-	                ${ _('Kill') }
-	            </a>
+              <a title="${_('Kill %(workflow)s') % dict(workflow=job.id)}"
+                class="btn btn-danger small confirmationModal"
+                alt="${ _('Are you sure you want to kill workflow %s?') %  job.id }"
+                href="javascript:void(0)"
+                data-url="${ url('oozie:manage_oozie_jobs', job_id=job.id, action='kill') }"
+                data-message="${ _('The workflow was killed!') }"
+                data-confirmation-message="${ _('Are you sure you\'d like to kill this job?') }">
+                  ${ _('Kill') }
+              </a>
               % endif
             </td>
           </tr>

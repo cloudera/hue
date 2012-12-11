@@ -82,7 +82,7 @@ ${layout.menubar(section='dashboard')}
             <td>
               % if has_job_edition_permission(job, user):
                 <a title="${_('Kill %(coordinator)s') % dict(coordinator=job.id)}"
-                  class="btn small confirmationModal"
+                  class="btn btn-danger small confirmationModal"
                   alt="${ _('Are you sure you want to kill coordinator %s?') % job.id }"
                   href="javascript:void(0)"
                   data-message="${ _('The coordinator was killed!') }"
