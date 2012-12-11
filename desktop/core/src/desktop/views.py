@@ -221,7 +221,15 @@ def serve_500_error(request, *args, **kwargs):
   """Registered handler for 500. We use the debug view to make debugging easier."""
   if desktop.conf.HTTP_500_DEBUG_MODE.get():
     return django.views.debug.technical_500_response(request, *sys.exc_info())
-  return render("500.mako", request, {'traceback': traceback.extract_tb(sys.exc_info()[2])})
+  try:
+    return render("500.mako", request, {'traceback': traceback.extract_tb(sys.exc_info()[2])})
+  except:
+    # Fallback to technical 500 response if ours fails
+    # Will end up here:
+    #   - Middleware or authentication backends problems
+    #   - Certain missing imports
+    #   - Packaging and install issues
+    return django.views.debug.technical_500_response(request, *sys.exc_info())
 
 _LOG_LEVELS = {
   "critical": logging.CRITICAL,
@@ -270,7 +278,8 @@ def commonheader(title, section, user, padding="60px"):
   """
   Returns the rendered common header
   """
-  apps_list = sorted(appmanager.get_apps(user), key=lambda app: app.menu_index)
+  apps = appmanager.get_apps(user)
+  apps_list = sorted(apps, key=lambda app: app.menu_index)
 
   return django_mako.render_to_string("common_header.mako", dict(
     apps=apps_list,
