@@ -363,12 +363,19 @@ def test_rename():
 def test_listdir():
   cluster = pseudo_hdfs4.shared_cluster()
   try:
-    c = make_logged_in_client(cluster.superuser)
-    cluster.fs.setuser(cluster.superuser)
+    c = make_logged_in_client('test')
 
     # Delete user's home if there's already something there
-    if cluster.fs.isdir("/user/test"):
-      cluster.fs.rmtree("/user/test")
+    home = cluster.fs.do_as_user('test', cluster.fs.get_home_dir)
+    if cluster.fs.exists(home):
+      cluster.fs.do_as_superuser(cluster.fs.rmtree, home)
+
+    response = c.get('/filebrowser/')
+    # Since we deleted the home directory... home_directory context should be None.
+    assert_false(response.context['home_directory'], response.context['home_directory'])
+
+    cluster.fs.do_as_superuser(cluster.fs.mkdir, home)
+    cluster.fs.do_as_superuser(cluster.fs.chown, home, 'test', 'test')
 
     # These paths contain non-ascii characters. Your editor will need the
     # corresponding font library to display them correctly.
@@ -382,12 +389,13 @@ def test_listdir():
       'listdir%20.,<>~`!@$%^&()_-+="',
     ]
 
-    prefix = '/test-filebrowser/'
+    prefix = home + '/test-filebrowser/'
     for path in orig_paths:
       c.post('/filebrowser/mkdir', dict(path=prefix, name=path))
 
     # Read the parent dir
     response = c.get('/filebrowser/view' + prefix)
+
     dir_listing = response.context['files']
     assert_equal(len(orig_paths) + 1, len(dir_listing))
 
@@ -405,27 +413,22 @@ def test_listdir():
       # We are actually reading a directory
       assert_equal('..', resp.context['files'][0]['name'], "'%s' should be a directory" % (path,))
 
-    # Since we deleted the home directory... home_directory context should be false.
-    assert_false(response.context['home_directory'])
-
-    # test's home directory now exists. Should be returned.
-    cluster.fs.mkdir('/user/test')
+    # Test's home directory now exists. Should be returned.
     c = make_logged_in_client()
-    response = c.get('/filebrowser/view/test-filebrowser/')
-    assert_equal(response.context['home_directory'], '/user/test')
+    response = c.get('/filebrowser/view' + prefix)
+    assert_equal(response.context['home_directory'], home)
 
     response = c.get('/filebrowser/view/test-filebrowser/?default_to_home')
-    assert_true(re.search('/user/test$', response['Location']))
+    assert_true(re.search('%s$' % home, response['Location']))
 
     # Test path relative to home directory
-    cluster.fs.mkdir('/user/test/test_dir')
+    cluster.fs.do_as_user('test', cluster.fs.mkdir, '%s/test_dir' % home)
     response = c.get('/filebrowser/home_relative_view/test_dir')
-    assert_equal('/user/test/test_dir', response.context['path'])
+    assert_equal('%s/test_dir' % home, response.context['path'])
 
   finally:
     try:
-      cluster.fs.rmtree('/test-filebrowser')
-      cluster.fs.rmtree('/user/test')
+      cluster.fs.do_as_superuser(cluster.fs.rmtree, prefix)
     except:
       pass      # Don't let cleanup errors mask earlier failures
 
