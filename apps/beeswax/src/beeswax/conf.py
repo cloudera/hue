@@ -29,7 +29,7 @@ SERVER_INTERFACE = Config(
 
 BEESWAX_SERVER_HOST = Config(
   key="beeswax_server_host",
-  help=_("Host where Beeswax server Thrift daemon is running."),
+  help=_("Host where Beeswax server Thrift daemon is running. FQDN required when using security even if on same host."),
   private=True,
   default="localhost")
 
@@ -42,7 +42,7 @@ BEESWAX_SERVER_PORT = Config(
 
 BEESWAX_META_SERVER_HOST = Config(
   key="beeswax_meta_server_host",
-  help=_("Host where Beeswax internal metastore Thrift daemon is running."),
+  help=_("Host where internal metastore Thrift daemon is running."),
   private=True,
   default="localhost")
 

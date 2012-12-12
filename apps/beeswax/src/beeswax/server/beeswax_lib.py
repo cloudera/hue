@@ -24,7 +24,7 @@ import hadoop.cluster
 
 from desktop.lib import thrift_util
 from hive_metastore import ThriftHiveMetastore
-
+from desktop.conf import KERBEROS
 from beeswaxd import BeeswaxService
 from beeswaxd.ttypes import QueryNotFoundException
 
@@ -266,12 +266,13 @@ class BeeswaxClient:
 
     cluster_conf = hadoop.cluster.get_cluster_conf_for_job_submission()
     use_sasl = cluster_conf is not None and cluster_conf.SECURITY_ENABLED.get()
+    kerberos_principal_short_name = KERBEROS.HUE_PRINCIPAL.get().split('/', 1)[0]
 
     client = thrift_util.get_client(BeeswaxService.Client,
                                     query_server['server_host'],
                                     query_server['server_port'],
                                     service_name=query_server['server_name'],
-                                    kerberos_principal="hue",
+                                    kerberos_principal=kerberos_principal_short_name,
                                     use_sasl=use_sasl,
                                     timeout_seconds=conf.BEESWAX_SERVER_CONN_TIMEOUT.get())
     return UnicodeBeeswaxClient(client)
