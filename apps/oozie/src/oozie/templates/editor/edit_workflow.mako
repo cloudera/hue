@@ -613,7 +613,8 @@ $('#workflow').on('click', '.new-node-link', function(e) {
     if (node.validate()) {
       workflow.is_dirty = true;
       modal.hide();
-      // save, add node to workflow.
+      // save, add kill, add node to workflow.
+      node.addChild(workflow.kill);
       workflow.nodes()[workflow.nodes().length - 2].append(node);
       $('#workflow').trigger('workflow:rebuild');
     }
