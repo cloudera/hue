@@ -219,17 +219,18 @@ def serve_404_error(request, *args, **kwargs):
 
 def serve_500_error(request, *args, **kwargs):
   """Registered handler for 500. We use the debug view to make debugging easier."""
+  exc_info = sys.exc_info()
   if desktop.conf.HTTP_500_DEBUG_MODE.get():
-    return django.views.debug.technical_500_response(request, *sys.exc_info())
+    return django.views.debug.technical_500_response(request, *exc_info)
   try:
-    return render("500.mako", request, {'traceback': traceback.extract_tb(sys.exc_info()[2])})
+    return render("500.mako", request, {'traceback': traceback.extract_tb(exc_info[2])})
   except:
     # Fallback to technical 500 response if ours fails
     # Will end up here:
     #   - Middleware or authentication backends problems
     #   - Certain missing imports
     #   - Packaging and install issues
-    return django.views.debug.technical_500_response(request, *sys.exc_info())
+    return django.views.debug.technical_500_response(request, *exc_info)
 
 _LOG_LEVELS = {
   "critical": logging.CRITICAL,

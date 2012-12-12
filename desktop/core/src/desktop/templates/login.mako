@@ -60,10 +60,12 @@ from django.utils.translation import ugettext as _
 			<div class="span4 offset4">
 				<form method="POST" action="${action}" class="well">
 					<label>${_('Username')}
-						<input name="username" class="input-large" type="text" maxlength="30">
+						${ form['username'] }
+						${ form['username'].errors }
 					</label>
 					<label>${_('Password')}
-						<input name="password" class="input-large" type="password" maxlength="30">
+						${ form['password'] }
+						${ form['password'].errors }
 					</label>
 
 					%if first_login_ever==True:

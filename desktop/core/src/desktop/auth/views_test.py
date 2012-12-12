@@ -19,6 +19,7 @@ from nose.tools import assert_true, assert_false, assert_equal
 
 from django.contrib.auth.models import User
 from django.test.client import Client
+from desktop import conf
 from desktop.lib.django_test_util import make_logged_in_client
 from hadoop.test_base import PseudoHdfsTestBase
 from hadoop import pseudo_hdfs4
@@ -45,6 +46,19 @@ class TestLoginWithHadoop(PseudoHdfsTestBase):
     response = self.c.get('/accounts/login/')
     assert_equal(200, response.status_code, "Expected ok status.")
     assert_false(response.context['first_login_ever'])
+
+  def test_bad_first_user(self):
+    finish = conf.AUTH.BACKEND.set_for_testing("desktop.auth.backend.AllowFirstUserDjangoBackend")
+
+    response = self.c.get('/accounts/login/')
+    assert_equal(200, response.status_code, "Expected ok status.")
+    assert_true(response.context['first_login_ever'])
+
+    response = self.c.post('/accounts/login/', dict(username="foo 1", password="foo"))
+    assert_equal(200, response.status_code, "Expected ok status.")
+    assert_true('This value may contain only letters, numbers and @/./+/-/_ characters.' in response.content, response)
+
+    finish()
 
   def test_login_home_creation_failure(self):
     response = self.c.get('/accounts/login/')
