@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import atexit
+import getpass
 import logging
 import os
 import subprocess
@@ -105,9 +106,11 @@ class OozieServerProvider(object):
   @classmethod
   def _setup_sharelib(cls):
     LOG.info("Copying Oozie sharelib")
-    cls.cluster.fs.do_as_user('oozie', cls.cluster.fs.create_home_dir, '/user/oozie')
-    cls.cluster.fs.do_as_user('oozie', cls.cluster.fs.copyFromLocal, OozieServerProvider.OOZIE_HOME + '/share', '/user/oozie/share')
-    LOG.info("Oozie sharelib copied to /user/oozie/share")
+    user_home = cls.cluster.fs.do_as_user(getpass.getuser(), cls.cluster.fs.get_home_dir)
+    oozie_share_lib = user_home + '/share'
+    cls.cluster.fs.do_as_user(getpass.getuser(), cls.cluster.fs.create_home_dir)
+    cls.cluster.fs.do_as_user(getpass.getuser(), cls.cluster.fs.copyFromLocal, OozieServerProvider.OOZIE_HOME + '/share', oozie_share_lib)
+    LOG.info("Oozie sharelib copied to %s" % oozie_share_lib)
 
   @classmethod
   def _get_shared_oozie_server(cls):
@@ -176,4 +179,4 @@ class TestMiniOozie(OozieServerProvider):
   def test_oozie_status(self):
     assert_equal(get_oozie().get_oozie_status()['systemMode'], 'NORMAL')
 
-    assert_true(self.cluster.fs.exists('/user/oozie/share/lib'))
+    assert_true(self.cluster.fs.exists('/user/%(user)s/share/lib') % {'user': getpass.getuser()})
