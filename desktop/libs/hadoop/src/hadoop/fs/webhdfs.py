@@ -528,13 +528,13 @@ class WebHdfs(Hdfs):
 
     try:
       self.setuser(username)
-      fn(*args, **kwargs)
+      return fn(*args, **kwargs)
     finally:
       self.setuser(prev_user)
 
 
   def do_as_superuser(self, fn, *args, **kwargs):
-    self.do_as_user(self.superuser, fn, *args, **kwargs)
+    return self.do_as_user(self.superuser, fn, *args, **kwargs)
 
 
 class File(object):
