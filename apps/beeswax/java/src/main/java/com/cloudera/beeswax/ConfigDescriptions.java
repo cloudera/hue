@@ -89,7 +89,8 @@ public class ConfigDescriptions {
         LOG.info("Parsed " + resourceName + " sucessfully.  Learned " + n
             + " descriptions.");
       } catch (Exception e) {
-        LOG.warn("Could not parse or find: " + resourceName, e);
+        LOG.warn("Could not parse or find: " + resourceName +
+            ".  Learned 0 description, this is not a problem.");
       }
     }
 
