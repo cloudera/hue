@@ -180,4 +180,4 @@ class TestMiniOozie(OozieServerProvider):
   def test_oozie_status(self):
     assert_equal(get_oozie().get_oozie_status()['systemMode'], 'NORMAL')
 
-    assert_true(self.cluster.fs.exists('/user/%(user)s/share/lib') % {'user': getpass.getuser()})
+    assert_true(self.cluster.fs.exists('/user/%(user)s/share/lib' % {'user': getpass.getuser()}))

@@ -30,7 +30,7 @@ import urlparse
 
 from django.utils.encoding import smart_str
 from nose.plugins.attrib import attr
-from nose.tools import assert_true, assert_false, assert_equal, assert_raises, assert_not_equal
+from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
@@ -366,6 +366,10 @@ def test_listdir():
     c = make_logged_in_client(cluster.superuser)
     cluster.fs.setuser(cluster.superuser)
 
+    # Delete user's home if there's already something there
+    if cluster.fs.isdir("/user/test"):
+      cluster.fs.rmtree("/user/test")
+
     # These paths contain non-ascii characters. Your editor will need the
     # corresponding font library to display them correctly.
     #
@@ -401,9 +405,7 @@ def test_listdir():
       # We are actually reading a directory
       assert_equal('..', resp.context['files'][0]['name'], "'%s' should be a directory" % (path,))
 
-    # Delete user's home if there's already something there
-    if cluster.fs.isdir("/user/test"):
-      cluster.fs.rmtree("/user/test")
+    # Since we deleted the home directory... home_directory context should be false.
     assert_false(response.context['home_directory'])
 
     # test's home directory now exists. Should be returned.
