@@ -29,6 +29,7 @@ from hadoop.fs.exceptions import WebHdfsException
 from useradmin.views import ensure_home_directory
 
 from desktop.auth.backend import AllowFirstUserDjangoBackend
+from desktop.auth.forms import UserCreationForm, AuthenticationForm
 from desktop.lib.django_util import render
 from desktop.lib.django_util import login_notrequired
 from desktop.log.access import access_warn, last_access_map
@@ -69,36 +70,50 @@ def first_login_ever():
 def dt_login(request):
   """Used by the non-jframe login"""
   redirect_to = request.REQUEST.get('next', '/')
-  login_errors = False
   is_first_login_ever = first_login_ever()
+
   if request.method == 'POST':
-    form = django.contrib.auth.forms.AuthenticationForm(data=request.POST)
-    if form.is_valid():
-      login(request, form.get_user())
-      if request.session.test_cookie_worked():
-        request.session.delete_test_cookie()
+    # For first login, need to validate user info!
+    first_user_form = is_first_login_ever and UserCreationForm(data=request.POST) or None
+    first_user = first_user_form and first_user_form.is_valid()
 
-      if is_first_login_ever:
-        try:
-          ensure_home_directory(request.fs, request.POST.get('username'))
-        except (IOError, WebHdfsException), e:
-          LOG.error(_('Could not create home directory.'), exc_info=e)
-          request.error(_('Could not create home directory.'))
+    if first_user or not is_first_login_ever:
+      auth_form = AuthenticationForm(data=request.POST)
 
-      access_warn(request, '"%s" login ok' % (request.user.username,))
-      return HttpResponseRedirect(redirect_to)
-    else:
-      access_warn(request, 'Failed login for user "%s"' % (request.POST.get('username'),))
-      login_errors = True
+      if auth_form.is_valid():
+        # Must login by using the AuthenticationForm.
+        # It provides 'backends' on the User object.
+        user = auth_form.get_user()
+        login(request, user)
+
+        if request.session.test_cookie_worked():
+          request.session.delete_test_cookie()
+
+        if is_first_login_ever:
+          # Create home directory for first user.
+          try:
+            ensure_home_directory(request.fs, user.username)
+          except (IOError, WebHdfsException), e:
+            LOG.error(_('Could not create home directory.'), exc_info=e)
+            request.error(_('Could not create home directory.'))
+
+        access_warn(request, '"%s" login ok' % (user.username,))
+        return HttpResponseRedirect(redirect_to)
+
+      else:
+        access_warn(request, 'Failed login for user "%s"' % (request.POST.get('username'),))
+
   else:
-    form = django.contrib.auth.forms.AuthenticationForm()
+    first_user_form = None
+    auth_form = AuthenticationForm()
+
   request.session.set_test_cookie()
   return render('login.mako', request, {
     'action': urlresolvers.reverse('desktop.auth.views.dt_login'),
-    'form': form,
+    'form': first_user_form or auth_form,
     'next': redirect_to,
     'first_login_ever': is_first_login_ever,
-    'login_errors': login_errors,
+    'login_errors': request.method == 'POST',
   })
 
 
