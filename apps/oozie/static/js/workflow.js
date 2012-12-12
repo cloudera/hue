@@ -444,7 +444,8 @@ var IdGeneratorTable = {
   distcp: new IdGenerator({prefix: 'distcp'}),
   fork: new IdGenerator({prefix: 'fork'}),
   decision: new IdGenerator({prefix: 'decision'}),
-  join: new IdGenerator({prefix: 'join'})
+  join: new IdGenerator({prefix: 'join'}),
+  kill: new IdGenerator({prefix: 'kill'})
 };
 
 var NodeModule = function($, IdGeneratorTable) {
@@ -1087,6 +1088,44 @@ var NodeModule = function($, IdGeneratorTable) {
 
 var Node = NodeModule($, IdGeneratorTable);
 
+var StartNode = NodeModule($, IdGeneratorTable);
+$.extend(StartNode.prototype, Node.prototype, {
+  /**
+   * Same as addChild for nodes, except if we reach the end,
+   * we add the end node to our child_links in the form of a
+   * 'related' link and 'start' link.
+   * We should always have a start link in an empty workflow!
+   */
+  replaceChild: function(child, replacement) {
+    var self = this;
+    var index = -1;
+
+    $.each(self.child_links(), function(i, link) {
+      if (link.child() == child.id()) {
+        index = i;
+      }
+    });
+
+    if (index > -1) {
+      self.child_links.splice(index, 1);
+      var links = self.child_links.splice(index);
+      var link = {
+        parent: ko.observable(self.id()),
+        child: ko.observable(replacement.id()),
+        name: ko.observable('to'),
+        comment: ko.observable(''),
+      };
+      self.child_links.push(link);
+
+      $.each(links, function(index, link) {
+        self.child_links.push(link);
+      });
+    }
+
+    return index != -1;
+  },
+});
+
 var ForkNode = NodeModule($, IdGeneratorTable);
 $.extend(ForkNode.prototype, Node.prototype, {
   // Join nodes are connected through 'related' links
@@ -1535,6 +1574,9 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
             var model = new NodeModel(node);
             var temp = null;
             switch(node.node_type) {
+              case 'start':
+                temp = new StartNode(self, model, self.registry);
+              break;
               case 'fork':
                 temp = new ForkNode(self, model, self.registry);
               break;
@@ -1585,6 +1627,22 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
           }
         });
         workflow.is_dirty = false;
+      }
+
+      if (!self.kill) {
+        var kill_json = {
+          "description": "",
+          "workflow": self.id(),
+          "child_links": [],
+          "node_type": "kill",
+          "message": "Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]",
+          "name": "kill",
+          "id": IdGeneratorTable['kill'].nextId()
+        };
+        var NodeModel = NodeModelChooser(kill_json.node_type);
+        var model = new NodeModel(kill_json);
+        self.kill = new Node(self, model, self.registry);
+        self.registry.add(self.kill.id(), self.kill);
       }
     },
 
