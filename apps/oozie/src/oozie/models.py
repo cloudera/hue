@@ -465,6 +465,8 @@ class Node(models.Model):
       node = self.distcp
     elif self.node_type == Fs.node_type:
       node = self.fs
+    elif self.node_type == Email.node_type:
+      node = self.email
     elif self.node_type == Streaming.node_type:
       node = self.streaming
     elif self.node_type == Java.node_type:
@@ -920,8 +922,22 @@ class Fs(Action):
     return json.loads(self.touchzs)
 
 
+class Email(Action):
+  PARAM_FIELDS = ('to', 'cc', 'subject', 'body')
+  node_type = 'email'
+
+  to = models.TextField(default='', verbose_name=_t('to addresses'),
+                            help_text=_t('Comma-separated values.'))
+  cc = models.TextField(default='', verbose_name=_t('cc addresses (optional)'), blank=True,
+                            help_text=_t('Comma-separated values.'))
+  subject = models.TextField(default="[]", verbose_name=_t('Subject'), blank=True,
+                            help_text=_t('Plain-text.'))
+  body = models.TextField(default="[]", verbose_name=_t('Body'), blank=True,
+                            help_text=_t('Plain-text.'))
+
+
 Action.types = (Mapreduce.node_type, Streaming.node_type, Java.node_type, Pig.node_type, Hive.node_type, Sqoop.node_type, Ssh.node_type, Shell.node_type,
-                DistCp.node_type, Fs.node_type)
+                DistCp.node_type, Fs.node_type, Email.node_type)
 
 
 class ControlFlow(Node):
@@ -1389,6 +1405,7 @@ ACTION_TYPES = {
   Shell.node_type: Shell,
   DistCp.node_type: DistCp,
   Fs.node_type: Fs,
+  Email.node_type: Email,
 }
 
 NODE_TYPES = ACTION_TYPES.copy()

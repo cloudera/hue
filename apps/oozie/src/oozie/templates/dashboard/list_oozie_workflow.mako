@@ -119,7 +119,7 @@ ${ layout.menubar(section='dashboard') }
       % if oozie_workflow.is_running():
         <a title="${_('Kill %(workflow)s') % dict(workflow=oozie_workflow.id)}"
           id="kill-workflow"
-          class="btn btn-danger small confirmationModal"
+          class="btn small confirmationModal"
           alt="${ _('Are you sure you want to kill workflow %s?') %  oozie_workflow.id }"
           href="javascript:void(0)"
           data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_workflow.id, action='kill') }"
@@ -290,7 +290,7 @@ ${ layout.menubar(section='dashboard') }
   </div>
   <div class="modal-footer">
     <a href="#" class="btn" data-dismiss="modal">${_('No')}</a>
-    <a class="btn btn-primary" href="javascript:void(0);">${_('Yes')}</a>
+    <a class="btn btn-danger" href="javascript:void(0);">${_('Yes')}</a>
   </div>
 </div>
 

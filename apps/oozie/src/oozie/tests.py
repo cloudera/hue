@@ -688,6 +688,50 @@ class TestEditor(OozieMockBase):
     </action>""" in xml, xml)
 
 
+  def test_workflow_email_gen_xml(self):
+    self.wf.node_set.filter(name='action-name-1').delete()
+
+    action1 = add_node(self.wf, 'action-name-1', 'email', [self.wf.start], {
+        u'name': 'MyEmail',
+        u'description': 'Execute an Email action',
+        u'to': 'hue@hue.org,django@python.org',
+        u'cc': '',
+        u'subject': 'My subject',
+        u'body': 'My body'
+    })
+    Link(parent=action1, child=self.wf.end, name="ok").save()
+
+    xml = self.wf.to_xml()
+
+    assert_true("""
+    <action name="MyEmail">
+        <email xmlns="uri:oozie:email-action:0.1">
+            <to>hue@hue.org,django@python.org</to>
+            <subject>My subject</subject>
+            <body>My body</body>
+        </email>
+        <ok to="end"/>
+        <error to="kill"/>
+    </action>""" in xml, xml)
+
+    action1.cc = 'lambda@python.org'
+    action1.save()
+
+    xml = self.wf.to_xml()
+
+    assert_true("""
+    <action name="MyEmail">
+        <email xmlns="uri:oozie:email-action:0.1">
+            <to>hue@hue.org,django@python.org</to>
+              <cc>lambda@python.org</cc>
+            <subject>My subject</subject>
+            <body>My body</body>
+        </email>
+        <ok to="end"/>
+        <error to="kill"/>
+    </action>""" in xml, xml)
+
+
   def test_workflow_flatten_list(self):
     assert_equal('[<Start: start>, <Mapreduce: action-name-1>, <Mapreduce: action-name-2>, <Mapreduce: action-name-3>, '
                  '<Kill: kill>, <End: end>]',

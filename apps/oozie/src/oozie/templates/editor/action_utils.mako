@@ -57,6 +57,11 @@
                 ${ _('The ssh server requires passwordless login') }.
               </p>
             % endif
+            % if node_type == 'email':
+              <p class="alert alert-warn span5">
+                ${ _('Requires some SMTP server configuration to be present (in oozie-site.xml)') }.
+              </p>
+            % endif
             </div>
           </div>
 
