@@ -214,7 +214,7 @@
 </%def>
 
 
-<%def name="path_chooser_libs(select_folder=False)">
+<%def name="path_chooser_libs(select_folder=False, skip_init=False)">
   <div id="chooseFile" class="modal hide fade">
     <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>
@@ -230,14 +230,16 @@
 
   <script type="text/javascript" charset="utf-8">
     $(document).ready(function(){
-      $(".pathChooser").each(function(){
-        var self = $(this);
-        % if select_folder:
-            self.after(getFileBrowseButton(self, true));
-        % else:
-            self.after(getFileBrowseButton(self));
-        % endif
-      });
+      % if not skip_init:
+        $(".pathChooser").each(function(){
+          var self = $(this);
+          % if select_folder:
+              self.after(getFileBrowseButton(self, true));
+          % else:
+              self.after(getFileBrowseButton(self));
+          % endif
+        });
+      % endif
     });
 
     function getFileBrowseButton(inputElement, selectFolder) {
@@ -276,7 +278,8 @@
             createFolder:false,
             uploadFile:false,
             initialPath:$.trim(inputElement.val()) != "" ? pathAddition + inputElement.val() : "${ workflow.deployment_dir }",
-            errorRedirectPath:"${ workflow.deployment_dir }"
+            errorRedirectPath:"${ workflow.deployment_dir }",
+            forceRefresh:true
           });
           $("#chooseFile").modal("show");
         }
@@ -287,6 +290,10 @@
             if (filePath == "") {
               filePath = "/";
             }
+            if (filePath.indexOf("//") == 0){
+              filePath = filePath.substr(1);
+            }
+            filePath = "." + filePath;
           }
           inputElement.val(filePath);
           inputElement.change();

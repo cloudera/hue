@@ -9,6 +9,7 @@
         // desktop/templates/common_header.mako
         defaults = {
             initialPath:"",
+            forceRefresh:false,
             errorRedirectPath:"",
             createFolder:true,
             uploadFile:true,
@@ -57,8 +58,13 @@
 
     Plugin.prototype.setOptions = function (options) {
         this.options = $.extend({}, defaults, options);
-        if ($.trim(this.options.initialPath) != "") {
+        if (this.options.forceRefresh){
+          this.navigateTo(this.options.initialPath);
+        }
+        else {
+          if ($.trim(this.options.initialPath) != "") {
             this.navigateTo(this.options.initialPath);
+          }
         }
     };
 
