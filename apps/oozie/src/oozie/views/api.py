@@ -37,10 +37,15 @@ LOG = logging.getLogger(__name__)
 
 JSON_FIELDS = ('parameters', 'job_properties', 'files', 'archives', 'prepares', 'params',
                'deletes', 'mkdirs', 'moves', 'chmods', 'touchzs')
+NUMBER_FIELDS = ('sub_workflow',)
+
 def format_field_value(field, value):
   if field in JSON_FIELDS:
     if not isinstance(value, basestring):
       return json.dumps(value)
+  if field in NUMBER_FIELDS:
+    if not isinstance(value, int):
+      return int(value)
   return value
 
 
@@ -50,7 +55,7 @@ def format_dict_field_values(dictionary):
   return dictionary
 
 
-def workflow_validate_action_json(node_type, node_dict, errors={}):
+def workflow_validate_action_json(node_type, node_dict, errors, user, workflow):
   """
   Validates a single action.
   node_type is the node type of the action information passed.
@@ -59,7 +64,7 @@ def workflow_validate_action_json(node_type, node_dict, errors={}):
   Returns Boolean.
   """
   assert isinstance(errors, dict), "errors must be a dict."
-  form_class = design_form_by_type(node_type)
+  form_class = design_form_by_type(node_type, user, workflow)
   form = form_class(data=node_dict)
 
   if form.is_valid():
@@ -85,8 +90,13 @@ def get_or_create_node(workflow, node_data):
 
   node_type = id[0:separator_index]
   node_model = NODE_TYPES.get(node_type, None)
+  kwargs = {'workflow': workflow, 'node_type': node_data['node_type']}
+
+  if node_data['node_type'] == 'subworkflow':
+    kwargs['sub_workflow'] = Workflow.objects.get(id=int(node_data['sub_workflow']))
+
   if node_model:
-    node = node_model(workflow=workflow, node_type=node_data['node_type'])
+    node = node_model(**kwargs)
   else:
     raise StructuredException(code="INVALID_REQUEST_ERROR", message=_('Could not find node of type'), data=node_data, error_code=500)
   node.save()
@@ -105,23 +115,26 @@ def update_workflow(json_workflow):
   return workflow
 
 
-def update_workflow_nodes(workflow, json_nodes, id_map):
+def update_workflow_nodes(workflow, json_nodes, id_map, user):
+  """Ideally would get objects from form validation instead."""
   for json_node in json_nodes:
     errors = {}
-    if json_node['node_type'] in ACTION_TYPES and not workflow_validate_action_json(json_node['node_type'], format_dict_field_values(json_node), errors):
+    if json_node['node_type'] in ACTION_TYPES and \
+        not workflow_validate_action_json(json_node['node_type'], format_dict_field_values(json_node), errors, user, workflow):
       raise StructuredException(code="INVALID_REQUEST_ERROR", message=_('Invalid action'), data={'errors': errors}, error_code=400)
 
   nodes = []
 
   for json_node in json_nodes:
     node = get_or_create_node(workflow, json_node)
+
     if node.node_type == 'fork' and json_node['node_type'] == 'decision':
       node = node.convert_to_decision()
 
     id_map[str(json_node['id'])] = node.id
 
     for key in json_node:
-      if key not in ('node_ptr', 'child_nodes', 'workflow', 'id'):
+      if key not in ('node_ptr', 'child_nodes', 'workflow', 'id', 'sub_workflow'):
         setattr(node, key, format_field_value(key, json_node[key]))
 
     node.workflow = workflow
@@ -147,7 +160,7 @@ def workflow_validate_action(request, workflow, node_type):
 
   action_dict = format_dict_field_values(json.loads(str(request.POST.get('node'))))
 
-  if workflow_validate_action_json(node_type, action_dict, response['data']):
+  if workflow_validate_action_json(node_type, action_dict, response['data'], request.user, workflow):
     response['status'] = 0
   else:
     response['status'] = -1
@@ -159,7 +172,6 @@ def workflow_validate_action(request, workflow, node_type):
 @check_job_access_permission(exception_class=(lambda x: StructuredException(code="UNAUTHORIZED_REQUEST_ERROR", message=x, data=None, error_code=401)))
 @check_job_edition_permission(exception_class=(lambda x: StructuredException(code="UNAUTHORIZED_REQUEST_ERROR", message=x, data=None, error_code=401)))
 def workflow_save(request, workflow):
-  print request.POST
   json_workflow = format_dict_field_values(json.loads(str(request.POST.get('workflow'))))
   json_workflow.setdefault('schema_version', workflow.schema_version)
 
@@ -172,7 +184,7 @@ def workflow_save(request, workflow):
   id_map = {}
 
   workflow = update_workflow(json_workflow)
-  nodes = update_workflow_nodes(workflow, json_nodes, id_map)
+  nodes = update_workflow_nodes(workflow, json_nodes, id_map, request.user)
 
   # Update links
   index = 0

@@ -141,6 +141,12 @@ ${ layout.menubar(section='workflows') }
                   <i class="icon-plus"></i> ${ _('Email') }
                 </a>
                 <p/>
+                <p>
+                <a data-node-type="subworkflow"
+                  title="${ _('Click to add to the end of the workflow') }" class="btn new-node-link">
+                  <i class="icon-plus"></i> ${ _('Sub-workflow') }
+                </a>
+                <p/>
               </div>
             </div>
              % endif

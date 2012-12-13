@@ -467,6 +467,8 @@ class Node(models.Model):
       node = self.fs
     elif self.node_type == Email.node_type:
       node = self.email
+    elif self.node_type == SubWorkflow.node_type:
+      node = self.subworkflow
     elif self.node_type == Streaming.node_type:
       node = self.streaming
     elif self.node_type == Java.node_type:
@@ -926,18 +928,29 @@ class Email(Action):
   PARAM_FIELDS = ('to', 'cc', 'subject', 'body')
   node_type = 'email'
 
-  to = models.TextField(default='', verbose_name=_t('to addresses'),
-                            help_text=_t('Comma-separated values.'))
-  cc = models.TextField(default='', verbose_name=_t('cc addresses (optional)'), blank=True,
-                            help_text=_t('Comma-separated values.'))
-  subject = models.TextField(default="[]", verbose_name=_t('Subject'), blank=True,
-                            help_text=_t('Plain-text.'))
-  body = models.TextField(default="[]", verbose_name=_t('Body'), blank=True,
-                            help_text=_t('Plain-text.'))
+  to = models.TextField(default='', verbose_name=_t('to addresses'), help_text=_t('Comma-separated values.'))
+  cc = models.TextField(default='', verbose_name=_t('cc addresses (optional)'), blank=True, help_text=_t('Comma-separated values.'))
+  subject = models.TextField(default='', verbose_name=_t('Subject'), help_text=_t('Plain-text.'))
+  body = models.TextField(default='', verbose_name=_t('Body'), help_text=_t('Plain-text.'))
+
+
+class SubWorkflow(Action):
+  PARAM_FIELDS = ('subworkflow', 'propagate_configuration', 'job_properties')
+  node_type = 'subworkflow'
+
+  sub_workflow = models.ForeignKey(Workflow, db_index=True, verbose_name=_t('Sub workflow'),
+                            help_text=_t('The sub workflow application to include. You must own all the sub-workflows.'))
+  propagate_configuration = models.BooleanField(default=True, verbose_name=_t('Propagate configuration'), blank=True,
+                            help_text=_t('If the workflow job configuration should be propagated to the child workflow.'))
+  job_properties = models.TextField(default='[]', verbose_name=_t('Hadoop job properties'),
+                                    help_text=_t('Can be used to specify the job properties that are required to run the child workflow job.'))
+
+  def get_properties(self):
+    return json.loads(self.job_properties)
 
 
 Action.types = (Mapreduce.node_type, Streaming.node_type, Java.node_type, Pig.node_type, Hive.node_type, Sqoop.node_type, Ssh.node_type, Shell.node_type,
-                DistCp.node_type, Fs.node_type, Email.node_type)
+                DistCp.node_type, Fs.node_type, Email.node_type, SubWorkflow.node_type)
 
 
 class ControlFlow(Node):
@@ -1406,6 +1419,7 @@ ACTION_TYPES = {
   DistCp.node_type: DistCp,
   Fs.node_type: Fs,
   Email.node_type: Email,
+  SubWorkflow.node_type: SubWorkflow,
 }
 
 NODE_TYPES = ACTION_TYPES.copy()
