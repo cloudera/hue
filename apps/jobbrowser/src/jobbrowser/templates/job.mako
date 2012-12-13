@@ -19,7 +19,7 @@
 <%!
   import os
   from jobbrowser.views import format_counter_name
-  from filebrowser.views import location_to_url  
+  from filebrowser.views import location_to_url
   from desktop.views import commonheader, commonfooter
 
   from django.template.defaultfilters import urlencode
@@ -40,10 +40,16 @@
             <tr>
                 <td data-row-selector-exclude="true">
                 %if task.taskAttemptIds:
-                    <a href="${ url('jobbrowser.views.single_task_attempt_logs', jobid=task.jobId, taskid=task.taskId, attemptid=task.taskAttemptIds[-1]) }" data-row-selector-exclude="true"><i class="icon-tasks"></i></a>
+                    <a href="${ url('jobbrowser.views.single_task_attempt_logs', job=task.jobId, taskid=task.taskId, attemptid=task.taskAttemptIds[-1]) }"
+                        data-row-selector="true"><i class="icon-tasks"></i>
+                    </a>
                 %endif
                 </td>
-                <td><a title="${_('View this task')}" href="${ url('jobbrowser.views.single_task', jobid=job.jobId, taskid=task.taskId) }" data-row-selector="true">${task.taskId_short}</a></td>
+                <td>
+                    <a title="${_('View this task')}" href="${ url('jobbrowser.views.single_task', job=job.jobId, taskid=task.taskId) }"
+                        data-row-selector-exclude="true">${task.taskId_short}
+                    </a>
+                </td>
                 <td>${task.taskType}</td>
             </tr>
             % endfor
@@ -83,6 +89,7 @@
         </tr>
     % endfor
 </%def>
+
 ${commonheader(_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId_short), "jobbrowser", user)}
 
 <div class="container-fluid">
@@ -100,12 +107,12 @@ ${commonheader(_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId_short), 
                         ${comps.get_status(job)}
                     </li>
                     <li class="nav-header">${_('Logs')}</li>
-                    <li><a href="${ url('jobbrowser.views.job_single_logs', jobid=job.jobId) }">${_('View logs')}</a></li>
+                    <li><a href="${ url('jobbrowser.views.job_single_logs', job=job.jobId) }">${_('View logs')}</a></li>
                     % if job.status.lower() == 'running' or job.status.lower() == 'pending':
                         <li class="nav-header">${_('Kill Job')}</li>
                         <li>
                           <a href="#" title="${_('Kill this job')}" onclick="$('#kill-job').submit()">${_('Kill this job')}</a>
-                          <form id="kill-job" action="${url('jobbrowser.views.kill_job', jobid=job.jobId)}?next=${request.get_full_path()|urlencode}" method="POST"></form>
+                          <form id="kill-job" action="${url('jobbrowser.views.kill_job', job=job.jobId)}?next=${request.get_full_path()|urlencode}" method="POST"></form>
                         </li>
                     % endif
                     % if not job.is_retired:
@@ -142,16 +149,48 @@ ${commonheader(_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId_short), 
         </div>
         <div class="span10">
             <ul class="nav nav-tabs">
-                <li class="active"><a href="#tasks" data-toggle="tab">${_('Tasks')}</a></li>
+                % if job.is_mr2:
+                    <li class="active"><a href="#attempts" data-toggle="tab">${_('Attempts')}</a></li>
+                    <li><a href="#tasks" data-toggle="tab">${_('Tasks')}</a></li>
+                % else:
+                    <li class="active"><a href="#tasks" data-toggle="tab">${_('Tasks')}</a></li>
+                % endif
                 <li><a href="#metadata" data-toggle="tab">${_('Metadata')}</a></li>
                 % if not job.is_retired:
-                <li><a href="#counters" data-toggle="tab">${_('Counters')}</a></li>
+                    <li><a href="#counters" data-toggle="tab">${_('Counters')}</a></li>
                 % endif
             </ul>
 
             <div class="tab-content">
-                <div class="tab-pane active" id="tasks">
-                    % if job.is_retired:
+                % if job.is_mr2:
+                    <div class="tab-pane active" id="attempts">
+                        <table id="jobAttemptTable" class="table table-striped table-condensed">
+                            <thead>
+                                <th>${_('Logs')}</th>
+                                <th>${_('Id')}</th>
+                                <th>${_('Container')}</th>
+                            </thead>
+                            <tbody>
+                                % for attempt in job.job_attempts['jobAttempt']:
+                                    <tr>
+                                        <td>
+                                            <a href="${ url('jobbrowser.views.job_attempt_logs', job=job.jobId, attempt_index=loop.index) }"
+                                                data-row-selector="true">
+                                                <i class="icon-tasks"></i>
+                                            </a>
+                                        </td>
+                                        <td>${ attempt['id'] }</td>
+                                        <td>${ attempt['containerId'] }</td>
+                                    </tr>
+                                % endfor
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="tab-pane" id="tasks">
+                % else:
+                    <div class="tab-pane active" id="tasks">
+                % endif
+                    % if job.is_retired and not job.is_mr2:
                        ${ _('This jobs is ')} <span class="label label-warning">${ _('retired') }</span> ${ _(' and so has little information available.') }
                        <br/>
                        <br/>
@@ -159,7 +198,7 @@ ${commonheader(_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId_short), 
                         %if failed_tasks:
                             <div>
                                 <h3>
-                                    <a href="${url('jobbrowser.views.tasks', jobid=job.jobId)}?taskstate=failed">${_('View Failed Tasks')} &raquo;</a>
+                                    <a href="${url('jobbrowser.views.tasks', job=job.jobId)}?taskstate=failed">${_('View Failed Tasks')} &raquo;</a>
                                     ${_('Failed Tasks')}
                                 </h3>
                                 <div>
@@ -168,7 +207,7 @@ ${commonheader(_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId_short), 
                             </div>
                         %endif
                         <div>
-                            <a style="float:right;margin-right:10px" href="${url('jobbrowser.views.tasks', jobid=job.jobId)}">${_('View All Tasks')} &raquo;</a>
+                            <a style="float:right;margin-right:10px" href="${url('jobbrowser.views.tasks', job=job.jobId)}">${_('View All Tasks')} &raquo;</a>
                             <h3>
                                 ${_('Recent Tasks')}
                             </h3>
@@ -226,7 +265,8 @@ ${commonheader(_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId_short), 
                             <td>${_('Status')}</td>
                             <td>${job.status}</td>
                         </tr>
-                            ${rows_for_conf_vars(job.conf_keys)}
+
+                        ${rows_for_conf_vars(job.conf_keys)}
 
                         </tbody>
                     </table>
@@ -237,6 +277,18 @@ ${commonheader(_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId_short), 
                         <th>${_('Value')}</th>
                         </thead>
                         <tbody>
+                          % if job.is_mr2:
+                            % for line in job.full_job_conf['property']:
+                                <tr>
+                                    <td width="20%">${ line['name'] }</td>
+                                    <td>
+                                        <div class="wordbreak">
+                                        ${ line['value'] }
+                                        </div>
+                                    </td>
+                                </tr>
+                            % endfor
+                          % else:
                             % for key, value in sorted(job.full_job_conf.items()):
                                 <tr>
                                     <td width="20%">${key}</td>
@@ -247,12 +299,17 @@ ${commonheader(_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId_short), 
                                     </td>
                                 </tr>
                             % endfor
+                          % endif
                         </tbody>
                     </table>
 
                 </div>
                 <div id="counters" class="tab-pane">
-                    ${comps.job_counters(job.counters)}
+                    % if job.is_mr2:
+                      ${ comps.job_counters_mr2(job.counters) }
+                    % else:
+                      ${ comps.job_counters(job.counters) }
+                    % endif
                 </div>
             </div>
         </div>

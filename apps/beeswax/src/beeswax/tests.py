@@ -15,8 +15,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
-# Tests for beeswax
 
 import cStringIO
 import gzip
@@ -1193,8 +1191,9 @@ Starting Job = job_201003191517_0002, Tracking URL = http://localhost:50030/jobd
     --- we should be ignoring duplicates ---
 Starting Job = job_201003191517_0002, Tracking URL = http://localhost:50030/jobdetails.jsp?jobid=job_201003191517_0002
 Starting Job = job_201003191517_0003, Tracking URL = http://localhost:50030/jobdetails.jsp?jobid=job_201003191517_0003
+12/12/27 10:48:22 INFO mapreduce.Job: The url to track the job: http://localhost:8088/proxy/application_1356251510842_0022/
 """
-  assert_equal(["job_201003191517_0002", "job_201003191517_0003"],
+  assert_equal(["job_201003191517_0002", "job_201003191517_0003", "application_1356251510842_0022"],
     beeswax.views._parse_out_hadoop_jobs(sample_log))
   assert_equal([], beeswax.views._parse_out_hadoop_jobs("nothing to see here"))
 

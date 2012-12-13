@@ -30,7 +30,7 @@ ${commonheader(_('Job Task: %(taskId)s - Job Browser') % dict(taskId=task.taskId
                     <li class="nav-header">${_('Task ID')}</li>
                     <li>${task.taskId_short}</li>
                     <li class="nav-header">${_('Job')}</li>
-                    <li><a href="${url('jobbrowser.views.single_job', jobid=joblnk.jobId)}" title="${_('View this job')}">${joblnk.jobId_short}</a></li>
+                    <li><a href="${url('jobbrowser.views.single_job', job=joblnk.jobId)}" title="${_('View this job')}">${joblnk.jobId_short}</a></li>
                     <li class="nav-header">${_('Status')}</li>
                     <li>
                             % if task.state.lower() == 'running' or task.state.lower() == 'pending':
@@ -73,9 +73,9 @@ ${commonheader(_('Job Task: %(taskId)s - Job Browser') % dict(taskId=task.taskId
                         <tbody>
                                 % for attempt in task.attempts:
                                 <tr>
-                                    <td data-row-selector-exclude="true"><a href="${ url('jobbrowser.views.single_task_attempt_logs', jobid=joblnk.jobId, taskid=task.taskId, attemptid=attempt.attemptId) }" data-row-selector-exclude="true"><i class="icon-tasks"></i></a></td>
+                                    <td data-row-selector-exclude="true"><a href="${ url('jobbrowser.views.single_task_attempt_logs', job=joblnk.jobId, taskid=task.taskId, attemptid=attempt.attemptId) }" data-row-selector-exclude="true"><i class="icon-tasks"></i></a></td>
                                     <td><a title="${_('View this attempt')}"
-                                           href="${ url('jobbrowser.views.single_task_attempt', jobid=joblnk.jobId, taskid=task.taskId, attemptid=attempt.attemptId) }" data-row-selector="true">${attempt.attemptId_short}</a></td>
+                                           href="${ url('jobbrowser.views.single_task_attempt', job=joblnk.jobId, taskid=task.taskId, attemptid=attempt.attemptId) }" data-row-selector="true">${attempt.attemptId_short}</a></td>
                                     <td>${"%d" % (attempt.progress * 100)}%</td>
                                     <td><span class="status_link ${attempt.state}">${attempt.state}</span></td>
                                     <td><a href="/jobbrowser/trackers/${attempt.taskTrackerId}" class="task_tracker_link">${attempt.taskTrackerId}</a></td>
@@ -108,7 +108,7 @@ ${commonheader(_('Job Task: %(taskId)s - Job Browser') % dict(taskId=task.taskId
                         </tr>
                         <tr>
                             <td>${_('JobId')}</td>
-                            <td><a href="${url('jobbrowser.views.single_job', jobid=joblnk.jobId)}" title="${_('View this job')}">${joblnk.jobId}</a></td>
+                            <td><a href="${url('jobbrowser.views.single_job', job=joblnk.jobId)}" title="${_('View this job')}">${joblnk.jobId}</a></td>
                         </tr>
                         <tr>
                             <td>${_('State')}</td>
@@ -138,7 +138,11 @@ ${commonheader(_('Job Task: %(taskId)s - Job Browser') % dict(taskId=task.taskId
                     </table>
                 </div>
                 <div id="counters" class="tab-pane">
-                    ${comps.task_counters(task.counters)}
+                    % if task.is_mr2:
+                        ${ comps.task_counters_mr2(task.counters) }
+                    % else:
+                        ${ comps.task_counters(task.counters) }
+                    % endif
                 </div>
             </div>
         </div>

@@ -200,7 +200,7 @@ ${ layout.menubar(section='dashboard') }
               <tr>
                 <td>
                   % if action.externalId:
-                    <a href="${ url('jobbrowser.views.job_single_logs', jobid=action.externalId) }" data-row-selector-exclude="true"><i class="icon-tasks"></i></a>
+                    <a href="${ url('jobbrowser.views.job_single_logs', job=action.externalId) }" data-row-selector-exclude="true"><i class="icon-tasks"></i></a>
                   % endif
                 </td>
                 <td>
@@ -217,7 +217,7 @@ ${ layout.menubar(section='dashboard') }
                 <td><span class="label ${ utils.get_status(action.status) }">${ action.status }</span></td>
                 <td>
                   % if action.externalId:
-                    <a href="${ url('jobbrowser.views.single_job', jobid=action.externalId) }">${ "_".join(action.externalId.split("_")[-2:]) }</a>
+                    <a href="${ url('jobbrowser.views.single_job', job=action.externalId) }">${ "_".join(action.externalId.split("_")[-2:]) }</a>
                   % endif
                 </td>
 

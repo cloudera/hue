@@ -15,27 +15,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from desktop.lib.view_util import format_duration_in_millis
-from desktop.lib import i18n
-from hadoop import job_tracker
-from hadoop import confparse
-from urlparse import urlparse, urlunparse
-
 import datetime
 import logging
 import lxml.html
 import re
 import urllib2
 
-from django.utils.translation import ugettext as _
+from urlparse import urlparse, urlunparse
 
-import hadoop.api.jobtracker.ttypes as ttypes
+from desktop.lib.view_util import format_duration_in_millis
+from desktop.lib import i18n
+from hadoop import job_tracker
+from hadoop import confparse
 from hadoop.api.jobtracker.ttypes import JobNotFoundException
 
-from django.utils.translation import ugettext as _
+import hadoop.api.jobtracker.ttypes as ttypes
 from desktop.lib.exceptions_renderable import PopupException
 
+from django.utils.translation import ugettext as _
+
+
 LOGGER = logging.getLogger(__name__)
+
 
 class JobLinkage(object):
   """
@@ -52,6 +53,7 @@ class JobLinkage(object):
     self._jobtracker = jobtracker
     self.jobId = jobid
     self.jobId_short = "_".join(jobid.split("_")[-2:])
+    self.is_mr2 = False
 
   def get_task(self, task_id):
     """Retrieve a TaskInProgress from hadoop."""
@@ -73,7 +75,7 @@ class Job(JobLinkage):
     return getattr(self, item)
 
   @staticmethod
-  def from_id(jt, jobid):
+  def from_id(jt, jobid, is_finished=False):
     """
       Returns a Job instance given a job tracker interface and an id. The job tracker interface is typically
       located in request.jt.
@@ -114,6 +116,7 @@ class Job(JobLinkage):
     self._full_job_conf = None
     self._init_attributes()
     self.is_retired = hasattr(thriftJob, 'is_retired')
+    self.is_mr2 = False
 
   @property
   def counters(self):
@@ -364,6 +367,7 @@ class Task(object):
     self.counters = self.task.counters
     self.failed = self.task.failed
     self.complete = self.task.complete
+    self.is_mr2 = False
 
   def get_attempt(self, id):
     """

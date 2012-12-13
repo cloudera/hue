@@ -578,9 +578,7 @@ def watch_query_refresh_json(request, id):
   log = dbms.get(request.user, query_history.get_query_server_config()).get_log(handle)
 
   jobs = _parse_out_hadoop_jobs(log)
-  job_urls = {}
-  for job in jobs:
-    job_urls[job] = reverse('jobbrowser.views.single_job', kwargs=dict(jobid=job))
+  job_urls = dict([(job, reverse('jobbrowser.views.single_job', kwargs=dict(job=job))) for job in jobs])
 
   result = {
     'log': log,
@@ -1244,6 +1242,8 @@ def _parse_query_context(context):
 
 
 HADOOP_JOBS_RE = re.compile("(http[^\s]*/jobdetails.jsp\?jobid=([a-z0-9_]*))")
+HADOOP_YARN_JOBS_RE = re.compile("(http[^\s]*/proxy/([a-z0-9_]+?)/)")
+
 def _parse_out_hadoop_jobs(log):
   """
   Ideally, Hive would tell us what jobs it has run directly
@@ -1251,6 +1251,7 @@ def _parse_out_hadoop_jobs(log):
   to look for URLs to those jobs.
   """
   ret = []
+
   for match in HADOOP_JOBS_RE.finditer(log):
     full_job_url, job_id = match.groups()
     # We ignore full_job_url for now, but it may
@@ -1258,9 +1259,14 @@ def _parse_out_hadoop_jobs(log):
     # correctly.
 
     # Ignore duplicates
-    if job_id in ret:
-      continue
-    ret.append(job_id)
+    if job_id not in ret:
+      ret.append(job_id)
+
+  for match in HADOOP_YARN_JOBS_RE.finditer(log):
+    full_job_url, job_id = match.groups()
+    if job_id not in ret:
+      ret.append(job_id)
+
   return ret
 
 

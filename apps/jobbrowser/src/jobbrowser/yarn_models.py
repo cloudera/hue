@@ -1,0 +1,206 @@
+#!/usr/bin/env python
+# Licensed to Cloudera, Inc. under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  Cloudera, Inc. licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import logging
+import re
+import time
+
+from desktop.lib.view_util import format_duration_in_millis
+
+from jobbrowser.models import format_unixtime_ms
+
+
+LOGGER = logging.getLogger(__name__)
+
+
+class Application:
+
+  def __init__(self, attrs):
+    for attr in attrs.keys():
+      setattr(self, attr, attrs[attr])
+
+    self._fixup()
+
+  def _fixup(self):
+    self.is_mr2 = True
+    jobid = self.id
+    if self.state in ('FINISHED', 'FAILED', 'KILLED'):
+      # When a job is finished
+      jobid = jobid.replace('application', 'job')
+      setattr(self, 'status', self.finalStatus)
+    else:
+      jobid = jobid.replace('job', 'application')
+      setattr(self, 'status', self.state)
+    setattr(self, 'jobId', jobid)
+    setattr(self, 'jobId_short', re.sub('(application|job)_', '', self.jobId))
+    setattr(self, 'jobName', self.name)
+    setattr(self, 'is_retired', False)
+    setattr(self, 'maps_percent_complete', self.progress)
+    setattr(self, 'reduces_percent_complete', self.progress)
+    setattr(self, 'queueName', self.queue)
+    setattr(self, 'priority', '')
+    if self.finishedTime == 0:
+      finishTime = int(time.time() * 1000)
+    else:
+      finishTime = self.finishedTime
+    setattr(self, 'durationInMillis', finishTime - self.startedTime)
+    setattr(self, 'startTimeMs', self.startedTime)
+    setattr(self, 'startTimeFormatted',  format_unixtime_ms(self.startedTime))
+    setattr(self, 'finishedMaps', None)
+    setattr(self, 'desiredMaps', None)
+    setattr(self, 'finishedReduces', None)
+    setattr(self, 'desiredReduces', None)
+    setattr(self, 'durationFormatted', format_duration_in_millis(self.durationInMillis))
+
+
+class Job:
+
+  def __init__(self, api, attrs):
+    self.api = api
+    self.is_mr2 = True
+    for attr in attrs.keys():
+      setattr(self, attr, attrs[attr])
+
+    self._fixup()
+
+  def _fixup(self):
+    jobid = self.id
+
+    if self.state in ('SUCCEEDED', 'FAILED', 'KILL_WAIT', 'KILLED', 'ERROR'):
+      setattr(self, 'status', self.state)
+      # When a job is finished, just use 'job' instead of 'application'
+      jobid = jobid.replace('application', 'job')
+    else:
+      jobid = jobid.replace('job', 'application')
+      setattr(self, 'status', self.state)
+    setattr(self, 'jobId', jobid)
+    setattr(self, 'jobId_short', self.jobId.replace('job_', ''))
+    setattr(self, 'is_retired', True)
+    setattr(self, 'maps_percent_complete', None)
+    setattr(self, 'reduces_percent_complete', None)
+    setattr(self, 'duration', self.finishTime - self.startTime)
+    setattr(self, 'finishTimeFormatted', format_unixtime_ms(self.finishTime))
+    setattr(self, 'startTimeFormatted', format_unixtime_ms(self.startTime))
+    setattr(self, 'finishedMaps', self.mapsCompleted)
+    setattr(self, 'desiredMaps', None)
+    setattr(self, 'finishedReduces', self.reducesCompleted)
+    setattr(self, 'desiredReduces', None)
+
+  @property
+  def counters(self):
+    return self.api.counters(self.id)['jobCounters']
+
+  @property
+  def full_job_conf(self):
+    if not hasattr(self, '_full_job_conf'):
+      self._full_job_conf = self.api.conf(self.id)['conf']
+    return self._full_job_conf
+
+  @property
+  def conf_keys(self):
+    return dict([(line['name'], line['value']) for line in self.full_job_conf['property']])
+
+  def get_task(self, task_id):
+    json = self.api.task(self.id, task_id)['task']
+    return Task(self, json)
+
+  def filter_tasks(self, task_types=None, task_states=None, task_text=None):
+    return [Task(self, task) for task in self.api.tasks(self.id).get('tasks', {}).get('task', [])
+            if (not task_types or task['type'].lower() in task_types) and
+               (not task_states or task['state'].lower() in task_states)]
+
+  @property
+  def job_attempts(self):
+    if not hasattr(self, '_job_attempts'):
+      self._job_attempts = self.api.job_attempts(self.id)['jobAttempts']
+    return self._job_attempts
+
+
+class Task:
+
+  def __init__(self, job, attrs):
+    self.job = job
+    if attrs:
+      for key, value in attrs.iteritems():
+        setattr(self, key, value)
+    self.is_mr2 = True
+
+    self._fixup()
+
+  def _fixup(self):
+    setattr(self, 'jobId', self.job.jobId)
+    setattr(self, 'taskId', self.id)
+    setattr(self, 'taskId_short', self.id)
+    setattr(self, 'taskType', self.type)
+    setattr(self, 'execStartTimeMs', self.startTime)
+    setattr(self, 'mostRecentState', self.state)
+    setattr(self, 'execStartTimeFormatted', format_unixtime_ms(self.startTime))
+    setattr(self, 'execFinishTimeFormatted', format_unixtime_ms(self.finishTime))
+    setattr(self, 'startTimeFormatted', self.startTime)
+
+  @property
+  def attempts(self):
+    # We can cache as we deal with history server
+    if not hasattr(self, '_attempts'):
+      self._attempts = [Attempt(self, attempt) for attempt in self.job.api.task_attempts(self.job.id, self.id)['taskAttempts']['taskAttempt']]
+    return self._attempts
+
+  @property
+  def taskAttemptIds(self):
+    if not hasattr(self, '_taskAttemptIds'):
+      self._taskAttemptIds = [attempt.id for attempt in self.attempts]
+    return self._taskAttemptIds
+
+  @property
+  def counters(self):
+    if not hasattr(self, '_counters'):
+      self._counters = self.job.api.task_counters(self.jobId, self.id)['jobTaskCounters']
+    return self._counters
+
+  def get_attempt(self, attempt_id):
+    json = self.job.api.task_attempt(self.jobId, self.id, attempt_id)['taskAttempt']
+    return Attempt(self, json)
+
+
+class Attempt:
+
+  def __init__(self, task, attrs):
+    self.task = task
+    if attrs:
+      for key, value in attrs.iteritems():
+        setattr(self, key, value)
+    self.is_mr2 = True
+
+    self._fixup()
+
+  def _fixup(self):
+    setattr(self, 'attemptId', self.id)
+    setattr(self, 'attemptId_short', self.id)
+    setattr(self, 'taskTrackerId', self.assignedContainerId)
+    setattr(self, 'startTimeFormatted', self.startTime)
+    setattr(self, 'finishTimeFormatted', self.finishTime)
+    setattr(self, 'outputSize', None)
+    setattr(self, 'phase', None)
+    setattr(self, 'shuffleFinishTimeFormatted', None)
+    setattr(self, 'sortFinishTimeFormatted', None)
+    setattr(self, 'mapFinishTimeFormatted', None)
+
+  @property
+  def counters(self):
+    if not hasattr(self, '_counters'):
+      self._counters = self.task.job.api.task_attempt_counters(self.task.jobId, self.task.id, self.id)['jobCounters']
+    return self._counters

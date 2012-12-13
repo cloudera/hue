@@ -39,9 +39,8 @@ ${layout.menubar(section='query')}
 			        %>
 				 	% if n_jobs > 0:
 						<li id="jobsHeader" class="nav-header">${mr_jobs} (${n_jobs})</li>
-
 						% for jobid in hadoop_jobs:
-						<li><a class="jobLink" href="${url("jobbrowser.views.single_job", jobid=jobid)}">${jobid.replace("job_", "")}</a></li>
+						    <li><a class="jobLink" href="${url("jobbrowser.views.single_job", job=jobid)}">${jobid.replace("job_", "")}</a></li>
 						% endfor
 					% else:
 						<li id="jobsHeader" class="nav-header">${mr_jobs}</li>

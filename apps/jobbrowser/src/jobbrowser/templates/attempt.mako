@@ -29,10 +29,10 @@ ${commonheader(_('Task Attempt: %(attemptId)s - Job Browser') % dict(attemptId=a
                     <li class="nav-header">${_('Attempt ID')}</li>
                     <li>${attempt.attemptId_short}</li>
                     <li class="nav-header">${_('Task')}</li>
-                    <li><a href="${url('jobbrowser.views.single_task', jobid=joblnk.jobId, taskid=taskid)}" title="${_('View this task')}">${task.taskId_short}</a>
+                    <li><a href="${url('jobbrowser.views.single_task', job=joblnk.jobId, taskid=taskid)}" title="${_('View this task')}">${task.taskId_short}</a>
                     </li>
                     <li class="nav-header">${_('Job')}</li>
-                    <li><a href="${url('jobbrowser.views.single_job', jobid=joblnk.jobId)}" title="${_('View this job')}">${joblnk.jobId_short}</a></li>
+                    <li><a href="${url('jobbrowser.views.single_job', job=joblnk.jobId)}" title="${_('View this job')}">${joblnk.jobId_short}</a></li>
                     <li class="nav-header">${_('Status')}</li>
                     <li>
                         <%
@@ -54,7 +54,7 @@ ${commonheader(_('Task Attempt: %(attemptId)s - Job Browser') % dict(attemptId=a
             <ul id="tabs" class="nav nav-tabs">
                 <li class="active"><a href="#metadata" data-toggle="tab">${_('Metadata')}</a></li>
                 <li><a href="#counters" data-toggle="tab">${_('Counters')}</a></li>
-                <li><a href="${ url('jobbrowser.views.single_task_attempt_logs', jobid=task.jobId, taskid=task.taskId, attemptid=attempt.attemptId) }">${_('Logs')}</a></li>
+                <li><a href="${ url('jobbrowser.views.single_task_attempt_logs', job=task.jobId, taskid=task.taskId, attemptid=attempt.attemptId) }">${_('Logs')}</a></li>
             </ul>
 
             <div class="tab-content">
@@ -73,7 +73,7 @@ ${commonheader(_('Task Attempt: %(attemptId)s - Job Browser') % dict(attemptId=a
                         </tr>
                         <tr>
                             <td>${_('Task ID')}</td>
-                            <td><a href="${url('jobbrowser.views.single_task', jobid=joblnk.jobId, taskid=taskid)}" title="${_('View this task')}">${task.taskId_short}</a></td>
+                            <td><a href="${url('jobbrowser.views.single_task', job=joblnk.jobId, taskid=taskid)}" title="${_('View this task')}">${task.taskId_short}</a></td>
                         </tr>
                         <tr>
                             <td>${_('Task Type')}</td>
@@ -81,7 +81,7 @@ ${commonheader(_('Task Attempt: %(attemptId)s - Job Browser') % dict(attemptId=a
                         </tr>
                         <tr>
                             <td>${_('JobId')}</td>
-                            <td><a href="${url('jobbrowser.views.single_job', jobid=joblnk.jobId)}" title="${_('View this job')}">${joblnk.jobId_short}</a></td>
+                            <td><a href="${url('jobbrowser.views.single_job', job=joblnk.jobId)}" title="${_('View this job')}">${joblnk.jobId_short}</a></td>
                         </tr>
                         <tr>
                             <td>${_('State')}</td>
@@ -116,7 +116,11 @@ ${commonheader(_('Task Attempt: %(attemptId)s - Job Browser') % dict(attemptId=a
                 </div>
 
                 <div class="tab-pane" id="counters">
-                    ${comps.task_counters(task.counters)}
+                    % if task.is_mr2:
+                        ${ comps.task_counters_mr2(task.counters) }
+                    % else:
+                        ${ comps.task_counters(task.counters) }
+                    % endif
                 </div>
             </div>
         </div>
