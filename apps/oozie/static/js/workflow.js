@@ -262,10 +262,10 @@ $.extend(DistCPModel.prototype, {
   description: '',
   node_type: 'distcp',
   workflow: 0,
-  job_properties: [],
-  prepares: [],
+  job_properties: '[]',
+  prepares: '[]',
   job_xml: '',
-  params: [],
+  params: '[]',
   child_links: []
 });
 
@@ -276,11 +276,11 @@ $.extend(MapReduceModel.prototype, {
   description: '',
   node_type: 'mapreduce',
   workflow: 0,
-  files: [],
-  archives: [],
-  job_properties: [],
+  files: '[]',
+  archives: '[]',
+  job_properties: '[]',
   jar_path: '',
-  prepares: [],
+  prepares: '[]',
   job_xml: '',
   child_links: []
 });
@@ -292,9 +292,9 @@ $.extend(StreamingModel.prototype, {
   description: '',
   node_type: 'streaming',
   workflow: 0,
-  files: [],
-  archives: [],
-  job_properties: [],
+  files: '[]',
+  archives: '[]',
+  job_properties: '[]',
   mapper: '',
   reducer: '',
   child_links: []
@@ -307,11 +307,11 @@ $.extend(JavaModel.prototype, {
   description: '',
   node_type: 'java',
   workflow: 0,
-  files: [],
-  archives: [],
-  job_properties: [],
+  files: '[]',
+  archives: '[]',
+  job_properties: '[]',
   jar_path: '',
-  prepares: [],
+  prepares: '[]',
   job_xml: '',
   main_class: '',
   args: '',
@@ -326,12 +326,12 @@ $.extend(PigModel.prototype, {
   description: '',
   node_type: 'pig',
   workflow: 0,
-  files: [],
-  archives: [],
-  job_properties: [],
-  prepares: [],
+  files: '[]',
+  archives: '[]',
+  job_properties: '[]',
+  prepares: '[]',
   job_xml: '',
-  params: [],
+  params: '[]',
   script_path: '',
   child_links: []
 });
@@ -343,12 +343,12 @@ $.extend(HiveModel.prototype, {
   description: '',
   node_type: 'hive',
   workflow: 0,
-  files: [],
-  archives: [],
-  job_properties: [],
-  prepares: [],
+  files: '[]',
+  archives: '[]',
+  job_properties: '[]',
+  prepares: '[]',
   job_xml: '',
-  params: [],
+  params: '[]',
   script_path: '',
   child_links: []
 });
@@ -360,12 +360,12 @@ $.extend(SqoopModel.prototype, {
   description: '',
   node_type: 'sqoop',
   workflow: 0,
-  files: [],
-  archives: [],
-  job_properties: [],
-  prepares: [],
+  files: '[]',
+  archives: '[]',
+  job_properties: '[]',
+  prepares: '[]',
   job_xml: '',
-  params: [],
+  params: '[]',
   script_path: '',
   child_links: []
 });
@@ -377,12 +377,12 @@ $.extend(ShellModel.prototype, {
   description: '',
   node_type: 'shell',
   workflow: 0,
-  files: [],
-  archives: [],
-  job_properties: [],
-  prepares: [],
+  files: '[]',
+  archives: '[]',
+  job_properties: '[]',
+  prepares: '[]',
   job_xml: '',
-  params: [],
+  params: '[]',
   command: '',
   capture_output: false,
   child_links: []
@@ -397,7 +397,7 @@ $.extend(SshModel.prototype, {
   workflow: 0,
   user: '',
   host: '',
-  params: [],
+  params: '[]',
   command: '',
   capture_output: false,
   child_links: []
@@ -1520,7 +1520,7 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
     $.each(mapping['__ko_mapping__'].mappedProperties, function(key, value) {
       var key = key;
       self[key].subscribe(function(value) {
-        workflow.is_dirty = true;
+        self.is_dirty( true );
         self.model[key] = ko.mapping.toJS(value);
       });
     });
@@ -1531,6 +1531,7 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
     self.el = $('#workflow');
     self.nodes = ko.observableArray([]);
     self.kill = null;
+    self.is_dirty = ko.observable( false );
 
     self.url = ko.computed(function() {
       return '/oozie/workflows/' + self.id()
@@ -1626,7 +1627,7 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
             }
           }
         });
-        workflow.is_dirty = false;
+        workflow.is_dirty( false );
       }
 
       if (!self.kill) {
@@ -1684,7 +1685,7 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
 
       // $(".propKey").each(addAutoComplete);
 
-      workflow.is_dirty = true;
+      workflow.is_dirty( true );
     },
 
     removeNode: function(node, event) {
@@ -1695,7 +1696,7 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
 
       self.rebuild();
 
-      workflow.is_dirty = true;
+      workflow.is_dirty( true );
     },
 
     save: function( options ) {},
@@ -1968,7 +1969,7 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
               // End of decision tree is being dragged to the bottom of a branch
               draggable.detach();
               newParent.append(draggable);
-              workflow.is_dirty = true;
+              workflow.is_dirty( true );
               self.rebuild();
             }
           } else {
@@ -2002,7 +2003,7 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
               newParent.append(draggable);
             break;
             }
-            workflow.is_dirty = true;
+            workflow.is_dirty( true );
             self.rebuild();
           }
         }

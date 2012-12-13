@@ -499,7 +499,13 @@ $.extend(Workflow.prototype, {
 
     var nodes = [];
     $.each(self.registry.nodes, function(key, node) {
-      nodes.push(node.model);
+      // Create object with members from the actual model to address JSON.stringify bug
+      // JSON.stringify does not pick up members specified in prototype prior to object creation.
+      var model = {};
+      for (var key in node.model) {
+        model[key] = node.model[key];
+      }
+      nodes.push(model);
     });
     data['nodes'] = nodes;
 
@@ -509,7 +515,7 @@ $.extend(Workflow.prototype, {
       data: { workflow: JSON.stringify(data) },
       success: function() {
         $.jHueNotify.info("${ _('Workflow saved') }");
-        workflow.is_dirty = false;
+        workflow.is_dirty( false );
       },
       error: function() {
         $.jHueNotify.error("${ _('Could not save workflow') }");
@@ -544,8 +550,7 @@ var workflow_model = {
   deployment_dir: "${ workflow.deployment_dir }",
   is_shared: "${ workflow.is_shared }" == "True",
   parameters: ${ workflow.parameters },
-  job_properties: ${ workflow.job_properties },
-  is_dirty: false
+  job_properties: ${ workflow.job_properties }
 };
 var registry = new Registry();
 var workflow = new Workflow({
@@ -575,7 +580,7 @@ $('#workflow').on('click', '.edit-node-link', function(e) {
 
   var try_save = function(e) {
     if (node.validate()) {
-      workflow.is_dirty = true;
+      workflow.is_dirty( true );
       modal.hide();
     }
   };
@@ -611,7 +616,7 @@ $('#workflow').on('click', '.new-node-link', function(e) {
 
   var try_save = function(e) {
     if (node.validate()) {
-      workflow.is_dirty = true;
+      workflow.is_dirty( true );
       modal.hide();
       // save, add kill, add node to workflow.
       node.addChild(workflow.kill);
@@ -649,7 +654,7 @@ var addAutoComplete = function(i, elem) {
 };
 
 window.onbeforeunload = function (e) {
-  if (workflow.is_dirty) {
+  if (workflow.is_dirty()) {
     var message = "${ _('You have unsaved changes in this workflow.') }";
 
     if (!e) e = window.event;
@@ -675,7 +680,7 @@ $(document).ready(function () {
 });
 
 function checkModelDirtiness() {
-  if (workflow.is_dirty) {
+  if (workflow.is_dirty()) {
     $(".ribbon-wrapper").fadeIn();
   }
   else {
