@@ -208,6 +208,17 @@ YARN_CLUSTERS = UnspecifiedConfigSection(
               "as the --config flag. Defaults to the environment variable " +
               "HADOOP_CONF_DIR when set, or '/etc/hadoop/conf'.")
       ),
+      IS_YARN=Config("is_yarn", help="Attribute set only on YARN clusters and not MR1 ones.",
+                     default=True, type=coerce_bool),
+      RESOURCE_MANAGER_API_URL=Config("resourcemanager_api_url",
+                  default='http://localhost:8088',
+                  help="URL of the ResourceManager API"),
+      PROXY_API_URL=Config("proxy_api_url",
+                  default='http://localhost:8088',
+                  help="URL of the ProxyServer API"),
+      HISTORY_SERVER_API_URL=Config("history_server_api_url",
+                  default='http://localhost:19888',
+                  help="URL of the HistoryServer API"),
     )
   )
 )

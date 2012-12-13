@@ -56,11 +56,11 @@ ${commonheader(_('Job Browser'), "jobbrowser", user)}
     <label class="pull-right">
         &nbsp;
         ${_('Text:')}
-        <input type="text" name="text" title="${_('Text Filter')}" value="${text_filter}" placeholder="${_('Text Filter')}" class="submitter input-large search-query"/>
+        <input type="text" name="text" title="${_('Text Filter')}" value="${ text_filter or '' }" placeholder="${_('Text Filter')}" class="submitter input-large search-query"/>
     </label>
     <label class="pull-right">
         ${_('Username:')}
-        <input type="text" name="user" title="${_('User Name Filter')}" value="${user_filter}" placeholder="${_('User Name Filter')}" class="submitter input-small search-query" />
+        <input type="text" name="user" title="${_('User Name Filter')}" value="${ user_filter or '' }" placeholder="${_('User Name Filter')}" class="submitter input-large search-query" />
     </label>
 </form>
 
@@ -94,30 +94,32 @@ ${commonheader(_('Job Browser'), "jobbrowser", user)}
         % for job in jobs:
         <tr class="job-row">
             <td data-row-selector-exclude="true">
-                <a href="${ url('jobbrowser.views.job_single_logs', jobid=job.jobId) }" data-row-selector-exclude="true"><i class="icon-tasks"></i></a>
+                <a href="${ url('jobbrowser.views.job_single_logs', job=job.jobId) }" data-row-selector-exclude="true"><i class="icon-tasks"></i></a>
             </td>
             <td>
-                <a href="${url('jobbrowser.views.single_job', jobid=job.jobId)}" title="${_('View this job')}" data-row-selector="true">${job.jobId_short}</a>
+                <a href="${url('jobbrowser.views.single_job', job=job.jobId)}" title="${_('View this job')}" data-row-selector="true">${job.jobId_short}</a>
             </td>
             <td>
                 ${job.jobName}
             </td>
             <td>
-                <a href="${url('jobbrowser.views.jobs')}?${get_state_link(request, 'state', job.status.lower())}" title="${_('Show only %(status)s jobs') % dict(status=job.status.lower())}" class="nounderline">
+                <a href="${url('jobbrowser.views.jobs')}?${get_state_link(request, 'state', job.status.lower())}"
+                    title="${_('Show only %(status)s jobs') % dict(status=job.status.lower())}" class="nounderline">
                     ${comps.get_status(job)}
                 </a>
             </td>
             <td>
-                <a href="${url('jobbrowser.views.jobs')}?${get_state_link(request, 'user', job.user.lower())}" title="${_('Show only %(status)s jobs') % dict(status=job.user.lower())}">${job.user}</a>
+                <a href="${url('jobbrowser.views.jobs')}?${get_state_link(request, 'user', job.user.lower())}"
+                    title="${_('Show only %(status)s jobs') % dict(status=job.user.lower())}">${job.user}</a>
             </td>
             <td data-sort-value="${job.maps_percent_complete}">
                 % if job.is_retired:
                     <div class="center">${_('N/A')}</div>
                 % else:
-                ${comps.mr_graph_maps(job)}
+                    ${comps.mr_graph_maps(job)}
                 % endif
             </td>
-            <td data-sort-value="${job.reduces_percent_complete}">
+                <td data-sort-value="${job.reduces_percent_complete}">
                 % if job.is_retired:
                     <div class="center">${_('N/A')}</div>
                 % else:
@@ -125,7 +127,7 @@ ${commonheader(_('Job Browser'), "jobbrowser", user)}
                 % endif
             </td>
             <td>${job.queueName}</td>
-            <td>${job.priority.lower()}</td>
+            <td>${job.priority.lower() or _('N/A')}</td>
             <td data-sort-value="${job.durationInMillis}" data-row-selector-exclude="true">
                 % if job.is_retired:
                     ${_('N/A')}
@@ -135,12 +137,13 @@ ${commonheader(_('Job Browser'), "jobbrowser", user)}
             </td>
             <td data-sort-value="${job.startTimeMs}">${job.startTimeFormatted}</td>
             <td>
-                % if job.status.lower() == 'running' or job.status.lower() == 'pending':
-                % if request.user.is_superuser or request.user.username == job.user:
-                <a href="#" title="${_('Kill this job')}" kill-action="${url('jobbrowser.views.kill_job', jobid=job.jobId)}?next=${request.get_full_path()|urlencode}" data-row-selector-exclude="true" data-keyboard="true" class="btn btn-mini kill">
-                  <i class="icon-remove"></i> ${_('Kill')}
-                </a>
-                % endif
+                % if (job.status.lower() == 'running' or job.status.lower() == 'pending') and not job.is_mr2:
+                  % if request.user.is_superuser or request.user.username == job.user:
+                    <a href="#" title="${_('Kill this job')}" kill-action="${url('jobbrowser.views.kill_job', job=job.jobId)}?next=${request.get_full_path() | urlencode}"
+                        data-row-selector-exclude="true" data-keyboard="true" class="btn btn-mini kill">
+                      <i class="icon-remove"></i> ${_('Kill')}
+                    </a>
+                  % endif
                 % endif
             </td>
             </tr>
@@ -150,17 +153,17 @@ ${commonheader(_('Job Browser'), "jobbrowser", user)}
     % endif
 
     % else:
-    ${commonheader(_('Job Browser'), "jobbrowser", user)}
-    <div class="container-fluid">
-    <h1>${_('Welcome to the Job Browser')}</h1>
-    <div>
-        <p>${_("There aren't any jobs running. Let's fix that.")}</p>
-        % if appmanager.get_desktop_module('jobsub') is not None:
-        <a href="/jobsub/">${_('Launch the Job Designer')}</a><br/>
-        % endif
-        % if appmanager.get_desktop_module('beeswax') is not None:
-        <a href="/beeswax/">${_('Launch Beeswax')}</a><br/>
-        % endif
+        ${commonheader(_('Job Browser'), "jobbrowser", user)}
+        <div class="container-fluid">
+        <h1>${_('Welcome to the Job Browser')}</h1>
+        <div>
+            <p>${_("There aren't any jobs running. Let's fix that.")}</p>
+            % if appmanager.get_desktop_module('jobsub') is not None:
+                <a href="/jobsub/">${_('Launch the Job Designer')}</a><br/>
+            % endif
+            % if appmanager.get_desktop_module('beeswax') is not None:
+                <a href="/beeswax/">${_('Launch Beeswax')}</a><br/>
+            % endif
     </div>
     % endif
 </div>
@@ -188,7 +191,7 @@ ${commonheader(_('Job Browser'), "jobbrowser", user)}
             "bLengthChange": false,
             "bFilter": false,
             "bInfo": false,
-            "aaSorting": [[ 0, "desc" ]],
+            "aaSorting": [[1, "desc"]],
             "aoColumns": [
                 {"bSortable": false},
                 null,

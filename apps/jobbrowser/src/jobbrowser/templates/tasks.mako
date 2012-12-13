@@ -21,17 +21,18 @@
 
 <%namespace name="comps" file="jobbrowser_components.mako" />
 
-${commonheader(_('Task View: Job: %(jobId)s - Job Browser') % dict(jobId=jobid_short), "jobbrowser", user)}
+${ commonheader(_('Task View: Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId_short), "jobbrowser", user) }
 
 <%def name="selected(val, state)">
     %   if val is not None and state is not None and val in state:
         selected="true"
     %   endif
 </%def>
+
 <div class="container-fluid">
-    <h1>${_('Task View: Job: %(jobId)s') % dict(jobId=jobid_short)}</h1>
+    <h1>${_('Task View: Job: %(jobId)s') % dict(jobId=job.jobId_short)}</h1>
     <div class="well hueWell">
-        <form method="get" action="/jobbrowser/jobs/${jobid}/tasks">
+        <form method="get" action="${ url('jobbrowser.views.tasks', job=job.jobId) }">
             <b>${_('Filter tasks:')}</b>
 
             <select name="taskstate" class="submitter">
@@ -42,7 +43,6 @@ ${commonheader(_('Task View: Job: %(jobId)s - Job Browser') % dict(jobId=jobid_s
                 <option value="killed" ${selected('killed', taskstate)}>${_('killed')}</option>
                 <option value="pending" ${selected('pending', taskstate)}>${_('pending')}</option>
             </select>
-
 
             <select name="tasktype" class="submitter">
                 <option value="">${_('All types')}</option>
@@ -57,12 +57,12 @@ ${commonheader(_('Task View: Job: %(jobId)s - Job Browser') % dict(jobId=jobid_s
                 % if tasktext:
                    value="${tasktext}"
                 % endif
-                    />
+            />
         </form>
     </div>
 
 
-    % if len(page.object_list) == 0:
+    % if not page.object_list:
          <p>${_('There were no tasks that match your search criteria.')}</p>
     % else:
         <table class="datatables table table-striped table-condensed">
@@ -84,24 +84,24 @@ ${commonheader(_('Task View: Job: %(jobId)s - Job Browser') % dict(jobId=jobid_s
 	            <tr>
                     <td data-row-selector-exclude="true">
                         %if t.taskAttemptIds:
-                            <a href="${ url('jobbrowser.views.single_task_attempt_logs', jobid=t.jobId, taskid=t.taskId, attemptid=t.taskAttemptIds[-1]) }" data-row-selector-exclude="true"><i class="icon-tasks"></i></a>
+                            <a href="${ url('jobbrowser.views.single_task_attempt_logs', job=t.jobId, taskid=t.taskId, attemptid=t.taskAttemptIds[-1]) }" data-row-selector-exclude="true"><i class="icon-tasks"></i></a>
                         %endif
                     </td>
 	                <td>${t.taskId_short}</td>
 	                <td>${t.taskType}</td>
 	                <td>
-	                   <div class="bar">${"%d" % (t.progress * 100)}%</div>
+	                   <div class="bar">${ "%d" % (t.progress * 100) }%</div>
 	                </td>
 	                <td>
-	                    <a href="${url('jobbrowser.views.tasks', jobid=jobid)}?${get_state_link(request, 'taskstate', t.state.lower())}"
-	                       title="${_('Show only %(state)s tasks') % dict(state=t.state.lower())}"
-	                       class="${t.state.lower()}">${t.state.lower()}
+	                    <a href="${ url('jobbrowser.views.tasks', job=job.jobId) }?${ get_state_link(request, 'taskstate', t.state.lower()) }"
+	                       title="${ _('Show only %(state)s tasks') % dict(state=t.state.lower()) }"
+	                       class="${ t.state.lower() }">${ t.state.lower() }
 	                    </a>
 	                </td>
 	                <td>${t.mostRecentState}</td>
 	                <td>${t.execStartTimeFormatted}</td>
 	                <td>${t.execFinishTimeFormatted}</td>
-	                <td><a href="/jobbrowser/jobs/${jobid}/tasks/${t.taskId}" data-row-selector="true">${_('Attempts')}</a></td>
+	                <td><a href="${ url('jobbrowser.views.single_task', job=job.jobId, taskid=t.taskId) }" data-row-selector="true">${_('Attempts')}</a></td>
 	            </tr>
 	            %endfor
 	        </tbody>
@@ -127,4 +127,4 @@ ${commonheader(_('Task View: Job: %(jobId)s - Job Browser') % dict(jobId=jobid_s
     });
 </script>
 
-${commonfooter(messages)}
+${ commonfooter(messages) }

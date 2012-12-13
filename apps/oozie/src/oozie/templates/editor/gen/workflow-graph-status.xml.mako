@@ -54,7 +54,7 @@
         </div>
         <div class="span2">
           % if action and action.externalId:
-           <a href="${ url('jobbrowser.views.job_single_logs', jobid=action.externalId) }" data-row-selector-exclude="true" id="advanced-btn">
+           <a href="${ url('jobbrowser.views.job_single_logs', job=action.externalId) }" data-row-selector-exclude="true" id="advanced-btn">
               <i class="icon-tasks"></i> ${ _('View the logs') }
             </a>
           % endif

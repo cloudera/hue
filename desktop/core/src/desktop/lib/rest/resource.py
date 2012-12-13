@@ -80,7 +80,7 @@ class Resource(object):
       return body
 
 
-  def get(self, relpath=None, params=None):
+  def get(self, relpath=None, params=None, headers=None):
     """
     Invoke the GET method on a resource.
     @param relpath: Optional. A relative path to this resource's path.
@@ -88,7 +88,7 @@ class Resource(object):
 
     @return: A dictionary of the JSON result.
     """
-    return self.invoke("GET", relpath, params)
+    return self.invoke("GET", relpath, params, headers=headers)
 
 
   def delete(self, relpath=None, params=None):

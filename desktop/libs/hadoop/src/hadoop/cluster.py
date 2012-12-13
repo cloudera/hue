@@ -116,6 +116,9 @@ def get_cluster_addr_for_job_submission():
     return None
   return "%s:%s" % (conf.HOST.get(), conf.PORT.get())
 
+def is_yarn():
+  cluster = get_cluster_conf_for_job_submission()
+  return cluster is not None and 'IS_YARN' in cluster.config.members
 
 def clear_caches():
   """

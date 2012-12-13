@@ -28,6 +28,9 @@ from nose.tools import assert_true, assert_false, assert_equal
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
+from hadoop import cluster
+from hadoop.conf import YARN_CLUSTERS
+from hadoop.yarn import resource_manager_api, mapreduce_api, history_server_api
 from jobsub.models import OozieDesign, CheckForSetup
 from liboozie.oozie_api_test import OozieServerProvider
 
@@ -315,7 +318,7 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
     # All jobs page and fetch job ID
     # Taking advantage of the fact new jobs are at the top of the list!
     response = self.client.get('/jobbrowser/jobs/')
-    assert_true(hadoop_job_id_short in response.content)
+    assert_true(hadoop_job_id_short in response.content, response.content)
 
     # Make sure job succeeded
     response = self.client.get('/jobbrowser/jobs/?state=completed')
@@ -396,3 +399,205 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
     # Test job single logs page
     response = self.client.get('/jobbrowser/jobs/%s/single_logs' % (hadoop_job_id))
     assert_true('syslog' in response.content)
+
+
+
+class TestMapReduce2:
+
+  def setUp(self):
+    # Beware: Monkey patching
+    if not hasattr(resource_manager_api, 'old_get_resource_manager_api'):
+      resource_manager_api.old_get_resource_manager = resource_manager_api.get_resource_manager
+    if not hasattr(resource_manager_api, 'old_get_mapreduce_api'):
+      mapreduce_api.old_get_mapreduce_api = mapreduce_api.get_mapreduce_api
+    if not hasattr(history_server_api, 'old_get_history_server_api'):
+      history_server_api.old_get_history_server_api = history_server_api.get_history_server_api
+
+    resource_manager_api.get_resource_manager = lambda: MockResourceManagerApi()
+    mapreduce_api.get_mapreduce_api = lambda: MockMapreduceApi()
+    history_server_api.get_history_server_api = lambda: HistoryServerApi()
+
+
+    self.c = make_logged_in_client(is_superuser=False)
+    grant_access("test", "test", "jobbrowser")
+
+    self.finish = YARN_CLUSTERS['default'].SUBMIT_TO.set_for_testing(True)
+    assert_true(cluster.is_yarn())
+
+  def tearDown(self):
+    resource_manager_api.get_resource_manager = getattr(resource_manager_api, 'old_get_resource_manager')
+    mapreduce_api.get_mapreduce_api = getattr(mapreduce_api, 'old_get_mapreduce_api')
+    history_server_api.get_history_server_api = getattr(history_server_api, 'old_get_history_server_api')
+
+    self.finish()
+
+
+  def test_jobs(self):
+    response = self.c.get('/jobbrowser/')
+    assert_equal(len(response.context['jobs']), 2)
+
+    # state=running comes from the API and so can't be mocked
+
+    response = self.c.get('/jobbrowser/jobs/?text=W=MapReduce-copy2')
+    assert_equal(len(response.context['jobs']), 1)
+
+  def test_running_job(self):
+    response = self.c.get('/jobbrowser/jobs/application_1356251510842_0054')
+    assert_equal(response.context['job'].jobId, 'application_1356251510842_0054')
+
+    response = self.c.get('/jobbrowser/jobs/job_1356251510842_0054')
+    assert_false('job' in response.context)
+
+  def test_finished_job(self):
+    response = self.c.get('/jobbrowser/jobs/application_1356251510842_0009')
+    assert_equal(response.context['job'].jobId, 'job_1356251510842_0009')
+
+    response = self.c.get('/jobbrowser/jobs/job_1356251510842_0009')
+    assert_equal(response.context['job'].jobId, 'job_1356251510842_0009')
+
+
+class MockResourceManagerApi:
+
+  def __init__(self, oozie_url=None): pass
+
+  def apps(self, **kwargs):
+    return {
+      u'apps':
+        {u'app': [
+           # RUNNING application_1356251510842_0054
+           {u'finishedTime': 1356961070119, u'name': u'oozie:launcher:T=map-reduce:W=MapReduce-copy:A=Sleep:ID=0000004-121223003201296-oozie-oozi-W',
+            u'amContainerLogs': u'http://runreal:8042/node/containerlogs/container_1356251510842_0054_01_000001/romain', u'clusterId': 1356251510842,
+            u'trackingUrl': u'http://localhost:8088/proxy/application_1356251510842_0054/jobhistory/job/job_1356251510842_0054', u'amHostHttpAddress': u'runreal:8042',
+            u'startedTime': 1356961057225, u'queue': u'default', u'state': u'RUNNING', u'elapsedTime': 12894, u'finalStatus': u'UNDEFINED', u'diagnostics': u'',
+            u'progress': 100.0, u'trackingUI': u'History', u'id': u'application_1356251510842_0054', u'user': u'romain'},
+           # FINISHED application_1356251510842_0009
+           {u'finishedTime': 1356467118570, u'name': u'oozie:action:T=map-reduce:W=MapReduce-copy2:A=Sleep:ID=0000002-121223003201296-oozie-oozi-W',
+            u'amContainerLogs': u'http://runreal:8042/node/containerlogs/container_1356251510842_0009_01_000001/romain', u'clusterId': 1356251510842,
+            u'trackingUrl': u'http://localhost:8088/proxy/application_1356251510842_0009/jobhistory/job/job_1356251510842_0009', u'amHostHttpAddress': u'runreal:8042',
+            u'startedTime': 1356467081121, u'queue': u'default', u'state': u'FINISHED', u'elapsedTime': 37449, u'finalStatus': u'SUCCEEDED', u'diagnostics': u'',
+            u'progress': 100.0, u'trackingUI': u'History', u'id': u'application_1356251510842_0009', u'user': u'romain'}]
+      }
+    }
+
+
+class MockMapreduce2Api(object):
+  """
+  MockMapreduceApi and HistoryServerApi are very similar and inherit from it.
+  """
+
+  def __init__(self, oozie_url=None): pass
+
+  def tasks(self, job_id):
+    return {u'tasks': {u'task': [{u'finishTime': 1357153330271, u'successfulAttempt': u'attempt_1356251510842_0062_m_000000_0', u'elapsedTime': 1901, u'state': u'SUCCEEDED',
+                                  u'startTime': 1357153328370, u'progress': 100.0, u'type': u'MAP', u'id': u'task_1356251510842_0062_m_000000'},
+                                 {u'finishTime': 0, u'successfulAttempt': u'', u'elapsedTime': 0, u'state': u'SCHEDULED', u'startTime': 1357153326322, u'progress': 0.0,
+                                  u'type': u'REDUCE', u'id': u'task_1356251510842_0062_r_000000'}]}}
+  def conf(self, job_id):
+    return {
+      "conf" : {
+        "path" : "hdfs://host.domain.com:9000/user/user1/.staging/job_1326232085508_0004/job.xml",
+        "property" : [
+           {
+              "value" : "/home/hadoop/hdfs/data",
+              "name" : "dfs.datanode.data.dir"
+           },]
+         }
+    }
+
+  def job_attempts(self, job_id):
+    return {
+       "jobAttempts" : {
+          "jobAttempt" : [
+             {
+                "nodeId" : "host.domain.com:8041",
+                "nodeHttpAddress" : "host.domain.com:8042",
+                "startTime" : 1326238773493,
+                "id" : 1,
+                "logsLink" : "http://host.domain.com:8042/node/containerlogs/container_1326232085508_0004_01_000001",
+                "containerId" : "container_1326232085508_0004_01_000001"
+             }
+          ]
+       }
+    }
+
+  def task_attempts(self, job_id, task_id):
+    return {
+       "taskAttempts" : {
+          "taskAttempt" : [
+             {
+                "elapsedMergeTime" : 47,
+                "shuffleFinishTime" : 1326238780052,
+                "assignedContainerId" : "container_1326232085508_0004_01_000003",
+                "progress" : 100,
+                "elapsedTime" : 0,
+                "state" : "RUNNING",
+                "elapsedShuffleTime" : 2592,
+                "mergeFinishTime" : 1326238780099,
+                "rack" : "/98.139.92.0",
+                "elapsedReduceTime" : 0,
+                "nodeHttpAddress" : "host.domain.com:8042",
+                "type" : "REDUCE",
+                "startTime" : 1326238777460,
+                "id" : "attempt_1326232085508_4_4_r_0_0",
+                "finishTime" : 0
+             }
+          ]
+       }
+    }
+
+  def counters(self, job_id):
+    return {
+       "jobCounters" : {
+          "id" : "job_1326232085508_4_4",
+          "counterGroup" : [
+             {
+                "counterGroupName" : "org.apache.hadoop.mapreduce.lib.input.FileInputFormatCounter",
+                "counter" : [
+                   {
+                      "reduceCounterValue" : 0,
+                      "mapCounterValue" : 0,
+                      "totalCounterValue" : 0,
+                      "name" : "BYTES_READ"
+                   }
+                ]
+             },
+             {
+                "counterGroupName" : "org.apache.hadoop.mapreduce.lib.output.FileOutputFormatCounter",
+                "counter" : [
+                   {
+                      "reduceCounterValue" : 0,
+                      "mapCounterValue" : 0,
+                      "totalCounterValue" : 0,
+                      "name" : "BYTES_WRITTEN"
+                   }
+                ]
+             }
+          ]
+       }
+    }
+
+
+class MockMapreduceApi(MockMapreduce2Api):
+  def job(self, user, job_id):
+    if '1356251510842_0009' not in job_id:
+      job = {u'job': {u'reducesCompleted': 0, u'mapsRunning': 1, u'id': u'job_1356251510842_0054', u'successfulReduceAttempts': 0, u'successfulMapAttempts': 0,
+                      u'uberized': False, u'reducesTotal': 1, u'elapsedTime': 3426, u'mapsPending': 0, u'state': u'RUNNING', u'failedReduceAttempts': 0,
+                      u'mapsCompleted': 0, u'killedMapAttempts': 0, u'killedReduceAttempts': 0, u'runningReduceAttempts': 0, u'failedMapAttempts': 0, u'mapsTotal': 1,
+                      u'user': u'romain', u'startTime': 1357152972886, u'reducesPending': 1, u'reduceProgress': 0.0, u'finishTime': 0,
+                      u'name': u'select avg(salary) from sample_07(Stage-1)', u'reducesRunning': 0, u'newMapAttempts': 0, u'diagnostics': u'', u'mapProgress': 0.0,
+                      u'runningMapAttempts': 1, u'newReduceAttempts': 1}}
+      job['job']['id'] = job_id
+      return job
+
+
+class HistoryServerApi(MockMapreduce2Api):
+
+  def __init__(self, oozie_url=None): pass
+
+  def job(self, user, job_id):
+    if '1356251510842_0054' not in job_id:
+      return {u'job': {u'reducesCompleted': 1, u'avgMapTime': 1798, u'avgMergeTime': 1479, u'id': u'job_1356251510842_0009', u'successfulReduceAttempts': 1,
+                     u'successfulMapAttempts': 2, u'uberized': False, u'reducesTotal': 1, u'state': u'SUCCEEDED', u'failedReduceAttempts': 0, u'mapsCompleted': 2,
+                     u'killedMapAttempts': 0, u'diagnostics': u'', u'mapsTotal': 2, u'user': u'romain', u'startTime': 1357151916268, u'avgReduceTime': 137,
+                     u'finishTime': 1357151923925, u'name': u'oozie:action:T=map-reduce:W=MapReduce-copy:A=Sleep:ID=0000004-121223003201296-oozie-oozi-W',
+                     u'avgShuffleTime': 1421, u'queue': u'default', u'killedReduceAttempts': 0, u'failedMapAttempts': 0}}
