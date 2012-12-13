@@ -154,6 +154,20 @@
     }
   },
   {
+    "pk": 18,
+    "model": "oozie.job",
+    "fields": {
+      "is_shared": true,
+      "name": "Email",
+      "parameters": "[{\"name\": \"oozie.use.system.libpath\", \"value\": \"true\"}]",
+      "deployment_dir": "/user/hue/oozie/workspaces/email",
+      "schema_version": "uri:oozie:workflow:0.4",
+      "last_modified": "2012-12-01 00:00:00",
+      "owner": 1100713,
+      "description": "Example of Email action"
+    }
+  },
+  {
     "pk": 5,
     "model": "oozie.workflow",
     "fields": {
@@ -260,6 +274,17 @@
       "start": 75,
       "is_single": false,
       "end": 74,
+      "job_properties": "[]"
+    }
+  },
+  {
+    "pk": 18,
+    "model": "oozie.workflow",
+    "fields": {
+      "job_xml": "",
+      "start": 79,
+      "is_single": false,
+      "end": 78,
       "job_properties": "[]"
     }
   },
@@ -834,6 +859,46 @@
     }
   },
   {
+    "pk": 99,
+    "model": "oozie.link",
+    "fields": {
+      "comment": "",
+      "name": "to",
+      "parent": 79,
+      "child": 80
+    }
+  },
+  {
+    "pk": 100,
+    "model": "oozie.link",
+    "fields": {
+      "comment": "",
+      "name": "related",
+      "parent": 79,
+      "child": 78
+    }
+  },
+  {
+    "pk": 101,
+    "model": "oozie.link",
+    "fields": {
+      "comment": "",
+      "name": "ok",
+      "parent": 80,
+      "child": 78
+    }
+  },
+  {
+    "pk": 102,
+    "model": "oozie.link",
+    "fields": {
+      "comment": "",
+      "name": "error",
+      "parent": 80,
+      "child": 77
+    }
+  },
+  {
     "pk": 16,
     "model": "oozie.node",
     "fields": {
@@ -1324,6 +1389,46 @@
     }
   },
   {
+    "pk": 77,
+    "model": "oozie.node",
+    "fields": {
+      "node_type": "kill",
+      "workflow": 18,
+      "name": "kill",
+      "description": ""
+    }
+  },
+  {
+    "pk": 78,
+    "model": "oozie.node",
+    "fields": {
+      "node_type": "end",
+      "workflow": 18,
+      "name": "end",
+      "description": ""
+    }
+  },
+  {
+    "pk": 79,
+    "model": "oozie.node",
+    "fields": {
+      "node_type": "start",
+      "workflow": 18,
+      "name": "start",
+      "description": ""
+    }
+  },
+  {
+    "pk": 80,
+    "model": "oozie.node",
+    "fields": {
+      "node_type": "email",
+      "workflow": 18,
+      "name": "Email",
+      "description": "Send an email"
+    }
+  },
+  {
     "pk": 19,
     "model": "oozie.mapreduce",
     "fields": {
@@ -1517,6 +1622,16 @@
     }
   },
   {
+    "pk": 80,
+    "model": "oozie.email",
+    "fields": {
+      "cc": "",
+      "to": "example@example.org",
+      "body": "Hue",
+      "subject": "I love"
+    }
+  },
+  {
     "pk": 18,
     "model": "oozie.start",
     "fields": {
@@ -1587,6 +1702,13 @@
     }
   },
   {
+    "pk": 79,
+    "model": "oozie.start",
+    "fields": {
+      "node_ptr": 79
+    }
+  },
+  {
     "pk": 17,
     "model": "oozie.end",
     "fields": {}
@@ -1633,6 +1755,11 @@
   },
   {
     "pk": 74,
+    "model": "oozie.end",
+    "fields": {}
+  },
+  {
+    "pk": 78,
     "model": "oozie.end",
     "fields": {}
   },
@@ -1701,6 +1828,13 @@
   },
   {
     "pk": 73,
+    "model": "oozie.kill",
+    "fields": {
+      "message": "Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]"
+    }
+  },
+  {
+    "pk": 77,
     "model": "oozie.kill",
     "fields": {
       "message": "Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]"

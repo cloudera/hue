@@ -419,6 +419,20 @@ $.extend(FsModel.prototype, {
   child_links: []
 });
 
+var EmailModel = ModelModule($);
+$.extend(EmailModel.prototype, {
+  id: 0,
+  name: '',
+  description: '',
+  node_type: 'email',
+  workflow: 0,
+  to: '',
+  cc: '',
+  subject: '',
+  body: '',
+  child_links: []
+});
+
 function nodeModelChooser(node_type) {
   switch(node_type) {
     case 'mapreduce':
@@ -441,6 +455,8 @@ function nodeModelChooser(node_type) {
       return DistCPModel;
     case 'fs':
         return FsModel;
+    case 'email':
+        return EmailModel;
     case 'fork':
       return ForkModel;
     case 'decision':
@@ -461,6 +477,7 @@ var IdGeneratorTable = {
   ssh: new IdGenerator({prefix: 'ssh'}),
   distcp: new IdGenerator({prefix: 'distcp'}),
   fs: new IdGenerator({prefix: 'fs'}),
+  email: new IdGenerator({prefix: 'email'}),
   fork: new IdGenerator({prefix: 'fork'}),
   decision: new IdGenerator({prefix: 'decision'}),
   join: new IdGenerator({prefix: 'join'}),

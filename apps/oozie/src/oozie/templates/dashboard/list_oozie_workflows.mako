@@ -84,7 +84,7 @@ ${ layout.menubar(section='dashboard') }
             <td>
               % if has_job_edition_permission(job, user):
               <a title="${_('Kill %(workflow)s') % dict(workflow=job.id)}"
-                class="btn btn-danger small confirmationModal"
+                class="btn small confirmationModal"
                 alt="${ _('Are you sure you want to kill workflow %s?') %  job.id }"
                 href="javascript:void(0)"
                 data-url="${ url('oozie:manage_oozie_jobs', job_id=job.id, action='kill') }"
@@ -149,7 +149,7 @@ ${ layout.menubar(section='dashboard') }
   </div>
   <div class="modal-footer">
     <a href="#" class="btn" data-dismiss="modal">${_('No')}</a>
-    <a class="btn btn-primary" href="javascript:void(0);">${_('Yes')}</a>
+    <a class="btn btn-danger" href="javascript:void(0);">${_('Yes')}</a>
   </div>
 </div>
 

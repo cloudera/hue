@@ -98,7 +98,7 @@ ${ layout.menubar(section='dashboard') }
               % if oozie_coordinator.is_running():
                 <a title="${_('Kill %(coordinator)s') % dict(coordinator=oozie_coordinator.id)}"
                   id="kill-coordinator"
-                  class="btn btn-danger small confirmationModal"
+                  class="btn small confirmationModal"
                   alt="${ _('Are you sure you want to kill coordinator %s?') % oozie_coordinator.id }"
                   href="javascript:void(0)"
                   data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='kill') }"
@@ -231,7 +231,7 @@ ${ layout.menubar(section='dashboard') }
   </div>
   <div class="modal-footer">
     <a href="#" class="btn" data-dismiss="modal">${_('No')}</a>
-    <a class="btn btn-primary" href="javascript:void(0);">${_('Yes')}</a>
+    <a class="btn btn-danger" href="javascript:void(0);">${_('Yes')}</a>
   </div>
 </div>
 

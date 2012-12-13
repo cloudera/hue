@@ -23,7 +23,8 @@ from django.utils.translation import ugettext_lazy as _t
 
 from desktop.lib.django_forms import MultiForm, SplitDateTimeWidget
 from oozie.models import Workflow, Node, Java, Mapreduce, Streaming, Coordinator,\
-  Dataset, DataInput, DataOutput, Pig, Link, Hive, Sqoop, Ssh, Shell, DistCp, Fs
+  Dataset, DataInput, DataOutput, Pig, Link, Hive, Sqoop, Ssh, Shell, DistCp, Fs,\
+  Email
 
 LOG = logging.getLogger(__name__)
 
@@ -237,6 +238,18 @@ class FsForm(forms.ModelForm):
     }
 
 
+class EmailForm(forms.ModelForm):
+  class Meta:
+    model = Email
+    exclude = NodeForm.Meta.ALWAYS_HIDE
+    widgets = {
+      'to': forms.TextInput(attrs={'class': 'span8'}),
+      'cc': forms.TextInput(attrs={'class': 'span8'}),
+      'subject': forms.TextInput(attrs={'class': 'span8'}),
+      'body': forms.Textarea(attrs={'class': 'span8'}),
+    }
+
+
 class LinkForm(forms.ModelForm):
   comment = forms.CharField(label='if', max_length=1024, required=True, widget=forms.TextInput(attrs={'class': 'span8'}))
 
@@ -357,6 +370,7 @@ _node_type_TO_FORM_CLS = {
   Shell.node_type: ShellForm,
   DistCp.node_type: DistCpForm,
   Fs.node_type: FsForm,
+  Email.node_type: EmailForm,
 }
 
 
