@@ -22,7 +22,6 @@ from django.conf.urls.defaults import patterns, url
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.db.models import query, CharField, SmallIntegerField
-from django.test.client import Client
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.paginator import Paginator
 from desktop.lib.conf import validate_path
@@ -298,25 +297,34 @@ def test_error_handling_failure():
   # Try to get filebrowser page
   # test for werkzeug debugger
   # Restore rewrite_user
+  import desktop.auth.backend
+
+  c = make_logged_in_client()
 
   restore_django_debug = desktop.conf.DJANGO_DEBUG_MODE.set_for_testing(False)
   restore_500_debug = desktop.conf.HTTP_500_DEBUG_MODE.set_for_testing(False)
 
-  # Add an error view
-  setattr(views.serve_500_error, 'login_notrequired', True)
-  error_url_pat = patterns('', url('^500_internal_error$', views.serve_500_error))
-  desktop.urls.urlpatterns.extend(error_url_pat)
+  original_rewrite_user = desktop.auth.backend.rewrite_user
+
+  def rewrite_user(user):
+    user = original_rewrite_user(user)
+    delattr(user, 'has_hue_permission')
+    return user
+
+  def store_exc_info(*args, **kwargs): pass
+  c.store_exc_info = store_exc_info
+
+  original_rewrite_user = desktop.auth.backend.rewrite_user
+  desktop.auth.backend.rewrite_user = rewrite_user
+
   try:
-    c = Client()
-    response = c.get('/500_internal_error')
-    assert_true('AttributeError at /500_internal_error' in response.content, response)
+    response = c.get('/dump_config')
+    assert_true('AttributeError at /dump_config' in response.content, response)
   finally:
     # Restore the world
-    for i in error_url_pat:
-      desktop.urls.urlpatterns.remove(i)
     restore_django_debug()
     restore_500_debug()
-    delattr(views.serve_500_error, 'login_notrequired')
+    desktop.auth.backend.rewrite_user = original_rewrite_user
 
 
 def test_404_handling():

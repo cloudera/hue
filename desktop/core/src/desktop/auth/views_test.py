@@ -29,9 +29,7 @@ class TestLoginWithHadoop(PseudoHdfsTestBase):
 
   def setUp(self):
     # Simulate first login ever
-    for user in User.objects.all():
-      user.delete()
-
+    User.objects.all().delete()
     self.c = Client()
 
   def test_login(self):
@@ -46,19 +44,6 @@ class TestLoginWithHadoop(PseudoHdfsTestBase):
     response = self.c.get('/accounts/login/')
     assert_equal(200, response.status_code, "Expected ok status.")
     assert_false(response.context['first_login_ever'])
-
-  def test_bad_first_user(self):
-    finish = conf.AUTH.BACKEND.set_for_testing("desktop.auth.backend.AllowFirstUserDjangoBackend")
-
-    response = self.c.get('/accounts/login/')
-    assert_equal(200, response.status_code, "Expected ok status.")
-    assert_true(response.context['first_login_ever'])
-
-    response = self.c.post('/accounts/login/', dict(username="foo 1", password="foo"))
-    assert_equal(200, response.status_code, "Expected ok status.")
-    assert_true('This value may contain only letters, numbers and @/./+/-/_ characters.' in response.content, response)
-
-    finish()
 
   def test_login_home_creation_failure(self):
     response = self.c.get('/accounts/login/')
@@ -78,10 +63,29 @@ class TestLoginWithHadoop(PseudoHdfsTestBase):
     # 'Could not create home directory.' won't show up because the messages are consumed before
 
 
-def test_non_jframe_login():
-  client = make_logged_in_client(username="test", password="test")
-  # Logout first
-  client.get('/accounts/logout')
-  # Login
-  response = client.post('/accounts/login/', dict(username="test", password="test"), follow=True)
-  assert_equal(response.template, 'index.mako')
+class TestLogin(object):
+  def setUp(self):
+    # Simulate first login ever
+    User.objects.all().delete()
+    self.c = Client()
+
+  def test_bad_first_user(self):
+    finish = conf.AUTH.BACKEND.set_for_testing("desktop.auth.backend.AllowFirstUserDjangoBackend")
+
+    response = self.c.get('/accounts/login/')
+    assert_equal(200, response.status_code, "Expected ok status.")
+    assert_true(response.context['first_login_ever'])
+
+    response = self.c.post('/accounts/login/', dict(username="foo 1", password="foo"))
+    assert_equal(200, response.status_code, "Expected ok status.")
+    assert_true('This value may contain only letters, numbers and @/./+/-/_ characters.' in response.content, response)
+
+    finish()
+
+  def test_non_jframe_login(self):
+    client = make_logged_in_client(username="test", password="test")
+    # Logout first
+    client.get('/accounts/logout')
+    # Login
+    response = client.post('/accounts/login/', dict(username="test", password="test"), follow=True)
+    assert_equal(response.template, 'index.mako')
