@@ -80,6 +80,13 @@ ${ layout.menubar(section='workflows') }
     </div>
 </div>
 
-${ utils.path_chooser_libs(True) }
+${ utils.path_chooser_libs(True, True) }
+
+<script>
+  $(document).ready(function(){
+    $("input[name='deployment_dir']").after(getFileBrowseButton($("input[name='deployment_dir']"), true));
+    $("input[name='job_xml']").after(getFileBrowseButton($("input[name='job_xml']"), false));
+  });
+</script>
 
 ${ commonfooter(messages) }

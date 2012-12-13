@@ -774,4 +774,11 @@ function checkModelDirtiness() {
 
 ${ utils.path_chooser_libs(True) }
 
+<script>
+  $(document).ready(function(){
+    $("input[name='job_xml']").next().remove();
+    $("input[name='job_xml']").after(getFileBrowseButton($("input[name='job_xml']"), false));
+  });
+</script>
+
 ${ commonfooter(messages) }
