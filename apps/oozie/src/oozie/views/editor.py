@@ -130,7 +130,8 @@ def edit_workflow(request, workflow):
     'job_properties': extract_field_data(workflow_form['job_properties']),
     'link_form': LinkForm(),
     'default_link_form': DefaultLinkForm(action=workflow.start),
-    'action_forms': [(node_type, design_form_by_type(node_type)()) for node_type in ACTION_TYPES.iterkeys()]
+    'action_forms': [(node_type, design_form_by_type(node_type, request.user, workflow)())
+                     for node_type in ACTION_TYPES.iterkeys()]
   })
 
 
@@ -462,8 +463,7 @@ def submit_coordinator(request, coordinator):
 
 def _submit_coordinator(request, coordinator, mapping):
   try:
-    submission = Submission(request.user, coordinator.workflow, request.fs, mapping)
-    wf_dir = submission.deploy()
+    wf_dir = Submission(request.user, coordinator.workflow, request.fs, {}).deploy()
 
     properties = {'wf_application_path': request.fs.get_hdfs_path(wf_dir)}
     properties.update(mapping)

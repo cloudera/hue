@@ -19,12 +19,14 @@ import logging
 
 from django import forms
 from django.db.models import Q
+from django.core.exceptions import ValidationError
+from django.utils.functional import curry
 from django.utils.translation import ugettext_lazy as _t
 
 from desktop.lib.django_forms import MultiForm, SplitDateTimeWidget
 from oozie.models import Workflow, Node, Java, Mapreduce, Streaming, Coordinator,\
   Dataset, DataInput, DataOutput, Pig, Link, Hive, Sqoop, Ssh, Shell, DistCp, Fs,\
-  Email
+  Email, SubWorkflow
 
 LOG = logging.getLogger(__name__)
 
@@ -249,6 +251,28 @@ class EmailForm(forms.ModelForm):
       'body': forms.Textarea(attrs={'class': 'span8'}),
     }
 
+class SubWorkflowForm(forms.ModelForm):
+
+  def __init__(self, *args, **kwargs):
+    user = kwargs.pop('user')
+    workflow = kwargs.pop('workflow')
+    super(SubWorkflowForm, self).__init__(*args, **kwargs)
+    choices=((wf.id, wf) for wf in Workflow.objects.filter(owner=user).exclude(id=workflow.id))
+    self.fields['sub_workflow'] = forms.ChoiceField(choices=choices, widget=forms.RadioSelect(attrs={'class':'radio'}))
+
+  class Meta:
+    model = SubWorkflow
+    exclude = NodeForm.Meta.ALWAYS_HIDE
+    widgets = {
+      'job_properties': forms.widgets.HiddenInput(),
+    }
+
+  def clean_sub_workflow(self):
+    try:
+      return Workflow.objects.get(id=int(self.cleaned_data.get('sub_workflow')))
+    except Exception, e:
+      raise ValidationError(_('The sub-workflow could not be found: %s' % e))
+
 
 class LinkForm(forms.ModelForm):
   comment = forms.CharField(label='if', max_length=1024, required=True, widget=forms.TextInput(attrs={'class': 'span8'}))
@@ -371,6 +395,7 @@ _node_type_TO_FORM_CLS = {
   DistCp.node_type: DistCpForm,
   Fs.node_type: FsForm,
   Email.node_type: EmailForm,
+  SubWorkflow.node_type: SubWorkflowForm,
 }
 
 
@@ -396,8 +421,13 @@ class RerunForm(forms.Form):
     self.fields['skip_nodes'].initial = initial_skip_nodes
 
 
-def design_form_by_type(node_type):
-  return _node_type_TO_FORM_CLS[node_type]
+def design_form_by_type(node_type, user, workflow):
+  klass_form = _node_type_TO_FORM_CLS[node_type]
+
+  if node_type == 'subworkflow':
+    klass_form = curry(klass_form, user=user, workflow=workflow)
+
+  return klass_form
 
 
 def design_form_by_instance(design_obj, data=None):

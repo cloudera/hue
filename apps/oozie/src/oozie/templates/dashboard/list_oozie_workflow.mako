@@ -89,7 +89,7 @@ ${ layout.menubar(section='dashboard') }
     </div>
   </div>
 
-  % if parameters:
+  % if parameters and len(parameters) < 10:
     <div class="row-fluid">
       <div class="span3">
         ${ _('Variables') }

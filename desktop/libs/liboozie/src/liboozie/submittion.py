@@ -121,6 +121,15 @@ class Submission(object):
     oozie_xml = self.job.to_xml()
     self._do_as(self.user.username , self._copy_files, deployment_dir, oozie_xml)
 
+    if hasattr(self.job, 'actions'):
+      for action in self.job.actions:
+        # Make sure XML is there
+        # Don't support shared sub-worfklow
+        if action.node_type == 'subworkflow':
+          node = action.get_full_node()
+          sub_deploy = Submission(self.user, node.sub_workflow, self.fs, self.properties)
+          sub_deploy.deploy()
+
     return deployment_dir
 
   def _update_properties(self, jobtracker_addr, deployment_dir):

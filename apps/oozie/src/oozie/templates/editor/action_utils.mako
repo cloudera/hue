@@ -47,7 +47,7 @@
           <div class="control-group">
             <label class="control-label"></label>
             <div class="controls">
-            <p class="alert alert-info span5">
+            <p class="alert alert-info span7">
               ${ _('All the paths are relative to the deployment directory. They can be absolute but this is not recommended.') }
               <br/>
               ${ _('You can parameterize values using case sensitive') } <code>${"${"}PARAMETER}</code>.
@@ -67,7 +67,7 @@
 
           % for field in action_form:
             % if field.html_name not in ('name', 'description', 'node_type', 'job_xml'):
-              % if field.html_name in ('capture_output', 'is_single'):
+              % if field.html_name in ('capture_output', 'is_single', 'sub_workflow'):
                 ${ utils.render_field_with_error_js(field, field.name, extra_attrs={'data-bind': 'checked: %s' % field.name}) }
               % else:
                 ${ utils.render_field_with_error_js(field, field.name, extra_attrs={'data-bind': 'value: %s' % field.name}) }

@@ -732,6 +732,38 @@ class TestEditor(OozieMockBase):
     </action>""" in xml, xml)
 
 
+  def test_workflow_subworkflow_gen_xml(self):
+    self.wf.node_set.filter(name='action-name-1').delete()
+
+    wf_dict = WORKFLOW_DICT.copy()
+    wf_dict['name'] = [u'wf-name-2']
+    wf2 = create_workflow(self.c, wf_dict)
+
+    action1 = add_node(self.wf, 'action-name-1', 'subworkflow', [self.wf.start], {
+        u'name': 'MySubworkflow',
+        u'description': 'Execute a subworkflow action',
+        u'sub_workflow': wf2,
+        u'propagate_configuration': True,
+        u'job_properties': '[{"value":"World!","name":"argument"}]'
+    })
+    Link(parent=action1, child=self.wf.end, name="ok").save()
+
+    xml = self.wf.to_xml()
+
+    assert_true(re.search(
+        '<sub-workflow>\W+'
+            '<app-path>\${nameNode}/user/hue/oozie/workspaces/_test_-oozie-(.+?)</app-path>\W+'
+            '<propagate-configuration/>\W+'
+                '<configuration>\W+'
+                '<property>\W+'
+                    '<name>argument</name>\W+'
+                    '<value>World!</value>\W+'
+                '</property>\W+'
+            '</configuration>\W+'
+        '</sub-workflow>', xml, re.MULTILINE), xml)
+
+    wf2.delete()
+
   def test_workflow_flatten_list(self):
     assert_equal('[<Start: start>, <Mapreduce: action-name-1>, <Mapreduce: action-name-2>, <Mapreduce: action-name-3>, '
                  '<Kill: kill>, <End: end>]',

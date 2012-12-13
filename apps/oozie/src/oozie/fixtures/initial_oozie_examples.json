@@ -1145,7 +1145,7 @@
       "node_type": "hive",
       "workflow": 10,
       "name": "Hive",
-      "description": "Show databases"
+      "description": "Show tables"
     }
   },
   {
@@ -1556,7 +1556,7 @@
       "files": "[\"hive-site.xml\"]",
       "job_xml": "hive-site.xml",
       "job_properties": "[{\"name\":\"oozie.hive.defaults\",\"value\":\"hive-site.xml\"}]",
-      "params": "[{\"value\":\"INPUT=/user/hue/oozie/workspaces/data\",\"type\":\"param\"}]",
+      "params": "[]",
       "archives": "[]",
       "prepares": "[]",
       "script_path": "hive.sql"
