@@ -51,7 +51,7 @@ LOG = logging.getLogger(__name__)
 
 PATH_MAX = 512
 name_validator = RegexValidator(regex='[a-zA-Z_][\-_a-zA-Z0-9]{1,39}',
-                                message=_('Enter a valid value: combination of 2 and 40 letters and digits starting by a letter'))
+                                message=_('Enter a valid value: combination of 2 - 40 letters and digits starting by a letter'))
 
 
 """
@@ -879,7 +879,7 @@ class DistCp(Action):
                                            'This should be used exclusively for directory cleanup'))
   job_xml = models.CharField(max_length=PATH_MAX, default='', blank=True, verbose_name=_t('Job XML'),
                              help_text=_t('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
-                                          'Properties specified in the Job Properteis element override properties specified in the '
+                                          'Properties specified in the Job Properties element override properties specified in the '
                                           'files specified in the Job XML element.'))
 
 
@@ -1248,7 +1248,7 @@ class DatasetManager(models.Manager):
 
 class Dataset(models.Model):
   name = models.CharField(max_length=40, validators=[name_validator], verbose_name=_t('Name'),
-                          help_text=_t('The name of the dataset.)'))
+                          help_text=_t('The name of the dataset.'))
   description = models.CharField(max_length=1024, blank=True, default='', verbose_name=_t('Description'),
                                  help_text=_t('A description of the dataset.'))
   start = models.DateTimeField(default=datetime.today(), verbose_name=_t('Start'),

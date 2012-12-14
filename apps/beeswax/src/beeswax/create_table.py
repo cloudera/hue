@@ -311,7 +311,7 @@ def _delim_preview(fs, file_form, encoding, file_types, delimiters):
                                             file_type=file_type,
                                             n_cols=n_cols))
   if not delim_form.is_valid():
-    assert False, _('Internal error when constructing the delimiter form: %(error)s' % {'error': delim_form.errors})
+    assert False, _('Internal error when constructing the delimiter form: %(error)s') % {'error': delim_form.errors}
   return fields_list, n_cols, delim_form
 
 

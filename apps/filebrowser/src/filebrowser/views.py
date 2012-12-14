@@ -1072,9 +1072,9 @@ def _upload_file(request):
             except Exception:
               pass
             if already_exists:
-                msg = _('Destination %(name)s already exists.' % {'name': dest})
+                msg = _('Destination %(name)s already exists.')  % {'name': dest}
             else:
-                msg = _('Copy to "%(name)s failed: %(error)s') % {'name': dest, 'error': ex}
+                msg = _('Copy to %(name)s failed: %(error)s') % {'name': dest, 'error': ex}
             raise PopupException(msg)
 
         return {
@@ -1155,9 +1155,9 @@ def _upload_archive(request):
             except Exception:
               pass
             if already_exists:
-                msg = _('Destination %(name)s already exists.' % {'name': dest})
+                msg = _('Destination %(name)s already exists.') % {'name': dest}
             else:
-                msg = _('Copy to "%(name)s failed: %(error)s') % {'name': dest, 'error': ex}
+                msg = _('Copy to %(name)s failed: %(error)s') % {'name': dest, 'error': ex}
             raise PopupException(msg)
 
         return {
