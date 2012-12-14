@@ -1893,47 +1893,6 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
     },
 
     // Data manipulation
-    cloneNode: function(node, event) {
-      var self = this;
-
-      var model_copy = $.extend(true, {}, node.model);
-      var template = model_copy.node_type + 'EditTemplate';
-      var NodeModel = NodeModelChooser(node.node_type());
-
-      model_copy.id = IdGeneratorTable[model_copy.node_type].nextId();
-      model_copy.name += '-copy';
-      model_copy.child_links = [];
-
-      var model = new NodeModel(model_copy);
-      var new_node = new Node(self, model, self.registry);
-
-      self.registry.add(new_node.id(), new_node);
-
-      new_node.addChild(self.kill);
-      node.append(new_node);
-
-      self.rebuild();
-
-      modal.setTemplate(template);
-      modal.show(new_node);
-      modal.recenter(280, 250);
-      modal.addDecorations();
-
-      // $(".propKey").each(addAutoComplete);
-
-      workflow.is_dirty( true );
-    },
-
-    removeNode: function(node, event) {
-      var self = this;
-
-      node.detach();
-      node.erase();
-
-      self.rebuild();
-
-      workflow.is_dirty( true );
-    },
 
     save: function( options ) {},
 

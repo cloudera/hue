@@ -412,8 +412,8 @@ ${ controls.decision_form(link_form, default_link_form, 'decision', True) }
 
       <div class="row-fluid">
         <div class="span10">
-          <button data-bind="click: function(data, event) { $root.cloneNode.call($root, data, event); }"  class="btn" name="clone_action" title="${ _('Clone') }" type="button"><i class="icon-retweet"></i></button>
-          <button data-bind="click: function(data, event) { $root.removeNode.call($root, data, event); }"  class="btn" name="delete_action" title="${ _('Delete') }" type="button"><i class="icon-remove"></i></button>
+          <button class="btn clone-node-btn" title="${ _('Clone') }" type="button"><i class="icon-retweet"></i></button>
+          <button class="btn delete-node-btn" title="${ _('Delete') }" type="button"><i class="icon-remove"></i></button>
         </div>
         <div class="span2">
         </div>
@@ -655,6 +655,65 @@ $('#workflow').on('click', '.new-node-link', function(e) {
   modal.el.on('click', '.doneButton', try_save);
 });
 
+$('#workflow').on('click', '.clone-node-btn', function(e) {
+  var node = ko.contextFor(this).$data;
+
+  var model_copy = $.extend(true, {}, node.model);
+  var template = model_copy.node_type + 'EditTemplate';
+  var NodeModel = nodeModelChooser(node.node_type());
+
+  model_copy.id = IdGeneratorTable[model_copy.node_type].nextId();
+  model_copy.name += '-copy';
+  model_copy.child_links = [];
+
+  var model = new NodeModel(model_copy);
+  var new_node = new Node(workflow, model, workflow.registry);
+
+  workflow.registry.add(new_node.id(), new_node);
+
+  modal.setTemplate(template);
+  modal.show(new_node);
+  modal.recenter(280, 250);
+  modal.addDecorations();
+
+  // $(".propKey").each(addAutoComplete);
+
+  var cancel_edit = function(e) {
+    // Didn't save, erase node.
+    new_node.erase();
+    modal.hide();
+  };
+
+  var try_save = function(e) {
+    if (node.validate()) {
+      workflow.is_dirty( true );
+      modal.hide();
+      // save, add kill, add node to workflow.
+      new_node.addChild(workflow.kill);
+      node.append(new_node);
+      $('#workflow').trigger('workflow:rebuild');
+    }
+  };
+
+  $('.modal-backdrop').on('click', cancel_edit);
+  modal.el.on('click', '.close', cancel_edit);
+  modal.el.on('click', '.cancelButton', cancel_edit);
+  modal.el.on('click', '.doneButton', try_save);
+});
+
+$('#workflow').on('click', '.delete-node-btn', function(e) {
+  var node = ko.contextFor(this).$data;
+
+  node.detach();
+  node.erase();
+
+  workflow.rebuild();
+
+  workflow.is_dirty( true );
+});
+
+
+
 ko.bindingHandlers.fileChooser = {
   init: function(element, valueAccessor, allBindings, model) {
     var self = $(element);
@@ -700,16 +759,14 @@ window.onresize = function () {
 };
 
 $(document).ready(function () {
-  window.setTimeout(checkModelDirtiness, 500);
+  window.setInterval(checkModelDirtiness, 500);
 });
 
 function checkModelDirtiness() {
   if (workflow.is_dirty()) {
     $(".ribbon-wrapper").fadeIn();
-  }
-  else {
+  } else {
     $(".ribbon-wrapper").hide();
-    window.setTimeout(checkModelDirtiness, 500);
   }
 }
 
