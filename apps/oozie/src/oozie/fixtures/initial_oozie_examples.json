@@ -140,20 +140,6 @@
     }
   },
   {
-    "pk": 17,
-    "model": "oozie.job",
-    "fields": {
-      "is_shared": true,
-      "name": "Fs",
-      "parameters": "[{\"name\": \"oozie.use.system.libpath\", \"value\": \"true\"}]",
-      "deployment_dir": "/user/hue/oozie/workspaces/fs",
-      "schema_version": "uri:oozie:workflow:0.4",
-      "last_modified": "2012-12-01 00:00:00",
-      "owner": 1100713,
-      "description": "Example of Fs actions"
-    }
-  },
-  {
     "pk": 18,
     "model": "oozie.job",
     "fields": {
@@ -165,6 +151,34 @@
       "last_modified": "2012-12-01 00:00:00",
       "owner": 1100713,
       "description": "Example of Email action"
+    }
+  },
+  {
+    "pk": 19,
+    "model": "oozie.job",
+    "fields": {
+      "is_shared": true,
+      "name": "Fs",
+      "parameters": "[{\"name\": \"oozie.use.system.libpath\", \"value\": \"true\"}]",
+      "deployment_dir": "/user/hue/oozie/workspaces/fs",
+      "schema_version": "uri:oozie:workflow:0.4",
+      "last_modified": "2012-12-01 00:00:00",
+      "owner": 1100713,
+      "description": "Example of sequential Fs actions"
+    }
+  },
+  {
+    "pk": 20,
+    "model": "oozie.job",
+    "fields": {
+      "is_shared": true,
+      "name": "Generic",
+      "parameters": "[{\"name\": \"oozie.use.system.libpath\", \"value\": \"true\"}]",
+      "deployment_dir": "/user/hue/oozie/workspaces/generic",
+      "schema_version": "uri:oozie:workflow:0.4",
+      "last_modified": "2012-12-01 00:00:00",
+      "owner": 1100713,
+      "description": "Execute a generic action with a custom extension"
     }
   },
   {
@@ -267,17 +281,6 @@
     }
   },
   {
-    "pk": 17,
-    "model": "oozie.workflow",
-    "fields": {
-      "job_xml": "",
-      "start": 75,
-      "is_single": false,
-      "end": 74,
-      "job_properties": "[]"
-    }
-  },
-  {
     "pk": 18,
     "model": "oozie.workflow",
     "fields": {
@@ -285,6 +288,28 @@
       "start": 79,
       "is_single": false,
       "end": 78,
+      "job_properties": "[]"
+    }
+  },
+  {
+    "pk": 19,
+    "model": "oozie.workflow",
+    "fields": {
+      "job_xml": "",
+      "start": 83,
+      "is_single": false,
+      "end": 82,
+      "job_properties": "[]"
+    }
+  },
+  {
+    "pk": 20,
+    "model": "oozie.workflow",
+    "fields": {
+      "job_xml": "",
+      "start": 87,
+      "is_single": false,
+      "end": 86,
       "job_properties": "[]"
     }
   },
@@ -829,36 +854,6 @@
     }
   },
   {
-    "pk": 96,
-    "model": "oozie.link",
-    "fields": {
-      "comment": "",
-      "name": "to",
-      "parent": 75,
-      "child": 76
-    }
-  },
-  {
-    "pk": 97,
-    "model": "oozie.link",
-    "fields": {
-      "comment": "",
-      "name": "related",
-      "parent": 75,
-      "child": 74
-    }
-  },
-  {
-    "pk": 98,
-    "model": "oozie.link",
-    "fields": {
-      "comment": "",
-      "name": "ok",
-      "parent": 76,
-      "child": 74
-    }
-  },
-  {
     "pk": 99,
     "model": "oozie.link",
     "fields": {
@@ -896,6 +891,86 @@
       "name": "error",
       "parent": 80,
       "child": 77
+    }
+  },
+  {
+    "pk": 103,
+    "model": "oozie.link",
+    "fields": {
+      "comment": "",
+      "name": "to",
+      "parent": 83,
+      "child": 84
+    }
+  },
+  {
+    "pk": 104,
+    "model": "oozie.link",
+    "fields": {
+      "comment": "",
+      "name": "related",
+      "parent": 83,
+      "child": 82
+    }
+  },
+  {
+    "pk": 105,
+    "model": "oozie.link",
+    "fields": {
+      "comment": "",
+      "name": "ok",
+      "parent": 84,
+      "child": 82
+    }
+  },
+  {
+    "pk": 106,
+    "model": "oozie.link",
+    "fields": {
+      "comment": "",
+      "name": "error",
+      "parent": 84,
+      "child": 81
+    }
+  },
+  {
+    "pk": 107,
+    "model": "oozie.link",
+    "fields": {
+      "comment": "",
+      "name": "to",
+      "parent": 87,
+      "child": 88
+    }
+  },
+  {
+    "pk": 108,
+    "model": "oozie.link",
+    "fields": {
+      "comment": "",
+      "name": "related",
+      "parent": 87,
+      "child": 86
+    }
+  },
+  {
+    "pk": 109,
+    "model": "oozie.link",
+    "fields": {
+      "comment": "",
+      "name": "ok",
+      "parent": 88,
+      "child": 86
+    }
+  },
+  {
+    "pk": 110,
+    "model": "oozie.link",
+    "fields": {
+      "comment": "",
+      "name": "error",
+      "parent": 88,
+      "child": 85
     }
   },
   {
@@ -1349,46 +1424,6 @@
     }
   },
   {
-    "pk": 73,
-    "model": "oozie.node",
-    "fields": {
-      "node_type": "kill",
-      "workflow": 17,
-      "name": "kill",
-      "description": ""
-    }
-  },
-  {
-    "pk": 74,
-    "model": "oozie.node",
-    "fields": {
-      "node_type": "end",
-      "workflow": 17,
-      "name": "end",
-      "description": ""
-    }
-  },
-  {
-    "pk": 75,
-    "model": "oozie.node",
-    "fields": {
-      "node_type": "start",
-      "workflow": 17,
-      "name": "start",
-      "description": ""
-    }
-  },
-  {
-    "pk": 76,
-    "model": "oozie.node",
-    "fields": {
-      "node_type": "fs",
-      "workflow": 17,
-      "name": "ManageFiles",
-      "description": ""
-    }
-  },
-  {
     "pk": 77,
     "model": "oozie.node",
     "fields": {
@@ -1426,6 +1461,86 @@
       "workflow": 18,
       "name": "Email",
       "description": "Send an email"
+    }
+  },
+  {
+    "pk": 81,
+    "model": "oozie.node",
+    "fields": {
+      "node_type": "kill",
+      "workflow": 19,
+      "name": "kill",
+      "description": ""
+    }
+  },
+  {
+    "pk": 82,
+    "model": "oozie.node",
+    "fields": {
+      "node_type": "end",
+      "workflow": 19,
+      "name": "end",
+      "description": ""
+    }
+  },
+  {
+    "pk": 83,
+    "model": "oozie.node",
+    "fields": {
+      "node_type": "start",
+      "workflow": 19,
+      "name": "start",
+      "description": ""
+    }
+  },
+  {
+    "pk": 84,
+    "model": "oozie.node",
+    "fields": {
+      "node_type": "fs",
+      "workflow": 19,
+      "name": "Fs",
+      "description": ""
+    }
+  },
+  {
+    "pk": 85,
+    "model": "oozie.node",
+    "fields": {
+      "node_type": "kill",
+      "workflow": 20,
+      "name": "kill",
+      "description": ""
+    }
+  },
+  {
+    "pk": 86,
+    "model": "oozie.node",
+    "fields": {
+      "node_type": "end",
+      "workflow": 20,
+      "name": "end",
+      "description": ""
+    }
+  },
+  {
+    "pk": 87,
+    "model": "oozie.node",
+    "fields": {
+      "node_type": "start",
+      "workflow": 20,
+      "name": "start",
+      "description": ""
+    }
+  },
+  {
+    "pk": 88,
+    "model": "oozie.node",
+    "fields": {
+      "node_type": "generic",
+      "workflow": 20,
+      "name": "GenericFs",
+      "description": ""
     }
   },
   {
@@ -1611,7 +1726,7 @@
     }
   },
   {
-    "pk": 76,
+    "pk": 84,
     "model": "oozie.fs",
     "fields": {
       "touchzs": "[{\"name\": \"${output}/testfs/new_file\"}]",
@@ -1629,6 +1744,13 @@
       "to": "example@example.org",
       "body": "Hue",
       "subject": "I love"
+    }
+  },
+  {
+    "pk": 88,
+    "model": "oozie.generic",
+    "fields": {
+      "xml": "<fs>\n    <mkdir path='${nameNode}${full_path}'/>\n</fs> "
     }
   },
   {
@@ -1695,17 +1817,24 @@
     }
   },
   {
-    "pk": 75,
-    "model": "oozie.start",
-    "fields": {
-      "node_ptr": 75
-    }
-  },
-  {
     "pk": 79,
     "model": "oozie.start",
     "fields": {
       "node_ptr": 79
+    }
+  },
+  {
+    "pk": 83,
+    "model": "oozie.start",
+    "fields": {
+      "node_ptr": 83
+    }
+  },
+  {
+    "pk": 87,
+    "model": "oozie.start",
+    "fields": {
+      "node_ptr": 87
     }
   },
   {
@@ -1754,12 +1883,17 @@
     "fields": {}
   },
   {
-    "pk": 74,
+    "pk": 78,
     "model": "oozie.end",
     "fields": {}
   },
   {
-    "pk": 78,
+    "pk": 82,
+    "model": "oozie.end",
+    "fields": {}
+  },
+  {
+    "pk": 86,
     "model": "oozie.end",
     "fields": {}
   },
@@ -1827,14 +1961,21 @@
     }
   },
   {
-    "pk": 73,
+    "pk": 77,
     "model": "oozie.kill",
     "fields": {
       "message": "Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]"
     }
   },
   {
-    "pk": 77,
+    "pk": 81,
+    "model": "oozie.kill",
+    "fields": {
+      "message": "Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]"
+    }
+  },
+  {
+    "pk": 85,
     "model": "oozie.kill",
     "fields": {
       "message": "Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]"

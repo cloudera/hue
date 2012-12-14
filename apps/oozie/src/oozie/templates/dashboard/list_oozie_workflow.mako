@@ -306,7 +306,7 @@ ${ layout.menubar(section='dashboard') }
       var _this = $(this);
       $("#confirmation .message").text(_this.data("confirmation-message"));
       $("#confirmation").modal("show");
-      $("#confirmation a.btn-primary").click(function() {
+      $("#confirmation a.btn-danger").click(function() {
         _this.trigger('confirmation');
       });
     });

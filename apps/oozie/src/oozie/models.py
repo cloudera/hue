@@ -473,6 +473,8 @@ class Node(models.Model):
       node = self.streaming
     elif self.node_type == Java.node_type:
       node = self.java
+    elif self.node_type == Generic.node_type:
+      node = self.generic
     elif self.node_type == Start.node_type:
       node = self.start
     elif self.node_type == End.node_type:
@@ -578,6 +580,8 @@ class Action(Node):
 #  - Action.types below
 #  - Node.get_full_node()
 #  - forms.py _node_type_TO_FORM_CLS
+#  - workflow.js
+#  - maybe actions_utils.mako
 
 class Mapreduce(Action):
   PARAM_FIELDS = ('files', 'archives', 'job_properties', 'jar_path', 'prepares')
@@ -949,8 +953,21 @@ class SubWorkflow(Action):
     return json.loads(self.job_properties)
 
 
+class Generic(Action):
+  PARAM_FIELDS = ('xml',)
+  node_type = 'generic'
+
+  xml = models.TextField(default='', verbose_name=_t('XML of the custom action'),
+                         help_text=_t('This will be inserted verbatim in the action %(action)s. '
+                                      'e.g. all the XML content like %(xml_action)s '
+                                      'will be inserted into the action and produce %(full_action)s') % {
+                                      'action': '&lt;action name="email"&gt;...&lt;/action&gt;',
+                                      'xml_action': '&lt;email&gt;&lt;cc&gt;hue@hue.org&lt;/cc&gt;&lt;/email&gt;',
+                                      'full_action': '&lt;action name="email"&gt;&lt;email&gt;&lt;cc&gt;hue@hue.org&lt;/cc&gt;&lt;/email&gt;&lt;ok/&gt;&lt;error/&gt;&lt;/action&gt;'})
+
+
 Action.types = (Mapreduce.node_type, Streaming.node_type, Java.node_type, Pig.node_type, Hive.node_type, Sqoop.node_type, Ssh.node_type, Shell.node_type,
-                DistCp.node_type, Fs.node_type, Email.node_type, SubWorkflow.node_type)
+                DistCp.node_type, Fs.node_type, Email.node_type, SubWorkflow.node_type, Generic.node_type)
 
 
 class ControlFlow(Node):
@@ -1009,7 +1026,7 @@ class Fork(ControlFlow):
 
     # Defaults to end
     if not has_default:
-      link = Links.objects.create(name="default", parent=decision, child=self.workflow.end)
+      link = Link.objects.create(name="default", parent=decision, child=self.workflow.end)
       link.save()
 
     self.delete()
@@ -1420,6 +1437,7 @@ ACTION_TYPES = {
   Fs.node_type: Fs,
   Email.node_type: Email,
   SubWorkflow.node_type: SubWorkflow,
+  Generic.node_type: Generic,
 }
 
 NODE_TYPES = ACTION_TYPES.copy()

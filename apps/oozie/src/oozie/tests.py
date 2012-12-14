@@ -778,6 +778,35 @@ class TestEditor(OozieMockBase):
                  str(self.wf.node_list))
 
 
+  def test_workflow_generic_gen_xml(self):
+    self.wf.node_set.filter(name='action-name-1').delete()
+
+    action1 = add_node(self.wf, 'action-name-1', 'generic', [self.wf.start], {
+        u'name': 'Generic',
+        u'description': 'Execute a Generic email action',
+        u'xml': """
+        <email xmlns="uri:oozie:email-action:0.1">
+            <to>hue@hue.org,django@python.org</to>
+            <subject>My subject</subject>
+            <body>My body</body>
+        </email>""",
+    })
+    Link(parent=action1, child=self.wf.end, name="ok").save()
+
+    xml = self.wf.to_xml()
+
+    assert_true("""
+    <action name="Generic">
+        <email xmlns="uri:oozie:email-action:0.1">
+            <to>hue@hue.org,django@python.org</to>
+            <subject>My subject</subject>
+            <body>My body</body>
+        </email>
+        <ok to="end"/>
+        <error to="kill"/>
+    </action>""" in xml, xml)
+
+
   def test_create_coordinator(self):
     create_coordinator(self.wf, self.c)
 

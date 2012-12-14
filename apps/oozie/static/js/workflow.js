@@ -446,6 +446,17 @@ $.extend(SubWorkflowModel.prototype, {
   child_links: []
 });
 
+var GenericModel = ModelModule($);
+$.extend(GenericModel.prototype, {
+  id: 0,
+  name: '',
+  description: '',
+  node_type: 'generic',
+  workflow: 0,
+  xml: '',
+  child_links: []
+});
+
 function nodeModelChooser(node_type) {
   switch(node_type) {
     case 'mapreduce':
@@ -472,6 +483,8 @@ function nodeModelChooser(node_type) {
         return EmailModel;
     case 'subworkflow':
         return SubWorkflowModel;
+    case 'generic':
+        return GenericModel;
     case 'fork':
       return ForkModel;
     case 'decision':
@@ -494,6 +507,7 @@ var IdGeneratorTable = {
   fs: new IdGenerator({prefix: 'fs'}),
   email: new IdGenerator({prefix: 'email'}),
   subworkflow: new IdGenerator({prefix: 'subworkflow'}),
+  generic: new IdGenerator({prefix: 'generic'}),
   fork: new IdGenerator({prefix: 'fork'}),
   decision: new IdGenerator({prefix: 'decision'}),
   join: new IdGenerator({prefix: 'join'}),
