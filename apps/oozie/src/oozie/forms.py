@@ -26,7 +26,7 @@ from django.utils.translation import ugettext_lazy as _t
 from desktop.lib.django_forms import MultiForm, SplitDateTimeWidget
 from oozie.models import Workflow, Node, Java, Mapreduce, Streaming, Coordinator,\
   Dataset, DataInput, DataOutput, Pig, Link, Hive, Sqoop, Ssh, Shell, DistCp, Fs,\
-  Email, SubWorkflow
+  Email, SubWorkflow, Generic
 
 LOG = logging.getLogger(__name__)
 
@@ -35,18 +35,23 @@ class ParameterForm(forms.Form):
   name = forms.CharField(max_length=40, widget=forms.widgets.HiddenInput())
   value = forms.CharField(max_length=100, required=False)
 
-  NON_PARAMETERS = ('user.name',
-                    'oozie.wf.rerun.failnodes',
-                    'oozie.wf.rerun.skip.nodes',
-                    'oozie.wf.application.path',
-                    'jobTracker',
-                    'nameNode',
-                    'hue-id-w')
+  NON_PARAMETERS = (
+      'user.name',
+      'oozie.wf.rerun.failnodes',
+      'oozie.wf.rerun.skip.nodes',
+      'oozie.wf.application.path',
+      'oozie.coord.application.path',
+      'mapreduce.job.user.name',
+      'wf_application_path',
+      'jobTracker',
+      'nameNode',
+      'hue-id-w',
+      'hue-id-c',
+  )
 
   @staticmethod
   def get_initial_params(conf_dict):
     params = filter(lambda key: key not in ParameterForm.NON_PARAMETERS, conf_dict.keys())
-
     return [{'name': name, 'value': conf_dict[name]} for name in params]
 
 
@@ -274,6 +279,15 @@ class SubWorkflowForm(forms.ModelForm):
       raise ValidationError(_('The sub-workflow could not be found: %s' % e))
 
 
+class GenericForm(forms.ModelForm):
+  class Meta:
+    model = Generic
+    exclude = NodeForm.Meta.ALWAYS_HIDE
+    widgets = {
+      'xml': forms.Textarea(attrs={'class': 'span8'})
+    }
+
+
 class LinkForm(forms.ModelForm):
   comment = forms.CharField(label='if', max_length=1024, required=True, widget=forms.TextInput(attrs={'class': 'span8'}))
 
@@ -396,6 +410,7 @@ _node_type_TO_FORM_CLS = {
   Fs.node_type: FsForm,
   Email.node_type: EmailForm,
   SubWorkflow.node_type: SubWorkflowForm,
+  Generic.node_type: GenericForm,
 }
 
 

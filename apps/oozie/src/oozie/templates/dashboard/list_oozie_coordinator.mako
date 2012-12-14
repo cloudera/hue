@@ -242,12 +242,12 @@ ${ layout.menubar(section='dashboard') }
     var _this = $(this);
     $("#confirmation .message").text(_this.attr("data-confirmation-message"));
     $("#confirmation").modal("show");
-    $("#confirmation a.btn-primary").click(function() {
+    $("#confirmation a.btn-danger").click(function() {
       _this.trigger('confirmation');
     });
   });
 
-  $("#kill-coordinator").bind('confirmation', function() {
+  $(".confirmationModal").bind('confirmation', function() {
     var _this = this;
     $.post($(this).attr("data-url"),
       { 'notification': $(this).attr("data-message") },

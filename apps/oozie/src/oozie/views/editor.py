@@ -178,7 +178,8 @@ def submit_workflow(request, workflow):
       request.error(_('Invalid submission form: %s' % params_form.errors))
   else:
     parameters = workflow.find_all_parameters()
-    params_form = ParametersFormSet(initial=parameters)
+    initial_params = ParameterForm.get_initial_params(dict([(param['name'], param['value']) for param in parameters]))
+    params_form = ParametersFormSet(initial=initial_params)
 
   popup = render('editor/submit_job_popup.mako', request, {
                    'params_form': params_form,
@@ -452,7 +453,8 @@ def submit_coordinator(request, coordinator):
       request.error(_('Invalid submission form: %s' % params_form.errors))
   else:
     parameters = coordinator.find_all_parameters()
-    params_form = ParametersFormSet(initial=parameters)
+    initial_params = ParameterForm.get_initial_params(dict([(param['name'], param['value']) for param in parameters]))
+    params_form = ParametersFormSet(initial=initial_params)
 
   popup = render('editor/submit_job_popup.mako', request, {
                  'params_form': params_form,
