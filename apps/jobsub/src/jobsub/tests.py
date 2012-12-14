@@ -17,6 +17,7 @@
 
 import copy
 import logging
+import time
 
 from nose.tools import assert_true, assert_false, assert_equal, assert_raises
 from django.contrib.auth.models import User
@@ -189,8 +190,18 @@ class TestJobsubWithHadoop(OozieServerProvider):
     self.cluster.fs.do_as_superuser(self.cluster.fs.chmod, '/user/jobsub_test', 0777, True)
     self.client = make_logged_in_client(username='jobsub_test')
 
-    # Ensure access to MR folder
-    self.cluster.fs.do_as_superuser(self.cluster.fs.chmod, '/tmp', 0777, recursive=True)
+    # Ensure access to MR folder.
+    # Need to chmod because jobs are submitted as a
+    # different user than what was previously used.
+    for i in range(0,10):
+      try:
+        self.cluster.fs.do_as_superuser(self.cluster.fs.chmod, '/tmp', 0777, recursive=True)
+        break
+      except Exception, e:
+        # chmod failure likely do to async processing of resource deletion.
+        # If the directory has improper permissions, should fail later in the test case.
+        LOG.warn("Received the following exception while change mode attempt %d of /tmp: %s" % (i, str(e)))
+        time.sleep(1)
 
   def tearDown(self):
     OozieDesign.objects.all().delete()
