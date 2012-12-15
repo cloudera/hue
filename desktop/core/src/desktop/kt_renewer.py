@@ -75,8 +75,9 @@ def detect_conf_var():
   Sun Java Krb5LoginModule in Java6, so we need to take an action to work
   around it.
   """
+  f = file(CONF.CCACHE_PATH.get(), "rb")
+
   try:
-    f = file(CONF.CCACHE_PATH.get(), "rb")
     data = f.read()
     return "X-CACHECONF:" in data
   finally:
