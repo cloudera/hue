@@ -106,9 +106,7 @@
                       ${ _('go to') }
                     </td>
                     <td class="right">
-                      % if 'name' in javascript_attrs:
-                        <a class="span3" data-bind="text: ${ javascript_attrs['name'] }"></a>
-                      % endif
+                      <a class="span3 edit-node-link" data-bind="text: $parent.registry.get(child()).name()"></a>
                     </td>
                   </tr>
                   <!-- /ko -->
