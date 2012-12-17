@@ -585,6 +585,8 @@ var modal = new Modal($('#node-modal'));
 workflow.load();
 
 $('#workflow').on('click', '.edit-node-link', function(e) {
+  modal.hide();
+
   var node = ko.contextFor(this).$data;
   var backup = ko.mapping.toJS(node);
   normalize_model_fields(backup);
@@ -613,6 +615,27 @@ $('#workflow').on('click', '.edit-node-link', function(e) {
   modal.el.on('click', '.close', cancel_edit);
   modal.el.on('click', '.cancelButton', cancel_edit);
   modal.el.on('click', '.doneButton', try_save);
+
+  modal.el.on('click', '.edit-node-link', function(e) {
+    // Switch to clicked action
+    cancel_edit();
+
+    var link = ko.contextFor(this).$data;
+    var parent = ko.contextFor(this).$parent;
+    var node = parent.registry.get(link.child());
+    var backup = ko.mapping.toJS(node);
+    normalize_model_fields(backup);
+
+    modal.setTemplate(node.edit_template);
+    modal.show(node);
+    modal.recenter(280, 250);
+    modal.addDecorations();
+
+    $('.modal-backdrop').on('click', cancel_edit);
+    modal.el.on('click', '.close', cancel_edit);
+    modal.el.on('click', '.cancelButton', cancel_edit);
+    modal.el.on('click', '.doneButton', try_save);
+  });
 });
 
 $('#workflow').on('click', '.new-node-link', function(e) {
