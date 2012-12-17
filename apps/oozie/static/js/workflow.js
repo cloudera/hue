@@ -141,7 +141,7 @@ var ModalModule = function($, ko) {
     self.modal.modal('show');
   };
 
-  module.prototype.hide = function(context) {
+  module.prototype.hide = function() {
     var self = this;
 
     self.el.modal('hide');

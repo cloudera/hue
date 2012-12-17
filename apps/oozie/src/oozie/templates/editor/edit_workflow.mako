@@ -541,6 +541,7 @@ ${ controls.decision_form(link_form, default_link_form, 'decision', True) }
 <script type="text/javascript" src="/oozie/static/js/workflow.js"></script>
 
 <script type="text/javascript">
+// Save workflow function
 $.extend(Workflow.prototype, {
   save: function( options ) {
     var self = this;
@@ -595,22 +596,25 @@ var workflow = new Workflow({
   model: workflow_model,
   registry: registry
 });
-var modal = new Modal($('#node-modal'));
 workflow.load();
 
-$('#workflow').on('click', '.edit-node-link', function(e) {
-  modal.hide();
+/**
+ * Modal
+ */
+var modal = new Modal($('#node-modal'));
 
-  var node = ko.contextFor(this).$data;
+// open a modal window for editing a node
+function edit_node_modal(node, save, cancel) {
   var backup = ko.mapping.toJS(node);
   normalize_model_fields(backup);
 
+  modal.hide();
   modal.setTemplate(node.edit_template);
   modal.show(node);
   modal.recenter(280, 250);
   modal.addDecorations();
 
-  var cancel_edit = function(e) {
+  var cancel_edit = cancel || function() {
     ko.mapping.fromJS(backup, node);
     modal.hide();
 
@@ -618,7 +622,7 @@ $('#workflow').on('click', '.edit-node-link', function(e) {
     return false;
   };
 
-  var try_save = function(e) {
+  var try_save = save || function() {
     if (node.validate()) {
       workflow.is_dirty( true );
       modal.hide();
@@ -630,44 +634,31 @@ $('#workflow').on('click', '.edit-node-link', function(e) {
   modal.el.on('click', '.cancelButton', cancel_edit);
   modal.el.on('click', '.doneButton', try_save);
 
-  modal.el.on('click', '.edit-node-link', function(e) {
-    // Switch to clicked action
-    cancel_edit();
-
+  modal.el.on('click', '.edit-node-link', function() {
     var link = ko.contextFor(this).$data;
     var parent = ko.contextFor(this).$parent;
     var node = parent.registry.get(link.child());
-    var backup = ko.mapping.toJS(node);
-    normalize_model_fields(backup);
 
-    modal.setTemplate(node.edit_template);
-    modal.show(node);
-    modal.recenter(280, 250);
-    modal.addDecorations();
+    cancel_edit();
 
-    $('.modal-backdrop').on('click', cancel_edit);
-    modal.el.on('click', '.close', cancel_edit);
-    modal.el.on('click', '.cancelButton', cancel_edit);
-    modal.el.on('click', '.doneButton', try_save);
+    edit_node_modal(node);
   });
+}
+
+$('#workflow').on('click', '.edit-node-link', function(e) {
+  var node = ko.contextFor(this).$data;
+  edit_node_modal(node);
 });
 
 $('#workflow').on('click', '.new-node-link', function(e) {
   var node_type = $(this).attr('data-node-type');
-  var template = node_type + 'EditTemplate';
   var NodeModel = nodeModelChooser(node_type);
   var model = new NodeModel({
     id: IdGeneratorTable[node_type].nextId(),
     node_type: node_type
   });
   var node = new Node(workflow, model, registry);
-
-  self.registry.add(model.id, node);
-
-  modal.setTemplate(template);
-  modal.show(node);
-  modal.recenter(280, 250);
-  modal.addDecorations();
+  workflow.registry.add(model.id, node);
 
   var cancel_edit = function(e) {
     // Didn't save, erase node.
@@ -686,34 +677,19 @@ $('#workflow').on('click', '.new-node-link', function(e) {
     }
   };
 
-  $('.modal-backdrop').on('click', cancel_edit);
-  modal.el.on('click', '.close', cancel_edit);
-  modal.el.on('click', '.cancelButton', cancel_edit);
-  modal.el.on('click', '.doneButton', try_save);
+  edit_node_modal(node, try_save, cancel_edit);
 });
 
 $('#workflow').on('click', '.clone-node-btn', function(e) {
   var node = ko.contextFor(this).$data;
-
   var model_copy = $.extend(true, {}, node.model);
-  var template = model_copy.node_type + 'EditTemplate';
   var NodeModel = nodeModelChooser(node.node_type());
-
   model_copy.id = IdGeneratorTable[model_copy.node_type].nextId();
   model_copy.name += '-copy';
   model_copy.child_links = [];
-
   var model = new NodeModel(model_copy);
   var new_node = new Node(workflow, model, workflow.registry);
-
   workflow.registry.add(new_node.id(), new_node);
-
-  modal.setTemplate(template);
-  modal.show(new_node);
-  modal.recenter(280, 250);
-  modal.addDecorations();
-
-  // $(".propKey").each(addAutoComplete);
 
   var cancel_edit = function(e) {
     // Didn't save, erase node.
@@ -732,10 +708,7 @@ $('#workflow').on('click', '.clone-node-btn', function(e) {
     }
   };
 
-  $('.modal-backdrop').on('click', cancel_edit);
-  modal.el.on('click', '.close', cancel_edit);
-  modal.el.on('click', '.cancelButton', cancel_edit);
-  modal.el.on('click', '.doneButton', try_save);
+  edit_node_modal(new_node, try_save, cancel_edit);
 });
 
 $('#workflow').on('click', '.delete-node-btn', function(e) {
