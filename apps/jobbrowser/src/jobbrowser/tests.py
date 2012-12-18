@@ -241,11 +241,18 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
     # Kill task
     self.client.post('/jobbrowser/jobs/%s/kill' % (hadoop_job_id,))
 
-    # It should say killed
+    # It should say killed at some point
     response = self.client.get('/jobbrowser/jobs/%s' % (hadoop_job_id,))
     html = response.content.lower()
+    i = 0
+    while 'killed' not in html and i < 10:
+      time.sleep(5)
+      response = self.client.get('/jobbrowser/jobs/%s' % (hadoop_job_id,))
+      html = response.content.lower()
+      i += 1
+
     assert_true(views.get_shorter_id(hadoop_job_id) in html)
-    assert_true('killed' in html)
+    assert_true('killed' in html, html)
 
     # Exercise select by taskstate
     self.client.get('/jobbrowser/jobs/%s/tasks?taskstate=failed' % (hadoop_job_id,))
