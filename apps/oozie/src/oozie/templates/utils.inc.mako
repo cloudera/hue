@@ -347,7 +347,7 @@
     var DATETIME_FORMAT = DATE_FORMAT + " " + TIME_FORMAT;
 
     function decorateDateTime () {
-      $(".date").each(function () {
+      $(".date:not('.input-append')").each(function () {
         $(this).removeClass("date").addClass("dateInput").wrap($("<div>").addClass("input-append").addClass("date").css("marginRight", "8px"));
         $(this).parent().data("date", $(this).val());
         $("<span>").addClass("add-on").html('<i class="icon-th"></i>').appendTo($(this).parent());
@@ -367,7 +367,7 @@
         rangeHandler(false);
       });
 
-      $(".time").each(function () {
+      $(".time:not('.input-append')").each(function () {
         $(this).attr("class", "input-mini timepicker-default").wrap($("<div>").addClass("input-append").addClass("date").addClass("bootstrap-timepicker-component"));
         $("<span>").addClass("add-on").html('<i class="icon-time"></i>').appendTo($(this).parent());
       });
