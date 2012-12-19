@@ -852,7 +852,7 @@ class TestEditor(OozieMockBase):
 
     response = client_another_me.get(reverse('oozie:edit_coordinator', args=[coord.id]))
     assert_true('Editor' in response.content, response.content)
-    assert_true('value="Save"' in response.content, response.content)
+    assert_true('Save coordinator' in response.content, response.content)
 
     # Check can schedule a non personal/shared workflow
     workflow_select = '%s</option>' % self.wf
@@ -873,7 +873,7 @@ class TestEditor(OozieMockBase):
     try:
       response = client_another_me.post(reverse('oozie:edit_coordinator', args=[coord.id]))
       assert_true(workflow_select in response.content, response.content)
-      assert_true('value="Save"' in response.content, response.content)
+      assert_true('Save coordinator' in response.content, response.content)
     finally:
       finish()
 
@@ -882,7 +882,7 @@ class TestEditor(OozieMockBase):
       response = client_another_me.post(reverse('oozie:edit_coordinator', args=[coord.id]))
       assert_true('This field is required' in response.content, response.content)
       assert_false(workflow_select in response.content, response.content)
-      assert_true('value="Save"' in response.content, response.content)
+      assert_true('Save coordinator' in response.content, response.content)
     finally:
       finish()
 
@@ -1235,7 +1235,7 @@ class TestPermissions(OozieBase):
 
     response = self.c.get(reverse('oozie:edit_coordinator', args=[coord.id]))
     assert_true('Editor' in response.content, response.content)
-    assert_true('value="Save"' in response.content, response.content)
+    assert_true('Save coordinator' in response.content, response.content)
 
     # Login as someone else
     client_not_me = make_logged_in_client(username='not_me', is_superuser=False, groupname='test')
@@ -1305,7 +1305,7 @@ class TestPermissions(OozieBase):
     try:
       response = client_not_me.get(reverse('oozie:edit_coordinator', args=[coord.id]))
       assert_false('Permission denied' in response.content, response.content)
-      assert_false('value="Save"' in response.content, response.content)
+      assert_false('Save coordinator' in response.content, response.content)
     finally:
       finish()
 
