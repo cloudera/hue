@@ -25,7 +25,7 @@
 ${ commonheader(_("Oozie App"), "oozie", user, "100px") }
 ${ layout.menubar(section='coordinators') }
 
-<style>
+<style type="text/css">
   .steps {
     min-height: 350px;
     margin-top: 10px;
