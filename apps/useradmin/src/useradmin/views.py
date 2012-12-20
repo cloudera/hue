@@ -273,7 +273,7 @@ def add_ldap_user(request):
       username = form.cleaned_data['username']
       import_by_dn = form.cleaned_data['dn']
       user = import_ldap_user(username, import_by_dn)
-      if form.cleaned_data['ensure_home_directory']:
+      if user and form.cleaned_data['ensure_home_directory']:
         try:
           ensure_home_directory(request.fs, user.username)
         except (IOError, WebHdfsException), e:

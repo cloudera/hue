@@ -104,7 +104,7 @@ class LdapConnection(object):
 
     ldap_result_id = self.ldap_handle.search(base_dn, scope, ldap_filter)
     result_type, result_data = self.ldap_handle.result(ldap_result_id)
-    if result_type == ldap.RES_SEARCH_RESULT and result_data[0][0] is not None:
+    if result_data and result_type == ldap.RES_SEARCH_RESULT:
       data = result_data[0][1]
       user_info = { 'username': data[user_name_attr][0] }
 
