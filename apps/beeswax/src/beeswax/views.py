@@ -853,7 +853,9 @@ def configuration(request):
   query_server = get_query_server_config(app_name)
   config_values = dbms.get(request.user, query_server).get_default_configuration(
                       bool(request.REQUEST.get("include_hadoop", False)))
-
+  for value in config_values:
+    if 'password' in value.key.lower():
+      value.value = "*" * 10
   return render("configuration.mako", request, {'config_values': config_values})
 
 

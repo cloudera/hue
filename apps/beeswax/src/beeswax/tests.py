@@ -116,6 +116,9 @@ class TestBeeswaxWithHadoop(BeeswaxSampleProvider):
     assert_true("hive.exec.scratchdir" in response.content)
     assert_true("hive.exec.scratchdir" in response_verbose.content)
 
+    assert_true("javax.jdo.option.ConnectionPassword**********" in response_verbose.content)
+    assert_true("javax.jdo.option.ConnectionPassword**********" in response_verbose.content)
+
     assert_false("tasktracker.http.threads" in response.content)
     assert_true("tasktracker.http.threads" in response_verbose.content)
     assert_true("A base for other temporary directories" in response_verbose.content)
