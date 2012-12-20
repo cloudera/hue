@@ -24,26 +24,22 @@ msgstr "HDFS 中存储 jobsub 示例和模板的位置。"
 #: src/jobsub/conf.py:33
 #, fuzzy
 msgid "Location on local filesystem where examples and template are stored."
-msgstr "本地文件系统上存储示例和模板的位置"
+msgstr "本地文件系统上存储示例和模板的位置。"
 
 #: src/jobsub/conf.py:39
 #, fuzzy
 msgid "Location on local filesystem where sample data is stored."
-msgstr "本地文件系统上存储样本数据的位置"
+msgstr "本地文件系统上存储示例数据的位置。"
 
 #: src/jobsub/conf.py:49
 #, fuzzy
-msgid ""
-"Deprecated, use liboozie.conf.OOZIE_URL instead. URL of Oozie server. "
-"This is required for job submission."
-msgstr "Oozie 服务器的 URL。提交作业时需要此 URL。"
+msgid "Deprecated, use liboozie.conf.OOZIE_URL instead. URL of Oozie server. This is required for job submission."
+msgstr "已弃用，请用 liboozie.conf.OOZIE_URL 替代。Oozie 服务器的 URL。提交作业时需要此 URL。"
 
 #: src/jobsub/conf.py:55
 #, fuzzy
-msgid ""
-"Deprecated, use liboozie.conf.SECURITY_ENABLED instead. Whether Oozie "
-"requires client to do perform Kerberos authentication"
-msgstr "Oozie 是否需要客户端执行 Kerberos 身份验证"
+msgid "Deprecated, use liboozie.conf.SECURITY_ENABLED instead. Whether Oozie requires client to do perform Kerberos authentication"
+msgstr "已弃用，请用 liboozie.conf.SECURITY_ENABLED 替代。Oozie 是否需要客户端执行 Kerberos 身份验证"
 
 #: src/jobsub/forms.py:39 src/jobsub/forms.py:58 src/jobsub/forms.py:77
 #: src/jobsub/forms.py:95 src/jobsub/templates/list_designs.mako:63
@@ -53,9 +49,7 @@ msgid "Name"
 msgstr "名称"
 
 #: src/jobsub/forms.py:43
-msgid ""
-"Allows letters, digits, '_', and '-'. The first character must be a "
-"letter or '_'."
+msgid "Allows letters, digits, '_', and '-'. The first character must be a letter or '_'."
 msgstr "允许字母、数字、'_' 和 '-'。第一个字符必须是字母或 '_'。"
 
 #: src/jobsub/forms.py:59 src/jobsub/forms.py:78 src/jobsub/forms.py:96
@@ -66,27 +60,27 @@ msgstr "描述"
 
 #: src/jobsub/forms.py:60
 msgid "Main class"
-msgstr ""
+msgstr "主类"
 
 #: src/jobsub/forms.py:61 src/jobsub/forms.py:79
 msgid "Jar path"
-msgstr ""
+msgstr "Jar 路径"
 
 #: src/jobsub/forms.py:62
 msgid "Args"
-msgstr ""
+msgstr "Args"
 
 #: src/jobsub/forms.py:63
 msgid "Java opts"
-msgstr ""
+msgstr "Java 选项"
 
 #: src/jobsub/forms.py:80
 msgid "Mapper"
-msgstr ""
+msgstr "映射程序 (Mapper)"
 
 #: src/jobsub/forms.py:81
 msgid "Reducer"
-msgstr ""
+msgstr "化简程序"
 
 #: src/jobsub/models.py:128
 msgid "Name of the design, which must be unique per user."
@@ -102,17 +96,17 @@ msgstr "要添加到分布式缓存的存档的路径列表。"
 
 #: src/jobsub/models.py:191
 msgid "Path to jar files on HDFS."
-msgstr "HDFS 上 jar 文件的路径。"
+msgstr "HDFS 上的 jar 文件路径。"
 
 #: src/jobsub/submit.py:48
 #, fuzzy, python-format
 msgid "Submission for job design '%(name)s' (id %(id)s, owner %(username)s)."
-msgstr "作业设计 '%(name)s'（ID 为 %(id)s、所有者为 %(username)s）的提交"
+msgstr "作业设计 '%(name)s'（ID 为 %(id)s、所有者为 %(username)s）提交。"
 
 #: src/jobsub/submit.py:72
 #, fuzzy, python-format
 msgid "Job design already submitted (Oozie job id %(id)s)."
-msgstr "已提交作业设计（Oozie 作业 ID 为 %(id)s）"
+msgstr "已提交作业设计（Oozie 作业 ID 为 %(id)s）。"
 
 #: src/jobsub/submit.py:81
 msgid "Failed to access deployment directory."
@@ -121,12 +115,12 @@ msgstr "无法访问部署目录。"
 #: src/jobsub/submit.py:210
 #, fuzzy
 msgid "Failed to obtain HDFS reference. Check your configuration."
-msgstr "未能获得 HDFS 参考。请检查您的配置。"
+msgstr "无法获得 HDFS 引用。请检查您的配置。"
 
 #: src/jobsub/views.py:59
 #, fuzzy, python-format
 msgid "Access denied: view job %(id)s."
-msgstr "访问被拒绝：查看作业 %(id)s"
+msgstr "访问被拒绝：查看作业 %(id)s。"
 
 #: src/jobsub/views.py:65
 #, python-format
@@ -140,7 +134,7 @@ msgstr "权限被拒绝。您不是所有者。"
 #: src/jobsub/views.py:206
 #, fuzzy, python-format
 msgid "Access denied: delete design %(id)s."
-msgstr "访问被拒绝：删除设计 %(id)s"
+msgstr "访问被拒绝：删除设计 %(id)s。"
 
 #: src/jobsub/views.py:214
 msgid "Workflow not found."
@@ -149,12 +143,12 @@ msgstr "未找到工作流。"
 #: src/jobsub/views.py:222
 #, fuzzy, python-format
 msgid "Access denied: edit design %(id)s."
-msgstr "访问被拒绝：编辑设计 %(id)s"
+msgstr "访问被拒绝：编辑设计 %(id)s。"
 
 #: src/jobsub/views.py:253
 #, fuzzy, python-format
 msgid "Access denied: design parameters %(id)s."
-msgstr "访问被拒绝：设计参数 %(id)s"
+msgstr "访问被拒绝：设计参数 %(id)s。"
 
 #: src/jobsub/views.py:265
 #, fuzzy
@@ -164,16 +158,16 @@ msgstr "请使用 POST 请求提交设计。"
 #: src/jobsub/views.py:269
 #, fuzzy, python-format
 msgid "Access denied: submit design %(id)s."
-msgstr "访问被拒绝：提交设计 %(id)s"
+msgstr "访问被拒绝：提交设计 %(id)s。"
 
 #: src/jobsub/views.py:280
 msgid "The Oozie server is not running"
-msgstr ""
+msgstr "Oozie 服务器未运行"
 
 #: src/jobsub/views.py:281
 #, fuzzy, python-format
 msgid "Error submitting design %(id)s."
-msgstr "提交设计 %(id)s 时出错"
+msgstr "提交设计 %(id)s 时出错。"
 
 #: src/jobsub/views.py:295
 #, fuzzy
@@ -213,10 +207,8 @@ msgid "or"
 msgstr "或"
 
 #: src/jobsub/templates/edit_design.mako:68
-msgid ""
-"When the design is submitted, you will be prompted for the actual value "
-"of "
-msgstr "提交设计时，将提示您实际值 — "
+msgid "When the design is submitted, you will be prompted for the actual value of "
+msgstr "提交设计时，将提示您输入实际值 "
 
 #: src/jobsub/templates/edit_design.mako:76
 msgid "Job Properties"
@@ -302,7 +294,7 @@ msgstr "创建映射减少设计"
 
 #: src/jobsub/templates/list_designs.mako:48
 msgid "Mapreduce"
-msgstr ""
+msgstr "MapReduce"
 
 #: src/jobsub/templates/list_designs.mako:49
 msgid "Create Streaming Design"
@@ -310,7 +302,7 @@ msgstr "创建流设计"
 
 #: src/jobsub/templates/list_designs.mako:49
 msgid "Streaming"
-msgstr ""
+msgstr "数据流"
 
 #: src/jobsub/templates/list_designs.mako:50
 msgid "Create Java Design"
@@ -318,7 +310,7 @@ msgstr "创建 Java 设计"
 
 #: src/jobsub/templates/list_designs.mako:50
 msgid "Java"
-msgstr ""
+msgstr "Java"
 
 #: src/jobsub/templates/list_designs.mako:53
 msgid "Install Samples"
@@ -510,16 +502,11 @@ msgstr "应用程序路径"
 
 #~ msgid "Filter: "
 #~ msgstr "过滤器： "
-
 #~ msgid "Search for username, name, etc..."
 #~ msgstr "搜索用户名、名称等..."
-
 #~ msgid "Edit %(name)s"
 #~ msgstr "编辑 %(name)s"
-
 #~ msgid "Delete %(name)s"
 #~ msgstr "删除 %(name)s"
-
 #~ msgid "Clone %(name)s"
 #~ msgstr "克隆 %(name)s"
-

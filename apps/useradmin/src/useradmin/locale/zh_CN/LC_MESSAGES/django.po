@@ -32,7 +32,7 @@ msgstr "您不能删除自己。"
 
 #: src/useradmin/views.py:74
 msgid "The user was deleted."
-msgstr ""
+msgstr "用户已删除。"
 
 #: src/useradmin/views.py:77
 msgid "User not found."
@@ -48,7 +48,7 @@ msgstr "默认用户组不可删除。"
 
 #: src/useradmin/views.py:100
 msgid "The group was deleted."
-msgstr ""
+msgstr "组已删除。"
 
 #: src/useradmin/views.py:103
 msgid "Group not found."
@@ -78,11 +78,11 @@ msgstr "确认密码"
 
 #: src/useradmin/views.py:120 src/useradmin/views.py:312
 msgid "Create home directory"
-msgstr ""
+msgstr "创建主目录"
 
 #: src/useradmin/views.py:121
 msgid "Create home directory if one doesn't already exist."
-msgstr ""
+msgstr "如果不存在主目录，应创建。"
 
 #: src/useradmin/views.py:132
 msgid "Passwords do not match."
@@ -106,12 +106,12 @@ msgstr "您不能让自己成为超级用户。"
 
 #: src/useradmin/views.py:220
 msgid "User information updated"
-msgstr ""
+msgstr "已更新用户信息"
 
 #: src/useradmin/views.py:229 src/useradmin/views.py:353
 #, python-format
 msgid "Cannot make home directory for user %s."
-msgstr ""
+msgstr "无法为用户 %s 创建主目录。"
 
 #: src/useradmin/views.py:252
 msgid "You must be a superuser to add or edit a group."
@@ -119,7 +119,7 @@ msgstr "您必须是超级用户才能添加或编辑组。"
 
 #: src/useradmin/views.py:263
 msgid "Group information updated"
-msgstr ""
+msgstr "已更新组信息"
 
 #: src/useradmin/views.py:284
 msgid "You must be a superuser to change permissions."
@@ -127,7 +127,7 @@ msgstr "您必须是超级用户才能更改权限。"
 
 #: src/useradmin/views.py:292
 msgid "Permission information updated"
-msgstr ""
+msgstr "已更新权限信息"
 
 #: src/useradmin/views.py:307 src/useradmin/views.py:372
 msgid "Distinguished name"
@@ -141,7 +141,7 @@ msgstr "是否按可分辨名称导入用户。"
 
 #: src/useradmin/views.py:313
 msgid "Create home directory for user if one doesn't already exist."
-msgstr ""
+msgstr "如果不存在用户主目录，应创建。"
 
 #: src/useradmin/views.py:324
 #, python-format
@@ -155,12 +155,10 @@ msgstr "您必须是超级用户才能添加其他用户。"
 #: src/useradmin/views.py:357
 #, fuzzy, python-format
 msgid "Could not get LDAP details for user %(username)s."
-msgstr "无法获取用户 %(username)s 的 LDAP 详细信息"
+msgstr "无法获取用户 %(username)s 的 LDAP 详细信息。"
 
 #: src/useradmin/views.py:369
-msgid ""
-"Required. 30 characters or fewer. May only contain letters, numbers, "
-"hyphens or underscores."
+msgid "Required. 30 characters or fewer. May only contain letters, numbers, hyphens or underscores."
 msgstr "必填。30 个或更少字符。只能包含字母、数字、连字符或下划线。"
 
 #: src/useradmin/views.py:373
@@ -177,13 +175,11 @@ msgstr "从组导入未导入的用户或新用户。"
 
 #: src/useradmin/views.py:381
 msgid "Create home directories"
-msgstr ""
+msgstr "创建主目录"
 
 #: src/useradmin/views.py:382
-msgid ""
-"Create home directories for every member imported, if members are being "
-"imported."
-msgstr ""
+msgid "Create home directories for every member imported, if members are being imported."
+msgstr "为导入的每个成员创建主目录（如果成员已导入）。"
 
 #: src/useradmin/views.py:393
 #, python-format
@@ -205,7 +201,7 @@ msgstr "您必须是超级用户才能同步 LDAP 用户/组。"
 
 #: src/useradmin/views.py:453
 msgid "The import may not be complete, sync again."
-msgstr ""
+msgstr "导入可能不完整，再次同步。"
 
 #: src/useradmin/views.py:477
 msgid "No active superuser configured."
@@ -236,11 +232,11 @@ msgstr "组"
 
 #: src/useradmin/views.py:754
 msgid "Create Home Directories"
-msgstr ""
+msgstr "创建主目录"
 
 #: src/useradmin/views.py:755
 msgid "Create home directory for every user, if one doesn't already exist."
-msgstr ""
+msgstr "如果不存在每位用户的主目录，应创建。"
 
 #: src/useradmin/management/commands/import_ldap_group.py:39
 msgid "Import users from the group."
@@ -287,12 +283,12 @@ msgstr "是"
 #: src/useradmin/templates/delete_group.mako:22
 #, fuzzy
 msgid "Are you sure you want to delete"
-msgstr "是否确定要删除 %(group_name)s？"
+msgstr "是否确定要删除"
 
 #: src/useradmin/templates/delete_group.mako:22
 #: src/useradmin/templates/delete_user.mako:22
 msgid "?"
-msgstr ""
+msgstr "?"
 
 #: src/useradmin/templates/delete_group.mako:25
 #: src/useradmin/templates/delete_user.mako:25
@@ -302,7 +298,7 @@ msgstr "否"
 #: src/useradmin/templates/delete_user.mako:22
 #, fuzzy
 msgid "Are you sure you want to delete "
-msgstr "是否确定要删除 %(group_name)s？"
+msgstr "是否确定要删除 "
 
 #: src/useradmin/templates/edit_group.mako:26
 #: src/useradmin/templates/list_groups.mako:25
@@ -364,12 +360,12 @@ msgstr "未找到用户。"
 
 #: src/useradmin/templates/edit_group.mako:85
 msgid "Create a new user now"
-msgstr ""
+msgstr "现在创建一个新用户"
 
 #: src/useradmin/templates/edit_group.mako:92
 #, fuzzy
 msgid "No permissions found."
-msgstr "权限"
+msgstr "未找到权限。"
 
 #: src/useradmin/templates/edit_permissions.mako:23
 #: src/useradmin/templates/list_permissions.mako:26
@@ -390,7 +386,7 @@ msgstr "更新权限"
 #: src/useradmin/templates/edit_user.mako:104
 #, fuzzy
 msgid "No groups found."
-msgstr "未找到组。"
+msgstr "未找到组！"
 
 #: src/useradmin/templates/edit_user.mako:24
 #: src/useradmin/templates/list_users.mako:25
@@ -426,7 +422,7 @@ msgstr "添加用户"
 
 #: src/useradmin/templates/edit_user.mako:104
 msgid "Create a new group now"
-msgstr ""
+msgstr "现在创建一个新组"
 
 #: src/useradmin/templates/layout.mako:32
 msgid "Users"
@@ -467,7 +463,7 @@ msgstr "编辑 %(groupname)s"
 
 #: src/useradmin/templates/list_groups.mako:80
 msgid "There are no groups matching the search criteria."
-msgstr ""
+msgstr "没有符合搜索条件的组。"
 
 #: src/useradmin/templates/list_permissions.mako:36
 msgid "Application"
@@ -483,7 +479,7 @@ msgstr "编辑权限"
 
 #: src/useradmin/templates/list_permissions.mako:60
 msgid "There are no permissions matching the search criteria."
-msgstr ""
+msgstr "没有符合搜索条件的权限。"
 
 #: src/useradmin/templates/list_users.mako:40
 msgid "Add/Sync LDAP user"
@@ -516,23 +512,19 @@ msgstr "编辑 %(username)s"
 
 #: src/useradmin/templates/list_users.mako:87
 msgid "There are no users matching the search criteria."
-msgstr ""
+msgstr "没有符合搜索条件的用户。"
 
 #: src/useradmin/templates/sync_ldap_users_groups.mako:37
 msgid "Sync LDAP users and groups"
 msgstr "同步 LDAP 用户和组"
 
 #: src/useradmin/templates/sync_ldap_users_groups.mako:41
-msgid ""
-"This will not import any users or groups that don't already exist in Hue."
-" Only users and groups imported from LDAP can be synced."
-msgstr "这将不导入 Hue 中尚不存在的任何用户或组。只能同步从 LDAP 导入的用户和组。"
+msgid "This will not import any users or groups that don't already exist in Hue. Only users and groups imported from LDAP can be synced."
+msgstr "这不会导入 Hue 中不存在的任何用户或组。仅可同步从 LDAP 中导入的用户和组。"
 
 #: src/useradmin/templates/sync_ldap_users_groups.mako:42
-msgid ""
-"All user information and group memberships will be updated based on the "
-"LDAP server's current state."
-msgstr "将基于 LDAP 服务器的当前状态更新所有用户信息和组成员关系。"
+msgid "All user information and group memberships will be updated based on the LDAP server's current state."
+msgstr "所有用户信息和组成员身份将根据 LDAP 服务器的当前状态更新。"
 
 #: src/useradmin/templates/sync_ldap_users_groups.mako:50
 msgid "Sync"
@@ -540,37 +532,25 @@ msgstr "同步"
 
 #~ msgid "The user was deleted !"
 #~ msgstr ""
-
 #~ msgid "The group was deleted !"
 #~ msgstr ""
-
 #~ msgid "Cannot make home directory for user %s"
 #~ msgstr ""
-
 #~ msgid "The import may not be complete, sync again"
 #~ msgstr ""
-
 #~ msgid "Filter: "
 #~ msgstr "过滤器： "
-
 #~ msgid "Search for group name, members, etc..."
 #~ msgstr "搜索组名、成员等..."
-
 #~ msgid "Edit"
 #~ msgstr "编辑"
-
 #~ msgid "Delete %(groupname)s"
 #~ msgstr "删除 %(groupname)s"
-
 #~ msgid "Are you sure you want to delete %(group_name)s?"
 #~ msgstr "是否确定要删除 %(group_name)s？"
-
 #~ msgid "Search for application name, description, etc..."
 #~ msgstr "搜索应用程序名称、描述等..."
-
 #~ msgid "Search for username, name, e-mail, etc..."
 #~ msgstr "搜索用户名、名称、电子邮件等..."
-
 #~ msgid "Delete %(username)s"
 #~ msgstr "删除 %(username)s"
-

@@ -61,12 +61,12 @@ msgstr "Dateiname oder Verzeichnis, in das hochgeladen werden soll."
 #: src/filebrowser/forms.py:90
 #, fuzzy
 msgid "Archive to Upload"
-msgstr "Hochzuladende Datei"
+msgstr "Archiv für Upload"
 
 #: src/filebrowser/forms.py:91
 #, fuzzy
 msgid "Archive to upload to."
-msgstr "Hochzuladende Datei"
+msgstr "Archiv, in das hochgeladen wird."
 
 #: src/filebrowser/forms.py:95
 msgid "File to remove"
@@ -92,13 +92,13 @@ msgstr "Verzeichnisname"
 #: src/filebrowser/forms.py:117
 #, fuzzy
 msgid "Path in which to create the file"
-msgstr "Pfad, in dem das Verzeichnis erstellt werden soll"
+msgstr "Pfad, in dem die Datei erstellt werden soll"
 
 #: src/filebrowser/forms.py:118
 #: src/filebrowser/templates/listdir_components.mako:359
 #, fuzzy
 msgid "File Name"
-msgstr "Neuer Name"
+msgstr "Dateiname"
 
 #: src/filebrowser/forms.py:122
 msgid "Path to change user/group ownership"
@@ -113,7 +113,7 @@ msgstr "Benutzer"
 
 #: src/filebrowser/forms.py:126
 msgid "OtherUser"
-msgstr ""
+msgstr "OtherUser"
 
 #: src/filebrowser/forms.py:127 src/filebrowser/templates/display.mako:79
 #: src/filebrowser/templates/listdir_components.mako:73
@@ -124,13 +124,13 @@ msgstr "Gruppe"
 
 #: src/filebrowser/forms.py:128
 msgid "OtherGroup"
-msgstr ""
+msgstr "OtherGroup"
 
 #: src/filebrowser/forms.py:129
 #: src/filebrowser/templates/listdir_components.mako:193
 #: src/filebrowser/templates/listdir_components.mako:257
 msgid "Recursive"
-msgstr ""
+msgstr "Rekursiv"
 
 #: src/filebrowser/forms.py:144
 msgid "Path to change permissions"
@@ -154,12 +154,8 @@ msgstr "Kann nicht zugreifen auf: %(path)s."
 
 #: src/filebrowser/views.py:145 src/filebrowser/views.py:884
 #, python-format
-msgid ""
-" Note: you are a Hue admin but not a HDFS superuser (which is "
-"\"%(superuser)s\")."
-msgstr ""
-" Hinweis: Sie sind ein Hue-Admin, aber kein HDFS-Superuser (das ist "
-"\"%(superuser)s\")."
+msgid " Note: you are a Hue admin but not a HDFS superuser (which is \"%(superuser)s\")."
+msgstr " Hinweis: Sie sind ein Hue-Admin, aber kein HDFS-Superuser (das ist \"%(superuser)s\")."
 
 #: src/filebrowser/views.py:171
 #, python-format
@@ -174,9 +170,7 @@ msgstr "Datei zu groß zum Bearbeiten: %(path)s"
 #: src/filebrowser/views.py:185
 #, python-format
 msgid "File is not encoded in %(encoding)s; cannot be edited: %(path)s"
-msgstr ""
-"Datei ist nicht verschlüsselt in %(encoding)s; kann nicht bearbeitet "
-"werden: %(path)s"
+msgstr "Datei ist nicht verschlüsselt in %(encoding)s; kann nicht bearbeitet werden: %(path)s"
 
 #: src/filebrowser/views.py:234
 #, python-format
@@ -212,9 +206,7 @@ msgstr "Länge darf nicht weniger sein als Null."
 #: src/filebrowser/views.py:575
 #, python-format
 msgid "Cannot request chunks greater than %(bytes)d bytes"
-msgstr ""
-"Es kann keine Teile angefordert werden, die größer als %(bytes)d Bytes "
-"sind"
+msgstr "Es kann keine Teile angefordert werden, die größer als %(bytes)d Bytes sind"
 
 #: src/filebrowser/views.py:686
 msgid "Failed to read Avro file."
@@ -262,69 +254,65 @@ msgstr "Operation kann nicht durchgeführt werden."
 
 #: src/filebrowser/views.py:917
 #, python-format
-msgid ""
-"Could not rename folder \"%s\" to \"%s\": Hashes are not allowed in "
-"filenames."
-msgstr ""
+msgid "Could not rename folder \"%s\" to \"%s\": Hashes are not allowed in filenames."
+msgstr "Ordner konnte nicht von \"%s\" in \"%s\" umbenannt werden: Rauten sind in Dateinamen nicht zulässig."
 
 #: src/filebrowser/views.py:931
 #, python-format
-msgid ""
-"Could not name folder \"%s\": Slashes or hashes are not allowed in "
-"filenames."
-msgstr ""
+msgid "Could not name folder \"%s\": Slashes or hashes are not allowed in filenames."
+msgstr "Ordner konnte nicht in \"%s\" umbenannt werden: Schrägstriche oder Rauten sind in Dateinamen nicht zulässig."
 
 #: src/filebrowser/views.py:941
 #, python-format
 msgid "Could not name file \"%s\": Slashes are not allowed in filenames."
-msgstr ""
+msgstr "Datei konnte nicht in \"%s\" umbenannt werden: Schrägstriche sind in Dateinamen nicht zulässig."
 
 #: src/filebrowser/views.py:1034 src/filebrowser/views.py:1111
 #, fuzzy
 msgid "A POST request is required."
-msgstr "Benutzer ist erforderlich."
+msgstr "Eine POST-Anfrage ist erforderlich."
 
 #: src/filebrowser/views.py:1037 src/filebrowser/views.py:1114
 #, python-format
 msgid "%(destination)s upload succeeded"
-msgstr ""
+msgstr "%(destination)s-Upload war erfolgreich"
 
 #: src/filebrowser/views.py:1039 src/filebrowser/views.py:1116
 #, fuzzy, python-format
 msgid "Upload failed: %(data)s"
-msgstr "Keine Datei: '%(data)s'"
+msgstr "Upload fehlgeschlagen: %(data)s"
 
 #: src/filebrowser/views.py:1055 src/filebrowser/views.py:1134
 #, python-format
 msgid "Sorry, no \"%(sep)s\" in the filename %(name)s.sep"
-msgstr ""
+msgstr "Kein \"%(sep)\" im Dateinamen %(name)s.sep"
 
 #: src/filebrowser/views.py:1075 src/filebrowser/views.py:1158
 #, python-format
 msgid "Destination %(name)s already exists.name"
-msgstr ""
+msgstr "Ziel %(name)s ist bereits vorhanden."
 
 #: src/filebrowser/views.py:1077 src/filebrowser/views.py:1160
 #, python-format
 msgid "Copy to \"%(name)s failed: %(error)s"
-msgstr ""
+msgstr "Kopieren nach \"%(name)s\" fehlgeschlagen: %(error)s"
 
 #: src/filebrowser/views.py:1087 src/filebrowser/views.py:1170
 #, python-format
 msgid "Error in upload form: %s"
-msgstr ""
+msgstr "Fehler im Upload-Formular: %s"
 
 #: src/filebrowser/views.py:1143
 msgid "Could not extract contents of file."
-msgstr ""
+msgstr "Dateiinhalt konnte nicht extrahiert werden."
 
 #: src/filebrowser/views.py:1149
 msgid "Could not interpret archive type."
-msgstr ""
+msgstr "Archivtyp konnte nicht interpretiert werden."
 
 #: src/filebrowser/lib/archives.py:40
 msgid "Must implement 'extract' method."
-msgstr ""
+msgstr "Methode 'extract' muss implementiert werden."
 
 #: src/filebrowser/templates/display.mako:31
 #: src/filebrowser/templates/edit.mako:29
@@ -427,7 +415,7 @@ msgstr "Geben Sie den Ort an, an dem Sie die Datei speichern möchten"
 #: src/filebrowser/templates/listdir_components.mako:289
 #, fuzzy
 msgid "Name is required."
-msgstr "Name ist erforderlich."
+msgstr "Der Name ist erforderlich."
 
 #: src/filebrowser/templates/edit.mako:81
 #: src/filebrowser/templates/listdir_components.mako:168
@@ -448,7 +436,7 @@ msgstr "Startseite"
 
 #: src/filebrowser/templates/fb_components.mako:25
 msgid "Edit path"
-msgstr ""
+msgstr "Pfad bearbeiten"
 
 #: src/filebrowser/templates/fileop.mako:26
 msgid "File Operation"
@@ -487,34 +475,34 @@ msgstr "Löschen"
 #: src/filebrowser/templates/listdir.mako:48
 #: src/filebrowser/templates/listdir.mako:49
 msgid "Upload"
-msgstr ""
+msgstr "Hochladen"
 
 #: src/filebrowser/templates/listdir.mako:53
 msgid "Files"
-msgstr ""
+msgstr "Dateien"
 
 #: src/filebrowser/templates/listdir.mako:54
 #, fuzzy
 msgid "Archive"
-msgstr "Suchen"
+msgstr "Archivieren"
 
 #: src/filebrowser/templates/listdir.mako:54
 msgid "Archives"
-msgstr ""
+msgstr "Archive"
 
 #: src/filebrowser/templates/listdir.mako:59
 msgid "New"
-msgstr ""
+msgstr "Neu"
 
 #: src/filebrowser/templates/listdir.mako:63
 #, fuzzy
 msgid "File"
-msgstr "Fehlgeschlagen"
+msgstr "Datei"
 
 #: src/filebrowser/templates/listdir.mako:64
 #, fuzzy
 msgid "Directory"
-msgstr "Neues Verzeichnis"
+msgstr "Verzeichnis"
 
 #: src/filebrowser/templates/listdir_components.mako:70
 msgid "Name"
@@ -558,30 +546,30 @@ msgstr "Elemente pro Seite"
 
 #: src/filebrowser/templates/listdir_components.mako:131
 msgid "Showing"
-msgstr ""
+msgstr "Anzeigen:"
 
 #: src/filebrowser/templates/listdir_components.mako:131
 msgid "to"
-msgstr ""
+msgstr "bis"
 
 #: src/filebrowser/templates/listdir_components.mako:131
 #: src/filebrowser/templates/listdir_components.mako:132
 msgid "of"
-msgstr ""
+msgstr "von"
 
 #: src/filebrowser/templates/listdir_components.mako:131
 #, fuzzy
 msgid "items, page"
-msgstr "Elemente pro Seite"
+msgstr "Element, Seite"
 
 #: src/filebrowser/templates/listdir_components.mako:139
 msgid "Confirm Delete"
-msgstr ""
+msgstr "Löschvorgang bestätigen"
 
 #: src/filebrowser/templates/listdir_components.mako:142
 #, fuzzy
 msgid "Are you sure you want to delete these files?"
-msgstr "Sind Sie sicher, dass Sie diese Datei löschen möchten?"
+msgstr "Möchten Sie diese Dateien wirklich löschen?"
 
 #: src/filebrowser/templates/listdir_components.mako:146
 msgid "No"
@@ -606,12 +594,8 @@ msgstr "Übermitteln"
 
 #: src/filebrowser/templates/listdir_components.mako:186
 #, python-format
-msgid ""
-"Note: Only the Hadoop superuser, \"%(superuser)s\" on this file system, "
-"may change the owner of a file."
-msgstr ""
-"Hinweis: Nur der Hadoop-Superuser, \"%(superuser)s\" auf diesem "
-"Dateisystem, darf den Eigentümer einer Datei ändern."
+msgid "Note: Only the Hadoop superuser, \"%(superuser)s\" on this file system, may change the owner of a file."
+msgstr "Hinweis: Nur der Hadoop-Superuser, \"%(superuser)s\" auf diesem Dateisystem, darf den Eigentümer einer Datei ändern."
 
 #: src/filebrowser/templates/listdir_components.mako:214
 msgid "Change Permissions:"
@@ -635,7 +619,7 @@ msgstr "Ausführen"
 
 #: src/filebrowser/templates/listdir_components.mako:251
 msgid "Sticky"
-msgstr ""
+msgstr "Sticky"
 
 #: src/filebrowser/templates/listdir_components.mako:276
 msgid "Move:"
@@ -644,7 +628,7 @@ msgstr "Verschieben:"
 #: src/filebrowser/templates/listdir_components.mako:280
 #, fuzzy
 msgid "Destination"
-msgstr "Zielpfad"
+msgstr "Ziel"
 
 #: src/filebrowser/templates/listdir_components.mako:301
 #: src/filebrowser/templates/listdir_components.mako:317
@@ -659,7 +643,7 @@ msgstr "Aktivieren Sie JavaScript, um den Datei-Uploader zu verwenden."
 
 #: src/filebrowser/templates/listdir_components.mako:318
 msgid "The file will then be extracted in the path specified above."
-msgstr ""
+msgstr "Die Datei wird anschließend im oben angegebenen Pfad extrahiert."
 
 #: src/filebrowser/templates/listdir_components.mako:335
 msgid "Create Directory"
@@ -668,17 +652,17 @@ msgstr "Verzeichnis erstellen"
 #: src/filebrowser/templates/listdir_components.mako:343
 #, fuzzy
 msgid "Directory name is required."
-msgstr "Ein Verzeichnisname ist erforderlich."
+msgstr "Verzeichnisname ist erforderlich."
 
 #: src/filebrowser/templates/listdir_components.mako:356
 #, fuzzy
 msgid "Create File"
-msgstr "Datei umbenennen in:"
+msgstr "Datei erstellen"
 
 #: src/filebrowser/templates/listdir_components.mako:364
 #, fuzzy
 msgid "File name is required."
-msgstr "Name ist erforderlich."
+msgstr "Dateiname ist erforderlich."
 
 #: src/filebrowser/templates/listdir_components.mako:434
 #, fuzzy
@@ -693,25 +677,25 @@ msgstr "Gruppe ist erforderlich."
 #: src/filebrowser/templates/listdir_components.mako:445
 #, fuzzy
 msgid "Specify another group."
-msgstr "Sie müssen eine andere Gruppe angeben."
+msgstr "Geben Sie eine andere Gruppe an."
 
 #: src/filebrowser/templates/listdir_components.mako:451
 #, fuzzy
 msgid "Specify another user."
-msgstr "Sie müssen einen anderen Benutzer angeben."
+msgstr "Geben Sie einen anderen Benutzer an."
 
 #: src/filebrowser/templates/listdir_components.mako:593
 msgid "There was a problem with your request."
-msgstr ""
+msgstr "Bei Ihrer Anfrage ist ein Problem aufgetreten."
 
 #: src/filebrowser/templates/listdir_components.mako:923
 #: src/filebrowser/templates/listdir_components.mako:971
 msgid "Drop files here to upload"
-msgstr "Hochzuladende Dateien hier ablegen"
+msgstr "Legen sie hochzuladende Dateien hier ab"
 
 #: src/filebrowser/templates/listdir_components.mako:924
 msgid "Upload a file"
-msgstr "Datei hochladen"
+msgstr "Eine Datei hochladen"
 
 #: src/filebrowser/templates/listdir_components.mako:932
 #: src/filebrowser/templates/listdir_components.mako:980
@@ -721,22 +705,18 @@ msgstr "Fehlgeschlagen"
 #: src/filebrowser/templates/listdir_components.mako:972
 #, fuzzy
 msgid "Upload an archive"
-msgstr "Datei hochladen"
+msgstr "Ein Archiv hochladen"
 
 #~ msgid ""
 #~ "Sorry, could not name folder \"%s\": "
 #~ "Slashes are not allowed in filenames."
 #~ msgstr ""
-
 #~ msgid "%(destination)s upload succeded"
 #~ msgstr ""
-
 #~ msgid "Change Owner / Group:"
 #~ msgstr "Eigentümer / Gruppe ändern:"
-
 #~ msgid "Upload files"
 #~ msgstr "Dateien hochladen"
-
 #~ msgid ""
 #~ "Showing %(start_index)s to %(end_index)s of"
 #~ " %(total_count)s items, page %(page)s of"
@@ -745,28 +725,19 @@ msgstr "Datei hochladen"
 #~ "%(start_index)s bis %(end_index)s von "
 #~ "%(total_count)s Elementen, Seite %(page)s von"
 #~ " %(num_pages)s anzeigen."
-
 #~ msgid "Type"
 #~ msgstr ""
-
 #~ msgid "Path"
 #~ msgstr "Pfad"
-
 #~ msgid "Operations"
 #~ msgstr "Operationen"
-
 #~ msgid "View File"
 #~ msgstr "Datei anzeigen"
-
 #~ msgid "Download File"
 #~ msgstr "Datei herunterladen"
-
 #~ msgid "Delete Recursively"
 #~ msgstr "Rekursiv löschen"
-
 #~ msgid "There are no files matching the search criteria."
 #~ msgstr ""
-
 #~ msgid "Please Confirm"
 #~ msgstr "Bestätigen"
-

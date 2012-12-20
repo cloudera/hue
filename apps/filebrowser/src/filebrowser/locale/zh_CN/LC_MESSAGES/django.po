@@ -61,12 +61,12 @@ msgstr "要上传到的文件名或目录。"
 #: src/filebrowser/forms.py:90
 #, fuzzy
 msgid "Archive to Upload"
-msgstr "要上传的文件"
+msgstr "要上传的存档"
 
 #: src/filebrowser/forms.py:91
 #, fuzzy
 msgid "Archive to upload to."
-msgstr "要上传的文件"
+msgstr "要上传的存档。"
 
 #: src/filebrowser/forms.py:95
 msgid "File to remove"
@@ -92,13 +92,13 @@ msgstr "目录名称"
 #: src/filebrowser/forms.py:117
 #, fuzzy
 msgid "Path in which to create the file"
-msgstr "要在其中创建目录的路径"
+msgstr "要在其中创建文件的路径"
 
 #: src/filebrowser/forms.py:118
 #: src/filebrowser/templates/listdir_components.mako:359
 #, fuzzy
 msgid "File Name"
-msgstr "新名称"
+msgstr "文件名"
 
 #: src/filebrowser/forms.py:122
 msgid "Path to change user/group ownership"
@@ -113,7 +113,7 @@ msgstr "用户"
 
 #: src/filebrowser/forms.py:126
 msgid "OtherUser"
-msgstr ""
+msgstr "OtherUser（其他用户）"
 
 #: src/filebrowser/forms.py:127 src/filebrowser/templates/display.mako:79
 #: src/filebrowser/templates/listdir_components.mako:73
@@ -124,13 +124,13 @@ msgstr "组"
 
 #: src/filebrowser/forms.py:128
 msgid "OtherGroup"
-msgstr ""
+msgstr "OtherGroup（其他组）"
 
 #: src/filebrowser/forms.py:129
 #: src/filebrowser/templates/listdir_components.mako:193
 #: src/filebrowser/templates/listdir_components.mako:257
 msgid "Recursive"
-msgstr ""
+msgstr "递归"
 
 #: src/filebrowser/forms.py:144
 msgid "Path to change permissions"
@@ -154,9 +154,7 @@ msgstr "无法访问：%(path)s。"
 
 #: src/filebrowser/views.py:145 src/filebrowser/views.py:884
 #, python-format
-msgid ""
-" Note: you are a Hue admin but not a HDFS superuser (which is "
-"\"%(superuser)s\")."
+msgid " Note: you are a Hue admin but not a HDFS superuser (which is \"%(superuser)s\")."
 msgstr " 注：您是 Hue 管理员，但不是 HDFS 超级用户（即 \"%(superuser)s\"）。"
 
 #: src/filebrowser/views.py:171
@@ -256,69 +254,65 @@ msgstr "无法执行操作。"
 
 #: src/filebrowser/views.py:917
 #, python-format
-msgid ""
-"Could not rename folder \"%s\" to \"%s\": Hashes are not allowed in "
-"filenames."
-msgstr ""
+msgid "Could not rename folder \"%s\" to \"%s\": Hashes are not allowed in filenames."
+msgstr "无法将文件夹 \"%s\" 重命名为 \"%s\"：文件名中不允许使用哈希。"
 
 #: src/filebrowser/views.py:931
 #, python-format
-msgid ""
-"Could not name folder \"%s\": Slashes or hashes are not allowed in "
-"filenames."
-msgstr ""
+msgid "Could not name folder \"%s\": Slashes or hashes are not allowed in filenames."
+msgstr "无法将文件夹命名为 \"%s\"：文件名中不允许使用斜线或哈希。"
 
 #: src/filebrowser/views.py:941
 #, python-format
 msgid "Could not name file \"%s\": Slashes are not allowed in filenames."
-msgstr ""
+msgstr "无法将文件命名为 \"%s\"：文件名中不允许使用斜线。"
 
 #: src/filebrowser/views.py:1034 src/filebrowser/views.py:1111
 #, fuzzy
 msgid "A POST request is required."
-msgstr "抱歉，需要提供用户。"
+msgstr "需要  POST 请求。"
 
 #: src/filebrowser/views.py:1037 src/filebrowser/views.py:1114
 #, python-format
 msgid "%(destination)s upload succeeded"
-msgstr ""
+msgstr "%(destination)s 上载成功"
 
 #: src/filebrowser/views.py:1039 src/filebrowser/views.py:1116
 #, fuzzy, python-format
 msgid "Upload failed: %(data)s"
-msgstr "不是文件：'%(data)s'"
+msgstr "上载失败：%(data)s"
 
 #: src/filebrowser/views.py:1055 src/filebrowser/views.py:1134
 #, python-format
 msgid "Sorry, no \"%(sep)s\" in the filename %(name)s.sep"
-msgstr ""
+msgstr "很抱歉，文件名 %(name)s.sep 中没有 \"%(sep)s\""
 
 #: src/filebrowser/views.py:1075 src/filebrowser/views.py:1158
 #, python-format
 msgid "Destination %(name)s already exists.name"
-msgstr ""
+msgstr "目标 %(name)s 已存在 .name"
 
 #: src/filebrowser/views.py:1077 src/filebrowser/views.py:1160
 #, python-format
 msgid "Copy to \"%(name)s failed: %(error)s"
-msgstr ""
+msgstr "无法复制到 \"%(name)s：%(error)s"
 
 #: src/filebrowser/views.py:1087 src/filebrowser/views.py:1170
 #, python-format
 msgid "Error in upload form: %s"
-msgstr ""
+msgstr "上载表单错误：%s"
 
 #: src/filebrowser/views.py:1143
 msgid "Could not extract contents of file."
-msgstr ""
+msgstr "无法提取文件内容。"
 
 #: src/filebrowser/views.py:1149
 msgid "Could not interpret archive type."
-msgstr ""
+msgstr "无法解释存档类型。"
 
 #: src/filebrowser/lib/archives.py:40
 msgid "Must implement 'extract' method."
-msgstr ""
+msgstr "必须实施 “提取”方法。"
 
 #: src/filebrowser/templates/display.mako:31
 #: src/filebrowser/templates/edit.mako:29
@@ -413,7 +407,7 @@ msgstr "另存为"
 #: src/filebrowser/templates/edit.mako:73
 #, fuzzy
 msgid "Enter the location where you'd like to save the file."
-msgstr "请输入您要保存文件的位置。"
+msgstr "请输入您希望保存该文件的位置。"
 
 #: src/filebrowser/templates/edit.mako:77
 #: src/filebrowser/templates/listdir_components.mako:164
@@ -421,7 +415,7 @@ msgstr "请输入您要保存文件的位置。"
 #: src/filebrowser/templates/listdir_components.mako:289
 #, fuzzy
 msgid "Name is required."
-msgstr "抱歉，需要提供名称。"
+msgstr "需要提供名称。"
 
 #: src/filebrowser/templates/edit.mako:81
 #: src/filebrowser/templates/listdir_components.mako:168
@@ -442,7 +436,7 @@ msgstr "主页"
 
 #: src/filebrowser/templates/fb_components.mako:25
 msgid "Edit path"
-msgstr ""
+msgstr "编辑路径"
 
 #: src/filebrowser/templates/fileop.mako:26
 msgid "File Operation"
@@ -481,34 +475,34 @@ msgstr "删除"
 #: src/filebrowser/templates/listdir.mako:48
 #: src/filebrowser/templates/listdir.mako:49
 msgid "Upload"
-msgstr ""
+msgstr "上传"
 
 #: src/filebrowser/templates/listdir.mako:53
 msgid "Files"
-msgstr ""
+msgstr "文件"
 
 #: src/filebrowser/templates/listdir.mako:54
 #, fuzzy
 msgid "Archive"
-msgstr "搜索"
+msgstr "存档"
 
 #: src/filebrowser/templates/listdir.mako:54
 msgid "Archives"
-msgstr ""
+msgstr "存档"
 
 #: src/filebrowser/templates/listdir.mako:59
 msgid "New"
-msgstr ""
+msgstr "新"
 
 #: src/filebrowser/templates/listdir.mako:63
 #, fuzzy
 msgid "File"
-msgstr "失败"
+msgstr "文件"
 
 #: src/filebrowser/templates/listdir.mako:64
 #, fuzzy
 msgid "Directory"
-msgstr "新目录"
+msgstr "目录"
 
 #: src/filebrowser/templates/listdir_components.mako:70
 msgid "Name"
@@ -552,30 +546,30 @@ msgstr "每页项目数"
 
 #: src/filebrowser/templates/listdir_components.mako:131
 msgid "Showing"
-msgstr ""
+msgstr "正在显示"
 
 #: src/filebrowser/templates/listdir_components.mako:131
 msgid "to"
-msgstr ""
+msgstr "至"
 
 #: src/filebrowser/templates/listdir_components.mako:131
 #: src/filebrowser/templates/listdir_components.mako:132
 msgid "of"
-msgstr ""
+msgstr "的"
 
 #: src/filebrowser/templates/listdir_components.mako:131
 #, fuzzy
 msgid "items, page"
-msgstr "每页项目数"
+msgstr "项，页"
 
 #: src/filebrowser/templates/listdir_components.mako:139
 msgid "Confirm Delete"
-msgstr ""
+msgstr "确认删除"
 
 #: src/filebrowser/templates/listdir_components.mako:142
 #, fuzzy
 msgid "Are you sure you want to delete these files?"
-msgstr "是否确定要删除此文件？"
+msgstr "是否确定要删除这些文件？"
 
 #: src/filebrowser/templates/listdir_components.mako:146
 msgid "No"
@@ -600,10 +594,8 @@ msgstr "提交"
 
 #: src/filebrowser/templates/listdir_components.mako:186
 #, python-format
-msgid ""
-"Note: Only the Hadoop superuser, \"%(superuser)s\" on this file system, "
-"may change the owner of a file."
-msgstr "注：只有此文件系统上的 Hadoop 超级用户 \"%(superuser)s\" 可以更改文件的所有者。"
+msgid "Note: Only the Hadoop superuser, \"%(superuser)s\" on this file system, may change the owner of a file."
+msgstr "请注意：仅 Hadoop 超级用户（此文件系统的 \"%(superuser)s\"）可更改文件所有者。"
 
 #: src/filebrowser/templates/listdir_components.mako:214
 msgid "Change Permissions:"
@@ -627,7 +619,7 @@ msgstr "执行"
 
 #: src/filebrowser/templates/listdir_components.mako:251
 msgid "Sticky"
-msgstr ""
+msgstr "易贴"
 
 #: src/filebrowser/templates/listdir_components.mako:276
 msgid "Move:"
@@ -636,7 +628,7 @@ msgstr "移动："
 #: src/filebrowser/templates/listdir_components.mako:280
 #, fuzzy
 msgid "Destination"
-msgstr "目标路径"
+msgstr "目标"
 
 #: src/filebrowser/templates/listdir_components.mako:301
 #: src/filebrowser/templates/listdir_components.mako:317
@@ -647,11 +639,11 @@ msgstr "正在上传到："
 #: src/filebrowser/templates/listdir_components.mako:323
 #, fuzzy
 msgid "Enable JavaScript to use the file uploader."
-msgstr "请启用 JavaScript 以使用文件上传程序。"
+msgstr "请启用 JavaScript 以使用文件上载程序。"
 
 #: src/filebrowser/templates/listdir_components.mako:318
 msgid "The file will then be extracted in the path specified above."
-msgstr ""
+msgstr "文件将被提取到上面指定的路径。"
 
 #: src/filebrowser/templates/listdir_components.mako:335
 msgid "Create Directory"
@@ -660,50 +652,50 @@ msgstr "创建目录"
 #: src/filebrowser/templates/listdir_components.mako:343
 #, fuzzy
 msgid "Directory name is required."
-msgstr "抱歉，需要提供目录名称。"
+msgstr "需要提供目录名。"
 
 #: src/filebrowser/templates/listdir_components.mako:356
 #, fuzzy
 msgid "Create File"
-msgstr "将文件重命名为："
+msgstr "创建文件"
 
 #: src/filebrowser/templates/listdir_components.mako:364
 #, fuzzy
 msgid "File name is required."
-msgstr "抱歉，需要提供名称。"
+msgstr "需要提供文件名。"
 
 #: src/filebrowser/templates/listdir_components.mako:434
 #, fuzzy
 msgid "User is required."
-msgstr "抱歉，需要提供用户。"
+msgstr "需要提供用户。"
 
 #: src/filebrowser/templates/listdir_components.mako:439
 #, fuzzy
 msgid "Group is required."
-msgstr "抱歉，需要提供组。"
+msgstr "需要提供组。"
 
 #: src/filebrowser/templates/listdir_components.mako:445
 #, fuzzy
 msgid "Specify another group."
-msgstr "抱歉，需要指定另一个组。"
+msgstr "指定另一个组。"
 
 #: src/filebrowser/templates/listdir_components.mako:451
 #, fuzzy
 msgid "Specify another user."
-msgstr "抱歉，需要指定另一个用户。"
+msgstr "指定另一位用户。"
 
 #: src/filebrowser/templates/listdir_components.mako:593
 msgid "There was a problem with your request."
-msgstr ""
+msgstr "您的请求出现问题。"
 
 #: src/filebrowser/templates/listdir_components.mako:923
 #: src/filebrowser/templates/listdir_components.mako:971
 msgid "Drop files here to upload"
-msgstr "将文件放在此处以上传"
+msgstr "拖放文件到此处进行上载"
 
 #: src/filebrowser/templates/listdir_components.mako:924
 msgid "Upload a file"
-msgstr "上传一个文件"
+msgstr "上载文件"
 
 #: src/filebrowser/templates/listdir_components.mako:932
 #: src/filebrowser/templates/listdir_components.mako:980
@@ -713,22 +705,18 @@ msgstr "失败"
 #: src/filebrowser/templates/listdir_components.mako:972
 #, fuzzy
 msgid "Upload an archive"
-msgstr "上传一个文件"
+msgstr "上载存档"
 
 #~ msgid ""
 #~ "Sorry, could not name folder \"%s\": "
 #~ "Slashes are not allowed in filenames."
 #~ msgstr ""
-
 #~ msgid "%(destination)s upload succeded"
 #~ msgstr ""
-
 #~ msgid "Change Owner / Group:"
 #~ msgstr "更改所有者/组："
-
 #~ msgid "Upload files"
 #~ msgstr "上传文件"
-
 #~ msgid ""
 #~ "Showing %(start_index)s to %(end_index)s of"
 #~ " %(total_count)s items, page %(page)s of"
@@ -737,28 +725,19 @@ msgstr "上传一个文件"
 #~ "正在显示 %(start_index)s 到 %(end_index)s，共 "
 #~ "%(total_count)s 个项目，第 %(page)s 页，共 "
 #~ "%(num_pages)s 页。"
-
 #~ msgid "Type"
 #~ msgstr ""
-
 #~ msgid "Path"
 #~ msgstr "路径"
-
 #~ msgid "Operations"
 #~ msgstr "操作"
-
 #~ msgid "View File"
 #~ msgstr "查看文件"
-
 #~ msgid "Download File"
 #~ msgstr "下载文件"
-
 #~ msgid "Delete Recursively"
 #~ msgstr "递归删除"
-
 #~ msgid "There are no files matching the search criteria."
 #~ msgstr ""
-
 #~ msgid "Please Confirm"
 #~ msgstr "请确认"
-

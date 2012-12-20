@@ -19,201 +19,191 @@ msgstr ""
 
 #: src/impala/conf.py:25
 msgid "Host of the Impala Server."
-msgstr ""
+msgstr "Impala Server のホストです。"
 
 #: src/impala/conf.py:31
 msgid "Port of the Impala Server."
-msgstr ""
+msgstr "Impala Server のポートです。"
 
 #: src/impala/templates/beeswax_components.mako:198
 msgid "Beginning of List"
-msgstr ""
+msgstr "リストの先頭"
 
 #: src/impala/templates/beeswax_components.mako:199
 msgid "Previous Page"
-msgstr ""
+msgstr "前のページ"
 
 #: src/impala/templates/beeswax_components.mako:200
 msgid "Next page"
-msgstr ""
+msgstr "次のページ"
 
 #: src/impala/templates/beeswax_components.mako:200
 msgid "Next Page"
-msgstr ""
+msgstr "次のページ"
 
 #: src/impala/templates/beeswax_components.mako:201
 msgid "End of List"
-msgstr ""
+msgstr "リストの末尾"
 
 #: src/impala/templates/beeswax_components.mako:203
 #, python-format
-msgid ""
-"Showing %(start)s to %(end)s of %(count)s items, page %(page)s of "
-"%(pages)s"
-msgstr ""
+msgid "Showing %(start)s to %(end)s of %(count)s items, page %(page)s of %(pages)s"
+msgstr "%(page)s／%(pages)s ページで %(count)s 件のアイテムのうち、%(start)s ～ %(end)s までを表示しています"
 
 #: src/impala/templates/execute.mako:26 src/impala/templates/layout.mako:34
 msgid "Query Editor"
-msgstr ""
+msgstr "クエリエディタ"
 
 #: src/impala/templates/execute.mako:35
 msgid "Query 2"
-msgstr ""
+msgstr "クエリ 2"
 
 #: src/impala/templates/execute.mako:40
 msgid "Example: SELECT * FROM tablename"
-msgstr ""
+msgstr "例：SELECT * FROM tablename"
 
 #: src/impala/templates/execute.mako:51
 msgid "Execute"
-msgstr ""
+msgstr "実行"
 
 #: src/impala/templates/execute.mako:53 src/impala/templates/execute.mako:289
 msgid "Save"
-msgstr ""
+msgstr "保存"
 
 #: src/impala/templates/execute.mako:55
 msgid "Save as..."
-msgstr ""
+msgstr "名前を付けて保存..."
 
 #: src/impala/templates/execute.mako:56
 msgid "Explain"
-msgstr ""
+msgstr "新しい"
 
 #: src/impala/templates/execute.mako:57
 msgid "or create a"
-msgstr ""
+msgstr "クエリを説明"
 
 #: src/impala/templates/execute.mako:57
 msgid "New query"
-msgstr ""
+msgstr "または作成"
 
 #: src/impala/templates/execute.mako:62 src/impala/templates/execute.mako:217
 msgid "Query"
-msgstr ""
+msgstr "クエリ"
 
 #: src/impala/templates/execute.mako:71
 msgid "Query server"
-msgstr ""
+msgstr "クエリサーバー"
 
 #: src/impala/templates/execute.mako:75
 msgid "settings"
-msgstr ""
+msgstr "設定"
 
 #: src/impala/templates/execute.mako:82 src/impala/templates/execute.mako:117
 #: src/impala/templates/execute.mako:152
 msgid "Delete this setting"
-msgstr ""
+msgstr "この設定を削除"
 
 #: src/impala/templates/execute.mako:107 src/impala/templates/execute.mako:142
 #: src/impala/templates/execute.mako:177
 msgid "Add"
-msgstr ""
+msgstr "追加"
 
 #: src/impala/templates/execute.mako:110
 msgid "File Resources"
-msgstr ""
+msgstr "ファイルのリソース"
 
 #: src/impala/templates/execute.mako:145
 msgid "User-defined Functions"
-msgstr ""
+msgstr "ユーザー定義関数"
 
 #: src/impala/templates/execute.mako:160
 msgid "myFunction"
-msgstr ""
+msgstr "myFunction"
 
 #: src/impala/templates/execute.mako:180
 msgid "Parameterization"
-msgstr ""
+msgstr "パラメータ化"
 
 #: src/impala/templates/execute.mako:182
-msgid ""
-"If checked (the default), you can include parameters like $parameter_name"
-" in your query, and users will be prompted for a value when the query is "
-"run."
-msgstr ""
+msgid "If checked (the default), you can include parameters like $parameter_name in your query, and users will be prompted for a value when the query is run."
+msgstr "チェックすると（デフォルトの設定）、$parameter_name などのパラメータをクエリで使用でき、クエリを実行したユーザーにはそのパラメータ値の指定が要求されます。"
 
 #: src/impala/templates/execute.mako:184
 msgid "Enable Parameterization"
-msgstr ""
+msgstr "パラメータ化の有効化"
 
 #: src/impala/templates/execute.mako:187
 msgid "Email Notification"
-msgstr ""
+msgstr "電子メール通知"
 
 #: src/impala/templates/execute.mako:189
-msgid ""
-"If checked, you will receive an email notification when the query "
-"completes."
-msgstr ""
+msgid "If checked, you will receive an email notification when the query completes."
+msgstr "チェックすると、クエリの完了が電子メールで通知されます。"
 
 #: src/impala/templates/execute.mako:191
 msgid "Email me on completion"
-msgstr ""
+msgstr "完了時に電子メールで通知"
 
 #: src/impala/templates/execute.mako:202
 msgid "Your query has the following error(s):"
-msgstr ""
+msgstr "このクエリには次のエラーがあります："
 
 #: src/impala/templates/execute.mako:205
 msgid "click the"
-msgstr ""
+msgstr "詳細については"
 
 #: src/impala/templates/execute.mako:205 src/impala/templates/execute.mako:223
 #, fuzzy
 msgid "Error Log"
-msgstr "サーバーログ"
+msgstr "次の [エラーログ] タブを"
 
 #: src/impala/templates/execute.mako:205
 msgid "tab below for details"
-msgstr ""
+msgstr "クリックしてください"
 
 #: src/impala/templates/execute.mako:256
 msgid "Choose a file"
-msgstr ""
+msgstr "ファイルを選択"
 
 #: src/impala/templates/execute.mako:269
 msgid "Choose a name"
-msgstr ""
+msgstr "名前を選択"
 
 #: src/impala/templates/execute.mako:274
 msgid "Name"
-msgstr ""
+msgstr "名前"
 
 #: src/impala/templates/execute.mako:280
 msgid "Description"
-msgstr ""
+msgstr "説明"
 
 #: src/impala/templates/execute.mako:288
 msgid "Cancel"
-msgstr ""
+msgstr "キャンセル"
 
 #: src/impala/templates/layout.mako:35
 msgid "My Queries"
-msgstr ""
+msgstr "マイクエリ"
 
 #: src/impala/templates/layout.mako:36
 msgid "Saved Queries"
-msgstr ""
+msgstr "保存したクエリ"
 
 #: src/impala/templates/layout.mako:37
 msgid "History"
-msgstr ""
+msgstr "履歴"
 
 #: src/impala/templates/layout.mako:38
 msgid "Tables"
-msgstr ""
+msgstr "テーブル"
 
 #: src/impala/templates/layout.mako:39
 msgid "Settings"
-msgstr ""
+msgstr "設定"
 
 #~ msgid "About Hue"
 #~ msgstr "Hue のバージョン情報"
-
 #~ msgid "Configuration"
 #~ msgstr "設定"
-
 #~ msgid "Check for misconfiguration"
 #~ msgstr "誤設定がないか確認します"
-

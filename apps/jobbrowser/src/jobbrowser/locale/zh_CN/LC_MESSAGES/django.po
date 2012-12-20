@@ -18,40 +18,38 @@ msgstr ""
 "Generated-By: Babel 0.9.6\n"
 
 #: src/jobbrowser/conf.py:26
-msgid ""
-"Share submitted jobs information with all users. If set to false, "
-"submitted jobs are visible only to the owner and administrators."
+msgid "Share submitted jobs information with all users. If set to false, submitted jobs are visible only to the owner and administrators."
 msgstr "与所有用户共享提交的作业信息。如果设置为 false，提交的作业仅对所有者和管理员可见。"
 
 #: src/jobbrowser/models.py:87
 #, fuzzy, python-format
 msgid "Could not find job with id %(jobid)s."
-msgstr "找不到 ID 为 %(jobid)s 的作业"
+msgstr "找不到 ID 为 %(jobid)s 的作业。"
 
 #: src/jobbrowser/models.py:421
 #, fuzzy, python-format
 msgid "Cannot look up TaskTracker %(id)s."
-msgstr "无法查找任务跟踪器 %(id)s"
+msgstr "无法查找 TaskTracker %(id)s。"
 
 #: src/jobbrowser/models.py:445
 #, fuzzy, python-format
 msgid "Cannot retrieve logs from TaskTracker %(id)s."
-msgstr "无法从任务跟踪器 %(id)s 检索日志"
+msgstr "无法从 TaskTracker %(id)s 检索日志。"
 
 #: src/jobbrowser/models.py:452
 #, fuzzy, python-format
 msgid "Hue encountered an error while retrieving logs from '%s'."
-msgstr "Hue 在从 '%s' 检索日志期间遇到错误"
+msgstr "Hue 在从 '%s' 检索日志期间遇到错误。"
 
 #: src/jobbrowser/views.py:61
 #, fuzzy, python-format
 msgid "You don't have the permissions to access job %(id)s."
-msgstr "您没有访问作业 %(id)s 的权限"
+msgstr "您没有访问作业 %(id)s 的权限。"
 
 #: src/jobbrowser/views.py:139
 #, fuzzy, python-format
 msgid "kill_job may only be invoked with a POST (got a %(method)s)."
-msgstr "只能使用 POST（得到一个 %(method)s）调用 kill_job"
+msgstr "只能使用 POST（得到一个 %(method)s）调用 kill_job。"
 
 #: src/jobbrowser/views.py:142
 msgid "Insufficient permission"
@@ -69,7 +67,7 @@ msgstr "作业未出现，因为将在 15 秒内被停止"
 #: src/jobbrowser/views.py:184
 #, python-format
 msgid "No tasks found for job %(id)s"
-msgstr ""
+msgstr "未找到作业 %(id)s 的任务"
 
 #: src/jobbrowser/views.py:265 src/jobbrowser/views.py:285
 #, python-format
@@ -257,7 +255,7 @@ msgstr "用户"
 
 #: src/jobbrowser/templates/job.mako:103
 msgid "View logs"
-msgstr ""
+msgstr "查看日志"
 
 #: src/jobbrowser/templates/job.mako:105
 msgid "Kill Job"
@@ -373,7 +371,7 @@ msgstr "作业浏览器"
 
 #: src/jobbrowser/templates/jobs.mako:37
 msgid "Job status:"
-msgstr ""
+msgstr "作业状态："
 
 #: src/jobbrowser/templates/jobs.mako:39
 msgid "All States"
@@ -397,16 +395,16 @@ msgstr "已停止"
 
 #: src/jobbrowser/templates/jobs.mako:53
 msgid "Show retired jobs"
-msgstr ""
+msgstr "显示已注销的作业"
 
 #: src/jobbrowser/templates/jobs.mako:58
 msgid "Text:"
-msgstr ""
+msgstr "文本："
 
 #: src/jobbrowser/templates/jobs.mako:62
 #, fuzzy
 msgid "Username:"
-msgstr "计数器名称"
+msgstr "用户名："
 
 #: src/jobbrowser/templates/jobs.mako:63
 msgid "User Name Filter"
@@ -432,7 +430,7 @@ msgstr "日期"
 #: src/jobbrowser/templates/jobs.mako:111
 #, python-format
 msgid "Show only %(status)s jobs"
-msgstr "仅显示 %(status)s 作业"
+msgstr "仅显示 %(status)s 任务"
 
 #: src/jobbrowser/templates/jobs.mako:115
 #: src/jobbrowser/templates/jobs.mako:122
@@ -462,19 +460,19 @@ msgstr "启动 Beeswax"
 
 #: src/jobbrowser/templates/jobs.mako:171
 msgid "Please Confirm"
-msgstr ""
+msgstr "请确认"
 
 #: src/jobbrowser/templates/jobs.mako:174
 msgid "Are you sure you want to kill this job?"
-msgstr ""
+msgstr "是否确定停止作业？"
 
 #: src/jobbrowser/templates/jobs.mako:178
 msgid "No"
-msgstr ""
+msgstr "否"
 
 #: src/jobbrowser/templates/jobs.mako:179
 msgid "Yes"
-msgstr ""
+msgstr "是"
 
 #: src/jobbrowser/templates/task.mako:22 src/jobbrowser/templates/task.mako:25
 #, python-format
@@ -596,7 +594,7 @@ msgstr "仅显示 %(state)s 任务"
 #: src/jobbrowser/templates/tasktracker.mako:22
 #, python-format
 msgid "Tracker: %(trackerId)s - Job Browser"
-msgstr "跟踪器：%(trackerId)s - 作业浏览器"
+msgstr "追踪器：%(trackerId)s - 作业浏览器"
 
 #: src/jobbrowser/templates/tasktracker.mako:24
 #, python-format

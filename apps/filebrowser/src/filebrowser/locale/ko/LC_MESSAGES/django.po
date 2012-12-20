@@ -61,12 +61,12 @@ msgstr "업로드할 파일 이름 또는 디렉토리입니다."
 #: src/filebrowser/forms.py:90
 #, fuzzy
 msgid "Archive to Upload"
-msgstr "업로드할 파일"
+msgstr "업로드할 아카이브"
 
 #: src/filebrowser/forms.py:91
 #, fuzzy
 msgid "Archive to upload to."
-msgstr "업로드할 파일"
+msgstr "업로드할 아카이브입니다."
 
 #: src/filebrowser/forms.py:95
 msgid "File to remove"
@@ -92,13 +92,13 @@ msgstr "디렉토리 이름"
 #: src/filebrowser/forms.py:117
 #, fuzzy
 msgid "Path in which to create the file"
-msgstr "디렉토리 생성 경로"
+msgstr "파일 생성 경로"
 
 #: src/filebrowser/forms.py:118
 #: src/filebrowser/templates/listdir_components.mako:359
 #, fuzzy
 msgid "File Name"
-msgstr "새 이름"
+msgstr "파일 이름"
 
 #: src/filebrowser/forms.py:122
 msgid "Path to change user/group ownership"
@@ -113,7 +113,7 @@ msgstr "사용자"
 
 #: src/filebrowser/forms.py:126
 msgid "OtherUser"
-msgstr ""
+msgstr "다른 사용자"
 
 #: src/filebrowser/forms.py:127 src/filebrowser/templates/display.mako:79
 #: src/filebrowser/templates/listdir_components.mako:73
@@ -124,13 +124,13 @@ msgstr "그룹"
 
 #: src/filebrowser/forms.py:128
 msgid "OtherGroup"
-msgstr ""
+msgstr "다른 그룹"
 
 #: src/filebrowser/forms.py:129
 #: src/filebrowser/templates/listdir_components.mako:193
 #: src/filebrowser/templates/listdir_components.mako:257
 msgid "Recursive"
-msgstr ""
+msgstr "재귀"
 
 #: src/filebrowser/forms.py:144
 msgid "Path to change permissions"
@@ -154,9 +154,7 @@ msgstr "액세스할 수 없음: %(path)s"
 
 #: src/filebrowser/views.py:145 src/filebrowser/views.py:884
 #, python-format
-msgid ""
-" Note: you are a Hue admin but not a HDFS superuser (which is "
-"\"%(superuser)s\")."
+msgid " Note: you are a Hue admin but not a HDFS superuser (which is \"%(superuser)s\")."
 msgstr " 참고: 귀하는 Hue 관리자이나 HDFS superuser(\"%(superuser)s\")는 아닙니다."
 
 #: src/filebrowser/views.py:171
@@ -256,69 +254,65 @@ msgstr "작업을 수행할 수 없습니다."
 
 #: src/filebrowser/views.py:917
 #, python-format
-msgid ""
-"Could not rename folder \"%s\" to \"%s\": Hashes are not allowed in "
-"filenames."
-msgstr ""
+msgid "Could not rename folder \"%s\" to \"%s\": Hashes are not allowed in filenames."
+msgstr "폴더 이름을 \"%s\"에서 \"%s\"(으)로 바꿀 수 없습니다. 파일 이름에 해시를 사용할 수 없습니다."
 
 #: src/filebrowser/views.py:931
 #, python-format
-msgid ""
-"Could not name folder \"%s\": Slashes or hashes are not allowed in "
-"filenames."
-msgstr ""
+msgid "Could not name folder \"%s\": Slashes or hashes are not allowed in filenames."
+msgstr "폴더 이름 \"%s\"을(를) 지정할 수 없습니다. 파일 이름에 슬래시 또는 해시를 사용할 수 없습니다."
 
 #: src/filebrowser/views.py:941
 #, python-format
 msgid "Could not name file \"%s\": Slashes are not allowed in filenames."
-msgstr ""
+msgstr "파일 이름 \"%s\"을(를) 지정할 수 없습니다. 파일 이름에 슬래시를 사용할 수 없습니다."
 
 #: src/filebrowser/views.py:1034 src/filebrowser/views.py:1111
 #, fuzzy
 msgid "A POST request is required."
-msgstr "사용자를 입력하십시오."
+msgstr "POST 요청이 필요합니다."
 
 #: src/filebrowser/views.py:1037 src/filebrowser/views.py:1114
 #, python-format
 msgid "%(destination)s upload succeeded"
-msgstr ""
+msgstr "%(destination)s 업로드 완료"
 
 #: src/filebrowser/views.py:1039 src/filebrowser/views.py:1116
 #, fuzzy, python-format
 msgid "Upload failed: %(data)s"
-msgstr "파일이 아님: '%(data)s'"
+msgstr "업로드 실패: %(data)s"
 
 #: src/filebrowser/views.py:1055 src/filebrowser/views.py:1134
 #, python-format
 msgid "Sorry, no \"%(sep)s\" in the filename %(name)s.sep"
-msgstr ""
+msgstr "파일 이름 %(name)s.sep에 \"%(sep)s\"이(가) 없습니다."
 
 #: src/filebrowser/views.py:1075 src/filebrowser/views.py:1158
 #, python-format
 msgid "Destination %(name)s already exists.name"
-msgstr ""
+msgstr "대상 %(name)s이(가) 이미 존재합니다."
 
 #: src/filebrowser/views.py:1077 src/filebrowser/views.py:1160
 #, python-format
 msgid "Copy to \"%(name)s failed: %(error)s"
-msgstr ""
+msgstr "\"%(name)s에 복사할 수 없습니다: %(error)s"
 
 #: src/filebrowser/views.py:1087 src/filebrowser/views.py:1170
 #, python-format
 msgid "Error in upload form: %s"
-msgstr ""
+msgstr "업로드 양식 %s에 오류 발생"
 
 #: src/filebrowser/views.py:1143
 msgid "Could not extract contents of file."
-msgstr ""
+msgstr "파일의 내용을 추출할 수 없습니다."
 
 #: src/filebrowser/views.py:1149
 msgid "Could not interpret archive type."
-msgstr ""
+msgstr "아카이브 유형을 해석할 수 없습니다."
 
 #: src/filebrowser/lib/archives.py:40
 msgid "Must implement 'extract' method."
-msgstr ""
+msgstr "'extract' 메서드를 구현해야 합니다."
 
 #: src/filebrowser/templates/display.mako:31
 #: src/filebrowser/templates/edit.mako:29
@@ -421,7 +415,7 @@ msgstr "파일을 저장할 위치를 입력하십시오."
 #: src/filebrowser/templates/listdir_components.mako:289
 #, fuzzy
 msgid "Name is required."
-msgstr "이름을 입력하십시오."
+msgstr "이름을 입력해야 합니다."
 
 #: src/filebrowser/templates/edit.mako:81
 #: src/filebrowser/templates/listdir_components.mako:168
@@ -442,7 +436,7 @@ msgstr "홈"
 
 #: src/filebrowser/templates/fb_components.mako:25
 msgid "Edit path"
-msgstr ""
+msgstr "경로 편집"
 
 #: src/filebrowser/templates/fileop.mako:26
 msgid "File Operation"
@@ -459,7 +453,7 @@ msgstr "파일 이름 검색"
 
 #: src/filebrowser/templates/listdir.mako:37
 msgid "Rename"
-msgstr "이름 바꾸기"
+msgstr "이름 변경"
 
 #: src/filebrowser/templates/listdir.mako:38
 msgid "Move"
@@ -481,34 +475,34 @@ msgstr "삭제"
 #: src/filebrowser/templates/listdir.mako:48
 #: src/filebrowser/templates/listdir.mako:49
 msgid "Upload"
-msgstr ""
+msgstr "업로드"
 
 #: src/filebrowser/templates/listdir.mako:53
 msgid "Files"
-msgstr ""
+msgstr "파일"
 
 #: src/filebrowser/templates/listdir.mako:54
 #, fuzzy
 msgid "Archive"
-msgstr "검색"
+msgstr "아카이브"
 
 #: src/filebrowser/templates/listdir.mako:54
 msgid "Archives"
-msgstr ""
+msgstr "아카이브"
 
 #: src/filebrowser/templates/listdir.mako:59
 msgid "New"
-msgstr ""
+msgstr "새로 만들기"
 
 #: src/filebrowser/templates/listdir.mako:63
 #, fuzzy
 msgid "File"
-msgstr "실패함"
+msgstr "파일"
 
 #: src/filebrowser/templates/listdir.mako:64
 #, fuzzy
 msgid "Directory"
-msgstr "새 디렉토리"
+msgstr "디렉토리"
 
 #: src/filebrowser/templates/listdir_components.mako:70
 msgid "Name"
@@ -552,25 +546,25 @@ msgstr "페이지당 항목 수"
 
 #: src/filebrowser/templates/listdir_components.mako:131
 msgid "Showing"
-msgstr ""
+msgstr "표시"
 
 #: src/filebrowser/templates/listdir_components.mako:131
 msgid "to"
-msgstr ""
+msgstr "->"
 
 #: src/filebrowser/templates/listdir_components.mako:131
 #: src/filebrowser/templates/listdir_components.mako:132
 msgid "of"
-msgstr ""
+msgstr "/"
 
 #: src/filebrowser/templates/listdir_components.mako:131
 #, fuzzy
 msgid "items, page"
-msgstr "페이지당 항목 수"
+msgstr "항목, 페이지"
 
 #: src/filebrowser/templates/listdir_components.mako:139
 msgid "Confirm Delete"
-msgstr ""
+msgstr "삭제 확인"
 
 #: src/filebrowser/templates/listdir_components.mako:142
 #, fuzzy
@@ -600,10 +594,8 @@ msgstr "제출"
 
 #: src/filebrowser/templates/listdir_components.mako:186
 #, python-format
-msgid ""
-"Note: Only the Hadoop superuser, \"%(superuser)s\" on this file system, "
-"may change the owner of a file."
-msgstr "참고: Hadoop superuser 즉, 이 시스템 파일의 \"%(superuser)s\"만이 파일의 소유자를 변경할 수 있습니다."
+msgid "Note: Only the Hadoop superuser, \"%(superuser)s\" on this file system, may change the owner of a file."
+msgstr "참고: 이 파일 시스템의 Hadoop superuser \"%(superuser)s\"만 파일의 소유자를 변경할 수 있습니다."
 
 #: src/filebrowser/templates/listdir_components.mako:214
 msgid "Change Permissions:"
@@ -627,7 +619,7 @@ msgstr "실행"
 
 #: src/filebrowser/templates/listdir_components.mako:251
 msgid "Sticky"
-msgstr ""
+msgstr "Sticky"
 
 #: src/filebrowser/templates/listdir_components.mako:276
 msgid "Move:"
@@ -636,7 +628,7 @@ msgstr "이동:"
 #: src/filebrowser/templates/listdir_components.mako:280
 #, fuzzy
 msgid "Destination"
-msgstr "대상 경로"
+msgstr "대상"
 
 #: src/filebrowser/templates/listdir_components.mako:301
 #: src/filebrowser/templates/listdir_components.mako:317
@@ -651,7 +643,7 @@ msgstr "파일 업로더를 사용할 수 있도록 JavaScript를 활성화하�
 
 #: src/filebrowser/templates/listdir_components.mako:318
 msgid "The file will then be extracted in the path specified above."
-msgstr ""
+msgstr "그 다음 위에 지정된 경로에서 파일이 추출됩니다."
 
 #: src/filebrowser/templates/listdir_components.mako:335
 msgid "Create Directory"
@@ -665,41 +657,41 @@ msgstr "디렉토리 이름을 입력해야 합니다."
 #: src/filebrowser/templates/listdir_components.mako:356
 #, fuzzy
 msgid "Create File"
-msgstr "다음으로 파일 이름 변경:"
+msgstr "파일 생성"
 
 #: src/filebrowser/templates/listdir_components.mako:364
 #, fuzzy
 msgid "File name is required."
-msgstr "이름을 입력하십시오."
+msgstr "파일 이름을 입력해야 합니다."
 
 #: src/filebrowser/templates/listdir_components.mako:434
 #, fuzzy
 msgid "User is required."
-msgstr "사용자를 입력하십시오."
+msgstr "사용자를 입력해야 합니다."
 
 #: src/filebrowser/templates/listdir_components.mako:439
 #, fuzzy
 msgid "Group is required."
-msgstr "그룹을 입력하십시오."
+msgstr "그룹을 입력해야 합니다."
 
 #: src/filebrowser/templates/listdir_components.mako:445
 #, fuzzy
 msgid "Specify another group."
-msgstr "다른 그룹을 지정해야 합니다."
+msgstr "다른 그룹을 지정하십시오."
 
 #: src/filebrowser/templates/listdir_components.mako:451
 #, fuzzy
 msgid "Specify another user."
-msgstr "다른 사용자를 지정해야 합니다."
+msgstr "다른 사용자를 지정하십시오."
 
 #: src/filebrowser/templates/listdir_components.mako:593
 msgid "There was a problem with your request."
-msgstr ""
+msgstr "요청에 문제가 있습니다."
 
 #: src/filebrowser/templates/listdir_components.mako:923
 #: src/filebrowser/templates/listdir_components.mako:971
 msgid "Drop files here to upload"
-msgstr "업로드할 파일을 여기에 놓으십시오."
+msgstr "업로드할 파일 여기 두기"
 
 #: src/filebrowser/templates/listdir_components.mako:924
 msgid "Upload a file"
@@ -713,22 +705,18 @@ msgstr "실패함"
 #: src/filebrowser/templates/listdir_components.mako:972
 #, fuzzy
 msgid "Upload an archive"
-msgstr "파일 업로드"
+msgstr "아카이브 업로드"
 
 #~ msgid ""
 #~ "Sorry, could not name folder \"%s\": "
 #~ "Slashes are not allowed in filenames."
 #~ msgstr ""
-
 #~ msgid "%(destination)s upload succeded"
 #~ msgstr ""
-
 #~ msgid "Change Owner / Group:"
 #~ msgstr "소유자/그룹 변경:"
-
 #~ msgid "Upload files"
 #~ msgstr "파일 업로드"
-
 #~ msgid ""
 #~ "Showing %(start_index)s to %(end_index)s of"
 #~ " %(total_count)s items, page %(page)s of"
@@ -737,28 +725,19 @@ msgstr "파일 업로드"
 #~ "%(page)s / %(num_pages)s 페이지, %(total_count)s개"
 #~ " 항목 중 %(start_index)s ~ %(end_index)s을(를)"
 #~ " 표시합니다."
-
 #~ msgid "Type"
 #~ msgstr ""
-
 #~ msgid "Path"
 #~ msgstr "경로"
-
 #~ msgid "Operations"
 #~ msgstr "작업"
-
 #~ msgid "View File"
 #~ msgstr "파일 보기"
-
 #~ msgid "Download File"
 #~ msgstr "파일 다운로드"
-
 #~ msgid "Delete Recursively"
 #~ msgstr "반복 삭제"
-
 #~ msgid "There are no files matching the search criteria."
 #~ msgstr ""
-
 #~ msgid "Please Confirm"
 #~ msgstr "확인하십시오."
-

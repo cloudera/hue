@@ -18,43 +18,38 @@ msgstr ""
 "Generated-By: Babel 0.9.6\n"
 
 #: src/jobbrowser/conf.py:26
-msgid ""
-"Share submitted jobs information with all users. If set to false, "
-"submitted jobs are visible only to the owner and administrators."
-msgstr ""
-"Compartir información de trabajos enviados con todos los usuarios. Si se "
-"establece en false, los trabajos enviados solo están visibles para el "
-"propietario y los administradores."
+msgid "Share submitted jobs information with all users. If set to false, submitted jobs are visible only to the owner and administrators."
+msgstr "Compartir información de trabajos enviados con todos los usuarios. Si se establece en false, los trabajos enviados solo están visibles para el propietario y los administradores."
 
 #: src/jobbrowser/models.py:87
 #, fuzzy, python-format
 msgid "Could not find job with id %(jobid)s."
-msgstr "No se ha encontrado el trabajo con el ID %(jobid)s"
+msgstr "No se ha encontrado el trabajo con el ID %(jobid)s."
 
 #: src/jobbrowser/models.py:421
 #, fuzzy, python-format
 msgid "Cannot look up TaskTracker %(id)s."
-msgstr "No se puede buscar TaskTracker %(id)s"
+msgstr "No se puede buscar TaskTracker %(id)s."
 
 #: src/jobbrowser/models.py:445
 #, fuzzy, python-format
 msgid "Cannot retrieve logs from TaskTracker %(id)s."
-msgstr "No se pueden recuperar registros de TaskTracker %(id)s"
+msgstr "No se pueden recuperar registros de TaskTracker %(id)s."
 
 #: src/jobbrowser/models.py:452
 #, fuzzy, python-format
 msgid "Hue encountered an error while retrieving logs from '%s'."
-msgstr "Hue ha encontrado un error al recuperar los registros de '%s'"
+msgstr "Hue ha encontrado un error al recuperar los registros de '%s'."
 
 #: src/jobbrowser/views.py:61
 #, fuzzy, python-format
 msgid "You don't have the permissions to access job %(id)s."
-msgstr "No tiene los permisos para acceder al trabajo %(id)s"
+msgstr "No tiene los permisos para acceder al trabajo %(id)s."
 
 #: src/jobbrowser/views.py:139
 #, fuzzy, python-format
 msgid "kill_job may only be invoked with a POST (got a %(method)s)."
-msgstr "kill_job solo se puede llamar con POST (se ha obtenido %(method)s)"
+msgstr "kill_job solo se puede llamar con POST (se ha obtenido %(method)s)."
 
 #: src/jobbrowser/views.py:142
 msgid "Insufficient permission"
@@ -63,9 +58,7 @@ msgstr "Permiso insuficiente"
 #: src/jobbrowser/views.py:143
 #, python-format
 msgid "Permission denied.  User %(username)s cannot delete user %(user)s's job."
-msgstr ""
-"Permiso denegado. El usuario %(username)s no puede eliminar el trabajo "
-"del usuario %(user)s."
+msgstr "Permiso denegado. El usuario %(username)s no puede eliminar el trabajo del usuario %(user)s."
 
 #: src/jobbrowser/views.py:159
 msgid "Job did not appear as killed within 15 seconds"
@@ -74,7 +67,7 @@ msgstr "El trabajo no ha aparecido como eliminado en 15 segundos"
 #: src/jobbrowser/views.py:184
 #, python-format
 msgid "No tasks found for job %(id)s"
-msgstr ""
+msgstr "No se ha encontrado ninguna tarea para el trabajo %(id)s"
 
 #: src/jobbrowser/views.py:265 src/jobbrowser/views.py:285
 #, python-format
@@ -262,7 +255,7 @@ msgstr "Usuario"
 
 #: src/jobbrowser/templates/job.mako:103
 msgid "View logs"
-msgstr ""
+msgstr "Ver registros"
 
 #: src/jobbrowser/templates/job.mako:105
 msgid "Kill Job"
@@ -369,7 +362,7 @@ msgstr "Total"
 #: src/jobbrowser/templates/jobbrowser_components.mako:112
 #, fuzzy
 msgid "Retired"
-msgstr "retirado"
+msgstr "Retirado"
 
 #: src/jobbrowser/templates/jobs.mako:32 src/jobbrowser/templates/jobs.mako:34
 #: src/jobbrowser/templates/jobs.mako:153
@@ -378,7 +371,7 @@ msgstr "Job Browser"
 
 #: src/jobbrowser/templates/jobs.mako:37
 msgid "Job status:"
-msgstr ""
+msgstr "Estado del trabajo:"
 
 #: src/jobbrowser/templates/jobs.mako:39
 msgid "All States"
@@ -402,16 +395,16 @@ msgstr "Eliminados"
 
 #: src/jobbrowser/templates/jobs.mako:53
 msgid "Show retired jobs"
-msgstr ""
+msgstr "Mostrar trabajos retirados"
 
 #: src/jobbrowser/templates/jobs.mako:58
 msgid "Text:"
-msgstr ""
+msgstr "Texto:"
 
 #: src/jobbrowser/templates/jobs.mako:62
 #, fuzzy
 msgid "Username:"
-msgstr "Nombre de contador"
+msgstr "Nombre de usuario:"
 
 #: src/jobbrowser/templates/jobs.mako:63
 msgid "User Name Filter"
@@ -437,7 +430,7 @@ msgstr "Fecha"
 #: src/jobbrowser/templates/jobs.mako:111
 #, python-format
 msgid "Show only %(status)s jobs"
-msgstr "Mostrar solo trabajos %(status)s"
+msgstr "Mostrar solo %(status)s trabajos"
 
 #: src/jobbrowser/templates/jobs.mako:115
 #: src/jobbrowser/templates/jobs.mako:122
@@ -467,19 +460,19 @@ msgstr "Lanzar Beeswax"
 
 #: src/jobbrowser/templates/jobs.mako:171
 msgid "Please Confirm"
-msgstr ""
+msgstr "Confirme"
 
 #: src/jobbrowser/templates/jobs.mako:174
 msgid "Are you sure you want to kill this job?"
-msgstr ""
+msgstr "¿Está seguro de que desea eliminar este trabajo?"
 
 #: src/jobbrowser/templates/jobs.mako:178
 msgid "No"
-msgstr ""
+msgstr "No"
 
 #: src/jobbrowser/templates/jobs.mako:179
 msgid "Yes"
-msgstr ""
+msgstr "Sí"
 
 #: src/jobbrowser/templates/task.mako:22 src/jobbrowser/templates/task.mako:25
 #, python-format
@@ -650,7 +643,7 @@ msgstr "Tareas reduce máximas:"
 
 #: src/jobbrowser/templates/tasktrackers.mako:21
 msgid "Task Trackers - Job Browser"
-msgstr "TaskTrackers: Job Browser"
+msgstr "Task Trackers: Job Browser"
 
 #: src/jobbrowser/templates/tasktrackers.mako:27
 msgid "Host"

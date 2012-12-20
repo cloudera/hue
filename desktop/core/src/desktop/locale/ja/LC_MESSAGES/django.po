@@ -23,9 +23,7 @@ msgid "load_apps has already been called."
 msgstr "load_apps はすでに呼び出されています。"
 
 #: src/desktop/conf.py:32
-msgid ""
-"If set to true, CherryPy will be used. Otherwise, Spawning will be used "
-"as the webserver."
+msgid "If set to true, CherryPy will be used. Otherwise, Spawning will be used as the webserver."
 msgstr "true に設定すると CherryPy が使用されます。false に設定すると、Spawning が Web サーバーとして使用されます。"
 
 #: src/desktop/conf.py:38
@@ -47,12 +45,8 @@ msgid "Filename of SSL RSA Private Key"
 msgstr "SSL RSA 秘密鍵のファイル名"
 
 #: src/desktop/conf.py:56
-msgid ""
-"If set to false, runcpserver will not actually start the web server.  "
-"Used if Apache is being used as a WSGI container."
-msgstr ""
-"false に設定すると、runcpserver からは Web サーバーが起動しなくなります。WSGI コンテナとして Apache "
-"を使用している場合に使用されます。"
+msgid "If set to false, runcpserver will not actually start the web server.  Used if Apache is being used as a WSGI container."
+msgstr "false に設定すると、runcpserver からは Web サーバーが起動しなくなります。WSGI コンテナとして Apache を使用している場合に使用されます。"
 
 #: src/desktop/conf.py:61
 msgid "Number of threads used by the CherryPy web server."
@@ -77,17 +71,17 @@ msgstr "電子メール通知配信用の SMTP サーバーです。"
 #: src/desktop/conf.py:107
 #, fuzzy
 msgid "The SMTP server port."
-msgstr "SMTP サーバーのポート"
+msgstr "SMTP サーバーのポートです。"
 
 #: src/desktop/conf.py:114
 #, fuzzy
 msgid "The username for the SMTP host."
-msgstr "SMTP ホストのユーザー名"
+msgstr "SMTP ホストのユーザー名です。"
 
 #: src/desktop/conf.py:121
 #, fuzzy
 msgid "The password for the SMTP user."
-msgstr "バインドユーザーのパスワードです。"
+msgstr "SMTP ユーザーのパスワードです。"
 
 #: src/desktop/conf.py:128
 msgid "Whether to use a TLS (secure) connection when talking to the SMTP server."
@@ -99,15 +93,10 @@ msgstr "Hue からのさまざまな自動通知で使用するデフォルト�
 
 #: src/desktop/conf.py:144
 #, fuzzy
-msgid ""
-"Configuration options for specifying the Desktop Database.\n"
-"          For more info, see "
-"http://docs.djangoproject.com/en/1.1/ref/settings/#database-engine"
-msgstr ""
-"Desktop Database.を指定する設定オプション\n"
-"\"\n"
-"\"          詳細については、http://docs.djangoproject.com/en/1.1/ref/settings"
-"/#database-engine を確認してください。"
+msgid "Configuration options for specifying the Desktop Database.\n"
+"          For more info, see http://docs.djangoproject.com/en/1.1/ref/settings/#database-engine"
+msgstr "Desktop Database.を指定する設定オプション\n"
+"          詳細については、http://docs.djangoproject.com/en/1.1/ref/settings/#database-engine を確認してください。"
 
 #: src/desktop/conf.py:149
 msgid "Database engine, such as postgresql, mysql, sqlite3, or Oracle."
@@ -120,32 +109,29 @@ msgstr "データベース名。splite3 を使用している場合は DB への
 #: src/desktop/conf.py:161
 #, fuzzy
 msgid "Database username."
-msgstr "データベースのユーザー名"
+msgstr "データベースのユーザー名です。"
 
 #: src/desktop/conf.py:167
 #, fuzzy
 msgid "Database password."
-msgstr "データベースのパスワード"
+msgstr "データベースのパスワードです。"
 
 #: src/desktop/conf.py:173
 #, fuzzy
 msgid "Database host."
-msgstr "データベースのホスト"
+msgstr "データベースのホストです。"
 
 #: src/desktop/conf.py:179
 #, fuzzy
 msgid "Database port."
-msgstr "データベースのポート"
+msgstr "データベースのポートです。"
 
 #: src/desktop/conf.py:188
 #, fuzzy
-msgid ""
-"Configuration options for specifying Hue's Kerberos integration for\n"
+msgid "Configuration options for specifying Hue's Kerberos integration for\n"
 "          secured Hadoop clusters."
-msgstr ""
-"セキュアな Hadoop クラスタに向けて Hue の Kerberos 統合を指定する\n"
-"\"\n"
-"\"          設定オプションです。"
+msgstr "セキュアな Hadoop クラスタに向けて Hue の Kerberos 統合を指定する\n"
+"          設定オプションです。"
 
 #: src/desktop/conf.py:193
 msgid "Path to a Kerberos keytab file containing Hue's service credentials."
@@ -162,17 +148,17 @@ msgstr "Hue がその keytab を更新する時間間隔です（単位は秒）
 #: src/desktop/conf.py:208
 #, fuzzy
 msgid "Path to keep Kerberos credentials cached."
-msgstr "キャッシュされている Kerberos 資格情報を維持するパス"
+msgstr "キャッシュされている Kerberos 資格情報を維持するパスです。"
 
 #: src/desktop/conf.py:215
 #, fuzzy
 msgid "Path to Kerberos 'kinit' command."
-msgstr "Kerberos の 'kinit' コマンドへのパス"
+msgstr "Kerberos の 'kinit' コマンドへのパスです。"
 
 #: src/desktop/conf.py:225
 #, fuzzy
 msgid "Time zone name."
-msgstr "タイムゾーン名"
+msgstr "タイムゾーン名です。"
 
 #: src/desktop/conf.py:232
 msgid "Default system-wide unicode encoding."
@@ -181,65 +167,45 @@ msgstr "システム規模でのデフォルトの Unicode エンコードです
 #: src/desktop/conf.py:239
 #, fuzzy
 msgid "Username to run servers as."
-msgstr "サーバーを実行するユーザー名"
+msgstr "サーバーを実行するユーザー名です。"
 
 #: src/desktop/conf.py:244
 #, fuzzy
 msgid "Group to run servers as."
-msgstr "サーバーを実行するグループ"
+msgstr "サーバーを実行するグループです。"
 
 #: src/desktop/conf.py:251
 msgid "Customizations to the UI."
-msgstr ""
+msgstr "UI のカスタマイズです。"
 
 #: src/desktop/conf.py:255
-msgid ""
-"Top banner HTML code. This code will be placed in the navigation bar so "
-"that it will reside at the top of the page in a fixed position. One "
-"common value is `<img src=\"http://www.example.com/example.gif\" />`"
-msgstr ""
+msgid "Top banner HTML code. This code will be placed in the navigation bar so that it will reside at the top of the page in a fixed position. One common value is `<img src=\"http://www.example.com/example.gif\" />`"
+msgstr "トップバナー HTML コードです。このコードはナビゲーションバーに配置され、ページ上部の固定位置に常駐するようになります。共通値の 1 つは `<img src=\"http://www.example.com/example.gif\" />` です。"
 
 #: src/desktop/conf.py:262
 msgid "Configuration options for user authentication into the web application."
 msgstr "Web アプリケーションに対するユーザー認証の設定オプションです。"
 
 #: src/desktop/conf.py:266
-msgid ""
-"Authentication backend.  Common settings are "
-"django.contrib.auth.backends.ModelBackend (fully Django backend), "
-"desktop.auth.backend.AllowAllBackend (allows everyone), "
-"desktop.auth.backend.AllowFirstUserDjangoBackend (relies on Django and "
-"user manager, after the first login). "
-msgstr ""
-"認証バックエンド。多く使用される設定は、django.contrib.auth.backends.ModelBackend（全面的に Django"
-" "
-"バックエンド）、desktop.auth.backend.AllowAllBackend（全員を許可）、desktop.auth.backend.AllowFirstUserDjangoBackend（最初のログイン以降は"
-" Django およびユーザーマネージャを使用）です。 "
+msgid "Authentication backend.  Common settings are django.contrib.auth.backends.ModelBackend (fully Django backend), desktop.auth.backend.AllowAllBackend (allows everyone), desktop.auth.backend.AllowFirstUserDjangoBackend (relies on Django and user manager, after the first login). "
+msgstr "認証バックエンド。多く使用される設定は、django.contrib.auth.backends.ModelBackend（全面的に Django バックエンド）、desktop.auth.backend.AllowAllBackend（全員を許可）、desktop.auth.backend.AllowFirstUserDjangoBackend（最初のログイン以降は Django およびユーザーマネージャを使用）です。 "
 
 #: src/desktop/conf.py:272
 msgid "Class which defines extra accessor methods for User objects."
 msgstr "User オブジェクトに対する余計なアクセサメソッドを定義するクラスです。"
 
 #: src/desktop/conf.py:275
-msgid ""
-"The service to use when querying PAM. The service usually corresponds to "
-"a single filename in /etc/pam.d"
-msgstr ""
+msgid "The service to use when querying PAM. The service usually corresponds to a single filename in /etc/pam.d"
+msgstr "PAM をクエリする際に使用するサービスです。このサービスは、/etc/pam.d 内の単一のファイル名に通常は対応します。"
 
 #: src/desktop/conf.py:279
-msgid ""
-"When using the desktop.auth.backend.RemoteUserDjangoBackend, this sets "
-"the normalized name of the header that contains the remote user. The HTTP"
-" header in the request is converted to a key by converting all characters"
-" to uppercase, replacing any hyphens with underscores and adding an HTTP_"
-" prefix to the name. So, for example, if the header is called Remote-User"
-" that would be configured as HTTP_REMOTE_USER"
-msgstr ""
+msgid "When using the desktop.auth.backend.RemoteUserDjangoBackend, this sets the normalized name of the header that contains the remote user. The HTTP header in the request is converted to a key by converting all characters to uppercase, replacing any hyphens with underscores and adding an HTTP_ prefix to the name. So, for example, if the header is called Remote-User that would be configured as HTTP_REMOTE_USER"
+msgstr "desktop.auth.backend.RemoteUserDjangoBackend を使用する際に、リモートユーザーを含むヘッダーの正規化名がこれによって設定されます。すべての文字を大文字に変換し、ハイフンをアンダースコアで置換して、HTTP_ プレフィックスを名前に追加することにより、要求の HTTP ヘッダーはキーに変換されます。そのため、ヘッダーがたとえば Remote-User と呼ばれる場合、これは HTTP_REMOTE_USER と設定されます。"
 
 #: src/desktop/conf.py:289
 #, fuzzy
 msgid "Configuration options for LDAP connectivity."
-msgstr "LDAP 接続性の設定オプション"
+msgstr "LDAP 接続性の設定オプションです。"
 
 #: src/desktop/conf.py:293
 msgid "The base LDAP distinguished name to use for LDAP search."
@@ -278,9 +244,7 @@ msgid "A base filter for use when searching for users."
 msgstr "ユーザーの検索で使用する基本的なフィルタです。"
 
 #: src/desktop/conf.py:322
-msgid ""
-"The username attribute in the LDAP schema. Typically, this is "
-"'sAMAccountName' for AD and 'uid' for other LDAP systems."
+msgid "The username attribute in the LDAP schema. Typically, this is 'sAMAccountName' for AD and 'uid' for other LDAP systems."
 msgstr "LDAP スキーマでのユーザー名属性。多くの場合、AD では 'sAMAccountName'、他の LDAP システムでは 'uid' です。"
 
 #: src/desktop/conf.py:330
@@ -298,7 +262,7 @@ msgstr "LDAP スキーマでのグループ名属性。多くの場合は 'cn' �
 
 #: src/desktop/conf.py:341
 msgid "The LDAP attribute which specifies the members of a group."
-msgstr "グループのメンバを指定する LDAP 属性です。"
+msgstr "グループのメンバーを指定する LDAP 属性です。"
 
 #: src/desktop/conf.py:351
 msgid "Paths on the local file system that users should be able to browse."
@@ -307,7 +271,7 @@ msgstr "ユーザーが参照できるローカルファイルシステム上の
 #: src/desktop/conf.py:356
 #, fuzzy
 msgid "The path on the local filesystem."
-msgstr "ローカルの FS 上のパスです。"
+msgstr "ローカルファイルシステム上のパスです。"
 
 #: src/desktop/conf.py:364
 msgid "Link for 'feedback' tab."
@@ -323,37 +287,31 @@ msgstr "true の場合は、すべてのデータベース要求がログに記�
 
 #: src/desktop/conf.py:384
 msgid "Administrators that should receive error emails."
-msgstr ""
+msgstr "エラーに関する電子メールを受信する必要がある管理者です。"
 
 #: src/desktop/conf.py:389
 msgid "The full name of the admin."
-msgstr ""
+msgstr "管理者の氏名です。"
 
 #: src/desktop/conf.py:392
 msgid "The email address of the admin."
-msgstr ""
+msgstr "管理者の電子メールアドレスです。"
 
 #: src/desktop/conf.py:396
 msgid "Enable or disable Django debug mode."
 msgstr "Django のデバッグモードを有効化または無効化します。"
 
 #: src/desktop/conf.py:403
-msgid ""
-"Enable or disable debugging information in the 500 internal server error "
-"response. Note that the debugging information may contain sensitive data."
-" If django_debug_mode is True, this is automatically enabled."
-msgstr ""
-"500 "
-"の内部サーバーのエラー応答でデバッグ情報を有効化または無効化します。デバッグ情報には機密データが記録されていることがあります。django_debug_mode"
-" が true の場合は、この設定が自動的に有効になります。"
+msgid "Enable or disable debugging information in the 500 internal server error response. Note that the debugging information may contain sensitive data. If django_debug_mode is True, this is automatically enabled."
+msgstr "500 の内部サーバーのエラー応答でデバッグ情報を有効化または無効化します。デバッグ情報には機密データが記録されていることがあります。django_debug_mode が true の場合は、この設定が自動的に有効になります。"
 
 #: src/desktop/conf.py:412
 msgid "Email address that internal error messages should send as."
-msgstr ""
+msgstr "内部エラーに関するメッセージを送信する必要がある電子メールアドレスです。"
 
 #: src/desktop/conf.py:418
 msgid "The email backend to use."
-msgstr ""
+msgstr "使用する電子メールバックエンドです。"
 
 #: src/desktop/conf.py:434
 msgid "Secret key should be configured as a random string."
@@ -377,31 +335,27 @@ msgid "LDAP is only partially configured. An LDAP URL must be provided."
 msgstr "LDAP の設定は部分的です。LDAP の URL を指定する必要があります。"
 
 #: src/desktop/conf.py:471
-msgid ""
-"LDAP is only partially configured. An NT Domain or username search "
-"pattern must be provided."
+msgid "LDAP is only partially configured. An NT Domain or username search pattern must be provided."
 msgstr "LDAP の設定は部分的です。NT ドメインまたはユーザー名の検索パターンを指定する必要があります。"
 
 #: src/desktop/conf.py:477
-msgid ""
-"The LDAP username pattern should contain the special<username> "
-"replacement string for authentication."
+msgid "The LDAP username pattern should contain the special<username> replacement string for authentication."
 msgstr "LDAP ユーザー名パターンでは、認証で使用する特別な <username> 置換文字列を指定する必要があります。"
 
 #: src/desktop/decorators.py:40
 #, fuzzy, python-format
 msgid "Permission denied (%(action)s/%(app)s)."
-msgstr "パーミッションが拒否されました（%(action)s/%(app)s）"
+msgstr "パーミッションが拒否されました（%(action)s/%(app)s）。"
 
 #: src/desktop/middleware.py:135
 #, fuzzy, python-format
 msgid "Cannot find HDFS called \"%(fs_ref)s\"."
-msgstr "\"%(fs_ref)s\"という HDFS が見つかりません"
+msgstr "\"%(fs_ref)s\"という HDFS が見つかりません。"
 
 #: src/desktop/middleware.py:239
 #, fuzzy, python-format
 msgid "%(module)s isn't a middleware module."
-msgstr "%(module)s はミドルウェアモジュールではありません"
+msgstr "%(module)s はミドルウェアモジュールではありません。"
 
 #: src/desktop/middleware.py:244
 #, fuzzy, python-format
@@ -411,16 +365,12 @@ msgstr "ミドルウェア \"%(module)s\" のインポートでエラー \"%(err
 #: src/desktop/middleware.py:248
 #, fuzzy, python-format
 msgid "Middleware module \"%(module)s\" does not define a \"%(class)s\" class."
-msgstr "ミドルウェアモジュール \"%(module)s\" では \"%(class)s\" クラスを定義しません"
+msgstr "ミドルウェアモジュール \"%(module)s\" では \"%(class)s\" クラスを定義しません。"
 
 #: src/desktop/middleware.py:260
 #, python-format
-msgid ""
-"AppSpecificMiddleware module \"%(module)s\" has a process_request "
-"function which is impossible."
-msgstr ""
-"AppSpecificMiddleware モジュール \"%(module)s\" には、実行不可能な process_request "
-"関数が含まれています。"
+msgid "AppSpecificMiddleware module \"%(module)s\" has a process_request function which is impossible."
+msgstr "AppSpecificMiddleware モジュール \"%(module)s\" には、実行不可能な process_request 関数が含まれています。"
 
 #: src/desktop/middleware.py:302
 #, python-format
@@ -442,7 +392,7 @@ msgstr "スーパーユーザーであることが必要です。"
 
 #: src/desktop/auth/views.py:85 src/desktop/auth/views.py:86
 msgid "Could not create home directory."
-msgstr ""
+msgstr "ホームディレクトリを作成できませんでした。"
 
 #: src/desktop/lib/django_util.py:379
 msgid "year"
@@ -524,7 +474,7 @@ msgstr "mapping ファイルを使用して Hue の設定をアップグレー�
 
 #: src/desktop/management/commands/config_upgrade.py:41
 msgid "Location of the mapping file."
-msgstr "マッピングファイルの保存場所です。"
+msgstr "mapping ファイルの保存場所です。"
 
 #: src/desktop/management/commands/config_upgrade.py:49
 #, python-format
@@ -534,7 +484,7 @@ msgstr "--%(param)s が必要です。"
 #: src/desktop/management/commands/config_upgrade.py:60
 #, fuzzy, python-format
 msgid "Invalid mapping %(mapping)s in %(file)s."
-msgstr "%(file)s に無効な mapping %(mapping)s があります"
+msgstr "%(file)s に無効な mapping %(mapping)s があります。"
 
 #: src/desktop/management/commands/create_desktop_app.py:31
 msgid "Creates a Hue application directory structure."
@@ -551,7 +501,7 @@ msgstr "予期される引数：app_name [app_dir]"
 #: src/desktop/management/commands/create_desktop_app.py:45
 #, fuzzy, python-format
 msgid "App template dir missing: %(template)s."
-msgstr "App テンプレートディレクトリがありません：%(template)s"
+msgstr "App テンプレートディレクトリがありません：%(template)s。"
 
 #: src/desktop/management/commands/create_desktop_app.py:49
 #, python-format
@@ -560,9 +510,7 @@ msgstr "テンプレートのパス %(path)r が存在しません。"
 
 #: src/desktop/management/commands/create_desktop_app.py:52
 #, fuzzy, python-format
-msgid ""
-"%(name)r is not a valid application name. Use only numbers, letters and "
-"underscores."
+msgid "%(name)r is not a valid application name. Use only numbers, letters and underscores."
 msgstr "%(name)r は有効なアプリケーション名ではありません。数字、文字、およびアンダースコアのみを使用してください。"
 
 #: src/desktop/management/commands/create_test_fs.py:31
@@ -585,48 +533,32 @@ msgstr "Hue の Web サーバーです。"
 
 #: src/desktop/management/commands/runpylint.py:28
 #, fuzzy
-msgid ""
-"\n"
+msgid "\n"
 "  Runs pylint on desktop code.\n"
 "\n"
 "  With no arguments, or with \"all\", this will run pylint on all\n"
 "  installed apps.  Otherwise, specify modules to run, as well\n"
-"  as other parameters to pylint.  Note that you'll want to preface the "
-"section\n"
-"  of pylint arguments with \"--\" so Django's manage.py passes them "
-"along.\n"
+"  as other parameters to pylint.  Note that you'll want to preface the section\n"
+"  of pylint arguments with \"--\" so Django's manage.py passes them along.\n"
 "\n"
 "  Examples:\n"
 "    python core/manage.py runpylint all -- -f parseable\n"
 "    python core/manage.py runpylint filebrowser\n"
 "    python core/manage.py runpylint\n"
 "  "
-msgstr ""
+msgstr "\n"
+"  デスクトップコードで pylint を実行します。\n"
 "\n"
-"\"\n"
-"\"  デスクトップコードで pylint を実行します。\n"
-"\"\n"
-"\"\n"
-"\"\n"
-"\"  引数指定なしまたは \"all\" を指定した場合は、インストールされた全\n"
-"\"\n"
-"\"  アプリケーションで pylint が実行されます。それ以外の引数値の\n"
-"\"\n"
-"\"  場合は、実行するモジュールなどを pylint に対して指定します。pylint 引数部分\n"
-"\"\n"
-"\"  の前に \"--\" を記述すると、Django の manage.py が引数に渡されます。\n"
-"\"\n"
-"\"\n"
-"\"\n"
-"\"  例：\n"
-"\"\n"
-"\"    python core/manage.py runpylint all -- -f parseable\n"
-"\"\n"
-"\"    python core/manage.py runpylint filebrowser\n"
-"\"\n"
-"\"    python core/manage.py runpylint\n"
-"\"\n"
-"\"  "
+"  引数指定なしまたは \"all\" を指定した場合は、インストールされた全\n"
+"  アプリケーションで pylint が実行されます。それ以外の引数値の\n"
+"  場合は、実行するモジュールなどを pylint に対して指定します。pylint 引数部分\n"
+"  の前に \"--\" を記述すると、Django の manage.py が引数に渡されます。\n"
+"\n"
+"  例：\n"
+"    python core/manage.py runpylint all -- -f parseable\n"
+"    python core/manage.py runpylint filebrowser\n"
+"    python core/manage.py runpylint\n"
+"  "
 
 #: src/desktop/management/commands/runpylint.py:61
 #, python-format
@@ -647,7 +579,7 @@ msgstr "ページが見つかりません"
 
 #: src/desktop/templates/404.mako:24
 msgid "We're sorry, but the requested page could not be found:"
-msgstr "申し訳ありませんが、要求されたページが見つかりませんでした。"
+msgstr "申し訳ありませんが、要求されたページが見つかりませんでした："
 
 #: src/desktop/templates/500.mako:21 src/desktop/templates/error.mako:22
 msgid "Error"
@@ -659,34 +591,32 @@ msgstr "サーバーエラー（500）"
 
 #: src/desktop/templates/500.mako:25
 #, fuzzy
-msgid ""
-"Sorry, there's been an error. An email was sent to your administrators. "
-"Thank you for your patience."
-msgstr "エラーが発生しました。サイト管理者に連絡してください。ご迷惑をおかけして申し訳ありません。"
+msgid "Sorry, there's been an error. An email was sent to your administrators. Thank you for your patience."
+msgstr "エラーが発生しました。電子メールが管理者に送信されました。ご迷惑をおかけして申し訳ありません。"
 
 #: src/desktop/templates/500.mako:28 src/desktop/templates/popup_error.mako:36
 msgid "More Info"
-msgstr ""
+msgstr "詳細情報"
 
 #: src/desktop/templates/500.mako:30 src/desktop/templates/500.mako:54
 #: src/desktop/templates/popup_error.mako:38
 #: src/desktop/templates/popup_error.mako:62
 msgid "View Logs"
-msgstr ""
+msgstr "ログの表示"
 
 #: src/desktop/templates/500.mako:37 src/desktop/templates/popup_error.mako:45
 #, fuzzy
 msgid "File Name"
-msgstr "タイムゾーン名"
+msgstr "ファイル名"
 
 #: src/desktop/templates/500.mako:38 src/desktop/templates/popup_error.mako:46
 msgid "Line Number"
-msgstr ""
+msgstr "行番号"
 
 #: src/desktop/templates/500.mako:39 src/desktop/templates/popup_error.mako:47
 #, fuzzy
 msgid "Function Name"
-msgstr "アプリケーション名"
+msgstr "関数名"
 
 #: src/desktop/templates/about_layout.mako:34
 msgid "Configuration"
@@ -702,7 +632,7 @@ msgstr "サーバーログ"
 
 #: src/desktop/templates/actionbar.mako:31 src/desktop/templates/logs.mako:61
 msgid "Search..."
-msgstr ""
+msgstr "検索..."
 
 #: src/desktop/templates/check_config.mako:22
 #: src/desktop/templates/dump_config.mako:26 src/desktop/templates/logs.mako:25
@@ -736,41 +666,41 @@ msgstr "戻る"
 
 #: src/desktop/templates/common_header.mako:66
 msgid "Select this folder"
-msgstr ""
+msgstr "このフォルダを選択"
 
 #: src/desktop/templates/common_header.mako:67
 msgid "Create folder"
-msgstr ""
+msgstr "フォルダを作成"
 
 #: src/desktop/templates/common_header.mako:68
 #, fuzzy
 msgid "Folder name"
-msgstr "ユーザー名"
+msgstr "フォルダ名"
 
 #: src/desktop/templates/common_header.mako:69
 msgid "Cancel"
-msgstr ""
+msgstr "キャンセル"
 
 #: src/desktop/templates/common_header.mako:70
 msgid "The file has not been found"
-msgstr ""
+msgstr "ファイルが見つかりません"
 
 #: src/desktop/templates/common_header.mako:71
 msgid "Upload a file"
-msgstr ""
+msgstr "ファイルをアップロード"
 
 #: src/desktop/templates/common_header.mako:72
 #, fuzzy
 msgid "Failed"
-msgstr "プロファイル"
+msgstr "失敗しました"
 
 #: src/desktop/templates/common_header.mako:78
 msgid "Go to column:"
-msgstr ""
+msgstr "列に移動："
 
 #: src/desktop/templates/common_header.mako:79
 msgid "column name..."
-msgstr ""
+msgstr "列名..."
 
 #: src/desktop/templates/common_header.mako:135
 msgid "About Hue"
@@ -794,7 +724,7 @@ msgstr "インストール済みアプリケーション"
 
 #: src/desktop/templates/dump_config.mako:41
 msgid "Configuration Sections and Variables"
-msgstr "設定セクションおよび変数"
+msgstr "設定セクションおよび設定変数"
 
 #: src/desktop/templates/dump_config.mako:105
 msgid "Default:"
@@ -802,7 +732,7 @@ msgstr "デフォルト："
 
 #: src/desktop/templates/error.mako:25 src/desktop/templates/login.mako:80
 msgid "Error!"
-msgstr "エラー。"
+msgstr "エラーです。"
 
 #: src/desktop/templates/login.mako:62
 msgid "Username"
@@ -826,15 +756,13 @@ msgstr "ユーザー名またはパスワードが無効です。"
 
 #: src/desktop/templates/login.mako:91
 #, fuzzy
-msgid ""
-"Since this is your first time logging in, pick any username and password."
-" Be sure to remember these, as"
-msgstr "最初のログインなので、ユーザー名とパスワードを指定してください。これらを忘れないようにする必要があります。"
+msgid "Since this is your first time logging in, pick any username and password. Be sure to remember these, as"
+msgstr "初回ログイン時には、ユーザー名とパスワードを指定してください。"
 
 #: src/desktop/templates/login.mako:92
 #, fuzzy
 msgid "they will become your Hue superuser credentials."
-msgstr "これらは、Hue のスーパーユーザー資格情報になります。"
+msgstr "これらは Hue スーパーユーザー資格情報になるため、必ず行ってください。"
 
 #: src/desktop/templates/logs.mako:57
 msgid "Log entries (most recent first)"
@@ -850,13 +778,10 @@ msgstr "戻る"
 
 #~ msgid "The password for the SMTP user"
 #~ msgstr "SMTP ユーザーのパスワード"
-
 #~ msgid ""
 #~ "The service to use when querying "
 #~ "PAM.The service usually corresponds to a"
 #~ " single filename in /etc/pam.d"
 #~ msgstr ""
-
 #~ msgid "An error occurred: %(error)s"
 #~ msgstr "エラーが発生しました：%(error)s"
-

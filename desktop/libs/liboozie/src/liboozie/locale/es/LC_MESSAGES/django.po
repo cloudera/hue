@@ -20,84 +20,72 @@ msgstr ""
 
 #: src/liboozie/conf.py:25
 msgid "URL of Oozie server. This is required for job submission."
-msgstr ""
+msgstr "URL al servidor Oozie. Es necesaria para el envío de trabajos."
 
 #: src/liboozie/conf.py:31
 msgid "Whether Oozie requires client to perform Kerberos authentication."
-msgstr ""
+msgstr "Indica si Oozie necesita que el cliente realice la autenticación de Kerberos."
 
 #: src/liboozie/conf.py:38
-msgid ""
-"Location on HDFS where the workflows/coordinators are deployed when "
-"submitted by a non-owner."
-msgstr ""
+msgid "Location on HDFS where the workflows/coordinators are deployed when submitted by a non-owner."
+msgstr "Ubicación, en HDFS, en la que se implementan los workflows/coordinators cuando no los envía el propietario."
 
 #: src/liboozie/conf.py:69
-msgid ""
-"The deployment directory of Oozie workflows does not exist. Run \"Setup "
-"App\" on the Oozie workflow page."
-msgstr ""
+msgid "The deployment directory of Oozie workflows does not exist. Run \"Setup App\" on the Oozie workflow page."
+msgstr "El directorio de implementación de los workflows de Oozie no existe. Ejecute \"Configurar ejemplo\" en la página del workflow de Oozie."
 
 #: src/liboozie/conf.py:72
 msgid "Oozie Share Lib not installed in default location."
-msgstr ""
+msgstr "Share Lib de Oozie no instalada en la ubicación predeterminada."
 
 #: src/liboozie/submittion.py:69
 #, python-format
 msgid "Submission already submitted (Oozie job id %s)"
-msgstr ""
+msgstr "Envío ya enviado (ID de trabajo de Oozie %s)"
 
 #: src/liboozie/submittion.py:117
 msgid "Failed to access deployment directory."
-msgstr ""
+msgstr "Error al acceder al directorio de implementación."
 
 #: src/liboozie/submittion.py:162
 #, python-format
 msgid "Path is not a directory: %s."
-msgstr ""
+msgstr "La ruta no es un directorio: %s."
 
 #: src/liboozie/submittion.py:167
 #, python-format
 msgid "Error accessing directory '%s': %s."
-msgstr ""
+msgstr "Error al acceder al directorio '%s': %s."
 
 #: src/liboozie/types.py:285
 msgid "Insufficient permission."
-msgstr ""
+msgstr "Permiso insuficiente."
 
 #: src/liboozie/types.py:286
 #, python-format
 msgid "Permission denied. User %(username)s cannot modify user %(user)s's job."
-msgstr ""
+msgstr "Permiso denegado. El usuario %(username)s no puede modificar el trabajo del usuario %(user)s."
 
 #~ msgid "URL to Oozie server. This is required for job submission."
 #~ msgstr ""
-
 #~ msgid "Whether Oozie requires client to perform Kerberos authentication"
 #~ msgstr ""
-
 #~ msgid ""
 #~ "Location on HDFS where the "
 #~ "workflows/coordinator are deployed when "
 #~ "submitted by a non owner."
 #~ msgstr ""
-
 #~ msgid ""
 #~ "The deployment directory of Oozie "
 #~ "workflows does not exist. Please run "
 #~ "\"Setup App\" on the Oozie workflow "
 #~ "page."
 #~ msgstr ""
-
 #~ msgid "Failed to access deployment directory"
 #~ msgstr ""
-
 #~ msgid "Path is not a directory: %s"
 #~ msgstr ""
-
 #~ msgid "Error accessing directory '%s': %s"
 #~ msgstr ""
-
 #~ msgid "Insufficient permission"
 #~ msgstr ""
-

@@ -18,15 +18,13 @@ msgstr ""
 "Generated-By: Babel 0.9.6\n"
 
 #: src/jobbrowser/conf.py:26
-msgid ""
-"Share submitted jobs information with all users. If set to false, "
-"submitted jobs are visible only to the owner and administrators."
+msgid "Share submitted jobs information with all users. If set to false, submitted jobs are visible only to the owner and administrators."
 msgstr "모든 사용자와 제출된 Job 정보를 공유합니다. FALSE로 설정되면 소유자와 관리자만 제출된 Job을 볼 수 있습니다."
 
 #: src/jobbrowser/models.py:87
 #, fuzzy, python-format
 msgid "Could not find job with id %(jobid)s."
-msgstr "ID가 %(jobid)s인 Job을 찾을 수 없습니다."
+msgstr "ID가 %(jobid)s인 작업을 찾을 수 없습니다."
 
 #: src/jobbrowser/models.py:421
 #, fuzzy, python-format
@@ -46,12 +44,12 @@ msgstr "'%s'에서 로그를 검색하는 동안 Hue에 오류가 발생했습�
 #: src/jobbrowser/views.py:61
 #, fuzzy, python-format
 msgid "You don't have the permissions to access job %(id)s."
-msgstr "귀하는 %(id)s Job에 액세스할 권한이 없습니다."
+msgstr "작업 %(id)s에 액세스할 수 있는 권한이 없습니다."
 
 #: src/jobbrowser/views.py:139
 #, fuzzy, python-format
 msgid "kill_job may only be invoked with a POST (got a %(method)s)."
-msgstr "kill_job은 POST(%(method)s 수신)와 함께만 호출될 수 있습니다."
+msgstr "kill_job은 POST(%(method)s 수신)와 함께 호출해야 합니다."
 
 #: src/jobbrowser/views.py:142
 msgid "Insufficient permission"
@@ -69,7 +67,7 @@ msgstr "Job이 15초 내에 종료된 것으로 나타나지 않았습니다."
 #: src/jobbrowser/views.py:184
 #, python-format
 msgid "No tasks found for job %(id)s"
-msgstr ""
+msgstr "작업 %(id)s에 대한 태스크가 없습니다."
 
 #: src/jobbrowser/views.py:265 src/jobbrowser/views.py:285
 #, python-format
@@ -111,7 +109,7 @@ msgstr "이 작업 보기"
 #: src/jobbrowser/templates/attempt_logs.mako:34
 #: src/jobbrowser/templates/task.mako:32
 msgid "Job"
-msgstr "Job"
+msgstr "작업"
 
 #: src/jobbrowser/templates/attempt.mako:35
 #: src/jobbrowser/templates/attempt.mako:84
@@ -248,7 +246,7 @@ msgstr "Job: %(jobId)s - Job Browser"
 
 #: src/jobbrowser/templates/job.mako:94
 msgid "Job ID"
-msgstr "Job ID"
+msgstr "작업 ID"
 
 #: src/jobbrowser/templates/job.mako:96 src/jobbrowser/templates/job.mako:198
 #: src/jobbrowser/templates/jobs.mako:83
@@ -257,7 +255,7 @@ msgstr "사용자"
 
 #: src/jobbrowser/templates/job.mako:103
 msgid "View logs"
-msgstr ""
+msgstr "로그 보기"
 
 #: src/jobbrowser/templates/job.mako:105
 msgid "Kill Job"
@@ -265,7 +263,7 @@ msgstr "작업 종료"
 
 #: src/jobbrowser/templates/job.mako:107 src/jobbrowser/templates/jobs.mako:140
 msgid "Kill this job"
-msgstr "이 Job 종료"
+msgstr "이 작업 종료"
 
 #: src/jobbrowser/templates/job.mako:112
 msgid "Maps:"
@@ -364,7 +362,7 @@ msgstr "합계"
 #: src/jobbrowser/templates/jobbrowser_components.mako:112
 #, fuzzy
 msgid "Retired"
-msgstr "폐기됨"
+msgstr "사용 중지됨"
 
 #: src/jobbrowser/templates/jobs.mako:32 src/jobbrowser/templates/jobs.mako:34
 #: src/jobbrowser/templates/jobs.mako:153
@@ -373,7 +371,7 @@ msgstr "Job Browser"
 
 #: src/jobbrowser/templates/jobs.mako:37
 msgid "Job status:"
-msgstr ""
+msgstr "작업 상태:"
 
 #: src/jobbrowser/templates/jobs.mako:39
 msgid "All States"
@@ -397,16 +395,16 @@ msgstr "중지됨"
 
 #: src/jobbrowser/templates/jobs.mako:53
 msgid "Show retired jobs"
-msgstr ""
+msgstr "사용 중지된 작업 표시"
 
 #: src/jobbrowser/templates/jobs.mako:58
 msgid "Text:"
-msgstr ""
+msgstr "텍스트:"
 
 #: src/jobbrowser/templates/jobs.mako:62
 #, fuzzy
 msgid "Username:"
-msgstr "카운터 이름"
+msgstr "사용자 이름:"
 
 #: src/jobbrowser/templates/jobs.mako:63
 msgid "User Name Filter"
@@ -432,7 +430,7 @@ msgstr "날짜"
 #: src/jobbrowser/templates/jobs.mako:111
 #, python-format
 msgid "Show only %(status)s jobs"
-msgstr "%(status)s Job만 표시"
+msgstr "%(state)s개 작업만 표시"
 
 #: src/jobbrowser/templates/jobs.mako:115
 #: src/jobbrowser/templates/jobs.mako:122
@@ -446,7 +444,7 @@ msgstr "종료"
 
 #: src/jobbrowser/templates/jobs.mako:155
 msgid "Welcome to the Job Browser"
-msgstr "Job Browser에 오신 것을 환영합니다."
+msgstr "작업 브라우저를 시작합니다."
 
 #: src/jobbrowser/templates/jobs.mako:157
 msgid "There aren't any jobs running. Let's fix that."
@@ -462,24 +460,24 @@ msgstr "Beeswax 실행"
 
 #: src/jobbrowser/templates/jobs.mako:171
 msgid "Please Confirm"
-msgstr ""
+msgstr "확인하십시오."
 
 #: src/jobbrowser/templates/jobs.mako:174
 msgid "Are you sure you want to kill this job?"
-msgstr ""
+msgstr "이 작업을 종료하시겠습니까?"
 
 #: src/jobbrowser/templates/jobs.mako:178
 msgid "No"
-msgstr ""
+msgstr "아니요"
 
 #: src/jobbrowser/templates/jobs.mako:179
 msgid "Yes"
-msgstr ""
+msgstr "예"
 
 #: src/jobbrowser/templates/task.mako:22 src/jobbrowser/templates/task.mako:25
 #, python-format
 msgid "Job Task: %(taskId)s - Job Browser"
-msgstr "Job 작업: %(taskId)s - Job Browser"
+msgstr "작업 태스크: %(taskId)s - 작업 브라우저"
 
 #: src/jobbrowser/templates/task.mako:49
 #: src/jobbrowser/templates/tasks.mako:104
@@ -591,12 +589,12 @@ msgstr "시도 보기"
 #: src/jobbrowser/templates/tasks.mako:97
 #, python-format
 msgid "Show only %(state)s tasks"
-msgstr "%(state)s 작업만 표시"
+msgstr "%(state)s 태스크만 표시"
 
 #: src/jobbrowser/templates/tasktracker.mako:22
 #, python-format
 msgid "Tracker: %(trackerId)s - Job Browser"
-msgstr "Tracker: %(trackerId)s - Job Browser"
+msgstr "Tracker: %(trackerId)s - 작업 브라우저"
 
 #: src/jobbrowser/templates/tasktracker.mako:24
 #, python-format
@@ -645,7 +643,7 @@ msgstr "최대 Reduce 작업:"
 
 #: src/jobbrowser/templates/tasktrackers.mako:21
 msgid "Task Trackers - Job Browser"
-msgstr "TaskTracker - Job Browser"
+msgstr "Task Tracker - 작업 브라우저"
 
 #: src/jobbrowser/templates/tasktrackers.mako:27
 msgid "Host"
@@ -677,11 +675,11 @@ msgstr "Reduce 수"
 
 #: src/jobbrowser/templates/tasktrackers.mako:34
 msgid "Max Map Tasks"
-msgstr "최대 Map 작업"
+msgstr "최대 Map 태스크"
 
 #: src/jobbrowser/templates/tasktrackers.mako:35
 msgid "Max Reduce Tasks"
-msgstr "최대 Reduce 작업"
+msgstr "최대 Reduce 태스크"
 
 #: src/jobbrowser/templatetags/unix_ms_to_datetime.py:29
 msgid "No time"

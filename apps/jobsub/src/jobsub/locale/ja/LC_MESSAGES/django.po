@@ -24,26 +24,22 @@ msgstr "HDFS 上で jobsub の例とテンプレートが保存されている�
 #: src/jobsub/conf.py:33
 #, fuzzy
 msgid "Location on local filesystem where examples and template are stored."
-msgstr "ローカル FS 上で例とテンプレートが保存されている場所です。"
+msgstr "ローカルファイルシステム上で例とテンプレートが保存されている場所です。"
 
 #: src/jobsub/conf.py:39
 #, fuzzy
 msgid "Location on local filesystem where sample data is stored."
-msgstr "ローカル FS 上でサンプルデータが保存されている場所です。"
+msgstr "ローカルファイルシステム上でサンプルデータが保存されている場所です。"
 
 #: src/jobsub/conf.py:49
 #, fuzzy
-msgid ""
-"Deprecated, use liboozie.conf.OOZIE_URL instead. URL of Oozie server. "
-"This is required for job submission."
-msgstr "Oozie サーバーの URL。ジョブのサブミッションで必要です。"
+msgid "Deprecated, use liboozie.conf.OOZIE_URL instead. URL of Oozie server. This is required for job submission."
+msgstr "非推奨です。代わりに liboozie.conf.OOZIE_URL を使用してください。Oozie サーバーの URL です。これはジョブのサブミッションに必要です。"
 
 #: src/jobsub/conf.py:55
 #, fuzzy
-msgid ""
-"Deprecated, use liboozie.conf.SECURITY_ENABLED instead. Whether Oozie "
-"requires client to do perform Kerberos authentication"
-msgstr "Oozie が Kerberos 認証の実行をクライアントに要求するかどうかの指定です。"
+msgid "Deprecated, use liboozie.conf.SECURITY_ENABLED instead. Whether Oozie requires client to do perform Kerberos authentication"
+msgstr "非推奨です。代わりに liboozie.conf.SECURITY_ENABLED を使用してください。Oozie が Kerberos 認証の実行をクライアントに要求するかどうかの指定です。"
 
 #: src/jobsub/forms.py:39 src/jobsub/forms.py:58 src/jobsub/forms.py:77
 #: src/jobsub/forms.py:95 src/jobsub/templates/list_designs.mako:63
@@ -53,9 +49,7 @@ msgid "Name"
 msgstr "名前"
 
 #: src/jobsub/forms.py:43
-msgid ""
-"Allows letters, digits, '_', and '-'. The first character must be a "
-"letter or '_'."
+msgid "Allows letters, digits, '_', and '-'. The first character must be a letter or '_'."
 msgstr "文字、数字、'_'、および '-' を使用できます。先頭には文字または '_' が必要です。"
 
 #: src/jobsub/forms.py:59 src/jobsub/forms.py:78 src/jobsub/forms.py:96
@@ -66,27 +60,27 @@ msgstr "説明"
 
 #: src/jobsub/forms.py:60
 msgid "Main class"
-msgstr ""
+msgstr "Main class"
 
 #: src/jobsub/forms.py:61 src/jobsub/forms.py:79
 msgid "Jar path"
-msgstr ""
+msgstr "Jar パス"
 
 #: src/jobsub/forms.py:62
 msgid "Args"
-msgstr ""
+msgstr "Args"
 
 #: src/jobsub/forms.py:63
 msgid "Java opts"
-msgstr ""
+msgstr "Java opts"
 
 #: src/jobsub/forms.py:80
 msgid "Mapper"
-msgstr ""
+msgstr "Mapper"
 
 #: src/jobsub/forms.py:81
 msgid "Reducer"
-msgstr ""
+msgstr "Reducer"
 
 #: src/jobsub/models.py:128
 msgid "Name of the design, which must be unique per user."
@@ -102,17 +96,17 @@ msgstr "分散キャッシュに追加するアーカイブのパスのリスト
 
 #: src/jobsub/models.py:191
 msgid "Path to jar files on HDFS."
-msgstr "HDFS 上の jar ファイルのパスです。"
+msgstr "HDFS 上の jar ファイルへのパスです。"
 
 #: src/jobsub/submit.py:48
 #, fuzzy, python-format
 msgid "Submission for job design '%(name)s' (id %(id)s, owner %(username)s)."
-msgstr "ジョブ設計 %(name)s のサブミッション（ID %(id)s、所有者 %(username)s）"
+msgstr "ジョブ設計 '%(name)s' のサブミッションです（ID %(id)s、所有者 %(username)s）。"
 
 #: src/jobsub/submit.py:72
 #, fuzzy, python-format
 msgid "Job design already submitted (Oozie job id %(id)s)."
-msgstr "サブミッション済みのジョブ設計（Oozie job ID %(id)s）"
+msgstr "サブミット済みのジョブ設計です（Oozie ジョブ ID %(id)s）。"
 
 #: src/jobsub/submit.py:81
 msgid "Failed to access deployment directory."
@@ -154,7 +148,7 @@ msgstr "設計 %(id)s の編集でアクセスが拒否されました。"
 #: src/jobsub/views.py:253
 #, fuzzy, python-format
 msgid "Access denied: design parameters %(id)s."
-msgstr "設計パラメータ %(id)s へのアクセスが拒否されました。"
+msgstr "パラメータ %(id)s の設計でアクセスが拒否されました。"
 
 #: src/jobsub/views.py:265
 #, fuzzy
@@ -168,12 +162,12 @@ msgstr "設計 %(id)s のサブミットでアクセスが拒否されました�
 
 #: src/jobsub/views.py:280
 msgid "The Oozie server is not running"
-msgstr ""
+msgstr "Oozie サーバーが実行されていません"
 
 #: src/jobsub/views.py:281
 #, fuzzy, python-format
 msgid "Error submitting design %(id)s."
-msgstr "設計 %(id)s のサブミットでエラーが発生しました"
+msgstr "設計 %(id)s のサブミット中にエラーが発生しました。"
 
 #: src/jobsub/views.py:295
 #, fuzzy
@@ -213,10 +207,8 @@ msgid "or"
 msgstr "または"
 
 #: src/jobsub/templates/edit_design.mako:68
-msgid ""
-"When the design is submitted, you will be prompted for the actual value "
-"of "
-msgstr "設計をサブミットすると、次の実際の値を指定することを要求されます。 "
+msgid "When the design is submitted, you will be prompted for the actual value of "
+msgstr "設計をサブミットすると、次の実際の値を指定することが要求されます： "
 
 #: src/jobsub/templates/edit_design.mako:76
 msgid "Job Properties"
@@ -302,7 +294,7 @@ msgstr "Mapreduce 設計の作成"
 
 #: src/jobsub/templates/list_designs.mako:48
 msgid "Mapreduce"
-msgstr ""
+msgstr "MapReduce"
 
 #: src/jobsub/templates/list_designs.mako:49
 msgid "Create Streaming Design"
@@ -310,7 +302,7 @@ msgstr "ストリーミング設計の作成"
 
 #: src/jobsub/templates/list_designs.mako:49
 msgid "Streaming"
-msgstr ""
+msgstr "ストリーミング"
 
 #: src/jobsub/templates/list_designs.mako:50
 msgid "Create Java Design"
@@ -318,7 +310,7 @@ msgstr "Java 設計の作成"
 
 #: src/jobsub/templates/list_designs.mako:50
 msgid "Java"
-msgstr ""
+msgstr "Java"
 
 #: src/jobsub/templates/list_designs.mako:53
 msgid "Install Samples"
@@ -434,7 +426,7 @@ msgstr "サブミッション日"
 
 #: src/jobsub/templates/workflow.mako:81
 msgid "Edit design"
-msgstr "設計の編集"
+msgstr "設計を編集"
 
 #: src/jobsub/templates/workflow.mako:88
 msgid "Actions"
@@ -510,16 +502,11 @@ msgstr "アプリケーションのパス"
 
 #~ msgid "Filter: "
 #~ msgstr "フィルタ： "
-
 #~ msgid "Search for username, name, etc..."
 #~ msgstr "ユーザー名、名前などを検索"
-
 #~ msgid "Edit %(name)s"
 #~ msgstr "%(name)s の編集"
-
 #~ msgid "Delete %(name)s"
 #~ msgstr "%(name)s の削除"
-
 #~ msgid "Clone %(name)s"
 #~ msgstr "%(name)s の複製"
-
