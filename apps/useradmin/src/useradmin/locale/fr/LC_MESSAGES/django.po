@@ -24,9 +24,7 @@ msgstr "Vous n'êtes pas autorisé à %(description)s."
 
 #: src/useradmin/views.py:59
 msgid "You must be a superuser to delete users."
-msgstr ""
-"Vous devez être un superutilisateur pour pouvoir supprimer des "
-"utilisateurs."
+msgstr "Vous devez être un superutilisateur pour pouvoir supprimer des utilisateurs."
 
 #: src/useradmin/views.py:66
 msgid "You cannot remove yourself."
@@ -34,7 +32,7 @@ msgstr "Vous ne pouvez pas vous supprimer vous-même."
 
 #: src/useradmin/views.py:74
 msgid "The user was deleted."
-msgstr ""
+msgstr "L'utilisateur a été supprimé."
 
 #: src/useradmin/views.py:77
 msgid "User not found."
@@ -46,11 +44,11 @@ msgstr "Vous devez être un superutilisateur pour pouvoir supprimer des groupes.
 
 #: src/useradmin/views.py:95
 msgid "The default user group may not be deleted."
-msgstr "Impossible de supprimer le groupe d'utilisateurs par défaut."
+msgstr "Le groupe d'utilisateurs par défaut peut ne pas être supprimé."
 
 #: src/useradmin/views.py:100
 msgid "The group was deleted."
-msgstr ""
+msgstr "Le groupe a été supprimé."
 
 #: src/useradmin/views.py:103
 msgid "Group not found."
@@ -80,11 +78,11 @@ msgstr "Confirmation du mot de passe"
 
 #: src/useradmin/views.py:120 src/useradmin/views.py:312
 msgid "Create home directory"
-msgstr ""
+msgstr "Créer un répertoire racine"
 
 #: src/useradmin/views.py:121
 msgid "Create home directory if one doesn't already exist."
-msgstr ""
+msgstr "Créez un répertoire racine s'il n'en existe pas encore."
 
 #: src/useradmin/views.py:132
 msgid "Passwords do not match."
@@ -96,9 +94,7 @@ msgstr "Vous devez indiquer un mot de passe lors de la création d'un utilisateu
 
 #: src/useradmin/views.py:180
 msgid "You must be a superuser to add or edit another user."
-msgstr ""
-"Vous devez être un superutilisateur pour pouvoir ajouter ou modifier un "
-"autre utilisateur."
+msgstr "Vous devez être un superutilisateur pour pouvoir ajouter ou modifier un autre utilisateur."
 
 #: src/useradmin/views.py:204
 msgid "You cannot make yourself inactive."
@@ -110,32 +106,28 @@ msgstr "Vous ne pouvez pas vous définir vous-même comme un superutilisateur."
 
 #: src/useradmin/views.py:220
 msgid "User information updated"
-msgstr ""
+msgstr "Informations sur l'utilisateur mises à jour"
 
 #: src/useradmin/views.py:229 src/useradmin/views.py:353
 #, python-format
 msgid "Cannot make home directory for user %s."
-msgstr ""
+msgstr "Impossible de générer le répertoire racine pour l'utilisateur %s."
 
 #: src/useradmin/views.py:252
 msgid "You must be a superuser to add or edit a group."
-msgstr ""
-"Vous devez être un superutilisateur pour pouvoir ajouter ou modifier un "
-"groupe."
+msgstr "Vous devez être un superutilisateur pour pouvoir ajouter ou modifier un groupe."
 
 #: src/useradmin/views.py:263
 msgid "Group information updated"
-msgstr ""
+msgstr "Informations sur le groupe mises à jour"
 
 #: src/useradmin/views.py:284
 msgid "You must be a superuser to change permissions."
-msgstr ""
-"Vous devez être un superutilisateur pour pouvoir modifier les "
-"autorisations."
+msgstr "Vous devez être un superutilisateur pour pouvoir modifier les autorisations."
 
 #: src/useradmin/views.py:292
 msgid "Permission information updated"
-msgstr ""
+msgstr "Informations d'autorisation mises à jour"
 
 #: src/useradmin/views.py:307 src/useradmin/views.py:372
 msgid "Distinguished name"
@@ -149,7 +141,7 @@ msgstr "Indique si l'utilisateur doit être importé par un nom distinctif."
 
 #: src/useradmin/views.py:313
 msgid "Create home directory for user if one doesn't already exist."
-msgstr ""
+msgstr "Créez un répertoire racine pour l'utilisateur s'il n'en existe pas encore."
 
 #: src/useradmin/views.py:324
 #, python-format
@@ -158,22 +150,16 @@ msgstr "Trop long : 30 caractères maximum et pas %(username)s"
 
 #: src/useradmin/views.py:341
 msgid "You must be a superuser to add another user."
-msgstr ""
-"Vous devez être un superutilisateur pour pouvoir ajouter un autre "
-"utilisateur."
+msgstr "Vous devez être un superutilisateur pour pouvoir ajouter un autre utilisateur."
 
 #: src/useradmin/views.py:357
 #, fuzzy, python-format
 msgid "Could not get LDAP details for user %(username)s."
-msgstr "Impossible de récupérer les détails LDAP de l'utilisateur %(username)s"
+msgstr "Impossible de récupérer les détails LDAP de l'utilisateur %(username)s."
 
 #: src/useradmin/views.py:369
-msgid ""
-"Required. 30 characters or fewer. May only contain letters, numbers, "
-"hyphens or underscores."
-msgstr ""
-"Requis. 30 caractères maximum. Ne peut contenir que des lettres, nombres,"
-" tirets ou traits de soulignement."
+msgid "Required. 30 characters or fewer. May only contain letters, numbers, hyphens or underscores."
+msgstr "Requis. 30 caractères maximum. Ne peut contenir que des lettres, nombres, tirets ou traits de soulignement."
 
 #: src/useradmin/views.py:373
 msgid "Whether or not the group should be imported by distinguished name."
@@ -189,13 +175,11 @@ msgstr "Importer des utilisateurs non importés ou nouveaux depuis le groupe."
 
 #: src/useradmin/views.py:381
 msgid "Create home directories"
-msgstr ""
+msgstr "Créer des répertoires racines"
 
 #: src/useradmin/views.py:382
-msgid ""
-"Create home directories for every member imported, if members are being "
-"imported."
-msgstr ""
+msgid "Create home directories for every member imported, if members are being imported."
+msgstr "Créez des répertoires racines pour chaque membre importé si des membres sont importés actuellement."
 
 #: src/useradmin/views.py:393
 #, python-format
@@ -209,17 +193,15 @@ msgstr "Vous devez être un superutilisateur pour pouvoir ajouter un autre group
 #: src/useradmin/views.py:423
 #, python-format
 msgid "Could not get LDAP details for group %(groupname)s"
-msgstr "Impossible de récupérer les détails LDAP du groupe %(groupname)s"
+msgstr "Impossible de récupérer les détails LDAP du groupe %(groupname)s."
 
 #: src/useradmin/views.py:439
 msgid "You must be a superuser to sync the LDAP users/groups."
-msgstr ""
-"Vous devez être un superutilisateur pour pouvoir synchroniser les "
-"utilisateurs/groupes LDAP."
+msgstr "Vous devez être un superutilisateur pour pouvoir synchroniser les utilisateurs/groupes LDAP."
 
 #: src/useradmin/views.py:453
 msgid "The import may not be complete, sync again."
-msgstr ""
+msgstr "L'importation n'est peut-être pas terminée. Recommencez la Synchronisation."
 
 #: src/useradmin/views.py:477
 msgid "No active superuser configured."
@@ -227,42 +209,38 @@ msgstr "Aucun super-utilisateur actif configuré."
 
 #: src/useradmin/views.py:479
 msgid "You cannot remove the last active superuser from the configuration."
-msgstr ""
-"Vous ne pouvez pas supprimer le dernier superutilisateur actif de la "
-"configuration."
+msgstr "Vous ne pouvez pas supprimer le dernier superutilisateur actif de la configuration."
 
 #: src/useradmin/views.py:662
 msgid "Group name may only contain letters, numbers, hyphens or underscores."
-msgstr ""
-"Le nom de groupe peut contenir uniquement des lettres, nombres, tirets ou"
-" traits de soulignement."
+msgstr "Le nom de groupe peut contenir uniquement des lettres, nombres, tirets ou traits de soulignement."
 
 #: src/useradmin/views.py:677
 #, fuzzy
 msgid "members"
-msgstr "Membres"
+msgstr "membres"
 
 #: src/useradmin/views.py:678
 #, fuzzy
 msgid "permissions"
-msgstr "Autorisations"
+msgstr "autorisations"
 
 #: src/useradmin/views.py:720
 #, fuzzy
 msgid "groups"
-msgstr "Groupes"
+msgstr "groupes"
 
 #: src/useradmin/views.py:754
 msgid "Create Home Directories"
-msgstr ""
+msgstr "Créer des répertoires racines"
 
 #: src/useradmin/views.py:755
 msgid "Create home directory for every user, if one doesn't already exist."
-msgstr ""
+msgstr "Créez un répertoire racine pour chaque utilisateur s'il n'en existe pas encore."
 
 #: src/useradmin/management/commands/import_ldap_group.py:39
 msgid "Import users from the group."
-msgstr "Importer des utilisateurs depuis le groupe."
+msgstr "Importez des utilisateurs à partir du groupe."
 
 #: src/useradmin/management/commands/import_ldap_group.py:48
 msgid "A group name must be provided."
@@ -290,9 +268,7 @@ msgstr "GID maximum à importer (exclusif)."
 
 #: src/useradmin/management/commands/useradmin_sync_with_unix.py:35
 msgid "Whether or not to check that the user's shell is not /bin/false."
-msgstr ""
-"Indique s'il faut vérifier que le shell de l'utilisateur n'est pas "
-"/bin/faux."
+msgstr "Indique s'il faut vérifier que le shell de l'utilisateur n'est pas /bin/faux."
 
 #: src/useradmin/templates/confirm.mako:22
 msgid "Confirm"
@@ -307,12 +283,12 @@ msgstr "Oui"
 #: src/useradmin/templates/delete_group.mako:22
 #, fuzzy
 msgid "Are you sure you want to delete"
-msgstr "Voulez-vous vraiment supprimer %(group_name)s ?"
+msgstr "Voulez-vous vraiment supprimer"
 
 #: src/useradmin/templates/delete_group.mako:22
 #: src/useradmin/templates/delete_user.mako:22
 msgid "?"
-msgstr ""
+msgstr "?"
 
 #: src/useradmin/templates/delete_group.mako:25
 #: src/useradmin/templates/delete_user.mako:25
@@ -322,7 +298,7 @@ msgstr "Non"
 #: src/useradmin/templates/delete_user.mako:22
 #, fuzzy
 msgid "Are you sure you want to delete "
-msgstr "Voulez-vous vraiment supprimer %(group_name)s ?"
+msgstr "Voulez-vous vraiment supprimer "
 
 #: src/useradmin/templates/edit_group.mako:26
 #: src/useradmin/templates/list_groups.mako:25
@@ -345,16 +321,16 @@ msgstr "Groupes Hue - Créer un groupe"
 
 #: src/useradmin/templates/edit_group.mako:67
 msgid "Update group"
-msgstr "Mettre à jour un groupe"
+msgstr "Mettre à jour le groupe"
 
 #: src/useradmin/templates/edit_group.mako:70
 msgid "Add/Sync group"
-msgstr "Ajouter/Synchroniser un groupe"
+msgstr "Ajouter/Sync groupe"
 
 #: src/useradmin/templates/edit_group.mako:72
 #: src/useradmin/templates/list_groups.mako:39
 msgid "Add group"
-msgstr "Ajouter le groupe"
+msgstr "Ajouter un groupe"
 
 #: src/useradmin/templates/edit_group.mako:75
 #: src/useradmin/templates/edit_permissions.mako:53
@@ -380,16 +356,16 @@ msgstr "Rechercher"
 #: src/useradmin/templates/edit_group.mako:85
 #, fuzzy
 msgid "No users found."
-msgstr "Utilisateur introuvable."
+msgstr "Aucun utilisateur trouvé."
 
 #: src/useradmin/templates/edit_group.mako:85
 msgid "Create a new user now"
-msgstr ""
+msgstr "Créer un utilisateur maintenant"
 
 #: src/useradmin/templates/edit_group.mako:92
 #, fuzzy
 msgid "No permissions found."
-msgstr "Autorisations"
+msgstr "Aucune autorisation trouvée."
 
 #: src/useradmin/templates/edit_permissions.mako:23
 #: src/useradmin/templates/list_permissions.mako:26
@@ -400,7 +376,7 @@ msgstr "Autorisations Hue"
 #: src/useradmin/templates/edit_permissions.mako:43
 #, python-format
 msgid "Hue Permissions - Edit app: %(app)s"
-msgstr "Autorisations Hue - Modifier une app : %(app)s"
+msgstr "Autorisations Hue - Modifier une application : %(app)s"
 
 #: src/useradmin/templates/edit_permissions.mako:52
 msgid "Update permission"
@@ -410,7 +386,7 @@ msgstr "Mettre à jour l'autorisation"
 #: src/useradmin/templates/edit_user.mako:104
 #, fuzzy
 msgid "No groups found."
-msgstr "Groupe introuvable."
+msgstr "Groupes introuvables."
 
 #: src/useradmin/templates/edit_user.mako:24
 #: src/useradmin/templates/list_users.mako:25
@@ -437,7 +413,7 @@ msgstr "Mettre à jour l'utilisateur"
 
 #: src/useradmin/templates/edit_user.mako:90
 msgid "Add/Sync user"
-msgstr "Ajouter/Synchroniser un utilisateur"
+msgstr "Ajouter/Sync utilisateur"
 
 #: src/useradmin/templates/edit_user.mako:92
 #: src/useradmin/templates/list_users.mako:39
@@ -446,7 +422,7 @@ msgstr "Ajouter un utilisateur"
 
 #: src/useradmin/templates/edit_user.mako:104
 msgid "Create a new group now"
-msgstr ""
+msgstr "Créer un groupe maintenant"
 
 #: src/useradmin/templates/layout.mako:32
 msgid "Users"
@@ -470,11 +446,11 @@ msgstr "Supprimer"
 
 #: src/useradmin/templates/list_groups.mako:40
 msgid "Add/Sync LDAP group"
-msgstr "Ajouter/Synchroniser un groupe LDAP"
+msgstr "Ajouter/Sync groupe LDAP"
 
 #: src/useradmin/templates/list_groups.mako:51
 msgid "Group Name"
-msgstr "Nom de groupe"
+msgstr "Nom du groupe"
 
 #: src/useradmin/templates/list_groups.mako:52
 msgid "Members"
@@ -487,7 +463,7 @@ msgstr "Modifier %(groupname)s"
 
 #: src/useradmin/templates/list_groups.mako:80
 msgid "There are no groups matching the search criteria."
-msgstr ""
+msgstr "Aucun groupe ne correspond aux critères de recherche."
 
 #: src/useradmin/templates/list_permissions.mako:36
 msgid "Application"
@@ -499,19 +475,19 @@ msgstr "Autorisation"
 
 #: src/useradmin/templates/list_permissions.mako:46
 msgid "Edit permission"
-msgstr "Modifier une autorisation"
+msgstr "Modifier l'autorisation"
 
 #: src/useradmin/templates/list_permissions.mako:60
 msgid "There are no permissions matching the search criteria."
-msgstr ""
+msgstr "Aucune autorisation ne correspond aux critères de recherche."
 
 #: src/useradmin/templates/list_users.mako:40
 msgid "Add/Sync LDAP user"
-msgstr "Ajouter/Synchroniser un utilisateur LDAP"
+msgstr "Ajouter/Sync utilisateur LDAP"
 
 #: src/useradmin/templates/list_users.mako:41
 msgid "Sync LDAP users/groups"
-msgstr "Synchroniser des utilisateurs/groupes LDAP"
+msgstr "Ajouter/Sync utilisateurs/groupes LDAP"
 
 #: src/useradmin/templates/list_users.mako:53
 msgid "First Name"
@@ -536,66 +512,45 @@ msgstr "Modifier %(username)s"
 
 #: src/useradmin/templates/list_users.mako:87
 msgid "There are no users matching the search criteria."
-msgstr ""
+msgstr "Aucun utilisateur ne correspond aux critères de recherche."
 
 #: src/useradmin/templates/sync_ldap_users_groups.mako:37
 msgid "Sync LDAP users and groups"
-msgstr "Synchroniser des utilisateurs et des groupes LDAP"
+msgstr "Sync utilisateurs et groupes LDAP"
 
 #: src/useradmin/templates/sync_ldap_users_groups.mako:41
-msgid ""
-"This will not import any users or groups that don't already exist in Hue."
-" Only users and groups imported from LDAP can be synced."
-msgstr ""
-"Cette opération n'importera aucun utilisateur ni groupe qui n'existe pas "
-"déjà dans Hue. Seuls les utilisateurs et groupes importés depuis LDAP "
-"peuvent être synchronisés."
+msgid "This will not import any users or groups that don't already exist in Hue. Only users and groups imported from LDAP can be synced."
+msgstr "Aucun utilisateur ou groupe n'existant pas encore dans Hue ne sera importé. Seuls les utilisateurs et groupes importés de LDAP peuvent être synchronisés."
 
 #: src/useradmin/templates/sync_ldap_users_groups.mako:42
-msgid ""
-"All user information and group memberships will be updated based on the "
-"LDAP server's current state."
-msgstr ""
-"L'ensemble des informations utilisateur et appartenances à des groupes "
-"seront mises à jour en fonction de l'état actuel du serveur LDAP."
+msgid "All user information and group memberships will be updated based on the LDAP server's current state."
+msgstr "L'ensemble des informations utilisateur et appartenances à des groupes seront mises à jour en fonction de l'état actuel du serveur LDAP."
 
 #: src/useradmin/templates/sync_ldap_users_groups.mako:50
 msgid "Sync"
-msgstr "Synchroniser"
+msgstr "Sync"
 
 #~ msgid "The user was deleted !"
 #~ msgstr ""
-
 #~ msgid "The group was deleted !"
 #~ msgstr ""
-
 #~ msgid "Cannot make home directory for user %s"
 #~ msgstr ""
-
 #~ msgid "The import may not be complete, sync again"
 #~ msgstr ""
-
 #~ msgid "Filter: "
 #~ msgstr "Filtrer : "
-
 #~ msgid "Search for group name, members, etc..."
 #~ msgstr "Rechercher un nom de groupe, des membres, etc."
-
 #~ msgid "Edit"
 #~ msgstr "Modifier"
-
 #~ msgid "Delete %(groupname)s"
 #~ msgstr "Supprimer %(groupname)s"
-
 #~ msgid "Are you sure you want to delete %(group_name)s?"
 #~ msgstr "Voulez-vous vraiment supprimer %(group_name)s ?"
-
 #~ msgid "Search for application name, description, etc..."
 #~ msgstr "Rechercher un nom d'application, une description, etc."
-
 #~ msgid "Search for username, name, e-mail, etc..."
 #~ msgstr "Rechercher un nom d'utilisateur, un nom, un courriel, etc."
-
 #~ msgid "Delete %(username)s"
 #~ msgstr "Supprimer %(username)s"
-

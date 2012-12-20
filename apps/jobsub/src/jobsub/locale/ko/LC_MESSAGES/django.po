@@ -24,26 +24,22 @@ msgstr "Jobsub 예제와 템플릿이 저장되는 HDFS 상의 위치입니다."
 #: src/jobsub/conf.py:33
 #, fuzzy
 msgid "Location on local filesystem where examples and template are stored."
-msgstr "예제와 템플릿이 저장되는 로컬 FS 상의 위치입니다."
+msgstr "예제와 템플릿이 저장되는 로컬 파일 시스템상의 위치입니다."
 
 #: src/jobsub/conf.py:39
 #, fuzzy
 msgid "Location on local filesystem where sample data is stored."
-msgstr "샘플 데이터가 저장되는 로컬 FS 상의 위치입니다."
+msgstr "샘플 데이터가 저장되는 로컬 파일 시스템상의 위치입니다."
 
 #: src/jobsub/conf.py:49
 #, fuzzy
-msgid ""
-"Deprecated, use liboozie.conf.OOZIE_URL instead. URL of Oozie server. "
-"This is required for job submission."
-msgstr "Oozie Server의 URL입니다. Job 제출을 위해서는 반드시 입력해야 합니다."
+msgid "Deprecated, use liboozie.conf.OOZIE_URL instead. URL of Oozie server. This is required for job submission."
+msgstr "사용되지 않습니다. 대신 liboozie.conf.OOZIE_URL을 사용하십시오. Oozie 서버의 URL입니다. 이는 작업 제출 시 필요합니다."
 
 #: src/jobsub/conf.py:55
 #, fuzzy
-msgid ""
-"Deprecated, use liboozie.conf.SECURITY_ENABLED instead. Whether Oozie "
-"requires client to do perform Kerberos authentication"
-msgstr "Oozie에서 클라이언트의 Kerberos 인증 수행을 요청할지 여부입니다."
+msgid "Deprecated, use liboozie.conf.SECURITY_ENABLED instead. Whether Oozie requires client to do perform Kerberos authentication"
+msgstr "사용되지 않습니다. 대신 liboozie.conf.SECURITY_ENABLED를 사용하십시오. Oozie에서 클라이언트의 Kerberos 인증 수행을 요구하는지 여부를 나타냅니다."
 
 #: src/jobsub/forms.py:39 src/jobsub/forms.py:58 src/jobsub/forms.py:77
 #: src/jobsub/forms.py:95 src/jobsub/templates/list_designs.mako:63
@@ -53,9 +49,7 @@ msgid "Name"
 msgstr "이름"
 
 #: src/jobsub/forms.py:43
-msgid ""
-"Allows letters, digits, '_', and '-'. The first character must be a "
-"letter or '_'."
+msgid "Allows letters, digits, '_', and '-'. The first character must be a letter or '_'."
 msgstr "문자, 숫자, '_', '-'이 허용됩니다. 문자 또는 '_'이 맨 앞에 와야 합니다."
 
 #: src/jobsub/forms.py:59 src/jobsub/forms.py:78 src/jobsub/forms.py:96
@@ -66,27 +60,27 @@ msgstr "설명"
 
 #: src/jobsub/forms.py:60
 msgid "Main class"
-msgstr ""
+msgstr "주 클래스"
 
 #: src/jobsub/forms.py:61 src/jobsub/forms.py:79
 msgid "Jar path"
-msgstr ""
+msgstr "jar 경로"
 
 #: src/jobsub/forms.py:62
 msgid "Args"
-msgstr ""
+msgstr "인수"
 
 #: src/jobsub/forms.py:63
 msgid "Java opts"
-msgstr ""
+msgstr "Java 옵션"
 
 #: src/jobsub/forms.py:80
 msgid "Mapper"
-msgstr ""
+msgstr "Mapper"
 
 #: src/jobsub/forms.py:81
 msgid "Reducer"
-msgstr ""
+msgstr "Reducer"
 
 #: src/jobsub/models.py:128
 msgid "Name of the design, which must be unique per user."
@@ -102,7 +96,7 @@ msgstr "분산 캐시에 추가할 아카이브의 경로 목록입니다."
 
 #: src/jobsub/models.py:191
 msgid "Path to jar files on HDFS."
-msgstr "HDFS의 jar 파일 경로입니다."
+msgstr "HDFS의 jar 파일에 대한 경로입니다."
 
 #: src/jobsub/submit.py:48
 #, fuzzy, python-format
@@ -126,7 +120,7 @@ msgstr "HDFS 참조를 가져오지 못했습니다. 구성을 확인하십시�
 #: src/jobsub/views.py:59
 #, fuzzy, python-format
 msgid "Access denied: view job %(id)s."
-msgstr "액세스 거부됨: %(id)s Job 보기"
+msgstr "액세스 거부됨: 작업 %(id)s 보기"
 
 #: src/jobsub/views.py:65
 #, python-format
@@ -140,7 +134,7 @@ msgstr "권한이 거부되었습니다. 귀하는 소유자가 아닙니다."
 #: src/jobsub/views.py:206
 #, fuzzy, python-format
 msgid "Access denied: delete design %(id)s."
-msgstr "액세스 거부됨: 삭제 디자인 %(id)s"
+msgstr "액세스 거부됨: 디자인 %(id)s 삭제"
 
 #: src/jobsub/views.py:214
 msgid "Workflow not found."
@@ -149,7 +143,7 @@ msgstr "워크플로를 찾을 수 없습니다."
 #: src/jobsub/views.py:222
 #, fuzzy, python-format
 msgid "Access denied: edit design %(id)s."
-msgstr "액세스 거부됨: 편집 디자인 %(id)s"
+msgstr "액세스 거부됨: 디자인 %(id)s 편집"
 
 #: src/jobsub/views.py:253
 #, fuzzy, python-format
@@ -164,16 +158,16 @@ msgstr "POST 요청을 사용하여 디자인을 제출하십시오."
 #: src/jobsub/views.py:269
 #, fuzzy, python-format
 msgid "Access denied: submit design %(id)s."
-msgstr "액세스 거부됨: 제출 디자인 %(id)s"
+msgstr "액세스 거부됨: 디자인 %(id)s 제출"
 
 #: src/jobsub/views.py:280
 msgid "The Oozie server is not running"
-msgstr ""
+msgstr "Oozie 서버가 실행되고 있지 않습니다."
 
 #: src/jobsub/views.py:281
 #, fuzzy, python-format
 msgid "Error submitting design %(id)s."
-msgstr "%(id)s 디자인을 제출하는 중 오류 발생"
+msgstr "%(id)s 디자인 제출 중 오류 발생"
 
 #: src/jobsub/views.py:295
 #, fuzzy
@@ -182,7 +176,7 @@ msgstr "POST 요청을 사용하여 예제를 설치하십시오."
 
 #: src/jobsub/views.py:300
 msgid "The examples could not be installed."
-msgstr "예제를 설치하지 못했습니다."
+msgstr "예제를 설치할 수 없습니다."
 
 #: src/jobsub/management/commands/jobsub_setup.py:88
 msgid "Unexpected fixture type."
@@ -213,10 +207,8 @@ msgid "or"
 msgstr "또는"
 
 #: src/jobsub/templates/edit_design.mako:68
-msgid ""
-"When the design is submitted, you will be prompted for the actual value "
-"of "
-msgstr "디자인을 제출할 때 다음에 대한 실제 값이 나타납니다. "
+msgid "When the design is submitted, you will be prompted for the actual value of "
+msgstr "디자인이 제출되면 다음의 실제 값을 입력하라는 프롬프트가 나타납니다. "
 
 #: src/jobsub/templates/edit_design.mako:76
 msgid "Job Properties"
@@ -302,7 +294,7 @@ msgstr "Mapreduce 디자인 생성"
 
 #: src/jobsub/templates/list_designs.mako:48
 msgid "Mapreduce"
-msgstr ""
+msgstr "MapReduce"
 
 #: src/jobsub/templates/list_designs.mako:49
 msgid "Create Streaming Design"
@@ -310,7 +302,7 @@ msgstr "스트리밍 디자인 생성"
 
 #: src/jobsub/templates/list_designs.mako:49
 msgid "Streaming"
-msgstr ""
+msgstr "스트리밍"
 
 #: src/jobsub/templates/list_designs.mako:50
 msgid "Create Java Design"
@@ -318,7 +310,7 @@ msgstr "Java 디자인 생성"
 
 #: src/jobsub/templates/list_designs.mako:50
 msgid "Java"
-msgstr ""
+msgstr "Java"
 
 #: src/jobsub/templates/list_designs.mako:53
 msgid "Install Samples"
@@ -434,7 +426,7 @@ msgstr "제출 날짜"
 
 #: src/jobsub/templates/workflow.mako:81
 msgid "Edit design"
-msgstr "편집 디자인"
+msgstr "디자인 편집"
 
 #: src/jobsub/templates/workflow.mako:88
 msgid "Actions"
@@ -510,16 +502,11 @@ msgstr "애플리케이션 경로"
 
 #~ msgid "Filter: "
 #~ msgstr "필터: "
-
 #~ msgid "Search for username, name, etc..."
 #~ msgstr "사용자 이름, 이름 등을 검색합니다."
-
 #~ msgid "Edit %(name)s"
 #~ msgstr "%(name)s 편집"
-
 #~ msgid "Delete %(name)s"
 #~ msgstr "%(name)s 삭제"
-
 #~ msgid "Clone %(name)s"
 #~ msgstr "%(name)s 복제"
-

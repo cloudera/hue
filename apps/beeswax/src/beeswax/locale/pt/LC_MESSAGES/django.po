@@ -18,10 +18,8 @@ msgstr ""
 "Generated-By: Babel 0.9.6\n"
 
 #: src/beeswax/conf.py:26
-msgid ""
-"Beeswax or Hive Server 2 Thrift API used. Choices are: 'beeswax' or "
-"'hiveserver2'."
-msgstr ""
+msgid "Beeswax or Hive Server 2 Thrift API used. Choices are: 'beeswax' or 'hiveserver2'."
+msgstr "Beeswax ou Hive Server 2 Thrift API utilizado. As opções são: \"beeswax\" ou \"hiveserver2\"."
 
 #: src/beeswax/conf.py:32
 msgid "Host where Beeswax server Thrift daemon is running."
@@ -33,17 +31,11 @@ msgstr "Configure a porta que o servidor Beeswax Thrift utiliza."
 
 #: src/beeswax/conf.py:45
 msgid "Host where Beeswax internal metastore Thrift daemon is running."
-msgstr ""
-"Anfitrião onde o daemon Thrift do meta-armazenamento interno do Beeswax "
-"está em execução."
+msgstr "Anfitrião onde o daemon Thrift de metastore interno do Beeswax está em execução."
 
 #: src/beeswax/conf.py:51
-msgid ""
-"Configure the port the internal metastore daemon runs on. Used only if "
-"hive.metastore.local is true."
-msgstr ""
-"Configure a porta utilizada pelo daemon do meta-armazenamento interno. "
-"Utilizado apenas se hive.metastore.local for True."
+msgid "Configure the port the internal metastore daemon runs on. Used only if hive.metastore.local is true."
+msgstr "Configure a porta onde o daemon de metastore interno está em execução. Utilizada apenas se hive.metastore.local for verdadeiro."
 
 #: src/beeswax/conf.py:58
 msgid "Path to beeswax_server.sh"
@@ -51,111 +43,75 @@ msgstr "Caminho para beeswax_server.sh"
 
 #: src/beeswax/conf.py:64
 #, fuzzy
-msgid ""
-"Maximum Java heap size (in megabytes) used by Beeswax Server.  Note that "
-"the setting of HADOOP_HEAPSIZE in $HADOOP_CONF_DIR/hadoop-env.sh may "
-"override this setting."
-msgstr ""
-"Tamanho máximo da heap de Java (em megabytes) utilizada pelo servidor "
-"Beeswax. Note que a definição de HADOOP_HEAPSIZE em $HADOOP_CONF_DIR"
-"/hadoop-env.sh pode sobrepor-se a esta definição."
+msgid "Maximum Java heap size (in megabytes) used by Beeswax Server.  Note that the setting of HADOOP_HEAPSIZE in $HADOOP_CONF_DIR/hadoop-env.sh may override this setting."
+msgstr "Tamanho máximo da heap de Java (em megabytes) utilizada pelo Servidor Beeswax. Note que a definição de HADOOP_HEAPSIZE em $HADOOP_CONF_DIR/hadoop-env.sh pode sobrepor-se a esta definição."
 
 #: src/beeswax/conf.py:72
-msgid ""
-"Path to the root of the Hive installation; defaults to environment "
-"variable when not set."
-msgstr ""
-"Caminho para a raiz da instalação Hive; assume o valor da variável de "
-"ambiente quando não definido."
+msgid "Path to the root of the Hive installation; defaults to environment variable when not set."
+msgstr "Caminho para a raiz da instalação Hive; assume o valor da variável de ambiente quando não definido."
 
 #: src/beeswax/conf.py:77
 msgid "Hive configuration directory, where hive-site.xml is located."
-msgstr ""
-"Directório de configuração do Hive, onde se encontra o ficheiro hive-"
-"site.xml."
+msgstr "Directório de configuração do Hive, onde se encontra o ficheiro hive-site.xml."
 
 #: src/beeswax/conf.py:83
 msgid "The local filesystem path containing the Beeswax examples."
-msgstr ""
-"Caminho no sistema de ficheiros local onde se encontram os exemplos do "
-"Beeswax."
+msgstr "Caminho no sistema de ficheiros local onde se encontram os exemplos do Beeswax."
 
 #: src/beeswax/conf.py:89
 msgid "Timeout in seconds for Thrift calls to Beeswax service."
-msgstr ""
-"Limite de tempo em segundos para as invocações do serviço Beeswax por "
-"parte do Thrift."
+msgstr "Limite de tempo em segundos para as invocações do serviço Beeswax por parte do Thrift."
 
 #: src/beeswax/conf.py:95
-msgid ""
-"Timeouts in seconds for Thrift calls to the Hive metastore. This timeout "
-"should take into account that the metastore could talk to an external "
-"database."
-msgstr ""
-"Limite de tempo em segundos para as invocações do meta-armazenamento do "
-"Hive por parte do Thrift. Este limite de tempo deve ter em conta que o "
-"meta-armazenamento pode comunicar com uma base de dados externa."
+msgid "Timeouts in seconds for Thrift calls to the Hive metastore. This timeout should take into account that the metastore could talk to an external database."
+msgstr "Limite de tempo em segundos para as invocações do meta-armazenamento do Hive por parte do Thrift. Este limite de tempo deve ter em conta que o meta-armazenamento pode comunicar com uma base de dados externa."
 
 #: src/beeswax/conf.py:101
 msgid "Time in seconds for Beeswax to persist queries in its cache."
 msgstr "Tempo (em segundos) de manutenção das consultas em cache pelo Beeswax."
 
 #: src/beeswax/conf.py:107
-msgid ""
-"Set a LIMIT clause when browsing a partitioned table. A positive value "
-"will be set as the LIMIT. If 0 or negative, do not set any limit."
-msgstr ""
-"Defina uma cláusula LIMIT quando procurar numa tabela com partições. Será"
-" definido um valor positivo como LIMIT. Se for 0 ou negativo, não defina "
-"qualquer limite."
+msgid "Set a LIMIT clause when browsing a partitioned table. A positive value will be set as the LIMIT. If 0 or negative, do not set any limit."
+msgstr "Defina uma cláusula LIMIT quando procurar numa tabela com partições. Será definido um valor positivo como LIMIT. Se for 0 ou negativo, não defina qualquer limite."
 
 #: src/beeswax/conf.py:113
-msgid ""
-"Share saved queries with all users. If set to false, saved queries are "
-"visible only to the owner and administrators."
-msgstr ""
-"Partilhar as consultas guardadas com todos os utilizadores. Se for "
-"definido como False, as consultas guardadas serão visíveis apenas pelo "
-"proprietário e pelos administradores."
+msgid "Share saved queries with all users. If set to false, saved queries are visible only to the owner and administrators."
+msgstr "Partilhar as consultas guardadas com todos os utilizadores. Se for definido como False, as consultas guardadas serão visíveis apenas pelo proprietário e pelos administradores."
 
 #: src/beeswax/create_table.py:92
 msgid "ctrl-As"
-msgstr ""
+msgstr "ctrl-As"
 
 #: src/beeswax/create_table.py:93
 msgid "ctrl-Bs"
-msgstr ""
+msgstr "ctrl-Bs"
 
 #: src/beeswax/create_table.py:94
 msgid "ctrl-Cs"
-msgstr ""
+msgstr "ctrl-Cs"
 
 #: src/beeswax/create_table.py:95
 #, fuzzy
 msgid "tabs"
-msgstr "Tabelas"
+msgstr "tabulações"
 
 #: src/beeswax/create_table.py:96
 msgid "commas"
-msgstr ""
+msgstr "vírgulas"
 
 #: src/beeswax/create_table.py:97
 msgid "spaces"
-msgstr ""
+msgstr "espaços"
 
 #: src/beeswax/create_table.py:314
 #, fuzzy, python-format
 msgid "Internal error when constructing the delimiter form: %(error)serror"
-msgstr "Erro interno ao construir o formulário delimitador"
+msgstr "Erro interno ao criar o formulário delimitador: %(error)serror"
 
 #: src/beeswax/create_table.py:341
 #, python-format
-msgid ""
-"Failed to decode file '%(path)s' into printable characters under "
-"%(encoding)s"
-msgstr ""
-"Falha ao descodificar o ficheiro \"%(path)s\" em caracteres imprimíveis "
-"com a codificação %(encoding)s"
+msgid "Failed to decode file '%(path)s' into printable characters under %(encoding)s"
+msgstr "Falha ao descodificar o ficheiro \"%(path)s\" em caracteres imprimíveis com a codificação %(encoding)s"
 
 #: src/beeswax/create_table.py:403
 #, python-format
@@ -164,9 +120,7 @@ msgstr "Falha ao abrir o ficheiro \"%(path)s\": %(error)s"
 
 #: src/beeswax/create_table.py:455
 msgid "Internal error: Missing needed parameter to load data into table"
-msgstr ""
-"Erro interno: falta um parâmetro necessário para carregar os dados para a"
-" tabela"
+msgstr "Erro interno: falta um parâmetro necessário para carregar os dados para a tabela"
 
 #: src/beeswax/forms.py:63
 msgid "Change the name to save as a new design."
@@ -232,23 +186,16 @@ msgstr "Editor de consultas"
 
 #: src/beeswax/forms.py:158
 msgid "jar"
-msgstr ""
+msgstr "jar"
 
 #: src/beeswax/forms.py:159
 msgid "archive"
-msgstr ""
+msgstr "arquivo"
 
 #: src/beeswax/forms.py:161
 #, fuzzy
-msgid ""
-"Resources to upload with your Hive job.  Use 'jar' for UDFs.  Use 'file' "
-"and 'archive' for files to be copied and made locally available during "
-"MAP/TRANSFORM. Paths are on HDFS."
-msgstr ""
-"Recursos para upload com o seu trabalho no Hive. Utilize \"jar\" para "
-"UDFs. Utilize \"file\" e \"archive\" para copiar ficheiros e torná-los "
-"disponíveis localmente durante operações MAP/TRANSFORM. Os caminhos "
-"pertencem ao HDFS."
+msgid "Resources to upload with your Hive job.  Use 'jar' for UDFs.  Use 'file' and 'archive' for files to be copied and made locally available during MAP/TRANSFORM. Paths are on HDFS."
+msgstr "Recursos para upload com o seu trabalho no Hive. Utilize \"jar\" para UDFs. Utilize \"file\" e \"archive\" para copiar ficheiros e torná-los disponíveis localmente durante operações MAP/TRANSFORM. Os caminhos pertencem ao HDFS."
 
 #: src/beeswax/forms.py:167
 msgid "Path to file on HDFS."
@@ -257,17 +204,17 @@ msgstr "Caminho para o ficheiro no HDFS."
 #: src/beeswax/forms.py:204
 #, fuzzy
 msgid "Field terminator"
-msgstr "Introduza aqui o terminador de campo"
+msgstr "Terminador de campo"
 
 #: src/beeswax/forms.py:206
 #, fuzzy
 msgid "Collection terminator"
-msgstr "Introduza aqui o terminador de colecção"
+msgstr "Terminador de colecção"
 
 #: src/beeswax/forms.py:208
 #, fuzzy
 msgid "Map key terminator"
-msgstr "Introduza aqui o terminador de chave de map"
+msgstr "Terminador de chave de map"
 
 #: src/beeswax/forms.py:217
 msgid "SerDe Name"
@@ -275,9 +222,7 @@ msgstr "Nome SerDe"
 
 #: src/beeswax/forms.py:220
 msgid "Comma-separated list of key-value pairs, eg., 'p1=v1, p2=v2'"
-msgstr ""
-"Lista de pares chave-valor separados por vírgula, por exemplo, \"p1=v1, "
-"p2=v2\""
+msgstr "Lista de pares chave-valor separados por vírgula, por exemplo, \"p1=v1, p2=v2\""
 
 #: src/beeswax/forms.py:231
 msgid "InputFormat Class"
@@ -320,7 +265,7 @@ msgstr "Carregar automaticamente este ficheiro para a tabela após a criação."
 #: src/beeswax/forms.py:297
 #, fuzzy
 msgid "Delimiter"
-msgstr "Delimitado"
+msgstr "Delimitador"
 
 #: src/beeswax/forms.py:309
 msgid "Delimiter value must be smaller than 256."
@@ -372,29 +317,27 @@ msgstr "%(column_name)s (chave de partição com tipo %(column_type)s)"
 #: src/beeswax/models.py:66
 #, fuzzy
 msgid "Host of the query server."
-msgstr "O resultado desta consulta caducou."
+msgstr "Anfitrião de servidor de consulta."
 
 #: src/beeswax/models.py:67
 #, fuzzy
 msgid "Port of the query server."
-msgstr "O resultado desta consulta caducou."
+msgstr "Porta de servidor de consulta."
 
 #: src/beeswax/models.py:68
 #, fuzzy
 msgid "Name of the query server."
-msgstr "O resultado desta consulta caducou."
+msgstr "Nome de servidor de consulta."
 
 #: src/beeswax/models.py:69
 #, fuzzy
 msgid "Type of the query server."
-msgstr "Tipo de valores em array."
+msgstr "Tipo do servidor de consulta."
 
 #: src/beeswax/models.py:90
 #, python-format
-msgid ""
-"Unknown QueryHistory type: %s. Was the attribute \"server_type\" "
-"specified?"
-msgstr ""
+msgid "Unknown QueryHistory type: %s. Was the attribute \"server_type\" specified?"
+msgstr "Tipo de QueryHistory desconhecido: %s. O atributo \"server_type\" foi especificado?"
 
 #: src/beeswax/models.py:217
 msgid "My saved query"
@@ -416,16 +359,12 @@ msgstr "A ID de design %(id)s não pertence ao utilizador %(user)s"
 
 #: src/beeswax/models.py:266
 #, python-format
-msgid ""
-"Type mismatch for design id %(id)s (owner %(owner)s) - Expected "
-"%(expected_type)s got %(real_type)s"
-msgstr ""
-"Tipo incorrecto para a ID de design %(id)s (proprietário %(owner)s) - "
-"Esperava-se %(expected_type)s e obteve-se %(real_type)s"
+msgid "Type mismatch for design id %(id)s (owner %(owner)s) - Expected %(expected_type)s got %(real_type)s"
+msgstr "Tipo incorrecto para a ID de design %(id)s (proprietário %(owner)s) - Esperava-se %(expected_type)s e obteve-se %(real_type)s"
 
 #: src/beeswax/models.py:291
 msgid "Last used"
-msgstr ""
+msgstr "Última utilização"
 
 #: src/beeswax/views.py:97
 #, python-format
@@ -439,7 +378,7 @@ msgstr "Design \"%(name)s\" guardado"
 
 #: src/beeswax/views.py:146
 msgid "Delete design?"
-msgstr ""
+msgstr "Eliminar design?"
 
 #: src/beeswax/views.py:161
 #, python-format
@@ -462,17 +401,13 @@ msgstr "Quer mesmo rejeitar a vista \"%(table)s\"?"
 
 #: src/beeswax/views.py:346
 #, fuzzy, python-format
-msgid ""
-"This may delete the underlying data as well as the metadata. Drop table "
-"'%(table)s'?"
-msgstr ""
-"Tal pode eliminar os dados subjacentes e também os metadados. Rejeitar a "
-"tabela \"%(table)s\"?"
+msgid "This may delete the underlying data as well as the metadata. Drop table '%(table)s'?"
+msgstr "Isto pode eliminar os dados subjacentes e também os metadados. Eliminar a tabela \"%(table)s\"?"
 
 #: src/beeswax/views.py:362
 #, fuzzy
 msgid "Can read table"
-msgstr "Criar tabela"
+msgstr "É possível ler a tabela"
 
 #: src/beeswax/views.py:399
 #, python-format
@@ -493,21 +428,13 @@ msgid "Cannot find query."
 msgstr "Não é possível encontrar a consulta."
 
 #: src/beeswax/views.py:721
-msgid ""
-"Saving results from a partitioned table is not supported. You may copy "
-"from the HDFS location manually."
-msgstr ""
-"Guardar resultados de uma tabela com partições não é suportado. Pode "
-"copiar manualmente a partir da localização no HDFS."
+msgid "Saving results from a partitioned table is not supported. You may copy from the HDFS location manually."
+msgstr "Guardar resultados de uma tabela com partições não é suportado. Pode copiar manualmente a partir da localização no HDFS."
 
 #: src/beeswax/views.py:728
 #, fuzzy, python-format
-msgid ""
-"Saving results from a query with no MapReduce jobs is not supported. You "
-"may copy manually from the HDFS location %(path)s."
-msgstr ""
-"Guardar resultados de uma tabela com partições não é suportado. Pode "
-"copiar manualmente a partir da localização no HDFS."
+msgid "Saving results from a query with no MapReduce jobs is not supported. You may copy manually from the HDFS location %(path)s."
+msgstr "Guardar resultados de uma consulta sem trabalhos MapReduce não é suportado. Pode copiar manualmente a partir da localização %(path)s no HDFS."
 
 #: src/beeswax/views.py:743
 msgid "The table could not be saved."
@@ -533,19 +460,14 @@ msgstr "Consulta ao Beeswax concluída"
 
 #: src/beeswax/views.py:920
 #, fuzzy, python-format
-msgid ""
-"%(subject)s. You may see the results here: %(link)s\n"
+msgid "%(subject)s. You may see the results here: %(link)s\n"
 "\n"
 "Query:\n"
 "%(query)s"
-msgstr ""
-"%(subject)s. Pode ver os resultados aqui: %(link)s\n"
-"\"\n"
-"\"\n"
-"\"\n"
-"\"Consulta:\n"
-"\"\n"
-"\"%(query)s"
+msgstr "%(subject)s. Pode ver os resultados aqui: %(link)s\n"
+"\n"
+"Consulta:\n"
+"%(query)s"
 
 #: src/beeswax/views.py:941
 #, python-format
@@ -577,7 +499,7 @@ msgstr "A consulta não é parametrizável."
 
 #: src/beeswax/views.py:1219
 msgid "Failed to retrieve query state from the Beeswax Server."
-msgstr "Falha ao obter o estado da consulta a partir do servidor Beeswax."
+msgstr "Falha ao obter estado de consulta a partir do Servidor Beeswax."
 
 #: src/beeswax/views.py:1224
 msgid "Failed to contact Beeswax Server to check query status."
@@ -625,14 +547,12 @@ msgstr "O design de exemplo %(name)s já existe."
 #: src/beeswax/server/dbms.py:200
 #, fuzzy, python-format
 msgid "Server returning invalid handle for query id %(id)d [%(query)s]..."
-msgstr ""
-"O servidor Beeswax está a devolver um handle inválido para a ID de "
-"consulta %(id)d [%(query)s]..."
+msgstr "O servidor está a devolver um handle inválido para a ID de consulta %(id)d [%(query)s]..."
 
 #: src/beeswax/server/dbms.py:289
 #, fuzzy
 msgid "Could not retrieve logs."
-msgstr "Não foi possível obter o registo."
+msgstr "Não foi possível obter os registos."
 
 #: src/beeswax/server/dbms.py:292
 msgid "Unknown exception."
@@ -663,9 +583,7 @@ msgstr "Fim da lista"
 
 #: src/beeswax/templates/beeswax_components.mako:203
 #, python-format
-msgid ""
-"Showing %(start)s to %(end)s of %(count)s items, page %(page)s of "
-"%(pages)s"
+msgid "Showing %(start)s to %(end)s of %(count)s items, page %(page)s of %(pages)s"
 msgstr "%(start)s a %(end)s de %(count)s itens, página %(page)s de %(pages)s"
 
 #: src/beeswax/templates/choose_delimiter.mako:25
@@ -674,7 +592,7 @@ msgstr "%(start)s a %(end)s de %(count)s itens, página %(page)s de %(pages)s"
 #: src/beeswax/templates/save_results.mako:23
 #, fuzzy
 msgid "Create table from file"
-msgstr "Criar uma nova tabela a partir de um ficheiro"
+msgstr "Criar tabela a partir ficheiro"
 
 #: src/beeswax/templates/choose_delimiter.mako:29
 #: src/beeswax/templates/choose_delimiter.mako:35
@@ -738,12 +656,8 @@ msgstr "Pré-visualizar"
 
 #: src/beeswax/templates/choose_delimiter.mako:63
 #, fuzzy
-msgid ""
-"Enter the column delimiter. Must be a single character. Use syntax like "
-"\"\\001\" or \"\t\" for special characters."
-msgstr ""
-"Introduza um delimitador de coluna. Tem de ser apenas um carácter. "
-"Utilize a sintaxe do tipo \"\" ou \"\t\" para caracteres especiais."
+msgid "Enter the column delimiter. Must be a single character. Use syntax like \"\\001\" or \"\t\" for special characters."
+msgstr "Introduza um delimitador de coluna. Tem de ter apenas um caracter. Utilize uma sintaxe do tipo \"\\001\" ou \"\t\" para caracteres especiais."
 
 #: src/beeswax/templates/choose_delimiter.mako:68
 msgid "Table preview"
@@ -774,18 +688,12 @@ msgstr "Atribua um nome à sua tabela e escolha um ficheiro"
 #: src/beeswax/templates/create_table_manually.mako:60
 #, fuzzy
 msgid "table_name"
-msgstr "Nome da tabela"
+msgstr "table_name"
 
 #: src/beeswax/templates/choose_file.mako:55
 #: src/beeswax/templates/create_table_manually.mako:65
-msgid ""
-"Name of the new table. Table names must be globally unique. Table names "
-"tend to correspond as well to the directory where the data will be "
-"stored."
-msgstr ""
-"Nome da nova tabela. Os nomes de tabelas têm de ser únicos a nível "
-"global. Os nomes de tabelas costumam corresponder ao directório onde os "
-"dados serão armazenados."
+msgid "Name of the new table. Table names must be globally unique. Table names tend to correspond as well to the directory where the data will be stored."
+msgstr "Nome da nova tabela. Os nomes de tabelas têm de ser únicos a nível global. Os nomes de tabelas costumam corresponder ao directório onde os dados serão armazenados."
 
 #: src/beeswax/templates/choose_file.mako:63
 #: src/beeswax/templates/create_table_manually.mako:73
@@ -794,31 +702,16 @@ msgstr "Opcional"
 
 #: src/beeswax/templates/choose_file.mako:69
 #: src/beeswax/templates/create_table_manually.mako:77
-msgid ""
-"Use a table comment to describe your table.  For example, you might note "
-"the data's provenance and any caveats users need to know."
-msgstr ""
-"Utilize um comentário de tabela para descrever a sua tabela. Por exemplo,"
-" pode anotar a proveniência dos dados e alguns avisos que os utilizadores"
-" devam conhecer."
+msgid "Use a table comment to describe your table.  For example, you might note the data's provenance and any caveats users need to know."
+msgstr "Utilize um comentário de tabela para descrever a sua tabela. Por exemplo, pode anotar a proveniência dos dados e alguns avisos que os utilizadores devam conhecer."
 
 #: src/beeswax/templates/choose_file.mako:84
-msgid ""
-"The HDFS path to the file that you would like to base this new table "
-"definition on. It can be compressed (gzip) or not."
-msgstr ""
-"Caminho no HDFS para o ficheiro que gostaria de utilizar como base para a"
-" definição desta nova tabela. Pode estar compactado (gzip) ou não."
+msgid "The HDFS path to the file that you would like to base this new table definition on. It can be compressed (gzip) or not."
+msgstr "Caminho no HDFS para o ficheiro que gostaria de utilizar como base para a definição desta nova tabela. Pode estar compactado (gzip) ou não."
 
 #: src/beeswax/templates/choose_file.mako:93
-msgid ""
-"Check this box if you want to import the data in this file after creating"
-" the table definition. Leave it unchecked if you want to define an empty "
-"table."
-msgstr ""
-"Marque esta caixa se pretender importar os dados contidos neste ficheiro "
-"após criar a definição da tabela. Deixe sem marca se pretender definir "
-"uma tabela vazia."
+msgid "Check this box if you want to import the data in this file after creating the table definition. Leave it unchecked if you want to define an empty table."
+msgstr "Marque esta caixa se pretender importar os dados contidos neste ficheiro após criar a definição da tabela. Deixe sem marca se pretender definir uma tabela vazia."
 
 #: src/beeswax/templates/choose_file.mako:95
 msgid "Warning!"
@@ -838,7 +731,7 @@ msgstr "Escolha um ficheiro"
 #: src/beeswax/templates/configuration.mako:28
 #, fuzzy
 msgid "Configuration Variables"
-msgstr "Variáveis de configuração do Hive"
+msgstr "Variáveis de configuração"
 
 #: src/beeswax/templates/configuration.mako:32
 #: src/beeswax/templates/my_queries.mako:41
@@ -864,7 +757,7 @@ msgstr "Valor"
 #: src/beeswax/templates/create_table_manually.mako:24
 #, fuzzy
 msgid "Create table manually"
-msgstr "Criar uma nova tabela manualmente"
+msgstr "Criar tabela manualmente"
 
 #: src/beeswax/templates/create_table_manually.mako:42
 msgid "Step 1: Name"
@@ -896,33 +789,22 @@ msgstr "Criar uma tabela"
 
 #: src/beeswax/templates/create_table_manually.mako:55
 msgid "Let's start with a name and description for where we'll store your data."
-msgstr ""
-"Comecemos com um nome e uma descrição da localização onde armazenará os "
-"seus dados."
+msgstr "Comecemos com um nome e uma descrição da localização onde armazenará os seus dados."
 
 #: src/beeswax/templates/create_table_manually.mako:63
 #: src/beeswax/templates/create_table_manually.mako:217
 #: src/beeswax/templates/create_table_manually.mako:230
 #: src/beeswax/templates/create_table_manually.mako:332
 msgid "This field is required. Spaces are not allowed."
-msgstr ""
+msgstr "Este campo é obrigatório. Não são permitidos espaços."
 
 #: src/beeswax/templates/create_table_manually.mako:86
 msgid "Choose Your Record Format"
 msgstr "Escolha o formato dos registos"
 
 #: src/beeswax/templates/create_table_manually.mako:87
-msgid ""
-"Individual records are broken up into columns either with delimiters "
-"(e.g., CSV or TSV) or using a specific serialization / deserialization "
-"(SerDe) implementation. (One common specialized SerDe is for parsing out "
-"columns with a regular expression.)"
-msgstr ""
-"Cada registo é dividido em colunas por meio de delimitadores (por "
-"exemplo, CSV ou TSV) ou por meio de uma implementação de "
-"serialização/desserialização (SerDe) específica. (Uma SerDe especializada"
-" comum consiste em fazer a análise das colunas com uma expressão "
-"regular.)"
+msgid "Individual records are broken up into columns either with delimiters (e.g., CSV or TSV) or using a specific serialization / deserialization (SerDe) implementation. (One common specialized SerDe is for parsing out columns with a regular expression.)"
+msgstr "Cada registo é dividido em colunas por meio de delimitadores (por exemplo, CSV ou TSV) ou por meio de uma implementação de serialização/desserialização (SerDe) específica. (Uma SerDe especializada comum consiste em fazer a análise das colunas com uma expressão regular.)"
 
 #: src/beeswax/templates/create_table_manually.mako:93
 msgid "Record format"
@@ -934,9 +816,7 @@ msgstr "Delimitado"
 
 #: src/beeswax/templates/create_table_manually.mako:103
 msgid "(Data files use delimiters, like commas (CSV) or tabs.)"
-msgstr ""
-"(Os ficheiros de dados utilizam delimitadores, como vírgulas (CSV) ou "
-"tabulações.)"
+msgstr "(Os ficheiros de dados utilizam delimitadores, como vírgulas (CSV) ou tabulações.)"
 
 #: src/beeswax/templates/create_table_manually.mako:112
 msgid "SerDe"
@@ -954,24 +834,18 @@ msgstr "Configurar a serialização dos registos"
 #: src/beeswax/templates/create_table_manually.mako:126
 #, fuzzy
 msgid "Only supports single-character delimiters."
-msgstr "O Hive suporta apenas delimitadores de um só carácter."
+msgstr "Suporta apenas delimitadores de um só carácter."
 
 #: src/beeswax/templates/create_table_manually.mako:132
 #: src/beeswax/templates/create_table_manually.mako:142
 #: src/beeswax/templates/create_table_manually.mako:152
 #, fuzzy
-msgid ""
-"This field is required. Spaces are not allowed. Terminator must be "
-"exactly one character."
-msgstr "O terminador tem de ser exactamente um carácter."
+msgid "This field is required. Spaces are not allowed. Terminator must be exactly one character."
+msgstr "Este campo é obrigatório. Não são permitidos espaços. O terminador tem de ter exactamente um carácter."
 
 #: src/beeswax/templates/create_table_manually.mako:134
-msgid ""
-"Enter the column delimiter.  Must be a single character.  Use syntax like"
-" \"\" or \"\t\" for special characters."
-msgstr ""
-"Introduza um delimitador de coluna. Tem de ser apenas um carácter. "
-"Utilize a sintaxe do tipo \"\" ou \"\t\" para caracteres especiais."
+msgid "Enter the column delimiter.  Must be a single character.  Use syntax like \"\" or \"\t\" for special characters."
+msgstr "Introduza um delimitador de coluna. Tem de ter apenas um carácter. Utilize uma sintaxe do tipo \"\" ou \"\t\" para caracteres especiais."
 
 #: src/beeswax/templates/create_table_manually.mako:144
 msgid "Use for array types."
@@ -984,7 +858,7 @@ msgstr "Utilizar para tipos Map."
 #: src/beeswax/templates/create_table_manually.mako:170
 #, fuzzy
 msgid "The Java class name of your SerDe."
-msgstr "Introduza o nome da classe de Java da sua SerDe."
+msgstr "Nome da classe de Java da sua SerDe."
 
 #: src/beeswax/templates/create_table_manually.mako:170
 #: src/beeswax/templates/create_table_manually.mako:182
@@ -1004,11 +878,11 @@ msgstr "Escolha um formato de ficheiro"
 #: src/beeswax/templates/create_table_manually.mako:194
 #: src/beeswax/templates/create_table_manually.mako:195
 msgid "Use"
-msgstr "Utilizar"
+msgstr "Utilizador"
 
 #: src/beeswax/templates/create_table_manually.mako:193
 msgid "for newline-delimited text files."
-msgstr "para ficheiros de texto delimitados com mudança de linha."
+msgstr "para ficheiros de texto delimitados com newline."
 
 #: src/beeswax/templates/create_table_manually.mako:194
 msgid "for Hadoop's binary serialization format."
@@ -1025,12 +899,12 @@ msgstr "Formato do ficheiro"
 #: src/beeswax/templates/create_table_manually.mako:219
 #, fuzzy
 msgid "Java class used to read data"
-msgstr "Classe de Java utilizada para ler os dados"
+msgstr "Classe de Java utilizada para ler dados"
 
 #: src/beeswax/templates/create_table_manually.mako:232
 #, fuzzy
 msgid "Java class used to write data"
-msgstr "Classe de Java utilizada para escrever os dados"
+msgstr "Classe de Java utilizada para escrever dados"
 
 #: src/beeswax/templates/create_table_manually.mako:242
 msgid "Choose Where Your Table's Data is Stored"
@@ -1041,12 +915,8 @@ msgid "Location"
 msgstr "Localização"
 
 #: src/beeswax/templates/create_table_manually.mako:254
-msgid ""
-"Store your table in the default location (controlled by Hive, and "
-"typically"
-msgstr ""
-"Guardar a tabela na localização predefinida (controlada pelo Hive, "
-"tipicamente"
+msgid "Store your table in the default location (controlled by Hive, and typically"
+msgstr "Guardar a tabela na localização predefinida (controlada pelo Hive, tipicamente"
 
 #: src/beeswax/templates/create_table_manually.mako:269
 msgid "Enter the path (on HDFS) to your table's data location"
@@ -1066,34 +936,18 @@ msgstr "Configurar as partições"
 
 #: src/beeswax/templates/create_table_manually.mako:291
 #, fuzzy
-msgid ""
-"If your data is naturally partitioned (by date, for example), partitions "
-"are a way to tell the query server that data for a specific partition "
-"value are stored together."
-msgstr ""
-"Se os seus dados estiverem naturalmente em partições (por exemplo, por "
-"data), as partições são uma forma de dizer ao Hive que os dados de um "
-"determinado valor de partição estão armazenados em conjunto."
+msgid "If your data is naturally partitioned (by date, for example), partitions are a way to tell the query server that data for a specific partition value are stored together."
+msgstr "Se os seus dados estiverem naturalmente em partições (por exemplo, por data), as partições são uma forma de informar o servidor de consulta de que os dados de um determinado valor de partição estão armazenados em conjunto."
 
 #: src/beeswax/templates/create_table_manually.mako:292
 #, fuzzy
 msgid "The query server establishes a mapping between directories on disk"
-msgstr "O Hive estabelece um mapeamento entre os directórios no disco"
+msgstr "O servidor de consulta estabelece um mapeamento entre os directórios no disco"
 
 #: src/beeswax/templates/create_table_manually.mako:294
 #, fuzzy
-msgid ""
-"and the data for that day.  Partitions are virtual columns; they are not "
-"represented in the data itself, but are determined by the data location. "
-"The query server implements query optimizations such that queries that "
-"are specific to a single partition need not read the data in other "
-"partitions."
-msgstr ""
-"e os dados para esse dia. As partições são colunas virtuais; não estão "
-"representadas nos próprios dados, mas são determinadas pela localização "
-"dos dados. O Hive implementa optimizações de consultas de forma a que as "
-"consultas que digam respeito a uma única partição não obriguem a ler "
-"dados de outras partições."
+msgid "and the data for that day.  Partitions are virtual columns; they are not represented in the data itself, but are determined by the data location. The query server implements query optimizations such that queries that are specific to a single partition need not read the data in other partitions."
+msgstr "e os dados para esse dia. As partições são colunas virtuais; não estão representadas nos próprios dados, mas são determinadas pela localização dos dados. O servidor de consulta implementa optimizações de consultas de forma a que as consultas que digam respeito a uma única partição não obriguem a leitura de dados de outras partições."
 
 #: src/beeswax/templates/create_table_manually.mako:302
 msgid "Add a partition"
@@ -1119,29 +973,23 @@ msgstr "Nome da coluna"
 
 #: src/beeswax/templates/create_table_manually.mako:333
 msgid "There is another field with the same name."
-msgstr ""
+msgstr "Existe outro campo com o mesmo nome."
 
 #: src/beeswax/templates/create_table_manually.mako:335
 msgid "Column name must be single words that start with a letter or a digit."
-msgstr ""
-"O nome da coluna tem de ser apenas uma palavra que comece com uma letra "
-"ou um dígito."
+msgstr "O nome da coluna deve ser composto por palavras simples que comecem com uma letra ou um dígito."
 
 #: src/beeswax/templates/create_table_manually.mako:340
 msgid "Column type"
 msgstr "Tipo de coluna"
 
 #: src/beeswax/templates/create_table_manually.mako:346
-msgid ""
-"Type for this column. Certain advanced types (namely, structs) are not "
-"exposed in this interface."
-msgstr ""
-"O tipo desta coluna. Alguns tipos avançados (por exemplo, structs) não "
-"são expostos nesta interface."
+msgid "Type for this column. Certain advanced types (namely, structs) are not exposed in this interface."
+msgstr "Tipo para esta coluna. Alguns tipos avançados (nomeadamente, estruturas) não são apresentados nesta interface."
 
 #: src/beeswax/templates/create_table_manually.mako:353
 msgid "Array value type"
-msgstr "Tipo de valor Array"
+msgstr "Tipo de valores do array"
 
 #: src/beeswax/templates/create_table_manually.mako:357
 msgid "Type of the array values."
@@ -1157,7 +1005,7 @@ msgstr "Tipo das chaves de map."
 
 #: src/beeswax/templates/create_table_manually.mako:373
 msgid "Map Value type"
-msgstr "Tipo de valor de Map"
+msgstr "Tipo de valores do array"
 
 #: src/beeswax/templates/create_table_manually.mako:377
 msgid "Type of the map values."
@@ -1165,15 +1013,15 @@ msgstr "Tipo de valores de map."
 
 #: src/beeswax/templates/create_table_manually.mako:504
 msgid "Type your field terminator here"
-msgstr "Introduza aqui o terminador de campo"
+msgstr "Introduza aqui o seu terminador de campo"
 
 #: src/beeswax/templates/create_table_manually.mako:513
 msgid "Type your collection terminator here"
-msgstr "Introduza aqui o terminador de colecção"
+msgstr "Introduza aqui o seu terminador de colecção"
 
 #: src/beeswax/templates/create_table_manually.mako:522
 msgid "Type your map key terminator here"
-msgstr "Introduza aqui o terminador de chave de map"
+msgstr "Introduza aqui o seu terminador de chave de map"
 
 #: src/beeswax/templates/define_columns.mako:57
 msgid "Define your columns"
@@ -1213,7 +1061,7 @@ msgstr "Tabela"
 #: src/beeswax/templates/describe_table.mako:30
 #, fuzzy, python-format
 msgid "%s Metadata: %s"
-msgstr "Metadados %s Beeswax: %s"
+msgstr "Metadados de %s: %s"
 
 #: src/beeswax/templates/describe_table.mako:37
 #: src/beeswax/templates/execute.mako:290
@@ -1238,7 +1086,7 @@ msgstr "Comentário"
 #: src/beeswax/templates/describe_table.mako:56
 #, fuzzy
 msgid "Table Metadata:"
-msgstr "Metadados da tabela Beeswax:"
+msgstr "Metadados da tabela:"
 
 #: src/beeswax/templates/describe_table.mako:62
 #: src/beeswax/templates/index.mako:52
@@ -1265,7 +1113,7 @@ msgstr "Colunas"
 
 #: src/beeswax/templates/describe_table.mako:77
 msgid "Partition Columns"
-msgstr "Colunas da partição"
+msgstr "Colunas de partição"
 
 #: src/beeswax/templates/describe_table.mako:80
 msgid "Sample"
@@ -1282,7 +1130,7 @@ msgstr "Erro!"
 
 #: src/beeswax/templates/describe_table.mako:137
 msgid "Drop Table"
-msgstr "Rejeitar tabela"
+msgstr "Remover tabela"
 
 #: src/beeswax/templates/describe_table.mako:144
 #: src/beeswax/templates/describe_table.mako:195
@@ -1298,7 +1146,7 @@ msgstr "Cancelar"
 
 #: src/beeswax/templates/describe_table.mako:145
 msgid "Yes, drop this table"
-msgstr ""
+msgstr "Sim, remover esta tabela"
 
 #: src/beeswax/templates/describe_table.mako:156
 msgid "Import data"
@@ -1310,12 +1158,8 @@ msgstr "Substituir dados existentes"
 
 #: src/beeswax/templates/describe_table.mako:191
 #: src/beeswax/templates/load_table.mako:49
-msgid ""
-"Note that loading data will move data from its location into the table's "
-"storage location."
-msgstr ""
-"Note que o carregamento de dados irá mover os dados da sua localização "
-"para a localização de armazenamento da tabela."
+msgid "Note that loading data will move data from its location into the table's storage location."
+msgstr "Note que o carregamento de dados irá mover os dados da sua localização para a localização de armazenamento da tabela."
 
 #: src/beeswax/templates/describe_table.mako:196
 msgid "Submit"
@@ -1327,7 +1171,7 @@ msgstr "A sua consulta tem o(s) seguinte(s) erro(s):"
 
 #: src/beeswax/templates/execute.mako:33
 msgid "click the"
-msgstr "clique no"
+msgstr "clique na"
 
 #: src/beeswax/templates/execute.mako:33 src/beeswax/templates/execute.mako:239
 msgid "Error Log"
@@ -1335,11 +1179,11 @@ msgstr "Registo de erros"
 
 #: src/beeswax/templates/execute.mako:33
 msgid "tab below for details"
-msgstr "em baixo para ver os detalhes"
+msgstr "tabela abaixo para obter detalhes"
 
 #: src/beeswax/templates/execute.mako:38
 msgid "Example: SELECT * FROM tablename"
-msgstr "Exemplo: SELECT * FROM nome da tabela"
+msgstr "Exemplo: SELECT * FROM nome_da_tabela"
 
 #: src/beeswax/templates/execute.mako:46
 msgid "Execute"
@@ -1376,12 +1220,12 @@ msgstr "Consulta"
 #: src/beeswax/templates/show_tables.mako:33
 #, fuzzy
 msgid "database"
-msgstr "Tabelas"
+msgstr "base de dados"
 
 #: src/beeswax/templates/execute.mako:72
 #, fuzzy
 msgid "settings"
-msgstr "Definições"
+msgstr "definições"
 
 #: src/beeswax/templates/execute.mako:79 src/beeswax/templates/execute.mako:124
 #: src/beeswax/templates/execute.mako:169
@@ -1404,21 +1248,15 @@ msgstr "Funções definidas pelo utilizador"
 
 #: src/beeswax/templates/execute.mako:177
 msgid "myFunction"
-msgstr ""
+msgstr "minhaFunção"
 
 #: src/beeswax/templates/execute.mako:197
 msgid "Parameterization"
 msgstr "Parametrização"
 
 #: src/beeswax/templates/execute.mako:199
-msgid ""
-"If checked (the default), you can include parameters like $parameter_name"
-" in your query, and users will be prompted for a value when the query is "
-"run."
-msgstr ""
-"Se seleccionado (predefinição), pode incluir parâmetros do tipo "
-"$parameter_name na sua consulta e o sistema pedirá o valor ao utilizador "
-"no momento da execução da consulta."
+msgid "If checked (the default), you can include parameters like $parameter_name in your query, and users will be prompted for a value when the query is run."
+msgstr "Se seleccionado (predefinição), pode incluir parâmetros do tipo $parameter_name na sua consulta e o sistema pedirá o valor ao utilizador no momento da execução da consulta."
 
 #: src/beeswax/templates/execute.mako:201
 msgid "Enable Parameterization"
@@ -1429,12 +1267,8 @@ msgid "Email Notification"
 msgstr "Notificação por e-mail"
 
 #: src/beeswax/templates/execute.mako:206
-msgid ""
-"If checked, you will receive an email notification when the query "
-"completes."
-msgstr ""
-"Se seleccionado, receberá uma notificação por e-mail quando a consulta "
-"estiver concluída."
+msgid "If checked, you will receive an email notification when the query completes."
+msgstr "Se seleccionado, receberá uma notificação por e-mail quando a consulta estiver concluída."
 
 #: src/beeswax/templates/execute.mako:208
 msgid "Email me on completion"
@@ -1506,7 +1340,7 @@ msgstr "Configuração alargada"
 
 #: src/beeswax/templates/index.mako:50
 msgid "Welcome to Beeswax for Hive"
-msgstr "Bem-vindo(a) ao Beeswax para Hive"
+msgstr "Bem-vindo ao Beeswax para Hive"
 
 #: src/beeswax/templates/index.mako:51
 msgid "To get started with Beeswax you'll first need set up some data:"
@@ -1514,7 +1348,7 @@ msgstr "Para começar a utilizar o Beeswax, é necessário configurar alguns dad
 
 #: src/beeswax/templates/index.mako:53
 msgid "or"
-msgstr ""
+msgstr "ou"
 
 #: src/beeswax/templates/index.mako:61
 #: src/beeswax/templates/show_tables.mako:41
@@ -1526,7 +1360,7 @@ msgstr "Instalar amostras"
 #: src/beeswax/templates/show_tables.mako:86
 #, fuzzy
 msgid "Yes, install samples"
-msgstr "Instalar amostras"
+msgstr "Sim, instalar exemplos"
 
 #: src/beeswax/templates/index.mako:88
 #: src/beeswax/templates/show_tables.mako:127
@@ -1574,7 +1408,7 @@ msgstr "Editar"
 #: src/beeswax/templates/list_designs.mako:76
 #: src/beeswax/templates/my_queries.mako:89
 msgid "Delete this query."
-msgstr "Eliminar esta consulta."
+msgstr "Editar esta consulta."
 
 #: src/beeswax/templates/list_designs.mako:76
 #: src/beeswax/templates/my_queries.mako:89
@@ -1631,7 +1465,7 @@ msgstr "Mostrar as consultas de todos"
 
 #: src/beeswax/templates/list_history.mako:78
 msgid "Show user queries"
-msgstr "Mostrar as consultas do utilizador"
+msgstr "Mostrar consultas do utilizador"
 
 #: src/beeswax/templates/list_history.mako:84
 msgid "Show auto actions"
@@ -1663,31 +1497,31 @@ msgstr "Resultados"
 
 #: src/beeswax/templates/list_history.mako:162
 msgid "No data available in table"
-msgstr ""
+msgstr "Nenhum dado disponível na tabela"
 
 #: src/beeswax/templates/list_history.mako:163
 msgid "Showing _START_ to _END_ of _TOTAL_ entries"
-msgstr ""
+msgstr "A mostrar _INÍCIO_ a _FINAL_ de _TOTAL_ entradas"
 
 #: src/beeswax/templates/list_history.mako:164
 msgid "Showing 0 to 0 of 0 entries"
-msgstr ""
+msgstr "A mostrar 0 a 0 de 0 entradas"
 
 #: src/beeswax/templates/list_history.mako:165
 msgid "(filtered from _MAX_ total entries)"
-msgstr ""
+msgstr "(filtrado do total de _MAX_ entradas)"
 
 #: src/beeswax/templates/list_history.mako:166
 msgid "No matching records found"
-msgstr ""
+msgstr "Não foram encontrados registros correspondentes"
 
 #: src/beeswax/templates/list_history.mako:168
 msgid "First"
-msgstr ""
+msgstr "Primeiro"
 
 #: src/beeswax/templates/list_history.mako:169
 msgid "Last"
-msgstr ""
+msgstr "Último"
 
 #: src/beeswax/templates/load_table.mako:24
 #: src/beeswax/templates/load_table.mako:29
@@ -1734,7 +1568,7 @@ msgstr "Ver todo o meu histórico de consultas"
 #: src/beeswax/templates/parameterization.mako:23
 #, fuzzy
 msgid "Parameterize Query"
-msgstr "Parametrizar consulta do Hive"
+msgstr "Parametrizar consulta"
 
 #: src/beeswax/templates/parameterization.mako:31
 msgid "Explain query"
@@ -1746,7 +1580,7 @@ msgstr "Executar consulta"
 
 #: src/beeswax/templates/parameterization.mako:38
 msgid "Please specify parameters for this query:"
-msgstr "Especifique os parâmetros para esta consulta:"
+msgstr "Especifique parâmetros para esta consulta:"
 
 #: src/beeswax/templates/save_results.mako:29
 #: src/beeswax/templates/watch_results.mako:192
@@ -1772,7 +1606,7 @@ msgstr "Localização dos resultados"
 #: src/beeswax/templates/show_tables.mako:28
 #, fuzzy
 msgid "Table List"
-msgstr "Tabelas"
+msgstr "Lista de tabelas"
 
 #: src/beeswax/templates/util.mako:66
 msgid "Unsaved Query"
@@ -1786,11 +1620,11 @@ msgstr "Resultados da consulta"
 #: src/beeswax/templates/watch_results.mako:62
 #, fuzzy
 msgid "Query Results:"
-msgstr "Resultados da consulta"
+msgstr "Resultados da consulta:"
 
 #: src/beeswax/templates/watch_results.mako:67
 msgid "Collapse this panel"
-msgstr ""
+msgstr "Retrair este painel"
 
 #: src/beeswax/templates/watch_results.mako:70
 msgid "Downloads"
@@ -1819,15 +1653,15 @@ msgstr "MR Jobs"
 #: src/beeswax/templates/watch_results.mako:89
 #: src/beeswax/templates/watch_wait.mako:48
 msgid "No Hadoop jobs were launched in running this query."
-msgstr "Nenhum trabalho do Hadoop foi iniciado com a execução desta consulta."
+msgstr "Não foram iniciados trabalhos Hadoop na execução desta consulta."
 
 #: src/beeswax/templates/watch_results.mako:95
 msgid "Did you know?"
-msgstr ""
+msgstr "Sabia?"
 
 #: src/beeswax/templates/watch_results.mako:95
 msgid "You can click on a row to select a column you want to jump to."
-msgstr ""
+msgstr "Pode clicar numa linha para seleccionar uma coluna para onde pretende ir."
 
 #: src/beeswax/templates/watch_results.mako:102
 msgid "Error"
@@ -1844,17 +1678,17 @@ msgstr "Aviso:"
 
 #: src/beeswax/templates/watch_results.mako:123
 msgid "Page offset may have incremented since last view."
-msgstr "O offset da página pode ter aumentado desde a última visualização."
+msgstr "O offset da página pode ter sido incrementado desde a última visualização."
 
 #: src/beeswax/templates/watch_results.mako:214
 msgid "Sorry, name is required."
-msgstr "O nome é necessário."
+msgstr "Lamentamos, mas é necessário o nome."
 
 #: src/beeswax/templates/watch_wait.mako:24
 #: src/beeswax/templates/watch_wait.mako:31
 #, fuzzy
 msgid "Waiting for query..."
-msgstr "Beeswax: A aguardar pela consulta..."
+msgstr "A aguardar pela consulta..."
 
 #~ msgid ""
 #~ "Error: Potentially incomplete results as "
@@ -1863,7 +1697,6 @@ msgstr "Beeswax: A aguardar pela consulta..."
 #~ "Erro: resultados possivelmente incompletos "
 #~ "devido a um erro durante a "
 #~ "obtenção dos dados."
-
 #~ msgid ""
 #~ "Detected another client retrieving results "
 #~ "for %(server_id)s. Expected next row to"
@@ -1874,28 +1707,22 @@ msgstr "Beeswax: A aguardar pela consulta..."
 #~ "resultados de %(server_id)s. Esperava que "
 #~ "a linha seguinte fosse %(row)s e "
 #~ "obteve-se %(start_row)s. A abortar"
-
 #~ msgid "Delimiter must be exactly one character."
 #~ msgstr "O delimitador tem de ser exactamente um carácter."
-
 #~ msgid "Failed to read table. Error: %(error)s"
 #~ msgstr "Falha ao ler a tabela. Erro: %(error)s"
-
 #~ msgid "Query is still being submitted to the Beeswax Server."
 #~ msgstr "A consulta ainda está a ser enviada ao servidor Beeswax."
-
 #~ msgid "Trying to display result that is not yet ready. Query id %(id)s"
 #~ msgstr ""
 #~ "A tentar mostrar um resultado que "
 #~ "ainda não está pronto. ID da "
 #~ "consulta %(id)s"
-
 #~ msgid "This action is only available to the user who submitted the query."
 #~ msgstr ""
 #~ "Esta acção está disponível apenas para"
 #~ " o utilizador que enviou esta "
 #~ "consulta."
-
 #~ msgid ""
 #~ "Saving results from a table to a"
 #~ " directory is not supported. You may"
@@ -1906,217 +1733,145 @@ msgstr "Beeswax: A aguardar pela consulta..."
 #~ " um directório não é suportado. Pode"
 #~ " copiar manualmente a partir da "
 #~ "localização no HDFS."
-
 #~ msgid "%(aggregation)s is not a valid aggregation"
 #~ msgstr ""
-
 #~ msgid "%(relation)s is not a valid operator"
 #~ msgstr ""
-
 #~ msgid "Missing ManagementForm for conditions"
 #~ msgstr ""
-
 #~ msgid "UnionMultiForm is not valid"
 #~ msgstr ""
-
 #~ msgid "%(field)s value not applicable with %(source)s source"
 #~ msgstr ""
-
 #~ msgid "%(field)s value missing"
 #~ msgstr ""
-
 #~ msgid "Display"
 #~ msgstr ""
-
 #~ msgid "Source"
 #~ msgstr "Recursos de ficheiro"
-
 #~ msgid "Aggregate"
 #~ msgstr ""
-
 #~ msgid "Distinct"
 #~ msgstr ""
-
 #~ msgid "Constant value"
 #~ msgstr ""
-
 #~ msgid "Table alias"
 #~ msgstr ""
-
 #~ msgid "From column"
 #~ msgstr "Adicionar coluna:"
-
 #~ msgid "Column alias"
 #~ msgstr "Colunas"
-
 #~ msgid "Sort"
 #~ msgstr "Relatório"
-
 #~ msgid "Sort order"
 #~ msgstr ""
-
 #~ msgid "Group order"
 #~ msgstr ""
-
 #~ msgid "From table"
 #~ msgstr "Rejeitar tabela"
-
 #~ msgid "Source must be \"table\" when not displaying column"
 #~ msgstr ""
-
 #~ msgid "Column alias not applicable when not displaying column"
 #~ msgstr ""
-
 #~ msgid "Source value missing"
 #~ msgstr ""
-
 #~ msgid "Constant"
 #~ msgstr ""
-
 #~ msgid "Sort order missing"
 #~ msgstr ""
-
 #~ msgid "Alias not applicable for selecting \"*\""
 #~ msgstr ""
-
 #~ msgid "Invalid column name \"%(column)s\""
 #~ msgstr ""
-
 #~ msgid "Ambiguous table \"%(table)s\" without alias"
 #~ msgstr ""
-
 #~ msgid "Not selecting from any table column"
 #~ msgstr ""
-
 #~ msgid "Not displaying any selection"
 #~ msgstr ""
-
 #~ msgid "Table name/alias"
 #~ msgstr "Nome da tabela"
-
 #~ msgid "Condition"
 #~ msgstr "Condições"
-
 #~ msgid "Operator %(operator)s does not take the right operand"
 #~ msgstr ""
-
 #~ msgid "Operator %(operator)s takes both operands"
 #~ msgstr ""
-
 #~ msgid "Constant (Left)"
 #~ msgstr ""
-
 #~ msgid "Table (Left)"
 #~ msgstr ""
-
 #~ msgid "Column (Left)"
 #~ msgstr ""
-
 #~ msgid "Constant (Right)"
 #~ msgstr ""
-
 #~ msgid "Table (Right)"
 #~ msgstr ""
-
 #~ msgid "Column (Right)"
 #~ msgstr ""
-
 #~ msgid "Unknown table \"%(table)s\" in condition"
 #~ msgstr "A tabela \"%(table)s\" não tem partições."
-
 #~ msgid "Remove"
 #~ msgstr "Pré-visualizar"
-
 #~ msgid "Beeswax: Create table from file"
 #~ msgstr "Beeswax: Criar tabela a partir de ficheiro"
-
 #~ msgid "Beeswax: Create Table"
 #~ msgstr "Beeswax: Criar tabela"
-
 #~ msgid "How Do You Want to Create Your Table?"
 #~ msgstr "De que forma pretende criar a sua tabela?"
-
 #~ msgid "Create From File"
 #~ msgstr "Criar a partir de ficheiro"
-
 #~ msgid "Create Manually"
 #~ msgstr "Criar manualmente"
-
 #~ msgid "Beeswax: Create table manually"
 #~ msgstr "Beeswax: Criar tabela manualmente"
-
 #~ msgid "Choose File"
 #~ msgstr "Escolha um ficheiro"
-
 #~ msgid "Extra column for command links."
 #~ msgstr "Coluna extra para ligações de comandos."
-
 #~ msgid "No"
 #~ msgstr "Não"
-
 #~ msgid "Hive Query"
 #~ msgstr "Consulta do Hive"
-
 #~ msgid "Hive settings"
 #~ msgstr "Definições do Hive"
-
 #~ msgid "Hive Configuration"
 #~ msgstr "Configuração do Hive"
-
 #~ msgid "Beeswax: Queries"
 #~ msgstr "Beeswax: Consultas"
-
 #~ msgid "Report"
 #~ msgstr "Relatório"
-
 #~ msgid "Edit this report."
 #~ msgstr "Editar este relatório."
-
 #~ msgid "Beeswax: Query History"
 #~ msgstr "Beeswax: Histórico de consultas"
-
 #~ msgid "Beeswax: Load Data into %(table)s"
 #~ msgstr "Beeswax: Carregar dados para %(table)s"
-
 #~ msgid "Beeswax: My Queries"
 #~ msgstr "Beeswax: As minhas consultas"
-
 #~ msgid "Beeswax: Query Constructor"
 #~ msgstr "Beeswax: Construtor de consulta"
-
 #~ msgid "Report Generator"
 #~ msgstr "Gerador de relatórios"
-
 #~ msgid "Working on saved query:"
 #~ msgstr "A trabalhar na consulta guardada:"
-
 #~ msgid "Error:"
 #~ msgstr "Erro:"
-
 #~ msgid "View logs"
 #~ msgstr "Ver registos"
-
 #~ msgid "Add column:"
 #~ msgstr "Adicionar coluna:"
-
 #~ msgid "Conditions"
 #~ msgstr "Condições"
-
 #~ msgid "Advanced ..."
 #~ msgstr "Avançadas..."
-
 #~ msgid "Server Log"
 #~ msgstr "Registo do servidor"
-
 #~ msgid "Beeswax: Table List"
 #~ msgstr "Beeswax: Lista de tabelas"
-
 #~ msgid "Beeswax: Query Results"
 #~ msgstr "Beeswax: Resultados da consulta"
-
 #~ msgid "Beeswax: Query Results:"
 #~ msgstr "Beeswax: Resultados da consulta:"
-
 #~ msgid "Back to first row"
 #~ msgstr "Voltar à primeira linha"
-

@@ -19,35 +19,27 @@ msgstr ""
 
 #: src/jobsub/conf.py:28
 msgid "Location on HDFS where the jobsub examples and templates are stored."
-msgstr ""
-"Ordner auf HDFS, in dem die jobsub-Beispiele und -Vorlagen gespeichert "
-"werden."
+msgstr "Ordner auf HDFS, in dem die jobsub-Beispiele und -Vorlagen gespeichert werden."
 
 #: src/jobsub/conf.py:33
 #, fuzzy
 msgid "Location on local filesystem where examples and template are stored."
-msgstr "Ordner im lokalen FS, in dem Beispiele und Vorlagen gespeichert werden"
+msgstr "Speicherort auf lokalem Dateisystem, an dem Beispiele und Vorlagen gespeichert werden"
 
 #: src/jobsub/conf.py:39
 #, fuzzy
 msgid "Location on local filesystem where sample data is stored."
-msgstr "Ordner im lokalen FS, in dem Beispieldaten gespeichert werden"
+msgstr "Speicherort auf lokalem Dateisystem, an dem Beispieldaten gespeichert werden"
 
 #: src/jobsub/conf.py:49
 #, fuzzy
-msgid ""
-"Deprecated, use liboozie.conf.OOZIE_URL instead. URL of Oozie server. "
-"This is required for job submission."
-msgstr "URL zum Oozie-Server. Diese ist erforderlich für die Jobübermittlung."
+msgid "Deprecated, use liboozie.conf.OOZIE_URL instead. URL of Oozie server. This is required for job submission."
+msgstr "Veraltet, verwenden Sie stattdessen liboozie.conf.OOZIE_URL. URL zum Oozie-Server. Diese ist erforderlich für die Jobübermittlung."
 
 #: src/jobsub/conf.py:55
 #, fuzzy
-msgid ""
-"Deprecated, use liboozie.conf.SECURITY_ENABLED instead. Whether Oozie "
-"requires client to do perform Kerberos authentication"
-msgstr ""
-"Ob Oozie für die Durchführung der Kerberos-Authentifizierung einen Client"
-" benötigt"
+msgid "Deprecated, use liboozie.conf.SECURITY_ENABLED instead. Whether Oozie requires client to do perform Kerberos authentication"
+msgstr "Veraltet, verwenden Sie stattdessen liboozie.conf.SECURITY_ENABLED. Ob Oozie für die Durchführung der Kerberos-Authentifizierung einen Client benötigt"
 
 #: src/jobsub/forms.py:39 src/jobsub/forms.py:58 src/jobsub/forms.py:77
 #: src/jobsub/forms.py:95 src/jobsub/templates/list_designs.mako:63
@@ -57,12 +49,8 @@ msgid "Name"
 msgstr "Name"
 
 #: src/jobsub/forms.py:43
-msgid ""
-"Allows letters, digits, '_', and '-'. The first character must be a "
-"letter or '_'."
-msgstr ""
-"Erlaubt Buchstaben, Ziffern, '_' und '-'. Das erste Zeichen muss ein "
-"Buchstabe oder '_' sein."
+msgid "Allows letters, digits, '_', and '-'. The first character must be a letter or '_'."
+msgstr "Erlaubt Buchstaben, Ziffern, '_' und '-'. Das erste Zeichen muss ein Buchstabe oder '_' sein."
 
 #: src/jobsub/forms.py:59 src/jobsub/forms.py:78 src/jobsub/forms.py:96
 #: src/jobsub/templates/list_designs.mako:65
@@ -72,27 +60,27 @@ msgstr "Beschreibung"
 
 #: src/jobsub/forms.py:60
 msgid "Main class"
-msgstr ""
+msgstr "Hauptklasse"
 
 #: src/jobsub/forms.py:61 src/jobsub/forms.py:79
 msgid "Jar path"
-msgstr ""
+msgstr "Jar-Pfad"
 
 #: src/jobsub/forms.py:62
 msgid "Args"
-msgstr ""
+msgstr "Argumente"
 
 #: src/jobsub/forms.py:63
 msgid "Java opts"
-msgstr ""
+msgstr "Java-Optionen"
 
 #: src/jobsub/forms.py:80
 msgid "Mapper"
-msgstr ""
+msgstr "Mapper"
 
 #: src/jobsub/forms.py:81
 msgid "Reducer"
-msgstr ""
+msgstr "Reducer"
 
 #: src/jobsub/models.py:128
 msgid "Name of the design, which must be unique per user."
@@ -113,12 +101,12 @@ msgstr "Pfad zu jar-Dateien auf HDFS."
 #: src/jobsub/submit.py:48
 #, fuzzy, python-format
 msgid "Submission for job design '%(name)s' (id %(id)s, owner %(username)s)."
-msgstr "Übermittlung für Jobdesign '%(name)s' (id %(id)s, Eigentümer %(username)s)"
+msgstr "Übermittlung für Jobdesign '%(name)s' (id %(id)s, Eigentümer %(username)s)."
 
 #: src/jobsub/submit.py:72
 #, fuzzy, python-format
 msgid "Job design already submitted (Oozie job id %(id)s)."
-msgstr "Jobdesign bereits übermittelt (Oozie-Job-ID %(id)s)"
+msgstr "Jobdesign bereits übermittelt (Oozie-Job-ID %(id)s)."
 
 #: src/jobsub/submit.py:81
 msgid "Failed to access deployment directory."
@@ -127,14 +115,12 @@ msgstr "Auf Bereitstellungsverzeichnis konnte nicht zugegriffen werden."
 #: src/jobsub/submit.py:210
 #, fuzzy
 msgid "Failed to obtain HDFS reference. Check your configuration."
-msgstr ""
-"Auf HDFS-Referenz konnte nicht zugegriffen werden. Überprüfen Sie Ihre "
-"Konfiguration."
+msgstr "Auf HDFS-Referenz konnte nicht zugegriffen werden. Überprüfen Sie Ihre Konfiguration."
 
 #: src/jobsub/views.py:59
 #, fuzzy, python-format
 msgid "Access denied: view job %(id)s."
-msgstr "Zugriff verweigert: Job %(id)s anzeigen"
+msgstr "Zugriff verweigert: Job %(id)s anzeigen."
 
 #: src/jobsub/views.py:65
 #, python-format
@@ -148,7 +134,7 @@ msgstr "Berechtigung abgelehnt. Sie sind nicht der Eigentümer."
 #: src/jobsub/views.py:206
 #, fuzzy, python-format
 msgid "Access denied: delete design %(id)s."
-msgstr "Zugriff abgelehnt: Design %(id)s löschen"
+msgstr "Zugriff abgelehnt: Design %(id)s löschen."
 
 #: src/jobsub/views.py:214
 msgid "Workflow not found."
@@ -157,12 +143,12 @@ msgstr "Workflow nicht gefunden."
 #: src/jobsub/views.py:222
 #, fuzzy, python-format
 msgid "Access denied: edit design %(id)s."
-msgstr "Zugriff abgelehnt: Design %(id)s bearbeiten"
+msgstr "Zugriff abgelehnt: Design %(id)s bearbeiten."
 
 #: src/jobsub/views.py:253
 #, fuzzy, python-format
 msgid "Access denied: design parameters %(id)s."
-msgstr "Zugriff abgelehnt: Designparameter %(id)s"
+msgstr "Zugriff abgelehnt: Designparameter %(id)s."
 
 #: src/jobsub/views.py:265
 #, fuzzy
@@ -172,16 +158,16 @@ msgstr "Verwenden Sie eine POST-Anfrage, um ein Design zu übermitteln."
 #: src/jobsub/views.py:269
 #, fuzzy, python-format
 msgid "Access denied: submit design %(id)s."
-msgstr "Zugriff abgelehnt: Design %(id)s übermitteln"
+msgstr "Zugriff abgelehnt: Design %(id)s übermitteln."
 
 #: src/jobsub/views.py:280
 msgid "The Oozie server is not running"
-msgstr ""
+msgstr "Der Oozie-Server ist nicht aktiv."
 
 #: src/jobsub/views.py:281
 #, fuzzy, python-format
 msgid "Error submitting design %(id)s."
-msgstr "Fehler bei der Übermittlung von Design %(id)s"
+msgstr "Fehler bei der Übermittlung von Design %(id)s."
 
 #: src/jobsub/views.py:295
 #, fuzzy
@@ -221,12 +207,8 @@ msgid "or"
 msgstr "oder"
 
 #: src/jobsub/templates/edit_design.mako:68
-msgid ""
-"When the design is submitted, you will be prompted for the actual value "
-"of "
-msgstr ""
-"Wenn das Design übermittelt ist, werden Sie aufgefordert werden, den "
-"tatsächlichen Wert einzugeben von "
+msgid "When the design is submitted, you will be prompted for the actual value of "
+msgstr "Wenn das Design übermittelt ist, werden Sie aufgefordert, den tatsächlichen Wert einzugeben von "
 
 #: src/jobsub/templates/edit_design.mako:76
 msgid "Job Properties"
@@ -312,7 +294,7 @@ msgstr "Mapreduce-Design erstellen"
 
 #: src/jobsub/templates/list_designs.mako:48
 msgid "Mapreduce"
-msgstr ""
+msgstr "MapReduce"
 
 #: src/jobsub/templates/list_designs.mako:49
 msgid "Create Streaming Design"
@@ -320,7 +302,7 @@ msgstr "Streaming-Design erstellen"
 
 #: src/jobsub/templates/list_designs.mako:49
 msgid "Streaming"
-msgstr ""
+msgstr "Streaming"
 
 #: src/jobsub/templates/list_designs.mako:50
 msgid "Create Java Design"
@@ -328,7 +310,7 @@ msgstr "Java-Design erstellen"
 
 #: src/jobsub/templates/list_designs.mako:50
 msgid "Java"
-msgstr ""
+msgstr "Java"
 
 #: src/jobsub/templates/list_designs.mako:53
 msgid "Install Samples"
@@ -520,16 +502,11 @@ msgstr "Anwendungspfad"
 
 #~ msgid "Filter: "
 #~ msgstr "Filter: "
-
 #~ msgid "Search for username, name, etc..."
 #~ msgstr "Nach Benutzernamen, Namen usw. suchen"
-
 #~ msgid "Edit %(name)s"
 #~ msgstr "%(name)s bearbeiten"
-
 #~ msgid "Delete %(name)s"
 #~ msgstr "%(name)s löschen"
-
 #~ msgid "Clone %(name)s"
 #~ msgstr "%(name)s klonen"
-

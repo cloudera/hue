@@ -18,40 +18,38 @@ msgstr ""
 "Generated-By: Babel 0.9.6\n"
 
 #: src/jobbrowser/conf.py:26
-msgid ""
-"Share submitted jobs information with all users. If set to false, "
-"submitted jobs are visible only to the owner and administrators."
+msgid "Share submitted jobs information with all users. If set to false, submitted jobs are visible only to the owner and administrators."
 msgstr "サブミットしたジョブの情報をすべてのユーザーと共有します。false に設定した場合、サブミットしたジョブはその所有者と管理者のみが表示できます。"
 
 #: src/jobbrowser/models.py:87
 #, fuzzy, python-format
 msgid "Could not find job with id %(jobid)s."
-msgstr "ID が %(jobid)s のジョブが見つかりませんでした"
+msgstr "ID が %(jobid)s のジョブが見つかりませんでした。"
 
 #: src/jobbrowser/models.py:421
 #, fuzzy, python-format
 msgid "Cannot look up TaskTracker %(id)s."
-msgstr "TaskTracker %(id)s をルックアップできません"
+msgstr "TaskTracker %(id)s をルックアップできません。"
 
 #: src/jobbrowser/models.py:445
 #, fuzzy, python-format
 msgid "Cannot retrieve logs from TaskTracker %(id)s."
-msgstr "TaskTracker %(id)s からログを取得できません"
+msgstr "TaskTracker %(id)s からログを取得できません。"
 
 #: src/jobbrowser/models.py:452
 #, fuzzy, python-format
 msgid "Hue encountered an error while retrieving logs from '%s'."
-msgstr "'%s' からのログの取得で Hue にエラーが発生しました"
+msgstr "'%s' からのログの取得中に Hue でエラーが発生しました。"
 
 #: src/jobbrowser/views.py:61
 #, fuzzy, python-format
 msgid "You don't have the permissions to access job %(id)s."
-msgstr "ジョブ %(id)s にアクセスするパーミッションがありません"
+msgstr "ジョブ %(id)s にアクセスするパーミッションがありません。"
 
 #: src/jobbrowser/views.py:139
 #, fuzzy, python-format
 msgid "kill_job may only be invoked with a POST (got a %(method)s)."
-msgstr "kill_job は POST（%(method)s の取得）でのみ呼び出し可能です"
+msgstr "kill_job は POST（%(method)s の取得）でのみ呼び出し可能です。"
 
 #: src/jobbrowser/views.py:142
 msgid "Insufficient permission"
@@ -69,7 +67,7 @@ msgstr "ジョブが 15 秒以内に強制終了になりませんでした"
 #: src/jobbrowser/views.py:184
 #, python-format
 msgid "No tasks found for job %(id)s"
-msgstr ""
+msgstr "ジョブ %(id)s のタスクが見つかりません"
 
 #: src/jobbrowser/views.py:265 src/jobbrowser/views.py:285
 #, python-format
@@ -248,7 +246,7 @@ msgstr "Job：%(jobId)s - Job Browser"
 
 #: src/jobbrowser/templates/job.mako:94
 msgid "Job ID"
-msgstr "Job ID"
+msgstr "ジョブ ID"
 
 #: src/jobbrowser/templates/job.mako:96 src/jobbrowser/templates/job.mako:198
 #: src/jobbrowser/templates/jobs.mako:83
@@ -257,7 +255,7 @@ msgstr "ユーザー"
 
 #: src/jobbrowser/templates/job.mako:103
 msgid "View logs"
-msgstr ""
+msgstr "ログを表示"
 
 #: src/jobbrowser/templates/job.mako:105
 msgid "Kill Job"
@@ -373,7 +371,7 @@ msgstr "Job Browser"
 
 #: src/jobbrowser/templates/jobs.mako:37
 msgid "Job status:"
-msgstr ""
+msgstr "ジョブのステータス："
 
 #: src/jobbrowser/templates/jobs.mako:39
 msgid "All States"
@@ -397,16 +395,16 @@ msgstr "強制終了"
 
 #: src/jobbrowser/templates/jobs.mako:53
 msgid "Show retired jobs"
-msgstr ""
+msgstr "リタイアジョブを表示"
 
 #: src/jobbrowser/templates/jobs.mako:58
 msgid "Text:"
-msgstr ""
+msgstr "テキスト："
 
 #: src/jobbrowser/templates/jobs.mako:62
 #, fuzzy
 msgid "Username:"
-msgstr "カウンタ名："
+msgstr "ユーザー名："
 
 #: src/jobbrowser/templates/jobs.mako:63
 msgid "User Name Filter"
@@ -432,7 +430,7 @@ msgstr "日付"
 #: src/jobbrowser/templates/jobs.mako:111
 #, python-format
 msgid "Show only %(status)s jobs"
-msgstr "%(status)s のジョブのみを表示"
+msgstr "%(state)s のジョブのみを表示"
 
 #: src/jobbrowser/templates/jobs.mako:115
 #: src/jobbrowser/templates/jobs.mako:122
@@ -462,24 +460,24 @@ msgstr "Beeswax の起動"
 
 #: src/jobbrowser/templates/jobs.mako:171
 msgid "Please Confirm"
-msgstr ""
+msgstr "確認してください"
 
 #: src/jobbrowser/templates/jobs.mako:174
 msgid "Are you sure you want to kill this job?"
-msgstr ""
+msgstr "このジョブを強制終了してよろしいですか?"
 
 #: src/jobbrowser/templates/jobs.mako:178
 msgid "No"
-msgstr ""
+msgstr "いいえ"
 
 #: src/jobbrowser/templates/jobs.mako:179
 msgid "Yes"
-msgstr ""
+msgstr "はい"
 
 #: src/jobbrowser/templates/task.mako:22 src/jobbrowser/templates/task.mako:25
 #, python-format
 msgid "Job Task: %(taskId)s - Job Browser"
-msgstr "Job タスク：%(taskId)s - Job Browser"
+msgstr "ジョブタスク：%(taskId)s - Job Browser"
 
 #: src/jobbrowser/templates/task.mako:49
 #: src/jobbrowser/templates/tasks.mako:104

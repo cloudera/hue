@@ -24,30 +24,22 @@ msgstr "Localização no HDFS onde os exemplos e modelos de jobsub estão guarda
 #: src/jobsub/conf.py:33
 #, fuzzy
 msgid "Location on local filesystem where examples and template are stored."
-msgstr ""
-"Localização no sistema de ficheiros local onde os exemplos e modelos "
-"estão guardados"
+msgstr "Localização no sistema de ficheiros local onde os exemplos e os modelos estão guardados."
 
 #: src/jobsub/conf.py:39
 #, fuzzy
 msgid "Location on local filesystem where sample data is stored."
-msgstr ""
-"Localização no sistema de ficheiros local onde os dados de amostra estão "
-"guardados"
+msgstr "Localização no sistema de ficheiros local onde os dados de exemplo estão guardados."
 
 #: src/jobsub/conf.py:49
 #, fuzzy
-msgid ""
-"Deprecated, use liboozie.conf.OOZIE_URL instead. URL of Oozie server. "
-"This is required for job submission."
-msgstr "URL do servidor Oozie. Necessário para o envio de trabalhos."
+msgid "Deprecated, use liboozie.conf.OOZIE_URL instead. URL of Oozie server. This is required for job submission."
+msgstr "Preterido, utilize antes liboozie.conf.OOZIE_URL. URL do Oozie Server. É necessário para a submissão de trabalhos."
 
 #: src/jobsub/conf.py:55
 #, fuzzy
-msgid ""
-"Deprecated, use liboozie.conf.SECURITY_ENABLED instead. Whether Oozie "
-"requires client to do perform Kerberos authentication"
-msgstr "Indica se o Oozie exige que o cliente faça a autenticação Kerberos ou não"
+msgid "Deprecated, use liboozie.conf.SECURITY_ENABLED instead. Whether Oozie requires client to do perform Kerberos authentication"
+msgstr "Preterido, utilize antes liboozie.conf.SECURITY_ENABLED. Se o Oozie exigir que o cliente efectue a autenticação Kerberos"
 
 #: src/jobsub/forms.py:39 src/jobsub/forms.py:58 src/jobsub/forms.py:77
 #: src/jobsub/forms.py:95 src/jobsub/templates/list_designs.mako:63
@@ -57,12 +49,8 @@ msgid "Name"
 msgstr "Nome"
 
 #: src/jobsub/forms.py:43
-msgid ""
-"Allows letters, digits, '_', and '-'. The first character must be a "
-"letter or '_'."
-msgstr ""
-"Aceita letras, dígitos, _ e -. O primeiro carácter tem de ser uma letra "
-"ou _."
+msgid "Allows letters, digits, '_', and '-'. The first character must be a letter or '_'."
+msgstr "Aceita letras, dígitos, _ e -. O primeiro carácter tem de ser uma letra ou _."
 
 #: src/jobsub/forms.py:59 src/jobsub/forms.py:78 src/jobsub/forms.py:96
 #: src/jobsub/templates/list_designs.mako:65
@@ -72,27 +60,27 @@ msgstr "Descrição"
 
 #: src/jobsub/forms.py:60
 msgid "Main class"
-msgstr ""
+msgstr "Classe Main"
 
 #: src/jobsub/forms.py:61 src/jobsub/forms.py:79
 msgid "Jar path"
-msgstr ""
+msgstr "Caminho jar"
 
 #: src/jobsub/forms.py:62
 msgid "Args"
-msgstr ""
+msgstr "Args"
 
 #: src/jobsub/forms.py:63
 msgid "Java opts"
-msgstr ""
+msgstr "Opções Java"
 
 #: src/jobsub/forms.py:80
 msgid "Mapper"
-msgstr ""
+msgstr "Mapper"
 
 #: src/jobsub/forms.py:81
 msgid "Reducer"
-msgstr ""
+msgstr "Reducer"
 
 #: src/jobsub/models.py:128
 msgid "Name of the design, which must be unique per user."
@@ -113,14 +101,12 @@ msgstr "Caminho para os ficheiros jar no HDFS."
 #: src/jobsub/submit.py:48
 #, fuzzy, python-format
 msgid "Submission for job design '%(name)s' (id %(id)s, owner %(username)s)."
-msgstr ""
-"Envio de design da tarefa \"%(name)s\" (id %(id)s, proprietário "
-"%(username)s)"
+msgstr "Submissão para design do trabalho \"%(name)s\" (id %(id)s, proprietário %(username)s)."
 
 #: src/jobsub/submit.py:72
 #, fuzzy, python-format
 msgid "Job design already submitted (Oozie job id %(id)s)."
-msgstr "Design da tarefa já enviado (ID de trabalho no Oozie %(id)s)"
+msgstr "Design do trabalho já submetido (ID do trabalho no Oozie %(id)s)."
 
 #: src/jobsub/submit.py:81
 msgid "Failed to access deployment directory."
@@ -134,7 +120,7 @@ msgstr "Falha ao obter a referência do HDFS. Verifique a sua configuração."
 #: src/jobsub/views.py:59
 #, fuzzy, python-format
 msgid "Access denied: view job %(id)s."
-msgstr "Acesso recusado: ver trabalho %(id)s"
+msgstr "Acesso recusado: ver trabalho %(id)s."
 
 #: src/jobsub/views.py:65
 #, python-format
@@ -148,7 +134,7 @@ msgstr "Permissão recusada. Não é o proprietário."
 #: src/jobsub/views.py:206
 #, fuzzy, python-format
 msgid "Access denied: delete design %(id)s."
-msgstr "Acesso recusado: eliminar design %(id)s"
+msgstr "Acesso recusado: eliminar design %(id)s."
 
 #: src/jobsub/views.py:214
 msgid "Workflow not found."
@@ -157,31 +143,31 @@ msgstr "Fluxo de trabalho não encontrado."
 #: src/jobsub/views.py:222
 #, fuzzy, python-format
 msgid "Access denied: edit design %(id)s."
-msgstr "Acesso recusado: editar design %(id)s"
+msgstr "Acesso recusado: editar design %(id)s."
 
 #: src/jobsub/views.py:253
 #, fuzzy, python-format
 msgid "Access denied: design parameters %(id)s."
-msgstr "Acesso recusado: parâmetros do design %(id)s"
+msgstr "Acesso recusado: parâmetros do design %(id)s."
 
 #: src/jobsub/views.py:265
 #, fuzzy
 msgid "Use a POST request to submit a design."
-msgstr "Utilize um pedido POST para enviar um design."
+msgstr "Utilize um pedido POST para submeter um design."
 
 #: src/jobsub/views.py:269
 #, fuzzy, python-format
 msgid "Access denied: submit design %(id)s."
-msgstr "Acesso recusado: enviar design %(id)s"
+msgstr "Acesso recusado: submeter design %(id)s."
 
 #: src/jobsub/views.py:280
 msgid "The Oozie server is not running"
-msgstr ""
+msgstr "O Oozie Server não está em execução"
 
 #: src/jobsub/views.py:281
 #, fuzzy, python-format
 msgid "Error submitting design %(id)s."
-msgstr "Erro ao enviar o design %(id)s"
+msgstr "Erro ao submeter design %(id)s."
 
 #: src/jobsub/views.py:295
 #, fuzzy
@@ -221,10 +207,8 @@ msgid "or"
 msgstr "ou"
 
 #: src/jobsub/templates/edit_design.mako:68
-msgid ""
-"When the design is submitted, you will be prompted for the actual value "
-"of "
-msgstr "Quando o design for enviado, ser-lhe-á pedido o valor real de "
+msgid "When the design is submitted, you will be prompted for the actual value of "
+msgstr "Quando o design for submetido, ser-lhe-á solicitado o valor real de "
 
 #: src/jobsub/templates/edit_design.mako:76
 msgid "Job Properties"
@@ -310,7 +294,7 @@ msgstr "Criar design de Mapreduce"
 
 #: src/jobsub/templates/list_designs.mako:48
 msgid "Mapreduce"
-msgstr ""
+msgstr "MapReduce"
 
 #: src/jobsub/templates/list_designs.mako:49
 msgid "Create Streaming Design"
@@ -318,15 +302,15 @@ msgstr "Criar design de Streaming"
 
 #: src/jobsub/templates/list_designs.mako:49
 msgid "Streaming"
-msgstr ""
+msgstr "Streaming"
 
 #: src/jobsub/templates/list_designs.mako:50
 msgid "Create Java Design"
-msgstr "Criar design de Java"
+msgstr "Criar Design Java"
 
 #: src/jobsub/templates/list_designs.mako:50
 msgid "Java"
-msgstr ""
+msgstr "Java"
 
 #: src/jobsub/templates/list_designs.mako:53
 msgid "Install Samples"
@@ -518,16 +502,11 @@ msgstr "Caminho para a aplicação"
 
 #~ msgid "Filter: "
 #~ msgstr "Filtro: "
-
 #~ msgid "Search for username, name, etc..."
 #~ msgstr "Pesquisar por nome de utilizador, nome, etc..."
-
 #~ msgid "Edit %(name)s"
 #~ msgstr "Editar %(name)s"
-
 #~ msgid "Delete %(name)s"
 #~ msgstr "Eliminar %(name)s"
-
 #~ msgid "Clone %(name)s"
 #~ msgstr "Clonar %(name)s"
-

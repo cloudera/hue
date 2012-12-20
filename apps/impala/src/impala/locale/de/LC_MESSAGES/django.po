@@ -19,201 +19,191 @@ msgstr ""
 
 #: src/impala/conf.py:25
 msgid "Host of the Impala Server."
-msgstr ""
+msgstr "Host des Impala-Servers."
 
 #: src/impala/conf.py:31
 msgid "Port of the Impala Server."
-msgstr ""
+msgstr "Port des Impala-Servers."
 
 #: src/impala/templates/beeswax_components.mako:198
 msgid "Beginning of List"
-msgstr ""
+msgstr "Beginn der Liste"
 
 #: src/impala/templates/beeswax_components.mako:199
 msgid "Previous Page"
-msgstr ""
+msgstr "Vorherige Seite"
 
 #: src/impala/templates/beeswax_components.mako:200
 msgid "Next page"
-msgstr ""
+msgstr "Nächste Seite"
 
 #: src/impala/templates/beeswax_components.mako:200
 msgid "Next Page"
-msgstr ""
+msgstr "Nächste Seite"
 
 #: src/impala/templates/beeswax_components.mako:201
 msgid "End of List"
-msgstr ""
+msgstr "Ende der Liste"
 
 #: src/impala/templates/beeswax_components.mako:203
 #, python-format
-msgid ""
-"Showing %(start)s to %(end)s of %(count)s items, page %(page)s of "
-"%(pages)s"
-msgstr ""
+msgid "Showing %(start)s to %(end)s of %(count)s items, page %(page)s of %(pages)s"
+msgstr "Anzeige von %(start)s bis %(end)s von %(count)s Elementen, Seite %(page)s von %(pages)s"
 
 #: src/impala/templates/execute.mako:26 src/impala/templates/layout.mako:34
 msgid "Query Editor"
-msgstr ""
+msgstr "Abfrage-Editor"
 
 #: src/impala/templates/execute.mako:35
 msgid "Query 2"
-msgstr ""
+msgstr "Abfrage 2"
 
 #: src/impala/templates/execute.mako:40
 msgid "Example: SELECT * FROM tablename"
-msgstr ""
+msgstr "Beispiel: SELECT * FROM tablename"
 
 #: src/impala/templates/execute.mako:51
 msgid "Execute"
-msgstr ""
+msgstr "Ausführen"
 
 #: src/impala/templates/execute.mako:53 src/impala/templates/execute.mako:289
 msgid "Save"
-msgstr ""
+msgstr "Speichern"
 
 #: src/impala/templates/execute.mako:55
 msgid "Save as..."
-msgstr ""
+msgstr "Speichern als..."
 
 #: src/impala/templates/execute.mako:56
 msgid "Explain"
-msgstr ""
+msgstr "Erklären"
 
 #: src/impala/templates/execute.mako:57
 msgid "or create a"
-msgstr ""
+msgstr "oder Erstellen einer"
 
 #: src/impala/templates/execute.mako:57
 msgid "New query"
-msgstr ""
+msgstr "Neue Abfrage"
 
 #: src/impala/templates/execute.mako:62 src/impala/templates/execute.mako:217
 msgid "Query"
-msgstr ""
+msgstr "Abfrage"
 
 #: src/impala/templates/execute.mako:71
 msgid "Query server"
-msgstr ""
+msgstr "Abfrageserver"
 
 #: src/impala/templates/execute.mako:75
 msgid "settings"
-msgstr ""
+msgstr "Einstellungen"
 
 #: src/impala/templates/execute.mako:82 src/impala/templates/execute.mako:117
 #: src/impala/templates/execute.mako:152
 msgid "Delete this setting"
-msgstr ""
+msgstr "Diese Einstellung löschen"
 
 #: src/impala/templates/execute.mako:107 src/impala/templates/execute.mako:142
 #: src/impala/templates/execute.mako:177
 msgid "Add"
-msgstr ""
+msgstr "Hinzufügen"
 
 #: src/impala/templates/execute.mako:110
 msgid "File Resources"
-msgstr ""
+msgstr "Dateiressourcen"
 
 #: src/impala/templates/execute.mako:145
 msgid "User-defined Functions"
-msgstr ""
+msgstr "Benutzerdefinierte Funktionen"
 
 #: src/impala/templates/execute.mako:160
 msgid "myFunction"
-msgstr ""
+msgstr "myFunction"
 
 #: src/impala/templates/execute.mako:180
 msgid "Parameterization"
-msgstr ""
+msgstr "Parametrisierung"
 
 #: src/impala/templates/execute.mako:182
-msgid ""
-"If checked (the default), you can include parameters like $parameter_name"
-" in your query, and users will be prompted for a value when the query is "
-"run."
-msgstr ""
+msgid "If checked (the default), you can include parameters like $parameter_name in your query, and users will be prompted for a value when the query is run."
+msgstr "Wenn markiert (Standardeinstellung), können Sie Parameter wie $parameter_name in Ihrer Abfrage einschließen, und Benutzer werden aufgefordert, einen Wert einzugeben, wenn die Abfrage ausgeführt wird."
 
 #: src/impala/templates/execute.mako:184
 msgid "Enable Parameterization"
-msgstr ""
+msgstr "Parametrisierung aktivieren"
 
 #: src/impala/templates/execute.mako:187
 msgid "Email Notification"
-msgstr ""
+msgstr "E-Mail-Benachrichtigung"
 
 #: src/impala/templates/execute.mako:189
-msgid ""
-"If checked, you will receive an email notification when the query "
-"completes."
-msgstr ""
+msgid "If checked, you will receive an email notification when the query completes."
+msgstr "Wenn markiert, erhalten Sie eine E-Mail-Benachrichtigung, wenn die Abfrage abgeschlossen ist."
 
 #: src/impala/templates/execute.mako:191
 msgid "Email me on completion"
-msgstr ""
+msgstr "E-Mail an mich bei Abschluss"
 
 #: src/impala/templates/execute.mako:202
 msgid "Your query has the following error(s):"
-msgstr ""
+msgstr "Ihre Abfrage enthält folgende(n) Fehler:"
 
 #: src/impala/templates/execute.mako:205
 msgid "click the"
-msgstr ""
+msgstr "Klicken Sie auf das Register"
 
 #: src/impala/templates/execute.mako:205 src/impala/templates/execute.mako:223
 #, fuzzy
 msgid "Error Log"
-msgstr "Server-Protokolle"
+msgstr "Fehlerprotokoll"
 
 #: src/impala/templates/execute.mako:205
 msgid "tab below for details"
-msgstr ""
+msgstr "unten für Details"
 
 #: src/impala/templates/execute.mako:256
 msgid "Choose a file"
-msgstr ""
+msgstr "Eine Datei auswählen"
 
 #: src/impala/templates/execute.mako:269
 msgid "Choose a name"
-msgstr ""
+msgstr "Wählen Sie einen Namen"
 
 #: src/impala/templates/execute.mako:274
 msgid "Name"
-msgstr ""
+msgstr "Name"
 
 #: src/impala/templates/execute.mako:280
 msgid "Description"
-msgstr ""
+msgstr "Beschreibung"
 
 #: src/impala/templates/execute.mako:288
 msgid "Cancel"
-msgstr ""
+msgstr "Abbrechen"
 
 #: src/impala/templates/layout.mako:35
 msgid "My Queries"
-msgstr ""
+msgstr "Meine Abfragen"
 
 #: src/impala/templates/layout.mako:36
 msgid "Saved Queries"
-msgstr ""
+msgstr "Gespeicherte Abfragen"
 
 #: src/impala/templates/layout.mako:37
 msgid "History"
-msgstr ""
+msgstr "Verlauf"
 
 #: src/impala/templates/layout.mako:38
 msgid "Tables"
-msgstr ""
+msgstr "Tabellen"
 
 #: src/impala/templates/layout.mako:39
 msgid "Settings"
-msgstr ""
+msgstr "Einstellungen"
 
 #~ msgid "About Hue"
 #~ msgstr "Über Hue"
-
 #~ msgid "Configuration"
 #~ msgstr "Konfiguration"
-
 #~ msgid "Check for misconfiguration"
 #~ msgstr "Auf Fehlkonfiguration prüfen"
-

@@ -32,7 +32,7 @@ msgstr "자신을 제거할 수는 없습니다."
 
 #: src/useradmin/views.py:74
 msgid "The user was deleted."
-msgstr ""
+msgstr "사용자가 삭제되었습니다."
 
 #: src/useradmin/views.py:77
 msgid "User not found."
@@ -44,11 +44,11 @@ msgstr "그룹을 삭제하려면 superuser여야 합니다."
 
 #: src/useradmin/views.py:95
 msgid "The default user group may not be deleted."
-msgstr "기본 사용자 그룹은 삭제할 수 없습니다."
+msgstr "기본 사용자 그룹을 삭제할 수 없습니다."
 
 #: src/useradmin/views.py:100
 msgid "The group was deleted."
-msgstr ""
+msgstr "그룹이 삭제되었습니다."
 
 #: src/useradmin/views.py:103
 msgid "Group not found."
@@ -78,11 +78,11 @@ msgstr "암호 확인"
 
 #: src/useradmin/views.py:120 src/useradmin/views.py:312
 msgid "Create home directory"
-msgstr ""
+msgstr "홈 디렉토리 생성"
 
 #: src/useradmin/views.py:121
 msgid "Create home directory if one doesn't already exist."
-msgstr ""
+msgstr "홈 디렉토리가 없으면 생성합니다."
 
 #: src/useradmin/views.py:132
 msgid "Passwords do not match."
@@ -106,12 +106,12 @@ msgstr "자신을 superuser로 지정할 수는 없습니다."
 
 #: src/useradmin/views.py:220
 msgid "User information updated"
-msgstr ""
+msgstr "사용자 정보 업데이트됨"
 
 #: src/useradmin/views.py:229 src/useradmin/views.py:353
 #, python-format
 msgid "Cannot make home directory for user %s."
-msgstr ""
+msgstr "사용자 %s의 홈 디렉토리를 만들 수 없습니다."
 
 #: src/useradmin/views.py:252
 msgid "You must be a superuser to add or edit a group."
@@ -119,7 +119,7 @@ msgstr "그룹을 추가하거나 편집하려면 superuser여야 합니다."
 
 #: src/useradmin/views.py:263
 msgid "Group information updated"
-msgstr ""
+msgstr "그룹 정보 업데이트됨"
 
 #: src/useradmin/views.py:284
 msgid "You must be a superuser to change permissions."
@@ -127,7 +127,7 @@ msgstr "권한을 변경하려면 superuser여야 합니다."
 
 #: src/useradmin/views.py:292
 msgid "Permission information updated"
-msgstr ""
+msgstr "권한 정보 업데이트됨"
 
 #: src/useradmin/views.py:307 src/useradmin/views.py:372
 msgid "Distinguished name"
@@ -141,7 +141,7 @@ msgstr "사용자를 고유 이름별로 가져올지 여부입니다."
 
 #: src/useradmin/views.py:313
 msgid "Create home directory for user if one doesn't already exist."
-msgstr ""
+msgstr "사용자의 홈 디렉토리가 없으면 생성합니다."
 
 #: src/useradmin/views.py:324
 #, python-format
@@ -155,12 +155,10 @@ msgstr "다른 사용자를 추가하려면 superuser여야 합니다."
 #: src/useradmin/views.py:357
 #, fuzzy, python-format
 msgid "Could not get LDAP details for user %(username)s."
-msgstr "사용자 %(username)s의 LDAP 정보를 가져오지 못했습니다."
+msgstr "사용자 %(username)s의 LDAP 세부 정보를 가져오지 못했습니다."
 
 #: src/useradmin/views.py:369
-msgid ""
-"Required. 30 characters or fewer. May only contain letters, numbers, "
-"hyphens or underscores."
+msgid "Required. 30 characters or fewer. May only contain letters, numbers, hyphens or underscores."
 msgstr "필수 입력 항목입니다. 30자 이하로 입력하십시오. 문자, 숫자, 하이픈, 밑줄만 포함될 수 있습니다."
 
 #: src/useradmin/views.py:373
@@ -177,13 +175,11 @@ msgstr "그룹에서 새 사용자 또는 가져오지 않은 사용자를 가�
 
 #: src/useradmin/views.py:381
 msgid "Create home directories"
-msgstr ""
+msgstr "홈 디렉토리 생성"
 
 #: src/useradmin/views.py:382
-msgid ""
-"Create home directories for every member imported, if members are being "
-"imported."
-msgstr ""
+msgid "Create home directories for every member imported, if members are being imported."
+msgstr "구성원을 가져올 경우 가져온 모든 구성원의 홈 디렉토리를 생성합니다."
 
 #: src/useradmin/views.py:393
 #, python-format
@@ -197,7 +193,7 @@ msgstr "다른 그룹을 추가하려면 superuser여야 합니다."
 #: src/useradmin/views.py:423
 #, python-format
 msgid "Could not get LDAP details for group %(groupname)s"
-msgstr "그룹 %(groupname)s의 LDAP 정보를 가져오지 못했습니다."
+msgstr "그룹 %(groupname)s의 LDAP 세부 정보를 가져올 수 없습니다."
 
 #: src/useradmin/views.py:439
 msgid "You must be a superuser to sync the LDAP users/groups."
@@ -205,7 +201,7 @@ msgstr "LDAP 사용자/그룹을 동기화하려면 superuser여야 합니다."
 
 #: src/useradmin/views.py:453
 msgid "The import may not be complete, sync again."
-msgstr ""
+msgstr "가져오기를 완료할 수 없습니다. 다시 동기화하십시오."
 
 #: src/useradmin/views.py:477
 msgid "No active superuser configured."
@@ -236,11 +232,11 @@ msgstr "그룹"
 
 #: src/useradmin/views.py:754
 msgid "Create Home Directories"
-msgstr ""
+msgstr "홈 디렉토리 생성"
 
 #: src/useradmin/views.py:755
 msgid "Create home directory for every user, if one doesn't already exist."
-msgstr ""
+msgstr "이미 있는 경우를 제외하고 모든 사용자의 홈 디렉토리를 생성합니다."
 
 #: src/useradmin/management/commands/import_ldap_group.py:39
 msgid "Import users from the group."
@@ -287,12 +283,12 @@ msgstr "예"
 #: src/useradmin/templates/delete_group.mako:22
 #, fuzzy
 msgid "Are you sure you want to delete"
-msgstr "%(group_name)s을(를) 삭제하시겠습니까?"
+msgstr "삭제하시겠습니까?"
 
 #: src/useradmin/templates/delete_group.mako:22
 #: src/useradmin/templates/delete_user.mako:22
 msgid "?"
-msgstr ""
+msgstr "?"
 
 #: src/useradmin/templates/delete_group.mako:25
 #: src/useradmin/templates/delete_user.mako:25
@@ -302,7 +298,7 @@ msgstr "아니요"
 #: src/useradmin/templates/delete_user.mako:22
 #, fuzzy
 msgid "Are you sure you want to delete "
-msgstr "%(group_name)s을(를) 삭제하시겠습니까?"
+msgstr "삭제하시겠습니까? "
 
 #: src/useradmin/templates/edit_group.mako:26
 #: src/useradmin/templates/list_groups.mako:25
@@ -360,16 +356,16 @@ msgstr "검색"
 #: src/useradmin/templates/edit_group.mako:85
 #, fuzzy
 msgid "No users found."
-msgstr "사용자를 찾을 수 없습니다."
+msgstr "사용자가 없습니다."
 
 #: src/useradmin/templates/edit_group.mako:85
 msgid "Create a new user now"
-msgstr ""
+msgstr "지금 새 사용자 생성"
 
 #: src/useradmin/templates/edit_group.mako:92
 #, fuzzy
 msgid "No permissions found."
-msgstr "권한"
+msgstr "권한을 찾을 수 없습니다."
 
 #: src/useradmin/templates/edit_permissions.mako:23
 #: src/useradmin/templates/list_permissions.mako:26
@@ -426,7 +422,7 @@ msgstr "사용자 추가"
 
 #: src/useradmin/templates/edit_user.mako:104
 msgid "Create a new group now"
-msgstr ""
+msgstr "지금 새 그룹 생성"
 
 #: src/useradmin/templates/layout.mako:32
 msgid "Users"
@@ -467,7 +463,7 @@ msgstr "%(groupname)s 편집"
 
 #: src/useradmin/templates/list_groups.mako:80
 msgid "There are no groups matching the search criteria."
-msgstr ""
+msgstr "검색 기준과 일치하는 그룹이 없습니다."
 
 #: src/useradmin/templates/list_permissions.mako:36
 msgid "Application"
@@ -483,7 +479,7 @@ msgstr "권한 편집"
 
 #: src/useradmin/templates/list_permissions.mako:60
 msgid "There are no permissions matching the search criteria."
-msgstr ""
+msgstr "검색 기준과 일치하는 권한이 없습니다."
 
 #: src/useradmin/templates/list_users.mako:40
 msgid "Add/Sync LDAP user"
@@ -516,23 +512,19 @@ msgstr "%(username)s 편집"
 
 #: src/useradmin/templates/list_users.mako:87
 msgid "There are no users matching the search criteria."
-msgstr ""
+msgstr "검색 기준과 일치하는 사용자가 없습니다."
 
 #: src/useradmin/templates/sync_ldap_users_groups.mako:37
 msgid "Sync LDAP users and groups"
 msgstr "LDAP 사용자 및 그룹 동기화"
 
 #: src/useradmin/templates/sync_ldap_users_groups.mako:41
-msgid ""
-"This will not import any users or groups that don't already exist in Hue."
-" Only users and groups imported from LDAP can be synced."
-msgstr "이미 Hue에 없는 사용자 또는 그룹은 가져오지 않습니다. LDAP에서 가져온 사용자와 그룹만 동기화될 수 있습니다."
+msgid "This will not import any users or groups that don't already exist in Hue. Only users and groups imported from LDAP can be synced."
+msgstr "이 작업은 Hue에 없는 사용자 또는 그룹은 가져오지 않습니다. LDAP에서 가져온 사용자 및 그룹만 동기화할 수 있습니다."
 
 #: src/useradmin/templates/sync_ldap_users_groups.mako:42
-msgid ""
-"All user information and group memberships will be updated based on the "
-"LDAP server's current state."
-msgstr "모든 사용자 정보 및 그룹 구성원 자격이 LDAP 서버의 현재 상태에 따라 업데이트됩니다."
+msgid "All user information and group memberships will be updated based on the LDAP server's current state."
+msgstr "모든 사용자 정보 및 그룹 구성원 자격이 LDAP 서버의 현재 상태를 기준으로 업데이트됩니다."
 
 #: src/useradmin/templates/sync_ldap_users_groups.mako:50
 msgid "Sync"
@@ -540,37 +532,25 @@ msgstr "동기화"
 
 #~ msgid "The user was deleted !"
 #~ msgstr ""
-
 #~ msgid "The group was deleted !"
 #~ msgstr ""
-
 #~ msgid "Cannot make home directory for user %s"
 #~ msgstr ""
-
 #~ msgid "The import may not be complete, sync again"
 #~ msgstr ""
-
 #~ msgid "Filter: "
 #~ msgstr "필터: "
-
 #~ msgid "Search for group name, members, etc..."
 #~ msgstr "그룹 이름, 구성원 등을 검색합니다."
-
 #~ msgid "Edit"
 #~ msgstr "편집"
-
 #~ msgid "Delete %(groupname)s"
 #~ msgstr "%(groupname)s 삭제"
-
 #~ msgid "Are you sure you want to delete %(group_name)s?"
 #~ msgstr "%(group_name)s을(를) 삭제하시겠습니까?"
-
 #~ msgid "Search for application name, description, etc..."
 #~ msgstr "애플리케이션 이름, 설명 등을 검색합니다."
-
 #~ msgid "Search for username, name, e-mail, etc..."
 #~ msgstr "사용자 이름, 이름, 이메일 등을 검색합니다."
-
 #~ msgid "Delete %(username)s"
 #~ msgstr "%(username)s 삭제"
-

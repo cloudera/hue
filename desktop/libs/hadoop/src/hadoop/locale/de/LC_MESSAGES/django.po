@@ -21,56 +21,48 @@ msgstr ""
 #: src/hadoop/fs/hadoopfs.py:268
 #, python-format
 msgid "%(remote_dst)s already exists. Skipping."
-msgstr ""
+msgstr "%(remote_dst)s bereits vorhanden. Wird übersprungen."
 
 #: src/hadoop/fs/hadoopfs.py:271
 #, python-format
 msgid "%(remote_dst)s does not exist. Trying to copy."
-msgstr ""
+msgstr "%(remote_dst)s nicht vorhanden. Kopieren wird versucht."
 
 #: src/hadoop/fs/hadoopfs.py:281
 #, python-format
 msgid "Copied %s -> %s."
-msgstr ""
+msgstr "%s -> %s kopiert."
 
 #: src/hadoop/fs/hadoopfs.py:283
 #, python-format
 msgid "Copying %s -> %s failed."
-msgstr ""
+msgstr "Kopieren von %s -> %s fehlgeschlagen."
 
 #: src/hadoop/fs/hadoopfs.py:288
 #, python-format
 msgid "Skipping %s (not a file)."
-msgstr ""
+msgstr "%s wird übersprungen (keine Datei)."
 
 #: src/hadoop/fs/hadoopfs.py:291 src/hadoop/fs/hadoopfs.py:294
 #: src/hadoop/fs/hadoopfs.py:297 src/hadoop/fs/hadoopfs.py:300
 #: src/hadoop/fs/hadoopfs.py:303 src/hadoop/fs/hadoopfs.py:306
 #, python-format
 msgid "%(function)s has not been implemented."
-msgstr ""
+msgstr "%(function)s wurde noch nicht implementiert."
 
 #~ msgid "exists has not been implemented."
 #~ msgstr ""
-
 #~ msgid "do_as_user has not been implemented."
 #~ msgstr ""
-
 #~ msgid "mkdir has not been implemented."
 #~ msgstr ""
-
 #~ msgid "isdir has not been implemented."
 #~ msgstr ""
-
 #~ msgid "%(remote_dst)s does not exist. Trying to copy"
 #~ msgstr ""
-
 #~ msgid "Copied %s -> %s"
 #~ msgstr ""
-
 #~ msgid "Copying %s -> %s failed"
 #~ msgstr ""
-
 #~ msgid "Skipping %s (not a file)"
 #~ msgstr ""
-
