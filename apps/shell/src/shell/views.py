@@ -113,8 +113,9 @@ def retrieve_output(request):
       SHELL_OUTPUT_LOGGER.info(log_format % log_args)
 
   for shell in result:
-    if 'output' in result[shell]:
-      result[shell]['output'] = remove_colors(result[shell]['output'])
+    shell = result[shell]
+    if isinstance(shell, dict) and 'output' in shell:
+      shell['output'] = remove_colors(shell['output'])
 
   return HttpResponse(simplejson.dumps(result), mimetype="application/json")
 
