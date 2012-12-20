@@ -28,7 +28,7 @@ ${ layout.menubar(section='workflows') }
 
 
 <div class="container-fluid">
-  <h1>${ _('Workflow Editor') }</h1>
+  <h1>${ _('Workflow Manager') }</h1>
 
   <div class="well hueWell">
     <div class="btn-group pull-right">

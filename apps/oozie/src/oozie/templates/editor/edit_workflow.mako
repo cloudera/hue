@@ -34,7 +34,7 @@ ${ layout.menubar(section='workflows') }
     <div class="ribbon">${ _('Unsaved') }</div>
   </div>
 
-  <h1 data-bind="text: '${ _('Workflow') } ' + name()"></h1>
+  <h1 data-bind="text: '${ _('Workflow Editor : ') } ' + name()"></h1>
 
   <div class="well">
     <span data-bind="text: '${ _('Description') }: ' + description() || 'N/A'"></span>

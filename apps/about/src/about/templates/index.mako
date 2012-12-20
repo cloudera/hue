@@ -30,10 +30,8 @@ ${commonheader(_('About Hue'), "about", user, "100px")}
 	</div>
 
 	<div class="container-fluid">
-
-		<img src="/static/art/help/logo.png" />
+		<img src="/static/art/hue-login-logo.png" />
 		<p>Hue ${version}</p>
-
 	</div>
 
 ${commonfooter(messages)}

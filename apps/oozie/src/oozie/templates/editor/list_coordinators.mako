@@ -28,7 +28,7 @@ ${ layout.menubar(section='coordinators') }
 
 
 <div class="container-fluid">
-  <h1>${ _('Coordinator Editor') }</h1>
+  <h1>${ _('Coordinator Manager') }</h1>
 
   <div class="well hueWell">
     <div class="btn-group pull-right">
