@@ -27,42 +27,41 @@ ${layout.menubar(section='users', _=_)}
 
 
 <div class="container-fluid">
-   <h1>${_('Hue Users - Add/Sync LDAP user')}</h1>
-
+    <h1>${_('Hue Users - Add/Sync LDAP user')}</h1>
     <br/>
 
-	<form id="editForm" method="POST" class="form form-horizontal">
-		<fieldset>
-		      % for field in form.fields:	
+  <form id="editForm" method="POST" class="form form-horizontal">
+    <fieldset>
+          % for field in form.fields:
                   % if form[field].is_hidden:
                       ${ form[field] }
                   % else:
                       ${ layout.render_field(form[field]) }
-                  % endif	
-		      % endfor				
-		</fieldset>
-		<br/>
-		<div class="form-actions">
-			% if username:
-				<input type="submit" class="btn btn-primary" value="${_('Update user')}"/>
-			% else:
-			    <input type="submit" class="btn btn-primary" value="${_('Add/Sync user')}"/>
-			% endif
-			<a href="/useradmin/users" class="btn">${_('Cancel')}</a>
-		</div>
-	</form>
+                  % endif
+          % endfor
+    </fieldset>
+    <br/>
+    <div class="form-actions">
+      % if username:
+        <input type="submit" class="btn btn-primary" value="${_('Update user')}"/>
+      % else:
+          <input type="submit" class="btn btn-primary" value="${_('Add/Sync user')}"/>
+      % endif
+      <a href="/useradmin/users" class="btn">${_('Cancel')}</a>
+    </div>
+  </form>
 </div>
 
 <script type="text/javascript" charset="utf-8">
-	$(document).ready(function(){
-		$("#id_groups").jHueSelector({
+  $(document).ready(function(){
+    $("#id_groups").jHueSelector({
             selectAllLabel: "${_('Select all')}",
             searchPlaceholder: "${_('Search')}",
             noChoicesFound: "${_('No groups found.')} <a href='${url('useradmin.views.edit_group')}'>${_('Create a new group now')} &raquo;</a>",
             width:618,
             height:240
         });
-	});
+  });
 </script>
 
 ${commonfooter(messages)}
