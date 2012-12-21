@@ -94,11 +94,11 @@ class LdapConnection(object):
       user_filter = '(' + user_filter + ')'
     user_name_attr = desktop.conf.LDAP.USERS.USER_NAME_ATTR.get()
 
+    # Allow wild cards on non distinguished names
+    sanitized_name = ldap.filter.escape_filter_chars(username).replace(r'\2a', r'*')
     if find_by_dn:
-      sanitized_name = ldap.filter.escape_filter_chars(username)
       user_name_filter = '(distinguishedName=' + sanitized_name + ')'
     else:
-      sanitized_name = ldap.filter.escape_filter_chars(username)
       user_name_filter = '(' + user_name_attr + '=' + sanitized_name + ')'
     ldap_filter = '(&' + user_filter + user_name_filter + ')'
 
