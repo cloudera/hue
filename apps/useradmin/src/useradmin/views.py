@@ -26,6 +26,7 @@ import threading
 import subprocess
 
 import ldap_access
+from ldap import LDAPError
 
 from django.contrib.auth.models import User, Group
 from desktop.lib.django_util import render
@@ -272,7 +273,12 @@ def add_ldap_user(request):
     if form.is_valid():
       username = form.cleaned_data['username']
       import_by_dn = form.cleaned_data['dn']
-      user = import_ldap_user(username, import_by_dn)
+      try:
+        user = import_ldap_user(username, import_by_dn)
+      except LDAPError, e:
+        LOG.error("LDAP Exception: %s" % e)
+        raise PopupException(_('There was an error when communicating with LDAP: %s') % str(e))
+
       if user and form.cleaned_data['ensure_home_directory']:
         try:
           ensure_home_directory(request.fs, user.username)
@@ -309,7 +315,11 @@ def add_ldap_group(request):
       groupname = form.cleaned_data['name']
       import_by_dn = form.cleaned_data['dn']
       import_members = form.cleaned_data['import_members']
-      group = import_ldap_group(groupname, import_members, import_by_dn)
+      try:
+        group = import_ldap_group(groupname, import_members, import_by_dn)
+      except LDAPError, e:
+        LOG.error("LDAP Exception: %s" % e)
+        raise PopupException(_('There was an error when communicating with LDAP: %s') % str(e))
 
       if group is None:
         errors = form._errors.setdefault('name', ErrorList())
@@ -336,8 +346,12 @@ def sync_ldap_users_groups(request):
   if request.method == 'POST':
     form = SyncLdapUsersGroupsForm(request.POST)
     if form.is_valid():
-      users = sync_ldap_users()
-      groups = sync_ldap_groups()
+      try:
+        users = sync_ldap_users()
+        groups = sync_ldap_groups()
+      except LDAPError:
+        LOG.error("LDAP Exception: %s" % e)
+        raise PopupException(_('There was an error when communicating with LDAP: %s') % str(e))
 
       # Create home dirs for every user sync'd
       if form.cleaned_data['ensure_home_directory']:

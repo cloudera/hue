@@ -22,6 +22,7 @@ Tests for "user admin"
 """
 
 import urllib
+from ldap import LDAPError
 
 from nose.plugins.attrib import attr
 from nose.tools import assert_true, assert_equal, assert_false
@@ -486,6 +487,21 @@ def test_sync_ldap_users_groups():
 
   assert_true(c.get(URL))
   assert_true(c.post(URL))
+
+def test_ldap_exception_handling():
+  reset_all_users()
+  reset_all_groups()
+
+  # Set up LDAP tests to use a LdapTestConnection instead of an actual LDAP connection
+  class LdapTestConnectionError(LdapTestConnection):
+    def find_user(self, user, find_by_dn=False):
+      raise LDAPError('No such object')
+  ldap_access.CACHED_LDAP_CONN = LdapTestConnectionError()
+
+  c = make_logged_in_client('test', is_superuser=True)
+
+  response = c.post(reverse(add_ldap_user), dict(username='moe', password1='test', password2='test'), follow=True)
+  assert_true('There was an error when communicating with LDAP' in response.content, response)
 
 @attr('requires_hadoop')
 def test_ensure_home_directory_add_ldap_user():
