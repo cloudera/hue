@@ -577,3 +577,7 @@ def import_workflow(request):
     'workflow_form': workflow_form,
     'workflow': workflow,
   })
+
+
+def jasmine(request):
+  return render('editor/jasmine.mako', request, None)
