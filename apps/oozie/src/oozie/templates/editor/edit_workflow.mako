@@ -564,7 +564,7 @@ $.extend(Workflow.prototype, {
  *  - 2 Layers of models.
  */
 // Fetch all nodes from server.
-var workflow_model = {
+var workflow_model = new WorkflowModel({
   id: ${ workflow.id },
   name: "${ workflow.name }",
   description: "${ workflow.description }",
@@ -575,7 +575,7 @@ var workflow_model = {
   is_shared: "${ workflow.is_shared }" == "True",
   parameters: ${ workflow.parameters },
   job_properties: ${ workflow.job_properties }
-};
+});
 var registry = new Registry();
 var workflow = new Workflow({
   model: workflow_model,
