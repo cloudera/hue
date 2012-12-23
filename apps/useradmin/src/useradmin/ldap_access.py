@@ -86,7 +86,6 @@ class LdapConnection(object):
     LDAP search helper method finding users. This supports searching for users
     by distinguished name, or the configured username attribute.
     """
-    base_dn = self._get_root_dn()
     scope = ldap.SCOPE_SUBTREE
 
     user_filter = desktop.conf.LDAP.USERS.USER_FILTER.get()
@@ -94,15 +93,25 @@ class LdapConnection(object):
       user_filter = '(' + user_filter + ')'
     user_name_attr = desktop.conf.LDAP.USERS.USER_NAME_ATTR.get()
 
+    # sanitize input
+    sanitized_username = ldap.filter.escape_filter_chars(username)
+
+    # if we are to find this user by full distinguished name,
+    # then search by setting search_dn to the provided username
+    # rather than by filtering by user_name_filter.
     if find_by_dn:
-      sanitized_name = ldap.filter.escape_filter_chars(username)
-      user_name_filter = '(distinguishedName=' + sanitized_name + ')'
+      search_dn = sanitized_username
+      user_name_filter = ''
+    # else use the root dn as the search_dn as is and assume that
+    # the provided username is not a full distinguished name.
+    # Search for the username by filtering on user_name_attr.
     else:
-      sanitized_name = ldap.filter.escape_filter_chars(username)
-      user_name_filter = '(' + user_name_attr + '=' + sanitized_name + ')'
+      search_dn = self._get_root_dn()
+      user_name_filter = '(' + user_name_attr + '=' + sanitized_username + ')'
+
     ldap_filter = '(&' + user_filter + user_name_filter + ')'
 
-    ldap_result_id = self.ldap_handle.search(base_dn, scope, ldap_filter)
+    ldap_result_id = self.ldap_handle.search(search_dn, scope, ldap_filter)
     result_type, result_data = self.ldap_handle.result(ldap_result_id)
     if result_data and result_type == ldap.RES_SEARCH_RESULT:
       data = result_data[0][1]
