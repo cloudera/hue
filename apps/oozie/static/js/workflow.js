@@ -1903,6 +1903,25 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
     },
 
     // Data manipulation
+    toJSON: function() {
+      var self = this;
+
+      data = $.extend(true, {}, self.model);
+
+      var nodes = [];
+      $.each(self.registry.nodes, function(key, node) {
+        // Create object with members from the actual model to address JSON.stringify bug
+        // JSON.stringify does not pick up members specified in prototype prior to object creation.
+        var model = {};
+        for (var key in node.model) {
+          model[key] = node.model[key];
+        }
+        nodes.push(model);
+      });
+      data['nodes'] = nodes;
+
+      return JSON.stringify(data);
+    },
 
     save: function( options ) {},
 

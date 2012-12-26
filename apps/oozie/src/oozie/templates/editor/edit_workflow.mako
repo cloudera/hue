@@ -519,24 +519,10 @@ $.extend(Workflow.prototype, {
 
     var options = options || {};
 
-    data = $.extend(true, {}, self.model);
-
-    var nodes = [];
-    $.each(self.registry.nodes, function(key, node) {
-      // Create object with members from the actual model to address JSON.stringify bug
-      // JSON.stringify does not pick up members specified in prototype prior to object creation.
-      var model = {};
-      for (var key in node.model) {
-        model[key] = node.model[key];
-      }
-      nodes.push(model);
-    });
-    data['nodes'] = nodes;
-
     var request = $.extend({
       url: self.url() + '/save',
       type: 'POST',
-      data: { workflow: JSON.stringify(data) },
+      data: { workflow: self.toJSON() },
       success: function() {
         $.jHueNotify.info("${ _('Workflow saved') }");
         workflow.is_dirty( false );
