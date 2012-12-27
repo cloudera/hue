@@ -453,6 +453,26 @@ ${ controls.decision_form(link_form, default_link_form, 'decision', True) }
   </div>
 </script>
 
+<script type="text/html" id="joinTemplate">
+  <div class="node node-join row-fluid">
+    <div class="action span12">
+      <div class="row-fluid">
+        <div class="span10">
+          <span class="label label-info" data-bind="text: (name()) ? name() : node_type() + '-' + id()"></span>
+        </div>
+      </div>
+
+      <div class="row-fluid">
+        <div class="span10">
+          <span data-bind="text: node_type()"></span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="row-fluid" data-bind="template: { name: 'linkTemplate', foreach: links() }"></div>
+</script>
+
 <script type="text/html" id="decisionTemplate">
   <div class="node node-decision row-fluid">
     <div class="action span12">
@@ -479,19 +499,15 @@ ${ controls.decision_form(link_form, default_link_form, 'decision', True) }
         </div>
       </div>
     </div>
-
-    <div class="row-fluid node-decision-end">
-      <div class="node-decision-end">&nbsp;</div>
-    </div>
   </div>
 </script>
 
-<script type="text/html" id="joinTemplate">
-  <div class="node node-join row-fluid">
+<script type="text/html" id="decisionEndTemplate">
+  <div class="node node-decisionend row-fluid">
     <div class="action span12">
       <div class="row-fluid">
         <div class="span10">
-          <span class="label label-info" data-bind="text: (name()) ? name() : node_type() + '-' + id()"></span>
+          <span class="label label-info" data-bind="text: 'end-' + id()"></span>
         </div>
       </div>
 

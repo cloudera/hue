@@ -1024,12 +1024,12 @@ class TestEditor(OozieMockBase):
     import_workflow(workflow, f.read(), schema_version=0.4)
     f.close()
     workflow.save()
-    assert_equal(11, len(Node.objects.filter(workflow=workflow)))
-    assert_equal(19, len(Link.objects.filter(parent__workflow=workflow)))
+    assert_equal(12, len(Node.objects.filter(workflow=workflow)))
+    assert_equal(20, len(Link.objects.filter(parent__workflow=workflow)))
     assert_equal(1, len(Link.objects.filter(parent__workflow=workflow, parent__node_type='decision', comment='${1 gt 2}', name='start')))
     assert_equal(1, len(Link.objects.filter(parent__workflow=workflow, parent__node_type='decision', comment='', name='start')))
     assert_equal(1, len(Link.objects.filter(parent__workflow=workflow, parent__node_type='decision', name='default')))
-    assert_equal(1, len(Link.objects.filter(parent__workflow=workflow, parent__node_type='decision', child__node_type='end', name='related')))
+    assert_equal(1, len(Link.objects.filter(parent__workflow=workflow, parent__node_type='decision', child__node_type='decisionend', name='related')))
     workflow.delete()
 
 

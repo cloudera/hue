@@ -25,6 +25,6 @@
             <subject>${ node.subject }</subject>
             <body>${ node.body }</body>
         </email>
-        <ok to="${ node.get_child('ok') }"/>
-        <error to="${ node.get_child('error') }"/>
+        <ok to="${ node.get_oozie_child('ok') }"/>
+        <error to="${ node.get_oozie_child('error') }"/>
     </action>

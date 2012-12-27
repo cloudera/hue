@@ -366,7 +366,7 @@ class Workflow(Job):
     return self.get_hierarchy_rec(node=node) + [[Kill.objects.get(name='kill', workflow=node.workflow)],
                                            [End.objects.get(name='end', workflow=node.workflow)]]
 
-  def get_hierarchy_rec(self, node=None, skip_parents_check=False):
+  def get_hierarchy_rec(self, node=None):
     if node is None:
       node = self.start
       if node.id is None:
@@ -375,24 +375,21 @@ class Workflow(Job):
     node = node.get_full_node()
     parents = node.get_parents()
 
-    if len(parents) > 1 and not skip_parents_check:
-      return []
-
     if isinstance(node, End):
       return [] # Not returning the end node
     elif isinstance(node, Decision):
       children = node.get_children('start')
-      end = node.get_child_end_or_none()
-      if end:
-        return [[node, [self.get_hierarchy_rec(node=child) for child in children]] + self.get_hierarchy_rec(node=end, skip_parents_check=True)]
-      else:
-        return [[node, [self.get_hierarchy_rec(node=child) for child in children]]]
+      return [[node] + [[self.get_hierarchy_rec(node=child) for child in children],
+                        node.get_child_end()]] + self.get_hierarchy_rec(node.get_child_end().get_child('to'))
+    elif isinstance(node, DecisionEnd):
+      return []
     elif isinstance(node, Fork):
       children = node.get_children('start')
       return [[node] + [[self.get_hierarchy_rec(node=child) for child in children],
                         node.get_child_join()]] + self.get_hierarchy_rec(node.get_child_join().get_child('to'))
     elif isinstance(node, Join):
       return []
+
     else:
       child = Link.objects.filter(parent=node).exclude(name__in=['related', 'kill', 'error'])[0].child
       return [node] + self.get_hierarchy_rec(child)
@@ -412,7 +409,7 @@ class Workflow(Job):
 
 class Link(models.Model):
   # Links to exclude when using get_children_link(), get_parent_links() in the API
-  META_LINKS = ('related')
+  META_LINKS = ('related', 'default')
 
   parent = models.ForeignKey('Node', related_name='child_node')
   child = models.ForeignKey('Node', related_name='parent_node', verbose_name='')
@@ -483,10 +480,12 @@ class Node(models.Model):
       node = self.kill
     elif self.node_type == Fork.node_type:
       node = self.fork
-    elif self.node_type == Decision.node_type:
-      node = self.decision
     elif self.node_type == Join.node_type:
       node = self.join
+    elif self.node_type == Decision.node_type:
+      node = self.decision
+    elif self.node_type == DecisionEnd.node_type:
+      node = self.decisionend
     else:
       raise Exception(_('Unknown Node type: %s. Was it set at its creation?'), (self.node_type,))
 
@@ -523,7 +522,15 @@ class Node(models.Model):
     return self.get_link(name)
 
   def get_child(self, name=None):
+    """Includes DecisionEnd nodes"""
     return self.get_link(name).child.get_full_node()
+
+  def get_oozie_child(self, name=None):
+    """Resolves DecisionEnd nodes"""
+    child = self.get_link(name).child.get_full_node()
+    if child and child.node_type == DecisionEnd.node_type:
+      child = child.get_oozie_child('to')
+    return child
 
   def get_children(self, name=None):
     if name is not None:
@@ -1046,34 +1053,6 @@ class Fork(ControlFlow):
     join.delete()
 
 
-class Decision(ControlFlow):
-  """
-  Essentially a fork where the end is not a join, but another node.
-  If two decisions share an end, the decision with the higher level takes the end
-  and the lower level decision will not have an end.
-  IE:     D
-        D   N
-          E
-    The first 'D' will be assigned the end 'E'.
-    The second 'D' will not have an end.
-  This enables easier interpretation of visual hierarchy.
-  """
-  node_type = 'decision'
-
-  def get_child_end_or_none(self):
-    try:
-      return Link.objects.get(parent=self, name='related').child.get_full_node()
-    except Link.DoesNotExist:
-      return None
-
-  def is_visible(self):
-    return True
-
-  def update_description(self):
-    self.description = ', '.join(self.get_children_links().values_list('comment', flat=True))
-    self.save()
-
-
 class Join(ControlFlow):
   node_type = 'join'
 
@@ -1086,6 +1065,47 @@ class Join(ControlFlow):
   def get_parent_actions(self):
     return [link.parent for link in self.get_parent_links()]
 
+
+class Decision(ControlFlow):
+  """
+  Essentially a fork where only one of the paths of execution are chosen.
+  Graphically, this is represented the same way as a fork.
+  The DecisionEnd node is not represented in Oozie, only in Hue.
+  """
+  node_type = 'decision'
+
+  def get_child_end(self):
+    return Link.objects.get(parent=self, name='related').child.get_full_node()
+
+  def is_visible(self):
+    return True
+
+  def update_description(self):
+    self.description = ', '.join(self.get_children_links().values_list('comment', flat=True))
+    self.save()
+
+
+class DecisionEnd(ControlFlow):
+  """
+  Defines the end of a join.
+  This node exists purely in the Hue application to provide a smooth transition
+  from Decision to Endself.
+
+  NOTE: NOT AN OOZIE NODE
+  """
+  node_type = 'decisionend'
+
+  def is_visible(self):
+    return False
+
+  def get_parent_decision(self):
+    return self.get_parent_link('related').parent.get_full_node()
+
+  def get_parent_actions(self):
+    return [link.parent for link in self.get_parent_links()]
+
+  def to_xml(self):
+    return ''
 
 
 FREQUENCY_UNITS = (('minutes', _('Minutes')),
@@ -1445,6 +1465,7 @@ NODE_TYPES.update({
   Fork.node_type: Fork,
   Join.node_type: Join,
   Decision.node_type: Decision,
+  DecisionEnd.node_type: DecisionEnd,
   Start.node_type: Start,
   End.node_type: End,
 })
