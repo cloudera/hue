@@ -21,6 +21,6 @@
               ${ link.comment }
             </case>
         % endfor
-            <default to="${ node.get_child('default') }"/>
+            <default to="${ node.get_oozie_child('default') }"/>
         </switch>
     </decision>

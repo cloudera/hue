@@ -35,6 +35,6 @@
 
             ${ common.distributed_cache(node.get_files(), node.get_archives()) }
         </hive>
-        <ok to="${ node.get_child('ok') }"/>
-        <error to="${ node.get_child('error') }"/>
+        <ok to="${ node.get_oozie_child('ok') }"/>
+        <error to="${ node.get_oozie_child('error') }"/>
     </action>

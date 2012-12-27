@@ -14,4 +14,4 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 
-    <start to="${ node.get_child('to') }"/>
+    <start to="${ node.get_oozie_child('to') }"/>

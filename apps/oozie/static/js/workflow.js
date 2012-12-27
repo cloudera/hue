@@ -528,6 +528,7 @@ var IdGeneratorTable = {
   fork: new IdGenerator({prefix: 'fork'}),
   decision: new IdGenerator({prefix: 'decision'}),
   join: new IdGenerator({prefix: 'join'}),
+  decisionend: new IdGenerator({prefix: 'decisionend'}),
   kill: new IdGenerator({prefix: 'kill'})
 };
 
@@ -544,8 +545,9 @@ var NodeModule = function($, IdGeneratorTable) {
       case 'fork':
         return (child.node_type() == 'join') ? 'related' : 'start';
       case 'decision':
-        return 'start';
+        return (child.node_type() == 'decisionend') ? 'related' : 'start';
       case 'join':
+      case 'decisionend':
         return 'to';
       default:
         return 'ok';
@@ -607,12 +609,16 @@ var NodeModule = function($, IdGeneratorTable) {
       self.view_template = ko.observable('forkTemplate');
     break;
 
+    case 'join':
+      self.view_template = ko.observable('joinTemplate');
+    break;
+
     case 'decision':
       self.view_template = ko.observable('decisionTemplate');
     break;
 
-    case 'join':
-      self.view_template = ko.observable('joinTemplate');
+    case 'decisionend':
+      self.view_template = ko.observable('decisionEndTemplate');
     break;
 
     default:
@@ -1383,7 +1389,7 @@ $.extend(ForkNode.prototype, Node.prototype, {
    * Append a node to the current fork
    * Also adds join node to node.
    * When adding the join node, append will remove all the children from the join!
-   * We need to make sure the join remembers its children.
+   * We need to make sure the join remembers its children since append will replace them.
    * NOTE: Cannot append a fork! Use addChild or replaceChild instead!
    */
   append: function(node) {
@@ -1449,17 +1455,28 @@ $.extend(ForkNode.prototype, Node.prototype, {
    */
   convertToDecision: function() {
     var self = this;
+
     var join = self.join();
     var end = null;
     var child = join.findChildren()[0];
 
-    if (child.findParents().length == 1) {
-      end = child;
-    }
+    // Replace join with decision end
+    var decision_end_model = new NodeModel({
+      id: IdGeneratorTable['decisionend'].nextId(),
+      node_type: 'decisionend',
+      workflow: self.workflow(),
+      child_links: join.model.child_links
+    });
+    var decision_end_node = new Node(self._workflow, decision_end_model, self.registry);
+    $.each(decision_end_model.child_links, function(index, link) {
+      link.parent = decision_end_model.id;
+    });
+    var parents = join.findParents();
+    $.each(parents, function(index, parent) {
+      parent.replaceChild(join, decision_end_node);
+    });
 
-    // Attaches child of join to parents of join
-    join.detach();
-
+    // Replace fork with decision node
     var decision_model = new DecisionModel({
       id: IdGeneratorTable['decision'].nextId(),
       name: self.name(),
@@ -1468,7 +1485,6 @@ $.extend(ForkNode.prototype, Node.prototype, {
       workflow: self.workflow(),
       child_links: self.model.child_links
     });
-
     var default_link = {
       parent: decision_model.id,
       child: self._workflow.end(),
@@ -1482,22 +1498,22 @@ $.extend(ForkNode.prototype, Node.prototype, {
       link.parent = decision_model.id;
     });
 
-    var decision_node = new DecisionNode(self._workflow, decision_model, self.registry);
-    if (end) {
-      decision_node.addEnd(end);
-    }
     var parents = self.findParents();
+    var decision_node = new DecisionNode(self._workflow, decision_model, self.registry);
     decision_node.removeChild(join);
-
-    join.erase();
-    self.erase();
-
-    self.registry.add(decision_node.id(), decision_node);
+    decision_node.addChild(decision_end_node);
 
     $.each(parents, function(index, parent) {
       parent.replaceChild(self, decision_node);
     });
 
+    // Get rid of fork and join in registry
+    join.erase();
+    self.erase();
+
+    // Add decision and decision end to registry
+    self.registry.add(decision_node.id(), decision_node);
+    self.registry.add(decision_end_node.id(), decision_end_node);
   }
 });
 
@@ -1508,55 +1524,6 @@ $.extend(DecisionNode.prototype, ForkNode.prototype, {
     var registry = registry;
 
     var end = null;
-
-    $.each(self.child_links(), function(index, link) {
-      if (link.name() == 'related') {
-        $(registry).bind('registry:add', function(e) {
-          var end = self.end();
-          if (end) {
-            self.removeEnd();
-            self.addEnd(end);
-            $(registry).unbind(e);
-          }
-        });
-      }
-    });
-  },
-
-  // Only a single end allowed for now!
-  // Finds end for branch
-  findEnd: function( ) {
-    var self = this;
-
-    var end = self.end();
-
-    if (!end) {
-      return self._findEnd( self, 0 );
-    }
-
-    return end;
-  },
-
-  _findEnd: function( node, count ) {
-    var self = this;
-
-    var end = null;
-
-    if (node.findParents().length > 1 && --count == 0) {
-      return node;
-    }
-
-    if (node.node_type() == 'decision' || node.node_type() == 'fork') {
-      count++;
-    }
-
-    $.each(node.findChildren(), function(index, node) {
-      if (end == null) {
-        end = self._findEnd(node, count);
-      }
-    });
-
-    return end;
   },
 
   end: function() {
@@ -1573,79 +1540,6 @@ $.extend(DecisionNode.prototype, ForkNode.prototype, {
     return end;
   },
 
-  addEnd: function(node) {
-    var self = this;
-
-    self.child_links.push({
-      parent: ko.observable(self.id()),
-      child: ko.observable(node.id()),
-      name: ko.observable('related'),
-      comment: ko.observable(''),
-    });
-
-    $(node).one('detached', function(e) {
-      var end = self.end();
-
-      if (end.links().length == 1) {
-        self.removeEnd();
-        var new_end = self.findEnd();
-        self.addEnd(new_end);
-      } else {
-        // Should never hit this case.
-        self.removeEnd();
-      }
-    });
-  },
-
-  removeEnd: function() {
-    var self = this;
-
-    var spliceIndex = -1;
-
-    $.each(self.child_links(), function(index, link) {
-      if (link.name() == 'related') {
-        spliceIndex = index;
-      }
-    });
-
-    if (spliceIndex > -1) {
-      var end = registry.get(self.child_links()[spliceIndex].child());
-
-      self.child_links.splice(spliceIndex, 1);
-      return true;
-    }
-
-    return false;
-  },
-
-  isChild: function(node) {
-    var self = this;
-
-    return self._isChild(node, self, 0);
-  },
-
-  _isChild: function( test_child, node, count ) {
-    var self = this;
-
-    var result = node.id() == test_child.id();
-
-    if (node.findParents().length > 1 && --count == 0) {
-      return result;
-    }
-
-    if (node.node_type() == 'decision' || node.node_type() == 'fork') {
-      count++;
-    }
-
-    $.each(node.findChildren(), function(index, node) {
-      if (!result) {
-        result = self._isChild(test_child, node, count);
-      }
-    });
-
-    return result;
-  },
-
   /**
    * Append a node to the current decision
    * Also appends end node to node.
@@ -1654,7 +1548,7 @@ $.extend(DecisionNode.prototype, ForkNode.prototype, {
   append: function(node) {
     var self = this;
 
-    var end = self.findEnd();
+    var end = self.end();
 
     if (end.id() == node.id()) {
       return false;
@@ -1675,7 +1569,7 @@ $.extend(DecisionNode.prototype, ForkNode.prototype, {
     var self = this;
 
     var ret = true;
-    var end = self.findEnd();
+    var end = self.end();
 
     if (end && end.id() == replacement.id()) {
       ret = self.removeChild(child);
@@ -1685,7 +1579,9 @@ $.extend(DecisionNode.prototype, ForkNode.prototype, {
 
     if (self.links().length < 2) {
       self.detach();
+      end.detach();
       self.erase();
+      end.erase();
     }
 
     return ret;
@@ -2019,8 +1915,9 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
         case 'end':
         case 'kill':
         case 'fork':
-        case 'decision':
         case 'join':
+        case 'decision':
+        case 'decisionend':
           return control(node, collection);
         default:
           return normal(node, collection);
@@ -2044,6 +1941,7 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
           case 'end':
           case 'kill':
           case 'join':
+          case 'decisionend':
             return normal(node, collection, false, true);
 
           case 'fork':
@@ -2075,11 +1973,7 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
             });
 
             // Add end
-            if (node.end() && end.id() == node.end().id()) {
-              return methodChooser(end, collection, true, true);
-            } else {
-              return end;
-            }
+            return methodChooser(node.end(), collection, true, true);
 
           default:
             // Should never get here.
@@ -2187,49 +2081,40 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
         // This will make it so that we can drop and drop to the top of a node list within a fork.
         var newParent = self.registry.get(droppable.parent());
 
-        if (newParent.id() != draggable.id()) {
-          if (newParent.isChild(draggable)) {
-            if (draggable.findParents().length > 1) {
-              // End of decision tree is being dragged to the bottom of a branch
-              draggable.detach();
+        if (newParent.id() != draggable.id() && !newParent.isChild(draggable)) {
+          switch(newParent.node_type()) {
+          case 'fork':
+          case 'decision':
+            draggable.detach();
+
+            var child = self.registry.get(droppable.child());
+            newParent.replaceChild(child, draggable);
+            draggable.addChild(child);
+          break;
+
+          case 'join':
+          case 'decisionend':
+            // Join and decisionend may disappear when we detach...
+            // Remember its children and append to child.
+            var parents = newParent.findParents();
+            draggable.detach();
+
+            if (newParent.findParents().length < 2) {
+              $.each(parents, function(index, parent) {
+                parent.append(draggable);
+              });
+            } else {
               newParent.append(draggable);
-              workflow.is_dirty( true );
-              self.rebuild();
             }
-          } else {
-            switch(newParent.node_type()) {
-            case 'fork':
-            case 'decision':
-              draggable.detach();
+          break;
 
-              var child = self.registry.get(droppable.child());
-              newParent.replaceChild(child, draggable);
-              draggable.addChild(child);
-            break;
-
-            case 'join':
-              // Join may disappear when we detach...
-              // Remember its children and append to child.
-              var parents = newParent.findParents();
-              draggable.detach();
-
-              if (newParent.findParents().length < 2) {
-                $.each(parents, function(index, parent) {
-                  parent.append(draggable);
-                });
-              } else {
-                newParent.append(draggable);
-              }
-            break;
-
-            default:
-              draggable.detach();
-              newParent.append(draggable);
-            break;
-            }
-            workflow.is_dirty( true );
-            self.rebuild();
+          default:
+            draggable.detach();
+            newParent.append(draggable);
+          break;
           }
+          workflow.is_dirty( true );
+          self.rebuild();
         }
 
         // Prevent bubbling events
@@ -2264,33 +2149,6 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
         if (!droppable.isChild(draggable) && droppable.id() != draggable.id()) {
           draggable.detach();
           droppable.append(draggable);
-
-          self.rebuild();
-        }
-
-        // Prevent bubbling events
-        return false;
-      });
-
-      // Drop on decision end link
-      self.el.on('drop', '.node-decision-end', function(e, ui) {
-        // draggable should be a node.
-        // droppable should be a decision end link... which should give us the decision node.
-        var draggable = ko.contextFor(ui.draggable[0]).$data;
-        var droppable = ko.contextFor(this).$data;
-        var end = droppable.findEnd(droppable);
-
-        if (end.id() != draggable.id()) {
-          draggable.detach();
-
-          $.each(end.findParents(), function(index, parent) {
-            if (droppable.isChild(parent)) {
-              parent.append(draggable);
-            }
-          });
-
-          droppable.removeEnd();
-          droppable.addEnd(draggable);
 
           self.rebuild();
         }

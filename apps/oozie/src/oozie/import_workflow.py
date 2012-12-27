@@ -41,9 +41,12 @@ import re
 from lxml import etree
 
 from django.core import serializers
+from django.utils.translation import ugettext as _
+
+from desktop.lib.exceptions_renderable import PopupException
 
 from conf import DEFINITION_XSLT_DIR
-from models import Node, Link, Start, End, Decision, Fork, Join
+from models import Node, Link, Start, End, Decision, DecisionEnd, Fork, Join
 
 LOG = logging.getLogger(__name__)
 
@@ -164,12 +167,19 @@ def _resolve_decision_relationships(workflow):
   """
   Requires proper workflow structure.
   Decision must come before a any random ends.
-  Ends for decisions should be at the highest decision.
+  DecisionEnd nodes are added to the end of the decision DAG.
+  A 'related' link is created to associate the DecisionEnd to the Decision.
   IE:      D
          D   N
        N   N
            N
-  The decision at the top should have the end, not the nested decision.
+        equals
+           D
+         D   N
+       N   N
+         E
+           E
+           N
 
   Performs a breadth first search to understand branching.
   Call helper for every new decision found.
@@ -188,37 +198,76 @@ def _resolve_decision_relationships(workflow):
       decision = find_decision(child) or decision
     return decision
 
+  def insert_end(node, decision_end):
+    """Insert DecisionEnd between node and node parents"""
+    parent_links = node.get_parent_links().exclude(name='default')
+
+    # Nodes that will be seen will always have one node
+    # Otherwise, we should fail.
+    for parent_link in parent_links:
+      parent = parent_link.parent
+      if parent.node_type != Decision.node_type:
+        links = Link.objects.filter(parent=parent).exclude(name__in=['related', 'kill', 'error'])
+        if len(links) != 1:
+          raise PopupException(_('Cannot import workflows that have decision DAG leaf nodes with multiple children or no children.'))
+        link = links[0]
+        link.child = decision_end
+        link.save()
+
+    # Create link between DecisionEnd and terminal node.
+    link = Link(name='to', parent=decision_end, child=node)
+    link.save()
+
   def helper(decision):
     visit = deque(decision.get_children())
     branch_count = len(visit)
 
+    # Create decision end if it does not exist.
+    if not Link.objects.filter(parent=decision, name='related').exists():
+      end = DecisionEnd(workflow=workflow, node_type=DecisionEnd.node_type)
+      end.save()
+      link = Link(name='related', parent=decision, child=end)
+      link.save()
+
     # Find end
     while visit:
-      node = visit.popleft()
+      node = visit.popleft().get_full_node()
       parents = node.get_parents()
 
-      # An end found...
-      # IF it covers all branches, then it is a true end.
-      # ELSE it is a false end and belongs to a higher decision.
-      if len(parents) > 1:
-        if len(parents) == branch_count:
-          link = Link(name='related', parent=decision, child=node)
-          link.save()
+      # An end is found...
+      # IF it covers all branches, then it is an end that perfectly matches this decision.
+      # ELSE it is an end for a higher decision as well.
+      # The unhandled case is multiple ends for a single decision that converge on a single end.
+      # This is not handled in Hue.
+      if isinstance(node, Decision):
+        end, end_parent_count = helper(node)
+        branch_count -= 1
+
+        if end_parent_count < branch_count:
+          # In case we hit a workflow that has 2 decision or more nodes where the ends
+          # do not cover the entire decision DAG.
+          raise PopupException(_('Cannot import workflows that have decisions paths with multiple terminal nodes that converge on a single terminal node.'))
 
         else:
-          return node, branch_count
+          insert_end(end, decision.get_child_end())
+          if end_parent_count != branch_count:
+            return end, end_parent_count - branch_count
 
-      elif isinstance(node, Decision):
-        inner_branch_count, end = helper(node)
-        branch_count = branch_count + inner_branch_count - 1
+        visit.extend(end.get_children())
 
-        if len(end.get_parents()) == branch_count:
-          link = Link(name='related', parent=decision, child=end)
-          link.save()
+      elif not isinstance(node, Join) and not isinstance(node, DecisionEnd) and len(parents) > 1:
+        if len(parents) < branch_count:
+          raise PopupException(_('Cannot import workflows that have decisions paths with multiple terminal nodes that converge on a single terminal node.'))
+
         else:
-          return node, branch_count
+          insert_end(node, decision.get_child_end())
+          if len(parents) != branch_count:
+            return node, len(parents) - branch_count
 
-      visit.extend(node.get_children())
+        visit.extend(node.get_children())
+
+      else:
+        visit.extend(node.get_children())
 
   decision = find_decision(workflow.start.get_full_node())
   if decision is not None:
