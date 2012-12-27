@@ -277,7 +277,7 @@ def add_ldap_user(request):
         user = import_ldap_user(username, import_by_dn)
       except LDAPError, e:
         LOG.error("LDAP Exception: %s" % e)
-        raise PopupException(_('There was an error when communicating with LDAP: %s') % str(e))
+        raise PopupException(_('There was an error when communicating with LDAP'), detail=str(e))
 
       if user and form.cleaned_data['ensure_home_directory']:
         try:
@@ -319,7 +319,7 @@ def add_ldap_group(request):
         group = import_ldap_group(groupname, import_members, import_by_dn)
       except LDAPError, e:
         LOG.error("LDAP Exception: %s" % e)
-        raise PopupException(_('There was an error when communicating with LDAP: %s') % str(e))
+        raise PopupException(_('There was an error when communicating with LDAP', detail=str(e))
 
       if group is None:
         errors = form._errors.setdefault('name', ErrorList())
@@ -351,7 +351,7 @@ def sync_ldap_users_groups(request):
         groups = sync_ldap_groups()
       except LDAPError:
         LOG.error("LDAP Exception: %s" % e)
-        raise PopupException(_('There was an error when communicating with LDAP: %s') % str(e))
+        raise PopupException(_('There was an error when communicating with LDAP'), detail=str(e))
 
       # Create home dirs for every user sync'd
       if form.cleaned_data['ensure_home_directory']:
