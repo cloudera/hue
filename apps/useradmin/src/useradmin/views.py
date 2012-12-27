@@ -319,7 +319,7 @@ def add_ldap_group(request):
         group = import_ldap_group(groupname, import_members, import_by_dn)
       except LDAPError, e:
         LOG.error("LDAP Exception: %s" % e)
-        raise PopupException(_('There was an error when communicating with LDAP', detail=str(e))
+        raise PopupException(_('There was an error when communicating with LDAP'), detail=str(e))
 
       if group is None:
         errors = form._errors.setdefault('name', ErrorList())
