@@ -45,7 +45,7 @@ ${commonlayout.menubar(section='designs')}
     </%def>
     <%def name="creation()">
         <span class="btn-group">
-                <a href="${ url('jobsub.views.new_design', action_type='mapreduce') }" class="btn" title="${_('Create Mapreduce Design')}" rel="tooltip"><i class="icon-plus-sign"></i> ${_('Mapreduce')}</a>
+                <a href="${ url('jobsub.views.new_design', action_type='mapreduce') }" class="btn" title="${_('Create MapReduce Design')}" rel="tooltip"><i class="icon-plus-sign"></i> ${_('MapReduce')}</a>
                 <a href="${ url('jobsub.views.new_design', action_type='streaming') }" class="btn" title="${_('Create Streaming Design')}" rel="tooltip"><i class="icon-plus-sign"></i> ${_('Streaming')}</a>
                 <a href="${ url('jobsub.views.new_design', action_type='java') }" class="btn"title="${_('Create Java Design')}" rel="tooltip"><i class="icon-plus-sign"></i> ${_('Java')}</a>
             </span>
