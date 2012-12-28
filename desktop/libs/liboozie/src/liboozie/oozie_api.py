@@ -18,6 +18,8 @@ import logging
 import posixpath
 import threading
 
+
+from desktop.conf import TIME_ZONE
 from desktop.lib.rest.http_client import HttpClient
 from desktop.lib.rest.resource import Resource
 
@@ -101,8 +103,8 @@ class OozieApi(object):
 
   def _get_params(self):
     if self.security_enabled:
-      return { 'doAs': self.user }
-    return { 'user.name': DEFAULT_USER, 'doAs': self.user }
+      return { 'doAs': self.user, 'timezone': TIME_ZONE.get() }
+    return { 'user.name': DEFAULT_USER, 'doAs': self.user, 'timezone': TIME_ZONE.get() }
 
   def _get_oozie_properties(self, properties=None):
     defaults = {
