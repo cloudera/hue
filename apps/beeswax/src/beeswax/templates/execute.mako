@@ -23,17 +23,15 @@
 <%namespace name="layout" file="layout.mako" />
 
 <%def name="query()">
-
-
-            % if error_message:
-                <div class="alert alert-error">
-                    <p><strong>${_('Your query has the following error(s):')}</strong></p>
-                    <p class="queryErrorMessage">${error_message}</p>
-                    % if log:
-                        <small>${_('click the')} <b>${_('Error Log')}</b> ${_('tab below for details')}</small>
-                    % endif
-                </div>
+    % if error_message:
+        <div class="alert alert-error">
+            <p><strong>${_('Your query has the following error(s):')}</strong></p>
+            <p class="queryErrorMessage">${error_message}</p>
+            % if log:
+                <small>${_('click the')} <b>${_('Error Log')}</b> ${_('tab below for details')}</small>
             % endif
+        </div>
+    % endif
 
     <textarea class="span9" rows="18" placeholder="${_('Example: SELECT * FROM tablename')}" name="${form.query["query"].html_name | n}" id="queryField">${extract_field_data(form.query["query"]) or ''}</textarea>
     <div id="validationResults">
