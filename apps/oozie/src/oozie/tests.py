@@ -1033,6 +1033,22 @@ class TestEditor(OozieMockBase):
     workflow.delete()
 
 
+  def test_import_workflow_decision_complex(self):
+    workflow = Workflow.objects.new_workflow(self.user)
+    workflow.save()
+    f = open('apps/oozie/src/oozie/test_data/0.4/test-decision-complex.xml')
+    import_workflow(workflow, f.read(), schema_version=0.4)
+    f.close()
+    workflow.save()
+    assert_equal(14, len(Node.objects.filter(workflow=workflow)))
+    assert_equal(26, len(Link.objects.filter(parent__workflow=workflow)))
+    assert_equal(3, len(Link.objects.filter(parent__workflow=workflow, parent__node_type='decision', comment='${ 1 gt 2 }', name='start')))
+    assert_equal(0, len(Link.objects.filter(parent__workflow=workflow, parent__node_type='decision', comment='', name='start')))
+    assert_equal(3, len(Link.objects.filter(parent__workflow=workflow, parent__node_type='decision', name='default')))
+    assert_equal(3, len(Link.objects.filter(parent__workflow=workflow, parent__node_type='decision', child__node_type='decisionend', name='related')))
+    workflow.delete()
+
+
   def test_import_workflow_distcp(self):
     workflow = Workflow.objects.new_workflow(self.user)
     workflow.save()

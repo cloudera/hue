@@ -409,7 +409,7 @@ class Workflow(Job):
 
 class Link(models.Model):
   # Links to exclude when using get_children_link(), get_parent_links() in the API
-  META_LINKS = ('related', 'default')
+  META_LINKS = ('related',)
 
   parent = models.ForeignKey('Node', related_name='child_node')
   child = models.ForeignKey('Node', related_name='parent_node', verbose_name='')
