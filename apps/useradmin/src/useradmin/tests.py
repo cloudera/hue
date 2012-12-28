@@ -467,8 +467,9 @@ def test_add_ldap_group():
   response = c.post(URL, dict(name='TestUsers', password1='test', password2='test'))
   assert_true('/useradmin/groups' in response['Location'])
 
-  response = c.post(URL, dict(name='bad_name', password1='test', password2='test'))
-  assert_true('Could not' in response.context['form'].errors['name'][0])
+  # Test with space
+  response = c.post(URL, dict(name='Test Administrators', password1='test', password2='test'))
+  assert_true('/useradmin/groups' in response['Location'])
 
   response = c.post(URL, dict(name='toolongnametoolongnametoolongname',
                               password1='test', password2='test'))

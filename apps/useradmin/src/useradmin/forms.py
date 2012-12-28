@@ -135,10 +135,9 @@ class AddLdapGroupForm(forms.Form):
   name = forms.RegexField(
       label="Name",
       max_length=64,
-      regex='^%s$' % (get_groupname_re_rule(),),
-      help_text=_("Required. 30 characters or fewer. May only contain letters, "
-                "numbers, hyphens or underscores."),
-      error_messages={'invalid': _("Whitespaces and ':' not allowed") })
+      regex='^%s$' % get_groupname_re_rule(),
+      help_text=_("Required. 30 characters or fewer."),
+      error_messages={'invalid': _("30 characters or fewer.") })
   dn = forms.BooleanField(label=_("Distinguished name"),
                           help_text=_("Whether or not the group should be imported by "
                                     "distinguished name."),

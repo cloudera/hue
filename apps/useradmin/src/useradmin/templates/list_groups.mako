@@ -58,7 +58,7 @@ ${layout.menubar(section='groups', _=_)}
       <tr class="tableRow" data-search="${group.name}${', '.join([group_user.username for group_user in group.user_set.all()])}">
         %if user.is_superuser:
           <td data-row-selector-exclude="true">
-              <div class="hueCheckbox groupCheck" data-group="${group.name}" data-confirmation-url="${ url('useradmin.views.delete_group', name=urllib.quote_plus(group.name))}" data-row-selector-exclude="true"></div>
+              <div class="hueCheckbox groupCheck" data-group="${group.name}" data-confirmation-url="${ url('useradmin.views.delete_group', name=urllib.quote(group.name))}" data-row-selector-exclude="true"></div>
           </td>
         %endif
         <td>
