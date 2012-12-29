@@ -99,8 +99,8 @@ class SuperUserChangeForm(UserChangeForm):
         self.initial['groups'] = []
 
 
-class AddLdapUserForm(forms.Form):
-  username = forms.RegexField(
+class AddLdapUsersForm(forms.Form):
+  username_pattern = forms.RegexField(
       label=_("Username"),
       max_length=64,
       regex='^%s$' % (get_username_re_rule(),),
@@ -117,22 +117,22 @@ class AddLdapUserForm(forms.Form):
                                             required=False)
 
   def clean(self):
-    cleaned_data = super(AddLdapUserForm, self).clean()
-    username = cleaned_data.get("username")
+    cleaned_data = super(AddLdapUsersForm, self).clean()
+    username_pattern = cleaned_data.get("username_pattern")
     dn = cleaned_data.get("dn")
 
     if not dn:
-      if username is not None and len(username) > 30:
-        msg = _('Too long: 30 characters or fewer and not %(username)s') % dict(username=len(username),)
-        errors = self._errors.setdefault('username', ErrorList())
+      if username_pattern is not None and len(username_pattern) > 30:
+        msg = _('Too long: 30 characters or fewer and not %s') % username_pattern
+        errors = self._errors.setdefault('username_pattern', ErrorList())
         errors.append(msg)
         raise forms.ValidationError(msg)
 
     return cleaned_data
 
 
-class AddLdapGroupForm(forms.Form):
-  name = forms.RegexField(
+class AddLdapGroupsForm(forms.Form):
+  groupname_pattern = forms.RegexField(
       label="Name",
       max_length=64,
       regex='^%s$' % get_groupname_re_rule(),
@@ -153,14 +153,14 @@ class AddLdapGroupForm(forms.Form):
                                                 required=False)
 
   def clean(self):
-    cleaned_data = super(AddLdapGroupForm, self).clean()
-    name = cleaned_data.get("name")
+    cleaned_data = super(AddLdapGroupsForm, self).clean()
+    groupname_pattern = cleaned_data.get("groupname_pattern")
     dn = cleaned_data.get("dn")
 
     if not dn:
-      if name is not None and len(name) > 30:
-        msg = _('Too long: 30 characters or fewer and not %(name)s') % dict(name=(len(name),))
-        errors = self._errors.setdefault('name', ErrorList())
+      if groupname_pattern is not None and len(groupname_pattern) > 30:
+        msg = _('Too long: 30 characters or fewer and not %s') % groupname_pattern
+        errors = self._errors.setdefault('groupname_pattern', ErrorList())
         errors.append(msg)
         raise forms.ValidationError(msg)
 

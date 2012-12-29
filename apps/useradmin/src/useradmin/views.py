@@ -39,8 +39,8 @@ from django.shortcuts import redirect
 from hadoop.fs.exceptions import WebHdfsException
 from useradmin.models import HuePermission, UserProfile, LdapGroup
 from useradmin.models import get_profile, get_default_user_group
-from useradmin.forms import SyncLdapUsersGroupsForm, AddLdapGroupForm,\
-  AddLdapUserForm, PermissionsEditForm, GroupEditForm, SuperUserChangeForm,\
+from useradmin.forms import SyncLdapUsersGroupsForm, AddLdapGroupsForm,\
+  AddLdapUsersForm, PermissionsEditForm, GroupEditForm, SuperUserChangeForm,\
   UserChangeForm
 
 
@@ -256,9 +256,9 @@ def edit_permission(request, app=None, priv=None):
   return render('edit_permissions.mako', request, dict(form=form, action=request.path, app=app, priv=priv))
 
 
-def add_ldap_user(request):
+def add_ldap_users(request):
   """
-  add_ldap_user(request) -> reply
+  add_ldap_users(request) -> reply
 
   Handler for importing LDAP users into the Hue database.
 
@@ -269,36 +269,37 @@ def add_ldap_user(request):
     raise PopupException(_("You must be a superuser to add another user."), error_code=401)
 
   if request.method == 'POST':
-    form = AddLdapUserForm(request.POST)
+    form = AddLdapUsersForm(request.POST)
     if form.is_valid():
-      username = form.cleaned_data['username']
+      username_pattern = form.cleaned_data['username_pattern']
       import_by_dn = form.cleaned_data['dn']
       try:
-        user = import_ldap_user(username, import_by_dn)
+        users = import_ldap_users(username_pattern, import_by_dn)
       except LDAPError, e:
         LOG.error("LDAP Exception: %s" % e)
         raise PopupException(_('There was an error when communicating with LDAP'), detail=str(e))
 
-      if user and form.cleaned_data['ensure_home_directory']:
-        try:
-          ensure_home_directory(request.fs, user.username)
-        except (IOError, WebHdfsException), e:
-          request.error(_("Cannot make home directory for user %s." % user.username))
+      if users and form.cleaned_data['ensure_home_directory']:
+        for user in users:
+          try:
+            ensure_home_directory(request.fs, user.username)
+          except (IOError, WebHdfsException), e:
+            request.error(_("Cannot make home directory for user %s." % user.username))
 
-      if user is None:
-        errors = form._errors.setdefault('username', ErrorList())
-        errors.append(_('Could not get LDAP details for user %(username)s.') % dict(username=(username,)))
+      if not users:
+        errors = form._errors.setdefault('username_pattern', ErrorList())
+        errors.append(_('Could not get LDAP details for users in pattern %s.') % username_pattern)
       else:
         return redirect(reverse(list_users))
   else:
-    form = AddLdapUserForm()
+    form = AddLdapUsersForm()
 
-  return render('add_ldap_user.mako', request, dict(form=form))
+  return render('add_ldap_users.mako', request, dict(form=form))
 
 
-def add_ldap_group(request):
+def add_ldap_groups(request):
   """
-  add_ldap_group(request) -> reply
+  add_ldap_groups(request) -> reply
 
   Handler for importing LDAP groups into the Hue database.
 
@@ -310,24 +311,25 @@ def add_ldap_group(request):
     raise PopupException(_("You must be a superuser to add another group."), error_code=401)
 
   if request.method == 'POST':
-    form = AddLdapGroupForm(request.POST)
+    form = AddLdapGroupsForm(request.POST)
     if form.is_valid():
-      groupname = form.cleaned_data['name']
+      groupname_pattern = form.cleaned_data['groupname_pattern']
       import_by_dn = form.cleaned_data['dn']
       import_members = form.cleaned_data['import_members']
       try:
-        group = import_ldap_group(groupname, import_members, import_by_dn)
+        groups = import_ldap_groups(groupname_pattern, import_members, import_by_dn)
       except LDAPError, e:
-        LOG.error("LDAP Exception: %s" % e)
+        LOG.error(_("LDAP Exception: %s") % e)
         raise PopupException(_('There was an error when communicating with LDAP'), detail=str(e))
 
-      if group is None:
-        errors = form._errors.setdefault('name', ErrorList())
-        errors.append(_('Could not get LDAP details for group %(groupname)s') % dict(groupname=(groupname,)))
-      else:
+      if groups:
         return redirect(reverse(list_groups))
+      else:
+        errors = form._errors.setdefault('groupname_pattern', ErrorList())
+        errors.append(_('Could not get LDAP details for groups in pattern %s') % groupname_pattern)
+
   else:
-    form = AddLdapGroupForm()
+    form = AddLdapGroupsForm()
 
   return render('edit_group.mako', request, dict(form=form, action=request.path, ldap=True))
 
@@ -446,96 +448,120 @@ def sync_unix_users_and_groups(min_uid, max_uid, min_gid, max_gid, check_shell):
       # Here's where that user to group map we built comes in handy
       hue_user.groups = user_groups[username]
     hue_user.save()
-    LOG.info("Synced user %s from Unix" % (hue_user.username,))
+    LOG.info(_("Synced user %s from Unix") % hue_user.username)
 
   __users_lock.release()
   __groups_lock.release()
 
 
-def _import_ldap_user(username, import_by_dn=False):
+def _import_ldap_users(username_pattern, import_by_dn=False):
   """
   Import a user from LDAP. If import_by_dn is true, this will import the user by
   the distinguished name, rather than the configured username attribute.
   """
   conn = ldap_access.get_connection()
-  user_info = conn.find_user(username, import_by_dn)
-  if user_info is None:
-    LOG.warn("Could not get LDAP details for user %s" % (username,))
+  user_info = conn.find_users(username_pattern, import_by_dn)
+  if not user_info:
+    LOG.warn(_("Could not get LDAP details for users with pattern %s") % username_pattern)
     return None
 
-  user, created = User.objects.get_or_create(username=user_info['username'])
-  profile = get_profile(user)
-  if not created and profile.creation_method == str(UserProfile.CreationMethod.HUE):
-    # This is a Hue user, and shouldn't be overwritten
-    LOG.warn('There was a naming conflict while importing user %s' % (username,))
-    return None
+  imported_users = []
+  for ldap_info in user_info:
+    user, created = User.objects.get_or_create(username=ldap_info['username'])
+    profile = get_profile(user)
+    if not created and profile.creation_method == str(UserProfile.CreationMethod.HUE):
+      # This is a Hue user, and shouldn't be overwritten
+      LOG.warn(_('There was a naming conflict while importing user %(username)s in pattern %(username_pattern)s') % {
+        'username': ldap_info['username'],
+        'username_pattern': username_pattern
+      })
+      return None
 
-  default_group = get_default_user_group()
-  if created and default_group is not None:
-    user.groups.add(default_group)
+    default_group = get_default_user_group()
+    if created and default_group is not None:
+      user.groups.add(default_group)
 
-  if 'first' in user_info:
-    user.first_name = user_info['first']
-  if 'last' in user_info:
-    user.last_name = user_info['last']
-  if 'email' in user_info:
-    user.email = user_info['email']
+    if 'first' in ldap_info:
+      user.first_name = ldap_info['first']
+    if 'last' in ldap_info:
+      user.last_name = ldap_info['last']
+    if 'email' in ldap_info:
+      user.email = ldap_info['email']
 
-  profile.creation_method = UserProfile.CreationMethod.EXTERNAL
-  profile.save()
-  user.save()
+    profile.creation_method = UserProfile.CreationMethod.EXTERNAL
+    profile.save()
+    user.save()
 
-  return user
+    imported_users.append(user)
+
+  return imported_users
 
 
-def _import_ldap_group(groupname, import_members=False, import_by_dn=False):
+def _import_ldap_groups(groupname_pattern, import_members=False, import_by_dn=False):
   """
   Import a group from LDAP. If import_members is true, this will also import any
   LDAP users that exist within the group.
   """
   conn = ldap_access.get_connection()
-  group_info = conn.find_group(groupname, import_by_dn)
-  if group_info is None:
-    LOG.warn("Could not get LDAP details for group %s" % (groupname,))
+  group_info = conn.find_groups(groupname_pattern, import_by_dn)
+  if not group_info:
+    LOG.warn(_("Could not get LDAP details for group pattern %s") % groupname_pattern)
     return None
 
-  group, created = Group.objects.get_or_create(name=group_info['name'])
-  if not created and not LdapGroup.objects.filter(group=group).exists():
-    # This is a Hue group, and shouldn't be overwritten
-    LOG.warn('There was a naming conflict while importing group %s' % (groupname,))
-    return None
+  groups = []
+  for ldap_info in group_info:
+    group, created = Group.objects.get_or_create(name=ldap_info['name'])
+    if not created and not LdapGroup.objects.filter(group=group).exists():
+      # This is a Hue group, and shouldn't be overwritten
+      LOG.warn(_('There was a naming conflict while importing group %(groupname)s in pattern %(groupname_pattern)s') % {
+        'groupname': ldap_info['name'],
+        'groupname_pattern': groupname_pattern
+      })
+      return None
 
-  LdapGroup.objects.get_or_create(group=group)
+    LdapGroup.objects.get_or_create(group=group)
 
-  group.user_set.clear()
-  for member in group_info['members']:
-    if import_members:
-      LOG.debug("Importing user %s" % (member,))
-      user = _import_ldap_user(member, import_by_dn=True)
-    else:
-      user_info = conn.find_user(member, find_by_dn=True)
-      try:
-        user = User.objects.get(username=user_info['username'])
-      except User.DoesNotExist:
+    group.user_set.clear()
+    for member in ldap_info['members']:
+      users = []
+
+      if import_members:
+        LOG.debug(_("Importing user %s") % member)
+        users = _import_ldap_users(member, import_by_dn=True)
+
+      else:
+        user_info = conn.find_users(member, find_by_dn=True)
+        if len(user_info) > 1:
+          LOG.warn(_('Found multiple users for member %s.') % member)
+        else:
+          for ldap_info in user_info:
+            try:
+              user = User.objects.get(username=ldap_info['username'])
+            except User.DoesNotExist:
+              continue
+            users.append(user)
+
+      if not users:
+        # There was a naming conflict, or for some other reason, we couldn't get
+        # at the user
         continue
 
-    if user is None:
-      # There was a naming conflict, or for some other reason, we couldn't get
-      # at the user
-      continue
-    LOG.debug("Adding user %s to group %s" % (member, group.name))
-    group.user_set.add(user)
+      LOG.debug(_("Adding member %s represented as users (should be a single user) %s to group %s") % (member, str(users), group.name))
+      for user in users:
+        group.user_set.add(user)
 
-  group.save()
-  return group
+    group.save()
+    groups.append(group)
 
-
-def import_ldap_user(user, import_by_dn):
-  return _import_ldap_user(user, import_by_dn)
+  return groups
 
 
-def import_ldap_group(group, import_members, import_by_dn):
-  return _import_ldap_group(group, import_members, import_by_dn)
+def import_ldap_users(user_pattern, import_by_dn):
+  return _import_ldap_users(user_pattern, import_by_dn)
+
+
+def import_ldap_groups(group_pattern, import_members, import_by_dn):
+  return _import_ldap_groups(group_pattern, import_members, import_by_dn)
 
 
 def sync_ldap_users():
@@ -547,7 +573,7 @@ def sync_ldap_users():
   """
   users = User.objects.filter(userprofile__creation_method=str(UserProfile.CreationMethod.EXTERNAL)).all()
   for user in users:
-    _import_ldap_user(user.username)
+    _import_ldap_users(user.username)
   return users
 
 
@@ -560,5 +586,5 @@ def sync_ldap_groups():
   """
   groups = Group.objects.filter(group__in=LdapGroup.objects.all())
   for group in groups:
-    _import_ldap_group(group.name)
+    _import_ldap_groups(group.name)
   return groups

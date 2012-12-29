@@ -467,9 +467,9 @@ def config_validator():
   if LDAP.LDAP_URL.get() is not None:
     if LDAP.NT_DOMAIN.get() is None and \
         LDAP.LDAP_USERNAME_PATTERN.get() is None:
-      res.append(LDAP.LDAP_URL,
+      res.append((LDAP.LDAP_URL,
                   unicode(_("LDAP is only partially configured. An NT Domain or username "
-                  "search pattern must be provided.")))
+                  "search pattern must be provided."))))
 
   if LDAP.LDAP_USERNAME_PATTERN.get() is not None and \
       '<username>' not in LDAP.LDAP_USERNAME_PATTERN.get():

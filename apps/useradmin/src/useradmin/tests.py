@@ -21,6 +21,7 @@
 Tests for "user admin"
 """
 
+import re
 import urllib
 from ldap import LDAPError
 
@@ -37,8 +38,8 @@ from useradmin.models import get_profile, get_default_user_group
 
 import useradmin.conf
 from hadoop import pseudo_hdfs4
-from views import sync_ldap_users, sync_ldap_groups, import_ldap_user, import_ldap_group, \
-                  add_ldap_user, add_ldap_group, sync_ldap_users_groups
+from views import sync_ldap_users, sync_ldap_groups, import_ldap_users, import_ldap_groups, \
+                  add_ldap_users, add_ldap_groups, sync_ldap_users_groups
 import ldap_access
 
 def reset_all_users():
@@ -71,13 +72,17 @@ class LdapTestConnection(object):
   def remove_user_group_for_test(self, user, group):
     LdapTestConnection._instance.groups[group]['members'].remove(user)
 
-  def find_user(self, user, find_by_dn=False):
+  def find_users(self, username_pattern, find_by_dn=False):
     """ Returns info for a particular user """
-    return LdapTestConnection._instance.users.get(user, None)
+    username_pattern = username_pattern.replace('.','\\.').replace('*', '.*')
+    usernames = filter(lambda username: re.match(username_pattern, username), LdapTestConnection._instance.users.keys())
+    return [LdapTestConnection._instance.users.get(username) for username in usernames]
 
-  def find_group(self, groupname, find_by_dn=False):
+  def find_groups(self, groupname_pattern, find_by_dn=False):
     """ Return all groups in the system with parents and children """
-    return LdapTestConnection._instance.groups.get(groupname, None)
+    groupname_pattern = groupname_pattern.replace('.','\\.').replace('*', '.*')
+    groupnames = filter(lambda username: re.match(groupname_pattern, username), LdapTestConnection._instance.groups.keys())
+    return [LdapTestConnection._instance.groups.get(groupname) for groupname in groupnames]
 
   class _Singleton:
     def __init__(self):
@@ -239,8 +244,7 @@ def test_group_admin():
 
   group_count = len(Group.objects.all())
   response = c.post('/useradmin/groups/new', dict(name="with space"))
-  assert_true("Group name may only contain letters" in response.content)
-  assert_equal(len(Group.objects.all()), group_count)
+  assert_equal(len(Group.objects.all()), group_count + 1)
 
 def test_user_admin():
   FUNNY_NAME = '~`!@#$%^&*()_-+={}[]|\;"<>?/,.'
@@ -378,7 +382,7 @@ def test_useradmin_ldap_integration():
   ldap_access.CACHED_LDAP_CONN = LdapTestConnection()
 
   # Try importing a user
-  import_ldap_user('larry', import_by_dn=False)
+  import_ldap_users('larry', import_by_dn=False)
   larry = User.objects.get(username='larry')
   assert_true(larry.first_name == 'Larry')
   assert_true(larry.last_name == 'Stooge')
@@ -392,7 +396,7 @@ def test_useradmin_ldap_integration():
   assert_equal(len(Group.objects.all()), 0)
 
   # Should import a group, but will only sync already-imported members
-  import_ldap_group('Test Administrators', import_members=False, import_by_dn=False)
+  import_ldap_groups('Test Administrators', import_members=False, import_by_dn=False)
   assert_equal(len(User.objects.all()), 1)
   assert_equal(len(Group.objects.all()), 1)
   test_admins = Group.objects.get(name='Test Administrators')
@@ -400,25 +404,25 @@ def test_useradmin_ldap_integration():
   assert_equal(test_admins.user_set.all()[0].username, larry.username)
 
   # Import all members of TestUsers
-  import_ldap_group('TestUsers', import_members=True, import_by_dn=False)
+  import_ldap_groups('TestUsers', import_members=True, import_by_dn=False)
   test_users = Group.objects.get(name='TestUsers')
   assert_true(LdapGroup.objects.filter(group=test_users).exists())
   assert_equal(len(test_users.user_set.all()), 3)
 
   ldap_access.CACHED_LDAP_CONN.remove_user_group_for_test('moe', 'TestUsers')
-  import_ldap_group('TestUsers', import_members=False, import_by_dn=False)
+  import_ldap_groups('TestUsers', import_members=False, import_by_dn=False)
   assert_equal(len(test_users.user_set.all()), 2)
   assert_equal(len(User.objects.get(username='moe').groups.all()), 0)
 
   ldap_access.CACHED_LDAP_CONN.add_user_group_for_test('moe', 'TestUsers')
-  import_ldap_group('TestUsers', import_members=False, import_by_dn=False)
+  import_ldap_groups('TestUsers', import_members=False, import_by_dn=False)
   assert_equal(len(test_users.user_set.all()), 3)
   assert_equal(len(User.objects.get(username='moe').groups.all()), 1)
 
   # Make sure that if a Hue user already exists with a naming collision, we
   # won't overwrite any of that user's information.
   hue_user = User.objects.create(username='otherguy', first_name='Different', last_name='Guy')
-  import_ldap_user('otherguy', import_by_dn=False)
+  import_ldap_users('otherguy', import_by_dn=False)
   hue_user = User.objects.get(username='otherguy')
   assert_equal(get_profile(hue_user).creation_method, str(UserProfile.CreationMethod.HUE))
   assert_equal(hue_user.first_name, 'Different')
@@ -427,12 +431,12 @@ def test_useradmin_ldap_integration():
   hue_group = Group.objects.create(name='OtherGroup')
   hue_group.user_set.add(hue_user)
   hue_group.save()
-  import_ldap_group('OtherGroup', import_members=False, import_by_dn=False)
+  import_ldap_groups('OtherGroup', import_members=False, import_by_dn=False)
   assert_false(LdapGroup.objects.filter(group=hue_group).exists())
   assert_true(hue_group.user_set.filter(username=hue_user.username).exists())
 
-def test_add_ldap_user():
-  URL = reverse(add_ldap_user)
+def test_add_ldap_users():
+  URL = reverse(add_ldap_users)
 
   reset_all_users()
   reset_all_groups()
@@ -444,14 +448,19 @@ def test_add_ldap_user():
 
   assert_true(c.get(URL))
 
-  response = c.post(URL, dict(username='moe', password1='test', password2='test'))
-  assert_true('/useradmin/users' in response['Location'])
+  response = c.post(URL, dict(username_pattern='moe', password1='test', password2='test'))
+  assert_true('Location' in response, response)
+  assert_true('/useradmin/users' in response['Location'], response)
 
-  response = c.post(URL, dict(username='bad_name', password1='test', password2='test'))
-  assert_true('Could not' in response.context['form'].errors['username'][0])
+  response = c.post(URL, dict(username_pattern='bad_name', password1='test', password2='test'))
+  assert_true('Could not' in response.context['form'].errors['username_pattern'][0], response)
 
-def test_add_ldap_group():
-  URL = reverse(add_ldap_group)
+  # Test wild card
+  response = c.post(URL, dict(username_pattern='*r*', password1='test', password2='test'))
+  assert_true('/useradmin/users' in response['Location'], response)
+
+def test_add_ldap_groups():
+  URL = reverse(add_ldap_groups)
 
   reset_all_users()
   reset_all_groups()
@@ -464,16 +473,17 @@ def test_add_ldap_group():
 
   assert_true(c.get(URL))
 
-  response = c.post(URL, dict(name='TestUsers', password1='test', password2='test'))
+  response = c.post(URL, dict(groupname_pattern='TestUsers'))
+  assert_true('Location' in response, response)
   assert_true('/useradmin/groups' in response['Location'])
 
   # Test with space
-  response = c.post(URL, dict(name='Test Administrators', password1='test', password2='test'))
-  assert_true('/useradmin/groups' in response['Location'])
+  response = c.post(URL, dict(groupname_pattern='Test Administrators'))
+  assert_true('Location' in response, response)
+  assert_true('/useradmin/groups' in response['Location'], response)
 
-  response = c.post(URL, dict(name='toolongnametoolongnametoolongname',
-                              password1='test', password2='test'))
-  assert_true('Too long' in response.context['form'].errors['name'][0])
+  response = c.post(URL, dict(groupname_pattern='toolongnametoolongnametoolongname'))
+  assert_true('30 characters or fewer' in response.context['form'].errors['groupname_pattern'][0], response)
 
 def test_sync_ldap_users_groups():
   URL = reverse(sync_ldap_users_groups)
@@ -495,18 +505,18 @@ def test_ldap_exception_handling():
 
   # Set up LDAP tests to use a LdapTestConnection instead of an actual LDAP connection
   class LdapTestConnectionError(LdapTestConnection):
-    def find_user(self, user, find_by_dn=False):
+    def find_users(self, user, find_by_dn=False):
       raise LDAPError('No such object')
   ldap_access.CACHED_LDAP_CONN = LdapTestConnectionError()
 
   c = make_logged_in_client('test', is_superuser=True)
 
-  response = c.post(reverse(add_ldap_user), dict(username='moe', password1='test', password2='test'), follow=True)
+  response = c.post(reverse(add_ldap_users), dict(username_pattern='moe', password1='test', password2='test'), follow=True)
   assert_true('There was an error when communicating with LDAP' in response.content, response)
 
 @attr('requires_hadoop')
-def test_ensure_home_directory_add_ldap_user():
-  URL = reverse(add_ldap_user)
+def test_ensure_home_directory_add_ldap_users():
+  URL = reverse(add_ldap_users)
 
   reset_all_users()
   reset_all_groups()
@@ -520,24 +530,33 @@ def test_ensure_home_directory_add_ldap_user():
 
   assert_true(c.get(URL))
 
-  response = c.post(URL, dict(username='moe', password1='test', password2='test'))
+  response = c.post(URL, dict(username_pattern='moe', password1='test', password2='test'))
   assert_true('/useradmin/users' in response['Location'])
   assert_false(cluster.fs.exists('/user/moe'))
 
   # Try same thing with home directory creation.
-  response = c.post(URL, dict(username='curly', password1='test', password2='test', ensure_home_directory=True))
+  response = c.post(URL, dict(username_pattern='curly', password1='test', password2='test', ensure_home_directory=True))
   assert_true('/useradmin/users' in response['Location'])
   assert_true(cluster.fs.exists('/user/curly'))
 
-  response = c.post(URL, dict(username='bad_name', password1='test', password2='test'))
-  assert_true('Could not' in response.context['form'].errors['username'][0])
+  response = c.post(URL, dict(username_pattern='bad_name', password1='test', password2='test'))
+  assert_true('Could not' in response.context['form'].errors['username_pattern'][0])
   assert_false(cluster.fs.exists('/user/bad_name'))
 
   # See if moe, who did not ask for his home directory, has a home directory.
   assert_false(cluster.fs.exists('/user/moe'))
 
+  # Try wild card now
+  response = c.post(URL, dict(username_pattern='*r*', password1='test', password2='test', ensure_home_directory=True))
+  assert_true('/useradmin/users' in response['Location'])
+  assert_true(cluster.fs.exists('/user/curly'))
+  assert_true(cluster.fs.exists('/user/larry'))
+  assert_true(cluster.fs.exists('/user/otherguy'))
+
   # Clean up
   cluster.fs.rmtree('/user/curly')
+  cluster.fs.rmtree('/user/larry')
+  cluster.fs.rmtree('/user/otherguy')
 
 @attr('requires_hadoop')
 def test_ensure_home_directory_sync_ldap_users_groups():
@@ -553,7 +572,7 @@ def test_ensure_home_directory_sync_ldap_users_groups():
   c = make_logged_in_client(cluster.superuser, is_superuser=True)
   cluster.fs.setuser(cluster.superuser)
 
-  response = c.post(reverse(add_ldap_user), dict(username='curly', password1='test', password2='test'))
+  response = c.post(reverse(add_ldap_users), dict(username_pattern='curly', password1='test', password2='test'))
   assert_false(cluster.fs.exists('/user/curly'))
   assert_true(c.post(URL, dict(ensure_home_directory=True)))
   assert_true(cluster.fs.exists('/user/curly'))
