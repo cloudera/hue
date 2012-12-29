@@ -81,7 +81,7 @@ class LdapConnection(object):
       except:
         raise RuntimeError("Failed to bind to LDAP server anonymously")
 
-  def find_user(self, username, find_by_dn=False):
+  def find_users(self, username_pattern, find_by_dn=False):
     """
     LDAP search helper method finding users. This supports searching for users
     by distinguished name, or the configured username attribute.
@@ -95,7 +95,7 @@ class LdapConnection(object):
     user_name_attr = desktop.conf.LDAP.USERS.USER_NAME_ATTR.get()
 
     # Allow wild cards on non distinguished names
-    sanitized_name = ldap.filter.escape_filter_chars(username).replace(r'\2a', r'*')
+    sanitized_name = ldap.filter.escape_filter_chars(username_pattern).replace(r'\2a', r'*')
     if find_by_dn:
       user_name_filter = '(distinguishedName=' + sanitized_name + ')'
     else:
@@ -104,22 +104,24 @@ class LdapConnection(object):
 
     ldap_result_id = self.ldap_handle.search(base_dn, scope, ldap_filter)
     result_type, result_data = self.ldap_handle.result(ldap_result_id)
+    user_info = []
     if result_data and result_type == ldap.RES_SEARCH_RESULT:
-      data = result_data[0][1]
-      user_info = { 'username': data[user_name_attr][0] }
+      for result_data_item in result_data:
+        data = result_data_item[1]
+        ldap_info = { 'username': data[user_name_attr][0] }
 
-      if 'givenName' in data:
-        user_info['first'] = data['givenName'][0]
-      if 'sn' in data:
-        user_info['last'] = data['sn'][0]
-      if 'mail' in data:
-        user_info['email'] = data['mail'][0]
+        if 'givenName' in data:
+          ldap_info['first'] = data['givenName'][0]
+        if 'sn' in data:
+          ldap_info['last'] = data['sn'][0]
+        if 'mail' in data:
+          ldap_info['email'] = data['mail'][0]
 
-      return user_info
+        user_info.append(ldap_info)
 
-    return None
+    return user_info
 
-  def find_group(self, groupname, find_by_dn=False):
+  def find_groups(self, groupname_pattern, find_by_dn=False):
     """
     LDAP search helper method for finding groups
     """
@@ -132,28 +134,31 @@ class LdapConnection(object):
     group_name_attr = desktop.conf.LDAP.GROUPS.GROUP_NAME_ATTR.get()
 
     if find_by_dn:
-      sanitized_name = ldap.filter.escape_filter_chars(groupname)
+      sanitized_name = ldap.filter.escape_filter_chars(groupname_pattern).replace(r'\2a', r'*')
       group_name_filter = '(distinguishedName=' + sanitized_name + ')'
     else:
-      sanitized_name = ldap.filter.escape_filter_chars(groupname)
+      sanitized_name = ldap.filter.escape_filter_chars(groupname_pattern)
       group_name_filter = '(' + group_name_attr + '=' + sanitized_name + ')'
     ldap_filter = '(&' + group_filter + group_name_filter + ')'
 
     ldap_result_id = self.ldap_handle.search(base_dn, scope, ldap_filter)
     result_type, result_data = self.ldap_handle.result(ldap_result_id)
+
+    group_info = []
     if result_data and result_type == ldap.RES_SEARCH_RESULT:
-      data = result_data[0][1]
-      group_info = { 'name': data[group_name_attr][0] }
+      for result_data_item in result_data:
+        data = result_data_item[1]
+        ldap_info = { 'name': data[group_name_attr][0] }
 
-      member_attr = desktop.conf.LDAP.GROUPS.GROUP_MEMBER_ATTR.get()
-      if member_attr in data:
-        group_info['members'] = data[member_attr]
-      else:
-        group_info['members'] = []
+        member_attr = desktop.conf.LDAP.GROUPS.GROUP_MEMBER_ATTR.get()
+        if member_attr in data:
+          ldap_info['members'] = data[member_attr]
+        else:
+          ldap_info['members'] = []
 
-      return group_info
+        group_info.append(ldap_info)
 
-    return None
+    return group_info
 
   def _get_root_dn(self):
     """

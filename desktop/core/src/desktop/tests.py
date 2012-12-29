@@ -390,12 +390,12 @@ def test_config_check():
   try:
     cli = make_logged_in_client()
     resp = cli.get('/debug/check_config')
-    assert_true('Secret key should be configured' in resp.content)
-    assert_true('desktop.ssl_certificate' in resp.content)
-    assert_true('Path does not exist' in resp.content)
-    assert_true('SSL private key file should be set' in resp.content)
-    assert_true('klingon' in resp.content)
-    assert_true('Encoding not supported' in resp.content)
+    assert_true('Secret key should be configured' in resp.content, resp)
+    assert_true('desktop.ssl_certificate' in resp.content, resp)
+    assert_true('Path does not exist' in resp.content, resp)
+    assert_true('SSL private key file should be set' in resp.content, resp)
+    assert_true('klingon' in resp.content, resp)
+    assert_true('Encoding not supported' in resp.content, resp)
 
     # Alert present in the status bar
     resp = cli.get('/status_bar/')
