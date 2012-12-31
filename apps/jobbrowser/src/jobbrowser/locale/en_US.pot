@@ -1,14 +1,14 @@
 # Translations template for Hue.
-# Copyright (C) 2012 Cloudera, Inc
+# Copyright (C) 2013 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-12-05 21:32-0800\n"
+"POT-Creation-Date: 2013-01-04 07:28-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -154,7 +154,7 @@ msgstr ""
 #: src/jobbrowser/templates/job.mako:189 src/jobbrowser/templates/job.mako:236
 #: src/jobbrowser/templates/jobbrowser_components.mako:54
 #: src/jobbrowser/templates/jobs.mako:81 src/jobbrowser/templates/task.mako:97
-#: src/jobbrowser/templates/tasktrackers.mako:26
+#: src/jobbrowser/templates/tasktrackers.mako:29
 msgid "Name"
 msgstr ""
 
@@ -214,6 +214,36 @@ msgstr ""
 #: src/jobbrowser/templates/attempt.mako:111
 #: src/jobbrowser/templates/task.mako:66
 msgid "Output Size"
+msgstr ""
+
+#: src/jobbrowser/templates/attempt.mako:139
+#: src/jobbrowser/templates/attempt.mako:155
+#: src/jobbrowser/templates/attempt_logs.mako:117
+#: src/jobbrowser/templates/attempt_logs.mako:133
+#: src/jobbrowser/templates/job.mako:276 src/jobbrowser/templates/job.mako:291
+#: src/jobbrowser/templates/job.mako:306 src/jobbrowser/templates/job.mako:328
+#: src/jobbrowser/templates/jobs.mako:207
+#: src/jobbrowser/templates/task.mako:157
+#: src/jobbrowser/templates/task.mako:173
+#: src/jobbrowser/templates/task.mako:189
+#: src/jobbrowser/templates/tasks.mako:121
+#: src/jobbrowser/templates/tasktrackers.mako:70
+msgid "No data available"
+msgstr ""
+
+#: src/jobbrowser/templates/attempt.mako:140
+#: src/jobbrowser/templates/attempt.mako:156
+#: src/jobbrowser/templates/attempt_logs.mako:118
+#: src/jobbrowser/templates/attempt_logs.mako:134
+#: src/jobbrowser/templates/job.mako:277 src/jobbrowser/templates/job.mako:292
+#: src/jobbrowser/templates/job.mako:307 src/jobbrowser/templates/job.mako:329
+#: src/jobbrowser/templates/jobs.mako:208
+#: src/jobbrowser/templates/task.mako:158
+#: src/jobbrowser/templates/task.mako:174
+#: src/jobbrowser/templates/task.mako:190
+#: src/jobbrowser/templates/tasks.mako:122
+#: src/jobbrowser/templates/tasktrackers.mako:71
+msgid "No matching records"
 msgstr ""
 
 #: src/jobbrowser/templates/attempt_logs.mako:74
@@ -641,43 +671,43 @@ msgstr ""
 msgid "Max reduce tasks:"
 msgstr ""
 
-#: src/jobbrowser/templates/tasktrackers.mako:21
+#: src/jobbrowser/templates/tasktrackers.mako:22
 msgid "Task Trackers - Job Browser"
 msgstr ""
 
-#: src/jobbrowser/templates/tasktrackers.mako:27
+#: src/jobbrowser/templates/tasktrackers.mako:30
 msgid "Host"
 msgstr ""
 
-#: src/jobbrowser/templates/tasktrackers.mako:28
+#: src/jobbrowser/templates/tasktrackers.mako:31
 msgid "Port"
 msgstr ""
 
-#: src/jobbrowser/templates/tasktrackers.mako:29
+#: src/jobbrowser/templates/tasktrackers.mako:32
 msgid "Last Seen"
 msgstr ""
 
-#: src/jobbrowser/templates/tasktrackers.mako:30
+#: src/jobbrowser/templates/tasktrackers.mako:33
 msgid "Available Space"
 msgstr ""
 
-#: src/jobbrowser/templates/tasktrackers.mako:31
+#: src/jobbrowser/templates/tasktrackers.mako:34
 msgid "Failure Count"
 msgstr ""
 
-#: src/jobbrowser/templates/tasktrackers.mako:32
+#: src/jobbrowser/templates/tasktrackers.mako:35
 msgid "Map Count"
 msgstr ""
 
-#: src/jobbrowser/templates/tasktrackers.mako:33
+#: src/jobbrowser/templates/tasktrackers.mako:36
 msgid "Reduce Count"
 msgstr ""
 
-#: src/jobbrowser/templates/tasktrackers.mako:34
+#: src/jobbrowser/templates/tasktrackers.mako:37
 msgid "Max Map Tasks"
 msgstr ""
 
-#: src/jobbrowser/templates/tasktrackers.mako:35
+#: src/jobbrowser/templates/tasktrackers.mako:38
 msgid "Max Reduce Tasks"
 msgstr ""
 

@@ -159,11 +159,11 @@ ${layout.menubar(section='history')}
             ],
             "aaSorting": [[0, 'desc']],
             "oLanguage": {
-                "sEmptyTable":     "${_('No data available in table')}",
+                "sEmptyTable":     "${_('No data available')}",
                 "sInfo":           "${_('Showing _START_ to _END_ of _TOTAL_ entries')}",
                 "sInfoEmpty":      "${_('Showing 0 to 0 of 0 entries')}",
                 "sInfoFiltered":   "${_('(filtered from _MAX_ total entries)')}",
-                "sZeroRecords":    "${_('No matching records found')}",
+                "sZeroRecords":    "${_('No matching records')}",
                 "oPaginate": {
                     "sFirst":    "${_('First')}",
                     "sLast":     "${_('Last')}",

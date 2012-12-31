@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-12-05 21:32-0800\n"
+"POT-Creation-Date: 2013-01-04 07:28-0800\n"
 "PO-Revision-Date: 2012-07-30 18:53-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: de <LL@li.org>\n"
@@ -18,8 +18,13 @@ msgstr ""
 "Generated-By: Babel 0.9.6\n"
 
 #: src/jobbrowser/conf.py:26
-msgid "Share submitted jobs information with all users. If set to false, submitted jobs are visible only to the owner and administrators."
-msgstr "Informationen über übermittelte Jobs allen Benutzern mitteilen. Wenn auf falsch gesetzt, sind übermittelte Jobs nur für den Eigentümer und Administratoren sichtbar."
+msgid ""
+"Share submitted jobs information with all users. If set to false, "
+"submitted jobs are visible only to the owner and administrators."
+msgstr ""
+"Informationen über übermittelte Jobs allen Benutzern mitteilen. Wenn auf "
+"falsch gesetzt, sind übermittelte Jobs nur für den Eigentümer und "
+"Administratoren sichtbar."
 
 #: src/jobbrowser/models.py:87
 #, fuzzy, python-format
@@ -58,7 +63,9 @@ msgstr "Unzureichende Berechtigungen"
 #: src/jobbrowser/views.py:143
 #, python-format
 msgid "Permission denied.  User %(username)s cannot delete user %(user)s's job."
-msgstr "Berechtigung verweigert. Benutzer %(username)s kann den Job des Benutzers %(user)s nicht löschen."
+msgstr ""
+"Berechtigung verweigert. Benutzer %(username)s kann den Job des Benutzers"
+" %(user)s nicht löschen."
 
 #: src/jobbrowser/views.py:159
 msgid "Job did not appear as killed within 15 seconds"
@@ -152,7 +159,7 @@ msgstr "Protokolle"
 #: src/jobbrowser/templates/job.mako:189 src/jobbrowser/templates/job.mako:236
 #: src/jobbrowser/templates/jobbrowser_components.mako:54
 #: src/jobbrowser/templates/jobs.mako:81 src/jobbrowser/templates/task.mako:97
-#: src/jobbrowser/templates/tasktrackers.mako:26
+#: src/jobbrowser/templates/tasktrackers.mako:29
 msgid "Name"
 msgstr "Name"
 
@@ -213,6 +220,36 @@ msgstr "Phase"
 #: src/jobbrowser/templates/task.mako:66
 msgid "Output Size"
 msgstr "Ausgabegröße"
+
+#: src/jobbrowser/templates/attempt.mako:139
+#: src/jobbrowser/templates/attempt.mako:155
+#: src/jobbrowser/templates/attempt_logs.mako:117
+#: src/jobbrowser/templates/attempt_logs.mako:133
+#: src/jobbrowser/templates/job.mako:276 src/jobbrowser/templates/job.mako:291
+#: src/jobbrowser/templates/job.mako:306 src/jobbrowser/templates/job.mako:328
+#: src/jobbrowser/templates/jobs.mako:207
+#: src/jobbrowser/templates/task.mako:157
+#: src/jobbrowser/templates/task.mako:173
+#: src/jobbrowser/templates/task.mako:189
+#: src/jobbrowser/templates/tasks.mako:121
+#: src/jobbrowser/templates/tasktrackers.mako:70
+msgid "No data available"
+msgstr ""
+
+#: src/jobbrowser/templates/attempt.mako:140
+#: src/jobbrowser/templates/attempt.mako:156
+#: src/jobbrowser/templates/attempt_logs.mako:118
+#: src/jobbrowser/templates/attempt_logs.mako:134
+#: src/jobbrowser/templates/job.mako:277 src/jobbrowser/templates/job.mako:292
+#: src/jobbrowser/templates/job.mako:307 src/jobbrowser/templates/job.mako:329
+#: src/jobbrowser/templates/jobs.mako:208
+#: src/jobbrowser/templates/task.mako:158
+#: src/jobbrowser/templates/task.mako:174
+#: src/jobbrowser/templates/task.mako:190
+#: src/jobbrowser/templates/tasks.mako:122
+#: src/jobbrowser/templates/tasktrackers.mako:71
+msgid "No matching records"
+msgstr ""
 
 #: src/jobbrowser/templates/attempt_logs.mako:74
 msgid "task diagnostic log"
@@ -641,43 +678,43 @@ msgstr "Max. Map-Tasks:"
 msgid "Max reduce tasks:"
 msgstr "Max. Reduce-Tasks:"
 
-#: src/jobbrowser/templates/tasktrackers.mako:21
+#: src/jobbrowser/templates/tasktrackers.mako:22
 msgid "Task Trackers - Job Browser"
 msgstr "Task-Trackers - Job-Browser"
 
-#: src/jobbrowser/templates/tasktrackers.mako:27
+#: src/jobbrowser/templates/tasktrackers.mako:30
 msgid "Host"
 msgstr "Host"
 
-#: src/jobbrowser/templates/tasktrackers.mako:28
+#: src/jobbrowser/templates/tasktrackers.mako:31
 msgid "Port"
 msgstr "Port"
 
-#: src/jobbrowser/templates/tasktrackers.mako:29
+#: src/jobbrowser/templates/tasktrackers.mako:32
 msgid "Last Seen"
 msgstr "Zuletzt gesehen"
 
-#: src/jobbrowser/templates/tasktrackers.mako:30
+#: src/jobbrowser/templates/tasktrackers.mako:33
 msgid "Available Space"
 msgstr "Verfügbarer Platz"
 
-#: src/jobbrowser/templates/tasktrackers.mako:31
+#: src/jobbrowser/templates/tasktrackers.mako:34
 msgid "Failure Count"
 msgstr "Fehlerzähler"
 
-#: src/jobbrowser/templates/tasktrackers.mako:32
+#: src/jobbrowser/templates/tasktrackers.mako:35
 msgid "Map Count"
 msgstr "Map-Zähler"
 
-#: src/jobbrowser/templates/tasktrackers.mako:33
+#: src/jobbrowser/templates/tasktrackers.mako:36
 msgid "Reduce Count"
 msgstr "Reduce-Zähler"
 
-#: src/jobbrowser/templates/tasktrackers.mako:34
+#: src/jobbrowser/templates/tasktrackers.mako:37
 msgid "Max Map Tasks"
 msgstr "Max. Map-Tasks"
 
-#: src/jobbrowser/templates/tasktrackers.mako:35
+#: src/jobbrowser/templates/tasktrackers.mako:38
 msgid "Max Reduce Tasks"
 msgstr "Max. Reduce-Tasks"
 

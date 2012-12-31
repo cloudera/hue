@@ -1,14 +1,14 @@
 # Translations template for Hue.
-# Copyright (C) 2012 Cloudera, Inc
+# Copyright (C) 2013 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-12-05 21:31-0800\n"
+"POT-Creation-Date: 2013-01-04 07:28-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -357,34 +357,34 @@ msgstr ""
 msgid "Permission denied (%(action)s/%(app)s)."
 msgstr ""
 
-#: src/desktop/middleware.py:135
+#: src/desktop/middleware.py:136
 #, python-format
 msgid "Cannot find HDFS called \"%(fs_ref)s\"."
 msgstr ""
 
-#: src/desktop/middleware.py:239
+#: src/desktop/middleware.py:240
 #, python-format
 msgid "%(module)s isn't a middleware module."
 msgstr ""
 
-#: src/desktop/middleware.py:244
+#: src/desktop/middleware.py:245
 #, python-format
 msgid "Error importing middleware %(module)s: \"%(error)s\"."
 msgstr ""
 
-#: src/desktop/middleware.py:248
+#: src/desktop/middleware.py:249
 #, python-format
 msgid "Middleware module \"%(module)s\" does not define a \"%(class)s\" class."
 msgstr ""
 
-#: src/desktop/middleware.py:260
+#: src/desktop/middleware.py:261
 #, python-format
 msgid ""
 "AppSpecificMiddleware module \"%(module)s\" has a process_request "
 "function which is impossible."
 msgstr ""
 
-#: src/desktop/middleware.py:302
+#: src/desktop/middleware.py:312
 #, python-format
 msgid "You do not have permission to access the %(app_name)s application."
 msgstr ""
@@ -397,11 +397,20 @@ msgstr ""
 msgid "No logs found."
 msgstr ""
 
-#: src/desktop/views.py:171 src/desktop/views.py:194 src/desktop/views.py:333
+#: src/desktop/views.py:171 src/desktop/views.py:194 src/desktop/views.py:343
 msgid "You must be a superuser."
 msgstr ""
 
-#: src/desktop/auth/views.py:85 src/desktop/auth/views.py:86
+#: src/desktop/auth/forms.py:26 src/desktop/templates/login.mako:66
+msgid "Username"
+msgstr ""
+
+#: src/desktop/auth/forms.py:27 src/desktop/auth/forms.py:35
+#: src/desktop/templates/login.mako:70
+msgid "Password"
+msgstr ""
+
+#: src/desktop/auth/views.py:97 src/desktop/auth/views.py:98
 msgid "Could not create home directory."
 msgstr ""
 
@@ -643,25 +652,25 @@ msgstr ""
 msgid "Search..."
 msgstr ""
 
-#: src/desktop/templates/check_config.mako:22
+#: src/desktop/templates/check_config.mako:23
 #: src/desktop/templates/dump_config.mako:26 src/desktop/templates/logs.mako:25
 msgid "About"
 msgstr ""
 
-#: src/desktop/templates/check_config.mako:27
+#: src/desktop/templates/check_config.mako:28
 #: src/desktop/templates/dump_config.mako:31
 msgid "Configuration files located in"
 msgstr ""
 
-#: src/desktop/templates/check_config.mako:30
+#: src/desktop/templates/check_config.mako:31
 msgid "Potential misconfiguration detected. Fix and restart Hue."
 msgstr ""
 
-#: src/desktop/templates/check_config.mako:47
+#: src/desktop/templates/check_config.mako:48
 msgid "Current value:"
 msgstr ""
 
-#: src/desktop/templates/check_config.mako:55
+#: src/desktop/templates/check_config.mako:56
 msgid "All OK. Configuration check passed."
 msgstr ""
 
@@ -734,37 +743,29 @@ msgstr ""
 msgid "Default:"
 msgstr ""
 
-#: src/desktop/templates/error.mako:25 src/desktop/templates/login.mako:80
+#: src/desktop/templates/error.mako:25 src/desktop/templates/login.mako:86
 msgid "Error!"
 msgstr ""
 
-#: src/desktop/templates/login.mako:62
-msgid "Username"
-msgstr ""
-
-#: src/desktop/templates/login.mako:65
-msgid "Password"
-msgstr ""
-
-#: src/desktop/templates/login.mako:70
+#: src/desktop/templates/login.mako:76
 msgid "Sign up"
 msgstr ""
 
-#: src/desktop/templates/login.mako:72
+#: src/desktop/templates/login.mako:78
 msgid "Sign in"
 msgstr ""
 
-#: src/desktop/templates/login.mako:80
+#: src/desktop/templates/login.mako:86
 msgid "Invalid username or password."
 msgstr ""
 
-#: src/desktop/templates/login.mako:91
+#: src/desktop/templates/login.mako:97
 msgid ""
 "Since this is your first time logging in, pick any username and password."
 " Be sure to remember these, as"
 msgstr ""
 
-#: src/desktop/templates/login.mako:92
+#: src/desktop/templates/login.mako:98
 msgid "they will become your Hue superuser credentials."
 msgstr ""
 

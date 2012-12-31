@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-12-05 21:32-0800\n"
+"POT-Creation-Date: 2013-01-04 07:28-0800\n"
 "PO-Revision-Date: 2012-07-30 18:54-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -19,27 +19,41 @@ msgstr ""
 
 #: src/jobsub/conf.py:28
 msgid "Location on HDFS where the jobsub examples and templates are stored."
-msgstr "Ubicación, en HDFS, en la que se almacenan los ejemplos y las plantillas de jobsub."
+msgstr ""
+"Ubicación, en HDFS, en la que se almacenan los ejemplos y las plantillas "
+"de jobsub."
 
 #: src/jobsub/conf.py:33
 #, fuzzy
 msgid "Location on local filesystem where examples and template are stored."
-msgstr "Ubicación, en el sistema de archivos local, en la que se almacenan los ejemplos y las plantillas."
+msgstr ""
+"Ubicación, en el sistema de archivos local, en la que se almacenan los "
+"ejemplos y las plantillas."
 
 #: src/jobsub/conf.py:39
 #, fuzzy
 msgid "Location on local filesystem where sample data is stored."
-msgstr "Ubicación, en el sistema de archivos local, en la que se almacenan los datos de ejemplo."
+msgstr ""
+"Ubicación, en el sistema de archivos local, en la que se almacenan los "
+"datos de ejemplo."
 
 #: src/jobsub/conf.py:49
 #, fuzzy
-msgid "Deprecated, use liboozie.conf.OOZIE_URL instead. URL of Oozie server. This is required for job submission."
-msgstr "Obsoleta, utilice en su lugar la URL liboozie.conf.OOZIE. URL del servidor Oozie. Es necesaria para el envío de trabajos."
+msgid ""
+"Deprecated, use liboozie.conf.OOZIE_URL instead. URL of Oozie server. "
+"This is required for job submission."
+msgstr ""
+"Obsoleta, utilice en su lugar la URL liboozie.conf.OOZIE. URL del "
+"servidor Oozie. Es necesaria para el envío de trabajos."
 
 #: src/jobsub/conf.py:55
 #, fuzzy
-msgid "Deprecated, use liboozie.conf.SECURITY_ENABLED instead. Whether Oozie requires client to do perform Kerberos authentication"
-msgstr "Obsoleta, utilice en su lugar liboozie.conf.SECURITY_ENABLED. Indica si Oozie necesita que el cliente realice la autenticación de Kerberos"
+msgid ""
+"Deprecated, use liboozie.conf.SECURITY_ENABLED instead. Whether Oozie "
+"requires client to do perform Kerberos authentication"
+msgstr ""
+"Obsoleta, utilice en su lugar liboozie.conf.SECURITY_ENABLED. Indica si "
+"Oozie necesita que el cliente realice la autenticación de Kerberos"
 
 #: src/jobsub/forms.py:39 src/jobsub/forms.py:58 src/jobsub/forms.py:77
 #: src/jobsub/forms.py:95 src/jobsub/templates/list_designs.mako:63
@@ -49,8 +63,12 @@ msgid "Name"
 msgstr "Nombre"
 
 #: src/jobsub/forms.py:43
-msgid "Allows letters, digits, '_', and '-'. The first character must be a letter or '_'."
-msgstr "Admite letras, dígitos, '_' y '-'. El primer carácter debe ser una letra o '_'."
+msgid ""
+"Allows letters, digits, '_', and '-'. The first character must be a "
+"letter or '_'."
+msgstr ""
+"Admite letras, dígitos, '_' y '-'. El primer carácter debe ser una letra "
+"o '_'."
 
 #: src/jobsub/forms.py:59 src/jobsub/forms.py:78 src/jobsub/forms.py:96
 #: src/jobsub/templates/list_designs.mako:65
@@ -92,7 +110,9 @@ msgstr "Lista de rutas a archivos que se van a agregar a la caché distribuida."
 
 #: src/jobsub/models.py:186 src/jobsub/models.py:227
 msgid "List of paths to archives to be added to the distributed cache."
-msgstr "Lista de rutas a almacenamientos que se van a agregar a la caché distribuida."
+msgstr ""
+"Lista de rutas a almacenamientos que se van a agregar a la caché "
+"distribuida."
 
 #: src/jobsub/models.py:191
 msgid "Path to jar files on HDFS."
@@ -207,7 +227,9 @@ msgid "or"
 msgstr "o bien"
 
 #: src/jobsub/templates/edit_design.mako:68
-msgid "When the design is submitted, you will be prompted for the actual value of "
+msgid ""
+"When the design is submitted, you will be prompted for the actual value "
+"of "
 msgstr "Cuando se envíe el diseño, se le solicitará el valor real de "
 
 #: src/jobsub/templates/edit_design.mako:76
@@ -289,11 +311,13 @@ msgid "Clone"
 msgstr "Clonar"
 
 #: src/jobsub/templates/list_designs.mako:48
-msgid "Create Mapreduce Design"
+#, fuzzy
+msgid "Create MapReduce Design"
 msgstr "Crear diseño de MapReduce"
 
 #: src/jobsub/templates/list_designs.mako:48
-msgid "Mapreduce"
+#, fuzzy
+msgid "MapReduce"
 msgstr "MapReduce"
 
 #: src/jobsub/templates/list_designs.mako:49
@@ -369,7 +393,7 @@ msgstr "Enviar %(name)s al clúster"
 
 #: src/jobsub/templates/list_designs.mako:181
 #: src/jobsub/templates/list_history.mako:80
-msgid "No data available in table"
+msgid "No data available"
 msgstr "Ningún dato disponible en la tabla"
 
 #: src/jobsub/templates/list_designs.mako:182
@@ -389,7 +413,7 @@ msgstr "(filtrado de _MAX_ entradas totales)"
 
 #: src/jobsub/templates/list_designs.mako:185
 #: src/jobsub/templates/list_history.mako:84
-msgid "No matching records found"
+msgid "No matching records"
 msgstr "No se ha encontrado ningún registro coincidente"
 
 #: src/jobsub/templates/list_designs.mako:187
@@ -500,13 +524,3 @@ msgstr "Hora de creación"
 msgid "Application Path"
 msgstr "Ruta de la aplicación"
 
-#~ msgid "Filter: "
-#~ msgstr "Filtro: "
-#~ msgid "Search for username, name, etc..."
-#~ msgstr "Buscar nombre de usuario, nombre, etc."
-#~ msgid "Edit %(name)s"
-#~ msgstr "Editar %(name)s"
-#~ msgid "Delete %(name)s"
-#~ msgstr "Eliminar %(name)s"
-#~ msgid "Clone %(name)s"
-#~ msgstr "Clonar %(name)s"

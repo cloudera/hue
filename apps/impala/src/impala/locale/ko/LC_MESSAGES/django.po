@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-12-05 21:32-0800\n"
+"POT-Creation-Date: 2013-01-04 07:29-0800\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -47,7 +47,9 @@ msgstr "목록 끝"
 
 #: src/impala/templates/beeswax_components.mako:203
 #, python-format
-msgid "Showing %(start)s to %(end)s of %(count)s items, page %(page)s of %(pages)s"
+msgid ""
+"Showing %(start)s to %(end)s of %(count)s items, page %(page)s of "
+"%(pages)s"
 msgstr "%(page)s / %(pages) 페이지, %(count)s 항목 중 %(start)s ~ %(end)s을(를) 표시합니다."
 
 #: src/impala/templates/execute.mako:26 src/impala/templates/layout.mako:34
@@ -125,8 +127,13 @@ msgid "Parameterization"
 msgstr "매개변수화"
 
 #: src/impala/templates/execute.mako:182
-msgid "If checked (the default), you can include parameters like $parameter_name in your query, and users will be prompted for a value when the query is run."
-msgstr "이 항목이 선택되면(기본 설정) 쿼리에 $parameter_name 같은 매개변수를 포함할 수 있으며 쿼리가 실행 중일 때 사용자에게 값이 표시됩니다."
+msgid ""
+"If checked (the default), you can include parameters like $parameter_name"
+" in your query, and users will be prompted for a value when the query is "
+"run."
+msgstr ""
+"이 항목이 선택되면(기본 설정) 쿼리에 $parameter_name 같은 매개변수를 포함할 수 있으며 쿼리가 실행 중일 때 "
+"사용자에게 값이 표시됩니다."
 
 #: src/impala/templates/execute.mako:184
 msgid "Enable Parameterization"
@@ -137,7 +144,9 @@ msgid "Email Notification"
 msgstr "이메일 알림"
 
 #: src/impala/templates/execute.mako:189
-msgid "If checked, you will receive an email notification when the query completes."
+msgid ""
+"If checked, you will receive an email notification when the query "
+"completes."
 msgstr "이 항목이 선택되면 쿼리 완료 시 이메일 알림을 받게 됩니다."
 
 #: src/impala/templates/execute.mako:191
@@ -201,9 +210,3 @@ msgstr "테이블"
 msgid "Settings"
 msgstr "설정"
 
-#~ msgid "About Hue"
-#~ msgstr "Hue 정보"
-#~ msgid "Configuration"
-#~ msgstr "구성"
-#~ msgid "Check for misconfiguration"
-#~ msgstr "잘못된 구성 검사"

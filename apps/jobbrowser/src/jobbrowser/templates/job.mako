@@ -271,8 +271,13 @@ ${commonheader(_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId_short), 
                 { "sWidth": "50%" },
                 { "sWidth": "49%" }
             ],
-            "aaSorting": [[ 1, "asc" ]]
+            "aaSorting": [[ 1, "asc" ]],
+            "oLanguage": {
+                "sEmptyTable": "${_('No data available')}",
+                "sZeroRecords": "${_('No matching records')}",
+            }
         });
+
         var _metadataTable = $("#metadataTable").dataTable({
             "bPaginate": false,
             "bLengthChange": false,
@@ -281,8 +286,13 @@ ${commonheader(_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId_short), 
             "aoColumns": [
                 { "sWidth": "30%" },
                 { "sWidth": "70%" }
-            ]
+            ],
+            "oLanguage": {
+                "sEmptyTable": "${_('No data available')}",
+                "sZeroRecords": "${_('No matching records')}",
+            }
         });
+
         var _rawConfigurationTable = $("#rawConfigurationTable").dataTable({
             "bPaginate": false,
             "bLengthChange": false,
@@ -291,7 +301,11 @@ ${commonheader(_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId_short), 
             "aoColumns": [
                 { "sWidth": "30%" },
                 { "sWidth": "70%" }
-            ]
+            ],
+            "oLanguage": {
+                "sEmptyTable": "${_('No data available')}",
+                "sZeroRecords": "${_('No matching records')}",
+            }
         });
 
         $("#metadataFilter").keydown(function(){
@@ -309,7 +323,11 @@ ${commonheader(_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId_short), 
                 { "sWidth": "20%" },
                 { "sWidth": "20%" },
                 { "sWidth": "20%" }
-            ]
+            ],
+            "oLanguage": {
+                "sEmptyTable": "${_('No data available')}",
+                "sZeroRecords": "${_('No matching records')}",
+            }
         });
 
         $(".dataTables_wrapper").css("min-height","0");

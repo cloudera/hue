@@ -46,7 +46,7 @@ ${commonlayout.menubar(section='designs')}
     <%def name="creation()">
         <span class="btn-group">
                 <a href="${ url('jobsub.views.new_design', action_type='mapreduce') }" class="btn" title="${_('Create MapReduce Design')}" rel="tooltip"><i class="icon-plus-sign"></i> ${_('MapReduce')}</a>
-                <a href="${ url('jobsub.views.new_design', action_type='streaming') }" class="btn" title="${_('Create Streaming Design')}" rel="tooltip"><i class="icon-plus-sign"></i> ${_('Streaming')}</a>
+                <a href="${ url('jobsub.views.new_design', action_type='streaming') }" class="btn" title="${_('Create Streaming Design')}" rel="tooltip"><i class="icon-plus-sign"></i> Streaming</a>
                 <a href="${ url('jobsub.views.new_design', action_type='java') }" class="btn"title="${_('Create Java Design')}" rel="tooltip"><i class="icon-plus-sign"></i> ${_('Java')}</a>
             </span>
       %if show_install_examples:
@@ -178,11 +178,11 @@ ${layout()}
                 }
             },
             "oLanguage": {
-                "sEmptyTable":     "${_('No data available in table')}",
+                "sEmptyTable":     "${_('No data available')}",
                 "sInfo":           "${_('Showing _START_ to _END_ of _TOTAL_ entries')}",
                 "sInfoEmpty":      "${_('Showing 0 to 0 of 0 entries')}",
                 "sInfoFiltered":   "${_('(filtered from _MAX_ total entries)')}",
-                "sZeroRecords":    "${_('No matching records found')}",
+                "sZeroRecords":    "${_('No matching records')}",
                 "oPaginate": {
                     "sFirst":    "${_('First')}",
                     "sLast":     "${_('Last')}",

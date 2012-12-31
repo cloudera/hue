@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-12-05 21:32-0800\n"
+"POT-Creation-Date: 2013-01-04 07:28-0800\n"
 "PO-Revision-Date: 2012-07-30 18:52-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: pt <LL@li.org>\n"
@@ -154,8 +154,12 @@ msgstr "Impossível aceder a: %(path)s."
 
 #: src/filebrowser/views.py:145 src/filebrowser/views.py:884
 #, python-format
-msgid " Note: you are a Hue admin but not a HDFS superuser (which is \"%(superuser)s\")."
-msgstr " Nota: é um administrador da Hue, mas não um super-utilizador do HDFS (que é \"%(superuser)s\")."
+msgid ""
+" Note: you are a Hue admin but not a HDFS superuser (which is "
+"\"%(superuser)s\")."
+msgstr ""
+" Nota: é um administrador da Hue, mas não um super-utilizador do HDFS "
+"(que é \"%(superuser)s\")."
 
 #: src/filebrowser/views.py:171
 #, python-format
@@ -170,7 +174,9 @@ msgstr "Ficheiro demasiado grande para editar: %(path)s"
 #: src/filebrowser/views.py:185
 #, python-format
 msgid "File is not encoded in %(encoding)s; cannot be edited: %(path)s"
-msgstr "O ficheiro não está codificado em %(encoding)s; não pode ser editado: %(path)s"
+msgstr ""
+"O ficheiro não está codificado em %(encoding)s; não pode ser editado: "
+"%(path)s"
 
 #: src/filebrowser/views.py:234
 #, python-format
@@ -254,18 +260,28 @@ msgstr "Não é possível efectuar a operação."
 
 #: src/filebrowser/views.py:917
 #, python-format
-msgid "Could not rename folder \"%s\" to \"%s\": Hashes are not allowed in filenames."
-msgstr "Não foi possível alterar o nome da pasta \"%s\" para \"%s\": Não são permitidos hashes em nomes de ficheiros."
+msgid ""
+"Could not rename folder \"%s\" to \"%s\": Hashes are not allowed in "
+"filenames."
+msgstr ""
+"Não foi possível alterar o nome da pasta \"%s\" para \"%s\": Não são "
+"permitidos hashes em nomes de ficheiros."
 
 #: src/filebrowser/views.py:931
 #, python-format
-msgid "Could not name folder \"%s\": Slashes or hashes are not allowed in filenames."
-msgstr "Não foi possível alterar o nome da pasta \"%s\": Não são permitidas barras ou hashes em nomes de ficheiros."
+msgid ""
+"Could not name folder \"%s\": Slashes or hashes are not allowed in "
+"filenames."
+msgstr ""
+"Não foi possível alterar o nome da pasta \"%s\": Não são permitidas "
+"barras ou hashes em nomes de ficheiros."
 
 #: src/filebrowser/views.py:941
 #, python-format
 msgid "Could not name file \"%s\": Slashes are not allowed in filenames."
-msgstr "Não foi possível atribuir o nome ao ficheiro \"%s\": Não são permitidas barras em nomes de ficheiros."
+msgstr ""
+"Não foi possível atribuir o nome ao ficheiro \"%s\": Não são permitidas "
+"barras em nomes de ficheiros."
 
 #: src/filebrowser/views.py:1034 src/filebrowser/views.py:1111
 #, fuzzy
@@ -288,13 +304,13 @@ msgid "Sorry, no \"%(sep)s\" in the filename %(name)s.sep"
 msgstr "Lamentamos, mas não existe \"%(sep)s\" no nome do ficheiro %(name)s.sep"
 
 #: src/filebrowser/views.py:1075 src/filebrowser/views.py:1158
-#, python-format
-msgid "Destination %(name)s already exists.name"
+#, fuzzy, python-format
+msgid "Destination %(name)s already exists."
 msgstr "O destino %(name)s já existe."
 
 #: src/filebrowser/views.py:1077 src/filebrowser/views.py:1160
-#, python-format
-msgid "Copy to \"%(name)s failed: %(error)s"
+#, fuzzy, python-format
+msgid "Copy to %(name)s failed: %(error)s"
 msgstr "Falha ao copiar para %(name)s: %(error)s"
 
 #: src/filebrowser/views.py:1087 src/filebrowser/views.py:1170
@@ -424,8 +440,8 @@ msgstr "É necessário o nome."
 #: src/filebrowser/templates/listdir_components.mako:291
 #: src/filebrowser/templates/listdir_components.mako:345
 #: src/filebrowser/templates/listdir_components.mako:366
-#: src/filebrowser/templates/listdir_components.mako:931
-#: src/filebrowser/templates/listdir_components.mako:979
+#: src/filebrowser/templates/listdir_components.mako:932
+#: src/filebrowser/templates/listdir_components.mako:980
 msgid "Cancel"
 msgstr "Cancelar"
 
@@ -594,8 +610,12 @@ msgstr "Enviar"
 
 #: src/filebrowser/templates/listdir_components.mako:186
 #, python-format
-msgid "Note: Only the Hadoop superuser, \"%(superuser)s\" on this file system, may change the owner of a file."
-msgstr "Nota: Apenas o super-utilizador do Hadoop, \"%(superuser)s\" neste sistema de ficheiros, pode alterar o proprietário de um ficheiro."
+msgid ""
+"Note: Only the Hadoop superuser, \"%(superuser)s\" on this file system, "
+"may change the owner of a file."
+msgstr ""
+"Nota: Apenas o super-utilizador do Hadoop, \"%(superuser)s\" neste "
+"sistema de ficheiros, pode alterar o proprietário de um ficheiro."
 
 #: src/filebrowser/templates/listdir_components.mako:214
 msgid "Change Permissions:"
@@ -688,56 +708,22 @@ msgstr "Especifique outro utilizador."
 msgid "There was a problem with your request."
 msgstr "Ocorreu um problema com o seu pedido."
 
-#: src/filebrowser/templates/listdir_components.mako:923
-#: src/filebrowser/templates/listdir_components.mako:971
+#: src/filebrowser/templates/listdir_components.mako:924
+#: src/filebrowser/templates/listdir_components.mako:972
 msgid "Drop files here to upload"
 msgstr "Largue aqui os ficheiros para fazer upload"
 
-#: src/filebrowser/templates/listdir_components.mako:924
+#: src/filebrowser/templates/listdir_components.mako:925
 msgid "Upload a file"
 msgstr "Fazer upload de um ficheiro"
 
-#: src/filebrowser/templates/listdir_components.mako:932
-#: src/filebrowser/templates/listdir_components.mako:980
+#: src/filebrowser/templates/listdir_components.mako:933
+#: src/filebrowser/templates/listdir_components.mako:981
 msgid "Failed"
 msgstr "Falhou"
 
-#: src/filebrowser/templates/listdir_components.mako:972
+#: src/filebrowser/templates/listdir_components.mako:973
 #, fuzzy
 msgid "Upload an archive"
 msgstr "Fazer upload de um arquivo"
 
-#~ msgid ""
-#~ "Sorry, could not name folder \"%s\": "
-#~ "Slashes are not allowed in filenames."
-#~ msgstr ""
-#~ msgid "%(destination)s upload succeded"
-#~ msgstr ""
-#~ msgid "Change Owner / Group:"
-#~ msgstr "Alterar proprietário/grupo:"
-#~ msgid "Upload files"
-#~ msgstr "Upload de ficheiros"
-#~ msgid ""
-#~ "Showing %(start_index)s to %(end_index)s of"
-#~ " %(total_count)s items, page %(page)s of"
-#~ " %(num_pages)s."
-#~ msgstr ""
-#~ "%(start_index)s a %(end_index)s de "
-#~ "%(total_count)s itens, página %(page)s de "
-#~ "%(num_pages)s."
-#~ msgid "Type"
-#~ msgstr ""
-#~ msgid "Path"
-#~ msgstr "Caminho"
-#~ msgid "Operations"
-#~ msgstr "Operações"
-#~ msgid "View File"
-#~ msgstr "Ver ficheiro"
-#~ msgid "Download File"
-#~ msgstr "Download de ficheiro"
-#~ msgid "Delete Recursively"
-#~ msgstr "Eliminar recursivamente"
-#~ msgid "There are no files matching the search criteria."
-#~ msgstr ""
-#~ msgid "Please Confirm"
-#~ msgstr "Confirme"

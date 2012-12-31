@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-12-05 21:32-0800\n"
+"POT-Creation-Date: 2013-01-04 07:28-0800\n"
 "PO-Revision-Date: 2012-07-30 18:54-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -33,13 +33,21 @@ msgstr "샘플 데이터가 저장되는 로컬 파일 시스템상의 위치입
 
 #: src/jobsub/conf.py:49
 #, fuzzy
-msgid "Deprecated, use liboozie.conf.OOZIE_URL instead. URL of Oozie server. This is required for job submission."
-msgstr "사용되지 않습니다. 대신 liboozie.conf.OOZIE_URL을 사용하십시오. Oozie 서버의 URL입니다. 이는 작업 제출 시 필요합니다."
+msgid ""
+"Deprecated, use liboozie.conf.OOZIE_URL instead. URL of Oozie server. "
+"This is required for job submission."
+msgstr ""
+"사용되지 않습니다. 대신 liboozie.conf.OOZIE_URL을 사용하십시오. Oozie 서버의 URL입니다. 이는 작업 제출"
+" 시 필요합니다."
 
 #: src/jobsub/conf.py:55
 #, fuzzy
-msgid "Deprecated, use liboozie.conf.SECURITY_ENABLED instead. Whether Oozie requires client to do perform Kerberos authentication"
-msgstr "사용되지 않습니다. 대신 liboozie.conf.SECURITY_ENABLED를 사용하십시오. Oozie에서 클라이언트의 Kerberos 인증 수행을 요구하는지 여부를 나타냅니다."
+msgid ""
+"Deprecated, use liboozie.conf.SECURITY_ENABLED instead. Whether Oozie "
+"requires client to do perform Kerberos authentication"
+msgstr ""
+"사용되지 않습니다. 대신 liboozie.conf.SECURITY_ENABLED를 사용하십시오. Oozie에서 클라이언트의 "
+"Kerberos 인증 수행을 요구하는지 여부를 나타냅니다."
 
 #: src/jobsub/forms.py:39 src/jobsub/forms.py:58 src/jobsub/forms.py:77
 #: src/jobsub/forms.py:95 src/jobsub/templates/list_designs.mako:63
@@ -49,7 +57,9 @@ msgid "Name"
 msgstr "이름"
 
 #: src/jobsub/forms.py:43
-msgid "Allows letters, digits, '_', and '-'. The first character must be a letter or '_'."
+msgid ""
+"Allows letters, digits, '_', and '-'. The first character must be a "
+"letter or '_'."
 msgstr "문자, 숫자, '_', '-'이 허용됩니다. 문자 또는 '_'이 맨 앞에 와야 합니다."
 
 #: src/jobsub/forms.py:59 src/jobsub/forms.py:78 src/jobsub/forms.py:96
@@ -207,7 +217,9 @@ msgid "or"
 msgstr "또는"
 
 #: src/jobsub/templates/edit_design.mako:68
-msgid "When the design is submitted, you will be prompted for the actual value of "
+msgid ""
+"When the design is submitted, you will be prompted for the actual value "
+"of "
 msgstr "디자인이 제출되면 다음의 실제 값을 입력하라는 프롬프트가 나타납니다. "
 
 #: src/jobsub/templates/edit_design.mako:76
@@ -289,11 +301,13 @@ msgid "Clone"
 msgstr "복제"
 
 #: src/jobsub/templates/list_designs.mako:48
-msgid "Create Mapreduce Design"
+#, fuzzy
+msgid "Create MapReduce Design"
 msgstr "Mapreduce 디자인 생성"
 
 #: src/jobsub/templates/list_designs.mako:48
-msgid "Mapreduce"
+#, fuzzy
+msgid "MapReduce"
 msgstr "MapReduce"
 
 #: src/jobsub/templates/list_designs.mako:49
@@ -369,7 +383,7 @@ msgstr "클러스터로 %(name)s 제출"
 
 #: src/jobsub/templates/list_designs.mako:181
 #: src/jobsub/templates/list_history.mako:80
-msgid "No data available in table"
+msgid "No data available"
 msgstr "테이블에 데이터가 없습니다."
 
 #: src/jobsub/templates/list_designs.mako:182
@@ -389,7 +403,7 @@ msgstr "(총 _MAX_ 항목에서 필터링됨)"
 
 #: src/jobsub/templates/list_designs.mako:185
 #: src/jobsub/templates/list_history.mako:84
-msgid "No matching records found"
+msgid "No matching records"
 msgstr "일치하는 기록이 없습니다."
 
 #: src/jobsub/templates/list_designs.mako:187
@@ -500,13 +514,3 @@ msgstr "생성된 시간"
 msgid "Application Path"
 msgstr "애플리케이션 경로"
 
-#~ msgid "Filter: "
-#~ msgstr "필터: "
-#~ msgid "Search for username, name, etc..."
-#~ msgstr "사용자 이름, 이름 등을 검색합니다."
-#~ msgid "Edit %(name)s"
-#~ msgstr "%(name)s 편집"
-#~ msgid "Delete %(name)s"
-#~ msgstr "%(name)s 삭제"
-#~ msgid "Clone %(name)s"
-#~ msgstr "%(name)s 복제"

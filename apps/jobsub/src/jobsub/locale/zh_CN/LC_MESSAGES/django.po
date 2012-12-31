@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-12-05 21:32-0800\n"
+"POT-Creation-Date: 2013-01-04 07:28-0800\n"
 "PO-Revision-Date: 2012-07-30 18:54-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -33,12 +33,16 @@ msgstr "本地文件系统上存储示例数据的位置。"
 
 #: src/jobsub/conf.py:49
 #, fuzzy
-msgid "Deprecated, use liboozie.conf.OOZIE_URL instead. URL of Oozie server. This is required for job submission."
+msgid ""
+"Deprecated, use liboozie.conf.OOZIE_URL instead. URL of Oozie server. "
+"This is required for job submission."
 msgstr "已弃用，请用 liboozie.conf.OOZIE_URL 替代。Oozie 服务器的 URL。提交作业时需要此 URL。"
 
 #: src/jobsub/conf.py:55
 #, fuzzy
-msgid "Deprecated, use liboozie.conf.SECURITY_ENABLED instead. Whether Oozie requires client to do perform Kerberos authentication"
+msgid ""
+"Deprecated, use liboozie.conf.SECURITY_ENABLED instead. Whether Oozie "
+"requires client to do perform Kerberos authentication"
 msgstr "已弃用，请用 liboozie.conf.SECURITY_ENABLED 替代。Oozie 是否需要客户端执行 Kerberos 身份验证"
 
 #: src/jobsub/forms.py:39 src/jobsub/forms.py:58 src/jobsub/forms.py:77
@@ -49,7 +53,9 @@ msgid "Name"
 msgstr "名称"
 
 #: src/jobsub/forms.py:43
-msgid "Allows letters, digits, '_', and '-'. The first character must be a letter or '_'."
+msgid ""
+"Allows letters, digits, '_', and '-'. The first character must be a "
+"letter or '_'."
 msgstr "允许字母、数字、'_' 和 '-'。第一个字符必须是字母或 '_'。"
 
 #: src/jobsub/forms.py:59 src/jobsub/forms.py:78 src/jobsub/forms.py:96
@@ -207,7 +213,9 @@ msgid "or"
 msgstr "或"
 
 #: src/jobsub/templates/edit_design.mako:68
-msgid "When the design is submitted, you will be prompted for the actual value of "
+msgid ""
+"When the design is submitted, you will be prompted for the actual value "
+"of "
 msgstr "提交设计时，将提示您输入实际值 "
 
 #: src/jobsub/templates/edit_design.mako:76
@@ -289,11 +297,13 @@ msgid "Clone"
 msgstr "克隆"
 
 #: src/jobsub/templates/list_designs.mako:48
-msgid "Create Mapreduce Design"
+#, fuzzy
+msgid "Create MapReduce Design"
 msgstr "创建映射减少设计"
 
 #: src/jobsub/templates/list_designs.mako:48
-msgid "Mapreduce"
+#, fuzzy
+msgid "MapReduce"
 msgstr "MapReduce"
 
 #: src/jobsub/templates/list_designs.mako:49
@@ -369,7 +379,7 @@ msgstr "将 %(name)s 提交给集群"
 
 #: src/jobsub/templates/list_designs.mako:181
 #: src/jobsub/templates/list_history.mako:80
-msgid "No data available in table"
+msgid "No data available"
 msgstr "表中无可用数据"
 
 #: src/jobsub/templates/list_designs.mako:182
@@ -389,7 +399,7 @@ msgstr "（已从 _MAX_ 总条目中过滤）"
 
 #: src/jobsub/templates/list_designs.mako:185
 #: src/jobsub/templates/list_history.mako:84
-msgid "No matching records found"
+msgid "No matching records"
 msgstr "未找到匹配记录"
 
 #: src/jobsub/templates/list_designs.mako:187
@@ -500,13 +510,3 @@ msgstr "创建时间"
 msgid "Application Path"
 msgstr "应用程序路径"
 
-#~ msgid "Filter: "
-#~ msgstr "过滤器： "
-#~ msgid "Search for username, name, etc..."
-#~ msgstr "搜索用户名、名称等..."
-#~ msgid "Edit %(name)s"
-#~ msgstr "编辑 %(name)s"
-#~ msgid "Delete %(name)s"
-#~ msgstr "删除 %(name)s"
-#~ msgid "Clone %(name)s"
-#~ msgstr "克隆 %(name)s"

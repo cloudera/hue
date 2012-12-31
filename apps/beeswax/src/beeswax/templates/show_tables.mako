@@ -100,7 +100,11 @@ ${layout.menubar(section='tables')}
             "aoColumns": [
                 null,
                 { "sWidth": "130px", "bSortable" : false }
-             ]
+             ],
+            "oLanguage": {
+                "sEmptyTable": "${_('No data available')}",
+                "sZeroRecords": "${_('No matching records')}",
+            }
         });
 
         $("a[data-row-selector='true']").jHueRowSelector();

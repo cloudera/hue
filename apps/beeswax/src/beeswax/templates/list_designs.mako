@@ -102,7 +102,6 @@ ${layout.menubar(section='saved queries')}
 
 <script type="text/javascript" charset="utf-8">
     $(document).ready(function(){
-
         $(".datatables").dataTable({
             "bPaginate": false,
             "bLengthChange": false,
@@ -116,7 +115,11 @@ ${layout.menubar(section='saved queries')}
                 null,
                 { "sSortDataType": "dom-sort-value", "sType": "numeric" },
                 { "bSortable": false }
-            ]
+            ],
+            "oLanguage": {
+                "sEmptyTable": "${_('No data available')}",
+                "sZeroRecords": "${_('No matching records')}",
+            }
         });
 
         $(".confirmationModal").live("click", function(){

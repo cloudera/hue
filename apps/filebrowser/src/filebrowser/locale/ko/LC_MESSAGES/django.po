@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-12-05 21:32-0800\n"
+"POT-Creation-Date: 2013-01-04 07:28-0800\n"
 "PO-Revision-Date: 2012-07-30 18:52-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -154,7 +154,9 @@ msgstr "액세스할 수 없음: %(path)s"
 
 #: src/filebrowser/views.py:145 src/filebrowser/views.py:884
 #, python-format
-msgid " Note: you are a Hue admin but not a HDFS superuser (which is \"%(superuser)s\")."
+msgid ""
+" Note: you are a Hue admin but not a HDFS superuser (which is "
+"\"%(superuser)s\")."
 msgstr " 참고: 귀하는 Hue 관리자이나 HDFS superuser(\"%(superuser)s\")는 아닙니다."
 
 #: src/filebrowser/views.py:171
@@ -254,12 +256,16 @@ msgstr "작업을 수행할 수 없습니다."
 
 #: src/filebrowser/views.py:917
 #, python-format
-msgid "Could not rename folder \"%s\" to \"%s\": Hashes are not allowed in filenames."
+msgid ""
+"Could not rename folder \"%s\" to \"%s\": Hashes are not allowed in "
+"filenames."
 msgstr "폴더 이름을 \"%s\"에서 \"%s\"(으)로 바꿀 수 없습니다. 파일 이름에 해시를 사용할 수 없습니다."
 
 #: src/filebrowser/views.py:931
 #, python-format
-msgid "Could not name folder \"%s\": Slashes or hashes are not allowed in filenames."
+msgid ""
+"Could not name folder \"%s\": Slashes or hashes are not allowed in "
+"filenames."
 msgstr "폴더 이름 \"%s\"을(를) 지정할 수 없습니다. 파일 이름에 슬래시 또는 해시를 사용할 수 없습니다."
 
 #: src/filebrowser/views.py:941
@@ -288,13 +294,13 @@ msgid "Sorry, no \"%(sep)s\" in the filename %(name)s.sep"
 msgstr "파일 이름 %(name)s.sep에 \"%(sep)s\"이(가) 없습니다."
 
 #: src/filebrowser/views.py:1075 src/filebrowser/views.py:1158
-#, python-format
-msgid "Destination %(name)s already exists.name"
+#, fuzzy, python-format
+msgid "Destination %(name)s already exists."
 msgstr "대상 %(name)s이(가) 이미 존재합니다."
 
 #: src/filebrowser/views.py:1077 src/filebrowser/views.py:1160
-#, python-format
-msgid "Copy to \"%(name)s failed: %(error)s"
+#, fuzzy, python-format
+msgid "Copy to %(name)s failed: %(error)s"
 msgstr "\"%(name)s에 복사할 수 없습니다: %(error)s"
 
 #: src/filebrowser/views.py:1087 src/filebrowser/views.py:1170
@@ -424,8 +430,8 @@ msgstr "이름을 입력해야 합니다."
 #: src/filebrowser/templates/listdir_components.mako:291
 #: src/filebrowser/templates/listdir_components.mako:345
 #: src/filebrowser/templates/listdir_components.mako:366
-#: src/filebrowser/templates/listdir_components.mako:931
-#: src/filebrowser/templates/listdir_components.mako:979
+#: src/filebrowser/templates/listdir_components.mako:932
+#: src/filebrowser/templates/listdir_components.mako:980
 msgid "Cancel"
 msgstr "취소"
 
@@ -594,7 +600,9 @@ msgstr "제출"
 
 #: src/filebrowser/templates/listdir_components.mako:186
 #, python-format
-msgid "Note: Only the Hadoop superuser, \"%(superuser)s\" on this file system, may change the owner of a file."
+msgid ""
+"Note: Only the Hadoop superuser, \"%(superuser)s\" on this file system, "
+"may change the owner of a file."
 msgstr "참고: 이 파일 시스템의 Hadoop superuser \"%(superuser)s\"만 파일의 소유자를 변경할 수 있습니다."
 
 #: src/filebrowser/templates/listdir_components.mako:214
@@ -688,56 +696,22 @@ msgstr "다른 사용자를 지정하십시오."
 msgid "There was a problem with your request."
 msgstr "요청에 문제가 있습니다."
 
-#: src/filebrowser/templates/listdir_components.mako:923
-#: src/filebrowser/templates/listdir_components.mako:971
+#: src/filebrowser/templates/listdir_components.mako:924
+#: src/filebrowser/templates/listdir_components.mako:972
 msgid "Drop files here to upload"
 msgstr "업로드할 파일 여기 두기"
 
-#: src/filebrowser/templates/listdir_components.mako:924
+#: src/filebrowser/templates/listdir_components.mako:925
 msgid "Upload a file"
 msgstr "파일 업로드"
 
-#: src/filebrowser/templates/listdir_components.mako:932
-#: src/filebrowser/templates/listdir_components.mako:980
+#: src/filebrowser/templates/listdir_components.mako:933
+#: src/filebrowser/templates/listdir_components.mako:981
 msgid "Failed"
 msgstr "실패함"
 
-#: src/filebrowser/templates/listdir_components.mako:972
+#: src/filebrowser/templates/listdir_components.mako:973
 #, fuzzy
 msgid "Upload an archive"
 msgstr "아카이브 업로드"
 
-#~ msgid ""
-#~ "Sorry, could not name folder \"%s\": "
-#~ "Slashes are not allowed in filenames."
-#~ msgstr ""
-#~ msgid "%(destination)s upload succeded"
-#~ msgstr ""
-#~ msgid "Change Owner / Group:"
-#~ msgstr "소유자/그룹 변경:"
-#~ msgid "Upload files"
-#~ msgstr "파일 업로드"
-#~ msgid ""
-#~ "Showing %(start_index)s to %(end_index)s of"
-#~ " %(total_count)s items, page %(page)s of"
-#~ " %(num_pages)s."
-#~ msgstr ""
-#~ "%(page)s / %(num_pages)s 페이지, %(total_count)s개"
-#~ " 항목 중 %(start_index)s ~ %(end_index)s을(를)"
-#~ " 표시합니다."
-#~ msgid "Type"
-#~ msgstr ""
-#~ msgid "Path"
-#~ msgstr "경로"
-#~ msgid "Operations"
-#~ msgstr "작업"
-#~ msgid "View File"
-#~ msgstr "파일 보기"
-#~ msgid "Download File"
-#~ msgstr "파일 다운로드"
-#~ msgid "Delete Recursively"
-#~ msgstr "반복 삭제"
-#~ msgid "There are no files matching the search criteria."
-#~ msgstr ""
-#~ msgid "Please Confirm"
-#~ msgstr "확인하십시오."

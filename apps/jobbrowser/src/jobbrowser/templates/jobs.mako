@@ -202,7 +202,11 @@ ${commonheader(_('Job Browser'), "jobbrowser", user)}
                 { "sSortDataType": "dom-sort-value", "sType": "numeric" },
                 { "sSortDataType": "dom-sort-value", "sType": "numeric" },
                 {"bSortable":false}
-            ]
+            ],
+            "oLanguage": {
+                "sEmptyTable": "${_('No data available')}",
+                "sZeroRecords": "${_('No matching records')}",
+            }
         });
 
         $(".kill").live("click", function(e){

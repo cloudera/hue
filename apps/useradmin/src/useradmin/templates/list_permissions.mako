@@ -76,8 +76,13 @@ ${layout.menubar(section='permissions', _=_)}
                 null,
                 null,
                 null
-            ]
+            ],
+            "oLanguage": {
+                "sEmptyTable": "${_('No data available')}",
+                "sZeroRecords": "${_('No matching records')}",
+            }
         });
+
         $(".dataTables_wrapper").css("min-height","0");
         $(".dataTables_filter").hide();
 

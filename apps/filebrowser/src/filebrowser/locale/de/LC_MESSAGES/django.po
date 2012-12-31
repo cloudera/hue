@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-12-05 21:32-0800\n"
+"POT-Creation-Date: 2013-01-04 07:28-0800\n"
 "PO-Revision-Date: 2012-07-30 18:52-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: de <LL@li.org>\n"
@@ -154,8 +154,12 @@ msgstr "Kann nicht zugreifen auf: %(path)s."
 
 #: src/filebrowser/views.py:145 src/filebrowser/views.py:884
 #, python-format
-msgid " Note: you are a Hue admin but not a HDFS superuser (which is \"%(superuser)s\")."
-msgstr " Hinweis: Sie sind ein Hue-Admin, aber kein HDFS-Superuser (das ist \"%(superuser)s\")."
+msgid ""
+" Note: you are a Hue admin but not a HDFS superuser (which is "
+"\"%(superuser)s\")."
+msgstr ""
+" Hinweis: Sie sind ein Hue-Admin, aber kein HDFS-Superuser (das ist "
+"\"%(superuser)s\")."
 
 #: src/filebrowser/views.py:171
 #, python-format
@@ -170,7 +174,9 @@ msgstr "Datei zu groß zum Bearbeiten: %(path)s"
 #: src/filebrowser/views.py:185
 #, python-format
 msgid "File is not encoded in %(encoding)s; cannot be edited: %(path)s"
-msgstr "Datei ist nicht verschlüsselt in %(encoding)s; kann nicht bearbeitet werden: %(path)s"
+msgstr ""
+"Datei ist nicht verschlüsselt in %(encoding)s; kann nicht bearbeitet "
+"werden: %(path)s"
 
 #: src/filebrowser/views.py:234
 #, python-format
@@ -206,7 +212,9 @@ msgstr "Länge darf nicht weniger sein als Null."
 #: src/filebrowser/views.py:575
 #, python-format
 msgid "Cannot request chunks greater than %(bytes)d bytes"
-msgstr "Es kann keine Teile angefordert werden, die größer als %(bytes)d Bytes sind"
+msgstr ""
+"Es kann keine Teile angefordert werden, die größer als %(bytes)d Bytes "
+"sind"
 
 #: src/filebrowser/views.py:686
 msgid "Failed to read Avro file."
@@ -254,18 +262,28 @@ msgstr "Operation kann nicht durchgeführt werden."
 
 #: src/filebrowser/views.py:917
 #, python-format
-msgid "Could not rename folder \"%s\" to \"%s\": Hashes are not allowed in filenames."
-msgstr "Ordner konnte nicht von \"%s\" in \"%s\" umbenannt werden: Rauten sind in Dateinamen nicht zulässig."
+msgid ""
+"Could not rename folder \"%s\" to \"%s\": Hashes are not allowed in "
+"filenames."
+msgstr ""
+"Ordner konnte nicht von \"%s\" in \"%s\" umbenannt werden: Rauten sind in"
+" Dateinamen nicht zulässig."
 
 #: src/filebrowser/views.py:931
 #, python-format
-msgid "Could not name folder \"%s\": Slashes or hashes are not allowed in filenames."
-msgstr "Ordner konnte nicht in \"%s\" umbenannt werden: Schrägstriche oder Rauten sind in Dateinamen nicht zulässig."
+msgid ""
+"Could not name folder \"%s\": Slashes or hashes are not allowed in "
+"filenames."
+msgstr ""
+"Ordner konnte nicht in \"%s\" umbenannt werden: Schrägstriche oder Rauten"
+" sind in Dateinamen nicht zulässig."
 
 #: src/filebrowser/views.py:941
 #, python-format
 msgid "Could not name file \"%s\": Slashes are not allowed in filenames."
-msgstr "Datei konnte nicht in \"%s\" umbenannt werden: Schrägstriche sind in Dateinamen nicht zulässig."
+msgstr ""
+"Datei konnte nicht in \"%s\" umbenannt werden: Schrägstriche sind in "
+"Dateinamen nicht zulässig."
 
 #: src/filebrowser/views.py:1034 src/filebrowser/views.py:1111
 #, fuzzy
@@ -288,13 +306,13 @@ msgid "Sorry, no \"%(sep)s\" in the filename %(name)s.sep"
 msgstr "Kein \"%(sep)\" im Dateinamen %(name)s.sep"
 
 #: src/filebrowser/views.py:1075 src/filebrowser/views.py:1158
-#, python-format
-msgid "Destination %(name)s already exists.name"
+#, fuzzy, python-format
+msgid "Destination %(name)s already exists."
 msgstr "Ziel %(name)s ist bereits vorhanden."
 
 #: src/filebrowser/views.py:1077 src/filebrowser/views.py:1160
-#, python-format
-msgid "Copy to \"%(name)s failed: %(error)s"
+#, fuzzy, python-format
+msgid "Copy to %(name)s failed: %(error)s"
 msgstr "Kopieren nach \"%(name)s\" fehlgeschlagen: %(error)s"
 
 #: src/filebrowser/views.py:1087 src/filebrowser/views.py:1170
@@ -424,8 +442,8 @@ msgstr "Der Name ist erforderlich."
 #: src/filebrowser/templates/listdir_components.mako:291
 #: src/filebrowser/templates/listdir_components.mako:345
 #: src/filebrowser/templates/listdir_components.mako:366
-#: src/filebrowser/templates/listdir_components.mako:931
-#: src/filebrowser/templates/listdir_components.mako:979
+#: src/filebrowser/templates/listdir_components.mako:932
+#: src/filebrowser/templates/listdir_components.mako:980
 msgid "Cancel"
 msgstr "Abbrechen"
 
@@ -594,8 +612,12 @@ msgstr "Übermitteln"
 
 #: src/filebrowser/templates/listdir_components.mako:186
 #, python-format
-msgid "Note: Only the Hadoop superuser, \"%(superuser)s\" on this file system, may change the owner of a file."
-msgstr "Hinweis: Nur der Hadoop-Superuser, \"%(superuser)s\" auf diesem Dateisystem, darf den Eigentümer einer Datei ändern."
+msgid ""
+"Note: Only the Hadoop superuser, \"%(superuser)s\" on this file system, "
+"may change the owner of a file."
+msgstr ""
+"Hinweis: Nur der Hadoop-Superuser, \"%(superuser)s\" auf diesem "
+"Dateisystem, darf den Eigentümer einer Datei ändern."
 
 #: src/filebrowser/templates/listdir_components.mako:214
 msgid "Change Permissions:"
@@ -688,56 +710,22 @@ msgstr "Geben Sie einen anderen Benutzer an."
 msgid "There was a problem with your request."
 msgstr "Bei Ihrer Anfrage ist ein Problem aufgetreten."
 
-#: src/filebrowser/templates/listdir_components.mako:923
-#: src/filebrowser/templates/listdir_components.mako:971
+#: src/filebrowser/templates/listdir_components.mako:924
+#: src/filebrowser/templates/listdir_components.mako:972
 msgid "Drop files here to upload"
 msgstr "Legen sie hochzuladende Dateien hier ab"
 
-#: src/filebrowser/templates/listdir_components.mako:924
+#: src/filebrowser/templates/listdir_components.mako:925
 msgid "Upload a file"
 msgstr "Eine Datei hochladen"
 
-#: src/filebrowser/templates/listdir_components.mako:932
-#: src/filebrowser/templates/listdir_components.mako:980
+#: src/filebrowser/templates/listdir_components.mako:933
+#: src/filebrowser/templates/listdir_components.mako:981
 msgid "Failed"
 msgstr "Fehlgeschlagen"
 
-#: src/filebrowser/templates/listdir_components.mako:972
+#: src/filebrowser/templates/listdir_components.mako:973
 #, fuzzy
 msgid "Upload an archive"
 msgstr "Ein Archiv hochladen"
 
-#~ msgid ""
-#~ "Sorry, could not name folder \"%s\": "
-#~ "Slashes are not allowed in filenames."
-#~ msgstr ""
-#~ msgid "%(destination)s upload succeded"
-#~ msgstr ""
-#~ msgid "Change Owner / Group:"
-#~ msgstr "Eigentümer / Gruppe ändern:"
-#~ msgid "Upload files"
-#~ msgstr "Dateien hochladen"
-#~ msgid ""
-#~ "Showing %(start_index)s to %(end_index)s of"
-#~ " %(total_count)s items, page %(page)s of"
-#~ " %(num_pages)s."
-#~ msgstr ""
-#~ "%(start_index)s bis %(end_index)s von "
-#~ "%(total_count)s Elementen, Seite %(page)s von"
-#~ " %(num_pages)s anzeigen."
-#~ msgid "Type"
-#~ msgstr ""
-#~ msgid "Path"
-#~ msgstr "Pfad"
-#~ msgid "Operations"
-#~ msgstr "Operationen"
-#~ msgid "View File"
-#~ msgstr "Datei anzeigen"
-#~ msgid "Download File"
-#~ msgstr "Datei herunterladen"
-#~ msgid "Delete Recursively"
-#~ msgstr "Rekursiv löschen"
-#~ msgid "There are no files matching the search criteria."
-#~ msgstr ""
-#~ msgid "Please Confirm"
-#~ msgstr "Bestätigen"
