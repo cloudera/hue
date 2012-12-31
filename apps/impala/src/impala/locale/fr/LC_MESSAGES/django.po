@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-12-05 21:32-0800\n"
+"POT-Creation-Date: 2013-01-04 07:29-0800\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -47,8 +47,12 @@ msgstr "Fin de la liste"
 
 #: src/impala/templates/beeswax_components.mako:203
 #, python-format
-msgid "Showing %(start)s to %(end)s of %(count)s items, page %(page)s of %(pages)s"
-msgstr "Affichage des éléments %(start)s à %(end)s sur %(count)s, page %(page)s sur %(pages)s"
+msgid ""
+"Showing %(start)s to %(end)s of %(count)s items, page %(page)s of "
+"%(pages)s"
+msgstr ""
+"Affichage des éléments %(start)s à %(end)s sur %(count)s, page %(page)s "
+"sur %(pages)s"
 
 #: src/impala/templates/execute.mako:26 src/impala/templates/layout.mako:34
 msgid "Query Editor"
@@ -125,8 +129,14 @@ msgid "Parameterization"
 msgstr "Paramétrage"
 
 #: src/impala/templates/execute.mako:182
-msgid "If checked (the default), you can include parameters like $parameter_name in your query, and users will be prompted for a value when the query is run."
-msgstr "Si coché (par défaut), vous pouvez inclure des paramètres tels que $parameter_name dans votre requête, et les utilisateurs seront invités à saisir une valeur lors de l'exécution de la requête."
+msgid ""
+"If checked (the default), you can include parameters like $parameter_name"
+" in your query, and users will be prompted for a value when the query is "
+"run."
+msgstr ""
+"Si coché (par défaut), vous pouvez inclure des paramètres tels que "
+"$parameter_name dans votre requête, et les utilisateurs seront invités à "
+"saisir une valeur lors de l'exécution de la requête."
 
 #: src/impala/templates/execute.mako:184
 msgid "Enable Parameterization"
@@ -137,8 +147,12 @@ msgid "Email Notification"
 msgstr "Notification par courriel"
 
 #: src/impala/templates/execute.mako:189
-msgid "If checked, you will receive an email notification when the query completes."
-msgstr "Si coché, vous recevrez une notification par courriel lorsque la requête est terminée."
+msgid ""
+"If checked, you will receive an email notification when the query "
+"completes."
+msgstr ""
+"Si coché, vous recevrez une notification par courriel lorsque la requête "
+"est terminée."
 
 #: src/impala/templates/execute.mako:191
 msgid "Email me on completion"
@@ -201,9 +215,3 @@ msgstr "Tables"
 msgid "Settings"
 msgstr "Paramètres"
 
-#~ msgid "About Hue"
-#~ msgstr "A propos de Hue"
-#~ msgid "Configuration"
-#~ msgstr "Configuration"
-#~ msgid "Check for misconfiguration"
-#~ msgstr "Recherche de configuration incorrecte"

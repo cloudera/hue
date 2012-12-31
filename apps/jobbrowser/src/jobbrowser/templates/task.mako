@@ -152,8 +152,13 @@ ${commonheader(_('Job Task: %(taskId)s - Job Browser') % dict(taskId=task.taskId
             "bLengthChange": false,
             "bInfo": false,
             "bFilter": false,
-            "aaSorting": [[ 1, "asc" ]]
+            "aaSorting": [[ 1, "asc" ]],
+            "oLanguage": {
+                "sEmptyTable": "${_('No data available')}",
+                "sZeroRecords": "${_('No matching records')}",
+            }
         });
+
         $("#metadataTable").dataTable({
             "bPaginate": false,
             "bLengthChange": false,
@@ -163,7 +168,11 @@ ${commonheader(_('Job Task: %(taskId)s - Job Browser') % dict(taskId=task.taskId
             "aoColumns": [
                 { "sWidth": "30%" },
                 { "sWidth": "70%" }
-            ]
+            ],
+            "oLanguage": {
+                "sEmptyTable": "${_('No data available')}",
+                "sZeroRecords": "${_('No matching records')}",
+            }
         });
 
         $(".taskCountersTable").dataTable({
@@ -175,7 +184,11 @@ ${commonheader(_('Job Task: %(taskId)s - Job Browser') % dict(taskId=task.taskId
             "aoColumns": [
                 { "sWidth": "30%" },
                 { "sWidth": "70%" }
-            ]
+            ],
+            "oLanguage": {
+                "sEmptyTable": "${_('No data available')}",
+                "sZeroRecords": "${_('No matching records')}",
+            }
         });
 
         $("a[data-row-selector='true']").jHueRowSelector();

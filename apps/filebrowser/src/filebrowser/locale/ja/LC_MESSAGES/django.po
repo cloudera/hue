@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-12-05 21:32-0800\n"
+"POT-Creation-Date: 2013-01-04 07:28-0800\n"
 "PO-Revision-Date: 2012-07-30 18:52-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -154,7 +154,9 @@ msgstr "アクセスできません：%(path)s."
 
 #: src/filebrowser/views.py:145 src/filebrowser/views.py:884
 #, python-format
-msgid " Note: you are a Hue admin but not a HDFS superuser (which is \"%(superuser)s\")."
+msgid ""
+" Note: you are a Hue admin but not a HDFS superuser (which is "
+"\"%(superuser)s\")."
 msgstr " 注意：現在、Hue の管理者ですが、HDFS のスーパーユーザー（\"%(superuser)s\"）ではありません。"
 
 #: src/filebrowser/views.py:171
@@ -254,12 +256,16 @@ msgstr "操作を実行できません。"
 
 #: src/filebrowser/views.py:917
 #, python-format
-msgid "Could not rename folder \"%s\" to \"%s\": Hashes are not allowed in filenames."
+msgid ""
+"Could not rename folder \"%s\" to \"%s\": Hashes are not allowed in "
+"filenames."
 msgstr "ファイル名にはハッシュを使用できないため、フォルダの名前を \"%s\" から \"%s\" に変更できません。"
 
 #: src/filebrowser/views.py:931
 #, python-format
-msgid "Could not name folder \"%s\": Slashes or hashes are not allowed in filenames."
+msgid ""
+"Could not name folder \"%s\": Slashes or hashes are not allowed in "
+"filenames."
 msgstr "ファイル名にはスラッシュやハッシュを使用できないため、フォルダの名前を \"%s\" にできません。"
 
 #: src/filebrowser/views.py:941
@@ -288,13 +294,13 @@ msgid "Sorry, no \"%(sep)s\" in the filename %(name)s.sep"
 msgstr "申し訳ありませんが、\"%(sep)s\" がファイル名 %(name)s.sep にありません"
 
 #: src/filebrowser/views.py:1075 src/filebrowser/views.py:1158
-#, python-format
-msgid "Destination %(name)s already exists.name"
+#, fuzzy, python-format
+msgid "Destination %(name)s already exists."
 msgstr "宛先名である %(name)s はすでに存在します。"
 
 #: src/filebrowser/views.py:1077 src/filebrowser/views.py:1160
-#, python-format
-msgid "Copy to \"%(name)s failed: %(error)s"
+#, fuzzy, python-format
+msgid "Copy to %(name)s failed: %(error)s"
 msgstr "\"%(name)s\" へのコピーに失敗しました：%(error)s"
 
 #: src/filebrowser/views.py:1087 src/filebrowser/views.py:1170
@@ -424,8 +430,8 @@ msgstr "名前が必要です。"
 #: src/filebrowser/templates/listdir_components.mako:291
 #: src/filebrowser/templates/listdir_components.mako:345
 #: src/filebrowser/templates/listdir_components.mako:366
-#: src/filebrowser/templates/listdir_components.mako:931
-#: src/filebrowser/templates/listdir_components.mako:979
+#: src/filebrowser/templates/listdir_components.mako:932
+#: src/filebrowser/templates/listdir_components.mako:980
 msgid "Cancel"
 msgstr "キャンセル"
 
@@ -594,7 +600,9 @@ msgstr "サブミット"
 
 #: src/filebrowser/templates/listdir_components.mako:186
 #, python-format
-msgid "Note: Only the Hadoop superuser, \"%(superuser)s\" on this file system, may change the owner of a file."
+msgid ""
+"Note: Only the Hadoop superuser, \"%(superuser)s\" on this file system, "
+"may change the owner of a file."
 msgstr "注意：このファイルシステムでは、Hadoop スーパーユーザーである \"%(superuser)s\" のみがファイルの所有者を変更できます。"
 
 #: src/filebrowser/templates/listdir_components.mako:214
@@ -688,55 +696,22 @@ msgstr "別のユーザーを指定してください。"
 msgid "There was a problem with your request."
 msgstr "要求に問題がありました。"
 
-#: src/filebrowser/templates/listdir_components.mako:923
-#: src/filebrowser/templates/listdir_components.mako:971
+#: src/filebrowser/templates/listdir_components.mako:924
+#: src/filebrowser/templates/listdir_components.mako:972
 msgid "Drop files here to upload"
 msgstr "ここにファイルをドロップしてアップロード"
 
-#: src/filebrowser/templates/listdir_components.mako:924
+#: src/filebrowser/templates/listdir_components.mako:925
 msgid "Upload a file"
 msgstr "ファイルをアップロード"
 
-#: src/filebrowser/templates/listdir_components.mako:932
-#: src/filebrowser/templates/listdir_components.mako:980
+#: src/filebrowser/templates/listdir_components.mako:933
+#: src/filebrowser/templates/listdir_components.mako:981
 msgid "Failed"
 msgstr "失敗"
 
-#: src/filebrowser/templates/listdir_components.mako:972
+#: src/filebrowser/templates/listdir_components.mako:973
 #, fuzzy
 msgid "Upload an archive"
 msgstr "アーカイブをアップロード"
 
-#~ msgid ""
-#~ "Sorry, could not name folder \"%s\": "
-#~ "Slashes are not allowed in filenames."
-#~ msgstr ""
-#~ msgid "%(destination)s upload succeded"
-#~ msgstr ""
-#~ msgid "Change Owner / Group:"
-#~ msgstr "所有者/グループの変更："
-#~ msgid "Upload files"
-#~ msgstr "ファイルをアップロード"
-#~ msgid ""
-#~ "Showing %(start_index)s to %(end_index)s of"
-#~ " %(total_count)s items, page %(page)s of"
-#~ " %(num_pages)s."
-#~ msgstr ""
-#~ "%(page)s/%(num_pages)s ページで %(total_count)s "
-#~ "件のアイテムのうち、%(start_index)s から %(end_index)s までを表示。"
-#~ msgid "Type"
-#~ msgstr ""
-#~ msgid "Path"
-#~ msgstr "パス"
-#~ msgid "Operations"
-#~ msgstr "操作"
-#~ msgid "View File"
-#~ msgstr "ファイルの表示"
-#~ msgid "Download File"
-#~ msgstr "ファイルのダウンロード"
-#~ msgid "Delete Recursively"
-#~ msgstr "再帰的に削除"
-#~ msgid "There are no files matching the search criteria."
-#~ msgstr ""
-#~ msgid "Please Confirm"
-#~ msgstr "確認してください"

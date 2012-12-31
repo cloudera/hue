@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-12-05 21:32-0800\n"
+"POT-Creation-Date: 2013-01-04 07:29-0800\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -47,7 +47,9 @@ msgstr "リストの末尾"
 
 #: src/impala/templates/beeswax_components.mako:203
 #, python-format
-msgid "Showing %(start)s to %(end)s of %(count)s items, page %(page)s of %(pages)s"
+msgid ""
+"Showing %(start)s to %(end)s of %(count)s items, page %(page)s of "
+"%(pages)s"
 msgstr "%(page)s／%(pages)s ページで %(count)s 件のアイテムのうち、%(start)s ～ %(end)s までを表示しています"
 
 #: src/impala/templates/execute.mako:26 src/impala/templates/layout.mako:34
@@ -125,8 +127,13 @@ msgid "Parameterization"
 msgstr "パラメータ化"
 
 #: src/impala/templates/execute.mako:182
-msgid "If checked (the default), you can include parameters like $parameter_name in your query, and users will be prompted for a value when the query is run."
-msgstr "チェックすると（デフォルトの設定）、$parameter_name などのパラメータをクエリで使用でき、クエリを実行したユーザーにはそのパラメータ値の指定が要求されます。"
+msgid ""
+"If checked (the default), you can include parameters like $parameter_name"
+" in your query, and users will be prompted for a value when the query is "
+"run."
+msgstr ""
+"チェックすると（デフォルトの設定）、$parameter_name "
+"などのパラメータをクエリで使用でき、クエリを実行したユーザーにはそのパラメータ値の指定が要求されます。"
 
 #: src/impala/templates/execute.mako:184
 msgid "Enable Parameterization"
@@ -137,7 +144,9 @@ msgid "Email Notification"
 msgstr "電子メール通知"
 
 #: src/impala/templates/execute.mako:189
-msgid "If checked, you will receive an email notification when the query completes."
+msgid ""
+"If checked, you will receive an email notification when the query "
+"completes."
 msgstr "チェックすると、クエリの完了が電子メールで通知されます。"
 
 #: src/impala/templates/execute.mako:191
@@ -201,9 +210,3 @@ msgstr "テーブル"
 msgid "Settings"
 msgstr "設定"
 
-#~ msgid "About Hue"
-#~ msgstr "Hue のバージョン情報"
-#~ msgid "Configuration"
-#~ msgstr "設定"
-#~ msgid "Check for misconfiguration"
-#~ msgstr "誤設定がないか確認します"

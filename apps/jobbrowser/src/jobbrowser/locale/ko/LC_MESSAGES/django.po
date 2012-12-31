@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-12-05 21:32-0800\n"
+"POT-Creation-Date: 2013-01-04 07:28-0800\n"
 "PO-Revision-Date: 2012-07-30 18:53-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -18,7 +18,9 @@ msgstr ""
 "Generated-By: Babel 0.9.6\n"
 
 #: src/jobbrowser/conf.py:26
-msgid "Share submitted jobs information with all users. If set to false, submitted jobs are visible only to the owner and administrators."
+msgid ""
+"Share submitted jobs information with all users. If set to false, "
+"submitted jobs are visible only to the owner and administrators."
 msgstr "모든 사용자와 제출된 Job 정보를 공유합니다. FALSE로 설정되면 소유자와 관리자만 제출된 Job을 볼 수 있습니다."
 
 #: src/jobbrowser/models.py:87
@@ -152,7 +154,7 @@ msgstr "로그"
 #: src/jobbrowser/templates/job.mako:189 src/jobbrowser/templates/job.mako:236
 #: src/jobbrowser/templates/jobbrowser_components.mako:54
 #: src/jobbrowser/templates/jobs.mako:81 src/jobbrowser/templates/task.mako:97
-#: src/jobbrowser/templates/tasktrackers.mako:26
+#: src/jobbrowser/templates/tasktrackers.mako:29
 msgid "Name"
 msgstr "이름"
 
@@ -213,6 +215,36 @@ msgstr "단계"
 #: src/jobbrowser/templates/task.mako:66
 msgid "Output Size"
 msgstr "출력 크기"
+
+#: src/jobbrowser/templates/attempt.mako:139
+#: src/jobbrowser/templates/attempt.mako:155
+#: src/jobbrowser/templates/attempt_logs.mako:117
+#: src/jobbrowser/templates/attempt_logs.mako:133
+#: src/jobbrowser/templates/job.mako:276 src/jobbrowser/templates/job.mako:291
+#: src/jobbrowser/templates/job.mako:306 src/jobbrowser/templates/job.mako:328
+#: src/jobbrowser/templates/jobs.mako:207
+#: src/jobbrowser/templates/task.mako:157
+#: src/jobbrowser/templates/task.mako:173
+#: src/jobbrowser/templates/task.mako:189
+#: src/jobbrowser/templates/tasks.mako:121
+#: src/jobbrowser/templates/tasktrackers.mako:70
+msgid "No data available"
+msgstr ""
+
+#: src/jobbrowser/templates/attempt.mako:140
+#: src/jobbrowser/templates/attempt.mako:156
+#: src/jobbrowser/templates/attempt_logs.mako:118
+#: src/jobbrowser/templates/attempt_logs.mako:134
+#: src/jobbrowser/templates/job.mako:277 src/jobbrowser/templates/job.mako:292
+#: src/jobbrowser/templates/job.mako:307 src/jobbrowser/templates/job.mako:329
+#: src/jobbrowser/templates/jobs.mako:208
+#: src/jobbrowser/templates/task.mako:158
+#: src/jobbrowser/templates/task.mako:174
+#: src/jobbrowser/templates/task.mako:190
+#: src/jobbrowser/templates/tasks.mako:122
+#: src/jobbrowser/templates/tasktrackers.mako:71
+msgid "No matching records"
+msgstr ""
 
 #: src/jobbrowser/templates/attempt_logs.mako:74
 msgid "task diagnostic log"
@@ -430,7 +462,7 @@ msgstr "날짜"
 #: src/jobbrowser/templates/jobs.mako:111
 #, python-format
 msgid "Show only %(status)s jobs"
-msgstr "%(state)s개 작업만 표시"
+msgstr "%(status)s개 작업만 표시"
 
 #: src/jobbrowser/templates/jobs.mako:115
 #: src/jobbrowser/templates/jobs.mako:122
@@ -641,43 +673,43 @@ msgstr "최대 Map 작업:"
 msgid "Max reduce tasks:"
 msgstr "최대 Reduce 작업:"
 
-#: src/jobbrowser/templates/tasktrackers.mako:21
+#: src/jobbrowser/templates/tasktrackers.mako:22
 msgid "Task Trackers - Job Browser"
 msgstr "Task Tracker - 작업 브라우저"
 
-#: src/jobbrowser/templates/tasktrackers.mako:27
+#: src/jobbrowser/templates/tasktrackers.mako:30
 msgid "Host"
 msgstr "호스트"
 
-#: src/jobbrowser/templates/tasktrackers.mako:28
+#: src/jobbrowser/templates/tasktrackers.mako:31
 msgid "Port"
 msgstr "포트"
 
-#: src/jobbrowser/templates/tasktrackers.mako:29
+#: src/jobbrowser/templates/tasktrackers.mako:32
 msgid "Last Seen"
 msgstr "마지막 표시"
 
-#: src/jobbrowser/templates/tasktrackers.mako:30
+#: src/jobbrowser/templates/tasktrackers.mako:33
 msgid "Available Space"
 msgstr "사용 가능한 공간"
 
-#: src/jobbrowser/templates/tasktrackers.mako:31
+#: src/jobbrowser/templates/tasktrackers.mako:34
 msgid "Failure Count"
 msgstr "실패 수"
 
-#: src/jobbrowser/templates/tasktrackers.mako:32
+#: src/jobbrowser/templates/tasktrackers.mako:35
 msgid "Map Count"
 msgstr "Map 수"
 
-#: src/jobbrowser/templates/tasktrackers.mako:33
+#: src/jobbrowser/templates/tasktrackers.mako:36
 msgid "Reduce Count"
 msgstr "Reduce 수"
 
-#: src/jobbrowser/templates/tasktrackers.mako:34
+#: src/jobbrowser/templates/tasktrackers.mako:37
 msgid "Max Map Tasks"
 msgstr "최대 Map 태스크"
 
-#: src/jobbrowser/templates/tasktrackers.mako:35
+#: src/jobbrowser/templates/tasktrackers.mako:38
 msgid "Max Reduce Tasks"
 msgstr "최대 Reduce 태스크"
 

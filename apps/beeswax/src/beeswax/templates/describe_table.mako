@@ -240,28 +240,36 @@ ${layout.menubar(section='tables')}
      });
 
      $(".datatables").dataTable({
-       "bPaginate":false,
-       "bLengthChange":false,
-       "bInfo":false,
-       "bFilter":false
+       "bPaginate": false,
+       "bLengthChange": false,
+       "bInfo": false,
+       "bFilter": false,
+       "oLanguage": {
+            "sEmptyTable": "${_('No data available')}",
+           "sZeroRecords": "${_('No matching records')}",
+       }
      });
 
-     $.getJSON("${ url("beeswax:drop_table", database=database, table=table.name) }", function (data) {
+     $.getJSON("${ url("beeswax:drop_table", database=database, table=table.name) }", function(data) {
        $("#dropTableMessage").text(data.title);
      });
 
-     $('a[data-toggle="tab"]').on('shown', function () {
+     $('a[data-toggle="tab"]').on('shown', function() {
        $(".sampleTable").not('.initialized').addClass('initialized').dataTable({
-         "bPaginate":false,
-         "bLengthChange":false,
-         "bInfo":false,
-         "bFilter":false,
-         "fnInitComplete":function () {
+         "bPaginate": false,
+         "bLengthChange": false,
+         "bInfo": false,
+         "bFilter": false,
+         "fnInitComplete": function () {
            $(".sampleTable").parent().jHueTableScroller();
            $(".sampleTable").jHueTableExtender({
-             hintElement:"#jumpToColumnAlert",
-             fixedHeader:true
+             hintElement: "#jumpToColumnAlert",
+             fixedHeader: true
            });
+         },
+         "oLanguage": {
+            "sEmptyTable": "${_('No data available')}",
+            "sZeroRecords": "${_('No matching records')}",
          }
        });
      })

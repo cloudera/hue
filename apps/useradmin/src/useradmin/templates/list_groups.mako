@@ -88,77 +88,80 @@ ${layout.menubar(section='groups', _=_)}
 
 <div id="deleteGroup" class="modal hide fade groupModal"></div>
 
-
-
-    <script type="text/javascript" charset="utf-8">
-        $(document).ready(function(){
-            $(".datatables").dataTable({
-                "bPaginate": false,
-                "bLengthChange": false,
-                "bInfo": false,
-                "bFilter": false,
-                "bAutoWidth": false,
-                "aoColumns": [
-                    %if user.is_superuser:
-                    { "bSortable": false },
-                    %endif
-                    { "sWidth": "20%" },
-                    { "sWidth": "20%" },
-                    null
-                 ]
-            });
-            $(".dataTables_wrapper").css("min-height","0");
-            $(".dataTables_filter").hide();
-
-            $(".confirmationModal").click(function(){
-                var _this = $(this);
-                $.ajax({
-                    url: _this.data("confirmation-url"),
-                    beforeSend: function(xhr){
-                        xhr.setRequestHeader("X-Requested-With", "Hue");
-                    },
-                    dataType: "html",
-                    success: function(data){
-                        $("#deleteGroup").html(data);
-                        $("#deleteGroup").modal("show");
-                    }
-                });
-            });
-
-            $("#selectAll").click(function(){
-                if ($(this).attr("checked")) {
-                    $(this).removeAttr("checked");
-                    $(".groupCheck").removeClass("icon-ok").removeAttr("checked");
-                }
-                else {
-                    $(this).attr("checked", "checked");
-                    $(".groupCheck").addClass("icon-ok").attr("checked", "checked");
-                }
-                toggleActions();
-            });
-
-            $(".groupCheck").click(function(){
-                if ($(this).attr("checked")) {
-                    $(this).removeClass("icon-ok").removeAttr("checked");
-                }
-                else {
-                    $(this).addClass("icon-ok").attr("checked", "checked");
-                }
-                toggleActions();
-            });
-
-            function toggleActions() {
-                if ($(".groupCheck[checked='checked']").length == 1) {
-                    $("#deleteGroupBtn").removeAttr("disabled").data("confirmation-url", $(".groupCheck[checked='checked']").data("confirmation-url"));
-                }
-                else {
-                    $("#deleteGroupBtn").attr("disabled", "disabled");
-                }
+<script type="text/javascript" charset="utf-8">
+    $(document).ready(function(){
+        $(".datatables").dataTable({
+            "bPaginate": false,
+            "bLengthChange": false,
+            "bInfo": false,
+            "bFilter": false,
+            "bAutoWidth": false,
+            "aoColumns": [
+                %if user.is_superuser:
+                { "bSortable": false },
+                %endif
+                { "sWidth": "20%" },
+                { "sWidth": "20%" },
+                null
+             ],
+            "oLanguage": {
+                "sEmptyTable": "${_('No data available')}",
+                "sZeroRecords": "${_('No matching records')}",
             }
-
-            $("a[data-row-selector='true']").jHueRowSelector();
         });
-    </script>
+
+        $(".dataTables_wrapper").css("min-height","0");
+        $(".dataTables_filter").hide();
+
+        $(".confirmationModal").click(function(){
+            var _this = $(this);
+            $.ajax({
+                url: _this.data("confirmation-url"),
+                beforeSend: function(xhr){
+                    xhr.setRequestHeader("X-Requested-With", "Hue");
+                },
+                dataType: "html",
+                success: function(data){
+                    $("#deleteGroup").html(data);
+                    $("#deleteGroup").modal("show");
+                }
+            });
+        });
+
+        $("#selectAll").click(function(){
+            if ($(this).attr("checked")) {
+                $(this).removeAttr("checked");
+                $(".groupCheck").removeClass("icon-ok").removeAttr("checked");
+            }
+            else {
+                $(this).attr("checked", "checked");
+                $(".groupCheck").addClass("icon-ok").attr("checked", "checked");
+            }
+            toggleActions();
+        });
+
+        $(".groupCheck").click(function(){
+            if ($(this).attr("checked")) {
+                $(this).removeClass("icon-ok").removeAttr("checked");
+            }
+            else {
+                $(this).addClass("icon-ok").attr("checked", "checked");
+            }
+            toggleActions();
+        });
+
+        function toggleActions() {
+            if ($(".groupCheck[checked='checked']").length == 1) {
+                $("#deleteGroupBtn").removeAttr("disabled").data("confirmation-url", $(".groupCheck[checked='checked']").data("confirmation-url"));
+            }
+            else {
+                $("#deleteGroupBtn").attr("disabled", "disabled");
+            }
+        }
+
+        $("a[data-row-selector='true']").jHueRowSelector();
+    });
+</script>
 
 ${layout.commons()}
 

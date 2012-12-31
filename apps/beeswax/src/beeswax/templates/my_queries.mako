@@ -22,13 +22,16 @@ from django.utils.translation import ugettext as _
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="layout" file="layout.mako" />
 <%!  from beeswax.views import collapse_whitespace %>
+
 ${commonheader(_('My Queries'), app_name, user, '100px')}
 ${layout.menubar(section='my queries')}
+
 <style>
     .tab-content {
         overflow:visible!important;
     }
 </style>
+
 <div class="container-fluid">
     <h1>${_('My Queries')}</h1>
 
@@ -183,7 +186,11 @@ ${layout.menubar(section='my queries')}
                 null,
                 { "sSortDataType": "dom-sort-value", "sType": "numeric" },
                 { "bSortable": false }
-            ]
+            ],
+            "oLanguage": {
+	            "sEmptyTable": "${_('No data available')}",
+	            "sZeroRecords": "${_('No matching records')}"
+	        }
         });
 
         var recentRunQueries = $("#recentRunQueriesTable").dataTable({
@@ -198,7 +205,11 @@ ${layout.menubar(section='my queries')}
                 null,
                 null,
                 { "bSortable": false }
-            ]
+            ],
+            "oLanguage": {
+                "sEmptyTable": "${_('No data available')}",
+                "sZeroRecords": "${_('No matching records')}"
+            }
         });
 
 

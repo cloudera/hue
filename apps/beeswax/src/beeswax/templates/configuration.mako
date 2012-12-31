@@ -59,7 +59,12 @@ ${layout.menubar(section='configuration')}
 		    "bLengthChange": false,
 		    "bFilter": false,
 			"bInfo": false,
+            "oLanguage": {
+                "sEmptyTable": "${_('No data available')}",
+                "sZeroRecords": "${_('No matching records')}",
+            }
 		});
+
 		var searchTimeoutId = 0;
 		$("#filterInput").keyup(function(){
 			window.clearTimeout(searchTimeoutId);
@@ -73,6 +78,7 @@ ${layout.menubar(section='configuration')}
 		        });
 			}, 500);
 	    });
+
 		$("#clearFilterBtn").click(function(){
 	        $("#filterInput").val("");
 	        $.each($(".confRow"), function(index, value) {

@@ -84,7 +84,7 @@ ${ layout.menubar(section='workflows') }
                 <p>
                 <a data-node-type="streaming"
                   title="${ _('Click to add to the end of the workflow') }" class="btn new-node-link">
-                  <i class="icon-plus"></i> ${ _('Streaming') }
+                  <i class="icon-plus"></i> Streaming
                 </a>
                 <p/>
                 <p>

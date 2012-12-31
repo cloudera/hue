@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-12-05 21:32-0800\n"
+"POT-Creation-Date: 2013-01-04 07:28-0800\n"
 "PO-Revision-Date: 2012-11-07 13:08-0800\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -27,11 +27,16 @@ msgid "Whether Oozie requires client to perform Kerberos authentication."
 msgstr "Oozie에서 클라이언트의 Kerberos 인증 수행을 요구하는지 여부를 나타냅니다."
 
 #: src/liboozie/conf.py:38
-msgid "Location on HDFS where the workflows/coordinators are deployed when submitted by a non-owner."
+msgid ""
+"Location on HDFS where the workflows/coordinators are deployed when "
+"submitted by a non-owner."
 msgstr "소유자가 아닌 사용자가 제출할 경우 워크플로/Coordinator가 배포되는 HDFS상의 위치입니다."
 
 #: src/liboozie/conf.py:69
-msgid "The deployment directory of Oozie workflows does not exist. Run \"Setup App\" on the Oozie workflow page."
+#, fuzzy
+msgid ""
+"The deployment directory of Oozie workflows does not exist. Run \"Setup "
+"Example\" on the Oozie workflow page."
 msgstr "Oozie 워크플로의 배포 디렉토리가 존재하지 않습니다. Oozie 워크플로 페이지의 \"앱 설정\"을 실행하십시오."
 
 #: src/liboozie/conf.py:72
@@ -47,12 +52,12 @@ msgstr "이미 제출됨(Oozie 작업 ID %s)"
 msgid "Failed to access deployment directory."
 msgstr "배포 디렉토리에 액세스하지 못했습니다."
 
-#: src/liboozie/submittion.py:162
+#: src/liboozie/submittion.py:171
 #, python-format
 msgid "Path is not a directory: %s."
 msgstr "경로가 디렉토리가 아닙니다: %s."
 
-#: src/liboozie/submittion.py:167
+#: src/liboozie/submittion.py:176
 #, python-format
 msgid "Error accessing directory '%s': %s."
 msgstr "디렉토리 '%s'에 액세스하는 중 오류 발생: %s"
@@ -66,26 +71,3 @@ msgstr "권한 부족"
 msgid "Permission denied. User %(username)s cannot modify user %(user)s's job."
 msgstr "권한이 거부되었습니다. 사용자 %(username)s은(는) 사용자 %(user)s의 Job을 수정할 수 없습니다."
 
-#~ msgid "URL to Oozie server. This is required for job submission."
-#~ msgstr ""
-#~ msgid "Whether Oozie requires client to perform Kerberos authentication"
-#~ msgstr ""
-#~ msgid ""
-#~ "Location on HDFS where the "
-#~ "workflows/coordinator are deployed when "
-#~ "submitted by a non owner."
-#~ msgstr ""
-#~ msgid ""
-#~ "The deployment directory of Oozie "
-#~ "workflows does not exist. Please run "
-#~ "\"Setup App\" on the Oozie workflow "
-#~ "page."
-#~ msgstr ""
-#~ msgid "Failed to access deployment directory"
-#~ msgstr ""
-#~ msgid "Path is not a directory: %s"
-#~ msgstr ""
-#~ msgid "Error accessing directory '%s': %s"
-#~ msgstr ""
-#~ msgid "Insufficient permission"
-#~ msgstr ""

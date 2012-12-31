@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-12-05 21:32-0800\n"
+"POT-Creation-Date: 2013-01-04 07:28-0800\n"
 "PO-Revision-Date: 2012-07-30 18:54-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: pt_BR <LL@li.org>\n"
@@ -24,7 +24,9 @@ msgstr "Local no HDFS onde os exemplos e modelos de jobsub são armazenados."
 #: src/jobsub/conf.py:33
 #, fuzzy
 msgid "Location on local filesystem where examples and template are stored."
-msgstr "Localização no sistema de arquivos local onde os exemplos e modelos são armazenados."
+msgstr ""
+"Localização no sistema de arquivos local onde os exemplos e modelos são "
+"armazenados."
 
 #: src/jobsub/conf.py:39
 #, fuzzy
@@ -33,13 +35,21 @@ msgstr "Localização no sistema de arquivos local onde as amostras são armazen
 
 #: src/jobsub/conf.py:49
 #, fuzzy
-msgid "Deprecated, use liboozie.conf.OOZIE_URL instead. URL of Oozie server. This is required for job submission."
-msgstr "Fora de uso; em vez disso, use a URL liboozie.conf.OOZIE. Ela é obrigatória para o envio da tarefa."
+msgid ""
+"Deprecated, use liboozie.conf.OOZIE_URL instead. URL of Oozie server. "
+"This is required for job submission."
+msgstr ""
+"Fora de uso; em vez disso, use a URL liboozie.conf.OOZIE. Ela é "
+"obrigatória para o envio da tarefa."
 
 #: src/jobsub/conf.py:55
 #, fuzzy
-msgid "Deprecated, use liboozie.conf.SECURITY_ENABLED instead. Whether Oozie requires client to do perform Kerberos authentication"
-msgstr "Fora de uso; em vez disso, use loboozie.conf.SECURITY_ENABLED. Se o servidor Oozie exige que o cliente realize a autenticação do Kerberos"
+msgid ""
+"Deprecated, use liboozie.conf.SECURITY_ENABLED instead. Whether Oozie "
+"requires client to do perform Kerberos authentication"
+msgstr ""
+"Fora de uso; em vez disso, use loboozie.conf.SECURITY_ENABLED. Se o "
+"servidor Oozie exige que o cliente realize a autenticação do Kerberos"
 
 #: src/jobsub/forms.py:39 src/jobsub/forms.py:58 src/jobsub/forms.py:77
 #: src/jobsub/forms.py:95 src/jobsub/templates/list_designs.mako:63
@@ -49,8 +59,12 @@ msgid "Name"
 msgstr "Nome"
 
 #: src/jobsub/forms.py:43
-msgid "Allows letters, digits, '_', and '-'. The first character must be a letter or '_'."
-msgstr "Permite letras, dígitos, '_',e '-'. O primeiro caractere deve ser uma letra ou '_'."
+msgid ""
+"Allows letters, digits, '_', and '-'. The first character must be a "
+"letter or '_'."
+msgstr ""
+"Permite letras, dígitos, '_',e '-'. O primeiro caractere deve ser uma "
+"letra ou '_'."
 
 #: src/jobsub/forms.py:59 src/jobsub/forms.py:78 src/jobsub/forms.py:96
 #: src/jobsub/templates/list_designs.mako:65
@@ -101,7 +115,9 @@ msgstr "Caminho para arquivos jar no HDFS."
 #: src/jobsub/submit.py:48
 #, fuzzy, python-format
 msgid "Submission for job design '%(name)s' (id %(id)s, owner %(username)s)."
-msgstr "Envio para o projeto de tarefa '%(name)s' (id %(id)s, proprietário %(username)s)."
+msgstr ""
+"Envio para o projeto de tarefa '%(name)s' (id %(id)s, proprietário "
+"%(username)s)."
 
 #: src/jobsub/submit.py:72
 #, fuzzy, python-format
@@ -207,7 +223,9 @@ msgid "or"
 msgstr "ou"
 
 #: src/jobsub/templates/edit_design.mako:68
-msgid "When the design is submitted, you will be prompted for the actual value of "
+msgid ""
+"When the design is submitted, you will be prompted for the actual value "
+"of "
 msgstr "Quando o projeto for enviado, será solicitado a você o valor real de "
 
 #: src/jobsub/templates/edit_design.mako:76
@@ -289,11 +307,13 @@ msgid "Clone"
 msgstr "Clonar"
 
 #: src/jobsub/templates/list_designs.mako:48
-msgid "Create Mapreduce Design"
+#, fuzzy
+msgid "Create MapReduce Design"
 msgstr "Criar projeto do Mapreduce"
 
 #: src/jobsub/templates/list_designs.mako:48
-msgid "Mapreduce"
+#, fuzzy
+msgid "MapReduce"
 msgstr "Mapreduce"
 
 #: src/jobsub/templates/list_designs.mako:49
@@ -369,7 +389,7 @@ msgstr "Enviar %(name)s para o cluster"
 
 #: src/jobsub/templates/list_designs.mako:181
 #: src/jobsub/templates/list_history.mako:80
-msgid "No data available in table"
+msgid "No data available"
 msgstr "Nenhum dado disponível na tabela"
 
 #: src/jobsub/templates/list_designs.mako:182
@@ -389,7 +409,7 @@ msgstr "(filtrado _MAX_ total entradas)"
 
 #: src/jobsub/templates/list_designs.mako:185
 #: src/jobsub/templates/list_history.mako:84
-msgid "No matching records found"
+msgid "No matching records"
 msgstr "Não foram encontrados registros correspondentes"
 
 #: src/jobsub/templates/list_designs.mako:187
@@ -500,13 +520,3 @@ msgstr "Horário de criação"
 msgid "Application Path"
 msgstr "Caminho do aplicativo"
 
-#~ msgid "Filter: "
-#~ msgstr "Filtro: "
-#~ msgid "Search for username, name, etc..."
-#~ msgstr "Pesquisar por nome de usuário, nome, etc..."
-#~ msgid "Edit %(name)s"
-#~ msgstr "Editar %(name)s"
-#~ msgid "Delete %(name)s"
-#~ msgstr "Excluir %(name)s"
-#~ msgid "Clone %(name)s"
-#~ msgstr "Clonar %(name)s"

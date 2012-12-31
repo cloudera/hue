@@ -97,77 +97,82 @@ ${layout.menubar(section='users', _=_)}
 
 </div>
 
-    <script type="text/javascript" charset="utf-8">
-        $(document).ready(function(){
-            $(".datatables").dataTable({
-                "bPaginate": false,
-                "bLengthChange": false,
-                "bInfo": false,
-                "bFilter": false,
-                "aoColumns": [
-                    %if user.is_superuser:
-                    { "bSortable": false },
-                    %endif
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    { "sType": "date" }
-                ]
-            });
-            $(".dataTables_wrapper").css("min-height","0");
-            $(".dataTables_filter").hide();
-
-            $(".confirmationModal").click(function(){
-                var _this = $(this);
-                $.ajax({
-                    url: _this.data("confirmation-url"),
-                    beforeSend: function(xhr){
-                        xhr.setRequestHeader("X-Requested-With", "Hue");
-                    },
-                    dataType: "html",
-                    success: function(data){
-                        $("#deleteUser").html(data);
-                        $("#deleteUser").modal("show");
-                    }
-                });
-            });
-
-            $("#selectAll").click(function(){
-                if ($(this).attr("checked")) {
-                    $(this).removeAttr("checked");
-                    $(".userCheck").removeClass("icon-ok").removeAttr("checked");
-                }
-                else {
-                    $(this).attr("checked", "checked");
-                    $(".userCheck").addClass("icon-ok").attr("checked", "checked");
-                }
-                toggleActions();
-            });
-
-            $(".userCheck").click(function(){
-                if ($(this).attr("checked")) {
-                    $(this).removeClass("icon-ok").removeAttr("checked");
-                }
-                else {
-                    $(this).addClass("icon-ok").attr("checked", "checked");
-                }
-                toggleActions();
-            });
-
-            function toggleActions() {
-                if ($(".userCheck[checked='checked']").length == 1) {
-                    $("#deleteUserBtn").removeAttr("disabled").data("confirmation-url", $(".userCheck[checked='checked']").data("confirmation-url"));
-                }
-                else {
-                    $("#deleteUserBtn").attr("disabled", "disabled");
-                }
+<script type="text/javascript" charset="utf-8">
+    $(document).ready(function(){
+        $(".datatables").dataTable({
+            "bPaginate": false,
+            "bLengthChange": false,
+            "bInfo": false,
+            "bFilter": false,
+            "aoColumns": [
+                %if user.is_superuser:
+                { "bSortable": false },
+                %endif
+                null,
+                null,
+                null,
+                null,
+                null,
+                { "sType": "date" }
+            ],
+            "oLanguage": {
+                "sEmptyTable": "${_('No data available')}",
+                "sZeroRecords": "${_('No matching records')}",
             }
-
-            $("a[data-row-selector='true']").jHueRowSelector();
         });
-    </script>
+
+        $(".dataTables_wrapper").css("min-height","0");
+        $(".dataTables_filter").hide();
+
+        $(".confirmationModal").click(function(){
+            var _this = $(this);
+            $.ajax({
+                url: _this.data("confirmation-url"),
+                beforeSend: function(xhr){
+                    xhr.setRequestHeader("X-Requested-With", "Hue");
+                },
+                dataType: "html",
+                success: function(data){
+                    $("#deleteUser").html(data);
+                    $("#deleteUser").modal("show");
+                }
+            });
+        });
+
+        $("#selectAll").click(function(){
+            if ($(this).attr("checked")) {
+                $(this).removeAttr("checked");
+                $(".userCheck").removeClass("icon-ok").removeAttr("checked");
+            }
+            else {
+                $(this).attr("checked", "checked");
+                $(".userCheck").addClass("icon-ok").attr("checked", "checked");
+            }
+            toggleActions();
+        });
+
+        $(".userCheck").click(function(){
+            if ($(this).attr("checked")) {
+                $(this).removeClass("icon-ok").removeAttr("checked");
+            }
+            else {
+                $(this).addClass("icon-ok").attr("checked", "checked");
+            }
+            toggleActions();
+        });
+
+        function toggleActions() {
+            if ($(".userCheck[checked='checked']").length == 1) {
+                $("#deleteUserBtn").removeAttr("disabled").data("confirmation-url", $(".userCheck[checked='checked']").data("confirmation-url"));
+            }
+            else {
+                $("#deleteUserBtn").attr("disabled", "disabled");
+            }
+        }
+
+        $("a[data-row-selector='true']").jHueRowSelector();
+    });
+</script>
 
 ${layout.commons()}
 

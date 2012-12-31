@@ -116,8 +116,13 @@ ${commonheader(_('Task View: Job: %(jobId)s - Job Browser') % dict(jobId=jobid_s
             "bLengthChange": false,
             "bFilter": false,
             "bInfo": false,
-            "aaSorting": [[ 1, "asc" ]]
+            "aaSorting": [[ 1, "asc" ]],
+            "oLanguage": {
+                "sEmptyTable": "${_('No data available')}",
+                "sZeroRecords": "${_('No matching records')}",
+            }
         });
+
         $("a[data-row-selector='true']").jHueRowSelector();
     });
 </script>

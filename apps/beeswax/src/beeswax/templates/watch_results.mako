@@ -227,9 +227,13 @@ ${layout.menubar(section='query')}
 <script type="text/javascript" charset="utf-8">
     $(document).ready(function () {
       $(".resultTable").dataTable({
-        "bPaginate":false,
-        "bLengthChange":false,
-        "bInfo":false
+        "bPaginate": false,
+        "bLengthChange": false,
+        "bInfo": false,
+        "oLanguage": {
+            "sEmptyTable": "${_('No data available')}",
+            "sZeroRecords": "${_('No matching records')}",
+        }
       });
       $(".dataTables_wrapper").css("min-height", "0");
       $(".dataTables_filter").hide();

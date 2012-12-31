@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-12-05 21:32-0800\n"
+"POT-Creation-Date: 2013-01-04 07:29-0800\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -47,7 +47,9 @@ msgstr "列表结尾"
 
 #: src/impala/templates/beeswax_components.mako:203
 #, python-format
-msgid "Showing %(start)s to %(end)s of %(count)s items, page %(page)s of %(pages)s"
+msgid ""
+"Showing %(start)s to %(end)s of %(count)s items, page %(page)s of "
+"%(pages)s"
 msgstr "正在显示 %(start)s 到 %(end)s，共 %(count)s 个项目，第 %(page)s 页，共 %(pages)s 页"
 
 #: src/impala/templates/execute.mako:26 src/impala/templates/layout.mako:34
@@ -125,7 +127,10 @@ msgid "Parameterization"
 msgstr "参数化"
 
 #: src/impala/templates/execute.mako:182
-msgid "If checked (the default), you can include parameters like $parameter_name in your query, and users will be prompted for a value when the query is run."
+msgid ""
+"If checked (the default), you can include parameters like $parameter_name"
+" in your query, and users will be prompted for a value when the query is "
+"run."
 msgstr "如果选中（默认值），您可在查询中包括 $parameter_name 之类的参数，并且在运行查询时会提示用户输入值。"
 
 #: src/impala/templates/execute.mako:184
@@ -137,7 +142,9 @@ msgid "Email Notification"
 msgstr "电子邮件通知"
 
 #: src/impala/templates/execute.mako:189
-msgid "If checked, you will receive an email notification when the query completes."
+msgid ""
+"If checked, you will receive an email notification when the query "
+"completes."
 msgstr "如果选中，您将在查询完成时收到一封电子邮件通知。"
 
 #: src/impala/templates/execute.mako:191
@@ -201,9 +208,3 @@ msgstr "表"
 msgid "Settings"
 msgstr "设置"
 
-#~ msgid "About Hue"
-#~ msgstr "关于 Hue"
-#~ msgid "Configuration"
-#~ msgstr "配置"
-#~ msgid "Check for misconfiguration"
-#~ msgstr "检查错误配置"

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-12-05 21:32-0800\n"
+"POT-Creation-Date: 2013-01-04 07:28-0800\n"
 "PO-Revision-Date: 2012-07-30 18:56-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -29,7 +29,9 @@ msgid "Hue Shell"
 msgstr "Hue シェル"
 
 #: src/shell/templates/failed_to_create.mako:24
-msgid "Failed to create a shell of the given type. The possible reasons for this are:"
+msgid ""
+"Failed to create a shell of the given type. The possible reasons for this"
+" are:"
 msgstr "指定されたタイプのシェルを作成できませんでした。考えられる原因は次のとおりです。"
 
 #: src/shell/templates/failed_to_create.mako:26
@@ -58,20 +60,28 @@ msgid "Select one of the available shells from the toolbar above."
 msgstr "上のツールバーにある使用可能なシェルの中から 1 つ選択してください。"
 
 #: src/shell/templates/index.mako:88
-msgid "You do not have permission to access any shell or there is no configured shell."
+msgid ""
+"You do not have permission to access any shell or there is no configured "
+"shell."
 msgstr "どのシェルにもアクセスするパーミッションがないか、シェルが 1 つも設定されていません。"
 
 #: src/shell/templates/no_such_user.mako:24
 #, fuzzy
-msgid "The Shell application requires a Unix user account for every user of Hue on the remote web server."
+msgid ""
+"The Shell application requires a Unix user account for every user of Hue "
+"on the remote web server."
 msgstr "このシェルアプリケーションでは、リモート Web サーバー上にある Hue のすべてのユーザーに Unix のユーザーアカウントが必要です。"
 
 #: src/shell/templates/no_such_user.mako:26
 #, fuzzy
-msgid "Ask your administrator to create a user account for you on the remote web server as described in the Shell documentation."
+msgid ""
+"Ask your administrator to create a user account for you on the remote web"
+" server as described in the Shell documentation."
 msgstr "シェルのマニュアルに従ってリモート Web サーバー上にユーザーアカウントを作成することを担当の管理者に依頼してください。"
 
 #: src/shell/templates/not_running_spawning.mako:24
-msgid "The webserver currently running Hue does not support the Shell application. Please contact your administrator."
+msgid ""
+"The webserver currently running Hue does not support the Shell "
+"application. Please contact your administrator."
 msgstr "現在 Hue を実行している Web サーバーでは、このシェルアプリケーションをサポートしていません。担当の管理者に問い合わせてください。"
 

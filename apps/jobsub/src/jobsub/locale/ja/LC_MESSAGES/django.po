@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-12-05 21:32-0800\n"
+"POT-Creation-Date: 2013-01-04 07:28-0800\n"
 "PO-Revision-Date: 2012-07-30 18:54-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -33,13 +33,21 @@ msgstr "ローカルファイルシステム上でサンプルデータが保存
 
 #: src/jobsub/conf.py:49
 #, fuzzy
-msgid "Deprecated, use liboozie.conf.OOZIE_URL instead. URL of Oozie server. This is required for job submission."
-msgstr "非推奨です。代わりに liboozie.conf.OOZIE_URL を使用してください。Oozie サーバーの URL です。これはジョブのサブミッションに必要です。"
+msgid ""
+"Deprecated, use liboozie.conf.OOZIE_URL instead. URL of Oozie server. "
+"This is required for job submission."
+msgstr ""
+"非推奨です。代わりに liboozie.conf.OOZIE_URL を使用してください。Oozie サーバーの URL "
+"です。これはジョブのサブミッションに必要です。"
 
 #: src/jobsub/conf.py:55
 #, fuzzy
-msgid "Deprecated, use liboozie.conf.SECURITY_ENABLED instead. Whether Oozie requires client to do perform Kerberos authentication"
-msgstr "非推奨です。代わりに liboozie.conf.SECURITY_ENABLED を使用してください。Oozie が Kerberos 認証の実行をクライアントに要求するかどうかの指定です。"
+msgid ""
+"Deprecated, use liboozie.conf.SECURITY_ENABLED instead. Whether Oozie "
+"requires client to do perform Kerberos authentication"
+msgstr ""
+"非推奨です。代わりに liboozie.conf.SECURITY_ENABLED を使用してください。Oozie が Kerberos "
+"認証の実行をクライアントに要求するかどうかの指定です。"
 
 #: src/jobsub/forms.py:39 src/jobsub/forms.py:58 src/jobsub/forms.py:77
 #: src/jobsub/forms.py:95 src/jobsub/templates/list_designs.mako:63
@@ -49,7 +57,9 @@ msgid "Name"
 msgstr "名前"
 
 #: src/jobsub/forms.py:43
-msgid "Allows letters, digits, '_', and '-'. The first character must be a letter or '_'."
+msgid ""
+"Allows letters, digits, '_', and '-'. The first character must be a "
+"letter or '_'."
 msgstr "文字、数字、'_'、および '-' を使用できます。先頭には文字または '_' が必要です。"
 
 #: src/jobsub/forms.py:59 src/jobsub/forms.py:78 src/jobsub/forms.py:96
@@ -207,7 +217,9 @@ msgid "or"
 msgstr "または"
 
 #: src/jobsub/templates/edit_design.mako:68
-msgid "When the design is submitted, you will be prompted for the actual value of "
+msgid ""
+"When the design is submitted, you will be prompted for the actual value "
+"of "
 msgstr "設計をサブミットすると、次の実際の値を指定することが要求されます： "
 
 #: src/jobsub/templates/edit_design.mako:76
@@ -289,11 +301,13 @@ msgid "Clone"
 msgstr "複製"
 
 #: src/jobsub/templates/list_designs.mako:48
-msgid "Create Mapreduce Design"
+#, fuzzy
+msgid "Create MapReduce Design"
 msgstr "Mapreduce 設計の作成"
 
 #: src/jobsub/templates/list_designs.mako:48
-msgid "Mapreduce"
+#, fuzzy
+msgid "MapReduce"
 msgstr "MapReduce"
 
 #: src/jobsub/templates/list_designs.mako:49
@@ -369,7 +383,7 @@ msgstr "クラスタに %(name)s をサブミット"
 
 #: src/jobsub/templates/list_designs.mako:181
 #: src/jobsub/templates/list_history.mako:80
-msgid "No data available in table"
+msgid "No data available"
 msgstr "テーブルにデータがありません。"
 
 #: src/jobsub/templates/list_designs.mako:182
@@ -389,7 +403,7 @@ msgstr "（合計 _MAX_ 件のエントリからフィルタ処理）"
 
 #: src/jobsub/templates/list_designs.mako:185
 #: src/jobsub/templates/list_history.mako:84
-msgid "No matching records found"
+msgid "No matching records"
 msgstr "一致するレコードが見つかりません"
 
 #: src/jobsub/templates/list_designs.mako:187
@@ -500,13 +514,3 @@ msgstr "作成時間"
 msgid "Application Path"
 msgstr "アプリケーションのパス"
 
-#~ msgid "Filter: "
-#~ msgstr "フィルタ： "
-#~ msgid "Search for username, name, etc..."
-#~ msgstr "ユーザー名、名前などを検索"
-#~ msgid "Edit %(name)s"
-#~ msgstr "%(name)s の編集"
-#~ msgid "Delete %(name)s"
-#~ msgstr "%(name)s の削除"
-#~ msgid "Clone %(name)s"
-#~ msgstr "%(name)s の複製"

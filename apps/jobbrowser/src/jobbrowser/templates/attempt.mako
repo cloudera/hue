@@ -134,7 +134,11 @@ ${commonheader(_('Task Attempt: %(attemptId)s - Job Browser') % dict(attemptId=a
             "aoColumns": [
                 { "sWidth": "30%" },
                 { "sWidth": "70%" }
-            ]
+            ],
+            "oLanguage": {
+                "sEmptyTable": "${_('No data available')}",
+                "sZeroRecords": "${_('No matching records')}",
+            }
         });
 
         $(".taskCountersTable").dataTable({
@@ -146,7 +150,11 @@ ${commonheader(_('Task Attempt: %(attemptId)s - Job Browser') % dict(attemptId=a
             "aoColumns": [
                 { "sWidth": "30%" },
                 { "sWidth": "70%" }
-            ]
+            ],
+            "oLanguage": {
+                "sEmptyTable": "${_('No data available')}",
+                "sZeroRecords": "${_('No matching records')}",
+            }
         });
 
         if (window.location.hash != null && window.location.hash.length > 1){
@@ -154,4 +162,5 @@ ${commonheader(_('Task Attempt: %(attemptId)s - Job Browser') % dict(attemptId=a
         }
     });
 </script>
+
 ${commonfooter(messages)}
