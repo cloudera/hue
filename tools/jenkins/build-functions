@@ -113,7 +113,7 @@ build_hive() {
 }
 
 ##########
-OOZIE_URL=${OOZIE_URL:-http://nightly.cloudera.com/cdh4/cdh/4/oozie-3.2.0-cdh4.2.0-SNAPSHOT.tar.gz}
+OOZIE_URL=${OOZIE_URL:-http://nightly.cloudera.com/cdh4/cdh/4/oozie-3.3.0-cdh4.2.0-SNAPSHOT.tar.gz}
 
 OOZIE_TGZ=$(basename $OOZIE_URL)
 OOZIE_VERSION=${OOZIE_TGZ/.tar.gz/}

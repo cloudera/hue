@@ -43,7 +43,7 @@ ${ layout.menubar(section='coordinators') }
 
 
 <div class="container-fluid">
-  <h1>${ _('Coordinator') } ${ coordinator.name }</h1>
+  <h1>${ _('Coordinator Editor') } ${ coordinator.name }</h1>
 
   <div class="row-fluid">
     <div class="span2">
