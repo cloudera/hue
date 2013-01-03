@@ -8,17 +8,26 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
 
-        # Adding model 'DecisionEnd'
-        db.create_table('oozie_decisionend', (
-            ('node_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['oozie.Node'], unique=True, primary_key=True)),
-        ))
-        db.send_create_signal('oozie', ['DecisionEnd'])
+        # Adding field 'Dataset.advanced_start_instance'
+        db.add_column('oozie_dataset', 'advanced_start_instance', self.gf('django.db.models.fields.CharField')(default='0', max_length=128), keep_default=False)
+
+        # Adding field 'Dataset.instance_choice'
+        db.add_column('oozie_dataset', 'instance_choice', self.gf('django.db.models.fields.CharField')(default='default', max_length=10), keep_default=False)
+
+        # Adding field 'Dataset.advanced_end_instance'
+        db.add_column('oozie_dataset', 'advanced_end_instance', self.gf('django.db.models.fields.CharField')(default='0', max_length=128, blank=True), keep_default=False)
 
 
     def backwards(self, orm):
 
-        # Deleting model 'DecisionEnd'
-        db.delete_table('oozie_decisionend')
+        # Deleting field 'Dataset.advanced_start_instance'
+        db.delete_column('oozie_dataset', 'advanced_start_instance')
+
+        # Deleting field 'Dataset.instance_choice'
+        db.delete_column('oozie_dataset', 'instance_choice')
+
+        # Deleting field 'Dataset.advanced_end_instance'
+        db.delete_column('oozie_dataset', 'advanced_end_instance')
 
 
     models = {
@@ -61,12 +70,12 @@ class Migration(SchemaMigration):
         'oozie.coordinator': {
             'Meta': {'object_name': 'Coordinator', '_ormbases': ['oozie.Job']},
             'concurrency': ('django.db.models.fields.PositiveSmallIntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'end': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2012, 12, 29, 18, 47, 41, 463666)'}),
+            'end': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2013, 1, 6, 19, 26, 33, 676504)'}),
             'execution': ('django.db.models.fields.CharField', [], {'max_length': '10', 'null': 'True', 'blank': 'True'}),
             'frequency_number': ('django.db.models.fields.SmallIntegerField', [], {'default': '1'}),
             'frequency_unit': ('django.db.models.fields.CharField', [], {'default': "'days'", 'max_length': '20'}),
             'job_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['oozie.Job']", 'unique': 'True', 'primary_key': 'True'}),
-            'start': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2012, 12, 26, 18, 47, 41, 463616)'}),
+            'start': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2013, 1, 3, 19, 26, 33, 676468)'}),
             'throttle': ('django.db.models.fields.PositiveSmallIntegerField', [], {'null': 'True', 'blank': 'True'}),
             'timeout': ('django.db.models.fields.SmallIntegerField', [], {'null': 'True', 'blank': 'True'}),
             'timezone': ('django.db.models.fields.CharField', [], {'default': "'America/Los_Angeles'", 'max_length': '24'}),
@@ -88,14 +97,17 @@ class Migration(SchemaMigration):
         },
         'oozie.dataset': {
             'Meta': {'object_name': 'Dataset'},
+            'advanced_end_instance': ('django.db.models.fields.CharField', [], {'default': "'0'", 'max_length': '128', 'blank': 'True'}),
+            'advanced_start_instance': ('django.db.models.fields.CharField', [], {'default': "'0'", 'max_length': '128'}),
             'coordinator': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['oozie.Coordinator']"}),
             'description': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '1024', 'blank': 'True'}),
             'done_flag': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '64', 'blank': 'True'}),
             'frequency_number': ('django.db.models.fields.SmallIntegerField', [], {'default': '1'}),
             'frequency_unit': ('django.db.models.fields.CharField', [], {'default': "'days'", 'max_length': '20'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'instance_choice': ('django.db.models.fields.CharField', [], {'default': "'default'", 'max_length': '10'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '40'}),
-            'start': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2012, 12, 26, 18, 47, 41, 464516)'}),
+            'start': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2013, 1, 3, 19, 26, 33, 677121)'}),
             'timezone': ('django.db.models.fields.CharField', [], {'default': "'America/Los_Angeles'", 'max_length': '24'}),
             'uri': ('django.db.models.fields.CharField', [], {'default': "'/data/${YEAR}${MONTH}${DAY}'", 'max_length': '1024'})
         },

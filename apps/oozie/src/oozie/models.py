@@ -1118,7 +1118,7 @@ DATASET_FREQUENCY = ['MINUTE', 'HOUR', 'DAY', 'MONTH', 'YEAR']
 
 class Coordinator(Job):
   """
-  http://incubator.apache.org/oozie/docs/3.2.0-incubating/docs/CoordinatorFunctionalSpec.html
+  http://oozie.apache.org/docs/3.3.0/CoordinatorFunctionalSpec.html
   """
   frequency_number = models.SmallIntegerField(default=1, choices=FREQUENCY_NUMBERS, verbose_name=_t('Frequency number'),
                                               help_text=_t('The number of units of the rate at which '
@@ -1267,6 +1267,9 @@ class DatasetManager(models.Manager):
 
 
 class Dataset(models.Model):
+  """
+  http://oozie.apache.org/docs/3.3.0/CoordinatorFunctionalSpec.html#a6.3._Synchronous_Coordinator_Application_Definition
+  """
   name = models.CharField(max_length=40, validators=[name_validator], verbose_name=_t('Name'),
                           help_text=_t('The name of the dataset.'))
   description = models.CharField(max_length=1024, blank=True, default='', verbose_name=_t('Description'),
@@ -1291,6 +1294,12 @@ class Dataset(models.Model):
                                             'flag is set to empty, then Coordinator looks for the existence of the directory itself.'))
   coordinator = models.ForeignKey(Coordinator, verbose_name=_t('Coordinator'),
                                   help_text=_t('The coordinator associated with this data.'))
+  instance_choice = models.CharField(max_length=10, default='default', verbose_name=_t('Instance type'),
+                               help_text=_t('Customize the date instance(s), e.g. define a range of dates, use EL functions...'))
+  advanced_start_instance  = models.CharField(max_length=128, default='0', verbose_name=_t('Start instance'),
+                               help_text=_t('Shift the frequency for gettting past/future start date or enter verbatim the Oozie start instance, e.g. ${coord:current(0)}'))
+  advanced_end_instance  = models.CharField(max_length=128, blank=True, default='0', verbose_name=_t('End instance'),
+                               help_text=_t('Optional: shift the frequency for gettting past/future end dates or enter verbatim the Oozie end instance'))
 
   objects = DatasetManager()
   unique_together = ('coordinator', 'name')
@@ -1309,6 +1318,35 @@ class Dataset(models.Model):
   @property
   def text_frequency(self):
     return '%(number)d %(unit)s' % {'unit': self.frequency_unit, 'number': self.frequency_number}
+
+  @property
+  def start_instance(self):
+    if not self.is_advanced_start_instance:
+      return int(self.advanced_start_instance)
+    else:
+      return 0
+
+  @property
+  def is_advanced_start_instance(self):
+    return not self.is_int(self.advanced_start_instance)
+
+  def is_int(self, text):
+    try:
+      int(text)
+      return True
+    except ValueError:
+      return False
+
+  @property
+  def end_instance(self):
+    if not self.is_advanced_end_instance:
+      return int(self.advanced_end_instance)
+    else:
+      return 0
+
+  @property
+  def is_advanced_end_instance(self):
+    return not self.is_int(self.advanced_end_instance)
 
 
 class DataInput(models.Model):

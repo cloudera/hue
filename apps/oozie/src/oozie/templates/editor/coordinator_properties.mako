@@ -63,7 +63,6 @@
 </%def>
 
 <%def name="init_viewmodel(element, initial_value)">
-
   <script type="text/javascript">
     $(document).ready(function(){
       var ViewModel = function(${ element }) {
