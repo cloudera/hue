@@ -27,6 +27,7 @@
   ${ utils.render_field_no_popover(dataset_form['name']) }
   ${ utils.render_field_no_popover(dataset_form['description']) }
   ${ utils.render_field_no_popover(dataset_form['start']) }
+
   <div class="row-fluid">
     <div class="span6">
       ${ utils.render_field_no_popover(dataset_form['frequency_number']) }
@@ -47,6 +48,8 @@
     .
   </div>
   ${ utils.render_field_no_popover(dataset_form['uri']) }
+
+  <%include file="dataset_utils.mako" args="base_id='#id_create-'"/>
 
   ${ utils.render_field_no_popover(dataset_form['timezone']) }
   ${ utils.render_field_no_popover(dataset_form['done_flag']) }

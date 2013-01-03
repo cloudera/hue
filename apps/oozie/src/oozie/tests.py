@@ -944,45 +944,97 @@ class TestEditor(OozieMockBase):
     create_dataset(coord, self.c)
     create_coordinator_data(coord, self.c)
 
-    assert_equal(
-        ['<coordinator-app', 'name="MyCoord"', 'frequency="${coord:days(1)}"', 'start="2012-07-01T00:00Z"', 'end="2012-07-04T00:00Z"',
-         'timezone="America/Los_Angeles"',
-         'xmlns="uri:oozie:coordinator:0.1">',
-         '<controls>',
-         '<timeout>100</timeout>',
-         '<concurrency>3</concurrency>',
-         '<execution>FIFO</execution>',
-         '<throttle>10</throttle>',
-         '</controls>',
-         '<datasets>',
-         '<dataset', 'name="MyDataset"', 'frequency="${coord:days(1)}"', 'initial-instance="2012-07-01T00:00Z"', 'timezone="America/Los_Angeles">',
-         '<uri-template>/data/${YEAR}${MONTH}${DAY}</uri-template>',
-         '<done-flag></done-flag>',
-         '</dataset>',
-         '</datasets>',
-         '<input-events>',
-         '<data-in', 'name="input_dir"', 'dataset="MyDataset">',
-         '<instance>${coord:current(0)}</instance>',
-         '</data-in>',
-         '</input-events>',
-         '<action>',
-         '<workflow>',
-         '<app-path>${wf_application_path}</app-path>',
-         '<configuration>',
-         '<property>',
-         '<name>input_dir</name>',
-         "<value>${coord:dataIn('input_dir')}</value>",
-         '</property>',
-         '</configuration>',
-         '</workflow>',
-         '</action>',
-         '</coordinator-app>'], coord.to_xml().split())
+    self.c.post(reverse('oozie:create_coordinator_dataset', args=[coord.id]), {
+                          u'create-name': [u'MyDataset2'], u'create-frequency_number': [u'1'], u'create-frequency_unit': [u'days'],
+                          u'create-uri': [u'/data/out/${YEAR}${MONTH}${DAY}'],
+                          u'create-instance_choice': [u'single'],
+                          u'instance_start': [u'-1'],
+                          u'create-advanced_start_instance': [u'0'],
+                          u'create-advanced_end_instance': [u'0'],
+                          u'create-start_0': [u'07/01/2012'], u'create-start_1': [u'12:00 AM'],
+                          u'create-timezone': [u'America/Los_Angeles'], u'create-done_flag': [u''],
+                        u'create-description': [u'']})
+
+    self.c.post(reverse('oozie:create_coordinator_data', args=[coord.id, 'output']),
+                         {u'output-name': [u'output_dir'], u'output-dataset': [u'2']})
+
+    assert_true(
+"""<coordinator-app name="MyCoord"
+  frequency="${coord:days(1)}"
+  start="2012-07-01T00:00Z" end="2012-07-04T00:00Z" timezone="America/Los_Angeles"
+  xmlns="uri:oozie:coordinator:0.1">
+  <controls>
+    <timeout>100</timeout>
+    <concurrency>3</concurrency>
+    <execution>FIFO</execution>
+    <throttle>10</throttle>
+  </controls>
+  <datasets>
+    <dataset name="MyDataset" frequency="${coord:days(1)}"
+             initial-instance="2012-07-01T00:00Z" timezone="America/Los_Angeles">
+      <uri-template>/data/${YEAR}${MONTH}${DAY}</uri-template>
+      <done-flag></done-flag>
+    </dataset>
+    <dataset name="MyDataset2" frequency="${coord:days(1)}"
+             initial-instance="2012-07-01T00:00Z" timezone="America/Los_Angeles">
+      <uri-template>/data/out/${YEAR}${MONTH}${DAY}</uri-template>
+      <done-flag></done-flag>
+    </dataset>
+  </datasets>
+  <input-events>
+    <data-in name="input_dir" dataset="MyDataset">
+    <start-instance>
+        ${coord:current(-1)}
+    </start-instance>
+    <end-instance>
+        ${coord:current(1)}
+    </end-instance>
+    </data-in>
+  </input-events>
+  <output-events>
+    <data-out name="output_dir" dataset="MyDataset2">
+      <instance>${coord:current(0)}</instance>
+    </data-out>
+  </output-events>
+  <action>
+    <workflow>
+      <app-path>${wf_application_path}</app-path>
+      <configuration>
+          <property>
+            <name>input_dir</name>
+            <value>${coord:dataIn('input_dir')}</value>
+          </property>
+        <property>
+          <name>output_dir</name>
+          <value>${coord:dataOut('output_dir')}</value>
+        </property>
+      </configuration>
+   </workflow>
+  </action>
+</coordinator-app>""" in coord.to_xml(), coord.to_xml())
 
 
   def test_create_coordinator_dataset(self):
     coord = create_coordinator(self.wf, self.c)
     create_dataset(coord, self.c)
 
+
+  def test_edit_coordinator_dataset(self):
+    coord = create_coordinator(self.wf, self.c)
+    create_dataset(coord, self.c)
+
+    response = self.c.post(reverse('oozie:edit_coordinator_dataset', args=[1]), {
+                        u'edit-name': [u'MyDataset'], u'edit-frequency_number': [u'1'], u'edit-frequency_unit': [u'days'],
+                        u'edit-uri': [u'/data/${YEAR}${MONTH}${DAY}'],
+                        u'edit-start_0': [u'07/01/2012'], u'edit-start_1': [u'12:00 AM'],
+                        u'edit-instance_choice': [u'range'],
+                        u'edit-advanced_start_instance': [u'-1'],
+                        u'edit-advanced_end_instance': [u'${coord:current(1)}'],
+                        u'edit-start_0': [u'07/01/2012'], u'edit-start_1': [u'12:00 AM'],
+                        u'edit-timezone': [u'America/Los_Angeles'], u'edit-done_flag': [u''],
+                        u'edit-description': [u'']}, follow=True)
+    data = json.loads(response.content)
+    assert_equal(0, data['status'], data['status'])
 
   def test_create_coordinator_input_data(self):
     coord = create_coordinator(self.wf, self.c)
@@ -1868,6 +1920,9 @@ def create_dataset(coord, client):
   response = client.post(reverse('oozie:create_coordinator_dataset', args=[coord.id]), {
                         u'create-name': [u'MyDataset'], u'create-frequency_number': [u'1'], u'create-frequency_unit': [u'days'],
                         u'create-uri': [u'/data/${YEAR}${MONTH}${DAY}'],
+                        u'create-instance_choice': [u'range'],
+                        u'create-advanced_start_instance': [u'-1'],
+                        u'create-advanced_end_instance': [u'${coord:current(1)}'],
                         u'create-start_0': [u'07/01/2012'], u'create-start_1': [u'12:00 AM'],
                         u'create-timezone': [u'America/Los_Angeles'], u'create-done_flag': [u''],
                         u'create-description': [u'']})

@@ -21,31 +21,35 @@
 
 
 <%namespace name="utils" file="../utils.inc.mako" />
-    <fieldset>
-      ${ utils.render_field(dataset_form['name']) }
-      ${ utils.render_field(dataset_form['description']) }
-      ${ utils.render_field(dataset_form['start']) }
-      <div class="row-fluid">
-        <div class="span6">
-          ${ utils.render_field(dataset_form['frequency_number']) }
-        </div>
-        <div class="span6">
-          ${ utils.render_field(dataset_form['frequency_unit']) }
-        </div>
-      </div>
 
-      <div class="alert alert-info">
-        ${ _('You can parameterize the values using') }
-        % for frequency in DATASET_FREQUENCY:
-          <code>${"${"}${ frequency }}</code>
-          % if not loop.last:
-            ,
-          % endif
-        % endfor
-        .
-      </div>
-      ${ utils.render_field(dataset_form['uri']) }
 
-      ${ utils.render_field(dataset_form['timezone']) }
-      ${ utils.render_field(dataset_form['done_flag']) }
-    </fieldset>
+<fieldset>
+  ${ utils.render_field(dataset_form['name']) }
+  ${ utils.render_field(dataset_form['description']) }
+  ${ utils.render_field(dataset_form['start']) }
+  <div class="row-fluid">
+    <div class="span6">
+      ${ utils.render_field(dataset_form['frequency_number']) }
+    </div>
+    <div class="span6">
+      ${ utils.render_field(dataset_form['frequency_unit']) }
+    </div>
+  </div>
+
+  <div class="alert alert-info">
+    ${ _('You can parameterize the values using') }
+    % for frequency in DATASET_FREQUENCY:
+      <code>${"${"}${ frequency }}</code>
+      % if not loop.last:
+        ,
+      % endif
+    % endfor
+    .
+  </div>
+  ${ utils.render_field(dataset_form['uri']) }
+
+  <%include file="dataset_utils.mako"/>
+
+  ${ utils.render_field(dataset_form['timezone']) }
+  ${ utils.render_field(dataset_form['done_flag']) }
+</fieldset>

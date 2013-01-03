@@ -331,6 +331,7 @@ def edit_coordinator(request, coordinator):
     'dataset_formset': dataset_formset,
     'data_input_formset': data_input_formset,
     'data_output_formset': data_output_formset,
+    'dataset': dataset,
     'dataset_form': dataset_form,
     'new_data_input_formset': new_data_input_formset,
     'new_data_output_formset': new_data_output_formset,
@@ -355,8 +356,6 @@ def create_coordinator_dataset(request, coordinator):
       response['status'] = 0
       response['data'] = reverse('oozie:edit_coordinator', kwargs={'coordinator': coordinator.id}) + "#listDataset"
       request.info(_('Dataset created'))
-    else:
-      dataset_form = DatasetForm(request.POST, instance=dataset, prefix='create')
   else:
     ## Bad
     response['data'] = _('A POST request is required.')
@@ -365,6 +364,7 @@ def create_coordinator_dataset(request, coordinator):
     response['data'] = render('editor/create_coordinator_dataset.mako', request, {
                             'coordinator': coordinator,
                             'dataset_form': dataset_form,
+                            'dataset': dataset,
                           }, force_template=True).content
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
@@ -378,7 +378,7 @@ def edit_coordinator_dataset(request, dataset):
   response = {'status': -1, 'data': 'None'}
 
   if request.method == 'POST':
-    dataset_form = DatasetForm(request.POST, instance=dataset)
+    dataset_form = DatasetForm(request.POST, instance=dataset, prefix='edit')
 
     if dataset_form.is_valid():
       dataset_form.save()
@@ -386,14 +386,15 @@ def edit_coordinator_dataset(request, dataset):
       response['data'] = reverse('oozie:edit_coordinator', kwargs={'coordinator': dataset.coordinator.id}) + "#listDataset"
       request.info(_('Dataset modified'))
     else:
-      dataset_form = DatasetForm(request.POST, instance=dataset)
+      response['data'] = dataset_form.errors
   else:
-    dataset_form = DatasetForm(instance=dataset)
+    dataset_form = DatasetForm(instance=dataset, prefix='edit')
 
   if response['status'] != 0:
     response['data'] = render('editor/edit_coordinator_dataset.mako', request, {
                           'coordinator': dataset.coordinator,
                           'dataset_form': dataset_form,
+                          'dataset': dataset,
                           'path': request.path,
                         }, force_template=True).content
 
@@ -423,7 +424,6 @@ def create_coordinator_data(request, coordinator, data_type):
       response['data'] = reverse('oozie:edit_coordinator', kwargs={'coordinator': coordinator.id})
       request.info(_('Coordinator data created'));
     else:
-      data_form = DataForm(request.POST, instance=data_instance, coordinator=coordinator)
       response['data'] = data_form.errors
   else:
     response['data'] = _('A POST request is required.')

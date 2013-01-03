@@ -15,6 +15,32 @@
 ## limitations under the License.
 
 
+<%def name="render_dataset_instance(dataset)">
+  % if dataset.instance_choice in ('default', 'single'):
+    % if not dataset.is_advanced_start_instance:
+      <instance>${ '${'}coord:current(${ dataset.start_instance })}</instance>
+    % else:
+      <instance>${ dataset.advanced_start_instance }</instance>
+    % endif
+  % else:
+    <start-instance>
+      % if not dataset.is_advanced_start_instance:
+        ${ '${'}coord:current(${ dataset.start_instance })}
+      % else:
+        ${ dataset.advanced_start_instance }
+      % endif
+    </start-instance>
+    <end-instance>
+      % if not dataset.is_advanced_end_instance:
+        ${ '${'}coord:current(${ dataset.end_instance })}
+      % else:
+        ${ dataset.advanced_end_instance }
+      % endif
+    </end-instance>
+  % endif
+</%def>
+
+
 <coordinator-app name="${ coord.name }"
   frequency="${ coord.frequency }"
   start="${ coord.start_utc }" end="${ coord.end_utc }" timezone="${ coord.timezone }"
@@ -52,7 +78,7 @@
   <input-events>
     % for input in coord.datainput_set.all():
     <data-in name="${ input.name }" dataset="${ input.dataset }">
-      <instance>${'${'}coord:current(0)}</instance>
+      ${ render_dataset_instance(input.dataset) }
     </data-in>
     % endfor
   </input-events>
@@ -62,7 +88,7 @@
   <output-events>
     % for output in coord.dataoutput_set.all():
     <data-out name="${ output.name }" dataset="${ output.dataset }">
-      <instance>${'${'}coord:current(0)}</instance>
+      ${ render_dataset_instance(output.dataset) }
     </data-out>
     % endfor
   </output-events>

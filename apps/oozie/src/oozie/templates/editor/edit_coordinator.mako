@@ -408,9 +408,7 @@ ${ layout.menubar(section='coordinators') }
 
 
 % if coordinator.id:
-
   <div class="modal hide" id="edit-dataset-modal" style="z-index:1500;width:850px"></div>
-
 
   <style type="text/css">
     .delete-row input {
@@ -478,6 +476,7 @@ ${ layout.menubar(section='coordinators') }
 
       $('#add-dataset-btn').click(function () {
         $("#add-dataset-form").empty();
+        window.viewModel.updateInstance();
         $("#add-dataset-body").find("input, select").each(function () {
           $(this).clone().appendTo($("#add-dataset-form"));
         });
@@ -488,6 +487,7 @@ ${ layout.menubar(section='coordinators') }
                     $("#add-dataset-form").empty();
                     $('#add-dataset-body').html(response['data']);
                     decorateDateTime();
+                    ko.applyBindings(window.viewModel);
                   } else {
                     window.location.replace(response['data']);
                     window.location.reload();
@@ -508,6 +508,7 @@ ${ layout.menubar(section='coordinators') }
           success:function (response) {
             $("#edit-dataset-body").html(response['data']);
             decorateDateTime();
+            ko.applyBindings(window.viewModel);
             routie("editDataset");
           }
         });
@@ -515,6 +516,7 @@ ${ layout.menubar(section='coordinators') }
 
       $('#update-dataset-btn').click(function () {
         $("#edit-dataset-form").empty();
+        window.viewModel.updateInstance();
         $("#edit-dataset-body").find("input, select").each(function () {
           $(this).clone().appendTo($("#edit-dataset-form"));
         });
@@ -599,6 +601,7 @@ ${ layout.menubar(section='coordinators') }
           showSection("steps");
         },
         "createDataset":function () {
+          window.viewModel.reset();
           showSection("createDataset");
         },
         "editDataset":function () {
@@ -689,7 +692,6 @@ ${ layout.menubar(section='coordinators') }
       });
     });
   </script>
-
 % endif
 
 
