@@ -485,6 +485,10 @@ def test_add_ldap_groups():
   response = c.post(URL, dict(groupname_pattern='toolongnametoolongnametoolongname'))
   assert_true('30 characters or fewer' in response.context['form'].errors['groupname_pattern'][0], response)
 
+  # Test wild card
+  response = c.post(URL, dict(groupname_pattern='*r*'))
+  assert_true('/useradmin/groups' in response['Location'], response)
+
 def test_sync_ldap_users_groups():
   URL = reverse(sync_ldap_users_groups)
 

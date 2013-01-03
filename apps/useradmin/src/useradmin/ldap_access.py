@@ -133,11 +133,11 @@ class LdapConnection(object):
       group_filter = '(' + group_filter + ')'
     group_name_attr = desktop.conf.LDAP.GROUPS.GROUP_NAME_ATTR.get()
 
+    # Allow wild cards on non distinguished names
+    sanitized_name = ldap.filter.escape_filter_chars(groupname_pattern).replace(r'\2a', r'*')
     if find_by_dn:
-      sanitized_name = ldap.filter.escape_filter_chars(groupname_pattern).replace(r'\2a', r'*')
       group_name_filter = '(distinguishedName=' + sanitized_name + ')'
     else:
-      sanitized_name = ldap.filter.escape_filter_chars(groupname_pattern)
       group_name_filter = '(' + group_name_attr + '=' + sanitized_name + ')'
     ldap_filter = '(&' + group_filter + group_name_filter + ')'
 
