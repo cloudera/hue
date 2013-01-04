@@ -18,6 +18,8 @@
 This module provides access to LDAP servers, along with some basic functionality required for Hue and
 User Admin to work seamlessly with LDAP.
 """
+import re
+
 import desktop.conf
 import ldap
 import ldap.filter
@@ -81,12 +83,31 @@ class LdapConnection(object):
       except:
         raise RuntimeError("Failed to bind to LDAP server anonymously")
 
+  def _get_search_params(self, name, attr, find_by_dn=False):
+    """
+      if we are to find this ldap object by full distinguished name,
+      then search by setting search_dn to the 'name'
+      rather than by filtering by 'attr'.
+    """
+    base_dn = self._get_root_dn()
+    if find_by_dn:
+      search_dn = re.sub(r'(\w+=)', lambda match: match.group(0).upper(), name)
+
+      if not search_dn.endswith(base_dn):
+        raise RuntimeError("Distinguished Name provided does not contain configured Base DN. Base DN: %(base_dn)s, DN: %(dn)s" % {
+          'base_dn': base_dn,
+          'dn': search_dn
+        })
+
+      return (search_dn, '')
+    else:
+      return (base_dn, '(' + attr + '=' + name + ')')
+
   def find_users(self, username_pattern, find_by_dn=False):
     """
     LDAP search helper method finding users. This supports searching for users
     by distinguished name, or the configured username attribute.
     """
-    base_dn = self._get_root_dn()
     scope = ldap.SCOPE_SUBTREE
 
     user_filter = desktop.conf.LDAP.USERS.USER_FILTER.get()
@@ -96,13 +117,10 @@ class LdapConnection(object):
 
     # Allow wild cards on non distinguished names
     sanitized_name = ldap.filter.escape_filter_chars(username_pattern).replace(r'\2a', r'*')
-    if find_by_dn:
-      user_name_filter = '(distinguishedName=' + sanitized_name + ')'
-    else:
-      user_name_filter = '(' + user_name_attr + '=' + sanitized_name + ')'
+    search_dn, user_name_filter = self._get_search_params(sanitized_name, user_name_attr, find_by_dn)
     ldap_filter = '(&' + user_filter + user_name_filter + ')'
 
-    ldap_result_id = self.ldap_handle.search(base_dn, scope, ldap_filter)
+    ldap_result_id = self.ldap_handle.search(search_dn, scope, ldap_filter)
     result_type, result_data = self.ldap_handle.result(ldap_result_id)
     user_info = []
     if result_data and result_type == ldap.RES_SEARCH_RESULT:
@@ -135,13 +153,10 @@ class LdapConnection(object):
 
     # Allow wild cards on non distinguished names
     sanitized_name = ldap.filter.escape_filter_chars(groupname_pattern).replace(r'\2a', r'*')
-    if find_by_dn:
-      group_name_filter = '(distinguishedName=' + sanitized_name + ')'
-    else:
-      group_name_filter = '(' + group_name_attr + '=' + sanitized_name + ')'
+    search_dn, group_name_filter = self._get_search_params(sanitized_name, group_name_attr, find_by_dn)
     ldap_filter = '(&' + group_filter + group_name_filter + ')'
 
-    ldap_result_id = self.ldap_handle.search(base_dn, scope, ldap_filter)
+    ldap_result_id = self.ldap_handle.search(search_dn, scope, ldap_filter)
     result_type, result_data = self.ldap_handle.result(ldap_result_id)
 
     group_info = []
