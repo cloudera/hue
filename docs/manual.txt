@@ -334,14 +334,14 @@ https://ccp.cloudera.com/display/CDH4DOC/Hive+Installation#HiveInstallation-Conf
 Installation and Configuration].
 Having a `hive-site.xml` is optional but often useful, particularly on setting
 up a http://wiki.apache.org/hadoop/Hive/AdminManual/MetastoreAdmin[metastore].
-You may store the `hive-site.xml` in `/etc/hue/conf`, or instruct
-Beeswax to locate it using the `hive_conf_dir` configuration variable.  See
-`/etc/hue/conf/hue.ini`.
+You may store the `hive-site.xml` in `/etc/hue`, or instruct
+Beeswax to locate it using the `hive_conf_dir` configuration variable. See
+`hue.ini`.
 
 Existing Hive Installation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-In `/etc/hue/conf/hue.ini`, modify `hive_conf_dir` to point to the
+In `hue.ini`, modify `hive_conf_dir` to point to the
 directory containing `hive-site.xml`.
 
 
@@ -350,9 +350,9 @@ Configuring Hue
 
 Hue ships with a default configuration that will work for
 pseudo-distributed clusters.  If you are running on a real cluster, you must
-make a few changes to the `/etc/hue/hue.ini` configuration file (or ``pseudo-distributed.ini`
-when in development mode). The following sections describe the key configuration options you must make to
-configure Hue.
+make a few changes to the `hue.ini` configuration file (`/etc/hue/hue.ini` when installed from the
+CDH package version) or `pseudo-distributed.ini` in `desktop/conf` when in development mode).
+The following sections describe the key configuration options you must make to configure Hue.
 
 
 [TIP]
@@ -387,7 +387,7 @@ Web Server Configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 These configuration variables are under the `[desktop]` section in
-the `/etc/hue/hue.ini` configuration file.
+the `hue.ini` configuration file.
 
 Specifying the Hue HTTP Address
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -438,7 +438,7 @@ do the following steps:
     $ ./build/env/bin/easy_install pyOpenSSL
 
 2. Configure Hue to use your private key by adding the following
-options to the `/etc/hue/hue.ini` configuration file:
+options to the `hue.ini` configuration file:
 
     ssl_certificate=/path/to/certificate
     ssl_private_key=/path/to/key
@@ -465,7 +465,7 @@ Hue Configuration for Hadoop
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 These configuration variables are under the `[hadoop]` section in
-the `/etc/hue/hue.ini` configuration file.
+the `hue.ini` configuration file.
 
 
 HDFS Cluster
@@ -779,7 +779,7 @@ To configure Hue to store data in MySQL:
 
   $ /usr/share/hue/build/env/bin/hue dumpdata > <some-temporary-file>.json
 
-4. Open the `/etc/hue/hue.ini` file in a text editor. Directly below the
+4. Open the `hue.ini` file in a text editor. Directly below the
    `[[database]]` line, add the following options (and modify accordingly for
    your MySQL setup):
 
