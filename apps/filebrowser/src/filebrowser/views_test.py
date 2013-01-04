@@ -27,17 +27,21 @@ import logging
 import os
 import re
 import urlparse
+from avro import schema, datafile, io
+from StringIO import StringIO
 
 from django.utils.encoding import smart_str
 from nose.plugins.attrib import attr
+from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
 from hadoop import pseudo_hdfs4
 
-from avro import schema, datafile, io
+from conf import MAX_SNAPPY_DECOMPRESSION_SIZE
 from lib.rwx import expand_mode
+from views import snappy_installed
 
 
 LOG = logging.getLogger(__name__)
@@ -519,6 +523,79 @@ def test_chooser():
   assert_equal('/', dic['current_dir_path'])
   assert_equal('/', dic['path'])
 
+
+@attr('requires_hadoop')
+def test_view_snappy_compressed_avro():
+  if not snappy_installed():
+    raise SkipTest
+  import snappy
+
+  cluster = pseudo_hdfs4.shared_cluster()
+  try:
+    c = make_logged_in_client()
+    cluster.fs.setuser(cluster.superuser)
+    if cluster.fs.isdir("/test-snappy-avro-filebrowser"):
+      cluster.fs.rmtree('/test-snappy-avro-filebrowser/')
+
+    cluster.fs.mkdir('/test-snappy-avro-filebrowser/')
+
+    test_schema = schema.parse("""
+      {
+        "name": "test",
+        "type": "record",
+        "fields": [
+          { "name": "name", "type": "string" },
+          { "name": "integer", "type": "int" }
+        ]
+      }
+    """)
+
+    # Cannot use StringIO with datafile writer!
+    f = cluster.fs.open('/test-snappy-avro-filebrowser/test-view.avro', "w")
+    data_file_writer = datafile.DataFileWriter(f, io.DatumWriter(),
+                                                writers_schema=test_schema,
+                                                codec='deflate')
+    dummy_datum = {
+      'name': 'Test',
+      'integer': 10,
+    }
+    data_file_writer.append(dummy_datum)
+    data_file_writer.close()
+
+    fh = cluster.fs.open('/test-snappy-avro-filebrowser/test-view.avro', 'r')
+    f = cluster.fs.open('/test-snappy-avro-filebrowser/test-view.compressed.avro', "w")
+    f.write(snappy.compress(fh.read()))
+    f.close()
+    fh.close()
+
+    # Snappy compressed fail
+    response = c.get('/filebrowser/view/test-snappy-avro-filebrowser/test-view.avro?compression=snappy_avro')
+    assert_true('Failed to decompress' in response.context['message'], response)
+
+    # Snappy compressed succeed
+    response = c.get('/filebrowser/view/test-snappy-avro-filebrowser/test-view.compressed.avro')
+    assert_equal('snappy_avro', response.context['view']['compression'])
+    assert_equal(eval(response.context['view']['contents']), dummy_datum, response)
+    response = c.get('/filebrowser/view/test-snappy-avro-filebrowser/test-view.compressed.avro?compression=snappy_avro')
+    assert_equal('snappy_avro', response.context['view']['compression'])
+    assert_equal(eval(response.context['view']['contents']), dummy_datum, response)
+
+    # Avro should also decompress snappy
+    response = c.get('/filebrowser/view/test-snappy-avro-filebrowser/test-view.compressed.avro?compression=avro')
+    assert_equal('snappy_avro', response.context['view']['compression'])
+    assert_equal(eval(response.context['view']['contents']), dummy_datum, response)
+
+    # Largest snappy compressed file
+    finish = MAX_SNAPPY_DECOMPRESSION_SIZE.set_for_testing(1)
+    response = c.get('/filebrowser/view/test-snappy-avro-filebrowser/test-view.avro?compression=snappy_avro')
+    assert_true('File size is greater than allowed max snappy decompression size' in response.context['message'], response)
+
+  finally:
+    finish()
+    try:
+      cluster.fs.rmtree('/test-snappy-avro-filebrowser/')
+    except:
+      pass      # Don't let cleanup errors mask earlier failures
 
 @attr('requires_hadoop')
 def test_view_avro():
