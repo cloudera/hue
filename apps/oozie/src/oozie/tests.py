@@ -432,7 +432,7 @@ class TestAPIWithOozie(OozieBase):
       jobsub_setup.Command().handle()
 
     # There should be 3 from examples
-    jobsub_design = OozieDesign.objects.all()[0]
+    jobsub_design = OozieDesign.objects.filter(root_action__action_type='streaming')[0]
     response = self.c.post(reverse('oozie:workflow_jobsub_actions', kwargs={'workflow': self.wf.id}), data={'jobsub_id': jobsub_design.id}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
     assert_equal(200, response.status_code)
     response_dict = json.loads(response.content)
