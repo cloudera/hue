@@ -20,7 +20,7 @@ from django.utils.translation import ugettext as _
 
 <%namespace name="layout" file="layout.mako" />
 
-${commonheader(_('Table List'), app_name, user, '100px')}
+${ commonheader(_('Table List'), app_name, user, '100px') | n,unicode }
 ${layout.menubar(section='tables')}
 
 
@@ -33,7 +33,7 @@ ${layout.menubar(section='tables')}
                     <li class="nav-header">${_('database')}</li>
                     <li>
                        <form action="${ url(app_name + ':show_tables') }" id="db_form" method="POST">
-                         ${ db_form }
+                         ${ db_form | n,unicode }
                        </form>
                     </li>
                     <li class="nav-header">${_('Actions')}</li>
@@ -138,4 +138,4 @@ ${layout.menubar(section='tables')}
     });
 </script>
 
-${commonfooter(messages)}
+${ commonfooter(messages) | n,unicode }

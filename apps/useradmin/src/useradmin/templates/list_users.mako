@@ -22,7 +22,7 @@ from django.utils.translation import ugettext as _
 
 <%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="layout" file="layout.mako" />
-${commonheader(_('Hue Users'), "useradmin", user, "100px")}
+${ commonheader(_('Hue Users'), "useradmin", user, "100px") | n,unicode }
 ${layout.menubar(section='users', _=_)}
 
 <div class="container-fluid">
@@ -176,4 +176,4 @@ ${layout.menubar(section='users', _=_)}
 
 ${layout.commons()}
 
-${commonfooter(messages)}
+${ commonfooter(messages) | n,unicode }

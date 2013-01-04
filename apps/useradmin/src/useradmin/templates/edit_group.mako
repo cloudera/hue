@@ -23,7 +23,7 @@ from django.utils.translation import ugettext as _
 
 <%namespace name="layout" file="layout.mako" />
 
-${commonheader(_('Hue Groups'), "useradmin", user, "100px")}
+${ commonheader(_('Hue Groups'), "useradmin", user, "100px") | n,unicode }
 ${layout.menubar(section='groups', _=_)}
 
 <%def name="render_field(field)">
@@ -96,4 +96,4 @@ ${layout.menubar(section='groups', _=_)}
 	});
 </script>
 
-${commonfooter(messages)}
+${ commonfooter(messages) | n,unicode }

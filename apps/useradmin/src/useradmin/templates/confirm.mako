@@ -17,7 +17,7 @@
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
-${commonheader(title, "useradmin", user)}
+${ commonheader(title, "useradmin", user) | n,unicode }
 <div class="container-fluid">
 	<h1>${_('Confirm')}</h1>
 	<form action="${path}" method="POST">
@@ -25,4 +25,4 @@ ${commonheader(title, "useradmin", user)}
 		<input type="submit" value="${_('Yes')}">
 	</form>
 </div>
-${commonfooter(messages)}
+${ commonfooter(messages) | n,unicode }

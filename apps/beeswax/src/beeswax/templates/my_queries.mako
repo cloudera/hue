@@ -23,7 +23,7 @@ from django.utils.translation import ugettext as _
 <%namespace name="layout" file="layout.mako" />
 <%!  from beeswax.views import collapse_whitespace %>
 
-${commonheader(_('My Queries'), app_name, user, '100px')}
+${ commonheader(_('My Queries'), app_name, user, '100px') | n,unicode }
 ${layout.menubar(section='my queries')}
 
 <style>
@@ -136,7 +136,7 @@ ${layout.menubar(section='my queries')}
                           % if len(query.query) > 100:
                             <code>${collapse_whitespace(query.query[:100])}...</code>
                           % else:
-                            <code>${collapse_whitespace(query.query)}</code>
+                            <code>${ collapse_whitespace(query.query) }</code>
                           % endif
                         </p>
                       </td>
@@ -253,4 +253,4 @@ ${layout.menubar(section='my queries')}
     });
 </script>
 
-${commonfooter(messages)}
+${ commonfooter(messages) | n,unicode }

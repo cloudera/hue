@@ -17,6 +17,7 @@
 
 import logging
 import time
+from django.template.defaultfilters import escapejs
 
 try:
   import json
@@ -146,6 +147,16 @@ class Job(models.Model):
 
   def get_parameters(self):
     return json.loads(self.parameters)
+
+  @property
+  def parameters_escapejs(self):
+    return self._escapejs_parameters_list(self.parameters)
+
+  def _escapejs_parameters_list(self, parameters):
+    escaped = []
+    for item in json.loads(parameters):
+      escaped.append({"name": escapejs(item["name"]), "value": escapejs(item["value"])})
+    return json.dumps(escaped)
 
   @property
   def status(self):
@@ -296,6 +307,10 @@ class Workflow(Job):
 
     return copy
 
+  @property
+  def job_properties_escapejs(self):
+    return self._escapejs_parameters_list(self.job_properties)
+
   def has_cycle(self):
     """
     Topological sort for detecting cycles in the directed graph.
@@ -315,7 +330,6 @@ class Workflow(Job):
     graph_edges = set([edge for node in self.node_set.all() for edge in node.get_children_links()])
 
     return len(graph_edges - removed_edges) > 0 # Graph does not have unseen edges
-
 
   def find_parameters(self):
     params = set()
@@ -939,8 +953,8 @@ class Email(Action):
   PARAM_FIELDS = ('to', 'cc', 'subject', 'body')
   node_type = 'email'
 
-  to = models.TextField(default='', verbose_name=_t('to addresses'), help_text=_t('Comma-separated values.'))
-  cc = models.TextField(default='', verbose_name=_t('cc addresses (optional)'), blank=True, help_text=_t('Comma-separated values.'))
+  to = models.TextField(default='', verbose_name=_t('TO addresses'), help_text=_t('Comma-separated values.'))
+  cc = models.TextField(default='', verbose_name=_t('CC addresses (optional)'), blank=True, help_text=_t('Comma-separated values.'))
   subject = models.TextField(default='', verbose_name=_t('Subject'), help_text=_t('Plain-text.'))
   body = models.TextField(default='', verbose_name=_t('Body'), help_text=_t('Plain-text.'))
 

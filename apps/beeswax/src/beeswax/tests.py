@@ -1106,6 +1106,20 @@ for x in sys.stdin:
     assert_true('Error' in response.content, response.content)
 
 
+  def test_xss_html_escaping(self):
+    client = make_logged_in_client()
+
+    data = {
+        u'settings-next_form_id': [u'1'], u'settings-0-key': [u'"><script>alert(1);</script>'], u'button-submit': [u'Execute'],
+        u'functions-next_form_id': [u'0'], u'settings-0-value': [u'"><script>alert(1);</script>'], u'query-is_parameterized': [u'on'],
+        u'query-query': [u'query'], u'query-database': [u'default'], u'settings-0-_exists': [u'True'], u'file_resources-next_form_id': [u'0']
+     }
+
+    resp = client.post('/beeswax/execute/', data)
+    assert_false('"><script>alert(1);</script>' in resp.content, resp.content)
+    assert_true('&quot;&gt;&lt;script&gt;alert(1);&lt;/script&gt;' in resp.content, resp.content)
+
+
 def test_import_gzip_reader():
   """Test the gzip reader in create table"""
   # Make gzipped data

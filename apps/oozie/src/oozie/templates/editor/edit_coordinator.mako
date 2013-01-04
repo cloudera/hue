@@ -24,7 +24,7 @@
 <%namespace name="properties" file="coordinator_properties.mako" />
 <%namespace name="coordinator_data" file="create_coordinator_data.mako" />
 
-${ commonheader(_("Oozie App"), "oozie", user, "100px") }
+${ commonheader(_("Oozie App"), "oozie", user, "100px") | n,unicode }
 ${ layout.menubar(section='coordinators') }
 
 <style type="text/css">
@@ -86,10 +86,10 @@ ${ layout.menubar(section='coordinators') }
           <li><a href="#step4" class="step">${ _('Step 4: Outputs') }</a></li>
           <li><a href="#step5" class="step">${ _('Step 5: Advanced settings') }</a></li>
         </ul>
-        ${ dataset_formset.management_form }
-        ${ data_input_formset.management_form }
-        ${ data_output_formset.management_form }
-        ${ properties.init_viewmodel('parameters', parameters) }
+        ${ dataset_formset.management_form | n,unicode }
+        ${ data_input_formset.management_form | n,unicode }
+        ${ data_output_formset.management_form | n,unicode }
+        ${ properties.init_viewmodel(coordinator) }
         <div class="steps">
 
           <div id="step1" class="stepDetails">
@@ -98,7 +98,7 @@ ${ layout.menubar(section='coordinators') }
               ${ utils.render_field_no_popover(coordinator_form['name'], extra_attrs = {'validate':'true'}) }
               ${ utils.render_field_no_popover(coordinator_form['description']) }
               ${ utils.render_field_no_popover(coordinator_form['workflow'], extra_attrs = {'validate':'true'}) }
-              ${ coordinator_form['parameters'] }
+              ${ coordinator_form['parameters'] | n,unicode }
               <div class="hide">
                 ${ utils.render_field(coordinator_form['timeout']) }
                 ${ coordinator_form['schema_version'] }
@@ -156,12 +156,12 @@ ${ layout.menubar(section='coordinators') }
                 <tbody>
                 % for form in data_input_formset.forms:
                 <tr>
-                ${ form['id'] }
+                  ${ form['id'] }
                   <td>${ form['name'] }</td>
                   <td>${ form['dataset'] }</td>
                   <td>${ form['dataset'].form.instance.dataset.uri }</td>
                 % if coordinator.is_editable(user):
-                  <td><a class="btn btn-small delete-row" href="javascript:void(0);">${ _('Delete') }${ form['DELETE'] }</a></td>
+                  <td><a class="btn btn-small delete-row" href="javascript:void(0);">${ _('Delete') }${ form['DELETE'] | n,unicode }</a></td>
                 % endif
                 </tr>
                 % endfor
@@ -214,7 +214,7 @@ ${ layout.menubar(section='coordinators') }
                     <td>${ form['dataset'] }</td>
                     <td>${ form['dataset'].form.instance.dataset.uri }</td>
                     % if coordinator.is_editable(user):
-                      <td><a class="btn btn-small delete-row" href="javascript:void(0);">${ _('Delete') }${ form['DELETE'] }</a></td>
+                      <td><a class="btn btn-small delete-row" href="javascript:void(0);">${ _('Delete') }${ form['DELETE'] | n,unicode }</a></td>
                     % endif
                   </tr>
                 % endfor
@@ -250,7 +250,7 @@ ${ layout.menubar(section='coordinators') }
               </div>
             </div>
             ${ utils.render_field_no_popover(coordinator_form['execution']) }
-            ${ coordinator_form['schema_version'] }
+            ${ coordinator_form['schema_version'] | n,unicode }
           </div>
 
         </div>
@@ -311,7 +311,7 @@ ${ layout.menubar(section='coordinators') }
               <tbody>
               % for form in dataset_formset.forms:
                 % for hidden in form.hidden_fields():
-                  ${ hidden }
+                  ${ hidden | n,unicode }
                 % endfor
                 <tr>
                   <td>
@@ -328,15 +328,15 @@ ${ layout.menubar(section='coordinators') }
                   <td>${ form.instance.done_flag }</td>
                   % if coordinator.is_editable(user):
                     <td data-row-selector-exclude="true">
-                      <a class="btn btn-small delete-row" href="javascript:void(0);">${ _('Delete') }${ form['DELETE'] }</a>
+                      <a class="btn btn-small delete-row" href="javascript:void(0);">${ _('Delete') }${ form['DELETE'] | n,unicode }</a>
                     </td>
                   % endif
                 </tr>
 
                 <div class="hide">
                   % for field in form.visible_fields():
-                  ${ field.errors }
-                  ${ field.label }: ${ field }
+                  ${ field.errors | n,unicode }
+                  ${ field.label }: ${ field | n,unicode }
                   % endfor
                 </div>
               % endfor
@@ -697,4 +697,4 @@ ${ layout.menubar(section='coordinators') }
 
 ${ utils.decorate_datetime_fields() }
 
-${ commonfooter(messages) }
+${ commonfooter(messages) | n,unicode }

@@ -452,7 +452,6 @@ def listdir_paged(request, path):
         'page': _massage_page(page),
         'pagesize': pagesize,
         'home_directory': request.fs.isdir(home_dir_path) and home_dir_path or None,
-        'filter_str': filter_str,
         'sortby': sortby,
         'descending': descending_param,
         # The following should probably be deprecated

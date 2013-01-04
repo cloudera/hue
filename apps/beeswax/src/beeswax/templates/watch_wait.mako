@@ -21,7 +21,7 @@ from django.utils.translation import ugettext as _
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="util" file="util.mako" />
 
-${commonheader(_('Waiting for query...'), app_name, user, '100px')}
+${ commonheader(_('Waiting for query...'), app_name, user, '100px') | n,unicode }
 ${layout.menubar(section='query')}
 
 ## Required for unit tests
@@ -57,10 +57,10 @@ ${layout.menubar(section='query')}
 
 		   	<div class="tab-content">
 				<div class="active tab-pane" id="log">
-					<pre>${log | h}</pre>
+					<pre>${ log }</pre>
 				</div>
 				<div class="tab-pane" id="query">
-					<pre>${query.query | h}</pre>
+					<pre>${ query.query }</pre>
 				</div>
 			</div>
 		</div>
@@ -128,4 +128,4 @@ ${layout.menubar(section='query')}
 </script>
 
 
-${commonfooter(messages)}
+${ commonfooter(messages) | n,unicode }

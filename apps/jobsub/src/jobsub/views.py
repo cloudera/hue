@@ -14,6 +14,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from django.template.defaultfilters import escapejs
 """
 Views for JobSubmission.
 
@@ -159,9 +160,9 @@ def list_designs(request):
   for design in data:
       ko_design = {
           'id': design.id,
-          'owner': design.owner.username,
-          'name': design.name,
-          'description': design.description,
+          'owner': escapejs(design.owner.username),
+          'name': escapejs(design.name),
+          'description': escapejs(design.description),
           'type': design.root_action.action_type,
           'last_modified': py_time.mktime(design.last_modified.timetuple()),
           'url_params': urlresolvers.reverse(jobsub.views.get_design_params, kwargs={'design_id': design.id}),
@@ -175,7 +176,7 @@ def list_designs(request):
       designs.append(ko_design)
 
   return render("list_designs.mako", request, {
-    'currentuser':request.user,
+    'currentuser': request.user,
     'owner': owner,
     'name': name,
     'designs': json.dumps(designs),

@@ -18,7 +18,7 @@ from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
 
-${commonheader(_('Hue Shell'), "shell", user)}
+${ commonheader(_('Hue Shell'), "shell", user) | n,unicode }
 <div class="container-fluid">
 <div>
     <h3>${_('Failed to create a shell of the given type. The possible reasons for this are:')}</h3>
@@ -31,4 +31,4 @@ ${commonheader(_('Hue Shell'), "shell", user)}
     </ol>
 </div>
 </div>
-${commonfooter(messages)}
+${ commonfooter(messages) | n,unicode }

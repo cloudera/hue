@@ -19,7 +19,7 @@
 %>
 <%namespace name="comps" file="jobbrowser_components.mako" />
 
-${commonheader(_('Task Attempt: %(attemptId)s - Job Browser') % dict(attemptId=attempt.attemptId_short), "jobbrowser", user)}
+${ commonheader(_('Task Attempt: %(attemptId)s - Job Browser') % dict(attemptId=attempt.attemptId_short), "jobbrowser", user) | n,unicode }
 <div class="container-fluid">
     <h1>${_('Task Attempt: %(attemptId)s - Job Browser') % dict(attemptId=attempt.attemptId_short)}</h1>
     <div class="row-fluid">
@@ -167,4 +167,4 @@ ${commonheader(_('Task Attempt: %(attemptId)s - Job Browser') % dict(attemptId=a
     });
 </script>
 
-${commonfooter(messages)}
+${ commonfooter(messages) | n,unicode }

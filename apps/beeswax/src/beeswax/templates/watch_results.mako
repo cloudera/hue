@@ -22,7 +22,7 @@ from django.utils.translation import ugettext as _
 <%namespace name="util" file="util.mako" />
 <%namespace name="comps" file="beeswax_components.mako" />
 
-${commonheader(_('Query Results'), app_name, user, '100px')}
+${ commonheader(_('Query Results'), app_name, user, '100px') | n,unicode }
 ${layout.menubar(section='query')}
 
 <style>
@@ -115,7 +115,7 @@ ${layout.menubar(section='query')}
             % if error:
               <div class="alert alert-error">
                 <h3>${_('Error!')}</h3>
-                <pre>${error_message | h}</pre>
+                <pre>${ error_message }</pre>
               </div>
             % else:
             % if expected_first_row != start_row:
@@ -155,11 +155,11 @@ ${layout.menubar(section='query')}
         </div>
 
         <div class="tab-pane" id="query">
-          <pre>${query.query | h}</pre>
+          <pre>${ query.query }</pre>
         </div>
 
         <div class="tab-pane" id="log">
-          <pre>${log | h}</pre>
+          <pre>${ log }</pre>
         </div>
 
         % if not error:
@@ -327,4 +327,4 @@ ${layout.menubar(section='query')}
     });
 </script>
 
-${commonfooter(messages)}
+${ commonfooter(messages) | n,unicode }

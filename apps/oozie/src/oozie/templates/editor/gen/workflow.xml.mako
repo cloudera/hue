@@ -17,18 +17,18 @@
 <%namespace name="common" file="workflow-common.xml.mako" />
 
 
-<workflow-app name="${ workflow.name }" xmlns="${ workflow.schema_version }">
+<workflow-app name="${ workflow.name | x }" xmlns="${ workflow.schema_version }">
   % if workflow.job_xml or workflow.get_properties():
   <global>
     % if workflow.job_xml:
-      <job-xml>${ workflow.job_xml }</job-xml>
+      <job-xml>${ workflow.job_xml | x }</job-xml>
     % endif
     % if workflow.get_properties():
-      ${ common.configuration(workflow.get_properties()) }
+      ${ common.configuration(workflow.get_properties()) | x }
     % endif
   </global>
   % endif
   % for node in workflow.node_list:
-      ${ node.to_xml() }
+      ${ node.to_xml() | n }
   % endfor
 </workflow-app>

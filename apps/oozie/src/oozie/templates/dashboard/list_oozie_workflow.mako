@@ -23,7 +23,7 @@
 <%namespace name="layout" file="../navigation-bar.mako" />
 <%namespace name="utils" file="../utils.inc.mako" />
 
-${ commonheader(_("Oozie App"), "oozie", user, "100px") }
+${ commonheader(_("Oozie App"), "oozie", user, "100px") | n,unicode }
 ${ layout.menubar(section='dashboard') }
 
 
@@ -100,10 +100,10 @@ ${ layout.menubar(section='dashboard') }
         <div class="row-fluid">
           <div class="span3"></div>
           <div class="span3">
-            ${ var | h }
+            ${ var }
           </div>
           <div class="span3">
-            ${ utils.guess_hdfs_link(var, str(value)) | h }
+            ${ utils.guess_hdfs_link(var, str(value)) }
           </div>
         </div>
       % endif
@@ -168,7 +168,7 @@ ${ layout.menubar(section='dashboard') }
            forms = WorkflowFormSet(instance=hue_workflow.get_full_node()).forms
          %>
 
-           ${ hue_workflow.get_full_node().gen_status_graph(forms, oozie_workflow.get_working_actions()) }
+           ${ hue_workflow.get_full_node().gen_status_graph(forms, oozie_workflow.get_working_actions()) | n,unicode }
          % endif
        </div>
      % endif
@@ -272,11 +272,11 @@ ${ layout.menubar(section='dashboard') }
       </div>
 
       <div class="tab-pane" id="log">
-          <pre>${ oozie_workflow.log | h }</pre>
+          <pre>${ oozie_workflow.log }</pre>
       </div>
 
       <div class="tab-pane" id="definition">
-          <textarea id="definitionEditor">${ oozie_workflow.definition | h }</textarea>
+          <textarea id="definitionEditor">${ oozie_workflow.definition }</textarea>
       </div>
   </div>
 
@@ -368,4 +368,4 @@ ${ layout.menubar(section='dashboard') }
   });
 </script>
 
-${commonfooter(messages)}
+${ commonfooter(messages) | n,unicode }

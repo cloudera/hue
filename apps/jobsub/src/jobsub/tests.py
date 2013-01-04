@@ -19,6 +19,11 @@ import copy
 import logging
 import time
 
+try:
+  import json
+except ImportError:
+  import simplejson as json
+
 from nose.tools import assert_true, assert_false, assert_equal, assert_raises
 from django.contrib.auth.models import User
 
@@ -31,6 +36,7 @@ from jobsub.management.commands import jobsub_setup
 from jobsub.models import OozieDesign, OozieMapreduceAction, OozieStreamingAction, CheckForSetup
 from jobsub.parameterization import recursive_walk, find_variables, substitute_variables
 from nose.plugins.skip import SkipTest
+from django.template.defaultfilters import escapejs
 
 
 LOG = logging.getLogger(__name__)
@@ -142,29 +148,32 @@ def test_job_design_cycle():
   # Now check list
   response = c.get('/jobsub/')
   for design in OozieDesign.objects.all():
-    assert_true(design.name in response.content, response.content)
+    assert_true(escape(design.name) in response.content, response.content)
 
   # With some filters
+  name1 = escape('name-1')
+  name2 = escape('name-2')
+
   response = c.get('/jobsub/', dict(name='name-1'))
-  assert_true('name-1' in response.content, response.content)
-  assert_false('name-2' in response.content, response.content)
+  assert_true(name1 in response.content, response.content)
+  assert_false(name2 in response.content, response.content)
 
   response = c.get('/jobsub/', dict(owner='doesnotexist'))
   assert_false('doesnotexist' in response.content)
 
   response = c.get('/jobsub/', dict(owner='test', name='name-1'))
-  assert_true('name-1' in response.content, response.content)
-  assert_false('name-2' in response.content, response.content)
+  assert_true(name1 in response.content, response.content)
+  assert_false(name2 in response.content, response.content)
 
   response = c.get('/jobsub/', dict(name="name"))
-  assert_true('name-1' in response.content, response.content)
-  assert_true('name-2' in response.content, response.content)
+  assert_true(name1 in response.content, response.content)
+  assert_true(name2 in response.content, response.content)
   assert_false('doesnotexist' in response.content, response.content)
 
   # Combined filters
   response = c.get('/jobsub/', dict(owner="test", name="name-2"))
-  assert_false('name-1' in response.content, response.content)
-  assert_true('name-2' in response.content, response.content)
+  assert_false(name1 in response.content, response.content)
+  assert_true(name2 in response.content, response.content)
   assert_false('doesnotexist' in response.content, response.content)
 
   # Try delete
@@ -180,6 +189,10 @@ def test_job_design_cycle():
   not_mine = OozieDesign.objects.get(name='name-2')
   response = c.post('/jobsub/delete_design/%d' % not_mine.id)
   assert_true('Permission denied.' in response.content, response.content)
+
+
+def escape(text):
+  return json.dumps(escapejs(text))
 
 
 class TestJobsubWithHadoop(OozieServerProvider):

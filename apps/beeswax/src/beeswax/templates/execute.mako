@@ -33,10 +33,11 @@
         </div>
     % endif
 
-    <textarea class="span9" rows="18" placeholder="${_('Example: SELECT * FROM tablename')}" name="${form.query["query"].html_name | n}" id="queryField">${extract_field_data(form.query["query"]) or ''}</textarea>
+    <textarea class="span9" rows="18" placeholder="${_('Example: SELECT * FROM tablename')}" name="${form.query["query"].html_name}" id="queryField">${extract_field_data(form.query["query"]) or ''}</textarea>
+
     <div id="validationResults">
     % if len(form.query["query"].errors):
-        ${unicode(form.query["query"].errors) | n}
+        ${ unicode(form.query["query"].errors) }
      % endif
     </div>
 
@@ -54,7 +55,7 @@
 </%def>
 
 
-${commonheader(_('Query'), app_name, user, '100px')}
+${ commonheader(_('Query'), app_name, user, '100px') | n,unicode }
 ${layout.menubar(section='query')}
 
 <div class="container-fluid">
@@ -65,7 +66,7 @@ ${layout.menubar(section='query')}
                     <ul class="nav nav-list">
                         <li class="nav-header">${_('database')}</li>
                         <li>
-                          ${ form.query['database'] }
+                          ${ form.query['database'] | n,unicode }
                         </li>
                         <li class="nav-header">${_('settings')}</li>
                         <li>
@@ -250,7 +251,7 @@ ${layout.menubar(section='query')}
                     % if error_message or log:
                         <div class="tab-pane" id="errorPane">
                         % if log:
-                            <pre>${log | h}</pre>
+                            <pre>${ log }</pre>
                         % endif
                         </div>
                     % endif
@@ -507,4 +508,4 @@ ${layout.menubar(section='query')}
 </script>
 
 
-${commonfooter(messages)}
+${ commonfooter(messages) | n,unicode }

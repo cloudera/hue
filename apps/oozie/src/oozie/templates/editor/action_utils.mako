@@ -30,7 +30,7 @@
     <form class="form-horizontal" id="import-node-form" method="POST">
       <div class="modal-header">
         <a href="#" class="close">&times;</a>
-        <h3 class="message">${_('Import Node')}</h3>
+        <h3 class="message">${_('Import Action')}</h3>
       </div>
 
       <div class="modal-content">

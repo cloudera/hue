@@ -22,7 +22,7 @@ from django.utils.translation import ugettext as _
 
 <%namespace name="layout" file="layout.mako" />
 
-${commonheader(_('Hue Users'), "useradmin", user, "100px")}
+${ commonheader(_('Hue Users'), "useradmin", user, "100px") | n,unicode }
 
 % if user.is_superuser:
   ${layout.menubar(section='users', _=_)}
@@ -101,4 +101,4 @@ ${commonheader(_('Hue Users'), "useradmin", user, "100px")}
     });
 </script>
 
-${commonfooter(messages)}
+${ commonfooter(messages) | n,unicode }

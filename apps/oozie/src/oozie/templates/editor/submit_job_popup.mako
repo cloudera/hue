@@ -30,11 +30,11 @@
     <fieldset>
       <div id="param-container">
 
-       ${ params_form.management_form }
+       ${ params_form.management_form | n,unicode }
 
        % for form in params_form.forms:
           % for hidden in form.hidden_fields():
-            ${ hidden }
+            ${ hidden | n,unicode }
           % endfor
           <div class="fieldWrapper">
             <div class="row-fluid

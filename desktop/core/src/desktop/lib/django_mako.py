@@ -28,7 +28,8 @@ ENCODING_ERRORS = 'replace'
 
 # Things to automatically import into all template namespaces
 IMPORTS=[
-  "from desktop.lib.django_mako import url"
+  "from desktop.lib.django_mako import url",
+  "from django.utils.html import escape"
 ]
 
 class DesktopLookup(TemplateCollection):
@@ -63,7 +64,7 @@ class DesktopLookup(TemplateCollection):
                             output_encoding=i18n.get_site_encoding(),
                             input_encoding=i18n.get_site_encoding(),
                             encoding_errors=ENCODING_ERRORS,
-                            default_filters=['unicode'], 
+                            default_filters=['unicode', 'escape'], 
                             imports=IMPORTS)
     # TODO(philip): Make a django_aware default filter, that understands
     # django safe strings.  See http://www.makotemplates.org/docs/filtering.html.

@@ -23,7 +23,7 @@ from django.utils.translation import ugettext as _
 
 <%namespace name="layout" file="layout.mako" />
 
-${commonheader(_('Job Designer'), "jobsub", user, "100px")}
+${ commonheader(_('Job Designer'), "jobsub", user, "100px") | n,unicode }
 ${layout.menubar(section='designs')}
 
 
@@ -33,17 +33,21 @@ ${layout.menubar(section='designs')}
 <script src="/static/ext/js/jquery/plugins/jquery-ui-autocomplete-1.8.18.min.js" type="text/javascript" charset="utf-8"></script>
 
 
-<%def name="render_field(field)">
-  %if not field.is_hidden:
-    <% group_class = len(field.errors) and "error" or "" %>
-    <div class="control-group ${group_class}">
-      <label class="control-label">${field.label | n}</label>
+
+
+<%def name="render_field(field, show_label=True, extra_attrs={})">
+  % if not field.is_hidden:
+    <% group_class = field.errors and "error" or "" %>
+    <div class="control-group ${group_class}"
+      rel="popover" data-original-title="${ field.label }" data-content="${ field.help_text }">
+      % if show_label:
+        <label class="control-label">${ field.label }</label>
+      % endif
       <div class="controls">
-        <input type="text" name="${field.html_name | n}"
-            class="span5 ${field.field.widget.attrs.get('class', '')}"
-            value="${extract_field_data(field) or ''}" />
-        % if len(field.errors):
-          <span class="help-inline">${unicode(field.errors) | n}</span>
+        <% field.field.widget.attrs.update(extra_attrs) %>
+        ${ field | n,unicode }
+        % if field.errors:
+          <span class="help-inline">${ unicode(field.errors) | n,unicode }</span>
         % endif
       </div>
     </div>
@@ -198,7 +202,7 @@ ${layout.menubar(section='designs')}
 
 <script type="text/javascript" charset="utf-8">
     $(document).ready(function(){
-        var propertiesHint = ${properties_hint};
+        var propertiesHint = ${ properties_hint | n,unicode };
 
         // The files and archives are dictionaries in the model, because we
         // can add and remove it the same way we add/remove properties.
@@ -287,9 +291,10 @@ ${layout.menubar(section='designs')}
             };
         };
 
-        var viewModel = new ViewModel(${properties},
-                arrayToDictArray(${files}),
-                arrayToDictArray(${archives}));
+        var viewModel = new ViewModel(
+                ${ properties | n,unicode },
+                arrayToDictArray(${ files | n,unicode }),
+                arrayToDictArray(${ archives | n,unicode }));
 
         ko.bindingHandlers.fileChooser = {
             init: function(element, valueAccessor, allBindings, model) {
@@ -327,4 +332,4 @@ ${layout.menubar(section='designs')}
 </script>
 
 
-${commonfooter(messages)}
+${ commonfooter(messages) | n,unicode }

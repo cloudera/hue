@@ -17,14 +17,17 @@
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
+
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="util" file="util.mako" />
-${commonheader(_('Create table from file'), app_name, user, '100px')}
+
+${ commonheader(_('Create table from file'), app_name, user, '100px') | n,unicode }
 ${layout.menubar(section='history')}
+
 <div class="container-fluid">
 % if error_msg:
-<h4>${error_msg}</h4>
+  <h4>${error_msg}</h4>
 % endif
   <h1>${_('Save Query Results')}</h1>
 
@@ -122,4 +125,5 @@ ${layout.menubar(section='history')}
     }
   });
 </script>
-${commonfooter(messages)}
+
+${ commonfooter(messages) | n,unicode }

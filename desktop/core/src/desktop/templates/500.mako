@@ -18,7 +18,7 @@ from desktop.lib.i18n import smart_unicode
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
-${commonheader(_('Error'), "", user)}
+${ commonheader(_('Error'), "", user) | n,unicode }
 
   <div class="container-fluid">
     <h1>${_('Server Error (500)')}</h1>
@@ -42,9 +42,9 @@ ${commonheader(_('Error'), "", user)}
           <tbody>
             % for (file_name, line_number, function_name, text) in traceback:
               <tr>
-                <td>${smart_unicode(file_name) or "" | h}</td>
-                <td>${smart_unicode(line_number) or "" | h}</td>
-                <td>${smart_unicode(function_name) or "" | h}</td>
+                <td>${smart_unicode(file_name) or ""}</td>
+                <td>${smart_unicode(line_number) or ""}</td>
+                <td>${smart_unicode(function_name) or ""}</td>
               </tr>
             % endfor
           </tbody>
@@ -62,4 +62,4 @@ ${commonheader(_('Error'), "", user)}
     }
   </script>
 
-${commonfooter(messages)}
+${ commonfooter(messages) | n,unicode }

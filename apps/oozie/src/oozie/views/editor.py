@@ -34,20 +34,18 @@ from desktop.lib.django_util import render, extract_field_data
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.rest.http_client import RestException
 from hadoop.fs.exceptions import WebHdfsException
-from jobsub.models import OozieDesign
 from liboozie.submittion import Submission
 
 from oozie.conf import SHARE_JOBS
 from oozie.decorators import check_job_access_permission, check_job_edition_permission,\
                              check_dataset_access_permission, check_dataset_edition_permission
 from oozie.import_workflow import import_workflow as _import_workflow
-from oozie.import_jobsub import convert_jobsub_design
 from oozie.management.commands import oozie_setup
-from oozie.models import Job, Workflow, History, Coordinator, Mapreduce, Java, Streaming,\
+from oozie.models import Job, Workflow, History, Coordinator,\
                          Dataset, DataInput, DataOutput, ACTION_TYPES
 from oozie.forms import WorkflowForm, CoordinatorForm, DatasetForm,\
   DataInputForm, DataInputSetForm, DataOutputForm, DataOutputSetForm, LinkForm,\
-  DefaultLinkForm, design_form_by_type, ImportJobsubDesignForm, ParameterForm,\
+  DefaultLinkForm, design_form_by_type, ParameterForm,\
   ImportWorkflowForm
 
 
@@ -334,8 +332,7 @@ def edit_coordinator(request, coordinator):
     'dataset_form': dataset_form,
     'new_data_input_formset': new_data_input_formset,
     'new_data_output_formset': new_data_output_formset,
-    'history': history,
-    'parameters': extract_field_data(coordinator_form['parameters'])
+    'history': history
   })
 
 

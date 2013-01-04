@@ -21,7 +21,7 @@
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="layout" file="layout.mako" />
 
-${commonheader(_("Create table manually"), app_name, user, '100px')}
+${ commonheader(_("Create table manually"), app_name, user, '100px') | n,unicode }
 ${layout.menubar(section='tables')}
 
 <div class="container-fluid">
@@ -733,4 +733,4 @@ $(document).ready(function () {
 });
 </script>
 
-${commonfooter(messages)}
+${ commonfooter(messages) | n,unicode }

@@ -21,7 +21,7 @@
 
 <%namespace name="layout" file="layout.mako" />
 
-${commonheader(_('Beeswax Table Partitions: %(tableName)s') % dict(tableName=table.name), app_name, user, '100px')}
+${ commonheader(_('Beeswax Table Partitions: %(tableName)s') % dict(tableName=table.name), app_name, user, '100px') | n,unicode }
 ${layout.menubar(section='tables')}
 
 <div class="container-fluid">
@@ -57,4 +57,4 @@ ${layout.menubar(section='tables')}
 
 </div>
 
-${commonfooter(messages)}
+${ commonfooter(messages) | n,unicode }

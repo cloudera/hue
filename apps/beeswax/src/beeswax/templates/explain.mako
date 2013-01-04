@@ -22,7 +22,7 @@ from django.utils.translation import ugettext as _
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="util" file="util.mako" />
 
-${commonheader(_('Query Explanation'), app_name, user, '100px')}
+${ commonheader(_('Query Explanation'), app_name, user, '100px') | n,unicode }
 ${layout.menubar(section='saved queries')}
 
 <div class="container-fluid">
@@ -47,4 +47,4 @@ ${layout.menubar(section='saved queries')}
 
 </div>
 
-${commonfooter(messages)}
+${ commonfooter(messages) | n,unicode }

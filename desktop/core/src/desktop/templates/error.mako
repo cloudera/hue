@@ -19,19 +19,19 @@ from desktop.lib.i18n import smart_unicode
 from django.utils.translation import ugettext as _
 %>
 
-${commonheader(_('Error'), app_name, user)}
+${ commonheader(_('Error'), app_name, user) | n,unicode }
 
   <div class="container-fluid">
-    <h1>${_('Error!')}</h1>
-    <pre>${smart_unicode(error) | h }</pre>
+    <h1>${ _('Error!') }</h1>
+    <pre>${ smart_unicode(error) }</pre>
 
     %if traceback:
       <textarea style="width: 100%;" rows=80 readonly="readonly">
-      ${smart_unicode(traceback) | h}
+      ${ smart_unicode(traceback) }
       </textarea>
     %endif
 
     <a class="btn" onclick="history.back()">${ _('Back') }</a>
   </div>
 
-${commonfooter(messages)}
+${ commonfooter(messages) | n,unicode }

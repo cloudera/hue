@@ -15,7 +15,7 @@
 ## limitations under the License.
 
     <action name="${ node }">
-        ${ node.xml }
+        ${ node.xml | n,unicode }
         <ok to="${ node.get_oozie_child('ok') }"/>
         <error to="${ node.get_oozie_child('error') }"/>
     </action>

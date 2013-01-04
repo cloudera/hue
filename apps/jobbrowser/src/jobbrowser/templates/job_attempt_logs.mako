@@ -20,7 +20,7 @@
 
 <%namespace name="comps" file="jobbrowser_components.mako" />
 
-${ commonheader(_('Job Browser - Job Attempt: %(attempt_index)s') % {'attempt_index': attempt_index}, "jobbrowser", user) }
+${ commonheader(_('Job Browser - Job Attempt: %(attempt_index)s') % {'attempt_index': attempt_index}, "jobbrowser", user) | n,unicode }
 
 <div class="container-fluid">
     <h1>
@@ -110,4 +110,4 @@ ${ commonheader(_('Job Browser - Job Attempt: %(attempt_index)s') % {'attempt_in
     });
 </script>
 
-${ commonfooter(messages) }
+${ commonfooter(messages) | n,unicode }

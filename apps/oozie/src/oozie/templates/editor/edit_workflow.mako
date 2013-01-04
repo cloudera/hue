@@ -17,6 +17,7 @@
 <%!
   from desktop.views import commonheader, commonfooter
   from django.utils.translation import ugettext as _
+  from django.template.defaultfilters import escapejs
 %>
 
 <%namespace name="layout" file="../navigation-bar.mako" />
@@ -25,7 +26,7 @@
 <%namespace name="controls" file="control_utils.mako" />
 <%namespace name="workflows" file="workflow_utils.mako" />
 
-${ commonheader(_("Oozie App"), "oozie", user, "100px") }
+${ commonheader(_("Oozie App"), "oozie", user, "100px") | n,unicode }
 ${ layout.menubar(section='workflows') }
 
 
@@ -160,7 +161,7 @@ ${ layout.menubar(section='workflows') }
               <div class="tab-pane" id="import">
                 <p>
                 <a title="${ _('Click to add to the end of the workflow') }" class="btn import-jobsub-node-link">
-                  <i class="icon-plus"></i> ${ _('Import Job Designer Workflow') }
+                  <i class="icon-plus"></i> ${ _('Job Designer Workflow') }
                 </a>
                 <p/>
               </div>
@@ -489,8 +490,8 @@ var workflow_model = new WorkflowModel({
   job_xml: "${ workflow.job_xml }",
   deployment_dir: "${ workflow.deployment_dir }",
   is_shared: "${ workflow.is_shared }" == "True",
-  parameters: ${ workflow.parameters },
-  job_properties: ${ workflow.job_properties }
+  parameters: ${ workflow.parameters_escapejs | n,unicode },
+  job_properties: ${ workflow.job_properties_escapejs | n,unicode }
 });
 var registry = new Registry();
 var workflow = new Workflow({
@@ -754,4 +755,4 @@ ${ utils.path_chooser_libs(True) }
   });
 </script>
 
-${ commonfooter(messages) }
+${ commonfooter(messages) | n,unicode }

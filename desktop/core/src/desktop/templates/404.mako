@@ -17,7 +17,7 @@
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
-${commonheader(_('Not Found'), "", user)}
+${ commonheader(_('Not Found'), "", user) | n,unicode }
 
   <div class="container-fluid">
     <h1>${_('Page not found')}</h1>
@@ -26,4 +26,4 @@ ${commonheader(_('Not Found'), "", user)}
     <code>${uri}</code>
   </div>
 
-${commonfooter(messages)}
+${ commonfooter(messages) | n,unicode }

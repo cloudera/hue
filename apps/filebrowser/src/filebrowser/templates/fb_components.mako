@@ -39,9 +39,9 @@ from django.utils.translation import ugettext as _
                         <% label = breadcrumb_item['label'] %>
                         %if label == '/':
                                 <li><a href="/filebrowser/view${breadcrumb_item['url']}"><span
-                                        class="divider">${label | h}</span></a></li>
+                                        class="divider">${label}</span></a></li>
                         %else:
-                                <li><a href="/filebrowser/view${breadcrumb_item['url']}">${label | h}</a><span class="divider">/</span></li>
+                                <li><a href="/filebrowser/view${breadcrumb_item['url']}">${label}</a><span class="divider">/</span></li>
                         %endif
                         % endfor
                 </ul>

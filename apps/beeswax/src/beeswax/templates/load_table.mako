@@ -21,7 +21,7 @@ from django.utils.translation import ugettext as _
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="util" file="util.mako" />
 
-${commonheader(_('Load Data into %(table)s') % {'table': table}, app_name, user, '100px')}
+${ commonheader(_('Load Data into %(table)s') % {'table': table}, app_name, user, '100px') | n,unicode }
 
 ${layout.menubar()}
 
@@ -53,4 +53,4 @@ ${layout.menubar()}
   </div>
 </div>
 
-${commonfooter(messages)}
+${ commonfooter(messages) | n,unicode }
