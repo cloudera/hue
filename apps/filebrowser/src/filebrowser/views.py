@@ -52,6 +52,7 @@ from desktop.lib import i18n, paginator
 from desktop.lib.conf import coerce_bool
 from desktop.lib.django_util import make_absolute, render, render_json, format_preserving_redirect
 from desktop.lib.exceptions_renderable import PopupException
+from filebrowser.conf import MAX_SNAPPY_DECOMPRESSION_SIZE
 from filebrowser.lib.archives import archive_factory
 from filebrowser.lib.rwx import filetype, rwx
 from filebrowser.lib import xxd
@@ -637,86 +638,112 @@ def read_contents(codec_type, path, fs, offset, length):
        length - Amount of bytes to read after offset.
        Returns: A tuple of codec_type, offset, length and contents read.
     """
-    # Auto codec detection for [gzip, avro, none]
-    # Only done when codec_type is unset
-    if not codec_type:
-        if path.endswith('.gz') and detect_gzip(fs.open(path).read(2)):
-            codec_type = 'gzip'
-            offset = 0
-        elif path.endswith('.avro') and detect_avro(fs.open(path).read(3)):
-            codec_type = 'avro'
-        else:
-            codec_type = 'none'
-
-    f = fs.open(path)
     contents = ''
 
-    if codec_type == 'gzip':
-        contents = _read_gzip(fs, path, offset, length)
-    elif codec_type == 'avro':
-        contents = _read_avro(fs, path, offset, length)
-    else:
-        # for 'none' type.
-        contents = _read_simple(fs, path, offset, length)
+    try:
+        fhandle = fs.open(path)
+        stats = fs.stats(path)
+
+        # Auto codec detection for [gzip, avro, none]
+        # Only done when codec_type is unset
+        contents = fhandle.read(3)
+        if not codec_type:
+            codec_type = 'none'
+            if path.endswith('.gz') and detect_gzip(contents):
+                codec_type = 'gzip'
+                offset = 0
+            elif path.endswith('.avro'):
+                if detect_avro(contents):
+                    codec_type = 'avro'
+                elif snappy_installed():
+                    if stats.size > MAX_SNAPPY_DECOMPRESSION_SIZE.get():
+                        raise PopupException(_('Failed to validate snappy compressed file. File size is greater than allowed max snappy decompression size of %d') % MAX_SNAPPY_DECOMPRESSION_SIZE.get())
+
+                    if detect_snappy(contents + fhandle.read()):
+                        codec_type = 'snappy_avro'
+        fhandle.seek(0)
+
+        if codec_type == 'avro' and snappy_installed() and detect_snappy(fhandle.read()):
+            fhandle.seek(0)
+            codec_type = 'snappy_avro'
+
+        if codec_type == 'gzip':
+            contents = _read_gzip(fhandle, path, offset, length, stats)
+        elif codec_type == 'avro':
+            contents = _read_avro(fhandle, path, offset, length, stats)
+        elif codec_type == 'snappy_avro':
+            contents = _read_snappy_avro(fhandle, path, offset, length, stats)
+        else:
+            # for 'none' type.
+            contents = _read_simple(fhandle, path, offset, length, stats)
+
+    finally:
+        fhandle.close()
 
     return (codec_type, offset, length, contents)
 
 
-def _read_avro(fs, path, offset, length):
+def _decompress_snappy(compressed_content):
+    try:
+        import snappy
+        return snappy.decompress(compressed_content)
+    except Exception, e:
+        raise PopupException(_('Failed to decompress snappy compressed file.'), detail=e)
+
+
+def _read_snappy_avro(fhandle, path, offset, length, stats):
+    if not snappy_installed():
+        raise PopupException(_('Failed to decompress snappy compressed file. Snappy is not installed!'))
+
+    if stats.size > MAX_SNAPPY_DECOMPRESSION_SIZE.get():
+        raise PopupException(_('Failed to decompress snappy compressed file. File size is greater than allowed max snappy decompression size of %d') % MAX_SNAPPY_DECOMPRESSION_SIZE.get())
+
+    return _read_avro(StringIO(_decompress_snappy(fhandle.read())), path, offset, length, stats)
+
+
+def _read_avro(fhandle, path, offset, length, stats):
     contents = ''
     try:
-        fhandle = fs.open(path)
-        try:
-            fhandle.seek(offset)
-            data_file_reader = datafile.DataFileReader(fhandle, io.DatumReader())
-            contents_list = []
-            read_start = fhandle.tell()
-            # Iterate over the entire sought file.
-            for datum in data_file_reader:
-                read_length = fhandle.tell() - read_start
-                if read_length > length and len(contents_list) > 0:
-                    break
-                else:
-                    datum_str = str(datum) + "\n"
-                    contents_list.append(datum_str)
-            data_file_reader.close()
-            contents = "".join(contents_list)
-        except:
-            logging.warn("Could not read avro file at %s" % path, exc_info=True)
-            raise PopupException(_("Failed to read Avro file."))
-    finally:
-        fhandle.close()
+        fhandle.seek(offset)
+        data_file_reader = datafile.DataFileReader(fhandle, io.DatumReader())
+        contents_list = []
+        read_start = fhandle.tell()
+        # Iterate over the entire sought file.
+        for datum in data_file_reader:
+            read_length = fhandle.tell() - read_start
+            if read_length > length and len(contents_list) > 0:
+                break
+            else:
+                datum_str = str(datum) + "\n"
+                contents_list.append(datum_str)
+        data_file_reader.close()
+        contents = "".join(contents_list)
+    except:
+        logging.warn("Could not read avro file at %s" % path, exc_info=True)
+        raise PopupException(_("Failed to read Avro file."))
     return contents
 
 
-def _read_gzip(fs, path, offset, length):
+def _read_gzip(fhandle, path, offset, length, stats):
     contents = ''
     if offset and offset != 0:
         raise PopupException(_("Offsets are not supported with Gzip compression."))
     try:
-        fhandle = fs.open(path)
-        try:
-            contents = GzipFile('', 'r', 0, StringIO(fhandle.read())).read(length)
-        except:
-            logging.warn("Could not decompress file at %s" % path, exc_info=True)
-            raise PopupException(_("Failed to decompress file."))
-    finally:
-        fhandle.close()
+        contents = GzipFile('', 'r', 0, StringIO(fhandle.read())).read(length)
+    except:
+        logging.warn("Could not decompress file at %s" % path, exc_info=True)
+        raise PopupException(_("Failed to decompress file."))
     return contents
 
 
-def _read_simple(fs, path, offset, length):
+def _read_simple(fhandle, path, offset, length, stats):
     contents = ''
     try:
-        fhandle = fs.open(path)
-        try:
-            fhandle.seek(offset)
-            contents = fhandle.read(length)
-        except:
-            logging.warn("Could not read file at %s" % path, exc_info=True)
-            raise PopupException(_("Failed to read file."))
-    finally:
-        fhandle.close()
+        fhandle.seek(offset)
+        contents = fhandle.read(length)
+    except:
+        logging.warn("Could not read file at %s" % path, exc_info=True)
+        raise PopupException(_("Failed to read file."))
     return contents
 
 
@@ -729,6 +756,28 @@ def detect_avro(contents):
     '''This is a silly small function which checks to see if the file is Avro'''
     # Check if the first three bytes are 'O', 'b' and 'j'
     return contents[:3] == '\x4F\x62\x6A'
+
+
+def detect_snappy(contents):
+    '''
+    This is a silly small function which checks to see if the file is Snappy.
+    It requires the entire contents of the compressed file.
+    This will also return false if snappy decompression if we do not have the library available.
+    '''
+    try:
+        import snappy
+        return snappy.isValidCompressed(contents)
+    except:
+        return False
+
+
+def snappy_installed():
+    '''Snappy is library that isn't supported by python2.4'''
+    try:
+        import snappy
+        return True
+    except:
+        return False
 
 
 def _calculate_navigation(offset, length, size):

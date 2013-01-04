@@ -55,7 +55,7 @@ ${commonheader(_('%(filename)s - File Viewer') % dict(filename=truncate(filename
 				        <li><a href="${base_url}?offset=0&length=2000&mode=${view['mode']}&compression=gzip">${_('Preview As Gzip')}</a></li>
 				      % endif
 
-				      % if view['compression'] != "avro" and path.endswith('.avro'):
+				      % if view['compression'] != "avro" and view['compression'] != "snappy_avro" and path.endswith('.avro'):
 				        <li><a href="${base_url}?offset=0&length=2000&mode=${view['mode']}&compression=avro">${_('Preview As Avro')}</a></li>
 				      % endif
 
