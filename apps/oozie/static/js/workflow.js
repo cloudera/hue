@@ -187,25 +187,6 @@ var ModalModule = function($, ko) {
 };
 var Modal = ModalModule($, ko);
 
-/**
- * ID Generator
- * Generate a new ID starting from 1.
- * - Accepts a prefix that will be prepended like so: <prefix>:<id number>
- */
-var IdGeneratorModule = function($) {
-  return function(options) {
-    var self = this;
-    $.extend(self, options);
-
-    self.counter = 1;
-
-    self.nextId = function() {
-      return ((self.prefix) ? self.prefix + ':' : '') + self.counter++;
-    };
-  };
-};
-var IdGenerator = IdGeneratorModule($);
-
 var ModelModule = function($) {
   var module = function(attrs) {
     var self = this;
@@ -510,6 +491,97 @@ function nodeModelChooser(node_type) {
       return NodeModel;
   }
 }
+
+
+/**
+ * Import node module
+ * Assists in the conversion of a jobsub node.
+ * Assists in the population of available nodes.
+ */
+var ImportNodeModule = function($) {
+  var module = function(options) {
+    var self = this;
+
+    self.workflow = options.workflow;
+    self.available_nodes = [];
+    self.url = ko.computed(function() {
+      return '/oozie/workflows/' + options.workflow.id() + '/jobsub/actions'
+    });
+
+    module.prototype.initialize.apply(self, arguments);
+
+    return self;
+  };
+
+  $.extend(module.prototype, {
+    initialize: function(options) {
+      var self = this;
+
+      if (options.nodes) {
+        $.each(options.nodes, function(index, node) {
+          self.available_nodes.push(node);
+        });
+      }
+    },
+
+    getAvailableNodes: function() {
+      var self = this;
+
+      return self.available_nodes;
+    },
+
+    loadAvailableNodes: function() {
+      var self = this;
+
+      $.getJSON(self.url(), function(data) {
+        if (data.status == 0) {
+          self.initialize(data.data);
+        } else {
+          $.jHueNotify.error("${ _('Received invalid response from server: ') }" + JSON.stringify(data));
+        }
+      });
+    },
+
+    convertNode: function(options, jobsub_id) {
+      var self = this;
+
+      var options = options || {};
+
+      var request = $.extend({
+        url: self.url(),
+        type: 'POST',
+        data: { 'jobsub_id': jobsub_id },
+        success: $.noop,
+        error: $.noop
+      }, options);
+
+      $.ajax(request);
+    },
+  });
+
+  return module;
+};
+var ImportNode = ImportNodeModule($);
+
+
+/**
+ * ID Generator
+ * Generate a new ID starting from 1.
+ * - Accepts a prefix that will be prepended like so: <prefix>:<id number>
+ */
+var IdGeneratorModule = function($) {
+  return function(options) {
+    var self = this;
+    $.extend(self, options);
+
+    self.counter = 1;
+
+    self.nextId = function() {
+      return ((self.prefix) ? self.prefix + ':' : '') + self.counter++;
+    };
+  };
+};
+var IdGenerator = IdGeneratorModule($);
 
 var IdGeneratorTable = {
   mapreduce: new IdGenerator({prefix: 'mapreduce'}),

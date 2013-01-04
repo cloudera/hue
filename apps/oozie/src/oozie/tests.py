@@ -38,7 +38,7 @@ from liboozie.oozie_api_test import OozieServerProvider
 from liboozie.types import WorkflowList, Workflow as OozieWorkflow, Coordinator as OozieCoordinator,\
   CoordinatorList, WorkflowAction
 
-from oozie.models import Workflow, Node, Kill, Link, Job, Coordinator, History,\
+from oozie.models import Workflow, Node, Kill, Streaming, Link, Job, Coordinator, History,\
   find_parameters, NODE_TYPES
 from oozie.conf import SHARE_JOBS
 from oozie.utils import workflow_to_dict, model_to_dict
@@ -417,6 +417,36 @@ class TestAPI(OozieMockBase):
     assert_equal(0, len(test_response_json_object['data']['prepares']), test_response_json_object['data'])
     assert_true('archives' in test_response_json_object['data'], test_response_json_object['data'])
     assert_equal(0, len(test_response_json_object['data']['archives']), test_response_json_object['data'])
+
+
+class TestAPIWithOozie(OozieBase):
+  def setUp(self):
+    OozieBase.setUp(self)
+
+    # When updating wf, update wf_json as well!
+    self.wf = Workflow.objects.get(name='MapReduce').clone(self.cluster.fs, self.user)
+
+  def test_import_jobsub_actions(self):
+    # Setup jobsub examples
+    if not jobsub_setup.Command().has_been_setup():
+      jobsub_setup.Command().handle()
+
+    # There should be 3 from examples
+    jobsub_design = OozieDesign.objects.all()[0]
+    response = self.c.post(reverse('oozie:workflow_jobsub_actions', kwargs={'workflow': self.wf.id}), data={'jobsub_id': jobsub_design.id}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+    assert_equal(200, response.status_code)
+    response_dict = json.loads(response.content)
+    assert_equal(0, response_dict['status'], response)
+    assert_equal(jobsub_design.name, response_dict['data']['node']['name'], response)
+    assert_equal(jobsub_design.description, response_dict['data']['node']['description'], response)
+    assert_equal('streaming', response_dict['data']['node']['node_type'], response)
+
+    # There should now be an imported action at the end of Node list
+    # Need to test properties to make sure we got it right
+    # Must also make sure that jobsub field values are translated
+    translation_regex = re.compile('(?<!\$)\$(\w+)')
+    for field in Streaming.PARAM_FIELDS:
+      assert_equal(translation_regex.sub(r'${\1}', getattr(jobsub_design.get_root_action(), field)), response_dict['data']['node'][field], response)
 
 
 class TestApiPermissionsWithOozie(OozieBase):
@@ -1431,30 +1461,6 @@ class TestEditorWithOozie(OozieBase):
 
     assert_not_equal(self.wf.deployment_dir, wf2.deployment_dir)
     assert_not_equal('', wf2.deployment_dir)
-
-
-  def test_import_action(self):
-    raise SkipTest
-
-    # Setup jobsub examples
-    if not jobsub_setup.Command().has_been_setup():
-      jobsub_setup.Command().handle()
-
-    # There should be 3 from examples
-    jobsub_design = OozieDesign.objects.all()[0]
-    node_size = len(Node.objects.all())
-    kwargs = dict(workflow=self.wf.id, parent_action_id=self.wf.end.get_parents()[0].id)
-    response = self.c.post(reverse('oozie:import_action', kwargs=kwargs), {'action_id': jobsub_design.id})
-    assert_equal(302, response.status_code)
-    assert_equal(node_size + 1, len(Node.objects.all()))
-
-    # There should now be an imported action at the end of Node list
-    # Need to test properties to make sure we got it right
-    # Must also make sure that jobsub field values are translated
-    translation_regex = re.compile('(?<!\$)\$(\w+)')
-    node = Node.objects.all()[len(Node.objects.all())-1].get_full_node()
-    for field in node.PARAM_FIELDS:
-      assert_equal(translation_regex.sub(r'${\1}', getattr(jobsub_design.get_root_action(), field)), getattr(node, field))
 
 
   def test_import_workflow(self):

@@ -71,6 +71,9 @@ ${ layout.menubar(section='workflows') }
               <li class="active">
                 <a href="#add" data-toggle="tab">${ _('Add') }</a>
               </li>
+              <li>
+                <a href="#import" data-toggle="tab">${ _('Import') }</a>
+              </li>
              </ul>
 
             <div class="tab-content">
@@ -151,6 +154,13 @@ ${ layout.menubar(section='workflows') }
                 <a data-node-type="generic"
                   title="${ _('Click to add to the end of the workflow') }" class="btn new-node-link">
                   <i class="icon-plus"></i> ${ _('Generic') }
+                </a>
+                <p/>
+              </div>
+              <div class="tab-pane" id="import">
+                <p>
+                <a title="${ _('Click to add to the end of the workflow') }" class="btn import-jobsub-node-link">
+                  <i class="icon-plus"></i> ${ _('Import Job Designer Workflow') }
                 </a>
                 <p/>
               </div>
@@ -382,6 +392,8 @@ ${ layout.menubar(section='workflows') }
 % for form_info in action_forms:
   ${ actions.action_form(action_form=form_info[1], node_type=form_info[0], template=True) }
 % endfor
+
+${ actions.import_jobsub_form(template=True) }
 
 ${ controls.fork_form('fork', True, javascript_attrs={'convert': 'function(data, event) { $data.convertToDecision(); $data._workflow.rebuild(); }'}) }
 
@@ -735,6 +747,68 @@ $('#workflow').on('click', '.delete-node-btn', function(e) {
   workflow.rebuild();
 
   workflow.is_dirty( true );
+});
+
+/**
+ * Import node
+ */
+var import_node = new ImportNode({workflow: workflow});
+import_node.loadAvailableNodes();
+
+$('#workflow').on('click', '.import-jobsub-node-link', function(e) {
+  var tempModelView = {
+    selected_node: ko.observable(),
+    available_nodes: ko.observableArray(import_node.getAvailableNodes()),
+    setJobDesignerId: function(data, event) {
+      tempModelView.selected_node(data);
+      return true;
+    }
+  };
+
+  modal.hide();
+  modal.setTemplate('ImportNodeTemplate');
+  modal.show(tempModelView);
+  modal.recenter(280, 250);
+  modal.addDecorations();
+
+  var cancel_edit = function() {
+    modal.hide();
+
+    // Prevent event propagation
+    return false;
+  };
+
+  var try_save = function() {
+    import_node.convertNode({
+      success: function(data) {
+        var node = data.data.node;
+        var NodeModel = nodeModelChooser(node.node_type);
+        node.id = IdGeneratorTable[node.node_type].nextId();
+        node.name = node.id;
+        node.child_links = [];
+        var model = new NodeModel(node);
+        var new_node = new Node(workflow, model, workflow.registry);
+        workflow.registry.add(new_node.id(), new_node);
+
+        // save, add kill, add node to workflow.
+        new_node.addChild(workflow.kill);
+        workflow.nodes()[workflow.nodes().length - 2].append(new_node);
+        workflow.is_dirty( true );
+        $('#workflow').trigger('workflow:rebuild');
+
+        $.jHueNotify.info("${ _('Imported Job Designer workflow as node.') }");
+      },
+      error: function() {
+        $.jHueNotify.error("${ _('Could not import Job Designer workflow as node.') }");
+      }
+    }, tempModelView.selected_node().id);
+    modal.hide();
+  };
+
+  $('.modal-backdrop').on('click', cancel_edit);
+  modal.el.on('click', '.close', cancel_edit);
+  modal.el.on('click', '.cancelButton', cancel_edit);
+  modal.el.on('click', '.doneButton', try_save);
 });
 
 
