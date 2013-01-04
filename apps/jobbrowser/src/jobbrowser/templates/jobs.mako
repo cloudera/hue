@@ -29,7 +29,7 @@
 </%def>
 
 % if jobs or filtered:
-${commonheader(_('Job Browser'), "jobbrowser", user)}
+${ commonheader(_('Job Browser'), "jobbrowser", user) | n,unicode }
 <div class="container-fluid">
 <h1>${_('Job Browser')}</h1>
 <form class="well form-inline" action="/jobbrowser/jobs" method="GET">
@@ -153,7 +153,7 @@ ${commonheader(_('Job Browser'), "jobbrowser", user)}
     % endif
 
     % else:
-        ${commonheader(_('Job Browser'), "jobbrowser", user)}
+        ${ commonheader(_('Job Browser'), "jobbrowser", user) | n,unicode }
         <div class="container-fluid">
         <h1>${_('Welcome to the Job Browser')}</h1>
         <div>
@@ -237,4 +237,4 @@ ${commonheader(_('Job Browser'), "jobbrowser", user)}
     });
 </script>
 
-${commonfooter(messages)}
+${ commonfooter(messages) | n,unicode }

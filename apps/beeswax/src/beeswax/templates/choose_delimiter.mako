@@ -22,7 +22,7 @@ from django.utils.translation import ugettext as _
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="util" file="util.mako" />
 
-${commonheader(_('Create table from file'), app_name, user, '100px')}
+${ commonheader(_('Create table from file'), app_name, user, '100px') | n,unicode }
 ${layout.menubar(section='tables')}
 
 <div class="container-fluid">
@@ -141,4 +141,4 @@ ${layout.menubar(section='tables')}
     });
 </script>
 
-${commonfooter(messages)}
+${ commonfooter(messages) | n,unicode }

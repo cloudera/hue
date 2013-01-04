@@ -23,7 +23,7 @@ from beeswax.views import collapse_whitespace
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="comps" file="beeswax_components.mako" />
 
-${commonheader(_('Query History'), app_name, user, '100px')}
+${ commonheader(_('Query History'), app_name, user, '100px') | n,unicode }
 ${layout.menubar(section='history')}
 
 <%def name="show_saved_query(design, history)">
@@ -176,4 +176,4 @@ ${layout.menubar(section='history')}
         $("a[data-row-selector='true']").jHueRowSelector();
     });
 </script>
-${commonfooter(messages)}
+${ commonfooter(messages) | n,unicode }

@@ -23,7 +23,7 @@
 <%namespace name="utils" file="../utils.inc.mako" />
 
 
-${ commonheader(_("Oozie App"), "oozie", user, "100px") }
+${ commonheader(_("Oozie App"), "oozie", user, "100px") | n,unicode }
 ${ layout.menubar(section='dashboard') }
 
 
@@ -307,4 +307,4 @@ ${ layout.menubar(section='dashboard') }
   });
 </script>
 
-${ commonfooter(messages) }
+${ commonfooter(messages) | n,unicode }

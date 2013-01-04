@@ -17,10 +17,11 @@
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
+
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="layout" file="layout.mako" />
 
-${commonheader(_('Parameterize Query'), app_name, user, '100px')}
+${ commonheader(_('Parameterize Query'), app_name, user, '100px') | n,unicode }
 
 ${layout.menubar()}
 
@@ -52,4 +53,4 @@ ${layout.menubar()}
     </form>
 </div>
 
-${commonfooter(messages)}
+${ commonfooter(messages) | n,unicode }

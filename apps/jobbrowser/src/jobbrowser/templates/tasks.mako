@@ -21,7 +21,7 @@
 
 <%namespace name="comps" file="jobbrowser_components.mako" />
 
-${ commonheader(_('Task View: Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId_short), "jobbrowser", user) }
+${ commonheader(_('Task View: Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId_short), "jobbrowser", user) | n,unicode }
 
 <%def name="selected(val, state)">
     %   if val is not None and state is not None and val in state:
@@ -127,4 +127,4 @@ ${ commonheader(_('Task View: Job: %(jobId)s - Job Browser') % dict(jobId=job.jo
     });
 </script>
 
-${ commonfooter(messages) }
+${ commonfooter(messages) | n,unicode }

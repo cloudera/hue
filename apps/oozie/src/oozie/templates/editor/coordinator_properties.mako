@@ -62,34 +62,34 @@
 
 </%def>
 
-<%def name="init_viewmodel(element, initial_value)">
+<%def name="init_viewmodel(coordinator)">
   <script type="text/javascript">
     $(document).ready(function(){
-      var ViewModel = function(${ element }) {
+      var ViewModel = function() {
         var self = this;
-        self.${ element } = ko.observableArray(${ element });
+        self.parameters = ko.observableArray(${ coordinator.parameters_escapejs | n });
 
         self.add_parameters = function() {
-          self.${ element }.push({name: "", value: ""});
+          self.parameters.push({name: "", value: ""});
         };
 
         self.remove_parameters = function(val) {
-          self.${ element }.remove(val);
+          self.parameters.remove(val);
         };
 
         self.submit = function(form) {
           var form = $("#jobForm");
 
           $("<input>").attr("type", "hidden")
-                  .attr("name", "${ element }")
-                  .attr("value", ko.utils.stringifyJson(self.${ element }))
+                  .attr("name", "parameters")
+                  .attr("value", ko.utils.stringifyJson(self.parameters))
                   .appendTo(form);
 
           form.submit();
         };
       };
 
-      window.viewModel = new ViewModel(${ initial_value });
+      window.viewModel = new ViewModel();
     });
   </script>
 </%def>

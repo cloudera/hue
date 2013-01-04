@@ -170,11 +170,11 @@
     <div class="control-group ${group_class}"
       rel="popover" data-original-title="${ field.label }" data-content="${ field.help_text }">
       % if show_label:
-        <label class="control-label">${ field.label | h }</label>
+        <label class="control-label">${ field.label }</label>
       % endif
       <div class="controls">
         <% field.field.widget.attrs.update(extra_attrs) %>
-        ${ field }
+        ${ field | n,unicode }
         % if field.errors:
           <span class="help-inline">${ unicode(field.errors) }</span>
         % endif
@@ -188,11 +188,11 @@
     <% group_class = field.errors and "error" or "" %>
     <div class="control-group ${group_class}">
     % if show_label:
-        <label class="control-label">${ field.label | h }</label>
+        <label class="control-label">${ field.label }</label>
     % endif
     <div class="controls">
     <% field.field.widget.attrs.update(extra_attrs) %>
-    ${ field }
+    ${ field | n,unicode }
     % if field.errors:
         <span class="help-inline">${ unicode(field.errors) }</span>
     % endif
@@ -207,13 +207,13 @@
 
 <%def name="render_field_with_error_js(field, error_name, show_label=True, extra_attrs={})">
   % if not field.is_hidden:
-    <div class="control-group" rel="popover" data-original-title="${ field.label }" data-content="${ field.help_text | h }" data-bind="attr: {'class': ( errors.${ error_name }().length > 0 ) ? 'control-group error' : 'control-group'}">
+    <div class="control-group" rel="popover" data-original-title="${ field.label }" data-content="${ field.help_text }" data-bind="attr: {'class': ( errors.${ error_name }().length > 0 ) ? 'control-group error' : 'control-group'}">
       % if show_label:
-        <label class="control-label">${ field.label | h }</label>
+        <label class="control-label">${ field.label }</label>
       % endif
       <div class="controls">
         <% field.field.widget.attrs.update(extra_attrs) %>
-        ${ field }
+        ${ field | n,unicode }
         <ul class="help-inline" data-bind="foreach: errors.${ error_name }()">
           <li class="error" data-bind="html: $data"></li>
         </ul>
@@ -225,7 +225,7 @@
 
 <%def name="render_constant(label, value)">
   <div class="control-group">
-    <label class="control-label">${ label | h }</label>
+    <label class="control-label">${ label }</label>
     <div class="controls">
       <div style="padding-top:4px">
       ${ value }

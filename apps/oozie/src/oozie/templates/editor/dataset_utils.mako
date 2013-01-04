@@ -58,9 +58,9 @@
 </div>
 
 <div class="hide">
-    ${ dataset_form['instance_choice'] }
-    ${ dataset_form['advanced_start_instance'] }
-    ${ dataset_form['advanced_end_instance'] }
+    ${ dataset_form['instance_choice'] | n,unicode }
+    ${ dataset_form['advanced_start_instance'] | n,unicode }
+    ${ dataset_form['advanced_end_instance'] | n,unicode  }
 </div>
 
 <script type="text/javascript">

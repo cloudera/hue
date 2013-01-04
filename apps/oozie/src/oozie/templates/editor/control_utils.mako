@@ -82,7 +82,7 @@
                 <br/>
                 ${"${"} hadoop:counters('secondjob')[RECORDS][REDUCE_OUT] lt 1000000 }
                 <br/>
-                <a href="http://oozie.apache.org/docs/3.3.0/WorkflowFunctionalSpec.html#a4.2_Expression_Language_Functions">More on predicates</a>
+                <a href="http://oozie.apache.org/docs/3.3.0/WorkflowFunctionalSpec.html#a4.2_Expression_Language_Functions">${ _('More on predicates') }</a>
               </div>
             </div>
           </div>

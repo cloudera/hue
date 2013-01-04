@@ -20,10 +20,11 @@ import urllib
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
+
 <%namespace name="commonlayout" file="layout.mako" />
 <%namespace name="actionbar" file="actionbar.mako" />
 
-${commonheader(_('Job Designer'), "jobsub", user, "100px")}
+${ commonheader(_('Job Designer'), "jobsub", user, "100px") | n,unicode }
 ${commonlayout.menubar(section='designs')}
 
 <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
@@ -144,7 +145,6 @@ ${layout()}
     var submitMessage = "${_('Submit %(name)s to the cluster') % dict(name='##PLACEHOLDER##')}";
 
     $(document).ready(function() {
-
         var designTable, viewModel;
 
         $("#filterInput").keyup(function() {
@@ -157,7 +157,7 @@ ${layout()}
             $("#installSamples").modal("show");
         });
 
-        viewModel = new JobSubModel(${designs});
+        viewModel = new JobSubModel(${ designs | n });
         ko.applyBindings(viewModel);
         designTable = $('#designTable').dataTable( {
             "sPaginationType": "bootstrap",
@@ -196,4 +196,5 @@ ${layout()}
         $("a[data-row-selector='true']").jHueRowSelector();
     });
 </script>
-${commonfooter(messages)}
+
+${ commonfooter(messages) | n,unicode }

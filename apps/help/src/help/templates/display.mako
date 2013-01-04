@@ -16,7 +16,7 @@
 <%!
 from desktop.views import commonheader, commonfooter
 %>
-${commonheader("Hue Help", "help", user, "100px")}
+${ commonheader("Hue Help", "help", user, "100px") | n,unicode }
 	<div class="subnav subnav-fixed">
 		<div class="container-fluid">
 		<ul class="nav nav-pills">
@@ -64,4 +64,4 @@ ${commonheader("Hue Help", "help", user, "100px")}
     });
   </script>
 
-${commonfooter(messages)}
+${ commonfooter(messages) | n,unicode }

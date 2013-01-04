@@ -27,7 +27,7 @@ from django.utils.translation import ugettext as _
   else:
     view_or_table_noun = _("Table")
 %>
-${commonheader(_("%s Metadata: %s") % (view_or_table_noun, table.name), app_name, user, '100px')}
+${ commonheader(_("%s Metadata: %s") % (view_or_table_noun, table.name), app_name, user, '100px') | n,unicode }
 ${layout.menubar(section='tables')}
 
 <%def name="column_table(cols)">
@@ -277,4 +277,4 @@ ${layout.menubar(section='tables')}
    });
  </script>
 
- ${commonfooter(messages)}
+ ${ commonfooter(messages) | n,unicode }

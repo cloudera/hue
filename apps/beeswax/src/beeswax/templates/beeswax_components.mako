@@ -160,9 +160,9 @@ ${field.label_tag() | n}
                 % endif
             % else:
                 %if file_chooser:
-                    <${tag} name="${field.html_name | n}" value="${extract_field_data(field) or ''}" ${make_attr_str(attrs) | n} class="${cls}" ${plc} /><a class="btn fileChooserBtn" href="#" data-filechooser-destination="${field.html_name | n}">..</a>
+                    <${tag} name="${field.html_name | n}" value="${extract_field_data(field) or ''}" ${make_attr_str(attrs) | n} class="${cls}" ${plc | n,unicode} /><a class="btn fileChooserBtn" href="#" data-filechooser-destination="${field.html_name | n}">..</a>
                 %else:
-                    <${tag} name="${field.html_name | n}" value="${extract_field_data(field) or ''}" ${make_attr_str(attrs) | n} class="${cls}" ${plc} />
+                    <${tag} name="${field.html_name | n}" value="${extract_field_data(field) or ''}" ${make_attr_str(attrs) | n} class="${cls}" ${plc | n,unicode} />
                 %endif
             % endif
         % endif

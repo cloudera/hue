@@ -21,7 +21,7 @@ from django.utils.translation import ugettext as _
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="util" file="util.mako" />
 
-${commonheader(_('Configuration Variables'), app_name, user, '100px')}
+${ commonheader(_('Configuration Variables'), app_name, user, '100px') | n,unicode }
 ${layout.menubar(section='configuration')}
 
 <div class="container-fluid">
@@ -88,4 +88,4 @@ ${layout.menubar(section='configuration')}
 	});
 </script>
 
-${commonfooter(messages)}
+${ commonfooter(messages) | n,unicode }

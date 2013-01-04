@@ -22,7 +22,7 @@
 <%namespace name="layout" file="../navigation-bar.mako" />
 <%namespace name="utils" file="../utils.inc.mako" />
 
-${ commonheader(_("Oozie App"), "oozie", user, "100px") }
+${ commonheader(_("Oozie App"), "oozie", user, "100px") | n,unicode }
 ${ layout.menubar(section='dashboard') }
 
 
@@ -211,11 +211,11 @@ ${ layout.menubar(section='dashboard') }
     </div>
 
     <div class="tab-pane" id="log">
-        <pre>${ oozie_coordinator.log | h }</pre>
+        <pre>${ oozie_coordinator.log }</pre>
     </div>
 
     <div class="tab-pane" id="definition">
-        <pre>${ oozie_coordinator.definition | h }</pre>
+        <pre>${ oozie_coordinator.definition }</pre>
     </div>
     </div>
   </div>
@@ -263,4 +263,4 @@ ${ layout.menubar(section='dashboard') }
   });
 </script>
 
-${commonfooter(messages)}
+${ commonfooter(messages) | n,unicode }

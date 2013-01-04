@@ -22,7 +22,7 @@ from useradmin.models import group_permissions
 
 <%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="layout" file="layout.mako" />
-${commonheader(_('Hue Groups'), "useradmin", user, "100px")}
+${ commonheader(_('Hue Groups'), "useradmin", user, "100px") | n,unicode }
 ${layout.menubar(section='groups', _=_)}
 
 <div class="container-fluid">
@@ -165,4 +165,4 @@ ${layout.menubar(section='groups', _=_)}
 
 ${layout.commons()}
 
-${commonfooter(messages)}
+${ commonfooter(messages) | n,unicode }

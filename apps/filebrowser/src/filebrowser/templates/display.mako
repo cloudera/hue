@@ -28,7 +28,7 @@
 %>
 <%namespace name="fb_components" file="fb_components.mako" />
 
-${commonheader(_('%(filename)s - File Viewer') % dict(filename=truncate(filename)), 'filebrowser', user)}
+${ commonheader(_('%(filename)s - File Viewer') % dict(filename=truncate(filename)), 'filebrowser', user) | n,unicode }
 
 
 
@@ -144,7 +144,7 @@ ${commonheader(_('%(filename)s - File Viewer') % dict(filename=truncate(filename
 		    % endif
 		      <div>
 		      % if 'contents' in view:
-		             <div><pre>${view['contents']|h}</pre></div>
+		             <div><pre>${view['contents']}</pre></div>
 		      % else:
 		        <table>
 		          % for offset, words, masked in view['xxd']:
@@ -214,4 +214,4 @@ ${commonheader(_('%(filename)s - File Viewer') % dict(filename=truncate(filename
 			});
 		});
 	</script>
-${commonfooter(messages)}
+${ commonfooter(messages) | n,unicode }

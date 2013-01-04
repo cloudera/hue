@@ -90,7 +90,7 @@
     % endfor
 </%def>
 
-${commonheader(_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId_short), "jobbrowser", user)}
+${ commonheader(_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId_short), "jobbrowser", user) | n,unicode }
 
 <div class="container-fluid">
     <h1>${_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId_short)}</h1>
@@ -394,4 +394,4 @@ ${commonheader(_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId_short), 
 </script>
 
 
-${commonfooter(messages)}
+${ commonfooter(messages) | n,unicode }

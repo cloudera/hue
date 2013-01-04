@@ -1298,6 +1298,29 @@ class TestEditor(OozieMockBase):
     workflow.delete()
 
 
+  def test_xss_escape_js(self):
+    escaped = '[{"name": "oozie.use.system.libpath", "value": "true"}, {"name": "123\\\\u0022\\\\u003E\\\\u003Cscript\\\\u003Ealert(1)\\\\u003C/script\\\\u003E", "value": "hacked"}]'
+    hacked = '[{"name":"oozie.use.system.libpath","value":"true"}, {"name": "123\\"><script>alert(1)</script>", "value": "hacked"}]'
+
+    self.wf.job_properties = hacked
+    self.wf.parameters = hacked
+
+    assert_equal(escaped, self.wf._escapejs_parameters_list(hacked))
+    assert_equal(escaped, self.wf.job_properties_escapejs)
+    assert_equal(escaped, self.wf.parameters_escapejs)
+
+
+  def test_xss_html_escaping(self):
+    data = WORKFLOW_DICT.copy()
+    data['description'] = [u'"><script>alert(1);</script>']
+
+    self.wf = create_workflow(self.c, workflow_dict=data)
+
+    resp = self.c.get('/oozie/list_workflows/')
+    assert_false('"><script>alert(1);</script>' in resp.content, resp.content)
+    assert_true('&quot;&gt;&lt;script&gt;alert(1);&lt;/script&gt;' in resp.content, resp.content)
+
+
 class TestPermissions(OozieBase):
 
   def setUp(self):

@@ -23,7 +23,7 @@ from django.contrib.auth.models import Group
 
 <%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="layout" file="layout.mako" />
-${commonheader(_('Hue Permissions'), "useradmin", user, "100px")}
+${ commonheader(_('Hue Permissions'), "useradmin", user, "100px") | n,unicode }
 ${layout.menubar(section='permissions', _=_)}
 
 <div class="container-fluid">
@@ -92,4 +92,4 @@ ${layout.menubar(section='permissions', _=_)}
 
 ${layout.commons()}
 
-${commonfooter(messages)}
+${ commonfooter(messages) | n,unicode }

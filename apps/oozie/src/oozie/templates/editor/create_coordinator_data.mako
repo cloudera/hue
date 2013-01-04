@@ -54,7 +54,7 @@ from django.utils.safestring import mark_safe
 
   <button type="button" class="btn" data-bind="click: add_${ element }">${ _('Add') }</button>
 
-  ${ formset.management_form }
+  ${ formset.management_form | n,unicode }
 
   </div>
 

@@ -23,7 +23,7 @@
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="layout" file="layout.mako" />
 
-${commonheader(_('Queries'), app_name, user, '100px')}
+${ commonheader(_('Queries'), app_name, user, '100px') | n,unicode }
 ${layout.menubar(section='saved queries')}
 <div class="container-fluid">
     <h1>${_('Queries')}</h1>
@@ -134,4 +134,4 @@ ${layout.menubar(section='saved queries')}
     });
 </script>
 
-${commonfooter(messages)}
+${ commonfooter(messages) | n,unicode }

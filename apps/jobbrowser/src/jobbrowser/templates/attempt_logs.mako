@@ -19,7 +19,7 @@
 %>
 <%namespace name="comps" file="jobbrowser_components.mako" />
 
-${commonheader(_('Task Attempt: %(attemptId)s - Job Browser') % dict(attemptId=attempt.attemptId_short), "jobbrowser", user)}
+${ commonheader(_('Task Attempt: %(attemptId)s - Job Browser') % dict(attemptId=attempt.attemptId_short), "jobbrowser", user) | n,unicode }
 <div class="container-fluid">
     <h1>${_('Task Attempt: %(attemptId)s - Job Browser') % dict(attemptId=attempt.attemptId_short)}</h1>
     <div class="row-fluid">
@@ -68,7 +68,7 @@ ${commonheader(_('Task Attempt: %(attemptId)s - Job Browser') % dict(attemptId=a
                     <%def name="format_log(raw)">
                         ## have to remove any indentation here or it breaks inside the pre tags
                           % for line in raw.split('\n'):
-                              ${ line | h,trim }
+                              ${ line | unicode,trim }
                         % endfor
                     </%def>
                     <h2>${_('task diagnostic log')}</h2>
@@ -137,4 +137,4 @@ ${commonheader(_('Task Attempt: %(attemptId)s - Job Browser') % dict(attemptId=a
     });
 </script>
 
-${commonfooter(messages)}
+${ commonfooter(messages) | n,unicode }

@@ -64,22 +64,22 @@ from django.utils.translation import ugettext as _
             <div class="span4 offset4">
                 <form method="POST" action="${action}" class="well">
                     <label>${_('Username')}
-                        ${ form['username'] }
+                        ${ form['username'] | n,unicode }
                         ${ form['username'].errors }
                     </label>
                     <label>${_('Password')}
-                        ${ form['password'] }
+                        ${ form['password'] | n,unicode }
                         ${ form['password'].errors }
                     </label>
 
-                    %if first_login_ever==True:
+                    %if first_login_ever:
                         <input type="submit" class="btn btn-primary" value="${_('Sign up')}" />
                     %else:
                         <input type="submit" class="btn btn-primary" value="${_('Sign in')}" />
                     %endif
                     <input type="hidden" name="next" value="${next}" />
 
-                    %if login_errors==True:
+                    %if login_errors:
                         <br/>
                         <br/>
                         <div class="alert alert-error">
@@ -90,7 +90,7 @@ from django.utils.translation import ugettext as _
             </div>
         </div>
 
-        %if first_login_ever==True:
+        %if first_login_ever:
         <div class="row">
             <div class="span6 offset3">
                 <div class="alert alert-block">

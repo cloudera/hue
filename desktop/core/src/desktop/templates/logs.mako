@@ -20,9 +20,11 @@ from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 import re
 %>
+
 <%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="layout" file="about_layout.mako" />
-${commonheader(_('About'), "about", user, "100px")}
+
+${ commonheader(_('About'), "about", user, "100px") | n,unicode }
 ${layout.menubar(section='log_view')}
 
 <style>
@@ -71,7 +73,7 @@ ${layout.menubar(section='log_view')}
 
   <div id="logs">
       % for l in log:
-        <pre>${smart_unicode(l, errors='ignore') | h}</pre>
+        <pre>${smart_unicode(l, errors='ignore')}</pre>
       % endfor
   </div>
 
@@ -141,4 +143,4 @@ ${layout.menubar(section='log_view')}
   });
 </script>
 
-${commonfooter(messages)}
+${ commonfooter(messages) | n,unicode }

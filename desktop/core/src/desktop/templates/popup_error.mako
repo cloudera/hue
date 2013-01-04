@@ -19,14 +19,14 @@ from desktop.lib.i18n import smart_unicode
 from django.utils.translation import ugettext as _
 %>
 
-${commonheader(title, "", user)}
+${ commonheader(title, "", user) | n,unicode }
 
   <div class="container-fluid">
     <div class="alert">
-      <p><strong>${smart_unicode(message) | h}</strong></p>
+      <p><strong>${smart_unicode(message)}</strong></p>
 
       % if detail:
-      <p>${smart_unicode(detail) or "" | h}</p>
+      <p>${smart_unicode(detail) or "" }</p>
       % endif
 
     </div>
@@ -50,9 +50,9 @@ ${commonheader(title, "", user)}
             <tbody>
               % for (file_name, line_number, function_name, text) in traceback:
                 <tr>
-                  <td>${smart_unicode(file_name) or "" | h}</td>
-                  <td>${smart_unicode(line_number) or "" | h}</td>
-                  <td>${smart_unicode(function_name) or "" | h}</td>
+                  <td>${smart_unicode(file_name) or ""}</td>
+                  <td>${smart_unicode(line_number) or ""}</td>
+                  <td>${smart_unicode(function_name) or ""}</td>
                 </tr>
               % endfor
             </tbody>
@@ -76,4 +76,4 @@ ${commonheader(title, "", user)}
     }
   </script>
 
-${commonfooter(messages)}
+${ commonfooter(messages) | n,unicode }

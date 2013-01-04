@@ -23,7 +23,7 @@ from django.utils.translation import ugettext as _
 
 
 
-${commonheader(_('File Operation'), 'filebrowser', user)}
+${ commonheader(_('File Operation'), 'filebrowser', user) | n,unicode }
 
 ## Not sure if enctype breaks anything if used for things other than file upload.
 
@@ -46,4 +46,4 @@ ${commonheader(_('File Operation'), 'filebrowser', user)}
 </form>
 </div>
 
-${commonfooter(messages)}
+${ commonfooter(messages) | n,unicode }

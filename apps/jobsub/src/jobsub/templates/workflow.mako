@@ -22,7 +22,7 @@
 %>
 <%namespace name="layout" file="layout.mako" />
 
-${commonheader(_("Job Designer"), "jobsub", user, "100px")}
+${ commonheader(_("Job Designer"), "jobsub", user, "100px") | n,unicode }
 ${layout.menubar(section='history')}
 
 <%def name="format_time(st_time)">
@@ -198,12 +198,12 @@ ${layout.menubar(section='history')}
 
         ## Tab: Definition
         <div class="tab-pane" id="definition">
-          <textarea id="definitionEditor">${definition|h}</textarea>
+          <textarea id="definitionEditor">${ definition }</textarea>
         </div>
 
         ## Tab: Log
         <div class="tab-pane" id="log">
-            <pre>${log|h}</pre>
+            <pre>${log}</pre>
         </div>
     </ul>
   </div>
@@ -238,4 +238,4 @@ ${configModal("appConfigModal", "Application Configuration", workflow.conf_dict)
   });
 </script>
 
-${commonfooter(messages)}
+${ commonfooter(messages) | n,unicode }

@@ -24,7 +24,7 @@ from django.utils.translation import ugettext as _
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="actionbar" file="actionbar.mako" />
 
-${commonheader(_('Job Designer'), "jobsub", user, "100px")}
+${ commonheader(_('Job Designer'), "jobsub", user, "100px") | n,unicode }
 ${layout.menubar(section='history')}
 
 <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
@@ -98,4 +98,4 @@ ${layout.menubar(section='history')}
     });
 </script>
 
-${commonfooter(messages)}
+${ commonfooter(messages) | n,unicode }
