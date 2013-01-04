@@ -15,19 +15,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
+
+from django.utils.translation import ugettext as _
+
+
+LOG = logging.getLogger(__name__)
 
 def model_to_dict(model):
   from django.db import models
   from datetime import datetime
   dictionary = {}
   for field in model._meta.fields:
-    attr = getattr(model, field.name, None)
-    if isinstance(attr, models.Model):
-      dictionary[field.name] = attr.id
-    elif isinstance(attr, datetime):
-      dictionary[field.name] = str(attr)
-    else:
-      dictionary[field.name] = attr
+    try:
+      attr = getattr(model, field.name, None)
+      if isinstance(attr, models.Model):
+        dictionary[field.name] = attr.id
+      elif isinstance(attr, datetime):
+        dictionary[field.name] = str(attr)
+      else:
+        dictionary[field.name] = attr
+    except Exception, e:
+      LOG.debug(_("Could not set field %(field)s: %(exception)s") % {'field': field.name, 'exception': str(e)})
   return dictionary
 
 

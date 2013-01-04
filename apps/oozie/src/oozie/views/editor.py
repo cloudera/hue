@@ -43,7 +43,7 @@ from oozie.decorators import check_job_access_permission, check_job_edition_perm
 from oozie.import_workflow import import_workflow as _import_workflow
 from oozie.import_jobsub import convert_jobsub_design
 from oozie.management.commands import oozie_setup
-from oozie.models import Job, Workflow, History, Coordinator,Mapreduce, Java, Streaming,\
+from oozie.models import Job, Workflow, History, Coordinator, Mapreduce, Java, Streaming,\
                          Dataset, DataInput, DataOutput, ACTION_TYPES
 from oozie.forms import WorkflowForm, CoordinatorForm, DatasetForm,\
   DataInputForm, DataInputSetForm, DataOutputForm, DataOutputSetForm, LinkForm,\
@@ -114,12 +114,43 @@ def create_workflow(request):
   })
 
 
+def import_workflow(request):
+  workflow = Workflow.objects.new_workflow(request.user)
+
+  if request.method == 'POST':
+    workflow_form = ImportWorkflowForm(request.POST, request.FILES, instance=workflow)
+
+    if workflow_form.is_valid():
+      workflow.save()
+
+      workflow_definition = workflow_form.cleaned_data['definition_file'].read()
+      schema_version = workflow_form.cleaned_data['schema_version']
+
+      try:
+        _import_workflow(workflow=workflow, workflow_definition=workflow_definition, schema_version=schema_version)
+        request.info(_('Workflow imported'))
+        return redirect(reverse('oozie:edit_workflow', kwargs={'workflow': workflow.id}))
+
+      except Exception, e:
+        request.error(_('Could not import workflow: %s' % e))
+        Workflow.objects.destroy(workflow, request.fs)
+        raise PopupException(_('Could not import workflow.'), detail=e)
+
+    else:
+      request.error(_('Errors on the form: %s') % workflow_form.errors)
+
+  else:
+    workflow_form = ImportWorkflowForm(instance=workflow)
+
+  return render('editor/import_workflow.mako', request, {
+    'workflow_form': workflow_form,
+    'workflow': workflow,
+  })
+
 @check_job_access_permission()
 def edit_workflow(request, workflow):
   history = History.objects.filter(submitter=request.user, job=workflow).order_by('-submission_date')
-
   workflow_form = WorkflowForm(instance=workflow)
-
   user_can_edit_job = workflow.is_editable(request.user)
 
   return render('editor/edit_workflow.mako', request, {
@@ -211,36 +242,6 @@ def schedule_workflow(request, workflow):
     return list_coordinators(request, workflow_id=workflow.id)
   else:
     return create_coordinator(request, workflow=workflow.id)
-
-
-@check_job_access_permission()
-def import_action(request, workflow, parent_action_id):
-  available_actions = OozieDesign.objects.all()
-
-  if request.method == 'POST':
-    form = ImportJobsubDesignForm(data=request.POST, choices=[(action.id, action.name) for action in available_actions])
-    if form.is_valid():
-      try:
-        design = OozieDesign.objects.get(id=form.cleaned_data['action_id'])
-        action = convert_jobsub_design(design)
-        action.workflow = workflow
-        action.save()
-
-        workflow.add_action(action, parent_action_id)
-      except OozieDesign.DoesNotExist:
-        request.error(_('Jobsub design doesn\'t exist.'))
-      except (Mapreduce.DoesNotExist, Streaming.DoesNotExist, Java.DoesNotExist):
-        request.error(_('Could not convert jobsub design'))
-      except:
-        request.error(_('Could not convert jobsub design or add action to workflow'))
-
-    return redirect(reverse('oozie:edit_workflow', kwargs={'workflow': action.workflow.id}))
-
-  return render('editor/import_workflow_action.mako', request, {
-    'workflow': workflow,
-    'available_actions': available_actions,
-    'form_url': reverse('oozie:import_action', kwargs={'workflow': workflow.id, 'parent_action_id': parent_action_id}),
-  })
 
 
 @check_job_access_permission()
@@ -543,40 +544,6 @@ def setup_app(request):
   except WebHdfsException, e:
     raise PopupException(_('The app setup could complete.'), detail=e)
   return redirect(reverse('oozie:list_workflows'))
-
-
-def import_workflow(request):
-  workflow = Workflow.objects.new_workflow(request.user)
-
-  if request.method == 'POST':
-    workflow_form = ImportWorkflowForm(request.POST, request.FILES, instance=workflow)
-
-    if workflow_form.is_valid():
-      workflow.save()
-
-      workflow_definition = workflow_form.cleaned_data['definition_file'].read()
-      schema_version = workflow_form.cleaned_data['schema_version']
-
-      try:
-        _import_workflow(workflow=workflow, workflow_definition=workflow_definition, schema_version=schema_version)
-        request.info(_('Workflow imported'))
-        return redirect(reverse('oozie:edit_workflow', kwargs={'workflow': workflow.id}))
-
-      except Exception, e:
-        request.error(_('Could not import workflow: %s' % e))
-        Workflow.objects.destroy(workflow, request.fs)
-        raise PopupException(_('Could not import workflow.'), detail=e)
-
-    else:
-      request.error(_('Errors on the form: %s') % workflow_form.errors)
-
-  else:
-    workflow_form = ImportWorkflowForm(instance=workflow)
-
-  return render('editor/import_workflow.mako', request, {
-    'workflow_form': workflow_form,
-    'workflow': workflow,
-  })
 
 
 def jasmine(request):

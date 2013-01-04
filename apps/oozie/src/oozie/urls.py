@@ -31,8 +31,6 @@ urlpatterns = patterns(
   url(r'^clone_workflow/(?P<workflow>\d+)$', 'clone_workflow', name='clone_workflow'),
   url(r'^submit_workflow/(?P<workflow>\d+)$', 'submit_workflow', name='submit_workflow'),
   url(r'^schedule_workflow/(?P<workflow>\d+)$', 'schedule_workflow', name='schedule_workflow'),
-
-  url(r'^import_action/(?P<workflow>\d+)/(?P<parent_action_id>\d+)$', 'import_action', name='import_action'),
   url(r'^import_workflow/$', 'import_workflow', name='import_workflow'),
 
   url(r'^list_coordinators/(?P<workflow_id>[-\w]+)?$', 'list_coordinators', name='list_coordinators'),
@@ -59,6 +57,7 @@ urlpatterns += patterns(
   url(r'^workflows/(?P<workflow>\d+)$', 'workflow', name='workflow'),
   url(r'^workflows/(?P<workflow>\d+)/save$', 'workflow_save', name='workflow_save'),
   url(r'^workflows/(?P<workflow>\d+)/actions/(?P<node_type>\w+)/validate$', 'workflow_validate_action', name='workflow_validate_action'),
+  url(r'^workflows/(?P<workflow>\d+)/jobsub/actions$', 'workflow_jobsub_actions', name='workflow_jobsub_actions'),
 )
 
 

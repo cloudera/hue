@@ -21,6 +21,75 @@
 <%namespace name="utils" file="../utils.inc.mako" />
 
 
+<%def name="import_jobsub_form(template=True)">
+% if template:
+  <script type="text/html" id="ImportNodeTemplate">
+% endif
+
+  <div data-bind="with: context">
+    <form class="form-horizontal" id="import-node-form" method="POST">
+      <div class="modal-header">
+        <a href="#" class="close">&times;</a>
+        <h3 class="message">${_('Import Node')}</h3>
+      </div>
+
+      <div class="modal-content">
+        <fieldset class="span12">
+          <table id="jobdesignerActionsTable" class="table datatables">
+            <thead>
+              <tr>
+                <th></th>
+                <th>${ _('Name') }</th>
+                <th>${ _('Description') }</th>
+              </tr>
+            </thead>
+            <tbody data-bind="visible: available_nodes().length > 0, foreach: available_nodes">
+              <tr class="action-row">
+                <td class=".btn-large action-column" data-row-selector-exclude="true" style="background-color: white;">
+                  <input type="radio" name="jobsub_id" data-bind="attr: { 'value': id }, click: $parent.setJobDesignerId" />
+                </td>
+                <td data-bind="text: $data.name"></td>
+                <td data-bind="text: $data.description"></td>
+              </tr>
+            </tbody>
+            <tbody data-bind="visible: available_nodes().length == 0">
+              <tr class="action-row">
+                <td>${ _('N/A') }</td><td></td><td></td>
+              </tr>
+            </tbody>
+          </table>
+        </fieldset>
+      </div>
+
+      <div class="modal-footer">
+        <a class="btn cancelButton" href="javascript:void(0);">${ _('Cancel') }</a>
+        <button class="btn btn-primary doneButton" type="button">${ _('Import') }</button>
+      </div>
+
+    </form>
+  </div>
+
+  <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
+
+  <script type="text/javascript" charset="utf-8">
+    $(document).ready(function() {
+      $(".action-row").click(function(e){
+        var select_btn = $(this).find('input');
+        select_btn.prop("checked", true);
+
+        $(".action-row").css("background-color", "");
+        $(this).css("background-color", "#ECF4F8");
+      });
+
+      $("a[data-row-selector='true']").jHueRowSelector();
+    });
+  </script>
+
+% if template:
+  </script>
+% endif
+</%def>
+
 <%def name="action_form(action_form, node_type, template=True)">
 % if template:
   <script type="text/html" id="${node_type}EditTemplate">
