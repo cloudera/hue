@@ -102,7 +102,7 @@ ${ layout.menubar(section='dashboard') }
 
   <div>
     <h1>${ _('Completed') }</h1>
-    <table class="table table-condensed" id="completed-table">
+    <table class="table table-condensed" id="completed-table" data-tablescroller-disable="true">
       <thead>
         <tr>
           <th width="10%">${ _('Completion') }</th>

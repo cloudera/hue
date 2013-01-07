@@ -31,5 +31,8 @@
 
   <script src="/static/js/Source/jHue/jquery.tableextender.js"></script>
   <script src="static/jasmine/jHueTableExtenderSpec.js"></script>
+
+  <script src="/static/js/Source/jHue/jquery.tablescroller.js"></script>
+  <script src="static/jasmine/jHueTableScrollerSpec.js"></script>
 </%block>
 
