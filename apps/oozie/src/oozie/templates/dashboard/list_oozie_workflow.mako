@@ -276,11 +276,14 @@ ${ layout.menubar(section='dashboard') }
       </div>
 
       <div class="tab-pane" id="definition">
-          <pre>${ oozie_workflow.definition | h }</pre>
+          <textarea id="definitionEditor">${ oozie_workflow.definition | h }</textarea>
       </div>
   </div>
 
-  <a class="btn" onclick="history.back()">${ _('Back') }</a>
+  <div style="margin-top: 20px; margin-bottom: 20px">
+    <a class="btn" onclick="history.back()">${ _('Back') }</a>
+  </div>
+
 </div>
 
 <div id="confirmation" class="modal hide">
@@ -295,9 +298,30 @@ ${ layout.menubar(section='dashboard') }
 </div>
 
 <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/codemirror-3.0.js"></script>
+<link rel="stylesheet" href="/static/ext/css/codemirror.css">
+<script src="/static/ext/js/codemirror-xml.js"></script>
 
 <script type="text/javascript">
   $(document).ready(function() {
+
+    var definitionEditor = $("#definitionEditor")[0];
+
+    var codeMirror = CodeMirror(function (elt) {
+      definitionEditor.parentNode.replaceChild(elt, definitionEditor);
+    }, {
+      value:definitionEditor.value,
+      readOnly:true,
+      lineNumbers:true
+    });
+
+    // force refresh on tab change
+    $("a[data-toggle='tab']").on("shown", function (e) {
+      if ($(e.target).attr("href") == "#definition") {
+        codeMirror.refresh();
+      }
+    });
+
     $(".action-link").click(function(){
       window.location = $(this).data('edit');
     });

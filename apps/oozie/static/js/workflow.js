@@ -177,6 +177,21 @@ var ModalModule = function($, ko) {
     $("input[name='script_path']").addClass("pathChooser").after(getFileBrowseButton($("input[name='script_path']")));
     $("input[name='command']").addClass("pathChooser").after(getFileBrowseButton($("input[name='command']")));
 
+    if (typeof CodeMirror !== 'undefined' && $("textarea[name='xml']").length > 0) {
+      $("textarea[name='xml']").hide();
+      var xmlEditor = $("<textarea>").attr("id", "tempXml").prependTo($("textarea[name='xml']").parent())[0];
+      var codeMirror = CodeMirror(function (elt) {
+        xmlEditor.parentNode.replaceChild(elt, xmlEditor);
+      }, {
+        value:$("textarea[name='xml']").val(),
+        lineNumbers:true,
+        autoCloseTags:true
+      });
+      codeMirror.on("update", function () {
+        ko.dataFor($("textarea[name='xml']")[0]).xml(codeMirror.getValue());
+      });
+    }
+
     $("*[rel=popover]").popover({
       placement:'left',
       trigger:'hover'

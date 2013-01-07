@@ -381,12 +381,25 @@ ${ layout.menubar(section='workflows') }
 .ribbon:after {
   right: 0;
 }
+
+.control-group.error .CodeMirror {
+  border: 1px solid #B94A48;
+}
+
+
 </style>
+
+<script src="/static/ext/js/codemirror-3.0.js"></script>
+<link rel="stylesheet" href="/static/ext/css/codemirror.css">
+<script src="/static/ext/js/codemirror-xml.js"></script>
+<script src="/static/ext/js/codemirror-closetag.js"></script>
 
 <script src="/static/ext/js/knockout-2.1.0.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/jquery/plugins/jquery-ui-autocomplete-1.9.1.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/jquery/plugins/jquery-ui-draggable-droppable-sortable-1.8.23.min.js" type="text/javascript" charset="utf-8"></script>
+
+
 
 
 % for form_info in action_forms:

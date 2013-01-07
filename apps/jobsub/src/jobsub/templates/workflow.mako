@@ -198,7 +198,7 @@ ${layout.menubar(section='history')}
 
         ## Tab: Definition
         <div class="tab-pane" id="definition">
-            <pre>${definition|h}</pre>
+          <textarea id="definitionEditor">${definition|h}</textarea>
         </div>
 
         ## Tab: Log
@@ -210,5 +210,32 @@ ${layout.menubar(section='history')}
 </div>
 
 ${configModal("appConfigModal", "Application Configuration", workflow.conf_dict)}
+
+<script src="/static/ext/js/codemirror-3.0.js"></script>
+<link rel="stylesheet" href="/static/ext/css/codemirror.css">
+<script src="/static/ext/js/codemirror-xml.js"></script>
+
+<script type="text/javascript">
+  $(document).ready(function() {
+
+    var definitionEditor = $("#definitionEditor")[0];
+
+    var codeMirror = CodeMirror(function (elt) {
+      definitionEditor.parentNode.replaceChild(elt, definitionEditor);
+    }, {
+      value:definitionEditor.value,
+      readOnly:true,
+      lineNumbers:true
+    });
+
+    // force refresh on tab change
+    $("a[data-toggle='tab']").on("shown", function (e) {
+      if ($(e.target).attr("href") == "#definition") {
+        codeMirror.refresh();
+      }
+    });
+
+  });
+</script>
 
 ${commonfooter(messages)}
