@@ -1087,6 +1087,9 @@ class TestEditor(OozieMockBase):
 
 
   def test_import_workflow_basic(self):
+    """
+    Validates import for most basic workflow: start and end.
+    """
     workflow = Workflow.objects.new_workflow(self.user)
     workflow.save()
     f = open('apps/oozie/src/oozie/test_data/0.4/test-basic.xml')
@@ -1100,6 +1103,9 @@ class TestEditor(OozieMockBase):
 
 
   def test_import_workflow_decision(self):
+    """
+    Validates import for decision node: link comments (conditions), default link, decision end.
+    """
     workflow = Workflow.objects.new_workflow(self.user)
     workflow.save()
     f = open('apps/oozie/src/oozie/test_data/0.4/test-decision.xml')
@@ -1132,6 +1138,9 @@ class TestEditor(OozieMockBase):
 
 
   def test_import_workflow_distcp(self):
+    """
+    Validates import for distcp node: params.
+    """
     workflow = Workflow.objects.new_workflow(self.user)
     workflow.save()
     f = open('apps/oozie/src/oozie/test_data/0.4/test-distcp.0.1.xml')
@@ -1160,6 +1169,9 @@ class TestEditor(OozieMockBase):
 
 
   def test_import_workflow_mapreduce(self):
+    """
+    Validates import for mapreduce node: job_properties.
+    """
     workflow = Workflow.objects.new_workflow(self.user)
     workflow.save()
     f = open('apps/oozie/src/oozie/test_data/0.4/test-mapreduce.xml')
@@ -1173,6 +1185,9 @@ class TestEditor(OozieMockBase):
 
 
   def test_import_workflow_pig(self):
+    """
+    Validates import for pig node: params.
+    """
     workflow = Workflow.objects.new_workflow(self.user)
     workflow.save()
     f = open('apps/oozie/src/oozie/test_data/0.4/test-pig.xml')
@@ -1188,6 +1203,9 @@ class TestEditor(OozieMockBase):
 
 
   def test_import_workflow_sqoop(self):
+    """
+    Validates import for sqoop node: script_path, files.
+    """
     workflow = Workflow.objects.new_workflow(self.user)
     workflow.save()
     f = open('apps/oozie/src/oozie/test_data/0.4/test-sqoop.0.2.xml')
@@ -1203,6 +1221,9 @@ class TestEditor(OozieMockBase):
 
 
   def test_import_workflow_java(self):
+    """
+    Validates import for job node: main_class, args.
+    """
     workflow = Workflow.objects.new_workflow(self.user)
     workflow.save()
     f = open('apps/oozie/src/oozie/test_data/0.4/test-java.xml')
@@ -1214,9 +1235,9 @@ class TestEditor(OozieMockBase):
     nodes = [Node.objects.filter(workflow=workflow, node_type='java')[0].get_full_node(),
              Node.objects.filter(workflow=workflow, node_type='java')[1].get_full_node()]
     assert_equal('org.apache.hadoop.examples.terasort.TeraGen', nodes[0].main_class)
-    assert_equal('["${records}","${output_dir}/teragen"]', nodes[0].args)
+    assert_equal('${records} ${output_dir}/teragen', nodes[0].args)
     assert_equal('org.apache.hadoop.examples.terasort.TeraSort', nodes[1].main_class)
-    assert_equal('["${output_dir}/teragen","${output_dir}/terasort"]', nodes[1].args)
+    assert_equal('${output_dir}/teragen ${output_dir}/terasort', nodes[1].args)
     workflow.delete()
 
 
