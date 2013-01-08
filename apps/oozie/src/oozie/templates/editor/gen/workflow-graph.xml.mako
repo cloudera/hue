@@ -44,7 +44,7 @@
 
 
 <%def name="display_graph(form, print_node)">
-  <div class="row action2" style="min-height:400px">
+  <div class="row action2" style="min-height:400px;margin-left:1px">
     ${ print_graph(nodes, print_node) }
   </div>
 
