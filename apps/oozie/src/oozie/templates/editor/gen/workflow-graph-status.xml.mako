@@ -24,43 +24,55 @@
 <%def name="print_status_node(form)">
   <%
     is_fork = form.instance.get_full_node().node_type == 'fork'
+    is_join = form.instance.get_full_node().node_type == 'join'
+    is_decision = form.instance.get_full_node().node_type == 'decision'
+    is_decision_end = form.instance.get_full_node().node_type == 'decisionend'
     action = actions.get(form.instance.__unicode__())
+    box_class = ""
+    if is_fork:
+      box_class = "node-fork"
+    if is_join:
+      box_class = "node-join"
+    if is_decision:
+      box_class = "node-decision"
+    if is_decision_end:
+      box_class = "node-decision-end"
+    if action:
+      box_class = "node-action"
   %>
 
   % if form.instance.get_full_node().is_visible():
-    <div class="row-fluid">
-      <div class="span12 action
-        % if not is_fork and action:
-            action-link
-            ${ utils.get_status(action.status) }
-          " data-edit="${ url('oozie:list_oozie_workflow_action', action=action.id) }
+
+      <div class="span12 action ${ box_class }">
+        <div class="row-fluid">
+          <div class="span12">
+            <h4>${ form.instance.__unicode__() }</h4>
+            <span class="muted">${ form.instance.node_type }</span>
+            <div class="node-description">${ form.instance.description }</div>
+            % if action:
+              ${ action.errorMessage or '' }
+            % endif
+          </div>
+        </div>
+        % if action and action.externalId:
+        <div class="row-fluid node-action-bar">
+          <div class="span2" style="text-align:left;padding-left: 6px">
+            % if not is_fork and action:
+              <span class="label ${ utils.get_status(action.status) }">${ action.status }</span>
+            % endif
+          </div>
+          <div class="span10" style="text-align:right">
+            % if not is_fork and action:
+            <a href="${ url('oozie:list_oozie_workflow_action', action=action.id) }" class="btn btn-mini" title="${ _('View workflow action') }" rel="tooltip"><i class="icon-eye-open"></i></a>
+            % endif
+            <a href="${ url('jobbrowser.views.job_single_logs', job=action.externalId) }" class="btn btn-mini" title="${ _('View the logs') }" rel="tooltip" data-row-selector-exclude="true" id="advanced-btn"><i class="icon-tasks"></i></a>
+            &nbsp;
+          </div>
+        </div>
         % endif
-        ">
-        <div class="span10">
-          <div>
-            % if not is_fork:
-              ${ form.instance.__unicode__() }
-            % endif
-          </div>
-          <div class="row-fluid">
-            ${ form.instance.node_type }<br/>
-            % if not is_fork:
-              ${ form.instance.description }<br/>
-              % if action:
-                ${ action.errorMessage or '' }
-              % endif
-            % endif
-          </div>
-        </div>
-        <div class="span2">
-          % if action and action.externalId:
-           <a href="${ url('jobbrowser.views.job_single_logs', job=action.externalId) }" data-row-selector-exclude="true" id="advanced-btn">
-              <i class="icon-tasks"></i> ${ _('View the logs') }
-            </a>
-          % endif
-        </div>
+
       </div>
-    </div>
+
   % endif
 
 </%def>

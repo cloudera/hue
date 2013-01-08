@@ -297,6 +297,8 @@ ${ layout.menubar(section='dashboard') }
   </div>
 </div>
 
+<link rel="stylesheet" href="/oozie/static/css/workflow.css">
+
 <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/codemirror-3.0.js"></script>
 <link rel="stylesheet" href="/static/ext/css/codemirror.css">
@@ -304,6 +306,8 @@ ${ layout.menubar(section='dashboard') }
 
 <script type="text/javascript">
   $(document).ready(function() {
+
+    $("*[rel=tooltip]").tooltip();
 
     var definitionEditor = $("#definitionEditor")[0];
 
