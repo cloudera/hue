@@ -146,7 +146,7 @@ DATABASE = ConfigSection(
   members=dict(
     ENGINE=Config(
       key='engine',
-      help=_('Database engine, such as postgresql, mysql, sqlite3, or Oracle.'),
+      help=_('Database engine, such as postgresql_psycopg2, mysql, or sqlite3.'),
       type=str,
       default='sqlite3',
     ),
