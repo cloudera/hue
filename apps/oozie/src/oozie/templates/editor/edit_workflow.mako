@@ -364,6 +364,10 @@ ${ layout.menubar(section='workflows') }
   background: #D9EDF7;
 }
 
+.node-action-hover {
+  background: #D9EDF7;
+}
+
 .node-fork-hover {
   background: #EEE;
 }
