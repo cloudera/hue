@@ -27,7 +27,7 @@
 
   var pluginName = "jHueTableScroller",
       defaults = {
-        minHeight: 500
+        minHeight: 400
       };
 
   function Plugin(element, options) {
@@ -45,6 +45,8 @@
   Plugin.prototype.init = function () {
     var _this = this;
 
+    $(_this.element).data("original-height", $(_this.element).height());
+
     var disableScrollingTable = $(_this.element).find("table").eq(0).data("tablescroller-disable");
     if (disableScrollingTable == null || disableScrollingTable != true) {
       resizeScrollingTable(_this.element);
@@ -55,25 +57,31 @@
 
     function resizeScrollingTable(el) {
       $(el).css("overflow-y", "").css("height", "");
-      var disableMinHeight = $(_this.element).find("table").eq(0).data("tablescroller-min-height-disable");
-      if (disableMinHeight != null && disableMinHeight == true) {
-        var heightAfter = 0;
-        $(el).nextAll(":visible").each(function () {
-          heightAfter += $(this).outerHeight(true);
-        });
-        if ($(el).height() > ($(window).height() - $(el).offset().top - heightAfter)) {
-          $(el).css("overflow-y", "auto").height($(window).height() - $(el).offset().top - heightAfter);
-        }
-      }
-      else {
+      var heightAfter = 0;
+      $(el).nextAll(":visible").each(function () {
+        heightAfter += $(this).outerHeight(true);
+      });
+      if ($(el).height() > ($(window).height() - $(el).offset().top - heightAfter)) {
         var specificMinHeight = $(el).find("table").eq(0).data("tablescroller-min-height");
         var minHeightVal = _this.options.minHeight;
         if (!isNaN(parseFloat(specificMinHeight)) && isFinite(specificMinHeight)) {
           minHeightVal = parseFloat(specificMinHeight);
         }
-        $(el).css("overflow-y", "auto");
-        if ($(el).height() > minHeightVal) {
-          $(el).height(minHeightVal);
+        var disableMinHeight = $(_this.element).find("table").eq(0).data("tablescroller-min-height-disable");
+        if (disableMinHeight != null && disableMinHeight == true) {
+          if ($(el).height() > ($(window).height() - $(el).offset().top - heightAfter)) {
+            $(el).css("overflow-y", "auto").height($(window).height() - $(el).offset().top - heightAfter);
+          }
+        }
+        else {
+          if (($(window).height() - $(el).offset().top - heightAfter) > minHeightVal){
+            $(el).css("overflow-y", "auto").height($(window).height() - $(el).offset().top - heightAfter);
+          }
+          else {
+            if ($(el).data("original-height") > minHeightVal){
+              $(el).css("overflow-y", "auto").height(minHeightVal);
+            }
+          }
         }
       }
     }
