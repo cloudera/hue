@@ -1238,7 +1238,7 @@ class TestEditor(OozieMockBase):
 
   def test_import_workflow_java(self):
     """
-    Validates import for job node: main_class, args.
+    Validates import for java node: main_class, args.
     """
     workflow = Workflow.objects.new_workflow(self.user)
     workflow.save()
@@ -1254,6 +1254,27 @@ class TestEditor(OozieMockBase):
     assert_equal('${records} ${output_dir}/teragen', nodes[0].args)
     assert_equal('org.apache.hadoop.examples.terasort.TeraSort', nodes[1].main_class)
     assert_equal('${output_dir}/teragen ${output_dir}/terasort', nodes[1].args)
+    workflow.delete()
+
+
+  def test_import_workflow_fs(self):
+    """
+    Validates import for fs node: chmods, deletes, mkdirs, moves, touchzs.
+    """
+    workflow = Workflow.objects.new_workflow(self.user)
+    workflow.save()
+    f = open('apps/oozie/src/oozie/test_data/0.4/test-fs.xml')
+    import_workflow(workflow, f.read())
+    f.close()
+    workflow.save()
+    assert_equal(4, len(Node.objects.filter(workflow=workflow)))
+    assert_equal(3, len(Link.objects.filter(parent__workflow=workflow)))
+    node = Node.objects.get(workflow=workflow, node_type='fs').get_full_node()
+    assert_equal('[{"path":"${nameNode}${output}/testfs/renamed","permissions":"700","recursive":"false"}]', node.chmods)
+    assert_equal('["${nameNode}${output}/testfs"]', node.deletes)
+    assert_equal('["${nameNode}${output}/testfs","${nameNode}${output}/testfs/source"]', node.mkdirs)
+    assert_equal('[{"source":"${nameNode}${output}/testfs/source","destination":"${nameNode}${output}/testfs/renamed"}]', node.moves)
+    assert_equal('["${nameNode}${output}/testfs/new_file"]', node.touchzs)
     workflow.delete()
 
 
