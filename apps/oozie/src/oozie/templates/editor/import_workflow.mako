@@ -30,7 +30,7 @@ ${ layout.menubar(section='workflows') }
   <h1>${ _('Import Workflow') }</h1>
 
     <div class="well">
-      <div class="alert alert-info"><h3>${_('Import an Oozie workflow')}</h3>${_("You can import an external Oozie workflow by providing the workflow definition file.")}</div>
+      <p>${_("You can import an external Oozie workflow by providing the workflow definition file.")}</p>
     </div>
 
     <div style="min-height:300px">

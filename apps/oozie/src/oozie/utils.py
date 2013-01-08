@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import logging
+import re
 
 from django.utils.translation import ugettext as _
 
@@ -63,3 +64,7 @@ def smart_path(path):
     path = '%(nameNode)s%(path)s' % {'nameNode': '${nameNode}', 'path': path}
 
   return path
+
+
+def xml_tag(element):
+  return re.sub(r'^\{.+\}', '', element.tag)

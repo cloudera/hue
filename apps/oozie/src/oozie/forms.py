@@ -76,7 +76,6 @@ SCHEMA_VERSION_CHOICES = ['0.4']
 
 class ImportWorkflowForm(WorkflowForm):
   definition_file = forms.FileField(label=_t("Local workflow.xml file"))
-  schema_version = forms.ChoiceField(choices=[(version, version) for version in SCHEMA_VERSION_CHOICES])
 
 
 class ImportJobsubDesignForm(forms.Form):

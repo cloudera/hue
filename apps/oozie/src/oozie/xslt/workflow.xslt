@@ -2,12 +2,13 @@
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:workflow="uri:oozie:workflow:0.4" exclude-result-prefixes="workflow">
 
-<xsl:template name="job_xml">
+<xsl:include href="0.4/workflow.xslt"/>
 
-  <field name="job_xml" type="CharField">
-    <xsl:value-of select="*[local-name()='job-xml']"/>
-  </field>
+<xsl:template match="/">
+
+    <xsl:apply-templates select="*"/>
 
 </xsl:template>
 
+<xsl:output method="xml" version="1.0" encoding="UTF-8" indent="yes"/>
 </xsl:stylesheet>

@@ -24,11 +24,12 @@ import re
 import os
 
 from nose.plugins.skip import SkipTest
-from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal
+from nose.tools import raises, assert_true, assert_false, assert_equal, assert_not_equal
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
 from desktop.lib.django_test_util import make_logged_in_client
+from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.test_utils import grant_access, add_permission
 from jobsub.management.commands import jobsub_setup
 from jobsub.models import OozieDesign
@@ -1086,6 +1087,21 @@ class TestEditor(OozieMockBase):
     assert_true('checked: capture_output' in response.content, response.content)
 
 
+  @raises(PopupException)
+  def test_import_workflow_namespace_error(self):
+    """
+    Validates import for most basic workflow: start and end.
+    """
+    workflow = Workflow.objects.new_workflow(self.user)
+    workflow.save()
+    f = open('apps/oozie/src/oozie/test_data/0.4/test-basic-namespace-missing.xml')
+    contents = f.read()
+    f.close()
+
+    # Should throw PopupException
+    import_workflow(workflow, contents)
+
+
   def test_import_workflow_basic(self):
     """
     Validates import for most basic workflow: start and end.
@@ -1093,7 +1109,7 @@ class TestEditor(OozieMockBase):
     workflow = Workflow.objects.new_workflow(self.user)
     workflow.save()
     f = open('apps/oozie/src/oozie/test_data/0.4/test-basic.xml')
-    import_workflow(workflow, f.read(), schema_version=0.4)
+    import_workflow(workflow, f.read())
     f.close()
     workflow.save()
     assert_equal(2, len(Node.objects.filter(workflow=workflow)))
@@ -1109,7 +1125,7 @@ class TestEditor(OozieMockBase):
     workflow = Workflow.objects.new_workflow(self.user)
     workflow.save()
     f = open('apps/oozie/src/oozie/test_data/0.4/test-decision.xml')
-    import_workflow(workflow, f.read(), schema_version=0.4)
+    import_workflow(workflow, f.read())
     f.close()
     workflow.save()
     assert_equal(12, len(Node.objects.filter(workflow=workflow)))
@@ -1125,7 +1141,7 @@ class TestEditor(OozieMockBase):
     workflow = Workflow.objects.new_workflow(self.user)
     workflow.save()
     f = open('apps/oozie/src/oozie/test_data/0.4/test-decision-complex.xml')
-    import_workflow(workflow, f.read(), schema_version=0.4)
+    import_workflow(workflow, f.read())
     f.close()
     workflow.save()
     assert_equal(14, len(Node.objects.filter(workflow=workflow)))
@@ -1144,7 +1160,7 @@ class TestEditor(OozieMockBase):
     workflow = Workflow.objects.new_workflow(self.user)
     workflow.save()
     f = open('apps/oozie/src/oozie/test_data/0.4/test-distcp.0.1.xml')
-    import_workflow(workflow, f.read(), schema_version=0.4)
+    import_workflow(workflow, f.read())
     f.close()
     workflow.save()
     assert_equal(4, len(Node.objects.filter(workflow=workflow)))
@@ -1157,7 +1173,7 @@ class TestEditor(OozieMockBase):
     workflow = Workflow.objects.new_workflow(self.user)
     workflow.save()
     f = open('apps/oozie/src/oozie/test_data/0.4/test-forks.xml')
-    import_workflow(workflow, f.read(), schema_version=0.4)
+    import_workflow(workflow, f.read())
     f.close()
     workflow.save()
     assert_equal(12, len(Node.objects.filter(workflow=workflow)))
@@ -1175,7 +1191,7 @@ class TestEditor(OozieMockBase):
     workflow = Workflow.objects.new_workflow(self.user)
     workflow.save()
     f = open('apps/oozie/src/oozie/test_data/0.4/test-mapreduce.xml')
-    import_workflow(workflow, f.read(), schema_version=0.4)
+    import_workflow(workflow, f.read())
     f.close()
     workflow.save()
     assert_equal(4, len(Node.objects.filter(workflow=workflow)))
@@ -1191,7 +1207,7 @@ class TestEditor(OozieMockBase):
     workflow = Workflow.objects.new_workflow(self.user)
     workflow.save()
     f = open('apps/oozie/src/oozie/test_data/0.4/test-pig.xml')
-    import_workflow(workflow, f.read(), schema_version=0.4)
+    import_workflow(workflow, f.read())
     f.close()
     workflow.save()
     node = Node.objects.get(workflow=workflow, node_type='pig').get_full_node()
@@ -1209,7 +1225,7 @@ class TestEditor(OozieMockBase):
     workflow = Workflow.objects.new_workflow(self.user)
     workflow.save()
     f = open('apps/oozie/src/oozie/test_data/0.4/test-sqoop.0.2.xml')
-    import_workflow(workflow, f.read(), schema_version=0.4)
+    import_workflow(workflow, f.read())
     f.close()
     workflow.save()
     assert_equal(4, len(Node.objects.filter(workflow=workflow)))
@@ -1227,7 +1243,7 @@ class TestEditor(OozieMockBase):
     workflow = Workflow.objects.new_workflow(self.user)
     workflow.save()
     f = open('apps/oozie/src/oozie/test_data/0.4/test-java.xml')
-    import_workflow(workflow, f.read(), schema_version=0.4)
+    import_workflow(workflow, f.read())
     f.close()
     workflow.save()
     assert_equal(5, len(Node.objects.filter(workflow=workflow)))

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:workflow="uri:oozie:workflow:0.4" xmlns:ssh="uri:oozie:ssh-action:0.1" exclude-result-prefixes="workflow ssh">
 
 <xsl:import href="../nodes/fields/capture_output.xslt"/>
 <xsl:import href="../nodes/fields/command.xslt"/>
@@ -8,7 +8,7 @@
 <xsl:import href="../nodes/fields/params.xslt"/>
 <xsl:import href="../nodes/fields/user.xslt"/>
 
-<xsl:template match="ssh:ssh" xmlns:ssh="uri:oozie:ssh-action:0.1">
+<xsl:template match="ssh:ssh">
 
   <object model="oozie.ssh" pk="0">
 

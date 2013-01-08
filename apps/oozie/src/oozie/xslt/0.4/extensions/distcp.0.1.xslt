@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
 
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:workflow="uri:oozie:workflow:0.4" xmlns:distcp="uri:oozie:distcp-action:0.1" exclude-result-prefixes="workflow distcp">
 
 <xsl:import href="../nodes/fields/job_properties.xslt"/>
 <xsl:import href="../nodes/fields/job_xml.xslt"/>
 <xsl:import href="../nodes/fields/params.xslt"/>
 <xsl:import href="../nodes/fields/prepares.xslt"/>
 
-<xsl:template match="distcp:distcp" xmlns:distcp="uri:oozie:distcp-action:0.1">
+<xsl:template match="distcp:distcp">
 
   <object model="oozie.distcp" pk="0">
 
