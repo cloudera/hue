@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:workflow="uri:oozie:workflow:0.4" xmlns:hive="uri:oozie:hive-action:0.2" exclude-result-prefixes="workflow hive">
 
 <xsl:import href="../nodes/fields/archives.xslt"/>
 <xsl:import href="../nodes/fields/files.xslt"/>
@@ -10,7 +10,7 @@
 <xsl:import href="../nodes/fields/prepares.xslt"/>
 <xsl:import href="../nodes/fields/script_path.xslt"/>
 
-<xsl:template match="hive:hive" xmlns:hive="uri:oozie:hive-action:0.2">
+<xsl:template match="hive:hive">
 
   <object model="oozie.hive" pk="0">
 

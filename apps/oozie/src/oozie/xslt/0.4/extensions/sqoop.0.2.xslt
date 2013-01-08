@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:workflow="uri:oozie:workflow:0.4" xmlns:sqoop="uri:oozie:sqoop-action:0.2" exclude-result-prefixes="workflow sqoop">
 
 <xsl:import href="../nodes/fields/archives.xslt"/>
 <xsl:import href="../nodes/fields/files.xslt"/>
@@ -9,7 +9,7 @@
 <xsl:import href="../nodes/fields/params.xslt"/>
 <xsl:import href="../nodes/fields/prepares.xslt"/>
 
-<xsl:template match="sqoop:sqoop" xmlns:sqoop="uri:oozie:sqoop-action:0.2">
+<xsl:template match="sqoop:sqoop">
 
   <object model="oozie.sqoop" pk="0">
 

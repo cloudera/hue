@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:workflow="uri:oozie:workflow:0.4" exclude-result-prefixes="workflow">
 
 <xsl:import href="fields/archives.xslt"/>
 <xsl:import href="fields/files.xslt"/>
@@ -9,7 +9,7 @@
 <xsl:import href="fields/job_xml.xslt"/>
 <xsl:import href="fields/prepares.xslt"/>
 
-<xsl:template match="map-reduce">
+<xsl:template match="workflow:map-reduce" xmlns:workflow="uri:oozie:workflow:0.4">
 
   <object model="oozie.mapreduce" pk="0">
 

@@ -48,10 +48,14 @@ from desktop.lib.exceptions_renderable import PopupException
 
 from conf import DEFINITION_XSLT_DIR
 from models import Node, Link, Start, End, Decision, DecisionEnd, Fork, Join
+from utils import xml_tag
 
 LOG = logging.getLogger(__name__)
 
+OOZIE_NAMESPACES = ['uri:oozie:workflow:0.1', 'uri:oozie:workflow:0.2', 'uri:oozie:workflow:0.3', 'uri:oozie:workflow:0.4']
+
 LINKS = ('ok', 'error', 'path')
+
 def _save_links(workflow, root):
   """
   Iterates over all links in the passed XML doc and creates links.
@@ -82,7 +86,7 @@ def _save_links(workflow, root):
     # Iterate over node members
     # Join nodes have attributes which point to the next node
     # Start node has attribute which points to first node
-    parent = Node.objects.get(workflow=workflow, name=node.attrib.get('name', node.tag)).get_full_node()
+    parent = Node.objects.get(workflow=workflow, name=node.attrib.get('name', xml_tag(node))).get_full_node()
 
     if isinstance(parent, Start):
       workflow.start = parent
@@ -103,7 +107,7 @@ def _save_links(workflow, root):
           to = case.attrib['to']
           child = Node.objects.get(workflow=workflow, name=to)
 
-          if case.tag == 'default':
+          if xml_tag(case) == 'default':
             name = 'default'
             obj = Link.objects.create(name=name, parent=parent, child=child)
 
@@ -117,9 +121,9 @@ def _save_links(workflow, root):
     else:
       for el in node:
         # Links
-        if el.tag in LINKS:
-          name = el.tag
-          if el.tag == 'path':
+        name = xml_tag(el)
+        if name in LINKS:
+          if name == 'path':
             to = el.attrib['start']
             name = 'start'
           else:
@@ -344,17 +348,26 @@ def _save_nodes(workflow, root):
       full_node.save()
 
 
-def import_workflow(workflow, workflow_definition, schema_version=0.4):
-  xslt_definition_fh = open("%(xslt_dir)s/%(schema_version)s/workflow.xslt" % {
-    'xslt_dir': DEFINITION_XSLT_DIR.get(),
-    'schema_version': schema_version
+def import_workflow(workflow, workflow_definition):
+  xslt_definition_fh = open("%(xslt_dir)s/workflow.xslt" % {
+    'xslt_dir': DEFINITION_XSLT_DIR.get()
   })
-
-  # Remove namespace from definition
-  workflow_definition = re.sub(r'\s*xmlns=".*?"', '', workflow_definition, count=1)
 
   # Parse Workflow Definition
   xml = etree.fromstring(workflow_definition)
+
+  if xml is None:
+    raise PopupException(_("Could not find any nodes in Workflow definition. Maybe it's malformed?"))
+
+  ns = xml.tag[:-12] # Remove workflow-app from tag in order to get proper namespace prefix
+  schema_version = ns and ns[1:-1] or None
+
+  # Ensure namespace exists
+  if schema_version not in OOZIE_NAMESPACES:
+    raise PopupException(_("Tag with namespace %(namespace)s is not a valid. Please use one of the following namespaces: %(namespaces)s") % {
+      'namespace': xml.tag,
+      'namespaces': ', '.join(OOZIE_NAMESPACES)
+    })
 
   # Get XSLT
   xslt = etree.parse(xslt_definition_fh)
@@ -369,5 +382,5 @@ def import_workflow(workflow, workflow_definition, schema_version=0.4):
   _save_links(workflow, xml)
 
   # Update schema_version
-  workflow.schema_version = "uri:oozie:workflow:%s" % schema_version
+  workflow.schema_version = schema_version
   workflow.save()

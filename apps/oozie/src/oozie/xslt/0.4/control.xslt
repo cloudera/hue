@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:workflow="uri:oozie:workflow:0.4" exclude-result-prefixes="workflow">
 
 <xsl:import href="nodes/decision.xslt"/>
 <xsl:import href="nodes/end.xslt"/>
@@ -9,7 +9,7 @@
 <xsl:import href="nodes/kill.xslt"/>
 <xsl:import href="nodes/start.xslt"/>
 
-<xsl:template match="start | end | decision | fork | join | kill">
+<xsl:template match="workflow:start | workflow:end | workflow:decision | workflow:fork | workflow:join | workflow:kill">
 
   <object model="oozie.node" pk="0">
 

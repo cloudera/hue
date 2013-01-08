@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:workflow="uri:oozie:workflow:0.4" exclude-result-prefixes="workflow">
 
 <xsl:import href="extensions/distcp.0.1.xslt"/>
 <xsl:import href="extensions/hive.0.1.xslt"/>
@@ -14,7 +14,7 @@
 <xsl:import href="nodes/pig.xslt"/>
 <xsl:import href="nodes/streaming.xslt"/>
 
-<xsl:template match="action">
+<xsl:template match="workflow:action" xmlns:workflow="uri:oozie:workflow:0.4">
 
   <object model="oozie.node" pk="0">
 
