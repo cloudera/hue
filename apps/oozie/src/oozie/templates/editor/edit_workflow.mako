@@ -306,27 +306,72 @@ ${ layout.menubar(section='workflows') }
   padding: 5px;
 }
 
-.action {border-style:solid; border-width:1px; border-color:LightGrey; padding: 3px;}
+.action {
+  border: 1px solid #DDD;
+  padding: 0px;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+}
 
-.action-link:hover, .edit-node-link:hover {cursor: pointer;}
+.action h4 {
+  margin-bottom: 1px;
+}
+
+.node-action {
+  background: #FFF url(/oozie/static/art/action.png) no-repeat 10px 10px;
+}
+
+.node-fork {
+  background: #FFF url(/oozie/static/art/fork.png) no-repeat 10px 10px;
+}
+
+.node-join {
+  background: #FFF url(/oozie/static/art/join.png) no-repeat 10px 10px;
+}
+
+.node-decision {
+  background: #FFF url(/oozie/static/art/decision.png) no-repeat 10px 10px;
+}
+
+.node-decisionend {
+  background: #FFF url(/oozie/static/art/decision_end.png) no-repeat 10px 10px;
+}
+
+.node-link {
+  border: 1px dashed #DDD;
+  margin: 10px;
+  background: url(/oozie/static/art/droppable.png) no-repeat 50% 50%;
+}
+
+.node-description {
+  padding-top: 10px;
+}
+
+.node-action-bar {
+  background-color: #EEE;
+  padding-top: 5px;
+  margin-top: 10px;
+  -webkit-box-shadow: inset 0px 3px 5px 0px #DDD;
+  box-shadow: inset 0px 3px 5px 0px #DDD;
+}
 
 #graph {
   text-align: center;
 }
 
 .node-link-hover {
-  background: gray;
+  background: #D9EDF7;
 }
 
 .node-fork-hover {
-  background: green;
+  background: #EEE;
 }
 
 .popover {
   z-index: 2060 !important;
   margin-left: 166px!important;
 }
-
 
 .ribbon-wrapper {
   width: 85px;
@@ -422,25 +467,19 @@ ${ controls.decision_form(link_form, default_link_form, 'decision', True) }
   <div class="node node-action row-fluid">
     <div class="action span12">
       <div class="row-fluid">
-        <div class="span10 edit-node-link" title="Edit" data-bind="attr: { 'data-node-type': node_type() }">
-          <span class="label label-info" data-bind="text: (name()) ? name() : node_type() + '-' + id()"></span>
+        <div class="span12">
+          <h4 data-bind="text: (name()) ? name() : node_type() + '-' + id()"></h4>
+          <span data-bind="text: node_type" class="muted"></span>
+          <div class="node-description" data-bind="text: description"></div>
         </div>
       </div>
 
-      <div class="row-fluid">
-        <div class="span10 action-link" title="Edit">
-          <span data-bind="text: node_type"></span>
-          <br/>
-          <span class="node-description" data-bind="text: description"></span>
-        </div>
-      </div>
-
-      <div class="row-fluid">
-        <div class="span10">
-          <button class="btn clone-node-btn" title="${ _('Clone') }" type="button"><i class="icon-retweet"></i></button>
-          <button class="btn delete-node-btn" title="${ _('Delete') }" type="button"><i class="icon-remove"></i></button>
-        </div>
-        <div class="span2">
+      <div class="row-fluid node-action-bar">
+        <div class="span12" style="text-align:right">
+          <a class="btn btn-mini edit-node-link" title="${ _('Edit') }" rel="tooltip" data-bind="attr: { 'data-node-type': node_type() }"><i class="icon-pencil"></i></a>
+          <button class="btn btn-mini clone-node-btn" title="${ _('Clone') }" rel="tooltip"><i class="icon-retweet"></i></button>
+          <button class="btn btn-mini delete-node-btn" title="${ _('Delete') }" rel="tooltip"><i class="icon-remove"></i></button>
+          &nbsp;
         </div>
       </div>
     </div>
@@ -453,16 +492,17 @@ ${ controls.decision_form(link_form, default_link_form, 'decision', True) }
   <div class="node node-fork row-fluid">
     <div class="action span12">
       <div class="row-fluid">
-        <div class="span10 edit-node-link"  data-bind="attr: { 'data-node-type': node_type() }" title="Edit">
-          <span class="label label-info" data-bind="text: (name()) ? name() : node_type() + '-' + id()"></span>
+        <div class="span12 action-link" title="Edit">
+          <h4 data-bind="text: (name()) ? name() : node_type() + '-' + id()"></h4>
+          <span data-bind="text: node_type" class="muted"></span>
+          <div class="node-description" data-bind="text: description()"></div>
         </div>
       </div>
 
-      <div class="row-fluid">
-        <div class="span10 action-link" title="Edit">
-          <span data-bind="text: node_type"></span>
-          <br/>
-          <span class="node-description" data-bind="text: description()"></span>
+      <div class="row-fluid node-action-bar">
+        <div class="span12" style="text-align:right">
+          <a class="btn btn-mini edit-node-link" title="${ _('Convert to Decision') }" data-bind="attr: { 'data-node-type': node_type() }" rel="tooltip"><i class="icon-wrench"></i></a>
+          &nbsp;
         </div>
       </div>
     </div>
@@ -482,14 +522,10 @@ ${ controls.decision_form(link_form, default_link_form, 'decision', True) }
   <div class="node node-join row-fluid">
     <div class="action span12">
       <div class="row-fluid">
-        <div class="span10">
-          <span class="label label-info" data-bind="text: (name()) ? name() : node_type() + '-' + id()"></span>
-        </div>
-      </div>
-
-      <div class="row-fluid">
-        <div class="span10">
-          <span data-bind="text: node_type()"></span>
+        <div class="span12">
+          <h4 data-bind="text: (name()) ? name() : node_type() + '-' + id()"></h4>
+          <span data-bind="text: node_type()" class="muted"></span>
+          <br/>&nbsp;
         </div>
       </div>
     </div>
@@ -502,16 +538,17 @@ ${ controls.decision_form(link_form, default_link_form, 'decision', True) }
   <div class="node node-decision row-fluid">
     <div class="action span12">
       <div class="row-fluid">
-        <div class="span10 edit-node-link"  data-bind="attr: { 'data-node-type': node_type() }" title="Edit">
-          <span class="label label-info" data-bind="text: (name()) ? name() : node_type() + '-' + id()"></span>
+        <div class="span12 action-link">
+          <h4 data-bind="text: (name()) ? name() : node_type() + '-' + id()"></h4>
+          <span data-bind="text: node_type" class="muted"></span>
+          <div class="node-description" data-bind="text: description()"></div>
         </div>
       </div>
 
-      <div class="row-fluid">
-        <div class="span10 action-link" title="Edit">
-          <span data-bind="text: node_type"></span>
-          <br/>
-          <span class="node-description" data-bind="text: description()"></span>
+      <div class="row-fluid node-action-bar">
+        <div class="span12" style="text-align:right">
+          <a class="btn btn-mini edit-node-link" title="${ _('Edit') }" data-bind="attr: { 'data-node-type': node_type() }" rel="tooltip"><i class="icon-pencil"></i></a>
+          &nbsp;
         </div>
       </div>
     </div>
@@ -531,14 +568,10 @@ ${ controls.decision_form(link_form, default_link_form, 'decision', True) }
   <div class="node node-decisionend row-fluid">
     <div class="action span12">
       <div class="row-fluid">
-        <div class="span10">
-          <span class="label label-info" data-bind="text: 'end-' + id()"></span>
-        </div>
-      </div>
-
-      <div class="row-fluid">
-        <div class="span10">
-          <span data-bind="text: node_type()"></span>
+        <div class="span12">
+          <h4 data-bind="text: 'end-' + id()"></h4>
+          <span data-bind="text: node_type()" class="muted"></span>
+          <br/>&nbsp;
         </div>
       </div>
     </div>

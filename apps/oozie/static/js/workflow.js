@@ -2069,6 +2069,8 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
       };
 
       methodChooser(self.registry.get(self.start()), self.nodes, false, true);
+      $(".tooltip").remove();
+      $("*[rel=tooltip]").tooltip();
     },
 
     rebuild: function() {
@@ -2093,12 +2095,14 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
 
       self.el.find('.node-action').each(function(index, el) {
         if (!$(el).hasClass('ui-draggable')) {
+          $(el).css("cursor", "move");
           $(el).draggable({
             containment: [ self.el.offset().left - 10, self.el.offset().top - 10,
                            self.el.offset().left + self.el.outerWidth(), self.el.offset().top + self.el.outerHeight() ],
-            handle: '.node',
             refreshPositions: true,
-            revert: true
+            revert: true,
+            zIndex: 1000,
+            opacity: 0.45
           });
         }
       });
