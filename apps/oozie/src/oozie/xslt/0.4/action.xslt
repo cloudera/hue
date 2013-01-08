@@ -9,6 +9,7 @@
 <xsl:import href="extensions/sqoop.0.1.xslt"/>
 <xsl:import href="extensions/sqoop.0.2.xslt"/>
 <xsl:import href="extensions/ssh.0.1.xslt"/>
+<xsl:import href="nodes/fs.xslt"/>
 <xsl:import href="nodes/java.xslt"/>
 <xsl:import href="nodes/mapreduce.xslt"/>
 <xsl:import href="nodes/pig.xslt"/>
@@ -22,7 +23,7 @@
       <xsl:value-of select="@name"/>
     </field>
     <field name="node_type" type="CharField">
-      <xsl:value-of select="name(.)"/>
+      <xsl:value-of select="name(*)"/>
     </field>
 
   </object>
