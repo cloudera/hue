@@ -352,7 +352,7 @@ class EnvironTests(WSGITestsMixin, TestCase):
         """
         The C{'CONTENT_LENGTH'} key of the C{environ} C{dict} passed to the
         application contains the value of the I{Content-Length} request header
-        (RFC 3875, section 4.1.2).
+        (RFC 3875, section 4.1.3-SNAPSHOT).
         """
         missing = self.render('GET', '1.1', [], [''])
         missing.addCallback(self.environKeyEqual('CONTENT_LENGTH', ''))
