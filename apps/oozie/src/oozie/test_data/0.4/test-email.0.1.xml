@@ -1,0 +1,16 @@
+<workflow-app name="Email" xmlns="uri:oozie:workflow:0.4">
+    <start to="Email"/>
+    <action name="Email">
+        <email xmlns="uri:oozie:email-action:0.1">
+            <to>example@example.org</to>
+            <subject>I love</subject>
+            <body>Hue</body>
+        </email>
+        <ok to="end"/>
+        <error to="kill"/>
+    </action>
+    <kill name="kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+    <end name="end"/>
+</workflow-app>
