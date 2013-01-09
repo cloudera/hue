@@ -110,7 +110,10 @@ class BeeswaxClient:
 
   def make_query(self, hql_query):
     # HUE-535 without having to modify Beeswaxd, add 'use database' as first option
-    configuration = ['use ' + hql_query.query.get('database', 'default')]
+    if self.query_server['server_name'] == 'impala':
+      configuration = []
+    else:
+      configuration = ['use ' + hql_query.query.get('database', 'default')]
     configuration.extend(hql_query.get_configuration())
 
     thrift_query = BeeswaxService.Query(query=hql_query.query['query'], configuration=configuration)
@@ -141,10 +144,13 @@ class BeeswaxClient:
     if rows is None:
       rows = -1
 
-    handle = handle.get_rpc_handle()
-    results = self.db_client.fetch(handle, start_over, rows)
+    rpc_handle = handle.get_rpc_handle()
+    results = self.db_client.fetch(rpc_handle, start_over, rows)
 
     if results.ready:
+      # Impala does not return the name of the columns, need to fetch separately
+      if self.query_server['server_name'] == 'impala':
+        results.columns = [column.name for column in self.get_results_metadata(handle).schema.fieldSchemas]
       return BeeswaxDataTable(results)
 
 
