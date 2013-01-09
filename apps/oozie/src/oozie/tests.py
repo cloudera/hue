@@ -1278,6 +1278,26 @@ class TestEditor(OozieMockBase):
     workflow.delete()
 
 
+  def test_import_workflow_email(self):
+    """
+    Validates import for email node: to, css, subject, body.
+    """
+    workflow = Workflow.objects.new_workflow(self.user)
+    workflow.save()
+    f = open('apps/oozie/src/oozie/test_data/0.4/test-email.0.1.xml')
+    import_workflow(workflow, f.read())
+    f.close()
+    workflow.save()
+    assert_equal(4, len(Node.objects.filter(workflow=workflow)))
+    assert_equal(3, len(Link.objects.filter(parent__workflow=workflow)))
+    node = Node.objects.get(workflow=workflow, node_type='email').get_full_node()
+    assert_equal('example@example.org', node.to)
+    assert_equal('', node.cc)
+    assert_equal('I love', node.subject)
+    assert_equal('Hue', node.body)
+    workflow.delete()
+
+
 class TestPermissions(OozieBase):
 
   def setUp(self):
