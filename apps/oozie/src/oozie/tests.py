@@ -23,7 +23,6 @@ import logging
 import re
 import os
 
-from nose.plugins.skip import SkipTest
 from nose.tools import raises, assert_true, assert_false, assert_equal, assert_not_equal
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -111,10 +110,37 @@ class MockOozieApi:
     return 'Done'
 
   def get_job_definition(self, jobid):
-    return '<xml></xml>'
+    if jobid == MockOozieApi.WORKFLOW_IDS[0]:
+      return """<workflow-app name="MapReduce" xmlns="uri:oozie:workflow:0.4">
+      <start to="Sleep"/>
+      <action name="Sleep">
+          <map-reduce>
+              <job-tracker>${jobTracker}</job-tracker>
+              <name-node>${nameNode}</name-node>
+              <configuration>
+                  <property>
+                      <name>mapred.reduce.tasks</name>
+                      <value>1</value>
+                  </property>
+                  <property>
+                      <name>sleep.job.reduce.sleep.time</name>
+                      <value>${REDUCER_SLEEP_TIME}</value>
+                  </property>
+              </configuration>
+          </map-reduce>
+          <ok to="end"/>
+          <error to="kill"/>
+      </action>
+      <kill name="kill">
+          <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+      </kill>
+      <end name="end"/>
+  </workflow-app>"""
+    else:
+      return """<workflow-app name="MapReduce" xmlns="uri:oozie:workflow:0.4">BAD</workflow-app>"""
 
   def get_job_log(self, jobid):
-    return '<xml></xml>'
+    return '2013-01-08 16:28:06,487  INFO ActionStartXCommand:539 - USER[romain] GROUP[-] TOKEN[] APP[MapReduce] JOB[0000002-130108101138395-oozie-oozi-W] ACTION[0000002-130108101138395-oozie-oozi-W@:start:] Start action [0000002-130108101138395-oozie-oozi-W@:start:] with user-retry state : userRetryCount [0], userRetryMax [0], userRetryInterval [10]'
 
 
 class OozieMockBase(object):
@@ -129,6 +155,7 @@ class OozieMockBase(object):
     oozie_api.OozieApi = MockOozieApi
     oozie_api._api_cache = None
 
+    History.objects.all().delete()
     Coordinator.objects.all().delete()
 
     self.c = make_logged_in_client(is_superuser=False)
@@ -1871,6 +1898,22 @@ class TestDashboard(OozieMockBase):
 
     response = client_not_me.get(reverse('oozie:list_oozie_coordinator', args=[MockOozieApi.COORDINATOR_IDS[0]]))
     assert_false('Permission denied' in response.content, response.content)
+
+  def test_good_workflow_status_graph(self):
+    workflow_count = Workflow.objects.count()
+
+    response = self.c.get(reverse('oozie:list_oozie_workflow', args=[MockOozieApi.WORKFLOW_IDS[0]]), {})
+
+    assert_true(response.context['workflow_graph'])
+    assert_equal(Workflow.objects.count(), workflow_count)
+
+  def test_bad_workflow_status_graph(self):
+    workflow_count = Workflow.objects.count()
+
+    response = self.c.get(reverse('oozie:list_oozie_workflow', args=[MockOozieApi.WORKFLOW_IDS[1]]), {})
+
+    assert_true(response.context['workflow_graph'] is None)
+    assert_equal(Workflow.objects.count(), workflow_count)
 
 
 class TestUtils(OozieMockBase):
