@@ -15,7 +15,7 @@
 # limitations under the License.
 
 DJANGO_APPS = ['impala']
-NICE_NAME = 'Impala'
+NICE_NAME = 'Cloudera Impala (TM) Query UI'
 MENU_INDEX = 11
 ICON = '/impala/static/art/icon_impala_24.png'
 

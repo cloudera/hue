@@ -647,8 +647,6 @@ def view_results(request, id, first_row=0):
   }
 
   if not error:
-    #data = list(results.rows()) # Materialize results
-
     download_urls = {}
     if downloadable:
       for format in common.DL_FORMATS:

@@ -86,12 +86,13 @@ ${ layout.menubar(section='coordinators') }
           <li><a href="#step4" class="step">${ _('Step 4: Outputs') }</a></li>
           <li><a href="#step5" class="step">${ _('Step 5: Advanced settings') }</a></li>
         </ul>
+
         ${ dataset_formset.management_form | n,unicode }
         ${ data_input_formset.management_form | n,unicode }
         ${ data_output_formset.management_form | n,unicode }
         ${ properties.init_viewmodel(coordinator) }
-        <div class="steps">
 
+        <div class="steps">
           <div id="step1" class="stepDetails">
             <div class="alert alert-info"><h3>${ _('Coordinator data') }</h3></div>
             <div class="fieldWrapper">
@@ -156,9 +157,9 @@ ${ layout.menubar(section='coordinators') }
                 <tbody>
                 % for form in data_input_formset.forms:
                 <tr>
-                  ${ form['id'] }
-                  <td>${ form['name'] }</td>
-                  <td>${ form['dataset'] }</td>
+                  ${ form['id'] | n,unicode }
+                  <td>${ form['name'] | n,unicode }</td>
+                  <td>${ form['dataset'] | n,unicode }</td>
                   <td>${ form['dataset'].form.instance.dataset.uri }</td>
                 % if coordinator.is_editable(user):
                   <td><a class="btn btn-small delete-row" href="javascript:void(0);">${ _('Delete') }${ form['DELETE'] | n,unicode }</a></td>
@@ -209,9 +210,9 @@ ${ layout.menubar(section='coordinators') }
               <tbody>
                 % for form in data_output_formset.forms:
                   <tr>
-                    ${ form['id'] }
-                    <td>${ form['name'] }</td>
-                    <td>${ form['dataset'] }</td>
+                    ${ form['id'] | n,unicode }
+                    <td>${ form['name'] | n,unicode }</td>
+                    <td>${ form['dataset'] | n,unicode }</td>
                     <td>${ form['dataset'].form.instance.dataset.uri }</td>
                     % if coordinator.is_editable(user):
                       <td><a class="btn btn-small delete-row" href="javascript:void(0);">${ _('Delete') }${ form['DELETE'] | n,unicode }</a></td>

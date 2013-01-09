@@ -37,7 +37,7 @@
 
     <div id="validationResults">
     % if len(form.query["query"].errors):
-        ${ unicode(form.query["query"].errors) }
+        ${ unicode(form.query["query"].errors) | n,unicode }
      % endif
     </div>
 
@@ -64,8 +64,16 @@ ${layout.menubar(section='query')}
             <div class="well sidebar-nav">
                 <form id="advancedSettingsForm" action="${action}" method="POST" class="form form-horizontal noPadding">
                     <ul class="nav nav-list">
-                        <li class="nav-header">${_('database')}</li>
-                        <li>
+                        <li class="nav-header
+                        % if app_name == 'impala':
+                            hide
+                        % endif
+                        ">${_('database')}</li>
+                        <li
+                        % if app_name == 'impala':
+                            class="hide"
+                        % endif
+                        >
                           ${ form.query['database'] | n,unicode }
                         </li>
                         <li class="nav-header">${_('settings')}</li>
