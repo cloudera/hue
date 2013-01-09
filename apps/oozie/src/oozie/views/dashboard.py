@@ -38,7 +38,7 @@ from oozie.forms import RerunForm, ParameterForm
 
 
 from oozie.conf import OOZIE_JOBS_COUNT
-from oozie.models import History, Job
+from oozie.models import History, Job, Workflow
 from oozie.settings import DJANGO_APPS
 
 
@@ -137,6 +137,11 @@ def list_oozie_workflow(request, job_id, coordinator_job_id=None):
 
   parameters = oozie_workflow.conf_dict.copy()
 
+  if hue_workflow:
+    workflow_graph = hue_workflow.gen_status_graph(oozie_workflow)
+  else:
+    workflow_graph = Workflow.gen_status_graph_from_xml(request.user, oozie_workflow)
+
   return render('dashboard/list_oozie_workflow.mako', request, {
     'history': history,
     'oozie_workflow': oozie_workflow,
@@ -145,6 +150,7 @@ def list_oozie_workflow(request, job_id, coordinator_job_id=None):
     'hue_coord': hue_coord,
     'parameters': parameters,
     'has_job_edition_permission': has_job_edition_permission,
+    'workflow_graph': workflow_graph
   })
 
 

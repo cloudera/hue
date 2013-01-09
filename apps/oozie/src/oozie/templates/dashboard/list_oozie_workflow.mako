@@ -143,7 +143,7 @@ ${ layout.menubar(section='dashboard') }
   <br/><br/>
 
     <ul class="nav nav-tabs">
-      % if hue_workflow:
+      % if workflow_graph:
         <li class="active"><a href="#graph" data-toggle="tab">${ _('Graph') }</a></li>
         <li><a href="#actions" data-toggle="tab">${ _('Actions') }</a></li>
       % else:
@@ -156,129 +156,119 @@ ${ layout.menubar(section='dashboard') }
     </ul>
 
     <div id="workflow-tab-content" class="tab-content" style="min-height:200px">
-     % if hue_workflow:
+
+     % if workflow_graph:
        <div id="graph" class="tab-pane active">
-         % if hue_workflow is not None:
-         <%
-           from oozie.forms import NodeForm
-           from oozie.models import Workflow, Node
-           from django.forms.models import inlineformset_factory
-
-           WorkflowFormSet = inlineformset_factory(Workflow, Node, form=NodeForm, max_num=0, can_order=False, can_delete=False)
-           forms = WorkflowFormSet(instance=hue_workflow.get_full_node()).forms
-         %>
-
-           ${ hue_workflow.get_full_node().gen_status_graph(forms, oozie_workflow.get_working_actions()) | n,unicode }
-         % endif
+           ${ workflow_graph | n,unicode }
        </div>
      % endif
 
-    <div class="tab-pane ${ utils.if_false(hue_workflow, 'active') }" id="actions">
-      % if oozie_workflow.get_working_actions():
-        <table class="table table-striped table-condensed selectable">
-          <thead>
-            <tr>
-              <th>${ _('Logs') }</th>
-              <th>${ _('Id') }</th>
-              <th>${ _('Name') }</th>
-              <th>${ _('Type') }</th>
-              <th>${ _('Status') }</th>
-              <th>${ _('External Id') }</th>
-
-              <th>${ _('Start Time') }</th>
-              <th>${ _('End Time') }</th>
-
-              <th>${ _('Retries') }</th>
-              <th>${ _('Error Message') }</th>
-              <th>${ _('Transition') }</th>
-
-              <th>${ _('Data') }</th>
-            </tr>
-          </thead>
-          <tbody>
-            % for i, action in enumerate(oozie_workflow.get_working_actions()):
+      <div id="actions" class="tab-pane ${ utils.if_false(workflow_graph, 'active') }">
+        % if oozie_workflow.get_working_actions():
+          <table class="table table-striped table-condensed selectable">
+            <thead>
               <tr>
-                <td>
-                  % if action.externalId:
-                    <a href="${ url('jobbrowser.views.job_single_logs', job=action.externalId) }" data-row-selector-exclude="true"><i class="icon-tasks"></i></a>
-                  % endif
-                </td>
-                <td>
-                  <a href="${ url('oozie:list_oozie_workflow_action', action=action.id) }" data-row-selector='true'>${ action.id }</a>
-                </td>
-                <td>
-                  % if design_link:
-                    <a href="${ design_link }">${ action.name }</a>
-                  % else:
-                    ${ action.name }
-                  % endif
-                </td>
-                <td>${ action.type }</td>
-                <td><span class="label ${ utils.get_status(action.status) }">${ action.status }</span></td>
-                <td>
-                  % if action.externalId:
-                    <a href="${ url('jobbrowser.views.single_job', job=action.externalId) }">${ "_".join(action.externalId.split("_")[-2:]) }</a>
-                  % endif
-                </td>
+                <th>${ _('Logs') }</th>
+                <th>${ _('Id') }</th>
+                <th>${ _('Name') }</th>
+                <th>${ _('Type') }</th>
+                <th>${ _('Status') }</th>
+                <th>${ _('External Id') }</th>
 
-                <td>${ utils.format_time(action.startTime) }</td>
-                <td>${ utils.format_time(action.endTime) }</td>
+                <th>${ _('Start Time') }</th>
+                <th>${ _('End Time') }</th>
 
-                <td>${ action.retries }</td>
-                <td>${ action.errorMessage }</td>
-                <td>${ action.transition }</td>
+                <th>${ _('Retries') }</th>
+                <th>${ _('Error Message') }</th>
+                <th>${ _('Transition') }</th>
 
-                <td>${ action.data }</td>
+                <th>${ _('Data') }</th>
               </tr>
-            % endfor
-          <tbody>
-        </table>
+            </thead>
+            <tbody>
+              % for i, action in enumerate(oozie_workflow.get_working_actions()):
+                <tr>
+                  <td>
+                    % if action.externalId:
+                      <a href="${ url('jobbrowser.views.job_single_logs', job=action.externalId) }" data-row-selector-exclude="true"><i class="icon-tasks"></i></a>
+                    % endif
+                  </td>
+                  <td>
+                    <a href="${ url('oozie:list_oozie_workflow_action', action=action.id) }" data-row-selector='true'>${ action.id }</a>
+                  </td>
+                  <td>
+                    % if design_link:
+                      <a href="${ design_link }">${ action.name }</a>
+                    % else:
+                      ${ action.name }
+                    % endif
+                  </td>
+                  <td>${ action.type }</td>
+                  <td><span class="label ${ utils.get_status(action.status) }">${ action.status }</span></td>
+                  <td>
+                    % if action.externalId:
+                      <a href="${ url('jobbrowser.views.single_job', job=action.externalId) }">${ "_".join(action.externalId.split("_")[-2:]) }</a>
+                    % endif
+                  </td>
+
+                  <td>${ utils.format_time(action.startTime) }</td>
+                  <td>${ utils.format_time(action.endTime) }</td>
+
+                  <td>${ action.retries }</td>
+                  <td>${ action.errorMessage }</td>
+                  <td>${ action.transition }</td>
+
+                  <td>${ action.data }</td>
+                </tr>
+              % endfor
+            <tbody>
+          </table>
         % endif
-      </div>
+       </div>
 
-      <div class="tab-pane" id="details">
-        <table class="table table-condensed">
-          <tbody>
-            <tr>
-              <td>${ _('Group') }</td>
-              <td>${ oozie_workflow.group or '-' }</td>
-            </tr>
-            <tr>
-              <td>${ _('External Id') }</td>
-              <td>${ oozie_workflow.externalId or '-' }</td>
-            </tr>
-            <tr>
-              <td>${ _('Start Time') }</td>
-              <td>${ utils.format_time(oozie_workflow.startTime) }</td>
-            </tr>
-            <tr>
-              <td>${ _('Created Time') }</td>
-              <td>${ utils.format_time(oozie_workflow.createdTime) }</td>
-            </tr>
-            <tr>
-              <td>${ _('End Time') }</td>
-              <td>${  utils.format_time(oozie_workflow.endTime) }</td>
-            </tr>
-            <tr>
-              <td>${ _('Application Path') }</td>
-              <td>${  utils.hdfs_link(oozie_workflow.appPath) }</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+       <div class="tab-pane" id="details">
+          <table class="table table-condensed">
+            <tbody>
+              <tr>
+                <td>${ _('Group') }</td>
+                <td>${ oozie_workflow.group or '-' }</td>
+              </tr>
+              <tr>
+                <td>${ _('External Id') }</td>
+                <td>${ oozie_workflow.externalId or '-' }</td>
+              </tr>
+              <tr>
+                <td>${ _('Start Time') }</td>
+                <td>${ utils.format_time(oozie_workflow.startTime) }</td>
+              </tr>
+              <tr>
+                <td>${ _('Created Time') }</td>
+                <td>${ utils.format_time(oozie_workflow.createdTime) }</td>
+              </tr>
+              <tr>
+                <td>${ _('End Time') }</td>
+                <td>${  utils.format_time(oozie_workflow.endTime) }</td>
+              </tr>
+              <tr>
+                <td>${ _('Application Path') }</td>
+                <td>${  utils.hdfs_link(oozie_workflow.appPath) }</td>
+              </tr>
+            </tbody>
+          </table>
+       </div>
 
-      <div class="tab-pane" id="configuration">
-          ${ utils.display_conf(oozie_workflow.conf_dict) }
-      </div>
+       <div class="tab-pane" id="configuration">
+            ${ utils.display_conf(oozie_workflow.conf_dict) }
+       </div>
 
-      <div class="tab-pane" id="log">
-          <pre>${ oozie_workflow.log }</pre>
-      </div>
+       <div class="tab-pane" id="log">
+            <pre>${ oozie_workflow.log }</pre>
+       </div>
 
-      <div class="tab-pane" id="definition">
-          <textarea id="definitionEditor">${ oozie_workflow.definition }</textarea>
-      </div>
-  </div>
+       <div class="tab-pane" id="definition" style="min-height:400px">
+            <textarea id="definitionEditor">${ oozie_workflow.definition }</textarea>
+       </div>
+    </div>
 
   <div style="margin-top: 20px; margin-bottom: 20px">
     <a class="btn" onclick="history.back()">${ _('Back') }</a>
@@ -303,6 +293,12 @@ ${ layout.menubar(section='dashboard') }
 <script src="/static/ext/js/codemirror-3.0.js"></script>
 <link rel="stylesheet" href="/static/ext/css/codemirror.css">
 <script src="/static/ext/js/codemirror-xml.js"></script>
+
+<style>
+.CodeMirror.cm-s-default {
+   height:500px;
+}
+</style>
 
 <script type="text/javascript">
   $(document).ready(function() {

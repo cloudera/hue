@@ -15,15 +15,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
-import time
-from django.template.defaultfilters import escapejs
-
 try:
   import json
 except ImportError:
   import simplejson as json
+import logging
 import re
+import time
+
 from datetime import datetime,  timedelta
 from string import Template
 from itertools import chain
@@ -32,6 +31,8 @@ from django.db import models
 from django.core.urlresolvers import reverse
 from django.core.validators import RegexValidator
 from django.contrib.auth.models import User
+from django.forms.models import inlineformset_factory
+from django.template.defaultfilters import escapejs
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
 from desktop.log.access import access_warn
@@ -42,8 +43,8 @@ from hadoop.fs.exceptions import WebHdfsException
 from hadoop.fs.hadoopfs import Hdfs
 from liboozie.submittion import Submission
 
-from oozie.management.commands import oozie_setup
 from oozie.conf import REMOTE_SAMPLE_DIR, SHARE_JOBS
+from oozie.management.commands import oozie_setup
 from timezones import TIMEZONES
 
 
@@ -408,13 +409,31 @@ class Workflow(Job):
       child = Link.objects.filter(parent=node).exclude(name__in=['related', 'kill', 'error'])[0].child
       return [node] + self.get_hierarchy_rec(child)
 
-  def gen_status_graph(self, forms, actions):
+  def gen_status_graph(self, oozie_workflow):
+    from oozie.forms import NodeForm  # Circular dependency
+    actions = oozie_workflow.get_working_actions()
+    WorkflowFormSet = inlineformset_factory(Workflow, Node, form=NodeForm, max_num=0, can_order=False, can_delete=False)
+    forms = WorkflowFormSet(instance=self).forms
     template='editor/gen/workflow-graph-status.xml.mako'
 
     index = dict([(form.instance.id, form) for form in forms])
     actions_index = dict([(action.name, action) for action in actions])
 
     return django_mako.render_to_string(template, {'nodes': self.get_hierarchy(), 'index': index, 'actions': actions_index})
+
+  @classmethod
+  def gen_status_graph_from_xml(cls, user, oozie_workflow):
+    from oozie.import_workflow import import_workflow # Circular dependency
+    try:
+      workflow = Workflow.objects.new_workflow(user)
+      workflow.save()
+      try:
+        import_workflow(workflow, oozie_workflow.definition)
+        return workflow.gen_status_graph(oozie_workflow)
+      except Exception, e:
+        LOG.info('Workflow %s could not be converted to a graph: %s' % (oozie_workflow.id, e))
+    finally:
+      workflow.delete()
 
   def to_xml(self):
     tmpl = 'editor/gen/workflow.xml.mako'

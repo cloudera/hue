@@ -1,3 +1,7 @@
+ul {
+  list-style-type: none;
+}
+
 #modal-window .modal-content {
   height: 300px;
   overflow: auto;

@@ -126,7 +126,9 @@
 
 <%def name="guess_hdfs_link(name, path)">
   <%
-    if name.endswith('dir') or name.endswith('path') or path.startswith('/') or path.startswith('hdfs://'):
+    import re
+
+    if re.search('(dir|path|output|input)', name, re.I) or path.startswith('/') or path.startswith('hdfs://'):
       return hdfs_link(path)
     else:
       return path

@@ -35,10 +35,8 @@ try:
   import json
 except ImportError:
   import simplejson as json
-from collections import deque
+
 import logging
-import re
-import sys
 from lxml import etree
 
 from django.core import serializers
