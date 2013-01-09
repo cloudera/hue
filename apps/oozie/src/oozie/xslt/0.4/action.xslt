@@ -16,6 +16,7 @@
 <xsl:import href="nodes/pig.xslt"/>
 <xsl:import href="nodes/streaming.xslt"/>
 <xsl:import href="nodes/generic.xslt"/>
+<xsl:import href="nodes/subworkflow.xslt"/>
 
 <xsl:template match="workflow:action" xmlns:workflow="uri:oozie:workflow:0.4">
 

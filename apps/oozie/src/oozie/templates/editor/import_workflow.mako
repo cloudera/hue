@@ -65,9 +65,9 @@ ${ layout.menubar(section='workflows') }
            </div>
 
            <div class="hide">
-             ${ workflow_form['schema_version'] }
-             ${ workflow_form['job_properties'] }
-             ${ workflow_form['parameters'] }
+             ${ workflow_form['schema_version'] | n,unicode }
+             ${ workflow_form['job_properties'] | n,unicode }
+             ${ workflow_form['parameters'] | n,unicode }
          </div>
          </fieldset>
 

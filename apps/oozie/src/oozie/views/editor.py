@@ -124,7 +124,7 @@ def import_workflow(request):
       workflow_definition = workflow_form.cleaned_data['definition_file'].read()
 
       try:
-        _import_workflow(workflow=workflow, workflow_definition=workflow_definition)
+        _import_workflow(fs=request.fs, workflow=workflow, workflow_definition=workflow_definition)
         request.info(_('Workflow imported'))
         return redirect(reverse('oozie:edit_workflow', kwargs={'workflow': workflow.id}))
 
