@@ -579,8 +579,8 @@ class TestEditor(OozieMockBase):
 
 
   def test_workflow_has_cycle(self):
-    action1 = Node.objects.get(name='action-name-1')
-    action3 = Node.objects.get(name='action-name-3')
+    action1 = Node.objects.get(workflow=self.wf, name='action-name-1')
+    action3 = Node.objects.get(workflow=self.wf, name='action-name-3')
 
     assert_false(self.wf.has_cycle())
 
@@ -1076,7 +1076,7 @@ class TestEditor(OozieMockBase):
 
 
   def test_workflow_prepare(self):
-    action1 = Node.objects.get(name='action-name-1').get_full_node()
+    action1 = Node.objects.get(workflow=self.wf, name='action-name-1').get_full_node()
 
     action1.prepares = json.dumps([
                            {"type": "delete","value": "${output}"},
@@ -1114,10 +1114,39 @@ class TestEditor(OozieMockBase):
     assert_true('checked: capture_output' in response.content, response.content)
 
 
-  @raises(PopupException)
+  def test_xss_escape_js(self):
+    escaped = '[{"name": "oozie.use.system.libpath", "value": "true"}, {"name": "123\\\\u0022\\\\u003E\\\\u003Cscript\\\\u003Ealert(1)\\\\u003C/script\\\\u003E", "value": "hacked"}]'
+    hacked = '[{"name":"oozie.use.system.libpath","value":"true"}, {"name": "123\\"><script>alert(1)</script>", "value": "hacked"}]'
+
+    self.wf.job_properties = hacked
+    self.wf.parameters = hacked
+
+    assert_equal(escaped, self.wf._escapejs_parameters_list(hacked))
+    assert_equal(escaped, self.wf.job_properties_escapejs)
+    assert_equal(escaped, self.wf.parameters_escapejs)
+
+
+  def test_xss_html_escaping(self):
+    data = WORKFLOW_DICT.copy()
+    data['description'] = [u'"><script>alert(1);</script>']
+
+    self.wf = create_workflow(self.c, workflow_dict=data)
+
+    resp = self.c.get('/oozie/list_workflows/')
+    assert_false('"><script>alert(1);</script>' in resp.content, resp.content)
+    assert_true('&quot;&gt;&lt;script&gt;alert(1);&lt;/script&gt;' in resp.content, resp.content)
+
+
+class TestImportWorkflow04(OozieMockBase):
+
+  def setUp(self):
+    super(TestImportWorkflow04, self).setUp()
+    self.setup_simple_workflow()
+
+  @raises(RuntimeError)
   def test_import_workflow_namespace_error(self):
     """
-    Validates import for most basic workflow: start and end.
+    Validates import for most basic workflow with an error.
     """
     workflow = Workflow.objects.new_workflow(self.user)
     workflow.save()
@@ -1142,6 +1171,7 @@ class TestEditor(OozieMockBase):
     assert_equal(2, len(Node.objects.filter(workflow=workflow)))
     assert_equal(1, len(Link.objects.filter(parent__workflow=workflow)))
     assert_equal('done', Node.objects.get(workflow=workflow, node_type='end').name)
+    assert_equal('uri:oozie:workflow:0.4', workflow.schema_version)
     workflow.delete()
 
 
@@ -1340,29 +1370,6 @@ class TestEditor(OozieMockBase):
     node = Node.objects.get(workflow=workflow, node_type='generic').get_full_node()
     assert_equal("<bleh test=\"test\">\n              <test>test</test>\n        </bleh>", node.xml)
     workflow.delete()
-
-
-  def test_xss_escape_js(self):
-    escaped = '[{"name": "oozie.use.system.libpath", "value": "true"}, {"name": "123\\\\u0022\\\\u003E\\\\u003Cscript\\\\u003Ealert(1)\\\\u003C/script\\\\u003E", "value": "hacked"}]'
-    hacked = '[{"name":"oozie.use.system.libpath","value":"true"}, {"name": "123\\"><script>alert(1)</script>", "value": "hacked"}]'
-
-    self.wf.job_properties = hacked
-    self.wf.parameters = hacked
-
-    assert_equal(escaped, self.wf._escapejs_parameters_list(hacked))
-    assert_equal(escaped, self.wf.job_properties_escapejs)
-    assert_equal(escaped, self.wf.parameters_escapejs)
-
-
-  def test_xss_html_escaping(self):
-    data = WORKFLOW_DICT.copy()
-    data['description'] = [u'"><script>alert(1);</script>']
-
-    self.wf = create_workflow(self.c, workflow_dict=data)
-
-    resp = self.c.get('/oozie/list_workflows/')
-    assert_false('"><script>alert(1);</script>' in resp.content, resp.content)
-    assert_true('&quot;&gt;&lt;script&gt;alert(1);&lt;/script&gt;' in resp.content, resp.content)
 
 
 class TestPermissions(OozieBase):
@@ -1625,6 +1632,8 @@ class TestPermissions(OozieBase):
 class TestEditorWithOozie(OozieBase):
 
   def setUp(self):
+    OozieBase.setUp(self)
+
     self.c = make_logged_in_client()
     self.wf = create_workflow(self.c)
     self.setup_simple_workflow()
@@ -1678,6 +1687,45 @@ class TestEditorWithOozie(OozieBase):
     }, follow=True)
     fh.close()
     assert_equal(workflow_count + 1, Workflow.objects.count(), response)
+
+
+
+class TestImportWorkflow04WithOozie(OozieBase):
+
+  def setUp(self):
+    OozieBase.setUp(self)
+
+    self.c = make_logged_in_client()
+    self.wf = create_workflow(self.c)
+    self.setup_simple_workflow()
+
+    # in order to reference examples in Subworkflow, must be owned by current user.
+    Workflow.objects.update(owner=self.user)
+
+
+  def tearDown(self):
+    self.wf.delete()
+
+    # Make sure examples are owned by Hue.
+    # This user is created by OozieBase.
+    Workflow.objects.update(owner=User.objects.get(username='hue'))
+
+
+  def test_import_workflow_subworkflow(self):
+    """
+    Validates import for subworkflow node: propagate_configuration.
+    """
+    workflow = Workflow.objects.new_workflow(self.user)
+    workflow.save()
+    f = open('apps/oozie/src/oozie/test_data/0.4/test-subworkflow.xml')
+    import_workflow(workflow, f.read(), self.cluster.fs)
+    f.close()
+    workflow.save()
+    assert_equal(4, len(Node.objects.filter(workflow=workflow)))
+    assert_equal(3, len(Link.objects.filter(parent__workflow=workflow)))
+    node = Node.objects.get(workflow=workflow, node_type='subworkflow').get_full_node()
+    assert_equal(True, node.propagate_configuration)
+    workflow.delete()
 
 
 class TestOozieSubmissions(OozieBase):

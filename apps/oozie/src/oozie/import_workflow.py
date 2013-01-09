@@ -42,10 +42,8 @@ from lxml import etree
 from django.core import serializers
 from django.utils.translation import ugettext as _
 
-from desktop.lib.exceptions_renderable import PopupException
-
 from conf import DEFINITION_XSLT_DIR
-from models import Node, Link, Start, End, Decision, DecisionEnd, Fork, Join
+from models import Workflow, Node, Link, Start, End, Decision, DecisionEnd, Fork, Join
 from utils import xml_tag
 
 LOG = logging.getLogger(__name__)
@@ -211,7 +209,7 @@ def _resolve_decision_relationships(workflow):
       if node_temp.id == decision.id and parent.node_type != Decision.node_type:
         links = Link.objects.filter(parent=parent).exclude(name__in=['related', 'kill', 'error'])
         if len(links) != 1:
-          raise PopupException(_('Cannot import workflows that have decision DAG leaf nodes with multiple children or no children.'))
+          raise RuntimeError(_('Cannot import workflows that have decision DAG leaf nodes with multiple children or no children.'))
         link = links[0]
         link.child = decision_end
         link.save()
@@ -247,7 +245,7 @@ def _resolve_decision_relationships(workflow):
     # A single end means that we've found a unique end for this decision.
     # Multiple ends mean that we've found a bad decision.
     if len(ends) > 1:
-      raise PopupException(_('Cannot import workflows that have decisions paths with multiple terminal nodes that converge on a single terminal node.'))
+      raise RuntimeError(_('Cannot import workflows that have decisions paths with multiple terminal nodes that converge on a single terminal node.'))
     elif len(ends) == 1:
       end = ends.pop()
       # Branch count will vary with each call if we have multiple decision nodes embedded within decision paths.
@@ -275,9 +273,9 @@ def _resolve_decision_relationships(workflow):
         # Can do this because we've replace all its parents with a single DecisionEnd node.
         return helper(end)
       else:
-        raise PopupException(_('Cannot import workflows that have decisions paths with multiple terminal nodes that converge on a single terminal node.'))
+        raise RuntimeError(_('Cannot import workflows that have decisions paths with multiple terminal nodes that converge on a single terminal node.'))
     else:
-      raise PopupException(_('Cannot import workflows that have decisions paths that never end.'))
+      raise RuntimeError(_('Cannot import workflows that have decisions paths that never end.'))
 
     return None
 
@@ -289,7 +287,7 @@ def _resolve_decision_relationships(workflow):
     # Will not be a kill node because we skip error links.
     # Error links should not go to a regular node.
     if node.get_parent_links().filter(name='error').exists():
-      raise PopupException(_('Error links cannot point to an ordinary node.'))
+      raise RuntimeError(_('Error links cannot point to an ordinary node.'))
 
     # Multiple parents means that we've found an end.
     # Joins will always have more than one parent.
@@ -307,7 +305,7 @@ def _resolve_decision_relationships(workflow):
         temp = helper(child)
         end = end or temp
         if end != temp:
-          raise PopupException(_('Different ends found in fork.'))
+          raise RuntimeError(_('Different ends found in fork.'))
       return end
     elif children:
       return helper(children.pop())
@@ -318,13 +316,14 @@ def _resolve_decision_relationships(workflow):
   helper(workflow.start.get_full_node())
 
 
-def _save_nodes(workflow, root):
+def _prepare_nodes(workflow, root):
   # Deserialize
   objs = serializers.deserialize('xml', etree.tostring(root))
 
   # First pass is a list of nodes and their types respectively.
   # Must link up nodes with their respective full nodes.
   node = None
+  nodes = []
   for obj in objs:
     obj.object.workflow = workflow
     if type(obj.object) is Node:
@@ -340,30 +339,101 @@ def _save_nodes(workflow, root):
       full_node.node_ptr_id = None
       full_node.id = None
 
-      if full_node.node_type is 'start':
-        full_node.name = 'start'
+      nodes.append(full_node)
 
-      full_node.save()
+  return nodes
 
 
-def import_workflow(workflow, workflow_definition):
+def _preprocess_nodes(workflow, transformed_root, workflow_definition_root, nodes, fs=None):
+  """
+  preprocess nodes
+  Resolve start name and subworkflow dependencies.
+  Looks at path and interrogates all workflows until the proper deployment path is found.
+  If the proper deployment path is never found, then 
+  """
+  for full_node in nodes:
+    if full_node.node_type is 'start':
+      full_node.name = 'start'
+    elif full_node.node_type is 'subworkflow':
+      app_path = None
+      for action_el in workflow_definition_root:
+        if 'name' in action_el.attrib and action_el.attrib['name'] == full_node.name:
+          for subworkflow_el in action_el:
+            if xml_tag(subworkflow_el) == 'sub-workflow':
+              for property_el in subworkflow_el:
+                if xml_tag(property_el) == 'app-path':
+                  app_path = property_el.text
+
+      if app_path is None:
+        raise RuntimeError(_("Could not find app-path for subworkflow %s") % full_node.name)
+
+      subworkflow = _resolve_subworkflow_from_deployment_dir(fs, workflow, app_path)
+      if subworkflow:
+        full_node.sub_workflow = subworkflow
+      else:
+        raise RuntimeError(_("Could not find subworkflow with deployment directory: %s") % app_path)
+
+
+def _resolve_subworkflow_from_deployment_dir(fs, workflow, app_path):
+  """
+  Resolves subworkflow in a subworkflow node
+  Looks at path and interrogates all workflows until the proper deployment path is found.
+  If the proper deployment path is never found, then 
+  """
+  if not fs:
+    raise RuntimeError(_("No hadoop file system to operate on."))
+
+  if app_path.endswith('/'):
+    app_path = app_path[:-1]
+  if app_path.startswith('hdfs://'):
+    app_path = app_path[7:]
+
+  try:
+    f = fs.open('%s/workflow.xml' % app_path)
+    root = etree.parse(f)
+    f.close()
+    return Workflow.objects.get(name=root.attrib['name'])
+  except IOError:
+    pass
+  except (KeyError, AttributeError), e:
+    raise RuntimeError(_("Could not find workflow name when resolving subworkflow."))
+  except Workflow.DoesNotExist, e:
+    raise RuntimeError(_("Could not find workflow with name %s extracted from subworkflow path %s") % (root.attrib['name'], app_path))
+  except Exception, e:
+    raise RuntimeError(_("Could not find workflow at path %s") % app_path)
+
+  for subworkflow in Workflow.objects.all():
+    if subworkflow.deployment_dir == app_path:
+      if workflow.owner.id != subworkflow.owner.id:
+        raise RuntimeError(_("Subworkflow is not owned by %s") % workflow.owner)
+      return subworkflow
+
+  return None
+
+
+def _save_nodes(nodes):
+  for node in nodes:
+    node.save()
+
+
+def import_workflow(workflow, workflow_definition, fs=None):
   xslt_definition_fh = open("%(xslt_dir)s/workflow.xslt" % {
     'xslt_dir': DEFINITION_XSLT_DIR.get()
   })
 
   # Parse Workflow Definition
-  xml = etree.fromstring(workflow_definition)
+  workflow_definition_root = etree.fromstring(workflow_definition)
 
-  if xml is None:
-    raise PopupException(_("Could not find any nodes in Workflow definition. Maybe it's malformed?"))
+  if workflow_definition_root is None:
+    raise RuntimeError(_("Could not find any nodes in Workflow definition. Maybe it's malformed?"))
 
-  ns = xml.tag[:-12] # Remove workflow-app from tag in order to get proper namespace prefix
+  ns = workflow_definition_root.tag[:-12] # Remove workflow-app from tag in order to get proper namespace prefix
   schema_version = ns and ns[1:-1] or None
 
   # Ensure namespace exists
   if schema_version not in OOZIE_NAMESPACES:
-    raise PopupException(_("Tag with namespace %(namespace)s is not a valid. Please use one of the following namespaces: %(namespaces)s") % {
-      'namespace': xml.tag,
+    raise RuntimeError(_("Tag with namespace %(namespace)s is not a valid. Please use one of the following namespaces: %(namespaces)s") % {
+      'namespace': workflow_definition_root.tag,
       'namespaces': ', '.join(OOZIE_NAMESPACES)
     })
 
@@ -373,11 +443,13 @@ def import_workflow(workflow, workflow_definition):
   transform = etree.XSLT(xslt)
 
   # Transform XML using XSLT
-  root = transform(xml)
+  transformed_root = transform(workflow_definition_root)
 
   # Resolve workflow dependencies and node types and link dependencies
-  _save_nodes(workflow, root)
-  _save_links(workflow, xml)
+  nodes = _prepare_nodes(workflow, transformed_root)
+  _preprocess_nodes(workflow, transformed_root, workflow_definition_root, nodes, fs)
+  _save_nodes(nodes)
+  _save_links(workflow, workflow_definition_root)
 
   # Update schema_version
   workflow.schema_version = schema_version
