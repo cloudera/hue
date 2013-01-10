@@ -355,9 +355,9 @@ public class Server {
         .transportFactory(new TTransportFactory());
     TServer server = new TThreadPoolServer(args);
 
-    HMSHandler.LOG.info("Started the new metaserver on port [" + port + "]...");
-    HMSHandler.LOG.info("minWorkerThreads = " + args.minWorkerThreads);
-    HMSHandler.LOG.info("maxWorkerThreads = " + args.maxWorkerThreads);
+    LOG.info("Started new Beeswax Thrift metaserver on port [" + port + "]...");
+    LOG.info("minWorkerThreads = " + args.minWorkerThreads);
+    LOG.info("maxWorkerThreads = " + args.maxWorkerThreads);
     server.serve();
   }
 }
