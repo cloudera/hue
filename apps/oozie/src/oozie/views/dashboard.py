@@ -20,6 +20,7 @@ try:
 except ImportError:
   import simplejson as json
 import logging
+import time
 
 from django.forms.formsets import formset_factory
 from django.http import HttpResponse
@@ -40,6 +41,8 @@ from oozie.forms import RerunForm, ParameterForm
 from oozie.conf import OOZIE_JOBS_COUNT
 from oozie.models import History, Job, Workflow
 from oozie.settings import DJANGO_APPS
+
+from django.template.defaultfilters import escapejs
 
 
 LOG = logging.getLogger(__name__)
@@ -98,6 +101,9 @@ def list_oozie_workflows(request):
 
   workflows = get_oozie().get_workflows(**kwargs)
 
+  if request.GET.get('format') == 'json':
+    return HttpResponse(json.dumps(massaged_oozie_jobs_for_json(workflows.jobs, request.user)), mimetype="application/json")
+
   return render('dashboard/list_oozie_workflows.mako', request, {
     'user': request.user,
     'jobs': split_oozie_jobs(workflows.jobs),
@@ -141,6 +147,17 @@ def list_oozie_workflow(request, job_id, coordinator_job_id=None):
     workflow_graph = hue_workflow.gen_status_graph(oozie_workflow)
   else:
     workflow_graph = Workflow.gen_status_graph_from_xml(request.user, oozie_workflow)
+
+  if request.GET.get('format') == 'json':
+    return_obj = {
+      'id': oozie_workflow.id,
+      'status':  oozie_workflow.status,
+      'progress': oozie_workflow.get_progress(),
+      'graph': workflow_graph,
+      'log': oozie_workflow.log,
+      'actions': massaged_workflow_actions_for_json(oozie_workflow.get_working_actions())
+    }
+    return HttpResponse(json.dumps(return_obj), mimetype="application/json")
 
   return render('dashboard/list_oozie_workflow.mako', request, {
     'history': history,
@@ -235,6 +252,64 @@ def _rerun_workflow(request, oozie_id, run_args, mapping):
   except RestException, ex:
     raise PopupException(_("Error rerunning workflow %s") % (oozie_id,),
                          detail=ex._headers.get('oozie-error-message', ex))
+
+
+def massaged_workflow_actions_for_json(workflow_actions):
+  actions = []
+  for action in workflow_actions:
+    massaged_action = {
+      'id': action.id,
+      'log': action.externalId and reverse('jobbrowser.views.job_single_logs', kwargs={'job': action.externalId}) or '',
+      'url': reverse('oozie:list_oozie_workflow_action', kwargs={'action': action.id}),
+      'name': escapejs(action.name),
+      'type': action.type,
+      'status': action.status,
+      'externalIdUrl': action.externalId and reverse('jobbrowser.views.single_job', kwargs={'job': action.externalId}) or '',
+      'externalId': action.externalId and '_'.join(action.externalId.split('_')[-2:]) or '',
+      'startTime': format_time(action.startTime),
+      'endTime': format_time(action.endTime),
+      'retries': action.retries,
+      'errorMessage': escapejs(action.errorMessage),
+      'transition': action.transition,
+      'data': escapejs(action.data)
+    }
+    actions.append(massaged_action)
+
+  return actions
+
+def format_time(st_time):
+  if st_time is None:
+    return '-'
+  else:
+    return time.strftime("%a, %d %b %Y %H:%M:%S", st_time)
+
+
+def massaged_oozie_jobs_for_json(oozie_jobs, user):
+  jobs = []
+
+  for job in oozie_jobs:
+    if job.is_running():
+      if job.type == 'Workflow':
+        job = get_oozie().get_job(job.id)
+      else:
+        job = get_oozie().get_coordinator(job.id)
+
+    massaged_job = {
+      'id': job.id,
+      'lastModTime': time.mktime(job.lastModTime),
+      'endTime': time.mktime(job.endTime),
+      'status': job.status,
+      'isRunning': job.is_running(),
+      'duration': job.endTime and job.startTime and ( time.mktime(job.endTime) - time.mktime(job.startTime) ) * 1000 or None,
+      'appName': escapejs(job.appName),
+      'progress': job.get_progress(),
+      'user': job.user,
+      'absoluteUrl': job.get_absolute_url(),
+      'canEdit': has_job_edition_permission(job, user),
+      }
+    jobs.append(massaged_job)
+
+  return jobs
 
 
 def split_oozie_jobs(oozie_jobs):

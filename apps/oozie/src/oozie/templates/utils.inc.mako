@@ -101,6 +101,23 @@
   % endif
 </%def>
 
+<%def name="hdfs_link_js(url)">
+  % if url:
+    <% path = Hdfs.urlsplit(url)[2] %>
+    % if path:
+      % if path.startswith(posixpath.sep):
+        /filebrowser/view${path}
+      % else:
+        /filebrowser/home_relative_view/${path}
+      % endif
+    % else:
+      javascript:void(0)
+    % endif
+  % else:
+    javascript:void(0)
+  % endif
+</%def>
+
 
 <%def name="display_conf(configs)">
   <table class="table table-condensed table-striped">
@@ -132,6 +149,18 @@
       return hdfs_link(path)
     else:
       return path
+    endif
+  %>
+</%def>
+
+<%def name="is_linkable(name, path)">
+  <%
+    import re
+
+    if re.search('(dir|path|output|input)', name, re.I) or path.startswith('/') or path.startswith('hdfs://'):
+      return True
+    else:
+      return False
     endif
   %>
 </%def>
