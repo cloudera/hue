@@ -435,9 +435,11 @@ class Workflow(Job):
     finally:
       workflow.delete()
 
-  def to_xml(self):
+  def to_xml(self, mapping=None):
+    if mapping is None:
+      mapping = {}
     tmpl = 'editor/gen/workflow.xml.mako'
-    return re.sub(re.compile('\s*\n+', re.MULTILINE), '\n', django_mako.render_to_string(tmpl, {'workflow': self}))
+    return re.sub(re.compile('\s*\n+', re.MULTILINE), '\n', django_mako.render_to_string(tmpl, {'workflow': self, 'mapping': mapping}))
 
 
 class Link(models.Model):
@@ -533,11 +535,14 @@ class Node(models.Model):
     else:
       return '%s-%s' % (self.node_type, self.id)
 
-  def to_xml(self):
+  def to_xml(self, mapping=None):
+    if mapping is None:
+      mapping = {}
     node = self.get_full_node()
 
     data = {
       'node': node,
+      'mapping': mapping
     }
 
     return django_mako.render_to_string(node.get_template_name(), data)
@@ -1137,7 +1142,7 @@ class DecisionEnd(ControlFlow):
   def get_parent_actions(self):
     return [link.parent for link in self.get_parent_links()]
 
-  def to_xml(self):
+  def to_xml(self, mapping):
     return ''
 
 
@@ -1188,9 +1193,11 @@ class Coordinator(Job):
   def get_type(self):
     return 'coordinator'
 
-  def to_xml(self):
+  def to_xml(self, mapping=None):
+    if mapping is None:
+      mapping = {}
     tmpl = "editor/gen/coordinator.xml.mako"
-    return re.sub(re.compile('\s*\n+', re.MULTILINE), '\n', django_mako.render_to_string(tmpl, {'coord': self}))
+    return re.sub(re.compile('\s*\n+', re.MULTILINE), '\n', django_mako.render_to_string(tmpl, {'coord': self, 'mapping': mapping}))
 
   def clone(self, new_owner=None):
     datasets = Dataset.objects.filter(coordinator=self)

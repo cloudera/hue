@@ -118,7 +118,7 @@ class Submission(object):
       LOG.exception(msg)
       raise PopupException(message=msg, detail=str(ex))
 
-    oozie_xml = self.job.to_xml()
+    oozie_xml = self.job.to_xml(self.properties)
     self._do_as(self.user.username , self._copy_files, deployment_dir, oozie_xml)
 
     if hasattr(self.job, 'actions'):

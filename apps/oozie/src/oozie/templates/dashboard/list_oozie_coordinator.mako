@@ -145,7 +145,12 @@ ${ layout.menubar(section='dashboard') }
                   % endif
                   <span class="label ${ utils.get_status(action.status) }">${ utils.format_time(action.nominalTime) }</span>
                 </td>
-                <td>${ action.errorMessage or "" } ${action.missingDependencies}</td>
+                <td>
+                  ${ action.errorMessage or "" }
+                  % if action.missingDependencies:
+                    ${ _('Missing')} ${ action.missingDependencies }
+                  % endif
+                </td>
               </tr>
             % endfor
           </tbody>
@@ -215,7 +220,7 @@ ${ layout.menubar(section='dashboard') }
     </div>
 
     <div class="tab-pane" id="definition">
-        <pre>${ oozie_coordinator.definition }</pre>
+        <textarea id="definitionEditor">${ oozie_coordinator.definition }</textarea>
     </div>
     </div>
   </div>
@@ -235,8 +240,29 @@ ${ layout.menubar(section='dashboard') }
   </div>
 </div>
 
+<script src="/static/ext/js/codemirror-3.0.js"></script>
+<link rel="stylesheet" href="/static/ext/css/codemirror.css">
+<script src="/static/ext/js/codemirror-xml.js"></script>
+
 <script>
   $("a[data-row-selector='true']").jHueRowSelector();
+
+  var definitionEditor = $("#definitionEditor")[0];
+
+  var codeMirror = CodeMirror(function(elt) {
+    definitionEditor.parentNode.replaceChild(elt, definitionEditor);
+    }, {
+      value: definitionEditor.value,
+    readOnly: true,
+    lineNumbers: true
+  });
+
+  // force refresh on tab change
+  $("a[data-toggle='tab']").on("shown", function (e) {
+    if ($(e.target).attr("href") == "#definition") {
+      codeMirror.refresh();
+    }
+  });
 
   $(".confirmationModal").click(function(){
     var _this = $(this);

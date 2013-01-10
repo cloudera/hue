@@ -29,6 +29,6 @@
   </global>
   % endif
   % for node in workflow.node_list:
-      ${ node.to_xml() | n }
+      ${ node.to_xml(mapping) | n }
   % endfor
 </workflow-app>

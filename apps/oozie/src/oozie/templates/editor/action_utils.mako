@@ -117,9 +117,13 @@
             <label class="control-label"></label>
             <div class="controls">
             <p class="alert alert-info span7">
-              ${ _('All the paths are relative to the deployment directory. They can be absolute but this is not recommended.') }
+              % if node_type != 'fs':
+                ${ _('All the paths are relative to the deployment directory. They can be absolute but this is not recommended.') }
+              % else:
+                ${ _('All the paths need to be absolute.') }
+              % endif
               <br/>
-              ${ _('You can parameterize values using case sensitive') } <code>${"${"}PARAMETER}</code>.
+              ${ _('You can parameterize values using case sensitive') } <code>${"${"}parameter}</code>.
             </p>
             % if node_type == 'ssh':
               <p class="alert alert-warn span5">

@@ -41,7 +41,7 @@ from liboozie.types import WorkflowList, Workflow as OozieWorkflow, Coordinator 
 from oozie.models import Workflow, Node, Kill, Streaming, Link, Job, Coordinator, History,\
   find_parameters, NODE_TYPES
 from oozie.conf import SHARE_JOBS
-from oozie.utils import workflow_to_dict, model_to_dict
+from oozie.utils import workflow_to_dict, model_to_dict, smart_path
 from oozie.import_workflow import import_workflow
 
 
@@ -662,7 +662,7 @@ class TestEditor(OozieMockBase):
         '        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>\n'
         '    </kill>\n'
         '    <end name="end"/>\n'
-        '</workflow-app>'.split(), self.wf.to_xml().split())
+        '</workflow-app>'.split(), self.wf.to_xml({'output': '/path'}).split())
 
 
   def test_workflow_shell_gen_xml(self):
@@ -725,7 +725,7 @@ class TestEditor(OozieMockBase):
     })
     Link(parent=action1, child=self.wf.end, name="ok").save()
 
-    xml = self.wf.to_xml()
+    xml = self.wf.to_xml({'mkdir2': '/path'})
 
     assert_true("""
     <action name="MyFs">
@@ -1000,12 +1000,12 @@ class TestEditor(OozieMockBase):
   <datasets>
     <dataset name="MyDataset" frequency="${coord:days(1)}"
              initial-instance="2012-07-01T00:00Z" timezone="America/Los_Angeles">
-      <uri-template>/data/${YEAR}${MONTH}${DAY}</uri-template>
+      <uri-template>${nameNode}/data/${YEAR}${MONTH}${DAY}</uri-template>
       <done-flag></done-flag>
     </dataset>
     <dataset name="MyDataset2" frequency="${coord:days(1)}"
              initial-instance="2012-07-01T00:00Z" timezone="America/Los_Angeles">
-      <uri-template>/data/out/${YEAR}${MONTH}${DAY}</uri-template>
+      <uri-template>${nameNode}/data/out/${YEAR}${MONTH}${DAY}</uri-template>
       <done-flag></done-flag>
     </dataset>
   </datasets>
@@ -1085,7 +1085,7 @@ class TestEditor(OozieMockBase):
                            {"type": "delete","value": "hdfs://localhost:8020/user/test/out"}])
     action1.save()
 
-    xml = self.wf.to_xml()
+    xml = self.wf.to_xml({'output': '/path'})
 
     assert_true('<delete path="${nameNode}${output}"/>' in xml, xml)
     assert_true('<delete path="${nameNode}/user/${wf:user()}/out"/>' in xml, xml)
@@ -1980,6 +1980,19 @@ class TestUtils(OozieMockBase):
     assert_true('description' in node_dict)
     assert_true('node_type' in node_dict)
     assert_true('workflow' in node_dict)
+
+
+  def test_smart_path(self):
+    assert_equal('${nameNode}/user/${wf:user()}/out', smart_path('out', {'output': '/path/out'}))
+    assert_equal('${nameNode}/path', smart_path('/path', {'output': '/path/out'}))
+    assert_equal('${nameNode}/path', smart_path('/path', {}))
+    assert_equal('${nameNode}${output}', smart_path('${output}', {'output': '/path/out'}))
+    assert_equal('hdfs://nn${output}', smart_path('hdfs://nn${output}', {'output': '/path/out'}))
+
+    assert_equal('${output}', smart_path('${output}', {}))
+    assert_equal('${output}', smart_path('${output}', {'output': 'hdfs://nn/path/out'}))
+    assert_equal('${output}', smart_path('${output}', {'output': '${path}'}))
+    assert_equal('${output_dir}', smart_path('${output_dir}', {'output': '/path/out', 'output_dir': 'hdfs://nn/path/out'}))
 
 
 # Utils

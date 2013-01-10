@@ -20,6 +20,7 @@ import logging
 from django import forms
 from django.db.models import Q
 from django.core.exceptions import ValidationError
+from django.forms.widgets import TextInput
 from django.utils.functional import curry
 from django.utils.translation import ugettext_lazy as _t
 
@@ -310,6 +311,11 @@ class DefaultLinkForm(forms.ModelForm):
 DATE_FORMAT = '%m/%d/%Y'
 TIME_FORMAT = '%I:%M %p'
 
+
+class NumberInput(TextInput):
+  input_type = 'number'
+
+
 class CoordinatorForm(forms.ModelForm):
   start = forms.SplitDateTimeField(input_time_formats=[TIME_FORMAT],
                                    widget=SplitDateTimeWidget(attrs={'class': 'input-small', 'id': 'coordinator_start'},
@@ -325,6 +331,7 @@ class CoordinatorForm(forms.ModelForm):
       'description': forms.TextInput(attrs={'class': 'span5'}),
       'parameters': forms.widgets.HiddenInput(),
       'schema_version': forms.widgets.HiddenInput(),
+      'timeout': NumberInput(),
     }
 
   def __init__(self, *args, **kwargs):
@@ -349,6 +356,7 @@ class DatasetForm(forms.ModelForm):
     model = Dataset
     exclude = ('coordinator')
     widgets = {
+      'description': forms.TextInput(attrs={'class': 'span5'}),
       'uri': forms.TextInput(attrs={'class': 'span5'}),
     }
 
