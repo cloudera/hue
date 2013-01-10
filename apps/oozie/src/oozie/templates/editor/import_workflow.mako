@@ -31,6 +31,9 @@ ${ layout.menubar(section='workflows') }
 
     <div class="well">
       <p>${_("You can import an external Oozie workflow by providing the workflow definition file.")}</p>
+      <p>
+        ${ _('Supported workflow versions are 0.4. Other versions might work depending on their complexity.') }
+      </p>
     </div>
 
     <div style="min-height:300px">

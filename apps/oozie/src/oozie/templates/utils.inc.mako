@@ -178,7 +178,7 @@
         <% field.field.widget.attrs.update(extra_attrs) %>
         ${ field | n,unicode }
         % if field.errors:
-          <span class="help-inline">${ unicode(field.errors) }</span>
+          <span class="help-inline">${ field.errors | n,unicode }</span>
         % endif
       </div>
     </div>
@@ -196,7 +196,7 @@
     <% field.field.widget.attrs.update(extra_attrs) %>
     ${ field | n,unicode }
     % if field.errors:
-        <span class="help-inline">${ unicode(field.errors) }</span>
+        <span class="help-inline">${ field.errors | n,unicode }</span>
     % endif
     % if field.help_text:
         <span class="help-block">${ field.help_text }</span>

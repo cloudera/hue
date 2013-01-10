@@ -14,9 +14,15 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 
+<%!
+  from oozie.utils import smart_path
+%>
+
 
 <%def name="render_dataset_instance(dataset)">
-  % if dataset.instance_choice in ('default', 'single'):
+  % if dataset.instance_choice == 'default':
+    <instance>${ '${'}coord:current(0)}</instance>
+  % elif dataset.instance_choice == 'single':
     % if not dataset.is_advanced_start_instance:
       <instance>${ '${'}coord:current(${ dataset.start_instance })}</instance>
     % else:
@@ -67,7 +73,7 @@
     % for dataset in coord.dataset_set.all():
     <dataset name="${ dataset.name }" frequency="${ dataset.frequency }"
              initial-instance="${ dataset.start_utc }" timezone="${ dataset.timezone }">
-      <uri-template>${ dataset.uri }</uri-template>
+      <uri-template>${ smart_path(dataset.uri, mapping) }</uri-template>
       <done-flag>${ dataset.done_flag }</done-flag>
     </dataset>
     % endfor
@@ -77,7 +83,7 @@
   % if coord.datainput_set.exists():
   <input-events>
     % for input in coord.datainput_set.all():
-    <data-in name="${ input.name }" dataset="${ input.dataset }">
+    <data-in name="${ input.name }" dataset="${ input.dataset.name }">
       ${ render_dataset_instance(input.dataset) }
     </data-in>
     % endfor
@@ -87,7 +93,7 @@
   % if coord.dataoutput_set.exists():
   <output-events>
     % for output in coord.dataoutput_set.all():
-    <data-out name="${ output.name }" dataset="${ output.dataset }">
+    <data-out name="${ output.name }" dataset="${ output.dataset.name }">
       ${ render_dataset_instance(output.dataset) }
     </data-out>
     % endfor

@@ -23,15 +23,15 @@
     <action name="${ node }">
         <fs>
             % for param in node.get_deletes():
-              <delete path='${ smart_path(param['name']) }'/>
+              <delete path='${ smart_path(param['name'], mapping) }'/>
             % endfor
 
             % for param in node.get_mkdirs():
-              <mkdir path='${ smart_path(param['name']) }'/>
+              <mkdir path='${ smart_path(param['name'], mapping) }'/>
             % endfor
 
             % for param in node.get_moves():
-              <move source='${ smart_path(param['source']) }' target='${ smart_path(param['destination']) }'/>
+              <move source='${ smart_path(param['source'], mapping) }' target='${ smart_path(param['destination'], mapping) }'/>
             % endfor
 
             % for param in node.get_chmods():
@@ -41,11 +41,11 @@
                 else:
                   recursive = 'false'
               %>
-              <chmod path='${ smart_path(param['path']) }' permissions='${ param['permissions'] }' dir-files='${ recursive }'/>
+              <chmod path='${ smart_path(param['path'], mapping) }' permissions='${ param['permissions'] }' dir-files='${ recursive }'/>
             % endfor
 
             % for param in node.get_touchzs():
-              <touchz path='${ smart_path(param['name']) }'/>
+              <touchz path='${ smart_path(param['name'], mapping) }'/>
             % endfor
         </fs>
         <ok to="${ node.get_oozie_child('ok') }"/>

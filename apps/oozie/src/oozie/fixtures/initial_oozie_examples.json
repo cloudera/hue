@@ -8,7 +8,7 @@
       "parameters": "[]",
       "deployment_dir": "/user/hue/oozie/workspaces/sleep",
       "schema_version": "uri:oozie:workflow:0.4",
-      "last_modified": "2012-12-01 00:00:00",
+      "last_modified": "2013-01-01 00:00:00",
       "owner": 1100713,
       "description": "Example of MapReduce action that sleeps"
     }
@@ -22,7 +22,7 @@
       "parameters": "[]",
       "deployment_dir": "/user/hue/oozie/workspaces/sleep",
       "schema_version": "uri:oozie:coordinator:0.2",
-      "last_modified": "2012-12-01 00:00:00",
+      "last_modified": "2013-01-01 00:00:00",
       "owner": 1100713,
       "description": "Example of MapReduce action"
     }
@@ -36,7 +36,7 @@
       "parameters": "[]",
       "deployment_dir": "/user/hue/oozie/workspaces/terasort",
       "schema_version": "uri:oozie:workflow:0.4",
-      "last_modified": "2012-12-01 00:00:00",
+      "last_modified": "2013-01-01 00:00:00",
       "owner": 1100713,
       "description": "Example of sequential Java actions"
     }
@@ -50,7 +50,7 @@
       "parameters": "[]",
       "deployment_dir": "/user/hue/oozie/workspaces/sleepfork",
       "schema_version": "uri:oozie:workflow:0.4",
-      "last_modified": "2012-12-01 00:00:00",
+      "last_modified": "2013-01-01 00:00:00",
       "owner": 1100713,
       "description": "Example of multiple forks"
     }
@@ -64,7 +64,7 @@
       "parameters": "[{\"name\":\"oozie.use.system.libpath\",\"value\":\"true\"}]",
       "deployment_dir": "/user/hue/oozie/workspaces/hive",
       "schema_version": "uri:oozie:workflow:0.4",
-      "last_modified": "2012-12-01 00:00:00",
+      "last_modified": "2013-01-01 00:00:00",
       "owner": 1100713,
       "description": "Example of Hive action"
     }
@@ -78,7 +78,7 @@
       "parameters": "[{\"name\":\"oozie.use.system.libpath\",\"value\":\"true\"}]",
       "deployment_dir": "/user/hue/oozie/workspaces/pig",
       "schema_version": "uri:oozie:workflow:0.4",
-      "last_modified": "2012-12-01 00:00:00",
+      "last_modified": "2013-01-01 00:00:00",
       "owner": 1100713,
       "description": "Example of Pig action"
     }
@@ -92,7 +92,7 @@
       "parameters": "[{\"name\":\"oozie.use.system.libpath\",\"value\":\"true\"}]",
       "deployment_dir": "/user/hue/oozie/workspaces/sqoop",
       "schema_version": "uri:oozie:workflow:0.4",
-      "last_modified": "2012-12-01 00:00:00",
+      "last_modified": "2013-01-01 00:00:00",
       "owner": 1100713,
       "description": "Example of Sqoop action"
     }
@@ -106,7 +106,7 @@
       "parameters": "[]",
       "deployment_dir": "/user/hue/oozie/workspaces/ssh",
       "schema_version": "uri:oozie:workflow:0.4",
-      "last_modified": "2012-12-01 00:00:00",
+      "last_modified": "2013-01-01 00:00:00",
       "owner": 1100713,
       "description": "Example of Ssh action"
     }
@@ -120,7 +120,7 @@
       "parameters": "[]",
       "deployment_dir": "/user/hue/oozie/workspaces/shell",
       "schema_version": "uri:oozie:workflow:0.4",
-      "last_modified": "2012-12-01 00:00:00",
+      "last_modified": "2013-01-01 00:00:00",
       "owner": 1100713,
       "description": "Example of Shell action"
     }
@@ -134,7 +134,7 @@
       "parameters": "[{\"name\":\"oozie.use.system.libpath\",\"value\":\"true\"}]",
       "deployment_dir": "/user/hue/oozie/workspaces/distcp",
       "schema_version": "uri:oozie:workflow:0.4",
-      "last_modified": "2012-12-01 00:00:00",
+      "last_modified": "2013-01-01 00:00:00",
       "owner": 1100713,
       "description": "Example of DistCp action"
     }
@@ -148,7 +148,7 @@
       "parameters": "[{\"name\": \"oozie.use.system.libpath\", \"value\": \"true\"}]",
       "deployment_dir": "/user/hue/oozie/workspaces/email",
       "schema_version": "uri:oozie:workflow:0.4",
-      "last_modified": "2012-12-01 00:00:00",
+      "last_modified": "2013-01-01 00:00:00",
       "owner": 1100713,
       "description": "Example of Email action"
     }
@@ -162,7 +162,7 @@
       "parameters": "[{\"name\": \"oozie.use.system.libpath\", \"value\": \"true\"}]",
       "deployment_dir": "/user/hue/oozie/workspaces/fs",
       "schema_version": "uri:oozie:workflow:0.4",
-      "last_modified": "2012-12-01 00:00:00",
+      "last_modified": "2013-01-01 00:00:00",
       "owner": 1100713,
       "description": "Example of sequential Fs actions"
     }
@@ -176,9 +176,23 @@
       "parameters": "[{\"name\": \"oozie.use.system.libpath\", \"value\": \"true\"}]",
       "deployment_dir": "/user/hue/oozie/workspaces/generic",
       "schema_version": "uri:oozie:workflow:0.4",
-      "last_modified": "2012-12-01 00:00:00",
+      "last_modified": "2013-01-01 00:00:00",
       "owner": 1100713,
       "description": "Execute a generic action with a custom extension"
+    }
+  },
+  {
+    "pk": 21,
+    "model": "oozie.job",
+    "fields": {
+      "is_shared": true,
+      "name": "DailyAnalytics",
+      "parameters": "[{\"name\":\"oozie.use.system.libpath\",\"value\":\"true\"}]",
+      "deployment_dir": "/user/hue/oozie/workspaces/range",
+      "schema_version": "uri:oozie:coordinator:0.1",
+      "last_modified": "2013-01-01 00:00:00",
+      "owner": 1100713,
+      "description": "Run daily a workflow with a date range of input data"
     }
   },
   {
@@ -1658,9 +1672,9 @@
       "files": "[]",
       "job_xml": "",
       "job_properties": "[]",
-      "params": "[{\"value\":\"-param\",\"type\":\"argument\"},{\"value\":\"INPUT=/user/hue/oozie/workspaces/data\",\"type\":\"argument\"},{\"value\":\"-param\",\"type\":\"argument\"},{\"value\":\"OUTPUT=${output}\",\"type\":\"argument\"}]",
+      "params": "[{\"value\":\"-param\",\"type\":\"argument\"},{\"value\":\"INPUT=${input}\",\"type\":\"argument\"},{\"value\":\"-param\",\"type\":\"argument\"},{\"value\":\"OUTPUT=${output}\",\"type\":\"argument\"}]",
       "archives": "[]",
-      "prepares": "[]",
+      "prepares": "[{\"value\":\"${output}\",\"type\":\"delete\"}]",
       "script_path": "aggregate.pig"
     }
   },
@@ -2005,12 +2019,28 @@
     "pk": 6,
     "model": "oozie.coordinator",
     "fields": {
-      "end": "2012-12-05 00:00:00",
+      "end": "2013-01-05 00:00:00",
       "concurrency": null,
       "frequency_number": 1,
       "workflow": 5,
       "frequency_unit": "days",
-      "start": "2012-12-01 00:00:00",
+      "start": "2013-01-01 00:00:00",
+      "timeout": null,
+      "timezone": "America/Los_Angeles",
+      "throttle": null,
+      "execution": null
+    }
+  },
+  {
+    "pk": 21,
+    "model": "oozie.coordinator",
+    "fields": {
+      "end": "2013-01-05 00:00:00",
+      "concurrency": null,
+      "frequency_number": 1,
+      "workflow": 11,
+      "frequency_unit": "days",
+      "start": "2013-01-03 00:00:00",
       "timeout": null,
       "timezone": "America/Los_Angeles",
       "throttle": null,
@@ -2024,12 +2054,60 @@
       "name": "sleep_time",
       "frequency_number": 1,
       "coordinator": 6,
+      "advanced_start_instance": "0",
       "frequency_unit": "days",
       "uri": "${DAY}",
-      "start": "2012-12-01 00:00:00",
+      "start": "2012-12-31 00:00:00",
+      "instance_choice": "default",
       "timezone": "America/Los_Angeles",
+      "advanced_end_instance": "0",
       "done_flag": "",
       "description": ""
+    }
+  },
+  {
+    "pk": 4,
+    "model": "oozie.dataset",
+    "fields": {
+      "name": "daily_shakespeare",
+      "frequency_number": 1,
+      "coordinator": 21,
+      "advanced_start_instance": "-1",
+      "frequency_unit": "days",
+      "uri": "/user/hue/oozie/workspaces/data/${YEAR}${MONTH}${DAY}",
+      "start": "2012-12-31 00:00:00",
+      "instance_choice": "range",
+      "timezone": "America/Los_Angeles",
+      "advanced_end_instance": "${coord:current(0)}",
+      "done_flag": "",
+      "description": "Contain two rolling days of data"
+    }
+  },
+  {
+    "pk": 5,
+    "model": "oozie.dataset",
+    "fields": {
+      "name": "daily_aggregated_shakespeare",
+      "frequency_number": 1,
+      "coordinator": 21,
+      "advanced_start_instance": "0",
+      "frequency_unit": "days",
+      "uri": "/tmp/test-${username}/${YEAR}${MONTH}${DAY}",
+      "start": "2012-12-31 00:00:00",
+      "instance_choice": "default",
+      "timezone": "America/Los_Angeles",
+      "advanced_end_instance": "0",
+      "done_flag": "",
+      "description": "Daily aggregated output"
+    }
+  },
+  {
+    "pk": 1,
+    "model": "oozie.datainput",
+    "fields": {
+      "coordinator": 21,
+      "name": "input",
+      "dataset": 4
     }
   },
   {
@@ -2039,6 +2117,15 @@
       "coordinator": 6,
       "name": "REDUCER_SLEEP_TIME",
       "dataset": 3
+    }
+  },
+  {
+    "pk": 2,
+    "model": "oozie.dataoutput",
+    "fields": {
+      "coordinator": 21,
+      "name": "output",
+      "dataset": 5
     }
   }
 ]

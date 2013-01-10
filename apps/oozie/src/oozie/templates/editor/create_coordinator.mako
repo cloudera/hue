@@ -168,15 +168,8 @@ ${ layout.menubar(section='coordinators') }
       currentStep = step;
       if (step != "step1") {
         $("#backBtn").removeClass("disabled");
-      }
-      else {
+      } else {
         $("#backBtn").addClass("disabled");
-      }
-      if (step != $(".stepDetails:last").attr("id")) {
-        $("#nextBtn").removeClass("disabled");
-      }
-      else {
-        $("#nextBtn").addClass("disabled");
       }
       $("a.step").parent().removeClass("active");
       $("a.step[href=#" + step + "]").parent().addClass("active");

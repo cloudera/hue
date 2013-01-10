@@ -31,7 +31,7 @@
                     operation = p['type']
                     path = p['value']
                   %>
-                  <${ operation } path="${ smart_path(path) }"/>
+                  <${ operation } path="${ smart_path(path, mapping) }"/>
                 % endfor
             </prepare>
         % endif
@@ -54,12 +54,12 @@
 
 <%def name="distributed_cache(files, archives)">
     % for f in files:
-        % if len(f) != 0:
+        % if f:
             <file>${ filelink(f) }</file>
         % endif
     % endfor
     % for a in archives:
-        % if len(a) != 0:
+        % if a:
             <archive>${ a }</archive>
         % endif
     % endfor

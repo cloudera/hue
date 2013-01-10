@@ -170,7 +170,7 @@ ${layout.menubar(section='dashboard')}
         null,
         { "bSortable": false }
       ],
-      "aaSorting": [[ 0, "desc" ]],
+      "aaSorting": [[ 5, "desc" ]],
       "oLanguage": {
             "sEmptyTable":     "${_('No data available')}",
             "sInfo":           "${_('Showing _START_ to _END_ of _TOTAL_ entries')}",
@@ -199,7 +199,7 @@ ${layout.menubar(section='dashboard')}
         null,
         null
       ],
-      "aaSorting": [[ 0, "desc" ]],
+      "aaSorting": [[ 5, "desc" ]],
       "oLanguage": {
             "sEmptyTable":     "${_('No data available')}",
             "sInfo":           "${_('Showing _START_ to _END_ of _TOTAL_ entries')}",

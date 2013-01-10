@@ -19,6 +19,7 @@ import logging
 import re
 
 from django.utils.translation import ugettext as _
+from jobsub.parameterization import find_variables
 
 
 LOG = logging.getLogger(__name__)
@@ -54,14 +55,26 @@ def workflow_to_dict(workflow):
   return workflow_dict
 
 
-def smart_path(path):
-  # Try to prepend home_dir and FS scheme. No change if path starts by a parameter.
+def smart_path(path, mapping):
+  # Try to prepend home_dir and FS scheme if needed.
+  # If path starts by a parameter try to get its value from the list of parameters submitted by the user or the coordinator.
+  # This dynamic checking enable the use of <prepares> statements in a workflow scheduled manually of by a coordinator.
+  # The logic is a bit complicated but Oozie is not consistent with data paths, prepare, coordinator paths and Fs action.
 
-  if not path.startswith('/') and not path.startswith('$') and not path.startswith('hdfs://'):
+  if not path.startswith('$') and not path.startswith('/') and not path.startswith('hdfs://'):
     path = '/user/%(username)s/%(path)s' % {'username': '${wf:user()}', 'path': path}
 
-  if not path.startswith('hdfs://'):
-    path = '%(nameNode)s%(path)s' % {'nameNode': '${nameNode}', 'path': path}
+  if path.startswith('$'):
+    variables = find_variables(path)
+    for var in variables:
+      prefix = '${%s}' % var
+      if path.startswith(prefix):
+        if var in mapping:
+          if not mapping[var].startswith('hdfs://') and not mapping[var].startswith('$'):
+            path = '%(nameNode)s%(path)s' % {'nameNode': '${nameNode}', 'path': path}
+  else:
+    if not path.startswith('hdfs://'):
+      path = '%(nameNode)s%(path)s' % {'nameNode': '${nameNode}', 'path': path}
 
   return path
 
