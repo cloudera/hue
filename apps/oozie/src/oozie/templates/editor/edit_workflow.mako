@@ -280,6 +280,8 @@ ${ layout.menubar(section='workflows') }
     <a href="#" class="close" data-dismiss="modal">&times;</a>
     <h3 class="message"></h3>
   </div>
+  <div class="modal-body">
+  </div>
   <div class="modal-footer">
     <a href="#" class="btn" data-dismiss="modal">${_('No')}</a>
     <a class="btn btn-primary" href="javascript:void(0);">${_('Yes')}</a>
@@ -332,8 +334,8 @@ ${ controls.decision_form(link_form, default_link_form, 'decision', True) }
       <div class="row-fluid node-action-bar">
         <div class="span12" style="text-align:right">
           <a class="btn btn-mini edit-node-link" title="${ _('Edit') }" rel="tooltip" data-bind="attr: { 'data-node-type': node_type() }"><i class="icon-pencil"></i></a>
-          <button class="btn btn-mini clone-node-btn" title="${ _('Clone') }" rel="tooltip"><i class="icon-retweet"></i></button>
-          <button class="btn btn-mini delete-node-btn" title="${ _('Delete') }" rel="tooltip"><i class="icon-remove"></i></button>
+          <a class="btn btn-mini clone-node-btn" title="${ _('Clone') }" rel="tooltip"><i class="icon-retweet"></i></a>
+          <a class="btn btn-mini delete-node-btn" title="${ _('Delete') }" rel="tooltip"><i class="icon-trash"></i></a>
           &nbsp;
         </div>
       </div>
@@ -615,13 +617,20 @@ $('#workflow').on('click', '.clone-node-btn', function(e) {
 
 $('#workflow').on('click', '.delete-node-btn', function(e) {
   var node = ko.contextFor(this).$data;
-
-  node.detach();
-  node.erase();
-
-  workflow.rebuild();
-
-  workflow.is_dirty( true );
+  $('#confirmation').find('h3').text('${ _('Confirm Delete') }');
+  $('#confirmation').find('.modal-body').html('${ _('Are you sure you want to delete ') }<strong>' + node.name() + '</strong>?');
+  $('#confirmation').find('.btn-primary').removeClass('btn-primary').addClass('btn-danger');
+  $('#confirmation').find('.btn-danger').on('click', function () {
+    node.detach();
+    node.erase();
+    workflow.rebuild();
+    workflow.is_dirty(true);
+    $('#confirmation').modal('hide');
+    $('#confirmation').find('h3').text('');
+    $('#confirmation').find('.modal-body').text('');
+    $('#confirmation').find('.btn-danger').removeClass('btn-danger').addClass('btn-primary');
+  });
+  $('#confirmation').modal('show');
 });
 
 /**
