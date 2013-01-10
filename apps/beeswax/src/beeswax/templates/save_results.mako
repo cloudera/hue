@@ -15,6 +15,8 @@
 ## limitations under the License.
 <%!
 from desktop.views import commonheader, commonfooter
+from desktop.lib.django_util import extract_field_data
+
 from django.utils.translation import ugettext as _
 %>
 
@@ -23,7 +25,9 @@ from django.utils.translation import ugettext as _
 <%namespace name="util" file="util.mako" />
 
 ${ commonheader(_('Create table from file'), app_name, user, '100px') | n,unicode }
-${layout.menubar(section='history')}
+${layout.menubar(section='query')}
+
+<script src="/static/ext/js/knockout-2.1.0.js" type="text/javascript" charset="utf-8"></script>
 
 <div class="container-fluid">
 % if error_msg:
@@ -36,19 +40,23 @@ ${layout.menubar(section='history')}
       <div class="control-group">
         <div class="controls">
           <label class="radio">
-            <input id="id_save_target_0" type="radio" name="save_target" value="to a new table" checked="checked"/>
-            &nbsp;${_('In a new table')}
+            <input id="id_save_target_0" type="radio" name="save_target" value="${ form.SAVE_TYPE_TBL }" data-bind="checked: toWhere"/>
+            &nbsp;${ _('In a new table') }
           </label>
-          ${comps.field(form['target_table'], notitle=True, placeholder="Table Name")}
+          <span data-bind="visible: toWhere() == 'to a new table'">
+            ${ comps.field(form['target_table'], notitle=True, placeholder='Table Name') }
+          </span>
         </div>
       </div>
       <div class="control-group">
         <div class="controls">
           <label class="radio">
-            <input id="id_save_target_1" type="radio" name="save_target" value="to HDFS directory">
-            &nbsp;${_('In an HDFS directory')}
+            <input id="id_save_target_1" type="radio" name="save_target" value="${ form.SAVE_TYPE_DIR }" data-bind="checked: toWhere">
+            &nbsp;${ _('In an HDFS directory') }
           </label>
-          ${comps.field(form['target_dir'], notitle=True, hidden=True, placeholder=_('Results location'), klass="pathChooser")}
+          <span data-bind="visible: toWhere() == 'to HDFS directory'">
+            ${ comps.field(form['target_dir'], notitle=True, placeholder=_('Results location'), klass='pathChooser') }
+          </span>
         </div>
       </div>
       <div id="fileChooserModal" class="smallModal well hide">
@@ -62,48 +70,12 @@ ${layout.menubar(section='history')}
   </form>
 </div>
 
-
 <script type="text/javascript" charset="utf-8">
   $(document).ready(function () {
-    $("input[name='save_target']").change(function () {
-      $(".errorlist").addClass("hide");
-      $(".control-group.error").removeClass("error");
-      $("input[name='target_table']").removeClass("fieldError");
-      if ($(this).val().indexOf("HDFS") > -1) {
-        $("input[name='target_table']").addClass("hide").val("");
-        $("input[name='target_dir']").removeClass("hide");
-        $(".fileChooserBtn").removeClass("hide");
-      }
-      else {
-        $("input[name='target_table']").removeClass("hide");
-        $("input[name='target_dir']").addClass("hide");
-        $(".fileChooserBtn").addClass("hide");
-      }
-    });
-
-    $("input[name='save_target']").change();
-
-    $("#saveForm").submit(function (e) {
-      if ($("input[name='save_target']:checked").val().indexOf("HDFS") > -1) {
-        if ($.trim($("input[name='target_dir']").val()) == "") {
-          $("input[name='target_dir']").parents(".control-group").addClass("error");
-          $("input[name='target_dir']").parents(".control-group").find(".fileChooserBtn").addClass("btn-danger");
-          return false;
-        }
-      }
-      else {
-        if ($.trim($("input[name='target_table']").val()) == "") {
-          $("input[name='target_table']").parents(".control-group").addClass("error");
-          return false;
-        }
-      }
-      return true;
-    });
-
     $("input[name='target_dir']").after(getFileBrowseButton($("input[name='target_dir']")));
 
     function getFileBrowseButton(inputElement) {
-      return $("<a>").addClass("btn").addClass("fileChooserBtn").addClass("hide").text("..").click(function (e) {
+      return $("<a>").addClass("btn").addClass("fileChooserBtn").text("..").click(function (e) {
         e.preventDefault();
         $("#fileChooserModal").jHueFileChooser({
           onFolderChange:function (filePath) {
@@ -123,6 +95,12 @@ ${layout.menubar(section='history')}
         $("input[name='target_dir']").parents(".control-group").find(".fileChooserBtn").removeClass("btn-danger");
       });
     }
+
+    var viewModel = {
+      toWhere: ko.observable("${ extract_field_data(form['save_target']) }")
+    };
+
+    ko.applyBindings(viewModel);
   });
 </script>
 

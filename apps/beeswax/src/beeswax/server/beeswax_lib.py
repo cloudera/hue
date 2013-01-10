@@ -38,7 +38,6 @@ from beeswax.server.dbms import Table, DataTable
 LOG = logging.getLogger(__name__)
 
 
-
 class BeeswaxTable(Table):
 
   def __init__(self, table_obj):
@@ -111,10 +110,10 @@ class BeeswaxClient:
   def make_query(self, hql_query):
     # HUE-535 without having to modify Beeswaxd, add 'use database' as first option
     if self.query_server['server_name'] == 'impala':
-      configuration = []
+      configuration = [','.join(['%(key)s=%(value)s' % setting for setting in hql_query.settings])]
     else:
       configuration = ['use ' + hql_query.query.get('database', 'default')]
-    configuration.extend(hql_query.get_configuration())
+      configuration.extend(hql_query.get_configuration())
 
     thrift_query = BeeswaxService.Query(query=hql_query.query['query'], configuration=configuration)
     thrift_query.hadoop_user = self.user.username
@@ -122,7 +121,10 @@ class BeeswaxClient:
 
 
   def get_databases(self, *args, **kwargs):
-    return self.meta_client.get_all_databases()
+    if self.query_server['server_name'] == 'impala':
+      return ['default']
+    else:
+      return self.meta_client.get_all_databases()
 
 
   def get_tables(self, *args, **kwargs):

@@ -59,48 +59,50 @@ ${layout.menubar(section='query')}
 </style>
 
 <div class="container-fluid">
-	<h1>${_('Query Results:')} ${util.render_query_context(query_context)}</h1>
+  <h1>${_('Query Results:')} ${ util.render_query_context(query_context) }</h1>
   <div id="expand"><i class="icon-chevron-right icon-white"></i></div>
-	<div class="row-fluid">
-		<div class="span3">
-			<div class="well sidebar-nav">
+    <div class="row-fluid">
+        <div class="span3">
+            <div class="well sidebar-nav">
         <a id="collapse" class="btn btn-small"><i class="icon-chevron-left" rel="tooltip" title="${_('Collapse this panel')}"></i></a>
-				<ul class="nav nav-list">
-					% if download_urls:
-					<li class="nav-header">${_('Downloads')}</li>
-					<li><a target="_blank" href="${download_urls["csv"]}">${_('Download as CSV')}</a></li>
-					<li><a target="_blank" href="${download_urls["xls"]}">${_('Download as XLS')}</a></li>
-					% endif
-					%if can_save:
-					<li><a data-toggle="modal" href="#saveAs">${_('Save')}</a></li>
-					% endif
-					<%
-			          n_jobs = hadoop_jobs and len(hadoop_jobs) or 0
-			          mr_jobs = (n_jobs == 1) and _('MR Job') or _('MR Jobs')
-			        %>
-				 	% if n_jobs > 0:
-						<li class="nav-header">${mr_jobs} (${n_jobs})</li>
-						% for jobid in hadoop_jobs:
-						    <li><a href="${url("jobbrowser.views.single_job", job=jobid.replace('application', 'job'))}">${ jobid.replace("application_", "") }</a></li>
-						% endfor
-					% else:
-						<li class="nav-header">${mr_jobs}</li>
-						<li>${_('No Hadoop jobs were launched in running this query.')}</li>
-					% endif
-				</ul>
-			</div>
+                <ul class="nav nav-list">
+                    % if download_urls:
+                    <li class="nav-header">${_('Downloads')}</li>
+                    <li><a target="_blank" href="${download_urls["csv"]}">${_('Download as CSV')}</a></li>
+                    <li><a target="_blank" href="${download_urls["xls"]}">${_('Download as XLS')}</a></li>
+                    % endif
+                    %if can_save:
+                    <li><a data-toggle="modal" href="#saveAs">${_('Save')}</a></li>
+                    % endif
+                    <%
+                      n_jobs = hadoop_jobs and len(hadoop_jobs) or 0
+                      mr_jobs = (n_jobs == 1) and _('MR Job') or _('MR Jobs')
+                    %>
+                     % if n_jobs > 0:
+                        <li class="nav-header">${mr_jobs} (${n_jobs})</li>
+                        % for jobid in hadoop_jobs:
+                            <li><a href="${url("jobbrowser.views.single_job", job=jobid.replace('application', 'job'))}">${ jobid.replace("application_", "") }</a></li>
+                        % endfor
+                    % else:
+                        <li class="nav-header">${mr_jobs}</li>
+                        <li>${_('No Hadoop jobs were launched in running this query.')}</li>
+                    % endif
+                </ul>
+            </div>
+
       <div id="jumpToColumnAlert" class="alert hide">
         <button type="button" class="close" data-dismiss="alert">&times;</button>
         <strong>${_('Did you know?')}</strong> ${_('You can click on a row to select a column you want to jump to.')}
       </div>
-		</div>
-		<div class="span9">
+        </div>
+
+        <div class="span9">
       <ul class="nav nav-tabs">
         <li class="active"><a href="#results" data-toggle="tab">
             %if error:
-			            ${_('Error')}
+                  ${_('Error')}
             %else:
-						${_('Results')}
+                  ${_('Results')}
             %endif
         </a></li>
         <li><a href="#query" data-toggle="tab">${_('Query')}</a></li>
@@ -116,6 +118,12 @@ ${layout.menubar(section='query')}
               <div class="alert alert-error">
                 <h3>${_('Error!')}</h3>
                 <pre>${ error_message }</pre>
+                % if expired and query_context:
+                    <div class="well">
+                        ${ _('The query result has expired.') }
+                        ${ _('You can rerun it from ') } ${ util.render_query_context(query_context) }
+                    </div>
+                % endif
               </div>
             % else:
             % if expected_first_row != start_row:
@@ -144,10 +152,12 @@ ${layout.menubar(section='query')}
             <div class="pagination pull-right">
               <ul>
               % if start_row != 0:
-                  <li class="prev"><a title="${_('Beginning of List')}" href="${ url(app_name + ':view_results', query.id, 0) }${'?context=' + context_param or '' | n}">&larr; ${_('Beginning of List')}</a></li>
+                  % if app_name != 'impala':
+                      <li class="prev"><a title="${_('Beginning of List')}" href="${ url(app_name + ':view_results', query.id, 0) }${'?context=' + context_param or '' | n}">&larr; ${_('Beginning of List')}</a></li>
+                  % endif
               % endif
               % if has_more and len(results) == 100:
-                  <li><a title="${_('Next page')}" href="${ url(app_name + ':view_results', query.id, next_row) }${'?context=' + context_param or '' | n}">${_('Next Page')} &rarr;</a></li>
+                  <li><a title="${_('Next page')}" href= "${ url(app_name + ':view_results', query.id, next_row) }${'?context=' + context_param or '' | n }">${_('Next Page')} &rarr;</a></li>
               % endif
               </ul>
             </div>
@@ -178,11 +188,12 @@ ${layout.menubar(section='query')}
         % endif
       </div>
 
-		</div>
-	</div>
+        </div>
+    </div>
 </div>
 
 %if can_save:
+## duplication from save_results.mako
 <div id="saveAs" class="modal hide fade">
   <form id="saveForm" action="${url(app_name + ':save_results', query.id) }" method="POST"
         class="form form-inline form-padding-fix">
@@ -324,6 +335,10 @@ ${layout.menubar(section='query')}
         $("#log pre").css("overflow", "auto").height($(window).height() - $("#log pre").position().top - 40);
       }
 
+      % if app_name == 'impala':
+          $("#collapse").click();
+          $(".sidebar-nav, #expand").hide();
+      % endif
     });
 </script>
 
