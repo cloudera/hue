@@ -42,7 +42,7 @@
     </div>
 
     <div class="actions">
-        <a id="executeQuery" class="btn btn-primary">${_('Execute')}</a>
+        <a id="executeQuery" class="btn btn-primary" tabindex="0">${_('Execute')}</a>
         % if design and not design.is_auto and design.name:
         <a id="saveQuery" class="btn">${_('Save')}</a>
         % endif

@@ -544,10 +544,6 @@ def watch_query(request, id):
   handle, state = _get_query_handle_and_state(query_history)
   query_history.save_state(state)
 
-
-  # Query finished?
-#  if state == models.QueryHistory.STATE.expired:
-#    raise PopupException(_("The result of this query has expired."))
   if query_history.is_success():
     return format_preserving_redirect(request, on_success_url, request.GET)
   elif query_history.is_failure():
@@ -610,6 +606,7 @@ def view_results(request, id, first_row=0):
   fetch_error = False
   error_message = ''
   log = ''
+  app_name = get_app_name(request)
 
   query_history = authorized_get_history(request, id, must_exist=True)
   db = dbms.get(request.user, query_history.get_query_server_config())
@@ -617,6 +614,13 @@ def view_results(request, id, first_row=0):
   handle, state = _get_query_handle_and_state(query_history)
   context_param = request.GET.get('context', '')
   query_context = _parse_query_context(context_param)
+
+  # Update the status as expired should not be accessible
+  # Impala does not support startover for now
+  expired = state == models.QueryHistory.STATE.expired
+  if expired or app_name == 'impala':
+    state = models.QueryHistory.STATE.expired
+    query_history.save_state(state)
 
   # Retrieve query results
   try:
@@ -631,7 +635,7 @@ def view_results(request, id, first_row=0):
     error_message, log = expand_exception(ex, db)
 
   # Handle errors
-  error = fetch_error or results is None
+  error = fetch_error or results is None or expired
 
   context = {
     'error': error,
@@ -644,13 +648,15 @@ def view_results(request, id, first_row=0):
     'query_context': query_context,
     'can_save': False,
     'context_param': context_param,
+    'expired': expired,
+    'app_name': app_name
   }
 
   if not error:
     download_urls = {}
     if downloadable:
       for format in common.DL_FORMATS:
-        download_urls[format] = reverse(get_app_name(request) + ':download', kwargs=dict(id=str(id), format=format))
+        download_urls[format] = reverse(app_name + ':download', kwargs=dict(id=str(id), format=format))
 
     save_form = beeswax.forms.SaveResultsForm()
     results.start_row = first_row
@@ -684,9 +690,7 @@ def save_results(request, id):
     # Make sure the result is available.
     # Note that we may still hit errors during the actual save
     if not query_history.is_success():
-    #if state != models.QueryHistory.STATE.available:
       if query_history.is_failure():
-      #if state in (models.QueryHistory.STATE.failed, models.QueryHistory.STATE.expired):
         msg = _('This query has %(state)s. Results unavailable.') % {'state': state}
       else:
         msg = _('The result of this query is not available yet.')
@@ -1214,7 +1218,7 @@ def _get_query_handle_and_state(query_history):
   handle = query_history.get_handle()
 
   if handle is None:
-    raise PopupException(_("Failed to retrieve query state from the Beeswax Server."))
+    raise PopupException(_("Failed to retrieve query state from the Query Server."))
 
   state = dbms.get(query_history.owner, query_history.get_query_server_config()).get_state(handle)
 

@@ -96,10 +96,11 @@ class SaveForm(forms.Form):
 class SaveResultsForm(DependencyAwareForm):
   """Used for saving the query result data"""
 
-  SAVE_TYPES = (SAVE_TYPE_TBL, SAVE_TYPE_DIR) = (_('to a new table'), _('to HDFS directory'))
+  SAVE_TYPES = (SAVE_TYPE_TBL, SAVE_TYPE_DIR) = ('to a new table', 'to HDFS directory')
   save_target = forms.ChoiceField(required=True,
                                   choices=common.to_choices(SAVE_TYPES),
-                                  widget=forms.RadioSelect)
+                                  widget=forms.RadioSelect,
+                                  initial=SAVE_TYPE_TBL)
   target_table = common.HiveIdentifierField(
                                   label=_t("Table Name"),
                                   required=False,
@@ -116,16 +117,21 @@ class SaveResultsForm(DependencyAwareForm):
     self.db = kwargs.pop('db', None)
     super(SaveResultsForm, self).__init__(*args, **kwargs)
 
-  def clean_target_table(self):
-    tbl = self.cleaned_data.get('target_table')
-    if tbl:
-      try:
-        if self.db is not None:
-          self.db.get_table("default", tbl)
-        raise forms.ValidationError(_('Table already exists'))
-      except hive_metastore.ttypes.NoSuchObjectException:
-        pass
-    return tbl
+  def clean(self):
+    cleaned_data = super(SaveResultsForm, self).clean()
+
+    if cleaned_data.get('save_target') == SaveResultsForm.SAVE_TYPE_TBL:
+      tbl = cleaned_data.get('target_table')
+      if tbl:
+        try:
+          if self.db is not None:
+            self.db.get_table('default', tbl) # Assumes 'default' DB
+          self._errors['target_table'] = self.error_class([_('Table already exists')])
+          del cleaned_data['target_table']
+        except hive_metastore.ttypes.NoSuchObjectException:
+          pass
+
+    return cleaned_data
 
 
 class HQLForm(forms.Form):
