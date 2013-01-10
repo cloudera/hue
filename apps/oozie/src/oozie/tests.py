@@ -1325,6 +1325,23 @@ class TestEditor(OozieMockBase):
     workflow.delete()
 
 
+  def test_import_workflow_generic(self):
+    """
+    Validates import for generic node: xml.
+    """
+    workflow = Workflow.objects.new_workflow(self.user)
+    workflow.save()
+    f = open('apps/oozie/src/oozie/test_data/0.4/test-generic.xml')
+    import_workflow(workflow, f.read())
+    f.close()
+    workflow.save()
+    assert_equal(4, len(Node.objects.filter(workflow=workflow)))
+    assert_equal(3, len(Link.objects.filter(parent__workflow=workflow)))
+    node = Node.objects.get(workflow=workflow, node_type='generic').get_full_node()
+    assert_equal("<bleh test=\"test\">\n              <test>test</test>\n        </bleh>", node.xml)
+    workflow.delete()
+
+
   def test_xss_escape_js(self):
     escaped = '[{"name": "oozie.use.system.libpath", "value": "true"}, {"name": "123\\\\u0022\\\\u003E\\\\u003Cscript\\\\u003Ealert(1)\\\\u003C/script\\\\u003E", "value": "hacked"}]'
     hacked = '[{"name":"oozie.use.system.libpath","value":"true"}, {"name": "123\\"><script>alert(1)</script>", "value": "hacked"}]'

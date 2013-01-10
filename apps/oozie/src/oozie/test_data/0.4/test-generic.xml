@@ -1,0 +1,14 @@
+<workflow-app name="fs-test" xmlns="uri:oozie:workflow:0.4">
+    <start to="Fs"/>
+    <action name="Fs">
+        <bleh test="test">
+              <test>test</test>
+        </bleh>
+        <ok to="end"/>
+        <error to="kill"/>
+    </action>
+    <kill name="kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+    <end name="end"/>
+</workflow-app>

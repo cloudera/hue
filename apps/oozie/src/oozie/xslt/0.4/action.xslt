@@ -15,6 +15,7 @@
 <xsl:import href="nodes/mapreduce.xslt"/>
 <xsl:import href="nodes/pig.xslt"/>
 <xsl:import href="nodes/streaming.xslt"/>
+<xsl:import href="nodes/generic.xslt"/>
 
 <xsl:template match="workflow:action" xmlns:workflow="uri:oozie:workflow:0.4">
 
