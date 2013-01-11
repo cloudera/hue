@@ -156,6 +156,15 @@ var ModalModule = function($, ko) {
 
   module.prototype.recenter = function(offset_x, offset_y) {
     var self = this;
+
+    var MARGIN = 10; // pixels around the modal
+
+    var modalContentHeight = (($(window).height() - MARGIN*2) -
+        (self.modal.find(".modal-header").outerHeight() + self.modal.find(".modal-header").outerHeight())) - 20;
+
+    self.modal.css("width", ($(window).width() - MARGIN*2)+"px");
+    self.modal.find(".modal-content").css("max-height", modalContentHeight+"px").css("height", modalContentHeight+"px");
+
     var top = ( ($(window).height() - self.modal.outerHeight(false)) / 2 );
     var left = ( ($(window).width() - self.modal.outerWidth(false)) / 2 );
     if (top < 0) {
