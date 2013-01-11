@@ -3,12 +3,11 @@
 # This file is distributed under the same license as the Hue project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-01-04 07:28-0800\n"
+"POT-Creation-Date: 2013-01-10 18:29-0800\n"
 "PO-Revision-Date: 2012-11-07 13:08-0800\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -30,14 +29,13 @@ msgstr "Oozie 是否需要客户端执行 Kerberos 身份验证。"
 msgid ""
 "Location on HDFS where the workflows/coordinators are deployed when "
 "submitted by a non-owner."
-msgstr "由非所有者提交时，工作流/协调器在 HDFS 上部署的位置。"
+msgstr "由非所有者提交时，workflow/coordinator 在 HDFS 上部署的位置。"
 
 #: src/liboozie/conf.py:69
-#, fuzzy
 msgid ""
 "The deployment directory of Oozie workflows does not exist. Run \"Setup "
 "Example\" on the Oozie workflow page."
-msgstr "Oozie 工作流的部署目录不存在。运行 Oozie 工作流页面上的 \"安装应用程序\"。"
+msgstr "Oozie workflow 的部署目录不存在。运行 Oozie workflow 页面上的 \"安装程序示例\"。"
 
 #: src/liboozie/conf.py:72
 msgid "Oozie Share Lib not installed in default location."

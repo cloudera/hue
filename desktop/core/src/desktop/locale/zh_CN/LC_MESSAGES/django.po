@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-01-04 07:28-0800\n"
+"POT-Creation-Date: 2013-01-10 18:29-0800\n"
 "PO-Revision-Date: 2012-08-10 13:58-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -18,7 +18,6 @@ msgstr ""
 "Generated-By: Babel 0.9.6\n"
 
 #: src/desktop/appmanager.py:228
-#, fuzzy
 msgid "load_apps has already been called."
 msgstr "已调用 load_apps。"
 
@@ -29,12 +28,10 @@ msgid ""
 msgstr "如果设置为 true，将使用 CherryPy。否则，Spawning 将被用作 Web 服务器。"
 
 #: src/desktop/conf.py:38
-#, fuzzy
 msgid "HTTP host to bind to."
 msgstr "要绑定的 HTTP 主机。"
 
 #: src/desktop/conf.py:43
-#, fuzzy
 msgid "HTTP port to bind to."
 msgstr "要绑定的 HTTP 端口。"
 
@@ -73,17 +70,14 @@ msgid "The SMTP server for email notification delivery."
 msgstr "用于传送电子邮件通知的 SMTP 服务器。"
 
 #: src/desktop/conf.py:107
-#, fuzzy
 msgid "The SMTP server port."
 msgstr "SMTP 服务器端口。"
 
 #: src/desktop/conf.py:114
-#, fuzzy
 msgid "The username for the SMTP host."
 msgstr "SMTP 主机的用户名。"
 
 #: src/desktop/conf.py:121
-#, fuzzy
 msgid "The password for the SMTP user."
 msgstr "SMTP 用户的密码。"
 
@@ -102,13 +96,14 @@ msgid ""
 "          For more info, see "
 "http://docs.djangoproject.com/en/1.1/ref/settings/#database-engine"
 msgstr ""
-"用于指定桌面数据库的配置选项。\n"
+"用于指定 Desktop 数据库的配置选项。\n"
 "\"\n"
 "\"有关详细信息，请参阅 http://docs.djangoproject.com/en/1.1/ref/settings/#database-"
 "engine"
 
 #: src/desktop/conf.py:149
-msgid "Database engine, such as postgresql, mysql, sqlite3, or Oracle."
+#, fuzzy
+msgid "Database engine, such as postgresql_psycopg2, mysql, or sqlite3."
 msgstr "数据库引擎，如 postgresql、mysql、sqlite3 或 Oracle。"
 
 #: src/desktop/conf.py:155
@@ -116,22 +111,18 @@ msgid "Database name, or path to DB if using sqlite3."
 msgstr "数据库名称，或数据库路径（如果使用 sqlite3）。"
 
 #: src/desktop/conf.py:161
-#, fuzzy
 msgid "Database username."
 msgstr "数据库用户名。"
 
 #: src/desktop/conf.py:167
-#, fuzzy
 msgid "Database password."
 msgstr "数据库密码。"
 
 #: src/desktop/conf.py:173
-#, fuzzy
 msgid "Database host."
 msgstr "数据库主机。"
 
 #: src/desktop/conf.py:179
-#, fuzzy
 msgid "Database port."
 msgstr "数据库端口。"
 
@@ -155,17 +146,14 @@ msgid "Frequency in seconds with which Hue will renew its keytab."
 msgstr "Hue 将续借其 keytab 的频率（秒数）。"
 
 #: src/desktop/conf.py:208
-#, fuzzy
 msgid "Path to keep Kerberos credentials cached."
 msgstr "保留缓存 Kerberos 凭据的路径。"
 
 #: src/desktop/conf.py:215
-#, fuzzy
 msgid "Path to Kerberos 'kinit' command."
 msgstr "Kerberos 'kinit' 命令的路径。"
 
 #: src/desktop/conf.py:225
-#, fuzzy
 msgid "Time zone name."
 msgstr "时区名称。"
 
@@ -174,12 +162,10 @@ msgid "Default system-wide unicode encoding."
 msgstr "默认系统范围 unicode 编码。"
 
 #: src/desktop/conf.py:239
-#, fuzzy
 msgid "Username to run servers as."
 msgstr "运行服务器的角色的用户名。"
 
 #: src/desktop/conf.py:244
-#, fuzzy
 msgid "Group to run servers as."
 msgstr "运行服务器的角色的组。"
 
@@ -236,7 +222,6 @@ msgstr ""
 "HTTP 标头转换为密钥。因此，举例来说，如果标头称为 Remote-User，则可配置为 HTTP_REMOTE_USER"
 
 #: src/desktop/conf.py:289
-#, fuzzy
 msgid "Configuration options for LDAP connectivity."
 msgstr "LDAP 连接的配置选项。"
 
@@ -283,7 +268,6 @@ msgid ""
 msgstr "LDAP 架构中的用户名属性。通常，对于 AD 为“sAMAccountName”，对于其他 LDAP 系统为“uid”。"
 
 #: src/desktop/conf.py:330
-#, fuzzy
 msgid "Configuration for LDAP group schema and search."
 msgstr "LDAP 组架构和搜索的配置。"
 
@@ -304,7 +288,6 @@ msgid "Paths on the local file system that users should be able to browse."
 msgstr "本地文件系统上用户可以浏览的路径。"
 
 #: src/desktop/conf.py:356
-#, fuzzy
 msgid "The path on the local filesystem."
 msgstr "本地文件系统上的路径。"
 
@@ -387,27 +370,27 @@ msgid ""
 msgstr "LDAP 用户名模式应包含用于身份验证的特殊 <username> 替换字符串。"
 
 #: src/desktop/decorators.py:40
-#, fuzzy, python-format
+#, python-format
 msgid "Permission denied (%(action)s/%(app)s)."
 msgstr "权限被拒绝 (%(action)s/%(app)s)。"
 
 #: src/desktop/middleware.py:136
-#, fuzzy, python-format
+#, python-format
 msgid "Cannot find HDFS called \"%(fs_ref)s\"."
 msgstr "找不到名为 \"%(fs_ref)s\" 的 HDFS。"
 
 #: src/desktop/middleware.py:240
-#, fuzzy, python-format
+#, python-format
 msgid "%(module)s isn't a middleware module."
 msgstr "%(module)s 不是中间件模块。"
 
 #: src/desktop/middleware.py:245
-#, fuzzy, python-format
+#, python-format
 msgid "Error importing middleware %(module)s: \"%(error)s\"."
 msgstr "导入中间件 %(module)s 时出错：\"%(error)s\"。"
 
 #: src/desktop/middleware.py:249
-#, fuzzy, python-format
+#, python-format
 msgid "Middleware module \"%(module)s\" does not define a \"%(class)s\" class."
 msgstr "中间件模块 \"%(module)s\" 未定义 \"%(class)s\" 类。"
 
@@ -428,7 +411,6 @@ msgid "No logs found!"
 msgstr "未找到日志！"
 
 #: src/desktop/views.py:94
-#, fuzzy
 msgid "No logs found."
 msgstr "未找到日志。"
 
@@ -525,11 +507,11 @@ msgstr "无可用帮助。"
 
 #: src/desktop/management/commands/config_upgrade.py:38
 msgid "Upgrades the Hue configuration with a mapping file."
-msgstr "用映射文件升级 Hue 配置。"
+msgstr "用 mapping 文件升级 Hue 配置。"
 
 #: src/desktop/management/commands/config_upgrade.py:41
 msgid "Location of the mapping file."
-msgstr "映射文件位置。"
+msgstr "mapping 文件位置。"
 
 #: src/desktop/management/commands/config_upgrade.py:49
 #, python-format
@@ -537,9 +519,9 @@ msgid "--%(param)s is required."
 msgstr "需要 --%(param)s。"
 
 #: src/desktop/management/commands/config_upgrade.py:60
-#, fuzzy, python-format
+#, python-format
 msgid "Invalid mapping %(mapping)s in %(file)s."
-msgstr "%(file)s 中的无效映射 %(mapping)s。"
+msgstr "%(file)s 中的无效 mapping %(mapping)s。"
 
 #: src/desktop/management/commands/create_desktop_app.py:31
 msgid "Creates a Hue application directory structure."
@@ -554,7 +536,7 @@ msgid "Expected arguments: app_name [app_dir]"
 msgstr "所需参数：app_name [app_dir]"
 
 #: src/desktop/management/commands/create_desktop_app.py:45
-#, fuzzy, python-format
+#, python-format
 msgid "App template dir missing: %(template)s."
 msgstr "应用程序模板目录缺失：%(template)s。"
 
@@ -564,7 +546,7 @@ msgid "The template path, %(path)r, does not exist."
 msgstr "不存在模板路径 %(path)r。"
 
 #: src/desktop/management/commands/create_desktop_app.py:52
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "%(name)r is not a valid application name. Use only numbers, letters and "
 "underscores."
@@ -577,7 +559,7 @@ msgstr "已在 %(dir)s 中创建文件系统"
 
 #: src/desktop/management/commands/runcherrypyserver.py:47
 msgid "CherryPy Server for Desktop."
-msgstr "CherryPy 服务器桌面版本。"
+msgstr "适用于 Desktop 的 CherryPy 服务器。"
 
 #: src/desktop/management/commands/runcherrypyserver.py:108
 #, python-format
@@ -592,7 +574,7 @@ msgstr "Hue 的 Web 服务器。"
 #, fuzzy
 msgid ""
 "\n"
-"  Runs pylint on desktop code.\n"
+"  Runs pylint on desktop and app code.\n"
 "\n"
 "  With no arguments, or with \"all\", this will run pylint on all\n"
 "  installed apps.  Otherwise, specify modules to run, as well\n"
@@ -663,7 +645,6 @@ msgid "Server Error (500)"
 msgstr "服务器错误 (500)"
 
 #: src/desktop/templates/500.mako:25
-#, fuzzy
 msgid ""
 "Sorry, there's been an error. An email was sent to your administrators. "
 "Thank you for your patience."
@@ -680,7 +661,6 @@ msgid "View Logs"
 msgstr "查看日志"
 
 #: src/desktop/templates/500.mako:37 src/desktop/templates/popup_error.mako:45
-#, fuzzy
 msgid "File Name"
 msgstr "文件名"
 
@@ -689,7 +669,6 @@ msgid "Line Number"
 msgstr "行号"
 
 #: src/desktop/templates/500.mako:39 src/desktop/templates/popup_error.mako:47
-#, fuzzy
 msgid "Function Name"
 msgstr "函数名称"
 
@@ -705,22 +684,21 @@ msgstr "检查错误配置"
 msgid "Server Logs"
 msgstr "服务器日志"
 
-#: src/desktop/templates/actionbar.mako:31 src/desktop/templates/logs.mako:61
+#: src/desktop/templates/actionbar.mako:31 src/desktop/templates/logs.mako:63
 msgid "Search..."
 msgstr "搜索..."
 
 #: src/desktop/templates/check_config.mako:23
-#: src/desktop/templates/dump_config.mako:26 src/desktop/templates/logs.mako:25
+#: src/desktop/templates/dump_config.mako:26 src/desktop/templates/logs.mako:27
 msgid "About"
 msgstr "关于"
 
 #: src/desktop/templates/check_config.mako:28
 #: src/desktop/templates/dump_config.mako:31
 msgid "Configuration files located in"
-msgstr "配置文件，位于"
+msgstr "配置文件位于"
 
 #: src/desktop/templates/check_config.mako:31
-#, fuzzy
 msgid "Potential misconfiguration detected. Fix and restart Hue."
 msgstr "检测到潜在的错误配置。修复并重启 Hue。"
 
@@ -729,13 +707,11 @@ msgid "Current value:"
 msgstr "当前值："
 
 #: src/desktop/templates/check_config.mako:56
-#, fuzzy
 msgid "All OK. Configuration check passed."
 msgstr "一切正常。已通过配置检查。"
 
 #: src/desktop/templates/common_header.mako:65
 #: src/desktop/templates/error.mako:34
-#, fuzzy
 msgid "Back"
 msgstr "返回"
 
@@ -748,7 +724,6 @@ msgid "Create folder"
 msgstr "创建文件夹"
 
 #: src/desktop/templates/common_header.mako:68
-#, fuzzy
 msgid "Folder name"
 msgstr "文件夹名称"
 
@@ -765,7 +740,6 @@ msgid "Upload a file"
 msgstr "上载文件"
 
 #: src/desktop/templates/common_header.mako:72
-#, fuzzy
 msgid "Failed"
 msgstr "失败"
 
@@ -819,25 +793,23 @@ msgstr "登录"
 
 #: src/desktop/templates/login.mako:86
 msgid "Invalid username or password."
-msgstr "无效用户名或密码"
+msgstr "无效用户名或密码。"
 
 #: src/desktop/templates/login.mako:97
-#, fuzzy
 msgid ""
 "Since this is your first time logging in, pick any username and password."
 " Be sure to remember these, as"
 msgstr "这是您的首次登录，因此请选择任意用户名和密码。请牢记它们，因为"
 
 #: src/desktop/templates/login.mako:98
-#, fuzzy
 msgid "they will become your Hue superuser credentials."
 msgstr "它们将成为您的 Hue 超级用户凭证。"
 
-#: src/desktop/templates/logs.mako:57
+#: src/desktop/templates/logs.mako:59
 msgid "Log entries (most recent first)"
 msgstr "日志条目（最近的条目靠前）"
 
-#: src/desktop/templates/logs.mako:65
+#: src/desktop/templates/logs.mako:67
 msgid "Download entire log as zip"
 msgstr "以 zip 格式下载整个日志"
 

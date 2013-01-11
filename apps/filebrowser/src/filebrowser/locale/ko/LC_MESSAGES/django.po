@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-01-04 07:28-0800\n"
+"POT-Creation-Date: 2013-01-10 18:29-0800\n"
 "PO-Revision-Date: 2012-07-30 18:52-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -16,6 +16,10 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
+
+#: src/filebrowser/conf.py:25
+msgid "Max snappy decompression size in bytes."
+msgstr ""
 
 #: src/filebrowser/forms.py:62
 msgid "File to edit"
@@ -59,12 +63,10 @@ msgid "Filename or directory to upload to."
 msgstr "업로드할 파일 이름 또는 디렉토리입니다."
 
 #: src/filebrowser/forms.py:90
-#, fuzzy
 msgid "Archive to Upload"
 msgstr "업로드할 아카이브"
 
 #: src/filebrowser/forms.py:91
-#, fuzzy
 msgid "Archive to upload to."
 msgstr "업로드할 아카이브입니다."
 
@@ -90,13 +92,11 @@ msgid "Directory Name"
 msgstr "디렉토리 이름"
 
 #: src/filebrowser/forms.py:117
-#, fuzzy
 msgid "Path in which to create the file"
 msgstr "파일 생성 경로"
 
 #: src/filebrowser/forms.py:118
 #: src/filebrowser/templates/listdir_components.mako:359
-#, fuzzy
 msgid "File Name"
 msgstr "파일 이름"
 
@@ -136,50 +136,50 @@ msgstr "재귀"
 msgid "Path to change permissions"
 msgstr "권한 변경 경로"
 
-#: src/filebrowser/views.py:106 src/filebrowser/views.py:486
+#: src/filebrowser/views.py:107 src/filebrowser/views.py:486
 #: src/filebrowser/views.py:516
 #, python-format
 msgid "File not found: %(path)s"
 msgstr "파일을 찾을 수 없음: %(path)s"
 
-#: src/filebrowser/views.py:108
+#: src/filebrowser/views.py:109
 #, python-format
 msgid "'%(path)s' is not a file"
 msgstr "'%(path)s은(는) 파일이 아닙니다."
 
-#: src/filebrowser/views.py:143
+#: src/filebrowser/views.py:144
 #, python-format
 msgid "Cannot access: %(path)s."
-msgstr "액세스할 수 없음: %(path)s"
+msgstr "액세스할 수 없음: %(path)s."
 
-#: src/filebrowser/views.py:145 src/filebrowser/views.py:884
+#: src/filebrowser/views.py:146 src/filebrowser/views.py:932
 #, python-format
 msgid ""
 " Note: you are a Hue admin but not a HDFS superuser (which is "
 "\"%(superuser)s\")."
 msgstr " 참고: 귀하는 Hue 관리자이나 HDFS superuser(\"%(superuser)s\")는 아닙니다."
 
-#: src/filebrowser/views.py:171
+#: src/filebrowser/views.py:172
 #, python-format
 msgid "Cannot edit a directory: %(path)s"
 msgstr "디렉토리를 편집할 수 없음: %(path)s"
 
-#: src/filebrowser/views.py:175
+#: src/filebrowser/views.py:176
 #, python-format
 msgid "File too big to edit: %(path)s"
 msgstr "파일이 너무 커 편집할 수 없음: %(path)s"
 
-#: src/filebrowser/views.py:185
+#: src/filebrowser/views.py:186
 #, python-format
 msgid "File is not encoded in %(encoding)s; cannot be edited: %(path)s"
 msgstr "파일이 %(encoding)s(으)로 인코딩되지 않아 편집할 수 없음: %(path)s"
 
-#: src/filebrowser/views.py:234
+#: src/filebrowser/views.py:235
 #, python-format
 msgid "Saved %(path)s."
 msgstr "%(path)s이(가) 저장되었습니다."
 
-#: src/filebrowser/views.py:329
+#: src/filebrowser/views.py:330
 #, python-format
 msgid "Not a directory: %(path)s"
 msgstr "디렉토리가 아님: %(path)s"
@@ -210,109 +210,131 @@ msgstr "길이는 음수일 수 없습니다."
 msgid "Cannot request chunks greater than %(bytes)d bytes"
 msgstr "%(bytes)d바이트보다 큰 청크는 요청할 수 없습니다."
 
-#: src/filebrowser/views.py:686
+#: src/filebrowser/views.py:659
+#, python-format
+msgid ""
+"Failed to validate snappy compressed file. File size is greater than "
+"allowed max snappy decompression size of %d"
+msgstr ""
+
+#: src/filebrowser/views.py:690
+#, fuzzy
+msgid "Failed to decompress snappy compressed file."
+msgstr "파일의 압축을 해제하지 못했습니다."
+
+#: src/filebrowser/views.py:695
+msgid "Failed to decompress snappy compressed file. Snappy is not installed!"
+msgstr ""
+
+#: src/filebrowser/views.py:698
+#, python-format
+msgid ""
+"Failed to decompress snappy compressed file. File size is greater than "
+"allowed max snappy decompression size of %d"
+msgstr ""
+
+#: src/filebrowser/views.py:722
 msgid "Failed to read Avro file."
 msgstr "Avro 파일을 읽지 못했습니다."
 
-#: src/filebrowser/views.py:695
+#: src/filebrowser/views.py:729
 msgid "Offsets are not supported with Gzip compression."
 msgstr "오프셋은 Gzip 압축을 지원하지 않습니다."
 
-#: src/filebrowser/views.py:702
+#: src/filebrowser/views.py:734
 msgid "Failed to decompress file."
 msgstr "파일의 압축을 해제하지 못했습니다."
 
-#: src/filebrowser/views.py:717
+#: src/filebrowser/views.py:745
 msgid "Failed to read file."
 msgstr "파일을 읽지 못했습니다."
 
-#: src/filebrowser/views.py:745 src/filebrowser/views.py:747
+#: src/filebrowser/views.py:793 src/filebrowser/views.py:795
 #: src/filebrowser/templates/display.mako:119
 #: src/filebrowser/templates/display.mako:199
 msgid "First Block"
 msgstr "맨 처음 블록"
 
-#: src/filebrowser/views.py:745 src/filebrowser/views.py:747
+#: src/filebrowser/views.py:793 src/filebrowser/views.py:795
 #: src/filebrowser/templates/display.mako:120
 #: src/filebrowser/templates/display.mako:200
 msgid "Previous Block"
 msgstr "이전 블록"
 
-#: src/filebrowser/views.py:750 src/filebrowser/views.py:753
+#: src/filebrowser/views.py:798 src/filebrowser/views.py:801
 #: src/filebrowser/templates/display.mako:121
 #: src/filebrowser/templates/display.mako:201
 msgid "Next Block"
 msgstr "다음 블록"
 
-#: src/filebrowser/views.py:750 src/filebrowser/views.py:753
+#: src/filebrowser/views.py:798 src/filebrowser/views.py:801
 #: src/filebrowser/templates/display.mako:122
 #: src/filebrowser/templates/display.mako:202
 msgid "Last Block"
 msgstr "마지막 블록"
 
-#: src/filebrowser/views.py:882
+#: src/filebrowser/views.py:930
 msgid "Cannot perform operation."
 msgstr "작업을 수행할 수 없습니다."
 
-#: src/filebrowser/views.py:917
+#: src/filebrowser/views.py:965
 #, python-format
 msgid ""
 "Could not rename folder \"%s\" to \"%s\": Hashes are not allowed in "
 "filenames."
 msgstr "폴더 이름을 \"%s\"에서 \"%s\"(으)로 바꿀 수 없습니다. 파일 이름에 해시를 사용할 수 없습니다."
 
-#: src/filebrowser/views.py:931
+#: src/filebrowser/views.py:979
 #, python-format
 msgid ""
 "Could not name folder \"%s\": Slashes or hashes are not allowed in "
 "filenames."
 msgstr "폴더 이름 \"%s\"을(를) 지정할 수 없습니다. 파일 이름에 슬래시 또는 해시를 사용할 수 없습니다."
 
-#: src/filebrowser/views.py:941
+#: src/filebrowser/views.py:989
 #, python-format
 msgid "Could not name file \"%s\": Slashes are not allowed in filenames."
 msgstr "파일 이름 \"%s\"을(를) 지정할 수 없습니다. 파일 이름에 슬래시를 사용할 수 없습니다."
 
-#: src/filebrowser/views.py:1034 src/filebrowser/views.py:1111
-#, fuzzy
+#: src/filebrowser/views.py:1082 src/filebrowser/views.py:1159
 msgid "A POST request is required."
 msgstr "POST 요청이 필요합니다."
 
-#: src/filebrowser/views.py:1037 src/filebrowser/views.py:1114
+#: src/filebrowser/views.py:1085 src/filebrowser/views.py:1162
 #, python-format
 msgid "%(destination)s upload succeeded"
 msgstr "%(destination)s 업로드 완료"
 
-#: src/filebrowser/views.py:1039 src/filebrowser/views.py:1116
-#, fuzzy, python-format
+#: src/filebrowser/views.py:1087 src/filebrowser/views.py:1164
+#, python-format
 msgid "Upload failed: %(data)s"
 msgstr "업로드 실패: %(data)s"
 
-#: src/filebrowser/views.py:1055 src/filebrowser/views.py:1134
+#: src/filebrowser/views.py:1103 src/filebrowser/views.py:1182
 #, python-format
 msgid "Sorry, no \"%(sep)s\" in the filename %(name)s.sep"
 msgstr "파일 이름 %(name)s.sep에 \"%(sep)s\"이(가) 없습니다."
 
-#: src/filebrowser/views.py:1075 src/filebrowser/views.py:1158
-#, fuzzy, python-format
+#: src/filebrowser/views.py:1123 src/filebrowser/views.py:1206
+#, python-format
 msgid "Destination %(name)s already exists."
 msgstr "대상 %(name)s이(가) 이미 존재합니다."
 
-#: src/filebrowser/views.py:1077 src/filebrowser/views.py:1160
-#, fuzzy, python-format
+#: src/filebrowser/views.py:1125 src/filebrowser/views.py:1208
+#, python-format
 msgid "Copy to %(name)s failed: %(error)s"
-msgstr "\"%(name)s에 복사할 수 없습니다: %(error)s"
+msgstr "%(name)s에 복사할 수 없습니다: %(error)s"
 
-#: src/filebrowser/views.py:1087 src/filebrowser/views.py:1170
+#: src/filebrowser/views.py:1135 src/filebrowser/views.py:1218
 #, python-format
 msgid "Error in upload form: %s"
 msgstr "업로드 양식 %s에 오류 발생"
 
-#: src/filebrowser/views.py:1143
+#: src/filebrowser/views.py:1191
 msgid "Could not extract contents of file."
 msgstr "파일의 내용을 추출할 수 없습니다."
 
-#: src/filebrowser/views.py:1149
+#: src/filebrowser/views.py:1197
 msgid "Could not interpret archive type."
 msgstr "아카이브 유형을 해석할 수 없습니다."
 
@@ -411,7 +433,6 @@ msgid "Save As"
 msgstr "다른 이름으로 저장"
 
 #: src/filebrowser/templates/edit.mako:73
-#, fuzzy
 msgid "Enter the location where you'd like to save the file."
 msgstr "파일을 저장할 위치를 입력하십시오."
 
@@ -419,7 +440,6 @@ msgstr "파일을 저장할 위치를 입력하십시오."
 #: src/filebrowser/templates/listdir_components.mako:164
 #: src/filebrowser/templates/listdir_components.mako:200
 #: src/filebrowser/templates/listdir_components.mako:289
-#, fuzzy
 msgid "Name is required."
 msgstr "이름을 입력해야 합니다."
 
@@ -488,7 +508,6 @@ msgid "Files"
 msgstr "파일"
 
 #: src/filebrowser/templates/listdir.mako:54
-#, fuzzy
 msgid "Archive"
 msgstr "아카이브"
 
@@ -501,12 +520,10 @@ msgid "New"
 msgstr "새로 만들기"
 
 #: src/filebrowser/templates/listdir.mako:63
-#, fuzzy
 msgid "File"
 msgstr "파일"
 
 #: src/filebrowser/templates/listdir.mako:64
-#, fuzzy
 msgid "Directory"
 msgstr "디렉토리"
 
@@ -524,7 +541,7 @@ msgstr "날짜"
 
 #: src/filebrowser/templates/listdir_components.mako:120
 msgid "Beginning of List"
-msgstr "목록 맨 앞"
+msgstr "목록 시작"
 
 #: src/filebrowser/templates/listdir_components.mako:121
 msgid "Previous Page"
@@ -564,7 +581,6 @@ msgid "of"
 msgstr "/"
 
 #: src/filebrowser/templates/listdir_components.mako:131
-#, fuzzy
 msgid "items, page"
 msgstr "항목, 페이지"
 
@@ -573,7 +589,6 @@ msgid "Confirm Delete"
 msgstr "삭제 확인"
 
 #: src/filebrowser/templates/listdir_components.mako:142
-#, fuzzy
 msgid "Are you sure you want to delete these files?"
 msgstr "이 파일을 삭제하시겠습니까?"
 
@@ -634,7 +649,6 @@ msgid "Move:"
 msgstr "이동:"
 
 #: src/filebrowser/templates/listdir_components.mako:280
-#, fuzzy
 msgid "Destination"
 msgstr "대상"
 
@@ -645,7 +659,6 @@ msgstr "업로드 위치:"
 
 #: src/filebrowser/templates/listdir_components.mako:306
 #: src/filebrowser/templates/listdir_components.mako:323
-#, fuzzy
 msgid "Enable JavaScript to use the file uploader."
 msgstr "파일 업로더를 사용할 수 있도록 JavaScript를 활성화하십시오."
 
@@ -658,37 +671,30 @@ msgid "Create Directory"
 msgstr "디렉토리 생성"
 
 #: src/filebrowser/templates/listdir_components.mako:343
-#, fuzzy
 msgid "Directory name is required."
 msgstr "디렉토리 이름을 입력해야 합니다."
 
 #: src/filebrowser/templates/listdir_components.mako:356
-#, fuzzy
 msgid "Create File"
 msgstr "파일 생성"
 
 #: src/filebrowser/templates/listdir_components.mako:364
-#, fuzzy
 msgid "File name is required."
 msgstr "파일 이름을 입력해야 합니다."
 
 #: src/filebrowser/templates/listdir_components.mako:434
-#, fuzzy
 msgid "User is required."
 msgstr "사용자를 입력해야 합니다."
 
 #: src/filebrowser/templates/listdir_components.mako:439
-#, fuzzy
 msgid "Group is required."
 msgstr "그룹을 입력해야 합니다."
 
 #: src/filebrowser/templates/listdir_components.mako:445
-#, fuzzy
 msgid "Specify another group."
 msgstr "다른 그룹을 지정하십시오."
 
 #: src/filebrowser/templates/listdir_components.mako:451
-#, fuzzy
 msgid "Specify another user."
 msgstr "다른 사용자를 지정하십시오."
 
@@ -711,7 +717,6 @@ msgid "Failed"
 msgstr "실패함"
 
 #: src/filebrowser/templates/listdir_components.mako:973
-#, fuzzy
 msgid "Upload an archive"
 msgstr "아카이브 업로드"
 

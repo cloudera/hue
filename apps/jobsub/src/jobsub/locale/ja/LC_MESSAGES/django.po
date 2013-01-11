@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-01-04 07:28-0800\n"
+"POT-Creation-Date: 2013-01-10 18:30-0800\n"
 "PO-Revision-Date: 2012-07-30 18:54-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -22,17 +22,14 @@ msgid "Location on HDFS where the jobsub examples and templates are stored."
 msgstr "HDFS 上で jobsub の例とテンプレートが保存されている場所です。"
 
 #: src/jobsub/conf.py:33
-#, fuzzy
 msgid "Location on local filesystem where examples and template are stored."
 msgstr "ローカルファイルシステム上で例とテンプレートが保存されている場所です。"
 
 #: src/jobsub/conf.py:39
-#, fuzzy
 msgid "Location on local filesystem where sample data is stored."
 msgstr "ローカルファイルシステム上でサンプルデータが保存されている場所です。"
 
 #: src/jobsub/conf.py:49
-#, fuzzy
 msgid ""
 "Deprecated, use liboozie.conf.OOZIE_URL instead. URL of Oozie server. "
 "This is required for job submission."
@@ -41,7 +38,6 @@ msgstr ""
 "です。これはジョブのサブミッションに必要です。"
 
 #: src/jobsub/conf.py:55
-#, fuzzy
 msgid ""
 "Deprecated, use liboozie.conf.SECURITY_ENABLED instead. Whether Oozie "
 "requires client to do perform Kerberos authentication"
@@ -50,7 +46,7 @@ msgstr ""
 "認証の実行をクライアントに要求するかどうかの指定です。"
 
 #: src/jobsub/forms.py:39 src/jobsub/forms.py:58 src/jobsub/forms.py:77
-#: src/jobsub/forms.py:95 src/jobsub/templates/list_designs.mako:63
+#: src/jobsub/forms.py:95 src/jobsub/templates/list_designs.mako:64
 #: src/jobsub/templates/list_history.mako:42
 #: src/jobsub/templates/workflow.mako:55 src/jobsub/templates/workflow.mako:100
 msgid "Name"
@@ -63,7 +59,7 @@ msgid ""
 msgstr "文字、数字、'_'、および '-' を使用できます。先頭には文字または '_' が必要です。"
 
 #: src/jobsub/forms.py:59 src/jobsub/forms.py:78 src/jobsub/forms.py:96
-#: src/jobsub/templates/list_designs.mako:65
+#: src/jobsub/templates/list_designs.mako:66
 #: src/jobsub/templates/list_history.mako:44
 msgid "Description"
 msgstr "説明"
@@ -109,12 +105,12 @@ msgid "Path to jar files on HDFS."
 msgstr "HDFS 上の jar ファイルへのパスです。"
 
 #: src/jobsub/submit.py:48
-#, fuzzy, python-format
+#, python-format
 msgid "Submission for job design '%(name)s' (id %(id)s, owner %(username)s)."
 msgstr "ジョブ設計 '%(name)s' のサブミッションです（ID %(id)s、所有者 %(username)s）。"
 
 #: src/jobsub/submit.py:72
-#, fuzzy, python-format
+#, python-format
 msgid "Job design already submitted (Oozie job id %(id)s)."
 msgstr "サブミット済みのジョブ設計です（Oozie ジョブ ID %(id)s）。"
 
@@ -123,68 +119,65 @@ msgid "Failed to access deployment directory."
 msgstr "展開ディレクトリにアクセスできませんでした。"
 
 #: src/jobsub/submit.py:210
-#, fuzzy
 msgid "Failed to obtain HDFS reference. Check your configuration."
 msgstr "HDFS の参照を取得できませんでした。使用している設定を確認してください。"
 
-#: src/jobsub/views.py:59
-#, fuzzy, python-format
+#: src/jobsub/views.py:60
+#, python-format
 msgid "Access denied: view job %(id)s."
 msgstr "ジョブ %(id)s の表示でアクセスが拒否されました。"
 
-#: src/jobsub/views.py:65
+#: src/jobsub/views.py:66
 #, python-format
 msgid "Error accessing Oozie job %(id)s."
 msgstr "Oozie ジョブ %(id)s へのアクセスでエラーが発生しました。"
 
-#: src/jobsub/views.py:198
+#: src/jobsub/views.py:199
 msgid "Permission denied. You are not the owner."
 msgstr "パーミッションが拒否されました。所有者ではありません。"
 
-#: src/jobsub/views.py:206
-#, fuzzy, python-format
+#: src/jobsub/views.py:207
+#, python-format
 msgid "Access denied: delete design %(id)s."
 msgstr "設計 %(id)s の削除でアクセスが拒否されました。"
 
-#: src/jobsub/views.py:214
+#: src/jobsub/views.py:215
 msgid "Workflow not found."
 msgstr "ワークフローが見つかりません。"
 
-#: src/jobsub/views.py:222
-#, fuzzy, python-format
+#: src/jobsub/views.py:223
+#, python-format
 msgid "Access denied: edit design %(id)s."
 msgstr "設計 %(id)s の編集でアクセスが拒否されました。"
 
-#: src/jobsub/views.py:253
-#, fuzzy, python-format
+#: src/jobsub/views.py:254
+#, python-format
 msgid "Access denied: design parameters %(id)s."
 msgstr "パラメータ %(id)s の設計でアクセスが拒否されました。"
 
-#: src/jobsub/views.py:265
-#, fuzzy
+#: src/jobsub/views.py:266
 msgid "Use a POST request to submit a design."
 msgstr "POST 要求を使用して設計をサブミットしてください。"
 
-#: src/jobsub/views.py:269
-#, fuzzy, python-format
+#: src/jobsub/views.py:270
+#, python-format
 msgid "Access denied: submit design %(id)s."
 msgstr "設計 %(id)s のサブミットでアクセスが拒否されました。"
 
-#: src/jobsub/views.py:280
+#: src/jobsub/views.py:281
 msgid "The Oozie server is not running"
 msgstr "Oozie サーバーが実行されていません"
 
-#: src/jobsub/views.py:281
-#, fuzzy, python-format
+#: src/jobsub/views.py:282
+#, python-format
 msgid "Error submitting design %(id)s."
 msgstr "設計 %(id)s のサブミット中にエラーが発生しました。"
 
-#: src/jobsub/views.py:295
-#, fuzzy
+#: src/jobsub/views.py:296
 msgid "Use a POST request to install the examples."
 msgstr "POST 要求を使用して例をインストールしてください。"
 
-#: src/jobsub/views.py:300
+#: src/jobsub/views.py:301
 msgid "The examples could not be installed."
 msgstr "例をインストールできませんでした。"
 
@@ -197,81 +190,81 @@ msgid "Expected sample user fixture."
 msgstr "想定どおりのサンプルユーザー什器です。"
 
 #: src/jobsub/templates/edit_design.mako:26
-#: src/jobsub/templates/list_designs.mako:26
+#: src/jobsub/templates/list_designs.mako:27
 #: src/jobsub/templates/list_history.mako:27
 #: src/jobsub/templates/workflow.mako:25
 msgid "Job Designer"
 msgstr "Job Designer"
 
-#: src/jobsub/templates/edit_design.mako:54
+#: src/jobsub/templates/edit_design.mako:58
 #, python-format
 msgid "Job Design (%(type)s type)"
 msgstr "ジョブ設計（%(type)s タイプ）"
 
-#: src/jobsub/templates/edit_design.mako:66
+#: src/jobsub/templates/edit_design.mako:70
 msgid "You can parameterize the values, using"
 msgstr "次を使用してこれらの値をパラメータ化できます。"
 
-#: src/jobsub/templates/edit_design.mako:66
+#: src/jobsub/templates/edit_design.mako:70
 msgid "or"
 msgstr "または"
 
-#: src/jobsub/templates/edit_design.mako:68
+#: src/jobsub/templates/edit_design.mako:72
 msgid ""
 "When the design is submitted, you will be prompted for the actual value "
 "of "
 msgstr "設計をサブミットすると、次の実際の値を指定することが要求されます： "
 
-#: src/jobsub/templates/edit_design.mako:76
+#: src/jobsub/templates/edit_design.mako:80
 msgid "Job Properties"
 msgstr "ジョブのプロパティ"
 
-#: src/jobsub/templates/edit_design.mako:82
+#: src/jobsub/templates/edit_design.mako:86
 msgid "Property name"
 msgstr "プロパティ名"
 
-#: src/jobsub/templates/edit_design.mako:83
+#: src/jobsub/templates/edit_design.mako:87
 #: src/jobsub/templates/workflow.mako:56
 msgid "Value"
 msgstr "値"
 
-#: src/jobsub/templates/edit_design.mako:91
-#: src/jobsub/templates/edit_design.mako:116
-#: src/jobsub/templates/edit_design.mako:139
-#: src/jobsub/templates/list_designs.mako:43
+#: src/jobsub/templates/edit_design.mako:95
+#: src/jobsub/templates/edit_design.mako:120
+#: src/jobsub/templates/edit_design.mako:143
+#: src/jobsub/templates/list_designs.mako:44
 msgid "Delete"
 msgstr "削除"
 
-#: src/jobsub/templates/edit_design.mako:103
+#: src/jobsub/templates/edit_design.mako:107
 msgid "Add Property"
 msgstr "プロパティの追加"
 
-#: src/jobsub/templates/edit_design.mako:108
+#: src/jobsub/templates/edit_design.mako:112
 msgid "Files"
 msgstr "ファイル"
 
-#: src/jobsub/templates/edit_design.mako:126
+#: src/jobsub/templates/edit_design.mako:130
 msgid "Add File"
 msgstr "ファイルの追加"
 
-#: src/jobsub/templates/edit_design.mako:131
+#: src/jobsub/templates/edit_design.mako:135
 msgid "Archives"
 msgstr "アーカイブ"
 
-#: src/jobsub/templates/edit_design.mako:149
+#: src/jobsub/templates/edit_design.mako:153
 msgid "Add Archive"
 msgstr "アーカイブの追加"
 
-#: src/jobsub/templates/edit_design.mako:156
+#: src/jobsub/templates/edit_design.mako:160
 msgid "Save"
 msgstr "保存"
 
-#: src/jobsub/templates/edit_design.mako:157
-#: src/jobsub/templates/list_designs.mako:105
+#: src/jobsub/templates/edit_design.mako:161
+#: src/jobsub/templates/list_designs.mako:106
 msgid "Cancel"
 msgstr "キャンセル"
 
-#: src/jobsub/templates/edit_design.mako:167
+#: src/jobsub/templates/edit_design.mako:171
 msgid "Choose a file"
 msgstr "ファイルを選択"
 
@@ -283,106 +276,101 @@ msgstr "設計"
 msgid "History"
 msgstr "履歴"
 
-#: src/jobsub/templates/list_designs.mako:37
+#: src/jobsub/templates/list_designs.mako:38
 msgid "Job Designs"
 msgstr "Job Designer"
 
-#: src/jobsub/templates/list_designs.mako:41
-#: src/jobsub/templates/list_designs.mako:106
+#: src/jobsub/templates/list_designs.mako:42
+#: src/jobsub/templates/list_designs.mako:107
 msgid "Submit"
 msgstr "サブミット"
 
-#: src/jobsub/templates/list_designs.mako:42
+#: src/jobsub/templates/list_designs.mako:43
 msgid "Edit"
 msgstr "編集"
 
-#: src/jobsub/templates/list_designs.mako:44
+#: src/jobsub/templates/list_designs.mako:45
 msgid "Clone"
 msgstr "複製"
 
-#: src/jobsub/templates/list_designs.mako:48
-#, fuzzy
+#: src/jobsub/templates/list_designs.mako:49
 msgid "Create MapReduce Design"
-msgstr "Mapreduce 設計の作成"
+msgstr "MapReduce 設計を作成"
 
-#: src/jobsub/templates/list_designs.mako:48
-#, fuzzy
+#: src/jobsub/templates/list_designs.mako:49
 msgid "MapReduce"
 msgstr "MapReduce"
 
-#: src/jobsub/templates/list_designs.mako:49
+#: src/jobsub/templates/list_designs.mako:50
 msgid "Create Streaming Design"
 msgstr "ストリーミング設計の作成"
 
-#: src/jobsub/templates/list_designs.mako:49
-msgid "Streaming"
-msgstr "ストリーミング"
-
-#: src/jobsub/templates/list_designs.mako:50
+#: src/jobsub/templates/list_designs.mako:51
 msgid "Create Java Design"
 msgstr "Java 設計の作成"
 
-#: src/jobsub/templates/list_designs.mako:50
+#: src/jobsub/templates/list_designs.mako:51
 msgid "Java"
 msgstr "Java"
 
-#: src/jobsub/templates/list_designs.mako:53
+#: src/jobsub/templates/list_designs.mako:54
 msgid "Install Samples"
 msgstr "サンプルのインストール"
 
-#: src/jobsub/templates/list_designs.mako:62
+#: src/jobsub/templates/list_designs.mako:63
 #: src/jobsub/templates/list_history.mako:41
 msgid "Owner"
 msgstr "所有者"
 
-#: src/jobsub/templates/list_designs.mako:64
+#: src/jobsub/templates/list_designs.mako:65
 #: src/jobsub/templates/list_history.mako:43
 #: src/jobsub/templates/workflow.mako:101
 msgid "Type"
 msgstr "タイプ"
 
-#: src/jobsub/templates/list_designs.mako:66
+#: src/jobsub/templates/list_designs.mako:67
 msgid "Last Modified"
 msgstr "前回変更"
 
-#: src/jobsub/templates/list_designs.mako:96
+#: src/jobsub/templates/list_designs.mako:97
 msgid "Submit this design?"
 msgstr "この設計をサブミットしますか。"
 
-#: src/jobsub/templates/list_designs.mako:115
+#: src/jobsub/templates/list_designs.mako:116
 msgid "Delete this design?"
 msgstr "この設計を削除しますか。"
 
-#: src/jobsub/templates/list_designs.mako:118
-#: src/jobsub/templates/list_designs.mako:134
+#: src/jobsub/templates/list_designs.mako:119
+#: src/jobsub/templates/list_designs.mako:135
 msgid "No"
 msgstr "いいえ"
 
-#: src/jobsub/templates/list_designs.mako:119
-#: src/jobsub/templates/list_designs.mako:135
+#: src/jobsub/templates/list_designs.mako:120
+#: src/jobsub/templates/list_designs.mako:136
 msgid "Yes"
 msgstr "はい"
 
-#: src/jobsub/templates/list_designs.mako:128
+#: src/jobsub/templates/list_designs.mako:129
 msgid "Install sample job designs?"
 msgstr "サンプルのジョブ設計をインストールしますか。"
 
-#: src/jobsub/templates/list_designs.mako:131
+#: src/jobsub/templates/list_designs.mako:132
 msgid "It will take a few seconds to install."
 msgstr "インストールには数秒を要します。"
 
-#: src/jobsub/templates/list_designs.mako:143
+#: src/jobsub/templates/list_designs.mako:144
 #, python-format
 msgid "Are you sure you want to delete %(name)s?"
 msgstr "%(name)s を削除していいですか。"
 
-#: src/jobsub/templates/list_designs.mako:144
+#: src/jobsub/templates/list_designs.mako:145
 #, python-format
 msgid "Submit %(name)s to the cluster"
 msgstr "クラスタに %(name)s をサブミット"
 
 #: src/jobsub/templates/list_designs.mako:181
 #: src/jobsub/templates/list_history.mako:80
+#, fuzzy
 msgid "No data available"
 msgstr "テーブルにデータがありません。"
 
@@ -403,6 +391,7 @@ msgstr "（合計 _MAX_ 件のエントリからフィルタ処理）"
 
 #: src/jobsub/templates/list_designs.mako:185
 #: src/jobsub/templates/list_history.mako:84
+#, fuzzy
 msgid "No matching records"
 msgstr "一致するレコードが見つかりません"
 

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-01-04 07:28-0800\n"
+"POT-Creation-Date: 2013-01-10 18:29-0800\n"
 "PO-Revision-Date: 2012-07-30 18:52-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: pt <LL@li.org>\n"
@@ -16,6 +16,10 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
+
+#: src/filebrowser/conf.py:25
+msgid "Max snappy decompression size in bytes."
+msgstr ""
 
 #: src/filebrowser/forms.py:62
 msgid "File to edit"
@@ -59,12 +63,10 @@ msgid "Filename or directory to upload to."
 msgstr "Nome de ficheiro ou directório para onde fazer o upload."
 
 #: src/filebrowser/forms.py:90
-#, fuzzy
 msgid "Archive to Upload"
 msgstr "Arquivo para upload"
 
 #: src/filebrowser/forms.py:91
-#, fuzzy
 msgid "Archive to upload to."
 msgstr "Arquivo para fazer upload para."
 
@@ -90,13 +92,11 @@ msgid "Directory Name"
 msgstr "Nome do directório"
 
 #: src/filebrowser/forms.py:117
-#, fuzzy
 msgid "Path in which to create the file"
 msgstr "Caminho no qual criar o ficheiro"
 
 #: src/filebrowser/forms.py:118
 #: src/filebrowser/templates/listdir_components.mako:359
-#, fuzzy
 msgid "File Name"
 msgstr "Nome do ficheiro"
 
@@ -136,23 +136,23 @@ msgstr "Recursivo"
 msgid "Path to change permissions"
 msgstr "Caminho para alterar as permissões"
 
-#: src/filebrowser/views.py:106 src/filebrowser/views.py:486
+#: src/filebrowser/views.py:107 src/filebrowser/views.py:486
 #: src/filebrowser/views.py:516
 #, python-format
 msgid "File not found: %(path)s"
 msgstr "Ficheiro não encontrado: %(path)s"
 
-#: src/filebrowser/views.py:108
+#: src/filebrowser/views.py:109
 #, python-format
 msgid "'%(path)s' is not a file"
 msgstr "'%(path)s' não é um ficheiro"
 
-#: src/filebrowser/views.py:143
+#: src/filebrowser/views.py:144
 #, python-format
 msgid "Cannot access: %(path)s."
 msgstr "Impossível aceder a: %(path)s."
 
-#: src/filebrowser/views.py:145 src/filebrowser/views.py:884
+#: src/filebrowser/views.py:146 src/filebrowser/views.py:932
 #, python-format
 msgid ""
 " Note: you are a Hue admin but not a HDFS superuser (which is "
@@ -161,29 +161,29 @@ msgstr ""
 " Nota: é um administrador da Hue, mas não um super-utilizador do HDFS "
 "(que é \"%(superuser)s\")."
 
-#: src/filebrowser/views.py:171
+#: src/filebrowser/views.py:172
 #, python-format
 msgid "Cannot edit a directory: %(path)s"
 msgstr "Não é possível editar um directório: %(path)s"
 
-#: src/filebrowser/views.py:175
+#: src/filebrowser/views.py:176
 #, python-format
 msgid "File too big to edit: %(path)s"
 msgstr "Ficheiro demasiado grande para editar: %(path)s"
 
-#: src/filebrowser/views.py:185
+#: src/filebrowser/views.py:186
 #, python-format
 msgid "File is not encoded in %(encoding)s; cannot be edited: %(path)s"
 msgstr ""
 "O ficheiro não está codificado em %(encoding)s; não pode ser editado: "
 "%(path)s"
 
-#: src/filebrowser/views.py:234
+#: src/filebrowser/views.py:235
 #, python-format
 msgid "Saved %(path)s."
 msgstr "%(path)s guardado."
 
-#: src/filebrowser/views.py:329
+#: src/filebrowser/views.py:330
 #, python-format
 msgid "Not a directory: %(path)s"
 msgstr "Não é um directório: %(path)s"
@@ -214,51 +214,74 @@ msgstr "O comprimento não pode ser inferior a zero."
 msgid "Cannot request chunks greater than %(bytes)d bytes"
 msgstr "Não pode pedir blocos com mais de %(bytes)d bytes"
 
-#: src/filebrowser/views.py:686
+#: src/filebrowser/views.py:659
+#, python-format
+msgid ""
+"Failed to validate snappy compressed file. File size is greater than "
+"allowed max snappy decompression size of %d"
+msgstr ""
+
+#: src/filebrowser/views.py:690
+#, fuzzy
+msgid "Failed to decompress snappy compressed file."
+msgstr "Falha ao descompactar o ficheiro."
+
+#: src/filebrowser/views.py:695
+msgid "Failed to decompress snappy compressed file. Snappy is not installed!"
+msgstr ""
+
+#: src/filebrowser/views.py:698
+#, python-format
+msgid ""
+"Failed to decompress snappy compressed file. File size is greater than "
+"allowed max snappy decompression size of %d"
+msgstr ""
+
+#: src/filebrowser/views.py:722
 msgid "Failed to read Avro file."
 msgstr "Falha ao ler o ficheiro Avro."
 
-#: src/filebrowser/views.py:695
+#: src/filebrowser/views.py:729
 msgid "Offsets are not supported with Gzip compression."
 msgstr "A compressão Gzip não suporta offsets."
 
-#: src/filebrowser/views.py:702
+#: src/filebrowser/views.py:734
 msgid "Failed to decompress file."
 msgstr "Falha ao descompactar o ficheiro."
 
-#: src/filebrowser/views.py:717
+#: src/filebrowser/views.py:745
 msgid "Failed to read file."
 msgstr "Falha ao ler o ficheiro."
 
-#: src/filebrowser/views.py:745 src/filebrowser/views.py:747
+#: src/filebrowser/views.py:793 src/filebrowser/views.py:795
 #: src/filebrowser/templates/display.mako:119
 #: src/filebrowser/templates/display.mako:199
 msgid "First Block"
 msgstr "Primeiro bloco"
 
-#: src/filebrowser/views.py:745 src/filebrowser/views.py:747
+#: src/filebrowser/views.py:793 src/filebrowser/views.py:795
 #: src/filebrowser/templates/display.mako:120
 #: src/filebrowser/templates/display.mako:200
 msgid "Previous Block"
 msgstr "Bloco anterior"
 
-#: src/filebrowser/views.py:750 src/filebrowser/views.py:753
+#: src/filebrowser/views.py:798 src/filebrowser/views.py:801
 #: src/filebrowser/templates/display.mako:121
 #: src/filebrowser/templates/display.mako:201
 msgid "Next Block"
 msgstr "Bloco seguinte"
 
-#: src/filebrowser/views.py:750 src/filebrowser/views.py:753
+#: src/filebrowser/views.py:798 src/filebrowser/views.py:801
 #: src/filebrowser/templates/display.mako:122
 #: src/filebrowser/templates/display.mako:202
 msgid "Last Block"
 msgstr "Último bloco"
 
-#: src/filebrowser/views.py:882
+#: src/filebrowser/views.py:930
 msgid "Cannot perform operation."
 msgstr "Não é possível efectuar a operação."
 
-#: src/filebrowser/views.py:917
+#: src/filebrowser/views.py:965
 #, python-format
 msgid ""
 "Could not rename folder \"%s\" to \"%s\": Hashes are not allowed in "
@@ -267,7 +290,7 @@ msgstr ""
 "Não foi possível alterar o nome da pasta \"%s\" para \"%s\": Não são "
 "permitidos hashes em nomes de ficheiros."
 
-#: src/filebrowser/views.py:931
+#: src/filebrowser/views.py:979
 #, python-format
 msgid ""
 "Could not name folder \"%s\": Slashes or hashes are not allowed in "
@@ -276,53 +299,52 @@ msgstr ""
 "Não foi possível alterar o nome da pasta \"%s\": Não são permitidas "
 "barras ou hashes em nomes de ficheiros."
 
-#: src/filebrowser/views.py:941
+#: src/filebrowser/views.py:989
 #, python-format
 msgid "Could not name file \"%s\": Slashes are not allowed in filenames."
 msgstr ""
 "Não foi possível atribuir o nome ao ficheiro \"%s\": Não são permitidas "
 "barras em nomes de ficheiros."
 
-#: src/filebrowser/views.py:1034 src/filebrowser/views.py:1111
-#, fuzzy
+#: src/filebrowser/views.py:1082 src/filebrowser/views.py:1159
 msgid "A POST request is required."
 msgstr "É necessário um pedido POST."
 
-#: src/filebrowser/views.py:1037 src/filebrowser/views.py:1114
+#: src/filebrowser/views.py:1085 src/filebrowser/views.py:1162
 #, python-format
 msgid "%(destination)s upload succeeded"
 msgstr "Upload para %(destination)s bem-sucedido"
 
-#: src/filebrowser/views.py:1039 src/filebrowser/views.py:1116
-#, fuzzy, python-format
+#: src/filebrowser/views.py:1087 src/filebrowser/views.py:1164
+#, python-format
 msgid "Upload failed: %(data)s"
 msgstr "Falha no upload: %(data)s"
 
-#: src/filebrowser/views.py:1055 src/filebrowser/views.py:1134
+#: src/filebrowser/views.py:1103 src/filebrowser/views.py:1182
 #, python-format
 msgid "Sorry, no \"%(sep)s\" in the filename %(name)s.sep"
 msgstr "Lamentamos, mas não existe \"%(sep)s\" no nome do ficheiro %(name)s.sep"
 
-#: src/filebrowser/views.py:1075 src/filebrowser/views.py:1158
-#, fuzzy, python-format
+#: src/filebrowser/views.py:1123 src/filebrowser/views.py:1206
+#, python-format
 msgid "Destination %(name)s already exists."
 msgstr "O destino %(name)s já existe."
 
-#: src/filebrowser/views.py:1077 src/filebrowser/views.py:1160
-#, fuzzy, python-format
+#: src/filebrowser/views.py:1125 src/filebrowser/views.py:1208
+#, python-format
 msgid "Copy to %(name)s failed: %(error)s"
 msgstr "Falha ao copiar para %(name)s: %(error)s"
 
-#: src/filebrowser/views.py:1087 src/filebrowser/views.py:1170
+#: src/filebrowser/views.py:1135 src/filebrowser/views.py:1218
 #, python-format
 msgid "Error in upload form: %s"
 msgstr "Erro ao fazer upload do formulário: %s"
 
-#: src/filebrowser/views.py:1143
+#: src/filebrowser/views.py:1191
 msgid "Could not extract contents of file."
 msgstr "Não foi possível extrair o conteúdo do ficheiro."
 
-#: src/filebrowser/views.py:1149
+#: src/filebrowser/views.py:1197
 msgid "Could not interpret archive type."
 msgstr "Não foi possível interpretar o tipo de arquivo."
 
@@ -421,7 +443,6 @@ msgid "Save As"
 msgstr "Guardar como"
 
 #: src/filebrowser/templates/edit.mako:73
-#, fuzzy
 msgid "Enter the location where you'd like to save the file."
 msgstr "Introduza a localização onde pretende guardar o ficheiro."
 
@@ -429,7 +450,6 @@ msgstr "Introduza a localização onde pretende guardar o ficheiro."
 #: src/filebrowser/templates/listdir_components.mako:164
 #: src/filebrowser/templates/listdir_components.mako:200
 #: src/filebrowser/templates/listdir_components.mako:289
-#, fuzzy
 msgid "Name is required."
 msgstr "É necessário o nome."
 
@@ -498,7 +518,6 @@ msgid "Files"
 msgstr "Ficheiros"
 
 #: src/filebrowser/templates/listdir.mako:54
-#, fuzzy
 msgid "Archive"
 msgstr "Arquivo"
 
@@ -511,12 +530,10 @@ msgid "New"
 msgstr "Novo"
 
 #: src/filebrowser/templates/listdir.mako:63
-#, fuzzy
 msgid "File"
 msgstr "Ficheiro"
 
 #: src/filebrowser/templates/listdir.mako:64
-#, fuzzy
 msgid "Directory"
 msgstr "Directório"
 
@@ -574,16 +591,14 @@ msgid "of"
 msgstr "de"
 
 #: src/filebrowser/templates/listdir_components.mako:131
-#, fuzzy
 msgid "items, page"
 msgstr "itens, página"
 
 #: src/filebrowser/templates/listdir_components.mako:139
 msgid "Confirm Delete"
-msgstr "Confirmar eiminação"
+msgstr "Confirmar eliminação"
 
 #: src/filebrowser/templates/listdir_components.mako:142
-#, fuzzy
 msgid "Are you sure you want to delete these files?"
 msgstr "Quer mesmo eliminar estes ficheiros?"
 
@@ -646,7 +661,6 @@ msgid "Move:"
 msgstr "Mover:"
 
 #: src/filebrowser/templates/listdir_components.mako:280
-#, fuzzy
 msgid "Destination"
 msgstr "Destino"
 
@@ -657,7 +671,6 @@ msgstr "A fazer upload para:"
 
 #: src/filebrowser/templates/listdir_components.mako:306
 #: src/filebrowser/templates/listdir_components.mako:323
-#, fuzzy
 msgid "Enable JavaScript to use the file uploader."
 msgstr "Active o JavaScript para utilizar o uploader de ficheiros."
 
@@ -670,37 +683,30 @@ msgid "Create Directory"
 msgstr "Criar directório"
 
 #: src/filebrowser/templates/listdir_components.mako:343
-#, fuzzy
 msgid "Directory name is required."
 msgstr "É necessário o nome do directório."
 
 #: src/filebrowser/templates/listdir_components.mako:356
-#, fuzzy
 msgid "Create File"
 msgstr "Ficheiro de criação"
 
 #: src/filebrowser/templates/listdir_components.mako:364
-#, fuzzy
 msgid "File name is required."
 msgstr "É necessário o nome do ficheiro."
 
 #: src/filebrowser/templates/listdir_components.mako:434
-#, fuzzy
 msgid "User is required."
 msgstr "É necessário o utilizador."
 
 #: src/filebrowser/templates/listdir_components.mako:439
-#, fuzzy
 msgid "Group is required."
 msgstr "É necessário o grupo."
 
 #: src/filebrowser/templates/listdir_components.mako:445
-#, fuzzy
 msgid "Specify another group."
 msgstr "Especifique outro grupo."
 
 #: src/filebrowser/templates/listdir_components.mako:451
-#, fuzzy
 msgid "Specify another user."
 msgstr "Especifique outro utilizador."
 
@@ -723,7 +729,6 @@ msgid "Failed"
 msgstr "Falhou"
 
 #: src/filebrowser/templates/listdir_components.mako:973
-#, fuzzy
 msgid "Upload an archive"
 msgstr "Fazer upload de um arquivo"
 
