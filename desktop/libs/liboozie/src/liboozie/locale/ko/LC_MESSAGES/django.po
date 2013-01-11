@@ -3,12 +3,11 @@
 # This file is distributed under the same license as the Hue project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-01-04 07:28-0800\n"
+"POT-Creation-Date: 2013-01-10 18:29-0800\n"
 "PO-Revision-Date: 2012-11-07 13:08-0800\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -30,14 +29,13 @@ msgstr "Oozie에서 클라이언트의 Kerberos 인증 수행을 요구하는지
 msgid ""
 "Location on HDFS where the workflows/coordinators are deployed when "
 "submitted by a non-owner."
-msgstr "소유자가 아닌 사용자가 제출할 경우 워크플로/Coordinator가 배포되는 HDFS상의 위치입니다."
+msgstr "소유자가 아닌 사용자가 제출할 경우 workflow/Coordinator가 배포되는 HDFS상의 위치입니다."
 
 #: src/liboozie/conf.py:69
-#, fuzzy
 msgid ""
 "The deployment directory of Oozie workflows does not exist. Run \"Setup "
 "Example\" on the Oozie workflow page."
-msgstr "Oozie 워크플로의 배포 디렉토리가 존재하지 않습니다. Oozie 워크플로 페이지의 \"앱 설정\"을 실행하십시오."
+msgstr "Oozie workflow의 배포 디렉토리가 존재하지 않습니다. Oozie workflow 페이지의 \"예제 설정\"을 실행하십시오."
 
 #: src/liboozie/conf.py:72
 msgid "Oozie Share Lib not installed in default location."
@@ -46,7 +44,7 @@ msgstr "기본 위치에 Oozie Share Lib가 설치되어 있지 않습니다."
 #: src/liboozie/submittion.py:69
 #, python-format
 msgid "Submission already submitted (Oozie job id %s)"
-msgstr "이미 제출됨(Oozie 작업 ID %s)"
+msgstr "이미 제출됨(Oozie Job ID %s)"
 
 #: src/liboozie/submittion.py:117
 msgid "Failed to access deployment directory."
@@ -64,7 +62,7 @@ msgstr "디렉토리 '%s'에 액세스하는 중 오류 발생: %s"
 
 #: src/liboozie/types.py:285
 msgid "Insufficient permission."
-msgstr "권한 부족"
+msgstr "권한 부족."
 
 #: src/liboozie/types.py:286
 #, python-format

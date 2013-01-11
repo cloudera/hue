@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-01-04 07:28-0800\n"
+"POT-Creation-Date: 2013-01-10 18:29-0800\n"
 "PO-Revision-Date: 2012-08-10 13:58-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -18,7 +18,6 @@ msgstr ""
 "Generated-By: Babel 0.9.6\n"
 
 #: src/desktop/appmanager.py:228
-#, fuzzy
 msgid "load_apps has already been called."
 msgstr "load_apps가 이미 호출되었습니다."
 
@@ -29,12 +28,10 @@ msgid ""
 msgstr "TRUE로 설정되면 CherryPy가 사용됩니다. 그 외의 경우에는 Spawning이 웹 서버로 사용됩니다."
 
 #: src/desktop/conf.py:38
-#, fuzzy
 msgid "HTTP host to bind to."
 msgstr "바인딩하는 HTTP 호스트입니다."
 
 #: src/desktop/conf.py:43
-#, fuzzy
 msgid "HTTP port to bind to."
 msgstr "바인딩하는 HTTP 포트입니다."
 
@@ -72,20 +69,17 @@ msgstr "외부 SMTP 서버로 연결하는 구성 옵션입니다."
 
 #: src/desktop/conf.py:100
 msgid "The SMTP server for email notification delivery."
-msgstr "이메일 알림 전송을 위한 SMTP 서버입니다."
+msgstr "Email 알림 전송을 위한 SMTP 서버입니다."
 
 #: src/desktop/conf.py:107
-#, fuzzy
 msgid "The SMTP server port."
 msgstr "SMTP 서버 포트입니다."
 
 #: src/desktop/conf.py:114
-#, fuzzy
 msgid "The username for the SMTP host."
-msgstr "SMTP 호스트 사용자 이름입니다."
+msgstr "SMTP 호스트의 사용자 이름입니다."
 
 #: src/desktop/conf.py:121
-#, fuzzy
 msgid "The password for the SMTP user."
 msgstr "SMTP 사용자의 암호입니다."
 
@@ -95,7 +89,7 @@ msgstr "SMTP 서버와 통신 시 TLS(보안) 연결 사용 여부입니다."
 
 #: src/desktop/conf.py:135
 msgid "Default email address to use for various automated notifications from Hue."
-msgstr "Hue의 여러 자동 알림에 사용하는 기본 이메일 주소입니다."
+msgstr "Hue의 여러 자동 알림에 사용하는 기본 Email 주소입니다."
 
 #: src/desktop/conf.py:144
 #, fuzzy
@@ -104,12 +98,13 @@ msgid ""
 "          For more info, see "
 "http://docs.djangoproject.com/en/1.1/ref/settings/#database-engine"
 msgstr ""
-"데스크탑 데이터베이스를 지정하는 구성 옵션입니다. 자세한 내용은 "
+"Desktop Database를 지정하는 구성 옵션입니다. 자세한 내용은 "
 "http://docs.djangoproject.com/en/1.1/ref/settings/#database-engine을 "
 "참조하십시오."
 
 #: src/desktop/conf.py:149
-msgid "Database engine, such as postgresql, mysql, sqlite3, or Oracle."
+#, fuzzy
+msgid "Database engine, such as postgresql_psycopg2, mysql, or sqlite3."
 msgstr "postgresql, mysql, sqlite3, Oracle 같은 데이터베이스 엔진입니다."
 
 #: src/desktop/conf.py:155
@@ -117,22 +112,18 @@ msgid "Database name, or path to DB if using sqlite3."
 msgstr "sqlite3를 사용할 경우 데이터베이스 이름 또는 경로입니다."
 
 #: src/desktop/conf.py:161
-#, fuzzy
 msgid "Database username."
 msgstr "데이터베이스 사용자 이름입니다."
 
 #: src/desktop/conf.py:167
-#, fuzzy
 msgid "Database password."
 msgstr "데이터베이스 암호입니다."
 
 #: src/desktop/conf.py:173
-#, fuzzy
 msgid "Database host."
 msgstr "데이터베이스 호스트입니다."
 
 #: src/desktop/conf.py:179
-#, fuzzy
 msgid "Database port."
 msgstr "데이터베이스 포트입니다."
 
@@ -156,17 +147,14 @@ msgid "Frequency in seconds with which Hue will renew its keytab."
 msgstr "Hue가 해당 Keytab을 업데이트하는 주기(단위: 초)입니다."
 
 #: src/desktop/conf.py:208
-#, fuzzy
 msgid "Path to keep Kerberos credentials cached."
 msgstr "캐시된 Kerberos 자격 증명 저장 경로입니다."
 
 #: src/desktop/conf.py:215
-#, fuzzy
 msgid "Path to Kerberos 'kinit' command."
 msgstr "Kerberos 'kinit' 명령의 경로입니다."
 
 #: src/desktop/conf.py:225
-#, fuzzy
 msgid "Time zone name."
 msgstr "표준 시간대 이름입니다."
 
@@ -175,12 +163,10 @@ msgid "Default system-wide unicode encoding."
 msgstr "기본 시스템 레벨 유니코드 인코딩입니다."
 
 #: src/desktop/conf.py:239
-#, fuzzy
 msgid "Username to run servers as."
 msgstr "서버를 실행할 사용자 이름"
 
 #: src/desktop/conf.py:244
-#, fuzzy
 msgid "Group to run servers as."
 msgstr "서버를 실행할 그룹"
 
@@ -209,7 +195,7 @@ msgid ""
 "desktop.auth.backend.AllowFirstUserDjangoBackend (relies on Django and "
 "user manager, after the first login). "
 msgstr ""
-"인증 백엡드입니다. 일반적인 설정은 django.contrib.auth.backends.ModelBackend(완전 Django "
+"인증 백엔드입니다. 일반적인 설정은 django.contrib.auth.backends.ModelBackend(완전 Django "
 "백엔드), desktop.auth.backend.AllowAllBackend(모든 사람 허용), "
 "desktop.auth.backend.AllowFirstUserDjangoBackend(첫 로그인 이후 Django와 사용자 "
 "관리자에 의존)입니다. "
@@ -238,7 +224,6 @@ msgstr ""
 "추가되어 키로 변환됩니다. 예를 들어 헤더가 Remote-User인 경우 헤더는 HTTP_REMOTE_USER로 변환됩니다."
 
 #: src/desktop/conf.py:289
-#, fuzzy
 msgid "Configuration options for LDAP connectivity."
 msgstr "LDAP 연결의 구성 옵션입니다."
 
@@ -287,7 +272,6 @@ msgstr ""
 "'uid'가 사용됩니다."
 
 #: src/desktop/conf.py:330
-#, fuzzy
 msgid "Configuration for LDAP group schema and search."
 msgstr "LDAP 그룹 스키마 및 검색에 대한 구성입니다."
 
@@ -308,7 +292,6 @@ msgid "Paths on the local file system that users should be able to browse."
 msgstr "사용자가 찾아볼 수 있는 로컬 파일 시스템의 경로입니다."
 
 #: src/desktop/conf.py:356
-#, fuzzy
 msgid "The path on the local filesystem."
 msgstr "로컬 파일 시스템상의 경로입니다."
 
@@ -326,7 +309,7 @@ msgstr "TRUE이면 모든 데이터베이스 요청을 로깅합니다."
 
 #: src/desktop/conf.py:384
 msgid "Administrators that should receive error emails."
-msgstr "오류 이메일을 수신하는 관리자입니다."
+msgstr "오류 Email을 수신하는 관리자입니다."
 
 #: src/desktop/conf.py:389
 msgid "The full name of the admin."
@@ -334,7 +317,7 @@ msgstr "관리자의 전체 이름입니다."
 
 #: src/desktop/conf.py:392
 msgid "The email address of the admin."
-msgstr "관리자의 이메일 주소입니다."
+msgstr "관리자의 Email 주소입니다."
 
 #: src/desktop/conf.py:396
 msgid "Enable or disable Django debug mode."
@@ -351,11 +334,11 @@ msgstr ""
 
 #: src/desktop/conf.py:412
 msgid "Email address that internal error messages should send as."
-msgstr "내부 오류 메시지를 전송하는 이메일 주소입니다."
+msgstr "내부 오류 메시지를 전송하는 Email 주소입니다."
 
 #: src/desktop/conf.py:418
 msgid "The email backend to use."
-msgstr "사용할 이메일 백엔드입니다."
+msgstr "사용할 Email 백엔드입니다."
 
 #: src/desktop/conf.py:434
 msgid "Secret key should be configured as a random string."
@@ -391,27 +374,27 @@ msgid ""
 msgstr "LDAP 사용자 이름 패턴에는 인증을 위한 특수한 <username> 대체 문자열이 있어야 합니다."
 
 #: src/desktop/decorators.py:40
-#, fuzzy, python-format
+#, python-format
 msgid "Permission denied (%(action)s/%(app)s)."
 msgstr "권한 거부됨(%(action)s/%(app)s)."
 
 #: src/desktop/middleware.py:136
-#, fuzzy, python-format
+#, python-format
 msgid "Cannot find HDFS called \"%(fs_ref)s\"."
 msgstr "\"%(fs_ref)s\" HDFS를 찾을 수 없습니다."
 
 #: src/desktop/middleware.py:240
-#, fuzzy, python-format
+#, python-format
 msgid "%(module)s isn't a middleware module."
 msgstr "%(module)s은(는) 미들웨어 모듈이 아닙니다."
 
 #: src/desktop/middleware.py:245
-#, fuzzy, python-format
+#, python-format
 msgid "Error importing middleware %(module)s: \"%(error)s\"."
 msgstr "미들웨어 %(module)s을(를) 가져오는 중 오류 발생: \"%(error)s\""
 
 #: src/desktop/middleware.py:249
-#, fuzzy, python-format
+#, python-format
 msgid "Middleware module \"%(module)s\" does not define a \"%(class)s\" class."
 msgstr "미들웨어 모듈 \"%(module)s\"은(는) \"%(class)s\" 클래스를 정의하지 않습니다."
 
@@ -434,7 +417,6 @@ msgid "No logs found!"
 msgstr "로그를 찾을 수 없습니다!"
 
 #: src/desktop/views.py:94
-#, fuzzy
 msgid "No logs found."
 msgstr "로그를 찾을 수 없습니다."
 
@@ -543,7 +525,7 @@ msgid "--%(param)s is required."
 msgstr "--%(param)s은(는) 필수 입력 사항입니다."
 
 #: src/desktop/management/commands/config_upgrade.py:60
-#, fuzzy, python-format
+#, python-format
 msgid "Invalid mapping %(mapping)s in %(file)s."
 msgstr "%(file)s의 매핑 %(mapping)s이(가) 잘못되었습니다."
 
@@ -560,7 +542,7 @@ msgid "Expected arguments: app_name [app_dir]"
 msgstr "필요한 인수: app_name [app_dir]"
 
 #: src/desktop/management/commands/create_desktop_app.py:45
-#, fuzzy, python-format
+#, python-format
 msgid "App template dir missing: %(template)s."
 msgstr "앱 템플릿 디렉토리 누락: %(template)s"
 
@@ -570,7 +552,7 @@ msgid "The template path, %(path)r, does not exist."
 msgstr "템플릿 경로 %(path)r이(가) 없습니다."
 
 #: src/desktop/management/commands/create_desktop_app.py:52
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "%(name)r is not a valid application name. Use only numbers, letters and "
 "underscores."
@@ -579,11 +561,11 @@ msgstr "%(name)r은(는) 올바른 애플리케이션 이름이 아닙니다. �
 #: src/desktop/management/commands/create_test_fs.py:31
 #, python-format
 msgid "Created fs in: %(dir)s"
-msgstr "fs가 생성된 위치: %(dir)s"
+msgstr "파일 시스템이 생성된 위치: %(dir)s"
 
 #: src/desktop/management/commands/runcherrypyserver.py:47
 msgid "CherryPy Server for Desktop."
-msgstr "데스크탑용 CherryPy 서버입니다."
+msgstr "Desktop용 CherryPy 서버입니다."
 
 #: src/desktop/management/commands/runcherrypyserver.py:108
 #, python-format
@@ -598,7 +580,7 @@ msgstr "Hue의 웹 서버입니다."
 #, fuzzy
 msgid ""
 "\n"
-"  Runs pylint on desktop code.\n"
+"  Runs pylint on desktop and app code.\n"
 "\n"
 "  With no arguments, or with \"all\", this will run pylint on all\n"
 "  installed apps.  Otherwise, specify modules to run, as well\n"
@@ -615,7 +597,7 @@ msgid ""
 msgstr ""
 "\n"
 "\"\n"
-"\"  pylint를 데스크톱 코드로 실행합니다.\n"
+"\"  pylint를 desktop 코드로 실행합니다.\n"
 "\"\n"
 "\"\n"
 "\"\n"
@@ -650,11 +632,11 @@ msgstr "Hue의 Spawning 서버입니다."
 
 #: src/desktop/templates/404.mako:20
 msgid "Not Found"
-msgstr "없음"
+msgstr "찾을 수 없습니다."
 
 #: src/desktop/templates/404.mako:23
 msgid "Page not found"
-msgstr "페이지가 없습니다."
+msgstr "페이지를 찾을 수 없습니다."
 
 #: src/desktop/templates/404.mako:24
 msgid "We're sorry, but the requested page could not be found:"
@@ -669,11 +651,10 @@ msgid "Server Error (500)"
 msgstr "서버 오류(500)"
 
 #: src/desktop/templates/500.mako:25
-#, fuzzy
 msgid ""
 "Sorry, there's been an error. An email was sent to your administrators. "
 "Thank you for your patience."
-msgstr "오류가 있습니다. 관리자에게 이메일이 전송되었습니다. 양해해 주셔서 감사합니다."
+msgstr "오류가 있습니다. 관리자에게 Email이 전송되었습니다. 양해해 주셔서 감사합니다."
 
 #: src/desktop/templates/500.mako:28 src/desktop/templates/popup_error.mako:36
 msgid "More Info"
@@ -686,7 +667,6 @@ msgid "View Logs"
 msgstr "로그 보기"
 
 #: src/desktop/templates/500.mako:37 src/desktop/templates/popup_error.mako:45
-#, fuzzy
 msgid "File Name"
 msgstr "파일 이름"
 
@@ -695,7 +675,6 @@ msgid "Line Number"
 msgstr "행 번호"
 
 #: src/desktop/templates/500.mako:39 src/desktop/templates/popup_error.mako:47
-#, fuzzy
 msgid "Function Name"
 msgstr "함수 이름"
 
@@ -711,12 +690,12 @@ msgstr "잘못된 구성 검사"
 msgid "Server Logs"
 msgstr "서버 로그"
 
-#: src/desktop/templates/actionbar.mako:31 src/desktop/templates/logs.mako:61
+#: src/desktop/templates/actionbar.mako:31 src/desktop/templates/logs.mako:63
 msgid "Search..."
 msgstr "검색..."
 
 #: src/desktop/templates/check_config.mako:23
-#: src/desktop/templates/dump_config.mako:26 src/desktop/templates/logs.mako:25
+#: src/desktop/templates/dump_config.mako:26 src/desktop/templates/logs.mako:27
 msgid "About"
 msgstr "정보"
 
@@ -726,7 +705,6 @@ msgid "Configuration files located in"
 msgstr "구성 파일 위치:"
 
 #: src/desktop/templates/check_config.mako:31
-#, fuzzy
 msgid "Potential misconfiguration detected. Fix and restart Hue."
 msgstr "잠재적 구성 오류를 발견했습니다. 수정한 다음 Hue를 다시 시작하십시오."
 
@@ -735,13 +713,11 @@ msgid "Current value:"
 msgstr "현재 값:"
 
 #: src/desktop/templates/check_config.mako:56
-#, fuzzy
 msgid "All OK. Configuration check passed."
 msgstr "모두 정상입니다. 구성 검사를 통과했습니다."
 
 #: src/desktop/templates/common_header.mako:65
 #: src/desktop/templates/error.mako:34
-#, fuzzy
 msgid "Back"
 msgstr "뒤로"
 
@@ -754,7 +730,6 @@ msgid "Create folder"
 msgstr "폴더 생성"
 
 #: src/desktop/templates/common_header.mako:68
-#, fuzzy
 msgid "Folder name"
 msgstr "폴더 이름"
 
@@ -771,7 +746,6 @@ msgid "Upload a file"
 msgstr "파일 업로드"
 
 #: src/desktop/templates/common_header.mako:72
-#, fuzzy
 msgid "Failed"
 msgstr "실패함"
 
@@ -828,22 +802,20 @@ msgid "Invalid username or password."
 msgstr "잘못된 사용자 이름 또는 암호"
 
 #: src/desktop/templates/login.mako:97
-#, fuzzy
 msgid ""
 "Since this is your first time logging in, pick any username and password."
 " Be sure to remember these, as"
 msgstr "첫 로그인이므로 사용자 이름 및 암호를 선택해야 합니다. 다음 사항에 유의하십시오."
 
 #: src/desktop/templates/login.mako:98
-#, fuzzy
 msgid "they will become your Hue superuser credentials."
 msgstr "Hue superuser 자격 증명이 됩니다."
 
-#: src/desktop/templates/logs.mako:57
+#: src/desktop/templates/logs.mako:59
 msgid "Log entries (most recent first)"
 msgstr "로그 항목(최근 항목부터 표시)"
 
-#: src/desktop/templates/logs.mako:65
+#: src/desktop/templates/logs.mako:67
 msgid "Download entire log as zip"
 msgstr "전체 로그를 zip 파일로 다운로드"
 

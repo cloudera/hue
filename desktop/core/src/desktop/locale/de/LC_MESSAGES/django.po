@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-01-04 07:28-0800\n"
+"POT-Creation-Date: 2013-01-10 18:29-0800\n"
 "PO-Revision-Date: 2012-08-10 13:58-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: de <LL@li.org>\n"
@@ -18,7 +18,6 @@ msgstr ""
 "Generated-By: Babel 0.9.6\n"
 
 #: src/desktop/appmanager.py:228
-#, fuzzy
 msgid "load_apps has already been called."
 msgstr "load_apps wurde bereits aufgerufen."
 
@@ -31,12 +30,10 @@ msgstr ""
 " als Webserver verwendet."
 
 #: src/desktop/conf.py:38
-#, fuzzy
 msgid "HTTP host to bind to."
 msgstr "Zu verbindender HTTP-Host."
 
 #: src/desktop/conf.py:43
-#, fuzzy
 msgid "HTTP port to bind to."
 msgstr "Zu verbindender HTTP-Port."
 
@@ -77,17 +74,14 @@ msgid "The SMTP server for email notification delivery."
 msgstr "Der SMTP-Server für die Zustellung von E-Mail-Benachrichtigungen."
 
 #: src/desktop/conf.py:107
-#, fuzzy
 msgid "The SMTP server port."
 msgstr "Der SMTP-Serverport."
 
 #: src/desktop/conf.py:114
-#, fuzzy
 msgid "The username for the SMTP host."
 msgstr "Der Benutzername für den SMTP-Host."
 
 #: src/desktop/conf.py:121
-#, fuzzy
 msgid "The password for the SMTP user."
 msgstr "Das Kennwort für den SMTP-Benutzer."
 
@@ -116,7 +110,8 @@ msgstr ""
 "http://docs.djangoproject.com/en/1.1/ref/settings/#database-engine"
 
 #: src/desktop/conf.py:149
-msgid "Database engine, such as postgresql, mysql, sqlite3, or Oracle."
+#, fuzzy
+msgid "Database engine, such as postgresql_psycopg2, mysql, or sqlite3."
 msgstr "Datenbank-Engine wie postgresql, mysql, sqlite3 oder Oracle."
 
 #: src/desktop/conf.py:155
@@ -124,22 +119,18 @@ msgid "Database name, or path to DB if using sqlite3."
 msgstr "Datenbankname oder Pfad zu DB, wenn sqlite3 verwendet wird."
 
 #: src/desktop/conf.py:161
-#, fuzzy
 msgid "Database username."
 msgstr "Datenbank-Benutzername."
 
 #: src/desktop/conf.py:167
-#, fuzzy
 msgid "Database password."
 msgstr "Datenbank-Kennwort."
 
 #: src/desktop/conf.py:173
-#, fuzzy
 msgid "Database host."
 msgstr "Datenbank-Host."
 
 #: src/desktop/conf.py:179
-#, fuzzy
 msgid "Database port."
 msgstr "Datenbank-Port."
 
@@ -169,17 +160,14 @@ msgid "Frequency in seconds with which Hue will renew its keytab."
 msgstr "Frequenz in Sekunden, mit der Hue seinen Keytab erneuert."
 
 #: src/desktop/conf.py:208
-#, fuzzy
 msgid "Path to keep Kerberos credentials cached."
 msgstr "Pfad, um Kerberos-Kontoinformationen im Cache zu halten."
 
 #: src/desktop/conf.py:215
-#, fuzzy
 msgid "Path to Kerberos 'kinit' command."
 msgstr "Pfad zu Kerberos-Befehl 'kinit'."
 
 #: src/desktop/conf.py:225
-#, fuzzy
 msgid "Time zone name."
 msgstr "Name der Zeitzone."
 
@@ -188,12 +176,10 @@ msgid "Default system-wide unicode encoding."
 msgstr "Systemweite Standard-Unicode-Kodierung."
 
 #: src/desktop/conf.py:239
-#, fuzzy
 msgid "Username to run servers as."
 msgstr "Benutzername für die Ausführung von Servern."
 
 #: src/desktop/conf.py:244
-#, fuzzy
 msgid "Group to run servers as."
 msgstr "Gruppe für die Ausführung von Servern."
 
@@ -260,7 +246,6 @@ msgstr ""
 "User lautet, ergibt dich die Konfiguration HTTP_REMOTE_USER."
 
 #: src/desktop/conf.py:289
-#, fuzzy
 msgid "Configuration options for LDAP connectivity."
 msgstr "Konfigurationsoptionen für LDAP-Konnektivität."
 
@@ -311,7 +296,6 @@ msgstr ""
 "'sAMAccountName' für AD und 'uid' für andere LDAP-Systeme."
 
 #: src/desktop/conf.py:330
-#, fuzzy
 msgid "Configuration for LDAP group schema and search."
 msgstr "Konfiguration für LDAP-Benutzerschema und -suche."
 
@@ -332,7 +316,6 @@ msgid "Paths on the local file system that users should be able to browse."
 msgstr "Pfade im lokalen Dateisystem, die Benutzer durchsuchen können sollten."
 
 #: src/desktop/conf.py:356
-#, fuzzy
 msgid "The path on the local filesystem."
 msgstr "Der Pfad auf dem lokalen Dateisystem."
 
@@ -429,27 +412,27 @@ msgstr ""
 "Ersatzzeichenfolge <username> zur Authentifizierung enthalten."
 
 #: src/desktop/decorators.py:40
-#, fuzzy, python-format
+#, python-format
 msgid "Permission denied (%(action)s/%(app)s)."
 msgstr "Berechtigung verweigert (%(action)s/%(app)s)."
 
 #: src/desktop/middleware.py:136
-#, fuzzy, python-format
+#, python-format
 msgid "Cannot find HDFS called \"%(fs_ref)s\"."
 msgstr "HDFS mit Namen \"%(fs_ref)s\" kann nicht gefunden werden."
 
 #: src/desktop/middleware.py:240
-#, fuzzy, python-format
+#, python-format
 msgid "%(module)s isn't a middleware module."
 msgstr "%(module)s ist kein Middleware-Modul."
 
 #: src/desktop/middleware.py:245
-#, fuzzy, python-format
+#, python-format
 msgid "Error importing middleware %(module)s: \"%(error)s\"."
 msgstr "Fehler beim Importieren von Middleware %(module)s: \"%(error)s\"."
 
 #: src/desktop/middleware.py:249
-#, fuzzy, python-format
+#, python-format
 msgid "Middleware module \"%(module)s\" does not define a \"%(class)s\" class."
 msgstr "Middleware-Modul \"%(module)s\" definiert keine \"%(class)s\"-Klasse."
 
@@ -474,7 +457,6 @@ msgid "No logs found!"
 msgstr "Keine Protokolle gefunden!"
 
 #: src/desktop/views.py:94
-#, fuzzy
 msgid "No logs found."
 msgstr "Keine Protokolle gefunden."
 
@@ -590,7 +572,7 @@ msgid "--%(param)s is required."
 msgstr "--%(param)s ist erforderlich."
 
 #: src/desktop/management/commands/config_upgrade.py:60
-#, fuzzy, python-format
+#, python-format
 msgid "Invalid mapping %(mapping)s in %(file)s."
 msgstr "Ungültiges Mapping %(mapping)s in %(file)s."
 
@@ -607,7 +589,7 @@ msgid "Expected arguments: app_name [app_dir]"
 msgstr "Erwartete Argumente: app_name [app_dir]"
 
 #: src/desktop/management/commands/create_desktop_app.py:45
-#, fuzzy, python-format
+#, python-format
 msgid "App template dir missing: %(template)s."
 msgstr "Anwendungsvorlagenverzeichnis fehlt: %(template)s."
 
@@ -617,7 +599,7 @@ msgid "The template path, %(path)r, does not exist."
 msgstr "Der Vorlagenpfad %(path)r existiert nicht."
 
 #: src/desktop/management/commands/create_desktop_app.py:52
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "%(name)r is not a valid application name. Use only numbers, letters and "
 "underscores."
@@ -647,7 +629,7 @@ msgstr "Webserver für Hue."
 #, fuzzy
 msgid ""
 "\n"
-"  Runs pylint on desktop code.\n"
+"  Runs pylint on desktop and app code.\n"
 "\n"
 "  With no arguments, or with \"all\", this will run pylint on all\n"
 "  installed apps.  Otherwise, specify modules to run, as well\n"
@@ -722,7 +704,6 @@ msgid "Server Error (500)"
 msgstr "Serverfehler (500)"
 
 #: src/desktop/templates/500.mako:25
-#, fuzzy
 msgid ""
 "Sorry, there's been an error. An email was sent to your administrators. "
 "Thank you for your patience."
@@ -741,7 +722,6 @@ msgid "View Logs"
 msgstr "Protokolle anzeigen"
 
 #: src/desktop/templates/500.mako:37 src/desktop/templates/popup_error.mako:45
-#, fuzzy
 msgid "File Name"
 msgstr "Dateiname"
 
@@ -750,7 +730,6 @@ msgid "Line Number"
 msgstr "Zeilennummer"
 
 #: src/desktop/templates/500.mako:39 src/desktop/templates/popup_error.mako:47
-#, fuzzy
 msgid "Function Name"
 msgstr "Funktionsname"
 
@@ -766,12 +745,12 @@ msgstr "Auf Fehlkonfiguration prüfen"
 msgid "Server Logs"
 msgstr "Serverprotokolle"
 
-#: src/desktop/templates/actionbar.mako:31 src/desktop/templates/logs.mako:61
+#: src/desktop/templates/actionbar.mako:31 src/desktop/templates/logs.mako:63
 msgid "Search..."
 msgstr "Suche..."
 
 #: src/desktop/templates/check_config.mako:23
-#: src/desktop/templates/dump_config.mako:26 src/desktop/templates/logs.mako:25
+#: src/desktop/templates/dump_config.mako:26 src/desktop/templates/logs.mako:27
 msgid "About"
 msgstr "Info"
 
@@ -781,7 +760,6 @@ msgid "Configuration files located in"
 msgstr "Konfigurationsdateien gefunden in"
 
 #: src/desktop/templates/check_config.mako:31
-#, fuzzy
 msgid "Potential misconfiguration detected. Fix and restart Hue."
 msgstr ""
 "Potenzielle Fehlkonfiguration erkannt. Reparieren und starten Sie Hue "
@@ -792,13 +770,11 @@ msgid "Current value:"
 msgstr "Aktueller Wert:"
 
 #: src/desktop/templates/check_config.mako:56
-#, fuzzy
 msgid "All OK. Configuration check passed."
 msgstr "Alles OK. Konfigurationsprüfung bestanden."
 
 #: src/desktop/templates/common_header.mako:65
 #: src/desktop/templates/error.mako:34
-#, fuzzy
 msgid "Back"
 msgstr "Zurück"
 
@@ -811,7 +787,6 @@ msgid "Create folder"
 msgstr "Ordner erstellen"
 
 #: src/desktop/templates/common_header.mako:68
-#, fuzzy
 msgid "Folder name"
 msgstr "Ordnername"
 
@@ -828,7 +803,6 @@ msgid "Upload a file"
 msgstr "Eine Datei hochladen"
 
 #: src/desktop/templates/common_header.mako:72
-#, fuzzy
 msgid "Failed"
 msgstr "Fehlgeschlagen"
 
@@ -885,7 +859,6 @@ msgid "Invalid username or password."
 msgstr "Ungültiger Benutzername oder Kennwort."
 
 #: src/desktop/templates/login.mako:97
-#, fuzzy
 msgid ""
 "Since this is your first time logging in, pick any username and password."
 " Be sure to remember these, as"
@@ -894,15 +867,14 @@ msgstr ""
 "ein Kennwort. Diese werden später benötigt, da"
 
 #: src/desktop/templates/login.mako:98
-#, fuzzy
 msgid "they will become your Hue superuser credentials."
 msgstr "sie Ihre Superuser-Benutzerinformationen für Hue sein werden."
 
-#: src/desktop/templates/logs.mako:57
+#: src/desktop/templates/logs.mako:59
 msgid "Log entries (most recent first)"
 msgstr "Protokolleinträge (aktuellste zuerst)"
 
-#: src/desktop/templates/logs.mako:65
+#: src/desktop/templates/logs.mako:67
 msgid "Download entire log as zip"
 msgstr "Gesamtes Protokoll als zip herunterladen"
 

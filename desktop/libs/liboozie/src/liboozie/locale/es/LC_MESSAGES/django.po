@@ -3,12 +3,11 @@
 # This file is distributed under the same license as the Hue project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-01-04 07:28-0800\n"
+"POT-Creation-Date: 2013-01-10 18:29-0800\n"
 "PO-Revision-Date: 2012-11-07 13:08-0800\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -20,7 +19,7 @@ msgstr ""
 
 #: src/liboozie/conf.py:25
 msgid "URL of Oozie server. This is required for job submission."
-msgstr "URL al servidor Oozie. Es necesaria para el envío de trabajos."
+msgstr "URL del servidor Oozie. Es necesaria para el envío de jobs."
 
 #: src/liboozie/conf.py:31
 msgid "Whether Oozie requires client to perform Kerberos authentication."
@@ -37,7 +36,6 @@ msgstr ""
 "cuando no los envía el propietario."
 
 #: src/liboozie/conf.py:69
-#, fuzzy
 msgid ""
 "The deployment directory of Oozie workflows does not exist. Run \"Setup "
 "Example\" on the Oozie workflow page."
@@ -76,6 +74,6 @@ msgstr "Permiso insuficiente."
 #, python-format
 msgid "Permission denied. User %(username)s cannot modify user %(user)s's job."
 msgstr ""
-"Permiso denegado. El usuario %(username)s no puede modificar el trabajo "
-"del usuario %(user)s."
+"Permiso denegado. El usuario %(username)s no puede modificar el job del "
+"usuario %(user)s."
 

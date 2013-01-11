@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-01-04 07:28-0800\n"
+"POT-Creation-Date: 2013-01-10 18:30-0800\n"
 "PO-Revision-Date: 2012-07-30 18:56-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -18,9 +18,9 @@ msgstr ""
 "Generated-By: Babel 0.9.6\n"
 
 #: src/shell/shellmanager.py:153
-#, fuzzy, python-format
+#, python-format
 msgid "bin/hadoop return non-zero %(retcode)d while trying to merge credentials."
-msgstr "자격 증명을 병합하는 동안 bin/hadoop이 0이 아닌 값(%(retcode)d)을 반환했습니다."
+msgstr "자격 증명을 병합하는 동안 bin/hadoop이 0이 아닌 값 %(retcode)d을(를) 반환했습니다."
 
 #: src/shell/templates/failed_to_create.mako:21
 #: src/shell/templates/index.mako:22 src/shell/templates/no_such_user.mako:21
@@ -55,7 +55,6 @@ msgid "There is no Unix user account for you."
 msgstr "귀하의 Unix 사용자 계정이 없습니다."
 
 #: src/shell/templates/index.mako:86
-#, fuzzy
 msgid "Select one of the available shells from the toolbar above."
 msgstr "위 도구 모음에서 사용 가능한 Shell 하나를 선택하십시오."
 
@@ -66,14 +65,12 @@ msgid ""
 msgstr "Shell에 대한 액세스 권한이 없거나 구성된 Shell이 없습니다."
 
 #: src/shell/templates/no_such_user.mako:24
-#, fuzzy
 msgid ""
 "The Shell application requires a Unix user account for every user of Hue "
 "on the remote web server."
 msgstr "Shell 애플리케이션에서는 원격 웹 서버에 있는 Hue의 모든 사용자에 대한  Unix 사용자 계정이 필요합니다."
 
 #: src/shell/templates/no_such_user.mako:26
-#, fuzzy
 msgid ""
 "Ask your administrator to create a user account for you on the remote web"
 " server as described in the Shell documentation."

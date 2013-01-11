@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-01-04 07:28-0800\n"
+"POT-Creation-Date: 2013-01-10 18:30-0800\n"
 "PO-Revision-Date: 2012-07-30 18:47-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -27,7 +27,6 @@ msgid "Required. 30 characters or fewer. No whitespaces or colons."
 msgstr "필수 입력 항목입니다. 30자 이하로 입력하십시오. 공백이나 콜론은 허용되지 않습니다."
 
 #: src/useradmin/forms.py:47 src/useradmin/forms.py:108
-#: src/useradmin/forms.py:141
 msgid "Whitespaces and ':' not allowed"
 msgstr "공백과 ':'은 허용되지 않습니다."
 
@@ -55,7 +54,7 @@ msgstr "암호가 일치하지 않습니다."
 msgid "You must specify a password when creating a new user."
 msgstr "새 사용자를 생성할 때 암호를 지정해야 합니다."
 
-#: src/useradmin/forms.py:109 src/useradmin/forms.py:142
+#: src/useradmin/forms.py:109 src/useradmin/forms.py:141
 msgid "Distinguished name"
 msgstr "고유 이름"
 
@@ -69,68 +68,62 @@ msgstr "사용자를 고유 이름별로 가져올지 여부입니다."
 msgid "Create home directory for user if one doesn't already exist."
 msgstr "사용자의 홈 디렉토리가 없으면 생성합니다."
 
-#: src/useradmin/forms.py:126
+#: src/useradmin/forms.py:126 src/useradmin/forms.py:162
 #, python-format
-msgid "Too long: 30 characters or fewer and not %(username)s"
-msgstr "너무 깁니다. 30자 이하여야 하며, %(username)s은(는) 허용되지 않습니다."
+msgid "Too long: 30 characters or fewer and not %s"
+msgstr "너무 깁니다. 30자 이하여야 하며, %s는 허용되지 않습니다."
 
 #: src/useradmin/forms.py:139
-msgid ""
-"Required. 30 characters or fewer. May only contain letters, numbers, "
-"hyphens or underscores."
-msgstr "필수 입력 항목입니다. 30자 이하로 입력하십시오. 문자, 숫자, 하이픈, 밑줄만 포함될 수 있습니다."
+msgid "Required. 30 characters or fewer."
+msgstr "필수 입력 항목입니다. 30자 이하로 입력하십시오."
 
-#: src/useradmin/forms.py:143
+#: src/useradmin/forms.py:140
+msgid "30 characters or fewer."
+msgstr "30자 이하로 입력하십시오."
+
+#: src/useradmin/forms.py:142
 msgid "Whether or not the group should be imported by distinguished name."
 msgstr "그룹을 고유 이름별로 가져올지 여부입니다."
 
-#: src/useradmin/forms.py:147
+#: src/useradmin/forms.py:146
 msgid "Import new members"
 msgstr "새 구성원 가져오기"
 
-#: src/useradmin/forms.py:148
+#: src/useradmin/forms.py:147
 msgid "Import unimported or new users from the group."
 msgstr "그룹에서 새 사용자 또는 가져오지 않은 사용자를 가져옵니다."
 
-#: src/useradmin/forms.py:151
+#: src/useradmin/forms.py:150
 msgid "Create home directories"
 msgstr "홈 디렉토리 생성"
 
-#: src/useradmin/forms.py:152
+#: src/useradmin/forms.py:151
 msgid ""
 "Create home directories for every member imported, if members are being "
 "imported."
 msgstr "구성원을 가져올 경우 가져온 모든 구성원의 홈 디렉토리를 생성합니다."
 
-#: src/useradmin/forms.py:163
-#, python-format
-msgid "Too long: 30 characters or fewer and not %(name)s"
-msgstr "너무 깁니다. 30자 이하여야 하며, %(name)s은(는) 허용되지 않습니다."
-
-#: src/useradmin/forms.py:185
+#: src/useradmin/forms.py:184
 msgid "Group name may only contain letters, numbers, hyphens or underscores."
 msgstr "그룹 이름에는 문자, 숫자, 하이픈, 밑줄만 포함될 수 있습니다."
 
-#: src/useradmin/forms.py:200
-#, fuzzy
+#: src/useradmin/forms.py:199
 msgid "members"
 msgstr "구성원"
 
-#: src/useradmin/forms.py:201
-#, fuzzy
+#: src/useradmin/forms.py:200
 msgid "permissions"
 msgstr "권한"
 
-#: src/useradmin/forms.py:244
-#, fuzzy
+#: src/useradmin/forms.py:243
 msgid "groups"
 msgstr "그룹"
 
-#: src/useradmin/forms.py:279
+#: src/useradmin/forms.py:278
 msgid "Create Home Directories"
 msgstr "홈 디렉토리 생성"
 
-#: src/useradmin/forms.py:280
+#: src/useradmin/forms.py:279
 msgid "Create home directory for every user, if one doesn't already exist."
 msgstr "이미 있는 경우를 제외하고 모든 사용자의 홈 디렉토리를 생성합니다."
 
@@ -187,7 +180,7 @@ msgstr "자신을 superuser로 지정할 수는 없습니다."
 msgid "User information updated"
 msgstr "사용자 정보 업데이트됨"
 
-#: src/useradmin/views.py:180 src/useradmin/views.py:286
+#: src/useradmin/views.py:180 src/useradmin/views.py:287
 #, python-format
 msgid "Cannot make home directory for user %s."
 msgstr "사용자 %s의 홈 디렉토리를 만들 수 없습니다."
@@ -212,40 +205,91 @@ msgstr "권한 정보 업데이트됨"
 msgid "You must be a superuser to add another user."
 msgstr "다른 사용자를 추가하려면 superuser여야 합니다."
 
-#: src/useradmin/views.py:280 src/useradmin/views.py:322
-#: src/useradmin/views.py:354
+#: src/useradmin/views.py:280 src/useradmin/views.py:323
+#: src/useradmin/views.py:356
 msgid "There was an error when communicating with LDAP"
-msgstr ""
+msgstr "LDAP와 통신하는 중 오류가 발생했습니다."
 
-#: src/useradmin/views.py:290
-#, fuzzy, python-format
-msgid "Could not get LDAP details for user %(username)s."
-msgstr "사용자 %(username)s의 LDAP 세부 정보를 가져오지 못했습니다."
+#: src/useradmin/views.py:291
+#, python-format
+msgid "Could not get LDAP details for users in pattern %s."
+msgstr "패턴이 %s인 사용자의 LDAP 세부 정보를 가져오지 못했습니다."
 
-#: src/useradmin/views.py:310
+#: src/useradmin/views.py:311
 msgid "You must be a superuser to add another group."
 msgstr "다른 그룹을 추가하려면 superuser여야 합니다."
 
-#: src/useradmin/views.py:326
+#: src/useradmin/views.py:322
 #, python-format
-msgid "Could not get LDAP details for group %(groupname)s"
-msgstr "그룹 %(groupname)s의 LDAP 세부 정보를 가져올 수 없습니다."
+msgid "LDAP Exception: %s"
+msgstr "LDAP 예외: %s"
 
-#: src/useradmin/views.py:344
+#: src/useradmin/views.py:329
+#, python-format
+msgid "Could not get LDAP details for groups in pattern %s"
+msgstr "패턴이 %s인 그룹의 LDAP 세부 정보를 가져오지 못했습니다."
+
+#: src/useradmin/views.py:346
 msgid "You must be a superuser to sync the LDAP users/groups."
 msgstr "LDAP 사용자/그룹을 동기화하려면 superuser여야 합니다."
 
-#: src/useradmin/views.py:362
+#: src/useradmin/views.py:364
 msgid "The import may not be complete, sync again."
 msgstr "가져오기를 완료할 수 없습니다. 다시 동기화하십시오."
 
-#: src/useradmin/views.py:389
+#: src/useradmin/views.py:391
 msgid "No active superuser configured."
 msgstr "구성된 활성 superuser가 없습니다."
 
-#: src/useradmin/views.py:391
+#: src/useradmin/views.py:393
 msgid "You cannot remove the last active superuser from the configuration."
 msgstr "구성에서 마지막 활성 superuser는 제거할 수 없습니다."
+
+#: src/useradmin/views.py:451
+#, python-format
+msgid "Synced user %s from Unix"
+msgstr "Unix에서 사용자 %s이(가) 업데이트됨"
+
+#: src/useradmin/views.py:465
+#, python-format
+msgid "Could not get LDAP details for users with pattern %s"
+msgstr "패턴이 %s인 사용자의 LDAP 세부 정보를 가져오지 못했습니다."
+
+#: src/useradmin/views.py:474
+#, python-format
+msgid ""
+"There was a naming conflict while importing user %(username)s in pattern "
+"%(username_pattern)s"
+msgstr "패턴이 %(username_pattern)s인 사용자 %(username)s을(를) 가져오는 중 이름 충돌이 발생했습니다."
+
+#: src/useradmin/views.py:508
+#, python-format
+msgid "Could not get LDAP details for group pattern %s"
+msgstr "그룹 패턴 %s의 LDAP 세부 정보를 가져오지 못했습니다."
+
+#: src/useradmin/views.py:516
+#, python-format
+msgid ""
+"There was a naming conflict while importing group %(groupname)s in "
+"pattern %(groupname_pattern)s"
+msgstr "패턴이 %(groupname_pattern)s인 그룹 %(groupname)s을(를) 가져오는 중 이름 충돌이 발생했습니다."
+
+#: src/useradmin/views.py:529
+#, python-format
+msgid "Importing user %s"
+msgstr "사용자 %s을(를) 가져오는 중"
+
+#: src/useradmin/views.py:535
+#, python-format
+msgid "Found multiple users for member %s."
+msgstr "구성원 %s의 사용자를 여러 명 찾았습니다."
+
+#: src/useradmin/views.py:549
+#, python-format
+msgid ""
+"Adding member %s represented as users (should be a single user) %s to "
+"group %s"
+msgstr "사용자(1명이어야 함) %s(으)로 표시된 구성원 %s을(를) 그룹 %s에 추가하는 중"
 
 #: src/useradmin/management/commands/import_ldap_group.py:39
 msgid "Import users from the group."
@@ -279,27 +323,27 @@ msgstr "가져올 최대 GID입니다(제외)."
 msgid "Whether or not to check that the user's shell is not /bin/false."
 msgstr "사용자의 Shell이 /bin/false가 아닌지를 확인하는 검사 수행 여부입니다."
 
-#: src/useradmin/templates/add_ldap_user.mako:25
+#: src/useradmin/templates/add_ldap_users.mako:25
 #: src/useradmin/templates/edit_user.mako:25
 #: src/useradmin/templates/list_users.mako:25
 #: src/useradmin/templates/list_users.mako:29
 msgid "Hue Users"
 msgstr "Hue 사용자"
 
-#: src/useradmin/templates/add_ldap_user.mako:30
+#: src/useradmin/templates/add_ldap_users.mako:30
 msgid "Hue Users - Add/Sync LDAP user"
 msgstr "Hue 사용자 - LDAP 사용자 추가/동기화"
 
-#: src/useradmin/templates/add_ldap_user.mako:46
+#: src/useradmin/templates/add_ldap_users.mako:46
 #: src/useradmin/templates/edit_user.mako:83
 msgid "Update user"
 msgstr "사용자 업데이트"
 
-#: src/useradmin/templates/add_ldap_user.mako:48
+#: src/useradmin/templates/add_ldap_users.mako:48
 msgid "Add/Sync user"
 msgstr "사용자 추가/동기화"
 
-#: src/useradmin/templates/add_ldap_user.mako:50
+#: src/useradmin/templates/add_ldap_users.mako:50
 #: src/useradmin/templates/edit_group.mako:75
 #: src/useradmin/templates/edit_permissions.mako:53
 #: src/useradmin/templates/edit_user.mako:87
@@ -307,7 +351,7 @@ msgstr "사용자 추가/동기화"
 msgid "Cancel"
 msgstr "취소"
 
-#: src/useradmin/templates/add_ldap_user.mako:58
+#: src/useradmin/templates/add_ldap_users.mako:58
 #: src/useradmin/templates/edit_group.mako:83
 #: src/useradmin/templates/edit_group.mako:90
 #: src/useradmin/templates/edit_permissions.mako:61
@@ -315,7 +359,7 @@ msgstr "취소"
 msgid "Select all"
 msgstr "모두 선택"
 
-#: src/useradmin/templates/add_ldap_user.mako:59
+#: src/useradmin/templates/add_ldap_users.mako:59
 #: src/useradmin/templates/edit_group.mako:84
 #: src/useradmin/templates/edit_group.mako:91
 #: src/useradmin/templates/edit_permissions.mako:62
@@ -323,14 +367,13 @@ msgstr "모두 선택"
 msgid "Search"
 msgstr "검색"
 
-#: src/useradmin/templates/add_ldap_user.mako:60
+#: src/useradmin/templates/add_ldap_users.mako:60
 #: src/useradmin/templates/edit_permissions.mako:63
 #: src/useradmin/templates/edit_user.mako:97
-#, fuzzy
 msgid "No groups found."
 msgstr "그룹을 찾을 수 없습니다."
 
-#: src/useradmin/templates/add_ldap_user.mako:60
+#: src/useradmin/templates/add_ldap_users.mako:60
 #: src/useradmin/templates/edit_user.mako:97
 msgid "Create a new group now"
 msgstr "지금 새 그룹 생성"
@@ -346,7 +389,6 @@ msgid "Yes"
 msgstr "예"
 
 #: src/useradmin/templates/delete_group.mako:22
-#, fuzzy
 msgid "Are you sure you want to delete"
 msgstr "삭제하시겠습니까?"
 
@@ -361,7 +403,6 @@ msgid "No"
 msgstr "아니요"
 
 #: src/useradmin/templates/delete_user.mako:22
-#, fuzzy
 msgid "Are you sure you want to delete "
 msgstr "삭제하시겠습니까? "
 
@@ -398,7 +439,6 @@ msgid "Add group"
 msgstr "그룹 추가"
 
 #: src/useradmin/templates/edit_group.mako:85
-#, fuzzy
 msgid "No users found."
 msgstr "사용자가 없습니다."
 
@@ -407,7 +447,6 @@ msgid "Create a new user now"
 msgstr "지금 새 사용자 생성"
 
 #: src/useradmin/templates/edit_group.mako:92
-#, fuzzy
 msgid "No permissions found."
 msgstr "권한을 찾을 수 없습니다."
 
@@ -436,13 +475,12 @@ msgid "Hue Users - Create user"
 msgstr "Hue 사용자 - 사용자 생성"
 
 #: src/useradmin/templates/edit_user.mako:42
-#, fuzzy
 msgid "Information"
-msgstr "사용자 정보 업데이트됨"
+msgstr "정보"
 
 #: src/useradmin/templates/edit_user.mako:57
 msgid "Optional"
-msgstr ""
+msgstr "옵션"
 
 #: src/useradmin/templates/edit_user.mako:85
 #: src/useradmin/templates/list_users.mako:39
@@ -536,7 +574,7 @@ msgstr "성"
 
 #: src/useradmin/templates/list_users.mako:55
 msgid "E-mail"
-msgstr "이메일"
+msgstr "E-maill"
 
 #: src/useradmin/templates/list_users.mako:57
 msgid "Last Login"

@@ -3,12 +3,11 @@
 # This file is distributed under the same license as the Hue project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-01-04 07:28-0800\n"
+"POT-Creation-Date: 2013-01-10 18:29-0800\n"
 "PO-Revision-Date: 2012-11-07 13:08-0800\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: pt <LL@li.org>\n"
@@ -35,13 +34,13 @@ msgstr ""
 "quando submetidos por um não proprietário."
 
 #: src/liboozie/conf.py:69
-#, fuzzy
 msgid ""
 "The deployment directory of Oozie workflows does not exist. Run \"Setup "
 "Example\" on the Oozie workflow page."
 msgstr ""
 "O directório de implementação dos workflows do Oozie não existe. Execute "
-"\"Setup App\" (Configurar Aplicação) na página de workflow do Oozie."
+"\"Setup Example\" (Exemplo de configuração) na página de workflow do "
+"Oozie."
 
 #: src/liboozie/conf.py:72
 msgid "Oozie Share Lib not installed in default location."
