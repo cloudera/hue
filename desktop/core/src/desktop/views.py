@@ -26,9 +26,11 @@ import zipfile
 from django.shortcuts import render_to_response
 from django.http import HttpResponse
 from django.core.servers.basehttp import FileWrapper
+from django.utils.translation import ugettext as _
 import django.views.debug
 
 from desktop.lib import django_mako
+from desktop.lib.conf import GLOBAL_CONFIG
 from desktop.lib.django_util import login_notrequired, render_json, render, render_to_string
 from desktop.lib.paths import get_desktop_root
 from desktop.log.access import access_log_level, access_warn
@@ -37,7 +39,6 @@ from desktop import appmanager
 import desktop.conf
 import desktop.log.log_buffer
 
-from django.utils.translation import ugettext as _
 
 LOG = logging.getLogger(__name__)
 
@@ -173,11 +174,15 @@ def dump_config(request):
   if request.GET.get("private"):
     show_private = True
 
+  apps = sorted(appmanager.DESKTOP_MODULES, key=lambda app: app.menu_index)
+  apps_names = [app.name for app in apps]
+  top_level = sorted(GLOBAL_CONFIG.get().values(), key=lambda obj: apps_names.index(obj.config.key))
+
   return render("dump_config.mako", request, dict(
     show_private=show_private,
-    top_level=desktop.lib.conf.GLOBAL_CONFIG,
+    top_level=top_level,
     conf_dir=conf_dir,
-    apps=appmanager.DESKTOP_MODULES))
+    apps=apps))
 
 if sys.version_info[0:2] <= (2,4):
   def _threads():
