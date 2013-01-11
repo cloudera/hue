@@ -364,12 +364,6 @@ class DatasetForm(forms.ModelForm):
     super(DatasetForm, self).__init__(*args, **kwargs)
 
 
-class DataInputSetForm(forms.ModelForm):
-  class Meta:
-    model = DataInput
-    exclude = ('coordinator')
-
-
 class DataInputForm(forms.ModelForm):
   class Meta:
     model = DataInput
@@ -382,12 +376,6 @@ class DataInputForm(forms.ModelForm):
     self.fields['dataset'].queryset = Dataset.objects.filter(coordinator=coordinator)
     if coordinator.workflow:
       self.fields['name'].widget = forms.Select(choices=((param, param) for param in set(coordinator.workflow.find_parameters())))
-
-
-class DataOutputSetForm(forms.ModelForm):
-  class Meta:
-    model = DataOutput
-    exclude = ('coordinator')
 
 
 class DataOutputForm(forms.ModelForm):

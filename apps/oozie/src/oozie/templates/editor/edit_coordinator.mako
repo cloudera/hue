@@ -103,7 +103,7 @@ ${ layout.menubar(section='coordinators') }
               ${ coordinator_form['parameters'] | n,unicode }
               <div class="hide">
                 ${ utils.render_field(coordinator_form['timeout']) }
-                ${ coordinator_form['schema_version'] }
+                ${ coordinator_form['schema_version']  | n,unicode }
               </div>
             </div>
           </div>

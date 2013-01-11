@@ -44,7 +44,7 @@ from oozie.management.commands import oozie_setup
 from oozie.models import Job, Workflow, History, Coordinator,\
                          Dataset, DataInput, DataOutput, ACTION_TYPES
 from oozie.forms import WorkflowForm, CoordinatorForm, DatasetForm,\
-  DataInputForm, DataInputSetForm, DataOutputForm, DataOutputSetForm, LinkForm,\
+  DataInputForm, DataOutputForm, LinkForm,\
   DefaultLinkForm, design_form_by_type, ParameterForm,\
   ImportWorkflowForm
 
@@ -284,8 +284,10 @@ def edit_coordinator(request, coordinator):
   history = History.objects.filter(submitter=request.user, job=coordinator).order_by('-submission_date')
 
   DatasetFormSet = inlineformset_factory(Coordinator, Dataset, form=DatasetForm, max_num=0, can_order=False, can_delete=True)
-  DataInputFormSet = inlineformset_factory(Coordinator, DataInput, form=DataInputSetForm, max_num=0, can_order=False, can_delete=True)
-  DataOutputFormSet = inlineformset_factory(Coordinator, DataOutput, form=DataOutputSetForm, max_num=0, can_order=False, can_delete=True)
+  DataInputFormSet = inlineformset_factory(Coordinator, DataInput, form=DataInputForm, max_num=0, can_order=False, can_delete=True)
+  DataInputFormSet.form = staticmethod(curry(DataInputForm, coordinator=coordinator))
+  DataOutputFormSet = inlineformset_factory(Coordinator, DataOutput, form=DataOutputForm, max_num=0, can_order=False, can_delete=True)
+  DataOutputFormSet.form = staticmethod(curry(DataOutputForm, coordinator=coordinator))
 
   dataset = Dataset(coordinator=coordinator)
   dataset_form = DatasetForm(instance=dataset, prefix='create')
