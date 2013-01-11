@@ -2092,7 +2092,7 @@
       "coordinator": 21,
       "advanced_start_instance": "0",
       "frequency_unit": "days",
-      "uri": "/tmp/test-${username}/${YEAR}${MONTH}${DAY}",
+      "uri": "/tmp/test-coord-${coord:user()}/${YEAR}${MONTH}${DAY}",
       "start": "2012-12-31 00:00:00",
       "instance_choice": "default",
       "timezone": "America/Los_Angeles",
