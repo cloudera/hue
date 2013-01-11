@@ -1729,8 +1729,8 @@ class TestImportWorkflow04WithOozie(OozieBase):
 
 
 class TestOozieSubmissions(OozieBase):
-  def setUp(self):
-    raise SkipTest
+##  def setUp(self):
+    #raise SkipTest
 
   def test_submit_mapreduce_action(self):
     wf = Workflow.objects.get(name='MapReduce')
