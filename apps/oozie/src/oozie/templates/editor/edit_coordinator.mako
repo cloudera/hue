@@ -99,6 +99,7 @@ ${ layout.menubar(section='coordinators') }
               ${ utils.render_field_no_popover(coordinator_form['name'], extra_attrs = {'validate':'true'}) }
               ${ utils.render_field_no_popover(coordinator_form['description']) }
               ${ utils.render_field_no_popover(coordinator_form['workflow'], extra_attrs = {'validate':'true'}) }
+              ${ utils.render_field_no_popover(coordinator_form['is_shared']) }
               ${ coordinator_form['parameters'] | n,unicode }
               <div class="hide">
                 ${ utils.render_field(coordinator_form['timeout']) }
@@ -239,7 +240,6 @@ ${ layout.menubar(section='coordinators') }
 
           <div id="step5" class="stepDetails hide">
             <div class="alert alert-info"><h3>${ _('Advanced settings') }</h3></div>
-            ${ utils.render_field_no_popover(coordinator_form['is_shared']) }
             ${ properties.print_key_value(coordinator_form['parameters'], 'parameters') }
             ${ utils.render_field_no_popover(coordinator_form['timeout']) }
             <div class="row-fluid">

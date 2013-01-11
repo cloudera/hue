@@ -47,6 +47,7 @@ ${ layout.menubar(section='workflows') }
           ${ utils.render_field(workflow_form['name']) }
           ${ utils.render_field(workflow_form['description']) }
           ${ utils.render_field(workflow_form['definition_file']) }
+          ${ utils.render_field(workflow_form['is_shared']) }
           ${ utils.render_field(workflow_form['schema_version']) }
 
           <div class="control-group ">
@@ -59,7 +60,6 @@ ${ layout.menubar(section='workflows') }
           </div>
 
             <div id="advanced-container" class="hide">
-              ${ utils.render_field(workflow_form['is_shared']) }
               ${ utils.render_field(workflow_form['deployment_dir']) }
               ${ utils.render_field(workflow_form['job_xml']) }
            </div>
