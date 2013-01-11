@@ -33,7 +33,7 @@ ${layout.menubar(section='dump_config')}
 
         <h2>${_('Installed applications')}</h2>
         <ul>
-        % for app in sorted(apps, key=lambda app: app.name.lower()):
+        % for app in apps:
             <li>${app.name}</li>
         % endfor
         </ul>
@@ -41,7 +41,7 @@ ${layout.menubar(section='dump_config')}
         <h2>${_('Configuration Sections and Variables')}</h2>
 
         <ul class="nav nav-tabs">
-            % for obj in sorted(top_level.get().values(), key=lambda obj: obj.config.key):
+            % for obj in top_level:
                 <li
                     % if loop.first:
                         class="active"
@@ -52,22 +52,20 @@ ${layout.menubar(section='dump_config')}
 
         <%def name="showTopLevel(config_obj, depth=0)">
             <div class="tab-content">
-                % if isinstance(config_obj, BoundContainer):
-                    % for v in config_obj.get().values():
-                        <%
-                            # Don't recurse into private variables.
-                            if v.config.private and not show_private:
-                                continue
-                        %>
-                        <div id="${v.config.key}Conf" class="tab-pane
-                        % if loop.first:
-                            active
-                        % endif
-                        ">
-                            ${recurse(v, depth + 1)}
-                      </div>
-                    % endfor
-                % endif
+                % for v in config_obj:
+                    <%
+                        # Don't recurse into private variables.
+                        if v.config.private and not show_private:
+                            continue
+                    %>
+                    <div id="${v.config.key}Conf" class="tab-pane
+                    % if loop.first:
+                        active
+                    % endif
+                    ">
+                        ${recurse(v, depth + 1)}
+                  </div>
+                % endfor
             </div>
         </%def>
 
@@ -108,7 +106,6 @@ ${layout.menubar(section='dump_config')}
             </tr>
             </table>
         </%def>
-
 
         ${showTopLevel(top_level)}
 
