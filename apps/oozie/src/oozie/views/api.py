@@ -110,7 +110,7 @@ def update_workflow(json_workflow):
   workflow = Workflow.objects.get(id=json_workflow['id'])
 
   for key in json_workflow:
-    if key not in ('nodes', 'start', 'end'):
+    if key not in ('nodes', 'start', 'end', 'job_ptr', 'owner'):
       setattr(workflow, key, json_workflow[key])
 
   workflow.save()

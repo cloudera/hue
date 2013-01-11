@@ -301,7 +301,6 @@ class TestAPI(OozieMockBase):
     self.setup_simple_workflow()
 
     workflow_dict = workflow_to_dict(self.wf)
-    workflow_dict = remove_related_fields( workflow_dict )
     workflow_json = json.dumps(workflow_dict)
 
     response = self.c.post(reverse('oozie:workflow_save', kwargs={'workflow': self.wf.pk}), data={'workflow': workflow_json})
@@ -311,7 +310,6 @@ class TestAPI(OozieMockBase):
 
     # Change property and save
     workflow_dict = workflow_to_dict(self.wf)
-    workflow_dict = remove_related_fields( workflow_dict )
     workflow_dict['description'] = 'test'
     workflow_json = json.dumps(workflow_dict)
 
@@ -326,7 +324,6 @@ class TestAPI(OozieMockBase):
 
     # Change node and save
     workflow_dict = workflow_to_dict(self.wf)
-    workflow_dict = remove_related_fields( workflow_dict )
     workflow_dict['nodes'][2]['name'] = 'new-name'
     node_id = workflow_dict['nodes'][2]['id']
     workflow_json = json.dumps(workflow_dict)
@@ -345,7 +342,6 @@ class TestAPI(OozieMockBase):
     # Bad workflow name
     workflow_dict = workflow_to_dict(self.wf)
     del workflow_dict['name']
-    workflow_dict = remove_related_fields( workflow_dict )
     workflow_json = json.dumps(workflow_dict)
 
     response = self.c.post(reverse('oozie:workflow_save', kwargs={'workflow': self.wf.pk}), data={'workflow': workflow_json}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
@@ -354,7 +350,6 @@ class TestAPI(OozieMockBase):
     # Bad node name
     workflow_dict = workflow_to_dict(self.wf)
     del workflow_dict['nodes'][2]['name']
-    workflow_dict = remove_related_fields( workflow_dict )
     workflow_json = json.dumps(workflow_dict)
 
     response = self.c.post(reverse('oozie:workflow_save', kwargs={'workflow': self.wf.pk}), data={'workflow': workflow_json}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
@@ -496,7 +491,6 @@ class TestApiPermissionsWithOozie(OozieBase):
     grant_access("not_me", "test", "oozie")
 
     workflow_dict = workflow_to_dict(self.wf)
-    workflow_dict = remove_related_fields(workflow_dict)
     workflow_json = json.dumps(workflow_dict)
 
     response = client_not_me.post(reverse('oozie:workflow_save', kwargs={'workflow': self.wf.pk}), data={'workflow': workflow_json}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
@@ -520,7 +514,6 @@ class TestApiPermissionsWithOozie(OozieBase):
 
     workflow_dict = workflow_to_dict(self.wf)
     del workflow_dict['name']
-    workflow_dict = remove_related_fields( workflow_dict )
     workflow_json = json.dumps(workflow_dict)
 
     response = client_not_me.post(reverse('oozie:workflow_save', kwargs={'workflow': self.wf.pk}), data={'workflow': workflow_json}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
@@ -2061,18 +2054,6 @@ COORDINATOR_DICT = {u'name': [u'MyCoord'], u'description': [u'Description of my 
                     u'throttle': [u'10'],
                     u'schema_version': [u'uri:oozie:coordinator:0.1']
 }
-
-
-def remove_related_fields(workflow_dict):
-  """
-  workflow_dict is a workflow that has been converted into a dictionary via workflow_to_dict
-  """
-
-  del workflow_dict['owner']
-  del workflow_dict['job_ptr']
-  for node in workflow_dict['nodes']:
-    del node['node_ptr']
-  return workflow_dict
 
 
 def add_node(workflow, name, node_type, parents, attrs={}):
