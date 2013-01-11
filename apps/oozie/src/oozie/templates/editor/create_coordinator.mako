@@ -76,6 +76,7 @@ ${ layout.menubar(section='coordinators') }
               ${ utils.render_field_no_popover(coordinator_form['name'], extra_attrs = {'validate':'true'}) }
               ${ utils.render_field_no_popover(coordinator_form['description']) }
               ${ utils.render_field_no_popover(coordinator_form['workflow'], extra_attrs = {'validate':'true'}) }
+              ${ utils.render_field_no_popover(coordinator_form['is_shared']) }
               ${ coordinator_form['parameters'] | n,unicode }
               <div class="hide">
                 ${ utils.render_field(coordinator_form['timeout']) }

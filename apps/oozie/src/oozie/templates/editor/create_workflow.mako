@@ -45,6 +45,7 @@ ${ layout.menubar(section='workflows') }
           <fieldset>
           ${ utils.render_field(workflow_form['name']) }
           ${ utils.render_field(workflow_form['description']) }
+          ${ utils.render_field(workflow_form['is_shared']) }
 
           <div class="control-group ">
             <label class="control-label">
@@ -56,7 +57,6 @@ ${ layout.menubar(section='workflows') }
           </div>
 
             <div id="advanced-container" class="hide">
-              ${ utils.render_field(workflow_form['is_shared']) }
               ${ utils.render_field(workflow_form['deployment_dir']) }
               ${ utils.render_field(workflow_form['job_xml']) }
            </div>
