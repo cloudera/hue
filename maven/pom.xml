@@ -43,7 +43,7 @@
 
   <properties>
     <hadoop.version>2.0.0-mr1-cdh4.2.0-SNAPSHOT</hadoop.version>
-    <hive.version>0.9.0-cdh4.2.0-SNAPSHOT</hive.version>
+    <hive.version>0.10.0-cdh4.2.0-SNAPSHOT</hive.version>
     <slf4j.version>1.6.1</slf4j.version>
     <commons-logging.version>1.0.4</commons-logging.version>
   </properties>
@@ -146,12 +146,12 @@
       <dependency>
         <groupId>org.apache.thrift</groupId>
         <artifactId>libthrift</artifactId>
-        <version>0.7.0</version>
+        <version>0.9.0</version>
       </dependency>
       <dependency>
         <groupId>org.apache.thrift</groupId>
         <artifactId>libfb303</artifactId>
-        <version>0.7.0</version>
+        <version>0.9.0</version>
       </dependency>
 
 

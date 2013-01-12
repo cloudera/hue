@@ -63,7 +63,7 @@ import org.apache.hadoop.hive.ql.processors.CommandProcessorFactory;
 import org.apache.hadoop.hive.ql.processors.CommandProcessorResponse;
 import org.apache.hadoop.hive.ql.QueryPlan;
 import org.apache.hadoop.hive.ql.session.SessionState;
-import org.apache.hadoop.hive.serde.Constants;
+import org.apache.hadoop.hive.serde.serdeConstants;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.log4j.Logger;
 import org.apache.thrift.TException;
@@ -435,7 +435,7 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
       }
       if (desc != null) {
         sep = desc.getProperties().getProperty(
-                                        Constants.SERIALIZATION_FORMAT,
+                                        serdeConstants.SERIALIZATION_FORMAT,
                                         "" + Utilities.ctrlaCode);
         tablename = desc.getTableName();
       }
