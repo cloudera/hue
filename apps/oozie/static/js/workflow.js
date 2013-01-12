@@ -552,7 +552,7 @@ var ImportNodeModule = function($) {
         if (data.status == 0) {
           self.initialize(data.data);
         } else {
-          $.jHueNotify.error("${ _('Received invalid response from server: ') }" + JSON.stringify(data));
+          $.jHueNotify.error("Received invalid response from server: " + JSON.stringify(data));
         }
       });
     },
@@ -1761,6 +1761,7 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
     self.nodes = ko.observableArray([]);
     self.kill = null;
     self.is_dirty = ko.observable( false );
+    self.read_only = ko.observable( options.read_only || false );
 
     self.url = ko.computed(function() {
       return '/oozie/workflows/' + self.id()
@@ -1793,13 +1794,16 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
     initialize: function(options) {
       var self = this;
 
-      if ('data' in options) {
+      $.extend(self.options, options);
+
+      if ('model' in options) {
+        self.model = options.model;
 
         // Initialize nodes
-        if (options.data.nodes) {
+        if (self.model.nodes) {
           self.registry.clear();
 
-          $.each(options.data.nodes, function(index, node) {
+          $.each(self.model.nodes, function(index, node) {
             var NodeModel = NodeModelChooser(node.node_type);
             var model = new NodeModel(node);
             var temp = null;
@@ -1826,7 +1830,7 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
         }
 
         // Update data
-        $.each(options.data, function (key, value) {
+        $.each(self.model, function (key, value) {
           if (key in self) {
             switch(key) {
               case 'job_properties':
@@ -1874,6 +1878,10 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
         self.kill = new Node(self, model, self.registry);
         self.registry.add(self.kill.id(), self.kill);
       }
+
+      if ('read_only' in options) {
+        self.read_only(options['read_only']);
+      }
     },
 
     toString: function() {
@@ -1915,12 +1923,12 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
         if (data.status == 0) {
           self.reload(data.data);
         } else {
-          $.jHueNotify.error("${ _('Received invalid response from server: ') }" + JSON.stringify(data));
+          $.jHueNotify.error("Received invalid response from server: " + JSON.stringify(data));
         }
       });
     },
 
-    reload: function(data) {
+    reload: function(model) {
       var self = this;
 
       // Clear all children
@@ -1929,7 +1937,7 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
       });
       self.nodes.removeAll();
 
-      self.initialize({data: data});
+      self.initialize({model: model});
       self.rebuild();
       self.el.trigger('workflow:loaded');
     },
@@ -2164,6 +2172,11 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
       // Build event delegations.
       // Drop on node link
       self.el.on('drop', '.node-link', function(e, ui) {
+        if (self.read_only()) {
+          $.jHueNotify.error("Workflow is in read only mode.");
+          return false;
+        }
+
         // draggable should be a node.
         // droppable should be a link.
         var draggable = ko.contextFor(ui.draggable[0]).$data;
@@ -2215,6 +2228,11 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
 
       // Drop on fork
       self.el.on('drop', '.node-fork', function(e, ui) {
+        if (self.read_only()) {
+          $.jHueNotify.error("Workflow is in read only mode.");
+          return false;
+        }
+
         // draggable should be a node.
         // droppable should be a fork.
         var draggable = ko.contextFor(ui.draggable[0]).$data;
@@ -2233,6 +2251,11 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
 
       // Drop on decision
       self.el.on('drop', '.node-decision', function(e, ui) {
+        if (self.read_only()) {
+          $.jHueNotify.error("Workflow is in read only mode.");
+          return false;
+        }
+
         // draggable should be a node.
         // droppable should be a fork.
         var draggable = ko.contextFor(ui.draggable[0]).$data;
@@ -2251,6 +2274,11 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
 
       // Drop on action
       self.el.on('drop', '.node-action', function(e, ui) {
+        if (self.read_only()) {
+          $.jHueNotify.error("Workflow is in read only mode.");
+          return false;
+        }
+
         // draggable should be a node.
         // droppable should be a node.
         var draggable = ko.contextFor(ui.draggable[0]).$data;

@@ -182,7 +182,7 @@ ${ layout.menubar(section='workflows') }
           </div>
         </div>
         <div class="form-actions center">
-          <a data-bind="click: function() { save() }" href="javascript:void(0);" class="btn btn-primary">${ _('Save') }</a>
+          <a data-bind="disable: workflow.read_only, visible: !workflow.read_only(), click: function() { save() }" href="javascript:void(0);" class="btn btn-primary">${ _('Save') }</a>
           <a href="${ url('oozie:list_workflows') }" class="btn">${ _('Back') }</a>
         </div>
       </div>
@@ -235,7 +235,7 @@ ${ layout.menubar(section='workflows') }
         </div>
         <div class="form-actions center">
           % if user_can_edit_job:
-            <button data-bind="click: function() { save() }" class="btn btn-primary">${ _('Save') }</button>
+            <button data-bind="disable: workflow.read_only, visible: !workflow.read_only(), click: function() { save() }" class="btn btn-primary">${ _('Save') }</button>
           % endif
           <a href="${ url('oozie:list_workflows') }" class="btn">${ _('Back') }</a>
         </div>
@@ -498,7 +498,8 @@ var workflow_model = new WorkflowModel({
 var registry = new Registry();
 var workflow = new Workflow({
   model: workflow_model,
-  registry: registry
+  registry: registry,
+  read_only: ${ str(not user_can_edit_job).lower() }
 });
 workflow.load();
 
@@ -514,7 +515,7 @@ function edit_node_modal(node, save, cancel) {
 
   modal.hide();
   modal.setTemplate(node.edit_template);
-  modal.show(node);
+  modal.show({node: node, read_only: workflow.read_only()});
   modal.recenter(280, 250);
   modal.addDecorations();
 
@@ -651,7 +652,7 @@ $('#workflow').on('click', '.import-jobsub-node-link', function(e) {
 
   modal.hide();
   modal.setTemplate('ImportNodeTemplate');
-  modal.show(tempModelView);
+  modal.show({node: tempModelView, read_only: workflow.read_only()});
   modal.recenter(280, 250);
   modal.addDecorations();
 
