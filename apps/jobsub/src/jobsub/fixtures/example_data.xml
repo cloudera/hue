@@ -34,7 +34,7 @@
   <object pk="2" model="jobsub.ooziedesign">
     <field to="auth.user" name="owner" rel="ManyToOneRel">1</field>
     <field type="CharField" name="name">grep_example</field>
-    <field type="CharField" name="description">[Sample] Grep for 'dream' in some Shakespearean text</field>
+    <field type="CharField" name="description">[Sample] Grep for dream in some Shakespearean text</field>
     <field type="DateTimeField" name="last_modified">2012-04-02 02:04:34</field>
     <field to="jobsub.oozieaction" name="root_action" rel="ManyToOneRel">2</field>
   </object>
