@@ -1773,6 +1773,7 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
     self.kill = null;
     self.is_dirty = ko.observable( false );
     self.read_only = ko.observable( options.read_only || false );
+    self.new_node = ko.observable();
 
     self.url = ko.computed(function() {
       return '/oozie/workflows/' + self.id()
@@ -2136,6 +2137,7 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
             revert: true,
             zIndex: 1000,
             opacity: 0.45,
+            revertDuration: 0,
             cancel: '.node-action-bar'
           });
         }
@@ -2315,7 +2317,7 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
         var newParents = droppable.findParents();
 
         // skip forking beneathe a decision node
-        if (droppable.id() != draggable.id() && newParents.length == 1 && draggable.findParents().length == 1) {
+        if (droppable.id() != draggable.id() && newParents.length == 1 && draggable.findParents().length <= 1) {
           var ForkModel = NodeModelChooser('fork');
           var JoinModel = NodeModelChooser('join');
 

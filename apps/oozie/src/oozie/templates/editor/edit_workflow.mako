@@ -179,6 +179,7 @@ ${ layout.menubar(section='workflows') }
             </div>
 
             <div id="graph" class="row-fluid" data-bind="template: { name: function(item) { return item.view_template() }, foreach: nodes }"></div>
+            <div id="new-node" class="row-fluid" data-bind="template: { name: 'nodeTemplate', if: new_node, data: new_node }"></div>
           </div>
         </div>
         <div class="form-actions center">
@@ -300,8 +301,6 @@ ${ layout.menubar(section='workflows') }
 <script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/jquery/plugins/jquery-ui-autocomplete-1.9.1.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/jquery/plugins/jquery-ui-draggable-droppable-sortable-1.8.23.min.js" type="text/javascript" charset="utf-8"></script>
-
-
 
 
 % for form_info in action_forms:
@@ -507,7 +506,6 @@ var modal = new Modal($('#node-modal'));
 workflow.load({ success: workflow_load_success });
 import_node.loadAvailableNodes({ success: import_load_available_nodes_success });
 
-
 /**
  * Modals
  */
@@ -553,14 +551,11 @@ function edit_node_modal(node, save, cancel) {
   });
 }
 
-// Modal for editing a node
-$('#workflow').on('click', '.edit-node-link', function(e) {
-  var node = ko.contextFor(this).$data;
-  edit_node_modal(node);
-});
+// Drag a new node onto the canvas
+$('#workflow').on('mousedown', '.new-node-link', function(e) {
+  e.preventDefault();
 
-// Modal for creating a new node
-$('#workflow').on('click', '.new-node-link', function(e) {
+  // Node starts off graph, then is validated/dropped onto graph, after being dragged onto graph.
   var node_type = $(this).attr('data-node-type');
   var NodeModel = nodeModelChooser(node_type);
   var model = new NodeModel({
@@ -570,24 +565,52 @@ $('#workflow').on('click', '.new-node-link', function(e) {
   var node = new Node(workflow, model, registry);
   workflow.registry.add(model.id, node);
 
+  // Add to new node location, then drag and drop.
+  workflow.new_node( node );
+  workflow.draggables();
+
+  // Reposition node to mouse pointer.
+  var el = $("#new-node .node-action");
+  var old_position = el.offset();
+
+  // Trigger fake mousedown event to start dragging node.
+  el.offset({ top: e.pageY - el.height()/10, left: e.pageX - el.width()/10 });
+  el.trigger($.Event("mousedown", {pageX: e.pageX, pageY: e.pageY, target: el[0], which: 1}));
+
   var cancel_edit = function(e) {
     // Didn't save, erase node.
+    node.detach();
     node.erase();
     modal.hide();
+    workflow.is_dirty( false );
+    $('#workflow').trigger('workflow:rebuild');
   };
 
   var try_save = function(e) {
     if (node.validate()) {
       workflow.is_dirty( true );
       modal.hide();
-      // save, add kill, add node to workflow.
       node.addChild(workflow.kill);
-      workflow.nodes()[workflow.nodes().length - 2].append(node);
       $('#workflow').trigger('workflow:rebuild');
     }
   };
 
-  edit_node_modal(node, try_save, cancel_edit);
+  // Remember to cleanup after.
+  el.one('dragstop', function(e) {
+    workflow.new_node(null);
+    el.offset(old_position);
+    if (node.findChildren().length > 0 || node.findParents().length > 1) {
+      edit_node_modal(node, try_save, cancel_edit);
+    } else {
+      node.erase();
+    }
+  });
+});
+
+// Modal for editing a node
+$('#workflow').on('click', '.edit-node-link', function(e) {
+  var node = ko.contextFor(this).$data;
+  edit_node_modal(node);
 });
 
 // Modal for cloning a node
