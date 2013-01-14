@@ -37,7 +37,7 @@ ${ commonheader(_('Hue Users'), "useradmin", user, "100px") | n,unicode }
 
     <br/>
 
-    <form id="editForm" method="POST" class="form form-horizontal">
+    <form id="editForm" method="POST" class="form form-horizontal" autocomplete="off">
         <fieldset>
             <h3>${ _('Information') }<h3>
 
