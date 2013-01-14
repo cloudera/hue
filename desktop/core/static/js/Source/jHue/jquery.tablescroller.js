@@ -21,6 +21,7 @@
  *      overriding the default 500px set by the plugin
  * - data-tablescroller-min-height-disable="true": disable enforcing a minimum height for the table
  * - data-tablescroller-disable="true": disable the plugin for the specific table
+ * - data-tablescroller-enforce-height="true": displays the table at its maximum height accordingly to the page
  */
 ;
 (function ($, window, document, undefined) {
@@ -50,8 +51,12 @@
     var disableScrollingTable = $(_this.element).find("table").eq(0).data("tablescroller-disable");
     if (disableScrollingTable == null || disableScrollingTable != true) {
       resizeScrollingTable(_this.element);
+      var _resizeTimeout = -1;
       $(window).resize(function () {
-        resizeScrollingTable(_this.element);
+        window.clearTimeout(_resizeTimeout);
+        _resizeTimeout = window.setTimeout(function(){
+          resizeScrollingTable(_this.element);
+        }, 400);
       });
     }
 
@@ -61,7 +66,14 @@
       $(el).nextAll(":visible").each(function () {
         heightAfter += $(this).outerHeight(true);
       });
-      if ($(el).height() > ($(window).height() - $(el).offset().top - heightAfter)) {
+
+      var heightCondition = $(el).height() > ($(window).height() - $(el).offset().top - heightAfter);
+      var enforceHeight = $(_this.element).find("table").eq(0).data("tablescroller-enforce-height");
+      if (enforceHeight !== undefined && enforceHeight == true) {
+        heightCondition = true;
+      }
+
+      if (heightCondition) {
         var specificMinHeight = $(el).find("table").eq(0).data("tablescroller-min-height");
         var minHeightVal = _this.options.minHeight;
         if (!isNaN(parseFloat(specificMinHeight)) && isFinite(specificMinHeight)) {
@@ -69,7 +81,7 @@
         }
         var disableMinHeight = $(_this.element).find("table").eq(0).data("tablescroller-min-height-disable");
         if (disableMinHeight != null && disableMinHeight == true) {
-          if ($(el).height() > ($(window).height() - $(el).offset().top - heightAfter)) {
+          if (heightCondition) {
             $(el).css("overflow-y", "auto").height($(window).height() - $(el).offset().top - heightAfter);
           }
         }

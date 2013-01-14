@@ -136,7 +136,8 @@
 
     if (_this.options.fixedHeader) {
       var clonedTable = $(_this.element).clone();
-      clonedTable.removeClass("resultTable").find("tbody").remove().css("margin-bottom", "0");
+      clonedTable.css("margin-bottom", "0").css("table-layout", "fixed");
+      clonedTable.removeClass("resultTable").find("tbody").remove();
       $(_this.element).find("thead>tr th").each(function (i) {
         var originalTh = $(this);
         clonedTable.find("thead>tr th:eq(" + i + ")").width(originalTh.width()).css("background-color", "#FFFFFF");
