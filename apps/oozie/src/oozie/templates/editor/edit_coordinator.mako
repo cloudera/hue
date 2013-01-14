@@ -73,6 +73,12 @@ ${ layout.menubar(section='coordinators') }
               <li><a href="#listHistory">${ _('Show history') }</a></li>
           % endif
 
+          % if coordinator:
+              <li class="nav-header">${ _('Actions') }</li>
+              <li><a id="submit-btn" href="javascript:void(0)" data-submit-url="${ url('oozie:submit_coordinator', coordinator=coordinator.id) }" title="${ _('Submit this coordinator') }" rel="tooltip" data-placement="right"><i class="icon-play"></i> ${ _('Submit') }</a></li>
+              <li><a id="clone-btn" href="javascript:void(0)" data-clone-url="${ url('oozie:clone_coordinator', coordinator=coordinator.id) }" title="${ _('Clone this coordinator') }" rel="tooltip" data-placement="right"><i class="icon-retweet"></i> ${ _('Clone') }</a></li>
+          % endif
+
         </ul>
       </div>
     </div>
@@ -401,7 +407,7 @@ ${ layout.menubar(section='coordinators') }
 
 </div>
 
-
+<div id="submit-job-modal" class="modal hide"></div>
 
 <form class="form-horizontal" id="add-dataset-form"></form>
 <form class="form-horizontal" id="edit-dataset-form"></form>
@@ -691,6 +697,24 @@ ${ layout.menubar(section='coordinators') }
       $(".save").click(function () {
         window.viewModel.submit();
       });
+
+      $("#clone-btn").on("click", function () {
+        var _url = $(this).data("clone-url");
+        $.post(_url, function (data) {
+          window.location = data.url;
+        });
+      });
+
+      $("#submit-btn").on("click", function () {
+        var _url = $(this).data("submit-url");
+        $.get(_url, function (response) {
+            $("#submit-job-modal").html(response);
+            $("#submit-job-modal").modal("show");
+          }
+        );
+      });
+
+      $("a[rel='tooltip']").tooltip();
     });
   </script>
 % endif

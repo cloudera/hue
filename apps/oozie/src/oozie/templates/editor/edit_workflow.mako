@@ -40,13 +40,14 @@ ${ layout.menubar(section='workflows') }
   <div class="well">
     <span data-bind="text: '${ _('Description') }: ' + description() || 'N/A'"></span>
     <div class="pull-right" style="margin-top:-5px">
+      % if user_can_access_job:
+          <a id="submit-btn" href="#" data-submit-url="${ url('oozie:submit_workflow', workflow=workflow.id) }" class="btn" title="${ _('Submit this workflow') }" rel="tooltip" data-placement="bottom"><i class="icon-play"></i> ${ _('Submit') }</a>
+          <a href="${ url('oozie:schedule_workflow', workflow=workflow.id) }" class="btn" title="${ _('Schedule this workflow') }" rel="tooltip" data-placement="bottom"><i class="icon-calendar"></i> ${ _('Schedule') }</a>
+          <a id="clone-btn" href="#" data-clone-url="${ url('oozie:clone_workflow', workflow=workflow.id) }" class="btn" title="${ _('Clone this workflow') }" rel="tooltip" data-placement="bottom"><i class="icon-retweet"></i> ${ _('Clone') }</a>
+          &nbsp;&nbsp;&nbsp;&nbsp;
+      % endif
       % if user_can_edit_job:
-        <label>
-            <a data-bind="attr: {href: '/filebrowser/view' + deployment_dir() }" class="btn">
-              ${ _('Upload') }
-            </a>
-            ${ _('files to deployment directory.') }
-        </label>
+          <a data-bind="attr: {href: '/filebrowser/view' + deployment_dir() }" class="btn" title="${ _('Upload additional files and libraries to the deployment directory') }" rel="tooltip" data-placement="bottom"><i class="icon-upload"></i> ${ _('Upload') }</a>
       % endif
     </div>
   </div>
@@ -291,6 +292,8 @@ ${ layout.menubar(section='workflows') }
 
 
 <div id="modal-window" class="modal hide fade"></div>
+
+<div id="submit-wf-modal" class="modal hide"></div>
 
 <script src="/static/ext/js/codemirror-3.0.js"></script>
 <link rel="stylesheet" href="/static/ext/css/codemirror.css">
@@ -770,6 +773,20 @@ window.onresize = function () {
 
 $(document).ready(function () {
   window.setInterval(checkModelDirtiness, 500);
+  $('#clone-btn').on('click', function () {
+    var _url = $(this).data('clone-url');
+    $.post(_url, function (data) {
+      window.location = data.url;
+    });
+  });
+  $('#submit-btn').on('click', function () {
+    var _url = $(this).data('submit-url');
+    $.get(_url, function (response) {
+        $('#submit-wf-modal').html(response);
+        $('#submit-wf-modal').modal('show');
+      }
+    );
+  });
 });
 
 function checkModelDirtiness() {
