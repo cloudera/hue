@@ -554,16 +554,18 @@ var ImportNodeModule = function($) {
       return self.available_nodes;
     },
 
-    loadAvailableNodes: function() {
+    loadAvailableNodes: function(options) {
       var self = this;
 
-      $.getJSON(self.url(), function(data) {
-        if (data.status == 0) {
-          self.initialize(data.data);
-        } else {
-          $.jHueNotify.error("Received invalid response from server: " + JSON.stringify(data));
-        }
-      });
+      var request = $.extend({
+        url: self.url(),
+        dataType: 'json',
+        type: 'GET',
+        success: $.noop,
+        error: $.noop,
+      }, options || {});
+
+      $.ajax(request);
     },
 
     convertNode: function(options, jobsub_id) {
@@ -1781,7 +1783,7 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
       self.rebuild();
     });
     self.el.on('workflow:events:load', function() {
-      self.dragAndDropEvents();
+      self.dragAndDropEvents( options );
     });
     self.el.on('workflow:droppables:load', function() {
       self.droppables();
@@ -1790,7 +1792,7 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
       self.draggables();
     });
 
-    self.dragAndDropEvents();
+    self.dragAndDropEvents( options );
     self.el.trigger('workflow:events:loaded');
 
     module.prototype.initialize.apply(self, arguments);
@@ -1923,18 +1925,32 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
       return JSON.stringify(data);
     },
 
-    save: function( options ) {},
-
-    load: function() {
+    save: function( options ) {
       var self = this;
 
-      $.getJSON(self.url(), function(data) {
-        if (data.status == 0) {
-          self.reload(data.data);
-        } else {
-          $.jHueNotify.error("Received invalid response from server: " + JSON.stringify(data));
-        }
-      });
+      var request = $.extend({
+        url: self.url() + '/save',
+        type: 'POST',
+        data: { workflow: self.toJSON() },
+        success: $.noop,
+        error: $.noop,
+      }, options || {});
+
+      $.ajax(request);
+    },
+
+    load: function( options ) {
+      var self = this;
+
+      var request = $.extend({
+        url: self.url(),
+        dataType: 'json',
+        type: 'GET',
+        success: $.noop,
+        error: $.noop,
+      }, options || {});
+
+      $.ajax(request);
     },
 
     reload: function(model) {
@@ -2175,14 +2191,16 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
       });
     },
 
-    dragAndDropEvents: function() {
+    dragAndDropEvents: function( options ) {
       var self = this;
+
+      var read_only_error_handler = options.read_only_error_handler;
 
       // Build event delegations.
       // Drop on node link
       self.el.on('drop', '.node-link', function(e, ui) {
         if (self.read_only()) {
-          $.jHueNotify.error("Workflow is in read only mode.");
+          read_only_error_handler();
           return false;
         }
 
@@ -2238,7 +2256,7 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
       // Drop on fork
       self.el.on('drop', '.node-fork', function(e, ui) {
         if (self.read_only()) {
-          $.jHueNotify.error("Workflow is in read only mode.");
+          read_only_error_handler();
           return false;
         }
 
@@ -2261,7 +2279,7 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
       // Drop on decision
       self.el.on('drop', '.node-decision', function(e, ui) {
         if (self.read_only()) {
-          $.jHueNotify.error("Workflow is in read only mode.");
+          read_only_error_handler();
           return false;
         }
 
@@ -2284,7 +2302,7 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
       // Drop on action
       self.el.on('drop', '.node-action', function(e, ui) {
         if (self.read_only()) {
-          $.jHueNotify.error("Workflow is in read only mode.");
+          read_only_error_handler();
           return false;
         }
 

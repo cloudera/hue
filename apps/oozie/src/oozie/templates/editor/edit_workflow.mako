@@ -182,7 +182,7 @@ ${ layout.menubar(section='workflows') }
           </div>
         </div>
         <div class="form-actions center">
-          <a data-bind="disable: workflow.read_only, visible: !workflow.read_only(), click: function() { save() }" href="javascript:void(0);" class="btn btn-primary">${ _('Save') }</a>
+          <a data-bind="disable: workflow.read_only, visible: !workflow.read_only(), click: function() { save({ success: workflow_save_success, error: workflow_save_error }) }" href="javascript:void(0);" class="btn btn-primary">${ _('Save') }</a>
           <a href="${ url('oozie:list_workflows') }" class="btn">${ _('Back') }</a>
         </div>
       </div>
@@ -235,7 +235,7 @@ ${ layout.menubar(section='workflows') }
         </div>
         <div class="form-actions center">
           % if user_can_edit_job:
-            <button data-bind="disable: workflow.read_only, visible: !workflow.read_only(), click: function() { save() }" class="btn btn-primary">${ _('Save') }</button>
+            <button data-bind="disable: workflow.read_only, visible: !workflow.read_only(), click: function() { save({ success: workflow_save_success, error: workflow_save_error }) }" class="btn btn-primary">${ _('Save') }</button>
           % endif
           <a href="${ url('oozie:list_workflows') }" class="btn">${ _('Back') }</a>
         </div>
@@ -445,43 +445,41 @@ ${ controls.decision_form(link_form, default_link_form, 'decision', True) }
 <script type="text/javascript" src="/oozie/static/js/workflow.js"></script>
 
 <script type="text/javascript">
-// Save workflow function
-$.extend(Workflow.prototype, {
-  save: function( options ) {
-    var self = this;
-
-    var options = options || {};
-
-    var request = $.extend({
-      url: self.url() + '/save',
-      type: 'POST',
-      data: { workflow: self.toJSON() },
-      success: function() {
-        $.jHueNotify.info("${ _('Workflow saved') }");
-        workflow.is_dirty( false );
-      },
-      error: function() {
-        $.jHueNotify.error("${ _('Could not save workflow') }");
-      }
-    }, options);
-
-    var success_handler = request['success'];
-    request['success'] = function(data, event) {
-      if ($.isFunction(success_handler)) {
-        success_handler(data, event);
-      }
-
-      self.reload(data.data);
-    };
-
-    $.ajax(request);
-  }
-});
-
 /**
- * Known issues with this way of doing things...
- *  - 2 Layers of models.
+ * Component Initialization
+ * Initialize the workflow, registry, modal, and import objects.
  */
+ // Custom handlers for saving, loading, error checking, etc.
+function import_load_available_nodes_success(data) {
+  if (data.status == 0) {
+    import_node.initialize(data.data);
+  } else {
+    $.jHueNotify.error("${ _('Received invalid response from server: ') }" + JSON.stringify(data));
+  }
+}
+
+function workflow_save_success(data) {
+  $.jHueNotify.info("${ _('Workflow saved') }");
+  workflow.reload(data.data);
+  workflow.is_dirty( false );
+}
+
+function workflow_save_error(data) {
+  $.jHueNotify.error("${ _('Could not save workflow') }");
+}
+
+function workflow_load_success(data) {
+  if (data.status == 0) {
+    workflow.reload(data.data);
+  } else {
+    $.jHueNotify.error("${ _('Received invalid response from server: ') }" + JSON.stringify(data));
+  }
+}
+
+function workflow_read_only_handler() {
+  $.jHueNotify.error("${ _('Workflow is in read only mode.') }");
+}
+
 // Fetch all nodes from server.
 var workflow_model = new WorkflowModel({
   id: ${ workflow.id },
@@ -499,15 +497,20 @@ var registry = new Registry();
 var workflow = new Workflow({
   model: workflow_model,
   registry: registry,
-  read_only: ${ str(not user_can_edit_job).lower() }
+  read_only: ${ str(not user_can_edit_job).lower() },
+  read_only_error_handler: workflow_read_only_handler,
 });
-workflow.load();
-
-/**
- * Modal
- */
+var import_node = new ImportNode({workflow: workflow});
 var modal = new Modal($('#node-modal'));
 
+// Load data.
+workflow.load({ success: workflow_load_success });
+import_node.loadAvailableNodes({ success: import_load_available_nodes_success });
+
+
+/**
+ * Modals
+ */
 // open a modal window for editing a node
 function edit_node_modal(node, save, cancel) {
   var backup = ko.mapping.toJS(node);
@@ -550,11 +553,13 @@ function edit_node_modal(node, save, cancel) {
   });
 }
 
+// Modal for editing a node
 $('#workflow').on('click', '.edit-node-link', function(e) {
   var node = ko.contextFor(this).$data;
   edit_node_modal(node);
 });
 
+// Modal for creating a new node
 $('#workflow').on('click', '.new-node-link', function(e) {
   var node_type = $(this).attr('data-node-type');
   var NodeModel = nodeModelChooser(node_type);
@@ -585,6 +590,7 @@ $('#workflow').on('click', '.new-node-link', function(e) {
   edit_node_modal(node, try_save, cancel_edit);
 });
 
+// Modal for cloning a node
 $('#workflow').on('click', '.clone-node-btn', function(e) {
   var node = ko.contextFor(this).$data;
   var model_copy = $.extend(true, {}, node.model);
@@ -616,6 +622,7 @@ $('#workflow').on('click', '.clone-node-btn', function(e) {
   edit_node_modal(new_node, try_save, cancel_edit);
 });
 
+// Modal for deleting a node
 $('#workflow').on('click', '.delete-node-btn', function(e) {
   var node = ko.contextFor(this).$data;
   $('#confirmation').find('h3').text('${ _('Confirm Delete') }');
@@ -634,12 +641,7 @@ $('#workflow').on('click', '.delete-node-btn', function(e) {
   $('#confirmation').modal('show');
 });
 
-/**
- * Import node
- */
-var import_node = new ImportNode({workflow: workflow});
-import_node.loadAvailableNodes();
-
+// Modal for importing a node
 $('#workflow').on('click', '.import-jobsub-node-link', function(e) {
   var tempModelView = {
     selected_node: ko.observable(),
