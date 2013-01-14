@@ -47,9 +47,9 @@ ${ layout.menubar(section='workflows') }
       </div>
       <div class="span4">
         <button class="btn action-buttons" id="submit-btn" disabled="disabled"><i class="icon-play"></i> ${ _('Submit') }</button>
-        <button class="btn action-buttons" id="schedule-btn" disabled="disabled"><i class="icon-refresh"></i> ${ _('Schedule') }</button>
+        <button class="btn action-buttons" id="schedule-btn" disabled="disabled"><i class="icon-calendar"></i> ${ _('Schedule') }</button>
         &nbsp;&nbsp;&nbsp;&nbsp;
-        <button class="btn action-buttons" id="clone-btn" disabled="disabled"><i class="icon-retweet"></i> ${ _('Copy') }</button>
+        <button class="btn action-buttons" id="clone-btn" disabled="disabled"><i class="icon-retweet"></i> ${ _('Clone') }</button>
         <button class="btn action-buttons" id="delete-btn" disabled="disabled"><i class="icon-remove"></i> ${ _('Delete') }</button>
       </div>
     </div>

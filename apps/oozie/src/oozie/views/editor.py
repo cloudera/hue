@@ -148,12 +148,14 @@ def import_workflow(request):
 def edit_workflow(request, workflow):
   history = History.objects.filter(submitter=request.user, job=workflow).order_by('-submission_date')
   workflow_form = WorkflowForm(instance=workflow)
+  user_can_access_job = workflow.is_accessible(request.user)
   user_can_edit_job = workflow.is_editable(request.user)
 
   return render('editor/edit_workflow.mako', request, {
     'workflow_form': workflow_form,
     'workflow': workflow,
     'history': history,
+    'user_can_access_job': user_can_access_job,
     'user_can_edit_job': user_can_edit_job,
     'job_properties': extract_field_data(workflow_form['job_properties']),
     'link_form': LinkForm(),
