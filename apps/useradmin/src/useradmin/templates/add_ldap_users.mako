@@ -30,7 +30,7 @@ ${layout.menubar(section='users', _=_)}
     <h1>${_('Hue Users - Add/Sync LDAP user')}</h1>
     <br/>
 
-  <form id="editForm" method="POST" class="form form-horizontal">
+  <form id="editForm" method="POST" class="form form-horizontal" autocomplete="off">
     <fieldset>
           % for field in form.fields:
                   % if form[field].is_hidden:

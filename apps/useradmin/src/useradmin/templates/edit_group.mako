@@ -55,7 +55,7 @@ ${layout.menubar(section='groups', _=_)}
 
     <br/>
 
-	<form id="editForm" action="${urllib.quote(action)}" method="POST" class="form form-horizontal">
+	<form id="editForm" action="${urllib.quote(action)}" method="POST" class="form form-horizontal" autocomplete="off">
 		<fieldset>
 		% for field in form:
 			${render_field(field)}
