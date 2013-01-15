@@ -43,6 +43,9 @@
 
     <div class="actions">
         <a id="executeQuery" class="btn btn-primary" tabindex="0">${_('Execute')}</a>
+        % if app_name == 'impala':
+          <a id="downloadQuery" class="btn">${_('Download')}</a>
+        % endif
         % if design and not design.is_auto and design.name:
         <a id="saveQuery" class="btn">${_('Save')}</a>
         % endif
@@ -90,8 +93,7 @@ ${layout.menubar(section='query')}
 
                                 <div class="control-group">
                                     ${comps.label(f['key'])}
-                                    ${comps.field(f['key'], attrs=dict(
-                                        placeholder="mapred.reduce.tasks",
+                                    ${comps.field(f['key'], attrs=dict(placeholder=app_name == 'impala' and "ABORT_ON_ERROR" or "mapred.reduce.tasks",
                                         klass="settingsField span8"
                                     ))}
                                 </div>
@@ -208,13 +210,19 @@ ${layout.menubar(section='query')}
                                 ${_("Enable Parameterization")}
                             </label>
                         </li>
-                        <li class="nav-header">${_('Email Notification')}</li>
-                        <li>
+                        <ul
+                        % if app_name == 'impala':
+                            class="hide"
+                        % endif
+                        >
+                          <li class="nav-header">${_('Email Notification')}</li>
+                          <li>
                             <label class="checkbox" rel="tooltip" data-original-title="${_("If checked, you will receive an email notification when the query completes.")}">
                                 <input type="checkbox" id="id_${form.query["email_notify"].html_name | n}" name="${form.query["email_notify"].html_name | n}" ${extract_field_data(form.query["email_notify"]) and "CHECKED" or ""}/>
                                 ${_("Email me on completion")}
                             </label>
-                        </li>
+                          </li>
+                        </ul>
                     </ul>
                     <input type="hidden" name="${form.query["query"].html_name | n}" class="query" value="" />
                 </form>
@@ -454,6 +462,14 @@ ${layout.menubar(section='query')}
             $("<input>").attr("type","hidden").attr("name","button-submit").attr("value","Execute").appendTo($("#advancedSettingsForm"));
             checkAndSubmit();
         });
+
+        % if app_name == 'impala':
+        $("#downloadQuery").click(function(){
+            $("<input>").attr("type", "hidden").attr("name", "button-submit").attr("value", "Execute").appendTo($("#advancedSettingsForm"));
+            $("<input>").attr("type", "hidden").attr("name", "download").attr("value", "true").appendTo($("#advancedSettingsForm"));
+            checkAndSubmit();
+        });
+        % endif
 
         $("#saveQuery").click(function(){
             $("<input>").attr("type","hidden").attr("name","saveform-name")

@@ -20,7 +20,7 @@ import thrift
 import time
 
 from django.utils.encoding import force_unicode
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext as _
 
 from filebrowser.views import location_to_url
 

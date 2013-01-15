@@ -67,7 +67,7 @@ def config_validator():
   for cluster in get_all_hdfs().values():
     res.extend(validate_path(REMOTE_DEPLOYMENT_DIR, is_dir=True, fs=cluster,
                              message=_('The deployment directory of Oozie workflows does not exist. '
-                                       'Run "Setup Example" on the Oozie workflow page.')))
+                                       'Run "Setup Examples" on the Oozie workflow page.')))
     res.extend(validate_path(ConfigMock('/user/oozie/share/lib'), is_dir=True, fs=cluster,
                              message=_('Oozie Share Lib not installed in default location.')))
 

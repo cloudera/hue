@@ -478,7 +478,8 @@ def execute_query(request, design_id=None):
             return explain_directly(request, query, design, query_server)
           else:
             notify = form.query.cleaned_data.get('email_notify', False)
-            return execute_directly(request, query, query_server, design, on_success_url=on_success_url, notify=notify)
+            download = request.POST.has_key('download')
+            return execute_directly(request, query, query_server, design, on_success_url=on_success_url, notify=notify, download=download)
         except BeeswaxException, ex:
           print ex.errorCode
           print ex.SQLState
@@ -536,6 +537,8 @@ def watch_query(request, id):
 
   # GET param: on_success_url. Default to view_results
   results_url = reverse(get_app_name(request) + ':view_results', kwargs={'id': id, 'first_row': 0})
+  if request.GET.get('download', ''):
+    results_url += '?download=true'
   on_success_url = request.GET.get('on_success_url')
   if not on_success_url:
     on_success_url = results_url
@@ -615,6 +618,9 @@ def view_results(request, id, first_row=0):
   context_param = request.GET.get('context', '')
   query_context = _parse_query_context(context_param)
 
+  # To remove in Hue 2.3
+  download  = request.GET.get('download', '')
+
   # Update the status as expired should not be accessible
   # Impala does not support startover for now
   expired = state == models.QueryHistory.STATE.expired
@@ -624,13 +630,22 @@ def view_results(request, id, first_row=0):
 
   # Retrieve query results
   try:
-    results = db.fetch(handle, start_over, 100)
-    data = list(results.rows()) # Materialize results
+    if not download:
+      results = db.fetch(handle, start_over, 100)
+      data = list(results.rows()) # Materialize results
 
-    # We display the "Download" button only when we know that there are results:
-    downloadable = first_row > 0 or data
+      # We display the "Download" button only when we know that there are results:
+      downloadable = first_row > 0 or data
+    else:
+      downloadable = True
+      data = []
+      results = type('Result', (object,), {
+                    'rows': 0,
+                    'columns': [],
+                    'has_more': False,
+                    'start_row': 0, })
     log = db.get_log(handle)
-  except BeeswaxException, ex:
+  except Exception, ex:
     fetch_error = True
     error_message, log = expand_exception(ex, db)
 
@@ -644,12 +659,13 @@ def view_results(request, id, first_row=0):
     'results': data,
     'expected_first_row': first_row,
     'log': log,
-    'hadoop_jobs': _parse_out_hadoop_jobs(log),
+    'hadoop_jobs': app_name != 'impala' and _parse_out_hadoop_jobs(log),
     'query_context': query_context,
     'can_save': False,
     'context_param': context_param,
     'expired': expired,
-    'app_name': app_name
+    'app_name': app_name,
+    'download': download
   }
 
   if not error:
@@ -670,7 +686,7 @@ def view_results(request, id, first_row=0):
       'columns': results.columns,
       'download_urls': download_urls,
       'save_form': save_form,
-      'can_save': query_history.owner == request.user,
+      'can_save': query_history.owner == request.user and not download,
     })
 
   return render('watch_results.mako', request, context)
@@ -1110,6 +1126,8 @@ def execute_directly(request, query, query_server=None, design=None, tablename=N
 
   history_obj = db.execute_query(query, design)
   watch_url = reverse(get_app_name(request) + ':watch_query', kwargs={'id': history_obj.id})
+  if 'download' in kwargs and kwargs['download']:
+    watch_url += '?download=true'
 
   # Prepare the GET params for the watch_url
   get_dict = QueryDict(None, mutable=True)

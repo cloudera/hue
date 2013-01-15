@@ -99,18 +99,15 @@ ${ layout.menubar(section='dashboard') }
                    data-confirmation-message="${ _('Are you sure you\'d like to kill this job?') }">
                 ${_('Kill')}
                 </button>
-              % endif
-              % if oozie_workflow.id:
+              % else:
+                % if oozie_workflow.id:
                   <button title="${ _('Rerun the same workflow') }" id="rerun-btn"
                      data-rerun-url="${ url('oozie:rerun_oozie_job', job_id=oozie_workflow.id, app_path=oozie_workflow.appPath) }"
-                     class="btn btn-small
-                % if oozie_workflow.is_running():
-                hide
+                     class="btn btn-small">
+                    ${ _('Rerun') }
+                  </button>
+                  <div id="rerun-wf-modal" class="modal hide"></div>
                 % endif
-                ">
-                  ${ _('Rerun') }
-                </button>
-                <div id="rerun-wf-modal" class="modal hide"></div>
               % endif
               </li>
           % endif
