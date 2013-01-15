@@ -17,7 +17,10 @@
     h3 { color: #1767b6; }
     a { color: #1767b6; }
     ul { list-style-type: none; }
-    .tab-content { padding: 70px; }    
+    section { margin-top: 0px; }
+    .tab-content { padding: 76px; }
+    .legend { text-align: center; }
+    #logo { margin-top: -10px; margin-bottom: -8px; }
   </style>
 </head>
 
@@ -25,15 +28,15 @@
     <div class="navbar navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container">
-          <a class="brand" href="./index.html">Hue</a>
+          <a class="brand" href="./index.html"><img id="logo" class="image" src="static/images/hue-logo.png"/></a>
           <div class="nav-collapse collapse">
             <ul class="nav nav-tabs">
               <li class="active">
                 <a href="#home" data-toggle="tab">Home</a>
-              </li>     
+              </li>
               <li>
                 <a href="#apps" data-toggle="tab">Apps</a>
-              </li>                     
+              </li>
               <li>
                 <a href="#releases" data-toggle="tab">Releases</a>
               </li>
@@ -56,20 +59,21 @@
       <div class="span8">
         <div class="tab-content">
           <div class="tab-pane active" id="home">
-          <h1><a href="http://github.com/cloudera/hue">hue</a>          <img class="image" src="static/images/hue-logo.png"/>
-        </h1>
+          <h1>
+            <a href="http://github.com/cloudera/hue">hue</a>
+          </h1>
 
         <div class="hero-unit">
           <p style="font-size: 1.5em;">Hue is an open source web-based application for making it easier to use Apache Hadoop.</p>
           <p>Hue features a file browser for HDFS, an Oozie Application for creating workflows and coordinators, a job designer/browser for MapReduce, Hive and Impala query editors, a Shell, a collection of Hadoop API.</p>
             <p class style="text-align:center; padding-top:10px">
-             <a class="btn btn-primary btn-large" href="http://github.com/downloads/cloudera/hue/hue-2.1.0.tgz">
+             <a class="btn btn-primary btn-large" href="http://cloudera.github.com/hue/releases/2.1.0/hue-2.1.0.tgz">
                Download Hue
              </a>
             <a class="btn btn-inverse btn-large" href="http://github.com/cloudera/hue">
               GitHub Project
-            </a>             
-             
+            </a>
+
            </p>
         </div>
         <div id="myCarousel" class="carousel slide" data-interval="4000">
@@ -126,92 +130,138 @@
           </div>
           <a class="carousel-control left" href="#myCarousel" data-slide="prev">&lsaquo;</a>
           <a class="carousel-control right" href="#myCarousel" data-slide="next">&rsaquo;</a>
-        </div>          
+        </div>
           </div>
-     
+
           <div class="tab-pane" id="apps">
             <h3>Apps</h3>
-            
+
             <div class="container-fluid">
               <div class="span3">
                  <ul data-spy="affix" data-offset-top="200">
-                   <li><a href="#beeswax"><i class="icon-chevron-right"></i> Beeswax</a></li>
+                   <li><a href="#beeswax"><i class="icon-chevron-right"></i> Beeswax/Hive</a></li>
                    <li><a href="#oozie"><i class="icon-chevron-right"></i> Oozie</a></li>
-                   <li><a href="#fb"><i class="icon-chevron-right"></i> FileBrowser</a></li>
-                   <li><a href="#impala"><i class="icon-chevron-right"></i> Impala</a></li>                                                              
-                   <li><a href="#jb"><i class="icon-chevron-right"></i> JobBrowser</a></li>
+                   <li><a href="#fb"><i class="icon-chevron-right"></i> File Browser</a></li>
+                   <li><a href="#impala"><i class="icon-chevron-right"></i> Impala</a></li>
+                   <li><a href="#jb"><i class="icon-chevron-right"></i> Job Browser</a></li>
+                   <li><a href="#jobsub"><i class="icon-chevron-right"></i> Job Designer</a></li>                   
                    <li><a href="#shell"><i class="icon-chevron-right"></i> Shell</a></li>
                    <li><a href="#useradmin"><i class="icon-chevron-right"></i> User Admin</a></li>
                  </ul>
               </div>
               <div class="span9">
                 <section id="beeswax">
-                  <h2>Beeswax</h2>
-                  <img class="image" src="static/images/beeswax.jpg"/>
-                  <img class="image" src="static/images/beeswax-result.jpg"/>
-                  <img class="image" src="static/images/beeswax-error.jpg"/>
-                  <img class="image" src="static/images/beeswax-meta.jpg"/>                                                      
-                </section>                
+                  <h2>Beeswax/Hive</h2>
+                  <p class="legend">
+                    <a href="static/images/beeswax.jpg" title="Click to see" rel="tooltip"><img class="image" src="static/images/beeswax.jpg"/></a>
+                    Query Editor
+                  </p>
+                  <p class="legend">
+                    <a href="static/images/beeswax-result.jpg title="Click to see" rel="tooltip""><img class="image" src="static/images/beeswax-result.jpg"/></a>
+                    Result Browsing
+                  </p>
+                  <p class="legend">
+                    <a href="static/images/beeswax-error.jpg" title="Click to see" rel="tooltip"><img class="image" src="static/images/beeswax-error.jpg"/></a>
+                    Error highlighting
+                  </p>
+                  <p class="legend">
+                    <a href="static/images/beeswax-meta.jpg" title="Click to see" rel="tooltip"><img class="image" src="static/images/beeswax-meta.jpg"/></a>
+                    Database meta data
+                  </p>
+                </section>
                 <section id="oozie">
-                  <h2>Oozie</h2>                
-                  <img class="image" src="static/images/oozie.jpg"/>
-                  <img class="image" src="static/images/oozie-dashboard.jpg"/>
-                  <img class="image" src="static/images/oozie-coord.jpg"/>                                    
-                  <img class="image" src="static/images/oozie-drag.jpg"/>                                    
+                  <h2>Oozie</h2>
+                  <p class="legend">
+                     <a href="static/images/oozie.jpg" title="Click to see" rel="tooltip"><img class="image" src="static/images/oozie.jpg"/></a>
+                     Running workflow dashboard
+                  </p>
+                  <p class="legend">
+                     <a href="static/images/oozie-dashboard.jpg" title="Click to see" rel="tooltip"><img class="image" src="static/images/oozie-dashboard.jpg"/></a>
+                     Dashboard
+                  </p>
+                  <p class="legend">
+                     <a href="static/images/oozie-coord.jpg" title="Click to see" rel="tooltip"><img class="image" src="static/images/oozie-coord.jpg"/></a>
+                     Coordinator wizard
+                  </p>
+                  <p class="legend">
+                     <a href="static/images/oozie-drag.jpg" title="Click to see" rel="tooltip"><img class="image" src="static/images/oozie-drag.jpg"/></a>
+                     Drag & Drop workflow editor
+                  </p>
                 </section>
                 <section id="fb">
-                  <h2>File Browser</h2>                
-                  <img class="image" src="static/images/fb.jpg"/>
-                </section> 
-                <section id="impala">
-                  <h2>Impala</h2>                
-                  <img class="image" src="static/images/impala.jpg"/>
-                </section> 
-                <section id="jb">
-                  <h2>Job Browser</h2>                
-                  <img class="image" src="static/images/jb.png"/>
+                  <h2>File Browser</h2>
+                  <p class="legend">
+                     <a href="static/images/fb.jpg" title="Click to see" rel="tooltip"><img class="image" src="static/images/fb.jpg"/></a>
+                     Bulk operations
+                  </p>
                 </section>
+                <section id="impala">
+                  <h2>Impala</h2>
+                  <p class="legend">
+                     <a href="static/images/impala.jpg" title="Click to see" rel="tooltip"><img class="image" src="static/images/impala.jpg"/></a>
+                     Query Editor
+                  </p>
+                </section>
+                <section id="jb">
+                  <h2>Job Browser</h2>
+                  <p class="legend">
+                     <a href="static/images/jb.png" title="Click to see" rel="tooltip"><img class="image" src="static/images/jb.png"/></a>
+                     Jobs information and direct log access
+                  </p>
+                </section>
+                <section id="jobsub">
+                  <h2>Job Designer</h2>
+                  <p class="legend">
+                     <a href="static/images/jobsub.png" title="Click to see" rel="tooltip"><img class="image" src="static/images/jobsub.png"/></a>
+                     Configure and run MapReduce jobs
+                  </p>
+                </section>                
                 <section id="shell">
-                  <h2>Shell</h2>                
-                  <img class="image" src="static/images/shell.png"/>
+                  <h2>Shell</h2>
+                  <p class="legend">
+                     <a href="static/images/shell.png" title="Click to see" rel="tooltip"><img class="image" src="static/images/shell.png"/></a>
+                     Pig, HBase, Sqoop2 shells
+                  </p>
                 </section>
                 <section id="useradmin">
-                  <h2>User Admin</h2>                
-                  <img class="image" src="static/images/useradmin.png"/>
-                </section>                
+                  <h2>User Admin</h2>
+                  <p class="legend">
+                     <a href="static/images/useradmin.png" title="Click to see" rel="tooltip"><img class="image" src="static/images/useradmin.png"/></a>
+                     Users, groups and permissions management
+                  </p>
+                </section>
               </div>
             </div>
-          </div>     
-                  
+          </div>
+
           <div class="tab-pane" id="releases">
             <h3 id="releases-2.1.0">Hue 2.1.0 - Oct 2, 2012</h3>
-            <p>Hue now provides an Apache Oozie application for creating workflows of Apache MapReduce, Apache Pig, Apache Hive, Apache Sqoop, Java, Shell, Ssh and Streaming jobs and scheduling them repetitively. Hue is now available in German, Spanish, French, Japanese, Korean, Portuguese, Brazilian and simplified Chinese.<br/> It works with <a href="https://ccp.cloudera.com/display/CDH4DOC/CDH4+Quick+Start+Guide">Cloudera's Distribution for Apache Hadoop (CDH) version 4.1</a>.</p>
+            <p>Hue now provides an Apache Oozie application for creating workflows of Apache MapReduce, Apache Pig, Apache Hive, Apache Sqoop, Java, Shell, Ssh and Streaming jobs and scheduling them repetitively. Hue is now available in German, Spanish, French, Japanese, Korean, Portuguese, Brazilian and simplified Chinese.<br/> It works best with <a href="https://ccp.cloudera.com/display/CDH4DOC/CDH4+Quick+Start+Guide">Cloudera's Distribution for Apache Hadoop (CDH) version 4.1</a>.</p>
             <ul>
               <li><a href="docs-2.1.0/index.html">Documentation</a></li>
-              <li><a href="http://github.com/downloads/cloudera/hue/hue-2.1.0.tgz">Download tarball</a></li>
+              <li><a href="http://cloudera.github.com/hue/releases/2.1.0/hue-2.1.0.tgz">Download tarball</a></li>
               <li><a href="https://ccp.cloudera.com/display/CDH4DOC/Hue+Installation#HueInstallation-InstallingHue">Install packages</a></li>
             </ul>
 
             <h3>Hue 2.0.1 - June 4, 2012</h3>
-            <p>Hue 2.0.1 is a major upgrade with many fixes and key new features. The frontend has been re-implemented, LDAP (OpenLDAP and Active Directory) and per-application authorization are supported, a Shell application was added.<br/> It works with <a href="https://ccp.cloudera.com/display/CDH4DOC/CDH4+Quick+Start+Guide">Cloudera's Distribution for Apache Hadoop (CDH) version 4</a>.</p>
+            <p>Hue 2.0.1 is a major upgrade with many fixes and key new features. The frontend has been re-implemented, LDAP (OpenLDAP and Active Directory) and per-application authorization are supported, a Shell application was added.<br/> It works best with <a href="https://ccp.cloudera.com/display/CDH4DOC/CDH4+Quick+Start+Guide">CDH 4.0</a>.</p>
             <ul>
               <li><a href="docs-2.0.1/index.html">Documentation</a></li>
-              <li><a href="http://github.com/downloads/cloudera/hue/hue-2.0.1.tgz">Download tarball</a></li>
+              <li><a href="http://cloudera.github.com/hue/releases/2.0.1/hue-2.0.1.tgz">Download tarball</a></li>
             </ul>
 
             <h3>Hue 1.2.0 - Feb 21, 2011</h3>
             <p>Hue 1.2.0 is a minor release, largely focused on bug fixes and compatibility with <a href="https://ccp.cloudera.com/display/CDHDOC/CDH3+Quick+Start+Guide">CDH3</a>.</p>
             <ul>
               <li><a href="docs-1.2.0/index.html">Documentation</a></li>
-              <li><a href="http://github.com/downloads/cloudera/hue/hue-1.2.0.tgz">Download tarball</a></li>
+              <li><a href="http://cloudera.github.com/hue/releases/1.2.0/hue-1.2.0.tgz">Download tarball</a></li>
             </ul>
 
            <h3>Hue 1.1.0 - Oct 11, 2010</h3>
-            <p>Hue 1.1.0 supports Kerberos integration with using a secured Hadoop
-            cluster. It works with <a href="https://ccp.cloudera.com/display/CDHDOC/CDH3+Quick+Start+Guide">CDH3</a>.</p>
+            <p>Hue 1.1.0 supports Kerberos integration with using a secured Hadoop cluster.</p>
             <ul>
               <li><a href="docs-1.1.0/index.html">Documentation</a></li>
-              <li><a href="http://github.com/downloads/cloudera/hue/hue-1.1.0.tgz">Download tarball</a></li>
+              <li><a href="http://cloudera.github.com/hue/releases/1.1.0/hue-1.1.0.tgz">Download tarball</a></li>
             </ul>
 
             <h3>Hue 1.0.1 - Aug 20, 2010</h3>
@@ -219,7 +269,7 @@
             security features.</p>
             <ul>
               <li><a href="docs-1.0.1/index.html">Documentation</a></li>
-              <li><a href="http://github.com/downloads/cloudera/hue/hue-1.0.1.tgz">Download tarball</a></li>
+              <li><a href="http://cloudera.github.com/hue/releases/1.0.1/hue-1.0.1.tgz">Download tarball</a></li>
             </ul>
           </div>
 
@@ -262,7 +312,7 @@
       </div>
     </div>
   </div>
-  
+
 <script type="text/javascript">
   var _gaq = _gaq || [];
   _gaq.push(['_setAccount', 'UA-37637545-1']);
@@ -272,11 +322,15 @@
     var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-  })();
-</script>  
+  })();  
+</script>
 
-  <script src="static/ext/js/jquery/jquery-1.8.1.min.js"></script>
-  <script src="static/ext/js/bootstrap.min.js"></script>
+<script src="static/ext/js/jquery/jquery-1.8.1.min.js"></script>
+<script src="static/ext/js/bootstrap.min.js"></script>
+
+<script>
+  $('#myCarousel').carousel();
+</script>
 
 </body>
 </html>
