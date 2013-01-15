@@ -31,7 +31,11 @@ ${layout.menubar(section='query')}
 	<h1>${_('Waiting for query...')} ${util.render_query_context(query_context)}</h1>
 	<div class="row-fluid">
 		<div class="span3">
-			<div class="well sidebar-nav">
+			<div class="well sidebar-nav
+			    % if app_name == 'impala':
+			      hive
+			    % endif
+			">
 				<ul class="nav nav-list">
 					<%
 			          n_jobs = hadoop_jobs and len(hadoop_jobs) or 0

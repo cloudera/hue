@@ -127,7 +127,7 @@ ${layout.menubar(section='history')}
                 <td>${query.owner}</td>
                 <td>${models.QueryHistory.STATE[query.last_state]}</td>
                 <td>
-                  % if qcontext and query.last_state != models.QueryHistory.STATE.expired.index:
+                  % if qcontext and query.last_state not in (models.QueryHistory.STATE.expired.index, models.QueryHistory.STATE.failed.index):
                     <a href="${ url(app_name + ':watch_query', id=query.id) }?context=${qcontext|u}" data-row-selector="true">${_('Results')}</a>
                   % else:
                     ~

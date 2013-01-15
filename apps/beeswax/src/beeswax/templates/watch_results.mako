@@ -74,6 +74,7 @@ ${layout.menubar(section='query')}
                     %if can_save:
                     <li><a data-toggle="modal" href="#saveAs">${_('Save')}</a></li>
                     % endif
+                    % if app_name != 'impala':
                     <%
                       n_jobs = hadoop_jobs and len(hadoop_jobs) or 0
                       mr_jobs = (n_jobs == 1) and _('MR Job') or _('MR Jobs')
@@ -86,6 +87,7 @@ ${layout.menubar(section='query')}
                     % else:
                         <li class="nav-header">${mr_jobs}</li>
                         <li>${_('No Hadoop jobs were launched in running this query.')}</li>
+                    % endif
                     % endif
                 </ul>
             </div>
@@ -229,7 +231,7 @@ ${layout.menubar(section='query')}
     </div>
   </form>
 </div>
-%endif
+%endif.resultTable
 
 
 
@@ -339,8 +341,12 @@ ${layout.menubar(section='query')}
       }
 
       % if app_name == 'impala':
+        % if not download:
           $("#collapse").click();
           $(".sidebar-nav, #expand").hide();
+        % elif not error:
+          $("table").replaceWith("${ _('Download results from the left.') }");
+        % endif
       % endif
     });
 </script>

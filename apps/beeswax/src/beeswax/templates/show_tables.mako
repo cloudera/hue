@@ -30,12 +30,18 @@ ${layout.menubar(section='tables')}
         <div class="span3">
             <div class="well sidebar-nav">
                 <ul class="nav nav-list">
+                    <span
+                        % if app_name == 'impala':
+                            class="hide"
+                        % endif
+                    >
                     <li class="nav-header">${_('database')}</li>
                     <li>
                        <form action="${ url(app_name + ':show_tables') }" id="db_form" method="POST">
                          ${ db_form | n,unicode }
                        </form>
                     </li>
+                    </span>
                     <li class="nav-header">${_('Actions')}</li>
                     % if not examples_installed:
                     <li><a href="#installSamples" data-toggle="modal">${_('Install samples')}</a></li>
