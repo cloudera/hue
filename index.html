@@ -19,8 +19,10 @@
     ul { list-style-type: none; }
     section { margin-top: 0px; }
     .tab-content { padding: 76px; }
-    .legend { text-align: center; }
-    #logo { margin-top: -10px; margin-bottom: -8px; }
+    .item { text-align: center; padding: 15px; }
+    .legend { text-align: center;  font-size: 1.2em; padding-bottom: 10px; }
+    p.item img { border-style:solid; border-width: 1px;}
+    #logo { margin-top: -10px; margin-bottom: -8px; padding-right: 15px; }
   </style>
 </head>
 
@@ -138,13 +140,13 @@
 
             <div class="container-fluid">
               <div class="span3">
-                 <ul data-spy="affix" data-offset-top="200">
+                 <ul class="affix" data-spy="affix" data-offset-top="200">
                    <li><a href="#beeswax"><i class="icon-chevron-right"></i> Beeswax/Hive</a></li>
                    <li><a href="#oozie"><i class="icon-chevron-right"></i> Oozie</a></li>
                    <li><a href="#fb"><i class="icon-chevron-right"></i> File Browser</a></li>
                    <li><a href="#impala"><i class="icon-chevron-right"></i> Impala</a></li>
                    <li><a href="#jb"><i class="icon-chevron-right"></i> Job Browser</a></li>
-                   <li><a href="#jobsub"><i class="icon-chevron-right"></i> Job Designer</a></li>                   
+                   <li><a href="#jobsub"><i class="icon-chevron-right"></i> Job Designer</a></li>
                    <li><a href="#shell"><i class="icon-chevron-right"></i> Shell</a></li>
                    <li><a href="#useradmin"><i class="icon-chevron-right"></i> User Admin</a></li>
                  </ul>
@@ -152,82 +154,82 @@
               <div class="span9">
                 <section id="beeswax">
                   <h2>Beeswax/Hive</h2>
-                  <p class="legend">
+                  <p class="item">
                     <a href="static/images/beeswax.jpg" title="Click to see" rel="tooltip"><img class="image" src="static/images/beeswax.jpg"/></a>
-                    Query Editor
+                    <p class="legend">Query Editor</p>
                   </p>
-                  <p class="legend">
+                  <p class="item">
                     <a href="static/images/beeswax-result.jpg title="Click to see" rel="tooltip""><img class="image" src="static/images/beeswax-result.jpg"/></a>
-                    Result Browsing
+                    <p class="legend">Result Browsing</p>
                   </p>
-                  <p class="legend">
+                  <p class="item">
                     <a href="static/images/beeswax-error.jpg" title="Click to see" rel="tooltip"><img class="image" src="static/images/beeswax-error.jpg"/></a>
-                    Error highlighting
+                    <p class="legend">Error highlighting</p>
                   </p>
-                  <p class="legend">
+                  <p class="item">
                     <a href="static/images/beeswax-meta.jpg" title="Click to see" rel="tooltip"><img class="image" src="static/images/beeswax-meta.jpg"/></a>
-                    Database meta data
+                    <p class="legend">Database meta data</p>
                   </p>
                 </section>
                 <section id="oozie">
                   <h2>Oozie</h2>
-                  <p class="legend">
+                  <p class="item">
                      <a href="static/images/oozie.jpg" title="Click to see" rel="tooltip"><img class="image" src="static/images/oozie.jpg"/></a>
-                     Running workflow dashboard
+                     <p class="legend">Running workflow dashboard</p>
                   </p>
-                  <p class="legend">
+                  <p class="item">
                      <a href="static/images/oozie-dashboard.jpg" title="Click to see" rel="tooltip"><img class="image" src="static/images/oozie-dashboard.jpg"/></a>
-                     Dashboard
+                     <p class="legend">Dashboard</p>
                   </p>
-                  <p class="legend">
+                  <p class="item">
                      <a href="static/images/oozie-coord.jpg" title="Click to see" rel="tooltip"><img class="image" src="static/images/oozie-coord.jpg"/></a>
-                     Coordinator wizard
+                     <p class="legend">Coordinator wizard</p>
                   </p>
-                  <p class="legend">
+                  <p class="item">
                      <a href="static/images/oozie-drag.jpg" title="Click to see" rel="tooltip"><img class="image" src="static/images/oozie-drag.jpg"/></a>
-                     Drag & Drop workflow editor
+                     <p class="legend">Drag & Drop workflow editor</p>
                   </p>
                 </section>
                 <section id="fb">
                   <h2>File Browser</h2>
-                  <p class="legend">
+                  <p class="item">
                      <a href="static/images/fb.jpg" title="Click to see" rel="tooltip"><img class="image" src="static/images/fb.jpg"/></a>
-                     Bulk operations
+                     <p class="legend">Bulk operations</p>
                   </p>
                 </section>
                 <section id="impala">
                   <h2>Impala</h2>
-                  <p class="legend">
+                  <p class="item">
                      <a href="static/images/impala.jpg" title="Click to see" rel="tooltip"><img class="image" src="static/images/impala.jpg"/></a>
-                     Query Editor
+                     <p class="legend">Query Editor</p>
                   </p>
                 </section>
                 <section id="jb">
                   <h2>Job Browser</h2>
-                  <p class="legend">
+                  <p class="item">
                      <a href="static/images/jb.png" title="Click to see" rel="tooltip"><img class="image" src="static/images/jb.png"/></a>
-                     Jobs information and direct log access
+                     <p class="legend">Jobs information and direct log access</p>
                   </p>
                 </section>
                 <section id="jobsub">
                   <h2>Job Designer</h2>
-                  <p class="legend">
+                  <p class="item">
                      <a href="static/images/jobsub.png" title="Click to see" rel="tooltip"><img class="image" src="static/images/jobsub.png"/></a>
-                     Configure and run MapReduce jobs
+                     <p class="legend">Configure and run MapReduce jobs</p>
                   </p>
-                </section>                
+                </section>
                 <section id="shell">
                   <h2>Shell</h2>
-                  <p class="legend">
+                  <p class="item">
                      <a href="static/images/shell.png" title="Click to see" rel="tooltip"><img class="image" src="static/images/shell.png"/></a>
-                     Pig, HBase, Sqoop2 shells
+                     <p class="legend">Pig, HBase, Sqoop2 shells</p>
                   </p>
                 </section>
                 <section id="useradmin">
                   <h2>User Admin</h2>
-                  <p class="legend">
+                  <p class="item">
                      <a href="static/images/useradmin.png" title="Click to see" rel="tooltip"><img class="image" src="static/images/useradmin.png"/></a>
-                     Users, groups and permissions management
+                     <p class="legend">Users, groups and permissions management</p>
                   </p>
                 </section>
               </div>
@@ -322,14 +324,27 @@
     var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-  })();  
+  })();
 </script>
 
 <script src="static/ext/js/jquery/jquery-1.8.1.min.js"></script>
 <script src="static/ext/js/bootstrap.min.js"></script>
 
 <script>
-  $('#myCarousel').carousel();
+  $(document).ready(function () {
+	  $('#myCarousel').carousel();
+	
+    $("ul.affix li a").click(function (e) {
+      var _link = $(this);
+      if (_link.attr("href").indexOf("#") == 0) {
+        e.preventDefault();
+        var _anchor = $("section#" + decodeURIComponent(_link.attr("href").substring(1)));
+        $("html, body").animate({
+          scrollTop:(_anchor.position().top - $(".navbar-fixed-top").height() - $(".subnav-fixed").height()) + "px"
+        }, 300);
+      }
+    });
+  });
 </script>
 
 </body>
