@@ -40,6 +40,8 @@ ${ commonheader(_('File Browser'), 'filebrowser', user) | n,unicode }
                 <button class="btn fileToolbarBtn" title="${_('Change Owner / Group')}" data-bind="click: changeOwner, enable: selectedFiles().length > 0"><i class="icon-user"></i> ${_('Change Owner / Group')}</button>
             %endif
             <button class="btn fileToolbarBtn" title="${_('Change Permissions')}" data-bind="click: changePermissions, enable: selectedFiles().length > 0"><i class="icon-list-alt"></i> ${_('Change Permissions')}</button>
+            <button class="btn fileToolbarBtn" title="${_('Download')}" data-bind="click: downloadFile, enable: selectedFiles().length == 1 && selectedFile().type == 'file'"><i class="icon-file"></i> ${_('Download')}</button>
+            &nbsp;&nbsp;
             <button class="btn fileToolbarBtn" title="${_('Delete')}" data-bind="click: deleteSelected, enable: selectedFiles().length > 0"><i class="icon-trash"></i> ${_('Delete')}</button>
         </%def>
 
@@ -51,7 +53,7 @@ ${ commonheader(_('File Browser'), 'filebrowser', user) | n,unicode }
               </a>
               <ul class="dropdown-menu">
                 <li><a href="#" class="upload-link" title="${_('Files')}" data-bind="click: uploadFile"><i class="icon-file"></i> ${_('Files')}</a></li>
-                <li><a href="#" class="upload-link" title="${_('Archive')}" data-bind="click: uploadArchive"><i class="icon-gift"></i> ${_('Archives')}</a></li>
+                <li><a href="#" class="upload-link" title="${_('Archive')}" data-bind="click: uploadArchive"><i class="icon-gift"></i> ${_('Zip file')}</a></li>
               </ul>
             </div>
 	        <div class="btn-group" style="display: inline-block;">
