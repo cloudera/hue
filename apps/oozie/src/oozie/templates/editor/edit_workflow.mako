@@ -574,6 +574,7 @@ $('#workflow').on('mousedown', '.new-node-link', function(e) {
   var old_position = el.offset();
 
   // Trigger fake mousedown event to start dragging node.
+  var is_dirty = workflow.is_dirty();
   el.offset({ top: e.pageY - el.height()/10, left: e.pageX - el.width()/10 });
   el.trigger($.Event("mousedown", {pageX: e.pageX, pageY: e.pageY, target: el[0], which: 1}));
 
@@ -582,7 +583,7 @@ $('#workflow').on('mousedown', '.new-node-link', function(e) {
     node.detach();
     node.erase();
     modal.hide();
-    workflow.is_dirty( false );
+    workflow.is_dirty( is_dirty );
     $('#workflow').trigger('workflow:rebuild');
   };
 
