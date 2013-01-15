@@ -410,9 +410,9 @@ class Workflow(Job):
       return [node] + self.get_hierarchy_rec(child)
 
   def gen_status_graph(self, oozie_workflow):
-    from oozie.forms import NodeForm  # Circular dependency
+    from oozie.forms import NodeMetaForm  # Circular dependency
     actions = oozie_workflow.get_working_actions()
-    WorkflowFormSet = inlineformset_factory(Workflow, Node, form=NodeForm, max_num=0, can_order=False, can_delete=False)
+    WorkflowFormSet = inlineformset_factory(Workflow, Node, form=NodeMetaForm, max_num=0, can_order=False, can_delete=False)
     forms = WorkflowFormSet(instance=self).forms
     template='editor/gen/workflow-graph-status.xml.mako'
 
@@ -1538,12 +1538,14 @@ ACTION_TYPES = {
   Generic.node_type: Generic,
 }
 
-NODE_TYPES = ACTION_TYPES.copy()
-NODE_TYPES.update({
+CONTROL_TYPES = {
   Fork.node_type: Fork,
   Join.node_type: Join,
   Decision.node_type: Decision,
   DecisionEnd.node_type: DecisionEnd,
   Start.node_type: Start,
   End.node_type: End,
-})
+}
+
+NODE_TYPES = ACTION_TYPES.copy()
+NODE_TYPES.update(CONTROL_TYPES)

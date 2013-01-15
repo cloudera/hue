@@ -1221,7 +1221,7 @@ var NodeModule = function($, IdGeneratorTable) {
 
       var success = false;
       var request = $.extend({
-        url: '/oozie/workflows/' + self._workflow.id() + '/actions/' + self.node_type() + '/validate',
+        url: '/oozie/workflows/' + self._workflow.id() + '/nodes/' + self.node_type() + '/validate',
         type: 'POST',
         data: { node: JSON.stringify(data) },
         success: function(data) {
