@@ -8,58 +8,88 @@
   <title>Hue - Hadoop User Experience</title>
 
   <link href="static/ext/css/bootstrap.min.css" rel="stylesheet">
-  <script src="static/ext/js/jquery/jquery-1.8.1.min.js"></script>
-  <script src="static/ext/js/bootstrap.min.js"></script>
 
   <style type="text/css">
-    h1 { font-size: 3.8em; color: #1767b6; margin-bottom: 3px; }
+    h1 { font-size: 7em; color: #1767b6; margin-bottom: 30px; }
     h1 .small { font-size: 0.4em; }
     h1 a { text-decoration: none }
     h2 { font-size: 1.5em; color: #1767b6; }
     h3 { color: #1767b6; }
     a { color: #1767b6; }
+    ul { list-style-type: none; }
+    .tab-content { padding: 70px; }    
   </style>
 </head>
 
 <body>
-  <a href="http://github.com/cloudera/hue">
-    <img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" />
-  </a>
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="brand" href="./index.html">Hue</a>
+          <div class="nav-collapse collapse">
+            <ul class="nav nav-tabs">
+              <li class="active">
+                <a href="#home" data-toggle="tab">Home</a>
+              </li>     
+              <li>
+                <a href="#apps" data-toggle="tab">Apps</a>
+              </li>                     
+              <li>
+                <a href="#releases" data-toggle="tab">Releases</a>
+              </li>
+              <li>
+                <a href="#source" data-toggle="tab">Source</h2></a>
+              </li>
+              <li>
+                <a href="#community" data-toggle="tab">Community</a>
+              </li>
+            </ul>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
 
   <div class="container-fluid">
     <div class="row-fluid">
       <div class="span2"></div>
       <div class="span8">
-        <h1><a href="http://github.com/cloudera/hue">hue</a>
-          <a href="http://github.com/cloudera/hue"><span class="small">Hadoop User Experience</span></a>
+        <div class="tab-content">
+          <div class="tab-pane active" id="home">
+          <h1><a href="http://github.com/cloudera/hue">hue</a>
         </h1>
 
         <div class="hero-unit">
-          <p>Hue is an open source web-based interface for making it easier to use Apache Hadoop. It features a file browser for HDFS, an Oozie Application for creating workflows and coordinators, a job designer/browser for MapReduce, a Hive and Impala UI, a Shell, a collection of Hadoop API and more.</p>
-            <p>
+          <p style="font-size: 1.5em;">Hue is an open source web-based application for making it easier to use Apache Hadoop.</p>
+          <p>Hue features a file browser for HDFS, an Oozie Application for creating workflows and coordinators, a job designer/browser for MapReduce, Hive and Impala query editors, a Shell, a collection of Hadoop API.</p>
+            <p class style="text-align:center; padding-top:10px">
              <a class="btn btn-primary btn-large" href="http://github.com/downloads/cloudera/hue/hue-2.1.0.tgz">
-               Download
+               Download Hue
              </a>
+            <a class="btn btn-inverse btn-large" href="http://github.com/cloudera/hue">
+              GitHub Project
+            </a>             
+             
            </p>
         </div>
-        <div id="myCarousel" class="carousel slide">
+        <div id="myCarousel" class="carousel slide" data-interval="4000">
           <div class="carousel-inner">
             <div class="active item">
-              <img class="image" src="static/images/beeswax.png"/>
+              <img class="image" src="static/images/beeswax.jpg"/>
               <div class="carousel-caption">
                 <h4>Beeswax</h4>
                 <p>The Beeswax application enables you to perform queries on Apache Hive, a data warehousing system designed to work with Hadoop. You can create Hive tables, load data, run and manage Hive queries, and download the results in a Microsoft Office Excel worksheet file or a comma-separated values file.</p>
               </div>
             </div>
            <div class="item">
-             <img class="image" src="static/images/fb.png"/>
+             <img class="image" src="static/images/fb.jpg"/>
               <div class="carousel-caption">
                 <h4>File Browser</h4>
                 <p>The File Browser application lets you browse and manipulate files and directories in the Hadoop Distributed File System (HDFS) while using Hue.</p>
               </div>
            </div>
            <div class="item">
-             <img class="image" src="static/images/oozie.png"/>
+             <img class="image" src="static/images/oozie.jpg"/>
               <div class="carousel-caption">
                 <h4>Oozie Editor/Dashboard</h4>
                 <p>The Oozie Editor/Dashboard application allows you to define Oozie workflow and coordinator applications, run workflow and coordinator jobs, and view the status of jobs.</p>
@@ -96,22 +126,64 @@
           </div>
           <a class="carousel-control left" href="#myCarousel" data-slide="prev">&lsaquo;</a>
           <a class="carousel-control right" href="#myCarousel" data-slide="next">&rsaquo;</a>
-        </div>
-
-        <ul class="nav nav-tabs">
-          <li class="active">
-            <a href="#releases" data-toggle="tab"><h2>Releases</h2></a>
-          </li>
-          <li>
-            <a href="#source" data-toggle="tab"><h2>Source</h2></a>
-          </li>
-          <li>
-            <a href="#community" data-toggle="tab"><h2>Community</h2></a>
-          </li>
-        </ul>
-
-        <div class="tab-content">
-          <div class="tab-pane active" id="releases">
+        </div>          
+          </div>
+     
+          <div class="tab-pane" id="apps">
+            <h3>Apps</h3>
+            
+            <div class="container-fluid">
+              <div class="span3">
+                 <ul data-spy="affix" data-offset-top="200">
+                   <li><a href="#beeswax"><i class="icon-chevron-right"></i> Beeswax</a></li>
+                   <li><a href="#oozie"><i class="icon-chevron-right"></i> Oozie</a></li>
+                   <li><a href="#fb"><i class="icon-chevron-right"></i> FileBrowser</a></li>
+                   <li><a href="#impala"><i class="icon-chevron-right"></i> Impala</a></li>                                                              
+                   <li><a href="#jb"><i class="icon-chevron-right"></i> JobBrowser</a></li>
+                   <li><a href="#shell"><i class="icon-chevron-right"></i> Shell</a></li>
+                   <li><a href="#useradmin"><i class="icon-chevron-right"></i> User Admin</a></li>
+                 </ul>
+              </div>
+              <div class="span9">
+                <section id="beeswax">
+                  <h2>Beeswax</h2>
+                  <img class="image" src="static/images/beeswax.jpg"/>
+                  <img class="image" src="static/images/beeswax-result.jpg"/>
+                  <img class="image" src="static/images/beeswax-error.jpg"/>
+                  <img class="image" src="static/images/beeswax-meta.jpg"/>                                                      
+                </section>                
+                <section id="oozie">
+                  <h2>Oozie</h2>                
+                  <img class="image" src="static/images/oozie.jpg"/>
+                  <img class="image" src="static/images/oozie-dashboard.jpg"/>
+                  <img class="image" src="static/images/oozie-coord.jpg"/>                                    
+                  <img class="image" src="static/images/oozie-drag.jpg"/>                                    
+                </section>
+                <section id="fb">
+                  <h2>File Browser</h2>                
+                  <img class="image" src="static/images/fb.jpg"/>
+                </section> 
+                <section id="impala">
+                  <h2>Impala</h2>                
+                  <img class="image" src="static/images/impala.jpg"/>
+                </section> 
+                <section id="jb">
+                  <h2>Job Browser</h2>                
+                  <img class="image" src="static/images/jb.png"/>
+                </section>
+                <section id="shell">
+                  <h2>Shell</h2>                
+                  <img class="image" src="static/images/shell.png"/>
+                </section>
+                <section id="useradmin">
+                  <h2>User Admin</h2>                
+                  <img class="image" src="static/images/useradmin.png"/>
+                </section>                
+              </div>
+            </div>
+          </div>     
+                  
+          <div class="tab-pane" id="releases">
             <h3 id="releases-2.1.0">Hue 2.1.0 - Oct 2, 2012</h3>
             <p>Hue now provides an Apache Oozie application for creating workflows of Apache MapReduce, Apache Pig, Apache Hive, Apache Sqoop, Java, Shell, Ssh and Streaming jobs and scheduling them repetitively. Hue is now available in German, Spanish, French, Japanese, Korean, Portuguese, Brazilian and simplified Chinese.<br/> It works with <a href="https://ccp.cloudera.com/display/CDH4DOC/CDH4+Quick+Start+Guide">Cloudera's Distribution for Apache Hadoop (CDH) version 4.1</a>.</p>
             <ul>
@@ -190,5 +262,21 @@
       </div>
     </div>
   </div>
+  
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-37637545-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>  
+
+  <script src="static/ext/js/jquery/jquery-1.8.1.min.js"></script>
+  <script src="static/ext/js/bootstrap.min.js"></script>
+
 </body>
 </html>
