@@ -362,9 +362,9 @@ class TestAPI(OozieMockBase):
 
     assert_equal(0, test_response_json_object['status'])
 
-  def test_workflow_validate_action(self):
+  def test_workflow_validate_node(self):
     data = {"files":"[\"hive-site.xml\"]","job_xml":"hive-site.xml","description":"Show databases","workflow":17,"child_links":[{"comment":"","name":"ok","id":106,"parent":76,"child":74},{"comment":"","name":"error","id":107,"parent":76,"child":73}],"job_properties":"[{\"name\":\"oozie.hive.defaults\",\"value\":\"hive-site.xml\"}]","node_type":"hive","params":"[{\"value\":\"INPUT=/user/hue/oozie/workspaces/data\",\"type\":\"param\"}]","archives":"[]","node_ptr":76,"prepares":"[]","script_path":"hive.sql","id":76,"name":"Hive"}
-    response = self.c.post(reverse('oozie:workflow_validate_action', kwargs={'workflow': self.wf.pk, 'node_type': 'hive'}), data={'node': json.dumps(data)}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+    response = self.c.post(reverse('oozie:workflow_validate_node', kwargs={'workflow': self.wf.pk, 'node_type': 'hive'}), data={'node': json.dumps(data)}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
     test_response_json = response.content
     test_response_json_object = json.loads(test_response_json)
 
@@ -388,10 +388,10 @@ class TestAPI(OozieMockBase):
     assert_true('archives' in test_response_json_object['data'], test_response_json_object['data'])
     assert_equal(0, len(test_response_json_object['data']['archives']), test_response_json_object['data'])
 
-  def test_workflow_validate_action_fail(self):
+  def test_workflow_validate_node_fail(self):
     # Empty files field
     data = {"job_xml":"hive-site.xml","description":"Show databases","workflow":17,"child_links":[{"comment":"","name":"ok","id":106,"parent":76,"child":74},{"comment":"","name":"error","id":107,"parent":76,"child":73}],"job_properties":"[{\"name\":\"oozie.hive.defaults\",\"value\":\"hive-site.xml\"}]","node_type":"hive","params":"[{\"value\":\"INPUT=/user/hue/oozie/workspaces/data\",\"type\":\"param\"}]","archives":"[]","node_ptr":76,"prepares":"[]","script_path":"hive.sql","id":76,"name":"Hive"}
-    response = self.c.post(reverse('oozie:workflow_validate_action', kwargs={'workflow': self.wf.pk, 'node_type': 'hive'}), data={'node': json.dumps(data)}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+    response = self.c.post(reverse('oozie:workflow_validate_node', kwargs={'workflow': self.wf.pk, 'node_type': 'hive'}), data={'node': json.dumps(data)}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
     test_response_json = response.content
     test_response_json_object = json.loads(test_response_json)
 
@@ -417,7 +417,7 @@ class TestAPI(OozieMockBase):
 
     # Empty script path
     data = {"files":"[\"hive-site.xml\"]","job_xml":"hive-site.xml","description":"Show databases","workflow":17,"child_links":[{"comment":"","name":"ok","id":106,"parent":76,"child":74},{"comment":"","name":"error","id":107,"parent":76,"child":73}],"job_properties":"[{\"name\":\"oozie.hive.defaults\",\"value\":\"hive-site.xml\"}]","node_type":"hive","params":"[{\"value\":\"INPUT=/user/hue/oozie/workspaces/data\",\"type\":\"param\"}]","archives":"[]","node_ptr":76,"prepares":"[]","script_path":"","id":76,"name":"Hive"}
-    response = self.c.post(reverse('oozie:workflow_validate_action', kwargs={'workflow': self.wf.pk, 'node_type': 'hive'}), data={'node': json.dumps(data)}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+    response = self.c.post(reverse('oozie:workflow_validate_node', kwargs={'workflow': self.wf.pk, 'node_type': 'hive'}), data={'node': json.dumps(data)}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
     test_response_json = response.content
     test_response_json_object = json.loads(test_response_json)
 

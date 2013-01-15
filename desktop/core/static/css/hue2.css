@@ -153,6 +153,10 @@ h1 {
     text-align:left!important;
 }
 
+.nowrap {
+    white-space: nowrap;
+}
+
 .btn.primary {
     background-color: #01639c;
     background-image: -moz-linear-gradient(center top , #2c7fb3, #01639c);

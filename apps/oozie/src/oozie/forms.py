@@ -90,8 +90,14 @@ class NodeForm(forms.ModelForm):
   class Meta:
     ALWAYS_HIDE = ('workflow', 'children', 'node_type')
     model = Node
-    exclude = ALWAYS_HIDE + ('name', 'description')
+    exclude = ALWAYS_HIDE
 
+
+class NodeMetaForm(forms.ModelForm):
+  class Meta:
+    ALWAYS_HIDE = ('workflow', 'children', 'node_type')
+    model = Node
+    exclude = ALWAYS_HIDE + ('name', 'description')
 
 class JavaForm(forms.ModelForm):
   class Meta:

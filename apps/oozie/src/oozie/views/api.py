@@ -28,9 +28,9 @@ from desktop.lib.exceptions import StructuredException
 
 from jobsub.models import OozieDesign
 
-from oozie.forms import WorkflowForm, ImportJobsubDesignForm, design_form_by_type
+from oozie.forms import WorkflowForm, ImportJobsubDesignForm, NodeForm, design_form_by_type
 from oozie.import_jobsub import convert_jobsub_design
-from oozie.models import Workflow, Node, Mapreduce, Java, Streaming, Link, NODE_TYPES, ACTION_TYPES
+from oozie.models import Workflow, Node, Mapreduce, Java, Streaming, Link, NODE_TYPES, ACTION_TYPES, CONTROL_TYPES
 from oozie.decorators import check_job_access_permission, check_job_edition_permission
 from oozie.utils import model_to_dict
 
@@ -58,16 +58,19 @@ def format_dict_field_values(dictionary):
   return dictionary
 
 
-def workflow_validate_action_json(node_type, node_dict, errors, user, workflow):
+def workflow_validate_node_json(node_type, node_dict, errors, user, workflow):
   """
-  Validates a single action.
+  Validates a single node.
   node_type is the node type of the action information passed.
   node_dict is a dictionary describing the node.
   errors is a dictionary that will be populated with any found errors.
   Returns Boolean.
   """
   assert isinstance(errors, dict), "errors must be a dict."
-  form_class = design_form_by_type(node_type, user, workflow)
+  if node_type in ACTION_TYPES:
+    form_class = design_form_by_type(node_type, user, workflow)
+  else:
+    form_class = NodeForm
   form = form_class(data=node_dict)
 
   if form.is_valid():
@@ -123,7 +126,7 @@ def update_workflow_nodes(workflow, json_nodes, id_map, user):
   for json_node in json_nodes:
     errors = {}
     if json_node['node_type'] in ACTION_TYPES and \
-        not workflow_validate_action_json(json_node['node_type'], format_dict_field_values(json_node), errors, user, workflow):
+        not workflow_validate_node_json(json_node['node_type'], format_dict_field_values(json_node), errors, user, workflow):
       raise StructuredException(code="INVALID_REQUEST_ERROR", message=_('Invalid action'), data={'errors': errors}, error_code=400)
 
   nodes = []
@@ -158,12 +161,12 @@ def update_workflow_nodes(workflow, json_nodes, id_map, user):
 
 @check_job_access_permission(exception_class=(lambda x: StructuredException(code="UNAUTHORIZED_REQUEST_ERROR", message=x, data=None, error_code=401)))
 @check_job_edition_permission(exception_class=(lambda x: StructuredException(code="UNAUTHORIZED_REQUEST_ERROR", message=x, data=None, error_code=401)))
-def workflow_validate_action(request, workflow, node_type):
+def workflow_validate_node(request, workflow, node_type):
   response = {'status': -1, 'data': {}}
 
-  action_dict = format_dict_field_values(json.loads(str(request.POST.get('node'))))
+  node_dict = format_dict_field_values(json.loads(str(request.POST.get('node'))))
 
-  if workflow_validate_action_json(node_type, action_dict, response['data'], request.user, workflow):
+  if workflow_validate_node_json(node_type, node_dict, response['data'], request.user, workflow):
     response['status'] = 0
   else:
     response['status'] = -1

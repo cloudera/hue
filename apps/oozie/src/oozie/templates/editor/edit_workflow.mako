@@ -312,9 +312,10 @@ ${ layout.menubar(section='workflows') }
 
 ${ actions.import_jobsub_form(template=True) }
 
-${ controls.fork_form('fork', True, javascript_attrs={'convert': 'function(data, event) { $data.convertToDecision(); $data._workflow.rebuild(); }'}) }
+${ controls.fork_convert_form(node_type='fork', template=True, javascript_attrs={'convert': 'function(data, event) { $data.convertToDecision(); $data._workflow.rebuild(); }'}) }
+${ controls.fork_edit_form(form=node_form, node_type='fork', template=True) }
 
-${ controls.decision_form(link_form, default_link_form, 'decision', True) }
+${ controls.decision_form(node_form, link_form, default_link_form, 'decision', True) }
 
 <script type="text/html" id="emptyTemplate"></script>
 
@@ -360,7 +361,8 @@ ${ controls.decision_form(link_form, default_link_form, 'decision', True) }
 
       <div class="row-fluid node-action-bar">
         <div class="span12" style="text-align:right">
-          <a class="btn btn-mini edit-node-link" title="${ _('Convert to Decision') }" data-bind="attr: { 'data-node-type': node_type() }" rel="tooltip"><i class="icon-wrench"></i></a>
+          <a class="btn btn-mini edit-node-link" title="${ _('Edit') }" rel="tooltip" data-bind="attr: { 'data-node-type': node_type() }"><i class="icon-pencil"></i></a>
+          <a class="btn btn-mini convert-node-link" title="${ _('Convert to Decision') }" data-bind="attr: { 'data-node-type': node_type() }" rel="tooltip"><i class="icon-wrench"></i></a>
           &nbsp;
         </div>
       </div>
@@ -378,18 +380,6 @@ ${ controls.decision_form(link_form, default_link_form, 'decision', True) }
 </script>
 
 <script type="text/html" id="joinTemplate">
-  <div class="node node-join row-fluid">
-    <div class="action span12">
-      <div class="row-fluid">
-        <div class="span12">
-          <h4 data-bind="text: (name()) ? name() : node_type() + '-' + id()"></h4>
-          <span data-bind="text: node_type()" class="muted"></span>
-          <br/>&nbsp;
-        </div>
-      </div>
-    </div>
-
-  </div>
   <div class="row-fluid" data-bind="template: { name: 'linkTemplate', foreach: links() }"></div>
 </script>
 
@@ -424,18 +414,6 @@ ${ controls.decision_form(link_form, default_link_form, 'decision', True) }
 </script>
 
 <script type="text/html" id="decisionEndTemplate">
-  <div class="node node-decisionend row-fluid">
-    <div class="action span12">
-      <div class="row-fluid">
-        <div class="span12">
-          <h4 data-bind="text: 'end-' + id()"></h4>
-          <span data-bind="text: node_type()" class="muted"></span>
-          <br/>&nbsp;
-        </div>
-      </div>
-    </div>
-
-  </div>
   <div class="row-fluid" data-bind="template: { name: 'linkTemplate', foreach: links() }"></div>
 </script>
 
@@ -513,12 +491,12 @@ import_node.loadAvailableNodes({ success: import_load_available_nodes_success })
  * Modals
  */
 // open a modal window for editing a node
-function edit_node_modal(node, save, cancel) {
+function edit_node_modal(node, save, cancel, template) {
   var backup = ko.mapping.toJS(node);
   normalize_model_fields(backup);
 
   modal.hide();
-  modal.setTemplate(node.edit_template);
+  modal.setTemplate(template || node.edit_template);
   modal.show({node: node, read_only: workflow.read_only()});
   modal.recenter(280, 250);
   modal.addDecorations();
@@ -615,6 +593,12 @@ $('#workflow').on('mousedown', '.new-node-link', function(e) {
 $('#workflow').on('click', '.edit-node-link', function(e) {
   var node = ko.contextFor(this).$data;
   edit_node_modal(node);
+});
+
+// Modal for converting to a decision node
+$('#workflow').on('click', '.convert-node-link', function(e) {
+  var node = ko.contextFor(this).$data;
+  edit_node_modal(node, null, null, 'forkConvertTemplate');
 });
 
 // Modal for cloning a node

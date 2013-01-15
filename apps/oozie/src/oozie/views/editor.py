@@ -42,11 +42,12 @@ from oozie.decorators import check_job_access_permission, check_job_edition_perm
 from oozie.import_workflow import import_workflow as _import_workflow
 from oozie.management.commands import oozie_setup
 from oozie.models import Job, Workflow, History, Coordinator,\
-                         Dataset, DataInput, DataOutput, ACTION_TYPES
+                         Dataset, DataInput, DataOutput,\
+                         ACTION_TYPES
 from oozie.forms import WorkflowForm, CoordinatorForm, DatasetForm,\
   DataInputForm, DataOutputForm, LinkForm,\
   DefaultLinkForm, design_form_by_type, ParameterForm,\
-  ImportWorkflowForm
+  ImportWorkflowForm, NodeForm
 
 
 LOG = logging.getLogger(__name__)
@@ -160,6 +161,7 @@ def edit_workflow(request, workflow):
     'job_properties': extract_field_data(workflow_form['job_properties']),
     'link_form': LinkForm(),
     'default_link_form': DefaultLinkForm(action=workflow.start),
+    'node_form': NodeForm(),
     'action_forms': [(node_type, design_form_by_type(node_type, request.user, workflow)())
                      for node_type in ACTION_TYPES.iterkeys()]
   })

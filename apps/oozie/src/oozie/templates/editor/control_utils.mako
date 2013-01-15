@@ -21,14 +21,12 @@
 <%namespace name="utils" file="../utils.inc.mako" />
 
 
-
-
-<%def name="fork_form(node_type, template=True, javascript_attrs={})">
+<%def name="fork_convert_form(node_type, template=True, javascript_attrs={})">
 % if template:
-  <script type="text/html" id="${node_type}EditTemplate">
+  <script type="text/html" id="${node_type}ConvertTemplate">
 % endif
   <div data-bind="with: context().node">
-    <form class="form-horizontal" id="${node_type}-action-form" method="POST">
+    <form class="form-horizontal" id="${node_type}-convert-form" method="POST">
       <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
         <h3 class="message" data-bind="text: '${_('Edit Node: ')}' + name()"></h3>
@@ -56,14 +54,11 @@
 </%def>
 
 
-
-
-
-<%def name="decision_form(link_form, default_link_form, node_type, template=True, javascript_attrs={})">
+<%def name="fork_edit_form(form, node_type, template=True, javascript_attrs={})">
 % if template:
   <script type="text/html" id="${node_type}EditTemplate">
 % endif
-  <div data-bind="with: context">
+  <div data-bind="with: context().node">
     <form class="form-horizontal" id="${node_type}-action-form" method="POST">
       <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
@@ -71,11 +66,51 @@
       </div>
 
       <div class="modal-content">
-        <fieldset>
+        <fieldset class="span12">
+          % for field in form:
+            % if field.html_name in ('name', 'description'):
+              ${ utils.render_field_with_error_js(field, field.name, extra_attrs={'data-bind': 'disable: $root.context().read_only, value: %s' % field.name}) }
+            % endif
+          % endfor
+        </fieldset>
+      </div>
+
+      <div class="modal-footer">
+        <a class="btn cancelButton" href="javascript:void(0);">Cancel</a>
+        <button class="btn btn-primary doneButton" type="button" data-bind="visible: !$root.context().read_only">${ _('Done')}</button>
+      </div>
+
+    </form>
+  </div>
+
+% if template:
+  </script>
+% endif
+</%def>
+
+
+<%def name="decision_form(node_form, link_form, default_link_form, node_type, template=True, javascript_attrs={})">
+% if template:
+  <script type="text/html" id="${node_type}EditTemplate">
+% endif
+  <div data-bind="with: context().node">
+    <form class="form-horizontal" id="${node_type}-action-form" method="POST">
+      <div class="modal-header">
+        <a href="#" class="close" data-dismiss="modal">&times;</a>
+        <h3 class="message" data-bind="text: '${_('Edit Node: ')}' + name()"></h3>
+      </div>
+
+      <div class="modal-content">
+        <fieldset class="span12">
+          % for field in node_form:
+            % if field.html_name in ('name', 'description'):
+              ${ utils.render_field_with_error_js(field, field.name, extra_attrs={'data-bind': 'disable: $root.context().read_only, value: %s' % field.name}) }
+            % endif
+          % endfor
 
           <div class="control-group">
             <label class="control-label"></label>
-            <div class="controls span8">
+            <div class="controls">
               <div>${ _('Examples of predicates:') }</div>
               <div class="well">
                 ${"${"} fs:fileSize(secondjobOutputDir) gt 10 * GB }
@@ -87,62 +122,58 @@
             </div>
           </div>
 
-          <div class="control-group">
-            <label class="control-label"></label>
-            <div class="controls">
-              <table class="table-condensed">
-                <thead>
-                  <tr>
-                    <th>${ _('Predicate') }</th>
-                    <th/>
-                    <th>${ _('Action') }</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <!-- ko foreach: links() -->
-                  <tr>
-                    <td>
-                      ${ utils.render_field(link_form['comment'], extra_attrs={'data-bind': 'value: comment'}) }
-                    </td>
-                    <td class="center">
-                      ${ _('go to') }
-                    </td>
-                    <td class="right">
-                      <a class="span3 edit-node-link" data-bind="text: $parent.registry.get(child()).name()"></a>
-                    </td>
-                  </tr>
-                  <!-- /ko -->
+          <table class="table-condensed">
+            <thead>
+              <tr>
+                <th>${ _('Predicate') }</th>
+                <th/>
+                <th>${ _('Action') }</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- ko foreach: links() -->
+              <tr>
+                <td>
+                  ${ utils.render_field(link_form['comment'], extra_attrs={'data-bind': 'value: comment'}) }
+                </td>
+                <td class="center">
+                  ${ _('go to') }
+                </td>
+                <td class="right">
+                  <a class="span3 edit-node-link" data-bind="text: $parent.registry.get(child()).name()"></a>
+                </td>
+              </tr>
+              <!-- /ko -->
 
-                  <!-- ko foreach: meta_links() -->
-                    <!-- ko if: $data.name() == 'default' -->
-                    <tr>
-                      <td>
-                       <div class="control-group">
-                          <label class="control-label"></label>
-                          <div class="controls span8">
-                            <div>${ _('default') }</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td class="center">
-                        ${ _('go to') }
-                      </td>
-                      <td class="right">
-                        ${ utils.render_field(default_link_form['child'], extra_attrs={'data-bind': 'value: child'}) }
-                      </td>
-                    </tr>
-                    <!-- /ko -->
-                  <!-- /ko -->
-                </tbody>
-              </table>
-            </div>
-          </div>
+              <!-- ko foreach: meta_links() -->
+                <!-- ko if: $data.name() == 'default' -->
+                <tr>
+                  <td>
+                   <div class="control-group">
+                      <label class="control-label"></label>
+                      <div class="controls">
+                        <div>${ _('default') }</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="center nowrap">
+                    ${ _('go to') }
+                  </td>
+                  <td class="right">
+                    ${ utils.render_field(default_link_form['child'], extra_attrs={'data-bind': 'value: child'}) }
+                  </td>
+                </tr>
+                <!-- /ko -->
+              <!-- /ko -->
+            </tbody>
+          </table>
 
         </fieldset>
       </div>
 
       <div class="modal-footer">
-        <button data-dismiss="modal" class="btn btn-primary">${ _('Done')}</button>
+        <a class="btn cancelButton" href="javascript:void(0);">Cancel</a>
+        <button class="btn btn-primary doneButton" type="button" data-bind="visible: !$root.context().read_only">${ _('Done')}</button>
       </div>
 
     </form>
@@ -152,6 +183,7 @@
   </script>
 % endif
 </%def>
+
 
 <%def name="links_form_fields(link_form, default_link_form, javascript_attrs={})">
 
