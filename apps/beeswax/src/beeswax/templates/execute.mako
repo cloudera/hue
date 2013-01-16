@@ -210,13 +210,16 @@ ${layout.menubar(section='query')}
                                 ${_("Enable Parameterization")}
                             </label>
                         </li>
-                        <ul
-                        % if app_name == 'impala':
-                            class="hide"
-                        % endif
-                        >
-                          <li class="nav-header">${_('Email Notification')}</li>
-                          <li>
+                          <li class="nav-header
+                            % if app_name == 'impala':
+                                hide
+                            % endif
+                          ">${_('Email Notification')}</li>
+                          <li
+	                        % if app_name == 'impala':
+	                            class="hide"
+	                        % endif
+                          >
                             <label class="checkbox" rel="tooltip" data-original-title="${_("If checked, you will receive an email notification when the query completes.")}">
                                 <input type="checkbox" id="id_${form.query["email_notify"].html_name | n}" name="${form.query["email_notify"].html_name | n}" ${extract_field_data(form.query["email_notify"]) and "CHECKED" or ""}/>
                                 ${_("Email me on completion")}

@@ -175,7 +175,7 @@ class Dbms:
     return None
 
 
-  def execute_and_watch(self, query, design=None, notify=False):
+  def execute_and_watch(self, query, design=None):
     """
     Run query and return a QueryHistory object in order to see its progress on a Web page.
     """
@@ -189,7 +189,7 @@ class Dbms:
                                 server_type=self.server_type,
                                 last_state=QueryHistory.STATE.submitted.index,
                                 design=design,
-                                notify=notify)
+                                notify=query.query.get('email_notify', False))
     query_history.save()
 
     LOG.debug("Made new QueryHistory id %s user %s query: %s..." % (query_history.id, self.client.user, query_history.query[:25]))

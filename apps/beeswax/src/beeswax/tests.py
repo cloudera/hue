@@ -59,11 +59,11 @@ CSV_LINK_PAT = re.compile('/beeswax/download/\d+/csv')
 def _make_query(client, query, submission_type="Execute",
                 udfs=None, settings=None, resources=[],
                 wait=False, name=None, desc=None, local=True,
-                is_parameterized=True, max=30.0, database='default', **kwargs):
+                is_parameterized=True, max=30.0, database='default', email_notify=False, **kwargs):
   """Wrapper around the real make_query"""
   res = make_query(client, query, submission_type,
                    udfs, settings, resources,
-                   wait, name, desc, local, is_parameterized, max, database, **kwargs)
+                   wait, name, desc, local, is_parameterized, max, database, email_notify, **kwargs)
 
   # Should be in the history if it's submitted.
   if submission_type == 'Execute':
@@ -503,6 +503,25 @@ for x in sys.stdin:
     # Get the result in csv. Should have 3 + 1 header row.
     csv_resp = download(handle, 'csv', self.db)
     assert_equal(len(csv_resp.content.strip().split('\n')), limit + 1)
+
+  def test_query_done_cb(self):
+    hql = 'SELECT * FROM test'
+    query = hql_query(hql)
+    query._data_dict['query']['email_notify'] = False
+    query_history = self.db.execute_and_watch(query)
+
+    response = self.client.get('/beeswax/query_cb/done/%s' % query_history.server_id)
+    assert_true('email_notify is false' in response.content, response.content)
+
+    query = hql_query(hql)
+    query._data_dict['query']['email_notify'] = True
+    query_history = self.db.execute_and_watch(query)
+
+    response = self.client.get('/beeswax/query_cb/done/%s' % query_history.server_id,)
+    assert_true('sent' in response.content, response.content)
+
+    response = self.client.get('/beeswax/query_cb/done/blahblahblah')
+    assert_true('QueryHistory matching query does not exist' in response.content, response.content)
 
   def test_data_export(self):
     hql = 'SELECT * FROM test'

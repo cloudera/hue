@@ -353,7 +353,7 @@ class Coordinator(Job):
     end = mktime(self.endTime)
 
     if end != start:
-      return int((1 - (end - next) / (end - start)) * 100)
+      return min(int((1 - (end - next) / (end - start)) * 100), 100)
     else:
       return 100
 

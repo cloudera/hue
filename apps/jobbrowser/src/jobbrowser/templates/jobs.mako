@@ -136,7 +136,7 @@ ${ commonheader(_('Job Browser'), "jobbrowser", user) | n,unicode }
                 % endif
             </td>
             <td data-sort-value="${job.startTimeMs}">${job.startTimeFormatted}</td>
-            <td>
+            <td data-row-selector-exclude="true" style="padding-right: 60px">
                 % if (job.status.lower() == 'running' or job.status.lower() == 'pending') and not job.is_mr2:
                   % if request.user.is_superuser or request.user.username == job.user:
                     <a href="#" title="${_('Kill this job')}" kill-action="${url('jobbrowser.views.kill_job', job=job.jobId)}?next=${request.get_full_path() | urlencode}"

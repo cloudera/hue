@@ -1443,11 +1443,11 @@ class History(models.Model):
 
   def get_workflow(self):
     if self.oozie_job_id.endswith('W'):
-      return self.job
+      return self.job.get_full_node()
 
   def get_coordinator(self):
     if self.oozie_job_id.endswith('C'):
-      return self.job
+      return self.job.get_full_node()
 
   @classmethod
   def get_workflow_from_config(self, conf_dict):

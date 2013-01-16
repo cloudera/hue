@@ -215,9 +215,12 @@ ${ layout.menubar(section='coordinators') }
     });
 
     $("#id_workflow").change(function () {
-      $("#workflowName").text($("#id_workflow option[value='" + $(this).val() + "']").text());
+      if ($(this).val()) {
+        $("#workflowName").text($("#id_workflow option[value='" + $(this).val() + "']").text());
+      }
     });
 
+    $("#id_workflow").change();
   });
 </script>
 
