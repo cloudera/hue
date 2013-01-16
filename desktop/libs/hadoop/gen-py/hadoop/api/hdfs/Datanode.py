@@ -119,7 +119,7 @@ class Processor(Iface, TProcessor):
     result = readBlock_result()
     try:
       result.success = self._handler.readBlock(args.ctx, args.block, args.offset, args.length)
-    except hadoop.api.common.ttypes.IOException as err:
+    except hadoop.api.common.ttypes.IOException, err:
       result.err = err
     oprot.writeMessageBegin("readBlock", TMessageType.REPLY, seqid)
     result.write(oprot)

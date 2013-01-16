@@ -1242,7 +1242,7 @@ class Processor(hadoop.api.common.HadoopServiceBase.Processor, Iface, TProcessor
     result = chmod_result()
     try:
       self._handler.chmod(args.ctx, args.path, args.perms)
-    except hadoop.api.common.ttypes.IOException as err:
+    except hadoop.api.common.ttypes.IOException, err:
       result.err = err
     oprot.writeMessageBegin("chmod", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -1256,7 +1256,7 @@ class Processor(hadoop.api.common.HadoopServiceBase.Processor, Iface, TProcessor
     result = chown_result()
     try:
       self._handler.chown(args.ctx, args.path, args.owner, args.group)
-    except hadoop.api.common.ttypes.IOException as err:
+    except hadoop.api.common.ttypes.IOException, err:
       result.err = err
     oprot.writeMessageBegin("chown", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -1281,7 +1281,7 @@ class Processor(hadoop.api.common.HadoopServiceBase.Processor, Iface, TProcessor
     result = enterSafeMode_result()
     try:
       self._handler.enterSafeMode(args.ctx)
-    except hadoop.api.common.ttypes.IOException as err:
+    except hadoop.api.common.ttypes.IOException, err:
       result.err = err
     oprot.writeMessageBegin("enterSafeMode", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -1295,7 +1295,7 @@ class Processor(hadoop.api.common.HadoopServiceBase.Processor, Iface, TProcessor
     result = getBlocks_result()
     try:
       result.success = self._handler.getBlocks(args.ctx, args.path, args.offset, args.length)
-    except hadoop.api.common.ttypes.IOException as err:
+    except hadoop.api.common.ttypes.IOException, err:
       result.err = err
     oprot.writeMessageBegin("getBlocks", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -1309,7 +1309,7 @@ class Processor(hadoop.api.common.HadoopServiceBase.Processor, Iface, TProcessor
     result = getPreferredBlockSize_result()
     try:
       result.success = self._handler.getPreferredBlockSize(args.ctx, args.path)
-    except hadoop.api.common.ttypes.IOException as err:
+    except hadoop.api.common.ttypes.IOException, err:
       result.err = err
     oprot.writeMessageBegin("getPreferredBlockSize", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -1323,7 +1323,7 @@ class Processor(hadoop.api.common.HadoopServiceBase.Processor, Iface, TProcessor
     result = isInSafeMode_result()
     try:
       result.success = self._handler.isInSafeMode(args.ctx)
-    except hadoop.api.common.ttypes.IOException as err:
+    except hadoop.api.common.ttypes.IOException, err:
       result.err = err
     oprot.writeMessageBegin("isInSafeMode", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -1337,7 +1337,7 @@ class Processor(hadoop.api.common.HadoopServiceBase.Processor, Iface, TProcessor
     result = leaveSafeMode_result()
     try:
       self._handler.leaveSafeMode(args.ctx)
-    except hadoop.api.common.ttypes.IOException as err:
+    except hadoop.api.common.ttypes.IOException, err:
       result.err = err
     oprot.writeMessageBegin("leaveSafeMode", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -1351,7 +1351,7 @@ class Processor(hadoop.api.common.HadoopServiceBase.Processor, Iface, TProcessor
     result = ls_result()
     try:
       result.success = self._handler.ls(args.ctx, args.path)
-    except hadoop.api.common.ttypes.IOException as err:
+    except hadoop.api.common.ttypes.IOException, err:
       result.err = err
     oprot.writeMessageBegin("ls", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -1365,7 +1365,7 @@ class Processor(hadoop.api.common.HadoopServiceBase.Processor, Iface, TProcessor
     result = mkdirhier_result()
     try:
       result.success = self._handler.mkdirhier(args.ctx, args.path, args.perms)
-    except hadoop.api.common.ttypes.IOException as err:
+    except hadoop.api.common.ttypes.IOException, err:
       result.err = err
     oprot.writeMessageBegin("mkdirhier", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -1379,7 +1379,7 @@ class Processor(hadoop.api.common.HadoopServiceBase.Processor, Iface, TProcessor
     result = refreshNodes_result()
     try:
       self._handler.refreshNodes(args.ctx)
-    except hadoop.api.common.ttypes.IOException as err:
+    except hadoop.api.common.ttypes.IOException, err:
       result.err = err
     oprot.writeMessageBegin("refreshNodes", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -1393,7 +1393,7 @@ class Processor(hadoop.api.common.HadoopServiceBase.Processor, Iface, TProcessor
     result = rename_result()
     try:
       result.success = self._handler.rename(args.ctx, args.path, args.newPath)
-    except hadoop.api.common.ttypes.IOException as err:
+    except hadoop.api.common.ttypes.IOException, err:
       result.err = err
     oprot.writeMessageBegin("rename", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -1407,7 +1407,7 @@ class Processor(hadoop.api.common.HadoopServiceBase.Processor, Iface, TProcessor
     result = reportBadBlocks_result()
     try:
       self._handler.reportBadBlocks(args.ctx, args.blocks)
-    except hadoop.api.common.ttypes.IOException as err:
+    except hadoop.api.common.ttypes.IOException, err:
       result.err = err
     oprot.writeMessageBegin("reportBadBlocks", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -1421,7 +1421,7 @@ class Processor(hadoop.api.common.HadoopServiceBase.Processor, Iface, TProcessor
     result = stat_result()
     try:
       result.success = self._handler.stat(args.ctx, args.path)
-    except hadoop.api.common.ttypes.IOException as err:
+    except hadoop.api.common.ttypes.IOException, err:
       result.err = err
     oprot.writeMessageBegin("stat", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -1435,7 +1435,7 @@ class Processor(hadoop.api.common.HadoopServiceBase.Processor, Iface, TProcessor
     result = getContentSummary_result()
     try:
       result.success = self._handler.getContentSummary(args.ctx, args.Path)
-    except hadoop.api.common.ttypes.IOException as err:
+    except hadoop.api.common.ttypes.IOException, err:
       result.err = err
     oprot.writeMessageBegin("getContentSummary", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -1449,7 +1449,7 @@ class Processor(hadoop.api.common.HadoopServiceBase.Processor, Iface, TProcessor
     result = multiGetContentSummary_result()
     try:
       result.success = self._handler.multiGetContentSummary(args.ctx, args.paths)
-    except hadoop.api.common.ttypes.IOException as err:
+    except hadoop.api.common.ttypes.IOException, err:
       result.err = err
     oprot.writeMessageBegin("multiGetContentSummary", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -1463,7 +1463,7 @@ class Processor(hadoop.api.common.HadoopServiceBase.Processor, Iface, TProcessor
     result = setQuota_result()
     try:
       self._handler.setQuota(args.ctx, args.path, args.namespaceQuota, args.diskspaceQuota)
-    except hadoop.api.common.ttypes.IOException as err:
+    except hadoop.api.common.ttypes.IOException, err:
       result.err = err
     oprot.writeMessageBegin("setQuota", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -1477,7 +1477,7 @@ class Processor(hadoop.api.common.HadoopServiceBase.Processor, Iface, TProcessor
     result = setReplication_result()
     try:
       result.success = self._handler.setReplication(args.ctx, args.path, args.replication)
-    except hadoop.api.common.ttypes.IOException as err:
+    except hadoop.api.common.ttypes.IOException, err:
       result.err = err
     oprot.writeMessageBegin("setReplication", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -1491,7 +1491,7 @@ class Processor(hadoop.api.common.HadoopServiceBase.Processor, Iface, TProcessor
     result = unlink_result()
     try:
       result.success = self._handler.unlink(args.ctx, args.path, args.recursive)
-    except hadoop.api.common.ttypes.IOException as err:
+    except hadoop.api.common.ttypes.IOException, err:
       result.err = err
     oprot.writeMessageBegin("unlink", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -1505,7 +1505,7 @@ class Processor(hadoop.api.common.HadoopServiceBase.Processor, Iface, TProcessor
     result = utime_result()
     try:
       self._handler.utime(args.ctx, args.path, args.atime, args.mtime)
-    except hadoop.api.common.ttypes.IOException as err:
+    except hadoop.api.common.ttypes.IOException, err:
       result.err = err
     oprot.writeMessageBegin("utime", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -1541,7 +1541,7 @@ class Processor(hadoop.api.common.HadoopServiceBase.Processor, Iface, TProcessor
     result = getDelegationToken_result()
     try:
       result.success = self._handler.getDelegationToken(args.ctx, args.renewer)
-    except hadoop.api.common.ttypes.IOException as err:
+    except hadoop.api.common.ttypes.IOException, err:
       result.err = err
     oprot.writeMessageBegin("getDelegationToken", TMessageType.REPLY, seqid)
     result.write(oprot)

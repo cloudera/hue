@@ -2622,11 +2622,11 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = create_database_result()
     try:
       self._handler.create_database(args.database)
-    except AlreadyExistsException as o1:
+    except AlreadyExistsException, o1:
       result.o1 = o1
-    except InvalidObjectException as o2:
+    except InvalidObjectException, o2:
       result.o2 = o2
-    except MetaException as o3:
+    except MetaException, o3:
       result.o3 = o3
     oprot.writeMessageBegin("create_database", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -2640,9 +2640,9 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = get_database_result()
     try:
       result.success = self._handler.get_database(args.name)
-    except NoSuchObjectException as o1:
+    except NoSuchObjectException, o1:
       result.o1 = o1
-    except MetaException as o2:
+    except MetaException, o2:
       result.o2 = o2
     oprot.writeMessageBegin("get_database", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -2656,11 +2656,11 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = drop_database_result()
     try:
       self._handler.drop_database(args.name, args.deleteData)
-    except NoSuchObjectException as o1:
+    except NoSuchObjectException, o1:
       result.o1 = o1
-    except InvalidOperationException as o2:
+    except InvalidOperationException, o2:
       result.o2 = o2
-    except MetaException as o3:
+    except MetaException, o3:
       result.o3 = o3
     oprot.writeMessageBegin("drop_database", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -2674,7 +2674,7 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = get_databases_result()
     try:
       result.success = self._handler.get_databases(args.pattern)
-    except MetaException as o1:
+    except MetaException, o1:
       result.o1 = o1
     oprot.writeMessageBegin("get_databases", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -2688,7 +2688,7 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = get_all_databases_result()
     try:
       result.success = self._handler.get_all_databases()
-    except MetaException as o1:
+    except MetaException, o1:
       result.o1 = o1
     oprot.writeMessageBegin("get_all_databases", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -2702,9 +2702,9 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = alter_database_result()
     try:
       self._handler.alter_database(args.dbname, args.db)
-    except MetaException as o1:
+    except MetaException, o1:
       result.o1 = o1
-    except NoSuchObjectException as o2:
+    except NoSuchObjectException, o2:
       result.o2 = o2
     oprot.writeMessageBegin("alter_database", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -2718,9 +2718,9 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = get_type_result()
     try:
       result.success = self._handler.get_type(args.name)
-    except MetaException as o1:
+    except MetaException, o1:
       result.o1 = o1
-    except NoSuchObjectException as o2:
+    except NoSuchObjectException, o2:
       result.o2 = o2
     oprot.writeMessageBegin("get_type", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -2734,11 +2734,11 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = create_type_result()
     try:
       result.success = self._handler.create_type(args.type)
-    except AlreadyExistsException as o1:
+    except AlreadyExistsException, o1:
       result.o1 = o1
-    except InvalidObjectException as o2:
+    except InvalidObjectException, o2:
       result.o2 = o2
-    except MetaException as o3:
+    except MetaException, o3:
       result.o3 = o3
     oprot.writeMessageBegin("create_type", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -2752,9 +2752,9 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = drop_type_result()
     try:
       result.success = self._handler.drop_type(args.type)
-    except MetaException as o1:
+    except MetaException, o1:
       result.o1 = o1
-    except NoSuchObjectException as o2:
+    except NoSuchObjectException, o2:
       result.o2 = o2
     oprot.writeMessageBegin("drop_type", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -2768,7 +2768,7 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = get_type_all_result()
     try:
       result.success = self._handler.get_type_all(args.name)
-    except MetaException as o2:
+    except MetaException, o2:
       result.o2 = o2
     oprot.writeMessageBegin("get_type_all", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -2782,11 +2782,11 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = get_fields_result()
     try:
       result.success = self._handler.get_fields(args.db_name, args.table_name)
-    except MetaException as o1:
+    except MetaException, o1:
       result.o1 = o1
-    except UnknownTableException as o2:
+    except UnknownTableException, o2:
       result.o2 = o2
-    except UnknownDBException as o3:
+    except UnknownDBException, o3:
       result.o3 = o3
     oprot.writeMessageBegin("get_fields", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -2800,11 +2800,11 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = get_schema_result()
     try:
       result.success = self._handler.get_schema(args.db_name, args.table_name)
-    except MetaException as o1:
+    except MetaException, o1:
       result.o1 = o1
-    except UnknownTableException as o2:
+    except UnknownTableException, o2:
       result.o2 = o2
-    except UnknownDBException as o3:
+    except UnknownDBException, o3:
       result.o3 = o3
     oprot.writeMessageBegin("get_schema", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -2818,13 +2818,13 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = create_table_result()
     try:
       self._handler.create_table(args.tbl)
-    except AlreadyExistsException as o1:
+    except AlreadyExistsException, o1:
       result.o1 = o1
-    except InvalidObjectException as o2:
+    except InvalidObjectException, o2:
       result.o2 = o2
-    except MetaException as o3:
+    except MetaException, o3:
       result.o3 = o3
-    except NoSuchObjectException as o4:
+    except NoSuchObjectException, o4:
       result.o4 = o4
     oprot.writeMessageBegin("create_table", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -2838,9 +2838,9 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = drop_table_result()
     try:
       self._handler.drop_table(args.dbname, args.name, args.deleteData)
-    except NoSuchObjectException as o1:
+    except NoSuchObjectException, o1:
       result.o1 = o1
-    except MetaException as o3:
+    except MetaException, o3:
       result.o3 = o3
     oprot.writeMessageBegin("drop_table", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -2854,7 +2854,7 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = get_tables_result()
     try:
       result.success = self._handler.get_tables(args.db_name, args.pattern)
-    except MetaException as o1:
+    except MetaException, o1:
       result.o1 = o1
     oprot.writeMessageBegin("get_tables", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -2868,7 +2868,7 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = get_all_tables_result()
     try:
       result.success = self._handler.get_all_tables(args.db_name)
-    except MetaException as o1:
+    except MetaException, o1:
       result.o1 = o1
     oprot.writeMessageBegin("get_all_tables", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -2882,9 +2882,9 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = get_table_result()
     try:
       result.success = self._handler.get_table(args.dbname, args.tbl_name)
-    except MetaException as o1:
+    except MetaException, o1:
       result.o1 = o1
-    except NoSuchObjectException as o2:
+    except NoSuchObjectException, o2:
       result.o2 = o2
     oprot.writeMessageBegin("get_table", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -2898,9 +2898,9 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = alter_table_result()
     try:
       self._handler.alter_table(args.dbname, args.tbl_name, args.new_tbl)
-    except InvalidOperationException as o1:
+    except InvalidOperationException, o1:
       result.o1 = o1
-    except MetaException as o2:
+    except MetaException, o2:
       result.o2 = o2
     oprot.writeMessageBegin("alter_table", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -2914,11 +2914,11 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = add_partition_result()
     try:
       result.success = self._handler.add_partition(args.new_part)
-    except InvalidObjectException as o1:
+    except InvalidObjectException, o1:
       result.o1 = o1
-    except AlreadyExistsException as o2:
+    except AlreadyExistsException, o2:
       result.o2 = o2
-    except MetaException as o3:
+    except MetaException, o3:
       result.o3 = o3
     oprot.writeMessageBegin("add_partition", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -2932,11 +2932,11 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = append_partition_result()
     try:
       result.success = self._handler.append_partition(args.db_name, args.tbl_name, args.part_vals)
-    except InvalidObjectException as o1:
+    except InvalidObjectException, o1:
       result.o1 = o1
-    except AlreadyExistsException as o2:
+    except AlreadyExistsException, o2:
       result.o2 = o2
-    except MetaException as o3:
+    except MetaException, o3:
       result.o3 = o3
     oprot.writeMessageBegin("append_partition", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -2950,11 +2950,11 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = append_partition_by_name_result()
     try:
       result.success = self._handler.append_partition_by_name(args.db_name, args.tbl_name, args.part_name)
-    except InvalidObjectException as o1:
+    except InvalidObjectException, o1:
       result.o1 = o1
-    except AlreadyExistsException as o2:
+    except AlreadyExistsException, o2:
       result.o2 = o2
-    except MetaException as o3:
+    except MetaException, o3:
       result.o3 = o3
     oprot.writeMessageBegin("append_partition_by_name", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -2968,9 +2968,9 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = drop_partition_result()
     try:
       result.success = self._handler.drop_partition(args.db_name, args.tbl_name, args.part_vals, args.deleteData)
-    except NoSuchObjectException as o1:
+    except NoSuchObjectException, o1:
       result.o1 = o1
-    except MetaException as o2:
+    except MetaException, o2:
       result.o2 = o2
     oprot.writeMessageBegin("drop_partition", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -2984,9 +2984,9 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = drop_partition_by_name_result()
     try:
       result.success = self._handler.drop_partition_by_name(args.db_name, args.tbl_name, args.part_name, args.deleteData)
-    except NoSuchObjectException as o1:
+    except NoSuchObjectException, o1:
       result.o1 = o1
-    except MetaException as o2:
+    except MetaException, o2:
       result.o2 = o2
     oprot.writeMessageBegin("drop_partition_by_name", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -3000,9 +3000,9 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = get_partition_result()
     try:
       result.success = self._handler.get_partition(args.db_name, args.tbl_name, args.part_vals)
-    except MetaException as o1:
+    except MetaException, o1:
       result.o1 = o1
-    except NoSuchObjectException as o2:
+    except NoSuchObjectException, o2:
       result.o2 = o2
     oprot.writeMessageBegin("get_partition", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -3016,9 +3016,9 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = get_partition_with_auth_result()
     try:
       result.success = self._handler.get_partition_with_auth(args.db_name, args.tbl_name, args.part_vals, args.user_name, args.group_names)
-    except MetaException as o1:
+    except MetaException, o1:
       result.o1 = o1
-    except NoSuchObjectException as o2:
+    except NoSuchObjectException, o2:
       result.o2 = o2
     oprot.writeMessageBegin("get_partition_with_auth", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -3032,9 +3032,9 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = get_partition_by_name_result()
     try:
       result.success = self._handler.get_partition_by_name(args.db_name, args.tbl_name, args.part_name)
-    except MetaException as o1:
+    except MetaException, o1:
       result.o1 = o1
-    except NoSuchObjectException as o2:
+    except NoSuchObjectException, o2:
       result.o2 = o2
     oprot.writeMessageBegin("get_partition_by_name", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -3048,9 +3048,9 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = get_partitions_result()
     try:
       result.success = self._handler.get_partitions(args.db_name, args.tbl_name, args.max_parts)
-    except NoSuchObjectException as o1:
+    except NoSuchObjectException, o1:
       result.o1 = o1
-    except MetaException as o2:
+    except MetaException, o2:
       result.o2 = o2
     oprot.writeMessageBegin("get_partitions", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -3064,9 +3064,9 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = get_partitions_with_auth_result()
     try:
       result.success = self._handler.get_partitions_with_auth(args.db_name, args.tbl_name, args.max_parts, args.user_name, args.group_names)
-    except NoSuchObjectException as o1:
+    except NoSuchObjectException, o1:
       result.o1 = o1
-    except MetaException as o2:
+    except MetaException, o2:
       result.o2 = o2
     oprot.writeMessageBegin("get_partitions_with_auth", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -3080,7 +3080,7 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = get_partition_names_result()
     try:
       result.success = self._handler.get_partition_names(args.db_name, args.tbl_name, args.max_parts)
-    except MetaException as o2:
+    except MetaException, o2:
       result.o2 = o2
     oprot.writeMessageBegin("get_partition_names", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -3094,7 +3094,7 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = get_partitions_ps_result()
     try:
       result.success = self._handler.get_partitions_ps(args.db_name, args.tbl_name, args.part_vals, args.max_parts)
-    except MetaException as o1:
+    except MetaException, o1:
       result.o1 = o1
     oprot.writeMessageBegin("get_partitions_ps", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -3108,9 +3108,9 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = get_partitions_ps_with_auth_result()
     try:
       result.success = self._handler.get_partitions_ps_with_auth(args.db_name, args.tbl_name, args.part_vals, args.max_parts, args.user_name, args.group_names)
-    except NoSuchObjectException as o1:
+    except NoSuchObjectException, o1:
       result.o1 = o1
-    except MetaException as o2:
+    except MetaException, o2:
       result.o2 = o2
     oprot.writeMessageBegin("get_partitions_ps_with_auth", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -3124,7 +3124,7 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = get_partition_names_ps_result()
     try:
       result.success = self._handler.get_partition_names_ps(args.db_name, args.tbl_name, args.part_vals, args.max_parts)
-    except MetaException as o1:
+    except MetaException, o1:
       result.o1 = o1
     oprot.writeMessageBegin("get_partition_names_ps", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -3138,9 +3138,9 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = get_partitions_by_filter_result()
     try:
       result.success = self._handler.get_partitions_by_filter(args.db_name, args.tbl_name, args.filter, args.max_parts)
-    except MetaException as o1:
+    except MetaException, o1:
       result.o1 = o1
-    except NoSuchObjectException as o2:
+    except NoSuchObjectException, o2:
       result.o2 = o2
     oprot.writeMessageBegin("get_partitions_by_filter", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -3154,9 +3154,9 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = alter_partition_result()
     try:
       self._handler.alter_partition(args.db_name, args.tbl_name, args.new_part)
-    except InvalidOperationException as o1:
+    except InvalidOperationException, o1:
       result.o1 = o1
-    except MetaException as o2:
+    except MetaException, o2:
       result.o2 = o2
     oprot.writeMessageBegin("alter_partition", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -3170,7 +3170,7 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = get_config_value_result()
     try:
       result.success = self._handler.get_config_value(args.name, args.defaultValue)
-    except ConfigValSecurityException as o1:
+    except ConfigValSecurityException, o1:
       result.o1 = o1
     oprot.writeMessageBegin("get_config_value", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -3184,7 +3184,7 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = partition_name_to_vals_result()
     try:
       result.success = self._handler.partition_name_to_vals(args.part_name)
-    except MetaException as o1:
+    except MetaException, o1:
       result.o1 = o1
     oprot.writeMessageBegin("partition_name_to_vals", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -3198,7 +3198,7 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = partition_name_to_spec_result()
     try:
       result.success = self._handler.partition_name_to_spec(args.part_name)
-    except MetaException as o1:
+    except MetaException, o1:
       result.o1 = o1
     oprot.writeMessageBegin("partition_name_to_spec", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -3212,11 +3212,11 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = add_index_result()
     try:
       result.success = self._handler.add_index(args.new_index, args.index_table)
-    except InvalidObjectException as o1:
+    except InvalidObjectException, o1:
       result.o1 = o1
-    except AlreadyExistsException as o2:
+    except AlreadyExistsException, o2:
       result.o2 = o2
-    except MetaException as o3:
+    except MetaException, o3:
       result.o3 = o3
     oprot.writeMessageBegin("add_index", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -3230,9 +3230,9 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = alter_index_result()
     try:
       self._handler.alter_index(args.dbname, args.base_tbl_name, args.idx_name, args.new_idx)
-    except InvalidOperationException as o1:
+    except InvalidOperationException, o1:
       result.o1 = o1
-    except MetaException as o2:
+    except MetaException, o2:
       result.o2 = o2
     oprot.writeMessageBegin("alter_index", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -3246,9 +3246,9 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = drop_index_by_name_result()
     try:
       result.success = self._handler.drop_index_by_name(args.db_name, args.tbl_name, args.index_name, args.deleteData)
-    except NoSuchObjectException as o1:
+    except NoSuchObjectException, o1:
       result.o1 = o1
-    except MetaException as o2:
+    except MetaException, o2:
       result.o2 = o2
     oprot.writeMessageBegin("drop_index_by_name", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -3262,9 +3262,9 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = get_index_by_name_result()
     try:
       result.success = self._handler.get_index_by_name(args.db_name, args.tbl_name, args.index_name)
-    except MetaException as o1:
+    except MetaException, o1:
       result.o1 = o1
-    except NoSuchObjectException as o2:
+    except NoSuchObjectException, o2:
       result.o2 = o2
     oprot.writeMessageBegin("get_index_by_name", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -3278,9 +3278,9 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = get_indexes_result()
     try:
       result.success = self._handler.get_indexes(args.db_name, args.tbl_name, args.max_indexes)
-    except NoSuchObjectException as o1:
+    except NoSuchObjectException, o1:
       result.o1 = o1
-    except MetaException as o2:
+    except MetaException, o2:
       result.o2 = o2
     oprot.writeMessageBegin("get_indexes", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -3294,7 +3294,7 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = get_index_names_result()
     try:
       result.success = self._handler.get_index_names(args.db_name, args.tbl_name, args.max_indexes)
-    except MetaException as o2:
+    except MetaException, o2:
       result.o2 = o2
     oprot.writeMessageBegin("get_index_names", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -3308,7 +3308,7 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = create_role_result()
     try:
       result.success = self._handler.create_role(args.role)
-    except MetaException as o1:
+    except MetaException, o1:
       result.o1 = o1
     oprot.writeMessageBegin("create_role", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -3322,7 +3322,7 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = drop_role_result()
     try:
       result.success = self._handler.drop_role(args.role_name)
-    except MetaException as o1:
+    except MetaException, o1:
       result.o1 = o1
     oprot.writeMessageBegin("drop_role", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -3336,7 +3336,7 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = get_role_names_result()
     try:
       result.success = self._handler.get_role_names()
-    except MetaException as o1:
+    except MetaException, o1:
       result.o1 = o1
     oprot.writeMessageBegin("get_role_names", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -3350,7 +3350,7 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = grant_role_result()
     try:
       result.success = self._handler.grant_role(args.role_name, args.principal_name, args.principal_type, args.grantor, args.grantorType, args.grant_option)
-    except MetaException as o1:
+    except MetaException, o1:
       result.o1 = o1
     oprot.writeMessageBegin("grant_role", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -3364,7 +3364,7 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = revoke_role_result()
     try:
       result.success = self._handler.revoke_role(args.role_name, args.principal_name, args.principal_type)
-    except MetaException as o1:
+    except MetaException, o1:
       result.o1 = o1
     oprot.writeMessageBegin("revoke_role", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -3378,7 +3378,7 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = list_roles_result()
     try:
       result.success = self._handler.list_roles(args.principal_name, args.principal_type)
-    except MetaException as o1:
+    except MetaException, o1:
       result.o1 = o1
     oprot.writeMessageBegin("list_roles", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -3392,7 +3392,7 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = get_privilege_set_result()
     try:
       result.success = self._handler.get_privilege_set(args.hiveObject, args.user_name, args.group_names)
-    except MetaException as o1:
+    except MetaException, o1:
       result.o1 = o1
     oprot.writeMessageBegin("get_privilege_set", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -3406,7 +3406,7 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = list_privileges_result()
     try:
       result.success = self._handler.list_privileges(args.principal_name, args.principal_type, args.hiveObject)
-    except MetaException as o1:
+    except MetaException, o1:
       result.o1 = o1
     oprot.writeMessageBegin("list_privileges", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -3420,7 +3420,7 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = grant_privileges_result()
     try:
       result.success = self._handler.grant_privileges(args.privileges)
-    except MetaException as o1:
+    except MetaException, o1:
       result.o1 = o1
     oprot.writeMessageBegin("grant_privileges", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -3434,7 +3434,7 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = revoke_privileges_result()
     try:
       result.success = self._handler.revoke_privileges(args.privileges)
-    except MetaException as o1:
+    except MetaException, o1:
       result.o1 = o1
     oprot.writeMessageBegin("revoke_privileges", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -3448,7 +3448,7 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = get_delegation_token_result()
     try:
       result.success = self._handler.get_delegation_token(args.renewer_kerberos_principal_name)
-    except MetaException as o1:
+    except MetaException, o1:
       result.o1 = o1
     oprot.writeMessageBegin("get_delegation_token", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -3462,7 +3462,7 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = get_delegation_token_with_signature_result()
     try:
       result.success = self._handler.get_delegation_token_with_signature(args.renewer_kerberos_principal_name, args.token_signature)
-    except MetaException as o1:
+    except MetaException, o1:
       result.o1 = o1
     oprot.writeMessageBegin("get_delegation_token_with_signature", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -3476,7 +3476,7 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = renew_delegation_token_result()
     try:
       result.success = self._handler.renew_delegation_token(args.token_str_form)
-    except MetaException as o1:
+    except MetaException, o1:
       result.o1 = o1
     oprot.writeMessageBegin("renew_delegation_token", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -3490,7 +3490,7 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     result = cancel_delegation_token_result()
     try:
       self._handler.cancel_delegation_token(args.token_str_form)
-    except MetaException as o1:
+    except MetaException, o1:
       result.o1 = o1
     oprot.writeMessageBegin("cancel_delegation_token", TMessageType.REPLY, seqid)
     result.write(oprot)

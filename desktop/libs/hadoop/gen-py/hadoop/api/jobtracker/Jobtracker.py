@@ -1265,7 +1265,7 @@ class Processor(hadoop.api.common.HadoopServiceBase.Processor, Iface, TProcessor
     result = getQueues_result()
     try:
       result.success = self._handler.getQueues(args.ctx)
-    except hadoop.api.common.ttypes.IOException as err:
+    except hadoop.api.common.ttypes.IOException, err:
       result.err = err
     oprot.writeMessageBegin("getQueues", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -1279,7 +1279,7 @@ class Processor(hadoop.api.common.HadoopServiceBase.Processor, Iface, TProcessor
     result = getJob_result()
     try:
       result.success = self._handler.getJob(args.ctx, args.jobID)
-    except JobNotFoundException as err:
+    except JobNotFoundException, err:
       result.err = err
     oprot.writeMessageBegin("getJob", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -1315,7 +1315,7 @@ class Processor(hadoop.api.common.HadoopServiceBase.Processor, Iface, TProcessor
     result = getRetiredJob_result()
     try:
       result.success = self._handler.getRetiredJob(args.ctx, args.jobID)
-    except JobNotFoundException as err:
+    except JobNotFoundException, err:
       result.err = err
     oprot.writeMessageBegin("getRetiredJob", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -1384,7 +1384,7 @@ class Processor(hadoop.api.common.HadoopServiceBase.Processor, Iface, TProcessor
     result = getTaskList_result()
     try:
       result.success = self._handler.getTaskList(args.ctx, args.jobID, args.types, args.states, args.text, args.count, args.offset)
-    except JobNotFoundException as err:
+    except JobNotFoundException, err:
       result.err = err
     oprot.writeMessageBegin("getTaskList", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -1398,9 +1398,9 @@ class Processor(hadoop.api.common.HadoopServiceBase.Processor, Iface, TProcessor
     result = getTask_result()
     try:
       result.success = self._handler.getTask(args.ctx, args.taskID)
-    except JobNotFoundException as jnf:
+    except JobNotFoundException, jnf:
       result.jnf = jnf
-    except TaskNotFoundException as tnf:
+    except TaskNotFoundException, tnf:
       result.tnf = tnf
     oprot.writeMessageBegin("getTask", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -1414,7 +1414,7 @@ class Processor(hadoop.api.common.HadoopServiceBase.Processor, Iface, TProcessor
     result = getJobCounters_result()
     try:
       result.success = self._handler.getJobCounters(args.ctx, args.jobID)
-    except JobNotFoundException as err:
+    except JobNotFoundException, err:
       result.err = err
     oprot.writeMessageBegin("getJobCounters", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -1428,7 +1428,7 @@ class Processor(hadoop.api.common.HadoopServiceBase.Processor, Iface, TProcessor
     result = getJobCounterRollups_result()
     try:
       result.success = self._handler.getJobCounterRollups(args.ctx, args.jobID)
-    except JobNotFoundException as err:
+    except JobNotFoundException, err:
       result.err = err
     oprot.writeMessageBegin("getJobCounterRollups", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -1475,7 +1475,7 @@ class Processor(hadoop.api.common.HadoopServiceBase.Processor, Iface, TProcessor
     result = getTracker_result()
     try:
       result.success = self._handler.getTracker(args.ctx, args.name)
-    except TaskTrackerNotFoundException as tne:
+    except TaskTrackerNotFoundException, tne:
       result.tne = tne
     oprot.writeMessageBegin("getTracker", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -1500,7 +1500,7 @@ class Processor(hadoop.api.common.HadoopServiceBase.Processor, Iface, TProcessor
     result = getJobConfXML_result()
     try:
       result.success = self._handler.getJobConfXML(args.ctx, args.jobID)
-    except hadoop.api.common.ttypes.IOException as err:
+    except hadoop.api.common.ttypes.IOException, err:
       result.err = err
     oprot.writeMessageBegin("getJobConfXML", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -1514,9 +1514,9 @@ class Processor(hadoop.api.common.HadoopServiceBase.Processor, Iface, TProcessor
     result = killJob_result()
     try:
       self._handler.killJob(args.ctx, args.jobID)
-    except hadoop.api.common.ttypes.IOException as err:
+    except hadoop.api.common.ttypes.IOException, err:
       result.err = err
-    except JobNotFoundException as jne:
+    except JobNotFoundException, jne:
       result.jne = jne
     oprot.writeMessageBegin("killJob", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -1530,11 +1530,11 @@ class Processor(hadoop.api.common.HadoopServiceBase.Processor, Iface, TProcessor
     result = killTaskAttempt_result()
     try:
       self._handler.killTaskAttempt(args.ctx, args.attemptID)
-    except hadoop.api.common.ttypes.IOException as err:
+    except hadoop.api.common.ttypes.IOException, err:
       result.err = err
-    except TaskAttemptNotFoundException as tne:
+    except TaskAttemptNotFoundException, tne:
       result.tne = tne
-    except JobNotFoundException as jne:
+    except JobNotFoundException, jne:
       result.jne = jne
     oprot.writeMessageBegin("killTaskAttempt", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -1548,9 +1548,9 @@ class Processor(hadoop.api.common.HadoopServiceBase.Processor, Iface, TProcessor
     result = setJobPriority_result()
     try:
       self._handler.setJobPriority(args.ctx, args.jobID, args.priority)
-    except hadoop.api.common.ttypes.IOException as err:
+    except hadoop.api.common.ttypes.IOException, err:
       result.err = err
-    except JobNotFoundException as jne:
+    except JobNotFoundException, jne:
       result.jne = jne
     oprot.writeMessageBegin("setJobPriority", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -1564,7 +1564,7 @@ class Processor(hadoop.api.common.HadoopServiceBase.Processor, Iface, TProcessor
     result = getDelegationToken_result()
     try:
       result.success = self._handler.getDelegationToken(args.ctx, args.renewer)
-    except hadoop.api.common.ttypes.IOException as err:
+    except hadoop.api.common.ttypes.IOException, err:
       result.err = err
     oprot.writeMessageBegin("getDelegationToken", TMessageType.REPLY, seqid)
     result.write(oprot)
