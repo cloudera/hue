@@ -1799,15 +1799,16 @@ class TestDashboardNoMocking:
 class TestDashboard(OozieMockBase):
 
   def test_manage_workflow_dashboard(self):
-    # Kill button in response
+    # Display of buttons happens in js now
     response = self.c.get(reverse('oozie:list_oozie_workflow', args=[MockOozieApi.WORKFLOW_IDS[0]]), {}, follow=True)
     assert_true(('%s/kill' % MockOozieApi.WORKFLOW_IDS[0]) in response.content, response.content)
-    assert_false('Rerun' in response.content, response.content)
+    assert_true(('rerun_oozie_job/%s' % MockOozieApi.WORKFLOW_IDS[0]) in response.content, response.content)
+    assert_true(('%s/suspend' % MockOozieApi.WORKFLOW_IDS[0]) in response.content, response.content)
+    assert_true(('%s/resume' % MockOozieApi.WORKFLOW_IDS[0]) in response.content, response.content)
 
-    # Rerun button in response
     response = self.c.get(reverse('oozie:list_oozie_workflow', args=[MockOozieApi.WORKFLOW_IDS[1]]), {}, follow=True)
-    assert_false(('%s/kill' % MockOozieApi.WORKFLOW_IDS[1]) in response.content, response.content)
-    assert_true('Rerun' in response.content, response.content)
+    assert_true(('%s/kill' % MockOozieApi.WORKFLOW_IDS[1]) in response.content, response.content)
+    assert_true(('rerun_oozie_job/%s' % MockOozieApi.WORKFLOW_IDS[1]) in response.content, response.content)
 
 
   def test_manage_coordinator_dashboard(self):
