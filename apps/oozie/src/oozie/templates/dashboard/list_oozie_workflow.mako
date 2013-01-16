@@ -88,10 +88,13 @@ ${ layout.menubar(section='dashboard') }
           % if has_job_edition_permission(oozie_workflow, user):
               <li class="nav-header">${ _('Manage') }</li>
               <li>
-              % if oozie_workflow.is_running():
                 <button title="${_('Kill %(workflow)s') % dict(workflow=oozie_workflow.id)}"
-                   id="kill-workflow"
-                   class="btn btn-small btn-danger confirmationModal"
+                   id="kill-btn"
+                   class="btn btn-small btn-danger confirmationModal
+                   % if not oozie_workflow.is_running():
+                     hide
+                   % endif
+                   "
                    alt="${ _('Are you sure you want to kill workflow %s?') %  oozie_workflow.id }"
                    href="javascript:void(0)"
                    data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_workflow.id, action='kill') }"
@@ -99,26 +102,43 @@ ${ layout.menubar(section='dashboard') }
                    data-confirmation-message="${ _('Are you sure you\'d like to kill this job?') }">
                 ${_('Kill')}
                 </button>
-              % else:
-                % if oozie_workflow.id:
-                  <button title="${ _('Rerun the same workflow') }" id="rerun-btn"
-                     data-rerun-url="${ url('oozie:rerun_oozie_job', job_id=oozie_workflow.id, app_path=oozie_workflow.appPath) }"
-                     class="btn btn-small">
-                    ${ _('Rerun') }
-                  </button>
-                  <div id="rerun-wf-modal" class="modal hide"></div>
-                % endif
-              % endif
+                <button title="${ _('Suspend the workflow') }" id="suspend-btn"
+                   data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_workflow.id, action='suspend') }"
+                   data-confirmation-message="${ _('Are you sure you\'d like to suspend this job?') }"
+                   class="btn btn-small confirmationModal
+                   % if not oozie_workflow.is_running():
+                     hide
+                   % endif
+                   ">
+                  ${ _('Suspend') }
+                </button>
+                <button title="${ _('Resume the workflow') }" id="resume-btn"
+                   data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_workflow.id, action='resume') }"
+                   data-confirmation-message="${ _('Are you sure you\'d like to resume this job?') }"
+                   class="btn btn-small confirmationModal
+                   % if oozie_workflow.is_running():
+                     hide
+                   % endif
+                   ">
+                  ${ _('Resume') }
+                </button>
+                <button title="${ _('Rerun the same workflow') }" id="rerun-btn"
+                   data-rerun-url="${ url('oozie:rerun_oozie_job', job_id=oozie_workflow.id, app_path=oozie_workflow.appPath) }"
+                   class="btn btn-small
+                   % if oozie_workflow.is_running():
+                     hide
+                   % endif
+                   ">
+                  ${ _('Rerun') }
+                </button>
+                <div id="rerun-wf-modal" class="modal hide"></div>
               </li>
           % endif
-
         </ul>
       </div>
     </div>
 
     <div class="span9">
-
-
       <ul class="nav nav-tabs">
         % if workflow_graph:
             <li class="active"><a href="#graph" data-toggle="tab">${ _('Graph') }</a></li>
@@ -333,7 +353,7 @@ ${ layout.menubar(section='dashboard') }
       name: action.name,
       type: action.type,
       status: action.status,
-      statusClass: "label "+getStatusClass(action.status),
+      statusClass: "label " + getStatusClass(action.status),
       externalIdUrl: action.externalIdUrl,
       externalId: action.externalId,
       startTime: action.startTime,
@@ -398,7 +418,37 @@ ${ layout.menubar(section='dashboard') }
       });
     });
 
-    $("#kill-workflow").bind('confirmation', function() {
+    $("#kill-btn").bind('confirmation', function() {
+      var _this = this;
+      $.post($(this).data("url"),
+        { 'notification': $(this).data("message") },
+        function(response) {
+          if (response['status'] != 0) {
+            $.jHueNotify.error("${ _('Error: ') }" + response['data']);
+          } else {
+            window.location.reload();
+          }
+        }
+      );
+      return false;
+    });
+
+    $("#suspend-btn").bind('confirmation', function() {
+      var _this = this;
+      $.post($(this).data("url"),
+        { 'notification': $(this).data("message") },
+        function(response) {
+          if (response['status'] != 0) {
+            $.jHueNotify.error("${ _('Error: ') }" + response['data']);
+          } else {
+            window.location.reload();
+          }
+        }
+      );
+      return false;
+    });
+
+    $("#resume-btn").bind('confirmation', function() {
       var _this = this;
       $.post($(this).data("url"),
         { 'notification': $(this).data("message") },
@@ -440,8 +490,20 @@ ${ layout.menubar(section='dashboard') }
 
         $("#status span").attr("class", "label").addClass(getStatusClass(data.status)).text(data.status);
 
-        if (data.id && data.status != "RUNNING"){
-          $("#kill-workflow").hide();
+        if (data.id && data.status == "SUSPENDED"){
+          $("#resume-btn").show();
+        } else {
+          $("#resume-btn").hide();
+        }
+
+        if (data.id && data.status == "RUNNING"){
+          $("#suspend-btn").show();
+        } else {
+          $("#suspend-btn").hide();
+        }
+
+        if (data.id && data.status != "RUNNING" && data.status != "SUSPENDED"){
+          $("#kill-btn").hide();
           $("#rerun-btn").show();
         }
 
