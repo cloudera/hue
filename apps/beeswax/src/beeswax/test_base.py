@@ -16,7 +16,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-from django.core.urlresolvers import reverse
 
 """
 Common infrastructure for beeswax tests
@@ -201,7 +200,7 @@ def wait_for_query_to_finish(client, response, max=30.0):
 def make_query(client, query, submission_type="Execute",
                udfs=None, settings=None, resources=None,
                wait=False, name=None, desc=None, local=True,
-               is_parameterized=True, max=30.0, database='default', **kwargs):
+               is_parameterized=True, max=30.0, database='default', email_notify=False, **kwargs):
   """
   Prepares arguments for the execute view.
 
@@ -219,6 +218,7 @@ def make_query(client, query, submission_type="Execute",
     'query-query': query,
     'query-is_parameterized': is_parameterized and "on",
     'query-database': database,
+    'query-email_notify': email_notify and "on",
   }
 
   if submission_type == 'Execute':

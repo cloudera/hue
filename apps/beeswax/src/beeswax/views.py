@@ -477,9 +477,8 @@ def execute_query(request, design_id=None):
           if to_explain:
             return explain_directly(request, query, design, query_server)
           else:
-            notify = form.query.cleaned_data.get('email_notify', False)
             download = request.POST.has_key('download')
-            return execute_directly(request, query, query_server, design, on_success_url=on_success_url, notify=notify, download=download)
+            return execute_directly(request, query, query_server, design, on_success_url=on_success_url, download=download)
         except BeeswaxException, ex:
           print ex.errorCode
           print ex.SQLState
@@ -912,36 +911,41 @@ def query_done_cb(request, server_id):
   This view should always return a 200 response, to reflect that the
   notification is delivered to the right view.
   """
-  res = HttpResponse('<html><head></head><body></body></html>')
+  message_template = '<html><head></head>%(message)s<body></body></html>'
+  message = {'message': 'error'}
 
-  history = models.QueryHistory.objects.get(server_id=server_id)
-
-  if history is None:
-    LOG.error('Processing query completion email: Cannot find query matching id %s' % (server_id,))
-    return res
-
-  # Update the query status
-  history.save_state(models.QueryHistory.STATE.available)
-
-  # Find out details about the query
-  if not history.notify:
-    return res
-  design = history.design
-  user = history.owner
-  subject = _("Beeswax query completed")
-  if design:
-    subject += ": %s" % (design.name,)
-
-  link = "%s/#launch=Beeswax:%s" % \
-            (get_desktop_uri_prefix(),
-             reverse(get_app_name(request) + ':watch_query', kwargs={'id': history.id}))
-  body = _("%(subject)s. You may see the results here: %(link)s\n\nQuery:\n%(query)s") % {'subject': subject, 'link': link, 'query': history.query}
   try:
+    query_history = models.QueryHistory.objects.get(server_id=server_id)
+
+    # Update the query status
+    query_history.set_to_available()
+
+    # Find out details about the query
+    if not query_history.notify:
+      message['message'] = 'email_notify is false'
+      return HttpResponse(message_template % message)
+
+    design = query_history.design
+    user = query_history.owner
+    subject = _("Beeswax query completed")
+
+    if design:
+      subject += ": %s" % (design.name,)
+
+    link = "%s/#launch=Beeswax:%s" % \
+              (get_desktop_uri_prefix(),
+               reverse(get_app_name(request) + ':watch_query', kwargs={'id': query_history.id}))
+    body = _("%(subject)s. You may see the results here: %(link)s\n\nQuery:\n%(query)s") % {
+               'subject': subject, 'link': link, 'query': query_history.query
+             }
+
     user.email_user(subject, body)
+    message['message'] = 'sent'
   except Exception, ex:
-    LOG.error("Failed to send query completion notification via e-mail to %s: %s" %
-              (user.username, ex))
-  return res
+    msg = "Failed to send query completion notification via e-mail: %s" % (ex)
+    LOG.error(msg)
+    message['message'] = msg
+  return HttpResponse(message_template % message)
 
 
 

@@ -117,6 +117,9 @@ class QueryHistory(models.Model):
   def set_to_failed(self):
     self.last_state = QueryHistory.STATE.failed.index
 
+  def set_to_available(self):
+    self.last_state = QueryHistory.STATE.available.index
+
 
 class HiveServerQueryHistory(QueryHistory):
   # Map from (thrift) server state

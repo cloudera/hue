@@ -922,7 +922,7 @@ from django.utils.translation import ugettext as _
                     action: action,
                     template: '<div class="qq-uploader">' +
                             '<div class="qq-upload-drop-area"><span>${_('Drop files here to upload')}</span></div>' +
-                            '<div class="qq-upload-button">${_('Upload a file')}</div>' +
+                            '<div class="qq-upload-button">${_('Select files')}</div>' +
                             '<ul class="qq-upload-list"></ul>' +
                             '</div>',
                     fileTemplate: '<li>' +
