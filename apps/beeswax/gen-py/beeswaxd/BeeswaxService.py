@@ -570,7 +570,7 @@ class Processor(Iface, TProcessor):
     result = query_result()
     try:
       result.success = self._handler.query(args.query)
-    except BeeswaxException as error:
+    except BeeswaxException, error:
       result.error = error
     oprot.writeMessageBegin("query", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -584,7 +584,7 @@ class Processor(Iface, TProcessor):
     result = executeAndWait_result()
     try:
       result.success = self._handler.executeAndWait(args.query, args.clientCtx)
-    except BeeswaxException as error:
+    except BeeswaxException, error:
       result.error = error
     oprot.writeMessageBegin("executeAndWait", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -598,7 +598,7 @@ class Processor(Iface, TProcessor):
     result = explain_result()
     try:
       result.success = self._handler.explain(args.query)
-    except BeeswaxException as error:
+    except BeeswaxException, error:
       result.error = error
     oprot.writeMessageBegin("explain", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -612,9 +612,9 @@ class Processor(Iface, TProcessor):
     result = fetch_result()
     try:
       result.success = self._handler.fetch(args.query_id, args.start_over, args.fetch_size)
-    except QueryNotFoundException as error:
+    except QueryNotFoundException, error:
       result.error = error
-    except BeeswaxException as error2:
+    except BeeswaxException, error2:
       result.error2 = error2
     oprot.writeMessageBegin("fetch", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -628,7 +628,7 @@ class Processor(Iface, TProcessor):
     result = get_state_result()
     try:
       result.success = self._handler.get_state(args.handle)
-    except QueryNotFoundException as error:
+    except QueryNotFoundException, error:
       result.error = error
     oprot.writeMessageBegin("get_state", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -642,7 +642,7 @@ class Processor(Iface, TProcessor):
     result = get_results_metadata_result()
     try:
       result.success = self._handler.get_results_metadata(args.handle)
-    except QueryNotFoundException as error:
+    except QueryNotFoundException, error:
       result.error = error
     oprot.writeMessageBegin("get_results_metadata", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -678,7 +678,7 @@ class Processor(Iface, TProcessor):
     result = get_log_result()
     try:
       result.success = self._handler.get_log(args.context)
-    except QueryNotFoundException as error:
+    except QueryNotFoundException, error:
       result.error = error
     oprot.writeMessageBegin("get_log", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -703,9 +703,9 @@ class Processor(Iface, TProcessor):
     result = close_result()
     try:
       self._handler.close(args.handle)
-    except QueryNotFoundException as error:
+    except QueryNotFoundException, error:
       result.error = error
-    except BeeswaxException as error2:
+    except BeeswaxException, error2:
       result.error2 = error2
     oprot.writeMessageBegin("close", TMessageType.REPLY, seqid)
     result.write(oprot)

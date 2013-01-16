@@ -288,7 +288,7 @@ class Processor(Iface, TProcessor):
     result = getAllMetrics_result()
     try:
       result.success = self._handler.getAllMetrics(args.ctx)
-    except IOException as err:
+    except IOException, err:
       result.err = err
     oprot.writeMessageBegin("getAllMetrics", TMessageType.REPLY, seqid)
     result.write(oprot)
@@ -302,7 +302,7 @@ class Processor(Iface, TProcessor):
     result = getMetricsContext_result()
     try:
       result.success = self._handler.getMetricsContext(args.ctx, args.contextName)
-    except IOException as err:
+    except IOException, err:
       result.err = err
     oprot.writeMessageBegin("getMetricsContext", TMessageType.REPLY, seqid)
     result.write(oprot)
