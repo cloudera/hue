@@ -16,6 +16,7 @@
 
 <%!
   from django.utils.translation import ugettext as _
+  from liboozie.oozie_api import get_oozie
 %>
 
 <%namespace name="utils" file="../utils.inc.mako" />
@@ -129,6 +130,14 @@
               <p class="alert alert-warn span5">
                 ${ _('The ssh server requires passwordless login') }.
               </p>
+            % endif
+            % if node_type == 'java':
+              % if get_oozie().security_enabled:
+                <p class="alert alert-warn span5">
+                  ${ _('The delegation token needs to be propagated from the launcher job to the MR job') }.
+                  <a href="https://issues.apache.org/jira/browse/OOZIE-1172">OOZIE-1172</a>
+                </p>
+              % endif
             % endif
             % if node_type == 'email':
               <p class="alert alert-warn span5">
