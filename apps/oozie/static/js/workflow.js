@@ -1498,12 +1498,12 @@ $.extend(ForkNode.prototype, Node.prototype, {
    * Also adds join node to node.
    * When adding the join node, append will remove all the children from the join!
    * We need to make sure the join remembers its children since append will replace them.
-   * NOTE: Cannot append a fork! Use addChild or replaceChild instead!
+   * NOTE: Cannot append a fork or decision! Use addChild or replaceChild instead!
    */
   append: function(node) {
     var self = this;
 
-    if (node.node_type() != 'fork') {
+    if (node.node_type() != 'decision' && node.node_type() != 'fork') {
       var join = self.join();
       if (join.id() != node.id()) {
         var children = join.findChildren();
@@ -1651,21 +1651,25 @@ $.extend(DecisionNode.prototype, ForkNode.prototype, {
   /**
    * Append a node to the current decision
    * Also appends end node to node.
-   * NOTE: Cannot append a decision! Use addChild or replaceChild instead!
+   * NOTE: Cannot append a decision or fork! Use addChild or replaceChild instead!
    */
   append: function(node) {
     var self = this;
 
-    var end = self.end();
+    if (node.node_type() != 'decision' && node.node_type() != 'fork') {
+      var end = self.end();
+      if (end.id() != node.id()) {
+        var children = end.findChildren();
 
-    if (end.id() == node.id()) {
-      return false;
+        self.addChild(node);
+        node.append(end);
+
+        // remember children
+        $.each(children, function(index, child) {
+          end.addChild(child);
+        });
+      }
     }
-
-    self.addChild(node);
-    node.append(end);
-
-    return true;
   },
 
   /**

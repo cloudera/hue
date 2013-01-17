@@ -30,7 +30,9 @@ from jobsub.models import OozieDesign
 
 from oozie.forms import WorkflowForm, ImportJobsubDesignForm, NodeForm, design_form_by_type
 from oozie.import_jobsub import convert_jobsub_design
-from oozie.models import Workflow, Node, Mapreduce, Java, Streaming, Link, NODE_TYPES, ACTION_TYPES, CONTROL_TYPES
+from oozie.models import Workflow, Node, Start, End, Kill, Mapreduce, Java, Streaming,\
+                         Link, Decision, Fork, DecisionEnd, Join,\
+                         NODE_TYPES, ACTION_TYPES, CONTROL_TYPES
 from oozie.decorators import check_job_access_permission, check_job_edition_permission
 from oozie.utils import model_to_dict
 
@@ -58,34 +60,6 @@ def format_dict_field_values(dictionary):
   return dictionary
 
 
-def workflow_validate_node_json(node_type, node_dict, errors, user, workflow):
-  """
-  Validates a single node.
-  node_type is the node type of the action information passed.
-  node_dict is a dictionary describing the node.
-  errors is a dictionary that will be populated with any found errors.
-  Returns Boolean.
-  """
-  assert isinstance(errors, dict), "errors must be a dict."
-  if node_type in ACTION_TYPES:
-    form_class = design_form_by_type(node_type, user, workflow)
-  else:
-    form_class = NodeForm
-  form = form_class(data=node_dict)
-
-  if form.is_valid():
-    for field in form.fields:
-      errors[field] = []
-
-    return True
-
-  else:
-    for field in form.fields:
-      errors[field] = form[field].errors
-
-    return False
-
-
 def get_or_create_node(workflow, node_data):
   node = None
   id = str(node_data['id'])
@@ -109,26 +83,134 @@ def get_or_create_node(workflow, node_data):
   return node
 
 
-def update_workflow(json_workflow):
-  workflow = Workflow.objects.get(id=json_workflow['id'])
+def _validate_node_links_json(node_type, node_links, errors):
+  """
+  Validate a single node's links.
+  node_type is the node type of the action information passed.
+  node_links is list of dictionaries describing the links.
+  errors is a dictionary that will be populated with any found errors.
+  """
+  assert isinstance(errors, dict), "errors must be a dict."
+  if not isinstance(node_links, list):
+    errors['links'] = _("links must be a list")
+    return False
 
-  for key in json_workflow:
-    if key not in ('nodes', 'start', 'end', 'job_ptr', 'owner'):
-      setattr(workflow, key, json_workflow[key])
+  # Check link counts are accurate.
+  if node_type == Start.node_type:
+    if len(node_links) != 2:
+      errors['links'] = _("Start should have two children: 'related' to end, 'to' to any node but an end.")
+      return False
+  elif node_type == End.node_type:
+    if len(node_links) != 0:
+      errors['links'] = _("End should have no children.")
+      return False
+  elif node_type == Kill.node_type:
+    if len(node_links) != 0:
+      errors['links'] = _("Kill should have no children.")
+      return False
+  elif node_type in (Join.node_type, DecisionEnd.node_type):
+    if len(node_links) != 1:
+      errors['links'] = _("Join and Decision End should have one child: 'to' to any node.")
+      return False
+  elif node_type in (Fork.node_type, Decision.node_type):
+    if len(node_links) < 2:
+      errors['links'] = _("Join and Decision should have at least two children: 'related' to their respective ends, 'start' to any node.")
+      return False
+  else:
+    if len(node_links) != 2:
+      errors['links'] = _("Actions should have two children: 'error' to kill, 'ok' to any node.")
+      return False
 
-  workflow.save()
+  # Check if link types are okay.
+  link_names_by_node_type = {
+    'start': {'related': 1, 'to': 1},
+    'end': {},
+    'kill': {},
+    'fork': {'related': 1, 'start': 2},
+    'join': {'to': 1},
+    'decision': {'related': 1, 'start': 2},
+    'decisionend': {'to': 1},
+    None: {'ok': 1, 'error': 1},
+  }
+  link_types = link_names_by_node_type.get(node_type, link_names_by_node_type[None])
+  for link in node_links:
+    link_name = link.get('name', None)
+    if link_name in link_types:
+      link_types[link_name] -= 1
 
-  return workflow
+  for link_type in link_types:
+    if link_types[link_type] > 0:
+      errors['links'] = _('%(node_type)s should have %(count)d more %(link_type)s link' % {
+        'node_type': node_type,
+        'count': link_types[link_type],
+        'link_type': link_type
+      })
+      return False
+
+  return True
 
 
-def update_workflow_nodes(workflow, json_nodes, id_map, user):
+def _validate_node_json(node_type, node_dict, errors, user, workflow):
+  """
+  Validates a single node excluding links.
+  node_type is the node type of the action information passed.
+  node_dict is a dictionary describing the node.
+  errors is a dictionary that will be populated with any found errors.
+  user is a User object that is associated with the node_type. Only needed for Subworkflow node.
+  workflow is the Workflow object associated with the node. Only needed for Subworkflow node.
+  Returns Boolean.
+  """
+  assert isinstance(errors, dict), "errors must be a dict."
+  if node_type in ACTION_TYPES:
+    form_class = design_form_by_type(node_type, user, workflow)
+  else:
+    form_class = NodeForm
+  form = form_class(data=node_dict)
+
+  if form.is_valid():
+    for field in form.fields:
+      errors[field] = []
+
+    return True
+
+  else:
+    for field in form.fields:
+      errors[field] = form[field].errors
+
+    return False
+
+
+def _validate_nodes_json(json_nodes, errors, user, workflow):
+  """
+  Validates every node and link in the workflow.
+  node_type is the node type of the action information passed.
+  node_dict is a dictionary describing the node.
+  errors is a dictionary that will be populated with any found errors.
+  user is a User object that is associated with the node_type. Only needed for Subworkflow node.
+  workflow is the Workflow object associated with the node. Only needed for Subworkflow node.
+  Returns Boolean.
+  """
+  assert isinstance(errors, dict), "errors must be a dict."
+  result = True
+
+  for node in json_nodes:
+    _errors = {}
+    node_dict = format_dict_field_values(node)
+    if node['node_type'] in ACTION_TYPES:
+      node_result = _validate_node_json(node['node_type'], node_dict, _errors, user, workflow)
+    else:
+      node_result = True
+    link_result = _validate_node_links_json(node['node_type'], node_dict['child_links'], _errors)
+    result = result and node_result and link_result
+    if not node.has_key('name') and ( not node.has_key('node_type') or not node.has_key('id') ):
+      raise StructuredException(code="INVALID_REQUEST_ERROR", message=_('Error saving workflow'), data={'errors': 'Node is missing a name.'}, error_code=400)
+    errors[node.get('name', '%s-%s' % ( node.get('node_type'), node.get('id')))] = _errors
+
+  return result
+
+
+def _update_workflow_nodes_json(workflow, json_nodes, id_map, user):
   """Ideally would get objects from form validation instead."""
-  for json_node in json_nodes:
-    errors = {}
-    if json_node['node_type'] in ACTION_TYPES and \
-        not workflow_validate_node_json(json_node['node_type'], format_dict_field_values(json_node), errors, user, workflow):
-      raise StructuredException(code="INVALID_REQUEST_ERROR", message=_('Invalid action'), data={'errors': errors}, error_code=400)
-
   nodes = []
 
   for json_node in json_nodes:
@@ -159,6 +241,35 @@ def update_workflow_nodes(workflow, json_nodes, id_map, user):
   return nodes
 
 
+def _update_workflow_json(json_workflow):
+  workflow = Workflow.objects.get(id=json_workflow['id'])
+
+  for key in json_workflow:
+    if key not in ('nodes', 'start', 'end', 'job_ptr', 'owner'):
+      setattr(workflow, key, json_workflow[key])
+
+  workflow.save()
+
+  return workflow
+
+
+def _workflow(request, workflow):
+  response = {'status': -1, 'data': 'None'}
+
+  workflow_dict = model_to_dict(workflow)
+  node_list = [node.get_full_node() for node in workflow.node_list]
+  nodes = [model_to_dict(node) for node in node_list]
+
+  for index in range(0, len(node_list)):
+    nodes[index]['child_links'] = [model_to_dict(link) for link in node_list[index].get_all_children_links()]
+
+  workflow_dict['nodes'] = nodes
+
+  response['status'] = 0
+  response['data'] = workflow_dict
+  return HttpResponse(json.dumps(response), mimetype="application/json")
+
+
 @check_job_access_permission(exception_class=(lambda x: StructuredException(code="UNAUTHORIZED_REQUEST_ERROR", message=x, data=None, error_code=401)))
 @check_job_edition_permission(exception_class=(lambda x: StructuredException(code="UNAUTHORIZED_REQUEST_ERROR", message=x, data=None, error_code=401)))
 def workflow_validate_node(request, workflow, node_type):
@@ -166,7 +277,7 @@ def workflow_validate_node(request, workflow, node_type):
 
   node_dict = format_dict_field_values(json.loads(str(request.POST.get('node'))))
 
-  if workflow_validate_node_json(node_type, node_dict, response['data'], request.user, workflow):
+  if _validate_node_json(node_type, node_dict, response['data'], request.user, workflow):
     response['status'] = 0
   else:
     response['status'] = -1
@@ -191,9 +302,13 @@ def workflow_save(request, workflow):
 
   json_nodes = json_workflow['nodes']
   id_map = {}
+  errors = {}
 
-  workflow = update_workflow(json_workflow)
-  nodes = update_workflow_nodes(workflow, json_nodes, id_map, request.user)
+  if not _validate_nodes_json(json_nodes, errors, request.user, workflow):
+    raise StructuredException(code="INVALID_REQUEST_ERROR", message=_('Error saving workflow'), data={'errors': errors}, error_code=400)
+
+  workflow = _update_workflow_json(json_workflow)
+  nodes = _update_workflow_nodes_json(workflow, json_nodes, id_map, request.user)
 
   # Update links
   index = 0
@@ -222,23 +337,6 @@ def workflow_save(request, workflow):
   Workflow.objects.check_workspace(workflow, request.fs)
 
   return _workflow(request, workflow=workflow)
-
-
-def _workflow(request, workflow):
-  response = {'status': -1, 'data': 'None'}
-
-  workflow_dict = model_to_dict(workflow)
-  node_list = [node.get_full_node() for node in workflow.node_list]
-  nodes = [model_to_dict(node) for node in node_list]
-
-  for index in range(0, len(node_list)):
-    nodes[index]['child_links'] = [model_to_dict(link) for link in node_list[index].get_all_children_links()]
-
-  workflow_dict['nodes'] = nodes
-
-  response['status'] = 0
-  response['data'] = workflow_dict
-  return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
 @check_job_access_permission(exception_class=(lambda x: StructuredException(code="UNAUTHORIZED_REQUEST_ERROR", message=x, data=None, error_code=401)))
