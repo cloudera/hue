@@ -74,6 +74,10 @@ class MockOozieApi:
   def setuser(self, user):
     pass
 
+  @property
+  def security_enabled(self):
+    return False
+
   def submit_job(self, properties):
     return 'ONE-OOZIE-ID-W'
 
