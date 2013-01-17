@@ -200,10 +200,20 @@ var ModalModule = function($, ko) {
         ko.dataFor($("textarea[name='xml']")[0]).xml(codeMirror.getValue());
       });
     }
-
-    $("*[rel=popover]").popover({
-      placement:'left',
-      trigger:'hover'
+    $("*[rel=popover]").each(function(){
+      if ($(this).find("input").length > 0){
+        $(this).popover({
+          placement:'right',
+          trigger:'hover',
+          selector: 'input'
+        });
+      }
+      else {
+        $(this).popover({
+          placement:'right',
+          trigger:'hover'
+        });
+      }
     });
   }
 

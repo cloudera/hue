@@ -31,247 +31,230 @@ ${ layout.menubar(section='workflows') }
 
 
 <div id="workflow" class="container-fluid">
+  <form class="form-horizontal" id="jobForm" method="POST">
   <div class="ribbon-wrapper hide">
     <div class="ribbon">${ _('Unsaved') }</div>
   </div>
 
   <h1 data-bind="text: '${ _('Workflow Editor : ') } ' + name()"></h1>
 
-  <div class="well">
-    <span data-bind="text: '${ _('Description') }: ' + description() || 'N/A'"></span>
-    <div class="pull-right" style="margin-top:-5px">
-      % if user_can_access_job:
-          <a id="submit-btn" href="#" data-submit-url="${ url('oozie:submit_workflow', workflow=workflow.id) }" class="btn" title="${ _('Submit this workflow') }" rel="tooltip" data-placement="bottom"><i class="icon-play"></i> ${ _('Submit') }</a>
-          <a href="${ url('oozie:schedule_workflow', workflow=workflow.id) }" class="btn" title="${ _('Schedule this workflow') }" rel="tooltip" data-placement="bottom"><i class="icon-calendar"></i> ${ _('Schedule') }</a>
-          <a id="clone-btn" href="#" data-clone-url="${ url('oozie:clone_workflow', workflow=workflow.id) }" class="btn" title="${ _('Clone this workflow') }" rel="tooltip" data-placement="bottom"><i class="icon-retweet"></i> ${ _('Clone') }</a>
-          &nbsp;&nbsp;&nbsp;&nbsp;
-      % endif
-      % if user_can_edit_job:
-          <a data-bind="attr: {href: '/filebrowser/view' + deployment_dir() }" class="btn" title="${ _('Upload additional files and libraries to the deployment directory') }" rel="tooltip" data-placement="bottom"><i class="icon-upload"></i> ${ _('Upload') }</a>
-      % endif
+  <div class="row-fluid">
+  <div class="span2">
+    <div class="well sidebar-nav">
+      <ul class="nav nav-list">
+        <li class="nav-header">${ _('Name') }</li>
+        <li><a href="#properties" data-bind="text: name()"></a></li>
+
+        <li class="nav-header">${ _('Description') }</li>
+        <li><a href="#properties" data-bind="text: description() || 'N/A'"></a></li>
+
+        <li class="nav-header">${ _('Editor') }</li>
+        <li><a href="#editWorkflow">${ _('Edit workflow') }</a></li>
+        <li><a href="javascript:void(0)" class="import-jobsub-node-link" title="${ _('Click to import a Job Designer worflow and add it to the end of the workflow') }" rel="tooltip" data-placement="right">${ _('Import workflow') }</a></li>
+
+        % if user_can_edit_job:
+          <li class="nav-header">${ _('History') }</li>
+          <li><a href="#listHistory">${ _('Show history') }</a></li>
+        % endif
+
+        <li class="nav-header">${ _('Actions') }</li>
+        % if user_can_access_job:
+          <li>
+            <a id="submit-btn" href="javascript:void(0)" data-submit-url="${ url('oozie:submit_workflow', workflow=workflow.id) }" title="${ _('Submit this workflow') }" rel="tooltip" data-placement="right"><i class="icon-play"></i> ${ _('Submit') }</a>
+          </li>
+          <li>
+            <a href="${ url('oozie:schedule_workflow', workflow=workflow.id) }" title="${ _('Schedule this workflow') }" rel="tooltip" data-placement="right"><i class="icon-calendar"></i> ${ _('Schedule') }</a>
+          </li>
+          <li>
+            <a id="clone-btn" href="#" data-clone-url="${ url('oozie:clone_workflow', workflow=workflow.id) }" title="${ _('Clone this workflow') }" rel="tooltip" data-placement="right"><i class="icon-retweet"></i> ${ _('Clone') }</a>
+          </li>
+        % endif
+        % if user_can_edit_job:
+          <li>
+            <a data-bind="attr: {href: '/filebrowser/view' + deployment_dir() }" title="${ _('Upload additional files and libraries to the deployment directory') }" rel="tooltip" data-placement="right"><i class="icon-upload"></i> ${ _('Upload') }</a>
+          </li>
+        % endif
+      </ul>
     </div>
   </div>
+  <div class="span10">
+    <div id="properties" class="section hide">
+      <div class="alert alert-info"><h3>${ _('Worfklow properties') }</h3></div>
+      <fieldset>
+      ${ utils.render_field(workflow_form['name'], extra_attrs={'data-bind': 'value: %s' % workflow_form['name'].name}) }
+      ${ utils.render_field(workflow_form['description'], extra_attrs={'data-bind': 'value: %s' % workflow_form['description'].name}) }
+      ${ utils.render_field(workflow_form['is_shared'], extra_attrs={'data-bind': 'checked: %s' % workflow_form['is_shared'].name}) }
 
-  <ul class="nav nav-tabs">
-    <li class="active"><a href="#editor" data-toggle="tab">${ _('Editor') }</a></li>
-    <li><a href="#properties" data-toggle="tab">${ _('Properties') }</a></li>
-    % if user_can_edit_job:
-      <li><a href="#history" data-toggle="tab">${ _('History') }</a></li>
-    % endif
-  </ul>
-
-  <form class="form-horizontal" id="jobForm" method="POST">
-
-    <div class="tab-content">
-      <div class="tab-pane active" id="editor">
-        <div class="row-fluid">
-          <div class="span2">
-            % if user_can_edit_job:
-            <h2>${ _('Actions') }</h2>
-            <br/>
-            <ul class="nav nav-tabs">
-              <li class="active">
-                <a href="#add" data-toggle="tab">${ _('Add') }</a>
-              </li>
-              <li>
-                <a href="#import" data-toggle="tab">${ _('Import') }</a>
-              </li>
-             </ul>
-
-            <div class="tab-content">
-              <div class="tab-pane active" id="add">
-                <p>
-                <a data-node-type="mapreduce"
-                  title="${ _('Click to add to the end of the workflow') }" class="btn new-node-link">
-                  <i class="icon-plus"></i> ${ _('MapReduce') }
-                </a>
-                <p/>
-                <p>
-                <a data-node-type="streaming"
-                  title="${ _('Click to add to the end of the workflow') }" class="btn new-node-link">
-                  <i class="icon-plus"></i> Streaming
-                </a>
-                <p/>
-                <p>
-                <a data-node-type="java"
-                  title="${ _('Click to add to the end of the workflow') }" class="btn new-node-link">
-                  <i class="icon-plus"></i> ${ _('Java') }
-                </a>
-                <p/>
-                <p>
-                <a data-node-type="pig"
-                  title="${ _('Click to add to the end of the workflow') }" class="btn new-node-link">
-                  <i class="icon-plus"></i> ${ _('Pig') }
-                </a>
-                <p/>
-                <p>
-                <a data-node-type="hive"
-                  title="${ _('Click to add to the end of the workflow') }" class="btn new-node-link">
-                  <i class="icon-plus"></i> ${ _('Hive') }
-                </a>
-                <p/>
-                <p>
-                <a data-node-type="sqoop"
-                  title="${ _('Click to add to the end of the workflow') }" class="btn new-node-link">
-                  <i class="icon-plus"></i> ${ _('Sqoop') }
-                </a>
-                <p/>
-                <p>
-                <a data-node-type="shell"
-                  title="${ _('Click to add to the end of the workflow') }" class="btn new-node-link">
-                  <i class="icon-plus"></i> ${ _('Shell') }
-                </a>
-                <p/>
-                <p>
-                <a data-node-type="ssh"
-                  title="${ _('Click to add to the end of the workflow') }" class="btn new-node-link">
-                  <i class="icon-plus"></i> ${ _('Ssh') }
-                </a>
-                <p/>
-                <p>
-                <a data-node-type="distcp"
-                  title="${ _('Click to add to the end of the workflow') }" class="btn new-node-link">
-                  <i class="icon-plus"></i> ${ _('DistCp') }
-                </a>
-                <p/>
-                <p>
-                <a data-node-type="fs"
-                  title="${ _('Click to add to the end of the workflow') }" class="btn new-node-link">
-                  <i class="icon-plus"></i> ${ _('Fs') }
-                </a>
-                <p/>
-                <p>
-                <a data-node-type="email"
-                  title="${ _('Click to add to the end of the workflow') }" class="btn new-node-link">
-                  <i class="icon-plus"></i> ${ _('Email') }
-                </a>
-                <p/>
-                <p>
-                <a data-node-type="subworkflow"
-                  title="${ _('Click to add to the end of the workflow') }" class="btn new-node-link">
-                  <i class="icon-plus"></i> ${ _('Sub-workflow') }
-                </a>
-                <p/>
-                <p>
-                <a data-node-type="generic"
-                  title="${ _('Click to add to the end of the workflow') }" class="btn new-node-link">
-                  <i class="icon-plus"></i> ${ _('Generic') }
-                </a>
-                <p/>
-              </div>
-              <div class="tab-pane" id="import">
-                <p>
-                <a title="${ _('Click to add to the end of the workflow') }" class="btn import-jobsub-node-link">
-                  <i class="icon-plus"></i> ${ _('Job Designer Workflow') }
-                </a>
-                <p/>
-              </div>
-            </div>
-             % endif
-          </div>
-
-          <div class="span9">
-            <h2>${ _('Flow') }</h2>
-            <br/>
-            <hr/>
-
-            <div style="padding-top:50px" data-bind="visible: nodes().length < 3">
-              ${ _('No actions: add some from the right panel') }
-            </div>
-
-            <div id="graph" class="row-fluid" data-bind="template: { name: function(item) { return item.view_template() }, foreach: nodes }"></div>
-            <div id="new-node" class="row-fluid" data-bind="template: { name: 'nodeTemplate', if: new_node, data: new_node }"></div>
-          </div>
+        <div class="control-group ">
+          <label class="control-label">
+            <a href="#" id="advanced-btn" onclick="$('#advanced-container').toggle('hide')">
+              <i class="icon-share-alt"></i> ${ _('advanced') }</a>
+          </label>
+          <div class="controls"></div>
         </div>
-        <div class="form-actions center">
-          <a data-bind="disable: workflow.read_only, visible: !workflow.read_only(), click: function() { save({ success: workflow_save_success, error: workflow_save_error }) }" href="javascript:void(0);" class="btn btn-primary">${ _('Save') }</a>
-          <a href="${ url('oozie:list_workflows') }" class="btn">${ _('Back') }</a>
-        </div>
-      </div>
 
-      <div class="tab-pane" id="properties">
-        <div class="row-fluid">
-          <div class="span1"></div>
-          <div class="span8">
-            <h2>${ _('Properties') }</h2>
-            <br/>
-              <fieldset>
-                ${ utils.render_field(workflow_form['name'], extra_attrs={'data-bind': 'value: %s' % workflow_form['name'].name}) }
-                ${ utils.render_field(workflow_form['description'], extra_attrs={'data-bind': 'value: %s' % workflow_form['description'].name}) }
-                ${ utils.render_field(workflow_form['is_shared'], extra_attrs={'data-bind': 'checked: %s' % workflow_form['is_shared'].name}) }
-
-                <div class="control-group ">
-                  <label class="control-label">
-                    <a href="#" id="advanced-btn" onclick="$('#advanced-container').toggle('hide')">
-                      <i class="icon-share-alt"></i> ${ _('advanced') }</a>
-                  </label>
-                  <div class="controls"></div>
-                </div>
-
-               <div id="advanced-container" class="hide">
-                 % if user_can_edit_job:
-                  ${ utils.render_field(workflow_form['deployment_dir'], extra_attrs={'data-bind': 'value: %s' % workflow_form['deployment_dir'].name}) }
-                 % endif
-
-                 <%
-                 workflows.key_value_field(workflow_form['parameters'], {
-                  'name': 'parameters',
-                  'remove': '$root.removeParameter',
-                  'add': '$root.addParameter',
-                 })
-                 %>
-
-                 <%
-                 workflows.key_value_field(workflow_form['job_properties'], {
-                  'name': 'job_properties',
-                  'remove': '$root.removeJobProperty',
-                  'add': '$root.addJobProperty',
-                 })
-                 %>
-
-                 ${ utils.render_field(workflow_form['job_xml'], extra_attrs={'data-bind': 'value: %s' % workflow_form['job_xml'].name}) }
-               </div>
-
-             </fieldset>
-           </div>
-        </div>
-        <div class="form-actions center">
-          % if user_can_edit_job:
-            <button data-bind="disable: workflow.read_only, visible: !workflow.read_only(), click: function() { save({ success: workflow_save_success, error: workflow_save_error }) }" class="btn btn-primary">${ _('Save') }</button>
-          % endif
-          <a href="${ url('oozie:list_workflows') }" class="btn">${ _('Back') }</a>
-        </div>
-        <div class="span3"></div>
-      </div>
-
+      <div id="advanced-container" class="hide">
       % if user_can_edit_job:
-        <div class="tab-pane" id="history">
-          % if not history:
-            ${ _('N/A') }
-          % else:
-          <table class="table">
-            <thead>
-              <tr>
-                <th>${ _('Date') }</th>
-                <th>${ _('Id') }</th>
-              </tr>
-            </thead>
-            <tbody>
-              % for record in history:
-                <tr>
-                  <td>
-                    <a href="${ url('oozie:list_history_record', record_id=record.id) }" data-row-selector="true"></a>
-                    ${ utils.format_date(record.submission_date) }
-                  </td>
-                  <td>${ record.oozie_job_id }</td>
-                </tr>
-              % endfor
-            </tbody>
-          </table>
-          % endif
-        </div>
+      ${ utils.render_field(workflow_form['deployment_dir'], extra_attrs={'data-bind': 'value: %s' % workflow_form['deployment_dir'].name}) }
+      % endif
+
+      <%
+      workflows.key_value_field(workflow_form['parameters'], {
+      'name': 'parameters',
+      'remove': '$root.removeParameter',
+      'add': '$root.addParameter',
+      })
+      %>
+
+      <%
+      workflows.key_value_field(workflow_form['job_properties'], {
+      'name': 'job_properties',
+      'remove': '$root.removeJobProperty',
+      'add': '$root.addJobProperty',
+      })
+      %>
+
+      ${ utils.render_field(workflow_form['job_xml'], extra_attrs={'data-bind': 'value: %s' % workflow_form['job_xml'].name}) }
+      </div>
+
+      </fieldset>
+    </div>
+
+    <div id="editWorkflow" class="section hide">
+    <div class="showActionToolbar hide">
+      <a href="javascript:void(0)"><i class="icon-chevron-left icon-white"></i></a>&nbsp;
+    </div>
+    <div class="addActionToolbar">
+      <div class="addActionToolbarTitle"><a id="hideActionToolbar" href="javascript:void(0)"><i class="icon-chevron-right icon-white"></i> ${ _('Available actions') }</a> </div>
+        <p>
+          <a data-node-type="mapreduce"
+             title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
+            <i class="icon-move"></i> MapReduce
+          </a>
+        <p/>
+        <p>
+          <a data-node-type="streaming"
+             title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
+            <i class="icon-move"></i> Streaming
+          </a>
+        <p/>
+        <p>
+          <a data-node-type="java"
+             title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
+            <i class="icon-move"></i> Java
+          </a>
+        <p/>
+        <p>
+          <a data-node-type="pig"
+             title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
+            <i class="icon-move"></i> Pig
+          </a>
+        <p/>
+        <p>
+          <a data-node-type="hive"
+             title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
+            <i class="icon-move"></i> Hive
+          </a>
+        <p/>
+        <p>
+          <a data-node-type="sqoop"
+             title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
+            <i class="icon-move"></i> Sqoop
+          </a>
+        <p/>
+        <p>
+          <a data-node-type="shell"
+             title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
+            <i class="icon-move"></i> Shell
+          </a>
+        <p/>
+        <p>
+          <a data-node-type="ssh"
+             title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
+            <i class="icon-move"></i> Ssh
+          </a>
+        <p/>
+        <p>
+          <a data-node-type="distcp"
+             title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
+            <i class="icon-move"></i> DistCp
+          </a>
+        <p/>
+        <p>
+          <a data-node-type="fs"
+             title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
+            <i class="icon-move"></i> Fs
+          </a>
+        <p/>
+        <p>
+          <a data-node-type="email"
+             title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
+            <i class="icon-move"></i> Email
+          </a>
+        <p/>
+        <p>
+          <a data-node-type="subworkflow"
+             title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
+            <i class="icon-move"></i> Sub-workflow
+          </a>
+        <p/>
+        <p>
+          <a data-node-type="generic"
+             title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
+            <i class="icon-move"></i> Generic
+          </a>
+        <p/>
+      </div>
+
+
+      <div class="alert alert-info"><h3>${ _('Workflow editor') }</h3></div>
+
+      <div class="alert" data-bind="visible: nodes().length < 3">
+        ${ _('No actions: add some from the right panel') }
+      </div>
+
+      <div id="graph" class="row-fluid" data-bind="template: { name: function(item) { return item.view_template() }, foreach: nodes }"></div>
+      <div id="new-node" class="row-fluid" data-bind="template: { name: 'nodeTemplate', if: new_node, data: new_node }"></div>
+
+    </div>
+
+    <div id="listHistory" class="section hide">
+      <div class="alert alert-info"><h3>${ _('History') }</h3></div>
+      % if not history:
+      ${ _('N/A') }
+      % else:
+        <table class="table">
+          <thead>
+          <tr>
+            <th>${ _('Date') }</th>
+            <th>${ _('Id') }</th>
+          </tr>
+          </thead>
+          <tbody>
+          % for record in history:
+          <tr>
+            <td>
+              <a href="${ url('oozie:list_history_record', record_id=record.id) }" data-row-selector="true"></a>
+            ${ utils.format_date(record.submission_date) }
+            </td>
+            <td>${ record.oozie_job_id }</td>
+          </tr>
+          % endfor
+          </tbody>
+        </table>
       % endif
     </div>
+
+
+  </div>
+  </div>
+
+  <div class="form-actions center">
+  % if user_can_edit_job:
+    <button data-bind="disable: workflow.read_only, visible: !workflow.read_only(), click: function() { save({ success: workflow_save_success, error: workflow_save_error }) }" class="btn btn-primary">${ _('Save') }</button>
+  % endif
+    <a href="${ url('oozie:list_workflows') }" class="btn">${ _('Back') }</a>
+  </div>
   </form>
 </div>
 
@@ -295,6 +278,7 @@ ${ layout.menubar(section='workflows') }
 
 <div id="submit-wf-modal" class="modal hide"></div>
 
+
 <script src="/static/ext/js/codemirror-3.0.js"></script>
 <link rel="stylesheet" href="/static/ext/css/codemirror.css">
 <script src="/static/ext/js/codemirror-xml.js"></script>
@@ -304,6 +288,7 @@ ${ layout.menubar(section='workflows') }
 <script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/jquery/plugins/jquery-ui-autocomplete-1.9.1.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/jquery/plugins/jquery-ui-draggable-droppable-sortable-1.8.23.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/routie-0.3.0.min.js" type="text/javascript" charset="utf-8"></script>
 
 
 % for form_info in action_forms:
@@ -695,6 +680,8 @@ $('#workflow').on('click', '.import-jobsub-node-link', function(e) {
         $('#workflow').trigger('workflow:rebuild');
 
         $.jHueNotify.info("${ _('Imported Job Designer workflow as node.') }");
+        routie('editWorkflow');
+        $('html, body').animate({ scrollTop: $(document).height() });
       },
       error: function() {
         $.jHueNotify.error("${ _('Could not import Job Designer workflow as node.') }");
@@ -756,6 +743,19 @@ window.onresize = function () {
 };
 
 $(document).ready(function () {
+
+  routie('editWorkflow');
+
+  $('#hideActionToolbar').on('click', function(){
+    $('.addActionToolbar').hide();
+    $('.showActionToolbar').show();
+  });
+
+  $('.showActionToolbar a').on('click', function(){
+    $('.addActionToolbar').show();
+    $('.showActionToolbar').hide();
+  });
+
   window.setInterval(checkModelDirtiness, 500);
   $('#clone-btn').on('click', function () {
     var _url = $(this).data('clone-url');
@@ -771,13 +771,36 @@ $(document).ready(function () {
       }
     );
   });
+
+  routie({
+    'properties':function () {
+      showSection('properties');
+    },
+    'editWorkflow':function () {
+      showSection('editWorkflow');
+    },
+    'listHistory':function () {
+      showSection('listHistory');
+    }
+  });
+
+  function highlightMenu(section) {
+    $('.nav-list li').removeClass('active');
+    $('a[href="#' + section + '"]:first').parent().addClass('active');
+  }
+
+  function showSection(section) {
+    $('.section').hide();
+    $('#' + section).show();
+    highlightMenu(section);
+  }
 });
 
 function checkModelDirtiness() {
   if (workflow.is_dirty()) {
-    $(".ribbon-wrapper").fadeIn();
+    $('.ribbon-wrapper').fadeIn();
   } else {
-    $(".ribbon-wrapper").hide();
+    $('.ribbon-wrapper').hide();
   }
 }
 

@@ -41,6 +41,9 @@ ${ layout.menubar(section='coordinators') }
   .help-block {
     color: #999999;
   }
+  .sidebar-nav {
+    padding: 9px 0;
+  }
 </style>
 
 <script src="/static/ext/js/knockout-2.1.0.js" type="text/javascript" charset="utf-8"></script>
@@ -627,6 +630,11 @@ ${ layout.menubar(section='coordinators') }
         }
       });
 
+      function highlightMenu(section) {
+        $(".nav-list li").removeClass("active");
+        $("a[href='#" + section + "']").parent().addClass("active");
+      }
+
       function showStep(step) {
         showSection("steps");
         currentStep = step;
@@ -651,6 +659,7 @@ ${ layout.menubar(section='coordinators') }
       function showSection(section) {
         $(".section").hide();
         $("#" + section).show();
+        highlightMenu(section);
       }
 
       function validateStep(step) {
