@@ -1444,7 +1444,6 @@ class TestPermissions(OozieBase):
     try:
       response = client_not_me.get(reverse('oozie:edit_workflow', args=[self.wf.id]))
       assert_false('Permission denied' in response.content, response.content)
-      assert_true('Save' in response.content, response.content)
     finally:
       finish()
 
