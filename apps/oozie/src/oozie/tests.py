@@ -359,6 +359,14 @@ class TestAPI(OozieMockBase):
     response = self.c.post(reverse('oozie:workflow_save', kwargs={'workflow': self.wf.pk}), data={'workflow': workflow_json}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
     assert_equal(400, response.status_code)
 
+    # Bad control node name should still go through
+    workflow_dict = workflow_to_dict(self.wf)
+    del workflow_dict['nodes'][0]['name']
+    workflow_json = json.dumps(workflow_dict)
+
+    response = self.c.post(reverse('oozie:workflow_save', kwargs={'workflow': self.wf.pk}), data={'workflow': workflow_json}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+    assert_equal(200, response.status_code)
+
   def test_workflow(self):
     response = self.c.get(reverse('oozie:workflow', kwargs={'workflow': self.wf.pk}))
     test_response_json = response.content
