@@ -21,6 +21,7 @@ PERMISSION_ACTIONS = (
   ("launch_pig", "Launch the Pig Shell"),
   ("launch_flume", "Launch the Flume Shell"),
   ("launch_hbase", "Launch the HBase Shell"),
+  ("launch_sqoop2", "Launch the Sqoop2 Shell"),
 )
 
 ICON = "/shell/static/art/icon_shell_24.png"
