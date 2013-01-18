@@ -338,14 +338,13 @@
 
         function handleChoice(filePath) {
           if (filePath.indexOf("${ workflow.deployment_dir }") > -1) {
-            filePath = filePath.substring("${ workflow.deployment_dir }".length);
+            filePath = filePath.substring("${ workflow.deployment_dir }".length + 1);
             if (filePath == "") {
-              filePath = "/";
+              filePath = "./";
             }
             if (filePath.indexOf("//") == 0){
               filePath = filePath.substr(1);
             }
-            filePath = "." + filePath;
           }
           inputElement.val(filePath);
           inputElement.change();
