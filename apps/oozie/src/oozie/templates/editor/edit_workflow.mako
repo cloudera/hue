@@ -50,7 +50,12 @@ ${ layout.menubar(section='workflows') }
 
         <li class="nav-header">${ _('Editor') }</li>
         <li><a href="#editWorkflow">${ _('Edit workflow') }</a></li>
-        <li><a href="javascript:void(0)" class="import-jobsub-node-link" title="${ _('Click to import a Job Designer worflow and add it to the end of the workflow') }" rel="tooltip" data-placement="right">${ _('Import workflow') }</a></li>
+        <li><a href="javascript:void(0)" class="import-jobsub-node-link" title="${ _('Click to import a Job Designer action and add it to the end of the flow') }" rel="tooltip" data-placement="right">${ _('Import workflow') }</a></li>
+        % if user_can_edit_job:
+            <li>
+              <a data-bind="attr: {href: '/filebrowser/view' + deployment_dir() }" target="_blank" title="${ _('Upload additional files and libraries to the deployment directory') }" rel="tooltip" data-placement="right">${ _('Upload') }</a>
+            </li>
+        % endif
 
         % if user_can_edit_job:
           <li class="nav-header">${ _('History') }</li>
@@ -69,17 +74,12 @@ ${ layout.menubar(section='workflows') }
             <a id="clone-btn" href="#" data-clone-url="${ url('oozie:clone_workflow', workflow=workflow.id) }" title="${ _('Clone this workflow') }" rel="tooltip" data-placement="right"><i class="icon-retweet"></i> ${ _('Clone') }</a>
           </li>
         % endif
-        % if user_can_edit_job:
-          <li>
-            <a data-bind="attr: {href: '/filebrowser/view' + deployment_dir() }" title="${ _('Upload additional files and libraries to the deployment directory') }" rel="tooltip" data-placement="right"><i class="icon-upload"></i> ${ _('Upload') }</a>
-          </li>
-        % endif
       </ul>
     </div>
   </div>
   <div class="span10">
     <div id="properties" class="section hide">
-      <div class="alert alert-info"><h3>${ _('Worfklow properties') }</h3></div>
+      <div class="alert alert-info"><h3>${ _('Properties') }</h3></div>
       <fieldset>
       ${ utils.render_field(workflow_form['name'], extra_attrs={'data-bind': 'value: %s' % workflow_form['name'].name}) }
       ${ utils.render_field(workflow_form['description'], extra_attrs={'data-bind': 'value: %s' % workflow_form['description'].name}) }
@@ -121,96 +121,92 @@ ${ layout.menubar(section='workflows') }
     </div>
 
     <div id="editWorkflow" class="section hide">
-    <div class="showActionToolbar hide">
-      <a href="javascript:void(0)"><i class="icon-chevron-left icon-white"></i></a>&nbsp;
-    </div>
-    <div class="addActionToolbar">
-      <div class="addActionToolbarTitle"><a id="hideActionToolbar" href="javascript:void(0)"><i class="icon-chevron-right icon-white"></i> ${ _('Available actions') }</a> </div>
-        <p>
+
+      <div class="alert alert-info"><h3>${ _('Editor') }</h3></div>
+
+      <div id="actionToolbar" class="well">
+        <div class="draggable-button">
           <a data-node-type="mapreduce"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
             <i class="icon-move"></i> MapReduce
           </a>
-        <p/>
-        <p>
+        </div>
+        <div class="draggable-button">
           <a data-node-type="streaming"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
             <i class="icon-move"></i> Streaming
           </a>
-        <p/>
-        <p>
+        </div>
+        <div class="draggable-button">
           <a data-node-type="java"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
             <i class="icon-move"></i> Java
           </a>
-        <p/>
-        <p>
+         </div>
+        <div class="draggable-button">
           <a data-node-type="pig"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
             <i class="icon-move"></i> Pig
           </a>
-        <p/>
-        <p>
+        </div>
+        <div class="draggable-button">
           <a data-node-type="hive"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
             <i class="icon-move"></i> Hive
           </a>
-        <p/>
-        <p>
+        </div>
+        <div class="draggable-button">
           <a data-node-type="sqoop"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
             <i class="icon-move"></i> Sqoop
           </a>
-        <p/>
-        <p>
+        </div>
+        <div class="draggable-button">
           <a data-node-type="shell"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
             <i class="icon-move"></i> Shell
           </a>
-        <p/>
-        <p>
+        </div>
+        <div class="draggable-button">
           <a data-node-type="ssh"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
             <i class="icon-move"></i> Ssh
           </a>
-        <p/>
-        <p>
+        </div>
+        <div class="draggable-button">
           <a data-node-type="distcp"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
             <i class="icon-move"></i> DistCp
           </a>
-        <p/>
-        <p>
+        </div>
+        <div class="draggable-button">
           <a data-node-type="fs"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
             <i class="icon-move"></i> Fs
           </a>
-        <p/>
-        <p>
+        </div>
+        <div class="draggable-button">
           <a data-node-type="email"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
             <i class="icon-move"></i> Email
           </a>
-        <p/>
-        <p>
+        </div>
+        <div class="draggable-button">
           <a data-node-type="subworkflow"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
             <i class="icon-move"></i> Sub-workflow
           </a>
-        <p/>
-        <p>
+        </div>
+        <div class="draggable-button">
           <a data-node-type="generic"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
             <i class="icon-move"></i> Generic
           </a>
-        <p/>
+        </div>
       </div>
 
-
-      <div class="alert alert-info"><h3>${ _('Workflow editor') }</h3></div>
-
       <div class="alert" data-bind="visible: nodes().length < 3">
-        ${ _('No actions: add some from the right panel') }
+        ${ _('No actions: drag some from the panel above') }
       </div>
 
       <div id="graph" class="row-fluid" data-bind="template: { name: function(item) { return item.view_template() }, foreach: nodes }"></div>
@@ -746,14 +742,33 @@ $(document).ready(function () {
 
   routie('editWorkflow');
 
-  $('#hideActionToolbar').on('click', function(){
-    $('.addActionToolbar').hide();
-    $('.showActionToolbar').show();
-  });
+  var actionToolbarProperties = {
+    docked: false,
+    detachPosition: 0,
+    initialWidth: 0
+  }
 
-  $('.showActionToolbar a').on('click', function(){
-    $('.addActionToolbar').show();
-    $('.showActionToolbar').hide();
+  $(window).scroll(function () {
+    if (!actionToolbarProperties.docked && ($('#actionToolbar').offset().top - 82 - $(window).scrollTop() < 0)) {
+      $('#actionToolbar').addClass('shadowed');
+      $('#actionToolbar').css('position', 'fixed');
+      $('#actionToolbar').css('top', '82px');
+      $('#graph').css('marginTop', ($('#actionToolbar').outerHeight() + 38) + 'px');
+      $('#actionToolbar').width(actionToolbarProperties.initialWidth);
+      actionToolbarProperties.detachPosition = $(window).scrollTop();
+      actionToolbarProperties.docked = true;
+    }
+    else if (actionToolbarProperties.docked && $(window).scrollTop() < actionToolbarProperties.detachPosition) {
+      $('#actionToolbar').removeClass('shadowed');
+      $('#actionToolbar').css('position', '');
+      $('#graph').css('marginTop', '');
+      actionToolbarProperties.docked = false;
+    }
+    else {
+      if (actionToolbarProperties.initialWidth == 0) {
+        actionToolbarProperties.initialWidth = $('#actionToolbar').width();
+      }
+    }
   });
 
   window.setInterval(checkModelDirtiness, 500);
