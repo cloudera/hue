@@ -1823,14 +1823,9 @@ class TestDashboard(OozieMockBase):
 
 
   def test_manage_coordinator_dashboard(self):
-    # Kill button in response
+    # Kill and resubmit button in response
     response = self.c.get(reverse('oozie:list_oozie_coordinator', args=[MockOozieApi.COORDINATOR_IDS[0]]), {}, follow=True)
     assert_true(('%s/kill' % MockOozieApi.COORDINATOR_IDS[0]) in response.content, response.content)
-    assert_false('Rerun' in response.content, response.content)
-
-    # Rerun button in response
-    response = self.c.get(reverse('oozie:list_oozie_coordinator', args=[MockOozieApi.COORDINATOR_IDS[1]]), {}, follow=True)
-    assert_false(('%s/kill' % MockOozieApi.COORDINATOR_IDS[1]) in response.content, response.content)
     assert_true('Resubmit' in response.content, response.content)
 
 
