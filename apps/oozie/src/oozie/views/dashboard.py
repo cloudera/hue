@@ -182,6 +182,18 @@ def list_oozie_coordinator(request, job_id):
   except History.DoesNotExist:
     pass
 
+  if request.GET.get('format') == 'json':
+    return_obj = {
+      'id': oozie_coordinator.id,
+      'status':  oozie_coordinator.status,
+      'progress': oozie_coordinator.get_progress(),
+      'nextTime': format_time(oozie_coordinator.nextMaterializedTime),
+      'endTime': format_time(oozie_coordinator.endTime),
+      'log': oozie_coordinator.log,
+      'actions': massaged_coordinator_actions_for_json(oozie_coordinator)
+    }
+    return HttpResponse(json.dumps(return_obj), mimetype="application/json")
+
   return render('dashboard/list_oozie_coordinator.mako', request, {
     'oozie_coordinator': oozie_coordinator,
     'coordinator': coordinator,
@@ -272,6 +284,28 @@ def massaged_workflow_actions_for_json(workflow_actions):
       'errorMessage': escapejs(action.errorMessage),
       'transition': action.transition,
       'data': escapejs(action.data)
+    }
+    actions.append(massaged_action)
+
+  return actions
+
+def massaged_coordinator_actions_for_json(coordinator):
+  coordinator_id = coordinator.id
+  coordinator_actions = coordinator.get_working_actions()
+  actions = []
+  for action in coordinator_actions:
+    massaged_action = {
+      'id': action.id,
+      'number': action.actionNumber,
+      'type': action.type,
+      'status': action.status,
+      'externalIdUrl': action.externalId and reverse('oozie:list_oozie_workflow', kwargs={'job_id': action.externalId, 'coordinator_job_id': coordinator_id}) or '',
+      'externalId': action.externalId or '-',
+      'nominalTime': format_time(action.nominalTime),
+      'createdTime': format_time(action.createdTime),
+      'lastModifiedTime': format_time(action.lastModifiedTime),
+      'errorMessage': escapejs(action.errorMessage),
+      'missingDependencies': escapejs(action.missingDependencies)
     }
     actions.append(massaged_action)
 

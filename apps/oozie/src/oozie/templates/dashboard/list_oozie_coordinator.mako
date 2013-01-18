@@ -31,93 +31,80 @@ ${ layout.menubar(section='dashboard') }
 
   <h1>${ _('Coordinator') } ${ oozie_coordinator.appName }</h1>
 
-    <div class="tab-pane" id="details">
-      <div class="container-fluid">
-        <div class="row-fluid">
-          <div class="span3">${ _('Coordinator') }</div>
-          <div class="span6">
-              % if coordinator is not None:
-                <a href="${ coordinator.get_absolute_url() }">${ oozie_coordinator.appName }</a>
-              % else:
-                ${ oozie_coordinator.appName }
-              % endif
+
+<div class="row-fluid">
+  <div class="span2">
+    <div class="well sidebar-nav">
+      <ul class="nav nav-list">
+        <li class="nav-header">${ _('Coordinator') }</li>
+        <li>
+            % if coordinator is not None:
+              <a href="${ coordinator.get_absolute_url() }">${ oozie_coordinator.appName }</a>
+            % else:
+            ${ oozie_coordinator.appName }
+            % endif
+        </li>
+
+        <li class="nav-header">${ _('Submitter') }</li>
+        <li>${ oozie_coordinator.user }</li>
+
+        <li class="nav-header">${ _('Status') }</li>
+        <li id="status"><span class="label ${ utils.get_status(oozie_coordinator.status) }">${ oozie_coordinator.status }</span></li>
+
+        <li class="nav-header">${ _('Progress') }</li>
+        <li id="progress">
+          <div class="progress">
+            <div class="bar" style="width: 0">${ oozie_coordinator.get_progress() }%</div>
           </div>
-        </div>
+        </li>
 
-        <div class="row-fluid">
-          <div class="span3">${ _('Submitter') }</div>
-          <div class="span6">${ oozie_coordinator.user }</div>
-        </div>
+        <li class="nav-header">${ _('Frequency') }</li>
+        <li>${ oozie_coordinator.frequency } ${ oozie_coordinator.timeUnit }</li>
 
-        <div class="row-fluid">
-          <div class="span3">${ _('Status') }</div>
-          <div class="span6"><span class="label ${ utils.get_status(oozie_coordinator.status) }">${ oozie_coordinator.status }</span>&nbsp;</div>
-        </div>
+        <li class="nav-header">${ _('Next Materialized Time') }</li>
+        <li id="nextTime">${ utils.format_time(oozie_coordinator.nextMaterializedTime) }</li>
 
-        <div class="row-fluid">
-          <div class="span3">
-            ${ _('Progress') }
-          </div>
-          <div class="span3">
-            ${ oozie_coordinator.get_progress() }%
-          </div>
-        </div>
+        <li class="nav-header">${ _('Start time') }</li>
+        <li>${ utils.format_time(oozie_coordinator.startTime) }</li>
 
-        <div class="row-fluid">
-          <div class="span3">${ _('Frequency') }</div>
-          <div class="span3">${ oozie_coordinator.frequency } ${ oozie_coordinator.timeUnit }</div>
-          <div class="span3">${ _('Next Materialized Time') }</div>
-          <div class="span3">${ utils.format_time(oozie_coordinator.nextMaterializedTime) }</div>
-        </div>
-
-
-        <div class="row-fluid">
-          <div class="span3">${ _('Start time') }</div><div class="span3">${ utils.format_time(oozie_coordinator.startTime) }</div>
-          <div class="span3">${ _('End time') }</div><div class="span3">${ utils.format_time(oozie_coordinator.endTime) }</div>
-        </div>
+        <li class="nav-header">${ _('End time') }</li>
+        <li id="endTime">${ utils.format_time(oozie_coordinator.endTime) }</li>
 
         % if coordinator:
-          <div class="row-fluid">
-            <div class="row-fluid">
-              <div class="span3">${ _('Datasets') }</div>
-            </div>
-            % for dataset in coordinator.dataset_set.all():
-              <div class="row-fluid">
-                <div class="span3"></div>
-                <div class="span6">${ dataset.name } : ${ dataset.uri }</div>
-              </div>
-            % endfor
-          </div>
+            <li class="nav-header">${ _('Datasets') }</li>
+          % for dataset in coordinator.dataset_set.all():
+            <li rel="tooltip" title="${ dataset.name } : ${ dataset.uri }"><i class="icon-eye-open"></i> <span class="dataset">${ dataset.name }</span></li>
+          % endfor
         % endif
 
         % if has_job_edition_permission(oozie_coordinator, user):
-          <div class="row-fluid">
-            <div class="span3">${ _('Manage') }</div>
-            <div class="span6">
-              <form action="${ url('oozie:resubmit_coordinator', oozie_coord_id=oozie_coordinator.id) }" method="post">
+          <li class="nav-header">${ _('Manage') }</li>
+          <li>
+          <form action="${ url('oozie:resubmit_coordinator', oozie_coord_id=oozie_coordinator.id) }" method="post">
+              <button type="button" title="${_('Kill %(coordinator)s') % dict(coordinator=oozie_coordinator.id)}"
+                 id="kill-btn"
+                 class="btn btn-small btn-danger confirmationModal"
+                 alt="${ _('Are you sure you want to kill coordinator %s?') % oozie_coordinator.id }"
+                 href="javascript:void(0)"
+                 data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='kill') }"
+                 data-message="${ _('The coordinator was killed!') }"
+                 data-confirmation-message="${ _('Are you sure you\'d like to kill this job?') }">
+              ${_('Kill')}
+              </button>
+              <button id="resubmit-btn" type="submit" class="btn btn-small
               % if oozie_coordinator.is_running():
-                <a title="${_('Kill %(coordinator)s') % dict(coordinator=oozie_coordinator.id)}"
-                  id="kill-coordinator"
-                  class="btn small confirmationModal"
-                  alt="${ _('Are you sure you want to kill coordinator %s?') % oozie_coordinator.id }"
-                  href="javascript:void(0)"
-                  data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='kill') }"
-                  data-message="${ _('The coordinator was killed!') }"
-                  data-confirmation-message="${ _('Are you sure you\'d like to kill this job?') }">
-                    ${_('Kill')}
-                </a>
-              % else:
-                <button type="submit" class="btn">
-                  ${ _('Resubmit') }
-                </button>
+                hide
               % endif
-              </form>
-            </div>
-          </div>
+              ">
+              ${ _('Resubmit') }
+              </button>
+          </form>
+          </li>
         % endif
-      </div>
+      </ul>
     </div>
-
+  </div>
+  <div class="span10">
     <ul class="nav nav-tabs">
       <li class="active"><a href="#calendar" data-toggle="tab">${ _('Calendar') }</a></li>
       <li><a href="#actions" data-toggle="tab">${ _('Actions') }</a></li>
@@ -127,105 +114,137 @@ ${ layout.menubar(section='dashboard') }
     </ul>
 
     <div class="tab-content" style="padding-bottom:200px">
-     <div class="tab-pane active" id="calendar">
+      <div class="tab-pane active" id="calendar">
         <table class="table table-striped table-condensed">
           <thead>
-            <tr>
-              <th>${ _('Day') }</th>
-              <th>${ _('Comment') }</th>
-            </tr>
+          <tr>
+            <th>${ _('Day') }</th>
+            <th>${ _('Comment') }</th>
+          </tr>
           </thead>
-          <tbody>
-            % for i, action in enumerate(reversed(oozie_coordinator.get_working_actions())):
-              <tr>
-                <td>
-                  % if action.externalId:
-                    <a href="${ url('oozie:list_oozie_workflow', job_id=action.externalId, coordinator_job_id=oozie_coordinator.id) }"
-                      data-row-selector="true"/>
-                  % endif
-                  <span class="label ${ utils.get_status(action.status) }">${ utils.format_time(action.nominalTime) }</span>
-                </td>
-                <td>
-                  ${ action.errorMessage or "" }
-                  % if action.missingDependencies:
-                    ${ _('Missing')} ${ action.missingDependencies }
-                  % endif
-                </td>
-              </tr>
-            % endfor
+          <tbody data-bind="template: {name: 'calendarTemplate', foreach: actions}">
+
           </tbody>
+          <tfoot>
+            <tr data-bind="visible: isLoading()">
+              <td colspan="2" class="left">
+                <img src="/static/art/spinner.gif" />
+              </td>
+            </tr>
+            <tr data-bind="visible: actions().length == 0 && !isLoading()">
+              <td colspan="2">
+                <div class="alert">
+                  ${ _('There are no actions to be shown.') }
+                </div>
+              </td>
+            </tr>
+          </tfoot>
         </table>
       </div>
+
+      <script id="calendarTemplate" type="text/html">
+
+        <tr>
+          <td>
+            <a data-bind="visible:externalId !='', attr: { href: externalIdUrl}" data-row-selector="true"></a>
+            <span data-bind="text: nominalTime, attr: {'class': statusClass}"></span>
+          </td>
+          <td><span data-bind="text: errorMessage"></span> <span data-bind="visible:missingDependencies !='', text: '${ _('Missing')}' + missingDependencies"></span></td>
+
+        </tr>
+
+      </script>
+
 
       <div class="tab-pane" id="actions">
-        <table data-filters="HtmlTable" class="table table-striped table-condensed" cellpadding="0" cellspacing="0">
+
+        <table class="table table-striped table-condensed" cellpadding="0" cellspacing="0">
           <thead>
-            <tr>
-              <th>${ _('Number') }</th>
-              <th>${ _('Nominal Time') }</th>
+          <tr>
+            <th>${ _('Number') }</th>
+            <th>${ _('Nominal Time') }</th>
 
-              <th>${ _('Type') }</th>
-              <th>${ _('Status') }</th>
+            <th>${ _('Type') }</th>
+            <th>${ _('Status') }</th>
 
-              <th>${ _('Error Message') }</th>
-              <th>${ _('Missing Dependencies') }</th>
+            <th>${ _('Error Message') }</th>
+            <th>${ _('Missing Dependencies') }</th>
 
-              <th>${ _('Created Time') }</th>
-              <th>${ _('Last Modified Time') }</th>
+            <th>${ _('Created Time') }</th>
+            <th>${ _('Last Modified Time') }</th>
 
-              <th>${ _('Id') }</th>
-              <th>${ _('External Id') }</th>
-              <th>${ _('Action') }</th>
-            </tr>
+            <th>${ _('Id') }</th>
+            <th>${ _('External Id') }</th>
+          </tr>
           </thead>
-          <tbody>
-            % for i, action in enumerate(oozie_coordinator.get_working_actions()):
-              <tr>
 
-                <td>${ action.actionNumber }</td>
-                <td>${ utils.format_time(action.nominalTime) }</td>
+          <tbody data-bind="template: {name: 'actionTemplate', foreach: actions}">
 
-                <td>${ action.type }</td>
-                <td><span class="label ${ utils.get_status(action.status) }">${ action.status }</span></td>
+          </tbody>
 
-                <td>${action.errorMessage}</td>
-                <td>${action.missingDependencies}</td>
-
-                <td>${ utils.format_time(action.createdTime) }</td>
-                <td>${ utils.format_time(action.lastModifiedTime) }</td>
-
-                <td>
-                  % if action.externalId:
-                    <a href="${ url('oozie:list_oozie_workflow', job_id=action.externalId, coordinator_job_id=oozie_coordinator.id) }"
-                      data-row-selector="true">${ action.id }</a>
-                  % else:
-                    ${ action.id }
-                  % endif
-                </td>
-                <td>
-                    ${ action.externalId or "-" }
-                </td>
-              </tr>
-            % endfor
-          <tbody>
+          <tfoot>
+          <tr data-bind="visible: isLoading()">
+            <td colspan="10" class="left">
+              <img src="/static/art/spinner.gif" />
+            </td>
+          </tr>
+          <tr data-bind="visible: !isLoading() && actions().length == 0">
+            <td colspan="10">
+              <div class="alert">
+                ${ _('There are no actions to be shown.') }
+              </div>
+            </td>
+          </tr>
+          </tfoot>
         </table>
       </div>
 
-    <div class="tab-pane" id="configuration">
-       ${ utils.display_conf(oozie_coordinator.conf_dict) }
-    </div>
+      <script id="actionTemplate" type="text/html">
 
-    <div class="tab-pane" id="log">
+        <tr>
+          <td data-bind="text: number"></td>
+          <td data-bind="text: nominalTime"></td>
+          <td data-bind="text: type"></td>
+          <td><span data-bind="text: status, attr: {'class': statusClass}"></span></td>
+          <td data-bind="text: errorMessage"></td>
+          <td data-bind="text: missingDependencies"></td>
+          <td data-bind="text: createdTime"></td>
+          <td data-bind="text: lastModifiedTime"></td>
+
+          <td>
+            <a data-bind="visible:externalId !='', attr: { href: externalIdUrl}, text: id" data-row-selector"true"></a>
+          </td>
+
+          <td data-bind="text: externalId"></td>
+
+        </tr>
+
+      </script>
+
+      <div class="tab-pane" id="configuration">
+        ${ utils.display_conf(oozie_coordinator.conf_dict) }
+      </div>
+
+      <div class="tab-pane" id="log">
         <pre>${ oozie_coordinator.log }</pre>
-    </div>
+      </div>
 
-    <div class="tab-pane" id="definition">
+      <div class="tab-pane" id="definition">
         <textarea id="definitionEditor">${ oozie_coordinator.definition }</textarea>
+      </div>
     </div>
-    </div>
-  </div>
 
-  <a href="${ url('oozie:list_oozie_coordinators') }" class="btn">${ _('Back') }</a>
+    <div style="margin-bottom: 16px">
+      <a href="${ url('oozie:list_oozie_coordinators') }" class="btn">${ _('Back') }</a>
+    </div>
+
+  </div>
+</div>
+
+
+
+
+
 
 </div>
 
@@ -240,52 +259,192 @@ ${ layout.menubar(section='dashboard') }
   </div>
 </div>
 
+<script src="/static/ext/js/knockout-2.1.0.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/codemirror-3.0.js"></script>
 <link rel="stylesheet" href="/static/ext/css/codemirror.css">
 <script src="/static/ext/js/codemirror-xml.js"></script>
 
+<style>
+  .CodeMirror.cm-s-default {
+    height:500px;
+  }
+  .sidebar-nav {
+    padding: 9px 0;
+  }
+</style>
+
 <script>
-  $("a[data-row-selector='true']").jHueRowSelector();
-
-  var definitionEditor = $("#definitionEditor")[0];
-
-  var codeMirror = CodeMirror(function(elt) {
-    definitionEditor.parentNode.replaceChild(elt, definitionEditor);
-    }, {
-      value: definitionEditor.value,
-    readOnly: true,
-    lineNumbers: true
-  });
-
-  // force refresh on tab change
-  $("a[data-toggle='tab']").on("shown", function (e) {
-    if ($(e.target).attr("href") == "#definition") {
-      codeMirror.refresh();
-    }
-  });
-
-  $(".confirmationModal").click(function(){
-    var _this = $(this);
-    $("#confirmation .message").text(_this.attr("data-confirmation-message"));
-    $("#confirmation").modal("show");
-    $("#confirmation a.btn-danger").click(function() {
-      _this.trigger('confirmation');
-    });
-  });
-
-  $(".confirmationModal").bind('confirmation', function() {
-    var _this = this;
-    $.post($(this).attr("data-url"),
-      { 'notification': $(this).attr("data-message") },
-      function(response) {
-        if (response['status'] != 0) {
-          $.jHueNotify.error("${ _('Problem: ') }" + response['data']);
-        } else {
-          window.location.reload();
+  function getStatusClass(status, prefix){
+    if(!Array.prototype.indexOf) {
+      Array.prototype.indexOf = function(needle) {
+        for(var i = 0; i < this.length; i++) {
+          if(this[i] === needle) {
+            return i;
+          }
         }
+        return -1;
+      };
+    }
+    if (prefix == null){
+      prefix = "label-";
+    }
+    var klass = "";
+    if (['SUCCEEDED', 'OK'].indexOf(status) > -1){
+      klass = prefix + "success";
+    }
+    else if (['RUNNING', 'PREP', 'WAITING', 'SUSPENDED', 'PREPSUSPENDED', 'PREPPAUSED', 'PAUSED'].indexOf(status) > -1){
+      klass = prefix + "warning";
+    }
+    else if (status == 'READY'){
+      klass = prefix + "success";
+    }
+    else {
+      klass = prefix + "important";
+      if (prefix == "bar-"){
+        klass = prefix + "danger";
       }
-    );
-    return false;
+    }
+    return klass;
+  }
+
+  var Action = function (action) {
+    return {
+      id: action.id,
+      number: action.number,
+      type: action.type,
+      status: action.status,
+      statusClass: "label " + getStatusClass(action.status),
+      externalIdUrl: action.externalIdUrl,
+      externalId: action.externalId,
+      nominalTime: action.nominalTime,
+      createdTime: action.createdTime,
+      lastModifiedTime: action.lastModifiedTime,
+      errorMessage: action.errorMessage,
+      missingDependencies: action.missingDependencies
+    }
+  }
+
+  var RunningCoordinatorActionsModel = function (actions) {
+    var self = this;
+    self.isLoading = ko.observable(true);
+    self.actions = ko.observableArray(ko.utils.arrayMap(actions), function (action) {
+      return new Action(action);
+    });
+
+  };
+
+  var viewModel = new RunningCoordinatorActionsModel([]);
+  ko.applyBindings(viewModel);
+
+  $(document).ready(function(){
+    $("a[data-row-selector='true']").jHueRowSelector();
+
+    $("*[rel=tooltip]").tooltip();
+
+    $(".dataset").each(function () {
+      if ($(this).text().length > 15) {
+        $(this).html($(this).text().substr(0, 14) + "&hellip;");
+      }
+      $(this).removeClass("hide");
+    });
+
+
+    var definitionEditor = $("#definitionEditor")[0];
+
+    var codeMirror = CodeMirror(function(elt) {
+      definitionEditor.parentNode.replaceChild(elt, definitionEditor);
+      }, {
+        value: definitionEditor.value,
+      readOnly: true,
+      lineNumbers: true
+    });
+
+    // force refresh on tab change
+    $("a[data-toggle='tab']").on("shown", function (e) {
+      if ($(e.target).attr("href") == "#definition") {
+        codeMirror.refresh();
+      }
+    });
+
+    $(".confirmationModal").click(function(){
+      var _this = $(this);
+      $("#confirmation .message").text(_this.attr("data-confirmation-message"));
+      $("#confirmation").modal("show");
+      $("#confirmation a.btn-danger").click(function() {
+        _this.trigger('confirmation');
+      });
+    });
+
+    $(".confirmationModal").bind('confirmation', function() {
+      var _this = this;
+      $.post($(this).attr("data-url"),
+        { 'notification': $(this).attr("data-message") },
+        function(response) {
+          if (response['status'] != 0) {
+            $.jHueNotify.error("${ _('Problem: ') }" + response['data']);
+          } else {
+            window.location.reload();
+          }
+        }
+      );
+      return false;
+    });
+
+    resizeLogs();
+    refreshView();
+    var logsAtEnd = true;
+
+    function refreshView() {
+      $.getJSON(window.location.href + "?format=json", function (data) {
+        viewModel.isLoading(false);
+        if (data.actions){
+          viewModel.actions(ko.utils.arrayMap(data.actions, function (action) {
+            return new Action(action);
+          }));
+        }
+
+        $("#status span").attr("class", "label").addClass(getStatusClass(data.status)).text(data.status);
+
+        if (data.id && data.status != "RUNNING" && data.status != "SUSPENDED"){
+          $("#kill-btn").hide();
+          $("#resubmit-btn").show();
+        }
+
+        $("#progress .bar").text(data.progress+"%").css("width", data.progress+"%").attr("class", "bar "+getStatusClass(data.status, "bar-"));
+
+        var _logsEl = $("#log pre");
+        var newLines = data.log.split("\n").slice(_logsEl.text().split("\n").length);
+        _logsEl.text(_logsEl.text() + newLines.join("\n"));
+        if (logsAtEnd) {
+          _logsEl.scrollTop(_logsEl[0].scrollHeight - _logsEl.height());
+        }
+        if (data.status != "RUNNING"){
+          return;
+        }
+        window.setTimeout(refreshView, 1000);
+      });
+    }
+
+    $(window).resize(function () {
+      resizeLogs();
+    });
+
+    $("a[href='#log']").on("shown", function () {
+      resizeLogs();
+    });
+
+    $("#log pre").scroll(function () {
+      if ($(this).scrollTop() + $(this).height() + 20 >= $(this)[0].scrollHeight) {
+        logsAtEnd = true;
+      }
+      else {
+        logsAtEnd = false;
+      }
+    });
+
+    function resizeLogs() {
+      $("#log pre").css("overflow", "auto").height($(window).height() - $("#log pre").position().top - 80);
+    }
   });
 </script>
 
