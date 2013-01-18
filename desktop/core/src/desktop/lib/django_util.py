@@ -46,6 +46,11 @@ MAKO = 'mako'
 USERNAME_RE_RULE = "[^-:\s][^:\s]*"
 GROUPNAME_RE_RULE = ".{,30}"
 
+
+# For backward compatibility for upgrades to Hue 2.2
+class PopupException: pass
+
+
 class Encoder(simplejson.JSONEncoder):
   """
   Automatically encodes JSON for Django models and
