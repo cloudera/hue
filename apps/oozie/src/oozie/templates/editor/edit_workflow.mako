@@ -50,7 +50,7 @@ ${ layout.menubar(section='workflows') }
 
         <li class="nav-header">${ _('Editor') }</li>
         <li><a href="#editWorkflow">${ _('Edit workflow') }</a></li>
-        <li><a href="javascript:void(0)" class="import-jobsub-node-link" title="${ _('Click to import a Job Designer action and add it to the end of the flow') }" rel="tooltip" data-placement="right">${ _('Import workflow') }</a></li>
+        <li><a href="javascript:void(0)" class="import-jobsub-node-link" title="${ _('Click to import a Job Designer action and add it to the end of the flow') }" rel="tooltip" data-placement="right">${ _('Import action') }</a></li>
         % if user_can_edit_job:
             <li>
               <a data-bind="attr: {href: '/filebrowser/view' + deployment_dir() }" target="_blank" title="${ _('Upload additional files and libraries to the deployment directory') }" rel="tooltip" data-placement="right">${ _('Upload') }</a>
