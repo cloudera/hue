@@ -808,6 +808,16 @@ $(document).ready(function () {
     $('.section').hide();
     $('#' + section).show();
     highlightMenu(section);
+    $(window).scrollTop(0);
+    if (section == 'editWorkflow') {
+      $('#actionToolbar').removeClass('shadowed');
+      $('#actionToolbar').css('position', '');
+      $('#graph').css('marginTop', '');
+      actionToolbarProperties.docked = false;
+      if (actionToolbarProperties.initialWidth == 0) {
+        actionToolbarProperties.initialWidth = $('#actionToolbar').width();
+      }
+    }
   }
 });
 
