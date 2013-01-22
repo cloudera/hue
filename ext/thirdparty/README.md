@@ -34,6 +34,7 @@ Checked-in third party dependencies
 |Y|MySQL for Python|1.2.3c1|GPL or the original license based on Python 1.5.2|http://sourceforge.net/projects/mysql-python/|
 |Y|processing|0.52|BSD|http://developer.berlios.de/projects/pyprocessing|
 |Y|Pygments|1.3.1|BSD|http://pypi.python.org/pypi/Pygments|
+|Y|PyOpenSSL|0.13|ASL2|https://launchpad.net/pyopenssl|
 |Y|pysqlite|2.55|zlib/libpng|http://oss.itsystementwicklung.de/download/pysqlite/2.5/2.5.5/|
 |Y|python-daemon|1.5.1|Python|http://pypi.python.org/pypi/python-daemon/|
 |Y|python-ldap|2.3.13|Python|http://pypi.python.org/pypi/python-ldap/|
