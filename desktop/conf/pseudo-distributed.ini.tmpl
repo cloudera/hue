@@ -142,6 +142,10 @@
   # For use when using LdapBackend for Hue authentication
   ## ldap_username_pattern="uid=<username>,ou=People,dc=mycompany,dc=com"
 
+  # Create users in Hue when they try to login with their LDAP credentials
+  # For use when using LdapBackend for Hue authentication
+  ## create_users_on_login = true
+
       [[[users]]]
 
       # Base filter for searching for users
