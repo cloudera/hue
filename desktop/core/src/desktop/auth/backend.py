@@ -276,6 +276,8 @@ class LdapBackend(object):
       existing_profile = get_profile(existing_user)
       if existing_profile.creation_method == str(UserProfile.CreationMethod.EXTERNAL):
         is_super = User.objects.get(username=username).is_superuser
+    elif not desktop.conf.LDAP.CREATE_USERS_ON_LOGIN.get():
+      return None
 
     try:
       user = self._backend.authenticate(username, password)
@@ -307,7 +309,6 @@ class LdapBackend(object):
   @classmethod
   def manages_passwords_externally(cls):
     return True
-
 
 
 class SpnegoDjangoBackend(django.contrib.auth.backends.ModelBackend):

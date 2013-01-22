@@ -309,6 +309,10 @@ LDAP = ConfigSection(
     BIND_PASSWORD=Config("bind_password",
                    default=None,
                    help=_("The password for the bind user.")),
+    CREATE_USERS_ON_LOGIN = Config("create_users_on_login",
+      help=_("Create users when they login with their LDAP credentials."),
+      type=coerce_bool,
+      default=True),
 
     USERS = ConfigSection(
       key="users",
