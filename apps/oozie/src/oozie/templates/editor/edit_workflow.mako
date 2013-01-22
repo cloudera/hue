@@ -247,7 +247,7 @@ ${ layout.menubar(section='workflows') }
 
   <div class="form-actions center">
   % if user_can_edit_job:
-    <button data-bind="disable: workflow.read_only, visible: !workflow.read_only(), click: function() { save({ success: workflow_save_success, error: workflow_save_error }) }" class="btn btn-primary">${ _('Save') }</button>
+    <button data-bind="disable: workflow.read_only, visible: !workflow.read_only(), click: function() { workflow.loading(true); workflow.save({ success: workflow_save_success, error: workflow_save_error }) }" class="btn btn-primary">${ _('Save') }</button>
   % endif
     <a href="${ url('oozie:list_workflows') }" class="btn">${ _('Back') }</a>
   </div>
@@ -423,10 +423,12 @@ function workflow_save_success(data) {
   $.jHueNotify.info("${ _('Workflow saved') }");
   workflow.reload(data.data);
   workflow.is_dirty( false );
+  workflow.loading(false);
 }
 
 function workflow_save_error(data) {
   $.jHueNotify.error("${ _('Could not save workflow') }");
+  workflow.loading(false);
 }
 
 function workflow_load_success(data) {
@@ -435,10 +437,12 @@ function workflow_load_success(data) {
   } else {
     $.jHueNotify.error("${ _('Received invalid response from server: ') }" + JSON.stringify(data));
   }
+  workflow.loading(false);
 }
 
 function workflow_read_only_handler() {
   $.jHueNotify.error("${ _('Workflow is in read only mode.') }");
+  workflow.loading(false);
 }
 
 // Fetch all nodes from server.
@@ -465,7 +469,18 @@ var import_node = new ImportNode({workflow: workflow});
 var modal = new Modal($('#node-modal'));
 
 // Load data.
-workflow.load({ success: workflow_load_success });
+{
+  var spinner = $('<img src="/static/art/spinner.gif" />');
+  workflow.loading.subscribe(function(value) {
+    if (value) {
+      $('#graph').append(spinner);
+    } else {
+      spinner.remove();
+    }
+  });
+  workflow.loading(true);
+  workflow.load({ success: workflow_load_success });
+}
 import_node.loadAvailableNodes({ success: import_load_available_nodes_success });
 
 /**

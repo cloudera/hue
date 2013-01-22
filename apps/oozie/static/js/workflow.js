@@ -1786,6 +1786,7 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
     self.nodes = ko.observableArray([]);
     self.kill = null;
     self.is_dirty = ko.observable( false );
+    self.loading = ko.observable( false );
     self.read_only = ko.observable( options.read_only || false );
     self.new_node = ko.observable();
 
