@@ -43,7 +43,7 @@ from oozie.import_workflow import import_workflow as _import_workflow
 from oozie.management.commands import oozie_setup
 from oozie.models import Job, Workflow, History, Coordinator,\
                          Dataset, DataInput, DataOutput,\
-                         ACTION_TYPES
+                         ACTION_TYPES, _STD_PROPERTIES_JSON
 from oozie.forms import WorkflowForm, CoordinatorForm, DatasetForm,\
   DataInputForm, DataOutputForm, LinkForm,\
   DefaultLinkForm, design_form_by_type, ParameterForm,\

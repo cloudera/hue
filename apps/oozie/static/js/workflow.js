@@ -222,6 +222,9 @@ var ModalModule = function($, ko) {
         });
       }
     });
+    $(".propKey").typeahead({
+      source:(typeof AUTOCOMPLETE_PROPERTIES != 'undefined') ? AUTOCOMPLETE_PROPERTIES : []
+    });
   }
 
   return module;
@@ -753,7 +756,9 @@ var NodeModule = function($, IdGeneratorTable) {
           self.job_properties.valueHasMutated();
         });
         self.job_properties.push(prop);
-        // $(".propKey:last").each(addAutoComplete);
+        $(".propKey:last").typeahead({
+          source:(typeof AUTOCOMPLETE_PROPERTIES != 'undefined') ? AUTOCOMPLETE_PROPERTIES : []
+        });
       };
 
       self.removeProp = function(val) {

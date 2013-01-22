@@ -282,7 +282,6 @@ ${ layout.menubar(section='workflows') }
 
 <script src="/static/ext/js/knockout-2.1.0.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/jquery/plugins/jquery-ui-autocomplete-1.9.1.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/jquery/plugins/jquery-ui-draggable-droppable-sortable-1.8.23.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/routie-0.3.0.min.js" type="text/javascript" charset="utf-8"></script>
 
@@ -718,19 +717,6 @@ ko.bindingHandlers.fileChooser = {
 
 ko.applyBindings(workflow, $('#workflow')[0]);
 
-// Handles adding autocomplete to job properties.
-// We need to propagate the selected value to knockoutjs.
-var addAutoComplete = function(i, elem) {
-  var propertiesHint = '';
-  $(elem).autocomplete({
-    source: propertiesHint,
-    select: function(event, ui) {
-      var context = ko.contextFor(this);
-      context.$data.name = ui.item.value;
-    }
-  });
-};
-
 window.onbeforeunload = function (e) {
   if (workflow.is_dirty()) {
     var message = "${ _('You have unsaved changes in this workflow.') }";
@@ -752,6 +738,8 @@ window.onresize = function () {
     modal.recenter(280, 250);
   }
 };
+
+var AUTOCOMPLETE_PROPERTIES;
 
 $(document).ready(function () {
 
@@ -834,6 +822,11 @@ $(document).ready(function () {
       }
     }
   }
+
+  // load the autocomplete properties
+  $.getJSON("${ url('oozie:autocomplete_properties') }", function (properties) {
+    AUTOCOMPLETE_PROPERTIES = properties;
+  });
 });
 
 function checkModelDirtiness() {
