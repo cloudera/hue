@@ -128,6 +128,13 @@ var ModalModule = function($, ko) {
     self.context = ko.observable();
     self.template = ko.observable(template || '');
     self.bound = false;
+
+    // exit with escape key.
+    $(window).on('keyup', function(e) {
+      if (e.keyCode == 27) {
+        $('.modal-backdrop').click();
+      }
+    });
   };
 
   module.prototype.show = function(context) {
