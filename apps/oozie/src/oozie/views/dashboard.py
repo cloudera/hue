@@ -296,11 +296,12 @@ def massaged_coordinator_actions_for_json(coordinator):
   for action in coordinator_actions:
     massaged_action = {
       'id': action.id,
+      'url': action.externalId and reverse('oozie:list_oozie_workflow', kwargs={'job_id': action.externalId, 'coordinator_job_id': coordinator_id}) or '',
       'number': action.actionNumber,
       'type': action.type,
       'status': action.status,
-      'externalIdUrl': action.externalId and reverse('oozie:list_oozie_workflow', kwargs={'job_id': action.externalId, 'coordinator_job_id': coordinator_id}) or '',
       'externalId': action.externalId or '-',
+      'externalIdUrl': action.externalId and reverse('oozie:list_oozie_workflow_action', kwargs={'action': action.externalId}) or '',
       'nominalTime': format_time(action.nominalTime),
       'createdTime': format_time(action.createdTime),
       'lastModifiedTime': format_time(action.lastModifiedTime),
