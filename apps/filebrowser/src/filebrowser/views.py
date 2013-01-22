@@ -50,7 +50,7 @@ from avro import datafile, io
 
 from desktop.lib import i18n, paginator
 from desktop.lib.conf import coerce_bool
-from desktop.lib.django_util import make_absolute, render, render_json, format_preserving_redirect
+from desktop.lib.django_util import make_absolute, render, render_json, format_preserving_redirect, render_to_string
 from desktop.lib.exceptions_renderable import PopupException
 from filebrowser.conf import MAX_SNAPPY_DECOMPRESSION_SIZE
 from filebrowser.lib.archives import archive_factory
@@ -606,7 +606,8 @@ def display(request, path):
         'dirname': dirname,
         'mode': mode,
         'compression': compression,
-        'size': stats['size']
+        'size': stats['size'],
+        'max_chunk_size': str(MAX_CHUNK_SIZE_BYTES)
     }
     data["filename"] = os.path.basename(path)
     data["editable"] = stats['size'] < MAX_FILEEDITOR_SIZE
