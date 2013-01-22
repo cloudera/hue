@@ -200,3 +200,7 @@ ul {
 .draggable-button a {
   padding: 8px;
 }
+
+.typeahead {
+  z-index: 2000;
+}

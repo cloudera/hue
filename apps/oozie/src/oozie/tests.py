@@ -453,6 +453,11 @@ class TestAPI(OozieMockBase):
     assert_true('archives' in test_response_json_object['data'], test_response_json_object['data'])
     assert_equal(0, len(test_response_json_object['data']['archives']), test_response_json_object['data'])
 
+  def test_autocomplete(self):
+    response = self.c.get(reverse('oozie:autocomplete_properties'))
+    test_response_json = response.content
+    assert_true('mapred.input.dir' in test_response_json)
+
 
 class TestAPIWithOozie(OozieBase):
   def setUp(self):
