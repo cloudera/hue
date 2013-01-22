@@ -378,8 +378,8 @@ class Workflow(Job):
 
   def get_hierarchy(self):
     node = self.start
-    return self.get_hierarchy_rec(node=node) + [[Kill.objects.get(name='kill', workflow=node.workflow)],
-                                           [End.objects.get(name='end', workflow=node.workflow)]]
+    return self.get_hierarchy_rec(node=node) + [[Kill.objects.get(workflow=node.workflow)],
+                                           [End.objects.get(workflow=node.workflow)]]
 
   def get_hierarchy_rec(self, node=None):
     if node is None:

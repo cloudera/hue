@@ -52,6 +52,7 @@ OOZIE_NAMESPACES = ['uri:oozie:workflow:0.1', 'uri:oozie:workflow:0.2', 'uri:ooz
 
 LINKS = ('ok', 'error', 'path')
 
+
 def _save_links(workflow, root):
   """
   Iterates over all links in the passed XML doc and creates links.
@@ -78,62 +79,135 @@ def _save_links(workflow, root):
   Note: Nodes are looked up by workflow and name.
   """
   # Iterate over nodes
-  for node in root:
+  for child_el in root:
+    # Skip special nodes (like comments).
+    if not isinstance(child_el.tag, basestring):
+      continue
+
     # Iterate over node members
     # Join nodes have attributes which point to the next node
     # Start node has attribute which points to first node
-    parent = Node.objects.get(workflow=workflow, name=node.attrib.get('name', xml_tag(node))).get_full_node()
+    parent = Node.objects.get(workflow=workflow, name=child_el.attrib.get('name', xml_tag(child_el))).get_full_node()
 
     if isinstance(parent, Start):
-      workflow.start = parent
-      to = node.attrib['to']
-      child = Node.objects.get(workflow=workflow, name=to)
-      obj = Link.objects.create(name='to', parent=parent, child=child)
-      obj.save()
+      _start_relationships(workflow, parent, child_el)
 
     elif isinstance(parent, Join):
-      to = node.attrib['to']
-      child = Node.objects.get(workflow=workflow, name=to)
-      obj = Link.objects.create(name='to', parent=parent, child=child)
-      obj.save()
+      _join_relationships(workflow, parent, child_el)
 
     elif isinstance(parent, Decision):
-      for switch in node:
-        for case in switch:
-          to = case.attrib['to']
-          child = Node.objects.get(workflow=workflow, name=to)
-
-          if xml_tag(case) == 'default':
-            name = 'default'
-            obj = Link.objects.create(name=name, parent=parent, child=child)
-
-          else:
-            name = 'start'
-            comment = case.text.strip()
-            obj = Link.objects.create(name=name, parent=parent, child=child, comment=comment)
-
-          obj.save()
-
+      _decision_relationships(workflow, parent, child_el)
     else:
-      for el in node:
-        # Links
-        name = xml_tag(el)
-        if name in LINKS:
-          if name == 'path':
-            to = el.attrib['start']
-            name = 'start'
-          else:
-            to = el.attrib['to']
-
-          child = Node.objects.get(workflow=workflow, name=to)
-          obj = Link.objects.create(name=name, parent=parent, child=child)
-          obj.save()
+      _node_relationships(workflow, parent, child_el)
 
   workflow.end = End.objects.get(workflow=workflow).get_full_node()
   workflow.save()
 
   _resolve_fork_relationships(workflow)
   _resolve_decision_relationships(workflow)
+
+def _start_relationships(workflow, parent, child_el):
+  """
+  Resolve start node links.
+  Will always use 'to' link type.
+  """
+  if 'to' not in child_el.attrib:
+    raise RuntimeError(_("Node %s has a link that is missing 'to' attribute.") % parent.name)
+
+  workflow.start = parent
+  to = child_el.attrib['to']
+
+  try:
+    child = Node.objects.get(workflow=workflow, name=to)
+  except Node.DoesNotExist, e:
+    raise RuntimeError(_("Node %s has not been defined.") % to)
+
+  obj = Link.objects.create(name='to', parent=parent, child=child)
+  obj.save()
+
+def _join_relationships(workflow, parent, child_el):
+  """
+  Resolves join node links.
+  Will always use 'to' link type.
+  """
+  if 'to' not in child_el.attrib:
+    raise RuntimeError(_("Node %s has a link that is missing 'to' attribute.") % parent.name)
+
+  to = child_el.attrib['to']
+
+  try:
+    child = Node.objects.get(workflow=workflow, name=to)
+  except Node.DoesNotExist, e:
+    raise RuntimeError(_("Node %s has not been defined.") % to)
+
+  obj = Link.objects.create(name='to', parent=parent, child=child)
+  obj.save()
+
+def _decision_relationships(workflow, parent, child_el):
+  """
+  Resolves the switch statement like nature of decision nodes.
+  Will use 'to' link type, except for default case.
+  """
+  for switch in child_el:
+    # Skip special nodes (like comments).
+    if not isinstance(switch.tag, basestring):
+      continue
+
+    for case in switch:
+      # Skip special nodes (like comments).
+      if not isinstance(case.tag, basestring):
+        continue
+
+      if 'to' not in case.attrib:
+        raise RuntimeError(_("Node %s has a link that is missing 'to' attribute.") % parent.name)
+
+      to = case.attrib['to']
+      try:
+        child = Node.objects.get(workflow=workflow, name=to)
+      except Node.DoesNotExist, e:
+        raise RuntimeError(_("Node %s has not been defined.") % to)
+
+      if xml_tag(case) == 'default':
+        name = 'default'
+        obj = Link.objects.create(name=name, parent=parent, child=child)
+
+      else:
+        name = 'start'
+        comment = case.text.strip()
+        obj = Link.objects.create(name=name, parent=parent, child=child, comment=comment)
+
+      obj.save()
+
+def _node_relationships(workflow, parent, child_el):
+  """
+  Resolves node links.
+  Will use 'start' link type for fork nodes and 'to' link type for all other nodes.
+  """
+  for el in child_el:
+    # Skip special nodes (like comments).
+    if not isinstance(el.tag, basestring):
+      continue
+
+    # Links
+    name = xml_tag(el)
+    if name in LINKS:
+      if name == 'path':
+        if 'start' not in el.attrib:
+          raise RuntimeError(_("Node %s has a link that is missing 'start' attribute.") % parent.name)
+        to = el.attrib['start']
+        name = 'start'
+      else:
+        if 'to' not in el.attrib:
+          raise RuntimeError(_("Node %s has a link that is missing 'to' attribute.") % parent.name)
+        to = el.attrib['to']
+
+      try:
+        child = Node.objects.get(workflow=workflow, name=to)
+      except Node.DoesNotExist, e:
+        raise RuntimeError("Node %s has not been defined" % to)
+
+      obj = Link.objects.create(name=name, parent=parent, child=child)
+      obj.save()
 
 
 def _resolve_fork_relationships(workflow):
@@ -444,6 +518,7 @@ def import_workflow(workflow, workflow_definition, fs=None):
 
   # Transform XML using XSLT
   transformed_root = transform(workflow_definition_root)
+  print etree.tostring(transformed_root, pretty_print=True)
 
   # Resolve workflow dependencies and node types and link dependencies
   nodes = _prepare_nodes(workflow, transformed_root)
