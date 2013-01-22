@@ -212,10 +212,12 @@ ${ layout.menubar(section='dashboard') }
           <td data-bind="text: lastModifiedTime"></td>
 
           <td>
-            <a data-bind="visible:externalId !='', attr: { href: externalIdUrl}, text: id" data-row-selector"true"></a>
+            <a data-bind="visible:externalId !='', attr: { href: url}, text: id" data-row-selector"true"></a>
           </td>
 
-          <td data-bind="text: externalId"></td>
+          <td>
+            <a data-bind="visible:externalId !='', attr: { href: externalIdUrl}, text: externalId"></a>
+          </td>
 
         </tr>
 
@@ -310,12 +312,13 @@ ${ layout.menubar(section='dashboard') }
   var Action = function (action) {
     return {
       id: action.id,
+      url: action.url,
       number: action.number,
       type: action.type,
       status: action.status,
       statusClass: "label " + getStatusClass(action.status),
-      externalIdUrl: action.externalIdUrl,
       externalId: action.externalId,
+      externalIdUrl: action.externalIdUrl,
       nominalTime: action.nominalTime,
       createdTime: action.createdTime,
       lastModifiedTime: action.lastModifiedTime,
