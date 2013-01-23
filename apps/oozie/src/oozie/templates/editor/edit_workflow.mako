@@ -210,7 +210,7 @@ ${ layout.menubar(section='workflows') }
       </div>
 
       <div id="graph" class="row-fluid" data-bind="template: { name: function(item) { return item.view_template() }, foreach: nodes }"></div>
-      <div id="new-node" class="row-fluid" data-bind="template: { name: 'nodeTemplate', if: new_node, data: new_node }"></div>
+      <div id="new-node" class="row-fluid" data-bind="template: { name: 'nodeTemplate', 'if': new_node, data: new_node }"></div>
 
     </div>
 
@@ -463,7 +463,7 @@ var workflow = new Workflow({
   model: workflow_model,
   registry: registry,
   read_only: ${ str(not user_can_edit_job).lower() },
-  read_only_error_handler: workflow_read_only_handler,
+  read_only_error_handler: workflow_read_only_handler
 });
 var import_node = new ImportNode({workflow: workflow});
 var modal = new Modal($('#node-modal'));
