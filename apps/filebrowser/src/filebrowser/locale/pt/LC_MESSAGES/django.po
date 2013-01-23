@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-01-10 18:29-0800\n"
+"POT-Creation-Date: 2013-01-02 22:57-0800\n"
 "PO-Revision-Date: 2012-07-30 18:52-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: pt <LL@li.org>\n"
@@ -16,10 +16,6 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
-
-#: src/filebrowser/conf.py:25
-msgid "Max snappy decompression size in bytes."
-msgstr ""
 
 #: src/filebrowser/forms.py:62
 msgid "File to edit"
@@ -136,54 +132,48 @@ msgstr "Recursivo"
 msgid "Path to change permissions"
 msgstr "Caminho para alterar as permissões"
 
-#: src/filebrowser/views.py:107 src/filebrowser/views.py:486
+#: src/filebrowser/views.py:106 src/filebrowser/views.py:486
 #: src/filebrowser/views.py:516
 #, python-format
 msgid "File not found: %(path)s"
 msgstr "Ficheiro não encontrado: %(path)s"
 
-#: src/filebrowser/views.py:109
+#: src/filebrowser/views.py:108
 #, python-format
 msgid "'%(path)s' is not a file"
 msgstr "'%(path)s' não é um ficheiro"
 
-#: src/filebrowser/views.py:144
+#: src/filebrowser/views.py:143
 #, python-format
 msgid "Cannot access: %(path)s."
 msgstr "Impossível aceder a: %(path)s."
 
-#: src/filebrowser/views.py:146 src/filebrowser/views.py:932
+#: src/filebrowser/views.py:145 src/filebrowser/views.py:884
 #, python-format
-msgid ""
-" Note: you are a Hue admin but not a HDFS superuser (which is "
-"\"%(superuser)s\")."
-msgstr ""
-" Nota: é um administrador da Hue, mas não um super-utilizador do HDFS "
-"(que é \"%(superuser)s\")."
+msgid " Note: you are a Hue admin but not a HDFS superuser (which is \"%(superuser)s\")."
+msgstr " Nota: é um administrador da Hue, mas não um super-utilizador do HDFS (que é \"%(superuser)s\")."
 
-#: src/filebrowser/views.py:172
+#: src/filebrowser/views.py:171
 #, python-format
 msgid "Cannot edit a directory: %(path)s"
 msgstr "Não é possível editar um directório: %(path)s"
 
-#: src/filebrowser/views.py:176
+#: src/filebrowser/views.py:175
 #, python-format
 msgid "File too big to edit: %(path)s"
 msgstr "Ficheiro demasiado grande para editar: %(path)s"
 
-#: src/filebrowser/views.py:186
+#: src/filebrowser/views.py:185
 #, python-format
 msgid "File is not encoded in %(encoding)s; cannot be edited: %(path)s"
-msgstr ""
-"O ficheiro não está codificado em %(encoding)s; não pode ser editado: "
-"%(path)s"
+msgstr "O ficheiro não está codificado em %(encoding)s; não pode ser editado: %(path)s"
 
-#: src/filebrowser/views.py:235
+#: src/filebrowser/views.py:234
 #, python-format
 msgid "Saved %(path)s."
 msgstr "%(path)s guardado."
 
-#: src/filebrowser/views.py:330
+#: src/filebrowser/views.py:329
 #, python-format
 msgid "Not a directory: %(path)s"
 msgstr "Não é um directório: %(path)s"
@@ -214,137 +204,104 @@ msgstr "O comprimento não pode ser inferior a zero."
 msgid "Cannot request chunks greater than %(bytes)d bytes"
 msgstr "Não pode pedir blocos com mais de %(bytes)d bytes"
 
-#: src/filebrowser/views.py:659
-#, python-format
-msgid ""
-"Failed to validate snappy compressed file. File size is greater than "
-"allowed max snappy decompression size of %d"
-msgstr ""
-
-#: src/filebrowser/views.py:690
-#, fuzzy
-msgid "Failed to decompress snappy compressed file."
-msgstr "Falha ao descompactar o ficheiro."
-
-#: src/filebrowser/views.py:695
-msgid "Failed to decompress snappy compressed file. Snappy is not installed!"
-msgstr ""
-
-#: src/filebrowser/views.py:698
-#, python-format
-msgid ""
-"Failed to decompress snappy compressed file. File size is greater than "
-"allowed max snappy decompression size of %d"
-msgstr ""
-
-#: src/filebrowser/views.py:722
+#: src/filebrowser/views.py:686
 msgid "Failed to read Avro file."
 msgstr "Falha ao ler o ficheiro Avro."
 
-#: src/filebrowser/views.py:729
+#: src/filebrowser/views.py:695
 msgid "Offsets are not supported with Gzip compression."
 msgstr "A compressão Gzip não suporta offsets."
 
-#: src/filebrowser/views.py:734
+#: src/filebrowser/views.py:702
 msgid "Failed to decompress file."
 msgstr "Falha ao descompactar o ficheiro."
 
-#: src/filebrowser/views.py:745
+#: src/filebrowser/views.py:717
 msgid "Failed to read file."
 msgstr "Falha ao ler o ficheiro."
 
-#: src/filebrowser/views.py:793 src/filebrowser/views.py:795
+#: src/filebrowser/views.py:745 src/filebrowser/views.py:747
 #: src/filebrowser/templates/display.mako:119
 #: src/filebrowser/templates/display.mako:199
 msgid "First Block"
 msgstr "Primeiro bloco"
 
-#: src/filebrowser/views.py:793 src/filebrowser/views.py:795
+#: src/filebrowser/views.py:745 src/filebrowser/views.py:747
 #: src/filebrowser/templates/display.mako:120
 #: src/filebrowser/templates/display.mako:200
 msgid "Previous Block"
 msgstr "Bloco anterior"
 
-#: src/filebrowser/views.py:798 src/filebrowser/views.py:801
+#: src/filebrowser/views.py:750 src/filebrowser/views.py:753
 #: src/filebrowser/templates/display.mako:121
 #: src/filebrowser/templates/display.mako:201
 msgid "Next Block"
 msgstr "Bloco seguinte"
 
-#: src/filebrowser/views.py:798 src/filebrowser/views.py:801
+#: src/filebrowser/views.py:750 src/filebrowser/views.py:753
 #: src/filebrowser/templates/display.mako:122
 #: src/filebrowser/templates/display.mako:202
 msgid "Last Block"
 msgstr "Último bloco"
 
-#: src/filebrowser/views.py:930
+#: src/filebrowser/views.py:882
 msgid "Cannot perform operation."
 msgstr "Não é possível efectuar a operação."
 
-#: src/filebrowser/views.py:965
+#: src/filebrowser/views.py:917
 #, python-format
-msgid ""
-"Could not rename folder \"%s\" to \"%s\": Hashes are not allowed in "
-"filenames."
-msgstr ""
-"Não foi possível alterar o nome da pasta \"%s\" para \"%s\": Não são "
-"permitidos hashes em nomes de ficheiros."
+msgid "Could not rename folder \"%s\" to \"%s\": Hashes are not allowed in filenames."
+msgstr "Não foi possível alterar o nome da pasta \"%s\" para \"%s\": Não são permitidos hashes em nomes de ficheiros."
 
-#: src/filebrowser/views.py:979
+#: src/filebrowser/views.py:931
 #, python-format
-msgid ""
-"Could not name folder \"%s\": Slashes or hashes are not allowed in "
-"filenames."
-msgstr ""
-"Não foi possível alterar o nome da pasta \"%s\": Não são permitidas "
-"barras ou hashes em nomes de ficheiros."
+msgid "Could not name folder \"%s\": Slashes or hashes are not allowed in filenames."
+msgstr "Não foi possível alterar o nome da pasta \"%s\": Não são permitidas barras ou hashes em nomes de ficheiros."
 
-#: src/filebrowser/views.py:989
+#: src/filebrowser/views.py:941
 #, python-format
 msgid "Could not name file \"%s\": Slashes are not allowed in filenames."
-msgstr ""
-"Não foi possível atribuir o nome ao ficheiro \"%s\": Não são permitidas "
-"barras em nomes de ficheiros."
+msgstr "Não foi possível atribuir o nome ao ficheiro \"%s\": Não são permitidas barras em nomes de ficheiros."
 
-#: src/filebrowser/views.py:1082 src/filebrowser/views.py:1159
+#: src/filebrowser/views.py:1034 src/filebrowser/views.py:1111
 msgid "A POST request is required."
 msgstr "É necessário um pedido POST."
 
-#: src/filebrowser/views.py:1085 src/filebrowser/views.py:1162
+#: src/filebrowser/views.py:1037 src/filebrowser/views.py:1114
 #, python-format
 msgid "%(destination)s upload succeeded"
 msgstr "Upload para %(destination)s bem-sucedido"
 
-#: src/filebrowser/views.py:1087 src/filebrowser/views.py:1164
+#: src/filebrowser/views.py:1039 src/filebrowser/views.py:1116
 #, python-format
 msgid "Upload failed: %(data)s"
 msgstr "Falha no upload: %(data)s"
 
-#: src/filebrowser/views.py:1103 src/filebrowser/views.py:1182
+#: src/filebrowser/views.py:1055 src/filebrowser/views.py:1134
 #, python-format
 msgid "Sorry, no \"%(sep)s\" in the filename %(name)s.sep"
 msgstr "Lamentamos, mas não existe \"%(sep)s\" no nome do ficheiro %(name)s.sep"
 
-#: src/filebrowser/views.py:1123 src/filebrowser/views.py:1206
+#: src/filebrowser/views.py:1075 src/filebrowser/views.py:1158
 #, python-format
 msgid "Destination %(name)s already exists."
 msgstr "O destino %(name)s já existe."
 
-#: src/filebrowser/views.py:1125 src/filebrowser/views.py:1208
+#: src/filebrowser/views.py:1077 src/filebrowser/views.py:1160
 #, python-format
 msgid "Copy to %(name)s failed: %(error)s"
 msgstr "Falha ao copiar para %(name)s: %(error)s"
 
-#: src/filebrowser/views.py:1135 src/filebrowser/views.py:1218
+#: src/filebrowser/views.py:1087 src/filebrowser/views.py:1170
 #, python-format
 msgid "Error in upload form: %s"
 msgstr "Erro ao fazer upload do formulário: %s"
 
-#: src/filebrowser/views.py:1191
+#: src/filebrowser/views.py:1143
 msgid "Could not extract contents of file."
 msgstr "Não foi possível extrair o conteúdo do ficheiro."
 
-#: src/filebrowser/views.py:1197
+#: src/filebrowser/views.py:1149
 msgid "Could not interpret archive type."
 msgstr "Não foi possível interpretar o tipo de arquivo."
 
@@ -625,12 +582,8 @@ msgstr "Enviar"
 
 #: src/filebrowser/templates/listdir_components.mako:186
 #, python-format
-msgid ""
-"Note: Only the Hadoop superuser, \"%(superuser)s\" on this file system, "
-"may change the owner of a file."
-msgstr ""
-"Nota: Apenas o super-utilizador do Hadoop, \"%(superuser)s\" neste "
-"sistema de ficheiros, pode alterar o proprietário de um ficheiro."
+msgid "Note: Only the Hadoop superuser, \"%(superuser)s\" on this file system, may change the owner of a file."
+msgstr "Nota: Apenas o super-utilizador do Hadoop, \"%(superuser)s\" neste sistema de ficheiros, pode alterar o proprietário de um ficheiro."
 
 #: src/filebrowser/templates/listdir_components.mako:214
 msgid "Change Permissions:"

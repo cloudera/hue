@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-01-10 18:30-0800\n"
+"POT-Creation-Date: 2013-01-02 22:57-0800\n"
 "PO-Revision-Date: 2012-07-30 18:47-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: pt_BR <LL@li.org>\n"
@@ -78,6 +78,7 @@ msgid "Required. 30 characters or fewer."
 msgstr "Obrigatório. 30 caracteres ou menos."
 
 #: src/useradmin/forms.py:140
+#, python-format
 msgid "30 characters or fewer."
 msgstr "30 caracteres ou menos."
 
@@ -98,18 +99,12 @@ msgid "Create home directories"
 msgstr "Criar diretórios iniciais"
 
 #: src/useradmin/forms.py:151
-msgid ""
-"Create home directories for every member imported, if members are being "
-"imported."
-msgstr ""
-"Criar diretórios iniciais para cada membro importado, se os membros "
-"estiverem sendo importados."
+msgid "Create home directories for every member imported, if members are being imported."
+msgstr "Criar diretórios iniciais para cada membro importado, se os membros estiverem sendo importados."
 
 #: src/useradmin/forms.py:184
 msgid "Group name may only contain letters, numbers, hyphens or underscores."
-msgstr ""
-"O nome do grupo pode conter somente letras, números, hífens ou "
-"sublinhados."
+msgstr "O nome do grupo pode conter somente letras, números, hífens ou sublinhados."
 
 #: src/useradmin/forms.py:199
 msgid "members"
@@ -261,12 +256,8 @@ msgstr "Não é possível obter detalhes de LDAP para usuários no padrão %s."
 
 #: src/useradmin/views.py:474
 #, python-format
-msgid ""
-"There was a naming conflict while importing user %(username)s in pattern "
-"%(username_pattern)s"
-msgstr ""
-"Houve um conflito de nome durante a importação do usuário %(username)s no"
-" padrão %(username_pattern)s"
+msgid "There was a naming conflict while importing user %(username)s in pattern %(username_pattern)s"
+msgstr "Houve um conflito de nome durante a importação do usuário %(username)s no padrão %(username_pattern)s"
 
 #: src/useradmin/views.py:508
 #, python-format
@@ -275,12 +266,8 @@ msgstr "Não é possível obter detalhes de LDAP para o grupo no padrão %s."
 
 #: src/useradmin/views.py:516
 #, python-format
-msgid ""
-"There was a naming conflict while importing group %(groupname)s in "
-"pattern %(groupname_pattern)s"
-msgstr ""
-"Houve um conflito de nomes durante a importação do grupo %(groupname)s no"
-" padrão %(groupname_pattern)s"
+msgid "There was a naming conflict while importing group %(groupname)s in pattern %(groupname_pattern)s"
+msgstr "Houve um conflito de nomes durante a importação do grupo %(groupname)s no padrão %(groupname_pattern)s"
 
 #: src/useradmin/views.py:529
 #, python-format
@@ -294,12 +281,8 @@ msgstr "Detectados vários usuários para o membro %s."
 
 #: src/useradmin/views.py:549
 #, python-format
-msgid ""
-"Adding member %s represented as users (should be a single user) %s to "
-"group %s"
-msgstr ""
-"Adicionar membro %s representado como usuários (deve ser um único "
-"usuário) %s para o grupo %s"
+msgid "Adding member %s represented as users (should be a single user) %s to group %s"
+msgstr "Adicionar membro %s representado como usuários (deve ser um único usuário) %s para o grupo %s"
 
 #: src/useradmin/management/commands/import_ldap_group.py:39
 msgid "Import users from the group."
@@ -538,18 +521,6 @@ msgstr "Editar %(groupname)s"
 msgid "There are no groups matching the search criteria."
 msgstr "Não há grupos correspondentes aos critérios de pesquisa."
 
-#: src/useradmin/templates/list_groups.mako:108
-#: src/useradmin/templates/list_permissions.mako:81
-#: src/useradmin/templates/list_users.mako:119
-msgid "No data available"
-msgstr ""
-
-#: src/useradmin/templates/list_groups.mako:109
-#: src/useradmin/templates/list_permissions.mako:82
-#: src/useradmin/templates/list_users.mako:120
-msgid "No matching records"
-msgstr ""
-
 #: src/useradmin/templates/list_permissions.mako:36
 msgid "Application"
 msgstr "Aplicativo"
@@ -604,22 +575,24 @@ msgid "Sync LDAP users and groups"
 msgstr "Sincronizar usuários e grupos de LDAP"
 
 #: src/useradmin/templates/sync_ldap_users_groups.mako:41
-msgid ""
-"This will not import any users or groups that don't already exist in Hue."
-" Only users and groups imported from LDAP can be synced."
-msgstr ""
-"Esta ação não importará nenhum usuário ou grupo que já não exista no Hue."
-" Somente usuários e grupos importados no LDAP podem ser sincronizados."
+msgid "This will not import any users or groups that don't already exist in Hue. Only users and groups imported from LDAP can be synced."
+msgstr "Esta ação não importará nenhum usuário ou grupo que já não exista no Hue. Somente usuários e grupos importados no LDAP podem ser sincronizados."
 
 #: src/useradmin/templates/sync_ldap_users_groups.mako:42
-msgid ""
-"All user information and group memberships will be updated based on the "
-"LDAP server's current state."
-msgstr ""
-"Todas as informações de associações de grupo serão atualizadas com base "
-"no estado atual do servidor de LDAP."
+msgid "All user information and group memberships will be updated based on the LDAP server's current state."
+msgstr "Todas as informações de associações de grupo serão atualizadas com base no estado atual do servidor de LDAP."
 
 #: src/useradmin/templates/sync_ldap_users_groups.mako:50
 msgid "Sync"
 msgstr "Sincronização"
 
+#~ msgid "Too long: 30 characters or fewer and not %(username)s"
+#~ msgstr "Longo demais: 30 caracteres ou menos e não %(username)s"
+#~ msgid ""
+#~ "Required. 30 characters or fewer. May"
+#~ " only contain letters, numbers, hyphens "
+#~ "or underscores."
+#~ msgstr ""
+#~ "Obrigatório. 30 caracteres ou menos. "
+#~ "Pode conter somente letras, números, "
+#~ "hífens ou sublinhados."

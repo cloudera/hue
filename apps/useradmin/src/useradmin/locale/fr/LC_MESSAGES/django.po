@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-01-10 18:30-0800\n"
+"POT-Creation-Date: 2013-01-02 22:57-0800\n"
 "PO-Revision-Date: 2012-07-30 18:47-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -78,6 +78,7 @@ msgid "Required. 30 characters or fewer."
 msgstr "Requis. 30 caractères maximum."
 
 #: src/useradmin/forms.py:140
+#, python-format
 msgid "30 characters or fewer."
 msgstr "30 caractères maximum."
 
@@ -98,18 +99,12 @@ msgid "Create home directories"
 msgstr "Créer des répertoires racines"
 
 #: src/useradmin/forms.py:151
-msgid ""
-"Create home directories for every member imported, if members are being "
-"imported."
-msgstr ""
-"Créez des répertoires racines pour chaque membre importé si des membres "
-"sont importés actuellement."
+msgid "Create home directories for every member imported, if members are being imported."
+msgstr "Créez des répertoires racines pour chaque membre importé si des membres sont importés actuellement."
 
 #: src/useradmin/forms.py:184
 msgid "Group name may only contain letters, numbers, hyphens or underscores."
-msgstr ""
-"Le nom de groupe peut contenir uniquement des lettres, nombres, tirets ou"
-" traits de soulignement."
+msgstr "Le nom de groupe peut contenir uniquement des lettres, nombres, tirets ou traits de soulignement."
 
 #: src/useradmin/forms.py:199
 msgid "members"
@@ -129,9 +124,7 @@ msgstr "Créer des répertoires racines"
 
 #: src/useradmin/forms.py:279
 msgid "Create home directory for every user, if one doesn't already exist."
-msgstr ""
-"Créez un répertoire racine pour chaque utilisateur s'il n'en existe pas "
-"encore."
+msgstr "Créez un répertoire racine pour chaque utilisateur s'il n'en existe pas encore."
 
 #: src/useradmin/models.py:125
 #, python-format
@@ -140,9 +133,7 @@ msgstr "Vous n'êtes pas autorisé à %(description)s."
 
 #: src/useradmin/views.py:68
 msgid "You must be a superuser to delete users."
-msgstr ""
-"Vous devez être un superutilisateur pour pouvoir supprimer des "
-"utilisateurs."
+msgstr "Vous devez être un superutilisateur pour pouvoir supprimer des utilisateurs."
 
 #: src/useradmin/views.py:76
 msgid "You cannot remove yourself."
@@ -174,9 +165,7 @@ msgstr "Groupe introuvable."
 
 #: src/useradmin/views.py:130
 msgid "You must be a superuser to add or edit another user."
-msgstr ""
-"Vous devez être un superutilisateur pour pouvoir ajouter ou modifier un "
-"autre utilisateur."
+msgstr "Vous devez être un superutilisateur pour pouvoir ajouter ou modifier un autre utilisateur."
 
 #: src/useradmin/views.py:155
 msgid "You cannot make yourself inactive."
@@ -197,9 +186,7 @@ msgstr "Impossible de générer le répertoire racine pour l'utilisateur %s."
 
 #: src/useradmin/views.py:208
 msgid "You must be a superuser to add or edit a group."
-msgstr ""
-"Vous devez être un superutilisateur pour pouvoir ajouter ou modifier un "
-"groupe."
+msgstr "Vous devez être un superutilisateur pour pouvoir ajouter ou modifier un groupe."
 
 #: src/useradmin/views.py:219
 msgid "Group information updated"
@@ -207,9 +194,7 @@ msgstr "Informations sur le groupe mises à jour"
 
 #: src/useradmin/views.py:242
 msgid "You must be a superuser to change permissions."
-msgstr ""
-"Vous devez être un superutilisateur pour pouvoir modifier les "
-"autorisations."
+msgstr "Vous devez être un superutilisateur pour pouvoir modifier les autorisations."
 
 #: src/useradmin/views.py:250
 msgid "Permission information updated"
@@ -217,9 +202,7 @@ msgstr "Informations d'autorisation mises à jour"
 
 #: src/useradmin/views.py:269
 msgid "You must be a superuser to add another user."
-msgstr ""
-"Vous devez être un superutilisateur pour pouvoir ajouter un autre "
-"utilisateur."
+msgstr "Vous devez être un superutilisateur pour pouvoir ajouter un autre utilisateur."
 
 #: src/useradmin/views.py:280 src/useradmin/views.py:323
 #: src/useradmin/views.py:356
@@ -247,15 +230,11 @@ msgstr "Impossible de récupérer les détails LDAP des groupes du modèle %s."
 
 #: src/useradmin/views.py:346
 msgid "You must be a superuser to sync the LDAP users/groups."
-msgstr ""
-"Vous devez être un superutilisateur pour pouvoir synchroniser les "
-"utilisateurs/groupes LDAP."
+msgstr "Vous devez être un superutilisateur pour pouvoir synchroniser les utilisateurs/groupes LDAP."
 
 #: src/useradmin/views.py:364
 msgid "The import may not be complete, sync again."
-msgstr ""
-"L'importation n'est peut-être pas terminée. Recommencez la "
-"Synchronisation."
+msgstr "L'importation n'est peut-être pas terminée. Recommencez la Synchronisation."
 
 #: src/useradmin/views.py:391
 msgid "No active superuser configured."
@@ -263,9 +242,7 @@ msgstr "Aucun super-utilisateur actif configuré."
 
 #: src/useradmin/views.py:393
 msgid "You cannot remove the last active superuser from the configuration."
-msgstr ""
-"Vous ne pouvez pas supprimer le dernier superutilisateur actif de la "
-"configuration."
+msgstr "Vous ne pouvez pas supprimer le dernier superutilisateur actif de la configuration."
 
 #: src/useradmin/views.py:451
 #, python-format
@@ -275,18 +252,12 @@ msgstr "Utilisateur %s synchronisé depuis Unix"
 #: src/useradmin/views.py:465
 #, python-format
 msgid "Could not get LDAP details for users with pattern %s"
-msgstr ""
-"Impossible de récupérer les détails LDAP des utilisateurs dotés du modèle"
-" %s"
+msgstr "Impossible de récupérer les détails LDAP des utilisateurs dotés du modèle %s"
 
 #: src/useradmin/views.py:474
 #, python-format
-msgid ""
-"There was a naming conflict while importing user %(username)s in pattern "
-"%(username_pattern)s"
-msgstr ""
-"Un conflit de dénomination est survenu lors de l'importation de "
-"l'utilisateur %(username)s dans le modèle %(username_pattern)s"
+msgid "There was a naming conflict while importing user %(username)s in pattern %(username_pattern)s"
+msgstr "Un conflit de dénomination est survenu lors de l'importation de l'utilisateur %(username)s dans le modèle %(username_pattern)s"
 
 #: src/useradmin/views.py:508
 #, python-format
@@ -295,12 +266,8 @@ msgstr "Impossible de récupérer les détails LDAP du modèle de groupe %s"
 
 #: src/useradmin/views.py:516
 #, python-format
-msgid ""
-"There was a naming conflict while importing group %(groupname)s in "
-"pattern %(groupname_pattern)s"
-msgstr ""
-"Un conflit de dénomination est survenu lors de l'importation du groupe "
-"%(groupname)s dans le modèle %(groupname_pattern)s"
+msgid "There was a naming conflict while importing group %(groupname)s in pattern %(groupname_pattern)s"
+msgstr "Un conflit de dénomination est survenu lors de l'importation du groupe %(groupname)s dans le modèle %(groupname_pattern)s"
 
 #: src/useradmin/views.py:529
 #, python-format
@@ -314,12 +281,8 @@ msgstr "Plusieurs utilisateurs ont été trouvés pour le membre %s."
 
 #: src/useradmin/views.py:549
 #, python-format
-msgid ""
-"Adding member %s represented as users (should be a single user) %s to "
-"group %s"
-msgstr ""
-"Ajout du membre %s représenté par des utilisateurs (doit correspondre à "
-"un seul utilisateur) %s au groupe %s"
+msgid "Adding member %s represented as users (should be a single user) %s to group %s"
+msgstr "Ajout du membre %s représenté par des utilisateurs (doit correspondre à un seul utilisateur) %s au groupe %s"
 
 #: src/useradmin/management/commands/import_ldap_group.py:39
 msgid "Import users from the group."
@@ -351,9 +314,7 @@ msgstr "GID maximum à importer (exclusif)."
 
 #: src/useradmin/management/commands/useradmin_sync_with_unix.py:35
 msgid "Whether or not to check that the user's shell is not /bin/false."
-msgstr ""
-"Indique s'il faut vérifier que le shell de l'utilisateur n'est pas "
-"/bin/faux."
+msgstr "Indique s'il faut vérifier que le shell de l'utilisateur n'est pas /bin/faux."
 
 #: src/useradmin/templates/add_ldap_users.mako:25
 #: src/useradmin/templates/edit_user.mako:25
@@ -560,18 +521,6 @@ msgstr "Modifier %(groupname)s"
 msgid "There are no groups matching the search criteria."
 msgstr "Aucun groupe ne correspond aux critères de recherche."
 
-#: src/useradmin/templates/list_groups.mako:108
-#: src/useradmin/templates/list_permissions.mako:81
-#: src/useradmin/templates/list_users.mako:119
-msgid "No data available"
-msgstr ""
-
-#: src/useradmin/templates/list_groups.mako:109
-#: src/useradmin/templates/list_permissions.mako:82
-#: src/useradmin/templates/list_users.mako:120
-msgid "No matching records"
-msgstr ""
-
 #: src/useradmin/templates/list_permissions.mako:36
 msgid "Application"
 msgstr "Application"
@@ -626,23 +575,24 @@ msgid "Sync LDAP users and groups"
 msgstr "Synchroniser des utilisateurs et des groupes LDAP"
 
 #: src/useradmin/templates/sync_ldap_users_groups.mako:41
-msgid ""
-"This will not import any users or groups that don't already exist in Hue."
-" Only users and groups imported from LDAP can be synced."
-msgstr ""
-"Tous les utilisateurs ou groupes qui n'existent pas déjà dans Hue ne "
-"seront pas importés. Seuls les utilisateurs et les groupes importés "
-"depuis LDAP peuvent être synchronisés."
+msgid "This will not import any users or groups that don't already exist in Hue. Only users and groups imported from LDAP can be synced."
+msgstr "Tous les utilisateurs ou groupes qui n'existent pas déjà dans Hue ne seront pas importés. Seuls les utilisateurs et les groupes importés depuis LDAP peuvent être synchronisés."
 
 #: src/useradmin/templates/sync_ldap_users_groups.mako:42
-msgid ""
-"All user information and group memberships will be updated based on the "
-"LDAP server's current state."
-msgstr ""
-"Toutes les informations utilisateur et les appartenances aux groupes "
-"seront mises à jour en fonction de l'état actuel du serveur LDAP."
+msgid "All user information and group memberships will be updated based on the LDAP server's current state."
+msgstr "Toutes les informations utilisateur et les appartenances aux groupes seront mises à jour en fonction de l'état actuel du serveur LDAP."
 
 #: src/useradmin/templates/sync_ldap_users_groups.mako:50
 msgid "Sync"
 msgstr "Synchroniser"
 
+#~ msgid "Too long: 30 characters or fewer and not %(username)s"
+#~ msgstr "Trop long : 30 caractères maximum et pas %(username)s"
+#~ msgid ""
+#~ "Required. 30 characters or fewer. May"
+#~ " only contain letters, numbers, hyphens "
+#~ "or underscores."
+#~ msgstr ""
+#~ "Requis. 30 caractères maximum. Ne peut"
+#~ " contenir que des lettres, nombres, "
+#~ "tirets ou traits de soulignement."

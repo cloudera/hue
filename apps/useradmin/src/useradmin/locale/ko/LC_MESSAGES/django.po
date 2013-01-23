@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-01-10 18:30-0800\n"
+"POT-Creation-Date: 2013-01-02 22:57-0800\n"
 "PO-Revision-Date: 2012-07-30 18:47-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -78,6 +78,7 @@ msgid "Required. 30 characters or fewer."
 msgstr "필수 입력 항목입니다. 30자 이하로 입력하십시오."
 
 #: src/useradmin/forms.py:140
+#, python-format
 msgid "30 characters or fewer."
 msgstr "30자 이하로 입력하십시오."
 
@@ -98,9 +99,7 @@ msgid "Create home directories"
 msgstr "홈 디렉토리 생성"
 
 #: src/useradmin/forms.py:151
-msgid ""
-"Create home directories for every member imported, if members are being "
-"imported."
+msgid "Create home directories for every member imported, if members are being imported."
 msgstr "구성원을 가져올 경우 가져온 모든 구성원의 홈 디렉토리를 생성합니다."
 
 #: src/useradmin/forms.py:184
@@ -257,9 +256,7 @@ msgstr "패턴이 %s인 사용자의 LDAP 세부 정보를 가져오지 못했�
 
 #: src/useradmin/views.py:474
 #, python-format
-msgid ""
-"There was a naming conflict while importing user %(username)s in pattern "
-"%(username_pattern)s"
+msgid "There was a naming conflict while importing user %(username)s in pattern %(username_pattern)s"
 msgstr "패턴이 %(username_pattern)s인 사용자 %(username)s을(를) 가져오는 중 이름 충돌이 발생했습니다."
 
 #: src/useradmin/views.py:508
@@ -269,9 +266,7 @@ msgstr "그룹 패턴 %s의 LDAP 세부 정보를 가져오지 못했습니다."
 
 #: src/useradmin/views.py:516
 #, python-format
-msgid ""
-"There was a naming conflict while importing group %(groupname)s in "
-"pattern %(groupname_pattern)s"
+msgid "There was a naming conflict while importing group %(groupname)s in pattern %(groupname_pattern)s"
 msgstr "패턴이 %(groupname_pattern)s인 그룹 %(groupname)s을(를) 가져오는 중 이름 충돌이 발생했습니다."
 
 #: src/useradmin/views.py:529
@@ -286,9 +281,7 @@ msgstr "구성원 %s의 사용자를 여러 명 찾았습니다."
 
 #: src/useradmin/views.py:549
 #, python-format
-msgid ""
-"Adding member %s represented as users (should be a single user) %s to "
-"group %s"
+msgid "Adding member %s represented as users (should be a single user) %s to group %s"
 msgstr "사용자(1명이어야 함) %s(으)로 표시된 구성원 %s을(를) 그룹 %s에 추가하는 중"
 
 #: src/useradmin/management/commands/import_ldap_group.py:39
@@ -528,18 +521,6 @@ msgstr "%(groupname)s 편집"
 msgid "There are no groups matching the search criteria."
 msgstr "검색 기준과 일치하는 그룹이 없습니다."
 
-#: src/useradmin/templates/list_groups.mako:108
-#: src/useradmin/templates/list_permissions.mako:81
-#: src/useradmin/templates/list_users.mako:119
-msgid "No data available"
-msgstr ""
-
-#: src/useradmin/templates/list_groups.mako:109
-#: src/useradmin/templates/list_permissions.mako:82
-#: src/useradmin/templates/list_users.mako:120
-msgid "No matching records"
-msgstr ""
-
 #: src/useradmin/templates/list_permissions.mako:36
 msgid "Application"
 msgstr "애플리케이션"
@@ -594,18 +575,21 @@ msgid "Sync LDAP users and groups"
 msgstr "LDAP 사용자 및 그룹 동기화"
 
 #: src/useradmin/templates/sync_ldap_users_groups.mako:41
-msgid ""
-"This will not import any users or groups that don't already exist in Hue."
-" Only users and groups imported from LDAP can be synced."
+msgid "This will not import any users or groups that don't already exist in Hue. Only users and groups imported from LDAP can be synced."
 msgstr "이 작업은 Hue에 없는 사용자 또는 그룹은 가져오지 않습니다. LDAP에서 가져온 사용자 및 그룹만 동기화할 수 있습니다."
 
 #: src/useradmin/templates/sync_ldap_users_groups.mako:42
-msgid ""
-"All user information and group memberships will be updated based on the "
-"LDAP server's current state."
+msgid "All user information and group memberships will be updated based on the LDAP server's current state."
 msgstr "모든 사용자 정보 및 그룹 구성원 자격이 LDAP 서버의 현재 상태를 기준으로 업데이트됩니다."
 
 #: src/useradmin/templates/sync_ldap_users_groups.mako:50
 msgid "Sync"
 msgstr "동기화"
 
+#~ msgid "Too long: 30 characters or fewer and not %(username)s"
+#~ msgstr "너무 깁니다. 30자 이하여야 하며, %(username)s은(는) 허용되지 않습니다."
+#~ msgid ""
+#~ "Required. 30 characters or fewer. May"
+#~ " only contain letters, numbers, hyphens "
+#~ "or underscores."
+#~ msgstr "필수 입력 항목입니다. 30자 이하로 입력하십시오. 문자, 숫자, 하이픈, 밑줄만 포함될 수 있습니다."

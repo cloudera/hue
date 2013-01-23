@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-01-10 18:30-0800\n"
+"POT-Creation-Date: 2013-01-02 22:57-0800\n"
 "PO-Revision-Date: 2012-07-30 18:54-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -30,32 +30,26 @@ msgid "Location on local filesystem where sample data is stored."
 msgstr "本地文件系统上存储示例数据的位置。"
 
 #: src/jobsub/conf.py:49
-msgid ""
-"Deprecated, use liboozie.conf.OOZIE_URL instead. URL of Oozie server. "
-"This is required for job submission."
+msgid "Deprecated, use liboozie.conf.OOZIE_URL instead. URL of Oozie server. This is required for job submission."
 msgstr "已弃用，请用 liboozie.conf.OOZIE_URL 替代。Oozie 服务器的 URL。提交作业时需要此 URL。"
 
 #: src/jobsub/conf.py:55
-msgid ""
-"Deprecated, use liboozie.conf.SECURITY_ENABLED instead. Whether Oozie "
-"requires client to do perform Kerberos authentication"
+msgid "Deprecated, use liboozie.conf.SECURITY_ENABLED instead. Whether Oozie requires client to do perform Kerberos authentication"
 msgstr "已弃用，请用 liboozie.conf.SECURITY_ENABLED 替代。Oozie 是否需要客户端执行 Kerberos 身份验证"
 
 #: src/jobsub/forms.py:39 src/jobsub/forms.py:58 src/jobsub/forms.py:77
-#: src/jobsub/forms.py:95 src/jobsub/templates/list_designs.mako:64
+#: src/jobsub/forms.py:95 src/jobsub/templates/list_designs.mako:63
 #: src/jobsub/templates/list_history.mako:42
 #: src/jobsub/templates/workflow.mako:55 src/jobsub/templates/workflow.mako:100
 msgid "Name"
 msgstr "名称"
 
 #: src/jobsub/forms.py:43
-msgid ""
-"Allows letters, digits, '_', and '-'. The first character must be a "
-"letter or '_'."
+msgid "Allows letters, digits, '_', and '-'. The first character must be a letter or '_'."
 msgstr "允许字母、数字、'_' 和 '-'。第一个字符必须是字母或 '_'。"
 
 #: src/jobsub/forms.py:59 src/jobsub/forms.py:78 src/jobsub/forms.py:96
-#: src/jobsub/templates/list_designs.mako:66
+#: src/jobsub/templates/list_designs.mako:65
 #: src/jobsub/templates/list_history.mako:44
 msgid "Description"
 msgstr "描述"
@@ -118,62 +112,62 @@ msgstr "无法访问部署目录。"
 msgid "Failed to obtain HDFS reference. Check your configuration."
 msgstr "无法获得 HDFS 引用。请检查您的配置。"
 
-#: src/jobsub/views.py:60
+#: src/jobsub/views.py:59
 #, python-format
 msgid "Access denied: view job %(id)s."
 msgstr "访问被拒绝：查看作业 %(id)s。"
 
-#: src/jobsub/views.py:66
+#: src/jobsub/views.py:65
 #, python-format
 msgid "Error accessing Oozie job %(id)s."
 msgstr "访问 Oozie 作业 %(id)s 时出错。"
 
-#: src/jobsub/views.py:199
+#: src/jobsub/views.py:198
 msgid "Permission denied. You are not the owner."
 msgstr "权限被拒绝。您不是所有者。"
 
-#: src/jobsub/views.py:207
+#: src/jobsub/views.py:206
 #, python-format
 msgid "Access denied: delete design %(id)s."
 msgstr "访问被拒绝：删除设计 %(id)s。"
 
-#: src/jobsub/views.py:215
+#: src/jobsub/views.py:214
 msgid "Workflow not found."
 msgstr "未找到 workflow。"
 
-#: src/jobsub/views.py:223
+#: src/jobsub/views.py:222
 #, python-format
 msgid "Access denied: edit design %(id)s."
 msgstr "访问被拒绝：编辑设计 %(id)s。"
 
-#: src/jobsub/views.py:254
+#: src/jobsub/views.py:253
 #, python-format
 msgid "Access denied: design parameters %(id)s."
 msgstr "访问被拒绝：设计参数 %(id)s。"
 
-#: src/jobsub/views.py:266
+#: src/jobsub/views.py:265
 msgid "Use a POST request to submit a design."
 msgstr "请使用 POST 请求提交设计。"
 
-#: src/jobsub/views.py:270
+#: src/jobsub/views.py:269
 #, python-format
 msgid "Access denied: submit design %(id)s."
 msgstr "访问被拒绝：提交设计 %(id)s。"
 
-#: src/jobsub/views.py:281
+#: src/jobsub/views.py:280
 msgid "The Oozie server is not running"
 msgstr "Oozie 服务器未运行"
 
-#: src/jobsub/views.py:282
+#: src/jobsub/views.py:281
 #, python-format
 msgid "Error submitting design %(id)s."
 msgstr "提交设计 %(id)s 时出错。"
 
-#: src/jobsub/views.py:296
+#: src/jobsub/views.py:295
 msgid "Use a POST request to install the examples."
 msgstr "请使用 POST 请求安装示例。"
 
-#: src/jobsub/views.py:301
+#: src/jobsub/views.py:300
 msgid "The examples could not be installed."
 msgstr "无法安装示例。"
 
@@ -186,81 +180,79 @@ msgid "Expected sample user fixture."
 msgstr "所需的样本用户固定器。"
 
 #: src/jobsub/templates/edit_design.mako:26
-#: src/jobsub/templates/list_designs.mako:27
+#: src/jobsub/templates/list_designs.mako:26
 #: src/jobsub/templates/list_history.mako:27
 #: src/jobsub/templates/workflow.mako:25
 msgid "Job Designer"
 msgstr "Job Designer"
 
-#: src/jobsub/templates/edit_design.mako:58
+#: src/jobsub/templates/edit_design.mako:54
 #, python-format
 msgid "Job Design (%(type)s type)"
 msgstr "作业设计（类型为 %(type)s）"
 
-#: src/jobsub/templates/edit_design.mako:70
+#: src/jobsub/templates/edit_design.mako:66
 msgid "You can parameterize the values, using"
 msgstr "您可以参数化该值，使用"
 
-#: src/jobsub/templates/edit_design.mako:70
+#: src/jobsub/templates/edit_design.mako:66
 msgid "or"
 msgstr "或"
 
-#: src/jobsub/templates/edit_design.mako:72
-msgid ""
-"When the design is submitted, you will be prompted for the actual value "
-"of "
+#: src/jobsub/templates/edit_design.mako:68
+msgid "When the design is submitted, you will be prompted for the actual value of "
 msgstr "提交设计时，将提示您输入实际值 "
 
-#: src/jobsub/templates/edit_design.mako:80
+#: src/jobsub/templates/edit_design.mako:76
 msgid "Job Properties"
 msgstr "Job 属性"
 
-#: src/jobsub/templates/edit_design.mako:86
+#: src/jobsub/templates/edit_design.mako:82
 msgid "Property name"
 msgstr "属性名称"
 
-#: src/jobsub/templates/edit_design.mako:87
+#: src/jobsub/templates/edit_design.mako:83
 #: src/jobsub/templates/workflow.mako:56
 msgid "Value"
 msgstr "值"
 
-#: src/jobsub/templates/edit_design.mako:95
-#: src/jobsub/templates/edit_design.mako:120
-#: src/jobsub/templates/edit_design.mako:143
-#: src/jobsub/templates/list_designs.mako:44
+#: src/jobsub/templates/edit_design.mako:91
+#: src/jobsub/templates/edit_design.mako:116
+#: src/jobsub/templates/edit_design.mako:139
+#: src/jobsub/templates/list_designs.mako:43
 msgid "Delete"
 msgstr "删除"
 
-#: src/jobsub/templates/edit_design.mako:107
+#: src/jobsub/templates/edit_design.mako:103
 msgid "Add Property"
 msgstr "添加属性"
 
-#: src/jobsub/templates/edit_design.mako:112
+#: src/jobsub/templates/edit_design.mako:108
 msgid "Files"
 msgstr "文件"
 
-#: src/jobsub/templates/edit_design.mako:130
+#: src/jobsub/templates/edit_design.mako:126
 msgid "Add File"
 msgstr "添加文件"
 
-#: src/jobsub/templates/edit_design.mako:135
+#: src/jobsub/templates/edit_design.mako:131
 msgid "Archives"
 msgstr "存档"
 
-#: src/jobsub/templates/edit_design.mako:153
+#: src/jobsub/templates/edit_design.mako:149
 msgid "Add Archive"
 msgstr "添加存档"
 
-#: src/jobsub/templates/edit_design.mako:160
+#: src/jobsub/templates/edit_design.mako:156
 msgid "Save"
 msgstr "保存"
 
-#: src/jobsub/templates/edit_design.mako:161
-#: src/jobsub/templates/list_designs.mako:106
+#: src/jobsub/templates/edit_design.mako:157
+#: src/jobsub/templates/list_designs.mako:105
 msgid "Cancel"
 msgstr "取消"
 
-#: src/jobsub/templates/edit_design.mako:171
+#: src/jobsub/templates/edit_design.mako:167
 msgid "Choose a file"
 msgstr "选择文件"
 
@@ -270,104 +262,107 @@ msgstr "设计"
 
 #: src/jobsub/templates/layout.mako:35
 msgid "History"
-msgstr "历史"
+msgstr "历史记录"
 
-#: src/jobsub/templates/list_designs.mako:38
+#: src/jobsub/templates/list_designs.mako:37
 msgid "Job Designs"
 msgstr "作业设计"
 
-#: src/jobsub/templates/list_designs.mako:42
-#: src/jobsub/templates/list_designs.mako:107
+#: src/jobsub/templates/list_designs.mako:41
+#: src/jobsub/templates/list_designs.mako:106
 msgid "Submit"
 msgstr "提交"
 
-#: src/jobsub/templates/list_designs.mako:43
+#: src/jobsub/templates/list_designs.mako:42
 msgid "Edit"
 msgstr "编辑"
 
-#: src/jobsub/templates/list_designs.mako:45
+#: src/jobsub/templates/list_designs.mako:44
 msgid "Clone"
 msgstr "克隆"
 
-#: src/jobsub/templates/list_designs.mako:49
+#: src/jobsub/templates/list_designs.mako:48
 msgid "Create MapReduce Design"
 msgstr "创建 MapReduce 设计"
 
-#: src/jobsub/templates/list_designs.mako:49
+#: src/jobsub/templates/list_designs.mako:48
 msgid "MapReduce"
 msgstr "MapReduce"
 
-#: src/jobsub/templates/list_designs.mako:50
+#: src/jobsub/templates/list_designs.mako:49
 msgid "Create Streaming Design"
 msgstr "创建流设计"
 
-#: src/jobsub/templates/list_designs.mako:51
+#: src/jobsub/templates/list_designs.mako:49
+msgid "Streaming"
+msgstr "数据流"
+
+#: src/jobsub/templates/list_designs.mako:50
 msgid "Create Java Design"
 msgstr "创建 Java 设计"
 
-#: src/jobsub/templates/list_designs.mako:51
+#: src/jobsub/templates/list_designs.mako:50
 msgid "Java"
 msgstr "Java"
 
-#: src/jobsub/templates/list_designs.mako:54
+#: src/jobsub/templates/list_designs.mako:53
 msgid "Install Samples"
 msgstr "安装示例"
 
-#: src/jobsub/templates/list_designs.mako:63
+#: src/jobsub/templates/list_designs.mako:62
 #: src/jobsub/templates/list_history.mako:41
 msgid "Owner"
 msgstr "所有者"
 
-#: src/jobsub/templates/list_designs.mako:65
+#: src/jobsub/templates/list_designs.mako:64
 #: src/jobsub/templates/list_history.mako:43
 #: src/jobsub/templates/workflow.mako:101
 msgid "Type"
 msgstr "类型"
 
-#: src/jobsub/templates/list_designs.mako:67
+#: src/jobsub/templates/list_designs.mako:66
 msgid "Last Modified"
 msgstr "上次修改"
 
-#: src/jobsub/templates/list_designs.mako:97
+#: src/jobsub/templates/list_designs.mako:96
 msgid "Submit this design?"
 msgstr "提交此设计？"
 
-#: src/jobsub/templates/list_designs.mako:116
+#: src/jobsub/templates/list_designs.mako:115
 msgid "Delete this design?"
 msgstr "删除此设计？"
 
-#: src/jobsub/templates/list_designs.mako:119
-#: src/jobsub/templates/list_designs.mako:135
+#: src/jobsub/templates/list_designs.mako:118
+#: src/jobsub/templates/list_designs.mako:134
 msgid "No"
 msgstr "否"
 
-#: src/jobsub/templates/list_designs.mako:120
-#: src/jobsub/templates/list_designs.mako:136
+#: src/jobsub/templates/list_designs.mako:119
+#: src/jobsub/templates/list_designs.mako:135
 msgid "Yes"
 msgstr "是"
 
-#: src/jobsub/templates/list_designs.mako:129
+#: src/jobsub/templates/list_designs.mako:128
 msgid "Install sample job designs?"
 msgstr "安装样本作业设计？"
 
-#: src/jobsub/templates/list_designs.mako:132
+#: src/jobsub/templates/list_designs.mako:131
 msgid "It will take a few seconds to install."
 msgstr "安装将需要几秒钟时间。"
 
-#: src/jobsub/templates/list_designs.mako:144
+#: src/jobsub/templates/list_designs.mako:143
 #, python-format
 msgid "Are you sure you want to delete %(name)s?"
 msgstr "是否确定要删除 %(name)s？"
 
-#: src/jobsub/templates/list_designs.mako:145
+#: src/jobsub/templates/list_designs.mako:144
 #, python-format
 msgid "Submit %(name)s to the cluster"
 msgstr "将 %(name)s 提交给集群"
 
 #: src/jobsub/templates/list_designs.mako:181
 #: src/jobsub/templates/list_history.mako:80
-#, fuzzy
-msgid "No data available"
+msgid "No data available in table"
 msgstr "表中无可用数据"
 
 #: src/jobsub/templates/list_designs.mako:182
@@ -378,7 +373,7 @@ msgstr "显示 _START_ 到 _END_，共 _TOTAL_ 个条目"
 #: src/jobsub/templates/list_designs.mako:183
 #: src/jobsub/templates/list_history.mako:82
 msgid "Showing 0 to 0 of 0 entries"
-msgstr "显示 0 到 0，共 0 个条目"
+msgstr "显示 0－0，共 0 个条目"
 
 #: src/jobsub/templates/list_designs.mako:184
 #: src/jobsub/templates/list_history.mako:83
@@ -387,8 +382,7 @@ msgstr "（已从 _MAX_ 总条目中过滤）"
 
 #: src/jobsub/templates/list_designs.mako:185
 #: src/jobsub/templates/list_history.mako:84
-#, fuzzy
-msgid "No matching records"
+msgid "No matching records found"
 msgstr "未找到匹配记录"
 
 #: src/jobsub/templates/list_designs.mako:187
@@ -404,12 +398,12 @@ msgstr "最后一个"
 #: src/jobsub/templates/list_designs.mako:189
 #: src/jobsub/templates/list_history.mako:88
 msgid "Next"
-msgstr "下一个"
+msgstr "下一页"
 
 #: src/jobsub/templates/list_designs.mako:190
 #: src/jobsub/templates/list_history.mako:89
 msgid "Previous"
-msgstr "上一个"
+msgstr "上一页"
 
 #: src/jobsub/templates/list_history.mako:33
 msgid "Job Submission History"
@@ -441,7 +435,7 @@ msgstr "定义"
 
 #: src/jobsub/templates/workflow.mako:91
 msgid "Log"
-msgstr "登录"
+msgstr "日志"
 
 #: src/jobsub/templates/workflow.mako:102
 #: src/jobsub/templates/workflow.mako:171
