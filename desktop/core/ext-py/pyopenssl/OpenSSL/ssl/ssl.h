@@ -14,6 +14,12 @@
 #define PyOpenSSL_SSL_H_
 
 #include <Python.h>
+#include <openssl/ssl.h>
+
+#if defined(OPENSSL_VERSION_NUMBER) && OPENSSL_VERSION_NUMBER > 0x009080efL
+  #define SNI_EXTENSION_SUPPORT 1
+#endif
+
 #include <pythread.h>
 #include "context.h"
 #include "connection.h"
