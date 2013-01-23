@@ -263,6 +263,11 @@ ssl_Connection_get_context(ssl_ConnectionObj *self, PyObject *args) {
     return (PyObject *)self->context;
 }
 
+// Only provide a TLS servername extension host name value
+// when it is actually installed.
+// This is used to get around the deficiencies of openSSL 0.9.8e and older.
+#if SNI_EXTENSION_SUPPORT
+
 static char ssl_Connection_set_context_doc[] = "\n\
 Switch this connection to a new session context\n\
 \n\
@@ -349,6 +354,7 @@ ssl_Connection_set_tlsext_host_name(ssl_ConnectionObj *self, PyObject *args) {
     return Py_None;
 }
 
+#endif
 
 
 static char ssl_Connection_pending_doc[] = "\n\
@@ -1269,9 +1275,11 @@ ssl_Connection_want_write(ssl_ConnectionObj *self, PyObject *args)
 static PyMethodDef ssl_Connection_methods[] =
 {
     ADD_METHOD(get_context),
+#if SNI_EXTENSION_SUPPORT
     ADD_METHOD(set_context),
     ADD_METHOD(get_servername),
     ADD_METHOD(set_tlsext_host_name),
+#endif
     ADD_METHOD(pending),
     ADD_METHOD(send),
     ADD_ALIAS (write, send),

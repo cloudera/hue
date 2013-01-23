@@ -237,6 +237,7 @@ global_info_callback(const SSL *ssl, int where, int _ret)
     return;
 }
 
+#if SNI_EXTENSION_SUPPORT
 /*
  * Globally defined TLS extension server name callback.  This is called from
  * OpenSSL internally.  The GIL will not be held when this function is invoked.
@@ -275,6 +276,7 @@ global_tlsext_servername_callback(const SSL *ssl, int *alert, void *arg) {
     MY_BEGIN_ALLOW_THREADS(conn->tstate);
     return result;
 }
+#endif
 
 /*
  * More recent builds of OpenSSL may have SSLv2 completely disabled.
@@ -1108,6 +1110,7 @@ ssl_Context_set_options(ssl_ContextObj *self, PyObject *args)
     return PyLong_FromLong(SSL_CTX_set_options(self->ctx, options));
 }
 
+#if SNI_EXTENSION_SUPPORT
 static char ssl_Context_set_tlsext_servername_callback_doc[] = "\n\
 Specify a callback function to be called when clients specify a server name.\n\
 \n\
@@ -1135,6 +1138,7 @@ ssl_Context_set_tlsext_servername_callback(ssl_ContextObj *self, PyObject *args)
     Py_INCREF(Py_None);
     return Py_None;
 }
+#endif
 
 
 /*
@@ -1174,7 +1178,9 @@ static PyMethodDef ssl_Context_methods[] = {
     ADD_METHOD(set_app_data),
     ADD_METHOD(get_cert_store),
     ADD_METHOD(set_options),
+#if SNI_EXTENSION_SUPPORT
     ADD_METHOD(set_tlsext_servername_callback),
+#endif
     { NULL, NULL }
 };
 #undef ADD_METHOD
@@ -1222,8 +1228,10 @@ ssl_Context_init(ssl_ContextObj *self, int i_method) {
     Py_INCREF(Py_None);
     self->info_callback = Py_None;
 
+#if SNI_EXTENSION_SUPPORT
     Py_INCREF(Py_None);
     self->tlsext_servername_callback = Py_None;
+#endif
 
     Py_INCREF(Py_None);
     self->passphrase_userdata = Py_None;

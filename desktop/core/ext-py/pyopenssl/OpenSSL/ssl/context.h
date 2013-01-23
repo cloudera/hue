@@ -29,7 +29,9 @@ typedef struct {
                         *passphrase_userdata,
                         *verify_callback,
                         *info_callback,
+#if SNI_EXTENSION_SUPPORT
                         *tlsext_servername_callback,
+#endif
                         *app_data;
     PyThreadState       *tstate;
 } ssl_ContextObj;
