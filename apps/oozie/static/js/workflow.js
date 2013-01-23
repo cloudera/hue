@@ -579,7 +579,7 @@ var ImportNodeModule = function($) {
         dataType: 'json',
         type: 'GET',
         success: $.noop,
-        error: $.noop,
+        error: $.noop
       }, options || {});
 
       $.ajax(request);
@@ -599,7 +599,7 @@ var ImportNodeModule = function($) {
       }, options);
 
       $.ajax(request);
-    },
+    }
   });
 
   return module;
@@ -1203,7 +1203,7 @@ var NodeModule = function($, IdGeneratorTable) {
            update: function(options) {
              return map_params(options, function() {});
            }
-         },
+         }
       });
 
       $.extend(self, mapping);
@@ -1245,7 +1245,7 @@ var NodeModule = function($, IdGeneratorTable) {
           ko.mapping.fromJS(data.data, self.errors);
           success = data.status == 0;
         },
-        async: false,
+        async: false
       }, options);
 
       $.ajax(request);
@@ -1413,7 +1413,7 @@ var NodeModule = function($, IdGeneratorTable) {
           parent: ko.observable(self.id()),
           child: ko.observable(replacement.id()),
           name: ko.observable(linkTypeChooser(self, replacement)),
-          comment: ko.observable(''),
+          comment: ko.observable('')
         };
         self.child_links.push(link);
 
@@ -1472,7 +1472,7 @@ $.extend(StartNode.prototype, Node.prototype, {
         parent: ko.observable(self.id()),
         child: ko.observable(replacement.id()),
         name: ko.observable('to'),
-        comment: ko.observable(''),
+        comment: ko.observable('')
       };
       self.child_links.push(link);
 
@@ -1482,7 +1482,7 @@ $.extend(StartNode.prototype, Node.prototype, {
     }
 
     return index != -1;
-  },
+  }
 });
 
 var ForkNode = NodeModule($, IdGeneratorTable);
@@ -1773,7 +1773,7 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
           };
 
           return map_params(options, subscribe);
-        },
+        }
       }
     });
 
@@ -1956,7 +1956,7 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
         type: 'POST',
         data: { workflow: self.toJSON() },
         success: $.noop,
-        error: $.noop,
+        error: $.noop
       }, options || {});
 
       $.ajax(request);
@@ -1970,7 +1970,7 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
         dataType: 'json',
         type: 'GET',
         success: $.noop,
-        error: $.noop,
+        error: $.noop
       }, options || {});
 
       $.ajax(request);
