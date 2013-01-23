@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-01-10 18:29-0800\n"
+"POT-Creation-Date: 2013-01-02 22:57-0800\n"
 "PO-Revision-Date: 2012-08-10 13:58-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -22,9 +22,7 @@ msgid "load_apps has already been called."
 msgstr "已调用 load_apps。"
 
 #: src/desktop/conf.py:32
-msgid ""
-"If set to true, CherryPy will be used. Otherwise, Spawning will be used "
-"as the webserver."
+msgid "If set to true, CherryPy will be used. Otherwise, Spawning will be used as the webserver."
 msgstr "如果设置为 true，将使用 CherryPy。否则，Spawning 将被用作 Web 服务器。"
 
 #: src/desktop/conf.py:38
@@ -44,9 +42,7 @@ msgid "Filename of SSL RSA Private Key"
 msgstr "SSL RSA 私钥的文件名"
 
 #: src/desktop/conf.py:56
-msgid ""
-"If set to false, runcpserver will not actually start the web server.  "
-"Used if Apache is being used as a WSGI container."
+msgid "If set to false, runcpserver will not actually start the web server.  Used if Apache is being used as a WSGI container."
 msgstr "如果设置为 false，runcpserver 实际上将不启动 Web 服务器。如果 Apache 正用作 WSGI 容器，则使用它。"
 
 #: src/desktop/conf.py:61
@@ -90,20 +86,13 @@ msgid "Default email address to use for various automated notifications from Hue
 msgstr "用于来自 Hue 的各种自动通知的默认电子邮件地址。"
 
 #: src/desktop/conf.py:144
-#, fuzzy
-msgid ""
-"Configuration options for specifying the Desktop Database.\n"
-"          For more info, see "
-"http://docs.djangoproject.com/en/1.1/ref/settings/#database-engine"
-msgstr ""
-"用于指定 Desktop 数据库的配置选项。\n"
-"\"\n"
-"\"有关详细信息，请参阅 http://docs.djangoproject.com/en/1.1/ref/settings/#database-"
-"engine"
+msgid "Configuration options for specifying the Desktop Database.\n"
+"          For more info, see http://docs.djangoproject.com/en/1.1/ref/settings/#database-engine"
+msgstr "用于指定 Desktop 数据库的配置选项。\n"
+"有关详细信息，请参阅 http://docs.djangoproject.com/en/1.1/ref/settings/#database-engine"
 
 #: src/desktop/conf.py:149
-#, fuzzy
-msgid "Database engine, such as postgresql_psycopg2, mysql, or sqlite3."
+msgid "Database engine, such as postgresql, mysql, sqlite3, or Oracle."
 msgstr "数据库引擎，如 postgresql、mysql、sqlite3 或 Oracle。"
 
 #: src/desktop/conf.py:155
@@ -127,9 +116,7 @@ msgid "Database port."
 msgstr "数据库端口。"
 
 #: src/desktop/conf.py:188
-#, fuzzy
-msgid ""
-"Configuration options for specifying Hue's Kerberos integration for\n"
+msgid "Configuration options for specifying Hue's Kerberos integration for\n"
 "          secured Hadoop clusters."
 msgstr "用于指定 Hue 的 Kerberos 集成以提供安全 Hadoop 集群的配置选项。"
 
@@ -143,7 +130,7 @@ msgstr "Hue 的 Kerberos 主体名称。通常为“hue/hostname.foo.com”。"
 
 #: src/desktop/conf.py:203
 msgid "Frequency in seconds with which Hue will renew its keytab."
-msgstr "Hue 将续借其 keytab 的频率（秒数）。"
+msgstr "Hue 更新其 keytab 的频率（秒数）。"
 
 #: src/desktop/conf.py:208
 msgid "Path to keep Kerberos credentials cached."
@@ -174,52 +161,28 @@ msgid "Customizations to the UI."
 msgstr "UI 自定义。"
 
 #: src/desktop/conf.py:255
-msgid ""
-"Top banner HTML code. This code will be placed in the navigation bar so "
-"that it will reside at the top of the page in a fixed position. One "
-"common value is `<img src=\"http://www.example.com/example.gif\" />`"
-msgstr ""
-"顶部横幅 HTML 代码。此代码将位于导航栏中，因此它将驻留在页面顶部的固定位置。一个公用值为 `<img "
-"src=\"http://www.example.com/example.gif\" />`"
+msgid "Top banner HTML code. This code will be placed in the navigation bar so that it will reside at the top of the page in a fixed position. One common value is `<img src=\"http://www.example.com/example.gif\" />`"
+msgstr "顶部横幅 HTML 代码。此代码将位于导航栏中，因此它将驻留在页面顶部的固定位置。一个公用值为 `<img src=\"http://www.example.com/example.gif\" />`"
 
 #: src/desktop/conf.py:262
 msgid "Configuration options for user authentication into the web application."
 msgstr "用于在 Web 应用程序中对用户进行身份验证的配置选项。"
 
 #: src/desktop/conf.py:266
-msgid ""
-"Authentication backend.  Common settings are "
-"django.contrib.auth.backends.ModelBackend (fully Django backend), "
-"desktop.auth.backend.AllowAllBackend (allows everyone), "
-"desktop.auth.backend.AllowFirstUserDjangoBackend (relies on Django and "
-"user manager, after the first login). "
-msgstr ""
-"身份验证后端。通用设置为 django.contrib.auth.backends.ModelBackend（完全 Django "
-"后端）、desktop.auth.backend.AllowAllBackend（允许所有人）、desktop.auth.backend.AllowFirstUserDjangoBackend（首次登录后取决于"
-" Django 和用户管理员）。 "
+msgid "Authentication backend.  Common settings are django.contrib.auth.backends.ModelBackend (fully Django backend), desktop.auth.backend.AllowAllBackend (allows everyone), desktop.auth.backend.AllowFirstUserDjangoBackend (relies on Django and user manager, after the first login). "
+msgstr "身份验证后端。通用设置为 django.contrib.auth.backends.ModelBackend（完全 Django 后端）、desktop.auth.backend.AllowAllBackend（允许所有人）、desktop.auth.backend.AllowFirstUserDjangoBackend（首次登录后取决于 Django 和用户管理员）。 "
 
 #: src/desktop/conf.py:272
 msgid "Class which defines extra accessor methods for User objects."
 msgstr "定义用户对象的其他存取器方法的类。"
 
 #: src/desktop/conf.py:275
-msgid ""
-"The service to use when querying PAM. The service usually corresponds to "
-"a single filename in /etc/pam.d"
-msgstr "该服务用于查询 PAM 时。服务通常对应于 /etc/pam.d 的单一文件名"
+msgid "The service to use when querying PAM. The service usually corresponds to a single filename in /etc/pam.d"
+msgstr "该服务在查询 PAM 时使用。服务通常对应于 /etc/pam.d 的单一文件名"
 
 #: src/desktop/conf.py:279
-msgid ""
-"When using the desktop.auth.backend.RemoteUserDjangoBackend, this sets "
-"the normalized name of the header that contains the remote user. The HTTP"
-" header in the request is converted to a key by converting all characters"
-" to uppercase, replacing any hyphens with underscores and adding an HTTP_"
-" prefix to the name. So, for example, if the header is called Remote-User"
-" that would be configured as HTTP_REMOTE_USER"
-msgstr ""
-"当使用 desktop.auth.backend.RemoteUserDjangoBackend "
-"时，会设置包含远程用户的标头的规范化名称。通过将所有字符转换为大写，用下划线替换所有连字符，并向名称中添加 HTTP_ 前缀，可将请求中的 "
-"HTTP 标头转换为密钥。因此，举例来说，如果标头称为 Remote-User，则可配置为 HTTP_REMOTE_USER"
+msgid "When using the desktop.auth.backend.RemoteUserDjangoBackend, this sets the normalized name of the header that contains the remote user. The HTTP header in the request is converted to a key by converting all characters to uppercase, replacing any hyphens with underscores and adding an HTTP_ prefix to the name. So, for example, if the header is called Remote-User that would be configured as HTTP_REMOTE_USER"
+msgstr "当使用 desktop.auth.backend.RemoteUserDjangoBackend 时，会设置包含远程用户的标头的规范化名称。通过将所有字符转换为大写，用下划线替换所有连字符，并向名称中添加 HTTP_ 前缀，可将请求中的 HTTP 标头转换为密钥。因此，举例来说，如果标头称为 Remote-User，则可配置为 HTTP_REMOTE_USER"
 
 #: src/desktop/conf.py:289
 msgid "Configuration options for LDAP connectivity."
@@ -262,9 +225,7 @@ msgid "A base filter for use when searching for users."
 msgstr "搜索用户时使用的基本过滤器。"
 
 #: src/desktop/conf.py:322
-msgid ""
-"The username attribute in the LDAP schema. Typically, this is "
-"'sAMAccountName' for AD and 'uid' for other LDAP systems."
+msgid "The username attribute in the LDAP schema. Typically, this is 'sAMAccountName' for AD and 'uid' for other LDAP systems."
 msgstr "LDAP 架构中的用户名属性。通常，对于 AD 为“sAMAccountName”，对于其他 LDAP 系统为“uid”。"
 
 #: src/desktop/conf.py:330
@@ -320,17 +281,12 @@ msgid "Enable or disable Django debug mode."
 msgstr "启用或禁用 Django 调试模式。"
 
 #: src/desktop/conf.py:403
-msgid ""
-"Enable or disable debugging information in the 500 internal server error "
-"response. Note that the debugging information may contain sensitive data."
-" If django_debug_mode is True, this is automatically enabled."
-msgstr ""
-"启用或禁用在 500 个内部服务器错误响应中调试信息。请注意，调试信息可能包含敏感数据。如果 django_debug_mode 为 "
-"True，则此选项已自动启用。"
+msgid "Enable or disable debugging information in the 500 internal server error response. Note that the debugging information may contain sensitive data. If django_debug_mode is True, this is automatically enabled."
+msgstr "在 500 内部服务器错误的响应中启用或禁用调试信息。请注意，调试信息可能包含敏感数据。如果 django_debug_mode 为 True，则此选项已自动启用。"
 
 #: src/desktop/conf.py:412
 msgid "Email address that internal error messages should send as."
-msgstr "应作为内部错误消息发送的电子邮件地址。"
+msgstr "作为发送内部错误消息的电子邮件地址。"
 
 #: src/desktop/conf.py:418
 msgid "The email backend to use."
@@ -358,15 +314,11 @@ msgid "LDAP is only partially configured. An LDAP URL must be provided."
 msgstr "仅部分配置了 LDAP。必须提供一个 LDAP URL。"
 
 #: src/desktop/conf.py:471
-msgid ""
-"LDAP is only partially configured. An NT Domain or username search "
-"pattern must be provided."
+msgid "LDAP is only partially configured. An NT Domain or username search pattern must be provided."
 msgstr "仅部分配置了 LDAP。必须提供 NT 域或用户名搜索模式。"
 
 #: src/desktop/conf.py:477
-msgid ""
-"The LDAP username pattern should contain the special<username> "
-"replacement string for authentication."
+msgid "The LDAP username pattern should contain the special<username> replacement string for authentication."
 msgstr "LDAP 用户名模式应包含用于身份验证的特殊 <username> 替换字符串。"
 
 #: src/desktop/decorators.py:40
@@ -396,9 +348,7 @@ msgstr "中间件模块 \"%(module)s\" 未定义 \"%(class)s\" 类。"
 
 #: src/desktop/middleware.py:261
 #, python-format
-msgid ""
-"AppSpecificMiddleware module \"%(module)s\" has a process_request "
-"function which is impossible."
+msgid "AppSpecificMiddleware module \"%(module)s\" has a process_request function which is impossible."
 msgstr "AppSpecificMiddleware 模块 \"%(module)s\" 具有无法实现的 process_request 函数。"
 
 #: src/desktop/middleware.py:312
@@ -547,9 +497,7 @@ msgstr "不存在模板路径 %(path)r。"
 
 #: src/desktop/management/commands/create_desktop_app.py:52
 #, python-format
-msgid ""
-"%(name)r is not a valid application name. Use only numbers, letters and "
-"underscores."
+msgid "%(name)r is not a valid application name. Use only numbers, letters and underscores."
 msgstr "%(name)r 不是有效的应用程序名称。仅可使用数字、字母和下划线。"
 
 #: src/desktop/management/commands/create_test_fs.py:31
@@ -571,49 +519,32 @@ msgid "Web server for Hue."
 msgstr "Hue 的 Web 服务器。"
 
 #: src/desktop/management/commands/runpylint.py:28
-#, fuzzy
-msgid ""
-"\n"
-"  Runs pylint on desktop and app code.\n"
+msgid "\n"
+"  Runs pylint on desktop code.\n"
 "\n"
 "  With no arguments, or with \"all\", this will run pylint on all\n"
 "  installed apps.  Otherwise, specify modules to run, as well\n"
-"  as other parameters to pylint.  Note that you'll want to preface the "
-"section\n"
-"  of pylint arguments with \"--\" so Django's manage.py passes them "
-"along.\n"
+"  as other parameters to pylint.  Note that you'll want to preface the section\n"
+"  of pylint arguments with \"--\" so Django's manage.py passes them along.\n"
 "\n"
 "  Examples:\n"
 "    python core/manage.py runpylint all -- -f parseable\n"
 "    python core/manage.py runpylint filebrowser\n"
 "    python core/manage.py runpylint\n"
 "  "
-msgstr ""
+msgstr "\n"
+"  在桌面代码上运行 pylint。\n"
 "\n"
-"\"\n"
-"\"  在桌面代码上运行 pylint。\n"
-"\"\n"
-"\"\n"
-"\"\n"
-"\"  在没有参数，或在 \"所有\" 的情况下，将在所有\n"
-"\"\n"
-"\"  已安装的应用程序上运行 pylint。  否则，指定模块运行，并为\n"
-"\"\n"
-"\"  pylint 指定其他参数。  请注意，您需要在\n"
-"\"\n"
-"\"  pylint 参数节前添加 \"--\"，以使 Django 的 manage.py 对其进行传递。\n"
-"\"\n"
-"\"\n"
-"\"\n"
-"\"  示例：\n"
-"\"\n"
-"\"    python core/manage.py runpylint all -- -f parseable\n"
-"\"\n"
-"\"    python core/manage.py runpylint filebrowser\n"
-"\"\n"
-"\"    python core/manage.py runpylint\n"
-"\"\n"
-"\"  "
+"  在没有参数，或在 \"所有\" 的情况下，将在所有\n"
+"  已安装的应用程序上运行 pylint。  否则，指定模块运行，并为\n"
+"  pylint 指定其他参数。  请注意，您需要在\n"
+"  pylint 参数节前添加 \"--\"，以使 Django 的 manage.py 对其进行传递。\n"
+"\n"
+"  示例：\n"
+"    python core/manage.py runpylint all -- -f parseable\n"
+"    python core/manage.py runpylint filebrowser\n"
+"    python core/manage.py runpylint\n"
+"  "
 
 #: src/desktop/management/commands/runpylint.py:61
 #, python-format
@@ -645,9 +576,7 @@ msgid "Server Error (500)"
 msgstr "服务器错误 (500)"
 
 #: src/desktop/templates/500.mako:25
-msgid ""
-"Sorry, there's been an error. An email was sent to your administrators. "
-"Thank you for your patience."
+msgid "Sorry, there's been an error. An email was sent to your administrators. Thank you for your patience."
 msgstr "很抱歉，发生了一个错误。已向您的管理员发送了一封电子邮件。感谢您的耐心等待。"
 
 #: src/desktop/templates/500.mako:28 src/desktop/templates/popup_error.mako:36
@@ -684,12 +613,12 @@ msgstr "检查错误配置"
 msgid "Server Logs"
 msgstr "服务器日志"
 
-#: src/desktop/templates/actionbar.mako:31 src/desktop/templates/logs.mako:63
+#: src/desktop/templates/actionbar.mako:31 src/desktop/templates/logs.mako:61
 msgid "Search..."
 msgstr "搜索..."
 
 #: src/desktop/templates/check_config.mako:23
-#: src/desktop/templates/dump_config.mako:26 src/desktop/templates/logs.mako:27
+#: src/desktop/templates/dump_config.mako:26 src/desktop/templates/logs.mako:25
 msgid "About"
 msgstr "关于"
 
@@ -796,20 +725,18 @@ msgid "Invalid username or password."
 msgstr "无效用户名或密码。"
 
 #: src/desktop/templates/login.mako:97
-msgid ""
-"Since this is your first time logging in, pick any username and password."
-" Be sure to remember these, as"
+msgid "Since this is your first time logging in, pick any username and password. Be sure to remember these, as"
 msgstr "这是您的首次登录，因此请选择任意用户名和密码。请牢记它们，因为"
 
 #: src/desktop/templates/login.mako:98
 msgid "they will become your Hue superuser credentials."
 msgstr "它们将成为您的 Hue 超级用户凭证。"
 
-#: src/desktop/templates/logs.mako:59
+#: src/desktop/templates/logs.mako:57
 msgid "Log entries (most recent first)"
 msgstr "日志条目（最近的条目靠前）"
 
-#: src/desktop/templates/logs.mako:67
+#: src/desktop/templates/logs.mako:65
 msgid "Download entire log as zip"
 msgstr "以 zip 格式下载整个日志"
 

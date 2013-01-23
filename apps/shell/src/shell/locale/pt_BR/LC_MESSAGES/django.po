@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-01-10 18:30-0800\n"
+"POT-Creation-Date: 2013-01-02 22:57-0800\n"
 "PO-Revision-Date: 2012-07-30 18:56-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: pt_BR <LL@li.org>\n"
@@ -20,9 +20,7 @@ msgstr ""
 #: src/shell/shellmanager.py:153
 #, python-format
 msgid "bin/hadoop return non-zero %(retcode)d while trying to merge credentials."
-msgstr ""
-"Retorno do bin/hadoop %(retcode)d diferente de zero enquanto tenta "
-"mesclar credenciais."
+msgstr "Retorno do bin/hadoop %(retcode)d diferente de zero enquanto tenta mesclar credenciais."
 
 #: src/shell/templates/failed_to_create.mako:21
 #: src/shell/templates/index.mako:22 src/shell/templates/no_such_user.mako:21
@@ -31,12 +29,8 @@ msgid "Hue Shell"
 msgstr "Hue Shell"
 
 #: src/shell/templates/failed_to_create.mako:24
-msgid ""
-"Failed to create a shell of the given type. The possible reasons for this"
-" are:"
-msgstr ""
-"Falha ao criar um programa shell de determinado tipo. As razões possíveis"
-" são:"
+msgid "Failed to create a shell of the given type. The possible reasons for this are:"
+msgstr "Falha ao criar um programa shell de determinado tipo. As razões possíveis são:"
 
 #: src/shell/templates/failed_to_create.mako:26
 msgid "The system is out of PTYs."
@@ -63,34 +57,18 @@ msgid "Select one of the available shells from the toolbar above."
 msgstr "Selecione um dos shells disponíveis na barra de ferramentas acima."
 
 #: src/shell/templates/index.mako:88
-msgid ""
-"You do not have permission to access any shell or there is no configured "
-"shell."
-msgstr ""
-"Você não tem permissão para acessar qualquer shell ou não existe um shell"
-" configurado."
+msgid "You do not have permission to access any shell or there is no configured shell."
+msgstr "Você não tem permissão para acessar qualquer shell ou não existe um shell configurado."
 
 #: src/shell/templates/no_such_user.mako:24
-msgid ""
-"The Shell application requires a Unix user account for every user of Hue "
-"on the remote web server."
-msgstr ""
-"O aplicativo Shell necessita de uma conta de usuário Unix para cada "
-"usuário do Hue no servidor Web remoto."
+msgid "The Shell application requires a Unix user account for every user of Hue on the remote web server."
+msgstr "O aplicativo Shell necessita de uma conta de usuário Unix para cada usuário do Hue no servidor Web remoto."
 
 #: src/shell/templates/no_such_user.mako:26
-msgid ""
-"Ask your administrator to create a user account for you on the remote web"
-" server as described in the Shell documentation."
-msgstr ""
-"Peça a seu administrador para criar uma conta de usuário para você no "
-"servidor Web remoto conforme descrito na documentação do shell."
+msgid "Ask your administrator to create a user account for you on the remote web server as described in the Shell documentation."
+msgstr "Peça a seu administrador para criar uma conta de usuário para você no servidor Web remoto conforme descrito na documentação do shell."
 
 #: src/shell/templates/not_running_spawning.mako:24
-msgid ""
-"The webserver currently running Hue does not support the Shell "
-"application. Please contact your administrator."
-msgstr ""
-"O servidor da Web que atualmente executa o Hue não é compatível com "
-"aplicativos Shell. Entre em contato com seu administrador."
+msgid "The webserver currently running Hue does not support the Shell application. Please contact your administrator."
+msgstr "O servidor da Web que atualmente executa o Hue não é compatível com aplicativos Shell. Entre em contato com seu administrador."
 

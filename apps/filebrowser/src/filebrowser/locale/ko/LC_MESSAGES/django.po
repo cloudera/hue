@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-01-10 18:29-0800\n"
+"POT-Creation-Date: 2013-01-02 22:57-0800\n"
 "PO-Revision-Date: 2012-07-30 18:52-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -16,10 +16,6 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
-
-#: src/filebrowser/conf.py:25
-msgid "Max snappy decompression size in bytes."
-msgstr ""
 
 #: src/filebrowser/forms.py:62
 msgid "File to edit"
@@ -136,50 +132,48 @@ msgstr "재귀"
 msgid "Path to change permissions"
 msgstr "권한 변경 경로"
 
-#: src/filebrowser/views.py:107 src/filebrowser/views.py:486
+#: src/filebrowser/views.py:106 src/filebrowser/views.py:486
 #: src/filebrowser/views.py:516
 #, python-format
 msgid "File not found: %(path)s"
 msgstr "파일을 찾을 수 없음: %(path)s"
 
-#: src/filebrowser/views.py:109
+#: src/filebrowser/views.py:108
 #, python-format
 msgid "'%(path)s' is not a file"
 msgstr "'%(path)s은(는) 파일이 아닙니다."
 
-#: src/filebrowser/views.py:144
+#: src/filebrowser/views.py:143
 #, python-format
 msgid "Cannot access: %(path)s."
 msgstr "액세스할 수 없음: %(path)s."
 
-#: src/filebrowser/views.py:146 src/filebrowser/views.py:932
+#: src/filebrowser/views.py:145 src/filebrowser/views.py:884
 #, python-format
-msgid ""
-" Note: you are a Hue admin but not a HDFS superuser (which is "
-"\"%(superuser)s\")."
+msgid " Note: you are a Hue admin but not a HDFS superuser (which is \"%(superuser)s\")."
 msgstr " 참고: 귀하는 Hue 관리자이나 HDFS superuser(\"%(superuser)s\")는 아닙니다."
 
-#: src/filebrowser/views.py:172
+#: src/filebrowser/views.py:171
 #, python-format
 msgid "Cannot edit a directory: %(path)s"
 msgstr "디렉토리를 편집할 수 없음: %(path)s"
 
-#: src/filebrowser/views.py:176
+#: src/filebrowser/views.py:175
 #, python-format
 msgid "File too big to edit: %(path)s"
 msgstr "파일이 너무 커 편집할 수 없음: %(path)s"
 
-#: src/filebrowser/views.py:186
+#: src/filebrowser/views.py:185
 #, python-format
 msgid "File is not encoded in %(encoding)s; cannot be edited: %(path)s"
 msgstr "파일이 %(encoding)s(으)로 인코딩되지 않아 편집할 수 없음: %(path)s"
 
-#: src/filebrowser/views.py:235
+#: src/filebrowser/views.py:234
 #, python-format
 msgid "Saved %(path)s."
 msgstr "%(path)s이(가) 저장되었습니다."
 
-#: src/filebrowser/views.py:330
+#: src/filebrowser/views.py:329
 #, python-format
 msgid "Not a directory: %(path)s"
 msgstr "디렉토리가 아님: %(path)s"
@@ -210,131 +204,104 @@ msgstr "길이는 음수일 수 없습니다."
 msgid "Cannot request chunks greater than %(bytes)d bytes"
 msgstr "%(bytes)d바이트보다 큰 청크는 요청할 수 없습니다."
 
-#: src/filebrowser/views.py:659
-#, python-format
-msgid ""
-"Failed to validate snappy compressed file. File size is greater than "
-"allowed max snappy decompression size of %d"
-msgstr ""
-
-#: src/filebrowser/views.py:690
-#, fuzzy
-msgid "Failed to decompress snappy compressed file."
-msgstr "파일의 압축을 해제하지 못했습니다."
-
-#: src/filebrowser/views.py:695
-msgid "Failed to decompress snappy compressed file. Snappy is not installed!"
-msgstr ""
-
-#: src/filebrowser/views.py:698
-#, python-format
-msgid ""
-"Failed to decompress snappy compressed file. File size is greater than "
-"allowed max snappy decompression size of %d"
-msgstr ""
-
-#: src/filebrowser/views.py:722
+#: src/filebrowser/views.py:686
 msgid "Failed to read Avro file."
 msgstr "Avro 파일을 읽지 못했습니다."
 
-#: src/filebrowser/views.py:729
+#: src/filebrowser/views.py:695
 msgid "Offsets are not supported with Gzip compression."
 msgstr "오프셋은 Gzip 압축을 지원하지 않습니다."
 
-#: src/filebrowser/views.py:734
+#: src/filebrowser/views.py:702
 msgid "Failed to decompress file."
 msgstr "파일의 압축을 해제하지 못했습니다."
 
-#: src/filebrowser/views.py:745
+#: src/filebrowser/views.py:717
 msgid "Failed to read file."
 msgstr "파일을 읽지 못했습니다."
 
-#: src/filebrowser/views.py:793 src/filebrowser/views.py:795
+#: src/filebrowser/views.py:745 src/filebrowser/views.py:747
 #: src/filebrowser/templates/display.mako:119
 #: src/filebrowser/templates/display.mako:199
 msgid "First Block"
 msgstr "맨 처음 블록"
 
-#: src/filebrowser/views.py:793 src/filebrowser/views.py:795
+#: src/filebrowser/views.py:745 src/filebrowser/views.py:747
 #: src/filebrowser/templates/display.mako:120
 #: src/filebrowser/templates/display.mako:200
 msgid "Previous Block"
 msgstr "이전 블록"
 
-#: src/filebrowser/views.py:798 src/filebrowser/views.py:801
+#: src/filebrowser/views.py:750 src/filebrowser/views.py:753
 #: src/filebrowser/templates/display.mako:121
 #: src/filebrowser/templates/display.mako:201
 msgid "Next Block"
 msgstr "다음 블록"
 
-#: src/filebrowser/views.py:798 src/filebrowser/views.py:801
+#: src/filebrowser/views.py:750 src/filebrowser/views.py:753
 #: src/filebrowser/templates/display.mako:122
 #: src/filebrowser/templates/display.mako:202
 msgid "Last Block"
 msgstr "마지막 블록"
 
-#: src/filebrowser/views.py:930
+#: src/filebrowser/views.py:882
 msgid "Cannot perform operation."
 msgstr "작업을 수행할 수 없습니다."
 
-#: src/filebrowser/views.py:965
+#: src/filebrowser/views.py:917
 #, python-format
-msgid ""
-"Could not rename folder \"%s\" to \"%s\": Hashes are not allowed in "
-"filenames."
+msgid "Could not rename folder \"%s\" to \"%s\": Hashes are not allowed in filenames."
 msgstr "폴더 이름을 \"%s\"에서 \"%s\"(으)로 바꿀 수 없습니다. 파일 이름에 해시를 사용할 수 없습니다."
 
-#: src/filebrowser/views.py:979
+#: src/filebrowser/views.py:931
 #, python-format
-msgid ""
-"Could not name folder \"%s\": Slashes or hashes are not allowed in "
-"filenames."
+msgid "Could not name folder \"%s\": Slashes or hashes are not allowed in filenames."
 msgstr "폴더 이름 \"%s\"을(를) 지정할 수 없습니다. 파일 이름에 슬래시 또는 해시를 사용할 수 없습니다."
 
-#: src/filebrowser/views.py:989
+#: src/filebrowser/views.py:941
 #, python-format
 msgid "Could not name file \"%s\": Slashes are not allowed in filenames."
 msgstr "파일 이름 \"%s\"을(를) 지정할 수 없습니다. 파일 이름에 슬래시를 사용할 수 없습니다."
 
-#: src/filebrowser/views.py:1082 src/filebrowser/views.py:1159
+#: src/filebrowser/views.py:1034 src/filebrowser/views.py:1111
 msgid "A POST request is required."
 msgstr "POST 요청이 필요합니다."
 
-#: src/filebrowser/views.py:1085 src/filebrowser/views.py:1162
+#: src/filebrowser/views.py:1037 src/filebrowser/views.py:1114
 #, python-format
 msgid "%(destination)s upload succeeded"
 msgstr "%(destination)s 업로드 완료"
 
-#: src/filebrowser/views.py:1087 src/filebrowser/views.py:1164
+#: src/filebrowser/views.py:1039 src/filebrowser/views.py:1116
 #, python-format
 msgid "Upload failed: %(data)s"
 msgstr "업로드 실패: %(data)s"
 
-#: src/filebrowser/views.py:1103 src/filebrowser/views.py:1182
+#: src/filebrowser/views.py:1055 src/filebrowser/views.py:1134
 #, python-format
 msgid "Sorry, no \"%(sep)s\" in the filename %(name)s.sep"
 msgstr "파일 이름 %(name)s.sep에 \"%(sep)s\"이(가) 없습니다."
 
-#: src/filebrowser/views.py:1123 src/filebrowser/views.py:1206
+#: src/filebrowser/views.py:1075 src/filebrowser/views.py:1158
 #, python-format
 msgid "Destination %(name)s already exists."
 msgstr "대상 %(name)s이(가) 이미 존재합니다."
 
-#: src/filebrowser/views.py:1125 src/filebrowser/views.py:1208
+#: src/filebrowser/views.py:1077 src/filebrowser/views.py:1160
 #, python-format
 msgid "Copy to %(name)s failed: %(error)s"
 msgstr "%(name)s에 복사할 수 없습니다: %(error)s"
 
-#: src/filebrowser/views.py:1135 src/filebrowser/views.py:1218
+#: src/filebrowser/views.py:1087 src/filebrowser/views.py:1170
 #, python-format
 msgid "Error in upload form: %s"
 msgstr "업로드 양식 %s에 오류 발생"
 
-#: src/filebrowser/views.py:1191
+#: src/filebrowser/views.py:1143
 msgid "Could not extract contents of file."
 msgstr "파일의 내용을 추출할 수 없습니다."
 
-#: src/filebrowser/views.py:1197
+#: src/filebrowser/views.py:1149
 msgid "Could not interpret archive type."
 msgstr "아카이브 유형을 해석할 수 없습니다."
 
@@ -615,9 +582,7 @@ msgstr "제출"
 
 #: src/filebrowser/templates/listdir_components.mako:186
 #, python-format
-msgid ""
-"Note: Only the Hadoop superuser, \"%(superuser)s\" on this file system, "
-"may change the owner of a file."
+msgid "Note: Only the Hadoop superuser, \"%(superuser)s\" on this file system, may change the owner of a file."
 msgstr "참고: 이 파일 시스템의 Hadoop superuser \"%(superuser)s\"만 파일의 소유자를 변경할 수 있습니다."
 
 #: src/filebrowser/templates/listdir_components.mako:214
@@ -664,7 +629,7 @@ msgstr "파일 업로더를 사용할 수 있도록 JavaScript를 활성화하�
 
 #: src/filebrowser/templates/listdir_components.mako:318
 msgid "The file will then be extracted in the path specified above."
-msgstr "그 다음 위에 지정된 경로에서 파일이 추출됩니다."
+msgstr "업로드 후 위에 지정된 경로에서 파일이 추출됩니다."
 
 #: src/filebrowser/templates/listdir_components.mako:335
 msgid "Create Directory"
