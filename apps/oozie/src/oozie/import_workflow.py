@@ -518,7 +518,6 @@ def import_workflow(workflow, workflow_definition, fs=None):
 
   # Transform XML using XSLT
   transformed_root = transform(workflow_definition_root)
-  print etree.tostring(transformed_root, pretty_print=True)
 
   # Resolve workflow dependencies and node types and link dependencies
   nodes = _prepare_nodes(workflow, transformed_root)
