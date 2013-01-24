@@ -51,13 +51,9 @@ ${ layout.menubar(section='coordinators') }
   <div class="row-fluid">
     <div class="span2">
       <div class="well sidebar-nav">
-        <ul class="nav nav-list">
-          <li class="nav-header">${ _('Name') }</li>
-          <li id="coordinatorName">${ _('Please choose one') }</li>
-
-          <li class="nav-header">${ _('Workflow') }</li>
-          <li id="workflowName">${ _('Please choose one') }</li>
-
+        <ul class="nav nav-list" style="min-height: 150px">
+          <li class="nav-header">${ _('Properties') }</li>
+          <li class="active"><a href="#">${ _('Edit properties') }</a></li>
          </ul>
         </div>
     </div>
@@ -212,18 +208,6 @@ ${ layout.menubar(section='coordinators') }
       $(this).parents(".control-group").removeClass("error");
       $(this).parent().find(".help-inline").remove();
     });
-
-    $("#id_name").change(function () {
-      $("#coordinatorName").text($(this).val());
-    });
-
-    $("#id_workflow").change(function () {
-      if ($(this).val()) {
-        $("#workflowName").text($("#id_workflow option[value='" + $(this).val() + "']").text());
-      }
-    });
-
-    $("#id_workflow").change();
   });
 </script>
 

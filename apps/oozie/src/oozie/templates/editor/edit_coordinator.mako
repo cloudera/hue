@@ -57,12 +57,12 @@ ${ layout.menubar(section='coordinators') }
     <div class="span2">
       <div class="well sidebar-nav">
         <ul class="nav nav-list">
-          <li class="nav-header">${ _('Name') }</li>
-          <li><a id="coordinatorName" href="#steps">${ coordinator.name }</a></li>
+          <li class="nav-header">${ _('Properties') }</li>
+          <li class="active"><a href="#properties">${ _('Edit properties') }</a></li>
 
           % if coordinator.workflow:
             <li class="nav-header">${ _('Workflow') }</li>
-            <li id="workflowName"><a href="${ coordinator.workflow.get_absolute_url() }" target="_blank">${ coordinator.workflow }</a></li>
+            <li id="workflowName"><a href="${ coordinator.workflow.get_absolute_url() }" target="_blank"><i class="icon-share-alt"></i> ${ coordinator.workflow }</a></li>
           % endif
 
           <li class="nav-header">${ _('Datasets') }</li>
@@ -87,7 +87,7 @@ ${ layout.menubar(section='coordinators') }
     </div>
     <div class="span10">
       <form id="jobForm" class="form-horizontal" action="${ url('oozie:edit_coordinator', coordinator=coordinator.id) }" method="POST">
-      <div id="steps" class="section">
+      <div id="properties" class="section">
         <ul class="nav nav-pills">
           <li class="active"><a href="#step1" class="step">${ _('Step 1: General') }</a></li>
           <li><a href="#step2" class="step">${ _('Step 2: Frequency') }</a></li>
@@ -607,8 +607,8 @@ ${ layout.menubar(section='coordinators') }
             window.viewModel.isSaveVisible(true);
           }
         },
-        "steps":function () {
-          showSection("steps");
+        "properties":function () {
+          showSection("properties");
         },
         "createDataset":function () {
           window.viewModel.reset();
@@ -636,7 +636,7 @@ ${ layout.menubar(section='coordinators') }
       }
 
       function showStep(step) {
-        showSection("steps");
+        showSection("properties");
         currentStep = step;
         if (step != "step1") {
           $("#backBtn").removeClass("disabled");
@@ -693,10 +693,6 @@ ${ layout.menubar(section='coordinators') }
       $("[validate=true]").change(function () {
         $(this).parents(".control-group").removeClass("error");
         $(this).parent().find(".help-inline").remove();
-      });
-
-      $("#id_name").change(function () {
-        $("#coordinatorName").text($(this).val());
       });
 
       $("#id_workflow").change(function () {
