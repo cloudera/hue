@@ -1085,7 +1085,7 @@ from django.utils.translation import ugettext as _
       }
 
       var octal = function (strInt) {
-        return parseInt("0" + strInt);
+        return parseInt("0" + strInt, 8);
       }
     };
 
