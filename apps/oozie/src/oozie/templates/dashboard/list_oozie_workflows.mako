@@ -48,7 +48,6 @@ ${ layout.menubar(section='dashboard') }
         <span class="btn-group" style="float:left;">
           <a class="btn btn-status btn-success" data-value='SUCCEEDED'>${ _('Succeeded') }</a>
           <a class="btn btn-status btn-warning" data-value='RUNNING'>${ _('Running') }</a>
-          <a class="btn btn-status btn-warning" data-value='SUSPENDED'>${ _('Suspended') }</a>
           <a class="btn btn-status btn-danger" data-value='KILLED'>${ _('Killed') }</a>
         </span>
       </span>
