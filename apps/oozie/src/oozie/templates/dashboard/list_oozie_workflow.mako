@@ -102,14 +102,14 @@ ${ layout.menubar(section='dashboard') }
                    data-confirmation-message="${ _('Are you sure you\'d like to kill this job?') }">
                 ${_('Kill')}
                 </button>
-                <button title="${ _('Suspend the workflow') }" id="suspend-btn"
+                <button title="${ _('Suspend the workflow after finishing the current running actions') }" id="suspend-btn"
                    data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_workflow.id, action='suspend') }"
                    data-confirmation-message="${ _('Are you sure you\'d like to suspend this job?') }"
                    class="btn btn-small confirmationModal
                    % if not oozie_workflow.is_running():
                      hide
                    % endif
-                   ">
+                   " rel="tooltip" data-placement="right">
                   ${ _('Suspend') }
                 </button>
                 <button title="${ _('Resume the workflow') }" id="resume-btn"
