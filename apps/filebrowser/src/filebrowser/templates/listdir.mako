@@ -56,16 +56,16 @@ ${ commonheader(_('File Browser'), 'filebrowser', user) | n,unicode }
                 <li><a href="#" class="upload-link" title="${_('Archive')}" data-bind="click: uploadArchive"><i class="icon-gift"></i> ${_('Zip file')}</a></li>
               </ul>
             </div>
-	        <div class="btn-group" style="display: inline-block;">
-	          <a href="#" data-toggle="dropdown" class="btn dropdown-toggle">
-	            <i class="icon-plus-sign"></i> ${_('New')}
-	            <span class="caret"></span>
-	          </a>
-	          <ul class="dropdown-menu">
-	            <li><a href="#" class="create-file-link" title="${_('File')}"><i class="icon-file"></i> ${_('File')}</a></li>
-	            <li><a href="#" class="create-directory-link" title="${_('Directory')}"><i class="icon-folder-close"></i> ${_('Directory')}</a></li>
-	          </ul>
-	        </div>
+            <div class="btn-group" style="display: inline">
+              <a href="#" data-toggle="dropdown" class="btn dropdown-toggle">
+                <i class="icon-plus-sign"></i> ${_('New')}
+                <span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu" style="top: auto">
+                <li><a href="#" class="create-file-link" title="${_('File')}"><i class="icon-file"></i> ${_('File')}</a></li>
+                <li><a href="#" class="create-directory-link" title="${_('Directory')}"><i class="icon-folder-close"></i> ${_('Directory')}</a></li>
+              </ul>
+            </div>
         </%def>
     </%actionbar:render>
 
