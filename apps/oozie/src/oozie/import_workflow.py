@@ -423,7 +423,7 @@ def _preprocess_nodes(workflow, transformed_root, workflow_definition_root, node
   preprocess nodes
   Resolve start name and subworkflow dependencies.
   Looks at path and interrogates all workflows until the proper deployment path is found.
-  If the proper deployment path is never found, then 
+  If the proper deployment path is never found, then
   """
   for full_node in nodes:
     if full_node.node_type is 'start':
@@ -452,7 +452,7 @@ def _resolve_subworkflow_from_deployment_dir(fs, workflow, app_path):
   """
   Resolves subworkflow in a subworkflow node
   Looks at path and interrogates all workflows until the proper deployment path is found.
-  If the proper deployment path is never found, then 
+  If the proper deployment path is never found, then
   """
   if not fs:
     raise RuntimeError(_("No hadoop file system to operate on."))

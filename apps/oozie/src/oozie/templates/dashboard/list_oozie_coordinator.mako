@@ -41,7 +41,7 @@ ${ layout.menubar(section='dashboard') }
             % if coordinator is not None:
               <a href="${ coordinator.get_absolute_url() }">${ oozie_coordinator.appName }</a>
             % else:
-            ${ oozie_coordinator.appName }
+              ${ oozie_coordinator.appName }
             % endif
         </li>
 
@@ -80,25 +80,51 @@ ${ layout.menubar(section='dashboard') }
         % if has_job_edition_permission(oozie_coordinator, user):
           <li class="nav-header">${ _('Manage') }</li>
           <li>
-          <form action="${ url('oozie:resubmit_coordinator', oozie_coord_id=oozie_coordinator.id) }" method="post">
-              <button type="button" title="${_('Kill %(coordinator)s') % dict(coordinator=oozie_coordinator.id)}"
-                 id="kill-btn"
-                 class="btn btn-small btn-danger confirmationModal"
-                 alt="${ _('Are you sure you want to kill coordinator %s?') % oozie_coordinator.id }"
-                 href="javascript:void(0)"
-                 data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='kill') }"
-                 data-message="${ _('The coordinator was killed!') }"
-                 data-confirmation-message="${ _('Are you sure you\'d like to kill this job?') }">
-              ${_('Kill')}
-              </button>
-              <button id="resubmit-btn" type="submit" class="btn btn-small
-              % if oozie_coordinator.is_running():
-                hide
-              % endif
-              ">
-              ${ _('Resubmit') }
-              </button>
-          </form>
+            <button title="${_('Kill %(coordinator)s') % dict(coordinator=oozie_coordinator.id)}"
+              id="kill-btn"
+              class="btn btn-small confirmationModal
+               % if not oozie_coordinator.is_running():
+                 hide
+               % endif
+              "
+              alt="${ _('Are you sure you want to kill coordinator %s?') % oozie_coordinator.id }"
+              href="javascript:void(0)"
+              data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='kill') }"
+              data-message="${ _('The coordinator was killed!') }"
+              data-confirmation-message="${ _('Are you sure you\'d like to kill this job?') }">
+                ${_('Kill')}
+            </button>
+            <button class="btn btn-small
+               % if oozie_coordinator.is_running() or oozie_coordinator.status in ('KILLED', 'FAILED'):
+                 hide
+               % endif
+            "
+              id="rerun-btn"
+              data-rerun-url="${ url('oozie:rerun_oozie_coord', job_id=oozie_coordinator.id, app_path=oozie_coordinator.coordJobPath) }"
+            >
+              ${ _('Rerun') }
+            </button>
+            <div id="rerun-coord-modal" class="modal hide"></div>
+            <button title="${ _('Suspend the coordinator after finishing the current running actions') }" id="suspend-btn"
+               data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='suspend') }"
+               data-confirmation-message="${ _('Are you sure you\'d like to suspend this job?') }"
+               class="btn btn-small confirmationModal
+               % if not oozie_coordinator.is_running():
+                 hide
+               % endif
+               " rel="tooltip" data-placement="right">
+              ${ _('Suspend') }
+            </button>
+            <button title="${ _('Resume the coordinator') }" id="resume-btn"
+               data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='resume') }"
+               data-confirmation-message="${ _('Are you sure you\'d like to resume this job?') }"
+               class="btn btn-small confirmationModal
+               % if oozie_coordinator.is_running():
+                 hide
+               % endif
+               ">
+              ${ _('Resume') }
+            </button>
           </li>
         % endif
       </ul>
@@ -123,7 +149,6 @@ ${ layout.menubar(section='dashboard') }
           </tr>
           </thead>
           <tbody data-bind="template: {name: 'calendarTemplate', foreach: actions}">
-
           </tbody>
           <tfoot>
             <tr data-bind="visible: isLoading()">
@@ -143,21 +168,18 @@ ${ layout.menubar(section='dashboard') }
       </div>
 
       <script id="calendarTemplate" type="text/html">
-
         <tr>
           <td>
-            <a data-bind="visible:externalId !='', attr: { href: externalIdUrl}" data-row-selector="true"></a>
-            <span data-bind="text: nominalTime, attr: {'class': statusClass}"></span>
+            <a data-bind="attr: {href: url}" data-row-selector="true">
+              <span data-bind="text: title, attr: {'class': statusClass, 'id': 'date-' + $index()}"></span>
+            </a>
           </td>
           <td><span data-bind="text: errorMessage"></span> <span data-bind="visible:missingDependencies !='', text: '${ _('Missing')}' + missingDependencies"></span></td>
-
         </tr>
-
       </script>
 
 
       <div class="tab-pane" id="actions">
-
         <table class="table table-striped table-condensed" cellpadding="0" cellspacing="0">
           <thead>
           <tr>
@@ -179,7 +201,6 @@ ${ layout.menubar(section='dashboard') }
           </thead>
 
           <tbody data-bind="template: {name: 'actionTemplate', foreach: actions}">
-
           </tbody>
 
           <tfoot>
@@ -200,7 +221,6 @@ ${ layout.menubar(section='dashboard') }
       </div>
 
       <script id="actionTemplate" type="text/html">
-
         <tr>
           <td data-bind="text: number"></td>
           <td data-bind="text: nominalTime"></td>
@@ -210,17 +230,13 @@ ${ layout.menubar(section='dashboard') }
           <td data-bind="text: missingDependencies"></td>
           <td data-bind="text: createdTime"></td>
           <td data-bind="text: lastModifiedTime"></td>
-
           <td>
-            <a data-bind="visible:externalId !='', attr: { href: url}, text: id" data-row-selector"true"></a>
+            <a data-bind="visible:externalId !='', attr: {href: url}, text: id" data-row-selector"true"></a>
           </td>
-
           <td>
-            <a data-bind="visible:externalId !='', attr: { href: externalIdUrl}, text: externalId"></a>
+            <a data-bind="visible:externalId !='', attr: {href: externalIdUrl}, text: externalId"></a>
           </td>
-
         </tr>
-
       </script>
 
       <div class="tab-pane" id="configuration">
@@ -294,11 +310,8 @@ ${ layout.menubar(section='dashboard') }
     if (['SUCCEEDED', 'OK'].indexOf(status) > -1){
       klass = prefix + "success";
     }
-    else if (['RUNNING', 'PREP', 'WAITING', 'SUSPENDED', 'PREPSUSPENDED', 'PREPPAUSED', 'PAUSED'].indexOf(status) > -1){
+    else if (['READY', 'RUNNING', 'PREP', 'WAITING', 'SUSPENDED', 'PREPSUSPENDED', 'PREPPAUSED', 'PAUSED', 'SUBMITTED'].indexOf(status) > -1){
       klass = prefix + "warning";
-    }
-    else if (status == 'READY'){
-      klass = prefix + "success";
     }
     else {
       klass = prefix + "important";
@@ -319,6 +332,7 @@ ${ layout.menubar(section='dashboard') }
       statusClass: "label " + getStatusClass(action.status),
       externalId: action.externalId,
       externalIdUrl: action.externalIdUrl,
+      title: action.title,
       nominalTime: action.nominalTime,
       createdTime: action.createdTime,
       lastModifiedTime: action.lastModifiedTime,
@@ -333,7 +347,6 @@ ${ layout.menubar(section='dashboard') }
     self.actions = ko.observableArray(ko.utils.arrayMap(actions), function (action) {
       return new Action(action);
     });
-
   };
 
   var viewModel = new RunningCoordinatorActionsModel([]);
@@ -393,12 +406,37 @@ ${ layout.menubar(section='dashboard') }
       return false;
     });
 
+    $("#suspend-btn").bind('confirmation', function() {
+      var _this = this;
+      $.post($(this).data("url"),
+        { 'notification': $(this).data("message") },
+        function(response) {
+          if (response['status'] != 0) {
+            $.jHueNotify.error("${ _('Error: ') }" + response['data']);
+          } else {
+            window.location.reload();
+          }
+        }
+      );
+      return false;
+    });
+
+    $('#rerun-btn').click(function() {
+      var _action = $(this).data("rerun-url");
+
+      $.get(_action, function(response) {
+          $('#rerun-coord-modal').html(response);
+          $('#rerun-coord-modal').modal('show');
+        }
+      );
+     });
+
     resizeLogs();
     refreshView();
     var logsAtEnd = true;
 
     function refreshView() {
-      $.getJSON(window.location.href + "?format=json", function (data) {
+      $.getJSON("${ oozie_coordinator.get_absolute_url() }" + "?format=json", function (data) {
         viewModel.isLoading(false);
         if (data.actions){
           viewModel.actions(ko.utils.arrayMap(data.actions, function (action) {
@@ -408,9 +446,22 @@ ${ layout.menubar(section='dashboard') }
 
         $("#status span").attr("class", "label").addClass(getStatusClass(data.status)).text(data.status);
 
-        if (data.id && data.status != "RUNNING" && data.status != "SUSPENDED"){
+        if (data.id && data.status != "RUNNING" && data.status != "SUSPENDED" && data.status != "KILLED" && data.status != "FAILED"){
           $("#kill-btn").hide();
-          $("#resubmit-btn").show();
+          $("#rerun-btn").show();
+        }
+
+        if (data.id && (data.status == "RUNNING" || data.status == "RUNNINGWITHERROR")){
+          $("#suspend-btn").show();
+        } else {
+          $("#suspend-btn").hide();
+        }
+
+        if (data.id && (data.status == "SUSPENDED" || data.status == "SUSPENDEDWITHERROR" || data.status == "SUSPENDEDWITHERROR"
+            || data.status == "PREPSUSPENDED")){
+          $("#resume-btn").show();
+        } else {
+          $("#resume-btn").hide();
         }
 
         $("#progress .bar").text(data.progress+"%").css("width", data.progress+"%").attr("class", "bar "+getStatusClass(data.status, "bar-"));

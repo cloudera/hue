@@ -39,7 +39,7 @@ ${ layout.menubar(section='coordinators') }
   .sidebar-nav {
     padding: 9px 0;
   }
-  
+
 </style>
 
 <script src="/static/ext/js/knockout-2.1.0.js" type="text/javascript" charset="utf-8"></script>

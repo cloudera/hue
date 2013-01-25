@@ -67,6 +67,7 @@ class MockOozieApi:
   COORDINATOR_DICT = dict([(coord['coordJobId'], coord) for coord in JSON_COORDINATOR_LIST])
 
   WORKFLOW_ACTION = {u'status': u'OK', u'retries': 0, u'transition': u'end', u'stats': None, u'startTime': u'Fri, 10 Aug 2012 05:24:21 GMT', u'toString': u'Action name[WordCount] status[OK]', u'cred': u'null', u'errorMessage': None, u'errorCode': None, u'consoleUrl': u'http://localhost:50030/jobdetails.jsp?jobid=job_201208072118_0044', u'externalId': u'job_201208072118_0044', u'externalStatus': u'SUCCEEDED', u'conf': u'<map-reduce xmlns="uri:oozie:workflow:0.2">\r\n  <job-tracker>localhost:8021</job-tracker>\r\n  <name-node>hdfs://localhost:8020</name-node>\r\n  <configuration>\r\n    <property>\r\n      <name>mapred.mapper.regex</name>\r\n      <value>dream</value>\r\n    </property>\r\n    <property>\r\n      <name>mapred.input.dir</name>\r\n      <value>/user/test/words/20120702</value>\r\n    </property>\r\n    <property>\r\n      <name>mapred.output.dir</name>\r\n      <value>/user/test/out/rrwords/20120702</value>\r\n    </property>\r\n    <property>\r\n      <name>mapred.mapper.class</name>\r\n      <value>org.apache.hadoop.mapred.lib.RegexMapper</value>\r\n    </property>\r\n    <property>\r\n      <name>mapred.combiner.class</name>\r\n      <value>org.apache.hadoop.mapred.lib.LongSumReducer</value>\r\n    </property>\r\n    <property>\r\n      <name>mapred.reducer.class</name>\r\n      <value>org.apache.hadoop.mapred.lib.LongSumReducer</value>\r\n    </property>\r\n    <property>\r\n      <name>mapred.output.key.class</name>\r\n      <value>org.apache.hadoop.io.Text</value>\r\n    </property>\r\n    <property>\r\n      <name>mapred.output.value.class</name>\r\n      <value>org.apache.hadoop.io.LongWritable</value>\r\n    </property>\r\n  </configuration>\r\n</map-reduce>', u'type': u'map-reduce', u'trackerUri': u'localhost:8021', u'externalChildIDs': None, u'endTime': u'Fri, 10 Aug 2012 05:24:38 GMT', u'data': None, u'id': u'0000012-120725142744176-oozie-oozi-W@WordCount', u'name': u'WordCount'}
+  COORDINATOR_ACTIONS = [{u'status': u'SUCCEEDED', u'toString': u'WorkflowAction name[0000000-130117135211239-oozie-oozi-C@1] status[SUCCEEDED]', u'runConf': None, u'errorMessage': None, u'missingDependencies': u'', u'coordJobId': u'0000000-130117135211239-oozie-oozi-C', u'errorCode': None, u'actionNumber': 1, u'consoleUrl': None, u'nominalTime': u'Mon, 31 Dec 2012 16:00:00 PST', u'externalStatus': u'', u'createdConf': None, u'createdTime': u'Fri, 25 Jan 2013 10:53:39 PST', u'externalId': u'0000035-130124125317829-oozie-oozi-W', u'lastModifiedTime': u'Fri, 25 Jan 2013 10:53:51 PST', u'type': None, u'id': u'0000000-130117135211239-oozie-oozi-C@1', u'trackerUri': None}, {u'status': u'SUCCEEDED', u'toString': u'WorkflowAction name[0000000-130117135211239-oozie-oozi-C@2] status[SUCCEEDED]', u'runConf': None, u'errorMessage': None, u'missingDependencies': u'', u'coordJobId': u'0000000-130117135211239-oozie-oozi-C', u'errorCode': None, u'actionNumber': 2, u'consoleUrl': None, u'nominalTime': u'Tue, 01 Jan 2013 16:00:00 PST', u'externalStatus': u'', u'createdConf': None, u'createdTime': u'Fri, 25 Jan 2013 10:56:27 PST', u'externalId': u'0000038-130124125317829-oozie-oozi-W', u'lastModifiedTime': u'Fri, 25 Jan 2013 10:56:41 PST', u'type': None, u'id': u'0000000-130117135211239-oozie-oozi-C@2', u'trackerUri': None}, {u'status': u'SUCCEEDED', u'toString': u'WorkflowAction name[0000000-130117135211239-oozie-oozi-C@3] status[SUCCEEDED]', u'runConf': None, u'errorMessage': None, u'missingDependencies': u'', u'coordJobId': u'0000000-130117135211239-oozie-oozi-C', u'errorCode': None, u'actionNumber': 3, u'consoleUrl': None, u'nominalTime': u'Wed, 02 Jan 2013 16:00:00 PST', u'externalStatus': u'', u'createdConf': None, u'createdTime': u'Fri, 25 Jan 2013 08:59:38 PST', u'externalId': u'0000026-130124125317829-oozie-oozi-W', u'lastModifiedTime': u'Fri, 25 Jan 2013 09:00:05 PST', u'type': None, u'id': u'0000000-130117135211239-oozie-oozi-C@3', u'trackerUri': None}, {u'status': u'SUCCEEDED', u'toString': u'WorkflowAction name[0000000-130117135211239-oozie-oozi-C@4] status[SUCCEEDED]', u'runConf': None, u'errorMessage': None, u'missingDependencies': u'', u'coordJobId': u'0000000-130117135211239-oozie-oozi-C', u'errorCode': None, u'actionNumber': 4, u'consoleUrl': None, u'nominalTime': u'Thu, 03 Jan 2013 16:00:00 PST', u'externalStatus': u'', u'createdConf': None, u'createdTime': u'Fri, 25 Jan 2013 10:53:39 PST', u'externalId': u'0000037-130124125317829-oozie-oozi-W', u'lastModifiedTime': u'Fri, 25 Jan 2013 10:54:17 PST', u'type': None, u'id': u'0000000-130117135211239-oozie-oozi-C@4', u'trackerUri': None}]
 
   def __init__(self, *args, **kwargs):
     pass
@@ -105,7 +106,7 @@ class MockOozieApi:
     if job_id in MockOozieApi.COORDINATOR_DICT:
       return OozieCoordinator(self, MockOozieApi.COORDINATOR_DICT[job_id])
     else:
-      return OozieCoordinator(self, {'id': job_id, 'actions': []})
+      return OozieCoordinator(self, {'id': job_id, 'actions': MockOozieApi.COORDINATOR_ACTIONS})
 
   def get_action(self, action_id):
     return WorkflowAction(MockOozieApi.WORKFLOW_ACTION)
@@ -1602,30 +1603,6 @@ class TestPermissions(OozieBase):
     finally:
       finish()
 
-    # Resubmit
-    finish = SHARE_JOBS.set_for_testing(False)
-    try:
-      history, created = History.objects.get_or_create(job=coord, oozie_job_id=MockOozieApi.COORDINATOR_IDS[0],
-                                                       defaults={'submitter': User.objects.get(username='test'), 'properties': '[]'})
-      oozie_job_id = history.oozie_job_id
-      response = client_not_me.post(reverse('oozie:resubmit_coordinator', args=[oozie_job_id]))
-      assert_true('Permission denied' in response.content, response.content)
-    finally:
-      finish()
-
-    finish = SHARE_JOBS.set_for_testing(True)
-    try:
-      try:
-        history, created = History.objects.get_or_create(job=coord, oozie_job_id=MockOozieApi.COORDINATOR_IDS[0],
-                                                         defaults={'submitter': User.objects.get(username='test'), 'properties': '[]'})
-        oozie_job_id = history.oozie_job_id
-        response = client_not_me.post(reverse('oozie:resubmit_coordinator', args=[oozie_job_id]))
-        assert_false('Permission denied' in response.content, response.content)
-      except IOError:
-        pass
-    finally:
-      finish()
-
     # Delete
     finish = SHARE_JOBS.set_for_testing(False)
     try:
@@ -1696,7 +1673,6 @@ class TestEditorWithOozie(OozieBase):
     }, follow=True)
     fh.close()
     assert_equal(workflow_count + 1, Workflow.objects.count(), response)
-
 
 
 class TestImportWorkflow04WithOozie(OozieBase):
@@ -1828,10 +1804,53 @@ class TestDashboard(OozieMockBase):
 
 
   def test_manage_coordinator_dashboard(self):
-    # Kill and resubmit button in response
+    # Display of buttons happens in js now
     response = self.c.get(reverse('oozie:list_oozie_coordinator', args=[MockOozieApi.COORDINATOR_IDS[0]]), {}, follow=True)
     assert_true(('%s/kill' % MockOozieApi.COORDINATOR_IDS[0]) in response.content, response.content)
-    assert_true('Resubmit' in response.content, response.content)
+    assert_true(('rerun_oozie_coord/%s' % MockOozieApi.COORDINATOR_IDS[0]) in response.content, response.content)
+    assert_true(('%s/suspend' % MockOozieApi.COORDINATOR_IDS[0]) in response.content, response.content)
+    assert_true(('%s/resume' % MockOozieApi.COORDINATOR_IDS[0]) in response.content, response.content)
+
+
+  def test_rerun_coordinator(self):
+    response = self.c.get(reverse('oozie:rerun_oozie_coord', args=[MockOozieApi.WORKFLOW_IDS[0], '/path']))
+    assert_true('Select actions to rerun' in response.content, response.content)
+
+
+  def test_rerun_coordinator_permissions(self):
+    post_data = {
+        u'form-MAX_NUM_FORMS': [u''],
+        u'nocleanup': [u'on'],
+        u'refresh': [u'on'],
+        u'form-TOTAL_FORMS': [u'0'],
+        u'actions': [u'1'],
+        u'form-INITIAL_FORMS': [u'0']
+    }
+
+    finish = SHARE_JOBS.set_for_testing(False)
+    try:
+      response = self.c.post(reverse('oozie:rerun_oozie_coord', args=[MockOozieApi.COORDINATOR_IDS[0], '/path']), post_data)
+      assert_false('Permission denied' in response.content, response.content)
+    finally:
+      finish()
+
+    # Login as someone else
+    client_not_me = make_logged_in_client(username='not_me', is_superuser=False, groupname='test')
+    grant_access("not_me", "test", "oozie")
+
+    finish = SHARE_JOBS.set_for_testing(False)
+    try:
+      response = client_not_me.post(reverse('oozie:rerun_oozie_coord', args=[MockOozieApi.COORDINATOR_IDS[0], '/path']), post_data)
+      assert_true('Permission denied' in response.content, response.content)
+    finally:
+      finish()
+
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      response = client_not_me.post(reverse('oozie:rerun_oozie_coord', args=[MockOozieApi.COORDINATOR_IDS[0], '/path']), post_data)
+      assert_true('Permission denied' in response.content, response.content)
+    finally:
+      finish()
 
 
   def test_list_workflows(self):
@@ -1906,7 +1925,7 @@ class TestDashboard(OozieMockBase):
     # Rerun
     response = client_not_me.get(reverse('oozie:rerun_oozie_job', kwargs={'job_id': MockOozieApi.WORKFLOW_IDS[0],
                                                                           'app_path': MockOozieApi.JSON_WORKFLOW_LIST[0]['appPath']}))
-    assert_false('Permission denied.' in response.content, response.content)
+    assert_true('Permission denied.' in response.content, response.content)
 
   def test_workflow_permissions(self):
     response = self.c.get(reverse('oozie:list_oozie_workflow', args=[MockOozieApi.WORKFLOW_IDS[0]]))

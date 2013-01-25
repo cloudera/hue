@@ -20,7 +20,7 @@ import logging
 from nose.tools import assert_equal
 from oozie.tests import MockOozieApi
 
-from liboozie.types import WorkflowAction
+from liboozie.types import WorkflowAction, Coordinator
 
 
 LOG = logging.getLogger(__name__)
@@ -31,3 +31,8 @@ def test_valid_external_id():
   assert_equal(None, WorkflowAction(MockOozieApi.JSON_WORKFLOW_LIST[1]).externalId)
   assert_equal(None, WorkflowAction(MockOozieApi.JSON_WORKFLOW_LIST[2]).externalId)
   assert_equal(None, WorkflowAction(MockOozieApi.JSON_WORKFLOW_LIST[3]).externalId)
+
+
+def aggregate_coordinator_instances():
+  dates = ['1', '2', '3', '6', '7', '8', '10', '12', '15', '16', '20', '23', '30', '40']
+  assert_equal(['1-3', '6-8', '10-10', '12-12', '15-16', '20-20', '23-23', '30-30', '40-40'], Coordinator.aggreate(dates))

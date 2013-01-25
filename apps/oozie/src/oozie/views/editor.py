@@ -492,21 +492,6 @@ def _submit_coordinator(request, coordinator, mapping):
                          detail=ex._headers.get('oozie-error-message', ex))
 
 
-def resubmit_coordinator(request, oozie_coord_id):
-  if request.method != 'POST':
-    raise PopupException(_('A POST request is required.'))
-
-  history = History.objects.get(oozie_job_id=oozie_coord_id)
-  Job.objects.is_accessible_or_exception(request, history.job.id)
-
-  coordinator = history.get_coordinator().get_full_node()
-  properties = history.properties_dict
-  job_id = _submit_coordinator(request, coordinator, properties)
-
-  request.info(_('Coordinator re-submitted'))
-  return redirect(reverse('oozie:list_oozie_coordinator', kwargs={'job_id': job_id}))
-
-
 def list_history(request):
   """
   List the job submission history.

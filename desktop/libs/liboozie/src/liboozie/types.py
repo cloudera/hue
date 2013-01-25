@@ -32,7 +32,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.log.access import access_warn
 
 import hadoop.confparse
-from liboozie.utils import parse_timestamp
+from liboozie.utils import parse_timestamp, format_time
 
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
@@ -152,6 +152,7 @@ class CoordinatorAction(Action):
     else:
       self.conf_dict = {}
 
+    self.title = ' %s-%s'% (self.actionNumber, format_time(self.nominalTime))
 
 class WorkflowAction(Action):
   _ATTRS = [
@@ -353,9 +354,34 @@ class Coordinator(Job):
     end = mktime(self.endTime)
 
     if end != start:
-      return min(int((1 - (end - next) / (end - start)) * 100), 100)
+      progress = min(int((1 - (end - next) / (end - start)) * 100), 100)
     else:
-      return 100
+      progress = 100
+
+    # Manage case of a rerun
+    action_count = float(len(self.actions))
+    if action_count != 0 and progress == 100:
+      progress = int(sum([action.is_finished() for action in self.actions]) / action_count * 100)
+
+    return progress
+
+  @classmethod
+  def aggreate(cls, actions):
+    if not actions:
+      return []
+
+    result = []
+    first = prev = actions[0]
+
+    for a in actions[1:]:
+      if int(a) != int(prev) + 1:
+        result.append('-'.join((first, prev)))
+        first = a
+      prev = a
+
+    result.append('-'.join((first, prev)))
+
+    return result
 
 
 class Workflow(Job):
