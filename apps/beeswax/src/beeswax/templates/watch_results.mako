@@ -56,6 +56,10 @@ ${layout.menubar(section='query')}
     white-space: nowrap;
   }
 
+  .noLeftMargin {
+    margin-left: 0!important;
+  }
+
 </style>
 
 <div class="container-fluid">
