@@ -29,6 +29,7 @@ from oozie.models import Workflow, Node, Java, Mapreduce, Streaming, Coordinator
   Dataset, DataInput, DataOutput, Pig, Link, Hive, Sqoop, Ssh, Shell, DistCp, Fs,\
   Email, SubWorkflow, Generic
 
+
 LOG = logging.getLogger(__name__)
 
 
@@ -435,6 +436,19 @@ class RerunForm(forms.Form):
 
     self.fields['skip_nodes'].choices = skip_nodes
     self.fields['skip_nodes'].initial = initial_skip_nodes
+
+
+class RerunCoordForm(forms.Form):
+  refresh = forms.BooleanField(initial=True, required=False, help_text=_t('Used to indicate if user wants to cleanup output events for given rerun actions'))
+  nocleanup = forms.BooleanField(initial=True, required=False, help_text=_t("Used to indicate if user wants to refresh an action's input and output events"))
+  actions = forms.MultipleChoiceField(required=True)
+
+  def __init__(self, *args, **kwargs):
+    oozie_coordinator = kwargs.pop('oozie_coordinator')
+
+    super(RerunCoordForm, self).__init__(*args, **kwargs)
+
+    self.fields['actions'].choices = [(action.actionNumber, action.title) for action in reversed(oozie_coordinator.get_working_actions())]
 
 
 def design_form_by_type(node_type, user, workflow):

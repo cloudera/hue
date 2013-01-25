@@ -42,7 +42,6 @@ urlpatterns = patterns(
   url(r'^edit_coordinator_dataset/(?P<dataset>\d+)$', 'edit_coordinator_dataset', name='edit_coordinator_dataset'),
   url(r'^create_coordinator_data/(?P<coordinator>[-\w]+)/(?P<data_type>(input|output))$', 'create_coordinator_data', name='create_coordinator_data'),
   url(r'^submit_coordinator/(?P<coordinator>\d+)$', 'submit_coordinator', name='submit_coordinator'),
-  url(r'^resubmit_coordinator/(?P<oozie_coord_id>[-\w]+)$', 'resubmit_coordinator', name='resubmit_coordinator'),
 
   url(r'^list_history$', 'list_history', name='list_history'),
   url(r'^list_history/(?P<record_id>[-\w]+)$', 'list_history_record', name='list_history_record'),
@@ -73,5 +72,6 @@ urlpatterns += patterns(
   url(r'^list_oozie_coordinator/(?P<job_id>[-\w]+)$', 'list_oozie_coordinator', name='list_oozie_coordinator'),
   url(r'^list_oozie_workflow_action/(?P<action>[-\w@]+)$', 'list_oozie_workflow_action', name='list_oozie_workflow_action'),
   url(r'^rerun_oozie_job/(?P<job_id>[-\w]+)/(?P<app_path>.+?)$', 'rerun_oozie_job', name='rerun_oozie_job'),
+  url(r'^rerun_oozie_coord/(?P<job_id>[-\w]+)/(?P<app_path>.+?)$', 'rerun_oozie_coordinator', name='rerun_oozie_coord'),
   url(r'^manage_oozie_jobs/(?P<job_id>[-\w]+)/(?P<action>(start|suspend|resume|kill|rerun))$', 'manage_oozie_jobs', name='manage_oozie_jobs'),
 )

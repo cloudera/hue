@@ -90,7 +90,7 @@ ${ layout.menubar(section='dashboard') }
               <li>
                 <button title="${_('Kill %(workflow)s') % dict(workflow=oozie_workflow.id)}"
                    id="kill-btn"
-                   class="btn btn-small btn-danger confirmationModal
+                   class="btn btn-small confirmationModal
                    % if not oozie_workflow.is_running():
                      hide
                    % endif

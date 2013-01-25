@@ -35,7 +35,7 @@ from desktop.lib.rest.http_client import RestException
 from desktop.log.access import access_warn
 from liboozie.oozie_api import get_oozie
 from liboozie.submittion import Submission
-from oozie.forms import RerunForm, ParameterForm
+from oozie.forms import RerunForm, ParameterForm, RerunCoordForm
 
 
 from oozie.conf import OOZIE_JOBS_COUNT
@@ -220,6 +220,7 @@ def list_oozie_workflow_action(request, action):
 def rerun_oozie_job(request, job_id, app_path):
   ParametersFormSet = formset_factory(ParameterForm, extra=0)
   oozie_workflow = check_job_access_permission(request, job_id)
+  check_job_edition_permission(oozie_workflow, request.user)
 
   if request.method == 'POST':
     rerun_form = RerunForm(request.POST, oozie_workflow=oozie_workflow)
@@ -238,7 +239,7 @@ def rerun_oozie_job(request, job_id, app_path):
 
       _rerun_workflow(request, job_id, args, mapping)
 
-      request.info(_('Workflow re-running.'))
+      request.info(_('Workflow re-running!'))
       return redirect(reverse('oozie:list_oozie_workflow', kwargs={'job_id': job_id}))
     else:
       request.error(_('Invalid submission form: %s %s' % (rerun_form.errors, params_form.errors)))
@@ -262,7 +263,61 @@ def _rerun_workflow(request, oozie_id, run_args, mapping):
     job_id = submission.rerun(**run_args)
     return job_id
   except RestException, ex:
-    raise PopupException(_("Error rerunning workflow %s") % (oozie_id,),
+    raise PopupException(_("Error re-running workflow %s") % (oozie_id,),
+                         detail=ex._headers.get('oozie-error-message', ex))
+
+
+@show_oozie_error
+def rerun_oozie_coordinator(request, job_id, app_path):
+  oozie_coordinator = check_job_access_permission(request, job_id)
+  check_job_edition_permission(oozie_coordinator, request.user)
+  ParametersFormSet = formset_factory(ParameterForm, extra=0)
+
+  if request.method == 'POST':
+    params_form = ParametersFormSet(request.POST)
+    rerun_form = RerunCoordForm(request.POST, oozie_coordinator=oozie_coordinator)
+
+    if sum([rerun_form.is_valid(), params_form.is_valid()]) == 2:
+      args = {}
+      args['deployment_dir'] = app_path
+
+      params = {
+        'type': 'action',
+        'scope': ','.join(oozie_coordinator.aggreate(rerun_form.cleaned_data['actions'])),
+        'refresh': rerun_form.cleaned_data['refresh'],
+        'nocleanup': rerun_form.cleaned_data['nocleanup'],
+      }
+
+      properties = dict([(param['name'], param['value']) for param in params_form.cleaned_data])
+
+      _rerun_coordinator(request, job_id, args, params, properties)
+
+      request.info(_('Coordinator re-running!'))
+      return redirect(reverse('oozie:list_oozie_coordinator', kwargs={'job_id': job_id}))
+    else:
+      request.error(_('Invalid submission form: %s' % (rerun_form.errors,)))
+      return list_oozie_coordinator(request, job_id)
+  else:
+    rerun_form = RerunCoordForm(oozie_coordinator=oozie_coordinator)
+    initial_params = ParameterForm.get_initial_params(oozie_coordinator.conf_dict)
+    params_form = ParametersFormSet(initial=initial_params)
+
+  popup = render('dashboard/rerun_coord_popup.mako', request, {
+                   'rerun_form': rerun_form,
+                   'params_form': params_form,
+                   'action': reverse('oozie:rerun_oozie_coord', kwargs={'job_id': job_id, 'app_path': app_path}),
+                 }, force_template=True).content
+
+  return HttpResponse(json.dumps(popup), mimetype="application/json")
+
+
+def _rerun_coordinator(request, oozie_id, args, params, properties):
+  try:
+    submission = Submission(user=request.user, fs=request.fs, oozie_id=oozie_id, properties=properties)
+    job_id = submission.rerun_coord(params=params, **args)
+    return job_id
+  except RestException, ex:
+    raise PopupException(_("Error re-running coordinator %s") % (oozie_id,),
                          detail=ex._headers.get('oozie-error-message', ex))
 
 
@@ -303,12 +358,14 @@ def massaged_coordinator_actions_for_json(coordinator):
       'externalId': action.externalId or '-',
       'externalIdUrl': action.externalId and reverse('oozie:list_oozie_workflow_action', kwargs={'action': action.externalId}) or '',
       'nominalTime': format_time(action.nominalTime),
+      'title': action.title,
       'createdTime': format_time(action.createdTime),
       'lastModifiedTime': format_time(action.lastModifiedTime),
       'errorMessage': escapejs(action.errorMessage),
       'missingDependencies': escapejs(action.missingDependencies)
     }
-    actions.append(massaged_action)
+
+    actions.insert(0, massaged_action)
 
   return actions
 

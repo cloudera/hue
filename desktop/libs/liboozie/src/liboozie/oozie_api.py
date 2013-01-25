@@ -202,19 +202,22 @@ class OozieApi(object):
     resp = self._root.get('job/%s' % (action_id,), params)
     return Klass(resp)
 
-  def job_control(self, jobid, action):
+  def job_control(self, jobid, action, properties=None, parameters=None):
     """
     job_control(jobid, action) -> None
     Raise RestException on error.
     """
-    if action not in ('start', 'suspend', 'resume', 'kill'):
+    if action not in ('start', 'suspend', 'resume', 'kill', 'rerun', 'coord-rerun'):
       msg = 'Invalid oozie job action: %s' % (action,)
       LOG.error(msg)
       raise ValueError(msg)
+    properties = self._get_oozie_properties(properties)
     params = self._get_params()
     params['action'] = action
+    if parameters is not None:
+      params.update(parameters)
 
-    return self._root.put('job/%s' % jobid, params)
+    return self._root.put('job/%s' % jobid, params,  data=config_gen(properties), contenttype=_XML_CONTENT_TYPE)
 
 
   def submit_workflow(self, application_path, properties=None):
@@ -254,9 +257,13 @@ class OozieApi(object):
     resp = self._root.post('jobs', params, data=config_gen(properties), contenttype=_XML_CONTENT_TYPE)
     return resp['id']
 
-  def rerun(self, jobid, properties=None):
+  def rerun(self, jobid, properties=None, params=None):
     properties = self._get_oozie_properties(properties)
-    params = self._get_params()
+    if params is None:
+      params = self._get_params()
+    else:
+      self._get_params().update(params)
+
     params['action'] = 'rerun'
 
     return self._root.put('job/%s' % jobid, params, data=config_gen(properties), contenttype=_XML_CONTENT_TYPE)
