@@ -33,6 +33,7 @@ from django.utils.translation import ugettext as _
 </%def>
 
 <%def name="_table(files, path, current_request_path, view)">
+    <script src="/static/ext/js/jquery/plugins/jquery.cookie.js"></script>
     <script src="/static/ext/js/knockout-2.1.0.js" type="text/javascript" charset="utf-8"></script>
     <script src="/static/ext/js/moment.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
@@ -717,9 +718,13 @@ from django.utils.translation import ugettext as _
     var FileBrowserModel = function (files, page, breadcrumbs, currentDirPath) {
       var self = this;
 
+      if (!$.cookie("hueFilebrowserRecordsPerPage")){
+        $.cookie("hueFilebrowserRecordsPerPage", "45");
+      }
+
       self.page = ko.observable(new Page(page));
       self.recordsPerPageChoices = ["15", "30", "45", "60", "100", "200"],
-              self.recordsPerPage = ko.observable("30");
+      self.recordsPerPage = ko.observable($.cookie("hueFilebrowserRecordsPerPage"));
       self.targetPageNum = ko.observable(1);
       self.targetPath = ko.observable("${current_request_path}");
 
@@ -810,6 +815,7 @@ from django.utils.translation import ugettext as _
       };
 
       self.recordsPerPage.subscribe(function (newValue) {
+        $.cookie("hueFilebrowserRecordsPerPage", newValue);
         self.retrieveData();
       });
 
