@@ -8,7 +8,7 @@
 #at your own risk.
 #Tested to work on(etch testing 13-08-2007):
 #  Python 2.4.4 (#2, Jul 17 2007, 11:56:54)
-#  [GCC 4.1.3 20070629 (prerelease) (Debian 4.1.3-SNAPSHOT-13)] on linux2
+#  [GCC 4.1.3 20070629 (prerelease) (Debian 4.1.3-13)] on linux2
 
 dependclasses=["User","Group" ,"Permission" , "Message"]
 
