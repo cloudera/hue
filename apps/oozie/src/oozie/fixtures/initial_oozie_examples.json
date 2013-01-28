@@ -1684,7 +1684,7 @@
     "fields": {
       "files": "[\"hive-site.xml\"]",
       "job_xml": "hive-site.xml",
-      "job_properties": "[{\"name\":\"oozie.hive.defaults\",\"value\":\"hive-site.xml\"}]",
+      "job_properties": "[]",
       "params": "[]",
       "archives": "[]",
       "prepares": "[]",
