@@ -1070,27 +1070,14 @@ from django.utils.translation import ugettext as _
       // Looks for managed hidden fields and handles sizing appropriately.
       var hiddenFields = function (parentEl, name, values) {
         parentEl = $(parentEl);
-        var fields = parentEl.find("input.hidden-field");
+        parentEl.find("input.hidden-field").remove();
 
-        // Create or delete hidden fields according to needs.
-        var resize = values.length - fields.length;
-        while (resize > 0) {
-          resize--;
+        $(values).each(function (index, value) {
           var field = $("<input type='hidden' />");
           field.attr("name", name);
           field.attr("class", "hidden-field")
+          field.val(value);
           parentEl.append(field);
-        }
-        while (resize < 0) {
-          resize++;
-          var field = fields[fields.length - resize - 1]
-          parentEl.remove(field);
-        }
-
-        // Set values
-        fields = parentEl.find("input.hidden-field");
-        $(values).each(function (index, value) {
-          $(fields[index]).val(value);
         });
       }
 
