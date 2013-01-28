@@ -422,6 +422,12 @@ def test_listdir():
     response = c.get('/filebrowser/view' + prefix)
     assert_equal(response.context['home_directory'], home)
 
+    # Test URL conflicts with filenames
+    stat_dir = '%sstat/dir' % prefix
+    cluster.fs.do_as_user('test', cluster.fs.mkdir, stat_dir)
+    response = c.get('/filebrowser/view%s' % stat_dir)
+    assert_equal(stat_dir, response.context['path'])
+
     response = c.get('/filebrowser/view/test-filebrowser/?default_to_home')
     assert_true(re.search('%s$' % home, response['Location']))
 
