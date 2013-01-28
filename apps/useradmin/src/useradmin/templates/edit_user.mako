@@ -39,7 +39,7 @@ ${ commonheader(_('Hue Users'), "useradmin", user, "100px") | n,unicode }
 
     <form id="editForm" method="POST" class="form form-horizontal" autocomplete="off">
         <fieldset>
-            <h3>${ _('Information') }<h3>
+            <h3>${ _('Information') }</h3>
 
             ${layout.render_field(form["username"])}
 
@@ -54,7 +54,7 @@ ${ commonheader(_('Hue Users'), "useradmin", user, "100px") | n,unicode }
             </div>
             % endif
 
-            <h3>${ _('Optional') }<h3>
+            <h3>${ _('Optional') }</h3>
 
             % if "first_name" in form.fields:
             <div class="row">

@@ -22,7 +22,7 @@ import django.contrib.auth.forms
 from django import forms
 from django.contrib.auth.models import User, Group
 from django.forms.util import ErrorList
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
 from desktop.lib.django_util import get_username_re_rule, get_groupname_re_rule
 
@@ -40,15 +40,15 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
   and UserCreationForm.
   """
   username = forms.RegexField(
-      label=_("Username"),
+      label=_t("Username"),
       max_length=30,
       regex='^%s$' % (get_username_re_rule(),),
-      help_text = _("Required. 30 characters or fewer. No whitespaces or colons."),
-      error_messages = {'invalid': _("Whitespaces and ':' not allowed") })
-  password1 = forms.CharField(label=_("Password"), widget=forms.PasswordInput, required=False)
-  password2 = forms.CharField(label=_("Password confirmation"), widget=forms.PasswordInput, required=False)
-  ensure_home_directory = forms.BooleanField(label=_("Create home directory"),
-                                            help_text=_("Create home directory if one doesn't already exist."),
+      help_text = _t("Required. 30 characters or fewer. No whitespaces or colons."),
+      error_messages = {'invalid': _t("Whitespaces and ':' not allowed") })
+  password1 = forms.CharField(label=_t("Password"), widget=forms.PasswordInput, required=False)
+  password2 = forms.CharField(label=_t("Password confirmation"), widget=forms.PasswordInput, required=False)
+  ensure_home_directory = forms.BooleanField(label=_t("Create home directory"),
+                                            help_text=_t("Create home directory if one doesn't already exist."),
                                             initial=True,
                                             required=False)
 
@@ -59,7 +59,7 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
     password1 = self.cleaned_data.get("password1", "")
     password2 = self.cleaned_data["password2"]
     if password1 != password2:
-      raise forms.ValidationError(_("Passwords do not match."))
+      raise forms.ValidationError(_t("Passwords do not match."))
     return password2
 
   def clean_password1(self):
@@ -101,18 +101,18 @@ class SuperUserChangeForm(UserChangeForm):
 
 class AddLdapUsersForm(forms.Form):
   username_pattern = forms.RegexField(
-      label=_("Username"),
+      label=_t("Username"),
       max_length=64,
       regex='^%s$' % (get_username_re_rule(),),
-      help_text=_("Required. 30 characters or fewer. No whitespaces or colons."),
-      error_messages={'invalid': _("Whitespaces and ':' not allowed")})
-  dn = forms.BooleanField(label=_("Distinguished name"),
-                          help_text=_("Whether or not the user should be imported by "
+      help_text=_t("Required. 30 characters or fewer. No whitespaces or colons."),
+      error_messages={'invalid': _t("Whitespaces and ':' not allowed")})
+  dn = forms.BooleanField(label=_t("Distinguished name"),
+                          help_text=_t("Whether or not the user should be imported by "
                                     "distinguished name."),
                           initial=False,
                           required=False)
-  ensure_home_directory = forms.BooleanField(label=_("Create home directory"),
-                                            help_text=_("Create home directory for user if one doesn't already exist."),
+  ensure_home_directory = forms.BooleanField(label=_t("Create home directory"),
+                                            help_text=_t("Create home directory for user if one doesn't already exist."),
                                             initial=True,
                                             required=False)
 
@@ -133,22 +133,22 @@ class AddLdapUsersForm(forms.Form):
 
 class AddLdapGroupsForm(forms.Form):
   groupname_pattern = forms.RegexField(
-      label="Name",
+      label=_t("Name"),
       max_length=64,
       regex='^%s$' % get_groupname_re_rule(),
-      help_text=_("Required. 30 characters or fewer."),
-      error_messages={'invalid': _("30 characters or fewer.") })
-  dn = forms.BooleanField(label=_("Distinguished name"),
-                          help_text=_("Whether or not the group should be imported by "
+      help_text=_t("Required. 30 characters or fewer."),
+      error_messages={'invalid': _t("30 characters or fewer.") })
+  dn = forms.BooleanField(label=_t("Distinguished name"),
+                          help_text=_t("Whether or not the group should be imported by "
                                     "distinguished name."),
                           initial=False,
                           required=False)
-  import_members = forms.BooleanField(label=_('Import new members'),
-                                      help_text=_('Import unimported or new users from the group.'),
+  import_members = forms.BooleanField(label=_t('Import new members'),
+                                      help_text=_t('Import unimported or new users from the group.'),
                                       initial=False,
                                       required=False)
-  ensure_home_directories = forms.BooleanField(label=_('Create home directories'),
-                                                help_text=_('Create home directories for every member imported, if members are being imported.'),
+  ensure_home_directories = forms.BooleanField(label=_t('Create home directories'),
+                                                help_text=_t('Create home directories for every member imported, if members are being imported.'),
                                                 initial=True,
                                                 required=False)
 
@@ -275,7 +275,7 @@ def _make_model_field(label, initial, choices, multi=True):
   return field
 
 class SyncLdapUsersGroupsForm(forms.Form):
-  ensure_home_directory = forms.BooleanField(label=_("Create Home Directories"),
-                                            help_text=_("Create home directory for every user, if one doesn't already exist."),
+  ensure_home_directory = forms.BooleanField(label=_t("Create Home Directories"),
+                                            help_text=_t("Create home directory for every user, if one doesn't already exist."),
                                             initial=True,
                                             required=False)
