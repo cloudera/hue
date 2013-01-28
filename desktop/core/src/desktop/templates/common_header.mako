@@ -30,6 +30,7 @@ from django.utils.translation import ugettext as _
   <meta name="author" content="">
 
   <link href="/static/ext/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/static/ext/css/font-awesome.min.css" rel="stylesheet">
   <link href="/static/css/hue2.css" rel="stylesheet">
   <link href="/static/ext/css/fileuploader.css" rel="stylesheet">
 

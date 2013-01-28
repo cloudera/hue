@@ -20,7 +20,7 @@ from django.utils.translation import ugettext as _
 <%def name="breadcrumbs(path, breadcrumbs, from_listdir=False)">
     % if from_listdir:
         <ul class="nav nav-pills hueBreadcrumbBar">
-            <li><a href="${url('filebrowser.views.view', path=urlencode(path))}?default_to_home"><i class="icon-home"></i> ${_('Home')}</a></li>
+            <li><a href="${url('filebrowser.views.view', path=urlencode(path))}?default_to_home" style="line-height:18px"><i class="icon-home"></i> ${_('Home')}</a></li>
             <li>
                 <span style="float:right; margin-top:10px;"><i id="editBreadcrumb" class="icon-pencil hand" rel="tooltip" title="${_('Edit path')}"></i></span>
                 <ul class="hueBreadcrumb" data-bind="foreach: breadcrumbs" style="padding-right:40px">

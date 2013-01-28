@@ -99,11 +99,11 @@ from django.utils.translation import ugettext as _
     </table>
 
     <script id="fileTemplate" type="text/html">
-        <tr style="cursor: pointer">
+        <tr style="cursor: pointer" data-bind="event: { mouseover: toggleHover, mouseout: toggleHover}">
             <td class="center" data-bind="click: handleSelect" style="cursor: default">
                 <div data-bind="visible: name != '..', css: {hueCheckbox: name != '..', 'icon-ok': selected}"></div>
             </td>
-            <td data-bind="click: $root.viewFile" class="left"><i data-bind="css: {'icon-file': type == 'file', 'icon-folder-close': type != 'file'}"></i></td>
+            <td data-bind="click: $root.viewFile" class="left"><i data-bind="css: {'icon-file-alt': type == 'file', 'icon-folder-close': type != 'file', 'icon-folder-open': type != 'file' && hovered}"></i></td>
             <td data-bind="click: $root.viewFile">
                 <strong><a href="#" data-bind="click: $root.viewFile, text: name"></a></strong>
             </td>
@@ -696,6 +696,10 @@ from django.utils.translation import ugettext as _
         selected:ko.observable(false),
         handleSelect:function (row, e) {
           this.selected(!this.selected());
+        },
+        hovered:ko.observable(false),
+        toggleHover:function (row, e) {
+          this.hovered(!this.hovered());
         }
       }
     }

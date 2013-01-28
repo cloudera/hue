@@ -52,7 +52,7 @@ ${ commonheader(_('File Browser'), 'filebrowser', user) | n,unicode }
                 <span class="caret"></span>
               </a>
               <ul class="dropdown-menu">
-                <li><a href="#" class="upload-link" title="${_('Files')}" data-bind="click: uploadFile"><i class="icon-file"></i> ${_('Files')}</a></li>
+                <li><a href="#" class="upload-link" title="${_('Files')}" data-bind="click: uploadFile"><i class="icon-file-alt"></i> ${_('Files')}</a></li>
                 <li><a href="#" class="upload-link" title="${_('Archive')}" data-bind="click: uploadArchive"><i class="icon-gift"></i> ${_('Zip file')}</a></li>
               </ul>
             </div>
@@ -62,7 +62,7 @@ ${ commonheader(_('File Browser'), 'filebrowser', user) | n,unicode }
                 <span class="caret"></span>
               </a>
               <ul class="dropdown-menu" style="top: auto">
-                <li><a href="#" class="create-file-link" title="${_('File')}"><i class="icon-file"></i> ${_('File')}</a></li>
+                <li><a href="#" class="create-file-link" title="${_('File')}"><i class="icon-file-alt"></i> ${_('File')}</a></li>
                 <li><a href="#" class="create-directory-link" title="${_('Directory')}"><i class="icon-folder-close"></i> ${_('Directory')}</a></li>
               </ul>
             </div>
