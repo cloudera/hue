@@ -17,12 +17,11 @@
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
-
+<%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="layout" file="layout.mako" />
 
 ${ commonheader(_('Tables'), app_name, user, '100px') | n,unicode }
 ${layout.menubar(section='tables')}
-
 
 <div class="container-fluid">
     <h1>${_('Tables')}</h1>
@@ -52,21 +51,33 @@ ${layout.menubar(section='tables')}
             </div>
         </div>
         <div class="span9">
+          <%actionbar:render>
+            <%def name="actions()">
+                <button id="viewBtn" class="btn toolbarBtn" title="${_('Browse the selected table')}" disabled="disabled"><i class="icon-eye-open"></i> ${_('View')}</button>
+                <button id="browseBtn" class="btn toolbarBtn" title="${_('Browse the selected table')}" disabled="disabled"><i class="icon-list"></i> ${_('Browse Data')}</button>
+                <button id="dropBtn" class="btn toolbarBtn" title="${_('Delete the selected tables')}" disabled="disabled"><i class="icon-trash"></i>  ${_('Drop')}</button>
+            </%def>
+          </%actionbar:render>
             <table class="table table-condensed table-striped datatables">
                 <thead>
-                    <tr>
-                        <th>${_('Table Name')}</th>
-                        <th>&nbsp;</th>
-                    </tr>
+                  <tr>
+                    <th width="1%"><div class="hueCheckbox selectAll" data-selectables="tableCheck"></div></th>
+                    <th>${_('Table Name')}</th>
+                  </tr>
                 </thead>
                 <tbody>
                 % for table in tables:
-                    <tr>
-                        <td>
-                            <a href="${ url(app_name + ':describe_table', database=database, table=table) }" data-row-selector="true">${ table }</a>
-                        </td>
-                        <td><a href="${ url(app_name + ':read_table', database=database, table=table) }" class="btn">${_('Browse Data')}</a></td>
-                    </tr>
+                  <tr>
+                    <td data-row-selector-exclude="true" width="1%">
+                      <div class="hueCheckbox tableCheck"
+                           data-view-url="${ url(app_name + ':describe_table', database=database, table=table) }"
+                           data-browse-url="${ url(app_name + ':read_table', database=database, table=table) }"
+                           data-drop-url="${ url(app_name + ':drop_table', database=database, table=table) }" data-row-selector-exclude="true"></div>
+                    </td>
+                    <td>
+                      <a href="${ url(app_name + ':describe_table', database=database, table=table) }" data-row-selector="true">${ table }</a>
+                    </td>
+                  </tr>
                 % endfor
                 </tbody>
             </table>
@@ -78,70 +89,141 @@ ${layout.menubar(section='tables')}
 
 % if not examples_installed:
 <div id="installSamples" class="modal hide fade">
-    <div class="modal-header">
-        <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3>${_('Install samples')}</h3>
-    </div>
-    <div class="modal-body">
-      <div id="installSamplesMessage">
+  <div class="modal-header">
+    <a href="#" class="close" data-dismiss="modal">&times;</a>
+    <h3>${_('Install samples')}</h3>
+  </div>
+  <div class="modal-body">
+    <div id="installSamplesMessage">
 
-      </div>
     </div>
-    <div class="modal-footer">
-        <a href="#" class="btn" data-dismiss="modal">${_('Cancel')}</a>
-        <a href="#" id="installSamplesBtn" class="btn btn-primary">${_('Yes, install samples')}</a>
-    </div>
+  </div>
+  <div class="modal-footer">
+    <a href="#" class="btn" data-dismiss="modal">${_('Cancel')}</a>
+    <a href="#" id="installSamplesBtn" class="btn btn-primary">${_('Yes, install samples')}</a>
+  </div>
 </div>
 % endif
+
+<div id="dropTable" class="modal hide fade">
+  <form id="dropTableForm" action="" method="POST">
+    <div class="modal-header">
+      <a href="#" class="close" data-dismiss="modal">&times;</a>
+      <h3 id="dropTableMessage">${_('Confirm action')}</h3>
+    </div>
+    <div class="modal-footer">
+      <input type="button" class="btn" data-dismiss="modal" value="${_('Cancel')}" />
+      <input type="submit" class="btn btn-danger" value="${_('Yes')}"/>
+    </div>
+  </form>
+</div>
 
 <script src="/static/ext/js/jquery/plugins/jquery.cookie.js"></script>
 
 <script type="text/javascript" charset="utf-8">
-    $(document).ready(function(){
-        $(".datatables").dataTable({
-            "bPaginate": false,
-            "bLengthChange": false,
-            "bInfo": false,
-            "bFilter": false,
-            "aoColumns": [
-                null,
-                { "sWidth": "130px", "bSortable" : false }
-             ],
-            "oLanguage": {
-                "sEmptyTable": "${_('No data available')}",
-                "sZeroRecords": "${_('No matching records')}",
-            }
-        });
-
-        $("a[data-row-selector='true']").jHueRowSelector();
-
-        $("#id_database").change(function(){
-             $.cookie("hueBeeswaxLastDatabase", $(this).val(), {expires: 90});
-             $('#db_form').submit();
-        });
-
-        % if not examples_installed:
-        $.getJSON("${ url(app_name + ':install_examples') }", function(data){
-            $("#installSamplesMessage").text(data.title);
-        });
-
-        $("#installSamplesBtn").click(function(){
-            $.post(
-                "${ url(app_name + ':install_examples') }",
-                { submit: "Submit" },
-                function(result){
-                    if (result.creationSucceeded){
-                        window.location.href = "${ url(app_name + ':show_tables') }";
-                    }
-                    else {
-                        var message = "${_('There was an error processing your request:')} " + result.message;
-                        $("#installSamplesMessage").addClass("alert").addClass("alert-error").text(message);
-                    }
-                }
-            );
-        });
-        % endif
+  $(document).ready(function () {
+    var tables = $(".datatables").dataTable({
+      "sDom":"<'row'r>t<'row'<'span8'i><''p>>",
+      "bPaginate":false,
+      "bLengthChange":false,
+      "bInfo":false,
+      "bFilter":true,
+      "aoColumns":[
+        {"bSortable":false, "sWidth":"1%" },
+        null
+      ],
+      "oLanguage":{
+        "sEmptyTable":"${_('No data available')}",
+        "sZeroRecords":"${_('No matching records')}",
+      }
     });
+
+    $("#filterInput").keyup(function () {
+      tables.fnFilter($(this).val());
+    });
+
+    $("a[data-row-selector='true']").jHueRowSelector();
+
+    $("#id_database").change(function () {
+      $.cookie("hueBeeswaxLastDatabase", $(this).val(), {expires:90});
+      $('#db_form').submit();
+    });
+
+    % if not examples_installed:
+        $.getJSON("${ url(app_name + ':install_examples') }", function (data) {
+          $("#installSamplesMessage").text(data.title);
+        });
+
+        $("#installSamplesBtn").click(function () {
+          $.post(
+              "${ url(app_name + ':install_examples') }",
+              { submit:"Submit" },
+              function (result) {
+                if (result.creationSucceeded) {
+                  window.location.href = "${ url(app_name + ':show_tables') }";
+                }
+                else {
+                  var message = "${_('There was an error processing your request:')} " + result.message;
+                  $("#installSamplesMessage").addClass("alert").addClass("alert-error").text(message);
+                }
+              }
+          );
+        });
+    % endif
+
+    $(".selectAll").click(function () {
+      if ($(this).attr("checked")) {
+        $(this).removeAttr("checked").removeClass("icon-ok");
+        $("." + $(this).data("selectables")).removeClass("icon-ok").removeAttr("checked");
+      }
+      else {
+        $(this).attr("checked", "checked").addClass("icon-ok");
+        $("." + $(this).data("selectables")).addClass("icon-ok").attr("checked", "checked");
+      }
+      toggleActions();
+    });
+
+    $(".tableCheck").click(function () {
+      if ($(this).attr("checked")) {
+        $(this).removeClass("icon-ok").removeAttr("checked");
+      }
+      else {
+        $(this).addClass("icon-ok").attr("checked", "checked");
+      }
+      $(".selectAll").removeAttr("checked").removeClass("icon-ok");
+      toggleActions();
+    });
+
+    function toggleActions() {
+      $(".toolbarBtn").attr("disabled", "disabled");
+      var selector = $(".hueCheckbox[checked='checked']");
+      if (selector.length == 1) {
+        if (selector.data("view-url")) {
+          $("#viewBtn").removeAttr("disabled").click(function () {
+            location.href = selector.data("view-url");
+          });
+        }
+        if (selector.data("browse-url")) {
+          $("#browseBtn").removeAttr("disabled").click(function () {
+            location.href = selector.data("browse-url")
+          });
+        }
+        if (selector.data("drop-url")) {
+          $("#dropBtn").removeAttr("disabled").data("confirmation-url", selector.data("drop-url"));
+        }
+      }
+    }
+
+    $("#dropBtn").click(function () {
+      if ($(this).data("confirmation-url")) {
+        $.getJSON($(this).data("confirmation-url"), function (data) {
+          $("#dropTableForm").attr("action", data.url);
+          $("#dropTableMessage").text(data.title);
+        });
+        $("#dropTable").modal("show");
+      }
+    });
+  });
 </script>
 
 ${ commonfooter(messages) | n,unicode }
