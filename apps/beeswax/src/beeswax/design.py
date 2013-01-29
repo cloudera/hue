@@ -36,7 +36,7 @@ SERIALIZATION_VERSION = '0.4.1'
 
 
 def hql_query(hql, database='default'):
-  data_dict = simplejson.loads('{"query": {"email_notify": null, "query": null, "type": 0, "is_parameterized": true, "database": "default"}, '
+  data_dict = simplejson.loads('{"query": {"email_notify": false, "query": null, "type": 0, "is_parameterized": true, "database": "default"}, '
                                '"functions": [], "VERSION": "0.4.1", "file_resources": [], "settings": []}')
   if not (isinstance(hql, str) or isinstance(hql, unicode)):
     raise Exception('Requires a SQL text query of type <str>, <unicode> and not %s' % type(hql))

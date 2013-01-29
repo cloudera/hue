@@ -156,6 +156,7 @@ for x in sys.stdin:
       resources=[("FILE", "/square.py")], local=False)
     response = wait_for_query_to_finish(self.client, response, max=180.0)
     assert_equal([['0'], ['1'], ['4'], ['9']], response.context["results"][0:4])
+    assert_true('converting to local %s/square.py' % self.cluster._fs_default_name in response.context["log"], response.context["log"])
 
   def test_query_with_setting(self):
     response = _make_query(self.client, "CREATE TABLE test2 AS SELECT foo+1 FROM test WHERE foo=4",

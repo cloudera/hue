@@ -198,6 +198,13 @@ class BeeswaxClient:
   def get_default_configuration(self, *args, **kwargs):
     return self.db_client.get_default_configuration(*args, **kwargs)
 
+  @classmethod
+  def get_security(cls):
+    cluster_conf = hadoop.cluster.get_cluster_conf_for_job_submission()
+    use_sasl = cluster_conf is not None and cluster_conf.SECURITY_ENABLED.get()
+    kerberos_principal_short_name = KERBEROS.HUE_PRINCIPAL.get().split('/', 1)[0]
+
+    return use_sasl, kerberos_principal_short_name
 
   def db_client(self, query_server):
     """Get the Thrift client to talk to beeswax server"""
@@ -272,9 +279,7 @@ class BeeswaxClient:
         res = self._client.get_results_metadata(*args, **kwargs)
         return _decode_struct_attr(res, 'table_dir')
 
-    cluster_conf = hadoop.cluster.get_cluster_conf_for_job_submission()
-    use_sasl = cluster_conf is not None and cluster_conf.SECURITY_ENABLED.get()
-    kerberos_principal_short_name = KERBEROS.HUE_PRINCIPAL.get().split('/', 1)[0]
+    use_sasl, kerberos_principal_short_name = BeeswaxClient.get_security()
 
     client = thrift_util.get_client(BeeswaxService.Client,
                                     query_server['server_host'],
@@ -374,10 +379,13 @@ class BeeswaxClient:
         return self._client.alter_partition(db_name, tbl_name, new_part)
 
     _, host, port = hive_site.get_metastore()
+    use_sasl, kerberos_principal_short_name = BeeswaxClient.get_security()
     client = thrift_util.get_client(ThriftHiveMetastore.Client,
                                     host,
                                     port,
                                     service_name="Hive Metastore Server",
+                                    kerberos_principal=kerberos_principal_short_name,
+                                    use_sasl=use_sasl,
                                     timeout_seconds=conf.METASTORE_CONN_TIMEOUT.get())
     return UnicodeMetastoreClient(client)
 
