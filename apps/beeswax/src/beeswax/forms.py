@@ -18,7 +18,6 @@
 from django import forms
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
-import hadoop
 import hive_metastore
 
 from desktop.lib.django_forms import simple_formset_factory, DependencyAwareForm
@@ -171,9 +170,6 @@ class FileResourceForm(forms.Form):
   )
 
   path = forms.CharField(required=True, help_text=_t("Path to file on HDFS."))
-
-  def clean_path(self):
-    return hadoop.conf.HDFS_CLUSTERS['default'].FS_DEFAULTFS.get() + self.cleaned_data['path']
 
 
 FileResourceFormSet = simple_formset_factory(FileResourceForm)
