@@ -20,12 +20,12 @@ from django.utils.translation import ugettext as _
 
 <%namespace name="layout" file="layout.mako" />
 
-${ commonheader(_('Table List'), app_name, user, '100px') | n,unicode }
+${ commonheader(_('Tables'), app_name, user, '100px') | n,unicode }
 ${layout.menubar(section='tables')}
 
 
 <div class="container-fluid">
-    <h1>${_('Table List')}</h1>
+    <h1>${_('Tables')}</h1>
     <div class="row-fluid">
         <div class="span3">
             <div class="well sidebar-nav">

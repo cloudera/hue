@@ -23,10 +23,11 @@
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="layout" file="layout.mako" />
 
-${ commonheader(_('Queries'), app_name, user, '100px') | n,unicode }
+${ commonheader(_('Saved Queries'), app_name, user, '100px') | n,unicode }
+
 ${layout.menubar(section='saved queries')}
 <div class="container-fluid">
-    <h1>${_('Queries')}</h1>
+    <h1>${_('Saved Queries')}</h1>
     <table class="table table-striped table-condensed datatables">
         <thead>
         <tr>

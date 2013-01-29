@@ -23,7 +23,7 @@ from beeswax.views import collapse_whitespace
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="comps" file="beeswax_components.mako" />
 
-${ commonheader(_('Query History'), app_name, user, '100px') | n,unicode }
+${ commonheader(_('History'), app_name, user, '100px') | n,unicode }
 ${layout.menubar(section='history')}
 
 <%def name="show_saved_query(design, history)">
@@ -48,7 +48,7 @@ ${layout.menubar(section='history')}
 </%def>
 
 <div class="container-fluid">
-    <h1>${_('Query History')}</h1>
+    <h1>${_('History')}</h1>
     <div class="row-fluid">
         <div class="span3">
             <div class="well sidebar-nav">

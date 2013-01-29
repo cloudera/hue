@@ -21,11 +21,11 @@ from django.utils.translation import ugettext as _
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="util" file="util.mako" />
 
-${ commonheader(_('Configuration Variables'), app_name, user, '100px') | n,unicode }
+${ commonheader(_('Settings'), app_name, user, '100px') | n,unicode }
 ${layout.menubar(section='configuration')}
 
 <div class="container-fluid">
-	<h1>${_('Configuration Variables')}</h1>
+	<h1>${_('Settings')}</h1>
 	<div class="well">
 		<form class="form-search" method="POST">
 		    <span class="pull-left">
