@@ -30,9 +30,16 @@ limitations under the License.
 {% endif %}
 
     <script type="text/javascript">
-        $(document).ready(function(){
-            $(".dataTables_wrapper").jHueTableScroller();
+      $(document).ready(function () {
+        $(".dataTables_wrapper").jHueTableScroller();
+        $(document).on("click", ".btn-primary, .btn-danger", function () {
+          if (!$(this).hasClass('disabled')) {
+            var text = ($(this).text()) ? $(this).text() : $(this).val();
+            $(this).attr("data-loading-text", text + " ...");
+            $(this).button("loading");
+          }
         });
+      });
     </script>
 
 	</body>
