@@ -174,31 +174,39 @@ class Dbms:
       curr = time.time()
     return None
 
+  def execute_next_statement(self, query_history):
+    query_history.statement_number += 1
+    query_history.last_state = QueryHistory.STATE.submitted.index
+    query_history.save()
+    query = query_history.design.get_design()
+    return self.execute_and_watch(query, query_history=query_history)
 
-  def execute_and_watch(self, query, design=None):
+  def execute_and_watch(self, query, design=None, query_history=None):
     """
     Run query and return a QueryHistory object in order to see its progress on a Web page.
     """
-    query_statement = query.query['query']
-    query_history = QueryHistory.build(
-                                owner=self.client.user,
-                                query=query_statement,
-                                server_host='%(server_host)s' % self.client.query_server,
-                                server_port='%(server_port)d' % self.client.query_server,
-                                server_name='%(server_name)s' % self.client.query_server,
-                                server_type=self.server_type,
-                                last_state=QueryHistory.STATE.submitted.index,
-                                design=design,
-                                notify=query.query.get('email_notify', False))
-    query_history.save()
+    hql_query = query.hql_query
+    if query_history is None:
+      query_history = QueryHistory.build(
+                                  owner=self.client.user,
+                                  query=hql_query,
+                                  server_host='%(server_host)s' % self.client.query_server,
+                                  server_port='%(server_port)d' % self.client.query_server,
+                                  server_name='%(server_name)s' % self.client.query_server,
+                                  server_type=self.server_type,
+                                  last_state=QueryHistory.STATE.submitted.index,
+                                  design=design,
+                                  notify=query.query.get('email_notify', False),
+                                  statement_number=0)
+      query_history.save()
 
-    LOG.debug("Made new QueryHistory id %s user %s query: %s..." % (query_history.id, self.client.user, query_history.query[:25]))
+      LOG.debug("Made new QueryHistory id %s user %s query: %s..." % (query_history.id, self.client.user, query_history.query[:25]))
 
     try:
-      handle = self.client.query(query)
+      handle = self.client.query(query, query_history.statement_number)
       if not handle.is_valid():
         msg = _("Server returning invalid handle for query id %(id)d [%(query)s]...") % \
-              {'id': query_history.id, 'query': query_statement[:40]}
+              {'id': query_history.id, 'query': query[:40]}
         raise BeeswaxException(msg)
     except BeeswaxException, ex: # TODO HS2
       LOG.exception(ex)
@@ -218,6 +226,8 @@ class Dbms:
 
     query_history.set_to_running()
     query_history.save()
+
+    LOG.debug("Updated QueryHistory id %s user %s statement_number: %s" % (query_history.id, self.client.user, query_history.statement_number))
 
     return query_history
 

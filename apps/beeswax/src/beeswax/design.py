@@ -152,6 +152,19 @@ class HQLdesign(object):
   def get_query(self):
     return self._data_dict["query"]
 
+  @property
+  def statement_count(self):
+    return len(self.statements)
+
+  def get_query_statement(self, n=0):
+    return self.statements[n]
+
+  @property
+  def statements(self):
+    hql_query = _strip_trailing_semicolon(self.hql_query)
+    return [statement.strip() for statement in hql_query.split(';')]
+
+
 def normalize_form_dict(form, attr_list):
   """
   normalize_form_dict(form, attr_list) -> A dictionary of (attr, value)

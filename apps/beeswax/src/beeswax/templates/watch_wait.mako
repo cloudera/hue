@@ -64,7 +64,7 @@ ${layout.menubar(section='query')}
 					<pre>${ log }</pre>
 				</div>
 				<div class="tab-pane" id="query">
-					<pre>${ query.query }</pre>
+					<pre>${ query.get_current_statement() }</pre>
 				</div>
 			</div>
 		</div>

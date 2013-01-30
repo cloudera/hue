@@ -315,8 +315,9 @@ class HiveServerClient:
     return HiveServerDataTable(results, schema)
 
 
-  def execute_async_query(self, query):
-    return self.execute_async_statement(statement=query.query['query'], conf_overlay={})
+  def execute_async_query(self, query, statement=0):
+    query_statement = query.get_query_statement(statement)
+    return self.execute_async_statement(statement=query_statement, conf_overlay={})
 
 
   def execute_statement(self, statement, conf_overlay=None, max_rows=100):
@@ -395,8 +396,8 @@ class HiveServerClientCompatible:
     self.query_server = client.query_server
 
 
-  def query(self, query):
-    return self._client.execute_async_query(query)
+  def query(self, query, statement=0):
+    return self._client.execute_async_query(query, statement)
 
 
   def get_state(self, handle):

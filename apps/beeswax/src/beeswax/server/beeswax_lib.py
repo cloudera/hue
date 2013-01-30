@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import logging
+import re
 import thrift
 
 from django.utils.encoding import smart_str, force_unicode
@@ -100,6 +101,7 @@ class BeeswaxDataTable(DataTable):
 
 
 class BeeswaxClient:
+  NO_RESULT_SET_RE = re.compile('DROP|CREATE|ALTER|LOAD', re.IGNORECASE)
 
   def __init__(self, query_server, user):
     self.user = user
@@ -107,7 +109,7 @@ class BeeswaxClient:
     self.db_client = self.db_client(query_server)
     self.meta_client = self.meta_client()
 
-  def make_query(self, hql_query):
+  def make_query(self, hql_query, statement=0):
     # HUE-535 without having to modify Beeswaxd, add 'use database' as first option
     if self.query_server['server_name'] == 'impala':
       configuration = [','.join(['%(key)s=%(value)s' % setting for setting in hql_query.settings])]
@@ -115,7 +117,8 @@ class BeeswaxClient:
       configuration = ['use ' + hql_query.query.get('database', 'default')]
       configuration.extend(hql_query.get_configuration())
 
-    thrift_query = BeeswaxService.Query(query=hql_query.query['query'], configuration=configuration)
+    query_statement = hql_query.get_query_statement(statement)
+    thrift_query = BeeswaxService.Query(query=query_statement, configuration=configuration)
     thrift_query.hadoop_user = self.user.username
     return thrift_query
 
@@ -136,10 +139,12 @@ class BeeswaxClient:
     return BeeswaxTable(table)
 
 
-  def query(self, query):
-    thrift_query = self.make_query(query)
+  def query(self, query, statement=0):
+    thrift_query = self.make_query(query, statement)
     handle = self.db_client.query(thrift_query)
-    return BeeswaxQueryHandle(secret=handle.id, has_result_set=True, log_context=handle.log_context)
+    # Fake has_result_set
+    has_result_set = not BeeswaxClient.NO_RESULT_SET_RE.match(thrift_query.query) is not None
+    return BeeswaxQueryHandle(secret=handle.id, has_result_set=has_result_set, log_context=handle.log_context)
 
 
   def fetch(self, handle, start_over=True, rows=-1):

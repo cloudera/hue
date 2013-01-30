@@ -131,7 +131,7 @@ ${layout.menubar(section='tables')}
                       ${comps.field(table_form["field_terminator"], render_default=True)}
                       <span  class="help-inline error-inline hide">${_('This field is required. Spaces are not allowed. Terminator must be exactly one character.')}</span>
                       <span class="help-block">
-                          ${_('Enter the column delimiter.  Must be a single character.  Use syntax like "\001" or "\t" for special characters.')}
+                          ${_('Enter the column delimiter. Must be a single character. Use syntax like "\\001" or "\\t" for special characters.')}
                       </span>
                   </div>
               </div>

@@ -30,9 +30,11 @@ from enum import Enum
 from desktop.lib.exceptions_renderable import PopupException
 
 from beeswax.conf import SERVER_INTERFACE
+from beeswax.design import HQLdesign
 from beeswaxd.ttypes import QueryHandle as BeeswaxdQueryHandle, QueryState
 from cli_service.ttypes import TSessionHandle, THandleIdentifier,\
   TOperationState, TOperationHandle, TOperationType
+
 
 
 LOG = logging.getLogger(__name__)
@@ -57,8 +59,10 @@ class QueryHistory(models.Model):
   last_state = models.IntegerField(db_index=True)
   has_results = models.BooleanField(default=False)          # If true, this query will eventually return tabular results.
   submission_date = models.DateTimeField(auto_now_add=True)
+  # In case of multi statements in a query, these are the id of the currently running statement
   server_id = models.CharField(max_length=1024, null=True)  # Aka secret, only query in the "submitted" state is allowed to have no server_id
   server_guid = models.CharField(max_length=1024, null=True, default=None)
+  statement_number = models.SmallIntegerField(default=0)    # The index of the currently running statement
   operation_type = models.SmallIntegerField(null=True)
   modified_row_count = models.FloatField(null=True)
   log_context = models.CharField(max_length=1024, null=True)
@@ -101,6 +105,20 @@ class QueryHistory(models.Model):
                     [self.server_name, self.server_host, self.server_port, self.server_type]))
 
 
+  def get_current_statement(self):
+    if self.design is not None:
+      design = self.design.get_design()
+      return design.get_query_statement(self.statement_number)
+    else:
+      return self.query
+
+  def is_finished(self):
+    if self.design is not None:
+      design = self.design.get_design()
+      return self.is_success() and self.statement_number + 1 == design.statement_count
+    else:
+      return self.is_success()
+
   def is_running(self):
     return self.last_state in (QueryHistory.STATE.running.index, QueryHistory.STATE.submitted.index)
 
@@ -118,6 +136,20 @@ class QueryHistory(models.Model):
 
   def set_to_available(self):
     self.last_state = QueryHistory.STATE.available.index
+
+
+def make_query_context(type, info):
+  """
+  ``type`` is one of "table" and "design", and ``info`` is the table name or design id.
+  Returns a value suitable for GET param.
+  """
+  if type == 'table':
+    return "%s:%s" % (type, info)
+  elif type == 'design':
+    # Use int() to validate that info is a number
+    return "%s:%s" % (type, int(info))
+  LOG.error("Invalid query context type: %s" % (type,))
+  return ''                                     # Empty string is safer than None
 
 
 class HiveServerQueryHistory(QueryHistory):
@@ -235,6 +267,9 @@ class SavedQuery(models.Model):
   class Meta:
     ordering = ['-mtime']
 
+  def get_design(self):
+    return HQLdesign.loads(self.data)
+
   def clone(self):
     """clone() -> A new SavedQuery with a deep copy of the same data"""
     design = SavedQuery(type=self.type, owner=self.owner)
@@ -274,6 +309,12 @@ class SavedQuery(models.Model):
 
   def __str__(self):
     return '%s %s' % (self.name, self.owner)
+
+  def get_query_context(self):
+    try:
+      return make_query_context('design', self.id)
+    except:
+      return ""
 
 
 class SessionManager(models.Manager):

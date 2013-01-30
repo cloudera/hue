@@ -24,7 +24,7 @@ from beeswax.views import collapse_whitespace
 <%namespace name="comps" file="beeswax_components.mako" />
 
 ${ commonheader(_('History'), app_name, user, '100px') | n,unicode }
-${layout.menubar(section='history')}
+${ layout.menubar(section='history') }
 
 <%def name="show_saved_query(design, history)">
   % if design:
@@ -105,12 +105,7 @@ ${layout.menubar(section='history')}
             %>
             % for query in page.object_list:
               <%
-                qcontext = ""
-                try:
-                  design = query.design
-                  qcontext = views.make_query_context('design', design.id)
-                except:
-                  pass
+                qcontext = query.design.get_query_context()
               %>
               <tr class="histRow">
                 <td data-sort-value="${time.mktime(query.submission_date.timetuple())}">${query.submission_date.strftime("%x %X")}</td>

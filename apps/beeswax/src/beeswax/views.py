@@ -47,7 +47,7 @@ import beeswax.management.commands.beeswax_install_examples
 from beeswax import common, data_export, models, conf
 from beeswax.forms import LoadDataForm, QueryForm, DbForm
 from beeswax.design import HQLdesign, hql_query
-from beeswax.models import SavedQuery
+from beeswax.models import SavedQuery, make_query_context
 from beeswax.server import dbms
 from beeswax.server.dbms import expand_exception, get_query_server_config
 
@@ -122,7 +122,7 @@ def save_design(request, form, type, design, explicit_save):
 
   design.save()
 
-  LOG.info('Saved %sdesign "%s" (id %s) for %s' %
+  LOG.info('Saved %s design "%s" (id %s) for %s' %
            (explicit_save and '' or 'auto ', design.name, design.id, design.owner))
   if explicit_save:
     messages.info(request, _('Saved design "%(name)s"') % {'name': design.name})
@@ -530,6 +530,7 @@ def watch_query(request, id):
   """
   # Coerce types; manage arguments
   query_history = authorized_get_history(request, id, must_exist=True)
+  db = dbms.get(request.user, query_history.get_query_server_config())
 
   # GET param: context.
   context_param = request.GET.get('context', '')
@@ -542,19 +543,26 @@ def watch_query(request, id):
   if not on_success_url:
     on_success_url = results_url
 
+  # Go to next statement if asked to continue or when a statement with no dataset finished.
+  if request.method == 'POST' or (not query_history.is_finished() and query_history.is_success() and not query_history.has_results):
+    try:
+      query_history = db.execute_next_statement(query_history)
+    except BeeswaxException, ex:
+      pass
+
   # Check query state
   handle, state = _get_query_handle_and_state(query_history)
   query_history.save_state(state)
 
-  if query_history.is_success():
-    return format_preserving_redirect(request, on_success_url, request.GET)
-  elif query_history.is_failure():
+  if query_history.is_failure():
     # When we fetch, Beeswax server will throw us a BeeswaxException, which has the
     # log we want to display.
     return format_preserving_redirect(request, results_url, request.GET)
+  elif query_history.is_finished() or (query_history.is_success() and query_history.has_results):
+    return format_preserving_redirect(request, on_success_url, request.GET)
 
   # Still running
-  log = dbms.get(request.user, query_history.get_query_server_config()).get_log(handle)
+  log = db.get_log(handle)
 
   # Keep waiting
   # - Translate context into something more meaningful (type, data)
@@ -570,10 +578,18 @@ def watch_query(request, id):
 
 def watch_query_refresh_json(request, id):
   query_history = authorized_get_history(request, id, must_exist=True)
+  db = dbms.get(request.user, query_history.get_query_server_config())
   handle, state = _get_query_handle_and_state(query_history)
   query_history.save_state(state)
 
-  log = dbms.get(request.user, query_history.get_query_server_config()).get_log(handle)
+  try:
+    if not query_history.is_finished() and query_history.is_success() and not query_history.has_results:
+      db.execute_next_statement(query_history)
+      handle, state = _get_query_handle_and_state(query_history)
+
+    log = db.get_log(handle)
+  except BeeswaxException, ex:
+    handle, state = _get_query_handle_and_state(query_history)
 
   jobs = _parse_out_hadoop_jobs(log)
   job_urls = dict([(job, reverse('jobbrowser.views.single_job', kwargs=dict(job=job))) for job in jobs])
@@ -582,11 +598,12 @@ def watch_query_refresh_json(request, id):
     'log': log,
     'jobs': jobs,
     'jobUrls': job_urls,
-    'isSuccess': query_history.is_success(),
+    'isSuccess': query_history.is_finished() or (query_history.is_success() and query_history.has_results),
     'isFailure': query_history.is_failure()
   }
 
   return HttpResponse(json.dumps(result), mimetype="application/json")
+
 
 def view_results(request, id, first_row=0):
   """
@@ -1124,11 +1141,11 @@ def execute_directly(request, query, query_server=None, design=None, tablename=N
     authorized_get_design(request, design.id)
 
   db = dbms.get(request.user, query_server)
-
   database = query.query.get('database', 'default')
   db.use(database)
 
   history_obj = db.execute_query(query, design)
+
   watch_url = reverse(get_app_name(request) + ':watch_query', kwargs={'id': history_obj.id})
   if 'download' in kwargs and kwargs['download']:
     watch_url += '?download=true'
@@ -1217,20 +1234,6 @@ def _list_designs(querydict, page_size, prefix="", user=None):
   filter_params = copy_query_dict(querydict, keys_to_copy)
 
   return page, filter_params
-
-
-def make_query_context(type, info):
-  """
-  ``type`` is one of "table" and "design", and ``info`` is the table name or design id.
-  Returns a value suitable for GET param.
-  """
-  if type == 'table':
-    return "%s:%s" % (type, info)
-  elif type == 'design':
-    # Use int() to validate that info is a number
-    return "%s:%s" % (type, int(info))
-  LOG.error("Invalid query context type: %s" % (type,))
-  return ''                                     # Empty string is safer than None
 
 
 def _get_query_handle_and_state(query_history):

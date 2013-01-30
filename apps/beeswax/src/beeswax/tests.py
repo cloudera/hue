@@ -27,13 +27,16 @@ import threading
 
 from nose.tools import assert_true, assert_equal, assert_false
 from nose.plugins.skip import SkipTest
+
 from django.utils.encoding import smart_str
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
 
-from beeswaxd import ttypes
 from desktop.lib.django_test_util import make_logged_in_client, assert_equal_mod_whitespace
 from desktop.lib.django_test_util import assert_similar_pages
 from desktop.lib.test_utils import grant_access
+
+from beeswaxd import ttypes
 
 import beeswax.create_table
 import beeswax.forms
@@ -465,6 +468,52 @@ for x in sys.stdin:
       LOG.info("Finished: " + str(i))
     except:
       LOG.exception("Saw exception in child thread.")
+
+  def test_multiple_statements_no_result_set(self):
+    hql = """
+      CREATE TABLE test_multiple_statements_1 (a int);
+      CREATE TABLE test_multiple_statements_2 (a int);
+      DROP TABLE test_multiple_statements_1;
+      DROP TABLE test_multiple_statements_2;
+    """
+
+    resp = _make_query(self.client, hql)
+    resp = wait_for_query_to_finish(self.client, resp, max=30.0)
+
+    assert_true('DROP TABLE test_multiple_statements_2' in resp.content, resp.content)
+
+  def test_multiple_statements_with_result_set(self):
+    hql = """
+      SELECT foo FROM test;
+      SELECT count(*) FROM test;
+    """
+
+    resp = _make_query(self.client, hql)
+    query = hql_query(hql)
+
+    handle = self.db.execute_and_wait(query)
+    resp = wait_for_query_to_finish(self.client, resp, max=30.0)
+
+    assert_true('multiStatementsQuery' in resp.content, resp.content)
+
+    resp = self.client.post(reverse('beeswax:watch_query', args=[resp.context['query'].id]))
+    assert_true('Waiting for query' in resp.content, resp.content)
+    assert_true('SELECT count(*) FROM test' in resp.content, resp.content)
+
+  def test_multiple_statements_various_queries(self):
+    hql = """
+      CREATE TABLE test_multiple_statements_2 (a int);
+      DROP TABLE test_multiple_statements_1;
+      SELECT foo FROM test;
+    """
+
+    resp = _make_query(self.client, hql)
+    query = hql_query(hql)
+
+    handle = self.db.execute_and_wait(query)
+    resp = wait_for_query_to_finish(self.client, resp, max=30.0)
+
+    assert_true('SELECT foo FROM test' in resp.content, resp.content)
 
   def test_parallel_queries(self):
     """

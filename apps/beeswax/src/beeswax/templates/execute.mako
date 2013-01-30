@@ -33,7 +33,7 @@
         </div>
     % endif
 
-    <textarea class="span9" rows="18" placeholder="${_('Example: SELECT * FROM tablename')}" name="${form.query["query"].html_name}" id="queryField">${extract_field_data(form.query["query"]) or ''}</textarea>
+    <textarea class="span9" rows="35" placeholder="${_('Example: SELECT * FROM tablename')}" name="${form.query["query"].html_name}" id="queryField">${extract_field_data(form.query["query"]) or ''}</textarea>
 
     <div id="validationResults">
     % if len(form.query["query"].errors):
@@ -216,9 +216,9 @@ ${layout.menubar(section='query')}
                             % endif
                           ">${_('Email Notification')}</li>
                           <li
-	                        % if app_name == 'impala':
-	                            class="hide"
-	                        % endif
+                            % if app_name == 'impala':
+                                class="hide"
+                            % endif
                           >
                             <label class="checkbox" rel="tooltip" data-original-title="${_("If checked, you will receive an email notification when the query completes.")}">
                                 <input type="checkbox" id="id_${form.query["email_notify"].html_name | n}" name="${form.query["email_notify"].html_name | n}" ${extract_field_data(form.query["email_notify"]) and "CHECKED" or ""}/>
@@ -229,6 +229,12 @@ ${layout.menubar(section='query')}
                     </ul>
                     <input type="hidden" name="${form.query["query"].html_name | n}" class="query" value="" />
                 </form>
+            </div>
+            <div id="multiStatementsQuery" class="alert">
+              <button type="button" class="close" data-dismiss="alert">&times;</button>
+              <strong>${_('Did you know?')}</strong>
+              ${ _("You can execute queries with multiple SQL statements delimited by a semicolon ';'.") }
+              ${ _("Use '\\059' instead of ';' if you have some conflicts.") }
             </div>
         </div>
         <div class="span9">
@@ -461,9 +467,16 @@ ${layout.menubar(section='query')}
             }
         % endif
 
-        $("#executeQuery").click(function(){
+        var executeQuery = function(){
             $("<input>").attr("type","hidden").attr("name","button-submit").attr("value","Execute").appendTo($("#advancedSettingsForm"));
             checkAndSubmit();
+        }
+
+        $("#executeQuery").click(executeQuery);
+        $("#executeQuery").keyup(function(event){
+            if(event.keyCode == 13){
+                executeQuery();
+            }
         });
 
         % if app_name == 'impala':

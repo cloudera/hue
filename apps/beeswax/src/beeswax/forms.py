@@ -25,7 +25,6 @@ from desktop.lib.django_forms import ChoiceOrOtherField, MultiForm, SubmitButton
 from filebrowser.forms import PathField
 
 from beeswax import common
-from beeswax.design import _strip_trailing_semicolon
 from beeswax.server.dbms import NoSuchObjectException
 from beeswax.models import SavedQuery
 
@@ -145,9 +144,6 @@ class HQLForm(forms.Form):
                            choices=(('default', 'default'),),
                            initial=0,
                            widget=forms.widgets.Select(attrs={'class': 'span6'}))
-
-  def clean_query(self):
-    return _strip_trailing_semicolon(self.cleaned_data['query'])
 
 
 class FunctionForm(forms.Form):
