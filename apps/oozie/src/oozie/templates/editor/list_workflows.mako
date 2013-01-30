@@ -19,7 +19,7 @@
   from django.utils.translation import ugettext as _
   import time as py_time
 %>
-
+<%namespace name="actionbar" file="../actionbar.mako" />
 <%namespace name="layout" file="../navigation-bar.mako" />
 <%namespace name="utils" file="../utils.inc.mako" />
 
@@ -30,37 +30,28 @@ ${ layout.menubar(section='workflows') }
 <div class="container-fluid">
   <h1>${ _('Workflow Manager') }</h1>
 
-  <div class="well hueWell">
-    <div class="btn-group pull-right">
-      <a href="${ url('oozie:create_workflow') }" class="btn"><i class="icon-plus-sign"></i> ${ _('Create') }</a>
-      <a href="${ url('oozie:import_workflow') }" class="btn"><i class="icon-plus-sign"></i> ${ _('Import') }</a>
-      % if currentuser.is_superuser:
-        <a href="#installSamples" data-toggle="modal" class="btn"><i class="icon-download-alt"></i> ${ _('Setup Examples') }</a>
-      % endif
-    </div>
+  <%actionbar:render>
+    <%def name="actions()">
+        <button class="btn toolbarBtn" id="submit-btn" disabled="disabled"><i class="icon-play"></i> ${ _('Submit') }</button>
+        <button class="btn toolbarBtn" id="schedule-btn" disabled="disabled"><i class="icon-calendar"></i> ${ _('Schedule') }</button>
+        <button class="btn toolbarBtn" id="clone-btn" disabled="disabled"><i class="icon-retweet"></i> ${ _('Clone') }</button>
+        <button class="btn toolbarBtn" id="delete-btn" disabled="disabled"><i class="icon-remove"></i> ${ _('Delete') }</button>
+    </%def>
 
-    <div class="row-fluid">
-      <div class="span4">
-        <form>
-          ${ _('Filter:') } <input type="text" id="filterInput" class="input-xlarge search-query" placeholder="${ _('Search for username, name, etc...') }">
-        </form>
-      </div>
-      <div class="span4">
-        <button class="btn action-buttons" id="submit-btn" disabled="disabled"><i class="icon-play"></i> ${ _('Submit') }</button>
-        <button class="btn action-buttons" id="schedule-btn" disabled="disabled"><i class="icon-calendar"></i> ${ _('Schedule') }</button>
-        &nbsp;&nbsp;&nbsp;&nbsp;
-        <button class="btn action-buttons" id="clone-btn" disabled="disabled"><i class="icon-retweet"></i> ${ _('Clone') }</button>
-        <button class="btn action-buttons" id="delete-btn" disabled="disabled"><i class="icon-remove"></i> ${ _('Delete') }</button>
-      </div>
-    </div>
-  </div>
+    <%def name="creation()">
+        <a href="${ url('oozie:create_workflow') }" class="btn"><i class="icon-plus-sign"></i> ${ _('Create') }</a>
+        <a href="${ url('oozie:import_workflow') }" class="btn"><i class="icon-plus-sign"></i> ${ _('Import') }</a>
+        % if currentuser.is_superuser:
+          <a href="#installSamples" data-toggle="modal" class="btn"><i class="icon-download-alt"></i> ${ _('Setup Examples') }</a>
+        % endif
+    </%def>
+  </%actionbar:render>
 
-  <br/>
 
   <table id="workflowTable" class="table datatables">
     <thead>
       <tr>
-        <th></th>
+        <th width="1%"><div class="hueCheckbox selectAll" data-selectables="workflowCheck"></div></th>
         <th>${ _('Name') }</th>
         <th>${ _('Description') }</th>
         <th>${ _('Last Modification') }</th>
@@ -71,9 +62,9 @@ ${ layout.menubar(section='workflows') }
     </thead>
     <tbody>
       % for workflow in jobs:
-        <tr class="action-row">
-          <td class=".btn-large action-column" data-row-selector-exclude="true" style="background-color: white;">
-            <input type="radio" name="action" data-row-selector-exclude="true"
+        <tr>
+          <td data-row-selector-exclude="true">
+             <div class="hueCheckbox workflowCheck" data-row-selector-exclude="true"
               % if workflow.is_accessible(currentuser):
                   data-submit-url="${ url('oozie:submit_workflow', workflow=workflow.id) }"
                   data-schedule-url="${ url('oozie:schedule_workflow', workflow=workflow.id) }"
@@ -82,7 +73,7 @@ ${ layout.menubar(section='workflows') }
               % if workflow.is_editable(currentuser):
                   data-delete-url="${ url('oozie:delete_workflow', workflow=workflow.id) }"
               % endif
-            />
+            ></div>
             % if workflow.is_accessible(currentuser):
               <a href="${ url('oozie:edit_workflow', workflow=workflow.id) }" data-row-selector="true"></a>
             % endif
@@ -137,123 +128,127 @@ ${ layout.menubar(section='workflows') }
   </form>
 </div>
 
-<style>
-  td .btn-large{ cursor: crosshair;  }
-
-  .action-column {
-    cursor: auto;
-  }
-</style>
-
 <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript" charset="utf-8">
-  $(document).ready(function() {
-    $(".action-row").click(function(e){
-      var select_btn = $(this).find('input');
-      select_btn.prop("checked", true);
+  $(document).ready(function () {
 
-      $(".action-row").css("background-color", "");
-      $(this).css("background-color", "#ECF4F8");
-
-      $(".action-buttons").attr("disabled", "disabled");
-
-      update_action_buttons_status();
+    $(".selectAll").click(function () {
+      if ($(this).attr("checked")) {
+        $(this).removeAttr("checked").removeClass("icon-ok");
+        $("." + $(this).data("selectables")).removeClass("icon-ok").removeAttr("checked");
+      }
+      else {
+        $(this).attr("checked", "checked").addClass("icon-ok");
+        $("." + $(this).data("selectables")).addClass("icon-ok").attr("checked", "checked");
+      }
+      toggleActions();
     });
 
-    function update_action_buttons_status() {
-      var select_btn = $('input[name=action]:checked');
+    $(".workflowCheck").click(function () {
+      if ($(this).attr("checked")) {
+        $(this).removeClass("icon-ok").removeAttr("checked");
+      }
+      else {
+        $(this).addClass("icon-ok").attr("checked", "checked");
+      }
+      $(".selectAll").removeAttr("checked").removeClass("icon-ok");
+      toggleActions();
+    });
 
-      var action_buttons = [
-        ['#submit-btn', 'data-submit-url'],
-        ['#schedule-btn', 'data-schedule-url'],
-        ['#delete-btn', 'data-delete-url'],
-        ['#clone-btn', 'data-clone-url']]
-
-      $.each(action_buttons, function(index) {
-        if (select_btn.attr(this[1])) {
-          $(this[0]).removeAttr('disabled');
-        } else {
-          $(this[0]).attr("disabled", "disabled");
-        }
-      });
+    function toggleActions() {
+      $(".toolbarBtn").attr("disabled", "disabled");
+      var selector = $(".hueCheckbox[checked='checked']");
+      if (selector.length == 1) {
+        var action_buttons = [
+          ['#submit-btn', 'data-submit-url'],
+          ['#schedule-btn', 'data-schedule-url'],
+          ['#delete-btn', 'data-delete-url'],
+          ['#clone-btn', 'data-clone-url']
+        ];
+        $.each(action_buttons, function (index) {
+          if (selector.attr(this[1])) {
+            $(this[0]).removeAttr("disabled");
+          } else {
+            $(this[0]).attr("disabled", "disabled");
+          }
+        });
+      }
     }
 
-    update_action_buttons_status();
-
-    $("#delete-btn").click(function(e){
-      var _this = $('input[name=action]:checked');
+    $("#delete-btn").click(function (e) {
+      var _this = $(".hueCheckbox[checked='checked']");
       var _action = _this.attr("data-delete-url");
       $("#deleteWfForm").attr("action", _action);
       $("#deleteWfMessage").text(_this.attr("alt"));
       $("#deleteWf").modal("show");
     });
 
-    $('#submit-btn').click(function() {
-      var _this = $('input[name=action]:checked');
+    $("#submit-btn").click(function () {
+      var _this = $(".hueCheckbox[checked='checked']");
       var _action = _this.attr("data-submit-url");
-
-      $.get(_action,  function(response) {
-          $('#submit-wf-modal').html(response);
-          $('#submit-wf-modal').modal('show');
+      $.get(_action, function (response) {
+          $("#submit-wf-modal").html(response);
+          $("#submit-wf-modal").modal("show");
         }
       );
-     });
+    });
 
-    $("#clone-btn").click(function(e){
-      var _this = $('input[name=action]:checked');
+    $("#clone-btn").click(function (e) {
+      var _this = $(".hueCheckbox[checked='checked']");
       var _url = _this.attr("data-clone-url");
-
-      $.post(_url, function(data) {
+      $.post(_url, function (data) {
         window.location = data.url;
       });
     });
 
-    $("#schedule-btn").click(function(e){
-      var _this = $('input[name=action]:checked');
+    $("#schedule-btn").click(function (e) {
+      var _this = $(".hueCheckbox[checked='checked']");
       var _url = _this.attr("data-schedule-url");
-
       window.location.replace(_url);
     });
 
-    var oTable = $('#workflowTable').dataTable( {
-      "sPaginationType": "bootstrap",
-      'iDisplayLength': 50,
-      "bLengthChange": false,
-      "sDom": "<'row'r>t<'row'<'span8'i><''p>>",
-      "aoColumns": [
-        { "bSortable": false },
+    var oTable = $("#workflowTable").dataTable({
+      "sPaginationType":"bootstrap",
+      'iDisplayLength':50,
+      "bLengthChange":false,
+      "sDom":"<'row'r>t<'row'<'span8'i><''p>>",
+      "aoColumns":[
+        { "bSortable":false },
         null,
         null,
-        { "sSortDataType": "dom-sort-value", "sType": "numeric" },
+        { "sSortDataType":"dom-sort-value", "sType":"numeric" },
         null,
         null,
         null
       ],
-      "aaSorting": [[3, 'desc'], [ 1, 'asc' ]],
-      "oLanguage": {
-        "sEmptyTable":     "${_('No data available')}",
-        "sInfo":           "${_('Showing _START_ to _END_ of _TOTAL_ entries')}",
-        "sInfoEmpty":      "${_('Showing 0 to 0 of 0 entries')}",
-        "sInfoFiltered":   "${_('(filtered from _MAX_ total entries)')}",
-        "sZeroRecords":    "${_('No matching records')}",
-        "oPaginate": {
-            "sFirst":    "${_('First')}",
-            "sLast":     "${_('Last')}",
-            "sNext":     "${_('Next')}",
-            "sPrevious": "${_('Previous')}"
-          }
+      "aaSorting":[
+        [3, 'desc'],
+        [ 1, 'asc' ]
+      ],
+      "oLanguage":{
+        "sEmptyTable":"${_('No data available')}",
+        "sInfo":"${_('Showing _START_ to _END_ of _TOTAL_ entries')}",
+        "sInfoEmpty":"${_('Showing 0 to 0 of 0 entries')}",
+        "sInfoFiltered":"${_('(filtered from _MAX_ total entries)')}",
+        "sZeroRecords":"${_('No matching records')}",
+        "oPaginate":{
+          "sFirst":"${_('First')}",
+          "sLast":"${_('Last')}",
+          "sNext":"${_('Next')}",
+          "sPrevious":"${_('Previous')}"
+        }
       }
     });
 
-    $('#filterInput').keydown(function(e) {
+    $("#filterInput").keydown(function (e) {
       if (e.which == 13) {
         e.preventDefault();
         return false;
       }
     });
 
-    $("#filterInput").keyup(function() {
+    $("#filterInput").keyup(function () {
       oTable.fnFilter($(this).val());
     });
 
