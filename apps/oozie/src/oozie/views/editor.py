@@ -28,7 +28,7 @@ from django.forms.models import inlineformset_factory
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.utils.functional import curry
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext as _, activate as activate_translation
 
 from desktop.lib.django_util import render, extract_field_data
 from desktop.lib.exceptions_renderable import PopupException
@@ -529,6 +529,7 @@ def setup_app(request):
     raise PopupException(_('A POST request is required.'))
   try:
     oozie_setup.Command().handle_noargs()
+    activate_translation(request.LANGUAGE_CODE)
     request.info(_('Workspaces and examples installed.'))
   except WebHdfsException, e:
     raise PopupException(_('The app setup could complete.'), detail=e)
