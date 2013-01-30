@@ -84,10 +84,9 @@ class QueryHistory(models.Model):
   def get_full_object(self):
     if self.server_type == HiveServerQueryHistory.node_type:
       return HiveServerQueryHistory.objects.get(id=self.id)
-    elif self.server_type == BeeswaxQueryHistory.node_type:
-      return BeeswaxQueryHistory.objects.get(id=self.id)
+    # Default is Beeswax
     else:
-      raise Exception(_('Unknown QueryHistory type: %s. Was the attribute "server_type" specified?'), (self.server_type,))
+      return BeeswaxQueryHistory.objects.get(id=self.id)
 
   @staticmethod
   def get(id):
