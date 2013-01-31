@@ -18,9 +18,11 @@
 import re
 
 from nose.tools import assert_true, assert_equal, assert_false
+from django.contrib.auth.models import User
 
-from beeswax.server import dbms
 from desktop.lib.django_test_util import make_logged_in_client
+from beeswax.models import SavedQuery
+from beeswax.server import dbms
 
 
 class MockDbms:
@@ -37,7 +39,7 @@ class TestImpala:
       # Mock DB calls as we don't need the real ones
       self.prev_dbms = dbms.get
       dbms.get = lambda a, b: MockDbms()
-  
+
       response = self.client.get("/impala/")
       assert_true(re.search('<li id="impalaIcon"\W+class="active', response.content), response.content)
       assert_true('Query Editor' in response.content)
@@ -46,3 +48,35 @@ class TestImpala:
       assert_true('Query Editor' in response.content)
     finally:
       dbms.get = self.prev_dbms
+
+  def test_saved_queries(self):
+    user = User.objects.get(username='test')
+
+    response = self.client.get("/impala/list_designs")
+    assert_equal(len(response.context['page'].object_list), 0)
+
+    try:
+      beewax_query = create_saved_query('beeswax', user)
+      response = self.client.get("/impala/list_designs")
+      assert_equal(len(response.context['page'].object_list), 0)
+
+      impala_query = create_saved_query('impala', user)
+      response = self.client.get("/impala/list_designs")
+      assert_equal(len(response.context['page'].object_list), 1)
+    finally:
+      if beewax_query is not None:
+        beewax_query.delete()
+      if impala_query is not None:
+        impala_query.delete()
+
+
+# Can be refactored with SavedQuery.create_empty() in Hue 2.3
+def create_saved_query(app_name, owner):
+    query_type = SavedQuery.TYPES_MAPPING[app_name]
+    design = SavedQuery(owner=owner, type=query_type)
+    design.name = SavedQuery.DEFAULT_NEW_DESIGN_NAME
+    design.desc = ''
+    design.data = ''
+    design.is_auto = False
+    design.save()
+    return design

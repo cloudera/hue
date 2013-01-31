@@ -182,12 +182,20 @@ def list_designs(request):
   specified in ``filterargs``).
   """
   DEFAULT_PAGE_SIZE = 10
+  app_name= get_app_name(request)
 
   if conf.SHARE_SAVED_QUERIES.get() or request.user.is_superuser:
     user = None
   else:
     user = request.user
-  page, filter_params = _list_designs(request.GET, DEFAULT_PAGE_SIZE, user=user)
+
+  # Extract the saved query list.
+  prefix = 'q-'
+  querydict_query = _copy_prefix(prefix, request.GET)
+  # Manually limit up the user filter.
+  querydict_query[ prefix + 'user' ] = user
+  querydict_query[ prefix + 'type' ] = app_name
+  page, filter_params = _list_designs(querydict_query, DEFAULT_PAGE_SIZE, prefix)
 
   return render('list_designs.mako', request, {
     'page': page,
@@ -932,7 +940,7 @@ def query_done_cb(request, server_id):
     if design:
       subject += ": %s" % (design.name,)
 
-    link = "%s/#launch=Beeswax:%s" % \
+    link = "%s%s" % \
               (get_desktop_uri_prefix(),
                reverse(get_app_name(request) + ':watch_query', kwargs={'id': query_history.id}))
     body = _("%(subject)s. You may see the results here: %(link)s\n\nQuery:\n%(query)s") % {
@@ -1154,7 +1162,7 @@ def execute_directly(request, query, query_server=None, design=None, tablename=N
   return format_preserving_redirect(request, watch_url, get_dict)
 
 
-def _list_designs(querydict, page_size, prefix="", user=None):
+def _list_designs(querydict, page_size, prefix=""):
   """
   _list_designs(querydict, page_size, prefix, user) -> (page, filter_param)
 
@@ -1174,8 +1182,8 @@ def _list_designs(querydict, page_size, prefix="", user=None):
 
   # Filtering. Only display designs explicitly saved.
   db_queryset = models.SavedQuery.objects.filter(is_auto=False)
-  if user is None:
-    user = querydict.get(prefix + 'user')
+
+  user = querydict.get(prefix + 'user')
   if user is not None:
     db_queryset = db_queryset.filter(owner__username=user)
 
