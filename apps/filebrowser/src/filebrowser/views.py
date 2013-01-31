@@ -144,7 +144,13 @@ def view(request, path):
         msg = _("Cannot access: %(path)s.") % {'path': escape(path)}
         if request.user.is_superuser and not request.user == request.fs.superuser:
             msg += _(' Note: you are a Hue admin but not a HDFS superuser (which is "%(superuser)s").') % {'superuser': request.fs.superuser}
-        raise PopupException(msg , detail=e)
+        if request.is_ajax():
+          exception = {
+            'error': msg
+          }
+          return render_json(exception)
+        else:
+          raise PopupException(msg , detail=e)
 
 
 def home_relative_view(request, path):

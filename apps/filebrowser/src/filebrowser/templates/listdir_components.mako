@@ -829,6 +829,11 @@ from django.utils.translation import ugettext as _
       self.retrieveData = function () {
         self.isLoading(true);
         $.getJSON(self.targetPath() + "?pagesize=" + self.recordsPerPage() + "&pagenum=" + self.targetPageNum() + "&filter=" + self.searchQuery() + "&sortby=" + self.sortBy() + "&descending=" + self.sortDescending() + "&format=json", function (data) {
+          if (data.error){
+            $.jHueNotify.error(data.error);
+            self.isLoading(false);
+            return false;
+          }
           if (data.type != null && data.type == "file") {
             location.href = data.url;
             return false;
