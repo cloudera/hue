@@ -185,6 +185,15 @@ def test_default_group():
   assert_false(Group.objects.filter(name='test_default').exists())
   assert_true(Group.objects.filter(name='new_default').exists())
 
+def test_get_profile():
+  # Ensure profiles are created after get_profile is called.
+  reset_all_users()
+  reset_all_groups()
+  c = make_logged_in_client(username='test', password='test', is_superuser=True)
+  assert_equal(0, UserProfile.objects.count())
+  p = get_profile(User.objects.get(username='test'))
+  assert_equal(1, UserProfile.objects.count())
+
 def test_group_admin():
   reset_all_users()
   reset_all_groups()
@@ -320,6 +329,8 @@ def test_user_admin():
   assert_true(FUNNY_NAME_QUOTED in response.content)
   assert_true(len(response.context["users"]) > 1)
   assert_true("Hue Users" in response.content)
+  # Validate profile is created.
+  assert_true(UserProfile.objects.filter(user__username=FUNNY_NAME).exists())
 
   # Need to give access to the user for the rest of the test
   group = Group.objects.create(name="test-group")
@@ -364,11 +375,20 @@ def test_user_admin():
               "Inactivated user gets redirected to login page")
 
   # Delete that regular user
-  funny_profile = UserProfile.objects.get(user=test_user)
+  funny_profile = get_profile(test_user)
   response = c_su.post('/useradmin/users/delete/%s' % (FUNNY_NAME_QUOTED,))
   assert_equal(302, response.status_code)
   assert_false(User.objects.filter(username=FUNNY_NAME).exists())
   assert_false(UserProfile.objects.filter(id=funny_profile.id).exists())
+
+  # Make sure that user deletion works if the user has never performed a request.
+  User.objects.create(username=FUNNY_NAME, password='test')
+  assert_true(User.objects.filter(username=FUNNY_NAME).exists())
+  assert_false(UserProfile.objects.filter(user__username=FUNNY_NAME).exists())
+  response = c_su.post('/useradmin/users/delete/%s' % (FUNNY_NAME_QUOTED,))
+  assert_equal(302, response.status_code)
+  assert_false(User.objects.filter(username=FUNNY_NAME).exists())
+  assert_false(UserProfile.objects.filter(user__username=FUNNY_NAME).exists())
 
   # You shouldn't be able to create a user without a password
   response = c_su.post('/useradmin/users/new', dict(username="test"))

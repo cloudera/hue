@@ -131,7 +131,11 @@ def get_profile(user):
   if hasattr(user, "_cached_userman_profile"):
     return user._cached_userman_profile
   else:
-    profile = UserProfile.objects.get(user=user)
+    # Lazily create profile.
+    try:
+      profile = UserProfile.objects.get(user=user)
+    except UserProfile.DoesNotExist, e:
+      profile = create_profile_for_user(user)
     user._cached_userman_profile = profile
     return profile
 
@@ -148,15 +152,10 @@ def create_profile_for_user(user):
   p.home_directory = "/user/%s" % p.user.username
   try:
     p.save()
+    return p
   except:
     LOG.debug("Failed to automatically create user profile.", exc_info=True)
-
-def create_user_signal_handler(sender, **kwargs):
-  if kwargs['created']:
-    create_profile_for_user(kwargs['instance'])
-
-# Create a user profile every time a user gets created.
-models.signals.post_save.connect(create_user_signal_handler, sender=auth_models.User)
+    return None
 
 class LdapGroup(models.Model):
   """

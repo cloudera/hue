@@ -75,8 +75,12 @@ def delete_user(request, username):
         if username == request.user.username:
           raise PopupException(_("You cannot remove yourself."), error_code=401)
         user = User.objects.get(username=username)
-        user_profile = UserProfile.objects.get(user=user)
-        user_profile.delete()
+        # Since profiles are lazily created, they may not exist.
+        try:
+          user_profile = UserProfile.objects.get(user=user)
+          user_profile.delete()
+        except UserProfile.DoesNotExist, e:
+          pass
         user.delete()
       finally:
         __users_lock.release()
@@ -144,6 +148,8 @@ def edit_user(request, username=None):
     if form.is_valid(): # All validation rules pass
       if instance is None:
         instance = form.save()
+        # Create profile for new users.
+        get_profile(instance)
       else:
         #
         # Check for 3 more conditions:
