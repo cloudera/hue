@@ -57,7 +57,7 @@ from filebrowser.lib.archives import archive_factory
 from filebrowser.lib.rwx import filetype, rwx
 from filebrowser.lib import xxd
 from filebrowser.forms import RenameForm, UploadFileForm, UploadArchiveForm, MkDirForm, EditorForm, TouchForm,\
-    RenameFormSet, RmTreeFormSet, ChmodFormSet,ChownFormSet
+                              RenameFormSet, RmTreeFormSet, ChmodFormSet, ChownFormSet, CopyFormSet
 from hadoop.fs.hadoopfs import Hdfs
 from hadoop.fs.exceptions import WebHdfsException
 
@@ -1013,6 +1013,19 @@ def move(request):
         for arg in args:
             request.fs.rename(arg['src_path'], arg['dest_path'])
     return generic_op(RenameFormSet, request, bulk_move, ["src_path", "dest_path"], None,
+                      data_extractor=formset_data_extractor(recurring, params),
+                      arg_extractor=formset_arg_extractor,
+                      initial_value_extractor=formset_initial_value_extractor)
+
+
+@require_http_methods(["POST"])
+def copy(request):
+    recurring = ['dest_path']
+    params = ['src_path']
+    def bulk_copy(*args, **kwargs):
+        for arg in args:
+            request.fs.copy(arg['src_path'], arg['dest_path'], recursive=True, owner=request.user)
+    return generic_op(CopyFormSet, request, bulk_copy, ["src_path", "dest_path"], None,
                       data_extractor=formset_data_extractor(recurring, params),
                       arg_extractor=formset_arg_extractor,
                       initial_value_extractor=formset_initial_value_extractor)

@@ -27,6 +27,7 @@ import stat
 import threading
 
 from django.utils.encoding import smart_str
+from django.utils.translation import ugettext as _
 from desktop.lib.rest import http_client, resource
 from hadoop.fs import normpath, SEEK_SET, SEEK_CUR, SEEK_END
 from hadoop.fs.hadoopfs import Hdfs
@@ -275,20 +276,6 @@ class WebHdfs(Hdfs):
     for dirent in ls:
       self.rename(Hdfs.join(old_dir, dirent), Hdfs.join(new_dir, dirent))
 
-  def _listdir_r(self, path, glob=None):
-    """
-    _listdir_r(path, glob=None) -> [ entry names ]
-
-    Get directory entry names without stats, recursively.
-    """
-    paths = [path]
-    while paths:
-      path = paths.pop()
-      if self.isdir(path):
-        hdfs_paths = self.listdir_stats(path, glob)
-        paths[:0] = [x.path for x in hdfs_paths]
-      yield path
-
   def chown(self, path, user=None, group=None, recursive=False):
     """chown(path, user=None, group=None, recursive=False)"""
     path = Hdfs.normpath(path)
@@ -299,7 +286,7 @@ class WebHdfs(Hdfs):
     if group is not None:
       params['group'] = group
     if recursive:
-      for xpath in self._listdir_r(path):
+      for xpath in self.listdir_recursive(path):
         self._root.put(xpath, params)
     else:
       self._root.put(path, params)
@@ -316,7 +303,7 @@ class WebHdfs(Hdfs):
     params['op'] = 'SETPERMISSION'
     params['permission'] = safe_octal(mode)
     if recursive:
-      for xpath in self._listdir_r(path):
+      for xpath in self.listdir_recursive(path):
         self._root.put(xpath, params)
     else:
       self._root.put(path, params)
@@ -439,6 +426,62 @@ class WebHdfs(Hdfs):
       else:
         self.do_as_user(owner, self.copyfile, source_file, destination_file)
         self.do_as_superuser(self.chown, destination_file, owner, owner)
+
+
+  def copy(self, src, dest, recursive=False, dir_mode=0755, owner=None):
+    """
+    Copy file, or directory, in HDFS to another location in HDFS.
+
+    ``src`` -- The directory, or file, to copy from.
+    ``dest`` -- the directory, or file, to copy to.
+            If 'dest' is a directory that exists, copy 'src' into dest.
+            If 'dest' is a file that exists and 'src' is a file, overwrite dest.
+            If 'dest' does not exist, create 'src' as 'dest'.
+    ``recursive`` -- Recursively copy contents of 'src' to 'dest'.
+                 This is required for directories.
+    ``dir_mode`` and ``owner`` are used to define permissions on the newly
+    copied files and directories.
+
+    This method will overwrite any pre-existing files that collide with what is being copied.
+    Copying a directory to a file is not allowed.
+    """
+    if owner is None:
+      owner = self.user
+
+    src = self.abspath(src)
+    dest = self.abspath(dest)
+
+    if not self.exists(src):
+      raise IOError(errno.ENOENT, _("File not found: %s") % src)
+
+    if self.isdir(src):
+      # 'src' is directory.
+      # Skip if not recursive copy and 'src' is directory.
+      if not recursive:
+        LOG.debug("Skipping contents of %s" % src)
+        return None
+
+      # If 'dest' is a directory change 'dest'
+      # to include 'src' basename.
+      # create 'dest' if it doesn't already exist.
+      if self.exists(dest):
+        if self.isdir(dest):
+          dest = self.join(dest, self.basename(src))
+        else:
+          raise IOError(errno.EEXIST, _("Destination file %s exists and is not a directory.") % dest)
+      self.do_as_user(owner, self.mkdir, dest)
+      self.do_as_user(owner, self.chmod, dest, mode=dir_mode)
+
+      # Copy files in 'src' directory to 'dest'.
+      self.copy_remote_dir(src, dest, dir_mode, owner)
+    else:
+      # 'src' is a file.
+      # If 'dest' is a directory, then copy 'src' into that directory.
+      # Other wise, copy to 'dest'.
+      if self.exists(dest) and self.isdir(dest):
+        self.copyfile(src, self.join(dest, self.basename(src)))
+      else:
+        self.copyfile(src, dest)
 
 
   @staticmethod

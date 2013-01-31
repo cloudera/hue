@@ -220,6 +220,20 @@ class Hdfs(object):
     path = url[i:]
     return (schema, netloc, normpath(path), '', '')
 
+  def listdir_recursive(self, path, glob=None):
+    """
+    listdir_recursive(path, glob=None) -> [ entry names ]
+
+    Get directory entry names without stats, recursively.
+    """
+    paths = [path]
+    while paths:
+      path = paths.pop()
+      if self.isdir(path):
+        hdfs_paths = self.listdir_stats(path, glob)
+        paths[:0] = [x.path for x in hdfs_paths]
+      yield path
+
   def create_home_dir(self, home_path=None):
     if home_path is None:
       home_path = self.get_home_dir()
@@ -287,6 +301,7 @@ class Hdfs(object):
     else:
       LOG.info(_('Skipping %s (not a file).') % local_src)
 
+
   @_coerce_exceptions
   def mktemp(self, subdir='', prefix='tmp', basedir=None):
     """
@@ -336,6 +351,9 @@ class Hdfs(object):
 
   def isdir(self):
     raise NotImplementedError(_("%(function)s has not been implemented.") % {'function': 'isdir'})
+
+  def listdir_stats(self):
+    raise NotImplementedError(_("%(function)s has not been implemented.") % {'function': 'listdir_stats'})
 
 
 """

@@ -140,6 +140,60 @@ def test_move():
 
 
 @attr('requires_hadoop')
+def test_copy():
+  cluster = pseudo_hdfs4.shared_cluster()
+
+  try:
+    c = make_logged_in_client(cluster.superuser)
+    cluster.fs.setuser(cluster.superuser)
+
+    prefix = '/test-copy'
+    PATH_1 = '%s/1' % prefix
+    PATH_2 = '%s/2' % prefix
+    SUB_PATH1_1 = '%s/1' % PATH_1
+    SUB_PATH1_2 = '%s/2' % PATH_1
+    SUB_PATH1_3 = '%s/3' % PATH_1
+    SUB_PATH2_1 = '%s/1' % PATH_2
+    SUB_PATH2_2 = '%s/2' % PATH_2
+    SUB_PATH2_3 = '%s/3' % PATH_2
+    cluster.fs.mkdir(prefix)
+    cluster.fs.mkdir(PATH_1)
+    cluster.fs.mkdir(PATH_2)
+    cluster.fs.mkdir(SUB_PATH1_1)
+    cluster.fs.mkdir(SUB_PATH1_2)
+    cluster.fs.mkdir(SUB_PATH1_3)
+
+    assert_true(cluster.fs.exists(SUB_PATH1_1))
+    assert_true(cluster.fs.exists(SUB_PATH1_2))
+    assert_true(cluster.fs.exists(SUB_PATH1_3))
+    assert_false(cluster.fs.exists(SUB_PATH2_1))
+    assert_false(cluster.fs.exists(SUB_PATH2_2))
+    assert_false(cluster.fs.exists(SUB_PATH2_3))
+
+    c.post('/filebrowser/copy', dict(src_path=[SUB_PATH1_1], dest_path=PATH_2))
+    assert_true(cluster.fs.exists(SUB_PATH1_1))
+    assert_true(cluster.fs.exists(SUB_PATH1_2))
+    assert_true(cluster.fs.exists(SUB_PATH1_3))
+    assert_true(cluster.fs.exists(SUB_PATH2_1))
+    assert_false(cluster.fs.exists(SUB_PATH2_2))
+    assert_false(cluster.fs.exists(SUB_PATH2_3))
+
+    c.post('/filebrowser/copy', dict(src_path=[SUB_PATH1_2, SUB_PATH1_3], dest_path=PATH_2))
+    assert_true(cluster.fs.exists(SUB_PATH1_1))
+    assert_true(cluster.fs.exists(SUB_PATH1_2))
+    assert_true(cluster.fs.exists(SUB_PATH1_3))
+    assert_true(cluster.fs.exists(SUB_PATH2_1))
+    assert_true(cluster.fs.exists(SUB_PATH2_2))
+    assert_true(cluster.fs.exists(SUB_PATH2_3))
+
+  finally:
+    try:
+      cluster.fs.rmtree(prefix)     # Clean up
+    except:
+      pass      # Don't let cleanup errors mask earlier failures
+
+
+@attr('requires_hadoop')
 def test_mkdir_singledir():
   cluster = pseudo_hdfs4.shared_cluster()
   cluster.fs.setuser('test')

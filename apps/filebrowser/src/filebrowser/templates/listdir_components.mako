@@ -301,6 +301,32 @@ from django.utils.translation import ugettext as _
         </form>
     </div>
 
+    <!-- copy modal -->
+    <div id="copyModal" class="modal hide fade">
+        <form id="copyForm" action="/filebrowser/copy" method="POST" enctype="multipart/form-data" class="form-inline form-padding-fix">
+            <div class="modal-header">
+                <a href="#" class="close" data-dismiss="modal">&times;</a>
+                <h3>${_('Copy:')}</h3>
+            </div>
+            <div class="modal-body">
+                <div style="padding-left: 15px;">
+                    <label for="copyDestination">${_('Destination')}</label>
+                    <input type="text" class="input-xlarge pathChooser" value="" name="dest_path" id="copyDestination" /><a class="btn fileChooserBtn" href="#" data-filechooser-destination="dest_path">..</a>
+                </div>
+                <br/>
+                <div class="fileChooserModal" class="hide">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div id="copyNameRequiredAlert" class="hide" style="position: absolute; left: 10;">
+                    <span class="label label-important">${_('Name is required.')}</span>
+                </div>
+                <a class="btn" onclick="$('#copyModal').modal('hide');">${_('Cancel')}</a>
+                <input class="btn btn-primary" type="submit" value="${_('Submit')}"/>
+            </div>
+        </form>
+    </div>
+
     <!-- upload file modal -->
     <div id="uploadFileModal" class="modal hide fade">
         <div class="modal-header">
@@ -503,6 +529,20 @@ from django.utils.translation import ugettext as _
       $("#moveForm").find("input[name='dest_path']").live("focus", function () {
         $("#moveNameRequiredAlert").hide();
         $("#moveForm").find("input[name='dest_path']").removeClass("fieldError");
+      });
+
+      $("#copyForm").on("submit", function () {
+        if ($.trim($("#copyForm").find("input.pathChooser").val()) == "") {
+          $("#copyNameRequiredAlert").show();
+          $("#copyForm").find("input[name='*dest_path']").addClass("fieldError");
+          return false;
+        }
+        return true;
+      });
+
+      $("#copyForm").find("input[name='dest_path']").on("focus", function () {
+        $("#copyNameRequiredAlert").hide();
+        $("#copyForm").find("input[name='dest_path']").recopyClass("fieldError");
       });
 
       $(".create-directory-link").click(function () {
@@ -902,6 +942,19 @@ from django.utils.translation import ugettext as _
         hiddenFields($("#moveForm"), "src_path", paths);
         $("#moveForm").attr("action", "/filebrowser/move?next=${url('filebrowser.views.view', path=urlencode('/'))}" + "." + self.currentPath());
         $("#moveModal").modal({
+          keyboard:true,
+          show:true
+        });
+      };
+
+      self.copy = function () {
+        var paths = [];
+        $(self.selectedFiles()).each(function (index, file) {
+          paths.push(file.path);
+        });
+        hiddenFields($("#copyForm"), "src_path", paths);
+        $("#copyForm").attr("action", "/filebrowser/copy?next=${url('filebrowser.views.view', path=urlencode('/'))}" + "." + self.currentPath());
+        $("#copyModal").modal({
           keyboard:true,
           show:true
         });

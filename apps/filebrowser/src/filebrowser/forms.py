@@ -79,6 +79,16 @@ class BaseRenameFormSet(FormSet):
 
 RenameFormSet = formset_factory(RenameForm, formset=BaseRenameFormSet, extra=0)
 
+class CopyForm(forms.Form):
+  op = "copy"
+  src_path = CharField(label=_("File to copy"), help_text=_("The file to copy."))
+  dest_path = CharField(label=_("Destination location"), help_text=_("Copy the file to:"))
+
+class BaseCopyFormSet(FormSet):
+  op = "copy"
+
+CopyFormSet = formset_factory(CopyForm, formset=BaseCopyFormSet, extra=0)
+
 class UploadFileForm(forms.Form):
   op = "upload"
   # The "hdfs" prefix in "hdfs_file" triggers the HDFSfileUploadHandler
