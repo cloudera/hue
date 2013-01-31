@@ -131,7 +131,7 @@ ${layout.menubar(section='tables')}
 
 
 <div id="dropTable" class="modal hide fade">
-    <form id="dropTableForm" method="POST" action="${ url(app_name + ':drop_table', database=database, table=table.name) }">
+    <form id="dropTableForm" method="POST" action="${ url(app_name + ':drop_table', database=database) }">
     <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
         <h3>${_('Drop Table')}</h3>
@@ -143,6 +143,11 @@ ${layout.menubar(section='tables')}
     <div class="modal-footer">
         <input type="button" class="btn" data-dismiss="modal" value="${_('Cancel')}" />
         <input type="submit" class="btn btn-danger" value="${_('Yes, drop this table')}"/>
+    </div>
+    <div class="hide">
+      <select name="table_selection">
+        <option value="${ table.name }" selected>${ table.name }</option>
+      </select>
     </div>
     </form>
 </div>
@@ -250,7 +255,7 @@ ${layout.menubar(section='tables')}
        }
      });
 
-     $.getJSON("${ url(app_name + ':drop_table', database=database, table=table.name) }", function(data) {
+     $.getJSON("${ url(app_name + ':drop_table', database=database) }", function(data) {
        $("#dropTableMessage").text(data.title);
      });
 

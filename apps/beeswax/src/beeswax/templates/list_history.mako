@@ -17,6 +17,7 @@
 import time
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
+from beeswax import models
 from beeswax.views import collapse_whitespace
 %>
 
@@ -100,9 +101,6 @@ ${ layout.menubar(section='history') }
               </tr>
             </thead>
             <tbody>
-            <%!
-              from beeswax import models, views
-            %>
             % for query in page.object_list:
               <%
                 qcontext = query.design.get_query_context()

@@ -18,11 +18,13 @@ import time
 from django.template.defaultfilters import timesince
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
+from beeswax import models
+from beeswax.views import collapse_whitespace
 %>
+
 <%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="layout" file="layout.mako" />
-<%!  from beeswax.views import collapse_whitespace %>
 
 ${ commonheader(_('My Queries'), app_name, user, '100px') | n,unicode }
 ${layout.menubar(section='my queries')}
@@ -68,14 +70,15 @@ ${layout.menubar(section='my queries')}
           </tr>
         </thead>
         <tbody>
-        <%!
-          from beeswax import models
-        %>
         % for design in q_page.object_list:
           <tr>
             <td data-row-selector-exclude="true">
-              <div class="hueCheckbox savedCheck" data-edit-url="${ url(app_name + ':execute_query', design_id=design.id) }" data-delete-url="${ url(app_name + ':delete_design', design_id=design.id) }"
-                   data-history-url="${ url(app_name + ':list_query_history') }?design_id=${design.id}" data-clone-url="${ url(app_name + ':clone_design', design_id=design.id) }" data-row-selector-exclude="true"></div>
+              <div class="hueCheckbox savedCheck canDelete"
+                   data-edit-url="${ url(app_name + ':execute_query', design_id=design.id) }"
+                   data-delete-name="${ design.id }"
+                   data-history-url="${ url(app_name + ':list_query_history') }?design_id=${design.id}"
+                   data-clone-url="${ url(app_name + ':clone_design', design_id=design.id) }"
+                   data-row-selector-exclude="true"></div>
             </td>
             <td>
               <a href="${ url(app_name + ':execute_query', design_id=design.id) }" data-row-selector="true">${design.name}</a>
@@ -110,21 +113,14 @@ ${layout.menubar(section='my queries')}
           </tr>
         </thead>
         <tbody>
-        <%!
-          from beeswax import models, views
-        %>
         % for query in h_page.object_list:
         <%
-          qcontext = ""
-          try:
-            design = query.design
-            qcontext = views.make_query_context('design', design.id)
-          except:
-            pass
+          qcontext = query.design.get_query_context()
         %>
           <tr>
             <td width="1%" data-row-selector-exclude="true">
-              <div class="hueCheckbox runCheck" data-edit-url="${ url(app_name + ':execute_query', design_id=design.id) }"
+              <div class="hueCheckbox runCheck"
+                data-edit-url="${ url(app_name + ':execute_query', design_id=design.id) }"
                 % if qcontext and query.last_state != models.QueryHistory.STATE.expired.index:
                   data-view-url="${ url(app_name + ':watch_query', id=query.id) }?context=${qcontext|u}"
                 % endif
@@ -152,7 +148,7 @@ ${layout.menubar(section='my queries')}
 </div>
 
 <div id="deleteQuery" class="modal hide fade">
-  <form id="deleteQueryForm" action="" method="POST">
+  <form id="deleteQueryForm" action="${ url(app_name + ':delete_design') }" method="POST">
     <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>
       <h3 id="deleteQueryMessage">${_('Confirm action')}</h3>
@@ -161,11 +157,22 @@ ${layout.menubar(section='my queries')}
       <input type="button" class="btn" data-dismiss="modal" value="${_('Cancel')}"/>
       <input type="submit" class="btn btn-danger" value="${_('Yes')}"/>
     </div>
+    <div class="hide">
+      <select name="designs_selection" data-bind="options: availableSavedQueries, selectedOptions: chosenSavedQueries" multiple="true"></select>
+    </div>
   </form>
 </div>
 
+<script src="/static/ext/js/knockout-2.1.0.js" type="text/javascript" charset="utf-8"></script>
+
 <script type="text/javascript" charset="utf-8">
   $(document).ready(function () {
+    var viewModel = {
+        availableSavedQueries : ko.observableArray(${ designs_json | n }),
+        chosenSavedQueries : ko.observableArray([])
+    };
+
+    ko.applyBindings(viewModel);
 
     updateQueryCounters();
 
@@ -175,7 +182,7 @@ ${layout.menubar(section='my queries')}
       "bLengthChange":false,
       "bInfo":false,
       "aaSorting":[
-        [4, 'desc']
+        [1, 'asc']
       ],
       "aoColumns":[
         {"bSortable":false, "sWidth":"1%" },
@@ -272,9 +279,10 @@ ${layout.menubar(section='my queries')}
             location.href = selector.data("history-url")
           });
         }
-        if (selector.data("delete-url")) {
-          $("#deleteBtn").removeAttr("disabled").data("confirmation-url", selector.data("delete-url"));
-        }
+      }
+
+      if (selector.length >= 1 && $('#recentSavedQueries').hasClass('active')) {
+        $("#deleteBtn").removeAttr("disabled");
       }
     }
 
@@ -290,13 +298,14 @@ ${layout.menubar(section='my queries')}
     }
 
     $("#deleteBtn").click(function () {
-      if ($(this).data("confirmation-url")) {
-        $.getJSON($(this).data("confirmation-url"), function (data) {
-          $("#deleteQueryForm").attr("action", data.url);
-          $("#deleteQueryMessage").text(data.title);
-        });
-        $("#deleteQuery").modal("show");
-      }
+      $.getJSON("${ url(app_name + ':delete_design') }", function(data) {
+        $("#deleteQueryMessage").text(data.title);
+      });
+      viewModel.chosenSavedQueries.removeAll();
+      $(".hueCheckbox[checked='checked']").each(function(index) {
+        viewModel.chosenSavedQueries.push($(this).data("delete-name"));
+      });
+      $("#deleteQuery").modal("show");
     });
 
     $("a[data-row-selector='true']").jHueRowSelector();

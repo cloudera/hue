@@ -141,6 +141,21 @@ class Dbms:
     return self.execute_statement(hql)
 
 
+  def drop_tables(self, database, tables, design):
+    hql = []
+
+    for table in tables:
+      if table.is_view:
+        hql.append("DROP VIEW `%s.%s`" % (database, table.name,))
+      else:
+        hql.append("DROP TABLE `%s.%s`" % (database, table.name,))
+    query = hql_query(';'.join(hql), database)
+    design.data = query.dumps()
+    design.save()
+
+    return self.execute_query(query, design)
+
+
   def use(self, database):
     """Beeswax does not support use directly."""
     if SERVER_INTERFACE.get() == HIVE_SERVER2:
@@ -174,12 +189,14 @@ class Dbms:
       curr = time.time()
     return None
 
+
   def execute_next_statement(self, query_history):
     query_history.statement_number += 1
     query_history.last_state = QueryHistory.STATE.submitted.index
     query_history.save()
     query = query_history.design.get_design()
     return self.execute_and_watch(query, query_history=query_history)
+
 
   def execute_and_watch(self, query, design=None, query_history=None):
     """

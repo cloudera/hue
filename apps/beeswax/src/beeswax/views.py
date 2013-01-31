@@ -131,19 +131,19 @@ def save_design(request, form, type, design, explicit_save):
 
 
 
-def delete_design(request, design_id):
-  """Delete a saved design"""
-  design = authorized_get_design(request, design_id)
-
-  if design is None:
-    LOG.error('Cannot delete non-existent design %s' % (design_id,))
-    return list_designs(request)
-
+def delete_design(request):
   if request.method == 'POST':
-    design.delete()
+    ids = request.POST.getlist('designs_selection')
+    designs = dict([(design_id, authorized_get_design(request, design_id)) for design_id in ids])
+
+    if None in designs.values():
+      LOG.error('Cannot delete non-existent design(s) %s' % ','.join([key for key, name in designs.items() if name is None]))
+      return list_designs(request)
+    for design in designs.values():
+      design.delete()
     return redirect(reverse(get_app_name(request) + ':list_designs'))
   else:
-    return render('confirm.html', request, dict(url=request.path, title=_('Delete design?')))
+    return render('confirm.html', request, dict(url=request.path, title=_('Delete design(s)?')))
 
 
 def clone_design(request, design_id):
@@ -201,6 +201,7 @@ def list_designs(request):
     'page': page,
     'filter_params': filter_params,
     'user': request.user,
+    'designs_json': json.dumps([query.id for query in page.object_list])
   })
 
 
@@ -242,6 +243,7 @@ def my_queries(request):
     'h_page': hist_page,
     'q_page': query_page,
     'filter_params': filter_params,
+    'designs_json': json.dumps([query.id for query in query_page.object_list])
   })
 
 
@@ -301,12 +303,14 @@ def show_tables(request, database=None):
 
   tables = db.get_tables(database=database)
   examples_installed = beeswax.models.MetaInstall.get().installed_example
+  #table_selection = TableSelection(tables=tables)
 
   return render("show_tables.mako", request, {
       'tables': tables,
       'examples_installed': examples_installed,
       'db_form': db_form,
       'database': database,
+      'tables_json': json.dumps(tables),
   })
 
 
@@ -333,25 +337,25 @@ def describe_table(request, database, table):
   })
 
 
-def drop_table(request, database, table):
+def drop_table(request, database):
   db = dbms.get(request.user)
 
-  table = db.get_table(database, table)
-
   if request.method == 'POST':
+    tables = request.POST.getlist('table_selection')
+    tables_objects = [db.get_table(database, table) for table in tables]
+    app_name = get_app_name(request)
     try:
-      query_history = db.drop_table(database, table)
-      url = reverse(get_app_name(request) + ':watch_query', args=[query_history.id]) + '?on_success_url=' + reverse(get_app_name(request) + ':show_tables')
+      # Can't be simpler without an important refactoring
+      design = SavedQuery.create_empty(app_name=app_name, owner=request.user)
+      query_history = db.drop_tables(database, tables_objects, design)
+      url = reverse(app_name + ':watch_query', args=[query_history.id]) + '?on_success_url=' + reverse(app_name + ':show_tables')
       return redirect(url)
     except BeeswaxException, ex:
       error_message, log = expand_exception(ex, db)
-      error = _("Failed to remove %(table)s.  Error: %(error)s") % {'table': table.name, 'error': error_message}
+      error = _("Failed to remove %(tables)s.  Error: %(error)s") % {'tables': ','.join(tables), 'error': error_message}
       raise PopupException(error, title=_("Beeswax Error"), detail=log)
   else:
-    if table.is_view:
-      title = _("Do you really want to drop the view '%(table)s'?") % {'table': table.name}
-    else:
-      title = _("This may delete the underlying data as well as the metadata. Drop table '%(table)s'?") % {'table': table.name}
+    title = _("Do you really want to delete the table(s)?")
     return render('confirm.html', request, dict(url=request.path, title=title))
 
 

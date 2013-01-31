@@ -72,7 +72,7 @@ ${layout.menubar(section='tables')}
                       <div class="hueCheckbox tableCheck"
                            data-view-url="${ url(app_name + ':describe_table', database=database, table=table) }"
                            data-browse-url="${ url(app_name + ':read_table', database=database, table=table) }"
-                           data-drop-url="${ url(app_name + ':drop_table', database=database, table=table) }" data-row-selector-exclude="true"></div>
+                           data-drop-name="${ table }" data-row-selector-exclude="true"></div>
                     </td>
                     <td>
                       <a href="${ url(app_name + ':describe_table', database=database, table=table) }" data-row-selector="true">${ table }</a>
@@ -84,8 +84,6 @@ ${layout.menubar(section='tables')}
         </div>
     </div>
 </div>
-
-
 
 % if not examples_installed:
 <div id="installSamples" class="modal hide fade">
@@ -106,7 +104,7 @@ ${layout.menubar(section='tables')}
 % endif
 
 <div id="dropTable" class="modal hide fade">
-  <form id="dropTableForm" action="" method="POST">
+  <form id="dropTableForm" action="${ url(app_name + ':drop_table', database=database) }" method="POST">
     <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>
       <h3 id="dropTableMessage">${_('Confirm action')}</h3>
@@ -115,13 +113,24 @@ ${layout.menubar(section='tables')}
       <input type="button" class="btn" data-dismiss="modal" value="${_('Cancel')}" />
       <input type="submit" class="btn btn-danger" value="${_('Yes')}"/>
     </div>
+    <div class="hide">
+      <select name="table_selection" data-bind="options: availableTables, selectedOptions: chosenTables" size="5" multiple="true"></select>
+    </div>
   </form>
 </div>
 
 <script src="/static/ext/js/jquery/plugins/jquery.cookie.js"></script>
+<script src="/static/ext/js/knockout-2.1.0.js" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript" charset="utf-8">
   $(document).ready(function () {
+    var viewModel = {
+        availableTables : ko.observableArray(${ tables_json | n }),
+        chosenTables : ko.observableArray([])
+    };
+
+    ko.applyBindings(viewModel);
+
     var tables = $(".datatables").dataTable({
       "sDom":"<'row'r>t<'row'<'span8'i><''p>>",
       "bPaginate":false,
@@ -208,20 +217,21 @@ ${layout.menubar(section='tables')}
             location.href = selector.data("browse-url")
           });
         }
-        if (selector.data("drop-url")) {
-          $("#dropBtn").removeAttr("disabled").data("confirmation-url", selector.data("drop-url"));
-        }
+      }
+      if (selector.length >= 1) {
+        $("#dropBtn").removeAttr("disabled");
       }
     }
 
     $("#dropBtn").click(function () {
-      if ($(this).data("confirmation-url")) {
-        $.getJSON($(this).data("confirmation-url"), function (data) {
-          $("#dropTableForm").attr("action", data.url);
-          $("#dropTableMessage").text(data.title);
-        });
-        $("#dropTable").modal("show");
-      }
+      $.getJSON("${ url(app_name + ':drop_table', database=database) }", function(data) {
+        $("#dropTableMessage").text(data.title);
+      });
+      viewModel.chosenTables.removeAll();
+      $(".hueCheckbox[checked='checked']").each(function( index ) {
+        viewModel.chosenTables.push($(this).data("drop-name"));
+      });
+      $("#dropTable").modal("show");
     });
   });
 </script>

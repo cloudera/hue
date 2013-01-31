@@ -30,7 +30,7 @@ from enum import Enum
 from desktop.lib.exceptions_renderable import PopupException
 
 from beeswax.conf import SERVER_INTERFACE
-from beeswax.design import HQLdesign
+from beeswax.design import HQLdesign, hql_query
 from beeswaxd.ttypes import QueryHandle as BeeswaxdQueryHandle, QueryState
 from cli_service.ttypes import TSessionHandle, THandleIdentifier,\
   TOperationState, TOperationHandle, TOperationType
@@ -72,7 +72,7 @@ class QueryHistory(models.Model):
   server_name = models.CharField(max_length=128, help_text=_('Name of the query server.'), default='')
   server_type = models.CharField(max_length=128, help_text=_('Type of the query server.'), default=BEESWAX, choices=SERVER_TYPE)
 
-  design = models.ForeignKey('SavedQuery', to_field='id', null=True) # Some queries (like read/drop table) don't have a design
+  design = models.ForeignKey('SavedQuery', to_field='id', null=True) # Some queries (like read/create table) don't have a design
   notify = models.BooleanField(default=False)                        # Notify on completion
 
   class Meta:
@@ -277,6 +277,17 @@ class SavedQuery(models.Model):
     design.name = copy.deepcopy(self.name)
     design.desc = copy.deepcopy(self.desc)
     design.is_auto = copy.deepcopy(self.is_auto)
+    return design
+
+  @classmethod
+  def create_empty(cls, app_name, owner):
+    query_type = SavedQuery.TYPES_MAPPING[app_name]
+    design = SavedQuery(owner=owner, type=query_type)
+    design.name = SavedQuery.DEFAULT_NEW_DESIGN_NAME
+    design.desc = ''
+    design.data = hql_query('').dumps()
+    design.is_auto = True
+    design.save()
     return design
 
   @staticmethod

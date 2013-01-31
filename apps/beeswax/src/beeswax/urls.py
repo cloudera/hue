@@ -21,11 +21,11 @@ urlpatterns = patterns('beeswax.views',
   url(r'^$', 'index', name='index'),
 
   url(r'^tables/(?P<database>\w+)?$', 'show_tables', name='show_tables'),
+  url(r'^tables/drop/(?P<database>\w+)$', 'drop_table', name='drop_table'),
   url(r'^table/(?P<database>\w+)/(?P<table>\w+)$', 'describe_table', name='describe_table'),
   url(r'^table/(?P<database>\w+)/(?P<table>\w+)/partitions$', 'describe_partitions', name='describe_partitions'),
   url(r'^table/(?P<database>\w+)/(?P<table>\w+)/load$', 'load_table', name='load_table'),
   url(r'^table/(?P<database>\w+)/(?P<table>\w+)/read$', 'read_table', name='read_table'),
-  url(r'^table/(?P<database>\w+)/(?P<table>\w+)/drop$', 'drop_table', name='drop_table'),
 
   url(r'^execute/(?P<design_id>\d+)?$', 'execute_query', name='execute_query'),
   url(r'^explain_parameterized/(?P<design_id>\d+)$', 'explain_parameterized_query', name='explain_parameterized_query'),
@@ -38,7 +38,7 @@ urlpatterns = patterns('beeswax.views',
 
   url(r'^my_queries$', 'my_queries', name='my_queries'),
   url(r'^list_designs$', 'list_designs', name='list_designs'),
-  url(r'^delete_design/(?P<design_id>\d+)$', 'delete_design', name='delete_design'),
+  url(r'^delete_designs$', 'delete_design', name='delete_design'),
   url(r'^clone_design/(?P<design_id>\d+)$', 'clone_design', name='clone_design'),
   url(r'^query_history$', 'list_query_history', name='list_query_history'),
 

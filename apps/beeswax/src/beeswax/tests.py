@@ -469,6 +469,22 @@ for x in sys.stdin:
     except:
       LOG.exception("Saw exception in child thread.")
 
+  def test_drop_multi_tables(self):
+    hql = """
+      CREATE TABLE test_drop_1 (a int);
+      CREATE TABLE test_drop_2 (a int);
+      CREATE TABLE test_drop_3 (a int);
+    """
+    resp = _make_query(self.client, hql)
+    resp = wait_for_query_to_finish(self.client, resp, max=30.0)
+
+    # Drop them
+    resp = self.client.get('/beeswax/tables/drop/default')
+    assert_true('want to delete' in resp.content, resp.content)
+    resp = self.client.post('/beeswax/tables/drop/default', {u'table_selection': [u'test_drop_1', u'test_drop_2', u'test_drop_3']})
+    assert_equal(resp.status_code, 302)
+
+
   def test_multiple_statements_no_result_set(self):
     hql = """
       CREATE TABLE test_multiple_statements_1 (a int);
@@ -503,7 +519,7 @@ for x in sys.stdin:
   def test_multiple_statements_various_queries(self):
     hql = """
       CREATE TABLE test_multiple_statements_2 (a int);
-      DROP TABLE test_multiple_statements_1;
+      DROP TABLE test_multiple_statements_2;
       SELECT foo FROM test;
     """
 
@@ -634,10 +650,24 @@ for x in sys.stdin:
     len_after = len(beeswax.models.SavedQuery.objects.filter(name__contains='rubbish'))
     assert_true(len_after == len_before + 1)
 
+    # Make 3 more designs
+    resp = cli.get('/beeswax/clone_design/%s' % (design.id,))
+    resp = cli.get('/beeswax/clone_design/%s' % (design.id,))
+    resp = cli.get('/beeswax/clone_design/%s' % (design.id,))
+    designs = beeswax.models.SavedQuery.objects.filter(name__contains='rubbish')[:3]
+    print designs
+
     # Delete a design
-    resp = cli.get('/beeswax/delete_design/1')
-    assert_true('Delete design?' in resp.content)
-    resp = cli.post('/beeswax/delete_design/1')
+    resp = cli.get('/beeswax/delete_designs')
+    assert_true('Delete design(s)' in resp.content, resp.content)
+    resp = cli.post('/beeswax/delete_designs', {u'designs_selection': [u'1']})
+    assert_equal(resp.status_code, 302)
+
+    # Delete designs
+    design_ids = map(str, designs.values_list('id', flat=True))
+    resp = cli.get('/beeswax/delete_designs', {u'designs_selection': design_ids})
+    assert_true('Delete design(s)' in resp.content, resp.content)
+    resp = cli.post('/beeswax/delete_designs', {u'designs_selection': design_ids})
     assert_equal(resp.status_code, 302)
 
     # Helper to test the view, filtering, etc
