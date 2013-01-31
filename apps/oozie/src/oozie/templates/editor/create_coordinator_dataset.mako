@@ -27,9 +27,9 @@
   ${ utils.render_field_no_popover(dataset_form['name']) }
   ${ utils.render_field_no_popover(dataset_form['description']) }
   <div class="row-fluid">
-      <div class="alert alert-warning">
-        ${ _('UTC time only! (e.g. if you want 10pm PST (UTC+8) set it 8 hours later to 6am the next day.') }
-      </div>
+    <div class="alert alert-warning">
+      ${ _('UTC time only. (e.g. if you want 10pm PST (UTC+8) set it 8 hours later to 6am the next day.') }
+    </div>
   </div>
   ${ utils.render_field_no_popover(dataset_form['start']) }
   ${ utils.render_field_no_popover(dataset_form['timezone']) }

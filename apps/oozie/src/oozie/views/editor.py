@@ -43,11 +43,11 @@ from oozie.import_workflow import import_workflow as _import_workflow
 from oozie.management.commands import oozie_setup
 from oozie.models import Workflow, History, Coordinator,\
                          Dataset, DataInput, DataOutput,\
-                         ACTION_TYPES
+                         ACTION_TYPES, Bundle, BundledCoordinator
 from oozie.forms import WorkflowForm, CoordinatorForm, DatasetForm,\
   DataInputForm, DataOutputForm, LinkForm,\
   DefaultLinkForm, design_form_by_type, ParameterForm,\
-  ImportWorkflowForm, NodeForm
+  ImportWorkflowForm, NodeForm, BundleForm, BundledCoordinatorForm
 
 
 LOG = logging.getLogger(__name__)
@@ -72,8 +72,6 @@ def list_workflows(request):
 
 
 def list_coordinators(request, workflow_id=None):
-  show_setup_app = True
-
   data = Coordinator.objects
   if workflow_id is not None:
     data = data.filter(workflow__id=workflow_id)
@@ -88,7 +86,22 @@ def list_coordinators(request, workflow_id=None):
   return render('editor/list_coordinators.mako', request, {
     'jobs': list(data),
     'currentuser': request.user,
-    'show_setup_app': show_setup_app,
+  })
+
+
+def list_bundles(request):
+  data = Bundle.objects
+
+  if not SHARE_JOBS.get() and not request.user.is_superuser:
+    data = data.filter(owner=request.user)
+  else:
+    data = data.filter(Q(is_shared=True) | Q(owner=request.user))
+
+  data = data.order_by('-last_modified')
+
+  return render('editor/list_bundles.mako', request, {
+    'jobs': list(data),
+    'currentuser': request.user,
   })
 
 
@@ -489,6 +502,192 @@ def _submit_coordinator(request, coordinator, mapping):
     return job_id
   except RestException, ex:
     raise PopupException(_("Error submitting coordinator %s") % (coordinator,),
+                         detail=ex._headers.get('oozie-error-message', ex))
+
+
+def create_bundle(request):
+  bundle = Bundle(owner=request.user, schema_version='uri:oozie:bundle:0.2')
+
+  if request.method == 'POST':
+    bundle_form = BundleForm(request.POST, instance=bundle)
+
+    if bundle_form.is_valid():
+      bundle = bundle_form.save()
+      return redirect(reverse('oozie:edit_bundle', kwargs={'bundle': bundle.id}))
+    else:
+      request.error(_('Errors on the form: %s') % bundle_form.errors)
+  else:
+    bundle_form = BundleForm(instance=bundle)
+
+  return render('editor/create_bundle.mako', request, {
+    'bundle': bundle,
+    'bundle_form': bundle_form,
+  })
+
+
+@check_job_access_permission()
+@check_job_edition_permission()
+def delete_bundle(request, bundle):
+  if request.method != 'POST':
+    raise PopupException(_('A POST request is required.'))
+
+  bundle.delete()
+  Submission(request.user, bundle, request.fs, {}).remove_deployment_dir()
+  request.info(_('Bundle deleted.'))
+
+  return redirect(reverse('oozie:list_bundles'))
+
+
+@check_job_access_permission()
+@check_job_edition_permission(True)
+def edit_bundle(request, bundle):
+  history = History.objects.filter(submitter=request.user, job=bundle).order_by('-submission_date')
+
+  BundledCoordinatorFormSet = inlineformset_factory(Bundle, BundledCoordinator, form=BundledCoordinatorForm, max_num=0, can_order=False, can_delete=True)
+  bundle_form = BundleForm(instance=bundle)
+
+  if request.method == 'POST':
+    bundle_form = BundleForm(request.POST, instance=bundle)
+    bundled_coordinator_formset = BundledCoordinatorFormSet(request.POST, instance=bundle)
+
+    if bundle_form.is_valid() and bundled_coordinator_formset.is_valid():
+      bundle = bundle_form.save()
+      bundled_coordinator_formset.save()
+
+      request.info(_('Bundle saved.'))
+      return redirect(reverse('oozie:list_bundles'))
+  else:
+    bundle_form = BundleForm(instance=bundle)
+    bundled_coordinator_formset = BundledCoordinatorFormSet(instance=bundle)
+
+  return render('editor/edit_bundle.mako', request, {
+    'bundle': bundle,
+    'bundle_form': bundle_form,
+    'bundled_coordinator_formset': bundled_coordinator_formset,
+    'bundled_coordinator_html_form': get_create_bundled_coordinator_html(request, bundle),
+    'history': history
+  })
+
+
+@check_job_access_permission()
+@check_job_edition_permission(True)
+def create_bundled_coordinator(request, bundle):
+  bundled_coordinator_instance = BundledCoordinator(bundle=bundle)
+
+  response = {'status': -1, 'data': 'None'}
+
+  if request.method == 'POST':
+    bundled_coordinator_form = BundledCoordinatorForm(request.POST, instance=bundled_coordinator_instance, prefix='create-bundled-coordinator')
+
+    if bundled_coordinator_form.is_valid():
+      bundled_coordinator_form.save()
+      response['status'] = 0
+      response['data'] = reverse('oozie:edit_bundle', kwargs={'bundle': bundle.id}) + "#listCoordinators"
+      request.info(_('Coordinator added to the bundle!'))
+  else:
+    bundled_coordinator_form = BundledCoordinatorForm(instance=bundled_coordinator_instance, prefix='create-bundled-coordinator')
+
+  if response['status'] != 0:
+    response['data'] = get_create_bundled_coordinator_html(request, bundle, bundled_coordinator_form=bundled_coordinator_form)
+
+  return HttpResponse(json.dumps(response), mimetype="application/json")
+
+
+def get_create_bundled_coordinator_html(request, bundle, bundled_coordinator_form=None):
+  if bundled_coordinator_form is None:
+    bundled_coordinator_instance = BundledCoordinator(bundle=bundle)
+    bundled_coordinator_form = BundledCoordinatorForm(instance=bundled_coordinator_instance, prefix='create-bundled-coordinator')
+
+  return render('editor/create_bundled_coordinator.mako', request, {
+                            'bundle': bundle,
+                            'bundled_coordinator_form': bundled_coordinator_form,
+                          }, force_template=True).content
+
+
+@check_job_access_permission()
+@check_job_edition_permission(True)
+def edit_bundled_coordinator(request, bundle, bundled_coordinator):
+  bundled_coordinator_instance = BundledCoordinator.objects.get(id=bundled_coordinator) # todo secu
+
+  response = {'status': -1, 'data': 'None'}
+
+  if request.method == 'POST':
+    bundled_coordinator_form = BundledCoordinatorForm(request.POST, instance=bundled_coordinator_instance, prefix='edit-bundled-coordinator')
+
+    if bundled_coordinator_form.is_valid():
+      bundled_coordinator_form.save()
+      response['status'] = 0
+      response['data'] = reverse('oozie:edit_bundle', kwargs={'bundle': bundle.id}) + "#listCoordinators"
+      request.info(_('Bundled coordinator updated!'))
+  else:
+    bundled_coordinator_form = BundledCoordinatorForm(instance=bundled_coordinator_instance, prefix='edit-bundled-coordinator')
+
+  if response['status'] != 0:
+    response['data'] = render('editor/edit_bundled_coordinator.mako', request, {
+                            'bundle': bundle,
+                            'bundled_coordinator_form': bundled_coordinator_form,
+                            'bundled_coordinator_instance': bundled_coordinator_instance,
+                          }, force_template=True).content
+
+  return HttpResponse(json.dumps(response), mimetype="application/json")
+
+
+@check_job_access_permission()
+def clone_bundle(request, bundle):
+  if request.method != 'POST':
+    raise PopupException(_('A POST request is required.'))
+
+  clone = bundle.clone(request.user)
+
+  response = {'url': reverse('oozie:edit_bundle', kwargs={'bundle': clone.id})}
+
+  return HttpResponse(json.dumps(response), mimetype="application/json")
+
+
+@check_job_access_permission()
+def submit_bundle(request, bundle):
+  ParametersFormSet = formset_factory(ParameterForm, extra=0)
+
+  if request.method == 'POST':
+    params_form = ParametersFormSet(request.POST)
+
+    if params_form.is_valid():
+      mapping = dict([(param['name'], param['value']) for param in params_form.cleaned_data])
+      job_id = _submit_bundle(request, bundle, mapping)
+
+      request.info(_('Bundle submitted.'))
+      return redirect(reverse('oozie:list_oozie_bundle', kwargs={'job_id': job_id}))
+    else:
+      request.error(_('Invalid submission form: %s' % params_form.errors))
+  else:
+    parameters = bundle.find_all_parameters()
+    initial_params = ParameterForm.get_initial_params(dict([(param['name'], param['value']) for param in parameters]))
+    params_form = ParametersFormSet(initial=initial_params)
+
+  popup = render('editor/submit_job_popup.mako', request, {
+                 'params_form': params_form,
+                 'action': reverse('oozie:submit_bundle',  kwargs={'bundle': bundle.id})
+                }, force_template=True).content
+  return HttpResponse(json.dumps(popup), mimetype="application/json")
+
+
+def _submit_bundle(request, bundle, properties):
+  try:
+    for bundled in bundle.coordinators.all():
+      wf_dir = Submission(request.user, bundled.coordinator.workflow, request.fs, properties).deploy()
+      properties = {'wf_application_path': request.fs.get_hdfs_path(wf_dir)}
+      coord_dir = Submission(request.user, bundled.coordinator, request.fs, properties).deploy()
+      bundled.coordinator.deployment_dir = coord_dir
+      bundled.coordinator.save() # Does not support concurrent submissions
+
+    submission = Submission(request.user, bundle, request.fs, properties=properties)
+    job_id = submission.run()
+
+    History.objects.create_from_submission(submission)
+
+    return job_id
+  except RestException, ex:
+    raise PopupException(_("Error submitting bundle %s") % (bundle,),
                          detail=ex._headers.get('oozie-error-message', ex))
 
 

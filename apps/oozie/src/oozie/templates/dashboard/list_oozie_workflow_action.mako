@@ -30,104 +30,131 @@ ${ layout.menubar(section='running') }
   ${ layout.dashboard_sub_menubar(section='workflows') }
 
   <h1>
-    ${ _('Workflow') } <a href="${ url('oozie:list_oozie_workflow', job_id=workflow.id) }">${ workflow.appName }</a> :
+    % if oozie_bundle:
+      ${ _('Bundle') } <a href="${ oozie_bundle.get_absolute_url() }">${ oozie_bundle.appName }</a> :
+    % endif
+    % if oozie_coordinator:
+      ${ _('Coordinator') } <a href="${ oozie_coordinator.get_absolute_url(oozie_bundle) }">${ oozie_coordinator.appName }</a> :
+    % endif
+    ${ _('Workflow') } <a href="${ workflow.get_absolute_url() }">${ workflow.appName }</a> :
     ${ _('Action') } ${ action.name }
   </h1>
 
-  <table class="table table-condensed datatables" id="jobTable">
-    <thead>
-      <tr>
-        <th>${ _('Property') }</th>
-        <th>${ _('Value') }</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>${ _('Name') }</td>
-        <td>${ action.name }</td>
-      </tr>
-      <tr>
-        <td>${ _('Type') }</td>
-        <td>${ action.type }</td>
-      </tr>
-      <tr>
-        <td>${ _('Status') }</td>
-        <td><span class="label ${ utils.get_status(action.status) }">${ action.status }</span></td>
-      </tr>
-      <tr>
-        <td>${ _('Configuration') }</td>
-        <td>${ utils.display_conf(action.conf_dict) }</td>
-      </tr>
-      % if action.errorCode:
-        <tr>
-          <td>${ _('Error Code') }</td>
-          <td>${ action.errorCode }</td>
-        </tr>
-      % endif
-      % if action.errorMessage:
-        <tr>
-          <td>${ _('Error Message') }</td>
-          <td>${ action.errorMessage }</td>
-        </tr>
-      % endif
-    </tbody>
-  </table>
+ <div class="row-fluid">
+    <div class="span2">
+      <div class="well sidebar-nav">
+        <ul class="nav nav-list">
+          <li class="nav-header">${ _('Workflow') }</li>
+          <li>
+            <a title="${ _('Edit workflow') }" href="${ workflow.get_absolute_url() }">${ workflow.appName }</a>
+          </li>
 
-  <h2>${ _('Details') }</h2>
+          <li class="nav-header">${ _('Name') }</li>
+          <li>${ action.name }</li>
 
-  <table class="table table-condensed datatables" id="jobTable">
-    <thead>
-      <tr>
-        <th>${ _('Property') }</th>
-        <th>${ _('Value') }</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>${ _('External Id') }</td>
-        <td>
           % if action.externalId:
-            <a href="${ url('jobbrowser.views.single_job', job=action.externalId) }">${ "_".join(action.externalId.split("_")[-2:]) }</a>
-          % endif
-        </td>
-      </tr>
-      <tr>
-        <td>${ _('External Status') }</td>
-        <td><span class="label ${ utils.get_status(action.externalStatus) }">${ action.externalStatus }<span></td>
-      </tr>
-      <tr>
-        <td>${ _('Data') }</td>
-        <td>${ action.data }</td>
-      </tr>
-      <tr>
-        <td>${ _('Start time') }</td>
-        <td>${ utils.format_time(action.startTime) }</td>
-      </tr>
-      <tr>
-        <td>${ _('End time') }</td>
-        <td>${ utils.format_time(action.endTime) }</td>
-      </tr>
-      <tr>
-        <td>${ _('Id') }</td>
-        <td>${ action.id }</td>
-      </tr>
-      <tr>
-        <td>${ _('Retries') }</td>
-        <td>${ action.retries }</td>
-      </tr>
-      <tr>
-        <td>${ _('TrackerURI') }</td>
-        <td>${ action.trackerUri }</td>
-      </tr>
-      <tr>
-        <td>${ _('Transition') }</td>
-        <td>${ action.transition }</td>
-      </tr>
-    </tbody>
-  </table>
+            <li class="nav-header">${ _('External Id') }</li>
+            <li><a href="${ url('jobbrowser.views.single_job', job=action.externalId) }">${ "_".join(action.externalId.split("_")[-2:]) }</a></li>
 
-  <br/>
-  <a class="btn" onclick="history.back()">${ _('Back') }</a>
+            <li class="nav-header">${ _('Logs') }</li>
+            <li>
+              <a href="${ url('jobbrowser.views.job_single_logs', job=action.externalId) }" title="${ _('View the logs') }" rel="tooltip"><i class="icon-tasks"></i></a>
+            </li>
+          % endif
+
+          <li class="nav-header">${ _('Type') }</li>
+          <li>${ action.type }</li>
+
+          <li class="nav-header">${ _('Status') }</li>
+          <li id="status"><span class="label ${ utils.get_status(action.status) }">${ action.status }</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="span9">
+      <ul class="nav nav-tabs">
+        <li class="active"><a href="#details" data-toggle="tab">${ _('Details') }</a></li>
+        <li><a href="#configuration" data-toggle="tab">${ _('Configuration') }</a></li>
+      </ul>
+
+      <div id="workflow-tab-content" class="tab-content" style="min-height:200px">
+
+        <div class="tab-pane active" id="details">
+          <table class="table table-condensed datatables" id="jobTable">
+            <thead>
+              <tr>
+                <th>${ _('Property') }</th>
+                <th>${ _('Value') }</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>${ _('External Status') }</td>
+                <td><span class="label ${ utils.get_status(action.externalStatus) }">${ action.externalStatus }<span></td>
+              </tr>
+              <tr>
+                <td>${ _('Data') }</td>
+                <td>${ action.data }</td>
+              </tr>
+              <tr>
+                <td>${ _('Start time') }</td>
+                <td>${ utils.format_time(action.startTime) }</td>
+              </tr>
+              <tr>
+                <td>${ _('End time') }</td>
+                <td>${ utils.format_time(action.endTime) }</td>
+              </tr>
+              <tr>
+                <td>${ _('Id') }</td>
+                <td>${ action.id }</td>
+              </tr>
+              % if action.errorCode:
+                <tr>
+                  <td>${ _('Error Code') }</td>
+                  <td>${ action.errorCode }</td>
+                </tr>
+              % endif
+              % if action.errorMessage:
+                <tr>
+                  <td>${ _('Error Message') }</td>
+                  <td>${ action.errorMessage }</td>
+                </tr>
+              % endif
+              <tr>
+                <td>${ _('Retries') }</td>
+                <td>${ action.retries }</td>
+              </tr>
+              <tr>
+                <td>${ _('TrackerURI') }</td>
+                <td>${ action.trackerUri }</td>
+              </tr>
+              <tr>
+                <td>${ _('Transition') }</td>
+                <td>${ action.transition }</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div id="configuration" class="tab-pane">
+          ${ utils.display_conf(action.conf_dict) }
+        </div>
+
+        % if action.externalId:
+          <div id="logs" class="tab-pane">
+            <h2>${ _('Logs') }</h2>
+
+            ${ utils.display_conf(action.conf_dict) }
+          </div>
+        % endif
+      </div>
+
+      <div style="margin-bottom: 16px">
+        <a class="btn" onclick="history.back()">${ _('Back') }</a>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 ${ commonfooter(messages) | n,unicode }

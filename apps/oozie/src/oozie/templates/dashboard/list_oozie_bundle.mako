@@ -27,104 +27,85 @@ ${ layout.menubar(section='dashboard') }
 
 
 <div class="container-fluid">
-  ${ layout.dashboard_sub_menubar(section='coordinators') }
+  ${ layout.dashboard_sub_menubar(section='bundles') }
 
-  <h1>
-    % if oozie_bundle:
-      ${ _('Bundle') } <a href="${ oozie_bundle.get_absolute_url() }">${ oozie_bundle.appName }</a> :
-    % endif
-    ${ _('Coordinator') } ${ oozie_coordinator.appName }
-  </h1>
+  <h1>${ _('Bundle') } ${ oozie_bundle.appName }</h1>
 
 
 <div class="row-fluid">
   <div class="span2">
     <div class="well sidebar-nav">
       <ul class="nav nav-list">
-        <li class="nav-header">${ _('Coordinator') }</li>
+        <li class="nav-header">${ _('Bundle') }</li>
         <li>
-            % if coordinator is not None:
-              <a href="${ coordinator.get_absolute_url() }">${ oozie_coordinator.appName }</a>
+            % if bundle is not None:
+              <a href="${ bundle.get_absolute_url() }">${ oozie_bundle.appName }</a>
             % else:
-              ${ oozie_coordinator.appName }
+              ${ oozie_bundle.appName }
             % endif
         </li>
 
         <li class="nav-header">${ _('Submitter') }</li>
-        <li>${ oozie_coordinator.user }</li>
+        <li>${ oozie_bundle.user }</li>
 
         <li class="nav-header">${ _('Status') }</li>
-        <li id="status"><span class="label ${ utils.get_status(oozie_coordinator.status) }">${ oozie_coordinator.status }</span></li>
+        <li id="status"><span class="label ${ utils.get_status(oozie_bundle.status) }">${ oozie_bundle.status }</span></li>
 
         <li class="nav-header">${ _('Progress') }</li>
         <li id="progress">
           <div class="progress">
-            <div class="bar" style="width: 0">${ oozie_coordinator.get_progress() }%</div>
+            <div class="bar" style="width: 0">${ oozie_bundle.get_progress() }%</div>
           </div>
         </li>
 
-        <li class="nav-header">${ _('Frequency') }</li>
-        <li>${ oozie_coordinator.frequency } ${ oozie_coordinator.timeUnit }</li>
+        <li class="nav-header">${ _('Kick off time') }</li>
+        <li>${ oozie_bundle.kickoffTime }</li>
 
-        <li class="nav-header">${ _('Next Materialized Time') }</li>
-        <li id="nextTime">${ utils.format_time(oozie_coordinator.nextMaterializedTime) }</li>
+        <li class="nav-header">${ _('Created time') }</li>
+        <li id="endTime">${ oozie_bundle.createdTime }</li>
 
-        <li class="nav-header">${ _('Start time') }</li>
-        <li>${ utils.format_time(oozie_coordinator.startTime) }</li>
-
-        <li class="nav-header">${ _('End time') }</li>
-        <li id="endTime">${ utils.format_time(oozie_coordinator.endTime) }</li>
-
-        % if coordinator:
-            <li class="nav-header">${ _('Datasets') }</li>
-          % for dataset in coordinator.dataset_set.all():
-            <li rel="tooltip" title="${ dataset.name } : ${ dataset.uri }"><i class="icon-eye-open"></i> <span class="dataset">${ dataset.name }</span></li>
+        % if bundle:
+            <li class="nav-header">${ _('Bundles') }</li>
+          % for bundled in bundle.coordinators.all():
+            <li rel="tooltip" title="${ bundled.coordinator.name }">
+              <i class="icon-eye-open"></i> <span class="dataset">${ bundled.coordinator.name }</span>
+            </li>
           % endfor
         % endif
 
-        % if has_job_edition_permission(oozie_coordinator, user):
+        % if has_job_edition_permission(oozie_bundle, user):
           <li class="nav-header">${ _('Manage') }</li>
           <li>
-            <button title="${_('Kill %(coordinator)s') % dict(coordinator=oozie_coordinator.id)}"
+            <button title="${_('Kill %(bundle)s') % dict(bundle=oozie_bundle.id)}"
               id="kill-btn"
               class="btn btn-small confirmationModal
-               % if not oozie_coordinator.is_running():
+               % if not oozie_bundle.is_running():
                  hide
                % endif
               "
-              alt="${ _('Are you sure you want to kill coordinator %s?') % oozie_coordinator.id }"
+              alt="${ _('Are you sure you want to kill bundle %s?') % oozie_bundle.id }"
               href="javascript:void(0)"
-              data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='kill') }"
-              data-message="${ _('The coordinator was killed!') }"
+              data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_bundle.id, action='kill') }"
+              data-message="${ _('The bundle was killed!') }"
               data-confirmation-message="${ _('Are you sure you\'d like to kill this job?') }">
                 ${_('Kill')}
             </button>
-            <button class="btn btn-small
-               % if oozie_coordinator.is_running() or oozie_coordinator.status in ('KILLED', 'FAILED'):
-                 hide
-               % endif
-            "
-              id="rerun-btn"
-              data-rerun-url="${ url('oozie:rerun_oozie_coord', job_id=oozie_coordinator.id, app_path=oozie_coordinator.coordJobPath) }"
-            >
-              ${ _('Rerun') }
-            </button>
             <div id="rerun-coord-modal" class="modal hide"></div>
-            <button title="${ _('Suspend the coordinator after finishing the current running actions') }" id="suspend-btn"
-               data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='suspend') }"
+            <button title="${ _('Suspend the bundle after finishing the current running actions') }" id="suspend-btn"
+               data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_bundle.id, action='suspend') }"
                data-confirmation-message="${ _('Are you sure you\'d like to suspend this job?') }"
                class="btn btn-small confirmationModal
-               % if not oozie_coordinator.is_running():
+               % if not oozie_bundle.is_running():
                  hide
                % endif
                " rel="tooltip" data-placement="right">
               ${ _('Suspend') }
             </button>
-            <button title="${ _('Resume the coordinator') }" id="resume-btn"
-               data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='resume') }"
+            <button title="${ _('Resume the bundle') }" id="resume-btn"
+               data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_bundle.id, action='resume') }"
                data-confirmation-message="${ _('Are you sure you\'d like to resume this job?') }"
                class="btn btn-small confirmationModal
-               % if oozie_coordinator.is_running():
+               % if oozie_bundle.is_running():
                  hide
                % endif
                ">
@@ -137,7 +118,7 @@ ${ layout.menubar(section='dashboard') }
   </div>
   <div class="span10">
     <ul class="nav nav-tabs">
-      <li class="active"><a href="#calendar" data-toggle="tab">${ _('Calendar') }</a></li>
+      <li class="active"><a href="#calendar" data-toggle="tab">${ _('Coordinators') }</a></li>
       <li><a href="#actions" data-toggle="tab">${ _('Actions') }</a></li>
       <li><a href="#configuration" data-toggle="tab">${ _('Configuration') }</a></li>
       <li><a href="#log" data-toggle="tab">${ _('Log') }</a></li>
@@ -176,10 +157,10 @@ ${ layout.menubar(section='dashboard') }
         <tr>
           <td>
             <a data-bind="attr: {href: url}" data-row-selector="true">
-              <span data-bind="text: title, attr: {'class': statusClass, 'id': 'date-' + $index()}"></span>
+              <span data-bind="text: name, attr: {'class': statusClass, 'id': 'date-' + $index()}"></span>
             </a>
           </td>
-          <td><span data-bind="text: errorMessage"></span> <span data-bind="visible:missingDependencies !='', text: '${ _('Missing')}' + missingDependencies"></span></td>
+          <td><span data-bind="text: lastAction"></span></td>
         </tr>
       </script>
 
@@ -188,20 +169,20 @@ ${ layout.menubar(section='dashboard') }
         <table class="table table-striped table-condensed" cellpadding="0" cellspacing="0">
           <thead>
           <tr>
-            <th>${ _('Number') }</th>
-            <th>${ _('Nominal Time') }</th>
+            <th>${ _('Name') }</th>
+            <th>${ _('Id') }</th>
+
+            <th>${ _('Last action') }</th>
+            <th>${ _('Acl') }</th>
 
             <th>${ _('Type') }</th>
             <th>${ _('Status') }</th>
 
-            <th>${ _('Error Message') }</th>
-            <th>${ _('Missing Dependencies') }</th>
+            <th>${ _('Time out') }</th>
+            <th>${ _('Start Time') }</th>
 
-            <th>${ _('Created Time') }</th>
-            <th>${ _('Last Modified Time') }</th>
-
-            <th>${ _('Id') }</th>
-            <th>${ _('External Id') }</th>
+            <th>${ _('End Time') }</th>
+            <th>${ _('Pause Time') }</th>
           </tr>
           </thead>
 
@@ -227,38 +208,38 @@ ${ layout.menubar(section='dashboard') }
 
       <script id="actionTemplate" type="text/html">
         <tr>
-          <td data-bind="text: number"></td>
-          <td data-bind="text: nominalTime"></td>
-          <td data-bind="text: type"></td>
-          <td><span data-bind="text: status, attr: {'class': statusClass}"></span></td>
-          <td data-bind="text: errorMessage"></td>
-          <td data-bind="text: missingDependencies"></td>
-          <td data-bind="text: createdTime"></td>
-          <td data-bind="text: lastModifiedTime"></td>
+          <td>
+            <a data-bind="visible:name !='', attr: {href: url}, text: name"></a>
+          </td>
           <td>
             <a data-bind="visible:externalId !='', attr: {href: url}, text: id" data-row-selector"true"></a>
           </td>
-          <td>
-            <a data-bind="visible:externalId !='', attr: {href: externalIdUrl}, text: externalId"></a>
-          </td>
+          <td data-bind="text: lastAction"></td>
+          <td data-bind="text: acl"></td>
+          <td data-bind="text: type"></td>
+          <td><span data-bind="text: status, attr: {'class': statusClass}"></span></td>
+          <td data-bind="text: timeOut"></td>
+          <td data-bind="text: startTime"></td>
+          <td data-bind="text: endTime"></td>
+          <td data-bind="text: pauseTime"></td>
         </tr>
       </script>
 
       <div class="tab-pane" id="configuration">
-        ${ utils.display_conf(oozie_coordinator.conf_dict) }
+        ${ utils.display_conf(oozie_bundle.conf_dict) }
       </div>
 
       <div class="tab-pane" id="log">
-        <pre>${ oozie_coordinator.log }</pre>
+        <pre>${ oozie_bundle.log }</pre>
       </div>
 
       <div class="tab-pane" id="definition">
-        <textarea id="definitionEditor">${ oozie_coordinator.definition }</textarea>
+        <textarea id="definitionEditor">${ oozie_bundle.definition }</textarea>
       </div>
     </div>
 
     <div style="margin-bottom: 16px">
-      <a href="${ url('oozie:list_oozie_coordinators') }" class="btn">${ _('Back') }</a>
+      <a href="${ url('oozie:list_oozie_bundles') }" class="btn">${ _('Back') }</a>
     </div>
 
   </div>
@@ -303,18 +284,22 @@ ${ layout.menubar(section='dashboard') }
     return {
       id: action.id,
       url: action.url,
-      number: action.number,
+      name: action.name,
       type: action.type,
       status: action.status,
       statusClass: "label " + getStatusClass(action.status),
       externalId: action.externalId,
-      externalIdUrl: action.externalIdUrl,
-      title: action.title,
-      nominalTime: action.nominalTime,
-      createdTime: action.createdTime,
-      lastModifiedTime: action.lastModifiedTime,
-      errorMessage: action.errorMessage,
-      missingDependencies: action.missingDependencies
+      frequency: action.frequency,
+      concurrency: action.concurrency,
+      pauseTime: action.pauseTime,
+      acl: action.acl,
+      user: action.user,
+      timeOut: action.timeOut,
+      coordJobPath: action.coordJobPath,
+      executionPolicy: action.executionPolicy,
+      startTime: action.startTime,
+      endTime: action.endTime,
+      lastAction: action.lastAction
     }
   }
 
@@ -413,7 +398,7 @@ ${ layout.menubar(section='dashboard') }
     var logsAtEnd = true;
 
     function refreshView() {
-      $.getJSON("${ oozie_coordinator.get_absolute_url(oozie_bundle) }" + "?format=json", function (data) {
+      $.getJSON("${ oozie_bundle.get_absolute_url() }" + "?format=json", function (data) {
         viewModel.isLoading(false);
         if (data.actions){
           viewModel.actions(ko.utils.arrayMap(data.actions, function (action) {
@@ -426,6 +411,10 @@ ${ layout.menubar(section='dashboard') }
         if (data.id && data.status != "RUNNING" && data.status != "SUSPENDED" && data.status != "KILLED" && data.status != "FAILED"){
           $("#kill-btn").hide();
           $("#rerun-btn").show();
+        }
+        
+        if (data.id && data.status == "KILLED") {
+          $("#kill-btn").hide();
         }
 
         if (data.id && (data.status == "RUNNING" || data.status == "RUNNINGWITHERROR")){
@@ -449,6 +438,7 @@ ${ layout.menubar(section='dashboard') }
         if (logsAtEnd) {
           _logsEl.scrollTop(_logsEl[0].scrollHeight - _logsEl.height());
         }
+
         if (data.status != "RUNNING" && data.status != "PREP"){
           return;
         }

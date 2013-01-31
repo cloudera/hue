@@ -24,7 +24,7 @@ from desktop.lib.rest.http_client import HttpClient
 from desktop.lib.rest.resource import Resource
 
 from liboozie.types import WorkflowList, CoordinatorList, Coordinator, Workflow,\
-  CoordinatorAction, WorkflowAction
+  CoordinatorAction, WorkflowAction, BundleList, Bundle, BundleAction
 from liboozie.utils import config_gen
 
 # Manage deprecation after HUE-792.
@@ -144,18 +144,20 @@ class OozieApi(object):
     resp = self._root.get('jobs', params)
     if jobtype == 'wf':
       wf_list = WorkflowList(self, resp, filters=kwargs)
-    else:
+    elif jobtype == 'coord':
       wf_list = CoordinatorList(self, resp, filters=kwargs)
+    else:
+      wf_list = BundleList(self, resp, filters=kwargs)
     return wf_list
-
 
   def get_workflows(self, offset=None, cnt=None, **kwargs):
     return self.get_jobs('wf', offset, cnt, **kwargs)
 
-
   def get_coordinators(self, offset=None, cnt=None, **kwargs):
     return self.get_jobs('coord', offset, cnt, **kwargs)
 
+  def get_bundles(self, offset=None, cnt=None, **kwargs):
+    return self.get_jobs('bundle', offset, cnt, **kwargs)
 
   # TODO: make get_job accept any jobid
   def get_job(self, jobid):
@@ -167,12 +169,15 @@ class OozieApi(object):
     wf = Workflow(self, resp)
     return wf
 
-
   def get_coordinator(self, jobid):
     params = self._get_params()
     resp = self._root.get('job/%s' % (jobid,), params)
     return Coordinator(self, resp)
 
+  def get_bundle(self, jobid):
+    params = self._get_params()
+    resp = self._root.get('job/%s' % (jobid,), params)
+    return Bundle(self, resp)
 
   def get_job_definition(self, jobid):
     """
@@ -182,7 +187,6 @@ class OozieApi(object):
     params['show'] = 'definition'
     xml = self._root.get('job/%s' % (jobid,), params)
     return xml
-
 
   def get_job_log(self, jobid):
     """
@@ -196,6 +200,8 @@ class OozieApi(object):
   def get_action(self, action_id):
     if 'C@' in action_id:
       Klass = CoordinatorAction
+    elif 'B@' in action_id:
+      Klass = BundleAction
     else:
       Klass = WorkflowAction
     params = self._get_params()
@@ -218,7 +224,6 @@ class OozieApi(object):
       params.update(parameters)
 
     return self._root.put('job/%s' % jobid, params,  data=config_gen(properties), contenttype=_XML_CONTENT_TYPE)
-
 
   def submit_workflow(self, application_path, properties=None):
     """

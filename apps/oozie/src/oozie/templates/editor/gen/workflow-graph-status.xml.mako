@@ -63,7 +63,7 @@
           </div>
           <div class="span10" style="text-align:right">
             % if not is_fork and action:
-            <a href="${ url('oozie:list_oozie_workflow_action', action=action.id) }" class="btn btn-mini" title="${ _('View workflow action') }" rel="tooltip"><i class="icon-eye-open"></i></a>
+            <a href="${ action.get_absolute_url() }" class="btn btn-mini" title="${ _('View workflow action') }" rel="tooltip"><i class="icon-eye-open"></i></a>
             % endif
             <a href="${ url('jobbrowser.views.job_single_logs', job=action.externalId) }" class="btn btn-mini" title="${ _('View the logs') }" rel="tooltip" data-row-selector-exclude="true" id="advanced-btn"><i class="icon-tasks"></i></a>
             &nbsp;

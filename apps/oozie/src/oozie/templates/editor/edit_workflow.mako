@@ -49,9 +49,9 @@ ${ layout.menubar(section='workflows') }
         <li><a href="#editWorkflow">${ _('Edit workflow') }</a></li>
         <li><a href="javascript:void(0)" class="import-jobsub-node-link" title="${ _('Click to import a Job Designer action and add it to the end of the flow') }" rel="tooltip" data-placement="right">${ _('Import action') }</a></li>
         % if user_can_edit_job:
-            <li>
-              <a data-bind="attr: {href: '/filebrowser/view' + deployment_dir() }" target="_blank" title="${ _('Upload additional files and libraries to the deployment directory') }" rel="tooltip" data-placement="right"><i class="icon-share-alt"></i> ${ _('Upload') }</a>
-            </li>
+          <li>
+            <a data-bind="attr: {href: '/filebrowser/view' + deployment_dir() }" target="_blank" title="${ _('Upload additional files and libraries to the deployment directory') }" rel="tooltip" data-placement="right"><i class="icon-share-alt"></i> ${ _('Upload') }</a>
+          </li>
         % endif
 
         % if user_can_edit_job:
@@ -78,9 +78,9 @@ ${ layout.menubar(section='workflows') }
     <div id="properties" class="section hide">
       <div class="alert alert-info"><h3>${ _('Properties') }</h3></div>
       <fieldset>
-      ${ utils.render_field(workflow_form['name'], extra_attrs={'data-bind': 'value: %s' % workflow_form['name'].name}) }
-      ${ utils.render_field(workflow_form['description'], extra_attrs={'data-bind': 'value: %s' % workflow_form['description'].name}) }
-      ${ utils.render_field(workflow_form['is_shared'], extra_attrs={'data-bind': 'checked: %s' % workflow_form['is_shared'].name}) }
+        ${ utils.render_field(workflow_form['name'], extra_attrs={'data-bind': 'value: %s' % workflow_form['name'].name}) }
+        ${ utils.render_field(workflow_form['description'], extra_attrs={'data-bind': 'value: %s' % workflow_form['description'].name}) }
+        ${ utils.render_field(workflow_form['is_shared'], extra_attrs={'data-bind': 'checked: %s' % workflow_form['is_shared'].name}) }
 
       <%
       workflows.key_value_field(workflow_form['parameters'], {
@@ -214,7 +214,7 @@ ${ layout.menubar(section='workflows') }
     <div id="listHistory" class="section hide">
       <div class="alert alert-info"><h3>${ _('History') }</h3></div>
       % if not history:
-      ${ _('N/A') }
+        ${ _('N/A') }
       % else:
         <table class="table">
           <thead>
@@ -228,7 +228,7 @@ ${ layout.menubar(section='workflows') }
           <tr>
             <td>
               <a href="${ url('oozie:list_history_record', record_id=record.id) }" data-row-selector="true"></a>
-            ${ utils.format_date(record.submission_date) }
+              ${ utils.format_date(record.submission_date) }
             </td>
             <td>${ record.oozie_job_id }</td>
           </tr>

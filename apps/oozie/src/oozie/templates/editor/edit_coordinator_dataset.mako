@@ -26,12 +26,15 @@
 <fieldset>
   ${ utils.render_field(dataset_form['name']) }
   ${ utils.render_field(dataset_form['description']) }
+
   <div class="row-fluid">
     <div class="span6">
       ${ utils.render_field(dataset_form['start']) }
     </div>
     <div class="span6">
-    <div class="alert alert-warning">${ _('Recommended to be before the coordinator start date.') }</div>
+      <div class="alert alert-warning">
+        ${ _('UTC time only.') } ${ _('Recommended to be before the coordinator start date.') }
+      </div>
     </div>
   </div>
   <div class="row-fluid">

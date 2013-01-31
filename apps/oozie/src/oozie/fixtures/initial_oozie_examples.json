@@ -189,7 +189,7 @@
       "name": "DailyAnalytics",
       "parameters": "[]",
       "deployment_dir": "/user/hue/oozie/workspaces/range",
-      "schema_version": "uri:oozie:coordinator:0.1",
+      "schema_version": "uri:oozie:coordinator:0.2",
       "last_modified": "2013-01-01 00:00:00",
       "owner": 1100713,
       "description": "Run daily a workflow with a date range of input data"

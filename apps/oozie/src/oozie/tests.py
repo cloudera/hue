@@ -35,10 +35,10 @@ from liboozie import oozie_api
 from liboozie.conf import OOZIE_URL
 from liboozie.oozie_api_test import OozieServerProvider
 from liboozie.types import WorkflowList, Workflow as OozieWorkflow, Coordinator as OozieCoordinator,\
-  CoordinatorList, WorkflowAction
+  Bundle as OozieBundle, CoordinatorList, WorkflowAction, BundleList
 
 from oozie.models import Workflow, Node, Kill, Streaming, Link, Job, Coordinator, History,\
-  find_parameters, NODE_TYPES
+  find_parameters, NODE_TYPES, Bundle
 from oozie.conf import SHARE_JOBS
 from oozie.utils import workflow_to_dict, model_to_dict, smart_path
 from oozie.import_workflow import import_workflow
@@ -65,8 +65,23 @@ class MockOozieApi:
   COORDINATOR_IDS = [coord['coordJobId'] for coord in JSON_COORDINATOR_LIST]
   COORDINATOR_DICT = dict([(coord['coordJobId'], coord) for coord in JSON_COORDINATOR_LIST])
 
+  JSON_BUNDLE_LIST = [
+     {u'status': u'SUCCEEDED', u'toString': u'Bundle id[0000021-130210132208494-oozie-oozi-B] status[SUCCEEDED]', u'group': None, u'conf': u'<configuration>\r\n  <property>\r\n    <name>oozie.bundle.application.path</name>\r\n    <value>hdfs://localhost:8020/user/hue/oozie/workspaces/_romain_-oozie-22-1360636939.69</value>\r\n  </property>\r\n  <property>\r\n    <name>user.name</name>\r\n    <value>romain</value>\r\n  </property>\r\n  <property>\r\n    <name>oozie.use.system.libpath</name>\r\n    <value>true</value>\r\n  </property>\r\n  <property>\r\n    <name>nameNode</name>\r\n    <value>hdfs://localhost:8020</value>\r\n  </property>\r\n  <property>\r\n    <name>wf_application_path</name>\r\n    <value>hdfs://localhost:8020/user/hue/oozie/deployments/_romain_-oozie-5-1360649203.07</value>\r\n  </property>\r\n  <property>\r\n    <name>jobTracker</name>\r\n    <value>localhost:8021</value>\r\n  </property>\r\n  <property>\r\n    <name>hue-id-b</name>\r\n    <value>22</value>\r\n  </property>\r\n</configuration>', u'bundleJobName': u'MyBundle1', u'startTime': None, u'bundleCoordJobs': [], u'kickoffTime': u'Mon, 11 Feb 2013 08:33:00 PST', u'acl': None, u'bundleJobPath': u'hdfs://localhost:8020/user/hue/oozie/workspaces/_romain_-oozie-22-1360636939.69', u'createdTime': u'Mon, 11 Feb 2013 22:06:44 PST', u'timeOut': 0, u'consoleUrl': None, u'bundleExternalId': None, u'timeUnit': u'NONE', u'pauseTime': None, u'bundleJobId': u'0000021-130210132208494-oozie-oozi-B', u'endTime': None, u'user': u'test'},
+     {u'status': u'KILLED', u'toString': u'Bundle id[0000020-130210132208494-oozie-oozi-B] status[KILLED]', u'group': None, u'conf': u'<configuration>\r\n  <property>\r\n    <name>oozie.bundle.application.path</name>\r\n    <value>hdfs://localhost:8020/user/hue/oozie/workspaces/_romain_-oozie-22-1360636939.69</value>\r\n  </property>\r\n  <property>\r\n    <name>user.name</name>\r\n    <value>romain</value>\r\n  </property>\r\n  <property>\r\n    <name>oozie.use.system.libpath</name>\r\n    <value>true</value>\r\n  </property>\r\n  <property>\r\n    <name>nameNode</name>\r\n    <value>hdfs://localhost:8020</value>\r\n  </property>\r\n  <property>\r\n    <name>wf_application_path</name>\r\n    <value>hdfs://localhost:8020/user/hue/oozie/deployments/_romain_-oozie-5-1360648977.2</value>\r\n  </property>\r\n  <property>\r\n    <name>jobTracker</name>\r\n    <value>localhost:8021</value>\r\n  </property>\r\n  <property>\r\n    <name>hue-id-b</name>\r\n    <value>22</value>\r\n  </property>\r\n</configuration>', u'bundleJobName': u'MyBundle2', u'startTime': None, u'bundleCoordJobs': [], u'kickoffTime': u'Mon, 11 Feb 2013 08:33:00 PST', u'acl': None, u'bundleJobPath': u'hdfs://localhost:8020/user/hue/oozie/workspaces/_romain_-oozie-22-1360636939.69', u'createdTime': u'Mon, 11 Feb 2013 22:02:58 PST', u'timeOut': 0, u'consoleUrl': None, u'bundleExternalId': None, u'timeUnit': u'NONE', u'pauseTime': None, u'bundleJobId': u'0000020-130210132208494-oozie-oozi-B', u'endTime': None, u'user': u'test'},
+     {u'status': u'KILLED', u'toString': u'Bundle id[0000019-130210132208494-oozie-oozi-B] status[KILLED]', u'group': None, u'conf': u'<configuration>\r\n  <property>\r\n    <name>oozie.bundle.application.path</name>\r\n    <value>hdfs://localhost:8020/user/hue/oozie/workspaces/_romain_-oozie-22-1360636939.69</value>\r\n  </property>\r\n  <property>\r\n    <name>user.name</name>\r\n    <value>romain</value>\r\n  </property>\r\n  <property>\r\n    <name>oozie.use.system.libpath</name>\r\n    <value>true</value>\r\n  </property>\r\n  <property>\r\n    <name>nameNode</name>\r\n    <value>hdfs://localhost:8020</value>\r\n  </property>\r\n  <property>\r\n    <name>wf_application_path</name>\r\n    <value>hdfs://localhost:8020/user/hue/oozie/deployments/_romain_-oozie-5-1360639372.41</value>\r\n  </property>\r\n  <property>\r\n    <name>jobTracker</name>\r\n    <value>localhost:8021</value>\r\n  </property>\r\n  <property>\r\n    <name>hue-id-b</name>\r\n    <value>22</value>\r\n  </property>\r\n</configuration>', u'bundleJobName': u'MyBundle3', u'startTime': None, u'bundleCoordJobs': [], u'kickoffTime': u'Mon, 11 Feb 2013 08:33:00 PST', u'acl': None, u'bundleJobPath': u'hdfs://localhost:8020/user/hue/oozie/workspaces/_romain_-oozie-22-1360636939.69', u'createdTime': u'Mon, 11 Feb 2013 19:22:53 PST', u'timeOut': 0, u'consoleUrl': None, u'bundleExternalId': None, u'timeUnit': u'NONE', u'pauseTime': None, u'bundleJobId': u'0000019-130210132208494-oozie-oozi-B', u'endTime': None, u'user': u'test'}
+  ]
+  BUNDLE_IDS = [bundle['bundleJobId'] for bundle in JSON_BUNDLE_LIST]
+  BUNDLE_DICT = dict([(bundle['bundleJobId'], bundle) for bundle in JSON_BUNDLE_LIST])
+
   WORKFLOW_ACTION = {u'status': u'OK', u'retries': 0, u'transition': u'end', u'stats': None, u'startTime': u'Fri, 10 Aug 2012 05:24:21 GMT', u'toString': u'Action name[WordCount] status[OK]', u'cred': u'null', u'errorMessage': None, u'errorCode': None, u'consoleUrl': u'http://localhost:50030/jobdetails.jsp?jobid=job_201208072118_0044', u'externalId': u'job_201208072118_0044', u'externalStatus': u'SUCCEEDED', u'conf': u'<map-reduce xmlns="uri:oozie:workflow:0.2">\r\n  <job-tracker>localhost:8021</job-tracker>\r\n  <name-node>hdfs://localhost:8020</name-node>\r\n  <configuration>\r\n    <property>\r\n      <name>mapred.mapper.regex</name>\r\n      <value>dream</value>\r\n    </property>\r\n    <property>\r\n      <name>mapred.input.dir</name>\r\n      <value>/user/test/words/20120702</value>\r\n    </property>\r\n    <property>\r\n      <name>mapred.output.dir</name>\r\n      <value>/user/test/out/rrwords/20120702</value>\r\n    </property>\r\n    <property>\r\n      <name>mapred.mapper.class</name>\r\n      <value>org.apache.hadoop.mapred.lib.RegexMapper</value>\r\n    </property>\r\n    <property>\r\n      <name>mapred.combiner.class</name>\r\n      <value>org.apache.hadoop.mapred.lib.LongSumReducer</value>\r\n    </property>\r\n    <property>\r\n      <name>mapred.reducer.class</name>\r\n      <value>org.apache.hadoop.mapred.lib.LongSumReducer</value>\r\n    </property>\r\n    <property>\r\n      <name>mapred.output.key.class</name>\r\n      <value>org.apache.hadoop.io.Text</value>\r\n    </property>\r\n    <property>\r\n      <name>mapred.output.value.class</name>\r\n      <value>org.apache.hadoop.io.LongWritable</value>\r\n    </property>\r\n  </configuration>\r\n</map-reduce>', u'type': u'map-reduce', u'trackerUri': u'localhost:8021', u'externalChildIDs': None, u'endTime': u'Fri, 10 Aug 2012 05:24:38 GMT', u'data': None, u'id': u'0000012-120725142744176-oozie-oozi-W@WordCount', u'name': u'WordCount'}
-  COORDINATOR_ACTIONS = [{u'status': u'SUCCEEDED', u'toString': u'WorkflowAction name[0000000-130117135211239-oozie-oozi-C@1] status[SUCCEEDED]', u'runConf': None, u'errorMessage': None, u'missingDependencies': u'', u'coordJobId': u'0000000-130117135211239-oozie-oozi-C', u'errorCode': None, u'actionNumber': 1, u'consoleUrl': None, u'nominalTime': u'Mon, 31 Dec 2012 16:00:00 PST', u'externalStatus': u'', u'createdConf': None, u'createdTime': u'Fri, 25 Jan 2013 10:53:39 PST', u'externalId': u'0000035-130124125317829-oozie-oozi-W', u'lastModifiedTime': u'Fri, 25 Jan 2013 10:53:51 PST', u'type': None, u'id': u'0000000-130117135211239-oozie-oozi-C@1', u'trackerUri': None}, {u'status': u'SUCCEEDED', u'toString': u'WorkflowAction name[0000000-130117135211239-oozie-oozi-C@2] status[SUCCEEDED]', u'runConf': None, u'errorMessage': None, u'missingDependencies': u'', u'coordJobId': u'0000000-130117135211239-oozie-oozi-C', u'errorCode': None, u'actionNumber': 2, u'consoleUrl': None, u'nominalTime': u'Tue, 01 Jan 2013 16:00:00 PST', u'externalStatus': u'', u'createdConf': None, u'createdTime': u'Fri, 25 Jan 2013 10:56:27 PST', u'externalId': u'0000038-130124125317829-oozie-oozi-W', u'lastModifiedTime': u'Fri, 25 Jan 2013 10:56:41 PST', u'type': None, u'id': u'0000000-130117135211239-oozie-oozi-C@2', u'trackerUri': None}, {u'status': u'SUCCEEDED', u'toString': u'WorkflowAction name[0000000-130117135211239-oozie-oozi-C@3] status[SUCCEEDED]', u'runConf': None, u'errorMessage': None, u'missingDependencies': u'', u'coordJobId': u'0000000-130117135211239-oozie-oozi-C', u'errorCode': None, u'actionNumber': 3, u'consoleUrl': None, u'nominalTime': u'Wed, 02 Jan 2013 16:00:00 PST', u'externalStatus': u'', u'createdConf': None, u'createdTime': u'Fri, 25 Jan 2013 08:59:38 PST', u'externalId': u'0000026-130124125317829-oozie-oozi-W', u'lastModifiedTime': u'Fri, 25 Jan 2013 09:00:05 PST', u'type': None, u'id': u'0000000-130117135211239-oozie-oozi-C@3', u'trackerUri': None}, {u'status': u'SUCCEEDED', u'toString': u'WorkflowAction name[0000000-130117135211239-oozie-oozi-C@4] status[SUCCEEDED]', u'runConf': None, u'errorMessage': None, u'missingDependencies': u'', u'coordJobId': u'0000000-130117135211239-oozie-oozi-C', u'errorCode': None, u'actionNumber': 4, u'consoleUrl': None, u'nominalTime': u'Thu, 03 Jan 2013 16:00:00 PST', u'externalStatus': u'', u'createdConf': None, u'createdTime': u'Fri, 25 Jan 2013 10:53:39 PST', u'externalId': u'0000037-130124125317829-oozie-oozi-W', u'lastModifiedTime': u'Fri, 25 Jan 2013 10:54:17 PST', u'type': None, u'id': u'0000000-130117135211239-oozie-oozi-C@4', u'trackerUri': None}]
+
+  JSON_ACTION_BUNDLE_LIST = [
+      {u'status': u'SUCCEEDED', u'toString': u'WorkflowAction name[0000000-130117135211239-oozie-oozi-C@1] status[SUCCEEDED]', u'runConf': None, u'errorMessage': None, u'missingDependencies': u'', u'coordJobId': u'0000000-130117135211239-oozie-oozi-C', u'errorCode': None, u'actionNumber': 1, u'consoleUrl': None, u'nominalTime': u'Mon, 31 Dec 2012 16:00:00 PST', u'externalStatus': u'', u'createdConf': None, u'createdTime': u'Fri, 25 Jan 2013 10:53:39 PST', u'externalId': u'0000035-130124125317829-oozie-oozi-W', u'lastModifiedTime': u'Fri, 25 Jan 2013 10:53:51 PST', u'type': None, u'id': u'0000000-130117135211239-oozie-oozi-C@1', u'trackerUri': None},
+      {u'status': u'SUCCEEDED', u'toString': u'WorkflowAction name[0000000-130117135211239-oozie-oozi-C@2] status[SUCCEEDED]', u'runConf': None, u'errorMessage': None, u'missingDependencies': u'', u'coordJobId': u'0000000-130117135211239-oozie-oozi-C', u'errorCode': None, u'actionNumber': 2, u'consoleUrl': None, u'nominalTime': u'Tue, 01 Jan 2013 16:00:00 PST', u'externalStatus': u'', u'createdConf': None, u'createdTime': u'Fri, 25 Jan 2013 10:56:27 PST', u'externalId': u'0000038-130124125317829-oozie-oozi-W', u'lastModifiedTime': u'Fri, 25 Jan 2013 10:56:41 PST', u'type': None, u'id': u'0000000-130117135211239-oozie-oozi-C@2', u'trackerUri': None},
+      {u'status': u'SUCCEEDED', u'toString': u'WorkflowAction name[0000000-130117135211239-oozie-oozi-C@3] status[SUCCEEDED]', u'runConf': None, u'errorMessage': None, u'missingDependencies': u'', u'coordJobId': u'0000000-130117135211239-oozie-oozi-C', u'errorCode': None, u'actionNumber': 3, u'consoleUrl': None, u'nominalTime': u'Wed, 02 Jan 2013 16:00:00 PST', u'externalStatus': u'', u'createdConf': None, u'createdTime': u'Fri, 25 Jan 2013 08:59:38 PST', u'externalId': u'0000026-130124125317829-oozie-oozi-W', u'lastModifiedTime': u'Fri, 25 Jan 2013 09:00:05 PST', u'type': None, u'id': u'0000000-130117135211239-oozie-oozi-C@3', u'trackerUri': None},
+      {u'status': u'SUCCEEDED', u'toString': u'WorkflowAction name[0000000-130117135211239-oozie-oozi-C@4] status[SUCCEEDED]', u'runConf': None, u'errorMessage': None, u'missingDependencies': u'', u'coordJobId': u'0000000-130117135211239-oozie-oozi-C', u'errorCode': None, u'actionNumber': 4, u'consoleUrl': None, u'nominalTime': u'Thu, 03 Jan 2013 16:00:00 PST', u'externalStatus': u'', u'createdConf': None, u'createdTime': u'Fri, 25 Jan 2013 10:53:39 PST', u'externalId': u'0000037-130124125317829-oozie-oozi-W', u'lastModifiedTime': u'Fri, 25 Jan 2013 10:54:17 PST', u'type': None, u'id': u'0000000-130117135211239-oozie-oozi-C@4', u'trackerUri': None}
+  ]
+  BUNDLE_ACTION = {u'startTime': u'Mon, 31 Dec 2012 16:00:00 PST', u'actions': [], u'frequency': 1, u'concurrency': 1, u'pauseTime': None, u'group': None, u'toString': u'Coordinator application id[0000022-130210132208494-oozie-oozi-C] status[SUCCEEDED]', u'consoleUrl': None, u'mat_throttling': 12, u'status': u'SUCCEEDED', u'conf': u'<configuration>\r\n  <property>\r\n    <name>oozie.coord.application.path</name>\r\n    <value>hdfs://localhost:8020/user/hue/oozie/deployments/_romain_-oozie-6-1360649203.56</value>\r\n  </property>\r\n  <property>\r\n    <name>oozie.bundle.application.path</name>\r\n    <value>hdfs://localhost:8020/user/hue/oozie/workspaces/_romain_-oozie-22-1360636939.69</value>\r\n  </property>\r\n  <property>\r\n    <name>market</name>\r\n    <value>France</value>\r\n  </property>\r\n  <property>\r\n    <name>user.name</name>\r\n    <value>romain</value>\r\n  </property>\r\n  <property>\r\n    <name>oozie.use.system.libpath</name>\r\n    <value>true</value>\r\n  </property>\r\n  <property>\r\n    <name>oozie.bundle.id</name>\r\n    <value>0000021-130210132208494-oozie-oozi-B</value>\r\n  </property>\r\n  <property>\r\n    <name>nameNode</name>\r\n    <value>hdfs://localhost:8020</value>\r\n  </property>\r\n  <property>\r\n    <name>wf_application_path</name>\r\n    <value>hdfs://localhost:8020/user/hue/oozie/deployments/_romain_-oozie-5-1360649203.07</value>\r\n  </property>\r\n  <property>\r\n    <name>jobTracker</name>\r\n    <value>localhost:8021</value>\r\n  </property>\r\n  <property>\r\n    <name>hue-id-b</name>\r\n    <value>22</value>\r\n  </property>\r\n</configuration>', u'user': u'romain', u'timeOut': 120, u'coordJobPath': u'hdfs://localhost:8020/user/hue/oozie/deployments/_romain_-oozie-6-1360649203.56', u'timeUnit': u'DAY', u'coordJobId': u'0000022-130210132208494-oozie-oozi-C', u'coordJobName': u'DailySleep', u'nextMaterializedTime': u'Fri, 04 Jan 2013 16:00:00 PST', u'coordExternalId': None, u'acl': None, u'lastAction': u'Fri, 04 Jan 2013 16:00:00 PST', u'executionPolicy': u'FIFO', u'timeZone': u'America/Los_Angeles', u'endTime': u'Fri, 04 Jan 2013 16:00:00 PST'}
 
   def __init__(self, *args, **kwargs):
     pass
@@ -95,6 +110,13 @@ class MockOozieApi:
 
     return CoordinatorList(self, {'offset': 0, 'total': 5, 'coordinatorjobs': coordinatorjobs})
 
+  def get_bundles(self, **kwargs):
+    bundlejobs = MockOozieApi.JSON_BUNDLE_LIST
+    if 'user' in kwargs:
+      bundlejobs = filter(lambda coord: coord['user'] == kwargs['user'], bundlejobs)
+
+    return BundleList(self, {'offset': 0, 'total': 4, 'bundlejobs': bundlejobs})
+
   def get_job(self, job_id):
     if job_id in MockOozieApi.WORKFLOW_DICT:
       return OozieWorkflow(self, MockOozieApi.WORKFLOW_DICT[job_id])
@@ -105,7 +127,10 @@ class MockOozieApi:
     if job_id in MockOozieApi.COORDINATOR_DICT:
       return OozieCoordinator(self, MockOozieApi.COORDINATOR_DICT[job_id])
     else:
-      return OozieCoordinator(self, {'id': job_id, 'actions': MockOozieApi.COORDINATOR_ACTIONS})
+      return OozieCoordinator(self, {'id': job_id, 'actions': []})
+
+  def get_bundle(self, job_id):
+    return OozieBundle(self, MockOozieApi.JSON_BUNDLE_LIST[0])
 
   def get_action(self, action_id):
     return WorkflowAction(MockOozieApi.WORKFLOW_ACTION)
@@ -1191,7 +1216,7 @@ class TestEditor(OozieMockBase):
     create_dataset(coord, self.c)
     create_coordinator_data(coord, self.c)
 
-    assert_equal([{'name': u'output', 'value': ''}, {'name': u'SLEEP', 'value': ''}, {'name': u'market', 'value': u'US,France'}],
+    assert_equal([{'name': u'output', 'value': ''}, {'name': u'SLEEP', 'value': ''}, {'name': u'market', 'value': u'US'}],
                  coord.find_all_parameters())
 
 
@@ -1222,6 +1247,120 @@ class TestEditor(OozieMockBase):
     resp = self.c.get('/oozie/list_workflows/')
     assert_false('"><script>alert(1);</script>' in resp.content, resp.content)
     assert_true('&quot;&gt;&lt;script&gt;alert(1);&lt;/script&gt;' in resp.content, resp.content)
+
+
+class TestEditorBundle(OozieMockBase):
+
+  def setUp(self):
+    super(TestEditorBundle, self).setUp()
+    self.setup_simple_workflow()
+
+
+  def test_create_bundle(self):
+    create_bundle(self.c)
+
+
+  def test_clone_bundle(self):
+    bundle = create_bundle(self.c)
+    bundle_count = Bundle.objects.count()
+
+    response = self.c.post(reverse('oozie:clone_bundle', args=[bundle.id]), {}, follow=True)
+
+    bundle2 = Bundle.objects.latest('id')
+    assert_not_equal(bundle.id, bundle2.id)
+    assert_equal(bundle_count + 1, Bundle.objects.count(), response)
+
+    assert_equal(bundle.coordinators.count(), bundle.coordinators.all().count())
+
+    coord_ids = set(bundle.coordinators.values_list('id', flat=True))
+    coord2_ids = set(bundle2.coordinators.values_list('id', flat=True))
+
+    if coord_ids or coord2_ids:
+      assert_not_equal(coord_ids, coord2_ids)
+
+    assert_not_equal(bundle.deployment_dir, bundle2.deployment_dir)
+    assert_not_equal('', bundle2.deployment_dir)
+
+
+  def test_delete_bundle(self):
+    bundle = create_bundle(self.c)
+    bundle_count = Bundle.objects.count()
+
+    response = self.c.post(reverse('oozie:delete_bundle', args=[bundle.id]), {}, follow=True)
+
+    assert_equal(bundle_count - 1, Bundle.objects.count(), response)
+
+
+  def test_bundle_gen_xml(self):
+    bundle = create_bundle(self.c)
+
+    assert_true(
+"""<bundle-app name="MyBundle"
+  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+  xmlns="uri:oozie:coordinator:0.1">
+  <parameters>
+    <property>
+        <name>market</name>
+        <value>US,France</value>
+    </property>
+  </parameters>
+  <controls>
+     <kick-off-time>2012-07-01T00:00Z</kick-off-time>
+  </controls>
+</bundle-app>
+""" in bundle.to_xml(), bundle.to_xml())
+
+
+  def test_create_bundled_coordinator(self):
+    bundle = create_bundle(self.c)
+    coord = create_coordinator(self.wf, self.c)
+
+    post = {
+        u'name': [u'test2'], u'kick_off_time_0': [u'02/12/2013'], u'kick_off_time_1': [u'05:05 PM'],
+        u'create-bundled-coordinator-parameters': [u'[{"name":"market","value":"US"}]'],
+        u'schema_version': [u'uri:oozie:bundle:0.2', u'uri:oozie:bundle:0.2'], u'coordinators-MAX_NUM_FORMS': [u'0'],
+        u'coordinators-INITIAL_FORMS': [u'0'],
+        #u'create-bundled-coordinator-coordinator': [u'?'],
+        u'parameters': [u'[{"name":"oozie.use.system.libpath","value":"true"}]'], u'coordinators-TOTAL_FORMS': [u'0'],
+        u'description': [u'ss']
+    }
+
+    response = self.c.get(reverse('oozie:create_bundled_coordinator', args=[bundle.id]))
+    assert_true('Add coordinator' in response.content, response.content)
+
+    response = self.c.post(reverse('oozie:create_bundled_coordinator', args=[bundle.id]), post, follow=True)
+    assert_true('This field is required' in response.content, response.content)
+
+    post['create-bundled-coordinator-coordinator'] = ['%s' % coord.id]
+    response = self.c.post(reverse('oozie:create_bundled_coordinator', args=[bundle.id]), post, follow=True)
+    assert_true('Coordinators' in response.content, response.content)
+
+    assert_true(
+"""<bundle-app name="MyBundle"
+  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+  xmlns="uri:oozie:coordinator:0.1">
+  <parameters>
+    <property>
+        <name>market</name>
+        <value>US,France</value>
+    </property>
+  </parameters>
+  <controls>
+     <kick-off-time>2012-07-01T00:00Z</kick-off-time>
+  </controls>
+    <coordinator name='MyCoord' >
+       <app-path>${nameNode}/user/hue/oozie/workspaces""" in bundle.to_xml(), bundle.to_xml())
+
+    assert_true(
+"""</app-path>
+         <configuration>
+           <property>
+              <name>market</name>
+              <value>US</value>
+          </property>
+        </configuration>
+    </coordinator>
+</bundle-app>""" in bundle.to_xml(), bundle.to_xml())
 
 
 class TestImportWorkflow04(OozieMockBase):
@@ -1691,6 +1830,106 @@ class TestPermissions(OozieBase):
     assert_equal(200, response.status_code)
 
 
+  def test_bundle_permissions(self):
+    bundle = create_bundle(self.c)
+
+    response = self.c.get(reverse('oozie:edit_bundle', args=[bundle.id]))
+    assert_true('Editor' in response.content, response.content)
+    assert_true('MyBundle' in response.content, response.content)
+    assert_true('Save' in response.content, response.content)
+    assert_false(bundle.is_shared)
+
+    # Login as someone else
+    client_not_me = make_logged_in_client(username='not_me', is_superuser=False, groupname='test')
+    grant_access("not_me", "test", "oozie")
+
+    # List
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      response = client_not_me.get(reverse('oozie:list_bundles'))
+      assert_false('MyBundle' in response.content, response.content)
+    finally:
+      finish()
+    finish = SHARE_JOBS.set_for_testing(False)
+    try:
+      response = client_not_me.get(reverse('oozie:list_bundles'))
+      assert_false('MyBundle' in response.content, response.content)
+    finally:
+      finish()
+
+    # View
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      response = client_not_me.get(reverse('oozie:edit_bundle', args=[bundle.id]))
+      assert_true('Permission denied' in response.content, response.content)
+    finally:
+      finish()
+
+    finish = SHARE_JOBS.set_for_testing(False)
+    try:
+      response = client_not_me.get(reverse('oozie:edit_bundle', args=[bundle.id]))
+      assert_true('Permission denied' in response.content, response.content)
+    finally:
+      finish()
+
+    # Share it !
+    bundle.is_shared = True
+    bundle.save()
+
+    # List
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      response = client_not_me.get(reverse('oozie:list_bundles'))
+      assert_equal(200, response.status_code)
+      assert_true('MyBundle' in response.content, response.content)
+    finally:
+      finish()
+
+    # View
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      response = client_not_me.get(reverse('oozie:edit_bundle', args=[bundle.id]))
+      assert_false('Permission denied' in response.content, response.content)
+    finally:
+      finish()
+
+    finish = SHARE_JOBS.set_for_testing(False)
+    try:
+      response = client_not_me.get(reverse('oozie:edit_bundle', args=[bundle.id]))
+      assert_true('Permission denied' in response.content, response.content)
+    finally:
+      finish()
+
+    # Submit
+    finish = SHARE_JOBS.set_for_testing(False)
+    try:
+      response = client_not_me.post(reverse('oozie:submit_bundle', args=[bundle.id]))
+      assert_true('Permission denied' in response.content, response.content)
+    finally:
+      finish()
+
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      try:
+        response = client_not_me.post(reverse('oozie:submit_bundle', args=[bundle.id]))
+        assert_false('Permission denied' in response.content, response.content)
+      except IOError:
+        pass
+    finally:
+      finish()
+
+    # Delete
+    finish = SHARE_JOBS.set_for_testing(False)
+    try:
+      response = client_not_me.post(reverse('oozie:delete_bundle', args=[bundle.id]))
+      assert_true('Permission denied' in response.content, response.content)
+    finally:
+      finish()
+
+    response = self.c.post(reverse('oozie:delete_bundle', args=[bundle.id]), follow=True)
+    assert_equal(200, response.status_code)
+
+
 class TestEditorWithOozie(OozieBase):
 
   def setUp(self):
@@ -1886,6 +2125,16 @@ class TestDashboard(OozieMockBase):
     assert_true(('%s/resume' % MockOozieApi.COORDINATOR_IDS[0]) in response.content, response.content)
 
 
+  def test_manage_bundles_dashboard(self):
+    # Display of buttons happens in js now
+    response = self.c.get(reverse('oozie:list_oozie_bundle', args=[MockOozieApi.BUNDLE_IDS[0]]), {}, follow=True)
+    assert_true(('%s/kill' % MockOozieApi.BUNDLE_IDS[0]) in response.content, response.content)
+    # Not supported yet
+    #assert_true(('rerun_oozie_bundle/%s' % MockOozieApi.BUNDLE_IDS[0]) in response.content, response.content)
+    assert_true(('%s/suspend' % MockOozieApi.BUNDLE_IDS[0]) in response.content, response.content)
+    assert_true(('%s/resume' % MockOozieApi.BUNDLE_IDS[0]) in response.content, response.content)
+
+
   def test_rerun_coordinator(self):
     response = self.c.get(reverse('oozie:rerun_oozie_coord', args=[MockOozieApi.WORKFLOW_IDS[0], '/path']))
     assert_true('Select actions to rerun' in response.content, response.content)
@@ -1939,6 +2188,12 @@ class TestDashboard(OozieMockBase):
       assert_true(coord_id in response.content, response.content)
 
 
+  def test_list_bundles(self):
+    response = self.c.get(reverse('oozie:list_oozie_bundles')+"?format=json")
+    for coord_id in MockOozieApi.BUNDLE_IDS:
+      assert_true(coord_id in response.content, response.content)
+
+
   def test_list_workflow(self):
     response = self.c.get(reverse('oozie:list_oozie_workflow', args=[MockOozieApi.WORKFLOW_IDS[0]]))
     assert_true('Workflow WordCount1' in response.content, response.content)
@@ -1955,6 +2210,12 @@ class TestDashboard(OozieMockBase):
     response = self.c.get(reverse('oozie:list_oozie_coordinator', args=[MockOozieApi.COORDINATOR_IDS[0]]))
     assert_true('Coordinator DailyWordCount1' in response.content, response.content)
     assert_true('Workflow' in response.content, response.content)
+
+
+  def test_list_bundle(self):
+    response = self.c.get(reverse('oozie:list_oozie_bundle', args=[MockOozieApi.BUNDLE_IDS[0]]))
+    assert_true('Bundle MyBundle1' in response.content, response.content)
+    assert_true('Coordinators' in response.content, response.content)
 
 
   def test_manage_oozie_jobs(self):
@@ -2062,6 +2323,44 @@ class TestDashboard(OozieMockBase):
     response = client_not_me.get(reverse('oozie:list_oozie_coordinator', args=[MockOozieApi.COORDINATOR_IDS[0]]))
     assert_false('Permission denied' in response.content, response.content)
 
+
+  def test_bundles_permissions(self):
+    response = self.c.get(reverse('oozie:list_oozie_bundles')+"?format=json")
+    assert_true('MyBundle1' in response.content, response.content)
+
+    # Login as someone else
+    client_not_me = make_logged_in_client(username='not_me', is_superuser=False, groupname='test', recreate=True)
+    grant_access("not_me", "not_me", "oozie")
+
+    response = client_not_me.get(reverse('oozie:list_oozie_bundles')+"?format=json")
+    assert_false('MyBundle1' in response.content, response.content)
+
+    # Add read only access
+    add_permission("not_me", "dashboard_jobs_access", "dashboard_jobs_access", "oozie")
+
+    response = client_not_me.get(reverse('oozie:list_oozie_bundles')+"?format=json")
+    assert_true('MyBundle1' in response.content, response.content)
+
+
+  def test_bundle_permissions(self):
+    response = self.c.get(reverse('oozie:list_oozie_bundle', args=[MockOozieApi.BUNDLE_IDS[0]]))
+    assert_true('MyBundle1' in response.content, response.content)
+    assert_false('Permission denied' in response.content, response.content)
+
+    # Login as someone else
+    client_not_me = make_logged_in_client(username='not_me', is_superuser=False, groupname='test', recreate=True)
+    grant_access("not_me", "not_me", "oozie")
+
+    response = client_not_me.get(reverse('oozie:list_oozie_bundle', args=[MockOozieApi.BUNDLE_IDS[0]]))
+    assert_true('Permission denied' in response.content, response.content)
+
+    # Add read only access
+    add_permission("not_me", "dashboard_jobs_access", "dashboard_jobs_access", "oozie")
+
+    response = client_not_me.get(reverse('oozie:list_oozie_bundle', args=[MockOozieApi.BUNDLE_IDS[0]]))
+    assert_false('Permission denied' in response.content, response.content)
+
+
   def test_good_workflow_status_graph(self):
     workflow_count = Workflow.objects.count()
 
@@ -2142,25 +2441,33 @@ class TestUtils(OozieMockBase):
 
 
 # Utils
-WORKFLOW_DICT = {u'deployment_dir': [u''], u'name': [u'wf-name-1'], u'description': [u''],
-                 u'schema_version': [u'uri:oozie:workflow:0.2'],
-                 u'parameters': [u'[{"name":"market","value":"US"}]'],
-                 u'job_xml': [u'jobconf.xml'],
-                 u'job_properties': [u'[{"name":"sleep-all","value":"${SLEEP}"}]']
+WORKFLOW_DICT = {
+    u'deployment_dir': [u''], u'name': [u'wf-name-1'], u'description': [u''],
+    u'schema_version': [u'uri:oozie:workflow:0.2'],
+    u'parameters': [u'[{"name":"market","value":"US"}]'],
+    u'job_xml': [u'jobconf.xml'],
+    u'job_properties': [u'[{"name":"sleep-all","value":"${SLEEP}"}]']
 }
-COORDINATOR_DICT = {u'name': [u'MyCoord'], u'description': [u'Description of my coordinator'],
-                    u'workflow': [u'1'],
-                    u'frequency_number': [u'1'], u'frequency_unit': [u'days'],
-                    u'start_0': [u'07/01/2012'], u'start_1': [u'12:00 AM'],
-                    u'end_0': [u'07/04/2012'], u'end_1': [u'12:00 AM'],
-                    u'timezone': [u'America/Los_Angeles'],
-                    u'parameters': [u'[{"name":"market","value":"US,France"}]'],
-                    u'job_properties': [u'[{"name":"username","value":"${coord:user()}"}]'],
-                    u'timeout': [u'100'],
-                    u'concurrency': [u'3'],
-                    u'execution': [u'FIFO'],
-                    u'throttle': [u'10'],
-                    u'schema_version': [u'uri:oozie:coordinator:0.1']
+COORDINATOR_DICT = {
+    u'name': [u'MyCoord'], u'description': [u'Description of my coordinator'],
+    u'workflow': [u'1'],
+    u'frequency_number': [u'1'], u'frequency_unit': [u'days'],
+    u'start_0': [u'07/01/2012'], u'start_1': [u'12:00 AM'],
+    u'end_0': [u'07/04/2012'], u'end_1': [u'12:00 AM'],
+    u'timezone': [u'America/Los_Angeles'],
+    u'parameters': [u'[{"name":"market","value":"US"}]'],
+    u'job_properties': [u'[{"name":"username","value":"${coord:user()}"}]'],
+    u'timeout': [u'100'],
+    u'concurrency': [u'3'],
+    u'execution': [u'FIFO'],
+    u'throttle': [u'10'],
+    u'schema_version': [u'uri:oozie:coordinator:0.1']
+}
+BUNDLE_DICT = {
+    u'name': [u'MyBundle'], u'description': [u'Description of my bundle'],
+    u'parameters': [u'[{"name":"market","value":"US,France"}]'],
+    u'kick_off_time_0': [u'07/01/2012'], u'kick_off_time_1': [u'12:00 AM'],
+    u'schema_version': [u'uri:oozie:coordinator:0.1']
 }
 
 
@@ -2225,6 +2532,19 @@ def create_coordinator(workflow, client):
   assert_equal(coord_count + 1, Coordinator.objects.count(), response)
 
   return Coordinator.objects.get(name='MyCoord')
+
+
+def create_bundle(client):
+  if not Bundle.objects.filter(name='MyBundle').exists():
+    bundle_count = Bundle.objects.count()
+    response = client.get(reverse('oozie:create_bundle'))
+    assert_equal(bundle_count, Bundle.objects.count(), response)
+
+    post = BUNDLE_DICT.copy()
+    response = client.post(reverse('oozie:create_bundle'), post)
+    assert_equal(bundle_count + 1, Bundle.objects.count(), response)
+
+  return Bundle.objects.get(name='MyBundle')
 
 
 def create_dataset(coord, client):

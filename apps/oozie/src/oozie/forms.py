@@ -27,7 +27,7 @@ from django.utils.translation import ugettext_lazy as _t
 from desktop.lib.django_forms import MultiForm, SplitDateTimeWidget
 from oozie.models import Workflow, Node, Java, Mapreduce, Streaming, Coordinator,\
   Dataset, DataInput, DataOutput, Pig, Link, Hive, Sqoop, Ssh, Shell, DistCp, Fs,\
-  Email, SubWorkflow, Generic
+  Email, SubWorkflow, Generic, Bundle, BundledCoordinator
 
 
 LOG = logging.getLogger(__name__)
@@ -450,6 +450,35 @@ class RerunCoordForm(forms.Form):
     super(RerunCoordForm, self).__init__(*args, **kwargs)
 
     self.fields['actions'].choices = [(action.actionNumber, action.title) for action in reversed(oozie_coordinator.get_working_actions())]
+
+
+class BundledCoordinatorForm(forms.ModelForm):
+
+  def __init__(self, *args, **kwargs):
+    super(BundledCoordinatorForm, self).__init__(*args, **kwargs)
+    self.fields['coordinator'].empty_label = None
+
+  class Meta:
+    model = BundledCoordinator
+    exclude = ('bundle',)
+    widgets = {
+      'parameters': forms.widgets.HiddenInput(),
+    }
+
+
+class BundleForm(forms.ModelForm):
+  kick_off_time = forms.SplitDateTimeField(input_time_formats=[TIME_FORMAT],
+                                           widget=SplitDateTimeWidget(attrs={'class': 'input-small', 'id': 'bundle_kick_off_time'},
+                                                                      date_format=DATE_FORMAT, time_format=TIME_FORMAT))
+
+  class Meta:
+    model = Bundle
+    exclude = ('owner', 'coordinators')
+    widgets = {
+      'description': forms.TextInput(attrs={'class': 'span5'}),
+      'parameters': forms.widgets.HiddenInput(),
+      'schema_version': forms.widgets.HiddenInput(),
+    }
 
 
 def design_form_by_type(node_type, user, workflow):

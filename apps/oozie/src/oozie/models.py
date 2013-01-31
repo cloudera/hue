@@ -139,6 +139,10 @@ class Job(models.Model):
       return self.coordinator
     except Coordinator.DoesNotExist:
       pass
+    try:
+      return self.bundle
+    except Bundle.DoesNotExist:
+      pass
 
   def get_type(self):
     return self.get_full_node().get_type()
@@ -1419,6 +1423,86 @@ class DataOutput(models.Model):
   unique_together = ('coordinator', 'name')
 
 
+class BundledCoordinator(models.Model):
+  bundle = models.ForeignKey('Bundle', verbose_name=_t('Bundle'),
+                             help_text=_t('The bundle regrouping all the coordinators.'))
+  coordinator = models.ForeignKey(Coordinator, verbose_name=_t('Coordinator'),
+                                  help_text=_t('The coordinator to batch with other coordinators.'))
+
+  parameters = models.TextField(default='[{"name":"oozie.use.system.libpath","value":"true"}]', verbose_name=_t('Oozie parameters'),
+                                help_text=_t('Constants used at the submission time (e.g. market=US, oozie.use.system.libpath=true).'))
+
+  def get_parameters(self):
+    return json.loads(self.parameters)
+
+
+class Bundle(Job):
+  """
+  http://oozie.apache.org/docs/3.3.0/BundleFunctionalSpec.html
+  """
+  kick_off_time = models.DateTimeField(default=datetime.today(), verbose_name=_t('Start'),
+                                       help_text=_t('When to start the first coordinators.'))
+  coordinators = models.ManyToManyField(Coordinator, through='BundledCoordinator')
+
+  HUE_ID = 'hue-id-b'
+
+  def get_type(self):
+    return 'bundle'
+
+  def to_xml(self, mapping=None):
+    if mapping is None:
+      mapping = {}
+    tmpl = "editor/gen/bundle.xml.mako"
+    return re.sub(re.compile('\s*\n+', re.MULTILINE), '\n', django_mako.render_to_string(tmpl, {'bundle': self, 'mapping': mapping}))
+
+  def clone(self, new_owner=None):
+    bundleds = BundledCoordinator.objects.filter(bundle=self)
+
+    copy = self
+    copy.pk = None
+    copy.id = None
+    copy.name += '-copy'
+    copy.deployment_dir = ''
+    if new_owner is not None:
+      copy.owner = new_owner
+    copy.save()
+
+    for bundled in bundleds:
+      bundled.pk = None
+      bundled.id = None
+      bundled.bundle = copy
+      bundled.save()
+
+    return copy
+
+  @classmethod
+  def get_application_path_key(cls):
+    return 'oozie.bundle.application.path'
+
+  @classmethod
+  def get_application_filename(cls):
+    return 'bundle.xml'
+
+  def get_absolute_url(self):
+    return reverse('oozie:edit_bundle', kwargs={'bundle': self.id})
+
+  def find_parameters(self):
+    params = {}
+
+    for bundled in self.coordinators.all():
+      for param in bundled.coordinator.find_parameters():
+        params[param] = ''
+
+      for param in find_parameters(bundled, ['parameters']):
+        params[param] = ''
+
+    return params
+
+  @property
+  def kick_off_time_utc(self):
+    return utc_datetime_format(self.kick_off_time)
+
+
 class HistoryManager(models.Manager):
   def create_from_submission(self, submission):
     History.objects.create(submitter=submission.user,
@@ -1448,6 +1532,8 @@ class History(models.Model):
 
     if self.oozie_job_id.endswith('C'):
       view = 'oozie:list_oozie_coordinator'
+    elif self.oozie_job_id.endswith('B'):
+      view = 'oozie:list_oozie_bundle'
 
     return reverse(view, kwargs={'job_id': self.oozie_job_id})
 

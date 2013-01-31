@@ -17,27 +17,11 @@
 
 import logging
 
-
-from django.core.urlresolvers import reverse
-from django.db.models import Q
-from django.forms.formsets import formset_factory
-from django.forms.models import inlineformset_factory, modelformset_factory
-from django.http import HttpResponse
-from django.shortcuts import redirect
-from django.utils.functional import curry, wraps
-from django.utils.translation import ugettext as _
-
-from desktop.lib.django_util import render, extract_field_data
+from django.utils.functional import wraps
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.rest.http_client import RestException
-from hadoop.fs.exceptions import WebHdfsException
-from jobsub.models import OozieDesign
-from liboozie.submittion import Submission
 
-from oozie.models import Job, Workflow, Node, Link, History, Coordinator,\
-  Mapreduce, Java, Streaming, Pig, Hive, Sqoop, Ssh, Shell, DistCp, Decision, Dataset
-from oozie.forms import NodeForm, WorkflowForm, CoordinatorForm, DatasetForm,\
-  DefaultLinkForm, design_form_by_type, ImportJobsubDesignForm, ParameterForm
+from oozie.models import Job, Node, Dataset
+
 
 LOG = logging.getLogger(__name__)
 
@@ -55,8 +39,10 @@ def check_job_access_permission(exception_class=PopupException):
     def decorate(request, *args, **kwargs):
       if 'workflow' in kwargs:
         job_type = 'workflow'
-      else:
+      elif 'coordinator' in kwargs:
         job_type = 'coordinator'
+      else:
+        job_type = 'bundle'
 
       job = kwargs.get(job_type)
       if job is not None:
@@ -78,8 +64,10 @@ def check_job_edition_permission(authorize_get=False, exception_class=PopupExcep
     def decorate(request, *args, **kwargs):
       if 'workflow' in kwargs:
         job_type = 'workflow'
-      else:
+      elif 'coordinator' in kwargs:
         job_type = 'coordinator'
+      else:
+        job_type = 'bundle'
 
       job = kwargs.get(job_type)
       if job is not None and not (authorize_get and request.method == 'GET'):

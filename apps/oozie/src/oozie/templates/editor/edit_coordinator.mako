@@ -132,7 +132,7 @@ ${ layout.menubar(section='coordinators') }
             <div class="fieldWrapper">
               <div class="row-fluid">
                   <div class="alert alert-warning">
-                    ${ _('UTC time only! (e.g. if you want 10pm PST (UTC+8) set it 8 hours later to 6am the next day.') }
+                    ${ _('UTC time only. (e.g. if you want 10pm PST (UTC+8) set it 8 hours later to 6am the next day.') }
                   </div>
               </div>
               <div class="row-fluid">
@@ -329,7 +329,7 @@ ${ layout.menubar(section='coordinators') }
                 % for hidden in form.hidden_fields():
                   ${ hidden | n,unicode }
                 % endfor
-                <tr>
+                <tr title="${ _('Click to view the dataset') }" rel="tooltip">
                   <td>
                   % if coordinator.is_editable(user):
                     <a href="javascript:void(0)" class="editDataset" data-url="${ url('oozie:edit_coordinator_dataset', dataset=form.instance.id) }" data-row-selector="true"/>

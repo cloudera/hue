@@ -52,7 +52,7 @@ class Action(object):
 
   @classmethod
   def create(self, action_class, action_dict):
-    if ControlFlowAction.is_control_flow(action_dict['type']):
+    if ControlFlowAction.is_control_flow(action_dict.get('type')):
       return ControlFlowAction(action_dict)
     else:
       return action_class(action_dict)
@@ -110,6 +110,60 @@ class ControlFlowAction(Action):
     self.conf_dict = {}
 
 
+class WorkflowAction(Action):
+  _ATTRS = [
+    'conf',
+    'consoleUrl',
+    'data',
+    'endTime',
+    'errorCode',
+    'errorMessage',
+    'externalId',
+    'externalStatus',
+    'id',
+    'name',
+    'retries',
+    'startTime',
+    'status',
+    'trackerUri',
+    'transition',
+    'type',
+  ]
+
+  def _fixup(self):
+    """
+    Fixup:
+      - time fields as struct_time
+      - config dict
+    """
+    super(WorkflowAction, self)._fixup()
+
+    if self.startTime:
+      self.startTime = parse_timestamp(self.startTime)
+    if self.endTime:
+      self.endTime = parse_timestamp(self.endTime)
+    if self.retries:
+      self.retries = int(self.retries)
+
+    if self.conf:
+      xml = StringIO(i18n.smart_str(self.conf))
+      self.conf_dict = hadoop.confparse.ConfParse(xml)
+    else:
+      self.conf_dict = {}
+
+    if self.externalId is not None and not re.match('job_.*', self.externalId):
+      self.externalId = None
+
+  def get_absolute_url(self):
+    kwargs = {'action': self.id}
+    if hasattr(self, 'oozie_coordinator') and self.oozie_coordinator:
+      kwargs['coordinator_job_id'] = self.oozie_coordinator.id
+    if hasattr(self, 'oozie_bundle') and self.oozie_bundle:
+      kwargs['bundle_job_id'] = self.oozie_bundle.id
+
+    return reverse('oozie:list_oozie_workflow_action', kwargs=kwargs)
+
+
 class CoordinatorAction(Action):
   _ATTRS = [
     'status',
@@ -154,24 +208,33 @@ class CoordinatorAction(Action):
 
     self.title = ' %s-%s'% (self.actionNumber, format_time(self.nominalTime))
 
-class WorkflowAction(Action):
+
+class BundleAction(Action):
   _ATTRS = [
-    'conf',
-    'consoleUrl',
-    'data',
-    'endTime',
-    'errorCode',
-    'errorMessage',
-    'externalId',
-    'externalStatus',
-    'id',
-    'name',
-    'retries',
-    'startTime',
-    'status',
-    'trackerUri',
-    'transition',
-    'type',
+      'startTime',
+      'actions',
+      'frequency',
+      'concurrency',
+      'pauseTime',
+      'group',
+      'toString',
+      'consoleUrl',
+      'mat_throttling',
+      'status',
+      'conf',
+      'user',
+      'timeOut',
+      'coordJobPath',
+      'timeUnit',
+      'coordJobId',
+      'coordJobName',
+      'nextMaterializedTime',
+      'coordExternalId',
+      'acl',
+      'lastAction',
+      'executionPolicy',
+      'timeZone',
+      'endTime'
   ]
 
   def _fixup(self):
@@ -180,23 +243,16 @@ class WorkflowAction(Action):
       - time fields as struct_time
       - config dict
     """
-    super(WorkflowAction, self)._fixup()
+    super(BundleAction, self)._fixup()
 
-    if self.startTime:
-      self.startTime = parse_timestamp(self.startTime)
-    if self.endTime:
-      self.endTime = parse_timestamp(self.endTime)
-    if self.retries:
-      self.retries = int(self.retries)
+    self.type = 'coord-action'
+    self.name = self.coordJobName
 
     if self.conf:
       xml = StringIO(i18n.smart_str(self.conf))
       self.conf_dict = hadoop.confparse.ConfParse(xml)
     else:
       self.conf_dict = {}
-
-    if self.externalId is not None and not re.match('job_.*', self.externalId):
-      self.externalId = None
 
 
 class Job(object):
@@ -300,6 +356,55 @@ class Job(object):
     return '%s - %s' % (self.id, self.status)
 
 
+class Workflow(Job):
+  _ATTRS = [
+    'actions',
+    'appName',
+    'appPath',
+    'conf',
+    'consoleUrl',
+    'createdTime',
+    'endTime',
+    'externalId',
+    'group',
+    'id',
+    'lastModTime',
+    'run',
+    'startTime',
+    'status',
+    'user',
+    'acl',
+    'parentId'
+  ]
+  ACTION = WorkflowAction
+
+  def _fixup(self):
+    super(Workflow, self)._fixup()
+
+    if self.createdTime:
+      self.createdTime = parse_timestamp(self.createdTime)
+    if self.lastModTime:
+      self.lastModTime = parse_timestamp(self.lastModTime)
+    if self.run:
+      self.run = int(self.run)
+
+  @property
+  def type(self):
+    return 'Workflow'
+
+  def get_absolute_url(self):
+    kwargs = {'job_id': self.id}
+    if hasattr(self, 'oozie_coordinator') and self.oozie_coordinator:
+      kwargs['coordinator_job_id'] = self.oozie_coordinator.id
+    if hasattr(self, 'oozie_bundle') and self.oozie_bundle:
+      kwargs['bundle_job_id'] = self.oozie_bundle.id
+    return reverse('oozie:list_oozie_workflow', kwargs=kwargs)
+
+  def get_progress(self):
+    """How many actions are finished on the total of actions."""
+    return int(sum([action.is_finished() for action in self.actions]) / float(max(len(self.actions), 1)) * 100)
+
+
 class Coordinator(Job):
   _ATTRS = [
     'acl',
@@ -344,8 +449,11 @@ class Coordinator(Job):
   def type(self):
     return 'Coordinator'
 
-  def get_absolute_url(self):
-    return reverse('oozie:list_oozie_coordinator', kwargs={'job_id': self.id})
+  def get_absolute_url(self, oozie_bundle=None):
+    kwargs = {'job_id': self.id}
+    if oozie_bundle:
+      kwargs.update({'bundle_job_id': oozie_bundle.id})
+    return reverse('oozie:list_oozie_coordinator', kwargs=kwargs)
 
   def get_progress(self):
     """How much more time before the final materialization."""
@@ -384,53 +492,54 @@ class Coordinator(Job):
     return result
 
 
-class Workflow(Job):
+class Bundle(Job):
   _ATTRS = [
-    'actions',
-    'appName',
-    'appPath',
-    'conf',
-    'consoleUrl',
-    'createdTime',
-    'endTime',
-    'externalId',
-    'group',
-    'id',
-    'lastModTime',
-    'run',
-    'startTime',
     'status',
-    'user',
+    'toString',
+    'group',
+    'conf',
+    'bundleJobName',
+    'startTime',
+    'bundleCoordJobs',
+    'kickoffTime',
     'acl',
-    'parentId'
+    'bundleJobPath',
+    'createdTime',
+    'timeOut',
+    'consoleUrl',
+    'bundleExternalId',
+    'timeUnit',
+    'pauseTime',
+    'bundleJobId',
+    'endTime',
+    'user',
   ]
-  ACTION = WorkflowAction
+
+  ACTION = BundleAction
 
   def _fixup(self):
-    super(Workflow, self)._fixup()
+    self.actions = self.bundleCoordJobs
 
-    if self.createdTime:
-      self.createdTime = parse_timestamp(self.createdTime)
-    if self.lastModTime:
-      self.lastModTime = parse_timestamp(self.lastModTime)
-    if self.run:
-      self.run = int(self.run)
+    super(Bundle, self)._fixup()
+
+    # For when listing/mixing all the jobs together
+    self.id = self.bundleJobId
+    self.appName = self.bundleJobName
 
   @property
   def type(self):
-    return 'Workflow'
+    return 'Bundle'
 
   def get_absolute_url(self):
-    return reverse('oozie:list_oozie_workflow', kwargs={'job_id': self.id})
+    return reverse('oozie:list_oozie_bundle', kwargs={'job_id': self.id})
 
   def get_progress(self):
-    """How many actions are finished on the total of actions."""
-    return int(sum([action.is_finished() for action in self.actions]) / float(max(len(self.actions), 1)) * 100)
+    return 50
 
 
 class JobList(object):
   """
-  Represents a list of Oozie jobs (Workflows or Coordinator).
+  Represents a list of Oozie jobs (Workflows or Coordinators or Bundles).
   """
   _ATTRS = [
     'offset',
@@ -447,7 +556,7 @@ class JobList(object):
     self._api = api
     self.offset = int(json_dict['offset'])
     self.total = int(json_dict['total'])
-    self.jobs = [ klass(self._api, wf_dict) for wf_dict in json_dict[jobs_key] ]
+    self.jobs = [klass(self._api, wf_dict) for wf_dict in json_dict[jobs_key]]
     self.filters = filters
 
 
@@ -459,4 +568,9 @@ class WorkflowList(JobList):
 class CoordinatorList(JobList):
   def __init__(self, api, json_dict, filters=None):
     super(CoordinatorList, self).__init__(Coordinator, 'coordinatorjobs', api, json_dict, filters)
+
+
+class BundleList(JobList):
+  def __init__(self, api, json_dict, filters=None):
+    super(BundleList, self).__init__(Bundle, 'bundlejobs', api, json_dict, filters)
 

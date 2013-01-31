@@ -32,8 +32,11 @@ ${ layout.menubar(section='dashboard') }
   ${ layout.dashboard_sub_menubar(section='workflows') }
 
   <h1>
+    % if oozie_bundle:
+      ${ _('Bundle') } <a href="${ oozie_bundle.get_absolute_url() }">${ oozie_bundle.appName }</a> :
+    % endif
     % if oozie_coordinator:
-      ${ _('Coordinator') } <a href="${ oozie_coordinator.get_absolute_url() }">${ oozie_coordinator.appName }</a> :
+      ${ _('Coordinator') } <a href="${ oozie_coordinator.get_absolute_url(oozie_bundle) }">${ oozie_coordinator.appName }</a> :
     % endif
 
     ${ _('Workflow') } ${ oozie_workflow.appName }
@@ -198,7 +201,6 @@ ${ layout.menubar(section='dashboard') }
 
 
         <script id="actionTemplate" type="text/html">
-
           <tr>
             <td>
               <a data-bind="visible:externalId !='', attr: { href: log}" data-row-selector-exclude="true"><i class="icon-tasks"></i></a>
@@ -223,7 +225,6 @@ ${ layout.menubar(section='dashboard') }
             <td data-bind="text: data"></td>
 
           </tr>
-
         </script>
 
 
@@ -276,9 +277,7 @@ ${ layout.menubar(section='dashboard') }
       </div>
     </div>
 
-
   </div>
-
 
 </div>
 
@@ -483,7 +482,7 @@ ${ layout.menubar(section='dashboard') }
         if (logsAtEnd) {
           _logsEl.scrollTop(_logsEl[0].scrollHeight - _logsEl.height());
         }
-        if (data.status != "RUNNING"){
+        if (data.status != "RUNNING" && data.status != "PREP"){
           return;
         }
         window.setTimeout(refreshView, 1000);
