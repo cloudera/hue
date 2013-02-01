@@ -210,8 +210,8 @@ def connect_to_thrift(conf):
   if conf.use_sasl:
     def sasl_factory():
       saslc = sasl.Client()
-      saslc.setAttr("host", conf.host)
-      saslc.setAttr("service", conf.kerberos_principal)
+      saslc.setAttr("host", str(conf.host))
+      saslc.setAttr("service", str(conf.kerberos_principal))
       saslc.init()
       return saslc
 

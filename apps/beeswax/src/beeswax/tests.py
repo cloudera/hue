@@ -1299,6 +1299,11 @@ def test_hive_site():
         <name>hive.metastore.warehouse.dir</name>
         <value>/abc</value>
       </property>
+
+      <property>
+        <name>hive.metastore.kerberos.principal</name>
+        <value>test/test.com@TEST.COM</value>
+      </property>
     </configuration>
   """
 
@@ -1316,11 +1321,12 @@ def test_hive_site():
     saved = beeswax.conf.BEESWAX_HIVE_CONF_DIR
     beeswax.conf.BEESWAX_HIVE_CONF_DIR = Getter()
 
-    is_local, host, port = beeswax.hive_site.get_metastore()
+    is_local, host, port, kerberos_principal = beeswax.hive_site.get_metastore()
     assert_false(is_local)
     assert_equal(host, 'darkside-1234')
     assert_equal(port, 9999)
     assert_equal(beeswax.hive_site.get_conf()['hive.metastore.warehouse.dir'], u'/abc')
+    assert_equal(kerberos_principal, 'test/test.com@TEST.COM')
   finally:
     if saved is not None:
       beeswax.conf.BEESWAX_HIVE_CONF_DIR = saved
