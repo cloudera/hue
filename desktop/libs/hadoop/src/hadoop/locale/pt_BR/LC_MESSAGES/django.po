@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-01-02 22:57-0800\n"
+"POT-Creation-Date: 2013-01-31 16:56-0800\n"
 "PO-Revision-Date: 2012-11-07 13:06-0800\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: pt_BR <LL@li.org>\n"
@@ -17,35 +17,46 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/hadoop/fs/hadoopfs.py:268
+#: src/hadoop/fs/hadoopfs.py:282
 #, python-format
 msgid "%(remote_dst)s already exists. Skipping."
 msgstr "%(remote_dst)s já existe. Ignorando."
 
-#: src/hadoop/fs/hadoopfs.py:271
+#: src/hadoop/fs/hadoopfs.py:285
 #, python-format
 msgid "%(remote_dst)s does not exist. Trying to copy."
 msgstr "%(remote_dst)s não existe. Tentando copiar."
 
-#: src/hadoop/fs/hadoopfs.py:281
+#: src/hadoop/fs/hadoopfs.py:295
 #, python-format
 msgid "Copied %s -> %s."
 msgstr "%s -> %s copiado."
 
-#: src/hadoop/fs/hadoopfs.py:283
+#: src/hadoop/fs/hadoopfs.py:297
 #, python-format
 msgid "Copying %s -> %s failed."
 msgstr "Falha na cópia %s -> %s."
 
-#: src/hadoop/fs/hadoopfs.py:288
+#: src/hadoop/fs/hadoopfs.py:302
 #, python-format
 msgid "Skipping %s (not a file)."
 msgstr "Ignorando %s (não é um arquivo)."
 
-#: src/hadoop/fs/hadoopfs.py:323 src/hadoop/fs/hadoopfs.py:326
-#: src/hadoop/fs/hadoopfs.py:329 src/hadoop/fs/hadoopfs.py:332
-#: src/hadoop/fs/hadoopfs.py:335 src/hadoop/fs/hadoopfs.py:338
+#: src/hadoop/fs/hadoopfs.py:338 src/hadoop/fs/hadoopfs.py:341
+#: src/hadoop/fs/hadoopfs.py:344 src/hadoop/fs/hadoopfs.py:347
+#: src/hadoop/fs/hadoopfs.py:350 src/hadoop/fs/hadoopfs.py:353
+#: src/hadoop/fs/hadoopfs.py:356
 #, python-format
 msgid "%(function)s has not been implemented."
 msgstr "%(function)s não foi implementada."
+
+#: src/hadoop/fs/webhdfs.py:455
+#, python-format
+msgid "File not found: %s"
+msgstr ""
+
+#: src/hadoop/fs/webhdfs.py:471
+#, python-format
+msgid "Destination file %s exists and is not a directory."
+msgstr ""
 

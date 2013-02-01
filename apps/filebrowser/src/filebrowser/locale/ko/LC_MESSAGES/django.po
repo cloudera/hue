@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-01-02 22:57-0800\n"
+"POT-Creation-Date: 2013-01-31 16:57-0800\n"
 "PO-Revision-Date: 2012-07-30 18:52-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -16,6 +16,10 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
+
+#: src/filebrowser/conf.py:25
+msgid "Max snappy decompression size in bytes."
+msgstr ""
 
 #: src/filebrowser/forms.py:62
 msgid "File to edit"
@@ -38,7 +42,7 @@ msgid "The file to rename."
 msgstr "이릉을 변경할 파일입니다."
 
 #: src/filebrowser/forms.py:75
-#: src/filebrowser/templates/listdir_components.mako:160
+#: src/filebrowser/templates/listdir_components.mako:164
 msgid "New name"
 msgstr "새 이름"
 
@@ -46,134 +50,156 @@ msgstr "새 이름"
 msgid "Rename the file to:"
 msgstr "다음으로 파일 이름 변경:"
 
+#: src/filebrowser/forms.py:84
+#, fuzzy
+msgid "File to copy"
+msgstr "제거할 파일"
+
+#: src/filebrowser/forms.py:84
+#, fuzzy
+msgid "The file to copy."
+msgstr "이릉을 변경할 파일입니다."
+
 #: src/filebrowser/forms.py:85
+#, fuzzy
+msgid "Destination location"
+msgstr "대상 경로"
+
+#: src/filebrowser/forms.py:85
+#, fuzzy
+msgid "Copy the file to:"
+msgstr "다음으로 파일 이름 변경:"
+
+#: src/filebrowser/forms.py:95
 msgid "File to Upload"
 msgstr "업로드할 파일"
 
-#: src/filebrowser/forms.py:86 src/filebrowser/forms.py:91
+#: src/filebrowser/forms.py:96 src/filebrowser/forms.py:101
 msgid "Destination Path"
 msgstr "대상 경로"
 
-#: src/filebrowser/forms.py:86
+#: src/filebrowser/forms.py:96
 msgid "Filename or directory to upload to."
 msgstr "업로드할 파일 이름 또는 디렉토리입니다."
 
-#: src/filebrowser/forms.py:90
+#: src/filebrowser/forms.py:100
 msgid "Archive to Upload"
 msgstr "업로드할 아카이브"
 
-#: src/filebrowser/forms.py:91
+#: src/filebrowser/forms.py:101
 msgid "Archive to upload to."
 msgstr "업로드할 아카이브입니다."
 
-#: src/filebrowser/forms.py:95
+#: src/filebrowser/forms.py:105
 msgid "File to remove"
 msgstr "제거할 파일"
 
-#: src/filebrowser/forms.py:99
+#: src/filebrowser/forms.py:109
 msgid "Directory to remove"
 msgstr "제거할 디렉토리"
 
-#: src/filebrowser/forms.py:103
+#: src/filebrowser/forms.py:113
 msgid "Directory to remove (recursively)"
 msgstr "제거할 디렉토리(반복 적용)"
 
-#: src/filebrowser/forms.py:112
+#: src/filebrowser/forms.py:122
 msgid "Path in which to create the directory"
 msgstr "디렉토리 생성 경로"
 
-#: src/filebrowser/forms.py:113
-#: src/filebrowser/templates/listdir_components.mako:338
+#: src/filebrowser/forms.py:123
+#: src/filebrowser/templates/listdir_components.mako:371
 msgid "Directory Name"
 msgstr "디렉토리 이름"
 
-#: src/filebrowser/forms.py:117
+#: src/filebrowser/forms.py:127
 msgid "Path in which to create the file"
 msgstr "파일 생성 경로"
 
-#: src/filebrowser/forms.py:118
-#: src/filebrowser/templates/listdir_components.mako:359
+#: src/filebrowser/forms.py:128
+#: src/filebrowser/templates/listdir_components.mako:395
 msgid "File Name"
 msgstr "파일 이름"
 
-#: src/filebrowser/forms.py:122
+#: src/filebrowser/forms.py:132
 msgid "Path to change user/group ownership"
 msgstr "사용자/그룹 소유권 변경 경로"
 
-#: src/filebrowser/forms.py:125 src/filebrowser/templates/display.mako:77
-#: src/filebrowser/templates/listdir_components.mako:72
-#: src/filebrowser/templates/listdir_components.mako:188
-#: src/filebrowser/templates/listdir_components.mako:221
+#: src/filebrowser/forms.py:135 src/filebrowser/templates/display.mako:79
+#: src/filebrowser/templates/listdir_components.mako:76
+#: src/filebrowser/templates/listdir_components.mako:195
+#: src/filebrowser/templates/listdir_components.mako:228
 msgid "User"
 msgstr "사용자"
 
-#: src/filebrowser/forms.py:126
+#: src/filebrowser/forms.py:136
 msgid "OtherUser"
 msgstr "다른 사용자"
 
-#: src/filebrowser/forms.py:127 src/filebrowser/templates/display.mako:79
-#: src/filebrowser/templates/listdir_components.mako:73
-#: src/filebrowser/templates/listdir_components.mako:190
-#: src/filebrowser/templates/listdir_components.mako:222
+#: src/filebrowser/forms.py:137 src/filebrowser/templates/display.mako:81
+#: src/filebrowser/templates/listdir_components.mako:77
+#: src/filebrowser/templates/listdir_components.mako:197
+#: src/filebrowser/templates/listdir_components.mako:229
 msgid "Group"
 msgstr "그룹"
 
-#: src/filebrowser/forms.py:128
+#: src/filebrowser/forms.py:138
 msgid "OtherGroup"
 msgstr "다른 그룹"
 
-#: src/filebrowser/forms.py:129
-#: src/filebrowser/templates/listdir_components.mako:193
-#: src/filebrowser/templates/listdir_components.mako:257
+#: src/filebrowser/forms.py:139
+#: src/filebrowser/templates/listdir_components.mako:200
+#: src/filebrowser/templates/listdir_components.mako:264
 msgid "Recursive"
 msgstr "재귀"
 
-#: src/filebrowser/forms.py:144
+#: src/filebrowser/forms.py:154
 msgid "Path to change permissions"
 msgstr "권한 변경 경로"
 
-#: src/filebrowser/views.py:106 src/filebrowser/views.py:486
+#: src/filebrowser/views.py:107 src/filebrowser/views.py:486
 #: src/filebrowser/views.py:516
 #, python-format
 msgid "File not found: %(path)s"
 msgstr "파일을 찾을 수 없음: %(path)s"
 
-#: src/filebrowser/views.py:108
+#: src/filebrowser/views.py:109
 #, python-format
 msgid "'%(path)s' is not a file"
 msgstr "'%(path)s은(는) 파일이 아닙니다."
 
-#: src/filebrowser/views.py:143
+#: src/filebrowser/views.py:144
 #, python-format
 msgid "Cannot access: %(path)s."
 msgstr "액세스할 수 없음: %(path)s."
 
-#: src/filebrowser/views.py:145 src/filebrowser/views.py:884
+#: src/filebrowser/views.py:146 src/filebrowser/views.py:933
 #, python-format
-msgid " Note: you are a Hue admin but not a HDFS superuser (which is \"%(superuser)s\")."
+msgid ""
+" Note: you are a Hue admin but not a HDFS superuser (which is "
+"\"%(superuser)s\")."
 msgstr " 참고: 귀하는 Hue 관리자이나 HDFS superuser(\"%(superuser)s\")는 아닙니다."
 
-#: src/filebrowser/views.py:171
+#: src/filebrowser/views.py:172
 #, python-format
 msgid "Cannot edit a directory: %(path)s"
 msgstr "디렉토리를 편집할 수 없음: %(path)s"
 
-#: src/filebrowser/views.py:175
+#: src/filebrowser/views.py:176
 #, python-format
 msgid "File too big to edit: %(path)s"
 msgstr "파일이 너무 커 편집할 수 없음: %(path)s"
 
-#: src/filebrowser/views.py:185
+#: src/filebrowser/views.py:186
 #, python-format
 msgid "File is not encoded in %(encoding)s; cannot be edited: %(path)s"
 msgstr "파일이 %(encoding)s(으)로 인코딩되지 않아 편집할 수 없음: %(path)s"
 
-#: src/filebrowser/views.py:234
+#: src/filebrowser/views.py:235
 #, python-format
 msgid "Saved %(path)s."
 msgstr "%(path)s이(가) 저장되었습니다."
 
-#: src/filebrowser/views.py:329
+#: src/filebrowser/views.py:330
 #, python-format
 msgid "Not a directory: %(path)s"
 msgstr "디렉토리가 아님: %(path)s"
@@ -204,104 +230,131 @@ msgstr "길이는 음수일 수 없습니다."
 msgid "Cannot request chunks greater than %(bytes)d bytes"
 msgstr "%(bytes)d바이트보다 큰 청크는 요청할 수 없습니다."
 
-#: src/filebrowser/views.py:686
+#: src/filebrowser/views.py:660
+#, python-format
+msgid ""
+"Failed to validate snappy compressed file. File size is greater than "
+"allowed max snappy decompression size of %d"
+msgstr ""
+
+#: src/filebrowser/views.py:691
+#, fuzzy
+msgid "Failed to decompress snappy compressed file."
+msgstr "파일의 압축을 해제하지 못했습니다."
+
+#: src/filebrowser/views.py:696
+msgid "Failed to decompress snappy compressed file. Snappy is not installed!"
+msgstr ""
+
+#: src/filebrowser/views.py:699
+#, python-format
+msgid ""
+"Failed to decompress snappy compressed file. File size is greater than "
+"allowed max snappy decompression size of %d"
+msgstr ""
+
+#: src/filebrowser/views.py:723
 msgid "Failed to read Avro file."
 msgstr "Avro 파일을 읽지 못했습니다."
 
-#: src/filebrowser/views.py:695
+#: src/filebrowser/views.py:730
 msgid "Offsets are not supported with Gzip compression."
 msgstr "오프셋은 Gzip 압축을 지원하지 않습니다."
 
-#: src/filebrowser/views.py:702
+#: src/filebrowser/views.py:735
 msgid "Failed to decompress file."
 msgstr "파일의 압축을 해제하지 못했습니다."
 
-#: src/filebrowser/views.py:717
+#: src/filebrowser/views.py:746
 msgid "Failed to read file."
 msgstr "파일을 읽지 못했습니다."
 
-#: src/filebrowser/views.py:745 src/filebrowser/views.py:747
-#: src/filebrowser/templates/display.mako:119
-#: src/filebrowser/templates/display.mako:199
+#: src/filebrowser/views.py:794 src/filebrowser/views.py:796
+#: src/filebrowser/templates/display.mako:97
+#: src/filebrowser/templates/display.mako:155
 msgid "First Block"
 msgstr "맨 처음 블록"
 
-#: src/filebrowser/views.py:745 src/filebrowser/views.py:747
-#: src/filebrowser/templates/display.mako:120
-#: src/filebrowser/templates/display.mako:200
+#: src/filebrowser/views.py:794 src/filebrowser/views.py:796
+#: src/filebrowser/templates/display.mako:98
+#: src/filebrowser/templates/display.mako:156
 msgid "Previous Block"
 msgstr "이전 블록"
 
-#: src/filebrowser/views.py:750 src/filebrowser/views.py:753
-#: src/filebrowser/templates/display.mako:121
-#: src/filebrowser/templates/display.mako:201
+#: src/filebrowser/views.py:799 src/filebrowser/views.py:802
+#: src/filebrowser/templates/display.mako:99
+#: src/filebrowser/templates/display.mako:157
 msgid "Next Block"
 msgstr "다음 블록"
 
-#: src/filebrowser/views.py:750 src/filebrowser/views.py:753
-#: src/filebrowser/templates/display.mako:122
-#: src/filebrowser/templates/display.mako:202
+#: src/filebrowser/views.py:799 src/filebrowser/views.py:802
+#: src/filebrowser/templates/display.mako:100
+#: src/filebrowser/templates/display.mako:158
 msgid "Last Block"
 msgstr "마지막 블록"
 
-#: src/filebrowser/views.py:882
+#: src/filebrowser/views.py:931
 msgid "Cannot perform operation."
 msgstr "작업을 수행할 수 없습니다."
 
-#: src/filebrowser/views.py:917
+#: src/filebrowser/views.py:966
 #, python-format
-msgid "Could not rename folder \"%s\" to \"%s\": Hashes are not allowed in filenames."
+msgid ""
+"Could not rename folder \"%s\" to \"%s\": Hashes are not allowed in "
+"filenames."
 msgstr "폴더 이름을 \"%s\"에서 \"%s\"(으)로 바꿀 수 없습니다. 파일 이름에 해시를 사용할 수 없습니다."
 
-#: src/filebrowser/views.py:931
+#: src/filebrowser/views.py:980
 #, python-format
-msgid "Could not name folder \"%s\": Slashes or hashes are not allowed in filenames."
+msgid ""
+"Could not name folder \"%s\": Slashes or hashes are not allowed in "
+"filenames."
 msgstr "폴더 이름 \"%s\"을(를) 지정할 수 없습니다. 파일 이름에 슬래시 또는 해시를 사용할 수 없습니다."
 
-#: src/filebrowser/views.py:941
+#: src/filebrowser/views.py:990
 #, python-format
 msgid "Could not name file \"%s\": Slashes are not allowed in filenames."
 msgstr "파일 이름 \"%s\"을(를) 지정할 수 없습니다. 파일 이름에 슬래시를 사용할 수 없습니다."
 
-#: src/filebrowser/views.py:1034 src/filebrowser/views.py:1111
+#: src/filebrowser/views.py:1096 src/filebrowser/views.py:1173
 msgid "A POST request is required."
 msgstr "POST 요청이 필요합니다."
 
-#: src/filebrowser/views.py:1037 src/filebrowser/views.py:1114
+#: src/filebrowser/views.py:1099 src/filebrowser/views.py:1176
 #, python-format
 msgid "%(destination)s upload succeeded"
 msgstr "%(destination)s 업로드 완료"
 
-#: src/filebrowser/views.py:1039 src/filebrowser/views.py:1116
+#: src/filebrowser/views.py:1101 src/filebrowser/views.py:1178
 #, python-format
 msgid "Upload failed: %(data)s"
 msgstr "업로드 실패: %(data)s"
 
-#: src/filebrowser/views.py:1055 src/filebrowser/views.py:1134
+#: src/filebrowser/views.py:1117 src/filebrowser/views.py:1196
 #, python-format
 msgid "Sorry, no \"%(sep)s\" in the filename %(name)s.sep"
 msgstr "파일 이름 %(name)s.sep에 \"%(sep)s\"이(가) 없습니다."
 
-#: src/filebrowser/views.py:1075 src/filebrowser/views.py:1158
+#: src/filebrowser/views.py:1137 src/filebrowser/views.py:1220
 #, python-format
 msgid "Destination %(name)s already exists."
 msgstr "대상 %(name)s이(가) 이미 존재합니다."
 
-#: src/filebrowser/views.py:1077 src/filebrowser/views.py:1160
+#: src/filebrowser/views.py:1139 src/filebrowser/views.py:1222
 #, python-format
 msgid "Copy to %(name)s failed: %(error)s"
 msgstr "%(name)s에 복사할 수 없습니다: %(error)s"
 
-#: src/filebrowser/views.py:1087 src/filebrowser/views.py:1170
+#: src/filebrowser/views.py:1149 src/filebrowser/views.py:1232
 #, python-format
 msgid "Error in upload form: %s"
 msgstr "업로드 양식 %s에 오류 발생"
 
-#: src/filebrowser/views.py:1143
+#: src/filebrowser/views.py:1205
 msgid "Could not extract contents of file."
 msgstr "파일의 내용을 추출할 수 없습니다."
 
-#: src/filebrowser/views.py:1149
+#: src/filebrowser/views.py:1211
 msgid "Could not interpret archive type."
 msgstr "아카이브 유형을 해석할 수 없습니다."
 
@@ -323,65 +376,66 @@ msgstr "작업"
 msgid "View As Text"
 msgstr "텍스트로 보기"
 
-#: src/filebrowser/templates/display.mako:51
+#: src/filebrowser/templates/display.mako:52
 msgid "View As Binary"
 msgstr "바이너리로 보기"
 
-#: src/filebrowser/templates/display.mako:55
+#: src/filebrowser/templates/display.mako:56
 msgid "Preview As Gzip"
 msgstr "Gzip으로 미리 보기"
 
-#: src/filebrowser/templates/display.mako:59
+#: src/filebrowser/templates/display.mako:60
 msgid "Preview As Avro"
 msgstr "Avro로 미리 보기"
 
-#: src/filebrowser/templates/display.mako:63
+#: src/filebrowser/templates/display.mako:64
 msgid "Stop preview"
 msgstr "미리 보기 중지"
 
-#: src/filebrowser/templates/display.mako:67
+#: src/filebrowser/templates/display.mako:68
 msgid "Edit File"
 msgstr "파일 편집"
 
-#: src/filebrowser/templates/display.mako:69
+#: src/filebrowser/templates/display.mako:71
+#: src/filebrowser/templates/listdir.mako:44
 msgid "Download"
 msgstr "다운로드"
 
-#: src/filebrowser/templates/display.mako:70
+#: src/filebrowser/templates/display.mako:72
 msgid "View File Location"
 msgstr "파일 위치 보기"
 
-#: src/filebrowser/templates/display.mako:71
+#: src/filebrowser/templates/display.mako:73
 msgid "Refresh"
 msgstr "새로 고침"
 
-#: src/filebrowser/templates/display.mako:72
+#: src/filebrowser/templates/display.mako:74
 msgid "Info"
 msgstr "정보"
 
-#: src/filebrowser/templates/display.mako:75
+#: src/filebrowser/templates/display.mako:77
 msgid "Last Modified"
 msgstr "최종 수정 날짜"
 
-#: src/filebrowser/templates/display.mako:81
-#: src/filebrowser/templates/listdir_components.mako:71
+#: src/filebrowser/templates/display.mako:83
+#: src/filebrowser/templates/listdir_components.mako:75
 msgid "Size"
 msgstr "크기"
 
-#: src/filebrowser/templates/display.mako:83
+#: src/filebrowser/templates/display.mako:85
 msgid "Mode"
 msgstr "모드"
 
-#: src/filebrowser/templates/display.mako:126
+#: src/filebrowser/templates/display.mako:104
 msgid "Viewing Bytes:"
 msgstr "바이트 표시:"
 
-#: src/filebrowser/templates/display.mako:131
+#: src/filebrowser/templates/display.mako:109
 #, python-format
 msgid "(%(length)s B block size)"
 msgstr "(%(length)s B 블록 크기)"
 
-#: src/filebrowser/templates/display.mako:142
+#: src/filebrowser/templates/display.mako:120
 msgid "Warning: some binary data has been masked out with '&#xfffd'."
 msgstr "경고: 일부 바이너리 데이터는 '&#xfffd'(으)로 마스킹되었을 수 있습니다."
 
@@ -404,21 +458,23 @@ msgid "Enter the location where you'd like to save the file."
 msgstr "파일을 저장할 위치를 입력하십시오."
 
 #: src/filebrowser/templates/edit.mako:77
-#: src/filebrowser/templates/listdir_components.mako:164
-#: src/filebrowser/templates/listdir_components.mako:200
-#: src/filebrowser/templates/listdir_components.mako:289
+#: src/filebrowser/templates/listdir_components.mako:168
+#: src/filebrowser/templates/listdir_components.mako:207
+#: src/filebrowser/templates/listdir_components.mako:296
+#: src/filebrowser/templates/listdir_components.mako:322
 msgid "Name is required."
 msgstr "이름을 입력해야 합니다."
 
 #: src/filebrowser/templates/edit.mako:81
-#: src/filebrowser/templates/listdir_components.mako:168
-#: src/filebrowser/templates/listdir_components.mako:202
-#: src/filebrowser/templates/listdir_components.mako:265
-#: src/filebrowser/templates/listdir_components.mako:291
-#: src/filebrowser/templates/listdir_components.mako:345
-#: src/filebrowser/templates/listdir_components.mako:366
-#: src/filebrowser/templates/listdir_components.mako:932
-#: src/filebrowser/templates/listdir_components.mako:980
+#: src/filebrowser/templates/listdir_components.mako:175
+#: src/filebrowser/templates/listdir_components.mako:209
+#: src/filebrowser/templates/listdir_components.mako:272
+#: src/filebrowser/templates/listdir_components.mako:298
+#: src/filebrowser/templates/listdir_components.mako:324
+#: src/filebrowser/templates/listdir_components.mako:381
+#: src/filebrowser/templates/listdir_components.mako:405
+#: src/filebrowser/templates/listdir_components.mako:1040
+#: src/filebrowser/templates/listdir_components.mako:1088
 msgid "Cancel"
 msgstr "취소"
 
@@ -452,236 +508,255 @@ msgstr "이름 변경"
 msgid "Move"
 msgstr "이동"
 
-#: src/filebrowser/templates/listdir.mako:40
-#: src/filebrowser/templates/listdir_components.mako:183
+#: src/filebrowser/templates/listdir.mako:39
+msgid "Copy"
+msgstr ""
+
+#: src/filebrowser/templates/listdir.mako:41
+#: src/filebrowser/templates/listdir_components.mako:190
 msgid "Change Owner / Group"
 msgstr "소유자/그룹 변경"
 
-#: src/filebrowser/templates/listdir.mako:42
+#: src/filebrowser/templates/listdir.mako:43
 msgid "Change Permissions"
 msgstr "권한 변경"
 
-#: src/filebrowser/templates/listdir.mako:43
+#: src/filebrowser/templates/listdir.mako:46
 msgid "Delete"
 msgstr "삭제"
 
-#: src/filebrowser/templates/listdir.mako:48
-#: src/filebrowser/templates/listdir.mako:49
+#: src/filebrowser/templates/listdir.mako:51
+#: src/filebrowser/templates/listdir.mako:52
 msgid "Upload"
 msgstr "업로드"
 
-#: src/filebrowser/templates/listdir.mako:53
+#: src/filebrowser/templates/listdir.mako:56
 msgid "Files"
 msgstr "파일"
 
-#: src/filebrowser/templates/listdir.mako:54
+#: src/filebrowser/templates/listdir.mako:57
 msgid "Archive"
 msgstr "아카이브"
 
-#: src/filebrowser/templates/listdir.mako:54
-msgid "Archives"
-msgstr "아카이브"
+#: src/filebrowser/templates/listdir.mako:57
+msgid "Zip file"
+msgstr ""
 
-#: src/filebrowser/templates/listdir.mako:59
+#: src/filebrowser/templates/listdir.mako:62
 msgid "New"
 msgstr "새로 만들기"
 
-#: src/filebrowser/templates/listdir.mako:63
+#: src/filebrowser/templates/listdir.mako:66
 msgid "File"
 msgstr "파일"
 
-#: src/filebrowser/templates/listdir.mako:64
+#: src/filebrowser/templates/listdir.mako:67
 msgid "Directory"
 msgstr "디렉토리"
 
-#: src/filebrowser/templates/listdir_components.mako:70
+#: src/filebrowser/templates/listdir_components.mako:74
 msgid "Name"
 msgstr "이름"
 
-#: src/filebrowser/templates/listdir_components.mako:74
+#: src/filebrowser/templates/listdir_components.mako:78
 msgid "Permissions"
 msgstr "권한"
 
-#: src/filebrowser/templates/listdir_components.mako:75
+#: src/filebrowser/templates/listdir_components.mako:79
 msgid "Date"
 msgstr "날짜"
 
-#: src/filebrowser/templates/listdir_components.mako:120
+#: src/filebrowser/templates/listdir_components.mako:124
 msgid "Beginning of List"
 msgstr "목록 시작"
 
-#: src/filebrowser/templates/listdir_components.mako:121
+#: src/filebrowser/templates/listdir_components.mako:125
 msgid "Previous Page"
 msgstr "이전 페이지"
 
-#: src/filebrowser/templates/listdir_components.mako:124
+#: src/filebrowser/templates/listdir_components.mako:128
 msgid "Next page"
 msgstr "다음 페이지"
 
-#: src/filebrowser/templates/listdir_components.mako:124
+#: src/filebrowser/templates/listdir_components.mako:128
 msgid "Next Page"
 msgstr "다음 페이지"
 
-#: src/filebrowser/templates/listdir_components.mako:125
+#: src/filebrowser/templates/listdir_components.mako:129
 msgid "End of List"
 msgstr "목록 끝"
 
-#: src/filebrowser/templates/listdir_components.mako:128
+#: src/filebrowser/templates/listdir_components.mako:132
 msgid "Show"
 msgstr "표시"
 
-#: src/filebrowser/templates/listdir_components.mako:130
+#: src/filebrowser/templates/listdir_components.mako:134
 msgid "items per page"
 msgstr "페이지당 항목 수"
 
-#: src/filebrowser/templates/listdir_components.mako:131
+#: src/filebrowser/templates/listdir_components.mako:135
 msgid "Showing"
 msgstr "표시"
 
-#: src/filebrowser/templates/listdir_components.mako:131
+#: src/filebrowser/templates/listdir_components.mako:135
 msgid "to"
 msgstr "->"
 
-#: src/filebrowser/templates/listdir_components.mako:131
-#: src/filebrowser/templates/listdir_components.mako:132
+#: src/filebrowser/templates/listdir_components.mako:135
+#: src/filebrowser/templates/listdir_components.mako:136
 msgid "of"
 msgstr "/"
 
-#: src/filebrowser/templates/listdir_components.mako:131
+#: src/filebrowser/templates/listdir_components.mako:135
 msgid "items, page"
 msgstr "항목, 페이지"
 
-#: src/filebrowser/templates/listdir_components.mako:139
+#: src/filebrowser/templates/listdir_components.mako:143
 msgid "Confirm Delete"
 msgstr "삭제 확인"
 
-#: src/filebrowser/templates/listdir_components.mako:142
+#: src/filebrowser/templates/listdir_components.mako:146
 msgid "Are you sure you want to delete these files?"
 msgstr "이 파일을 삭제하시겠습니까?"
 
-#: src/filebrowser/templates/listdir_components.mako:146
+#: src/filebrowser/templates/listdir_components.mako:150
 msgid "No"
 msgstr "아니요"
 
-#: src/filebrowser/templates/listdir_components.mako:147
+#: src/filebrowser/templates/listdir_components.mako:151
 msgid "Yes"
 msgstr "예"
 
-#: src/filebrowser/templates/listdir_components.mako:157
+#: src/filebrowser/templates/listdir_components.mako:161
 msgid "Renaming:"
 msgstr "이름 변경:"
 
-#: src/filebrowser/templates/listdir_components.mako:169
-#: src/filebrowser/templates/listdir_components.mako:203
-#: src/filebrowser/templates/listdir_components.mako:266
-#: src/filebrowser/templates/listdir_components.mako:292
-#: src/filebrowser/templates/listdir_components.mako:346
-#: src/filebrowser/templates/listdir_components.mako:367
+#: src/filebrowser/templates/listdir_components.mako:171
+#: src/filebrowser/templates/listdir_components.mako:379
+#: src/filebrowser/templates/listdir_components.mako:403
+msgid "already exists."
+msgstr ""
+
+#: src/filebrowser/templates/listdir_components.mako:176
+#: src/filebrowser/templates/listdir_components.mako:210
+#: src/filebrowser/templates/listdir_components.mako:273
+#: src/filebrowser/templates/listdir_components.mako:299
+#: src/filebrowser/templates/listdir_components.mako:325
+#: src/filebrowser/templates/listdir_components.mako:382
+#: src/filebrowser/templates/listdir_components.mako:406
 msgid "Submit"
 msgstr "제출"
 
-#: src/filebrowser/templates/listdir_components.mako:186
+#: src/filebrowser/templates/listdir_components.mako:193
 #, python-format
-msgid "Note: Only the Hadoop superuser, \"%(superuser)s\" on this file system, may change the owner of a file."
+msgid ""
+"Note: Only the Hadoop superuser, \"%(superuser)s\" on this file system, "
+"may change the owner of a file."
 msgstr "참고: 이 파일 시스템의 Hadoop superuser \"%(superuser)s\"만 파일의 소유자를 변경할 수 있습니다."
 
-#: src/filebrowser/templates/listdir_components.mako:214
+#: src/filebrowser/templates/listdir_components.mako:221
 msgid "Change Permissions:"
 msgstr "권한 변경:"
 
-#: src/filebrowser/templates/listdir_components.mako:223
+#: src/filebrowser/templates/listdir_components.mako:230
 msgid "Other"
 msgstr "기타"
 
-#: src/filebrowser/templates/listdir_components.mako:230
+#: src/filebrowser/templates/listdir_components.mako:237
 msgid "Read"
 msgstr "읽기"
 
-#: src/filebrowser/templates/listdir_components.mako:237
+#: src/filebrowser/templates/listdir_components.mako:244
 msgid "Write"
 msgstr "쓰기"
 
-#: src/filebrowser/templates/listdir_components.mako:244
+#: src/filebrowser/templates/listdir_components.mako:251
 msgid "Execute"
 msgstr "실행"
 
-#: src/filebrowser/templates/listdir_components.mako:251
+#: src/filebrowser/templates/listdir_components.mako:258
 msgid "Sticky"
 msgstr "Sticky"
 
-#: src/filebrowser/templates/listdir_components.mako:276
+#: src/filebrowser/templates/listdir_components.mako:283
 msgid "Move:"
 msgstr "이동:"
 
-#: src/filebrowser/templates/listdir_components.mako:280
+#: src/filebrowser/templates/listdir_components.mako:287
+#: src/filebrowser/templates/listdir_components.mako:313
 msgid "Destination"
 msgstr "대상"
 
-#: src/filebrowser/templates/listdir_components.mako:301
-#: src/filebrowser/templates/listdir_components.mako:317
+#: src/filebrowser/templates/listdir_components.mako:309
+msgid "Copy:"
+msgstr ""
+
+#: src/filebrowser/templates/listdir_components.mako:334
+#: src/filebrowser/templates/listdir_components.mako:350
 msgid "Uploading to:"
 msgstr "업로드 위치:"
 
-#: src/filebrowser/templates/listdir_components.mako:306
-#: src/filebrowser/templates/listdir_components.mako:323
+#: src/filebrowser/templates/listdir_components.mako:339
+#: src/filebrowser/templates/listdir_components.mako:356
 msgid "Enable JavaScript to use the file uploader."
 msgstr "파일 업로더를 사용할 수 있도록 JavaScript를 활성화하십시오."
 
-#: src/filebrowser/templates/listdir_components.mako:318
+#: src/filebrowser/templates/listdir_components.mako:351
 msgid "The file will then be extracted in the path specified above."
 msgstr "업로드 후 위에 지정된 경로에서 파일이 추출됩니다."
 
-#: src/filebrowser/templates/listdir_components.mako:335
+#: src/filebrowser/templates/listdir_components.mako:368
 msgid "Create Directory"
 msgstr "디렉토리 생성"
 
-#: src/filebrowser/templates/listdir_components.mako:343
+#: src/filebrowser/templates/listdir_components.mako:376
 msgid "Directory name is required."
 msgstr "디렉토리 이름을 입력해야 합니다."
 
-#: src/filebrowser/templates/listdir_components.mako:356
+#: src/filebrowser/templates/listdir_components.mako:392
 msgid "Create File"
 msgstr "파일 생성"
 
-#: src/filebrowser/templates/listdir_components.mako:364
+#: src/filebrowser/templates/listdir_components.mako:400
 msgid "File name is required."
 msgstr "파일 이름을 입력해야 합니다."
 
-#: src/filebrowser/templates/listdir_components.mako:434
+#: src/filebrowser/templates/listdir_components.mako:473
 msgid "User is required."
 msgstr "사용자를 입력해야 합니다."
 
-#: src/filebrowser/templates/listdir_components.mako:439
+#: src/filebrowser/templates/listdir_components.mako:478
 msgid "Group is required."
 msgstr "그룹을 입력해야 합니다."
 
-#: src/filebrowser/templates/listdir_components.mako:445
+#: src/filebrowser/templates/listdir_components.mako:484
 msgid "Specify another group."
 msgstr "다른 그룹을 지정하십시오."
 
-#: src/filebrowser/templates/listdir_components.mako:451
+#: src/filebrowser/templates/listdir_components.mako:490
 msgid "Specify another user."
 msgstr "다른 사용자를 지정하십시오."
 
-#: src/filebrowser/templates/listdir_components.mako:593
+#: src/filebrowser/templates/listdir_components.mako:679
 msgid "There was a problem with your request."
 msgstr "요청에 문제가 있습니다."
 
-#: src/filebrowser/templates/listdir_components.mako:924
-#: src/filebrowser/templates/listdir_components.mako:972
+#: src/filebrowser/templates/listdir_components.mako:1032
+#: src/filebrowser/templates/listdir_components.mako:1080
 msgid "Drop files here to upload"
 msgstr "업로드할 파일 여기 두기"
 
-#: src/filebrowser/templates/listdir_components.mako:925
-msgid "Upload a file"
-msgstr "파일 업로드"
+#: src/filebrowser/templates/listdir_components.mako:1033
+msgid "Select files"
+msgstr ""
 
-#: src/filebrowser/templates/listdir_components.mako:933
-#: src/filebrowser/templates/listdir_components.mako:981
+#: src/filebrowser/templates/listdir_components.mako:1041
+#: src/filebrowser/templates/listdir_components.mako:1089
 msgid "Failed"
 msgstr "실패함"
 
-#: src/filebrowser/templates/listdir_components.mako:973
-msgid "Upload an archive"
-msgstr "아카이브 업로드"
+#: src/filebrowser/templates/listdir_components.mako:1081
+#, fuzzy
+msgid "Upload a zip file"
+msgstr "파일 업로드"
 
