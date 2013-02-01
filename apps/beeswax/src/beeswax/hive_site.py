@@ -34,6 +34,7 @@ _METASTORE_LOC_CACHE = None
 
 _CNF_METASTORE_LOCAL = 'hive.metastore.local'
 _CNF_METASTORE_URIS = 'hive.metastore.uris'
+_CNF_METASTORE_KERBEROS_PRINCIPAL = 'hive.metastore.kerberos.principal'
 
 # Host is whatever up to the colon. Allow and ignore a trailing slash.
 _THRIFT_URI_RE = re.compile("^thrift://([^:]+):(\d+)[/]?$")
@@ -59,9 +60,9 @@ def get_conf():
 
 def get_metastore():
   """
-  get_metastore() -> (is_local, host, port)
+  get_metastore() -> (is_local, host, port, kerberos_principal)
 
-  Look at both hive-site.xml and beeswax.conf, and return the location of the metastore.
+  Look at both hive-site.xml and beeswax.conf, and return the metastore information.
 
   hive-site.xml supersedes beeswax.conf.
   - If hive-site says local metastore (default), then get host & port from beeswax.conf.
@@ -71,6 +72,7 @@ def get_metastore():
   global _METASTORE_LOC_CACHE
   if not _METASTORE_LOC_CACHE:
     is_local = get_conf().getbool(_CNF_METASTORE_LOCAL, True)
+    kerberos_principal = get_conf().get(_CNF_METASTORE_KERBEROS_PRINCIPAL, None)
     if is_local:
       host = beeswax.conf.BEESWAX_META_SERVER_HOST.get()
       port = beeswax.conf.BEESWAX_META_SERVER_PORT.get()
@@ -86,7 +88,7 @@ def get_metastore():
           LOG.fatal('Cannot understand remote metastore uri "%s"' % (thrift_uri,))
         else:
           host, port = match.groups()
-    _METASTORE_LOC_CACHE = (is_local, host, int(port))
+    _METASTORE_LOC_CACHE = (is_local, host, int(port), kerberos_principal)
   return _METASTORE_LOC_CACHE
 
 
