@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-01-10 18:30-0800\n"
+"POT-Creation-Date: 2013-01-31 16:57-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -71,6 +71,10 @@ msgstr ""
 #: src/useradmin/forms.py:126 src/useradmin/forms.py:162
 #, python-format
 msgid "Too long: 30 characters or fewer and not %s"
+msgstr ""
+
+#: src/useradmin/forms.py:136
+msgid "Name"
 msgstr ""
 
 #: src/useradmin/forms.py:139
