@@ -32,7 +32,9 @@ limitations under the License.
     <script type="text/javascript">
       $(document).ready(function () {
         $(".dataTables_wrapper").jHueTableScroller();
-        $(document).on("click", ".btn-primary, .btn-danger", function () {
+        // sets feedback on every primary and danger action across Hue
+        // can be disabled adding the class "disable-feedback" to the button
+        $(document).on("click", ".btn-primary:not(.disable-feedback), .btn-danger:not(.disable-feedback)", function () {
           if (!$(this).hasClass('disabled')) {
             var text = ($(this).text()) ? $(this).text() : $(this).val();
             $(this).attr("data-loading-text", text + " ...");

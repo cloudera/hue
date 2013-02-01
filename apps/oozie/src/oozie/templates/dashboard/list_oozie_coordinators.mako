@@ -47,8 +47,9 @@ ${layout.menubar(section='dashboard')}
         <span class="btn-group" style="float:left;">
           <a class="btn btn-status btn-success" data-value='SUCCEEDED'>${ _('Succeeded') }</a>
           <a class="btn btn-status btn-warning" data-value='RUNNING'>${ _('Running') }</a>
-          <a class="btn btn-status btn-danger" data-value='KILLED'>${ _('Killed') }</a>
+          <a class="btn btn-status btn-danger disable-feedback" data-value='KILLED'>${ _('Killed') }</a>
         </span>
+      </span>
    </form>
   </div>
 
@@ -67,33 +68,7 @@ ${layout.menubar(section='dashboard')}
         </tr>
       </thead>
       <tbody>
-        % for job in jobs['running_jobs']:
-          <tr>
-            <td>${ utils.format_date(job.endTime) }</td>
-            <td>
-              <span class="label ${ utils.get_status(job.status) }">
-                ${ job.status }
-              </span>
-            </td>
-            <td>${ job.appName }</td>
-            <td data-sort-value="${ job.get_progress() }">${ job.get_progress() }%</td>
-            <td>${ job.user }</td>
-            <td><a href="${ job.get_absolute_url() }" data-row-selector="true"></a>${ job.id }</td>
-            <td>
-              % if has_job_edition_permission(job, user):
-                <a title="${_('Kill %(coordinator)s') % dict(coordinator=job.id)}"
-                  class="btn small confirmationModal"
-                  alt="${ _('Are you sure you want to kill coordinator %s?') % job.id }"
-                  href="javascript:void(0)"
-                  data-message="${ _('The coordinator was killed!') }"
-                  data-confirmation-message="${ _('Are you sure you\'d like to kill this job?') }"
-                  data-url="${ url('oozie:manage_oozie_jobs', job_id=job.id, action='kill') }">
-                    ${ _('Kill') }
-                </a>
-              % endif
-           </td>
-          </tr>
-        %endfor
+
       </tbody>
     </table>
   </div>
@@ -112,28 +87,7 @@ ${layout.menubar(section='dashboard')}
         </tr>
       </thead>
       <tbody>
-        %for job in jobs['completed_jobs']:
-          <tr>
-            <td>${ utils.format_date(job.endTime) }</td>
-            <td>
-              <span class="label
-               % if job.status == 'SUCCEEDED':
-                 label-success
-               % elif job.is_running():
-                  label-warning
-               % else:
-                 label-important
-               % endif
-               ">
-                ${job.status}
-              </span>
-            </td>
-            <td>${ job.appName }</td>
-            <td data-sort-value="${ utils.job_duration(job) }">${ utils.format_job_duration(job) }</td>
-            <td>${job.user}</td>
-            <td><a href="${ job.get_absolute_url() }" data-row-selector="true"></a>${ job.id }</td>
-          </tr>
-        %endfor
+
       </tbody>
      </table>
    </div>
@@ -151,107 +105,128 @@ ${layout.menubar(section='dashboard')}
   </div>
 </div>
 
-
+<script src="/oozie/static/js/utils.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript" charset="utf-8">
-  $(document).ready(function() {
-    var runningTable = $('#running-table').dataTable( {
-      'sPaginationType': 'bootstrap',
-      'iDisplayLength': 50,
-      "bLengthChange": false,
-      "sDom": "<'row'r>t<'row'<'span6'i><''p>>",
-      "aoColumns": [
-        { "sType": "date" },
+
+  var Coordinator = function (c) {
+    return {
+      id:c.id,
+      endTime:c.endTime,
+      status:c.status,
+      statusClass:"label " + getStatusClass(c.status),
+      isRunning:c.isRunning,
+      duration:c.duration,
+      appName:decodeURIComponent(c.appName),
+      progress:c.progress,
+      progressClass:"bar " + getStatusClass(c.status, "bar-"),
+      user:c.user,
+      absoluteUrl:c.absoluteUrl,
+      canEdit:c.canEdit,
+      killUrl:c.killUrl
+    }
+  }
+
+  $(document).ready(function () {
+    var runningTable = $('#running-table').dataTable({
+      'sPaginationType':'bootstrap',
+      'iDisplayLength':50,
+      "bLengthChange":false,
+      "sDom":"<'row'r>t<'row'<'span6'i><''p>>",
+      "aoColumns":[
+        { "sType":"date" },
         null,
         null,
-        { "sSortDataType": "dom-sort-value", "sType": "numeric" },
+        { "sSortDataType":"dom-sort-value", "sType":"numeric" },
         null,
         null,
-        { "bSortable": false }
+        { "bSortable":false }
       ],
-      "aaSorting": [[ 5, "desc" ]],
-      "oLanguage": {
-            "sEmptyTable":     "${_('No data available')}",
-            "sInfo":           "${_('Showing _START_ to _END_ of _TOTAL_ entries')}",
-            "sInfoEmpty":      "${_('Showing 0 to 0 of 0 entries')}",
-            "sInfoFiltered":   "${_('(filtered from _MAX_ total entries)')}",
-            "sZeroRecords":    "${_('No matching records')}",
-            "oPaginate": {
-                "sFirst":    "${_('First')}",
-                "sLast":     "${_('Last')}",
-                "sNext":     "${_('Next')}",
-                "sPrevious": "${_('Previous')}"
-            }
+      "aaSorting":[
+        [ 5, "desc" ]
+      ],
+      "oLanguage":{
+        "sEmptyTable":"${_('No data available')}",
+        "sInfo":"${_('Showing _START_ to _END_ of _TOTAL_ entries')}",
+        "sInfoEmpty":"${_('Showing 0 to 0 of 0 entries')}",
+        "sInfoFiltered":"${_('(filtered from _MAX_ total entries)')}",
+        "sZeroRecords":"${_('No matching records')}",
+        "oPaginate":{
+          "sFirst":"${_('First')}",
+          "sLast":"${_('Last')}",
+          "sNext":"${_('Next')}",
+          "sPrevious":"${_('Previous')}"
+        }
       }
     });
 
-    var completedTable = $('#completed-table').dataTable( {
-      'sPaginationType': 'bootstrap',
-      'iDisplayLength': 50,
-      "bLengthChange": false,
-      "sDom": "<'row'r>t<'row'<'span6'i><''p>>",
-      "aoColumns": [
-        { "sType": "date" },
+    var completedTable = $('#completed-table').dataTable({
+      'sPaginationType':'bootstrap',
+      'iDisplayLength':50,
+      "bLengthChange":false,
+      "sDom":"<'row'r>t<'row'<'span6'i><''p>>",
+      "aoColumns":[
+        { "sType":"date" },
         null,
         null,
-        { "sSortDataType": "dom-sort-value", "sType": "numeric" },
+        { "sSortDataType":"dom-sort-value", "sType":"numeric" },
         null,
         null
       ],
-      "aaSorting": [[ 5, "desc" ]],
-      "oLanguage": {
-            "sEmptyTable":     "${_('No data available')}",
-            "sInfo":           "${_('Showing _START_ to _END_ of _TOTAL_ entries')}",
-            "sInfoEmpty":      "${_('Showing 0 to 0 of 0 entries')}",
-            "sInfoFiltered":   "${_('(filtered from _MAX_ total entries)')}",
-            "sZeroRecords":    "${_('No matching records')}",
-            "oPaginate": {
-                "sFirst":    "${_('First')}",
-                "sLast":     "${_('Last')}",
-                "sNext":     "${_('Next')}",
-                "sPrevious": "${_('Previous')}"
-            }
+      "aaSorting":[
+        [ 5, "desc" ]
+      ],
+      "oLanguage":{
+        "sEmptyTable":"${_('No data available')}",
+        "sInfo":"${_('Showing _START_ to _END_ of _TOTAL_ entries')}",
+        "sInfoEmpty":"${_('Showing 0 to 0 of 0 entries')}",
+        "sInfoFiltered":"${_('(filtered from _MAX_ total entries)')}",
+        "sZeroRecords":"${_('No matching records')}",
+        "oPaginate":{
+          "sFirst":"${_('First')}",
+          "sLast":"${_('Last')}",
+          "sNext":"${_('Next')}",
+          "sPrevious":"${_('Previous')}"
+        }
       }
     });
 
-    $('#filterInput').keydown(function(e) {
+    $('#filterInput').keydown(function (e) {
       if (e.which == 13) {
         e.preventDefault();
         return false;
       }
     });
 
-    $("#filterInput").keyup(function() {
+    $("#filterInput").keyup(function () {
       runningTable.fnFilter($(this).val());
       completedTable.fnFilter($(this).val());
 
-      hash = "#";
-
+      var hash = "#";
       if ($("a.btn-date.active").length > 0) {
         hash += "date=" + $("a.btn-date.active").text();
       }
-
       window.location.hash = hash;
     });
 
 
-    $("a.btn-status").click(function() {
+    $("a.btn-status").click(function () {
       $(this).toggleClass('active');
       drawTable();
     });
 
-    $("a.btn-date").click(function() {
+    $("a.btn-date").click(function () {
       $("a.btn-date").not(this).removeClass('active');
       $(this).toggleClass('active');
       drawTable();
     });
 
-    function drawTable(){
+    function drawTable() {
       runningTable.fnDraw();
       completedTable.fnDraw();
 
-      hash = "#";
+      var hash = "#";
       if ($("a.btn-date.active").length > 0) {
         hash += "date=" + $("a.btn-date.active").text();
       }
@@ -259,55 +234,136 @@ ${layout.menubar(section='dashboard')}
     }
 
     $.fn.dataTableExt.afnFiltering.push(
-      function(oSettings, aData, iDataIndex) {
-        urlHashes = ""
+            function (oSettings, aData, iDataIndex) {
+              var urlHashes = ""
 
-        statusBtn = $('a.btn-status.active');
-        statusFilter = true;
-        if (statusBtn.length > 0) {
-          statuses = []
-          $.each(statusBtn, function() {
-            statuses.push($(this).attr('data-value'));
-          });
-          statusFilter = aData[1].match(RegExp(statuses.join('|'), "i")) != null;
-        }
+              var statusBtn = $('a.btn-status.active');
+              var statusFilter = true;
+              if (statusBtn.length > 0) {
+                var statuses = []
+                $.each(statusBtn, function () {
+                  statuses.push($(this).attr('data-value'));
+                });
+                statusFilter = aData[1].match(RegExp(statuses.join('|'), "i")) != null;
+              }
 
-        dateBtn = $('a.btn-date.active');
-        dateFilter = true;
-        if (dateBtn.length > 0) {
-          minAge = new Date() - parseInt(dateBtn.attr('data-value')) * 1000 * 60 * 60 * 24;
-          dateFilter = Date.parse(aData[0]) >= minAge;
-        }
+              var dateBtn = $('a.btn-date.active');
+              var dateFilter = true;
+              if (dateBtn.length > 0) {
+                var minAge = new Date() - parseInt(dateBtn.attr('data-value')) * 1000 * 60 * 60 * 24;
+                dateFilter = Date.parse(aData[0]) >= minAge;
+              }
 
-        return statusFilter && dateFilter;
-      }
+              return statusFilter && dateFilter;
+            }
     );
 
     $("a[data-row-selector='true']").jHueRowSelector();
 
-    $(".confirmationModal").click(function(){
+    $(document).on("click", ".confirmationModal", function () {
       var _this = $(this);
+      _this.bind('confirmation', function () {
+        var _this = this;
+        $.post($(this).attr("data-url"),
+                { 'notification':$(this).attr("data-message") },
+                function (response) {
+                  if (response['status'] != 0) {
+                    $.jHueNotify.error("${ _('Problem: ') }" + response['data']);
+                  } else {
+                    window.location.reload();
+                  }
+                }
+        );
+        return false;
+      });
       $("#confirmation .message").text(_this.attr("data-confirmation-message"));
       $("#confirmation").modal("show");
-      $("#confirmation a.btn-danger").click(function() {
+      $("#confirmation a.btn-danger").click(function () {
         _this.trigger('confirmation');
       });
     });
 
-    $(".confirmationModal").bind('confirmation', function() {
-      var _this = this;
-      $.post($(this).attr("data-url"),
-        { 'notification': $(this).attr("data-message") },
-        function(response) {
-          if (response['status'] != 0) {
-            $.jHueNotify.error("${ _('Problem: ') }" + response['data']);
-          } else {
-            window.location.reload();
-          }
+    refreshRunning();
+    refreshCompleted();
+
+    var numRunning = 0;
+
+    function refreshRunning() {
+      $.getJSON(window.location.href + "?format=json&type=running", function (data) {
+        if (data) {
+          var nNodes = runningTable.fnGetNodes();
+
+          // check for zombie nodes
+          $(nNodes).each(function (iNode, node) {
+            var nodeFound = false;
+            $(data).each(function (iCoord, currentItem) {
+              if ($(node).children("td").eq(5).text() == currentItem.id) {
+                nodeFound = true;
+              }
+            });
+            if (!nodeFound) {
+              runningTable.fnDeleteRow(node);
+              runningTable.fnDraw();
+            }
+          });
+
+          $(data).each(function (iCoord, item) {
+            var coord = new Coordinator(item);
+            var foundRow = null;
+            $(nNodes).each(function (iNode, node) {
+              if ($(node).children("td").eq(5).text() == coord.id) {
+                foundRow = node;
+              }
+            });
+            if (foundRow == null) {
+              var killCell = "";
+              if (coord.canEdit) {
+                killCell = '<a class="btn btn-small confirmationModal" ' +
+                        'href="javascript:void(0)" ' +
+                        'data-url="' + coord.killUrl + '" ' +
+                        'title="${ _('Kill') } ' + coord.id + '"' +
+                        'alt="${ _('Are you sure you want to kill coordinator ')}' + coord.id + '?" ' +
+                        'data-message="${ _('The coordinator was killed!') }" ' +
+                        'data-confirmation-message="${ _('Are you sure you\'d like to kill this job?') }"' +
+                        '>${ _('Kill') }</a>';
+              }
+              if (['RUNNING', 'PREP', 'WAITING', 'SUSPENDED', 'PREPSUSPENDED', 'PREPPAUSED', 'PAUSED'].indexOf(coord.status) > -1) {
+                runningTable.fnAddData([coord.endTime, '<span class="' + coord.statusClass + '">' + coord.status + '</span>', coord.appName,
+                  '<div class="progress"><div class="' + coord.progressClass + '" style="width:' + coord.progress + '%">' + coord.progress + '%</div></div>', coord.user, '<a href="' + coord.absoluteUrl + '">' + coord.id + '</a>',
+                  killCell]);
+              }
+
+            }
+            else {
+              runningTable.fnUpdate('<span class="' + coord.statusClass + '">' + coord.status + '</span>', foundRow, 1, false);
+              runningTable.fnUpdate('<div class="progress"><div class="' + coord.progressClass + '" style="width:' + coord.progress + '%">' + coord.progress + '%</div></div>', foundRow, 3, false);
+            }
+          });
         }
-      );
-      return false;
-    });
+        if (data.length == 0) {
+          runningTable.fnClearTable();
+        }
+
+        if (data.length != numRunning) {
+          refreshCompleted();
+        }
+        numRunning = data.length;
+
+        window.setTimeout(refreshRunning, 1000);
+      });
+    }
+
+    function refreshCompleted() {
+      $.getJSON(window.location.href + "?format=json&type=completed", function (data) {
+        completedTable.fnClearTable();
+        $(data).each(function (iWf, item) {
+          var coord = new Coordinator(item);
+          completedTable.fnAddData([coord.endTime, '<span class="' + coord.statusClass + '">' + coord.status + '</span>', coord.appName,
+            coord.duration, coord.user, '<a href="' + coord.absoluteUrl + '">' + coord.id + '</a>'], false);
+        });
+        completedTable.fnDraw();
+      });
+    }
 
   });
 </script>

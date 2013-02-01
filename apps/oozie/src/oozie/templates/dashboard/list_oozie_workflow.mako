@@ -293,6 +293,7 @@ ${ layout.menubar(section='dashboard') }
   </div>
 </div>
 
+<script src="/oozie/static/js/utils.js" type="text/javascript" charset="utf-8"></script>
 <link rel="stylesheet" href="/oozie/static/css/workflow.css">
 <script src="/static/ext/js/knockout-2.1.0.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
@@ -310,40 +311,6 @@ ${ layout.menubar(section='dashboard') }
 </style>
 
 <script type="text/javascript">
-
-  function getStatusClass(status, prefix){
-    if(!Array.prototype.indexOf) {
-      Array.prototype.indexOf = function(needle) {
-        for(var i = 0; i < this.length; i++) {
-          if(this[i] === needle) {
-            return i;
-          }
-        }
-        return -1;
-      };
-    }
-    if (prefix == null){
-      prefix = "label-";
-    }
-    var klass = "";
-    if (['SUCCEEDED', 'OK'].indexOf(status) > -1){
-      klass = prefix + "success";
-    }
-    else if (['RUNNING', 'PREP', 'WAITING', 'SUSPENDED', 'PREPSUSPENDED', 'PREPPAUSED', 'PAUSED'].indexOf(status) > -1){
-      klass = prefix + "warning";
-    }
-    else if (status == 'READY'){
-      klass = prefix + "success";
-    }
-    else {
-      klass = prefix + "important";
-      if (prefix == "bar-"){
-        klass = prefix + "danger";
-      }
-    }
-    return klass;
-  }
-
 
   var Action = function (action) {
     return {

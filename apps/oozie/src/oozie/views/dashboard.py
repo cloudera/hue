@@ -43,6 +43,7 @@ from oozie.models import History, Job, Workflow
 from oozie.settings import DJANGO_APPS
 
 from django.template.defaultfilters import escapejs
+from desktop.lib.view_util import format_duration_in_millis
 
 
 LOG = logging.getLogger(__name__)
@@ -102,7 +103,12 @@ def list_oozie_workflows(request):
   workflows = get_oozie().get_workflows(**kwargs)
 
   if request.GET.get('format') == 'json':
-    return HttpResponse(json.dumps(massaged_oozie_jobs_for_json(workflows.jobs, request.user)), mimetype="application/json")
+    json_jobs = workflows.jobs
+    if request.GET.get('type') == 'running':
+      json_jobs = split_oozie_jobs(workflows.jobs)['running_jobs']
+    if request.GET.get('type') == 'completed':
+      json_jobs = split_oozie_jobs(workflows.jobs)['completed_jobs']
+    return HttpResponse(json.dumps(massaged_oozie_jobs_for_json(json_jobs, request.user)).replace('\\\\', '\\'), mimetype="application/json")
 
   return render('dashboard/list_oozie_workflows.mako', request, {
     'user': request.user,
@@ -118,6 +124,14 @@ def list_oozie_coordinators(request):
     kwargs['user'] = request.user.username
 
   coordinators = get_oozie().get_coordinators(**kwargs)
+
+  if request.GET.get('format') == 'json':
+    json_jobs = coordinators.jobs
+    if request.GET.get('type') == 'running':
+      json_jobs = split_oozie_jobs(coordinators.jobs)['running_jobs']
+    if request.GET.get('type') == 'completed':
+      json_jobs = split_oozie_jobs(coordinators.jobs)['completed_jobs']
+    return HttpResponse(json.dumps(massaged_oozie_jobs_for_json(json_jobs, request.user)).replace('\\\\', '\\'), mimetype="application/json")
 
   return render('dashboard/list_oozie_coordinators.mako', request, {
     'jobs': split_oozie_jobs(coordinators.jobs),
@@ -157,7 +171,7 @@ def list_oozie_workflow(request, job_id, coordinator_job_id=None):
       'log': oozie_workflow.log,
       'actions': massaged_workflow_actions_for_json(oozie_workflow.get_working_actions())
     }
-    return HttpResponse(json.dumps(return_obj), mimetype="application/json")
+    return HttpResponse(json.dumps(return_obj).replace('\\\\', '\\'), mimetype="application/json")
 
   return render('dashboard/list_oozie_workflow.mako', request, {
     'history': history,
@@ -192,7 +206,7 @@ def list_oozie_coordinator(request, job_id):
       'log': oozie_coordinator.log,
       'actions': massaged_coordinator_actions_for_json(oozie_coordinator)
     }
-    return HttpResponse(json.dumps(return_obj), mimetype="application/json")
+    return HttpResponse(json.dumps(return_obj).replace('\\\\', '\\'), mimetype="application/json")
 
   return render('dashboard/list_oozie_coordinator.mako', request, {
     'oozie_coordinator': oozie_coordinator,
@@ -388,16 +402,17 @@ def massaged_oozie_jobs_for_json(oozie_jobs, user):
 
     massaged_job = {
       'id': job.id,
-      'lastModTime': time.mktime(job.lastModTime),
-      'endTime': time.mktime(job.endTime),
+      'lastModTime': hasattr(job, 'lastModTime') and job.lastModTime and format_time(job.lastModTime) or None,
+      'endTime': job.endTime and format_time(job.endTime) or None,
       'status': job.status,
       'isRunning': job.is_running(),
-      'duration': job.endTime and job.startTime and ( time.mktime(job.endTime) - time.mktime(job.startTime) ) * 1000 or None,
+      'duration': job.endTime and job.startTime and format_duration_in_millis(( time.mktime(job.endTime) - time.mktime(job.startTime) ) * 1000) or None,
       'appName': escapejs(job.appName),
       'progress': job.get_progress(),
       'user': job.user,
       'absoluteUrl': job.get_absolute_url(),
       'canEdit': has_job_edition_permission(job, user),
+      'killUrl': reverse('oozie:manage_oozie_jobs', kwargs={'job_id':job.id, 'action':'kill'}),
       }
     jobs.append(massaged_job)
 
