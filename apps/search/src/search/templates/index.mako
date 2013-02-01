@@ -23,113 +23,12 @@ import math
 
 <%namespace name="macros" file="macros.mako" />
 
-${ commonheader(_('Search'), "search", user) }
+${ commonheader(_('Search'), "search", user) | n,unicode }
 
-<style>
-  .content {
-    margin-left: 58px;
-  }
-
-  .action {
-    margin-right: 5px;
-  }
-
-  .action a, .time a, .account-group, .retweeted {
-    color: #999999;
-  }
-
-  .account-group a {
-    text-decoration: none;
-    font-weight: normal;
-  }
-
-  .username {
-    font-size: 12px;
-  }
-
-  .time {
-    color: #BBBBBB;
-    float: right;
-    margin-top: 1px;
-    position: relative;
-  }
-
-  .avatar {
-    position: absolute;
-    margin-left: -56px!important;
-    margin-top: 4px!important;
-    -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, .2);
-    -moz-box-shadow: 0 1px 1px rgba(0, 0, 0, .2);
-    box-shadow: 0 1px 1px rgba(0, 0, 0, .2);
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-    border-radius: 5px;
-  }
-
-  .text {
-    margin-bottom: 4px;
-    cursor: pointer;
-  }
-
-  .tweet-actions li {
-    display: inline;
-  }
-
-  .stream-item-footer {
-    font-size: 12px;
-    color: #999999;
-  }
-
-  ul.tweet-actions {
-    list-style: none outside none;
-  }
-
-  ul.tweet-actions {
-    margin: 0;
-    padding: 0;
-  }
-
-  .fullname {
-    color: #333333;
-    font-weight: bold;
-  }
-
-  .stream-item-footer, .retweeted {
-    font-size: 12px;
-    padding-top: 1px;
-  }
-
-  .icon {
-    background-position: 0 0;
-    background-repeat: no-repeat;
-    display: inline-block;
-    vertical-align: text-top;
-    height: 13px;
-    width: 14px;
-    margin-top: 0;
-    margin-left: -2px;
-  }
-  .icon-reply {
-    background-image: url("/search/static/art/reply.png");
-  }
-  .icon-retweet {
-    background-image: url("/search/static/art/retweet.png");
-  }
-  .twitter-logo {
-    background-image: url("/search/static/art/bird_gray_32.png");
-    width: 32px;
-    height: 32px;
-    background-repeat: no-repeat;
-    display: inline-block;
-    vertical-align: top;
-    margin-top: 2px;
-  }
-
-</style>
 
 <div class="container-fluid">
     <div class="row-fluid">
-        %if solr_query['facets'] == 1:
+        % if solr_query['facets'] == 1:
         <div class="span3">
             <div class="well" style="padding: 8px 0;">
             <ul class="nav nav-list">
@@ -193,12 +92,12 @@ ${ commonheader(_('Search'), "search", user) }
             </div>
         </div>
         <div class="span9">
-        %else:
+        % else:
         <div class="span12">
-        %endif
+        % endif
             <form class="form-search well">
                 <i class="twitter-logo"></i>
-                ${ search_form }
+                ${ search_form | n,unicode }
                 <button class="btn" type="submit">${_('Search')}</button>
                 <div class="btn-group pull-right">
                   <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
@@ -229,10 +128,10 @@ ${ commonheader(_('Search'), "search", user) }
                         previous = int(solr_query["start"]) - int(solr_query["rows"])
                         next = int(solr_query["start"]) + int(solr_query["rows"])
                       %>
-                      %if int(solr_query["start"]) > 0:
+                      % if int(solr_query["start"]) > 0:
                         <li><a title="${_('Beginning of List')}" href="?query=${solr_query["q"]}&fq=${solr_query["fq"]}&sort=${solr_query["sort"]}&rows=${solr_query["rows"]}&start=${beginning}">&larr; ${_('Beginning of List')}</a></li>
                         <li><a title="Previous Page" href="?query=${solr_query["q"]}&fq=${solr_query["fq"]}&sort=${solr_query["sort"]}&rows=${solr_query["rows"]}&start=${previous}">${_('Previous Page')}</a></li>
-                      %endif
+                      % endif
                       <li><a title="Next page" href="?query=${solr_query["q"]}&fq=${solr_query["fq"]}&sort=${solr_query["sort"]}&rows=${solr_query["rows"]}&start=${next}">${_('Next Page')}</a></li>
                     </ul>
                     <p>${_('Show')}
@@ -248,6 +147,8 @@ ${ commonheader(_('Search'), "search", user) }
 <div class="hide">
   ${rr}
 </div>
+
+<link rel="stylesheet" href="/search/static/css/search.css">
 
 <script src="/static/ext/js/moment.min.js" type="text/javascript" charset="utf-8"></script>
 <script>
@@ -274,4 +175,4 @@ ${ commonheader(_('Search'), "search", user) }
   });
 </script>
 
-${ commonfooter(messages) }
+${ commonfooter(messages) | n,unicode }
