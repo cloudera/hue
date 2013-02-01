@@ -1852,13 +1852,13 @@ class TestDashboard(OozieMockBase):
 
 
   def test_list_workflows(self):
-    response = self.c.get(reverse('oozie:list_oozie_workflows'))
+    response = self.c.get(reverse('oozie:list_oozie_workflows')+"?format=json")
     for wf_id in MockOozieApi.WORKFLOW_IDS:
       assert_true(wf_id in response.content, response.content)
 
 
   def test_list_coordinators(self):
-    response = self.c.get(reverse('oozie:list_oozie_coordinators'))
+    response = self.c.get(reverse('oozie:list_oozie_coordinators')+"?format=json")
     for coord_id in MockOozieApi.COORDINATOR_IDS:
       assert_true(coord_id in response.content, response.content)
 
@@ -1894,7 +1894,7 @@ class TestDashboard(OozieMockBase):
 
 
   def test_workflows_permissions(self):
-    response = self.c.get(reverse('oozie:list_oozie_workflows'))
+    response = self.c.get(reverse('oozie:list_oozie_workflows')+"?format=json")
     assert_true('WordCount1' in response.content, response.content)
 
     # Rerun
@@ -1906,7 +1906,7 @@ class TestDashboard(OozieMockBase):
     client_not_me = make_logged_in_client(username='not_me', is_superuser=False, groupname='test', recreate=True)
     grant_access("not_me", "not_me", "oozie")
 
-    response = client_not_me.get(reverse('oozie:list_oozie_workflows'))
+    response = client_not_me.get(reverse('oozie:list_oozie_workflows')+"?format=json")
     assert_false('WordCount1' in response.content, response.content)
 
     # Rerun
@@ -1917,7 +1917,7 @@ class TestDashboard(OozieMockBase):
     # Add read only access
     add_permission("not_me", "dashboard_jobs_access", "dashboard_jobs_access", "oozie")
 
-    response = client_not_me.get(reverse('oozie:list_oozie_workflows'))
+    response = client_not_me.get(reverse('oozie:list_oozie_workflows')+"?format=json")
     assert_true('WordCount1' in response.content, response.content)
 
     # Rerun
@@ -1951,20 +1951,20 @@ class TestDashboard(OozieMockBase):
 
 
   def test_coordinators_permissions(self):
-    response = self.c.get(reverse('oozie:list_oozie_coordinators'))
+    response = self.c.get(reverse('oozie:list_oozie_coordinators')+"?format=json")
     assert_true('DailyWordCount1' in response.content, response.content)
 
     # Login as someone else
     client_not_me = make_logged_in_client(username='not_me', is_superuser=False, groupname='test', recreate=True)
     grant_access("not_me", "not_me", "oozie")
 
-    response = client_not_me.get(reverse('oozie:list_oozie_coordinators'))
+    response = client_not_me.get(reverse('oozie:list_oozie_coordinators')+"?format=json")
     assert_false('DailyWordCount1' in response.content, response.content)
 
     # Add read only access
     add_permission("not_me", "dashboard_jobs_access", "dashboard_jobs_access", "oozie")
 
-    response = client_not_me.get(reverse('oozie:list_oozie_coordinators'))
+    response = client_not_me.get(reverse('oozie:list_oozie_coordinators')+"?format=json")
     assert_true('DailyWordCount1' in response.content, response.content)
 
 
