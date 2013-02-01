@@ -90,7 +90,7 @@ class Command(NoArgsCommand):
       args.append('true')
 
     # Start metastore as well?
-    is_local, host, port = beeswax.hive_site.get_metastore()
+    is_local, host, port, kerberos_principal = beeswax.hive_site.get_metastore()
     if not is_local:
       LOG.info("Beeswax configured to use external metastore at %s:%s" % (host, port))
     else:
