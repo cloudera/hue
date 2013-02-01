@@ -184,13 +184,15 @@ def escape(text)  :
           </small>
           <a target="_blank" href="https://twitter.com/${ result.get('user_screen_name', '') }" class="account-group">
             <img src="http://twitter.com/api/users/profile_image/${ result.get('user_screen_name', '') }" class="avatar"
-                 data-placement="left" rel="popover"  data-content="Location: ${ result.get('user_location', '') }<br/>User tweets #: ${ result.get('user_statuses_count', '') }<br/>User followers #: ${ result.get('user_followers_count', '') }" title="@${ result.get('user_screen_name', '') }" data-trigger="hover">
+                 data-placement="left" rel="popover"  data-content="Location: ${ result.get('user_location', '') }
+             <br/>User tweets #: ${ result.get('user_statuses_count', '') }
+             <br/>User followers #: ${ result.get('user_followers_count', '') }" title="@${ result.get('user_screen_name', '') }" data-trigger="hover">
             <strong class="fullname">${ result.get('user_name', '') }</strong>
             <span>&rlm;</span><span class="username">@${ result.get('user_screen_name', '') }</span>
           </a>
         </div>
         <div class="text" data-link="https://twitter.com/${ result.get('user_screen_name', '') }/status/${ result.get('id', '') }">
-          ${ parseLinks(result.get('text', '')) }
+          ${ parseLinks(result.get('text', ''))  | n,unicode }
           %if result.get('retweet_count', ''):
               <div class="retweeted">
                 ${_('Retweeted %s times') % result.get('retweet_count', '') }

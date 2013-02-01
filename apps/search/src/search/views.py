@@ -22,12 +22,11 @@ except ImportError:
 import logging
 
 from desktop.lib.django_util import render
-
-from search.forms import QueryForm
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.rest.http_client import HttpClient, RestException
 from desktop.lib.rest.resource import Resource
 
+from search.forms import QueryForm
 
 
 # http://lucene.apache.org/solr/api-4_0_0-BETA/doc-files/tutorial.html#Getting+Started
@@ -85,7 +84,8 @@ class SolrApi(object):
                 ('facet.date', 'created_at'),
                 ('facet.date.start', 'NOW/DAY-305DAYS'),
                 ('facet.date.end', 'NOW/DAY+1DAY'),
-                ('facet.date.gap', '+1DAY'),)
+                ('facet.date.gap', '+1DAY'),
+             )
 
       fqs = solr_query['fq'].split('|')
       for fq in fqs:
@@ -95,7 +95,3 @@ class SolrApi(object):
       return self._root.get('collection1/browse', params)
     except RestException, e:
       raise PopupException('Error while accessing Solr: %s' % e)
-
-
-
-
