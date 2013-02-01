@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-01-10 18:29-0800\n"
+"POT-Creation-Date: 2013-01-31 16:56-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -238,115 +238,119 @@ msgstr ""
 msgid "The password for the bind user."
 msgstr ""
 
-#: src/desktop/conf.py:315
-msgid "Configuration for LDAP user schema and search."
+#: src/desktop/conf.py:313
+msgid "Create users when they login with their LDAP credentials."
 msgstr ""
 
 #: src/desktop/conf.py:319
+msgid "Configuration for LDAP user schema and search."
+msgstr ""
+
+#: src/desktop/conf.py:323
 msgid "A base filter for use when searching for users."
 msgstr ""
 
-#: src/desktop/conf.py:322
+#: src/desktop/conf.py:326
 msgid ""
 "The username attribute in the LDAP schema. Typically, this is "
 "'sAMAccountName' for AD and 'uid' for other LDAP systems."
 msgstr ""
 
-#: src/desktop/conf.py:330
+#: src/desktop/conf.py:334
 msgid "Configuration for LDAP group schema and search."
 msgstr ""
 
-#: src/desktop/conf.py:334
+#: src/desktop/conf.py:338
 msgid "A base filter for use when searching for groups."
 msgstr ""
 
-#: src/desktop/conf.py:337
+#: src/desktop/conf.py:341
 msgid "The group name attribute in the LDAP schema. Typically, this is 'cn'."
 msgstr ""
 
-#: src/desktop/conf.py:341
+#: src/desktop/conf.py:345
 msgid "The LDAP attribute which specifies the members of a group."
 msgstr ""
 
-#: src/desktop/conf.py:351
+#: src/desktop/conf.py:355
 msgid "Paths on the local file system that users should be able to browse."
 msgstr ""
 
-#: src/desktop/conf.py:356
+#: src/desktop/conf.py:360
 msgid "The path on the local filesystem."
 msgstr ""
 
-#: src/desktop/conf.py:364
+#: src/desktop/conf.py:368
 msgid "Link for 'feedback' tab."
 msgstr ""
 
-#: src/desktop/conf.py:371
+#: src/desktop/conf.py:375
 msgid "Whether to send debug messages from JavaScript to the server logs."
 msgstr ""
 
-#: src/desktop/conf.py:378
+#: src/desktop/conf.py:382
 msgid "If true, log all database requests."
 msgstr ""
 
-#: src/desktop/conf.py:384
+#: src/desktop/conf.py:388
 msgid "Administrators that should receive error emails."
 msgstr ""
 
-#: src/desktop/conf.py:389
+#: src/desktop/conf.py:393
 msgid "The full name of the admin."
 msgstr ""
 
-#: src/desktop/conf.py:392
+#: src/desktop/conf.py:396
 msgid "The email address of the admin."
 msgstr ""
 
-#: src/desktop/conf.py:396
+#: src/desktop/conf.py:400
 msgid "Enable or disable Django debug mode."
 msgstr ""
 
-#: src/desktop/conf.py:403
+#: src/desktop/conf.py:407
 msgid ""
 "Enable or disable debugging information in the 500 internal server error "
 "response. Note that the debugging information may contain sensitive data."
 " If django_debug_mode is True, this is automatically enabled."
 msgstr ""
 
-#: src/desktop/conf.py:412
+#: src/desktop/conf.py:416
 msgid "Email address that internal error messages should send as."
 msgstr ""
 
-#: src/desktop/conf.py:418
+#: src/desktop/conf.py:422
 msgid "The email backend to use."
 msgstr ""
 
-#: src/desktop/conf.py:434
+#: src/desktop/conf.py:438
 msgid "Secret key should be configured as a random string."
 msgstr ""
 
-#: src/desktop/conf.py:440
+#: src/desktop/conf.py:444
 msgid "SSL private key file should be set to enable HTTPS."
 msgstr ""
 
-#: src/desktop/conf.py:446
+#: src/desktop/conf.py:450
 msgid "Encoding not supported."
 msgstr ""
 
-#: src/desktop/conf.py:455
+#: src/desktop/conf.py:459
 #, python-format
 msgid "Keytab should have 0600 permissions (has %o)."
 msgstr ""
 
-#: src/desktop/conf.py:465
+#: src/desktop/conf.py:469
 msgid "LDAP is only partially configured. An LDAP URL must be provided."
 msgstr ""
 
-#: src/desktop/conf.py:471
+#: src/desktop/conf.py:475
 msgid ""
 "LDAP is only partially configured. An NT Domain or username search "
 "pattern must be provided."
 msgstr ""
 
-#: src/desktop/conf.py:477
+#: src/desktop/conf.py:481
 msgid ""
 "The LDAP username pattern should contain the special<username> "
 "replacement string for authentication."
@@ -389,15 +393,15 @@ msgstr ""
 msgid "You do not have permission to access the %(app_name)s application."
 msgstr ""
 
-#: src/desktop/views.py:56
+#: src/desktop/views.py:57
 msgid "No logs found!"
 msgstr ""
 
-#: src/desktop/views.py:94
+#: src/desktop/views.py:95
 msgid "No logs found."
 msgstr ""
 
-#: src/desktop/views.py:171 src/desktop/views.py:194 src/desktop/views.py:343
+#: src/desktop/views.py:172 src/desktop/views.py:199 src/desktop/views.py:348
 msgid "You must be a superuser."
 msgstr ""
 
@@ -414,72 +418,72 @@ msgstr ""
 msgid "Could not create home directory."
 msgstr ""
 
-#: src/desktop/lib/django_util.py:379
+#: src/desktop/lib/django_util.py:384
 msgid "year"
 msgid_plural "years"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/desktop/lib/django_util.py:380
+#: src/desktop/lib/django_util.py:385
 msgid "month"
 msgid_plural "months"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/desktop/lib/django_util.py:381
+#: src/desktop/lib/django_util.py:386
 msgid "week"
 msgid_plural "weeks"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/desktop/lib/django_util.py:382
+#: src/desktop/lib/django_util.py:387
 msgid "day"
 msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/desktop/lib/django_util.py:383
+#: src/desktop/lib/django_util.py:388
 msgid "hour"
 msgid_plural "hours"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/desktop/lib/django_util.py:384
+#: src/desktop/lib/django_util.py:389
 msgid "minute"
 msgid_plural "minutes"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/desktop/lib/django_util.py:385
+#: src/desktop/lib/django_util.py:390
 msgid "second"
 msgid_plural "seconds"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/desktop/lib/django_util.py:406
+#: src/desktop/lib/django_util.py:411
 msgid "s"
 msgstr ""
 
-#: src/desktop/lib/django_util.py:408
+#: src/desktop/lib/django_util.py:413
 msgid "seconds"
 msgstr ""
 
-#: src/desktop/lib/django_util.py:414
+#: src/desktop/lib/django_util.py:419
 #, python-format
 msgid "%(number)d%(type)s"
 msgstr ""
 
-#: src/desktop/lib/django_util.py:416
+#: src/desktop/lib/django_util.py:421
 #, python-format
 msgid "%(number)d %(type)s"
 msgstr ""
 
-#: src/desktop/lib/django_util.py:423
+#: src/desktop/lib/django_util.py:428
 #, python-format
 msgid "%(separator)s %(number)d%(type)s"
 msgstr ""
 
-#: src/desktop/lib/django_util.py:425
+#: src/desktop/lib/django_util.py:430
 #, python-format
 msgid "%(separator)s %(number)d %(type)s"
 msgstr ""
@@ -490,8 +494,8 @@ msgstr ""
 
 #: src/desktop/management/commands/config_dump.py:60
 #: src/desktop/management/commands/config_dump.py:70
-#: src/desktop/templates/dump_config.mako:92
-#: src/desktop/templates/dump_config.mako:104
+#: src/desktop/templates/dump_config.mako:90
+#: src/desktop/templates/dump_config.mako:102
 msgid "No help available."
 msgstr ""
 
@@ -674,56 +678,56 @@ msgstr ""
 msgid "All OK. Configuration check passed."
 msgstr ""
 
-#: src/desktop/templates/common_header.mako:65
+#: src/desktop/templates/common_header.mako:66
 #: src/desktop/templates/error.mako:34
 msgid "Back"
 msgstr ""
 
-#: src/desktop/templates/common_header.mako:66
+#: src/desktop/templates/common_header.mako:67
 msgid "Select this folder"
 msgstr ""
 
-#: src/desktop/templates/common_header.mako:67
+#: src/desktop/templates/common_header.mako:68
 msgid "Create folder"
 msgstr ""
 
-#: src/desktop/templates/common_header.mako:68
+#: src/desktop/templates/common_header.mako:69
 msgid "Folder name"
 msgstr ""
 
-#: src/desktop/templates/common_header.mako:69
+#: src/desktop/templates/common_header.mako:70
 msgid "Cancel"
 msgstr ""
 
-#: src/desktop/templates/common_header.mako:70
+#: src/desktop/templates/common_header.mako:71
 msgid "The file has not been found"
 msgstr ""
 
-#: src/desktop/templates/common_header.mako:71
+#: src/desktop/templates/common_header.mako:72
 msgid "Upload a file"
 msgstr ""
 
-#: src/desktop/templates/common_header.mako:72
+#: src/desktop/templates/common_header.mako:73
 msgid "Failed"
 msgstr ""
 
-#: src/desktop/templates/common_header.mako:78
+#: src/desktop/templates/common_header.mako:79
 msgid "Go to column:"
 msgstr ""
 
-#: src/desktop/templates/common_header.mako:79
+#: src/desktop/templates/common_header.mako:80
 msgid "column name..."
 msgstr ""
 
-#: src/desktop/templates/common_header.mako:135
+#: src/desktop/templates/common_header.mako:136
 msgid "About Hue"
 msgstr ""
 
-#: src/desktop/templates/common_header.mako:142
+#: src/desktop/templates/common_header.mako:143
 msgid "Profile"
 msgstr ""
 
-#: src/desktop/templates/common_header.mako:144
+#: src/desktop/templates/common_header.mako:145
 msgid "Sign Out"
 msgstr ""
 
@@ -739,7 +743,7 @@ msgstr ""
 msgid "Configuration Sections and Variables"
 msgstr ""
 
-#: src/desktop/templates/dump_config.mako:105
+#: src/desktop/templates/dump_config.mako:103
 msgid "Default:"
 msgstr ""
 
