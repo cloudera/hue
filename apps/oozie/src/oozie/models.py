@@ -705,7 +705,7 @@ class Java(Action):
   java_opts = models.CharField(max_length=256, blank=True, verbose_name=_t('Java options'),
                                help_text=_t('Command-line parameters used to start the JVM that will execute '
                                             'the Java application. Using this element is equivalent to use the mapred.child.java.opts '
-                                            'configuration property.'))
+                                            'configuration property. E.g. -Dexample-property=hue'))
   job_properties = models.TextField(default='[]', verbose_name=_t('Hadoop job properties'),
                                     help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production)'))
   prepares = models.TextField(default="[]", verbose_name=_t('Prepares'),
