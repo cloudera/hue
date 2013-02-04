@@ -981,9 +981,14 @@ from django.utils.translation import ugettext as _
 
       self.changePermissions = function () {
         var paths = [];
+        var allFileType = true;
         $(self.selectedFiles()).each(function (index, file) {
+          if ("dir" == file.type){
+            allFileType = false;
+          }
           paths.push(file.path);
         });
+
         hiddenFields($("#chmodForm"), 'path', paths);
         $("#chmodForm").attr("action", "/filebrowser/chmod?next=${url('filebrowser.views.view', path=urlencode('/'))}" + "." + self.currentPath());
         $("#changePermissionModal").modal({
@@ -992,7 +997,7 @@ from django.utils.translation import ugettext as _
         });
 
         // Initial values for form
-        permissions = ["sticky", "user_read", "user_write", "user_execute", "group_read", "group_write", "group_execute", "other_read", "other_write", "other_execute"].reverse();
+        var permissions = ["sticky", "user_read", "user_write", "user_execute", "group_read", "group_write", "group_execute", "other_read", "other_write", "other_execute"].reverse();
         var mode = octal(self.selectedFile().mode) & 01777;
         for (var i = 0; i < permissions.length; i++) {
           if (mode & 1) {
@@ -1001,6 +1006,16 @@ from django.utils.translation import ugettext as _
             $("#chmodForm input[name=" + permissions[i] + "]").attr("checked", false);
           }
           mode >>>= 1;
+        }
+        if (allFileType){
+          $("#chmodForm input[name='user_execute']").attr("disabled", "disabled");
+          $("#chmodForm input[name='group_execute']").attr("disabled", "disabled");
+          $("#chmodForm input[name='other_execute']").attr("disabled", "disabled");
+        }
+        else {
+          $("#chmodForm input[name='user_execute']").removeAttr("disabled");
+          $("#chmodForm input[name='group_execute']").removeAttr("disabled");
+          $("#chmodForm input[name='other_execute']").removeAttr("disabled");
         }
       };
 
