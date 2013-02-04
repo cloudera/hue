@@ -129,9 +129,9 @@ ${layout.menubar(section='dashboard')}
   }
 
   $(document).ready(function () {
-    var runningTable = $('#running-table').dataTable({
-      'sPaginationType':'bootstrap',
-      'iDisplayLength':50,
+    var runningTable = $("#running-table").dataTable({
+      "sPaginationType":"bootstrap",
+      "iDisplayLength":50,
       "bLengthChange":false,
       "sDom":"<'row'r>t<'row'<'span6'i><''p>>",
       "aoColumns":[
@@ -158,12 +158,15 @@ ${layout.menubar(section='dashboard')}
           "sNext":"${_('Next')}",
           "sPrevious":"${_('Previous')}"
         }
+      },
+      "fnDrawCallback":function (oSettings) {
+        $("a[data-row-selector='true']").jHueRowSelector();
       }
     });
 
-    var completedTable = $('#completed-table').dataTable({
-      'sPaginationType':'bootstrap',
-      'iDisplayLength':50,
+    var completedTable = $("#completed-table").dataTable({
+      "sPaginationType":"bootstrap",
+      "iDisplayLength":50,
       "bLengthChange":false,
       "sDom":"<'row'r>t<'row'<'span6'i><''p>>",
       "aoColumns":[
@@ -189,10 +192,13 @@ ${layout.menubar(section='dashboard')}
           "sNext":"${_('Next')}",
           "sPrevious":"${_('Previous')}"
         }
+      },
+      "fnDrawCallback":function (oSettings) {
+        $("a[data-row-selector='true']").jHueRowSelector();
       }
     });
 
-    $('#filterInput').keydown(function (e) {
+    $("#filterInput").keydown(function (e) {
       if (e.which == 13) {
         e.preventDefault();
         return false;
@@ -212,13 +218,13 @@ ${layout.menubar(section='dashboard')}
 
 
     $("a.btn-status").click(function () {
-      $(this).toggleClass('active');
+      $(this).toggleClass("active");
       drawTable();
     });
 
     $("a.btn-date").click(function () {
-      $("a.btn-date").not(this).removeClass('active');
-      $(this).toggleClass('active');
+      $("a.btn-date").not(this).removeClass("active");
+      $(this).toggleClass("active");
       drawTable();
     });
 
@@ -234,41 +240,39 @@ ${layout.menubar(section='dashboard')}
     }
 
     $.fn.dataTableExt.afnFiltering.push(
-            function (oSettings, aData, iDataIndex) {
-              var urlHashes = ""
+      function (oSettings, aData, iDataIndex) {
+        var urlHashes = ""
 
-              var statusBtn = $('a.btn-status.active');
-              var statusFilter = true;
-              if (statusBtn.length > 0) {
-                var statuses = []
-                $.each(statusBtn, function () {
-                  statuses.push($(this).attr('data-value'));
-                });
-                statusFilter = aData[1].match(RegExp(statuses.join('|'), "i")) != null;
-              }
+        var statusBtn = $("a.btn-status.active");
+        var statusFilter = true;
+        if (statusBtn.length > 0) {
+          var statuses = []
+          $.each(statusBtn, function () {
+            statuses.push($(this).attr("data-value"));
+          });
+          statusFilter = aData[1].match(RegExp(statuses.join('|'), "i")) != null;
+        }
 
-              var dateBtn = $('a.btn-date.active');
-              var dateFilter = true;
-              if (dateBtn.length > 0) {
-                var minAge = new Date() - parseInt(dateBtn.attr('data-value')) * 1000 * 60 * 60 * 24;
-                dateFilter = Date.parse(aData[0]) >= minAge;
-              }
+        var dateBtn = $("a.btn-date.active");
+        var dateFilter = true;
+        if (dateBtn.length > 0) {
+          var minAge = new Date() - parseInt(dateBtn.attr("data-value")) * 1000 * 60 * 60 * 24;
+          dateFilter = Date.parse(aData[0]) >= minAge;
+        }
 
-              return statusFilter && dateFilter;
-            }
+        return statusFilter && dateFilter;
+      }
     );
-
-    $("a[data-row-selector='true']").jHueRowSelector();
 
     $(document).on("click", ".confirmationModal", function () {
       var _this = $(this);
-      _this.bind('confirmation', function () {
+      _this.bind("confirmation", function () {
         var _this = this;
         $.post($(this).attr("data-url"),
-                { 'notification':$(this).attr("data-message") },
+                { "notification":$(this).attr("data-message") },
                 function (response) {
-                  if (response['status'] != 0) {
-                    $.jHueNotify.error("${ _('Problem: ') }" + response['data']);
+                  if (response["status"] != 0) {
+                    $.jHueNotify.error("${ _('Problem: ') }" + response["data"]);
                   } else {
                     window.location.reload();
                   }
@@ -279,7 +283,7 @@ ${layout.menubar(section='dashboard')}
       $("#confirmation .message").text(_this.attr("data-confirmation-message"));
       $("#confirmation").modal("show");
       $("#confirmation a.btn-danger").click(function () {
-        _this.trigger('confirmation');
+        _this.trigger("confirmation");
       });
     });
 
@@ -329,7 +333,7 @@ ${layout.menubar(section='dashboard')}
               }
               if (['RUNNING', 'PREP', 'WAITING', 'SUSPENDED', 'PREPSUSPENDED', 'PREPPAUSED', 'PAUSED'].indexOf(coord.status) > -1) {
                 runningTable.fnAddData([coord.endTime, '<span class="' + coord.statusClass + '">' + coord.status + '</span>', coord.appName,
-                  '<div class="progress"><div class="' + coord.progressClass + '" style="width:' + coord.progress + '%">' + coord.progress + '%</div></div>', coord.user, '<a href="' + coord.absoluteUrl + '">' + coord.id + '</a>',
+                  '<div class="progress"><div class="' + coord.progressClass + '" style="width:' + coord.progress + '%">' + coord.progress + '%</div></div>', coord.user, '<a href="' + coord.absoluteUrl + '" data-row-selector="true">' + coord.id + '</a>',
                   killCell]);
               }
 
@@ -359,7 +363,7 @@ ${layout.menubar(section='dashboard')}
         $(data).each(function (iWf, item) {
           var coord = new Coordinator(item);
           completedTable.fnAddData([coord.endTime, '<span class="' + coord.statusClass + '">' + coord.status + '</span>', coord.appName,
-            coord.duration, coord.user, '<a href="' + coord.absoluteUrl + '">' + coord.id + '</a>'], false);
+            coord.duration, coord.user, '<a href="' + coord.absoluteUrl + '" data-row-selector="true">' + coord.id + '</a>'], false);
         });
         completedTable.fnDraw();
       });
