@@ -674,7 +674,6 @@ $('#workflow').on('click', '.import-jobsub-node-link', function(e) {
         var node = data.data.node;
         var NodeModel = nodeModelChooser(node.node_type);
         node.id = IdGeneratorTable[node.node_type].nextId();
-        node.name = node.id;
         node.child_links = [];
         var model = new NodeModel(node);
         var new_node = new Node(workflow, model, workflow.registry);
