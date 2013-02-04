@@ -28,13 +28,14 @@
             ${ common.configuration(node.get_properties()) }
 
             <main-class>${ node.main_class }</main-class>
+
+            % if node.java_opts:
+            <java-opts>${ node.java_opts }</java-opts>
+            % endif
+
             % for arg in node.args.split():
             <arg>${ arg }</arg>
             % endfor
-
-            % if len(node.java_opts):
-            <java-opts>${ node.java_opts }</java-opts>
-            % endif
 
             ${ common.distributed_cache(node.get_files(), node.get_archives()) }
         </java>

@@ -28,7 +28,6 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
 from desktop.lib.django_test_util import make_logged_in_client
-from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.test_utils import grant_access, add_permission
 from jobsub.management.commands import jobsub_setup
 from jobsub.models import OozieDesign
@@ -674,6 +673,40 @@ class TestEditor(OozieMockBase):
         '    </kill>\n'
         '    <end name="end"/>\n'
         '</workflow-app>'.split(), self.wf.to_xml({'output': '/path'}).split())
+
+
+  def test_workflow_java_gen_xml(self):
+    self.wf.node_set.filter(name='action-name-1').delete()
+
+    action1 = add_node(self.wf, 'action-name-1', 'java', [self.wf.start], {
+        u'name': 'MyTeragen',
+        "description":"Generate N number of records",
+        "main_class":"org.apache.hadoop.examples.terasort.TeraGen",
+        "args":"1000 ${output_dir}/teragen",
+        "files":"[]",
+        "job_xml":"",
+        "java_opts":"-Dexample-property=natty",
+        "jar_path":"/user/hue/oozie/workspaces/lib/hadoop-examples.jar",
+        "prepares":"[]",
+        "archives":"[]",
+    })
+    Link(parent=action1, child=self.wf.end, name="ok").save()
+
+    xml = self.wf.to_xml({'output_dir': '/path'})
+
+    assert_true("""
+    <action name="MyTeragen">
+        <java>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <main-class>org.apache.hadoop.examples.terasort.TeraGen</main-class>
+            <java-opts>-Dexample-property=natty</java-opts>
+            <arg>1000</arg>
+            <arg>${output_dir}/teragen</arg>
+        </java>
+        <ok to="end"/>
+        <error to="kill"/>
+    </action>""" in xml, xml)
 
 
   def test_workflow_shell_gen_xml(self):
