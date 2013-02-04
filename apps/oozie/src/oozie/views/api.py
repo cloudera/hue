@@ -32,7 +32,7 @@ from oozie.forms import WorkflowForm, ImportJobsubDesignForm, NodeForm, design_f
 from oozie.import_jobsub import convert_jobsub_design
 from oozie.models import Workflow, Node, Start, End, Kill, Mapreduce, Java, Streaming,\
                          Link, Decision, Fork, DecisionEnd, Join,\
-                         NODE_TYPES, ACTION_TYPES, CONTROL_TYPES, _STD_PROPERTIES_JSON
+                         NODE_TYPES, ACTION_TYPES, _STD_PROPERTIES_JSON
 from oozie.decorators import check_job_access_permission, check_job_edition_permission
 from oozie.utils import model_to_dict
 
