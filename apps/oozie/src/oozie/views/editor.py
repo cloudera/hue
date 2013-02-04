@@ -41,9 +41,9 @@ from oozie.decorators import check_job_access_permission, check_job_edition_perm
                              check_dataset_access_permission, check_dataset_edition_permission
 from oozie.import_workflow import import_workflow as _import_workflow
 from oozie.management.commands import oozie_setup
-from oozie.models import Job, Workflow, History, Coordinator,\
+from oozie.models import Workflow, History, Coordinator,\
                          Dataset, DataInput, DataOutput,\
-                         ACTION_TYPES, _STD_PROPERTIES_JSON
+                         ACTION_TYPES
 from oozie.forms import WorkflowForm, CoordinatorForm, DatasetForm,\
   DataInputForm, DataOutputForm, LinkForm,\
   DefaultLinkForm, design_form_by_type, ParameterForm,\

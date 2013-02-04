@@ -131,6 +131,11 @@ ${ layout.menubar(section='coordinators') }
             </div>
             <div class="fieldWrapper">
               <div class="row-fluid">
+                  <div class="alert alert-warning">
+                    ${ _('UTC time only! (e.g. if you want 10pm PST (UTC+8) set it 8 hours later to 6am the next day.') }
+                  </div>
+              </div>
+              <div class="row-fluid">
                 <div class="span6">
                 ${ utils.render_field_no_popover(coordinator_form['start']) }
                 </div>
@@ -267,7 +272,7 @@ ${ layout.menubar(section='coordinators') }
 
         <div class="form-actions">
           <a id="backBtn" class="btn disabled">${ _('Back') }</a>
-          <a id="nextBtn" class="btn btn-primary">${ _('Next') }</a>
+          <a id="nextBtn" class="btn btn-primary disable-feedback">${ _('Next') }</a>
           % if coordinator.is_editable(user):
             <a class="btn btn-primary save" data-bind="visible: isSaveVisible()" style="margin-left: 30px">${ _('Save coordinator') }</a>
           % endif
@@ -528,20 +533,21 @@ ${ layout.menubar(section='coordinators') }
         $("#edit-dataset-form").empty();
         window.viewModel.updateInstance();
         $("#edit-dataset-body").find("input, select").each(function () {
-          $(this).clone().appendTo($("#edit-dataset-form"));
+          // Don't clone as it is duplicating ids.
+          $(this).appendTo($("#edit-dataset-form"));
         });
         $.post($("#edit-dataset-body").data("url"),
-                $("#edit-dataset-form").serialize(),
-                function (response) {
-                  if (response['status'] != 0) {
-                    $("#edit-dataset-form").empty();
-                    $('#edit-dataset-body').html(response['data']);
-                    decorateDateTime();
-                  } else {
-                    window.location.replace(response['data']);
-                    window.location.reload();
-                  }
-                }
+            $("#edit-dataset-form").serialize(),
+            function (response) {
+              if (response['status'] != 0) {
+                $("#edit-dataset-form").empty();
+                $('#edit-dataset-body').html(response['data']);
+                decorateDateTime();
+              } else {
+                window.location.replace(response['data']);
+                window.location.reload();
+              }
+            }
         );
       });
 
