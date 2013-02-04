@@ -1,7 +1,7 @@
 import re
 
 from jobsub.models import OozieDesign, OozieMapreduceAction, OozieStreamingAction,\
-  OozieJavaAction
+                          OozieJavaAction
 
 from oozie.models import Mapreduce, Java, Streaming
 
