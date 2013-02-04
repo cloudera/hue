@@ -59,42 +59,57 @@ ${ commonheader(_('Task Attempt: %(attemptId)s - Job Browser') % dict(attemptId=
 
             <div class="tab-content">
                 <div class="tab-pane active" id="logs">
-                    <%
-                        log_diagnostic = logs[0]
-                        log_stdout = logs[1]
-                        log_stderr = logs[2]
-                        log_syslog = logs[3]
-                    %>
-                    <%def name="format_log(raw)">
-                        ## have to remove any indentation here or it breaks inside the pre tags
-                          % for line in raw.split('\n'):
-                              ${ line | unicode,trim }
-                        % endfor
-                    </%def>
-                    <h2>${_('task diagnostic log')}</h2>
-                    % if not log_diagnostic:
+                  <%def name="format_log(raw)">
+                    ## have to remove any indentation here or it breaks inside the pre tags
+                    % for line in raw.split('\n'):
+${ line | unicode,trim }
+                    % endfor
+                  </%def>
+                  <%
+                      log_diagnostic = logs[0]
+                      log_stdout = logs[1]
+                      log_stderr = logs[2]
+                      log_syslog = logs[3]
+                  %>
+                  <div class="tabbable">
+                    <ul class="nav nav-pills">
+                      <li class="active"><a href="#logsDiagnostic" data-toggle="tab">${_('task diagnostic log')}</a></li>
+                      <li class=""><a href="#logsStdOut" data-toggle="tab">${_('stdout')}</a></li>
+                      <li class=""><a href="#logsStdErr" data-toggle="tab">${_('stderr')}</a></li>
+                      <li class=""><a href="#logsSysLog" data-toggle="tab">${_('syslog')}</a></li>
+                    </ul>
+                    <div class="tab-content">
+                      <div class="tab-pane active" id="logsDiagnostic">
+                          % if not log_diagnostic:
                             <pre>-- empty --</pre>
-                    % else:
+                          % else:
                             <pre>${format_log(log_diagnostic)}</pre>
-                    % endif
-                    <h2>${_('stdout')}</h2>
-                    % if not log_stdout:
+                          % endif
+                      </div>
+                      <div class="tab-pane" id="logsStdOut">
+                          % if not log_stdout:
                             <pre>-- empty --</pre>
-                    % else:
+                          % else:
                             <pre>${format_log(log_stdout)}</pre>
-                    % endif
-                    <h2>${_('stderr')}</h2>
-                    % if not log_stderr:
+                          % endif
+                      </div>
+                      <div class="tab-pane" id="logsStdErr">
+                          % if not log_stderr:
                             <pre>-- empty --</pre>
-                    % else:
+                          % else:
                             <pre>${format_log(log_stderr)}</pre>
-                    % endif
-                    <h2>${_('syslog')}</h2>
-                    % if not log_syslog:
+                          % endif
+                      </div>
+                      <div class="tab-pane" id="logsSysLog">
+                          % if not log_syslog:
                             <pre>-- empty --</pre>
-                    % else:
+                          % else:
                             <pre>${format_log(log_syslog)}</pre>
-                    % endif
+                          % endif
+                      </div>
+                    </div>
+                  </div>
+
                 </div>
             </div>
         </div>
