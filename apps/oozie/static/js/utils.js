@@ -32,11 +32,8 @@ function getStatusClass(status, prefix){
   if (['SUCCEEDED', 'OK'].indexOf(status) > -1){
     klass = prefix + "success";
   }
-  else if (['RUNNING', 'PREP', 'WAITING', 'SUSPENDED', 'PREPSUSPENDED', 'PREPPAUSED', 'PAUSED'].indexOf(status) > -1){
+  else if (['RUNNING', 'READY', 'PREP', 'WAITING', 'SUSPENDED', 'PREPSUSPENDED', 'PREPPAUSED', 'PAUSED', 'SUSPENDEDWITHERROR', 'PAUSEDWITHERROR'].indexOf(status) > -1){
     klass = prefix + "warning";
-  }
-  else if (status == 'READY'){
-    klass = prefix + "success";
   }
   else {
     klass = prefix + "important";
