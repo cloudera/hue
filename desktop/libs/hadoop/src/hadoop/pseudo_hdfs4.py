@@ -201,10 +201,12 @@ class PseudoHdfs4(object):
 
     # This is where we prepare our Hadoop configuration
     conf_dir = self._tmppath('conf')
-    os.mkdir(conf_dir)
+    if not os.path.exists(conf_dir):
+      os.mkdir(conf_dir)
 
     self._log_dir = self._tmppath('logs')
-    os.mkdir(self._log_dir)
+    if not os.path.exists(self._log_dir):
+      os.mkdir(self._log_dir)
 
     # Write out the Hadoop conf files
     self._write_hadoop_metrics_conf(conf_dir)
@@ -410,6 +412,7 @@ class PseudoHdfs4(object):
       'dfs.datanode.ipc.address': '%s:0' % self._fqdn,
       'dfs.replication': 1,
       'dfs.safemode.min.datanodes': 1,
+      'fs.trash.interval': 10
     }
     write_config(hdfs_configs, self._tmppath('conf/hdfs-site.xml'))
 

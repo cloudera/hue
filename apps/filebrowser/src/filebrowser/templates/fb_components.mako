@@ -29,6 +29,9 @@ from django.utils.translation import ugettext as _
                 </ul>
                 <input id="hueBreadcrumbText" type="text" class="input-xxlarge" style="margin-top:4px;margin-right:4px;display:none" data-bind="value: currentPath" />
             </li>
+            <li class="pull-right">
+                <a href="${url('filebrowser.views.view', path=urlencode(path))}?default_to_trash" style="line-height:18px"><i class="icon-trash"></i> ${_('Trash')}</a>
+            </li>
         </ul>
     % else:
         <ul class="nav nav-pills hueBreadcrumbBar">

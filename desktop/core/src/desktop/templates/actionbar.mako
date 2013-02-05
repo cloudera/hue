@@ -24,7 +24,7 @@
                 ${caller.creation()}
             %endif
         </div>
-        <p>
+        <div style="margin: 0px 0px 10px 0px">
             %if hasattr(caller, "search"):
                 ${caller.search()}
             %else:
@@ -34,6 +34,6 @@
                 &nbsp;&nbsp;&nbsp;&nbsp;
                 ${caller.actions()}
             %endif
-        </p>
+        </div>
     </div>
 </%def>

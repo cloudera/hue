@@ -25,6 +25,7 @@ import logging
 import mimetypes
 import operator
 import posixpath
+import re
 import shutil
 import stat as stat_module
 import os
@@ -57,7 +58,9 @@ from filebrowser.lib.archives import archive_factory
 from filebrowser.lib.rwx import filetype, rwx
 from filebrowser.lib import xxd
 from filebrowser.forms import RenameForm, UploadFileForm, UploadArchiveForm, MkDirForm, EditorForm, TouchForm,\
-                              RenameFormSet, RmTreeFormSet, ChmodFormSet, ChownFormSet, CopyFormSet
+                              RenameFormSet, RmTreeFormSet, ChmodFormSet, ChownFormSet, CopyFormSet, RestoreFormSet,\
+                              TrashPurgeForm
+from hadoop.core_site import get_trash_interval
 from hadoop.fs.hadoopfs import Hdfs
 from hadoop.fs.exceptions import WebHdfsException
 
@@ -133,6 +136,11 @@ def view(request, path):
         home_dir_path = request.user.get_home_directory()
         if request.fs.isdir(home_dir_path):
             return format_preserving_redirect(request, urlresolvers.reverse(view, kwargs=dict(path=home_dir_path)))
+
+    # default_to_home is set in bootstrap.js
+    if 'default_to_trash' in request.GET:
+        if request.fs.isdir(request.fs.trash_path):
+            return format_preserving_redirect(request, urlresolvers.reverse(view, kwargs=dict(path=request.fs.trash_path)))
 
     try:
         stats = request.fs.stats(path)
@@ -331,6 +339,8 @@ def listdir(request, path, chooser):
     Implements directory listing (or index).
 
     Intended to be called via view().
+
+    TODO: Remove?
     """
     if not request.fs.isdir(path):
         raise PopupException(_("Not a directory: %(path)s") % {'path': path})
@@ -407,6 +417,8 @@ def listdir_paged(request, path):
     if not request.fs.isdir(path):
         raise PopupException("Not a directory: %s" % (path,))
 
+    trash_enabled = get_trash_interval()
+
     pagenum = int(request.GET.get('pagenum', 1))
     pagesize = int(request.GET.get('pagesize', 30))
 
@@ -458,6 +470,7 @@ def listdir_paged(request, path):
         'page': _massage_page(page),
         'pagesize': pagesize,
         'home_directory': request.fs.isdir(home_dir_path) and home_dir_path or None,
+        'trash_enabled': trash_enabled,
         'sortby': sortby,
         'descending': descending_param,
         # The following should probably be deprecated
@@ -1003,8 +1016,10 @@ def rmtree(request):
     recurring = []
     params = ["path"]
     def bulk_rmtree(*args, **kwargs):
+        original = request.fs.setskiptrash('skip_trash' in request.GET)
         for arg in args:
-            request.fs.rmtree(arg['path'])
+            request.fs.do_as_user(request.user, request.fs.rmtree, arg['path'])
+        request.fs.setskiptrash(original)
     return generic_op(RmTreeFormSet, request, bulk_rmtree, ["path"], None,
                       data_extractor=formset_data_extractor(recurring, params),
                       arg_extractor=formset_arg_extractor,
@@ -1076,6 +1091,24 @@ def chown(request):
                       data_extractor=formset_data_extractor(recurring, params),
                       arg_extractor=formset_arg_extractor,
                       initial_value_extractor=formset_initial_value_extractor)
+
+
+@require_http_methods(["POST"])
+def trash_restore(request):
+    recurring = []
+    params = ["path"]
+    def bulk_restore(*args, **kwargs):
+        for arg in args:
+            request.fs.do_as_user(request.user, request.fs.restore, arg['path'])
+    return generic_op(RestoreFormSet, request, bulk_restore, ["path"], None,
+                      data_extractor=formset_data_extractor(recurring, params),
+                      arg_extractor=formset_arg_extractor,
+                      initial_value_extractor=formset_initial_value_extractor)
+
+
+@require_http_methods(["POST"])
+def trash_purge(request):
+    return generic_op(TrashPurgeForm, request, request.fs.purge_trash, [], None)
 
 
 def upload_file(request):
@@ -1236,6 +1269,7 @@ def _upload_archive(request):
           }
     else:
         raise PopupException(_("Error in upload form: %s") % (form.errors,))
+
 
 def status(request):
     status = request.fs.status()

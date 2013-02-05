@@ -153,6 +153,40 @@ from django.utils.translation import ugettext as _
         </div>
     </div>
 
+    <!-- restore modal -->
+    <div id="restoreTrashModal" class="modal hide fade">
+        <div class="modal-header">
+            <a href="#" class="close" data-dismiss="modal">&times;</a>
+            <h3>${_('Confirm Restore')}</h3>
+        </div>
+        <div class="modal-body">
+            <p>${_('Are you sure you want to restore these files?')}</p>
+        </div>
+        <div class="modal-footer">
+            <form id="restoreTrashForm" action="/filebrowser/trash/restore" method="POST" enctype="multipart/form-data" class="form-stacked">
+                <a class="btn" data-dismiss="modal">${_('No')}</a>
+                <input type="submit" value="${_('Yes')}" class="btn btn-primary" />
+            </form>
+        </div>
+    </div>
+
+    <!-- purge modal -->
+    <div id="purgeTrashModal" class="modal hide fade">
+        <div class="modal-header">
+            <a href="#" class="close" data-dismiss="modal">&times;</a>
+            <h3>${_('Confirm Empty Trash')}</h3>
+        </div>
+        <div class="modal-body">
+            <p>${_('Are you sure you want to permanently delete all your trash?')}</p>
+        </div>
+        <div class="modal-footer">
+            <form id="purgeTrashForm" action="/filebrowser/trash/purge" method="POST" enctype="multipart/form-data" class="form-stacked">
+                <a class="btn" data-dismiss="modal">${_('Cancel')}</a>
+                <input type="submit" value="${_('Delete')}" class="btn btn-primary" />
+            </form>
+        </div>
+    </div>
+
     <!-- rename modal -->
     <div id="renameModal" class="modal hide fade">
         <form id="renameForm" action="/filebrowser/rename?next=${current_request_path}" method="POST" enctype="multipart/form-data" class="form-inline form-padding-fix">
@@ -771,6 +805,7 @@ from django.utils.translation import ugettext as _
       self.recordsPerPage = ko.observable($.cookie("hueFilebrowserRecordsPerPage"));
       self.targetPageNum = ko.observable(1);
       self.targetPath = ko.observable("${current_request_path}");
+      self.trashEnabled = ko.observable(${ trash_enabled and "true" or "false" });
 
       self.sortBy = ko.observable("name");
       self.sortDescending = ko.observable(false);
@@ -821,6 +856,14 @@ from django.utils.translation import ugettext as _
       }, self);
 
       self.currentPath = ko.observable(currentDirPath);
+
+      self.inTrash = ko.computed(function() {
+        return self.currentPath().match(/^\/user\/.+?\/\.Trash/) && self.trashEnabled();
+      });
+
+      self.inRestorableTrash = ko.computed(function() {
+        return self.currentPath().match(/^\/user\/.+?\/\.Trash\/.+?/) && self.trashEnabled();
+      });
 
       self.getStats = function (callback) {
         $.getJSON(self.targetPath() + "?pagesize=1&format=json", callback);
@@ -1019,17 +1062,27 @@ from django.utils.translation import ugettext as _
         }
       };
 
-      self.deleteSelected = function () {
+      var deleteSelected = function(skip_trash) {
         var paths = [];
         $(self.selectedFiles()).each(function (index, file) {
           paths.push(file.path);
         });
         hiddenFields($("#deleteForm"), 'path', paths);
-        $("#deleteForm").attr("action", "/filebrowser/rmtree" + "?next=${url('filebrowser.views.view', path=urlencode('/'))}" + "." + self.currentPath());
+        $("#deleteForm").attr("action", "/filebrowser/rmtree" + "?" +
+            (skip_trash ? "skip_trash=true&" : "") +
+            "next=${url('filebrowser.views.view', path=urlencode('/'))}" + "." + self.currentPath());
         $("#deleteModal").modal({
           keyboard:true,
           show:true
         });
+      }
+
+      self.deleteSelected = function () {
+        deleteSelected(true);
+      };
+
+      self.trashSelected = function () {
+        deleteSelected();
       };
 
       self.createDirectory = function (formElement) {
@@ -1040,6 +1093,32 @@ from django.utils.translation import ugettext as _
       self.createFile = function (formElement) {
         $(formElement).attr("action", "/filebrowser/touch?next=${url('filebrowser.views.view', path=urlencode('/'))}" + "." + self.currentPath());
         return true;
+      };
+
+      self.restoreTrashSelected = function(formElement) {
+        var paths = [];
+        $(self.selectedFiles()).each(function (index, file) {
+          paths.push(file.path);
+        });
+        hiddenFields($("#restoreTrashForm"), 'path', paths);
+        $("#restoreTrashForm").attr("action", "/filebrowser/trash/restore?next=${url('filebrowser.views.view', path=urlencode('/'))}" + "." + self.currentPath());
+        $("#restoreTrashModal").modal({
+          keyboard:true,
+          show:true
+        });
+      };
+
+      self.purgeTrash = function(formElement) {
+        var paths = [];
+        $(self.selectedFiles()).each(function (index, file) {
+          paths.push(file.path);
+        });
+        hiddenFields($("#purgeTrashForm"), 'path', paths);
+        $("#purgeTrashForm").attr("action", "/filebrowser/trash/purge?next=${url('filebrowser.views.view', path=urlencode('/'))}" + "." + self.currentPath());
+        $("#purgeTrashModal").modal({
+          keyboard:true,
+          show:true
+        });
       };
 
       self.uploadFile = (function () {

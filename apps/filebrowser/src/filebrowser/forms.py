@@ -117,6 +117,18 @@ class BaseRmTreeFormset(FormSet):
 
 RmTreeFormSet = formset_factory(RmTreeForm, formset=BaseRmTreeFormset, extra=0)
 
+class RestoreForm(forms.Form):
+  op = "rmtree"
+  path = PathField(label=_("Path to restore"))
+
+class BaseRestoreFormset(FormSet):
+  op = "restore"
+
+RestoreFormSet = formset_factory(RestoreForm, formset=BaseRestoreFormset, extra=0)
+
+class TrashPurgeForm(forms.Form):
+  op = "purge_trash"
+
 class MkDirForm(forms.Form):
   op = "mkdir"
   path = PathField(label=_("Path in which to create the directory"))

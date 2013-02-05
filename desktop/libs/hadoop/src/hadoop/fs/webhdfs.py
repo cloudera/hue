@@ -25,6 +25,7 @@ import posixpath
 import random
 import stat
 import threading
+import time
 
 from django.utils.encoding import smart_str
 from django.utils.translation import ugettext as _
@@ -36,6 +37,7 @@ from hadoop.fs.webhdfs_types import WebHdfsStat, WebHdfsContentSummary
 from hadoop.conf import UPLOAD_CHUNK_SIZE
 
 import hadoop.conf
+import hadoop.core_site
 
 
 DEFAULT_HDFS_SUPERUSER = 'hdfs'
@@ -50,6 +52,7 @@ class WebHdfs(Hdfs):
   WebHdfs implements the filesystem interface via the WebHDFS rest protocol.
   """
   DEFAULT_USER = 'hue'        # This should be the user running Hue
+  TRASH_CURRENT = 'Current'
 
   def __init__(self, url,
                fs_defaultfs,
@@ -80,7 +83,7 @@ class WebHdfs(Hdfs):
                temp_dir=hdfs_config.TEMP_DIR.get())
 
   def __str__(self):
-    return "WebHdfs at %s" % (self._url,)
+    return "WebHdfs at %s" % self._url
 
   def _make_client(self, url, security_enabled):
     client = http_client.HttpClient(
@@ -121,6 +124,26 @@ class WebHdfs(Hdfs):
     except AttributeError:
       return WebHdfs.DEFAULT_USER
 
+  @property
+  def trash_path(self):
+    try:
+      return self._thread_local.trash_path
+    except AttributeError:
+      self._thread_local.trash_path = self.join(self.get_home_dir(), '.Trash')
+    return self._thread_local.trash_path
+
+  @property
+  def current_trash_path(self):
+    return self.join(self.trash_path, self.TRASH_CURRENT)
+
+  @property
+  def skip_trash(self):
+    try:
+      return self._thread_local.skip_trash
+    except AttributeError:
+      self._thread_local.skip_trash = False
+    return self._thread_local.skip_trash
+
   def _getparams(self):
     return {
       "user.name" : WebHdfs.DEFAULT_USER,
@@ -133,6 +156,10 @@ class WebHdfs(Hdfs):
     self._thread_local.user = user
     return curr
 
+  def setskiptrash(self, skip_trash):
+    curr = self.skip_trash
+    self._thread_local.skip_trash = skip_trash
+    return curr
 
   def listdir_stats(self, path, glob=None):
     """
@@ -189,7 +216,7 @@ class WebHdfs(Hdfs):
     res = self._stats(path)
     if res is not None:
       return res
-    raise IOError(errno.ENOENT, "File %s not found" % (smart_str(path),))
+    raise IOError(errno.ENOENT, _("File %s not found") % path)
 
   def exists(self, path):
     return self._stats(path) is not None
@@ -206,6 +233,41 @@ class WebHdfs(Hdfs):
       return False
     return not sb.isDir
 
+  def _ensure_current_trash_directory(self):
+    """Create trash directory for a user if it doesn't exist."""
+    if not self.exists(self.current_trash_path):
+      self.mkdir(self.current_trash_path)
+    return self.current_trash_path
+
+  def _trash(self, path, recursive=False):
+    """
+    _trash(path, recursive=False)
+
+    Move a file or directory to trash.
+    Will create a timestamped directory underneath /user/<username>/.Trash.
+
+    Trash must be enabled for this to work.
+    """
+    if not self.exists(path):
+      raise IOError(errno.ENOENT, _("File %s not found") % path)
+
+    if not recursive and self.isdir(path):
+      raise IOError(errno.EISDIR, _("File %s is a directory") % path)
+
+    if path.startswith(self.trash_path):
+      raise IOError(errno.EPERM, _("File %s is already trashed") % path)
+
+    # Make path (with timestamp suffix if necessary)
+    base_trash_path = self.join(self._ensure_current_trash_directory(), path[1:])
+    trash_path = base_trash_path
+    while self.exists(trash_path):
+      trash_path = base_trash_path + str(time.time())
+
+    # Move path to trash path
+    self.mkdir(self.dirname(trash_path))
+    self.rename(path, trash_path)
+
+
   def _delete(self, path, recursive=False):
     """
     _delete(path, recursive=False)
@@ -220,19 +282,68 @@ class WebHdfs(Hdfs):
     # This part of the API is nonsense.
     # The lack of exception should indicate success.
     if not result['boolean']:
-      raise IOError('Delete failed: %s' % (smart_str(path),))
+      raise IOError(_('Delete failed: %s') % path)
 
   def remove(self, path):
     """Delete a file."""
-    self._delete(path, recursive=False)
+    if hadoop.core_site.get_trash_interval() is None or self.skip_trash:
+      self._delete(path, recursive=False)
+    else:
+      self._trash(path, recursive=False)
 
   def rmdir(self, path):
-    """Delete a file."""
-    self._delete(path, recursive=False)
+    """Delete a directory."""
+    self.remove(path)
 
   def rmtree(self, path):
     """Delete a tree recursively."""
-    self._delete(path, recursive=True)
+    if hadoop.core_site.get_trash_interval() is None or self.skip_trash:
+      self._delete(path, recursive=True)
+    else:
+      self._trash(path, recursive=True)
+
+  def restore(self, path):
+    """
+    restore(path)
+
+    The root of ``path`` will be /users/<current user>/.Trash/<timestamp>.
+    Removing the root from ``path`` will provide the original path.
+    Ensure parent directories exist and rename path.
+    """
+    if hadoop.core_site.get_trash_interval() is None:
+      raise IOError(errno.EPERM, _("Trash is not enabled."))
+
+    if not path.startswith(self.trash_path):
+      raise IOError(errno.EPERM, _("File %s is not in trash") % path)
+
+    # Build original path
+    original_path = []
+    split_path = self.split(path)
+    while split_path[0] != self.trash_path:
+      original_path.append(split_path[1])
+      split_path = self.split(split_path[0])
+    original_path.reverse()
+    original_path = self.join(posixpath.sep, *original_path)
+
+    # move to original path
+    # the path could have been expunged.
+    if self.exists(original_path):
+      raise IOError(errno.EEXIST, _("Path %s already exists.") % str(smart_str(original_path)))
+    self.rename(path, original_path)
+
+  def purge_trash(self):
+    """
+    purge_trash()
+
+    Purge all trash in users ``trash_path``
+    """
+    if hadoop.core_site.get_trash_interval() is None:
+      raise IOError(errno.EPERM, _("Trash is not enabled."))
+
+    original = self.setskiptrash(True)
+    for timestamped_directory in self.listdir(self.trash_path):
+      self.rmtree(self.join(self.trash_path, timestamped_directory))
+    self.setskiptrash(original)
 
   def mkdir(self, path, mode=None):
     """
@@ -247,7 +358,7 @@ class WebHdfs(Hdfs):
       params['permission'] = safe_octal(mode)
     success = self._root.put(path, params)
     if not success:
-      raise IOError("Mkdir failed: %s" % (smart_str(path),))
+      raise IOError(_("Mkdir failed: %s") % path)
 
   def rename(self, old, new):
     """rename(old, new)"""
@@ -261,17 +372,17 @@ class WebHdfs(Hdfs):
     params['destination'] = smart_str(new)
     result = self._root.put(old, params)
     if not result['boolean']:
-      raise IOError("Rename failed: %s -> %s" %
-                    (smart_str(old), smart_str(new)))
+      raise IOError(_("Rename failed: %s -> %s") %
+                    (str(smart_str(old)), str(smart_str(new))))
 
   def rename_star(self, old_dir, new_dir):
     """Equivalent to `mv old_dir/* new"""
     if not self.isdir(old_dir):
-      raise IOError(errno.ENOTDIR, "'%s' is not a directory" % (old_dir,))
+      raise IOError(errno.ENOTDIR, _("'%s' is not a directory") % old_dir)
     if not self.exists(new_dir):
       self.mkdir(new_dir)
     elif not self.isdir(new_dir):
-      raise IOError(errno.ENOTDIR, "'%s' is not a directory" % (new_dir,))
+      raise IOError(errno.ENOTDIR, _("'%s' is not a directory") % new_dir)
     ls = self.listdir(old_dir)
     for dirent in ls:
       self.rename(Hdfs.join(old_dir, dirent), Hdfs.join(new_dir, dirent))
@@ -385,11 +496,11 @@ class WebHdfs(Hdfs):
   def copyfile(self, src, dst):
     sb = self._stats(src)
     if sb is None:
-      raise IOError(errno.ENOENT, "Copy src '%s' does not exist" % (src,))
+      raise IOError(errno.ENOENT, _("Copy src '%s' does not exist") % src)
     if sb.isDir:
-      raise IOError(errno.INVAL, "Copy src '%s' is a directory" % (src,))
+      raise IOError(errno.INVAL, _("Copy src '%s' is a directory") % src)
     if self.isdir(dst):
-      raise IOError(errno.INVAL, "Copy dst '%s' is a directory" % (dst,))
+      raise IOError(errno.INVAL, _("Copy dst '%s' is a directory") % dst)
 
     offset = 0
 
@@ -511,7 +622,7 @@ class WebHdfs(Hdfs):
 
     if next_url is None:
       raise WebHdfsException(
-        "Failed to create '%s'. HDFS did not return a redirect" % (path,))
+        _("Failed to create '%s'. HDFS did not return a redirect") % path)
 
     # Now talk to the real thing. The redirect url already includes the params.
     client = self._make_client(next_url, self.security_enabled)
@@ -528,7 +639,7 @@ class WebHdfs(Hdfs):
         raise webhdfs_ex
 
       if http_error.code not in (301, 302, 303, 307):
-        LOG.error("Response is not a redirect: %s" % (webhdfs_ex,))
+        LOG.error("Response is not a redirect: %s" % webhdfs_ex)
         raise webhdfs_ex
       return http_error.headers.getheader('location')
     except Exception, ex:
@@ -579,7 +690,7 @@ class File(object):
     try:
       self._stat = fs.stats(path)
       if self._stat.isDir:
-        raise IOError(errno.EISDIR, "Is a directory: '%s'" % (smart_str(path),))
+        raise IOError(errno.EISDIR, _("Is a directory: '%s'") % path)
     except IOError, ex:
       if ex.errno == errno.ENOENT and 'w' in self._mode:
         self._fs.create(self._path)
@@ -597,7 +708,7 @@ class File(object):
       self.stat()
       self._pos = self._fs.stats(self._path).size + offset
     else:
-      raise IOError(errno.EINVAL, "Invalid argument to seek for whence")
+      raise IOError(errno.EINVAL, _("Invalid argument to seek for whence"))
 
   def stat(self):
     self._stat = self._fs.stats(self._path)
@@ -617,7 +728,7 @@ class File(object):
 
   def append(self, data):
     if 'w' not in self._mode:
-      raise IOError(errno.EINVAL, "File not open for writing")
+      raise IOError(errno.EINVAL, _("File not open for writing"))
     self._fs.append(self._path, data=data)
 
   def flush(self):
@@ -673,7 +784,7 @@ def test_fs_configuration(fs_config):
   except Exception, ex:
     LOG.info("%s -- Validation error: %s" % (fs, ex))
     return [(fs_config.WEBHDFS_URL,
-            'Failed to create temporary file "%s"' % (tmpname,))]
+            _('Failed to create temporary file "%s"') % tmpname)]
 
   # Check superuser has super power
   try:  # Finally: delete tmpname
@@ -690,6 +801,6 @@ def test_fs_configuration(fs_config):
     except Exception, ex:
       LOG.error("Failed to remove '%s': %s" % (tmpname, ex))
       return [(fs_config.WEBHDFS_URL,
-              'Failed to remove temporary file "%s"' % (tmpname,))]
+              _('Failed to remove temporary file "%s"') % tmpname)]
 
   return [ ]
