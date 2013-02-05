@@ -228,6 +228,11 @@ ${layout.menubar(section='dashboard')}
       drawTable();
     });
 
+    var hash = window.location.hash;
+    if (hash != "" && hash.indexOf("=") > -1) {
+      $("a.btn-date[data-value='" + hash.split("=")[1] + "']").click();
+    }
+
     function drawTable() {
       runningTable.fnDraw();
       completedTable.fnDraw();
@@ -293,7 +298,7 @@ ${layout.menubar(section='dashboard')}
     var numRunning = 0;
 
     function refreshRunning() {
-      $.getJSON(window.location.href + "?format=json&type=running", function (data) {
+      $.getJSON(window.location.pathname + "?format=json&type=running", function (data) {
         if (data) {
           var nNodes = runningTable.fnGetNodes();
 
@@ -358,7 +363,7 @@ ${layout.menubar(section='dashboard')}
     }
 
     function refreshCompleted() {
-      $.getJSON(window.location.href + "?format=json&type=completed", function (data) {
+      $.getJSON(window.location.pathname + "?format=json&type=completed", function (data) {
         completedTable.fnClearTable();
         $(data).each(function (iWf, item) {
           var coord = new Coordinator(item);
