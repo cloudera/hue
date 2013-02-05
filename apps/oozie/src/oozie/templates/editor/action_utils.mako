@@ -323,7 +323,7 @@
 
       <div class="modal-footer">
         <a class="btn cancelButton" href="javascript:void(0);">Cancel</a>
-        <button class="btn btn-primary doneButton" type="button" data-bind="visible: !$root.context().read_only">${ _('Done')}</button>
+        <button class="btn btn-primary doneButton disable-feedback" type="button" data-bind="visible: !$root.context().read_only">${ _('Done')}</button>
       </div>
 
     </form>

@@ -59,11 +59,11 @@ ${ layout.menubar(section='dashboard') }
     <table class="table table-condensed" id="running-table">
       <thead>
         <tr>
-          <th width="10%">${ _('Submission') }</th>
+          <th width="15%">${ _('Submission') }</th>
           <th width="10%">${ _('Status') }</th>
           <th width="30%">${ _('Name') }</th>
           <th width="10%">${ _('Progress') }</th>
-          <th width="15%">${ _('Submitter') }</th>
+          <th width="10%">${ _('Submitter') }</th>
           <th width="15%">${ _('Id') }</th>
           <th width="10%">${ _('Action') }</th>
         </tr>
@@ -80,11 +80,11 @@ ${ layout.menubar(section='dashboard') }
     <table class="table table-condensed" id="completed-table" data-tablescroller-disable="true">
       <thead>
         <tr>
-          <th width="10%">${ _('Completion') }</th>
+          <th width="15%">${ _('Completion') }</th>
           <th width="10%">${ _('Status') }</th>
           <th width="35%">${ _('Name') }</th>
           <th width="10%">${ _('Duration') }</th>
-          <th width="15%">${ _('Submitter') }</th>
+          <th width="10%">${ _('Submitter') }</th>
           <th width="20%">${ _('Id') }</th>
         </tr>
       </thead>
