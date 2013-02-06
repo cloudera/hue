@@ -767,6 +767,32 @@ var NodeModule = function($, IdGeneratorTable) {
     }
 
     if ('files' in model) {
+      //// WARNING: The following order should be preserved!
+
+      // Need to represent files as some thing else for knockout mappings.
+      // The KO idiom "value" requires a named parameter.
+      self._files = self.files;
+      self.files = ko.observableArray([]);
+
+      // ['file', ...] => [{'name': 'file', 'dummy': ''}, ...].
+      $.each(self._files(), function(index, filename) {
+        var prop = { name: ko.observable(filename), dummy: ko.observable("") };
+        prop.name.subscribe(function(value) {
+          self.files.valueHasMutated();
+        });
+        prop.dummy.subscribe(function(value) {
+          self.files.valueHasMutated();
+        });
+        self.files.push(prop);
+      });
+
+      // [{'name': 'file', 'dummy': ''}, ...] => ['file', ...].
+      self.files.subscribe(function(value) {
+        self._files.removeAll();
+        $.each(self.files(), function(index, file) {
+          self._files.push(file.name);
+        });
+      });
 
       self.addFile = function() {
         var prop = { name: ko.observable(""), dummy: ko.observable("") };
