@@ -17,9 +17,12 @@
 
 
 from django import forms
+from search.models import Core
 
 
 class QueryForm(forms.Form):
+  cores = forms.ChoiceField()
+
   query = forms.CharField(label='', max_length=256, required=False, initial='',
                           widget=forms.TextInput(attrs={'class': 'input-xxlarge search-query', 'placeholder': 'Search'}))
   fq = forms.CharField(label='', max_length=256, required=False, initial='', widget=forms.HiddenInput(), help_text='Solr Filter query')
@@ -27,3 +30,19 @@ class QueryForm(forms.Form):
   rows = forms.CharField(label='', required=False, initial='', widget=forms.HiddenInput(), help_text='Solr records per page')
   start = forms.CharField(label='', required=False, initial='', widget=forms.HiddenInput(), help_text='Solr start record')
   facets = forms.CharField(label='', required=False, initial='', widget=forms.HiddenInput(), help_text='Show hide facet search')
+
+  def __init__(self, *args, **kwargs):
+    super(QueryForm, self).__init__(*args, **kwargs)
+    choices = [(core.name, core.label) for core in Core.objects.filter(enabled=True)]
+    initial_choice = self._initial_core(choices)
+    self.fields['cores'] = forms.ChoiceField(choices=choices, initial=initial_choice, required=False, label='')
+
+  def clean_cores(self):
+    if self.cleaned_data.get('cores'):
+      return self.cleaned_data['cores']
+    else:
+      return self._initial_core(self.fields['cores'].choices)
+
+
+  def _initial_core(self, choices):
+    return choices and choices[0][0] or None

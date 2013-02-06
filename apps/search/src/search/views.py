@@ -19,79 +19,118 @@ try:
   import json
 except ImportError:
   import simplejson as json
+
 import logging
 
+from django.utils.translation import ugettext as _
+
 from desktop.lib.django_util import render
-from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.rest.http_client import HttpClient, RestException
-from desktop.lib.rest.resource import Resource
 
+from search.api import SolrApi
+from search.conf import SOLR_URL
+from search.decorators import allow_admin_only
 from search.forms import QueryForm
+from search.models import Core, temp_fixture_hook
 
-
-# http://lucene.apache.org/solr/api-4_0_0-BETA/doc-files/tutorial.html#Getting+Started
-SOLR_URL = 'http://c1328.halxg.cloudera.com:8983/solr/'
 
 LOG = logging.getLogger(__name__)
 
 
 def index(request):
+  temp_fixture_hook()
+
   search_form = QueryForm(request.GET)
   response = {}
+  solr_query = {}
 
   if search_form.is_valid():
-    solr_query = {}
+    core = search_form.cleaned_data['cores']
+    solr_query['core'] = core
     solr_query['q'] = search_form.cleaned_data['query']
     solr_query['fq'] = search_form.cleaned_data['fq']
     solr_query['sort'] = search_form.cleaned_data['sort'] or 'created_at desc'
     solr_query['rows'] = search_form.cleaned_data['rows'] or 15
     solr_query['start'] = search_form.cleaned_data['start'] or 0
     solr_query['facets'] = search_form.cleaned_data['facets'] or 1
-    response = SolrApi(SOLR_URL).query(solr_query)
-    response = json.loads(response)
 
-  return render('index.mako', request, {'search_form': search_form, 'response': response, 'rr': json.dumps(response), 'solr_query': solr_query})
+    hue_core = Core.objects.get(name=core)
 
-# Simple API for now
-class SolrApi(object):
-  def __init__(self, solr_url):
-    self._url = solr_url
-    self._client = HttpClient(self._url, logger=LOG)
-    self._root = Resource(self._client)
+    response = SolrApi(SOLR_URL.get()).query(solr_query, hue_core)
 
-  def query(self, solr_query):
-    try:
-      params = (('q', solr_query['q']),
-                ('wt', 'json'),
-                ('sort', solr_query['sort']),
-                ('rows', solr_query['rows']),
-                ('start', solr_query['start']),
+  return render('index.mako', request, {
+                    'search_form': search_form,
+                    'response': response,
+                    'solr_query': solr_query,
+                    'hue_core': hue_core,
+                    'rr': json.dumps(response),
+                })
 
-                ('facet', solr_query['facets'] == 1 and 'true' or 'false'),
-                ('facet.limit', 10),
-                ('facet.mincount', 1),
-                ('facet.sort', 'count'),
 
-                ('facet.field', 'user_location'),
-                ('facet.field', 'user_statuses_count'),
-                ('facet.field', 'user_followers_count'),
+@allow_admin_only
+def admin(request):
+  # To cross check both
+  cores = SolrApi(SOLR_URL.get()).cores()
+  hue_cores = Core.objects.all()
 
-                ('facet.range', 'retweet_count'),
-                ('f.retweet_count.facet.range.start', '0'),
-                ('f.retweet_count.facet.range.end', '100'),
-                ('f.retweet_count.facet.range.gap', '10'),
+  return render('admin.mako', request, {
+                    'cores': cores,
+                    'hue_cores': hue_cores,
+                })
 
-                ('facet.date', 'created_at'),
-                ('facet.date.start', 'NOW/DAY-305DAYS'),
-                ('facet.date.end', 'NOW/DAY+1DAY'),
-                ('facet.date.gap', '+1DAY'),
-             )
+@allow_admin_only
+def admin_settings(request):
+  cores = SolrApi(SOLR_URL.get()).cores()
+  hue_cores = Core.objects.all()
 
-      fqs = solr_query['fq'].split('|')
-      for fq in fqs:
-        if fq:
-          params += (('fq', fq),)
+  return render('admin_settings.mako', request, {
+                    'cores': cores,
+                    'hue_cores': hue_cores,
+                })
 
-      return self._root.get('collection1/browse', params)
-    except RestException, e:
-      raise PopupException('Error while accessing Solr: %s' % e)
+@allow_admin_only
+def admin_core(request, core):
+  solr_core = SolrApi(SOLR_URL.get()).core(core)
+  solr_schema = SolrApi(SOLR_URL.get()).schema(core)
+  hue_core = Core.objects.get(name=core)
+
+  return render('admin_core.mako', request, {
+                    'solr_core': solr_core,
+                    'solr_schema': solr_schema,
+                    'hue_core': hue_core,
+                })
+
+@allow_admin_only
+def admin_core_result(request, core):
+  solr_core = SolrApi(SOLR_URL.get()).core(core)
+  hue_core = Core.objects.get(name=core)
+
+  return render('admin_core_result.mako', request, {
+                    'solr_core': solr_core,
+                    'hue_core': hue_core,
+                })
+
+@allow_admin_only
+def admin_core_facets(request, core):
+  solr_core = SolrApi(SOLR_URL.get()).core(core)
+  hue_core = Core.objects.get(name=core)
+
+  if request.method == 'POST':
+    print request.POST
+    hue_core.facets.update_from_post(request.POST)
+    hue_core.facets.save()
+    request.info(_('Facets updated'))
+
+  return render('admin_core_facets.mako', request, {
+                    'solr_core': solr_core,
+                    'hue_core': hue_core,
+                })
+
+@allow_admin_only
+def admin_core_sorting(request, core):
+  solr_core = SolrApi(SOLR_URL.get()).core(core)
+  hue_core = Core.objects.get(name=core)
+
+  return render('admin_core_sorting.mako', request, {
+                    'solr_core': solr_core,
+                    'hue_core': hue_core,
+                })
