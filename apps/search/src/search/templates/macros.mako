@@ -175,49 +175,48 @@ def escape(text)  :
 
 <%def name="tweet_result(result)">
 <tr>
-    <td style="word-wrap: break-word;">
+  <td style="word-wrap: break-word;">
+    <div class="content">
+      <div class="stream-item-header">
+        <small class="time">
+          <a href="https://twitter.com/${ result.get('user_screen_name', '') }/status/${ result.get('id', '') }" target="_blank" data-dt="${ result.get('created_at', '') }" rel="tooltip" data-placement="left" title="${ result.get('created_at', '') }"></a>
+        </small>
+        <a target="_blank" href="https://twitter.com/${ result.get('user_screen_name', '') }" class="account-group">
+          <img src="http://twitter.com/api/users/profile_image/${ result.get('user_screen_name', '') }" class="avatar"
+              data-placement="left" rel="popover"  data-content="Location: ${ result.get('user_location', '') }
+          <br/>User tweets #: ${ result.get('user_statuses_count', '') }
+           <br/>User followers #: ${ result.get('user_followers_count', '') }" title="@${ result.get('user_screen_name', '') }" data-trigger="hover">
+          <strong class="fullname">${ result.get('user_name', '') }</strong>
+         <span>&rlm;</span><span class="username">@${ result.get('user_screen_name', '') }</span>
+        </a>
+      </div>
+      <div class="text" data-link="https://twitter.com/${ result.get('user_screen_name', '') }/status/${ result.get('id', '') }">
+        ${ parseLinks(result.get('text', ''))  | n,unicode }
+        %if result.get('retweet_count', ''):
+          <div class="retweeted">
+            ${_('Retweeted %s times') % result.get('retweet_count', '') }
+          </div>
+        %endif
+      </div>
 
-      <div class="content">
-        <div class="stream-item-header">
-          <small class="time">
-            <a href="https://twitter.com/${ result.get('user_screen_name', '') }/status/${ result.get('id', '') }" target="_blank" data-dt="${ result.get('created_at', '') }" rel="tooltip" data-placement="left" title="${ result.get('created_at', '') }"></a>
-          </small>
-          <a target="_blank" href="https://twitter.com/${ result.get('user_screen_name', '') }" class="account-group">
-            <img src="http://twitter.com/api/users/profile_image/${ result.get('user_screen_name', '') }" class="avatar"
-                 data-placement="left" rel="popover"  data-content="Location: ${ result.get('user_location', '') }
-             <br/>User tweets #: ${ result.get('user_statuses_count', '') }
-             <br/>User followers #: ${ result.get('user_followers_count', '') }" title="@${ result.get('user_screen_name', '') }" data-trigger="hover">
-            <strong class="fullname">${ result.get('user_name', '') }</strong>
-            <span>&rlm;</span><span class="username">@${ result.get('user_screen_name', '') }</span>
-          </a>
-        </div>
-        <div class="text" data-link="https://twitter.com/${ result.get('user_screen_name', '') }/status/${ result.get('id', '') }">
-          ${ parseLinks(result.get('text', ''))  | n,unicode }
-          %if result.get('retweet_count', ''):
-              <div class="retweeted">
-                ${_('Retweeted %s times') % result.get('retweet_count', '') }
-              </div>
-          %endif
-        </div>
-
-        <div class="stream-item-footer">
-          <ul class="tweet-actions">
-            <li class="action">
-              <a href="https://twitter.com/intent/tweet?in_reply_to=${ result.get('id', '') }" target="_blank">
-                <i class="icon icon-reply"></i>
-                <b>${_('Reply')}</b>
-              </a>
-            </li>
-            <li class="action">
-              <a href="https://twitter.com/intent/retweet?tweet_id=${ result.get('id', '') }" target="_blank">
-                <i class="icon icon-retweet"></i>
-                <b>${_('Retweet')}</b>
-              </a>
-            </li>
-          </ul>
-        </div>
+      <div class="stream-item-footer">
+        <ul class="tweet-actions">
+          <li class="action">
+            <a href="https://twitter.com/intent/tweet?in_reply_to=${ result.get('id', '') }" target="_blank">
+              <i class="icon icon-reply"></i>
+              <b>${_('Reply')}</b>
+            </a>
+          </li>
+          <li class="action">
+            <a href="https://twitter.com/intent/retweet?tweet_id=${ result.get('id', '') }" target="_blank">
+              <i class="icon icon-retweet"></i>
+              <b>${_('Retweet')}</b>
+            </a>
+          </li>
+        </ul>
       </div>
     </div>
-    </td>
+   </div>
+  </td>
 </tr>
 </%def>
