@@ -709,6 +709,39 @@ class TestEditor(OozieMockBase):
     </action>""" in xml, xml)
 
 
+  def test_workflow_streaming_gen_xml(self):
+    self.wf.node_set.filter(name='action-name-1').delete()
+
+    action1 = add_node(self.wf, 'action-name-1', 'streaming', [self.wf.start], {
+        u'name': 'MyStreaming',
+        "description": "Generate N number of records",
+        "main_class": "org.apache.hadoop.examples.terasort.TeraGen",
+        "mapper": "MyMapper",
+        "reducer": "MyReducer",
+        "files": '["my_file"]',
+        "archives":'["my_archive"]',
+    })
+    Link(parent=action1, child=self.wf.end, name="ok").save()
+
+    xml = self.wf.to_xml()
+
+    assert_true("""
+    <action name="MyStreaming">
+        <map-reduce>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <streaming>
+                <mapper>MyMapper</mapper>
+                <reducer>MyReducer</reducer>
+            </streaming>
+            <file>my_file#my_file</file>
+            <archive>my_archive</archive>
+        </map-reduce>
+        <ok to="end"/>
+        <error to="kill"/>
+    </action>""" in xml, xml)
+
+
   def test_workflow_shell_gen_xml(self):
     self.wf.node_set.filter(name='action-name-1').delete()
 
