@@ -125,7 +125,16 @@ ${layout.menubar(section='tables')}
             $("#installSamplesMessage").text(data.title);
         });
 
+        $("#installSamples").on('hidden', function(){
+          $("#installSamplesBtn").button("reset");
+        });
+
         $("#installSamplesBtn").click(function(){
+            var _this = $(this);
+            if (!_this.hasClass('disabled')) {
+              _this.attr("data-loading-text", _this.text()+" ...");
+              _this.button("loading");
+            }
             $.post(
                 "${ url(app_name + ':install_examples') }",
                 { submit: "Submit" },
