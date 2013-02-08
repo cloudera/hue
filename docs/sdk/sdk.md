@@ -703,6 +703,51 @@ Then you can use this decorator on your view functions to enforce permission:
     def delete_financial_report(request):
       ...
 
+Using and Installing Thrift
+---------------------------
+Right now, we check in the generated thrift code.
+To generate the code, you'll need the thrift binary version 0.9.0.
+Please download from http://thrift.apache.org/.
+
+The modules using ``Thrift`` have some helper scripts like ``regenerate_thrift.sh``
+for regenerating the code from the interfaces.
+
+Profiling Hue Apps
+------------------
+Hue has a profiling system built in, which can be used to analyze server-side
+performance of applications.  To enable profiling::
+
+    $ build/env/bin/hue runprofileserver
+
+Then, access the page that you want to profile.  This will create files like
+/tmp/useradmin.users.000072ms.2011-02-21T13:03:39.745851.prof.  The format for
+the file names is /tmp/<app_module>.<page_url>.<time_taken>.<timestamp>.prof.
+
+Hue uses the hotshot profiling library for instrumentation.  The documentation
+for this library is located at: http://docs.python.org/library/hotshot.html.
+
+You can use kcachegrind to view the profiled data graphically::
+
+    $ hotshot2calltree /tmp/xyz.prof > /tmp/xyz.trace
+    $ kcachegrind /tmp/xyz.trace
+
+More generally, you can programmatically inspect a trace::
+
+    #!/usr/bin/python
+    import hotshot.stats
+    import sys
+
+    stats = hotshot.stats.load(sys.argv[1])
+    stats.sort_stats('cumulative', 'calls')
+    stats.print_stats(100)
+
+This script takes in a .prof file, and orders function calls by the cumulative
+time spent in that function, followed by the number of times the function was
+called, and then prints out the top 100 time-wasters.  For information on the
+other stats available, take a look at this website:
+http://docs.python.org/library/profile.html#pstats.Stats
+
+
 <!--
 ## Django Models
 
@@ -871,6 +916,23 @@ call.
 <!-- ## Knockout, jQuery -->
 
 <!-- ## Lost: Keyboard shortcuts -->
+
+
+Internationalization
+====================
+How to update all the messages and compile them::
+
+    $ make locales
+
+How to update and compile the messages of one app::
+
+    $ cd apps/beeswax
+    $ make compile-locale
+
+How to create a new locale for an app::
+
+    $ cd $APP_ROOT/src/$APP_NAME/locale
+    $ $HUE_ROOT/build/env/bin/pybabel init -D django -i en_US.pot -d . -l fr
 
 
 Debugging Tips and Tricks
