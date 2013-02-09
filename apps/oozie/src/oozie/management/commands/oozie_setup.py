@@ -21,6 +21,7 @@ import os
 from django.contrib.auth.models import User
 from django.core import management
 from django.core.management.base import NoArgsCommand
+from django.db import transaction
 from django.utils.translation import ugettext as _
 
 from hadoop import cluster
@@ -54,10 +55,11 @@ class Command(NoArgsCommand):
     fs.do_as_user(fs.DEFAULT_USER, fs.copyFromLocal, local_dir, remote_data_dir)
 
     # Load jobs
-    sample, created = User.objects.get_or_create(username='sample')
+    try:
+      sample_user = User.objects.get(pk=1100713)
+    except User.DoesNotExist:
+      sample_user = User.objects.create(username='sample', pk=1100713, id=1100713)
     management.call_command('loaddata', 'initial_oozie_examples.json', verbosity=2)
-    from oozie.models import Job
-    Job.objects.filter(owner__id=1100713).update(owner=sample) # 11OOZIE
 
 
 def create_directories(fs):
