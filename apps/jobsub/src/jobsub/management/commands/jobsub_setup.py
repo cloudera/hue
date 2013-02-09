@@ -93,8 +93,8 @@ class Command(NoArgsCommand):
     try:
       sample_user.object = User.objects.get(username=sample_user.object.username)
     except User.DoesNotExist:
-      sample_user.object.pk = None
-      sample_user.object.id = None
+      sample_user.object.pk = 1100713
+      sample_user.object.id = 1100713
       sample_user.save()
 
     # Create the designs

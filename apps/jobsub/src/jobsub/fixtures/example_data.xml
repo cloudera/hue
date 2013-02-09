@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <django-objects version="1.0">
   <!-- Sample User -->
-  <object pk="1" model="auth.user">
+  <object pk="1100713" model="auth.user">
     <field type="CharField" name="username">sample</field>
     <field type="CharField" name="first_name"></field>
     <field type="CharField" name="last_name"></field>
