@@ -82,6 +82,10 @@ class PseudoHdfs4(object):
     self._tt_proc = None
     self._fqdn = socket.getfqdn()
 
+    self._core_site = None
+    self._hdfs_site = None
+    self._mapred_site = None
+
     self.shutdown_hook = None
 
   def __str__(self):
@@ -131,6 +135,10 @@ class PseudoHdfs4(object):
   @property
   def mapred_job_tracker_http_address(self):
     return "%s:%s" % (self._fqdn, self._jt_http_port,)
+
+  @property
+  def hadoop_conf_dir(self):
+    return self._tmppath('conf')
 
   @property
   def fs(self):
@@ -200,16 +208,15 @@ class PseudoHdfs4(object):
       TEST_USER_GROUP_MAPPING[self.superuser] = [self.superuser]
 
     # This is where we prepare our Hadoop configuration
-    conf_dir = self._tmppath('conf')
-    if not os.path.exists(conf_dir):
-      os.mkdir(conf_dir)
+    if not os.path.exists(self.hadoop_conf_dir):
+      os.mkdir(self.hadoop_conf_dir)
 
     self._log_dir = self._tmppath('logs')
     if not os.path.exists(self._log_dir):
       os.mkdir(self._log_dir)
 
     # Write out the Hadoop conf files
-    self._write_hadoop_metrics_conf(conf_dir)
+    self._write_hadoop_metrics_conf(self.hadoop_conf_dir)
     self._write_core_site()
     self._write_hdfs_site()
 
@@ -217,7 +224,7 @@ class PseudoHdfs4(object):
     env = dict(
       HADOOP_HOME = hadoop.conf.HDFS_CLUSTERS['default'].HADOOP_HDFS_HOME.get(),
       HADOOP_BIN = hadoop.conf.HDFS_CLUSTERS['default'].HADOOP_BIN.get(),
-      HADOOP_CONF_DIR = conf_dir,
+      HADOOP_CONF_DIR = self.hadoop_conf_dir,
       HADOOP_HEAPSIZE = "128",
       HADOOP_LOG_DIR = self._log_dir,
       USER = self.superuser,
@@ -231,11 +238,11 @@ class PseudoHdfs4(object):
     LOG.debug("Hadoop Environment:\n" + "\n".join([ str(x) for x in sorted(env.items()) ]))
 
     # Format HDFS
-    self._format(conf_dir, env)
+    self._format(self.hadoop_conf_dir, env)
 
     # Run them
-    self._nn_proc = self._start_daemon('namenode', conf_dir, env)
-    self._dn_proc = self._start_daemon('datanode', conf_dir, env)
+    self._nn_proc = self._start_daemon('namenode', self.hadoop_conf_dir, env)
+    self._dn_proc = self._start_daemon('datanode', self.hadoop_conf_dir, env)
 
     # Make sure they're running
     deadline = time.time() + STARTUP_DEADLINE
@@ -261,7 +268,6 @@ class PseudoHdfs4(object):
 
   def _start_mr1(self, env):
     LOG.info("Starting MR1")
-    conf_dir = self._tmppath('conf')
 
     # We need a different env because it's a different hadoop
     self._mr1_env = env.copy()
@@ -279,8 +285,8 @@ class PseudoHdfs4(object):
     self._write_mapred_site()
 
     # Run JT & TT
-    self._jt_proc = self._start_daemon('jobtracker', conf_dir, self.mr1_env)
-    self._tt_proc = self._start_daemon('tasktracker', conf_dir, self.mr1_env)
+    self._jt_proc = self._start_daemon('jobtracker', self.hadoop_conf_dir, self.mr1_env)
+    self._tt_proc = self._start_daemon('tasktracker', self.hadoop_conf_dir, self.mr1_env)
 
     # Make sure they're running
     deadline = time.time() + STARTUP_DEADLINE
@@ -411,10 +417,10 @@ class PseudoHdfs4(object):
       'dfs.datanode.http.address': '0.0.0.0:0',
       'dfs.datanode.ipc.address': '%s:0' % self._fqdn,
       'dfs.replication': 1,
-      'dfs.safemode.min.datanodes': 1,
-      'fs.trash.interval': 10
+      'dfs.safemode.min.datanodes': 1
     }
-    write_config(hdfs_configs, self._tmppath('conf/hdfs-site.xml'))
+    self._hdfs_site = self._tmppath('conf/hdfs-site.xml')
+    write_config(hdfs_configs, self._hdfs_site)
 
   def _write_core_site(self):
     # Prep user group mapping file
@@ -427,13 +433,15 @@ class PseudoHdfs4(object):
       'fs.default.name': self._fs_default_name,
       'hadoop.security.authorization': 'true',
       'hadoop.security.authentication': 'simple',
-      'hadoop.proxyuser.hue.hosts': '*',      
+      'hadoop.proxyuser.hue.hosts': '*',
       'hadoop.proxyuser.hue.groups': '*',
-      'hadoop.proxyuser.%s.hosts' % (getpass.getuser(),): '*',      
+      'hadoop.proxyuser.%s.hosts' % (getpass.getuser(),): '*',
       'hadoop.proxyuser.%s.groups' % (getpass.getuser(),): '*',
       'hadoop.tmp.dir': self._tmppath('hadoop_tmp_dir'),
+      'fs.trash.interval': 10
     }
-    write_config(core_configs, self._tmppath('conf/core-site.xml'))
+    self._core_site = self._tmppath('conf/core-site.xml')
+    write_config(core_configs, self._core_site)
 
   def _write_mapred_site(self):
     self._jt_thrift_port = find_unused_port()
@@ -448,6 +456,7 @@ class PseudoHdfs4(object):
       'mapred.jobtracker.plugins': 'org.apache.hadoop.thriftfs.ThriftJobTrackerPlugin',
       'mapred.task.tracker.http.address': '%s:%s' % (self._fqdn, self._tt_http_port,),
     }
+    self._mapred_site = self._tmppath('conf/mapred-site.xml')
     write_config(mapred_configs, self._tmppath('conf/mapred-site.xml'))
 
   def _write_hadoop_metrics_conf(self, conf_dir):
@@ -488,9 +497,11 @@ def shared_cluster():
     closers = [
       hadoop.conf.HDFS_CLUSTERS['default'].FS_DEFAULTFS.set_for_testing(cluster.fs_default_name),
       hadoop.conf.HDFS_CLUSTERS['default'].WEBHDFS_URL.set_for_testing(webhdfs_url),
+      hadoop.conf.HDFS_CLUSTERS['default'].HADOOP_CONF_DIR.set_for_testing(cluster.hadoop_conf_dir),
       hadoop.conf.MR_CLUSTERS['default'].HOST.set_for_testing(fqdn),
       hadoop.conf.MR_CLUSTERS['default'].PORT.set_for_testing(cluster._jt_port),
       hadoop.conf.MR_CLUSTERS['default'].JT_THRIFT_PORT.set_for_testing(cluster.jt_thrift_port),
+      hadoop.conf.MR_CLUSTERS['default'].HADOOP_CONF_DIR.set_for_testing(cluster.hadoop_conf_dir),
     ]
 
     old = hadoop.cluster.clear_caches()

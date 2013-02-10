@@ -23,6 +23,7 @@ from nose.plugins.attrib import attr
 import logging
 import posixfile
 import random
+import sys
 from threading import Thread
 import unittest
 
@@ -205,6 +206,10 @@ class WebhdfsTests(unittest.TestCase):
     assert_equals(('hdfs', '', 'foo/bar', '', ''), Hdfs.urlsplit(url))
 
   def test_i18n_namespace(self):
+    # Use utf-8 encoding
+    reload(sys)
+    sys.setdefaultencoding('utf-8')
+
     def check_existence(name, parent, present=True):
       assertion = present and assert_true or assert_false
       listing = self.cluster.fs.listdir(parent)
@@ -244,12 +249,16 @@ class WebhdfsTests(unittest.TestCase):
       try:
         self.cluster.fs.rmtree(dir_path)
       except IOError, ex:
-        LOG.info(unicode('Successfully caught error: %s') % ex)
+        LOG.info('Successfully caught error: %s' % ex)
     finally:
       try:
         self.cluster.fs.rmtree(prefix)
       except Exception, ex:
-        LOG.error(unicode('Failed to cleanup %s: %s') % (prefix, ex))
+        LOG.error('Failed to cleanup %s: %s' % (prefix, ex))
+
+      # Reset encoding
+      reload(sys)
+      sys.setdefaultencoding('ascii')
 
   def test_threadedness(self):
     # Start a second thread to change the user, and
