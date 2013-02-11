@@ -44,10 +44,13 @@ import java.util.Properties;
 import java.util.UUID;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
+import javax.security.auth.login.LoginException;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
+import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.Schema;
 import org.apache.hadoop.hive.ql.CommandNeedRetryException;
 import org.apache.hadoop.hive.ql.Driver;
@@ -64,7 +67,11 @@ import org.apache.hadoop.hive.ql.processors.CommandProcessorResponse;
 import org.apache.hadoop.hive.ql.QueryPlan;
 import org.apache.hadoop.hive.ql.session.SessionState;
 import org.apache.hadoop.hive.serde.serdeConstants;
+import org.apache.hadoop.hive.shims.ShimLoader;
+import org.apache.hadoop.hive.thrift.DelegationTokenIdentifier;
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.security.UserGroupInformation;
+import org.apache.hadoop.security.token.Token;
 import org.apache.log4j.Logger;
 import org.apache.thrift.TException;
 
@@ -115,6 +122,8 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
    * EXCEPTION is also valid.
    */
   private class RunningQueryState {
+    public static final String BWTOKEN = "BeeswaxImpersonationToken";
+
     private QueryState state = QueryState.CREATED;
     // Thread local used by Hive quite a bit.
     private CleanableSessionState sessionState;
@@ -129,6 +138,7 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
     private LogContext logContext;
     /** The client handle, if applicable */
     private QueryHandle handle = null;
+    private String delegationToken = null;
 
     /**
      * Create an instance with the given query and LogContext.
@@ -266,6 +276,12 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
         }
       }
 
+      try {
+        // setup the delegation token if needed
+        useDelegationToken();
+      } catch (IOException e) {
+        throw new RuntimeException("Failed to setup delegation token", e);
+      }
       driver = new Driver(hiveConf);
       ClassLoader loader = hiveConf.getClassLoader();
       String auxJars = HiveConf.getVar(hiveConf, HiveConf.ConfVars.HIVEAUXJARS);
@@ -298,6 +314,22 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
           new PrintStream(new TeeOutputStream(System.err, sessionState.err));
 
       this.state = QueryState.INITIALIZED;
+    }
+
+    /*
+     * if there's a delegation token obtained from remote metastore,
+     * store it in the ugi. Set the token.signature in hive conf which
+     * prompts the metastore clients to retrieve this token from ugi and
+     * connect to remote metastore using DIGEST sasl instead of kerberos
+     */
+    private void useDelegationToken() throws IOException {
+      if (delegationToken != null) {
+        hiveConf.set("hive.metastore.token.signature", BWTOKEN);
+        Token<DelegationTokenIdentifier> delegationTokenID = new Token<DelegationTokenIdentifier>();
+        delegationTokenID.decodeFromUrlString(delegationToken);
+        delegationTokenID.setService(new Text(BWTOKEN));
+        UserGroupInformation.getCurrentUser().addToken(delegationTokenID);
+      }
     }
 
     /**
@@ -591,6 +623,20 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
     private void cleanSessionState() {
       ((CleanableSessionState) SessionState.get()).destroyHiveHistory();
     }
+
+    /**
+     * @return the delegationToken
+     */
+    public String getDelegationToken() {
+      return delegationToken;
+    }
+
+    /**
+     * @param delegationToken the delegationToken to set
+     */
+    public void setDelegationToken(String delegationToken) {
+      this.delegationToken = delegationToken;
+    }
   }
 
 
@@ -758,6 +804,20 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
 
     // Make an administrative record
     final RunningQueryState state = new RunningQueryState(query, lc);
+
+    // acquire delegation token if needed
+    try {
+      state.setDelegationToken(getDelegationTokenFromMetaStore(query.hadoop_user));
+    } catch (UnsupportedOperationException e) {
+      // If delegationToken is not support in this environment, then ignore it
+    } catch (HiveException e) {
+      throw new BeeswaxException(e.getMessage(), handle.log_context, handle);
+    } catch (MetaException e) {
+      throw new BeeswaxException(e.getMessage(), handle.log_context, handle);
+    } catch (TException e) {
+      throw new BeeswaxException(e.getMessage(), handle.log_context, handle);
+    }
+
     try {
       return doWithState(state,
           new PrivilegedExceptionAction<QueryHandle>() {
@@ -783,6 +843,23 @@ public class BeeswaxServiceImpl implements BeeswaxService.Iface {
     } catch (BeeswaxException e) {
       throw e;
     }
+  }
+
+  // obtain delegation token for the give user from metastore
+  private String getDelegationTokenFromMetaStore(String owner)
+      throws HiveException, UnsupportedOperationException, MetaException, TException {
+
+    HiveConf hiveConf = new HiveConf();
+    if (!hiveConf.getBoolVar(HiveConf.ConfVars.METASTORE_USE_THRIFT_SASL) ||
+        !UserGroupInformation.isSecurityEnabled() ||
+        hiveConf.getVar(HiveConf.ConfVars.METASTOREURIS).isEmpty()) {
+      throw new UnsupportedOperationException(
+        "delegation token is can only be obtained for a secure remote metastore");
+    }
+    HiveMetaStoreClient metastoreClient = new HiveMetaStoreClient(hiveConf);
+    String delegationTokenStr = metastoreClient.getDelegationToken(owner, owner);
+    metastoreClient.close();
+    return delegationTokenStr;
   }
 
   /**
