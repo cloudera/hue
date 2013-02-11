@@ -89,13 +89,13 @@ class Command(NoArgsCommand):
 
     if sample_user is None:
       raise Exception(_("Expected sample user fixture."))
+
     # Create the sample user if it doesn't exist
+    USERNAME = 'sample'
     try:
-      sample_user.object = User.objects.get(username=sample_user.object.username)
+      sample_user.object = User.objects.get(username=USERNAME)
     except User.DoesNotExist:
-      sample_user.object.pk = 1100713
-      sample_user.object.id = 1100713
-      sample_user.save()
+      sample_user.object = User.objects.create(username=USERNAME, password='!', is_active=False, is_superuser=False, id=1100713, pk=1100713)
 
     # Create the designs
     for d in sample_oozie_designs:

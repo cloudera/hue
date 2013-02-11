@@ -115,8 +115,7 @@ class Command(NoArgsCommand):
     try:
       user = User.objects.get(username=USERNAME)
     except User.DoesNotExist:
-      user = User(username=USERNAME, password='!', is_active=False, is_superuser=False)
-      user.save()
+      user = User.objects.create(username=USERNAME, password='!', is_active=False, is_superuser=False, id=1100713, pk=1100713)
       LOG.info('Installed a user called "%s"' % (USERNAME,))
     return user
 

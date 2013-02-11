@@ -55,10 +55,11 @@ class Command(NoArgsCommand):
     fs.do_as_user(fs.DEFAULT_USER, fs.copyFromLocal, local_dir, remote_data_dir)
 
     # Load jobs
+    USERNAME = 'sample'
     try:
-      sample_user = User.objects.get(pk=1100713)
+      sample_user = User.objects.get(username=USERNAME)
     except User.DoesNotExist:
-      sample_user = User.objects.create(username='sample', pk=1100713, id=1100713)
+      sample_user = User.objects.create(username=USERNAME, password='!', is_active=False, is_superuser=False, id=1100713, pk=1100713)
     management.call_command('loaddata', 'initial_oozie_examples.json', verbosity=2)
 
 
