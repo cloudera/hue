@@ -82,19 +82,6 @@ ${ layout.menubar(section='workflows') }
       ${ utils.render_field(workflow_form['description'], extra_attrs={'data-bind': 'value: %s' % workflow_form['description'].name}) }
       ${ utils.render_field(workflow_form['is_shared'], extra_attrs={'data-bind': 'checked: %s' % workflow_form['is_shared'].name}) }
 
-        <div class="control-group ">
-          <label class="control-label">
-            <a href="#" id="advanced-btn" onclick="$('#advanced-container').toggle('hide')">
-              <i class="icon-share-alt"></i> ${ _('advanced') }</a>
-          </label>
-          <div class="controls"></div>
-        </div>
-
-      <div id="advanced-container" class="hide">
-      % if user_can_edit_job:
-      ${ utils.render_field(workflow_form['deployment_dir'], extra_attrs={'data-bind': 'value: %s' % workflow_form['deployment_dir'].name}) }
-      % endif
-
       <%
       workflows.key_value_field(workflow_form['parameters'], {
       'name': 'parameters',
@@ -111,7 +98,20 @@ ${ layout.menubar(section='workflows') }
       })
       %>
 
-      ${ utils.render_field(workflow_form['job_xml'], extra_attrs={'data-bind': 'value: %s' % workflow_form['job_xml'].name}) }
+        <div class="control-group ">
+          <label class="control-label">
+            <a href="#" id="advanced-btn" onclick="$('#advanced-container').toggle('hide')">
+              <i class="icon-share-alt"></i> ${ _('advanced') }</a>
+          </label>
+          <div class="controls"></div>
+        </div>
+
+      <div id="advanced-container" class="hide">
+        % if user_can_edit_job:
+          ${ utils.render_field(workflow_form['deployment_dir'], extra_attrs={'data-bind': 'value: %s' % workflow_form['deployment_dir'].name}) }
+        % endif
+
+        ${ utils.render_field(workflow_form['job_xml'], extra_attrs={'data-bind': 'value: %s' % workflow_form['job_xml'].name}) }
       </div>
 
       </fieldset>

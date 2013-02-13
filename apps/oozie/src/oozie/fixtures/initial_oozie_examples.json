@@ -24,7 +24,7 @@
       "schema_version": "uri:oozie:coordinator:0.2",
       "last_modified": "2013-01-01 00:00:00",
       "owner": 1100713,
-      "description": "Example of MapReduce action"
+      "description": "Run a daily sleep job"
     }
   },
   {
@@ -187,7 +187,7 @@
     "fields": {
       "is_shared": true,
       "name": "DailyAnalytics",
-      "parameters": "[{\"name\":\"oozie.use.system.libpath\",\"value\":\"true\"}]",
+      "parameters": "[]",
       "deployment_dir": "/user/hue/oozie/workspaces/range",
       "schema_version": "uri:oozie:coordinator:0.1",
       "last_modified": "2013-01-01 00:00:00",
@@ -2028,7 +2028,8 @@
       "timeout": null,
       "timezone": "America/Los_Angeles",
       "throttle": null,
-      "execution": null
+      "execution": null,
+      "job_properties": "[]"
     }
   },
   {
@@ -2044,7 +2045,8 @@
       "timeout": null,
       "timezone": "America/Los_Angeles",
       "throttle": null,
-      "execution": null
+      "execution": null,
+      "job_properties": "[]"
     }
   },
   {

@@ -1039,6 +1039,12 @@ class TestEditor(OozieMockBase):
         '  <action>\n'
         '    <workflow>\n'
         '      <app-path>${wf_application_path}</app-path>\n'
+        '      <configuration>\n'
+        '        <property>\n'
+        '          <name>username</name>\n'
+        '          <value>${coord:user()}</value>\n'
+        '        </property>\n'
+        '      </configuration>\n'
         '   </workflow>\n'
         '  </action>\n'
         '</coordinator-app>\n'.split(), coord.to_xml().split())
@@ -1112,6 +1118,10 @@ class TestEditor(OozieMockBase):
         <property>
           <name>output_dir</name>
           <value>${coord:dataOut('output_dir')}</value>
+        </property>
+        <property>
+          <name>username</name>
+          <value>${coord:user()}</value>
         </property>
       </configuration>
    </workflow>
@@ -2138,13 +2148,14 @@ WORKFLOW_DICT = {u'deployment_dir': [u''], u'name': [u'wf-name-1'], u'descriptio
                  u'job_xml': [u'jobconf.xml'],
                  u'job_properties': [u'[{"name":"sleep-all","value":"${SLEEP}"}]']
 }
-COORDINATOR_DICT = {u'name': [u'MyCoord'], u'description': [u'Description of my coodinator'],
+COORDINATOR_DICT = {u'name': [u'MyCoord'], u'description': [u'Description of my coordinator'],
                     u'workflow': [u'1'],
                     u'frequency_number': [u'1'], u'frequency_unit': [u'days'],
                     u'start_0': [u'07/01/2012'], u'start_1': [u'12:00 AM'],
                     u'end_0': [u'07/04/2012'], u'end_1': [u'12:00 AM'],
                     u'timezone': [u'America/Los_Angeles'],
                     u'parameters': [u'[{"name":"market","value":"US,France"}]'],
+                    u'job_properties': [u'[{"name":"username","value":"${coord:user()}"}]'],
                     u'timeout': [u'100'],
                     u'concurrency': [u'3'],
                     u'execution': [u'FIFO'],
