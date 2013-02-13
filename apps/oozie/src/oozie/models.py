@@ -1188,6 +1188,9 @@ class Coordinator(Job):
   throttle = models.PositiveSmallIntegerField(null=True, blank=True, choices=FREQUENCY_NUMBERS, verbose_name=_t('Throttle'),
                                  help_text=_t('The materialization or creation throttle value for its coordinator actions. '
                                               'How many maximum coordinator actions are allowed to be in WAITING state concurrently.'))
+  job_properties = models.TextField(default='[]', verbose_name=_t('Workflow properties'),
+                                    help_text=_t('Configuration properties to transmit to the workflow (e.g. limit=100, username=${coord:user()})'))
+
   HUE_ID = 'hue-id-c'
 
   def get_type(self):
@@ -1246,6 +1249,13 @@ class Coordinator(Job):
   @classmethod
   def get_application_filename(cls):
     return 'coordinator.xml'
+
+  def get_properties(self):
+    return json.loads(self.job_properties)
+
+  @property
+  def job_properties_escapejs(self):
+    return self._escapejs_parameters_list(self.job_properties)
 
   @property
   def start_utc(self):

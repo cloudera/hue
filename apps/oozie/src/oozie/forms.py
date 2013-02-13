@@ -337,6 +337,7 @@ class CoordinatorForm(forms.ModelForm):
     widgets = {
       'description': forms.TextInput(attrs={'class': 'span5'}),
       'parameters': forms.widgets.HiddenInput(),
+      'job_properties': forms.widgets.HiddenInput(),
       'schema_version': forms.widgets.HiddenInput(),
       'timeout': NumberInput(),
     }
