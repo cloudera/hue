@@ -22,6 +22,7 @@
     .item { text-align: center; padding: 15px; }
     .legend { text-align: center;  font-size: 1.2em; padding-bottom: 10px; }
     p.item img { border-style:solid; border-width: 1px;}
+    body { font-size: 110%; }
     #logo { margin-top: -10px; margin-bottom: -8px; padding-right: 15px; }
   </style>
 </head>
@@ -36,6 +37,9 @@
               <li class="active">
                 <a href="#home" data-toggle="tab">Home</a>
               </li>
+              <li>
+                <a href="#hue" data-toggle="tab">What is Hue?</a>
+              </li>              
               <li>
                 <a href="#apps" data-toggle="tab">Apps</a>
               </li>
@@ -135,6 +139,30 @@
         </div>
           </div>
 
+          <div class="tab-pane" id="hue">
+            <h3>What is Hue?</h3>
+
+            <div class="container-fluid">
+              <div class="span3">
+              </div>
+              <div class="span9">
+                <section id="whats">
+                  <h2>A starting point for exploration and real time interaction with <a href="http://hadoop.apache.org/">Apache Hadoop</a></h2>
+                  <p>
+                     Hue is <a href="#releases" class="link">mature</a> and used from fortune 500 companies to startups, students and data scientist/analysts.
+                  </p>
+                  <p>
+                    With Hue, one can get started with Hadoop and become familiar with and explore different angles of the platform. 
+                    Hue’s target is the Hadoop user experience and lets users avoid the command line interface and have them focus on visibility and getting results quickly.
+                  <p>
+                  </p>
+                   Hue is composed of various <a href="#apps" class="link">applications</a>. The major query and scripting solutions are leveraged in specific editors (e.g. <a href="#apps" class="link" data-anchor="beeswax">Hive</a>, <a href="#apps" class="link" data-anchor="impala">Impala</a>) for quick interaction with big data. A Hadoop <a href="#apps" class="link" data-anchor="jb">JobBrowser</a> and <a href="#apps" class="link" data-anchor="fb">FileBrowser</a> are included for monitoring MapReduce tasks and intuitively manipulating the data. An <a href="#apps" class="link" data-anchor="oozie">Oozie application</a> lets users create complex workflows of Hadoop jobs in a drag & drop editor and schedule them repetitively in a few clicks. This integration brings new ways to discover insights. Moreover, Hue comes with a <a href="docs-2.1.0/sdk/sdk.html">SDK</a> for letting developers reuse Hue’s libraries and start building apps on top of Hadoop.
+                  </p>
+                </section>                
+              </div>
+            </div>
+          </div>
+
           <div class="tab-pane" id="apps">
             <h3>Apps</h3>
 
@@ -159,7 +187,7 @@
                     <p class="legend">Query Editor</p>
                   </p>
                   <p class="item">
-                    <a href="static/images/beeswax-result.jpg title="Click to see" rel="tooltip""><img class="image" src="static/images/beeswax-result.jpg"/></a>
+                    <a href="static/images/beeswax-result.jpg" title="Click to see" rel="tooltip""><img class="image" src="static/images/beeswax-result.jpg"/></a>
                     <p class="legend">Result Browsing</p>
                   </p>
                   <p class="item">
@@ -186,7 +214,7 @@
                      <p class="legend">Coordinator wizard</p>
                   </p>
                   <p class="item">
-                     <a href="static/images/oozie-drag.jpg" title="Click to see" rel="tooltip"><img class="image" src="static/images/oozie-drag.jpg"/></a>
+                     <a href="static/images/oozie-drag.png" title="Click to see" rel="tooltip"><img class="image" src="static/images/oozie-drag.png"/></a>
                      <p class="legend">Drag & Drop workflow editor</p>
                   </p>
                 </section>
@@ -333,6 +361,25 @@
 <script>
   $(document).ready(function () {
 	  $('#myCarousel').carousel();
+	
+    $("a.link").click(function (e) {
+      var _link = $(this);
+      if (_link.attr("href").indexOf("#") == 0) {
+        e.preventDefault();
+        var section = decodeURIComponent(_link.attr("href").substring(1));
+        $(".tab-pane").removeClass("active");
+        $("#" + section).addClass("active");
+        $(".nav-tabs li").removeClass("active");
+        $("a[href='#" + section + "']").parent().addClass("active"); 
+        
+        if ($(_link).data('anchor')) {
+          var _anchor = $("section#" + $(_link).data('anchor'));
+          $("html, body").animate({
+           scrollTop:(_anchor.position().top - $(".navbar-fixed-top").height() - $(".subnav-fixed").height()) + "px"
+          }, 300);
+        }
+      }
+	  });
 	
     $("ul.affix li a").click(function (e) {
       var _link = $(this);
