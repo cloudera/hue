@@ -476,7 +476,7 @@ def submit_coordinator(request, coordinator):
 
 def _submit_coordinator(request, coordinator, mapping):
   try:
-    wf_dir = Submission(request.user, coordinator.workflow, request.fs, {}).deploy()
+    wf_dir = Submission(request.user, coordinator.workflow, request.fs, mapping).deploy()
 
     properties = {'wf_application_path': request.fs.get_hdfs_path(wf_dir)}
     properties.update(mapping)
