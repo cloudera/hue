@@ -77,12 +77,26 @@
           self.parameters.remove(val);
         };
 
+        self.job_properties = ko.observableArray(${ coordinator.job_properties_escapejs | n });
+
+        self.add_job_properties = function() {
+          self.job_properties.push({name: "", value: ""});
+        };
+
+        self.remove_job_properties = function(val) {
+          self.job_properties.remove(val);
+        };
+
         self.submit = function(form) {
           var form = $("#jobForm");
 
           $("<input>").attr("type", "hidden")
                   .attr("name", "parameters")
                   .attr("value", ko.utils.stringifyJson(self.parameters))
+                  .appendTo(form);
+          $("<input>").attr("type", "hidden")
+                  .attr("name", "job_properties")
+                  .attr("value", ko.utils.stringifyJson(self.job_properties))
                   .appendTo(form);
 
           form.submit();

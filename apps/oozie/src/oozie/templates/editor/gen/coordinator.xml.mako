@@ -103,7 +103,7 @@
   <action>
     <workflow>
       <app-path>${'${'}wf_application_path}</app-path>
-      % if coord.datainput_set.exists() or coord.dataoutput_set.exists():
+      % if coord.datainput_set.exists() or coord.dataoutput_set.exists() or coord.get_properties():
       <configuration>
         % for input in coord.datainput_set.all():
           <property>
@@ -115,6 +115,12 @@
         <property>
           <name>${ output.name }</name>
           <value>${'${'}coord:dataOut('${ output.name }')}</value>
+        </property>
+        % endfor
+        % for property in coord.get_properties():
+        <property>
+          <name>${ property['name'] }</name>
+          <value>${ property['value'] }</value>
         </property>
         % endfor
       </configuration>
