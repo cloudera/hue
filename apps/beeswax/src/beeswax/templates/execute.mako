@@ -33,7 +33,7 @@
         </div>
     % endif
 
-    <textarea class="span9" rows="35" placeholder="${_('Example: SELECT * FROM tablename')}" name="${form.query["query"].html_name}" id="queryField">${extract_field_data(form.query["query"]) or ''}</textarea>
+    <textarea class="span11" rows="30" placeholder="${_('Example: SELECT * FROM tablename')}" name="${form.query["query"].html_name}" id="queryField">${extract_field_data(form.query["query"]) or ''}</textarea>
 
     <div id="validationResults">
     % if len(form.query["query"].errors):
@@ -531,7 +531,23 @@ ${layout.menubar(section='query')}
           selectedLine = $.trim(err.substring(err.indexOf(" ", firstPos), err.indexOf(":", firstPos)))*1;
         }
 
-        if (selectedLine > -1){
+      initQueryField();
+
+      var resizeTimeout = -1;
+      $(window).on("resize", function () {
+        window.clearTimeout(resizeTimeout);
+        resizeTimeout = window.setTimeout(function () {
+          $("#queryField").unbind();
+          $("#queryField").data("scroll", $("#queryField").scrollTop());
+          $("#queryField").insertBefore($(".linedwrap"));
+          $("#queryField").css("width", "");
+          $(".linedwrap").remove();
+          initQueryField();
+        }, 200);
+      });
+
+      function initQueryField() {
+        if (selectedLine > -1) {
           $("#queryField").linedtextarea({
             selectedLine: selectedLine
           });
@@ -539,11 +555,16 @@ ${layout.menubar(section='query')}
         else {
           $("#queryField").linedtextarea();
         }
-
-        function checkAndSubmit(){
-            $(".query").val($("#queryField").val());
-            $("#advancedSettingsForm").submit();
+        $("#queryField").width($("#queryField").width() - 4); // fixes zooms problems
+        if ($("#queryField").data("scroll")) {
+          $("#queryField").scrollTop($("#queryField").data("scroll"));
         }
+      }
+
+      function checkAndSubmit() {
+        $(".query").val($("#queryField").val());
+        $("#advancedSettingsForm").submit();
+      }
     });
 </script>
 
