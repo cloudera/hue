@@ -1,3 +1,213 @@
-<html>
-<h1><a name="AboutHue-AboutHue"></a>About impala</h1>
+<h1><a name="ClouderaImpalaQueryUI-IntroducingClouderaImpalaQueryUI"></a>Introducing Cloudera Impala Query UI</h1>
+
+<p>The Cloudera Impala Query UI application enables you to perform queries on Apache Hadoop data stored in HDFS or HBase using Cloudera Impala. For information about Cloudera Impala, see <a href="https://ccp.cloudera.com/display/IMPALA10BETADOC/Installing+and+Using+Cloudera+Impala">Installing and Using Impala</a>. You can create, run, and manage queries, and download the results in a Microsoft Office Excel worksheet file or a comma-separated values file. </p>
+
+
+<h2><a name="ClouderaImpalaQueryUI-Contents"></a>Contents</h2>
+
+<style type='text/css'>/*<![CDATA[*/
+div.rbtoc1359395594328 {margin-left: 1.5em;padding: 0px;}
+div.rbtoc1359395594328 ul {margin-left: 0px;padding-left: 20px;}
+div.rbtoc1359395594328 li {margin-left: 0px;padding-left: 0px;}
+
+/*]]>*/</style><div class='rbtoc1359395594328'>
+<ul>
+    <li><a href='#ClouderaImpalaQueryUI-IntroducingClouderaImpalaQueryUI'>Introducing Cloudera Impala Query UI</a></li>
+    <li><a href='#ClouderaImpalaQueryUI-ClouderaImpalaQueryUIandInstallationandConfiguration'>Cloudera Impala Query UI and Installation and Configuration</a></li>
+    <li><a href='#ClouderaImpalaQueryUI-StartingClouderaImpalaQueryUI'>Starting Cloudera Impala Query UI</a></li>
+    <li><a href='#ClouderaImpalaQueryUI-WorkingwithQueries'>Working with Queries</a></li>
+<ul>
+<ul>
+    <li><a href='#ClouderaImpalaQueryUI-CreatingandRunningQueries'>Creating and Running Queries</a></li>
+    <li><a href='#ClouderaImpalaQueryUI-AdvancedQuerySettings'>Advanced Query Settings</a></li>
+    <li><a href='#ClouderaImpalaQueryUI-Viewing%2CEditing%2CorDeletingSavedQueries'>Viewing, Editing, or Deleting Saved Queries</a></li>
+</ul>
+</ul>
+</ul></div>
+<p><br class="atl-forced-newline" /></p>
+
+<h1><a name="ClouderaImpalaQueryUI-ClouderaImpalaQueryUIandInstallationandConfiguration"></a>Cloudera Impala Query UI and Installation and Configuration</h1>
+
+<p>The Cloudera Impala Query UI application is installed and configured as part of Hue. For information about installing and configuring Hue, see <a href="https://ccp.cloudera.com/display/CDH4DOC/Hue+Installation">Hue Installation</a>.</p>
+
+<p>The Cloudera Impala Query UI assumes an existing Cloudera Impala installation.  The Hue installation instructions include the configuration necessary for Impala.   You can view the current configuration from from the <b>Settings</b> tab.</p>
+
+<h1><a name="ClouderaImpalaQueryUI-StartingClouderaImpalaQueryUI"></a>Starting Cloudera Impala Query UI</h1>
+
+<p>To start the application, click the <b>Cloudera Impala</b> icon (<span class="image-wrap" style=""><img src="/impala/static/help/images/23887903.png" style="border: 0px solid black"/></span>) in the navigation bar at the top of the Hue browser page.</p>
+
+
+<h1><a name="ClouderaImpalaQueryUI-WorkingwithQueries"></a>Working with Queries</h1>
+
+<p>The Query Editor view lets you create queries in the <a href="https://ccp.cloudera.com/display/IMPALA10BETADOC/Language+Reference">Cloudera Impala Query Language</a>, which is similar to Structured Query Language (SQL). You can name and save your queries to use later.   When you submit a query, you can either wait for the query to complete, or return later to find the queries in the <b>History</b> view. You can also request receive an email message after the query is completed.</p>
+
+<h3><a name="ClouderaImpalaQueryUI-CreatingandRunningQueries"></a>Creating and Running Queries</h3>
+
+<div class='panelMacro'><table class='noteMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="/static/art/help/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td><b>Note</b><br />To run a query, you must be logged in to Hue as a user that also has a Unix user account on the remote server.</td></tr></table></div>
+
+<p><b>To create and run a query</b>:</p>
+
+<ol>
+	<li>In the Query Editor window, type the query. For example, to select all data from the <em>sample_08</em> table, you would type:
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<div id="root">
+		<pre class="theme: Default; brush: plain; gutter: false">SELECT * FROM sample_08</pre>
+		</div>
+</div></div></li>
+	<li>In the box to the left of the Query field you can enable users to enter parameters at run-time and request email notification when the job is complete.  See <a href="#ClouderaImpalaQueryUI-AdvancedSettings">Advanced Query Settings</a> for details on using these settings.</li>
+	<li>To save your query and advanced settings to use again later, click <b>Save As,</b> enter a name and description, and then click <b>OK</b>. To save changes to an existing query, click <b>Save.</b></li>
+	<li>To run the query, click <b>Execute</b>.
+<br class="atl-forced-newline" />
+<a name="ClouderaImpalaQueryUI-QueryResults"></a><br/>
+The Query Results window appears with the results of your query.
+	<ul>
+		<li>To view a log of the query execution, click <b>Log</b> at the top of the results display. You can use the information in this tab to debug your query.</li>
+		<li>To view the query that generated these results, click <b>Query</b> at the top of the results display.</li>
+		<li>To view the columns of the query, click <b>Columns</b>.</li>
+		<li>To return to the query in the Query Editor, click <b>Unsaved Query</b>.</li>
+	</ul>
+	</li>
+</ol>
+
+
+<p><a name="ClouderaImpalaQueryUI-AdvancedSettings"></a></p>
+
+<h3><a name="ClouderaImpalaQueryUI-AdvancedQuerySettings"></a>Advanced Query Settings</h3>
+
+<p>The pane to the left of the Query Editor lets you specify the following options:
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></p>
+
+<style type="text/css">
+td.confluenceTd {
+border: #dddddd solid 1px;
+height: 36px;
+padding: 5px 10px;
+vertical-align: top;
+}
+th.confluenceTh {
+border: #dddddd solid 1px;
+height: 40px;
+padding: 5px 10px;
+vertical-align: center;
+}
+</style>
+
+
+<div class='table-wrap'>
+<table class='confluenceTable'><tbody>
+<tr>
+<th class='confluenceTh'> Option </th>
+<th class='confluenceTh'> Description </th>
+</tr>
+<tr>
+<td class='confluenceTd'> <b>SETTINGS</b> </td>
+<td class='confluenceTd'> Override the Cloudera Impala default settings. Click <b>Add</b> to configure a new setting. <br class="atl-forced-newline" />
+»&nbsp;&nbsp; For <b>Key</b>, enter an Impala configuration variable name. <br class="atl-forced-newline" />
+»&nbsp;&nbsp; For <b>Value</b>, enter the value you want to use for the variable. <br class="atl-forced-newline" />  <br class="atl-forced-newline" />
+To view the default settings, click the <b>Settings</b> tab at the top of the page. </td>
+</tr>
+<tr>
+<td class='confluenceTd'> <b>PARAMETERIZATION</b> </td>
+<td class='confluenceTd'>  Indicate that a dialog box should display to enter parameter values when a query containing the string $&lt;parametername&gt; is executed. Enabled by default.</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<h3><a name="ClouderaImpalaQueryUI-Viewing%2CEditing%2CorDeletingSavedQueries"></a>Viewing, Editing, or Deleting Saved Queries</h3>
+
+<p>You can view a list of saved queries of all users by clicking <b>Saved Queries</b>. You can copy any user's query, but you can only edit, delete, and view the history of your own queries.</p>
+
+<p><b>To edit a saved query:</b></p>
+
+<ol>
+	<li>In the Cloudera Impala window, click <b>Saved Queries</b>.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+The Queries window displays.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>Click the <b>Options</b> button next to the query and choose <b>Edit</b> from the context menu.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+The Query Editor window displays.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>Change the query and then click <b>Save.</b> You can also click <b>Save As</b>, enter a new name, and click <b>OK</b> to save a copy of the query.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+</ol>
+
+
+<p><b>To delete a saved query:</b></p>
+
+<ol>
+	<li>Click <b>Saved Queries</b>.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+The Queries window displays.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>Click the <b>Options</b> button next to the query and choose <b>Delete</b> from the context menu.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>Click <b>Yes</b> to confirm the deletion.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+</ol>
+
+
+<p><b>To copy a saved query:</b></p>
+
+<ol>
+	<li>Click <b>Saved Queries</b>.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+The Queries window displays.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>Click the <b>Options</b> button next to the query and choose <b>Clone</b> from the context menu.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+The Query Editor window displays.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>Change the query as necessary and then click <b>Save.</b> You can also click <b>Save As</b>, enter a new name, and click <b>Ok</b> to save a copy of the query.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+</ol>
+
+
+<p><b>To copy a query in the Query History window:</b></p>
+
+<ol>
+	<li>Click <b>History</b>.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+The Query History window displays.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>To display the queries for all users, click <b>Show everyone's queries</b>.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+The queries for all users displays in the Query History window.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>Click the <b>Clone</b> link next to the query you want to copy.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+A copy of the query displays in the Query Editor window.
+<br class="atl-forced-newline" />
+<br class="atl-forced-newline" /></li>
+	<li>Change the query, if necessary, and then click <b>Save As</b>, enter a new name, and click <b>OK</b> to save the query.</li>
+</ol>
+
+
+				    					    <br/>
+                        </td>
+		    </tr>
+	    </table>
+	    
+    </body>
 </html>

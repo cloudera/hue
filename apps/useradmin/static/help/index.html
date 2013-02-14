@@ -7,11 +7,11 @@
 <h2><a name="UserAdmin-Contents"></a>Contents</h2>
 
 <style type='text/css'>/*<![CDATA[*/
-div.rbtoc1348177692294 {margin-left: 1.5em;padding: 0px;}
-div.rbtoc1348177692294 ul {margin-left: 0px;padding-left: 20px;}
-div.rbtoc1348177692294 li {margin-left: 0px;padding-left: 0px;}
+div.rbtoc1355772985424 {margin-left: 1.5em;padding: 0px;}
+div.rbtoc1355772985424 ul {margin-left: 0px;padding-left: 20px;}
+div.rbtoc1355772985424 li {margin-left: 0px;padding-left: 0px;}
 
-/*]]>*/</style><div class='rbtoc1348177692294'>
+/*]]>*/</style><div class='rbtoc1355772985424'>
 <ul>
     <li><a href='#UserAdmin-IntroducingUserAdmin'>Introducing User Admin</a></li>
     <li><a href='#UserAdmin-StartingUserAdmin'>Starting User Admin</a></li>
@@ -40,7 +40,7 @@ div.rbtoc1348177692294 li {margin-left: 0px;padding-left: 0px;}
 <p><b>To start User Admin:</b></p>
 
 <ul>
-	<li>Click the <b>User Admin</b> icon ( <span class="image-wrap" style=""><img src="/useradmin/static/art/useradmin-logo.png" width="30" style="border: 0px solid black"/></span> ) in the navigation bar at the top of the Hue browser page.
+	<li>Click the <b>User Admin</b> icon ( <span class="image-wrap" style=""><img src="/useradmin/static/help/images/23888159.png" width="30" style="border: 0px solid black"/></span> ) in the navigation bar at the top of the Hue browser page.
 <br class="atl-forced-newline" />
 <br class="atl-forced-newline" /></li>
 </ul>
@@ -48,16 +48,20 @@ div.rbtoc1348177692294 li {margin-left: 0px;padding-left: 0px;}
 
 <h1><a name="UserAdmin-WorkingwithUserAccounts"></a>Working with User Accounts</h1>
 
-<p>The Hue User Admin application provides two levels of user privileges:</p>
+<p>The Hue User Admin application provides two levels of user privileges: superusers and users.</p>
 <ul>
-	<li>Superusers &#8212; have permissions to perform administrative functions &#8211; add and delete users, add and delete groups, assign permissions to groups. The first user who logs into Hue after its initial installation becomes the first superuser. That superuser can then create more superusers and user accounts. Later, the superuser can also change any existing user account into a superuser. A superuser can also import users and groups from an LDAP server.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" /></li>
-	<li>Users &#8212; can log in to Hue and run Hue applications, subject to the permissions provided by the Hue groups to which they belong.</li>
+	<li>Superusers &#8212; The first user who logs into Hue after its initial installation becomes the first superuser. Superusers have permissions to perform administrative functions:
+	<ul>
+		<li>add and delete users</li>
+		<li>add and delete groups</li>
+		<li>assign permissions to groups</li>
+		<li>change a user into a superuser</li>
+		<li>import users and groups from an LDAP server</li>
+	</ul>
+	</li>
+	<li>Users &#8212; can change their name, e-mail address, and password and log in to Hue and run Hue applications, subject to the permissions provided by the Hue groups to which they belong.</li>
 </ul>
 
-
-<div class='panelMacro'><table class='noteMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="/static/art/help/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td><b>Note:</b> To do the management tasks described in this chapter, you must log into Hue using a superuser account. Users who don't have superuser permissions can only change their name, e-mail address, and password.</td></tr></table></div>
 
 <h2><a name="UserAdmin-AddingaUserAccount"></a>Adding a User Account</h2>
 
@@ -95,37 +99,42 @@ vertical-align: center;
 </tr>
 <tr>
 <td class='confluenceTd'> <b>Username</b> </td>
-<td class='confluenceTd'> Specify a user name that contains only letters, numbers, and underscores; blank spaces are not allowed and the name cannot begin with a number. The user name is used to log into Hue and in file permissions and job submissions. This is a required field. </td>
+<td class='confluenceTd'> A user name that contains only letters, numbers, and underscores; blank spaces are not allowed and the name cannot begin with a number. The user name is used to log into Hue and in file permissions and job submissions. This is a required field. </td>
 </tr>
 <tr>
-<td class='confluenceTd'> <b>First name</b> and <br class="atl-forced-newline" />
-<b>Last name</b> </td>
-<td class='confluenceTd'> Specify the user's first and last name. </td>
+<td class='confluenceTd'> <b>Password</b> and <b>Password confirmation</b></td>
+<td class='confluenceTd'> A password for the user. This is a required field. </td>
+</tr>
+<tr>
+<td class='confluenceTd'> <b>First name</b> and <b>Last name</b> </td>
+<td class='confluenceTd'> The user's first and last name. </td>
 </tr>
 <tr>
 <td class='confluenceTd'> <b>E-mail address</b> </td>
-<td class='confluenceTd'> Specify the user's e-mail address. The e-mail address is used by the Job Designer and Beeswax applications to send users an e-mail message after certain actions have occurred. The Job Designer sends an e-mail message after a user's job has completed. Beeswax sends a message after a query has completed. If an e-mail address is not specified, the application will not attempt to email the user. </td>
+<td class='confluenceTd'> The user's e-mail address. The e-mail address is used by the Job Designer and Beeswax applications to send users an e-mail message after certain actions have occurred. The Job Designer sends an e-mail message after a user's job has completed. Beeswax sends a message after a query has completed. If an e-mail address is not specified, the application will not attempt to email the user. </td>
+</tr>
+<tr>
+<td class='confluenceTd'> <b>Groups</b> </td>
+<td class='confluenceTd'> The groups to which the user belongs. By default, a user is assigned to the <b>default</b> group, which allows access to all applications. See <a href="#UserAdmin-AssigningPermissions">Assigning Permissions</a>.</td>
 </tr>
 <tr>
 <td class='confluenceTd'> <b>Active</b> </td>
-<td class='confluenceTd'> Select this option to enable this user account and allow the user to log in. Deselect this option to disable an account without deleting it. </td>
+<td class='confluenceTd'> Indicate that the user account is enabled and the user is allowed to log in. </td>
+</tr>
+<tr>
+<td class='confluenceTd'> <b>Create home directory</b> </td>
+<td class='confluenceTd'> Create a directory named /user/&lt;Username&gt; in HDFS. For non-superusers, the user and group of the directory are &lt;Username&gt;. For superusers, the user and group are &lt;Username&gt; and supergroup. </td>
 </tr>
 <tr>
 <td class='confluenceTd'> <b>Superuser&nbsp;status</b> </td>
-<td class='confluenceTd'> Select this option to assign superuser privileges to the user. </td>
-</tr>
-<tr>
-<td class='confluenceTd'> <b>Password</b> </td>
-<td class='confluenceTd'> Specify a password for the user. This is a required field. </td>
+<td class='confluenceTd'> Assign superuser privileges to the user. </td>
 </tr>
 </tbody></table>
 </div>
 
 <p><br class="atl-forced-newline" /></p></li>
-	<li>Click <b>Save</b> to save the information you specified and close the <b>Add User</b> dialog box.
-<br class="atl-forced-newline" /></li>
+	<li>Click <b>Save</b> to save the information you specified and close the <b>Add User</b> dialog box.</li>
 </ol>
-
 
 
 <h2><a name="UserAdmin-DeletingaUserAccount"></a>Deleting a User Account</h2>
@@ -203,8 +212,6 @@ This imports the user's first and last name, username, and email, but does not s
 
 <p>Superusers can add groups, delete the groups they have created, configure group permissions, and assign users to group memberships.</p>
 
-
-
 <h2><a name="UserAdmin-AddingaGroup"></a>Adding a Group</h2>
 
 <p>You can add groups, and delete the groups you've added. You can also import groups from an LDAP directory.</p>
@@ -227,8 +234,6 @@ This imports the user's first and last name, username, and email, but does not s
 
 <h2><a name="UserAdmin-AddingUserstoaGroup"></a>Adding Users to a Group</h2>
 
-
-
 <ol>
 	<li>In the <b>User Admin</b> window, click <b>Groups</b>.
 <br class="atl-forced-newline" />
@@ -244,8 +249,6 @@ This imports the user's first and last name, username, and email, but does not s
 
 
 <h2><a name="UserAdmin-DeletingaGroup"></a>Deleting a Group</h2>
-
-
 
 <p><b>To delete a group:</b>
 <br class="atl-forced-newline" /></p>
@@ -265,7 +268,6 @@ This imports the user's first and last name, username, and email, but does not s
 
 <p>You can add and remove users, and create subgroups for groups created manually in Authorization Manager.</p>
 
-
 <p><b>To edit a group:</b>
 <br class="atl-forced-newline" /></p>
 <ol>
@@ -282,10 +284,10 @@ This imports the user's first and last name, username, and email, but does not s
 
 <h2><a name="UserAdmin-ImportingGroupsfromanLDAPDirectory"></a>Importing Groups from an LDAP Directory</h2>
 
-<p>To add a group from an external LDAP directory:</p>
+<p><b>To add a group from an external LDAP directory:</b></p>
 
 <ol>
-	<li>From the <b>Groups</b> tab, Click <b>Add/sync LDAP user</b>.
+	<li>From the <b>Groups</b> tab, click <b>Add/sync LDAP group</b>.
 <br class="atl-forced-newline" />
 <br class="atl-forced-newline" /></li>
 	<li>In the <b>Add or Sync a LDAP group</b> dialog, type the group name in the <b>Name</b> field.
@@ -300,8 +302,6 @@ This imports the user's first and last name, username, and email, but does not s
 	</ul>
 	</li>
 </ol>
-
-
 
 
 <h1><a name="UserAdmin-ManagingApplicationPermissions"></a>Managing Application Permissions</h1>
@@ -327,10 +327,6 @@ This imports the user's first and last name, username, and email, but does not s
 	<li>Click <b>Save</b>.<br/>
 The new groups will appear in the Groups column in the <b>Hue Permissions</b> list.</li>
 </ol>
-
-
-
-
 
 
 				    					    <br/>
