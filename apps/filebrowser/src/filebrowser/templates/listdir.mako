@@ -47,10 +47,10 @@ ${ commonheader(_('File Browser'), 'filebrowser', user) | n,unicode }
             <button class="btn fileToolbarBtn" title="${_('Restore from trash')}" data-bind="visible: inRestorableTrash(), click: restoreTrashSelected, enable: selectedFiles().length > 0"><i class="icon-cloud-upload"></i> ${_('Restore')}</button>
 
             <div id="delete-dropdown" class="btn-group" style="display: inline">
-              <a href="#" class="btn delete-link dropdown-toggle" title="${_('Delete')}" data-toggle="dropdown" data-bind="visible: !inTrash()">
+              <button href="#" class="btn delete-link dropdown-toggle" title="${_('Delete')}" data-toggle="dropdown" data-bind="visible: !inTrash(), enable: selectedFiles().length > 0">
                 <i class="icon-remove"></i> ${_('Delete')}
                 <span class="caret"></span>
-              </a>
+              </button>
               <ul class="dropdown-menu" style="top: auto">
                 <li data-bind="visible: trashEnabled"><a href="#" class="delete-link" title="${_('Move to Trash')}" data-bind="enable: selectedFiles().length > 0, click: trashSelected"><i class="icon-trash"></i> ${_('Move to Trash')}</a></li>
                 <li><a href="#" class="delete-link" title="${_('Delete forever')}" data-bind="enable: selectedFiles().length > 0, click: deleteSelected"><i class="icon-bolt"></i> ${_('Delete forever')}</a></li>
