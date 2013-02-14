@@ -2,10 +2,9 @@
 
 <p>The Job Designer application enables you to create and submit Hadoop MapReduce jobs to the Hadoop cluster. You can include variables with your jobs to enable you and other users to enter values for the variables when they run your job. The Job Designer supports MapReduce, streaming, and Java jobs. For more information about Hadoop MapReduce, see the <a href="https://ccp.cloudera.com/display/SUPPORT/Hadoop+Tutorial">Hadoop Tutorial</a>.</p>
 
-<div class='panelMacro'><table class='noteMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="/static/art/help/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td><b>Note:</b>
-<ul>
-	<li>Job Designer uses Oozie to submit MapReduce jobs.  Therefore, Oozie must be installed and configured before you can use JobDesigner.</li>
-	<li>In order to run streaming jobs as part of a workflow, Oozie must be configured to use the Oozie ShareLib. See <a href="https://ccp.cloudera.com/display/CDH4DOC/Hue+Installation">Hue Installation</a> for more information.</li>
+<div class='panelMacro'><table class='noteMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="/static/art/help/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td><b>Note</b><br /><ul>
+	<li>Job Designer uses Oozie to submit MapReduce jobs.  Therefore, Oozie must be installed and configured before you can use JobDesigner. For information about installing Oozie, see <a href="https://ccp.cloudera.com/display/CDH4DOC/Oozie+Installation">Oozie Installation</a>.</li>
+	<li>In order to run Streaming jobs as part of a workflow, Oozie must be configured to use the Oozie ShareLib.</li>
 	<li>A job's input files must be uploaded to the cluster before you can submit the job.
 <br class="atl-forced-newline" /></li>
 </ul>
@@ -16,11 +15,11 @@
 <h2><a name="JobDesigner-Contents"></a>Contents</h2>
 
 <style type='text/css'>/*<![CDATA[*/
-div.rbtoc1348243396876 {margin-left: 1.5em;padding: 0px;}
-div.rbtoc1348243396876 ul {margin-left: 0px;padding-left: 20px;}
-div.rbtoc1348243396876 li {margin-left: 0px;padding-left: 0px;}
+div.rbtoc1359395639176 {margin-left: 1.5em;padding: 0px;}
+div.rbtoc1359395639176 ul {margin-left: 0px;padding-left: 20px;}
+div.rbtoc1359395639176 li {margin-left: 0px;padding-left: 0px;}
 
-/*]]>*/</style><div class='rbtoc1348243396876'>
+/*]]>*/</style><div class='rbtoc1359395639176'>
 <ul>
     <li><a href='#JobDesigner-IntroducingJobDesigner'>Introducing Job Designer</a></li>
     <li><a href='#JobDesigner-JobDesignerInstallationandConfiguration'>Job Designer Installation and Configuration</a></li>
@@ -47,7 +46,7 @@ div.rbtoc1348243396876 li {margin-left: 0px;padding-left: 0px;}
 
 <h1><a name="JobDesigner-JobDesignerInstallationandConfiguration"></a>Job Designer Installation and Configuration</h1>
 
-<p>Job Designer is one of the applications that is installed as part of Hue. For more information about installing Hue, see <a href="https://ccp.cloudera.com/display/CDH4DOC/Hue+Installation">Hue Installation</a>.  For information about installing Oozie, see <a href="https://ccp.cloudera.com/display/CDH4DOC/Oozie+Installation">Oozie Installation</a>.</p>
+<p>Job Designer is one of the applications that is installed as part of Hue. For information about installing and configuring Hue, see <a href="https://ccp.cloudera.com/display/CDH4DOC/Hue+Installation">Hue Installation</a>.</p>
 
 <p><a name="JobDesigner-StartingJobDesigner"></a></p>
 
@@ -254,7 +253,8 @@ vertical-align: center;
 <ol>
 	<li>In the <b>Job Designs</b> window, click <b>Designs</b> in the upper left corner.<br/>
 Your jobs and other users' jobs are displayed in the <b>Job Designs</b> window.</li>
-	<li>Click the <b>Submit</b> button to the right of the job you want to submit.
+	<li>Check the checkbox next to the job you want to submit.</li>
+	<li>Click the <b>Submit</b> button.
 	<ol>
 		<li>If the job contains variables, enter the information requested in the dialog box that appears.&nbsp;For example, the sample grep MapReduce design displays a dialog where you specify the output directory.</li>
 		<li>Click <b>Submit</b> to submit the job.</li>
@@ -275,7 +275,8 @@ Your jobs and other users' jobs are displayed in the <b>Job Designs</b> window.<
 
 <ol>
 	<li>In the <b>Job Designs</b> window, click <b>Designs</b>.&nbsp;The jobs are displayed in the <b>Job Designs</b> window.</li>
-	<li>Click the <b>Clone</b> button to the right of the job you want to copy.</li>
+	<li>Check the checkbox next to the job you want to clone.</li>
+	<li>Click the <b>Clone</b> button.</li>
 	<li>In the <b>Job Design Editor</b> window, change the settings and then click <b>Save</b> to save the job settings.</li>
 </ol>
 
@@ -284,7 +285,8 @@ Your jobs and other users' jobs are displayed in the <b>Job Designs</b> window.<
 
 <ol>
 	<li>In the <b>Job Designs</b> window, click <b>Designs</b>.&nbsp;The jobs are displayed in the <b>Job Designs</b> window.</li>
-	<li>Click the <b>Edit</b> button to the right of the job you want to copy.</li>
+	<li>Check the checkbox next to the job you want to edit.</li>
+	<li>Click the <b>Edit</b> button.</li>
 	<li>In the <b>Job Design</b> window, change the settings and then click <b>Save</b> to save the job settings.</li>
 </ol>
 
@@ -293,7 +295,8 @@ Your jobs and other users' jobs are displayed in the <b>Job Designs</b> window.<
 
 <ol>
 	<li>In the <b>Job Designs</b> window, click <b>Designs</b>.&nbsp;The jobs are displayed in the <b>Job Designs</b> window.</li>
-	<li>In the <b>Job Designs</b> window, select the job, right-click, and choose <b>Delete</b> from the context menu.</li>
+	<li>Check the checkbox next to the job you want to delete.</li>
+	<li>Click the <b>Delete</b> button.</li>
 	<li>Click <b>Ok</b> to confirm the deletion.</li>
 </ol>
 
@@ -308,23 +311,19 @@ Your jobs and other users' jobs are displayed in the <b>Job Designs</b> window.<
 
 <p><b>To display Job Details:</b></p>
 
-
-<p>In the <b>Job Submission History</b> window, double-click a Oozie Job ID. The results of the job display:</p>
+<p>In the <b>Job Submission History</b> window, click a Oozie Job ID. The results of the job display:</p>
 
 <ul>
 	<li>Actions - a list of actions in the job.
 	<ul>
 		<li>Click <span class="image-wrap" style=""><img src="/jobsub/static/help/cog.png" style="border: 0px solid black"/></span>&nbsp;to display the action configuration. In the action configuration for a MapReduce action, click the value of the mapred.output.dir property to display the job output.</li>
+		<li>In the root-node row, click the Id in the External Id column to view the job in the Job Browser.</li>
 	</ul>
 	</li>
 	<li>Details - the job details. Click <span class="image-wrap" style=""><img src="/jobsub/static/help/cog.png" style="border: 0px solid black"/></span> to display the Oozie application configuration.</li>
 	<li>Definition - the Oozie application definition.</li>
 	<li>Log - the output log.</li>
 </ul>
-
-
-
-
 
 
 				    					    <br/>
