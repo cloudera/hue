@@ -1,71 +1,97 @@
-<h1><a name="OozieEditorandDashboard-IntroducingOozie%26nbsp%3BEditor%2FDashboard"></a>Introducing Oozie&nbsp;Editor/Dashboard</h1>
+<h1><a name="OozieEditorandDashboard-IntroducingOozieEditor%2FDashboard"></a>Introducing Oozie Editor/Dashboard</h1>
 
-<p>The Oozie Editor/Dashboard application allows you to define Oozie workflow and coordinator applications, run workflow and coordinator jobs, and view the status of jobs.&nbsp;</p>
+<p>The Oozie Editor/Dashboard application allows you to define Oozie workflow and coordinator applications, run workflow and coordinator jobs, and view the status of jobs. For information about Oozie, see <a href="http://archive.cloudera.com/cdh4/cdh/4/oozie/">Oozie Documentation</a>.</p>
 
-<p>A&nbsp;workflow&nbsp;application is a collection of actions arranged in a directed acyclic graph (DAG). It includes control flow nodes (start, end, fork, join, and kill) and action nodes (MapReduce, streaming, Java, Pig, Hive, Sqoop, Shell, and ssh actions). The current release does not support the decision control flow node and the fs and Oozie sub-workflow action nodes.</p>
+<p>A workflow application is a collection of actions arranged in a directed acyclic graph (DAG). It includes control flow nodes (start, end, fork, join, decision, and kill) and action nodes (MapReduce, Streaming, Java, Pig, Hive, Sqoop, Shell, Ssh, DistCp, Fs, Email, Sub-workflow, and Generic).</p>
 
-<p>A&nbsp;coordinator&nbsp;application allows you to define and execute recurrent and interdependent workflow jobs. The coordinator application defines the conditions under which the execution of workflows can occur.</p>
+<p>A coordinator application allows you to define and execute recurrent and interdependent workflow jobs. The coordinator application defines the conditions under which the execution of workflows can occur.</p>
 
 
 
 <h2><a name="OozieEditorandDashboard-Contents"></a>Contents</h2>
 
 <style type='text/css'>/*<![CDATA[*/
-div.rbtoc1348526886180 {margin-left: 1.5em;padding: 0px;}
-div.rbtoc1348526886180 ul {margin-left: 0px;padding-left: 20px;}
-div.rbtoc1348526886180 li {margin-left: 0px;padding-left: 0px;}
+div.rbtoc1359479446372 {margin-left: 1.5em;padding: 0px;}
+div.rbtoc1359479446372 ul {margin-left: 0px;padding-left: 20px;}
+div.rbtoc1359479446372 li {margin-left: 0px;padding-left: 0px;}
 
-/*]]>*/</style><div class='rbtoc1348526886180'>
+/*]]>*/</style><div class='rbtoc1359479446372'>
 <ul>
-    <li><a href='#OozieEditorandDashboard-IntroducingOozie%26nbsp%3BEditor%2FDashboard'>Introducing Oozie&nbsp;Editor/Dashboard</a></li>
+    <li><a href='#OozieEditorandDashboard-IntroducingOozieEditor%2FDashboard'>Introducing Oozie Editor/Dashboard</a></li>
     <li><a href='#OozieEditorandDashboard-Oozie%26nbsp%3BEditor%2FDashboard%26nbsp%3BInstallationandConfiguration'>Oozie&nbsp;Editor/Dashboard&nbsp;Installation and Configuration</a></li>
     <li><a href='#OozieEditorandDashboard-StartingOozie%26nbsp%3BEditor%2FDashboard'>Starting Oozie&nbsp;Editor/Dashboard</a></li>
-    <li><a href='#OozieEditorandDashboard-FilteringListsin%26nbsp%3BOozie%26nbsp%3BEditor%2FDashboard'>Filtering Lists in&nbsp;Oozie&nbsp;Editor/Dashboard</a></li>
+    <li><a href='#OozieEditorandDashboard-InstallingOozieEditor%2FDashboardSamples'>Installing Oozie Editor/Dashboard Samples</a></li>
+    <li><a href='#OozieEditorandDashboard-FilteringListsinOozieEditor%2FDashboard'>Filtering Lists in Oozie Editor/Dashboard</a></li>
     <li><a href='#OozieEditorandDashboard-PermissionsinOozieEditor%2FDashboard'>Permissions in Oozie Editor/Dashboard</a></li>
     <li><a href='#OozieEditorandDashboard-OozieDashboard'>Oozie Dashboard</a></li>
 <ul>
     <li><a href='#OozieEditorandDashboard-Workflows'>Workflows</a></li>
     <li><a href='#OozieEditorandDashboard-Coordinators'>Coordinators</a></li>
 </ul>
-    <li><a href='#OozieEditorandDashboard-WorkflowEditor'>Workflow Editor</a></li>
+    <li><a href='#OozieEditorandDashboard-WorkflowManager'>Workflow Manager</a></li>
 <ul>
+    <li><a href='#OozieEditorandDashboard-InstallingtheSampleWorkflows'>Installing the Sample Workflows</a></li>
     <li><a href='#OozieEditorandDashboard-OpeningaWorkflow'>Opening a Workflow</a></li>
     <li><a href='#OozieEditorandDashboard-CreatingaWorkflow'>Creating a Workflow</a></li>
-    <li><a href='#OozieEditorandDashboard-EditingaWorkflow'>Editing a Workflow</a></li>
-    <li><a href='#OozieEditorandDashboard-EditingWorkflowProperties'>Editing Workflow Properties</a></li>
+    <li><a href='#OozieEditorandDashboard-ImportingaWorkflow'>Importing a Workflow</a></li>
     <li><a href='#OozieEditorandDashboard-SubmittingaWorkflow'>Submitting a Workflow</a></li>
-    <li><a href='#OozieEditorandDashboard-SchedulingaWorkflow'>Scheduling a Workflow</a></li>
-</ul>
-    <li><a href='#OozieEditorandDashboard-CoordinatorEditor'>Coordinator Editor</a></li>
 <ul>
-    <li><a href='#OozieEditorandDashboard-Openinga%26nbsp%3BCoordinator'>Opening a&nbsp;Coordinator</a></li>
-    <li><a href='#OozieEditorandDashboard-Creatinga%26nbsp%3BCoordinator'>Creating a&nbsp;Coordinator</a></li>
-    <li><a href='#OozieEditorandDashboard-Editinga%26nbsp%3BCoordinator'>Editing a&nbsp;Coordinator</a></li>
-    <li><a href='#OozieEditorandDashboard-CreatingaDataset'>Creating a Dataset</a></li>
-    <li><a href='#OozieEditorandDashboard-Submittinga%26nbsp%3BCoordinator'>Submitting a&nbsp;Coordinator</a></li>
+    <li><a href='#OozieEditorandDashboard-SuspendingaRunningJob'>Suspending a Running Job</a></li>
+    <li><a href='#OozieEditorandDashboard-ResumingaSuspendedJob'>Resuming a Suspended Job</a></li>
+    <li><a href='#OozieEditorandDashboard-RerunningaWorkflow'>Rerunning a Workflow</a></li>
 </ul>
-    <li><a href='#OozieEditorandDashboard-SubmissionsHistory'>Submissions History</a></li>
+    <li><a href='#OozieEditorandDashboard-SchedulingaWorkflow'>Scheduling a Workflow</a></li>
+    <li><a href='#OozieEditorandDashboard-EditingaWorkflow'>Editing a Workflow</a></li>
+<ul>
+    <li><a href='#OozieEditorandDashboard-ActionNodes'>Action Nodes</a></li>
+    <li><a href='#OozieEditorandDashboard-ControlNodes'>Control Nodes</a></li>
+</ul>
+    <li><a href='#OozieEditorandDashboard-UploadingWorkflowFiles'>Uploading Workflow Files</a></li>
+    <li><a href='#OozieEditorandDashboard-EditingWorkflowProperties'>Editing Workflow Properties</a></li>
+    <li><a href='#OozieEditorandDashboard-DisplayingtheHistoryofaWorkflow'>Displaying the History of a Workflow</a></li>
+</ul>
+    <li><a href='#OozieEditorandDashboard-CoordinatorManager'>Coordinator Manager</a></li>
+<ul>
+    <li><a href='#OozieEditorandDashboard-OpeningaCoordinator'>Opening a Coordinator</a></li>
+    <li><a href='#OozieEditorandDashboard-CreatingaCoordinator'>Creating a Coordinator</a></li>
+    <li><a href='#OozieEditorandDashboard-SubmittingaCoordinator'>Submitting a Coordinator</a></li>
+    <li><a href='#OozieEditorandDashboard-EditingaCoordinator'>Editing a Coordinator</a></li>
+    <li><a href='#OozieEditorandDashboard-CreatingaDataset'>Creating a Dataset</a></li>
+    <li><a href='#OozieEditorandDashboard-DisplayingDatasets'>Displaying Datasets</a></li>
+    <li><a href='#OozieEditorandDashboard-EditingaDataset'>Editing a Dataset</a></li>
+    <li><a href='#OozieEditorandDashboard-DisplayingtheHistoryofaCoordinator'>Displaying the History of a Coordinator</a></li>
+</ul>
 </ul></div>
 
 <h1><a name="OozieEditorandDashboard-Oozie%26nbsp%3BEditor%2FDashboard%26nbsp%3BInstallationandConfiguration"></a>Oozie&nbsp;Editor/Dashboard&nbsp;Installation and Configuration</h1>
 
-<p>Oozie&nbsp;Editor/Dashboard&nbsp;is one of the applications that is installed as part of Hue. For more information about installing Hue, see&nbsp;<a href="https://ccp.cloudera.com/display/CDH4DOC/Hue+Installation">Hue Installation</a>. For information about Oozie, see&nbsp;<a href="http://archive.cloudera.com/cdh4/cdh/4/oozie/">Oozie Documentation</a>.</p>
+<p>Oozie&nbsp;Editor/Dashboard is one of the applications that is installed as part of Hue. For information about installing and configuring Hue, see <a href="https://ccp.cloudera.com/display/CDH4DOC/Hue+Installation">Hue Installation</a>.</p>
 
-<div class='panelMacro'><table class='noteMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="/static/art/help/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td><b>Note:</b> In order to run streaming or Pig jobs as part of a workflow, Oozie must be configured to use the Oozie ShareLib.  If this is not the case, Pig and streaming actions will not run.  See <a href="https://ccp.cloudera.com/display/CDH4DOC/Hue+Installation">Hue Installation</a> for more information.</td></tr></table></div>
+<div class='panelMacro'><table class='noteMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="/static/art/help/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td><b>Note</b><br />In order to run DistCp, Streaming, Pig, Sqoop, and Hive jobs as part of a workflow, Oozie must be configured to use the Oozie ShareLib. See <a href="https://ccp.cloudera.com/display/CDH4DOC/Oozie+Installation">Oozie Installation</a>.</td></tr></table></div>
 
 <h1><a name="OozieEditorandDashboard-StartingOozie%26nbsp%3BEditor%2FDashboard"></a>Starting Oozie&nbsp;Editor/Dashboard</h1>
 
-<p>To start Oozie Editor/Dashboard, click the <b>Oozie Editor/Dashboard</b> icon ( <span class="image-wrap" style=""><img src="/oozie/static/art/icon.png" width="24" style="border: 0px solid black"/></span>) in the navigation bar at the top of the Hue browser page. <b>Oozie Editor/Dashboard</b> opens with the following screens:</p>
+<p>To start Oozie Editor/Dashboard, click the <b>Oozie Editor/Dashboard</b> icon (<span class="image-wrap" style=""><img src="/jobsub/static/help/images/23888164.png" width="24" style="border: 0px solid black"/></span>) in the navigation bar at the top of the Hue browser page. <b>Oozie Editor/Dashboard</b> opens with the following screens:</p>
 
 <ul>
-  <li>Dashboad &#45;&nbsp;shows the running and completed workflow and coordinator jobs. The screen is selected and opened to the Workflows page.</li>
-  <li>Workflows - shows available workflows.</li>
-  <li>Coordinators &#45;&nbsp;shows available coordinators.</li>
-  <li>History - shows a list of submitted jobs.</li>
+	<li>Dashboard - shows the running and completed workflow and coordinator jobs. The screen is selected and opened to the Workflows page.</li>
+	<li>Workflows - shows available workflows.</li>
+	<li>Coordinators - shows available coordinators.</li>
+	<li>History - shows a list of submitted jobs.</li>
 </ul>
 
 
-<h1><a name="OozieEditorandDashboard-FilteringListsin%26nbsp%3BOozie%26nbsp%3BEditor%2FDashboard"></a>Filtering Lists in&nbsp;Oozie&nbsp;Editor/Dashboard</h1>
+<h1><a name="OozieEditorandDashboard-InstallingOozieEditor%2FDashboardSamples"></a>Installing Oozie Editor/Dashboard Samples</h1>
+
+<p>The Oozie Editor/Dashboard&nbsp;sample workflows and coordinators can help you learn how to use Oozie Editor/Dashboard. To install the samples:</p>
+
+<ol>
+	<li>Click the <b>Workflows</b>&nbsp;tab.</li>
+	<li>Click the&nbsp;<b>Setup App</b>&nbsp;button. This action adds samples demonstrating all the types of actions to the Workflows Editor and one sample to the Coordinator Editor. It also creates workspaces and deployment directories required by the samples in /user/hue/oozie.</li>
+</ol>
+
+
+<h1><a name="OozieEditorandDashboard-FilteringListsinOozieEditor%2FDashboard"></a>Filtering Lists in Oozie Editor/Dashboard</h1>
 
 <p>The Dashboard, Workflows, Coordinators, and History screens contain lists of workflows, coordinators, and jobs. When you type in the Filter field on these screens, the lists are dynamically filtered to display only those rows containing text that matches the specified substring.</p>
 
@@ -126,24 +152,24 @@ vertical-align: center;
 
 <h2><a name="OozieEditorandDashboard-Workflows"></a>Workflows</h2>
 
-<p>Click the <b>Workflows</b> tab to view the running and completed workflows for the filters you have specified.</p>
+<p>Click the <b>Workflows</b> tab to view the running and completed workflow jobs for the filters you have specified.</p>
 
-<p>Click a workflow row in the Running or Completed table to view detailed information about that workflow.</p>
+<p>Click a workflow row in the Running or Completed table to view detailed information about that workflow job.</p>
 
-<p>For the selected workflow, the following tabs and information is available.</p>
+<p>For the selected job, the following information is available.</p>
 
 <ul>
-  <li>The <b>Graph</b>&nbsp;tab shows the workflow DAG.</li>
-  <li>The <b>Actions</b> tab shows you details about the actions that make up this workflow.
-  <ul>
-    <li>Click the <b>Id</b>&nbsp;link to see additional details about this action.</li>
-    <li>Click the <b>External Id</b>&nbsp;link to view this action in the Hue Job Browser.</li>
-  </ul>
-  </li>
-  <li>The <b>Details</b> tab shows job statistics including start and end times, and provides a link to the actual workflow definition in the File Browser.</li>
-  <li>The <b>Configuration</b> tab shows selected job configuration settings.</li>
-  <li>The <b>Logs</b> tab shows log output generated by the workflow.</li>
-  <li>The <b>Definition</b> tab shows the Oozie workflow definition, as it appears in the <tt>workflow.xml</tt> file (also linked under the application path properties in the <b>Details</b> tab and the <b>Configuration</b> tab).</li>
+	<li>The <b>Graph</b>&nbsp;tab shows the workflow DAG.</li>
+	<li>The <b>Actions</b> tab shows you details about the actions that make up the workflow.
+	<ul>
+		<li>Click the <b>Id</b>&nbsp;link to see additional details about the action.</li>
+		<li>Click the&nbsp;<b>External Id</b>&nbsp;link to view the job in the Job Browser.</li>
+	</ul>
+	</li>
+	<li>The <b>Details</b> tab shows job statistics including start and end times, and provides a link to the workflow definition in the File Browser.</li>
+	<li>The <b>Configuration</b> tab shows selected job configuration settings.</li>
+	<li>The <b>Logs</b> tab shows log output generated by the workflow job.</li>
+	<li>The <b>Definition</b> tab shows the Oozie workflow definition, as it appears in the <tt>workflow.xml</tt> file (also linked under the application path properties in the <b>Details</b> tab and the <b>Configuration</b> tab).</li>
 </ul>
 
 
@@ -152,148 +178,251 @@ vertical-align: center;
 
 <p>Click the <b>Coordinators</b> tab to view the running and completed coordinator jobs&nbsp;for the filters you have specified.</p>
 
-<p>For the selected coordinator, the following tabs and information is available.</p>
+<p>For the selected job, the following information is available.</p>
 <ul>
-  <li>The <b>Calendar</b> tab shows the timestamp of the job. Click the timestamp to open the workflow DAG.&nbsp;</li>
-  <li>The&nbsp;<b>Actions</b>&nbsp;tab shows you details about the actions that make up this coordinator.
-  <ul>
-    <li>Click the&nbsp;<b>Id</b>&nbsp;link to see additional details about this action.</li>
-    <li>Click the&nbsp;<b>External Id</b>&nbsp;link to view this action in the Hue Job Browser.</li>
-  </ul>
-  </li>
-  <li>The&nbsp;<b>Configuration</b>&nbsp;tab shows selected job configuration settings.</li>
-  <li>The&nbsp;<b>Logs</b>&nbsp;tab shows log output generated by the coordinator.</li>
-  <li>The&nbsp;<b>Definition</b>&nbsp;tab shows the Oozie coordinator&nbsp;definition, as it appears in the&nbsp;<tt>coordinator.xml</tt>&nbsp;file (also linked under&nbsp;the oozie.coord.application.path property in the &nbsp;<b>Configuration</b>&nbsp;tab).</li>
+	<li>The <b>Calendar</b> tab shows the timestamp of the job. Click the timestamp to open the workflow DAG.&nbsp;</li>
+	<li>The&nbsp;<b>Actions</b>&nbsp;tab shows you details about the actions that make up the coordinator.
+	<ul>
+		<li>Click the&nbsp;<b>Id</b>&nbsp;link to see additional details about the action.</li>
+		<li>Click the&nbsp;<b>External Id</b>&nbsp;link to view the job in the Job Browser.</li>
+	</ul>
+	</li>
+	<li>The&nbsp;<b>Configuration</b>&nbsp;tab shows selected job configuration settings.</li>
+	<li>The&nbsp;<b>Logs</b>&nbsp;tab shows log output generated by the coordinator.</li>
+	<li>The&nbsp;<b>Definition</b>&nbsp;tab shows the Oozie coordinator&nbsp;definition, as it appears in the&nbsp;<tt>coordinator.xml</tt>&nbsp;file (also linked under&nbsp;the oozie.coord.application.path property in the &nbsp;<b>Configuration</b>&nbsp;tab).</li>
 </ul>
 
 
+<h1><a name="OozieEditorandDashboard-WorkflowManager"></a>Workflow Manager</h1>
 
-<h1><a name="OozieEditorandDashboard-WorkflowEditor"></a>Workflow Editor</h1>
+<p>In Workflow Manager you create Oozie workflows and submit them for execution.</p>
 
-<p>The Workflow Editor is where you create or edit Oozie workflows and submit them for execution.&nbsp;The&nbsp;Workflow Editor&nbsp;comes with several preinstalled sample workflows.</p>
+<p>Click the <b>Workflows</b> tab to open the Workflow Manager.</p>
 
-<p>In Workflow Editor, you can create workflows that include MapReduce, streaming, Java, Pig, Hive, Sqoop, Shell, and ssh&nbsp;actions. You can create these actions in the Workflow Editor, or you can import job designs from Job Designer to be used as actions in your workflow.</p>
-
-<p>Click the <b>Workflows</b> tab to open the Workflow editor.</p>
-
-<p>The main page of the workflow editor shows the current set of workflow designs.</p>
-
-<p>Each row shows a workflow design: its name, description, timestamp of its last modification. It also shows:</p>
+<p>Each row shows a workflow: its name, description, timestamp of its last modification. It also shows:</p>
 <ul>
-  <li><b>Steps</b>: the number of steps in the workflow execution path. This is the number of execution steps between the start and end of the workflow. This will not necessarily be the same as the number of actions in the workflow, if there are control flow nodes in the control path.</li>
-  <li><b>Status</b>: who can run the workflow.&nbsp;<b>shared</b>&nbsp;means users other than the owner can access the workflow.&nbsp;<b>personal</b>&nbsp;means only the owner can modify or submit the workflow. The default is personal.</li>
-  <li><b>Owner</b>: the user that created the workflow.</li>
+	<li><b>Steps</b>: the number of steps in the workflow execution path. This is the number of execution steps between the start and end of the workflow. This will not necessarily be the same as the number of actions in the workflow, if there are control flow nodes in the control path.</li>
+	<li><b>Status</b>: who can run the workflow.&nbsp;<b>shared</b>&nbsp;means users other than the owner can access the workflow.&nbsp;<b>personal</b>&nbsp;means only the owner can modify or submit the workflow. The default is personal.</li>
+	<li><b>Owner</b>: the user that created the workflow.</li>
 </ul>
+
+
+<p>In Workflow Editor you edit workflows that include MapReduce, Streaming, Java, Pig, Hive, Sqoop, Shell, Ssh, DistCp, Fs, Email, Sub-workflow, and Generic actions. You can configure these actions in the Workflow Editor, or you can import job designs from Job Designer to be used as actions in your workflow. For information about defining workflows, see the <a href="http://archive.cloudera.com/cdh4/cdh/4/oozie/WorkflowFunctionalSpec.html">Workflow Specification</a>.</p>
+
+<h2><a name="OozieEditorandDashboard-InstallingtheSampleWorkflows"></a>Installing the Sample Workflows</h2>
+
+<ol>
+	<li>Click the <b>Setup Examples</b> button at the top right.</li>
+</ol>
 
 
 <h2><a name="OozieEditorandDashboard-OpeningaWorkflow"></a>Opening a Workflow</h2>
 
-<p>To open a workflow, click the workflow. Proceed with&nbsp;<a href="#OozieEditorandDashboard-EditingaWorkflow">Editing a Workflow</a>.</p>
+<p>To open a workflow, in Workflow Manager, click the workflow. Proceed with&nbsp;<a href="#OozieEditorandDashboard-EditingaWorkflow">Editing a Workflow</a>.</p>
 
 <h2><a name="OozieEditorandDashboard-CreatingaWorkflow"></a>Creating a Workflow</h2>
 
-<p>To create a workflow:</p>
 <ol>
-  <li>Click the <b>Create</b>&nbsp;button at the top right of the Action Chooser.&nbsp;</li>
-  <li>In the Name field, type a name.</li>
-  <li>To specify the HDFS deployment directory and Oozie schema version click <b>advanced</b>.</li>
-  <li>Click <b>Save</b>. The workflow editor opens. Proceed with&nbsp;<a href="#OozieEditorandDashboard-EditingaWorkflow">Editing a Workflow</a>.</li>
+	<li>Click the <b>Create</b>&nbsp;button at the top right.</li>
+	<li>In the Name field, type a name.</li>
+	<li>Click <b>advanced</b> to specify whether the workflow is shared, the deployment directory, or a job.xml file.</li>
+	<li>Click <b>Save</b>. The Workflow Editor opens. Proceed with&nbsp;<a href="#OozieEditorandDashboard-EditingaWorkflow">Editing a Workflow</a>.</li>
 </ol>
 
 
-<p><a name="OozieEditorandDashboard-EditingaWorkflow"></a></p>
-
-<h2><a name="OozieEditorandDashboard-EditingaWorkflow"></a>Editing a Workflow</h2>
-
-<p>In the workflow editor you can add and delete actions, clone actions, create and remove fork and join control nodes, and move actions as follows:</p>
-
-<ul>
-  <li>Add actions to the workflow by doing one of the following:
-  <ul>
-    <li>Click the <b>Add</b> tab.&nbsp;
-    <ol>
-      <li>Click a&nbsp;<b>&#43;&nbsp;</b><b><em>action</em></b> button,<b><em>&nbsp;</em></b>where <em>action</em> is MapReduce, Streaming, Java, Pig, Hive, Sqoop, Shell, or Ssh.</li>
-      <li>Set the action properties and click <b>Save</b>.</li>
-    </ol>
-    </li>
-    <li>Click the <b>Import</b> tab.
-    <ol>
-      <li>Click the <b>+ Job Design</b> button.</li>
-      <li>Click a radio button next to a job design and click&nbsp;<b>Import</b>.</li>
-    </ol>
-    </li>
-  </ul>
-  </li>
-  <li>Clone actions by clicking the&nbsp; <span class="image-wrap" style=""><img src="/oozie/static/help/retweet.png" style="border: 0px solid black"/></span>&nbsp;button.</li>
-  <li>Create or remove a fork and join by moving an action up or down with the&nbsp; <span class="image-wrap" style=""><img src="/oozie/static/help/updown.png" style="border: 0px solid black"/></span>&nbsp;buttons.</li>
-  <li>Change the position of an action by clicking the&nbsp; <span class="image-wrap" style=""><img src="/oozie/static/help/updown.png" style="border: 0px solid black"/></span>&nbsp;buttons in the same direction twice.</li>
-  <li><font color="#222222">To upload a file (for example,</font>&nbsp;<font color="#222222">a Pig script)&nbsp;</font><font color="#222222">to the folder containing the files referenced by the workflow, click the</font>&nbsp;<font color="#222222"><b>Upload</b></font><font color="#222222">&nbsp;button.</font></li>
-</ul>
-
-
-
-<div class='panelMacro'><table class='noteMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="/static/art/help/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td><font color="#222222">Each action must have a unique name.</font></td></tr></table></div>
-
-
-
-<h2><a name="OozieEditorandDashboard-EditingWorkflowProperties"></a>Editing Workflow Properties</h2>
+<h2><a name="OozieEditorandDashboard-ImportingaWorkflow"></a>Importing a Workflow</h2>
 
 <ol>
-  <li>In the workflow editor, click the <b>Properties</b>&nbsp;tab.</li>
-  <li>To share the workflow with all users, check the <b>Is shared</b> checkbox.</li>
-  <li>To set advanced execution options, click <b>advanced</b> and edit the deployment directory, add parameters and job properties, or Oozie schema version, .</li>
-  <li>Click <b>Save</b>.</li>
+	<li>Click the <b>Import</b>&nbsp;button at the top right.</li>
+	<li>In the Name field, type a name.</li>
+	<li>In the <b>Local workflow.xml file</b> field, click <b>Choose File</b> and select a workflow file.</li>
+	<li>Click <b>advanced</b> to specify whether the workflow is shared, the deployment directory, or a job.xml file.</li>
+	<li>Click <b>Save</b>. The Workflow Editor opens. Proceed with&nbsp;<a href="#OozieEditorandDashboard-EditingaWorkflow">Editing a Workflow</a>.</li>
 </ol>
 
 
 <h2><a name="OozieEditorandDashboard-SubmittingaWorkflow"></a>Submitting a Workflow</h2>
 
-<p>To submit a workflow for execution, click the radio button next to the workflow and click the&nbsp;<b>Submit</b>&nbsp;button.</p>
+<p>To submit a workflow for execution, do one of the following:</p>
+
+<ul>
+	<li>In the Workflow Manager, click the radio button next to the workflow, and click the <b>Submit</b> button.</li>
+	<li>In the Workflow Editor, click the <b>Submit</b> button.</li>
+</ul>
+
+
+<p>The workflow job is submitted and the Dashboard displays the workflow job.</p>
+
+<p>To view the output of the job, click <span class="image-wrap" style=""><img src="/jobsub/static/help/images/23888324.png" style="border: 0px solid black"/></span> <b>View the logs</b>.</p>
+
+<h3><a name="OozieEditorandDashboard-SuspendingaRunningJob"></a>Suspending a Running Job</h3>
+
+<p>In the pane on the left, click the <b>Suspend</b> button.</p>
+<ol>
+	<li>Verify that you want to suspend the job.</li>
+</ol>
+
+
+<h3><a name="OozieEditorandDashboard-ResumingaSuspendedJob"></a>Resuming a Suspended Job</h3>
+
+<p>In the pane on the left, click the <b>Resume</b> button.</p>
+<ol>
+	<li>Verify that you want to resume the job.</li>
+</ol>
+
+
+<h3><a name="OozieEditorandDashboard-RerunningaWorkflow"></a>Rerunning a Workflow</h3>
+
+<p>In the pane on the left, click the <b>Rerun</b> button.</p>
+<ol>
+	<li>Check the checkboxes next to the actions to rerun.</li>
+	<li>Specify required variables.</li>
+	<li>Click <b>Submit</b>.</li>
+</ol>
 
 
 <h2><a name="OozieEditorandDashboard-SchedulingaWorkflow"></a>Scheduling a Workflow</h2>
 
-<p>To schedule a workflow for recurring execution, click the radio button next to the workflow and click the&nbsp;<b>Schedule</b>&nbsp;button. A coordinator is created and opened in the coordinator editor.</p>
+<p>To schedule a workflow for recurring execution, do one of the following:</p>
+
+<ul>
+	<li>In the Workflow Manager, click the radio button next to the workflow and click the <b>Schedule</b> button.</li>
+	<li>In the Workflow Editor, click the <b>Schedule</b> button.</li>
+</ul>
 
 
-<h1><a name="OozieEditorandDashboard-CoordinatorEditor"></a>Coordinator Editor</h1>
+<p>A coordinator is created and opened in the Coordinator Editor. Proceed with&nbsp;<a href="#OozieEditorandDashboard-EditingaCoordinator">Editing a Coordinator</a>.</p>
 
-<p>The Coordinator Editor is where you create or edit Oozie coordinator applications and submit them for execution.&nbsp;The&nbsp;Workflow Editor&nbsp;contains one pre-installed sample coordinator.</p>
+<p><a name="OozieEditorandDashboard-EditingaWorkflow"></a></p>
 
-<h2><a name="OozieEditorandDashboard-Openinga%26nbsp%3BCoordinator"></a>Opening a&nbsp;Coordinator</h2>
+<h2><a name="OozieEditorandDashboard-EditingaWorkflow"></a>Editing a Workflow</h2>
 
-<p>To open a coordinator, click the coordinator. Proceed with&nbsp;<a href="#OozieEditorandDashboard-EditingaCoordinator">Editing a Coordinator</a>.</p>
+<p>In the Workflow Editor you can easily perform operations on Oozie action and control nodes.</p>
+
+<h3><a name="OozieEditorandDashboard-ActionNodes"></a>Action Nodes</h3>
+
+<p>The Workflow Editor supports dragging and dropping action nodes. As you move the action over other actions and forks, highlights indicate active areas.  If there are actions in the workflow, the active areas are the actions themselves and the areas above and below the actions. If you drop an action on an existing action, a fork and join is added to the workflow.</p>
+
+<ul>
+	<li>Add actions to the workflow by doing one of the following:
+	<ul>
+		<li>Click an action (<span class="image-wrap" style=""><img src="/jobsub/static/help/images/23888498.png" style="border: 0px solid black"/></span>) button and drop the action on the workflow. The Edit Node screen displays.
+		<ol>
+			<li>Set the action properties and click <b>Done</b>. Each action in a workflow must have a unique name.</li>
+		</ol>
+		</li>
+		<li>Click the <b>Import action</b> link to import an existing job design. The Import Action screen displays.
+		<ol>
+			<li>Click a radio button next to a job design and click <b>Import</b>. The action is added to the end of the workflow.</li>
+		</ol>
+		</li>
+	</ul>
+	</li>
+	<li>Clone an action by clicking the <span class="image-wrap" style=""><img src="/jobsub/static/help/images/23888163.png" style="border: 0px solid black"/></span> button.
+	<ol>
+		<li>The action is opened in the Edit Node screen.</li>
+		<li>Edit the action properties and click <b>Done</b>. The action is added to the end of the workflow.</li>
+	</ol>
+	</li>
+	<li>Delete an action by clicking the <span class="image-wrap" style=""><img src="/jobsub/static/help/images/23888458.png" style="border: 0px solid black"/></span> button.</li>
+	<li>Edit an action by clicking the <span class="image-wrap" style=""><img src="/jobsub/static/help/images/23888457.png" style="border: 0px solid black"/></span> button.</li>
+	<li>Change the position of an action by left-clicking and dragging an action to a new location.</li>
+</ul>
 
 
-<h2><a name="OozieEditorandDashboard-Creatinga%26nbsp%3BCoordinator"></a>Creating a&nbsp;Coordinator</h2>
+<h3><a name="OozieEditorandDashboard-ControlNodes"></a>Control Nodes</h3>
 
-<p>To create a coordinator:</p>
+<ul>
+	<li>Create a fork and join by dropping an action on top of another action.</li>
+	<li>Remove a fork and join by dragging a forked action and dropping it above the fork.</li>
+	<li>Convert a fork to a decision by clicking the <span class="image-wrap" style=""><img src="/jobsub/static/help/images/23888456.png" style="border: 0px solid black"/></span> button.</li>
+	<li>To edit a decision:
+	<ol>
+		<li>Click the <span class="image-wrap" style=""><img src="/jobsub/static/help/images/23888457.png" style="border: 0px solid black"/></span> button.</li>
+		<li>Fill in the predicates that determines which action to perform and select the default action from the drop-down list.</li>
+		<li>Click <b>Done</b>.</li>
+	</ol>
+	</li>
+</ul>
+
+
+
+<h2><a name="OozieEditorandDashboard-UploadingWorkflowFiles"></a>Uploading Workflow Files</h2>
+
+<p>In the Workflow Editor, click the <b>Upload</b> button.</p>
+
+<h2><a name="OozieEditorandDashboard-EditingWorkflowProperties"></a>Editing Workflow Properties</h2>
+
 <ol>
-  <li>Click the&nbsp;<b>Create</b>&nbsp;button at the top right of the Action Chooser.&nbsp;</li>
-  <li>In the Name field, type a name.</li>
-  <li>In the Workflow drop-down list, choose a workflow that the coordinator will schedule.</li>
-  <li>In the Frequency area, specify how often the workflow will be scheduled and how many times it will run.</li>
-  <li>Click&nbsp;<b>Save</b>. The coordinator&nbsp;editor opens. Proceed with&nbsp;<a href="#OozieEditorandDashboard-EditingaCoordinator">Editing a Coordinator</a>.</li>
+	<li>In the Workflow Editor, click the link under the Name or Description fields in the left pane.</li>
+	<li>To share the workflow with all users, check the <b>Is shared</b> checkbox.</li>
+	<li>To set advanced execution options, click <b>advanced</b> and edit the deployment directory, add parameters and job properties, or specify a job.xml file.</li>
+	<li>Click <b>Save</b>.</li>
 </ol>
 
+
+<h2><a name="OozieEditorandDashboard-DisplayingtheHistoryofaWorkflow"></a>Displaying the History of a Workflow</h2>
+
+<ol>
+	<li>Do one of the following:
+	<ul>
+		<li>In the Workflow Editor, click <b>Show history</b> in the pane at the left. Click a job.</li>
+		<li>In the Oozie Dashboard/Editor, click the <b>History</b> tab. Click a submission Id.</li>
+	</ul>
+	</li>
+</ol>
+
+
+<h1><a name="OozieEditorandDashboard-CoordinatorManager"></a>Coordinator Manager</h1>
+
+<p>In Coordinator Manager you create Oozie coordinator applications and submit them for execution. </p>
+
+<p>Click the <b>Coordinators</b> tab to open the Coordinator Manager.</p>
+
+<p>Each row shows a coordinator: its name, description, timestamp of its last modification. It also shows:</p>
+<ul>
+	<li><b>Workflow</b>: the workflow that will be run by the coordinator.</li>
+	<li><b>Frequency</b>: how often the workflow referenced by the coordinator will be run.</li>
+	<li><b>Status</b>: who can run the coordinator. <b>shared</b> means users other than the owner can access the workflow. <b>personal</b> means only the owner can modify or submit the workflow. The default is personal.</li>
+	<li><b>Owner</b>: the user that created the workflow.</li>
+</ul>
+
+
+<p>In Coordinator Editor, you edit coordinators and the datasets required by the coordinators. For information about defining coordinators and datasets, see the <a href="http://archive.cloudera.com/cdh4/cdh/4/oozie/CoordinatorFunctionalSpec.html">Coordinator Specification</a>.</p>
+
+<h2><a name="OozieEditorandDashboard-OpeningaCoordinator"></a>Opening a Coordinator</h2>
+
+<p>To open a coordinator, in Coordinator Manager, click the coordinator. Proceed with <a href="#OozieEditorandDashboard-EditingaCoordinator">Editing a Coordinator</a>.</p>
+
+<h2><a name="OozieEditorandDashboard-CreatingaCoordinator"></a>Creating a Coordinator</h2>
+
+<p>To create a coordinator, in Coordinator Manager:</p>
+<ol>
+	<li>Click the *Create button at the top right. The Coordinator wizard opens. Proceed with <a href="#OozieEditorandDashboard-EditingaCoordinator">Editing a Coordinator</a>.</li>
+</ol>
+
+
+<h2><a name="OozieEditorandDashboard-SubmittingaCoordinator"></a>Submitting a Coordinator</h2>
+
+<p>To submit a coordinator for execution, click the radio button next to the coordinator and click the <b>Submit</b> button.</p>
 
 <p><a name="OozieEditorandDashboard-EditingaCoordinator"></a></p>
 
 
-<h2><a name="OozieEditorandDashboard-Editinga%26nbsp%3BCoordinator"></a>Editing a&nbsp;Coordinator</h2>
-<div class='panelMacro'><table class='noteMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="/static/art/help/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td><b>Note:</b> Most workflows require either an input dataset, an output dataset, or both.</td></tr></table></div>
+<h2><a name="OozieEditorandDashboard-EditingaCoordinator"></a>Editing a Coordinator</h2>
 
-<p>In the coordinator&nbsp;editor you specify coordinator properties and the datasets on which the workflow scheduled by the coordinator will operate as follows:</p>
+<p>In the Coordinator Editor you specify coordinator properties and the datasets on which the workflow scheduled by the coordinator will operate by stepping through screens in a wizard. You can also advance to particular steps and revisit steps by clicking the Step "tabs" above the screens. The following instructions walk you through the coordinator wizard. </p>
 
 <ol>
-  <li>To share the coordinator&nbsp;with all users, check the&nbsp;<b>Is shared</b>&nbsp;checkbox.</li>
-  <li>To set advanced execution options, click <b>advanced</b>&nbsp;and fill in properties that determine how long a coordinator will wait before timing out, how many coordinators can wait and run concurrently, the coordinator scheduling policy, and the coordinator schema version.</li>
-  <li>In the Frequency area, set how many time thes communicator will run for each specified unit, the start and end time of the coordinator, and the timezone of the start and end times.</li>
-  <li><font color="#222222">The inputs and outputs of the workflow must be mapped to some data. Click</font> <font color="#222222"><b>Add</b></font> <font color="#222222">and select a dataset from the Dataset drop-down menu and map it to one variable of your workflow.</font><br/>
-<font color="#222222">If no datasets exist, follow the procedure in</font>&nbsp;<a href="#OozieEditorandDashboard-CreatingaDataset">Creating a Dataset</a>.</li>
-  <li>Select a dataset from the <b>Dataset</b> drop-down menu.</li>
-  <li>Click <b>Save</b>.</li>
+	<li>Type a name, select the workflow, check the Is shared checkbox to share the job, and click <b>Next</b>. If the Coordinator Editor was opened after scheduling a workflow, the workflow will be set.</li>
+	<li>Select how many times the communicator will run for each specified unit, the start and end times of the coordinator, and the timezone of the start and end times, and click <b>Next</b>.</li>
+	<li>Click <b>Add</b> to select an input dataset and click <b>Next</b>. If no datasets exist, follow the procedure in <a href="#OozieEditorandDashboard-CreatingaDataset">Creating a Dataset</a>.</li>
+	<li>Click <b>Add</b> to select an output dataset.  Click <b>Save coordinator</b> or click <b>Next</b> to specify advanced settings.</li>
+	<li>To share the coordinator with all users, check the&nbsp;<b>Is shared</b>&nbsp;checkbox.</li>
+	<li>Fill in parameters to pass to Oozie, properties that determine how long a coordinator will wait before timing out, how many coordinators can run and wait concurrently, and the coordinator execution policy.</li>
+	<li>Click <b>Save coordinator</b>.</li>
 </ol>
+
 
 
 <p><a name="OozieEditorandDashboard-CreatingaDataset"></a></p>
@@ -301,40 +430,52 @@ vertical-align: center;
 <h2><a name="OozieEditorandDashboard-CreatingaDataset"></a>Creating a Dataset</h2>
 
 <ol>
-  <li>In the coordinator&nbsp;editor, do one of the following:
-  <ul>
-    <li>Click the&nbsp;<b>Datasets</b>&nbsp;tab at the top of the editor.</li>
-    <li>In the Data area, click the&nbsp;<b>Datasets</b>&nbsp;button.</li>
-  </ul>
-  </li>
-  <li>Click <b>Create</b>.</li>
-  <li>In the Start and Frequency fields, specify when and how often input datasets will be available.</li>
-  <li>In the Uri field, specify a URI template for the location of input and output datasets. You can specify the variables&nbsp;
-<div class="preformatted panel" style="border-width: 1px;"><div class="preformattedContent panelContent">
-<pre>${YEAR},${MONTH},${DAY},${HOUR},${MINUTE}</pre>
-</div></div>
-<p> to construct URIs and URI paths containing dates and timestamps. For example: </p>
-<div class="preformatted panel" style="border-width: 1px;"><div class="preformattedContent panelContent">
-<pre>hdfs://foo:9000/usr/app/stats/${YEAR}/${MONTH}/data</pre>
-</div></div></li>
-  <li>Specify the timezone of the start date.</li>
-  <li>In the Done flag field, specify the flag that identifies when input datasets are no longer ready.</li>
+	<li>In the Coordinator Editor, do one of the following:
+	<ul>
+		<li>Click <b>here</b> in the Inputs or Outputs pane at the top of the editor.</li>
+		<li>In the pane at the left, click the <b>Create new</b> link. Proceed with <a href="#OozieEditorandDashboard-EditingaDataset">Editing a Dataset</a>.</li>
+	</ul>
+	</li>
 </ol>
 
 
-<h2><a name="OozieEditorandDashboard-Submittinga%26nbsp%3BCoordinator"></a>Submitting a&nbsp;Coordinator</h2>
+<h2><a name="OozieEditorandDashboard-DisplayingDatasets"></a>Displaying Datasets</h2>
 
-<p>To submit a coordinator&nbsp;for execution, click the radio button next to the coordinator&nbsp;and click the&nbsp;<b>Submit</b>&nbsp;button.</p>
+<ol>
+	<li>In the Coordinator Editor, click <b>Show existing</b> in pane at the left.</li>
+	<li>To edit a dataset, click the dataset name in the Existing datasets table. Proceed with <a href="#OozieEditorandDashboard-EditingaDataset">Editing a Dataset</a>.</li>
+</ol>
 
 
-<h1><a name="OozieEditorandDashboard-SubmissionsHistory"></a>Submissions History</h1>
+<p><a name="OozieEditorandDashboard-EditingaDataset"></a></p>
+<h2><a name="OozieEditorandDashboard-EditingaDataset"></a>Editing a Dataset</h2>
 
-<p>The Submissions History is where you view the history of workflow and coordinator jobs. Clicking a link in the Name column opens the workflow or coordinator in an editor. Clicking a link in the Submission Id column opens the job in the Dashboard.</p>
+<ol>
+	<li>Type a name for the dataset.</li>
+	<li>In the Start and Frequency fields, specify when and how often the dataset will be available.</li>
+	<li>In the URI field, specify a URI template for the location of the dataset. To construct URIs and URI paths containing dates and timestamps, you can specify the variables <tt>${YEAR},${MONTH},${DAY},${HOUR},${MINUTE</tt><tt>}</tt>. For example: <tt>hdfs://foo:9000/usr/app/stats/${YEAR}/${MONTH}/data</tt>.</li>
+	<li>In the Instance field, click a button to choose a default, single, or range of data instances. For example, if frequency==DAY, a window of the last rolling 5 days (not including today) would be expressed as start: -5 and end: -1. Check the advanced checkbox to display a field where you can specify a coordinator <a href="http://archive.cloudera.com/cdh4/cdh/4/oozie/CoordinatorFunctionalSpec.html#a6.6._Parameterization_of_Dataset_Instances_in_Input_and_Output_Events">EL function</a>.</li>
+	<li>Specify the timezone of the start date.</li>
+	<li>In the Done flag field, specify the flag that identifies when input datasets are no longer ready.</li>
+</ol>
 
-                          <br/>
+
+<h2><a name="OozieEditorandDashboard-DisplayingtheHistoryofaCoordinator"></a>Displaying the History of a Coordinator</h2>
+
+<ol>
+	<li>Do one of the following:
+	<ul>
+		<li>In the Coordinator Editor, click <b>Show history</b> in the pane at the left.  Click a job.</li>
+		<li>In the Oozie Dashboard/Editor, click the <b>History</b> tab. Click a coordinator.</li>
+	</ul>
+	</li>
+</ol>
+
+
+				    					    <br/>
                         </td>
-        </tr>
-      </table>
-
+		    </tr>
+	    </table>
+	    
     </body>
 </html>

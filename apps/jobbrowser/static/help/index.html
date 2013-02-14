@@ -4,14 +4,15 @@
 
 
 
+
 <h2><a name="JobBrowser-Contents"></a>Contents</h2>
 
 <style type='text/css'>/*<![CDATA[*/
-div.rbtoc1347648975019 {margin-left: 1.5em;padding: 0px;}
-div.rbtoc1347648975019 ul {margin-left: 0px;padding-left: 20px;}
-div.rbtoc1347648975019 li {margin-left: 0px;padding-left: 0px;}
+div.rbtoc1359395622915 {margin-left: 1.5em;padding: 0px;}
+div.rbtoc1359395622915 ul {margin-left: 0px;padding-left: 20px;}
+div.rbtoc1359395622915 li {margin-left: 0px;padding-left: 0px;}
 
-/*]]>*/</style><div class='rbtoc1347648975019'>
+/*]]>*/</style><div class='rbtoc1359395622915'>
 <ul>
     <li><a href='#JobBrowser-IntroducingJobBrowser'>Introducing Job Browser</a></li>
     <li><a href='#JobBrowser-JobBrowserInstallationandConfiguration'>Job Browser Installation and Configuration</a></li>
@@ -25,9 +26,11 @@ div.rbtoc1347648975019 li {margin-left: 0px;padding-left: 0px;}
 
 <h1><a name="JobBrowser-JobBrowserInstallationandConfiguration"></a>Job Browser Installation and Configuration</h1>
 
-<p>Job Browser is one of the applications that is installed as part of Hue. For more information about installing Hue, see <a href="https://ccp.cloudera.com/display/CDHDOC/Hue+Installation">Hue Installation</a>.</p>
+<p>Job Browser is one of the applications that is installed as part of Hue. For information about installing and configuring Hue, see <a href="https://ccp.cloudera.com/display/CDHDOC/Hue+Installation">Hue Installation</a>.</p>
 
-<p>By default, a JobBrowser user can see submitted job information for all users &#8211; both his/her own jobs and those of other users. If this behavior is not desirable, you can change the value of the <tt>share_jobs</tt> property under the <tt>[jobbrowser]</tt> section in the <tt>etc/hue/hue.ini</tt> file.  Setting this property to <tt>false</tt> will restrict the viewing of submitted jobs to only the job submitter and Hue administrators.
+<p>Job Browser can display both MRv1 and MRv2 jobs, but must be configured to display one type at a time in the <tt>[mapred_clusters]</tt> and <tt>[yarn_clusters]</tt> sections in the Hue configuration file.</p>
+
+<p>By default, a JobBrowser user can see submitted job information for all users &#8211; both his/her own jobs and those of other users. To restrict viewing of submitted jobs to the job submitter and Hue administrators, set the <tt>share_jobs</tt> property under the <tt>[jobbrowser]</tt> section in the Hue configuration file to <tt>false</tt>.
 <br class="atl-forced-newline" />
 <br class="atl-forced-newline" /></p>
 
@@ -35,7 +38,7 @@ div.rbtoc1347648975019 li {margin-left: 0px;padding-left: 0px;}
 
 <h1><a name="JobBrowser-StartingJobBrowser"></a>Starting Job Browser</h1>
 
-<p>To start Job Browser, click the <b>Job Browser</b> icon ( <span class="image-wrap" style=""><img src="/jobbrowser/static/art/icon_large.png" height="26" style="border: 0px solid black"/></span> ) in the navigation bar at the top of the Hue web page.</p>
+<p>To start Job Browser, click the <b>Job Browser</b> icon (<span class="image-wrap" style=""><img src="/jobbrowser/static/help/images/23888158.png" height="26" style="border: 0px solid black"/></span>) in the navigation bar at the top of the Hue web page.</p>
 
 <p>If there are no jobs that have been run, the <b>Welcome to the Job Browser</b> page opens, with links to the Job Designer and Beeswax.</p>
 
@@ -50,20 +53,19 @@ div.rbtoc1347648975019 li {margin-left: 0px;padding-left: 0px;}
 <p><b>To filter the jobs displayed in the Job Browser list:</b></p>
 
 <ul>
-	<li>To filter the jobs by their state (such as <b>Running</b> or <b>Completed</b>), choose a state from the <b>Job status</b> drop-down menu.
-<br class="atl-forced-newline" /></li>
-	<li>To filter by a user who ran the jobs, enter the user's name in the <b>User Name</b> query box.
-<br class="atl-forced-newline" /></li>
-	<li>To filter by job name, enter the name in the <b>Text</b> query box.
-<br class="atl-forced-newline" /></li>
-	<li>To clear the filters, choose <b>All States</b> from the <b>Job status</b> drop-down menu and delete any text in the <b>User Name</b> and <b>Text</b> query boxes.&nbsp;</li>
-	<li>To display retired jobs, check the <b>Show retired jobs</b>&nbsp;checkbox.&nbsp;Retired jobs show somewhat limited information &#8211; for example, information on maps and reduces and job duration is not available. Jobs are designated as&nbsp;Retired by the JobTracker based on the value of <tt>mapred.jobtracker.retirejob.interval</tt>.&nbsp;The retired jobs no longer display after the JobTracker is restarted.</li>
+	<li>To filter the jobs by their state (such as <b>Running</b> or <b>Completed</b>), choose a state from the <b>Job status</b> drop-down menu.</li>
+	<li>To filter by a user who ran the jobs, enter the user's name in the <b>User Name</b> query box.</li>
+	<li>To filter by job name, enter the name in the <b>Text</b> query box.</li>
+	<li>To clear the filters, choose <b>All States</b> from the <b>Job status</b> drop-down menu and delete any text in the <b>User Name</b> and <b>Text</b> query boxes.</li>
+	<li>To display retired jobs, check the <b>Show retired jobs</b> checkbox. Retired jobs show somewhat limited information &#8211; for example, information on maps and reduces and job duration is not available. Jobs are designated as&nbsp;Retired by the JobTracker based on the value of <tt>mapred.jobtracker.retirejob.interval</tt>. The retired jobs no longer display after the JobTracker is restarted.</li>
 </ul>
 
 
 <p><a name="JobBrowser-ViewingJobInformationandLogs"></a></p>
 
 <h1><a name="JobBrowser-ViewingJobInformationandLogs"></a>Viewing Job Information and Logs</h1>
+
+<div class='panelMacro'><table class='noteMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="/static/art/help/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td>At any level you can view the log for an object by click the <span class="image-wrap" style=""><img src="/oozie/static/help/images/23888324.png" style="border: 0px solid black"/></span> icon in the Logs column.</td></tr></table></div>
 
 <p><b>To view job information for an individual job:</b></p>
 
@@ -72,12 +74,8 @@ div.rbtoc1347648975019 li {margin-left: 0px;padding-left: 0px;}
 This shows the <b>Job</b> page for the job, with the recent tasks associated with the job are displayed in the <b>Tasks</b> tab.
 <br class="atl-forced-newline" />
 <br class="atl-forced-newline" /></li>
-	<li>Click the <b>Metadata</b> tab to view the metadata for this job.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" /></li>
-	<li>Click the <b>Counters</b> tab to view the counter metrics for the job.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" /></li>
+	<li>Click the <b>Metadata</b> tab to view the metadata for this job.</li>
+	<li>Click the <b>Counters</b> tab to view the counter metrics for the job.</li>
 </ol>
 
 
@@ -88,11 +86,8 @@ This shows the <b>Job</b> page for the job, with the recent tasks associated wit
 This lists all the tasks associated with the job.
 <br class="atl-forced-newline" />
 <br class="atl-forced-newline" /></li>
-	<li>Click <b>Attempts</b> to the right of a task to view the attempts for that task.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" /></li>
+	<li>Click <b>Attempts</b> to the right of a task to view the attempts for that task.</li>
 </ol>
-
 
 
 <p><b>To view information about an individual task:</b></p>
@@ -110,11 +105,8 @@ The metadata associated with the task is displayed.
 The counters associated with the task are displayed.
 <br class="atl-forced-newline" />
 <br class="atl-forced-newline" /></li>
-	<li>To return to the <b>Job</b> window for this job, click the job number in the status panel at the left of the window.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" /></li>
+	<li>To return to the <b>Job</b> window for this job, click the job number in the status panel at the left of the window.</li>
 </ol>
-
 
 
 <p><b>To view details about a task attempt:</b></p>
@@ -132,9 +124,7 @@ The counters associated with the attempt are displayed.
 The logs associated with the task attempt are displayed.
 <br class="atl-forced-newline" />
 <br class="atl-forced-newline" /></li>
-	<li>To return to the list of tasks for the current job, click the task number in the status panel at the left of the window.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" /></li>
+	<li>To return to the list of tasks for the current job, click the task number in the status panel at the left of the window.</li>
 </ol>
 
 
@@ -145,10 +135,8 @@ The logs associated with the task attempt are displayed.
 <p><b>To view job output:</b></p>
 
 <ol>
-	<li>In the <b>Job Browser</b> window, double-click the job.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" /></li>
-	<li>To view the output of the job, click the link under <b>Output</b> in the status panel at the left of the window.<br/>
+	<li>In the <b>Job Browser</b> window, click the link in the ID column.</li>
+	<li>To view the output of the job, click the link under <b>OUTPUT</b> in the panel at the left of the window.<br/>
 This takes you to the job output directory in the <b>File Browser</b>.</li>
 </ol>
 
