@@ -11,11 +11,11 @@
 <h2><a name="OozieEditorandDashboard-Contents"></a>Contents</h2>
 
 <style type='text/css'>/*<![CDATA[*/
-div.rbtoc1359479446372 {margin-left: 1.5em;padding: 0px;}
-div.rbtoc1359479446372 ul {margin-left: 0px;padding-left: 20px;}
-div.rbtoc1359479446372 li {margin-left: 0px;padding-left: 0px;}
+div.rbtoc1360779583763 {margin-left: 1.5em;padding: 0px;}
+div.rbtoc1360779583763 ul {margin-left: 0px;padding-left: 20px;}
+div.rbtoc1360779583763 li {margin-left: 0px;padding-left: 0px;}
 
-/*]]>*/</style><div class='rbtoc1359479446372'>
+/*]]>*/</style><div class='rbtoc1360779583763'>
 <ul>
     <li><a href='#OozieEditorandDashboard-IntroducingOozieEditor%2FDashboard'>Introducing Oozie Editor/Dashboard</a></li>
     <li><a href='#OozieEditorandDashboard-Oozie%26nbsp%3BEditor%2FDashboard%26nbsp%3BInstallationandConfiguration'>Oozie&nbsp;Editor/Dashboard&nbsp;Installation and Configuration</a></li>
@@ -415,10 +415,10 @@ vertical-align: center;
 
 <ol>
 	<li>Type a name, select the workflow, check the Is shared checkbox to share the job, and click <b>Next</b>. If the Coordinator Editor was opened after scheduling a workflow, the workflow will be set.</li>
-	<li>Select how many times the communicator will run for each specified unit, the start and end times of the coordinator, and the timezone of the start and end times, and click <b>Next</b>.</li>
+	<li>Select how many times the communicator will run for each specified unit, the start and end times of the coordinator, the timezone of the start and end times, and click <b>Next</b>. The start and end times must be expressed as UTC times. For example, to run at 10 pm PST, specify a start time of 6 am UTC of the following day (+8 hours) and set the Timezone field to America/Los_Angeles.</li>
 	<li>Click <b>Add</b> to select an input dataset and click <b>Next</b>. If no datasets exist, follow the procedure in <a href="#OozieEditorandDashboard-CreatingaDataset">Creating a Dataset</a>.</li>
 	<li>Click <b>Add</b> to select an output dataset.  Click <b>Save coordinator</b> or click <b>Next</b> to specify advanced settings.</li>
-	<li>To share the coordinator with all users, check the&nbsp;<b>Is shared</b>&nbsp;checkbox.</li>
+	<li>To share the coordinator with all users, check the <b>Is shared</b> checkbox.</li>
 	<li>Fill in parameters to pass to Oozie, properties that determine how long a coordinator will wait before timing out, how many coordinators can run and wait concurrently, and the coordinator execution policy.</li>
 	<li>Click <b>Save coordinator</b>.</li>
 </ol>

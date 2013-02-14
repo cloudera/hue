@@ -26,7 +26,7 @@ def test_about():
 
   # Test default output
   response = c.get('/help/')
-  assert_true("Welcome to Hue!" in response.content)
+  assert_true("Introducing Hue" in response.content)
 
   # Test default to index.md
   response = c.get("/help/about/")

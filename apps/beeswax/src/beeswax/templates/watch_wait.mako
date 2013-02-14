@@ -33,7 +33,7 @@ ${layout.menubar(section='query')}
 		<div class="span3">
 			<div class="well sidebar-nav
 			    % if app_name == 'impala':
-			      hive
+			      hide
 			    % endif
 			">
 				<ul class="nav nav-list">
