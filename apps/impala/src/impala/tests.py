@@ -21,7 +21,7 @@ from nose.tools import assert_true, assert_equal, assert_false
 from django.contrib.auth.models import User
 
 from desktop.lib.django_test_util import make_logged_in_client
-from beeswax.models import SavedQuery
+from beeswax.models import SavedQuery, QueryHistory
 from beeswax.server import dbms
 
 
@@ -63,6 +63,13 @@ class TestImpala:
       impala_query = create_saved_query('impala', user)
       response = self.client.get("/impala/list_designs")
       assert_equal(len(response.context['page'].object_list), 1)
+
+      # Test my query page
+      QueryHistory.objects.create(owner=user, design=impala_query, query='', last_state=QueryHistory.STATE.available.index)
+
+      resp = self.client.get('/impala/my_queries')
+      assert_equal(len(resp.context['q_page'].object_list), 1)
+      assert_equal(len(resp.context['h_page'].object_list), 1)
     finally:
       if beewax_query is not None:
         beewax_query.delete()

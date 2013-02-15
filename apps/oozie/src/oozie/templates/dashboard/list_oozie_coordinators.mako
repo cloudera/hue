@@ -58,7 +58,7 @@ ${layout.menubar(section='dashboard')}
     <table class="table table-condensed" id="running-table">
       <thead>
         <tr>
-          <th width="105%">${ _('Next submission') }</th>
+          <th width="15%">${ _('Next submission') }</th>
           <th width="10%">${ _('Status') }</th>
           <th width="25%">${ _('Name') }</th>
           <th width="10%">${ _('Progress') }</th>

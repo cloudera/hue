@@ -107,7 +107,7 @@ ${ layout.menubar(section='history') }
               %>
               <tr class="histRow">
                 <td data-sort-value="${time.mktime(query.submission_date.timetuple())}">${query.submission_date.strftime("%x %X")}</td>
-                <td>${show_saved_query(design, query)}</td>
+                <td>${show_saved_query(query.design, query)}</td>
                 <td>
                   <p>
                     % if len(query.query) > 100:
