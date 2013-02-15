@@ -288,17 +288,20 @@ def single_task_attempt_logs(request, job, taskid, attemptid):
     logs = [ diagnostic_log ]
     # Add remaining logs
     logs += [ section.strip() for section in attempt.get_task_log() ]
+    first_log_tab = next((i for i, log in enumerate(logs) if log), 0)
   except TaskTrackerNotFoundException:
     # Four entries,
     # for diagnostic, stdout, stderr and syslog
     logs = [ _("Failed to retrieve log. TaskTracker not found.") ] * 4
+    first_log_tab = 0
 
   return render("attempt_logs.mako", request, {
       "attempt": attempt,
       "taskid": taskid,
       "joblnk": job_link,
       "task": task,
-      "logs": logs
+      "logs": logs,
+      "first_log_tab": first_log_tab,
     })
 
 @check_job_permission

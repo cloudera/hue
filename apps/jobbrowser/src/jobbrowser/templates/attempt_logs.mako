@@ -73,34 +73,34 @@ ${ line | unicode,trim }
                   %>
                   <div class="tabbable">
                     <ul class="nav nav-pills">
-                      <li class="active"><a href="#logsDiagnostic" data-toggle="tab">${_('task diagnostic log')}</a></li>
-                      <li class=""><a href="#logsStdOut" data-toggle="tab">${_('stdout')}</a></li>
-                      <li class=""><a href="#logsStdErr" data-toggle="tab">${_('stderr')}</a></li>
-                      <li class=""><a href="#logsSysLog" data-toggle="tab">${_('syslog')}</a></li>
+                      <li class="${ first_log_tab == 0 and 'active' or '' }"><a href="#logsDiagnostic" data-toggle="tab">${_('task diagnostic log')}</a></li>
+                      <li class="${ first_log_tab == 1 and 'active' or '' }"><a href="#logsStdOut" data-toggle="tab">${_('stdout')}</a></li>
+                      <li class="${ first_log_tab == 2 and 'active' or '' }"><a href="#logsStdErr" data-toggle="tab">${_('stderr')}</a></li>
+                      <li class="${ first_log_tab == 3 and 'active' or '' }"><a href="#logsSysLog" data-toggle="tab">${_('syslog')}</a></li>
                     </ul>
                     <div class="tab-content">
-                      <div class="tab-pane active" id="logsDiagnostic">
+                      <div class="tab-pane ${ first_log_tab == 0 and 'active' or '' }" id="logsDiagnostic">
                           % if not log_diagnostic:
                             <pre>-- empty --</pre>
                           % else:
                             <pre>${format_log(log_diagnostic)}</pre>
                           % endif
                       </div>
-                      <div class="tab-pane" id="logsStdOut">
+                      <div class="tab-pane ${ first_log_tab == 1 and 'active' or '' }" id="logsStdOut">
                           % if not log_stdout:
                             <pre>-- empty --</pre>
                           % else:
                             <pre>${format_log(log_stdout)}</pre>
                           % endif
                       </div>
-                      <div class="tab-pane" id="logsStdErr">
+                      <div class="tab-pane ${ first_log_tab == 2 and 'active' or '' }" id="logsStdErr">
                           % if not log_stderr:
                             <pre>-- empty --</pre>
                           % else:
                             <pre>${format_log(log_stderr)}</pre>
                           % endif
                       </div>
-                      <div class="tab-pane" id="logsSysLog">
+                      <div class="tab-pane ${ first_log_tab == 3 and 'active' or '' }" id="logsSysLog">
                           % if not log_syslog:
                             <pre>-- empty --</pre>
                           % else:

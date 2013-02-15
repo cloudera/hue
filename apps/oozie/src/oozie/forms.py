@@ -35,7 +35,7 @@ LOG = logging.getLogger(__name__)
 
 class ParameterForm(forms.Form):
   name = forms.CharField(max_length=40, widget=forms.widgets.HiddenInput())
-  value = forms.CharField(max_length=100, required=False)
+  value = forms.CharField(max_length=1024, required=False)
 
   NON_PARAMETERS = (
       'user.name',
