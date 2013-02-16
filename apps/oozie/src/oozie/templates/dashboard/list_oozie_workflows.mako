@@ -107,7 +107,7 @@ ${ layout.menubar(section='dashboard') }
   </div>
 </div>
 
-<script src="/oozie/static/js/utils.js" type="text/javascript" charset="utf-8"></script>
+<script src="/oozie/static/js/bundles.utils.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript" charset="utf-8">

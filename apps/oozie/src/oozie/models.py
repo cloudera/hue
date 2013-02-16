@@ -249,6 +249,7 @@ class Workflow(Job):
   job_properties = models.TextField(default='[]', verbose_name=_t('Hadoop job properties'),
                                     help_text=_t('Job configuration properties used by all the actions of the workflow '
                                                  '(e.g. mapred.job.queue.name=production)'))
+  managed = models.BooleanField(default=True)
 
   objects = WorkflowManager()
 
@@ -613,6 +614,11 @@ class Node(models.Model):
   def is_visible(self):
     return True
 
+  def add_node(self, child):
+    raise NotImplementedError(_("%(node_type)s has not implemented the 'add_node' method.") % {
+      'node_type': self.node_type
+    })
+
 
 class Action(Node):
   """
@@ -623,6 +629,13 @@ class Action(Node):
   class Meta:
     # Cloning does not work anymore if not abstract
     abstract = True
+
+  def add_node(self, child):
+    Link.objects.filter(parent=self, name='ok').delete()
+    Link.objects.create(parent=self, child=child, name='ok')
+    if not Link.objects.filter(parent=self, name='error').exists():
+      Link.objects.create(parent=self, child=Kill.objects.get(name='kill', workflow=self.workflow), name='error')
+
 
 # The fields with '[]' as default value are JSON dictionaries
 # When adding a new action, also update
@@ -1037,15 +1050,25 @@ class ControlFlow(Node):
 class Start(ControlFlow):
   node_type = 'start'
 
+  def add_node(self, child):
+    Link.objects.filter(parent=self).delete()
+    link = Link.objects.create(parent=self, child=child, name='to')
+
 
 class End(ControlFlow):
   node_type = 'end'
+
+  def add_node(self, child):
+    raise RuntimeError(_("End should not have any children."))
 
 
 class Kill(ControlFlow):
   node_type = 'kill'
 
   message = models.CharField(max_length=256, blank=False, default='Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]')
+
+  def add_node(self, child):
+    raise RuntimeError(_("Kill should not have any children."))
 
 
 class Fork(ControlFlow):

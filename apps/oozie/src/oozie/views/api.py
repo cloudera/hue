@@ -34,30 +34,10 @@ from oozie.models import Workflow, Node, Start, End, Kill, Mapreduce, Java, Stre
                          Link, Decision, Fork, DecisionEnd, Join,\
                          NODE_TYPES, ACTION_TYPES, _STD_PROPERTIES_JSON
 from oozie.decorators import check_job_access_permission, check_job_edition_permission
-from oozie.utils import model_to_dict
+from oozie.utils import model_to_dict, format_dict_field_values, format_field_value
 
 
 LOG = logging.getLogger(__name__)
-
-
-JSON_FIELDS = ('parameters', 'job_properties', 'files', 'archives', 'prepares', 'params',
-               'deletes', 'mkdirs', 'moves', 'chmods', 'touchzs')
-NUMBER_FIELDS = ('sub_workflow',)
-
-def format_field_value(field, value):
-  if field in JSON_FIELDS:
-    if not isinstance(value, basestring):
-      return json.dumps(value)
-  if field in NUMBER_FIELDS:
-    if not isinstance(value, int):
-      return int(value)
-  return value
-
-
-def format_dict_field_values(dictionary):
-  for key in dictionary:
-    dictionary[key] = format_field_value(key, dictionary[key])
-  return dictionary
 
 
 def get_or_create_node(workflow, node_data):
@@ -114,7 +94,7 @@ def _validate_node_links_json(node_type, node_links, errors):
       return False
   elif node_type in (Fork.node_type, Decision.node_type):
     if len(node_links) < 2:
-      errors['links'] = _("Join and Decision should have at least two children: 'related' to their respective ends, 'start' to any node.")
+      errors['links'] = _("Fork and Decision should have at least two children: 'related' to their respective ends, 'start' to any node.")
       return False
   else:
     if len(node_links) != 2:

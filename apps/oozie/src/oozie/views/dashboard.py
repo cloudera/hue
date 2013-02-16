@@ -35,10 +35,9 @@ from desktop.lib.rest.http_client import RestException
 from desktop.log.access import access_warn
 from liboozie.oozie_api import get_oozie
 from liboozie.submittion import Submission
-from oozie.forms import RerunForm, ParameterForm, RerunCoordForm
-
 
 from oozie.conf import OOZIE_JOBS_COUNT
+from oozie.forms import RerunForm, ParameterForm, RerunCoordForm
 from oozie.models import History, Job, Workflow
 from oozie.settings import DJANGO_APPS
 

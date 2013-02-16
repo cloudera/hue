@@ -15,6 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+try:
+  import json
+except ImportError:
+  import simplejson as json
 import logging
 import re
 
@@ -23,6 +27,25 @@ from jobsub.parameterization import find_variables
 
 
 LOG = logging.getLogger(__name__)
+
+JSON_FIELDS = ('parameters', 'job_properties', 'files', 'archives', 'prepares', 'params',
+               'deletes', 'mkdirs', 'moves', 'chmods', 'touchzs')
+NUMBER_FIELDS = ('sub_workflow',)
+
+def format_field_value(field, value):
+  if field in JSON_FIELDS:
+    if not isinstance(value, basestring):
+      return json.dumps(value)
+  if field in NUMBER_FIELDS:
+    if not isinstance(value, int):
+      return int(value)
+  return value
+
+
+def format_dict_field_values(dictionary):
+  for key in dictionary:
+    dictionary[key] = format_field_value(key, dictionary[key])
+  return dictionary
 
 def model_to_dict(model):
   from django.db import models
@@ -40,6 +63,13 @@ def model_to_dict(model):
     except Exception, e:
       LOG.debug(_("Could not set field %(field)s: %(exception)s") % {'field': field.name, 'exception': str(e)})
   return dictionary
+
+
+def sanitize_node_dict(node_dict):
+  for field in ['node_ptr', 'workflow']:
+    if field in node_dict:
+      del node_dict[field]
+  return node_dict
 
 
 def workflow_to_dict(workflow):

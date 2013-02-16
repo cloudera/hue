@@ -24,175 +24,20 @@ try:
 except ImportError:
   import simplejson as json
 
+from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_false, assert_equal, assert_raises
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
 from liboozie.oozie_api_test import OozieServerProvider
+from oozie.models import Workflow, Node, Action, Start, Kill, End, Link
 
-from jobsub import conf
-from jobsub.management.commands import jobsub_setup
-from jobsub.models import OozieDesign, OozieMapreduceAction, OozieStreamingAction, CheckForSetup
-from jobsub.parameterization import recursive_walk, find_variables, substitute_variables
 from django.template.defaultfilters import escapejs
 
 
 LOG = logging.getLogger(__name__)
-
-
-def test_recursive_walk():
-  def f(_):
-    f.leafs += 1
-  f.leafs = 0
-
-  # Test that we apply the function the right number of times
-  recursive_walk(f, [0,1,2])
-  assert_equal(3, f.leafs)
-  f.leafs = 0
-
-  recursive_walk(f, 1)
-  assert_equal(1, f.leafs)
-  f.leafs = 0
-
-  D = dict(a=2, b=3, c=dict(d=4, e=5))
-  Dorig = copy.deepcopy(D)
-  recursive_walk(f, D)
-  assert_equal(4, f.leafs)
-  assert_equal(Dorig, D, 'Object unexpectedly modified.')
-
-  # Test application and replacement
-  def square(x):
-    return x * x
-
-  assert_equal(dict(a=4, b=9, c=dict(d=16, e=25)), recursive_walk(square, D))
-
-def test_find_variables():
-  A = dict(one='$a',
-        two=dict(c='foo $b $$'),
-        three=['${foo}', 'xxx ${foo}'])
-  assert_equal(set(['a', 'b', 'foo']),
-    find_variables(A))
-
-def test_substitute_variables():
-  data = ['$greeting', dict(a='${where} $where')]
-  assert_equal(['hi', dict(a='there there')],
-    substitute_variables(data, dict(greeting='hi', where='there')))
-
-  data = [None, 'foo', dict(a=None)]
-  assert_equal(data, substitute_variables(data, dict()), 'Nothing to substitute')
-
-def test_job_design_cycle():
-  """
-  Tests for the "job design" CMS.
-  Submission requires a cluster, so that's separate.
-  """
-  c = make_logged_in_client()
-
-  # New should give us a form.
-  response = c.get('/jobsub/new_design/java')
-  assert_equal(1, response.content.count('action="/jobsub/new_design/java" method="POST"'))
-
-  # Streaming also:
-  response = c.get('/jobsub/new_design/streaming')
-  assert_equal(1, response.content.count('action="/jobsub/new_design/streaming" method="POST"'))
-
-  # Post back to create a new submission
-  design_count = OozieDesign.objects.count()
-  response = c.post('/jobsub/new_design/java', {
-     u'wf-name': [u'name-1'],
-     u'wf-description': [u'description name-1'],
-     u'action-args': [u'x y z'],
-     u'action-main_class': [u'MyClass'],
-     u'action-jar_path': [u'myfile.jar'],
-     u'action-java_opts': [u''],
-     u'action-archives': [u'[]'],
-     u'action-job_properties': [u'[]'],
-     u'action-files': [u'[]']})
-  assert_equal(design_count + 1, OozieDesign.objects.count())
-  job_id = OozieDesign.objects.get(name='name-1').id
-
-  response = c.post('/jobsub/new_design/mapreduce', {
-     u'wf-name': [u'name-2'],
-     u'wf-description': [u'description name-2'],
-     u'action-args': [u'x y z'],
-     u'action-jar_path': [u'myfile.jar'],
-     u'action-archives': [u'[]'],
-     u'action-job_properties': [u'[]'],
-     u'action-files': [u'[]']})
-
-  # Follow it
-  edit_url = '/jobsub/edit_design/%d' % job_id
-  response = c.get(edit_url)
-  assert_true('x y z' in response.content, response.content)
-
-  # Make an edit
-  response = c.post(edit_url, {
-     u'wf-name': [u'name-1'],
-     u'wf-description': [u'description name-1'],
-     u'action-args': [u'a b c'],
-     u'action-main_class': [u'MyClass'],
-     u'action-jar_path': [u'myfile.jar'],
-     u'action-java_opts': [u''],
-     u'action-archives': [u'[]'],
-     u'action-job_properties': [u'[]'],
-     u'action-files': [u'[]']})
-  assert_true('a b c' in c.get(edit_url).content)
-
-  # Try to post
-  response = c.post('/jobsub/new_design/java',
-    dict(name='test2', jarfile='myfile.jar', arguments='x y z', submit='Save'))
-  assert_false('This field is required' in response)
-
-  # Now check list
-  response = c.get('/jobsub/')
-  for design in OozieDesign.objects.all():
-    assert_true(escape(design.name) in response.content, response.content)
-
-  # With some filters
-  name1 = escape('name-1')
-  name2 = escape('name-2')
-
-  response = c.get('/jobsub/', dict(name='name-1'))
-  assert_true(name1 in response.content, response.content)
-  assert_false(name2 in response.content, response.content)
-
-  response = c.get('/jobsub/', dict(owner='doesnotexist'))
-  assert_false('doesnotexist' in response.content)
-
-  response = c.get('/jobsub/', dict(owner='test', name='name-1'))
-  assert_true(name1 in response.content, response.content)
-  assert_false(name2 in response.content, response.content)
-
-  response = c.get('/jobsub/', dict(name="name"))
-  assert_true(name1 in response.content, response.content)
-  assert_true(name2 in response.content, response.content)
-  assert_false('doesnotexist' in response.content, response.content)
-
-  # Combined filters
-  response = c.get('/jobsub/', dict(owner="test", name="name-2"))
-  assert_false(name1 in response.content, response.content)
-  assert_true(name2 in response.content, response.content)
-  assert_false('doesnotexist' in response.content, response.content)
-
-  # Try delete
-  job_id = OozieDesign.objects.get(name='name-1').id
-  response = c.post('/jobsub/delete_design/%d' % job_id)
-  assert_raises(OozieDesign.DoesNotExist, OozieDesign.objects.get, id=job_id)
-
-  # Let's make sure we can't delete other people's designs.
-  c.logout()
-  c = make_logged_in_client('test2', is_superuser=False)
-  grant_access('test2', 'test-grp', 'jobsub')
-
-  not_mine = OozieDesign.objects.get(name='name-2')
-  response = c.post('/jobsub/delete_design/%d' % not_mine.id)
-  assert_true('Permission denied.' in response.content, response.content)
-
-
-def escape(text):
-  return json.dumps(escapejs(text))
-
 
 class TestJobsubWithHadoop(OozieServerProvider):
 
@@ -215,106 +60,75 @@ class TestJobsubWithHadoop(OozieServerProvider):
         LOG.warn("Received the following exception while change mode attempt %d of /tmp: %s" % (i, str(e)))
         time.sleep(1)
 
+    self.design = self.create_design()
+
   def tearDown(self):
-    OozieDesign.objects.all().delete()
-    CheckForSetup.objects.all().delete()
+    Workflow.objects.all().delete()
 
-  def test_jobsub_setup(self):
-    # User 'test' triggers the setup of the examples.
-    # 'hue' home will be deleted, the examples installed in the new one
-    # and 'test' will try to access them.
-    self.cluster.fs.setuser('jobsub_test')
+  def create_design(self):
+    response = self.client.post(reverse('jobsub.views.new_design',
+      kwargs={'node_type': 'mapreduce'}),
+      data={'name': 'sleep_job',
+            'description': '',
+            'node_type': 'mapreduce',
+            'jar_path': '/user/hue/oozie/workspaces/lib/hadoop-examples.jar',
+            'prepares': '[]',
+            'files': '[]',
+            'archives': '[]',
+            'job_properties': '[{\"name\":\"mapred.reduce.tasks\",\"value\":\"1\"},{\"name\":\"mapred.mapper.class\",\"value\":\"org.apache.hadoop.examples.SleepJob\"},{\"name\":\"mapred.reducer.class\",\"value\":\"org.apache.hadoop.examples.SleepJob\"},{\"name\":\"mapred.mapoutput.key.class\",\"value\":\"org.apache.hadoop.io.IntWritable\"},{\"name\":\"mapred.mapoutput.value.class\",\"value\":\"org.apache.hadoop.io.NullWritable\"},{\"name\":\"mapred.output.format.class\",\"value\":\"org.apache.hadoop.mapred.lib.NullOutputFormat\"},{\"name\":\"mapred.input.format.class\",\"value\":\"org.apache.hadoop.examples.SleepJob$SleepInputFormat\"},{\"name\":\"mapred.partitioner.class\",\"value\":\"org.apache.hadoop.examples.SleepJob\"},{\"name\":\"mapred.speculative.execution\",\"value\":\"false\"},{\"name\":\"sleep.job.map.sleep.time\",\"value\":\"0\"},{\"name\":\"sleep.job.reduce.sleep.time\",\"value\":\"${REDUCER_SLEEP_TIME}\"}]'},
+      HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+    assert_equal(response.status_code, 200)
+    return Workflow.objects.all()[0]
 
-    username = 'hue'
-    home_dir = '/user/%s/' % username
-    finish = conf.REMOTE_DATA_DIR.set_for_testing('%s/jobsub' % home_dir)
+  def test_new_design(self):
+    # Ensure the following:
+    #   - creator is owner.
+    #   - workflow name and description are the same as action name and description.
+    #   - workflow has one action.
+    assert_false(self.design.managed)
+    assert_equal(4, Action.objects.filter(workflow=self.design).count())
+    assert_equal(1, Kill.objects.filter(workflow=self.design).count())
+    assert_equal(1, Start.objects.filter(workflow=self.design).count())
+    assert_equal(1, End.objects.filter(workflow=self.design).count())
+    assert_equal(4, Node.objects.filter(workflow=self.design).count())
+    assert_equal(3, Link.objects.filter(parent__workflow=self.design).count())
 
-    try:
-      data_dir = conf.REMOTE_DATA_DIR.get()
+  def test_save_design(self):
+    response = self.client.post(reverse('jobsub.views.save_design',
+      kwargs={'design_id': self.design.id}),
+      data={'name': 'mapreduce1',
+            'description': '',
+            'node_type': 'mapreduce',
+            'jar_path': '/user/hue/oozie/workspaces/lib/hadoop-examples.jar',
+            'prepares': '[]',
+            'files': '[{"name": "test", "dummy": ""}]',
+            'archives': '[]',
+            'job_properties': '[{\"name\":\"mapred.reduce.tasks\",\"value\":\"1\"},{\"name\":\"mapred.mapper.class\",\"value\":\"org.apache.hadoop.examples.SleepJob\"},{\"name\":\"mapred.reducer.class\",\"value\":\"org.apache.hadoop.examples.SleepJob\"},{\"name\":\"mapred.mapoutput.key.class\",\"value\":\"org.apache.hadoop.io.IntWritable\"},{\"name\":\"mapred.mapoutput.value.class\",\"value\":\"org.apache.hadoop.io.NullWritable\"},{\"name\":\"mapred.output.format.class\",\"value\":\"org.apache.hadoop.mapred.lib.NullOutputFormat\"},{\"name\":\"mapred.input.format.class\",\"value\":\"org.apache.hadoop.examples.SleepJob$SleepInputFormat\"},{\"name\":\"mapred.partitioner.class\",\"value\":\"org.apache.hadoop.examples.SleepJob\"},{\"name\":\"mapred.speculative.execution\",\"value\":\"false\"},{\"name\":\"sleep.job.map.sleep.time\",\"value\":\"0\"},{\"name\":\"sleep.job.reduce.sleep.time\",\"value\":\"${REDUCER_SLEEP_TIME}\"}]'},
+      HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+    assert_equal(response.status_code, 200)
+    self.design = Workflow.objects.get(id=self.design.id)
+    assert_equal(self.design.start.get_child('to').get_full_node().files, '[{"name": "test", "dummy": ""}]')
 
-      if not jobsub_setup.Command().has_been_setup():
-        self.cluster.fs.setuser(self.cluster.fs.superuser)
-        if self.cluster.fs.exists(home_dir):
-          self.cluster.fs.rmtree(home_dir)
+  def test_get_design(self):
+    response = self.client.get(reverse('jobsub.views.get_design',
+      kwargs={'design_id': self.design.id}),
+      HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+    assert_equal(response.status_code, 200)
 
-        jobsub_setup.Command().handle()
+  def test_delete_design(self):
+    assert_equal(1, Workflow.objects.count())
+    response = self.client.post(reverse('jobsub.views.delete_design',
+      kwargs={'design_id': self.design.id}),
+      follow=True,
+      HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+    assert_equal(response.status_code, 200)
+    assert_equal(0, Workflow.objects.count())
 
-      self.cluster.fs.setuser('jobsub_test')
-      stats = self.cluster.fs.stats(home_dir)
-      assert_equal(stats['user'], username)
-      assert_equal(oct(stats['mode']), '040755') #04 because is a dir
-
-      stats = self.cluster.fs.stats(data_dir)
-      assert_equal(stats['user'], username)
-      assert_equal(oct(stats['mode']), '041777')
-
-      # Only examples should have been created by 'hue'
-      stats = self.cluster.fs.listdir_stats(data_dir)
-      sample_stats = filter(lambda stat: stat.user == username, stats)
-      assert_equal(len(sample_stats), 2)
-    finally:
-      finish()
-
-  def test_jobsub_setup_and_run_samples(self):
-    """
-    Merely exercises jobsub_setup, and then runs the sleep example.
-    """
-    if not jobsub_setup.Command().has_been_setup():
-      jobsub_setup.Command().handle()
-    self.cluster.fs.setuser('jobsub_test')
-
-    assert_equal(3, OozieDesign.objects.filter(owner__username='sample').count())
-    assert_equal(2, OozieMapreduceAction.objects.filter(ooziedesign__owner__username='sample').count())
-    assert_equal(1, OozieStreamingAction.objects.filter(ooziedesign__owner__username='sample').count())
-
-    # Make sure sample user got created.
-    assert_equal(1, User.objects.filter(username='sample').count())
-
-    # Clone design
-    assert_equal(0, OozieDesign.objects.filter(owner__username='jobsub_test').count())
-    jobid = OozieDesign.objects.get(name='sleep_job', owner__username='sample').id
-
-    self.client.post('/jobsub/clone_design/%d' % jobid)
-    assert_equal(1, OozieDesign.objects.filter(owner__username='jobsub_test').count())
-    jobid = OozieDesign.objects.get(owner__username='jobsub_test').id
-
-    # And now submit and run the sleep sample
-    response = self.client.post('/jobsub/submit_design/%d' % jobid, {
-        'num_reduces': 1,
-        'num_maps': 1,
-        'map_sleep_time': 1,
-        'reduce_sleep_time': 1}, follow=True)
-
-    assert_true(sum([status in response.content for status in ('PREP', 'OK', 'DONE')]) > 0)
-    assert_true(str(jobid) in response.content)
-
-    oozie_job_id = response.context['jobid']
-    job = OozieServerProvider.wait_until_completion(oozie_job_id, timeout=120, step=1)
-    logs = OozieServerProvider.oozie.get_job_log(oozie_job_id)
-
-    assert_equal('SUCCEEDED', job.status, logs)
-
-
-    # Grep
-    n = OozieDesign.objects.filter(owner__username='jobsub_test').count()
-    jobid = OozieDesign.objects.get(name='grep_example').id
-
-    self.client.post('/jobsub/clone_design/%d' % jobid)
-    assert_equal(n + 1, OozieDesign.objects.filter(owner__username='jobsub_test').count())
-    jobid = OozieDesign.objects.get(owner__username='jobsub_test', name__contains='sleep_job').id
-
-    # And now submit and run the sleep sample
-    response = self.client.post('/jobsub/submit_design/%d' % jobid, {
-        'num_reduces': 1,
-        'num_maps': 1,
-        'map_sleep_time': 1,
-        'reduce_sleep_time': 1}, follow=True)
-
-    assert_true(sum([status in response.content for status in ('PREP', 'OK', 'DONE')]) > 0)
-    assert_true(str(jobid) in response.content)
-
-    oozie_job_id = response.context['jobid']
-    job = OozieServerProvider.wait_until_completion(oozie_job_id, timeout=60, step=1)
-    logs = OozieServerProvider.oozie.get_job_log(oozie_job_id)
-
-    assert_equal('SUCCEEDED', job.status, logs)
+  def test_clone_design(self):
+    assert_equal(1, Workflow.objects.count())
+    response = self.client.post(reverse('jobsub.views.clone_design',
+      kwargs={'design_id': self.design.id}),
+      follow=True,
+      HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+    assert_equal(response.status_code, 200)
+    assert_equal(2, Workflow.objects.count())

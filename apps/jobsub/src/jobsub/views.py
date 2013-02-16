@@ -14,7 +14,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from django.template.defaultfilters import escapejs
 """
 Views for JobSubmission.
 
@@ -34,8 +33,11 @@ import time as py_time
 
 from django.core import urlresolvers
 from django.shortcuts import redirect
+from django.template.defaultfilters import escapejs
+from django.utils.translation import ugettext as _
 
-from desktop.lib.django_util import render, extract_field_data
+from desktop.lib.django_util import render, render_json, extract_field_data
+from desktop.lib.exceptions import StructuredException
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.rest.http_client import RestException
 from desktop.log.access import access_warn
@@ -43,98 +45,15 @@ from desktop.log.access import access_warn
 from hadoop.fs.exceptions import WebHdfsException
 from liboozie.oozie_api import get_oozie
 
-from jobsub import models, submit
-from jobsub.management.commands import jobsub_setup
-import jobsub.forms
+from oozie.models import Workflow
+from oozie.forms import design_form_by_type
+from oozie.utils import model_to_dict, format_dict_field_values, format_field_value,\
+                        sanitize_node_dict, JSON_FIELDS
 
-from django.utils.translation import ugettext as _
+from jobsub.management.commands import jobsub_setup
 
 
 LOG = logging.getLogger(__name__)
-
-def oozie_job(request, jobid):
-  """View the details about this job."""
-  try:
-    workflow = get_oozie().get_job(jobid)
-    _check_permission(request, workflow.user,
-                      _("Access denied: view job %(id)s.") % {'id': jobid},
-                      allow_root=True)
-    # Accessing log and definition will trigger Oozie API calls
-    log = workflow.log
-    definition = workflow.definition
-  except RestException, ex:
-    raise PopupException(_("Error accessing Oozie job %(id)s.") % {'id': jobid},
-                         detail=ex.message)
-
-  # Cross reference the submission history (if any)
-  design_link = None
-  try:
-    history_record = models.JobHistory.objects.get(job_id=jobid)
-    design = history_record.design
-    if design.owner == request.user:
-      design_link = urlresolvers.reverse(jobsub.views.edit_design,
-                                         kwargs={'design_id': design.id})
-  except models.JobHistory.DoesNotExist, ex:
-    pass
-
-  return render('workflow.mako', request, {
-    'workflow': workflow,
-    'design_link': design_link,
-    'definition': definition,
-    'log': log,
-    'jobid': jobid,
-  })
-
-
-def list_history(request):
-  """
-  List the job submission history. Normal users can only look at their
-  own submissions.
-  """
-  history = models.JobHistory.objects
-
-  if not request.user.is_superuser:
-    history = history.filter(owner=request.user)
-  history = history.order_by('-submission_date')
-
-  return render('list_history.mako', request, {
-    'history': history,
-  })
-
-
-def new_design(request, action_type):
-  form = jobsub.forms.design_form_by_type(action_type)
-
-  if request.method == 'POST':
-    form.bind(request.POST)
-
-    if form.is_valid():
-      action = form.action.save(commit=False)
-      action.action_type = action_type
-      action.save()
-
-      design = form.wf.save(commit=False)
-      design.root_action = action
-      design.owner = request.user
-      design.save()
-
-      return redirect(urlresolvers.reverse(list_designs))
-  else:
-    form.bind()
-
-  return _render_design_edit(request, form, action_type, _STD_PROPERTIES_JSON)
-
-
-def _render_design_edit(request, form, action_type, properties_hint):
-  return render('edit_design.mako', request, {
-    'form': form,
-    'action': request.path,
-    'action_type': action_type,
-    'properties': extract_field_data(form.action['job_properties']),
-    'files': extract_field_data(form.action['files']),
-    'archives': extract_field_data(form.action['archives']),
-    'properties_hint': properties_hint,
-  })
 
 
 def list_designs(request):
@@ -144,7 +63,7 @@ def list_designs(request):
     owner       - Substring filter by owner field
     name        - Substring filter by design name field
   '''
-  data = models.OozieDesign.objects
+  data = Workflow.objects.filter(managed=False)
   owner = request.GET.get('owner', '')
   name = request.GET.get('name', '')
   if owner:
@@ -153,9 +72,6 @@ def list_designs(request):
       data = data.filter(name__icontains=name)
   data = data.order_by('-last_modified')
 
-  show_install_examples = \
-      request.user.is_superuser and not jobsub_setup.Command().has_been_setup()
-
   designs = []
   for design in data:
       ko_design = {
@@ -163,32 +79,28 @@ def list_designs(request):
           'owner': escapejs(design.owner.username),
           'name': escapejs(design.name),
           'description': escapejs(design.description),
-          'type': design.root_action.action_type,
+          'node_type': design.start.get_child('to').node_type,
           'last_modified': py_time.mktime(design.last_modified.timetuple()),
-          'url_params': urlresolvers.reverse(jobsub.views.get_design_params, kwargs={'design_id': design.id}),
-          'url_submit': urlresolvers.reverse(jobsub.views.submit_design, kwargs={'design_id': design.id}),
-          'url_edit': urlresolvers.reverse(jobsub.views.edit_design, kwargs={'design_id': design.id}),
-          'url_delete': urlresolvers.reverse(jobsub.views.delete_design, kwargs={'design_id': design.id}),
-          'url_clone': urlresolvers.reverse(jobsub.views.clone_design, kwargs={'design_id': design.id}),
-          'can_submit': request.user.username == design.owner.username,
-          'can_delete': request.user.is_superuser or request.user.username == design.owner.username
+          'editable': design.owner.id == request.user.id
       }
       designs.append(ko_design)
 
-  return render("list_designs.mako", request, {
-    'currentuser': request.user,
-    'owner': owner,
-    'name': name,
-    'designs': json.dumps(designs),
-    'show_install_examples': show_install_examples,
-  })
+  if request.is_ajax():
+    return render_json(designs)
+  else:
+    return render("designs.mako", request, {
+      'currentuser': request.user,
+      'owner': owner,
+      'name': name,
+      'designs': json.dumps(designs)
+    })
 
 def _get_design(design_id):
   """Raise PopupException if design doesn't exist"""
   try:
-    return models.OozieDesign.objects.get(pk=design_id)
-  except models.OozieDesign.DoesNotExist:
-    raise PopupException("Job design not found")
+    return Workflow.objects.get(pk=design_id)
+  except Workflow.DoesNotExist:
+    raise PopupException(_("Workflow not found"))
 
 def _check_permission(request, owner_name, error_msg, allow_root=False):
   """Raise PopupException if user doesn't have permission to modify the design"""
@@ -198,139 +110,110 @@ def _check_permission(request, owner_name, error_msg, allow_root=False):
     access_warn(request, error_msg)
     raise PopupException(_("Permission denied. You are not the owner."))
 
-
 def delete_design(request, design_id):
-  if request.method == 'POST':
-    try:
-      design_obj = _get_design(design_id)
-      _check_permission(request, design_obj.owner.username,
-                        _("Access denied: delete design %(id)s.") % {'id': design_id},
-                        allow_root=True)
-      design_obj.root_action.delete()
-      design_obj.delete()
+  if request.method != 'POST':
+    raise StructuredException(code="METHOD_NOT_ALLOWED_ERROR", message=_('Must be POST request.'), error_code=405)
 
-      submit.Submission(design_obj, request.fs).remove_deployment_dir()
-    except models.OozieDesign.DoesNotExist:
-      LOG.error("Trying to delete non-existent design (id %s)" % (design_id,))
-      raise PopupException(_("Workflow not found."))
+  try:
+    workflow = _get_design(design_id)
+    _check_permission(request, workflow.owner.username,
+                      _("Access denied: delete workflow %(id)s.") % {'id': design_id},
+                      allow_root=True)
+    Workflow.objects.destroy(workflow, request.fs)
 
-  return redirect(urlresolvers.reverse(list_designs))
+  except Workflow.DoesNotExist:
+    LOG.error("Trying to delete non-existent workflow (id %s)" % (design_id,))
+    raise StructuredException(code="NOT_FOUND", message=_('Could not find design.'), error_code=404)
+
+  return render_json({})
 
 
-def edit_design(request, design_id):
-  design_obj = _get_design(design_id)
-  _check_permission(request, design_obj.owner.username,
-                    _("Access denied: edit design %(id)s.") % {'id': design_id})
+def get_design(request, design_id):
+  workflow = _get_design(design_id)
+  _check_permission(request, workflow.owner.username, _("Access denied: edit design %(id)s.") % {'id': design_id})
+  node = workflow.start.get_child('to')
+  node_dict = model_to_dict(node)
+  node_dict['id'] = design_id
+  for key in node_dict:
+    if key not in JSON_FIELDS:
+      node_dict[key] = escapejs(node_dict[key])
+  node_dict['editable'] = True
+  return render_json(node_dict);
 
-  if request.method == 'POST':
-    form = jobsub.forms.design_form_by_instance(design_obj, request.POST)
-    if form.is_valid():
-      form.action.save()
-      form.wf.save()
-      return redirect(urlresolvers.reverse(list_designs))
-  else:
-    form = jobsub.forms.design_form_by_instance(design_obj)
 
-  return _render_design_edit(request,
-                               form,
-                               design_obj.root_action.action_type,
-                               _STD_PROPERTIES_JSON)
+def save_design(request, design_id):
+  workflow = _get_design(design_id)
+  _check_permission(request, workflow.owner.username, _("Access denied: edit design %(id)s.") % {'id': workflow.id})
+
+  ActionForm = design_form_by_type(request.POST.get('node_type', None), request.user, workflow)
+  form = ActionForm(request.POST)
+
+  if not form.is_valid():
+    raise StructuredException(code="INVALID_REQUEST_ERROR", message=_('Error saving design'), data={'errors': form.errors}, error_code=400)
+
+  data = format_dict_field_values(request.POST.copy())
+  sanitize_node_dict(data)
+  workflow.name = data['name']
+  workflow.description = data['description']
+  node = workflow.start.get_child('to').get_full_node()
+  node_id = node.id
+  for key in data:
+    setattr(node, key, data[key])
+  node.id = node_id
+  node.pk = node_id
+  node.save()
+  workflow.save()
+
+  data['id'] = workflow.id
+  return render_json(data);
+
+
+def new_design(request, node_type):
+  """
+  Designs are the interpolation of Workflows and a single action.
+  Save ``name`` and ``description`` of workflows.
+  Also, use ``id`` of workflows.
+  """
+  if request.method != 'POST':
+    raise StructuredException(code="METHOD_NOT_ALLOWED_ERROR", message=_('Must be POST request.'), error_code=405)
+
+  workflow = Workflow.objects.new_workflow(request.user)
+  ActionForm = design_form_by_type(node_type, request.user, workflow)
+  form = ActionForm(request.POST)
+
+  if not form.is_valid():
+    raise StructuredException(code="INVALID_REQUEST_ERROR", message=_('Error saving design'), data={'errors': form.errors}, error_code=400)
+
+  workflow.managed = False
+  workflow.save()
+  Workflow.objects.initialize(workflow, request.fs)
+  action = form.save(commit=False)
+  action.workflow = workflow
+  action.node_type = node_type
+  action.save()
+  workflow.start.add_node(action)
+  action.add_node(workflow.end)
+  workflow.name = request.POST.get('name')
+  workflow.description = request.POST.get('description')
+  workflow.save()
+
+  data = format_dict_field_values(request.POST.copy())
+  data['id'] = workflow.id
+  return render_json(data)
 
 
 def clone_design(request, design_id):
-  design_obj = _get_design(design_id)
-  clone = design_obj.clone(request.user)
-  return redirect(urlresolvers.reverse(edit_design, kwargs={'design_id': clone.id}))
-
-
-def get_design_params(request, design_id):
-  """
-  Return the parameters found in the design as a json dictionary of
-    { param_key : label }
-  This expects an ajax call.
-  """
-  design_obj = _get_design(design_id)
-  _check_permission(request, design_obj.owner.username,
-                    _("Access denied: design parameters %(id)s.") % {'id': design_id})
-  params = design_obj.find_parameters()
-  params_with_labels = dict((p, p.upper()) for p in params)
-  return render('dont_care_for_ajax', request, { 'params': params_with_labels })
-
-
-def submit_design(request, design_id):
-  """
-  Submit a workflow to Oozie.
-  The POST data should contain parameter values.
-  """
   if request.method != 'POST':
-    raise PopupException(_('Use a POST request to submit a design.'))
+    raise StructuredException(code="METHOD_NOT_ALLOWED_ERROR", message=_('Must be POST request.'), error_code=405)
 
-  design_obj = _get_design(design_id)
-  _check_permission(request, design_obj.owner.username,
-                    _("Access denied: submit design %(id)s.") % {'id': design_id})
+  workflow = _get_design(design_id)
+  clone = workflow.clone(request.fs, request.user)
+  cloned_action = clone.start.get_child('to')
+  cloned_action.name = clone.name
+  cloned_action.save()
 
-  # Expect the parameter mapping in the POST data
-  design_obj.bind_parameters(request.POST)
+  return get_design(request, clone.id)
 
-  try:
-    submission = submit.Submission(design_obj, request.fs)
-    jobid = submission.run()
-  except RestException, ex:
-    detail = ex.message
-    if 'urlopen error' in ex.message:
-      detail = '%s: %s' % (_('The Oozie server is not running'), detail)
-    raise PopupException(_("Error submitting design %(id)s.") % {'id': design_id}, detail=detail)
-  # Save the submission record
-  job_record = models.JobHistory(owner=request.user,
-                                 job_id=jobid,
-                                 design=design_obj)
-  job_record.save()
-
-  # Show oozie job info
-  return redirect(urlresolvers.reverse(oozie_job, kwargs={'jobid': jobid}))
-
-
-def setup(request):
-  """Installs jobsub examples."""
-  if request.method != "POST":
-    raise PopupException(_('Use a POST request to install the examples.'))
-  try:
-    # Warning: below will modify fs.user
-    jobsub_setup.Command().handle_noargs()
-  except WebHdfsException, e:
-    raise PopupException(_('The examples could not be installed.'), detail=e)
-  return redirect(urlresolvers.reverse(list_designs))
 
 def jasmine(request):
   return render('jasmine.mako', request, None)
-
-
-# See http://wiki.apache.org/hadoop/JobConfFile
-_STD_PROPERTIES = [
-  'mapred.input.dir',
-  'mapred.output.dir',
-  'mapred.job.name',
-  'mapred.job.queue.name',
-  'mapred.mapper.class',
-  'mapred.reducer.class',
-  'mapred.combiner.class',
-  'mapred.partitioner.class',
-  'mapred.map.tasks',
-  'mapred.reduce.tasks',
-  'mapred.input.format.class',
-  'mapred.output.format.class',
-  'mapred.input.key.class',
-  'mapred.input.value.class',
-  'mapred.output.key.class',
-  'mapred.output.value.class',
-  'mapred.mapoutput.key.class',
-  'mapred.mapoutput.value.class',
-  'mapred.combine.buffer.size',
-  'mapred.min.split.size',
-  'mapred.speculative.execution',
-  'mapred.map.tasks.speculative.execution',
-  'mapred.reduce.tasks.speculative.execution',
-  'mapred.queue.default.acl-administer-jobs',
-]
-
-_STD_PROPERTIES_JSON = json.dumps(_STD_PROPERTIES)

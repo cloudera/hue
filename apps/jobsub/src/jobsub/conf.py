@@ -22,6 +22,9 @@ from desktop.lib.conf import Config, coerce_bool
 from desktop.lib import paths
 from django.utils.translation import ugettext_lazy as _
 
+
+# Deprecated! To remove in Hue 3.
+# All of the config is now in Oozie app.
 REMOTE_DATA_DIR = Config(
   key="remote_data_dir",
   default="/user/hue/jobsub",

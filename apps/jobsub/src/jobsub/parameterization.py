@@ -31,6 +31,9 @@ and explicitly only supports two variables.
 TODO(philip): This also needs methods for simply
 indicating which variables need substitution, to
 prompt the user only for those.
+
+DEPRECATED!!!
+Jobsub uses oozie models now.
 """
 
 import logging

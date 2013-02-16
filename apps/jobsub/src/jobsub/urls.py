@@ -18,25 +18,19 @@
 from django.conf.urls.defaults import patterns, url
 
 urlpatterns = patterns(
-  'jobsub',
+  'jobsub.views',
 
   # The base view is the "list" view, which we alias as /
-  url(r'^$', 'views.list_designs'),
+  url(r'^$', 'list_designs'),
 
-  url(r'^list_designs$', 'views.list_designs'),
-  url(r'^new_design/(?P<action_type>\w+)$', 'views.new_design'),
-  url(r'^delete_design/(?P<design_id>\d+)$', 'views.delete_design'),
-  url(r'^edit_design/(?P<design_id>\d+)$', 'views.edit_design'),
-  url(r'^clone_design/(?P<design_id>\d+)$', 'views.clone_design'),
-  url(r'^submit_design/(?P<design_id>\d+)$', 'views.submit_design'),
-  url(r'^design_parameters/(?P<design_id>\d+)$', 'views.get_design_params'),
+  # Actions: get, save, clone, delete, submit, new.
+  url(r'^designs$', 'list_designs'),
+  url(r'^designs/(?P<design_id>\d+)$', 'get_design'),
+  url(r'^designs/(?P<node_type>\w+)/new$', 'new_design'),
+  url(r'^designs/(?P<design_id>\d+)/save$', 'save_design'),
+  url(r'^designs/(?P<design_id>\d+)/clone$', 'clone_design'),
+  url(r'^designs/(?P<design_id>\d+)/delete$', 'delete_design'),
 
-  url(r'^job/(?P<jobid>[-\w]+)$', 'views.oozie_job'),
-  url(r'^list_history$', 'views.list_history'),
-
-  # Setup
-  url(r'^setup/$', 'views.setup'),
-
-  # Jasmine
-  url(r'^jasmine', 'views.jasmine'),
+  # Jasmine - Skip until rewritten
+  # url(r'^jasmine', 'views.jasmine'),
 )

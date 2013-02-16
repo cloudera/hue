@@ -24,7 +24,7 @@ class SubmissionErrorRecastMiddleware(object):
   When this middleware sees a SubmissionError,
   it adds a response_data field to it.
 
-  We do this instead of "monkey-patching" a response_data 
+  We do this instead of "monkey-patching" a response_data
   property into SubmissionError.
   """
   def process_exception(self, request, exception):

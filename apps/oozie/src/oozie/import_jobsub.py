@@ -5,6 +5,7 @@ from jobsub.models import OozieDesign, OozieMapreduceAction, OozieStreamingActio
 
 from oozie.models import Mapreduce, Java, Streaming
 
+
 def convert_jobsub_design(jobsub_design):
   """Creates an oozie action from a jobsub design"""
   action = jobsub_design.get_root_action()

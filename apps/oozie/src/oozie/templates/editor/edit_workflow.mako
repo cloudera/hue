@@ -282,6 +282,16 @@ ${ layout.menubar(section='workflows') }
 <script src="/static/ext/js/jquery/plugins/jquery-ui-draggable-droppable-sortable-1.8.23.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/routie-0.3.0.min.js" type="text/javascript" charset="utf-8"></script>
 
+<link rel="stylesheet" href="/oozie/static/css/workflow.css">
+<script type="text/javascript" src="/oozie/static/js/workflow.utils.js"></script>
+<script type="text/javascript" src="/oozie/static/js/workflow.registry.js"></script>
+<script type="text/javascript" src="/oozie/static/js/workflow.modal.js"></script>
+<script type="text/javascript" src="/oozie/static/js/workflow.models.js"></script>
+<script type="text/javascript" src="/oozie/static/js/workflow.idgen.js"></script>
+<script type="text/javascript" src="/oozie/static/js/workflow.node-fields.js"></script>
+<script type="text/javascript" src="/oozie/static/js/workflow.node.js"></script>
+<script type="text/javascript" src="/oozie/static/js/workflow.js"></script>
+
 
 % for form_info in action_forms:
   ${ actions.action_form(action_form=form_info[1], node_type=form_info[0], template=True) }
@@ -397,9 +407,6 @@ ${ controls.decision_form(node_form, link_form, default_link_form, 'decision', T
 <script type="text/html" id="linkTemplate">
   <div class="node-link">&nbsp;</div>
 </script>
-
-<link rel="stylesheet" href="/oozie/static/css/workflow.css">
-<script type="text/javascript" src="/oozie/static/js/workflow.js"></script>
 
 <script type="text/javascript">
 /**

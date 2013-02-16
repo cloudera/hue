@@ -21,7 +21,7 @@ from south.v2 import SchemaMigration
 from django.db import models
 
 class Migration(SchemaMigration):
-    
+
     def forwards(self, orm):
         # Adding model 'JobDesign'
         db.create_table('jobsub_jobdesign', (
@@ -41,10 +41,10 @@ class Migration(SchemaMigration):
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
         ))
         db.send_create_signal('jobsub', ['CheckForSetup'])
-    
-    
+
+
     def backwards(self, orm):
-        
+
         # Deleting model 'ServerSubmissionState'
         db.delete_table('jobsub_serversubmissionstate')
 
@@ -56,8 +56,8 @@ class Migration(SchemaMigration):
 
         # Deleting model 'CheckForSetup'
         db.delete_table('jobsub_checkforsetup')
-    
-    
+
+
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},
@@ -111,5 +111,5 @@ class Migration(SchemaMigration):
             'type': ('django.db.models.fields.CharField', [], {'max_length': '128'})
         }
     }
-    
+
     complete_apps = ['jobsub']

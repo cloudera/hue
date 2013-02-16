@@ -238,8 +238,8 @@
             <%
             job_properties_field(action_form['job_properties'], {
               'name': 'job_properties',
-              'add': 'addProp',
-              'remove': '$parent.removeProp'
+              'add': 'addProperty',
+              'remove': '$parent.removeProperty'
             })
             %>
           % endif

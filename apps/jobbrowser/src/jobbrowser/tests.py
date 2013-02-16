@@ -23,6 +23,8 @@ import logging
 import time
 import unittest
 
+from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
 from nose.tools import assert_true, assert_false, assert_equal
 
 from desktop.lib.django_test_util import make_logged_in_client
@@ -30,15 +32,15 @@ from desktop.lib.test_utils import grant_access
 from hadoop import cluster
 from hadoop.conf import YARN_CLUSTERS
 from hadoop.yarn import resource_manager_api, mapreduce_api, history_server_api
-from jobsub.models import OozieDesign, CheckForSetup
 from liboozie.oozie_api_test import OozieServerProvider
+from oozie.models import Workflow
 
 from jobbrowser import models, views
 from jobbrowser.conf import SHARE_JOBS
 
 
 LOG = logging.getLogger(__name__)
-
+_INITIALIZED = False
 
 def test_dots_to_camel_case():
   assert_equal("fooBar", models.dots_to_camel_case("foo.bar"))
@@ -84,17 +86,7 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
       cls.cluster.fs.do_as_superuser(cls.cluster.fs.mkdir, "/tmp")
     cls.cluster.fs.do_as_superuser(cls.cluster.fs.chmod, "/tmp", 0777)
 
-    # Install examples
-    import jobsub.management.commands.jobsub_setup as jobsub_setup
-    if not jobsub_setup.Command().has_been_setup():
-      jobsub_setup.Command().handle()
 
-    cls.sleep_design_id = OozieDesign.objects.get(name='sleep_job').id
-
-  @classmethod
-  def teardown_class(cls):
-    OozieDesign.objects.all().delete()
-    CheckForSetup.objects.all().delete()
 
   def setUp(self):
     TestJobBrowserWithHadoop.user_count += 1
@@ -108,18 +100,51 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
     self.client = make_logged_in_client(username=self.username, is_superuser=False, groupname='test')
     grant_access(self.username, 'test', 'jobsub')
     grant_access(self.username, 'test', 'jobbrowser')
+    grant_access(self.username, 'test', 'oozie')
 
     # Ensure access to MR folder
     self.cluster.fs.do_as_superuser(self.cluster.fs.chmod, '/tmp', 0777, recursive=True)
 
     self.cluster.fs.setuser(self.username)
 
+    self.install_examples()
+    self.design = self.create_design()
+
   def tearDown(self):
     try:
+      Workflow.objects.all().delete()
       # Remove user home directories.
       self.cluster.fs.do_as_superuser(self.cluster.fs.rmtree, self.home_dir)
     except:
       pass
+
+  def create_design(self):
+    response = self.client.post(reverse('jobsub.views.new_design',
+      kwargs={'node_type': 'mapreduce'}),
+      data={'name': 'sleep_job',
+            'description': '',
+            'node_type': 'mapreduce',
+            'jar_path': '/user/hue/oozie/workspaces/lib/hadoop-examples.jar',
+            'prepares': '[]',
+            'files': '[]',
+            'archives': '[]',
+            'job_properties': '[{\"name\":\"mapred.reduce.tasks\",\"value\":\"1\"},{\"name\":\"mapred.mapper.class\",\"value\":\"org.apache.hadoop.examples.SleepJob\"},{\"name\":\"mapred.reducer.class\",\"value\":\"org.apache.hadoop.examples.SleepJob\"},{\"name\":\"mapred.mapoutput.key.class\",\"value\":\"org.apache.hadoop.io.IntWritable\"},{\"name\":\"mapred.mapoutput.value.class\",\"value\":\"org.apache.hadoop.io.NullWritable\"},{\"name\":\"mapred.output.format.class\",\"value\":\"org.apache.hadoop.mapred.lib.NullOutputFormat\"},{\"name\":\"mapred.input.format.class\",\"value\":\"org.apache.hadoop.examples.SleepJob$SleepInputFormat\"},{\"name\":\"mapred.partitioner.class\",\"value\":\"org.apache.hadoop.examples.SleepJob\"},{\"name\":\"mapred.speculative.execution\",\"value\":\"false\"},{\"name\":\"sleep.job.map.sleep.time\",\"value\":\"0\"},{\"name\":\"sleep.job.reduce.sleep.time\",\"value\":\"${REDUCER_SLEEP_TIME}\"}]'},
+      HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+    assert_equal(response.status_code, 200)
+    return Workflow.objects.all()[0]
+
+  def install_examples(self):
+    global _INITIALIZED
+    if _INITIALIZED:
+      return
+
+    self.client.post(reverse('oozie:setup_app'))
+    self.cluster.fs.do_as_user(self.username, self.cluster.fs.create_home_dir, self.home_dir)
+    self.cluster.fs.do_as_superuser(self.cluster.fs.chmod, self.home_dir, 0777, True)
+    hue = User.objects.create_user('hue', 'hue' + '@localhost', 'hue')
+    Workflow.objects.update(owner=hue)
+
+    _INITIALIZED = True
 
   def test_uncommon_views(self):
     """
@@ -145,25 +170,34 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
     except:
         # rmtree probably failed here.
         pass
-    response = self.client.post('/jobsub/new_design/mapreduce', {
-        'wf-name': ['test_failed_jobs-1'],
-        'wf-description': ['description test_failed_jobs-1'],
-        'action-args': [''],
-        'action-jar_path': ['/user/hue/jobsub/examples/hadoop-examples.jar'],
-        'action-archives': ['[]'],
-        'action-job_properties': ['[{"name":"mapred.input.dir","value":"%s"},\
+    response = self.client.post(reverse('jobsub.views.new_design', kwargs={'node_type': 'mapreduce'}), {
+        'name': ['test_failed_jobs-1'],
+        'description': ['description test_failed_jobs-1'],
+        'args': '',
+        'jar_path': '/user/hue/oozie/workspaces/lib/hadoop-examples.jar',
+        'prepares': '[]',
+        'archives': '[]',
+        'files': '[]',
+        'job_properties': ['[{"name":"mapred.input.dir","value":"%s"},\
             {"name":"mapred.output.dir","value":"%s"},\
             {"name":"mapred.mapper.class","value":"org.apache.hadoop.mapred.lib.dne"},\
             {"name":"mapred.combiner.class","value":"org.apache.hadoop.mapred.lib.dne"},\
-            {"name":"mapred.reducer.class","value":"org.apache.hadoop.mapred.lib.dne"}]' % (INPUT_DIR, OUTPUT_DIR)],
-        'action-files': ['[]']}, follow=True)
-    designs = json.loads(response.context['designs'])
+            {"name":"mapred.reducer.class","value":"org.apache.hadoop.mapred.lib.dne"}]' % (INPUT_DIR, OUTPUT_DIR)]
+        }, HTTP_X_REQUESTED_WITH='XMLHttpRequest', follow=True)
 
     # Submit the job
-    design_id = designs[0]['id']
-    response = self.client.post("/jobsub/submit_design/%d" % design_id, follow=True)
-    oozie_jobid = response.context['jobid']
-    OozieServerProvider.wait_until_completion(oozie_jobid, timeout=500, step=1)
+    design_dict = json.loads(response.content)
+    design_id = int(design_dict['id'][0])
+    response = self.client.post(reverse('oozie:submit_workflow',
+                                args=[design_id]),
+                                data={u'form-MAX_NUM_FORMS': [u''],
+                                      u'form-INITIAL_FORMS': [u'1'],
+                                      u'form-0-name': [u'REDUCER_SLEEP_TIME'],
+                                      u'form-0-value': [u'1'],
+                                      u'form-TOTAL_FORMS': [u'1']},
+                                follow=True)
+    oozie_jobid = response.context['oozie_workflow'].id
+    job = OozieServerProvider.wait_until_completion(oozie_jobid, timeout=120, step=1)
     hadoop_job_id = get_hadoop_job_id(self.oozie, oozie_jobid, 1)
     hadoop_job_id_short = views.get_shorter_id(hadoop_job_id)
 
@@ -203,20 +237,17 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
     """
     Test job in kill state.
     """
-    # Clone design
-    assert_equal(0, OozieDesign.objects.filter(owner__username=self.username).count())
-    self.client.post('/jobsub/clone_design/%d' % self.sleep_design_id)
-    assert_equal(1, OozieDesign.objects.filter(owner__username=self.username).count())
-
     # Run the sleep example, since it doesn't require user home directory
-    design_id = OozieDesign.objects.get(owner__username=self.username).id
-    response = self.client.post("/jobsub/submit_design/%d" % (design_id,),
-      dict(map_sleep_time=1,
-           num_maps=1,
-           num_reduces=1,
-           reduce_sleep_time=1),
-      follow=True)
-    oozie_jobid = response.context['jobid']
+    design_id = self.design.id
+    response = self.client.post(reverse('oozie:submit_workflow',
+                                args=[self.design.id]),
+                                data={u'form-MAX_NUM_FORMS': [u''],
+                                      u'form-INITIAL_FORMS': [u'1'],
+                                      u'form-0-name': [u'REDUCER_SLEEP_TIME'],
+                                      u'form-0-value': [u'1'],
+                                      u'form-TOTAL_FORMS': [u'1']},
+                                follow=True)
+    oozie_jobid = response.context['oozie_workflow'].id
 
     # Wait for a job to be created and fetch job ID
     hadoop_job_id = get_hadoop_job_id(self.oozie, oozie_jobid, 1)
@@ -292,21 +323,18 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
     The status of the jobs should be the same as the status reported back by oozie.
     In this case, all jobs should succeed.
     """
-    # Clone design
-    assert_equal(0, OozieDesign.objects.filter(owner__username=self.username).count())
-    self.client.post('/jobsub/clone_design/%d' % self.sleep_design_id)
-    assert_equal(1, OozieDesign.objects.filter(owner__username=self.username).count())
-
     # Run the sleep example, since it doesn't require user home directory
-    design_id = OozieDesign.objects.get(owner__username=self.username).id
-    response = self.client.post("/jobsub/submit_design/%d" % (design_id,),
-      dict(map_sleep_time=1,
-           num_maps=1,
-           num_reduces=1,
-           reduce_sleep_time=1),
-      follow=True)
-    oozie_jobid = response.context['jobid']
-    job = OozieServerProvider.wait_until_completion(oozie_jobid, timeout=120, step=1)
+    design_id = self.design.id
+    response = self.client.post(reverse('oozie:submit_workflow',
+                                args=[design_id]),
+                                data={u'form-MAX_NUM_FORMS': [u''],
+                                      u'form-INITIAL_FORMS': [u'1'],
+                                      u'form-0-name': [u'REDUCER_SLEEP_TIME'],
+                                      u'form-0-value': [u'1'],
+                                      u'form-TOTAL_FORMS': [u'1']},
+                                follow=True)
+    oozie_jobid = response.context['oozie_workflow'].id
+    OozieServerProvider.wait_until_completion(oozie_jobid, timeout=120, step=1)
     hadoop_job_id = get_hadoop_job_id(self.oozie, oozie_jobid, 1)
     hadoop_job_id_short = views.get_shorter_id(hadoop_job_id)
 
@@ -371,10 +399,10 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
     # We can't just check the complete contents of the python map because the
     # SLOTS_MILLIS_* entries have a variable number of milliseconds from
     # run-to-run.
-    assert_equal(response.context['job'].counters['org.apache.hadoop.mapreduce.JobCounter']['counters']['TOTAL_LAUNCHED_MAPS']['total'], 1)
-    assert_equal(response.context['job'].counters['org.apache.hadoop.mapreduce.JobCounter']['counters']['TOTAL_LAUNCHED_REDUCES']['total'], 1)
-    assert_equal(response.context['job'].counters['org.apache.hadoop.mapreduce.JobCounter']['counters']['FALLOW_SLOTS_MILLIS_MAPS']['total'], 0)
-    assert_equal(response.context['job'].counters['org.apache.hadoop.mapreduce.JobCounter']['counters']['FALLOW_SLOTS_MILLIS_REDUCES']['total'], 0)
+    assert_equal(response.context['job'].counters['org.apache.hadoop.mapreduce.JobCounter']['counters']['TOTAL_LAUNCHED_MAPS']['total'], 2L)
+    assert_equal(response.context['job'].counters['org.apache.hadoop.mapreduce.JobCounter']['counters']['TOTAL_LAUNCHED_REDUCES']['total'], 1L)
+    assert_equal(response.context['job'].counters['org.apache.hadoop.mapreduce.JobCounter']['counters']['FALLOW_SLOTS_MILLIS_MAPS']['total'], 0L)
+    assert_equal(response.context['job'].counters['org.apache.hadoop.mapreduce.JobCounter']['counters']['FALLOW_SLOTS_MILLIS_REDUCES']['total'], 0L)
     assert_true(response.context['job'].counters['org.apache.hadoop.mapreduce.JobCounter']['counters']['SLOTS_MILLIS_MAPS']['total'] > 0)
     assert_true(response.context['job'].counters['org.apache.hadoop.mapreduce.JobCounter']['counters']['SLOTS_MILLIS_REDUCES']['total'] > 0)
 

@@ -268,7 +268,10 @@ class OozieBase(OozieServerProvider):
     self.c.post(reverse('oozie:setup_app'))
     self.cluster.fs.do_as_user('test', self.cluster.fs.create_home_dir, '/user/test')
     self.cluster.fs.do_as_superuser(self.cluster.fs.chmod, '/user/test', 0777, True)
-    hue = User.objects.create_user('hue', 'hue' + '@localhost', 'hue')
+    try:
+      hue = User.objects.get(username='hue')
+    except User.DoesNotExist:
+      hue = User.objects.create_user('hue', 'hue' + '@localhost', 'hue')
     Workflow.objects.update(owner=hue)
 
     _INITIALIZED = True
@@ -2517,6 +2520,7 @@ def create_workflow(client, workflow_dict=WORKFLOW_DICT):
 
   wf = Workflow.objects.get(name=name)
   assert_not_equal('', wf.deployment_dir)
+  assert_true(wf.managed)
 
   return wf
 

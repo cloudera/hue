@@ -33,13 +33,13 @@ from jobsub.models import JobDesign, OozieJavaAction, OozieStreamingAction, Oozi
 LOG = logging.getLogger(__name__)
 
 class Migration(SchemaMigration):
-    
+
     def forwards(self, orm):
         """
         Added custom transaction processing for transactional DBMS.
         If a DDL operation fails, the entire transaction fails and all future commands are ignored.
         """
-        
+
         # Adding model 'OozieStreamingAction'
         db.create_table('jobsub_ooziestreamingaction', (
             ('oozieaction_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['jobsub.OozieAction'], unique=True, primary_key=True)),
@@ -104,7 +104,7 @@ class Migration(SchemaMigration):
 
         # Adding field 'CheckForSetup.setup_level'
         db.add_column('jobsub_checkforsetup', 'setup_level', self.gf('django.db.models.fields.IntegerField')(default=0), keep_default=False)
-    
+
         # The next sequence may fail... so they should have their own transactions.
         db.commit_transaction()
 
@@ -129,7 +129,7 @@ class Migration(SchemaMigration):
         db.start_transaction()
 
     def backwards(self, orm):
-        
+
         # Deleting model 'OozieStreamingAction'
         db.delete_table('jobsub_ooziestreamingaction')
 
@@ -150,8 +150,8 @@ class Migration(SchemaMigration):
 
         # Deleting field 'CheckForSetup.setup_level'
         db.delete_column('jobsub_checkforsetup', 'setup_level')
-    
-    
+
+
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},
@@ -256,6 +256,6 @@ class Migration(SchemaMigration):
             'root_action': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['jobsub.OozieAction']"})
         }
     }
-    
+
     complete_apps = ['jobsub']
 

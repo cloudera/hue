@@ -1,0 +1,66 @@
+<div id="sqoop" class="container-fluid">
+  <h1>{{ title }}</h1>
+  <form class="form-horizontal" id="workflowForm" action="#list-designs" method="POST">
+    <fieldset>
+      <div class="control-group" rel="popover" data-original-title="{{ name.name }}" data-content="{{ name.popover }}" data-bind="attr: {'class': ( errors.name().length > 0 ) ? 'control-group error' : 'control-group'}">
+        <label class="control-label">{{ name.name }}</label>
+        <div class="controls">
+          <input id="sqoop-name" type="text" name="name" data-bind="value: name" />
+          <ul class="help-inline" data-bind="foreach: errors.name()">
+            <li class="error" data-bind="html: $data"></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="control-group" rel="popover" data-original-title="{{ description.name }}" data-content="{{ description.popover }}" data-bind="attr: {'class': ( errors.description().length > 0 ) ? 'control-group error' : 'control-group'}">
+        <label class="control-label">{{ description.name }}</label>
+        <div class="controls">
+          <input id="sqoop-description" type="text" name="description" data-bind="value: description" />
+          <ul class="help-inline" data-bind="foreach: errors.description()">
+            <li class="error" data-bind="html: $data"></li>
+          </ul>
+        </div>
+      </div>
+
+      <hr/>
+
+      <div class="control-group">
+        <p class="alert alert-info">{{ alert }}</p>
+      </div>
+
+      <div class="control-group" rel="popover" data-original-title="{{ script_path.name }}" data-content="{{ script_path.popover }}" data-bind="attr: {'class': ( errors.script_path().length > 0 ) ? 'control-group error' : 'control-group'}">
+        <label class="control-label">{{ script_path.name }}</label>
+        <div class="controls">
+          <textarea id="sqoop-script-path" type="text" name="script-path" data-bind="value: script_path"></textarea>
+          <ul class="help-inline" data-bind="foreach: errors.script_path()">
+            <li class="error" data-bind="html: $data"></li>
+          </ul>
+        </div>
+      </div>
+
+      {{#prepares}}
+        {{>prepares}}
+      {{/prepares}}
+
+      {{#params}}
+        {{>params}}
+      {{/params}}
+
+      {{#job_properties}}
+        {{>job_properties}}
+      {{/job_properties}}
+
+      {{#files}}
+        {{>files}}
+      {{/files}}
+
+      {{#archives}}
+        {{>archives}}
+      {{/archives}}
+    </fieldset>
+    <div class="form-actions">
+      <button data-bind="click: {{ save.func }}" class="btn btn-primary">{{ save.name }}</button>
+      <a href="javascript:void(0);" data-bind="click: {{ cancel.func }}" class="btn">{{ cancel.name }}</a>
+    </div>
+  </form>
+</div>

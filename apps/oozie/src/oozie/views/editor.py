@@ -55,7 +55,7 @@ LOG = logging.getLogger(__name__)
 
 def list_workflows(request):
   show_setup_app = True
-  data = Workflow.objects
+  data = Workflow.objects.filter(managed=True)
 
   if not SHARE_JOBS.get() and not request.user.is_superuser:
     data = data.filter(owner=request.user)
@@ -113,6 +113,7 @@ def create_workflow(request):
 
     if workflow_form.is_valid():
       wf = workflow_form.save()
+      wf.managed = True
       Workflow.objects.initialize(wf, request.fs)
       return redirect(reverse('oozie:edit_workflow', kwargs={'workflow': workflow.id}))
     else:

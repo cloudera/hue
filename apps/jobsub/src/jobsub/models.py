@@ -91,6 +91,10 @@ PATH_MAX = 512
 
 class OozieAction(models.Model):
   """
+  DEPRECATED!!!
+      This is the old Hue 2.0/2.1 job design model. In Hue 2.2 and newer,
+      Oozie models are used.
+
   The OozieAction model is an abstract base class. All concrete actions
   derive from it. And it provides something for the OozieDesign to
   reference. See
@@ -119,6 +123,10 @@ class OozieAction(models.Model):
 
 class OozieDesign(models.Model):
   """
+  DEPRECATED!!!
+      This is the old Hue 2.0/2.1 job design model. In Hue 2.2 and newer,
+      Oozie models are used.
+
   Contains information about all (Oozie) designs. Specific action info are
   stored in the Oozie*Action models.
   """
@@ -174,6 +182,10 @@ class OozieDesign(models.Model):
 
 class OozieMapreduceAction(OozieAction):
   """
+  DEPRECATED!!!
+      This is the old Hue 2.0/2.1 job design model. In Hue 2.2 and newer,
+      Oozie models are used.
+
   Stores MR actions
   """
   PARAM_FIELDS = ('files', 'archives', 'job_properties', 'jar_path')
@@ -193,6 +205,10 @@ class OozieMapreduceAction(OozieAction):
 
 class OozieStreamingAction(OozieAction):
   """
+  DEPRECATED!!!
+      This is the old Hue 2.0/2.1 job design model. In Hue 2.2 and newer,
+      Oozie models are used.
+
   This is still an MR action from Oozie's perspective. But the data modeling is
   slightly different.
 
@@ -214,6 +230,10 @@ class OozieStreamingAction(OozieAction):
 
 class OozieJavaAction(OozieAction):
   """
+  DEPRECATED!!!
+      This is the old Hue 2.0/2.1 job design model. In Hue 2.2 and newer,
+      Oozie models are used.
+
   Definition of Java actions
   """
   PARAM_FIELDS = ('files', 'archives', 'jar_path', 'main_class', 'args',
@@ -236,6 +256,10 @@ class OozieJavaAction(OozieAction):
 
 class JobHistory(models.Model):
   """
+  DEPRECATED!!!
+      This is the old Hue 2.0/2.1 job design model. In Hue 2.2 and newer,
+      Oozie models are used.
+
   Contains informatin on submitted jobs/workflows.
   """
   owner = models.ForeignKey(User)
