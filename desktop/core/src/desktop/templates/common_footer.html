@@ -36,11 +36,35 @@ limitations under the License.
         // can be disabled adding the class "disable-feedback" to the button
         $(document).on("click", ".btn-primary:not(.disable-feedback), .btn-danger:not(.disable-feedback)", function () {
           if (!$(this).hasClass('disabled')) {
-            var text = ($(this).text()) ? $(this).text() : $(this).val();
+            var text = ($(this).text() != "") ? $(this).text() : $(this).val();
             $(this).attr("data-loading-text", text + " ...");
             $(this).button("loading");
+            startPendingRequestsPolling();
           }
         });
+
+        var pendingRequestsInterval = -1;
+
+        function startPendingRequestsPolling() {
+          pendingRequestsInterval = window.setInterval(function () {
+            var activeRequests = 0;
+            if (jQuery.ajax.active) {
+              activeRequests = jQuery.ajax.active;
+            }
+            else {
+              activeRequests = jQuery.active;
+            }
+            if (activeRequests == 0) {
+              $(".btn-primary:not(.disable-feedback), .btn-danger:not(.disable-feedback)").button("reset");
+              window.clearInterval(pendingRequestsInterval);
+            }
+          }, 500);
+        }
+
+        $(document).on("hidden", ".modal", function () {
+          $(".btn-primary:not(.disable-feedback), .btn-danger:not(.disable-feedback)").button("reset");
+        });
+
       });
     </script>
 
