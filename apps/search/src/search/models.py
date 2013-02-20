@@ -127,7 +127,7 @@ class Core(models.Model):
     return self.facets.get_query_params()
 
   def get_absolute_url(self):
-    return reverse('search:admin_core', kwargs={'core': self.name})
+    return reverse('search:admin_core_properties', kwargs={'core': self.name})
 
   @property
   def fields(self):

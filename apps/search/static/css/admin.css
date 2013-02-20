@@ -1,0 +1,17 @@
+.sidebar-nav {
+  padding: 9px 0;
+}
+
+#content-editor {
+  border: 1px dotted #DDD;
+}
+
+.availableFields ul {
+  list-style: none outside none;
+  padding: 0;
+  margin: 0;
+}
+
+.availableFields ul li {
+  cursor: pointer;
+}

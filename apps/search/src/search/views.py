@@ -58,12 +58,12 @@ def index(request):
     response = SolrApi(SOLR_URL.get()).query(solr_query, hue_core)
 
   return render('index.mako', request, {
-                    'search_form': search_form,
-                    'response': response,
-                    'solr_query': solr_query,
-                    'hue_core': hue_core,
-                    'rr': json.dumps(response),
-                })
+    'search_form': search_form,
+    'response': response,
+    'solr_query': solr_query,
+    'hue_core': hue_core,
+    'rr': json.dumps(response),
+  })
 
 
 @allow_admin_only
@@ -73,41 +73,53 @@ def admin(request):
   hue_cores = Core.objects.all()
 
   return render('admin.mako', request, {
-                    'cores': cores,
-                    'hue_cores': hue_cores,
-                })
+    'cores': cores,
+    'hue_cores': hue_cores,
+  })
+
 
 @allow_admin_only
-def admin_settings(request):
-  cores = SolrApi(SOLR_URL.get()).cores()
-  hue_cores = Core.objects.all()
-
-  return render('admin_settings.mako', request, {
-                    'cores': cores,
-                    'hue_cores': hue_cores,
-                })
-
-@allow_admin_only
-def admin_core(request, core):
+def admin_core_properties(request, core):
   solr_core = SolrApi(SOLR_URL.get()).core(core)
+  hue_core = Core.objects.get(name=core)
+
+  return render('admin_core_properties.mako', request, {
+    'solr_core': solr_core,
+    'hue_core': hue_core,
+  })
+
+
+@allow_admin_only
+def admin_core_schema(request, core):
   solr_schema = SolrApi(SOLR_URL.get()).schema(core)
   hue_core = Core.objects.get(name=core)
+  return render('admin_core_schema.mako', request, {
+    'solr_schema': solr_schema,
+    'hue_core': hue_core,
+  })
 
-  return render('admin_core.mako', request, {
-                    'solr_core': solr_core,
-                    'solr_schema': solr_schema,
-                    'hue_core': hue_core,
-                })
 
 @allow_admin_only
-def admin_core_result(request, core):
+def admin_core_template(request, core):
   solr_core = SolrApi(SOLR_URL.get()).core(core)
   hue_core = Core.objects.get(name=core)
 
-  return render('admin_core_result.mako', request, {
-                    'solr_core': solr_core,
-                    'hue_core': hue_core,
-                })
+  solr_query = {}
+  solr_query['core'] = core
+  solr_query['q'] = ''
+  solr_query['fq'] = ''
+  solr_query['rows'] = 10
+  solr_query['start'] = 0
+  solr_query['facets'] = 0
+
+  response = SolrApi(SOLR_URL.get()).query(solr_query, hue_core)
+
+  return render('admin_core_template.mako', request, {
+    'solr_core': solr_core,
+    'hue_core': hue_core,
+    'sample_data': json.dumps(response["response"]["docs"]),
+  })
+
 
 @allow_admin_only
 def admin_core_facets(request, core):
@@ -121,9 +133,10 @@ def admin_core_facets(request, core):
     request.info(_('Facets updated'))
 
   return render('admin_core_facets.mako', request, {
-                    'solr_core': solr_core,
-                    'hue_core': hue_core,
-                })
+    'solr_core': solr_core,
+    'hue_core': hue_core,
+  })
+
 
 @allow_admin_only
 def admin_core_sorting(request, core):
@@ -131,6 +144,6 @@ def admin_core_sorting(request, core):
   hue_core = Core.objects.get(name=core)
 
   return render('admin_core_sorting.mako', request, {
-                    'solr_core': solr_core,
-                    'hue_core': hue_core,
-                })
+    'solr_core': solr_core,
+    'hue_core': hue_core,
+  })
