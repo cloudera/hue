@@ -113,11 +113,13 @@ class QueryHistory(models.Model):
       return self.query
 
   def is_finished(self):
+    is_statement_finished = not self.is_running()
+
     if self.design is not None:
       design = self.design.get_design()
-      return self.is_success() and self.statement_number + 1 == design.statement_count
+      return is_statement_finished and self.statement_number + 1 == design.statement_count # Last statement
     else:
-      return self.is_success()
+      return is_statement_finished
 
   def is_running(self):
     return self.last_state in (QueryHistory.STATE.running.index, QueryHistory.STATE.submitted.index)
