@@ -412,7 +412,7 @@ ${ layout.menubar(section='dashboard') }
           $("#kill-btn").hide();
           $("#rerun-btn").show();
         }
-        
+
         if (data.id && data.status == "KILLED") {
           $("#kill-btn").hide();
         }

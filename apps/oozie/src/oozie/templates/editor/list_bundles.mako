@@ -66,7 +66,7 @@ ${ layout.menubar(section='bundles') }
                   data-submit-url="${ url('oozie:submit_bundle', bundle=bundle.id) }"
               % endif
               % if bundle.is_editable(currentuser):
-                  data-delete-url="${ url('oozie:delete_bundle', bundle=bundle.id) }"
+                  data-delete-id="${ bundle.id }"
               % endif
               >
             </div>
@@ -100,22 +100,32 @@ ${ layout.menubar(section='bundles') }
 <div id="submit-job-modal" class="modal hide"></div>
 
 <div id="delete-job" class="modal hide">
-  <form id="deleteWfForm" action="" method="POST">
+  <form id="deleteWfForm" action="${ url('oozie:delete_bundle') }" method="POST">
     <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3 id="deleteWfMessage">${ _('Delete this bundle?') }</h3>
+      <h3 id="deleteWfMessage">${ _('Delete the selected bundle(s)?') }</h3>
     </div>
     <div class="modal-footer">
       <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>
       <input type="submit" class="btn btn-danger" value="${ _('Yes') }"/>
     </div>
+    <div class="hide">
+      <select name="job_selection" data-bind="options: availableJobs, selectedOptions: chosenJobs" size="5" multiple="true"></select>
+    </div>
   </form>
 </div>
 
 <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/knockout-2.1.0.js" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript" charset="utf-8">
   $(document).ready(function () {
+    var viewModel = {
+        availableJobs : ko.observableArray(${ json_jobs | n }),
+        chosenJobs : ko.observableArray([])
+    };
+
+    ko.applyBindings(viewModel);
 
     $(".selectAll").click(function () {
       if ($(this).attr("checked")) {
@@ -147,7 +157,6 @@ ${ layout.menubar(section='bundles') }
         var action_buttons = [
           ['#submit-btn', 'data-submit-url'],
           ['#bundle-btn', 'data-bundle-url'],
-          ['#delete-btn', 'data-delete-url'],
           ['#clone-btn', 'data-clone-url']
         ];
         $.each(action_buttons, function (index) {
@@ -158,13 +167,17 @@ ${ layout.menubar(section='bundles') }
           }
         });
       }
+      var can_delete = $(".hueCheckbox[checked='checked'][data-delete-id]");
+      if (can_delete.length >= 1 && can_delete.length == selector.length) {
+        $("#delete-btn").removeAttr("disabled");
+      }
     }
 
     $("#delete-btn").click(function (e) {
-      var _this = $(".hueCheckbox[checked='checked']");
-      var _action = _this.attr("data-delete-url");
-      $("#deleteWfForm").attr("action", _action);
-      $("#deleteWfMessage").text(_this.attr("alt"));
+      viewModel.chosenJobs.removeAll();
+      $(".hueCheckbox[checked='checked']").each(function( index ) {
+        viewModel.chosenJobs.push($(this).data("delete-id"));
+      });
       $("#delete-job").modal("show");
     });
 

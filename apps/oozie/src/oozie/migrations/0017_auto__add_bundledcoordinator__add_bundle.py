@@ -5,9 +5,9 @@ from south.v2 import SchemaMigration
 from django.db import models
 
 class Migration(SchemaMigration):
-    
+
     def forwards(self, orm):
-        
+
         # Adding model 'BundledCoordinator'
         db.create_table('oozie_bundledcoordinator', (
             ('coordinator', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['oozie.Coordinator'])),
@@ -23,17 +23,17 @@ class Migration(SchemaMigration):
             ('job_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['oozie.Job'], unique=True, primary_key=True)),
         ))
         db.send_create_signal('oozie', ['Bundle'])
-    
-    
+
+
     def backwards(self, orm):
-        
+
         # Deleting model 'BundledCoordinator'
         db.delete_table('oozie_bundledcoordinator')
 
         # Deleting model 'Bundle'
         db.delete_table('oozie_bundle')
-    
-    
+
+
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},
@@ -329,5 +329,5 @@ class Migration(SchemaMigration):
             'start': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'start_workflow'", 'null': 'True', 'to': "orm['oozie.Start']"})
         }
     }
-    
+
     complete_apps = ['oozie']

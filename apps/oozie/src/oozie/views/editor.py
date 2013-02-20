@@ -43,7 +43,7 @@ from oozie.import_workflow import import_workflow as _import_workflow
 from oozie.management.commands import oozie_setup
 from oozie.models import Workflow, History, Coordinator,\
                          Dataset, DataInput, DataOutput,\
-                         ACTION_TYPES, Bundle, BundledCoordinator
+                         ACTION_TYPES, Bundle, BundledCoordinator, Job
 from oozie.forms import WorkflowForm, CoordinatorForm, DatasetForm,\
   DataInputForm, DataOutputForm, LinkForm,\
   DefaultLinkForm, design_form_by_type, ParameterForm,\
@@ -66,6 +66,7 @@ def list_workflows(request):
 
   return render('editor/list_workflows.mako', request, {
     'jobs': list(data),
+    'json_jobs': json.dumps(list(data.values_list('id', flat=True))),
     'currentuser': request.user,
     'show_setup_app': show_setup_app,
   })
@@ -85,6 +86,7 @@ def list_coordinators(request, workflow_id=None):
 
   return render('editor/list_coordinators.mako', request, {
     'jobs': list(data),
+    'json_jobs': json.dumps(list(data.values_list('id', flat=True))),
     'currentuser': request.user,
   })
 
@@ -101,6 +103,7 @@ def list_bundles(request):
 
   return render('editor/list_bundles.mako', request, {
     'jobs': list(data),
+    'json_jobs': json.dumps(list(data.values_list('id', flat=True))),
     'currentuser': request.user,
   })
 
@@ -181,14 +184,19 @@ def edit_workflow(request, workflow):
   })
 
 
-@check_job_access_permission()
-@check_job_edition_permission()
-def delete_workflow(request, workflow):
+
+def delete_workflow(request):
   if request.method != 'POST':
     raise PopupException(_('A POST request is required.'))
 
-  Workflow.objects.destroy(workflow, request.fs)
-  request.info(_('Workflow deleted.'))
+  job_ids = request.POST.getlist('job_selection')
+
+  for job_id in job_ids:
+    job = Job.objects.is_accessible_or_exception(request, job_id)
+    Job.objects.can_edit_or_exception(request, job)
+    Workflow.objects.destroy(job, request.fs)
+
+  request.info(_('Workflow(s) deleted.'))
 
   return redirect(reverse('oozie:list_workflows'))
 
@@ -283,15 +291,19 @@ def create_coordinator(request, workflow=None):
   })
 
 
-@check_job_access_permission()
-@check_job_edition_permission()
-def delete_coordinator(request, coordinator):
+def delete_coordinator(request):
   if request.method != 'POST':
     raise PopupException(_('A POST request is required.'))
 
-  coordinator.delete()
-  Submission(request.user, coordinator, request.fs, {}).remove_deployment_dir()
-  request.info(_('Coordinator deleted.'))
+  job_ids = request.POST.getlist('job_selection')
+
+  for job_id in job_ids:
+    job = Job.objects.is_accessible_or_exception(request, job_id)
+    Job.objects.can_edit_or_exception(request, job)
+    Submission(request.user, job, request.fs, {}).remove_deployment_dir()
+    job.delete()
+
+  request.info(_('Coordinator(s) deleted.'))
 
   return redirect(reverse('oozie:list_coordinators'))
 
@@ -526,15 +538,20 @@ def create_bundle(request):
   })
 
 
-@check_job_access_permission()
-@check_job_edition_permission()
-def delete_bundle(request, bundle):
+
+def delete_bundle(request):
   if request.method != 'POST':
     raise PopupException(_('A POST request is required.'))
 
-  bundle.delete()
-  Submission(request.user, bundle, request.fs, {}).remove_deployment_dir()
-  request.info(_('Bundle deleted.'))
+  job_ids = request.POST.getlist('job_selection')
+
+  for job_id in job_ids:
+    job = Job.objects.is_accessible_or_exception(request, job_id)
+    Job.objects.can_edit_or_exception(request, job)
+    Submission(request.user, job, request.fs, {}).remove_deployment_dir()
+    job.delete()
+
+  request.info(_('Bundle(s) deleted.'))
 
   return redirect(reverse('oozie:list_bundles'))
 

@@ -1003,6 +1003,10 @@ class TestEditor(OozieMockBase):
     assert_not_equal(coord.deployment_dir, coord2.deployment_dir)
     assert_not_equal('', coord2.deployment_dir)
 
+    # Bulk delete
+    response = self.c.post(reverse('oozie:delete_coordinator'), {'job_selection': [coord.id, coord2.id]}, follow=True)
+    assert_equal(coordinator_count - 1, Coordinator.objects.count(), response)
+
 
   def test_coordinator_workflow_access_permissions(self):
     self.wf.is_shared = True
@@ -1284,12 +1288,16 @@ class TestEditorBundle(OozieMockBase):
     assert_not_equal(bundle.deployment_dir, bundle2.deployment_dir)
     assert_not_equal('', bundle2.deployment_dir)
 
+    # Bulk delete
+    response = self.c.post(reverse('oozie:delete_bundle'), {'job_selection': [bundle.id, bundle2.id]}, follow=True)
+    assert_equal(bundle_count - 1, Bundle.objects.count(), response)
+
 
   def test_delete_bundle(self):
     bundle = create_bundle(self.c)
     bundle_count = Bundle.objects.count()
 
-    response = self.c.post(reverse('oozie:delete_bundle', args=[bundle.id]), {}, follow=True)
+    response = self.c.post(reverse('oozie:delete_bundle'), {'job_selection': [bundle.id]}, follow=True)
 
     assert_equal(bundle_count - 1, Bundle.objects.count(), response)
 
@@ -1699,12 +1707,12 @@ class TestPermissions(OozieBase):
     # Delete
     finish = SHARE_JOBS.set_for_testing(False)
     try:
-      response = client_not_me.post(reverse('oozie:delete_workflow', args=[self.wf.id]))
+      response = client_not_me.post(reverse('oozie:delete_workflow'), {'job_selection': [self.wf.id]})
       assert_true('Permission denied' in response.content, response.content)
     finally:
       finish()
 
-    response = self.c.post(reverse('oozie:delete_workflow', args=[self.wf.id]), follow=True)
+    response = self.c.post(reverse('oozie:delete_workflow'), {'job_selection': [self.wf.id]}, follow=True)
     assert_equal(200, response.status_code)
 
 
@@ -1824,12 +1832,12 @@ class TestPermissions(OozieBase):
     # Delete
     finish = SHARE_JOBS.set_for_testing(False)
     try:
-      response = client_not_me.post(reverse('oozie:delete_coordinator', args=[coord.id]))
+      response = client_not_me.post(reverse('oozie:delete_coordinator'), {'job_selection': [coord.id]})
       assert_true('Permission denied' in response.content, response.content)
     finally:
       finish()
 
-    response = self.c.post(reverse('oozie:delete_coordinator', args=[coord.id]), follow=True)
+    response = self.c.post(reverse('oozie:delete_coordinator'), {'job_selection': [coord.id]}, follow=True)
     assert_equal(200, response.status_code)
 
 
@@ -1924,12 +1932,12 @@ class TestPermissions(OozieBase):
     # Delete
     finish = SHARE_JOBS.set_for_testing(False)
     try:
-      response = client_not_me.post(reverse('oozie:delete_bundle', args=[bundle.id]))
+      response = client_not_me.post(reverse('oozie:delete_bundle'), {'job_selection': [bundle.id]})
       assert_true('Permission denied' in response.content, response.content)
     finally:
       finish()
 
-    response = self.c.post(reverse('oozie:delete_bundle', args=[bundle.id]), follow=True)
+    response = self.c.post(reverse('oozie:delete_bundle'), {'job_selection': [bundle.id]}, follow=True)
     assert_equal(200, response.status_code)
 
 
@@ -1971,6 +1979,10 @@ class TestEditorWithOozie(OozieBase):
 
     assert_not_equal(self.wf.deployment_dir, wf2.deployment_dir)
     assert_not_equal('', wf2.deployment_dir)
+
+    # Bulk delete
+    response = self.c.post(reverse('oozie:delete_workflow'), {'job_selection': [self.wf.id, wf2.id]}, follow=True)
+    assert_equal(workflow_count - 1, Workflow.objects.count(), response)
 
 
   def test_import_workflow(self):
