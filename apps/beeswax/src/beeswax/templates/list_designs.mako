@@ -51,7 +51,6 @@ ${layout.menubar(section='saved queries')}
         <th>${_('Name')}</th>
         <th>${_('Description')}</th>
         <th>${_('Owner')}</th>
-        <th>${_('Type')}</th>
         <th>${_('Last Modified')}</th>
       </tr>
     </thead>
@@ -77,18 +76,15 @@ ${layout.menubar(section='saved queries')}
         % if may_edit:
           <a href="${ url(app_name + ':execute_query', design_id=design.id) }" data-row-selector="true">${design.name}</a>
         % else:
-          ${design.name}
+          ${ design.name }
         % endif
         </td>
         <td>
         % if design.desc:
-          ${design.desc}
+          ${ design.desc }
         % endif
         </td>
-        <td>${design.owner.username}</td>
-        <td>
-          ${_('Query')}
-        </td>
+        <td>${ design.owner.username }</td>
         <td data-sort-value="${time.mktime(design.mtime.timetuple())}">${ timesince(design.mtime) } ${_('ago')}</td>
       </tr>
       % endfor
@@ -134,7 +130,6 @@ ${layout.menubar(section='saved queries')}
       ],
       "aoColumns":[
         {"bSortable":false, "sWidth":"1%" },
-        null,
         null,
         null,
         null,

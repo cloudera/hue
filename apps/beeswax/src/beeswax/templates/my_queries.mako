@@ -65,7 +65,6 @@ ${layout.menubar(section='my queries')}
             <th width="1%"><div class="hueCheckbox selectAll" data-selectables="savedCheck"></div></th>
             <th>${_('Name')}</th>
             <th>${_('Desc')}</th>
-            <th>${_('Type')}</th>
             <th>${_('Last Modified')}</th>
           </tr>
         </thead>
@@ -87,9 +86,6 @@ ${layout.menubar(section='my queries')}
               % if design.desc:
               ${design.desc}
               % endif
-            </td>
-            <td>
-              ${_('Query')}
             </td>
             <td data-sort-value="${time.mktime(design.mtime.timetuple())}">${ timesince(design.mtime) } ${_('ago')}</td>
           </tr>
@@ -187,8 +183,7 @@ ${layout.menubar(section='my queries')}
       "aoColumns":[
         {"bSortable":false, "sWidth":"1%" },
         {"sWidth":"30%"},
-        {"sWidth":"40%"},
-        {"sWidth":"9%"},
+        {"sWidth":"49%"},
         { "sSortDataType":"dom-sort-value", "sType":"numeric", "sWidth":"20%" }
       ],
       "oLanguage":{
