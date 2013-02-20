@@ -15,86 +15,94 @@
 ## limitations under the License.
 
 <%!
-from desktop.views import commonheader, commonfooter
-from django.utils.translation import ugettext as _
+  from desktop.views import commonheader, commonfooter
+  from django.utils.translation import ugettext as _
 %>
 
+<%namespace name="layout" file="layout.mako" />
 <%namespace name="macros" file="macros.mako" />
-<%namespace name="navigation" file="navigation_bar_admin.mako" />
 
 ${ commonheader(_('Search'), "search", user) | n,unicode }
 
+<%layout:skeleton>
+  <%def name="title()">
+    <h1>${_('Search Admin - ')}${hue_core.name}</h1>
+  </%def>
+  <%def name="navigation()">
+    ${ layout.sidebar(hue_core.name, 'facets') }
+  </%def>
+  <%def name="content()">
+    <form method="POST" id="facets" data-bind="submit: submit">
 
-<div class="container-fluid">
-  ${ navigation.menubar('cores') }
-  ${ navigation.sub_menubar(hue_core.name, 'facets') }
+    <div class="well"><h3>${_('Field Facets')}</h3></div>
 
-  Solr
-  <p>
-  ${ solr_core }
-  </p>
+    <table class="table table-striped">
+      <thead data-bind="visible: fieldsFacets().length == 0">
+      <tr>
+        <td colspan="3">
+          <div class="alert">
+          ${_('There are currently no field Facets defined. Please add at least one from the bottom.')}
+          </div>
+        </td>
+      </tr>
+      </thead>
+      <tbody id="fields" data-bind="foreach: fieldsFacets">
+      <tr data-bind="attr: {'data-field': $data}">
+        <td><span data-bind="text: $data"></span></td>
+        <td width="30"><a class="btn btn-small" data-bind="click: $root.removeFieldsFacets"><i class="icon-trash"></i></a></td>
+      </tr>
+      </tbody>
+      <tfoot>
+      <tr style="padding-top: 20px">
+        <td><select data-bind="options: fields, value: selectedField" style="width:100%"></select></td>
+        <td width="30"><a class="btn btn-small" data-bind="click: $root.addFieldsFacets"><i class="icon-plus"></i></a></td>
+      </tr>
+      </tfoot>
+    </table>
 
-  Hue
-  <p>
-  ${ hue_core }
-  </p>
-
-  <!--
-  <div class="btn-group" style="display: inline">
-    <a href="#" data-toggle="dropdown" class="btn dropdown-toggle">
-      <i class="icon-plus-sign"></i> New
-      <span class="caret"></span>
-    </a>
-    <ul class="dropdown-menu" style="top: auto">
-      <li><a href="#" class="create-file-link" title="${ _('Field facet') }"><i class="icon-bookmark"></i> ${ _('Field') }</a></li>
-      <li><a href="#" class="create-directory-link" title="${ _('Range') }"><i class="icon-resize-full"></i> ${ _('Range') }</a></li>
-      <li><a href="#" class="create-directory-link" title="Directory"><i class="icon-calendar"></i> ${ _('Date') }</a></li>
-    </ul>
-  </div>
-  -->
-
-  <form method="POST" id="facets" data-bind="submit: submit">
-    <ul data-bind="foreach: field_facets">
-      <li>
-        <span data-bind="text: $data"></span>
-        <button data-bind="click: $parent.removeFieldFacets">${ _('Remove') }</button>
-      </li>
-    </ul>
-
-    <button type="submit">${ _('Save') }</button>
-  </form>
-
-
-  <select data-bind="options: fields, selectedOptions: field_facets" size="5" multiple="true"></select>
-
-  ${ hue_core.fields }
-
-</div>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary btn-large" id="save-facets">${_('Save Facets')}</button>
+    </div>
+    </form>
+  </%def>
+</%layout:skeleton>
 
 <script src="/static/ext/js/knockout-2.1.0.js" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript">
-  $(document).ready(function(){
-     function ViewModel() {
-       var self = this;
-       self.fields = ko.observableArray(${ hue_core.fields | n,unicode });
-       self.field_facets = ko.observableArray(${ hue_core.facets.data | n,unicode }.fields);
+  $(document).ready(function () {
+    function ViewModel() {
+      var self = this;
+      self.fields = ko.observableArray(${ hue_core.fields | n,unicode });
+      self.fieldsFacets = ko.observableArray(${ hue_core.facets.data | n,unicode }.fields
+    )
+      ;
+      self.selectedField = ko.observable();
 
-       self.removeFieldFacets = function(facet) {
-         self.field_facets.remove(facet);
-       };
+      self.removeFieldsFacets = function (facet) {
+        self.fieldsFacets.remove(facet);
+      };
 
-      self.submit = function() {
-	    $.ajax("${ url('search:admin_core_facets', core=hue_core.name) }", {
-		    data : {'fields': ko.utils.stringifyJson(self.field_facets)},
-		    contentType : 'application/json',
-		    type : 'POST'
-	    }); // notif + refresh?
+      self.addFieldsFacets = function () {
+        self.fieldsFacets.push(self.selectedField());
+      };
+
+      self.submit = function () {
+        $.ajax("${ url('search:admin_core_facets', core=hue_core.name) }", {
+          data: {'fields': ko.utils.stringifyJson(self.fieldsFacets)},
+          contentType: 'application/json',
+          type: 'POST',
+          complete: function (data) {
+            location.reload();
+          }
+        });
       };
     };
 
     ko.applyBindings(new ViewModel());
+
   });
 </script>
 
 ${ commonfooter(messages) | n,unicode }
+
