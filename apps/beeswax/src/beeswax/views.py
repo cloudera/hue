@@ -303,7 +303,6 @@ def show_tables(request, database=None):
 
   tables = db.get_tables(database=database)
   examples_installed = beeswax.models.MetaInstall.get().installed_example
-  #table_selection = TableSelection(tables=tables)
 
   return render("show_tables.mako", request, {
       'tables': tables,

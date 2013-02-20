@@ -34,6 +34,6 @@ urlpatterns = patterns('useradmin.views',
   url(r'^permissions/edit/(?P<app>.*)/(?P<priv>.*)$', 'edit_permission'),
   url(r'^users/new$', 'edit_user', name="useradmin.new"),
   url(r'^groups/new$', 'edit_group', name="useradmin.new_group"),
-  url(r'^users/delete/(?P<username>%s)$' % (username_re,), 'delete_user'),
+  url(r'^users/delete', 'delete_user'),
   url(r'^groups/delete/(?P<name>%s)$' % (groupname_re,), 'delete_group'),
 )

@@ -72,7 +72,8 @@ ${layout.menubar(section='tables')}
                       <div class="hueCheckbox tableCheck"
                            data-view-url="${ url(app_name + ':describe_table', database=database, table=table) }"
                            data-browse-url="${ url(app_name + ':read_table', database=database, table=table) }"
-                           data-drop-name="${ table }" data-row-selector-exclude="true"></div>
+                           data-drop-name="${ table }"
+                           data-row-selector-exclude="true"></div>
                     </td>
                     <td>
                       <a href="${ url(app_name + ':describe_table', database=database, table=table) }" data-row-selector="true">${ table }</a>

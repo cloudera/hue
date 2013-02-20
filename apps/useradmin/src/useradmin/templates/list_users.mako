@@ -31,7 +31,7 @@ ${layout.menubar(section='users', _=_)}
     <%actionbar:render>
         <%def name="actions()">
             %if user.is_superuser:
-                <button id="deleteUserBtn" class="btn confirmationModal" title="${_('Delete')}" disabled="disabled"><i class="icon-trash"></i> ${_('Delete')}</button>
+                <button id="deleteUserBtn" class="btn" title="${_('Delete')}" disabled="disabled"><i class="icon-trash"></i> ${_('Delete')}</button>
             %endif
         </%def>
         <%def name="creation()">
@@ -62,7 +62,7 @@ ${layout.menubar(section='users', _=_)}
             <tr class="tableRow" data-search="${listed_user.username}${listed_user.first_name}${listed_user.last_name}${listed_user.email}${', '.join([group.name for group in listed_user.groups.all()])}">
                 %if user.is_superuser:
                     <td data-row-selector-exclude="true">
-                        <div class="hueCheckbox userCheck" data-username="${listed_user.username}" data-confirmation-url="${ url('useradmin.views.delete_user', username=urllib.quote(listed_user.username))}" data-row-selector-exclude="true"></div>
+                        <div class="hueCheckbox userCheck" data-row-selector-exclude="true" data-id="${ listed_user.id }"></div>
                     </td>
                 %endif
                 <td>
@@ -93,85 +93,118 @@ ${layout.menubar(section='users', _=_)}
 
     <div id="syncLdap" class="modal hide fade"></div>
 
-    <div id="deleteUser" class="modal hide fade"></div>
+    <div id="deleteUser" class="modal hide fade">
+        <form id="dropTableForm" action="${ url('useradmin.views.delete_user') }" method="POST">
+            <div class="modal-header">
+                <a href="#" class="close" data-dismiss="modal">&times;</a>
+                <h3 id="deleteUserMessage">${ _("Are you sure you want to delete the selected user(s)?") }</h3>
+            </div>
+            <div class="modal-footer">
+                <a href="#" class="btn" data-dismiss="modal">${_('No')}</a>
+                <input type="submit" class="btn btn-danger" value="${_('Yes')}"/>
+            </div>
+            <div class="hide">
+                <select name="user_ids" data-bind="options: availableUsers, selectedOptions: chosenUsers" multiple="true"></select>
+            </div>
+        </form>
+    </div>
 
 </div>
 
+<script src="/static/ext/js/knockout-2.1.0.js" type="text/javascript" charset="utf-8"></script>
+
 <script type="text/javascript" charset="utf-8">
-    $(document).ready(function(){
-        $(".datatables").dataTable({
-            "bPaginate": false,
-            "bLengthChange": false,
-            "bInfo": false,
-            "bFilter": false,
-            "aoColumns": [
-                %if user.is_superuser:
-                { "bSortable": false },
-                %endif
-                null,
-                null,
-                null,
-                null,
-                null,
-                { "sType": "date" }
-            ],
-            "oLanguage": {
-                "sEmptyTable": "${_('No data available')}",
-                "sZeroRecords": "${_('No matching records')}",
-            }
-        });
+  $(document).ready(function () {
+    var viewModel = {
+        availableUsers : ko.observableArray(${ users_json | n }),
+        chosenUsers : ko.observableArray([])
+    };
 
-        $(".dataTables_wrapper").css("min-height","0");
-        $(".dataTables_filter").hide();
+    ko.applyBindings(viewModel);
 
-        $(".confirmationModal").click(function(){
-            var _this = $(this);
-            $.ajax({
-                url: _this.data("confirmation-url"),
-                beforeSend: function(xhr){
-                    xhr.setRequestHeader("X-Requested-With", "Hue");
-                },
-                dataType: "html",
-                success: function(data){
-                    $("#deleteUser").html(data);
-                    $("#deleteUser").modal("show");
-                }
-            });
-        });
-
-        $("#selectAll").click(function(){
-            if ($(this).attr("checked")) {
-                $(this).removeAttr("checked");
-                $(".userCheck").removeClass("icon-ok").removeAttr("checked");
-            }
-            else {
-                $(this).attr("checked", "checked");
-                $(".userCheck").addClass("icon-ok").attr("checked", "checked");
-            }
-            toggleActions();
-        });
-
-        $(".userCheck").click(function(){
-            if ($(this).attr("checked")) {
-                $(this).removeClass("icon-ok").removeAttr("checked");
-            }
-            else {
-                $(this).addClass("icon-ok").attr("checked", "checked");
-            }
-            toggleActions();
-        });
-
-        function toggleActions() {
-            if ($(".userCheck[checked='checked']").length == 1) {
-                $("#deleteUserBtn").removeAttr("disabled").data("confirmation-url", $(".userCheck[checked='checked']").data("confirmation-url"));
-            }
-            else {
-                $("#deleteUserBtn").attr("disabled", "disabled");
-            }
+    $(".datatables").dataTable({
+        "bPaginate": false,
+        "bLengthChange": false,
+        "bInfo": false,
+        "bFilter": false,
+        "aoColumns": [
+            %if user.is_superuser:
+            { "bSortable": false },
+            %endif
+            null,
+            null,
+            null,
+            null,
+            null,
+            { "sType": "date" }
+        ],
+        "oLanguage": {
+            "sEmptyTable": "${_('No data available')}",
+            "sZeroRecords": "${_('No matching records')}",
         }
-
-        $("a[data-row-selector='true']").jHueRowSelector();
     });
+
+    $(".dataTables_wrapper").css("min-height","0");
+    $(".dataTables_filter").hide();
+
+    $(".confirmationModal").click(function(){
+        var _this = $(this);
+        $.ajax({
+            url: _this.data("confirmation-url"),
+            beforeSend: function(xhr){
+                xhr.setRequestHeader("X-Requested-With", "Hue");
+            },
+            dataType: "html",
+            success: function(data){
+                $("#deleteUser").html(data);
+                $("#deleteUser").modal("show");
+            }
+        });
+    });
+
+    $("#selectAll").click(function(){
+        if ($(this).attr("checked")) {
+            $(this).removeAttr("checked");
+            $(".userCheck").removeClass("icon-ok").removeAttr("checked");
+        }
+        else {
+            $(this).attr("checked", "checked");
+            $(".userCheck").addClass("icon-ok").attr("checked", "checked");
+        }
+        toggleActions();
+    });
+
+    $(".userCheck").click(function(){
+        if ($(this).attr("checked")) {
+            $(this).removeClass("icon-ok").removeAttr("checked");
+        }
+        else {
+            $(this).addClass("icon-ok").attr("checked", "checked");
+        }
+        toggleActions();
+    });
+
+    function toggleActions() {
+        if ($(".userCheck[checked='checked']").length >= 1) {
+            $("#deleteUserBtn").removeAttr("disabled");
+        }
+        else {
+            $("#deleteUserBtn").attr("disabled", "disabled");
+        }
+    }
+
+    $("#deleteUserBtn").click(function () {
+        viewModel.chosenUsers.removeAll();
+
+        $(".hueCheckbox[checked='checked']").each(function( index ) {
+            viewModel.chosenUsers.push($(this).data("id"));
+        });
+
+        $("#deleteUser").modal("show");
+    });
+
+    $("a[data-row-selector='true']").jHueRowSelector();
+  });
 </script>
 
 ${layout.commons()}

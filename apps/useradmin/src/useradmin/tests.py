@@ -264,6 +264,7 @@ def test_user_admin():
   useradmin.conf.DEFAULT_USER_GROUP.set_for_testing('test_default')
 
   c = make_logged_in_client('test', is_superuser=True)
+  user = User.objects.get(username='test')
 
   # Test basic output.
   response = c.get('/useradmin/')
@@ -294,7 +295,7 @@ def test_user_admin():
   assert_true("You cannot remove" in response.content,
               "Shouldn't be able to remove the last superuser")
   # Shouldn't be able to delete oneself
-  response = c.post('/useradmin/users/delete/test', {})
+  response = c.post('/useradmin/users/delete', {u'user_ids': [user.id]})
   assert_true("You cannot remove yourself" in response.content,
               "Shouldn't be able to delete the last superuser")
 
@@ -357,8 +358,9 @@ def test_user_admin():
                              is_active = True))
   response = c_reg.get('/useradmin/users/edit/%s' % (FUNNY_NAME_QUOTED,))
   assert_equal("Hello", response.context["form"].instance.first_name)
+  funny_user = User.objects.get(username=FUNNY_NAME)
   # Can't edit other people.
-  response = c_reg.post("/useradmin/users/delete/test")
+  response = c_reg.post("/useradmin/users/delete", {u'user_ids': [funny_user.id]})
   assert_true("You must be a superuser" in response.content,
               "Regular user can't edit other people")
 
@@ -376,16 +378,23 @@ def test_user_admin():
 
   # Delete that regular user
   funny_profile = get_profile(test_user)
-  response = c_su.post('/useradmin/users/delete/%s' % (FUNNY_NAME_QUOTED,))
+  response = c_su.post('/useradmin/users/delete', {u'user_ids': [funny_user.id]})
   assert_equal(302, response.status_code)
   assert_false(User.objects.filter(username=FUNNY_NAME).exists())
   assert_false(UserProfile.objects.filter(id=funny_profile.id).exists())
 
+  # Bulk delete users
+  u1 = User.objects.create(username='u1', password="u1")
+  u2 = User.objects.create(username='u2', password="u2")
+  assert_equal(User.objects.filter(username__in=['u1', 'u2']).count(), 2)
+  response = c_su.post('/useradmin/users/delete', {u'user_ids': [u1.id, u2.id]})
+  assert_equal(User.objects.filter(username__in=['u1', 'u2']).count(), 0)
+
   # Make sure that user deletion works if the user has never performed a request.
-  User.objects.create(username=FUNNY_NAME, password='test')
+  funny_user = User.objects.create(username=FUNNY_NAME, password='test')
   assert_true(User.objects.filter(username=FUNNY_NAME).exists())
   assert_false(UserProfile.objects.filter(user__username=FUNNY_NAME).exists())
-  response = c_su.post('/useradmin/users/delete/%s' % (FUNNY_NAME_QUOTED,))
+  response = c_su.post('/useradmin/users/delete', {u'user_ids': [funny_user.id]})
   assert_equal(302, response.status_code)
   assert_false(User.objects.filter(username=FUNNY_NAME).exists())
   assert_false(UserProfile.objects.filter(user__username=FUNNY_NAME).exists())

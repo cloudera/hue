@@ -24,6 +24,10 @@ import grp
 import logging
 import threading
 import subprocess
+try:
+  import json
+except ImportError:
+  import simplejson as json
 
 import ldap_access
 from ldap import LDAPError
@@ -52,7 +56,11 @@ __groups_lock = threading.Lock()
 
 
 def list_users(request):
-  return render("list_users.mako", request, dict(users=User.objects.all(), request=request))
+  return render("list_users.mako", request, {
+      'users': User.objects.all(),
+      'users_json': json.dumps(list(User.objects.values_list('id', flat=True))),
+      'request': request
+  })
 
 
 def list_groups(request):
@@ -63,34 +71,27 @@ def list_permissions(request):
   return render("list_permissions.mako", request, dict(permissions=HuePermission.objects.all()))
 
 
-def delete_user(request, username):
+def delete_user(request):
   if not request.user.is_superuser:
     raise PopupException(_("You must be a superuser to delete users."), error_code=401)
 
-  if request.method == 'POST':
-    try:
-      global __users_lock
-      __users_lock.acquire()
-      try:
-        if username == request.user.username:
-          raise PopupException(_("You cannot remove yourself."), error_code=401)
-        user = User.objects.get(username=username)
-        # Since profiles are lazily created, they may not exist.
-        try:
-          user_profile = UserProfile.objects.get(user=user)
-          user_profile.delete()
-        except UserProfile.DoesNotExist, e:
-          pass
-        user.delete()
-      finally:
-        __users_lock.release()
+  if request.method != 'POST':
+    raise PopupException(_('A POST request is required.'))
 
-      request.info(_('The user was deleted.'))
-      return redirect(reverse(list_users))
-    except User.DoesNotExist:
-      raise PopupException(_("User not found."), error_code=404)
-  else:
-    return render("delete_user.mako", request, dict(path=request.path, username=username))
+  ids = request.POST.getlist('user_ids')
+  global __users_lock
+  __users_lock.acquire()
+  try:
+    if str(request.user.id) in ids:
+      raise PopupException(_("You cannot remove yourself."), error_code=401)
+
+    UserProfile.objects.filter(user__id__in=ids).delete()
+    User.objects.filter(id__in=ids).delete()
+  finally:
+    __users_lock.release()
+
+  request.info(_('The users were deleted.'))
+  return redirect(reverse(list_users))
 
 
 def delete_group(request, name):
