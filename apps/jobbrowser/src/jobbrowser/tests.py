@@ -422,7 +422,9 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
     # Test job single logs page
     response = self.client.get('/jobbrowser/jobs/%s/single_logs' % (hadoop_job_id))
     assert_true('syslog' in response.content)
-    assert_true('<div class="tab-pane active" id="logsSysLog">' in response.content, response.content)
+    assert_true('<div class="tab-pane active" id="logsSysLog">' in response.content or
+                '<div class="tab-pane active" id="logsStdOut">' in response.content, # For jenkins
+                response.content)
 
 
 class TestMapReduce2:
