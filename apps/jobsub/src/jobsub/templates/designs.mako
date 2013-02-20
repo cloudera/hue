@@ -625,7 +625,7 @@ $(document).ready(function() {
       });
 
       designs.closeDesign();
- 
+
       var context = $.extend(true, {}, global_action_context, contexts[node_type]);
       templates.getActionTemplate(node_type, context);
       designs.newDesign(node_type);
