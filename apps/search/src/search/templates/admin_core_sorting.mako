@@ -63,7 +63,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
       </div>
 
       <div class="form-actions" style="margin-top: 80px">
-        <button type="submit" class="btn btn-primary">${_('Save Sorting')}</button>
+        <button type="submit" class="btn btn-primary" id="save-sorting">${_('Save Sorting')}</button>
         <a class="btn" href="${ url('search:admin') }"><i class="icon-list"></i> ${ _('Return to Core list') }</a>
         <a class="btn" href="${ url('search:index') }"><i class="icon-search"></i> ${ _('Back to Search') }</a>
       </div>
@@ -111,7 +111,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     var self = this;
     self.fields = ko.observableArray(${ hue_core.fields | n,unicode });
 
-    self.sortingFields = ko.observableArray(ko.utils.arrayMap([], function (obj) {
+    self.sortingFields = ko.observableArray(ko.utils.arrayMap(${ hue_core.sorting.data | n,unicode }.fields, function (obj) {
       return new SortingField(obj.field, obj.label, obj.asc);
     }));
 
@@ -133,15 +133,28 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     };
 
     self.submit = function () {
-      ##TODO: the sorting fields are in self.sortingFields
-      console.log(ko.utils.stringifyJson(self.sortingFields));
-    };
+      $.ajax("${ url('search:admin_core_sorting', core=hue_core.name) }", {
+        data: {
+          'fields': ko.utils.stringifyJson(self.sortingFields)
+        },
+        contentType: 'application/json',
+        type: 'POST',
+        success: function () {
+          $.jHueNotify.info("${_('Sorting updated')}");
+        },
+        error: function (data) {
+          $.jHueNotify.error("${_('Error: ')}" + data);
+        },
+        complete: function() {
+          $("#save-sorting").button('reset');
+        }
+      });
+    };    
   };
 
   var viewModel = new ViewModel();
 
   $(document).ready(function () {
-
     ko.applyBindings(viewModel);
 
     $("#newFieldAsc").click(function(){
@@ -151,9 +164,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     $("#newFieldDesc").click(function(){
       viewModel.newFieldAscDesc("desc");
     });
-
   });
 </script>
-
 
 ${ commonfooter(messages) | n,unicode }

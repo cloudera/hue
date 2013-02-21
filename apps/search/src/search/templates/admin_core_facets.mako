@@ -114,7 +114,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 
 
       <div class="form-actions" style="margin-top: 80px">
-        <button type="submit" class="btn btn-primary">${_('Save Facets')}</button>
+        <button type="submit" class="btn btn-primary" id="save-facets">${_('Save Facets')}</button>
         <a class="btn" href="${ url('search:admin') }"><i class="icon-list"></i> ${ _('Return to Core list') }</a>
         <a class="btn" href="${ url('search:index') }"><i class="icon-search"></i> ${ _('Back to Search') }</a>
       </div>
@@ -221,7 +221,6 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     };
 
     self.submit = function () {
-      console.log(ko.utils.stringifyJson(self.fieldFacets));
       $.ajax("${ url('search:admin_core_facets', core=hue_core.name) }", {
         data: {
           'fields': ko.utils.stringifyJson(self.fieldFacets),
@@ -230,8 +229,14 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
         },
         contentType: 'application/json',
         type: 'POST',
-        complete: function (data) {
-          location.reload();
+        success: function () {
+          $.jHueNotify.info("${_('Facets updated')}");
+        },
+        error: function (data) {
+          $.jHueNotify.error("${_('Error: ')}" + data);
+        },
+        complete: function() {
+          $("#save-facets").button('reset');
         }
       });
     };

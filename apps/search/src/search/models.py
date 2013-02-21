@@ -54,7 +54,7 @@ class Facet(models.Model):
     if post_data.get('ranges'):
       data_dict['ranges'] = json.loads(post_data['ranges'])
 
-    if post_data('dates'):
+    if post_data.get('dates'):
       data_dict['dates'] = json.loads(post_data['dates'])
 
     self.data = json.dumps(data_dict)
@@ -121,7 +121,18 @@ class Result(models.Model):
     return Template(self.get_template()).render(result=result)
 
 
-class Sorting(models.Model): pass
+class Sorting(models.Model):
+  _META_TEMPLATE_ATTRS = ['fields']
+
+  data = models.TextField()
+
+  def update_from_post(self, post_data):
+    data_dict = json.loads(self.data)
+
+    if post_data.get('fields'):
+      data_dict['fields'] = json.loads(post_data['fields'])
+
+    self.data = json.dumps(data_dict)  
 
 
 class Core(models.Model):
@@ -160,7 +171,7 @@ def temp_fixture_hook():
                  'dates': [{"type":"date","field":"last_modified","start":"02-13-2013","end":"02-19-2013","gap":"1"}]
               }))
     result = Result.objects.create(data=json.dumps({'template': 'To customize!<br/>'}))
-    sorting = Sorting.objects.create()
+    sorting = Sorting.objects.create(data=json.dumps({'fields': [{"field":"id","label":"My id","asc":False}]}))
 
     Core.objects.create(name='collection1', label='Tweets', facets=facets, result=result, sorting=sorting)
     Core.objects.create(name='collection2', label='Zendesk Tickets', facets=facets, result=result, sorting=sorting)
