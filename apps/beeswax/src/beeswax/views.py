@@ -1408,10 +1408,14 @@ def _update_query_state(query_history):
   when the user attempts to view results that have expired.
   """
   if query_history.last_state <= models.QueryHistory.STATE.running.index:
-    state_enum = dbms.get(query_history.owner, query_history.get_query_server_config()).get_state(query_history.get_handle())
-    if state_enum is None:
-      # Error was logged at the source
-      return False
+    try:
+      state_enum = dbms.get(query_history.owner, query_history.get_query_server_config()).get_state(query_history.get_handle())
+      if state_enum is None:
+        # Error was logged at the source
+        return False
+    except Exception, e:
+      LOG.error(e)
+      state_enum = models.QueryHistory.STATE.failed
     query_history.save_state(state_enum)
   return True
 
