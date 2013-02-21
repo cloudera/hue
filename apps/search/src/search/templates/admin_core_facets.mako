@@ -134,7 +134,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
   var Facet = function (type, field, start, end, gap) {
     return {
       type: type,
-      field:field,
+      field: field,
       start: start,
       end: end,
       gap: gap
