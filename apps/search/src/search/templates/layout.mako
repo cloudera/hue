@@ -24,9 +24,6 @@
   <link rel="stylesheet" href="/search/static/css/admin.css">
 
   <div class="container-fluid">
-    <div class="pull-right">
-      <a class="btn" href="${ url('search:admin') }"><i class="icon-list"></i> ${ _('Core list') }</a>
-    </div>
     %if hasattr(caller, "title"):
       ${caller.title()}
     %else:

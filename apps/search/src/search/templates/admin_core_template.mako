@@ -29,8 +29,27 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     padding: 0;
     padding-left:10px;
   }
+  .available-fields ul {
+    list-style: none;
+    margin-left: 0;
+  }
+  .available-fields ul li {
+    color: #666;
+  }
   .preview-row:nth-child(odd) {
     background-color:#f9f9f9;
+  }
+  .tmpl {
+    border: 1px solid #CCC;
+    margin: 10px;
+    height: 80px;
+    cursor: pointer;
+  }
+  .tmpl:hover {
+    border: 1px solid #999;
+  }
+  .tmpl.selected {
+    border: 2px solid #999;
   }
 </style>
 
@@ -55,6 +74,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
           <div class="span9">
             <div id="toolbar"></div>
             <div id="content-editor" class="clear">${_('Add your content here...')}</div>
+            <div id="load-template" class="btn-group"><a title="Load template" class="btn toolbar-btn toolbar-cmd"><i class="icon-paste" style="margin-top:2px;"></i></a></div>
           </div>
 
           <div class="span3">
@@ -66,7 +86,6 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
             </div>
           </div>
         </div>
-
 
       </div>
       <div class="tab-pane" id="source">
@@ -93,8 +112,38 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     </div>
 
     <div class="form-actions">
-      <a class="btn btn-primary btn-large" id="save-template">${_('Save Template')}</a>
+      <a class="btn btn-primary" id="save-template">${_('Save Template')}</a>
+      <a class="btn" href="${ url('search:admin') }"><i class="icon-list"></i> ${ _('Return to Core list') }</a>
+      <a class="btn" href="${ url('search:index') }"><i class="icon-search"></i> ${ _('Back to Search') }</a>
     </div>
+
+    <div id="load-template-modal" class="modal hide fade">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h3>${_('Load template')}</h3>
+      </div>
+      <div class="modal-body">
+        <div class="tmpl">
+          <div class="row-fluid">
+            <div class="span1"><img src="http://twitter.com/api/users/profile_image/{{user_screen_name}}" style="margin:20px"></div>
+            <div class="span9">
+              <h5>{{user_name}}</h5>
+              {{text}}
+            </div>
+            <div class="span2"><br><a class="btn" href="https://twitter.com/{{user_screen_name}}/status/{{id}}" target="_blank"><i class="icon-twitter"></i></a></div>
+          </div>
+        </div>
+        <div class="tmpl">
+          <h5>{{user_name}} <span style="color:#999">({{user_screen_name}})</span></h5>
+          <p>{{text}}</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a href="#" class="btn" data-dismiss="modal">${_('Cancel')}</a>
+        <button type="button" id="load-template-btn" href="#" class="btn btn-primary" disabled="disabled">${_('Load template')}</button>
+      </div>
+    </div>
+
 
   </%def>
 </%layout:skeleton>
@@ -136,7 +185,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
       lineNumbers: true
     });
 
-    $("#content-editor").freshereditor({toolbar_selector: "#toolbar", excludes: ['strikethrough', 'removeFormat', 'backcolor', 'insertorderedlist', 'insertheading1', 'insertheading2', 'superscript', 'subscript']});
+    $("#content-editor").freshereditor({toolbar_selector: "#toolbar", excludes: ['strikethrough', 'removeFormat', 'backcolor', 'insertorderedlist', 'justifyfull', 'insertheading1', 'insertheading2', 'superscript', 'subscript']});
     $("#content-editor").freshereditor("edit", true);
 
     // force refresh on tab change
@@ -160,6 +209,30 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
         $("#content-editor").html(codeMirror.getValue());
       }, 300);
     });
+
+    $("#load-template").appendTo($("#toolbar .btn-toolbar")).removeClass("hide");
+
+    $("#load-template-modal").modal({
+      show: false
+    });
+
+    $("#load-template .btn").click(function(){
+      $(".tmpl.selected").removeClass("selected");
+      $("#load-template-modal").modal("show");
+      $("#load-template-btn").attr("disabled", "disabled");
+    });
+
+    $(".tmpl").click(function(){
+      $(".tmpl.selected").removeClass("selected");
+      $(this).addClass("selected");
+      $("#load-template-btn").removeAttr("disabled");
+    });
+
+    $("#load-template-btn").click(function(){
+      $("#load-template-modal").modal("hide");
+      $("#content-editor").html($(".tmpl.selected").html());
+    });
+
 
     $("#save-template").click(function () {
       ##TODO: save template

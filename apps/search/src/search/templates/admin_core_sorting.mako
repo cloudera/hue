@@ -32,36 +32,42 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     ${ layout.sidebar(hue_core.name, 'sorting') }
   </%def>
   <%def name="content()">
-    <div class="well"><h3>${_('Fields')}</h3></div>
+    <form method="POST" class="form-horizontal" data-bind="submit: submit">
+      <div class="section">
+        <div class="alert alert-info"><h4>${_('Sorting Fields')}</h4></div>
+        <div data-bind="visible: sortingFields().length == 0" style="padding-left: 10px;margin-bottom: 20px">
+          <em>${_('There are currently no Sorting Fields defined. Please add at least one from the bottom.')}</em>
+        </div>
+        <div data-bind="foreach: sortingFields">
+          <div class="bubble">
+            <strong><span data-bind="text: label"></span></strong>
+            <span style="color:#666;font-size: 12px">
+              (<span data-bind="text: field"></span> <i class="icon-arrow-up" data-bind="visible: asc == true"></i><i class="icon-arrow-down" data-bind="visible: asc == false"></i> )
+            </span>
+            <a class="btn btn-small" data-bind="click: $root.removeSortingField"><i class="icon-trash"></i></a>
+          </div>
+        </div>
+        <div class="clearfix"></div>
+        <div class="miniform">
+          ${_('Field')}
+          <select data-bind="options: fields, value: newFieldSelect"></select>
+          &nbsp;${_('Label')}
+          <input type="text" data-bind="value: newFieldLabel" class="input" />
+          &nbsp;${_('Sorting')}
+          <div class="btn-group" style="display: inline">
+            <button id="newFieldAsc" type="button" data-bind="css: {'active': newFieldAscDesc() == 'asc', 'btn': true}"><i class="icon-arrow-up"></i></button>
+            <button id="newFieldDesc" type="button" data-bind="css: {'active': newFieldAscDesc() == 'desc', 'btn': true}"><i class="icon-arrow-down"></i></button>
+          </div>
+          &nbsp;&nbsp;<a class="btn" data-bind="click: $root.addSortingField"><i class="icon-plus"></i> ${_('Add field to Sorting Fields')}</a>
+        </div>
+      </div>
 
-    <table class="table table-striped">
-      <thead data-bind="visible: fieldsSorting().length == 0">
-        <tr>
-          <td colspan="3">
-            <div class="alert">
-            ${_('There are currently no Sorting fields defined. Please add at least one from the bottom.')}
-            </div>
-          </td>
-        </tr>
-      </thead>
-      <tbody id="fields" data-bind="foreach: fieldsSorting">
-        <tr data-bind="attr: {'data-field': $data}">
-          <td width="30"><i class="icon-list"></i></td>
-          <td><span data-bind="text: $data"></span></td>
-          <td width="30"><a class="btn btn-small" data-bind="click: $root.removeFieldSorting"><i class="icon-trash"></i></a></td>
-        </tr>
-      </tbody>
-      <tfoot>
-        <tr style="padding-top: 20px">
-          <td colspan="2"><select data-bind="options: fields, value: selectedField" style="width:100%"></select></td>
-          <td width="30"><a class="btn btn-small" data-bind="click: $root.addFieldSorting"><i class="icon-plus"></i></a></td>
-        </tr>
-      </tfoot>
-    </table>
-
-    <div class="form-actions">
-      <a class="btn btn-primary btn-large" id="save-sorting">${_('Save Sorting')}</a>
-    </div>
+      <div class="form-actions" style="margin-top: 80px">
+        <button type="submit" class="btn btn-primary">${_('Save Sorting')}</button>
+        <a class="btn" href="${ url('search:admin') }"><i class="icon-list"></i> ${ _('Return to Core list') }</a>
+        <a class="btn" href="${ url('search:index') }"><i class="icon-search"></i> ${ _('Back to Search') }</a>
+      </div>
+    </form>
   </%def>
 </%layout:skeleton>
 
@@ -92,54 +98,58 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 <script src="/static/ext/js/jquery/plugins/jquery-ui-draggable-droppable-sortable-1.8.23.min.js"></script>
 
 <script type="text/javascript">
-  $(document).ready(function () {
-    function ViewModel() {
-      var self = this;
-      self.fields = ko.observableArray(${ hue_core.fields | n,unicode });
-      self.fieldsSorting = ko.observableArray();
 
-      self.selectedField = ko.observable();
+  var SortingField = function (field, label, asc) {
+    return {
+      field:field,
+      label: label,
+      asc: asc
+    }
+  }
 
-      self.removeFieldSorting = function (sort) {
-        self.fieldsSorting.remove(sort);
-      };
+  function ViewModel() {
+    var self = this;
+    self.fields = ko.observableArray(${ hue_core.fields | n,unicode });
 
-      self.addFieldSorting = function () {
-        self.fieldsSorting.push(self.selectedField());
-      };
+    self.sortingFields = ko.observableArray(ko.utils.arrayMap([], function (obj) {
+      return new SortingField(obj.field, obj.label, obj.asc);
+    }));
 
-      self.submit = function () {
-        $.ajax("${ url('search:admin_core_sorting', core=hue_core.name) }", {
-          data: {'fields': ko.utils.stringifyJson(self.fieldsSorting)},
-          contentType: 'application/json',
-          type: 'POST',
-          complete: function (data) {
-            location.reload();
-          }
-        });
-      };
+    self.newFieldSelect = ko.observable();
+    self.newFieldLabel = ko.observable("");
+    self.newFieldAscDesc = ko.observable("asc");
+
+    self.removeSortingField = function (field) {
+      self.sortingFields.remove(field);
     };
 
-    var viewModel = new ViewModel();
+    self.addSortingField = function () {
+      if (self.newFieldLabel() == ""){
+        self.newFieldLabel(self.newFieldSelect());
+      }
+      self.sortingFields.push(new SortingField(self.newFieldSelect(), self.newFieldLabel(), self.newFieldAscDesc()=="asc"));
+      self.newFieldLabel("");
+      self.newFieldAscDesc("asc");
+    };
+
+    self.submit = function () {
+      ##TODO: the sorting fields are in self.sortingFields
+      console.log(ko.utils.stringifyJson(self.sortingFields));
+    };
+  };
+
+  var viewModel = new ViewModel();
+
+  $(document).ready(function () {
+
     ko.applyBindings(viewModel);
 
-    $("#fields").sortable({
-      placeholder: "placeholder",
-      update: function (event, ui) {
-        var reorderedFields = [];
-        $("#fields tr").each(function () {
-          reorderedFields.push($(this).data("field"));
-        });
-        viewModel.fieldsSorting([]);
-        viewModel.fieldsSorting(reorderedFields);
-      }
+    $("#newFieldAsc").click(function(){
+      viewModel.newFieldAscDesc("asc");
     });
-    $("#fields").disableSelection();
 
-    $("#save-sorting").click(function () {
-      ##TODO: save sorting
-      ## you can access to the fields like this: viewModel.fieldsSorting()
-      ## console.log(viewModel.fieldsSorting());
+    $("#newFieldDesc").click(function(){
+      viewModel.newFieldAscDesc("desc");
     });
 
   });

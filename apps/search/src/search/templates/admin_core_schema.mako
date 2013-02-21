@@ -35,6 +35,10 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     <textarea id="schema">
     ${ solr_schema.decode('utf-8') }
     </textarea>
+    <div class="form-actions">
+      <a class="btn" href="${ url('search:admin') }"><i class="icon-list"></i> ${ _('Return to Core list') }</a>
+      <a class="btn" href="${ url('search:index') }"><i class="icon-search"></i> ${ _('Back to Search') }</a>
+    </div>
   </%def>
 </%layout:skeleton>
 
@@ -56,7 +60,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
       lineNumbers: true
     });
 
-    codeMirror.setSize("100%", $(document).height() - 150);
+    codeMirror.setSize("100%", $(document).height() - 150 - $(".form-actions").outerHeight());
 
   });
 </script>
