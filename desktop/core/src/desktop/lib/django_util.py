@@ -44,7 +44,7 @@ MAKO = 'mako'
 
 # This is what Debian allows. See chkname.c in shadow.
 USERNAME_RE_RULE = "[^-:\s][^:\s]*"
-GROUPNAME_RE_RULE = ".{,30}"
+GROUPNAME_RE_RULE = ".{,80}"
 
 
 # For backward compatibility for upgrades to Hue 2.2

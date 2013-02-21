@@ -103,13 +103,11 @@ class LdapConnection(object):
     else:
       return (base_dn, '(' + attr + '=' + name + ')')
 
-  def find_users(self, username_pattern, find_by_dn=False):
+  def find_users(self, username_pattern, find_by_dn=False, scope=ldap.SCOPE_SUBTREE):
     """
     LDAP search helper method finding users. This supports searching for users
     by distinguished name, or the configured username attribute.
     """
-    scope = ldap.SCOPE_SUBTREE
-
     user_filter = desktop.conf.LDAP.USERS.USER_FILTER.get()
     if not user_filter.startswith('('):
       user_filter = '(' + user_filter + ')'
@@ -124,9 +122,17 @@ class LdapConnection(object):
     result_type, result_data = self.ldap_handle.result(ldap_result_id)
     user_info = []
     if result_data and result_type == ldap.RES_SEARCH_RESULT:
-      for result_data_item in result_data:
-        data = result_data_item[1]
-        ldap_info = { 'username': data[user_name_attr][0] }
+      for dn, data in result_data:
+
+        # Skip unnamed entries.
+        if user_name_attr not in data:
+          LOG.warn('Could not find %s in ldap attributes' % user_name_attr)
+          continue
+
+        ldap_info = {
+          'dn': dn,
+          'name': data[user_name_attr][0]
+        }
 
         if 'givenName' in data:
           ldap_info['first'] = data['givenName'][0]
@@ -139,7 +145,7 @@ class LdapConnection(object):
 
     return user_info
 
-  def find_groups(self, groupname_pattern, find_by_dn=False):
+  def find_groups(self, groupname_pattern, find_by_dn=False, scope=ldap.SCOPE_SUBTREE):
     """
     LDAP search helper method for finding groups
     """
@@ -161,9 +167,17 @@ class LdapConnection(object):
 
     group_info = []
     if result_data and result_type == ldap.RES_SEARCH_RESULT:
-      for result_data_item in result_data:
-        data = result_data_item[1]
-        ldap_info = { 'name': data[group_name_attr][0] }
+      for dn, data in result_data:
+
+        # Skip unnamed entries.
+        if group_name_attr not in data:
+          LOG.warn('Could not find %s in ldap attributes' % group_name_attr)
+          continue
+
+        ldap_info = {
+          'dn': dn,
+          'name': data[group_name_attr][0]
+        }
 
         member_attr = desktop.conf.LDAP.GROUPS.GROUP_MEMBER_ATTR.get()
         if member_attr in data:
