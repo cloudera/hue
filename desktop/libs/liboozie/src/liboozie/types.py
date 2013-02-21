@@ -254,6 +254,19 @@ class BundleAction(Action):
     else:
       self.conf_dict = {}
 
+  def get_progress(self):
+    """How much more time before the next action."""
+    next = mktime(parse_timestamp(self.lastAction))
+    start = mktime(parse_timestamp(self.startTime))
+    end = mktime(parse_timestamp(self.endTime))
+
+    if end != start:
+      progress = min(int((1 - (end - next) / (end - start)) * 100), 100)
+    else:
+      progress = 100
+
+    return progress
+
 
 class Job(object):
   RUNNING_STATUSES = set(['PREP', 'RUNNING', 'SUSPENDED', 'PREP', # Workflow
@@ -534,7 +547,13 @@ class Bundle(Job):
     return reverse('oozie:list_oozie_bundle', kwargs={'job_id': self.id})
 
   def get_progress(self):
-    return 50
+    progresses = [action.get_progress() for action in self.actions]
+    count = len(progresses)
+
+    if count != 0:
+      return sum(progresses) / float(count)
+    else:
+      return 0
 
 
 class JobList(object):

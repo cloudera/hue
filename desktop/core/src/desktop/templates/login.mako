@@ -65,11 +65,11 @@ from django.utils.translation import ugettext as _
                 <form method="POST" action="${action}" class="well">
                     <label>${_('Username')}
                         ${ form['username'] | n,unicode }
-                        ${ form['username'].errors }
+                        ${ form['username'].errors | n,unicode }
                     </label>
                     <label>${_('Password')}
                         ${ form['password'] | n,unicode }
-                        ${ form['password'].errors }
+                        ${ form['password'].errors | n,unicode }
                     </label>
 
                     %if first_login_ever:
