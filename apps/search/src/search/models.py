@@ -41,25 +41,20 @@ class DateFacet(object): pass
 
 class Facet(models.Model):
   _ATTRIBUTES = ['properties', 'fields', 'range', 'date']
+  
   enabled = models.BooleanField(default=True)
   data = models.TextField()
-
-  def dumps(self):
-    pass
-
-  def loads(self, json):
-    pass
 
   def update_from_post(self, post_data):
     data_dict = json.loads(self.data)
 
-    if 'fields' in post_data and post_data['fields']:
+    if post_data.get('fields'):
       data_dict['fields'] = json.loads(post_data['fields'])
 
-    if 'ranges' in post_data and post_data['ranges']:
+    if post_data.get('ranges'):
       data_dict['ranges'] = json.loads(post_data['ranges'])
 
-    if 'dates' in post_data and post_data['dates']:
+    if post_data('dates'):
       data_dict['dates'] = json.loads(post_data['dates'])
 
     self.data = json.dumps(data_dict)
@@ -105,26 +100,25 @@ class Facet(models.Model):
 class Result(models.Model):
   _META_TEMPLATE_ATTRS = ['template', 'highlighted_fields', 'css']
 
-  def __init__(self, *args, **kwargs):
-    super(Result, self).__init__(*args, **kwargs)
-    self._data_dict = []
-
   data = models.TextField()
 
-  def gen_template(self):
-    return """
-      <tr>
-        <td style="word-wrap: break-word;">
-          <div class="content">
-            <div class="text">
-              ${ result.get('id', '')  | n,unicode }
-            </div>
-          </div>
-        </td>
-      </tr>"""
+  def update_from_post(self, post_data):
+    data_dict = json.loads(self.data)
 
-  def gen_result(self, result):
-    return Template(self.gen_template()).render(result=result)
+    if post_data.get('template'):
+      data_dict['template'] = json.loads(post_data['template'])
+
+    self.data = json.dumps(data_dict)
+
+
+  def get_template(self):
+    data_dict = json.loads(self.data)
+
+    return data_dict.get('template')
+
+
+  def render_result(self, result):
+    return Template(self.get_template()).render(result=result)
 
 
 class Sorting(models.Model): pass
@@ -135,6 +129,7 @@ class Core(models.Model):
   name = models.CharField(max_length=40, unique=True, help_text=_t('Name of the Solr collection'))
   label = models.CharField(max_length=100)
   properties = models.TextField(default='[]', verbose_name=_t('Core properties'), help_text=_t('Properties (e.g. facets off, results by pages number)'))
+  
   facets = models.ForeignKey(Facet)
   result = models.ForeignKey(Result)
   sorting = models.ForeignKey(Sorting)
@@ -157,10 +152,14 @@ class Query(object): pass
 
 
 def temp_fixture_hook():
-  Core.objects.all().delete()
+  #Core.objects.all().delete()
   if not Core.objects.exists():
-    facets = Facet.objects.create(data=json.dumps({'ranges': [{"type":"range","field":"price","start":"1","end":"400","gap":"100"}], 'fields': [{"type":"field","field":"id"}], 'dates': [{"type":"date","field":"last_modified","start":"02-13-2013","end":"02-19-2013","gap":"1"}]}))
-    result = Result.objects.create()
+    facets = Facet.objects.create(data=json.dumps({
+                 'ranges': [{"type":"range","field":"price","start":"1","end":"400","gap":"100"}],
+                 'fields': [{"type":"field","field":"id"}],
+                 'dates': [{"type":"date","field":"last_modified","start":"02-13-2013","end":"02-19-2013","gap":"1"}]
+              }))
+    result = Result.objects.create(data=json.dumps({'template': 'To customize!<br/>'}))
     sorting = Sorting.objects.create()
 
     Core.objects.create(name='collection1', label='Tweets', facets=facets, result=result, sorting=sorting)
