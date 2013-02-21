@@ -135,7 +135,7 @@ def admin_core_facets(request, core):
   if request.method == 'POST':
     hue_core.facets.update_from_post(request.POST)
     hue_core.facets.save()
-    request.info(_('Facets updated'))
+    return HttpResponse(json.dumps({}), mimetype="application/json")
 
   return render('admin_core_facets.mako', request, {
     'solr_core': solr_core,
@@ -147,6 +147,11 @@ def admin_core_facets(request, core):
 def admin_core_sorting(request, core):
   solr_core = SolrApi(SOLR_URL.get()).core(core)
   hue_core = Core.objects.get(name=core)
+
+  if request.method == 'POST':
+    hue_core.sorting.update_from_post(request.POST)
+    hue_core.sorting.save()
+    return HttpResponse(json.dumps({}), mimetype="application/json")
 
   return render('admin_core_sorting.mako', request, {
     'solr_core': solr_core,
