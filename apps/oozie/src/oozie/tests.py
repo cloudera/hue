@@ -1346,6 +1346,11 @@ class TestEditorBundle(OozieMockBase):
     response = self.c.post(reverse('oozie:create_bundled_coordinator', args=[bundle.id]), post, follow=True)
     assert_true('Coordinators' in response.content, response.content)
 
+    xml = bundle.to_xml({
+       'wf_%s_dir' % self.wf.id: '/deployment_path_wf',
+       'coord_%s_dir' % coord.id: '/deployment_path_coord'
+    })
+
     assert_true(
 """<bundle-app name="MyBundle"
   xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
@@ -1360,18 +1365,19 @@ class TestEditorBundle(OozieMockBase):
      <kick-off-time>2012-07-01T00:00Z</kick-off-time>
   </controls>
     <coordinator name='MyCoord' >
-       <app-path>${nameNode}/user/hue/oozie/workspaces""" in bundle.to_xml(), bundle.to_xml())
-
-    assert_true(
-"""</app-path>
+       <app-path>${nameNode}/deployment_path_coord</app-path>
          <configuration>
+           <property>
+              <name>wf_application_path</name>
+              <value>/deployment_path_wf</value>
+          </property>
            <property>
               <name>market</name>
               <value>US</value>
           </property>
         </configuration>
     </coordinator>
-</bundle-app>""" in bundle.to_xml(), bundle.to_xml())
+</bundle-app>""" in xml, xml)
 
 
 class TestImportWorkflow04(OozieMockBase):

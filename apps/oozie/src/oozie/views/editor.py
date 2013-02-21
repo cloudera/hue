@@ -691,13 +691,15 @@ def submit_bundle(request, bundle):
 
 def _submit_bundle(request, bundle, properties):
   try:
+    deployment_dirs = {}
+
     for bundled in bundle.coordinators.all():
       wf_dir = Submission(request.user, bundled.coordinator.workflow, request.fs, properties).deploy()
-      properties = {'wf_application_path': request.fs.get_hdfs_path(wf_dir)}
+      deployment_dirs['wf_%s_dir' % bundled.coordinator.workflow.id] = request.fs.get_hdfs_path(wf_dir)
       coord_dir = Submission(request.user, bundled.coordinator, request.fs, properties).deploy()
-      bundled.coordinator.deployment_dir = coord_dir
-      bundled.coordinator.save() # Does not support concurrent submissions
+      deployment_dirs['coord_%s_dir' % bundled.coordinator.id] = coord_dir
 
+    properties.update(deployment_dirs)
     submission = Submission(request.user, bundle, request.fs, properties=properties)
     job_id = submission.run()
 

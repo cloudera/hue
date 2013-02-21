@@ -36,9 +36,12 @@
   % if bundle.coordinators:
     % for bundled in bundle.coordinators.all():
     <coordinator name='${ bundled.coordinator.name }' >
-       <app-path>${'${'}nameNode}${ bundled.coordinator.deployment_dir }</app-path>
-       % if bundled.get_parameters():
+       <app-path>${'${'}nameNode}${ mapping.pop('coord_%s_dir' % bundled.coordinator.id) }</app-path>
          <configuration>
+           <property>
+              <name>wf_application_path</name>
+              <value>${ mapping.pop('wf_%s_dir' % bundled.coordinator.workflow.id) }</value>
+          </property>
            % for param in bundled.get_parameters():
            <property>
               <name>${ param['name'] }</name>
@@ -46,7 +49,6 @@
           </property>
           % endfor
         </configuration>
-      % endif
     </coordinator>
     % endfor
   % endif
