@@ -56,6 +56,12 @@ class Facet(models.Model):
     if 'fields' in post_data and post_data['fields']:
       data_dict['fields'] = json.loads(post_data['fields'])
 
+    if 'ranges' in post_data and post_data['ranges']:
+      data_dict['ranges'] = json.loads(post_data['ranges'])
+
+    if 'dates' in post_data and post_data['dates']:
+      data_dict['dates'] = json.loads(post_data['dates'])
+
     self.data = json.dumps(data_dict)
 
   def get_query_params(self):
@@ -69,7 +75,7 @@ class Facet(models.Model):
     )
 
     if 'fields' in data_dict and data_dict['fields']:
-      field_facets = tuple([('facet.field', field_facet) for field_facet in data_dict['fields']])
+      field_facets = tuple([('facet.field', field_facet['field']) for field_facet in data_dict['fields']])
       params += field_facets
 
     return params
@@ -143,7 +149,7 @@ class Query(object): pass
 def temp_fixture_hook():
   #Core.objects.all().delete()
   if not Core.objects.exists():
-    facets = Facet.objects.create(data=json.dumps({'fields': ['id']}))
+    facets = Facet.objects.create(data=json.dumps({'fields': ['id'], 'ranges': [], 'dates': []}))
     result = Result.objects.create()
     sorting = Sorting.objects.create()
 

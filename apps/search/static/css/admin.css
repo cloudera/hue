@@ -15,3 +15,32 @@
 .availableFields ul li {
   cursor: pointer;
 }
+
+.form-actions {
+  padding-left: 20px!important;
+}
+
+.bubble {
+  float: left;
+  background-color: #EEEEEE;
+  border: 1px solid #E0E0E0;
+  padding: 8px;
+  margin: 4px;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+}
+
+.section {
+  background-color: #FAFAFA;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+}
+
+.miniform {
+  margin-top: 20px;
+  background-color: #F3F3F3;
+  padding: 10px;
+  border-top: 1px solid #DDD;
+}
