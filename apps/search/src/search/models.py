@@ -40,7 +40,7 @@ class DateFacet(object): pass
 
 
 class Facet(models.Model):
-  _ATTRIBUTES = ['properties', 'fields', 'range', 'date'] # Metadata of the data, only 'fields' used currently
+  _ATTRIBUTES = ['properties', 'fields', 'range', 'date']
   enabled = models.BooleanField(default=True)
   data = models.TextField()
 
@@ -64,6 +64,7 @@ class Facet(models.Model):
 
     self.data = json.dumps(data_dict)
 
+
   def get_query_params(self):
     data_dict = json.loads(self.data)
 
@@ -74,22 +75,31 @@ class Facet(models.Model):
         ('facet.sort', 'count'),
     )
 
-    if 'fields' in data_dict and data_dict['fields']:
+    if data_dict.get('fields'):
       field_facets = tuple([('facet.field', field_facet['field']) for field_facet in data_dict['fields']])
       params += field_facets
 
+    if data_dict.get('ranges'):
+      for field_facet in data_dict['ranges']:      
+        range_facets = tuple([
+                           ('facet.range', field_facet['field']),
+                           ('f.%s.facet.range.start' % field_facet['field'], field_facet['start']),
+                           ('f.%s.facet.range.end' % field_facet['field'], field_facet['end']),
+                           ('f.%s.facet.range.gap' % field_facet['field'], field_facet['gap']),]
+                        )
+        params += range_facets      
+ 
+    if data_dict.get('dates'):
+      for field_facet in data_dict['dates']:      
+        range_facets = tuple([
+                           ('facet.date', field_facet['field']),
+                           ('f.%s.facet.date.start' % field_facet['field'], 'NOW/DAY-305DAYS'),
+                           ('f.%s.facet.date.end' % field_facet['field'], 'NOW/DAY+1DAY'),
+                           ('f.%s.facet.date.gap' % field_facet['field'], '+%sDAY' % field_facet['gap']),]
+                        )
+        params += range_facets
+ 
     return params
-
-# e.g.
-#                ('facet.range', 'retweet_count'),
-#                ('f.retweet_count.facet.range.start', '0'),
-#                ('f.retweet_count.facet.range.end', '100'),
-#                ('f.retweet_count.facet.range.gap', '10'),
-#
-#                ('facet.date', 'created_at'),
-#                ('facet.date.start', 'NOW/DAY-305DAYS'),
-#                ('facet.date.end', 'NOW/DAY+1DAY'),
-#                ('facet.date.gap', '+1DAY'),
 
 
 class Result(models.Model):
@@ -147,9 +157,9 @@ class Query(object): pass
 
 
 def temp_fixture_hook():
-  #Core.objects.all().delete()
+  Core.objects.all().delete()
   if not Core.objects.exists():
-    facets = Facet.objects.create(data=json.dumps({'fields': ['id'], 'ranges': [], 'dates': []}))
+    facets = Facet.objects.create(data=json.dumps({'ranges': [{"type":"range","field":"price","start":"1","end":"400","gap":"100"}], 'fields': [{"type":"field","field":"id"}], 'dates': [{"type":"date","field":"last_modified","start":"02-13-2013","end":"02-19-2013","gap":"1"}]}))
     result = Result.objects.create()
     sorting = Sorting.objects.create()
 
