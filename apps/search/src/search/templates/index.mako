@@ -125,7 +125,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
       <table class="table table-striped table-hover" style="table-layout: fixed;">
         <tbody>
           % for result in response['response']['docs']:
-            ${ hue_core.result.gen_result(result) | n,unicode }
+            ${ hue_core.result.render_result(result) | n,unicode }
           % endfor
         </tbody>
       </table>

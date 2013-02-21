@@ -73,8 +73,12 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
         <div class="row-fluid">
           <div class="span9">
             <div id="toolbar"></div>
-            <div id="content-editor" class="clear">${_('Add your content here...')}</div>
-            <div id="load-template" class="btn-group"><a title="Load template" class="btn toolbar-btn toolbar-cmd"><i class="icon-paste" style="margin-top:2px;"></i></a></div>
+            <div id="content-editor" class="clear">${ hue_core.result.get_template() | n,unicode }</div>
+            <div id="load-template" class="btn-group">
+              <a title="Load template" class="btn toolbar-btn toolbar-cmd">
+                <i class="icon-paste" style="margin-top:2px;"></i>
+              </a>
+            </div>
           </div>
 
           <div class="span3">
@@ -174,21 +178,23 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     ko.applyBindings(new ViewModel());
 
     var samples = ${ sample_data | n,unicode };
-
     var templateEditor = $("#template-source")[0];
 
     var codeMirror = CodeMirror(function (elt) {
-      templateEditor.parentNode.replaceChild(elt, templateEditor);
-    }, {
-      value: templateEditor.value,
-      readOnly: false,
-      lineNumbers: true
+        templateEditor.parentNode.replaceChild(elt, templateEditor);
+      }, {
+        value: templateEditor.value,
+        readOnly: false,
+        lineNumbers: true
     });
 
-    $("#content-editor").freshereditor({toolbar_selector: "#toolbar", excludes: ['strikethrough', 'removeFormat', 'backcolor', 'insertorderedlist', 'justifyfull', 'insertheading1', 'insertheading2', 'superscript', 'subscript']});
+    $("#content-editor").freshereditor({
+        toolbar_selector: "#toolbar",
+        excludes: ['strikethrough', 'removeFormat', 'backcolor', 'insertorderedlist', 'justifyfull', 'insertheading1', 'insertheading2', 'superscript', 'subscript']
+    });
     $("#content-editor").freshereditor("edit", true);
 
-    // force refresh on tab change
+    // Force refresh on tab change
     $("a[data-toggle='tab']").on("shown", function (e) {
       if ($(e.target).attr("href") == "#source") {
         codeMirror.setValue($("#content-editor").html());
@@ -235,9 +241,22 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 
 
     $("#save-template").click(function () {
-      ##TODO: save template
-      ## you can access it with: $("#content-editor").html()
-      ## console.log($("#content-editor").html());
+      $.ajax("${ url('search:admin_core_template', core=hue_core.name) }", {
+        data: {
+          'template': ko.utils.stringifyJson($("#content-editor").html()),
+        },
+        contentType: 'application/json',
+        type: 'POST',
+        success: function () {
+          $.jHueNotify.info("${_('Template updated')}");
+        },
+        error: function (data) {
+          $.jHueNotify.error("${_('Error: ')}" + data);
+        },
+        complete: function() {
+          $("#save-template").button('reset');
+        }
+      });
     });
 
   });

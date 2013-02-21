@@ -22,6 +22,7 @@ except ImportError:
 
 import logging
 
+from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 
 from desktop.lib.django_util import render
@@ -104,6 +105,11 @@ def admin_core_template(request, core):
   solr_core = SolrApi(SOLR_URL.get()).core(core)
   hue_core = Core.objects.get(name=core)
 
+  if request.method == 'POST':
+    hue_core.result.update_from_post(request.POST)
+    hue_core.result.save()
+    return HttpResponse(json.dumps({}), mimetype="application/json")
+
   solr_query = {}
   solr_query['core'] = core
   solr_query['q'] = ''
@@ -127,7 +133,6 @@ def admin_core_facets(request, core):
   hue_core = Core.objects.get(name=core)
 
   if request.method == 'POST':
-    print request.POST
     hue_core.facets.update_from_post(request.POST)
     hue_core.facets.save()
     request.info(_('Facets updated'))
