@@ -23,7 +23,7 @@ Tests for "user admin"
 
 import re
 import urllib
-from ldap import LDAPError
+import ldap
 
 from nose.plugins.attrib import attr
 from nose.tools import assert_true, assert_equal, assert_false
@@ -72,28 +72,50 @@ class LdapTestConnection(object):
   def remove_user_group_for_test(self, user, group):
     LdapTestConnection._instance.groups[group]['members'].remove(user)
 
-  def find_users(self, username_pattern, find_by_dn=False):
+  def find_users(self, username_pattern, find_by_dn=False, scope=ldap.SCOPE_SUBTREE):
     """ Returns info for a particular user """
-    username_pattern = username_pattern.replace('.','\\.').replace('*', '.*')
-    usernames = filter(lambda username: re.match(username_pattern, username), LdapTestConnection._instance.users.keys())
-    return [LdapTestConnection._instance.users.get(username) for username in usernames]
+    if find_by_dn:
+      data = filter(lambda attrs: attrs['dn'] == username_pattern, LdapTestConnection._instance.users.values())
+    else:
+      username_pattern = username_pattern.replace('.','\\.').replace('*', '.*')
+      usernames = filter(lambda username: re.match(username_pattern, username), LdapTestConnection._instance.users.keys())
+      data = [LdapTestConnection._instance.users.get(username) for username in usernames]
+    return data
 
-  def find_groups(self, groupname_pattern, find_by_dn=False):
+  def find_groups(self, groupname_pattern, find_by_dn=False, scope=ldap.SCOPE_SUBTREE):
     """ Return all groups in the system with parents and children """
-    groupname_pattern = groupname_pattern.replace('.','\\.').replace('*', '.*')
-    groupnames = filter(lambda username: re.match(groupname_pattern, username), LdapTestConnection._instance.groups.keys())
-    return [LdapTestConnection._instance.groups.get(groupname) for groupname in groupnames]
+    if find_by_dn:
+      data = filter(lambda attrs: attrs['dn'] == groupname_pattern, LdapTestConnection._instance.groups.values())
+      # SCOPE_SUBTREE means we return all sub-entries of the desired entry along with the desired entry.
+      if data and scope == ldap.SCOPE_SUBTREE:
+        sub_data = filter(lambda attrs: attrs['dn'].endswith(data[0]['dn']), LdapTestConnection._instance.groups.values())
+        data.extend(sub_data)
+    else:
+      groupname_pattern = groupname_pattern.replace('.','\\.').replace('*', '.*')
+      groupnames = filter(lambda username: re.match(groupname_pattern, username), LdapTestConnection._instance.groups.keys())
+      data = [LdapTestConnection._instance.groups.get(groupname) for groupname in groupnames]
+    return data
 
   class _Singleton:
     def __init__(self):
-      self.users = {'moe': {'username':'moe', 'first':'Moe', 'email':'moe@stooges.com'},
-                    'larry': {'username':'larry', 'first':'Larry', 'last':'Stooge', 'email':'larry@stooges.com'},
-                    'curly': {'username':'curly', 'first':'Curly', 'last':'Stooge', 'email':'curly@stooges.com'},
-                    'otherguy': {'username':'otherguy', 'first':'Other', 'last':'Guy', 'email':'other@guy.com'}}
+      self.users = {'moe': {'dn': 'uid=moe,ou=People,dc=example,dc=com', 'username':'moe', 'first':'Moe', 'email':'moe@stooges.com'},
+                    'larry': {'dn': 'uid=larry,ou=People,dc=example,dc=com', 'username':'larry', 'first':'Larry', 'last':'Stooge', 'email':'larry@stooges.com'},
+                    'curly': {'dn': 'uid=curly,ou=People,dc=example,dc=com', 'username':'curly', 'first':'Curly', 'last':'Stooge', 'email':'curly@stooges.com'},
+                    'rock': {'dn': 'uid=rock,ou=People,dc=example,dc=com', 'username':'rock', 'first':'rock', 'last':'man', 'email':'rockman@stooges.com'},
+                    'otherguy': {'dn': 'uid=otherguy,ou=People,dc=example,dc=com', 'username':'otherguy', 'first':'Other', 'last':'Guy', 'email':'other@guy.com'}}
 
-      self.groups = {'TestUsers': {'name':'TestUsers', 'members':['moe','larry','curly']},
-                     'Test Administrators': {'name':'Test Administrators', 'members':['curly','larry']},
-                     'OtherGroup': {'name':'OtherGroup', 'members':[]}}
+      self.groups = {'TestUsers': {
+                        'dn': 'cn=TestUsers,ou=Groups,dc=example,dc=com',
+                        'name':'TestUsers',
+                        'members':['uid=moe,ou=People,dc=example,dc=com','uid=larry,ou=People,dc=example,dc=com','uid=curly,ou=People,dc=example,dc=com']},
+                     'Test Administrators': {
+                        'dn': 'cn=Test Administrators,cn=TestUsers,ou=Groups,dc=example,dc=com',
+                        'name':'Test Administrators',
+                        'members':['uid=rock,ou=People,dc=example,dc=com','uid=larry,ou=People,dc=example,dc=com','uid=curly,ou=People,dc=example,dc=com']},
+                     'OtherGroup': {
+                        'dn': 'cn=OtherGroup,cn=TestUsers,ou=Groups,dc=example,dc=com',
+                        'name':'OtherGroup',
+                        'members':[]}}
 
 
 
@@ -403,7 +425,57 @@ def test_user_admin():
   response = c_su.post('/useradmin/users/new', dict(username="test"))
   assert_true("You must specify a password when creating a new user." in response.content)
 
-def test_useradmin_ldap_integration():
+
+def test_useradmin_ldap_group_integration():
+  reset_all_users()
+  reset_all_groups()
+
+  # Set up LDAP tests to use a LdapTestConnection instead of an actual LDAP connection
+  ldap_access.CACHED_LDAP_CONN = LdapTestConnection()
+
+  # Import all members of TestUsers
+  import_ldap_groups('TestUsers', import_members=True, import_members_recursive=False, import_by_dn=False)
+  test_users = Group.objects.get(name='TestUsers')
+  assert_true(LdapGroup.objects.filter(group=test_users).exists())
+  assert_equal(len(test_users.user_set.all()), 3)
+
+  # Should import a group, but will only sync already-imported members
+  import_ldap_groups('Test Administrators', import_members=False, import_members_recursive=False, import_by_dn=False)
+  assert_equal(len(User.objects.all()), 3)
+  assert_equal(len(Group.objects.all()), 2)
+  test_admins = Group.objects.get(name='Test Administrators')
+  assert_equal(len(test_admins.user_set.all()), 2)
+  larry = User.objects.get(username='larry')
+  assert_equal(test_admins.user_set.all()[0].username, larry.username)
+
+  # Only sync already imported
+  ldap_access.CACHED_LDAP_CONN.remove_user_group_for_test('uid=moe,ou=People,dc=example,dc=com', 'TestUsers')
+  import_ldap_groups('TestUsers', import_members=False, import_members_recursive=False, import_by_dn=False)
+  assert_equal(len(test_users.user_set.all()), 2)
+  assert_equal(len(User.objects.get(username='moe').groups.all()), 0)
+
+  # Import missing user
+  ldap_access.CACHED_LDAP_CONN.add_user_group_for_test('uid=moe,ou=People,dc=example,dc=com', 'TestUsers')
+  import_ldap_groups('TestUsers', import_members=True, import_members_recursive=False, import_by_dn=False)
+  assert_equal(len(test_users.user_set.all()), 3)
+  assert_equal(len(User.objects.get(username='moe').groups.all()), 1)
+
+  # Import all members of TestUsers and members of subgroups
+  import_ldap_groups('TestUsers', import_members=True, import_members_recursive=True, import_by_dn=False)
+  test_users = Group.objects.get(name='TestUsers')
+  assert_true(LdapGroup.objects.filter(group=test_users).exists())
+  assert_equal(len(test_users.user_set.all()), 4)
+
+  # Make sure Hue groups with naming collisions don't get marked as LDAP groups
+  hue_user = User.objects.create(username='otherguy', first_name='Different', last_name='Guy')
+  hue_group = Group.objects.create(name='OtherGroup')
+  hue_group.user_set.add(hue_user)
+  hue_group.save()
+  import_ldap_groups('OtherGroup', import_members=False, import_members_recursive=False, import_by_dn=False)
+  assert_false(LdapGroup.objects.filter(group=hue_group).exists())
+  assert_true(hue_group.user_set.filter(username=hue_user.username).exists())
+
+def test_useradmin_ldap_user_integration():
   reset_all_users()
   reset_all_groups()
 
@@ -424,30 +496,6 @@ def test_useradmin_ldap_integration():
   assert_equal(len(User.objects.all()), 1)
   assert_equal(len(Group.objects.all()), 0)
 
-  # Should import a group, but will only sync already-imported members
-  import_ldap_groups('Test Administrators', import_members=False, import_by_dn=False)
-  assert_equal(len(User.objects.all()), 1)
-  assert_equal(len(Group.objects.all()), 1)
-  test_admins = Group.objects.get(name='Test Administrators')
-  assert_equal(len(test_admins.user_set.all()), 1)
-  assert_equal(test_admins.user_set.all()[0].username, larry.username)
-
-  # Import all members of TestUsers
-  import_ldap_groups('TestUsers', import_members=True, import_by_dn=False)
-  test_users = Group.objects.get(name='TestUsers')
-  assert_true(LdapGroup.objects.filter(group=test_users).exists())
-  assert_equal(len(test_users.user_set.all()), 3)
-
-  ldap_access.CACHED_LDAP_CONN.remove_user_group_for_test('moe', 'TestUsers')
-  import_ldap_groups('TestUsers', import_members=False, import_by_dn=False)
-  assert_equal(len(test_users.user_set.all()), 2)
-  assert_equal(len(User.objects.get(username='moe').groups.all()), 0)
-
-  ldap_access.CACHED_LDAP_CONN.add_user_group_for_test('moe', 'TestUsers')
-  import_ldap_groups('TestUsers', import_members=False, import_by_dn=False)
-  assert_equal(len(test_users.user_set.all()), 3)
-  assert_equal(len(User.objects.get(username='moe').groups.all()), 1)
-
   # Make sure that if a Hue user already exists with a naming collision, we
   # won't overwrite any of that user's information.
   hue_user = User.objects.create(username='otherguy', first_name='Different', last_name='Guy')
@@ -456,13 +504,6 @@ def test_useradmin_ldap_integration():
   assert_equal(get_profile(hue_user).creation_method, str(UserProfile.CreationMethod.HUE))
   assert_equal(hue_user.first_name, 'Different')
 
-  # Make sure Hue groups with naming collisions don't get marked as LDAP groups
-  hue_group = Group.objects.create(name='OtherGroup')
-  hue_group.user_set.add(hue_user)
-  hue_group.save()
-  import_ldap_groups('OtherGroup', import_members=False, import_by_dn=False)
-  assert_false(LdapGroup.objects.filter(group=hue_group).exists())
-  assert_true(hue_group.user_set.filter(username=hue_user.username).exists())
 
 def test_add_ldap_users():
   URL = reverse(add_ldap_users)
@@ -511,8 +552,8 @@ def test_add_ldap_groups():
   assert_true('Location' in response, response)
   assert_true('/useradmin/groups' in response['Location'], response)
 
-  response = c.post(URL, dict(groupname_pattern='toolongnametoolongnametoolongname'))
-  assert_true('30 characters or fewer' in response.context['form'].errors['groupname_pattern'][0], response)
+  response = c.post(URL, dict(groupname_pattern='toolongnametoolongnametoolongnametoolongnametoolongnametoolongnametoolongnametoolongname'))
+  assert_true('Ensure this value has at most 80 characters' in response.context['form'].errors['groupname_pattern'][0], response)
 
   # Test wild card
   response = c.post(URL, dict(groupname_pattern='*r*'))
@@ -539,7 +580,7 @@ def test_ldap_exception_handling():
   # Set up LDAP tests to use a LdapTestConnection instead of an actual LDAP connection
   class LdapTestConnectionError(LdapTestConnection):
     def find_users(self, user, find_by_dn=False):
-      raise LDAPError('No such object')
+      raise ldap.LDAPError('No such object')
   ldap_access.CACHED_LDAP_CONN = LdapTestConnectionError()
 
   c = make_logged_in_client('test', is_superuser=True)

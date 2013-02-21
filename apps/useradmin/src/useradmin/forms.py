@@ -134,10 +134,10 @@ class AddLdapUsersForm(forms.Form):
 class AddLdapGroupsForm(forms.Form):
   groupname_pattern = forms.RegexField(
       label=_t("Name"),
-      max_length=64,
+      max_length=80,
       regex='^%s$' % get_groupname_re_rule(),
-      help_text=_t("Required. 30 characters or fewer."),
-      error_messages={'invalid': _t("30 characters or fewer.") })
+      help_text=_t("Required. 80 characters or fewer."),
+      error_messages={'invalid': _t("80 characters or fewer.") })
   dn = forms.BooleanField(label=_t("Distinguished name"),
                           help_text=_t("Whether or not the group should be imported by "
                                     "distinguished name."),
@@ -147,6 +147,10 @@ class AddLdapGroupsForm(forms.Form):
                                       help_text=_t('Import unimported or new users from the group.'),
                                       initial=False,
                                       required=False)
+  import_members_recursive = forms.BooleanField(label=_t('Import new members from all subgroups'),
+                                                help_text=_t('Import unimported or new users from the all subgroups.'),
+                                                initial=False,
+                                                required=False)
   ensure_home_directories = forms.BooleanField(label=_t('Create home directories'),
                                                 help_text=_t('Create home directories for every member imported, if members are being imported.'),
                                                 initial=True,
