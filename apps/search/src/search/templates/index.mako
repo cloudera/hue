@@ -21,88 +21,91 @@ from django.utils.translation import ugettext as _
 
 <%namespace name="macros" file="macros.mako" />
 
-${ commonheader(_('Search'), "search", user) | n,unicode }
+${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 
+<div class="search-bar">
+  % if user.is_superuser:
+    <div class="pull-right" style="margin-top: 4px">
+      <a class="change-settings" href="#"><i class="icon-edit"></i> ${ _('Change settings for this Core') }</a>
+    </div>
+  % endif
+  <form class="form-search" style="margin: 0">
+    <div class="dropdown" style="display: inline">
+      Search in <a href="#" data-toggle="dropdown"><strong class="current-core"></strong> <i class="icon-caret-down"></i></a>
+      <ul class="dropdown-menu">
+        % if user.is_superuser:
+          % for core in hue_cores:
+            <li><a class="dropdown-core" href="#" data-value="${ core.name }" data-settings-url="${ core.get_absolute_url() }">${ core.label }</a></li>
+          % endfor
+        % else:
+          % for core in hue_cores:
+            <li><a class="dropdown-core" href="#" data-value="${ core.name }">${ core.label }</a></li>
+          % endfor
+        % endif
+      </ul>
+    </div>
+    <div class="input-append">
+      ${ search_form | n,unicode }
+      <button type="submit" class="btn">${ _('Go') }</button>
+    </div>
+  </form>
+</div>
 
 <div class="container-fluid">
-
   <div class="row-fluid">
-    <div class="span12">
-      <form class="form-search well">
-        <i class="twitter-logo"></i>
-        ${ search_form | n,unicode }
-        <button class="btn" type="submit">${_('Search')}</button>
-        % if response:
-        <div class="btn-group pull-right">
-          <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-            ${_('Sort by')}
-            <span class="caret"></span>
-          </a>
-          <ul class="dropdown-menu">
-            <li><a href="?query=${solr_query["q"]}&fq=${solr_query["fq"]}&sort=created_at+desc&rows=${solr_query["rows"]}&start=${solr_query["start"]}">${_('Date')}</a></li>
-            <li><a href="?query=${solr_query["q"]}&fq=${solr_query["fq"]}&sort=retweet_count+desc&rows=${solr_query["rows"]}&start=${solr_query["start"]}">${_('Retweets count')}</a></li>
-            <li class="divider"></li>
-            <li><a href="?query=${solr_query["q"]}&fq=${solr_query["fq"]}&rows=${solr_query["rows"]}&start=${solr_query["start"]}">${_('Reset sorting')}</a></li>
-          </ul>
-          % endif
-          % if user.is_superuser:
-            <a class="btn" href="${ url('search:admin') }">${ _('Admin') }</a>
-          % endif
-        </div>
-      </form>
-    </div>
-  </div>
-
-  % if response and solr_query['facets'] == 1:
-  <div class="row-fluid">
-    <div class="span3">
-      <div class="well" style="padding: 8px 0;">
-      <ul class="nav nav-list">
-        % if solr_query['fq']:
-          <li class="nav-header">${_('Current filter')}</li>
-          % for fq in solr_query['fq'].split('|'):
-            % if fq:
-              <%
-                removeList = solr_query['fq'].split('|')
-                removeList.remove(fq)
-              %>
-              <li><a href="?query=${ solr_query['q'] }&fq=${'|'.join(removeList)}&sort=${solr_query["sort"]}">${fq} <i class="icon-trash"></i></a></li>
-            % endif
-          % endfor
-          <li style="margin-bottom: 20px"></li>
-        % endif
-
+    % if response and response['response']['docs'] and len(response['response']['docs']) > 0 and solr_query['facets'] == 1:
+    <div class="span2">
+      <ul class="facet-list">
         % if response and response['facet_counts']:
           % if response['facet_counts']['facet_fields']:
-            <h4>${_('Fields')}</h4>
             % for cat in response['facet_counts']['facet_fields']:
                 % if response['facet_counts']['facet_fields'][cat]:
+                  <%
+                    found_value = ""
+                    for fq in solr_query['fq'].split('|'):
+                      if fq and fq.split(':')[0] == cat:
+                        found_value = fq.split(':')[1]
+                        remove_list = solr_query['fq'].split('|')
+                        remove_list.remove(fq)
+                  %>
                 <li class="nav-header">${cat}</li>
                 % for subcat, count in macros.pairwise(response['facet_counts']['facet_fields'][cat]):
-                  %if count > 0 and subcat != "":
-                    <li><a href="?query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ cat }:${ subcat }&sort=${solr_query["sort"]}">${subcat} (${ count })</a></li>
+                  %if count > 0 and subcat != "" and found_value == "":
+                    <li><a href="?query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ cat }:${ subcat }&sort=${solr_query["sort"]}">${subcat}</a> <span class="counter">(${ count })</span></li>
                   %endif
+                  % if found_value != "":
+                    <li><strong>${ found_value }</strong> <a href="?query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}&sort=${solr_query["sort"]}"><i class="icon-remove"></i></a></li>
+                  % endif
                 % endfor
                 % endif
             % endfor
           %endif
 
           % if response['facet_counts']['facet_ranges']:
-            <h4>${_('Ranges')}</h4>
             % for cat in response['facet_counts']['facet_ranges']:
                 % if response['facet_counts']['facet_ranges'][cat]:
+                  <%
+                    found_value = ""
+                    for fq in solr_query['fq'].split('|'):
+                      if fq and fq.split(':')[0] == cat:
+                        found_value = fq.split(':')[1]
+                        remove_list = solr_query['fq'].split('|')
+                        remove_list.remove(fq)
+                  %>
                 <li class="nav-header">${cat}</li>
                 % for range, count in macros.pairwise(response['facet_counts']['facet_ranges'][cat]['counts']):
-                 % if count > 0:
+                 % if count > 0 and found_value == "":
                    <li><a href="?query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ cat }:${ range }&sort=${solr_query["sort"]}">${ range } (${ count })</a></li>
                   %endif
+                  % if found_value != "":
+                      <li><strong>${ found_value }</strong> <a href="?query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}&sort=${solr_query["sort"]}"><i class="icon-remove"></i></a></li>
+                  % endif
                 % endfor
               % endif
             % endfor
           % endif
 
           % if response['facet_counts']['facet_dates']:
-            <h4>${_('Dates')}</h4>
             % for cat in response['facet_counts']['facet_dates']:
                 % if response['facet_counts']['facet_dates'][cat]:
                 <li class="nav-header">${cat}</li>
@@ -116,29 +119,39 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
           %endif
          %endif
       </ul>
-      </div>
     </div>
     % endif
+    % if response and response['response']['docs'] and len(response['response']['docs']) > 0:
+    <div class="span10">
+      <ul class="breadcrumb">
+        <li class="pull-right">
+          <select class="sort-by">
+            <option value="">${ _('Sort by') }</option>
+          </select>
+        </li>
+        <li class="active">
+        <%
+          end_record = int(solr_query["start"])+int(solr_query["rows"])
+          if end_record > int(response['response']['numFound']):
+            end_record = response['response']['numFound'];
+        %>
+        ${_('Showing %s - %s of %s results') % (int(solr_query["start"])+1, end_record, response['response']['numFound'])}
+        </li>
+      </ul>
 
-    <div class="span9">
-    % if response:
       <script src="/static/ext/js/mustache.js"></script>
 
-      <table class="table table-striped table-hover" style="table-layout: fixed;">
-        <tbody>
-          <div id="result-container"></div>
-            <script>
-              $.each(${ json.dumps([result for result in response['response']['docs']]) | n,unicode }, function (index, item) {
-                $("<div>").addClass("result-row").html(
-                  Mustache.render(${ hue_core.result.data | n,unicode }.template, item)
-                ).appendTo($("#result-container"));
-              });
-            </script>
-        </tbody>
-      </table>
+      <div id="result-container"></div>
+      <script>
+        $.each(${ json.dumps([result for result in response['response']['docs']]) | n,unicode }, function (index, item) {
+          $("<div>").addClass("result-row").html(
+            Mustache.render(${ hue_core.result.data | n,unicode }.template, item)
+          ).appendTo($("#result-container"));
+        });
+      </script>
 
       <div class="pagination">
-        <ul class="pull-right">
+        <ul>
           <%
             beginning = 0
             previous = int(solr_query["start"]) - int(solr_query["rows"])
@@ -150,15 +163,15 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
           % endif
           <li><a title="Next page" href="?query=${solr_query["q"]}&fq=${solr_query["fq"]}&sort=${solr_query["sort"]}&rows=${solr_query["rows"]}&start=${next}">${_('Next Page')}</a></li>
         </ul>
-        <p>
-          ${_('Showing %s to %s of %s tweets') % (int(solr_query["start"])+1, int(solr_query["start"])+int(solr_query["rows"]), response['response']['numFound'])}
-          ##${_('Show')}
-          ##<select id="recordsPerPage" class="input-mini"><option value="15">15</option><option value="30">30</option><option value="45">45</option><option value="60">60</option><option value="100">100</option></select>
-          ##${_('tweets per page.')}
-        </p>
       </div>
-    % endif
     </div>
+    % else:
+    <div class="span12">
+      <div class="alert">
+        ${_('Your search - %s - did not match any documents.') % (solr_query["q"])}
+      </div>
+    </div>
+    % endif
   </div>
 </div>
 
@@ -166,31 +179,65 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
   ${ rr | n,unicode }
 </div>
 
+
 <link rel="stylesheet" href="/search/static/css/search.css">
 
 <script src="/static/ext/js/moment.min.js" type="text/javascript" charset="utf-8"></script>
 
 <script>
-  $(document).ready(function(){
-    $("a[data-dt]").each(function(){
-      $(this).text(moment($(this).data("dt")).add("hours", 8).fromNow());
+  $(document).ready(function () {
+
+    $(".current-core").text($("select[name='cores'] option:selected").text());
+    % if user.is_superuser:
+        $(".dropdown-core").each(function () {
+          if ($(this).data("value") == $("select[name='cores']").val()) {
+            $(".change-settings").attr("href", $(this).data("settings-url"));
+          }
+        });
+    % endif
+
+    $(".dropdown-core").click(function (e) {
+      e.preventDefault();
+      $(".current-core").text($(this).text());
+      $("select[name='cores']").val($(this).data("value"));
+      % if user.is_superuser:
+          $(".change-settings").attr("href", $(this).data("settings-url"));
+      % endif
+      $("form").submit();
     });
-    $(".text").click(function(e){
-      if ($(e.target).is("div")){
-        window.open($(this).data("link"))
-      }
-      if ($(e.target).is("a")){
-        e.stopImmediatePropagation();
-        e.stopPropagation();
-      }
-    });
-    $("[rel='tooltip']").tooltip();
-    $("[rel='popover']").popover();
-    $("#recordsPerPage").change(function(){
+
+    $("#recordsPerPage").change(function () {
       $("input[name='rows']").val($(this).val());
       $("input[name='rows']").closest("form").submit();
     });
     $("#recordsPerPage").val($("input[name='rows']").val());
+
+    var sortingData = ${ hue_core.sorting.data | n,unicode };
+    if (sortingData && sortingData.fields && sortingData.fields.length > 0) {
+      $.each(sortingData.fields, function (index, item) {
+        $("<option>").attr("value", item.label).text(item.label).data("field", item.field).data("asc", item.asc).appendTo($(".sort-by"));
+      });
+      var activeSorting = "${solr_query["sort"]}";
+      if (activeSorting != "" && activeSorting.indexOf(" ") > -1) {
+        $.each(sortingData.fields, function (index, item) {
+          if (item.field == activeSorting.split(" ")[0] && item.asc == (activeSorting.split(" ")[1] == "asc")) {
+            $(".sort-by").val(item.label);
+          }
+        });
+      }
+    }
+    else {
+      $(".sort-by").hide();
+    }
+
+    $(".sort-by").change(function () {
+      var _sort = $(".sort-by option:selected").data("field") + "+" + ($(".sort-by option:selected").data("asc") ? "asc" : "desc");
+      if ($(".sort-by").val() == "") {
+        _sort = "";
+      }
+      location.href = "?query=${solr_query["q"]}&fq=${solr_query["fq"]}&sort=" + _sort + "&rows=${solr_query["rows"]}&start=${solr_query["start"]}";
+    });
+
   });
 </script>
 

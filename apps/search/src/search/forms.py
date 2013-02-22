@@ -24,7 +24,7 @@ class QueryForm(forms.Form):
   cores = forms.ChoiceField()
 
   query = forms.CharField(label='', max_length=256, required=False, initial='',
-                          widget=forms.TextInput(attrs={'class': 'input-xxlarge search-query', 'placeholder': 'Search'}))
+                          widget=forms.TextInput(attrs={'class': 'search-query input-xxlarge', 'placeholder': 'Search...'}))
   fq = forms.CharField(label='', max_length=256, required=False, initial='', widget=forms.HiddenInput(), help_text='Solr Filter query')
   sort = forms.CharField(label='', max_length=256, required=False, initial='', widget=forms.HiddenInput(), help_text='Solr sort')
   rows = forms.CharField(label='', required=False, initial='', widget=forms.HiddenInput(), help_text='Solr records per page')
@@ -35,7 +35,7 @@ class QueryForm(forms.Form):
     super(QueryForm, self).__init__(*args, **kwargs)
     choices = [(core.name, core.label) for core in Core.objects.filter(enabled=True)]
     initial_choice = self._initial_core(choices)
-    self.fields['cores'] = forms.ChoiceField(choices=choices, initial=initial_choice, required=False, label='')
+    self.fields['cores'] = forms.ChoiceField(choices=choices, initial=initial_choice, required=False, label='', widget=forms.Select(attrs={'class':'hide'}))
 
   def clean_cores(self):
     if self.cleaned_data.get('cores'):
