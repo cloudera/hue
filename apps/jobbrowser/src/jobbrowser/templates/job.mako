@@ -331,7 +331,7 @@ ${ commonheader(_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId_short),
             "aaSorting": [[ 1, "asc" ]],
             "oLanguage": {
                 "sEmptyTable": "${_('No data available')}",
-                "sZeroRecords": "${_('No matching records')}",
+                "sZeroRecords": "${_('No matching records')}"
             }
         });
 
@@ -346,7 +346,7 @@ ${ commonheader(_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId_short),
             ],
             "oLanguage": {
                 "sEmptyTable": "${_('No data available')}",
-                "sZeroRecords": "${_('No matching records')}",
+                "sZeroRecords": "${_('No matching records')}"
             }
         });
 
@@ -361,11 +361,11 @@ ${ commonheader(_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId_short),
             ],
             "oLanguage": {
                 "sEmptyTable": "${_('No data available')}",
-                "sZeroRecords": "${_('No matching records')}",
+                "sZeroRecords": "${_('No matching records')}"
             }
         });
 
-        $("#metadataFilter").keydown(function(){
+        $("#metadataFilter").keyup(function(){
             _metadataTable.fnFilter($(this).val());
             _rawConfigurationTable.fnFilter($(this).val());
         });
@@ -383,7 +383,7 @@ ${ commonheader(_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId_short),
             ],
             "oLanguage": {
                 "sEmptyTable": "${_('No data available')}",
-                "sZeroRecords": "${_('No matching records')}",
+                "sZeroRecords": "${_('No matching records')}"
             }
         });
 

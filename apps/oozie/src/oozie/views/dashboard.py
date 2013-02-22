@@ -307,6 +307,20 @@ def list_oozie_workflow_action(request, action, coordinator_job_id=None, bundle_
 
 
 @show_oozie_error
+def list_oozie_info(request):
+
+  instrumentation = get_oozie().get_instrumentation()
+  configuration = get_oozie().get_configuration()
+  oozie_status = get_oozie().get_oozie_status()
+
+  return render('dashboard/list_oozie_info.mako', request, {
+    'instrumentation': instrumentation,
+    'configuration': configuration,
+    'oozie_status': oozie_status,
+  })
+
+
+@show_oozie_error
 def rerun_oozie_job(request, job_id, app_path):
   ParametersFormSet = formset_factory(ParameterForm, extra=0)
   oozie_workflow = check_job_access_permission(request, job_id)
@@ -434,6 +448,7 @@ def massaged_workflow_actions_for_json(workflow_actions, oozie_coordinator, oozi
       'startTime': format_time(action.startTime),
       'endTime': format_time(action.endTime),
       'retries': action.retries,
+      'errorCode': escapejs(action.errorCode),
       'errorMessage': escapejs(action.errorMessage),
       'transition': action.transition,
       'data': escapejs(action.data)
@@ -465,6 +480,7 @@ def massaged_coordinator_actions_for_json(coordinator, oozie_bundle):
       'title': action.title,
       'createdTime': format_time(action.createdTime),
       'lastModifiedTime': format_time(action.lastModifiedTime),
+      'errorCode': escapejs(action.errorCode),
       'errorMessage': escapejs(action.errorMessage),
       'missingDependencies': escapejs(action.missingDependencies)
     }
@@ -487,6 +503,8 @@ def massaged_bundle_actions_for_json(bundle):
       'status': action.status,
       'externalId': action.coordExternalId or '-',
       'frequency': action.frequency,
+      'timeUnit': action.timeUnit,
+      'nextMaterializedTime': action.nextMaterializedTime,
       'concurrency': action.concurrency,
       'pauseTime': action.pauseTime,
       'user': action.user,
@@ -538,7 +556,11 @@ def massaged_oozie_jobs_for_json(oozie_jobs, user):
       'absoluteUrl': job.get_absolute_url(),
       'canEdit': has_job_edition_permission(job, user),
       'killUrl': reverse('oozie:manage_oozie_jobs', kwargs={'job_id':job.id, 'action':'kill'}),
-      }
+      'created': hasattr(job, 'createdTime') and job.createdTime and job.createdTime and ((job.type == 'Bundle' and job.createdTime) or format_time(job.createdTime)),
+      'run': hasattr(job, 'run') and job.run or 0,
+      'frequency': hasattr(job, 'frequency') and job.frequency or None,
+      'timeUnit': hasattr(job, 'timeUnit') and job.timeUnit or None,
+    }
     jobs.append(massaged_job)
 
   return jobs

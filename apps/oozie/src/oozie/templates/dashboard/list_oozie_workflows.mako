@@ -59,11 +59,14 @@ ${ layout.menubar(section='dashboard') }
     <table class="table table-condensed" id="running-table">
       <thead>
         <tr>
-          <th width="15%">${ _('Submission') }</th>
+          <th width="10%">${ _('Submission') }</th>
           <th width="10%">${ _('Status') }</th>
-          <th width="30%">${ _('Name') }</th>
-          <th width="10%">${ _('Progress') }</th>
-          <th width="10%">${ _('Submitter') }</th>
+          <th width="20%">${ _('Name') }</th>
+          <th width="5%">${ _('Progress') }</th>
+          <th width="5%">${ _('Submitter') }</th>
+          <th width="10%">${ _('Created') }</th>
+          <th width="10%">${ _('Last modified') }</th>
+          <th width="5%">${ _('Run') }</th>
           <th width="15%">${ _('Id') }</th>
           <th width="10%">${ _('Action') }</th>
         </tr>
@@ -80,12 +83,15 @@ ${ layout.menubar(section='dashboard') }
     <table class="table table-condensed" id="completed-table" data-tablescroller-disable="true">
       <thead>
         <tr>
-          <th width="15%">${ _('Completion') }</th>
+          <th width="10%">${ _('Completion') }</th>
           <th width="10%">${ _('Status') }</th>
-          <th width="35%">${ _('Name') }</th>
-          <th width="10%">${ _('Duration') }</th>
-          <th width="10%">${ _('Submitter') }</th>
-          <th width="20%">${ _('Id') }</th>
+          <th width="25%">${ _('Name') }</th>
+          <th width="5%">${ _('Duration') }</th>
+          <th width="5%">${ _('Submitter') }</th>
+          <th width="10%">${ _('Created') }</th>
+          <th width="10%">${ _('Last modified') }</th>
+          <th width="5%">${ _('Run') }</th>
+          <th width="25%">${ _('Id') }</th>
         </tr>
       </thead>
       <tbody>
@@ -111,23 +117,24 @@ ${ layout.menubar(section='dashboard') }
 <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript" charset="utf-8">
-
   var Workflow = function (wf) {
     return {
-      id:wf.id,
-      lastModTime:wf.lastModTime,
-      endTime:wf.endTime,
-      status:wf.status,
-      statusClass:"label " + getStatusClass(wf.status),
-      isRunning:wf.isRunning,
-      duration:wf.duration,
-      appName:wf.appName,
-      progress:wf.progress,
-      progressClass:"bar " + getStatusClass(wf.status, "bar-"),
-      user:wf.user,
-      absoluteUrl:wf.absoluteUrl,
-      canEdit:wf.canEdit,
-      killUrl:wf.killUrl
+      id: wf.id,
+      lastModTime: wf.lastModTime,
+      endTime: wf.endTime,
+      status: wf.status,
+      statusClass: "label " + getStatusClass(wf.status),
+      isRunning: wf.isRunning,
+      duration: wf.duration,
+      appName: wf.appName,
+      progress: wf.progress,
+      progressClass: "bar " + getStatusClass(wf.status, "bar-"),
+      user: wf.user,
+      absoluteUrl: wf.absoluteUrl,
+      canEdit: wf.canEdit,
+      killUrl: wf.killUrl,
+      created: wf.created,
+      run: wf.run
     }
   }
 
@@ -142,6 +149,9 @@ ${ layout.menubar(section='dashboard') }
         null,
         null,
         { "sSortDataType":"dom-sort-value", "sType":"numeric" },
+        null,
+        null,
+        null,
         null,
         null,
         { "bSortable":false }
@@ -177,6 +187,9 @@ ${ layout.menubar(section='dashboard') }
         null,
         null,
         { "sSortDataType":"dom-sort-value", "sType":"numeric" },
+        null,
+        null,
+        null,
         null,
         null
       ],
@@ -335,8 +348,16 @@ ${ layout.menubar(section='dashboard') }
                         '>${ _('Kill') }</a>';
               }
               if (['RUNNING', 'PREP', 'WAITING', 'SUSPENDED', 'PREPSUSPENDED', 'PREPPAUSED', 'PAUSED'].indexOf(wf.status) > -1) {
-                runningTable.fnAddData([wf.lastModTime, '<span class="' + wf.statusClass + '">' + wf.status + '</span>', wf.appName,
-                  '<div class="progress"><div class="' + wf.progressClass + '" style="width:' + wf.progress + '%">' + wf.progress + '%</div></div>', wf.user, '<a href="' + wf.absoluteUrl + '" data-row-selector="true">' + wf.id + '</a>',
+                runningTable.fnAddData([
+                  wf.lastModTime,
+                  '<span class="' + wf.statusClass + '">' + wf.status + '</span>',
+                  wf.appName,
+                  '<div class="progress"><div class="' + wf.progressClass + '" style="width:' + wf.progress + '%">' + wf.progress + '%</div></div>',
+                  wf.user,
+                  wf.created,
+                  wf.lastModTime,
+                  wf.run,
+                  '<a href="' + wf.absoluteUrl + '" data-row-selector="true">' + wf.id + '</a>',
                   killCell]);
               }
             }
@@ -364,8 +385,15 @@ ${ layout.menubar(section='dashboard') }
         completedTable.fnClearTable();
         $(data).each(function (iWf, item) {
           var wf = new Workflow(item);
-          completedTable.fnAddData([wf.endTime, '<span class="' + wf.statusClass + '">' + wf.status + '</span>', decodeURIComponent(wf.appName),
-            wf.duration, wf.user, '<a href="' + wf.absoluteUrl + '" data-row-selector="true">' + wf.id + '</a>'], false);
+          completedTable.fnAddData([
+            wf.endTime,
+            '<span class="' + wf.statusClass + '">' + wf.status + '</span>', decodeURIComponent(wf.appName),
+            wf.duration,
+            wf.user,
+            wf.created,
+            wf.lastModTime,
+            wf.run,
+            '<a href="' + wf.absoluteUrl + '" data-row-selector="true">' + wf.id + '</a>'], false);
         });
         completedTable.fnDraw();
       });

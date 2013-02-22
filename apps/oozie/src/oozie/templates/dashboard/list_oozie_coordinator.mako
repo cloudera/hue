@@ -194,6 +194,7 @@ ${ layout.menubar(section='dashboard') }
             <th>${ _('Type') }</th>
             <th>${ _('Status') }</th>
 
+            <th>${ _('Error Code') }</th>
             <th>${ _('Error Message') }</th>
             <th>${ _('Missing Dependencies') }</th>
 
@@ -231,6 +232,7 @@ ${ layout.menubar(section='dashboard') }
           <td data-bind="text: nominalTime"></td>
           <td data-bind="text: type"></td>
           <td><span data-bind="text: status, attr: {'class': statusClass}"></span></td>
+          <td data-bind="text: errorCode"></td>
           <td data-bind="text: errorMessage"></td>
           <td data-bind="text: missingDependencies"></td>
           <td data-bind="text: createdTime"></td>
@@ -314,6 +316,7 @@ ${ layout.menubar(section='dashboard') }
       createdTime: action.createdTime,
       lastModifiedTime: action.lastModifiedTime,
       errorMessage: action.errorMessage,
+      errorCode: action.errorCode,
       missingDependencies: action.missingDependencies
     }
   }

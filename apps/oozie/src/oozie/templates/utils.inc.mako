@@ -119,8 +119,12 @@
 </%def>
 
 
-<%def name="display_conf(configs)">
-  <table class="table table-condensed table-striped">
+<%def name="display_conf(configs, id=None)">
+  <table class="table table-condensed table-striped"
+    % if id is not None:
+      id="${ id }"
+    % endif
+  >
     <thead>
       <tr>
         <th>${ _('Name') }</th>
@@ -183,7 +187,7 @@
 
 
 <%def name="get_status(status)">
-   % if status in ('SUCCEEDED', 'OK'):
+   % if status in ('SUCCEEDED', 'OK', 'NORMAL'):
      label-success
    % elif status in ('RUNNING', 'PREP', 'WAITING', 'SUSPENDED', 'PREPSUSPENDED', 'PREPPAUSED', 'PAUSED'):
       label-warning

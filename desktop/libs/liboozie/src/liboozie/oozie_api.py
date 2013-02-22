@@ -282,9 +282,6 @@ class OozieApi(object):
     return resp
 
   def get_instrumentation(self):
-    """
-    get_instrumentation() -> Oozie instrumentation (dictionary)
-    """
     params = self._get_params()
     resp = self._root.get('admin/instrumentation', params)
     return resp

@@ -5,19 +5,19 @@ from south.v2 import SchemaMigration
 from django.db import models
 
 class Migration(SchemaMigration):
-    
+
     def forwards(self, orm):
-        
+
         # Adding field 'Workflow.managed'
         db.add_column('oozie_workflow', 'managed', self.gf('django.db.models.fields.BooleanField')(default=True, blank=True), keep_default=False)
-    
-    
+
+
     def backwards(self, orm):
-        
+
         # Deleting field 'Workflow.managed'
         db.delete_column('oozie_workflow', 'managed')
-    
-    
+
+
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},
@@ -300,5 +300,5 @@ class Migration(SchemaMigration):
             'start': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'start_workflow'", 'blank': 'True', 'null': 'True', 'to': "orm['oozie.Start']"})
         }
     }
-    
+
     complete_apps = ['oozie']

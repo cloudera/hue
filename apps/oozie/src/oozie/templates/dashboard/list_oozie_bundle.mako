@@ -131,7 +131,8 @@ ${ layout.menubar(section='dashboard') }
           <thead>
           <tr>
             <th>${ _('Day') }</th>
-            <th>${ _('Comment') }</th>
+            <th>${ _('Last action') }</th>
+            <th>${ _('Next materialization') }</th>
           </tr>
           </thead>
           <tbody data-bind="template: {name: 'calendarTemplate', foreach: actions}">
@@ -161,6 +162,7 @@ ${ layout.menubar(section='dashboard') }
             </a>
           </td>
           <td><span data-bind="text: lastAction"></span></td>
+          <td><span data-bind="text: nextMaterializedTime"></span></td>
         </tr>
       </script>
 
@@ -173,6 +175,10 @@ ${ layout.menubar(section='dashboard') }
             <th>${ _('Id') }</th>
 
             <th>${ _('Last action') }</th>
+
+            <th>${ _('Frequency') }</th>
+            <th>${ _('Time Unit') }</th>
+
             <th>${ _('Acl') }</th>
 
             <th>${ _('Type') }</th>
@@ -215,6 +221,8 @@ ${ layout.menubar(section='dashboard') }
             <a data-bind="visible:externalId !='', attr: {href: url}, text: id" data-row-selector"true"></a>
           </td>
           <td data-bind="text: lastAction"></td>
+          <td data-bind="text: frequency"></td>
+          <td data-bind="text: timeUnit"></td>
           <td data-bind="text: acl"></td>
           <td data-bind="text: type"></td>
           <td><span data-bind="text: status, attr: {'class': statusClass}"></span></td>
@@ -290,6 +298,7 @@ ${ layout.menubar(section='dashboard') }
       statusClass: "label " + getStatusClass(action.status),
       externalId: action.externalId,
       frequency: action.frequency,
+      timeUnit: action.timeUnit,
       concurrency: action.concurrency,
       pauseTime: action.pauseTime,
       acl: action.acl,
@@ -299,7 +308,8 @@ ${ layout.menubar(section='dashboard') }
       executionPolicy: action.executionPolicy,
       startTime: action.startTime,
       endTime: action.endTime,
-      lastAction: action.lastAction
+      lastAction: action.lastAction,
+      nextMaterializedTime: action.nextMaterializedTime
     }
   }
 

@@ -61,9 +61,10 @@ ${layout.menubar(section='dashboard')}
         <tr>
           <th width="15%">${ _('Kickoff Time') }</th>
           <th width="10%">${ _('Status') }</th>
-          <th width="25%">${ _('Name') }</th>
+          <th width="20%">${ _('Name') }</th>
           <th width="10%">${ _('Progress') }</th>
-          <th width="15%">${ _('Submitter') }</th>
+          <th width="10%">${ _('Submitter') }</th>
+          <th width="10%">${ _('Created Time') }</th>
           <th width="15%">${ _('Id') }</th>
           <th width="10%">${ _('Action') }</th>
         </tr>
@@ -81,8 +82,9 @@ ${layout.menubar(section='dashboard')}
         <tr>
           <th width="15%">${ _('Kickoff Time') }</th>
           <th width="10%">${ _('Status') }</th>
-          <th width="35%">${ _('Name') }</th>
+          <th width="25%">${ _('Name') }</th>
           <th width="15%">${ _('Submitter') }</th>
+          <th width="15%">${ _('Created Time') }</th>
           <th width="25%">${ _('Id') }</th>
         </tr>
       </thead>
@@ -124,7 +126,8 @@ ${layout.menubar(section='dashboard')}
       user: bundle.user,
       absoluteUrl: bundle.absoluteUrl,
       canEdit: bundle.canEdit,
-      killUrl: bundle.killUrl
+      killUrl: bundle.killUrl,
+      created: bundle.created
     }
   }
 
@@ -139,6 +142,7 @@ ${layout.menubar(section='dashboard')}
         null,
         null,
         { "sSortDataType":"dom-sort-value", "sType":"numeric" },
+        null,
         null,
         null,
         { "bSortable":false }
@@ -171,6 +175,7 @@ ${layout.menubar(section='dashboard')}
       "sDom":"<'row'r>t<'row'<'span6'i><''p>>",
       "aoColumns":[
         { "sType":"date" },
+        null,
         null,
         null,
         null,
@@ -342,6 +347,7 @@ ${layout.menubar(section='dashboard')}
                     bundle.appName,
                     '<div class="progress"><div class="' + bundle.progressClass + '" style="width:' + bundle.progress + '%">' + bundle.progress + '%</div></div>',
                     bundle.user,
+                    bundle.created,
                     '<a href="' + bundle.absoluteUrl + '" data-row-selector="true">' + bundle.id + '</a>',
                     killCell]);
               }
@@ -376,6 +382,7 @@ ${layout.menubar(section='dashboard')}
               '<span class="' + bundle.statusClass + '">' + bundle.status + '</span>',
               bundle.appName,
               bundle.user,
+              bundle.created,
               '<a href="' + bundle.absoluteUrl + '" data-row-selector="true">' + bundle.id + '</a>'
           ], false);
         });
