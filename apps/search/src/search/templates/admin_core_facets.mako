@@ -26,7 +26,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 
 <%layout:skeleton>
   <%def name="title()">
-    <h1>${_('Search Admin - ')}${hue_core.name}</h1>
+    <h1>${_('Search Admin - ')}${hue_core.label}</h1>
   </%def>
   <%def name="navigation()">
     ${ layout.sidebar(hue_core.name, 'facets') }
@@ -115,7 +115,6 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 
       <div class="form-actions" style="margin-top: 80px">
         <button type="submit" class="btn btn-primary" id="save-facets">${_('Save Facets')}</button>
-        <a class="btn" href="${ url('search:admin') }"><i class="icon-list"></i> ${ _('Return to Core list') }</a>
         <a class="btn" href="${ url('search:index') }"><i class="icon-search"></i> ${ _('Back to Search') }</a>
       </div>
     </form>

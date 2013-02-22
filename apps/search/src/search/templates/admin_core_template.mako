@@ -25,17 +25,6 @@
 ${ commonheader(_('Search'), "search", user) | n,unicode }
 
 <style type="text/css">
-  .available-fields {
-    padding: 0;
-    padding-left:10px;
-  }
-  .available-fields ul {
-    list-style: none;
-    margin-left: 0;
-  }
-  .available-fields ul li {
-    color: #666;
-  }
   .preview-row:nth-child(odd) {
     background-color:#f9f9f9;
   }
@@ -55,7 +44,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 
 <%layout:skeleton>
   <%def name="title()">
-    <h1>${_('Search Admin - ')}${hue_core.name}</h1>
+    <h1>${_('Search Admin - ')}${hue_core.label}</h1>
   </%def>
   <%def name="navigation()">
     ${ layout.sidebar(hue_core.name, 'template') }
@@ -117,7 +106,6 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 
     <div class="form-actions">
       <a class="btn btn-primary" id="save-template">${_('Save Template')}</a>
-      <a class="btn" href="${ url('search:admin') }"><i class="icon-list"></i> ${ _('Return to Core list') }</a>
       <a class="btn" href="${ url('search:index') }"><i class="icon-search"></i> ${ _('Back to Search') }</a>
     </div>
 

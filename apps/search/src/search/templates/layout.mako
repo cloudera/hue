@@ -24,6 +24,14 @@
   <link rel="stylesheet" href="/search/static/css/admin.css">
 
   <div class="container-fluid">
+    <div class="pull-right" style="margin-top: 20px">
+      <span class="muted">${ _('Change settings for') }</span>
+      <select id="change-core" style="margin-bottom: 0;display: inline">
+          % for c in hue_cores:
+            <option value="${ c.get_absolute_url() }"> ${ c.label } (${ c.name })</option>
+          % endfor
+      </select>
+    </div>
     %if hasattr(caller, "title"):
       ${caller.title()}
     %else:
@@ -49,6 +57,13 @@
       %endif
     </div>
   </div>
+  <script type="text/javascript">
+    $(document).ready(function () {
+      $("#change-core").change(function(){
+        location.href = $("#change-core").val();
+      });
+    });
+  </script>
 </%def>
 
 <%def name="sidebar(core, section='')">

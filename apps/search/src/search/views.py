@@ -88,10 +88,12 @@ def admin(request):
 def admin_core_properties(request, core):
   solr_core = SolrApi(SOLR_URL.get()).core(core)
   hue_core = Core.objects.get(name=core)
+  hue_cores = Core.objects.all()
 
   return render('admin_core_properties.mako', request, {
     'solr_core': solr_core,
     'hue_core': hue_core,
+    'hue_cores': hue_cores,
   })
 
 
@@ -99,9 +101,12 @@ def admin_core_properties(request, core):
 def admin_core_schema(request, core):
   solr_schema = SolrApi(SOLR_URL.get()).schema(core)
   hue_core = Core.objects.get(name=core)
+  hue_cores = Core.objects.all()
+
   return render('admin_core_schema.mako', request, {
     'solr_schema': solr_schema,
     'hue_core': hue_core,
+    'hue_cores': hue_cores,
   })
 
 
@@ -109,6 +114,7 @@ def admin_core_schema(request, core):
 def admin_core_template(request, core):
   solr_core = SolrApi(SOLR_URL.get()).core(core)
   hue_core = Core.objects.get(name=core)
+  hue_cores = Core.objects.all()
 
   if request.method == 'POST':
     hue_core.result.update_from_post(request.POST)
@@ -128,6 +134,7 @@ def admin_core_template(request, core):
   return render('admin_core_template.mako', request, {
     'solr_core': solr_core,
     'hue_core': hue_core,
+    'hue_cores': hue_cores,
     'sample_data': json.dumps(response["response"]["docs"]),
   })
 
@@ -136,6 +143,7 @@ def admin_core_template(request, core):
 def admin_core_facets(request, core):
   solr_core = SolrApi(SOLR_URL.get()).core(core)
   hue_core = Core.objects.get(name=core)
+  hue_cores = Core.objects.all()
 
   if request.method == 'POST':
     hue_core.facets.update_from_post(request.POST)
@@ -145,6 +153,7 @@ def admin_core_facets(request, core):
   return render('admin_core_facets.mako', request, {
     'solr_core': solr_core,
     'hue_core': hue_core,
+    'hue_cores': hue_cores,
   })
 
 
@@ -152,6 +161,7 @@ def admin_core_facets(request, core):
 def admin_core_sorting(request, core):
   solr_core = SolrApi(SOLR_URL.get()).core(core)
   hue_core = Core.objects.get(name=core)
+  hue_cores = Core.objects.all()
 
   if request.method == 'POST':
     hue_core.sorting.update_from_post(request.POST)
@@ -161,4 +171,5 @@ def admin_core_sorting(request, core):
   return render('admin_core_sorting.mako', request, {
     'solr_core': solr_core,
     'hue_core': hue_core,
+    'hue_cores': hue_cores,
   })
