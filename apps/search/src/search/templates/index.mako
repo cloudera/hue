@@ -122,11 +122,18 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 
     <div class="span9">
     % if response:
+      <script src="/static/ext/js/mustache.js"></script>
+
       <table class="table table-striped table-hover" style="table-layout: fixed;">
         <tbody>
-          % for result in response['response']['docs']:
-            ${ hue_core.result.render_result(result) | n,unicode }
-          % endfor
+          <div id="result-container"></div>
+            <script>
+              $.each(${ json.dumps([result for result in response['response']['docs']]) | n,unicode }, function (index, item) {
+                $("<div>").addClass("result-row").html(
+                  Mustache.render(${ hue_core.result.data | n,unicode }.template, item)
+                ).appendTo($("#result-container"));
+              });
+            </script>
         </tbody>
       </table>
 

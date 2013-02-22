@@ -64,6 +64,7 @@ def index(request):
     'solr_query': solr_query,
     'hue_core': hue_core,
     'rr': json.dumps(response),
+    'json': json,
   })
 
 
