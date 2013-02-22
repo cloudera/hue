@@ -40,6 +40,9 @@ LOG = logging.getLogger(__name__)
 def index(request):
   temp_fixture_hook()
 
+  cores = SolrApi(SOLR_URL.get()).cores()
+  hue_cores = Core.objects.all()
+
   search_form = QueryForm(request.GET)
   response = {}
   solr_query = {}
@@ -63,6 +66,7 @@ def index(request):
     'response': response,
     'solr_query': solr_query,
     'hue_core': hue_core,
+    'hue_cores': hue_cores,
     'rr': json.dumps(response),
     'json': json,
   })
