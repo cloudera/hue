@@ -1,0 +1,2230 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+    "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
+<title>Hue v2.1.0, released October 2nd, 2012</title>
+<style type="text/css">
+/* Shared CSS for AsciiDoc xhtml11 and html5 backends */
+
+/* Default font. */
+body {
+  font-family: Georgia,serif;
+}
+
+/* Title font. */
+h1, h2, h3, h4, h5, h6,
+div.title, caption.title,
+thead, p.table.header,
+#toctitle,
+#author, #revnumber, #revdate, #revremark,
+#footer {
+  font-family: Arial,Helvetica,sans-serif;
+}
+
+body {
+  margin: 1em 5% 1em 5%;
+}
+
+a {
+  color: blue;
+  text-decoration: underline;
+}
+a:visited {
+  color: fuchsia;
+}
+
+em {
+  font-style: italic;
+  color: navy;
+}
+
+strong {
+  font-weight: bold;
+  color: #083194;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #527bbd;
+  margin-top: 1.2em;
+  margin-bottom: 0.5em;
+  line-height: 1.3;
+}
+
+h1, h2, h3 {
+  border-bottom: 2px solid silver;
+}
+h2 {
+  padding-top: 0.5em;
+}
+h3 {
+  float: left;
+}
+h3 + * {
+  clear: left;
+}
+h5 {
+  font-size: 1.0em;
+}
+
+div.sectionbody {
+  margin-left: 0;
+}
+
+hr {
+  border: 1px solid silver;
+}
+
+p {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+ul, ol, li > p {
+  margin-top: 0;
+}
+ul > li     { color: #aaa; }
+ul > li > * { color: black; }
+
+pre {
+  padding: 0;
+  margin: 0;
+}
+
+#author {
+  color: #527bbd;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+#email {
+}
+#revnumber, #revdate, #revremark {
+}
+
+#footer {
+  font-size: small;
+  border-top: 2px solid silver;
+  padding-top: 0.5em;
+  margin-top: 4.0em;
+}
+#footer-text {
+  float: left;
+  padding-bottom: 0.5em;
+}
+#footer-badges {
+  float: right;
+  padding-bottom: 0.5em;
+}
+
+#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
+div.imageblock, div.exampleblock, div.verseblock,
+div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
+div.admonitionblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+div.admonitionblock {
+  margin-top: 2.0em;
+  margin-bottom: 2.0em;
+  margin-right: 10%;
+  color: #606060;
+}
+
+div.content { /* Block element content. */
+  padding: 0;
+}
+
+/* Block element titles. */
+div.title, caption.title {
+  color: #527bbd;
+  font-weight: bold;
+  text-align: left;
+  margin-top: 1.0em;
+  margin-bottom: 0.5em;
+}
+div.title + * {
+  margin-top: 0;
+}
+
+td div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content + div.title {
+  margin-top: 0.0em;
+}
+
+div.sidebarblock > div.content {
+  background: #ffffee;
+  border: 1px solid #dddddd;
+  border-left: 4px solid #f0f0f0;
+  padding: 0.5em;
+}
+
+div.listingblock > div.content {
+  border: 1px solid #dddddd;
+  border-left: 5px solid #f0f0f0;
+  background: #f8f8f8;
+  padding: 0.5em;
+}
+
+div.quoteblock, div.verseblock {
+  padding-left: 1.0em;
+  margin-left: 1.0em;
+  margin-right: 10%;
+  border-left: 5px solid #f0f0f0;
+  color: #888;
+}
+
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock > pre.content {
+  font-family: inherit;
+  font-size: inherit;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
+div.verseblock + div.attribution {
+  text-align: left;
+}
+
+div.admonitionblock .icon {
+  vertical-align: top;
+  font-size: 1.1em;
+  font-weight: bold;
+  text-decoration: underline;
+  color: #527bbd;
+  padding-right: 0.5em;
+}
+div.admonitionblock td.content {
+  padding-left: 0.5em;
+  border-left: 3px solid #dddddd;
+}
+
+div.exampleblock > div.content {
+  border-left: 3px solid #dddddd;
+  padding-left: 0.5em;
+}
+
+div.imageblock div.content { padding-left: 0; }
+span.image img { border-style: none; }
+a.image:visited { color: white; }
+
+dl {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+dt {
+  margin-top: 0.5em;
+  margin-bottom: 0;
+  font-style: normal;
+  color: navy;
+}
+dd > *:first-child {
+  margin-top: 0.1em;
+}
+
+ul, ol {
+    list-style-position: outside;
+}
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
+  list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
+}
+
+tfoot {
+  font-weight: bold;
+}
+td > div.verse {
+  white-space: pre;
+}
+
+div.hdlist {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+div.hdlist tr {
+  padding-bottom: 15px;
+}
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
+  vertical-align: top;
+  font-style: normal;
+  padding-right: 0.8em;
+  color: navy;
+}
+td.hdlist2 {
+  vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
+}
+
+.footnote, .footnoteref {
+  font-size: 0.8em;
+}
+
+span.footnote, span.footnoteref {
+  vertical-align: super;
+}
+
+#footnotes {
+  margin: 20px 0 20px 0;
+  padding: 7px 0 0 0;
+}
+
+#footnotes div.footnote {
+  margin: 0 0 5px 0;
+}
+
+#footnotes hr {
+  border: none;
+  border-top: 1px solid silver;
+  height: 1px;
+  text-align: left;
+  margin-left: 0;
+  width: 20%;
+  min-width: 100px;
+}
+
+div.colist td {
+  padding-right: 0.5em;
+  padding-bottom: 0.3em;
+  vertical-align: top;
+}
+div.colist td img {
+  margin-top: 0.3em;
+}
+
+@media print {
+  #footer-badges { display: none; }
+}
+
+#toc {
+  margin-bottom: 2.5em;
+}
+
+#toctitle {
+  color: #527bbd;
+  font-size: 1.1em;
+  font-weight: bold;
+  margin-top: 1.0em;
+  margin-bottom: 0.1em;
+}
+
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+div.toclevel2 {
+  margin-left: 2em;
+  font-size: 0.9em;
+}
+div.toclevel3 {
+  margin-left: 4em;
+  font-size: 0.9em;
+}
+div.toclevel4 {
+  margin-left: 6em;
+  font-size: 0.9em;
+}
+
+span.aqua { color: aqua; }
+span.black { color: black; }
+span.blue { color: blue; }
+span.fuchsia { color: fuchsia; }
+span.gray { color: gray; }
+span.green { color: green; }
+span.lime { color: lime; }
+span.maroon { color: maroon; }
+span.navy { color: navy; }
+span.olive { color: olive; }
+span.purple { color: purple; }
+span.red { color: red; }
+span.silver { color: silver; }
+span.teal { color: teal; }
+span.white { color: white; }
+span.yellow { color: yellow; }
+
+span.aqua-background { background: aqua; }
+span.black-background { background: black; }
+span.blue-background { background: blue; }
+span.fuchsia-background { background: fuchsia; }
+span.gray-background { background: gray; }
+span.green-background { background: green; }
+span.lime-background { background: lime; }
+span.maroon-background { background: maroon; }
+span.navy-background { background: navy; }
+span.olive-background { background: olive; }
+span.purple-background { background: purple; }
+span.red-background { background: red; }
+span.silver-background { background: silver; }
+span.teal-background { background: teal; }
+span.white-background { background: white; }
+span.yellow-background { background: yellow; }
+
+span.big { font-size: 2em; }
+span.small { font-size: 0.6em; }
+
+span.underline { text-decoration: underline; }
+span.overline { text-decoration: overline; }
+span.line-through { text-decoration: line-through; }
+
+
+/*
+ * xhtml11 specific
+ *
+ * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
+
+div.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+div.tableblock > table {
+  border: 3px solid #527bbd;
+}
+thead, p.table.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
+
+
+/*
+ * html5 specific
+ *
+ * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
+
+table.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+thead, p.tableblock.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.tableblock {
+  margin-top: 0;
+}
+table.tableblock {
+  border-width: 3px;
+  border-spacing: 0px;
+  border-style: solid;
+  border-color: #527bbd;
+  border-collapse: collapse;
+}
+th.tableblock, td.tableblock {
+  border-width: 1px;
+  padding: 4px;
+  border-style: solid;
+  border-color: #527bbd;
+}
+
+table.tableblock.frame-topbot {
+  border-left-style: hidden;
+  border-right-style: hidden;
+}
+table.tableblock.frame-sides {
+  border-top-style: hidden;
+  border-bottom-style: hidden;
+}
+table.tableblock.frame-none {
+  border-style: hidden;
+}
+
+th.tableblock.halign-left, td.tableblock.halign-left {
+  text-align: left;
+}
+th.tableblock.halign-center, td.tableblock.halign-center {
+  text-align: center;
+}
+th.tableblock.halign-right, td.tableblock.halign-right {
+  text-align: right;
+}
+
+th.tableblock.valign-top, td.tableblock.valign-top {
+  vertical-align: top;
+}
+th.tableblock.valign-middle, td.tableblock.valign-middle {
+  vertical-align: middle;
+}
+th.tableblock.valign-bottom, td.tableblock.valign-bottom {
+  vertical-align: bottom;
+}
+
+
+/*
+ * manpage specific
+ *
+ * */
+
+body.manpage h1 {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border-top: 2px solid silver;
+  border-bottom: 2px solid silver;
+}
+body.manpage h2 {
+  border-style: none;
+}
+body.manpage div.sectionbody {
+  margin-left: 3em;
+}
+
+@media print {
+  body.manpage div#toc { display: none; }
+}
+</style>
+<script type="text/javascript">
+/*<![CDATA[*/
+var asciidoc = {  // Namespace.
+
+/////////////////////////////////////////////////////////////////////
+// Table Of Contents generator
+/////////////////////////////////////////////////////////////////////
+
+/* Author: Mihai Bazon, September 2002
+ * http://students.infoiasi.ro/~mishoo
+ *
+ * Table Of Content generator
+ * Version: 0.4
+ *
+ * Feel free to use this script under the terms of the GNU General Public
+ * License, as long as you do not remove or alter this notice.
+ */
+
+ /* modified by Troy D. Hanson, September 2006. License: GPL */
+ /* modified by Stuart Rackham, 2006, 2009. License: GPL */
+
+// toclevels = 1..4.
+toc: function (toclevels) {
+
+  function getText(el) {
+    var text = "";
+    for (var i = el.firstChild; i != null; i = i.nextSibling) {
+      if (i.nodeType == 3 /* Node.TEXT_NODE */) // IE doesn't speak constants.
+        text += i.data;
+      else if (i.firstChild != null)
+        text += getText(i);
+    }
+    return text;
+  }
+
+  function TocEntry(el, text, toclevel) {
+    this.element = el;
+    this.text = text;
+    this.toclevel = toclevel;
+  }
+
+  function tocEntries(el, toclevels) {
+    var result = new Array;
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    // Function that scans the DOM tree for header elements (the DOM2
+    // nodeIterator API would be a better technique but not supported by all
+    // browsers).
+    var iterate = function (el) {
+      for (var i = el.firstChild; i != null; i = i.nextSibling) {
+        if (i.nodeType == 1 /* Node.ELEMENT_NODE */) {
+          var mo = re.exec(i.tagName);
+          if (mo && (i.getAttribute("class") || i.getAttribute("className")) != "float") {
+            result[result.length] = new TocEntry(i, getText(i), mo[1]-1);
+          }
+          iterate(i);
+        }
+      }
+    }
+    iterate(el);
+    return result;
+  }
+
+  var toc = document.getElementById("toc");
+  if (!toc) {
+    return;
+  }
+
+  // Delete existing TOC entries in case we're reloading the TOC.
+  var tocEntriesToRemove = [];
+  var i;
+  for (i = 0; i < toc.childNodes.length; i++) {
+    var entry = toc.childNodes[i];
+    if (entry.nodeName == 'div'
+     && entry.getAttribute("class")
+     && entry.getAttribute("class").match(/^toclevel/))
+      tocEntriesToRemove.push(entry);
+  }
+  for (i = 0; i < tocEntriesToRemove.length; i++) {
+    toc.removeChild(tocEntriesToRemove[i]);
+  }
+
+  // Rebuild TOC entries.
+  var entries = tocEntries(document.getElementById("content"), toclevels);
+  for (var i = 0; i < entries.length; ++i) {
+    var entry = entries[i];
+    if (entry.element.id == "")
+      entry.element.id = "_toc_" + i;
+    var a = document.createElement("a");
+    a.href = "#" + entry.element.id;
+    a.appendChild(document.createTextNode(entry.text));
+    var div = document.createElement("div");
+    div.appendChild(a);
+    div.className = "toclevel" + entry.toclevel;
+    toc.appendChild(div);
+  }
+  if (entries.length == 0)
+    toc.parentNode.removeChild(toc);
+},
+
+
+/////////////////////////////////////////////////////////////////////
+// Footnotes generator
+/////////////////////////////////////////////////////////////////////
+
+/* Based on footnote generation code from:
+ * http://www.brandspankingnew.net/archive/2005/07/format_footnote.html
+ */
+
+footnotes: function () {
+  // Delete existing footnote entries in case we're reloading the footnodes.
+  var i;
+  var noteholder = document.getElementById("footnotes");
+  if (!noteholder) {
+    return;
+  }
+  var entriesToRemove = [];
+  for (i = 0; i < noteholder.childNodes.length; i++) {
+    var entry = noteholder.childNodes[i];
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
+      entriesToRemove.push(entry);
+  }
+  for (i = 0; i < entriesToRemove.length; i++) {
+    noteholder.removeChild(entriesToRemove[i]);
+  }
+
+  // Rebuild footnote entries.
+  var cont = document.getElementById("content");
+  var spans = cont.getElementsByTagName("span");
+  var refs = {};
+  var n = 0;
+  for (i=0; i<spans.length; i++) {
+    if (spans[i].className == "footnote") {
+      n++;
+      var note = spans[i].getAttribute("data-note");
+      if (!note) {
+        // Use [\s\S] in place of . so multi-line matches work.
+        // Because JavaScript has no s (dotall) regex flag.
+        note = spans[i].innerHTML.match(/\s*\[([\s\S]*)]\s*/)[1];
+        spans[i].innerHTML =
+          "[<a id='_footnoteref_" + n + "' href='#_footnote_" + n +
+          "' title='View footnote' class='footnote'>" + n + "</a>]";
+        spans[i].setAttribute("data-note", note);
+      }
+      noteholder.innerHTML +=
+        "<div class='footnote' id='_footnote_" + n + "'>" +
+        "<a href='#_footnoteref_" + n + "' title='Return to text'>" +
+        n + "</a>. " + note + "</div>";
+      var id =spans[i].getAttribute("id");
+      if (id != null) refs["#"+id] = n;
+    }
+  }
+  if (n == 0)
+    noteholder.parentNode.removeChild(noteholder);
+  else {
+    // Process footnoterefs.
+    for (i=0; i<spans.length; i++) {
+      if (spans[i].className == "footnoteref") {
+        var href = spans[i].getElementsByTagName("a")[0].getAttribute("href");
+        href = href.match(/#.*/)[0];  // Because IE return full URL.
+        n = refs[href];
+        spans[i].innerHTML =
+          "[<a href='#_footnote_" + n +
+          "' title='View footnote' class='footnote'>" + n + "</a>]";
+      }
+    }
+  }
+},
+
+install: function(toclevels) {
+  var timerId;
+
+  function reinstall() {
+    asciidoc.footnotes();
+    if (toclevels) {
+      asciidoc.toc(toclevels);
+    }
+  }
+
+  function reinstallAndRemoveTimer() {
+    clearInterval(timerId);
+    reinstall();
+  }
+
+  timerId = setInterval(reinstall, 500);
+  if (document.addEventListener)
+    document.addEventListener("DOMContentLoaded", reinstallAndRemoveTimer, false);
+  else
+    window.onload = reinstallAndRemoveTimer;
+}
+
+}
+asciidoc.install();
+/*]]>*/
+</script>
+</head>
+<body class="article">
+<div id="header">
+<h1>Hue v2.1.0, released October 2nd, 2012</h1>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph"><p>This is the release of Hue 2.1.0.
+Hue 2.1.0 is compatible with CDH4.1 (Cloudera&#8217;s Distribution Including Apache
+Hadoop 4.1).</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_notable_features">Notable Features</h2>
+<div class="sectionbody">
+<div class="ulist"><ul>
+<li>
+<p>
+Hue now provides an Apache Oozie application for creating workflows of Apache MapReduce,
+  Apache Pig, Apache Hive, Apache Sqoop, Java, Shell, Ssh and Streaming jobs and
+  scheduling them repetitively (HUE-755).
+</p>
+</li>
+<li>
+<p>
+Hue is now available in German, Spanish, French, Japanese, Korean, Portuguese,
+  Brazilian and simplified Chinese (HUE-758).
+</p>
+</li>
+</ul></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_notable_fixes">Notable Fixes</h2>
+<div class="sectionbody">
+<div class="ulist"><ul>
+<li>
+<p>
+HUE-755 [jobsub] Support Oozie workflows with sequential actions
+</p>
+</li>
+<li>
+<p>
+HUE-612 Show retired jobs in the job browser
+</p>
+</li>
+<li>
+<p>
+HUE-206 Browsing a large directory slow for IE
+</p>
+</li>
+<li>
+<p>
+HUE-811 [core] Notification messages working only on FF
+</p>
+</li>
+<li>
+<p>
+HUE-799 [useradmin] Cannot delete group
+</p>
+</li>
+<li>
+<p>
+HUE-797 [useradmin] The admin can&#8217;t delete a user
+</p>
+</li>
+<li>
+<p>
+HUE-758 [core] Internationalization
+</p>
+</li>
+<li>
+<p>
+HUE-720 [useradmin] Create home dir for user optionally
+</p>
+</li>
+<li>
+<p>
+HUE-704 Importing very large <em>query</em> rows into beeswax_queryhistory on MySQL breaks if the length exceeds varchar(1024)
+</p>
+</li>
+<li>
+<p>
+HUE-652 HUE-617 [ui] Datatable shouldn&#8217;t sort dates literally
+</p>
+</li>
+<li>
+<p>
+HUE-504 Sticky bit support in Hue
+</p>
+</li>
+</ul></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_compatibility">Compatibility</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Hue 2.1.0 runs on CentOS versions 5 to 6, and Ubuntu 10.04 to 12.04.</p></div>
+<div class="paragraph"><p>Hue 2.1.0 is compatible with CDH4.1. Specifically:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+File Browser depends on Hadoop 0.20 (for WebHDFS/HttpFS).
+</p>
+</li>
+<li>
+<p>
+Beeswax is tested against Hive 0.9.0.
+</p>
+</li>
+<li>
+<p>
+Job Browser depends on MR1 (for the JobTracker plugin).
+</p>
+</li>
+<li>
+<p>
+Job Browser does <strong>not</strong> work with Yarn/MR2.
+</p>
+</li>
+<li>
+<p>
+Job Designer depends on Oozie, using the Oozie web service API.
+</p>
+</li>
+</ul></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_upgrade">Upgrade</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Hue 2.1.0 is backward compatible with Hue 2.0.1.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_known_issue">Known Issue</h2>
+<div class="sectionbody">
+<div class="ulist"><ul>
+<li>
+<p>
+Uploads with HttpFs in a federated cluster fail (HUE-742).
+</p>
+</li>
+</ul></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_list_of_all_commits">List of All Commits</h2>
+<div class="sectionbody">
+<div class="ulist"><ul>
+<li>
+<p>
+884941a [doc] 2.1.0 release notes
+</p>
+</li>
+<li>
+<p>
+274bfd5 [oozie] Fix HDFS permissions of shared workflows
+</p>
+</li>
+<li>
+<p>
+b78de53 [oozie] Users can copy accessible workflows
+</p>
+</li>
+<li>
+<p>
+0568235 [doc] Update JobDesigner and Oozie documentation
+</p>
+</li>
+<li>
+<p>
+bd383f0 [oozie] Edit action upload opens on deployment dir
+</p>
+</li>
+<li>
+<p>
+bebd820 [oozie] Adding NN url to each &lt;prepare&gt;
+</p>
+</li>
+<li>
+<p>
+64b21df [oozie] Fix Sqoop command XML field
+</p>
+</li>
+<li>
+<p>
+f5babd6 [oozie] Convert Sqoop action command to TextField
+</p>
+</li>
+<li>
+<p>
+70f04f9 [oozie] Add examples of all the available actions
+</p>
+</li>
+<li>
+<p>
+f63e11d [doc] Update help documentation with images
+</p>
+</li>
+<li>
+<p>
+01735aa HUE-847 [oozie] File selector corrupting the fields
+</p>
+</li>
+<li>
+<p>
+824096b HUE-833 [oozie] Add Shell action
+</p>
+</li>
+<li>
+<p>
+4874946 HUE-833 [oozie] Add Ssh action
+</p>
+</li>
+<li>
+<p>
+ef41254 HUE-833 [oozie] Add Sqoop action
+</p>
+</li>
+<li>
+<p>
+661c333 [core] Increase upload chunks from 64KB to 64MB
+</p>
+</li>
+<li>
+<p>
+50c17ec [help] Updating the documentation of all the apps
+</p>
+</li>
+<li>
+<p>
+b22901a HUE-883 [oozie] Add Hive action
+</p>
+</li>
+<li>
+<p>
+0b85584 [oozie] i18n of all the models
+</p>
+</li>
+<li>
+<p>
+4958337 [oozie] Update of the locales
+</p>
+</li>
+<li>
+<p>
+18b719a HUE-771 [beeswax] Can&#8217;t create a table with another delimiter
+</p>
+</li>
+<li>
+<p>
+a29fa65 [beeswax] Convert some error notifications to info level
+</p>
+</li>
+<li>
+<p>
+303b2f3 [oozie] Fixed layout problem on workflow dashboard for IE
+</p>
+</li>
+<li>
+<p>
+1bb94ef [oozie] Longer input fields for action forms
+</p>
+</li>
+<li>
+<p>
+aae4271 [desktop] Fix unicode error in server logs
+</p>
+</li>
+<li>
+<p>
+f10dc62 [oozie] Fix calendar selection when editing a dataset
+</p>
+</li>
+<li>
+<p>
+6dc5559 [oozie] Fix coordinator dataset input/output XML generation
+</p>
+</li>
+<li>
+<p>
+bcb133a [core] Updating pot and syncing po files
+</p>
+</li>
+<li>
+<p>
+203696c [oozie] Adding Portuguese translations
+</p>
+</li>
+<li>
+<p>
+17ea854 [core] Fixing extraction of strings
+</p>
+</li>
+<li>
+<p>
+6ab9d5d [core] Improving usage of translations across all apps
+</p>
+</li>
+<li>
+<p>
+0de08d4 [oozie] Initial localizations
+</p>
+</li>
+<li>
+<p>
+bea9e92 [beeswax] Fix some missed strings during i18n
+</p>
+</li>
+<li>
+<p>
+3aba683 [oozie] Create deployment directory when creating a new workflow
+</p>
+</li>
+<li>
+<p>
+6d7d47f [core] Updating translations of the apps
+</p>
+</li>
+<li>
+<p>
+9b21d6e [oozie] Fix edition permission on Coordinator
+</p>
+</li>
+<li>
+<p>
+d1d4763 [oozie] fix tests for dataset creation
+</p>
+</li>
+<li>
+<p>
+04730f6 [doc] Update of README, manual and SDK
+</p>
+</li>
+<li>
+<p>
+edbf6bf [oozie] Fix create dataset
+</p>
+</li>
+<li>
+<p>
+0876925 [desktop] Update PAM backend to use a configuration defined service
+</p>
+</li>
+<li>
+<p>
+b88c142 [oozie] Only accessible workflows can be scheduled
+</p>
+</li>
+<li>
+<p>
+30e81cf [desktop] Update sdk docs to reflect commonfooter change
+</p>
+</li>
+<li>
+<p>
+7658155 [beeswax,filebrowser,jobbrowser,jobsub,shell,desktop] Added javascript notifications to every template needed
+</p>
+</li>
+<li>
+<p>
+551b162 [oozie] Add progress information on dashboard
+</p>
+</li>
+<li>
+<p>
+7cc9c44 [oozie,beeswax,jobsub,jobbrowser] Replace table sorting <em>type</em> customization with <em>source</em> customizations
+</p>
+</li>
+<li>
+<p>
+ee5e0a5 [oozie] Need to multiply duration by 1000 in order to display properly
+</p>
+</li>
+<li>
+<p>
+84d3201 [oozie] Durability and progress sorting for workflows and coordinators
+</p>
+</li>
+<li>
+<p>
+44e9f29 [oozie] Prevent enter key from submitting the search forms
+</p>
+</li>
+<li>
+<p>
+2631b71 [oozie] IE support of dashboard buttons
+</p>
+</li>
+<li>
+<p>
+112a391 [oozie] Chmod 664 migration files
+</p>
+</li>
+<li>
+<p>
+216937f [jobsub] Add Oozie sharelib property to streaming example
+</p>
+</li>
+<li>
+<p>
+28705bb [oozie] Migrations for oozie app
+</p>
+</li>
+<li>
+<p>
+97ce533 [oozie] Improve examples description
+</p>
+</li>
+<li>
+<p>
+b51208b [oozie] New oozie examples
+</p>
+</li>
+<li>
+<p>
+57936d4 [oozie] Disable Decision node
+</p>
+</li>
+<li>
+<p>
+f7b8bcf [oozie] Fix layout of <em>edit action</em> form with localization
+</p>
+</li>
+<li>
+<p>
+7ff26fa [oozie] Compatibility Python 2.4 for generate XML workflow
+</p>
+</li>
+<li>
+<p>
+d0e1141 [oozie] Workflows with a Fork can be submitted
+</p>
+</li>
+<li>
+<p>
+0bb59d4 HUE-816 [oozie] Sample data had defined schema_version twice, once empty
+</p>
+</li>
+<li>
+<p>
+31b9d03 [beeswax] Fix tests after the change of interface in Hive 0.9.0
+</p>
+</li>
+<li>
+<p>
+f0dc0ba HUE-815 [fb] Upload button does not work in Firefox
+</p>
+</li>
+<li>
+<p>
+a17c897 [oozie] Improve datasets UI
+</p>
+</li>
+<li>
+<p>
+670d875 [oozie] Add global configuration to Workflow
+</p>
+</li>
+<li>
+<p>
+c12df63 [oozie] Fix oozie unit tests from previous commit
+</p>
+</li>
+<li>
+<p>
+f440beb [oozie] Added confirmation popups for some actions
+</p>
+</li>
+<li>
+<p>
+2b7936b [oozie] Adding control fields to Coordinator
+</p>
+</li>
+<li>
+<p>
+aad045a [oozie] Improve Editor usability
+</p>
+</li>
+<li>
+<p>
+089ea70 [oozie] Prettify dataset in oozie app
+</p>
+</li>
+<li>
+<p>
+3201daf [core] Make Oozielib backward compatible with Jobsub
+</p>
+</li>
+<li>
+<p>
+219d5bd [oozie] Add prepare statement in a workflow action
+</p>
+</li>
+<li>
+<p>
+315d008 HUE-720 [useradmin] Created home directory should belong to the user
+</p>
+</li>
+<li>
+<p>
+d766032 [core] Update Jenkins Hive version
+</p>
+</li>
+<li>
+<p>
+59cf1c9 [oozie] Move Save button to Properties tab
+</p>
+</li>
+<li>
+<p>
+5fc85ba [oozie] Prettify dataset add in coordinator editor
+</p>
+</li>
+<li>
+<p>
+6bcf8bc [beeswax] Do not use lazy string extraction in views
+</p>
+</li>
+<li>
+<p>
+1985495 [oozie] Calendar widget images chmod 644
+</p>
+</li>
+<li>
+<p>
+91e7f4f [oozie] Added images associated with calendar
+</p>
+</li>
+<li>
+<p>
+622ecf7 [HUE-720] Create home directory checked by default on user "add" page
+</p>
+</li>
+<li>
+<p>
+d425493 [oozie] Workflow breaks when two branches join to the same node
+</p>
+</li>
+<li>
+<p>
+* b0cfd86 [oozie] import jobsub actions
+</p>
+</li>
+<li>
+<p>
+* 941ab54 [oozie] Add workflow and coordinator variables
+</p>
+</li>
+<li>
+<p>
+* abb916f [oozie] Adding translated messages
+</p>
+</li>
+<li>
+<p>
+* 85d9c91 [oozie] Add resubmit management command to workflow and coordinator dashboards
+</p>
+</li>
+<li>
+<p>
+* 29e7fb7 [oozie] Add kill command to oozie coordinator dashboard
+</p>
+</li>
+<li>
+<p>
+* f971054 [oozie] Update the list of jobs seen as <em>RUNNING</em>
+</p>
+</li>
+<li>
+<p>
+d581141 HUE-811 [core] Notification messages working only on FF
+</p>
+</li>
+<li>
+<p>
+af2f86c [oozie] Update notify error on workflow page to use i18n translations
+</p>
+</li>
+<li>
+<p>
+22db019 [oozie] Update test_manage_workflow test case to incorporate negative test
+</p>
+</li>
+<li>
+<p>
+d785fd7 [oozie] Add kill button to workflow
+</p>
+</li>
+<li>
+<p>
+7e501e9 [beeswax] Test log searcher can understand different log formats
+</p>
+</li>
+<li>
+<p>
+f71073e [oozie] Fix calendar widget&#8217;s missing libs
+</p>
+</li>
+<li>
+<p>
+49545bc [oozie] Fix tests after new calendar widget
+</p>
+</li>
+<li>
+<p>
+1adc980 [oozie] A cloned job has a wrong deployment directory
+</p>
+</li>
+<li>
+<p>
+4034c6e [oozie] New calendar widget and field
+</p>
+</li>
+<li>
+<p>
+86d6a4e [oozie] XML configuration element of a coordinator shouldn&#8217;t be generated if empty
+</p>
+</li>
+<li>
+<p>
+338be2d [oozie] Refactor oozie_setup command
+</p>
+</li>
+<li>
+<p>
+aaabb2a [oozie] Display workflow graph as readonly when not edition perms
+</p>
+</li>
+<li>
+<p>
+aa942cc [beeswax] Fetch query based on server configuration
+</p>
+</li>
+<li>
+<p>
+8f42218 [oozie] Fix clone workflow action
+</p>
+</li>
+<li>
+<p>
+8f26521 [oozie] Fix the install of the examples from the editor
+</p>
+</li>
+<li>
+<p>
+c371fa8 [oozie] Sleep worflow and coordinator examples
+</p>
+</li>
+<li>
+<p>
+d7a6d69 [core] Latest Oozie 3.2 breaks the app
+</p>
+</li>
+<li>
+<p>
+3e4b20e [beeswax] Fix tests after changes in Hive logging format
+</p>
+</li>
+<li>
+<p>
+c17ebe4 HUE-803 [useradmin] Improved "sync users and groups" UI slightly.
+</p>
+</li>
+<li>
+<p>
+17142a5 Revert "[core] WebHDFS octal permissions should be at most 4 digits"
+</p>
+</li>
+<li>
+<p>
+dd27176 HUE-720 [useradmin] Add home dir.
+</p>
+</li>
+<li>
+<p>
+905a41f HUE-705 [fb] No error message when a file upload failed
+</p>
+</li>
+<li>
+<p>
+11d27e5 HUE-704 [beeswax] Update queryhistory model to use TextField for query.
+</p>
+</li>
+<li>
+<p>
+6b6d5bf [oozie] Can clone a coordinator
+</p>
+</li>
+<li>
+<p>
+cc814c5 [oozie] Cannot delete a coordinator
+</p>
+</li>
+<li>
+<p>
+2ed4dc8 [oozie] Mock submission to Oozie in the tests
+</p>
+</li>
+<li>
+<p>
+c6a4ada [core] Localization of 8 apps
+</p>
+</li>
+<li>
+<p>
+e0c9ade HUE-724 Integrate Django Flash for confirmation messages
+</p>
+</li>
+<li>
+<p>
+3f884f6 [oozie] Workflows and Coordinators security access checks
+</p>
+</li>
+<li>
+<p>
+9f02a72 [oozie] Adding tests suite to the Editor and Dashboard
+</p>
+</li>
+<li>
+<p>
+aa20455 [desktop] Header UI update
+</p>
+</li>
+<li>
+<p>
+d7bb460 HUE-755 [oozie] Oozie Application
+</p>
+</li>
+<li>
+<p>
+fb9491b HUE-724 [core] Integrate Django messages for notifications
+</p>
+</li>
+<li>
+<p>
+7f0bca6 [desktop] Header configuration
+</p>
+</li>
+<li>
+<p>
+7a40908 HUE-799 [ua] Fix delete group action.
+</p>
+</li>
+<li>
+<p>
+a581de0 [fb] Sticky bit testing.
+</p>
+</li>
+<li>
+<p>
+9a40ef8 HUE-797 [useradmin] Admin cannot delete a user account.
+</p>
+</li>
+<li>
+<p>
+3752cff HUE-504 [fb] Add sticky bit support.
+</p>
+</li>
+<li>
+<p>
+e2cc325 HUE-787 [Desktop] Config dump view uses raw values instead of type cased values in template.
+</p>
+</li>
+<li>
+<p>
+220f252 [core] REST Exception also gets the headers of urllib2.HTTPError
+</p>
+</li>
+<li>
+<p>
+3d4184e HUE-791 [core] Adding Django Transaction middleware
+</p>
+</li>
+<li>
+<p>
+38548f0 HUE-795 [core] Integrate latest MIT fileuploader.js
+</p>
+</li>
+<li>
+<p>
+8ab4ca3 HUE-758 [core] Finishing Internationalization
+</p>
+</li>
+<li>
+<p>
+27f232f [core] Revert back missing module
+</p>
+</li>
+<li>
+<p>
+c40fc08 [core] Removing unused files and updating NOTICE.txt
+</p>
+</li>
+<li>
+<p>
+94390b0 HUE-690 [fb] Disallowing multi-level directory creation in filebrowser.
+</p>
+</li>
+<li>
+<p>
+4a1b4a8 HUE-792 [core] Move the Oozie lib from Jobsub to Desktop
+</p>
+</li>
+<li>
+<p>
+45ec32f HUE-788 [core] Enable apps to be url namespaced
+</p>
+</li>
+<li>
+<p>
+5be5736 [doc] Improve getting started section
+</p>
+</li>
+<li>
+<p>
+f6e86b8 [jobsub] Changing job_properties field from CharField to TextField
+</p>
+</li>
+<li>
+<p>
+3b411c6 [core] Remove deprecated en_US locale
+</p>
+</li>
+<li>
+<p>
+dcb1a3c HUE-724 [core] Create jHueNotify plugin
+</p>
+</li>
+<li>
+<p>
+09b3d88 HUE-731 [ui] Clean old <em>hidden</em> and <em>jframe-hidden</em> CSS classes
+</p>
+</li>
+<li>
+<p>
+4de6d30 HUE-769 [jb] Sorting jobs by Duration can be wrong
+</p>
+</li>
+<li>
+<p>
+306199f HUE-782 [core] jHueFileChooser allowed to select a folder
+</p>
+</li>
+<li>
+<p>
+cdea584 [doc] Make the README up to date
+</p>
+</li>
+<li>
+<p>
+7ee080a HUE-758 [core] Internationalization
+</p>
+</li>
+<li>
+<p>
+11c9e52 HUE-767 [jb] Make kill column not clickable
+</p>
+</li>
+<li>
+<p>
+a849ded HUE-767 [jb] Improve the look and feel with bootstraps
+</p>
+</li>
+<li>
+<p>
+417d7e1 HUE-778 [beeswax] Fix email checkbox grammar
+</p>
+</li>
+<li>
+<p>
+5102dd4 [doc] Warn SDK users about using released downloads
+</p>
+</li>
+<li>
+<p>
+c8c9bdd HUE-780 [fb] Small improvements for a better usability
+</p>
+</li>
+<li>
+<p>
+e99bc2e [core] English corrections of user text
+</p>
+</li>
+<li>
+<p>
+6f685aa [doc] Fix create desktop app ambiguity in the SDK manual
+</p>
+</li>
+<li>
+<p>
+9f442c5 [jobsub] Extraneous comments in the "Job Designer" help file
+</p>
+</li>
+<li>
+<p>
+76ef2af HUE-779 [fb] Pagination on following page is not correct
+</p>
+</li>
+<li>
+<p>
+33d87f0 [core] Upgrading to Mako 0.7.2 for fixing regression in 0.7.1
+</p>
+</li>
+<li>
+<p>
+b18502a [core] Harmonize table row hover color
+</p>
+</li>
+<li>
+<p>
+166241a HUE-766 [core] Desktop i18n
+</p>
+</li>
+<li>
+<p>
+28a0eaf HUE-760 [beeswax] Backend i18n
+</p>
+</li>
+<li>
+<p>
+6c9657b [core] Rowselector jQuery plugin exclude element parameter
+</p>
+</li>
+<li>
+<p>
+a4f4208 HUE-206 [fb] Browsing a large directory slow for IE
+</p>
+</li>
+<li>
+<p>
+84a855f HUE-316 [core] Upgraded ext-py Mako to 0.7.1
+</p>
+</li>
+<li>
+<p>
+39a97e4 HUE-612 [jb] Get and display a retired job
+</p>
+</li>
+<li>
+<p>
+03ac5e9 HUE-768 [core] Remove ambiguity about table headers sort icons
+</p>
+</li>
+<li>
+<p>
+b1431da [beeswax] Make prettier create manually a table form
+</p>
+</li>
+<li>
+<p>
+6d5a20d HUE-728 [beeswax] Polish UI and make it consistent
+</p>
+</li>
+<li>
+<p>
+cdda28f [core] Remove unused AspectJ
+</p>
+</li>
+<li>
+<p>
+398bb4f [core] Add a relativePath to hue-parent pom to all the pom.xml
+</p>
+</li>
+<li>
+<p>
+b29ffbe [core] Update version of snapshots used by Jenkins
+</p>
+</li>
+<li>
+<p>
+21b66b8 HUE-761 [fb] Backend i18n
+</p>
+</li>
+<li>
+<p>
+b2a66d8 HUE-638 [beeswax] Use buttons instead of input type="button"
+</p>
+</li>
+<li>
+<p>
+7ad2b31 HUE-612 [jb] Show retired jobs in the job browser
+</p>
+</li>
+<li>
+<p>
+830f507 [beeswax] Fix share queries tests
+</p>
+</li>
+<li>
+<p>
+b400f94 [jobsub] Backend i18n
+</p>
+</li>
+<li>
+<p>
+053506c HUE-764 [shell] Backend i18n
+</p>
+</li>
+<li>
+<p>
+89018c3 HUE-765 [admin] Backend i18n
+</p>
+</li>
+<li>
+<p>
+70b53ae HUE-762 [jb] backend i18n
+</p>
+</li>
+<li>
+<p>
+5728384 HUE-766 [core] Desktop template i18n
+</p>
+</li>
+<li>
+<p>
+e58c95e [core] Deleting unused files
+</p>
+</li>
+<li>
+<p>
+9d22489 HUE-763 [jobsub] Fix i18n error when submitting a job
+</p>
+</li>
+<li>
+<p>
+7a91b19 HUE-763 [jobsub] Add the missing ugettext in some templates
+</p>
+</li>
+<li>
+<p>
+32d734d [doc] Updating required Ubuntu packages
+</p>
+</li>
+<li>
+<p>
+36a1b25 HUE-727 [fb] filechooser.js should not always open on / by default
+</p>
+</li>
+<li>
+<p>
+bdb090b HUE-760 [beeswax] Templates internationalization
+</p>
+</li>
+<li>
+<p>
+bcfec10 HUE-761 [fb] Templates Internationalization
+</p>
+</li>
+<li>
+<p>
+1435746 HUE-763 [jobsub] Templates internationalization
+</p>
+</li>
+<li>
+<p>
+d890c2d HUE-762 [jb] Templates Internationalization
+</p>
+</li>
+<li>
+<p>
+db7b1ca HUE-759 [about] Template Internationalization
+</p>
+</li>
+<li>
+<p>
+4120375 HUE-765 [admin] Integrating i18n
+</p>
+</li>
+<li>
+<p>
+20be268 HUE-765 [admin] Template Internationalization
+</p>
+</li>
+<li>
+<p>
+e60a5aa HUE-764 [shell] i18n ompile messages automatically for all locales
+</p>
+</li>
+<li>
+<p>
+3e57c89 HUE-764 [shell] Templates Internationalization
+</p>
+</li>
+<li>
+<p>
+4984b7b [jobsub] Misspell in job sample description
+</p>
+</li>
+<li>
+<p>
+1cde9c4 HUE-727 [fb] filechooser.js should not always open on / by default Changed filechooser.js Added initial path to the places where filechooser is used
+</p>
+</li>
+<li>
+<p>
+f6a36f8 HUE-744 [jb] Numeric/time columns are not sorted properly
+</p>
+</li>
+<li>
+<p>
+c1bb84f HUE-728 [beeswax] Polish UI and make it consistent
+</p>
+</li>
+<li>
+<p>
+8b1089b HUE-749 [beeswax] Create a new table from file page is broken
+</p>
+</li>
+<li>
+<p>
+edd14f0 HUE-731 [ui] Clean old <em>jframe-hidden</em> CSS classes
+</p>
+</li>
+<li>
+<p>
+2d75bd9 HUE-746 [admin] Javacript error on Permissions page
+</p>
+</li>
+<li>
+<p>
+19afeef HUE-738 [admin] Groups page does not redimension automatically
+</p>
+</li>
+<li>
+<p>
+158cd9b [doc] Fixing version for the package installation
+</p>
+</li>
+<li>
+<p>
+1969955 [useradmin] "Sync users/groups LDAP" popup submission results in an embedded window
+</p>
+</li>
+<li>
+<p>
+7c277af HUE-735 [fb] Open on home folder by default
+</p>
+</li>
+<li>
+<p>
+452ce74 [shell] Auto scroll on new output with Firefox
+</p>
+</li>
+<li>
+<p>
+eac61ca [build] Adding release notes for 2.0.1
+</p>
+</li>
+<li>
+<p>
+d3dda42 Do not fail silentely on TTransportExceptions
+</p>
+</li>
+<li>
+<p>
+53ab476 [shell] Ambiguous message when launching the app with no shell
+</p>
+</li>
+<li>
+<p>
+d6b5644 [core] WebHDFS octal permissions should be at most 4 digits
+</p>
+</li>
+<li>
+<p>
+980aea5 [jobsub] Better error handling when submitting a job
+</p>
+</li>
+<li>
+<p>
+562585c Revert "[core] Thrift calls can hang forever in the unit tests"
+</p>
+</li>
+<li>
+<p>
+dbcda98 Revert "[core] Skip tests timing out after eventlet patching"
+</p>
+</li>
+<li>
+<p>
+5207d3e [core] Perform Eventlet patching only when running Spawning server
+</p>
+</li>
+<li>
+<p>
+82a7b6e [build] Updated version to 2.1.0
+</p>
+</li>
+<li>
+<p>
+f690aeb HUE-715 [ui] Light blue color for the selected row by jHueRowSelector
+</p>
+</li>
+<li>
+<p>
+f07e157 [Shell] Fix bad config name "hadoop.KERBEROS"
+</p>
+</li>
+<li>
+<p>
+f9f5487 HUE-643 Modal dialog too small for complex object creation
+</p>
+</li>
+<li>
+<p>
+e8795d1 [doc] The JT host name needs to be FQDN for a secured cluster
+</p>
+</li>
+<li>
+<p>
+409ed0d [core] Skip tests timing out after eventlet patching
+</p>
+</li>
+<li>
+<p>
+39c2af7 [shell] Hue shells cannot recall command history
+</p>
+</li>
+<li>
+<p>
+c73279d HUE-728 [beeswax] Polish UI and make it consistent
+</p>
+</li>
+<li>
+<p>
+c4695a9 [beeswax] Fix beeswax unit test (skip --superuser option)
+</p>
+</li>
+<li>
+<p>
+194640b [core] Overly alarming message when libtidy is not found
+</p>
+</li>
+<li>
+<p>
+895e408 [core] Thrift calls can hang forever in the unit tests
+</p>
+</li>
+<li>
+<p>
+db43064 [build] Mako files MUST not be executable
+</p>
+</li>
+<li>
+<p>
+5c5141e [core] Spawning server should not be blocked by network calls (cherry picked from commit 575205b18048d1467a3fb6709f28e790535d2b8d)
+</p>
+</li>
+<li>
+<p>
+10ae072 [beeswax] Pass in keytab to beeswax server for it to auto renew ticket
+</p>
+</li>
+<li>
+<p>
+999e05c HUE-712: Support refreshing kerberos ticket for beeswax runing in standalone mode with authentication enabled
+</p>
+</li>
+<li>
+<p>
+cafbb72 HUE-639. thrift enhancements for sync query execution and additional error diagnostics
+</p>
+</li>
+<li>
+<p>
+b3612e5 [build] Update Hadoop version to CDH4.0.0-SNAPSHOT
+</p>
+</li>
+<li>
+<p>
+f06352a HUE-715 Full rows are clickable across Hue (cherry picked from commit 040ddf40e9cf64a271ed853ab35344077fce92e2)
+</p>
+</li>
+<li>
+<p>
+1d4b48a HUE-726 applied jHueSelector to the permission list on Useradmin add/edit group (cherry picked from commit ac6b6dcddc640c7c5f39b51debe9f0f7cd1bc1f6)
+</p>
+</li>
+<li>
+<p>
+7f3b2d3 [shell] Can copy/paste shell output
+</p>
+</li>
+<li>
+<p>
+7137365 [beeswax] Do not show the <em>Download links</em> before query completion
+</p>
+</li>
+<li>
+<p>
+dd5c997 [doc] Fix SDK link in manual
+</p>
+</li>
+<li>
+<p>
+041015d [ui] Restore icon library
+</p>
+</li>
+<li>
+<p>
+1644919 [beeswax] Save table as a file opens output directory
+</p>
+</li>
+<li>
+<p>
+9e0b032 [sdk] Update SDK docs for Hue 2.0
+</p>
+</li>
+<li>
+<p>
+081d73e [sdk] Update SDK app template
+</p>
+</li>
+<li>
+<p>
+9810072 [beeswax] Test randomly failing
+</p>
+</li>
+</ul></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_contributors">Contributors</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>This Hue release is made possible thanks to the contribution from:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Aaron Newton
+</p>
+</li>
+<li>
+<p>
+Aaron T. Myers
+</p>
+</li>
+<li>
+<p>
+Abraham Elmahrek
+</p>
+</li>
+<li>
+<p>
+Aditya Acharya
+</p>
+</li>
+<li>
+<p>
+Alex Newman
+</p>
+</li>
+<li>
+<p>
+Andrew Bayer
+</p>
+</li>
+<li>
+<p>
+Andrew Yao
+</p>
+</li>
+<li>
+<p>
+Ann McCown
+</p>
+</li>
+<li>
+<p>
+bc Wong
+</p>
+</li>
+<li>
+<p>
+Ben Bishop
+</p>
+</li>
+<li>
+<p>
+Bruce Mitchener
+</p>
+</li>
+<li>
+<p>
+Bruno Mahé
+</p>
+</li>
+<li>
+<p>
+Eli Collins
+</p>
+</li>
+<li>
+<p>
+Enrico Berti
+</p>
+</li>
+<li>
+<p>
+Eric Wong
+</p>
+</li>
+<li>
+<p>
+Harsh J
+</p>
+</li>
+<li>
+<p>
+Henry Robinson
+</p>
+</li>
+<li>
+<p>
+Jon Natkins
+</p>
+</li>
+<li>
+<p>
+Lars Francke
+</p>
+</li>
+<li>
+<p>
+Loren Siebert
+</p>
+</li>
+<li>
+<p>
+Marcus McLaughlin
+</p>
+</li>
+<li>
+<p>
+Mike Cotton
+</p>
+</li>
+<li>
+<p>
+Paul Battaglia
+</p>
+</li>
+<li>
+<p>
+Philip Zeyliger
+</p>
+</li>
+<li>
+<p>
+Romain Rigaux
+</p>
+</li>
+<li>
+<p>
+Roman Shaposhnik
+</p>
+</li>
+<li>
+<p>
+Shawn Van Ittersum
+</p>
+</li>
+<li>
+<p>
+Shrijeet Paliwal
+</p>
+</li>
+<li>
+<p>
+Thomas Aylott
+</p>
+</li>
+<li>
+<p>
+Todd Lipcon
+</p>
+</li>
+<li>
+<p>
+Vinithra Varadharajan
+</p>
+</li>
+</ul></div>
+</div>
+</div>
+</div>
+<div id="footnotes"><hr /></div>
+<div id="footer">
+<div id="footer-text">
+Last updated 2013-02-25 11:50:42 PST
+</div>
+</div>
+</body>
+</html>
