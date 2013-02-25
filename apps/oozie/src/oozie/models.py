@@ -417,14 +417,16 @@ class Workflow(Job):
   def gen_status_graph(self, oozie_workflow):
     from oozie.forms import NodeMetaForm  # Circular dependency
     actions = oozie_workflow.get_working_actions()
+    controls = oozie_workflow.get_control_flow_actions()
     WorkflowFormSet = inlineformset_factory(Workflow, Node, form=NodeMetaForm, max_num=0, can_order=False, can_delete=False)
     forms = WorkflowFormSet(instance=self).forms
     template='editor/gen/workflow-graph-status.xml.mako'
 
     index = dict([(form.instance.id, form) for form in forms])
     actions_index = dict([(action.name, action) for action in actions])
+    controls_index = dict([(control.name.strip(':'), control) for control in controls])
 
-    return django_mako.render_to_string(template, {'nodes': self.get_hierarchy(), 'index': index, 'actions': actions_index})
+    return django_mako.render_to_string(template, {'nodes': self.get_hierarchy(), 'index': index, 'actions': actions_index, 'controls': controls_index})
 
   @classmethod
   def gen_status_graph_from_xml(cls, user, oozie_workflow):
@@ -1043,7 +1045,7 @@ class ControlFlow(Node):
     return django_mako.render_to_string(self.get_template_name(), {})
 
   def is_visible(self):
-    return False
+    return True
 
 
 # Could not make this abstract
@@ -1069,6 +1071,9 @@ class Kill(ControlFlow):
 
   def add_node(self, child):
     raise RuntimeError(_("Kill should not have any children."))
+
+  def is_visible(self):
+    return False
 
 
 class Fork(ControlFlow):

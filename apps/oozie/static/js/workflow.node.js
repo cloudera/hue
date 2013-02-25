@@ -85,11 +85,11 @@ var NodeModule = function($, IdGeneratorTable, NodeFields) {
     self.edit_template = model.node_type + 'EditTemplate';
     switch(model.node_type) {
     case 'start':
-      self.view_template = ko.observable('startTemplate');
+    case 'end':
+      self.view_template = ko.observable('disabledNodeTemplate');
     break;
 
     case 'kill':
-    case 'end':
       self.view_template = ko.observable('emptyTemplate');
     break;
 

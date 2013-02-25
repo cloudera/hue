@@ -306,8 +306,28 @@ ${ controls.decision_form(node_form, link_form, default_link_form, 'decision', T
 
 <script type="text/html" id="emptyTemplate"></script>
 
-<script type="text/html" id="startTemplate">
-  <div class="row-fluid" data-bind="template: { name: 'linkTemplate', foreach: links }"></div>
+<script type="text/html" id="disabledNodeTemplate">
+  <div class="node node-control row-fluid">
+    <div class="action span12">
+      <div class="row-fluid">
+        <div class="span12">
+          <h4 data-bind="text: (name()) ? name() : node_type() + '-' + id()"></h4>
+          <span data-bind="text: node_type" class="muted"></span>
+          <div class="node-description" data-bind="text: description"></div>
+        </div>
+      </div>
+
+      <div class="row-fluid node-action-bar">
+        <div class="span12" style="text-align:right">
+          &nbsp;
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ko if: links -->
+    <div class="row-fluid" data-bind="template: { name: 'linkTemplate', foreach: links }"></div>
+  <!-- /ko -->
 </script>
 
 <script type="text/html" id="nodeTemplate">

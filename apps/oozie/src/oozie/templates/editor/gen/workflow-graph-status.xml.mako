@@ -27,7 +27,8 @@
     is_join = form.instance.get_full_node().node_type == 'join'
     is_decision = form.instance.get_full_node().node_type == 'decision'
     is_decision_end = form.instance.get_full_node().node_type == 'decisionend'
-    action = actions.get(form.instance.__unicode__())
+    action = actions.get(unicode(form.instance))
+    control = controls.get(unicode(form.instance))
     box_class = ""
     if is_fork:
       box_class = "node-fork"
@@ -51,21 +52,34 @@
             <div class="node-description">${ form.instance.description }</div>
             % if action:
               ${ action.errorMessage or '' }
+            % elif control:
+              ${ control.errorMessage or '' }
             % endif
           </div>
         </div>
         % if action and action.externalId:
         <div class="row-fluid node-action-bar">
           <div class="span2" style="text-align:left;padding-left: 6px">
-            % if not is_fork and action:
+            % if action:
               <span class="label ${ utils.get_status(action.status) }">${ action.status }</span>
             % endif
           </div>
           <div class="span10" style="text-align:right">
-            % if not is_fork and action:
-            <a href="${ action.get_absolute_url() }" class="btn btn-mini" title="${ _('View workflow action') }" rel="tooltip"><i class="icon-eye-open"></i></a>
+            % if action:
+              <a href="${ action.get_absolute_url() }" class="btn btn-mini" title="${ _('View workflow action') }" rel="tooltip"><i class="icon-eye-open"></i></a>
             % endif
             <a href="${ url('jobbrowser.views.job_single_logs', job=action.externalId) }" class="btn btn-mini" title="${ _('View the logs') }" rel="tooltip" data-row-selector-exclude="true" id="advanced-btn"><i class="icon-tasks"></i></a>
+            &nbsp;
+          </div>
+        </div>
+        % elif control:
+        <div class="row-fluid node-action-bar">
+          <div class="span2" style="text-align:left;padding-left: 6px">
+            % if control:
+              <span class="label ${ utils.get_status(control.status) }">${ control.status }</span>
+            % endif
+          </div>
+          <div class="span10" style="text-align:right">
             &nbsp;
           </div>
         </div>
