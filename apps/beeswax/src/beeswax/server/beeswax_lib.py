@@ -383,9 +383,9 @@ class BeeswaxClient:
         self._encode_partition(new_part)
         return self._client.alter_partition(db_name, tbl_name, new_part)
 
+    # Use service name from kerberos principal set in hive-site.xml
     _, host, port, metastore_kerberos_principal = hive_site.get_metastore()
     use_sasl, kerberos_principal_short_name = BeeswaxClient.get_security()
-    # Use service name from kerberos principal set in hive-site.xml
     kerberos_principal_short_name = metastore_kerberos_principal and metastore_kerberos_principal.split('/', 1)[0] or None
     client = thrift_util.get_client(ThriftHiveMetastore.Client,
                                     host,

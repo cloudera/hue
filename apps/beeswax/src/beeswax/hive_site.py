@@ -23,6 +23,8 @@ import logging
 import os.path
 import re
 
+from desktop.lib import security_util
+
 import beeswax.conf
 from hadoop import confparse
 
@@ -57,7 +59,6 @@ def get_conf():
     _parse_hive_site()
   return _HIVE_SITE_DICT
 
-
 def get_metastore():
   """
   get_metastore() -> (is_local, host, port, kerberos_principal)
@@ -71,23 +72,22 @@ def get_metastore():
   """
   global _METASTORE_LOC_CACHE
   if not _METASTORE_LOC_CACHE:
-    is_local = get_conf().getbool(_CNF_METASTORE_LOCAL, True)
-    kerberos_principal = get_conf().get(_CNF_METASTORE_KERBEROS_PRINCIPAL, None)
+    kerberos_principal = security_util.get_kerberos_principal(get_conf().get(_CNF_METASTORE_KERBEROS_PRINCIPAL, None))
+    kerberos_principal_components = security_util.get_components(kerberos_principal)
+    thrift_uri = get_conf().get(_CNF_METASTORE_URIS)
+    is_local = thrift_uri is None or thrift_uri == ''
     if is_local:
       host = beeswax.conf.BEESWAX_META_SERVER_HOST.get()
       port = beeswax.conf.BEESWAX_META_SERVER_PORT.get()
     else:
-      thrift_uri = get_conf().get(_CNF_METASTORE_URIS)
       host, port = 'undefined', '0'
-      if thrift_uri is None:
-        LOG.fatal('Remote metastore uri ("%s") not found in hive config %s' %
-                  (_CNF_METASTORE_URIS, _HIVE_SITE_PATH))
+      match = _THRIFT_URI_RE.match(thrift_uri)
+      if not match:
+        LOG.fatal('Cannot understand remote metastore uri "%s"' % (thrift_uri,))
       else:
-        match = _THRIFT_URI_RE.match(thrift_uri)
-        if not match:
-          LOG.fatal('Cannot understand remote metastore uri "%s"' % (thrift_uri,))
-        else:
-          host, port = match.groups()
+        host, port = match.groups()
+      if len(kerberos_principal_components) == 3:
+        host = kerberos_principal_components[1]
     _METASTORE_LOC_CACHE = (is_local, host, int(port), kerberos_principal)
   return _METASTORE_LOC_CACHE
 
