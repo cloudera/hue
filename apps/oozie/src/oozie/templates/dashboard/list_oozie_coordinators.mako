@@ -65,7 +65,7 @@ ${layout.menubar(section='dashboard')}
           <th width="10%">${ _('Submitter') }</th>
           <th width="5%">${ _('Frequency') }</th>
           <th width="5%">${ _('Time unit') }</th>
-          <th width="5%">${ _('Started') }</th>
+          <th width="10%">${ _('Start Time') }</th>
           <th width="15%">${ _('Id') }</th>
           <th width="10%">${ _('Action') }</th>
         </tr>
@@ -88,7 +88,7 @@ ${layout.menubar(section='dashboard')}
           <th width="10%">${ _('Submitter') }</th>
           <th width="5%">${ _('Frequency') }</th>
           <th width="5%">${ _('Time unit') }</th>
-          <th width="5%">${ _('Started') }</th>
+          <th width="10%">${ _('Start Time') }</th>
           <th width="20%">${ _('Id') }</th>
         </tr>
       </thead>
@@ -133,7 +133,7 @@ ${layout.menubar(section='dashboard')}
       killUrl: c.killUrl,
       frequency: c.frequency,
       timeUnit: c.timeUnit,
-      created: c.created
+      startTime: c.startTime
     }
   }
 
@@ -359,7 +359,7 @@ ${layout.menubar(section='dashboard')}
                   coord.user,
 				  coord.frequency,
 				  coord.timeUnit,
-				  coord.created,
+				  coord.startTime,
 				  '<a href="' + coord.absoluteUrl + '" data-row-selector="true">' + coord.id + '</a>',
                   killCell
                 ]);
@@ -397,7 +397,7 @@ ${layout.menubar(section='dashboard')}
             coord.user,
             coord.frequency,
             coord.timeUnit,
-            coord.created,
+            coord.startTime,
             '<a href="' + coord.absoluteUrl + '" data-row-selector="true">' + coord.id + '</a>'], false);
         });
         completedTable.fnDraw();

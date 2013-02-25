@@ -557,6 +557,7 @@ def massaged_oozie_jobs_for_json(oozie_jobs, user):
       'canEdit': has_job_edition_permission(job, user),
       'killUrl': reverse('oozie:manage_oozie_jobs', kwargs={'job_id':job.id, 'action':'kill'}),
       'created': hasattr(job, 'createdTime') and job.createdTime and job.createdTime and ((job.type == 'Bundle' and job.createdTime) or format_time(job.createdTime)),
+      'startTime': hasattr(job, 'startTime') and format_time(job.startTime) or None,
       'run': hasattr(job, 'run') and job.run or 0,
       'frequency': hasattr(job, 'frequency') and job.frequency or None,
       'timeUnit': hasattr(job, 'timeUnit') and job.timeUnit or None,
