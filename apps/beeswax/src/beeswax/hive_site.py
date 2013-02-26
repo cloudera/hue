@@ -35,6 +35,7 @@ _HIVE_SITE_DICT = None                  # A dictionary of name/value config opti
 _METASTORE_LOC_CACHE = None
 
 _CNF_METASTORE_LOCAL = 'hive.metastore.local'
+_CNF_METASTORE_SASL = 'hive.metastore.sasl.enabled'
 _CNF_METASTORE_URIS = 'hive.metastore.uris'
 _CNF_METASTORE_KERBEROS_PRINCIPAL = 'hive.metastore.kerberos.principal'
 
@@ -86,7 +87,7 @@ def get_metastore():
         LOG.fatal('Cannot understand remote metastore uri "%s"' % (thrift_uri,))
       else:
         host, port = match.groups()
-      if len(kerberos_principal_components) == 3:
+      if str(get_conf().get(_CNF_METASTORE_SASL, 'false')).lower() == 'true' and len(kerberos_principal_components) == 3:
         host = kerberos_principal_components[1]
     _METASTORE_LOC_CACHE = (is_local, host, int(port), kerberos_principal)
   return _METASTORE_LOC_CACHE

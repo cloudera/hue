@@ -1362,6 +1362,63 @@ def test_hive_site():
       beeswax.conf.BEESWAX_HIVE_CONF_DIR = saved
     shutil.rmtree(tmpdir)
 
+def test_hive_site_sasl():
+  """Test hive-site parsing with sasl enabled"""
+  HIVE_SITE = """
+    <configuration>
+      <property>
+        <name>hive.metastore.local</name>
+        <value>false</value>
+      </property>
+
+      <property>
+        <name>hive.metastore.uris</name>
+        <value>thrift://darkside-1234:9999</value>
+      </property>
+
+      <property>
+        <name>hive.metastore.warehouse.dir</name>
+        <value>/abc</value>
+      </property>
+
+      <property>
+        <name>hive.metastore.kerberos.principal</name>
+        <value>test/test.com@TEST.COM</value>
+      </property>
+
+      <property>
+        <name>hive.metastore.sasl.enabled</name>
+        <value>true</value>
+      </property>
+    </configuration>
+  """
+
+  beeswax.hive_site.reset()
+  tmpdir = tempfile.mkdtemp()
+  saved = None
+  try:
+    file(os.path.join(tmpdir, 'hive-site.xml'), 'w').write(HIVE_SITE)
+
+    # We just replace the Beeswax conf variable
+    class Getter(object):
+      def get(self):
+        return tmpdir
+
+    saved = beeswax.conf.BEESWAX_HIVE_CONF_DIR
+    beeswax.conf.BEESWAX_HIVE_CONF_DIR = Getter()
+
+    is_local, host, port, kerberos_principal = beeswax.hive_site.get_metastore()
+    assert_false(is_local)
+    # Should look at kerberos instance for host.
+    assert_equal(host, 'test.com')
+    assert_equal(port, 9999)
+    assert_equal(beeswax.hive_site.get_conf()['hive.metastore.warehouse.dir'], u'/abc')
+    assert_equal(kerberos_principal, 'test/test.com@TEST.COM')
+  finally:
+    if saved is not None:
+      beeswax.conf.BEESWAX_HIVE_CONF_DIR = saved
+    shutil.rmtree(tmpdir)
+
 def test_collapse_whitespace():
   assert_equal("", collapse_whitespace("\t\n\n  \n\t \n"))
   assert_equal("x", collapse_whitespace("\t\nx\n  \n\t \n"))
