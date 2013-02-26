@@ -193,7 +193,7 @@ class GroupEditForm(forms.ModelForm):
     super(GroupEditForm, self).__init__(*args, **kwargs)
 
     if self.instance.id:
-      self.fields['name'].widget.attrs['readonly'] = True
+      # self.fields['name'].widget.attrs['readonly'] = True
       initial_members = User.objects.filter(groups=self.instance).order_by('username')
       initial_perms = HuePermission.objects.filter(grouppermission__group=self.instance).order_by('app','description')
     else:

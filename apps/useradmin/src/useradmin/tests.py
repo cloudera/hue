@@ -271,11 +271,18 @@ def test_group_admin():
 
   # Should be one group left, because we created the other group
   response = c.post('/useradmin/groups/delete/testgroup')
-  assert_true(len(Group.objects.all()) == 1)
+  assert_equal(len(Group.objects.all()), 1)
 
   group_count = len(Group.objects.all())
   response = c.post('/useradmin/groups/new', dict(name="with space"))
-  assert_equal(len(Group.objects.all()), group_count + 1)
+  group_count += 1
+  assert_equal(len(Group.objects.all()), group_count)
+
+  # Rename a group
+  response = c.post('/useradmin/groups/edit/with space', dict(name='withspace'))
+  assert_equal(len(Group.objects.all()), group_count)
+  assert_equal(len(Group.objects.filter(name='withspace')), 1)
+  assert_equal(len(Group.objects.filter(name='with space')), 0)
 
 def test_user_admin():
   FUNNY_NAME = '~`!@#$%^&*()_-+={}[]|\;"<>?/,.'
