@@ -51,7 +51,7 @@ from avro import datafile, io
 
 from desktop.lib import i18n, paginator
 from desktop.lib.conf import coerce_bool
-from desktop.lib.django_util import make_absolute, render, render_json, format_preserving_redirect, render_to_string
+from desktop.lib.django_util import make_absolute, render, render_json, format_preserving_redirect
 from desktop.lib.exceptions_renderable import PopupException
 from filebrowser.conf import MAX_SNAPPY_DECOMPRESSION_SIZE
 from filebrowser.lib.archives import archive_factory
@@ -69,7 +69,7 @@ from django.utils.translation import ugettext as _
 
 DEFAULT_CHUNK_SIZE_BYTES = 1024 * 4 # 4KB
 MAX_CHUNK_SIZE_BYTES = 1024 * 1024 # 1MB
-DOWNLOAD_CHUNK_SIZE = 32 * 1024 # 32KB
+DOWNLOAD_CHUNK_SIZE = 64 * 1024 * 1024 # 64MB
 
 # Defaults for "xxd"-style output.
 # Sentences refer to groups of bytes printed together, within a line.
