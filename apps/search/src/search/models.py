@@ -41,7 +41,7 @@ class DateFacet(object): pass
 
 class Facet(models.Model):
   _ATTRIBUTES = ['properties', 'fields', 'range', 'date']
-  
+
   enabled = models.BooleanField(default=True)
   data = models.TextField()
 
@@ -75,17 +75,17 @@ class Facet(models.Model):
       params += field_facets
 
     if data_dict.get('ranges'):
-      for field_facet in data_dict['ranges']:      
+      for field_facet in data_dict['ranges']:
         range_facets = tuple([
                            ('facet.range', field_facet['field']),
                            ('f.%s.facet.range.start' % field_facet['field'], field_facet['start']),
                            ('f.%s.facet.range.end' % field_facet['field'], field_facet['end']),
                            ('f.%s.facet.range.gap' % field_facet['field'], field_facet['gap']),]
                         )
-        params += range_facets      
- 
+        params += range_facets
+
     if data_dict.get('dates'):
-      for field_facet in data_dict['dates']:      
+      for field_facet in data_dict['dates']:
         range_facets = tuple([
                            ('facet.date', field_facet['field']),
                            ('f.%s.facet.date.start' % field_facet['field'], 'NOW/DAY-305DAYS'),
@@ -93,7 +93,7 @@ class Facet(models.Model):
                            ('f.%s.facet.date.gap' % field_facet['field'], '+%sDAY' % field_facet['gap']),]
                         )
         params += range_facets
- 
+
     return params
 
 
@@ -132,24 +132,44 @@ class Sorting(models.Model):
     if post_data.get('fields'):
       data_dict['fields'] = json.loads(post_data['fields'])
 
-    self.data = json.dumps(data_dict)  
+    self.data = json.dumps(data_dict)
+
+
+
+class CoreManager(models.Manager):
+  def get_or_create(self, name):
+    try:
+      return self.get(name=name)
+    except Core.DoesNotExist:
+      facets = Facet.objects.create(data=json.dumps({
+                   'ranges': [],
+                   'fields': [],
+                   'dates': []
+                }))
+      result = Result.objects.create(data=json.dumps({'template': '{{id}}</br>To customize!<br/>'}))
+      sorting = Sorting.objects.create(data=json.dumps({'fields': []}))
+
+      return Core.objects.create(name=name, label=name, facets=facets, result=result, sorting=sorting)
 
 
 class Core(models.Model):
   enabled = models.BooleanField(default=True)
   name = models.CharField(max_length=40, unique=True, help_text=_t('Name of the Solr collection'))
   label = models.CharField(max_length=100)
+  # solr_address?
   properties = models.TextField(default='[]', verbose_name=_t('Core properties'), help_text=_t('Properties (e.g. facets off, results by pages number)'))
-  
+
   facets = models.ForeignKey(Facet)
   result = models.ForeignKey(Result)
   sorting = models.ForeignKey(Sorting)
+
+  objects = CoreManager()
 
   def get_query(self):
     return self.facets.get_query_params()
 
   def get_absolute_url(self):
-    return reverse('search:admin_core_properties', kwargs={'core': self.name})
+    return reverse('search:admin_core', kwargs={'core': self.name})
 
   @property
   def fields(self):
@@ -163,7 +183,7 @@ class Query(object): pass
 
 
 def temp_fixture_hook():
-  #Core.objects.all().delete()
+  Core.objects.all().delete()
   if not Core.objects.exists():
     facets = Facet.objects.create(data=json.dumps({
                  'ranges': [{"type":"range","field":"price","start":"1","end":"400","gap":"100"}],

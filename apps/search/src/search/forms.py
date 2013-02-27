@@ -46,3 +46,10 @@ class QueryForm(forms.Form):
 
   def _initial_core(self, choices):
     return choices and choices[0][0] or None
+
+
+
+class CoreForm(forms.ModelForm):
+  class Meta:
+    model = Core
+    exclude = ('facets', 'result', 'sorting', 'properties')

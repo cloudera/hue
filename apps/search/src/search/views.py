@@ -22,15 +22,17 @@ except ImportError:
 
 import logging
 
+from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.utils.translation import ugettext as _
+from django.shortcuts import redirect
 
 from desktop.lib.django_util import render
 
 from search.api import SolrApi
 from search.conf import SOLR_URL
 from search.decorators import allow_admin_only
-from search.forms import QueryForm
+from search.forms import QueryForm, CoreForm
 from search.models import Core, temp_fixture_hook
 
 
@@ -38,13 +40,19 @@ LOG = logging.getLogger(__name__)
 
 
 def index(request):
-  temp_fixture_hook()
+  #Core.objects.all().delete()
+  ##temp_fixture_hook()
 
   cores = SolrApi(SOLR_URL.get()).cores()
   hue_cores = Core.objects.all()
 
+  if not hue_cores:
+    for core in cores['status']:
+      Core.objects.get_or_create(name=core)
+
   search_form = QueryForm(request.GET)
   response = {}
+  error = {}
   solr_query = {}
 
   if search_form.is_valid():
@@ -57,13 +65,17 @@ def index(request):
     solr_query['start'] = search_form.cleaned_data['start'] or 0
     solr_query['facets'] = search_form.cleaned_data['facets'] or 1
 
-    hue_core = Core.objects.get(name=core)
+    hue_core = Core.objects.get_or_create(name=core)
 
-    response = SolrApi(SOLR_URL.get()).query(solr_query, hue_core)
+    try:
+      response = SolrApi(SOLR_URL.get()).query(solr_query, hue_core)
+    except Exception, e:
+      error['message'] = unicode(str(e), "utf8")
 
   return render('index.mako', request, {
     'search_form': search_form,
     'response': response,
+    'error': error,
     'solr_query': solr_query,
     'hue_core': hue_core,
     'hue_cores': hue_cores,
@@ -90,7 +102,31 @@ def admin_core_properties(request, core):
   hue_core = Core.objects.get(name=core)
   hue_cores = Core.objects.all()
 
+  if request.method == 'POST':
+    core_form = CoreForm(request.POST, instance=hue_core)
+    if core_form.is_valid():
+      hue_core = core_form.save()
+      return redirect(reverse('search:admin_core_properties', kwargs={'core': hue_core.name}))
+    else:
+      request.error(_('Errors on the form: %s') % core_form.errors)
+  else:
+    core_form = CoreForm(instance=hue_core)
+
   return render('admin_core_properties.mako', request, {
+    'solr_core': solr_core,
+    'hue_core': hue_core,
+    'hue_cores': hue_cores,
+    'core_form': core_form,
+  })
+
+
+@allow_admin_only
+def admin_core_solr_properties(request, core):
+  solr_core = SolrApi(SOLR_URL.get()).core(core)
+  hue_core = Core.objects.get(name=core)
+  hue_cores = Core.objects.all()
+
+  return render('admin_core_solr_properties.mako', request, {
     'solr_core': solr_core,
     'hue_core': hue_core,
     'hue_cores': hue_cores,

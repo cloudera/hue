@@ -24,14 +24,6 @@
   <link rel="stylesheet" href="/search/static/css/admin.css">
 
   <div class="container-fluid">
-    <div class="pull-right" style="margin-top: 20px">
-      <span class="muted">${ _('Change settings for') }</span>
-      <select id="change-core" style="margin-bottom: 0;display: inline">
-          % for c in hue_cores:
-            <option value="${ c.get_absolute_url() }"> ${ c.label } (${ c.name })</option>
-          % endfor
-      </select>
-    </div>
     %if hasattr(caller, "title"):
       ${caller.title()}
     %else:
@@ -69,22 +61,46 @@
 <%def name="sidebar(core, section='')">
   <div class="well sidebar-nav" style="min-height: 250px">
     <ul class="nav nav-list">
-      <li class="nav-header">${_('Core')}</li>
+
+    <li class="nav-header">${_('Core')}</li>
+    <li>
+      <div>
+      ##<span class="muted">${ _('Change settings for') }</span>
+      ##<select id="change-core" style="margin-bottom: 0;display: inline">
+      ##  % for c in hue_cores:
+      ##    <option value="${ c.get_absolute_url() }"> ${ c.label } (${ c.name })</option>
+      ##  % endfor
+      ##</select>
+      </div>
+    </li>
       <li class="${ utils.is_selected(section, 'properties') }">
         <a href="${ url('search:admin_core_properties', core=core) }">${_('Properties')}</a>
       </li>
-      <li class="${ utils.is_selected(section, 'schema') }">
-        <a href="${ url('search:admin_core_schema', core=core) }">${_('Schema')}</a>
-      </li>
-      <li class="nav-header">${_('Results')}</li>
+
+      <li class="nav-header">${_('Template')}</li>
       <li class="${ utils.is_selected(section, 'template') }">
-        <a href="${ url('search:admin_core_template', core=core) }">${_('Template')}</a>
+        <a href="${ url('search:admin_core_template', core=core) }">${_('1. Snippet')}</a>
       </li>
       <li class="${ utils.is_selected(section, 'facets') }">
-        <a href="${ url('search:admin_core_facets', core=core) }">${_('Facets')}</a>
+        <a href="${ url('search:admin_core_facets', core=core) }">${_('2. Facets')}</a>
       </li>
       <li class="${ utils.is_selected(section, 'sorting') }">
-        <a href="${ url('search:admin_core_sorting', core=core) }">${_('Sorting')}</a>
+        <a href="${ url('search:admin_core_sorting', core=core) }">${_('3. Sorting')}</a>
+      </li>
+      <li class="${ utils.is_selected(section, 'autocomplete') }">
+        <a href="${ url('search:admin_core_sorting', core=core) }">${_('4. Auto-complete')}</a>
+      </li>
+      <li class="nav-header">${_('Search')}</li>
+      <li>
+        <a href="${ url('search:index') }"><i class="icon-share-alt"></i> ${ _('Query UI') }</a>
+      </li>
+
+      <li class="nav-header">${_('Solr')}</li>
+      <li class="${ utils.is_selected(section, 'index') }">
+        <a href="${ url('search:admin_core_solr_properties', core=core) }">${_('Index')}</a>
+      </li>
+      <li class="${ utils.is_selected(section, 'schema') }">
+        <a href="${ url('search:admin_core_schema', core=core) }">${_('Schema')}</a>
       </li>
     </ul>
   </div>

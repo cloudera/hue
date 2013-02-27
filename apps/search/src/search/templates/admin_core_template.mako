@@ -44,13 +44,12 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 
 <%layout:skeleton>
   <%def name="title()">
-    <h1>${_('Search Admin - ')}${hue_core.label}</h1>
+    <h1>${ _('Template Editor ') } : ${ hue_core.name }</h1>
   </%def>
   <%def name="navigation()">
     ${ layout.sidebar(hue_core.name, 'template') }
   </%def>
   <%def name="content()">
-
     <ul class="nav nav-tabs">
       <li class="active"><a href="#visual" data-toggle="tab">${_('Visual editor')}</a></li>
       <li><a href="#source" data-toggle="tab">${_('Source')}</a></li>
@@ -74,7 +73,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
             <div class="well available-fields">
               <h4>${_('Available Fields')}</h4>
               <ul data-bind="foreach: fields">
-                <li data-bind="text: $data, click: $root.addField"></li>
+                <li data-bind="text: $data, click: $root.addField" title="${ _('Click to append to the template') }"></li>
               </ul>
             </div>
           </div>
@@ -105,8 +104,8 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     </div>
 
     <div class="form-actions">
-      <a class="btn btn-primary" id="save-template">${_('Save Template')}</a>
-      <a class="btn" href="${ url('search:index') }"><i class="icon-search"></i> ${ _('Back to Search') }</a>
+      <a class="btn" id="save-template">${_('Save')}</a>
+      <a class="btn btn-primary" id="save-template">${_('Save and next')}</a>
     </div>
 
     <div id="load-template-modal" class="modal hide fade">
