@@ -45,7 +45,7 @@ class SolrApi(object):
                 ('wt', 'json'),
                 ('rows', solr_query['rows']),
                 ('start', solr_query['start']),
-                ('facet', solr_query['facets'] == 1 and 'true' or 'false'),
+                ('facet', 'false'), #solr_query['facets'] == 1 and 'true' or 'false'
              )
 
       params += hue_core.get_query()
@@ -56,6 +56,8 @@ class SolrApi(object):
         if fq:
           params += (('fq', fq),)
 
+      # Debug for now
+      print solr_query, params
       response = self._root.get('%(core)s/browse' % solr_query, params)
       return json.loads(response)
     except RestException, e:

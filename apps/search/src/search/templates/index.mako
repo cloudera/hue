@@ -26,7 +26,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 <div class="search-bar">
   % if user.is_superuser:
     <div class="pull-right" style="margin-top: 4px">
-      <a class="change-settings" href="#"><i class="icon-edit"></i> ${ _('Change settings for this Core') }</a>
+      <a class="change-settings btn" href="#"><i class="icon-edit"></i> ${ _('Customize this Index') }</a>
     </div>
   % endif
   <form class="form-search" style="margin: 0">
@@ -53,10 +53,17 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 
 <div class="container-fluid">
   <div class="row-fluid">
+    % if error:
+    <div class="span12">
+      <div class="alert">
+        ${ error['message'] }
+      </div>
+    </div>
+    %else:
     % if response and response['response']['docs'] and len(response['response']['docs']) > 0 and solr_query['facets'] == 1:
     <div class="span2">
       <ul class="facet-list">
-        % if response and response['facet_counts']:
+        % if response and response.get('facet_counts'):
           % if response['facet_counts']['facet_fields']:
             % for cat in response['facet_counts']['facet_fields']:
                 % if response['facet_counts']['facet_fields'][cat]:
@@ -158,10 +165,18 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
             next = int(solr_query["start"]) + int(solr_query["rows"])
           %>
           % if int(solr_query["start"]) > 0:
-            <li><a title="${_('Beginning of List')}" href="?query=${solr_query["q"]}&fq=${solr_query["fq"]}&sort=${solr_query["sort"]}&rows=${solr_query["rows"]}&start=${beginning}">&larr; ${_('Beginning of List')}</a></li>
-            <li><a title="Previous Page" href="?query=${solr_query["q"]}&fq=${solr_query["fq"]}&sort=${solr_query["sort"]}&rows=${solr_query["rows"]}&start=${previous}">${_('Previous Page')}</a></li>
+            <li>
+              <a title="${_('Beginning of List')}" href="?query=${solr_query["q"]}&fq=${solr_query["fq"]}&sort=${solr_query["sort"]}&rows=${solr_query["rows"]}&start=${beginning}">&larr; ${_('Beginning of List')}</a>
+            </li>
+            <li>
+              <a title="Previous Page" href="?query=${solr_query["q"]}&fq=${solr_query["fq"]}&sort=${solr_query["sort"]}&rows=${solr_query["rows"]}&start=${previous}">${_('Previous Page')}</a>
+            </li>
           % endif
-          <li><a title="Next page" href="?query=${solr_query["q"]}&fq=${solr_query["fq"]}&sort=${solr_query["sort"]}&rows=${solr_query["rows"]}&start=${next}">${_('Next Page')}</a></li>
+          % if end_record < int(response["response"]["numFound"]):
+            <li>
+              <a title="Next page" href="?query=${solr_query["q"]}&fq=${solr_query["fq"]}&sort=${solr_query["sort"]}&rows=${solr_query["rows"]}&start=${next}">${_('Next Page')}</a>
+            </li>
+          % endif
         </ul>
       </div>
     </div>
@@ -173,6 +188,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
     </div>
     % endif
   </div>
+  % endif
 </div>
 
 <div class="hide">

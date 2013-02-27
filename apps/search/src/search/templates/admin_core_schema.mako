@@ -25,20 +25,21 @@
 ${ commonheader(_('Search'), "search", user) | n,unicode }
 
 <%layout:skeleton>
+
   <%def name="title()">
     <h1>${_('Search Admin - ')}${hue_core.label}</h1>
   </%def>
+
   <%def name="navigation()">
     ${ layout.sidebar(hue_core.name, 'schema') }
   </%def>
+
   <%def name="content()">
     <textarea id="schema">
-    ${ solr_schema.decode('utf-8') }
+      ${ solr_schema.decode('utf-8') }
     </textarea>
-    <div class="form-actions">
-      <a class="btn" href="${ url('search:index') }"><i class="icon-search"></i> ${ _('Back to Search') }</a>
-    </div>
   </%def>
+
 </%layout:skeleton>
 
 

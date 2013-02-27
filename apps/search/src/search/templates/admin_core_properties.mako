@@ -29,6 +29,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
       ${ solr_core["status"][hue_core.name]["index"][key] }
     %endif
 </%def>
+
 <%def name="coreProperty(key)">
   %if key in solr_core["status"][hue_core.name]:
       ${ solr_core["status"][hue_core.name][key] }
@@ -39,121 +40,28 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
   <%def name="title()">
     <h1>${_('Search Admin - ')}${hue_core.label}</h1>
   </%def>
+
   <%def name="navigation()">
     ${ layout.sidebar(hue_core.name, 'properties') }
   </%def>
+
   <%def name="content()">
+  <form method="POST">
     <ul class="nav nav-tabs">
-      <li class="active"><a href="#index" data-toggle="tab">${_('Index properties')}</a></li>
-      <li><a href="#core" data-toggle="tab">${_('Core properties')}</a></li>
+      <li class="active"><a href="#index" data-toggle="tab">${_('Core')}</a></li>
     </ul>
     <div class="tab-content">
       <div class="tab-pane active" id="index">
-        <table class="table">
-          <thead>
-          <tr>
-            <th width="20%">${_('Property')}</th>
-            <th>${_('Value')}</th>
-          </tr>
-          </thead>
-          <tbody>
-          <tr>
-            <td>sizeInBytes</td>
-            <td>${ indexProperty('sizeInBytes') }</td>
-          </tr>
-          <tr>
-            <td>segmentCount</td>
-            <td>${ indexProperty('segmentCount') }</td>
-          </tr>
-          <tr>
-            <td>maxDoc</td>
-            <td>${ indexProperty('maxDoc') }</td>
-          </tr>
-          <tr>
-            <td>lastModified</td>
-            <td>${ indexProperty('lastModified') }</td>
-          </tr>
-          <tr>
-            <td>current</td>
-            <td>${ indexProperty('current') }</td>
-          </tr>
-          <tr>
-            <td>version</td>
-            <td>${ indexProperty('version') }</td>
-          </tr>
-          <tr>
-            <td>directory</td>
-            <td>${ indexProperty('directory') }</td>
-          </tr>
-          <tr>
-            <td>numDocs</td>
-            <td>${ indexProperty('numDocs') }</td>
-          </tr>
-          <tr>
-            <td>hasDeletions</td>
-            <td>${ indexProperty('hasDeletions') }</td>
-          </tr>
-          <tr>
-            <td>size</td>
-            <td>${ indexProperty('size') }</td>
-          </tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="tab-pane" id="core">
-        <table class="table">
-          <thead>
-          <tr>
-            <th width="20%">${_('Property')}</th>
-            <th>${_('Value')}</th>
-          </tr>
-          </thead>
-          <tbody>
-          <tr>
-            <td>uptime</td>
-            <td>${ coreProperty('uptime') }</td>
-          </tr>
-          <tr>
-            <td>name</td>
-            <td>${ coreProperty('name') }</td>
-          </tr>
-          <tr>
-            <td>isDefaultCore</td>
-            <td>${ coreProperty('isDefaultCore') }</td>
-          </tr>
-          <tr>
-            <td>dataDir</td>
-            <td>${ coreProperty('dataDir') }</td>
-          </tr>
-          <tr>
-            <td>instanceDir</td>
-            <td>${ coreProperty('instanceDir') }</td>
-          </tr>
-          <tr>
-            <td>startTime</td>
-            <td>${ coreProperty('startTime') }</td>
-          </tr>
-          <tr>
-            <td>config</td>
-            <td>${ coreProperty('config') }</td>
-          </tr>
-          <tr>
-            <td>schema</td>
-            <td>${ coreProperty('schema') }</td>
-          </tr>
-          </tbody>
-        </table>
+        ${ core_form | n,unicode }
       </div>
     </div>
-
 
     <div class="form-actions">
-      <a class="btn" href="${ url('search:index') }"><i class="icon-search"></i> ${ _('Back to Search') }</a>
+      <button type="submit" class="btn btn-primary" id="save-sorting">${_('Save')}</button>
     </div>
-
+  </form>
   </%def>
+
 </%layout:skeleton>
 
 ${ commonfooter(messages) | n,unicode }
-
-

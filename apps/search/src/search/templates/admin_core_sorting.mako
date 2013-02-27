@@ -63,8 +63,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
       </div>
 
       <div class="form-actions" style="margin-top: 80px">
-        <button type="submit" class="btn btn-primary" id="save-sorting">${_('Save Sorting')}</button>
-        <a class="btn" href="${ url('search:index') }"><i class="icon-search"></i> ${ _('Back to Search') }</a>
+        <button type="submit" class="btn btn-primary" id="save-sorting">${_('Save')}</button>
       </div>
     </form>
   </%def>
@@ -148,7 +147,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
           $("#save-sorting").button('reset');
         }
       });
-    };    
+    };
   };
 
   var viewModel = new ViewModel();
