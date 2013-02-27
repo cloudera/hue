@@ -127,7 +127,11 @@
   # URL of the LDAP server
   ## ldap_url=ldap://auth.mycompany.com
 
-  # Path to certificate for authentication over TLS
+  # A PEM-format file containing certificates for the CA's that
+  # Hue will trust for authentication over TLS.
+  # The certificate for the CA that signed the
+  # LDAP server certificate must be included among these certificates.
+  # See more here http://www.openldap.org/doc/admin24/tls.html.
   ## ldap_cert=
 
   # Distinguished name of the user to bind as -- not necessary if the LDAP server
