@@ -73,6 +73,9 @@ ${ layout.menubar(section='dashboard') }
             </div>
           </li>
 
+          <li class="nav-header">${ _('Last Modification time') }</li>
+          <li>${  utils.format_time(oozie_workflow.lastModTime) }</li>
+
           % if parameters and len(parameters) < 10:
               <li class="nav-header">${ _('Variables') }</li>
               % for var, value in parameters.iteritems():
@@ -257,6 +260,10 @@ ${ layout.menubar(section='dashboard') }
               <td>${ _('Application Path') }</td>
               <td>${  utils.hdfs_link(oozie_workflow.appPath) }</td>
             </tr>
+            <tr>
+              <td>${ _('Run') }</td>
+              <td>${  oozie_workflow.run }</td>
+            </tr>
             </tbody>
           </table>
         </div>
@@ -330,7 +337,8 @@ ${ layout.menubar(section='dashboard') }
       errorMessage: action.errorMessage,
       errorCode: action.errorCode,
       transition: action.transition,
-      data: action.data
+      data: action.data,
+      lastModTime: action.lastModTime
     }
   }
 

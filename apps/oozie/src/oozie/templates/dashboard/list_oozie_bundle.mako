@@ -62,10 +62,10 @@ ${ layout.menubar(section='dashboard') }
         <li>${ oozie_bundle.kickoffTime }</li>
 
         <li class="nav-header">${ _('Created time') }</li>
-        <li id="endTime">${ oozie_bundle.createdTime }</li>
+        <li>${ oozie_bundle.createdTime }</li>
 
         % if bundle:
-            <li class="nav-header">${ _('Bundles') }</li>
+            <li class="nav-header">${ _('Coordinators') }</li>
           % for bundled in bundle.coordinators.all():
             <li rel="tooltip" title="${ bundled.coordinator.name }">
               <i class="icon-eye-open"></i> <span class="dataset">${ bundled.coordinator.name }</span>
@@ -89,6 +89,16 @@ ${ layout.menubar(section='dashboard') }
               data-message="${ _('The bundle was killed!') }"
               data-confirmation-message="${ _('Are you sure you\'d like to kill this job?') }">
                 ${_('Kill')}
+            </button>
+            <button class="btn btn-small
+               % if oozie_bundle.is_running() or oozie_bundle.status in ('KILLED', 'FAILED'):
+                 hide
+               % endif
+            "
+              id="rerun-btn"
+              data-rerun-url="${ url('oozie:rerun_oozie_bundle', job_id=oozie_bundle.id, app_path=oozie_bundle.bundleJobPath) }"
+            >
+              ${ _('Rerun') }
             </button>
             <div id="rerun-coord-modal" class="modal hide"></div>
             <button title="${ _('Suspend the bundle after finishing the current running actions') }" id="suspend-btn"
@@ -130,7 +140,7 @@ ${ layout.menubar(section='dashboard') }
         <table class="table table-striped table-condensed">
           <thead>
           <tr>
-            <th>${ _('Day') }</th>
+            <th>${ _('Coordinator') }</th>
             <th>${ _('Last action') }</th>
             <th>${ _('Next materialization') }</th>
           </tr>

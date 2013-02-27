@@ -126,6 +126,21 @@ class Submission(object):
     return self.oozie_id
 
 
+  def rerun_bundle(self, deployment_dir, params):
+    jobtracker = cluster.get_cluster_addr_for_job_submission()
+
+    try:
+      prev = get_oozie().setuser(self.user.username)
+      self._update_properties(jobtracker, deployment_dir)
+      self.properties.update({'oozie.bundle.application.path': deployment_dir})
+      get_oozie().job_control(self.oozie_id, action='bundle-rerun', properties=self.properties, parameters=params)
+      LOG.info("Rerun: %s" % (self,))
+    finally:
+      get_oozie().setuser(prev)
+
+    return self.oozie_id
+
+
   def deploy(self):
     try:
       deployment_dir = self._create_deployment_dir()

@@ -32,10 +32,18 @@
       <div id="config-container">
         <div class="fieldWrapper">
           <div class="row-fluid">
-            <h3>${ _('Select actions to rerun') }</h3>
+            <h3>${ _('Select coordinators to rerun') }</h3>
           </div>
           <div class="row-fluid">
-            ${ utils.render_field(rerun_form['actions'], show_label=False) }
+            ${ utils.render_field(rerun_form['coordinators'], show_label=False) }
+          </div>
+          <div class="row-fluid">
+            <div class="span6">
+              ${ utils.render_field_no_popover(rerun_form['start'], show_label=True) }
+            </div>
+            <div class="span6">
+              ${ utils.render_field_no_popover(rerun_form['end'], show_label=True) }
+            </div>
           </div>
           <div class="row-fluid">
             <div class="span6">
@@ -92,17 +100,14 @@
 
     window.viewModel = new ViewModel();
 
-    $("#id_actions").jHueSelector({
+    $("#id_coordinators").jHueSelector({
       selectAllLabel: "${_('Select all')}",
       searchPlaceholder: "${_('Search')}",
       noChoicesFound: "${_('No successful actions found.')}",
       width:524,
       height:200
     });
-
-    // Update status color of each date
-    $(".jHueSelectorBody ul li label").each(function(index) {
-      $(this).addClass($("#date-" + index).attr('class'));
-    });
   });
 </script>
+
+${ utils.decorate_datetime_fields() }

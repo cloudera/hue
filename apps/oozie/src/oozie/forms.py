@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import logging
+from datetime import datetime,  timedelta
 
 from django import forms
 from django.db.models import Q
@@ -450,6 +451,26 @@ class RerunCoordForm(forms.Form):
     super(RerunCoordForm, self).__init__(*args, **kwargs)
 
     self.fields['actions'].choices = [(action.actionNumber, action.title) for action in reversed(oozie_coordinator.get_working_actions())]
+
+
+class RerunBundleForm(forms.Form):
+  refresh = forms.BooleanField(initial=True, required=False, help_text=_t('Used to indicate if user wants to cleanup output events for given rerun actions'))
+  nocleanup = forms.BooleanField(initial=True, required=False, help_text=_t("Used to indicate if user wants to refresh an action's input and output events"))
+  coordinators = forms.MultipleChoiceField(required=True)
+  start = forms.SplitDateTimeField(input_time_formats=[TIME_FORMAT], required=False, initial=datetime.today(),
+                                   widget=SplitDateTimeWidget(attrs={'class': 'input-small', 'id': 'rerun_start'},
+                                                              date_format=DATE_FORMAT, time_format=TIME_FORMAT))
+  end = forms.SplitDateTimeField(input_time_formats=[TIME_FORMAT], required=False, initial=datetime.today() + timedelta(days=3),
+                                 widget=SplitDateTimeWidget(attrs={'class': 'input-small', 'id': 'rerun_end'},
+                                                            date_format=DATE_FORMAT, time_format=TIME_FORMAT))
+
+  def __init__(self, *args, **kwargs):
+    oozie_bundle = kwargs.pop('oozie_bundle')
+
+    super(RerunBundleForm, self).__init__(*args, **kwargs)
+
+    self.fields['coordinators'].choices = [(action.name, action.name) for action in reversed(oozie_bundle.actions)]
+    self.fields['coordinators'].initial = [action.name for action in reversed(oozie_bundle.actions)]
 
 
 class BundledCoordinatorForm(forms.ModelForm):

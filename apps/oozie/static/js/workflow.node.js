@@ -431,7 +431,7 @@ var NodeModule = function($, IdGeneratorTable, NodeFields) {
       var self = this;
       self.registry.remove(self.id());
     }
-    
+
   });
 
   return module;

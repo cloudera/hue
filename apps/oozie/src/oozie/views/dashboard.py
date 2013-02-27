@@ -37,8 +37,9 @@ from liboozie.oozie_api import get_oozie
 from liboozie.submittion import Submission
 
 from oozie.conf import OOZIE_JOBS_COUNT
-from oozie.forms import RerunForm, ParameterForm, RerunCoordForm
-from oozie.models import History, Job, Workflow
+from oozie.forms import RerunForm, ParameterForm, RerunCoordForm,\
+  RerunBundleForm
+from oozie.models import History, Job, Workflow, utc_datetime_format
 from oozie.settings import DJANGO_APPS
 
 from django.template.defaultfilters import escapejs
@@ -425,6 +426,69 @@ def _rerun_coordinator(request, oozie_id, args, params, properties):
                          detail=ex._headers.get('oozie-error-message', ex))
 
 
+@show_oozie_error
+def rerun_oozie_bundle(request, job_id, app_path):
+  oozie_bundle = check_job_access_permission(request, job_id)
+  check_job_edition_permission(oozie_bundle, request.user)
+  ParametersFormSet = formset_factory(ParameterForm, extra=0)
+
+  if request.method == 'POST':
+    params_form = ParametersFormSet(request.POST)
+    rerun_form = RerunBundleForm(request.POST, oozie_bundle=oozie_bundle)
+
+    if sum([rerun_form.is_valid(), params_form.is_valid()]) == 2:
+      args = {}
+      args['deployment_dir'] = app_path
+
+      params = {
+        'coord-scope': ','.join(rerun_form.cleaned_data['coordinators']),
+        'refresh': rerun_form.cleaned_data['refresh'],
+        'nocleanup': rerun_form.cleaned_data['nocleanup'],
+      }
+
+      if rerun_form.cleaned_data['start'] and rerun_form.cleaned_data['end']:
+        date = {
+            'date-scope':
+                '%(start)s::%(end)s' % {
+                    'start': utc_datetime_format(rerun_form.cleaned_data['start']),
+                    'end': utc_datetime_format(rerun_form.cleaned_data['end'])
+                }
+        }
+        params.update(date)
+
+      properties = dict([(param['name'], param['value']) for param in params_form.cleaned_data])
+
+      _rerun_bundle(request, job_id, args, params, properties)
+
+      request.info(_('Bundle re-running!'))
+      return redirect(reverse('oozie:list_oozie_bundle', kwargs={'job_id': job_id}))
+    else:
+      request.error(_('Invalid submission form: %s' % (rerun_form.errors,)))
+      return list_oozie_bundle(request, job_id)
+  else:
+    rerun_form = RerunBundleForm(oozie_bundle=oozie_bundle)
+    initial_params = ParameterForm.get_initial_params(oozie_bundle.conf_dict)
+    params_form = ParametersFormSet(initial=initial_params)
+
+  popup = render('dashboard/rerun_bundle_popup.mako', request, {
+                   'rerun_form': rerun_form,
+                   'params_form': params_form,
+                   'action': reverse('oozie:rerun_oozie_bundle', kwargs={'job_id': job_id, 'app_path': app_path}),
+                 }, force_template=True).content
+
+  return HttpResponse(json.dumps(popup), mimetype="application/json")
+
+
+def _rerun_bundle(request, oozie_id, args, params, properties):
+  try:
+    submission = Submission(user=request.user, fs=request.fs, oozie_id=oozie_id, properties=properties)
+    job_id = submission.rerun_bundle(params=params, **args)
+    return job_id
+  except RestException, ex:
+    raise PopupException(_("Error re-running bundle %s") % (oozie_id,),
+                         detail=ex._headers.get('oozie-error-message', ex))
+
+
 def massaged_workflow_actions_for_json(workflow_actions, oozie_coordinator, oozie_bundle):
   actions = []
   action_link_params = {}
@@ -451,7 +515,9 @@ def massaged_workflow_actions_for_json(workflow_actions, oozie_coordinator, oozi
       'errorCode': escapejs(action.errorCode),
       'errorMessage': escapejs(action.errorMessage),
       'transition': action.transition,
-      'data': escapejs(action.data)
+      'data': escapejs(action.data),
+      'lastModTime': format_time(action.lastModTime),
+      'run': action.run,
     }
     actions.append(massaged_action)
 

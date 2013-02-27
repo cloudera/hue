@@ -2150,8 +2150,7 @@ class TestDashboard(OozieMockBase):
     # Display of buttons happens in js now
     response = self.c.get(reverse('oozie:list_oozie_bundle', args=[MockOozieApi.BUNDLE_IDS[0]]), {}, follow=True)
     assert_true(('%s/kill' % MockOozieApi.BUNDLE_IDS[0]) in response.content, response.content)
-    # Not supported yet
-    #assert_true(('rerun_oozie_bundle/%s' % MockOozieApi.BUNDLE_IDS[0]) in response.content, response.content)
+    assert_true(('rerun_oozie_bundle/%s' % MockOozieApi.BUNDLE_IDS[0]) in response.content, response.content)
     assert_true(('%s/suspend' % MockOozieApi.BUNDLE_IDS[0]) in response.content, response.content)
     assert_true(('%s/resume' % MockOozieApi.BUNDLE_IDS[0]) in response.content, response.content)
 
@@ -2192,6 +2191,58 @@ class TestDashboard(OozieMockBase):
     finish = SHARE_JOBS.set_for_testing(True)
     try:
       response = client_not_me.post(reverse('oozie:rerun_oozie_coord', args=[MockOozieApi.COORDINATOR_IDS[0], '/path']), post_data)
+      assert_true('Permission denied' in response.content, response.content)
+    finally:
+      finish()
+
+
+  def test_rerun_bundle(self):
+    response = self.c.get(reverse('oozie:rerun_oozie_coord', args=[MockOozieApi.WORKFLOW_IDS[0], '/path']))
+    assert_true('Select actions to rerun' in response.content, response.content)
+
+
+  def test_rerun_bundle_permissions(self):
+    post_data =  {
+        u'end_1': [u'01:55 PM'],
+        u'end_0': [u'03/02/2013'],
+        u'refresh': [u'on'],
+        u'nocleanup': [u'on'],
+        u'start_0': [u'02/27/2013'],
+        u'start_1': [u'01:55 PM'],
+        u'coordinators': [u'DailySleep'],
+
+        u'form-MAX_NUM_FORMS': [u''],
+        u'form-TOTAL_FORMS': [u'3'],
+        u'form-INITIAL_FORMS': [u'3'],
+        u'form-0-name': [u'oozie.use.system.libpath'],
+        u'form-0-value': [u'true'],
+        u'form-1-name': [u'hue-id-b'],
+        u'form-1-value': [u'22'],
+        u'form-2-name': [u'oozie.bundle.application.path'],
+        u'form-2-value': [u'hdfs://localhost:8020/path'],
+    }
+
+    finish = SHARE_JOBS.set_for_testing(False)
+    try:
+      response = self.c.post(reverse('oozie:rerun_oozie_bundle', args=[MockOozieApi.BUNDLE_IDS[0], '/path']), post_data)
+      assert_false('Permission denied' in response.content, response.content)
+    finally:
+      finish()
+
+    # Login as someone else
+    client_not_me = make_logged_in_client(username='not_me', is_superuser=False, groupname='test')
+    grant_access("not_me", "test", "oozie")
+
+    finish = SHARE_JOBS.set_for_testing(False)
+    try:
+      response = client_not_me.post(reverse('oozie:rerun_oozie_bundle', args=[MockOozieApi.BUNDLE_IDS[0], '/path']), post_data)
+      assert_true('Permission denied' in response.content, response.content)
+    finally:
+      finish()
+
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      response = client_not_me.post(reverse('oozie:rerun_oozie_bundle', args=[MockOozieApi.BUNDLE_IDS[0], '/path']), post_data)
       assert_true('Permission denied' in response.content, response.content)
     finally:
       finish()
