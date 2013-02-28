@@ -2122,6 +2122,22 @@ class TestDashboardNoMocking:
       finish()
 
 
+class TestDashboardWithOozie(OozieBase):
+
+  def test_oozie_page(self):
+    response = self.c.get(reverse('oozie:list_oozie_info'))
+    assert_true('version' in response.content, response.content)
+    assert_true('NORMAL' in response.content, response.content)
+
+    assert_true('variables' in response.content, response.content)
+    assert_true('timers' in response.content, response.content)
+    assert_true('counters' in response.content, response.content)
+
+    assert_true('ownMinTime' in response.content, response.content)
+    assert_true(':END:#action.end' in response.content, response.content)
+    assert_true('oozie.base.url' in response.content, response.content)
+
+
 class TestDashboard(OozieMockBase):
 
   def test_manage_workflow_dashboard(self):

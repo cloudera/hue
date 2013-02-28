@@ -89,8 +89,24 @@ ${ layout.menubar(section='dashboard') }
                         <tbody>
                           % for item in group['data']:
                             <tr>
-                              <td>${ item.pop('name') }</td>
-                              <td>${ ', '.join(map(str, item.values())) }</td>
+                              <% name = item.pop('name') %>
+                              <td>${ name }</td>
+                              % if category == 'timers':
+                                <td>
+                                  % for label, timer in zip(['ownMinTime', 'ownTimeStdVar', 'totalTimeStdVar', 'ownTimeAvg', 'ticks', 'name', 'ownMaxTime', 'totalMinTime', 'totalMaxTime', 'totalTimeAvg'], item.values()):
+                                  ${ label } :
+                                  % if label == 'name':
+                                    ${ name } -
+                                  % endif
+                                  ${ timer }
+                                  % if not loop.last:
+                                    </br>
+                                  % endif
+                                  % endfor
+                                </td>
+                              % else:
+                                <td>${ ', '.join(map(str, item.values())) }</td>
+                              % endif
                             </tr>
                           % endfor
                         </tbody>
