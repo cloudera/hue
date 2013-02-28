@@ -7,6 +7,7 @@
             <main-class>org.apache.hadoop.examples.terasort.TeraGen</main-class>
             <arg>${records}</arg>
             <arg>${output_dir}/teragen</arg>
+            <capture-output/>
         </java>
         <ok to="TeraSort"/>
         <error to="kill"/>

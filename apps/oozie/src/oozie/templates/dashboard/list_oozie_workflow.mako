@@ -73,8 +73,8 @@ ${ layout.menubar(section='dashboard') }
             </div>
           </li>
 
-          <li class="nav-header">${ _('Last Modification time') }</li>
-          <li>${  utils.format_time(oozie_workflow.lastModTime) }</li>
+          <li class="nav-header">${ _('Id') }</li>
+          <li>${  oozie_workflow.id }</li>
 
           % if parameters and len(parameters) < 10:
               <li class="nav-header">${ _('Variables') }</li>
@@ -245,6 +245,10 @@ ${ layout.menubar(section='dashboard') }
               <td>${ oozie_workflow.externalId or '-' }</td>
             </tr>
             <tr>
+              <td>${ _('Last Modification time') }</td>
+              <td>${ utils.format_time(oozie_workflow.lastModTime) }</td>
+            </tr>
+            <tr>
               <td>${ _('Start Time') }</td>
               <td>${ utils.format_time(oozie_workflow.startTime) }</td>
             </tr>
@@ -337,8 +341,7 @@ ${ layout.menubar(section='dashboard') }
       errorMessage: action.errorMessage,
       errorCode: action.errorCode,
       transition: action.transition,
-      data: action.data,
-      lastModTime: action.lastModTime
+      data: action.data
     }
   }
 
@@ -457,7 +460,7 @@ ${ layout.menubar(section='dashboard') }
     var logsAtEnd = true;
 
     function refreshView() {
-      $.getJSON(window.location.href + "?format=json", function (data) {
+      $.getJSON("${ oozie_workflow.get_absolute_url() }" + "?format=json", function (data) {
 
         if (data.actions){
           viewModel.actions(ko.utils.arrayMap(data.actions, function (action) {

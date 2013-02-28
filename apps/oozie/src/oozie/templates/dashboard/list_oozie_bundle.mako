@@ -61,8 +61,8 @@ ${ layout.menubar(section='dashboard') }
         <li class="nav-header">${ _('Kick off time') }</li>
         <li>${ oozie_bundle.kickoffTime }</li>
 
-        <li class="nav-header">${ _('Created time') }</li>
-        <li>${ oozie_bundle.createdTime }</li>
+        <li class="nav-header">${ _('Id') }</li>
+        <li>${ oozie_bundle.id }</li>
 
         % if bundle:
             <li class="nav-header">${ _('Coordinators') }</li>
@@ -130,6 +130,7 @@ ${ layout.menubar(section='dashboard') }
     <ul class="nav nav-tabs">
       <li class="active"><a href="#calendar" data-toggle="tab">${ _('Coordinators') }</a></li>
       <li><a href="#actions" data-toggle="tab">${ _('Actions') }</a></li>
+      <li><a href="#details" data-toggle="tab">${ _('Details') }</a></li>
       <li><a href="#configuration" data-toggle="tab">${ _('Configuration') }</a></li>
       <li><a href="#log" data-toggle="tab">${ _('Log') }</a></li>
       <li><a href="#definition" data-toggle="tab">${ _('Definition') }</a></li>
@@ -243,6 +244,17 @@ ${ layout.menubar(section='dashboard') }
         </tr>
       </script>
 
+      <div class="tab-pane" id="details">
+        <table class="table table-condensed">
+          <tbody>
+            <tr>
+              <td>${ _('Created time') }</td>
+              <td>${ oozie_bundle.createdTime }</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
       <div class="tab-pane" id="configuration">
         ${ utils.display_conf(oozie_bundle.conf_dict) }
       </div>
@@ -262,10 +274,6 @@ ${ layout.menubar(section='dashboard') }
 
   </div>
 </div>
-
-
-
-
 
 
 </div>

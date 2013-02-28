@@ -69,11 +69,8 @@ ${ layout.menubar(section='dashboard') }
         <li class="nav-header">${ _('Next Materialized Time') }</li>
         <li id="nextTime">${ utils.format_time(oozie_coordinator.nextMaterializedTime) }</li>
 
-        <li class="nav-header">${ _('Start time') }</li>
-        <li>${ utils.format_time(oozie_coordinator.startTime) }</li>
-
-        <li class="nav-header">${ _('End time') }</li>
-        <li id="endTime">${ utils.format_time(oozie_coordinator.endTime) }</li>
+        <li class="nav-header">${ _('Id') }</li>
+        <li>${ oozie_coordinator.id }</li>
 
         % if coordinator:
             <li class="nav-header">${ _('Datasets') }</li>
@@ -139,6 +136,7 @@ ${ layout.menubar(section='dashboard') }
     <ul class="nav nav-tabs">
       <li class="active"><a href="#calendar" data-toggle="tab">${ _('Calendar') }</a></li>
       <li><a href="#actions" data-toggle="tab">${ _('Actions') }</a></li>
+      <li><a href="#details" data-toggle="tab">${ _('Details') }</a></li>
       <li><a href="#configuration" data-toggle="tab">${ _('Configuration') }</a></li>
       <li><a href="#log" data-toggle="tab">${ _('Log') }</a></li>
       <li><a href="#definition" data-toggle="tab">${ _('Definition') }</a></li>
@@ -245,6 +243,21 @@ ${ layout.menubar(section='dashboard') }
           </td>
         </tr>
       </script>
+
+      <div class="tab-pane" id="details">
+        <table class="table table-condensed">
+          <tbody>
+            <tr>
+              <td>${ _('Start time') }</td>
+              <td>${ utils.format_time(oozie_coordinator.startTime) }</td>
+            </tr>
+            <tr>
+              <td>${ _('End time') }</td>
+              <td>${ utils.format_time(oozie_coordinator.endTime) }</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
       <div class="tab-pane" id="configuration">
         ${ utils.display_conf(oozie_coordinator.conf_dict) }

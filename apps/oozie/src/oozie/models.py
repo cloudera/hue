@@ -734,6 +734,11 @@ class Java(Action):
                              help_text=_t('Refer to a Hadoop JobConf job.xml file bundled in the workflow deployment directory. '
                                           'Properties specified in the Job Properties element override properties specified in the '
                                           'files specified in the Job XML element.'))
+  capture_output = models.BooleanField(default=False, verbose_name=_t('Capture output'),
+                              help_text=_t('Capture output of the stdout of the %(program)s command execution. The %(program)s '
+                                           'command output must be in Java Properties file format and it must not exceed 2KB. '
+                                           'From within the workflow definition, the output of an %(program)s action node is accessible '
+                                           'via the String action:output(String node, String key) function') % {'program': node_type.title()})
 
   def get_properties(self):
     return json.loads(self.job_properties)

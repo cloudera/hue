@@ -6,7 +6,7 @@
 
   <field name="capture_output" type="BooleanField">
     <xsl:choose>
-      <xsl:when test="*[local-name()='exec']">
+      <xsl:when test="*[local-name()='capture-output']">
         True
       </xsl:when>
       <xsl:otherwise>

@@ -38,6 +38,10 @@
             % endfor
 
             ${ common.distributed_cache(node.get_files(), node.get_archives()) }
+
+            % if node.capture_output:
+            <capture-output/>
+            % endif
         </java>
         <ok to="${ node.get_oozie_child('ok') }"/>
         <error to="${ node.get_oozie_child('error') }"/>

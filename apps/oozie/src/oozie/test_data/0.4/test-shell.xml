@@ -1,0 +1,32 @@
+<workflow-app name="Shells" xmlns="uri:oozie:workflow:0.4">
+    <start to="shell-1"/>
+    <action name="shell-1">
+        <shell xmlns="uri:oozie:shell-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+              <job-xml>my-job.xml</job-xml>
+            <exec>hello.py</exec>
+              <argument>World!</argument>
+            <file>hello.py#hello.py</file>
+              <capture-output/>
+        </shell>
+        <ok to="shell-2"/>
+        <error to="kill"/>
+    </action>
+    <action name="shell-2">
+        <shell xmlns="uri:oozie:shell-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+              <job-xml>my-job.xml</job-xml>
+            <exec>hello.py</exec>
+              <argument>World!</argument>
+            <file>hello.py#hello.py</file>
+        </shell>
+        <ok to="end"/>
+        <error to="kill"/>
+    </action>
+    <kill name="kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+    <end name="end"/>
+</workflow-app>

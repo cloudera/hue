@@ -11,6 +11,7 @@
 <xsl:import href="fields/job_properties.xslt"/>
 <xsl:import href="fields/main_class.xslt"/>
 <xsl:import href="fields/prepares.xslt"/>
+<xsl:import href="fields/capture_output.xslt"/>
 
 <xsl:template match="workflow:java" xmlns:workflow="uri:oozie:workflow:0.4">
 
@@ -25,6 +26,7 @@
     <xsl:call-template name="job_xml"/>
     <xsl:call-template name="main_class"/>
     <xsl:call-template name="prepares"/>
+    <xsl:call-template name="capture_output"/>
 
   </object>
 

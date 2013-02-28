@@ -717,6 +717,7 @@ class TestEditor(OozieMockBase):
         "jar_path":"/user/hue/oozie/workspaces/lib/hadoop-examples.jar",
         "prepares":"[]",
         "archives":"[]",
+        "capture_output": "on",
     })
     Link(parent=action1, child=self.wf.end, name="ok").save()
 
@@ -731,6 +732,7 @@ class TestEditor(OozieMockBase):
             <java-opts>-Dexample-property=natty</java-opts>
             <arg>1000</arg>
             <arg>${output_dir}/teragen</arg>
+            <capture-output/>
         </java>
         <ok to="end"/>
         <error to="kill"/>
@@ -1554,6 +1556,28 @@ class TestImportWorkflow04(OozieMockBase):
     assert_equal('${records} ${output_dir}/teragen', nodes[0].args)
     assert_equal('org.apache.hadoop.examples.terasort.TeraSort', nodes[1].main_class)
     assert_equal('${output_dir}/teragen ${output_dir}/terasort', nodes[1].args)
+    assert_true(nodes[0].capture_output)
+    assert_false(nodes[1].capture_output)
+    workflow.delete()
+
+
+  def test_import_workflow_shell(self):
+    workflow = Workflow.objects.new_workflow(self.user)
+    workflow.save()
+    f = open('apps/oozie/src/oozie/test_data/0.4/test-shell.xml')
+    import_workflow(workflow, f.read())
+    f.close()
+    workflow.save()
+    assert_equal(5, len(Node.objects.filter(workflow=workflow)))
+    assert_equal(5, len(Link.objects.filter(parent__workflow=workflow)))
+    nodes = [Node.objects.filter(workflow=workflow, node_type='shell')[0].get_full_node(),
+             Node.objects.filter(workflow=workflow, node_type='shell')[1].get_full_node()]
+    assert_equal('shell-1', nodes[0].name)
+    assert_equal('shell-2', nodes[1].name)
+    assert_equal('my-job.xml', nodes[0].job_xml)
+    assert_equal('hello.py', nodes[0].command)
+    assert_true(nodes[0].capture_output)
+    assert_false(nodes[1].capture_output)
     workflow.delete()
 
 

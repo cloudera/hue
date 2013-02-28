@@ -516,8 +516,6 @@ def massaged_workflow_actions_for_json(workflow_actions, oozie_coordinator, oozi
       'errorMessage': escapejs(action.errorMessage),
       'transition': action.transition,
       'data': escapejs(action.data),
-      'lastModTime': format_time(action.lastModTime),
-      'run': action.run,
     }
     actions.append(massaged_action)
 

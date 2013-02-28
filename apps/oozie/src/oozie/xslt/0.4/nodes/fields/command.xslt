@@ -6,6 +6,7 @@
 
   <field name="command" type="CharField">
     <xsl:value-of select="*[local-name()='command']"/>
+    <xsl:value-of select="*[local-name()='exec']"/>
   </field>
 
 </xsl:template>
