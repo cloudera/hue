@@ -2108,6 +2108,19 @@ class TestOozieSubmissions(OozieBase):
     assert_equal('SUCCEEDED', job.status)
 
 
+  def test_oozie_page(self):
+    response = self.c.get(reverse('oozie:list_oozie_info'))
+    assert_true('version' in response.content, response.content)
+    assert_true('NORMAL' in response.content, response.content)
+
+    assert_true('variables' in response.content, response.content)
+    assert_true('timers' in response.content, response.content)
+    assert_true('counters' in response.content, response.content)
+
+    assert_true('ownMinTime' in response.content, response.content)
+    assert_true('oozie.base.url' in response.content, response.content)
+
+
 class TestDashboardNoMocking:
 
   def test_oozie_not_running_message(self):
@@ -2120,22 +2133,6 @@ class TestDashboardNoMocking:
       assert_true('The Oozie server is not running' in response.content, response.content)
     finally:
       finish()
-
-
-class TestDashboardWithOozie(OozieBase):
-
-  def test_oozie_page(self):
-    response = self.c.get(reverse('oozie:list_oozie_info'))
-    assert_true('version' in response.content, response.content)
-    assert_true('NORMAL' in response.content, response.content)
-
-    assert_true('variables' in response.content, response.content)
-    assert_true('timers' in response.content, response.content)
-    assert_true('counters' in response.content, response.content)
-
-    assert_true('ownMinTime' in response.content, response.content)
-    assert_true(':END:#action.end' in response.content, response.content)
-    assert_true('oozie.base.url' in response.content, response.content)
 
 
 class TestDashboard(OozieMockBase):
