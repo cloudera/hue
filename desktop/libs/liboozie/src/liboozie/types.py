@@ -128,6 +128,7 @@ class WorkflowAction(Action):
     'trackerUri',
     'transition',
     'type',
+    'externalChildIDs',
   ]
 
   def _fixup(self):

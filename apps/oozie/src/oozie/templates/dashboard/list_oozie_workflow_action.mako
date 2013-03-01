@@ -34,7 +34,7 @@ ${ layout.menubar(section='running') }
       ${ _('Bundle') } <a href="${ oozie_bundle.get_absolute_url() }">${ oozie_bundle.appName }</a> :
     % endif
     % if oozie_coordinator:
-      ${ _('Coordinator') } <a href="${ oozie_coordinator.get_absolute_url(oozie_bundle) }">${ oozie_coordinator.appName }</a> :
+      ${ _('Coordinator') } <a href="${ oozie_coordinator.get_absolute_url() }">${ oozie_coordinator.appName }</a> :
     % endif
     ${ _('Workflow') } <a href="${ workflow.get_absolute_url() }">${ workflow.appName }</a> :
     ${ _('Action') } ${ action.name }
@@ -75,6 +75,7 @@ ${ layout.menubar(section='running') }
       <ul class="nav nav-tabs">
         <li class="active"><a href="#details" data-toggle="tab">${ _('Details') }</a></li>
         <li><a href="#configuration" data-toggle="tab">${ _('Configuration') }</a></li>
+        <li><a href="#child-jobs" data-toggle="tab">${ _('Child Jobs') }</a></li>
       </ul>
 
       <div id="workflow-tab-content" class="tab-content" style="min-height:200px">
@@ -136,17 +137,40 @@ ${ layout.menubar(section='running') }
           </table>
         </div>
 
-        <div id="configuration" class="tab-pane">
-          ${ utils.display_conf(action.conf_dict) }
+        <div id="configuration" class="tab-pane" style="min-height:400px">
+          <textarea id="configurationEditor">${ action.conf }</textarea>
         </div>
 
-        % if action.externalId:
-          <div id="logs" class="tab-pane">
-            <h2>${ _('Logs') }</h2>
-
-            ${ utils.display_conf(action.conf_dict) }
-          </div>
-        % endif
+        <div id="child-jobs" class="tab-pane">
+          % if not action.externalChildIDs:
+            ${ _('No child jobs') }
+          % else:
+          <table class="table table-condensed datatables" id="jobTable">
+            <thead>
+              <tr>
+                <th>${ _('Logs') }</th>
+                <th>${ _('Ids') }</th>
+              </tr>
+            </thead>
+            <tbody>
+            % for child_id in action.externalChildIDs.split(','):
+              <tr>
+                <td>
+                  <a href="${ url('jobbrowser.views.job_single_logs', job=child_id) }" title="${ _('View the logs') }" rel="tooltip">
+                    <i class="icon-tasks"></i>
+                  </a>
+                </td>
+                <td>
+                  <a href="${ url('jobbrowser.views.single_job', job=child_id) }">
+                    ${ "_".join(child_id.split("_")[-2:]) }
+                  </a>
+                </td>
+              </tr>
+            % endfor
+              </tbody>
+            </table>
+          % endif
+        </div>
       </div>
 
       <div style="margin-bottom: 16px">
@@ -156,5 +180,31 @@ ${ layout.menubar(section='running') }
   </div>
 
 </div>
+
+<script src="/static/ext/js/codemirror-3.0.js"></script>
+<link rel="stylesheet" href="/static/ext/css/codemirror.css">
+<script src="/static/ext/js/codemirror-xml.js"></script>
+
+<script type="text/javascript">
+
+  $(document).ready(function() {
+    var definitionEditor = $("#configurationEditor")[0];
+
+    var codeMirror = CodeMirror(function (elt) {
+      definitionEditor.parentNode.replaceChild(elt, definitionEditor);
+    }, {
+      value:definitionEditor.value,
+      readOnly:true,
+      lineNumbers:true
+    });
+
+    // force refresh on tab change
+    $("a[data-toggle='tab']").on("shown", function (e) {
+      if ($(e.target).attr("href") == "#configuration") {
+        codeMirror.refresh();
+      }
+    });
+  });
+</script>
 
 ${ commonfooter(messages) | n,unicode }

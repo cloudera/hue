@@ -173,6 +173,11 @@ def list_oozie_workflow(request, job_id, coordinator_job_id=None, bundle_job_id=
   if bundle_job_id is not None:
     oozie_bundle = check_job_access_permission(request, bundle_job_id)
 
+  if oozie_coordinator is not None:
+    setattr(oozie_workflow, 'oozie_coordinator', oozie_coordinator)
+  if oozie_bundle is not None:
+    setattr(oozie_workflow, 'oozie_bundle', oozie_bundle)
+
   history = History.cross_reference_submission_history(request.user, job_id, coordinator_job_id)
 
   hue_coord = history and history.get_coordinator() or History.get_coordinator_from_config(oozie_workflow.conf_dict)
@@ -491,19 +496,17 @@ def _rerun_bundle(request, oozie_id, args, params, properties):
 
 def massaged_workflow_actions_for_json(workflow_actions, oozie_coordinator, oozie_bundle):
   actions = []
-  action_link_params = {}
-
-  if oozie_coordinator is not None:
-    action_link_params['coordinator_job_id'] = oozie_coordinator.id
-  if oozie_bundle is not None:
-    action_link_params['bundle_job_id'] = oozie_bundle.id
 
   for action in workflow_actions:
-    action_link_params.update({'action': action.id})
+    if oozie_coordinator is not None:
+      setattr(action, 'oozie_coordinator', oozie_coordinator.id)
+    if oozie_bundle is not None:
+      setattr(action, 'oozie_bundle', oozie_bundle.id)
+
     massaged_action = {
       'id': action.id,
       'log': action.externalId and reverse('jobbrowser.views.job_single_logs', kwargs={'job': action.externalId}) or '',
-      'url': reverse('oozie:list_oozie_workflow_action', kwargs=action_link_params),
+      'url': action.get_absolute_url(),
       'name': escapejs(action.name),
       'type': action.type,
       'status': action.status,
