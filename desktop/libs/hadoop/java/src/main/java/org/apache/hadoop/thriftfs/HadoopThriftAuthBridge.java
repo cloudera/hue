@@ -24,7 +24,9 @@ import javax.security.sasl.SaslException;
 
 import java.io.IOException;
 import java.lang.reflect.UndeclaredThrowableException;
+import java.util.HashMap;
 import java.util.Map;
+import javax.security.sasl.Sasl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -138,10 +140,12 @@ class HadoopThriftAuthBridge {
       }
 
       TSaslServerTransport.Factory transFactory = new TSaslServerTransport.Factory();
+      Map<String,String> SASL_PROPS = new HashMap<String, String>(SaslRpcServer.SASL_PROPS);
+      SASL_PROPS.put(Sasl.QOP, SaslRpcServer.QualityOfProtection.AUTHENTICATION.getSaslQop());
       transFactory.addServerDefinition(
         AuthMethod.KERBEROS.getMechanismName(),
         names[0], names[1],  // two parts of kerberos principal
-        SaslRpcServer.SASL_PROPS,
+        SASL_PROPS,
         new SaslRpcServer.SaslGssCallbackHandler());
 
       return new TUGIAssumingTransportFactory(transFactory, realUgi);
