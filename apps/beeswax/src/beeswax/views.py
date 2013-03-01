@@ -596,12 +596,11 @@ def watch_query_refresh_json(request, id):
   try:
     if not query_history.is_finished() and query_history.is_success() and not query_history.has_results:
       db.execute_next_statement(query_history)
-      handle, state = _get_query_handle_and_state(query_history)
-
-    log = db.get_log(handle)
+      handle, state = _get_query_handle_and_state(query_history)    
   except BeeswaxException, ex:
     handle, state = _get_query_handle_and_state(query_history)
-
+    
+  log = db.get_log(handle)
   jobs = _parse_out_hadoop_jobs(log)
   job_urls = dict([(job, reverse('jobbrowser.views.single_job', kwargs=dict(job=job))) for job in jobs])
 
