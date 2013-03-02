@@ -181,10 +181,17 @@ class AllowFirstUserDjangoBackend(django.contrib.auth.backends.ModelBackend):
 class AllowAllBackend(DesktopBackendBase):
   """
   Authentication backend that allows any user to login as long
-  as they have a username and password of any kind.
+  as they have a username. The users will be added to the 'default_user_group'.
   """
   def check_auth(self, username, password):
-    return True
+    user = find_or_create_user(username, None)
+    user.is_superuser = False
+    user.save()
+    default_group = get_default_user_group()
+    if default_group is not None:
+      user.groups.add(default_group)
+
+    return user
 
   @classmethod
   def manages_passwords_externally(cls):

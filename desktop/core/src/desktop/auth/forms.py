@@ -19,12 +19,15 @@ from django.contrib.auth.forms import AuthenticationForm as AuthAuthenticationFo
 from django.forms import CharField, TextInput, PasswordInput
 from django.utils.translation import ugettext_lazy as _t
 
+
+
 class AuthenticationForm(AuthAuthenticationForm):
   """
   Adds appropriate classes to authentication form
   """
   username = CharField(label=_t("Username"), max_length=30, widget=TextInput(attrs={'class': 'input-large', 'maxlength': 30}))
   password = CharField(label=_t("Password"), widget=PasswordInput(attrs={'class': 'input-large', 'maxlength': 30}))
+
 
 class UserCreationForm(AuthUserCreationForm):
   """

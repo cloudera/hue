@@ -67,7 +67,11 @@ from django.utils.translation import ugettext as _
                         ${ form['username'] | n,unicode }
                         ${ form['username'].errors | n,unicode }
                     </label>
-                    <label>${_('Password')}
+                    <label
+                    % if is_allow_all:
+                      class="hide"
+                    % endif
+                    >${_('Password')}
                         ${ form['password'] | n,unicode }
                         ${ form['password'].errors | n,unicode }
                     </label>
@@ -101,5 +105,15 @@ from django.utils.translation import ugettext as _
         </div>
         %endif
     </div>
+
+% if is_allow_all:
+  <script src="/static/ext/js/jquery/jquery-1.8.1.min.js"></script>
+  <script>
+    $(document).ready(function(){
+      $('#id_password').val('password');
+    });
+  </script>
+% endif
+
 </body>
 </html>

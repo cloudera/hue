@@ -28,7 +28,7 @@ from django.utils.translation import ugettext as _
 from hadoop.fs.exceptions import WebHdfsException
 from useradmin.views import ensure_home_directory
 
-from desktop.auth.backend import AllowFirstUserDjangoBackend
+from desktop.auth.backend import AllowFirstUserDjangoBackend, AllowAllBackend
 from desktop.auth.forms import UserCreationForm, AuthenticationForm
 from desktop.lib.django_util import render
 from desktop.lib.django_util import login_notrequired
@@ -66,11 +66,16 @@ def first_login_ever():
   return False
 
 
+def is_allow_all_backend():
+  return get_backends() and isinstance(get_backends()[0], AllowAllBackend)
+
+
 @login_notrequired
 def dt_login(request):
   """Used by the non-jframe login"""
   redirect_to = request.REQUEST.get('next', '/')
   is_first_login_ever = first_login_ever()
+  is_allow_all = is_allow_all_backend()
 
   if request.method == 'POST':
     # For first login, need to validate user info!
@@ -89,7 +94,7 @@ def dt_login(request):
         if request.session.test_cookie_worked():
           request.session.delete_test_cookie()
 
-        if is_first_login_ever:
+        if is_first_login_ever or is_allow_all:
           # Create home directory for first user.
           try:
             ensure_home_directory(request.fs, user.username)
@@ -114,6 +119,7 @@ def dt_login(request):
     'next': redirect_to,
     'first_login_ever': is_first_login_ever,
     'login_errors': request.method == 'POST',
+    'is_allow_all': is_allow_all
   })
 
 
