@@ -177,7 +177,7 @@ ${layout.menubar(section='query')}
                       <li class="prev"><a title="${_('Beginning of List')}" href="${ url(app_name + ':view_results', query.id, 0) }${'?context=' + context_param or '' | n}">&larr; ${_('Beginning of List')}</a></li>
                   % endif
               % endif
-              % if has_more and len(results) == 100:
+              % if has_more and (len(results) == 100 or app_name == 'impala'):
                   <li><a title="${_('Next page')}" href= "${ url(app_name + ':view_results', query.id, next_row) }${'?context=' + context_param or '' | n }">${_('Next Page')} &rarr;</a></li>
               % endif
               </ul>
