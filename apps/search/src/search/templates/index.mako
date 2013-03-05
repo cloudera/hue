@@ -208,7 +208,6 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 
 <script>
   $(document).ready(function () {
-
     $(".current-core").text($("select[name='cores'] option:selected").text());
     % if user.is_superuser:
         $(".dropdown-core").each(function () {
@@ -258,6 +257,19 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
         _sort = "";
       }
       location.href = "?query=${solr_query["q"]}&fq=${solr_query["fq"]}&sort=" + _sort + "&rows=${solr_query["rows"]}&start=${solr_query["start"]}";
+    });
+    
+    $("#id_query").keydown(function() {
+      var query = $("#id_query").val();
+      $.ajax("${ url('search:query_suggest', core=hue_core.name) }" + query, {
+        type: 'GET',
+        success: function (data) {
+          if (data.message.spellcheck && ! jQuery.isEmptyObject(data.message.spellcheck.suggestions)) {
+            $('#id_query').typeahead({source: data.message.spellcheck.suggestions[1].suggestion});
+          }
+        }
+      });    
+      
     });
 
   });

@@ -90,21 +90,21 @@
       <li class="${ utils.is_selected(section, 'highlighting') }">
         <a href="${ url('search:admin_core_highlighting', core=core) }">${_('4. Highlighting')}</a>
       </li>
-      <li class="${ utils.is_selected(section, 'autocomplete') }">
-        <a href="${ url('search:admin_core_sorting', core=core) }">${_('5. Auto-complete')}</a>
-      </li>
+      ##<li class="${ utils.is_selected(section, 'autocomplete') }">
+      ##  <a href="${ url('search:admin_core_sorting', core=core) }">${_('5. Auto-complete')}</a>
+      ##</li>
       <li class="nav-header">${_('Search')}</li>
       <li>
-        <a href="${ url('search:index') }"><i class="icon-share-alt"></i> ${ _('Query UI') }</a>
+        <a href="${ url('search:index') }"><i class="icon-share-alt"></i> ${ _('Query') }</a>
       </li>
 
-      <li class="nav-header">${_('Solr')}</li>
-      <li class="${ utils.is_selected(section, 'index') }">
-        <a href="${ url('search:admin_core_solr_properties', core=core) }">${_('Index')}</a>
-      </li>
-      <li class="${ utils.is_selected(section, 'schema') }">
-        <a href="${ url('search:admin_core_schema', core=core) }">${_('Schema')}</a>
-      </li>
+      ##<li class="nav-header">${_('Solr')}</li>
+      ##<li class="${ utils.is_selected(section, 'index') }">
+      ##  <a href="${ url('search:admin_core_solr_properties', core=core) }">${_('Index')}</a>
+      ##</li>
+      ##<li class="${ utils.is_selected(section, 'schema') }">
+      ##  <a href="${ url('search:admin_core_schema', core=core) }">${_('Schema')}</a>
+      ##</li>
     </ul>
   </div>
 </%def>

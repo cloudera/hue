@@ -49,7 +49,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
         <div class="miniform">
           ${_('Field')}
           <select id="select-field-facet" data-bind="options: fields, value: selectedFieldFacet"></select>
-          <a class="btn" data-bind="click: $root.addFieldFacet"><i class="icon-plus"></i> ${_('Add field to Field Facets')}</a>
+          <a class="btn" data-bind="click: $root.addFieldFacet"><i class="icon-plus"></i> ${_('Add field')}</a>
           &nbsp;<span id="field-facet-error" class="label label-important hide">${_('The field you are trying to add is already in the list.')}</span>
         </div>
       </div>
@@ -79,7 +79,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
           <input type="text" data-bind="value: selectedRangeEndFacet" class="input-mini" />
           &nbsp;${_('Gap')}
           <input type="text" data-bind="value: selectedRangeGapFacet" class="input-mini" />
-          <a class="btn" data-bind="click: $root.addRangeFacet"><i class="icon-plus"></i> ${_('Add field to Range Facets')}</a>
+          <a class="btn" data-bind="click: $root.addRangeFacet"><i class="icon-plus"></i> ${_('Add field')}</a>
         </div>
       </div>
 
@@ -108,7 +108,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
           <input id="dp-end" class="input-small" type="text" data-bind="value: selectedDateEndFacet" />
           &nbsp;${_('Gap')}
           <input type="text" data-bind="value: selectedDateGapFacet" class="input-mini" />
-          <a class="btn" data-bind="click: $root.addDateFacet"><i class="icon-plus"></i> ${_('Add field to Date Facets')}</a>
+          <a class="btn" data-bind="click: $root.addDateFacet"><i class="icon-plus"></i> ${_('Add field')}</a>
         </div>
       </div>
 

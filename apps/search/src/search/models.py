@@ -175,8 +175,8 @@ class Core(models.Model):
   name = models.CharField(max_length=40, unique=True, help_text=_t('Name of the Solr collection'))
   label = models.CharField(max_length=100)
   # solr_address?
+  # facets off, results by pages number, autocomplete off...
   properties = models.TextField(default='[]', verbose_name=_t('Core properties'), help_text=_t('Properties (e.g. facets off, results by pages number)'))
-
   facets = models.ForeignKey(Facet)
   result = models.ForeignKey(Result)
   sorting = models.ForeignKey(Sorting)
