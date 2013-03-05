@@ -46,9 +46,11 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
   <%def name="title()">
     <h1>${ _('Template Editor ') } : ${ hue_core.name }</h1>
   </%def>
+
   <%def name="navigation()">
     ${ layout.sidebar(hue_core.name, 'template') }
   </%def>
+
   <%def name="content()">
     <ul class="nav nav-tabs">
       <li class="active"><a href="#visual" data-toggle="tab">${_('Visual editor')}</a></li>

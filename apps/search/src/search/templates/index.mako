@@ -150,9 +150,15 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 
       <div id="result-container"></div>
       <script>
-        $.each(${ json.dumps([result for result in response['response']['docs']]) | n,unicode }, function (index, item) {
+      <%
+        docs = response['response']['docs']
+        for doc in response['response']['docs']:
+          if doc['id'] in response['highlighting']:
+            doc.update(response['highlighting'][doc['id']])
+        %>
+        $.each(${ json.dumps([result for result in docs]) | n,unicode }, function (index, item) {
           $("<div>").addClass("result-row").html(
-            Mustache.render(${ hue_core.result.data | n,unicode }.template, item)
+            Mustache.render('${ hue_core.result.get_template(with_highlighting=True) | n,unicode }', item)
           ).appendTo($("#result-container"));
         });
       </script>

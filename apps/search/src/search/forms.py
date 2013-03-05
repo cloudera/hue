@@ -48,6 +48,16 @@ class QueryForm(forms.Form):
     return choices and choices[0][0] or None
 
 
+class HighlightingForm(forms.Form):
+  fields = forms.MultipleChoiceField(required=False)
+  is_enabled = forms.BooleanField(label='Enabled', initial=True, required=False)
+
+  def __init__(self, *args, **kwargs):
+    fields = kwargs.pop('fields')
+    super(HighlightingForm, self).__init__(*args, **kwargs)
+    self.fields['fields'].choices = ((name, name) for name in fields)
+
+
 
 class CoreForm(forms.ModelForm):
   class Meta:
