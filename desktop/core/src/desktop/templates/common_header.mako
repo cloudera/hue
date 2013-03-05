@@ -170,7 +170,7 @@ from django.utils.translation import ugettext as _
       <a href="${url('oozie:list_oozie_info')}" class="nav-tooltip" title="Oozie">${ _('Oozie') }</a>
     </li>
     <li>
-      <a href="http://oozie.apache.org/docs/3.3.0/index.html" target="_blank" class="nav-tooltip" title="Documentation">${ _('Documentation') }</a>
+      <a href="http://oozie.apache.org/docs/3.3.0/index.html" target="_blank" class="nav-tooltip" title="${ _('Documentation in a new tab') }">${ _('Documentation') }</a>
     </li>
   </ul>
 </div>
