@@ -215,7 +215,6 @@ def admin_core_highlighting(request, core):
   hue_cores = Core.objects.all()
 
   if request.method == 'POST':
-    # TODO on/off + form actually
     hue_core.result.update_from_post(request.POST)
     hue_core.result.save()
     return HttpResponse(json.dumps({}), mimetype="application/json")
@@ -226,3 +225,20 @@ def admin_core_highlighting(request, core):
     'hue_cores': hue_cores,
   })
 
+# TODO security
+def query_suggest(request, core, query=""):
+  hue_core = Core.objects.get(name=core)
+  result = {'status': -1, 'message': 'Error'}
+  
+  solr_query = {}
+  solr_query['core'] = core
+  solr_query['q'] = query
+
+  try:
+    response = SolrApi(SOLR_URL.get()).suggest(solr_query, hue_core)
+    result['message'] = response
+    result['status'] = 0    
+  except Exception, e:
+    error['message'] = unicode(str(e), "utf8")  
+
+  return HttpResponse(json.dumps(result), mimetype="application/json")

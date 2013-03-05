@@ -63,6 +63,16 @@ class SolrApi(object):
     except RestException, e:
       raise PopupException('Error while accessing Solr: %s' % e)
 
+  def suggest(self, solr_query, hue_core):
+    try:
+      params = (('q', solr_query['q']),
+                ('wt', 'json'),
+             )
+      response = self._root.get('%(core)s/suggest' % solr_query, params)
+      return json.loads(response)
+    except RestException, e:
+      raise PopupException('Error while accessing Solr: %s' % e)
+
   def cores(self):
     try:
       return self._root.get('admin/cores', params={'wt': 'json'})

@@ -22,6 +22,8 @@ urlpatterns = patterns('search.views',
   url(r'^query$', 'index', name='query'),
   url(r'^admin$', 'admin', name='admin'),
 
+  url(r'^suggest/(?P<core>\w+)/(?P<query>\w+)?$', 'query_suggest', name='query_suggest'),
+
   url(r'^admin/cores$', 'admin', name='admin_cores'),
 
   url(r'^admin/core/(?P<core>\w+)$', 'admin_core_template', name='admin_core'),
