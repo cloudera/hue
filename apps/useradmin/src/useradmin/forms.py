@@ -22,7 +22,7 @@ import django.contrib.auth.forms
 from django import forms
 from django.contrib.auth.models import User, Group
 from django.forms.util import ErrorList
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
 from desktop.lib.django_util import get_username_re_rule, get_groupname_re_rule
 
