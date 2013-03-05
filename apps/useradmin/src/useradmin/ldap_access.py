@@ -131,7 +131,7 @@ class LdapConnection(object):
 
         ldap_info = {
           'dn': dn,
-          'name': data[user_name_attr][0]
+          'username': data[user_name_attr][0]
         }
 
         if 'givenName' in data:
