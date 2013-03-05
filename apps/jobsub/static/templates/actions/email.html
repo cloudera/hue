@@ -26,6 +26,7 @@
 
       <div class="control-group">
         <p class="alert alert-info">{{ alert }}</p>
+        <p class="alert alert-info">{{ smtp_alert }}</p>
       </div>
 
       <div class="control-group" rel="popover" data-original-title="{{ to.name }}" data-content="{{ to.popover }}" data-bind="attr: {'class': ( errors.to().length > 0 ) ? 'control-group error' : 'control-group'}">

@@ -55,6 +55,7 @@ from jobsub.management.commands import jobsub_setup
 
 LOG = logging.getLogger(__name__)
 
+SKIP_ESCAPE = ('name', 'owner')
 
 def list_designs(request):
   '''
@@ -76,8 +77,9 @@ def list_designs(request):
   for design in data:
       ko_design = {
           'id': design.id,
-          'owner': escapejs(design.owner.username),
-          'name': escapejs(design.name),
+          'owner': design.owner.username,
+          # Design name is validated by workflow and node forms.
+          'name': design.name,
           'description': escapejs(design.description),
           'node_type': design.start.get_child('to').node_type,
           'last_modified': py_time.mktime(design.last_modified.timetuple()),
@@ -91,8 +93,7 @@ def list_designs(request):
     return render("designs.mako", request, {
       'currentuser': request.user,
       'owner': owner,
-      'name': name,
-      'designs': json.dumps(designs)
+      'name': name
     })
 
 def _get_design(design_id):
@@ -130,14 +131,14 @@ def delete_design(request, design_id):
 
 def get_design(request, design_id):
   workflow = _get_design(design_id)
-  _check_permission(request, workflow.owner.username, _("Access denied: edit design %(id)s.") % {'id': design_id})
   node = workflow.start.get_child('to')
   node_dict = model_to_dict(node)
   node_dict['id'] = design_id
   for key in node_dict:
     if key not in JSON_FIELDS:
-      node_dict[key] = escapejs(node_dict[key])
-  node_dict['editable'] = True
+      if key not in SKIP_ESCAPE:
+        node_dict[key] = escapejs(node_dict[key])
+  node_dict['editable'] = workflow.owner.id == request.user.id
   return render_json(node_dict);
 
 
@@ -185,6 +186,8 @@ def new_design(request, node_type):
     raise StructuredException(code="INVALID_REQUEST_ERROR", message=_('Error saving design'), data={'errors': form.errors}, error_code=400)
 
   workflow.managed = False
+  # Every one should be able to execute and clone a design.
+  workflow.is_shared = True
   workflow.save()
   Workflow.objects.initialize(workflow, request.fs)
   action = form.save(commit=False)

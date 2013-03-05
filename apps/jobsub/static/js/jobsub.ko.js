@@ -80,6 +80,10 @@ var Design = (function($, ko, NodeFields) {
         });
       }
 
+      if (!('editable' in self)) {
+        self.editable = ko.observable(false);
+      }
+
       $(document).trigger('initialize.design', [options, self]);
     },
     request: function(url, options) {
@@ -311,6 +315,8 @@ var Designs = (function($, ko, NodeModelChooser) {
       // Reversing the order of the next two statements may cause KO to break.
       self.temporary().template(node_type);
       self.temporary().design(design);
+      // Do not do any thing with any other design.
+      self.deselectAll();
       $(document).trigger('new.design', [design]);
     },
     saveDesign: function(data, event) {
@@ -338,13 +344,13 @@ var Designs = (function($, ko, NodeModelChooser) {
             design.initialize({model: data});
             self.temporary().design(design);
             self.temporary().template(self.selectedDesignObject().template());
-            $(document).trigger('edit.design', [design, data]);
+            $(document).trigger('edit.design', [design]);
           });
           design.load();
         } else {
           self.temporary().design(design);
           self.temporary().template(self.selectedDesignObject().template());
-          $(document).trigger('edit.design', [design, data]);
+          $(document).trigger('edit.design', [design]);
         }
       }
     },

@@ -45,10 +45,12 @@ ${ commonheader(_('Job Designer'), "jobsub", user, "60px") | n,unicode }
 
   <%actionbar:render>
     <%def name="actions()">
+      <button id="home" class="btn" title="${_('Home')}"><i class="icon-share"></i> ${_('Home')}</button>
+      &nbsp;
       <button id="submit-design" class="btn" title="${_('Submit')}" data-bind="enable: selectedDesignObjects().length == 1"><i class="icon-play"></i> ${_('Submit')}</button>
-      <button id="edit-design" class="btn" title="${_('Edit')}" data-bind="enable: selectedDesignObjects().length == 1"><i class="icon-pencil"></i> ${_('Edit')}</button>
+      <button id="edit-design" class="btn" title="${_('Edit')}" data-bind="enable: selectedDesignObjects().length == 1 && window.location.hash.substring(0,12) != '#edit-design'"><i class="icon-pencil"></i> ${_('Edit')}</button>
       <button id="delete-designs" class="btn" title="${_('Delete')}" data-bind="enable: selectedDesignObjects().length > 0"><i class="icon-trash"></i> ${_('Delete')}</button>
-      <button id="clone-designs" class="btn" title="${_('Clone')}" data-bind="click: cloneDesigns, enable: selectedDesignObjects().length > 0"><i class="icon-share"></i> ${_('Clone')}</button>
+      <button id="clone-designs" class="btn" title="${_('Clone')}" data-bind="enable: selectedDesignObjects().length > 0"><i class="icon-share"></i> ${_('Clone')}</button>
     </%def>
 
     <%def name="creation()">
@@ -59,37 +61,37 @@ ${ commonheader(_('Job Designer'), "jobsub", user, "60px") | n,unicode }
           </a>
           <ul class="dropdown-menu" style="top: auto">
             <li>
-              <a href="#new-design/mapreduce" class="new-node-link" title="${_('Create MapReduce Design')}" rel="tooltip"><i class="icon-plus-sign"></i> ${_('MapReduce')}</a>
+              <a href="#new-design/mapreduce" class="new-node-link" title="${_('Create MapReduce Design')}" rel="tooltip"><i class="icon-plus-sign"></i> MapReduce</a>
             </li>
             <li>
-              <a href="#new-design/java" class="new-node-link" title="${_('Create Java Design')}" rel="tooltip"><i class="icon-plus-sign"></i> ${_('Java')}</a>
+              <a href="#new-design/java" class="new-node-link" title="${_('Create Java Design')}" rel="tooltip"><i class="icon-plus-sign"></i> Java</a>
             </li>
             <li>
-              <a href="#new-design/streaming" class="new-node-link" title="${_('Create Streaming Design')}" rel="tooltip"><i class="icon-plus-sign"></i> ${_('Streaming')}</a>
+              <a href="#new-design/streaming" class="new-node-link" title="${_('Create Streaming Design')}" rel="tooltip"><i class="icon-plus-sign"></i> Streaming</a>
             </li>
             <li>
-              <a href="#new-design/hive" class="new-node-link" title="${_('Create Hive Design')}" rel="tooltip"><i class="icon-plus-sign"></i> ${_('Hive')}</a>
+              <a href="#new-design/hive" class="new-node-link" title="${_('Create Hive Design')}" rel="tooltip"><i class="icon-plus-sign"></i> Hive</a>
             </li>
             <li>
-              <a href="#new-design/pig" class="new-node-link" title="${_('Create Pig Design')}" rel="tooltip"><i class="icon-plus-sign"></i> ${_('Pig')}</a>
+              <a href="#new-design/pig" class="new-node-link" title="${_('Create Pig Design')}" rel="tooltip"><i class="icon-plus-sign"></i> Pig</a>
             </li>
             <li>
-              <a href="#new-design/sqoop" class="new-node-link" title="${_('Create Sqoop Design')}" rel="tooltip"><i class="icon-plus-sign"></i> ${_('Sqoop')}</a>
+              <a href="#new-design/sqoop" class="new-node-link" title="${_('Create Sqoop Design')}" rel="tooltip"><i class="icon-plus-sign"></i> Sqoop</a>
             </li>
             <li>
-              <a href="#new-design/fs" class="new-node-link" title="${_('Create FS Design')}" rel="tooltip"><i class="icon-plus-sign"></i> ${_('FS')}</a>
+              <a href="#new-design/fs" class="new-node-link" title="${_('Create Fs Design')}" rel="tooltip"><i class="icon-plus-sign"></i> Fs</a>
             </li>
             <li>
-              <a href="#new-design/ssh" class="new-node-link" title="${_('Create SSH Design')}" rel="tooltip"><i class="icon-plus-sign"></i> ${_('SSH')}</a>
+              <a href="#new-design/ssh" class="new-node-link" title="${_('Create Ssh Design')}" rel="tooltip"><i class="icon-plus-sign"></i> Ssh</a>
             </li>
             <li>
-              <a href="#new-design/shell" class="new-node-link" title="${_('Create Shell Design')}" rel="tooltip"><i class="icon-plus-sign"></i> ${_('Shell')}</a>
+              <a href="#new-design/shell" class="new-node-link" title="${_('Create Shell Design')}" rel="tooltip"><i class="icon-plus-sign"></i> Shell</a>
             </li>
             <li>
-              <a href="#new-design/email" class="new-node-link" title="${_('Create Email Design')}" rel="tooltip"><i class="icon-plus-sign"></i> ${_('Email')}</a>
+              <a href="#new-design/email" class="new-node-link" title="${_('Create Email Design')}" rel="tooltip"><i class="icon-plus-sign"></i> Email</a>
             </li>
             <li>
-              <a href="#new-design/distcp" class="new-node-link" title="${_('Create DistCP Design')}" rel="tooltip"><i class="icon-plus-sign"></i> ${_('DistCP')}</a>
+              <a href="#new-design/distcp" class="new-node-link" title="${_('Create DistCp Design')}" rel="tooltip"><i class="icon-plus-sign"></i> DistCp</a>
             </li>
           </ul>
         </div>
@@ -228,7 +230,8 @@ $(document).ready(function() {
   // This global context may need to be updated.
   var global_action_context = {
     alert: "${_('You can parameterize the values, using')} <code>$myVar</code> ${_('or')} <code>${"${"}myVar}</code>. ${_('When the design is submitted, you will be prompted for the actual value of ')}<code>myVar</code>.",
-    shell_alert: "${_('Requires some SMTP server configuration to be present (in oozie-site.xml).')}",
+    paths_alert: "${_('All the paths are relative to the deployment directory. They can be absolute but this is not recommended.')}",
+    smtp_alert: "${_('Requires some SMTP server configuration to be present (in oozie-site.xml).')}",
     ssh_alert: "${_('The ssh server requires passwordless login.')}",
     save: {
       name: "${_('Save')}",
@@ -643,14 +646,17 @@ $(document).ready(function() {
         return;
       }
 
-      if (!designObject.design().editable()) {
-        routie('list-designs');
-        $.jHueNotify.error("${ _('Design is not editable. It is owned by user ') }" + designObject.design().owner() + '.');
-        return;
-      }
-
       // Show section only after we've finished the edit design process.
       $(document).one('edit.design', function() {
+        if (designObject.design().editable()) {
+          $('#design input').removeAttr('disabled');
+          $('#design textarea').removeAttr('disabled');
+          $('#design button').removeAttr('disabled');
+        } else {
+          $('#design input').attr('disabled', 'disabled');
+          $('#design textarea').attr('disabled', 'disabled');
+          $('#design button').attr('disabled', 'disabled');
+        }
         showSection('design');
       });
 
@@ -679,11 +685,17 @@ $(document).ready(function() {
     );
   });
   $('#edit-design').click(function() {
-    window.location = '#edit-design/' + designs.selectedIndex();
+    routie('edit-design/' + designs.selectedIndex());
   });
   $('#delete-designs').click(function() {
     $('#deleteWf').modal('show');
   });
+  $('#clone-designs').click(function() {
+    designs.cloneDesigns();
+  });
+  $('#home').click(function() {
+    routie('list-designs');
+  })
 });
 </script>
 
