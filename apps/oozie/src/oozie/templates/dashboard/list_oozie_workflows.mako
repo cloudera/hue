@@ -23,13 +23,9 @@
 <%namespace name="utils" file="../utils.inc.mako" />
 
 
-${ commonheader(_("Oozie App"), "oozie", user, "100px") | n,unicode }
-${ layout.menubar(section='dashboard') }
-
+${ commonheader(_("Oozie App"), "workflows", user, "65px") | n,unicode }
 
 <div class="container-fluid">
-  ${ layout.dashboard_sub_menubar(section='workflows') }
-
   <div class="well hueWell">
     <form>
       ${ _('Filter:') } <input type="text" id="filterInput" class="input-xlarge search-query" placeholder="${ _('Search for username, name, etc...') }">

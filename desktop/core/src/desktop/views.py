@@ -280,7 +280,7 @@ def who_am_i(request):
   time.sleep(sleep)
   return HttpResponse(request.user.username + "\t" + request.fs.user + "\n")
 
-def commonheader(title, section, user, padding="60px"):
+def commonheader(title, section, user, padding="30px"):
   """
   Returns the rendered common header
   """

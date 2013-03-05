@@ -133,7 +133,7 @@ from django.utils.translation import ugettext as _
     % endif
     <div class="navbar-inner">
       <div class="container-fluid">
-        <a class="brand nav-tooltip" title="${_('About Hue')}" href="/about">Hue</a>
+        <a class="brand nav-tooltip" title="${_('About Oozie UI')}" href="/about"><img width="70%" src="/static/art/oozie_200x.png" style="margin-top: -5px; margin-bottom: -5px"> UI</a>
         <div id="usernameDropdown" class="btn-group pull-right">
           <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
             <i class="icon-user"></i> ${user.username}
@@ -146,19 +146,34 @@ from django.utils.translation import ugettext as _
           </ul>
         </div>
 
-        <div class="nav-collapse">
-          <ul class="nav">
-            %for app in apps:
-              %if app.icon_path:
-              <li id="${app.display_name}Icon" ${is_selected(section, app.display_name)}>
-                <a class="nav-tooltip" title="${app.nice_name}" href="/${app.display_name}"><img src="${app.icon_path}" /></a>
-              </li>
-              %endif
-            %endfor
-            <li class="divider-vertical"></li>
-            <li id="checkConfig"></li>
-          </ul>
-        </div>
+<%def name="is_selected(section, matcher)">
+  <%
+    if section == matcher:
+      return "active"
+    else:
+      return ""
+  %>
+</%def>
+
+<div class="nav-collapse">
+  <ul class="nav nav-pills">
+    <li class="${is_selected(section, 'workflows')}">
+      <a href="${url('oozie:list_oozie_workflows')}" class="nav-tooltip" title="Workflows">${ _('Workflows') }</a>
+    </li>
+    <li class="${is_selected(section, 'coordinators')}">
+      <a href="${url('oozie:list_oozie_coordinators')}" class="nav-tooltip" title="Coordinators">${ _('Coordinators') }</a>
+    </li>
+    <li class="${is_selected(section, 'bundles')}">
+      <a href="${url('oozie:list_oozie_bundles')}" class="nav-tooltip" title="Bundles">${ _('Bundles') }</a>
+    </li>
+    <li class="${is_selected(section, 'oozie')}">
+      <a href="${url('oozie:list_oozie_info')}" class="nav-tooltip" title="Oozie">${ _('Oozie') }</a>
+    </li>
+    <li>
+      <a href="http://oozie.apache.org/docs/3.3.0/index.html" target="_blank" class="nav-tooltip" title="Documentation">${ _('Documentation') }</a>
+    </li>
+  </ul>
+</div>
       </div>
     </div>
 </div>

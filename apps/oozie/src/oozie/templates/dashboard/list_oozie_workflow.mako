@@ -23,13 +23,10 @@
 <%namespace name="layout" file="../navigation-bar.mako" />
 <%namespace name="utils" file="../utils.inc.mako" />
 
-${ commonheader(_("Oozie App"), "oozie", user, "100px") | n,unicode }
-${ layout.menubar(section='dashboard') }
+${ commonheader(_("Oozie App"), "workflows", user, "65px") | n,unicode }
 
 
 <div class="container-fluid" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
-
-  ${ layout.dashboard_sub_menubar(section='workflows') }
 
   <h1>
     % if oozie_bundle:

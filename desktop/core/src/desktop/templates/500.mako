@@ -18,7 +18,7 @@ from desktop.lib.i18n import smart_unicode
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
-${ commonheader(_('Error'), "", user) | n,unicode }
+${ commonheader(_('Error'), "", user, "65px") | n,unicode }
 
   <div class="container-fluid">
     <h1>${_('Server Error (500)')}</h1>

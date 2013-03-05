@@ -23,7 +23,7 @@ from django.utils.translation import ugettext as _
 <%namespace name="dir" file="listdir_components.mako" />
 <%namespace name="fb_components" file="fb_components.mako" />
 
-${ commonheader(_('File Browser'), 'filebrowser', user) | n,unicode }
+${ commonheader(_('File Browser'), 'filebrowser', user, "65px") | n,unicode }
 
 <div class="container-fluid">
     <h1>${_('File Browser')}</h1>

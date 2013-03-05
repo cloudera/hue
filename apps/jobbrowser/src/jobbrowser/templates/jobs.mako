@@ -29,7 +29,7 @@
 </%def>
 
 % if jobs or filtered:
-${ commonheader(_('Job Browser'), "jobbrowser", user) | n,unicode }
+${ commonheader(_('Job Browser'), "jobbrowser", user, "65px") | n,unicode }
 <div class="container-fluid">
 <h1>${_('Job Browser')}</h1>
 <form class="well form-inline" action="/jobbrowser/jobs" method="GET">

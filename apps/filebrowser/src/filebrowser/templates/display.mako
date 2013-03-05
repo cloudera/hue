@@ -28,7 +28,7 @@
 %>
 <%namespace name="fb_components" file="fb_components.mako" />
 
-${ commonheader(_('%(filename)s - File Viewer') % dict(filename=truncate(filename)), 'filebrowser', user) | n,unicode }
+${ commonheader(_('%(filename)s - File Viewer') % dict(filename=truncate(filename)), 'filebrowser', user, "65px") | n,unicode }
 
 
 

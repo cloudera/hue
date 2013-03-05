@@ -22,12 +22,9 @@
 <%namespace name="layout" file="../navigation-bar.mako" />
 <%namespace name="utils" file="../utils.inc.mako" />
 
-${ commonheader(_("Oozie App"), "oozie", user, "100px") | n,unicode }
-${ layout.menubar(section='dashboard') }
-
+${ commonheader(_("Oozie App"), "oozie", user, "65px") | n,unicode }
 
 <div class="container-fluid">
-  ${ layout.dashboard_sub_menubar(section='oozie') }
 
   <h1>Oozie</h1>
 

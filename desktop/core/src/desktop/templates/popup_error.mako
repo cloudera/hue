@@ -19,7 +19,7 @@ from desktop.lib.i18n import smart_unicode
 from django.utils.translation import ugettext as _
 %>
 
-${ commonheader(title, "", user) | n,unicode }
+${ commonheader(title, "", user, "65px") | n,unicode }
 
   <div class="container-fluid">
     <div class="alert">
