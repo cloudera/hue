@@ -21,13 +21,16 @@ urlpatterns = patterns('search.views',
   url(r'^$', 'index', name='index'),
   url(r'^query$', 'index', name='query'),
   url(r'^admin$', 'admin', name='admin'),
+
   url(r'^admin/cores$', 'admin', name='admin_cores'),
+
   url(r'^admin/core/(?P<core>\w+)$', 'admin_core_template', name='admin_core'),
   url(r'^admin/core/(?P<core>\w+)/properties$', 'admin_core_properties', name='admin_core_properties'),
-  url(r'^admin/core/(?P<core>\w+)/solr_properties$', 'admin_core_solr_properties', name='admin_core_solr_properties'),
   url(r'^admin/core/(?P<core>\w+)/schema$', 'admin_core_schema', name='admin_core_schema'),
   url(r'^admin/core/(?P<core>\w+)/template$', 'admin_core_template', name='admin_core_template'),
   url(r'^admin/core/(?P<core>\w+)/facets$', 'admin_core_facets', name='admin_core_facets'),
+  url(r'^admin/core/(?P<core>\w+)/highlighting$', 'admin_core_highlighting', name='admin_core_highlighting'),
   url(r'^admin/core/(?P<core>\w+)/sorting$', 'admin_core_sorting', name='admin_core_sorting'),
+  url(r'^admin/core/(?P<core>\w+)/solr_properties$', 'admin_core_solr_properties', name='admin_core_solr_properties'),
 
 )

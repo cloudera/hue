@@ -16,6 +16,7 @@
 # limitations under the License.
 
 from lxml import etree
+import re
 
 try:
   import json
@@ -98,7 +99,7 @@ class Facet(models.Model):
 
 
 class Result(models.Model):
-  _META_TEMPLATE_ATTRS = ['template', 'highlighted_fields', 'css']
+  _META_TEMPLATE_ATTRS = ['template', 'highlighting', 'css']
 
   data = models.TextField()
 
@@ -108,17 +109,34 @@ class Result(models.Model):
     if post_data.get('template'):
       data_dict['template'] = json.loads(post_data['template'])
 
+    if post_data.get('highlighting'):
+      data_dict['highlighting'] = json.loads(post_data['highlighting'])
+
     self.data = json.dumps(data_dict)
 
 
-  def get_template(self):
+  def get_template(self, with_highlighting=False):
     data_dict = json.loads(self.data)
 
-    return data_dict.get('template')
+    template = data_dict.get('template')
+    if with_highlighting:
+      for field in data_dict.get('highlighting', []):
+        template = re.sub('\{\{%s\}\}' % field, '{{{%s}}}' % field, template)
 
+    return template
 
-  def render_result(self, result):
-    return Template(self.get_template()).render(result=result)
+  def get_query_params(self):
+    data_dict = json.loads(self.data)
+
+    params = ()
+
+    if data_dict.get('highlighting'):
+      params += (
+        ('hl', 'true'),
+        ('hl.fl', ','.join(data_dict.get('highlighting'))),
+      )
+
+    return params
 
 
 class Sorting(models.Model):
@@ -146,7 +164,7 @@ class CoreManager(models.Manager):
                    'fields': [],
                    'dates': []
                 }))
-      result = Result.objects.create(data=json.dumps({'template': '{{id}}</br>To customize!<br/>'}))
+      result = Result.objects.create(data=json.dumps({'template': '{{id}}</br>To customize!<br/>', 'highlighting': []}))
       sorting = Sorting.objects.create(data=json.dumps({'fields': []}))
 
       return Core.objects.create(name=name, label=name, facets=facets, result=result, sorting=sorting)
@@ -166,7 +184,7 @@ class Core(models.Model):
   objects = CoreManager()
 
   def get_query(self):
-    return self.facets.get_query_params()
+    return self.facets.get_query_params() + self.result.get_query_params()
 
   def get_absolute_url(self):
     return reverse('search:admin_core', kwargs={'core': self.name})
@@ -180,18 +198,3 @@ class Core(models.Model):
 
 
 class Query(object): pass
-
-
-def temp_fixture_hook():
-  Core.objects.all().delete()
-  if not Core.objects.exists():
-    facets = Facet.objects.create(data=json.dumps({
-                 'ranges': [{"type":"range","field":"price","start":"1","end":"400","gap":"100"}],
-                 'fields': [{"type":"field","field":"id"}],
-                 'dates': [{"type":"date","field":"last_modified","start":"02-13-2013","end":"02-19-2013","gap":"1"}]
-              }))
-    result = Result.objects.create(data=json.dumps({'template': 'To customize!<br/>'}))
-    sorting = Sorting.objects.create(data=json.dumps({'fields': [{"field":"id","label":"My id","asc":False}]}))
-
-    Core.objects.create(name='collection1', label='Tweets', facets=facets, result=result, sorting=sorting)
-    Core.objects.create(name='collection2', label='Zendesk Tickets', facets=facets, result=result, sorting=sorting)

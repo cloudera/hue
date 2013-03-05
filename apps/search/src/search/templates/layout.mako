@@ -87,8 +87,11 @@
       <li class="${ utils.is_selected(section, 'sorting') }">
         <a href="${ url('search:admin_core_sorting', core=core) }">${_('3. Sorting')}</a>
       </li>
+      <li class="${ utils.is_selected(section, 'highlighting') }">
+        <a href="${ url('search:admin_core_highlighting', core=core) }">${_('4. Highlighting')}</a>
+      </li>
       <li class="${ utils.is_selected(section, 'autocomplete') }">
-        <a href="${ url('search:admin_core_sorting', core=core) }">${_('4. Auto-complete')}</a>
+        <a href="${ url('search:admin_core_sorting', core=core) }">${_('5. Auto-complete')}</a>
       </li>
       <li class="nav-header">${_('Search')}</li>
       <li>

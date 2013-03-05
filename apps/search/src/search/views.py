@@ -32,17 +32,14 @@ from desktop.lib.django_util import render
 from search.api import SolrApi
 from search.conf import SOLR_URL
 from search.decorators import allow_admin_only
-from search.forms import QueryForm, CoreForm
-from search.models import Core, temp_fixture_hook
+from search.forms import QueryForm, CoreForm, HighlightingForm
+from search.models import Core
 
 
 LOG = logging.getLogger(__name__)
 
 
 def index(request):
-  #Core.objects.all().delete()
-  ##temp_fixture_hook()
-
   cores = SolrApi(SOLR_URL.get()).cores()
   hue_cores = Core.objects.all()
 
@@ -209,3 +206,23 @@ def admin_core_sorting(request, core):
     'hue_core': hue_core,
     'hue_cores': hue_cores,
   })
+
+
+@allow_admin_only
+def admin_core_highlighting(request, core):
+  solr_core = SolrApi(SOLR_URL.get()).core(core)
+  hue_core = Core.objects.get(name=core)
+  hue_cores = Core.objects.all()
+
+  if request.method == 'POST':
+    # TODO on/off + form actually
+    hue_core.result.update_from_post(request.POST)
+    hue_core.result.save()
+    return HttpResponse(json.dumps({}), mimetype="application/json")
+
+  return render('admin_core_highlighting.mako', request, {
+    'solr_core': solr_core,
+    'hue_core': hue_core,
+    'hue_cores': hue_cores,
+  })
+
