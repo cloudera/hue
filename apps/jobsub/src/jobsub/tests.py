@@ -15,7 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import copy
 import logging
 import time
 
@@ -24,17 +23,13 @@ try:
 except ImportError:
   import simplejson as json
 
-from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_false, assert_equal, assert_raises
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
 from desktop.lib.django_test_util import make_logged_in_client
-from desktop.lib.test_utils import grant_access
 from liboozie.oozie_api_test import OozieServerProvider
 from oozie.models import Workflow, Node, Action, Start, Kill, End, Link
-
-from django.template.defaultfilters import escapejs
 
 
 LOG = logging.getLogger(__name__)

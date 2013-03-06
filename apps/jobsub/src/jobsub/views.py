@@ -33,29 +33,24 @@ import time as py_time
 
 from django.core import urlresolvers
 from django.shortcuts import redirect
-from django.template.defaultfilters import escapejs
 from django.utils.translation import ugettext as _
 
-from desktop.lib.django_util import render, render_json, extract_field_data
+from desktop.lib.django_util import render, render_json
 from desktop.lib.exceptions import StructuredException
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.rest.http_client import RestException
 from desktop.log.access import access_warn
-
-from hadoop.fs.exceptions import WebHdfsException
-from liboozie.oozie_api import get_oozie
 
 from oozie.models import Workflow
 from oozie.forms import design_form_by_type
-from oozie.utils import model_to_dict, format_dict_field_values, format_field_value,\
-                        sanitize_node_dict, JSON_FIELDS
+from oozie.utils import model_to_dict, format_dict_field_values,\
+                        sanitize_node_dict
 
+# To re-enable
 from jobsub.management.commands import jobsub_setup
 
 
 LOG = logging.getLogger(__name__)
 
-SKIP_ESCAPE = ('name', 'owner')
 
 def list_designs(request):
   '''
@@ -80,7 +75,7 @@ def list_designs(request):
           'owner': design.owner.username,
           # Design name is validated by workflow and node forms.
           'name': design.name,
-          'description': escapejs(design.description),
+          'description': design.description,
           'node_type': design.start.get_child('to').node_type,
           'last_modified': py_time.mktime(design.last_modified.timetuple()),
           'editable': design.owner.id == request.user.id
@@ -88,7 +83,7 @@ def list_designs(request):
       designs.append(ko_design)
 
   if request.is_ajax():
-    return render_json(designs)
+    return render_json(designs, js_safe=True)
   else:
     return render("designs.mako", request, {
       'currentuser': request.user,
@@ -134,12 +129,8 @@ def get_design(request, design_id):
   node = workflow.start.get_child('to')
   node_dict = model_to_dict(node)
   node_dict['id'] = design_id
-  for key in node_dict:
-    if key not in JSON_FIELDS:
-      if key not in SKIP_ESCAPE:
-        node_dict[key] = escapejs(node_dict[key])
   node_dict['editable'] = workflow.owner.id == request.user.id
-  return render_json(node_dict);
+  return render_json(node_dict, js_safe=True);
 
 
 def save_design(request, design_id):

@@ -32,12 +32,12 @@ from django.core.urlresolvers import reverse
 from django.core.validators import RegexValidator
 from django.contrib.auth.models import User
 from django.forms.models import inlineformset_factory
-from django.template.defaultfilters import escapejs
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
 from desktop.log.access import access_warn
 from desktop.lib import django_mako
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.lib.json_utils import JSONEncoderForHTML
 from hadoop.fs.exceptions import WebHdfsException
 
 from hadoop.fs.hadoopfs import Hdfs
@@ -158,10 +158,7 @@ class Job(models.Model):
     return self._escapejs_parameters_list(self.parameters)
 
   def _escapejs_parameters_list(self, parameters):
-    escaped = []
-    for item in json.loads(parameters):
-      escaped.append({"name": escapejs(item["name"]), "value": escapejs(item["value"])})
-    return json.dumps(escaped)
+    return json.dumps(json.loads(parameters), cls=JSONEncoderForHTML)
 
   @property
   def status(self):

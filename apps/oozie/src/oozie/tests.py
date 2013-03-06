@@ -1236,8 +1236,8 @@ class TestEditor(OozieMockBase):
 
 
   def test_xss_escape_js(self):
-    escaped = '[{"name": "oozie.use.system.libpath", "value": "true"}, {"name": "123\\\\u0022\\\\u003E\\\\u003Cscript\\\\u003Ealert(1)\\\\u003C/script\\\\u003E", "value": "hacked"}]'
-    hacked = '[{"name":"oozie.use.system.libpath","value":"true"}, {"name": "123\\"><script>alert(1)</script>", "value": "hacked"}]'
+    hacked = '[{"name":"oozie.use.system.libpath","value":"true"}, {"name": "123\\"><script>alert(1)</script>", "value": "\'hacked\'"}]'
+    escaped = '[{"name": "oozie.use.system.libpath", "value": "true"}, {"name": "123\\"\\u003e\\u003cscript\\u003ealert(1)\\u003c/script\\u003e", "value": "\'hacked\'"}]'
 
     self.wf.job_properties = hacked
     self.wf.parameters = hacked

@@ -17,7 +17,6 @@
 <%!
   from desktop.views import commonheader, commonfooter
   from django.utils.translation import ugettext as _
-  from django.template.defaultfilters import escapejs
 %>
 
 <%namespace name="layout" file="../navigation-bar.mako" />

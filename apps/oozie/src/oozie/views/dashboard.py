@@ -29,9 +29,10 @@ from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
 
-from desktop.lib.django_util import render
+from desktop.lib.django_util import render, encode_json_for_js
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.rest.http_client import RestException
+from desktop.lib.view_util import format_duration_in_millis
 from desktop.log.access import access_warn
 from liboozie.oozie_api import get_oozie
 from liboozie.submittion import Submission
@@ -41,9 +42,6 @@ from oozie.forms import RerunForm, ParameterForm, RerunCoordForm,\
   RerunBundleForm
 from oozie.models import History, Job, Workflow, utc_datetime_format
 from oozie.settings import DJANGO_APPS
-
-from django.template.defaultfilters import escapejs
-from desktop.lib.view_util import format_duration_in_millis
 
 
 LOG = logging.getLogger(__name__)
@@ -108,7 +106,7 @@ def list_oozie_workflows(request):
       json_jobs = split_oozie_jobs(workflows.jobs)['running_jobs']
     if request.GET.get('type') == 'completed':
       json_jobs = split_oozie_jobs(workflows.jobs)['completed_jobs']
-    return HttpResponse(json.dumps(massaged_oozie_jobs_for_json(json_jobs, request.user)).replace('\\\\', '\\'), mimetype="application/json")
+    return HttpResponse(encode_json_for_js(massaged_oozie_jobs_for_json(json_jobs, request.user)), mimetype="application/json")
 
   return render('dashboard/list_oozie_workflows.mako', request, {
     'user': request.user,
@@ -205,7 +203,7 @@ def list_oozie_workflow(request, job_id, coordinator_job_id=None, bundle_job_id=
       'log': oozie_workflow.log,
       'actions': massaged_workflow_actions_for_json(oozie_workflow.get_working_actions(), oozie_coordinator, oozie_bundle)
     }
-    return HttpResponse(json.dumps(return_obj).replace('\\\\', '\\'), mimetype="application/json")
+    return HttpResponse(encode_json_for_js(return_obj), mimetype="application/json")
 
   return render('dashboard/list_oozie_workflow.mako', request, {
     'history': history,
@@ -245,7 +243,7 @@ def list_oozie_coordinator(request, job_id, bundle_job_id=None):
       'log': oozie_coordinator.log,
       'actions': massaged_coordinator_actions_for_json(oozie_coordinator, oozie_bundle)
     }
-    return HttpResponse(json.dumps(return_obj).replace('\\\\', '\\'), mimetype="application/json")
+    return HttpResponse(encode_json_for_js(return_obj), mimetype="application/json")
 
   return render('dashboard/list_oozie_coordinator.mako', request, {
     'oozie_coordinator': oozie_coordinator,
@@ -507,7 +505,7 @@ def massaged_workflow_actions_for_json(workflow_actions, oozie_coordinator, oozi
       'id': action.id,
       'log': action.externalId and reverse('jobbrowser.views.job_single_logs', kwargs={'job': action.externalId}) or '',
       'url': action.get_absolute_url(),
-      'name': escapejs(action.name),
+      'name': action.name,
       'type': action.type,
       'status': action.status,
       'externalIdUrl': action.externalId and reverse('jobbrowser.views.single_job', kwargs={'job': action.externalId}) or '',
@@ -515,10 +513,10 @@ def massaged_workflow_actions_for_json(workflow_actions, oozie_coordinator, oozi
       'startTime': format_time(action.startTime),
       'endTime': format_time(action.endTime),
       'retries': action.retries,
-      'errorCode': escapejs(action.errorCode),
-      'errorMessage': escapejs(action.errorMessage),
+      'errorCode': action.errorCode,
+      'errorMessage': action.errorMessage,
       'transition': action.transition,
-      'data': escapejs(action.data),
+      'data': action.data,
     }
     actions.append(massaged_action)
 
@@ -547,9 +545,9 @@ def massaged_coordinator_actions_for_json(coordinator, oozie_bundle):
       'title': action.title,
       'createdTime': format_time(action.createdTime),
       'lastModifiedTime': format_time(action.lastModifiedTime),
-      'errorCode': escapejs(action.errorCode),
-      'errorMessage': escapejs(action.errorMessage),
-      'missingDependencies': escapejs(action.missingDependencies)
+      'errorCode': action.errorCode,
+      'errorMessage': action.errorMessage,
+      'missingDependencies': action.missingDependencies
     }
 
     actions.insert(0, massaged_action)
@@ -617,7 +615,7 @@ def massaged_oozie_jobs_for_json(oozie_jobs, user):
       'status': job.status,
       'isRunning': job.is_running(),
       'duration': job.endTime and job.startTime and format_duration_in_millis(( time.mktime(job.endTime) - time.mktime(job.startTime) ) * 1000) or None,
-      'appName': escapejs(job.appName),
+      'appName': job.appName,
       'progress': job.get_progress(),
       'user': job.user,
       'absoluteUrl': job.get_absolute_url(),

@@ -34,9 +34,10 @@ from django.template.loader import render_to_string as django_render_to_string
 from django.template import RequestContext
 from django.db import models
 
-from desktop.lib import django_mako
 import desktop.conf
 import desktop.lib.thrift_util
+from desktop.lib import django_mako
+from desktop.lib.json_utils import JSONEncoderForHTML
 
 # Values for template_lib parameter
 DJANGO = 'django'
@@ -259,12 +260,21 @@ def encode_json(data, indent=None):
   """
   return simplejson.dumps(data, indent=indent, cls=Encoder)
 
+def encode_json_for_js(data, indent=None):
+  """
+  Converts data into a JSON string.
+
+  Typically this is used from render_json, but it's the natural
+  endpoint to test the Encoder logic, so it's separated out.
+  """
+  return simplejson.dumps(data, indent=indent, cls=JSONEncoderForHTML)
+
 VALID_JSON_IDENTIFIER = re.compile("^[a-zA-Z_$][a-zA-Z0-9_$]*$")
 
 class IllegalJsonpCallbackNameException(Exception):
   pass
 
-def render_json(data, jsonp_callback=None):
+def render_json(data, jsonp_callback=None, js_safe=False):
   """
   Renders data as json.  If jsonp is specified, wraps
   the result in a function.
@@ -273,7 +283,10 @@ def render_json(data, jsonp_callback=None):
     indent = 2
   else:
     indent = 0
-  json = encode_json(data, indent)
+  if js_safe:
+    json = encode_json_for_js(data, indent)
+  else:
+    json = encode_json(data, indent)
   if jsonp_callback is not None:
     if not VALID_JSON_IDENTIFIER.match(jsonp_callback):
       raise IllegalJsonpCallbackNameException("Invalid jsonp callback name: %s" % jsonp_callback)
