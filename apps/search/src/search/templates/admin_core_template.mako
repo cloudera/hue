@@ -40,6 +40,12 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
   .tmpl.selected {
     border: 2px solid #999;
   }
+  .space {
+    display: block;
+    font-size: 6px;
+    height: 6px;
+    line-height: 6px;
+  }
 </style>
 
 <%layout:skeleton>
@@ -75,7 +81,14 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
             <div class="well available-fields">
               <h4>${_('Available Fields')}</h4>
               <ul data-bind="foreach: fields">
-                <li data-bind="text: $data, click: $root.addField" title="${ _('Click to append to the template') }"></li>
+                <li class="field-button">
+                  <a title="${ _('Click on this button to add the field') }" class="btn" data-bind="click: $root.addField">
+                    <i class="icon-plus"></i>
+                    &nbsp;
+                    <span data-bind="text: $data"></span>
+                  </a>
+                  <span class="space">&nbsp;</span>
+                </li>
               </ul>
             </div>
           </div>
@@ -158,9 +171,42 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     function ViewModel() {
       var self = this;
       self.fields = ko.observableArray(${ hue_core.fields | n,unicode });
+      self.lastIndex = ko.observable(0);
+
+      setInterval(function() {
+        var contentEditor = $('#content-editor');
+        var range = window.getSelection().getRangeAt(0);
+        if (range.startContainer && ( contentEditor.is(range.startContainer) || contentEditor.has(range.startContainer).length )) {
+          // Use DOM methods instead of JQuery methods to interpret Text Nodes.
+          // Node Type '3' is a text node.
+          if (range.startContainer.nodeType == 3) {
+            // Assuming 'content-editor' is parent.
+            for (var i = 0; i < contentEditor[0].childNodes.length; ++i) {
+              if (contentEditor[0].childNodes[i] == range.startContainer) {
+                self.lastIndex(i);
+                break;
+              }
+            }
+          } else {
+            // Start offset with respect to parent container.
+            // Assuming this is 'content-editor'
+            self.lastIndex(range.startOffset);
+          }
+        }
+      }, 100);
+
       self.addField = function (field) {
-        $("#content-editor").focus();
-        $("#content-editor").html($("#content-editor").html() + "{{" + field + "}}");
+        // Use DOM methods instead of JQuery methods to interpret Text Nodes.
+        var contentEditor = $("#content-editor")[0];
+        if (self.lastIndex() > contentEditor.childNodes.length || self.lastIndex() < 0) {
+          self.lastIndex() = contentEditor.childNodes.length - 1;
+        }
+        var text = document.createTextNode("{{" + field + "}}");
+        if (contentEditor.childNodes.length) {
+          contentEditor.insertBefore(text, contentEditor.childNodes[self.lastIndex()]);
+        } else {
+          contentEditor.appendChild(text);
+        }
       };
     };
 
@@ -247,7 +293,6 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
         }
       });
     });
-
   });
 </script>
 
