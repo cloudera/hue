@@ -175,22 +175,28 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 
       setInterval(function() {
         var contentEditor = $('#content-editor');
-        var range = window.getSelection().getRangeAt(0);
-        if (range.startContainer && ( contentEditor.is(range.startContainer) || contentEditor.has(range.startContainer).length )) {
-          // Use DOM methods instead of JQuery methods to interpret Text Nodes.
-          // Node Type '3' is a text node.
-          if (range.startContainer.nodeType == 3) {
-            // Assuming 'content-editor' is parent.
-            for (var i = 0; i < contentEditor[0].childNodes.length; ++i) {
-              if (contentEditor[0].childNodes[i] == range.startContainer) {
-                self.lastIndex(i);
-                break;
+        if (window.getSelection().rangeCount > 0) {
+          var range = window.getSelection().getRangeAt(0);
+          if (range.startContainer && ( contentEditor.is(range.startContainer) || contentEditor.has(range.startContainer).length )) {
+            // Use DOM methods instead of JQuery methods to interpret Text Nodes.
+            // Node Type '3' is a text node.
+            if (range.startContainer == contentEditor[0]) {
+              // Start offset with respect to parent container.
+              // Assuming this is 'content-editor'
+              self.lastIndex(range.startOffset);
+            } else {
+              // Find child of 'content-editor' and use index of that child.
+              var el = range.startContainer;
+              while(el.parentNode != contentEditor[0]) {
+                el = el.parentNode;
+              }
+              for (var i = 0; i < contentEditor[0].childNodes.length; ++i) {
+                if (contentEditor[0].childNodes[i] == el) {
+                  self.lastIndex(i);
+                  break;
+                }
               }
             }
-          } else {
-            // Start offset with respect to parent container.
-            // Assuming this is 'content-editor'
-            self.lastIndex(range.startOffset);
           }
         }
       }, 100);
@@ -203,10 +209,13 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
         }
         var text = document.createTextNode("{{" + field + "}}");
         if (contentEditor.childNodes.length) {
-          contentEditor.insertBefore(text, contentEditor.childNodes[self.lastIndex()]);
+          console.log(self.lastIndex());
+          console.log(contentEditor.childNodes);
+          contentEditor.insertBefore(text, contentEditor.childNodes[self.lastIndex()].nextSibling);
         } else {
           contentEditor.appendChild(text);
         }
+        self.lastIndex(self.lastIndex() + 1);
       };
     };
 
