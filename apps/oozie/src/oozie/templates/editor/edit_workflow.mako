@@ -735,7 +735,7 @@ $('#workflow').on('click', '.import-jobsub-node-link', function(e) {
 ko.bindingHandlers.fileChooser = {
   init: function(element, valueAccessor, allBindings, model) {
     var self = $(element);
-    self.after(getFileBrowseButton(self));
+    self.after(getFileBrowseButton(self, true));
   }
 };
 

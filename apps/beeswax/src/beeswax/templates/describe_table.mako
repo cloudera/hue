@@ -166,11 +166,11 @@ ${layout.menubar(section='tables')}
                 ${comps.bootstrapLabel(load_form["path"])}
                 <div class="controls">
                     ${comps.field(load_form["path"],
-                    placeholder="/user/user_name/data_dir/file",
-                    klass="pathChooser input-xlarge",
-                    file_chooser=True,
-                    show_errors=False
-                    )}
+                                  placeholder="/user/user_name/data_dir/file",
+                                  klass="pathChooser input-xlarge",
+                                  file_chooser=True,
+                                  show_errors=False)
+                     }
                 </div>
             </div>
 
@@ -239,7 +239,16 @@ ${layout.menubar(section='tables')}
            $("input[name='"+_destination+"']").val(filePath);
            $("#filechooser").slideUp();
          },
-         createFolder: false
+         onFolderChange: function (filePath) {
+           $("input[name='"+_destination+"']").val(filePath);
+         },
+         onFolderChoose: function (filePath) {
+           $("input[name='"+_destination+"']").val(filePath);
+           $("#filechooser").slideUp();
+         },
+         createFolder: false,
+         selectFolder: true,
+         uploadFile: true
        });
        $("#filechooser").slideDown();
      });

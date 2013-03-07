@@ -396,10 +396,13 @@ def load_table(request, database, table):
         hql += ")"
 
       on_success_url = reverse(get_app_name(request) + ':describe_table', kwargs={'database': database, 'table': table})
-      return confirm_query(request, hql, on_success_url)
+      query = hql_query(hql, database=database)
+      try:
+        return execute_directly(request, query, on_success_url=on_success_url)
+      except Exception, e:
+        raise PopupException(_("Can't load the data"), detail=e)
   else:
-    form = beeswax.forms.LoadDataForm(table_obj)
-    return render("load_table.mako", request, {'form': form, 'table': table, 'action': request.get_full_path()})
+    raise PopupException(_('Requires a POST'), detail=e)
 
 
 def describe_partitions(request, database, table):
