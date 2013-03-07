@@ -165,12 +165,7 @@ ${layout.menubar(section='tables')}
             <div class="control-group">
                 ${comps.bootstrapLabel(load_form["path"])}
                 <div class="controls">
-                    ${comps.field(load_form["path"],
-                                  placeholder="/user/user_name/data_dir/file",
-                                  klass="pathChooser input-xlarge",
-                                  file_chooser=True,
-                                  show_errors=False)
-                     }
+                    ${comps.field(load_form["path"], placeholder="/user/user_name/data_dir/file", klass="pathChooser input-xlarge", file_chooser=True, show_errors=False)}
                 </div>
             </div>
 

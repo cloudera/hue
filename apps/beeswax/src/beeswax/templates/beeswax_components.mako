@@ -175,9 +175,9 @@ ${field.label_tag() | n}
 
 <%def name="pageref(num)">
   % if hasattr(filter_params, "urlencode"):
-    href="?page=${num}&${filter_params.urlencode()}"
+    href="?q-page=${num}&${filter_params.urlencode()}"
   % else:
-    href="?page=${num}&${filter_params}"
+    href="?q-page=${num}&${filter_params}"
   % endif
 </%def>
 <%def name="prevpage(page)">

@@ -181,7 +181,7 @@ def list_designs(request):
   only the personal queries of the user will be returned (even if another user is
   specified in ``filterargs``).
   """
-  DEFAULT_PAGE_SIZE = 10
+  DEFAULT_PAGE_SIZE = 20
   app_name= get_app_name(request)
 
   if conf.SHARE_SAVED_QUERIES.get() or request.user.is_superuser:
@@ -254,7 +254,7 @@ def list_query_history(request):
     page=<n>            - Controls pagination. Defaults to 1.
     user=<name>         - Show history items from a user. Default to current user only.
                           Also accepts ':all' to show all history items.
-    type=<type>         - <type> is "report|hql", for design type. Default to show all.
+    type=<type>         - <type> is "beeswax|impala", for design type. Default to show all.
     design_id=<id>      - Show history for this particular design id.
     sort=<key>          - Sort by the attribute <key>, which is one of:
                             "date", "state", "name" (design name), and "type" (design type)
@@ -402,7 +402,7 @@ def load_table(request, database, table):
       except Exception, e:
         raise PopupException(_("Can't load the data"), detail=e)
   else:
-    raise PopupException(_('Requires a POST'), detail=e)
+    raise PopupException(_('Requires a POST'))
 
 
 def describe_partitions(request, database, table):

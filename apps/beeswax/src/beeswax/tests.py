@@ -50,6 +50,7 @@ from beeswax.test_base import make_query, wait_for_query_to_finish, verify_histo
   BEESWAXD_TEST_PORT
 from beeswax.design import hql_query, _strip_trailing_semicolon
 from beeswax.data_export import download
+from beeswax.models import SavedQuery, QueryHistory
 from beeswax.server import dbms
 from beeswax.server.beeswax_lib import BeeswaxDataTable
 from beeswax.test_base import BeeswaxSampleProvider
@@ -655,7 +656,6 @@ for x in sys.stdin:
     resp = cli.get('/beeswax/clone_design/%s' % (design.id,))
     resp = cli.get('/beeswax/clone_design/%s' % (design.id,))
     designs = beeswax.models.SavedQuery.objects.filter(name__contains='rubbish')[:3]
-    print designs
 
     # Delete a design
     resp = cli.get('/beeswax/delete_designs')
@@ -781,13 +781,18 @@ for x in sys.stdin:
     about whether a table is partitioned.
     """
     # Check that view works
-    resp = self.client.get("/beeswax/table/default/test/load")
-    assert_true(resp.context["form"])
+    resp = self.client.get("/beeswax/table/default/test")
+    assert_true(resp.context["load_form"])
 
     # Try the submission
-    resp = self.client.post("/beeswax/table/default/test/load", dict(path="/tmp/foo", overwrite=True))
-    assert_equal_mod_whitespace("LOAD DATA INPATH '/tmp/foo' OVERWRITE INTO TABLE `default.test`",
-        resp.context["form"].query.initial["query"])
+    try:    
+      self.client.post("/beeswax/table/default/test/load", dict(path="/tmp/foo", overwrite=True))
+    except:
+      pass
+    query = QueryHistory.objects.latest('id')
+    
+    assert_equal_mod_whitespace("LOAD DATA INPATH '/tmp/foo' OVERWRITE INTO TABLE `default.test`", query.query, resp.context)
+
     resp = self.client.post("/beeswax/table/default/test/load", dict(path="/tmp/foo", overwrite=False))
     assert_equal_mod_whitespace("LOAD DATA INPATH '/tmp/foo' INTO TABLE `default.test`",
         resp.context["form"].query.initial["query"])
@@ -1217,6 +1222,22 @@ for x in sys.stdin:
     resp = client.post('/beeswax/execute/', data)
     assert_false('"><script>alert(1);</script>' in resp.content, resp.content)
     assert_true('&quot;&gt;&lt;script&gt;alert(1);&lt;/script&gt;' in resp.content, resp.content)
+
+  def test_list_design_pagination(self):
+    client = make_logged_in_client()
+
+    _make_query(client, 'SELECT', name='my query history', submission_type='Save')
+    design = SavedQuery.objects.get(name='my query history')
+  
+    for i in range(25):
+      client.get('/beeswax/clone_design/%s' % (design.id,))
+  
+    resp = client.get('/beeswax/list_designs')
+    assert_true(len(resp.context['page'].object_list) >=20)
+    resp = client.get('/beeswax/list_designs?q-page=2')
+    assert_true(len(resp.context['page'].object_list) > 1)
+  
+    SavedQuery.objects.filter(name='my query history').delete()
 
 
 def test_import_gzip_reader():
