@@ -34,7 +34,7 @@ from beeswax import models
 from beeswax import hive_site
 from beeswax.models import BeeswaxQueryHandle
 from beeswax.server.dbms import Table, DataTable
-
+from impala.conf import IMPALA_PRINCIPAL
 
 LOG = logging.getLogger(__name__)
 
@@ -204,10 +204,17 @@ class BeeswaxClient:
     return self.db_client.get_default_configuration(*args, **kwargs)
 
   @classmethod
-  def get_security(cls):
+  def get_security(cls, query_server=None):
     cluster_conf = hadoop.cluster.get_cluster_conf_for_job_submission()
     use_sasl = cluster_conf is not None and cluster_conf.SECURITY_ENABLED.get()
-    kerberos_principal_short_name = KERBEROS.HUE_PRINCIPAL.get().split('/', 1)[0]
+
+    if query_server is not None and query_server.get('server_name') == 'impala':
+      principal = IMPALA_PRINCIPAL.get()
+    else:
+      principal = KERBEROS.HUE_PRINCIPAL.get()
+
+    # We should integrate hive_site.get_metastore() here in the future
+    kerberos_principal_short_name = principal.split('/', 1)[0]
 
     return use_sasl, kerberos_principal_short_name
 
@@ -284,7 +291,7 @@ class BeeswaxClient:
         res = self._client.get_results_metadata(*args, **kwargs)
         return _decode_struct_attr(res, 'table_dir')
 
-    use_sasl, kerberos_principal_short_name = BeeswaxClient.get_security()
+    use_sasl, kerberos_principal_short_name = BeeswaxClient.get_security(query_server)
 
     client = thrift_util.get_client(BeeswaxService.Client,
                                     query_server['server_host'],

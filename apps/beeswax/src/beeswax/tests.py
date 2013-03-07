@@ -52,8 +52,9 @@ from beeswax.design import hql_query, _strip_trailing_semicolon
 from beeswax.data_export import download
 from beeswax.models import SavedQuery, QueryHistory
 from beeswax.server import dbms
-from beeswax.server.beeswax_lib import BeeswaxDataTable
+from beeswax.server.beeswax_lib import BeeswaxDataTable, BeeswaxClient
 from beeswax.test_base import BeeswaxSampleProvider
+import hadoop
 
 
 LOG = logging.getLogger(__name__)
@@ -1469,6 +1470,25 @@ def test_search_log_line():
     Error: line 1:31 cannot recognize input near '''' '_this_is_not' 'SQL' in constant
     """
   assert_false(search_log_line('ql.Driver', 'FAILED: Parse Error', logs))
+
+
+def test_beeswax_get_kerberos_security():
+  query_server = {'server_name': 'beeswax'}
+  assert_equal((False, 'hue'), BeeswaxClient.get_security(query_server))
+
+  query_server = {'server_name': 'impala'}
+  assert_equal((False, 'impala'), BeeswaxClient.get_security(query_server))
+
+  cluster_conf = hadoop.cluster.get_cluster_conf_for_job_submission()
+  finish = cluster_conf.SECURITY_ENABLED.set_for_testing(True)
+  try:
+    query_server = {'server_name': 'beeswax'}
+    assert_equal((True, 'hue'), BeeswaxClient.get_security(query_server))
+
+    query_server = {'server_name': 'impala'}
+    assert_equal((True, 'impala'), BeeswaxClient.get_security(query_server))
+  finally:
+    finish()
 
 
 def search_log_line(component, expected_log, all_logs):

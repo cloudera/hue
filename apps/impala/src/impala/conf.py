@@ -15,8 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django.utils.translation import ugettext_lazy as _
+import socket
 
+from django.utils.translation import ugettext_lazy as _
 from desktop.lib.conf import Config
 
 
@@ -31,3 +32,9 @@ SERVER_PORT = Config(
   help=_("Port of the Impala Server."),
   default=21000,
   type=int)
+
+IMPALA_PRINCIPAL=Config(
+  key='impala_principal',
+  help=_("Kerberos principal name for Impala. Typically 'impala/hostname.foo.com'."),
+  type=str,
+  default="impala/%s" % socket.getfqdn())

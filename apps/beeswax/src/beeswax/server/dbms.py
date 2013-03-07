@@ -23,7 +23,6 @@ from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext as _
 
 from filebrowser.views import location_to_url
-
 from beeswaxd.ttypes import BeeswaxException
 
 from beeswax.conf import BEESWAX_SERVER_HOST, BEESWAX_SERVER_PORT,\
