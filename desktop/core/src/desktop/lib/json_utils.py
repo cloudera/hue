@@ -36,14 +36,14 @@ class JSONEncoderForHTML(json.JSONEncoder):
     def encode(self, o):
         # Override JSONEncoder.encode because it has hacks for
         # performance that make things more complicated.
-        chunks = self.iterencode(o, True)
+        chunks = self.iterencode(o) # .iterencode(o, True) because of 2.4
         if self.ensure_ascii:
             return ''.join(chunks)
         else:
             return u''.join(chunks)
 
     def iterencode(self, o, _one_shot=False):
-        chunks = super(JSONEncoderForHTML, self).iterencode(o, _one_shot)
+        chunks = super(JSONEncoderForHTML, self).iterencode(o) # .iterencode(o, _one_shot) because of 2.4
         for chunk in chunks:
             chunk = chunk.replace('&', '\\u0026')
             chunk = chunk.replace('<', '\\u003c')

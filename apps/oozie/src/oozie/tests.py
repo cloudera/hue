@@ -1078,6 +1078,10 @@ class TestEditor(OozieMockBase):
         '          <name>username</name>\n'
         '          <value>${coord:user()}</value>\n'
         '        </property>\n'
+        '        <property>\n'
+        '          <name>SLEEP</name>\n'
+        '          <value>1000</value>\n'
+        '        </property>\n'
         '      </configuration>\n'
         '   </workflow>\n'
         '  </action>\n'
@@ -1157,6 +1161,10 @@ class TestEditor(OozieMockBase):
           <name>username</name>
           <value>${coord:user()}</value>
         </property>
+        <property>
+          <name>SLEEP</name>
+          <value>1000</value>
+        </property>
       </configuration>
    </workflow>
   </action>
@@ -1225,7 +1233,7 @@ class TestEditor(OozieMockBase):
     create_dataset(coord, self.c)
     create_coordinator_data(coord, self.c)
 
-    assert_equal([{'name': u'output', 'value': ''}, {'name': u'SLEEP', 'value': ''}, {'name': u'market', 'value': u'US'}],
+    assert_equal([{'name': u'output', 'value': ''}, {'name': u'market', 'value': u'US'}],
                  coord.find_all_parameters())
 
 
@@ -1256,6 +1264,26 @@ class TestEditor(OozieMockBase):
     resp = self.c.get('/oozie/list_workflows/')
     assert_false('"><script>alert(1);</script>' in resp.content, resp.content)
     assert_true('&quot;&gt;&lt;script&gt;alert(1);&lt;/script&gt;' in resp.content, resp.content)
+
+
+  def test_submit_workflow(self):
+    # Check param popup
+    response = self.c.get(reverse('oozie:submit_workflow', args=[self.wf.id]))
+    assert_equal([{'name': u'output', 'value': ''},
+                  {'name': u'SLEEP', 'value': ''},
+                  {'name': u'market', 'value': u'US'}
+                  ],
+                  response.context['params_form'].initial)
+
+  def test_submit_coordinator(self):
+    coord = create_coordinator(self.wf, self.c)
+
+    # Check param popup, SLEEP is set by coordinator so not shown in the popup
+    response = self.c.get(reverse('oozie:submit_coordinator', args=[coord.id]))
+    assert_equal([{'name': u'output', 'value': ''},
+                  {'name': u'market', 'value': u'US'}
+                  ],
+                  response.context['params_form'].initial)
 
 
 class TestEditorBundle(OozieMockBase):
@@ -2581,7 +2609,7 @@ COORDINATOR_DICT = {
     u'end_0': [u'07/04/2012'], u'end_1': [u'12:00 AM'],
     u'timezone': [u'America/Los_Angeles'],
     u'parameters': [u'[{"name":"market","value":"US"}]'],
-    u'job_properties': [u'[{"name":"username","value":"${coord:user()}"}]'],
+    u'job_properties': [u'[{"name":"username","value":"${coord:user()}"},{"name":"SLEEP","value":"1000"}]'],
     u'timeout': [u'100'],
     u'concurrency': [u'3'],
     u'execution': [u'FIFO'],

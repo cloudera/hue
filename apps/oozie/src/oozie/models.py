@@ -1324,6 +1324,9 @@ class Coordinator(Job):
     for ds in self.dataoutput_set.all():
       params.pop(ds.name, None)
 
+    for wf_param in json.loads(self.job_properties):
+      params.pop(wf_param['name'], None)
+
     return params
 
 
