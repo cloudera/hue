@@ -15,12 +15,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
+try:
+  import oauth2 as oauth
+except:
+  pass
+
+import cgi
 import logging
+import urllib
 
 import django.contrib.auth.views
 from django.core import urlresolvers
 from django.core.exceptions import SuspiciousOperation
-from django.contrib.auth import login, get_backends
+from django.contrib.auth import login, get_backends, authenticate
 from django.contrib.auth.models import User
 from django.contrib.sessions.models import Session
 from django.http import HttpResponseRedirect
@@ -28,11 +36,12 @@ from django.utils.translation import ugettext as _
 from hadoop.fs.exceptions import WebHdfsException
 from useradmin.views import ensure_home_directory
 
-from desktop.auth.backend import AllowFirstUserDjangoBackend, AllowAllBackend
+from desktop.auth.backend import AllowFirstUserDjangoBackend
 from desktop.auth.forms import UserCreationForm, AuthenticationForm
 from desktop.lib.django_util import render
 from desktop.lib.django_util import login_notrequired
 from desktop.log.access import access_warn, last_access_map
+from desktop.conf import OAUTH
 
 LOG = logging.getLogger(__name__)
 
@@ -66,8 +75,8 @@ def first_login_ever():
   return False
 
 
-def is_allow_all_backend():
-  return get_backends() and isinstance(get_backends()[0], AllowAllBackend)
+def get_backend_name():
+  return get_backends() and get_backends()[0].__class__.__name__
 
 
 @login_notrequired
@@ -75,7 +84,7 @@ def dt_login(request):
   """Used by the non-jframe login"""
   redirect_to = request.REQUEST.get('next', '/')
   is_first_login_ever = first_login_ever()
-  is_allow_all = is_allow_all_backend()
+  backend_name = get_backend_name()
 
   if request.method == 'POST':
     # For first login, need to validate user info!
@@ -94,7 +103,7 @@ def dt_login(request):
         if request.session.test_cookie_worked():
           request.session.delete_test_cookie()
 
-        if is_first_login_ever or is_allow_all:
+        if is_first_login_ever or backend_name == 'AllowAllBackend':
           # Create home directory for first user.
           try:
             ensure_home_directory(request.fs, user.username)
@@ -119,7 +128,7 @@ def dt_login(request):
     'next': redirect_to,
     'first_login_ever': is_first_login_ever,
     'login_errors': request.method == 'POST',
-    'is_allow_all': is_allow_all
+    'backend_name': backend_name
   })
 
 
@@ -141,3 +150,43 @@ def _profile_dict(user):
     last_name=user.last_name,
     last_login=str(user.last_login), # datetime object needs to be converted
     email=user.email)
+
+
+# Oauth is based on Twitter as example.
+
+@login_notrequired
+def oauth_login(request):
+  consumer = oauth.Consumer(OAUTH.CONSUMER_KEY.get(), OAUTH.CONSUMER_SECRET.get())
+  client = oauth.Client(consumer)
+  resp, content = client.request(OAUTH.REQUEST_TOKEN_URL.get(), "POST", body=urllib.urlencode({
+                      'oauth_callback': 'http://' + request.get_host() + '/login/oauth_authenticated/'
+                  }))
+
+  if resp['status'] != '200':
+    raise Exception(_("Invalid response from Oauth provider: %s") % resp)
+
+  request.session['request_token'] = dict(cgi.parse_qsl(content))
+
+  url = "%s?oauth_token=%s" % (OAUTH.AUTHENTICATE_URL.get(), request.session['request_token']['oauth_token'])
+
+  return HttpResponseRedirect(url)
+
+
+@login_notrequired
+def oauth_authenticated(request):
+  consumer = oauth.Consumer(OAUTH.CONSUMER_KEY.get(), OAUTH.CONSUMER_SECRET.get())
+  token = oauth.Token(request.session['request_token']['oauth_token'], request.session['request_token']['oauth_token_secret'])
+  client = oauth.Client(consumer, token)
+
+  resp, content = client.request(OAUTH.ACCESS_TOKEN_URL.get(), "GET")
+  if resp['status'] != '200':
+      raise Exception(_("Invalid response from Oauth provider: %s") % resp)
+
+  access_token = dict(cgi.parse_qsl(content))
+
+  user = authenticate(access_token=access_token)
+  login(request, user)
+
+  redirect_to = request.REQUEST.get('next', '/')
+  return HttpResponseRedirect(redirect_to)
+

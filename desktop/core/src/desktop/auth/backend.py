@@ -177,6 +177,35 @@ class AllowFirstUserDjangoBackend(django.contrib.auth.backends.ModelBackend):
     return User.objects.count() == 0
 
 
+class OAuthBackend(DesktopBackendBase):
+  """
+  Heavily based on Twitter Oauth: https://github.com/simplegeo/python-oauth2#logging-into-django-w-twitter
+  Requires: python-oauth2 and httplib2
+
+  build/env/bin/python setup.py install https://github.com/simplegeo/python-oauth2
+  build/env/bin/pip install httplib2
+  """
+
+  def authenticate(self, access_token):
+    username = access_token['screen_name']
+    password = access_token['oauth_token_secret']
+
+    # Could save oauth_token detail in the user profile here
+
+    user = find_or_create_user(username, password)
+    user.is_superuser = False
+    user.save()
+
+    default_group = get_default_user_group()
+    if default_group is not None:
+      user.groups.add(default_group)
+
+    return user
+
+  @classmethod
+  def manages_passwords_externally(cls):
+    return True
+
 
 class AllowAllBackend(DesktopBackendBase):
   """

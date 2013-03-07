@@ -63,12 +63,16 @@ from django.utils.translation import ugettext as _
         <div class="row">
             <div class="span4 offset4">
                 <form method="POST" action="${action}" class="well">
-                    <label>${_('Username')}
+                    <label
+                    % if backend_name == 'OAuthBackend':
+                      class="hide"
+                    % endif
+                    >${_('Username')}
                         ${ form['username'] | n,unicode }
                         ${ form['username'].errors | n,unicode }
                     </label>
                     <label
-                    % if is_allow_all:
+                    % if backend_name in ('AllowAllBackend', 'OAuthBackend'):
                       class="hide"
                     % endif
                     >${_('Password')}
@@ -79,7 +83,7 @@ from django.utils.translation import ugettext as _
                     %if first_login_ever:
                         <input type="submit" class="btn btn-primary" value="${_('Sign up')}" />
                     %else:
-                        <input type="submit" class="btn btn-primary" value="${_('Sign in')}" />
+                        <input type="submit" class="btn btn-primary" value="${_('Sign in')}"/>
                     %endif
                     <input type="hidden" name="next" value="${next}" />
 
@@ -106,12 +110,25 @@ from django.utils.translation import ugettext as _
         %endif
     </div>
 
-% if is_allow_all:
+% if backend_name == 'AllowAllBackend':
   <script src="/static/ext/js/jquery/jquery-1.8.1.min.js"></script>
   <script>
     $(document).ready(function(){
       $('#id_password').val('password');
     });
+  </script>
+% endif
+
+% if backend_name == 'OAuthBackend':
+  <script src="/static/ext/js/jquery/jquery-1.8.1.min.js"></script>
+  <script>
+  $(document).ready(function(){
+    $("input").css({"display": "block", "margin-left": "auto", "margin-right": "auto"});
+    $("input").bind('click', function() {
+      window.location.replace('/login/oauth/');
+      return false;
+    });
+  });
   </script>
 % endif
 

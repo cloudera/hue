@@ -264,7 +264,7 @@ AUTH = ConfigSection(
     BACKEND=Config("backend",
                    default="desktop.auth.backend.AllowFirstUserDjangoBackend",
                    help=_("Authentication backend.  Common settings are "
-                        "django.contrib.auth.backends.ModelBackend (fully Django backend), " + 
+                        "django.contrib.auth.backends.ModelBackend (fully Django backend), " +
                         "desktop.auth.backend.AllowAllBackend (allows everyone), " +
                         "desktop.auth.backend.AllowFirstUserDjangoBackend (relies on Django and user manager, after the first login). ")),
     USER_AUGMENTOR=Config("user_augmentor",
@@ -349,6 +349,47 @@ LDAP = ConfigSection(
 ))
 
 
+OAUTH = ConfigSection(
+  key='oauth',
+  help=_('Configuration options for Oauth 1.0 authentication'),
+  members=dict(
+    CONSUMER_KEY = Config(
+      key="consumer_key",
+      help=_("The Consumer key of the application."),
+      type=str,
+      default="XXXXXXXXXXXXXXXXXXXXX"
+    ),
+
+    CONSUMER_SECRET = Config(
+      key="consumer_secret",
+      help=_("The Consumer secret of the application."),
+      type=str,
+      default="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+    ),
+
+    REQUEST_TOKEN_URL = Config(
+      key="request_token_url",
+      help=_("The Request token URL."),
+      type=str,
+      default="https://api.twitter.com/oauth/request_token"
+    ),
+
+    ACCESS_TOKEN_URL = Config(
+      key="access_token_url",
+      help=_("The Access token URL."),
+      type=str,
+      default="https://api.twitter.com/oauth/access_token"
+    ),
+
+    AUTHENTICATE_URL = Config(
+      key="authenticate_url",
+      help=_("The Authorize URL."),
+      type=str,
+      default="https://api.twitter.com/oauth/authorize"
+    ),
+  )
+)
+
 
 LOCAL_FILESYSTEMS = UnspecifiedConfigSection(
   key="local_filesystems",
@@ -362,7 +403,7 @@ LOCAL_FILESYSTEMS = UnspecifiedConfigSection(
 def default_feedback_url():
   """A version-specific URL."""
   return "http://groups.google.com/a/cloudera.org/group/hue-user"
-  
+
 FEEDBACK_URL = Config(
   key="feedback_url",
   help=_("Link for 'feedback' tab."),

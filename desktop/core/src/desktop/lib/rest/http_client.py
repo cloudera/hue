@@ -164,6 +164,7 @@ class HttpClient(object):
     request.get_method = lambda: http_method
 
     headers = self._get_headers(headers)
+
     for k, v in headers.items():
       request.add_header(k, v)
 

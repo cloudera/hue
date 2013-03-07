@@ -61,6 +61,10 @@ dynamic_patterns = patterns('',
   (r'^debug/check_config_ajax$', 'desktop.views.check_config_ajax'),
   (r'^log_frontend_event$', 'desktop.views.log_frontend_event'),
 
+  # Oauth
+  (r'^login/oauth/?$', 'desktop.auth.views.oauth_login'),
+  (r'^login/oauth_authenticated/?$', 'desktop.auth.views.oauth_authenticated'),
+
   # Jasmine
   (r'^jasmine', 'desktop.views.jasmine'),
 
