@@ -140,8 +140,8 @@ from django.utils.translation import ugettext as _
             <span class="caret"></span>
           </a>
           <ul class="dropdown-menu">
-            <li><a class="userProfile" href="${ url('useradmin.views.edit_user', username=urllib.quote(user.username)) }">${_('Profile')}</a></li>
-            <li class="divider"></li>
+            ##<li><a class="userProfile" href="${ url('useradmin.views.edit_user', username=urllib.quote(user.username)) }">${_('Profile')}</a></li>
+            ##<li class="divider"></li>
             <li><a href="/accounts/logout/">${_('Sign Out')}</a></li>
           </ul>
         </div>

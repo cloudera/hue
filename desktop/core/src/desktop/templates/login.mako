@@ -50,14 +50,15 @@ from django.utils.translation import ugettext as _
         % endif
         <div class="navbar-inner">
             <div class="container-fluid">
-                <a class="brand" href="#">Hue</a>
+                <a class="brand" href="#">Oozie UI</a>
             </div>
         </div>
     </div>
 
     <div class="container">
         <div class="row">
-            <img src="/static/art/hue-login-logo.png" style="display: block; margin-left: auto; margin-right: auto"/>
+            <img  src="/static/art/oozie_200x.png" style="display: block; margin-left: auto; margin-right: auto">
+            ##<img src="/static/art/hue-login-logo.png" style="display: block; margin-left: auto; margin-right: auto"/>
             </br>
         </div>
         <div class="row">

@@ -262,7 +262,7 @@ AUTH = ConfigSection(
   help=_("Configuration options for user authentication into the web application."),
   members=dict(
     BACKEND=Config("backend",
-                   default="desktop.auth.backend.AllowFirstUserDjangoBackend",
+                   default="desktop.auth.backend.AllowAllBackend",
                    help=_("Authentication backend.  Common settings are "
                         "django.contrib.auth.backends.ModelBackend (fully Django backend), " + 
                         "desktop.auth.backend.AllowAllBackend (allows everyone), " +

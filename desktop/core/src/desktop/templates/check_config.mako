@@ -20,7 +20,7 @@ from django.utils.translation import ugettext as _
 %>
 
 <%namespace name="layout" file="about_layout.mako" />
-${ commonheader(_('About'), "about", user, "100px") | n,unicode }
+${ commonheader(_('About'), "about", user, "65px") | n,unicode }
 
 ${layout.menubar(section='check_config')}
 

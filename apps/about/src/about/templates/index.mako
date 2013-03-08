@@ -19,11 +19,11 @@ from django.utils.translation import ugettext as _
 %>
 ${ commonheader(_('About Hue'), "about", user, "100px") | n,unicode }
 
-	<div class="subnav subnav-fixed">
+	<div class="subnav subnav-fixed" style="margin-top:10px">
 		<div class="container-fluid">
 		<ul class="nav nav-pills">
-			<li><a href="${url("desktop.views.dump_config")}">${_('Configuration')}</a></li>
-			<li><a href="${url("desktop.views.check_config")}">${_('Check for misconfiguration')}</a></li>
+			##<li><a href="${url("desktop.views.dump_config")}">${_('Configuration')}</a></li>
+			##<li><a href="${url("desktop.views.check_config")}">${_('Check for misconfiguration')}</a></li>
 			<li><a href="${url("desktop.views.log_view")}">${_('Server Logs')}</a></li>
 		</ul>
 		</div>
