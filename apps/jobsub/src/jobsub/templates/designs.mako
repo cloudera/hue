@@ -1,4 +1,3 @@
-## Licensed to Cloudera, Inc. under one
 ## or more contributor license agreements.  See the NOTICE file
 ## distributed with this work for additional information
 ## regarding copyright ownership.  Cloudera, Inc. licenses this file
@@ -50,7 +49,7 @@ ${ commonheader(_('Job Designer'), "jobsub", user, "60px") | n,unicode }
       <button id="submit-design" class="btn" title="${_('Submit')}" data-bind="enable: selectedDesignObjects().length == 1"><i class="icon-play"></i> ${_('Submit')}</button>
       <button id="edit-design" class="btn" title="${_('Edit')}" data-bind="enable: selectedDesignObjects().length == 1 && window.location.hash.substring(0,12) != '#edit-design'"><i class="icon-pencil"></i> ${_('Edit')}</button>
       <button id="delete-designs" class="btn" title="${_('Delete')}" data-bind="enable: selectedDesignObjects().length > 0"><i class="icon-trash"></i> ${_('Delete')}</button>
-      <button id="clone-designs" class="btn" title="${_('Clone')}" data-bind="enable: selectedDesignObjects().length > 0"><i class="icon-share"></i> ${_('Clone')}</button>
+      <button id="copy-designs" class="btn" title="${_('Copy')}" data-bind="enable: selectedDesignObjects().length > 0"><i class="icon-retweet"></i> ${_('Copy')}</button>
     </%def>
 
     <%def name="creation()">
@@ -111,6 +110,7 @@ ${ commonheader(_('Job Designer'), "jobsub", user, "60px") | n,unicode }
           <th>${_('Description')}</th>
           <th>${_('Owner')}</th>
           <th>${_('Type')}</th>
+          <th>${_('Status')}</th>
           <th>${_('Last modified')}</th>
         </tr>
       </thead>
@@ -131,6 +131,14 @@ ${ commonheader(_('Job Designer'), "jobsub", user, "60px") | n,unicode }
     <td data-bind="click: function(data, event) { window.location = '#edit-design/' + $index() }, text: description"></td>
     <td data-bind="click: function(data, event) { window.location = '#edit-design/' + $index() }, text: owner"></td>
     <td data-bind="click: function(data, event) { window.location = '#edit-design/' + $index() }, text: node_type"></td>
+    <td data-bind="click: function(data, event) { window.location = '#edit-design/' + $index() }">
+      <!-- ko if: is_shared -->
+        <span class="label label-info">shared</span>
+      <!-- /ko -->
+      <!-- ko ifnot: is_shared -->
+        <span class="label label-info">personal</span>
+      <!-- /ko -->
+    </td>
     <td data-bind="click: function(data, event) { window.location = '#edit-design/' + $index() }, text: new Date(last_modified() * 1000).format('%B %d, %Y %I:%M %p'), attr: { 'data-sort-value': last_modified() }"></td>
   </tr>
 </script>
@@ -164,6 +172,8 @@ ${ commonheader(_('Job Designer'), "jobsub", user, "60px") | n,unicode }
 </div>
 
 <script type="text/javascript" charset="utf-8">
+var AUTOCOMPLETE_PROPERTIES;
+
 $(document).bind('initialize.designs', function() {
   var designTable, viewModel;
 
@@ -243,11 +253,42 @@ $(document).ready(function() {
     },
     name: {
       name: "${ _('Name') }",
-      popover: "${ _('Name of the design.') }"
+      popover: "${ _('Name of the design.') }",
+      js: {
+        name: 'name'
+      }
     },
     description: {
       name: "${ _('Description') }",
-      popover: "${ _('Description of the design.') }"
+      popover: "${ _('Description of the design.') }",
+      js: {
+        name: 'description'
+      }
+    },
+    is_shared: {
+      name: "${ _('Is shared') }",
+      popover: "${ _('Enable other users to have access to this job.') }",
+      js: {
+        name: 'is_shared'
+      }
+    },
+    parameters: {
+      title: "${ _('Oozie parameters') }",
+      name: "${ _('Name') }",
+      value: "${ _('Value') }",
+      delete: {
+        name: "${ _('Delete') }",
+        func: 'function(data, event) { $parent.removeParameter.call($parent, data, event) }'
+      },
+      add: {
+        name: "${ _('Add') }",
+        func: 'addParameter'
+      },
+      ko: {
+        items: "parameters",
+        error_class: "parameters_error_class",
+        condition: "parameters_condition"
+      }
     },
     user: {
       name: "${ _('User') }",
@@ -690,12 +731,16 @@ $(document).ready(function() {
   $('#delete-designs').click(function() {
     $('#deleteWf').modal('show');
   });
-  $('#clone-designs').click(function() {
+  $('#copy-designs').click(function() {
     designs.cloneDesigns();
   });
   $('#home').click(function() {
     routie('list-designs');
-  })
+  });
+  // load the autocomplete properties
+  $.getJSON("${ url('oozie:autocomplete_properties') }", function (properties) {
+    AUTOCOMPLETE_PROPERTIES = properties;
+  });
 });
 </script>
 

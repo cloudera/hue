@@ -1,3 +1,7 @@
 li.error {
-	list-style: none;
+  list-style: none;
+}
+a.advanced, a.advanced:link, a.advanced:hover {
+  color: black;
+  text-decoration: none;
 }

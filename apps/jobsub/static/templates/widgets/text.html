@@ -1,0 +1,9 @@
+<div class="control-group" rel="popover" data-original-title="{{ name }}" data-content="{{ popover }}" data-bind="attr: {'class': ( errors.{{ js.name }}().length > 0 ) ? 'control-group error' : 'control-group'}">
+  <label class="control-label">{{ name }}</label>
+  <div class="controls">
+    <input id="{{ js.name }}" type="text" name="{{ js.name }}" data-bind="value: {{ js.name }}" />
+    <ul class="help-inline" data-bind="foreach: errors.{{ js.name }}()">
+      <li class="error" data-bind="html: $data"></li>
+    </ul>
+  </div>
+</div>

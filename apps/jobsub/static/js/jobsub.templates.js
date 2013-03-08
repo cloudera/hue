@@ -37,6 +37,11 @@ var Templates = (function($, ko) {
         distcp: 'static/templates/actions/distcp.html',
       },
       partials: {
+        name: 'static/templates/widgets/text.html',
+        description: 'static/templates/widgets/text.html',
+        is_shared: 'static/templates/widgets/checkbox.html',
+        // Oozie parameters
+        parameters: 'static/templates/widgets/parameters.html',
         archives: 'static/templates/widgets/filechooser.html',
         files: 'static/templates/widgets/filechooser.html',
         mkdirs: 'static/templates/widgets/filechooser.html',

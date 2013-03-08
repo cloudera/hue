@@ -78,7 +78,8 @@ def list_designs(request):
           'description': design.description,
           'node_type': design.start.get_child('to').node_type,
           'last_modified': py_time.mktime(design.last_modified.timetuple()),
-          'editable': design.owner.id == request.user.id
+          'editable': design.owner.id == request.user.id,
+          'is_shared': design.is_shared
       }
       designs.append(ko_design)
 
@@ -129,7 +130,9 @@ def get_design(request, design_id):
   node = workflow.start.get_child('to')
   node_dict = model_to_dict(node)
   node_dict['id'] = design_id
+  node_dict['is_shared'] = workflow.is_shared
   node_dict['editable'] = workflow.owner.id == request.user.id
+  node_dict['parameters'] = workflow.parameters
   return render_json(node_dict, js_safe=True);
 
 
@@ -144,9 +147,18 @@ def save_design(request, design_id):
     raise StructuredException(code="INVALID_REQUEST_ERROR", message=_('Error saving design'), data={'errors': form.errors}, error_code=400)
 
   data = format_dict_field_values(request.POST.copy())
+  _save_design(design_id, data)
+
+  return get_design(request, design_id);
+
+
+def _save_design(design_id, data):
   sanitize_node_dict(data)
+  workflow = _get_design(design_id)
   workflow.name = data['name']
-  workflow.description = data['description']
+  workflow.description = data.setdefault('description', '')
+  workflow.is_shared = str(data.setdefault('is_shared', 'true')).lower() == "true"
+  workflow.parameters = data.setdefault('parameters', '[]')
   node = workflow.start.get_child('to').get_full_node()
   node_id = node.id
   for key in data:
@@ -155,9 +167,6 @@ def save_design(request, design_id):
   node.pk = node_id
   node.save()
   workflow.save()
-
-  data['id'] = workflow.id
-  return render_json(data);
 
 
 def new_design(request, node_type):
@@ -187,13 +196,17 @@ def new_design(request, node_type):
   action.save()
   workflow.start.add_node(action)
   action.add_node(workflow.end)
+
+  # Action form validates name and description.
   workflow.name = request.POST.get('name')
   workflow.description = request.POST.get('description')
   workflow.save()
 
+  # Save design again to update all fields.
   data = format_dict_field_values(request.POST.copy())
-  data['id'] = workflow.id
-  return render_json(data)
+  _save_design(workflow.id, data)
+
+  return get_design(request, workflow.id)
 
 
 def clone_design(request, design_id):

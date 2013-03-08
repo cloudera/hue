@@ -2,24 +2,30 @@
   <h1>{{ title }}</h1>
   <form class="form-horizontal" id="workflowForm" action="#list-designs" method="POST">
     <fieldset>
-      <div class="control-group" rel="popover" data-original-title="{{ name.name }}" data-content="{{ name.popover }}" data-bind="attr: {'class': ( errors.name().length > 0 ) ? 'control-group error' : 'control-group'}">
-        <label class="control-label">{{ name.name }}</label>
-        <div class="controls">
-          <input id="email-name" type="text" name="name" data-bind="value: name" />
-          <ul class="help-inline" data-bind="foreach: errors.name()">
-            <li class="error" data-bind="html: $data"></li>
-          </ul>
-        </div>
-      </div>
+      {{#name}}
+        {{>name}}
+      {{/name}}
 
-      <div class="control-group" rel="popover" data-original-title="{{ description.name }}" data-content="{{ description.popover }}" data-bind="attr: {'class': ( errors.description().length > 0 ) ? 'control-group error' : 'control-group'}">
-        <label class="control-label">{{ description.name }}</label>
-        <div class="controls">
-          <input id="email-description" type="text" name="description" data-bind="value: description" />
-          <ul class="help-inline" data-bind="foreach: errors.description()">
-            <li class="error" data-bind="html: $data"></li>
-          </ul>
-        </div>
+      {{#description}}
+        {{>description}}
+      {{/description}}
+
+      <div class="control-group ">
+        <label class="control-label">
+          <a href="javascript:void(0);" onclick="$('div.advanced').toggle('hide')" class="advanced">
+            <i class="icon-share-alt"></i>
+            advanced
+          </a>
+        </label>
+      </div>
+      <div class="advanced hide">
+        {{#is_shared}}
+          {{>is_shared}}
+        {{/is_shared}}
+
+        {{#parameters}}
+          {{>parameters}}
+        {{/parameters}}
       </div>
 
       <hr/>

@@ -175,30 +175,48 @@ function addFileBrowseButton() {
 }
 
 //// Event handling.
-$(document).bind('add.file.workflow', addFileBrowseButton);
-$(document).bind('remove.file.workflow', addFileBrowseButton);
-$(document).bind('add.property.workflow', addFileBrowseButton);
-$(document).bind('remove.property.workflow', addFileBrowseButton);
-$(document).bind('add.archive.workflow', addFileBrowseButton);
-$(document).bind('remove.archive.workflow', addFileBrowseButton);
-$(document).bind('add.arg.workflow', addFileBrowseButton);
-$(document).bind('add.argument.workflow', addFileBrowseButton);
-$(document).bind('add.envvar.workflow', addFileBrowseButton);
-$(document).bind('add.param.workflow', addFileBrowseButton);
-$(document).bind('remove.param.workflow', addFileBrowseButton);
-$(document).bind('add.prepare_delete.workflow', addFileBrowseButton);
-$(document).bind('add.prepare_mkdir.workflow', addFileBrowseButton);
-$(document).bind('remove.prepare.workflow', addFileBrowseButton);
-$(document).bind('add.delete.workflow', addFileBrowseButton);
-$(document).bind('remove.delete.workflow', addFileBrowseButton);
-$(document).bind('add.mkdir.workflow', addFileBrowseButton);
-$(document).bind('remove.mkdir.workflow', addFileBrowseButton);
-$(document).bind('add.chmod.workflow', addFileBrowseButton);
-$(document).bind('remove.chmod.workflow', addFileBrowseButton);
-$(document).bind('add.move.workflow', addFileBrowseButton);
-$(document).bind('remove.move.workflow', addFileBrowseButton);
-$(document).bind('add.touchz.workflow', addFileBrowseButton);
-$(document).bind('remove.touchz.workflow', addFileBrowseButton);
+var events = [
+  'add.file.workflow',
+  'add.property.workflow',
+  'add.archive.workflow',
+  'add.arg.workflow',
+  'add.argument.workflow',
+  'add.envvar.workflow',
+  'add.param.workflow',
+  'add.prepare_delete.workflow',
+  'add.prepare_mkdir.workflow',
+  'add.delete.workflow',
+  'add.mkdir.workflow',
+  'add.chmod.workflow',
+  'add.move.workflow',
+  'add.touchz.workflow',
+  'add.parameter.workflow',
+  'remove.file.workflow',
+  'remove.property.workflow',
+  'remove.archive.workflow',
+  'remove.arg.workflow',
+  'remove.argument.workflow',
+  'remove.envvar.workflow',
+  'remove.param.workflow',
+  'remove.prepare_delete.workflow',
+  'remove.prepare_mkdir.workflow',
+  'remove.delete.workflow',
+  'remove.mkdir.workflow',
+  'remove.chmod.workflow',
+  'remove.move.workflow',
+  'remove.touchz.workflow',
+  'remove.parameter.workflow',
+  'error.design'
+]
+$.each(events, function(index, event) {
+  $(document).bind(event, addFileBrowseButton);
+  $(document).bind(event, function() {
+    $(".propKey").typeahead({
+      source:(typeof AUTOCOMPLETE_PROPERTIES != 'undefined') ? AUTOCOMPLETE_PROPERTIES : []
+    });
+  });
+});
+
 $(document).bind('error.design', addFileBrowseButton);
 $(document).bind('save.design', function() {designs.load();});
 $(document).bind('delete.design', function() {designs.load();});

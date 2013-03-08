@@ -53,10 +53,49 @@ var Design = (function($, ko, NodeFields) {
       }
 
       // @see http://knockoutjs.com/documentation/plugins-mapping.html
-      // MAPPING_OPTIONS comes from /oozie/static/js/models.js
+      // MAPPING_OPTIONS comes from /oozie/static/js/workflow.models.js
       // We don't update the observed object using ko.mapping because
       // the plugin does not work with mixed objects.
-      ko.mapping.fromJS(self.model, MAPPING_OPTIONS, self);
+      ko.mapping.fromJS(self.model, $.extend({
+        is_shared: {
+          create: function(options) {
+            return ko.observable(($.type(options.data) == "string") ? value.toLowerCase() == "true" : new Boolean(options.data).valueOf());
+          },
+          update: function(options) {
+            return ($.type(options.data) == "string") ? value.toLowerCase() == "true" : new Boolean(options.data);
+          }
+        },
+        parameters: {
+          // Will receive individual objects to subscribe.
+          // Containing array is mapped automagically
+          create: function(options) {
+            var parent = options.parent;
+            var subscribe = function(mapping) {
+              mapping.name.subscribe(function(value) {
+                parent.parameters.valueHasMutated();
+              });
+              mapping.value.subscribe(function(value) {
+                parent.parameters.valueHasMutated();
+              });
+            };
+
+            return map_params(options, subscribe);
+          },
+          update: function(options) {
+            var parent = options.parent;
+            var subscribe = function(mapping) {
+              mapping.name.subscribe(function(value) {
+                parent.parameters.valueHasMutated();
+              });
+              mapping.value.subscribe(function(value) {
+                parent.parameters.valueHasMutated();
+              });
+            };
+
+            return map_params(options, subscribe);
+          }
+        }
+      }, MAPPING_OPTIONS), self);
 
       // hack on '<key>ErrorClass' and '<key>Condition'.
       $.each(self.__ko_mapping__, function(key, enabled) {
@@ -157,6 +196,25 @@ var Design = (function($, ko, NodeFields) {
         }
       }, options);
       this.request('/jobsub/designs/' + self.id() + '/delete', options);
+    },
+
+    // More node field methods
+    addParameter: function(data) {
+      var self = this;
+      var prop = { name: ko.observable(""), value: ko.observable("") };
+      prop.name.subscribe(function(value) {
+        self.parameters.valueHasMutated();
+      });
+      prop.value.subscribe(function(value) {
+        self.parameters.valueHasMutated();
+      });
+      self.parameters.push(prop);
+      $(document).trigger('add.parameter.workflow', [data]);
+    },
+    removeParameter: function(data) {
+      var self = this;
+      self.parameters.remove(data);
+      $(document).trigger('remove.parameter.workflow', [data]);
     }
   });
 
@@ -310,7 +368,9 @@ var Designs = (function($, ko, NodeModelChooser) {
       var self = this;
       var design = self.createDesign({
         id: null,
-        node_type: node_type
+        node_type: node_type,
+        is_shared: true,
+        parameters: '[{"name":"oozie.use.system.libpath","value":"true"}]'
       });
       // Reversing the order of the next two statements may cause KO to break.
       self.temporary().template(node_type);

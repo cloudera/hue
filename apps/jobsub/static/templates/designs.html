@@ -6,6 +6,7 @@
       <th>{{ description }}</th>
       <th>{{ owner }}</th>
       <th>{{ type }}</th>
+      <th>{{ status }}</th>
       <th>{{ last_modified }}</th>
     </tr>
   </thead>
@@ -18,6 +19,7 @@
       <td data-bind="text: description"></td>
       <td data-bind="text: owner"></td>
       <td data-bind="text: type"></td>
+      <td data-bind="text: is_shared"></td>
       <td data-sort-value="${time.mktime(design.mtime.timetuple())}" data-bind="text: last_modified"></td>
     </tr>
   </tbody>
