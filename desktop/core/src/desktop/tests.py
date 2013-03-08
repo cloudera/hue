@@ -15,25 +15,29 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from desktop.lib import django_mako
+
+import desktop
+import desktop.urls
+import desktop.conf
+import logging
+import time
+
+import desktop.views as views
+import proxy.conf
 
 from nose.tools import assert_true, assert_equal, assert_not_equal
 from django.conf.urls.defaults import patterns, url
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.db.models import query, CharField, SmallIntegerField
+
+from desktop.lib import django_mako
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.paginator import Paginator
 from desktop.lib.conf import validate_path
-import desktop
-import desktop.urls
-import desktop.conf
-import logging
-import time
 from desktop.lib.django_util import TruncatingModel
 from desktop.lib.exceptions_renderable import PopupException
-import desktop.views as views
-import proxy.conf
+from desktop.lib.test_utils import grant_access
 
 
 def setup_test_environment():
@@ -125,6 +129,13 @@ def test_dump_config():
   assert_true(CANARY in response1.content, response1.content)
 
   clear()
+
+  # Login as someone else
+  client_not_me = make_logged_in_client(username='not_me', is_superuser=False, groupname='test')
+  grant_access("not_me", "test", "desktop")
+
+  response = client_not_me.get('/dump_config')
+  assert_equal("You must be a superuser.", response.content)
 
 
 def test_prefs():
