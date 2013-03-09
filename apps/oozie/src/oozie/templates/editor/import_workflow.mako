@@ -47,6 +47,7 @@ ${ layout.menubar(section='workflows') }
           ${ utils.render_field(workflow_form['name']) }
           ${ utils.render_field(workflow_form['description']) }
           ${ utils.render_field(workflow_form['definition_file']) }
+          ${ utils.render_field(workflow_form['resource_archive']) }
           ${ utils.render_field(workflow_form['is_shared']) }
           ${ utils.render_field(workflow_form['schema_version']) }
 
@@ -70,19 +71,19 @@ ${ layout.menubar(section='workflows') }
              ${ workflow_form['parameters'] | n,unicode }
          </div>
          </fieldset>
+        </div>
 
         <div class="span2"></div>
-        </div>
       </div>
 
       <div class="form-actions center">
-        <input class="btn btn-primary" type="submit" value="${ _('Save') }" />
+        <input class="btn btn-primary" type="submit" value="${ _('Import') }" />
         <a class="btn" onclick="history.back()">${ _('Back') }</a>
       </div>
       </form>
     </div>
 </div>
 
-${ utils.path_chooser_libs(True) }
+${ utils.path_chooser_libs(False) }
 
 ${ commonfooter(messages) | n,unicode }

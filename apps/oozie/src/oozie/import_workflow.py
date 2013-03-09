@@ -485,9 +485,13 @@ def _resolve_subworkflow_from_deployment_dir(fs, workflow, app_path):
   return None
 
 
-def _save_nodes(nodes):
+def _save_nodes(workflow, nodes):
   for node in nodes:
-    node.save()
+    try:
+      # Do not overwrite start or end node
+      Node.objects.get(workflow=workflow, node_type=node.node_type, name=node.name)
+    except Node.DoesNotExist:
+      node.save()
 
 
 def import_workflow(workflow, workflow_definition, fs=None):
@@ -522,7 +526,7 @@ def import_workflow(workflow, workflow_definition, fs=None):
   # Resolve workflow dependencies and node types and link dependencies
   nodes = _prepare_nodes(workflow, transformed_root)
   _preprocess_nodes(workflow, transformed_root, workflow_definition_root, nodes, fs)
-  _save_nodes(nodes)
+  _save_nodes(workflow, nodes)
   _save_links(workflow, workflow_definition_root)
 
   # Update schema_version

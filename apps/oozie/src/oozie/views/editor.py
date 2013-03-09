@@ -20,6 +20,7 @@ try:
 except ImportError:
   import simplejson as json
 import logging
+import shutil
 
 from django.core.urlresolvers import reverse
 from django.db.models import Q
@@ -36,6 +37,7 @@ from desktop.lib.rest.http_client import RestException
 from hadoop.fs.exceptions import WebHdfsException
 from liboozie.submittion import Submission
 
+from filebrowser.lib.archives import archive_factory
 from oozie.conf import SHARE_JOBS
 from oozie.decorators import check_job_access_permission, check_job_edition_permission,\
                              check_dataset_access_permission, check_dataset_edition_permission
@@ -45,9 +47,9 @@ from oozie.models import Workflow, History, Coordinator,\
                          Dataset, DataInput, DataOutput,\
                          ACTION_TYPES, Bundle, BundledCoordinator, Job
 from oozie.forms import WorkflowForm, CoordinatorForm, DatasetForm,\
-  DataInputForm, DataOutputForm, LinkForm,\
-  DefaultLinkForm, design_form_by_type, ParameterForm,\
-  ImportWorkflowForm, NodeForm, BundleForm, BundledCoordinatorForm
+                        DataInputForm, DataOutputForm, LinkForm,\
+                        DefaultLinkForm, ParameterForm, ImportWorkflowForm,\
+                        NodeForm, BundleForm, BundledCoordinatorForm, design_form_by_type
 
 
 LOG = logging.getLogger(__name__)
@@ -137,6 +139,19 @@ def import_workflow(request):
     workflow_form = ImportWorkflowForm(request.POST, request.FILES, instance=workflow)
 
     if workflow_form.is_valid():
+      if workflow_form.cleaned_data.get('resource_archive'):
+        # Upload resources to workspace
+        source = workflow_form.cleaned_data.get('resource_archive')
+        if source.name.endswith('.zip'):
+          workflow.save()
+          Workflow.objects.initialize(workflow, request.fs)
+          temp_path = archive_factory(source).extract()
+          request.fs.copyFromLocal(temp_path, workflow.deployment_dir)
+          shutil.rmtree(temp_path)
+        else:
+          raise PopupException(_('Archive should be a Zip.'))
+
+      workflow.managed = True
       workflow.save()
 
       workflow_definition = workflow_form.cleaned_data['definition_file'].read()

@@ -79,6 +79,7 @@ SCHEMA_VERSION_CHOICES = ['0.4']
 
 class ImportWorkflowForm(WorkflowForm):
   definition_file = forms.FileField(label=_t("Local workflow.xml file"))
+  resource_archive = forms.FileField(label=_t("Workflow resource archive (zip)"), required=False)
 
 
 class ImportJobsubDesignForm(forms.Form):

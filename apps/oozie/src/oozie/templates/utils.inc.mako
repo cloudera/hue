@@ -332,7 +332,7 @@
               }
             },
             createFolder:false,
-            uploadFile:false,
+            uploadFile:true,
             initialPath:$.trim(inputElement.val()) != "" ? pathAddition + inputElement.val() : "${ workflow.deployment_dir }",
             errorRedirectPath:"${ workflow.deployment_dir }",
             forceRefresh:true
