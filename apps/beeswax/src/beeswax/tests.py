@@ -16,6 +16,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+try:
+  import json
+except ImportError:
+  import simplejson as json
 import cStringIO
 import gzip
 import logging
@@ -782,26 +786,24 @@ for x in sys.stdin:
     about whether a table is partitioned.
     """
     # Check that view works
-    resp = self.client.get("/beeswax/table/default/test")
-    assert_true(resp.context["load_form"])
+    resp = self.client.get("/beeswax/table/default/test/load")
+    assert_true('Path' in resp.content)
 
     # Try the submission
-    try:    
-      self.client.post("/beeswax/table/default/test/load", dict(path="/tmp/foo", overwrite=True))
-    except:
-      pass
+    self.client.post("/beeswax/table/default/test/load", dict(path="/tmp/foo", overwrite=True))
     query = QueryHistory.objects.latest('id')
-    
-    assert_equal_mod_whitespace("LOAD DATA INPATH '/tmp/foo' OVERWRITE INTO TABLE `default.test`", query.query, resp.context)
+
+    assert_equal_mod_whitespace("LOAD DATA INPATH '/tmp/foo' OVERWRITE INTO TABLE `default.test`", query.query)
 
     resp = self.client.post("/beeswax/table/default/test/load", dict(path="/tmp/foo", overwrite=False))
-    assert_equal_mod_whitespace("LOAD DATA INPATH '/tmp/foo' INTO TABLE `default.test`",
-        resp.context["form"].query.initial["query"])
+    query = QueryHistory.objects.latest('id')
+    assert_equal_mod_whitespace("LOAD DATA INPATH '/tmp/foo' INTO TABLE `default.test`", query.query)
 
     # Try it with partitions
     resp = self.client.post("/beeswax/table/default/test_partitions/load", dict(path="/tmp/foo", partition_0="alpha", partition_1="beta"))
+    query = QueryHistory.objects.latest('id')
     assert_equal_mod_whitespace("LOAD DATA INPATH '/tmp/foo' INTO TABLE `default.test_partitions` PARTITION (baz='alpha', boom='beta')",
-        resp.context["form"].query.initial["query"])
+        query.query)
 
 
   def test_save_results_to_dir(self):
@@ -1229,15 +1231,17 @@ for x in sys.stdin:
 
     _make_query(client, 'SELECT', name='my query history', submission_type='Save')
     design = SavedQuery.objects.get(name='my query history')
-  
+
     for i in range(25):
       client.get('/beeswax/clone_design/%s' % (design.id,))
-  
+
     resp = client.get('/beeswax/list_designs')
-    assert_true(len(resp.context['page'].object_list) >=20)
+    ids_page_1 = set([query.id for query in resp.context['page'].object_list])
     resp = client.get('/beeswax/list_designs?q-page=2')
-    assert_true(len(resp.context['page'].object_list) > 1)
-  
+    ids_page_2 = set([query.id for query in resp.context['page'].object_list])
+    for id in ids_page_2:
+      assert_true(id not in ids_page_1)
+
     SavedQuery.objects.filter(name='my query history').delete()
 
 

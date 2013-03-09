@@ -59,7 +59,7 @@ ${layout.menubar(section='tables')}
             <div class="well sidebar-nav">
                 <ul class="nav nav-list">
                     <li class="nav-header">${_('Actions')}</li>
-                    <li><a href="#importData" data-toggle="modal">${_('Import Data')}</a></li>
+                    <li><a href="#" id="import-data-btn">${_('Import Data')}</a></li>
                     <li><a href="${ url(app_name + ':read_table', database=database, table=table.name) }">${_('Browse Data')}</a></li>
                     <li><a href="#dropTable" data-toggle="modal">${_('Drop')} ${view_or_table_noun}</a></li>
                     <li><a href="${ table.hdfs_link }" rel="${ table.path_location }">${_('View File Location')}</a></li>
@@ -153,101 +153,18 @@ ${layout.menubar(section='tables')}
 </div>
 
 
+<div id="import-data-modal" class="modal hide fade"></div>
 
-<div id="importData" class="modal hide fade">
-    <form method="POST" action="${ url(app_name + ':load_table', database=database, table=table.name) }" class="form-horizontal">
-        <div class="modal-header">
-            <a href="#" class="close" data-dismiss="modal">&times;</a>
-            <h3>${_('Import data')}</h3>
-        </div>
-        <div class="modal-body">
-
-            <div class="control-group">
-                ${comps.bootstrapLabel(load_form["path"])}
-                <div class="controls">
-                    ${comps.field(load_form["path"], placeholder="/user/user_name/data_dir/file", klass="pathChooser input-xlarge", file_chooser=True, show_errors=False)}
-                </div>
-            </div>
-
-            <div id="filechooser"></div>
-
-            % for pf in load_form.partition_columns:
-                <div class="control-group">
-                     ${comps.bootstrapLabel(load_form[pf])}
-                     <div class="controls">
-                       ${comps.field(load_form[pf], render_default=True, attrs={'klass': 'input-xlarge'})}
-                    </div>
-                </div>
-            % endfor
-
-            <div class="control-group">
-              <div class="controls">
-                <label class="checkbox">
-                    <input type="checkbox" name="overwrite"/> ${_('Overwrite existing data')}
-                  </label>
-                </div>
-            </div>
-
-            <p class="muted"><em>${_("Note that loading data will move data from its location into the table's storage location.")}</em></p>
-        </div>
-
-        <div class="modal-footer">
-            <a href="#" class="btn" data-dismiss="modal">${_('Cancel')}</a>
-            <input type="submit" class="btn btn-primary" value="${_('Submit')}"/>
-        </div>
-    </form>
-</div>
 </div>
 
- <style>
-   #filechooser {
-     display: none;
-     min-height: 100px;
-     height: 250px;
-     overflow-y: scroll;
-     margin-top: 10px;
-   }
-
+<style>
    .sampleTable td, .sampleTable th {
      white-space: nowrap;
    }
+</style>
 
-   .form-horizontal .controls {
-     margin-left: 0;
-   }
-
-   .form-horizontal .control-label {
-     width: auto;
-     padding-right: 10px;
-   }
- </style>
-
- <script type="text/javascript" charset="utf-8">
+<script type="text/javascript" charset="utf-8">
    $(document).ready(function () {
-
-     $(".fileChooserBtn").click(function(e){
-       e.preventDefault();
-       var _destination = $(this).attr("data-filechooser-destination");
-       $("#filechooser").jHueFileChooser({
-         initialPath: $("input[name='"+_destination+"']").val(),
-         onFileChoose: function(filePath){
-           $("input[name='"+_destination+"']").val(filePath);
-           $("#filechooser").slideUp();
-         },
-         onFolderChange: function (filePath) {
-           $("input[name='"+_destination+"']").val(filePath);
-         },
-         onFolderChoose: function (filePath) {
-           $("input[name='"+_destination+"']").val(filePath);
-           $("#filechooser").slideUp();
-         },
-         createFolder: false,
-         selectFolder: true,
-         uploadFile: true
-       });
-       $("#filechooser").slideDown();
-     });
-
      $(".datatables").dataTable({
        "bPaginate": false,
        "bLengthChange": false,
@@ -283,7 +200,15 @@ ${layout.menubar(section='tables')}
        });
      })
 
-   });
- </script>
+    $("#import-data-btn").click(function () {
+      $.get("${ url(app_name + ':load_table', database=database, table=table.name) }", function (response) {
+          $("#import-data-modal").html(response['data']);
+          $("#import-data-modal").modal("show");
+        }
+      );
+    });
 
- ${ commonfooter(messages) | n,unicode }
+   });
+</script>
+
+${ commonfooter(messages) | n,unicode }

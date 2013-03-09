@@ -325,12 +325,9 @@ def describe_table(request, database, table):
   except BeeswaxException, ex:
     error_message, logs = expand_exception(ex, db)
 
-  load_form = LoadDataForm(table)
-
   return render("describe_table.mako", request, {
       'table': table,
       'sample': table_data and table_data.rows(),
-      'load_form': load_form,
       'error_message': error_message,
       'database': database,
   })
@@ -374,35 +371,38 @@ def read_table(request, database, table):
 
 
 def load_table(request, database, table):
-  table_obj = dbms.get(request.user).get_table(database, table)
+  app_name = get_app_name(request)
+  db = dbms.get(request.user)
+  table = db.get_table(database, table)
+  response = {'status': -1, 'data': 'None'}
 
   if request.method == "POST":
-    form = beeswax.forms.LoadDataForm(table_obj, request.POST)
-    if form.is_valid():
-      # TODO(philip/todd): When PathField might refer to non-HDFS,
-      # we need a pathfield.is_local function.
-      hql = "LOAD DATA INPATH"
-      hql += " '%s'" % form.cleaned_data['path']
-      if form.cleaned_data['overwrite']:
-        hql += " OVERWRITE"
-      hql += " INTO TABLE "
-      hql += "`%s.%s`" % (database, table,)
-      if form.partition_columns:
-        hql += " PARTITION ("
-        vals = []
-        for key, column_name in form.partition_columns.iteritems():
-          vals.append("%s='%s'" % (column_name, form.cleaned_data[key]))
-        hql += ", ".join(vals)
-        hql += ")"
+    load_form = beeswax.forms.LoadDataForm(table, request.POST)
 
-      on_success_url = reverse(get_app_name(request) + ':describe_table', kwargs={'database': database, 'table': table})
-      query = hql_query(hql, database=database)
+    if load_form.is_valid():
+      on_success_url = reverse(get_app_name(request) + ':describe_table', kwargs={'database': database, 'table': table.name})
       try:
-        return execute_directly(request, query, on_success_url=on_success_url)
+        design = SavedQuery.create_empty(app_name=app_name, owner=request.user)
+        query_history = db.load_data(database, table, load_form, design)
+        url = reverse(app_name + ':watch_query', args=[query_history.id]) + '?on_success_url=' + on_success_url
+        response['status'] = 0
+        response['data'] = url
       except Exception, e:
-        raise PopupException(_("Can't load the data"), detail=e)
+        response['status'] = 1
+        response['data'] = _("Can't load the data: ") + str(e)
   else:
-    raise PopupException(_('Requires a POST'))
+    load_form = LoadDataForm(table)
+
+  if response['status'] == -1:
+    popup = render('load_data_popup.mako', request, {
+                     'table': table,
+                     'load_form': load_form,
+                     'database': database,
+                     'app_name': app_name
+                 }, force_template=True).content
+    response['data'] = popup
+
+  return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
 def describe_partitions(request, database, table):

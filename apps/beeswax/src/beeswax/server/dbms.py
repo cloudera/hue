@@ -140,6 +140,28 @@ class Dbms:
     return self.execute_statement(hql)
 
 
+  def load_data(self, database, table, form, design):
+    hql = "LOAD DATA INPATH"
+    hql += " '%s'" % form.cleaned_data['path']
+    if form.cleaned_data['overwrite']:
+      hql += " OVERWRITE"
+    hql += " INTO TABLE "
+    hql += "`%s.%s`" % (database, table.name,)
+    if form.partition_columns:
+      hql += " PARTITION ("
+      vals = []
+      for key, column_name in form.partition_columns.iteritems():
+        vals.append("%s='%s'" % (column_name, form.cleaned_data[key]))
+      hql += ", ".join(vals)
+      hql += ")"
+
+    query = hql_query(hql, database)
+    design.data = query.dumps()
+    design.save()
+
+    return self.execute_query(query, design)
+
+
   def drop_tables(self, database, tables, design):
     hql = []
 
