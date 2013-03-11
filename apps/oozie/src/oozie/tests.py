@@ -327,7 +327,7 @@ class TestAPI(OozieMockBase):
     OozieMockBase.setUp(self)
 
     # When updating wf, update wf_json as well!
-    self.wf = Workflow.objects.get(name='wf-name-1')
+    self.wf = Workflow.objects.get(name='wf-name-1', managed=True)
 
   def test_workflow_save(self):
     self.setup_simple_workflow()
@@ -492,7 +492,7 @@ class TestAPIWithOozie(OozieBase):
     OozieBase.setUp(self)
 
     # When updating wf, update wf_json as well!
-    self.wf = Workflow.objects.get(name='MapReduce').clone(self.cluster.fs, self.user)
+    self.wf = Workflow.objects.get(name='MapReduce', managed=True).clone(self.cluster.fs, self.user)
 
   def test_import_jobsub_actions(self):
     # Setup jobsub examples
@@ -523,7 +523,7 @@ class TestApiPermissionsWithOozie(OozieBase):
     OozieBase.setUp(self)
 
     # When updating wf, update wf_json as well!
-    self.wf = Workflow.objects.get(name='MapReduce').clone(self.cluster.fs, self.user)
+    self.wf = Workflow.objects.get(name='MapReduce', managed=True).clone(self.cluster.fs, self.user)
 
   def test_workflow_save(self):
     # Share
@@ -1715,7 +1715,7 @@ class TestPermissions(OozieBase):
       finish()
 
     # Share it !
-    self.wf = Workflow.objects.get(name='wf-name-1')
+    self.wf = Workflow.objects.get(name='wf-name-1', managed=True)
     self.wf.is_shared = True
     self.wf.save()
     Workflow.objects.check_workspace(self.wf, self.cluster.fs)
@@ -1816,7 +1816,7 @@ class TestPermissions(OozieBase):
       finish()
 
     # Share it !
-    wf = Workflow.objects.get(id=coord.workflow.id)
+    wf = Workflow.objects.get(id=coord.workflow.id, managed=True)
     wf.is_shared = True
     wf.save()
     Workflow.objects.check_workspace(wf, self.cluster.fs)
@@ -2104,7 +2104,7 @@ class TestImportWorkflow04WithOozie(OozieBase):
 class TestOozieSubmissions(OozieBase):
 
   def test_submit_mapreduce_action(self):
-    wf = Workflow.objects.get(name='MapReduce')
+    wf = Workflow.objects.get(name='MapReduce', managed=True)
     post_data = {u'form-MAX_NUM_FORMS': [u''], u'form-INITIAL_FORMS': [u'1'],
                  u'form-0-name': [u'REDUCER_SLEEP_TIME'], u'form-0-value': [u'1'], u'form-TOTAL_FORMS': [u'1']}
 
@@ -2134,7 +2134,7 @@ class TestOozieSubmissions(OozieBase):
 
 
   def test_submit_java_action(self):
-    wf = Workflow.objects.get(name='Sequential Java')
+    wf = Workflow.objects.get(name='Sequential Java', managed=True)
 
     response = self.c.post(reverse('oozie:submit_workflow', args=[wf.id]),
                            data={u'form-MAX_NUM_FORMS': [u''],
@@ -2147,7 +2147,7 @@ class TestOozieSubmissions(OozieBase):
 
 
   def test_submit_distcp_action(self):
-    wf = Workflow.objects.get(name='DistCp')
+    wf = Workflow.objects.get(name='DistCp', managed=True)
 
     response = self.c.post(reverse('oozie:submit_workflow', args=[wf.id]),
                            data= {u'form-MAX_NUM_FORMS': [u''], u'form-TOTAL_FORMS': [u'3'], u'form-INITIAL_FORMS': [u'3'],
@@ -2537,7 +2537,7 @@ class TestUtils(OozieMockBase):
     OozieMockBase.setUp(self)
 
     # When updating wf, update wf_json as well!
-    self.wf = Workflow.objects.get(name='wf-name-1')
+    self.wf = Workflow.objects.get(name='wf-name-1', managed=True)
 
 
   def test_workflow_to_dict(self):

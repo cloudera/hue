@@ -187,7 +187,7 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
 
     # Submit the job
     design_dict = json.loads(response.content)
-    design_id = int(design_dict['id'][0])
+    design_id = int(design_dict['id'])
     response = self.client.post(reverse('oozie:submit_workflow',
                                 args=[design_id]),
                                 data={u'form-MAX_NUM_FORMS': [u''],
