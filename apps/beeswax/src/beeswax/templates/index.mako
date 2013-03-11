@@ -34,7 +34,7 @@ ${layout.menubar(section='tables')}
                     <li><a href="#installSamples" data-toggle="modal">${_('Install Samples')}</a></li>
                     % endif
                     <li class="nav-header">${_('Tables')}</li>
-                    <li><a href="${ url(app_name + ':show_tables') }">${_('Show Tables')}</a></li>
+                    <li><a href="${ url('catalog:show_tables') }">${_('Show Tables')}</a></li>
                     <li><a href="${ url(app_name + ':create_table') }">${_('Create Table')}</a></li>
                     <li class="nav-header">${_('Queries')}</li>
                     <li><a href="${ url(app_name + ':list_designs') }">${_('Saved Queries')}</a></li>

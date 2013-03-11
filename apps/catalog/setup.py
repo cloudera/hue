@@ -17,13 +17,13 @@ from setuptools import setup, find_packages
 from hueversion import VERSION
 
 setup(
-      name = "jobsub",
+      name = "catalog",
       version = VERSION,
-      url = 'http://github.com/cloudera/hue',
       author = "Hue",
-      description = "Hadoop Job Submission",
+      url = 'http://github.com/cloudera/hue',
+      description = "Metastore browser",
       packages = find_packages('src'),
       package_dir = {'': 'src'},
-      install_requires = ['setuptools', 'desktop', 'oozie'],
-      entry_points = { 'desktop.sdk.application': 'jobsub=jobsub' },
+      install_requires = ['setuptools', 'desktop'],
+      entry_points = { 'desktop.sdk.application': 'catalog=catalog' },
 )

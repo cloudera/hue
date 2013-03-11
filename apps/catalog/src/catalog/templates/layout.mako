@@ -29,15 +29,10 @@ def is_selected(section, matcher):
 
 <%def name="menubar(section='')">
 <div class="subnav subnav-fixed">
-	<div class="container-fluid">
-		<ul class="nav nav-pills">
-			<li class="${is_selected(section, 'query')}"><a href="${ url(app_name + ':execute_query') }">${_('Query Editor')}</a></li>
-			<li class="${is_selected(section, 'my queries')}"><a href="${ url(app_name + ':my_queries') }">${_('My Queries')}</a></li>
-			<li class="${is_selected(section, 'saved queries')}"><a href="${ url(app_name + ':list_designs') }">${_('Saved Queries')}</a></li>
-			<li class="${is_selected(section, 'history')}"><a href="${ url(app_name + ':list_query_history') }">${_('History')}</a></li>
-			<li class="${is_selected(section, 'configuration')}"><a href="${ url(app_name + ':configuration') }">${_('Settings')}</a></li>
-		</ul>
-	</div>
+  <div class="container-fluid">
+    <ul class="nav nav-pills">
+      <li class="${is_selected(section, 'tables')}"><a href="${ url(app_name + ':show_tables') }">${_('Tables')}</a></li>
+    </ul>
+  </div>
 </div>
 </%def>
-

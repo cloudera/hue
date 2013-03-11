@@ -32,6 +32,7 @@ default: env-install
 
 APPS := about \
   beeswax \
+  catalog \
   filebrowser \
   help \
   jobbrowser \
@@ -103,6 +104,7 @@ ext-clean: $(EXT_CLEAN_TARGETS)
 ################################################
 I18N_APPS := about \
   beeswax \
+  catalog \
   filebrowser \
   jobbrowser \
   jobsub \

@@ -20,8 +20,7 @@ from django.utils.translation import ugettext as _
 <%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="layout" file="layout.mako" />
 
-${ commonheader(_('Tables'), app_name, user, '100px') | n,unicode }
-${layout.menubar(section='tables')}
+${ commonheader(_('Tables'), 'catalog', user) | n,unicode }
 
 <div class="container-fluid">
     <h1>${_('Tables')}</h1>
@@ -29,14 +28,10 @@ ${layout.menubar(section='tables')}
         <div class="span3">
             <div class="well sidebar-nav">
                 <ul class="nav nav-list">
-                    <span
-                        % if app_name == 'impala':
-                            class="hide"
-                        % endif
-                    >
+                    <span>
                     <li class="nav-header">${_('database')}</li>
                     <li>
-                       <form action="${ url(app_name + ':show_tables') }" id="db_form" method="POST">
+                       <form action="${ url('catalog:show_tables') }" id="db_form" method="POST">
                          ${ db_form | n,unicode }
                        </form>
                     </li>
@@ -44,9 +39,9 @@ ${layout.menubar(section='tables')}
                     <li class="nav-header">${_('Actions')}</li>
                     % if not examples_installed:
                     <li><a href="#installSamples" data-toggle="modal">${_('Install samples')}</a></li>
-                      % endif
-                      <li><a href="${ url(app_name + ':import_wizard', database=database) }">${_('Create a new table from a file')}</a></li>
-                    <li><a href="${ url(app_name + ':create_table', database=database) }">${_('Create a new table manually')}</a></li>
+                    % endif
+                    <li><a href="${ url('beeswax:import_wizard', database=database) }">${_('Create a new table from a file')}</a></li>
+                    <li><a href="${ url('beeswax:create_table', database=database) }">${_('Create a new table manually')}</a></li>
                 </ul>
             </div>
         </div>
@@ -70,13 +65,13 @@ ${layout.menubar(section='tables')}
                   <tr>
                     <td data-row-selector-exclude="true" width="1%">
                       <div class="hueCheckbox tableCheck"
-                           data-view-url="${ url(app_name + ':describe_table', database=database, table=table) }"
-                           data-browse-url="${ url(app_name + ':read_table', database=database, table=table) }"
+                           data-view-url="${ url('catalog:describe_table', database=database, table=table) }"
+                           data-browse-url="${ url('catalog:read_table', database=database, table=table) }"
                            data-drop-name="${ table }"
                            data-row-selector-exclude="true"></div>
                     </td>
                     <td>
-                      <a href="${ url(app_name + ':describe_table', database=database, table=table) }" data-row-selector="true">${ table }</a>
+                      <a href="${ url('catalog:describe_table', database=database, table=table) }" data-row-selector="true">${ table }</a>
                     </td>
                   </tr>
                 % endfor
@@ -105,7 +100,7 @@ ${layout.menubar(section='tables')}
 % endif
 
 <div id="dropTable" class="modal hide fade">
-  <form id="dropTableForm" action="${ url(app_name + ':drop_table', database=database) }" method="POST">
+  <form id="dropTableForm" action="${ url('catalog:drop_table', database=database) }" method="POST">
     <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>
       <h3 id="dropTableMessage">${_('Confirm action')}</h3>
@@ -160,17 +155,17 @@ ${layout.menubar(section='tables')}
     });
 
     % if not examples_installed:
-        $.getJSON("${ url(app_name + ':install_examples') }", function (data) {
+        $.getJSON("${ url('beeswax:install_examples') }", function (data) {
           $("#installSamplesMessage").text(data.title);
         });
 
         $("#installSamplesBtn").click(function () {
           $.post(
-              "${ url(app_name + ':install_examples') }",
+              "${ url('beeswax:install_examples') }",
               { submit:"Submit" },
               function (result) {
                 if (result.creationSucceeded) {
-                  window.location.href = "${ url(app_name + ':show_tables') }";
+                  window.location.href = "${ url('catalog:show_tables') }";
                 }
                 else {
                   var message = "${_('There was an error processing your request:')} " + result.message;
@@ -225,7 +220,7 @@ ${layout.menubar(section='tables')}
     }
 
     $("#dropBtn").click(function () {
-      $.getJSON("${ url(app_name + ':drop_table', database=database) }", function(data) {
+      $.getJSON("${ url('catalog:drop_table', database=database) }", function(data) {
         $("#dropTableMessage").text(data.title);
       });
       viewModel.chosenTables.removeAll();

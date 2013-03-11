@@ -1,3 +1,4 @@
+#
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -13,17 +14,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from setuptools import setup, find_packages
-from hueversion import VERSION
+#
 
-setup(
-      name = "jobsub",
-      version = VERSION,
-      url = 'http://github.com/cloudera/hue',
-      author = "Hue",
-      description = "Hadoop Job Submission",
-      packages = find_packages('src'),
-      package_dir = {'': 'src'},
-      install_requires = ['setuptools', 'desktop', 'oozie'],
-      entry_points = { 'desktop.sdk.application': 'jobsub=jobsub' },
-)
+ifeq ($(ROOT),)
+  $(error "Error: Expect the environment variable $$ROOT to point to the Desktop installation")
+endif
+
+APP_NAME = catalog
+include $(ROOT)/Makefile.sdk

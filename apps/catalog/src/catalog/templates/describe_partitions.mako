@@ -19,10 +19,7 @@
   from django.utils.translation import ugettext as _
 %>
 
-<%namespace name="layout" file="layout.mako" />
-
-${ commonheader(_('Beeswax Table Partitions: %(tableName)s') % dict(tableName=table.name), app_name, user, '100px') | n,unicode }
-${layout.menubar(section='tables')}
+${ commonheader(_('Table Partitions: %(tableName)s') % dict(tableName=table.name), app_name, user) | n,unicode }
 
 <div class="container-fluid">
 <h1>${_('Partitions')}</h1>

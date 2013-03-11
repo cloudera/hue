@@ -38,20 +38,6 @@ class QueryForm(MultiForm):
       saveform=SaveForm)
 
 
-class DbForm(forms.Form):
-  """For 'show tables'"""
-  database = forms.ChoiceField(required=False,
-                           label='',
-                           choices=(('default', 'default'),),
-                           initial=0,
-                           widget=forms.widgets.Select(attrs={'class': 'span6'}))
-
-  def __init__(self, *args, **kwargs):
-    databases = kwargs.pop('databases')
-    super(DbForm, self).__init__(*args, **kwargs)
-    self.fields['database'].choices = ((db, db) for db in databases)
-
-
 class SaveForm(forms.Form):
   """Used for saving query design."""
   name = forms.CharField(required=False,
@@ -345,24 +331,3 @@ class ColumnTypeForm(DependencyAwareForm):
 ColumnTypeFormSet = simple_formset_factory(ColumnTypeForm, initial=[{}], add_label=_t("add a column"))
 # Default to no partitions
 PartitionTypeFormSet = simple_formset_factory(PartitionTypeForm, add_label=_t("add a partition"))
-
-
-class LoadDataForm(forms.Form):
-  """Form used for loading data into an existing table."""
-  path = PathField(label=_t("Path"))
-  overwrite = forms.BooleanField(required=False, initial=False, label=_t("Overwrite?"))
-
-  def __init__(self, table_obj, *args, **kwargs):
-    """
-    @param table_obj is a hive_metastore.thrift Table object,
-    used to add fields corresponding to partition keys.
-    """
-    super(LoadDataForm, self).__init__(*args, **kwargs)
-    self.partition_columns = dict()
-    for i, column in enumerate(table_obj.partition_keys):
-      # We give these numeric names because column names
-      # may be unpleasantly arbitrary.
-      name = "partition_%d" % i
-      char_field = forms.CharField(required=True, label=_t("%(column_name)s (partition key with type %(column_type)s)") % {'column_name': column.name, 'column_type': column.type})
-      self.fields[name] = char_field
-      self.partition_columns[name] = column.name

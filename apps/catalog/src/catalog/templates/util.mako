@@ -59,7 +59,7 @@ from django.utils.translation import ugettext as _
   % if query_context:
     % if query_context[0] == 'table':
       <% tablename, database = query_context[1].split(':') %>
-      <a href="${ url('catalog:describe_table', database, tablename) }">${tablename}</a>
+      <a href="${ url(app_name + ':describe_table', database, tablename) }">${tablename}</a>
     % elif query_context[0] == 'design':
       <% design = query_context[1] %>
       % if design.is_auto:

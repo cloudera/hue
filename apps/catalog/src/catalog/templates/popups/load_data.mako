@@ -17,10 +17,7 @@
 from django.utils.translation import ugettext as _
 %>
 
-
-<%namespace name="comps" file="beeswax_components.mako" />
-
-
+<%namespace name="comps" file="../components.mako" />
 
 <form method="POST" class="form-horizontal" id="load-data-form">
     <div class="modal-header">
@@ -111,7 +108,7 @@ from django.utils.translation import ugettext as _
      });
 
    $("#load-data-submit-btn").click(function(e){
-     $.post("${ url(app_name + ':load_table', database=database, table=table.name) }",
+     $.post("${ url('catalog:load_table', database=database, table=table.name) }",
        $("#load-data-form").serialize(),
         function (response) {
           if (response['status'] != 0) {

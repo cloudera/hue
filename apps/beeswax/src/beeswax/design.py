@@ -18,10 +18,13 @@
 """
 The HQLdesign class can (de)serialize a design to/from a QueryDict.
 """
+try:
+  import json
+except ImportError:
+  import simplejson as json
 
 import logging
 import re
-import simplejson
 
 import django.http
 from django import forms
@@ -36,7 +39,7 @@ SERIALIZATION_VERSION = '0.4.1'
 
 
 def hql_query(hql, database='default'):
-  data_dict = simplejson.loads('{"query": {"email_notify": false, "query": null, "type": 0, "is_parameterized": true, "database": "default"}, '
+  data_dict = json.loads('{"query": {"email_notify": false, "query": null, "type": 0, "is_parameterized": true, "database": "default"}, '
                                '"functions": [], "VERSION": "0.4.1", "file_resources": [], "settings": []}')
   if not (isinstance(hql, str) or isinstance(hql, unicode)):
     raise Exception('Requires a SQL text query of type <str>, <unicode> and not %s' % type(hql))
@@ -77,7 +80,7 @@ class HQLdesign(object):
     """Returns the serialized form of the design in a string"""
     dic = self._data_dict.copy()
     dic['VERSION'] = SERIALIZATION_VERSION
-    return simplejson.dumps(dic)
+    return json.dumps(dic)
 
   @property
   def hql_query(self):
@@ -134,7 +137,8 @@ class HQLdesign(object):
   @staticmethod
   def loads(data):
     """Returns an HQLdesign from the serialized form"""
-    dic = simplejson.loads(data)
+    dic = json.loads(data)
+    dic = dict(map(lambda k: (str(k), dic.get(k)), dic.keys()))
     if dic['VERSION'] != SERIALIZATION_VERSION:
       LOG.error('Design version mismatch. Found %s; expect %s' % (dic['VERSION'], SERIALIZATION_VERSION))
 
@@ -197,7 +201,7 @@ def denormalize_form_dict(data_dict, form, attr_list):
   res = django.http.QueryDict('', mutable=True)
   for attr in attr_list:
     try:
-      res[form.add_prefix(attr)] = data_dict[attr]
+      res[str(form.add_prefix(attr))] = data_dict[attr]
     except KeyError:
       pass
   return res
@@ -215,7 +219,7 @@ def denormalize_formset_dict(data_dict_list, formset, attr_list):
     res.update(denormalize_form_dict(data_dict, form, attr_list))
     res[prefix + '-_exists'] = 'True'
 
-  res[formset.management_form.add_prefix('next_form_id')] = str(len(data_dict_list))
+  res[str(formset.management_form.add_prefix('next_form_id'))] = str(len(data_dict_list))
   return res
 
   def __str__(self):

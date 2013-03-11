@@ -102,6 +102,7 @@ def render_to_string_normal(template_name, django_context):
     data_dict = django_context
 
   template = lookup.get_template(template_name)
+  data_dict = dict(map(lambda k: (str(k), data_dict.get(k)), data_dict.keys()))
   result = template.render(**data_dict)
   return i18n.smart_unicode(result)
 

@@ -44,7 +44,7 @@ import beeswax.design
 import beeswax.management.commands.beeswax_install_examples
 
 from beeswax import common, data_export, models, conf
-from beeswax.forms import LoadDataForm, QueryForm, DbForm
+from beeswax.forms import QueryForm
 from beeswax.design import HQLdesign, hql_query
 from beeswax.models import SavedQuery, make_query_context
 from beeswax.server import dbms
@@ -283,141 +283,6 @@ def list_query_history(request):
   })
 
 
-"""
-Table Views
-"""
-
-def show_tables(request, database=None):
-  if database is None:
-    database = request.COOKIES.get('hueBeeswaxLastDatabase', 'default') # Assume always 'default'
-  db = dbms.get(request.user)
-
-  databases = db.get_databases()
-
-  if request.method == 'POST':
-    db_form = DbForm(request.POST, databases=databases)
-    if db_form.is_valid():
-      database = db_form.cleaned_data['database']
-  else:
-    db_form = DbForm(initial={'database': database}, databases=databases)
-
-  tables = db.get_tables(database=database)
-  examples_installed = beeswax.models.MetaInstall.get().installed_example
-
-  return render("show_tables.mako", request, {
-      'tables': tables,
-      'examples_installed': examples_installed,
-      'db_form': db_form,
-      'database': database,
-      'tables_json': json.dumps(tables),
-  })
-
-
-def describe_table(request, database, table):
-  db = dbms.get(request.user)
-  error_message = ''
-  table_data = ''
-
-  table = db.get_table(database, table)
-
-  try:
-    table_data = db.get_sample(database, table)
-  except Exception, ex:
-    error_message, logs = expand_exception(ex, db)
-
-  return render("describe_table.mako", request, {
-      'table': table,
-      'sample': table_data and table_data.rows(),
-      'error_message': error_message,
-      'database': database,
-  })
-
-
-def drop_table(request, database):
-  db = dbms.get(request.user)
-
-  if request.method == 'POST':
-    tables = request.POST.getlist('table_selection')
-    tables_objects = [db.get_table(database, table) for table in tables]
-    app_name = get_app_name(request)
-    try:
-      # Can't be simpler without an important refactoring
-      design = SavedQuery.create_empty(app_name=app_name, owner=request.user)
-      query_history = db.drop_tables(database, tables_objects, design)
-      url = reverse(app_name + ':watch_query', args=[query_history.id]) + '?on_success_url=' + reverse(app_name + ':show_tables')
-      return redirect(url)
-    except Exception, ex:
-      error_message, log = expand_exception(ex, db)
-      error = _("Failed to remove %(tables)s.  Error: %(error)s") % {'tables': ','.join(tables), 'error': error_message}
-      raise PopupException(error, title=_("Beeswax Error"), detail=log)
-  else:
-    title = _("Do you really want to delete the table(s)?")
-    return render('confirm.html', request, dict(url=request.path, title=title))
-
-
-def read_table(request, database, table):
-  db = dbms.get(request.user)
-
-  table = db.get_table(database, table)
-
-  try:
-    history = db.select_star_from(database, table)
-    get = request.GET.copy()
-    get['context'] = 'table:%s:%s' % (table.name, database)
-    request.GET = get
-    return watch_query(request, history.id)
-  except Exception, e:
-    raise PopupException(_('Can read table'), detail=e)
-
-
-def load_table(request, database, table):
-  app_name = get_app_name(request)
-  db = dbms.get(request.user)
-  table = db.get_table(database, table)
-  response = {'status': -1, 'data': 'None'}
-
-  if request.method == "POST":
-    load_form = beeswax.forms.LoadDataForm(table, request.POST)
-
-    if load_form.is_valid():
-      on_success_url = reverse(get_app_name(request) + ':describe_table', kwargs={'database': database, 'table': table.name})
-      try:
-        design = SavedQuery.create_empty(app_name=app_name, owner=request.user)
-        query_history = db.load_data(database, table, load_form, design)
-        url = reverse(app_name + ':watch_query', args=[query_history.id]) + '?on_success_url=' + on_success_url
-        response['status'] = 0
-        response['data'] = url
-      except Exception, e:
-        response['status'] = 1
-        response['data'] = _("Can't load the data: ") + str(e)
-  else:
-    load_form = LoadDataForm(table)
-
-  if response['status'] == -1:
-    popup = render('load_data_popup.mako', request, {
-                     'table': table,
-                     'load_form': load_form,
-                     'database': database,
-                     'app_name': app_name
-                 }, force_template=True).content
-    response['data'] = popup
-
-  return HttpResponse(json.dumps(response), mimetype="application/json")
-
-
-def describe_partitions(request, database, table):
-  db = dbms.get(request.user)
-
-  table_obj = db.get_table(database, table)
-  if not table_obj.partition_keys:
-    raise PopupException(_("Table '%(table)s' is not partitioned.") % {'table': table})
-
-  partitions = db.get_partitions(database, table_obj, max_parts=None)
-
-  return render("describe_partitions.mako", request,
-                dict(table=table_obj, partitions=partitions, request=request))
-
-
 def download(request, id, format):
   assert format in common.DL_FORMATS
 
@@ -426,7 +291,6 @@ def download(request, id, format):
   LOG.debug('Download results for query %s: [ %s ]' % (query_history.server_id, query_history.query))
 
   return data_export.download(query_history.get_handle(), format, db)
-
 
 
 """
@@ -818,7 +682,7 @@ def _save_results_ctas(request, query_history, target_table, result_meta):
     hql = 'CREATE TABLE `%s` AS SELECT * FROM %s' % (target_table, result_meta.in_tablename)
     query = hql_query(hql)
     # Display the CTAS running. Could take a long time.
-    return execute_directly(request, query, query_server, on_success_url=reverse(get_app_name(request) + ':show_tables'))
+    return execute_directly(request, query, query_server, on_success_url=reverse('catalog:show_tables'))
 
   # Case 2: The results are in some temporary location
   # 1. Create table
@@ -866,7 +730,7 @@ def _save_results_ctas(request, query_history, target_table, result_meta):
     raise ex
 
   # Show tables upon success
-  return format_preserving_redirect(request, reverse(get_app_name(request) + ':show_tables'))
+  return format_preserving_redirect(request, reverse('catalog:show_tables'))
 
 
 def confirm_query(request, query, on_success_url=None):
@@ -1348,7 +1212,6 @@ def _list_query_history(user, querydict, page_size, prefix=""):
   if not querydict.get(prefix + 'auto_query', False):
     db_queryset = db_queryset.filter(design__isnull=False)
 
-  username = user.username
   user_filter = querydict.get(prefix + 'user', user.username)
   if user_filter != ':all':
     db_queryset = db_queryset.filter(owner__username=user_filter)

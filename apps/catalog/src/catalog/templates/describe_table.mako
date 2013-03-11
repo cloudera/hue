@@ -18,8 +18,7 @@ from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
 
-<%namespace name="layout" file="layout.mako" />
-<%namespace name="comps" file="beeswax_components.mako" />
+<%namespace name="comps" file="components.mako" />
 
 <%
   if table.is_view:
@@ -27,8 +26,7 @@ from django.utils.translation import ugettext as _
   else:
     view_or_table_noun = _("Table")
 %>
-${ commonheader(_("%s Metadata: %s") % (view_or_table_noun, table.name), app_name, user, '100px') | n,unicode }
-${layout.menubar(section='tables')}
+${ commonheader(_("%s Metadata: %s") % (view_or_table_noun, table.name), app_name, user) | n,unicode }
 
 <%def name="column_table(cols)">
     <table class="table table-striped table-condensed datatables">
@@ -60,7 +58,7 @@ ${layout.menubar(section='tables')}
                 <ul class="nav nav-list">
                     <li class="nav-header">${_('Actions')}</li>
                     <li><a href="#" id="import-data-btn">${_('Import Data')}</a></li>
-                    <li><a href="${ url(app_name + ':read_table', database=database, table=table.name) }">${_('Browse Data')}</a></li>
+                    <li><a href="${ url('catalog:read_table', database=database, table=table.name) }">${_('Browse Data')}</a></li>
                     <li><a href="#dropTable" data-toggle="modal">${_('Drop')} ${view_or_table_noun}</a></li>
                     <li><a href="${ table.hdfs_link }" rel="${ table.path_location }">${_('View File Location')}</a></li>
                 </ul>
@@ -89,7 +87,7 @@ ${layout.menubar(section='tables')}
                 % if table.partition_keys:
                   <div class="tab-pane" id="partitionColumns">
                     ${column_table(table.partition_keys)}
-                    <a href="${ url(app_name + ':describe_partitions', database=database, table=table.name) }">${_('Show Partitions')}</a>
+                    <a href="${ url('catalog:describe_partitions', database=database, table=table.name) }">${_('Show Partitions')}</a>
                   </div>
                 % endif
 
@@ -131,7 +129,7 @@ ${layout.menubar(section='tables')}
 
 
 <div id="dropTable" class="modal hide fade">
-    <form id="dropTableForm" method="POST" action="${ url(app_name + ':drop_table', database=database) }">
+    <form id="dropTableForm" method="POST" action="${ url('catalog:drop_table', database=database) }">
     <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
         <h3>${_('Drop Table')}</h3>
@@ -176,7 +174,7 @@ ${layout.menubar(section='tables')}
        }
      });
 
-     $.getJSON("${ url(app_name + ':drop_table', database=database) }", function(data) {
+     $.getJSON("${ url('catalog:drop_table', database=database) }", function(data) {
        $("#dropTableMessage").text(data.title);
      });
 
@@ -201,7 +199,7 @@ ${layout.menubar(section='tables')}
      })
 
     $("#import-data-btn").click(function () {
-      $.get("${ url(app_name + ':load_table', database=database, table=table.name) }", function (response) {
+      $.get("${ url('catalog:load_table', database=database, table=table.name) }", function (response) {
           $("#import-data-modal").html(response['data']);
           $("#import-data-modal").modal("show");
         }

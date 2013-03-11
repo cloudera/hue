@@ -132,23 +132,6 @@ class TestBeeswaxWithHadoop(BeeswaxSampleProvider):
     assert_true("tasktracker.http.threads" in response_verbose.content)
     assert_true("A base for other temporary directories" in response_verbose.content)
 
-  def test_describe_partitions(self):
-    response = self.client.get("/beeswax/table/default/test_partitions/partitions")
-    assert_true("baz_one" in response.content)
-    assert_true("boom_two" in response.content)
-    response = self.client.get("/beeswax/table/default/test/partitions")
-    assert_true("is not partitioned." in response.content)
-
-  def test_browse_partitions_with_limit(self):
-    # Limit to 90
-    finish = beeswax.conf.BROWSE_PARTITIONED_TABLE_LIMIT.set_for_testing("90")
-    try:
-      response = self.client.get("/beeswax/table/default/test_partitions")
-      assert_true("0x%x" % 89 in response.content, response.content)
-      assert_false("0x%x" % 90 in response.content, response.content)
-    finally:
-      finish()
-
   def test_query_with_resource(self):
     script = self.cluster.fs.open("/square.py", "w")
     script.write(
@@ -190,38 +173,6 @@ for x in sys.stdin:
     """
     # Minimal server operation
     assert_equal("echo", self.db.echo("echo"))
-
-    # Table should have been created
-    response = self.client.get("/beeswax/tables/")
-    assert_true("test" in response.context["tables"])
-
-    # Switch databases
-    response = self.client.get("/beeswax/tables/default")
-    assert_true("test" in response.context["tables"])
-
-    response = self.client.get("/beeswax/tables/not_there")
-    assert_false("test" in response.context["tables"])
-
-    # And have detail
-    response = self.client.get("/beeswax/table/default/test")
-    assert_true("foo" in response.content)
-
-    # Remember the number of history items. Use a generic fragment 'test' to pass verification.
-    history_cnt = verify_history(self.client, fragment='test')
-
-    # Show table data.
-    response = self.client.get("/beeswax/table/default/test/read", follow=True)
-    response = wait_for_query_to_finish(self.client, response, max=30.0)
-    # Note that it may not return all rows at once. But we expect at least 10.
-    assert_true(len(response.context['results']) > 10)
-    # Column names
-    assert_true("<td>foo</td>" in response.content)
-    assert_true("<td>bar</td>" in response.content)
-    # This should NOT go into the query history.
-    assert_equal(verify_history(self.client, fragment='test'), history_cnt,
-                 'Implicit queries should not be saved in the history')
-    assert_equal(str(response.context['query_context'][0]), 'table')
-    assert_equal(str(response.context['query_context'][1]), 'test:default')
 
     # Query the data
     # We use a semicolon here for kicks; the code strips it out.
@@ -319,7 +270,6 @@ for x in sys.stdin:
     hql = """
       SELECT foo FROM test;
     """
-
     query = hql_query(hql)
     handle = self.db.execute_and_wait(query)
 
@@ -474,22 +424,6 @@ for x in sys.stdin:
       LOG.info("Finished: " + str(i))
     except:
       LOG.exception("Saw exception in child thread.")
-
-  def test_drop_multi_tables(self):
-    hql = """
-      CREATE TABLE test_drop_1 (a int);
-      CREATE TABLE test_drop_2 (a int);
-      CREATE TABLE test_drop_3 (a int);
-    """
-    resp = _make_query(self.client, hql)
-    resp = wait_for_query_to_finish(self.client, resp, max=30.0)
-
-    # Drop them
-    resp = self.client.get('/beeswax/tables/drop/default')
-    assert_true('want to delete' in resp.content, resp.content)
-    resp = self.client.post('/beeswax/tables/drop/default', {u'table_selection': [u'test_drop_1', u'test_drop_2', u'test_drop_3']})
-    assert_equal(resp.status_code, 302)
-
 
   def test_multiple_statements_no_result_set(self):
     hql = """
@@ -779,33 +713,6 @@ for x in sys.stdin:
     client_not_me.logout()
 
 
-  def test_load_data(self):
-    """
-    Test load data queries.
-    These require Hadoop, because they ask the metastore
-    about whether a table is partitioned.
-    """
-    # Check that view works
-    resp = self.client.get("/beeswax/table/default/test/load")
-    assert_true('Path' in resp.content)
-
-    # Try the submission
-    self.client.post("/beeswax/table/default/test/load", dict(path="/tmp/foo", overwrite=True))
-    query = QueryHistory.objects.latest('id')
-
-    assert_equal_mod_whitespace("LOAD DATA INPATH '/tmp/foo' OVERWRITE INTO TABLE `default.test`", query.query)
-
-    resp = self.client.post("/beeswax/table/default/test/load", dict(path="/tmp/foo", overwrite=False))
-    query = QueryHistory.objects.latest('id')
-    assert_equal_mod_whitespace("LOAD DATA INPATH '/tmp/foo' INTO TABLE `default.test`", query.query)
-
-    # Try it with partitions
-    resp = self.client.post("/beeswax/table/default/test_partitions/load", dict(path="/tmp/foo", partition_0="alpha", partition_1="beta"))
-    query = QueryHistory.objects.latest('id')
-    assert_equal_mod_whitespace("LOAD DATA INPATH '/tmp/foo' INTO TABLE `default.test_partitions` PARTITION (baz='alpha', boom='beta')",
-        query.query)
-
-
   def test_save_results_to_dir(self):
     """Check that saving to directory works"""
 
@@ -904,7 +811,7 @@ for x in sys.stdin:
     self.client.post('/beeswax/install_examples')
 
     # New tables exists
-    resp = self.client.get('/beeswax/tables/')
+    resp = self.client.get('/catalog/tables/')
     assert_true('sample_08' in resp.content)
     assert_true('sample_07' in resp.content)
 
@@ -972,7 +879,7 @@ for x in sys.stdin:
           STORED AS TextFile LOCATION "/tmp/foo"
     """, resp.context['query'].query)
 
-    assert_true('on_success_url=%2Fbeeswax%2Ftable%2Fdefault%2Fmy_table' in resp.context['fwd_params'], resp.context['fwd_params'])
+    assert_true('on_success_url=%2Fcatalog%2Ftable%2Fdefault%2Fmy_table' in resp.context['fwd_params'], resp.context['fwd_params'])
 
   def test_create_table_timestamp(self):
     # Check form
@@ -986,14 +893,14 @@ for x in sys.stdin:
     self._make_custom_data_file(filename, [0, 0, 0])
     self._make_table('timestamp_invalid_data', 'CREATE TABLE timestamp_invalid_data (timestamp1 TIMESTAMP)', filename)
 
-    response = self.client.get("/beeswax/table/default/timestamp_invalid_data")
+    response = self.client.get("/catalog/table/default/timestamp_invalid_data")
     assert_true('Error!' in response.content, response.content)
 
     # Good format
     self._make_custom_data_file(filename, ['2012-01-01 10:11:30', '2012-01-01 10:11:31'])
     self._make_table('timestamp_valid_data', 'CREATE TABLE timestamp_valid_data (timestamp1 TIMESTAMP)', filename)
 
-    response = self.client.get("/beeswax/table/default/timestamp_valid_data")
+    response = self.client.get("/catalog/table/default/timestamp_valid_data")
     assert_true('2012-01-01 10:11:30' in response.content, response.content)
 
   def test_partitioned_create_table(self):
@@ -1174,19 +1081,12 @@ for x in sys.stdin:
     resp = wait_for_query_to_finish(self.client, resp, max=180.0)
 
     # Check data is in the table (by describing it)
-    resp = self.client.get('/beeswax/table/default/test_create_import')
+    resp = self.client.get('/catalog/table/default/test_create_import')
     cols = resp.context['table'].cols
     assert_equal(len(cols), 3)
     assert_equal([ col.name for col in cols ], [ 'col_a', 'col_b', 'col_c' ])
     assert_true("nada</td>" in resp.content)
     assert_true("sp ace</td>" in resp.content)
-
-  def test_describe_view(self):
-    resp = self.client.get('/beeswax/table/default/myview')
-    assert_equal(None, resp.context['sample'])
-    assert_true(resp.context['table'].is_view)
-    assert_true("View Metadata" in resp.content)
-    assert_true("Drop View" in resp.content)
 
 
   def test_select_query_server(self):
@@ -1452,9 +1352,11 @@ def test_hive_site_sasl():
     assert_equal(beeswax.hive_site.get_conf()['hive.metastore.warehouse.dir'], u'/abc')
     assert_equal(kerberos_principal, 'test/test.com@TEST.COM')
   finally:
+    beeswax.hive_site.reset()
     if saved is not None:
       beeswax.conf.BEESWAX_HIVE_CONF_DIR = saved
     shutil.rmtree(tmpdir)
+
 
 def test_collapse_whitespace():
   assert_equal("", collapse_whitespace("\t\n\n  \n\t \n"))
