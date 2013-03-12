@@ -32,6 +32,10 @@ limitations under the License.
     <script type="text/javascript">
       $(document).ready(function () {
         $(".dataTables_wrapper").jHueTableScroller();
+
+        var resetTimeout = -1;
+        var pendingRequestsInterval = -1;
+
         // sets feedback on every primary and danger action across Hue
         // can be disabled adding the class "disable-feedback" to the button
         $(document).on("click", ".btn-primary:not(.disable-feedback), .btn-danger:not(.disable-feedback)", function () {
@@ -40,32 +44,57 @@ limitations under the License.
             $(this).attr("data-loading-text", text + " ...");
             $(this).button("loading");
             startPendingRequestsPolling();
+            resetTimeout = window.setTimeout(function () {
+              resetPrimaryButtonsStatus();
+            }, 100);
           }
         });
 
-        var pendingRequestsInterval = -1;
+        $(document).on("hidden", ".modal", function () {
+          resetPrimaryButtonsStatus();
+        });
+
+        $(window).unload(function () {
+          window.clearInterval(pendingRequestsInterval);
+          window.clearTimeout(resetTimeout);
+        });
+
+        $("form").submit(function () {
+          window.setInterval(function () {
+            window.clearTimeout(resetTimeout);
+          }, 10);
+        });
+
+        var hasAjaxBeenSent = false;
+        $(document).ajaxSend(function () {
+          hasAjaxBeenSent = true;
+        });
 
         function startPendingRequestsPolling() {
           pendingRequestsInterval = window.setInterval(function () {
-            var activeRequests = 0;
-            if (jQuery.ajax.active) {
-              activeRequests = jQuery.ajax.active;
+            if (hasAjaxBeenSent) {
+              var activeRequests = 0;
+              if (jQuery.ajax.active) {
+                activeRequests = jQuery.ajax.active;
+              }
+              else {
+                activeRequests = jQuery.active;
+              }
+              if (activeRequests == 0) {
+                resetPrimaryButtonsStatus();
+                window.clearInterval(pendingRequestsInterval);
+              }
             }
             else {
-              activeRequests = jQuery.active;
-            }
-            if (activeRequests == 0) {
-              $(".btn-primary:not(.disable-feedback), .btn-danger:not(.disable-feedback)").button("reset");
               window.clearInterval(pendingRequestsInterval);
             }
-          }, 500);
+          }, 200);
         }
-
-        $(document).on("hidden", ".modal", function () {
-          $(".btn-primary:not(.disable-feedback), .btn-danger:not(.disable-feedback)").button("reset");
-        });
-
       });
+
+      function resetPrimaryButtonsStatus() {
+        $(".btn-primary:not(.disable-feedback), .btn-danger:not(.disable-feedback)").button("reset");
+      }
     </script>
 
 	</body>

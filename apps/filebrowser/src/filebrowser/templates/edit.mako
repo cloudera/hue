@@ -84,36 +84,36 @@ ${ commonheader(_('%(filename)s - File Viewer') % dict(filename=truncate(filenam
     </form>
 </div>
 
-<script type="text/javascript" charset="utf-8">
-	$(document).ready(function(){
-		$("#saveAsBtn").click(function(){
-			$("#saveAsModal").modal({
-				backdrop: "static",
-				keyboard: true,
-				show: true
-			})
-		});
+  <script type="text/javascript" charset="utf-8">
+    $(document).ready(function () {
+      $("#saveAsBtn").click(function () {
+        $("#saveAsModal").modal({
+          backdrop: "static",
+          keyboard: true,
+          show: true
+        })
+      });
 
+      $("#cancelSaveAsBtn").click(function () {
+        $("#saveAsModal").modal("hide");
+      });
 
-		$("#cancelSaveAsBtn").click(function(){
-			$("#saveAsModal").modal("hide");
-		});
+      $("#saveAsForm").submit(function () {
+        if ($.trim($("#saveAsForm").find("input[name='path']").val()) == "") {
+          $("#saveAsForm").find("input[name='path']").addClass("fieldError");
+          $("#saveAsNameRequiredAlert").show();
+          resetPrimaryButtonsStatus(); //globally available
+          return false;
+        }
+        return true;
+      });
 
-		$("#saveAsForm").submit(function() {
-			if ($.trim($("#saveAsForm").find("input[name='path']").val()) == ""){
-				$("#saveAsForm").find("input[name='path']").addClass("fieldError");
-				$("#saveAsNameRequiredAlert").show();
-				return false;
-			}
-			return true;
-		});
-
-		$("#saveAsForm").find("input[name='path']").focus(function(){
-			$(this).removeClass("fieldError");
-			$("#saveAsNameRequiredAlert").hide();
-		});
-	});
-</script>
+      $("#saveAsForm").find("input[name='path']").focus(function () {
+        $(this).removeClass("fieldError");
+        $("#saveAsNameRequiredAlert").hide();
+      });
+    });
+  </script>
 
 ${ commonfooter(messages) | n,unicode }
 

@@ -506,11 +506,13 @@ from django.utils.translation import ugettext as _
         if ($("#chownForm select[name='user']").val() == null) {
           $("#chownRequired").find(".label").text("${_('User is required.')}");
           $("#chownRequired").show();
+          resetPrimaryButtonsStatus(); //globally available
           return false;
         }
         else if ($("#chownForm select[name='group']").val() == null) {
           $("#chownRequired").find(".label").text("${_('Group is required.')}");
           $("#chownRequired").show();
+          resetPrimaryButtonsStatus(); //globally available
           return false;
         }
         else {
@@ -518,6 +520,7 @@ from django.utils.translation import ugettext as _
             $("#chownRequired").find(".label").text("${_('Specify another group.')}");
             $("#chownForm input[name='group_other']").addClass("fieldError");
             $("#chownRequired").show();
+            resetPrimaryButtonsStatus(); //globally available
             return false;
           }
           if ($("#chownForm select[name='user']").val() == "__other__" && $("input[name='user_other']").val() == "") {
@@ -525,6 +528,7 @@ from django.utils.translation import ugettext as _
             $("#chownForm input[name='user_other']").addClass("fieldError");
             $("#chownRequired").show();
             return false;
+            resetPrimaryButtonsStatus(); //globally available
           }
           return true;
         }
@@ -534,12 +538,14 @@ from django.utils.translation import ugettext as _
         if ($("#newNameInput").val() == "") {
           $("#renameNameRequiredAlert").show();
           $("#newNameInput").addClass("fieldError");
+          resetPrimaryButtonsStatus(); //globally available
           return false;
         }
         if (fileExists($("#newNameInput").val())) {
           $("#renameNameExistsAlert").find(".newName").text($("#newNameInput").val());
           $("#renameNameExistsAlert").show();
           $("#newNameInput").addClass("fieldError");
+          resetPrimaryButtonsStatus(); //globally available
           return false;
         }
         return true;
@@ -555,6 +561,7 @@ from django.utils.translation import ugettext as _
         if ($.trim($("#moveForm").find("input.pathChooser").val()) == "") {
           $("#moveNameRequiredAlert").show();
           $("#moveForm").find("input[name='*dest_path']").addClass("fieldError");
+          resetPrimaryButtonsStatus(); //globally available
           return false;
         }
         return true;
@@ -569,6 +576,7 @@ from django.utils.translation import ugettext as _
         if ($.trim($("#copyForm").find("input.pathChooser").val()) == "") {
           $("#copyNameRequiredAlert").show();
           $("#copyForm").find("input[name='*dest_path']").addClass("fieldError");
+          resetPrimaryButtonsStatus(); //globally available
           return false;
         }
         return true;
@@ -576,7 +584,7 @@ from django.utils.translation import ugettext as _
 
       $("#copyForm").find("input[name='dest_path']").on("focus", function () {
         $("#copyNameRequiredAlert").hide();
-        $("#copyForm").find("input[name='dest_path']").recopyClass("fieldError");
+        $("#copyForm").find("input[name='dest_path']").removeClass("fieldError");
       });
 
       $(".create-directory-link").click(function () {
@@ -597,12 +605,14 @@ from django.utils.translation import ugettext as _
         if ($.trim($("#newDirectoryNameInput").val()) == "") {
           $("#directoryNameRequiredAlert").show();
           $("#newDirectoryNameInput").addClass("fieldError");
+          resetPrimaryButtonsStatus(); //globally available
           return false;
         }
         if (fileExists($("#newDirectoryNameInput").val())) {
           $("#directoryNameExistsAlert").find(".newName").text($("#newDirectoryNameInput").val());
           $("#directoryNameExistsAlert").show();
           $("#newDirectoryNameInput").addClass("fieldError");
+          resetPrimaryButtonsStatus(); //globally available
           return false;
         }
         return true;
@@ -619,12 +629,14 @@ from django.utils.translation import ugettext as _
         if ($.trim($("#newFileNameInput").val()) == "") {
           $("#fileNameRequiredAlert").show();
           $("#newFileNameInput").addClass("fieldError");
+          resetPrimaryButtonsStatus(); //globally available
           return false;
         }
         if (fileExists($("#newFileNameInput").val())) {
           $("#fileNameExistsAlert").find(".newName").text($("#newFileNameInput").val());
           $("#fileNameExistsAlert").show();
           $("#newFileNameInput").addClass("fieldError");
+          resetPrimaryButtonsStatus(); //globally available
           return false;
         }
         return true;
