@@ -2,7 +2,7 @@
     <start to="Subworkflow"/>
     <action name="Subworkflow">
         <sub-workflow>
-            <app-path>/user/hue/oozie/workspaces/sleep</app-path>
+            <app-path>/user/hue/oozie/workspaces/managed/sleep</app-path>
             <propagate-configuration/>
             <configuration>
                 <property>
