@@ -609,7 +609,7 @@ def massaged_oozie_jobs_for_json(oozie_jobs, user):
     massaged_job = {
       'id': job.id,
       'lastModTime': hasattr(job, 'lastModTime') and job.lastModTime and format_time(job.lastModTime) or None,
-      'kickoffTime': hasattr(job, 'kickoffTime') and job.kickoffTime or None,
+      'kickoffTime': hasattr(job, 'kickoffTime') and job.kickoffTime or '',
       'timeOut': hasattr(job, 'timeOut') and job.timeOut or None,
       'endTime': job.endTime and format_time(job.endTime) or None,
       'status': job.status,
