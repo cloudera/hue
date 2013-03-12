@@ -33,7 +33,7 @@
         </div>
     % endif
 
-    <textarea class="span11" rows="30" placeholder="${_('Example: SELECT * FROM tablename')}" name="${form.query["query"].html_name}" id="queryField">${extract_field_data(form.query["query"]) or ''}</textarea>
+    <textarea class="span11" placeholder="${_('Example: SELECT * FROM tablename')}" name="${form.query["query"].html_name}" id="queryField">${extract_field_data(form.query["query"]) or ''}</textarea>
 
     <div id="validationResults">
     % if len(form.query["query"].errors):
@@ -237,7 +237,7 @@ ${layout.menubar(section='query')}
               ${ _("Use '\\059' instead of ';' if you have some conflicts.") }
             </div>
         </div>
-        <div class="span9">
+        <div id="querySide" class="span9">
             % if on_success_url:
               <input type="hidden" name="on_success_url" value="${on_success_url}"/>
             % endif
@@ -282,7 +282,11 @@ ${layout.menubar(section='query')}
                     % endif
                 </div>
             % else:
-                ${query()}
+              <div class="tab-content">
+                <div id="queryPane">
+                  ${query()}
+                </div>
+              </div>
             % endif
             <br/>
         </div>
@@ -534,19 +538,39 @@ ${layout.menubar(section='query')}
       initQueryField();
 
       var resizeTimeout = -1;
+      var winWidth = $(window).width();
+      var winHeight = $(window).height();
+
       $(window).on("resize", function () {
         window.clearTimeout(resizeTimeout);
         resizeTimeout = window.setTimeout(function () {
-          $("#queryField").unbind();
-          $("#queryField").data("scroll", $("#queryField").scrollTop());
-          $("#queryField").insertBefore($(".linedwrap"));
-          $("#queryField").css("width", "");
-          $(".linedwrap").remove();
-          initQueryField();
+          // prevents endless loop in IE8
+          if (winWidth != $(window).width() || winHeight != $(window).height()) {
+            $("#queryField").unbind();
+            $("#queryField").data("scroll", $("#queryField").scrollTop());
+            $("#queryField").insertBefore($(".linedwrap"));
+            $("#queryField").css("width", "");
+            $(".linedwrap").remove();
+            initQueryField();
+            winWidth = $(window).width();
+            winHeight = $(window).height();
+          }
         }, 200);
       });
 
       function initQueryField() {
+        var _height = 100;
+        $("#querySide").children().not(".tab-content").each(function () {
+          _height += $(this).outerHeight();
+        });
+        $("#queryPane").children().not("textarea").each(function () {
+          _height += $(this).outerHeight();
+        });
+        var _newHeight = $(window).height() - $("#querySide").offset().top - _height;
+        if (_newHeight < 300) {
+          _newHeight = 300;
+        }
+        $("#queryField").height(_newHeight);
         if (selectedLine > -1) {
           $("#queryField").linedtextarea({
             selectedLine: selectedLine
