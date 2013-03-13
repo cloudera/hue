@@ -1123,7 +1123,7 @@ def trash_purge(request):
 
 def upload_file(request):
     """
-    A wrapper around the actual upload view function to clean up the temporary file afterwards.
+    A wrapper around the actual upload view function to clean up the temporary file afterwards if it fails.
 
     Returns JSON.
     e.g. {'status' 0/1, data:'message'...}
@@ -1132,12 +1132,10 @@ def upload_file(request):
 
     if request.method == 'POST':
         try:
-            try:
-                resp = _upload_file(request)
-                response.update(resp)
-            except Exception, ex:
-                response['data'] = str(ex)
-        finally:
+            resp = _upload_file(request)
+            response.update(resp)
+        except Exception, ex:
+            response['data'] = str(ex)
             hdfs_file = request.FILES.get('hdfs_file')
             if hdfs_file:
                 hdfs_file.remove()
@@ -1154,7 +1152,9 @@ def upload_file(request):
 def _upload_file(request):
     """
     Handles file uploaded by HDFSfileUploadHandler.
-    The uploaded file is stored in HDFS. We just need to rename it to the destination path.
+
+    The uploaded file is stored in HDFS at its destination with a .tmp suffix.
+    We just need to rename it to the destination path.
     """
     form = UploadFileForm(request.POST, request.FILES)
 
@@ -1170,12 +1170,8 @@ def _upload_file(request):
         username = request.user.username
 
         try:
-            # Temp file is created by superuser. Chown the file.
-            request.fs.do_as_superuser(request.fs.chmod, tmp_file, 0644)
-            request.fs.do_as_superuser(request.fs.chown, tmp_file, username, username)
-
-            # Move the file to where it belongs
-            request.fs.rename(tmp_file, dest)
+            # Remove tmp suffix of the file
+            request.fs.do_as_user(username, request.fs.rename, tmp_file, dest)
         except IOError, ex:
             already_exists = False
             try:

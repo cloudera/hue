@@ -1241,9 +1241,11 @@ from django.utils.translation import ugettext as _
             dest:self.currentPath(),
             fileFieldLabel:"hdfs_file"
           },
-          onComplete:function (id, fileName, responseJSON) {
+          onComplete:function (id, fileName, response) {
             num_of_pending_uploads--;
-            if (num_of_pending_uploads == 0) {
+            if (response.status != 0) {
+              $.jHueNotify.error("${ _('Error: ') }" + (response['data'] ? response['data'] : "${ _('Check file permissions') }"));
+            } else if (num_of_pending_uploads == 0) {
               window.location = "/filebrowser/view" + self.currentPath();
             }
           },

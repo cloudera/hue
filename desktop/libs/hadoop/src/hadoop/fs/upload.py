@@ -31,8 +31,10 @@ import time
 
 from django.core.files.uploadhandler import \
     FileUploadHandler, StopFutureHandlers, StopUpload
+from django.utils.translation import ugettext as _
 import hadoop.cluster
 from hadoop.conf import UPLOAD_CHUNK_SIZE
+from hadoop.fs.exceptions import WebHdfsException
 
 UPLOAD_SUBDIR = 'hue-uploads'
 LOG = logging.getLogger(__name__)
@@ -59,15 +61,13 @@ class HDFStemporaryUploadedFile(object):
     if not self._fs:
       raise HDFSerror("No HDFS found")
 
-    # We want to set the user to be the superuser. But any operation
-    # in the fs needs a username, including the retrieval of the superuser.
-    # So we first set it to the DEFAULT_USER to break this chicken-&-egg.
-    self._fs.setuser(self._fs.DEFAULT_USER)
-    self._fs.setuser(self._fs.superuser)
-
-    self._path = self._fs.mkswap(name, suffix='tmp', basedir=destination)
-
-    self._file = self._fs.open(self._path, 'w')
+    # We want to set the user to be the user doing the upload
+    self._fs.setuser(request.user.username)
+    try:
+      self._path = self._fs.mkswap(name, suffix='tmp', basedir=destination)
+      self._file = self._fs.open(self._path, 'w')
+    except WebHdfsException, e:
+      raise e
     self._do_cleanup = True
 
   def __del__(self):
@@ -114,6 +114,13 @@ class HDFSfileUploadHandler(FileUploadHandler):
 
   This handler is triggered by any upload field whose name starts with
   "HDFS" (case insensitive).
+
+  In practice, the middlewares (which access the request.REQUEST/POST/FILES objects) triggers
+  the upload before reaching the view in case of permissions error. Read about Django
+  uploading documentation.
+  
+  This might trigger the upload before executing the hue auth middleware. HDFS destination
+  permissions will be doing the checks.
   """
   def __init__(self, request):
     FileUploadHandler.__init__(self, request)
@@ -126,19 +133,16 @@ class HDFSfileUploadHandler(FileUploadHandler):
 
   def new_file(self, field_name, file_name, *args, **kwargs):
     # Detect "HDFS" in the field name.
-    # NOTE: The user is not authenticated at this point, and it's
-    #       very difficult to do so because we handle upload before
-    #       running the auth middleware.
     if field_name.upper().startswith('HDFS'):
       try:
         self._file = HDFStemporaryUploadedFile(self.request, file_name, self._destination)
-      except (HDFSerror, IOError), ex:
+        LOG.debug('Upload attempt to %s' % (self._file.get_temp_path(),))
+        self._activated = True
+        self._starttime = time.time()
+      except Exception, ex:
         LOG.error("Not using HDFS upload handler: %s" % (ex,))
-        return
+        raise ex
 
-      LOG.debug('Upload attempt to %s' % (self._file.get_temp_path(),))
-      self._activated = True
-      self._starttime = time.time()
       raise StopFutureHandlers()
 
   def receive_data_chunk(self, raw_data, start):

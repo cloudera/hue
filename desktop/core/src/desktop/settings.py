@@ -95,9 +95,9 @@ TEMPLATE_LOADERS = (
     'desktop.lib.template_loader.load_template_source',
 )
 
-MIDDLEWARE_CLASSES = [
+MIDDLEWARE_CLASSES = (
+    # The order matters
     'desktop.middleware.DatabaseLoggingMiddleware',
-
     'django.middleware.common.CommonMiddleware',
     'desktop.middleware.SessionOverPostMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -107,7 +107,7 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.locale.LocaleMiddleware',
     'babeldjango.middleware.LocaleMiddleware',
     'desktop.middleware.AjaxMiddleware',
-    # Must be after Session, Auth, and Ajax.  Before everything else.
+    # Must be after Session, Auth, and Ajax. Before everything else.
     'desktop.middleware.LoginAndPermissionMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'desktop.middleware.NotificationMiddleware',
@@ -117,7 +117,7 @@ MIDDLEWARE_CLASSES = [
     'desktop.middleware.AppSpecificMiddleware',
     'django.middleware.transaction.TransactionMiddleware',
     # 'debug_toolbar.middleware.DebugToolbarMiddleware'
-]
+)
 
 if os.environ.get(ENV_DESKTOP_DEBUG):
   MIDDLEWARE_CLASSES.append('desktop.middleware.HtmlValidationMiddleware')

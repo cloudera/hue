@@ -28,7 +28,6 @@ import os
 import re
 import urlparse
 from avro import schema, datafile, io
-from StringIO import StringIO
 
 from django.utils.encoding import smart_str
 from nose.plugins.attrib import attr
@@ -459,7 +458,7 @@ def test_listdir():
 
     for dirent in dir_listing:
       path = dirent['name']
-      if path == '..':
+      if path in ('.', '..'):
         continue
 
       assert_true(path in orig_paths)
@@ -469,7 +468,8 @@ def test_listdir():
       resp = c.get(url)
 
       # We are actually reading a directory
-      assert_equal('..', resp.context['files'][0]['name'], "'%s' should be a directory" % (path,))
+      assert_equal('.', resp.context['files'][0]['name'])
+      assert_equal('..', resp.context['files'][1]['name'])
 
     # Test's home directory now exists. Should be returned.
     c = make_logged_in_client()
@@ -984,8 +984,12 @@ def test_upload_file():
     cluster.fs.do_as_superuser(cluster.fs.chown, HDFS_DEST_DIR, USER_NAME, USER_NAME)
     cluster.fs.do_as_superuser(cluster.fs.chmod, HDFS_DEST_DIR, 0700)
 
+    stats = cluster.fs.stats(HDFS_DEST_DIR)
+    assert_equal(stats['user'], USER_NAME)
+    assert_equal(stats['group'], USER_NAME)
+
     # Just upload the current python file
-    resp = client.post('/filebrowser/upload/file',
+    resp = client.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR,
                        dict(dest=HDFS_DEST_DIR, hdfs_file=file(LOCAL_FILE)))
     response = json.loads(resp.content)
 
@@ -1000,16 +1004,19 @@ def test_upload_file():
     assert_equal(actual, expected)
 
     # Upload again and so fails because file already exits
-    resp = client.post('/filebrowser/upload/file',
+    resp = client.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR,
                        dict(dest=HDFS_DEST_DIR, hdfs_file=file(LOCAL_FILE)))
     response = json.loads(resp.content)
     assert_equal(-1, response['status'], response)
+    assert_true('already exists' in response['data'], response)
 
     # Upload in tmp and fails because of missing permissions
-    resp = client_not_me.post('/filebrowser/upload/file',
-                              dict(dest=HDFS_DEST_DIR, hdfs_file=file(LOCAL_FILE)))
-    response = json.loads(resp.content)
-    assert_equal(-1, response['status'], response)
+    try:
+      resp = client_not_me.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR,
+                                dict(dest=HDFS_DEST_DIR, hdfs_file=file(LOCAL_FILE)))
+      raise Exception('Should have sent a permissions exception!')
+    except Exception, e:
+      assert_true('Permission denied' in str(e), e)
   finally:
     try:
       cluster.fs.remove(HDFS_DEST_DIR)
