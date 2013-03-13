@@ -15,20 +15,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+import logging
 import thrift
 
 from desktop.lib import thrift_util
 
-from cli_service import TCLIService
-from cli_service.ttypes import TOpenSessionReq, TGetTablesReq, TFetchResultsReq,\
+from TCLIService import TCLIService
+from TCLIService.ttypes import TOpenSessionReq, TGetTablesReq, TFetchResultsReq,\
   TStatusCode, TGetResultSetMetadataReq, TGetColumnsReq, TType,\
   TExecuteStatementReq, TGetOperationStatusReq, TFetchOrientation,\
-  TCloseSessionReq, TGetCatalogsReq
+  TCloseSessionReq, TGetSchemasReq, TGetLogReq
 
 from beeswax import conf
 from beeswax.models import Session, HiveServerQueryHandle, HiveServerQueryHistory
-from beeswax.server.dbms import Table, NoSuchObjectException, DataTable
+from beeswax.server.dbms import Table, NoSuchObjectException, DataTable,\
+  QueryServerException
+
+
+LOG = logging.getLogger(__name__)
 
 
 class HiveServerTable(Table):
@@ -235,36 +239,12 @@ class HiveServerClient:
                                           timeout_seconds=conf.BEESWAX_SERVER_CONN_TIMEOUT.get())
 
 
-  def call(self, fn, req, status=TStatusCode.SUCCESS_STATUS):
-    session = Session.objects.get_session(self.user)
-    if session is None:
-      session = self.open_session(self.user)
-    if hasattr(req, 'sessionHandle') and req.sessionHandle is None:
-      req.sessionHandle = session.get_handle()
-
-    res = fn(req)
-
-    if res.status.statusCode == TStatusCode.ERROR_STATUS: #TODO should be TStatusCode.INVALID_HANDLE_STATUS
-      print 'HS2 Session has expired: %s' % res
-      print 'Retrying with a new sessions...'
-
-      session = self.open_session(self.user)
-      req.sessionHandle = session.get_handle()
-
-      res = fn(req)
-
-    if status is not None and res.status.statusCode not in (
-        TStatusCode.SUCCESS_STATUS, TStatusCode.SUCCESS_WITH_INFO_STATUS, TStatusCode.STILL_EXECUTING_STATUS):
-      raise Exception('Bad status for request %s:\n%s' % (req, res))
-    else:
-      return res
-
-
   def open_session(self, user):
-    req = TOpenSessionReq(username=user.username)
+    req = TOpenSessionReq(username=user.username, configuration={})
     res = self._client.OpenSession(req)
 
     sessionId = res.sessionHandle.sessionId
+    LOG.info('Opening session %s' % sessionId)
 
     encoded_status, encoded_guid = HiveServerQueryHandle(secret=sessionId.secret, guid=sessionId.guid).get()
 
@@ -274,6 +254,36 @@ class HiveServerClient:
                                   guid=encoded_guid,
                                   server_protocol_version=res.serverProtocolVersion)
 
+
+  def call(self, fn, req, status=TStatusCode.SUCCESS_STATUS):
+    session = Session.objects.get_session(self.user)
+
+    if session is None:
+      session = self.open_session(self.user)
+
+    if hasattr(req, 'sessionHandle') and req.sessionHandle is None:
+      req.sessionHandle = session.get_handle()
+
+    res = fn(req)
+
+    # Not supported currently in HS2: TStatusCode.INVALID_HANDLE_STATUS
+    if res.status.statusCode == TStatusCode.ERROR_STATUS and \
+        res.status.errorMessage is not None and 'Invalid SessionHandle' in res.status.errorMessage:
+      LOG.info('Retrying with a new session because of %s' % res)
+
+      session = self.open_session(self.user)
+      req.sessionHandle = session.get_handle()
+
+      # Get back the name of the function to call
+      res = getattr(self._client, fn.attr)(req)
+
+    if status is not None and res.status.statusCode not in (
+        TStatusCode.SUCCESS_STATUS, TStatusCode.SUCCESS_WITH_INFO_STATUS, TStatusCode.STILL_EXECUTING_STATUS):
+      raise QueryServerException(Exception('Bad status for request %s:\n%s' % (req, res)))
+    else:
+      return res
+
+
   def close_session(self):
     session = Session.objects.get_session(self.user).get_handle()
 
@@ -282,12 +292,13 @@ class HiveServerClient:
 
 
   def get_databases(self):
-    req = TGetCatalogsReq()
-    res = self.call(self._client.GetCatalogs, req)
+    # GetCatalogs() is not implemented in HS2
+    req = TGetSchemasReq()
+    res = self.call(self._client.GetSchemas, req)
 
     results, schema = self.fetch_result(res.operationHandle)
 
-    return HiveServerTRowSet(results.results, schema.schema).cols(('TABLE_CATALOG',))
+    return HiveServerTRowSet(results.results, schema.schema).cols(('TABLE_SCHEMA',))
 
 
   def get_tables(self, database, table_names):
@@ -300,8 +311,9 @@ class HiveServerClient:
 
 
   def get_table(self, database, table_name):
-    req = TGetTablesReq(schemaName='default', tableName=table_name)
+    req = TGetTablesReq(schemaName=database, tableName=table_name)
     res = self.call(self._client.GetTables, req)
+
     table_results, table_schema = self.fetch_result(res.operationHandle)
 
     # Using 'SELECT * from table' does not show column comments in the metadata
@@ -309,26 +321,31 @@ class HiveServerClient:
     return HiveServerTable(table_results.results, table_schema.schema, desc_results.results, desc_schema.schema)
 
 
-  def execute_query(self, query, max_rows=1000):
-    # TODO: Need jars, UDF etc
-    results, schema = self.execute_statement(statement=query.query['query'], conf_overlay={}, max_rows=max_rows)
+  def execute_query(self, query, max_rows=100):
+    # TODO: Need to set jars, UDF etc
+    self.execute_statement(statement='SET hive.server2.blocking.query=true')
+
+    results, schema = self.execute_statement(statement=query.query['query'], max_rows=max_rows)
     return HiveServerDataTable(results, schema)
 
 
   def execute_async_query(self, query, statement=0):
+    self.execute_statement(statement='SET hive.server2.blocking.query=false')
+
     query_statement = query.get_query_statement(statement)
-    return self.execute_async_statement(statement=query_statement, conf_overlay={})
+    return self.execute_async_statement(statement=query_statement)
 
 
-  def execute_statement(self, statement, conf_overlay=None, max_rows=100):
-    req = TExecuteStatementReq(statement=statement)
+  def execute_statement(self, statement, max_rows=100):
+    req = TExecuteStatementReq(statement=statement, confOverlay={})
     res = self.call(self._client.ExecuteStatement, req)
 
     return self.fetch_result(res.operationHandle, max_rows=max_rows)
 
 
-  def execute_async_statement(self, statement, conf_overlay=None):
-    req = TExecuteStatementReq(statement=statement)
+  def execute_async_statement(self, statement):
+    # confOverlay is not used by Hive Server 2
+    req = TExecuteStatementReq(statement=statement, confOverlay={})
     res = self.call(self._client.ExecuteStatement, req)
 
     return HiveServerQueryHandle(secret=res.operationHandle.operationId.secret,
@@ -338,20 +355,20 @@ class HiveServerClient:
                                  modified_row_count=res.operationHandle.modifiedRowCount)
 
 
-  def fetch_data(self, operation_handle, orientation=TFetchOrientation.FETCH_NEXT, max_rows=10000):
-    # The client should check for hasMoreRows and fetch until the result is empty
+  def fetch_data(self, operation_handle, orientation=TFetchOrientation.FETCH_NEXT, max_rows=100):
+    # The client should check for hasMoreRows and fetch until the result is empty dues to a HS2 bug
     results, schema = self.fetch_result(operation_handle, orientation, max_rows)
     return HiveServerDataTable(results, schema)
 
 
-  def get_columns(self, table):
-    req = TGetColumnsReq(schemaName='default', tableName=table)
+  def get_columns(self, database, table):
+    req = TGetColumnsReq(schemaName=database, tableName=table)
     res = self.call(self._client.GetColumns, req)
 
     return self.fetch_result(res.operationHandle)
 
 
-  def fetch_result(self, operation_handle, orientation=TFetchOrientation.FETCH_NEXT, max_rows=10000):
+  def fetch_result(self, operation_handle, orientation=TFetchOrientation.FETCH_NEXT, max_rows=100):
     fetch_req = TFetchResultsReq(operationHandle=operation_handle, orientation=orientation, maxRows=max_rows)
     res = self.call(self._client.FetchResults, fetch_req)
 
@@ -366,9 +383,14 @@ class HiveServerClient:
 
   def get_operation_status(self, operation_handle):
     req = TGetOperationStatusReq(operationHandle=operation_handle)
-    res = self.call(self._client.GetOperationStatus, req)
+    return self.call(self._client.GetOperationStatus, req)
 
-    return res
+
+  def get_log(self, operation_handle):
+    req = TGetLogReq(operationHandle=operation_handle)
+    res = self.call(self._client.GetLog, req)
+
+    return res.log
 
 
 class HiveServerTableCompatible(HiveServerTable):
@@ -387,6 +409,24 @@ class HiveServerTableCompatible(HiveServerTable):
                                     'comment': col.get('comment', ''), }) for col in HiveServerTable.cols.fget(self)]
 
 
+class ResultCompatible:
+
+  def __init__(self, data_table):
+    self.data_table = data_table
+    self.rows = data_table.rows
+    self.has_more = data_table.has_more
+    self.start_row = data_table.startRowOffset
+    self.ready = True
+
+  @property
+  def columns(self):
+    return self.cols()
+
+
+  def cols(self):
+    return [col.name for col in self.data_table.cols()]
+
+
 class HiveServerClientCompatible:
   """Same API as Beeswax"""
 
@@ -402,8 +442,8 @@ class HiveServerClientCompatible:
 
   def get_state(self, handle):
     operationHandle = handle.get_rpc_handle()
-
     res = self._client.get_operation_status(operationHandle)
+
     return HiveServerQueryHistory.STATE_MAP[res.operationState]
 
 
@@ -423,10 +463,8 @@ class HiveServerClientCompatible:
 
     data_table = self._client.fetch_data(operationHandle, orientation=orientation, max_rows=max_rows)
 
-    return type('Result', (object,), {'rows': data_table.rows,
-                                      'columns': [col.name for col in data_table.cols()],
-                                      'has_more': data_table.has_more,
-                                      'start_row': data_table.startRowOffset, })
+    return ResultCompatible(data_table)
+
 
   def dump_config(self):
     return 'Does not exist in HS2'
@@ -436,12 +474,13 @@ class HiveServerClientCompatible:
     return 'Does not exist in HS2'
 
 
-  def get_log(self, *args, **kwargs):
-    return 'No logs retrieval implemented'
+  def get_log(self, handle):
+    operationHandle = handle.get_rpc_handle()
+    return self._client.get_log(operationHandle)
 
 
-  def get_databases(self, database, table_names):
-    return [table['TABLE_CAT'] for table in self._client.get_databases()]
+  def get_databases(self):
+    return [table['TABLE_SCHEMA'] for table in self._client.get_databases()]
 
 
   def get_tables(self, database, table_names):

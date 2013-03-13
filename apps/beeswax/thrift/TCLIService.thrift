@@ -16,20 +16,21 @@
 
 // Coding Conventions for this file:
 //
-// Structs and Unions
-// * Struct and union names begin with a "T", and use a capital letter for
-//   each new word, with no underscores.
+// Structs/Enums/Unions
+// * Struct, Enum, and Union names begin with a "T",
+//   and use a capital letter for each new word, with no underscores.
 // * All fields should be declared as either optional or required.
 //
 // Functions
 // * Function names start with a capital letter and have a capital letter for
 //   each new word, with no underscores.
-// * Each function should take exactly one parameter, named FunctionNameReq,
-//   and should return either void or FunctionNameResp. This convention allows
+// * Each function should take exactly one parameter, named TFunctionNameReq,
+//   and should return either void or TFunctionNameResp. This convention allows
 //   incremental updates.
 //
 // Services
-// * Service names should end in the word "Service".
+// * Service names begin with the letter "T", use a capital letter for each
+//   new word (with no underscores), and end with the word "Service".
 
 namespace java org.apache.hive.service.cli.thrift
 namespace cpp apache.hive.service.cli.thrift
@@ -40,7 +41,7 @@ enum TProtocolVersion {
   HIVE_CLI_SERVICE_PROTOCOL_V1
 }
 
-enum TType {
+enum TTypeId {
   BOOLEAN_TYPE,
   TINYINT_TYPE,
   SMALLINT_TYPE,
@@ -55,50 +56,53 @@ enum TType {
   MAP_TYPE,
   STRUCT_TYPE,
   UNION_TYPE,
-  USER_DEFINED_TYPE
+  USER_DEFINED_TYPE,
+  DECIMAL_TYPE
 }
-  
-const set<TType> PRIMITIVE_TYPES = [
-  TType.BOOLEAN_TYPE
-  TType.TINYINT_TYPE
-  TType.SMALLINT_TYPE
-  TType.INT_TYPE
-  TType.BIGINT_TYPE
-  TType.FLOAT_TYPE
-  TType.DOUBLE_TYPE
-  TType.STRING_TYPE
-  TType.TIMESTAMP_TYPE
-  TType.BINARY_TYPE
+
+const set<TTypeId> PRIMITIVE_TYPES = [
+  TTypeId.BOOLEAN_TYPE
+  TTypeId.TINYINT_TYPE
+  TTypeId.SMALLINT_TYPE
+  TTypeId.INT_TYPE
+  TTypeId.BIGINT_TYPE
+  TTypeId.FLOAT_TYPE
+  TTypeId.DOUBLE_TYPE
+  TTypeId.STRING_TYPE
+  TTypeId.TIMESTAMP_TYPE
+  TTypeId.BINARY_TYPE,
+  TTypeId.DECIMAL_TYPE
 ]
 
-const set<TType> COMPLEX_TYPES = [
-  TType.ARRAY_TYPE
-  TType.MAP_TYPE
-  TType.STRUCT_TYPE
-  TType.UNION_TYPE
-  TType.USER_DEFINED_TYPE
+const set<TTypeId> COMPLEX_TYPES = [
+  TTypeId.ARRAY_TYPE
+  TTypeId.MAP_TYPE
+  TTypeId.STRUCT_TYPE
+  TTypeId.UNION_TYPE
+  TTypeId.USER_DEFINED_TYPE
 ]
 
-const set<TType> COLLECTION_TYPES = [
-  TType.ARRAY_TYPE
-  TType.MAP_TYPE
+const set<TTypeId> COLLECTION_TYPES = [
+  TTypeId.ARRAY_TYPE
+  TTypeId.MAP_TYPE
 ]
 
-const map<TType,string> TYPE_NAMES = {
-  TType.BOOLEAN_TYPE: "BOOLEAN",
-  TType.TINYINT_TYPE: "TINYINT",
-  TType.SMALLINT_TYPE: "SMALLINT",
-  TType.INT_TYPE: "INT",
-  TType.BIGINT_TYPE: "BIGINT",
-  TType.FLOAT_TYPE: "FLOAT",
-  TType.DOUBLE_TYPE: "DOUBLE",
-  TType.STRING_TYPE: "STRING",
-  TType.TIMESTAMP_TYPE: "TIMESTAMP",
-  TType.BINARY_TYPE: "BINARY",
-  TType.ARRAY_TYPE: "ARRAY",
-  TType.MAP_TYPE: "MAP",
-  TType.STRUCT_TYPE: "STRUCT",
-  TType.UNION_TYPE: "UNIONTYPE"
+const map<TTypeId,string> TYPE_NAMES = {
+  TTypeId.BOOLEAN_TYPE: "BOOLEAN",
+  TTypeId.TINYINT_TYPE: "TINYINT",
+  TTypeId.SMALLINT_TYPE: "SMALLINT",
+  TTypeId.INT_TYPE: "INT",
+  TTypeId.BIGINT_TYPE: "BIGINT",
+  TTypeId.FLOAT_TYPE: "FLOAT",
+  TTypeId.DOUBLE_TYPE: "DOUBLE",
+  TTypeId.STRING_TYPE: "STRING",
+  TTypeId.TIMESTAMP_TYPE: "TIMESTAMP",
+  TTypeId.BINARY_TYPE: "BINARY",
+  TTypeId.ARRAY_TYPE: "ARRAY",
+  TTypeId.MAP_TYPE: "MAP",
+  TTypeId.STRUCT_TYPE: "STRUCT",
+  TTypeId.UNION_TYPE: "UNIONTYPE"
+  TTypeId.DECIMAL_TYPE: "DECIMAL"
 }
 
 // Thrift does not support recursively defined types or forward declarations,
@@ -150,7 +154,7 @@ typedef i32 TTypeEntryPtr
 struct TPrimitiveTypeEntry {
   // The primitive type token. This must satisfy the condition
   // that type is in the PRIMITIVE_TYPES set.
-  1: required TType type
+  1: required TTypeId type
 }
 
 // Type entry for an ARRAY type.
@@ -204,7 +208,7 @@ struct TColumnDesc {
 
   // The type descriptor for this column
   2: required TTypeDesc typeDesc
-  
+
   // The ordinal position of this column in the schema
   3: required i32 position
 
@@ -254,6 +258,7 @@ struct TDoubleValue {
 }
 
 struct TStringValue {
+  // NULL if value is unset
   1: optional string value
 }
 
@@ -280,7 +285,7 @@ union TColumnValue {
   4: TI32Value    i32Val       // INT
   5: TI64Value    i64Val       // BIGINT, TIMESTAMP
   6: TDoubleValue doubleVal    // FLOAT, DOUBLE
-  7: TStringValue stringVal    // STRING, LIST, MAP, STRUCT, UNIONTYPE, BINARY
+  7: TStringValue stringVal    // STRING, LIST, MAP, STRUCT, UNIONTYPE, BINARY, DECIMAL
 }
 
 // Represents a row in a rowset.
@@ -438,11 +443,11 @@ struct TOperationHandle {
 // OpenSession()
 //
 // Open a session (connection) on the server against
-// which operations may be executed. 
+// which operations may be executed.
 struct TOpenSessionReq {
   // The version of the HiveServer2 protocol that the client is using.
   1: required TProtocolVersion client_protocol = TProtocolVersion.HIVE_CLI_SERVICE_PROTOCOL_V1
-  
+
   // Username and password for authentication.
   // Depending on the authentication scheme being used,
   // this information may instead be provided by a lower
@@ -606,13 +611,13 @@ struct TGetTypeInfoReq {
 struct TGetTypeInfoResp {
   1: required TStatus status
   2: optional TOperationHandle operationHandle
-}  
+}
 
 
 // GetCatalogs()
 //
-// Returns the list of catalogs (databases) 
-// Results are ordered by TABLE_CATALOG 
+// Returns the list of catalogs (databases)
+// Results are ordered by TABLE_CATALOG
 //
 // Resultset columns :
 // col1
@@ -633,7 +638,7 @@ struct TGetCatalogsResp {
 
 // GetSchemas()
 //
-// Retrieves the schema names available in this database. 
+// Retrieves the schema names available in this database.
 // The results are ordered by TABLE_CATALOG and TABLE_SCHEM.
 // col1
 // name: TABLE_SCHEM
@@ -722,9 +727,9 @@ struct TGetTablesResp {
 
 // GetTableTypes()
 //
-// Returns the table types available in this database. 
-// The results are ordered by table type. 
-// 
+// Returns the table types available in this database.
+// The results are ordered by table type.
+//
 // col1
 // name: TABLE_TYPE
 // type: STRING
@@ -745,8 +750,8 @@ struct TGetTableTypesResp {
 // Returns a list of columns in the specified tables.
 // The information is returned as a result set which can be fetched
 // using the OperationHandle provided in the response.
-// Results are ordered by TABLE_CAT, TABLE_SCHEM, TABLE_NAME, 
-// and ORDINAL_POSITION. 
+// Results are ordered by TABLE_CAT, TABLE_SCHEM, TABLE_NAME,
+// and ORDINAL_POSITION.
 //
 // Result Set Columns are the same as those for the ODBC CLIColumns
 // function.
@@ -842,7 +847,7 @@ struct TGetFunctionsResp {
   1: required TStatus status
   2: optional TOperationHandle operationHandle
 }
-  
+
 
 // GetOperationStatus()
 //
@@ -937,7 +942,7 @@ struct TFetchResultsReq {
   // The fetch orientation. For V1 this must be either
   // FETCH_NEXT or FETCH_FIRST. Defaults to FETCH_NEXT.
   2: required TFetchOrientation orientation = TFetchOrientation.FETCH_NEXT
-  
+
   // Max number of rows that should be returned in
   // the rowset.
   3: required i64 maxRows
@@ -954,6 +959,22 @@ struct TFetchResultsResp {
   // representing result set data, e.g. delimited strings,
   // binary encoded, etc.
   3: optional TRowSet results
+}
+
+// GetLog()
+//
+// Fetch operation log from the server corresponding to
+// a particular OperationHandle.
+struct TGetLogReq {
+  // Operation whose log is requested
+  1: required TOperationHandle operationHandle
+}
+
+struct TGetLogResp {
+  1: required TStatus status
+
+  2: required string log
+
 }
 
 service TCLIService {
@@ -981,12 +1002,15 @@ service TCLIService {
   TGetFunctionsResp GetFunctions(1:TGetFunctionsReq req);
 
   TGetOperationStatusResp GetOperationStatus(1:TGetOperationStatusReq req);
-  
+
   TCancelOperationResp CancelOperation(1:TCancelOperationReq req);
 
   TCloseOperationResp CloseOperation(1:TCloseOperationReq req);
 
   TGetResultSetMetadataResp GetResultSetMetadata(1:TGetResultSetMetadataReq req);
-  
+
   TFetchResultsResp FetchResults(1:TFetchResultsReq req);
+
+  TGetLogResp GetLog(1:TGetLogReq req);
 }
+

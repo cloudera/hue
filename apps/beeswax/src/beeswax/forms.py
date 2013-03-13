@@ -25,7 +25,6 @@ from desktop.lib.django_forms import ChoiceOrOtherField, MultiForm, SubmitButton
 from filebrowser.forms import PathField
 
 from beeswax import common
-from beeswax.server.dbms import NoSuchObjectException
 from beeswax.models import SavedQuery
 
 
@@ -126,7 +125,7 @@ class SaveResultsForm(DependencyAwareForm):
             self.db.get_table('default', tbl) # Assumes 'default' DB
           self._errors['target_table'] = self.error_class([_('Table already exists')])
           del cleaned_data['target_table']
-        except hive_metastore.ttypes.NoSuchObjectException:
+        except Exception:
           pass
 
     return cleaned_data
@@ -260,7 +259,7 @@ def _clean_tablename(db, name):
     table = db.get_table("default", name)
     if table.name:
       raise forms.ValidationError(_('Table "%(name)s" already exists') % {'name': name})
-  except (hive_metastore.ttypes.NoSuchObjectException, NoSuchObjectException):
+  except Exception:
     return name
 
 

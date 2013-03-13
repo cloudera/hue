@@ -32,7 +32,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from beeswax.conf import SERVER_INTERFACE
 from beeswax.design import HQLdesign, hql_query
 from beeswaxd.ttypes import QueryHandle as BeeswaxdQueryHandle, QueryState
-from cli_service.ttypes import TSessionHandle, THandleIdentifier,\
+from TCLIService.ttypes import TSessionHandle, THandleIdentifier,\
   TOperationState, TOperationHandle, TOperationType
 
 
@@ -183,6 +183,7 @@ class HiveServerQueryHistory(QueryHistory):
 
   def save_state(self, new_state):
     self.last_state = new_state.index
+    self.save()
 
 
 class BeeswaxQueryHistory(QueryHistory):

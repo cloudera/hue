@@ -90,6 +90,8 @@ class ConnectionConfig(object):
     self.kerberos_principal = kerberos_principal
     self.timeout_seconds = timeout_seconds
 
+  def __str__(self):
+    return ', '.join(map(str, [self.klass, self.host, self.port, self.service_name, self.use_sasl, self.kerberos_principal, self.timeout_seconds]))
 
 class ConnectionPooler(object):
   """
@@ -152,6 +154,7 @@ class ConnectionPooler(object):
 
     start_pool_get_time = time.time()
     has_waited_for = 0
+
     while connection is None:
       if get_client_timeout is not None:
         this_round_timeout = max(min(get_client_timeout - has_waited_for, 1), 0)
@@ -181,11 +184,11 @@ class ConnectionPooler(object):
     self.pooldict[_get_pool_key(conf)].put(client)
 
 def _get_pool_key(conf):
-   """
-   Given a ConnectionConfig, return the tuple used as the key in the dictionary
-   of connections by the ConnectionPooler class.
-   """
-   return (conf.klass, conf.host, conf.port)
+  """
+  Given a ConnectionConfig, return the tuple used as the key in the dictionary
+  of connections by the ConnectionPooler class.
+  """
+  return (conf.klass, conf.host, conf.port)
 
 def construct_superclient(conf):
   """
@@ -251,8 +254,8 @@ class PooledClient(object):
 
     # Fetch the thrift client from the pool
     superclient = _connection_pool.get_client(self.conf)
-
     res = getattr(superclient, attr)
+
     if not callable(res):
       # It's a simple attribute. We can put the superclient back in the pool.
       _connection_pool.return_client(self.conf, superclient)
@@ -279,8 +282,7 @@ class PooledClient(object):
                 superclient.transport.open()
 
             superclient.set_timeout(self.conf.timeout_seconds)
-            ret = res(*args, **kwargs)
-            return ret
+            return res(*args, **kwargs)
           except TApplicationException, e:
             # Unknown thrift exception... typically IO errors
             logging.info("Thrift saw an application exception: " + str(e), exc_info=False)
@@ -297,6 +299,7 @@ class PooledClient(object):
             raise
         finally:
           _connection_pool.return_client(self.conf, superclient)
+      wrapper.attr = attr # Save the name of the attribute as it is replaced by 'wrapper'
       return wrapper
 
 

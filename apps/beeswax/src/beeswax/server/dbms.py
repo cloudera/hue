@@ -73,7 +73,12 @@ def get_query_server_config(name='beeswax', requires_ddl=False):
   return query_server
 
 
-class QueryServerException: pass
+class QueryServerException(Exception):
+  # Ideally the query handle will be stored here too.
+
+  def __init__(self, e):
+    super(QueryServerException, self).__init__(e)
+
 
 class NoSuchObjectException: pass
 
@@ -332,12 +337,17 @@ class DataTable:
 
 
 # TODO decorator?
-def expand_exception(exc, db):
+def expand_exception(exc, db, handle=None):
   try:
-    log = db.get_log(exc)
-  except:
+    if handle is not None:
+      log = db.get_log(handle)
+    elif hasattr(handle, 'get_rpc_handle'):
+      log = db.get_log(exc)
+    else:
+      log = _("No server logs for this query")
+  except Exception, e:
     # Always show something, even if server has died on the job.
-    log = _("Could not retrieve logs.")
+    log = _("Could not retrieve logs: %s" % e)
 
   if not exc.message:
     error_message = _("Unknown exception.")

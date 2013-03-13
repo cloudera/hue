@@ -38,7 +38,6 @@ from desktop.lib.exceptions_renderable import PopupException
 
 from hadoop.fs.exceptions import WebHdfsException
 from jobsub.parameterization import find_variables, substitute_variables
-from beeswaxd.ttypes import BeeswaxException, QueryNotFoundException
 
 import beeswax.forms
 import beeswax.design
@@ -323,7 +322,7 @@ def describe_table(request, database, table):
 
   try:
     table_data = db.get_sample(database, table)
-  except BeeswaxException, ex:
+  except Exception, ex:
     error_message, logs = expand_exception(ex, db)
 
   return render("describe_table.mako", request, {
@@ -347,7 +346,7 @@ def drop_table(request, database):
       query_history = db.drop_tables(database, tables_objects, design)
       url = reverse(app_name + ':watch_query', args=[query_history.id]) + '?on_success_url=' + reverse(app_name + ':show_tables')
       return redirect(url)
-    except BeeswaxException, ex:
+    except Exception, ex:
       error_message, log = expand_exception(ex, db)
       error = _("Failed to remove %(tables)s.  Error: %(error)s") % {'tables': ','.join(tables), 'error': error_message}
       raise PopupException(error, title=_("Beeswax Error"), detail=log)
@@ -494,9 +493,7 @@ def execute_query(request, design_id=None):
           else:
             download = request.POST.has_key('download')
             return execute_directly(request, query, query_server, design, on_success_url=on_success_url, download=download)
-        except BeeswaxException, ex:
-          print ex.errorCode
-          print ex.SQLState
+        except Exception, ex:
           error_message, log = expand_exception(ex, db)
   else:
     if design.id is not None:
@@ -562,7 +559,7 @@ def watch_query(request, id):
   if request.method == 'POST' or (not query_history.is_finished() and query_history.is_success() and not query_history.has_results):
     try:
       query_history = db.execute_next_statement(query_history)
-    except BeeswaxException, ex:
+    except Exception, ex:
       pass
 
   # Check query state
@@ -570,7 +567,7 @@ def watch_query(request, id):
   query_history.save_state(state)
 
   if query_history.is_failure():
-    # When we fetch, Beeswax server will throw us a BeeswaxException, which has the
+    # When we fetch, Beeswax server will throw us a Exception, which has the
     # log we want to display.
     return format_preserving_redirect(request, results_url, request.GET)
   elif query_history.is_finished() or (query_history.is_success() and query_history.has_results):
@@ -601,13 +598,13 @@ def watch_query_refresh_json(request, id):
     if not query_history.is_finished() and query_history.is_success() and not query_history.has_results:
       db.execute_next_statement(query_history)
       handle, state = _get_query_handle_and_state(query_history)
-  except BeeswaxException, ex:
+  except Exception, ex:
     LOG.exception(ex)
     handle, state = _get_query_handle_and_state(query_history)
 
   try:
     log = db.get_log(handle)
-  except BeeswaxException, ex:
+  except Exception, ex:
     log = str(ex)
 
   jobs = _parse_out_hadoop_jobs(log)
@@ -682,7 +679,7 @@ def view_results(request, id, first_row=0):
     log = db.get_log(handle)
   except Exception, ex:
     fetch_error = True
-    error_message, log = expand_exception(ex, db)
+    error_message, log = expand_exception(ex, db, handle)
 
   # Handle errors
   error = fetch_error or results is None or expired
@@ -761,7 +758,7 @@ def save_results(request, id):
       try:
         handle, state = _get_query_handle_and_state(query_history)
         result_meta = db.get_results_metadata(handle)
-      except QueryNotFoundException, ex:
+      except Exception, ex:
         LOG.exception(ex)
         raise PopupException(_('Cannot find query.'))
       if result_meta.table_dir:
@@ -787,7 +784,7 @@ def save_results(request, id):
           # To new table
           try:
             return _save_results_ctas(request, query_history, form.cleaned_data['target_table'], result_meta)
-          except BeeswaxException, bex:
+          except Exception, bex:
             LOG.exception(bex)
             error_msg, log = expand_exception(bex, db)
       except WebHdfsException, ex:
@@ -811,7 +808,7 @@ def save_results(request, id):
 def _save_results_ctas(request, query_history, target_table, result_meta):
   """
   Handle saving results as a new table. Returns HTTP response.
-  May raise BeeswaxException, IOError.
+  May raise Exception, IOError.
   """
   query_server = query_history.get_query_server_config() # Query server requires DDL support
   db = dbms.get(request.user)
@@ -1109,7 +1106,7 @@ def _run_parameterized_query(request, design_id, explain):
         return explain_directly(request, query, design, query_server)
       else:
         return execute_directly(request, query, query_server, design)
-    except BeeswaxException, ex:
+    except Exception, ex:
       db = dbms.get(request.user, query_server)
       error_message, log = expand_exception(ex, db)
       return render('execute.mako', request, {
