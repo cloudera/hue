@@ -36,7 +36,6 @@ from cli_service.ttypes import TSessionHandle, THandleIdentifier,\
   TOperationState, TOperationHandle, TOperationType
 
 
-
 LOG = logging.getLogger(__name__)
 
 QUERY_SUBMISSION_TIMEOUT = datetime.timedelta(0, 60 * 60)               # 1 hour
@@ -101,8 +100,10 @@ class QueryHistory(models.Model):
 
 
   def get_query_server_config(self):
-    return dict(zip(['server_name', 'server_host', 'server_port', 'server_type'],
-                    [self.server_name, self.server_host, self.server_port, self.server_type]))
+    from beeswax.server.dbms import get_query_server_config
+    principal = get_query_server_config(self.server_type)['principal']
+    return dict(zip(['server_name', 'server_host', 'server_port', 'server_type', 'principal'],
+                    [self.server_name, self.server_host, self.server_port, self.server_type, principal]))
 
 
   def get_current_statement(self):

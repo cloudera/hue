@@ -17,7 +17,7 @@ from setuptools import setup, find_packages
 from hueversion import VERSION
 
 setup(
-      name = "Impala",
+      name = "impala",
       version = VERSION,
       author = "Hue",
       url = 'http://github.com/cloudera/hue',

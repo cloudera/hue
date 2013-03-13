@@ -34,7 +34,6 @@ from beeswax import models
 from beeswax import hive_site
 from beeswax.models import BeeswaxQueryHandle
 from beeswax.server.dbms import Table, DataTable
-from impala.conf import IMPALA_PRINCIPAL
 
 LOG = logging.getLogger(__name__)
 
@@ -208,8 +207,8 @@ class BeeswaxClient:
     cluster_conf = hadoop.cluster.get_cluster_conf_for_job_submission()
     use_sasl = cluster_conf is not None and cluster_conf.SECURITY_ENABLED.get()
 
-    if query_server is not None and query_server.get('server_name') == 'impala':
-      principal = IMPALA_PRINCIPAL.get()
+    if query_server is not None:
+      principal = query_server['principal']
     else:
       principal = KERBEROS.HUE_PRINCIPAL.get()
 
