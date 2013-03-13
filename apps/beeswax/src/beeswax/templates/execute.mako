@@ -33,7 +33,7 @@
         </div>
     % endif
 
-    <textarea class="span11" placeholder="${_('Example: SELECT * FROM tablename')}" name="${form.query["query"].html_name}" id="queryField">${extract_field_data(form.query["query"]) or ''}</textarea>
+    <textarea class="span11" tabindex="1" placeholder="${_('Example: SELECT * FROM tablename')}" name="${form.query["query"].html_name}" id="queryField">${extract_field_data(form.query["query"]) or ''}</textarea>
 
     <div id="validationResults">
     % if len(form.query["query"].errors):
@@ -42,18 +42,18 @@
     </div>
 
     <div class="actions">
-        <a id="executeQuery" class="btn btn-primary" tabindex="0">${_('Execute')}</a>
+        <button type="button" id="executeQuery" class="btn btn-primary" tabindex="2">${_('Execute')}</button>
         % if app_name == 'impala':
-          <a id="downloadQuery" class="btn">${_('Download')}</a>
+          <button type="button" id="downloadQuery" class="btn">${_('Download')}</button>
         % endif
         % if design and not design.is_auto and design.name:
-        <a id="saveQuery" class="btn">${_('Save')}</a>
+        <button type="button" id="saveQuery" class="btn">${_('Save')}</button>
         % endif
-        <a id="saveQueryAs" class="btn">${_('Save as...')}</a>
+        <button type="button" id="saveQueryAs" class="btn">${_('Save as...')}</button>
         % if app_name != 'impala':
-        <a id="explainQuery" class="btn">${_('Explain')}</a>
+        <button type="button" id="explainQuery" class="btn">${_('Explain')}</button>
         % endif
-        &nbsp; ${_('or create a')} &nbsp;<a class="btn" href="${ url(app_name + ':execute_query') }">${_('New query')}</a>
+        &nbsp; ${_('or create a')} &nbsp;<button type="button" class="btn" href="${ url(app_name + ':execute_query') }">${_('New query')}</button>
     </div>
 </%def>
 
@@ -477,6 +477,9 @@ ${layout.menubar(section='query')}
         }
 
         $("#executeQuery").click(executeQuery);
+        $("#executeQuery").tooltip({
+            title: '${_("Press \"tab\", then \"enter\".")}'
+        });
         $("#executeQuery").keyup(function(event){
             if(event.keyCode == 13){
                 executeQuery();
