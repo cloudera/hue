@@ -216,8 +216,8 @@ def test_mkdir_singledir():
     # Read the parent dir and make sure we created 'success_path' only.
     response = c.get('/filebrowser/view' + prefix)
     dir_listing = response.context['files']
-    assert_equal(2, len(dir_listing))
-    assert_equal(dir_listing[1]['name'], success_path)
+    assert_equal(3, len(dir_listing))
+    assert_equal(dir_listing[2]['name'], success_path)
 
   finally:
     try:
@@ -250,8 +250,8 @@ def test_touch():
     # Read the parent dir and make sure we created 'success_path' only.
     response = c.get('/filebrowser/view' + prefix)
     file_listing = response.context['files']
-    assert_equal(2, len(file_listing))
-    assert_equal(file_listing[1]['name'], success_path)
+    assert_equal(3, len(file_listing))
+    assert_equal(file_listing[2]['name'], success_path)
 
   finally:
     try:
@@ -455,7 +455,7 @@ def test_listdir():
     response = c.get('/filebrowser/view' + prefix)
 
     dir_listing = response.context['files']
-    assert_equal(len(orig_paths) + 1, len(dir_listing))
+    assert_equal(len(orig_paths) + 2, len(dir_listing))
 
     for dirent in dir_listing:
       path = dirent['name']
@@ -515,20 +515,20 @@ def test_listdir_sort_and_filter():
     cluster.fs.mkdir(cluster.fs.join(BASE, FUNNY_NAME))
 
     # All 12 of the entries
-    expect = [ '..', FUNNY_NAME] + [ str(i) for i in range(1, 11) ]
+    expect = [ '.', '..', FUNNY_NAME] + [ str(i) for i in range(1, 11) ]
 
     # Check pagination
     listing = c.get('/filebrowser/view' + BASE + '?pagesize=20').context['files']
     assert_equal(len(expect), len(listing))
 
     listing = c.get('/filebrowser/view' + BASE + '?pagesize=10').context['files']
-    assert_equal(11, len(listing))
+    assert_equal(12, len(listing))
 
     listing = c.get('/filebrowser/view' + BASE + '?pagesize=10&pagenum=1').context['files']
-    assert_equal(11, len(listing))
+    assert_equal(12, len(listing))
 
     listing = c.get('/filebrowser/view' + BASE + '?pagesize=10&pagenum=2').context['files']
-    assert_equal(2, len(listing))
+    assert_equal(3, len(listing))
 
     # Check sorting (name)
     listing = c.get('/filebrowser/view' + BASE + '?sortby=name').context['files']
@@ -538,8 +538,9 @@ def test_listdir_sort_and_filter():
     assert_equal(sorted(expect), [ f['name'] for f in listing ])
 
     listing = c.get('/filebrowser/view' + BASE + '?sortby=name&descending=true').context['files']
-    assert_equal("..", listing[0]['name'])
-    assert_equal(FUNNY_NAME, listing[1]['name'])
+    assert_equal(".", listing[0]['name'])
+    assert_equal("..", listing[1]['name'])
+    assert_equal(FUNNY_NAME, listing[2]['name'])
 
     # Check sorting (size)
     listing = c.get('/filebrowser/view' + BASE + '?sortby=size').context['files']
@@ -547,23 +548,24 @@ def test_listdir_sort_and_filter():
 
     # Check sorting (mtime)
     listing = c.get('/filebrowser/view' + BASE + '?sortby=mtime').context['files']
-    assert_equal("..", listing[0]['name'])
+    assert_equal(".", listing[0]['name'])
+    assert_equal("..", listing[1]['name'])
     assert_equal(FUNNY_NAME, listing[-1]['name'])
 
     # Check filter
     listing = c.get('/filebrowser/view' + BASE + '?filter=1').context['files']
-    assert_equal(['..', '1', '10'], [ f['name'] for f in listing ])
+    assert_equal(['.', '..', '1', '10'], [ f['name'] for f in listing ])
 
     listing = c.get('/filebrowser/view' + BASE + '?filter=' + FUNNY_NAME).context['files']
-    assert_equal(['..', FUNNY_NAME], [ f['name'] for f in listing ])
+    assert_equal(['.', '..', FUNNY_NAME], [ f['name'] for f in listing ])
 
     # Check filter + sorting
     listing = c.get('/filebrowser/view' + BASE + '?filter=1&sortby=name&descending=true').context['files']
-    assert_equal(['..', '10', '1'], [ f['name'] for f in listing ])
+    assert_equal(['.', '..', '10', '1'], [ f['name'] for f in listing ])
 
     # Check filter + sorting + pagination
     listing = c.get('/filebrowser/view' + BASE + '?filter=1&sortby=name&descending=true&pagesize=1&pagenum=2').context['files']
-    assert_equal(['..', '1'], [ f['name'] for f in listing ])
+    assert_equal(['.', '..', '1'], [ f['name'] for f in listing ])
   finally:
     try:
       cluster.fs.rmtree(BASE)

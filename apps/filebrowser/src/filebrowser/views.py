@@ -450,7 +450,8 @@ def listdir_paged(request, path):
     # Do pagination
     page = paginator.Paginator(all_stats, pagesize).page(pagenum)
     shown_stats = page.object_list
-    # Include parent dir always as first option, unless at filesystem root.
+
+    # Include parent dir always as second option, unless at filesystem root.
     if Hdfs.normpath(path) != posixpath.sep:
         parent_path = request.fs.join(path, "..")
         parent_stat = request.fs.stats(parent_path)
@@ -459,6 +460,15 @@ def listdir_paged(request, path):
         parent_stat['path'] = parent_path
         parent_stat['name'] = ".."
         shown_stats.insert(0, parent_stat)
+
+    # Include same dir always as first option to see stats of the current folder
+    current_stat = request.fs.stats(path)
+    # The 'path' field would be absolute, but we want its basename to be
+    # actually '.' for display purposes. Encode it since _massage_stats expects byte strings.
+    current_stat['path'] = path
+    current_stat['name'] = "."
+    shown_stats.insert(0, current_stat)
+
     page.object_list = [ _massage_stats(request, s) for s in shown_stats ]
 
 

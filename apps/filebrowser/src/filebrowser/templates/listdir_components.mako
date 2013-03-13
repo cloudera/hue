@@ -101,10 +101,10 @@ from django.utils.translation import ugettext as _
     <script id="fileTemplate" type="text/html">
         <tr style="cursor: pointer" data-bind="event: { mouseover: toggleHover, mouseout: toggleHover}">
             <td class="center" data-bind="click: handleSelect" style="cursor: default">
-                <div data-bind="visible: name != '..', css: {hueCheckbox: name != '..', 'icon-ok': selected}"></div>
+                <div data-bind="visible: name != '.' && name != '..', css: {hueCheckbox: name != '.' && name != '..', 'icon-ok': selected}"></div>
             </td>
             <td data-bind="click: $root.viewFile" class="left"><i data-bind="css: {'icon-file-alt': type == 'file', 'icon-folder-close': type != 'file', 'icon-folder-open': type != 'file' && hovered}"></i></td>
-            <td data-bind="click: $root.viewFile">
+            <td data-bind="click: $root.viewFile, attr: {'title': tooltip}" rel="tooltip">
                 <strong><a href="#" data-bind="click: $root.viewFile, text: name"></a></strong>
             </td>
             <td data-bind="click: $root.viewFile">
@@ -766,6 +766,13 @@ from django.utils.translation import ugettext as _
     }
 
     var File = function (file) {
+      file.tooltip = "";
+      if (file.name == "."){
+        file.tooltip = "${_('This folder')}";
+      }
+      if (file.name == ".."){
+        file.tooltip = "${_('One level up')}";
+      }
       return {
         name:file.name,
         path:file.path,
@@ -786,7 +793,8 @@ from django.utils.translation import ugettext as _
         hovered:ko.observable(false),
         toggleHover:function (row, e) {
           this.hovered(!this.hovered());
-        }
+        },
+        tooltip:file.tooltip
       }
     }
 
@@ -903,6 +911,7 @@ from django.utils.translation import ugettext as _
       };
 
       self.updateFileList = function (files, page, breadcrumbs, currentDirPath) {
+        $(".tooltip").hide();
         self.page(new Page(page));
         self.files(ko.utils.arrayMap(files, function (file) {
           return new File(file);
@@ -916,6 +925,7 @@ from django.utils.translation import ugettext as _
 
         self.isLoading(false);
         $(".scrollable").jHueTableScroller();
+        $("*[rel='tooltip']").tooltip({ placement:"left" });
       };
 
       self.recordsPerPage.subscribe(function (newValue) {
@@ -947,7 +957,7 @@ from django.utils.translation import ugettext as _
       self.selectAll = function () {
         self.allSelected(!self.allSelected());
         ko.utils.arrayForEach(self.files(), function (file) {
-          if (file.name != "..") {
+          if (file.name != "." && file.name != "..") {
             file.selected(self.allSelected());
           }
         });
