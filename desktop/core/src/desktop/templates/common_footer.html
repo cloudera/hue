@@ -46,7 +46,7 @@ limitations under the License.
             startPendingRequestsPolling();
             resetTimeout = window.setTimeout(function () {
               resetPrimaryButtonsStatus();
-            }, 100);
+            }, 200);
           }
         });
 
@@ -59,7 +59,8 @@ limitations under the License.
           window.clearTimeout(resetTimeout);
         });
 
-        $("form").submit(function () {
+        $(document).on("submit", "form", function () {
+          hasAjaxBeenSent = false;
           window.setInterval(function () {
             window.clearTimeout(resetTimeout);
           }, 10);
