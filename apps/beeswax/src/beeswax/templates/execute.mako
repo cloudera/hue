@@ -236,6 +236,12 @@ ${layout.menubar(section='query')}
               ${ _("You can execute queries with multiple SQL statements delimited by a semicolon ';'.") }
               ${ _("Use '\\059' instead of ';' if you have some conflicts.") }
             </div>
+
+            <div id="fragmentSelectionQuery" class="alert">
+              <button type="button" class="close" data-dismiss="alert">&times;</button>
+              <strong>${_('Did you know?')}</strong>
+              ${_('You can highlight and run a fragment of a query.')}
+            </div>
         </div>
         <div id="querySide" class="span9">
             % if on_success_url:
@@ -411,7 +417,7 @@ ${layout.menubar(section='query')}
 </style>
 
 <script src="/static/ext/js/jquery/plugins/jquery.cookie.js"></script>
-
+<script src="/static/ext/js/jquery/plugins/jquery-fieldselection.js" type="text/javascript"></script>
 
 <script type="text/javascript" charset="utf-8">
     $(document).ready(function(){
@@ -588,8 +594,17 @@ ${layout.menubar(section='query')}
         }
       }
 
+      function getHighlightedQuery() {
+        var selection = $("#queryField").getSelection();
+        if (selection) {
+            return selection.text;
+        }
+        return null;
+      }
+
       function checkAndSubmit() {
-        $(".query").val($("#queryField").val());
+        var query = getHighlightedQuery() || $("#queryField").val();
+        $(".query").val(query);
         $("#advancedSettingsForm").submit();
       }
     });
