@@ -38,35 +38,89 @@ from django.utils.translation import ugettext as _
     <script src="/static/ext/js/moment.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
     <style type="text/css">
-        .fixed {
-            position: fixed;
-            top: 40px;
-            filter: progid:dximagetransform.microsoft.gradient(startColorstr='#ffffffff', endColorstr='#fff2f2f2', GradientType=0);
-            -webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
-            -moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
-        }
-        .pull-right {
-            margin: 4px;
-        }
-        .sortable {
-            cursor: pointer;
-        }
-        .file-row {
-            height:37px;
-        }
-        .fileChooserModal {
-            padding: 14px;
-        }
-        .fileChooserModal .hueBreadcrumb {
-            margin: 0 0 18px!important;
-        }
-        .fieldError {
-          border-color: #B94A48!important;
-        }
+      .fixed {
+        position: fixed;
+        top: 40px;
+        filter: progid:dximagetransform.microsoft.gradient(startColorstr='#ffffffff', endColorstr='#fff2f2f2', GradientType=0);
+        -webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
+        -moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
+      }
+
+      .pull-right {
+        margin: 4px;
+      }
+
+      .sortable {
+        cursor: pointer;
+      }
+
+      .file-row {
+        height: 37px;
+      }
+
+      .fileChooserModal {
+        padding: 14px;
+      }
+
+      .fileChooserModal .hueBreadcrumb {
+        margin: 0 0 18px !important;
+      }
+
+      .fieldError {
+        border-color: #B94A48 !important;
+      }
+
+      .pagination {
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        background-color: #f5f5f5;
+        margin: 0;
+        border-top: 1px solid #e3e3e3;
+        -webkit-box-shadow: 0px -1px 3px rgba(50, 50, 50, 0.1);
+        -moz-box-shadow: 0px -1px 3px rgba(50, 50, 50, 0.1);
+        box-shadow: 0px -1px 3px rgba(50, 50, 50, 0.1);
+        padding-bottom: 16px;
+      }
+
+      .pagination p {
+        padding-top: 10px;
+        padding-left: 10px;
+      }
+
+      .pagination ul {
+        margin-bottom: 10px;
+        margin-right: 20px;
+      }
+
+      .btn-group {
+        font-size: 14px;
+        vertical-align: baseline;
+      }
+
+      #delete-dropdown {
+        margin-left: -11px;
+      }
+
+      .actionbar {
+        padding-top: 6px;
+        background-color: #FFFFFF;
+      }
+
+      .shadow {
+        -webkit-box-shadow: 0px 2px 3px rgba(50, 50, 50, 0.1);
+        -moz-box-shadow: 0px 2px 3px rgba(50, 50, 50, 0.1);
+        box-shadow: 0px 1px 2px rgba(50, 50, 50, 0.1);
+      }
+
+      .scrollable {
+        margin-bottom: 80px;
+      }
     </style>
 
-    <table class="table table-striped table-condensed datatables">
+    <table class="table table-striped table-condensed datatables tablescroller-disable">
         <thead>
             <tr>
                 <th width="1%"><div data-bind="click: selectAll, css: {hueCheckbox: true, 'icon-ok': allSelected}"></div></th>
@@ -133,7 +187,7 @@ from django.utils.translation import ugettext as _
             <select class="input-mini" data-bind="options: recordsPerPageChoices, value: recordsPerPage"></select>
         ${_('items per page')}.
         ${_('Showing')} <span data-bind="text: page().start_index"></span> ${_('to')} <span data-bind="text: page().end_index"></span> ${_('of')} <span data-bind="text: page().total_count"></span> ${_('items, page')}
-            <span data-bind="text: page().number"></span> ${_('of')} <span data-bind="text: page().num_pages"></span></p>
+            <span data-bind="text: page().number"></span> ${_('of')} <span data-bind="text: page().num_pages"></span>.</p>
     </div>
 
     <!-- delete modal -->
@@ -743,7 +797,28 @@ from django.utils.translation import ugettext as _
         }
       });
 
+      $(".actionbar").data("originalWidth", $(".actionbar").width());
+      $(".actionbarGhost").height($(".actionbar").outerHeight() + 20);
+      resetActionbar();
+
+      $(window).scroll(function () {
+        if ($(window).scrollTop() > 95) {
+          $(".actionbar").width($(".actionbar").data("originalWidth"));
+          $(".actionbar").css("position", "fixed").css("top", "40px");
+          $(".actionbarGhost").removeClass("hide");
+        }
+        else {
+          resetActionbar();
+        }
+      });
+
     });
+
+    function resetActionbar() {
+      $(".actionbar").attr("style", "");
+      $(".actionbar").data("originalWidth", $(".actionbar").width());
+      $(".actionbarGhost").addClass("hide");
+    }
 
     function stripHashes(str) {
       return str.replace(/#/gi, encodeURIComponent("#"));
@@ -924,8 +999,9 @@ from django.utils.translation import ugettext as _
         $('.uploader').trigger('fb:updatePath', {dest:self.currentPath()});
 
         self.isLoading(false);
-        $(".scrollable").jHueTableScroller();
         $("*[rel='tooltip']").tooltip({ placement:"left" });
+        $(window).scrollTop(0);
+        resetActionbar();;
       };
 
       self.recordsPerPage.subscribe(function (newValue) {

@@ -27,10 +27,10 @@ ${ commonheader(_('File Browser'), 'filebrowser', user) | n,unicode }
 
 <div class="container-fluid">
     <h1>${_('File Browser')}</h1>
-
+    <div class="actionbar">
     <%actionbar:render>
         <%def name="search()">
-            <input type="text" class="input-xlarge search-query" placeholder="${_('Search for file name')}" data-bind="value: searchQuery">
+            <input type="text" class="input-large search-query" placeholder="${_('Search for file name')}" data-bind="value: searchQuery">
         </%def>
 
         <%def name="actions()">
@@ -81,16 +81,18 @@ ${ commonheader(_('File Browser'), 'filebrowser', user) | n,unicode }
             </div>
         </%def>
     </%actionbar:render>
-
-    <div class="alert alert-warn" data-bind="visible: inTrash">
-        ${ _("You are in Hadoop trash. Your files will be under a checkpoint, or timestamp named, directory.") }
     </div>
-
-    % if breadcrumbs:
-        ${fb_components.breadcrumbs(path, breadcrumbs, True)}
-    %endif
+    <div class="actionbarGhost hide"></div>
 
     <div class="scrollable">
+      <div class="alert alert-warn" data-bind="visible: inTrash">
+        ${ _("You are in Hadoop trash. Your files will be under a checkpoint, or timestamp named, directory.") }
+      </div>
+
+      % if breadcrumbs:
+        ${fb_components.breadcrumbs(path, breadcrumbs, True)}
+      %endif
+
         ${dir.list_table_browser(files, path_enc, current_request_path, cwd_set)}
     </div>
 </div>
