@@ -95,7 +95,7 @@ TEMPLATE_LOADERS = (
     'desktop.lib.template_loader.load_template_source',
 )
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE_CLASSES = [
     # The order matters
     'desktop.middleware.DatabaseLoggingMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -117,7 +117,7 @@ MIDDLEWARE_CLASSES = (
     'desktop.middleware.AppSpecificMiddleware',
     'django.middleware.transaction.TransactionMiddleware',
     # 'debug_toolbar.middleware.DebugToolbarMiddleware'
-)
+]
 
 if os.environ.get(ENV_DESKTOP_DEBUG):
   MIDDLEWARE_CLASSES.append('desktop.middleware.HtmlValidationMiddleware')
