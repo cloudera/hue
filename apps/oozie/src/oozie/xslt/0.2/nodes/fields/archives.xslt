@@ -7,7 +7,7 @@
   <field name="archives" type="TextField">
     <xsl:text>[</xsl:text>
     <xsl:for-each select="*[local-name()='archive']">
-      <xsl:text><![CDATA["]]></xsl:text><xsl:value-of select="." /><xsl:text><![CDATA["]]></xsl:text>
+      <xsl:text><![CDATA[{"dummy":"","name":"]]></xsl:text><xsl:value-of select="." /><xsl:text><![CDATA["}]]></xsl:text>
       <xsl:if  test="position() &lt; last()">
         <xsl:text>,</xsl:text>
       </xsl:if>

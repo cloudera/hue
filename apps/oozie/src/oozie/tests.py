@@ -711,12 +711,12 @@ class TestEditor(OozieMockBase):
         "description":"Generate N number of records",
         "main_class":"org.apache.hadoop.examples.terasort.TeraGen",
         "args":"1000 ${output_dir}/teragen",
-        "files":"[]",
+        "files":'["my_file","my_file2"]',
         "job_xml":"",
         "java_opts":"-Dexample-property=natty",
         "jar_path":"/user/hue/oozie/workspaces/lib/hadoop-examples.jar",
-        "prepares":"[]",
-        "archives":"[]",
+        "prepares":'[{"value":"/test","type":"mkdir"}]',
+        "archives":'[{"dummy":"","name":"my_archive"},{"dummy":"","name":"my_archive2"}]',
         "capture_output": "on",
     })
     Link(parent=action1, child=self.wf.end, name="ok").save()
@@ -728,10 +728,17 @@ class TestEditor(OozieMockBase):
         <java>
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
+            <prepare>
+                  <mkdir path="${nameNode}/test"/>
+            </prepare>
             <main-class>org.apache.hadoop.examples.terasort.TeraGen</main-class>
             <java-opts>-Dexample-property=natty</java-opts>
             <arg>1000</arg>
             <arg>${output_dir}/teragen</arg>
+            <file>my_file#my_file</file>
+            <file>my_file2#my_file2</file>
+            <archive>my_archive#my_archive</archive>
+            <archive>my_archive2#my_archive2</archive>
             <capture-output/>
         </java>
         <ok to="end"/>

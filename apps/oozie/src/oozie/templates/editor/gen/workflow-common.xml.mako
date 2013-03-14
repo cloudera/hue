@@ -60,7 +60,7 @@
     % endfor
     % for a in archives:
         % if a:
-            <archive>${ a }</archive>
+            <archive>${ filelink(a['name']) }</archive>
         % endif
     % endfor
 </%def>
