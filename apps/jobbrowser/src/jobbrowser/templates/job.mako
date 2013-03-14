@@ -107,7 +107,7 @@ ${ commonheader(_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId_short),
                         ${comps.get_status(job)}
                     </li>
                     <li class="nav-header">${_('Logs')}</li>
-                    <li><a href="${ url('jobbrowser.views.job_single_logs', job=job.jobId) }">${_('View logs')}</a></li>
+                    <li><a href="${ url('jobbrowser.views.job_single_logs', job=job.jobId) }"><i class="icon-tasks"></i> ${_('Logs')}</a></li>
                     % if job.status.lower() == 'running' or job.status.lower() == 'pending':
                         <li class="nav-header">${_('Kill Job')}</li>
                         <li>
@@ -138,9 +138,11 @@ ${ commonheader(_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId_short),
                             dir_name = basename.split('/')[-1]
                         %>
                         % if location_url != None:
-                                <a href="${location_url}" title="${output_dir}">${dir_name}</a>
-                        % else:
-                            ${dir_name}
+                            <a href="${location_url}" title="${output_dir}">
+                        % endif
+                        <i class="icon-folder-open"></i> ${dir_name}
+                        % if location_url != None:
+                            </a>
                         % endif
                         </li>
                     % endif
