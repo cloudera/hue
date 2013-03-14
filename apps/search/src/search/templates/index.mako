@@ -60,7 +60,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
       </div>
     </div>
     %else:
-    % if response and response['response']['docs'] and len(response['response']['docs']) > 0 and solr_query['facets'] == 1:
+    % if response and response['response']['docs'] and len(response['response']['docs']) > 0 and solr_query['facets'] == 1 and response.get('facet_counts'):
     <div class="span2">
       <ul class="facet-list">
         % if response and response.get('facet_counts'):
@@ -129,7 +129,11 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
     </div>
     % endif
     % if response and response['response']['docs'] and len(response['response']['docs']) > 0:
-    <div class="span10">
+      %if response.get('facet_counts'):
+      <div class="span10">
+      %else:
+      <div class="span12">
+      %endif
       <ul class="breadcrumb">
         <li class="pull-right">
           <select class="sort-by">

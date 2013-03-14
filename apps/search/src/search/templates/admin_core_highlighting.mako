@@ -34,23 +34,21 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
   </%def>
 
   <%def name="content()">
-    <form method="POST" class="form-horizontal" data-bind="submit: submit">
+    <form method="POST" class="form" data-bind="submit: submit">
       <div class="section">
-        <div class="alert alert-info"><h4>${_('Highlighting')}</h4></div>
-        <div data-bind="visible: highlightedFields().length == 0" style="padding-left: 10px;margin-bottom: 20px">
+        <div class="alert alert-info">
+          <div class="pull-right">
+            <label><input type='checkbox' data-bind="checked: isEnabled" style="margin-top: -2px; margin-right: 4px"/> ${_('Enabled') }</label>
+          </div>
+          <h4>${_('Highlighting')}</h4>
+        </div>
+        <div data-bind="visible: highlightedFields().length > 0" style="padding-left: 10px;margin-bottom: 20px">
           <em>${_('Please select some fields to highlight in the result below.')}</em>
         </div>
 
-        <div class="clearfix"></div>
-        <div class="miniform">
-          ${_('Is enabled') }
-          </br>
-          <input type='checkbox' data-bind="checked: isEnabled" />
-          </br>
-          ${_('Fields') }
-          </br>
-          <select data-bind="options: fields, selectedOptions: highlightedFields" size="20" multiple="true"></select>
-          <select id="fields" data-bind="options: fields, selectedOptions: highlightedFields" size="20" multiple="true"></select>
+        <div class="selector">
+          <select data-bind="options: fields, selectedOptions: highlightedFields" size="20" multiple="true" class="hide"></select>
+          <select id="fields" size="20" multiple="true"></select>
         </div>
       </div>
 
@@ -120,13 +118,21 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
   $(document).ready(function () {
     ko.applyBindings(viewModel);
 
-    ## TODO
+    ko.utils.arrayForEach(viewModel.fields(), function(field) {
+      $("<option>").attr("value", field).text(field).appendTo($("#fields"));
+    });
+
+    $("#fields").val(viewModel.highlightedFields());
+
     $("#fields").jHueSelector({
       selectAllLabel: "${_('Select all')}",
       searchPlaceholder: "${_('Search')}",
-      noChoicesFound: "${_('No groups found.')}",
-      width:600,
-      height:240
+      noChoicesFound: "${_('No fields found.')}",
+      width:$(".selector").width(),
+      height:240,
+      onChange: function(){
+        viewModel.highlightedFields($("#fields").val());
+      }
     });
   });
 </script>
