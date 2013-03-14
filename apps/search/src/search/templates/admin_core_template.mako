@@ -119,8 +119,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     </div>
 
     <div class="form-actions">
-      <a class="btn" id="save-template">${_('Save')}</a>
-      <a class="btn btn-primary" id="save-template">${_('Save and next')}</a>
+      <a class="btn btn-primary" id="save-template">${_('Save')}</a>
     </div>
 
     <div id="load-template-modal" class="modal hide fade">

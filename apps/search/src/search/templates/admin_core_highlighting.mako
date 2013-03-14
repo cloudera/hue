@@ -42,7 +42,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
           </div>
           <h4>${_('Highlighting')}</h4>
         </div>
-        <div data-bind="visible: highlightedFields().length > 0" style="padding-left: 10px;margin-bottom: 20px">
+        <div style="padding-left: 10px;margin-bottom: 20px">
           <em>${_('Please select some fields to highlight in the result below.')}</em>
         </div>
 
@@ -90,7 +90,9 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     var self = this;
     self.fields = ko.observableArray(${ hue_core.fields | n,unicode });
 
-    self.highlightedFields = ko.observableArray(${ hue_core.result.data | n,unicode }.highlighting);
+    var resultData = ${ hue_core.result.data | n,unicode };
+
+    self.highlightedFields = ko.observableArray(resultData!=null?resultData.highlighting:[]);
     self.isEnabled = ko.observable(true);
 
     self.submit = function () {

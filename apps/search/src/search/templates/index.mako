@@ -153,6 +153,8 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
       <script src="/static/ext/js/mustache.js"></script>
 
       <div id="result-container"></div>
+
+      <textarea id="mustacheTmpl" class="hide">${ hue_core.result.get_template(with_highlighting=True) | n,unicode }</textarea>
       <script>
       <%
         docs = response['response']['docs']
@@ -162,7 +164,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
         %>
         $.each(${ json.dumps([result for result in docs]) | n,unicode }, function (index, item) {
           $("<div>").addClass("result-row").html(
-            Mustache.render('${ hue_core.result.get_template(with_highlighting=True) | n,unicode }', item)
+            Mustache.render($("#mustacheTmpl").text(), item)
           ).appendTo($("#result-container"));
         });
       </script>

@@ -95,7 +95,7 @@
       ##</li>
       <li class="nav-header">${_('Search')}</li>
       <li>
-        <a href="${ url('search:index') }"><i class="icon-share-alt"></i> ${ _('Query') }</a>
+        <a href="${ url('search:index') }" target="_blank"><i class="icon-share-alt"></i> ${ _('Query') }</a>
       </li>
 
       ##<li class="nav-header">${_('Solr')}</li>
