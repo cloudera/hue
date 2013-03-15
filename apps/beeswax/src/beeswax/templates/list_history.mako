@@ -109,13 +109,11 @@ ${ layout.menubar(section='history') }
                 <td data-sort-value="${time.mktime(query.submission_date.timetuple())}">${query.submission_date.strftime("%x %X")}</td>
                 <td>${show_saved_query(query.design, query)}</td>
                 <td>
-                  <p>
-                    % if len(query.query) > 100:
-                      <code>${collapse_whitespace(query.query[:100])}...</code>
-                    % else:
-                      <code>${collapse_whitespace(query.query)}</code>
-                    % endif
-                  </p>
+                  % if len(query.query) > 100:
+                    <code>${collapse_whitespace(query.query[:100])}...</code>
+                  % else:
+                    <code>${collapse_whitespace(query.query)}</code>
+                  % endif
                 </td>
                 <td>${query.owner}</td>
                 <td>${models.QueryHistory.STATE[query.last_state]}</td>

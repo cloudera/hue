@@ -212,7 +212,7 @@ def my_queries(request):
   and those in ``list_designs`` (with a ``q-`` prefix). The only thing it disallows
   is the ``user`` filter, since this view only shows what belongs to the user.
   """
-  DEFAULT_PAGE_SIZE = 40
+  DEFAULT_PAGE_SIZE = 30
   app_name= get_app_name(request)
 
   # Extract the history list.
@@ -262,7 +262,8 @@ def list_query_history(request):
                           Default to "-date".
     auto_query=<bool>   - Show auto generated actions (drop table, read data, etc). Default False
   """
-  DEFAULT_PAGE_SIZE = 20
+  DEFAULT_PAGE_SIZE = 30
+  prefix = 'q-'
 
   share_queries = conf.SHARE_SAVED_QUERIES.get() or request.user.is_superuser
 
@@ -273,7 +274,7 @@ def list_query_history(request):
   app_name= get_app_name(request)
   querydict_query['type'] = app_name
 
-  page, filter_params = _list_query_history(request.user, querydict_query, DEFAULT_PAGE_SIZE)
+  page, filter_params = _list_query_history(request.user, querydict_query, DEFAULT_PAGE_SIZE, prefix)
 
   return render('list_history.mako', request, {
     'request': request,

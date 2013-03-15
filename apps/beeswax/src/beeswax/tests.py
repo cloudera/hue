@@ -1317,7 +1317,11 @@ def test_history_page():
 
   # Only show Beeswax queries
   response = do_view('')
-  assert_equal('beeswax', response.context['filter_params']['type'])
+  assert_equal({}, response.context['filter_params'])
+
+  # Test pagination
+  response = do_view('?q-page=100')
+  assert_equal(0, len(response.context['page'].object_list))
 
 def test_strip_trailing_semicolon():
   # Note that there are two queries (both an execute and an explain) scattered
