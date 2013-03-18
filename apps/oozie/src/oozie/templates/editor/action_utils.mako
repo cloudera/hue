@@ -165,7 +165,7 @@
                   {'label': _('Add delete'), 'method': 'addPrepareDelete'},
                   {'label': _('Add mkdir'), 'method': 'addPrepareMkdir'},
                 ],
-                'remove': '$parent.removePrepare'
+                'remove': '$parent.removePrepare.bind($parent)'
               })
             %>
           % endif
@@ -179,7 +179,7 @@
                   {'label': _('Add Param'), 'method': 'addParam'},
                   {'label': _('Add Argument'), 'method': 'addArgument'},
                 ],
-                'remove': '$parent.removeParam'
+                'remove': '$parent.removeParam.bind($parent)'
               })
               %>
             % endif
@@ -192,7 +192,7 @@
                   {'label': _('Add Argument'), 'method': 'addArgument'},
                   {'label': _('Add Env-Var'), 'method': 'addEnvVar'},
                 ],
-                'remove': '$parent.removeParam'
+                'remove': '$parent.removeParam.bind($parent)'
               })
               %>
             % endif
@@ -204,7 +204,7 @@
                 'add': [
                   {'label': _('Add Param'), 'method': 'addParam'},
                 ],
-                'remove': '$parent.removeParam'
+                'remove': '$parent.removeParam.bind($parent)'
               })
               %>
             % endif
@@ -216,7 +216,7 @@
                 'add': [
                   {'label': _('Add Argument'), 'method': 'addArgument'},
                 ],
-                'remove': '$parent.removeParam'
+                'remove': '$parent.removeParam.bind($parent)'
               })
               %>
             % endif
@@ -228,7 +228,7 @@
                 'add': [
                   {'label': _('Add Arg'), 'method': 'addArg'},
                 ],
-                'remove': '$parent.removeParam'
+                'remove': '$parent.removeParam.bind($parent)'
               })
               %>
             % endif
@@ -239,7 +239,7 @@
             job_properties_field(action_form['job_properties'], {
               'name': 'job_properties',
               'add': 'addProperty',
-              'remove': '$parent.removeProperty'
+              'remove': '$parent.removeProperty.bind($parent)'
             })
             %>
           % endif
@@ -249,7 +249,7 @@
             file_field(action_form['files'], {
               'name': 'files',
               'add': 'addFile',
-              'remove': '$parent.removeFile'
+              'remove': '$parent.removeFile.bind($parent)'
             })
             %>
           % endif
@@ -259,7 +259,7 @@
             archives_field(action_form['archives'], {
               'name': 'archives',
               'add': 'addArchive',
-              'remove': '$parent.removeArchive'
+              'remove': '$parent.removeArchive.bind($parent)'
             })
             %>
           % endif
@@ -273,7 +273,7 @@
             file_field(action_form['deletes'], {
               'name': 'deletes',
               'add': 'addDelete',
-              'remove': '$parent.removeDelete'
+              'remove': '$parent.removeDelete.bind($parent)'
             })
             %>
           % endif
@@ -283,7 +283,7 @@
             file_field(action_form['mkdirs'], {
               'name': 'mkdirs',
               'add': 'addMkdir',
-              'remove': '$parent.removeMkdir'
+              'remove': '$parent.removeMkdir.bind($parent)'
             })
             %>
           % endif
@@ -293,7 +293,7 @@
             move_field(action_form['moves'], {
               'name': 'moves',
               'add': 'addMove',
-              'remove': '$parent.removeMove'
+              'remove': '$parent.removeMove.bind($parent)'
             })
             %>
           % endif
@@ -303,7 +303,7 @@
             chmod_field(action_form['chmods'], {
               'name': 'chmods',
               'add': 'addChmod',
-              'remove': '$parent.removeChmod'
+              'remove': '$parent.removeChmod.bind($parent)'
             })
             %>
           % endif
@@ -313,7 +313,7 @@
             file_field(action_form['touchzs'], {
               'name': 'touchzs',
               'add': 'addTouchz',
-              'remove': '$parent.removeTouchz'
+              'remove': '$parent.removeTouchz.bind($parent)'
             })
             %>
           % endif
