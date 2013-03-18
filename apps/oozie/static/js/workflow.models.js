@@ -346,6 +346,7 @@ $.extend(JavaModel.prototype, {
   main_class: '',
   args: '',
   java_opts: '',
+  capture_output: false,
   child_links: []
 });
 
