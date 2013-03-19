@@ -38,11 +38,14 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
       <div class="section">
         <div class="alert alert-info">
           <div class="pull-right">
-            <label><input type='checkbox' data-bind="checked: isEnabled" style="margin-top: -2px; margin-right: 4px"/> ${_('Enabled') }</label>
+            <label>
+              <input type='checkbox' data-bind="checked: isEnabled" style="margin-top: -2px; margin-right: 4px"/> ${_('Enabled') }
+            </label>
           </div>
-          <h4>${_('Highlighting')}</h4>
+          <h4>${_('Highlighting')}</h4>          
         </div>
         <div style="padding-left: 10px;margin-bottom: 20px">
+          <p>${_('Highlights the query keywords matching some of the fields below.')}</p>
           <em>${_('Please select some fields to highlight in the result below.')}</em>
         </div>
 
@@ -92,12 +95,13 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 
     var resultData = ${ hue_core.result.data | n,unicode };
 
-    self.highlightedFields = ko.observableArray(resultData!=null?resultData.highlighting:[]);
-    self.isEnabled = ko.observable(true);
+    self.highlightedFields = ko.observableArray(resultData != null ? resultData.highlighting : []);
+    self.isEnabled = ko.observable(${ hue_core.result.data | n,unicode }.properties.highlighting_enabled);
 
     self.submit = function () {
       $.ajax("${ url('search:admin_core_highlighting', core=hue_core.name) }", {
         data: {
+          'properties': ko.utils.stringifyJson({'highlighting_enabled': self.isEnabled()}),
           'highlighting': ko.utils.stringifyJson(self.highlightedFields)
         },
         contentType: 'application/json',
@@ -131,7 +135,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
       searchPlaceholder: "${_('Search')}",
       noChoicesFound: "${_('No fields found.')}",
       width:$(".selector").width(),
-      height:240,
+      height:340,
       onChange: function(){
         viewModel.highlightedFields($("#fields").val());
       }
