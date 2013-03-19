@@ -67,29 +67,31 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
       <div class="tab-pane active" id="visual">
 
         <div class="row-fluid">
-          <div class="span9">
+          <div class="span12">
+            <div>
+             ${ _('Edit the result snippet below.') }
+            </div>
             <div id="toolbar"></div>
+            </br>
             <div id="content-editor" class="clear">${ hue_core.result.get_template() | n,unicode }</div>
             <div id="load-template" class="btn-group">
               <a title="Load template" class="btn toolbar-btn toolbar-cmd">
                 <i class="icon-paste" style="margin-top:2px;"></i>
               </a>
             </div>
-          </div>
 
-          <div class="span3">
+            </br></br></br>
+
             <div class="well available-fields">
               <h4>${_('Available Fields')}</h4>
-              <ul data-bind="foreach: fields">
-                <li class="field-button">
-                  <a title="${ _('Click on this button to add the field') }" class="btn" data-bind="click: $root.addField">
+              <span data-bind="foreach: fields" class="field-button">
+                  <a title="${ _('Click on this button to add the field') }"  style="margin-bottom:10px" class="btn" data-bind="click: $root.addField">
                     <i class="icon-plus"></i>
                     &nbsp;
                     <span data-bind="text: $data"></span>
                   </a>
-                  <span class="space">&nbsp;</span>
-                </li>
-              </ul>
+                  &nbsp;
+                </span>
             </div>
           </div>
         </div>

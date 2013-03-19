@@ -264,7 +264,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
       }
       location.href = "?query=${solr_query["q"]}&fq=${solr_query["fq"]}&sort=" + _sort + "&rows=${solr_query["rows"]}&start=${solr_query["start"]}";
     });
-    
+
     $("#id_query").keydown(function() {
       var query = $("#id_query").val();
       $.ajax("${ url('search:query_suggest', core=hue_core.name) }" + query, {
@@ -274,8 +274,8 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
             $('#id_query').typeahead({source: data.message.spellcheck.suggestions[1].suggestion});
           }
         }
-      });    
-      
+      });
+
     });
 
   });
