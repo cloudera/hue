@@ -102,12 +102,15 @@ class Facet(models.Model):
 
 
 class Result(models.Model):
-  _META_TEMPLATE_ATTRS = ['template', 'highlighting', 'css']
+  _META_TEMPLATE_ATTRS = ['properties', 'template', 'highlighting', 'css']
 
   data = models.TextField()
 
   def update_from_post(self, post_data):
     data_dict = json.loads(self.data)
+    print data_dict
+    if post_data.get('properties'):
+      data_dict['properties'] = json.loads(post_data['properties'])
 
     if post_data.get('template'):
       data_dict['template'] = json.loads(post_data['template'])
@@ -135,7 +138,7 @@ class Result(models.Model):
 
     if data_dict.get('highlighting'):
       params += (
-        ('hl', 'true'),
+        ('hl', data_dict.get('properties', {}).get('highlighting_enabled') and 'true' or 'false'),
         ('hl.fl', ','.join(data_dict.get('highlighting'))),
       )
 
@@ -189,7 +192,11 @@ class CoreManager(models.Manager):
                    'fields': [],
                    'dates': []
                 }))
-      result = Result.objects.create(data=json.dumps({'template': 'To customize!<br/>', 'highlighting': []}))
+      result = Result.objects.create(data=json.dumps({
+                  'template': '{{id}} To customize!<br/>',
+                  'highlighting': [],
+                  'properties': {'highlighting_enabled': False},
+              }))
       sorting = Sorting.objects.create(data=json.dumps({'properties': {'is_enabled': False}, 'fields': []}))
 
       return Core.objects.create(name=name, label=name, facets=facets, result=result, sorting=sorting)
