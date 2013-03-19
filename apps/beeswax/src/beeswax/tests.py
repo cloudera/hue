@@ -1320,7 +1320,7 @@ def test_history_page():
   assert_equal({}, response.context['filter_params'])
 
   # Test pagination
-  response = do_view('?q-page=100')
+  response = do_view('q-page=100')
   assert_equal(0, len(response.context['page'].object_list))
 
 def test_strip_trailing_semicolon():

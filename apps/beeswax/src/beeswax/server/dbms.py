@@ -341,7 +341,7 @@ def expand_exception(exc, db, handle=None):
   try:
     if handle is not None:
       log = db.get_log(handle)
-    elif hasattr(handle, 'get_rpc_handle'):
+    elif hasattr(exc, 'get_rpc_handle') or hasattr(exc, 'log_context'):
       log = db.get_log(exc)
     else:
       log = _("No server logs for this query")
