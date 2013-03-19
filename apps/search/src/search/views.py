@@ -42,10 +42,9 @@ LOG = logging.getLogger(__name__)
 def index(request):
   cores = SolrApi(SOLR_URL.get()).cores()
   hue_cores = Core.objects.all()
-
-  if not hue_cores:
-    for core in cores['status']:
-      Core.objects.get_or_create(name=core)
+  
+  for core in cores['status']:
+    Core.objects.get_or_create(name=core)
 
   search_form = QueryForm(request.GET)
   response = {}

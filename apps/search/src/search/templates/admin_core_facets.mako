@@ -35,7 +35,15 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     <form method="POST" class="form-horizontal" data-bind="submit: submit">
 
       <div class="section">
-        <div class="alert alert-info"><h4>${_('Field Facets')}</h4></div>
+        <div class="alert alert-info"><h4>${_('Facets')}</h4></div>
+        <div class="clearfix"></div>
+        <div class="miniform">
+          ${_('Facets enabled: ')}<input type="checkbox" data-bind="checked: isEnabled" />          
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="alert alert-info" style="margin-top: 60px"><h4>${_('Field Facets')}</h4></div>
         <div data-bind="visible: fieldFacets().length == 0" style="padding-left: 10px;margin-bottom: 20px">
           <em>${_('There are currently no field Facets defined.')}</em>
         </div>
@@ -126,7 +134,6 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 <script src="/static/ext/js/bootstrap-datepicker.min.js" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript">
-
   var DATE_FORMAT = "mm-dd-yyyy";
 
   var Facet = function (type, field, start, end, gap) {
@@ -152,8 +159,10 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
   }
 
   function ViewModel() {
-    var self = this;
+    var self = this;    
     self.fields = ko.observableArray(${ hue_core.fields | n,unicode });
+
+    self.isEnabled = ko.observable(${ hue_core.facets.data | n,unicode }.properties.is_enabled);
 
     self.fieldFacets = ko.observableArray(ko.utils.arrayMap(${ hue_core.facets.data | n,unicode }.fields, function (obj) {
       return new FieldFacet(obj.field);
@@ -221,6 +230,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     self.submit = function () {
       $.ajax("${ url('search:admin_core_facets', core=hue_core.name) }", {
         data: {
+          'properties': ko.utils.stringifyJson({'is_enabled': self.isEnabled()}),
           'fields': ko.utils.stringifyJson(self.fieldFacets),
           'ranges': ko.utils.stringifyJson(self.rangeFacets),
           'dates': ko.utils.stringifyJson(self.dateFacets)
