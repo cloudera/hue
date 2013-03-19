@@ -56,7 +56,7 @@ def index(request):
     solr_query['core'] = core
     solr_query['q'] = search_form.cleaned_data['query']
     solr_query['fq'] = search_form.cleaned_data['fq']
-    solr_query['sort'] = search_form.cleaned_data['sort'] or 'created_at desc'
+    solr_query['sort'] = search_form.cleaned_data['sort'] or 'score desc'
     solr_query['rows'] = search_form.cleaned_data['rows'] or 15
     solr_query['start'] = search_form.cleaned_data['start'] or 0
     solr_query['facets'] = search_form.cleaned_data['facets'] or 1
