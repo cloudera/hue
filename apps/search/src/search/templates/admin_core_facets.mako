@@ -38,7 +38,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
         <div class="alert alert-info"><h4>${_('Facets')}</h4></div>
         <div class="clearfix"></div>
         <div class="miniform">
-          ${_('Enabled')} <input type="checkbox" data-bind="checked: isEnabled" />          
+          ${_('Enabled')} <input type="checkbox" data-bind="checked: isEnabled" />
         </div>
       </div>
 
@@ -82,11 +82,11 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
           ${_('Field')}
           <select data-bind="options: fields, value: selectedRangeFacet"></select>
           &nbsp;${_('Start')}
-          <input type="text" data-bind="value: selectedRangeStartFacet" class="input-mini" />
+          <input type="number" data-bind="value: selectedRangeStartFacet" class="input-mini" />
           &nbsp;${_('End')}
-          <input type="text" data-bind="value: selectedRangeEndFacet" class="input-mini" />
+          <input type="number" data-bind="value: selectedRangeEndFacet" class="input-mini" />
           &nbsp;${_('Gap')}
-          <input type="text" data-bind="value: selectedRangeGapFacet" class="input-mini" />
+          <input type="number" data-bind="value: selectedRangeGapFacet" class="input-mini" />
           <a class="btn" data-bind="click: $root.addRangeFacet"><i class="icon-plus"></i> ${_('Add field')}</a>
         </div>
       </div>
@@ -108,14 +108,14 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
         </div>
         <div class="clearfix"></div>
         <div class="miniform">
-        ${_('Field')}
+          ${_('Field')}
           <select data-bind="options: fields, value: selectedDateFacet"></select>
           &nbsp;${_('Start')}
           <input id="dp-start" class="input-small" type="text" data-bind="value: selectedDateStartFacet" />
           &nbsp;${_('End')}
           <input id="dp-end" class="input-small" type="text" data-bind="value: selectedDateEndFacet" />
           &nbsp;${_('Gap')}
-          <input type="text" data-bind="value: selectedDateGapFacet" class="input-mini" />
+          <input type="number" data-bind="value: selectedDateGapFacet" class="input-mini" />
           <a class="btn" data-bind="click: $root.addDateFacet"><i class="icon-plus"></i> ${_('Add field')}</a>
         </div>
       </div>
@@ -159,7 +159,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
   }
 
   function ViewModel() {
-    var self = this;    
+    var self = this;
     self.fields = ko.observableArray(${ hue_core.fields | n,unicode });
 
     self.isEnabled = ko.observable(${ hue_core.facets.data | n,unicode }.properties.is_enabled);

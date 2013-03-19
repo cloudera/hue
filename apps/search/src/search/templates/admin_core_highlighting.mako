@@ -42,7 +42,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
               <input type='checkbox' data-bind="checked: isEnabled" style="margin-top: -2px; margin-right: 4px"/> ${_('Enabled') }
             </label>
           </div>
-          <h4>${_('Highlighting')}</h4>          
+          <h4>${_('Highlighting')}</h4>
         </div>
         <div style="padding-left: 10px;margin-bottom: 20px">
           <p>${_('Highlights the query keywords matching some of the fields below.')}</p>

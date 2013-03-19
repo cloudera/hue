@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from datetime import datetime
 from lxml import etree
 import re
 
@@ -48,7 +49,7 @@ class Facet(models.Model):
 
   def update_from_post(self, post_data):
     data_dict = json.loads(self.data)
-
+    print data_dict
     if post_data.get('properties'):
       data_dict['properties'] = json.loads(post_data['properties'])
 
@@ -90,10 +91,12 @@ class Facet(models.Model):
 
     if data_dict.get('dates'):
       for field_facet in data_dict['dates']:
+        start = datetime.strptime(field_facet['start'], '%m-%d-%Y') - datetime.now()
+        end = datetime.strptime(field_facet['end'], '%m-%d-%Y') - datetime.now()
         range_facets = tuple([
                            ('facet.date', field_facet['field']),
-                           ('f.%s.facet.date.start' % field_facet['field'], 'NOW/DAY-305DAYS'),
-                           ('f.%s.facet.date.end' % field_facet['field'], 'NOW/DAY+1DAY'),
+                           ('f.%s.facet.date.start' % field_facet['field'], 'NOW/DAY%sDAYS' % start.days),
+                           ('f.%s.facet.date.end' % field_facet['field'], 'NOW/DAY%sDAY' % end.days),
                            ('f.%s.facet.date.gap' % field_facet['field'], '+%sDAY' % field_facet['gap']),]
                         )
         params += range_facets

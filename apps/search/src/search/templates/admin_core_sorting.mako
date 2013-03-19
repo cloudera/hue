@@ -28,21 +28,21 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
   <%def name="title()">
     <h1>${_('Search Admin - ')}${hue_core.label}</h1>
   </%def>
-  
+
   <%def name="navigation()">
     ${ layout.sidebar(hue_core.name, 'sorting') }
   </%def>
-  
+
   <%def name="content()">
     <form method="POST" class="form-horizontal" data-bind="submit: submit">
       <div class="section">
         <div class="alert alert-info"><h4>${_('Sorting')}</h4></div>
         <div class="clearfix"></div>
         <div class="miniform">
-          ${_('Enabled')} <input type="checkbox" data-bind="checked: isEnabled" />          
+          ${_('Enabled')} <input type="checkbox" data-bind="checked: isEnabled" />
         </div>
       </div>
-          
+
       <div class="section">
         <div class="alert alert-info" style="margin-top: 60px"><h4>${_('Sorting Fields')}</h4></div>
         <div data-bind="visible: sortingFields().length == 0" style="padding-left: 10px;margin-bottom: 20px">
@@ -145,7 +145,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     self.submit = function () {
       $.ajax("${ url('search:admin_core_sorting', core=hue_core.name) }", {
         data: {
-          'properties': ko.utils.stringifyJson({'is_enabled': self.isEnabled()}),        
+          'properties': ko.utils.stringifyJson({'is_enabled': self.isEnabled()}),
           'fields': ko.utils.stringifyJson(self.sortingFields)
         },
         contentType: 'application/json',
