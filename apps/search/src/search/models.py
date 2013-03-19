@@ -49,6 +49,9 @@ class Facet(models.Model):
   def update_from_post(self, post_data):
     data_dict = json.loads(self.data)
 
+    if post_data.get('properties'):
+      data_dict['properties'] = json.loads(post_data['properties'])
+
     if post_data.get('fields'):
       data_dict['fields'] = json.loads(post_data['fields'])
 
@@ -65,7 +68,7 @@ class Facet(models.Model):
     data_dict = json.loads(self.data)
 
     params = (
-        ('facet', 'true'),
+        ('facet', data_dict.get('properties', {}).get('is_enabled') and 'true' or 'false'),
         ('facet.limit', 10),
         ('facet.mincount', 1),
         ('facet.sort', 'count'),
@@ -160,6 +163,7 @@ class CoreManager(models.Manager):
       return self.get(name=name)
     except Core.DoesNotExist:
       facets = Facet.objects.create(data=json.dumps({
+                   'properties': {'is_enabled': True},
                    'ranges': [],
                    'fields': [],
                    'dates': []
