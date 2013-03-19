@@ -35,10 +35,13 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     <form method="POST" class="form-horizontal" data-bind="submit: submit">
 
       <div class="section">
-        <div class="alert alert-info"><h4>${_('Facets')}</h4></div>
-        <div class="clearfix"></div>
-        <div class="miniform">
-          ${_('Enabled')} <input type="checkbox" data-bind="checked: isEnabled" />
+        <div class="alert alert-info">
+          <div class="pull-right">
+            <label>
+              <input type='checkbox' data-bind="checked: isEnabled" style="margin-top: -2px; margin-right: 4px"/> ${_('Enabled') }
+            </label>
+          </div>         
+          <h4>${_('Facets')}</h4>
         </div>
       </div>
 
