@@ -46,6 +46,7 @@
     <hive.version>0.10.0-cdh4.3.0-SNAPSHOT</hive.version>
     <slf4j.version>1.6.1</slf4j.version>
     <commons-logging.version>1.0.4</commons-logging.version>
+    <javaVersion>1.6</javaVersion>
     <targetJavaVersion>1.6</targetJavaVersion>
   </properties>
 
@@ -61,6 +62,15 @@
   </scm>
 
   <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-enforcer-plugin</artifactId>
+          <version>1.0</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -69,6 +79,44 @@
         <configuration>
           <tagBase>https://svn.apache.org/repos/asf/maven/components/releases</tagBase>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <inherited>false</inherited>
+        <configuration>
+          <rules>
+            <requireMavenVersion>
+              <version>[2.0.0,)</version>
+            </requireMavenVersion>
+            <requireJavaVersion>
+              <version>[${javaVersion}.0,${javaVersion}.1000]</version>
+            </requireJavaVersion>
+          </rules>
+        </configuration>
+        <executions>
+          <execution>
+              <id>clean</id>
+              <goals>
+                  <goal>enforce</goal>
+              </goals>
+              <phase>pre-clean</phase>
+          </execution>
+          <execution>
+              <id>default</id>
+              <goals>
+                  <goal>enforce</goal>
+              </goals>
+              <phase>validate</phase>
+          </execution>
+          <execution>
+              <id>site</id>
+              <goals>
+                  <goal>enforce</goal>
+              </goals>
+              <phase>pre-site</phase>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
