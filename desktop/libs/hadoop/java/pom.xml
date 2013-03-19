@@ -117,7 +117,7 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.0</version>
         <configuration>
-          <source>1.6</source>
+          <source>${javaVersion}</source>
           <target>${targetJavaVersion}</target>
         </configuration>
         <executions>
