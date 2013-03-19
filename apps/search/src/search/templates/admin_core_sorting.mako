@@ -28,13 +28,23 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
   <%def name="title()">
     <h1>${_('Search Admin - ')}${hue_core.label}</h1>
   </%def>
+  
   <%def name="navigation()">
     ${ layout.sidebar(hue_core.name, 'sorting') }
   </%def>
+  
   <%def name="content()">
     <form method="POST" class="form-horizontal" data-bind="submit: submit">
       <div class="section">
-        <div class="alert alert-info"><h4>${_('Sorting Fields')}</h4></div>
+        <div class="alert alert-info"><h4>${_('Sorting')}</h4></div>
+        <div class="clearfix"></div>
+        <div class="miniform">
+          ${_('Enabled')} <input type="checkbox" data-bind="checked: isEnabled" />          
+        </div>
+      </div>
+          
+      <div class="section">
+        <div class="alert alert-info" style="margin-top: 60px"><h4>${_('Sorting Fields')}</h4></div>
         <div data-bind="visible: sortingFields().length == 0" style="padding-left: 10px;margin-bottom: 20px">
           <em>${_('There are currently no Sorting Fields defined. Please add at least one from the bottom.')}</em>
         </div>
@@ -99,7 +109,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 
   var SortingField = function (field, label, asc) {
     return {
-      field:field,
+      field: field,
       label: label,
       asc: asc
     }
@@ -108,6 +118,8 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
   function ViewModel() {
     var self = this;
     self.fields = ko.observableArray(${ hue_core.fields | n,unicode });
+
+    self.isEnabled = ko.observable(${ hue_core.sorting.data | n,unicode }.properties.is_enabled);
 
     self.sortingFields = ko.observableArray(ko.utils.arrayMap(${ hue_core.sorting.data | n,unicode }.fields, function (obj) {
       return new SortingField(obj.field, obj.label, obj.asc);
@@ -133,6 +145,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     self.submit = function () {
       $.ajax("${ url('search:admin_core_sorting', core=hue_core.name) }", {
         data: {
+          'properties': ko.utils.stringifyJson({'is_enabled': self.isEnabled()}),        
           'fields': ko.utils.stringifyJson(self.sortingFields)
         },
         contentType: 'application/json',

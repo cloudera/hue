@@ -38,7 +38,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
         <div class="alert alert-info"><h4>${_('Facets')}</h4></div>
         <div class="clearfix"></div>
         <div class="miniform">
-          ${_('Facets enabled: ')}<input type="checkbox" data-bind="checked: isEnabled" />          
+          ${_('Enabled')} <input type="checkbox" data-bind="checked: isEnabled" />          
         </div>
       </div>
 

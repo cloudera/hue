@@ -48,7 +48,6 @@ class SolrApi(object):
              )
 
       params += hue_core.get_query()
-      #('sort', solr_query['sort']),
 
       fqs = solr_query['fq'].split('|')
       for fq in fqs:
@@ -56,7 +55,8 @@ class SolrApi(object):
           params += (('fq', fq),)
 
       # Debug for now
-      print solr_query, params
+      print solr_query
+      print params
 
       response = self._root.get('%(core)s/browse' % solr_query, params)
       return json.loads(response)

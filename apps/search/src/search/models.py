@@ -143,18 +143,39 @@ class Result(models.Model):
 
 
 class Sorting(models.Model):
-  _META_TEMPLATE_ATTRS = ['fields']
+  _META_TEMPLATE_ATTRS = ['properties', 'fields']
 
   data = models.TextField()
 
   def update_from_post(self, post_data):
     data_dict = json.loads(self.data)
 
+    if post_data.get('properties'):
+      data_dict['properties'] = json.loads(post_data['properties'])
+
     if post_data.get('fields'):
       data_dict['fields'] = json.loads(post_data['fields'])
 
     self.data = json.dumps(data_dict)
 
+
+  def get_query_params(self):
+    data_dict = json.loads(self.data)
+
+    params = ()
+
+    if data_dict.get('properties', {}).get('is_enabled') and 'true' or 'false':
+      if data_dict.get('fields'):
+        fields = ['%s %s' % (field['field'], field['asc'] and 'asc' or 'desc') for field in data_dict.get('fields')]
+        params += (
+          ('sort', ','.join(fields)),
+        )
+
+    return params
+
+
+  def get_query(self):
+    ('sort', solr_query['sort']),
 
 
 class CoreManager(models.Manager):
@@ -163,13 +184,13 @@ class CoreManager(models.Manager):
       return self.get(name=name)
     except Core.DoesNotExist:
       facets = Facet.objects.create(data=json.dumps({
-                   'properties': {'is_enabled': True},
+                   'properties': {'is_enabled': False},
                    'ranges': [],
                    'fields': [],
                    'dates': []
                 }))
-      result = Result.objects.create(data=json.dumps({'template': '{{id}}</br>To customize!<br/>', 'highlighting': []}))
-      sorting = Sorting.objects.create(data=json.dumps({'fields': []}))
+      result = Result.objects.create(data=json.dumps({'template': 'To customize!<br/>', 'highlighting': []}))
+      sorting = Sorting.objects.create(data=json.dumps({'properties': {'is_enabled': False}, 'fields': []}))
 
       return Core.objects.create(name=name, label=name, facets=facets, result=result, sorting=sorting)
 
@@ -179,7 +200,7 @@ class Core(models.Model):
   name = models.CharField(max_length=40, unique=True, help_text=_t('Name of the Solr collection'))
   label = models.CharField(max_length=100)
   # solr_address?
-  # facets off, results by pages number, autocomplete off...
+  # results by pages number, autocomplete off...
   properties = models.TextField(default='[]', verbose_name=_t('Core properties'), help_text=_t('Properties (e.g. facets off, results by pages number)'))
   facets = models.ForeignKey(Facet)
   result = models.ForeignKey(Result)
@@ -188,7 +209,7 @@ class Core(models.Model):
   objects = CoreManager()
 
   def get_query(self):
-    return self.facets.get_query_params() + self.result.get_query_params()
+    return self.facets.get_query_params() + self.result.get_query_params() + self.sorting.get_query_params()
 
   def get_absolute_url(self):
     return reverse('search:admin_core', kwargs={'core': self.name})
@@ -198,7 +219,7 @@ class Core(models.Model):
     solr_schema = SolrApi(SOLR_URL.get()).schema(self.name)
     schema = etree.fromstring(solr_schema)
 
-    return [field.get('name') for fields in schema.iter('fields') for field in fields.iter('field')]
+    return ['score'] + sorted([field.get('name') for fields in schema.iter('fields') for field in fields.iter('field')])
 
 
 class Query(object): pass
