@@ -328,7 +328,7 @@ class HiveServerClient:
 
 
   def execute_query(self, query, max_rows=100):
-    # TODO: Need to set jars, UDF etc
+    # Only execute_async_query() supports configuration
     if self.query_server['server_name'] == 'beeswax':
       self.execute_statement(statement='SET hive.server2.blocking.query=true')
 
@@ -337,11 +337,22 @@ class HiveServerClient:
 
 
   def execute_async_query(self, query, statement=0):
+    # Set configuration manually until Hive Server 2 supports confOverlay
+    # This will leak the config in the session
+    if statement == 0:
+      if self.query_server['server_name'] == 'beeswax':
+        self.execute_statement(statement='SET hive.server2.blocking.query=true')
+      for resource in query.get_configuration():
+        self.execute_statement(resource.strip())
+
     if self.query_server['server_name'] == 'beeswax':
       self.execute_statement(statement='SET hive.server2.blocking.query=false')
 
-    query_statement = query.get_query_statement(statement)
-    return self.execute_async_statement(statement=query_statement)
+    confOverlay = {}
+    confOverlay.update(dict([(setting['key'], setting['value']) for setting in query.settings]))
+
+    query_statement =  query.get_query_statement(statement)
+    return self.execute_async_statement(statement=query_statement, confOverlay=confOverlay)
 
 
   def execute_statement(self, statement, max_rows=100):
@@ -351,9 +362,9 @@ class HiveServerClient:
     return self.fetch_result(res.operationHandle, max_rows=max_rows)
 
 
-  def execute_async_statement(self, statement):
+  def execute_async_statement(self, statement, confOverlay):
     # confOverlay is not used by Hive Server 2
-    req = TExecuteStatementReq(statement=statement, confOverlay={})
+    req = TExecuteStatementReq(statement=statement, confOverlay=confOverlay)
     res = self.call(self._client.ExecuteStatement, req)
 
     return HiveServerQueryHandle(secret=res.operationHandle.operationId.secret,

@@ -14,6 +14,7 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
+from desktop.lib.i18n import smart_unicode
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
@@ -155,16 +156,16 @@ ${layout.menubar(section='query')}
             <tr>
               <th>&nbsp;</th>
               % for col in columns:
-                <th>${col}</th>
+                <th>${ col }</th>
               % endfor
             </tr>
             </thead>
             <tbody>
               % for i, row in enumerate(results):
               <tr>
-                <td>${start_row + i}</td>
+                <td>${ start_row + i }</td>
                 % for item in row:
-                  <td>${ item }</td>
+                  <td>${ smart_unicode(item, errors='ignore') }</td>
                 % endfor
               </tr>
               % endfor
