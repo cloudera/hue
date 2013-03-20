@@ -178,7 +178,7 @@ ${layout.menubar(section='my queries')}
       "bLengthChange":false,
       "bInfo":false,
       "aaSorting":[
-        [1, 'asc']
+        [3, "desc"]
       ],
       "aoColumns":[
         {"bSortable":false, "sWidth":"1%" },
@@ -198,7 +198,7 @@ ${layout.menubar(section='my queries')}
       "bLengthChange":false,
       "bInfo":false,
       "aaSorting":[
-        [1, 'desc']
+        [1, "desc"]
       ],
       "aoColumns":[
         {"bSortable":false},

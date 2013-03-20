@@ -129,6 +129,28 @@ def save_design(request, form, type, design, explicit_save):
   return design
 
 
+def save_design_properties(request):
+  response = {'status': -1, 'data': ''}
+
+  try:
+    if request.method != 'POST':
+      raise PopupException(_('POST request required.'))
+
+    design_id = request.POST.get('pk')
+    design = authorized_get_design(request, design_id)
+
+    field = request.POST.get('name')
+    if field == 'name':
+      design.name = request.POST.get('value')
+    elif field == 'description':
+      design.desc = request.POST.get('value')
+    design.save()
+    response['status'] = 0
+  except Exception, e:
+    response['data'] = str(e)
+
+  return HttpResponse(json.dumps(response), mimetype="application/json")
+
 
 def delete_design(request):
   if request.method == 'POST':
@@ -368,14 +390,15 @@ def execute_query(request, design_id=None):
       # New design
       form.bind()
     form.query.fields['database'].choices = databases # Could not do it in the form
-
   return render('execute.mako', request, {
+
     'action': action,
     'design': design,
     'error_message': error_message,
     'form': form,
     'log': log,
     'on_success_url': on_success_url,
+    'can_edit_name': design and not design.is_auto and design.name,
   })
 
 

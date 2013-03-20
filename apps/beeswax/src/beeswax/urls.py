@@ -28,6 +28,7 @@ urlpatterns = patterns('beeswax.views',
   url(r'^results/(?P<id>\d+)/(?P<first_row>\d+)$', 'view_results', name='view_results'),
   url(r'^download/(?P<id>\d+)/(?P<format>\w+)$', 'download', name='download'),
   url(r'^save_results/(?P<id>\d+)$', 'save_results', name='save_results'),
+  url(r'^save_design_properties$', 'save_design_properties', name='save_design_properties'), # Ajax
 
   url(r'^my_queries$', 'my_queries', name='my_queries'),
   url(r'^list_designs$', 'list_designs', name='list_designs'),

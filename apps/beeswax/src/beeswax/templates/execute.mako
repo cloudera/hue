@@ -247,20 +247,37 @@ ${layout.menubar(section='query')}
                 </form>
             </div>
         </div>
+
         <div id="querySide" class="span9">
             % if on_success_url:
               <input type="hidden" name="on_success_url" value="${on_success_url}"/>
             % endif
-
-            % if design and not design.is_auto and design.name:
-              <h1>${_('Query Editor')} : ${design.name}</h1>
-              % if design.desc:
-                <p>${design.desc}</p>
+            <div style="margin-bottom: 30px">
+              <h1>
+                ${ _('Query Editor') }
+                % if can_edit_name:
+                  :
+                  <a href="#" id="query-name" data-type="text" data-pk="${ design.id }"
+                     data-name="name"
+                     data-url="${ url(app_name + ':save_design_properties') }"
+                     data-original-title="${ _('Query name') }"
+                     data-value="${ design.name }"
+                     data-placement="left">
+                  </a>
+                %endif
+              </h1>
+              % if can_edit_name:
+                <p>
+                  <a href="#" id="query-description" data-type="textarea" data-pk="${ design.id }"
+                     data-name="description"
+                     data-url="${ url(app_name + ':save_design_properties') }"
+                     data-original-title="${ _('Query description') }"
+                     data-value="${ design.desc }"
+                     data-placement="bottom">
+                  </a>
+                </p>
               % endif
-            % else:
-              <h1>${_('Query Editor')}</h1>
-            % endif
-
+            </div>
             % if error_messages or log:
                 <ul class="nav nav-tabs">
                     <li class="active">
@@ -333,7 +350,7 @@ ${layout.menubar(section='query')}
         <div class="control-group">
             <label class="control-label">${_('Description')}</label>
             <div class="controls">
-            ${comps.field(form.saveform['desc'], tag='textarea', klass="input-xlarge")}
+              ${comps.field(form.saveform['desc'], klass="input-xlarge")}
             </div>
         </div>
       </form>
@@ -351,6 +368,9 @@ ${layout.menubar(section='query')}
 <script src="/static/ext/js/codemirror-show-hint.js"></script>
 
 <link rel="stylesheet" href="/static/ext/css/codemirror-show-hint.css">
+
+<link href="/static/ext/css/bootstrap-editable.css" rel="stylesheet">
+<script src="/static/ext/js/bootstrap-editable.min.js"></script>
 
 <style>
   h1 {
@@ -414,8 +434,25 @@ ${layout.menubar(section='query')}
 
 <script type="text/javascript" charset="utf-8">
     $(document).ready(function(){
-
       var queryPlaceholder = "${_('Example: SELECT * FROM tablename')}";
+
+      var successfunction = function(response, newValue) {
+        if (response.status != 0) {
+          $.jHueNotify.error("${ _('Problem: ') }" + response.data);
+        };
+      }
+
+      $("#query-name").editable({
+        'validate': function(value) {
+          if($.trim(value) == '') {
+            return "${ _('This field is required') }";
+          }
+        },
+        'success': successfunction
+      });
+      $("#query-description").editable({
+         'success': successfunction
+      });
 
       $("*[rel=tooltip]").tooltip({
         placement: 'bottom'

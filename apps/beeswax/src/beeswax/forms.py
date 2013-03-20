@@ -59,14 +59,16 @@ class SaveForm(forms.Form):
     return self.cleaned_data.get('name', '').strip()
 
   def clean(self):
+    cleaned_data = super(SaveForm, self).clean()
+
     if self.errors:
       return
-    save = self.cleaned_data.get('save')
-    name = self.cleaned_data.get('name')
+    save = cleaned_data.get('save')
+    name = cleaned_data.get('name')
     if save and not name:
       # Bother with name iff we're saving
       raise forms.ValidationError(_('Please enter a name'))
-    return self.cleaned_data
+    return cleaned_data
 
   def set_data(self, name, desc=''):
     """Set the name and desc programmatically"""
