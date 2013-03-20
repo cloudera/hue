@@ -16,7 +16,7 @@
 DJANGO_APPS = ['pig']
 NICE_NAME = 'Pig'
 MENU_INDEX = 12
-ICON = '/pig/static/art/icon_pig_24.ico'
+ICON = '/pig/static/art/icon_pig_24.png'
 
 REQUIRES_HADOOP = False
 IS_URL_NAMESPACED = True

@@ -38,15 +38,18 @@ class Document(models.Model):
 
 
 class PigScript(Document):
-  _ATTRIBUTES = ['script', 'properties']
+  _ATTRIBUTES = ['script', 'name', 'properties']
   
-  data = models.TextField(default=json.dumps({'script': ''}))
+  data = models.TextField(default=json.dumps({'script': '', 'name': ''}))
     
   def update_from_dict(self, attrs):
     data_dict = self.dict
     
     if attrs.get('script'):
       data_dict['script'] = attrs['script']
+
+    if attrs.get('name'):
+      data_dict['name'] = attrs['name']
 
     self.data = json.dumps(data_dict)
     

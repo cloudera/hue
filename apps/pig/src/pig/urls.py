@@ -18,16 +18,17 @@
 from django.conf.urls.defaults import patterns, url
 
 urlpatterns = patterns('pig.views',
-  url(r'^$', 'editor', name='index'),
+  url(r'^$', 'app', name='index'),
 
-  url(r'^editor/$', 'editor', name='editor'),
-  url(r'^dashboard/$', 'dashboard', name='dashboard'),
-  url(r'^scripts/$', 'scripts', name='scripts'),
+  url(r'^app/$', 'app', name='app'),
   url(r'^udfs/$', 'udfs', name='udfs'),
 
   # Ajax
-  url(r'^load_script/(?P<doc_id>\d+)?', 'load_script', name='load_script'),
-  url(r'^save(?P<doc_id>[\w\.]+)', 'save', name='save'),
-  url(r'^submit/(?P<doc_id>[\w\.]+)$', 'submit', name='submit'),
-  url(r'^watch/(?P<doc_id>[\w\.]+)/(?P<job_id>[-\w]+)$', 'watch', name='watch')
+  url(r'^scripts/$', 'scripts', name='scripts'),
+  url(r'^dashboard/$', 'dashboard', name='dashboard'),
+  url(r'^save/$', 'save', name='save'),
+  url(r'^run/$', 'run', name='run'),
+  url(r'^copy/$', 'copy', name='copy'),
+  url(r'^delete/$', 'delete', name='delete'),
+  url(r'^watch/(?P<job_id>[-\w]+)$', 'watch', name='watch'),
 )

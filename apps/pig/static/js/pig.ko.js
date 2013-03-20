@@ -15,180 +15,278 @@
 // limitations under the License.
 
 
-var App = function (app) {
+var PigScript = function (pigScript) {
   return {
-    id:app.id,
-    name:app.name,
-    archive:app.archive,
-    submitUrl:app.submitUrl,
-    watchUrl:app.watchUrl,
-    saveUrl:app.saveUrl,
-    killUrl:"",
-    rerunUrl:"",
-    description:app.description,
-    isRunning:ko.observable(false),
-    status:ko.observable(""),
-    progress:ko.observable(""),
-    progressCss:ko.observable("width: 0%"),
-    intervalId:-1,
-    actions:ko.observableArray(),
-    output:ko.observable(""),
-    tooltip:ko.observable("")
+    id: ko.observable(pigScript.id),
+    name: ko.observable(pigScript.name),
+    script: ko.observable(pigScript.script),
+    isRunning: ko.observable(false),
+    selected: ko.observable(false),
+    handleSelect: function (row, e) {
+      this.selected(!this.selected());
+    },
+    hovered: ko.observable(false),
+    toggleHover: function (row, e) {
+      this.hovered(!this.hovered());
+    }
   }
 }
 
-var pigModel = function (serviceUrl, labels) {
+var Workflow = function (wf) {
+  return {
+    id: wf.id,
+    lastModTime: wf.lastModTime,
+    endTime: wf.endTime,
+    status: wf.status,
+    statusClass: "label " + getStatusClass(wf.status),
+    isRunning: wf.isRunning,
+    duration: wf.duration,
+    appName: wf.appName,
+    progress: wf.progress,
+    progressClass: "bar " + getStatusClass(wf.status, "bar-"),
+    user: wf.user,
+    absoluteUrl: wf.absoluteUrl,
+    canEdit: wf.canEdit,
+    killUrl: wf.killUrl,
+    created: wf.created,
+    run: wf.run
+  }
+}
+
+
+var PigViewModel = function (scripts, props) {
   var self = this;
 
-  self.serviceUrl = ko.observable(serviceUrl);
-  self.LABELS = labels;
-  self.apps = ko.observableArray();
-  self.history = ko.observableArray();
-  self.isLoading = ko.observable(true);
+  self.LABELS = props.labels;
 
-  self.retrieveData = function () {
-    self.isLoading(true);
+  self.LIST_SCRIPTS = props.listScripts;
+  self.SAVE_URL = props.saveUrl;
+  self.RUN_URL = props.runUrl;
+  self.COPY_URL = props.copyUrl;
+  self.DELETE_URL = props.deleteUrl;
 
-    $.getJSON(self.serviceUrl() + self.getDocId(), function (data) {
-      self.apps(ko.utils.arrayMap(data.apps, function (app) {
-        return getInitApp(app);
-      }));
-      self.isLoading(false);
-      if ($){
-        $(document).trigger("updateTooltips");
+  self.isLoading = ko.observable(false);
+  self.allSelected = ko.observable(false);
+
+  self.scripts = ko.observableArray(ko.utils.arrayMap(scripts, function (pigScript) {
+    return new PigScript(pigScript);
+  }));
+
+  self.filteredScripts = ko.observableArray(self.scripts());
+
+  self.runningScripts = ko.observableArray([]);
+  self.completedScripts = ko.observableArray([]);
+
+  var _defaultScript = {
+    id: -1,
+    name: self.LABELS.NEW_SCRIPT_NAME,
+    script: self.LABELS.NEW_SCRIPT_CONTENT
+  };
+
+  self.currentScript = ko.observable(new PigScript(_defaultScript));
+  self.currentDeleteType = ko.observable("");
+
+  self.selectedScripts = ko.computed(function () {
+    return ko.utils.arrayFilter(self.scripts(), function (script) {
+      return script.selected();
+    });
+  }, self);
+
+  self.selectedScript = ko.computed(function () {
+    return self.selectedScripts()[0];
+  }, self);
+
+  self.selectAll = function () {
+    self.allSelected(!self.allSelected());
+    ko.utils.arrayForEach(self.scripts(), function (script) {
+      script.selected(self.allSelected());
+    });
+    return true;
+  };
+
+  self.getScriptById = function (id) {
+    var _s = null;
+    ko.utils.arrayForEach(self.scripts(), function (script) {
+      if (script.id() == id) {
+        _s = script;
       }
     });
-
-    function getInitApp(app) {
-      var a = new App(app);
-      a.tooltip(self.LABELS.TOOLTIP_PLAY);
-      return a;
-    }
-  };
-  
-  self.getDocId = function() {
-    var hash = window.location.hash;
-    var jobId = ""
-    if (hash != null && hash.indexOf("/") > -1) {
-      jobId = hash.substring(hash.indexOf("/") + 1);
-    }
-    return jobId;
+    return _s;
   }
 
-  self.manageApp = function (app) {
-    if (app.status() == "" || app.status() == "FAILED" || app.status() == "STOPPED") {
-      self.submitApp(app);
-    }
-    if (app.isRunning()) {
-      self.killApp(app);
-    }
-    if (app.status() == "SUCCEEDED") {
-      self.rerunApp(app);
-    }
+  self.filterScripts = function (filter) {
+    self.filteredScripts(ko.utils.arrayFilter(self.scripts(), function (script) {
+      return script.name().toLowerCase().indexOf(filter.toLowerCase()) > -1
+    }));
   };
 
-  self.submitApp = function (app) {
-    $.post(app.submitUrl, $("#queryForm").serialize(), function (data) {
-      window.location.hash = "#/" + data.jobId;
-      app.watchUrl = data.watchUrl;
-      self.updateAppStatus(app);
-      app.intervalId = window.setInterval(function () {
-        self.updateAppStatus(app);
-      }, 1000);
-    }, "json");
+  self.loadScript = function (id) {
+    var _s = self.getScriptById(id);
+    if (_s != null) {
+      self.currentScript(_s);
+    }
+    else {
+      self.currentScript(new PigScript(_defaultScript));
+    }
+  }
+
+  self.newScript = function () {
+    self.currentScript(new PigScript(_defaultScript));
+    $(document).trigger("loadEditor");
+    $(document).trigger("showEditor");
   };
 
-  self.save = function (app) {
-    $.post(app.submitUrl, $("#queryForm").serialize(), function (data) {
-      if (self.getDocId() == "") {
-    	  window.location.hash += "/" + data.doc_id;  
-      }
-      $.jHueNotify.info(self.LABELS.SAVED);
-    }, "json");
+  self.editScript = function (script) {
+    $(document).trigger("showEditor");
   };
-  
-  self.killApp = function (app) {
-    app.isRunning(false);
-    app.status("STOPPED");
-    app.tooltip(self.LABELS.TOOLTIP_PLAY);
-    if (app.intervalId > -1) {
-      window.clearInterval(app.intervalId);
-      self.appendToHistory(app);
+
+  self.editScriptProperties = function (script) {
+    $(document).trigger("showProperties");
+  };
+
+  self.viewScript = function (script) {
+    self.currentScript(script);
+    $(document).trigger("loadEditor");
+    $(document).trigger("showEditor");
+  };
+
+  self.saveScript = function () {
+    callSave(self.currentScript());
+  };
+
+  self.runScript = function () {
+    callRun(self.currentScript());
+  };
+
+  self.copyScript = function () {
+    callCopy(self.currentScript());
+  };
+
+  self.confirmDeleteScript = function () {
+    self.currentDeleteType("single");
+    showDeleteModal();
+  };
+
+  self.listRunScript = function () {
+    callRun(self.selectedScript());
+  };
+
+  self.listCopyScript = function () {
+    callCopy(self.selectedScript());
+  };
+
+  self.listConfirmDeleteScripts = function () {
+    self.currentDeleteType("multiple");
+    showDeleteModal();
+  };
+
+  self.deleteScripts = function () {
+    var ids = [];
+    if (self.currentDeleteType() == "single") {
+      ids.push(self.currentScript().id());
     }
-    if ($) {
-      $(document).trigger("updateTooltips");
-    }
-    if (app.killUrl) {
-      $.post(app.killUrl,function (data) {
-        if (data.status != 0) {
-          $.jHueNotify.error(data.data);
-        }
-      }, "json").error(function () {
-        $.jHueNotify.error(self.LABELS.KILL_ERROR);
+    if (self.currentDeleteType() == "multiple") {
+      $(self.selectedScripts()).each(function (index, script) {
+        ids.push(script.id());
       });
     }
-
+    callDelete(ids);
   };
 
-  self.rerunApp = function (app) {
-    if (app.intervalId > -1) {
-      window.clearInterval(app.intervalId);
-    }
-    self.submitApp(app);
-  };
-
-  self.updateAppStatus = function (app) {
-    $.getJSON(app.watchUrl, function (watch) {
-      var previousTooltip = app.tooltip();
-      app.tooltip(self.LABELS.TOOLTIP_STOP);
-      app.isRunning(watch.workflow.isRunning);
-      app.status(watch.workflow.status);
-      app.progress(watch.workflow.progress);
-      app.progressCss("width: " + app.progress() + "%");
-      app.actions(watch.workflow.actions);
-      app.killUrl = watch.workflow.killUrl;
-      app.rerunUrl = watch.workflow.rerunUrl;
-      app.output(watch.output);
-      if (!watch.workflow.isRunning) {
-        window.clearInterval(app.intervalId);
-        app.tooltip(self.LABELS.TOOLTIP_PLAY);
-        self.appendToHistory(app);
-      }
-      if (app.tooltip() != previousTooltip) {
-        if ($) {
-          $(document).trigger("updateTooltips");
-        }
-      }
+  self.updateScripts = function () {
+    $.getJSON(self.LIST_SCRIPTS, function (data) {
+      self.scripts(ko.utils.arrayMap(data, function (script) {
+        return new PigScript(script);
+      }));
+      self.filteredScripts(self.scripts());
+      $(document).trigger("scriptsRefreshed");
     });
   };
 
-  self.resetAppStatus = function (app) {
-    app.isRunning(false);
-    app.status("");
-  };
+  self.updateDashboard = function (workflows) {
+    var koWorkflows = ko.utils.arrayMap(workflows, function (wf) {
+      return new Workflow(wf);
+    });
+    self.runningScripts(ko.utils.arrayFilter(koWorkflows, function (wf) {
+      return wf.isRunning
+    }));
+    self.completedScripts(ko.utils.arrayFilter(koWorkflows, function (wf) {
+      return !wf.isRunning
+    }));
+  }
 
-  self.appendToHistory = function (app) {
-    var newApp = {
-      id:app.id,
-      name:app.name,
-      when:moment().format('MM/DD/YYYY, h:mm:ss a'),
-      archive:app.archive,
-      submitUrl:app.submitUrl,
-      watchUrl:app.watchUrl,
-      killUrl:app.killUrl,
-      rerunUrl:app.rerunUrl,
-      description:app.description,
-      isRunning:ko.observable(app.isRunning()),
-      status:ko.observable(app.status()),
-      progress:ko.observable(app.progress()),
-      progressCss:ko.observable(app.progressCss()),
-      intervalId:app.intervalId,
-      actions:ko.observableArray(app.actions()),
-      output:ko.observable(app.output())
-    };
-    var history = self.history();
-    history.push(newApp);
-    self.history(history);
-  };
+  function showDeleteModal() {
+    $(".deleteMsg").addClass("hide");
+    if (self.currentDeleteType() == "single") {
+      $(".deleteMsg.single").removeClass("hide");
+    }
+    if (self.currentDeleteType() == "multiple") {
+      if (self.selectedScripts().length > 1) {
+        $(".deleteMsg.multiple").removeClass("hide");
+      }
+      else {
+        $(".deleteMsg.single").removeClass("hide");
+      }
+    }
+    $("#deleteModal").modal({
+      keyboard: true,
+      show: true
+    });
+  }
 
+  function callSave(script) {
+    $(document).trigger("saving");
+    $.post(self.SAVE_URL,
+        {
+          id: script.id(),
+          name: script.name(),
+          script: script.script()
+        },
+        function (data) {
+          self.currentScript().id(data.id);
+          $(document).trigger("saved");
+          self.updateScripts();
+        }, "json");
+  }
+
+  function callRun(script) {
+    $(document).trigger("running");
+    $.post(self.RUN_URL,
+        {
+          id: script.id(),
+          name: script.name(),
+          script: script.script()
+        },
+        function (data) {
+          $(document).trigger("showDashboard");
+          self.updateScripts();
+        }, "json");
+  }
+
+  function callCopy(script) {
+    $.post(self.COPY_URL,
+        {
+          id: script.id()
+        },
+        function (data) {
+          self.currentScript(new PigScript(data));
+          $(document).trigger("loadEditor");
+          self.updateScripts();
+        }, "json");
+  }
+
+  function callDelete(ids) {
+    if (ids.indexOf(self.currentScript().id()) > -1) {
+      self.currentScript(new PigScript(_defaultScript));
+      $(document).trigger("loadEditor");
+    }
+    $.post(self.DELETE_URL,
+        {
+          ids: ids.join(",")
+        },
+        function (data) {
+          self.updateScripts();
+          $("#deleteModal").modal("hide");
+        }, "json");
+  }
 };
