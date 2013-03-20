@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env bash
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -15,13 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django.conf.urls.defaults import patterns, url
+set -o errexit
+set -o xtrace
 
-from beeswax.urls import urlpatterns as beeswax_urls
+cd $(dirname $0)
 
+thrift -I thrift/include -r --gen py:new_style -o ./ thrift/ImpalaService.thrift
 
-urlpatterns = patterns('impala.views',
-  url(r'^refresh_catalog$', 'refresh_catalog', name='refresh_catalog'),
-)
-
-urlpatterns += beeswax_urls

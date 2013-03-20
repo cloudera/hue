@@ -225,6 +225,18 @@ ${layout.menubar(section='query')}
                                 ${_("Email me on completion")}
                             </label>
                           </li>
+                        % if app_name == 'impala':
+                          <li class="nav-header">
+                            ${_('Metastore Catalog')}
+                          </li>
+                          <li>
+                            <div class="control-group">
+                              <button id="refresh-btn" class="btn btn-small" data-loading-text="Refreshing..." rel="tooltip" data-placement="right" data-original-title="${ _('Update the list of tables seen by Impala. It can take a few seconds...') }">
+                                ${ _('Refresh') }
+                              </button>
+                            </div>
+                          </li>
+                        % endif
                         </ul>
                     </ul>
                     <input type="hidden" name="${form.query["query"].html_name | n}" class="query" value="" />
@@ -607,6 +619,24 @@ ${layout.menubar(section='query')}
         $(".query").val(query);
         $("#advancedSettingsForm").submit();
       }
+
+      % if app_name == 'impala':
+        $("#refresh-btn").click(function() {
+          var _this = this;
+          $(_this).button('loading');
+          $.post('/impala/refresh_catalog',
+            function(response) {
+              if (response['status'] != 0) {
+                $.jHueNotify.error("${ _('Problem: ') }" + response['data']);
+              } else {
+                $.jHueNotify.info("${ _('Refresh successful!') }")
+              }
+            }
+          ).fail(function(e) { $.jHueNotify.error("${ _('Problem: ') }" + e) })
+           .always(function() { $(_this).button('reset') });
+          return false;
+        });
+      % endif
     });
 </script>
 
