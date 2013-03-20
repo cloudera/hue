@@ -150,7 +150,7 @@ class HiveServerTTableSchema:
     return HiveServerTColumnDesc(self.columns[pos]).val
 
   def _get_col_position(self, column_name):
-    return filter(lambda col: col.columnName == column_name, self.schema.columns)[0].position - 1
+    return filter(lambda (i, col): col.columnName == column_name, enumerate(self.schema.columns))[0][0]
 
 
 class HiveServerTRow:
@@ -163,7 +163,7 @@ class HiveServerTRow:
     return HiveServerTColumnValue(self.row.colVals[pos]).val
 
   def _get_col_position(self, column_name):
-    return filter(lambda col: col.columnName == column_name, self.schema.columns)[0].position - 1
+    return filter(lambda (i, col): col.columnName == column_name, enumerate(self.schema.columns))[0][0]
 
   def fields(self):
     return [HiveServerTColumnValue(field).val for field in self.row.colVals]
@@ -249,6 +249,7 @@ class HiveServerClient:
     encoded_status, encoded_guid = HiveServerQueryHandle(secret=sessionId.secret, guid=sessionId.guid).get()
 
     return Session.objects.create(owner=user,
+                                  application=self.query_server['server_name'],
                                   status_code=res.status.statusCode,
                                   secret=encoded_status,
                                   guid=encoded_guid,
@@ -256,7 +257,7 @@ class HiveServerClient:
 
 
   def call(self, fn, req, status=TStatusCode.SUCCESS_STATUS):
-    session = Session.objects.get_session(self.user)
+    session = Session.objects.get_session(self.user, self.query_server['server_name'])
 
     if session is None:
       session = self.open_session(self.user)
@@ -285,7 +286,7 @@ class HiveServerClient:
 
 
   def close_session(self):
-    session = Session.objects.get_session(self.user).get_handle()
+    session = Session.objects.get_session(self.user, self.query_server['server_name']).get_handle()
 
     req = TCloseSessionReq(sessionHandle=session)
     return self._client.CloseSession(req)
@@ -298,7 +299,12 @@ class HiveServerClient:
 
     results, schema = self.fetch_result(res.operationHandle)
 
-    return HiveServerTRowSet(results.results, schema.schema).cols(('TABLE_SCHEMA',))
+    if self.query_server['server_name'] == 'impala':
+      col = 'TABLE_SCHEM'
+    else:
+      col = 'TABLE_SCHEMA'
+
+    return HiveServerTRowSet(results.results, schema.schema).cols((col,))
 
 
   def get_tables(self, database, table_names):
@@ -323,14 +329,16 @@ class HiveServerClient:
 
   def execute_query(self, query, max_rows=100):
     # TODO: Need to set jars, UDF etc
-    self.execute_statement(statement='SET hive.server2.blocking.query=true')
+    if self.query_server['server_name'] == 'beeswax':
+      self.execute_statement(statement='SET hive.server2.blocking.query=true')
 
     results, schema = self.execute_statement(statement=query.query['query'], max_rows=max_rows)
     return HiveServerDataTable(results, schema)
 
 
   def execute_async_query(self, query, statement=0):
-    self.execute_statement(statement='SET hive.server2.blocking.query=false')
+    if self.query_server['server_name'] == 'beeswax':
+      self.execute_statement(statement='SET hive.server2.blocking.query=false')
 
     query_statement = query.get_query_statement(statement)
     return self.execute_async_statement(statement=query_statement)
@@ -367,7 +375,7 @@ class HiveServerClient:
 
     return self.fetch_result(res.operationHandle)
 
-
+# TFetchOrientation.FETCH_NEXT
   def fetch_result(self, operation_handle, orientation=TFetchOrientation.FETCH_NEXT, max_rows=100):
     fetch_req = TFetchResultsReq(operationHandle=operation_handle, orientation=orientation, maxRows=max_rows)
     res = self.call(self._client.FetchResults, fetch_req)
@@ -456,6 +464,9 @@ class HiveServerClientCompatible:
     if max_rows is None:
       max_rows = 10000
 
+    # Both Hive Server 2 and Impala do not support FETCH_FIRST yet
+    start_over = False
+
     if start_over:
       orientation = TFetchOrientation.FETCH_FIRST
     else:
@@ -475,12 +486,19 @@ class HiveServerClientCompatible:
 
 
   def get_log(self, handle):
-    operationHandle = handle.get_rpc_handle()
-    return self._client.get_log(operationHandle)
+    if self.query_server['server_name'] == 'impala':
+      return 'Impala does not support GetLog()'
+    else:
+      operationHandle = handle.get_rpc_handle()
+      return self._client.get_log(operationHandle)
 
 
   def get_databases(self):
-    return [table['TABLE_SCHEMA'] for table in self._client.get_databases()]
+    if self.query_server['server_name'] == 'impala':
+      col = 'TABLE_SCHEM'
+    else:
+      col = 'TABLE_SCHEMA'
+    return [table[col] for table in self._client.get_databases()]
 
 
   def get_tables(self, database, table_names):

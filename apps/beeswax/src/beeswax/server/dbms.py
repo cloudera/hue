@@ -186,8 +186,8 @@ class Dbms:
 
 
   def use(self, database):
-    """Beeswax does not support use directly."""
-    if SERVER_INTERFACE.get() == HIVE_SERVER2:
+    """Beeswax interface does not support use directly. Impala app does not support it."""
+    if SERVER_INTERFACE.get() == HIVE_SERVER2 and self.client.query_server['server_name'] != 'impala':
       query = hql_query('USE %s' % database)
       return self.execute_and_wait(query)
 
