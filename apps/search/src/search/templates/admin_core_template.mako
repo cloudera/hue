@@ -68,9 +68,6 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 
         <div class="row-fluid">
           <div class="span12">
-            <div>
-             ${ _('Edit the result snippet below.') }
-            </div>
             <div id="toolbar"></div>
             </br>
             <div id="content-editor" class="clear">${ hue_core.result.get_template() | n,unicode }</div>
@@ -103,7 +100,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
             <textarea id="template-source"></textarea>
           </div>
 
-          <div class="span3">
+          <div class="span3">          
             <div class="well available-fields">
               <h4>${_('Available Fields')}</h4>
               <ul data-bind="foreach: fields">
@@ -150,7 +147,6 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
         <button type="button" id="load-template-btn" href="#" class="btn btn-primary" disabled="disabled">${_('Load template')}</button>
       </div>
     </div>
-
 
   </%def>
 </%layout:skeleton>
@@ -208,7 +204,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
         if (self.lastIndex() > contentEditor.childNodes.length || self.lastIndex() < 0) {
           self.lastIndex() = contentEditor.childNodes.length - 1;
         }
-        var text = document.createTextNode("{{" + field + "}}");
+        var text = document.createTextNode(" {{" + field + "}}");
         if (contentEditor.childNodes.length) {
           console.log(self.lastIndex());
           console.log(contentEditor.childNodes);

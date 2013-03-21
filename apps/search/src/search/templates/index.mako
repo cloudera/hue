@@ -159,7 +159,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
       <%
         docs = response['response']['docs']
         for doc in response['response']['docs']:
-          if doc['id'] in response['highlighting']:
+          if doc['id'] in response.get('highlighting', []):
             doc.update(response['highlighting'][doc['id']])
         %>
         $.each(${ json.dumps([result for result in docs]) | n,unicode }, function (index, item) {

@@ -6,12 +6,30 @@ for more details.
 
 ## Install
 $ PREFIX=/usr/share make install
-$ sudo chmod 4750 $PREFIX/hue/apps/shell/src/shell/build/setui
-$ sudo chown root:$USER $PREFIX/hue/apps/shell/src/shell/build/setui
 
-## Install plug-ins
-$ cd /usr/lib/hadoop-0.20-mapreduce/lib
-$ ln -s /usr/share/hue/desktop/libs/hadoop/java-lib/hue*jar
+(dependencies might be missing from https://github.com/cloudera/hue#development-prerequisites)
+
+## Configure Solr
+Edit conf/hue.ini:
+
+[search]
+
+   # URL of the Solr Server
+   ##solr_url=http://localhost:1978/solr/
+
+## Run!
+$ /usr/share/hue/build/env/bin/supervisor
+
+
+
+Go to http://localhost:8888/
+
+Please report feeback!
+
+
+
+
+## For enabling file download
 
 ## Configure Hadoop
 Edit hdfs-site.xml:
@@ -21,6 +39,13 @@ Edit hdfs-site.xml:
   <value>true</value>
 </property>
 
+
+## Optional 
+
+## Install plug-ins
+$ cd /usr/lib/hadoop-0.20-mapreduce/lib
+$ ln -s /usr/share/hue/desktop/libs/hadoop/java-lib/hue*jar
+
 Edit mapred-site.xml:
 
 <property>
@@ -29,6 +54,3 @@ Edit mapred-site.xml:
   <description>Comma-separated list of jobtracker plug-ins to be activated.
   </description>
 </property>
-
-## Run!
-$ /usr/share/hue/build/env/bin/supervisor
