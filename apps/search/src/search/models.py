@@ -196,7 +196,27 @@ class CoreManager(models.Manager):
                    'dates': []
                 }))
       result = Result.objects.create(data=json.dumps({
-                  'template': '{{id}} To customize!<br/>',
+                  'template': """
+<div class="row-fluid">
+  <div class="span1"><img src="http://twitter.com/api/users/profile_image/{{user_screen_name}}" style="margin:10px"></div>
+  <div class="span9">
+    <h5>{{user_name}}</h5>
+    {{text}}
+    <br>    
+    <a href="/filebrowser/view/{{file_path}}">
+      {{file_name}} {{content_type}} {{file_length}}{{#file_length}} bytes{{/file_length}}
+    </a>
+    {{#file_path}}
+    <a href="/filebrowser/download{{file_path}}?disposition=inline">
+      Download
+    </a>
+    {{/file_path}}
+  </div>
+  <div class="span2"><br><a class="btn" href="https://twitter.com/{{user_screen_name}}/status/{{id}}" target="_blank" title="Open in Twitter">
+    <i class="icon-twitter"></i></a>
+  </div>
+</div>                  
+                  """,
                   'highlighting': [],
                   'properties': {'highlighting_enabled': False},
               }))

@@ -107,6 +107,7 @@ def download(request, path):
     Downloads a file.
 
     This is inspired by django.views.static.serve.
+    ?disposition={attachment, inline}
     """
     if not request.fs.exists(path):
         raise Http404(_("File not found: %(path)s") % {'path': escape(path)})
@@ -126,7 +127,7 @@ def download(request, path):
     response = HttpResponse(_file_reader(fh), mimetype=mimetype)
     response["Last-Modified"] = http_date(stats['mtime'])
     response["Content-Length"] = stats['size']
-    response["Content-Disposition"] = "attachment"
+    response['Content-Disposition'] = request.GET.get('disposition', 'attachment')
     return response
 
 
