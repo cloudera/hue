@@ -271,7 +271,7 @@ ${ layout.menubar(section='workflows') }
 <div id="submit-wf-modal" class="modal hide"></div>
 
 
-<script src="/static/ext/js/codemirror-3.0.js"></script>
+<script src="/static/ext/js/codemirror-3.11.js"></script>
 <link rel="stylesheet" href="/static/ext/css/codemirror.css">
 <script src="/static/ext/js/codemirror-xml.js"></script>
 <script src="/static/ext/js/codemirror-closetag.js"></script>

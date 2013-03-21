@@ -291,7 +291,7 @@ ${ layout.menubar(section='dashboard') }
 
 <script src="/oozie/static/js/bundles.utils.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout-2.1.0.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/codemirror-3.0.js"></script>
+<script src="/static/ext/js/codemirror-3.11.js"></script>
 <link rel="stylesheet" href="/static/ext/css/codemirror.css">
 <script src="/static/ext/js/codemirror-xml.js"></script>
 

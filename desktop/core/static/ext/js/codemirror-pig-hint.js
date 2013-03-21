@@ -102,12 +102,8 @@
       // If this is a property, see if it belongs to some object we can
       // find in the current environment.
       var obj = context.pop(), base;
+      base = obj.string;
 
-      if (obj.type == "variable") 
-          base = obj.string;
-      else if(obj.type == "variable-3")
-          base = ":" + obj.string;
-        
       while (base != null && context.length)
         base = base[context.pop().string];
       if (base != null) gatherCompletions(base);
