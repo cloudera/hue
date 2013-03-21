@@ -30,6 +30,7 @@ from beeswax import conf
 from beeswax.models import Session, HiveServerQueryHandle, HiveServerQueryHistory
 from beeswax.server.dbms import Table, NoSuchObjectException, DataTable,\
   QueryServerException
+from beeswax.server.beeswax_lib import BeeswaxClient
 
 
 LOG = logging.getLogger(__name__)
@@ -226,16 +227,19 @@ class HiveServerTColumnDesc:
 
 
 class HiveServerClient:
-  """Thrift service client."""
 
   def __init__(self, query_server, user):
     self.query_server = query_server
     self.user = user
 
+    use_sasl, kerberos_principal_short_name = BeeswaxClient.get_security(query_server)
+
     self._client = thrift_util.get_client(TCLIService.Client,
                                           query_server['server_host'],
                                           query_server['server_port'],
-                                          service_name='Hive Server 2',
+                                          service_name=query_server['server_name'],
+                                          kerberos_principal=kerberos_principal_short_name,
+                                          use_sasl=use_sasl,
                                           timeout_seconds=conf.BEESWAX_SERVER_CONN_TIMEOUT.get())
 
 
