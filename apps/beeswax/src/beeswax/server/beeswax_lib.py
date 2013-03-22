@@ -100,7 +100,7 @@ class BeeswaxDataTable(DataTable):
 
 
 class BeeswaxClient:
-  NO_RESULT_SET_RE = re.compile('DROP|CREATE|ALTER|LOAD', re.IGNORECASE)
+  NO_RESULT_SET_RE = re.compile('DROP|CREATE|ALTER|LOAD|USE', re.IGNORECASE)
 
   def __init__(self, query_server, user):
     self.user = user

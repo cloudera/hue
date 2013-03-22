@@ -46,7 +46,7 @@ import beeswax.management.commands.beeswax_install_examples
 from beeswax import common, data_export, models, conf
 from beeswax.forms import QueryForm
 from beeswax.design import HQLdesign, hql_query
-from beeswax.models import SavedQuery, make_query_context
+from beeswax.models import SavedQuery, make_query_context, QueryHistory
 from beeswax.server import dbms
 from beeswax.server.dbms import expand_exception, get_query_server_config
 
@@ -491,6 +491,7 @@ def view_results(request, id, first_row=0):
 
   The query results MUST be ready.
   To display query results, one should always go through the watch_query view.
+  If the result set has has_result_set=False, display an empty result.
 
   If ``first_row`` is 0, restarts (if necessary) the query read.  Otherwise, just
   spits out a warning if first_row doesn't match the servers conception.
@@ -500,8 +501,12 @@ def view_results(request, id, first_row=0):
   """
   first_row = long(first_row)
   start_over = (first_row == 0)
-  results = None
-  data = None
+  results = type('Result', (object,), {
+                'rows': 0,
+                'columns': [],
+                'has_more': False,
+                'start_row': 0, })
+  data = []
   fetch_error = False
   error_message = ''
   log = ''
@@ -524,23 +529,20 @@ def view_results(request, id, first_row=0):
     state = models.QueryHistory.STATE.expired
     query_history.save_state(state)
 
-  # Retrieve query results
+  # Retrieve query results or use empty result if no result set
   try:
-    if not download:
+    if not handle.has_result_set:
+      downloadable = False
+    elif not download:
       results = db.fetch(handle, start_over, 100)
       data = list(results.rows()) # Materialize results
 
       # We display the "Download" button only when we know that there are results:
       downloadable = first_row > 0 or data
+      log = db.get_log(handle)
     else:
       downloadable = True
-      data = []
-      results = type('Result', (object,), {
-                    'rows': 0,
-                    'columns': [],
-                    'has_more': False,
-                    'start_row': 0, })
-    log = db.get_log(handle)
+
   except Exception, ex:
     fetch_error = True
     error_message, log = expand_exception(ex, db, handle)
@@ -1125,7 +1127,10 @@ def _get_query_handle_and_state(query_history):
   if handle is None:
     raise PopupException(_("Failed to retrieve query state from the Query Server."))
 
-  state = dbms.get(query_history.owner, query_history.get_query_server_config()).get_state(handle)
+  if handle.has_result_set:
+    state = dbms.get(query_history.owner, query_history.get_query_server_config()).get_state(handle)
+  else:
+    state = QueryHistory.STATE.available
 
   if state is None:
     raise PopupException(_("Failed to contact Beeswax Server to check query status."))

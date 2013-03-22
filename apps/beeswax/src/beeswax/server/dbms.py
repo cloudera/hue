@@ -186,10 +186,10 @@ class Dbms:
 
 
   def use(self, database):
-    """Beeswax interface does not support use directly. Impala app does not support it."""
-    if SERVER_INTERFACE.get() == HIVE_SERVER2 and self.client.query_server['server_name'] != 'impala':
+    """Beeswax interface does not support use directly."""
+    if SERVER_INTERFACE.get() == HIVE_SERVER2:
       query = hql_query('USE %s' % database)
-      return self.execute_and_wait(query)
+      self.client.query(query)
 
 
   def get_log(self, query_handle):
@@ -269,7 +269,6 @@ class Dbms:
     query_history.has_results = handle.has_result_set
     query_history.modified_row_count = handle.modified_row_count
     query_history.log_context = handle.log_context
-
     query_history.set_to_running()
     query_history.save()
 

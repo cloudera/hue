@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import logging
+import re
 import thrift
 
 from desktop.lib import thrift_util
@@ -271,9 +272,9 @@ class HiveServerClient:
 
     res = fn(req)
 
-    # Not supported currently in HS2: TStatusCode.INVALID_HANDLE_STATUS
+    # Not supported currently in HS2 and Impala: TStatusCode.INVALID_HANDLE_STATUS
     if res.status.statusCode == TStatusCode.ERROR_STATUS and \
-        res.status.errorMessage is not None and 'Invalid SessionHandle' in res.status.errorMessage:
+        re.search('Invalid SessionHandle|Invalid session id', res.status.errorMessage or '', re.I):
       LOG.info('Retrying with a new session because of %s' % res)
 
       session = self.open_session(self.user)
@@ -390,7 +391,7 @@ class HiveServerClient:
 
     return self.fetch_result(res.operationHandle)
 
-# TFetchOrientation.FETCH_NEXT
+
   def fetch_result(self, operation_handle, orientation=TFetchOrientation.FETCH_NEXT, max_rows=100):
     fetch_req = TFetchResultsReq(operationHandle=operation_handle, orientation=orientation, maxRows=max_rows)
     res = self.call(self._client.FetchResults, fetch_req)
