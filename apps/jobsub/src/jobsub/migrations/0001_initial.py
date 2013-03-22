@@ -26,7 +26,7 @@ class Migration(SchemaMigration):
         # Adding model 'JobDesign'
         db.create_table('jobsub_jobdesign', (
             ('description', self.gf('django.db.models.fields.CharField')(max_length=1024)),
-            ('data', self.gf('django.db.models.fields.CharField')(max_length=4096)),
+            ('data', self.gf('django.db.models.fields.TextField')()),
             ('last_modified', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
             ('owner', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
             ('type', self.gf('django.db.models.fields.CharField')(max_length=128)),

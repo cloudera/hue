@@ -718,7 +718,7 @@ class Java(Action):
                               help_text=_t('Name or path to the %(program)s jar file on HDFS. E.g. examples.jar.') % {'program': 'Java'})
   main_class = models.CharField(max_length=256, blank=False, verbose_name=_t('Main class'),
                                 help_text=_t('Full name of the Java class. E.g. org.apache.hadoop.examples.Grep'))
-  args = models.CharField(max_length=4096, blank=True, verbose_name=_t('Arguments'),
+  args = models.TextField(blank=True, verbose_name=_t('Arguments'),
                           help_text=_t('Arguments of the main method. The value of each arg element is considered a single argument '
                                        'and they are passed to the main method in the same order.'))
   java_opts = models.CharField(max_length=256, blank=True, verbose_name=_t('Java options'),

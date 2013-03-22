@@ -46,7 +46,7 @@ class Migration(SchemaMigration):
             ('files', self.gf('django.db.models.fields.CharField')(default='[]', max_length=512)),
             ('mapper', self.gf('django.db.models.fields.CharField')(max_length=512)),
             ('reducer', self.gf('django.db.models.fields.CharField')(max_length=512)),
-            ('job_properties', self.gf('django.db.models.fields.CharField')(default='[]', max_length=32768)),
+            ('job_properties', self.gf('django.db.models.fields.TextField')(default='[]')),
             ('archives', self.gf('django.db.models.fields.CharField')(default='[]', max_length=512)),
         ))
         db.send_create_signal('jobsub', ['OozieStreamingAction'])
@@ -85,7 +85,7 @@ class Migration(SchemaMigration):
             ('files', self.gf('django.db.models.fields.CharField')(default='[]', max_length=512)),
             ('jar_path', self.gf('django.db.models.fields.CharField')(max_length=512)),
             ('archives', self.gf('django.db.models.fields.CharField')(default='[]', max_length=512)),
-            ('job_properties', self.gf('django.db.models.fields.CharField')(default='[]', max_length=32768)),
+            ('job_properties', self.gf('django.db.models.fields.TextField')(default='[]')),
         ))
         db.send_create_signal('jobsub', ['OozieMapreduceAction'])
 
@@ -95,8 +95,8 @@ class Migration(SchemaMigration):
             ('files', self.gf('django.db.models.fields.CharField')(default='[]', max_length=512)),
             ('jar_path', self.gf('django.db.models.fields.CharField')(max_length=512)),
             ('java_opts', self.gf('django.db.models.fields.CharField')(max_length=256, blank=True)),
-            ('args', self.gf('django.db.models.fields.CharField')(max_length=4096, blank=True)),
-            ('job_properties', self.gf('django.db.models.fields.CharField')(default='[]', max_length=32768)),
+            ('args', self.gf('django.db.models.fields.TextField')(blank=True)),
+            ('job_properties', self.gf('django.db.models.fields.TextField')(default='[]')),
             ('archives', self.gf('django.db.models.fields.CharField')(default='[]', max_length=512)),
             ('main_class', self.gf('django.db.models.fields.CharField')(max_length=256)),
         ))

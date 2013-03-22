@@ -46,7 +46,7 @@ class JobDesign(models.Model):
   # Type corresponds to a JobSubForm that gets registered in jobsub.forms.interface.registry
   type = models.CharField(max_length=128)
   # Data is serialized via JobSubFormInterface.serialize_[to|from]_string
-  data = models.CharField(max_length=4096)
+  data = models.TextField()
 
   def edit_url(self):
     return urlresolvers.reverse("jobsub.views.edit_design", kwargs=dict(id=self.id))
@@ -248,7 +248,7 @@ class OozieJavaAction(OozieAction):
   # Location of the jar in hdfs
   jar_path = models.CharField(max_length=PATH_MAX, blank=False)
   main_class = models.CharField(max_length=256, blank=False)
-  args = models.CharField(max_length=4096, blank=True)
+  args = models.TextField(blank=True)
   java_opts = models.CharField(max_length=256, blank=True)
   # For the job configuration. JSON dict.
   job_properties = models.TextField(default="[]")
