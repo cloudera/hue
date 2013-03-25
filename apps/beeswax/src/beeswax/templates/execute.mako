@@ -86,7 +86,8 @@ ${layout.menubar(section='query')}
                                 <div class="control-group">
                                     ${comps.label(f['key'])}
                                     ${comps.field(f['key'], attrs=dict(placeholder=app_name == 'impala' and "ABORT_ON_ERROR" or "mapred.reduce.tasks",
-                                        klass="settingsField span8"
+                                        klass="settingsField span8",
+                                        autocomplete="off"
                                     ))}
                                 </div>
 
@@ -629,6 +630,14 @@ ${layout.menubar(section='query')}
           return false;
         });
       % endif
+    });
+
+    $.getJSON("${ url('beeswax:configuration') }", function(data) {
+      $(".settingsField").typeahead({
+        source: $.map(data.config_values, function(value, key) {
+          return value.key;
+        })
+      });
     });
 </script>
 
