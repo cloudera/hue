@@ -22,6 +22,8 @@ var PigScript = function (pigScript) {
     script: ko.observable(pigScript.script),
     isRunning: ko.observable(false),
     selected: ko.observable(false),
+    watchUrl: ko.observable(""),
+    actions: ko.observableArray([]),
     handleSelect: function (row, e) {
       this.selected(!this.selected());
     },
@@ -144,6 +146,10 @@ var PigViewModel = function (scripts, props) {
     $(document).trigger("showProperties");
   };
 
+  self.showScriptLogs = function (script) {
+    $(document).trigger("showLogs");
+  };
+
   self.viewScript = function (script) {
     self.currentScript(script);
     $(document).trigger("loadEditor");
@@ -258,7 +264,14 @@ var PigViewModel = function (scripts, props) {
           script: script.script()
         },
         function (data) {
-          $(document).trigger("showDashboard");
+          if (data.id && self.currentScript().id() != data.id){
+            self.currentScript(script);
+            $(document).trigger("loadEditor");
+          }
+          script.isRunning(true);
+          script.watchUrl(data.watchUrl);
+          $(document).trigger("startLogsRefresh");
+          $(document).trigger("showLogs");
           self.updateScripts();
         }, "json");
   }

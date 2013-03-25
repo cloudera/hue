@@ -107,17 +107,22 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
             <li class="nav-header">${_('Properties')}</li>
             <li data-bind="click: editScriptProperties" data-section="properties"><a href="#">${ _('Edit properties') }</a></li>
             ##<li class="nav-header">${_('UDF')}</li>
-                        ##<li><a href="#createDataset">${ _('New') }</a></li>
-                        ##<li><a href="#createDataset">${ _('Add') }</a></li>
-                        <li class="nav-header">${_('Actions')}</li>
+            ##<li><a href="#createDataset">${ _('New') }</a></li>
+            ##<li><a href="#createDataset">${ _('Add') }</a></li>
+            <li class="nav-header">${_('Actions')}</li>
             <li data-bind="click: saveScript">
               <a href="#" title="${ _('Save the script') }" rel="tooltip" data-placement="right">
                 <i class="icon-save"></i> ${ _('Save') }
               </a>
             </li>
-            <li data-bind="click: runScript">
+            <li data-bind="click: runScript, visible: !currentScript().isRunning()">
               <a href="#" title="${ _('Run the script') }" rel="tooltip" data-placement="right">
                 <i class="icon-play"></i> ${ _('Run') }
+              </a>
+            </li>
+            <li data-bind="visible: currentScript().isRunning()">
+              <a href="#" title="${ _('Run the script') }" rel="tooltip" data-placement="right" class="disabled">
+                <i class="icon-spinner icon-spin"></i> ${ _('Running...') }
               </a>
             </li>
             <li data-bind="visible: currentScript().id() != -1, click: copyScript">
@@ -129,6 +134,10 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
               <a href="#" title="${ _('Delete the script') }" rel="tooltip" data-placement="right">
                 <i class="icon-trash"></i> ${ _('Delete') }
               </a>
+            </li>
+            <li class="nav-header" data-bind="visible: currentScript().isRunning()">${_('Logs')}</li>
+            <li data-bind="visible: currentScript().isRunning(), click: showScriptLogs" data-section="logs">
+              <a href="#" title="${ _('Show Logs') }" rel="tooltip" data-placement="right">${ _('Current Logs') }</a>
             </li>
           </ul>
         </form>
@@ -150,7 +159,19 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
           </label>
         </form>
       </div>
-
+      <div id="logs" class="section hide">
+        <div class="alert alert-info"><h3>${ _('Logs for') } '<span data-bind="text: currentScript().name"></span>'</h3></div>
+        <div data-bind="visible: currentScript().actions().length == 0">
+          <img src="/static/art/spinner.gif" />
+        </div>
+        <div data-bind="template: {name: 'logTemplate', foreach: currentScript().actions}"></div>
+        <script id="logTemplate" type="text/html">
+          <div data-bind="css:{'alert-modified': name != '', 'alert': name != '', 'alert-success': status == 'SUCCEEDED' || status == 'OK', 'alert-error': status != 'RUNNING' && status != 'SUCCEEDED' && status != 'OK' && status != 'PREP'}">
+            <div class="pull-right" data-bind="text: status"></div><h4>${ _('Action') } '<span data-bind="text: name"></span>'</h4></div>
+          <pre data-bind="visible: logs == ''">${ _('No available logs.') }</pre>
+          <pre data-bind="visible: logs != '', text: logs"></pre>
+        </script>
+      </div>
     </div>
 
   </div>
@@ -313,6 +334,15 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
       }
     });
 
+    $(document).on("showLogs", function () {
+      if (viewModel.currentScript().id() != -1) {
+        routie("logs/" + viewModel.currentScript().id());
+      }
+      else {
+        routie("logs");
+      }
+    });
+
     $(document).on("updateTooltips", function () {
       $("a[rel=tooltip]").tooltip("destroy");
       $("a[rel=tooltip]").tooltip();
@@ -346,6 +376,17 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
       $("#filter").val("");
     });
 
+    var logsRefreshInterval;
+    $(document).on("startLogsRefresh", function () {
+      logsRefreshInterval = window.setInterval(function () {
+        refreshLogs();
+      }, 1000);
+    });
+
+    $(document).on("stopLogsRefresh", function () {
+      window.clearTimeout(logsRefreshInterval);
+    });
+
     var _resizeTimeout = -1;
     $(window).on("resize", function () {
       window.clearTimeout(_resizeTimeout);
@@ -372,6 +413,24 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
       $.getJSON("${ url('pig:dashboard') }", function (data) {
         viewModel.updateDashboard(data);
       });
+    }
+
+    function refreshLogs() {
+      if (viewModel.currentScript().watchUrl() != "") {
+        $.getJSON(viewModel.currentScript().watchUrl(), function (data) {
+          if (data.workflow && data.workflow.isRunning) {
+            viewModel.currentScript().actions(data.workflow.actions);
+          }
+          else {
+            viewModel.currentScript().isRunning(false);
+            $(document).trigger("stopLogsRefresh");
+            $(document).trigger("showEditor");
+          }
+        });
+      }
+      else {
+        $(document).trigger("stopLogsRefresh");
+      }
     }
 
     function showMainSection(mainSection) {
@@ -436,6 +495,16 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
           $(document).trigger("loadEditor");
         }
         showSection("editor", "properties");
+      },
+      "logs": function () {
+        showSection("editor", "logs");
+      },
+      "logs/:scriptId": function (scriptId) {
+        if (scriptId !== "undefined" && scriptId != viewModel.currentScript().id()) {
+          viewModel.loadScript(scriptId);
+          $(document).trigger("loadEditor");
+        }
+        showSection("editor", "logs");
       }
     });
 
