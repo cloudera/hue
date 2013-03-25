@@ -35,7 +35,7 @@ class DbForm(forms.Form):
                            label='',
                            choices=(('default', 'default'),),
                            initial=0,
-                           widget=forms.widgets.Select(attrs={'class': 'span6'}))
+                           widget=forms.widgets.Select(attrs={'class': 'input-medium'}))
 
   def __init__(self, *args, **kwargs):
     databases = kwargs.pop('databases')

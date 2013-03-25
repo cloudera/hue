@@ -52,10 +52,17 @@
     if (disableScrollingTable == null || disableScrollingTable != true) {
       resizeScrollingTable(_this.element);
       var _resizeTimeout = -1;
+      var winWidth = $(window).width();
+      var winHeight = $(window).height();
       $(window).resize(function () {
         window.clearTimeout(_resizeTimeout);
         _resizeTimeout = window.setTimeout(function(){
-          resizeScrollingTable(_this.element);
+          // prevents endless loop in IE8
+          if (winWidth != $(window).width() || winHeight != $(window).height()) {
+            resizeScrollingTable(_this.element);
+            winWidth = $(window).width();
+            winHeight = $(window).height();
+          }
         }, 400);
       });
     }

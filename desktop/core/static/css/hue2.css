@@ -121,6 +121,7 @@
 }
 .navbar .nav .active > a, .navbar .nav .active > a:hover {
     background-color: rgba(0, 0, 0, 0.5);
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr='#103951', endColorstr='#103951'); /* IE */
     color: #FFFFFF;
     text-decoration: none;
 }
