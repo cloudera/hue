@@ -69,20 +69,17 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
         <div class="row-fluid">
           <div class="span12">
             <div id="toolbar"></div>
-            </br>
-            <div id="content-editor" class="clear">${ hue_core.result.get_template() | n,unicode }</div>
+            <div id="content-editor" class="clear" style="margin-top: 20px">${ hue_core.result.get_template() | n,unicode }</div>
             <div id="load-template" class="btn-group">
               <a title="Load template" class="btn toolbar-btn toolbar-cmd">
                 <i class="icon-paste" style="margin-top:2px;"></i>
               </a>
             </div>
 
-            </br></br></br>
-
-            <div class="well available-fields">
+            <div class="well available-fields" style="margin-top: 60px">
               <h4>${_('Available Fields')}</h4>
-              <span data-bind="foreach: fields" class="field-button">
-                  <a title="${ _('Click on this button to add the field') }"  style="margin-bottom:10px" class="btn" data-bind="click: $root.addField">
+              <span data-bind="foreach: availableFields" class="field-button">
+                  <a title="${ _('Click on this button to add the field') }"  style="margin-bottom:10px" class="btn btn-small" data-bind="click: $root.addFieldToVisual">
                     <i class="icon-plus"></i>
                     &nbsp;
                     <span data-bind="text: $data"></span>
@@ -96,16 +93,18 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
       </div>
       <div class="tab-pane" id="source">
         <div class="row-fluid">
-          <div class="span9">
+          <div class="span12">
             <textarea id="template-source"></textarea>
-          </div>
-
-          <div class="span3">          
-            <div class="well available-fields">
+            <div class="well available-fields" style="margin-top: 40px">
               <h4>${_('Available Fields')}</h4>
-              <ul data-bind="foreach: fields">
-                <li data-bind="text: $data, click: $root.addField"></li>
-              </ul>
+              <span data-bind="foreach: availableFields" class="field-button">
+                  <a title="${ _('Click on this button to add the field') }"  style="margin-bottom:10px" class="btn btn-small" data-bind="click: $root.addFieldToSource">
+                    <i class="icon-plus"></i>
+                    &nbsp;
+                    <span data-bind="text: $data"></span>
+                  </a>
+                  &nbsp;
+                </span>
             </div>
           </div>
         </div>
@@ -164,55 +163,86 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 
 
 <script type="text/javascript">
-  $(document).ready(function () {
-    function ViewModel() {
-      var self = this;
-      self.fields = ko.observableArray(${ hue_core.fields | n,unicode });
-      self.lastIndex = ko.observable(0);
 
-      setInterval(function() {
-        var contentEditor = $('#content-editor');
-        if (window.getSelection().rangeCount > 0) {
-          var range = window.getSelection().getRangeAt(0);
-          if (range.startContainer && ( contentEditor.is(range.startContainer) || contentEditor.has(range.startContainer).length )) {
-            // Use DOM methods instead of JQuery methods to interpret Text Nodes.
-            // Node Type '3' is a text node.
-            if (range.startContainer == contentEditor[0]) {
-              // Start offset with respect to parent container.
-              // Assuming this is 'content-editor'
-              self.lastIndex(range.startOffset);
-            } else {
-              // Find child of 'content-editor' and use index of that child.
-              var el = range.startContainer;
-              while(el.parentNode != contentEditor[0]) {
-                el = el.parentNode;
-              }
-              for (var i = 0; i < contentEditor[0].childNodes.length; ++i) {
-                if (contentEditor[0].childNodes[i] == el) {
-                  self.lastIndex(i);
-                  break;
-                }
-              }
-            }
+  $(document).ready(function () {
+
+    $("#content-editor").on("mouseup", function () {
+      storeSelection();
+    });
+
+    $("#content-editor").on("keyup", function () {
+      storeSelection();
+    });
+
+    function storeSelection() {
+      if (window.getSelection) {
+        // IE9 and non-IE
+        sel = window.getSelection();
+        if (sel.getRangeAt && sel.rangeCount) {
+          range = sel.getRangeAt(0);
+          $('#content-editor').data("range", range);
+        }
+      }
+      else if (document.selection && document.selection.type != "Control") {
+        // IE < 9
+        $('#content-editor').data("selection", document.selection);
+      }
+    }
+
+    function pasteHtmlAtCaret(html) {
+      var sel, range;
+      if (window.getSelection) {
+        // IE9 and non-IE
+        sel = window.getSelection();
+        if (sel.getRangeAt && sel.rangeCount) {
+          if ($('#content-editor').data("range")) {
+            range = $('#content-editor').data("range");
+          }
+          else {
+            range = sel.getRangeAt(0);
+          }
+          range.deleteContents();
+
+          // Range.createContextualFragment() would be useful here but is
+          // non-standard and not supported in all browsers (IE9, for one)
+          var el = document.createElement("div");
+          el.innerHTML = html;
+          var frag = document.createDocumentFragment(), node, lastNode;
+          while ((node = el.firstChild)) {
+            lastNode = frag.appendChild(node);
+          }
+          range.insertNode(frag);
+
+          // Preserve the selection
+          if (lastNode) {
+            range = range.cloneRange();
+            range.setStartAfter(lastNode);
+            range.collapse(true);
+            sel.removeAllRanges();
+            sel.addRange(range);
           }
         }
-      }, 100);
+      } else if (document.selection && document.selection.type != "Control") {
+        // IE < 9
+        if ($('#content-editor').data("selection")) {
+          $('#content-editor').data("selection").createRange().pasteHTML(html);
+        }
+        else {
+          document.selection.createRange().pasteHTML(html);
+        }
+      }
+    }
 
-      self.addField = function (field) {
-        // Use DOM methods instead of JQuery methods to interpret Text Nodes.
-        var contentEditor = $("#content-editor")[0];
-        if (self.lastIndex() > contentEditor.childNodes.length || self.lastIndex() < 0) {
-          self.lastIndex() = contentEditor.childNodes.length - 1;
-        }
-        var text = document.createTextNode(" {{" + field + "}}");
-        if (contentEditor.childNodes.length) {
-          console.log(self.lastIndex());
-          console.log(contentEditor.childNodes);
-          contentEditor.insertBefore(text, contentEditor.childNodes[self.lastIndex()].nextSibling);
-        } else {
-          contentEditor.appendChild(text);
-        }
-        self.lastIndex(self.lastIndex() + 1);
+    function ViewModel() {
+      var self = this;
+      self.availableFields = ko.observableArray(${ hue_core.fields | n,unicode });
+      self.lastIndex = ko.observable(0);
+      self.addFieldToVisual = function (field) {
+        $("#content-editor").focus();
+        pasteHtmlAtCaret("{{" + field + "}}");
+      };
+      self.addFieldToSource = function (field) {
+        codeMirror.replaceSelection("{{" + field + "}}")
       };
     };
 
