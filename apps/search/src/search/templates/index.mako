@@ -26,7 +26,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 <div class="search-bar">
   % if user.is_superuser:
     <div class="pull-right" style="margin-top: 4px">
-      <a class="change-settings btn" href="#"><i class="icon-edit"></i> ${ _('Customize this Index') }</a>
+      <a class="change-settings btn" href="#"><i class="icon-edit"></i> ${ _('Customize result display') }</a>
     </div>
   % endif
   <form class="form-search" style="margin: 0">
