@@ -756,7 +756,7 @@ class TestEditor(OozieMockBase):
         "mapper": "MyMapper",
         "reducer": "MyReducer",
         "files": '["my_file"]',
-        "archives":'["my_archive"]',
+        "archives":'[{"dummy":"","name":"my_archive"}]',
     })
     Link(parent=action1, child=self.wf.end, name="ok").save()
 
@@ -772,7 +772,7 @@ class TestEditor(OozieMockBase):
                 <reducer>MyReducer</reducer>
             </streaming>
             <file>my_file#my_file</file>
-            <archive>my_archive</archive>
+            <archive>my_archive#my_archive</archive>
         </map-reduce>
         <ok to="end"/>
         <error to="kill"/>
