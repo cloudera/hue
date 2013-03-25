@@ -18,69 +18,27 @@
   from django.utils.translation import ugettext as _
 %>
 
-<%def name="fieldName(field)">
+<%def name="breadcrumbs(breadcrumbs)">
+<ul class="nav nav-pills hueBreadcrumbBar" id="breadcrumbs">
+  <li><a href="${url('catalog:index')}"><i class="icon-home"></i> ${_('Home')}</a></li>
+  <li>
+    <ul class="hueBreadcrumb">
+      % for crumb in breadcrumbs:
+        <li>
+          <a href="${ crumb['url'] }">${ crumb['name'] }</a>
+          % if not loop.last:
+            <span class="divider">/</span>
+          % endif
+        </li>
+      % endfor
+    </ul>
+  </li>
+</ul>
 </%def>
 
 <%def name="bootstrapLabel(field)">
     <label for="${field.html_name | n}" class="control-label">${field.label}</label>
 </%def>
-
-<%def name="label(
-  field,
-  render_default=False,
-  data_filters=None,
-  hidden=False,
-  notitle=False,
-  tag='input',
-  klass=None,
-  attrs=None,
-  value=None,
-  help=False,
-  help_attrs=None,
-  dd_attrs=None,
-  dt_attrs=None,
-  title_klass=None,
-  button_text=False
-  )">
-<%
-  if value is None:
-    value = extract_field_data(field)
-
-  def make_attr_str(attributes):
-    if attributes is None:
-      attributes = {}
-    ret_str = ""
-    for key, value in attributes.iteritems():
-      if key == "klass":
-        key = "class"
-      ret_str += "%s='%s'" % (key.replace("_", "-"), unicode(value))
-    return ret_str
-
-  if not attrs:
-    attrs = {}
-  if not render_default:
-    attrs.setdefault('type', 'text')
-
-  if data_filters:
-    attrs.data_filters = data_filters
-
-  classes = []
-  if klass:
-    classes.append(klass)
-  if hidden:
-    classes.append("hide")
-  cls = ' '.join(classes)
-
-  title_classes = []
-  if title_klass:
-    title_classes.append(title_klass)
-  if notitle or hidden:
-    title_classes.append("hide")
-  titlecls = ' '.join(title_classes)
-%>
-${field.label_tag() | n}
-</%def>
-
 
 <%def name="field(
   field,
@@ -170,36 +128,4 @@ ${field.label_tag() | n}
             ${unicode(field.errors) | n}
         % endif
     % endif
-</%def>
-
-
-<%def name="pageref(num)">
-  % if hasattr(filter_params, "urlencode"):
-    href="?q-page=${num}&${filter_params.urlencode()}"
-  % else:
-    href="?q-page=${num}&${filter_params}"
-  % endif
-</%def>
-<%def name="prevpage(page)">
-  ${pageref(page.previous_page_number())}
-</%def>
-<%def name="nextpage(page)">
-  ${pageref(page.next_page_number())}
-</%def>
-<%def name="toppage(page)">
-  ${pageref(1)}
-</%def>
-<%def name="bottompage(page)">
-  ${pageref(page.num_pages())}
-</%def>
-<%def name="pagination(page)">
-    <div class="pagination">
-        <ul class="pull-right">
-            <li class="prev"><a title="${_('Beginning of List')}" ${toppage(page)}>&larr; ${_('Beginning of List')}</a></li>
-            <li><a title="${_('Previous Page')}" ${prevpage(page)}>${_('Previous Page')}</a></li>
-            <li><a title="${_('Next page')}" ${nextpage(page)}>${_('Next Page')}</a></li>
-            <li class="next"><a title="${_('End of List')}" ${bottompage(page)}>${_('End of List')} &rarr;</a></li>
-        </ul>
-        <p>${_('Showing %(start)s to %(end)s of %(count)s items, page %(page)s of %(pages)s') % dict(start=page.start_index(),end=page.end_index(),count=page.total_count(),page=page.number,pages=page.num_pages())}</p>
-    </div>
 </%def>

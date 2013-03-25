@@ -55,6 +55,7 @@ def _make_query(client, query, submission_type="Execute",
 
   return res
 
+
 class TestCatalogWithHadoop(BeeswaxSampleProvider):
   requires_hadoop = True
 
@@ -63,9 +64,6 @@ class TestCatalogWithHadoop(BeeswaxSampleProvider):
     self.db = dbms.get(user, get_query_server_config())
 
   def test_basic_flow(self):
-    """
-    Test basic query submission
-    """
     # Table should have been created
     response = self.client.get("/catalog/tables/")
     assert_true("test" in response.context["tables"])
@@ -104,11 +102,20 @@ class TestCatalogWithHadoop(BeeswaxSampleProvider):
     assert_true(resp.context['table'].is_view)
     assert_true("View Metadata" in resp.content)
     assert_true("Drop View" in resp.content)
+    # Breadcrumbs
+    assert_true("default" in resp.content)
+    assert_true("myview" in resp.content)
 
   def test_describe_partitions(self):
     response = self.client.get("/catalog/table/default/test_partitions/partitions", follow=True)
     assert_true("baz_one" in response.content)
     assert_true("boom_two" in response.content)
+    # Breadcrumbs
+    assert_true("default" in response.content)
+    assert_true("test_partitions" in response.content)
+    assert_true("partitions" in response.content)
+
+    # Not partitioned
     response = self.client.get("/catalog/table/default/test/partitions", follow=True)
     assert_true("is not partitioned." in response.content)
 

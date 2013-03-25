@@ -19,7 +19,10 @@
   from django.utils.translation import ugettext as _
 %>
 
+<%namespace name="components" file="components.mako" />
+
 ${ commonheader(_('Table Partitions: %(tableName)s') % dict(tableName=table.name), app_name, user) | n,unicode }
+${ components.breadcrumbs(breadcrumbs) }
 
 <div class="container-fluid">
 <h1>${_('Partitions')}</h1>
@@ -53,5 +56,7 @@ ${ commonheader(_('Table Partitions: %(tableName)s') % dict(tableName=table.name
 </table>
 
 </div>
+
+<link rel="stylesheet" href="/catalog/static/css/catalog.css" type="text/css">
 
 ${ commonfooter(messages) | n,unicode }

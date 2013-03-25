@@ -18,7 +18,7 @@ from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
 
-<%namespace name="comps" file="components.mako" />
+<%namespace name="components" file="components.mako" />
 
 <%
   if table.is_view:
@@ -27,6 +27,7 @@ from django.utils.translation import ugettext as _
     view_or_table_noun = _("Table")
 %>
 ${ commonheader(_("%s Metadata: %s") % (view_or_table_noun, table.name), app_name, user) | n,unicode }
+${ components.breadcrumbs(breadcrumbs) }
 
 <%def name="column_table(cols)">
     <table class="table table-striped table-condensed datatables">
@@ -160,6 +161,8 @@ ${ commonheader(_("%s Metadata: %s") % (view_or_table_noun, table.name), app_nam
      white-space: nowrap;
    }
 </style>
+
+<link rel="stylesheet" href="/catalog/static/css/catalog.css" type="text/css">
 
 <script type="text/javascript" charset="utf-8">
    $(document).ready(function () {

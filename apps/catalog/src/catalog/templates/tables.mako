@@ -18,11 +18,13 @@ from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
 <%namespace name="actionbar" file="actionbar.mako" />
+<%namespace name="components" file="components.mako" />
 <%namespace name="layout" file="layout.mako" />
 
 ${ commonheader(_('Tables'), 'catalog', user) | n,unicode }
+${ components.breadcrumbs(breadcrumbs) }
 
-<div class="container-fluid">
+<div class="container-fluid" id="tables">
     <h1>${_('Tables')}</h1>
     <div class="row-fluid">
         <div class="span3">
@@ -114,6 +116,8 @@ ${ commonheader(_('Tables'), 'catalog', user) | n,unicode }
     </div>
   </form>
 </div>
+
+<link rel="stylesheet" href="/catalog/static/css/catalog.css" type="text/css">
 
 <script src="/static/ext/js/jquery/plugins/jquery.cookie.js"></script>
 <script src="/static/ext/js/knockout-2.1.0.js" type="text/javascript" charset="utf-8"></script>

@@ -64,11 +64,17 @@ def show_tables(request, database=None):
   examples_installed = MetaInstall.get().installed_example
 
   return render("tables.mako", request, {
-      'tables': tables,
-      'examples_installed': examples_installed,
-      'db_form': db_form,
-      'database': database,
-      'tables_json': json.dumps(tables),
+    'breadcrumbs': [
+      {
+        'name': database,
+        'url': reverse('catalog:show_tables', kwargs={'database': database})
+      }
+    ],
+    'tables': tables,
+    'examples_installed': examples_installed,
+    'db_form': db_form,
+    'database': database,
+    'tables_json': json.dumps(tables),
   })
 
 
@@ -85,10 +91,20 @@ def describe_table(request, database, table):
     error_message, logs = dbms.expand_exception(ex, db)
 
   return render("describe_table.mako", request, {
-      'table': table,
-      'sample': table_data and table_data.rows(),
-      'error_message': error_message,
-      'database': database,
+    'breadcrumbs': [
+      {
+        'name': database,
+        'url': reverse('catalog:show_tables', kwargs={'database': database})
+      },
+      {
+        'name': str(table.name),
+        'url': reverse('catalog:describe_table', kwargs={'database': database, 'table': table.name})
+      },
+    ],
+    'table': table,
+    'sample': table_data and table_data.rows(),
+    'error_message': error_message,
+    'database': database,
   })
 
 
@@ -170,4 +186,18 @@ def describe_partitions(request, database, table):
   partitions = db.get_partitions(database, table_obj, max_parts=None)
 
   return render("describe_partitions.mako", request,
-                dict(table=table_obj, partitions=partitions, request=request))
+                dict(breadcrumbs=[
+                  {
+                    'name': database,
+                    'url': reverse('catalog:show_tables', kwargs={'database': database})
+                  },
+                  {
+                    'name': table,
+                    'url': reverse('catalog:describe_table', kwargs={'database': database, 'table': table})
+                  },
+                  {
+                    'name': 'partitions',
+                    'url': reverse('catalog:describe_partitions', kwargs={'database': database, 'table': table})
+                  },
+                ],
+                table=table_obj, partitions=partitions, request=request))
