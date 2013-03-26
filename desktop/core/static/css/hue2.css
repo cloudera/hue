@@ -1066,3 +1066,27 @@ a#advanced-btn:hover {
   margin-right: -14px;
   margin-top: -12px;
 }
+
+#jHueScrollUpAnchor {
+  color: #FFFFFF;
+  opacity: 0.65;
+  filter: alpha(opacity=65);
+  display: none;
+  position: fixed;
+  z-index: 2147483647;
+  bottom: 20px;
+  right: 20px;
+  -webkit-border-radius: 6px;
+  -moz-border-radius: 6px;
+  border-radius: 6px;
+  background-color: #333333;
+  padding: 10px;
+  padding-left: 14px;
+  padding-right: 14px;
+}
+
+#jHueScrollUpAnchor:hover {
+  text-decoration: none;
+  opacity: 0.85;
+  filter: alpha(opacity=85);
+}

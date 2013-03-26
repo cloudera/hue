@@ -32,35 +32,7 @@ ${ commonheader("Hue Help", "help", user, "100px") | n,unicode }
 
   <script>
     $(document).ready(function () {
-      $("a").click(function (e) {
-        var _link = $(this);
-        if (_link.attr("href").indexOf("#") == 0) {
-          e.preventDefault();
-          $(".returnHome").remove();
-          var _anchor = $("a[name='" + decodeURIComponent(_link.attr("href").substring(1)) + "']").last();
-          $("html, body").animate({
-            scrollTop:(_anchor.position().top - $(".navbar-fixed-top").height() - $(".subnav-fixed").height()) + "px"
-          }, 300);
-          createTopArrow(_anchor);
-        }
-      });
-
-      if (window.location.hash != ""){
-        var _anchor = $("a[name='" + decodeURIComponent(window.location.hash.substring(1)) + "']").last();
-        window.setTimeout(function(){
-          $("html, body").scrollTop(_anchor.position().top - $(".navbar-fixed-top").height() - $(".subnav-fixed").height());
-          createTopArrow(_anchor);
-        }, 10);
-      }
-
-      function createTopArrow(anchor){
-        $("<i>").css("cursor", "pointer").css("margin-left", "10px").attr("class", "returnHome icon icon-arrow-up").click(function () {
-          $(this).remove();
-          $("html, body").animate({
-            scrollTop:"0px"
-          }, 300);
-        }).appendTo(anchor.parent());
-      }
+      $.jHueScrollUp();
     });
   </script>
 
