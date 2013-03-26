@@ -23,12 +23,11 @@ import logging
 import time
 
 from django.core.urlresolvers import reverse
+from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_http_methods
-from django.http import HttpResponse
 
-from desktop.lib.django_util import render, encode_json_for_js
-from desktop.lib.exceptions_renderable import PopupException
+from desktop.lib.django_util import render
 from desktop.lib.view_util import format_duration_in_millis
 from liboozie.oozie_api import get_oozie
 from oozie.views.dashboard import show_oozie_error, check_job_access_permission
@@ -39,20 +38,22 @@ from pig.models import get_workflow_output, hdfs_link, PigScript
 
 LOG = logging.getLogger(__name__)
 
+
 def app(request):
   return render('app.mako', request, {
-    'scripts': json.dumps(get_scripts())
+    'scripts': json.dumps(get_scripts(is_history=True))
     }
   )
+
 
 def scripts(request):
   return HttpResponse(json.dumps(get_scripts()), mimetype="application/json")
 
 
-def get_scripts():
+def get_scripts(is_history=True):
   scripts = []
 
-  for script in PigScript.objects.filter(is_history=False):
+  for script in PigScript.objects.filter(is_history=is_history):
     data = json.loads(script.data)
     massaged_script = {
       'id': script.id,
@@ -63,6 +64,7 @@ def get_scripts():
 
   return scripts
 
+
 @show_oozie_error
 def dashboard(request):
   kwargs = {'cnt': 100,}
@@ -70,7 +72,9 @@ def dashboard(request):
   kwargs['name'] = Api.WORKFLOW_NAME
 
   jobs = get_oozie().get_workflows(**kwargs).jobs
-  return HttpResponse(json.dumps(massaged_oozie_jobs_for_json(jobs, request.user)), mimetype="application/json")
+  hue_jobs = PigScript.objects.filter(owner=request.user)
+
+  return HttpResponse(json.dumps(massaged_oozie_jobs_for_json(jobs, hue_jobs, request.user)), mimetype="application/json")
 
 
 def udfs(request):
@@ -80,8 +84,8 @@ def udfs(request):
 @require_http_methods(["POST"])
 def save(request):
   # TODO security
-  pig_script = create_or_update_script(request.POST.get('id'), request.POST.get('name'), request.POST.get('script'), request.user)
-  
+  pig_script = create_or_update_script(request.POST.get('id'), request.POST.get('name'), request.POST.get('script'), request.user, is_history=True)
+
   response = {
     'id': pig_script.id,
   }
@@ -93,14 +97,17 @@ def save(request):
 @show_oozie_error
 def run(request):
   # TODO security
-  pig_script = create_or_update_script(request.POST.get('id'), request.POST.get('name'), request.POST.get('script'), request.user)
+  pig_script = create_or_update_script(request.POST.get('id'), request.POST.get('name'), request.POST.get('script'), request.user, is_history=False)
 
-  # Todo, will come from script properties later
+  # TODO: will come from script properties later
   mapping = {
     'oozie.use.system.libpath':  'true',
-  }  
+  }
 
   oozie_id = Api(request.fs, request.user).submit(pig_script, mapping)
+
+  pig_script.update_from_dict({'job_id': oozie_id})
+  pig_script.save()
 
   response = {
     'id': pig_script.id,
@@ -108,6 +115,7 @@ def run(request):
   }
 
   return HttpResponse(json.dumps(response), content_type="text/plain")
+
 
 @require_http_methods(["POST"])
 def copy(request):
@@ -124,9 +132,10 @@ def copy(request):
     'id': pig_script.id,
     'name': name,
     'script': script
-    }
+  }
 
   return HttpResponse(json.dumps(response), content_type="text/plain")
+
 
 @require_http_methods(["POST"])
 def delete(request):
@@ -147,20 +156,21 @@ def delete(request):
   return HttpResponse(json.dumps(response), content_type="text/plain")
 
 
-def create_or_update_script(id, name, script, user):
+def create_or_update_script(id, name, script, user, is_history=True):
   try:
     pig_script = PigScript.objects.get(id=id)
   except:
-    pig_script = PigScript.objects.create(owner=user)
+    pig_script = PigScript.objects.create(owner=user, is_history=is_history)
 
   pig_script.update_from_dict({'name': name, 'script': script})
   pig_script.save()
 
   return pig_script
 
+
 @show_oozie_error
 def watch(request, job_id):
-  oozie_workflow = check_job_access_permission(request, job_id) 
+  oozie_workflow = check_job_access_permission(request, job_id)
   logs, workflow_actions = Api(request, job_id).get_log(request, oozie_workflow)
   output = get_workflow_output(oozie_workflow, request.fs)
 
@@ -179,7 +189,7 @@ def watch(request, job_id):
     'logs': logs,
     'output': hdfs_link(output)
   }
-  
+
   return HttpResponse(json.dumps(response), content_type="text/plain")
 
 
@@ -189,23 +199,24 @@ def format_time(st_time):
   else:
     return time.strftime("%a, %d %b %Y %H:%M:%S", st_time)
 
+
 def has_job_edition_permission(oozie_job, user):
   return user.is_superuser or oozie_job.user == user.username
+
 
 def has_dashboard_jobs_access(user):
   return user.is_superuser or user.has_hue_permission(action="dashboard_jobs_access", app=DJANGO_APPS[0])
 
-def massaged_oozie_jobs_for_json(oozie_jobs, user):
+
+def massaged_oozie_jobs_for_json(oozie_jobs, hue_jobs, user):
   jobs = []
+  hue_jobs = dict([(script.dict.get('job_id'), script) for script in hue_jobs if script.dict.get('job_id')])
 
   for job in oozie_jobs:
     if job.is_running():
-      if job.type == 'Workflow':
-        job = get_oozie().get_job(job.id)
-      elif job.type == 'Coordinator':
-        job = get_oozie().get_coordinator(job.id)
-      else:
-        job = get_oozie().get_bundle(job.id)
+      job = get_oozie().get_job(job.id)
+
+    script = hue_jobs.get(job.id) and hue_jobs.get(job.id) or None
 
     massaged_job = {
       'id': job.id,
@@ -216,7 +227,8 @@ def massaged_oozie_jobs_for_json(oozie_jobs, user):
       'status': job.status,
       'isRunning': job.is_running(),
       'duration': job.endTime and job.startTime and format_duration_in_millis(( time.mktime(job.endTime) - time.mktime(job.startTime) ) * 1000) or None,
-      'appName': job.appName,
+      'appName': script and script.dict['name'] or _('Unsaved script'),
+      'scriptId': script and script.id or -1,
       'progress': job.get_progress(),
       'user': job.user,
       'absoluteUrl': job.get_absolute_url(),

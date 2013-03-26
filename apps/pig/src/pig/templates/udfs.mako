@@ -26,17 +26,17 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
 
 <div class="container-fluid">
    ${ navigation.menubar(section='udfs') }
-  
+
     <div class="tab-content">
       <div class="tab-pane active">
 
 		<div class="container-fluid">
-		    <div class="row-fluid">         
-		      No UDFS         
+		    <div class="row-fluid">
+		      No UDFS
 		    </div>
 		</div>
 
-   
+
       </div>
 
     </div>

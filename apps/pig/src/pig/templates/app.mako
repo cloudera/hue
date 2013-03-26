@@ -25,8 +25,8 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
 <div class="subnav subnav-fixed">
   <div class="container-fluid">
     <ul class="nav nav nav-pills">
-      <li class="active"><a href="#scripts">${ _('Scripts') }</a></li>
-      <li><a href="#editor">${ _('Editor') }</a></li>
+      <li class="active"><a href="#editor">${ _('Editor') }</a></li>
+      <li><a href="#scripts">${ _('Scripts') }</a></li>
       <li><a href="#dashboard">${ _('Dashboard') }</a></li>
       ##<li class="${utils.is_selected(section, 'udfs')}"><a href="${ url('pig:udfs') }">${ _('UDF') }</a></li>
       </ul>
@@ -91,7 +91,7 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
           <strong><a href="#" data-bind="click: $root.viewScript, text: name"></a></strong>
         </td>
         <td data-bind="click: $root.viewScript">
-          <span data-bind="text: script"></span>
+          <span data-bind="text: scriptSumup"></span>
         </td>
       </tr>
     </script>
@@ -167,7 +167,7 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
         <div data-bind="template: {name: 'logTemplate', foreach: currentScript().actions}"></div>
         <script id="logTemplate" type="text/html">
           <div data-bind="css:{'alert-modified': name != '', 'alert': name != '', 'alert-success': status == 'SUCCEEDED' || status == 'OK', 'alert-error': status != 'RUNNING' && status != 'SUCCEEDED' && status != 'OK' && status != 'PREP'}">
-            <div class="pull-right" data-bind="text: status"></div><h4>${ _('Action') } '<span data-bind="text: name"></span>'</h4></div>
+            <div class="pull-right" data-bind="text: status"></div><h4>${ _('Progress: 100%') } '<span data-bind="text: name"></span>'</h4></div>
           <pre data-bind="visible: logs == ''">${ _('No available logs.') }</pre>
           <pre data-bind="visible: logs != '', text: logs"></pre>
         </script>
@@ -202,7 +202,7 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
       <thead>
       <tr>
         <th width="20%">${_('Name')}</th>
-        <th width="10%">${_('Status')}</th>
+        <th width="20%">${_('Status')}</th>
         <th width="">${_('Created on')}</th>
       </tr>
       </thead>
@@ -213,14 +213,14 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
 
     <script id="dashboardTemplate" type="text/html">
       <tr style="cursor: pointer">
-        <td>
-          <strong><a data-bind="text: appName, attr: {'href': absoluteUrl}" target="_blank"></a></strong>
+        <td data-bind="click: $root.viewSubmittedScript" title="${_('Click to edit')}">
+          <strong><a data-bind="text: appName"></a></strong>
         </td>
         <td>
           <span data-bind="attr: {'class': statusClass}, text: status"></span>
         </td>
         <td>
-          <span data-bind="text: created"></span>
+          <strong><a data-bind="text: created, attr: {'href': absoluteUrl}" target="_blank"></a></strong>
         </td>
       </tr>
     </script>
@@ -266,7 +266,7 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
     TOOLTIP_STOP: "${ _('Stop the execution') }",
     SAVED: "${ _('Saved') }",
     NEW_SCRIPT_NAME: "${ _('Unsaved script') }",
-    NEW_SCRIPT_CONTENT: "ie. a = LOAD '/user/${ user }/data';"
+    NEW_SCRIPT_CONTENT: "ie. A = LOAD '/user/${ user }/data';"
   };
 
   var scripts = ${ scripts | n,unicode };
@@ -310,7 +310,7 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
       viewModel.currentScript().script(codeMirror.getValue());
     });
 
-    showMainSection("scripts");
+    showMainSection("editor");
 
     $(document).on("loadEditor", function () {
       codeMirror.setValue(viewModel.currentScript().script());
@@ -424,7 +424,7 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
           else {
             viewModel.currentScript().isRunning(false);
             $(document).trigger("stopLogsRefresh");
-            $(document).trigger("showEditor");
+            //$(document).trigger("showEditor");
           }
         });
       }

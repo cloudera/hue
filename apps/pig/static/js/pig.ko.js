@@ -20,6 +20,7 @@ var PigScript = function (pigScript) {
     id: ko.observable(pigScript.id),
     name: ko.observable(pigScript.name),
     script: ko.observable(pigScript.script),
+    scriptSumup: ko.observable(pigScript.script.replace(/\W+/g, ' ').substring(0, 100)),
     isRunning: ko.observable(false),
     selected: ko.observable(false),
     watchUrl: ko.observable(""),
@@ -37,6 +38,7 @@ var PigScript = function (pigScript) {
 var Workflow = function (wf) {
   return {
     id: wf.id,
+    scriptId: wf.scriptId,
     lastModTime: wf.lastModTime,
     endTime: wf.endTime,
     status: wf.status,
@@ -302,4 +304,10 @@ var PigViewModel = function (scripts, props) {
           $("#deleteModal").modal("hide");
         }, "json");
   }
+
+  self.viewSubmittedScript = function (workflow) {
+    self.loadScript(workflow.scriptId);
+    $(document).trigger("loadEditor");
+    $(document).trigger("showEditor");
+  };
 };

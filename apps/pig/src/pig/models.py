@@ -30,44 +30,47 @@ from django.utils.translation import ugettext as _, ugettext_lazy as _t
 from oozie.models import Workflow
 
 
-# To move somewhere else when official commit
 class Document(models.Model):
-  owner = models.ForeignKey(User, db_index=True, verbose_name=_t('Owner'), help_text=_t('Person who can modify the job.'))
-  is_history = models.BooleanField(default=False, db_index=True, verbose_name=_t('Is managed'),
+  owner = models.ForeignKey(User, db_index=True, verbose_name=_t('Owner'), help_text=_t('User who can modify the job.'))
+  is_history = models.BooleanField(default=True, db_index=True, verbose_name=_t('Is a submitted job'),
                                   help_text=_t('If the job should show up in the history'))
 
 
 class PigScript(Document):
-  _ATTRIBUTES = ['script', 'name', 'properties']
-  
-  data = models.TextField(default=json.dumps({'script': '', 'name': ''}))
-    
+  _ATTRIBUTES = ['script', 'name', 'properties', 'job_id']
+
+  data = models.TextField(default=json.dumps({'script': '', 'name': '', 'properties': [], 'job_id': None}))
+
   def update_from_dict(self, attrs):
     data_dict = self.dict
-    
+
     if attrs.get('script'):
       data_dict['script'] = attrs['script']
 
     if attrs.get('name'):
       data_dict['name'] = attrs['name']
 
+    if attrs.get('job_id'):
+      data_dict['job_id'] = attrs['job_id']
+
     self.data = json.dumps(data_dict)
-    
+
   @property
   def dict(self):
     return json.loads(self.data)
-  
-  
+
+
 class Submission(models.Model):
   script = models.ForeignKey(PigScript)
   workflow = models.ForeignKey(Workflow)
-  
+
 
 class Udf:
   pass
 
 
 def get_workflow_output(oozie_workflow, fs):
+  # TODO: guess from the STORE
   output = None
 
   if 'workflowRoot' in oozie_workflow.conf_dict:
