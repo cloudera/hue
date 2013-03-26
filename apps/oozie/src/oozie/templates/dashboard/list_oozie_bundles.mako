@@ -248,6 +248,8 @@ ${layout.menubar(section='dashboard')}
       window.location.hash = hash;
     }
 
+    $.fn.dataTableExt.sErrMode = "throw";
+
     $.fn.dataTableExt.afnFiltering.push(
       function (oSettings, aData, iDataIndex) {
         var urlHashes = ""
@@ -341,15 +343,21 @@ ${layout.menubar(section='dashboard')}
                         '>${ _('Kill') }</a>';
               }
               if (['RUNNING', 'PREP', 'WAITING', 'SUSPENDED', 'PREPSUSPENDED', 'PREPPAUSED', 'PAUSED'].indexOf(bundle.status) > -1) {
-                runningTable.fnAddData([
-                    bundle.kickoffTime,
+                try {
+                  runningTable.fnAddData([
+                    emptyStringIfNull(bundle.kickoffTime),
                     '<span class="' + bundle.statusClass + '">' + bundle.status + '</span>',
                     bundle.appName,
                     '<div class="progress"><div class="' + bundle.progressClass + '" style="width:' + bundle.progress + '%">' + bundle.progress + '%</div></div>',
                     bundle.user,
-                    bundle.created,
+                    emptyStringIfNull(bundle.created),
                     '<a href="' + bundle.absoluteUrl + '" data-row-selector="true">' + bundle.id + '</a>',
-                    killCell]);
+                    killCell
+                  ]);
+                }
+                catch (error) {
+                  $.jHueNotify.error(error);
+                }
               }
 
             }
@@ -377,14 +385,19 @@ ${layout.menubar(section='dashboard')}
         completedTable.fnClearTable();
         $(data).each(function (iWf, item) {
           var bundle = new Bundle(item);
-          completedTable.fnAddData([
-              bundle.kickoffTime,
+          try {
+            completedTable.fnAddData([
+              emptyStringIfNull(bundle.kickoffTime),
               '<span class="' + bundle.statusClass + '">' + bundle.status + '</span>',
               bundle.appName,
               bundle.user,
-              bundle.created,
+              emptyStringIfNull(bundle.created),
               '<a href="' + bundle.absoluteUrl + '" data-row-selector="true">' + bundle.id + '</a>'
-          ], false);
+            ], false);
+          }
+          catch (error) {
+            $.jHueNotify.error(error);
+          }
         });
         completedTable.fnDraw();
       });

@@ -259,6 +259,8 @@ ${layout.menubar(section='dashboard')}
       window.location.hash = hash;
     }
 
+    $.fn.dataTableExt.sErrMode = "throw";
+
     $.fn.dataTableExt.afnFiltering.push(
       function (oSettings, aData, iDataIndex) {
         var urlHashes = ""
@@ -352,19 +354,24 @@ ${layout.menubar(section='dashboard')}
                         '>${ _('Kill') }</a>';
               }
               if (['RUNNING', 'PREP', 'WAITING', 'SUSPENDED', 'PREPSUSPENDED', 'PREPPAUSED', 'PAUSED'].indexOf(coord.status) > -1) {
-                runningTable.fnAddData([
-                  coord.endTime, '<span class="' + coord.statusClass + '">' + coord.status + '</span>',
-                  coord.appName,
-                  '<div class="progress"><div class="' + coord.progressClass + '" style="width:' + coord.progress + '%">' + coord.progress + '%</div></div>',
-                  coord.user,
-				  coord.frequency,
-				  coord.timeUnit,
-				  coord.startTime,
-				  '<a href="' + coord.absoluteUrl + '" data-row-selector="true">' + coord.id + '</a>',
-                  killCell
-                ]);
+                try {
+                  runningTable.fnAddData([
+                    emptyStringIfNull(coord.endTime),
+                    '<span class="' + coord.statusClass + '">' + coord.status + '</span>',
+                    coord.appName,
+                    '<div class="progress"><div class="' + coord.progressClass + '" style="width:' + coord.progress + '%">' + coord.progress + '%</div></div>',
+                    coord.user,
+                    emptyStringIfNull(coord.frequency),
+                    emptyStringIfNull(coord.timeUnit),
+                    emptyStringIfNull(coord.startTime),
+                    '<a href="' + coord.absoluteUrl + '" data-row-selector="true">' + coord.id + '</a>',
+                    killCell
+                  ]);
+                }
+                catch (error) {
+                  $.jHueNotify.error(error);
+                }
               }
-
             }
             else {
               runningTable.fnUpdate('<span class="' + coord.statusClass + '">' + coord.status + '</span>', foundRow, 1, false);
@@ -390,15 +397,22 @@ ${layout.menubar(section='dashboard')}
         completedTable.fnClearTable();
         $(data).each(function (iWf, item) {
           var coord = new Coordinator(item);
-          completedTable.fnAddData([
-            coord.endTime, '<span class="' + coord.statusClass + '">' + coord.status + '</span>',
-            coord.appName,
-            coord.duration,
-            coord.user,
-            coord.frequency,
-            coord.timeUnit,
-            coord.startTime,
-            '<a href="' + coord.absoluteUrl + '" data-row-selector="true">' + coord.id + '</a>'], false);
+          try {
+            completedTable.fnAddData([
+              emptyStringIfNull(coord.endTime),
+              '<span class="' + coord.statusClass + '">' + coord.status + '</span>',
+              coord.appName,
+              emptyStringIfNull(coord.duration),
+              coord.user,
+              emptyStringIfNull(coord.frequency),
+              emptyStringIfNull(coord.timeUnit),
+              emptyStringIfNull(coord.startTime),
+              '<a href="' + coord.absoluteUrl + '" data-row-selector="true">' + coord.id + '</a>'
+            ], false);
+          }
+          catch (error) {
+            $.jHueNotify.error(error);
+          }
         });
         completedTable.fnDraw();
       });

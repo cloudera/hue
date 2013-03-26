@@ -255,6 +255,8 @@ ${ layout.menubar(section='dashboard') }
       window.location.hash = hash;
     }
 
+    $.fn.dataTableExt.sErrMode = "throw";
+
     $.fn.dataTableExt.afnFiltering.push(
       function (oSettings, aData, iDataIndex) {
         var urlHashes = ""
@@ -348,17 +350,23 @@ ${ layout.menubar(section='dashboard') }
                         '>${ _('Kill') }</a>';
               }
               if (['RUNNING', 'PREP', 'WAITING', 'SUSPENDED', 'PREPSUSPENDED', 'PREPPAUSED', 'PAUSED'].indexOf(wf.status) > -1) {
-                runningTable.fnAddData([
-                  wf.lastModTime,
-                  '<span class="' + wf.statusClass + '">' + wf.status + '</span>',
-                  wf.appName,
-                  '<div class="progress"><div class="' + wf.progressClass + '" style="width:' + wf.progress + '%">' + wf.progress + '%</div></div>',
-                  wf.user,
-                  wf.created,
-                  wf.lastModTime,
-                  wf.run,
-                  '<a href="' + wf.absoluteUrl + '" data-row-selector="true">' + wf.id + '</a>',
-                  killCell]);
+                try {
+                  runningTable.fnAddData([
+                    emptyStringIfNull(wf.lastModTime),
+                    '<span class="' + wf.statusClass + '">' + wf.status + '</span>',
+                    wf.appName,
+                    '<div class="progress"><div class="' + wf.progressClass + '" style="width:' + wf.progress + '%">' + wf.progress + '%</div></div>',
+                    wf.user,
+                    emptyStringIfNull(wf.created),
+                    emptyStringIfNull(wf.lastModTime),
+                    wf.run,
+                    '<a href="' + wf.absoluteUrl + '" data-row-selector="true">' + wf.id + '</a>',
+                    killCell
+                  ]);
+                }
+                catch (error) {
+                  $.jHueNotify.error(error);
+                }
               }
             }
             else {
@@ -385,15 +393,21 @@ ${ layout.menubar(section='dashboard') }
         completedTable.fnClearTable();
         $(data).each(function (iWf, item) {
           var wf = new Workflow(item);
-          completedTable.fnAddData([
-            wf.endTime,
-            '<span class="' + wf.statusClass + '">' + wf.status + '</span>', decodeURIComponent(wf.appName),
-            wf.duration,
-            wf.user,
-            wf.created,
-            wf.lastModTime,
-            wf.run,
-            '<a href="' + wf.absoluteUrl + '" data-row-selector="true">' + wf.id + '</a>'], false);
+          try {
+            completedTable.fnAddData([
+              emptyStringIfNull(wf.endTime),
+              '<span class="' + wf.statusClass + '">' + wf.status + '</span>', decodeURIComponent(wf.appName),
+              emptyStringIfNull(wf.duration),
+              wf.user,
+              emptyStringIfNull(wf.created),
+              emptyStringIfNull(wf.lastModTime),
+              wf.run,
+              '<a href="' + wf.absoluteUrl + '" data-row-selector="true">' + wf.id + '</a>'
+            ], false);
+          }
+          catch (error) {
+            $.jHueNotify.error(error);
+          }
         });
         completedTable.fnDraw();
       });

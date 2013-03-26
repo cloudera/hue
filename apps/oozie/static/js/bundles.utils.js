@@ -46,3 +46,10 @@ function getStatusClass(status, prefix){
   }
   return klass;
 }
+
+function emptyStringIfNull(obj){
+  if (obj != null && obj != undefined){
+    return obj;
+  }
+  return "";
+}
