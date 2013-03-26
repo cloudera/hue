@@ -886,11 +886,29 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
           switch(newParent.node_type()) {
           case 'fork':
           case 'decision':
+            // Children that are forks or decisions may be removed when we detach.
+            // Remember children in this case to find correct node.
+            var child = self.registry.get(droppable.child());
+            var children_of_child = [];
+            if (child.node_type() == 'fork' || child.node_type() == 'decision') {
+              children_of_child = child.findChildren();
+            }
+
             draggable.detach();
 
-            var child = self.registry.get(droppable.child());
-            newParent.replaceChild(child, draggable);
-            draggable.addChild(child);
+            // Make sure fork and decision still exist
+            // Otherwise find child that replaced it
+            var child_to_replace = child;
+            if (child.node_type() == 'fork' || child.node_type() == 'decision') {
+              if (!self.registry.get(child.id())) {
+                // Guaranteed one because the fork is being removed right now.
+                child_to_replace = $.grep(children_of_child, function(child_of_child, index) {
+                  return child_of_child.findParents().length > 0;
+                })[0];
+              }
+            }
+            newParent.replaceChild(child_to_replace, draggable);
+            draggable.addChild(child_to_replace);
           break;
 
           case 'join':
