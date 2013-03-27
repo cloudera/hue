@@ -1113,6 +1113,14 @@ from django.utils.translation import ugettext as _
         });
         hiddenFields($("#chownForm"), 'path', paths);
         $("#chownForm").attr("action", "/filebrowser/chown?next=${url('filebrowser.views.view', path=urlencode('/'))}" + "." + self.currentPath());
+        $("select[name=user]").val(self.selectedFile().stats.user);
+        if ($("select[name=group] option:contains('" + self.selectedFile().stats.group + "')").length > 0) {
+          $("select[name=group]").val(self.selectedFile().stats.group);
+        } else{
+          $("select[name=group]").val("__other__");
+          $("input[name=group_other]").val(self.selectedFile().stats.group);
+        }
+        $("select[name=group]").change();
         $("#changeOwnerModal").modal({
           keyboard:true,
           show:true
