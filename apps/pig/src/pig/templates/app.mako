@@ -103,9 +103,18 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
         <form id="advancedSettingsForm" method="POST" class="form form-horizontal noPadding">
           <ul class="nav nav-list">
             <li class="nav-header">${_('Editor')}</li>
-            <li data-bind="click: editScript" class="active" data-section="edit"><a href="#">${ _('Edit script') }</a></li>
+            <li data-bind="click: editScript" class="active" data-section="edit">
+              <a href="#"><i class="icon-edit"></i> ${ _('Edit script') }</a>
+            </li>
+            <li data-bind="click: newScript">
+              <a href="#" title="${ _('New script') }" rel="tooltip" data-placement="right">
+                <i class="icon-plus-sign"></i> ${ _('New script') }
+              </a>
+            </li>            
             <li class="nav-header">${_('Properties')}</li>
-            <li data-bind="click: editScriptProperties" data-section="properties"><a href="#">${ _('Edit properties') }</a></li>
+            <li data-bind="click: editScriptProperties" data-section="properties">
+              <a href="#"><i class="icon-reorder"></i> ${ _('Edit properties') }</a>
+            </li>
             ##<li class="nav-header">${_('UDF')}</li>
             ##<li><a href="#createDataset">${ _('New') }</a></li>
             ##<li><a href="#createDataset">${ _('Add') }</a></li>
@@ -167,7 +176,7 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
         <div data-bind="template: {name: 'logTemplate', foreach: currentScript().actions}"></div>
         <script id="logTemplate" type="text/html">
           <div data-bind="css:{'alert-modified': name != '', 'alert': name != '', 'alert-success': status == 'SUCCEEDED' || status == 'OK', 'alert-error': status != 'RUNNING' && status != 'SUCCEEDED' && status != 'OK' && status != 'PREP'}">
-            <div class="pull-right" data-bind="text: status"></div><h4>${ _('Progress: 100%') } '<span data-bind="text: name"></span>'</h4></div>
+            <div class="pull-right" data-bind="text: status"></div><h4>${ _('Progress: 50%') } '<span data-bind="text: name"></span>'</h4></div>
           <pre data-bind="visible: logs == ''">${ _('No available logs.') }</pre>
           <pre data-bind="visible: logs != '', text: logs"></pre>
         </script>
@@ -402,6 +411,8 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
         viewModel.filterScripts($("#filter").val());
       }, 350);
     });
+
+    viewModel.filterScripts('');
 
     refreshDashboard();
 

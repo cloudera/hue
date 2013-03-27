@@ -18,6 +18,7 @@
 var PigScript = function (pigScript) {
   return {
     id: ko.observable(pigScript.id),
+    isDesign: ko.observable(pigScript.isDesign),
     name: ko.observable(pigScript.name),
     script: ko.observable(pigScript.script),
     scriptSumup: ko.observable(pigScript.script.replace(/\W+/g, ' ').substring(0, 100)),
@@ -120,7 +121,7 @@ var PigViewModel = function (scripts, props) {
 
   self.filterScripts = function (filter) {
     self.filteredScripts(ko.utils.arrayFilter(self.scripts(), function (script) {
-      return script.name().toLowerCase().indexOf(filter.toLowerCase()) > -1
+      return script.isDesign() && script.name().toLowerCase().indexOf(filter.toLowerCase()) > -1
     }));
   };
 

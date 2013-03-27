@@ -20,7 +20,7 @@ try:
 except ImportError:
   import simplejson as json
 import logging
-import time
+
 
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
@@ -28,12 +28,12 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_http_methods
 
 from desktop.lib.django_util import render
-from desktop.lib.view_util import format_duration_in_millis
-from liboozie.oozie_api import get_oozie
+from desktop.lib.exceptions_renderable import PopupException
 from oozie.views.dashboard import show_oozie_error, check_job_access_permission
 
-from pig.api import Api
-from pig.models import get_workflow_output, hdfs_link, PigScript
+from pig import api
+from pig.models import get_workflow_output, hdfs_link, PigScript,\
+  create_or_update_script, get_scripts
 
 
 LOG = logging.getLogger(__name__)
@@ -41,50 +41,33 @@ LOG = logging.getLogger(__name__)
 
 def app(request):
   return render('app.mako', request, {
-    'scripts': json.dumps(get_scripts(is_history=True))
+    'scripts': json.dumps(get_scripts(request.user))
     }
   )
 
 
 def scripts(request):
-  return HttpResponse(json.dumps(get_scripts()), mimetype="application/json")
-
-
-def get_scripts(is_history=True):
-  scripts = []
-
-  for script in PigScript.objects.filter(is_history=is_history):
-    data = json.loads(script.data)
-    massaged_script = {
-      'id': script.id,
-      'name': data["name"],
-      'script': data["script"]
-    }
-    scripts.append(massaged_script)
-
-  return scripts
+  return HttpResponse(json.dumps(get_scripts(request.user)), mimetype="application/json")
 
 
 @show_oozie_error
 def dashboard(request):
-  kwargs = {'cnt': 100,}
-  kwargs['user'] = request.user.username
-  kwargs['name'] = Api.WORKFLOW_NAME
+  pig_api = api.get(request.fs, request.user)
 
-  jobs = get_oozie().get_workflows(**kwargs).jobs
+  jobs = pig_api.get_jobs()
   hue_jobs = PigScript.objects.filter(owner=request.user)
+  massaged_jobs = pig_api.massaged_jobs_for_json(jobs, hue_jobs)
 
-  return HttpResponse(json.dumps(massaged_oozie_jobs_for_json(jobs, hue_jobs, request.user)), mimetype="application/json")
-
-
-def udfs(request):
-  return render('udfs.mako', request, {})
+  return HttpResponse(json.dumps(massaged_jobs), mimetype="application/json")
 
 
-@require_http_methods(["POST"])
 def save(request):
-  # TODO security
-  pig_script = create_or_update_script(request.POST.get('id'), request.POST.get('name'), request.POST.get('script'), request.user, is_history=True)
+  if request.method != 'POST':
+    raise PopupException(_('POST request required.'))
+
+  pig_script = create_or_update_script(request.POST.get('id'), request.POST.get('name'), request.POST.get('script'), request.user)
+  pig_script.is_design = True
+  pig_script.save()
 
   response = {
     'id': pig_script.id,
@@ -93,18 +76,13 @@ def save(request):
   return HttpResponse(json.dumps(response), content_type="text/plain")
 
 
-@require_http_methods(["POST"])
+
 @show_oozie_error
 def run(request):
-  # TODO security
-  pig_script = create_or_update_script(request.POST.get('id'), request.POST.get('name'), request.POST.get('script'), request.user, is_history=False)
+  pig_script = create_or_update_script(request.POST.get('id'), request.POST.get('name'), request.POST.get('script'), request.user, is_design=False)
 
-  # TODO: will come from script properties later
-  mapping = {
-    'oozie.use.system.libpath':  'true',
-  }
-
-  oozie_id = Api(request.fs, request.user).submit(pig_script, mapping)
+  params = {}
+  oozie_id = api.get(request.fs, request.user).submit(pig_script, params)
 
   pig_script.update_from_dict({'job_id': oozie_id})
   pig_script.save()
@@ -117,10 +95,14 @@ def run(request):
   return HttpResponse(json.dumps(response), content_type="text/plain")
 
 
-@require_http_methods(["POST"])
 def copy(request):
-  # TODO security
-  existing_script_data = json.loads((PigScript.objects.get(id=request.POST.get('id'))).data)
+  if request.method != 'POST':
+    raise PopupException(_('POST request required.'))
+
+  pig_script = PigScript.objects.get(id=request.POST.get('id'))
+  pig_script.can_edit_or_exception(request.user)
+
+  existing_script_data = pig_script.dict
   name = existing_script_data["name"] + _(' (Copy)')
   script = existing_script_data["script"]
 
@@ -137,14 +119,16 @@ def copy(request):
   return HttpResponse(json.dumps(response), content_type="text/plain")
 
 
-@require_http_methods(["POST"])
 def delete(request):
-  # TODO security
+  if request.method != 'POST':
+    raise PopupException(_('POST request required.'))
+
   ids = request.POST.get('ids').split(",")
 
   for script_id in ids:
     try:
       pig_script = PigScript.objects.get(id=script_id)
+      pig_script.can_edit_or_exception(request.user)
       pig_script.delete()
     except:
       None
@@ -156,22 +140,10 @@ def delete(request):
   return HttpResponse(json.dumps(response), content_type="text/plain")
 
 
-def create_or_update_script(id, name, script, user, is_history=True):
-  try:
-    pig_script = PigScript.objects.get(id=id)
-  except:
-    pig_script = PigScript.objects.create(owner=user, is_history=is_history)
-
-  pig_script.update_from_dict({'name': name, 'script': script})
-  pig_script.save()
-
-  return pig_script
-
-
 @show_oozie_error
 def watch(request, job_id):
   oozie_workflow = check_job_access_permission(request, job_id)
-  logs, workflow_actions = Api(request, job_id).get_log(request, oozie_workflow)
+  logs, workflow_actions = api.get(request, job_id).get_log(request, oozie_workflow)
   output = get_workflow_output(oozie_workflow, request.fs)
 
   workflow = {
@@ -191,55 +163,3 @@ def watch(request, job_id):
   }
 
   return HttpResponse(json.dumps(response), content_type="text/plain")
-
-
-def format_time(st_time):
-  if st_time is None:
-    return '-'
-  else:
-    return time.strftime("%a, %d %b %Y %H:%M:%S", st_time)
-
-
-def has_job_edition_permission(oozie_job, user):
-  return user.is_superuser or oozie_job.user == user.username
-
-
-def has_dashboard_jobs_access(user):
-  return user.is_superuser or user.has_hue_permission(action="dashboard_jobs_access", app=DJANGO_APPS[0])
-
-
-def massaged_oozie_jobs_for_json(oozie_jobs, hue_jobs, user):
-  jobs = []
-  hue_jobs = dict([(script.dict.get('job_id'), script) for script in hue_jobs if script.dict.get('job_id')])
-
-  for job in oozie_jobs:
-    if job.is_running():
-      job = get_oozie().get_job(job.id)
-
-    script = hue_jobs.get(job.id) and hue_jobs.get(job.id) or None
-
-    massaged_job = {
-      'id': job.id,
-      'lastModTime': hasattr(job, 'lastModTime') and job.lastModTime and format_time(job.lastModTime) or None,
-      'kickoffTime': hasattr(job, 'kickoffTime') and job.kickoffTime or None,
-      'timeOut': hasattr(job, 'timeOut') and job.timeOut or None,
-      'endTime': job.endTime and format_time(job.endTime) or None,
-      'status': job.status,
-      'isRunning': job.is_running(),
-      'duration': job.endTime and job.startTime and format_duration_in_millis(( time.mktime(job.endTime) - time.mktime(job.startTime) ) * 1000) or None,
-      'appName': script and script.dict['name'] or _('Unsaved script'),
-      'scriptId': script and script.id or -1,
-      'progress': job.get_progress(),
-      'user': job.user,
-      'absoluteUrl': job.get_absolute_url(),
-      'canEdit': has_job_edition_permission(job, user),
-      'killUrl': reverse('oozie:manage_oozie_jobs', kwargs={'job_id':job.id, 'action':'kill'}),
-      'created': hasattr(job, 'createdTime') and job.createdTime and job.createdTime and ((job.type == 'Bundle' and job.createdTime) or format_time(job.createdTime)),
-      'startTime': hasattr(job, 'startTime') and format_time(job.startTime) or None,
-      'run': hasattr(job, 'run') and job.run or 0,
-      'frequency': hasattr(job, 'frequency') and job.frequency or None,
-      'timeUnit': hasattr(job, 'timeUnit') and job.timeUnit or None,
-      }
-    jobs.append(massaged_job)
-
-  return jobs

@@ -15,25 +15,35 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 try:
   import json
 except ImportError:
   import simplejson as json
 import posixpath
 
-from hadoop.fs.hadoopfs import Hdfs
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
+
+from desktop.lib.exceptions_renderable import PopupException
+from hadoop.fs.hadoopfs import Hdfs
 
 from oozie.models import Workflow
 
 
 class Document(models.Model):
   owner = models.ForeignKey(User, db_index=True, verbose_name=_t('Owner'), help_text=_t('User who can modify the job.'))
-  is_history = models.BooleanField(default=True, db_index=True, verbose_name=_t('Is a submitted job'),
-                                  help_text=_t('If the job should show up in the history'))
+  is_design = models.BooleanField(default=True, db_index=True, verbose_name=_t('Is a user document, not a document submission.'),
+                                     help_text=_t('If the document is not a submitted job but a real query, script, workflow.'))
+
+  def is_editable(self, user):
+    return user.is_superuser or self.owner == user
+
+  def can_edit_or_exception(self, user, exception_class=PopupException):
+    if self.is_editable(user):
+      return True
+    else:
+      raise exception_class(_('Only superusers and %s are allowed to modify this document.') % user)
 
 
 class PigScript(Document):
@@ -65,12 +75,38 @@ class Submission(models.Model):
   workflow = models.ForeignKey(Workflow)
 
 
-class Udf:
-  pass
+def create_or_update_script(id, name, script, user, is_design=True):
+  """Take care of security"""
+  try:
+    pig_script = PigScript.objects.get(id=id)
+    pig_script.can_edit_or_exception(user)
+  except:
+    pig_script = PigScript.objects.create(owner=user, is_design=is_design)
+
+  pig_script.update_from_dict({'name': name, 'script': script})
+  pig_script.save()
+
+  return pig_script
+
+
+def get_scripts(user, max_count=200):
+  scripts = []
+
+  for script in PigScript.objects.filter(owner=user).order_by('-id')[:max_count]:
+    data = json.loads(script.data)
+    massaged_script = {
+      'id': script.id,
+      'name': data['name'],
+      'script': data['script'],
+      'isDesign': script.is_design,
+    }
+    scripts.append(massaged_script)
+
+  return scripts
 
 
 def get_workflow_output(oozie_workflow, fs):
-  # TODO: guess from the STORE
+  # TODO: guess from the STORE or parameters
   output = None
 
   if 'workflowRoot' in oozie_workflow.conf_dict:

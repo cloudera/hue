@@ -21,7 +21,6 @@ urlpatterns = patterns('pig.views',
   url(r'^$', 'app', name='index'),
 
   url(r'^app/$', 'app', name='app'),
-  url(r'^udfs/$', 'udfs', name='udfs'),
 
   # Ajax
   url(r'^scripts/$', 'scripts', name='scripts'),
