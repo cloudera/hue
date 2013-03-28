@@ -14,6 +14,7 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
+from desktop.lib.i18n import smart_unicode
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
@@ -26,8 +27,7 @@ from django.utils.translation import ugettext as _
   else:
     view_or_table_noun = _("Table")
 %>
-${ commonheader(_("%s Metadata: %s") % (view_or_table_noun, table.name), app_name, user) | n,unicode }
-${ components.breadcrumbs(breadcrumbs) }
+${ commonheader(_("%s : %s") % (view_or_table_noun, table.name), app_name, user) | n,unicode }
 
 <%def name="column_table(cols)">
     <table class="table table-striped table-condensed datatables">
@@ -52,7 +52,9 @@ ${ components.breadcrumbs(breadcrumbs) }
 </%def>
 
 <div class="container-fluid">
-    <h1>${_('Table Metadata:')} ${table.name}</h1>
+    <h1>${_('Table')} ${table.name}</h1>
+    ${ components.breadcrumbs(breadcrumbs) }
+
     <div class="row-fluid">
         <div class="span3">
             <div class="well sidebar-nav">
@@ -67,7 +69,7 @@ ${ components.breadcrumbs(breadcrumbs) }
         </div>
         <div class="span9">
             % if table.comment is not None:
-                <h5>${ table.comment }</h5>
+                <div class="alert alert-info">${ _('Comment:') } ${ table.comment }</div>
             % endif
 
             <ul class="nav nav-tabs">
@@ -112,7 +114,7 @@ ${ components.breadcrumbs(breadcrumbs) }
                             % for i, row in enumerate(sample):
                               <tr>
                                 % for item in row:
-                                  <td>${ item }</td>
+                                  <td>${ smart_unicode(item, errors='ignore') }</td>
                                 % endfor
                               </tr>
                             % endfor

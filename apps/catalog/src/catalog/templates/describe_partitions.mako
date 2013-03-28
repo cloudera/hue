@@ -22,10 +22,10 @@
 <%namespace name="components" file="components.mako" />
 
 ${ commonheader(_('Table Partitions: %(tableName)s') % dict(tableName=table.name), app_name, user) | n,unicode }
-${ components.breadcrumbs(breadcrumbs) }
 
 <div class="container-fluid">
 <h1>${_('Partitions')}</h1>
+${ components.breadcrumbs(breadcrumbs) }
 
 <table class="table table-striped table-condensed datatables">
   % if partitions:

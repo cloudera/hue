@@ -100,7 +100,7 @@ class TestCatalogWithHadoop(BeeswaxSampleProvider):
     resp = self.client.get('/catalog/table/default/myview')
     assert_equal(None, resp.context['sample'])
     assert_true(resp.context['table'].is_view)
-    assert_true("View Metadata" in resp.content)
+    assert_true("View" in resp.content)
     assert_true("Drop View" in resp.content)
     # Breadcrumbs
     assert_true("default" in resp.content)

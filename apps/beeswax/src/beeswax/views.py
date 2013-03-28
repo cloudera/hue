@@ -513,7 +513,8 @@ def view_results(request, id, first_row=0):
   app_name = get_app_name(request)
 
   query_history = authorized_get_history(request, id, must_exist=True)
-  db = dbms.get(request.user, query_history.get_query_server_config())
+  query_server = query_history.get_query_server_config()
+  db = dbms.get(request.user, query_server)
 
   handle, state = _get_query_handle_and_state(query_history)
   context_param = request.GET.get('context', '')
@@ -531,7 +532,7 @@ def view_results(request, id, first_row=0):
 
   # Retrieve query results or use empty result if no result set
   try:
-    if not handle.has_result_set:
+    if query_server['server_name'] == 'impala' and not handle.has_result_set:
       downloadable = False
     elif not download:
       results = db.fetch(handle, start_over, 100)
@@ -1127,13 +1128,15 @@ def _get_query_handle_and_state(query_history):
   if handle is None:
     raise PopupException(_("Failed to retrieve query state from the Query Server."))
 
-  if handle.has_result_set:
-    state = dbms.get(query_history.owner, query_history.get_query_server_config()).get_state(handle)
-  else:
+  query_server = query_history.get_query_server_config()
+
+  if query_server['server_name'] == 'impala' and not handle.has_result_set:
     state = QueryHistory.STATE.available
+  else:
+    state = dbms.get(query_history.owner, query_history.get_query_server_config()).get_state(handle)
 
   if state is None:
-    raise PopupException(_("Failed to contact Beeswax Server to check query status."))
+    raise PopupException(_("Failed to contact Server to check query status."))
   return (handle, state)
 
 

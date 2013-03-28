@@ -378,8 +378,7 @@ ul.errorlist li {
 
 .hueBreadcrumb {
     list-style: none outside none;
-    margin: 0 0 18px;
-    padding: 9px 14px;
+    padding: 9px 9px;
 }
 .hueBreadcrumb li {
     display: inline-block;
@@ -408,6 +407,17 @@ ul.errorlist li {
 .hueWell {
     padding-bottom:0;
 }
+
+.hueBreadcrumbBar {
+    padding: 8px 15px;
+    margin: 0 0 20px;
+    list-style: none;
+    border: 1px solid #E5E5E5;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+}
+
 
 /*********************************************************
  * From: http://datatables.net/blog/Twitter_Bootstrap

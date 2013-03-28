@@ -186,18 +186,18 @@ def describe_partitions(request, database, table):
   partitions = db.get_partitions(database, table_obj, max_parts=None)
 
   return render("describe_partitions.mako", request,
-                dict(breadcrumbs=[
-                  {
-                    'name': database,
-                    'url': reverse('catalog:show_tables', kwargs={'database': database})
-                  },
-                  {
-                    'name': table,
-                    'url': reverse('catalog:describe_table', kwargs={'database': database, 'table': table})
-                  },
-                  {
-                    'name': 'partitions',
-                    'url': reverse('catalog:describe_partitions', kwargs={'database': database, 'table': table})
-                  },
-                ],
-                table=table_obj, partitions=partitions, request=request))
+      {'breadcrumbs': [
+        {
+          'name': database,
+          'url': reverse('catalog:show_tables', kwargs={'database': database})
+        },
+        {
+          'name': table,
+          'url': reverse('catalog:describe_table', kwargs={'database': database, 'table': table})
+        },
+        {
+          'name': 'partitions',
+          'url': reverse('catalog:describe_partitions', kwargs={'database': database, 'table': table})
+        },
+      ],
+      'table': table_obj, 'partitions': partitions, 'request': request})

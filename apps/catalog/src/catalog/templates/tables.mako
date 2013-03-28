@@ -19,13 +19,12 @@ from django.utils.translation import ugettext as _
 %>
 <%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="components" file="components.mako" />
-<%namespace name="layout" file="layout.mako" />
 
 ${ commonheader(_('Tables'), 'catalog', user) | n,unicode }
-${ components.breadcrumbs(breadcrumbs) }
 
 <div class="container-fluid" id="tables">
     <h1>${_('Tables')}</h1>
+    ${ components.breadcrumbs(breadcrumbs) }
     <div class="row-fluid">
         <div class="span3">
             <div class="well sidebar-nav">

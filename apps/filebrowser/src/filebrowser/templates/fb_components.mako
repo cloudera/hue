@@ -17,6 +17,7 @@
 from django.template.defaultfilters import urlencode
 from django.utils.translation import ugettext as _
 %>
+
 <%def name="breadcrumbs(path, breadcrumbs, from_listdir=False)">
     % if from_listdir:
         <ul class="nav nav-pills hueBreadcrumbBar">
@@ -51,19 +52,4 @@ from django.utils.translation import ugettext as _
             </li>
         </ul>
     % endif
-
-    <style type="text/css">
-        .hueBreadcrumbBar {
-            padding: 8px 15px;
-            margin: 0 0 20px;
-            list-style: none;
-            border: 1px solid #E5E5E5;
-            -webkit-border-radius: 4px;
-            -moz-border-radius: 4px;
-            border-radius: 4px;
-        }
-        .hueBreadcrumb {
-            margin: 0!important;
-        }
-    </style>
 </%def>

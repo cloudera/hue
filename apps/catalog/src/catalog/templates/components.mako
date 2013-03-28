@@ -19,21 +19,28 @@
 %>
 
 <%def name="breadcrumbs(breadcrumbs)">
-<ul class="nav nav-pills hueBreadcrumbBar" id="breadcrumbs">
-  <li><a href="${url('catalog:index')}"><i class="icon-home"></i> ${_('Home')}</a></li>
-  <li>
-    <ul class="hueBreadcrumb">
-      % for crumb in breadcrumbs:
-        <li>
-          <a href="${ crumb['url'] }">${ crumb['name'] }</a>
-          % if not loop.last:
-            <span class="divider">/</span>
-          % endif
-        </li>
-      % endfor
-    </ul>
-  </li>
-</ul>
+
+
+
+  <ul class="nav nav-pills hueBreadcrumbBar" id="breadcrumbs">
+    <li>
+      <a href="${url('catalog:index')}"><i class="icon-sitemap"></i> ${_('Catalog')}</a>
+    </li>
+    <li>
+      <ul class="hueBreadcrumb">
+        % for crumb in breadcrumbs:
+          <li>
+            <a href="${ crumb['url'] }">${ crumb['name'] }</a>
+            % if not loop.last:
+              <span class="divider">/</span>
+            % endif
+          </li>
+        % endfor
+      </ul>
+    </li>
+  </ul>
+
+
 </%def>
 
 <%def name="bootstrapLabel(field)">
