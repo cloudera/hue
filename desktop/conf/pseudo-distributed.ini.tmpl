@@ -392,6 +392,10 @@
   # Choices are 'beeswax' (default), 'hiveserver2'.
   ## server_interface=beeswax
 
+  # Time in milliseconds for Beeswax to persist queries in its cache.
+  # 7*24*60*60*1000 = 1 week
+  ## beeswax_running_query_lifetime=604800000L
+
 
 ###########################################################################
 # Settings to configure Impala

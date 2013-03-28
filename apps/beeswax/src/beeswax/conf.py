@@ -101,7 +101,7 @@ BEESWAX_RUNNING_QUERY_LIFETIME = Config(
   key='beeswax_running_query_lifetime',
   default=604800000L, # 7*24*60*60*1000 (1 week)
   type=long,
-  help=_('Time in seconds for Beeswax to persist queries in its cache.'))
+  help=_('Time in milliseconds for Beeswax to persist queries in its cache.'))
 
 BROWSE_PARTITIONED_TABLE_LIMIT = Config(
   key='browse_partitioned_table_limit',
