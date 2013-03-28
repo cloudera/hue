@@ -291,11 +291,12 @@ class LdapBackend(object):
 
     # Certificate-related config settings
     if desktop.conf.LDAP.LDAP_CERT.get():
-      ldap_settings.AUTH_LDAP_START_TLS = True
-      ldap_settings.AUTH_LDAP_GLOBAL_OPTIONS[ldap.OPT_X_TLS_CACERTFILE] = desktop.conf.LDAP.LDAP_CERT.get()
+      ldap_settings.AUTH_LDAP_START_TLS = desktop.conf.LDAP.USE_START_TLS.get()
+      ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_ALLOW)
+      ldap.set_option(ldap.OPT_X_TLS_CACERTFILE, desktop.conf.LDAP.LDAP_CERT.get())
     else:
       ldap_settings.AUTH_LDAP_START_TLS = False
-      ldap_settings.AUTH_LDAP_GLOBAL_OPTIONS[ldap.OPT_X_TLS_REQUIRE_CERT] = ldap.OPT_X_TLS_NEVER
+      ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_NEVER)
 
   def authenticate(self, username=None, password=None):
     # Do this check up here, because the auth call creates a django user upon first login per user
