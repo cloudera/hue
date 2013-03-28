@@ -230,22 +230,21 @@ ${layout.menubar(section='query')}
                             </div>
                           </li>
                         % endif
-                        </ul>
-                    </ul>
+                          <li class="nav-header"></li>
+                          <li>
+                            <div class="control-group">
+                              <i class="icon-question-sign" id="help"></i>
+                              <div id="help-content" class="hide">
+                                <ul>
+                                  <li>${ _("You can execute queries with multiple SQL statements delimited by a semicolon ';'.") }</li>
+                                  <li>${ _('You can highlight and run a fragment of a query.') }</li>
+                                </ul>
+                              </div>
+                            </div>
+                          </li>
+                       </ul>
                     <input type="hidden" name="${form.query["query"].html_name | n}" class="query" value="" />
                 </form>
-            </div>
-            <div id="multiStatementsQuery" class="alert">
-              <button type="button" class="close" data-dismiss="alert">&times;</button>
-              <strong>${_('Did you know?')}</strong>
-              ${ _("You can execute queries with multiple SQL statements delimited by a semicolon ';'.") }
-              ${ _("Use '\\059' instead of ';' if you have some conflicts.") }
-            </div>
-
-            <div id="fragmentSelectionQuery" class="alert">
-              <button type="button" class="close" data-dismiss="alert">&times;</button>
-              <strong>${_('Did you know?')}</strong>
-              ${_('You can highlight and run a fragment of a query.')}
             </div>
         </div>
         <div id="querySide" class="span9">
@@ -632,13 +631,15 @@ ${layout.menubar(section='query')}
       % endif
     });
 
-    $.getJSON("${ url('beeswax:configuration') }", function(data) {
+    $.getJSON("${ url(app_name + ':configuration') }", function(data) {
       $(".settingsField").typeahead({
         source: $.map(data.config_values, function(value, key) {
           return value.key;
         })
       });
     });
+
+    $("#help").popover({'title': "${_('Did you know?')}", 'content': $("#help-content").html(), 'trigger': 'hover', 'html': true});
 </script>
 
 
