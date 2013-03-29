@@ -68,7 +68,7 @@ ${ commonheader(_("%s : %s") % (view_or_table_noun, table.name), app_name, user)
             </div>
         </div>
         <div class="span9">
-            % if table.comment is not None:
+            % if table.comment:
                 <div class="alert alert-info">${ _('Comment:') } ${ table.comment }</div>
             % endif
 

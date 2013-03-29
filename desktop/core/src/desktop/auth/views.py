@@ -152,7 +152,7 @@ def _profile_dict(user):
     email=user.email)
 
 
-# Oauth is based on Twitter as example.
+# OAuth is based on Twitter as example.
 
 @login_notrequired
 def oauth_login(request):
@@ -163,7 +163,7 @@ def oauth_login(request):
                   }))
 
   if resp['status'] != '200':
-    raise Exception(_("Invalid response from Oauth provider: %s") % resp)
+    raise Exception(_("Invalid response from OAuth provider: %s") % resp)
 
   request.session['request_token'] = dict(cgi.parse_qsl(content))
 
@@ -180,7 +180,7 @@ def oauth_authenticated(request):
 
   resp, content = client.request(OAUTH.ACCESS_TOKEN_URL.get(), "GET")
   if resp['status'] != '200':
-      raise Exception(_("Invalid response from Oauth provider: %s") % resp)
+      raise Exception(_("Invalid response from OAuth provider: %s") % resp)
 
   access_token = dict(cgi.parse_qsl(content))
 

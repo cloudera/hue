@@ -110,7 +110,7 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
               <a href="#" title="${ _('New script') }" rel="tooltip" data-placement="right">
                 <i class="icon-plus-sign"></i> ${ _('New script') }
               </a>
-            </li>            
+            </li>
             <li class="nav-header">${_('Properties')}</li>
             <li data-bind="click: editScriptProperties" data-section="properties">
               <a href="#"><i class="icon-reorder"></i> ${ _('Edit properties') }</a>
@@ -176,7 +176,12 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
         <div data-bind="template: {name: 'logTemplate', foreach: currentScript().actions}"></div>
         <script id="logTemplate" type="text/html">
           <div data-bind="css:{'alert-modified': name != '', 'alert': name != '', 'alert-success': status == 'SUCCEEDED' || status == 'OK', 'alert-error': status != 'RUNNING' && status != 'SUCCEEDED' && status != 'OK' && status != 'PREP'}">
-            <div class="pull-right" data-bind="text: status"></div><h4>${ _('Progress: 50%') } '<span data-bind="text: name"></span>'</h4></div>
+            <div class="pull-right" data-bind="text: status"></div>
+              <h4>${ _('Progress:') } <span data-bind="text: progress"></span>${ _('%') }</h4>
+              <div class="progress">
+                <div class="bar" data-bind="css: {'width': progressPercent}" style="width: 50%"></div>
+              </div>
+          </div>
           <pre data-bind="visible: logs == ''">${ _('No available logs.') }</pre>
           <pre data-bind="visible: logs != '', text: logs"></pre>
         </script>
