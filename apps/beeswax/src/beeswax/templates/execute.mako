@@ -33,7 +33,7 @@
         </div>
     % endif
 
-    <textarea class="span11" tabindex="1" placeholder="${_('Example: SELECT * FROM tablename')}" name="${form.query["query"].html_name}" id="queryField">${extract_field_data(form.query["query"]) or ''}</textarea>
+    <textarea class="hide" tabindex="1" name="${form.query["query"].html_name}" id="queryField">${extract_field_data(form.query["query"]) or ''}</textarea>
 
     <div id="validationResults">
     % if len(form.query["query"].errors):
@@ -344,8 +344,13 @@ ${layout.menubar(section='query')}
     </div>
 </div>
 
-<link rel="stylesheet" href="/static/ext/css/jquery-linedtextarea.css" type="text/css" media="screen" title="no title" charset="utf-8" />
-<script src="/static/ext/js/jquery/plugins/jquery-linedtextarea.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/codemirror-3.11.js"></script>
+<link rel="stylesheet" href="/static/ext/css/codemirror.css">
+<script src="/static/js/Source/jHue/codemirror-hql.js"></script>
+<script src="/static/js/Source/jHue/codemirror-hql-hint.js"></script>
+<script src="/static/ext/js/codemirror-show-hint.js"></script>
+
+<link rel="stylesheet" href="/static/ext/css/codemirror-show-hint.css">
 
 <style>
   h1 {
@@ -390,32 +395,16 @@ ${layout.menubar(section='query')}
     border-radius: 0 3px 3px 0;
   }
 
-  .linedwrap {
-    margin-top: 20px;
-    margin-bottom: 10px;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    border-radius: 4px;
-    background-color: #ffffff;
-    border: 1px solid #cccccc;
-    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-    -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-    -webkit-transition: border linear 0.2s, box-shadow linear 0.2s;
-    -moz-transition: border linear 0.2s, box-shadow linear 0.2s;
-    -o-transition: border linear 0.2s, box-shadow linear 0.2s;
-    transition: border linear 0.2s, box-shadow linear 0.2s;
+  .CodeMirror {
+    border: 1px solid #eee;
+    margin-bottom: 20px;
   }
 
-  .linedtextarea textarea {
-    -webkit-box-shadow: none;
-    -moz-box-shadow: none;
-    box-shadow: none;
-  }
-
-  .linedwrap .codelines .lineselect {
+  .editorError {
     color: #B94A48;
     background-color: #F2DEDE;
+    padding: 4px;
+    font-size: 11px;
   }
 
 </style>
@@ -425,128 +414,114 @@ ${layout.menubar(section='query')}
 
 <script type="text/javascript" charset="utf-8">
     $(document).ready(function(){
-        $("*[rel=tooltip]").tooltip({
-            placement: 'bottom'
-        });
 
-        $("a[data-form-prefix]").each(function(){
-            var _prefix = $(this).attr("data-form-prefix");
-            var _nextID = 0;
-            if ($("."+_prefix+"Field").length){
-                _nextID= ($("."+_prefix+"Field").last().attr("name").substr(_prefix.length+1).split("-")[0]*1)+1;
-            }
-            $("<input>").attr("type","hidden").attr("name",_prefix+"-next_form_id").attr("value",_nextID).appendTo($("#advancedSettingsForm"));
-            $("."+_prefix+"Delete").click(function(e){
-                e.preventDefault();
-                $("input[name="+_prefix+"-add]").attr("value","");
-                $("<input>").attr("type","hidden").attr("name", $(this).attr("name")).attr("value","True").appendTo($("#advancedSettingsForm"));
-                checkAndSubmit();
-            });
-        });
+      var queryPlaceholder = "${_('Example: SELECT * FROM tablename')}";
 
-        $("a[data-form-prefix]").click(function(){
-            var _prefix = $(this).attr("data-form-prefix");
-            $("<input>").attr("type","hidden").attr("name",_prefix+"-add").attr("value","True").appendTo($("#advancedSettingsForm"));
-            checkAndSubmit();
-        });
+      $("*[rel=tooltip]").tooltip({
+        placement: 'bottom'
+      });
 
-        $(".file_resourcesField").each(function(){
-            var self = $(this);
-            self.after(getFileBrowseButton(self));
-        });
-
-        function getFileBrowseButton(inputElement) {
-            return $("<button>").addClass("btn").addClass("fileChooserBtn").text("..").click(function(e){
-                e.preventDefault();
-                $("#filechooser").jHueFileChooser({
-                    initialPath: inputElement.val(),
-                    onFileChoose: function(filePath) {
-                        inputElement.val(filePath);
-                        $("#chooseFile").modal("hide");
-                    },
-                    createFolder: false
-                });
-                $("#chooseFile").modal("show");
-            })
+      $("a[data-form-prefix]").each(function () {
+        var _prefix = $(this).attr("data-form-prefix");
+        var _nextID = 0;
+        if ($("." + _prefix + "Field").length) {
+          _nextID = ($("." + _prefix + "Field").last().attr("name").substr(_prefix.length + 1).split("-")[0] * 1) + 1;
         }
-
-        $("#id_query-database").change(function(){
-             $.cookie("hueBeeswaxLastDatabase", $(this).val(), {expires: 90});
+        $("<input>").attr("type", "hidden").attr("name", _prefix + "-next_form_id").attr("value", _nextID).appendTo($("#advancedSettingsForm"));
+        $("." + _prefix + "Delete").click(function (e) {
+          e.preventDefault();
+          $("input[name=" + _prefix + "-add]").attr("value", "");
+          $("<input>").attr("type", "hidden").attr("name", $(this).attr("name")).attr("value", "True").appendTo($("#advancedSettingsForm"));
+          checkAndSubmit();
         });
+      });
 
-        ## If no particular query is loaded
-        % if design is None or design.id is None:
-            if ($.cookie("hueBeeswaxLastDatabase") != null) {
-                $("#id_query-database").val($.cookie("hueBeeswaxLastDatabase"));
-            }
-        % endif
+      $("a[data-form-prefix]").click(function () {
+        var _prefix = $(this).attr("data-form-prefix");
+        $("<input>").attr("type", "hidden").attr("name", _prefix + "-add").attr("value", "True").appendTo($("#advancedSettingsForm"));
+        checkAndSubmit();
+      });
 
-        var executeQuery = function(){
-            $("<input>").attr("type","hidden").attr("name","button-submit").attr("value","Execute").appendTo($("#advancedSettingsForm"));
-            checkAndSubmit();
+      $(".file_resourcesField").each(function () {
+        var self = $(this);
+        self.after(getFileBrowseButton(self));
+      });
+
+      function getFileBrowseButton(inputElement) {
+        return $("<button>").addClass("btn").addClass("fileChooserBtn").text("..").click(function (e) {
+          e.preventDefault();
+          $("#filechooser").jHueFileChooser({
+            initialPath: inputElement.val(),
+            onFileChoose: function (filePath) {
+              inputElement.val(filePath);
+              $("#chooseFile").modal("hide");
+            },
+            createFolder: false
+          });
+          $("#chooseFile").modal("show");
+        })
+      }
+
+      $("#id_query-database").change(function () {
+        $.cookie("hueBeeswaxLastDatabase", $(this).val(), {expires: 90});
+      });
+
+      ## If no particular query is loaded
+      % if design is None or design.id is None:
+        if ($.cookie("hueBeeswaxLastDatabase") != null) {
+          $("#id_query-database").val($.cookie("hueBeeswaxLastDatabase"));
         }
+      % endif
 
-        $("#executeQuery").click(executeQuery);
-        $("#executeQuery").tooltip({
-            title: '${_("Press \"tab\", then \"enter\".")}'
-        });
-        $("#executeQuery").keyup(function(event){
-            if(event.keyCode == 13){
-                executeQuery();
-            }
-        });
+      var executeQuery = function () {
+        $("<input>").attr("type", "hidden").attr("name", "button-submit").attr("value", "Execute").appendTo($("#advancedSettingsForm"));
+        checkAndSubmit();
+      }
 
-        % if app_name == 'impala':
-        $("#downloadQuery").click(function(){
-            $("<input>").attr("type", "hidden").attr("name", "button-submit").attr("value", "Execute").appendTo($("#advancedSettingsForm"));
-            $("<input>").attr("type", "hidden").attr("name", "download").attr("value", "true").appendTo($("#advancedSettingsForm"));
-            checkAndSubmit();
-        });
-        % endif
+      $("#executeQuery").click(executeQuery);
+      $("#executeQuery").tooltip({
+        title: '${_("Press \"tab\", then \"enter\".")}'
+      });
+      $("#executeQuery").keyup(function (event) {
+        if (event.keyCode == 13) {
+          executeQuery();
+        }
+      });
 
-        $("#saveQuery").click(function(){
-            $("<input>").attr("type","hidden").attr("name","saveform-name")
+      % if app_name == 'impala':
+        $("#downloadQuery").click(function () {
+          $("<input>").attr("type", "hidden").attr("name", "button-submit").attr("value", "Execute").appendTo($("#advancedSettingsForm"));
+          $("<input>").attr("type", "hidden").attr("name", "download").attr("value", "true").appendTo($("#advancedSettingsForm"));
+          checkAndSubmit();
+        });
+      % endif
+
+      $("#saveQuery").click(function () {
+        $("<input>").attr("type", "hidden").attr("name", "saveform-name")
                 .attr("value", "${extract_field_data(form.saveform["name"])}").appendTo($("#advancedSettingsForm"));
-            $("<input>").attr("type","hidden").attr("name","saveform-desc")
+        $("<input>").attr("type", "hidden").attr("name", "saveform-desc")
                 .attr("value", "${extract_field_data(form.saveform["desc"])}").appendTo($("#advancedSettingsForm"));
-            $("<input>").attr("type","hidden").attr("name","saveform-save").attr("value","Save").appendTo($("#advancedSettingsForm"));
-            checkAndSubmit();
-        });
+        $("<input>").attr("type", "hidden").attr("name", "saveform-save").attr("value", "Save").appendTo($("#advancedSettingsForm"));
+        checkAndSubmit();
+      });
 
-        $("#saveQueryAs").click(function(){
-            $("<input>").attr("type","hidden").attr("name","saveform-saveas").attr("value","Save As...").appendTo($("#advancedSettingsForm"));
-            $("#saveAs").modal("show");
-        });
+      $("#saveQueryAs").click(function () {
+        $("<input>").attr("type", "hidden").attr("name", "saveform-saveas").attr("value", "Save As...").appendTo($("#advancedSettingsForm"));
+        $("#saveAs").modal("show");
+      });
 
-        $("#saveAsNameBtn").click(function(){
-             $("<input>").attr("type","hidden").attr("name","saveform-name")
-                 .attr("value", $("input[name=saveform-name]").val()).appendTo($("#advancedSettingsForm"));
-             $("<input>").attr("type","hidden").attr("name","saveform-desc")
-                 .attr("value", $("input[name=saveform-desc]").val()).appendTo($("#advancedSettingsForm"));
+      $("#saveAsNameBtn").click(function () {
+        $("<input>").attr("type", "hidden").attr("name", "saveform-name")
+                .attr("value", $("input[name=saveform-name]").val()).appendTo($("#advancedSettingsForm"));
+        $("<input>").attr("type", "hidden").attr("name", "saveform-desc")
+                .attr("value", $("input[name=saveform-desc]").val()).appendTo($("#advancedSettingsForm"));
+        checkAndSubmit();
+      });
 
-            checkAndSubmit();
-        });
-
-        $("#explainQuery").click(function(){
-            $("<input>").attr("type","hidden").attr("name","button-explain").attr("value","Explain").appendTo($("#advancedSettingsForm"));
-            checkAndSubmit();
-        });
-
-        $("#queryField").change(function(){
-            $(".query").val($(this).val());
-        });
-
-        $("#queryField").focus(function(){
-            $(this).removeClass("fieldError");
-            $("#validationResults").empty();
-        });
-
-        var selectedLine = -1;
-        if ($(".queryErrorMessage")){
-          var err = $(".queryErrorMessage").text().toLowerCase();
-          var firstPos = err.indexOf("line");
-          selectedLine = $.trim(err.substring(err.indexOf(" ", firstPos), err.indexOf(":", firstPos)))*1;
-        }
+      $("#explainQuery").click(function () {
+        $("<input>").attr("type", "hidden").attr("name", "button-explain").attr("value", "Explain").appendTo($("#advancedSettingsForm"));
+        checkAndSubmit();
+      });
 
       initQueryField();
 
@@ -559,12 +534,7 @@ ${layout.menubar(section='query')}
         resizeTimeout = window.setTimeout(function () {
           // prevents endless loop in IE8
           if (winWidth != $(window).width() || winHeight != $(window).height()) {
-            $("#queryField").unbind();
-            $("#queryField").data("scroll", $("#queryField").scrollTop());
-            $("#queryField").insertBefore($(".linedwrap"));
-            $("#queryField").css("width", "");
-            $(".linedwrap").remove();
-            initQueryField();
+            codeMirror.setSize("95%", $(window).height() - 270 - $("#queryPane .alert-error").outerHeight() - $(".nav-tabs").outerHeight());
             winWidth = $(window).width();
             winHeight = $(window).height();
           }
@@ -572,42 +542,67 @@ ${layout.menubar(section='query')}
       });
 
       function initQueryField() {
-        var _height = 100;
-        $("#querySide").children().not(".tab-content").each(function () {
-          _height += $(this).outerHeight();
-        });
-        $("#queryPane").children().not("textarea").each(function () {
-          _height += $(this).outerHeight();
-        });
-        var _newHeight = $(window).height() - $("#querySide").offset().top - _height;
-        if (_newHeight < 300) {
-          _newHeight = 300;
-        }
-        $("#queryField").height(_newHeight);
-        if (selectedLine > -1) {
-          $("#queryField").linedtextarea({
-            selectedLine: selectedLine
-          });
-        }
-        else {
-          $("#queryField").linedtextarea();
-        }
-        $("#queryField").width($("#queryField").width() - 4); // fixes zooms problems
-        if ($("#queryField").data("scroll")) {
-          $("#queryField").scrollTop($("#queryField").data("scroll"));
+        if ($("#queryField").val() == "") {
+          $("#queryField").val(queryPlaceholder);
         }
       }
 
+      var queryEditor = $("#queryField")[0];
+
+      CodeMirror.commands.autocomplete = function (cm) {
+        CodeMirror.showHint(cm, CodeMirror.hiveQLHint);
+      }
+      var codeMirror = CodeMirror(function (elt) {
+        queryEditor.parentNode.replaceChild(elt, queryEditor);
+      }, {
+        value: queryEditor.value,
+        readOnly: false,
+        lineNumbers: true,
+        mode: "text/x-hiveql",
+        extraKeys: {
+          "Shift-Space": "autocomplete",
+          Tab: function (cm) {
+            $("#executeQuery").focus();
+          }
+        }
+      });
+
+      var selectedLine = -1;
+      var errorWidget = null;
+      if ($(".queryErrorMessage").length > 0) {
+        var err = $(".queryErrorMessage").text().toLowerCase();
+        var firstPos = err.indexOf("line");
+        selectedLine = $.trim(err.substring(err.indexOf(" ", firstPos), err.indexOf(":", firstPos))) * 1;
+        errorWidget = codeMirror.addLineWidget(selectedLine - 1, $("<div>").addClass("editorError").html("<i class='icon-exclamation-sign'></i> " + err)[0], {coverGutter: true, noHScroll: true})
+      }
+
+      codeMirror.setSize("95%", $(window).height() - 270 - $("#queryPane .alert-error").outerHeight() - $(".nav-tabs").outerHeight());
+
+      codeMirror.on("focus", function () {
+        if (codeMirror.getValue() == queryPlaceholder) {
+          codeMirror.setValue("");
+        }
+        if (errorWidget) {
+          errorWidget.clear();
+        }
+        $("#validationResults").empty();
+      });
+
+      codeMirror.on("change", function () {
+        $(".query").val(codeMirror.getValue());
+      });
+
+
       function getHighlightedQuery() {
-        var selection = $("#queryField").getSelection();
-        if (selection) {
-            return selection.text;
+        var selection = codeMirror.getSelection();
+        if (selection != "") {
+          return selection;
         }
         return null;
       }
 
       function checkAndSubmit() {
-        var query = getHighlightedQuery() || $("#queryField").val();
+        var query = getHighlightedQuery() || codeMirror.getValue();
         $(".query").val(query);
         $("#advancedSettingsForm").submit();
       }

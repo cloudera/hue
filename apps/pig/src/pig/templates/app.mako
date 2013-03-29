@@ -263,7 +263,7 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
 <link rel="stylesheet" href="/static/ext/css/codemirror.css">
 <script src="/static/ext/js/codemirror-pig.js"></script>
 <script src="/static/ext/js/codemirror-show-hint.js"></script>
-<script src="/static/ext/js/codemirror-pig-hint.js"></script>
+<script src="/static/js/Source/jHue/codemirror-pig-hint.js"></script>
 <link rel="stylesheet" href="/static/ext/css/codemirror-show-hint.css">
 
 
