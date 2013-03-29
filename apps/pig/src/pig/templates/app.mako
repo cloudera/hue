@@ -178,8 +178,8 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
           <div data-bind="css:{'alert-modified': name != '', 'alert': name != '', 'alert-success': status == 'SUCCEEDED' || status == 'OK', 'alert-error': status != 'RUNNING' && status != 'SUCCEEDED' && status != 'OK' && status != 'PREP'}">
             <div class="pull-right" data-bind="text: status"></div>
               <h4>${ _('Progress:') } <span data-bind="text: progress"></span>${ _('%') }</h4>
-              <div class="progress">
-                <div class="bar" data-bind="css: {'width': progressPercent}" style="width: 50%"></div>
+              <div data-bind="css: {'progress': name != '', 'progress-striped': name != '', 'active': status == 'RUNNING'}" style="margin-top:10px">
+                <div data-bind="css: {'bar': name != '', 'bar-success': status == 'SUCCEEDED' || status == 'OK', 'bar-warning': status == 'RUNNING' || status == 'PREP', 'bar-danger': status != 'RUNNING' && status != 'SUCCEEDED' && status != 'OK' && status != 'PREP'}, attr: {'style': 'width:' + progressPercent}"></div>
               </div>
           </div>
           <pre data-bind="visible: logs == ''">${ _('No available logs.') }</pre>
@@ -444,6 +444,7 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
             viewModel.currentScript().actions(data.workflow.actions);
           }
           else {
+            viewModel.currentScript().actions(data.workflow.actions);
             viewModel.currentScript().isRunning(false);
             $(document).trigger("stopLogsRefresh");
             //$(document).trigger("showEditor");
