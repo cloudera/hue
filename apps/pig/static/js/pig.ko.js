@@ -274,6 +274,7 @@ var PigViewModel = function (scripts, props) {
           script.isRunning(true);
           script.watchUrl(data.watchUrl);
           $(document).trigger("startLogsRefresh");
+          $(document).trigger("refreshDashboard");
           $(document).trigger("showLogs");
           self.updateScripts();
         }, "json");

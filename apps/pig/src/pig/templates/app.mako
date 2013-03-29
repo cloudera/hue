@@ -373,6 +373,10 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
       showAlert("<b>${_('There was an error with your request!')}</b>", "error");
     });
 
+    $(document).on("refreshDashboard", function () {
+      refreshDashboard();
+    });
+
     $(document).on("showDashboard", function () {
       routie("dashboard");
     });
@@ -417,7 +421,9 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
     refreshDashboard();
 
     var dashboardRefreshInterval = window.setInterval(function () {
-      refreshDashboard();
+      if (viewModel.runningScripts().length > 0) {
+        refreshDashboard();
+      }
     }, 1000);
 
     function refreshDashboard() {
