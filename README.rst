@@ -12,7 +12,9 @@ applications. It features:
       * Job Designer for creating MapReduce/Streaming/Java jobs
       * Beeswax application for executing Hive queries
       * Impala App for executing Cloudera Impala queries
-      * Oozie App for submitting and scheduling workflows
+      * Oozie App for submitting and scheduling workflows and bundles
+      * Pig App for submitting Pig scripts
+      * Table Browser for accessing Hive metadata
       * JobBrowser for viewing MapReduce jobs
       * A Pig/HBase/Sqoop2 shell
 
