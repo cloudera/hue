@@ -609,7 +609,24 @@ def view_results(request, id, first_row=0):
       'download_urls': download_urls,
       'save_form': save_form,
       'can_save': query_history.owner == request.user and not download,
+      'next_json_set': reverse(get_app_name(request) + ':view_results', kwargs={
+        'id': str(id),
+        'first_row': results.start_row + len(data)
+      }) + ('?context=' + context_param or '') + '&format=json'
     })
+
+  if request.GET.get('format') == 'json':
+    context = {
+      'results': data,
+      'has_more': results.has_more,
+      'next_row': results.start_row + len(data),
+      'start_row': results.start_row,
+      'next_json_set': reverse(get_app_name(request) + ':view_results', kwargs={
+        'id': str(id),
+        'first_row': results.start_row + len(data)
+      }) + ('?context=' + context_param or '') + '&format=json'
+    }
+    return HttpResponse(json.dumps(context), mimetype="application/json")
 
   return render('watch_results.mako', request, context)
 

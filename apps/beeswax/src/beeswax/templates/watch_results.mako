@@ -171,18 +171,14 @@ ${layout.menubar(section='query')}
               % endfor
             </tbody>
             </table>
-            <div class="pagination pull-right">
-              <ul>
-              % if start_row != 0:
-                  % if app_name != 'impala':
-                      <li class="prev"><a title="${_('Beginning of List')}" href="${ url(app_name + ':view_results', query.id, 0) }${'?context=' + context_param or '' | n}">&larr; ${_('Beginning of List')}</a></li>
-                  % endif
-              % endif
-              % if has_more and (len(results) == 100 or app_name == 'impala'):
-                  <li><a title="${_('Next page')}" href= "${ url(app_name + ':view_results', query.id, next_row) }${'?context=' + context_param or '' | n }">${_('Next Page')} &rarr;</a></li>
-              % endif
-              </ul>
-            </div>
+
+             <div style="text-align: center; padding: 5px; height: 30px">
+               <span class="noMore hide"
+                     style="color:#999999">${ _('You have reached the last record for this query.') }</span><img
+                     src="/static/art/spinner.gif"
+                     class="spinner"
+                     style="display: none;"/>
+             </div>
             % endif
         </div>
 
@@ -257,8 +253,9 @@ ${layout.menubar(section='query')}
 
 
 <script type="text/javascript" charset="utf-8">
+
     $(document).ready(function () {
-      $(".resultTable").dataTable({
+      var dataTable = $(".resultTable").dataTable({
         "bPaginate": false,
         "bLengthChange": false,
         "bInfo": false,
@@ -368,6 +365,37 @@ ${layout.menubar(section='query')}
           $("table").replaceWith("${ _('Download results from the left.') }");
         % endif
       % endif
+
+      // enable infinite scroll instead of pagination
+      var _nextJsonSet = "${ next_json_set }";
+      var _hasMore = ${ has_more and 'true' or 'false' };
+      var _dt = $("div.dataTables_wrapper");
+      _dt.on("scroll", function (e) {
+        if (_dt.scrollTop() + _dt.outerHeight() + 20 > _dt[0].scrollHeight && !_dt.data("isLoading") && _hasMore) {
+          _dt.data("isLoading", true);
+          _dt.animate({opacity: '0.55'}, 200);
+          $(".spinner").show();
+          $.getJSON(_nextJsonSet, function (data) {
+            _hasMore = data.has_more;
+            if (!_hasMore) {
+              $(".noMore").removeClass("hide");
+            }
+            _nextJsonSet = data.next_json_set;
+            var _cnt = 0;
+            for (var i = 0; i < data.results.length; i++) {
+              var row = data.results[i];
+              row.unshift(data.start_row + _cnt);
+              dataTable.fnAddData(row);
+              _cnt++;
+            }
+            _dt.data("isLoading", false);
+            _dt.animate({opacity: '1'}, 50);
+            $(".spinner").hide();
+          });
+        }
+      });
+      _dt.jHueScrollUp();
+
     });
 </script>
 

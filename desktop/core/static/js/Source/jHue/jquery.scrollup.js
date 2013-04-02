@@ -52,14 +52,25 @@
 
     var link = $("<a/>").attr("id", "jHueScrollUpAnchor").attr("href", "javascript:void(0)").html("<i class='icon-chevron-up'></i>").appendTo("body");
 
-    $(window).scroll(function () {
-      $(($(window).scrollTop() > _this.options.threshold) ? link.fadeIn(200) : link.fadeOut(200));
-    });
+    if ($(_this.element).is("body")) {
+      $(window).scroll(function () {
+        $(($(window).scrollTop() > _this.options.threshold) ? link.fadeIn(200) : link.fadeOut(200));
+      });
+      link.click(function (event) {
+        $("body, html").animate({scrollTop: $(_this.element).position().top}, 300);
+        return false;
+      });
+    }
+    else {
+      $(_this.element).scroll(function () {
+        $(($(_this.element).scrollTop() > _this.options.threshold) ? link.fadeIn(200) : link.fadeOut(200));
+      });
+      link.click(function (event) {
+        $(_this.element).animate({scrollTop: 0}, 300);
+        return false;
+      });
+    }
 
-    link.click(function (event) {
-      $("body, html").animate({scrollTop: $(_this.element).position().top}, 300);
-      return false;
-    });
   };
 
   $.fn[pluginName] = function (options) {
