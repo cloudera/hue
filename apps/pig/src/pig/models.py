@@ -47,21 +47,16 @@ class Document(models.Model):
 
 
 class PigScript(Document):
-  _ATTRIBUTES = ['script', 'name', 'properties', 'job_id']
+  _ATTRIBUTES = ['script', 'name', 'properties', 'job_id', 'parameters']
 
-  data = models.TextField(default=json.dumps({'script': '', 'name': '', 'properties': [], 'job_id': None}))
+  data = models.TextField(default=json.dumps({'script': '', 'name': '', 'properties': [], 'job_id': None, 'parameters': []}))
 
   def update_from_dict(self, attrs):
     data_dict = self.dict
 
-    if attrs.get('script'):
-      data_dict['script'] = attrs['script']
-
-    if attrs.get('name'):
-      data_dict['name'] = attrs['name']
-
-    if attrs.get('job_id'):
-      data_dict['job_id'] = attrs['job_id']
+    for attr in PigScript._ATTRIBUTES:
+      if attrs.get(attr):
+        data_dict[attr] = attrs[attr]
 
     self.data = json.dumps(data_dict)
 
@@ -75,7 +70,7 @@ class Submission(models.Model):
   workflow = models.ForeignKey(Workflow)
 
 
-def create_or_update_script(id, name, script, user, is_design=True):
+def create_or_update_script(id, name, script, user, parameters, is_design=True):
   """Take care of security"""
   try:
     pig_script = PigScript.objects.get(id=id)
@@ -83,7 +78,7 @@ def create_or_update_script(id, name, script, user, is_design=True):
   except:
     pig_script = PigScript.objects.create(owner=user, is_design=is_design)
 
-  pig_script.update_from_dict({'name': name, 'script': script})
+  pig_script.update_from_dict({'name': name, 'script': script, 'parameters': parameters})
   pig_script.save()
 
   return pig_script
@@ -98,6 +93,7 @@ def get_scripts(user, max_count=200):
       'id': script.id,
       'name': data['name'],
       'script': data['script'],
+      'parameters': data['parameters'],
       'isDesign': script.is_design,
     }
     scripts.append(massaged_script)

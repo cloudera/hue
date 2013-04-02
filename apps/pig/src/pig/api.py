@@ -15,6 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+try:
+  import json
+except ImportError:
+  import simplejson as json
 import logging
 import re
 import time
@@ -49,11 +53,10 @@ class OozieApi:
     self.fs = fs
     self.user = user
 
-  def submit(self, pig_script, mapping):
-    # TODO: will come from script properties later
-    mapping.update({
+  def submit(self, pig_script, params):
+    mapping = {
       'oozie.use.system.libpath':  'true',
-    })
+    }
 
     workflow = Workflow.objects.new_workflow(self.user)
     workflow.name = OozieApi.WORKFLOW_NAME
@@ -64,7 +67,12 @@ class OozieApi:
     script_path = workflow.deployment_dir + '/script.pig'
     self.fs.create(script_path, data=pig_script.dict['script'])
 
-    action = Pig.objects.create(name='pig', script_path=script_path, workflow=workflow, node_type='pig')
+    pig_params = []
+    for param in json.loads(params):
+      pig_params.append({"type":"argument","value":"-param"})
+      pig_params.append({"type":"argument","value":"%(name)s=%(value)s" % param})
+
+    action = Pig.objects.create(name='pig', script_path=script_path, workflow=workflow, node_type='pig', params=json.dumps(pig_params))
     action.add_node(workflow.end)
 
     start_link = workflow.start.get_link()

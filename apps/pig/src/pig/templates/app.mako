@@ -124,7 +124,7 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
                 <i class="icon-save"></i> ${ _('Save') }
               </a>
             </li>
-            <li data-bind="click: runScript, visible: !currentScript().isRunning()">
+            <li data-bind="click: showSubmissionModal, visible: !currentScript().isRunning()">
               <a href="#" title="${ _('Run the script') }" rel="tooltip" data-placement="right">
                 <i class="icon-play"></i> ${ _('Run') }
               </a>
@@ -156,18 +156,53 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
     <div class="span10">
       <div id="edit" class="section">
         <div class="alert alert-info"><h3>${ _('Edit') } '<span data-bind="text: currentScript().name"></span>'</h3></div>
-
         <form id="queryForm">
           <textarea id="scriptEditor" data-bind="text:currentScript().script"></textarea>
         </form>
       </div>
+
       <div id="properties" class="section hide">
         <div class="alert alert-info"><h3>${ _('Edit properties for') } '<span data-bind="text: currentScript().name"></span>'</h3></div>
-        <form class="form-inline" style="padding-left: 10px">
-          <label>${ _('Script name') } &nbsp; <input type="text" id="scriptName" class="input-xlarge" data-bind="value: currentScript().name" />
+         <form class="form-inline" style="padding-left: 10px">
+          <label>
+            ${ _('Script name') } &nbsp;
+            <input type="text" id="scriptName" class="input-xlarge" data-bind="value: currentScript().name" />
           </label>
+          <br/>
+          <br/>
+          <label>${ _('Parameters') } &nbsp;
+            <button class="btn" data-bind="click: currentScript().addParameter, visible: currentScript().parameters().length == 0" style="margin-left: 4px">
+              <i class="icon-plus"></i> ${ _('Add') }
+            </button>
+          </label>
+          <div>
+            <table data-bind="css: {'parameterTable': currentScript().parameters().length > 0}">
+              <thead data-bind="visible: currentScript().parameters().length > 0">
+                <tr>
+                  <th>${ _('Name') }</th>
+                  <th>${ _('Value') }</th>
+                  <th>&nbsp;</th>
+                </tr>
+              </thead>
+              <tbody data-bind="foreach: currentScript().parameters">
+                <tr>
+                  <td><input type="text" data-bind="value: name" class="input-large" /></td>
+                  <td><input type="text" data-bind="value: value" class="input-large" /></td>
+                  <td><button data-bind="click: viewModel.currentScript().removeParameter" class="btn"><i class="icon-trash"></i> ${ _('Remove') }</button></td>
+                </tr>
+              </tbody>
+              <tfoot data-bind="visible: currentScript().parameters().length > 0">
+                <tr>
+                  <td colspan="3">
+                    <button class="btn" data-bind="click: currentScript().addParameter"><i class="icon-plus"></i> ${ _('Add') }</button>
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
         </form>
       </div>
+
       <div id="logs" class="section hide">
         <div class="alert alert-info"><h3>${ _('Logs for') } '<span data-bind="text: currentScript().name"></span>'</h3></div>
         <div data-bind="visible: currentScript().actions().length == 0">
@@ -241,7 +276,7 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
   </div>
 </div>
 
-<!-- delete modal -->
+
 <div id="deleteModal" class="modal hide fade">
   <div class="modal-header">
     <a href="#" class="close" data-dismiss="modal">&times;</a>
@@ -256,6 +291,28 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
     <a class="btn btn-danger" data-bind="click: deleteScripts">${_('Yes')}</a>
   </div>
 </div>
+
+
+<div id="submitModal" class="modal hide fade">
+  <div class="modal-header">
+    <a href="#" class="close" data-dismiss="modal">&times;</a>
+    <h3>${_('Submit Script')} '<span data-bind="text: currentScript().name"></span>' ${_('?')}</h3>
+  </div>
+  <div class="modal-body" data-bind="visible: submissionVariables().length > 0">
+    <legend style="color:#666">${_('Script variables')}</legend>
+    <div data-bind="foreach: submissionVariables" style="margin-bottom: 20px">
+      <div class="row-fluid">
+        <span data-bind="text: name" class="span3"></span>
+        <input type="text" data-bind="value: value" class="span9" />
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <a class="btn" data-dismiss="modal">${_('No')}</a>
+    <a class="btn btn-danger" data-bind="click: runScript">${_('Yes')}</a>
+  </div>
+</div>
+
 
 <div class="bottomAlert alert"></div>
 
@@ -280,7 +337,8 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
     TOOLTIP_STOP: "${ _('Stop the execution') }",
     SAVED: "${ _('Saved') }",
     NEW_SCRIPT_NAME: "${ _('Unsaved script') }",
-    NEW_SCRIPT_CONTENT: "ie. A = LOAD '/user/${ user }/data';"
+    NEW_SCRIPT_CONTENT: "ie. A = LOAD '/user/${ user }/data';",
+    NEW_SCRIPT_PARAMETERS: []
   };
 
   var scripts = ${ scripts | n,unicode };

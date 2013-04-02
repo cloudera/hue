@@ -14,3 +14,28 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+from django.contrib.auth.models import User
+
+from nose.tools import assert_true, assert_equal
+
+from desktop.lib.django_test_util import make_logged_in_client
+from desktop.lib.test_utils import grant_access
+from pig.models import create_or_update_script
+
+
+class TestPigBase(object):
+  def setUp(self):
+    self.c = make_logged_in_client(is_superuser=False)
+    grant_access("test", "test", "pig")
+    self.user = User.objects.get(username='test')
+
+  def create_script(self):
+    return create_or_update_script(10000, 'Test', 'A = LOAD "$data"; STOPE A INTO "$output";', self.user)
+
+
+class TestMock(TestPigBase):
+
+  def test_create_script(self):
+    pig_script = self.create_script()
+    assert_equal('Test', pig_script.dict['name'])

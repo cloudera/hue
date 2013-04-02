@@ -47,3 +47,11 @@
   -webkit-border-top-right-radius: 0;
   border-top-right-radius: 0;
 }
+
+.parameterTable {
+  background-color: #eeeeee;
+}
+
+.parameterTable td {
+  padding: 7px;
+}

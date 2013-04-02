@@ -1411,38 +1411,59 @@ def test_beeswax_get_kerberos_security():
     finish()
 
 
-def test_save_design_properties():
-  client = make_logged_in_client()
+class MockDbms:
+  
+  def __init__(self, client, server_type):
+    pass
 
-  resp = client.get('/beeswax/save_design_properties')
-  content = json.loads(resp.content)
-  assert_equal(-1, content['status'])
+  def get_databases(self):
+    return ['default', 'test']
 
-  response = _make_query(client, 'SELECT', submission_type='Save', name='My Name', desc='My Description')
-  design = response.context['design']
 
-  try:
-    resp = client.post('/beeswax/save_design_properties', {'name': 'name', 'value': 'New Name', 'pk': design.id})
-    design = SavedQuery.objects.get(id=design.id)
+class MockServer(object):
+
+  def setUp(self):
+    # Beware: Monkey patch Beeswax/Hive server with Mock API
+    if not hasattr(dbms, 'OriginalBeeswaxApi'):
+      dbms.OriginalBeeswaxApi = dbms.Dbms
+    dbms.Dbms = MockDbms
+
+    self.client = make_logged_in_client(is_superuser=False)
+    grant_access("test", "test", "beeswax")
+
+  def tearDown(self):
+    dbms.Dbms = dbms.OriginalBeeswaxApi
+  
+  def test_save_design_properties(self):  
+    resp = self.client.get('/beeswax/save_design_properties')
     content = json.loads(resp.content)
-    assert_equal(0, content['status'])
-    assert_equal('New Name', design.name)
-    assert_equal('My Description', design.desc)
-  finally:
-    design.delete()
-
-  response = _make_query(client, 'SELECT', submission_type='Save', name='My Name', desc='My Description')
-  design = response.context['design']
-
-  try:
-    resp = client.post('/beeswax/save_design_properties', {'name': 'description', 'value': 'New Description', 'pk': design.id})
-    design = SavedQuery.objects.get(id=design.id)
-    content = json.loads(resp.content)
-    assert_equal(0, content['status'])
-    assert_equal('My Name', design.name)
-    assert_equal('New Description', design.desc)
-  finally:
-    design.delete()
+    assert_equal(-1, content['status'])
+  
+    response = _make_query(self.client, 'SELECT', submission_type='Save', name='My Name', desc='My Description')
+    design = response.context['design']
+  
+    try:
+      resp = self.client.post('/beeswax/save_design_properties', {'name': 'name', 'value': 'New Name', 'pk': design.id})
+      design = SavedQuery.objects.get(id=design.id)
+      content = json.loads(resp.content)
+      assert_equal(0, content['status'])
+      assert_equal('New Name', design.name)
+      assert_equal('My Description', design.desc)
+    finally:
+      design.delete()
+  
+    response = _make_query(self.client, 'SELECT', submission_type='Save', name='My Name', desc='My Description')
+    design = response.context['design']
+  
+    try:
+      resp = self.client.post('/beeswax/save_design_properties', {'name': 'description', 'value': 'New Description', 'pk': design.id})
+      design = SavedQuery.objects.get(id=design.id)
+      content = json.loads(resp.content)
+      assert_equal(0, content['status'])
+      assert_equal('My Name', design.name)
+      assert_equal('New Description', design.desc)
+    finally:
+      design.delete()
 
 
 def search_log_line(component, expected_log, all_logs):

@@ -16,24 +16,47 @@
 
 
 var PigScript = function (pigScript) {
-  return {
-    id: ko.observable(pigScript.id),
-    isDesign: ko.observable(pigScript.isDesign),
-    name: ko.observable(pigScript.name),
-    script: ko.observable(pigScript.script),
-    scriptSumup: ko.observable(pigScript.script.replace(/\W+/g, ' ').substring(0, 100)),
-    isRunning: ko.observable(false),
-    selected: ko.observable(false),
-    watchUrl: ko.observable(""),
-    actions: ko.observableArray([]),
-    handleSelect: function (row, e) {
-      this.selected(!this.selected());
-    },
-    hovered: ko.observable(false),
-    toggleHover: function (row, e) {
-      this.hovered(!this.hovered());
+  var self = this;
+
+  self.id = ko.observable(pigScript.id);
+  self.isDesign = ko.observable(pigScript.isDesign);
+  self.name = ko.observable(pigScript.name);
+  self.script = ko.observable(pigScript.script);
+  self.scriptSumup = ko.observable(pigScript.script.replace(/\W+/g, ' ').substring(0, 100));
+  self.isRunning = ko.observable(false);
+  self.selected = ko.observable(false);
+  self.watchUrl = ko.observable("");
+  self.actions = ko.observableArray([]);
+  self.handleSelect = function (row, e) {
+    this.selected(!this.selected());
+  };
+  self.hovered = ko.observable(false);
+  self.toggleHover = function (row, e) {
+    this.hovered(!this.hovered());
+  };
+  self.parameters = ko.observableArray(pigScript.parameters);
+  self.addParameter = function () {
+    self.parameters.push({name: '', value: ''});
+  };
+  self.removeParameter = function () {
+    self.parameters.remove(this);
+  };
+  self.getParameters = function () {
+    var params = {};
+    var variables = this.script().match(/\$(\w)+/g);
+    if (variables) {
+      $.each(variables, function(index, param) {
+        var p = param.substring(1);
+        params[p] = '';
+        $.each(self.parameters(), function(index, param) {
+          if (param['name'] == p) {
+            params[p] = param['value'];
+          }
+        });
+      });
     }
-  }
+    return params;
+  };
 }
 
 var Workflow = function (wf) {
@@ -72,6 +95,7 @@ var PigViewModel = function (scripts, props) {
 
   self.isLoading = ko.observable(false);
   self.allSelected = ko.observable(false);
+  self.submissionVariables = ko.observableArray([]);
 
   self.scripts = ko.observableArray(ko.utils.arrayMap(scripts, function (pigScript) {
     return new PigScript(pigScript);
@@ -85,7 +109,8 @@ var PigViewModel = function (scripts, props) {
   var _defaultScript = {
     id: -1,
     name: self.LABELS.NEW_SCRIPT_NAME,
-    script: self.LABELS.NEW_SCRIPT_CONTENT
+    script: self.LABELS.NEW_SCRIPT_CONTENT,
+    parameters: self.LABELS.NEW_SCRIPT_PARAMETERS,
   };
 
   self.currentScript = ko.observable(new PigScript(_defaultScript));
@@ -224,6 +249,19 @@ var PigViewModel = function (scripts, props) {
     }));
   }
 
+  self.showSubmissionModal = function showSubmissionModal() {
+    var script = self.currentScript();
+    self.submissionVariables.removeAll();
+    $.each(script.getParameters(), function (key, value) {
+      self.submissionVariables.push({'name': key, 'value': value});
+    });
+
+    $("#submitModal").modal({
+      keyboard: true,
+      show: true
+    });
+  }
+
   function showDeleteModal() {
     $(".deleteMsg").addClass("hide");
     if (self.currentDeleteType() == "single") {
@@ -249,7 +287,8 @@ var PigViewModel = function (scripts, props) {
         {
           id: script.id(),
           name: script.name(),
-          script: script.script()
+          script: script.script(),
+          parameters: ko.utils.stringifyJson(script.parameters())
         },
         function (data) {
           self.currentScript().id(data.id);
@@ -264,7 +303,8 @@ var PigViewModel = function (scripts, props) {
         {
           id: script.id(),
           name: script.name(),
-          script: script.script()
+          script: script.script(),
+            parameters: ko.utils.stringifyJson(self.submissionVariables())
         },
         function (data) {
           if (data.id && self.currentScript().id() != data.id){
@@ -277,6 +317,7 @@ var PigViewModel = function (scripts, props) {
           $(document).trigger("refreshDashboard");
           $(document).trigger("showLogs");
           self.updateScripts();
+          $("#submitModal").modal("hide");
         }, "json");
   }
 
