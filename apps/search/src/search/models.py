@@ -45,8 +45,8 @@ class Facet(models.Model):
 
   def update_from_post(self, post_data):
     data_dict = json.loads(self.data)
-    
-    for attr in Sorting._META_TEMPLATE_ATTRS:
+
+    for attr in Facet._ATTRIBUTES:
       if post_data.get(attr):
         data_dict[attr] = json.loads(post_data[attr])
 
@@ -56,11 +56,13 @@ class Facet(models.Model):
   def get_query_params(self):
     data_dict = json.loads(self.data)
 
+    properties = data_dict.get('properties')
+    
     params = (
-        ('facet', data_dict.get('properties', {}).get('is_enabled') and 'true' or 'false'),
-        ('facet.limit', 10),
-        ('facet.mincount', 1),
-        ('facet.sort', 'count'),
+        ('facet', properties.get('isEnabled') and 'true' or 'false'),
+        ('facet.limit', properties.get('limit')),
+        ('facet.mincount', properties.get('mincount')),
+        ('facet.sort', properties.get('sort')),
     )
 
     if data_dict.get('fields'):
@@ -83,8 +85,8 @@ class Facet(models.Model):
         end = datetime.strptime(field_facet['end'], '%m-%d-%Y') - datetime.now()
         range_facets = tuple([
                            ('facet.date', field_facet['field']),
-                           ('f.%s.facet.date.start' % field_facet['field'], 'NOW/DAY%sDAYS' % start.days),
-                           ('f.%s.facet.date.end' % field_facet['field'], 'NOW/DAY%sDAY' % end.days),
+                           ('f.%s.facet.date.start' % field_facet['field'], '%sDAYS/DAY' % start.days),
+                           ('f.%s.facet.date.end' % field_facet['field'], '%sDAYS/DAY' % end.days),
                            ('f.%s.facet.date.gap' % field_facet['field'], '+%sDAY' % field_facet['gap']),]
                         )
         params += range_facets
@@ -93,14 +95,14 @@ class Facet(models.Model):
 
 
 class Result(models.Model):
-  _META_TEMPLATE_ATTRS = ['properties', 'template', 'highlighting']
+  _ATTRIBUTES = ['properties', 'template', 'highlighting']
 
   data = models.TextField()
 
   def update_from_post(self, post_data):
     data_dict = json.loads(self.data)
 
-    for attr in Result._META_TEMPLATE_ATTRS:
+    for attr in Result._ATTRIBUTES:
       if post_data.get(attr):
         data_dict[attr] = json.loads(post_data[attr])
 
@@ -132,14 +134,14 @@ class Result(models.Model):
 
 
 class Sorting(models.Model):
-  _META_TEMPLATE_ATTRS = ['properties', 'fields']
+  _ATTRIBUTES = ['properties', 'fields']
 
   data = models.TextField()
 
   def update_from_post(self, post_data):
     data_dict = json.loads(self.data)
 
-    for attr in Sorting._META_TEMPLATE_ATTRS:
+    for attr in Sorting._ATTRIBUTES:
       if post_data.get(attr):
         data_dict[attr] = json.loads(post_data[attr])
 
@@ -171,7 +173,7 @@ class CoreManager(models.Manager):
       return self.get(name=name)
     except Core.DoesNotExist:
       facets = Facet.objects.create(data=json.dumps({
-                   'properties': {'is_enabled': False},
+                   'properties': {'isEnabled': False, 'limit': 10, 'mincount': 1, 'sort': 'count'},
                    'ranges': [],
                    'fields': [],
                    'dates': []

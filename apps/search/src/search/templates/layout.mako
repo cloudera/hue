@@ -74,7 +74,7 @@
       </div>
     </li>
       <li class="${ utils.is_selected(section, 'properties') }">
-        <a href="${ url('search:admin_core_properties', core=core) }">${_('Properties')}</a>
+        <a href="${ url('search:admin_core_properties', core=core) }"><i class="icon-reorder"></i> ${_('Properties')}</a>
       </li>
 
       <li class="nav-header">${_('Template')}</li>
@@ -92,7 +92,7 @@
       </li>
       <li class="nav-header">${_('Search')}</li>
       <li>
-        <a href="${ url('search:index') }?cores=${ core }" target="_blank"><i class="icon-share-alt"></i> ${ _('Query') }</a>
+        <a href="${ url('search:index') }?cores=${ core }"><i class="icon-share-alt"></i> ${ _('Query') }</a>
       </li>
 
       ##<li class="nav-header">${_('Solr')}</li>
