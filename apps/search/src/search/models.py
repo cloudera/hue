@@ -15,15 +15,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from datetime import datetime
-from lxml import etree
-import re
-
 try:
   import json
 except ImportError:
   import simplejson as json
-
+  
+from datetime import datetime
+from lxml import etree
+import re
 import logging
 
 from django.db import models
@@ -37,30 +36,19 @@ from search.conf import SOLR_URL
 LOG = logging.getLogger(__name__)
 
 
-class RangeFacet(object): pass
-class DateFacet(object): pass
-
 
 class Facet(models.Model):
-  _ATTRIBUTES = ['properties', 'fields', 'range', 'date']
+  _ATTRIBUTES = ['properties', 'fields', 'ranges', 'dates']
 
   enabled = models.BooleanField(default=True)
   data = models.TextField()
 
   def update_from_post(self, post_data):
     data_dict = json.loads(self.data)
-    print data_dict
-    if post_data.get('properties'):
-      data_dict['properties'] = json.loads(post_data['properties'])
-
-    if post_data.get('fields'):
-      data_dict['fields'] = json.loads(post_data['fields'])
-
-    if post_data.get('ranges'):
-      data_dict['ranges'] = json.loads(post_data['ranges'])
-
-    if post_data.get('dates'):
-      data_dict['dates'] = json.loads(post_data['dates'])
+    
+    for attr in Sorting._META_TEMPLATE_ATTRS:
+      if post_data.get(attr):
+        data_dict[attr] = json.loads(post_data[attr])
 
     self.data = json.dumps(data_dict)
 
@@ -105,21 +93,16 @@ class Facet(models.Model):
 
 
 class Result(models.Model):
-  _META_TEMPLATE_ATTRS = ['properties', 'template', 'highlighting', 'css']
+  _META_TEMPLATE_ATTRS = ['properties', 'template', 'highlighting']
 
   data = models.TextField()
 
   def update_from_post(self, post_data):
     data_dict = json.loads(self.data)
-    print data_dict
-    if post_data.get('properties'):
-      data_dict['properties'] = json.loads(post_data['properties'])
 
-    if post_data.get('template'):
-      data_dict['template'] = json.loads(post_data['template'])
-
-    if post_data.get('highlighting'):
-      data_dict['highlighting'] = json.loads(post_data['highlighting'])
+    for attr in Result._META_TEMPLATE_ATTRS:
+      if post_data.get(attr):
+        data_dict[attr] = json.loads(post_data[attr])
 
     self.data = json.dumps(data_dict)
 
@@ -156,11 +139,9 @@ class Sorting(models.Model):
   def update_from_post(self, post_data):
     data_dict = json.loads(self.data)
 
-    if post_data.get('properties'):
-      data_dict['properties'] = json.loads(post_data['properties'])
-
-    if post_data.get('fields'):
-      data_dict['fields'] = json.loads(post_data['fields'])
+    for attr in Sorting._META_TEMPLATE_ATTRS:
+      if post_data.get(attr):
+        data_dict[attr] = json.loads(post_data[attr])
 
     self.data = json.dumps(data_dict)
 
@@ -202,7 +183,7 @@ class CoreManager(models.Manager):
   <div class="span9">
     <h5>{{user_name}}</h5>
     {{text}}
-    <br>    
+    <br>
     <a href="/filebrowser/view/{{file_path}}">
       {{file_name}} {{content_type}} {{file_length}}{{#file_length}} bytes{{/file_length}}
     </a>
@@ -215,7 +196,7 @@ class CoreManager(models.Manager):
   <div class="span2"><br><a class="btn" href="https://twitter.com/{{user_screen_name}}/status/{{id}}" target="_blank" title="Open in Twitter">
     <i class="icon-twitter"></i></a>
   </div>
-</div>                  
+</div>
                   """,
                   'highlighting': [],
                   'properties': {'highlighting_enabled': False},
@@ -227,7 +208,7 @@ class CoreManager(models.Manager):
 
 class Core(models.Model):
   enabled = models.BooleanField(default=True)
-  name = models.CharField(max_length=40, unique=True, help_text=_t('Name of the Solr collection'))
+  name = models.CharField(max_length=40, unique=True, verbose_name=_t('Solr collection'))
   label = models.CharField(max_length=100)
   # solr_address?
   # results by pages number, autocomplete off...
@@ -246,10 +227,13 @@ class Core(models.Model):
 
   @property
   def fields(self):
+    return ['score'] + sorted([field.get('name') for field in self.fields_data])
+
+  @property
+  def fields_data(self):
     solr_schema = SolrApi(SOLR_URL.get()).schema(self.name)
     schema = etree.fromstring(solr_schema)
 
-    return ['score'] + sorted([field.get('name') for fields in schema.iter('fields') for field in fields.iter('field')])
+    return sorted([{'name': field.get('name'),'type': field.get('type')}
+                   for fields in schema.iter('fields') for field in fields.iter('field')])
 
-
-class Query(object): pass

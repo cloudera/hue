@@ -41,15 +41,19 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
             <label>
               <input type='checkbox' data-bind="checked: isEnabled" style="margin-top: -2px; margin-right: 4px"/> ${_('Enabled') }
             </label>
-          </div>        
+          </div>
           <h4>${_('Sorting')}</h4>
         </div>
+        ${_('Specify on which field and order the results are sorted.')}
+        <span data-bind="visible: ! isEnabled()">
+          ${_('Sorting is currently disabled.')}
+        </span>
       </div>
 
       <div class="section">
         <div class="alert alert-info" style="margin-top: 60px"><h4>${_('Sorting Fields')}</h4></div>
         <div data-bind="visible: sortingFields().length == 0" style="padding-left: 10px;margin-bottom: 20px">
-          <em>${_('There are currently no Sorting Fields defined. Please add at least one from the bottom.')}</em>
+          <em>${_('There are currently no fields defined.')}</em>
         </div>
         <div data-bind="foreach: sortingFields">
           <div class="bubble">
@@ -63,7 +67,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
         <div class="clearfix"></div>
         <div class="miniform">
           ${_('Field')}
-          <select data-bind="options: fields, value: newFieldSelect"></select>
+          <select data-bind="options: sortingFieldsList, value: newFieldSelect"></select>
           &nbsp;${_('Label')}
           <input type="text" data-bind="value: newFieldLabel" class="input" />
           &nbsp;${_('Sorting')}
@@ -71,7 +75,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
             <button id="newFieldAsc" type="button" data-bind="css: {'active': newFieldAscDesc() == 'asc', 'btn': true}"><i class="icon-arrow-up"></i></button>
             <button id="newFieldDesc" type="button" data-bind="css: {'active': newFieldAscDesc() == 'desc', 'btn': true}"><i class="icon-arrow-down"></i></button>
           </div>
-          &nbsp;&nbsp;<a class="btn" data-bind="click: $root.addSortingField"><i class="icon-plus"></i> ${_('Add field to Sorting Fields')}</a>
+          &nbsp;&nbsp;<a class="btn" data-bind="click: $root.addSortingField"><i class="icon-plus"></i> ${_('Add')}</a>
         </div>
       </div>
 
@@ -128,12 +132,23 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
       return new SortingField(obj.field, obj.label, obj.asc);
     }));
 
+    // Remove already selected fields
+    self.sortingFieldsList = ko.observableArray(${ hue_core.fields | n,unicode });
+    $.each(self.sortingFields(), function(index, field) {
+      self.sortingFieldsList.remove(field.field);
+    });
+
     self.newFieldSelect = ko.observable();
     self.newFieldLabel = ko.observable("");
     self.newFieldAscDesc = ko.observable("asc");
 
     self.removeSortingField = function (field) {
       self.sortingFields.remove(field);
+      self.sortingFieldsList.push(field.field);
+      self.sortingFieldsList.sort();
+      if (self.sortingFields().length == 0) {
+        self.isEnabled(false);
+      }
     };
 
     self.addSortingField = function () {
@@ -143,6 +158,8 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
       self.sortingFields.push(new SortingField(self.newFieldSelect(), self.newFieldLabel(), self.newFieldAscDesc()=="asc"));
       self.newFieldLabel("");
       self.newFieldAscDesc("asc");
+      self.sortingFieldsList.remove(self.newFieldSelect());
+      self.isEnabled(true);
     };
 
     self.submit = function () {

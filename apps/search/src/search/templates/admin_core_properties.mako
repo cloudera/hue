@@ -21,6 +21,8 @@
 
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="macros" file="macros.mako" />
+<%namespace name="utils" file="utils.inc.mako" />
+
 
 ${ commonheader(_('Search'), "search", user) | n,unicode }
 
@@ -48,16 +50,36 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
   <%def name="content()">
   <form method="POST">
     <ul class="nav nav-tabs">
-      <li class="active"><a href="#index" data-toggle="tab">${_('Core')}</a></li>
+      <li class="active">
+        <a href="#index" data-toggle="tab">${_('Core')}</a>
+      </li>
+      <li>
+        <a href="#schema" data-toggle="tab">${_('Schema')}</a>
+      </li>
+      <li>
+        <a href="#properties" data-toggle="tab">${_('Properties')}</a>
+      </li>
     </ul>
     <div class="tab-content">
       <div class="tab-pane active" id="index">
-        ${ core_form | n,unicode }
-      </div>
-    </div>
+        <div class="fieldWrapper">
+          ${ utils.render_field(core_form['enabled']) }
+          ${ utils.render_field(core_form['name']) }
+          ${ utils.render_field(core_form['label']) }
+        </div>
 
-    <div class="form-actions">
-      <button type="submit" class="btn btn-primary" id="save-sorting">${_('Save')}</button>
+	    <div class="form-actions">
+	      <button type="submit" class="btn btn-primary" id="save-sorting">${_('Save')}</button>
+	    </div>
+      </div>
+
+      <div class="tab-pane" id="schema">
+        todo?
+      </div>
+
+      <div class="tab-pane" id="properties">
+        todo?
+      </div>
     </div>
   </form>
   </%def>
