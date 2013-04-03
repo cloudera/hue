@@ -75,9 +75,12 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
                 <i class="icon-paste" style="margin-top:2px;"></i>
               </a>
             </div>
-
+          </div>
+        </div>
+        <div class="row-fluid">
+          <div class="span9">
             <div class="well available-fields" style="margin-top: 60px">
-              <h4>${_('Available Fields')}</h4>
+              <h5>${_('Available Fields')}</h5>
               <span data-bind="foreach: availableFields" class="field-button">
                   <a title="${ _('Click on this button to add the field') }"  style="margin-bottom:10px" class="btn btn-small" data-bind="click: $root.addFieldToVisual">
                     <i class="icon-plus"></i>
@@ -88,6 +91,20 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
                 </span>
             </div>
           </div>
+          <div class="span3">
+            <div class="well available-fields" style="margin-top: 60px">
+              <h5>${_('Available Functions')}</h5>
+              <ul class="functions-visual">
+                <li title="${ _('Formats a date in the DD-MM-YYYY format') }" rel="tooltip" data-placement="left">{{#date}} {{/date}}</li>
+                <li title="${ _('Formats a date in the HH:mm:ss format') }" rel="tooltip" data-placement="left">{{#time}} {{/time}}</li>
+                <li title="${ _('Formats a date in the DD-MM-YYYY HH:mm:ss format') }" rel="tooltip" data-placement="left">{{#datetime}} {{/datetime}}</li>
+                <li title="${ _('Formats a date in the full format') }" rel="tooltip" data-placement="left">{{#fulldate}} {{/fulldate}}</li>
+                <li title="${ _('Formats a date as a Unix timestamp') }" rel="tooltip" data-placement="left">{{#timestamp}} {{/timestamp}}</li>
+                <li title="${ _('Downloads the linked file') }" rel="tooltip" data-placement="left">{{#downloadfile}} {{/downloadfile}}</li>
+                <li title="${ _('Links to the file') }" rel="tooltip" data-placement="left">{{#viewfile}} {{/viewfile}}</li>
+              </ul>
+            </div>
+          </div>
         </div>
 
       </div>
@@ -95,8 +112,14 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
         <div class="row-fluid">
           <div class="span12">
             <textarea id="template-source"></textarea>
-            <div class="well available-fields" style="margin-top: 40px">
-              <h4>${_('Available Fields')}</h4>
+
+          </div>
+        </div>
+
+        <div class="row-fluid">
+          <div class="span9">
+            <div class="well available-fields" style="margin-top: 60px">
+              <h5>${_('Available Fields')}</h5>
               <span data-bind="foreach: availableFields" class="field-button">
                   <a title="${ _('Click on this button to add the field') }"  style="margin-bottom:10px" class="btn btn-small" data-bind="click: $root.addFieldToSource">
                     <i class="icon-plus"></i>
@@ -105,6 +128,20 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
                   </a>
                   &nbsp;
                 </span>
+            </div>
+          </div>
+          <div class="span3">
+            <div class="well available-fields" style="margin-top: 60px">
+              <h5>${_('Available Functions')}</h5>
+              <ul class="functions-source">
+                <li title="${ _('Formats a date in the DD-MM-YYYY format') }" rel="tooltip" data-placement="left">{{#date}} {{/date}}</li>
+                <li title="${ _('Formats a date in the HH:mm:ss format') }" rel="tooltip" data-placement="left">{{#time}} {{/time}}</li>
+                <li title="${ _('Formats a date in the DD-MM-YYYY HH:mm:ss format') }" rel="tooltip" data-placement="left">{{#datetime}} {{/datetime}}</li>
+                <li title="${ _('Formats a date in the full format') }" rel="tooltip" data-placement="left">{{#fulldate}} {{/fulldate}}</li>
+                <li title="${ _('Formats a date as a Unix timestamp') }" rel="tooltip" data-placement="left">{{#timestamp}} {{/timestamp}}</li>
+                <li title="${ _('Downloads the linked file') }" rel="tooltip" data-placement="left">{{#downloadfile}} {{/downloadfile}}</li>
+                <li title="${ _('Links to the file') }" rel="tooltip" data-placement="left">{{#viewfile}} {{/viewfile}}</li>
+              </ul>
             </div>
           </div>
         </div>
@@ -157,14 +194,16 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 <script src="/static/ext/js/shortcut.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/freshereditor.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/codemirror-3.0.js"></script>
+<script src="/static/ext/js/moment.min.js" type="text/javascript" charset="utf-8"></script>
 <link rel="stylesheet" href="/static/ext/css/codemirror.css">
 <script src="/static/ext/js/codemirror-xml.js"></script>
 <script src="/static/ext/js/mustache.js"></script>
 
-
 <script type="text/javascript">
 
   $(document).ready(function () {
+
+    $("li[rel='tooltip']").tooltip();
 
     $("#content-editor").on("mouseup", function () {
       storeSelection();
@@ -246,7 +285,17 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
       };
     };
 
-    ko.applyBindings(new ViewModel());
+    var viewModel = new ViewModel();
+    ko.applyBindings(viewModel);
+
+    $(".functions-visual li").on("click", function(){
+      $("#content-editor").focus();
+      pasteHtmlAtCaret($(this).text());
+    });
+
+    $(".functions-source li").on("click", function(){
+      codeMirror.replaceSelection($(this).text());
+    });
 
     var samples = ${ sample_data | n,unicode };
     var templateEditor = $("#template-source")[0];
@@ -274,6 +323,47 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
       if ($(e.target).attr("href") == "#preview") {
         $("#preview-container").empty();
         $(samples).each(function (cnt, item) {
+          item.viewfile = function () {
+            return function (val) {
+              return '<a href="/filebrowser/view/' + $.trim(Mustache.render(val, item)) + '">' + $.trim(Mustache.render(val, item)) + '</a>';
+            }
+          };
+          item.downloadfile = function () {
+            return function (val) {
+              return '<a href="/filebrowser/download/' + $.trim(Mustache.render(val, item)) + '?disposition=inline">' + $.trim(Mustache.render(val, item)) + '</a>';
+            }
+          };
+          item.date = function () {
+            return function (val) {
+              return genericFormatDate(val, item, "DD-MM-YYYY");
+            }
+          };
+          item.time = function () {
+            return function (val) {
+              return genericFormatDate(val, item, "HH:mm:ss");
+            }
+          };
+          item.datetime = function () {
+            return function (val) {
+              return genericFormatDate(val, item, "DD-MM-YYYY HH:mm:ss");
+            }
+          };
+          item.fulldate = function () {
+            return function (val) {
+              return genericFormatDate(val, item, null);
+            }
+          };
+          item.timestamp = function () {
+            return function (val) {
+              var d = moment(Mustache.render(val, item));
+              if (d.isValid()) {
+                return d.valueOf();
+              }
+              else {
+                return Mustache.render(val, item);
+              }
+            }
+          };
           $("<div>").addClass("preview-row").html(Mustache.render($("#content-editor").html(), item)).appendTo($("#preview-container"));
         });
       }

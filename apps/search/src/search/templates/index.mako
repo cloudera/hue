@@ -23,6 +23,9 @@ from django.utils.translation import ugettext as _
 
 ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 
+<link rel="stylesheet" href="/search/static/css/search.css">
+<script src="/static/ext/js/moment.min.js" type="text/javascript" charset="utf-8"></script>
+
 <div class="search-bar">
   % if user.is_superuser:
     <div class="pull-right" style="margin-top: 4px">
@@ -156,13 +159,66 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 
       <textarea id="mustacheTmpl" class="hide">${ hue_core.result.get_template(with_highlighting=True) | n,unicode }</textarea>
       <script>
+
       <%
         docs = response['response']['docs']
         for doc in response['response']['docs']:
           if doc['id'] in response.get('highlighting', []):
             doc.update(response['highlighting'][doc['id']])
         %>
+
+        function genericFormatDate(val, item, format){
+          var d = moment(Mustache.render(val, item));
+          if (d.isValid()) {
+            return d.format(format);
+          }
+          else {
+            return Mustache.render(val, item);
+          }
+        }
+
         $.each(${ json.dumps([result for result in docs]) | n,unicode }, function (index, item) {
+          item.viewfile = function () {
+            return function (val) {
+              return '<a href="/filebrowser/view/' + $.trim(Mustache.render(val, item)) + '">' + $.trim(Mustache.render(val, item)) + '</a>';
+            }
+          };
+          item.downloadfile = function () {
+            return function (val) {
+              return '<a href="/filebrowser/download/' + $.trim(Mustache.render(val, item)) + '?disposition=inline">' + $.trim(Mustache.render(val, item)) + '</a>';
+            }
+          };
+          item.date = function () {
+            return function (val) {
+              return genericFormatDate(val, item, "DD-MM-YYYY");
+            }
+          };
+          item.time = function () {
+            return function (val) {
+              return genericFormatDate(val, item, "HH:mm:ss");
+            }
+          };
+          item.datetime = function () {
+            return function (val) {
+              return genericFormatDate(val, item, "DD-MM-YYYY HH:mm:ss");
+            }
+          };
+          item.fulldate = function () {
+            return function (val) {
+              return genericFormatDate(val, item, null);
+            }
+          };
+          item.timestamp = function () {
+            return function (val) {
+              var d = moment(Mustache.render(val, item));
+              if (d.isValid()) {
+                return d.valueOf();
+              }
+              else {
+                return Mustache.render(val, item);
+              }
+            }
+          };
           $("<div>").addClass("result-row").html(
             Mustache.render($("#mustacheTmpl").text(), item)
           ).appendTo($("#result-container"));
@@ -206,11 +262,6 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 <div class="hide">
   ${ rr | n,unicode }
 </div>
-
-
-<link rel="stylesheet" href="/search/static/css/search.css">
-
-<script src="/static/ext/js/moment.min.js" type="text/javascript" charset="utf-8"></script>
 
 <script>
   $(document).ready(function () {
