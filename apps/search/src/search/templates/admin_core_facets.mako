@@ -51,9 +51,34 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
             ${_('Facets provide an intuitive way to filter the results.')}
             ${_('Different types of facets can be added on the following steps.')}
           </p>
-          <p>
-            <input type='checkbox' data-bind="checked: isEnabled" style="margin-top: -2px; margin-right: 4px"/> ${_('Enabled') }
-          </p>
+
+	      <div class="control-group"">
+	        <label class="control-label"> ${_('Enabled') }</label>
+	        <div class="controls">
+	          <input type='checkbox' data-bind="checked: properties().isEnabled" />	           
+	        </div>
+	      </div>
+          <div class="control-group"">
+            <label class="control-label"> ${_('Limit') }</label>
+            <div class="controls">
+              <input type='number' data-bind="value: properties().limit" class="input-mini"/>
+            </div>
+          </div>
+          <div class="control-group"">
+            <label class="control-label"> ${_('Mincount') }</label>
+            <div class="controls">
+              <input type='number' data-bind="value: properties().mincount" class="input-mini"/>
+            </div>
+          </div>          
+          <div class="control-group"">
+            <label class="control-label"> ${_('Sort') }</label>
+            <div class="controls">
+              <select data-bind="value: properties().sort">
+                <option value="count">count</option>
+                <option value="index">index</option>
+              </select>
+            </div>
+          </div>          
         </div>
 
         <div id="step2" class="stepDetails hide">
@@ -102,7 +127,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
           &nbsp;${_('End')}
           <input type="number" data-bind="value: selectedRangeEndFacet" class="input-mini" />
           &nbsp;${_('Gap')}
-          <input type="number" data-bind="value: selectedRangeGapFacet" class="input-mini" />
+          <input type="number" data-bind="value: selectedRangeGapFacet" class="input-mini" />          
           <a class="btn" data-bind="click: $root.addRangeFacet"><i class="icon-plus"></i> ${_('Add')}</a>
         </div>
       </div>
@@ -132,6 +157,12 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
           <input id="dp-end" class="input-small" type="text" data-bind="value: selectedDateEndFacet" />
           &nbsp;${_('Gap')}
           <input type="number" data-bind="value: selectedDateGapFacet" class="input-mini" />
+          ##           <input type='checkbox' data-bind="checked: properties().isVerbatim" />
+          
+          ##<input class="input-mini" type="number" data-bind="value: selectedDateDateMaths()[0].frequency" />
+          ##<input class="input-small" type="text" data-bind="value: selectedDateDateMaths()[0].unit" />
+          ##<input class="input-small" type="text" data-bind="value: selectedDateDateMaths()[0].unit" />
+          
           <a class="btn" data-bind="click: $root.addDateFacet"><i class="icon-plus"></i> ${_('Add')}</a>
         </div>
       </div>
@@ -153,9 +184,11 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 <script src="/static/ext/js/routie-0.3.0.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/bootstrap-datepicker.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/bootstrap-editable.min.js"></script>
+<script src="/static/ext/js/moment.min.js" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript">
   var DATE_FORMAT = "mm-dd-yyyy";
+  var MOMENT_DATE_FORMAT = "MM-DD-YYYY";
 
   var Facet = function (type, field, start, end, gap) {
     return {
@@ -163,7 +196,9 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
       field: field,
       start: start,
       end: end,
-      gap: gap
+      gap: gap,
+      isVerbatim: false,
+      verbatim: ""
     }
   }
 
@@ -179,6 +214,25 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     return new Facet("date", field, start, end, gap);
   }
 
+  var Properties = function (properties) {
+    var self = this;
+
+    self.isEnabled = ko.observable(properties.isEnabled);
+    self.limit = ko.observable(properties.limit);
+    self.mincount = ko.observable(properties.mincount);
+    self.sort = ko.observable(properties.sort);    
+  }
+  
+  var DateMath = function (frequency, unit, isRounded, isVerbatim, verbatim) {
+    var self = this;
+
+    self.frequency = ko.observable(frequency);
+    self.unit = ko.observable(unit);
+    self.isVerbatim = ko.observable(typeof isVerbatim !== 'undefined' ? isVerbatim : true);
+    self.verbatim = ko.observable(unit);
+    self.isRounded = ko.observable(typeof isRounded !== 'undefined' ? isRounded : true);    
+  }
+
   function ViewModel() {
     var self = this;
 
@@ -190,8 +244,8 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     $.each(${ hue_core.fields_data | n,unicode }, function(index, field) {
       self.fullFields[field.name] = field;
     });
-
-    self.isEnabled = ko.observable(${ hue_core.facets.data | n,unicode }.properties.is_enabled);
+    
+    self.properties = ko.observable(new Properties(${ hue_core.facets.data | n,unicode }.properties));
 
     self.fieldFacets = ko.observableArray(ko.utils.arrayMap(${ hue_core.facets.data | n,unicode }.fields, function (obj) {
       return new FieldFacet(obj.field);
@@ -229,14 +283,19 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 
     self.selectedFieldFacet = ko.observable();
     self.selectedRangeFacet = ko.observable();
-    self.selectedRangeStartFacet = ko.observable("");
-    self.selectedRangeEndFacet = ko.observable("");
-    self.selectedRangeGapFacet = ko.observable("");
+    self.selectedRangeStartFacet = ko.observable(0);
+    self.selectedRangeEndFacet = ko.observable(100);
+    self.selectedRangeGapFacet = ko.observable(10);
+    
     self.selectedDateFacet = ko.observable();
-    self.selectedDateStartFacet = ko.observable("");
-    self.selectedDateEndFacet = ko.observable("");
-    self.selectedDateGapFacet = ko.observable("");
+    self.selectedDateStartFacet = ko.observable(moment().subtract('days', 10).format(MOMENT_DATE_FORMAT));
+    self.selectedDateEndFacet = ko.observable(moment().format(MOMENT_DATE_FORMAT));
+    self.selectedDateGapFacet = ko.observable(10);
+    self.selectedDateIsVerbatim = ko.observable(false);
 
+    self.selectedDateDateMaths = ko.observableArray([new DateMath(10, 'DAY')]);
+    
+    
     self.removeFieldFacet = function (facet) {
       self.fieldFacets.remove(facet);
       self.fieldFacetsList.push(facet.field);
@@ -261,7 +320,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
       if (!found){
         self.fieldFacets.push(new FieldFacet(self.selectedFieldFacet()));
         self.fieldFacetsList.remove(self.selectedFieldFacet());
-        self.isEnabled(true);
+        self.properties().isEnabled(true);
       }
       else {
         $("#field-facet-error").show();
@@ -285,7 +344,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     self.submit = function () {
       $.ajax("${ url('search:admin_core_facets', core=hue_core.name) }", {
         data: {
-          'properties': ko.utils.stringifyJson({'is_enabled': self.isEnabled()}),
+          'properties': ko.toJSON(self.properties),
           'fields': ko.utils.stringifyJson(self.fieldFacets),
           'ranges': ko.utils.stringifyJson(self.rangeFacets),
           'dates': ko.utils.stringifyJson(self.dateFacets)
@@ -410,4 +469,3 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 </script>
 
 ${ commonfooter(messages) | n,unicode }
-
