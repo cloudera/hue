@@ -34,7 +34,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
   <%def name="content()">
     <form method="POST" class="form-horizontal" data-bind="submit: submit">
 
-      <div class="section">       
+      <div class="section">
         <div class="alert alert-info"><h3>${_('Facets')}</h3></div>
       </div>
 
@@ -47,24 +47,32 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
         </ul>
 
         <div id="step1" class="stepDetails">
-          <input type='checkbox' data-bind="checked: isEnabled" style="margin-top: -2px; margin-right: 4px"/> ${_('Enabled') }
+          <p>
+            ${_('Facets provide an intuitive way to filter the results.')}
+            ${_('Different types of facets can be added on the following steps.')}
+          </p>
+          <p>
+            <input type='checkbox' data-bind="checked: isEnabled" style="margin-top: -2px; margin-right: 4px"/> ${_('Enabled') }
+          </p>
         </div>
 
-        <div id="step2" class="stepDetails hide">      
+        <div id="step2" class="stepDetails hide">
           <div class="alert alert-info" style="margin-top: 60px"><h4>${_('Field Facets')}</h4></div>
           <div data-bind="visible: fieldFacets().length == 0" style="padding-left: 10px;margin-bottom: 20px">
             <em>${_('There are currently no field Facets defined.')}</em>
           </div>
           <div data-bind="foreach: fieldFacets">
             <div class="bubble">
-              <strong><span data-bind="text: field"></span></strong>
+              <strong>
+                <span data-bind="text: field"></span>
+              </strong>
               <a class="btn btn-small" data-bind="click: $root.removeFieldFacet"><i class="icon-trash"></i></a>
             </div>
           </div>
           <div class="clearfix"></div>
           <div class="miniform">
             ${_('Field')}
-            <select id="select-field-facet" data-bind="options: fields, value: selectedFieldFacet"></select>
+            <select id="select-field-facet" data-bind="options: fieldFacetsList, value: selectedFieldFacet"></select>
             <a class="btn" data-bind="click: $root.addFieldFacet"><i class="icon-plus"></i> ${_('Add')}</a>
             &nbsp;<span id="field-facet-error" class="label label-important hide">${_('The field you are trying to add is already in the list.')}</span>
           </div>
@@ -88,7 +96,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
         <div class="clearfix"></div>
         <div class="miniform">
           ${_('Field')}
-          <select data-bind="options: fields, value: selectedRangeFacet"></select>
+          <select data-bind="options: rangeFacetsList, value: selectedRangeFacet"></select>
           &nbsp;${_('Start')}
           <input type="number" data-bind="value: selectedRangeStartFacet" class="input-mini" />
           &nbsp;${_('End')}
@@ -117,7 +125,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
         <div class="clearfix"></div>
         <div class="miniform">
           ${_('Field')}
-          <select data-bind="options: fields, value: selectedDateFacet"></select>
+          <select data-bind="options: dateFacetsList, value: selectedDateFacet"></select>
           &nbsp;${_('Start')}
           <input id="dp-start" class="input-small" type="text" data-bind="value: selectedDateStartFacet" />
           &nbsp;${_('End')}
@@ -131,7 +139,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 
       <div class="form-actions" style="margin-top: 80px">
         <a id="backBtn" class="btn disabled disable-feedback">${ _('Back') }</a>
-        <a id="nextBtn" class="btn btn-primary disable-feedback">${ _('Next') }</a>      
+        <a id="nextBtn" class="btn btn-primary disable-feedback">${ _('Next') }</a>
         <button type="submit" class="btn btn-primary" data-bind="visible: isSaveBtnVisible()" id="save-facets">${_('Save')}</button>
       </div>
     </form>
@@ -139,10 +147,12 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 </%layout:skeleton>
 
 <link rel="stylesheet" href="/static/ext/css/bootstrap-datepicker.min.css" type="text/css" media="screen" title="no title" charset="utf-8" />
+<link href="/static/ext/css/bootstrap-editable.css" rel="stylesheet">
 
 <script src="/static/ext/js/knockout-2.1.0.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/routie-0.3.0.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/bootstrap-datepicker.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/bootstrap-editable.min.js"></script>
 
 <script type="text/javascript">
   var DATE_FORMAT = "mm-dd-yyyy";
@@ -171,24 +181,51 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 
   function ViewModel() {
     var self = this;
-    
+
     self.isSaveBtnVisible = ko.observable(false);
-    
+
     self.fields = ko.observableArray(${ hue_core.fields | n,unicode });
 
-    self.isEnabled = ko.observable(${ hue_core.facets.data | n,unicode }.properties.is_enabled);    
+    self.fullFields = {}
+    $.each(${ hue_core.fields_data | n,unicode }, function(index, field) {
+      self.fullFields[field.name] = field;
+    });
+
+    self.isEnabled = ko.observable(${ hue_core.facets.data | n,unicode }.properties.is_enabled);
 
     self.fieldFacets = ko.observableArray(ko.utils.arrayMap(${ hue_core.facets.data | n,unicode }.fields, function (obj) {
       return new FieldFacet(obj.field);
     }));
 
+    // Remove already selected fields
+    self.fieldFacetsList = ko.observableArray(${ hue_core.fields | n,unicode });
+    $.each(self.fieldFacets(), function(index, field) {
+      self.fieldFacetsList.remove(field.field);
+    });
+
     self.rangeFacets = ko.observableArray(ko.utils.arrayMap(${ hue_core.facets.data | n,unicode }.ranges, function (obj) {
       return new RangeFacet(obj.field, obj.start, obj.end, obj.gap);
     }));
 
+    // Only ranges
+    self.rangeFacetsList = ko.observableArray([]);
+    $.each(self.fields(), function(index, field) {
+      if (self.fullFields[field] && ['tdate', 'tint', 'long'].indexOf(self.fullFields[field].type) >= 0) {
+        self.rangeFacetsList.push(field);
+      }
+    });
+
     self.dateFacets = ko.observableArray(ko.utils.arrayMap(${ hue_core.facets.data | n,unicode }.dates, function (obj) {
       return new DateFacet(obj.field, obj.start, obj.end, obj.gap);
     }));
+
+    // Only dates
+    self.dateFacetsList = ko.observableArray([]);
+    $.each(self.fields(), function(index, field) {
+      if (self.fullFields[field] && self.fullFields[field].type == 'tdate') {
+        self.dateFacetsList.push(field);
+      }
+    });
 
     self.selectedFieldFacet = ko.observable();
     self.selectedRangeFacet = ko.observable();
@@ -202,6 +239,8 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 
     self.removeFieldFacet = function (facet) {
       self.fieldFacets.remove(facet);
+      self.fieldFacetsList.push(facet.field);
+      self.fieldFacetsList.sort();
     };
 
     self.removeRangeFacet = function (facet) {
@@ -221,6 +260,8 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
       });
       if (!found){
         self.fieldFacets.push(new FieldFacet(self.selectedFieldFacet()));
+        self.fieldFacetsList.remove(self.selectedFieldFacet());
+        self.isEnabled(true);
       }
       else {
         $("#field-facet-error").show();
@@ -269,20 +310,23 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
   $(document).ready(function () {
     $(".btn-primary").button("reset");
     ko.applyBindings(viewModel);
+
     $("#select-field-facet").click(function(){
       $("#field-facet-error").hide();
     });
+
     $("#dp-start").datepicker({
       format: DATE_FORMAT
     }).on("changeDate", function(e){
       viewModel.selectedDateStartFacet($(this).val());
     });
+
     $("#dp-end").datepicker({
       format: DATE_FORMAT
     }).on("changeDate", function(e){
       viewModel.selectedDateEndFacet($(this).val());
     });
-    
+
     var currentStep = "step1";
 
     routie({
@@ -309,7 +353,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
         }
       }
     });
-    
+
       function showStep(step) {
         currentStep = step;
         if (step != "step1") {
@@ -361,7 +405,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
         if (nextStep <= $(".step").length) {
           routie("step" + nextStep);
         }
-      });        
+      });
   });
 </script>
 

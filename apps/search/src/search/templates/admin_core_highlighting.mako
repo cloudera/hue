@@ -45,8 +45,12 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
           <h4>${_('Highlighting')}</h4>
         </div>
         <div style="padding-left: 10px;margin-bottom: 20px">
-          <p>${_('Highlights the query keywords matching some of the fields below.')}</p>
-          <em>${_('Please select some fields to highlight in the result below.')}</em>
+          <p>
+            ${_('Highlights the query keywords matching some of the fields below.')}
+            <span data-bind="visible: ! isEnabled()">
+              ${_('Highlighting is currently disabled.')}
+            </span>
+          </p>
         </div>
 
         <div class="selector">
@@ -138,6 +142,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
       height:340,
       onChange: function(){
         viewModel.highlightedFields($("#fields").val());
+        viewModel.isEnabled(viewModel.highlightedFields() != null);
       }
     });
   });
