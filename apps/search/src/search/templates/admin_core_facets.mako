@@ -34,38 +34,43 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
   <%def name="content()">
     <form method="POST" class="form-horizontal" data-bind="submit: submit">
 
-      <div class="section">
-        <div class="alert alert-info">
-          <div class="pull-right">
-            <label>
-              <input type='checkbox' data-bind="checked: isEnabled" style="margin-top: -2px; margin-right: 4px"/> ${_('Enabled') }
-            </label>
-          </div>         
-          <h4>${_('Facets')}</h4>
-        </div>
+      <div class="section">       
+        <div class="alert alert-info"><h3>${_('Facets')}</h3></div>
       </div>
 
-      <div class="section">
-        <div class="alert alert-info" style="margin-top: 60px"><h4>${_('Field Facets')}</h4></div>
-        <div data-bind="visible: fieldFacets().length == 0" style="padding-left: 10px;margin-bottom: 20px">
-          <em>${_('There are currently no field Facets defined.')}</em>
+      <div id="facets" class="section">
+        <ul class="nav nav-pills">
+          <li class="active"><a href="#step1" class="step">${ _('Step 1: General') }</a></li>
+          <li><a href="#step2" class="step">${ _('Step 2: Field') }</a></li>
+          <li><a href="#step3" class="step">${ _('Step 3: Range') }</a></li>
+          <li><a href="#step4" class="step">${ _('Step 4: Date') }</a></li>
+        </ul>
+
+        <div id="step1" class="stepDetails">
+          <input type='checkbox' data-bind="checked: isEnabled" style="margin-top: -2px; margin-right: 4px"/> ${_('Enabled') }
         </div>
-        <div data-bind="foreach: fieldFacets">
-          <div class="bubble">
-            <strong><span data-bind="text: field"></span></strong>
-            <a class="btn btn-small" data-bind="click: $root.removeFieldFacet"><i class="icon-trash"></i></a>
+
+        <div id="step2" class="stepDetails hide">      
+          <div class="alert alert-info" style="margin-top: 60px"><h4>${_('Field Facets')}</h4></div>
+          <div data-bind="visible: fieldFacets().length == 0" style="padding-left: 10px;margin-bottom: 20px">
+            <em>${_('There are currently no field Facets defined.')}</em>
+          </div>
+          <div data-bind="foreach: fieldFacets">
+            <div class="bubble">
+              <strong><span data-bind="text: field"></span></strong>
+              <a class="btn btn-small" data-bind="click: $root.removeFieldFacet"><i class="icon-trash"></i></a>
+            </div>
+          </div>
+          <div class="clearfix"></div>
+          <div class="miniform">
+            ${_('Field')}
+            <select id="select-field-facet" data-bind="options: fields, value: selectedFieldFacet"></select>
+            <a class="btn" data-bind="click: $root.addFieldFacet"><i class="icon-plus"></i> ${_('Add')}</a>
+            &nbsp;<span id="field-facet-error" class="label label-important hide">${_('The field you are trying to add is already in the list.')}</span>
           </div>
         </div>
-        <div class="clearfix"></div>
-        <div class="miniform">
-          ${_('Field')}
-          <select id="select-field-facet" data-bind="options: fields, value: selectedFieldFacet"></select>
-          <a class="btn" data-bind="click: $root.addFieldFacet"><i class="icon-plus"></i> ${_('Add field')}</a>
-          &nbsp;<span id="field-facet-error" class="label label-important hide">${_('The field you are trying to add is already in the list.')}</span>
-        </div>
-      </div>
 
-      <div class="section">
+      <div id="step3" class="stepDetails hide">
         <div class="alert alert-info" style="margin-top: 60px"><h4>${_('Range Facets')}</h4></div>
         <div data-bind="visible: rangeFacets().length == 0" style="padding-left: 10px;margin-bottom: 20px">
           <em>${_('There are currently no Range Facets defined.')}</em>
@@ -90,11 +95,11 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
           <input type="number" data-bind="value: selectedRangeEndFacet" class="input-mini" />
           &nbsp;${_('Gap')}
           <input type="number" data-bind="value: selectedRangeGapFacet" class="input-mini" />
-          <a class="btn" data-bind="click: $root.addRangeFacet"><i class="icon-plus"></i> ${_('Add field')}</a>
+          <a class="btn" data-bind="click: $root.addRangeFacet"><i class="icon-plus"></i> ${_('Add')}</a>
         </div>
       </div>
 
-      <div class="section">
+      <div id="step4" class="stepDetails hide">
         <div class="alert alert-info" style="margin-top: 60px"><h4>${_('Date Facets')}</h4></div>
         <div data-bind="visible: dateFacets().length == 0" style="padding-left: 10px;margin-bottom: 20px">
           <em>${_('There are currently no Date Facets defined.')}</em>
@@ -119,13 +124,15 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
           <input id="dp-end" class="input-small" type="text" data-bind="value: selectedDateEndFacet" />
           &nbsp;${_('Gap')}
           <input type="number" data-bind="value: selectedDateGapFacet" class="input-mini" />
-          <a class="btn" data-bind="click: $root.addDateFacet"><i class="icon-plus"></i> ${_('Add field')}</a>
+          <a class="btn" data-bind="click: $root.addDateFacet"><i class="icon-plus"></i> ${_('Add')}</a>
         </div>
       </div>
-
+     </div>
 
       <div class="form-actions" style="margin-top: 80px">
-        <button type="submit" class="btn btn-primary" id="save-facets">${_('Save')}</button>
+        <a id="backBtn" class="btn disabled disable-feedback">${ _('Back') }</a>
+        <a id="nextBtn" class="btn btn-primary disable-feedback">${ _('Next') }</a>      
+        <button type="submit" class="btn btn-primary" data-bind="visible: isSaveBtnVisible()" id="save-facets">${_('Save')}</button>
       </div>
     </form>
   </%def>
@@ -134,6 +141,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 <link rel="stylesheet" href="/static/ext/css/bootstrap-datepicker.min.css" type="text/css" media="screen" title="no title" charset="utf-8" />
 
 <script src="/static/ext/js/knockout-2.1.0.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/routie-0.3.0.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/bootstrap-datepicker.min.js" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript">
@@ -163,9 +171,12 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 
   function ViewModel() {
     var self = this;
+    
+    self.isSaveBtnVisible = ko.observable(false);
+    
     self.fields = ko.observableArray(${ hue_core.fields | n,unicode });
 
-    self.isEnabled = ko.observable(${ hue_core.facets.data | n,unicode }.properties.is_enabled);
+    self.isEnabled = ko.observable(${ hue_core.facets.data | n,unicode }.properties.is_enabled);    
 
     self.fieldFacets = ko.observableArray(ko.utils.arrayMap(${ hue_core.facets.data | n,unicode }.fields, function (obj) {
       return new FieldFacet(obj.field);
@@ -271,6 +282,86 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     }).on("changeDate", function(e){
       viewModel.selectedDateEndFacet($(this).val());
     });
+    
+    var currentStep = "step1";
+
+    routie({
+      "step1":function () {
+        showStep("step1");
+        viewModel.isSaveBtnVisible(false);
+      },
+      "step2":function () {
+        if (validateStep("step1")) {
+          showStep("step2");
+          viewModel.isSaveBtnVisible(false);
+        }
+      },
+      "step3":function () {
+        if (validateStep("step1") && validateStep("step2")) {
+          showStep("step3");
+          viewModel.isSaveBtnVisible(false);
+        }
+      },
+      "step4":function () {
+        if (validateStep("step1") && validateStep("step2")) {
+          showStep("step4");
+          viewModel.isSaveBtnVisible(true);
+        }
+      }
+    });
+    
+      function showStep(step) {
+        currentStep = step;
+        if (step != "step1") {
+          $("#backBtn").removeClass("disabled");
+        }
+        else {
+          $("#backBtn").addClass("disabled");
+        }
+        if (step != $(".stepDetails:last").attr("id")) {
+          $("#nextBtn").removeClass("disabled");
+        }
+        else {
+          $("#nextBtn").addClass("disabled");
+        }
+        $("a.step").parent().removeClass("active");
+        $("a.step[href=#" + step + "]").parent().addClass("active");
+        $(".stepDetails").hide();
+        $("#" + step).show();
+      }
+
+      function showSection(section) {
+        $(".section").hide();
+        $("#" + section).show();
+      }
+
+      function validateStep(step) {
+        var proceed = true;
+        $("#" + step).find("[validate=true]").each(function () {
+          if ($(this).val().trim() == "") {
+            proceed = false;
+            routie(step);
+            $(this).parents(".control-group").addClass("error");
+            $(this).parent().find(".help-inline").remove();
+            $(this).after("<span class=\"help-inline\"><strong>${ _('This field is required.') }</strong></span>");
+          }
+        });
+        return proceed;
+      }
+
+      $("#backBtn").click(function () {
+        var nextStep = (currentStep.substr(4) * 1 - 1);
+        if (nextStep >= 1) {
+          routie("step" + nextStep);
+        }
+      });
+
+      $("#nextBtn").click(function () {
+        var nextStep = (currentStep.substr(4) * 1 + 1);
+        if (nextStep <= $(".step").length) {
+          routie("step" + nextStep);
+        }
+      });        
   });
 </script>
 
