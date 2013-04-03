@@ -46,6 +46,58 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     height: 6px;
     line-height: 6px;
   }
+
+  .CodeMirror {
+    border: 1px solid #CDCDCD;
+  }
+
+    /* Widgets */
+  .widget-box {
+    background: none repeat scroll 0 0 #F9F9F9;
+    border-top: 1px solid #CDCDCD;
+    border-left: 1px solid #CDCDCD;
+    border-right: 1px solid #CDCDCD;
+    clear: both;
+    margin-top: 10px;
+    margin-bottom: 16px;
+    position: relative;
+  }
+
+  .widget-title {
+    background-color: #efefef;
+    background-image: -webkit-gradient(linear, 0 0%, 0 100%, from(#fdfdfd), to(#eaeaea));
+    background-image: -webkit-linear-gradient(top, #fdfdfd 0%, #eaeaea 100%);
+    background-image: -moz-linear-gradient(top, #fdfdfd 0%, #eaeaea 100%);
+    background-image: -ms-linear-gradient(top, #fdfdfd 0%, #eaeaea 100%);
+    background-image: -o-linear-gradient(top, #fdfdfd 0%, #eaeaea 100%);
+    background-image: -linear-gradient(top, #fdfdfd 0%, #eaeaea 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fdfdfd', endColorstr='#eaeaea',GradientType=0 ); /* IE6-9 */
+    border-bottom: 1px solid #CDCDCD;
+    height: 36px;
+  }
+
+  .widget-title span.icon {
+    border-right: 1px solid #cdcdcd;
+    padding: 9px 10px 7px 11px;
+    float: left;
+    opacity: .7;
+  }
+  .widget-title h5 {
+    color: #666666;
+    text-shadow: 0 1px 0 #ffffff;
+    float: left;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 12px;
+    line-height: 12px;
+    margin: 0;
+  }
+
+  .widget-content {
+    padding: 12px 15px;
+    border-bottom: 1px solid #cdcdcd;
+  }
+
 </style>
 
 <%layout:skeleton>
@@ -67,81 +119,102 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
       <div class="tab-pane active" id="visual">
 
         <div class="row-fluid">
-          <div class="span12">
+          <div class="span9">
             <div id="toolbar"></div>
-            <div id="content-editor" class="clear" style="margin-top: 20px">${ hue_core.result.get_template() | n,unicode }</div>
+            <div id="content-editor" class="clear" style="margin-top: 20px; min-height: 300px">${ hue_core.result.get_template() | n,unicode }</div>
             <div id="load-template" class="btn-group">
               <a title="Load template" class="btn toolbar-btn toolbar-cmd">
                 <i class="icon-paste" style="margin-top:2px;"></i>
               </a>
             </div>
           </div>
-        </div>
-        <div class="row-fluid">
-          <div class="span9">
-            <div class="well available-fields" style="margin-top: 60px">
-              <h5>${_('Available Fields')}</h5>
-              <span data-bind="foreach: availableFields" class="field-button">
-                  <a title="${ _('Click on this button to add the field') }"  style="margin-bottom:10px" class="btn btn-small" data-bind="click: $root.addFieldToVisual">
-                    <i class="icon-plus"></i>
-                    &nbsp;
-                    <span data-bind="text: $data"></span>
-                  </a>
-                  &nbsp;
-                </span>
-            </div>
-          </div>
           <div class="span3">
-            <div class="well available-fields" style="margin-top: 60px">
-              <h5>${_('Available Functions')}</h5>
-              <ul class="functions-visual">
-                <li title="${ _('Formats a date in the DD-MM-YYYY format') }" rel="tooltip" data-placement="left">{{#date}} {{/date}}</li>
-                <li title="${ _('Formats a date in the HH:mm:ss format') }" rel="tooltip" data-placement="left">{{#time}} {{/time}}</li>
-                <li title="${ _('Formats a date in the DD-MM-YYYY HH:mm:ss format') }" rel="tooltip" data-placement="left">{{#datetime}} {{/datetime}}</li>
-                <li title="${ _('Formats a date in the full format') }" rel="tooltip" data-placement="left">{{#fulldate}} {{/fulldate}}</li>
-                <li title="${ _('Formats a date as a Unix timestamp') }" rel="tooltip" data-placement="left">{{#timestamp}} {{/timestamp}}</li>
-                <li title="${ _('Downloads the linked file') }" rel="tooltip" data-placement="left">{{#downloadfile}} {{/downloadfile}}</li>
-                <li title="${ _('Links to the file') }" rel="tooltip" data-placement="left">{{#viewfile}} {{/viewfile}}</li>
-              </ul>
+            <div class="widget-box">
+              <div class="widget-title">
+								<span class="icon">
+									<i class="icon-th-list"></i>
+								</span>
+                <h5>${_('Available Fields')}</h5>
+              </div>
+              <div class="widget-content">
+                <select data-bind="options: availableFields, value: selectedVisualField" class="input-medium"></select>
+                <a title="${ _('Click on this button to add the field') }"  style="margin-bottom:10px" class="btn btn-small" data-bind="click: $root.addFieldToVisual">
+                  <i class="icon-plus"></i>
+                </a>
+              </div>
+            </div>
+            <div class="widget-box">
+              <div class="widget-title">
+								<span class="icon">
+									<i class="icon-magic"></i>
+								</span>
+                <h5>${_('Available Functions')}</h5>
+              </div>
+              <div class="widget-content">
+                <select id="visualFunctions" data-bind="value: selectedVisualFunction" class="input-medium">
+                  <option title="${ _('Formats a date in the DD-MM-YYYY format') }" value="{{#date}} {{/date}}">{{#date}}</option>
+                  <option title="${ _('Formats a date in the HH:mm:ss format') }" value="{{#time}} {{/time}}">{{#time}}</option>
+                  <option title="${ _('Formats a date in the DD-MM-YYYY HH:mm:ss format') }" value="{{#datetime}} {{/datetime}}">{{#datetime}}</option>
+                  <option title="${ _('Formats a date in the full format') }" value="{{#fulldate}} {{/fulldate}}">{{#fulldate}}</option>
+                  <option title="${ _('Formats a date as a Unix timestamp') }" value="{{#timestamp}} {{/timestamp}}">{{#timestamp}}</option>
+                  <option title="${ _('Downloads the linked file') }" value="{{#downloadfile}} {{/downloadfile}}">{{#downloadfile}}</option>
+                  <option title="${ _('Links to the file') }" value="{{#viewfile}} {{/viewfile}}">{{#viewfile}}</option>
+                </select>
+                <a title="${ _('Click on this button to add the field') }"  style="margin-bottom:10px" class="btn btn-small" data-bind="click: $root.addFunctionToVisual">
+                  <i class="icon-plus"></i>
+                </a>
+                <br/>
+                <p class="muted"></p>
+              </div>
             </div>
           </div>
         </div>
+
 
       </div>
       <div class="tab-pane" id="source">
         <div class="row-fluid">
-          <div class="span12">
-            <textarea id="template-source"></textarea>
-
-          </div>
-        </div>
-
-        <div class="row-fluid">
           <div class="span9">
-            <div class="well available-fields" style="margin-top: 60px">
-              <h5>${_('Available Fields')}</h5>
-              <span data-bind="foreach: availableFields" class="field-button">
-                  <a title="${ _('Click on this button to add the field') }"  style="margin-bottom:10px" class="btn btn-small" data-bind="click: $root.addFieldToSource">
-                    <i class="icon-plus"></i>
-                    &nbsp;
-                    <span data-bind="text: $data"></span>
-                  </a>
-                  &nbsp;
-                </span>
-            </div>
+            <textarea id="template-source"></textarea>
           </div>
           <div class="span3">
-            <div class="well available-fields" style="margin-top: 60px">
-              <h5>${_('Available Functions')}</h5>
-              <ul class="functions-source">
-                <li title="${ _('Formats a date in the DD-MM-YYYY format') }" rel="tooltip" data-placement="left">{{#date}} {{/date}}</li>
-                <li title="${ _('Formats a date in the HH:mm:ss format') }" rel="tooltip" data-placement="left">{{#time}} {{/time}}</li>
-                <li title="${ _('Formats a date in the DD-MM-YYYY HH:mm:ss format') }" rel="tooltip" data-placement="left">{{#datetime}} {{/datetime}}</li>
-                <li title="${ _('Formats a date in the full format') }" rel="tooltip" data-placement="left">{{#fulldate}} {{/fulldate}}</li>
-                <li title="${ _('Formats a date as a Unix timestamp') }" rel="tooltip" data-placement="left">{{#timestamp}} {{/timestamp}}</li>
-                <li title="${ _('Downloads the linked file') }" rel="tooltip" data-placement="left">{{#downloadfile}} {{/downloadfile}}</li>
-                <li title="${ _('Links to the file') }" rel="tooltip" data-placement="left">{{#viewfile}} {{/viewfile}}</li>
-              </ul>
+            <div class="widget-box" style="margin-top: 0">
+              <div class="widget-title">
+								<span class="icon">
+									<i class="icon-th-list"></i>
+								</span>
+                <h5>${_('Available Fields')}</h5>
+              </div>
+              <div class="widget-content">
+                <select data-bind="options: availableFields, value: selectedSourceField" class="input-medium"></select>
+                <a title="${ _('Click on this button to add the field') }"  style="margin-bottom:10px" class="btn btn-small" data-bind="click: $root.addFieldToSource">
+                  <i class="icon-plus"></i>
+                </a>
+              </div>
+            </div>
+            <div class="widget-box">
+              <div class="widget-title">
+								<span class="icon">
+									<i class="icon-magic"></i>
+								</span>
+                <h5>${_('Available Functions')}</h5>
+              </div>
+              <div class="widget-content">
+                <select id="sourceFunctions" data-bind="value: selectedSourceFunction" class="input-medium">
+                  <option title="${ _('Formats a date in the DD-MM-YYYY format') }" value="{{#date}} {{/date}}">{{#date}}</option>
+                  <option title="${ _('Formats a date in the HH:mm:ss format') }" value="{{#time}} {{/time}}">{{#time}}</option>
+                  <option title="${ _('Formats a date in the DD-MM-YYYY HH:mm:ss format') }" value="{{#datetime}} {{/datetime}}">{{#datetime}}</option>
+                  <option title="${ _('Formats a date in the full format') }" value="{{#fulldate}} {{/fulldate}}">{{#fulldate}}</option>
+                  <option title="${ _('Formats a date as a Unix timestamp') }" value="{{#timestamp}} {{/timestamp}}">{{#timestamp}}</option>
+                  <option title="${ _('Downloads the linked file') }" value="{{#downloadfile}} {{/downloadfile}}">{{#downloadfile}}</option>
+                  <option title="${ _('Links to the file') }" value="{{#viewfile}} {{/viewfile}}">{{#viewfile}}</option>
+                </select>
+                <a title="${ _('Click on this button to add the field') }"  style="margin-bottom:10px" class="btn btn-small" data-bind="click: $root.addFunctionToSource">
+                  <i class="icon-plus"></i>
+                </a>
+                <br/>
+                <p class="muted"></p>
+              </div>
             </div>
           </div>
         </div>
@@ -275,27 +348,37 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     function ViewModel() {
       var self = this;
       self.availableFields = ko.observableArray(${ hue_core.fields | n,unicode });
+      self.selectedVisualField = ko.observable();
+      self.selectedVisualFunction = ko.observable();
+      self.selectedVisualFunction.subscribe(function (newValue) {
+        var _vf = $("#visualFunctions");
+        _vf.siblings(".muted").text(_vf.find(":selected").attr("title"));
+      });
+      self.selectedSourceField = ko.observable();
+      self.selectedSourceFunction = ko.observable();
+      self.selectedSourceFunction.subscribe(function (newValue) {
+        var _sf = $("#sourceFunctions");
+        _sf.siblings(".muted").text(_sf.find(":selected").attr("title"));
+      });
       self.lastIndex = ko.observable(0);
-      self.addFieldToVisual = function (field) {
+      self.addFieldToVisual = function () {
         $("#content-editor").focus();
-        pasteHtmlAtCaret("{{" + field + "}}");
+        pasteHtmlAtCaret("{{" + self.selectedVisualField() + "}}");
       };
-      self.addFieldToSource = function (field) {
-        codeMirror.replaceSelection("{{" + field + "}}")
+      self.addFieldToSource = function () {
+        codeMirror.replaceSelection("{{" + self.selectedSourceField() + "}}");
+      };
+      self.addFunctionToVisual = function () {
+        $("#content-editor").focus();
+        pasteHtmlAtCaret(self.selectedVisualFunction());
+      };
+      self.addFunctionToSource = function () {
+        codeMirror.replaceSelection(self.selectedSourceFunction());
       };
     };
 
     var viewModel = new ViewModel();
     ko.applyBindings(viewModel);
-
-    $(".functions-visual li").on("click", function(){
-      $("#content-editor").focus();
-      pasteHtmlAtCaret($(this).text());
-    });
-
-    $(".functions-source li").on("click", function(){
-      codeMirror.replaceSelection($(this).text());
-    });
 
     var samples = ${ sample_data | n,unicode };
     var templateEditor = $("#template-source")[0];
