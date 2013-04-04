@@ -110,6 +110,14 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 
   .carousel-control {
     top: 100%;
+    outline: none;
+  }
+  .carousel-control:focus {
+    outline: none;
+  }
+
+  .tab-content {
+    overflow: inherit;
   }
 </style>
 
@@ -150,8 +158,8 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
                 <h5>${_('Available Fields')}</h5>
               </div>
               <div class="widget-content">
-                <select data-bind="options: availableFields, value: selectedVisualField" class="input-medium"></select>
-                <a title="${ _('Click on this button to add the field') }"  style="margin-bottom:10px" class="btn btn-small" data-bind="click: $root.addFieldToVisual">
+                <select data-bind="options: availableFields, value: selectedVisualField" class="input-medium chzn-select"></select>
+                <a title="${ _('Click on this button to add the field') }"  style="margin-top:-22px" class="btn btn-small" data-bind="click: $root.addFieldToVisual">
                   <i class="icon-plus"></i>
                 </a>
               </div>
@@ -164,7 +172,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
                 <h5>${_('Available Functions')}</h5>
               </div>
               <div class="widget-content">
-                <select id="visualFunctions" data-bind="value: selectedVisualFunction" class="input-medium">
+                <select id="visualFunctions" data-bind="value: selectedVisualFunction" class="input-medium chzn-select">
                   <option title="${ _('Formats a date in the DD-MM-YYYY format') }" value="{{#date}} {{/date}}">{{#date}}</option>
                   <option title="${ _('Formats a date in the HH:mm:ss format') }" value="{{#time}} {{/time}}">{{#time}}</option>
                   <option title="${ _('Formats a date in the DD-MM-YYYY HH:mm:ss format') }" value="{{#datetime}} {{/datetime}}">{{#datetime}}</option>
@@ -173,7 +181,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
                   <option title="${ _('Downloads the linked file') }" value="{{#downloadfile}} {{/downloadfile}}">{{#downloadfile}}</option>
                   <option title="${ _('Links to the file') }" value="{{#viewfile}} {{/viewfile}}">{{#viewfile}}</option>
                 </select>
-                <a title="${ _('Click on this button to add the field') }"  style="margin-bottom:10px" class="btn btn-small" data-bind="click: $root.addFunctionToVisual">
+                <a title="${ _('Click on this button to add the field') }"  style="margin-top:-22px" class="btn btn-small" data-bind="click: $root.addFunctionToVisual">
                   <i class="icon-plus"></i>
                 </a>
                 <br/>
@@ -199,8 +207,8 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
                 <h5>${_('Available Fields')}</h5>
               </div>
               <div class="widget-content">
-                <select data-bind="options: availableFields, value: selectedSourceField" class="input-medium"></select>
-                <a title="${ _('Click on this button to add the field') }"  style="margin-bottom:10px" class="btn btn-small" data-bind="click: $root.addFieldToSource">
+                <select data-bind="options: availableFields, value: selectedSourceField" class="input-medium chzn-select"></select>
+                <a title="${ _('Click on this button to add the field') }"  style="margin-top:-22px" class="btn btn-small" data-bind="click: $root.addFieldToSource">
                   <i class="icon-plus"></i>
                 </a>
               </div>
@@ -213,7 +221,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
                 <h5>${_('Available Functions')}</h5>
               </div>
               <div class="widget-content">
-                <select id="sourceFunctions" data-bind="value: selectedSourceFunction" class="input-medium">
+                <select id="sourceFunctions" data-bind="value: selectedSourceFunction" class="input-medium chzn-select">
                   <option title="${ _('Formats a date in the DD-MM-YYYY format') }" value="{{#date}} {{/date}}">{{#date}}</option>
                   <option title="${ _('Formats a date in the HH:mm:ss format') }" value="{{#time}} {{/time}}">{{#time}}</option>
                   <option title="${ _('Formats a date in the DD-MM-YYYY HH:mm:ss format') }" value="{{#datetime}} {{/datetime}}">{{#datetime}}</option>
@@ -222,7 +230,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
                   <option title="${ _('Downloads the linked file') }" value="{{#downloadfile}} {{/downloadfile}}">{{#downloadfile}}</option>
                   <option title="${ _('Links to the file') }" value="{{#viewfile}} {{/viewfile}}">{{#viewfile}}</option>
                 </select>
-                <a title="${ _('Click on this button to add the field') }"  style="margin-bottom:10px" class="btn btn-small" data-bind="click: $root.addFunctionToSource">
+                <a title="${ _('Click on this button to add the field') }"  style="margin-top:-22px" class="btn btn-small" data-bind="click: $root.addFunctionToSource">
                   <i class="icon-plus"></i>
                 </a>
                 <br/>
@@ -365,13 +373,16 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 
 <link rel="stylesheet" href="/static/ext/farbtastic/farbtastic.css">
 <link rel="stylesheet" href="/static/ext/css/freshereditor.css">
+<link rel="stylesheet" href="/static/ext/css/codemirror.css">
+<link rel="stylesheet" href="/static/ext/chosen/chosen.css">
+
 <script src="/static/ext/js/knockout-2.1.0.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/farbtastic/farbtastic.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/chosen/chosen.jquery.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/shortcut.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/freshereditor.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/codemirror-3.0.js"></script>
 <script src="/static/ext/js/moment.min.js" type="text/javascript" charset="utf-8"></script>
-<link rel="stylesheet" href="/static/ext/css/codemirror.css">
 <script src="/static/ext/js/codemirror-xml.js"></script>
 <script src="/static/ext/js/mustache.js"></script>
 
@@ -481,6 +492,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 
     var viewModel = new ViewModel();
     ko.applyBindings(viewModel);
+    $(".chzn-select").chosen();
 
     var samples = ${ sample_data | n,unicode };
     var templateEditor = $("#template-source")[0];
@@ -595,6 +607,9 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
       pasteHtmlAtCaret(_clone.html());
     });
 
+    $("body").click(function () {
+      $("#load-template").popover("hide");
+    });
 
     $("#save-template").click(function () {
       $.ajax("${ url('search:admin_core_template', core=hue_core.name) }", {
