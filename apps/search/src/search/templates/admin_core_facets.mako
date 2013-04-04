@@ -35,42 +35,42 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     <form method="POST" class="form-horizontal" data-bind="submit: submit">
 
       <div class="section">
-        <div class="alert alert-info"><h3>${_('Facets')}</h3></div>
+        <div class="alert alert-info">
+          <div class="pull-right" style="margin-top: 10px">
+            <label>
+              <input type='checkbox' data-bind="checked: properties().isEnabled" style="margin-top: -2px; margin-right: 4px"/> ${_('Enabled') }
+            </label>
+          </div>
+          <h3>${_('Facets')}</h3>
+          ${_('Facets provide an intuitive way to filter the results.')}
+          ${_('Different types of facets can be added on the following steps.')}
+          <span data-bind="visible: !properties().isEnabled()"><strong>${_('Facets are currently disabled.')}</strong></span>
+        </div>
       </div>
 
       <div id="facets" class="section">
         <ul class="nav nav-pills">
           <li class="active"><a href="#step1" class="step">${ _('Step 1: General') }</a></li>
-          <li><a href="#step2" class="step">${ _('Step 2: Field') }</a></li>
-          <li><a href="#step3" class="step">${ _('Step 3: Range') }</a></li>
-          <li><a href="#step4" class="step">${ _('Step 4: Date') }</a></li>
+          <li><a href="#step2" class="step">${ _('Step 2: Field Facets') }</a></li>
+          <li><a href="#step3" class="step">${ _('Step 3: Range Facets') }</a></li>
+          <li><a href="#step4" class="step">${ _('Step 4: Date Facets') }</a></li>
+          <li><a href="#step5" class="step">${ _('Step 5: Facets Order') }</a></li>
         </ul>
 
         <div id="step1" class="stepDetails">
-          <p>
-            ${_('Facets provide an intuitive way to filter the results.')}
-            ${_('Different types of facets can be added on the following steps.')}
-          </p>
-
-	      <div class="control-group"">
-	        <label class="control-label"> ${_('Enabled') }</label>
-	        <div class="controls">
-	          <input type='checkbox' data-bind="checked: properties().isEnabled" />	
-	        </div>
-	      </div>
-          <div class="control-group"">
+          <div class="control-group">
             <label class="control-label"> ${_('Limit') }</label>
             <div class="controls">
               <input type='number' data-bind="value: properties().limit" class="input-mini"/>
             </div>
           </div>
-          <div class="control-group"">
+          <div class="control-group">
             <label class="control-label"> ${_('Mincount') }</label>
             <div class="controls">
               <input type='number' data-bind="value: properties().mincount" class="input-mini"/>
             </div>
           </div>
-          <div class="control-group"">
+          <div class="control-group">
             <label class="control-label"> ${_('Sort') }</label>
             <div class="controls">
               <select data-bind="value: properties().sort">
@@ -82,15 +82,13 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
         </div>
 
         <div id="step2" class="stepDetails hide">
-          <div class="alert alert-info" style="margin-top: 60px"><h4>${_('Field Facets')}</h4></div>
           <div data-bind="visible: fieldFacets().length == 0" style="padding-left: 10px;margin-bottom: 20px">
             <em>${_('There are currently no field Facets defined.')}</em>
           </div>
           <div data-bind="foreach: fieldFacets">
             <div class="bubble">
-              <strong>
-                <span data-bind="text: field"></span>
-              </strong>
+              <strong><span data-bind="text: label"></span></strong>
+              <span style="color:#666;font-size: 12px">(<span data-bind="text: field"></span>)</span>
               <a class="btn btn-small" data-bind="click: $root.removeFieldFacet"><i class="icon-trash"></i></a>
             </div>
           </div>
@@ -98,21 +96,22 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
           <div class="miniform">
             ${_('Field')}
             <select id="select-field-facet" data-bind="options: fieldFacetsList, value: selectedFieldFacet"></select>
+            &nbsp;${_('Label')}
+            <input type="text" data-bind="value: selectedFieldLabel" class="input" />
             <a class="btn" data-bind="click: $root.addFieldFacet"><i class="icon-plus"></i> ${_('Add')}</a>
             &nbsp;<span id="field-facet-error" class="label label-important hide">${_('The field you are trying to add is already in the list.')}</span>
           </div>
         </div>
 
       <div id="step3" class="stepDetails hide">
-        <div class="alert alert-info" style="margin-top: 60px"><h4>${_('Range Facets')}</h4></div>
         <div data-bind="visible: rangeFacets().length == 0" style="padding-left: 10px;margin-bottom: 20px">
           <em>${_('There are currently no Range Facets defined.')}</em>
         </div>
         <div data-bind="foreach: rangeFacets">
           <div class="bubble">
-            <strong><span data-bind="text: field"></span></strong>
+            <strong><span data-bind="text: label"></span></strong>
             <span style="color:#666;font-size: 12px">
-              (<span data-bind="text: start"></span> <i class="icon-double-angle-right"></i> <span data-bind="text: end"></span>,
+              (<span data-bind="text: field"></span>, <span data-bind="text: start"></span> <i class="icon-double-angle-right"></i> <span data-bind="text: end"></span>,
               <i class="icon-resize-horizontal"></i> <span data-bind="text: gap"></span>)
             </span>
             <a class="btn btn-small" data-bind="click: $root.removeRangeFacet"><i class="icon-trash"></i></a>
@@ -122,6 +121,8 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
         <div class="miniform">
           ${_('Field')}
           <select data-bind="options: rangeFacetsList, value: selectedRangeFacet"></select>
+          &nbsp;${_('Label')}
+          <input type="text" data-bind="value: selectedRangeLabel" class="input" />
           &nbsp;${_('Start')}
           <input type="number" data-bind="value: selectedRangeStartFacet" class="input-mini" />
           &nbsp;${_('End')}
@@ -133,15 +134,14 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
       </div>
 
       <div id="step4" class="stepDetails hide">
-        <div class="alert alert-info" style="margin-top: 60px"><h4>${_('Date Facets')}</h4></div>
         <div data-bind="visible: dateFacets().length == 0" style="padding-left: 10px;margin-bottom: 20px">
           <em>${_('There are currently no Date Facets defined.')}</em>
         </div>
         <div data-bind="foreach: dateFacets">
           <div class="bubble">
-            <strong><span data-bind="text: field"></span></strong>
+            <strong><span data-bind="text: label"></span></strong>
             <span style="color:#666;font-size: 12px">
-              (<span data-bind="text: start"></span> <i class="icon-double-angle-right"></i> <span data-bind="text: end"></span>,
+              (<span data-bind="text: field"></span>, <span data-bind="text: start"></span> <i class="icon-double-angle-right"></i> <span data-bind="text: end"></span>,
               <i class="icon-resize-horizontal"></i> <span data-bind="text: gap"></span>)
             </span>
             <a class="btn btn-small" data-bind="click: $root.removeDateFacet"><i class="icon-trash"></i></a>
@@ -151,8 +151,12 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
         <div class="miniform">
           ${_('Field')}
           <select data-bind="options: dateFacetsList, value: selectedDateFacet"></select>
+          &nbsp;${_('Label')}
+          <input type="text" data-bind="value: selectedDateLabel" class="input" />
+          <br/>
+          <br/>
           <span>
-            &nbsp;${_('Range from')}
+            ${_('Range from')}
             <span data-bind="template: {name: 'scriptDateMath', data: selectedDateDateMaths()[0]}"/>
           </span>
           <span>
@@ -164,6 +168,19 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
             <span id="scriptTable" data-bind="template: {name: 'scriptDateMath', data: selectedDateDateMaths()[2]}"/>
           </span>
           <a class="btn" data-bind="click: $root.addDateFacet"><i class="icon-plus"></i> ${_('Add')}</a>
+        </div>
+      </div>
+
+      <div id="step5" class="stepDetails hide">
+        <div data-bind="visible: sortableFacets().length == 0" style="padding-left: 10px;margin-bottom: 20px">
+          <em>${_('There are currently no Facets defined.')}</em>
+        </div>
+        <div data-bind="sortable: sortableFacets">
+          <div class="bubble" style="float: none;cursor: move">
+            <i class="icon-move"></i>
+            <strong><span data-bind="text: label"></span></strong>
+            <span style="color:#666;font-size: 12px">(<span data-bind="text: field"></span>)</span>
+          </div>
         </div>
       </div>
 
@@ -195,20 +212,34 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 <link rel="stylesheet" href="/static/ext/css/bootstrap-datepicker.min.css" type="text/css" media="screen" title="no title" charset="utf-8" />
 <link href="/static/ext/css/bootstrap-editable.css" rel="stylesheet">
 
-<script src="/static/ext/js/knockout-2.1.0.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/routie-0.3.0.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/bootstrap-datepicker.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/bootstrap-editable.min.js"></script>
 <script src="/static/ext/js/moment.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/knockout-sortable.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/jquery/plugins/jquery-ui-draggable-droppable-sortable-1.8.23.min.js"></script>
 
 <script type="text/javascript">
   var DATE_FORMAT = "mm-dd-yyyy";
   var MOMENT_DATE_FORMAT = "MM-DD-YYYY";
 
-  var Facet = function (type, field, start, end, gap) {
+  function s4() {
+    return Math.floor((1 + Math.random()) * 0x10000)
+            .toString(16)
+            .substring(1);
+  }
+
+  function UUID() {
+    return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+            s4() + '-' + s4() + s4() + s4();
+  }
+
+  var Facet = function (type, field, label, start, end, gap) {
     return {
+      uuid: UUID(),
       type: type,
       field: field,
+      label: label,
       start: start,
       end: end,
       gap: gap,
@@ -217,16 +248,16 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     }
   }
 
-  var FieldFacet = function (field) {
-    return new Facet("field", field);
+  var FieldFacet = function (field, label) {
+    return new Facet("field", field, label);
   }
 
-  var RangeFacet = function (field, start, end, gap) {
-    return new Facet("range", field, start, end, gap);
+  var RangeFacet = function (field, label, start, end, gap) {
+    return new Facet("range", field, label, start, end, gap);
   }
 
-  var DateFacet = function (field, start, end, gap) {
-    return new Facet("date", field, start, end, gap);
+  var DateFacet = function (field, label, start, end, gap) {
+    return new Facet("date", field, label, start, end, gap);
   }
 
   var Properties = function (properties) {
@@ -252,8 +283,6 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     };
   }
 
-
-
   function ViewModel() {
     var self = this;
 
@@ -269,7 +298,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     self.properties = ko.observable(new Properties(${ hue_core.facets.data | n,unicode }.properties));
 
     self.fieldFacets = ko.observableArray(ko.utils.arrayMap(${ hue_core.facets.data | n,unicode }.fields, function (obj) {
-      return new FieldFacet(obj.field);
+      return new FieldFacet(obj.field, obj.label);
     }));
 
     // Remove already selected fields
@@ -279,7 +308,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     });
 
     self.rangeFacets = ko.observableArray(ko.utils.arrayMap(${ hue_core.facets.data | n,unicode }.ranges, function (obj) {
-      return new RangeFacet(obj.field, obj.start, obj.end, obj.gap);
+      return new RangeFacet(obj.field, obj.label, obj.start, obj.end, obj.gap);
     }));
 
     // Only ranges
@@ -291,7 +320,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     });
 
     self.dateFacets = ko.observableArray(ko.utils.arrayMap(${ hue_core.facets.data | n,unicode }.dates, function (obj) {
-      return new DateFacet(obj.field, new DateMath(obj.start), new DateMath(obj.end), new DateMath(obj.gap));
+      return new DateFacet(obj.field, obj.label, new DateMath(obj.start), new DateMath(obj.end), new DateMath(obj.gap));
     }));
 
     // Only dates
@@ -302,13 +331,23 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
       }
     });
 
+    self.sortableFacets = ko.observableArray([]);
+    self.sortableFacetsList = ko.computed(function() {
+      return ko.utils.arrayMap(self.sortableFacets(), function (obj) {
+        return obj.uuid;
+      })
+    }, this);
+
     self.selectedFieldFacet = ko.observable();
+    self.selectedFieldLabel = ko.observable("");
     self.selectedRangeFacet = ko.observable();
+    self.selectedRangeLabel = ko.observable("");
     self.selectedRangeStartFacet = ko.observable(0);
     self.selectedRangeEndFacet = ko.observable(100);
     self.selectedRangeGapFacet = ko.observable(10);
 
     self.selectedDateFacet = ko.observable();
+    self.selectedDateLabel = ko.observable("");
 
     self.selectedDateDateMaths = ko.observableArray([
         // Same as addDateFacet()
@@ -322,14 +361,21 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
       self.fieldFacets.remove(facet);
       self.fieldFacetsList.push(facet.field);
       self.fieldFacetsList.sort();
+      self.updateSortableFacets();
     };
 
     self.removeRangeFacet = function (facet) {
       self.rangeFacets.remove(facet);
+      self.updateSortableFacets();
     };
 
     self.removeDateFacet = function (facet) {
       self.dateFacets.remove(facet);
+      self.updateSortableFacets();
+    };
+
+    self.updateSortableFacets = function () {
+      self.sortableFacets(self.fieldFacets().concat(self.rangeFacets()).concat(self.dateFacets()));
     };
 
     self.addFieldFacet = function () {
@@ -340,9 +386,14 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
         }
       });
       if (!found){
-        self.fieldFacets.push(new FieldFacet(self.selectedFieldFacet()));
+        if (self.selectedFieldLabel() == ""){
+          self.selectedFieldLabel(self.selectedFieldFacet());
+        }
+        self.fieldFacets.push(new FieldFacet(self.selectedFieldFacet(), self.selectedFieldLabel()));
+        self.selectedFieldLabel("");
         self.fieldFacetsList.remove(self.selectedFieldFacet());
         self.properties().isEnabled(true);
+        self.updateSortableFacets();
       }
       else {
         $("#field-facet-error").show();
@@ -350,18 +401,29 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     };
 
     self.addRangeFacet = function () {
-      self.rangeFacets.push(new RangeFacet(self.selectedRangeFacet(), self.selectedRangeStartFacet(), self.selectedRangeEndFacet(), self.selectedRangeGapFacet()));
+      if (self.selectedRangeLabel() == ""){
+        self.selectedRangeLabel(self.selectedRangeFacet());
+      }
+      self.rangeFacets.push(new RangeFacet(self.selectedRangeFacet(), self.selectedRangeLabel(), self.selectedRangeStartFacet(), self.selectedRangeEndFacet(), self.selectedRangeGapFacet()));
+      self.selectedRangeLabel("");
       self.selectedRangeStartFacet("");
       self.selectedRangeEndFacet("");
       self.selectedRangeGapFacet("");
+      self.updateSortableFacets();
     };
 
     self.addDateFacet = function () {
-      self.dateFacets.push(new DateFacet(self.selectedDateFacet(), self.selectedDateDateMaths()[0], self.selectedDateDateMaths()[1], self.selectedDateDateMaths()[2]));
-      self.selectedDateDateMaths.removeAll();
-      self.selectedDateDateMaths.push(new DateMath({frequency: 10, unit: 'DAYS'}));
-      self.selectedDateDateMaths.push(new DateMath({frequency: 0, unit: 'DAYS'}));
-      self.selectedDateDateMaths.push(new DateMath({frequency: 1, unit: 'DAYS'}));
+      if (self.selectedDateLabel() == ""){
+        self.selectedDateLabel(self.selectedDateFacet());
+      }
+      self.dateFacets.push(new DateFacet(self.selectedDateFacet(), self.selectedDateLabel(), self.selectedDateDateMaths()[0], self.selectedDateDateMaths()[1], self.selectedDateDateMaths()[2]));
+      self.selectedDateLabel("");
+      self.selectedDateDateMaths([
+        new DateMath({frequency: 10, unit: 'DAYS'}),
+        new DateMath({frequency: 0, unit: 'DAYS'}),
+        new DateMath({frequency: 1, unit: 'DAYS'})
+      ]);
+      self.updateSortableFacets();
     };
 
     self.submit = function () {
@@ -370,7 +432,8 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
           'properties': ko.toJSON(self.properties),
           'fields': ko.utils.stringifyJson(self.fieldFacets),
           'ranges': ko.utils.stringifyJson(self.rangeFacets),
-          'dates': ko.toJSON(self.dateFacets)
+          'dates': ko.toJSON(self.dateFacets),
+          'order': ko.toJSON(self.sortableFacetsList)
         },
         contentType: 'application/json',
         type: 'POST',
@@ -431,6 +494,12 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
       "step4":function () {
         if (validateStep("step1") && validateStep("step2")) {
           showStep("step4");
+          viewModel.isSaveBtnVisible(false);
+        }
+      },
+      "step5":function () {
+        if (validateStep("step1") && validateStep("step2")) {
+          showStep("step5");
           viewModel.isSaveBtnVisible(true);
         }
       }

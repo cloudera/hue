@@ -37,22 +37,19 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     <form method="POST" class="form" data-bind="submit: submit">
       <div class="section">
         <div class="alert alert-info">
-          <div class="pull-right">
+          <div class="pull-right" style="margin-top: 10px">
             <label>
               <input type='checkbox' data-bind="checked: isEnabled" style="margin-top: -2px; margin-right: 4px"/> ${_('Enabled') }
             </label>
           </div>
-          <h4>${_('Highlighting')}</h4>
-        </div>
-        <div style="padding-left: 10px;margin-bottom: 20px">
-          <p>
-            ${_('Highlights the query keywords matching some of the fields below.')}
+          <h3>${_('Highlighting')}</h3>
+          ${_('Highlights the query keywords matching some of the fields below.')}
+          <strong>
             <span data-bind="visible: ! isEnabled()">
-              ${_('Highlighting is currently disabled.')}
+            ${_('Highlighting is currently disabled.')}
             </span>
-          </p>
+          </strong>
         </div>
-
         <div class="selector">
           <select data-bind="options: fields, selectedOptions: highlightedFields" size="20" multiple="true" class="hide"></select>
           <select id="fields" size="20" multiple="true"></select>
@@ -89,7 +86,6 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 </style>
 
 
-<script src="/static/ext/js/knockout-2.1.0.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/jquery/plugins/jquery-ui-draggable-droppable-sortable-1.8.23.min.js"></script>
 
 <script type="text/javascript">
