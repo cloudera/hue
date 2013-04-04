@@ -55,7 +55,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 	      <div class="control-group"">
 	        <label class="control-label"> ${_('Enabled') }</label>
 	        <div class="controls">
-	          <input type='checkbox' data-bind="checked: properties().isEnabled" />	           
+	          <input type='checkbox' data-bind="checked: properties().isEnabled" />	
 	        </div>
 	      </div>
           <div class="control-group"">
@@ -69,7 +69,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
             <div class="controls">
               <input type='number' data-bind="value: properties().mincount" class="input-mini"/>
             </div>
-          </div>          
+          </div>
           <div class="control-group"">
             <label class="control-label"> ${_('Sort') }</label>
             <div class="controls">
@@ -78,7 +78,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
                 <option value="index">index</option>
               </select>
             </div>
-          </div>          
+          </div>
         </div>
 
         <div id="step2" class="stepDetails hide">
@@ -127,7 +127,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
           &nbsp;${_('End')}
           <input type="number" data-bind="value: selectedRangeEndFacet" class="input-mini" />
           &nbsp;${_('Gap')}
-          <input type="number" data-bind="value: selectedRangeGapFacet" class="input-mini" />          
+          <input type="number" data-bind="value: selectedRangeGapFacet" class="input-mini" />
           <a class="btn" data-bind="click: $root.addRangeFacet"><i class="icon-plus"></i> ${_('Add')}</a>
         </div>
       </div>
@@ -151,22 +151,37 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
         <div class="miniform">
           ${_('Field')}
           <select data-bind="options: dateFacetsList, value: selectedDateFacet"></select>
-          &nbsp;${_('Start')}
-          <input id="dp-start" class="input-small" type="text" data-bind="value: selectedDateStartFacet" />
-          &nbsp;${_('End')}
-          <input id="dp-end" class="input-small" type="text" data-bind="value: selectedDateEndFacet" />
-          &nbsp;${_('Gap')}
-          <input type="number" data-bind="value: selectedDateGapFacet" class="input-mini" />
-          ##           <input type='checkbox' data-bind="checked: properties().isVerbatim" />
-          
-          ##<input class="input-mini" type="number" data-bind="value: selectedDateDateMaths()[0].frequency" />
-          ##<input class="input-small" type="text" data-bind="value: selectedDateDateMaths()[0].unit" />
-          ##<input class="input-small" type="text" data-bind="value: selectedDateDateMaths()[0].unit" />
-          
+          <span>
+            &nbsp;${_('Range from')}
+            <span data-bind="template: {name: 'scriptDateMath', data: selectedDateDateMaths()[0]}"/>
+          </span>
+          <span>
+            &nbsp;${_('before today until')}
+            <span  data-bind="template: {name: 'scriptDateMath', data: selectedDateDateMaths()[1]}"/>
+          </span>
+          <span>
+            &nbsp;${_('before today. Goes up by increments of')}
+            <span id="scriptTable" data-bind="template: {name: 'scriptDateMath', data: selectedDateDateMaths()[2]}"/>
+          </span>
           <a class="btn" data-bind="click: $root.addDateFacet"><i class="icon-plus"></i> ${_('Add')}</a>
         </div>
       </div>
-     </div>
+
+      <script id="scriptDateMath" type="text/html">
+        <input class="input-mini" type="number" data-bind="value: frequency" />
+        <select class="input-small" data-bind="value: unit">
+          <option value="YEAR">YEARS</option>
+          <option value="MONTH">MONTHS</option>
+          <option value="DAYS">DAYS</option>
+          <option value="DATE">DATE</option>
+          <option value="HOURS">HOURS</option>
+          <option value="MINUTES">MINUTES</option>
+          <option value="SECONDS">SECONDS</option>
+          <option value="MILLISECONDS">MILLISECONDS</option>
+        </select>
+      </script>
+
+      </div>
 
       <div class="form-actions" style="margin-top: 80px">
         <a id="backBtn" class="btn disabled disable-feedback">${ _('Back') }</a>
@@ -220,18 +235,24 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     self.isEnabled = ko.observable(properties.isEnabled);
     self.limit = ko.observable(properties.limit);
     self.mincount = ko.observable(properties.mincount);
-    self.sort = ko.observable(properties.sort);    
+    self.sort = ko.observable(properties.sort);
   }
-  
-  var DateMath = function (frequency, unit, isRounded, isVerbatim, verbatim) {
+
+  var DateMath = function (args) {
     var self = this;
 
-    self.frequency = ko.observable(frequency);
-    self.unit = ko.observable(unit);
-    self.isVerbatim = ko.observable(typeof isVerbatim !== 'undefined' ? isVerbatim : true);
-    self.verbatim = ko.observable(unit);
-    self.isRounded = ko.observable(typeof isRounded !== 'undefined' ? isRounded : true);    
+    self.frequency = ko.observable(args['frequency']);
+    self.unit = ko.observable(args['unit']);
+    self.isVerbatim = ko.observable(typeof args['isVerbatim'] !== 'undefined' ? args['isVerbatim'] : false);
+    self.verbatim = ko.observable(args['verbatim']);
+    self.isRounded = ko.observable(typeof args['isRounded'] !== 'undefined' ? args['isRounded'] : true);
+
+    self.toString = function() {
+      return self.frequency() + ' ' + self.unit();
+    };
   }
+
+
 
   function ViewModel() {
     var self = this;
@@ -244,7 +265,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     $.each(${ hue_core.fields_data | n,unicode }, function(index, field) {
       self.fullFields[field.name] = field;
     });
-    
+
     self.properties = ko.observable(new Properties(${ hue_core.facets.data | n,unicode }.properties));
 
     self.fieldFacets = ko.observableArray(ko.utils.arrayMap(${ hue_core.facets.data | n,unicode }.fields, function (obj) {
@@ -270,7 +291,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     });
 
     self.dateFacets = ko.observableArray(ko.utils.arrayMap(${ hue_core.facets.data | n,unicode }.dates, function (obj) {
-      return new DateFacet(obj.field, obj.start, obj.end, obj.gap);
+      return new DateFacet(obj.field, new DateMath(obj.start), new DateMath(obj.end), new DateMath(obj.gap));
     }));
 
     // Only dates
@@ -286,16 +307,17 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     self.selectedRangeStartFacet = ko.observable(0);
     self.selectedRangeEndFacet = ko.observable(100);
     self.selectedRangeGapFacet = ko.observable(10);
-    
-    self.selectedDateFacet = ko.observable();
-    self.selectedDateStartFacet = ko.observable(moment().subtract('days', 10).format(MOMENT_DATE_FORMAT));
-    self.selectedDateEndFacet = ko.observable(moment().format(MOMENT_DATE_FORMAT));
-    self.selectedDateGapFacet = ko.observable(10);
-    self.selectedDateIsVerbatim = ko.observable(false);
 
-    self.selectedDateDateMaths = ko.observableArray([new DateMath(10, 'DAY')]);
-    
-    
+    self.selectedDateFacet = ko.observable();
+
+    self.selectedDateDateMaths = ko.observableArray([
+        // Same as addDateFacet()
+        new DateMath({frequency: 10, unit: 'DAYS'}),
+        new DateMath({frequency: 0, unit: 'DAYS'}),
+        new DateMath({frequency: 1, unit: 'DAYS'})
+    ]);
+
+
     self.removeFieldFacet = function (facet) {
       self.fieldFacets.remove(facet);
       self.fieldFacetsList.push(facet.field);
@@ -335,10 +357,11 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     };
 
     self.addDateFacet = function () {
-      self.dateFacets.push(new DateFacet(self.selectedDateFacet(), self.selectedDateStartFacet(), self.selectedDateEndFacet(), self.selectedDateGapFacet()));
-      self.selectedDateStartFacet("");
-      self.selectedDateEndFacet("");
-      self.selectedDateGapFacet("");
+      self.dateFacets.push(new DateFacet(self.selectedDateFacet(), self.selectedDateDateMaths()[0], self.selectedDateDateMaths()[1], self.selectedDateDateMaths()[2]));
+      self.selectedDateDateMaths.removeAll();
+      self.selectedDateDateMaths.push(new DateMath({frequency: 10, unit: 'DAYS'}));
+      self.selectedDateDateMaths.push(new DateMath({frequency: 0, unit: 'DAYS'}));
+      self.selectedDateDateMaths.push(new DateMath({frequency: 1, unit: 'DAYS'}));
     };
 
     self.submit = function () {
@@ -347,7 +370,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
           'properties': ko.toJSON(self.properties),
           'fields': ko.utils.stringifyJson(self.fieldFacets),
           'ranges': ko.utils.stringifyJson(self.rangeFacets),
-          'dates': ko.utils.stringifyJson(self.dateFacets)
+          'dates': ko.toJSON(self.dateFacets)
         },
         contentType: 'application/json',
         type: 'POST',
