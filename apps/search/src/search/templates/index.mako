@@ -29,7 +29,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 <div class="search-bar">
   % if user.is_superuser:
     <div class="pull-right" style="margin-top: 4px">
-      <a class="change-settings btn" href="#"><i class="icon-edit"></i> ${ _('Customize result display') }</a>
+      <a class="change-settings" href="#"><i class="icon-edit"></i> ${ _('Customize result display') }</a>
     </div>
   % endif
   <form class="form-search" style="margin: 0">
@@ -49,6 +49,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
     </div>
     <div class="input-append">
       ${ search_form | n,unicode }
+      <div class="icon-search" style="position: absolute;top: 7px;left: 11px;background-image: url('http://twitter.github.com/bootstrap/assets/img/glyphicons-halflings.png');"></div>
       <button type="submit" class="btn">${ _('Go') }</button>
     </div>
   </form>
@@ -316,17 +317,42 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
       location.href = "?query=${solr_query["q"]}&fq=${solr_query["fq"]}&sort=" + _sort + "&rows=${solr_query["rows"]}&start=${solr_query["start"]}";
     });
 
-    $("#id_query").keydown(function() {
-      var query = $("#id_query").val();
-      $.ajax("${ url('search:query_suggest', core=hue_core.name) }" + query, {
-        type: 'GET',
-        success: function (data) {
-          if (data.message.spellcheck && ! jQuery.isEmptyObject(data.message.spellcheck.suggestions)) {
-            $('#id_query').typeahead({source: data.message.spellcheck.suggestions[1].suggestion});
-          }
-        }
-      });
+    $("#id_query").on("click", function (e) {
+      if (e.pageX - $(this).position().left >= $(this).width()) {
+        $(this).val("");
+        $("#id_query").removeClass("deletable");
+      }
+    });
 
+    $("#id_query").on("mousemove", function (e) {
+      if (e.pageX - $(this).position().left >= $(this).width() && $(this).hasClass("deletable")) {
+        $(this).css("cursor", "pointer");
+      }
+      else {
+        $(this).css("cursor", "auto");
+      }
+    });
+
+    if ($("#id_query").val().trim() != "") {
+      $("#id_query").addClass("deletable");
+    }
+
+    $("#id_query").on("keyup", function() {
+      var query = $("#id_query").val();
+      if ($.trim(query) != "") {
+        $("#id_query").addClass("deletable");
+        $.ajax("${ url('search:query_suggest', core=hue_core.name) }" + query, {
+          type: 'GET',
+          success: function (data) {
+            if (data.message.spellcheck && ! jQuery.isEmptyObject(data.message.spellcheck.suggestions)) {
+              $('#id_query').typeahead({source: data.message.spellcheck.suggestions[1].suggestion});
+            }
+          }
+        });
+      }
+      else {
+        $("#id_query").removeClass("deletable");
+      }
     });
 
   });

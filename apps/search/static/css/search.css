@@ -18,10 +18,21 @@
   padding: 10px;
   padding-left: 20px;
   padding-right: 20px;
+  text-align: center;
 }
 
 .search-bar input {
   margin-left: 10px;
+  padding-right: 20px;
+}
+.search-bar input.deletable {
+  background-image: url("../art/remove.png");
+  background-repeat: no-repeat;
+  background-position: 99% 50%;
+}
+
+.search-bar ul li {
+  text-align: right;
 }
 
 .sort-by {
