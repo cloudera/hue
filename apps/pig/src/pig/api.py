@@ -72,7 +72,25 @@ class OozieApi:
       pig_params.append({"type":"argument","value":"-param"})
       pig_params.append({"type":"argument","value":"%(name)s=%(value)s" % param})
 
-    action = Pig.objects.create(name='pig', script_path=script_path, workflow=workflow, node_type='pig', params=json.dumps(pig_params))
+    files = []
+    archives = []
+
+    for resource in pig_script.dict['resources']:
+      if resource['type'] == 'file':
+        files.append(resource['value'])
+      if resource['type'] == 'archive':
+        archives.append({"dummy": "", "name": resource['value']})
+
+    action = Pig.objects.create(
+        name='pig',
+        script_path=script_path,
+        workflow=workflow,
+        node_type='pig',
+        params=json.dumps(pig_params),
+        files=json.dumps(files),
+        archives=json.dumps(archives),
+    )
+
     action.add_node(workflow.end)
 
     start_link = workflow.start.get_link()
@@ -109,7 +127,8 @@ class OozieApi:
         'status': action.status,
         'logs': logs.get(action.name, ''),
         'progress': oozie_workflow.get_progress(),
-        'progressPercent': '%d%%' % oozie_workflow.get_progress()
+        'progressPercent': '%d%%' % oozie_workflow.get_progress(),
+        'absoluteUrl': oozie_workflow.get_absolute_url(),
       }
       workflow_actions.append(appendable)
 

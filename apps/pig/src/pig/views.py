@@ -71,6 +71,7 @@ def save(request):
     'script': request.POST.get('script'),
     'user': request.user,
     'parameters': json.loads(request.POST.get('parameters')),
+    'resources': json.loads(request.POST.get('resources')),
   }
   pig_script = create_or_update_script(**attrs)
   pig_script.is_design = True
@@ -86,17 +87,22 @@ def save(request):
 
 @show_oozie_error
 def run(request):
+  if request.method != 'POST':
+    raise PopupException(_('POST request required.'))
+
   attrs = {
     'id': request.POST.get('id'),
     'name': request.POST.get('name'),
     'script': request.POST.get('script'),
     'user': request.user,
     'parameters': json.loads(request.POST.get('parameters')),
+    'resources': json.loads(request.POST.get('resources')),
     'is_design': False
   }
-  pig_script = create_or_update_script(**attrs)
-  params = request.POST.get('parameters')
 
+  pig_script = create_or_update_script(**attrs)
+
+  params = request.POST.get('parameters')
   oozie_id = api.get(request.fs, request.user).submit(pig_script, params)
 
   pig_script.update_from_dict({'job_id': oozie_id})

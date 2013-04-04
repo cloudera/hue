@@ -31,7 +31,15 @@ class TestPigBase(object):
     self.user = User.objects.get(username='test')
 
   def create_script(self):
-    return create_or_update_script(10000, 'Test', 'A = LOAD "$data"; STOPE A INTO "$output";', self.user)
+    attrs = {
+      'id': 1000,
+      'name': 'Test',
+      'script': 'A = LOAD "$data"; STORE A INTO "$output";',
+      'user': self.user,
+      'parameters': [],
+      'resources': [],
+    }
+    return create_or_update_script(**attrs)
 
 
 class TestMock(TestPigBase):

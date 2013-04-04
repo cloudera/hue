@@ -14,6 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+var Resource = function (resource) {
+  var self = this;
+
+  self.type = ko.observable(resource.type);
+  self.value = ko.observable(resource.value);
+};
 
 var PigScript = function (pigScript) {
   var self = this;
@@ -56,6 +62,16 @@ var PigScript = function (pigScript) {
       });
     }
     return params;
+  };
+  self.resources = ko.observableArray([]);
+  ko.utils.arrayForEach(pigScript.resources, function (resource) {
+    self.resources.push(new Resource({type: resource.type, value: resource.value}));
+  });
+  self.addResource = function () {
+    self.resources.push(new Resource({type: 'file', value: ''}));
+  };
+  self.removeResource = function () {
+    self.resources.remove(this);
   };
 }
 
@@ -111,6 +127,7 @@ var PigViewModel = function (scripts, props) {
     name: self.LABELS.NEW_SCRIPT_NAME,
     script: self.LABELS.NEW_SCRIPT_CONTENT,
     parameters: self.LABELS.NEW_SCRIPT_PARAMETERS,
+    resources: self.LABELS.NEW_SCRIPT_RESOURCES
   };
 
   self.currentScript = ko.observable(new PigScript(_defaultScript));
@@ -260,7 +277,21 @@ var PigViewModel = function (scripts, props) {
       keyboard: true,
       show: true
     });
-  }
+  };
+
+  self.showFileChooser = function showFileChooser() {
+    var inputPath = this;
+    var path = inputPath.value().substr(0, inputPath.value().lastIndexOf("/"));
+    $("#filechooser").jHueFileChooser({
+      initialPath: path,
+      onFileChoose: function (filePath) {
+        inputPath.value(filePath);
+        $("#chooseFile").modal("hide");
+      },
+      createFolder: false
+    });
+    $("#chooseFile").modal("show");
+  };
 
   function showDeleteModal() {
     $(".deleteMsg").addClass("hide");
@@ -288,7 +319,8 @@ var PigViewModel = function (scripts, props) {
           id: script.id(),
           name: script.name(),
           script: script.script(),
-          parameters: ko.utils.stringifyJson(script.parameters())
+          parameters: ko.utils.stringifyJson(script.parameters()),
+          resources: ko.toJSON(script.resources())
         },
         function (data) {
           self.currentScript().id(data.id);
@@ -304,7 +336,8 @@ var PigViewModel = function (scripts, props) {
           id: script.id(),
           name: script.name(),
           script: script.script(),
-            parameters: ko.utils.stringifyJson(self.submissionVariables())
+          parameters: ko.utils.stringifyJson(self.submissionVariables()),
+          resources: ko.toJSON(script.resources())
         },
         function (data) {
           if (data.id && self.currentScript().id() != data.id){

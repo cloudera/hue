@@ -47,15 +47,22 @@ class Document(models.Model):
 
 
 class PigScript(Document):
-  _ATTRIBUTES = ['script', 'name', 'properties', 'job_id', 'parameters']
+  _ATTRIBUTES = ['script', 'name', 'properties', 'job_id', 'parameters', 'resources']
 
-  data = models.TextField(default=json.dumps({'script': '', 'name': '', 'properties': [], 'job_id': None, 'parameters': []}))
+  data = models.TextField(default=json.dumps({
+      'script': '',
+      'name': '',
+      'properties': [],
+      'job_id': None,
+      'parameters': [],
+      'resources': []
+  }))
 
   def update_from_dict(self, attrs):
     data_dict = self.dict
 
     for attr in PigScript._ATTRIBUTES:
-      if attrs.get(attr):
+      if attrs.get(attr) is not None:
         data_dict[attr] = attrs[attr]
 
     self.data = json.dumps(data_dict)
@@ -70,16 +77,20 @@ class Submission(models.Model):
   workflow = models.ForeignKey(Workflow)
 
 
-def create_or_update_script(id, name, script, user, parameters, is_design=True):
-  """Take care of security"""
+def create_or_update_script(id, name, script, user, parameters, resources, is_design=True):
+  """This take care of security"""
   try:
     pig_script = PigScript.objects.get(id=id)
     pig_script.can_edit_or_exception(user)
   except:
     pig_script = PigScript.objects.create(owner=user, is_design=is_design)
 
-  pig_script.update_from_dict({'name': name, 'script': script, 'parameters': parameters})
-  pig_script.save()
+  pig_script.update_from_dict({
+      'name': name,
+      'script': script,
+      'parameters': parameters,
+      'resources': resources
+  })
 
   return pig_script
 
@@ -88,12 +99,13 @@ def get_scripts(user, max_count=200):
   scripts = []
 
   for script in PigScript.objects.filter(owner=user).order_by('-id')[:max_count]:
-    data = json.loads(script.data)
+    data = script.dict
     massaged_script = {
       'id': script.id,
       'name': data['name'],
       'script': data['script'],
       'parameters': data['parameters'],
+      'resources': data['resources'],
       'isDesign': script.is_design,
     }
     scripts.append(massaged_script)

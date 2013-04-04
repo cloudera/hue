@@ -28,7 +28,6 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
       <li class="active"><a href="#editor">${ _('Editor') }</a></li>
       <li><a href="#scripts">${ _('Scripts') }</a></li>
       <li><a href="#dashboard">${ _('Dashboard') }</a></li>
-      ##<li class="${utils.is_selected(section, 'udfs')}"><a href="${ url('pig:udfs') }">${ _('UDF') }</a></li>
       </ul>
   </div>
 </div>
@@ -115,9 +114,9 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
             <li data-bind="click: editScriptProperties" data-section="properties">
               <a href="#"><i class="icon-reorder"></i> ${ _('Edit properties') }</a>
             </li>
-            ##<li class="nav-header">${_('UDF')}</li>
+            ##<li class="nav-header">${_('Python UDF')}</li>
             ##<li><a href="#createDataset">${ _('New') }</a></li>
-            ##<li><a href="#createDataset">${ _('Add') }</a></li>
+            ##<li><a href="#createDataset">${ _('List') }</a></li>
             <li class="nav-header">${_('Actions')}</li>
             <li data-bind="click: saveScript">
               <a href="#" title="${ _('Save the script') }" rel="tooltip" data-placement="right">
@@ -200,6 +199,51 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
               </tfoot>
             </table>
           </div>
+          <br/>
+          <label>${ _('Resources') } &nbsp;
+            <button class="btn" data-bind="click: currentScript().addResource, visible: currentScript().resources().length == 0" style="margin-left: 4px">
+              <i class="icon-plus"></i> ${ _('Add') }
+            </button>
+          </label>
+          <div>
+            <table data-bind="css: {'parameterTable': currentScript().resources().length > 0}">
+              <thead data-bind="visible: currentScript().resources().length > 0">
+                <tr>
+                  <th>${ _('Type') }</th>
+                  <th>${ _('Value') }</th>
+                  <th>&nbsp;</th>
+                </tr>
+              </thead>
+              <tbody data-bind="foreach: currentScript().resources">
+                <tr>
+                  <td>
+                    <select type="text" data-bind="value: type" class="input-large">
+                      ##<option value="udf">${ _('UDF') }</option>
+                      <option value="file">${ _('File') }</option>
+                      <option value="archive">${ _('Archive') }</option>
+                    </select>
+                  </td>
+                  <td>
+                    <div class="input-append">
+                      <input type="text" data-bind="value: value" class="input-xxlarge" />
+                      <button class="btn fileChooserBtn" data-bind="click: $root.showFileChooser">..</button>
+                    </div>
+                  </td>
+                  <td>
+                    <button data-bind="click: viewModel.currentScript().removeResource" class="btn">
+                    <i class="icon-trash"></i> ${ _('Remove') }</button>
+                  </td>
+                </tr>
+              </tbody>
+              <tfoot data-bind="visible: currentScript().resources().length > 0">
+                <tr>
+                  <td colspan="3">
+                    <button class="btn" data-bind="click: currentScript().addResource"><i class="icon-plus"></i> ${ _('Add') }</button>
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
         </form>
       </div>
 
@@ -211,11 +255,13 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
         <div data-bind="template: {name: 'logTemplate', foreach: currentScript().actions}"></div>
         <script id="logTemplate" type="text/html">
           <div data-bind="css:{'alert-modified': name != '', 'alert': name != '', 'alert-success': status == 'SUCCEEDED' || status == 'OK', 'alert-error': status != 'RUNNING' && status != 'SUCCEEDED' && status != 'OK' && status != 'PREP'}">
-            <div class="pull-right" data-bind="text: status"></div>
-              <h4>${ _('Progress:') } <span data-bind="text: progress"></span>${ _('%') }</h4>
-              <div data-bind="css: {'progress': name != '', 'progress-striped': name != '', 'active': status == 'RUNNING'}" style="margin-top:10px">
-                <div data-bind="css: {'bar': name != '', 'bar-success': status == 'SUCCEEDED' || status == 'OK', 'bar-warning': status == 'RUNNING' || status == 'PREP', 'bar-danger': status != 'RUNNING' && status != 'SUCCEEDED' && status != 'OK' && status != 'PREP'}, attr: {'style': 'width:' + progressPercent}"></div>
-              </div>
+            <div class="pull-right">
+              <i class="icon-share-alt"></i> <a data-bind="text: status, visible: absoluteUrl != '', attr: {'href': absoluteUrl}" target="_blank"/>
+            </div>
+            <h4>${ _('Progress:') } <span data-bind="text: progress"></span>${ _('%') }</h4>
+            <div data-bind="css: {'progress': name != '', 'progress-striped': name != '', 'active': status == 'RUNNING'}" style="margin-top:10px">
+              <div data-bind="css: {'bar': name != '', 'bar-success': status == 'SUCCEEDED' || status == 'OK', 'bar-warning': status == 'RUNNING' || status == 'PREP', 'bar-danger': status != 'RUNNING' && status != 'SUCCEEDED' && status != 'OK' && status != 'PREP'}, attr: {'style': 'width:' + progressPercent}"></div>
+            </div>
           </div>
           <pre data-bind="visible: logs == ''">${ _('No available logs.') }</pre>
           <pre data-bind="visible: logs != '', text: logs"></pre>
@@ -226,7 +272,7 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
   </div>
 
   <div id="dashboard" class="row-fluid mainSection hide">
-    <h3>Running</h3>
+    <h3>${ _('Running') }</h3>
     <div class="alert alert-info" data-bind="visible: runningScripts().length == 0">
       ${_('There are currently no running scripts.')}
     </div>
@@ -243,7 +289,7 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
       </tbody>
     </table>
 
-    <h3>Completed</h3>
+    <h3>${ _('Completed') }</h3>
     <div class="alert alert-info" data-bind="visible: completedScripts().length == 0">
       ${_('There are currently no completed scripts.')}
     </div>
@@ -313,6 +359,18 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
   </div>
 </div>
 
+<div id="chooseFile" class="modal hide fade">
+    <div class="modal-header">
+        <a href="#" class="close" data-dismiss="modal">&times;</a>
+        <h3>${_('Choose a file')}</h3>
+    </div>
+    <div class="modal-body">
+        <div id="filechooser">
+        </div>
+    </div>
+    <div class="modal-footer">
+    </div>
+</div>
 
 <div class="bottomAlert alert"></div>
 
@@ -328,6 +386,11 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
 <script src="/static/js/Source/jHue/codemirror-pig-hint.js"></script>
 <link rel="stylesheet" href="/static/ext/css/codemirror-show-hint.css">
 
+<style>
+  .fileChooserBtn {
+    border-radius: 0 3px 3px 0;
+  }
+</style>
 
 <script type="text/javascript" charset="utf-8">
 
@@ -338,7 +401,8 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
     SAVED: "${ _('Saved') }",
     NEW_SCRIPT_NAME: "${ _('Unsaved script') }",
     NEW_SCRIPT_CONTENT: "ie. A = LOAD '/user/${ user }/data';",
-    NEW_SCRIPT_PARAMETERS: []
+    NEW_SCRIPT_PARAMETERS: [],
+    NEW_SCRIPT_RESOURCES: []
   };
 
   var scripts = ${ scripts | n,unicode };
@@ -356,7 +420,6 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
   ko.applyBindings(viewModel);
 
   $(document).ready(function () {
-
     var scriptEditor = $("#scriptEditor")[0];
 
     CodeMirror.commands.autocomplete = function(cm) {
@@ -588,7 +651,6 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
         showSection("editor", "logs");
       }
     });
-
   });
 
   var _bottomAlertFade = -1;
