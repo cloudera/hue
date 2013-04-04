@@ -374,11 +374,9 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 <link rel="stylesheet" href="/static/ext/farbtastic/farbtastic.css">
 <link rel="stylesheet" href="/static/ext/css/freshereditor.css">
 <link rel="stylesheet" href="/static/ext/css/codemirror.css">
-<link rel="stylesheet" href="/static/ext/chosen/chosen.css">
 
 <script src="/static/ext/js/knockout-2.1.0.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/farbtastic/farbtastic.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/chosen/chosen.jquery.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/shortcut.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/freshereditor.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/codemirror-3.0.js"></script>

@@ -37,21 +37,18 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     <form method="POST" class="form-horizontal" data-bind="submit: submit">
       <div class="section">
         <div class="alert alert-info">
-          <div class="pull-right">
+          <div class="pull-right" style="margin-top: 10px">
             <label>
               <input type='checkbox' data-bind="checked: isEnabled" style="margin-top: -2px; margin-right: 4px"/> ${_('Enabled') }
             </label>
           </div>
-          <h4>${_('Sorting')}</h4>
+          <h3>${_('Sorting')}</h3>
+          ${_('Specify on which field and order the results are sorted.')}
+          <span data-bind="visible: ! isEnabled()"><strong>${_('Sorting is currently disabled.')}</strong></span>
         </div>
-        ${_('Specify on which field and order the results are sorted.')}
-        <span data-bind="visible: ! isEnabled()">
-          ${_('Sorting is currently disabled.')}
-        </span>
       </div>
 
       <div class="section">
-        <div class="alert alert-info" style="margin-top: 60px"><h4>${_('Sorting Fields')}</h4></div>
         <div data-bind="visible: sortingFields().length == 0" style="padding-left: 10px;margin-bottom: 20px">
           <em>${_('There are currently no fields defined.')}</em>
         </div>
@@ -109,7 +106,6 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 </style>
 
 
-<script src="/static/ext/js/knockout-2.1.0.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/jquery/plugins/jquery-ui-draggable-droppable-sortable-1.8.23.min.js"></script>
 
 <script type="text/javascript">
