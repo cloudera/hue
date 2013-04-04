@@ -24,4 +24,4 @@ SOLR_URL = Config(
   key="solr_url",
   help=_("URL of the Solr Server."),
   private=False,
-  default="http://c1328.halxg.cloudera.com:8983/solr/")
+  default="http://localhost:1978/solr/")
