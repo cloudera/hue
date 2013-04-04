@@ -19,7 +19,7 @@ try:
   import json
 except ImportError:
   import simplejson as json
-  
+
 from datetime import datetime
 from lxml import etree
 import re
@@ -57,7 +57,7 @@ class Facet(models.Model):
     data_dict = json.loads(self.data)
 
     properties = data_dict.get('properties')
-    
+
     params = (
         ('facet', properties.get('isEnabled') and 'true' or 'false'),
         ('facet.limit', properties.get('limit')),
@@ -81,14 +81,17 @@ class Facet(models.Model):
 
     if data_dict.get('dates'):
       for field_facet in data_dict['dates']:
-        start = datetime.strptime(field_facet['start'], '%m-%d-%Y') - datetime.now()
-        end = datetime.strptime(field_facet['end'], '%m-%d-%Y') - datetime.now()
+        start = field_facet['start']
+        end = field_facet['end']
+        gap = field_facet['gap']
+
         range_facets = tuple([
                            ('facet.date', field_facet['field']),
-                           ('f.%s.facet.date.start' % field_facet['field'], '%sDAYS/DAY' % start.days),
-                           ('f.%s.facet.date.end' % field_facet['field'], '%sDAYS/DAY' % end.days),
-                           ('f.%s.facet.date.gap' % field_facet['field'], '+%sDAY' % field_facet['gap']),]
+                           ('f.%s.facet.date.start' % field_facet['field'], '%(frequency)s%(unit)s' % start), # if rounded add /DAY
+                           ('f.%s.facet.date.end' % field_facet['field'], '%(frequency)s%(unit)s' % end),
+                           ('f.%s.facet.date.gap' % field_facet['field'], '%(frequency)s%(unit)s' % gap),]
                         )
+
         params += range_facets
 
     return params
