@@ -25,33 +25,42 @@
 ${ commonheader(_('Search'), "search", user) | n,unicode }
 
 <style type="text/css">
-  .preview-row:nth-child(odd) {
-    background-color:#f9f9f9;
-  }
-  .tmpl {
-    border: 1px solid #CCC;
-    margin: 10px;
-    height: 80px;
-    cursor: pointer;
-  }
-  .tmpl:hover {
-    border: 1px solid #999;
-  }
-  .tmpl.selected {
-    border: 2px solid #999;
-  }
-  .space {
-    display: block;
-    font-size: 6px;
-    height: 6px;
-    line-height: 6px;
-  }
-
   .CodeMirror {
     border: 1px solid #CDCDCD;
   }
 
-    /* Widgets */
+  #content-editor {
+    outline: 0;
+    border: 1px solid #CDCDCD;
+  }
+
+  #content-editor [class*="span"], .tmpl [class*="span"] {
+    background-color: #eee;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    min-height: 40px;
+    line-height: 40px;
+    background-color: #F3F3F3;
+    border: 2px dashed #DDD;
+  }
+
+  .tmpl {
+    margin: 10px;
+    height: 60px;
+  }
+
+  .tmpl [class*="span"] {
+    color: #999;
+    font-size: 12px;
+    text-align: center;
+    font-weight: bold;
+  }
+
+  .preview-row:nth-child(odd) {
+    background-color: #f9f9f9;
+  }
+
   .widget-box {
     background: none repeat scroll 0 0 #F9F9F9;
     border-top: 1px solid #CDCDCD;
@@ -71,7 +80,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     background-image: -ms-linear-gradient(top, #fdfdfd 0%, #eaeaea 100%);
     background-image: -o-linear-gradient(top, #fdfdfd 0%, #eaeaea 100%);
     background-image: -linear-gradient(top, #fdfdfd 0%, #eaeaea 100%);
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fdfdfd', endColorstr='#eaeaea',GradientType=0 ); /* IE6-9 */
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fdfdfd', endColorstr='#eaeaea', GradientType=0); /* IE6-9 */
     border-bottom: 1px solid #CDCDCD;
     height: 36px;
   }
@@ -82,6 +91,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     float: left;
     opacity: .7;
   }
+
   .widget-title h5 {
     color: #666666;
     text-shadow: 0 1px 0 #ffffff;
@@ -98,6 +108,9 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     border-bottom: 1px solid #cdcdcd;
   }
 
+  .carousel-control {
+    top: 100%;
+  }
 </style>
 
 <%layout:skeleton>
@@ -123,8 +136,8 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
             <div id="toolbar"></div>
             <div id="content-editor" class="clear" style="margin-top: 20px; min-height: 300px">${ hue_core.result.get_template() | n,unicode }</div>
             <div id="load-template" class="btn-group">
-              <a title="Load template" class="btn toolbar-btn toolbar-cmd">
-                <i class="icon-paste" style="margin-top:2px;"></i>
+              <a title="Layout" class="btn toolbar-btn toolbar-cmd">
+                <i class="icon-th-large" style="margin-top:2px;"></i>
               </a>
             </div>
           </div>
@@ -233,27 +246,117 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     <div id="load-template-modal" class="modal hide fade">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h3>${_('Load template')}</h3>
+        <h3>${_('Insert layout')}</h3>
       </div>
       <div class="modal-body">
-        <div class="tmpl">
-          <div class="row-fluid">
-            <div class="span1"><img src="http://twitter.com/api/users/profile_image/{{user_screen_name}}" style="margin:20px"></div>
-            <div class="span9">
-              <h5>{{user_name}}</h5>
-              {{text}}
+        <div id="layoutCarousel" class="carousel slide">
+          <div class="carousel-inner">
+            <div class="item active">
+              <div class="tmpl">
+                <div class="row-fluid">
+                  <div class="span12">12</div>
+                </div>
+              </div>
             </div>
-            <div class="span2"><br><a class="btn" href="https://twitter.com/{{user_screen_name}}/status/{{id}}" target="_blank"><i class="icon-twitter"></i></a></div>
+            <div class="item">
+              <div class="tmpl">
+                <div class="row-fluid">
+                  <div class="span1">1</div>
+                  <div class="span11">11</div>
+                </div>
+              </div>
+            </div>
+            <div class="item">
+              <div class="tmpl">
+                <div class="row-fluid">
+                  <div class="span2">2</div>
+                  <div class="span10">10</div>
+                </div>
+              </div>
+            </div>
+            <div class="item">
+              <div class="tmpl">
+                <div class="row-fluid">
+                  <div class="span3">3</div>
+                  <div class="span9">9</div>
+                </div>
+              </div>
+            </div>
+            <div class="item">
+              <div class="tmpl">
+                <div class="row-fluid">
+                  <div class="span4">4</div>
+                  <div class="span8">8</div>
+                </div>
+              </div>
+            </div>
+            <div class="item">
+              <div class="tmpl">
+                <div class="row-fluid">
+                  <div class="span6">6</div>
+                  <div class="span6">6</div>
+                </div>
+              </div>
+            </div>
+            <div class="item">
+              <div class="tmpl">
+                <div class="row-fluid">
+                  <div class="span4">4</div>
+                  <div class="span4">4</div>
+                  <div class="span4">4</div>
+                </div>
+              </div>
+            </div>
+            <div class="item">
+              <div class="tmpl">
+                <div class="row-fluid">
+                  <div class="span3">3</div>
+                  <div class="span3">3</div>
+                  <div class="span3">3</div>
+                  <div class="span3">3</div>
+                </div>
+              </div>
+            </div>
+            <div class="item">
+              <div class="tmpl">
+                <div class="row-fluid">
+                  <div class="span8">8</div>
+                  <div class="span4">4</div>
+                </div>
+              </div>
+            </div>
+            <div class="item">
+              <div class="tmpl">
+                <div class="row-fluid">
+                  <div class="span9">9</div>
+                  <div class="span3">3</div>
+                </div>
+              </div>
+            </div>
+            <div class="item">
+              <div class="tmpl">
+                <div class="row-fluid">
+                  <div class="span10">10</div>
+                  <div class="span2">2</div>
+                </div>
+              </div>
+            </div>
+            <div class="item">
+              <div class="tmpl">
+                <div class="row-fluid">
+                  <div class="span11">11</div>
+                  <div class="span1">1</div>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-        <div class="tmpl">
-          <h5>{{user_name}} <span style="color:#999">({{user_screen_name}})</span></h5>
-          <p>{{text}}</p>
+          <a class="left carousel-control" href="#layoutCarousel" data-slide="prev">&laquo;</a>
+          <a class="right carousel-control" href="#layoutCarousel" data-slide="next">&raquo;</a>
         </div>
       </div>
       <div class="modal-footer">
         <a href="#" class="btn" data-dismiss="modal">${_('Cancel')}</a>
-        <button type="button" id="load-template-btn" href="#" class="btn btn-primary" disabled="disabled">${_('Load template')}</button>
+        <button type="button" id="load-template-btn" href="#" class="btn btn-primary" disabled="disabled">${_('Insert layout')}</button>
       </div>
     </div>
 
@@ -275,8 +378,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 <script type="text/javascript">
 
   $(document).ready(function () {
-
-    $("li[rel='tooltip']").tooltip();
+    $("#layoutCarousel").carousel("pause");
 
     $("#content-editor").on("mouseup", function () {
       storeSelection();
@@ -384,16 +486,16 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     var templateEditor = $("#template-source")[0];
 
     var codeMirror = CodeMirror(function (elt) {
-        templateEditor.parentNode.replaceChild(elt, templateEditor);
-      }, {
-        value: templateEditor.value,
-        readOnly: false,
-        lineNumbers: true
+      templateEditor.parentNode.replaceChild(elt, templateEditor);
+    }, {
+      value: templateEditor.value,
+      readOnly: false,
+      lineNumbers: true
     });
 
     $("#content-editor").freshereditor({
-        toolbar_selector: "#toolbar",
-        excludes: ['strikethrough', 'removeFormat', 'backcolor', 'insertorderedlist', 'justifyfull', 'insertheading1', 'insertheading2', 'superscript', 'subscript']
+      toolbar_selector: "#toolbar",
+      excludes: ['strikethrough', 'removeFormat', 'backcolor', 'insertorderedlist', 'justifyfull', 'insertheading1', 'insertheading2', 'superscript', 'subscript']
     });
     $("#content-editor").freshereditor("edit", true);
 
@@ -460,27 +562,37 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
       }, 300);
     });
 
-    $("#load-template").appendTo($("#toolbar .btn-toolbar")).removeClass("hide");
+    $("#load-template").prependTo($("#toolbar .btn-toolbar")).removeClass("hide");
 
     $("#load-template-modal").modal({
       show: false
     });
 
-    $("#load-template .btn").click(function(){
-      $(".tmpl.selected").removeClass("selected");
+    $("#load-template .btn").on("hover", function () {
+      $("#load-template").popover("hide");
+    });
+
+    $("#load-template .btn").click(function () {
+      $("#load-template-btn").button("reset");
+      $("#load-template").popover("hide");
       $("#load-template-modal").modal("show");
-      $("#load-template-btn").attr("disabled", "disabled");
     });
 
-    $(".tmpl").click(function(){
-      $(".tmpl.selected").removeClass("selected");
-      $(this).addClass("selected");
-      $("#load-template-btn").removeAttr("disabled");
-    });
+    if ($("#content-editor").text().trim() == "") {
+      $("#load-template").popover({
+        placement: "bottom",
+        title: "${ _('Start with this!') }",
+        content: "${ _('You can add a layout from here') }"
+      });
+      $("#load-template").popover("show");
+    }
 
-    $("#load-template-btn").click(function(){
+    $("#load-template-btn").click(function () {
       $("#load-template-modal").modal("hide");
-      $("#content-editor").html($(".tmpl.selected").html());
+      $("#content-editor").focus();
+      var _clone = $("#layoutCarousel .item.active .tmpl").clone();
+      _clone.find("[class*='span']").text("");
+      pasteHtmlAtCaret(_clone.html());
     });
 
 
@@ -497,7 +609,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
         error: function (data) {
           $.jHueNotify.error("${_('Error: ')}" + data);
         },
-        complete: function() {
+        complete: function () {
           $("#save-template").button('reset');
         }
       });
