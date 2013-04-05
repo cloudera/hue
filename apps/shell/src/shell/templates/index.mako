@@ -28,7 +28,7 @@ ${ commonheader(_('Hue Shell'), "shell", user, "100px") | n,unicode }
                 % if shell["exists"]:
                     <li><a href="${url('shell.views.create')}?keyName=${shell["keyName"]}" class="${shell["keyName"]}">${shell["niceName"]}</a></li>
                 % else:
-                    <li><a href="#" class="disabled">${shell["niceName"]}</a></li>
+                    <li class="disabled"><a>${shell["niceName"]}</a></li>
                 % endif
             % endfor
         </ul>
@@ -93,6 +93,11 @@ ${ commonheader(_('Hue Shell'), "shell", user, "100px") | n,unicode }
 
 <script type="text/javascript" charset="utf-8">
     $(document).ready(function(){
+        $(".disabled").tooltip({
+          title: '${_("The shell is not present on the Hue host.")}',
+          placement: 'bottom'
+        });
+
         var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
         for (var i=0;i<hashes.length;i++){
             if (hashes[i].indexOf("keyName")>-1){
