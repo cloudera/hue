@@ -40,10 +40,7 @@ LOG = logging.getLogger(__name__)
 
 
 def app(request):
-  return render('app.mako', request, {
-    'scripts': json.dumps(get_scripts(request.user))
-    }
-  )
+  return render('app.mako', request, {})
 
 
 def scripts(request):

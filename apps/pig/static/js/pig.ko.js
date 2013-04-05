@@ -88,9 +88,11 @@ var Workflow = function (wf) {
     duration: wf.duration,
     appName: wf.appName,
     progress: wf.progress,
+    progressPercent: wf.progressPercent,
     progressClass: "bar " + getStatusClass(wf.status, "bar-"),
     user: wf.user,
     absoluteUrl: wf.absoluteUrl,
+    watchUrl: wf.watchUrl,
     canEdit: wf.canEdit,
     killUrl: wf.killUrl,
     created: wf.created,
@@ -99,7 +101,7 @@ var Workflow = function (wf) {
 }
 
 
-var PigViewModel = function (scripts, props) {
+var PigViewModel = function (props) {
   var self = this;
 
   self.LABELS = props.labels;
@@ -114,9 +116,7 @@ var PigViewModel = function (scripts, props) {
   self.allSelected = ko.observable(false);
   self.submissionVariables = ko.observableArray([]);
 
-  self.scripts = ko.observableArray(ko.utils.arrayMap(scripts, function (pigScript) {
-    return new PigScript(pigScript);
-  }));
+  self.scripts = ko.observableArray([]);
 
   self.filteredScripts = ko.observableArray(self.scripts());
 
@@ -385,7 +385,46 @@ var PigViewModel = function (scripts, props) {
 
   self.viewSubmittedScript = function (workflow) {
     self.loadScript(workflow.scriptId);
-    $(document).trigger("loadEditor");
-    $(document).trigger("showEditor");
+    self.currentScript().isRunning(true);
+    self.currentScript().watchUrl(workflow.watchUrl);
+    $(document).trigger("startLogsRefresh");
+    $(document).trigger("showLogs");
+  };
+
+  self.showLogsInterval = -1;
+  self.showLogsAtEnd = true;
+  self.showLogs = function (workflow) {
+    window.clearInterval(self.showLogsInterval);
+    $("#logsModal pre").scroll(function () {
+      self.showLogsAtEnd = $(this).scrollTop() + $(this).height() + 20 >= $(this)[0].scrollHeight;
+    });
+    if (workflow.isRunning) {
+      $("#logsModal img").removeClass("hide");
+      $("#logsModal pre").addClass("hide");
+      $("#logsModal").modal({
+        keyboard: true,
+        show: true
+      });
+      $("#logsModal").on("hide", function () {
+        window.clearInterval(self.showLogsInterval);
+      });
+      self.showLogsInterval = window.setInterval(function () {
+        $.getJSON(workflow.watchUrl, function (data) {
+          if (data.workflow && !data.workflow.isRunning) {
+            window.clearInterval(self.showLogsInterval);
+          }
+          if (data.logs.pig) {
+            $("#logsModal img").addClass("hide");
+            $("#logsModal pre").removeClass("hide");
+            var _logsEl = $("#logsModal pre");
+            var newLines = data.logs.pig.split("\n").slice(_logsEl.text().split("\n").length);
+            _logsEl.text(_logsEl.text() + newLines.join("\n"));
+            if (self.showLogsAtEnd) {
+              _logsEl.scrollTop(_logsEl[0].scrollHeight - _logsEl.height());
+            }
+          }
+        });
+      }, 1000);
+    }
   };
 };

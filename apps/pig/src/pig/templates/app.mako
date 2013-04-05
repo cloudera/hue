@@ -28,7 +28,7 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
       <li class="active"><a href="#editor">${ _('Editor') }</a></li>
       <li><a href="#scripts">${ _('Scripts') }</a></li>
       <li><a href="#dashboard">${ _('Dashboard') }</a></li>
-      </ul>
+    </ul>
   </div>
 </div>
 
@@ -269,46 +269,67 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
         </div>
 
       </div>
-    </div>
-
   </div>
 
   <div id="dashboard" class="row-fluid mainSection hide">
-    <h3>${ _('Running') }</h3>
-    <div class="alert alert-info" data-bind="visible: runningScripts().length == 0">
-      ${_('There are currently no running scripts.')}
+    <ul class="nav nav-tabs">
+      <li class="active"><a href="#runningScripts" data-toggle="tab">${ _('Running') }</a></li>
+      <li><a href="#completedScripts" data-toggle="tab">${ _('Completed') }</a></li>
+    </ul>
+    <div class="tab-content">
+      <div class="tab-pane active" id="runningScripts">
+        <div class="alert alert-info" data-bind="visible: runningScripts().length == 0">
+          ${_('There are currently no running scripts.')}
+        </div>
+        <table class="table table-striped table-condensed datatables tablescroller-disable" data-bind="visible: runningScripts().length > 0">
+          <thead>
+          <tr>
+            <th width="20%">${_('Name')}</th>
+            <th width="40%">${_('Progress')}</th>
+            <th>${_('Created on')}</th>
+            <th width="30">&nbsp;</th>
+          </tr>
+          </thead>
+          <tbody data-bind="template: {name: 'runningTemplate', foreach: runningScripts}">
+
+          </tbody>
+        </table>
+      </div>
+      <div class="tab-pane" id="completedScripts">
+        <div class="alert alert-info" data-bind="visible: completedScripts().length == 0">
+          ${_('There are currently no completed scripts.')}
+        </div>
+        <table class="table table-striped table-condensed datatables tablescroller-disable" data-bind="visible: completedScripts().length > 0">
+          <thead>
+          <tr>
+            <th width="20%">${_('Name')}</th>
+            <th width="40%">${_('Status')}</th>
+            <th>${_('Created on')}</th>
+          </tr>
+          </thead>
+          <tbody data-bind="template: {name: 'completedTemplate', foreach: completedScripts}">
+
+          </tbody>
+        </table>
+      </div>
     </div>
-    <table class="table table-striped table-condensed datatables tablescroller-disable" data-bind="visible: runningScripts().length > 0">
-      <thead>
-      <tr>
-        <th width="20%">${_('Name')}</th>
-        <th width="10%">${_('Status')}</th>
-        <th width="">${_('Created on')}</th>
+
+    <script id="runningTemplate" type="text/html">
+      <tr style="cursor: pointer">
+        <td data-bind="click: $root.viewSubmittedScript" title="${_('Click to edit')}">
+          <strong><a data-bind="text: appName"></a></strong>
+        </td>
+        <td>
+          <div data-bind="css: {'progress': appName != '', 'progress-striped': appName != '', 'active': status == 'RUNNING'}">
+            <div data-bind="css: {'bar': appName != '', 'bar-success': status == 'SUCCEEDED' || status == 'OK', 'bar-warning': status == 'RUNNING' || status == 'PREP', 'bar-danger': status != 'RUNNING' && status != 'SUCCEEDED' && status != 'OK' && status != 'PREP'}, attr: {'style': 'width:' + progressPercent}"></div>
+          </div>
+        </td>
+        <td data-bind="text: created"></td>
+        <td data-bind="click: $root.showLogs"><i class="icon-tasks"></i></td>
       </tr>
-      </thead>
-      <tbody data-bind="template: {name: 'dashboardTemplate', foreach: runningScripts}">
+    </script>
 
-      </tbody>
-    </table>
-
-    <h3>${ _('Completed') }</h3>
-    <div class="alert alert-info" data-bind="visible: completedScripts().length == 0">
-      ${_('There are currently no completed scripts.')}
-    </div>
-    <table class="table table-striped table-condensed datatables tablescroller-disable" data-bind="visible: completedScripts().length > 0">
-      <thead>
-      <tr>
-        <th width="20%">${_('Name')}</th>
-        <th width="20%">${_('Status')}</th>
-        <th width="">${_('Created on')}</th>
-      </tr>
-      </thead>
-      <tbody data-bind="template: {name: 'dashboardTemplate', foreach: completedScripts}">
-
-      </tbody>
-    </table>
-
-    <script id="dashboardTemplate" type="text/html">
+    <script id="completedTemplate" type="text/html">
       <tr style="cursor: pointer">
         <td data-bind="click: $root.viewSubmittedScript" title="${_('Click to edit')}">
           <strong><a data-bind="text: appName"></a></strong>
@@ -316,9 +337,7 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
         <td>
           <span data-bind="attr: {'class': statusClass}, text: status"></span>
         </td>
-        <td>
-          <strong><a data-bind="text: created, attr: {'href': absoluteUrl}" target="_blank"></a></strong>
-        </td>
+        <td data-bind="text: created"></td>
       </tr>
     </script>
   </div>
@@ -340,6 +359,19 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
   </div>
 </div>
 
+<div id="logsModal" class="modal hide fade">
+  <div class="modal-header">
+    <a href="#" class="close" data-dismiss="modal">&times;</a>
+    <h3>${_('Logs')}</h3>
+  </div>
+  <div class="modal-body">
+    <img src="/static/art/spinner.gif" class="hide" />
+    <pre class="scroll hide"></pre>
+  </div>
+  <div class="modal-footer">
+    <a class="btn" data-dismiss="modal">${_('Close')}</a>
+  </div>
+</div>
 
 <div id="submitModal" class="modal hide fade">
   <div class="modal-header">
@@ -407,8 +439,6 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
     NEW_SCRIPT_RESOURCES: []
   };
 
-  var scripts = ${ scripts | n,unicode };
-
   var appProperties = {
     labels: LABELS,
     listScripts: "${ url('pig:scripts') }",
@@ -418,10 +448,12 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
     deleteUrl: "${ url('pig:delete') }"
   }
 
-  var viewModel = new PigViewModel(scripts, appProperties);
+  var viewModel = new PigViewModel(appProperties);
   ko.applyBindings(viewModel);
 
   $(document).ready(function () {
+    viewModel.updateScripts();
+
     var scriptEditor = $("#scriptEditor")[0];
 
     CodeMirror.commands.autocomplete = function(cm) {
@@ -522,13 +554,16 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
 
     var logsRefreshInterval;
     $(document).on("startLogsRefresh", function () {
+      window.clearInterval(logsRefreshInterval);
+      $("#withLogs").text("");
+      refreshLogs();
       logsRefreshInterval = window.setInterval(function () {
         refreshLogs();
       }, 1000);
     });
 
     $(document).on("stopLogsRefresh", function () {
-      window.clearTimeout(logsRefreshInterval);
+      window.clearInterval(logsRefreshInterval);
     });
 
     var _resizeTimeout = -1;
@@ -568,19 +603,18 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
     function refreshLogs() {
       if (viewModel.currentScript().watchUrl() != "") {
         $.getJSON(viewModel.currentScript().watchUrl(), function (data) {
+          if (data.logs.pig) {
+            $("#withoutLogs").addClass("hide");
+            $("#withLogs").removeClass("hide");
+            var _logsEl = $("#withLogs");
+            var newLines = data.logs.pig.split("\n").slice(_logsEl.text().split("\n").length);
+            _logsEl.text(_logsEl.text() + newLines.join("\n"));
+            if (logsAtEnd) {
+              _logsEl.scrollTop(_logsEl[0].scrollHeight - _logsEl.height());
+            }
+          }
           if (data.workflow && data.workflow.isRunning) {
             viewModel.currentScript().actions(data.workflow.actions);
-            if (data.logs.pig) {
-              $("#withoutLogs").addClass("hide");
-              $("#withLogs").removeClass("hide");
-              resizeLogs();
-              var _logsEl = $("#withLogs");
-              var newLines = data.logs.pig.split("\n").slice(_logsEl.text().split("\n").length);
-              _logsEl.text(_logsEl.text() + newLines.join("\n"));
-              if (logsAtEnd) {
-                _logsEl.scrollTop(_logsEl[0].scrollHeight - _logsEl.height());
-              }
-            }
           }
           else {
             viewModel.currentScript().actions(data.workflow.actions);
@@ -595,12 +629,7 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
     }
 
     $("#withLogs").scroll(function () {
-      if ($(this).scrollTop() + $(this).height() + 20 >= $(this)[0].scrollHeight) {
-        logsAtEnd = true;
-      }
-      else {
-        logsAtEnd = false;
-      }
+      logsAtEnd = $(this).scrollTop() + $(this).height() + 20 >= $(this)[0].scrollHeight;
     });
 
     function resizeLogs() {
