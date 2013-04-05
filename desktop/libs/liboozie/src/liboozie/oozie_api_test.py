@@ -106,6 +106,8 @@ class OozieServerProvider(object):
 
   @classmethod
   def _setup_sharelib(cls):
+    # At some point could reuse:
+    # oozie-setup.sh sharelib create -fs FS_URI
     LOG.info("Copying Oozie sharelib")
     user_home = cls.cluster.fs.do_as_user(getpass.getuser(), cls.cluster.fs.get_home_dir)
     oozie_share_lib = user_home + '/share'
