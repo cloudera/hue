@@ -33,45 +33,31 @@ ${ commonheader(_('Hue Users'), "useradmin", user, "100px") | n,unicode }
         <h1>${_('Hue Users - Create user')}</h1>
     % endif
 
-  </br>
-
   <form id="editForm" method="POST" class="form form-horizontal" autocomplete="off">
 
       <div id="properties" class="section">
-        <ul class="nav nav-pills">
+        <ul class="nav nav-tabs">
           <li class="active"><a href="#step1" class="step">${ _('Step 1: Credentials (required)') }</a></li>
           <li><a href="#step2" class="step">${ _('Step 2: Names and Groups') }</a></li>
+          % if user.is_superuser:
           <li><a href="#step3" class="step">${ _('Step 3: Advanced') }</a></li>
+          % endif
         </ul>
 
         <div class="steps" >
           <div id="step1" class="stepDetails">
             ${layout.render_field(form["username"], extra_attrs={'validate':'true'})}
-
             % if "password1" in form.fields:
-            <div class="row">
-                <div class="span5">
-                ${layout.render_field(form["password1"], extra_attrs={'validate':'true'})}
-                </div>
-                <div class="span4">
-                ${layout.render_field(form["password2"], extra_attrs={'validate':'true'})}
-                </div>
-            </div>
+              ${layout.render_field(form["password1"], extra_attrs={'validate':'true'})}
+              ${layout.render_field(form["password2"], extra_attrs={'validate':'true'})}
             % endif
-
             ${layout.render_field(form["ensure_home_directory"])}
-        </div>
+          </div>
 
-        <div id="step2" class="stepDetails hide">
+          <div id="step2" class="stepDetails hide">
             % if "first_name" in form.fields:
-            <div class="row">
-                <div class="span5">
-                ${layout.render_field(form["first_name"])}
-                </div>
-                <div class="span4">
-                ${layout.render_field(form["last_name"])}
-                </div>
-            </div>
+              ${layout.render_field(form["first_name"])}
+              ${layout.render_field(form["last_name"])}
             % endif
 
             ${layout.render_field(form["email"])}
@@ -79,7 +65,7 @@ ${ commonheader(_('Hue Users'), "useradmin", user, "100px") | n,unicode }
               ${layout.render_field(form["groups"])}
             % endif
         </div>
-
+        % if user.is_superuser:
         <div id="step3" class="stepDetails hide">
             % if user.is_superuser:
               ${layout.render_field(form["is_active"])}
@@ -89,6 +75,7 @@ ${ commonheader(_('Hue Users'), "useradmin", user, "100px") | n,unicode }
               ${'is_superuser' in form.fields and layout.render_field(form["is_superuser"])}
             % endif
         </div>
+        % endif
       </div>
 
         <div class="form-actions">
@@ -106,12 +93,20 @@ ${ commonheader(_('Hue Users'), "useradmin", user, "100px") | n,unicode }
 
 <style type="text/css">
   .steps {
-    min-height: 400px;
     padding-top: 20px;
+    margin-bottom: 100px;
   }
 
   input[type=submit] {
     margin-left: 50px;
+  }
+
+  .form-actions {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    margin: 0;
   }
 </style>
 
