@@ -33,6 +33,7 @@ var PigScript = function (pigScript) {
   self.selected = ko.observable(false);
   self.watchUrl = ko.observable("");
   self.actions = ko.observableArray([]);
+
   self.handleSelect = function (row, e) {
     this.selected(!this.selected());
   };
@@ -272,7 +273,8 @@ var PigViewModel = function (scripts, props) {
     $.each(script.getParameters(), function (key, value) {
       self.submissionVariables.push({'name': key, 'value': value});
     });
-
+    $("#runScriptBtn").button("reset");
+    $("#runScriptBtn").attr("data-loading-text", $("#runScriptBtn").text() + " ...");
     $("#submitModal").modal({
       keyboard: true,
       show: true

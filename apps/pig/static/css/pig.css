@@ -13,39 +13,32 @@
   border-left: 2px solid #dd514c;
 }
 
-
 .sidebar-nav {
   padding: 9px 0;
 }
 
-.CodeMirror {border: 1px solid #eee;}
+.CodeMirror {
+  border: 1px solid #eee;
+}
 
 .bottomAlert {
-  position: fixed; bottom: 0; left: 0;margin: 0;width: 100%;text-align: center;display:none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  margin: 0;
+  width: 100%;
+  text-align: center;
+  display: none;
 }
 
 #logs .alert-modified {
-  border-color: #DDD;
-  margin-bottom: 0;
-  -moz-border-radius-bottomright: 0;
-  -webkit-border-bottom-right-radius: 0;
-  border-bottom-right-radius: 0;
-  -moz-border-radius-bottomleft: 0;
-  -webkit-border-bottom-left-radius: 0;
-  border-bottom-left-radius: 0;
+  padding-right: 14px;
 }
 
 #logs pre {
   margin: 0;
-  color:#666;
+  color: #666;
   border-color: #DDD;
-  border-top: 0;
-  -moz-border-radius-topleft: 0;
-  -webkit-border-top-left-radius: 0;
-  border-top-left-radius: 0;
-  -moz-border-radius-topright: 0;
-  -webkit-border-top-right-radius: 0;
-  border-top-right-radius: 0;
 }
 
 .parameterTable {
@@ -54,4 +47,8 @@
 
 .parameterTable td {
   padding: 7px;
+}
+
+.span2 .pull-right {
+  display: none;
 }
