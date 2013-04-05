@@ -67,13 +67,8 @@ ${ commonheader(_('Hue Users'), "useradmin", user, "100px") | n,unicode }
         </div>
         % if user.is_superuser:
         <div id="step3" class="stepDetails hide">
-            % if user.is_superuser:
-              ${layout.render_field(form["is_active"])}
-            % endif
-
-            % if user.is_superuser:
-              ${'is_superuser' in form.fields and layout.render_field(form["is_superuser"])}
-            % endif
+            ${layout.render_field(form["is_active"])}
+            ${'is_superuser' in form.fields and layout.render_field(form["is_superuser"])}
         </div>
         % endif
       </div>
