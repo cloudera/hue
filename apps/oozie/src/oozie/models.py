@@ -42,6 +42,7 @@ from hadoop.fs.exceptions import WebHdfsException
 
 from hadoop.fs.hadoopfs import Hdfs
 from liboozie.submittion import Submission
+from liboozie.submittion import create_directories
 
 from oozie.conf import REMOTE_SAMPLE_DIR, SHARE_JOBS
 from oozie.management.commands import oozie_setup
@@ -216,7 +217,7 @@ class WorkflowManager(models.Manager):
     self.check_workspace(workflow, fs)
 
   def check_workspace(self, workflow, fs):
-    oozie_setup.create_directories(fs)
+    create_directories(fs)
 
     if workflow.is_shared:
       perms = 0755

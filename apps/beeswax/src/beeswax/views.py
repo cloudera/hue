@@ -587,7 +587,8 @@ def view_results(request, id, first_row=0):
     'context_param': context_param,
     'expired': expired,
     'app_name': app_name,
-    'download': download
+    'download': download,
+    'next_json_set': None
   }
 
   if not error:

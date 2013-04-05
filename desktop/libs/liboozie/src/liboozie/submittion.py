@@ -24,10 +24,9 @@ from django.utils.translation import ugettext as _
 from desktop.lib.exceptions_renderable import PopupException
 from hadoop import cluster
 from hadoop.fs.hadoopfs import Hdfs
+
 from liboozie.oozie_api import get_oozie
-
 from liboozie.conf import REMOTE_DEPLOYMENT_DIR
-
 
 LOG = logging.getLogger(__name__)
 
@@ -184,7 +183,10 @@ class Submission(object):
     Return the job deployment directory in HDFS, creating it if necessary.
     The actual deployment dir should be 0711 owned by the user
     """
-    if self.user != self.job.owner:
+    # Automatic setup of the required directories if needed
+    create_directories(self.fs)
+
+    if self.user != self.job.owner:      
       path = Hdfs.join(REMOTE_DEPLOYMENT_DIR.get(), '_%s_-oozie-%s-%s' % (self.user.username, self.job.id, time.time()))
       self.fs.copy_remote_dir(self.job.deployment_dir, path, owner=self.user, dir_mode=0711)
     else:
@@ -261,3 +263,18 @@ class Submission(object):
       LOG.warn("Failed to clean up workflow deployment directory for "
                "%s (owner %s). Caused by: %s",
                self.job.name, self.user, ex)
+
+
+def create_directories(fs, directory_list=[]):
+  # If needed, create the remote home, deployment and data directories
+  directories = [REMOTE_DEPLOYMENT_DIR.get()] + directory_list
+
+  for directory in directories:
+    if not fs.do_as_user(fs.DEFAULT_USER, fs.exists, directory):
+      remote_home_dir = Hdfs.join('/user', fs.DEFAULT_USER)
+      if directory.startswith(remote_home_dir):
+        # Home is 755
+        fs.do_as_user(fs.DEFAULT_USER, fs.create_home_dir, remote_home_dir)
+      # Shared by all the users
+      fs.do_as_user(fs.DEFAULT_USER, fs.mkdir, directory, 01777)
+      fs.do_as_user(fs.DEFAULT_USER, fs.chmod, directory, 01777) # To remove after https://issues.apache.org/jira/browse/HDFS-3491

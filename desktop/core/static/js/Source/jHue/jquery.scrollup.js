@@ -23,7 +23,7 @@
  *   options:
  *    - threshold: (default 100) value in pixels, scroll amount before the link appears
  */
-;
+
 (function ($, window, document, undefined) {
 
   var pluginName = "jHueScrollUp",

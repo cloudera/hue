@@ -46,18 +46,8 @@ def config_validator():
   Called by core check_config() view.
   """
   from hadoop.cluster import get_all_hdfs
-#  from liboozie.oozie_api import get_oozie
 
   res = []
-
-#  status = 'down'
-#  try:
-#    status = str(get_oozie().get_oozie_status())
-#  except:
-#    pass
-#  if 'NORMAL' not in status:
-#    res.append((status, _('The Oozie server is not available')))
-
 
   class ConfigMock:
     def __init__(self, value): self.value = value

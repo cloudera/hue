@@ -25,10 +25,10 @@ from django.db import transaction
 from django.utils.translation import ugettext as _
 
 from hadoop import cluster
-from hadoop.fs.hadoopfs import Hdfs
-from liboozie.conf import REMOTE_DEPLOYMENT_DIR
 
-from oozie.conf import LOCAL_SAMPLE_DATA_DIR, LOCAL_SAMPLE_DIR, REMOTE_SAMPLE_DIR
+from oozie.conf import LOCAL_SAMPLE_DATA_DIR, LOCAL_SAMPLE_DIR,\
+  REMOTE_SAMPLE_DIR
+from liboozie.submittion import create_directories
 
 
 LOG = logging.getLogger(__name__)
@@ -36,8 +36,9 @@ LOG = logging.getLogger(__name__)
 
 class Command(NoArgsCommand):
   def handle_noargs(self, **options):
-    fs = cluster.get_hdfs()
-    remote_dir = create_directories(fs)
+    fs = cluster.get_hdfs()    
+    create_directories(fs, [REMOTE_SAMPLE_DIR.get()])
+    remote_dir = REMOTE_SAMPLE_DIR.get()
 
     # Copy examples binaries
     for name in os.listdir(LOCAL_SAMPLE_DIR.get()):
@@ -61,20 +62,3 @@ class Command(NoArgsCommand):
     except User.DoesNotExist:
       sample_user = User.objects.create(username=USERNAME, password='!', is_active=False, is_superuser=False, id=1100713, pk=1100713)
     management.call_command('loaddata', 'initial_oozie_examples.json', verbosity=2)
-
-
-def create_directories(fs):
-  # If needed, create the remote home, deployment and data directories
-  directories = (REMOTE_DEPLOYMENT_DIR.get(), REMOTE_SAMPLE_DIR.get())
-
-  for directory in directories:
-    if not fs.do_as_user(fs.DEFAULT_USER, fs.exists, directory):
-      remote_home_dir = Hdfs.join('/user', fs.DEFAULT_USER)
-      if directory.startswith(remote_home_dir):
-        # Home is 755
-        fs.do_as_user(fs.DEFAULT_USER, fs.create_home_dir, remote_home_dir)
-      # Shared by all the users
-      fs.do_as_user(fs.DEFAULT_USER, fs.mkdir, directory, 01777)
-      fs.do_as_user(fs.DEFAULT_USER, fs.chmod, directory, 01777) # To remove after https://issues.apache.org/jira/browse/HDFS-3491
-
-  return REMOTE_SAMPLE_DIR.get()

@@ -250,153 +250,150 @@ ${layout.menubar(section='query')}
 %endif.resultTable
 
 
-
-
 <script type="text/javascript" charset="utf-8">
+$(document).ready(function () {
+  var dataTable = $(".resultTable").dataTable({
+    "bPaginate": false,
+    "bLengthChange": false,
+    "bInfo": false,
+    "oLanguage": {
+        "sEmptyTable": "${_('No data available')}",
+        "sZeroRecords": "${_('No matching records')}",
+    },
+    "fnDrawCallback": function( oSettings ) {
+      $(".resultTable").jHueTableExtender({
+        hintElement: "#jumpToColumnAlert",
+        fixedHeader: true,
+        firstColumnTooltip: true
+      });
+    }
+  });
+  
+  $(".dataTables_wrapper").css("min-height", "0");
+  $(".dataTables_filter").hide();
+  
+  $("input[name='save_target']").change(function () {
+    $("#fieldRequired").addClass("hide");
+    $("input[name='target_dir']").removeClass("fieldError");
+    $("input[name='target_table']").removeClass("fieldError");
+    if ($(this).val().indexOf("HDFS") > -1) {
+      $("input[name='target_table']").addClass("hide");
+      $("input[name='target_dir']").removeClass("hide");
+      $(".fileChooserBtn").removeClass("hide");
+    }
+    else {
+      $("input[name='target_table']").removeClass("hide");
+      $("input[name='target_dir']").addClass("hide");
+      $(".fileChooserBtn").addClass("hide");
+    }
+  });
 
-    $(document).ready(function () {
-      var dataTable = $(".resultTable").dataTable({
-        "bPaginate": false,
-        "bLengthChange": false,
-        "bInfo": false,
-        "oLanguage": {
-            "sEmptyTable": "${_('No data available')}",
-            "sZeroRecords": "${_('No matching records')}",
+  $("#saveBtn").click(function () {
+    if ($("input[name='save_target']:checked").val().indexOf("HDFS") > -1) {
+      if ($.trim($("input[name='target_dir']").val()) == "") {
+        $("#fieldRequired").removeClass("hide");
+        $("input[name='target_dir']").addClass("fieldError");
+        return false;
+      }
+    }
+    else {
+      if ($.trim($("input[name='target_table']").val()) == "") {
+        $("#fieldRequired").removeClass("hide");
+        $("input[name='target_table']").addClass("fieldError");
+        return false;
+      }
+    }
+    $("#saveForm").submit();
+  });
+
+
+  $("input[name='target_dir']").after(getFileBrowseButton($("input[name='target_dir']")));
+
+  function getFileBrowseButton(inputElement) {
+    return $("<a>").addClass("btn").addClass("fileChooserBtn").addClass("hide").text("..").click(function (e) {
+      e.preventDefault();
+      $("#fileChooserModal").jHueFileChooser({
+        onFolderChange:function (filePath) {
+          inputElement.val(filePath);
         },
-        "fnDrawCallback": function( oSettings ) {
-          $(".resultTable").jHueTableExtender({
-            hintElement: "#jumpToColumnAlert",
-            fixedHeader: true,
-            firstColumnTooltip: true
-          });
-        }
+        onFolderChoose:function (filePath) {
+          inputElement.val(filePath);
+          $("#fileChooserModal").slideUp();
+        },
+        createFolder:false,
+        uploadFile:false,
+        selectFolder:true,
+        initialPath:$.trim(inputElement.val())
       });
-      $(".dataTables_wrapper").css("min-height", "0");
-      $(".dataTables_filter").hide();
-      $("input[name='save_target']").change(function () {
-        $("#fieldRequired").addClass("hide");
-        $("input[name='target_dir']").removeClass("fieldError");
-        $("input[name='target_table']").removeClass("fieldError");
-        if ($(this).val().indexOf("HDFS") > -1) {
-          $("input[name='target_table']").addClass("hide");
-          $("input[name='target_dir']").removeClass("hide");
-          $(".fileChooserBtn").removeClass("hide");
-        }
-        else {
-          $("input[name='target_table']").removeClass("hide");
-          $("input[name='target_dir']").addClass("hide");
-          $(".fileChooserBtn").addClass("hide");
-        }
-      });
-
-      $("#saveBtn").click(function () {
-        if ($("input[name='save_target']:checked").val().indexOf("HDFS") > -1) {
-          if ($.trim($("input[name='target_dir']").val()) == "") {
-            $("#fieldRequired").removeClass("hide");
-            $("input[name='target_dir']").addClass("fieldError");
-            return false;
-          }
-        }
-        else {
-          if ($.trim($("input[name='target_table']").val()) == "") {
-            $("#fieldRequired").removeClass("hide");
-            $("input[name='target_table']").addClass("fieldError");
-            return false;
-          }
-        }
-        $("#saveForm").submit();
-      });
-
-
-      $("input[name='target_dir']").after(getFileBrowseButton($("input[name='target_dir']")));
-
-      function getFileBrowseButton(inputElement) {
-        return $("<a>").addClass("btn").addClass("fileChooserBtn").addClass("hide").text("..").click(function (e) {
-          e.preventDefault();
-          $("#fileChooserModal").jHueFileChooser({
-            onFolderChange:function (filePath) {
-              inputElement.val(filePath);
-            },
-            onFolderChoose:function (filePath) {
-              inputElement.val(filePath);
-              $("#fileChooserModal").slideUp();
-            },
-            createFolder:false,
-            uploadFile:false,
-            selectFolder:true,
-            initialPath:$.trim(inputElement.val())
-          });
-          $("#fileChooserModal").slideDown();
-        });
-      }
-
-      $("#collapse").click(function () {
-        $(".sidebar-nav").parent().css("margin-left", "-31%");
-        $("#expand").show().css("top", $(".sidebar-nav i").position().top + "px");
-        $(".sidebar-nav").parent().next().removeClass("span9").addClass("span12").addClass("noLeftMargin");
-      });
-      $("#expand").click(function () {
-        $(this).hide();
-        $(".sidebar-nav").parent().next().removeClass("span12").addClass("span9").removeClass("noLeftMargin");
-        $(".sidebar-nav").parent().css("margin-left", "0");
-      });
-
-
-
-      resizeLogs();
-
-      $(window).resize(function () {
-        resizeLogs();
-      });
-
-      $("a[href='#log']").on("shown", function () {
-        resizeLogs();
-      });
-
-      function resizeLogs() {
-        $("#log pre").css("overflow", "auto").height($(window).height() - $("#log pre").position().top - 40);
-      }
-
-      % if app_name == 'impala':
-        % if not download:
-          $("#collapse").click();
-          $(".sidebar-nav, #expand").hide();
-        % elif not error:
-          $("table").replaceWith("${ _('Download results from the left.') }");
-        % endif
-      % endif
-
-      // enable infinite scroll instead of pagination
-      var _nextJsonSet = "${ next_json_set }";
-      var _hasMore = ${ has_more and 'true' or 'false' };
-      var _dt = $("div.dataTables_wrapper");
-      _dt.on("scroll", function (e) {
-        if (_dt.scrollTop() + _dt.outerHeight() + 20 > _dt[0].scrollHeight && !_dt.data("isLoading") && _hasMore) {
-          _dt.data("isLoading", true);
-          _dt.animate({opacity: '0.55'}, 200);
-          $(".spinner").show();
-          $.getJSON(_nextJsonSet, function (data) {
-            _hasMore = data.has_more;
-            if (!_hasMore) {
-              $(".noMore").removeClass("hide");
-            }
-            _nextJsonSet = data.next_json_set;
-            var _cnt = 0;
-            for (var i = 0; i < data.results.length; i++) {
-              var row = data.results[i];
-              row.unshift(data.start_row + _cnt);
-              dataTable.fnAddData(row);
-              _cnt++;
-            }
-            _dt.data("isLoading", false);
-            _dt.animate({opacity: '1'}, 50);
-            $(".spinner").hide();
-          });
-        }
-      });
-      _dt.jHueScrollUp();
-
+      $("#fileChooserModal").slideDown();
     });
+  }
+
+  $("#collapse").click(function () {
+    $(".sidebar-nav").parent().css("margin-left", "-31%");
+    $("#expand").show().css("top", $(".sidebar-nav i").position().top + "px");
+    $(".sidebar-nav").parent().next().removeClass("span9").addClass("span12").addClass("noLeftMargin");
+  });
+  $("#expand").click(function () {
+    $(this).hide();
+    $(".sidebar-nav").parent().next().removeClass("span12").addClass("span9").removeClass("noLeftMargin");
+    $(".sidebar-nav").parent().css("margin-left", "0");
+  });
+
+  resizeLogs();
+
+  $(window).resize(function () {
+    resizeLogs();
+  });
+
+  $("a[href='#log']").on("shown", function () {
+    resizeLogs();
+  });
+
+  function resizeLogs() {
+    $("#log pre").css("overflow", "auto").height($(window).height() - $("#log pre").position().top - 40);
+  }
+
+  % if app_name == 'impala':
+    % if not download:
+      $("#collapse").click();
+      $(".sidebar-nav, #expand").hide();
+    % elif not error:
+      $("table").replaceWith("${ _('Download results from the left.') }");
+    % endif
+  % endif
+
+  // enable infinite scroll instead of pagination
+  var _nextJsonSet = "${ next_json_set }";
+  var _hasMore = ${ has_more and 'true' or 'false' };
+  var _dt = $("div.dataTables_wrapper");
+  _dt.on("scroll", function (e) {
+    if (_dt.scrollTop() + _dt.outerHeight() + 20 > _dt[0].scrollHeight && !_dt.data("isLoading") && _hasMore) {
+      _dt.data("isLoading", true);
+      _dt.animate({opacity: '0.55'}, 200);
+      $(".spinner").show();
+      $.getJSON(_nextJsonSet, function (data) {
+        _hasMore = data.has_more;
+        if (!_hasMore) {
+          $(".noMore").removeClass("hide");
+        }
+        _nextJsonSet = data.next_json_set;
+        var _cnt = 0;
+        for (var i = 0; i < data.results.length; i++) {
+          var row = data.results[i];
+          row.unshift(data.start_row + _cnt);
+          dataTable.fnAddData(row);
+          _cnt++;
+        }
+        _dt.data("isLoading", false);
+        _dt.animate({opacity: '1'}, 50);
+        $(".spinner").hide();
+      });
+    }
+  });
+
+  _dt.jHueScrollUp();
+});
 </script>
 
 ${ commonfooter(messages) | n,unicode }
