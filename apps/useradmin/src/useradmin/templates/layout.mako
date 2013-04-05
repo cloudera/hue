@@ -25,15 +25,19 @@ def is_selected(section, matcher):
     return ""
 %>
 
-<%def name="render_field(field)">
-  %if not field.is_hidden:
-    <% group_class = len(field.errors) and "error" or "" %>
-    <div class="control-group ${group_class}">
-      <label class="control-label" for="id_${field.html_name}">${field.label}</label>
+<%def name="render_field(field, show_label=True, extra_attrs={})">
+  % if not field.is_hidden:
+    <% group_class = field.errors and "error" or "" %>
+    <div class="control-group ${group_class}"
+      rel="popover" data-original-title="${ field.label }" data-content="${ field.help_text }">
+      % if show_label:
+        <label class="control-label">${ field.label }</label>
+      % endif
       <div class="controls">
-        ${unicode(field) | n}
-        % if len(field.errors):
-          <span class="help-inline">${unicode(field.errors) | n}</span>
+        <% field.field.widget.attrs.update(extra_attrs) %>
+        ${ field | n,unicode }
+        % if field.errors:
+          <span class="help-inline">${ field.errors | n,unicode }</span>
         % endif
       </div>
     </div>

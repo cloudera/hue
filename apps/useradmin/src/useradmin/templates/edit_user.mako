@@ -15,8 +15,6 @@
 ## limitations under the License.
 <%!
 from desktop.views import commonheader, commonfooter
-from desktop.lib.django_util import extract_field_data
-import urllib
 from django.utils.translation import ugettext as _
 %>
 
@@ -25,7 +23,7 @@ from django.utils.translation import ugettext as _
 ${ commonheader(_('Hue Users'), "useradmin", user, "100px") | n,unicode }
 
 % if user.is_superuser:
-  ${layout.menubar(section='users', _=_)}
+  ${ layout.menubar(section='users', _=_) }
 % endif
 
 <div class="container-fluid">
@@ -35,27 +33,36 @@ ${ commonheader(_('Hue Users'), "useradmin", user, "100px") | n,unicode }
         <h1>${_('Hue Users - Create user')}</h1>
     % endif
 
-    <br/>
+  </br>
 
-    <form id="editForm" method="POST" class="form form-horizontal" autocomplete="off">
-        <fieldset>
-            <h3>${ _('Information') }</h3>
+  <form id="editForm" method="POST" class="form form-horizontal" autocomplete="off">
 
-            ${layout.render_field(form["username"])}
+      <div id="properties" class="section">
+        <ul class="nav nav-pills">
+          <li class="active"><a href="#step1" class="step">${ _('Step 1: Credentials (required)') }</a></li>
+          <li><a href="#step2" class="step">${ _('Step 2: Names and Groups') }</a></li>
+          <li><a href="#step3" class="step">${ _('Step 3: Advanced') }</a></li>
+        </ul>
+
+        <div class="steps" >
+          <div id="step1" class="stepDetails">
+            ${layout.render_field(form["username"], extra_attrs={'validate':'true'})}
 
             % if "password1" in form.fields:
             <div class="row">
                 <div class="span5">
-                ${layout.render_field(form["password1"])}
+                ${layout.render_field(form["password1"], extra_attrs={'validate':'true'})}
                 </div>
                 <div class="span4">
-                ${layout.render_field(form["password2"])}
+                ${layout.render_field(form["password2"], extra_attrs={'validate':'true'})}
                 </div>
             </div>
             % endif
 
-            <h3>${ _('Optional') }</h3>
+            ${layout.render_field(form["ensure_home_directory"])}
+        </div>
 
+        <div id="step2" class="stepDetails hide">
             % if "first_name" in form.fields:
             <div class="row">
                 <div class="span5">
@@ -70,35 +77,128 @@ ${ commonheader(_('Hue Users'), "useradmin", user, "100px") | n,unicode }
             ${layout.render_field(form["email"])}
             % if user.is_superuser:
               ${layout.render_field(form["groups"])}
+            % endif
+        </div>
+
+        <div id="step3" class="stepDetails hide">
+            % if user.is_superuser:
               ${layout.render_field(form["is_active"])}
             % endif
-            ${layout.render_field(form["ensure_home_directory"])}
+
             % if user.is_superuser:
               ${'is_superuser' in form.fields and layout.render_field(form["is_superuser"])}
             % endif
-        </fieldset>
-        <br/>
-        <div class="form-actions">
-            % if username:
-                <input type="submit" class="btn btn-primary" value="${_('Update user')}"/>
-            % else:
-                <input type="submit" class="btn btn-primary" value="${_('Add user')}"/>
-            % endif
-            <a class="btn" onclick="history.back()">${ _('Cancel') }</a>
         </div>
-    </form>
+      </div>
+
+        <div class="form-actions">
+          <a id="backBtn" class="btn disabled">${ _('Back') }</a>
+          <a id="nextBtn" class="btn btn-primary disable-feedback">${ _('Next') }</a>
+
+          % if username:
+            <input type="submit" class="btn btn-primary" value="${_('Update user')}"/>
+          % else:
+            <input type="submit" class="btn btn-primary" value="${_('Add user')}"/>
+          % endif
+        </div>
+  </form>
 </div>
 
+<style type="text/css">
+  .steps {
+    min-height: 400px;
+    padding-top: 20px;
+  }
+
+  input[type=submit] {
+    margin-left: 50px;
+  }
+</style>
+
+<script src="/static/ext/js/routie-0.3.0.min.js" type="text/javascript" charset="utf-8"></script>
+
 <script type="text/javascript" charset="utf-8">
-    $(document).ready(function(){
-        $("#id_groups").jHueSelector({
-            selectAllLabel: "${_('Select all')}",
-            searchPlaceholder: "${_('Search')}",
-            noChoicesFound: "${_('No groups found.')} <a href='${url('useradmin.views.edit_group')}'>${_('Create a new group now')} &raquo;</a>",
-            width:618,
-            height:240
-        });
+
+$(document).ready(function(){
+  $("#id_groups").jHueSelector({
+    selectAllLabel: "${_('Select all')}",
+    searchPlaceholder: "${_('Search')}",
+    noChoicesFound: "${_('No groups found.')} <a href='${url('useradmin.views.edit_group')}'>${_('Create a new group now')} &raquo;</a>",
+    width:618,
+    height:240
+  });
+
+ var currentStep = "step1";
+
+ routie({
+    "step1":function () {
+      showStep("step1");
+    },
+    "step2":function () {
+      if (validateStep("step1")) {
+        showStep("step2");
+      }
+    },
+    "step3":function () {
+      if (validateStep("step1") && validateStep("step2")) {
+        showStep("step3");
+      }
+    }
+  });
+
+  function showStep(step) {
+    currentStep = step;
+    if (step != "step1") {
+      $("#backBtn").removeClass("disabled");
+    } else {
+      $("#backBtn").addClass("disabled");
+    }
+
+    if (step != $(".stepDetails:last").attr("id")) {
+      $("#nextBtn").removeClass("disabled");
+    } else {
+      $("#nextBtn").addClass("disabled");
+    }
+
+    $("a.step").parent().removeClass("active");
+    $("a.step[href=#" + step + "]").parent().addClass("active");
+    $(".stepDetails").hide();
+    $("#" + step).show();
+  }
+
+  function validateStep(step) {
+    var proceed = true;
+    $("#" + step).find("[validate=true]").each(function () {
+      if ($(this).val().trim() == "") {
+        proceed = false;
+        routie(step);
+        $(this).parents(".control-group").addClass("error");
+        $(this).parent().find(".help-inline").remove();
+        $(this).after("<span class=\"help-inline\"><strong>${ _('This field is required.') }</strong></span>");
+      }
     });
+    return proceed;
+  }
+
+  $("#backBtn").click(function () {
+    var nextStep = (currentStep.substr(4) * 1 - 1);
+    if (nextStep >= 1) {
+      routie("step" + nextStep);
+    }
+  });
+
+  $("#nextBtn").click(function () {
+    var nextStep = (currentStep.substr(4) * 1 + 1);
+    if (nextStep <= $(".step").length) {
+      routie("step" + nextStep);
+    }
+  });
+
+  $("[validate=true]").change(function () {
+    $(this).parents(".control-group").removeClass("error");
+    $(this).parent().find(".help-inline").remove();
+  });
+});
 </script>
 
 ${ commonfooter(messages) | n,unicode }
