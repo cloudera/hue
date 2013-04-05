@@ -825,10 +825,7 @@ def install_examples(request):
   """
   Handle installing sample data and example queries.
   """
-  if request.method == 'GET':
-    return render('confirm.html', request,
-                  dict(url=request.path, title=_('Install sample tables and Beeswax examples?')))
-  elif request.method == 'POST':
+  if request.method == 'POST':
     result = {}
     result['creationSucceeded'] = False
     result['message'] = ''
@@ -839,8 +836,11 @@ def install_examples(request):
     except Exception, err:
       LOG.exception(err)
       result['message'] = str(err)
-
     return HttpResponse(json.dumps(result), mimetype="application/json")
+  else:
+    return render('confirm.html', request,
+                  {'url': request.path, 'title': _('Install sample tables and Beeswax examples?')})
+
 
 
 @login_notrequired

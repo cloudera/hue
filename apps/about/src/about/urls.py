@@ -17,6 +17,7 @@
 
 from django.conf.urls.defaults import patterns, url
 
-urlpatterns = patterns('about',
-  url(r'^$', 'views.index'),
+urlpatterns = patterns('about.views',
+  url(r'^$', 'admin_wizard', name='index'),
+  url(r'^admin_wizard$', 'admin_wizard', name='admin_wizard'),
 )

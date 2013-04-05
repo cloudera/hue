@@ -15,10 +15,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from desktop.lib.django_util import render
 from django.conf import settings
 
-def index(request):
-  return render('index.mako', request,
-    dict(version=settings.HUE_DESKTOP_VERSION))
+from desktop.lib.django_util import render
+from desktop.views import check_config
+from desktop import appmanager
+
+
+def admin_wizard(request):
+  apps = appmanager.get_apps(request.user)
+  app_names = [app.name for app in sorted(apps, key=lambda app: app.menu_index)]
+
+  return render('admin_wizard.mako', request, {
+      'version': settings.HUE_DESKTOP_VERSION,
+      'check_config': check_config(request),
+      'app_names': app_names
+  })
 

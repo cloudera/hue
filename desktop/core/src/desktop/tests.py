@@ -409,8 +409,8 @@ def test_config_check():
     assert_true('Encoding not supported' in resp.content, resp)
 
     # Alert present in the status bar
-    resp = cli.get('/status_bar/')
-    assert_true('Misconfiguration' in resp.content)
+    resp = cli.get('/about', follow=True)
+    assert_true('misconfiguration' in resp.content, resp.content)
   finally:
     for old_conf in reset:
       old_conf()
@@ -444,8 +444,8 @@ def test_ui_customizations():
 
   try:
     c = make_logged_in_client()
-    resp = c.get('/debug/check_config')
-    assert_true(custom_banner in resp.content)
+    resp = c.get('/about', follow=True)
+    assert_true(custom_banner in resp.content, resp)
   finally:
     for old_conf in reset:
       old_conf()

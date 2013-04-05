@@ -77,11 +77,7 @@ class Command(NoArgsCommand):
   """
 
   def handle_noargs(self, **options):
-    """Main entry point to install examples. May raise InstallException"""
-    if self._check_installed():
-      msg = _('Beeswax examples already installed.')
-      LOG.error(msg)
-      raise InstallException(msg)
+    """Main entry point to install or re-install examples. May raise InstallException"""
 
     try:
       user = self._install_user()
@@ -130,7 +126,11 @@ class Command(NoArgsCommand):
 
     for table_dict in table_list:
       table = SampleTable(table_dict)
-      table.install(django_user)
+      try:
+        table.install(django_user)
+      except Exception, ex:
+        LOG.exception(ex)
+        LOG.error('Could not install table: %s' % (ex,))
     LOG.info('Successfully created sample tables with data')
 
   def _install_queries(self, django_user):
@@ -143,7 +143,11 @@ class Command(NoArgsCommand):
 
     for design_dict in design_list:
       design = SampleDesign(design_dict)
-      design.install(django_user)
+      try:
+        design.install(django_user)
+      except Exception, ex:
+        LOG.exception(ex)
+        LOG.error('Could not install query: %s' % (ex,))
     LOG.info('Successfully installed all sample queries')
 
 

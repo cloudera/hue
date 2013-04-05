@@ -110,7 +110,7 @@ from django.utils.translation import ugettext as _
         $(this).closest("form").submit();
       });
       % if user.is_superuser:
-      $("#checkConfig").load("/debug/check_config_ajax");
+        $("#checkConfig").load("/debug/check_config_ajax");
       % endif
       $(".navbar .nav-tooltip").tooltip({
         delay:0,

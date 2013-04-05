@@ -15,20 +15,14 @@
 ## limitations under the License.
 <%!
 from desktop.lib.conf import BoundConfig
-from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
-
-<%namespace name="layout" file="about_layout.mako" />
-${ commonheader(_('About'), "about", user, "100px") | n,unicode }
-
-${layout.menubar(section='check_config')}
 
 <div class="container-fluid">
     ${_('Configuration files located in')} <code>${conf_dir}</code>
     <br/><br/>
     % if error_list:
-      <h2>${_('Potential misconfiguration detected. Fix and restart Hue.')}</h2>
+      <div class="alert alert-error">${_('Potential misconfiguration detected. Fix and restart Hue.')}</div>
       <br/>
         <table class="table table-striped">
       % for confvar, error in error_list:
@@ -56,5 +50,3 @@ ${layout.menubar(section='check_config')}
       <h2>${_('All OK. Configuration check passed.')}</h2>
     % endif
 </div>
-
-${ commonfooter(messages) | n,unicode }

@@ -88,4 +88,4 @@ class TestLogin(object):
     client.get('/accounts/logout')
     # Login
     response = client.post('/accounts/login/', dict(username="test", password="test"), follow=True)
-    assert_equal(response.template, 'index.mako')
+    assert_true('admin_wizard.mako' in response.template, response.template) # Go to superuser wizard

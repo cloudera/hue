@@ -25,7 +25,9 @@ import zipfile
 
 from django.shortcuts import render_to_response
 from django.http import HttpResponse
+from django.core.urlresolvers import reverse
 from django.core.servers.basehttp import FileWrapper
+from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 import django.views.debug
 
@@ -216,12 +218,11 @@ def threads(request):
 def jasmine(request):
   return render('jasmine.mako', request, None)
 
-@login_notrequired
 def index(request):
-  return render("index.mako", request, dict(
-    feedback_url=desktop.conf.FEEDBACK_URL.get(),
-    send_dbug_messages=desktop.conf.SEND_DBUG_MESSAGES.get()
-  ))
+  if request.user.is_superuser:
+    return redirect(reverse('about:index'))
+  else:
+    return redirect(reverse('beeswax:index'))
 
 def serve_404_error(request, *args, **kwargs):
   """Registered handler for 404. We just return a simple error"""
@@ -352,6 +353,7 @@ def check_config(request):
   """Check config and view for the list of errors"""
   if not request.user.is_superuser:
     return HttpResponse(_("You must be a superuser."))
+
   conf_dir = os.path.realpath(get_desktop_root('conf'))
   return render('check_config.mako', request, dict(
                     error_list=_get_config_errors(cache=False),
