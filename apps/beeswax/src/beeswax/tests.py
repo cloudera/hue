@@ -43,6 +43,7 @@ from desktop.lib.test_utils import grant_access
 from beeswaxd import ttypes
 
 import beeswax.create_table
+import beeswax.create_database
 import beeswax.forms
 import beeswax.hive_site
 import beeswax.models
@@ -1087,6 +1088,19 @@ for x in sys.stdin:
     assert_equal([ col.name for col in cols ], [ 'col_a', 'col_b', 'col_c' ])
     assert_true("nada</td>" in resp.content)
     assert_true("sp ace</td>" in resp.content)
+
+
+  def test_create_database(self):
+    resp = self.client.post("/beeswax/create/database", {
+      'name': 'my_db',
+      'comment': 'foo',
+      'create': 'Create database',
+      'use_default_location': True,
+    }, follow=True)
+    assert_equal_mod_whitespace("CREATE DATABASE my_db COMMENT \"foo\"", resp.context['query'].query)
+
+    resp = wait_for_query_to_finish(self.client, resp, max=180.0)
+    assert_true('my_db' in resp.context['databases'], resp)
 
 
   def test_select_query_server(self):

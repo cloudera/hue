@@ -64,6 +64,10 @@ class TestCatalogWithHadoop(BeeswaxSampleProvider):
     self.db = dbms.get(user, get_query_server_config())
 
   def test_basic_flow(self):
+    # Default database should exist
+    response = self.client.get("/catalog/databases")
+    assert_true("default" in response.context["databases"])
+
     # Table should have been created
     response = self.client.get("/catalog/tables/")
     assert_true("test" in response.context["tables"])
@@ -142,6 +146,22 @@ class TestCatalogWithHadoop(BeeswaxSampleProvider):
     resp = self.client.get('/catalog/tables/drop/default', follow=True)
     assert_true('want to delete' in resp.content, resp.content)
     resp = self.client.post('/catalog/tables/drop/default', {u'table_selection': [u'test_drop_1', u'test_drop_2', u'test_drop_3']})
+    assert_equal(resp.status_code, 302)
+
+
+  def test_drop_multi_databases(self):
+    hql = """
+      CREATE DATABASE test_drop_1;
+      CREATE DATABASE test_drop_2;
+      CREATE DATABASE test_drop_3;
+    """
+    resp = _make_query(self.client, hql)
+    resp = wait_for_query_to_finish(self.client, resp, max=30.0)
+
+    # Drop them
+    resp = self.client.get('/catalog/databases/drop', follow=True)
+    assert_true('want to delete' in resp.content, resp.content)
+    resp = self.client.post('/catalog/databases/drop', {u'database_selection': [u'test_drop_1', u'test_drop_2', u'test_drop_3']})
     assert_equal(resp.status_code, 302)
 
 

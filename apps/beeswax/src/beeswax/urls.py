@@ -42,6 +42,12 @@ urlpatterns = patterns('beeswax.views',
 )
 
 urlpatterns += patterns(
+  'beeswax.create_database',
+
+  url(r'^create/database$', 'create_database', name='create_database'),
+)
+
+urlpatterns += patterns(
   'beeswax.create_table',
 
   url(r'^create/create_table/(?P<database>\w+)$', 'create_table', name='create_table'),

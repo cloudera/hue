@@ -726,7 +726,7 @@ def _save_results_ctas(request, query_history, target_table, result_meta):
     hql = 'CREATE TABLE `%s` AS SELECT * FROM %s' % (target_table, result_meta.in_tablename)
     query = hql_query(hql)
     # Display the CTAS running. Could take a long time.
-    return execute_directly(request, query, query_server, on_success_url=reverse('catalog:show_tables'))
+    return execute_directly(request, query, query_server, on_success_url=reverse('catalog:index'))
 
   # Case 2: The results are in some temporary location
   # 1. Create table
@@ -774,7 +774,7 @@ def _save_results_ctas(request, query_history, target_table, result_meta):
     raise ex
 
   # Show tables upon success
-  return format_preserving_redirect(request, reverse('catalog:show_tables'))
+  return format_preserving_redirect(request, reverse('catalog:index'))
 
 
 def confirm_query(request, query, on_success_url=None):

@@ -185,6 +185,22 @@ class Dbms:
     return self.execute_query(query, design)
 
 
+  def drop_database(self, database):
+    return self.execute_statement("DROP DATABASE `%s`" % database)
+
+
+  def drop_databases(self, databases, design):
+    hql = []
+
+    for database in databases:
+      hql.append("DROP DATABASE `%s`" % database)
+    query = hql_query(';'.join(hql), database)
+    design.data = query.dumps()
+    design.save()
+
+    return self.execute_query(query, design)
+
+
   def use(self, database):
     """Beeswax interface does not support use directly."""
     if SERVER_INTERFACE.get() == HIVE_SERVER2:

@@ -489,7 +489,7 @@ class DependencyAwareForm(forms.Form):
   Inherit from this class and add
   (condition name, condition value, child name) tuples
   to self.dependencies to describe dependencies between
-  certain form feilds.
+  certain form fields.
 
   The semantic meaning is that the field named "child name"
   is required if and only if the field "condition name"

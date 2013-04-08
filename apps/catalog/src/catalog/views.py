@@ -32,6 +32,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from beeswax.models import SavedQuery, MetaInstall
 from beeswax.server import dbms
 
+from catalog.conf import CATALOG_DATABASE_COOKIE_EXPIRE
 from catalog.forms import LoadDataForm, DbForm
 
 LOG = logging.getLogger(__name__)
@@ -43,12 +44,47 @@ def index(request):
 
 
 """
+Database Views
+"""
+
+def show_databases(request):
+  db = dbms.get(request.user)
+  databases = db.get_databases()
+  return render("databases.mako", request, {
+    'breadcrumbs': [],
+    'databases': databases,
+  })
+
+
+def drop_database(request):
+  db = dbms.get(request.user)
+
+  if request.method == 'POST':
+    databases = request.POST.getlist('database_selection')
+
+    try:
+      # Can't be simpler without an important refactoring
+      design = SavedQuery.create_empty(app_name='beeswax', owner=request.user)
+      query_history = db.drop_databases(databases, design)
+      url = reverse('beeswax:watch_query', args=[query_history.id]) + '?on_success_url=' + reverse('catalog:show_databases')
+      return redirect(url)
+    except Exception, ex:
+      error_message, log = dbms.expand_exception(ex, db)
+      error = _("Failed to remove %(databases)s.  Error: %(error)s") % {'databases': ','.join(databases), 'error': error_message}
+      raise PopupException(error, title=_("Beeswax Error"), detail=log)
+  else:
+    title = _("Do you really want to delete the database(s)?")
+    return render('confirm.html', request, dict(url=request.path, title=title))
+
+
+"""
 Table Views
 """
 
 def show_tables(request, database=None):
   if database is None:
     database = request.COOKIES.get('hueBeeswaxLastDatabase', 'default') # Assume always 'default'
+
   db = dbms.get(request.user)
 
   databases = db.get_databases()
@@ -63,7 +99,7 @@ def show_tables(request, database=None):
   tables = db.get_tables(database=database)
   examples_installed = MetaInstall.get().installed_example
 
-  return render("tables.mako", request, {
+  resp = render("tables.mako", request, {
     'breadcrumbs': [
       {
         'name': database,
@@ -76,6 +112,8 @@ def show_tables(request, database=None):
     'database': database,
     'tables_json': json.dumps(tables),
   })
+  resp.set_cookie("hueBeeswaxLastDatabase", database, expires=90)
+  return resp
 
 
 def describe_table(request, database, table):

@@ -23,7 +23,7 @@ from django.utils.translation import ugettext as _
 ${ commonheader(_('Tables'), 'catalog', user) | n,unicode }
 
 <div class="container-fluid" id="tables">
-    <h1>${_('Tables')}</h1>
+    <h1>${_('Database %s') % database}</h1>
     ${ components.breadcrumbs(breadcrumbs) }
     <div class="row-fluid">
         <div class="span3">
