@@ -98,7 +98,7 @@ class Facet(models.Model):
 
 
 class Result(models.Model):
-  _ATTRIBUTES = ['properties', 'template', 'highlighting']
+  _ATTRIBUTES = ['properties', 'template', 'highlighting', 'extracode']
 
   data = models.TextField()
 
@@ -121,6 +121,10 @@ class Result(models.Model):
         template = re.sub('\{\{%s\}\}' % field, '{{{%s}}}' % field, template)
 
     return template
+
+  def get_extracode(self):
+    data_dict = json.loads(self.data)
+    return data_dict.get('extracode')
 
   def get_query_params(self):
     data_dict = json.loads(self.data)
@@ -205,6 +209,7 @@ class CoreManager(models.Manager):
                   """,
                   'highlighting': [],
                   'properties': {'highlighting_enabled': False},
+                  'extracode': "<style>\n</style>\n\n<script>\n</script>"
               }))
       sorting = Sorting.objects.create(data=json.dumps({'properties': {'is_enabled': False}, 'fields': []}))
 

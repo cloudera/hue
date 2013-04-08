@@ -275,6 +275,8 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
   ${ rr | n,unicode }
 </div>
 
+${ hue_core.result.get_extracode() | n,unicode }
+
 <script>
   $(document).ready(function () {
     $(".dateFacet").each(function(){

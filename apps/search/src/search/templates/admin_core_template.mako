@@ -135,6 +135,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
       <li class="active"><a href="#visual" data-toggle="tab">${_('Visual editor')}</a></li>
       <li><a href="#source" data-toggle="tab">${_('Source')}</a></li>
       <li><a href="#preview" data-toggle="tab">${_('Preview')}</a></li>
+      <li><a href="#extra" data-toggle="tab">${_('Advanced')}</a></li>
     </ul>
     <div class="tab-content">
       <div class="tab-pane active" id="visual">
@@ -244,6 +245,16 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 
       <div class="tab-pane" id="preview">
         <div id="preview-container"></div>
+      </div>
+
+      <div class="tab-pane" id="extra">
+        <div class="row-fluid">
+          <div class="span12">
+            <span class="muted"> ${ _('Here you can define custom CSS classes or Javascript functions that you can use in your template.') }</span><br/><br/>
+            <textarea id="template-extra">${ hue_core.result.get_extracode() | n,unicode }</textarea>
+          </div>
+        </div>
+
       </div>
     </div>
 
@@ -371,6 +382,10 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
   </%def>
 </%layout:skeleton>
 
+<span id="extraCode">
+  ${ hue_core.result.get_extracode() | n,unicode }
+</span>
+
 <link rel="stylesheet" href="/static/ext/farbtastic/farbtastic.css">
 <link rel="stylesheet" href="/static/ext/css/freshereditor.css">
 <link rel="stylesheet" href="/static/ext/css/codemirror.css">
@@ -477,14 +492,14 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
         pasteHtmlAtCaret("{{" + self.selectedVisualField() + "}}");
       };
       self.addFieldToSource = function () {
-        codeMirror.replaceSelection("{{" + self.selectedSourceField() + "}}");
+        templateSourceMirror.replaceSelection("{{" + self.selectedSourceField() + "}}");
       };
       self.addFunctionToVisual = function () {
         $("#content-editor").focus();
         pasteHtmlAtCaret(self.selectedVisualFunction());
       };
       self.addFunctionToSource = function () {
-        codeMirror.replaceSelection(self.selectedSourceFunction());
+        templateSourceMirror.replaceSelection(self.selectedSourceFunction());
       };
     };
 
@@ -493,12 +508,20 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     $(".chzn-select").chosen();
 
     var samples = ${ sample_data | n,unicode };
-    var templateEditor = $("#template-source")[0];
-
-    var codeMirror = CodeMirror(function (elt) {
-      templateEditor.parentNode.replaceChild(elt, templateEditor);
+    var templateSourceEl = $("#template-source")[0];
+    var templateSourceMirror = CodeMirror(function (elt) {
+      templateSourceEl.parentNode.replaceChild(elt, templateSourceEl);
     }, {
-      value: templateEditor.value,
+      value: templateSourceEl.value,
+      readOnly: false,
+      lineNumbers: true
+    });
+
+    var templateExtraEl = $("#template-extra")[0];
+    var templateExtraMirror = CodeMirror(function (elt) {
+      templateExtraEl.parentNode.replaceChild(elt, templateExtraEl);
+    }, {
+      value: templateExtraEl.value,
       readOnly: false,
       lineNumbers: true
     });
@@ -512,8 +535,11 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     // Force refresh on tab change
     $("a[data-toggle='tab']").on("shown", function (e) {
       if ($(e.target).attr("href") == "#source") {
-        codeMirror.setValue($("#content-editor").html());
-        codeMirror.refresh();
+        templateSourceMirror.setValue($("#content-editor").html());
+        templateSourceMirror.refresh();
+      }
+      if ($(e.target).attr("href") == "#extra") {
+        templateExtraMirror.refresh();
       }
       if ($(e.target).attr("href") == "#preview") {
         $("#preview-container").empty();
@@ -564,11 +590,19 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
       }
     });
 
-    var delay = -1;
-    codeMirror.on("change", function () {
-      clearTimeout(delay);
-      delay = setTimeout(function () {
-        $("#content-editor").html(codeMirror.getValue());
+    var sourceDelay = -1;
+    templateSourceMirror.on("change", function () {
+      clearTimeout(sourceDelay);
+      sourceDelay = setTimeout(function () {
+        $("#content-editor").html(templateSourceMirror.getValue());
+      }, 300);
+    });
+
+    var extraDelay = -1;
+    templateExtraMirror.on("change", function () {
+      clearTimeout(extraDelay);
+      extraDelay = setTimeout(function () {
+        $("#extraCode").html($.parseHTML(templateExtraMirror.getValue()));
       }, 300);
     });
 
@@ -613,6 +647,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
       $.ajax("${ url('search:admin_core_template', core=hue_core.name) }", {
         data: {
           'template': ko.utils.stringifyJson($("#content-editor").html()),
+          'extracode': ko.utils.stringifyJson(templateExtraMirror.getValue())
         },
         contentType: 'application/json',
         type: 'POST',
