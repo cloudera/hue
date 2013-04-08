@@ -84,7 +84,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
                   %if count > 0 and subcat != "" and found_value == "":
                     <li><a href="?query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ cat }:${ subcat }&sort=${solr_query["sort"]}">${subcat}</a> <span class="counter">(${ count })</span></li>
                   %endif
-                  % if found_value != "":
+                  % if found_value != "" and subcat == found_value:
                     <li><strong>${ found_value }</strong> <a href="?query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}&sort=${solr_query["sort"]}"><i class="icon-remove"></i></a></li>
                   % endif
                 % endfor
@@ -108,7 +108,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
                  % if count > 0 and found_value == "":
                    <li><a href="?query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ cat }:${ range }&sort=${solr_query["sort"]}">${ range } (${ count })</a></li>
                   %endif
-                  % if found_value != "":
+                  % if found_value != "" and range == found_value:
                       <li><strong>${ found_value }</strong> <a href="?query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}&sort=${solr_query["sort"]}"><i class="icon-remove"></i></a></li>
                   % endif
                 % endfor
@@ -119,10 +119,21 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
           % if response['facet_counts']['facet_dates']:
             % for cat in response['facet_counts']['facet_dates']:
                 % if response['facet_counts']['facet_dates'][cat]:
+                  <%
+                    found_value = ""
+                    for fq in solr_query['fq'].split('|'):
+                      if fq and fq.split(':')[0] == cat:
+                        found_value = fq[fq.index(':')+1:]
+                        remove_list = solr_query['fq'].split('|')
+                        remove_list.remove(fq)
+                  %>
                 <li class="nav-header">${cat}</li>
                 % for date, count in response['facet_counts']['facet_dates'][cat].iteritems():
-                  % if date not in ('start', 'end', 'gap') and count > 0:
-                    <li><a href="?query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ cat }:${ date }&sort=${solr_query["sort"]}">${ date } (${ count })</a></li>
+                  % if date not in ('start', 'end', 'gap') and count > 0 and found_value == "":
+                    <li><a href='?query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ cat }:"${ date }"&sort=${solr_query["sort"]}'><span class="dateFacet">${ date }</span> (${ count })</a></li>
+                  % endif
+                  % if found_value != "" and '"' + date + '"' == found_value:
+                      <li><strong><span class="dateFacet">${date}</span></strong> <a href="?query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}&sort=${solr_query["sort"]}"><i class="icon-remove"></i></a></li>
                   % endif
                 % endfor
                 % endif
@@ -266,6 +277,10 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 
 <script>
   $(document).ready(function () {
+    $(".dateFacet").each(function(){
+      $(this).text(moment($(this).text()).fromNow());
+    });
+
     $(".current-core").text($("select[name='cores'] option:selected").text());
     % if user.is_superuser:
         $(".dropdown-core").each(function () {
