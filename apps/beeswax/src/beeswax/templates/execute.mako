@@ -53,7 +53,7 @@
         % if app_name != 'impala':
         <button type="button" id="explainQuery" class="btn">${_('Explain')}</button>
         % endif
-        &nbsp; ${_('or create a')} &nbsp;<button type="button" class="btn" href="${ url(app_name + ':execute_query') }">${_('New query')}</button>
+        &nbsp; ${_('or create a')} &nbsp;<a type="button" class="btn" href="${ url(app_name + ':execute_query') }">${_('New query')}</a>
     </div>
 </%def>
 

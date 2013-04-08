@@ -60,9 +60,9 @@ ${layout.menubar(section='tables')}
                             <div class="scrollable">
                                 <table class="table table-striped">
                                     <tr>
-                                        <td>&nbsp;</td>
+                                        <td id="editColumns"><i class="icon-edit" rel="tooltip" data-placement="left" title="${ _('Bulk edit names') }"></i></td>
                                         % for form in column_formset.forms:
-                                                <td>
+                                                <td class="cols">
                                                 ${comps.label(form["column_name"])}
                                                 ${comps.field(form["column_name"],
                                                 render_default=False,
@@ -99,30 +99,117 @@ ${layout.menubar(section='tables')}
     </div>
 </div>
 
+<div id="columnNamesPopover" class="popover editable-container hide right">
+  <div class="arrow"></div>
+  <div class="popover-inner">
+    <h3 class="popover-title left">${ _('Write or paste comma separated column names') }</h3>
+    <div class="popover-content">
+      <p>
+        <div>
+          <form style="display: block;" class="form-inline editableform">
+            <div class="control-group">
+              <div>
+                <div style="position: relative;" class="editable-input">
+                  <input type="text" class="span8" style="padding-right: 24px;" placeholder="${ _('e.g. id, name, salary') }">
+                </div>
+                <div class="editable-buttons">
+                  <button type="button" class="btn btn-primary editable-submit"><i class="icon-ok icon-white"></i></button>
+                  <button type="button" class="btn editable-cancel"><i class="icon-remove"></i></button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </p>
+    </div>
+  </div>
+</div>
+
+<link href="/static/ext/css/bootstrap-editable.css" rel="stylesheet">
 <style>
-    .scrollable {
-        width: 100%;
-        overflow-x: auto;
-    }
+  .scrollable {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  #editColumns {
+    cursor: pointer;
+    text-align: right;
+    padding-top: 36px;
+  }
 </style>
 
 <script type="text/javascript" charset="utf-8">
-    $(document).ready(function(){
-        $(".scrollable").width($(".form-actions").width());
-        $("#step1").click(function(e){
-            e.preventDefault();
-            $("input[name='cancel_create']").attr("name","cancel_delim").click();
-        });
-        $("#step2").click(function(e){
-            e.preventDefault();
-            $("input[name='cancel_create']").click();
-        });
-        $("body").keypress(function(e){
-            if(e.which == 13){
-                e.preventDefault();
-                $("input[name='submit_create']").click();
-            }
-        });
+  $(document).ready(function () {
+    $("[rel='tooltip']").tooltip();
+
+    $(".scrollable").width($(".form-actions").width());
+    $("#step1").click(function (e) {
+      e.preventDefault();
+      $("input[name='cancel_create']").attr("name", "cancel_delim").click();
     });
+    $("#step2").click(function (e) {
+      e.preventDefault();
+      $("input[name='cancel_create']").click();
+    });
+    $("body").keypress(function (e) {
+      if (e.which == 13) {
+        e.preventDefault();
+        $("input[name='submit_create']").click();
+      }
+    });
+
+    $("body").click(function () {
+      if ($("#columnNamesPopover").is(":visible")) {
+        $("#columnNamesPopover").hide();
+      }
+    });
+
+    $(".editable-container").click(function (e) {
+      e.stopImmediatePropagation();
+    });
+
+    $("#editColumns").click(function (e) {
+      e.stopImmediatePropagation();
+      $("[rel='tooltip']").tooltip("hide");
+      var _newVal = "";
+      $(".cols input[type='text']").each(function (cnt, item) {
+        _newVal += $(item).val() + (cnt < $(".cols input[type='text']").length - 1 ? ", " : "");
+      });
+      $("#columnNamesPopover").show().css("left", $("#editColumns i").position().left + 16).css("top", $("#editColumns i").position().top - ($("#columnNamesPopover").height() / 2));
+      $(".editable-input input").val(_newVal).focus();
+    });
+
+    $("#columnNamesPopover .editable-submit").click(function () {
+      parseJSON($(".editable-input input").val());
+      $("#columnNamesPopover").hide();
+      $(".editable-input input").val("");
+    });
+
+    $("#columnNamesPopover .editable-cancel").click(function () {
+      $("#columnNamesPopover").hide();
+    });
+
+    function parseJSON(val) {
+      try {
+        if (val.indexOf("\"") == -1 && val.indexOf("'") == -1) {
+          val = '"' + val.replace(/,/gi, '","') + '"';
+        }
+        if (val.indexOf("[") == -1) {
+          val = "[" + val + "]";
+        }
+        var _parsed = JSON.parse(val);
+        $(".cols input[type='text']").each(function (cnt, item) {
+          try {
+            $(item).val($.trim(_parsed[cnt]));
+          }
+          catch (i_err) {
+          }
+        });
+      }
+      catch (err) {
+      }
+    }
+  });
 </script>
 ${ commonfooter(messages) | n,unicode }
