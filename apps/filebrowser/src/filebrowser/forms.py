@@ -17,7 +17,7 @@
 
 from django import forms
 from django.forms import FileField, CharField, BooleanField, Textarea
-from django.forms.formsets import formset_factory, BaseFormSet, ManagementForm
+from django.forms.formsets import formset_factory, BaseFormSet
 
 from desktop.lib import i18n
 from filebrowser.lib import rwx
@@ -81,8 +81,12 @@ RenameFormSet = formset_factory(RenameForm, formset=BaseRenameFormSet, extra=0)
 
 class CopyForm(forms.Form):
   op = "copy"
-  src_path = CharField(label=_("File to copy"), help_text=_("The file to copy."))
-  dest_path = CharField(label=_("Destination location"), help_text=_("Copy the file to:"))
+  src_path = CharField(label=_("File to copy"), help_text=_("The file to copy."), required=True)
+  dest_path = CharField(label=_("Destination location"), help_text=_("Copy the file to:"), required=True)
+
+  def clean(self):
+    if self.cleaned_data["src_path"] == self.cleaned_data["dest_path"]:
+      raise forms.ValidationError("Cannot copy a directory, into itself") 
 
 class BaseCopyFormSet(FormSet):
   op = "copy"

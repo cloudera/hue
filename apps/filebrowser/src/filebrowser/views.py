@@ -25,7 +25,6 @@ import logging
 import mimetypes
 import operator
 import posixpath
-import re
 import shutil
 import stat as stat_module
 import os
@@ -952,34 +951,35 @@ def generic_op(form_class, request, op, parameter_names, piggyback=None, templat
     if request.method == 'POST':
         form = form_class(**data_extractor(request))
         ret['form'] = form
-        if form.is_valid():
-            args = arg_extractor(request, form, parameter_names)
-            try:
-                op(*args)
-            except (IOError, WebHdfsException), e:
-                msg = _("Cannot perform operation.")
-                if request.user.is_superuser and not request.user == request.fs.superuser:
-                    msg += _(' Note: you are a Hue admin but not a HDFS superuser (which is "%(superuser)s").') \
-                           % {'superuser': request.fs.superuser}
-                raise PopupException(msg, detail=e)
-            if next:
-                logging.debug("Next: %s" % next)
-                # Doesn't need to be quoted: quoting is done by HttpResponseRedirect.
-                return format_preserving_redirect(request, next)
-            ret["success"] = True
-            try:
-                if piggyback:
-                    piggy_path = form.cleaned_data[piggyback]
-                    ret["result"] = _massage_stats(request, request.fs.stats(piggy_path))
-            except Exception, e:
-                # Hard to report these more naturally here.  These happen either
-                # because of a bug in the piggy-back code or because of a
-                # race condition.
-                logger.exception("Exception while processing piggyback data")
-                ret["result_error"] = True
+        if not form.is_valid():
+          raise PopupException(_("Error in %s form: %s") % (form_class.__name__, "".join([err.as_text() for err in form.errors])))
+        args = arg_extractor(request, form, parameter_names)
+        try:
+            op(*args)
+        except (IOError, WebHdfsException), e:
+            msg = _("Cannot perform operation.")
+            if request.user.is_superuser and not request.user == request.fs.superuser:
+                msg += _(' Note: you are a Hue admin but not a HDFS superuser (which is "%(superuser)s").') \
+                       % {'superuser': request.fs.superuser}
+            raise PopupException(msg, detail=e)
+        if next:
+            logging.debug("Next: %s" % next)
+            # Doesn't need to be quoted: quoting is done by HttpResponseRedirect.
+            return format_preserving_redirect(request, next)
+        ret["success"] = True
+        try:
+            if piggyback:
+                piggy_path = form.cleaned_data[piggyback]
+                ret["result"] = _massage_stats(request, request.fs.stats(piggy_path))
+        except Exception, e:
+            # Hard to report these more naturally here.  These happen either
+            # because of a bug in the piggy-back code or because of a
+            # race condition.
+            logger.exception("Exception while processing piggyback data")
+            ret["result_error"] = True
 
-            ret['user'] = request.user
-            return render(template, request, ret)
+        ret['user'] = request.user
+        return render(template, request, ret)
     else:
         # Initial parameters may be specified with get with the default extractor
         initial_values = initial_value_extractor(request, parameter_names)
