@@ -85,14 +85,14 @@ class Facet(models.Model):
         end = field_facet['end']
         gap = field_facet['gap']
 
-        range_facets = tuple([
+        date_facets = tuple([
                            ('facet.date', field_facet['field']),
-                           ('f.%s.facet.date.start' % field_facet['field'], '%(frequency)s%(unit)s' % start), # if rounded add /DAY
-                           ('f.%s.facet.date.end' % field_facet['field'], '%(frequency)s%(unit)s' % end),
-                           ('f.%s.facet.date.gap' % field_facet['field'], '%(frequency)s%(unit)s' % gap),]
+                           ('f.%s.facet.date.start' % field_facet['field'], 'NOW-%(frequency)s%(unit)s/%(rounder)s' % {"frequency": start["frequency"], "unit": start["unit"], "rounder": gap["unit"]}),
+                           ('f.%s.facet.date.end' % field_facet['field'], 'NOW-%(frequency)s%(unit)s' % end),
+                           ('f.%s.facet.date.gap' % field_facet['field'], '+%(frequency)s%(unit)s' % gap),]
                         )
 
-        params += range_facets
+        params += date_facets
 
     return params
 
