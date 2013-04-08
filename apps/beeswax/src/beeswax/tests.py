@@ -824,8 +824,8 @@ for x in sys.stdin:
 
     # Now install it a second time, and expect an error
     resp = self.client.post('/beeswax/install_examples')
-    assert_true('false' in resp.content)
-    assert_true('already installed' in resp.content)
+    assert_true('true' in resp.content)
+    assert_equal('', json.loads(resp.content)['message'])
 
     # First, unset the db entry to allow installation to re-run
     meta = beeswax.models.MetaInstall.get()
@@ -834,8 +834,8 @@ for x in sys.stdin:
 
     # Now it should complain
     resp = self.client.post('/beeswax/install_examples')
-    assert_true('false' in resp.content)
-    assert_true('already exists' in resp.content)
+    assert_true('true' in resp.content)
+    assert_equal('', json.loads(resp.content)['message'])
 
 
   def test_create_table_generation(self):
