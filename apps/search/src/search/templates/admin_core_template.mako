@@ -161,7 +161,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
               </div>
               <div class="widget-content">
                 <select data-bind="options: availableFields, value: selectedVisualField" class="input-medium chzn-select"></select>
-                <a title="${ _('Click on this button to add the field') }"  style="margin-top:-22px" class="btn btn-small" data-bind="click: $root.addFieldToVisual">
+                <a title="${ _('Click on this button to add the field') }" class="btn btn-small" data-bind="click: $root.addFieldToVisual">
                   <i class="icon-plus"></i>
                 </a>
               </div>
@@ -183,7 +183,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
                   <option title="${ _('Downloads the linked file') }" value="{{#downloadfile}} {{/downloadfile}}">{{#downloadfile}}</option>
                   <option title="${ _('Links to the file') }" value="{{#viewfile}} {{/viewfile}}">{{#viewfile}}</option>
                 </select>
-                <a title="${ _('Click on this button to add the field') }"  style="margin-top:-22px" class="btn btn-small" data-bind="click: $root.addFunctionToVisual">
+                <a title="${ _('Click on this button to add the field') }" class="btn btn-small" data-bind="click: $root.addFunctionToVisual">
                   <i class="icon-plus"></i>
                 </a>
                 <br/>
@@ -210,7 +210,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
               </div>
               <div class="widget-content">
                 <select data-bind="options: availableFields, value: selectedSourceField" class="input-medium chzn-select"></select>
-                <a title="${ _('Click on this button to add the field') }"  style="margin-top:-22px" class="btn btn-small" data-bind="click: $root.addFieldToSource">
+                <a title="${ _('Click on this button to add the field') }" class="btn btn-small" data-bind="click: $root.addFieldToSource">
                   <i class="icon-plus"></i>
                 </a>
               </div>
@@ -232,7 +232,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
                   <option title="${ _('Downloads the linked file') }" value="{{#downloadfile}} {{/downloadfile}}">{{#downloadfile}}</option>
                   <option title="${ _('Links to the file') }" value="{{#viewfile}} {{/viewfile}}">{{#viewfile}}</option>
                 </select>
-                <a title="${ _('Click on this button to add the field') }"  style="margin-top:-22px" class="btn btn-small" data-bind="click: $root.addFunctionToSource">
+                <a title="${ _('Click on this button to add the field') }" class="btn btn-small" data-bind="click: $root.addFunctionToSource">
                   <i class="icon-plus"></i>
                 </a>
                 <br/>
