@@ -189,11 +189,11 @@ class CoreManager(models.Manager):
                   'template': """
 <div class="row-fluid">
   <div class="span1"><img src="http://twitter.com/api/users/profile_image/{{user_screen_name}}" style="margin:10px"></div>
-  <div class="span9">    
+  <div class="span9">
     <h5><a href="https://twitter.com/{{user_screen_name}}/status/{{id}}" target="_blank" title="Open in Twitter"></a><a target="_blank" href="https://twitter.com/{{user_screen_name}}">{{user_name}}</a></h5>
-       
+
     {{text}}
-      
+
     <br>
     <a href="/filebrowser/view/{{file_path}}">
       {{file_name}} {{file_length}}{{#file_length}} bytes {{content_type}}{{/file_length}}
@@ -218,17 +218,17 @@ class CoreManager(models.Manager):
             </a>
           </li>
         </ul>
-      </div> 
-    
+      </div>
+
   </div>
   <div class="span2">
     <br><a class="btn" href="https://twitter.com/{{user_screen_name}}/status/{{id}}" target="_blank" title="Open in Twitter">
     <i class="icon-twitter"></i></a>
     <small class="time">
       <a href="https://twitter.com/{{user_screen_name}}/status/{{id}}" target="_blank" data-dt="{{created_at}}" rel="tooltip" data-placement="left" title="{{created_at}}">{{created_at}}</a>
-    </small>      
+    </small>
   </div>
-</div>            
+</div>
                   """,
                   'highlighting': [],
                   'properties': {'highlighting_enabled': False},
@@ -337,7 +337,7 @@ margin-top: 2px;
 </style>
 
 <script>
-</script>                  
+</script>
                   """
               }))
       sorting = Sorting.objects.create(data=json.dumps({'properties': {'is_enabled': False}, 'fields': []}))
