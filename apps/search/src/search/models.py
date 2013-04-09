@@ -38,7 +38,7 @@ LOG = logging.getLogger(__name__)
 
 
 class Facet(models.Model):
-  _ATTRIBUTES = ['properties', 'fields', 'ranges', 'dates']
+  _ATTRIBUTES = ['properties', 'fields', 'ranges', 'dates', 'order']
 
   enabled = models.BooleanField(default=True)
   data = models.TextField()
@@ -47,7 +47,7 @@ class Facet(models.Model):
     data_dict = json.loads(self.data)
 
     for attr in Facet._ATTRIBUTES:
-      if post_data.get(attr):
+      if post_data.get(attr) is not None:
         data_dict[attr] = json.loads(post_data[attr])
 
     self.data = json.dumps(data_dict)
@@ -106,7 +106,7 @@ class Result(models.Model):
     data_dict = json.loads(self.data)
 
     for attr in Result._ATTRIBUTES:
-      if post_data.get(attr):
+      if post_data.get(attr) is not None:
         data_dict[attr] = json.loads(post_data[attr])
 
     self.data = json.dumps(data_dict)
@@ -149,7 +149,7 @@ class Sorting(models.Model):
     data_dict = json.loads(self.data)
 
     for attr in Sorting._ATTRIBUTES:
-      if post_data.get(attr):
+      if post_data.get(attr) is not None:
         data_dict[attr] = json.loads(post_data[attr])
 
     self.data = json.dumps(data_dict)

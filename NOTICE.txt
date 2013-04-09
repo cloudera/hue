@@ -12,3 +12,6 @@ Vitaliy Potapov (http://vitalets.github.com/x-editable/)
 
 This product includes software developed by
 Prasanthj (https://github.com/prasanthj/pig-codemirror-2)
+
+This product includes software developed by
+Ryan Niemeyer (https://github.com/rniemeyer/knockout-sortable)
