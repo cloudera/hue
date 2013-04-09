@@ -74,9 +74,9 @@ ROW FORMAT \
     MAP KEYS TERMINATED BY '${table["map_key_terminator"] | n}'
 %     endif
 %   else:
-  SERDE ${table["serde_name"] | n}
+  SERDE '${table["serde_name"] | n}'
 %     if table["serde_properties"]:
-  WITH SERDEPROPERTIES ${table["serde_properties"] | n}
+  WITH SERDEPROPERTIES (${table["serde_properties"] | n})
 %     endif
 %   endif
 % endif
