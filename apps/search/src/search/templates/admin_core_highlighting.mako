@@ -93,10 +93,11 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     var self = this;
     self.fields = ko.observableArray(${ hue_core.fields | n,unicode });
 
-    var resultData = ${ hue_core.result.data | n,unicode };
+    var highlighting = ${ hue_core.result.get_highlighting() | n,unicode };
+    var properties = ${ hue_core.result.get_properties() | n,unicode };
 
-    self.highlightedFields = ko.observableArray(resultData != null ? resultData.highlighting : []);
-    self.isEnabled = ko.observable(${ hue_core.result.data | n,unicode }.properties.highlighting_enabled);
+    self.highlightedFields = ko.observableArray(highlighting != null ? highlighting : []);
+    self.isEnabled = ko.observable(properties.highlighting_enabled);
 
     self.submit = function () {
       $.ajax("${ url('search:admin_core_highlighting', core=hue_core.name) }", {

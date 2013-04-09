@@ -127,10 +127,10 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
                         remove_list = solr_query['fq'].split('|')
                         remove_list.remove(fq)
                   %>
-                <li class="nav-header">${cat}</li>
+                <li class="nav-header dateFacetHeader">${cat}</li>
                 % for date, count in response['facet_counts']['facet_dates'][cat].iteritems():
                   % if date not in ('start', 'end', 'gap') and count > 0 and found_value == "":
-                    <li><a href='?query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ cat }:"${ date }"&sort=${solr_query["sort"]}'><span class="dateFacet">${ date }</span> (${ count })</a></li>
+                    <li class="dateFacetItem"><a href='?query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ cat }:"${ date }"&sort=${solr_query["sort"]}'><span class="dateFacet">${ date }</span> (${ count })</a></li>
                   % endif
                   % if found_value != "" and '"' + date + '"' == found_value:
                       <li><strong><span class="dateFacet">${date}</span></strong> <a href="?query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}&sort=${solr_query["sort"]}"><i class="icon-remove"></i></a></li>
@@ -279,9 +279,25 @@ ${ hue_core.result.get_extracode() | n,unicode }
 
 <script>
   $(document).ready(function () {
-    $(".dateFacet").each(function(){
-      $(this).text(moment($(this).text()).fromNow());
+    $(".dateFacet").each(function () {
+      var _m = moment($(this).text());
+      $(this).text(_m.fromNow());
+      $(this).parents(".dateFacetItem").data("epoch", _m.valueOf());
     });
+
+    var orderedDateFacets = $(".dateFacetItem");
+    orderedDateFacets.sort(function (a, b) {
+      a = $(a).data("epoch");
+      b = $(b).data("epoch");
+      if (a > b) {
+        return -1;
+      } else if (a < b) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
+    $(".dateFacetHeader").after(orderedDateFacets);
 
     $(".current-core").text($("select[name='cores'] option:selected").text());
     % if user.is_superuser:
