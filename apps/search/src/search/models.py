@@ -126,6 +126,14 @@ class Result(models.Model):
     data_dict = json.loads(self.data)
     return data_dict.get('extracode')
 
+  def get_highlighting(self):
+    data_dict = json.loads(self.data)
+    return json.dumps(data_dict.get('highlighting'))
+
+  def get_properties(self):
+    data_dict = json.loads(self.data)
+    return json.dumps(data_dict.get('properties'))
+
   def get_query_params(self):
     data_dict = json.loads(self.data)
 
