@@ -175,7 +175,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
         <div data-bind="visible: sortableFacets().length == 0" style="padding-left: 10px;margin-bottom: 20px">
           <em>${_('There are currently no Facets defined.')}</em>
         </div>
-        <div data-bind="sortable: sortableFacets">
+        <div data-bind="sortable: sortableFacets, afterMove: isSaveBtnVisible(true)">
           <div class="bubble" style="float: none;cursor: move">
             <i class="icon-move"></i>
             <strong><span data-bind="text: label"></span></strong>
@@ -220,7 +220,6 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 <script src="/static/ext/js/jquery/plugins/jquery-ui-draggable-droppable-sortable-1.8.23.min.js"></script>
 
 <script type="text/javascript">
-  var DATE_FORMAT = "mm-dd-yyyy";
   var MOMENT_DATE_FORMAT = "MM-DD-YYYY";
 
   function s4() {
@@ -234,30 +233,30 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
             s4() + '-' + s4() + s4() + s4();
   }
 
-  var Facet = function (type, field, label, start, end, gap) {
+  var Facet = function (args) {
     return {
-      uuid: UUID(),
-      type: type,
-      field: field,
-      label: label,
-      start: start,
-      end: end,
-      gap: gap,
+      uuid: (typeof args['uuid'] !== 'undefined' && args['uuid'] != null) ? args['uuid'] : UUID(),
+      type: args['type'],
+      field: args['field'],
+      label: args['label'],
+      start: args['start'],
+      end: args['end'],
+      gap: args['gap'],
       isVerbatim: false,
       verbatim: ""
     }
   }
 
-  var FieldFacet = function (field, label) {
-    return new Facet("field", field, label);
+  var FieldFacet = function (obj) {
+    return new Facet({type: "field", field: obj.field, label: obj.label, uuid: obj.uuid});
   }
 
-  var RangeFacet = function (field, label, start, end, gap) {
-    return new Facet("range", field, label, start, end, gap);
+  var RangeFacet = function (obj) {
+    return new Facet({type: "range", field: obj.field, label: obj.label, start: obj.start, end: obj.end, gap: obj.gap, uuid: obj.uuid});
   }
 
-  var DateFacet = function (field, label, start, end, gap) {
-    return new Facet("date", field, label, start, end, gap);
+  var DateFacet = function (obj) {
+    return new Facet({type: "date", field: obj.field, label: obj.label, start: obj.start, end: obj.end, gap: obj.gap, uuid: obj.uuid});
   }
 
   var Properties = function (properties) {
@@ -298,7 +297,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     self.properties = ko.observable(new Properties(${ hue_core.facets.data | n,unicode }.properties));
 
     self.fieldFacets = ko.observableArray(ko.utils.arrayMap(${ hue_core.facets.data | n,unicode }.fields, function (obj) {
-      return new FieldFacet(obj.field, obj.label);
+      return new FieldFacet(obj);
     }));
 
     // Remove already selected fields
@@ -308,7 +307,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     });
 
     self.rangeFacets = ko.observableArray(ko.utils.arrayMap(${ hue_core.facets.data | n,unicode }.ranges, function (obj) {
-      return new RangeFacet(obj.field, obj.label, obj.start, obj.end, obj.gap);
+      return new RangeFacet(obj);
     }));
 
     // Only ranges
@@ -320,9 +319,15 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     });
 
     self.dateFacets = ko.observableArray(ko.utils.arrayMap(${ hue_core.facets.data | n,unicode }.dates, function (obj) {
-      return new DateFacet(obj.field, obj.label, new DateMath(obj.start), new DateMath(obj.end), new DateMath(obj.gap));
+      return new DateFacet({
+          field: obj.field,
+          label: obj.label,
+          start: new DateMath(obj.start),
+          end: new DateMath(obj.end),
+          gap: new DateMath(obj.gap),
+          uuid: obj.uuid,
+      });
     }));
-
     // Only dates
     self.dateFacetsList = ko.observableArray([]);
     $.each(self.fields(), function(index, field) {
@@ -331,13 +336,13 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
       }
     });
 
-    self.sortableFacets = ko.observableArray([]);
-    self.sortableFacetsList = ko.computed(function() {
-      return ko.utils.arrayMap(self.sortableFacets(), function (obj) {
-        return obj.uuid;
-      })
-    }, this);
-
+    // List of all facets sorted by UUID
+    self.sortableFacets = ko.observableArray(self.fieldFacets().concat(self.rangeFacets()).concat(self.dateFacets()));
+    self.sortableFacets.sort(function(left, right) {
+      var sorted_ids = ${ hue_core.facets.data | n,unicode }.order; 
+      return sorted_ids.indexOf(left.uuid) > sorted_ids.indexOf(right.uuid);
+    })
+    
     self.selectedFieldFacet = ko.observable();
     self.selectedFieldLabel = ko.observable("");
     self.selectedRangeFacet = ko.observable();
@@ -359,27 +364,29 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 
     self.removeFieldFacet = function (facet) {
       self.fieldFacets.remove(facet);
+      self.sortableFacets.remove(facet);
       self.fieldFacetsList.push(facet.field);
       self.fieldFacetsList.sort();
       self.updateSortableFacets();
-      viewModel.isSaveBtnVisible(true);
+      self.isSaveBtnVisible(true);
     };
 
     self.removeRangeFacet = function (facet) {
       self.rangeFacets.remove(facet);
+      self.sortableFacets.remove(facet);
       self.updateSortableFacets();
-      viewModel.isSaveBtnVisible(true);
+      self.isSaveBtnVisible(true);
     };
 
     self.removeDateFacet = function (facet) {
       self.dateFacets.remove(facet);
+      self.sortableFacets.remove(facet);
       self.updateSortableFacets();
-      viewModel.isSaveBtnVisible(true);
+      self.isSaveBtnVisible(true);
     };
 
     self.updateSortableFacets = function () {
-      self.sortableFacets(self.fieldFacets().concat(self.rangeFacets()).concat(self.dateFacets()));
-      viewModel.isSaveBtnVisible(true);
+      self.isSaveBtnVisible(true);
     };
 
     self.addFieldFacet = function () {
@@ -393,12 +400,14 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
         if (self.selectedFieldLabel() == ""){
           self.selectedFieldLabel(self.selectedFieldFacet());
         }
-        self.fieldFacets.push(new FieldFacet(self.selectedFieldFacet(), self.selectedFieldLabel()));
+        var newFacet = new FieldFacet({field: self.selectedFieldFacet(), label: self.selectedFieldLabel()});
+        self.fieldFacets.push(newFacet);
+        self.sortableFacets.push(newFacet);
         self.selectedFieldLabel("");
         self.fieldFacetsList.remove(self.selectedFieldFacet());
         self.properties().isEnabled(true);
         self.updateSortableFacets();
-        viewModel.isSaveBtnVisible(true);
+        self.isSaveBtnVisible(true);
       }
       else {
         $("#field-facet-error").show();
@@ -409,21 +418,37 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
       if (self.selectedRangeLabel() == ""){
         self.selectedRangeLabel(self.selectedRangeFacet());
       }
-      self.rangeFacets.push(new RangeFacet(self.selectedRangeFacet(), self.selectedRangeLabel(), self.selectedRangeStartFacet(), self.selectedRangeEndFacet(), self.selectedRangeGapFacet()));
+      var newFacet = new RangeFacet({
+          field: self.selectedRangeFacet(),
+          label: self.selectedRangeLabel(),
+          start: self.selectedRangeStartFacet(),
+          end: self.selectedRangeEndFacet(),
+          gap: self.selectedRangeGapFacet()
+       });
+      self.rangeFacets.push(newFacet);
+      self.sortableFacets.push(newFacet);
       self.selectedRangeLabel("");
       self.selectedRangeStartFacet(0);
       self.selectedRangeEndFacet(100);
       self.selectedRangeGapFacet(10);
       self.properties().isEnabled(true);
       self.updateSortableFacets();
-      viewModel.isSaveBtnVisible(true);
+      self.isSaveBtnVisible(true);
     };
 
     self.addDateFacet = function () {
       if (self.selectedDateLabel() == ""){
         self.selectedDateLabel(self.selectedDateFacet());
       }
-      self.dateFacets.push(new DateFacet(self.selectedDateFacet(), self.selectedDateLabel(), self.selectedDateDateMaths()[0], self.selectedDateDateMaths()[1], self.selectedDateDateMaths()[2]));
+      var newFacet = new DateFacet({
+          field: self.selectedDateFacet(),
+          label: self.selectedDateLabel(),
+          start: self.selectedDateDateMaths()[0],
+          end: self.selectedDateDateMaths()[1],
+          gap: self.selectedDateDateMaths()[2]
+      });
+      self.dateFacets.push(newFacet);
+      self.sortableFacets.push(newFacet);
       self.selectedDateLabel("");
       self.selectedDateDateMaths([
         new DateMath({frequency: 10, unit: 'DAYS'}),
@@ -432,7 +457,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
       ]);
       self.properties().isEnabled(true);
       self.updateSortableFacets();
-      viewModel.isSaveBtnVisible(true);
+      self.isSaveBtnVisible(true);
     };
 
     self.submit = function () {
@@ -442,13 +467,15 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
           'fields': ko.utils.stringifyJson(self.fieldFacets),
           'ranges': ko.utils.stringifyJson(self.rangeFacets),
           'dates': ko.toJSON(self.dateFacets),
-          'order': ko.toJSON(self.sortableFacetsList)
+          'order': ko.toJSON(ko.utils.arrayMap(self.sortableFacets(), function (obj) {
+                      return obj.uuid;
+           }))
         },
         contentType: 'application/json',
         type: 'POST',
         success: function () {
           $.jHueNotify.info("${_('Facets updated')}");
-          viewModel.isSaveBtnVisible(false);
+          self.isSaveBtnVisible(false);
         },
         error: function (data) {
           $.jHueNotify.error("${_('Error: ')}" + data);
@@ -465,21 +492,10 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
   $(document).ready(function () {
     $(".btn-primary").button("reset");
     ko.applyBindings(viewModel);
+    viewModel.isSaveBtnVisible(false);
 
     $("#select-field-facet").click(function(){
       $("#field-facet-error").hide();
-    });
-
-    $("#dp-start").datepicker({
-      format: DATE_FORMAT
-    }).on("changeDate", function(e){
-      viewModel.selectedDateStartFacet($(this).val());
-    });
-
-    $("#dp-end").datepicker({
-      format: DATE_FORMAT
-    }).on("changeDate", function(e){
-      viewModel.selectedDateEndFacet($(this).val());
     });
 
     var currentStep = "step1";

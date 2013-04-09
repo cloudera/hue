@@ -152,6 +152,7 @@ def admin_core_facets(request, core):
   hue_cores = Core.objects.all()
 
   if request.method == 'POST':
+    print request.POST
     hue_core.facets.update_from_post(request.POST)
     hue_core.facets.save()
     return HttpResponse(json.dumps({}), mimetype="application/json")
