@@ -29,8 +29,8 @@ try:
 except ImportError:
   import simplejson as json
 
-import ldap_access
-from ldap import LDAPError
+#import ldap_access
+#from ldap import LDAPError
 
 from django.contrib.auth.models import User, Group
 from desktop.lib.django_util import render

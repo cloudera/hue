@@ -21,7 +21,7 @@ import types
 import urllib
 import urllib2
 
-from urllib2_kerberos import HTTPKerberosAuthHandler
+#from urllib2_kerberos import HTTPKerberosAuthHandler
 
 __docformat__ = "epytext"
 

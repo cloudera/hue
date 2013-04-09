@@ -38,8 +38,8 @@ from django.core.exceptions import ImproperlyConfigured
 from useradmin.models import get_profile, get_default_user_group, UserProfile
 
 import pam
-from django_auth_ldap.backend import LDAPBackend, ldap_settings
-import ldap
+#from django_auth_ldap.backend import LDAPBackend, ldap_settings
+#import ldap
 
 
 LOG = logging.getLogger(__name__)

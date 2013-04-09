@@ -23,7 +23,7 @@ import select
 import socket
 import threading
 import time
-import sasl
+#import sasl
 import sys
 
 from thrift.Thrift import TType, TApplicationException

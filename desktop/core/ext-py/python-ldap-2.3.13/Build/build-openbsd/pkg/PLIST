@@ -1,3 +1,0 @@
-@comment $OpenBSD$
-%%filelist
-@dirrm lib/python1.6/site-packages/python-ldap

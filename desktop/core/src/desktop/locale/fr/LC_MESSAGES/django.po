@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-01-31 16:56-0800\n"
+"POT-Creation-Date: 2013-04-09 16:31-0700\n"
 "PO-Revision-Date: 2012-08-10 13:58-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -272,8 +272,12 @@ msgid "The LDAP URL to connect to."
 msgstr "URL LDAP à laquelle se connecter."
 
 #: src/desktop/conf.py:302
-msgid "The LDAP certificate for authentication over TLS."
-msgstr "Certificat LDAP pour une authentification sur TLS."
+msgid ""
+"A PEM-format file containing certificates for the CA's that Hue will "
+"trust for authentication over TLS. The certificate for the CA that signed"
+" the LDAP server certificate must be included among these certificates. "
+"See more here http://www.openldap.org/doc/admin24/tls.html."
+msgstr ""
 
 #: src/desktop/conf.py:305
 msgid "A pattern to use for constructing LDAP usernames."
@@ -478,16 +482,16 @@ msgstr "Journaux introuvables."
 msgid "You must be a superuser."
 msgstr "Vous devez être un superutilisateur."
 
-#: src/desktop/auth/forms.py:26 src/desktop/templates/login.mako:66
+#: src/desktop/auth/forms.py:28 src/desktop/templates/login.mako:67
 msgid "Username"
 msgstr "Nom d'utilisateur"
 
-#: src/desktop/auth/forms.py:27 src/desktop/auth/forms.py:35
-#: src/desktop/templates/login.mako:70
+#: src/desktop/auth/forms.py:29 src/desktop/auth/forms.py:38
+#: src/desktop/templates/login.mako:75
 msgid "Password"
 msgstr "Mot de passe"
 
-#: src/desktop/auth/views.py:97 src/desktop/auth/views.py:98
+#: src/desktop/auth/views.py:102 src/desktop/auth/views.py:103
 msgid "Could not create home directory."
 msgstr "Impossible de créer un répertoire racine."
 
@@ -746,14 +750,6 @@ msgstr "Numéro de ligne"
 msgid "Function Name"
 msgstr "Nom de la fonction"
 
-#: src/desktop/templates/about_layout.mako:34
-msgid "Configuration"
-msgstr "Configuration"
-
-#: src/desktop/templates/about_layout.mako:35
-msgid "Check for misconfiguration"
-msgstr "Recherche de configuration incorrecte"
-
 #: src/desktop/templates/about_layout.mako:36
 msgid "Server Logs"
 msgstr "Journaux de serveur"
@@ -826,16 +822,36 @@ msgid "column name..."
 msgstr "nom de la colonne..."
 
 #: src/desktop/templates/common_header.mako:136
-msgid "About Hue"
-msgstr "A propos de Hue"
-
-#: src/desktop/templates/common_header.mako:143
-msgid "Profile"
-msgstr "Profil"
+msgid "About Oozie UI"
+msgstr ""
 
 #: src/desktop/templates/common_header.mako:145
 msgid "Sign Out"
 msgstr "Se déconnecter"
+
+#: src/desktop/templates/common_header.mako:161
+msgid "Workflows"
+msgstr ""
+
+#: src/desktop/templates/common_header.mako:164
+msgid "Coordinators"
+msgstr ""
+
+#: src/desktop/templates/common_header.mako:167
+msgid "Bundles"
+msgstr ""
+
+#: src/desktop/templates/common_header.mako:170
+msgid "Oozie"
+msgstr ""
+
+#: src/desktop/templates/common_header.mako:173
+msgid "Documentation in a new tab"
+msgstr ""
+
+#: src/desktop/templates/common_header.mako:173
+msgid "Documentation"
+msgstr ""
 
 #: src/desktop/templates/config_alert_dock.mako:20
 msgid "Misconfiguration detected"
@@ -853,23 +869,23 @@ msgstr "Sections et variables de configuration"
 msgid "Default:"
 msgstr "Par défaut :"
 
-#: src/desktop/templates/error.mako:25 src/desktop/templates/login.mako:86
+#: src/desktop/templates/error.mako:25 src/desktop/templates/login.mako:91
 msgid "Error!"
 msgstr "Erreur !"
 
-#: src/desktop/templates/login.mako:76
+#: src/desktop/templates/login.mako:81
 msgid "Sign up"
 msgstr "S'inscrire"
 
-#: src/desktop/templates/login.mako:78
+#: src/desktop/templates/login.mako:83
 msgid "Sign in"
 msgstr "Se connecter"
 
-#: src/desktop/templates/login.mako:86
+#: src/desktop/templates/login.mako:91
 msgid "Invalid username or password."
 msgstr "Nom d'utilisateur ou mot de passe non valide."
 
-#: src/desktop/templates/login.mako:97
+#: src/desktop/templates/login.mako:102
 msgid ""
 "Since this is your first time logging in, pick any username and password."
 " Be sure to remember these, as"
@@ -877,7 +893,7 @@ msgstr ""
 "Comme il s'agit de votre première connexion, sélectionnez un nom "
 "d'utilisateur et un mot de passe. Veillez à les mémoriser, car"
 
-#: src/desktop/templates/login.mako:98
+#: src/desktop/templates/login.mako:103
 msgid "they will become your Hue superuser credentials."
 msgstr "ils deviendront vos informations de connexion de superutilisateur Hue."
 
@@ -892,4 +908,19 @@ msgstr "Télécharger l'intégralité du journal sous forme de fichier zip"
 #: src/desktop/templates/popup_error.mako:69
 msgid "Go back"
 msgstr "Revenir"
+
+#~ msgid "The LDAP certificate for authentication over TLS."
+#~ msgstr "Certificat LDAP pour une authentification sur TLS."
+
+#~ msgid "Configuration"
+#~ msgstr "Configuration"
+
+#~ msgid "Check for misconfiguration"
+#~ msgstr "Recherche de configuration incorrecte"
+
+#~ msgid "About Hue"
+#~ msgstr "A propos de Hue"
+
+#~ msgid "Profile"
+#~ msgstr "Profil"
 

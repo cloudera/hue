@@ -21,8 +21,8 @@ User Admin to work seamlessly with LDAP.
 import re
 
 import desktop.conf
-import ldap
-import ldap.filter
+#import ldap
+#import ldap.filter
 
 import logging
 LOG = logging.getLogger(__name__)

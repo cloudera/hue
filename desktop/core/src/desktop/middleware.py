@@ -19,7 +19,7 @@ import logging
 import os.path
 import re
 import tempfile
-import kerberos
+#import kerberos
 
 from django.conf import settings
 from django.contrib import messages
