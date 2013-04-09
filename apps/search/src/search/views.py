@@ -117,32 +117,6 @@ def admin_core_properties(request, core):
 
 
 @allow_admin_only
-def admin_core_solr_properties(request, core):
-  solr_core = SolrApi(SOLR_URL.get()).core(core)
-  hue_core = Core.objects.get(name=core)
-  hue_cores = Core.objects.all()
-
-  return render('admin_core_solr_properties.mako', request, {
-    'solr_core': solr_core,
-    'hue_core': hue_core,
-    'hue_cores': hue_cores,
-  })
-
-
-@allow_admin_only
-def admin_core_schema(request, core):
-  solr_schema = SolrApi(SOLR_URL.get()).schema(core)
-  hue_core = Core.objects.get(name=core)
-  hue_cores = Core.objects.all()
-
-  return render('admin_core_schema.mako', request, {
-    'solr_schema': solr_schema,
-    'hue_core': hue_core,
-    'hue_cores': hue_cores,
-  })
-
-
-@allow_admin_only
 def admin_core_template(request, core):
   solr_core = SolrApi(SOLR_URL.get()).core(core)
   hue_core = Core.objects.get(name=core)
@@ -223,6 +197,39 @@ def admin_core_highlighting(request, core):
     'hue_core': hue_core,
     'hue_cores': hue_cores,
   })
+
+
+# Ajax below
+
+@allow_admin_only
+def admin_core_solr_properties(request, core):
+  solr_core = SolrApi(SOLR_URL.get()).core(core)
+  hue_core = Core.objects.get(name=core)
+  hue_cores = Core.objects.all()
+
+  content = render('admin_core_properties_solr_properties.mako', request, {
+    'solr_core': solr_core,
+    'hue_core': hue_core,
+    'hue_cores': hue_cores,
+  }, force_template=True).content
+
+  return HttpResponse(json.dumps({'content': content}), mimetype="application/json")
+
+
+@allow_admin_only
+def admin_core_schema(request, core):
+  solr_schema = SolrApi(SOLR_URL.get()).schema(core)
+  hue_core = Core.objects.get(name=core)
+  hue_cores = Core.objects.all()
+
+  content = render('admin_core_properties_solr_schema', request, {
+    'solr_schema': solr_schema,
+    'hue_core': hue_core,
+    'hue_cores': hue_cores,
+  }, force_template=True).content
+
+  return HttpResponse(json.dumps({'content': content}), mimetype="application/json")
+
 
 # TODO security
 def query_suggest(request, core, query=""):
