@@ -52,7 +52,7 @@ ${ commonheader(_('About Hue'), "quick_start", user, "100px") | n,unicode }
       <li class="active"><a href="#step1" class="step">${ _('Step 1: Check Configuration') }</a></li>
       <li><a href="#step2" class="step">${ _('Step 2: Examples') }</a></li>
       <li><a href="#step3" class="step">${ _('Step 3: Users') }</a></li>
-      <li><a href="/beeswax" class="step">${ _('Step 4: Use Hue') }</a></li>
+      <li><a href="${ url('desktop.views.home') }" class="step">${ _('Step 4: Use Hue') }</a></li>
     </ul>
 
     <div class="steps" >
@@ -72,10 +72,10 @@ ${ commonheader(_('About Hue'), "quick_start", user, "100px") | n,unicode }
             </button>
           </li>
         % endif
-        % if 'oozie' in app_names:
+        % if 'oozie' in app_names or 'jobsub' in app_names:
           <li>
             <button type="button" class="btn" data-loading-text="Installing..." data-url="${ url('oozie:setup_app') }">
-              <i class="icon-download-alt"></i> Oozie
+              <i class="icon-download-alt"></i> Oozie / Job Designer
             </button>
           </li>
         % endif

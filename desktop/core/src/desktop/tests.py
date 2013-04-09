@@ -38,6 +38,7 @@ from desktop.lib.conf import validate_path
 from desktop.lib.django_util import TruncatingModel
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.test_utils import grant_access
+from desktop.views import check_config_ajax
 
 
 def setup_test_environment():
@@ -449,3 +450,9 @@ def test_ui_customizations():
   finally:
     for old_conf in reset:
       old_conf()
+
+
+def test_check_config_ajax():
+  c = make_logged_in_client()
+  response = c.get(reverse(check_config_ajax))
+  assert_true("Misconfiguration" in response.content, response.content)
