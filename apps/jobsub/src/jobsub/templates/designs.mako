@@ -104,7 +104,7 @@ ${ commonheader(_('Job Designer'), "jobsub", user, "60px") | n,unicode }
       <thead>
         <tr>
           <th width="1%">
-            <div id="selectAll" data-bind="click: toggleSelectAll, css: {hueCheckbox: true, 'icon-ok': selectedDesignObjects().length == designs().length}"></div>
+            <div id="selectAll" data-bind="click: toggleSelectAll, css: {hueCheckbox: true, 'icon-ok': allSelected}"></div>
           </th>
           <th>${_('Name')}</th>
           <th>${_('Description')}</th>
@@ -190,6 +190,7 @@ $(document).bind('initialize.designs', function() {
     "bDestroy": true,
     "aoColumns": [
       { "bSortable": false },
+      null,
       null,
       null,
       null,

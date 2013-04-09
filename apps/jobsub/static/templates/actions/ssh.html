@@ -31,8 +31,8 @@
       <hr/>
 
       <div class="control-group">
-        <p class="alert alert-info">{{ alert }}</p>
-        <p class="alert alert-warn">{{ ssh_alert }}</p>
+        <p class="alert alert-info">{{{ alert }}}</p>
+        <p class="alert alert-warn">{{{ ssh_alert }}}</p>
       </div>
 
       <div class="control-group" rel="popover" data-original-title="{{ user.name }}" data-content="{{ user.popover }}" data-bind="attr: {'class': ( errors.user().length > 0 ) ? 'control-group error' : 'control-group'}">
@@ -65,9 +65,9 @@
         </div>
       </div>
 
-      {{#args}}
-        {{>args}}
-      {{/args}}
+      {{#params}}
+        {{>params}}
+      {{/params}}
     </fieldset>
     <div class="form-actions">
       <button data-bind="click: {{ save.func }}" class="btn btn-primary">{{ save.name }}</button>

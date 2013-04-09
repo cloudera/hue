@@ -264,7 +264,7 @@ var Designs = (function($, ko, NodeModelChooser) {
       return selected;
     });
     self.allSelected = ko.computed(function() {
-      return self.selectedDesignObjects().length == self.designs().length;
+      return self.selectedDesignObjects().length == self.designs().length && self.selectedDesignObjects().length > 0;
     });
 
     self.initialize(options);
