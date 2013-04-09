@@ -32,7 +32,6 @@ from desktop.lib.exceptions_renderable import PopupException
 from beeswax.models import SavedQuery, MetaInstall
 from beeswax.server import dbms
 
-from catalog.conf import CATALOG_DATABASE_COOKIE_EXPIRE
 from catalog.forms import LoadDataForm, DbForm
 
 LOG = logging.getLogger(__name__)
