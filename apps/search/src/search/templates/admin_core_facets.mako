@@ -362,20 +362,24 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
       self.fieldFacetsList.push(facet.field);
       self.fieldFacetsList.sort();
       self.updateSortableFacets();
+      viewModel.isSaveBtnVisible(true);
     };
 
     self.removeRangeFacet = function (facet) {
       self.rangeFacets.remove(facet);
       self.updateSortableFacets();
+      viewModel.isSaveBtnVisible(true);
     };
 
     self.removeDateFacet = function (facet) {
       self.dateFacets.remove(facet);
       self.updateSortableFacets();
+      viewModel.isSaveBtnVisible(true);
     };
 
     self.updateSortableFacets = function () {
       self.sortableFacets(self.fieldFacets().concat(self.rangeFacets()).concat(self.dateFacets()));
+      viewModel.isSaveBtnVisible(true);
     };
 
     self.addFieldFacet = function () {
@@ -394,6 +398,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
         self.fieldFacetsList.remove(self.selectedFieldFacet());
         self.properties().isEnabled(true);
         self.updateSortableFacets();
+        viewModel.isSaveBtnVisible(true);
       }
       else {
         $("#field-facet-error").show();
@@ -406,10 +411,12 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
       }
       self.rangeFacets.push(new RangeFacet(self.selectedRangeFacet(), self.selectedRangeLabel(), self.selectedRangeStartFacet(), self.selectedRangeEndFacet(), self.selectedRangeGapFacet()));
       self.selectedRangeLabel("");
-      self.selectedRangeStartFacet("");
-      self.selectedRangeEndFacet("");
-      self.selectedRangeGapFacet("");
+      self.selectedRangeStartFacet(0);
+      self.selectedRangeEndFacet(100);
+      self.selectedRangeGapFacet(10);
+      self.properties().isEnabled(true);
       self.updateSortableFacets();
+      viewModel.isSaveBtnVisible(true);
     };
 
     self.addDateFacet = function () {
@@ -423,7 +430,9 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
         new DateMath({frequency: 0, unit: 'DAYS'}),
         new DateMath({frequency: 1, unit: 'DAYS'})
       ]);
+      self.properties().isEnabled(true);
       self.updateSortableFacets();
+      viewModel.isSaveBtnVisible(true);
     };
 
     self.submit = function () {
@@ -439,6 +448,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
         type: 'POST',
         success: function () {
           $.jHueNotify.info("${_('Facets updated')}");
+          viewModel.isSaveBtnVisible(false);
         },
         error: function (data) {
           $.jHueNotify.error("${_('Error: ')}" + data);
@@ -477,30 +487,25 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     routie({
       "step1":function () {
         showStep("step1");
-        viewModel.isSaveBtnVisible(false);
       },
       "step2":function () {
         if (validateStep("step1")) {
           showStep("step2");
-          viewModel.isSaveBtnVisible(false);
         }
       },
       "step3":function () {
         if (validateStep("step1") && validateStep("step2")) {
           showStep("step3");
-          viewModel.isSaveBtnVisible(false);
         }
       },
       "step4":function () {
         if (validateStep("step1") && validateStep("step2")) {
           showStep("step4");
-          viewModel.isSaveBtnVisible(false);
         }
       },
       "step5":function () {
         if (validateStep("step1") && validateStep("step2")) {
           showStep("step5");
-          viewModel.isSaveBtnVisible(true);
         }
       }
     });
