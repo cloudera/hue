@@ -15,27 +15,19 @@
 ## limitations under the License.
 
 <%!
-  from desktop.views import commonheader, commonfooter
   from django.utils.translation import ugettext as _
 %>
 
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="macros" file="macros.mako" />
 
-${ commonheader(_('Search'), "search", user) | n,unicode }
-
 <%layout:skeleton>
 
   <%def name="title()">
-    <h1>${_('Search Admin - ')}${hue_core.label}</h1>
-  </%def>
-
-  <%def name="navigation()">
-    ${ layout.sidebar(hue_core.name, 'schema') }
   </%def>
 
   <%def name="content()">
-    <textarea id="schema">
+    <textarea id="schema_field">
       ${ solr_schema.decode('utf-8') }
     </textarea>
   </%def>
@@ -50,9 +42,9 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 
 <script type="text/javascript">
   $(document).ready(function () {
-    var schemaViewer = $("#schema")[0];
+    var schemaViewer = $("#schema_field")[0];
 
-    var codeMirror = CodeMirror(function (elt) {
+    window.codeMirror = CodeMirror(function (elt) {
       schemaViewer.parentNode.replaceChild(elt, schemaViewer);
     }, {
       value: schemaViewer.value,
@@ -60,9 +52,6 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
       lineNumbers: true
     });
 
-    codeMirror.setSize("100%", $(document).height() - 150 - $(".form-actions").outerHeight());
-
+    window.codeMirror.setSize("100%", $(document).height() - 150 - $(".form-actions").outerHeight());
   });
 </script>
-
-${ commonfooter(messages) | n,unicode }

@@ -74,16 +74,27 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
       </div>
 
       <div class="tab-pane" id="schema">
-        todo?
+        ${_('Loading...')} <img src="/static/art/login-spinner.gif">
       </div>
 
       <div class="tab-pane" id="properties">
-        todo?
+        ${_('Loading...')} <img src="/static/art/login-spinner.gif">
       </div>
     </div>
   </form>
   </%def>
 
 </%layout:skeleton>
+
+<script type="text/javascript" charset="utf-8">
+  $(document).ready(function(){
+    $.get("${ url('search:admin_core_schema', core=hue_core.name) }", function(data) {
+        $("#schema").html(data.content); // Need to scroll to refresh
+    });
+    $.get("${ url('search:admin_core_solr_properties', core=hue_core.name) }", function(data) {
+        $("#properties").html(data.content);
+    });
+ });
+</script>
 
 ${ commonfooter(messages) | n,unicode }

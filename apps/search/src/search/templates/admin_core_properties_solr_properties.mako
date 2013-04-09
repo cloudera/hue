@@ -15,20 +15,19 @@
 ## limitations under the License.
 
 <%!
-  from desktop.views import commonheader, commonfooter
   from django.utils.translation import ugettext as _
 %>
 
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="macros" file="macros.mako" />
 
-${ commonheader(_('Search'), "search", user) | n,unicode }
 
 <%def name="indexProperty(key)">
   %if key in solr_core["status"][hue_core.name]["index"]:
       ${ solr_core["status"][hue_core.name]["index"][key] }
     %endif
 </%def>
+
 <%def name="coreProperty(key)">
   %if key in solr_core["status"][hue_core.name]:
       ${ solr_core["status"][hue_core.name][key] }
@@ -36,22 +35,17 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 </%def>
 
 <%layout:skeleton>
-
   <%def name="title()">
-    <h1>${_('Search Admin - ')}${hue_core.label}</h1>
-  </%def>
-
-  <%def name="navigation()">
-    ${ layout.sidebar(hue_core.name, 'index') }
   </%def>
 
   <%def name="content()">
     <ul class="nav nav-tabs">
-      <li class="active"><a href="#index" data-toggle="tab">${_('Index properties')}</a></li>
-      <li><a href="#core" data-toggle="tab">${_('Core properties')}</a></li>
+      <li class="active"><a href="#index_properties" data-toggle="tab">${_('Index properties')}</a></li>
+      <li><a href="#core_properties" data-toggle="tab">${_('Core properties')}</a></li>
     </ul>
+
     <div class="tab-content">
-      <div class="tab-pane active" id="index">
+      <div class="tab-pane active" id="index_properties">
         <table class="table">
           <thead>
           <tr>
@@ -103,7 +97,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
           </tbody>
         </table>
       </div>
-      <div class="tab-pane" id="core">
+      <div class="tab-pane" id="core_properties">
         <table class="table">
           <thead>
           <tr>
@@ -151,7 +145,3 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 
   </%def>
 </%layout:skeleton>
-
-${ commonfooter(messages) | n,unicode }
-
-
