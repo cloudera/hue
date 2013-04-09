@@ -45,6 +45,13 @@ import desktop.log.log_buffer
 LOG = logging.getLogger(__name__)
 
 @access_log_level(logging.WARN)
+def home(request):
+  apps = appmanager.get_apps(request.user)
+  apps = dict([(app.name, app) for app in apps])
+  return render('home.mako', request, dict(apps=apps))
+
+
+@access_log_level(logging.WARN)
 def log_view(request):
   """
   We have a log handler that retains the last X characters of log messages.
@@ -222,7 +229,7 @@ def index(request):
   if request.user.is_superuser:
     return redirect(reverse('about:index'))
   else:
-    return redirect(reverse('beeswax:index'))
+    return home(request)
 
 def serve_404_error(request, *args, **kwargs):
   """Registered handler for 404. We just return a simple error"""

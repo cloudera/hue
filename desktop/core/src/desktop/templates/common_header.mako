@@ -149,6 +149,9 @@ from django.utils.translation import ugettext as _
 
         <div class="nav-collapse">
           <ul class="nav">
+            <li id="homeIcon" ${is_selected(section, "home")}>
+              <a class="nav-tooltip" title="${ _('Home') }" href="/home"><img src="/static/art/home.png" /></a>
+            </li>
             %for app in apps:
               %if app.icon_path:
               <li id="${app.display_name}Icon" ${is_selected(section, app.display_name)}>
