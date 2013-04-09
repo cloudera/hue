@@ -143,7 +143,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
         <div class="row-fluid">
           <div class="span9">
             <div id="toolbar"></div>
-            <div id="content-editor" class="clear" style="margin-top: 20px; min-height: 300px">${ hue_core.result.get_template() | n,unicode }</div>
+            <div id="content-editor" class="clear" style="margin-top: 20px; min-height: 400px">${ hue_core.result.get_template() | n,unicode }</div>
             <div id="load-template" class="btn-group">
               <a title="Layout" class="btn toolbar-btn toolbar-cmd">
                 <i class="icon-th-large" style="margin-top:2px;"></i>
@@ -153,9 +153,9 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
           <div class="span3">
             <div class="widget-box">
               <div class="widget-title">
-								<span class="icon">
-									<i class="icon-th-list"></i>
-								</span>
+				<span class="icon">
+					<i class="icon-th-list"></i>
+				</span>
                 <h5>${_('Available Fields')}</h5>
               </div>
               <div class="widget-content">
@@ -167,9 +167,9 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
             </div>
             <div class="widget-box">
               <div class="widget-title">
-								<span class="icon">
-									<i class="icon-magic"></i>
-								</span>
+				<span class="icon">
+					<i class="icon-magic"></i>
+				</span>
                 <h5>${_('Available Functions')}</h5>
               </div>
               <div class="widget-content">
@@ -200,11 +200,11 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
             <textarea id="template-source"></textarea>
           </div>
           <div class="span3">
-            <div class="widget-box" style="margin-top: 0">
+            <div class="widget-box" style="margin-top: 0; min-height: 400px">
               <div class="widget-title">
-								<span class="icon">
-									<i class="icon-th-list"></i>
-								</span>
+				<span class="icon">
+					<i class="icon-th-list"></i>
+				</span>
                 <h5>${_('Available Fields')}</h5>
               </div>
               <div class="widget-content">
@@ -216,9 +216,9 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
             </div>
             <div class="widget-box">
               <div class="widget-title">
-								<span class="icon">
-									<i class="icon-magic"></i>
-								</span>
+				<span class="icon">
+					<i class="icon-magic"></i>
+				</span>
                 <h5>${_('Available Functions')}</h5>
               </div>
               <div class="widget-content">

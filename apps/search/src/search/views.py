@@ -131,7 +131,7 @@ def admin_core_template(request, core):
   solr_query['core'] = core
   solr_query['q'] = ''
   solr_query['fq'] = ''
-  solr_query['rows'] = 10
+  solr_query['rows'] = 5
   solr_query['start'] = 0
   solr_query['facets'] = 0
 
