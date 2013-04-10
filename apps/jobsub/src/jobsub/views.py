@@ -71,15 +71,15 @@ def list_designs(request):
   designs = []
   for design in data:
       ko_design = {
-          'id': design.id,
-          'owner': design.owner.username,
-          # Design name is validated by workflow and node forms.
-          'name': design.name,
-          'description': design.description,
-          'node_type': design.start.get_child('to').node_type,
-          'last_modified': py_time.mktime(design.last_modified.timetuple()),
-          'editable': design.owner.id == request.user.id,
-          'is_shared': design.is_shared
+        'id': design.id,
+        'owner': design.owner.username,
+        # Design name is validated by workflow and node forms.
+        'name': design.name,
+        'description': design.description,
+        'node_type': design.start.get_child('to').node_type,
+        'last_modified': py_time.mktime(design.last_modified.timetuple()),
+        'editable': design.owner.id == request.user.id,
+        'is_shared': design.is_shared
       }
       designs.append(ko_design)
 

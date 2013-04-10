@@ -155,6 +155,8 @@ function getFileBrowseButton(inputElement) {
       initialPath: inputElement.val(),
       onFileChoose: function(filePath) {
         inputElement.val(filePath);
+        inputElement.change();
+        addFileBrowseButton();
         $("#chooseFile").modal("hide");
       },
       createFolder: false

@@ -55,7 +55,7 @@
 <%def name="distributed_cache(files, archives)">
     % for f in files:
         % if f:
-            <file>${ filelink(f) }</file>
+            <file>${ filelink(f['name']) }</file>
         % endif
     % endfor
     % for a in archives:

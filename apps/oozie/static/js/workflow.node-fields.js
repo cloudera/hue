@@ -33,7 +33,7 @@ var NodeFields = {
       self.files.valueHasMutated();
     });
     self.files.push(prop);
-    $(document).trigger('add.file.design', [data]);
+    $(document).trigger('add.file.workflow', [data]);
   },
   removeArchive: function(data, event) {
     var self = this;
