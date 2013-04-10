@@ -103,8 +103,10 @@ def _save_links(workflow, root):
   workflow.end = End.objects.get(workflow=workflow).get_full_node()
   workflow.save()
 
+  _resolve_start_relationships(workflow)
   _resolve_fork_relationships(workflow)
   _resolve_decision_relationships(workflow)
+
 
 def _start_relationships(workflow, parent, child_el):
   """
@@ -125,6 +127,7 @@ def _start_relationships(workflow, parent, child_el):
   obj = Link.objects.create(name='to', parent=parent, child=child)
   obj.save()
 
+
 def _join_relationships(workflow, parent, child_el):
   """
   Resolves join node links.
@@ -142,6 +145,7 @@ def _join_relationships(workflow, parent, child_el):
 
   obj = Link.objects.create(name='to', parent=parent, child=child)
   obj.save()
+
 
 def _decision_relationships(workflow, parent, child_el):
   """
@@ -178,6 +182,7 @@ def _decision_relationships(workflow, parent, child_el):
 
       obj.save()
 
+
 def _node_relationships(workflow, parent, child_el):
   """
   Resolves node links.
@@ -208,6 +213,16 @@ def _node_relationships(workflow, parent, child_el):
 
       obj = Link.objects.create(name=name, parent=parent, child=child)
       obj.save()
+
+
+def _resolve_start_relationships(workflow):
+  if not workflow.start:
+    raise RuntimeError(_("Workflow start has not been created."))
+
+  if not workflow.end:
+    raise RuntimeError(_("Workflow end has not been created."))
+
+  obj = Link.objects.get_or_create(name='related', parent=workflow.start, child=workflow.end)
 
 
 def _resolve_fork_relationships(workflow):
