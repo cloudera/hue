@@ -55,8 +55,8 @@ ${ commonheader(_('About Hue'), "quick_start", user, "100px") | n,unicode }
     <ul class="nav nav-tabs">
       <li class="active"><a href="#step1" class="step">${ _('Step 1:') } <i class="icon-cogs"></i> ${ _('Check Configuration') }</a></li>
       <li><a href="#step2" class="step">${ _('Step 2:') } <i class="icon-book"></i> ${ _('Examples') }</a></li>
-      <li><a href="#step3" class="step">${ _('Step 3:') } <i class="icon-user"></i> ${ _('Users') }</a></li>
-      <li><a id="lastStep" href="${ url('desktop.views.home') }" class="step">${ _('Step 4:') } <i class="icon-home"></i> ${_('Use Hue') }</a></li>
+      <li><a href="#step3" class="step">${ _('Step 3:') } <i class="icon-group"></i> ${ _('Users') }</a></li>
+      <li><a id="lastStep" href="${ url('desktop.views.home') }" class="step">${ _('Step 4:') } <i class="icon-flag"></i> ${_('Go !') }</a></li>
     </ul>
 
     <div class="steps" >
@@ -75,7 +75,7 @@ ${ commonheader(_('About Hue'), "quick_start", user, "100px") | n,unicode }
           <span class="icon">
             <i class="icon-th-list"></i>
           </span>
-          <h5>${ _('Install or re-install available app examples') }</h5>
+          <h5>${ _('Install or re-install the application examples') }</h5>
         </div>
         <div class="widget-content">
           <ul>

@@ -41,9 +41,6 @@ ${ layout.menubar(section='workflows') }
     <%def name="creation()">
         <a href="${ url('oozie:create_workflow') }" class="btn"><i class="icon-plus-sign"></i> ${ _('Create') }</a>
         <a href="${ url('oozie:import_workflow') }" class="btn"><i class="icon-plus-sign"></i> ${ _('Import') }</a>
-        % if currentuser.is_superuser:
-          <a href="#installSamples" data-toggle="modal" class="btn"><i class="icon-download-alt"></i> ${ _('Setup Examples') }</a>
-        % endif
     </%def>
   </%actionbar:render>
 
@@ -65,16 +62,16 @@ ${ layout.menubar(section='workflows') }
         <tr>
           <td data-row-selector-exclude="true">
              <div class="hueCheckbox workflowCheck" data-row-selector-exclude="true"
-              % if workflow.is_accessible(currentuser):
+              % if workflow.is_accessible(user):
                   data-submit-url="${ url('oozie:submit_workflow', workflow=workflow.id) }"
                   data-schedule-url="${ url('oozie:schedule_workflow', workflow=workflow.id) }"
                   data-clone-url="${ url('oozie:clone_workflow', workflow=workflow.id) }"
               % endif
-              % if workflow.is_editable(currentuser):
+              % if workflow.is_editable(user):
                   data-delete-id="${ workflow.id }"
               % endif
             ></div>
-            % if workflow.is_accessible(currentuser):
+            % if workflow.is_accessible(user):
               <a href="${ url('oozie:edit_workflow', workflow=workflow.id) }" data-row-selector="true"></a>
             % endif
           </td>
@@ -115,21 +112,6 @@ ${ layout.menubar(section='workflows') }
   </form>
 </div>
 
-<div id="installSamples" class="modal hide fade">
-  <form id="installSamplesForm" action="${url('oozie:setup_app')}" method="POST">
-    <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3>${ _('Set up the workspaces and examples?') }</h3>
-    </div>
-    <div class="modal-body">
-      ${ _('Hue is going to re-create the workspaces and re-install the examples.') }
-    </div>
-    <div class="modal-footer">
-      <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>
-      <input type="submit" class="btn btn-primary" value="${ _('Yes') }"/>
-    </div>
-  </form>
-</div>
 
 <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout-2.1.0.js" type="text/javascript" charset="utf-8"></script>

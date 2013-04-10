@@ -15,7 +15,6 @@
 ## limitations under the License.
 <%
   from jobbrowser.views import get_state_link
-  from desktop import appmanager
   from django.template.defaultfilters import urlencode
   from desktop.views import commonheader, commonfooter
   from django.utils.translation import ugettext as _
@@ -28,11 +27,10 @@
 %   endif
 </%def>
 
-% if jobs or filtered:
 ${ commonheader(_('Job Browser'), "jobbrowser", user) | n,unicode }
 <div class="container-fluid">
-<h1>${_('Job Browser')}</h1>
-<form class="well form-inline" action="/jobbrowser/jobs" method="GET">
+  <h1>${_('Job Browser')}</h1>
+  <form class="well form-inline" action="/jobbrowser/jobs" method="GET">
     <label>
     ${_('Job status:')}
     <select name="state" class="submitter">
@@ -62,7 +60,7 @@ ${ commonheader(_('Job Browser'), "jobbrowser", user) | n,unicode }
         ${_('Username:')}
         <input type="text" name="user" title="${_('User Name Filter')}" value="${ user_filter or '' }" placeholder="${_('User Name Filter')}" class="submitter input-large search-query" />
     </label>
-</form>
+  </form>
 
 
 % if not jobs:
@@ -150,21 +148,6 @@ ${ commonheader(_('Job Browser'), "jobbrowser", user) | n,unicode }
             % endfor
         </tbody>
     </table>
-    % endif
-
-    % else:
-        ${ commonheader(_('Job Browser'), "jobbrowser", user) | n,unicode }
-        <div class="container-fluid">
-        <h1>${_('Welcome to the Job Browser')}</h1>
-        <div>
-            <p>${_("There aren't any jobs running. Let's fix that.")}</p>
-            % if appmanager.get_desktop_module('jobsub') is not None:
-                <a href="/jobsub/">${_('Launch the Job Designer')}</a><br/>
-            % endif
-            % if appmanager.get_desktop_module('beeswax') is not None:
-                <a href="/beeswax/">${_('Launch Beeswax')}</a><br/>
-            % endif
-    </div>
     % endif
 </div>
 

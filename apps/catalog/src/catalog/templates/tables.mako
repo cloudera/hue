@@ -38,9 +38,6 @@ ${ commonheader(_('Tables'), 'catalog', user) | n,unicode }
                     </li>
                     </span>
                     <li class="nav-header">${_('Actions')}</li>
-                    % if not examples_installed:
-                    <li><a href="#installSamples" data-toggle="modal">${_('Install samples')}</a></li>
-                    % endif
                     <li><a href="${ url('beeswax:import_wizard', database=database) }">${_('Create a new table from a file')}</a></li>
                     <li><a href="${ url('beeswax:create_table', database=database) }">${_('Create a new table manually')}</a></li>
                 </ul>
@@ -81,24 +78,6 @@ ${ commonheader(_('Tables'), 'catalog', user) | n,unicode }
         </div>
     </div>
 </div>
-
-% if not examples_installed:
-<div id="installSamples" class="modal hide fade">
-  <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${_('Install samples')}</h3>
-  </div>
-  <div class="modal-body">
-    <div id="installSamplesMessage">
-
-    </div>
-  </div>
-  <div class="modal-footer">
-    <a href="#" class="btn" data-dismiss="modal">${_('Cancel')}</a>
-    <a href="#" id="installSamplesBtn" class="btn btn-primary">${_('Yes, install samples')}</a>
-  </div>
-</div>
-% endif
 
 <div id="dropTable" class="modal hide fade">
   <form id="dropTableForm" action="${ url('catalog:drop_table', database=database) }" method="POST">
@@ -156,28 +135,6 @@ ${ commonheader(_('Tables'), 'catalog', user) | n,unicode }
       $.cookie("hueBeeswaxLastDatabase", $(this).val(), {expires:90});
       $('#db_form').submit();
     });
-
-    % if not examples_installed:
-        $.getJSON("${ url('beeswax:install_examples') }", function (data) {
-          $("#installSamplesMessage").text(data.title);
-        });
-
-        $("#installSamplesBtn").click(function () {
-          $.post(
-              "${ url('beeswax:install_examples') }",
-              { submit:"Submit" },
-              function (result) {
-                if (result.creationSucceeded) {
-                  window.location.href = "${ url('catalog:show_tables') }";
-                }
-                else {
-                  var message = "${_('There was an error processing your request:')} " + result.message;
-                  $("#installSamplesMessage").addClass("alert").addClass("alert-error").text(message);
-                }
-              }
-          );
-        });
-    % endif
 
     $(".selectAll").click(function () {
       if ($(this).attr("checked")) {

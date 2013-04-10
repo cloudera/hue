@@ -69,7 +69,6 @@ def list_workflows(request):
   return render('editor/list_workflows.mako', request, {
     'jobs': list(data),
     'json_jobs': json.dumps(list(data.values_list('id', flat=True))),
-    'currentuser': request.user,
     'show_setup_app': show_setup_app,
   })
 
@@ -89,7 +88,6 @@ def list_coordinators(request, workflow_id=None):
   return render('editor/list_coordinators.mako', request, {
     'jobs': list(data),
     'json_jobs': json.dumps(list(data.values_list('id', flat=True))),
-    'currentuser': request.user,
   })
 
 
@@ -106,7 +104,6 @@ def list_bundles(request):
   return render('editor/list_bundles.mako', request, {
     'jobs': list(data),
     'json_jobs': json.dumps(list(data.values_list('id', flat=True))),
-    'currentuser': request.user,
   })
 
 

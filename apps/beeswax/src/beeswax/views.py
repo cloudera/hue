@@ -57,14 +57,6 @@ SAVE_RESULTS_CTAS_TIMEOUT = 300         # seconds
 
 
 def index(request):
-  try:
-    tables = dbms.get(request.user).get_tables()
-    if not tables:
-      examples_installed = beeswax.models.MetaInstall.get().installed_example
-      return render("index.mako", request, {'examples_installed': examples_installed})
-  except:
-    pass
-
   return execute_query(request)
 
 

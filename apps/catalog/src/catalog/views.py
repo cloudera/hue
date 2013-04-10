@@ -96,7 +96,6 @@ def show_tables(request, database=None):
     db_form = DbForm(initial={'database': database}, databases=databases)
 
   tables = db.get_tables(database=database)
-  examples_installed = MetaInstall.get().installed_example
 
   resp = render("tables.mako", request, {
     'breadcrumbs': [
@@ -106,7 +105,6 @@ def show_tables(request, database=None):
       }
     ],
     'tables': tables,
-    'examples_installed': examples_installed,
     'db_form': db_form,
     'database': database,
     'tables_json': json.dumps(tables),

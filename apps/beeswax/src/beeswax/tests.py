@@ -43,7 +43,6 @@ from desktop.lib.test_utils import grant_access
 from beeswaxd import ttypes
 
 import beeswax.create_table
-import beeswax.create_database
 import beeswax.forms
 import beeswax.hive_site
 import beeswax.models
@@ -55,7 +54,7 @@ from beeswax.test_base import make_query, wait_for_query_to_finish, verify_histo
   BEESWAXD_TEST_PORT
 from beeswax.design import hql_query, _strip_trailing_semicolon
 from beeswax.data_export import download
-from beeswax.models import SavedQuery, QueryHistory
+from beeswax.models import SavedQuery
 from beeswax.server import dbms
 from beeswax.server.beeswax_lib import BeeswaxDataTable, BeeswaxClient
 from beeswax.test_base import BeeswaxSampleProvider
