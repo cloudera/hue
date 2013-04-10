@@ -149,6 +149,8 @@ ${ line | unicode,trim }
                 "sZeroRecords": "${_('No matching records')}",
             }
         });
+
+        $.jHueScrollUp();
     });
 </script>
 

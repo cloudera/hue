@@ -37,12 +37,16 @@ ${ commonheader(_('About Hue'), "quick_start", user, "100px") | n,unicode }
 <div class="container-fluid">
 
   <div class="row-fluid">
-    <h2>Hue ${version} <img src="/static/art/hue-login-logo.png"/></h2>
+    <h2>
+      % if user.is_superuser:
+        ${ _('Quick Start Wizard') } -
+      % endif
+      Hue ${version} <img src="/static/art/hue-login-logo.png"/>
+    </h2>
   </div>
 
   % if user.is_superuser:
   <br/>
-  ${ _('Configure Hue through this wizard.') }
   <br/>
   <br/>
 
@@ -50,49 +54,83 @@ ${ commonheader(_('About Hue'), "quick_start", user, "100px") | n,unicode }
    <div id="properties" class="section">
     <ul class="nav nav-tabs">
       <li class="active"><a href="#step1" class="step">${ _('Step 1:') } <i class="icon-cogs"></i> ${ _('Check Configuration') }</a></li>
-      <li><a href="#step2" class="step">${ _('Step 2:') } <i class="icon-comments-alt"></i> ${ _('Examples') }</a></li>
+      <li><a href="#step2" class="step">${ _('Step 2:') } <i class="icon-book"></i> ${ _('Examples') }</a></li>
       <li><a href="#step3" class="step">${ _('Step 3:') } <i class="icon-user"></i> ${ _('Users') }</a></li>
-      <li><a href="${ url('desktop.views.home') }" class="step">${ _('Step 4:') } <i class="icon-home"></i> ${_('Use Hue') }</a></li>
+      <li><a id="lastStep" href="${ url('desktop.views.home') }" class="step">${ _('Step 4:') } <i class="icon-home"></i> ${_('Use Hue') }</a></li>
     </ul>
 
     <div class="steps" >
       <div id="step1" class="stepDetails">
-       ${ check_config.content | n,unicode }
+      <div class="widget-box">
+
+        <div class="widget-content">
+          ${ check_config.content | n,unicode }
+        </div>
+      </div>
     </div>
 
     <div id="step2" class="stepDetails hide">
-      <p>
-      ${ _('Install or re-install available app examples') }:
-      </p>
-      <ul class="nav nav-tabs nav-stacked">
+      <div class="widget-box">
+        <div class="widget-title">
+          <span class="icon">
+            <i class="icon-th-list"></i>
+          </span>
+          <h5>${ _('Install or re-install available app examples') }</h5>
+        </div>
+        <div class="widget-content">
+          <ul>
         % if 'beeswax' in app_names:
           <li>
-            <button type="button" class="btn" data-loading-text="${ _('Installing...') }" data-url="${ url('beeswax:install_examples') }">
+            <a href="#" class="installBtn" data-loading-text="${ _('Installing...') }" data-url="${ url('beeswax:install_examples') }">
              <i class="icon-download-alt"></i> Beeswax
-            </button>
+            </a>
           </li>
         % endif
         % if 'oozie' in app_names or 'jobsub' in app_names:
           <li>
-            <button type="button" class="btn" data-loading-text="${ _('Installing...') }" data-url="${ url('oozie:setup_app') }">
+            <a href="#" class="installBtn" data-loading-text="${ _('Installing...') }" data-url="${ url('oozie:setup_app') }">
               <i class="icon-download-alt"></i> Oozie / Job Designer
-            </button>
+            </a>
           </li>
         % endif
         % if 'pig' in app_names:
           <li>
-            <button type="button" class="btn" data-loading-text="${ _('Installing...') }" data-url="${ url('pig:install_examples') }">
+            <a href="#" class="installBtn" data-loading-text="${ _('Installing...') }" data-url="${ url('pig:install_examples') }">
              <i class="icon-download-alt"></i> Pig
-            </button>
+            </a>
           </li>
         % endif
-      </ul>
+          </ul>
+        </div>
+      </div>
     </div>
 
     <div id="step3" class="stepDetails hide">
-      ${ _('Go create or import users in the') }
-      <a class="btn" href="${ url('useradmin.views.list_users') }" target="_blank">${ _('User Admin') } <img src="/useradmin/static/art/icon_useradmin_24.png"></a>
-      ${ _('application') }.
+      <div class="widget-box">
+        <div class="widget-title">
+          <span class="icon">
+            <i class="icon-th-list"></i>
+          </span>
+          <h5>${ _('Go create or import users') }</h5>
+        </div>
+        <div class="widget-content">
+	      <a  href="${ url('useradmin.views.list_users') }" target="_blank">${ _('User Admin') } <img src="/useradmin/static/art/icon_useradmin_24.png"></a>
+        </div>
+      </div>
+    </div>
+
+    <div id="step4" class="stepDetails hide">
+      <div class="widget-box">
+        <div class="widget-title">
+          <span class="icon">
+            <i class="icon-th-list"></i>
+          </span>
+          <h5>${ _('Go use the apps') }</h5>
+        </div>
+        <div class="widget-content">
+          <a href="${ url('desktop.views.home') }" class="step"><i class="icon-home"></i> ${_('Hue Home') }</a>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -121,7 +159,7 @@ ${ commonheader(_('About Hue'), "quick_start", user, "100px") | n,unicode }
 <script type="text/javascript" charset="utf-8">
 $(document).ready(function(){
 
-  $("button").click(function() {
+  $(".installBtn").click(function() {
     var button = $(this);
     $(button).button('loading');
     $.post($(this).data("url"), function(data) {
@@ -165,6 +203,9 @@ $(document).ready(function(){
 
     $("a.step").parent().removeClass("active");
     $("a.step[href=#" + step + "]").parent().addClass("active");
+    if (step == "step4") {
+      $("#lastStep").parent().addClass("active");
+    }
     $(".stepDetails").hide();
     $("#" + step).show();
   }

@@ -235,9 +235,10 @@ ${layout.menubar(section='query')}
                             <div class="control-group">
                               <i class="icon-question-sign" id="help"></i>
                               <div id="help-content" class="hide">
-                                <ul>
-                                  <li>${ _("You can execute queries with multiple SQL statements delimited by a semicolon ';'.") }</li>
-                                  <li>${ _('You can highlight and run a fragment of a query.') }</li>
+                                <ul style="text-align: left;">
+                                  <li>${ _('Press Shift + Space to autocomplete') }</li>
+                                  <li>${ _("You can execute queries with multiple SQL statements delimited by a semicolon ';'") }</li>
+                                  <li>${ _('You can highlight and run a fragment of a query') }</li>
                                 </ul>
                               </div>
                             </div>
@@ -671,7 +672,12 @@ ${layout.menubar(section='query')}
       });
     });
 
-    $("#help").popover({'title': "${_('Did you know?')}", 'content': $("#help-content").html(), 'trigger': 'hover', 'html': true});
+    $("#help").popover({
+        'title': "${_('Did you know?')}",
+        'content': $("#help-content").html(),
+        'trigger': 'hover',
+        'html': true
+    });
 </script>
 
 
