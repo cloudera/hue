@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-04-09 16:31-0700\n"
+"POT-Creation-Date: 2013-01-31 16:56-0800\n"
 "PO-Revision-Date: 2012-08-10 13:58-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -238,12 +238,8 @@ msgid "The LDAP URL to connect to."
 msgstr "要连接到的 LDAP URL。"
 
 #: src/desktop/conf.py:302
-msgid ""
-"A PEM-format file containing certificates for the CA's that Hue will "
-"trust for authentication over TLS. The certificate for the CA that signed"
-" the LDAP server certificate must be included among these certificates. "
-"See more here http://www.openldap.org/doc/admin24/tls.html."
-msgstr ""
+msgid "The LDAP certificate for authentication over TLS."
+msgstr "用于基于 TLS 的身份验证的 LDAP 证书。"
 
 #: src/desktop/conf.py:305
 msgid "A pattern to use for constructing LDAP usernames."
@@ -426,16 +422,16 @@ msgstr "未找到日志。"
 msgid "You must be a superuser."
 msgstr "您必须是超级用户。"
 
-#: src/desktop/auth/forms.py:28 src/desktop/templates/login.mako:67
+#: src/desktop/auth/forms.py:26 src/desktop/templates/login.mako:66
 msgid "Username"
 msgstr "用户名"
 
-#: src/desktop/auth/forms.py:29 src/desktop/auth/forms.py:38
-#: src/desktop/templates/login.mako:75
+#: src/desktop/auth/forms.py:27 src/desktop/auth/forms.py:35
+#: src/desktop/templates/login.mako:70
 msgid "Password"
 msgstr "密码"
 
-#: src/desktop/auth/views.py:102 src/desktop/auth/views.py:103
+#: src/desktop/auth/views.py:97 src/desktop/auth/views.py:98
 msgid "Could not create home directory."
 msgstr "无法创建主目录。"
 
@@ -680,6 +676,14 @@ msgstr "行号"
 msgid "Function Name"
 msgstr "函数名称"
 
+#: src/desktop/templates/about_layout.mako:34
+msgid "Configuration"
+msgstr "配置"
+
+#: src/desktop/templates/about_layout.mako:35
+msgid "Check for misconfiguration"
+msgstr "检查错误配置"
+
 #: src/desktop/templates/about_layout.mako:36
 msgid "Server Logs"
 msgstr "服务器日志"
@@ -752,36 +756,16 @@ msgid "column name..."
 msgstr "列名称..."
 
 #: src/desktop/templates/common_header.mako:136
-msgid "About Oozie UI"
-msgstr ""
+msgid "About Hue"
+msgstr "关于 Hue"
+
+#: src/desktop/templates/common_header.mako:143
+msgid "Profile"
+msgstr "配置文件"
 
 #: src/desktop/templates/common_header.mako:145
 msgid "Sign Out"
 msgstr "注销"
-
-#: src/desktop/templates/common_header.mako:161
-msgid "Workflows"
-msgstr ""
-
-#: src/desktop/templates/common_header.mako:164
-msgid "Coordinators"
-msgstr ""
-
-#: src/desktop/templates/common_header.mako:167
-msgid "Bundles"
-msgstr ""
-
-#: src/desktop/templates/common_header.mako:170
-msgid "Oozie"
-msgstr ""
-
-#: src/desktop/templates/common_header.mako:173
-msgid "Documentation in a new tab"
-msgstr ""
-
-#: src/desktop/templates/common_header.mako:173
-msgid "Documentation"
-msgstr ""
 
 #: src/desktop/templates/config_alert_dock.mako:20
 msgid "Misconfiguration detected"
@@ -799,29 +783,29 @@ msgstr "配置节和变量"
 msgid "Default:"
 msgstr "默认值："
 
-#: src/desktop/templates/error.mako:25 src/desktop/templates/login.mako:91
+#: src/desktop/templates/error.mako:25 src/desktop/templates/login.mako:86
 msgid "Error!"
 msgstr "错误！"
 
-#: src/desktop/templates/login.mako:81
+#: src/desktop/templates/login.mako:76
 msgid "Sign up"
 msgstr "注册"
 
-#: src/desktop/templates/login.mako:83
+#: src/desktop/templates/login.mako:78
 msgid "Sign in"
 msgstr "登录"
 
-#: src/desktop/templates/login.mako:91
+#: src/desktop/templates/login.mako:86
 msgid "Invalid username or password."
 msgstr "无效用户名或密码。"
 
-#: src/desktop/templates/login.mako:102
+#: src/desktop/templates/login.mako:97
 msgid ""
 "Since this is your first time logging in, pick any username and password."
 " Be sure to remember these, as"
 msgstr "这是您的首次登录，因此请选择任意用户名和密码。请牢记它们，因为"
 
-#: src/desktop/templates/login.mako:103
+#: src/desktop/templates/login.mako:98
 msgid "they will become your Hue superuser credentials."
 msgstr "它们将成为您的 Hue 超级用户凭证。"
 
@@ -836,19 +820,4 @@ msgstr "以 zip 格式下载整个日志"
 #: src/desktop/templates/popup_error.mako:69
 msgid "Go back"
 msgstr "返回"
-
-#~ msgid "The LDAP certificate for authentication over TLS."
-#~ msgstr "用于基于 TLS 的身份验证的 LDAP 证书。"
-
-#~ msgid "Configuration"
-#~ msgstr "配置"
-
-#~ msgid "Check for misconfiguration"
-#~ msgstr "检查错误配置"
-
-#~ msgid "About Hue"
-#~ msgstr "关于 Hue"
-
-#~ msgid "Profile"
-#~ msgstr "配置文件"
 
