@@ -58,14 +58,14 @@ ${layout.menubar(section='dashboard')}
     <table class="table table-condensed" id="running-table">
       <thead>
         <tr>
-          <th width="10%">${ _('Next submission') }</th>
-          <th width="10%">${ _('Status') }</th>
+          <th width="12%">${ _('Next submission') }</th>
+          <th width="5%">${ _('Status') }</th>
           <th width="20%">${ _('Name') }</th>
           <th width="5%">${ _('Progress') }</th>
           <th width="10%">${ _('Submitter') }</th>
-          <th width="5%">${ _('Frequency') }</th>
+          <th width="3%">${ _('Frequency') }</th>
           <th width="5%">${ _('Time unit') }</th>
-          <th width="10%">${ _('Start Time') }</th>
+          <th width="12%">${ _('Start Time') }</th>
           <th width="15%">${ _('Id') }</th>
           <th width="10%">${ _('Action') }</th>
         </tr>
@@ -81,14 +81,14 @@ ${layout.menubar(section='dashboard')}
     <table class="table table-condensed" id="completed-table" data-tablescroller-disable="true">
       <thead>
         <tr>
-          <th width="10%">${ _('Completion') }</th>
+          <th width="12%">${ _('Completion') }</th>
           <th width="5%">${ _('Status') }</th>
-          <th width="25%">${ _('Name') }</th>
+          <th width="20%">${ _('Name') }</th>
           <th width="10%">${ _('Duration') }</th>
           <th width="10%">${ _('Submitter') }</th>
           <th width="5%">${ _('Frequency') }</th>
           <th width="5%">${ _('Time unit') }</th>
-          <th width="10%">${ _('Start Time') }</th>
+          <th width="13%">${ _('Start Time') }</th>
           <th width="20%">${ _('Id') }</th>
         </tr>
       </thead>

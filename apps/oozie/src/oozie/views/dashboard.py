@@ -638,16 +638,18 @@ def split_oozie_jobs(oozie_jobs):
   jobs_completed = []
 
   for job in oozie_jobs:
-    if job.is_running():
-      if job.type == 'Workflow':
-        job = get_oozie().get_job(job.id)
-      elif job.type == 'Coordinator':
-        job = get_oozie().get_coordinator(job.id)
+    # Bulk load instead
+    if job.appName != 'pig-app-hue-script':
+      if job.is_running():
+        if job.type == 'Workflow':
+          job = get_oozie().get_job(job.id)
+        elif job.type == 'Coordinator':
+          job = get_oozie().get_coordinator(job.id)
+        else:
+          job = get_oozie().get_bundle(job.id)
+        jobs_running.append(job)
       else:
-        job = get_oozie().get_bundle(job.id)
-      jobs_running.append(job)
-    else:
-      jobs_completed.append(job)
+        jobs_completed.append(job)
 
   jobs['running_jobs'] = sorted(jobs_running, key=lambda w: w.status)
   jobs['completed_jobs'] = sorted(jobs_completed, key=lambda w: w.status)

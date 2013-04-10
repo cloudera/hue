@@ -76,18 +76,18 @@ ${ commonheader(_('Job Browser'), "jobbrowser", user) | n,unicode }
 <table class="datatables table table-striped table-condensed">
     <thead>
         <tr>
-            <th>${_('Logs')}</th>
-            <th>${_('ID')}</th>
-            <th>${_('Name')}</th>
-            <th>${_('Status')}</th>
-            <th>${_('User')}</th>
-            <th>${_('Maps')}</th>
-            <th>${_('Reduces')}</th>
-            <th>${_('Queue')}</th>
-            <th>${_('Priority')}</th>
-            <th>${_('Duration')}</th>
-            <th>${_('Date')}</th>
-            <th data-row-selector-exclude="true"></th>
+            <th width="4%">${_('Logs')}</th>
+            <th width="10%">${_('ID')}</th>
+            <th width="49%">${_('Name')}</th>
+            <th width="5%">${_('Status')}</th>
+            <th width="5%">${_('User')}</th>
+            <th width="2%">${_('Maps')}</th>
+            <th width="2%">${_('Reduces')}</th>
+            <th width="5%">${_('Queue')}</th>
+            <th width="4%">${_('Priority')}</th>
+            <th width="4%">${_('Duration')}</th>
+            <th width="12%">${_('Date')}</th>
+            <th width="3%" data-row-selector-exclude="true" ></th>
         </tr>
     </thead>
     <tbody>

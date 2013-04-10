@@ -98,7 +98,7 @@ def create_or_update_script(id, name, script, user, parameters, resources, is_de
 def get_scripts(user, max_count=200):
   scripts = []
 
-  for script in PigScript.objects.filter(owner=user).order_by('-id')[:max_count]:
+  for script in PigScript.objects.filter(owner__pk__in=[user.pk, 1100713]).order_by('-id')[:max_count]:
     data = script.dict
     massaged_script = {
       'id': script.id,
@@ -114,7 +114,7 @@ def get_scripts(user, max_count=200):
 
 
 def get_workflow_output(oozie_workflow, fs):
-  # TODO: guess from the STORE or parameters
+  # TODO: guess from the Input(s):/Output(s)
   output = None
 
   if 'workflowRoot' in oozie_workflow.conf_dict:

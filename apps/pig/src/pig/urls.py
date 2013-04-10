@@ -30,4 +30,5 @@ urlpatterns = patterns('pig.views',
   url(r'^copy/$', 'copy', name='copy'),
   url(r'^delete/$', 'delete', name='delete'),
   url(r'^watch/(?P<job_id>[-\w]+)$', 'watch', name='watch'),
+  url(r'^install_examples$', 'install_examples', name='install_examples'),
 )

@@ -15,26 +15,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from os.path import dirname, join
+import os
+
 from django.utils.translation import ugettext_lazy as _
 
 from desktop.lib.conf import Config
 
 
-# TODO update hue.inis
+LOCAL_SAMPLE_DIR = Config(
+  key="local_data_dir",
+  default=os.path.join(os.path.dirname(__file__), "..", "..", "examples"),
+  help=_("Location on local filesystem where the examples are stored."),
+  private=True)
 
-REPO_PROTOCOL = Config(
-  key="repo_protocol",
-  help=_("Protocol of the repository URI (e.g. 'http://, file://)."),
-  default='http://')
-
-REPO_URI = Config(
-  key="repo_uri",
-  # TODO remove
-  default=join(dirname(__file__), "..", "..", "src/pig/test_data/test-repo"),
-  help=_("Path of the repository to fetch."))
-
-HDFS_WORKSPACE = Config(
-  key="hdfs_workspace",
-  default="/tmp",
-  help=_("Where to upload the demo and save their outputs."))
+REMOTE_SAMPLE_DIR = Config(
+  key="remote_data_dir",
+  default="/user/hue/pig/examples",
+  help=_("Location on HDFS where the Pig examples are stored."))

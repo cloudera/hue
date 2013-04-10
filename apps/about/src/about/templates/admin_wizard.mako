@@ -49,10 +49,10 @@ ${ commonheader(_('About Hue'), "quick_start", user, "100px") | n,unicode }
   <div class="row-fluid">
    <div id="properties" class="section">
     <ul class="nav nav-tabs">
-      <li class="active"><a href="#step1" class="step">${ _('Step 1: Check Configuration') }</a></li>
-      <li><a href="#step2" class="step">${ _('Step 2: Examples') }</a></li>
-      <li><a href="#step3" class="step">${ _('Step 3: Users') }</a></li>
-      <li><a href="${ url('desktop.views.home') }" class="step">${ _('Step 4: Use Hue') }</a></li>
+      <li class="active"><a href="#step1" class="step">${ _('Step 1:') } <i class="icon-cogs"></i> ${ _('Check Configuration') }</a></li>
+      <li><a href="#step2" class="step">${ _('Step 2:') } <i class="icon-comments-alt"></i> ${ _('Examples') }</a></li>
+      <li><a href="#step3" class="step">${ _('Step 3:') } <i class="icon-user"></i> ${ _('Users') }</a></li>
+      <li><a href="${ url('desktop.views.home') }" class="step">${ _('Step 4:') } <i class="icon-home"></i> ${_('Use Hue') }</a></li>
     </ul>
 
     <div class="steps" >
@@ -67,15 +67,22 @@ ${ commonheader(_('About Hue'), "quick_start", user, "100px") | n,unicode }
       <ul class="nav nav-tabs nav-stacked">
         % if 'beeswax' in app_names:
           <li>
-            <button type="button" class="btn" data-loading-text="Installing..." data-url="${ url('beeswax:install_examples') }">
+            <button type="button" class="btn" data-loading-text="${ _('Installing...') }" data-url="${ url('beeswax:install_examples') }">
              <i class="icon-download-alt"></i> Beeswax
             </button>
           </li>
         % endif
         % if 'oozie' in app_names or 'jobsub' in app_names:
           <li>
-            <button type="button" class="btn" data-loading-text="Installing..." data-url="${ url('oozie:setup_app') }">
+            <button type="button" class="btn" data-loading-text="${ _('Installing...') }" data-url="${ url('oozie:setup_app') }">
               <i class="icon-download-alt"></i> Oozie / Job Designer
+            </button>
+          </li>
+        % endif
+        % if 'pig' in app_names:
+          <li>
+            <button type="button" class="btn" data-loading-text="${ _('Installing...') }" data-url="${ url('pig:install_examples') }">
+             <i class="icon-download-alt"></i> Pig
             </button>
           </li>
         % endif

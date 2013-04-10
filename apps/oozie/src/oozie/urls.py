@@ -52,7 +52,7 @@ urlpatterns = patterns(
   url(r'^create_bundled_coordinator/(?P<bundle>\d+)$', 'create_bundled_coordinator', name='create_bundled_coordinator'),
   url(r'^edit_bundled_coordinator/(?P<bundle>\d+)/(?P<bundled_coordinator>\d+)$', 'edit_bundled_coordinator', name='edit_bundled_coordinator'),
 
-  url(r'^list_history$', 'list_history', name='list_history'),
+  url(r'^list_history$', 'list_history', name='list_history'), # Unused
   url(r'^list_history/(?P<record_id>[-\w]+)$', 'list_history_record', name='list_history_record'),
   url(r'^setup_app/$', 'setup_app', name='setup_app'),
   url(r'^jasmine', 'jasmine'),

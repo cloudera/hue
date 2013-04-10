@@ -59,14 +59,14 @@ ${ layout.menubar(section='dashboard') }
     <table class="table table-condensed" id="running-table">
       <thead>
         <tr>
-          <th width="10%">${ _('Submission') }</th>
-          <th width="10%">${ _('Status') }</th>
+          <th width="12%">${ _('Submission') }</th>
+          <th width="5%">${ _('Status') }</th>
           <th width="20%">${ _('Name') }</th>
           <th width="5%">${ _('Progress') }</th>
           <th width="5%">${ _('Submitter') }</th>
-          <th width="10%">${ _('Created') }</th>
-          <th width="10%">${ _('Last modified') }</th>
-          <th width="5%">${ _('Run') }</th>
+          <th width="13%">${ _('Created') }</th>
+          <th width="13%">${ _('Last modified') }</th>
+          <th width="2%">${ _('Run') }</th>
           <th width="15%">${ _('Id') }</th>
           <th width="10%">${ _('Action') }</th>
         </tr>
@@ -83,14 +83,14 @@ ${ layout.menubar(section='dashboard') }
     <table class="table table-condensed" id="completed-table" data-tablescroller-disable="true">
       <thead>
         <tr>
-          <th width="10%">${ _('Completion') }</th>
-          <th width="10%">${ _('Status') }</th>
+          <th width="12%">${ _('Completion') }</th>
+          <th width="5%">${ _('Status') }</th>
           <th width="25%">${ _('Name') }</th>
           <th width="5%">${ _('Duration') }</th>
           <th width="5%">${ _('Submitter') }</th>
-          <th width="10%">${ _('Created') }</th>
-          <th width="10%">${ _('Last modified') }</th>
-          <th width="5%">${ _('Run') }</th>
+          <th width="13%">${ _('Created') }</th>
+          <th width="13%">${ _('Last modified') }</th>
+          <th width="2%">${ _('Run') }</th>
           <th width="25%">${ _('Id') }</th>
         </tr>
       </thead>

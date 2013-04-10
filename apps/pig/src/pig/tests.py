@@ -14,14 +14,23 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from liboozie.oozie_api_test import OozieServerProvider
+
+try:
+  import json
+except ImportError:
+  import simplejson as json
+import time
 
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
 
 from nose.tools import assert_true, assert_equal
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
-from pig.models import create_or_update_script
+from pig.models import create_or_update_script, PigScript
+from oozie.tests import OozieBase
 
 
 class TestPigBase(object):
@@ -47,3 +56,50 @@ class TestMock(TestPigBase):
   def test_create_script(self):
     pig_script = self.create_script()
     assert_equal('Test', pig_script.dict['name'])
+
+
+class TestWithHadoop(OozieBase):
+
+  def setUp(self):
+    super(TestWithHadoop, self).setUp()
+    grant_access("test", "test", "pig")
+    self.c.post(reverse('pig:install_examples'))
+
+  def wait_until_completion(self, pig_script_id, timeout=300.0, step=5):
+    script = PigScript.objects.get(id=pig_script_id)
+    job_id = script.dict['job_id']
+
+    response = self.c.get(reverse('pig:watch', args=[job_id]))
+    response = json.loads(response.content)
+
+    start = time.time()
+
+    while response['workflow']['status'] in ['PREP', 'RUNNING'] and time.time() - start < timeout:
+      time.sleep(step)
+      response = self.c.get(reverse('pig:watch', args=[job_id]))
+      response = json.loads(response.content)
+
+    logs = OozieServerProvider.oozie.get_job_log(job_id)
+
+    if response['workflow']['status'] != 'SUCCEEDED':
+      msg = "[%d] %s took more than %d to complete or %s: %s" % (time.time(), job_id, timeout, response['workflow']['status'], logs)
+      raise Exception(msg)
+
+    return pig_script_id
+
+  def test_submit(self):
+    script = PigScript.objects.get(id=1)
+    script_dict = script.dict
+
+    post_data = {
+      'id': script.id,
+      'name': script_dict['name'],
+      'script': script_dict['script'],
+      'user': script.owner,
+      'parameters': json.dumps(script_dict['parameters']),
+      'resources': json.dumps(script_dict['resources']),
+      'submissionVariables': json.dumps([{"name": "output", "value": '/tmp/test_pig'}]),
+    }
+
+    response = self.c.post(reverse('pig:run'), data=post_data, follow=True)
+    self.wait_until_completion(json.loads(response.content)['id'])

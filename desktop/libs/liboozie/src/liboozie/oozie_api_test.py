@@ -72,7 +72,7 @@ class OozieServerProvider(object):
       LOG.info(msg)
       raise Exception(msg)
     else:
-      LOG.info('[%d] Job %s tooke %d: %s' % (time.time(), job.id, time.time() - start, logs))
+      LOG.info('[%d] Job %s took %d: %s' % (time.time(), job.id, time.time() - start, logs))
 
     return job
 

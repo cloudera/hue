@@ -32,6 +32,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from oozie.views.dashboard import show_oozie_error, check_job_access_permission
 
 from pig import api
+from pig.management.commands import pig_setup
 from pig.models import get_workflow_output, hdfs_link, PigScript,\
   create_or_update_script, get_scripts
 
@@ -99,7 +100,7 @@ def run(request):
 
   pig_script = create_or_update_script(**attrs)
 
-  params = request.POST.get('parameters')
+  params = request.POST.get('submissionVariables')
   oozie_id = api.get(request.fs, request.user).submit(pig_script, params)
 
   pig_script.update_from_dict({'job_id': oozie_id})
@@ -181,3 +182,19 @@ def watch(request, job_id):
   }
 
   return HttpResponse(json.dumps(response), content_type="text/plain")
+
+
+def install_examples(request):
+  result = {'status': -1, 'message': ''}
+
+  if request.method != 'POST':
+    result['message'] = _('A POST request is required.')
+  else:
+    try:
+      pig_setup.Command().handle_noargs()
+      result['status'] = 0
+    except Exception, e:
+      LOG.exception(e)
+      result['message'] = str(e)
+
+  return HttpResponse(json.dumps(result), mimetype="application/json")

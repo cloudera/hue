@@ -338,7 +338,8 @@ var PigViewModel = function (props) {
           id: script.id(),
           name: script.name(),
           script: script.script(),
-          parameters: ko.utils.stringifyJson(self.submissionVariables()),
+          parameters: ko.utils.stringifyJson(script.parameters()),
+          submissionVariables: ko.utils.stringifyJson(self.submissionVariables()),
           resources: ko.toJSON(script.resources())
         },
         function (data) {
