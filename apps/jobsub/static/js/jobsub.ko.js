@@ -123,6 +123,23 @@ var Design = (function($, ko, NodeFields) {
         self.editable = ko.observable(false);
       }
 
+      if ('files' in self) {
+        var files = self.files();
+        self.files = ko.observableArray([]);
+
+        // ['file', ...] => [{'name': 'file', 'dummy': ''}, ...].
+        $.each(files, function(index, filename) {
+          var prop = { name: ko.observable(filename), dummy: ko.observable("") };
+          prop.name.subscribe(function(value) {
+            self.files.valueHasMutated();
+          });
+          prop.dummy.subscribe(function(value) {
+            self.files.valueHasMutated();
+          });
+          self.files.push(prop);
+        });
+      }
+
       $(document).trigger('initialize.design', [options, self]);
     },
     request: function(url, options) {
@@ -143,7 +160,7 @@ var Design = (function($, ko, NodeFields) {
       var options = $.extend({
         success: function(data) {
           self.is_dirty(false);
-          $(document).trigger('load.design', [options, data]);
+          $(document).trigger('load.design', [options, data, self]);
         }
       }, options);
       this.request('/jobsub/designs/' + self.id(), options);
@@ -155,7 +172,16 @@ var Design = (function($, ko, NodeFields) {
       var model_dict = {};
       $.each(ko.mapping.toJS(self), function(key, value) {
         if (key != 'errors') {
-          model_dict[key] = ko.utils.unwrapObservable(value);
+          if (key == 'files') {
+            // [{'name': 'file', 'dummy': ''}, ...] => ['file', ...].
+            var files = ko.utils.unwrapObservable(value);
+            model_dict[key] = [];
+            $.each(files, function(i, value) {
+              model_dict[key].push(value.name);
+            });
+          } else {
+            model_dict[key] = ko.utils.unwrapObservable(value);
+          }
         }
       });
       var data = normalize_model_fields($.parseJSON(JSON.stringify(model_dict)));
@@ -400,7 +426,7 @@ var Designs = (function($, ko, NodeModelChooser) {
       if (self.selectedDesignObject()) {
         var design = self.selectedDesignObject().design();
         if (design.is_dirty()) {
-          $(document).one('load.design', function(e, options, data) {
+          $(document).one('load.design', function(e, options, data, design) {
             design.initialize({model: data});
             self.temporary().design(design);
             self.temporary().template(self.selectedDesignObject().template());

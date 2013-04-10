@@ -208,7 +208,7 @@ var events = [
   'remove.touchz.workflow',
   'remove.parameter.workflow',
   'error.design'
-]
+];
 $.each(events, function(index, event) {
   $(document).bind(event, addFileBrowseButton);
   $(document).bind(event, function() {
