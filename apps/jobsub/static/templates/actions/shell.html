@@ -68,6 +68,10 @@
       {{#archives}}
         {{>archives}}
       {{/archives}}
+
+      {{#capture_output}}
+        {{>capture_output}}
+      {{/capture_output}}
     </fieldset>
     <div class="form-actions">
       <button data-bind="click: {{ save.func }}" class="btn btn-primary">{{ save.name }}</button>

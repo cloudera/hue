@@ -273,6 +273,13 @@ $(document).ready(function() {
         name: 'is_shared'
       }
     },
+    capture_output: {
+      name: "${ _('Capture output') }",
+      popover: "${ _('Capture the output of this job.') }",
+      js: {
+        name: 'capture_output'
+      }
+    },
     parameters: {
       title: "${ _('Oozie parameters') }",
       name: "${ _('Name') }",

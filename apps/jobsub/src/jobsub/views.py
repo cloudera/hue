@@ -162,7 +162,10 @@ def _save_design(design_id, data):
   node = workflow.start.get_child('to').get_full_node()
   node_id = node.id
   for key in data:
-    setattr(node, key, data[key])
+    if key in ('is_shared', 'capture_output', 'propagate_configuration'):
+      setattr(node, key, str(data[key]).lower() == 'true')
+    else:
+      setattr(node, key, data[key])
   node.id = node_id
   node.pk = node_id
   node.save()

@@ -56,6 +56,7 @@ var Templates = (function($, ko) {
         params: 'static/templates/widgets/params.html',
         arguments_envvars: 'static/templates/widgets/params.html',
         params_arguments: 'static/templates/widgets/params.html',
+        capture_output: 'static/templates/widgets/checkbox.html'
       }
     }, options);
 
