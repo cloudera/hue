@@ -138,6 +138,7 @@ ${ commonheader(_('Home'), "home", user) | n,unicode }
             ${ app_link("beeswax", _('Hive')) }
             ${ app_link("impala", _('Impala')) }
             ${ app_link("pig", _('Pig')) }
+            ${ app_link("shell", _('Shell')) }
           </ul>
         </div>
       </div>
@@ -173,7 +174,7 @@ ${ commonheader(_('Home'), "home", user) | n,unicode }
         <div class="widget-content">
           <ul>
             ${ app_link("oozie", _('Dashboard')) }
-            ${ app_link("oozie", _('Editor'), "/create_workflow/") }
+            ${ app_link("oozie", _('Editor'), "/list_workflows/") }
           </ul>
         </div>
       </div>

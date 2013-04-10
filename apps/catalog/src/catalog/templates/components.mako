@@ -24,7 +24,7 @@
 
   <ul class="nav nav-pills hueBreadcrumbBar" id="breadcrumbs">
     <li>
-      <a href="${url('catalog:index')}"><i class="icon-sitemap"></i> ${_('Catalog')}</a>
+      <a href="${url('catalog:index')}"><i class="icon-sitemap"></i> ${_('Databases')}</a>
     </li>
     <li>
       <ul class="hueBreadcrumb">
