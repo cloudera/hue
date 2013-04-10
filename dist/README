@@ -8,19 +8,11 @@ Instructions to install the tarball release of Hue Oozie.
 ## Install
 $ PREFIX=/usr/share make install
 
-## Edit Oozie URL (if needed):
-In /usr/share/hue/desktop/conf/hue.ini
-
-[liboozie]
-  # The URL where the Oozie service runs on (default is below).
-  ## oozie_url=http://localhost:11000/oozie
-
-
-## Install plug-ins
+## Install plug-ins (optional: for direct access to logs. Requires Hadoop 1.2 or 0.23)
 $ cd /usr/lib/hadoop-0.20-mapreduce/lib
 $ ln -s /usr/share/hue/desktop/libs/hadoop/java-lib/hue*jar
 
-## Configure Hadoop
+## Configure Hadoop (optional: for HDFS file links)
 Edit hdfs-site.xml:
 
 <property>

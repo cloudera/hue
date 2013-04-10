@@ -21,6 +21,7 @@ import logging
 import string
 from urllib import quote_plus
 from lxml import html
+from hadoop import cluster
 
 try:
   import json
@@ -30,6 +31,7 @@ except ImportError:
 from django.http import HttpResponseRedirect, HttpResponse
 from django.utils.functional import wraps
 from django.utils.translation import ugettext as _
+from django.shortcuts import redirect
 
 from desktop.log.access import access_warn, access_log_level
 from desktop.lib.rest.http_client import RestException
@@ -54,6 +56,8 @@ def check_job_permission(view_func):
     try:
       job = get_api(request.user, request.jt).get_job(jobid=jobid)
     except Exception, e:
+      jt_job_url = 'http://%s:50030/jobdetails.jsp?jobid=%s&refresh=0' % (cluster.get_cluster_addr_for_job_submission().split(':')[0], jobid)
+      return redirect(jt_job_url)
       raise PopupException(_('Could not find job %s. The job might not be running yet.') % jobid, detail=e)
     if not conf.SHARE_JOBS.get() and not request.user.is_superuser \
       and job.user != request.user.username:
