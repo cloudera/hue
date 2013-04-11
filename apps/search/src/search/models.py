@@ -377,7 +377,7 @@ class Core(models.Model):
 
   @property
   def fields(self):
-    return ['score'] + sorted([field.get('name') for field in self.fields_data])
+    return sorted([field.get('name') for field in self.fields_data])
 
   @property
   def fields_data(self):
