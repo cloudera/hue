@@ -22,3 +22,14 @@ endif
 
 APP_NAME = impala
 include $(ROOT)/Makefile.sdk
+
+#
+# Tell the `bdist' target to exclude our java source.
+#
+BDIST_EXCLUDES += \
+	--exclude=java \
+	--exclude=thrift
+
+SDIST_EXCLUDES += \
+	--exclude=java-lib \
+	--exclude=thrift
