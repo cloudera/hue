@@ -60,7 +60,7 @@ ${layout.menubar(section='saved queries')}
       %>
       % for design in page.object_list:
         <%
-          may_edit = user == design.owner or user.is_superuser
+          may_edit = user == design.owner
         %>
       <tr>
         <td data-row-selector-exclude="true">

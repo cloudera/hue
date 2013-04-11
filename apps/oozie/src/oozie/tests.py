@@ -2102,7 +2102,7 @@ class TestImportWorkflow04WithOozie(OozieBase):
     f.close()
     workflow.save()
     assert_equal(4, len(Node.objects.filter(workflow=workflow)))
-    assert_equal(3, len(Link.objects.filter(parent__workflow=workflow)))
+    assert_equal(4, len(Link.objects.filter(parent__workflow=workflow)))
     node = Node.objects.get(workflow=workflow, node_type='subworkflow').get_full_node()
     assert_equal(True, node.propagate_configuration)
     workflow.delete()
