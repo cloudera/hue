@@ -30,6 +30,7 @@ LOG = logging.getLogger(__name__)
 
 JSON_FIELDS = ('parameters', 'job_properties', 'files', 'archives', 'prepares', 'params',
                'deletes', 'mkdirs', 'moves', 'chmods', 'touchzs')
+BOOLEAN_FIELDS = ('propagate_configuration','capture_output')
 NUMBER_FIELDS = ('sub_workflow',)
 
 def format_field_value(field, value):
@@ -39,6 +40,8 @@ def format_field_value(field, value):
   if field in NUMBER_FIELDS:
     if not isinstance(value, int):
       return int(value)
+  if field in BOOLEAN_FIELDS:
+    return str(value).lower() == 'true'
   return value
 
 

@@ -52,9 +52,6 @@ def get_or_create_node(workflow, node_data):
   node_model = NODE_TYPES.get(node_type, None)
   kwargs = {'workflow': workflow, 'node_type': node_data['node_type']}
 
-  if node_data['node_type'] == 'subworkflow':
-    kwargs['sub_workflow'] = Workflow.objects.get(id=int(node_data['sub_workflow']))
-
   if node_model:
     node = node_model(**kwargs)
   else:
@@ -198,6 +195,12 @@ def _update_workflow_nodes_json(workflow, json_nodes, id_map, user):
 
     if node.node_type == 'fork' and json_node['node_type'] == 'decision':
       node = node.convert_to_decision()
+
+    if node.node_type == 'subworkflow':
+      try:
+        node.sub_workflow = Workflow.objects.get(id=int(json_node['sub_workflow']))
+      except Workflow.DoesNotExist:
+        pass
 
     id_map[str(json_node['id'])] = node.id
 

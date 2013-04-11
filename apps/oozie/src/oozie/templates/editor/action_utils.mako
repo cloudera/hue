@@ -149,7 +149,7 @@
 
           % for field in action_form:
             % if field.html_name not in ('name', 'description', 'node_type', 'job_xml'):
-              % if field.html_name in ('capture_output', 'is_single', 'sub_workflow'):
+              % if field.html_name in ('capture_output', 'is_single', 'sub_workflow', 'propagate_configuration'):
                 ${ utils.render_field_with_error_js(field, field.name, extra_attrs={'data-bind': 'disable: $root.context().read_only, checked: %s' % field.name}) }
               % else:
                 ${ utils.render_field_with_error_js(field, field.name, extra_attrs={'data-bind': 'disable: $root.context().read_only, value: %s' % field.name}) }
