@@ -43,6 +43,9 @@ class Facet(models.Model):
   enabled = models.BooleanField(default=True)
   data = models.TextField()
 
+  def get_data(self):
+    return json.loads(self.data)
+
   def update_from_post(self, post_data):
     data_dict = json.loads(self.data)
 
