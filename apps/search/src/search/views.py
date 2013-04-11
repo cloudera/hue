@@ -56,7 +56,8 @@ def index(request):
     solr_query['core'] = core
     solr_query['q'] = search_form.cleaned_data['query']
     solr_query['fq'] = search_form.cleaned_data['fq']
-    solr_query['sort'] = search_form.cleaned_data['sort'] or 'score desc'
+    if search_form.cleaned_data['sort']:
+      solr_query['sort'] = search_form.cleaned_data['sort']
     solr_query['rows'] = search_form.cleaned_data['rows'] or 15
     solr_query['start'] = search_form.cleaned_data['start'] or 0
     solr_query['facets'] = search_form.cleaned_data['facets'] or 1
@@ -159,7 +160,7 @@ def augment_solr_response(response, facets):
         facet['counts'] = counts
         normalized_facets[get_facet_field_uuid(cat, 'date', facets)] = facet
 
-  for ordered_uuid in facets['order']:
+  for ordered_uuid in facets.get('order', []):
     try:
       augmented['normalized_facets'].append(normalized_facets[ordered_uuid])
     except:
