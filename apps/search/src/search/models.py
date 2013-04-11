@@ -234,7 +234,7 @@ class CoreManager(models.Manager):
   </div>
   <div class="span2">
     <br><a class="btn" href="https://twitter.com/{{user_screen_name}}/status/{{id}}" target="_blank" title="Open in Twitter">
-    <i class="icon-twitter"></i></a>
+    <i class="icon-share-alt"></i></a>
     <small class="time">
       <a href="https://twitter.com/{{user_screen_name}}/status/{{id}}" target="_blank" data-dt="{{created_at}}" rel="tooltip" data-placement="left" title="{{created_at}}">{{created_at}}</a>
     </small>
