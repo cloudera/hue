@@ -104,12 +104,12 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
                         remove_list.remove(fq)
                   %>
                 <li class="nav-header">${cat}</li>
-                % for range, count in macros.pairwise(response['facet_counts']['facet_ranges'][cat]['counts']):
+                % for rng, count in macros.pairwise(response['facet_counts']['facet_ranges'][cat]['counts']):
                  % if count > 0 and found_value == "":
-                   <li><a href="?query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ cat }:${ range }&sort=${solr_query["sort"]}">${ range } (${ count })</a></li>
+                   <li><a href="?query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ cat }:[${ rng } TO ${ str(int(rng) + int(response['facet_counts']['facet_ranges'][cat]['gap']) - 1) }]&sort=${solr_query["sort"]}">${ rng } (${ count })</a></li>
                   %endif
-                  % if found_value != "" and range == found_value:
-                      <li><strong>${ found_value }</strong> <a href="?query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}&sort=${solr_query["sort"]}"><i class="icon-remove"></i></a></li>
+                  % if found_value != "" and "[" + rng + " TO " + str(int(rng) + int(response['facet_counts']['facet_ranges'][cat]['gap']) - 1) + "]" == found_value:
+                      <li><strong>${ rng }</strong> <a href="?query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}&sort=${solr_query["sort"]}"><i class="icon-remove"></i></a></li>
                   % endif
                 % endfor
               % endif
