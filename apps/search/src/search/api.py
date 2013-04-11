@@ -41,7 +41,7 @@ class SolrApi(object):
 
   def query(self, solr_query, hue_core):
     try:
-      params = (('q', solr_query['q']),
+      params = (('q', solr_query['q'] or '*'),
                 ('wt', 'json'),
                 ('rows', solr_query['rows']),
                 ('start', solr_query['start']),
@@ -58,7 +58,7 @@ class SolrApi(object):
       print solr_query
       print params
 
-      response = self._root.get('%(core)s/browse' % solr_query, params)
+      response = self._root.get('%(core)s/select' % solr_query, params)
       return json.loads(response)
     except RestException, e:
       raise PopupException('Error while accessing Solr: %s' % e)
