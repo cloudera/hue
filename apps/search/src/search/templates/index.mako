@@ -64,87 +64,54 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
       </div>
     </div>
     %else:
-    % if response and response['response']['docs'] and len(response['response']['docs']) > 0 and solr_query['facets'] == 1 and response.get('facet_counts'):
+    % if response and response['response']['docs'] and len(response['response']['docs']) > 0 and response['normalized_facets']:
     <div class="span2">
       <ul class="facet-list">
-        % if response and response.get('facet_counts'):
-          % if response['facet_counts']['facet_fields']:
-            % for cat in response['facet_counts']['facet_fields']:
-                % if response['facet_counts']['facet_fields'][cat]:
-                  <%
-                    found_value = ""
-                    for fq in solr_query['fq'].split('|'):
-                      if fq and fq.split(':')[0] == cat:
-                        found_value = fq.split(':')[1]
-                        remove_list = solr_query['fq'].split('|')
-                        remove_list.remove(fq)
-                  %>
-                <li class="nav-header">${cat}</li>
-                % for subcat, count in macros.pairwise(response['facet_counts']['facet_fields'][cat]):
-                  %if count > 0 and subcat != "" and found_value == "":
-                    <li><a href="?query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ cat }:${ subcat }&sort=${solr_query["sort"]}">${subcat}</a> <span class="counter">(${ count })</span></li>
-                  %endif
-                  % if found_value != "" and subcat == found_value:
-                    <li><strong>${ found_value }</strong> <a href="?query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}&sort=${solr_query["sort"]}"><i class="icon-remove"></i></a></li>
-                  % endif
-                % endfor
-                % endif
-            % endfor
-          %endif
+        % for fld in response['normalized_facets']:
+        % if fld['type'] == 'date':
+            <li class="nav-header dateFacetHeader">${fld['label']}</li>
+        % else:
+            <li class="nav-header">${fld['label']}</li>
+        % endif
 
-          % if response['facet_counts']['facet_ranges']:
-            % for cat in response['facet_counts']['facet_ranges']:
-                % if response['facet_counts']['facet_ranges'][cat]:
-                  <%
-                    found_value = ""
-                    for fq in solr_query['fq'].split('|'):
-                      if fq and fq.split(':')[0] == cat:
-                        found_value = fq.split(':')[1]
-                        remove_list = solr_query['fq'].split('|')
-                        remove_list.remove(fq)
-                  %>
-                <li class="nav-header">${cat}</li>
-                % for rng, count in macros.pairwise(response['facet_counts']['facet_ranges'][cat]['counts']):
-                 % if count > 0 and found_value == "":
-                   <li><a href="?query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ cat }:[${ rng } TO ${ str(int(rng) + int(response['facet_counts']['facet_ranges'][cat]['gap']) - 1) }]&sort=${solr_query["sort"]}">${ rng } (${ count })</a></li>
-                  %endif
-                  % if found_value != "" and "[" + rng + " TO " + str(int(rng) + int(response['facet_counts']['facet_ranges'][cat]['gap']) - 1) + "]" == found_value:
-                      <li><strong>${ rng }</strong> <a href="?query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}&sort=${solr_query["sort"]}"><i class="icon-remove"></i></a></li>
-                  % endif
-                % endfor
+        <%
+          found_value = ""
+          for fq in solr_query['fq'].split('|'):
+            if fq and fq.split(':')[0] == fld['field']:
+              found_value = fq.split(':')[1]
+              remove_list = solr_query['fq'].split('|')
+              remove_list.remove(fq)
+        %>
+          % for group, count in macros.pairwise(fld['counts']):
+            %if count > 0 and group != "" and found_value == "":
+              % if fld['type'] == 'field':
+                <li><a href="?cores=${ current_cores }&query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ fld['field'] }:${ group }&sort=${solr_query["sort"]}">${group}</a> <span class="counter">(${ count })</span></li>
               % endif
-            % endfor
-          % endif
-
-          % if response['facet_counts']['facet_dates']:
-            % for cat in response['facet_counts']['facet_dates']:
-                % if response['facet_counts']['facet_dates'][cat]:
-                  <%
-                    found_value = ""
-                    for fq in solr_query['fq'].split('|'):
-                      if fq and fq.split(':')[0] == cat:
-                        found_value = fq[fq.index(':')+1:]
-                        remove_list = solr_query['fq'].split('|')
-                        remove_list.remove(fq)
-                  %>
-                <li class="nav-header dateFacetHeader">${cat}</li>
-                % for date, count in response['facet_counts']['facet_dates'][cat].iteritems():
-                  % if date not in ('start', 'end', 'gap') and count > 0 and found_value == "":
-                    <li class="dateFacetItem"><a href='?query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ cat }:"${ date }"&sort=${solr_query["sort"]}'><span class="dateFacet">${ date }</span> (${ count })</a></li>
-                  % endif
-                  % if found_value != "" and '"' + date + '"' == found_value:
-                      <li><strong><span class="dateFacet">${date}</span></strong> <a href="?query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}&sort=${solr_query["sort"]}"><i class="icon-remove"></i></a></li>
-                  % endif
-                % endfor
-                % endif
-            % endfor
-          %endif
-         %endif
+              % if fld['type'] == 'range':
+                <li><a href="?cores=${ current_cores }&query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ fld['field'] }:[${ group } TO ${ str(int(group) + int(fld['gap']) - 1) }]&sort=${solr_query["sort"]}">${ group } (${ count })</a></li>
+              % endif
+              % if fld['type'] == 'date':
+                <li class="dateFacetItem"><a href='?cores=${ current_cores }&query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ fld['field'] }:"${ group }"&sort=${solr_query["sort"]}'><span class="dateFacet">${ group }</span> (${ count })</a></li>
+              % endif
+            %endif
+            % if found_value != "":
+              % if fld['type'] == 'field' and group == found_value:
+                <li><strong>${ group }</strong> <a href="?cores=${ current_cores }&query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}&sort=${solr_query["sort"]}"><i class="icon-remove"></i></a></li>
+              %endif
+              % if fld['type'] == 'range' and "[" + group + " TO " + str(int(group) + int(fld['gap']) - 1) + "]" == found_value:
+                <li><strong>${ group }</strong> <a href="?cores=${ current_cores }&query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}&sort=${solr_query["sort"]}"><i class="icon-remove"></i></a></li>
+              %endif
+              % if fld['type'] == 'date' and '"' + group + '"' == found_value:
+                <li><strong><span class="dateFacet">${group}</span></strong> <a href="?cores=${ current_cores }&query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}&sort=${solr_query["sort"]}"><i class="icon-remove"></i></a></li>
+              %endif
+            %endif
+          % endfor
+        % endfor
       </ul>
     </div>
     % endif
     % if response and response['response']['docs'] and len(response['response']['docs']) > 0:
-      %if response.get('facet_counts'):
+      %if response['normalized_facets']:
       <div class="span10">
       %else:
       <div class="span12">
@@ -271,9 +238,6 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
   % endif
 </div>
 
-<div class="hide">
-  ${ rr | n,unicode }
-</div>
 
 ${ hue_core.result.get_extracode() | n,unicode }
 
