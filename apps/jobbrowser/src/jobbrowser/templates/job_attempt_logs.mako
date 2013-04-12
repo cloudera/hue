@@ -28,40 +28,38 @@ ${ commonheader(_('Job Browser - Job Attempt: %(attempt_index)s') % {'attempt_in
         ${ _('Job') } <a href="${url('jobbrowser.views.single_job', job=job.jobId)}" title="${_('View this job')}">${ job.jobId_short }</a>
         ${ _('Attempt: %(attempt_index)s') % {'attempt_index': attempt_index} }
     </h1>
+    <br/>
     <div class="row-fluid">
         <div class="span2">
             <div class="well sidebar-nav">
                 <ul class="nav nav-list">
                     <li class="nav-header">${ _('Attempt ID') }</li>
                     <li>${ attempt_index }</li>
-                    <li class="nav-header">${ _('Quick links') }</li>
-                    <li><a href="#stdout">${_('stdout')}</a></li>
-                    <li><a href="#stderr">${_('stderr')}</a></li>
-                    <li><a href="#syslog">${_('syslog')}</a></li>
                 </ul>
             </div>
         </div>
 
         <div class="span10">
-            <ul class="nav nav-tabs">
-                <li class="active">
-                    <a href="#logs" data-toggle="tab">${_('Logs')}</a>
-                </li>
+            <ul class="nav nav-pills">
+                <li class="active"><a href="#stdout" data-toggle="tab">${_('stdout')}</a></li>
+                <li><a href="#stderr" data-toggle="tab">${_('stderr')}</a></li>
+                <li><a href="#syslog" data-toggle="tab">${_('syslog')}</a></li>
             </ul>
 
             <div class="tab-content">
-                <div class="tab-pane active" id="logs">
-                    <h2 id="stdout">${_('stdout')}</h2>
+                <div class="tab-pane active" id="stdout">
                     <pre id="stdout-container">
                         ${_('Loading...')} <img src="/static/art/login-spinner.gif">
                     </pre>
+                </div>
 
-                    <h2 id="stderr">${_('stderr')}</h2>
+                <div class="tab-pane" id="stderr">
                     <pre id="stderr-container">
                         ${_('Loading...')} <img src="/static/art/login-spinner.gif">
                     </pre>
+                </div>
 
-                    <h2 id="syslog">${_('syslog')}</h2>
+                <div class="tab-pane" id="syslog">
                     <pre id="syslog-container">
                         ${_('Loading...')} <img src="/static/art/login-spinner.gif">
                     </pre>
@@ -98,15 +96,17 @@ ${ commonheader(_('Job Browser - Job Attempt: %(attempt_index)s') % {'attempt_in
         });
 
         // From 15s to less than 5s display time with async
-        $.get('${ url("jobbrowser.views.job_attempt_logs_json", job=job.jobId, attempt_index=attempt_index, name='syslog') }', function(data) {
+        $.get('${ url("jobbrowser.views.job_attempt_logs_json", job=job.jobId, attempt_index=attempt_index, name='syslog', offset=0) }', function(data) {
             $('#syslog-container').html(data['log']);
         });
-        $.get('${ url("jobbrowser.views.job_attempt_logs_json", job=job.jobId, attempt_index=attempt_index, name='stdout') }', function(data) {
+        $.get('${ url("jobbrowser.views.job_attempt_logs_json", job=job.jobId, attempt_index=attempt_index, name='stdout', offset=0) }', function(data) {
             $('#stdout-container').html(data['log']);
         });
-		$.get('${ url("jobbrowser.views.job_attempt_logs_json", job=job.jobId, attempt_index=attempt_index, name='stderr') }', function(data) {
+		$.get('${ url("jobbrowser.views.job_attempt_logs_json", job=job.jobId, attempt_index=attempt_index, name='stderr', offset=0) }', function(data) {
 		    $('#stderr-container').html(data['log']);
 		});
+
+		$.jHueScrollUp();
     });
 </script>
 

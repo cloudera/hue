@@ -152,8 +152,8 @@ def job_attempt_logs_json(request, job, attempt_index=0, name='syslog', offset=0
     raise KeyError(_("Cannot find job attempt '%(id)s'") % {'id': job.jobId}, e)
 
   link = '/%s/' % name
-  if offset >= 0:
-    link += '?start=%d' % offset
+  if offset and int(offset) >= 0:
+    link += '?start=%s' % offset
 
   try:
     log = html.parse(log_link + link).xpath('/html/body/table/tbody/tr/td[2]')[0].text_content()
