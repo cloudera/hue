@@ -29,7 +29,9 @@ from django.views.decorators.http import require_http_methods
 
 from desktop.lib.django_util import render
 from desktop.lib.exceptions_renderable import PopupException
-from oozie.views.dashboard import show_oozie_error, check_job_access_permission
+from desktop.lib.rest.http_client import RestException
+from oozie.views.dashboard import show_oozie_error, check_job_access_permission,\
+                                  check_job_edition_permission
 
 from pig import api
 from pig.management.commands import pig_setup
@@ -81,6 +83,24 @@ def save(request):
 
   return HttpResponse(json.dumps(response), content_type="text/plain")
 
+
+@show_oozie_error
+def stop(request):
+  if request.method != 'POST':
+    raise PopupException(_('POST request required.'))
+
+  pig_script = PigScript.objects.get(id=request.POST.get('id'))
+  job_id = pig_script.dict['job_id']
+
+  job = check_job_access_permission(request, job_id)
+  check_job_edition_permission(job, request.user)
+
+  try:
+    api.get(request, request.user).stop(job_id)
+  except RestException, e:
+    raise PopupException(_("Error stopping Pig script.") % e.message)
+
+  return watch(request, job_id)
 
 
 @show_oozie_error
