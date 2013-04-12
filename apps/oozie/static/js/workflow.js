@@ -361,7 +361,7 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
 
     // @see http://knockoutjs.com/documentation/plugins-mapping.html
     var mapping = ko.mapping.fromJS(options.model, {
-      ignore: ['initialize', 'toString'],
+      ignore: ['initialize', 'toString', 'copy'],
       job_properties: {
         create: function(options) {
           var parent = options.parent;

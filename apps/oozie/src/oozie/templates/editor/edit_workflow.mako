@@ -624,12 +624,10 @@ $('#workflow').on('click', '.convert-node-link', function(e) {
 // Modal for cloning a node
 $('#workflow').on('click', '.clone-node-btn', function(e) {
   var node = ko.contextFor(this).$data;
-  var model_copy = $.extend(true, {}, node.model);
-  var NodeModel = nodeModelChooser(node.node_type());
-  model_copy.id = IdGeneratorTable[model_copy.node_type].nextId();
-  model_copy.name += '-copy';
-  model_copy.child_links = [];
-  var model = new NodeModel(model_copy);
+  var model = node.model.copy();
+  model.id = IdGeneratorTable[model.node_type].nextId();
+  model.name += '-copy';
+  model.child_links = [];
   var new_node = new Node(workflow, model, workflow.registry);
   workflow.registry.add(new_node.id(), new_node);
 

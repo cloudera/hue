@@ -47,7 +47,7 @@ var map_params = function(options, subscribe) {
 
 // Maps JSON strings to fields in the view model.
 var MAPPING_OPTIONS = {
-  ignore: ['initialize', 'toString'],
+  ignore: ['initialize', 'toString', 'copy'],
   job_properties: {
     create: function(options) {
       var parent = options.parent;
@@ -235,6 +235,17 @@ var ModelModule = function($) {
     toString: function() {
       var self = this;
       return JSON.stringify(self, null, '\t');
+    },
+
+    copy: function() {
+      var self = this;
+      var model = $.extend(true, {}, self);
+      $.each(MODEL_FIELDS_JSON, function(i, field) {
+        if (field in model && $.type(model[field]) != "string") {
+          model[field] = JSON.stringify(model[field]);
+        }
+      });
+      return model;
     }
   });
 
