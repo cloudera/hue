@@ -95,3 +95,6 @@ class MapreduceApi(object):
     app_id = job_id.replace('job', 'application')
     return self._root.get('%(app_id)s/ws/%(version)s/mapreduce/jobs/%(job_id)s/tasks/%(task_id)s/attempts' % {'app_id': app_id, 'job_id': job_id, 'task_id': task_id, 'version': _API_VERSION}, headers={'Accept': _JSON_CONTENT_TYPE})
 
+  def task_attempt(self, job_id, task_id, attempt_id):
+    app_id = job_id.replace('job', 'application')
+    return self._root.get('%(app_id)s/ws/%(version)s/mapreduce/jobs/%(job_id)s/tasks/%(task_id)s/attempts/%(attempt_id)s' % {'app_id': app_id, 'job_id': job_id, 'task_id': task_id, 'attempt_id': attempt_id, 'version': _API_VERSION}, headers={'Accept': _JSON_CONTENT_TYPE})

@@ -182,7 +182,7 @@ ${ commonheader(_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId_short),
                                             </a>
                                         </td>
                                         <td>${ attempt['id'] }</td>
-                                        <td>${ attempt['containerId'] }</td>
+                                        <td>${ comps.get_container_link(job.status, attempt['containerId']) }</td>
                                     </tr>
                                 % endfor
                             </tbody>

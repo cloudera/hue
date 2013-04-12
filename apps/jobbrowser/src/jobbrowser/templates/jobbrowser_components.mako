@@ -191,6 +191,14 @@
     % endif
 </%def>
 
+<%def name="get_container_link(status, container_id)">
+    ## As soon as the job finishes the container disappears
+    % if status.lower() in ('running', 'prep', 'accepted', 'finishing'):
+        <a href="${ url('jobbrowser.views.single_tracker',trackerid=container_id) }" class="task_tracker_link">${ container_id }</a>
+    % else:
+        ${ container_id }
+    % endif
+</%def>
 
 <%def name="get_bootstrap_class(job, prefix)">
     <%

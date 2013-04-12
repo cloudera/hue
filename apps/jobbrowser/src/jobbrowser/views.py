@@ -258,8 +258,7 @@ def single_task_attempt(request, job, taskid, attemptid):
   except (KeyError, RestException), e:
     raise PopupException(_("Cannot find attempt '%(id)s' in task") % {'id': attemptid}, e)
 
-  return render("attempt.mako", request,
-    {
+  return render("attempt.mako", request, {
       "attempt": attempt,
       "taskid": taskid,
       "joblnk": job_link,
@@ -297,7 +296,7 @@ def single_task_attempt_logs(request, job, taskid, attemptid):
     # Four entries,
     # for diagnostic, stdout, stderr and syslog
     logs = [ _("Failed to retrieve log. TaskTracker not found.") ] * 4
-  
+
   context = {
       "attempt": attempt,
       "taskid": taskid,
@@ -306,7 +305,7 @@ def single_task_attempt_logs(request, job, taskid, attemptid):
       "logs": logs,
       "first_log_tab": first_log_tab,
   }
-  
+
   if request.GET.get('format') == 'python':
     return context
   else:
@@ -344,10 +343,9 @@ def trackers(request):
   return render("tasktrackers.mako", request, {'trackers':trackers})
 
 def single_tracker(request, trackerid):
-  """
-  We get here from /trackers/trackerid
-  """
-  tracker = Tracker.from_name(request.jt, trackerid)
+  jt = get_api(request.user, request.jt)
+
+  tracker = jt.get_tracker(trackerid)
   return render("tasktracker.mako", request, {'tracker':tracker})
 
 def clusterstatus(request):

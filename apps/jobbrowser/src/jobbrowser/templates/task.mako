@@ -78,7 +78,13 @@ ${ commonheader(_('Job Task: %(taskId)s - Job Browser') % dict(taskId=task.taskI
                                            href="${ url('jobbrowser.views.single_task_attempt', job=joblnk.jobId, taskid=task.taskId, attemptid=attempt.attemptId) }" data-row-selector="true">${attempt.attemptId_short}</a></td>
                                     <td>${"%d" % (attempt.progress * 100)}%</td>
                                     <td><span class="status_link ${attempt.state}">${attempt.state}</span></td>
-                                    <td><a href="/jobbrowser/trackers/${attempt.taskTrackerId}" class="task_tracker_link">${attempt.taskTrackerId}</a></td>
+                                    <td>
+                                      % if task.is_mr2:
+                                        ${ comps.get_container_link(task.state, attempt.taskTrackerId) }
+                                      % else:
+                                        <a href="/jobbrowser/trackers/${attempt.taskTrackerId}" class="task_tracker_link">${attempt.taskTrackerId}</a>
+                                      % endif
+                                    </td>
                                     <td>${attempt.startTimeFormatted}</td>
                                     <td>${attempt.finishTimeFormatted}</td>
                                     <td>${attempt.outputSize}</td>

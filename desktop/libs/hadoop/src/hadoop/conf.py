@@ -219,6 +219,9 @@ YARN_CLUSTERS = UnspecifiedConfigSection(
       HISTORY_SERVER_API_URL=Config("history_server_api_url",
                   default='http://localhost:19888',
                   help="URL of the HistoryServer API"),
+      NODE_MANAGER_API_URL=Config("node_manager_api_url",
+                  default='http://localhost:8042',
+                  help="URL of the HistoryServer API"),
     )
   )
 )

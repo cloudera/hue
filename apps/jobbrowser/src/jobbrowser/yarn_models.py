@@ -204,3 +204,30 @@ class Attempt:
     if not hasattr(self, '_counters'):
       self._counters = self.task.job.api.task_attempt_counters(self.task.jobId, self.task.id, self.id)['jobCounters']
     return self._counters
+
+
+class Container:
+
+  def __init__(self, attrs):
+    if attrs:
+      for key, value in attrs['container'].iteritems():
+        setattr(self, key, value)
+    self.is_mr2 = True
+
+    self._fixup()
+
+  def _fixup(self):
+    setattr(self, 'trackerId', self.id)
+    setattr(self, 'httpPort', self.nodeId.split(':')[1])
+    setattr(self, 'host', self.nodeId.split(':')[0])
+    setattr(self, 'lastSeenMs', None)
+    setattr(self, 'lastSeenFormatted', '')
+    setattr(self, 'totalVirtualMemory', None)
+    setattr(self, 'totalPhysicalMemory', self.totalMemoryNeededMB)
+    setattr(self, 'availableSpace', None)
+    setattr(self, 'failureCount', None)
+    setattr(self, 'mapCount', None)
+    setattr(self, 'reduceCount', None)
+    setattr(self, 'maxMapTasks', None)
+    setattr(self, 'maxReduceTasks', None)
+    setattr(self, 'taskReports', None)

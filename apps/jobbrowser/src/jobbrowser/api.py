@@ -25,10 +25,11 @@ from hadoop.api.jobtracker.ttypes import ThriftJobPriority, TaskTrackerNotFoundE
 import hadoop.yarn.history_server_api as history_server_api
 import hadoop.yarn.mapreduce_api as mapreduce_api
 import hadoop.yarn.resource_manager_api as resource_manager_api
+import hadoop.yarn.node_manager_api as node_manager_api
 
 from jobbrowser.conf import SHARE_JOBS
-from jobbrowser.models import Job, JobLinkage, TaskList
-from jobbrowser.yarn_models import Application, Job as YarnJob
+from jobbrowser.models import Job, JobLinkage, TaskList, Tracker
+from jobbrowser.yarn_models import Application, Job as YarnJob, Container
 
 
 LOG = logging.getLogger(__name__)
@@ -140,6 +141,9 @@ class JtApi(JobBrowserApi):
                            _DEFAULT_OBJ_PER_PAGINATION,
                            _DEFAULT_OBJ_PER_PAGINATION * (filters['pagenum'] - 1))
 
+  def get_tracker(self, trackerid):
+    return Tracker.from_name(self.jt, trackerid)
+
 
 class YarnApi(JobBrowserApi):
   """
@@ -158,6 +162,7 @@ class YarnApi(JobBrowserApi):
     self.user = user
     self.resource_manager_api = resource_manager_api.get_resource_manager()
     self.mapreduce_api = mapreduce_api.get_mapreduce_api()
+    self.node_manager_api = node_manager_api.get_resource_manager_api()
     self.history_server_api = history_server_api.get_history_server_api()
 
   def get_job_link(self, job_id):
@@ -216,3 +221,6 @@ class YarnApi(JobBrowserApi):
 
   def get_task(self, jobid, task_id):
     return self.get_job(jobid).task(task_id)
+
+  def get_tracker(self, container_id):
+    return Container(self.node_manager_api.container(container_id))
