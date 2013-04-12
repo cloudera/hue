@@ -82,7 +82,7 @@ var MAPPING_OPTIONS = {
     },
     update: function(options) {
       return map_params(options, function() {});
-    },
+    }
   },
   archives: {
     create: function(options) {
@@ -110,7 +110,7 @@ var MAPPING_OPTIONS = {
       };
 
       return map_params(options, subscribe);
-    },
+    }
   },
   params: {
     create: function(options) {
@@ -138,7 +138,7 @@ var MAPPING_OPTIONS = {
       };
 
       return map_params(options, subscribe);
-    },
+    }
   },
   prepares: {
     create: function(options) {
@@ -166,17 +166,17 @@ var MAPPING_OPTIONS = {
       };
 
       return map_params(options, subscribe);
-    },
+    }
   },
   deletes: {
     create: function(options) {
       return map_params(options, function() {});
-    },
+    }
   },
   mkdirs: {
     create: function(options) {
       return map_params(options, function() {});
-    },
+    }
   },
   moves: {
     create: function(options) {
@@ -191,7 +191,7 @@ var MAPPING_OPTIONS = {
       };
 
       return map_params(options, subscribe);
-    },
+    }
    },
    chmods: {
      create: function(options) {
@@ -209,12 +209,12 @@ var MAPPING_OPTIONS = {
        };
 
        return map_params(options, subscribe);
-     },
+     }
    },
    touchzs: {
      create: function(options) {
        return map_params(options, function() {});
-     },
+     }
    }
 };
 

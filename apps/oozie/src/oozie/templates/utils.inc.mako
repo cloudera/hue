@@ -286,6 +286,9 @@
 
   <script type="text/javascript" charset="utf-8">
     $(document).ready(function(){
+
+      $("*").on("focusin", false); //fixes an infinite loop on Firefox
+
       % if not skip_init:
         $(".pathChooser").each(function(){
           var self = $(this);
@@ -327,9 +330,7 @@
             },
             onFileChoose:function (filePath) {
               handleChoice(filePath);
-              if (selectFolder == undefined || !selectFolder) {
-                $("#chooseFile").modal("hide");
-              }
+              $("#chooseFile").modal("hide");
             },
             createFolder:false,
             uploadFile:true,
