@@ -119,6 +119,9 @@ def describe_table(request, database, table):
   table_data = ''
 
   table = db.get_table(database, table)
+  partitions = None
+  if table.partition_keys:
+    partitions = db.get_partitions(database, table, max_parts=None)
 
   try:
     table_data = db.get_sample(database, table)
@@ -137,6 +140,7 @@ def describe_table(request, database, table):
       },
     ],
     'table': table,
+    'partitions': partitions,
     'sample': table_data and table_data.rows(),
     'error_message': error_message,
     'database': database,
@@ -174,7 +178,17 @@ def read_table(request, database, table):
     url = reverse('beeswax:watch_query', args=[history.id]) + '?context=table:%s:%s' % (table.name, database)
     return redirect(url)
   except Exception, e:
-    raise PopupException(_('Can read table'), detail=e)
+    raise PopupException(_('Cannot read table'), detail=e)
+
+
+def read_partition(request, database, table, partition_id):
+  db = dbms.get(request.user)
+  try:
+    partition = db.get_partition(database, table, int(partition_id))
+    url = reverse('beeswax:watch_query', args=[partition.id]) + '?context=table:%s:%s' % (table, database)
+    return redirect(url)
+  except Exception, e:
+    raise PopupException(_('Cannot read table'), detail=e)
 
 
 def load_table(request, database, table):
@@ -235,4 +249,4 @@ def describe_partitions(request, database, table):
           'url': reverse('catalog:describe_partitions', kwargs={'database': database, 'table': table})
         },
       ],
-      'table': table_obj, 'partitions': partitions, 'request': request})
+      'database': database, 'table': table_obj, 'partitions': partitions, 'request': request})

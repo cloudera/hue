@@ -27,36 +27,58 @@ ${ commonheader(_('Table Partitions: %(tableName)s') % dict(tableName=table.name
 <h1>${_('Partitions')}</h1>
 ${ components.breadcrumbs(breadcrumbs) }
 
-<table class="table table-striped table-condensed datatables">
-  % if partitions:
-    <tr>
-      % for field in table.partition_keys:
-        <th>${field.name}</th>
-      % endfor
-      <th>${_('Path')}</th>
-    </tr>
-    % for partition in partitions:
-      <tr>
-        % for key in partition.values:
-          <td>${key}</td>
-        % endfor
-        <td>
-          <% url = location_to_url(partition.sd.location) %>
-          % if url:
-            <a href="${url}">${partition.sd.location}</a>
+  <div class="row-fluid">
+    <div class="span2">
+      <div class="well sidebar-nav">
+        <ul class="nav nav-list">
+          <li class="nav-header">${_('Actions')}</li>
+          <li><a href="${ url('catalog:describe_table', database=database, table=table.name) }">${_('Show Table')}</a></li>
+          <li style="height: 30px"></li>
+        </ul>
+      </div>
+    </div>
+    <div class="span10">
+      <table class="table table-striped table-condensed datatables">
+          % if partitions:
+          <tr>
+          % for field in table.partition_keys:
+              <th>${field.name}</th>
+          % endfor
+            <th>${_('Path')}</th>
+          </tr>
+          % for partition_id, partition in enumerate(partitions):
+            <tr>
+            % for idx, key in enumerate(partition.values):
+                <td><a href="${ url('catalog:read_partition', database=database, table=table.name, partition_id=partition_id) }" data-row-selector="true">${key}</a></td>
+            % endfor
+            <% location = location_to_url(partition.sd.location) %>
+            % if url:
+                <td data-row-selector-exclude="true">
+                  <a href="${location}">${partition.sd.location}</a>
+                </td>
+            % else:
+                <td>
+                ${partition.sd.location}
+                </td>
+            % endif
+            </tr>
+          % endfor
           % else:
-            ${partition.sd.location}
+            <tr><td>${_('Table has no partitions.')}</td></tr>
           % endif
-        </td>
-      </tr>
-    % endfor
-  % else:
-    <tr><td>${_('Table has no partitions.')}</td></tr>
-  % endif
-</table>
+      </table>
+    </div>
+  </div>
+
 
 </div>
 
 <link rel="stylesheet" href="/catalog/static/css/catalog.css" type="text/css">
+
+<script type="text/javascript" charset="utf-8">
+  $(document).ready(function () {
+    $("a[data-row-selector='true']").jHueRowSelector();
+  });
+</script>
 
 ${ commonfooter(messages) | n,unicode }

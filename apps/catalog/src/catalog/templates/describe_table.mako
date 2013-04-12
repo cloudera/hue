@@ -56,7 +56,7 @@ ${ commonheader(_("%s : %s") % (view_or_table_noun, table.name), app_name, user)
     ${ components.breadcrumbs(breadcrumbs) }
 
     <div class="row-fluid">
-        <div class="span3">
+        <div class="span2">
             <div class="well sidebar-nav">
                 <ul class="nav nav-list">
                     <li class="nav-header">${_('Actions')}</li>
@@ -64,10 +64,13 @@ ${ commonheader(_("%s : %s") % (view_or_table_noun, table.name), app_name, user)
                     <li><a href="${ url('catalog:read_table', database=database, table=table.name) }">${_('Browse Data')}</a></li>
                     <li><a href="#dropTable" data-toggle="modal">${_('Drop')} ${view_or_table_noun}</a></li>
                     <li><a href="${ table.hdfs_link }" rel="${ table.path_location }">${_('View File Location')}</a></li>
+                    % if table.partition_keys:
+                      <li><a href="${ url('catalog:describe_partitions', database=database, table=table.name) }">${_('Show Partitions')} (${ len(partitions) })</a></li>
+                    % endif
                 </ul>
             </div>
         </div>
-        <div class="span9">
+        <div class="span10">
             % if table.comment:
                 <div class="alert alert-info">${ _('Comment:') } ${ table.comment }</div>
             % endif
@@ -90,7 +93,6 @@ ${ commonheader(_("%s : %s") % (view_or_table_noun, table.name), app_name, user)
                 % if table.partition_keys:
                   <div class="tab-pane" id="partitionColumns">
                     ${column_table(table.partition_keys)}
-                    <a href="${ url('catalog:describe_partitions', database=database, table=table.name) }">${_('Show Partitions')}</a>
                   </div>
                 % endif
 
