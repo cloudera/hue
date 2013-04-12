@@ -16,7 +16,6 @@
 <%!
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
-import json
 %>
 <%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="components" file="components.mako" />
@@ -26,6 +25,7 @@ ${ commonheader(_('Databases'), 'catalog', user) | n,unicode }
 <div class="container-fluid" id="databases">
     <h1>${_('Databases')}</h1>
     ${ components.breadcrumbs(breadcrumbs) }
+
     <div class="row-fluid">
         <div class="span3">
             <div class="well sidebar-nav">
@@ -91,7 +91,7 @@ ${ commonheader(_('Databases'), 'catalog', user) | n,unicode }
 <script type="text/javascript" charset="utf-8">
   $(document).ready(function () {
     var viewModel = {
-        availableDatabases : ko.observableArray(${ json.dumps(databases) | n }),
+        availableDatabases : ko.observableArray(${ databases_json | n,unicode }),
         chosenDatabases : ko.observableArray([])
     };
 

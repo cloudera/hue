@@ -19,12 +19,9 @@
 %>
 
 <%def name="breadcrumbs(breadcrumbs)">
-
-
-
   <ul class="nav nav-pills hueBreadcrumbBar" id="breadcrumbs">
     <li>
-      <a href="${url('catalog:index')}"><i class="icon-sitemap"></i> ${_('Databases')}</a>
+      <a href="${url('catalog:databases')}"><i class="icon-sitemap"></i> ${_('Databases')}</a>
     </li>
     <li>
       <ul class="hueBreadcrumb">
@@ -39,8 +36,6 @@
       </ul>
     </li>
   </ul>
-
-
 </%def>
 
 <%def name="bootstrapLabel(field)">

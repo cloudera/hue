@@ -46,12 +46,14 @@ def index(request):
 Database Views
 """
 
-def show_databases(request):
+def databases(request):
   db = dbms.get(request.user)
   databases = db.get_databases()
+
   return render("databases.mako", request, {
     'breadcrumbs': [],
     'databases': databases,
+    'databases_json': json.dumps(databases),
   })
 
 

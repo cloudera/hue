@@ -20,7 +20,7 @@ from django.conf.urls.defaults import patterns, url
 urlpatterns = patterns('catalog.views',
   url(r'^$', 'index', name='index'),
 
-  url(r'^databases/?$', 'show_databases', name='show_databases'),
+  url(r'^databases/?$', 'databases', name='databases'),
   url(r'^databases/drop/?$', 'drop_database', name='drop_database'),
 
   url(r'^tables/(?P<database>\w+)?$', 'show_tables', name='show_tables'),
