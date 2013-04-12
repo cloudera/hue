@@ -102,6 +102,9 @@ class OozieApi:
     workflow.delete()
     return oozie_wf
 
+  def stop(self, job_id):
+    return get_oozie().job_control(job_id, 'kill')
+
   def get_jobs(self):
     kwargs = {'cnt': OozieApi.MAX_DASHBOARD_JOBS,}
     kwargs['user'] = self.user.username

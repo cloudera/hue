@@ -109,6 +109,7 @@ var PigViewModel = function (props) {
   self.LIST_SCRIPTS = props.listScripts;
   self.SAVE_URL = props.saveUrl;
   self.RUN_URL = props.runUrl;
+  self.STOP_URL = props.stopUrl;
   self.COPY_URL = props.copyUrl;
   self.DELETE_URL = props.deleteUrl;
 
@@ -219,6 +220,10 @@ var PigViewModel = function (props) {
     showDeleteModal();
   };
 
+  self.stopScript = function () {
+    callStop(self.currentScript());
+  };
+
   self.listRunScript = function () {
     callRun(self.selectedScript());
   };
@@ -281,6 +286,15 @@ var PigViewModel = function (props) {
     });
   };
 
+  self.showStopModal = function showStopModal() {
+    $("#stopScriptBtn").button("reset");
+    $("#stopScriptBtn").attr("data-loading-text", $("#stopScriptBtn").text() + " ...");
+    $("#stopModal").modal({
+      keyboard: true,
+      show: true
+    });
+  }
+
   self.showFileChooser = function showFileChooser() {
     var inputPath = this;
     var path = inputPath.value().substr(0, inputPath.value().lastIndexOf("/"));
@@ -309,6 +323,24 @@ var PigViewModel = function (props) {
       }
     }
     $("#deleteModal").modal({
+      keyboard: true,
+      show: true
+    });
+  }
+
+  function showStopModal() {
+    $(".stopMsg").addClass("hide");
+    if (self.currentStopType() == "single") {
+      $(".stopMsg.single").removeClass("hide");
+    }
+    if (self.currentStopType() == "multiple") {
+      if (self.selectedScripts().length > 1) {
+        $(".stopMsg.multiple").removeClass("hide");
+      } else {
+        $(".stopMsg.single").removeClass("hide");
+      }
+    }
+    $("#stopModal").modal({
       keyboard: true,
       show: true
     });
@@ -345,6 +377,7 @@ var PigViewModel = function (props) {
         function (data) {
           if (data.id && self.currentScript().id() != data.id){
             self.currentScript(script);
+            script.id(data.id);
             $(document).trigger("loadEditor");
           }
           script.isRunning(true);
@@ -355,6 +388,17 @@ var PigViewModel = function (props) {
           self.updateScripts();
           $("#submitModal").modal("hide");
         }, "json");
+  }
+
+  function callStop(script) {
+    $(document).trigger("stopping");
+    $.post(self.STOP_URL, {
+        id: script.id()
+      },
+      function (data) {
+        $(document).trigger("stopped");
+        $("#stopModal").modal("hide");
+      }, "json");
   }
 
   function callCopy(script) {

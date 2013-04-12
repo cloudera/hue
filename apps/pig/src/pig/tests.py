@@ -103,3 +103,24 @@ class TestWithHadoop(OozieBase):
 
     response = self.c.post(reverse('pig:run'), data=post_data, follow=True)
     self.wait_until_completion(json.loads(response.content)['id'])
+
+  def test_stop(self):
+    script = PigScript.objects.get(id=1)
+    script_dict = script.dict
+
+    post_data = {
+      'id': script.id,
+      'name': script_dict['name'],
+      'script': script_dict['script'],
+      'user': script.owner,
+      'parameters': json.dumps(script_dict['parameters']),
+      'resources': json.dumps(script_dict['resources']),
+      'submissionVariables': json.dumps([{"name": "output", "value": '/tmp/test_pig'}]),
+    }
+
+    submit_response = self.c.post(reverse('pig:run'), data=post_data, follow=True)
+    script = PigScript.objects.get(id=json.loads(submit_response.content)['id'])
+    assert_true(script.dict['job_id'], script.dict)
+
+    stop_response = self.c.post(reverse('pig:stop'), data={'id': script.id}, follow=True)
+    assert_equal('KILLED', json.loads(stop_response.content)['workflow']['status'])

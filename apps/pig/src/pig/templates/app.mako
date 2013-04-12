@@ -128,9 +128,9 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
                 <i class="icon-play"></i> ${ _('Run') }
               </a>
             </li>
-            <li data-bind="visible: currentScript().isRunning()">
+            <li data-bind="click: showStopModal, visible: currentScript().isRunning()">
               <a href="#" title="${ _('Run the script') }" rel="tooltip" data-placement="right" class="disabled">
-                <i class="icon-spinner icon-spin"></i> ${ _('Running...') }
+                <i class="icon-spinner icon-ban-circle"></i> ${ _('Stop') }
               </a>
             </li>
             <li data-bind="visible: currentScript().id() != -1, click: copyScript">
@@ -393,6 +393,17 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
   </div>
 </div>
 
+<div id="stopModal" class="modal hide fade">
+  <div class="modal-header">
+    <a href="#" class="close" data-dismiss="modal">&times;</a>
+    <h3>${_('Stop Script')} '<span data-bind="text: currentScript().name"></span>' ${_('?')}</h3>
+  </div>
+  <div class="modal-footer">
+    <a class="btn" data-dismiss="modal">${_('No')}</a>
+    <a id="stopScriptBtn" class="btn btn-danger disable-feedback" data-bind="click: stopScript">${_('Yes')}</a>
+  </div>
+</div>
+
 <div id="chooseFile" class="modal hide fade">
     <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
@@ -444,6 +455,7 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
     listScripts: "${ url('pig:scripts') }",
     saveUrl: "${ url('pig:save') }",
     runUrl: "${ url('pig:run') }",
+    stopUrl: "${ url('pig:stop') }",
     copyUrl: "${ url('pig:copy') }",
     deleteUrl: "${ url('pig:delete') }"
   }
