@@ -28,7 +28,6 @@ from desktop.lib.django_util import render
 
 from beeswax.design import hql_query
 from beeswax.forms import CreateDatabaseForm
-from beeswax.server import dbms
 from beeswax.views import execute_directly
 
 
@@ -36,7 +35,6 @@ LOG = logging.getLogger(__name__)
 
 
 def create_database(request):
-  db = dbms.get(request.user)
 
   if request.method == "POST":
     data = request.POST.copy()
@@ -50,7 +48,7 @@ def create_database(request):
       # Mako outputs bytestring in utf8
       proposed_query = proposed_query.decode('utf-8')
       query = hql_query(proposed_query)
-      return execute_directly(request, query, on_success_url=reverse('catalog:show_databases'))
+      return execute_directly(request, query, on_success_url=reverse('catalog:databases'))
   else:
     form = CreateDatabaseForm()
 

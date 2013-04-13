@@ -67,7 +67,7 @@ def drop_database(request):
       # Can't be simpler without an important refactoring
       design = SavedQuery.create_empty(app_name='beeswax', owner=request.user)
       query_history = db.drop_databases(databases, design)
-      url = reverse('beeswax:watch_query', args=[query_history.id]) + '?on_success_url=' + reverse('catalog:show_databases')
+      url = reverse('beeswax:watch_query', args=[query_history.id]) + '?on_success_url=' + reverse('catalog:databases')
       return redirect(url)
     except Exception, ex:
       error_message, log = dbms.expand_exception(ex, db)
