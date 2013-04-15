@@ -19,6 +19,8 @@ import logging
 import re
 import time
 
+from lxml import html
+
 from desktop.lib.view_util import format_duration_in_millis
 
 from jobbrowser.models import format_unixtime_ms
@@ -198,12 +200,35 @@ class Attempt:
     setattr(self, 'shuffleFinishTimeFormatted', None)
     setattr(self, 'sortFinishTimeFormatted', None)
     setattr(self, 'mapFinishTimeFormatted', None)
+    if not hasattr(self, 'diagnostics'):
+      self.diagnostics = ''
 
   @property
   def counters(self):
     if not hasattr(self, '_counters'):
       self._counters = self.task.job.api.task_attempt_counters(self.task.jobId, self.task.id, self.id)['jobCounters']
     return self._counters
+
+  def get_task_log(self, offset=0):
+    logs = []
+
+    attempt = self.task.job.job_attempts['jobAttempt'][0]
+    log_link = attempt['logsLink']
+
+    for name in ('stdout', 'stderr', 'syslog'):
+      link = '/%s/' % name
+      if int(offset) >= 0:
+        link += '?start=%s' % offset
+
+      try:
+        log_link = re.sub('job_[^/]+', self.id, log_link)
+        log = html.parse(log_link + link).xpath('/html/body/table/tbody/tr/td[2]')[0].text_content()
+      except Exception, e:
+        log = _('Failed to retrieve log: %s') % e
+
+      logs.append(log)
+
+    return logs + [''] * (3 - len(logs))
 
 
 class Container:
