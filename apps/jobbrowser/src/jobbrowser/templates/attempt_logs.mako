@@ -116,42 +116,92 @@ ${ line | unicode,trim }
     </div>
 </div>
 
+<script src="/jobbrowser/static/js/utils.js" type="text/javascript" charset="utf-8"></script>
+
 <script type="text/javascript" charset="utf-8">
-    $(document).ready(function(){
-        $("#metadataTable").dataTable({
-            "bPaginate": false,
-            "bLengthChange": false,
-            "bInfo": false,
-            "bAutoWidth": false,
-            "bFilter": false,
-            "aoColumns": [
-                { "sWidth": "30%" },
-                { "sWidth": "70%" }
-            ],
-            "oLanguage": {
-                "sEmptyTable": "${_('No data available')}",
-                "sZeroRecords": "${_('No matching records')}",
-            }
-        });
-
-        $(".taskCountersTable").dataTable({
-            "bPaginate": false,
-            "bLengthChange": false,
-            "bInfo": false,
-            "bFilter": false,
-            "bAutoWidth": false,
-            "aoColumns": [
-                { "sWidth": "30%" },
-                { "sWidth": "70%" }
-            ],
-            "oLanguage": {
-                "sEmptyTable": "${_('No data available')}",
-                "sZeroRecords": "${_('No matching records')}",
-            }
-        });
-
-        $.jHueScrollUp();
+  $(document).ready(function () {
+    $("#metadataTable").dataTable({
+      "bPaginate": false,
+      "bLengthChange": false,
+      "bInfo": false,
+      "bAutoWidth": false,
+      "bFilter": false,
+      "aoColumns": [
+        { "sWidth": "30%" },
+        { "sWidth": "70%" }
+      ],
+      "oLanguage": {
+        "sEmptyTable": "${_('No data available')}",
+        "sZeroRecords": "${_('No matching records')}",
+      }
     });
+
+    $(".taskCountersTable").dataTable({
+      "bPaginate": false,
+      "bLengthChange": false,
+      "bInfo": false,
+      "bFilter": false,
+      "bAutoWidth": false,
+      "aoColumns": [
+        { "sWidth": "30%" },
+        { "sWidth": "70%" }
+      ],
+      "oLanguage": {
+        "sEmptyTable": "${_('No data available')}",
+        "sZeroRecords": "${_('No matching records')}",
+      }
+    });
+
+    refreshLogs();
+    var logsRefreshInterval = window.setInterval(function () {
+      refreshLogs();
+    }, 1000);
+
+    $(document).on("stopLogsRefresh", function () {
+      window.clearInterval(logsRefreshInterval);
+    });
+
+    initLogsElement($("#logsDiagnostic pre"));
+    initLogsElement($("#logsStdOut pre"));
+    initLogsElement($("#logsStdErr pre"));
+    initLogsElement($("#logsSysLog pre"));
+
+    function refreshLogs() {
+      $.getJSON("?format=json", function (data) {
+        if (data && data.logs && data.logs.length > 3) {
+          var log_diagnostic = data.logs[0];
+          var log_stdout = data.logs[1];
+          var log_stderr = data.logs[2];
+          var log_syslog = data.logs[3];
+
+          appendAndScroll($("#logsDiagnostic pre"), log_diagnostic);
+          appendAndScroll($("#logsStdOut pre"), log_stdout);
+          appendAndScroll($("#logsStdErr pre"), log_stderr);
+          appendAndScroll($("#logsSysLog pre"), log_syslog);
+
+          if (!data.isRunning) {
+            $(document).trigger("stopLogsRefresh");
+          }
+        }
+        else {
+          $(document).trigger("stopLogsRefresh");
+        }
+      });
+    }
+
+    $(document).on("resized", function () {
+      resizeLogs($("#logsDiagnostic pre"));
+      resizeLogs($("#logsStdOut pre"));
+      resizeLogs($("#logsStdErr pre"));
+      resizeLogs($("#logsSysLog pre"));
+    });
+
+    $("a[data-toggle='tab']").on("shown", function (e) {
+      resizeLogs($($(e.target).attr("href")).find("pre"));
+    });
+
+    $.jHueScrollUp();
+  });
 </script>
 
 ${ commonfooter(messages) | n,unicode }

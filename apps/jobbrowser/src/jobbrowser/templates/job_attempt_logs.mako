@@ -69,45 +69,88 @@ ${ commonheader(_('Job Browser - Job Attempt: %(attempt_index)s') % {'attempt_in
     </div>
 </div>
 
+<script src="/jobbrowser/static/js/utils.js" type="text/javascript" charset="utf-8"></script>
+
 <script type="text/javascript" charset="utf-8">
-    $(document).ready(function(){
-        $("#metadataTable").dataTable({
-            "bPaginate": false,
-            "bLengthChange": false,
-            "bInfo": false,
-            "bAutoWidth": false,
-            "bFilter": false,
-            "aoColumns": [
-                { "sWidth": "30%" },
-                { "sWidth": "70%" }
-            ]
-        });
-
-        $(".taskCountersTable").dataTable({
-            "bPaginate": false,
-            "bLengthChange": false,
-            "bInfo": false,
-            "bFilter": false,
-            "bAutoWidth": false,
-            "aoColumns": [
-                { "sWidth": "30%" },
-                { "sWidth": "70%" }
-            ]
-        });
-
-        // From 15s to less than 5s display time with async
-        $.get('${ url("jobbrowser.views.job_attempt_logs_json", job=job.jobId, attempt_index=attempt_index, name='syslog', offset=0) }', function(data) {
-            $('#syslog-container').html(data['log']);
-        });
-        $.get('${ url("jobbrowser.views.job_attempt_logs_json", job=job.jobId, attempt_index=attempt_index, name='stdout', offset=0) }', function(data) {
-            $('#stdout-container').html(data['log']);
-        });
-		$.get('${ url("jobbrowser.views.job_attempt_logs_json", job=job.jobId, attempt_index=attempt_index, name='stderr', offset=0) }', function(data) {
-		    $('#stderr-container').html(data['log']);
-		});
-
-		$.jHueScrollUp();
+  $(document).ready(function () {
+    $("#metadataTable").dataTable({
+      "bPaginate": false,
+      "bLengthChange": false,
+      "bInfo": false,
+      "bAutoWidth": false,
+      "bFilter": false,
+      "aoColumns": [
+        { "sWidth": "30%" },
+        { "sWidth": "70%" }
+      ]
     });
+
+    $(".taskCountersTable").dataTable({
+      "bPaginate": false,
+      "bLengthChange": false,
+      "bInfo": false,
+      "bFilter": false,
+      "bAutoWidth": false,
+      "aoColumns": [
+        { "sWidth": "30%" },
+        { "sWidth": "70%" }
+      ]
+    });
+
+    // From 15s to less than 5s display time with async
+
+    refreshLogs();
+    var logsRefreshInterval = window.setInterval(function () {
+      refreshLogs();
+    }, 5000);
+
+    $(document).on("stopLogsRefresh", function () {
+      window.clearInterval(logsRefreshInterval);
+    });
+
+    initLogsElement($("#syslog-container"));
+    initLogsElement($("#stdout-container"));
+    initLogsElement($("#stderr-container"));
+
+    function refreshLogs() {
+      $.getJSON("${ url("jobbrowser.views.job_attempt_logs_json", job=job.jobId, attempt_index=attempt_index, name='syslog', offset=0) }", function (data) {
+        if (data && data.log) {
+          appendAndScroll($("#syslog-container"), data.log);
+        }
+        else {
+          $(document).trigger("stopLogsRefresh");
+        }
+      });
+      $.getJSON("${ url("jobbrowser.views.job_attempt_logs_json", job=job.jobId, attempt_index=attempt_index, name='stdout', offset=0) }", function (data) {
+        if (data && data.log) {
+          appendAndScroll($("#stdout-container"), data.log);
+        }
+        else {
+          $(document).trigger("stopLogsRefresh");
+        }
+      });
+      $.getJSON("${ url("jobbrowser.views.job_attempt_logs_json", job=job.jobId, attempt_index=attempt_index, name='stderr', offset=0) }", function (data) {
+        if (data && data.log) {
+          appendAndScroll($("#stderr-container"), data.log);
+        }
+        else {
+          $(document).trigger("stopLogsRefresh");
+        }
+      });
+    }
+
+    $(document).on("resized", function () {
+      resizeLogs($("#syslog-container"));
+      resizeLogs($("#stdout-container"));
+      resizeLogs($("#stderr-container"));
+    });
+
+    $("a[data-toggle='tab']").on("shown", function (e) {
+      resizeLogs($($(e.target).attr("href")).find("pre"));
+    });
+
+    $.jHueScrollUp();
+  });
 </script>
 
 ${ commonfooter(messages) | n,unicode }

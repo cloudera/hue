@@ -308,6 +308,12 @@ def single_task_attempt_logs(request, job, taskid, attemptid):
 
   if request.GET.get('format') == 'python':
     return context
+  elif request.GET.get('format') == 'json':
+    response = {
+      "logs": logs,
+      "isRunning": job.status.lower() in ('running', 'pending', 'prep')
+    }
+    return HttpResponse(json.dumps(response), mimetype="application/json")
   else:
     return render("attempt_logs.mako", request, context)
 
