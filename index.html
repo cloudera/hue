@@ -4,6 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <meta name="keywords" content="hadoop UI,cloudera,django,hadoop,hdfs,hive,hue,impala,mapreduce,oozie,pig,python,tutorial,apache" />
 
   <title>Hue - Hadoop User Experience</title>
 
@@ -73,7 +74,7 @@
           <p style="font-size: 1.5em;">Hue is an open source web-based application for making it easier to use Apache Hadoop.</p>
           <p>Hue features a File Browser for HDFS, a Job Designer/Browser for MapReduce, query editors for Hive, Pig and Cloudera Impala, an Oozie Application for creating workflows, various Shells, a collection of Hadoop API.</p>
             <p class style="text-align:center; padding-top:10px">
-             <a class="btn btn-primary btn-large" href="http://cloudera.github.com/hue/releases/2.2.0/hue-2.2.0.tgz">
+             <a class="btn btn-primary btn-large" href="http://cloudera.github.com/hue/releases/2.3.0/hue-2.3.0.tgz">
                Download Hue
              </a>
             <a class="btn btn-inverse btn-large" href="http://github.com/cloudera/hue">
@@ -173,7 +174,7 @@
                    Hue is composed of various <a href="#apps" class="link">applications</a>. The major query and scripting solutions are leveraged in specific editors (e.g. <a href="#apps" class="link" data-anchor="beeswax">Hive</a>, <a href="#apps" class="link" data-anchor="impala">Impala</a>, <a href="#apps" class="link" data-anchor="pig">Pig</a>) for quick interaction with big data. A Hadoop <a href="#apps" class="link" data-anchor="jb">JobBrowser</a> and <a href="#apps" class="link" data-anchor="fb">FileBrowser</a> are included for monitoring MapReduce tasks and intuitively manipulating the data (also observable in <a href="#apps" class="link" data-anchor="catalog">Table Browser</a>). An <a href="#apps" class="link" data-anchor="oozie">Oozie application</a> lets users create complex workflows of Hadoop jobs in a drag & drop editor and schedule them repetitively in a few clicks. This integration brings new ways to discover insights.
                    </p>
                   <p>
-                    Moreover, Hue comes with a <a href="docs-2.1.0/sdk/sdk.html">SDK</a> for letting developers reuse Hue’s libraries and start building apps on top of Hadoop.
+                    Moreover, Hue comes with a <a href="docs-2.3.0/sdk/sdk.html">SDK</a> for letting developers reuse Hue’s libraries and start building apps on top of Hadoop.
                   </p>
                 </section>                
               </div>
@@ -298,6 +299,21 @@
           </div>
 
           <div class="tab-pane" id="releases">
+            <h3 id="releases-2.3.0">Hue 2.3.0 - April 15th, 2013</h3>
+            <ul>
+              <li>Pig App: new application for editing and running Pig scripts with UDF and parameters</li>
+              <li>Catalog App: new application for manage databases, viewing tables schemas and sample of content</li>
+              <li>Oozie Bundles are now supported</li>
+              <li>Multi query and selecting a portion of a query to run</li>                                          
+              <li>Job Designer was totally restyled and now support all the Oozie actions</li>                                          
+              <li>Oracle databases are now supported</li>                                          
+            </ul>
+            <p>Hue works best with <a href="https://ccp.cloudera.com/display/CDH4DOC/CDH4+Quick+Start+Guide">Cloudera's Distribution for Apache Hadoop (CDH) version 4.2</a>.</p>
+            <ul>
+              <li><a href="docs-2.3.0/index.html">Documentation</a></li>
+              <li><a href="http://cloudera.github.com/hue/releases/2.3.0/hue-2.3.0.tgz">Download tarball</a></li>
+            </ul>
+          
             <h3 id="releases-2.2.0">Hue 2.2.0 - Feb 25th, 2013</h3>
             <ul>
               <li>The Oozie application has been restyled completely and now supports Ajax refreshes</li>
