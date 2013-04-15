@@ -189,7 +189,8 @@ ${layout.menubar(section='my queries')}
       "oLanguage":{
         "sEmptyTable":"${_('No data available')}",
         "sZeroRecords":"${_('No matching records')}"
-      }
+      },
+      "bStateSave": true
     });
 
     var recentRunQueries = $("#recentRunQueriesTable").dataTable({
@@ -210,7 +211,8 @@ ${layout.menubar(section='my queries')}
       "oLanguage":{
         "sEmptyTable":"${_('No data available')}",
         "sZeroRecords":"${_('No matching records')}"
-      }
+      },
+      "bStateSave": true
     });
 
     $("#filterInput").keyup(function () {
