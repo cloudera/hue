@@ -1,0 +1,216 @@
+Hue v2.3.0, released April 15th, 2013
+=====================================
+
+Hue 2.3.0 is compatible with CDH4.2 (Cloudera's Distribution Including Apache Hadoop 4.2).
+
+Website: http://cloudera.github.com/hue
+
+
+Notable Features
+----------------
+
+- Pig App: new application for editing and running Pig scripts with UDF and parameters
+- Catalog App: new application for manage databases, viewing tables schemas and sample of content
+- Oozie Bundles are now supported
+- SQL highlighting and autocomplete for Hive / Impala apps
+- Multi query and selecting a portion of a query to run
+- Job Designer was totally restyled and now support all the Oozie actions
+- Oracle databases are now supported
+
+
+Notable Fixes
+-------------
+
+- HUE-1158 [jb] MR2 Incorrect logs shown
+- HUE-1146 [jb] Task attemps can't be accessed in MR2
+- HUE-1156 [jb] MR2 Get all the logs
+- HUE-1141 [core] Home dashboard
+- HUE-880 [core] Hue works out of the box
+- HUE-966 [desktop] OAuthBackend and view for Oauth
+- HUE-1113 [core] Oracle support
+- HUE-1087 [beeswax] Pagination on /beeswax/list_designs page broken
+- HUE-1043 [oozie] Rerun a bundle
+
+
+
+Compatibility
+-------------
+
+Hue 2.3.0 runs on CentOS versions 5 to 6, and Ubuntu 10.04 to 12.10.
+
+Hue 2.3.0 is compatible with CDH4.2. Specifically:
+
+- File Browser depends on Hadoop 0.20 (for WebHDFS/HttpFS).
+- Beeswax is tested against Hive 0.10.0.
+- Job Designer depends on Oozie 3.3, using the Oozie web service API.
+
+
+List of 128 Commits
+-------------------
+
+* 494ff7c HUE-1158 [jb] MR2 Incorrect logs shown
+* 0f7b30f HUE-1146 [jb] Task attemps can't be accessed in MR2
+* e3921b7 HUE-1128 [pig] DB migration file
+* 84343f2 [jb] Task Attempt page fails to render
+* 3d6c013 [catalog] Fix create database tests
+* 557cfc1 HUE-1157 [jb] MR2 Container link broken
+* a72b2ae [oozie] Fix clone
+* b54c0cd [catalog] Fix databases page
+* f9a3089 HUE-75 [beeswax] "show partitions" forgets its table pane
+* da8963f HUE-1152 [oozie] Can't select a file
+* 8788397 HUE-1156 [jb] MR2 Get all the logs
+* ab407ba [impala] Error deploying hue-impala due to dependence on thrift
+* 2932c6e HUE-1122 [oozie] Propagate configuration option is always checked in Sub workflow action
+* 4a4ab10 HUE-1031 [oozie] Encode generated XML in UTF-8
+* 28ecd0c [oozie] Fix test case and remove super user oozie submission.
+* c6de770 HUE-1160 [oozie] Import workflow doesn't create link from start to end
+* 43806f0 [core] Unify examples installation
+* ba855c3 HUE-1103 [jobsub] Fix files
+* de29acf [jobsub] Fix checkboxes and add capture output
+* 0374347 [core] Various UX and UI polishing
+* d7c0815 HUE-1147 [pig] UpperText example
+* 338c4a6 HUE-1149 [core] Package httplib2
+* 8a320db [core] Fix config alert dock
+* 2041367 HUE-1103 [josub] Support files
+* 68b3e65 Fix bad import
+* 4cf4788 HUE-1141 [core] Home dashboard
+* 70e5aa7 [catalog] Database management in table browser
+* ae98d74 HUE-1117 [jobsub] Various js bugs
+* de8b53a HUE-1142 [beeswax] Support json paste on column names
+* da14733 [beeswax] Update tests with new re-installable examples
+* f69e2c6 HUE-880 [core] Hue works out of the box
+* 47d71af [core] Set version to 2.3
+* 6909f61 [shell] Mute non available shells
+* 2418050 [core] Update mini cluster dependencies
+* e3f7cc3 HUE-1126 [pig] Display logs of other running scripts and/or past run scripts
+* 7aa2479 HUE-1050 [useradmin] Create user wizard
+* ca5d66b HUE-1050 [useradmin] Create user wizard
+* 10754af HUE-1124 [pig] Improve running script log visualization
+* aeae2ac HUE-1050 [useradmin] Create user wizard
+* 248259f [oozie] Create workspace directory if needed
+* b20347e HUE-1130 [pig] UDF support
+* 745d60a HUE-1137 [core] Style drop area for FileUploader
+* 46e1871 HUE-1074 [impala] Infinite scroll on result page
+* c134c56 HUE-1129 [pig] Parameters support
+* ea8b714 HUE-1111 [beeswax] Save and edit the description of a query
+* 841fa9a HUE-1065 [core] ldaps support in Hue
+* 9f8f6e3 [core] Update readme about Pig and Catalog apps
+* 5fc66e2 HUE-1123 [pig] Update progress when job terminates
+* 9c2d407 HUE-1123 [pig] Introduce progress bar instead of textual percentage
+* 1b015a1 HUE-1063 [beeswax] SQL autocomplete and syntax highlighting
+* d74462f HUE-1125 [pig] Reduce the amount of ajax calls to the dashboard service
+* 8255a8a HUE-966 [desktop] OAuthBackend and view for Oauth
+* d381b14 HUE-1116 [catalog] Create a table from a file or loading data are broken
+* 966ead1 [beeswax] Document beeswax_running_query_lifetime
+* eda80af [beeswax] Fix autocomplete and restyle did you know
+* 509895e [shell] Sqoop 2 instead of Sqoop2 renaming
+* 4e07398 HUE-1099 [fb] Chown popup is not prefilled with the currents owners
+* 13847d8 [pig] Decouple view from API
+* 296c421 [pig] Various UX improvements
+* 392cb63 [pig] Reintroduced logs on the running script
+* d97c2ff [pig] Fix autocomplete
+* fff06f0 [pig] First round of beautification of the app
+* f78394f [pig] Initial commit
+* df7cca5 HUE-1119 [oozie] Workflow builder fork fails
+* 34a9756 HUE-1120 [oozie] Prevent errors on dashboard rendering
+* 1081ada HUE-919 [core] Create 'scroll to top' jQuery plugin
+* f536121 HUE-941 [core] Fix compatibility problems with IE8+
+* f81f6b2 [oozie] Fix workflow streaming XML generation test
+* 0f5d66b HUE-1118 [catalog] Add breadcrums to table browser
+* 9cc7984 HUE-1073 [beeswax] Auto complete settings
+* 52cf2ce HUE-1100 [impala] Support refresh with both Beeswax and HS2 API
+* d556215 HUE-1115 [impala] Support multi db and use statement
+* 1d3a308 HUE-1107 [beeswax] Hive Server 2 kerberos support
+* 39f2f07 HUE-1113 [core] Oracle support
+* 8196725 HUE-1100 [impala] Support refresh
+* 51847e2 [catalog] Add locales information
+* 2d0cb7b [catalog] Create Table Browser App
+* 1f53916 HUE-1108 [beeswax] Hive Server 2 query properties and UDF support
+* bdaedab HUE-1110 [impala] Support Hive Server 2 API
+* ce7e3c2 HUE-1105 [oozie] Support archives in actions
+* 1568565 [beeswax] Fix for Beeswax after Hive Server 2 support
+* 1162e67 HUE-1075 [beeswax] Support Hive Server 2
+* bf86118 HUE-1102 [oozie] Cannot delete fields in action editor
+* 1f78202 HUE-1104 [oozie] Add capture output to Java action
+* 4ae3afe [oozie] Bundle kickoff date is optional
+* cace2a2 HUE-1106 [beeswax] Pagination on /beeswax/query_history page is broken
+* d79ee52 HUE-1056 [beeswax] Highlight and run a portion of a query
+* e377e6c [jb] Still display logs even if syslog is missing
+* 41e230b [core] Fix settings
+* 89218ae HUE-1094 [fb] Fail early when creating files in a folder without permissions
+* 77290a2 HUE-975 [filebrowser] Access to pagination buttons on large pages
+* 6d6d53e HUE-566 [beeswax] Need keyboard shortcut for executing a query in beeswax
+* b0851c2 HUE-1097 [beeswax] Decouple from Impala
+* 3fa47e5 HUE-1047 [core] Invalid form submission blocks next submission
+* fcf3c7f HUE-1095 [fb] Add "." to the directory listing
+* 21acdd0 HUE-1047 [core] Invalid form submission blocks next submission
+* a9c22cc HUE-1058 [beeswax] Resize query editor textarea in IE8 and IE9
+* ddfa3de [oozie] Fix subworkflow import test
+* 9033de2 HUE-1077 [jobsub] Add some examples
+* bbed14d [core] Hide configuration tabs application to non-superusers
+* 87cb7de HUE-1001 [oozie] Upload resource archive
+* d170972 HUE-1089 [beeswax] Loading data can show a 500 error
+* ef9ebeb HUE-1055 [jobsub] Support design properties
+* f03f970 HUE-1088 [impala] Kerberos support
+* d6301a4 HUE-538 [fb] Upload doesn't work if / is not owned by 'hdfs'
+* e67a1e0 HUE-1087 [beeswax] Pagination on /beeswax/list_designs page broken
+* 000d97f HUE-1086 [oozie] Coordinator submission should prefil variables from workflow properties
+* b95b881 HUE-956 [beeswax] Load data into a table should redirect to the table
+* d9ccf6b HUE-1085 [oozie] Invalid js escaping
+* e8e9369 HUE-1082 [useradmin] Ldap Sync Users fails
+* b97c8c7 HUE-1054 [jobsub] Polishing jobsub application
+* 4886b79 HUE-1074 [impala] Result view not showing all the results
+* 4eeb114 HUE-962 [useradmin] Improve AllowAllBackend experience
+* 8968d22 HUE-1070 [oozie] Display all job URLs spawned by Pig
+* c7900e0 HUE-1068 [oozie] Java action should support capture output
+* 60173e1 HUE-1064 [core] JT plugin should support hadoop.rpc.protection set to anything other than "authentication"
+* 813a0f6 [oozie] Regroup Oozie instrumentation tests with submission ones
+* 3d4c3c5 HUE-910 [oozie] Add labels to Oozie instrumentation timers
+* 356f85b HUE-1043 [oozie] Rerun a bundle
+* fa0fa4b Revert "HUE-1061 [useradmin] Edit group name"
+* b3c118b [desktop] Change comments describing LDAPS config
+* 0efebd4 HUE-1061 [useradmin] Edit group name
+* 3bdc408 HUE-1062 [fb] Increase chunk size during download
+* 841c7fe HUE-1045 [beeswax] Use kerberos instance as host in hive site
+* fa4c985 HUE-1045 [beeswax] Beeswax host selection sasl
+* 6ca40cd HUE-910 [oozie] Display all actions in workflow editor and dashboard
+* cdd1be9 HUE-1059 [oozie] Display Coordinators start time
+* 5ef487d HUE-1059 [oozie] Display all Oozie web UI information
+
+
+Contributors
+------------
+
+This Hue release is made possible thanks to the contribution from:
+
+- Aaron Newton
+- Aaron T. Myers
+- Abraham Elmahrek
+- Aditya Acharya
+- Alex Newman
+- Andrew Bayer
+- Andrew Yao
+- Ann McCown
+- bc Wong
+- Ben Bishop
+- Bruce Mitchener
+- Bruno Mahé
+- Eli Collins
+- Enrico Berti
+- Eric Wong
+- Harsh J
+- Henry Robinson
+- Jon Natkins
+- Lars Francke
+- Loren Siebert
+- Marcus McLaughlin
+- Mike Cotton
+- Paul Battaglia
+- Philip Zeyliger
+- Romain Rigaux
+- Roman Shaposhnik
+- Shawn Van Ittersum
+- Shrijeet Paliwal
+- Thomas Aylott
+- Todd Lipcon
+- Vinithra Varadharajan
