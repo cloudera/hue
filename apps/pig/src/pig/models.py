@@ -28,8 +28,6 @@ from django.utils.translation import ugettext as _, ugettext_lazy as _t
 from desktop.lib.exceptions_renderable import PopupException
 from hadoop.fs.hadoopfs import Hdfs
 
-from oozie.models import Workflow
-
 
 class Document(models.Model):
   owner = models.ForeignKey(User, db_index=True, verbose_name=_t('Owner'), help_text=_t('User who can modify the job.'))
@@ -70,11 +68,6 @@ class PigScript(Document):
   @property
   def dict(self):
     return json.loads(self.data)
-
-
-class Submission(models.Model):
-  script = models.ForeignKey(PigScript)
-  workflow = models.ForeignKey(Workflow)
 
 
 def create_or_update_script(id, name, script, user, parameters, resources, is_design=True):
