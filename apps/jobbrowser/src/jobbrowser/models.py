@@ -410,6 +410,7 @@ class TaskAttempt(object):
     self.mapFinishTimeMs = self.task_attempt.mapFinishTime # DO NOT USE, NOT VALID IN 0.20
     self.mapFinishTimeFormatted = format_unixtime_ms(self.task_attempt.mapFinishTime)
     self.counters = self.task_attempt.counters
+    self.is_mr2 = False
 
   def get_tracker(self):
     try:
