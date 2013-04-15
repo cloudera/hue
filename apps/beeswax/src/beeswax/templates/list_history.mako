@@ -134,38 +134,41 @@ ${ layout.menubar(section='history') }
 </div>
 
 <script type="text/javascript" charset="utf-8">
-    $(document).ready(function(){
-        $(".datatables").dataTable({
-            "bPaginate": false,
-            "bLengthChange": false,
-            "bInfo": false,
-            "bFilter": false,
-            "aoColumns": [
-                { "sSortDataType": "dom-sort-value", "sType": "numeric" },
-                null,
-                null,
-                null,
-                null,
-                { "bSortable": false }
-            ],
-            "aaSorting": [[0, 'desc']],
-            "oLanguage": {
-                "sEmptyTable":     "${_('No data available')}",
-                "sInfo":           "${_('Showing _START_ to _END_ of _TOTAL_ entries')}",
-                "sInfoEmpty":      "${_('Showing 0 to 0 of 0 entries')}",
-                "sInfoFiltered":   "${_('(filtered from _MAX_ total entries)')}",
-                "sZeroRecords":    "${_('No matching records')}",
-                "oPaginate": {
-                    "sFirst":    "${_('First')}",
-                    "sLast":     "${_('Last')}",
-                    "sNext":     "${_('Next')}",
-                    "sPrevious": "${_('Previous')}"
-                }
-            }
-        });
-
-        $("a[data-row-selector='true']").jHueRowSelector();
+  $(document).ready(function () {
+    $(".datatables").dataTable({
+      "bPaginate": false,
+      "bLengthChange": false,
+      "bInfo": false,
+      "bFilter": false,
+      "aoColumns": [
+        { "sSortDataType": "dom-sort-value", "sType": "numeric" },
+        null,
+        null,
+        null,
+        null,
+        { "bSortable": false }
+      ],
+      "aaSorting": [
+        [0, 'desc']
+      ],
+      "oLanguage": {
+        "sEmptyTable": "${_('No data available')}",
+        "sInfo": "${_('Showing _START_ to _END_ of _TOTAL_ entries')}",
+        "sInfoEmpty": "${_('Showing 0 to 0 of 0 entries')}",
+        "sInfoFiltered": "${_('(filtered from _MAX_ total entries)')}",
+        "sZeroRecords": "${_('No matching records')}",
+        "oPaginate": {
+          "sFirst": "${_('First')}",
+          "sLast": "${_('Last')}",
+          "sNext": "${_('Next')}",
+          "sPrevious": "${_('Previous')}"
+        }
+      },
+      "bStateSave": true
     });
+
+    $("a[data-row-selector='true']").jHueRowSelector();
+  });
 </script>
 
 ${ commonfooter(messages) | n,unicode }

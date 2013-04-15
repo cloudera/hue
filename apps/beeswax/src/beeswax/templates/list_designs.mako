@@ -126,7 +126,7 @@ ${layout.menubar(section='saved queries')}
       "bLengthChange":false,
       "bInfo":false,
       "aaSorting":[
-        [1, 'asc']
+        [4, 'desc']
       ],
       "aoColumns":[
         {"bSortable":false, "sWidth":"1%" },
@@ -138,7 +138,8 @@ ${layout.menubar(section='saved queries')}
       "oLanguage":{
         "sEmptyTable":"${_('No data available')}",
         "sZeroRecords":"${_('No matching records')}",
-      }
+      },
+      "bStateSave": true
     });
 
     $("#filterInput").keyup(function () {
