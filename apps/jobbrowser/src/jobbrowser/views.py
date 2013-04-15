@@ -270,10 +270,6 @@ def single_task_attempt_logs(request, job, taskid, attemptid):
   jt = get_api(request.user, request.jt)
 
   job_link = jt.get_job_link(job.jobId)
-
-  if job_link.is_mr2:
-    return job_attempt_logs(request, job=job.jobId)
-
   task = job_link.get_task(taskid)
 
   try:
@@ -285,17 +281,20 @@ def single_task_attempt_logs(request, job, taskid, attemptid):
 
   try:
     # Add a diagnostic log
-    diagnostic_log = ", ".join(task.diagnosticMap[attempt.attemptId])
-    logs = [ diagnostic_log ]
+    if job_link.is_mr2:
+      diagnostic_log = attempt.diagnostics
+    else:
+      diagnostic_log =  ", ".join(task.diagnosticMap[attempt.attemptId])
+    logs = [diagnostic_log]
     # Add remaining logs
-    logs += [ section.strip() for section in attempt.get_task_log() ]
+    logs += [section.strip() for section in attempt.get_task_log()]
     log_tab = [i for i, log in enumerate(logs) if log]
     if log_tab:
       first_log_tab = log_tab[0]
   except TaskTrackerNotFoundException:
     # Four entries,
     # for diagnostic, stdout, stderr and syslog
-    logs = [ _("Failed to retrieve log. TaskTracker not found.") ] * 4
+    logs = [_("Failed to retrieve log. TaskTracker not found.")] * 4
 
   context = {
       "attempt": attempt,

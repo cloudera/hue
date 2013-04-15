@@ -24,10 +24,7 @@ urlpatterns = patterns('jobbrowser.views',
   url(r'^jobs/(?P<job>\w+)$','single_job', name='single_job'),
   url(r'^jobs/(?P<job>\w+)/counters$', 'job_counters', name='job_counters'),
   url(r'^jobs/(?P<job>\w+)/kill$', 'kill_job', name='kill_job'),
-  url(r'^jobs/(?P<job>\w+)/setpriority$', 'set_job_priority', name='set_job_priority'), #? used
   url(r'^jobs/(?P<job>\w+)/single_logs$', 'job_single_logs', name='job_single_logs'),
-  url(r'^jobs/(?P<job>\w+)/job_attempt_logs/(?P<attempt_index>\d+)$', 'job_attempt_logs', name='job_attempt_logs'),
-  url(r'^jobs/(?P<job>\w+)/job_attempt_logs_json/(?P<attempt_index>\d+)/(?P<name>\w+)?/(?P<offset>\d+)?$', 'job_attempt_logs_json', name='job_attempt_logs_json'), # MR2
   url(r'^jobs/(?P<job>\w+)/tasks$','tasks', name='tasks'),
   url(r'^jobs/(?P<job>\w+)/tasks/(?P<taskid>\w+)$', 'single_task', name='single_task'), # TODO s/single// ?
   url(r'^jobs/(?P<job>\w+)/tasks/(?P<taskid>\w+)/attempts/(?P<attemptid>\w+)$', 'single_task_attempt', name='single_task_attempt'),
@@ -35,7 +32,13 @@ urlpatterns = patterns('jobbrowser.views',
   url(r'^jobs/(?P<job>\w+)/tasks/(?P<taskid>\w+)/attempts/(?P<attemptid>\w+)/logs$', 'single_task_attempt_logs', name='single_task_attempt_logs'),
   url(r'^jobs/(\w+)/tasks/(\w+)/attempts/(?P<attemptid>\w+)/kill$', 'kill_task_attempt', name='kill_task_attempt'),
   url(r'^trackers/(?P<trackerid>.+)$', 'single_tracker', name='single_tracker'),
+
+  # MR2 specific
+  url(r'^jobs/(?P<job>\w+)/job_attempt_logs/(?P<attempt_index>\d+)$', 'job_attempt_logs', name='job_attempt_logs'),
+  url(r'^jobs/(?P<job>\w+)/job_attempt_logs_json/(?P<attempt_index>\d+)/(?P<name>\w+)?/(?P<offset>\d+)?$', 'job_attempt_logs_json', name='job_attempt_logs_json'),
+
   # Unused
+  url(r'^jobs/(?P<job>\w+)/setpriority$', 'set_job_priority', name='set_job_priority'),
   url(r'^trackers$', 'trackers', name='trackers'),
   url(r'^clusterstatus$', 'clusterstatus', name='clusterstatus'),
   url(r'^queues$', 'queues', name='queues'),

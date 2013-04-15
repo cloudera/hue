@@ -108,7 +108,7 @@ ${ commonheader(_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId_short),
                     </li>
                     <li class="nav-header">${_('Logs')}</li>
                     <li><a href="${ url('jobbrowser.views.job_single_logs', job=job.jobId) }"><i class="icon-tasks"></i> ${_('Logs')}</a></li>
-                    % if job.status.lower() == 'running' or job.status.lower() == 'pending':
+                    % if not job.is_mr2 and (job.status.lower() in ('running', 'pending')):
                         <li class="nav-header">${_('Kill Job')}</li>
                         <li>
                           <a href="#" title="${_('Kill this job')}" onclick="$('#kill-job').submit()">${_('Kill this job')}</a>
