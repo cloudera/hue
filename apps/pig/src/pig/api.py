@@ -97,7 +97,10 @@ class OozieApi:
     start_link.child = action
     start_link.save()
 
-    return _submit_workflow(self.user, self.fs, workflow, mapping)
+    oozie_wf = _submit_workflow(self.user, self.fs, workflow, mapping)
+
+    workflow.delete()
+    return oozie_wf
 
   def get_jobs(self):
     kwargs = {'cnt': OozieApi.MAX_DASHBOARD_JOBS,}
