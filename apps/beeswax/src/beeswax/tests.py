@@ -1308,6 +1308,7 @@ def test_hive_site():
     assert_equal(beeswax.hive_site.get_conf()['hive.metastore.warehouse.dir'], u'/abc')
     assert_equal(kerberos_principal, 'test/test.com@TEST.COM')
   finally:
+    beeswax.hive_site.reset()
     if saved is not None:
       beeswax.conf.BEESWAX_HIVE_CONF_DIR = saved
     shutil.rmtree(tmpdir)
@@ -1416,6 +1417,7 @@ def test_hive_site_multi_metastore_uris():
     assert_equal(host, 'darkside-12345')
     assert_equal(port, 9998)
   finally:
+    beeswax.hive_site.reset()
     if saved is not None:
       beeswax.conf.BEESWAX_HIVE_CONF_DIR = saved
     shutil.rmtree(tmpdir)

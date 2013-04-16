@@ -65,7 +65,7 @@ class TestWithHadoop(OozieBase):
     grant_access("test", "test", "pig")
     self.c.post(reverse('pig:install_examples'))
 
-  def wait_until_completion(self, pig_script_id, timeout=300.0, step=5):
+  def wait_until_completion(self, pig_script_id, timeout=300.0, step=5, expected_status='SUCCEEDED'):
     script = PigScript.objects.get(id=pig_script_id)
     job_id = script.dict['job_id']
 
@@ -81,7 +81,7 @@ class TestWithHadoop(OozieBase):
 
     logs = OozieServerProvider.oozie.get_job_log(job_id)
 
-    if response['workflow']['status'] != 'SUCCEEDED':
+    if response['workflow']['status'] != expected_status:
       msg = "[%d] %s took more than %d to complete or %s: %s" % (time.time(), job_id, timeout, response['workflow']['status'], logs)
       raise Exception(msg)
 
@@ -123,4 +123,4 @@ class TestWithHadoop(OozieBase):
     assert_true(script.dict['job_id'], script.dict)
 
     stop_response = self.c.post(reverse('pig:stop'), data={'id': script.id}, follow=True)
-    assert_equal('KILLED', json.loads(stop_response.content)['workflow']['status'])
+    self.wait_until_completion(json.loads(submit_response.content)['id'], expected_status='KILLED')
