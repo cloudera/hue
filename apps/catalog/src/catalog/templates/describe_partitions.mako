@@ -24,8 +24,8 @@
 ${ commonheader(_('Table Partitions: %(tableName)s') % dict(tableName=table.name), app_name, user) | n,unicode }
 
 <div class="container-fluid">
-<h1>${_('Partitions')}</h1>
-${ components.breadcrumbs(breadcrumbs) }
+  <h1>${_('Partitions')}</h1>
+  ${ components.breadcrumbs(breadcrumbs) }
 
   <div class="row-fluid">
     <div class="span2">
@@ -69,8 +69,6 @@ ${ components.breadcrumbs(breadcrumbs) }
       </table>
     </div>
   </div>
-
-
 </div>
 
 <link rel="stylesheet" href="/catalog/static/css/catalog.css" type="text/css">

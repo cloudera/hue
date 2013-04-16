@@ -111,6 +111,9 @@ class TestCatalogWithHadoop(BeeswaxSampleProvider):
     assert_true("myview" in resp.content)
 
   def test_describe_partitions(self):
+    response = self.client.get("/catalog/table/default/test_partitions")
+    assert_true("Show Partitions (1)" in response.content)
+
     response = self.client.get("/catalog/table/default/test_partitions/partitions", follow=True)
     assert_true("baz_one" in response.content)
     assert_true("boom_two" in response.content)
