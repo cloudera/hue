@@ -638,7 +638,6 @@ def split_oozie_jobs(oozie_jobs):
   jobs_completed = []
 
   for job in oozie_jobs:
-    # Bulk load instead
     if job.appName != 'pig-app-hue-script':
       if job.is_running():
         if job.type == 'Workflow':
