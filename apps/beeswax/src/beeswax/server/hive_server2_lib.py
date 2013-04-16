@@ -480,8 +480,9 @@ class HiveServerClientCompatible:
     if max_rows is None:
       max_rows = 10000
 
-    # Both Hive Server 2 and Impala do not support FETCH_FIRST yet
-    start_over = False
+    # Impala does not support FETCH_FIRST
+    if self.query_server['server_name'] == 'impala':
+      start_over = False
 
     if start_over:
       orientation = TFetchOrientation.FETCH_FIRST
