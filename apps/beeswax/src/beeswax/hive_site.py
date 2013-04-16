@@ -75,16 +75,17 @@ def get_metastore():
   if not _METASTORE_LOC_CACHE:
     kerberos_principal = security_util.get_kerberos_principal(get_conf().get(_CNF_METASTORE_KERBEROS_PRINCIPAL, None))
     kerberos_principal_components = security_util.get_components(kerberos_principal)
-    thrift_uri = get_conf().get(_CNF_METASTORE_URIS)
-    is_local = thrift_uri is None or thrift_uri == ''
+    thrift_uris = get_conf().get(_CNF_METASTORE_URIS)
+    is_local = thrift_uris is None or thrift_uris == ''
     if is_local:
       host = beeswax.conf.BEESWAX_META_SERVER_HOST.get()
       port = beeswax.conf.BEESWAX_META_SERVER_PORT.get()
     else:
+      thrift_uri = thrift_uris.split(",")[0]
       host, port = 'undefined', '0'
       match = _THRIFT_URI_RE.match(thrift_uri)
       if not match:
-        LOG.fatal('Cannot understand remote metastore uri "%s"' % (thrift_uri,))
+        LOG.fatal('Cannot understand remote metastore uri "%s"' % thrift_uri)
       else:
         host, port = match.groups()
       if str(get_conf().get(_CNF_METASTORE_SASL, 'false')).lower() == 'true' and len(kerberos_principal_components) == 3:
