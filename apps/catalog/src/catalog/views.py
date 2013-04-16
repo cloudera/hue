@@ -131,12 +131,10 @@ def describe_table(request, database, table):
     error_message, logs = dbms.expand_exception(ex, db)
 
   return render("describe_table.mako", request, {
-    'breadcrumbs': [
-      {
+    'breadcrumbs': [{
         'name': database,
         'url': reverse('catalog:show_tables', kwargs={'database': database})
-      },
-      {
+      }, {
         'name': str(table.name),
         'url': reverse('catalog:describe_table', kwargs={'database': database, 'table': table.name})
       },

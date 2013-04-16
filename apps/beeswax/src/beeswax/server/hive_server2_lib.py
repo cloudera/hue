@@ -38,7 +38,9 @@ LOG = logging.getLogger(__name__)
 
 
 class HiveServerTable(Table):
-
+  """
+  We are parsing DESCRIBE EXTENDED text sometimes and might need to implement the metastore API instead at some point.
+  """
   def __init__(self, table_results, table_schema, desc_results, desc_schema):
     if not table_results.rows:
       raise NoSuchObjectException()
@@ -57,18 +59,34 @@ class HiveServerTable(Table):
 
   @property
   def partition_keys(self):
-    # TODO
-    return [][:conf.BROWSE_PARTITIONED_TABLE_LIMIT.get()]
+    describe = self.extended_describe
+    #  partitionKeys:[FieldSchema(name:datehour, type:int, comment:null)],
+    match = re.search('partitionKeys:\[([^\]]+)\]', describe)
+    if match is not None:
+      match = match.group(1)
+      return [PartitionKeyCompatible(partition)
+              for partition in re.findall('FieldSchema\((.+?)\)', match)]
+    else:
+      return []
 
   @property
   def path_location(self):
-    # TODO
-    return ''
+    describe = self.extended_describe
+    match = re.search('location:([^,]+)', describe)
+    if match is not None:
+      match = match.group(1)
+    return match
 
   @property
   def parameters(self):
-    # TODO
-    return {}
+    # Parses a list of: parameters:{serialization.format=1}),... parameters:{numPartitions=2, EXTERNAL=TRUE}
+    describe = self.extended_describe
+    params = re.findall('parameters:\{([^\}]+?)\}', describe)
+    if params:
+      params_list = ', '.join(params).split(', ')
+      return dict([param.split('=')for param in params_list])
+    else:
+      return {}
 
   @property
   def cols(self):
@@ -76,13 +94,16 @@ class HiveServerTable(Table):
     if sum([bool(col['col_name']) for col in cols]) == len(cols):
       return cols
     else:
-      return cols[:-2] # Drop last 2 lines of Extended describe
+      return cols[:-2] # Drop last 2 lines of extended describe
 
   @property
   def comment(self):
-    # TODO
-    return ''
+    return HiveServerTRow(self.table, self.table_schema).col('REMARKS')
 
+  @property
+  def extended_describe(self):
+    # Just keep the content and skip the last new line
+    return HiveServerTTableSchema(self.results, self.schema).cols()[-1]['data_type']
 
 
 class HiveServerTRowSet:
@@ -328,16 +349,23 @@ class HiveServerClient:
     table_results, table_schema = self.fetch_result(res.operationHandle)
 
     # Using 'SELECT * from table' does not show column comments in the metadata
+    if self.query_server['server_name'] == 'beeswax':
+      self.execute_statement(statement='SET hive.server2.blocking.query=true')
+
     desc_results, desc_schema = self.execute_statement('DESCRIBE EXTENDED %s' % table_name)
     return HiveServerTable(table_results.results, table_schema.schema, desc_results.results, desc_schema.schema)
 
 
   def execute_query(self, query, max_rows=100):
+    return self.execute_query_statement(statement=query.query['query'], max_rows=max_rows)
+
+
+  def execute_query_statement(self, statement, max_rows=100):
     # Only execute_async_query() supports configuration
     if self.query_server['server_name'] == 'beeswax':
       self.execute_statement(statement='SET hive.server2.blocking.query=true')
 
-    results, schema = self.execute_statement(statement=query.query['query'], max_rows=max_rows)
+    results, schema = self.execute_statement(statement=statement, max_rows=max_rows)
     return HiveServerDataTable(results, schema)
 
 
@@ -417,6 +445,15 @@ class HiveServerClient:
     return res.log
 
 
+  def get_partitions(self, database, table_name, max_parts):
+    table = self.get_table(database, table_name)
+    if self.query_server['server_name'] == 'beeswax':
+      self.execute_statement(statement='SET hive.server2.blocking.query=true')
+
+    partitionTable = self.execute_query_statement('SHOW PARTITIONS %s' % table_name) # DB prefix not supported
+    return [PartitionValueCompatible(partition, table) for partition in partitionTable.rows()][-max_parts:]
+
+
 class HiveServerTableCompatible(HiveServerTable):
   """Same API as Beeswax"""
 
@@ -446,9 +483,26 @@ class ResultCompatible:
   def columns(self):
     return self.cols()
 
-
   def cols(self):
     return [col.name for col in self.data_table.cols()]
+
+
+class PartitionKeyCompatible:
+
+  def __init__(self, partition):
+    # Parses: ['name:datehour, type:int, comment:null']
+    name, type, comment = partition.split(', ')
+    self.name = name.split(':')[1]
+    self.type = type.split(':')[1]
+    self.comment = comment.split(':')[1]
+
+
+class PartitionValueCompatible:
+
+  def __init__(self, partition, table):
+    # Parses: ['datehour=2013022516']
+    self.values = [part.split('=')[1] for part in partition]
+    self.sd = type('Sd', (object,), {'location': '%s/%s' % (table.path_location, ','.join(partition)),})
 
 
 class HiveServerClientCompatible:
@@ -546,7 +600,8 @@ class HiveServerClientCompatible:
   def get_partition(self, *args, **kwargs): raise NotImplementedError()
 
 
-  def get_partitions(self, *args, **kwargs): raise NotImplementedError()
+  def get_partitions(self, database, table_name, max_parts):
+    return self._client.get_partitions(database, table_name, max_parts)
 
 
   def alter_partition(self, db_name, tbl_name, new_part): raise NotImplementedError()

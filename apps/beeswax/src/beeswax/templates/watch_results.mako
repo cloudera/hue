@@ -268,10 +268,10 @@ $(document).ready(function () {
       });
     }
   });
-  
+
   $(".dataTables_wrapper").css("min-height", "0");
   $(".dataTables_filter").hide();
-  
+
   $("input[name='save_target']").change(function () {
     $("#fieldRequired").addClass("hide");
     $("input[name='target_dir']").removeClass("fieldError");

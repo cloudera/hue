@@ -1477,7 +1477,7 @@ def test_beeswax_get_kerberos_security():
 
 
 class MockDbms:
-  
+
   def __init__(self, client, server_type):
     pass
 
@@ -1498,15 +1498,15 @@ class MockServer(object):
 
   def tearDown(self):
     dbms.Dbms = dbms.OriginalBeeswaxApi
-  
-  def test_save_design_properties(self):  
+
+  def test_save_design_properties(self):
     resp = self.client.get('/beeswax/save_design_properties')
     content = json.loads(resp.content)
     assert_equal(-1, content['status'])
-  
+
     response = _make_query(self.client, 'SELECT', submission_type='Save', name='My Name', desc='My Description')
     design = response.context['design']
-  
+
     try:
       resp = self.client.post('/beeswax/save_design_properties', {'name': 'name', 'value': 'New Name', 'pk': design.id})
       design = SavedQuery.objects.get(id=design.id)
@@ -1516,10 +1516,10 @@ class MockServer(object):
       assert_equal('My Description', design.desc)
     finally:
       design.delete()
-  
+
     response = _make_query(self.client, 'SELECT', submission_type='Save', name='My Name', desc='My Description')
     design = response.context['design']
-  
+
     try:
       resp = self.client.post('/beeswax/save_design_properties', {'name': 'description', 'value': 'New Description', 'pk': design.id})
       design = SavedQuery.objects.get(id=design.id)
