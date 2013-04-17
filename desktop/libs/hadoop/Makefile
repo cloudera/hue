@@ -44,12 +44,6 @@ PLUGIN_JAVA_LIB := $(PLUGIN_DIR)/java-lib
 PLUGIN_JAVA_DIR := $(PLUGIN_DIR)/java
 BLD_DIR_PLUGINS := $(PLUGIN_DIR)/java/target
 
-STATIC_GROUP_MAPPING_DIR := $(realpath .)/static-group-mapping
-STATIC_GROUP_MAPPING_SRC := $(STATIC_GROUP_MAPPING_DIR)/src
-STATIC_GROUP_MAPPING_BUILD := $(STATIC_GROUP_MAPPING_DIR)/target
-STATIC_GROUP_MAPPING_LIB := $(STATIC_GROUP_MAPPING_DIR)/java-lib
-STATIC_GROUP_MAPPING := $(STATIC_GROUP_MAPPING_LIB)/static-group-mapping-$(DESKTOP_VERSION).jar
-
 SUDO_SHELL_DIR := $(realpath .)/sudo-shell
 SUDO_SHELL_SRC := $(SUDO_SHELL_DIR)/src
 SUDO_SHELL_BUILD := $(SUDO_SHELL_DIR)/target
@@ -62,7 +56,7 @@ CREDENTIALS_MERGER_BUILD := $(CREDENTIALS_MERGER_DIR)/target
 CREDENTIALS_MERGER_LIB := $(CREDENTIALS_MERGER_DIR)/java-lib
 CREDENTIALS_MERGER := $(CREDENTIALS_MERGER_LIB)/credentials-merger-$(DESKTOP_VERSION).jar
 
-compile: $(DESKTOP_PLUGIN_JAR) $(STATIC_GROUP_MAPPING) $(SUDO_SHELL) $(CREDENTIALS_MERGER)
+compile: $(DESKTOP_PLUGIN_JAR) $(SUDO_SHELL) $(CREDENTIALS_MERGER)
 
 # Build the plugin jar iff the source is present
 ifneq (,$(wildcard $(PLUGIN_JAVA_DIR)))
@@ -78,22 +72,6 @@ clean::
 else
 $(DESKTOP_PLUGIN_JAR):
 	$(error Cannot build hadoop plugin without source)
-endif
-
-# Build the static group mapping jar iff the source is present
-ifneq (,$(wildcard $(STATIC_GROUP_MAPPING_SRC)))
-$(STATIC_GROUP_MAPPING): $(shell find $(STATIC_GROUP_MAPPING_SRC) -type f)
-	mkdir -p $(STATIC_GROUP_MAPPING_LIB)
-	@echo "--- Building static UserGroupMappingService"
-	cd $(STATIC_GROUP_MAPPING_DIR) && mvn clean install -DskipTests $(MAVEN_OPTIONS)
-	cp $(STATIC_GROUP_MAPPING_BUILD)/static-group-mapping-$(MAVEN_VERSION).jar $(STATIC_GROUP_MAPPING)
-
-clean::
-	rm -rf $(STATIC_GROUP_MAPPING_LIB)
-	cd $(STATIC_GROUP_MAPPING_DIR) && mvn clean $(MAVEN_OPTIONS) ||:
-else
-$(STATIC_GROUP_MAPPING):
-	$(error Cannot build static-group-mapping jar without source)
 endif
 
 # Build the sudo shell jar iff the source is present
@@ -133,6 +111,5 @@ endif
 #
 BDIST_EXCLUDES += \
 	--exclude=java \
-	--exclude=static-group-mapping/src \
 	--exclude=sudo-shell/src \
 	--exclude=regenerate-thrift.sh
