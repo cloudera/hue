@@ -54,6 +54,9 @@ import org.apache.thrift.transport.TTransportFactory;
 import com.cloudera.beeswax.api.BeeswaxService;
 import com.cloudera.beeswax.api.BeeswaxService.Processor;
 import com.facebook.fb303.FacebookService;
+import java.util.HashMap;
+import java.util.Map;
+import javax.security.sasl.Sasl;
 
 public class Server {
 
@@ -260,10 +263,12 @@ public class Server {
             "Kerberos principal should have at least 2 parts: " + kerberosName);
       }
 
+      Map<String,String> SASL_PROPS = new HashMap<String, String>(SaslRpcServer.SASL_PROPS);
+      SASL_PROPS.put(Sasl.QOP, SaslRpcServer.QualityOfProtection.AUTHENTICATION.getSaslQop());
       TSaslServerTransport.Factory saslFactory =
           new TSaslServerTransport.Factory(AuthMethod.KERBEROS.getMechanismName(),
               names[0], names[1] , // two parts of kerberos principal
-              SaslRpcServer.SASL_PROPS,
+              SASL_PROPS,
               new SaslRpcServer.SaslGssCallbackHandler());
       transFactory = new KbrSaslTransportFactory(saslFactory, bwUgi);
     } else {
