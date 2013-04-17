@@ -333,7 +333,23 @@ def execute_query(request, design_id=None):
 
   query_server = get_query_server_config(app_name, requires_ddl=False)
   db = dbms.get(request.user, query_server)
-  databases = ((db, db) for db in db.get_databases())
+  dbs = db.get_databases()
+  databases = ((db, db) for db in dbs)
+
+  autocomplete = {}
+  for database in dbs:
+    tables = db.get_tables(database=database)
+    autocomplete_tables = []
+    for table in tables:
+      t = db.get_table(database, table)
+      autocomplete_tables.append({
+        'name': t.name,
+        'cols': [column.name for column in t.cols]
+      })
+
+    autocomplete[database] = {
+      'tables': autocomplete_tables
+    }
 
   if request.method == 'POST':
     form.bind(request.POST)
@@ -383,12 +399,12 @@ def execute_query(request, design_id=None):
       form.bind()
     form.query.fields['database'].choices = databases # Could not do it in the form
   return render('execute.mako', request, {
-
     'action': action,
     'design': design,
     'error_message': error_message,
     'form': form,
     'log': log,
+    'autocomplete': json.dumps(autocomplete),
     'on_success_url': on_success_url,
     'can_edit_name': design and not design.is_auto and design.name,
   })

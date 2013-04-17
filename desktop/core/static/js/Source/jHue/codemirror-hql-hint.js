@@ -35,18 +35,17 @@
   function scriptHint(editor, _keywords, getToken) {
     // Find the token at the cursor
     var cur = editor.getCursor(), token = getToken(editor, cur), tprop = token;
-    // If it's not a 'word-style' token, ignore the token.
 
-    if (!/^[\w$_]*$/.test(token.string)) {
+    // If it's not a 'word-style' or dot token, ignore the token.
+    if (!/^[\.\w$_]*$/.test(token.string)) {
       token = tprop = {start: cur.ch, end: cur.ch, string: "", state: token.state,
-        className: token.string == ":" ? "hiveql-type" : null};
+        className: token.string == "." ? "hiveql-type" : null};
     }
 
     if (!context) var context = [];
     context.push(tprop);
 
     var completionList = getCompletions(token, context);
-    completionList = completionList.sort();
     //prevent autocomplete for last word, instead show dropdown with one word
     if (completionList.length == 1) {
       completionList.push(" ");
@@ -56,6 +55,11 @@
       from: CodeMirror.Pos(cur.line, token.start),
       to: CodeMirror.Pos(cur.line, token.end)};
   }
+
+  CodeMirror.catalogTables = "";
+  CodeMirror.catalogFields = "";
+  CodeMirror.possibleTable = false;
+  CodeMirror.possibleSoloField = false;
 
   CodeMirror.hiveQLHint = function (editor) {
     return scriptHint(editor, hiveQLKeywordsU, function (e, cur) {
@@ -76,23 +80,36 @@
   var hiveQLBuiltinsL = hiveQLBuiltins.toLowerCase().split(" ").join("() ").split(" ");
 
   function getCompletions(token, context) {
-    var found = [], start = token.string;
+    var catalogTablesL = CodeMirror.catalogTables.toLowerCase().split(" ");
+    var catalogFieldsL = CodeMirror.catalogFields.toLowerCase().split(" ");
+
+    var found = [], start = token.string, extraFound = [];
 
     function maybeAdd(str) {
       if (str.indexOf(start) == 0 && !arrayContains(found, str)) found.push(str);
     }
 
+    function maybeAddToExtra(str) {
+      if (str.indexOf(start) == 0 && !arrayContains(found, str)) extraFound.push(str);
+    }
+
     function gatherCompletions(obj) {
-      if (obj == ":") {
-        forEach(hiveQLTypesL, maybeAdd);
+      if (obj.indexOf(".") == 0) {
+        forEach(catalogFieldsL, maybeAdd);
       }
       else {
-        forEach(hiveQLBuiltinsU, maybeAdd);
-        forEach(hiveQLBuiltinsL, maybeAdd);
-        forEach(hiveQLTypesU, maybeAdd);
-        forEach(hiveQLTypesL, maybeAdd);
-        forEach(hiveQLKeywordsU, maybeAdd);
-        forEach(hiveQLKeywordsL, maybeAdd);
+        if (!CodeMirror.possibleTable) {
+          if (CodeMirror.possibleSoloField) {
+            forEach(catalogFieldsL, maybeAddToExtra);
+          }
+          forEach(hiveQLBuiltinsU, maybeAdd);
+          forEach(hiveQLBuiltinsL, maybeAdd);
+          forEach(hiveQLTypesU, maybeAdd);
+          forEach(hiveQLTypesL, maybeAdd);
+          forEach(hiveQLKeywordsU, maybeAdd);
+          forEach(hiveQLKeywordsL, maybeAdd);
+        }
+        forEach(catalogTablesL, maybeAdd);
       }
     }
 
@@ -106,6 +123,6 @@
         base = base[context.pop().string];
       if (base != null) gatherCompletions(base);
     }
-    return found;
+    return extraFound.concat(found.sort());
   }
 })();

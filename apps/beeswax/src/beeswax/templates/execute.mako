@@ -585,11 +585,116 @@ ${layout.menubar(section='query')}
         }
       }
 
+      var dbTree = ${ autocomplete | n,unicode };
+
+      function getTableAliases() {
+        var _aliases = {};
+        var _val = codeMirror.getValue();
+        var _from = _val.toUpperCase().indexOf("FROM");
+        if (_from > -1) {
+          var _match = _val.toUpperCase().substring(_from).match(/ON|WHERE|GROUP|SORT/);
+          var _to = _val.length;
+          if (_match) {
+            _to = _match.index;
+          }
+          var _found = _val.substr(_from, _to).replace(/(\r\n|\n|\r)/gm, "").replace(/from/gi, "").replace(/join/gi, ",").split(",");
+          for (var i = 0; i < _found.length; i++) {
+            var _tablealias = $.trim(_found[i]).split(" ");
+            if (_tablealias.length > 1) {
+              _aliases[_tablealias[1]] = _tablealias[0];
+            }
+          }
+        }
+        return _aliases;
+      }
+
+      function getTableFields(tableName, withDot) {
+        if (tableName.indexOf("(") > -1) {
+          tableName = tableName.substr(tableName.indexOf("(") + 1);
+        }
+        var _branch = dbTree[$("#id_query-database").val()];
+        if (_branch != null && _branch.tables) {
+          for (var i = 0; i < _branch.tables.length; i++) {
+            var _aliases = getTableAliases();
+            if (_aliases[tableName]) {
+              tableName = _aliases[tableName];
+            }
+            if (_branch.tables[i].name == tableName) {
+              var _cols = _branch.tables[i].cols.slice(0);
+              if (withDot) {
+                for (var idx = 0; idx < _cols.length; idx++) {
+                  _cols[idx] = "." + _cols[idx];
+                }
+              }
+              return _cols.join(" ");
+            }
+          }
+        }
+        return "";
+      }
+
+      function tableHasAlias(tableName) {
+        var _aliases = getTableAliases();
+        for (var alias in _aliases) {
+          if (_aliases[alias] == tableName) {
+            return true;
+          }
+        }
+        return false;
+      }
+
+      function getTables() {
+        var _branch = dbTree[$("#id_query-database").val()];
+        if (_branch != null && _branch.tables) {
+          var _names = "";
+          for (var i = 0; i < _branch.tables.length; i++) {
+            if (i > 0) {
+              _names += " ";
+            }
+            _names += _branch.tables[i].name;
+          }
+          return _names;
+        }
+        return "";
+      }
+
       var queryEditor = $("#queryField")[0];
 
       CodeMirror.commands.autocomplete = function (cm) {
+        CodeMirror.catalogTables = getTables();
+        var _before = codeMirror.getRange({line: 0, ch: 0}, {line: codeMirror.getCursor().line, ch: codeMirror.getCursor().ch}).replace(/(\r\n|\n|\r)/gm, " ");
+        CodeMirror.possibleTable = false;
+        if (_before.toUpperCase().indexOf(" FROM ") > -1 && _before.toUpperCase().indexOf(" ON ") == -1 && _before.toUpperCase().indexOf(" WHERE ") == -1) {
+          CodeMirror.possibleTable = true;
+        }
+        CodeMirror.possibleSoloField = false;
+        if (_before.toUpperCase().indexOf("SELECT ") > -1 && _before.toUpperCase().indexOf(" FROM ") && !CodeMirror.fromDot) {
+          CodeMirror.possibleSoloField = true;
+          try {
+            var _possibleTables = $.trim(codeMirror.getValue().substr(codeMirror.getValue().toUpperCase().indexOf("FROM") + 4)).split(" ");
+            var _foundTable = "";
+            for (var i = 0; i < _possibleTables.length; i++) {
+              if ($.trim(_possibleTables[i]) != "" && _foundTable == "") {
+                _foundTable = _possibleTables[i];
+              }
+            }
+            if (_foundTable != "") {
+              if (tableHasAlias(_foundTable)) {
+                CodeMirror.possibleSoloField = false;
+              }
+              else {
+                CodeMirror.catalogFields = getTableFields(_foundTable, false);
+              }
+            }
+          }
+          catch (e) {
+          }
+        }
         CodeMirror.showHint(cm, CodeMirror.hiveQLHint);
       }
+
+      CodeMirror.fromDot = false;
+
       var codeMirror = CodeMirror(function (elt) {
         queryEditor.parentNode.replaceChild(elt, queryEditor);
       }, {
@@ -598,9 +703,26 @@ ${layout.menubar(section='query')}
         lineNumbers: true,
         mode: "text/x-hiveql",
         extraKeys: {
-          "Shift-Space": "autocomplete",
+          "Shift-Space": function () {
+            CodeMirror.fromDot = false;
+            codeMirror.execCommand("autocomplete");
+          },
           Tab: function (cm) {
             $("#executeQuery").focus();
+          }
+        },
+        onKeyEvent: function (e, s) {
+          if (s.type == "keyup") {
+            if (s.keyCode == 190) {
+              window.setTimeout(function () {
+                var _line = codeMirror.getLine(codeMirror.getCursor().line);
+                var _partial = _line.substring(0, codeMirror.getCursor().ch);
+                var _table = _partial.substring(_partial.lastIndexOf(" ") + 1, _partial.length - 1);
+                CodeMirror.catalogFields = getTableFields(_table, true);
+                CodeMirror.fromDot = true;
+                codeMirror.execCommand("autocomplete");
+              }, 100); // timeout for IE8
+            }
           }
         }
       });
@@ -679,6 +801,5 @@ ${layout.menubar(section='query')}
         'html': true
     });
 </script>
-
 
 ${ commonfooter(messages) | n,unicode }
