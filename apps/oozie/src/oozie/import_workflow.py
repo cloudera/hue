@@ -43,7 +43,9 @@ from django.core import serializers
 from django.utils.translation import ugettext as _
 
 from conf import DEFINITION_XSLT_DIR
-from models import Workflow, Node, Link, Start, End, Decision, DecisionEnd, Fork, Join
+from models import Workflow, Node, Link, Start, End,\
+                   Decision, DecisionEnd, Fork, Join,\
+                   Kill
 from utils import xml_tag
 
 LOG = logging.getLogger(__name__)
@@ -84,6 +86,10 @@ def _save_links(workflow, root):
     if not isinstance(child_el.tag, basestring):
       continue
 
+    # Skip kill nodes.
+    if child_el.tag.endswith('kill'):
+      continue
+
     # Iterate over node members
     # Join nodes have attributes which point to the next node
     # Start node has attribute which points to first node
@@ -97,6 +103,7 @@ def _save_links(workflow, root):
 
     elif isinstance(parent, Decision):
       _decision_relationships(workflow, parent, child_el)
+
     else:
       _node_relationships(workflow, parent, child_el)
 
@@ -187,6 +194,7 @@ def _node_relationships(workflow, parent, child_el):
   """
   Resolves node links.
   Will use 'start' link type for fork nodes and 'to' link type for all other nodes.
+  Error links will automatically resolve to a single kill node.
   """
   for el in child_el:
     # Skip special nodes (like comments).
@@ -201,6 +209,8 @@ def _node_relationships(workflow, parent, child_el):
           raise RuntimeError(_("Node %s has a link that is missing 'start' attribute.") % parent.name)
         to = el.attrib['start']
         name = 'start'
+      elif name == 'error':
+        to = 'kill'
       else:
         if 'to' not in el.attrib:
           raise RuntimeError(_("Node %s has a link that is missing 'to' attribute.") % parent.name)
@@ -406,7 +416,9 @@ def _resolve_decision_relationships(workflow):
 
 
 def _prepare_nodes(workflow, root):
-  # Deserialize
+  """
+  Deserialize
+  """
   objs = serializers.deserialize('xml', etree.tostring(root))
 
   # First pass is a list of nodes and their types respectively.
@@ -501,12 +513,23 @@ def _resolve_subworkflow_from_deployment_dir(fs, workflow, app_path):
 
 
 def _save_nodes(workflow, nodes):
+  """
+  Save nodes, but skip kill nodes because we create a single kill node to use.
+  """
   for node in nodes:
+    if node.node_type is 'kill':
+      continue
+
     try:
       # Do not overwrite start or end node
       Node.objects.get(workflow=workflow, node_type=node.node_type, name=node.name)
     except Node.DoesNotExist:
       node.save()
+
+  # Create kill node
+  # Only need it if we have a node to reference it with.
+  if len(nodes) > 2:
+    Kill.objects.create(name='kill', workflow=workflow, node_type=Kill.node_type)
 
 
 def import_workflow(workflow, workflow_definition, fs=None):
