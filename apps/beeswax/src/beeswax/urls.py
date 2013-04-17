@@ -32,7 +32,9 @@ urlpatterns = patterns('beeswax.views',
 
   url(r'^my_queries$', 'my_queries', name='my_queries'),
   url(r'^list_designs$', 'list_designs', name='list_designs'),
+  url(r'^list_trashed_designs$', 'list_trashed_designs', name='list_trashed_designs'),
   url(r'^delete_designs$', 'delete_design', name='delete_design'),
+  url(r'^restore_designs$', 'restore_design', name='restore_design'),
   url(r'^clone_design/(?P<design_id>\d+)$', 'clone_design', name='clone_design'),
   url(r'^query_history$', 'list_query_history', name='list_query_history'),
 

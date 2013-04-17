@@ -267,6 +267,8 @@ class SavedQuery(models.Model):
   # An auto design is a place-holder for things users submit but not saved.
   # We still want to store it as a design to allow users to save them later.
   is_auto = models.BooleanField(default=False, db_index=True)
+  is_trashed = models.BooleanField(default=False, db_index=True, verbose_name=_t('Is trashed'),
+                                   help_text=_t('If this query is trashed.'))
 
   class Meta:
     ordering = ['-mtime']

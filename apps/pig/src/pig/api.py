@@ -59,47 +59,50 @@ class OozieApi:
     }
 
     workflow = Workflow.objects.new_workflow(self.user)
-    workflow.name = OozieApi.WORKFLOW_NAME
-    workflow.is_history = True
-    workflow.save()
-    Workflow.objects.initialize(workflow, self.fs)
 
-    script_path = workflow.deployment_dir + '/script.pig'
-    self.fs.create(script_path, data=pig_script.dict['script'])
+    try:
+      workflow.name = OozieApi.WORKFLOW_NAME
+      workflow.is_history = True
+      workflow.save()
+      Workflow.objects.initialize(workflow, self.fs)
 
-    pig_params = []
-    for param in json.loads(params):
-      pig_params.append({"type":"argument","value":"-param"})
-      pig_params.append({"type":"argument","value":"%(name)s=%(value)s" % param})
+      script_path = workflow.deployment_dir + '/script.pig'
+      self.fs.create(script_path, data=pig_script.dict['script'])
 
-    files = []
-    archives = []
+      pig_params = []
+      for param in json.loads(params):
+        pig_params.append({"type":"argument","value":"-param"})
+        pig_params.append({"type":"argument","value":"%(name)s=%(value)s" % param})
 
-    for resource in pig_script.dict['resources']:
-      if resource['type'] == 'file':
-        files.append(resource['value'])
-      if resource['type'] == 'archive':
-        archives.append({"dummy": "", "name": resource['value']})
+      files = []
+      archives = []
 
-    action = Pig.objects.create(
-        name='pig',
-        script_path=script_path,
-        workflow=workflow,
-        node_type='pig',
-        params=json.dumps(pig_params),
-        files=json.dumps(files),
-        archives=json.dumps(archives),
-    )
+      for resource in pig_script.dict['resources']:
+        if resource['type'] == 'file':
+          files.append(resource['value'])
+        if resource['type'] == 'archive':
+          archives.append({"dummy": "", "name": resource['value']})
 
-    action.add_node(workflow.end)
+      action = Pig.objects.create(
+          name='pig',
+          script_path=script_path,
+          workflow=workflow,
+          node_type='pig',
+          params=json.dumps(pig_params),
+          files=json.dumps(files),
+          archives=json.dumps(archives),
+      )
 
-    start_link = workflow.start.get_link()
-    start_link.child = action
-    start_link.save()
+      action.add_node(workflow.end)
 
-    oozie_wf = _submit_workflow(self.user, self.fs, workflow, mapping)
+      start_link = workflow.start.get_link()
+      start_link.child = action
+      start_link.save()
 
-    workflow.delete()
+      oozie_wf = _submit_workflow(self.user, self.fs, workflow, mapping)
+    finally:
+      workflow.delete()
+
     return oozie_wf
 
   def stop(self, job_id):

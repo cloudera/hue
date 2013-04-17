@@ -33,14 +33,16 @@ ${ layout.menubar(section='bundles') }
 
   <%actionbar:render>
     <%def name="actions()">
-      <a href="${ url('oozie:list_bundles') }" id="home-btn" class="btn"><i class="icon-home"></i> ${ _('Bundles') }</a>
+      <a href="${ url('oozie:list_bundles') }" id="home-btn" class="btn" title="${ _('Got to bundle manager') }"><i class="icon-home"></i> ${ _('Bundles') }</a>
+      &nbsp;&nbsp;
+      <button class="btn toolbarBtn" id="restore-btn" disabled="disabled" title="${ _('Retore the selected bundles') }"><i class="icon-cloud-upload"></i> ${ _('Restore') }</button>
+      <button class="btn toolbarBtn" id="destroy-btn" disabled="disabled" title="${ _('Delete the selected bundles') }"><i class="icon-bolt"></i> ${ _('Delete forever') }</button>
     </%def>
 
     <%def name="creation()">
-      <button class="btn toolbarBtn" id="restore-btn" disabled="disabled"><i class="icon-plus"></i> ${ _('Restore') }</button>
-      <button class="btn toolbarBtn" id="destroy-btn" disabled="disabled"><i class="icon-bolt"></i> ${ _('Delete forever') }</button>
-      &nbsp;&nbsp;
-      <button class="btn" id="purge-btn"><i class="icon-fire"></i> ${ _('Empty') }</button>
+      <button class="btn" id="purge-btn" title="${ _('Delete all the bundles') }" data-bind="enabled: availableJobs().length > 0">
+        <i class="icon-fire"></i> ${ _('Empty') }
+      </button>
     </%def>
   </%actionbar:render>
 
