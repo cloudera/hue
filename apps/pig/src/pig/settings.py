@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 DJANGO_APPS = ['pig']
-NICE_NAME = 'Pig'
+NICE_NAME = 'Pig Editor'
 MENU_INDEX = 12
 ICON = '/pig/static/art/icon_pig_24.png'
 
