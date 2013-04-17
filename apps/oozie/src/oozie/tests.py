@@ -1674,6 +1674,32 @@ class TestImportWorkflow04(OozieMockBase):
     workflow.delete()
 
 
+  def test_import_multi_kill_node(self):
+    """
+    Validates import for multiple kill nodes: xml.
+
+    Kill nodes should be skipped and a single kill node should be created.
+    """
+    workflow = Workflow.objects.new_workflow(self.user)
+    workflow.save()
+    f = open('apps/oozie/src/oozie/test_data/0.4/test-java-multiple-kill.xml')
+    import_workflow(workflow, f.read())
+    f.close()
+    workflow.save()
+    assert_equal('kill', Kill.objects.get(workflow=workflow).name)
+    assert_equal(5, len(Node.objects.filter(workflow=workflow)))
+    assert_equal(6, len(Link.objects.filter(parent__workflow=workflow)))
+    nodes = [Node.objects.filter(workflow=workflow, node_type='java')[0].get_full_node(),
+             Node.objects.filter(workflow=workflow, node_type='java')[1].get_full_node()]
+    assert_equal('org.apache.hadoop.examples.terasort.TeraGen', nodes[0].main_class)
+    assert_equal('${records} ${output_dir}/teragen', nodes[0].args)
+    assert_equal('org.apache.hadoop.examples.terasort.TeraSort', nodes[1].main_class)
+    assert_equal('${output_dir}/teragen ${output_dir}/terasort', nodes[1].args)
+    assert_true(nodes[0].capture_output)
+    assert_false(nodes[1].capture_output)
+    workflow.delete()
+
+
 class TestPermissions(OozieBase):
 
   def setUp(self):
