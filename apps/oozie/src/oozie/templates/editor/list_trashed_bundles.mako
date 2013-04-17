@@ -19,84 +19,66 @@
   from django.utils.translation import ugettext as _
   import time as py_time
 %>
+
 <%namespace name="actionbar" file="../actionbar.mako" />
 <%namespace name="layout" file="../navigation-bar.mako" />
 <%namespace name="utils" file="../utils.inc.mako" />
 
 ${ commonheader(_("Oozie App"), "oozie", user, "100px") | n,unicode }
-${ layout.menubar(section='coordinators') }
+${ layout.menubar(section='bundles') }
 
 
 <div class="container-fluid">
-  <h1>${ _('Coordinator Trash') }</h1>
+  <h1>${ _('Bundle Trash') }</h1>
 
   <%actionbar:render>
     <%def name="actions()">
-        <button class="btn toolbarBtn" id="submit-btn" disabled="disabled"><i class="icon-play"></i> ${ _('Submit') }</button>
-        <button class="btn toolbarBtn" id="clone-btn" disabled="disabled"><i class="icon-retweet"></i> ${ _('Clone') }</button>
-        <div id="delete-dropdown" class="btn-group" style="display: inline">
-          <button id="delete-btn" class="btn delete-link dropdown-toggle" title="${_('Delete')}" data-toggle="dropdown" disabled="disabled">
-            <i class="icon-remove"></i> ${_('Delete')}
-            <span class="caret"></span>
-          </button>
-          <ul class="dropdown-menu" style="top: auto">
-            <li><a href="javascript:void(0);" id="trash-btn" class="delete-link" title="${_('Move to Trash')}"><i class="icon-trash"></i> ${_('Move to Trash')}</a></li>
-            <li><a href="javascript:void(0);" id="destroy-btn" class="delete-link" title="${_('Delete forever')}"><i class="icon-bolt"></i> ${_('Delete forever')}</a></li>
-          </ul>
-        </div>
+      <a href="${ url('oozie:list_bundles') }" id="home-btn" class="btn"><i class="icon-home"></i> ${ _('Bundles') }</a>
     </%def>
 
     <%def name="creation()">
-        <a href="${ url('oozie:create_coordinator') }" class="btn"><i class="icon-plus-sign"></i> ${ _('Create') }</a>
-        &nbsp;&nbsp;
-        <a href="${ url('oozie:list_trashed_coordinators') }" class="btn"><i class="icon-trash"></i> ${ _('Trash') }</a>
+      <button class="btn toolbarBtn" id="restore-btn" disabled="disabled"><i class="icon-plus"></i> ${ _('Restore') }</button>
+      <button class="btn toolbarBtn" id="destroy-btn" disabled="disabled"><i class="icon-bolt"></i> ${ _('Delete forever') }</button>
+      &nbsp;&nbsp;
+      <button class="btn" id="purge-btn"><i class="icon-fire"></i> ${ _('Empty') }</button>
     </%def>
   </%actionbar:render>
 
-  <table id="coordinatorTable" class="table datatables">
+  <table id="bundleTable" class="table datatables">
     <thead>
       <tr>
-        <th width="1%"><div class="hueCheckbox selectAll" data-selectables="coordinatorCheck"></div></th>
-        <th>${ _('Name') }</th>
-        <th>${ _('Description') }</th>
-        <th>${ _('Workflow') }</th>
-        <th>${ _('Frequency') }</th>
+        <th width="1%"><div class="hueCheckbox selectAll" data-selectables="bundleCheck"></div></th>
+        <th width="10%">${ _('Name') }</th>
+        <th width="20%">${ _('Description') }</th>
+        <th width="35%">${ _('Coordinators') }</th>
+        <th>${ _('Kick off') }</th>
         <th>${ _('Status') }</th>
         <th>${ _('Last Modified') }</th>
         <th>${ _('Owner') }</th>
       </tr>
     </thead>
     <tbody>
-      %for coordinator in jobs:
+      % for bundle in jobs:
         <tr>
           <td data-row-selector-exclude="true">
-            <div class="hueCheckbox coordinatorCheck" data-row-selector-exclude="true"
-              % if coordinator.is_accessible(user):
-                  data-clone-url="${ url('oozie:clone_coordinator', coordinator=coordinator.id) }"
-                  data-submit-url="${ url('oozie:submit_coordinator', coordinator=coordinator.id) }"
-              % endif
-              % if coordinator.is_editable(user):
-                  data-delete-id="${ coordinator.id }"
-              % endif
-              >
-            </div>
-            % if coordinator.is_accessible(user):
-              <a href="${ url('oozie:edit_coordinator', coordinator=coordinator.id) }" data-row-selector="true"/>
-            % endif
+            <div class="hueCheckbox bundleCheck" data-row-selector-exclude="true" data-bundle-id="${ bundle.id }"></div>
           </td>
-          <td>${ coordinator.name }</td>
-          <td>${ coordinator.description }</td>
+          <td>${ bundle.name }</td>
+          <td>${ bundle.description }</td>
           <td>
-            % if coordinator.workflow is not None:
-              ${ coordinator.workflow }
-            % endif
+             % for bundled in bundle.coordinators.all():
+               ${ bundled.coordinator.name }
+           % if not loop.last:
+            ,
+           % endif
+             % endfor
           </td>
-          <td>${ coordinator.text_frequency }</td>
+          <td>${ bundle.kick_off_time }</td>
           <td>
-            <span class="label label-info">${ coordinator.status }</span>
+            <span class="label label-info">${ bundle.status }</span>
           </td>
-          <td nowrap="nowrap" data-sort-value="${py_time.mktime(coordinator.last_modified.timetuple())}">${ utils.format_date(coordinator.last_modified) }</td>
-          <td>${ coordinator.owner.username }</td>
+          <td nowrap="nowrap" data-sort-value="${py_time.mktime(bundle.last_modified.timetuple())}">${ utils.format_date(bundle.last_modified) }</td>
+          <td>${ bundle.owner.username }</td>
         </tr>
       %endfor
     </tbody>
@@ -104,13 +86,11 @@ ${ layout.menubar(section='coordinators') }
 </div>
 
 
-<div id="submit-job-modal" class="modal hide"></div>
-
-<div id="trash-job" class="modal hide">
-  <form id="trashForm" action="${ url('oozie:delete_coordinator') }" method="POST">
+<div id="purge-job" class="modal hide">
+  <form id="purgeForm" action="${ url('oozie:delete_bundle') }?skip_trash=true" method="POST">
     <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3 id="trashMessage">${ _('Move the selected coordinator(s) to trash?') }</h3>
+      <h3 id="purgefMessage">${ _('Delete all bundle(s)?') }</h3>
     </div>
     <div class="modal-footer">
       <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>
@@ -123,10 +103,26 @@ ${ layout.menubar(section='coordinators') }
 </div>
 
 <div id="destroy-job" class="modal hide">
-  <form id="destroyForm" action="${ url('oozie:delete_coordinator') }?skip_trash=true" method="POST">
+  <form id="destroyForm" action="${ url('oozie:delete_bundle') }?skip_trash=true" method="POST">
     <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3 id="destroyMessage">${ _('Delete the selected coordinator(s)?') }</h3>
+      <h3 id="destroyMessage">${ _('Delete the selected bundle(s)?') }</h3>
+    </div>
+    <div class="modal-footer">
+      <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>
+      <input type="submit" class="btn btn-danger" value="${ _('Yes') }"/>
+    </div>
+    <div class="hide">
+      <select name="job_selection" data-bind="options: availableJobs, selectedOptions: chosenJobs" size="5" multiple="true"></select>
+    </div>
+  </form>
+</div>
+
+<div id="restore-job" class="modal hide">
+  <form id="restoreForm" action="${ url('oozie:restore_bundle') }" method="POST">
+    <div class="modal-header">
+      <a href="#" class="close" data-dismiss="modal">&times;</a>
+      <h3 id="restoreMessage">${ _('Restore the selected bundle(s)?') }</h3>
     </div>
     <div class="modal-footer">
       <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>
@@ -162,7 +158,7 @@ ${ layout.menubar(section='coordinators') }
       toggleActions();
     });
 
-    $(".coordinatorCheck").click(function () {
+    $(".bundleCheck").click(function () {
       if ($(this).attr("checked")) {
         $(this).removeClass("icon-ok").removeAttr("checked");
       }
@@ -176,69 +172,38 @@ ${ layout.menubar(section='coordinators') }
     function toggleActions() {
       $(".toolbarBtn").attr("disabled", "disabled");
       var selector = $(".hueCheckbox[checked='checked']");
-      if (selector.length == 1) {
-        var action_buttons = [
-          ['#submit-btn', 'data-submit-url'],
-          ['#bundle-btn', 'data-bundle-url'],
-          ['#clone-btn', 'data-clone-url']
-        ];
-        $.each(action_buttons, function (index) {
-          if (selector.attr(this[1])) {
-            $(this[0]).removeAttr("disabled");
-          } else {
-            $(this[0]).attr("disabled", "disabled");
-          }
-        });
-      }
-      var can_delete = $(".hueCheckbox[checked='checked'][data-delete-id]");
-      if (can_delete.length >= 1 && can_delete.length == selector.length) {
-        $("#delete-btn").removeAttr("disabled");
+      var can_modify = $(".hueCheckbox[checked='checked'][data-bundle-id]");
+      if (can_modify.length >= 1 && can_modify.length == selector.length) {
+        $("#destroy-btn").removeAttr("disabled");
+        $("#restore-btn").removeAttr("disabled");
       }
     }
 
-    $("#trash-btn").click(function (e) {
+    $("#purge-btn").click(function (e) {
       viewModel.chosenJobs.removeAll();
-      $(".hueCheckbox[checked='checked']").each(function( index ) {
-        viewModel.chosenJobs.push($(this).data("delete-id"));
+      $(".hueCheckbox").each(function( index ) {
+        viewModel.chosenJobs.push($(this).data("bundle-id"));
       });
-      $("#trash-job").modal("show");
+      $("#purge-job").modal("show");
     });
 
     $("#destroy-btn").click(function (e) {
       viewModel.chosenJobs.removeAll();
       $(".hueCheckbox[checked='checked']").each(function( index ) {
-        viewModel.chosenJobs.push($(this).data("delete-id"));
+        viewModel.chosenJobs.push($(this).data("bundle-id"));
       });
       $("#destroy-job").modal("show");
     });
 
-    $("#submit-btn").click(function () {
-      var _this = $(".hueCheckbox[checked='checked']");
-      var _action = _this.attr("data-submit-url");
-      $.get(_action, function (response) {
-          $("#submit-job-modal").html(response);
-          $("#submit-job-modal").modal("show");
-        }
-      );
-    });
-
-    $(".deleteConfirmation").click(function () {
-      var _this = $(this);
-      var _action = _this.attr("data-url");
-      $("#deleteWfForm").attr("action", _action);
-      $("#deleteWfMessage").text(_this.attr("alt"));
-      $("#delete-job").modal("show");
-    });
-
-    $("#clone-btn").click(function (e) {
-      var _this = $(".hueCheckbox[checked='checked']");
-      var _url = _this.attr("data-clone-url");
-      $.post(_url, function (data) {
-        window.location = data.url;
+    $("#restore-btn").click(function (e) {
+      viewModel.chosenJobs.removeAll();
+      $(".hueCheckbox[checked='checked']").each(function( index ) {
+        viewModel.chosenJobs.push($(this).data("bundle-id"));
       });
+      $("#restore-job").modal("show");
     });
 
-    var oTable = $("#coordinatorTable").dataTable({
+    var oTable = $("#bundleTable").dataTable({
       "sPaginationType":"bootstrap",
       'iDisplayLength':50,
       "bLengthChange":false,

@@ -56,7 +56,6 @@ LOG = logging.getLogger(__name__)
 
 
 def list_workflows(request):
-  show_setup_app = True
   data = Workflow.objects.filter(managed=True)
 
   if not SHARE_JOBS.get() and not request.user.is_superuser:
@@ -69,7 +68,22 @@ def list_workflows(request):
   return render('editor/list_workflows.mako', request, {
     'jobs': list(data),
     'json_jobs': json.dumps(list(data.values_list('id', flat=True))),
-    'show_setup_app': show_setup_app,
+  })
+
+
+def list_trashed_workflows(request):
+  data = Workflow.objects.trashed().filter(managed=True)
+
+  if not SHARE_JOBS.get() and not request.user.is_superuser:
+    data = data.filter(owner=request.user)
+  else:
+    data = data.filter(Q(is_shared=True) | Q(owner=request.user))
+
+  data = data.order_by('-last_modified')
+
+  return render('editor/list_trashed_workflows.mako', request, {
+    'jobs': list(data),
+    'json_jobs': json.dumps(list(data.values_list('id', flat=True))),
   })
 
 
@@ -91,6 +105,24 @@ def list_coordinators(request, workflow_id=None):
   })
 
 
+def list_trashed_coordinators(request, workflow_id=None):
+  data = Coordinator.objects.trashed()
+  if workflow_id is not None:
+    data = data.filter(workflow__id=workflow_id)
+
+  if not SHARE_JOBS.get() and not request.user.is_superuser:
+    data = data.filter(owner=request.user)
+  else:
+    data = data.filter(Q(is_shared=True) | Q(owner=request.user))
+
+  data = data.order_by('-last_modified')
+
+  return render('editor/list_trashed_coordinators.mako', request, {
+    'jobs': list(data),
+    'json_jobs': json.dumps(list(data.values_list('id', flat=True))),
+  })
+
+
 def list_bundles(request):
   data = Bundle.objects
 
@@ -102,6 +134,22 @@ def list_bundles(request):
   data = data.order_by('-last_modified')
 
   return render('editor/list_bundles.mako', request, {
+    'jobs': list(data),
+    'json_jobs': json.dumps(list(data.values_list('id', flat=True))),
+  })
+
+
+def list_trashed_bundles(request):
+  data = Bundle.objects.trashed()
+
+  if not SHARE_JOBS.get() and not request.user.is_superuser:
+    data = data.filter(owner=request.user)
+  else:
+    data = data.filter(Q(is_shared=True) | Q(owner=request.user))
+
+  data = data.order_by('-last_modified')
+
+  return render('editor/list_trashed_bundles.mako', request, {
     'jobs': list(data),
     'json_jobs': json.dumps(list(data.values_list('id', flat=True))),
   })
@@ -196,8 +244,31 @@ def edit_workflow(request, workflow):
   })
 
 
-
 def delete_workflow(request):
+  if request.method != 'POST':
+    raise PopupException(_('A POST request is required.'))
+
+  skip_trash = 'skip_trash' in request.GET
+
+  job_ids = request.POST.getlist('job_selection')
+
+  for job_id in job_ids:
+    job = Job.objects.is_accessible_or_exception(request, job_id)
+    Job.objects.can_edit_or_exception(request, job)
+    if skip_trash:
+      Workflow.objects.destroy(job, request.fs)
+    else:
+      job.workflow.delete(skip_trash=False)
+
+  if skip_trash:
+    request.info(_('Workflow(s) deleted.'))
+  else:
+    request.info(_('Workflow(s) trashed.'))
+
+  return redirect(reverse('oozie:list_workflows'))
+
+
+def restore_workflow(request):
   if request.method != 'POST':
     raise PopupException(_('A POST request is required.'))
 
@@ -206,9 +277,9 @@ def delete_workflow(request):
   for job_id in job_ids:
     job = Job.objects.is_accessible_or_exception(request, job_id)
     Job.objects.can_edit_or_exception(request, job)
-    Workflow.objects.destroy(job, request.fs)
+    job.workflow.restore()
 
-  request.info(_('Workflow(s) deleted.'))
+  request.info(_('Workflow(s) restored.'))
 
   return redirect(reverse('oozie:list_workflows'))
 
@@ -306,15 +377,37 @@ def delete_coordinator(request):
   if request.method != 'POST':
     raise PopupException(_('A POST request is required.'))
 
+  skip_trash = 'skip_trash' in request.GET
+
   job_ids = request.POST.getlist('job_selection')
 
   for job_id in job_ids:
     job = Job.objects.is_accessible_or_exception(request, job_id)
     Job.objects.can_edit_or_exception(request, job)
-    Submission(request.user, job, request.fs, {}).remove_deployment_dir()
-    job.delete()
+    if skip_trash:
+      Submission(request.user, job, request.fs, {}).remove_deployment_dir()
+    job.delete(skip_trash=skip_trash)
 
-  request.info(_('Coordinator(s) deleted.'))
+  if skip_trash:
+    request.info(_('Coordinator(s) deleted.'))
+  else:
+    request.info(_('Coordinator(s) trashed.'))
+
+  return redirect(reverse('oozie:list_coordinators'))
+
+
+def restore_coordinator(request):
+  if request.method != 'POST':
+    raise PopupException(_('A POST request is required.'))
+
+  job_ids = request.POST.getlist('job_selection')
+
+  for job_id in job_ids:
+    job = Job.objects.is_accessible_or_exception(request, job_id)
+    Job.objects.can_edit_or_exception(request, job)
+    job.restore()
+
+  request.info(_('Coordinator(s) restored.'))
 
   return redirect(reverse('oozie:list_coordinators'))
 
@@ -554,15 +647,34 @@ def delete_bundle(request):
   if request.method != 'POST':
     raise PopupException(_('A POST request is required.'))
 
+  skip_trash = 'skip_trash' in request.GET
+
   job_ids = request.POST.getlist('job_selection')
 
   for job_id in job_ids:
     job = Job.objects.is_accessible_or_exception(request, job_id)
     Job.objects.can_edit_or_exception(request, job)
-    Submission(request.user, job, request.fs, {}).remove_deployment_dir()
-    job.delete()
+    if skip_trash:
+      Submission(request.user, job, request.fs, {}).remove_deployment_dir()
+    job.delete(skip_trash=skip_trash)
 
   request.info(_('Bundle(s) deleted.'))
+
+  return redirect(reverse('oozie:list_bundles'))
+
+
+def restore_bundle(request):
+  if request.method != 'POST':
+    raise PopupException(_('A POST request is required.'))
+
+  job_ids = request.POST.getlist('job_selection')
+
+  for job_id in job_ids:
+    job = Job.objects.is_accessible_or_exception(request, job_id)
+    Job.objects.can_edit_or_exception(request, job)
+    job.restore()
+
+  request.info(_('Bundle(s) restored.'))
 
   return redirect(reverse('oozie:list_bundles'))
 

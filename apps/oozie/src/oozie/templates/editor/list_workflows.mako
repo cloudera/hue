@@ -32,15 +32,26 @@ ${ layout.menubar(section='workflows') }
 
   <%actionbar:render>
     <%def name="actions()">
-        <button class="btn toolbarBtn" id="submit-btn" disabled="disabled"><i class="icon-play"></i> ${ _('Submit') }</button>
-        <button class="btn toolbarBtn" id="schedule-btn" disabled="disabled"><i class="icon-calendar"></i> ${ _('Schedule') }</button>
-        <button class="btn toolbarBtn" id="clone-btn" disabled="disabled"><i class="icon-retweet"></i> ${ _('Clone') }</button>
-        <button class="btn toolbarBtn" id="delete-btn" disabled="disabled"><i class="icon-remove"></i> ${ _('Delete') }</button>
+      <button class="btn toolbarBtn" id="submit-btn" disabled="disabled"><i class="icon-play"></i> ${ _('Submit') }</button>
+      <button class="btn toolbarBtn" id="schedule-btn" disabled="disabled"><i class="icon-calendar"></i> ${ _('Schedule') }</button>
+      <button class="btn toolbarBtn" id="clone-btn" disabled="disabled"><i class="icon-retweet"></i> ${ _('Clone') }</button>
+      <div id="delete-dropdown" class="btn-group" style="display: inline">
+        <button id="delete-btn" class="btn delete-link dropdown-toggle" title="${_('Delete')}" data-toggle="dropdown" disabled="disabled">
+          <i class="icon-remove"></i> ${_('Delete')}
+          <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" style="top: auto">
+          <li><a href="javascript:void(0);" id="trash-btn" class="delete-link" title="${_('Move to Trash')}"><i class="icon-trash"></i> ${_('Move to Trash')}</a></li>
+          <li><a href="javascript:void(0);" id="destroy-btn" class="delete-link" title="${_('Delete forever')}"><i class="icon-bolt"></i> ${_('Delete forever')}</a></li>
+        </ul>
+      </div>
     </%def>
 
     <%def name="creation()">
-        <a href="${ url('oozie:create_workflow') }" class="btn"><i class="icon-plus-sign"></i> ${ _('Create') }</a>
-        <a href="${ url('oozie:import_workflow') }" class="btn"><i class="icon-plus-sign"></i> ${ _('Import') }</a>
+      <a href="${ url('oozie:create_workflow') }" class="btn"><i class="icon-plus-sign"></i> ${ _('Create') }</a>
+      <a href="${ url('oozie:import_workflow') }" class="btn"><i class="icon-plus-sign"></i> ${ _('Import') }</a>
+      &nbsp;&nbsp;
+      <a href="${ url('oozie:list_trashed_workflows') }" class="btn"><i class="icon-trash"></i> ${ _('Trash') }</a>
     </%def>
   </%actionbar:render>
 
@@ -96,11 +107,27 @@ ${ layout.menubar(section='workflows') }
 
 <div id="submit-wf-modal" class="modal hide"></div>
 
-<div id="deleteWf" class="modal hide fade">
-  <form id="deleteWfForm" action="${ url('oozie:delete_workflow') }" method="POST">
+<div id="trashWf" class="modal hide fade">
+  <form id="trashWfForm" action="${ url('oozie:delete_workflow') }" method="POST">
     <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3 id="deleteWfMessage">${ _('Delete the selected workflow(s)?') }</h3>
+      <h3 id="trashWfMessage">${ _('Move the selected workflow(s) to trash?') }</h3>
+    </div>
+    <div class="modal-footer">
+      <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>
+      <input type="submit" class="btn btn-danger" value="${ _('Yes') }"/>
+    </div>
+    <div class="hide">
+      <select name="job_selection" data-bind="options: availableJobs, selectedOptions: chosenJobs" size="5" multiple="true"></select>
+    </div>
+  </form>
+</div>
+
+<div id="destroyWf" class="modal hide fade">
+  <form id="destroyWfForm" action="${ url('oozie:delete_workflow') }?skip_trash=true" method="POST">
+    <div class="modal-header">
+      <a href="#" class="close" data-dismiss="modal">&times;</a>
+      <h3 id="destroyWfMessage">${ _('Delete the selected workflow(s)?') }</h3>
     </div>
     <div class="modal-footer">
       <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>
@@ -171,12 +198,20 @@ ${ layout.menubar(section='workflows') }
       }
     }
 
-    $("#delete-btn").click(function (e) {
+    $("#trash-btn").click(function (e) {
       viewModel.chosenJobs.removeAll();
       $(".hueCheckbox[checked='checked']").each(function( index ) {
         viewModel.chosenJobs.push($(this).data("delete-id"));
       });
-      $("#deleteWf").modal("show");
+      $("#trashWf").modal("show");
+    });
+
+    $("#destroy-btn").click(function (e) {
+      viewModel.chosenJobs.removeAll();
+      $(".hueCheckbox[checked='checked']").each(function( index ) {
+        viewModel.chosenJobs.push($(this).data("delete-id"));
+      });
+      $("#destroyWf").modal("show");
     });
 
     $("#submit-btn").click(function () {

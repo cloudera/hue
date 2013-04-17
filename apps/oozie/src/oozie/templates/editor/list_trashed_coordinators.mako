@@ -32,24 +32,14 @@ ${ layout.menubar(section='coordinators') }
 
   <%actionbar:render>
     <%def name="actions()">
-        <button class="btn toolbarBtn" id="submit-btn" disabled="disabled"><i class="icon-play"></i> ${ _('Submit') }</button>
-        <button class="btn toolbarBtn" id="clone-btn" disabled="disabled"><i class="icon-retweet"></i> ${ _('Clone') }</button>
-        <div id="delete-dropdown" class="btn-group" style="display: inline">
-          <button id="delete-btn" class="btn delete-link dropdown-toggle" title="${_('Delete')}" data-toggle="dropdown" disabled="disabled">
-            <i class="icon-remove"></i> ${_('Delete')}
-            <span class="caret"></span>
-          </button>
-          <ul class="dropdown-menu" style="top: auto">
-            <li><a href="javascript:void(0);" id="trash-btn" class="delete-link" title="${_('Move to Trash')}"><i class="icon-trash"></i> ${_('Move to Trash')}</a></li>
-            <li><a href="javascript:void(0);" id="destroy-btn" class="delete-link" title="${_('Delete forever')}"><i class="icon-bolt"></i> ${_('Delete forever')}</a></li>
-          </ul>
-        </div>
+        <a href="${ url('oozie:list_coordinators') }" id="home-btn" class="btn"><i class="icon-home"></i> ${ _('Coordinators') }</a>
     </%def>
 
     <%def name="creation()">
-        <a href="${ url('oozie:create_coordinator') }" class="btn"><i class="icon-plus-sign"></i> ${ _('Create') }</a>
+        <button class="btn toolbarBtn" id="restore-btn" disabled="disabled"><i class="icon-plus"></i> ${ _('Restore') }</button>
+        <button class="btn toolbarBtn" id="destroy-btn" disabled="disabled"><i class="icon-bolt"></i> ${ _('Delete forever') }</button>
         &nbsp;&nbsp;
-        <a href="${ url('oozie:list_trashed_coordinators') }" class="btn"><i class="icon-trash"></i> ${ _('Trash') }</a>
+        <button class="btn" id="purge-btn"><i class="icon-fire"></i> ${ _('Empty') }</button>
     </%def>
   </%actionbar:render>
 
@@ -70,19 +60,7 @@ ${ layout.menubar(section='coordinators') }
       %for coordinator in jobs:
         <tr>
           <td data-row-selector-exclude="true">
-            <div class="hueCheckbox coordinatorCheck" data-row-selector-exclude="true"
-              % if coordinator.is_accessible(user):
-                  data-clone-url="${ url('oozie:clone_coordinator', coordinator=coordinator.id) }"
-                  data-submit-url="${ url('oozie:submit_coordinator', coordinator=coordinator.id) }"
-              % endif
-              % if coordinator.is_editable(user):
-                  data-delete-id="${ coordinator.id }"
-              % endif
-              >
-            </div>
-            % if coordinator.is_accessible(user):
-              <a href="${ url('oozie:edit_coordinator', coordinator=coordinator.id) }" data-row-selector="true"/>
-            % endif
+            <div class="hueCheckbox coordinatorCheck" data-row-selector-exclude="true" data-coordinator-id="${ coordinator.id }"></div>
           </td>
           <td>${ coordinator.name }</td>
           <td>${ coordinator.description }</td>
@@ -104,13 +82,11 @@ ${ layout.menubar(section='coordinators') }
 </div>
 
 
-<div id="submit-job-modal" class="modal hide"></div>
-
-<div id="trash-job" class="modal hide">
-  <form id="trashForm" action="${ url('oozie:delete_coordinator') }" method="POST">
+<div id="purge-job" class="modal hide">
+  <form id="purgeForm" action="${ url('oozie:delete_coordinator') }?skip_trash=true" method="POST">
     <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3 id="trashMessage">${ _('Move the selected coordinator(s) to trash?') }</h3>
+      <h3 id="purgeMessage">${ _('Delete all coordinator(s)?') }</h3>
     </div>
     <div class="modal-footer">
       <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>
@@ -122,11 +98,29 @@ ${ layout.menubar(section='coordinators') }
   </form>
 </div>
 
+
 <div id="destroy-job" class="modal hide">
-  <form id="destroyForm" action="${ url('oozie:delete_coordinator') }?skip_trash=true" method="POST">
+  <form id="purgeForm" action="${ url('oozie:delete_coordinator') }?skip_trash=true" method="POST">
     <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3 id="destroyMessage">${ _('Delete the selected coordinator(s)?') }</h3>
+      <h3 id="purgeMessage">${ _('Delete the selected coordinator(s)?') }</h3>
+    </div>
+    <div class="modal-footer">
+      <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>
+      <input type="submit" class="btn btn-danger" value="${ _('Yes') }"/>
+    </div>
+    <div class="hide">
+      <select name="job_selection" data-bind="options: availableJobs, selectedOptions: chosenJobs" size="5" multiple="true"></select>
+    </div>
+  </form>
+</div>
+
+
+<div id="restore-job" class="modal hide">
+  <form id="restoreWfForm" action="${ url('oozie:restore_coordinator') }" method="POST">
+    <div class="modal-header">
+      <a href="#" class="close" data-dismiss="modal">&times;</a>
+      <h3 id="restoreWfMessage">${ _('Restore the selected coordinator(s)?') }</h3>
     </div>
     <div class="modal-footer">
       <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>
@@ -176,66 +170,35 @@ ${ layout.menubar(section='coordinators') }
     function toggleActions() {
       $(".toolbarBtn").attr("disabled", "disabled");
       var selector = $(".hueCheckbox[checked='checked']");
-      if (selector.length == 1) {
-        var action_buttons = [
-          ['#submit-btn', 'data-submit-url'],
-          ['#bundle-btn', 'data-bundle-url'],
-          ['#clone-btn', 'data-clone-url']
-        ];
-        $.each(action_buttons, function (index) {
-          if (selector.attr(this[1])) {
-            $(this[0]).removeAttr("disabled");
-          } else {
-            $(this[0]).attr("disabled", "disabled");
-          }
-        });
-      }
-      var can_delete = $(".hueCheckbox[checked='checked'][data-delete-id]");
-      if (can_delete.length >= 1 && can_delete.length == selector.length) {
-        $("#delete-btn").removeAttr("disabled");
+      var can_modify = $(".hueCheckbox[checked='checked'][data-coordinator-id]");
+      if (can_modify.length >= 1 && can_modify.length == selector.length) {
+        $("#destroy-btn").removeAttr("disabled");
+        $("#restore-btn").removeAttr("disabled");
       }
     }
 
-    $("#trash-btn").click(function (e) {
+    $("#purge-btn").click(function (e) {
       viewModel.chosenJobs.removeAll();
-      $(".hueCheckbox[checked='checked']").each(function( index ) {
-        viewModel.chosenJobs.push($(this).data("delete-id"));
+      $(".hueCheckbox").each(function( index ) {
+        viewModel.chosenJobs.push($(this).data("coordinator-id"));
       });
-      $("#trash-job").modal("show");
+      $("#purge-job").modal("show");
     });
 
     $("#destroy-btn").click(function (e) {
       viewModel.chosenJobs.removeAll();
       $(".hueCheckbox[checked='checked']").each(function( index ) {
-        viewModel.chosenJobs.push($(this).data("delete-id"));
+        viewModel.chosenJobs.push($(this).data("coordinator-id"));
       });
       $("#destroy-job").modal("show");
     });
 
-    $("#submit-btn").click(function () {
-      var _this = $(".hueCheckbox[checked='checked']");
-      var _action = _this.attr("data-submit-url");
-      $.get(_action, function (response) {
-          $("#submit-job-modal").html(response);
-          $("#submit-job-modal").modal("show");
-        }
-      );
-    });
-
-    $(".deleteConfirmation").click(function () {
-      var _this = $(this);
-      var _action = _this.attr("data-url");
-      $("#deleteWfForm").attr("action", _action);
-      $("#deleteWfMessage").text(_this.attr("alt"));
-      $("#delete-job").modal("show");
-    });
-
-    $("#clone-btn").click(function (e) {
-      var _this = $(".hueCheckbox[checked='checked']");
-      var _url = _this.attr("data-clone-url");
-      $.post(_url, function (data) {
-        window.location = data.url;
+    $("#restore-btn").click(function (e) {
+      viewModel.chosenJobs.removeAll();
+      $(".hueCheckbox[checked='checked']").each(function( index ) {
+        viewModel.chosenJobs.push($(this).data("coordinator-id"));
       });
+      $("#restore-job").modal("show");
     });
 
     var oTable = $("#coordinatorTable").dataTable({
