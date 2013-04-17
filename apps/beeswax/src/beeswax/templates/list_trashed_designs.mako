@@ -29,29 +29,22 @@ ${ commonheader(_('Saved Queries'), app_name, user, '100px') | n,unicode }
 ${layout.menubar(section='saved queries')}
 
 <div class="container-fluid">
-  <h1>${_('Saved Queries')}</h1>
+  <h1>${_('Trashed Queries')}</h1>
 
   <%actionbar:render>
     <%def name="actions()">
-      <button id="editBtn" class="btn toolbarBtn" title="${_('Edit the selected query')}" disabled="disabled"><i class="icon-edit"></i> ${_('Edit')}</button>
-      <button id="cloneBtn" class="btn toolbarBtn" title="${_('Clone the selected query')}" disabled="disabled"><i class="icon-retweet"></i> ${_('Clone')}</button>
-      <button id="historyBtn" class="btn toolbarBtn" title="${_('View the usage history of the selected query')}" disabled="disabled"><i class="icon-tasks"></i> ${_('Usage history')}</button>
-
-      <div id="delete-dropdown" class="btn-group" style="display: inline">
-        <button href="#" class="btn dropdown-toggle" title="${_('Delete selected queries')}" data-toggle="dropdown" disabled="disabled">
-          <i class="icon-remove"></i> ${_('Delete')}
-          <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu" style="top: auto">
-          <li><a href="#" id="trashQueryBtn" title="${_('Move to Trash')}"><i class="icon-trash"></i> ${_('Move to Trash')}</a></li>
-          <li><a href="#" id="deleteQueryBtn" title="${_('Delete forever')}"><i class="icon-bolt"></i> ${_('Delete forever')}</a></li>
-        </ul>
-      </div>
+      <button id="deleteQueryBtn" class="btn toolbarBtn" title="${_('Delete forever')}" disabled="disabled">
+        <i class="icon-bolt"></i> ${_('Delete forever')}
+      </button>
+      <button id="restoreQueryBtn" class="btn toolbarBtn" title="${_('Restore from trash')}" disabled="disabled">
+        <i class="icon-cloud-upload"></i> ${_('Restore')}
+      </button>
     </%def>
 
     <%def name="creation()">
-      <a class="btn" href="${ url(app_name + ':execute_query') }" title="${_('New query')}"><i class="icon-plus-sign"></i> ${_('Create New Query')}</a>
-      <a class="btn" href="${ url(app_name + ':list_trashed_designs') }" title="${_('Go to the trash')}"><i class="icon-trash"></i> ${_('Trash')}</a>
+      <button id="emptyTrashBtn" class="btn" title="${_('Empty trash')}" data-bind="enabled: availableSavedQueries().length > 0">
+        <i class="icon-fire"></i> ${_('Empty')}
+      </button>
     </%def>
   </%actionbar:render>
 
@@ -74,18 +67,13 @@ ${layout.menubar(section='saved queries')}
         <td data-row-selector-exclude="true">
           <div class="hueCheckbox savedCheck"
             % if may_edit:
-              data-edit-url="${ url(app_name + ':execute_query', design_id=design.id) }"
-              data-delete-name="${ design.id }"
-              data-history-url="${ url(app_name + ':list_query_history') }?design_id=${design.id}"
+              data-delete-id="${ design.id }"
             % endif
-            data-clone-url="${ url(app_name + ':clone_design', design_id=design.id) }" data-row-selector-exclude="true"></div>
+            data-row-selector-exclude="true">
+         </div>
         </td>
         <td>
-        % if may_edit:
-          <a href="${ url(app_name + ':execute_query', design_id=design.id) }" data-row-selector="true">${design.name}</a>
-        % else:
-          ${ design.name }
-        % endif
+         ${ design.name }
         </td>
         <td>
         % if design.desc:
@@ -103,7 +91,7 @@ ${layout.menubar(section='saved queries')}
 
 <div id="deleteQuery" class="modal hide fade">
   <form id="deleteQueryForm" action="${ url(app_name + ':delete_design') }" method="POST">
-    <input type="hidden" name="skipTrash" id="skipTrash" value="false"/>
+    <input type="hidden" name="skipTrash" id="skipTrash" value="true"/>
     <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>
       <h3 id="deleteQueryMessage">${_('Confirm action')}</h3>
@@ -180,50 +168,45 @@ ${layout.menubar(section='saved queries')}
 
     function toggleActions() {
       $(".toolbarBtn").attr("disabled", "disabled");
-      $(".btn.dropdown-toggle").attr("disabled", "disabled");
 
       var selector = $(".hueCheckbox[checked='checked']");
-      if (selector.length == 1) {
-        if (selector.data("edit-url")) {
-          $("#editBtn").removeAttr("disabled").click(function () {
-            location.href = selector.data("edit-url");
-          });
-        }
-        if (selector.data("clone-url")) {
-          $("#cloneBtn").removeAttr("disabled").click(function () {
-            location.href = selector.data("clone-url")
-          });
-        }
-        if (selector.data("history-url")) {
-          $("#historyBtn").removeAttr("disabled").click(function () {
-            location.href = selector.data("history-url")
-          });
-        }
-      }
+
       if (selector.length >= 1) {
-        $(".btn.dropdown-toggle").removeAttr("disabled");
+        $(".toolbarBtn").removeAttr("disabled");
       }
     }
 
-    function deleteQueries() {
+    function restoreQuery() {
       viewModel.chosenSavedQueries.removeAll();
       $(".hueCheckbox[checked='checked']").each(function( index ) {
-        viewModel.chosenSavedQueries.push($(this).data("delete-name"));
+        viewModel.chosenSavedQueries.push($(this).data("delete-id"));
       });
 
       $("#deleteQuery").modal("show");
     }
 
-    $("#trashQueryBtn").click(function () {
-      $("#skipTrash").val(false);
-      $("#deleteQueryMessage").text("${ _('Move the selected queries to the trash?') }");
-      deleteQueries();
+    $("#restoreQueryBtn").click(function () {
+      $("#deleteQueryForm").attr("action", "${ url(app_name + ':restore_design') }");
+      $("#deleteQueryMessage").text("${ _('Restore the selected queries?') }");
+      restoreQuery();
     });
 
     $("#deleteQueryBtn").click(function () {
-      $("#skipTrash").val(true);
+      $("#deleteQueryForm").attr("action", "${ url(app_name + ':delete_design') }");
       $("#deleteQueryMessage").text("${ _('Delete the selected queries?') }");
-      deleteQueries();
+      restoreQuery();
+    });
+
+    $("#emptyTrashBtn").click(function () {
+      $("#deleteQueryForm").attr("action", "${ url(app_name + ':delete_design') }");
+      $("#deleteQueryMessage").text("${ _('Empty the trash?') }");
+
+      viewModel.chosenSavedQueries.removeAll();
+      $.each(viewModel.availableSavedQueries(), function(index, query) {
+        viewModel.chosenSavedQueries.push(query);
+      });
+
+      $("#deleteQuery").modal("show");
     });
 
     $("a[data-row-selector='true']").jHueRowSelector();

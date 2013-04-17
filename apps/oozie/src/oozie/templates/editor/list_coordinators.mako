@@ -28,20 +28,20 @@ ${ layout.menubar(section='coordinators') }
 
 
 <div class="container-fluid">
-  <h1>${ _('Coordinator Trash') }</h1>
+  <h1>${ _('Coordinator Manager') }</h1>
 
   <%actionbar:render>
     <%def name="actions()">
         <button class="btn toolbarBtn" id="submit-btn" disabled="disabled"><i class="icon-play"></i> ${ _('Submit') }</button>
         <button class="btn toolbarBtn" id="clone-btn" disabled="disabled"><i class="icon-retweet"></i> ${ _('Clone') }</button>
         <div id="delete-dropdown" class="btn-group" style="display: inline">
-          <button id="delete-btn" class="btn delete-link dropdown-toggle" title="${_('Delete')}" data-toggle="dropdown" disabled="disabled">
+          <button id="delete-btn" class="btn toolbarBtn dropdown-toggle" title="${_('Delete')}" data-toggle="dropdown" disabled="disabled">
             <i class="icon-remove"></i> ${_('Delete')}
             <span class="caret"></span>
           </button>
           <ul class="dropdown-menu" style="top: auto">
-            <li><a href="javascript:void(0);" id="trash-btn" class="delete-link" title="${_('Move to Trash')}"><i class="icon-trash"></i> ${_('Move to Trash')}</a></li>
-            <li><a href="javascript:void(0);" id="destroy-btn" class="delete-link" title="${_('Delete forever')}"><i class="icon-bolt"></i> ${_('Delete forever')}</a></li>
+            <li><a href="javascript:void(0);" id="trash-btn" title="${_('Move to Trash')}"><i class="icon-trash"></i> ${_('Move to Trash')}</a></li>
+            <li><a href="javascript:void(0);" id="destroy-btn" title="${_('Delete forever')}"><i class="icon-bolt"></i> ${_('Delete forever')}</a></li>
           </ul>
         </div>
     </%def>

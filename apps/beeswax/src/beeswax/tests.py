@@ -1485,7 +1485,7 @@ class MockDbms:
     return ['default', 'test']
 
 
-class MockServer(object):
+class TestWithMockedServer(object):
 
   def setUp(self):
     # Beware: Monkey patch Beeswax/Hive server with Mock API
@@ -1529,6 +1529,51 @@ class MockServer(object):
       assert_equal('New Description', design.desc)
     finally:
       design.delete()
+
+  def test_bulk_query_trash(self):
+    response = _make_query(self.client, 'SELECT', submission_type='Save', name='My Name 1', desc='My Description')
+    query = response.context['design']
+    response = _make_query(self.client, 'SELECT', submission_type='Save', name='My Name 2', desc='My Description')
+    query2 = response.context['design']
+    ids = [query.id, query2.id]
+
+    resp = self.client.get('/beeswax/list_designs')
+    ids_page_1 = set([query.id for query in resp.context['page'].object_list])
+    assert_equal(2, sum([query_id in ids_page_1 for query_id in ids]))
+
+    resp = self.client.post(reverse('beeswax:delete_design'), {u'skipTrash': [u'false'], u'designs_selection': ids})
+    queries = SavedQuery.objects.filter(id__in=ids)
+    assert_true(queries[0].is_trashed)
+    assert_true(queries[1].is_trashed)
+
+    resp = self.client.get('/beeswax/list_designs')
+    ids_page_1 = set([query.id for query in resp.context['page'].object_list])
+    assert_equal(0, sum([query_id in ids_page_1 for query_id in ids]))
+
+    resp = self.client.post(reverse('beeswax:restore_design'), {u'skipTrash': [u'false'], u'designs_selection': ids})
+    query = SavedQuery.objects.filter(id__in=ids)
+    assert_false(queries[0].is_trashed)
+    assert_false(queries[1].is_trashed)
+
+    resp = self.client.get('/beeswax/list_designs')
+    ids_page_1 = set([query.id for query in resp.context['page'].object_list])
+    assert_equal(2, sum([query_id in ids_page_1 for query_id in ids]))
+
+    resp = self.client.post(reverse('beeswax:delete_design'), {u'skipTrash': [u'false'], u'designs_selection': ids})
+    query = SavedQuery.objects.filter(id__in=ids)
+    assert_true(queries[0].is_trashed)
+    assert_true(queries[1].is_trashed)
+
+    resp = self.client.get('/beeswax/list_designs')
+    ids_page_1 = set([query.id for query in resp.context['page'].object_list])
+    assert_equal(0, sum([query_id in ids_page_1 for query_id in ids]))
+
+    resp = self.client.post(reverse('beeswax:delete_design'), {u'skipTrash': [u'true'], u'designs_selection': ids})
+    assert_false(SavedQuery.objects.filter(id__in=ids).exists())
+
+    resp = self.client.get('/beeswax/list_designs')
+    ids_page_1 = set([query.id for query in resp.context['page'].object_list])
+    assert_equal(0, sum([query_id in ids_page_1 for query_id in ids]))
 
 
 def search_log_line(component, expected_log, all_logs):

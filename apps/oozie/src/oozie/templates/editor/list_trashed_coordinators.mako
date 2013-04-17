@@ -32,13 +32,19 @@ ${ layout.menubar(section='coordinators') }
 
   <%actionbar:render>
     <%def name="actions()">
-        <a href="${ url('oozie:list_coordinators') }" id="home-btn" class="btn"><i class="icon-home"></i> ${ _('Coordinators') }</a>
+        <a href="${ url('oozie:list_coordinators') }" id="home-btn" class="btn" title="${ _('Got to coordinator manager') }">
+          <i class="icon-home"></i> ${ _('Coordinators') }
+        </a>
+        &nbsp;&nbsp;
+        <button class="btn toolbarBtn" id="restore-btn" disabled="disabled" title="${_('Restore the selected coordinators')}">
+          <i class="icon-cloud-upload"></i> ${ _('Restore') }
+        </button>
+        <button class="btn toolbarBtn" id="destroy-btn" disabled="disabled" title="${_('Delete the selected coordinators')}">
+          <i class="icon-bolt"></i> ${ _('Delete forever') }
+        </button>
     </%def>
 
     <%def name="creation()">
-        <button class="btn toolbarBtn" id="restore-btn" disabled="disabled"><i class="icon-plus"></i> ${ _('Restore') }</button>
-        <button class="btn toolbarBtn" id="destroy-btn" disabled="disabled"><i class="icon-bolt"></i> ${ _('Delete forever') }</button>
-        &nbsp;&nbsp;
         <button class="btn" id="purge-btn"><i class="icon-fire"></i> ${ _('Empty') }</button>
     </%def>
   </%actionbar:render>

@@ -130,7 +130,7 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
             </li>
             <li data-bind="click: showStopModal, visible: currentScript().isRunning()">
               <a href="#" title="${ _('Run the script') }" rel="tooltip" data-placement="right" class="disabled">
-                <i class="icon-spinner icon-ban-circle"></i> ${ _('Stop') }
+                <i class="icon-spinner icon-spin"></i><i class="icon-ban-circle"></i> ${ _('Stop') }
               </a>
             </li>
             <li data-bind="visible: currentScript().id() != -1, click: copyScript">

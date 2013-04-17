@@ -152,11 +152,33 @@ def delete_design(request):
     if None in designs.values():
       LOG.error('Cannot delete non-existent design(s) %s' % ','.join([key for key, name in designs.items() if name is None]))
       return list_designs(request)
+
     for design in designs.values():
-      design.delete()
+      if request.POST.get('skipTrash', 'false') == 'false':
+        design.is_trashed = True
+        design.save()
+      else:
+        design.delete()
     return redirect(reverse(get_app_name(request) + ':list_designs'))
   else:
     return render('confirm.html', request, dict(url=request.path, title=_('Delete design(s)?')))
+
+
+def restore_design(request):
+  if request.method == 'POST':
+    ids = request.POST.getlist('designs_selection')
+    designs = dict([(design_id, authorized_get_design(request, design_id)) for design_id in ids])
+
+    if None in designs.values():
+      LOG.error('Cannot restore non-existent design(s) %s' % ','.join([key for key, name in designs.items() if name is None]))
+      return list_designs(request)
+
+    for design in designs.values():
+      design.is_trashed = False
+      design.save()
+    return redirect(reverse(get_app_name(request) + ':list_designs'))
+  else:
+    return render('confirm.html', request, dict(url=request.path, title=_('Restore design(s)?')))
 
 
 def clone_design(request, design_id):
@@ -216,6 +238,29 @@ def list_designs(request):
     'user': request.user,
     'designs_json': json.dumps([query.id for query in page.object_list])
   })
+
+
+def list_trashed_designs(request):
+  DEFAULT_PAGE_SIZE = 20
+  app_name= get_app_name(request)
+
+  user = request.user
+
+  # Extract the saved query list.
+  prefix = 'q-'
+  querydict_query = _copy_prefix(prefix, request.GET)
+  # Manually limit up the user filter.
+  querydict_query[ prefix + 'user' ] = user
+  querydict_query[ prefix + 'type' ] = app_name
+  page, filter_params = _list_designs(querydict_query, DEFAULT_PAGE_SIZE, prefix, is_trashed=True)
+
+  return render('list_trashed_designs.mako', request, {
+    'page': page,
+    'filter_params': filter_params,
+    'user': request.user,
+    'designs_json': json.dumps([query.id for query in page.object_list])
+  })
+
 
 
 def my_queries(request):
@@ -1107,7 +1152,7 @@ def execute_directly(request, query, query_server=None, design=None, tablename=N
   return format_preserving_redirect(request, watch_url, get_dict)
 
 
-def _list_designs(querydict, page_size, prefix=""):
+def _list_designs(querydict, page_size, prefix="", is_trashed=False):
   """
   _list_designs(querydict, page_size, prefix, user) -> (page, filter_param)
 
@@ -1126,7 +1171,7 @@ def _list_designs(querydict, page_size, prefix=""):
   )
 
   # Filtering. Only display designs explicitly saved.
-  db_queryset = models.SavedQuery.objects.filter(is_auto=False)
+  db_queryset = models.SavedQuery.objects.filter(is_auto=False, is_trashed=is_trashed)
 
   user = querydict.get(prefix + 'user')
   if user is not None:

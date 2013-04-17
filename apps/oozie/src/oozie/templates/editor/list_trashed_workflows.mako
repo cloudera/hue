@@ -32,14 +32,22 @@ ${ layout.menubar(section='workflows') }
 
   <%actionbar:render>
     <%def name="actions()">
-      <a href="${ url('oozie:list_workflows') }" id="home-btn" class="btn"><i class="icon-home"></i> ${ _('Workflows') }</a>
+      <a href="${ url('oozie:list_workflows') }" id="home-btn" class="btn" title="${ _('Got to workflow manager') }">
+        <i class="icon-home"></i> ${ _('Workflows') }
+      </a>
+      &nbsp;&nbsp;
+      <button type="button" id="restore-btn" class="btn" title="${ _('Restore the selected workflows') }">
+        <i class="icon-cloud-upload"></i> ${ _('Restore') }
+      </button>
+      <button type="button" id="destroy-btn" class="btn" title="${ _('Delete the selected workflows') }">
+        <i class="icon-bolt"></i> ${ _('Delete forever') }
+      </button>
     </%def>
 
     <%def name="creation()">
-      <button type="button" id="restore-btn" class="btn"><i class="icon-plus-sign"></i> ${ _('Restore') }</button>
-      <button type="button" id="destroy-btn" class="btn"><i class="icon-bolt"></i> ${ _('Delete forever') }</button>
-      &nbsp;&nbsp;
-      <button type="button" id="purge-btn" class="btn"><i class="icon-fire"></i> ${ _('Purge trash') }</button>
+      <button type="button" id="purge-btn" class="btn" title="${ _('Restore all the workflows') }">
+        <i class="icon-fire"></i> ${ _('Empty') }
+      </button>
     </%def>
   </%actionbar:render>
 

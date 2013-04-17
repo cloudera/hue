@@ -27,6 +27,7 @@ ${ commonheader(_('File Browser'), 'filebrowser', user) | n,unicode }
 
 <div class="container-fluid">
     <h1>${_('File Browser')}</h1>
+
     <div class="actionbar">
     <%actionbar:render>
         <%def name="search()">
