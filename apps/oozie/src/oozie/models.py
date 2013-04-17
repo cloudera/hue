@@ -57,6 +57,14 @@ name_validator = RegexValidator(regex='[a-zA-Z_][\-_a-zA-Z0-9]{1,39}',
                                 message=_('Enter a valid value: combination of 2 - 40 letters and digits starting by a letter'))
 
 
+class TrashManager(models.Manager):
+  def trashed(self):
+    return super(TrashManager, self).get_query_set().filter(is_trashed=True)
+
+  def get_query_set(self):
+    return super(TrashManager, self).get_query_set().filter(is_trashed=False)
+
+
 """
 Permissions:
 
@@ -113,9 +121,24 @@ class Job(models.Model):
                                   help_text=_t('Enable other users to have access to this job.'))
   parameters = models.TextField(default='[{"name":"oozie.use.system.libpath","value":"true"}]', verbose_name=_t('Oozie parameters'),
                                 help_text=_t('Parameters used at the submission time (e.g. market=US, oozie.use.system.libpath=true).'))
+  is_trashed = models.BooleanField(default=False, db_index=True, verbose_name=_t('Is trashed'),
+                                   help_text=_t('If this job is trashed.'))
 
   objects = JobManager()
   unique_together = ('owner', 'name')
+
+  def delete(self, skip_trash=False, *args, **kwargs):
+    if skip_trash:
+      return super(Job, self).delete(*args, **kwargs)
+    else:
+      self.is_trashed = True
+      self.save()
+      return self
+
+  def restore(self):
+    self.is_trashed = False
+    self.save()
+    return self
 
   def save(self):
     super(Job, self).save()
@@ -184,7 +207,7 @@ class Job(models.Model):
     return user.is_superuser or self.owner == user
 
 
-class WorkflowManager(models.Manager):
+class WorkflowManager(TrashManager):
   def new_workflow(self, owner):
     workflow = Workflow(owner=owner, schema_version='uri:oozie:workflow:0.4')
 
@@ -233,7 +256,7 @@ class WorkflowManager(models.Manager):
     except:
       pass
     workflow.save()
-    workflow.delete()
+    workflow.delete(skip_trash=True)
 
 
 class Workflow(Job):
@@ -1228,6 +1251,8 @@ class Coordinator(Job):
   job_properties = models.TextField(default='[]', verbose_name=_t('Workflow properties'),
                                     help_text=_t('Configuration properties to transmit to the workflow (e.g. limit=100, username=${coord:user()})'))
 
+  objects = TrashManager()
+
   HUE_ID = 'hue-id-c'
 
   def get_type(self):
@@ -1479,6 +1504,8 @@ class Bundle(Job):
   kick_off_time = models.DateTimeField(default=datetime.today(), verbose_name=_t('Start'),
                                        help_text=_t('When to start the first coordinators.'))
   coordinators = models.ManyToManyField(Coordinator, through='BundledCoordinator')
+
+  objects = TrashManager()
 
   HUE_ID = 'hue-id-b'
 

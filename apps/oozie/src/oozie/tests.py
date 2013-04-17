@@ -934,7 +934,7 @@ class TestEditor(OozieMockBase):
             '</configuration>\W+'
         '</sub-workflow>', xml, re.MULTILINE), xml)
 
-    wf2.delete()
+    wf2.delete(skip_trash=True)
 
   def test_workflow_flatten_list(self):
     assert_equal('[<Start: start>, <Mapreduce: action-name-1>, <Mapreduce: action-name-2>, <Mapreduce: action-name-3>, '
@@ -1292,6 +1292,14 @@ class TestEditor(OozieMockBase):
                   ],
                   response.context['params_form'].initial)
 
+  def test_trash_workflow(self):
+    previous_trashed = len(Workflow.objects.trashed())
+    assert_equal(1, len(Workflow.objects.all()))
+    response = self.c.post(reverse('oozie:delete_workflow'), {'job_selection': [self.wf.id]}, follow=True)
+    assert_equal(200, response.status_code, response)
+    assert_equal(previous_trashed + 1, len(Workflow.objects.trashed()))
+    assert_equal(0, len(Workflow.objects.all()))
+
 
 class TestEditorBundle(OozieMockBase):
 
@@ -1452,7 +1460,7 @@ class TestImportWorkflow04(OozieMockBase):
     assert_equal(2, len(Link.objects.filter(parent__workflow=workflow)))
     assert_equal('done', Node.objects.get(workflow=workflow, node_type='end').name)
     assert_equal('uri:oozie:workflow:0.4', workflow.schema_version)
-    workflow.delete()
+    workflow.delete(skip_trash=True)
 
 
   def test_import_workflow_decision(self):
@@ -1471,7 +1479,7 @@ class TestImportWorkflow04(OozieMockBase):
     assert_equal(1, len(Link.objects.filter(parent__workflow=workflow, parent__node_type='decision', comment='', name='start')))
     assert_equal(1, len(Link.objects.filter(parent__workflow=workflow, parent__node_type='decision', name='default')))
     assert_equal(1, len(Link.objects.filter(parent__workflow=workflow, parent__node_type='decision', child__node_type='decisionend', name='related')))
-    workflow.delete()
+    workflow.delete(skip_trash=True)
 
 
   def test_import_workflow_decision_complex(self):
@@ -1487,7 +1495,7 @@ class TestImportWorkflow04(OozieMockBase):
     assert_equal(0, len(Link.objects.filter(parent__workflow=workflow, parent__node_type='decision', comment='', name='start')))
     assert_equal(3, len(Link.objects.filter(parent__workflow=workflow, parent__node_type='decision', name='default')))
     assert_equal(3, len(Link.objects.filter(parent__workflow=workflow, parent__node_type='decision', child__node_type='decisionend', name='related')))
-    workflow.delete()
+    workflow.delete(skip_trash=True)
 
 
   def test_import_workflow_distcp(self):
@@ -1503,7 +1511,7 @@ class TestImportWorkflow04(OozieMockBase):
     assert_equal(4, len(Node.objects.filter(workflow=workflow)))
     assert_equal(4, len(Link.objects.filter(parent__workflow=workflow)))
     assert_equal('[{"type":"arg","value":"-overwrite"},{"type":"arg","value":"-m"},{"type":"arg","value":"${MAP_NUMBER}"},{"type":"arg","value":"/user/hue/oozie/workspaces/data"},{"type":"arg","value":"${OUTPUT}"}]', Node.objects.get(workflow=workflow, node_type='distcp').get_full_node().params)
-    workflow.delete()
+    workflow.delete(skip_trash=True)
 
 
   def test_import_workflow_forks(self):
@@ -1518,7 +1526,7 @@ class TestImportWorkflow04(OozieMockBase):
     assert_equal(6, len(Link.objects.filter(parent__workflow=workflow, parent__node_type='fork')))
     assert_equal(4, len(Link.objects.filter(parent__workflow=workflow, parent__node_type='fork', name='start')))
     assert_equal(2, len(Link.objects.filter(parent__workflow=workflow, parent__node_type='fork', child__node_type='join', name='related')))
-    workflow.delete()
+    workflow.delete(skip_trash=True)
 
 
   def test_import_workflow_mapreduce(self):
@@ -1534,7 +1542,7 @@ class TestImportWorkflow04(OozieMockBase):
     assert_equal(4, len(Node.objects.filter(workflow=workflow)))
     assert_equal(4, len(Link.objects.filter(parent__workflow=workflow)))
     assert_equal('[{"name":"mapred.reduce.tasks","value":"1"},{"name":"mapred.mapper.class","value":"org.apache.hadoop.examples.SleepJob"},{"name":"mapred.reducer.class","value":"org.apache.hadoop.examples.SleepJob"},{"name":"mapred.mapoutput.key.class","value":"org.apache.hadoop.io.IntWritable"},{"name":"mapred.mapoutput.value.class","value":"org.apache.hadoop.io.NullWritable"},{"name":"mapred.output.format.class","value":"org.apache.hadoop.mapred.lib.NullOutputFormat"},{"name":"mapred.input.format.class","value":"org.apache.hadoop.examples.SleepJob$SleepInputFormat"},{"name":"mapred.partitioner.class","value":"org.apache.hadoop.examples.SleepJob"},{"name":"mapred.speculative.execution","value":"false"},{"name":"sleep.job.map.sleep.time","value":"0"},{"name":"sleep.job.reduce.sleep.time","value":"1"}]', Node.objects.get(workflow=workflow, node_type='mapreduce').get_full_node().job_properties)
-    workflow.delete()
+    workflow.delete(skip_trash=True)
 
 
   def test_import_workflow_pig(self):
@@ -1552,7 +1560,7 @@ class TestImportWorkflow04(OozieMockBase):
     assert_equal(4, len(Link.objects.filter(parent__workflow=workflow)))
     assert_equal('aggregate.pig', node.script_path)
     assert_equal('[{"type":"argument","value":"-param"},{"type":"argument","value":"INPUT=/user/hue/oozie/workspaces/data"},{"type":"argument","value":"-param"},{"type":"argument","value":"OUTPUT=${output}"}]', node.params)
-    workflow.delete()
+    workflow.delete(skip_trash=True)
 
 
   def test_import_workflow_sqoop(self):
@@ -1570,7 +1578,7 @@ class TestImportWorkflow04(OozieMockBase):
     node = Node.objects.get(workflow=workflow, node_type='sqoop').get_full_node()
     assert_equal('["db.hsqldb.properties#db.hsqldb.properties","db.hsqldb.script#db.hsqldb.script"]', node.files)
     assert_equal('import --connect jdbc:hsqldb:file:db.hsqldb --table TT --target-dir ${output} -m 1', node.script_path)
-    workflow.delete()
+    workflow.delete(skip_trash=True)
 
 
   def test_import_workflow_java(self):
@@ -1593,7 +1601,7 @@ class TestImportWorkflow04(OozieMockBase):
     assert_equal('${output_dir}/teragen ${output_dir}/terasort', nodes[1].args)
     assert_true(nodes[0].capture_output)
     assert_false(nodes[1].capture_output)
-    workflow.delete()
+    workflow.delete(skip_trash=True)
 
 
   def test_import_workflow_shell(self):
@@ -1613,7 +1621,7 @@ class TestImportWorkflow04(OozieMockBase):
     assert_equal('hello.py', nodes[0].command)
     assert_true(nodes[0].capture_output)
     assert_false(nodes[1].capture_output)
-    workflow.delete()
+    workflow.delete(skip_trash=True)
 
 
   def test_import_workflow_fs(self):
@@ -1634,7 +1642,7 @@ class TestImportWorkflow04(OozieMockBase):
     assert_equal('["${nameNode}${output}/testfs","${nameNode}${output}/testfs/source"]', node.mkdirs)
     assert_equal('[{"source":"${nameNode}${output}/testfs/source","destination":"${nameNode}${output}/testfs/renamed"}]', node.moves)
     assert_equal('["${nameNode}${output}/testfs/new_file"]', node.touchzs)
-    workflow.delete()
+    workflow.delete(skip_trash=True)
 
 
   def test_import_workflow_email(self):
@@ -1654,7 +1662,7 @@ class TestImportWorkflow04(OozieMockBase):
     assert_equal('', node.cc)
     assert_equal('I love', node.subject)
     assert_equal('Hue', node.body)
-    workflow.delete()
+    workflow.delete(skip_trash=True)
 
 
   def test_import_workflow_generic(self):
@@ -1671,7 +1679,7 @@ class TestImportWorkflow04(OozieMockBase):
     assert_equal(4, len(Link.objects.filter(parent__workflow=workflow)))
     node = Node.objects.get(workflow=workflow, node_type='generic').get_full_node()
     assert_equal("<bleh test=\"test\">\n              <test>test</test>\n        </bleh>", node.xml)
-    workflow.delete()
+    workflow.delete(skip_trash=True)
 
 
   def test_import_multi_kill_node(self):
@@ -1697,7 +1705,7 @@ class TestImportWorkflow04(OozieMockBase):
     assert_equal('${output_dir}/teragen ${output_dir}/terasort', nodes[1].args)
     assert_true(nodes[0].capture_output)
     assert_false(nodes[1].capture_output)
-    workflow.delete()
+    workflow.delete(skip_trash=True)
 
 
 class TestPermissions(OozieBase):
@@ -1707,6 +1715,11 @@ class TestPermissions(OozieBase):
     self.wf = create_workflow(self.c)
     self.setup_simple_workflow()
 
+  def tearDown(self):
+    try:
+      self.wf.delete(skip_trash=True)
+    except:
+      pass
 
   def test_workflow_permissions(self):
     response = self.c.get(reverse('oozie:edit_workflow', args=[self.wf.id]))
@@ -1795,7 +1808,7 @@ class TestPermissions(OozieBase):
     finally:
       finish()
 
-    # Delete
+    # Move to trash
     finish = SHARE_JOBS.set_for_testing(False)
     try:
       response = client_not_me.post(reverse('oozie:delete_workflow'), {'job_selection': [self.wf.id]})
@@ -1804,6 +1817,28 @@ class TestPermissions(OozieBase):
       finish()
 
     response = self.c.post(reverse('oozie:delete_workflow'), {'job_selection': [self.wf.id]}, follow=True)
+    assert_equal(200, response.status_code)
+
+    # Trash
+    finish = SHARE_JOBS.set_for_testing(False)
+    try:
+      response = client_not_me.get(reverse('oozie:list_trashed_workflows'))
+      assert_false(self.wf.name in response.content, response.content)
+    finally:
+      finish()
+
+    response = self.c.get(reverse('oozie:list_trashed_workflows'))
+    assert_true(self.wf.name in response.content, response.content)
+
+    # Restore
+    finish = SHARE_JOBS.set_for_testing(False)
+    try:
+      response = client_not_me.post(reverse('oozie:restore_workflow'), {'job_selection': [coord.id]})
+      assert_true('Permission denied' in response.content, response.content)
+    finally:
+      finish()
+
+    response = self.c.post(reverse('oozie:restore_workflow'), {'job_selection': [coord.id]}, follow=True)
     assert_equal(200, response.status_code)
 
 
@@ -1920,7 +1955,7 @@ class TestPermissions(OozieBase):
     finally:
       finish()
 
-    # Delete
+    # Move to trash
     finish = SHARE_JOBS.set_for_testing(False)
     try:
       response = client_not_me.post(reverse('oozie:delete_coordinator'), {'job_selection': [coord.id]})
@@ -1931,6 +1966,28 @@ class TestPermissions(OozieBase):
     response = self.c.post(reverse('oozie:delete_coordinator'), {'job_selection': [coord.id]}, follow=True)
     assert_equal(200, response.status_code)
 
+    # List trash
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      response = client_not_me.get(reverse('oozie:list_trash_coordinators'))
+      assert_true(coord.name in response.content, response.content)
+    finally:
+      finish()
+    finish = SHARE_JOBS.set_for_testing(False)
+
+    response = client_not_me.get(reverse('oozie:list_trash_coordinators'))
+    assert_false(coord.name in response.content, response.content)
+
+    # Restore
+    finish = SHARE_JOBS.set_for_testing(False)
+    try:
+      response = client_not_me.post(reverse('oozie:restore_coordinator'), {'job_selection': [coord.id]})
+      assert_true('Permission denied' in response.content, response.content)
+    finally:
+      finish()
+
+    response = self.c.post(reverse('oozie:restore_coordinator'), {'job_selection': [coord.id]}, follow=True)
+    assert_equal(200, response.status_code)
 
   def test_bundle_permissions(self):
     bundle = create_bundle(self.c)
@@ -2031,6 +2088,29 @@ class TestPermissions(OozieBase):
     response = self.c.post(reverse('oozie:delete_bundle'), {'job_selection': [bundle.id]}, follow=True)
     assert_equal(200, response.status_code)
 
+    # List trash
+    finish = SHARE_JOBS.set_for_testing(True)
+    try:
+      response = client_not_me.get(reverse('oozie:list_trash_bundles'))
+      assert_true(bundle.name in response.content, response.content)
+    finally:
+      finish()
+    finish = SHARE_JOBS.set_for_testing(False)
+
+    response = client_not_me.get(reverse('oozie:list_trash_bundles'))
+    assert_false(bundle.name in response.content, response.content)
+
+    # Restore
+    finish = SHARE_JOBS.set_for_testing(False)
+    try:
+      response = client_not_me.post(reverse('oozie:restore_bundle'), {'job_selection': [bundle.id]})
+      assert_true('Permission denied' in response.content, response.content)
+    finally:
+      finish()
+
+    response = self.c.post(reverse('oozie:restore_bundle'), {'job_selection': [bundle.id]}, follow=True)
+    assert_equal(200, response.status_code)
+
 
 class TestEditorWithOozie(OozieBase):
 
@@ -2043,7 +2123,10 @@ class TestEditorWithOozie(OozieBase):
 
 
   def tearDown(self):
-    self.wf.delete()
+    try:
+      self.wf.delete(skip_trash=True)
+    except:
+      pass
 
 
   def test_create_workflow(self):
@@ -2095,6 +2178,14 @@ class TestEditorWithOozie(OozieBase):
     fh.close()
     assert_equal(workflow_count + 1, Workflow.objects.count(), response)
 
+  def test_delete_workflow(self):
+    previous_trashed = len(Workflow.objects.trashed())
+    assert_equal(1, len(Workflow.objects.all()))
+    response = self.c.post(reverse('oozie:delete_workflow') + "?skip_trash=true", {'job_selection': [self.wf.id]}, follow=True)
+    assert_equal(200, response.status_code, response)
+    assert_equal(previous_trashed + 1, len(Workflow.objects.trashed()))
+    assert_equal(0, len(Workflow.objects.all()))
+
 
 class TestImportWorkflow04WithOozie(OozieBase):
 
@@ -2110,7 +2201,7 @@ class TestImportWorkflow04WithOozie(OozieBase):
 
 
   def tearDown(self):
-    self.wf.delete()
+    self.wf.delete(skip_trash=True)
 
     # Make sure examples are owned by Hue.
     # This user is created by OozieBase.
@@ -2131,7 +2222,7 @@ class TestImportWorkflow04WithOozie(OozieBase):
     assert_equal(4, len(Link.objects.filter(parent__workflow=workflow)))
     node = Node.objects.get(workflow=workflow, node_type='subworkflow').get_full_node()
     assert_equal(True, node.propagate_configuration)
-    workflow.delete()
+    workflow.delete(skip_trash=True)
 
 
 class TestOozieSubmissions(OozieBase):

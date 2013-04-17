@@ -35,11 +35,22 @@ ${ layout.menubar(section='bundles') }
     <%def name="actions()">
         <button class="btn toolbarBtn" id="submit-btn" disabled="disabled"><i class="icon-play"></i> ${ _('Submit') }</button>
         <button class="btn toolbarBtn" id="clone-btn" disabled="disabled"><i class="icon-retweet"></i> ${ _('Clone') }</button>
-        <button class="btn toolbarBtn" id="delete-btn" disabled="disabled"><i class="icon-remove"></i> ${ _('Delete') }</button>
+        <div id="delete-dropdown" class="btn-group" style="display: inline">
+          <button id="delete-btn" class="btn delete-link dropdown-toggle" title="${_('Delete')}" data-toggle="dropdown" disabled="disabled">
+            <i class="icon-remove"></i> ${_('Delete')}
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu" style="top: auto">
+            <li><a href="javascript:void(0);" id="trash-btn" class="delete-link" title="${_('Move to Trash')}"><i class="icon-trash"></i> ${_('Move to Trash')}</a></li>
+            <li><a href="javascript:void(0);" id="destroy-btn" class="delete-link" title="${_('Delete forever')}"><i class="icon-bolt"></i> ${_('Delete forever')}</a></li>
+          </ul>
+        </div>
     </%def>
 
     <%def name="creation()">
         <a href="${ url('oozie:create_bundle') }" class="btn"><i class="icon-plus-sign"></i> ${ _('Create') }</a>
+        &nbsp;&nbsp;
+        <a href="${ url('oozie:list_trashed_bundles') }" class="btn"><i class="icon-trash"></i> ${ _('Trash') }</a>
     </%def>
   </%actionbar:render>
 
@@ -99,11 +110,27 @@ ${ layout.menubar(section='bundles') }
 
 <div id="submit-job-modal" class="modal hide"></div>
 
-<div id="delete-job" class="modal hide">
-  <form id="deleteWfForm" action="${ url('oozie:delete_bundle') }" method="POST">
+<div id="trash-job" class="modal hide">
+  <form id="trashForm" action="${ url('oozie:delete_bundle') }" method="POST">
     <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3 id="deleteWfMessage">${ _('Delete the selected bundle(s)?') }</h3>
+      <h3 id="trashMessage">${ _('Move the selected bundle(s) to trash?') }</h3>
+    </div>
+    <div class="modal-footer">
+      <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>
+      <input type="submit" class="btn btn-danger" value="${ _('Yes') }"/>
+    </div>
+    <div class="hide">
+      <select name="job_selection" data-bind="options: availableJobs, selectedOptions: chosenJobs" size="5" multiple="true"></select>
+    </div>
+  </form>
+</div>
+
+<div id="destroy-job" class="modal hide">
+  <form id="destroyForm" action="${ url('oozie:delete_bundle') }?skip_trash=true" method="POST">
+    <div class="modal-header">
+      <a href="#" class="close" data-dismiss="modal">&times;</a>
+      <h3 id="destroyMessage">${ _('Delete the selected bundle(s)?') }</h3>
     </div>
     <div class="modal-footer">
       <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>
@@ -173,12 +200,20 @@ ${ layout.menubar(section='bundles') }
       }
     }
 
-    $("#delete-btn").click(function (e) {
+    $("#trash-btn").click(function (e) {
       viewModel.chosenJobs.removeAll();
       $(".hueCheckbox[checked='checked']").each(function( index ) {
         viewModel.chosenJobs.push($(this).data("delete-id"));
       });
-      $("#delete-job").modal("show");
+      $("#trash-job").modal("show");
+    });
+
+    $("#destroy-btn").click(function (e) {
+      viewModel.chosenJobs.removeAll();
+      $(".hueCheckbox[checked='checked']").each(function( index ) {
+        viewModel.chosenJobs.push($(this).data("delete-id"));
+      });
+      $("#destroy-job").modal("show");
     });
 
     $("#submit-btn").click(function () {
@@ -189,14 +224,6 @@ ${ layout.menubar(section='bundles') }
           $("#submit-job-modal").modal("show");
         }
       );
-    });
-
-    $(".deleteConfirmation").click(function () {
-      var _this = $(this);
-      var _action = _this.attr("data-url");
-      $("#deleteWfForm").attr("action", _action);
-      $("#deleteWfMessage").text(_this.attr("alt"));
-      $("#delete-job").modal("show");
     });
 
     $("#clone-btn").click(function (e) {
