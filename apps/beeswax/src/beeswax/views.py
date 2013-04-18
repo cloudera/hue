@@ -447,6 +447,7 @@ def execute_query(request, design_id=None):
       # New design
       form.bind()
     form.query.fields['database'].choices = databases # Could not do it in the form
+
   return render('execute.mako', request, {
     'action': action,
     'design': design,
@@ -853,6 +854,7 @@ def confirm_query(request, query, on_success_url=None):
     'design': None,
     'on_success_url': on_success_url,
     'design': None,
+    'autocomplete': json.dumps({}),
   })
 
 
@@ -1080,6 +1082,7 @@ def _run_parameterized_query(request, design_id, explain):
         'error_message': error_message,
         'form': query_form,
         'log': log,
+        'autocomplete': json.dumps({}),
       })
   else:
     return render("parameterization.mako", request, dict(form=parameterization_form, design=design, explain=explain))
