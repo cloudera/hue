@@ -133,7 +133,7 @@ def delete_design(request, design_id):
   try:
     workflow = _get_design(design_id)
     _check_permission(request, workflow.owner.username,
-                      _("Access denied: delete workflow %(id)s.") % {'id': design_id},
+                      _("Access denied: delete design %(id)s.") % {'id': design_id},
                       allow_root=True)
     if skip_trash:
       Workflow.objects.destroy(workflow, request.fs)
@@ -141,13 +141,11 @@ def delete_design(request, design_id):
       workflow.delete(skip_trash=False)
 
   except Workflow.DoesNotExist:
-    if skip_trash:
-      LOG.error("Trying to delete non-existent workflow (id %s)" % design_id)
-    else:
-      LOG.error("Trying to trash non-existent workflow (id %s)" % design_id)
-    raise StructuredException(code="NOT_FOUND", message=_('Could not find design.'), error_code=404)
+    raise StructuredException(code="NOT_FOUND", message=_('Could not find design %s.') % design_id, error_code=404)
 
-  return render_json({})
+  return render_json({
+    status: 0
+  })
 
 
 def restore_design(request, design_id):
@@ -157,15 +155,17 @@ def restore_design(request, design_id):
   try:
     workflow = _get_design(design_id)
     _check_permission(request, workflow.owner.username,
-                      _("Access denied: delete workflow %(id)s.") % {'id': design_id},
+                      _("Access denied: delete design %(id)s.") % {'id': design_id},
                       allow_root=True)
     workflow.restore()
 
   except Workflow.DoesNotExist:
     LOG.error("Trying to restore non-existent workflow (id %s)" % (design_id,))
-    raise StructuredException(code="NOT_FOUND", message=_('Could not find design.'), error_code=404)
+    raise StructuredException(code="NOT_FOUND", message=_('Could not find design %s.') % design_id, error_code=404)
 
-  return render_json({})
+  return render_json({
+    status: 0
+  })
 
 
 def get_design(request, design_id):

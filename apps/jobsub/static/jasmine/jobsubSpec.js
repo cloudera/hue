@@ -4,7 +4,7 @@ describe("Designs", function(){
 
   function getSampleDesign(id, name, node_type, is_shared, is_trashed, is_editable){
     return {
-      "is_shared": is_shared, 
+      "is_shared": is_shared,
       "node_type": node_type, 
       "last_modified": 1366678126.0, 
       "name": name, 
