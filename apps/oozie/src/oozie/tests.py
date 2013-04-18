@@ -1294,11 +1294,11 @@ class TestEditor(OozieMockBase):
 
   def test_trash_workflow(self):
     previous_trashed = len(Workflow.objects.trashed())
-    assert_equal(1, len(Workflow.objects.all()))
+    previous_available = len(Workflow.objects.all())
     response = self.c.post(reverse('oozie:delete_workflow'), {'job_selection': [self.wf.id]}, follow=True)
     assert_equal(200, response.status_code, response)
     assert_equal(previous_trashed + 1, len(Workflow.objects.trashed()))
-    assert_equal(0, len(Workflow.objects.all()))
+    assert_equal(previous_available - 1, len(Workflow.objects.all()))
 
 
 class TestEditorBundle(OozieMockBase):
@@ -1833,12 +1833,12 @@ class TestPermissions(OozieBase):
     # Restore
     finish = SHARE_JOBS.set_for_testing(False)
     try:
-      response = client_not_me.post(reverse('oozie:restore_workflow'), {'job_selection': [coord.id]})
+      response = client_not_me.post(reverse('oozie:restore_workflow'), {'job_selection': [self.wf.id]})
       assert_true('Permission denied' in response.content, response.content)
     finally:
       finish()
 
-    response = self.c.post(reverse('oozie:restore_workflow'), {'job_selection': [coord.id]}, follow=True)
+    response = self.c.post(reverse('oozie:restore_workflow'), {'job_selection': [self.wf.id]}, follow=True)
     assert_equal(200, response.status_code)
 
 
@@ -1969,13 +1969,13 @@ class TestPermissions(OozieBase):
     # List trash
     finish = SHARE_JOBS.set_for_testing(True)
     try:
-      response = client_not_me.get(reverse('oozie:list_trash_coordinators'))
+      response = client_not_me.get(reverse('oozie:list_trashed_coordinators'))
       assert_true(coord.name in response.content, response.content)
     finally:
       finish()
     finish = SHARE_JOBS.set_for_testing(False)
 
-    response = client_not_me.get(reverse('oozie:list_trash_coordinators'))
+    response = client_not_me.get(reverse('oozie:list_trashed_coordinators'))
     assert_false(coord.name in response.content, response.content)
 
     # Restore
@@ -2091,13 +2091,13 @@ class TestPermissions(OozieBase):
     # List trash
     finish = SHARE_JOBS.set_for_testing(True)
     try:
-      response = client_not_me.get(reverse('oozie:list_trash_bundles'))
+      response = client_not_me.get(reverse('oozie:list_trashed_bundles'))
       assert_true(bundle.name in response.content, response.content)
     finally:
       finish()
     finish = SHARE_JOBS.set_for_testing(False)
 
-    response = client_not_me.get(reverse('oozie:list_trash_bundles'))
+    response = client_not_me.get(reverse('oozie:list_trashed_bundles'))
     assert_false(bundle.name in response.content, response.content)
 
     # Restore
@@ -2180,11 +2180,11 @@ class TestEditorWithOozie(OozieBase):
 
   def test_delete_workflow(self):
     previous_trashed = len(Workflow.objects.trashed())
-    assert_equal(1, len(Workflow.objects.all()))
+    previous_available = len(Workflow.objects.all())
     response = self.c.post(reverse('oozie:delete_workflow') + "?skip_trash=true", {'job_selection': [self.wf.id]}, follow=True)
     assert_equal(200, response.status_code, response)
-    assert_equal(previous_trashed + 1, len(Workflow.objects.trashed()))
-    assert_equal(0, len(Workflow.objects.all()))
+    assert_equal(previous_trashed, len(Workflow.objects.trashed()))
+    assert_equal(previous_available - 1, len(Workflow.objects.all()))
 
 
 class TestImportWorkflow04WithOozie(OozieBase):
