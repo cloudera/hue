@@ -21,7 +21,7 @@ from search.models import Core
 
 
 class QueryForm(forms.Form):
-  cores = forms.ChoiceField()
+  collection = forms.ChoiceField()
 
   query = forms.CharField(label='', max_length=256, required=False, initial='',
                           widget=forms.TextInput(attrs={'class': 'search-query input-xxlarge', 'placeholder': 'Search...'}))
@@ -35,13 +35,13 @@ class QueryForm(forms.Form):
     super(QueryForm, self).__init__(*args, **kwargs)
     choices = [(core.name, core.label) for core in Core.objects.filter(enabled=True)]
     initial_choice = self._initial_core(choices)
-    self.fields['cores'] = forms.ChoiceField(choices=choices, initial=initial_choice, required=False, label='', widget=forms.Select(attrs={'class':'hide'}))
+    self.fields['collection'] = forms.ChoiceField(choices=choices, initial=initial_choice, required=False, label='', widget=forms.Select(attrs={'class':'hide'}))
 
-  def clean_cores(self):
-    if self.cleaned_data.get('cores'):
-      return self.cleaned_data['cores']
+  def clean_collection(self):
+    if self.cleaned_data.get('collection'):
+      return self.cleaned_data['collection']
     else:
-      return self._initial_core(self.fields['cores'].choices)
+      return self._initial_core(self.fields['collection'].choices)
 
 
   def _initial_core(self, choices):

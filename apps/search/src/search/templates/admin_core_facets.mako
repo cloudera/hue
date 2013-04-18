@@ -339,10 +339,10 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     // List of all facets sorted by UUID
     self.sortableFacets = ko.observableArray(self.fieldFacets().concat(self.rangeFacets()).concat(self.dateFacets()));
     self.sortableFacets.sort(function(left, right) {
-      var sorted_ids = ${ hue_core.facets.data | n,unicode }.order; 
+      var sorted_ids = ${ hue_core.facets.data | n,unicode }.order;
       return sorted_ids.indexOf(left.uuid) > sorted_ids.indexOf(right.uuid);
     })
-    
+
     self.selectedFieldFacet = ko.observable();
     self.selectedFieldLabel = ko.observable("");
     self.selectedRangeFacet = ko.observable();
