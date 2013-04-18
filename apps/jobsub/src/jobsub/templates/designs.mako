@@ -134,7 +134,7 @@ ${ commonheader(_('Job Designer'), "jobsub", user, "60px") | n,unicode }
           <th>${_('Type')}</th>
           <th>${_('Status')}</th>
           <th>${_('Last modified')}</th>
-          <th class="hide">${_('Trashed')}</th>
+          <th>${_('Trashed')}</th>
         </tr>
       </thead>
       <tbody id="designs" data-bind="template: {name: 'designTemplate', foreach: designs}">
@@ -163,7 +163,7 @@ ${ commonheader(_('Job Designer'), "jobsub", user, "60px") | n,unicode }
       <!-- /ko -->
     </td>
     <td data-bind="click: function(data, event) { window.location = '#edit-design/' + $index() }, text: new Date(last_modified() * 1000).format('%B %d, %Y %I:%M %p'), attr: { 'data-sort-value': last_modified() }"></td>
-    <td data-bind="visible: false, text: is_trashed"></td>
+    <td data-bind="text: is_trashed"></td>
   </tr>
 </script>
 
@@ -245,11 +245,12 @@ var designTableOptions = {
   "bLengthChange": false,
   "sDom": "<'row'r>t<'row'<'span8'i><''p>>",
   "bDestroy": true,
-  "aoColumnsDefs": [
+  "aoColumnDefs": [
     { "bSortable": false, "aTargets": [ 0 ] },
     { "sSortDataType": "dom-sort-value", "sType": "numeric", "aTargets": [6] },
+    { "bVisible": false, "aTargets": [7] }
   ],
-  "aaSorting": [[ 5, "desc" ]],
+  "aaSorting": [[ 6, "desc" ]],
   "fnPreDrawCallback": function( oSettings ) {
     if (designs.allSelected()) {
       designs.selectAll();
