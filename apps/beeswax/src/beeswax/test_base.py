@@ -131,7 +131,7 @@ def get_shared_beeswax_server():
       sleep = 0.001
       make_logged_in_client()
       user = User.objects.get(username='test')
-      query_server = get_query_server_config(requires_ddl=True)
+      query_server = get_query_server_config()
       db = dbms.get(user, query_server)
 
       while not started and time.time() - start < 20.0:

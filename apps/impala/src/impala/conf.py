@@ -33,6 +33,12 @@ SERVER_PORT = Config(
   default=21000,
   type=int)
 
+SERVER_INTERFACE = Config(
+  key="server_interface",
+  help=_("Beeswax or Hive Server 2 Thrift API used. Choices are: 'beeswax' or 'hiveserver2'."
+         "'beeswax' requires Beeswax to run for proxying the metadata requests"),
+  default="beeswax")
+
 IMPALA_PRINCIPAL=Config(
   key='impala_principal',
   help=_("Kerberos principal name for Impala. Typically 'impala/hostname.foo.com'."),

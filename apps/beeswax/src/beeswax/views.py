@@ -376,7 +376,7 @@ def execute_query(request, design_id=None):
   design = safe_get_design(request, query_type, design_id)
   on_success_url = request.REQUEST.get('on_success_url')
 
-  query_server = get_query_server_config(app_name, requires_ddl=False)
+  query_server = get_query_server_config(app_name)
   db = dbms.get(request.user, query_server)
   dbs = db.get_databases()
   databases = ((db, db) for db in dbs)

@@ -42,33 +42,33 @@ def get(user, query_server=None):
   from beeswax.server.beeswax_lib import BeeswaxClient
 
   if query_server is None:
-    query_server = get_query_server_config(requires_ddl=True)
+    query_server = get_query_server_config()
 
-  if SERVER_INTERFACE.get() == HIVE_SERVER2:
+  if query_server['server_interface'] == HIVE_SERVER2:
     return Dbms(HiveServerClientCompatible(HiveServerClient(query_server, user)), QueryHistory.SERVER_TYPE[1][0])
   else:
     return Dbms(BeeswaxClient(query_server, user), QueryHistory.SERVER_TYPE[0][0])
 
 
 
-def get_query_server_config(name='beeswax', requires_ddl=False):
-  if name == 'impala' and not requires_ddl:
-    from impala.conf import SERVER_HOST, SERVER_PORT, IMPALA_PRINCIPAL
+def get_query_server_config(name='beeswax'):
+  if name == 'impala':
+    from impala.conf import SERVER_HOST, SERVER_PORT, IMPALA_PRINCIPAL, SERVER_INTERFACE as IMPALA_SERVER_INTERFACE
     query_server = {
         'server_name': 'impala',
         'server_host': SERVER_HOST.get(),
         'server_port': SERVER_PORT.get(),
-        'support_ddl': False,
-        'principal': IMPALA_PRINCIPAL.get()
+        'server_interface': IMPALA_SERVER_INTERFACE.get(),
+        'principal': IMPALA_PRINCIPAL.get(),
     }
   else:
     query_server = {
         'server_name': 'beeswax',
         'server_host': BEESWAX_SERVER_HOST.get(),
         'server_port': BEESWAX_SERVER_PORT.get(),
-        'support_ddl': True,
+        'server_interface': SERVER_INTERFACE.get(),
         'principal': KERBEROS.HUE_PRINCIPAL.get()
-      }
+    }
 
   return query_server
 

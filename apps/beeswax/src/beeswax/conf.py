@@ -24,9 +24,7 @@ from desktop.lib.conf import Config, coerce_bool
 SERVER_INTERFACE = Config(
   key="server_interface",
   help=_("Beeswax or Hive Server 2 Thrift API used. Choices are: 'beeswax' or 'hiveserver2'."),
-  default="beeswax",
-  private=True)
-
+  default="beeswax")
 
 BEESWAX_SERVER_HOST = Config(
   key="beeswax_server_host",
@@ -41,7 +39,6 @@ BEESWAX_SERVER_PORT = Config(
   help=_("Configure the port the Beeswax Thrift server runs on."),
   default=8002,
   type=int)
-
 
 BEESWAX_META_SERVER_HOST = Config(
   key="beeswax_meta_server_host",
