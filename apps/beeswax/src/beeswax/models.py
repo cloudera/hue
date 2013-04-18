@@ -101,9 +101,16 @@ class QueryHistory(models.Model):
 
   def get_query_server_config(self):
     from beeswax.server.dbms import get_query_server_config
-    principal = get_query_server_config(self.server_type)['principal']
-    return dict(zip(['server_name', 'server_host', 'server_port', 'server_type', 'principal'],
-                    [self.server_name, self.server_host, self.server_port, self.server_type, principal]))
+
+    query_server = get_query_server_config(self.server_type)
+    query_server.update({
+        'server_name': self.server_name,
+        'server_host': self.server_host,
+        'server_port': self.server_port,
+        'server_type': self.server_type,
+    })
+
+    return query_server
 
 
   def get_current_statement(self):

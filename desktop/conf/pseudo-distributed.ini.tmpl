@@ -426,17 +426,21 @@
 ###########################################################################
 
 [impala]
+  # Host of the Impala Server
+  ## server_host=localhost
 
-   # Host of the Impala Server
-   ## server_host=localhost
+  # Port of the Impala Server when using Beeswax Thrift interface
+  ## server_port=21000
+  # Port of the Impala Server when using  Hive Server 2 Thrift interface
+  ## server_port=21050
 
-   # Port of the Impala Server when using Beeswax Thrift interface
-   ## server_port=21000
-   # Port of the Impala Server when using  Hive Server 2 Thrift interface
-   ## server_port=21050
+  # The backend to contact for queries/metadata requests
+  # Choices are 'beeswax' (default), 'hiveserver2'.
+  # 'beeswax' requires Beeswax to run for proxying the metadata requests
+  ## server_interface=beeswax
 
-   # Kerberos principal
-   ## impala_principal=impala/hostname.foo.com
+  # Kerberos principal
+  ## impala_principal=impala/hostname.foo.com
 
 
 ###########################################################################
