@@ -56,7 +56,7 @@ LOG = logging.getLogger(__name__)
 
 
 def list_workflows(request):
-  data = Workflow.objects.filter(managed=True)
+  data = Workflow.objects.available().filter(managed=True)
 
   if not SHARE_JOBS.get() and not request.user.is_superuser:
     data = data.filter(owner=request.user)
@@ -88,7 +88,7 @@ def list_trashed_workflows(request):
 
 
 def list_coordinators(request, workflow_id=None):
-  data = Coordinator.objects
+  data = Coordinator.objects.available()
   if workflow_id is not None:
     data = data.filter(workflow__id=workflow_id)
 
@@ -124,7 +124,7 @@ def list_trashed_coordinators(request, workflow_id=None):
 
 
 def list_bundles(request):
-  data = Bundle.objects
+  data = Bundle.objects.available()
 
   if not SHARE_JOBS.get() and not request.user.is_superuser:
     data = data.filter(owner=request.user)
@@ -342,7 +342,7 @@ def _submit_workflow(user, fs, workflow, mapping):
 
 @check_job_access_permission()
 def schedule_workflow(request, workflow):
-  if Coordinator.objects.filter(workflow=workflow).exists():
+  if Coordinator.objects.available().filter(workflow=workflow).exists():
     request.info(_('You already have some coordinators for this workflow. Submit one or create a new one.'))
     return list_coordinators(request, workflow_id=workflow.id)
   else:

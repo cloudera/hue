@@ -45,7 +45,7 @@ ${ layout.menubar(section='workflows') }
     </%def>
 
     <%def name="creation()">
-      <button type="button" id="purge-btn" class="btn" title="${ _('Restore all the workflows') }">
+      <button type="button" id="purge-btn" class="btn" title="${ _('Delete all the workflows') }">
         <i class="icon-fire"></i> ${ _('Empty') }
       </button>
     </%def>

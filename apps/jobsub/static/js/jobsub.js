@@ -219,7 +219,4 @@ $.each(events, function(index, event) {
 });
 
 $(document).bind('error.design', addFileBrowseButton);
-$(document).bind('save.design', function() {designs.load();});
-$(document).bind('delete.design', function() {designs.load();});
-$(document).bind('clone.design', function() {designs.load();});
-$(document).bind('load.designs', function() { routie('list-designs'); });
+$(document).bind('loaded.designs', function() { routie('list-designs'); });

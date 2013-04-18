@@ -57,28 +57,47 @@ var Templates = (function($, ko) {
         arguments_envvars: 'static/templates/widgets/params.html',
         params_arguments: 'static/templates/widgets/params.html',
         capture_output: 'static/templates/widgets/checkbox.html'
-      }
+      },
     }, options);
 
     self.initialize(options);
   };
 
+  function invertDictionary(dict) {
+    var inverse = {};
+    $.each(dict, function(key, value) {
+      if (value in inverse) {
+        inverse[value].push(key);
+      } else {
+        inverse[value] = [key];
+      }
+    });
+    return inverse;
+  }
+
   $.extend(module.prototype, {
     initialize: function(options) {
       var self = this;
 
+      var reverse_partials = invertDictionary(options.partials);
+      var reverse_actions = invertDictionary(options.actions);
+
       self.partials = {};
-      $.each(options.partials, function(widget_id, url) {
+      $.each(reverse_partials, function(url, widget_ids) {
         $.get(url, function(data) {
-          self.partials[widget_id] = data;
-        })
+          $.each(widget_ids, function(index, widget_id) {
+            self.partials[widget_id] = data;
+          });
+        });
       });
 
       self.actions = {};
-      $.each(options.actions, function(action_id, url) {
+      $.each(reverse_actions, function(url, widget_ids) {
         $.get(url, function(data) {
-          self.actions[action_id] = data;
-        })
+          $.each(widget_ids, function(index, widget_id) {
+            self.actions[widget_id] = data;
+          });
+        });
       });
     },
     getActionTemplate: function(id, context) {
