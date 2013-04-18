@@ -1484,6 +1484,9 @@ class MockDbms:
   def get_databases(self):
     return ['default', 'test']
 
+  def get_tables(self, database):
+    return ['table1', 'table2']
+
 
 class TestWithMockedServer(object):
 
