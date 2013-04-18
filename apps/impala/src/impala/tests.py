@@ -29,6 +29,9 @@ class MockDbms:
   def get_databases(self):
     return ['db1', 'db2']
 
+  def get_tables(self, database):
+    return ['table1', 'table2']
+
 
 class TestImpala:
   def setUp(self):

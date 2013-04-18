@@ -703,7 +703,7 @@ ${layout.menubar(section='query')}
         lineNumbers: true,
         mode: "text/x-hiveql",
         extraKeys: {
-          "Shift-Space": function () {
+          "Ctrl-Space": function () {
             CodeMirror.fromDot = false;
             codeMirror.execCommand("autocomplete");
           },

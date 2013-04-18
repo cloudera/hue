@@ -336,16 +336,20 @@ def execute_query(request, design_id=None):
   dbs = db.get_databases()
   databases = ((db, db) for db in dbs)
 
+  # Todo: build lazily
   autocomplete = {}
   for database in dbs:
     tables = db.get_tables(database=database)
     autocomplete_tables = []
     for table in tables:
-      t = db.get_table(database, table)
-      autocomplete_tables.append({
-        'name': t.name,
-        'cols': [column.name for column in t.cols]
-      })
+      try:
+        t = db.get_table(database, table)
+        autocomplete_tables.append({
+          'name': t.name,
+          'cols': [column.name for column in t.cols]
+        })
+      except Exception, e:
+        LOG.warn('Skipping table %s.%s : %s' % (database, table, e))
 
     autocomplete[database] = {
       'tables': autocomplete_tables
