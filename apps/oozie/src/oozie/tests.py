@@ -184,9 +184,6 @@ class OozieMockBase(object):
     oozie_api.OozieApi = MockOozieApi
     oozie_api._api_cache = None
 
-    History.objects.all().delete()
-    Coordinator.objects.all().delete()
-
     self.c = make_logged_in_client(is_superuser=False)
     grant_access("test", "test", "oozie")
     self.user = User.objects.get(username='test')
@@ -197,6 +194,10 @@ class OozieMockBase(object):
     oozie_api.OozieApi = oozie_api.OriginalOozieApi
     Workflow.objects.check_workspace = Workflow.objects.original_check_workspace
     oozie_api._api_cache = None
+
+    History.objects.all().delete()
+    Coordinator.objects.all().delete()
+    Bundle.objects.all().delete()
 
 
   def setup_simple_workflow(self):
@@ -985,13 +986,13 @@ class TestEditor(OozieMockBase):
 
   def test_clone_coordinator(self):
     coord = create_coordinator(self.wf, self.c)
-    coordinator_count = Coordinator.objects.count()
+    coordinator_count = Coordinator.objects.available().count()
 
     response = self.c.post(reverse('oozie:clone_coordinator', args=[coord.id]), {}, follow=True)
 
     coord2 = Coordinator.objects.latest('id')
     assert_not_equal(coord.id, coord2.id)
-    assert_equal(coordinator_count + 1, Coordinator.objects.count(), response)
+    assert_equal(coordinator_count + 1, Coordinator.objects.available().count(), response)
 
     assert_equal(coord.dataset_set.count(), coord2.dataset_set.count())
     assert_equal(coord.datainput_set.count(), coord2.datainput_set.count())
@@ -1014,7 +1015,7 @@ class TestEditor(OozieMockBase):
 
     # Bulk delete
     response = self.c.post(reverse('oozie:delete_coordinator'), {'job_selection': [coord.id, coord2.id]}, follow=True)
-    assert_equal(coordinator_count - 1, Coordinator.objects.count(), response)
+    assert_equal(coordinator_count - 1, Coordinator.objects.available().count(), response)
 
 
   def test_coordinator_workflow_access_permissions(self):
@@ -1294,11 +1295,11 @@ class TestEditor(OozieMockBase):
 
   def test_trash_workflow(self):
     previous_trashed = len(Workflow.objects.trashed())
-    previous_available = len(Workflow.objects.all())
+    previous_available = len(Workflow.objects.available())
     response = self.c.post(reverse('oozie:delete_workflow'), {'job_selection': [self.wf.id]}, follow=True)
     assert_equal(200, response.status_code, response)
     assert_equal(previous_trashed + 1, len(Workflow.objects.trashed()))
-    assert_equal(previous_available - 1, len(Workflow.objects.all()))
+    assert_equal(previous_available - 1, len(Workflow.objects.available()))
 
 
 class TestEditorBundle(OozieMockBase):
@@ -1314,13 +1315,13 @@ class TestEditorBundle(OozieMockBase):
 
   def test_clone_bundle(self):
     bundle = create_bundle(self.c)
-    bundle_count = Bundle.objects.count()
+    bundle_count = Bundle.objects.available().count()
 
     response = self.c.post(reverse('oozie:clone_bundle', args=[bundle.id]), {}, follow=True)
 
     bundle2 = Bundle.objects.latest('id')
     assert_not_equal(bundle.id, bundle2.id)
-    assert_equal(bundle_count + 1, Bundle.objects.count(), response)
+    assert_equal(bundle_count + 1, Bundle.objects.available().count(), response)
 
     assert_equal(bundle.coordinators.count(), bundle.coordinators.all().count())
 
@@ -1335,16 +1336,16 @@ class TestEditorBundle(OozieMockBase):
 
     # Bulk delete
     response = self.c.post(reverse('oozie:delete_bundle'), {'job_selection': [bundle.id, bundle2.id]}, follow=True)
-    assert_equal(bundle_count - 1, Bundle.objects.count(), response)
+    assert_equal(bundle_count - 1, Bundle.objects.available().count(), response)
 
 
   def test_delete_bundle(self):
     bundle = create_bundle(self.c)
-    bundle_count = Bundle.objects.count()
+    bundle_count = Bundle.objects.available().count()
 
     response = self.c.post(reverse('oozie:delete_bundle'), {'job_selection': [bundle.id]}, follow=True)
 
-    assert_equal(bundle_count - 1, Bundle.objects.count(), response)
+    assert_equal(bundle_count - 1, Bundle.objects.available().count(), response)
 
 
   def test_bundle_gen_xml(self):
@@ -2137,11 +2138,11 @@ class TestEditorWithOozie(OozieBase):
 
 
   def test_clone_workflow(self):
-    workflow_count = Workflow.objects.count()
+    workflow_count = Workflow.objects.available().count()
 
     response = self.c.post(reverse('oozie:clone_workflow', args=[self.wf.id]), {}, follow=True)
 
-    assert_equal(workflow_count + 1, Workflow.objects.count(), response)
+    assert_equal(workflow_count + 1, Workflow.objects.available().count(), response)
 
     wf2 = Workflow.objects.latest('id')
     assert_not_equal(self.wf.id, wf2.id)
@@ -2156,11 +2157,11 @@ class TestEditorWithOozie(OozieBase):
 
     # Bulk delete
     response = self.c.post(reverse('oozie:delete_workflow'), {'job_selection': [self.wf.id, wf2.id]}, follow=True)
-    assert_equal(workflow_count - 1, Workflow.objects.count(), response)
+    assert_equal(workflow_count - 1, Workflow.objects.available().count(), response)
 
 
   def test_import_workflow(self):
-    workflow_count = Workflow.objects.count()
+    workflow_count = Workflow.objects.available().count()
 
     # Create
     filename = os.path.abspath(os.path.dirname(__file__) + "/test_data/0.4/test-mapreduce.xml")
@@ -2176,7 +2177,7 @@ class TestEditorWithOozie(OozieBase):
       'description': ['']
     }, follow=True)
     fh.close()
-    assert_equal(workflow_count + 1, Workflow.objects.count(), response)
+    assert_equal(workflow_count + 1, Workflow.objects.available().count(), response)
 
   def test_delete_workflow(self):
     previous_trashed = len(Workflow.objects.trashed())
@@ -2639,20 +2640,20 @@ class TestDashboard(OozieMockBase):
 
 
   def test_good_workflow_status_graph(self):
-    workflow_count = Workflow.objects.count()
+    workflow_count = Workflow.objects.available().count()
 
     response = self.c.get(reverse('oozie:list_oozie_workflow', args=[MockOozieApi.WORKFLOW_IDS[0]]), {})
 
     assert_true(response.context['workflow_graph'])
-    assert_equal(Workflow.objects.count(), workflow_count)
+    assert_equal(Workflow.objects.available().count(), workflow_count)
 
   def test_bad_workflow_status_graph(self):
-    workflow_count = Workflow.objects.count()
+    workflow_count = Workflow.objects.available().count()
 
     response = self.c.get(reverse('oozie:list_oozie_workflow', args=[MockOozieApi.WORKFLOW_IDS[1]]), {})
 
     assert_true(response.context['workflow_graph'] is None)
-    assert_equal(Workflow.objects.count(), workflow_count)
+    assert_equal(Workflow.objects.available().count(), workflow_count)
 
 
 class TestUtils(OozieMockBase):
@@ -2784,13 +2785,13 @@ def create_workflow(client, workflow_dict=WORKFLOW_DICT):
   Node.objects.filter(workflow__name=name).delete()
   Workflow.objects.filter(name=name).delete()
 
-  workflow_count = Workflow.objects.count()
+  workflow_count = Workflow.objects.available().count()
   response = client.get(reverse('oozie:create_workflow'))
-  assert_equal(workflow_count, Workflow.objects.count(), response)
+  assert_equal(workflow_count, Workflow.objects.available().count(), response)
 
   response = client.post(reverse('oozie:create_workflow'), workflow_dict, follow=True)
   assert_equal(200, response.status_code)
-  assert_equal(workflow_count + 1, Workflow.objects.count(), response)
+  assert_equal(workflow_count + 1, Workflow.objects.available().count(), response)
 
   wf = Workflow.objects.get(name=name)
   assert_not_equal('', wf.deployment_dir)
@@ -2800,27 +2801,27 @@ def create_workflow(client, workflow_dict=WORKFLOW_DICT):
 
 
 def create_coordinator(workflow, client):
-  coord_count = Coordinator.objects.count()
+  coord_count = Coordinator.objects.available().count()
   response = client.get(reverse('oozie:create_coordinator'))
-  assert_equal(coord_count, Coordinator.objects.count(), response)
+  assert_equal(coord_count, Coordinator.objects.available().count(), response)
 
   post = COORDINATOR_DICT.copy()
   post['workflow'] = workflow.id
   response = client.post(reverse('oozie:create_coordinator'), post)
-  assert_equal(coord_count + 1, Coordinator.objects.count(), response)
+  assert_equal(coord_count + 1, Coordinator.objects.available().count(), response)
 
   return Coordinator.objects.get(name='MyCoord')
 
 
 def create_bundle(client):
-  if not Bundle.objects.filter(name='MyBundle').exists():
-    bundle_count = Bundle.objects.count()
+  if not Bundle.objects.available().filter(name='MyBundle').exists():
+    bundle_count = Bundle.objects.available().count()
     response = client.get(reverse('oozie:create_bundle'))
-    assert_equal(bundle_count, Bundle.objects.count(), response)
+    assert_equal(bundle_count, Bundle.objects.available().count(), response)
 
     post = BUNDLE_DICT.copy()
     response = client.post(reverse('oozie:create_bundle'), post)
-    assert_equal(bundle_count + 1, Bundle.objects.count(), response)
+    assert_equal(bundle_count + 1, Bundle.objects.available().count(), response)
 
   return Bundle.objects.get(name='MyBundle')
 

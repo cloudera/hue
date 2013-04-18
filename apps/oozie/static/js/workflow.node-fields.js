@@ -28,7 +28,7 @@ var NodeFields = {
   },
   addFile: function(data, event) {
     var self = this;
-    var prop = { name: ko.observable("") };
+    var prop = { name: ko.observable(""), dummy: ko.observable("") };
     prop.name.subscribe(function(value) {
       self.files.valueHasMutated();
     });

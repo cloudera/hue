@@ -46,13 +46,29 @@ ${ commonheader(_('Job Designer'), "jobsub", user, "60px") | n,unicode }
     <%def name="actions()">
       <button id="home" class="btn" title="${_('Home')}"><i class="icon-share"></i> ${_('Home')}</button>
       &nbsp;
-      <button id="submit-design" class="btn" title="${_('Submit')}" data-bind="enable: selectedDesignObjects().length == 1"><i class="icon-play"></i> ${_('Submit')}</button>
-      <button id="edit-design" class="btn" title="${_('Edit')}" data-bind="enable: selectedDesignObjects().length == 1 && window.location.hash.substring(0,12) != '#edit-design'"><i class="icon-pencil"></i> ${_('Edit')}</button>
-      <button id="delete-designs" class="btn" title="${_('Delete')}" data-bind="enable: selectedDesignObjects().length > 0"><i class="icon-trash"></i> ${_('Delete')}</button>
-      <button id="copy-designs" class="btn" title="${_('Copy')}" data-bind="enable: selectedDesignObjects().length > 0"><i class="icon-retweet"></i> ${_('Copy')}</button>
+      <!-- ko ifnot: inTrash -->
+        <button id="submit-design" class="btn" title="${_('Submit')}" data-bind="enable: selectedDesignObjects().length == 1"><i class="icon-play"></i> ${_('Submit')}</button>
+        <button id="edit-design" class="btn" title="${_('Edit')}" data-bind="enable: selectedDesignObjects().length == 1 && window.location.hash.substring(0,12) != '#edit-design'"><i class="icon-pencil"></i> ${_('Edit')}</button>
+        <button id="copy-designs" class="btn" title="${_('Copy')}" data-bind="enable: selectedDesignObjects().length > 0"><i class="icon-retweet"></i> ${_('Copy')}</button>
+        <div id="delete-dropdown" class="btn-group" style="display: inline">
+          <button id="delete-btn" class="btn toolbarBtn dropdown-toggle" title="${_('Delete')}" data-toggle="dropdown" data-bind="enable: selectedDesignObjects().length > 0">
+            <i class="icon-remove"></i> ${_('Delete')}
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu" style="top: auto">
+            <li><a href="javascript:void(0);" id="trash-designs" title="${_('Move to Trash')}"><i class="icon-trash"></i> ${_('Move to Trash')}</a></li>
+            <li><a href="javascript:void(0);" id="destroy-designs" title="${_('Delete forever')}"><i class="icon-bolt"></i> ${_('Delete forever')}</a></li>
+          </ul>
+        </div>
+      <!-- /ko -->
+      <!-- ko if: inTrash -->
+        <button id="restore-designs" class="btn" title="${_('Restore')}" data-bind="enable: selectedDesignObjects().length > 0"><i class="icon-cloud-upload"></i> ${_('Restore')}</button>
+        <button id="destroy-designs" class="btn" title="${_('Delete forever')}" data-bind="enable: selectedDesignObjects().length > 0"><i class="icon-bolt"></i> ${_('Delete forever')}</button>
+      <!-- /ko -->
     </%def>
 
     <%def name="creation()">
+      <!-- ko ifnot: inTrash -->
         <div id="new-action-dropdown" class="btn-group" style="display: inline">
           <a href="#" class="btn new-action-link dropdown-toggle" title="${_('New Action')}" data-toggle="dropdown">
             <i class="icon-plus-sign"></i> ${_('New Action')}
@@ -94,6 +110,12 @@ ${ commonheader(_('Job Designer'), "jobsub", user, "60px") | n,unicode }
             </li>
           </ul>
         </div>
+        &nbsp;&nbsp;
+        <a href="#trashed-designs" class="btn"><i class="icon-trash"></i> ${ _('Trash') }</a>
+      <!-- /ko -->
+      <!-- ko if: inTrash -->
+        <button type="button" id="purge-trashed-designs" class="btn" title="${ _('Delete all the designs') }"><i class="icon-fire"></i> ${ _('Empty') }</button>
+      <!-- /ko -->
     </%def>
   </%actionbar:render>
 
@@ -112,6 +134,7 @@ ${ commonheader(_('Job Designer'), "jobsub", user, "60px") | n,unicode }
           <th>${_('Type')}</th>
           <th>${_('Status')}</th>
           <th>${_('Last modified')}</th>
+          <th class="hide">${_('Trashed')}</th>
         </tr>
       </thead>
       <tbody id="designs" data-bind="template: {name: 'designTemplate', foreach: designs}">
@@ -140,20 +163,60 @@ ${ commonheader(_('Job Designer'), "jobsub", user, "60px") | n,unicode }
       <!-- /ko -->
     </td>
     <td data-bind="click: function(data, event) { window.location = '#edit-design/' + $index() }, text: new Date(last_modified() * 1000).format('%B %d, %Y %I:%M %p'), attr: { 'data-sort-value': last_modified() }"></td>
+    <td data-bind="visible: false, text: is_trashed"></td>
   </tr>
 </script>
 
 <div id="submitWf" class="modal hide fade"></div>
 
-<div id="deleteWf" class="modal hide fade">
-  <form id="deleteWfForm" action="#" method="POST" style="margin:0">
+<div id="trashWf" class="modal hide fade">
+  <form id="trashWfForm" action="#" method="POST" style="margin:0">
     <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3 id="deleteWfMessage">${_('Delete the selected designs?')}</h3>
+      <h3 id="trashWfMessage">${_('Move the selected designs to trash?')}</h3>
     </div>
     <div class="modal-footer">
       <a href="#" class="btn" data-dismiss="modal">${_('No')}</a>
-      <input type="submit" class="btn btn-danger" value="${_('Yes')}" data-dismiss="modal" data-bind="click: deleteDesigns" />
+      <input type="submit" class="btn btn-danger" value="${_('Yes')}" data-dismiss="modal" data-bind="click: trashDesigns" />
+    </div>
+  </form>
+</div>
+
+<div id="destroyWf" class="modal hide fade">
+  <form id="destroyWfForm" action="#" method="POST" style="margin:0">
+    <div class="modal-header">
+      <a href="#" class="close" data-dismiss="modal">&times;</a>
+      <h3 id="destroyWfMessage">${_('Delete the selected designs?')}</h3>
+    </div>
+    <div class="modal-footer">
+      <a href="#" class="btn" data-dismiss="modal">${_('No')}</a>
+      <input type="submit" class="btn btn-danger" value="${_('Yes')}" data-dismiss="modal" data-bind="click: destroyDesigns" />
+    </div>
+  </form>
+</div>
+
+<div id="purgeWf" class="modal hide fade">
+  <form id="purgeWfForm" action="#" method="POST" style="margin:0">
+    <div class="modal-header">
+      <a href="#" class="close" data-dismiss="modal">&times;</a>
+      <h3 id="purgeWfMessage">${_('Delete all trashed designs?')}</h3>
+    </div>
+    <div class="modal-footer">
+      <a href="#" class="btn" data-dismiss="modal">${_('No')}</a>
+      <input type="submit" class="btn btn-danger" value="${_('Yes')}" data-dismiss="modal" data-bind="click: destroyAllTrashedDesigns" />
+    </div>
+  </form>
+</div>
+
+<div id="restoreWf" class="modal hide fade">
+  <form id="restoreWfForm" action="#" method="POST" style="margin:0">
+    <div class="modal-header">
+      <a href="#" class="close" data-dismiss="modal">&times;</a>
+      <h3 id="restoreWfMessage">${_('Restore the selected designs?')}</h3>
+    </div>
+    <div class="modal-footer">
+      <a href="#" class="btn" data-dismiss="modal">${_('No')}</a>
+      <input type="submit" class="btn btn-danger" value="${_('Yes')}" data-dismiss="modal" data-bind="click: restoreDesigns" />
     </div>
   </form>
 </div>
@@ -172,57 +235,74 @@ ${ commonheader(_('Job Designer'), "jobsub", user, "60px") | n,unicode }
 </div>
 
 <script type="text/javascript" charset="utf-8">
-var AUTOCOMPLETE_PROPERTIES;
+//// Binding
+var designs = new Designs();
+ko.applyBindings(designs);
 
-$(document).bind('initialize.designs', function() {
-  var designTable, viewModel;
-
-  $("#filterInput").keyup(function() {
-      if (designTable != null){
-          designTable.fnFilter($(this).val());
-      }
-  });
-
-  designTable = $('#designTable').dataTable( {
-    "sPaginationType": "bootstrap",
-    "bLengthChange": false,
-    "sDom": "<'row'r>t<'row'<'span8'i><''p>>",
-    "bDestroy": true,
-    "aoColumns": [
-      { "bSortable": false },
-      null,
-      null,
-      null,
-      null,
-      null,
-      { "sSortDataType": "dom-sort-value", "sType": "numeric" }
-    ],
-    "aaSorting": [[ 5, "desc" ]],
-    "fnPreDrawCallback": function( oSettings ) {
-      if (designs.allSelected()) {
-        designs.selectAll();
-      }
-    },
-    "oLanguage": {
-      "sEmptyTable":     "${_('No data available')}",
-      "sInfo":           "${_('Showing _START_ to _END_ of _TOTAL_ entries')}",
-      "sInfoEmpty":      "${_('Showing 0 to 0 of 0 entries')}",
-      "sInfoFiltered":   "${_('(filtered from _MAX_ total entries)')}",
-      "sZeroRecords":    "${_('No matching records')}",
-      "oPaginate": {
-        "sFirst":    "${_('First')}",
-        "sLast":     "${_('Last')}",
-        "sNext":     "${_('Next')}",
-        "sPrevious": "${_('Previous')}"
-      }
+// Design table and other variables.
+var designTableOptions = {
+  "sPaginationType": "bootstrap",
+  "bLengthChange": false,
+  "sDom": "<'row'r>t<'row'<'span8'i><''p>>",
+  "bDestroy": true,
+  "aoColumnsDefs": [
+    { "bSortable": false, "aTargets": [ 0 ] },
+    { "sSortDataType": "dom-sort-value", "sType": "numeric", "aTargets": [6] },
+  ],
+  "aaSorting": [[ 5, "desc" ]],
+  "fnPreDrawCallback": function( oSettings ) {
+    if (designs.allSelected()) {
+      designs.selectAll();
     }
-  });
+  },
+  "oLanguage": {
+    "sEmptyTable":     "${_('No data available')}",
+    "sInfo":           "${_('Showing _START_ to _END_ of _TOTAL_ entries')}",
+    "sInfoEmpty":      "${_('Showing 0 to 0 of 0 entries')}",
+    "sInfoFiltered":   "${_('(filtered from _MAX_ total entries)')}",
+    "sZeroRecords":    "${_('No matching records')}",
+    "oPaginate": {
+      "sFirst":    "${_('First')}",
+      "sLast":     "${_('Last')}",
+      "sNext":     "${_('Next')}",
+      "sPrevious": "${_('Previous')}"
+    }
+  }
+};
+var designTable = $('#designTable').dataTable( designTableOptions );
 
+function redraw() {
+  designTable.fnDestroy();
+  designTable = $('#designTable').dataTable( designTableOptions );
+  designTable.fnFilter(designs.inTrash().toString(), 7);
+}
+
+function reload() {
+  // Reload with datatables and knockout doesn't work without this.
+  // Remove datatables, reload, then reinitialize datatables.
   $(document).one('load.designs', function() {
     designTable.fnDestroy();
   });
+  designs.load();
+  $(document).one('loaded.designs', function() {
+    designTable = $('#designTable').dataTable( designTableOptions );
+    designTable.fnFilter(designs.inTrash().toString(), 7);
+  });
+}
+
+$(document).bind('initialized.designs', function() {
+  $("#filterInput").keyup(function() {
+    if (designTable != null){
+      designTable.fnFilter($(this).val());
+    }
+  });
 });
-designs.load();
+$(document).bind('saved.design', reload);
+$(document).bind('deleted.design', reload);
+$(document).bind('cloned.design', reload);
+$(document).bind('restored.design', reload);
+
+reload();
 
 /**
  * Using Mustache templating system: http://mustache.github.com/
@@ -232,9 +312,6 @@ designs.load();
  * Routie is used to provide hash routing: http://projects.jga.me/routie/.
  */
 $(document).ready(function() {
-  //// Binding
-  ko.applyBindings(designs);
-
   //// Routes
   // Context matches up with jobsub.templates.js and various templates defined there.
   // If there is an update to any of the templates,
@@ -250,7 +327,7 @@ $(document).ready(function() {
     },
     cancel: {
       name: "${_('Cancel')}",
-      func: "function(data, event) {$root.closeDesign.call($parent, {}); designs.load();}"
+      func: "function(data, event) {$root.closeDesign.call($parent, {}); reload();}"
     },
     name: {
       name: "${ _('Name') }",
@@ -672,7 +749,7 @@ $(document).ready(function() {
        * Create template by calling `getActionTemplate`.
        */
       // Show section only after we've finished the new design process.
-      $(document).one('new.design', function() {
+      $(document).one('created.design', function() {
         showSection('design');
       });
 
@@ -696,7 +773,7 @@ $(document).ready(function() {
       }
 
       // Show section only after we've finished the edit design process.
-      $(document).one('edit.design', function() {
+      $(document).one('edited.design', function() {
         if (designObject.design().editable()) {
           $('#design input').removeAttr('disabled');
           $('#design textarea').removeAttr('disabled');
@@ -716,8 +793,17 @@ $(document).ready(function() {
       designs.select(index);
       designs.editDesign();
     },
-    'list-designs': function() {
+    'trashed-designs': function() {
+      $('#home').removeAttr('disabled');
+      designs.inTrash(true);
       showSection('list-designs');
+      redraw();
+    },
+    'list-designs': function() {
+      $('#home').removeAttr('disabled');
+      designs.inTrash(false);
+      showSection('list-designs');
+      redraw();
     }
   });
   routie('list-designs');
@@ -733,19 +819,30 @@ $(document).ready(function() {
       }
     );
   });
-  $('#edit-design').click(function() {
+  $('body').on('click', '#edit-design', function() {
     routie('edit-design/' + designs.selectedIndex());
   });
-  $('#delete-designs').click(function() {
-    $('#deleteWf').modal('show');
+  $('body').on('click', '#trash-designs', function() {
+    $('#trashWf').modal('show');
   });
-  $('#copy-designs').click(function() {
+  $('body').on('click', '#destroy-designs', function() {
+    $('#destroyWf').modal('show');
+  });
+  $('body').on('click', '#purge-trashed-designs', function() {
+    $('#purgeWf').modal('show');
+  });
+  $('body').on('click', '#restore-designs', function() {
+    $('#restoreWf').modal('show');
+  });
+  $('body').on('click', '#copy-designs', function() {
     designs.cloneDesigns();
   });
   $('#home').click(function() {
     routie('list-designs');
   });
+
   // load the autocomplete properties
+  var AUTOCOMPLETE_PROPERTIES;
   $.getJSON("${ url('oozie:autocomplete_properties') }", function (properties) {
     AUTOCOMPLETE_PROPERTIES = properties;
   });

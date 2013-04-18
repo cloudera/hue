@@ -503,7 +503,7 @@ def _resolve_subworkflow_from_deployment_dir(fs, workflow, app_path):
   except Exception, e:
     raise RuntimeError(_("Could not find workflow at path %s") % app_path)
 
-  for subworkflow in Workflow.objects.all():
+  for subworkflow in Workflow.objects.available():
     if subworkflow.deployment_dir == app_path:
       if workflow.owner.id != subworkflow.owner.id:
         raise RuntimeError(_("Subworkflow is not owned by %s") % workflow.owner)

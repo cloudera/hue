@@ -111,19 +111,48 @@ class TestJobsubWithHadoop(OozieServerProvider):
     assert_equal(response.status_code, 200)
 
   def test_delete_design(self):
-    assert_equal(1, Workflow.objects.count())
+    # Trash
+    assert_equal(1, Workflow.objects.available().count())
     response = self.client.post(reverse('jobsub.views.delete_design',
       kwargs={'design_id': self.design.id}),
       follow=True,
       HTTP_X_REQUESTED_WITH='XMLHttpRequest')
     assert_equal(response.status_code, 200)
-    assert_equal(0, Workflow.objects.count())
+    assert_equal(0, Workflow.objects.available().count())
+    assert_equal(1, Workflow.objects.trashed().count())
+
+    # Destroy
+    response = self.client.post(reverse('jobsub.views.delete_design',
+      kwargs={'design_id': self.design.id}) + '?skip_trash',
+      follow=True,
+      HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+    assert_equal(response.status_code, 200)
+    assert_equal(0, Workflow.objects.available().count())
+    assert_equal(0, Workflow.objects.trashed().count())
 
   def test_clone_design(self):
-    assert_equal(1, Workflow.objects.count())
+    assert_equal(1, Workflow.objects.available().count())
     response = self.client.post(reverse('jobsub.views.clone_design',
       kwargs={'design_id': self.design.id}),
       follow=True,
       HTTP_X_REQUESTED_WITH='XMLHttpRequest')
     assert_equal(response.status_code, 200)
-    assert_equal(2, Workflow.objects.count())
+    assert_equal(2, Workflow.objects.available().count())
+
+  def test_restore_design(self):
+    assert_equal(1, Workflow.objects.available().count())
+    response = self.client.post(reverse('jobsub.views.delete_design',
+      kwargs={'design_id': self.design.id}),
+      follow=True,
+      HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+    assert_equal(response.status_code, 200)
+    assert_equal(0, Workflow.objects.available().count())
+    assert_equal(1, Workflow.objects.trashed().count())
+
+    response = self.client.post(reverse('jobsub.views.restore_design',
+      kwargs={'design_id': self.design.id}),
+      follow=True,
+      HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+    assert_equal(response.status_code, 200)
+    assert_equal(1, Workflow.objects.available().count())
+    assert_equal(0, Workflow.objects.trashed().count())

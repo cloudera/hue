@@ -271,7 +271,7 @@ class SubWorkflowForm(forms.ModelForm):
     user = kwargs.pop('user')
     workflow = kwargs.pop('workflow')
     super(SubWorkflowForm, self).__init__(*args, **kwargs)
-    choices=((wf.id, wf) for wf in Workflow.objects.filter(owner=user).exclude(id=workflow.id))
+    choices=((wf.id, wf) for wf in Workflow.objects.available().filter(owner=user).exclude(id=workflow.id))
     self.fields['sub_workflow'] = forms.ChoiceField(choices=choices, widget=forms.RadioSelect(attrs={'class':'radio'}))
 
   class Meta:
@@ -348,7 +348,7 @@ class CoordinatorForm(forms.ModelForm):
     user = kwargs['user']
     del kwargs['user']
     super(CoordinatorForm, self).__init__(*args, **kwargs)
-    qs = Workflow.objects.filter(Q(is_shared=True) | Q(owner=user))
+    qs = Workflow.objects.available().filter(Q(is_shared=True) | Q(owner=user))
     workflows = []
     for workflow in qs:
       if workflow.is_accessible(user):

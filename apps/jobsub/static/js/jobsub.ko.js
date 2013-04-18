@@ -21,8 +21,10 @@ var Design = (function($, ko, NodeFields) {
   var module = function(options) {
     var self = this;
 
-    self.options = {};
-    self.model = {};
+    self.options = options || {
+      model: {}
+    };
+    self.model = self.options.model;
 
     self.initialize(options);
   };
@@ -33,6 +35,8 @@ var Design = (function($, ko, NodeFields) {
   $.extend(module.prototype, NodeFields, {
     initialize: function(options) {
       var self = this;
+
+      $(document).trigger('initialize.design', [options, self]);
 
       self.options = $.extend(self.options, options);
       self.model = options.model;
@@ -97,6 +101,23 @@ var Design = (function($, ko, NodeFields) {
         }
       }, MAPPING_OPTIONS), self);
 
+      if ('files' in self) {
+        var files = self.files();
+        self.files = ko.observableArray([]);
+
+        // ['file', ...] => [{'name': 'file', 'dummy': ''}, ...].
+        $.each(files, function(index, filename) {
+          var prop = { name: ko.observable(filename), dummy: ko.observable("") };
+          prop.name.subscribe(function(value) {
+            self.files.valueHasMutated();
+          });
+          prop.dummy.subscribe(function(value) {
+            self.files.valueHasMutated();
+          });
+          self.files.push(prop);
+        });
+      }
+
       // hack on '<key>ErrorClass' and '<key>Condition'.
       $.each(self.__ko_mapping__, function(key, enabled) {
         if (ko.isObservable(self[key])) {
@@ -123,24 +144,7 @@ var Design = (function($, ko, NodeFields) {
         self.editable = ko.observable(false);
       }
 
-      if ('files' in self) {
-        var files = self.files();
-        self.files = ko.observableArray([]);
-
-        // ['file', ...] => [{'name': 'file', 'dummy': ''}, ...].
-        $.each(files, function(index, filename) {
-          var prop = { name: ko.observable(filename), dummy: ko.observable("") };
-          prop.name.subscribe(function(value) {
-            self.files.valueHasMutated();
-          });
-          prop.dummy.subscribe(function(value) {
-            self.files.valueHasMutated();
-          });
-          self.files.push(prop);
-        });
-      }
-
-      $(document).trigger('initialize.design', [options, self]);
+      $(document).trigger('initialized.design', [options, self]);
     },
     request: function(url, options) {
       var self = this;
@@ -159,8 +163,10 @@ var Design = (function($, ko, NodeFields) {
       var self = this;
       var options = $.extend({
         success: function(data) {
-          self.is_dirty(false);
           $(document).trigger('load.design', [options, data, self]);
+          self.is_dirty(false);
+          self.initialize({model: data});
+          $(document).trigger('loaded.design', [options, data, self]);
         }
       }, options);
       this.request('/jobsub/designs/' + self.id(), options);
@@ -169,6 +175,7 @@ var Design = (function($, ko, NodeFields) {
       // First try to save, then update error list if fail.
       // Response should be json object. IE: {data: {errors: {files: ['example', ...], ... }}}
       var self = this;
+      $(document).trigger('save.design', [options]);
       var model_dict = {};
       $.each(ko.mapping.toJS(self), function(key, value) {
         if (key != 'errors') {
@@ -198,30 +205,47 @@ var Design = (function($, ko, NodeFields) {
           }
         },
         success: function(data) {
-          $(document).trigger('save.design', [options, data]);
+          $(document).trigger('saved.design', [options, data]);
         }
       }, options);
       self.request((self.new()) ? '/jobsub/designs/'+self.node_type()+'/new' : '/jobsub/designs/'+self.id()+'/save', options);
     },
     clone: function(options) {
       var self = this;
+      $(document).trigger('clone.design', [options]);
       var options = $.extend({
         type: 'POST',
         success: function(data) {
-          $(document).trigger('clone.design', [options, data]);
+          $(document).trigger('cloned.design', [options, data]);
         }
       }, options);
       this.request('/jobsub/designs/' + self.id() + '/clone', options);
     },
-    delete: function(options) {
+    delete: function(skip_trash, options) {
       var self = this;
+      $(document).trigger('delete.design', [options]);
       var options = $.extend({
         type: 'POST',
         success: function(data) {
-          $(document).trigger('delete.design', [options, data]);
+          $(document).trigger('deleted.design', [options, data]);
         }
       }, options);
-      this.request('/jobsub/designs/' + self.id() + '/delete', options);
+      if (skip_trash) {
+        this.request('/jobsub/designs/' + self.id() + '/delete?skip_trash=true', options);
+      } else {
+        this.request('/jobsub/designs/' + self.id() + '/delete', options);
+      }
+    },
+    restore: function(options) {
+      var self = this;
+      $(document).trigger('restore.design', [options]);
+      var options = $.extend({
+        type: 'POST',
+        success: function(data) {
+          $(document).trigger('restored.design', [options, data]);
+        }
+      }, options);
+      this.request('/jobsub/designs/' + self.id() + '/restore', options);
     },
 
     // More node field methods
@@ -255,12 +279,21 @@ var Designs = (function($, ko, NodeModelChooser) {
     var self = this;
 
     self.options = options || {
-      models: []
+      models: [],
     };
 
     self.temporary = ko.observable();
-
+    self.inTrash = ko.observable(false);
     self.designs = ko.observableArray([]);
+    self.trashedDesignObjects = ko.computed(function() {
+      var selected = [];
+      $.each(self.designs(), function(index, designObject) {
+        if (designObject.design().is_trashed()) {
+          selected.push(designObject);
+        }
+      });
+      return selected;
+    });
     self.selectedDesignObjects = ko.computed(function() {
       var selected = [];
       $.each(self.designs(), function(index, designObject) {
@@ -299,11 +332,12 @@ var Designs = (function($, ko, NodeModelChooser) {
   $.extend(module.prototype, {
     initialize: function(options) {
       var self = this;
+      $(document).trigger('initialize.designs', [options, self]);
 
       self.options = $.extend(self.options, options);
 
       self.designs.removeAll();
-      self.createDesigns(self.options.models);
+      self.designs(self.createDesigns(self.options.models));
       self.temporary({
         design: ko.observable(null),
         selected: ko.observable(false),
@@ -311,7 +345,7 @@ var Designs = (function($, ko, NodeModelChooser) {
       })
       self.deselectAll();
 
-      $(document).trigger('initialize.designs', [options, self]);
+      $(document).trigger('initialized.designs', [options, self]);
     },
     load: function(options) {
       // Fetch designs from backend.
@@ -321,8 +355,10 @@ var Designs = (function($, ko, NodeModelChooser) {
         dataType: 'json',
         type: 'GET',
         success: function(data) {
+          // data = { designs: designs: [ {'is_trashed': ..., ...}, ... ] }
           $(document).trigger('load.designs', [options, data]);
-          self.initialize({models: data});
+          self.initialize({models: data.designs});
+          $(document).trigger('loaded.designs', [options, data]);
         },
         error: $.noop
       }, options || {});
@@ -352,13 +388,15 @@ var Designs = (function($, ko, NodeModelChooser) {
     },
     createDesigns: function(models) {
       var self = this;
+      var designs = [];
       $.each(models, function(index, model) {
-        self.designs.push({
+        designs.push({
           design: ko.observable(self.createDesign(model)),
           selected: ko.observable(false),
           template: ko.observable(model.node_type)
         });
       });
+      return designs;
     },
     toggleSelect: function(index) {
       var self = this;
@@ -392,6 +430,7 @@ var Designs = (function($, ko, NodeModelChooser) {
     //// Design delegation
     newDesign: function(node_type) {
       var self = this;
+      $(document).trigger('create.design', [design]);
       var design = self.createDesign({
         id: null,
         node_type: node_type,
@@ -403,7 +442,7 @@ var Designs = (function($, ko, NodeModelChooser) {
       self.temporary().design(design);
       // Do not do any thing with any other design.
       self.deselectAll();
-      $(document).trigger('new.design', [design]);
+      $(document).trigger('created.design', [design]);
     },
     saveDesign: function(data, event) {
       var self = this;
@@ -415,28 +454,46 @@ var Designs = (function($, ko, NodeModelChooser) {
         designObject.design().clone();
       });
     },
-    deleteDesigns: function() {
+    trashDesigns: function() {
       var self = this;
       $.each(self.selectedDesignObjects(), function(index, designObject) {
         designObject.design().delete();
       });
     },
+    destroyDesigns: function() {
+      var self = this;
+      $.each(self.selectedDesignObjects(), function(index, designObject) {
+        designObject.design().delete(true);
+      });
+    },
+    destroyAllTrashedDesigns: function() {
+      var self = this;
+      $.each(self.trashedDesignObjects(), function(index, designObject) {
+        designObject.design().delete(true);
+      });
+    },
+    restoreDesigns: function() {
+      var self = this;
+      $.each(self.selectedDesignObjects(), function(index, designObject) {
+        designObject.design().restore(true);
+      });
+    },
     editDesign: function(index) {
       var self = this;
+      $(document).trigger('edit.design', [design]);
       if (self.selectedDesignObject()) {
         var design = self.selectedDesignObject().design();
         if (design.is_dirty()) {
-          $(document).one('load.design', function(e, options, data, design) {
-            design.initialize({model: data});
+          $(document).one('loaded.design', function(e, options, data, design) {
             self.temporary().design(design);
             self.temporary().template(self.selectedDesignObject().template());
-            $(document).trigger('edit.design', [design]);
+            $(document).trigger('edited.design', [design]);
           });
           design.load();
         } else {
           self.temporary().design(design);
           self.temporary().template(self.selectedDesignObject().template());
-          $(document).trigger('edit.design', [design]);
+          $(document).trigger('edited.design', [design]);
         }
       }
     },
@@ -449,5 +506,3 @@ var Designs = (function($, ko, NodeModelChooser) {
 
   return module;
 })($, ko, nodeModelChooser);
-
-var designs = new Designs({models: []});

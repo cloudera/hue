@@ -61,7 +61,7 @@ class TrashManager(models.Manager):
   def trashed(self):
     return super(TrashManager, self).get_query_set().filter(is_trashed=True)
 
-  def get_query_set(self):
+  def available(self):
     return super(TrashManager, self).get_query_set().filter(is_trashed=False)
 
 
