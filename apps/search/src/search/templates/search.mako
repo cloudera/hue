@@ -86,24 +86,24 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
           % for group, count in macros.pairwise(fld['counts']):
             %if count > 0 and group != "" and found_value == "":
               % if fld['type'] == 'field':
-                <li><a href='?cores=${ current_cores }&query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ fld['field'] }:"${ urllib.quote_plus(group.encode('ascii', 'xmlcharrefreplace')) }"${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}'>${group}</a> <span class="counter">(${ count })</span></li>
+                <li><a href='?collection=${ current_cores }&query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ fld['field'] }:"${ urllib.quote_plus(group.encode('ascii', 'xmlcharrefreplace')) }"${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}'>${group}</a> <span class="counter">(${ count })</span></li>
               % endif
               % if fld['type'] == 'range':
-                <li><a href='?cores=${ current_cores }&query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ fld['field'] }:["${ group }" TO "${ str(int(group) + int(fld['gap']) - 1) }"]${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}'>${ group } (${ count })</a></li>
+                <li><a href='?collection=${ current_cores }&query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ fld['field'] }:["${ group }" TO "${ str(int(group) + int(fld['gap']) - 1) }"]${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}'>${ group } (${ count })</a></li>
               % endif
               % if fld['type'] == 'date':
-                <li class="dateFacetItem"><a href='?cores=${ current_cores }&query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ fld['field'] }:"${ group }"${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}'><span class="dateFacet">${ group }</span> (${ count })</a></li>
+                <li class="dateFacetItem"><a href='?collection=${ current_core }&query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ fld['field'] }:"${ group }"${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}'><span class="dateFacet">${ group }</span> (${ count })</a></li>
               % endif
             %endif
             % if found_value != "":
               % if fld['type'] == 'field' and '"' + group + '"' == found_value:
-                <li><strong>${ group }</strong> <a href="?cores=${ current_cores }&query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}"><i class="icon-remove"></i></a></li>
+                <li><strong>${ group }</strong> <a href="?collection=${ current_cores }&query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}"><i class="icon-remove"></i></a></li>
               %endif
               % if fld['type'] == 'range' and '["' + group + '" TO "' + str(int(group) + int(fld['gap']) - 1) + '"]' == found_value:
-                <li><strong>${ group }</strong> <a href="?cores=${ current_cores }&query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}"><i class="icon-remove"></i></a></li>
+                <li><strong>${ group }</strong> <a href="?collection=${ current_cores }&query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}"><i class="icon-remove"></i></a></li>
               %endif
               % if fld['type'] == 'date' and '"' + group + '"' == found_value:
-                <li><strong><span class="dateFacet">${group}</span></strong> <a href="?cores=${ current_cores }&query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}"><i class="icon-remove"></i></a></li>
+                <li><strong><span class="dateFacet">${group}</span></strong> <a href="?collection=${ current_core }&query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}"><i class="icon-remove"></i></a></li>
               %endif
             %endif
           % endfor
@@ -264,10 +264,10 @@ ${ hue_core.result.get_extracode() | n,unicode }
     });
     $(".dateFacetHeader").after(orderedDateFacets);
 
-    $(".current-core").text($("select[name='cores'] option:selected").text());
+    $(".current-core").text($("select[name='collection'] option:selected").text());
     % if user.is_superuser:
         $(".dropdown-core").each(function () {
-          if ($(this).data("value") == $("select[name='cores']").val()) {
+          if ($(this).data("value") == $("select[name='collection']").val()) {
             $(".change-settings").attr("href", $(this).data("settings-url"));
           }
         });
@@ -276,7 +276,7 @@ ${ hue_core.result.get_extracode() | n,unicode }
     $(".dropdown-core").click(function (e) {
       e.preventDefault();
       $(".current-core").text($(this).text());
-      $("select[name='cores']").val($(this).data("value"));
+      $("select[name='collection']").val($(this).data("value"));
       % if user.is_superuser:
           $(".change-settings").attr("href", $(this).data("settings-url"));
       % endif

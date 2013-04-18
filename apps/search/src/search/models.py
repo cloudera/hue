@@ -387,3 +387,92 @@ class Core(models.Model):
     return sorted([{'name': field.get('name'),'type': field.get('type')}
                    for fields in schema.iter('fields') for field in fields.iter('field')])
 
+
+def get_facet_field_label(field, type, facets):
+  label = field
+  if type == 'field':
+    for fld in facets['fields']:
+      if fld['field'] == field:
+        label = fld['label']
+  elif type == 'range':
+    for fld in facets['ranges']:
+      if fld['field'] == field:
+        label = fld['label']
+  elif type == 'date':
+    for fld in facets['dates']:
+      if fld['field'] == field:
+        label = fld['label']
+  return label
+
+def get_facet_field_uuid(field, type, facets):
+  uuid = ''
+  if type == 'field':
+    for fld in facets['fields']:
+      if fld['field'] == field:
+        uuid = fld['uuid']
+  elif type == 'range':
+    for fld in facets['ranges']:
+      if fld['field'] == field:
+        uuid = fld['uuid']
+  elif type == 'date':
+    for fld in facets['dates']:
+      if fld['field'] == field:
+        uuid = fld['uuid']
+  return uuid
+
+
+def augment_solr_response(response, facets):
+  augmented = response
+  augmented['normalized_facets'] = []
+
+  normalized_facets = {}
+  if response and response.get('facet_counts'):
+    if response['facet_counts']['facet_fields']:
+      for cat in response['facet_counts']['facet_fields']:
+        facet = {
+          'field': cat,
+          'type': 'field',
+          'label': get_facet_field_label(cat, 'field', facets),
+          'counts': response['facet_counts']['facet_fields'][cat],
+        }
+        normalized_facets[get_facet_field_uuid(cat, 'field', facets)] = facet
+
+    if response['facet_counts']['facet_ranges']:
+      for cat in response['facet_counts']['facet_ranges']:
+        facet = {
+          'field': cat,
+          'type': 'range',
+          'label': get_facet_field_label(cat, 'range', facets),
+          'counts': response['facet_counts']['facet_ranges'][cat]['counts'],
+          'start': response['facet_counts']['facet_ranges'][cat]['start'],
+          'end': response['facet_counts']['facet_ranges'][cat]['end'],
+          'gap': response['facet_counts']['facet_ranges'][cat]['gap'],
+        }
+        normalized_facets[get_facet_field_uuid(cat, 'range', facets)] = facet
+
+    if response['facet_counts']['facet_dates']:
+      for cat in response['facet_counts']['facet_dates']:
+        facet = {
+          'field': cat,
+          'type': 'date',
+          'label': get_facet_field_label(cat, 'date', facets),
+          'start': response['facet_counts']['facet_dates'][cat]['start'],
+          'end': response['facet_counts']['facet_dates'][cat]['end'],
+          'gap': response['facet_counts']['facet_dates'][cat]['gap'],
+        }
+        counts = []
+        for date, count in response['facet_counts']['facet_dates'][cat].iteritems():
+          if date not in ('start', 'end', 'gap'):
+            counts.append(date)
+            counts.append(count)
+        facet['counts'] = counts
+        normalized_facets[get_facet_field_uuid(cat, 'date', facets)] = facet
+
+  for ordered_uuid in facets.get('order', []):
+    try:
+      augmented['normalized_facets'].append(normalized_facets[ordered_uuid])
+    except:
+      pass
+
+  return augmented
+

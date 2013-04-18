@@ -33,7 +33,7 @@ from search.api import SolrApi
 from search.conf import SOLR_URL
 from search.decorators import allow_admin_only
 from search.forms import QueryForm, CoreForm, HighlightingForm
-from search.models import Core
+from search.models import Core, augment_solr_response
 
 
 LOG = logging.getLogger(__name__)
@@ -52,7 +52,7 @@ def index(request):
   solr_query = {}
 
   if search_form.is_valid():
-    core = search_form.cleaned_data['cores']
+    core = search_form.cleaned_data['collection']
     solr_query['core'] = core
     solr_query['q'] = search_form.cleaned_data['query']
     solr_query['fq'] = search_form.cleaned_data['fq']
@@ -68,105 +68,20 @@ def index(request):
       response = SolrApi(SOLR_URL.get()).query(solr_query, hue_core)
     except Exception, e:
       error['message'] = unicode(str(e), "utf8")
+  else:
+    core = cores['status'].keys()[0]
 
-  return render('index.mako', request, {
+  return render('search.mako', request, {
     'search_form': search_form,
     'response': augment_solr_response(response, hue_core.facets.get_data()),
     'error': error,
     'solr_query': solr_query,
     'hue_core': hue_core,
     'hue_cores': hue_cores,
-    'current_cores': request.GET and request.GET['cores'] or '',
+    'current_core': request.GET and request.GET.get('collection', core),
     'json': json,
   })
 
-def get_facet_field_label(field, type, facets):
-  label = field
-  if type == 'field':
-    for fld in facets['fields']:
-      if fld['field'] == field:
-        label = fld['label']
-  elif type == 'range':
-    for fld in facets['ranges']:
-      if fld['field'] == field:
-        label = fld['label']
-  elif type == 'date':
-    for fld in facets['dates']:
-      if fld['field'] == field:
-        label = fld['label']
-  return label
-
-def get_facet_field_uuid(field, type, facets):
-  uuid = ''
-  if type == 'field':
-    for fld in facets['fields']:
-      if fld['field'] == field:
-        uuid = fld['uuid']
-  elif type == 'range':
-    for fld in facets['ranges']:
-      if fld['field'] == field:
-        uuid = fld['uuid']
-  elif type == 'date':
-    for fld in facets['dates']:
-      if fld['field'] == field:
-        uuid = fld['uuid']
-  return uuid
-
-
-def augment_solr_response(response, facets):
-  augmented = response
-  augmented['normalized_facets'] = []
-
-  normalized_facets = {}
-  if response and response.get('facet_counts'):
-    if response['facet_counts']['facet_fields']:
-      for cat in response['facet_counts']['facet_fields']:
-        facet = {
-          'field': cat,
-          'type': 'field',
-          'label': get_facet_field_label(cat, 'field', facets),
-          'counts': response['facet_counts']['facet_fields'][cat],
-        }
-        normalized_facets[get_facet_field_uuid(cat, 'field', facets)] = facet
-
-    if response['facet_counts']['facet_ranges']:
-      for cat in response['facet_counts']['facet_ranges']:
-        facet = {
-          'field': cat,
-          'type': 'range',
-          'label': get_facet_field_label(cat, 'range', facets),
-          'counts': response['facet_counts']['facet_ranges'][cat]['counts'],
-          'start': response['facet_counts']['facet_ranges'][cat]['start'],
-          'end': response['facet_counts']['facet_ranges'][cat]['end'],
-          'gap': response['facet_counts']['facet_ranges'][cat]['gap'],
-        }
-        normalized_facets[get_facet_field_uuid(cat, 'range', facets)] = facet
-
-    if response['facet_counts']['facet_dates']:
-      for cat in response['facet_counts']['facet_dates']:
-        facet = {
-          'field': cat,
-          'type': 'date',
-          'label': get_facet_field_label(cat, 'date', facets),
-          'start': response['facet_counts']['facet_dates'][cat]['start'],
-          'end': response['facet_counts']['facet_dates'][cat]['end'],
-          'gap': response['facet_counts']['facet_dates'][cat]['gap'],
-        }
-        counts = []
-        for date, count in response['facet_counts']['facet_dates'][cat].iteritems():
-          if date not in ('start', 'end', 'gap'):
-            counts.append(date)
-            counts.append(count)
-        facet['counts'] = counts
-        normalized_facets[get_facet_field_uuid(cat, 'date', facets)] = facet
-
-  for ordered_uuid in facets.get('order', []):
-    try:
-      augmented['normalized_facets'].append(normalized_facets[ordered_uuid])
-    except:
-      pass
-
-  return augmented
 
 @allow_admin_only
 def admin(request):
