@@ -226,7 +226,7 @@ def admin_core_schema(request, core):
   hue_core = Core.objects.get(name=core)
   hue_cores = Core.objects.all()
 
-  content = render('admin_core_properties_solr_schema', request, {
+  content = render('admin_core_properties_solr_schema.mako', request, {
     'solr_schema': solr_schema,
     'hue_core': hue_core,
     'hue_cores': hue_cores,

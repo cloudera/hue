@@ -86,10 +86,10 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
           % for group, count in macros.pairwise(fld['counts']):
             %if count > 0 and group != "" and found_value == "":
               % if fld['type'] == 'field':
-                <li><a href='?collection=${ current_cores }&query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ fld['field'] }:"${ urllib.quote_plus(group.encode('ascii', 'xmlcharrefreplace')) }"${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}'>${group}</a> <span class="counter">(${ count })</span></li>
+                <li><a href='?collection=${ current_core }&query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ fld['field'] }:"${ urllib.quote_plus(group.encode('ascii', 'xmlcharrefreplace')) }"${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}'>${group}</a> <span class="counter">(${ count })</span></li>
               % endif
               % if fld['type'] == 'range':
-                <li><a href='?collection=${ current_cores }&query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ fld['field'] }:["${ group }" TO "${ str(int(group) + int(fld['gap']) - 1) }"]${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}'>${ group } (${ count })</a></li>
+                <li><a href='?collection=${ current_core }&query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ fld['field'] }:["${ group }" TO "${ str(int(group) + int(fld['gap']) - 1) }"]${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}'>${ group } (${ count })</a></li>
               % endif
               % if fld['type'] == 'date':
                 <li class="dateFacetItem"><a href='?collection=${ current_core }&query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ fld['field'] }:"${ group }"${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}'><span class="dateFacet">${ group }</span> (${ count })</a></li>
@@ -97,10 +97,10 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
             %endif
             % if found_value != "":
               % if fld['type'] == 'field' and '"' + group + '"' == found_value:
-                <li><strong>${ group }</strong> <a href="?collection=${ current_cores }&query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}"><i class="icon-remove"></i></a></li>
+                <li><strong>${ group }</strong> <a href="?collection=${ current_core }&query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}"><i class="icon-remove"></i></a></li>
               %endif
               % if fld['type'] == 'range' and '["' + group + '" TO "' + str(int(group) + int(fld['gap']) - 1) + '"]' == found_value:
-                <li><strong>${ group }</strong> <a href="?collection=${ current_cores }&query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}"><i class="icon-remove"></i></a></li>
+                <li><strong>${ group }</strong> <a href="?collection=${ current_core }&query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}"><i class="icon-remove"></i></a></li>
               %endif
               % if fld['type'] == 'date' and '"' + group + '"' == found_value:
                 <li><strong><span class="dateFacet">${group}</span></strong> <a href="?collection=${ current_core }&query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}"><i class="icon-remove"></i></a></li>
@@ -312,7 +312,7 @@ ${ hue_core.result.get_extracode() | n,unicode }
       if ($(".sort-by").val() == "") {
         _sort = "";
       }
-      location.href = "?query=${solr_query["q"]}&fq=${solr_query["fq"]}&rows=${solr_query["rows"]}&start=${solr_query["start"]}" + _sort != "" ? "&sort=" + _sort : "";
+      location.href = "?query=${solr_query["q"]}&fq=${solr_query["fq"]}&rows=${solr_query["rows"]}&start=${solr_query["start"]}" + (_sort != "" ? "&sort=" + _sort : "");
     });
 
     $("#id_query").on("click", function (e) {
