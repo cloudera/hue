@@ -381,25 +381,6 @@ def execute_query(request, design_id=None):
   dbs = db.get_databases()
   databases = ((db, db) for db in dbs)
 
-  # Todo: build lazily
-  autocomplete = {}
-  for database in dbs:
-    tables = db.get_tables(database=database)
-    autocomplete_tables = []
-    for table in tables:
-      try:
-        t = db.get_table(database, table)
-        autocomplete_tables.append({
-          'name': t.name,
-          'cols': [column.name for column in t.cols]
-        })
-      except Exception, e:
-        LOG.warn('Skipping table %s.%s : %s' % (database, table, e))
-
-    autocomplete[database] = {
-      'tables': autocomplete_tables
-    }
-
   if request.method == 'POST':
     form.bind(request.POST)
     form.query.fields['database'].choices =  databases # Could not do it in the form
@@ -454,7 +435,7 @@ def execute_query(request, design_id=None):
     'error_message': error_message,
     'form': form,
     'log': log,
-    'autocomplete': json.dumps(autocomplete),
+    'autocomplete_base_url': reverse(get_app_name(request) + ':autocomplete', kwargs={}),
     'on_success_url': on_success_url,
     'can_edit_name': design and not design.is_auto and design.name,
   })
@@ -854,7 +835,7 @@ def confirm_query(request, query, on_success_url=None):
     'design': None,
     'on_success_url': on_success_url,
     'design': None,
-    'autocomplete': json.dumps({}),
+    'autocomplete_base_url': reverse(get_app_name(request) + ':autocomplete', kwargs={}),
   })
 
 
@@ -947,6 +928,27 @@ def query_done_cb(request, server_id):
     message['message'] = msg
   return HttpResponse(message_template % message)
 
+
+def autocomplete(request, database=None, table=None):
+  app_name = get_app_name(request)
+  query_server = get_query_server_config(app_name)
+  db = dbms.get(request.user, query_server)
+  response = {}
+
+  try:
+    if database is None:
+      response['databases'] = db.get_databases()
+    elif table is None:
+      response['tables'] = db.get_tables(database=database)
+    else:
+      t = db.get_table(database, table)
+      response['columns'] = [column.name for column in t.cols]
+  except Exception, e:
+    LOG.warn('Autocomplete data fetching error %s.%s: %s' % (database, table, e))
+    response['error'] = e.message
+
+
+  return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
 """
@@ -1082,7 +1084,7 @@ def _run_parameterized_query(request, design_id, explain):
         'error_message': error_message,
         'form': query_form,
         'log': log,
-        'autocomplete': json.dumps({}),
+        'autocomplete_base_url': reverse(get_app_name(request) + ':autocomplete', kwargs={}),
       })
   else:
     return render("parameterization.mako", request, dict(form=parameterization_form, design=design, explain=explain))
@@ -1399,4 +1401,3 @@ def _update_query_state(query_history):
 WHITESPACE = re.compile("\s+", re.MULTILINE)
 def collapse_whitespace(s):
   return WHITESPACE.sub(" ", s).strip()
-
