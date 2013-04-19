@@ -33,6 +33,7 @@ import shell.utils as utils
 import signal
 import subprocess
 import tempfile
+import time
 import tty
 
 from eventlet.green import os
@@ -147,6 +148,8 @@ class Shell(object):
     merge_tool_args += delegation_token_files
     LOG.debug("Merging credentials files with command: '%s'" % (' '.join(merge_tool_args)))
     merge_process = subprocess.Popen(merge_tool_args, stderr=subprocess.PIPE, shell=False, close_fds=True)
+    while merge_process.poll() is None:
+      time.sleep(1)
     retcode = merge_process.wait()
     if retcode != 0:
       LOG.error("Failed to merge credentials :'%s'..." % (merge_process.stderr.readline(),))
