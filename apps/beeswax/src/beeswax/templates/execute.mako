@@ -236,7 +236,7 @@ ${layout.menubar(section='query')}
                               <i class="icon-question-sign" id="help"></i>
                               <div id="help-content" class="hide">
                                 <ul style="text-align: left;">
-                                  <li>${ _('Press Shift + Space to autocomplete') }</li>
+                                  <li>${ _('Press CTRL + Space to autocomplete') }</li>
                                   <li>${ _("You can execute queries with multiple SQL statements delimited by a semicolon ';'") }</li>
                                   <li>${ _('You can highlight and run a fragment of a query') }</li>
                                 </ul>
@@ -431,11 +431,12 @@ ${layout.menubar(section='query')}
 </style>
 
 <script src="/static/ext/js/jquery/plugins/jquery.cookie.js"></script>
+<script src="/static/ext/js/jquery/plugins/jquery.total-storage.min.js"></script>
 <script src="/static/ext/js/jquery/plugins/jquery-fieldselection.js" type="text/javascript"></script>
 
 <script type="text/javascript" charset="utf-8">
     $(document).ready(function(){
-      var queryPlaceholder = "${_('Example: SELECT * FROM tablename')}";
+      var queryPlaceholder = "${_('Example: SELECT * FROM tablename, or press CTRL + space')}";
 
       var successfunction = function(response, newValue) {
         if (response.status != 0) {
@@ -585,7 +586,21 @@ ${layout.menubar(section='query')}
         }
       }
 
-      var dbTree = ${ autocomplete | n,unicode };
+      var AUTOCOMPLETE_BASE_URL = "${ autocomplete_base_url | n,unicode }";
+
+      function autocomplete(options) {
+        if (options.database == null) {
+          $.getJSON(AUTOCOMPLETE_BASE_URL, options.onDataReceived);
+        }
+        if (options.database != null) {
+          if (options.table != null) {
+            $.getJSON(AUTOCOMPLETE_BASE_URL + options.database + "/" + options.table, options.onDataReceived);
+          }
+          else {
+            $.getJSON(AUTOCOMPLETE_BASE_URL + options.database + "/", options.onDataReceived);
+          }
+        }
+      }
 
       function getTableAliases() {
         var _aliases = {};
@@ -608,29 +623,46 @@ ${layout.menubar(section='query')}
         return _aliases;
       }
 
-      function getTableFields(tableName, withDot) {
+      function getTableColumns(tableName, callback) {
         if (tableName.indexOf("(") > -1) {
           tableName = tableName.substr(tableName.indexOf("(") + 1);
         }
-        var _branch = dbTree[$("#id_query-database").val()];
-        if (_branch != null && _branch.tables) {
-          for (var i = 0; i < _branch.tables.length; i++) {
-            var _aliases = getTableAliases();
-            if (_aliases[tableName]) {
-              tableName = _aliases[tableName];
-            }
-            if (_branch.tables[i].name == tableName) {
-              var _cols = _branch.tables[i].cols.slice(0);
-              if (withDot) {
-                for (var idx = 0; idx < _cols.length; idx++) {
-                  _cols[idx] = "." + _cols[idx];
-                }
-              }
-              return _cols.join(" ");
-            }
-          }
+
+        var _aliases = getTableAliases();
+        if (_aliases[tableName]) {
+          tableName = _aliases[tableName];
         }
-        return "";
+
+        if ($.totalStorage('columns_' + $("#id_query-database").val() + '_' + tableName) != null) {
+          callback($.totalStorage('columns_' + $("#id_query-database").val() + '_' + tableName));
+          autocomplete({
+            database: $("#id_query-database").val(),
+            table: tableName,
+            onDataReceived: function (data) {
+              if (data.error) {
+                $.jHueNotify.error(data.error);
+              }
+              else {
+                $.totalStorage('columns_' + $("#id_query-database").val() + '_' + tableName, data.columns.join(" "));
+              }
+            }
+          });
+        }
+        else {
+          autocomplete({
+            database: $("#id_query-database").val(),
+            table: tableName,
+            onDataReceived: function (data) {
+              if (data.error) {
+                $.jHueNotify.error(data.error);
+              }
+              else {
+                $.totalStorage('columns_' + $("#id_query-database").val() + '_' + tableName, data.columns.join(" "));
+                callback($.totalStorage('columns_' + $("#id_query-database").val() + '_' + tableName));
+              }
+            }
+          });
+        }
       }
 
       function tableHasAlias(tableName) {
@@ -643,54 +675,79 @@ ${layout.menubar(section='query')}
         return false;
       }
 
-      function getTables() {
-        var _branch = dbTree[$("#id_query-database").val()];
-        if (_branch != null && _branch.tables) {
-          var _names = "";
-          for (var i = 0; i < _branch.tables.length; i++) {
-            if (i > 0) {
-              _names += " ";
+      function getTables(callback) {
+        if ($.totalStorage('tables_' + $("#id_query-database").val()) != null) {
+          callback($.totalStorage('tables_' + $("#id_query-database").val()));
+          autocomplete({
+            database: $("#id_query-database").val(),
+            onDataReceived: function (data) {
+              if (data.error) {
+                $.jHueNotify.error(data.error);
+              }
+              else {
+                $.totalStorage('tables_' + $("#id_query-database").val(), data.tables.join(" "));
+              }
             }
-            _names += _branch.tables[i].name;
-          }
-          return _names;
+          });
         }
-        return "";
+        else {
+          autocomplete({
+            database: $("#id_query-database").val(),
+            onDataReceived: function (data) {
+              if (data.error) {
+                $.jHueNotify.error(data.error);
+              }
+              else {
+                $.totalStorage('tables_' + $("#id_query-database").val(), data.tables.join(" "));
+                callback($.totalStorage('tables_' + $("#id_query-database").val()));
+              }
+            }
+          });
+        }
       }
 
       var queryEditor = $("#queryField")[0];
 
       CodeMirror.commands.autocomplete = function (cm) {
-        CodeMirror.catalogTables = getTables();
-        var _before = codeMirror.getRange({line: 0, ch: 0}, {line: codeMirror.getCursor().line, ch: codeMirror.getCursor().ch}).replace(/(\r\n|\n|\r)/gm, " ");
-        CodeMirror.possibleTable = false;
-        if (_before.toUpperCase().indexOf(" FROM ") > -1 && _before.toUpperCase().indexOf(" ON ") == -1 && _before.toUpperCase().indexOf(" WHERE ") == -1) {
-          CodeMirror.possibleTable = true;
-        }
-        CodeMirror.possibleSoloField = false;
-        if (_before.toUpperCase().indexOf("SELECT ") > -1 && _before.toUpperCase().indexOf(" FROM ") && !CodeMirror.fromDot) {
-          CodeMirror.possibleSoloField = true;
-          try {
-            var _possibleTables = $.trim(codeMirror.getValue().substr(codeMirror.getValue().toUpperCase().indexOf("FROM") + 4)).split(" ");
-            var _foundTable = "";
-            for (var i = 0; i < _possibleTables.length; i++) {
-              if ($.trim(_possibleTables[i]) != "" && _foundTable == "") {
-                _foundTable = _possibleTables[i];
+        getTables(function (tables) {
+          CodeMirror.catalogTables = tables;
+          var _before = codeMirror.getRange({line: 0, ch: 0}, {line: codeMirror.getCursor().line, ch: codeMirror.getCursor().ch}).replace(/(\r\n|\n|\r)/gm, " ");
+          CodeMirror.possibleTable = false;
+          if (_before.toUpperCase().indexOf(" FROM ") > -1 && _before.toUpperCase().indexOf(" ON ") == -1 && _before.toUpperCase().indexOf(" WHERE ") == -1) {
+            CodeMirror.possibleTable = true;
+          }
+          CodeMirror.possibleSoloField = false;
+          if (_before.toUpperCase().indexOf("SELECT ") > -1 && _before.toUpperCase().indexOf(" FROM ") == -1 && !CodeMirror.fromDot) {
+            CodeMirror.possibleSoloField = true;
+            try {
+              var _possibleTables = $.trim(codeMirror.getValue().substr(codeMirror.getValue().toUpperCase().indexOf("FROM") + 4)).split(" ");
+              var _foundTable = "";
+              for (var i = 0; i < _possibleTables.length; i++) {
+                if ($.trim(_possibleTables[i]) != "" && _foundTable == "") {
+                  _foundTable = _possibleTables[i];
+                }
+              }
+              if (_foundTable != "") {
+                if (tableHasAlias(_foundTable)) {
+                  CodeMirror.possibleSoloField = false;
+                  CodeMirror.showHint(cm, CodeMirror.hiveQLHint);
+                }
+                else {
+                  getTableColumns(_foundTable,
+                          function (columns) {
+                            CodeMirror.catalogFields = columns;
+                            CodeMirror.showHint(cm, CodeMirror.hiveQLHint);
+                          });
+                }
               }
             }
-            if (_foundTable != "") {
-              if (tableHasAlias(_foundTable)) {
-                CodeMirror.possibleSoloField = false;
-              }
-              else {
-                CodeMirror.catalogFields = getTableFields(_foundTable, false);
-              }
+            catch (e) {
             }
           }
-          catch (e) {
+          else {
+            CodeMirror.showHint(cm, CodeMirror.hiveQLHint);
           }
-        }
-        CodeMirror.showHint(cm, CodeMirror.hiveQLHint);
+        });
       }
 
       CodeMirror.fromDot = false;
@@ -703,6 +760,10 @@ ${layout.menubar(section='query')}
         lineNumbers: true,
         mode: "text/x-hiveql",
         extraKeys: {
+          "Shift-Space": function () {
+            CodeMirror.fromDot = false;
+            codeMirror.execCommand("autocomplete");
+          },
           "Ctrl-Space": function () {
             CodeMirror.fromDot = false;
             codeMirror.execCommand("autocomplete");
@@ -714,14 +775,20 @@ ${layout.menubar(section='query')}
         onKeyEvent: function (e, s) {
           if (s.type == "keyup") {
             if (s.keyCode == 190) {
-              window.setTimeout(function () {
-                var _line = codeMirror.getLine(codeMirror.getCursor().line);
-                var _partial = _line.substring(0, codeMirror.getCursor().ch);
-                var _table = _partial.substring(_partial.lastIndexOf(" ") + 1, _partial.length - 1);
-                CodeMirror.catalogFields = getTableFields(_table, true);
+              var _line = codeMirror.getLine(codeMirror.getCursor().line);
+              var _partial = _line.substring(0, codeMirror.getCursor().ch);
+              var _table = _partial.substring(_partial.lastIndexOf(" ") + 1, _partial.length - 1);
+              getTableColumns(_table, function (columns) {
+                var _cols = columns.split(" ");
+                for (var col in _cols){
+                  _cols[idx] = "." + _cols[idx];
+                }
+                CodeMirror.catalogFields = _cols.join(" ");
                 CodeMirror.fromDot = true;
-                codeMirror.execCommand("autocomplete");
-              }, 100); // timeout for IE8
+                window.setTimeout(function () {
+                  codeMirror.execCommand("autocomplete");
+                }, 100);  // timeout for IE8
+              });
             }
           }
         }
