@@ -134,8 +134,8 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
   <%def name="content()">
     <ul class="nav nav-tabs">
       <li class="active"><a href="#visual" data-toggle="tab">${_('Visual editor')}</a></li>
-      <li><a href="#source" data-toggle="tab">${_('Source')}</a></li>
       <li><a href="#preview" data-toggle="tab">${_('Preview')}</a></li>
+      <li><a href="#source" data-toggle="tab">${_('Source')}</a></li>
       <li><a href="#extra" data-toggle="tab">${_('Advanced')}</a></li>
     </ul>
     <div class="tab-content">
@@ -160,7 +160,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
                 <h5>${_('Available Fields')}</h5>
               </div>
               <div class="widget-content">
-                <select data-bind="options: availableFields, value: selectedVisualField" class="input-medium chzn-select"></select>
+                <select data-bind="options: availableFields, value: selectedVisualField" class="input-large chzn-select"></select>
                 <a title="${ _('Click on this button to add the field') }" class="btn btn-small" data-bind="click: $root.addFieldToVisual">
                   <i class="icon-plus"></i>
                 </a>
@@ -174,7 +174,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
                 <h5>${_('Available Functions')}</h5>
               </div>
               <div class="widget-content">
-                <select id="visualFunctions" data-bind="value: selectedVisualFunction" class="input-medium chzn-select">
+                <select id="visualFunctions" data-bind="value: selectedVisualFunction" class="input-large chzn-select">
                   <option title="${ _('Formats a date in the DD-MM-YYYY format') }" value="{{#date}} {{/date}}">{{#date}}</option>
                   <option title="${ _('Formats a date in the HH:mm:ss format') }" value="{{#time}} {{/time}}">{{#time}}</option>
                   <option title="${ _('Formats a date in the DD-MM-YYYY HH:mm:ss format') }" value="{{#datetime}} {{/datetime}}">{{#datetime}}</option>

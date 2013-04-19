@@ -43,7 +43,8 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
             </label>
           </div>
           <h3>${_('Sorting')}</h3>
-          ${_('Specify on which field and order the results are sorted.')}
+          ${_('Specify on which fields and order the results are sorted by default.')}
+          ${_('The sorting is a combination of the fields, from left to right.')}
           <span data-bind="visible: ! isEnabled()"><strong>${_('Sorting is currently disabled.')}</strong></span>
         </div>
       </div>
