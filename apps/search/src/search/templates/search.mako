@@ -199,6 +199,17 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
               }
             }
           };
+          item.fromnow = function () {
+            return function (val) {
+              var d = moment(Mustache.render(val, item));
+              if (d.isValid()) {
+                return d.fromNow();
+              }
+              else {
+                return Mustache.render(val, item);
+              }
+            }
+          };
           $("<div>").addClass("result-row").html(
             Mustache.render($("#mustacheTmpl").text(), item)
           ).appendTo($("#result-container"));
