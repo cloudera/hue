@@ -180,9 +180,9 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
                   <option title="${ _('Formats a date in the DD-MM-YYYY HH:mm:ss format') }" value="{{#datetime}} {{/datetime}}">{{#datetime}}</option>
                   <option title="${ _('Formats a date in the full format') }" value="{{#fulldate}} {{/fulldate}}">{{#fulldate}}</option>
                   <option title="${ _('Formats a date as a Unix timestamp') }" value="{{#timestamp}} {{/timestamp}}">{{#timestamp}}</option>
-                  <option title="${ _('Shows the relative time') }" value="{{#fromnow}} {{/fromnow}}">{{#fromnow}}</option>
-                  <option title="${ _('Downloads the linked file') }" value="{{#downloadfile}} {{/downloadfile}}">{{#downloadfile}}</option>
-                  <option title="${ _('Links to the file') }" value="{{#viewfile}} {{/viewfile}}">{{#viewfile}}</option>
+                  <option title="${ _('Downloads and embed the file in the browser') }" value="{{#embeddeddownload}} {{/embeddeddownload}}">{{#embeddeddownload}}</option>
+                  <option title="${ _('Downloads the linked file') }" value="{{#download}} {{/download}}">{{#download}}</option>
+                  <option title="${ _('Preview file in File Browser') }" value="{{#preview}} {{/preview}}">{{#preview}}</option>
                 </select>
                 <a title="${ _('Click on this button to add the field') }" class="btn btn-small" data-bind="click: $root.addFunctionToVisual">
                   <i class="icon-plus"></i>
@@ -231,8 +231,9 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
                   <option title="${ _('Formats a date in the full format') }" value="{{#fulldate}} {{/fulldate}}">{{#fulldate}}</option>
                   <option title="${ _('Formats a date as a Unix timestamp') }" value="{{#timestamp}} {{/timestamp}}">{{#timestamp}}</option>
                   <option title="${ _('Shows the relative time') }" value="{{#fromnow}} {{/fromnow}}">{{#fromnow}}</option>
-                  <option title="${ _('Downloads the linked file') }" value="{{#downloadfile}} {{/downloadfile}}">{{#downloadfile}}</option>
-                  <option title="${ _('Links to the file') }" value="{{#viewfile}} {{/viewfile}}">{{#viewfile}}</option>
+                  <option title="${ _('Downloads and embed the file in the browser') }" value="{{#embeddeddownload}} {{/embeddeddownload}}">{{#embeddeddownload}}</option>
+                  <option title="${ _('Downloads the linked file') }" value="{{#download}} {{/download}}">{{#download}}</option>
+                  <option title="${ _('Preview file in File Browser') }" value="{{#preview}} {{/preview}}">{{#preview}}</option>
                 </select>
                 <a title="${ _('Click on this button to add the field') }" class="btn btn-small" data-bind="click: $root.addFunctionToSource">
                   <i class="icon-plus"></i>
@@ -559,14 +560,19 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
       if ($(e.target).attr("href") == "#preview") {
         $("#preview-container").empty();
         $(samples).each(function (cnt, item) {
-          item.viewfile = function () {
+          item.preview = function () {
             return function (val) {
               return '<a href="/filebrowser/view/' + $.trim(Mustache.render(val, item)) + '">' + $.trim(Mustache.render(val, item)) + '</a>';
             }
           };
-          item.downloadfile = function () {
+          item.embeddeddownload = function () {
             return function (val) {
               return '<a href="/filebrowser/download/' + $.trim(Mustache.render(val, item)) + '?disposition=inline">' + $.trim(Mustache.render(val, item)) + '</a>';
+            }
+          };
+          item.download = function () {
+            return function (val) {
+              return '<a href="/filebrowser/download/' + $.trim(Mustache.render(val, item)) + '>' + $.trim(Mustache.render(val, item)) + '</a>';
             }
           };
           item.date = function () {

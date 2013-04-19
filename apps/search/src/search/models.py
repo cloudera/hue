@@ -426,6 +426,8 @@ def augment_solr_response(response, facets):
   augmented['normalized_facets'] = []
 
   normalized_facets = {}
+  default_facets = []
+
   if response and response.get('facet_counts'):
     if response['facet_counts']['facet_fields']:
       for cat in response['facet_counts']['facet_fields']:
@@ -435,7 +437,11 @@ def augment_solr_response(response, facets):
           'label': get_facet_field_label(cat, 'field', facets),
           'counts': response['facet_counts']['facet_fields'][cat],
         }
-        normalized_facets[get_facet_field_uuid(cat, 'field', facets)] = facet
+        uuid = get_facet_field_uuid(cat, 'field', facets)
+        if uuid == '':
+          default_facets.append(facet)
+        else:
+          normalized_facets[uuid] = facet
 
     if response['facet_counts']['facet_ranges']:
       for cat in response['facet_counts']['facet_ranges']:
@@ -448,7 +454,11 @@ def augment_solr_response(response, facets):
           'end': response['facet_counts']['facet_ranges'][cat]['end'],
           'gap': response['facet_counts']['facet_ranges'][cat]['gap'],
         }
-        normalized_facets[get_facet_field_uuid(cat, 'range', facets)] = facet
+        uuid = get_facet_field_uuid(cat, 'range', facets)
+        if uuid == '':
+          default_facets.append(facet)
+        else:
+          normalized_facets[uuid] = facet
 
     if response['facet_counts']['facet_dates']:
       for cat in response['facet_counts']['facet_dates']:
@@ -466,13 +476,20 @@ def augment_solr_response(response, facets):
             counts.append(date)
             counts.append(count)
         facet['counts'] = counts
-        normalized_facets[get_facet_field_uuid(cat, 'date', facets)] = facet
+
+        uuid = get_facet_field_uuid(cat, 'date', facets)
+        if uuid == '':
+          default_facets.append(facet)
+        else:
+          normalized_facets[uuid] = facet
 
   for ordered_uuid in facets.get('order', []):
     try:
       augmented['normalized_facets'].append(normalized_facets[ordered_uuid])
     except:
       pass
+  if default_facets:
+    augmented['normalized_facets'].extend(default_facets)
 
   return augmented
 

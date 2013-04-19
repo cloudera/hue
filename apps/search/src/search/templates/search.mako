@@ -69,22 +69,22 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
     <div class="span2">
       <ul class="facet-list">
         % for fld in response['normalized_facets']:
-        % if fld['type'] == 'date':
+          % if fld['type'] == 'date':
             <li class="nav-header dateFacetHeader">${fld['label']}</li>
-        % else:
+          % else:
             <li class="nav-header">${fld['label']}</li>
-        % endif
+          % endif
 
-        <%
+          <%
           found_value = ""
           for fq in solr_query['fq'].split('|'):
             if fq and fq.split(':')[0] == fld['field']:
-              found_value = fq[fq.find(":")+1:]
+              found_value = fq[fq.find(":") + 1:]
               remove_list = solr_query['fq'].split('|')
               remove_list.remove(fq)
-        %>
+          %>
           % for group, count in macros.pairwise(fld['counts']):
-            %if count > 0 and group != "" and found_value == "":
+            % if count > 0 and group != "" and found_value == "":
               % if fld['type'] == 'field':
                 <li><a href='?collection=${ current_core }&query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ fld['field'] }:"${ urllib.quote_plus(group.encode('ascii', 'xmlcharrefreplace')) }"${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}'>${group}</a> <span class="counter">(${ count })</span></li>
               % endif
@@ -94,29 +94,30 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
               % if fld['type'] == 'date':
                 <li class="dateFacetItem"><a href='?collection=${ current_core }&query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ fld['field'] }:"${ group }"${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}'><span class="dateFacet">${ group }</span> (${ count })</a></li>
               % endif
-            %endif
+            % endif
             % if found_value != "":
               % if fld['type'] == 'field' and '"' + group + '"' == found_value:
                 <li><strong>${ group }</strong> <a href="?collection=${ current_core }&query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}"><i class="icon-remove"></i></a></li>
-              %endif
+              % endif
               % if fld['type'] == 'range' and '["' + group + '" TO "' + str(int(group) + int(fld['gap']) - 1) + '"]' == found_value:
                 <li><strong>${ group }</strong> <a href="?collection=${ current_core }&query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}"><i class="icon-remove"></i></a></li>
-              %endif
+              % endif
               % if fld['type'] == 'date' and '"' + group + '"' == found_value:
                 <li><strong><span class="dateFacet">${group}</span></strong> <a href="?collection=${ current_core }&query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}"><i class="icon-remove"></i></a></li>
-              %endif
-            %endif
+              % endif
+            % endif
           % endfor
         % endfor
       </ul>
     </div>
     % endif
+
     % if response and response['response']['docs'] and len(response['response']['docs']) > 0:
-      %if response['normalized_facets']:
+      % if response['normalized_facets']:
       <div class="span10">
-      %else:
+      % else:
       <div class="span12">
-      %endif
+      % endif
       <ul class="breadcrumb">
         <li class="pull-right">
           <select class="sort-by">
@@ -129,7 +130,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
           if end_record > int(response['response']['numFound']):
             end_record = response['response']['numFound'];
         %>
-        ${_('Showing %s - %s of %s results') % (int(solr_query["start"])+1, end_record, response['response']['numFound'])}
+        ${_('Showing %s - %s of %s results') % (int(solr_query["start"]) + 1, end_record, response['response']['numFound'])}
         </li>
       </ul>
 
@@ -158,14 +159,19 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
         }
 
         $.each(${ json.dumps([result for result in docs]) | n,unicode }, function (index, item) {
-          item.viewfile = function () {
+          item.preview = function () {
             return function (val) {
               return '<a href="/filebrowser/view/' + $.trim(Mustache.render(val, item)) + '">' + $.trim(Mustache.render(val, item)) + '</a>';
             }
           };
-          item.downloadfile = function () {
+          item.embeddeddownload = function () {
             return function (val) {
               return '<a href="/filebrowser/download/' + $.trim(Mustache.render(val, item)) + '?disposition=inline">' + $.trim(Mustache.render(val, item)) + '</a>';
+            }
+          };
+          item.download = function () {
+            return function (val) {
+              return '<a href="/filebrowser/download/' + $.trim(Mustache.render(val, item)) + '>' + $.trim(Mustache.render(val, item)) + '</a>';
             }
           };
           item.date = function () {

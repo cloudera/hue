@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -- coding: utf-8 --
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -41,11 +42,12 @@ class SolrApi(object):
 
   def query(self, solr_query, hue_core):
     try:
-      params = (('q', solr_query['q'] or '*'),
-                ('wt', 'json'),
-                ('rows', solr_query['rows']),
-                ('start', solr_query['start']),
-             )
+      params = (
+          ('q', solr_query['q'] or '*'),
+          ('wt', 'json'),
+          ('rows', solr_query['rows']),
+          ('start', solr_query['start']),
+      )
 
       params += hue_core.get_query()
 
@@ -65,9 +67,10 @@ class SolrApi(object):
 
   def suggest(self, solr_query, hue_core):
     try:
-      params = (('q', solr_query['q']),
-                ('wt', 'json'),
-             )
+      params = (
+          ('q', solr_query['q']),
+          ('wt', 'json'),
+      )
       response = self._root.get('%(core)s/suggest' % solr_query, params)
       return json.loads(response)
     except RestException, e:
