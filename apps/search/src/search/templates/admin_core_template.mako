@@ -180,6 +180,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
                   <option title="${ _('Formats a date in the DD-MM-YYYY HH:mm:ss format') }" value="{{#datetime}} {{/datetime}}">{{#datetime}}</option>
                   <option title="${ _('Formats a date in the full format') }" value="{{#fulldate}} {{/fulldate}}">{{#fulldate}}</option>
                   <option title="${ _('Formats a date as a Unix timestamp') }" value="{{#timestamp}} {{/timestamp}}">{{#timestamp}}</option>
+                  <option title="${ _('Shows the relative time') }" value="{{#fromnow}} {{/fromnow}}">{{#fromnow}}</option>
                   <option title="${ _('Downloads the linked file') }" value="{{#downloadfile}} {{/downloadfile}}">{{#downloadfile}}</option>
                   <option title="${ _('Links to the file') }" value="{{#viewfile}} {{/viewfile}}">{{#viewfile}}</option>
                 </select>
@@ -229,6 +230,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
                   <option title="${ _('Formats a date in the DD-MM-YYYY HH:mm:ss format') }" value="{{#datetime}} {{/datetime}}">{{#datetime}}</option>
                   <option title="${ _('Formats a date in the full format') }" value="{{#fulldate}} {{/fulldate}}">{{#fulldate}}</option>
                   <option title="${ _('Formats a date as a Unix timestamp') }" value="{{#timestamp}} {{/timestamp}}">{{#timestamp}}</option>
+                  <option title="${ _('Shows the relative time') }" value="{{#fromnow}} {{/fromnow}}">{{#fromnow}}</option>
                   <option title="${ _('Downloads the linked file') }" value="{{#downloadfile}} {{/downloadfile}}">{{#downloadfile}}</option>
                   <option title="${ _('Links to the file') }" value="{{#viewfile}} {{/viewfile}}">{{#viewfile}}</option>
                 </select>
@@ -592,6 +594,17 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
               var d = moment(Mustache.render(val, item));
               if (d.isValid()) {
                 return d.valueOf();
+              }
+              else {
+                return Mustache.render(val, item);
+              }
+            }
+          };
+          item.fromnow = function () {
+            return function (val) {
+              var d = moment(Mustache.render(val, item));
+              if (d.isValid()) {
+                return d.fromNow();
               }
               else {
                 return Mustache.render(val, item);
