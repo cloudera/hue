@@ -37,6 +37,14 @@
     var cur = editor.getCursor(), token = getToken(editor, cur), tprop = token;
     // If it's not a 'word-style' token, ignore the token.
 
+    if (token.string.indexOf("'") == 0){
+      CodeMirror.isPath = true;
+      token.string = token.string.substring(1, token.string.length);
+    }
+    if (token.string.indexOf("/") > -1){
+      token.string = token.string.substring(token.string.lastIndexOf("/") + 1);
+    }
+
     if (!/^[\w$_]*$/.test(token.string)) {
       token = tprop = {start: cur.ch, end: cur.ch, string: "", state: token.state,
         className: token.string == ":" ? "pig-type" : null};
@@ -56,6 +64,9 @@
       from: CodeMirror.Pos(cur.line, token.start),
       to: CodeMirror.Pos(cur.line, token.end)};
   }
+
+  CodeMirror.isPath = false;
+  CodeMirror.currentFiles = [];
 
   CodeMirror.pigHint = function (editor) {
     return scriptHint(editor, pigKeywordsU, function (e, cur) {
@@ -99,21 +110,33 @@
     var found = [], start = token.string;
 
     function maybeAdd(str) {
-      if (str.indexOf(start) == 0 && !arrayContains(found, str)) found.push(str);
+      var stripped = strip(str).replace(/(?:(?:^|\n)\s+|\s+(?:$|\n))/g,'').replace(/\s+/g,' ');
+      if (stripped.indexOf(start) == 0 && !arrayContains(found, str)) found.push(str);
+    }
+
+    function strip(html){
+      var tmp = document.createElement("DIV");
+      tmp.innerHTML = html;
+      return tmp.textContent||tmp.innerText;
     }
 
     function gatherCompletions(obj) {
-      if (obj == ":") {
-        forEach(pigTypesL, maybeAdd);
+      if (CodeMirror.isPath || obj.indexOf("'") == 0){
+        forEach(CodeMirror.currentFiles, maybeAdd);
       }
       else {
-        forEach(pigBuiltinsU, maybeAdd);
-        forEach(pigBuiltinsL, maybeAdd);
-        forEach(pigBuiltinsC, maybeAdd);
-        forEach(pigTypesU, maybeAdd);
-        forEach(pigTypesL, maybeAdd);
-        forEach(pigKeywordsU, maybeAdd);
-        forEach(pigKeywordsL, maybeAdd);
+        if (obj == ":") {
+          forEach(pigTypesL, maybeAdd);
+        }
+        else {
+          forEach(pigBuiltinsU, maybeAdd);
+          forEach(pigBuiltinsL, maybeAdd);
+          forEach(pigBuiltinsC, maybeAdd);
+          forEach(pigTypesU, maybeAdd);
+          forEach(pigTypesL, maybeAdd);
+          forEach(pigKeywordsU, maybeAdd);
+          forEach(pigKeywordsL, maybeAdd);
+        }
       }
     }
 
