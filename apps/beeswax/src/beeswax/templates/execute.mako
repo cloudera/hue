@@ -503,6 +503,7 @@ ${layout.menubar(section='query')}
 
       $("#id_query-database").change(function () {
         $.cookie("hueBeeswaxLastDatabase", $(this).val(), {expires: 90});
+        getTables(function(){}); //preload tables for current DB
       });
 
       ## If no particular query is loaded
@@ -708,46 +709,54 @@ ${layout.menubar(section='query')}
 
       var queryEditor = $("#queryField")[0];
 
+      getTables(function(){}); //preload tables for current DB
+
       CodeMirror.commands.autocomplete = function (cm) {
-        getTables(function (tables) {
-          CodeMirror.catalogTables = tables;
-          var _before = codeMirror.getRange({line: 0, ch: 0}, {line: codeMirror.getCursor().line, ch: codeMirror.getCursor().ch}).replace(/(\r\n|\n|\r)/gm, " ");
-          CodeMirror.possibleTable = false;
-          if (_before.toUpperCase().indexOf(" FROM ") > -1 && _before.toUpperCase().indexOf(" ON ") == -1 && _before.toUpperCase().indexOf(" WHERE ") == -1) {
-            CodeMirror.possibleTable = true;
-          }
-          CodeMirror.possibleSoloField = false;
-          if (_before.toUpperCase().indexOf("SELECT ") > -1 && _before.toUpperCase().indexOf(" FROM ") == -1 && !CodeMirror.fromDot) {
-            CodeMirror.possibleSoloField = true;
-            try {
-              var _possibleTables = $.trim(codeMirror.getValue().substr(codeMirror.getValue().toUpperCase().indexOf("FROM") + 4)).split(" ");
-              var _foundTable = "";
-              for (var i = 0; i < _possibleTables.length; i++) {
-                if ($.trim(_possibleTables[i]) != "" && _foundTable == "") {
-                  _foundTable = _possibleTables[i];
+        if ($.totalStorage('tables_' + $("#id_query-database").val()) == null) {
+          CodeMirror.showHint(cm, CodeMirror.hiveQLHint);
+          getTables(function () {}); // if preload didn't work, tries again
+        }
+        else {
+          getTables(function (tables) {
+            CodeMirror.catalogTables = tables;
+            var _before = codeMirror.getRange({line: 0, ch: 0}, {line: codeMirror.getCursor().line, ch: codeMirror.getCursor().ch}).replace(/(\r\n|\n|\r)/gm, " ");
+            CodeMirror.possibleTable = false;
+            if (_before.toUpperCase().indexOf(" FROM ") > -1 && _before.toUpperCase().indexOf(" ON ") == -1 && _before.toUpperCase().indexOf(" WHERE ") == -1) {
+              CodeMirror.possibleTable = true;
+            }
+            CodeMirror.possibleSoloField = false;
+            if (_before.toUpperCase().indexOf("SELECT ") > -1 && _before.toUpperCase().indexOf(" FROM ") == -1 && !CodeMirror.fromDot) {
+              CodeMirror.possibleSoloField = true;
+              try {
+                var _possibleTables = $.trim(codeMirror.getValue().substr(codeMirror.getValue().toUpperCase().indexOf("FROM") + 4)).split(" ");
+                var _foundTable = "";
+                for (var i = 0; i < _possibleTables.length; i++) {
+                  if ($.trim(_possibleTables[i]) != "" && _foundTable == "") {
+                    _foundTable = _possibleTables[i];
+                  }
+                }
+                if (_foundTable != "") {
+                  if (tableHasAlias(_foundTable)) {
+                    CodeMirror.possibleSoloField = false;
+                    CodeMirror.showHint(cm, CodeMirror.hiveQLHint);
+                  }
+                  else {
+                    getTableColumns(_foundTable,
+                            function (columns) {
+                              CodeMirror.catalogFields = columns;
+                              CodeMirror.showHint(cm, CodeMirror.hiveQLHint);
+                            });
+                  }
                 }
               }
-              if (_foundTable != "") {
-                if (tableHasAlias(_foundTable)) {
-                  CodeMirror.possibleSoloField = false;
-                  CodeMirror.showHint(cm, CodeMirror.hiveQLHint);
-                }
-                else {
-                  getTableColumns(_foundTable,
-                          function (columns) {
-                            CodeMirror.catalogFields = columns;
-                            CodeMirror.showHint(cm, CodeMirror.hiveQLHint);
-                          });
-                }
+              catch (e) {
               }
             }
-            catch (e) {
+            else {
+              CodeMirror.showHint(cm, CodeMirror.hiveQLHint);
             }
-          }
-          else {
-            CodeMirror.showHint(cm, CodeMirror.hiveQLHint);
-          }
-        });
+          });
+        }
       }
 
       CodeMirror.fromDot = false;
@@ -760,10 +769,6 @@ ${layout.menubar(section='query')}
         lineNumbers: true,
         mode: "text/x-hiveql",
         extraKeys: {
-          "Shift-Space": function () {
-            CodeMirror.fromDot = false;
-            codeMirror.execCommand("autocomplete");
-          },
           "Ctrl-Space": function () {
             CodeMirror.fromDot = false;
             codeMirror.execCommand("autocomplete");
