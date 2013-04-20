@@ -427,7 +427,7 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
 <script src="/static/ext/js/codemirror-3.11.js"></script>
 <link rel="stylesheet" href="/static/ext/css/codemirror.css">
 <script src="/static/ext/js/codemirror-pig.js"></script>
-<script src="/static/ext/js/codemirror-show-hint.js"></script>
+<script src="/static/js/Source/jHue/codemirror-show-hint.js"></script>
 <script src="/static/js/Source/jHue/codemirror-pig-hint.js"></script>
 <link rel="stylesheet" href="/static/ext/css/codemirror-show-hint.css">
 
@@ -466,10 +466,31 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
   $(document).ready(function () {
     viewModel.updateScripts();
 
+    var USER_HOME = "/user/${ user }/";
+
     var scriptEditor = $("#scriptEditor")[0];
 
-    CodeMirror.commands.autocomplete = function(cm) {
-      CodeMirror.showHint(cm, CodeMirror.pigHint);
+    CodeMirror.commands.autocomplete = function (cm) {
+      var _line = codeMirror.getLine(codeMirror.getCursor().line);
+      var _partial = _line.substring(0, codeMirror.getCursor().ch);
+      if (_partial.indexOf("'") > -1 && _partial.indexOf("'") == _partial.lastIndexOf("'") && (_partial.toLowerCase().indexOf("load") > -1 || _partial.toLowerCase().indexOf("into") > -1)) {
+        var _path = _partial.substring(_partial.lastIndexOf("'") + 1);
+        var _autocompleteUrl = "/filebrowser/view";
+        if (_path.indexOf("/") == 0) {
+          _autocompleteUrl += _path.substr(0, _path.lastIndexOf("/"));
+        }
+        else if (_path.indexOf("/") > 0) {
+          _autocompleteUrl += USER_HOME + _path.substr(0, _path.lastIndexOf("/"));
+        }
+        else {
+          _autocompleteUrl += USER_HOME;
+        }
+        showHdfsAutocomplete(_autocompleteUrl + "?format=json");
+      }
+      else {
+        CodeMirror.isPath = false;
+        CodeMirror.showHint(cm, CodeMirror.pigHint);
+      }
     }
     var codeMirror = CodeMirror(function (elt) {
       scriptEditor.parentNode.replaceChild(elt, scriptEditor);
@@ -478,8 +499,49 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
       readOnly: false,
       lineNumbers: true,
       mode: "text/x-pig",
-      extraKeys: {"Shift-Space": "autocomplete"}
+      extraKeys: {"Ctrl-Space": "autocomplete"},
+      onKeyEvent: function (e, s) {
+        if (s.type == "keyup") {
+          if (s.keyCode == 191) {
+            var _line = codeMirror.getLine(codeMirror.getCursor().line);
+            var _partial = _line.substring(0, codeMirror.getCursor().ch);
+            var _path = _partial.substring(_partial.lastIndexOf("'") + 1);
+            if (_path[0] == "/") {
+              if (_path.lastIndexOf("/") != 0) {
+                showHdfsAutocomplete("/filebrowser/view" + _partial.substring(_partial.lastIndexOf("'") + 1) + "?format=json");
+              }
+            }
+            else {
+              showHdfsAutocomplete("/filebrowser/view" + USER_HOME + _partial.substring(_partial.lastIndexOf("'") + 1) + "?format=json");
+            }
+          }
+        }
+      }
     });
+
+    function showHdfsAutocomplete(path) {
+      $.getJSON(path, function (data) {
+        CodeMirror.currentFiles = [];
+        if (data.error != null) {
+          $.jHueNotify.error(data.error);
+        }
+        else {
+          $(data.files).each(function (cnt, item) {
+            if (item.name != ".") {
+              var _ico = "icon-file-alt";
+              if (item.type == "dir") {
+                _ico = "icon-folder-close";
+              }
+              CodeMirror.currentFiles.push('<i class="' + _ico + '"></i> ' + item.name);
+            }
+          });
+          CodeMirror.isPath = true;
+          window.setTimeout(function () {
+            CodeMirror.showHint(codeMirror, CodeMirror.pigHint);
+          }, 100);  // timeout for IE8
+        }
+      });
+    }
 
     codeMirror.on("focus", function () {
       if (codeMirror.getValue() == LABELS.NEW_SCRIPT_CONTENT) {

@@ -27,7 +27,8 @@ CodeMirror.showHint = function(cm, getHints, options) {
     for (var i = 0; i < completions.length; ++i) {
       var elt = hints.appendChild(document.createElement("li"));
       elt.className = "CodeMirror-hint" + (i ? "" : " CodeMirror-hint-active");
-      elt.appendChild(document.createTextNode(completions[i]));
+      //elt.appendChild(document.createTextNode(completions[i]));
+      elt.innerHTML = completions[i];
       elt.hintId = i;
     }
     var pos = cm.cursorCoords(options.alignWithWord !== false ? data.from : null);
@@ -134,9 +135,27 @@ CodeMirror.showHint = function(cm, getHints, options) {
       cm.off("scroll", onScroll);
     }
     function pick() {
-      cm.replaceRange(completions[selectedHint], data.from, data.to);
+      var _insertion = strip(completions[selectedHint]).replace(/(?:(?:^|\n)\s+|\s+(?:$|\n))/g,'').replace(/\s+/g,' ');
+      if (CodeMirror.isPath){
+        var _curRange = cm.getRange(data.from, data.to);
+        if (_curRange.indexOf("/") > -1){
+          _insertion = _curRange.substring(0, _curRange.lastIndexOf("/") + 1) + _insertion;
+        }
+        else {
+          if (_curRange != ""){
+            _insertion = "'" + _insertion;
+          }
+        }
+      }
+      cm.replaceRange(_insertion, data.from, data.to);
       close();
     }
+    function strip(html){
+      var tmp = document.createElement("DIV");
+      tmp.innerHTML = html;
+      return tmp.textContent||tmp.innerText;
+    }
+
     var once, lastPos = cm.getCursor(), lastLen = cm.getLine(lastPos.line).length;
     function cursorActivity() {
       clearTimeout(once);

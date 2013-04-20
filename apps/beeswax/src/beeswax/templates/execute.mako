@@ -366,7 +366,7 @@ ${layout.menubar(section='query')}
 <link rel="stylesheet" href="/static/ext/css/codemirror.css">
 <script src="/static/js/Source/jHue/codemirror-hql.js"></script>
 <script src="/static/js/Source/jHue/codemirror-hql-hint.js"></script>
-<script src="/static/ext/js/codemirror-show-hint.js"></script>
+<script src="/static/js/Source/jHue/codemirror-show-hint.js"></script>
 
 <link rel="stylesheet" href="/static/ext/css/codemirror-show-hint.css">
 
