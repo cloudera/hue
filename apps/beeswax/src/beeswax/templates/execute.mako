@@ -644,7 +644,7 @@ ${layout.menubar(section='query')}
                 $.jHueNotify.error(data.error);
               }
               else {
-                $.totalStorage('columns_' + $("#id_query-database").val() + '_' + tableName, data.columns.join(" "));
+                $.totalStorage('columns_' + $("#id_query-database").val() + '_' + tableName, (data.columns ? data.columns.join(" ") : ""));
               }
             }
           });
@@ -658,7 +658,7 @@ ${layout.menubar(section='query')}
                 $.jHueNotify.error(data.error);
               }
               else {
-                $.totalStorage('columns_' + $("#id_query-database").val() + '_' + tableName, data.columns.join(" "));
+                $.totalStorage('columns_' + $("#id_query-database").val() + '_' + tableName, (data.columns ? data.columns.join(" ") : ""));
                 callback($.totalStorage('columns_' + $("#id_query-database").val() + '_' + tableName));
               }
             }
@@ -786,7 +786,7 @@ ${layout.menubar(section='query')}
               getTableColumns(_table, function (columns) {
                 var _cols = columns.split(" ");
                 for (var col in _cols){
-                  _cols[idx] = "." + _cols[idx];
+                  _cols[col] = "." + _cols[col];
                 }
                 CodeMirror.catalogFields = _cols.join(" ");
                 CodeMirror.fromDot = true;
