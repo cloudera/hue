@@ -421,16 +421,6 @@ code {
     padding:0;
 }
 
-.folder {
-    background: url(../images/folder.png) no-repeat left center;
-    padding-left:20px;
-}
-
-.file {
-    background: url(../images/file.png) no-repeat left center;
-    padding-left:20px;
-}
-
 .contextMenu {
     display:none;
 }

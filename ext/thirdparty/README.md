@@ -11,7 +11,6 @@ Checked-in third party dependencies
 |Y|Avro|1.5.0|ASL2|http://avro.apache.org/|
 |Y|Beaker|1.4.2|BSD|http://beaker.groovie.org/|
 |Y|CherryPy|3.1.2|BSD|http://www.cherrypy.org/|
-|Y|Clientcide|?|MIT|http://www.clientcide.com/js|
 |Y|ConfigObj|4.6.0|BSD|http://www.voidspace.org.uk/python/configobj.html|
 |Y|ctypes|1.0.2|MIT|http://pypi.python.org/pypi/ctypes|
 |Y|Django|1.2.3|BSD|http://www.djangoproject.com/download/1.2.3/tarball/|
@@ -23,7 +22,6 @@ Checked-in third party dependencies
 |Y|elementtree|1.2.6-20050316|Python(MIT)|http://effbot.org/downloads#elementtree|
 |Y|enum|0.4.4|Python|http://pypi.python.org/pypi/enum/|
 |Y|eventlet|0.9.14|MIT|http://pypi.python.org/pypi/eventlet/|
-|Y|FancyUpload|3.0|MIT|http://github.com/digitarald/digitarald-fancyupload/tarball/3.0|
 |Y|greenlet|0.3.1|MIT|http://pypi.python.org/pypi/greenlet/|
 |Y|kerberos|1.1.1|ASL2|http://pypi.python.org/pypi/kerberos|
 |Y|lockfile|0.8|MIT|http://smontanaro.dyndns.org/python/lockfile-0.8.tar.gz|
@@ -42,7 +40,6 @@ Checked-in third party dependencies
 |Y|Python-paste|1.7.2|MIT|http://pythonpaste.org|
 |Y|pytidylib|0.2.1|MIT|http://cloud.github.com/downloads/countergram/pytidylib/pytidylib-0.2.1.tar.gz|
 |Y|PyYAML|3.09|MIT|http://pyyaml.org/wiki/PyYAML|
-|Y|Raphael|MIT|http://raphaeljs.com/index.html|
 |Y|Shakespeares Sonnets|?|Public Domain from Gutenberg|http://www.gutenberg.org/dirs/etext97/wssnt10.txt|
 |Y|sasl|0.1.1|Apache|http://pypi.python.org/pypi/sasl/0.1.1|
 |Y|simplejson|2.0.9|MIT|http://pypi.python.org/packages/source/s/simplejson/simplejson-2.0.9.tar.gz|

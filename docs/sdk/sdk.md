@@ -809,7 +809,7 @@ Icons
 -----
 
 You should create an icon for your application that is a transparent png sized
-55px by 55px. Your `settings.py` file should point to your icon via the `ICON`
+24px by 24px. Your `settings.py` file should point to your icon via the `ICON`
 variable. The `create_desktop_app` command creates a default icon for you.
 
 <div class="note">
@@ -817,28 +817,12 @@ variable. The `create_desktop_app` command creates a default icon for you.
   in the navigation bar.
 </div>
 
-Hue includes a selection of around 1,500 small 16px by 16px icons that can be
-useful when making links that perform actions. These are open source icons that
-you can use in your own applications as you like. You can find these in
-*desktop/core/static/art/icons/* and *desktop/core/static/art/led-icons/* and
-you can style your elements to use them like this (in your css file):
+Hue ships with Twitter Bootstrap and Font Awesome 3 (http://fortawesome.github.io/Font-Awesome/)
+so you have plenty of scalable icons to choose from. You can style your elements to use them
+like this (in your mako template):
 
-    /* show an add icon next to the text of the link: */
-    .calculator a.add {
-      background: url(/static/art/icons/add.png) no-repeat 1px 0px;
-      display: block;
-      height: 18px;
-      padding-left: 22px;
-    }
-    /* or hide the link text and show only the icon: */
-    .calculator a.add {
-      background: url(/static/art/icons/add.png) no-repeat 1px 0px;
-      display: block;
-      height: 16px;
-      width: 16px
-      text-indent: -200px; /* this pushes the text out of view, leaving only the icon */
-      overflow: hidden;
-    }
+    <!-- show a trash icon in a link -->
+    <a href="#something"><i class="icon-trash"></i> Trash</a>
 
 Adding Interactive Elements to Your UI
 --------------------------------------
