@@ -41,7 +41,7 @@ ${ layout.menubar(section='history') }
     </a>
     % else:
     ## TODO (bc/nutron): Shouldn't be able to edit someone else's design. Let user clone instead.
-    <a href="${ url(app_name + ':clone_design', design_id=design.id) }" title="${_('Copy this query.')}">${_('Clone')}</a>
+    <a href="${ url(app_name + ':clone_design', design_id=design.id) }" title="${_('Copy this query.')}">${_('Copy')}</a>
     % endif
   % else:
     [ ${_('Auto generated action')} ]
