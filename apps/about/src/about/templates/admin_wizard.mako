@@ -47,8 +47,6 @@ ${ commonheader(_('About Hue'), "quick_start", user, "100px") | n,unicode }
 
   % if user.is_superuser:
   <br/>
-  <br/>
-  <br/>
 
   <div class="row-fluid">
    <div id="properties" class="section">
@@ -56,13 +54,18 @@ ${ commonheader(_('About Hue'), "quick_start", user, "100px") | n,unicode }
       <li class="active"><a href="#step1" class="step">${ _('Step 1:') } <i class="icon-cogs"></i> ${ _('Check Configuration') }</a></li>
       <li><a href="#step2" class="step">${ _('Step 2:') } <i class="icon-book"></i> ${ _('Examples') }</a></li>
       <li><a href="#step3" class="step">${ _('Step 3:') } <i class="icon-group"></i> ${ _('Users') }</a></li>
-      <li><a id="lastStep" href="${ url('desktop.views.home') }" class="step">${ _('Step 4:') } <i class="icon-flag"></i> ${_('Go !') }</a></li>
+      <li><a id="lastStep" href="#step4" class="step">${ _('Step 4:') } <i class="icon-flag"></i> ${_('Go !') }</a></li>
     </ul>
 
     <div class="steps" >
       <div id="step1" class="stepDetails">
       <div class="widget-box">
-
+        <div class="widget-title">
+          <span class="icon">
+            <i class="icon-th-list"></i>
+          </span>
+          <h5>${ _('Check your current configuration') }</h5>
+        </div>
         <div class="widget-content">
           ${ check_config.content | n,unicode }
         </div>
@@ -134,7 +137,7 @@ ${ commonheader(_('About Hue'), "quick_start", user, "100px") | n,unicode }
     </div>
   </div>
 
-    <div class="form-actions">
+    <div class="form-actions" style="position:fixed;bottom:0;margin:0;margin-left:-20px;width:100%">
       <a id="backBtn" class="btn disabled">${ _('Back') }</a>
       <a id="nextBtn" class="btn btn-primary disable-feedback">${ _('Next') }</a>
     </div>
@@ -145,8 +148,8 @@ ${ commonheader(_('About Hue'), "quick_start", user, "100px") | n,unicode }
 % if user.is_superuser:
 <style type="text/css">
   .steps {
-    min-height: 400px;
-    padding-top: 20px;
+    min-height: 300px;
+    margin-bottom: 80px;
   }
 
   input[type=submit] {
