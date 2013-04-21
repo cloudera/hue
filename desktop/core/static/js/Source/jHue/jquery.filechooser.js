@@ -139,16 +139,16 @@
                 $(data.files).each(function (cnt, file) {
                     var _f = $("<li>");
                     var _flink = $("<a>");
-                    _flink.attr("href", "javascript:void(0)").text(file.name).appendTo(_f);
+                    _flink.attr("href", "javascript:void(0)").text(" " + file.name).appendTo(_f);
                     if (file.type == "dir") {
-                        _f.addClass("folder");
+                        $("<i class='icon-folder-close'></i>").prependTo(_flink);
                         _f.click(function () {
                             _parent.options.onFolderChange(file.path);
                             _parent.navigateTo(file.path);
                         });
                     }
                     if (file.type == "file") {
-                        _f.addClass("file");
+                        $("<i class='icon-file-alt'></i>").prependTo(_flink);
                         _f.click(function () {
                             _parent.options.onFileChoose(file.path);
                         });
