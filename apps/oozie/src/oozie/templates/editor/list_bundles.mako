@@ -34,7 +34,7 @@ ${ layout.menubar(section='bundles') }
   <%actionbar:render>
     <%def name="actions()">
         <button class="btn toolbarBtn" id="submit-btn" disabled="disabled"><i class="icon-play"></i> ${ _('Submit') }</button>
-        <button class="btn toolbarBtn" id="clone-btn" disabled="disabled"><i class="icon-retweet"></i> ${ _('Clone') }</button>
+        <button class="btn toolbarBtn" id="clone-btn" disabled="disabled"><i class="icon-retweet"></i> ${ _('Copy') }</button>
         <div id="delete-dropdown" class="btn-group" style="display: inline">
           <button id="delete-btn" class="btn toolbarBtn dropdown-toggle" title="${_('Delete')}" data-toggle="dropdown" disabled="disabled">
             <i class="icon-remove"></i> ${_('Delete')}

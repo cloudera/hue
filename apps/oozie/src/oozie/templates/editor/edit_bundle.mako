@@ -79,7 +79,7 @@ ${ layout.menubar(section='bundles') }
               </li>
               <li>
                 <a id="clone-btn" href="javascript:void(0)" data-clone-url="${ url('oozie:clone_bundle', bundle=bundle.id) }"
-                   title="${ _('Clone this bundle') }" rel="tooltip" data-placement="right"><i class="icon-retweet"></i> ${ _('Clone') }
+                   title="${ _('Copy this bundle') }" rel="tooltip" data-placement="right"><i class="icon-retweet"></i> ${ _('Copy') }
                 </a>
              </li>
           % endif
