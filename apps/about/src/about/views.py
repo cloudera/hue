@@ -15,9 +15,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+try:
+  import json
+except ImportError:
+  import simplejson as json
+
 from django.conf import settings
+from django.http import HttpResponse
+from django.utils.translation import ugettext as _
 
 from desktop.lib.django_util import render
+from desktop.models import Settings
 from desktop.views import check_config
 from desktop import appmanager
 
@@ -33,3 +41,16 @@ def admin_wizard(request):
       'app_names': app_names,
   })
 
+
+def collect_usage(request):
+  response = {'status': -1, 'data': ''}
+
+  if request.method == 'POST':
+    settings, created = Settings.objects.get_or_create(id=1)
+    settings.usage_collection = request.POST.get('analytics')
+    settings.save()
+    response['status'] = 0
+  else:
+    response['data'] = _('POST request required.')
+      
+  return HttpResponse(json.dumps(response), mimetype="application/json")

@@ -14,14 +14,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""
-Extra models related to Desktop users.
-"""
+
 from django.db import models
 from django.contrib.auth import models as auth_models
+
 
 class UserPreferences(models.Model):
   """Holds arbitrary key/value strings."""
   user = models.ForeignKey(auth_models.User)
   key = models.CharField(max_length=20)
   value = models.TextField(max_length=4096)
+
+
+class Settings(models.Model):
+  usage_collection = models.BooleanField(db_index=True, default=True)
