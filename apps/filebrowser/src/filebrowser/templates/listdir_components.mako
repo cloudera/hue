@@ -814,7 +814,7 @@ from django.utils.translation import ugettext as _
     });
 
     function resetActionbar() {
-      $(".actionbar").attr("style", "");
+      $(".actionbar").attr("style", "min-width: 1190px");
       $(".actionbar").data("originalWidth", $(".actionbar").width());
       $(".actionbarGhost").addClass("hide");
     }
