@@ -726,30 +726,35 @@ ${layout.menubar(section='query')}
             }
             CodeMirror.possibleSoloField = false;
             if (_before.toUpperCase().indexOf("SELECT ") > -1 && _before.toUpperCase().indexOf(" FROM ") == -1 && !CodeMirror.fromDot) {
-              CodeMirror.possibleSoloField = true;
-              try {
-                var _possibleTables = $.trim(codeMirror.getValue().substr(codeMirror.getValue().toUpperCase().indexOf("FROM") + 4)).split(" ");
-                var _foundTable = "";
-                for (var i = 0; i < _possibleTables.length; i++) {
-                  if ($.trim(_possibleTables[i]) != "" && _foundTable == "") {
-                    _foundTable = _possibleTables[i];
+              if (codeMirror.getValue().toUpperCase().indexOf("FROM") > -1) {
+                CodeMirror.possibleSoloField = true;
+                try {
+                  var _possibleTables = $.trim(codeMirror.getValue().substr(codeMirror.getValue().toUpperCase().indexOf("FROM") + 4)).split(" ");
+                  var _foundTable = "";
+                  for (var i = 0; i < _possibleTables.length; i++) {
+                    if ($.trim(_possibleTables[i]) != "" && _foundTable == "") {
+                      _foundTable = _possibleTables[i];
+                    }
+                  }
+                  if (_foundTable != "") {
+                    if (tableHasAlias(_foundTable)) {
+                      CodeMirror.possibleSoloField = false;
+                      CodeMirror.showHint(cm, CodeMirror.hiveQLHint);
+                    }
+                    else {
+                      getTableColumns(_foundTable,
+                              function (columns) {
+                                CodeMirror.catalogFields = columns;
+                                CodeMirror.showHint(cm, CodeMirror.hiveQLHint);
+                              });
+                    }
                   }
                 }
-                if (_foundTable != "") {
-                  if (tableHasAlias(_foundTable)) {
-                    CodeMirror.possibleSoloField = false;
-                    CodeMirror.showHint(cm, CodeMirror.hiveQLHint);
-                  }
-                  else {
-                    getTableColumns(_foundTable,
-                            function (columns) {
-                              CodeMirror.catalogFields = columns;
-                              CodeMirror.showHint(cm, CodeMirror.hiveQLHint);
-                            });
-                  }
+                catch (e) {
                 }
               }
-              catch (e) {
+              else {
+                CodeMirror.showHint(cm, CodeMirror.hiveQLHint);
               }
             }
             else {
@@ -783,17 +788,19 @@ ${layout.menubar(section='query')}
               var _line = codeMirror.getLine(codeMirror.getCursor().line);
               var _partial = _line.substring(0, codeMirror.getCursor().ch);
               var _table = _partial.substring(_partial.lastIndexOf(" ") + 1, _partial.length - 1);
-              getTableColumns(_table, function (columns) {
-                var _cols = columns.split(" ");
-                for (var col in _cols){
-                  _cols[col] = "." + _cols[col];
-                }
-                CodeMirror.catalogFields = _cols.join(" ");
-                CodeMirror.fromDot = true;
-                window.setTimeout(function () {
-                  codeMirror.execCommand("autocomplete");
-                }, 100);  // timeout for IE8
-              });
+              if (codeMirror.getValue().toUpperCase().indexOf("FROM") > -1) {
+                getTableColumns(_table, function (columns) {
+                  var _cols = columns.split(" ");
+                  for (var col in _cols){
+                    _cols[col] = "." + _cols[col];
+                  }
+                  CodeMirror.catalogFields = _cols.join(" ");
+                  CodeMirror.fromDot = true;
+                  window.setTimeout(function () {
+                    codeMirror.execCommand("autocomplete");
+                  }, 100);  // timeout for IE8
+                });
+              }
             }
           }
         }

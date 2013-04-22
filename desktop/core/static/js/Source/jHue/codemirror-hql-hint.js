@@ -71,6 +71,10 @@
   var hiveQLKeywordsU = hiveQLKeywords.split(" ");
   var hiveQLKeywordsL = hiveQLKeywords.toLowerCase().split(" ");
 
+  var hiveQLKeywordsAfterTables = "JOIN ON WHERE";
+  var hiveQLKeywordsAfterTablesU = hiveQLKeywordsAfterTables.split(" ");
+  var hiveQLKeywordsAfterTablesL = hiveQLKeywordsAfterTables.toLowerCase().split(" ");
+
   var hiveQLTypes = "TINYINT SMALLINT INT BIGINT BOOLEAN FLOAT DOUBLE STRING BINARY TIMESTAMP DECIMAL ARRAY MAP STRUCT UNIONTYPE DELIMITED SERDE SEQUENCEFILE TEXTFILE RCFILE INPUTFORMAT OUTPUTFORMAT";
   var hiveQLTypesU = hiveQLTypes.split(" ");
   var hiveQLTypesL = hiveQLTypes.toLowerCase().split(" ");
@@ -108,8 +112,14 @@
           forEach(hiveQLTypesL, maybeAdd);
           forEach(hiveQLKeywordsU, maybeAdd);
           forEach(hiveQLKeywordsL, maybeAdd);
+
         }
-        forEach(catalogTablesL, maybeAdd);
+        else {
+          forEach(catalogTablesL, maybeAddToExtra);
+          forEach(hiveQLKeywordsAfterTablesU, maybeAdd);
+          forEach(hiveQLKeywordsAfterTablesL, maybeAdd);
+        }
+
       }
     }
 
@@ -123,6 +133,6 @@
         base = base[context.pop().string];
       if (base != null) gatherCompletions(base);
     }
-    return extraFound.concat(found.sort());
+    return extraFound.sort().concat(found.sort());
   }
 })();
