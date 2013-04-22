@@ -365,7 +365,11 @@ ${layout.menubar(section='query')}
 <script src="/static/ext/js/codemirror-3.11.js"></script>
 <link rel="stylesheet" href="/static/ext/css/codemirror.css">
 <script src="/static/js/Source/jHue/codemirror-hql.js"></script>
-<script src="/static/js/Source/jHue/codemirror-hql-hint.js"></script>
+% if app_name == 'impala':
+  <script src="/static/js/Source/jHue/codemirror-isql-hint.js"></script>
+% else:
+  <script src="/static/js/Source/jHue/codemirror-hql-hint.js"></script>
+% endif
 <script src="/static/js/Source/jHue/codemirror-show-hint.js"></script>
 
 <link rel="stylesheet" href="/static/ext/css/codemirror-show-hint.css">
@@ -711,9 +715,15 @@ ${layout.menubar(section='query')}
 
       getTables(function(){}); //preload tables for current DB
 
+      % if app_name == 'impala':
+        var AUTOCOMPLETE_SET = CodeMirror.impalaSQLHint;
+      % else:
+        var AUTOCOMPLETE_SET = CodeMirror.hiveQLHint;
+      % endif
+
       CodeMirror.commands.autocomplete = function (cm) {
         if ($.totalStorage('tables_' + $("#id_query-database").val()) == null) {
-          CodeMirror.showHint(cm, CodeMirror.hiveQLHint);
+          CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
           getTables(function () {}); // if preload didn't work, tries again
         }
         else {
@@ -739,13 +749,13 @@ ${layout.menubar(section='query')}
                   if (_foundTable != "") {
                     if (tableHasAlias(_foundTable)) {
                       CodeMirror.possibleSoloField = false;
-                      CodeMirror.showHint(cm, CodeMirror.hiveQLHint);
+                      CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
                     }
                     else {
                       getTableColumns(_foundTable,
                               function (columns) {
                                 CodeMirror.catalogFields = columns;
-                                CodeMirror.showHint(cm, CodeMirror.hiveQLHint);
+                                CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
                               });
                     }
                   }
@@ -758,7 +768,7 @@ ${layout.menubar(section='query')}
               }
             }
             else {
-              CodeMirror.showHint(cm, CodeMirror.hiveQLHint);
+              CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
             }
           });
         }
