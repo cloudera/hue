@@ -23,6 +23,7 @@ import time
 import traceback
 import zipfile
 
+from django.conf import settings
 from django.shortcuts import render_to_response
 from django.http import HttpResponse
 from django.core.urlresolvers import reverse
@@ -315,7 +316,11 @@ def commonfooter(messages=None):
   """
   if messages is None:
     messages = {}
-  return render_to_string("common_footer.html", {'messages': messages})
+  return render_to_string("common_footer.html", {
+    'messages': messages,
+    'version': settings.HUE_DESKTOP_VERSION,
+    'display_analytics': True
+  })
 
 
 # If the app's conf.py has a config_validator() method, call it.
