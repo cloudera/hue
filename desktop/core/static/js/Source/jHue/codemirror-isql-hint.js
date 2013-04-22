@@ -39,7 +39,7 @@
     // If it's not a 'word-style' or dot token, ignore the token.
     if (!/^[\.\w$_]*$/.test(token.string)) {
       token = tprop = {start: cur.ch, end: cur.ch, string: "", state: token.state,
-        className: token.string == "." ? "hiveql-type" : null};
+        className: token.string == "." ? "impalasql-type" : null};
     }
 
     if (!context) var context = [];
@@ -61,27 +61,27 @@
   CodeMirror.possibleTable = false;
   CodeMirror.possibleSoloField = false;
 
-  CodeMirror.hiveQLHint = function (editor) {
-    return scriptHint(editor, hiveQLKeywordsU, function (e, cur) {
+  CodeMirror.impalaSQLHint = function (editor) {
+    return scriptHint(editor, impalaSQLKeywordsU, function (e, cur) {
       return e.getTokenAt(cur);
     });
   };
 
-  var hiveQLKeywords = "ADD AFTER ALL ALTER AND ARCHIVE AS ASC BETWEEN BUCKET BUCKETS BY CASCADE CHANGE CLI CLUSTER CLUSTERED COALESCE COLLECTION COLUMN COLUMNS COMMENT CREATE CROSS DATA DATABASE DATABASES DBPROPERTIES DEFERRED DELIMITED DEPENDENCY DESC DESCRIBE DIRECTORY DISABLE DISTINCT DISTRIBUTE DOT DROP ENABLE ESCAPED EXISTS EXPLAIN EXPORT EXTENDED EXTERNAL FIELDS FILEFORMAT FIRST FORMAT FORMATTED FROM FULL FUNCTION FUNCTIONS GRANT GROUP HAVING IDXPROPERTIES IF IGNORE IMPORT IN INDEX INDEXES INPATH INSERT INTO IS ITEMS JOIN KEYS LATERAL LEFT LIKE LIMIT LINES LOAD LOCAL LOCATION LOCKS MAP MAPJOIN MSCK NOT OF OFFLINE ON OPTION ORDER OUT OUTER OVERWRITE PARTITION PARTITIONED PARTITIONS PERCENT PRIVILEGES PROTECTION REBUILD RECORDREADER RECOVER REDUCE REGEXP RENAME REPAIR REPLACE RESTRICT REVOKE RIGHT RLIKE ROLE ROW SCHEMA SCHEMAS SELECT SEMI SEPARATED SERDE SERDEPROPERTIES SET SHOW SKEWED SORT SORTED STORED SUM TABLE TABLES TABLESAMPLE TBLPROPERTIES TEMPORARY TERMINATED TO TOUCH TRANSFORM TRUNCATE UNARCHIVE UNION US USER USING VIEW WHERE WITH";
-  var hiveQLKeywordsU = hiveQLKeywords.split(" ");
-  var hiveQLKeywordsL = hiveQLKeywords.toLowerCase().split(" ");
+  var impalaSQLKeywords = "ALL AND AS BY COMMENT CREATE DATABASE DATABASES DELIMITED DESCRIBE DISTINCT DROP EXISTS EXPLAIN EXTERNAL FIELDS FORMAT FROM GROUP HAVING IF INSERT INTO JOIN LIKE LIMIT LINES LOCATION NOT OR ORDER OVERWRITE PARTITIONED REFRESH ROW SCHEMA SCHEMAS SELECT SHOW STORED TABLE TABLES TERMINATED UNION USE WHERE";
+  var impalaSQLKeywordsU = impalaSQLKeywords.split(" ");
+  var impalaSQLKeywordsL = impalaSQLKeywords.toLowerCase().split(" ");
 
-  var hiveQLKeywordsAfterTables = "JOIN ON WHERE";
-  var hiveQLKeywordsAfterTablesU = hiveQLKeywordsAfterTables.split(" ");
-  var hiveQLKeywordsAfterTablesL = hiveQLKeywordsAfterTables.toLowerCase().split(" ");
+  var impalaSQLKeywordsAfterTables = "JOIN ON WHERE";
+  var impalaSQLKeywordsAfterTablesU = impalaSQLKeywordsAfterTables.split(" ");
+  var impalaSQLKeywordsAfterTablesL = impalaSQLKeywordsAfterTables.toLowerCase().split(" ");
 
-  var hiveQLTypes = "TINYINT SMALLINT INT BIGINT BOOLEAN FLOAT DOUBLE STRING BINARY TIMESTAMP DECIMAL ARRAY MAP STRUCT UNIONTYPE DELIMITED SERDE SEQUENCEFILE TEXTFILE RCFILE INPUTFORMAT OUTPUTFORMAT";
-  var hiveQLTypesU = hiveQLTypes.split(" ");
-  var hiveQLTypesL = hiveQLTypes.toLowerCase().split(" ");
+  var impalaSQLTypes = "TINYINT SMALLINT INT BIGINT BOOLEAN FLOAT DOUBLE STRING TIMESTAMP PARQUETFILE SEQUENCEFILE TEXTFILE RCFILE";
+  var impalaSQLTypesU = impalaSQLTypes.split(" ");
+  var impalaSQLTypesL = impalaSQLTypes.toLowerCase().split(" ");
 
-  var hiveQLBuiltins = "ROUND FLOOR CEIL CEILING RAND EXP LN LOG10 LOG2 LOG POW POWER SQRT BIN HEX UNHEX CONV ABS PMOD SIN ASIN COS ACOS TAN ATAN DEGREES RADIANS POSITIVE NEGATIVE SIGN E PI SIZE MAP_KEYS MAP_VALUES ARRAY_CONTAINS SORT_ARRAY BINARY CAST FROM_UNIXTIME UNIX_TIMESTAMP TO_DATE YEAR MONTH DAY HOUR MINUTE SECOND WEEKOFYEAR DATEDIFF DATE_ADD DATE_SUB FROM_UTC_TIMESTAMP TO_UTC_TIMESTAMP ASCII CONCAT CONTEXT_NGRAMS CONCAT_WS FIND_IN_SET FORMAT_NUMBER GET_JSON_OBJECT IN_FILE INSTR LENGTH LOCATE LOWER LCASE LPAD LTRIM NGRAMS PARSE_URL PRINTF REGEXP_EXTRACT REGEXP_REPLACE REPEAT REVERSE RPAD RTRIM SENTENCES SPACE SPLIT STR_TO_MAP SUBSTR SUBSTRING TRANSLATE TRIM UPPER UCASE JAVA_METHOD REFLECT XPATH XPATH_SHORT XPATH_INT XPATH_LONG XPATH_FLOAT XPATH_DOUBLE XPATH_NUMBER XPATH_STRING COUNT SUM AVG MIN MAX VARIANCE VAR_SAMP STDEV_POP STDEV_SAMP COVAR_POP COVAR_SAMP CORR PERCENTILE PERCENTILE_APPROX HISTOGRAM_NUMERIC COLLECT_SET INLINE EXPLODE JSON_TUPLE PARSE_URL_TUPLE GET_JSON_OBJECT";
-  var hiveQLBuiltinsU = hiveQLBuiltins.split(" ").join("() ").split(" ");
-  var hiveQLBuiltinsL = hiveQLBuiltins.toLowerCase().split(" ").join("() ").split(" ");
+  var impalaSQLBuiltins = "COUNT SUM CAST LIKE IN BETWEEN COALESCE";
+  var impalaSQLBuiltinsU = impalaSQLBuiltins.split(" ").join("() ").split(" ");
+  var impalaSQLBuiltinsL = impalaSQLBuiltins.toLowerCase().split(" ").join("() ").split(" ");
 
   function getCompletions(token, context) {
     var catalogTablesL = CodeMirror.catalogTables.toLowerCase().split(" ");
@@ -106,18 +106,17 @@
           if (CodeMirror.possibleSoloField) {
             forEach(catalogFieldsL, maybeAddToExtra);
           }
-          forEach(hiveQLBuiltinsU, maybeAdd);
-          forEach(hiveQLBuiltinsL, maybeAdd);
-          forEach(hiveQLTypesU, maybeAdd);
-          forEach(hiveQLTypesL, maybeAdd);
-          forEach(hiveQLKeywordsU, maybeAdd);
-          forEach(hiveQLKeywordsL, maybeAdd);
-
+          forEach(impalaSQLBuiltinsU, maybeAdd);
+          forEach(impalaSQLBuiltinsL, maybeAdd);
+          forEach(impalaSQLTypesU, maybeAdd);
+          forEach(impalaSQLTypesL, maybeAdd);
+          forEach(impalaSQLKeywordsU, maybeAdd);
+          forEach(impalaSQLKeywordsL, maybeAdd);
         }
         else {
           forEach(catalogTablesL, maybeAddToExtra);
-          forEach(hiveQLKeywordsAfterTablesU, maybeAdd);
-          forEach(hiveQLKeywordsAfterTablesL, maybeAdd);
+          forEach(impalaSQLKeywordsAfterTablesU, maybeAdd);
+          forEach(impalaSQLKeywordsAfterTablesL, maybeAdd);
         }
       }
     }
