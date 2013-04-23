@@ -77,6 +77,30 @@ def get_default_mrcluster():
       return candidates.values()[0]
     return None
 
+def get_next_ha_mrcluster():
+  """
+  Return the next available JT instance or None
+  
+  This method currently works for distincting between active/standby JT as a standby JT does not respond.
+  A cleaner but more complicated way would be to do something like the MRHAAdmin tool and
+  org.apache.hadoop.ha.HAServiceStatus#getServiceStatus().
+  """
+  candidates = all_mrclusters()
+
+  for name in conf.MR_CLUSTERS.keys():
+    config = conf.MR_CLUSTERS[name]
+    if config.SUBMIT_TO.get():
+      try:
+        jt = candidates[name]
+        status = jt.cluster_status()
+        if status.stateAsString == 'RUNNING':
+          return (config, jt)
+        else:
+          LOG.info('JobTracker %s is not RUNNING, skipping it: %s' % (name, status))
+      except Exception, ex:
+        LOG.info('JobTracker %s is not available, skipping it: %s' % (name, ex))
+  return None
+
 def get_mrcluster(identifier="default"):
   global MR_CACHE
   all_mrclusters()
@@ -95,16 +119,21 @@ def get_cluster_conf_for_job_submission():
   """
   Check the `submit_to' for each MR/Yarn cluster, and return the
   config section of first one that enables submission.
+
+  HA support for MR1.
   """
   for name in conf.YARN_CLUSTERS.keys():
     yarn = conf.YARN_CLUSTERS[name]
     if yarn.SUBMIT_TO.get():
       return yarn
-  for name in conf.MR_CLUSTERS.keys():
-    mr = conf.MR_CLUSTERS[name]
-    if mr.SUBMIT_TO.get():
-      return mr
-  return None
+
+  mr = get_next_ha_mrcluster()
+
+  if mr is not None:
+    config, jt = mr
+    return config
+  else:
+    return None
 
 def get_cluster_addr_for_job_submission():
   """

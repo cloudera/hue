@@ -242,6 +242,7 @@
   # Configuration for HDFS NameNode
   # ------------------------------------------------------------------------
   [[hdfs_clusters]]
+    # HA support by using HttpFs
 
     [[[default]]]
       # Enter the filesystem uri
@@ -269,6 +270,7 @@
   # Configuration for MapReduce JobTracker
   # ------------------------------------------------------------------------
   [[mapred_clusters]]
+    # HA support by specifying multiple configs
 
     [[[default]]]
       # Enter the host on which you are running the Hadoop JobTracker
