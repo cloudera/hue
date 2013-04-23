@@ -18,7 +18,7 @@
 import logging
 
 from desktop.lib.paginator import Paginator
-
+from django.utils.functional import wraps
 from hadoop import cluster
 from hadoop.api.jobtracker.ttypes import ThriftJobPriority, TaskTrackerNotFoundException, ThriftJobState
 
@@ -30,6 +30,7 @@ import hadoop.yarn.node_manager_api as node_manager_api
 from jobbrowser.conf import SHARE_JOBS
 from jobbrowser.models import Job, JobLinkage, TaskList, Tracker
 from jobbrowser.yarn_models import Application, Job as YarnJob, Container
+from hadoop.cluster import get_next_ha_mrcluster
 
 
 LOG = logging.getLogger(__name__)
@@ -44,6 +45,26 @@ def get_api(user, jt):
     return JtApi(jt)
 
 
+def jt_ha(funct):
+  """
+  Support JT plugin HA by trying other MR cluster.
+
+  This modifies the cached JT and so will happen just once by failover.
+  """
+  def decorate(api, *args, **kwargs):
+    try:
+      return funct(api, *args, **kwargs)
+    except Exception, ex:
+      if 'Could not connect to' in str(ex):
+        LOG.info('JobTracker not available, trying JT plugin HA: %s.' % ex)
+        jt_ha = get_next_ha_mrcluster()
+        if jt_ha is not None:
+          config, api.jt = jt_ha
+          return funct(api, *args, **kwargs)
+      raise ex
+  return wraps(funct)(decorate)
+
+
 class JobBrowserApi(object):
 
   def paginate_task(self, task_list, pagenum):
@@ -55,12 +76,15 @@ class JtApi(JobBrowserApi):
   def __init__(self, jt):
     self.jt = jt
 
+  @jt_ha
   def get_job_link(self, jobid):
     return JobLinkage(self.jt, jobid)
 
+  @jt_ha
   def get_job(self, jobid):
     return Job.from_id(jt=self.jt, jobid=jobid)
 
+  @jt_ha
   def get_jobs(self, user, **kwargs):
     """
     Returns an array of jobs where the returned
@@ -94,6 +118,7 @@ class JtApi(JobBrowserApi):
 
     return self.filter_jobs(user, jobs, **kwargs)
 
+  @jt_ha
   def filter_jobs(self, user, jobs, **kwargs):
     check_permission = not SHARE_JOBS.get() and not user.is_superuser
 
@@ -132,6 +157,7 @@ class JtApi(JobBrowserApi):
 
     return filter(predicate, jobs)
 
+  @jt_ha
   def get_tasks(self, jobid, **filters):
     return TaskList.select(self.jt,
                            jobid,
@@ -141,6 +167,7 @@ class JtApi(JobBrowserApi):
                            _DEFAULT_OBJ_PER_PAGINATION,
                            _DEFAULT_OBJ_PER_PAGINATION * (filters['pagenum'] - 1))
 
+  @jt_ha
   def get_tracker(self, trackerid):
     return Tracker.from_name(self.jt, trackerid)
 
