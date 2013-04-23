@@ -144,7 +144,7 @@ def delete_design(request, design_id):
     raise StructuredException(code="NOT_FOUND", message=_('Could not find design %s.') % design_id, error_code=404)
 
   return render_json({
-    status: 0
+    'status': 0
   })
 
 
@@ -164,7 +164,7 @@ def restore_design(request, design_id):
     raise StructuredException(code="NOT_FOUND", message=_('Could not find design %s.') % design_id, error_code=404)
 
   return render_json({
-    status: 0
+    'status': 0
   })
 
 
