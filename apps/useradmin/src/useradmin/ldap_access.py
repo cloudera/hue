@@ -93,7 +93,7 @@ class LdapConnection(object):
     if find_by_dn:
       search_dn = re.sub(r'(\w+=)', lambda match: match.group(0).upper(), name)
 
-      if not search_dn.endswith(re.sub(r'(\w+=)', lambda match: match.group(0).upper(), base_dn)):
+      if not search_dn.upper().endswith(base_dn.upper()):
         raise RuntimeError("Distinguished Name provided does not contain configured Base DN. Base DN: %(base_dn)s, DN: %(dn)s" % {
           'base_dn': base_dn,
           'dn': search_dn
