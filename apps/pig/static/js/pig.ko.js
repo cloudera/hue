@@ -272,18 +272,22 @@ var PigViewModel = function (props) {
     }));
   }
 
-  self.showSubmissionModal = function showSubmissionModal() {
+  self.runOrShowSubmissionModal = function runOrShowSubmissionModal() {
     var script = self.currentScript();
-    self.submissionVariables.removeAll();
-    $.each(script.getParameters(), function (key, value) {
-      self.submissionVariables.push({'name': key, 'value': value});
-    });
-    $("#runScriptBtn").button("reset");
-    $("#runScriptBtn").attr("data-loading-text", $("#runScriptBtn").text() + " ...");
-    $("#submitModal").modal({
-      keyboard: true,
-      show: true
-    });
+    if (script.getParameters().length > 0) {
+      self.submissionVariables.removeAll();
+      $.each(script.getParameters(), function (key, value) {
+        self.submissionVariables.push({'name': key, 'value': value});
+      });
+      $("#runScriptBtn").button("reset");
+      $("#runScriptBtn").attr("data-loading-text", $("#runScriptBtn").text() + " ...");
+      $("#submitModal").modal({
+        keyboard: true,
+        show: true
+      });
+    } else {
+      self.runScript();
+    }
   };
 
   self.showStopModal = function showStopModal() {
