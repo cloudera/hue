@@ -62,14 +62,14 @@ def index(request):
     solr_query['start'] = search_form.cleaned_data['start'] or 0
     solr_query['facets'] = search_form.cleaned_data['facets'] or 1
 
-    hue_core = Core.objects.get_or_create(name=core)
-
     try:
+      hue_core = Core.objects.get_or_create(name=core)
       response = SolrApi(SOLR_URL.get()).query(solr_query, hue_core)
     except Exception, e:
       error['message'] = unicode(str(e), "utf8")
   else:
     core = cores['status'].keys()[0]
+    hue_core = Core.objects.get_or_create(name=core)
 
   return render('search.mako', request, {
     'search_form': search_form,
@@ -78,7 +78,7 @@ def index(request):
     'solr_query': solr_query,
     'hue_core': hue_core,
     'hue_cores': hue_cores,
-    'current_core': request.GET and request.GET.get('collection', core),
+    'current_core': core,
     'json': json,
   })
 
