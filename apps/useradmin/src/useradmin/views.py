@@ -543,13 +543,13 @@ def _import_ldap_groups(groupname_pattern, import_members=False, recursive_impor
       users = []
 
       if import_members:
-        LOG.debug(_("Importing user %s") % member)
+        LOG.debug("Importing user %s" % str(member))
         users = _import_ldap_users(member, import_by_dn=True)
 
       else:
         user_info = conn.find_users(member, find_by_dn=True)
         if len(user_info) > 1:
-          LOG.warn(_('Found multiple users for member %s.') % member)
+          LOG.warn('Found multiple users for member %s.' % member)
         else:
           for ldap_info in user_info:
             try:
@@ -563,7 +563,7 @@ def _import_ldap_groups(groupname_pattern, import_members=False, recursive_impor
         # at the user
         continue
 
-      LOG.debug(_("Adding member %s represented as users (should be a single user) %s to group %s") % (member, str(users), group.name))
+      LOG.debug("Adding member %s represented as users (should be a single user) %s to group %s" % (str(member), str(users), str(group.name)))
       for user in users:
         group.user_set.add(user)
 

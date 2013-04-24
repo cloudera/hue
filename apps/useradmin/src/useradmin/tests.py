@@ -99,7 +99,7 @@ class LdapTestConnection(object):
   class _Singleton:
     def __init__(self):
       self.users = {'moe': {'dn': 'uid=moe,ou=People,dc=example,dc=com', 'username':'moe', 'first':'Moe', 'email':'moe@stooges.com'},
-                    'larry': {'dn': 'uid=larry,ou=People,dc=example,dc=com', 'username':'larry', 'first':'Larry', 'last':'Stooge', 'email':'larry@stooges.com'},
+                    'lårry': {'dn': 'uid=lårry,ou=People,dc=example,dc=com', 'username':'lårry', 'first':'Larry', 'last':'Stooge', 'email':'larry@stooges.com'},
                     'curly': {'dn': 'uid=curly,ou=People,dc=example,dc=com', 'username':'curly', 'first':'Curly', 'last':'Stooge', 'email':'curly@stooges.com'},
                     'rock': {'dn': 'uid=rock,ou=People,dc=example,dc=com', 'username':'rock', 'first':'rock', 'last':'man', 'email':'rockman@stooges.com'},
                     'otherguy': {'dn': 'uid=otherguy,ou=People,dc=example,dc=com', 'username':'otherguy', 'first':'Other', 'last':'Guy', 'email':'other@guy.com'}}
@@ -107,11 +107,11 @@ class LdapTestConnection(object):
       self.groups = {'TestUsers': {
                         'dn': 'cn=TestUsers,ou=Groups,dc=example,dc=com',
                         'name':'TestUsers',
-                        'members':['uid=moe,ou=People,dc=example,dc=com','uid=larry,ou=People,dc=example,dc=com','uid=curly,ou=People,dc=example,dc=com']},
+                        'members':['uid=moe,ou=People,dc=example,dc=com','uid=lårry,ou=People,dc=example,dc=com','uid=curly,ou=People,dc=example,dc=com']},
                      'Test Administrators': {
                         'dn': 'cn=Test Administrators,cn=TestUsers,ou=Groups,dc=example,dc=com',
                         'name':'Test Administrators',
-                        'members':['uid=rock,ou=People,dc=example,dc=com','uid=larry,ou=People,dc=example,dc=com','uid=curly,ou=People,dc=example,dc=com']},
+                        'members':['uid=rock,ou=People,dc=example,dc=com','uid=lårry,ou=People,dc=example,dc=com','uid=curly,ou=People,dc=example,dc=com']},
                      'OtherGroup': {
                         'dn': 'cn=OtherGroup,cn=TestUsers,ou=Groups,dc=example,dc=com',
                         'name':'OtherGroup',
@@ -445,7 +445,7 @@ def test_useradmin_ldap_group_integration():
   assert_equal(len(Group.objects.all()), 2)
   test_admins = Group.objects.get(name='Test Administrators')
   assert_equal(len(test_admins.user_set.all()), 2)
-  larry = User.objects.get(username='larry')
+  larry = User.objects.get(username='lårry')
   assert_equal(test_admins.user_set.all()[0].username, larry.username)
 
   # Only sync already imported
@@ -483,8 +483,8 @@ def test_useradmin_ldap_user_integration():
   ldap_access.CACHED_LDAP_CONN = LdapTestConnection()
 
   # Try importing a user
-  import_ldap_users('larry', import_by_dn=False)
-  larry = User.objects.get(username='larry')
+  import_ldap_users('lårry', import_by_dn=False)
+  larry = User.objects.get(username='lårry')
   assert_true(larry.first_name == 'Larry')
   assert_true(larry.last_name == 'Stooge')
   assert_true(larry.email == 'larry@stooges.com')
@@ -624,12 +624,12 @@ def test_ensure_home_directory_add_ldap_users():
   response = c.post(URL, dict(username_pattern='*r*', password1='test', password2='test', ensure_home_directory=True))
   assert_true('/useradmin/users' in response['Location'])
   assert_true(cluster.fs.exists('/user/curly'))
-  assert_true(cluster.fs.exists('/user/larry'))
+  assert_true(cluster.fs.exists('/user/lårry'))
   assert_true(cluster.fs.exists('/user/otherguy'))
 
   # Clean up
   cluster.fs.rmtree('/user/curly')
-  cluster.fs.rmtree('/user/larry')
+  cluster.fs.rmtree('/user/lårry')
   cluster.fs.rmtree('/user/otherguy')
 
 @attr('requires_hadoop')
