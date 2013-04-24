@@ -66,16 +66,6 @@
     <ul class="nav nav-list">
 
     <li class="nav-header">${_('Core')}</li>
-    <li>
-      <div>
-      ##<span class="muted">${ _('Change settings for') }</span>
-      ##<select id="change-core" style="margin-bottom: 0;display: inline">
-      ##  % for c in hue_cores:
-      ##    <option value="${ c.get_absolute_url() }"> ${ c.label } (${ c.name })</option>
-      ##  % endfor
-      ##</select>
-      </div>
-    </li>
       <li class="${ utils.is_selected(section, 'properties') }">
         <a href="${ url('search:admin_core_properties', core=core) }"><i class="icon-reorder"></i> ${_('Properties')}</a>
       </li>
@@ -93,18 +83,11 @@
       <li class="${ utils.is_selected(section, 'highlighting') }">
         <a href="${ url('search:admin_core_highlighting', core=core) }">${_('4. Highlighting')}</a>
       </li>
+
       <li class="nav-header">${_('Search')}</li>
       <li>
-        <a href="${ url('search:index') }?cores=${ core }"><i class="icon-share-alt"></i> ${ _('Query') }</a>
+        <a href="${ url('search:index') }?collection=${ core }"><i class="icon-share-alt"></i> ${ _('Query') }</a>
       </li>
-
-      ##<li class="nav-header">${_('Solr')}</li>
-      ##<li class="${ utils.is_selected(section, 'index') }">
-      ##  <a href="${ url('search:admin_core_solr_properties', core=core) }">${_('Index')}</a>
-      ##</li>
-      ##<li class="${ utils.is_selected(section, 'schema') }">
-      ##  <a href="${ url('search:admin_core_schema', core=core) }">${_('Schema')}</a>
-      ##</li>
     </ul>
   </div>
 </%def>
