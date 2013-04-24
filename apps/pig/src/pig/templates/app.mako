@@ -123,7 +123,7 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
                 <i class="icon-save"></i> ${ _('Save') }
               </a>
             </li>
-            <li data-bind="click: showSubmissionModal, visible: !currentScript().isRunning()">
+            <li data-bind="click: runOrShowSubmissionModal, visible: !currentScript().isRunning()">
               <a href="#" title="${ _('Run the script') }" rel="tooltip" data-placement="right">
                 <i class="icon-play"></i> ${ _('Run') }
               </a>
