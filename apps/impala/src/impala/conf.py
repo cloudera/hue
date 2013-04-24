@@ -24,7 +24,6 @@ from desktop.lib.conf import Config
 SERVER_HOST = Config(
   key="server_host",
   help=_("Host of the Impala Server."),
-  private=True,
   default="localhost")
 
 SERVER_PORT = Config(
