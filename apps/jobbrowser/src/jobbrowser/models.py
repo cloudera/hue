@@ -450,7 +450,7 @@ class TaskAttempt(object):
 
     et = lxml.html.parse(data)
     log_sections = et.findall('body/pre')
-    logs = [ section.text for section in log_sections ]
+    logs = [section.text or '' for section in log_sections]
     if len(logs) < 3:
       LOGGER.warn('Error parsing task attempt log for %s at "%s". Found %d (not 3) log sections' %
                   (self.attemptId, url, len(log_sections)))
