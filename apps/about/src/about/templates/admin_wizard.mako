@@ -96,7 +96,7 @@ ${ commonheader(_('About Hue'), "quick_start", user, "100px") | n,unicode }
         % if 'pig' in app_names:
           <li>
             <a href="#" class="installBtn" data-loading-text="${ _('Installing...') }" data-url="${ url('pig:install_examples') }">
-             <i class="icon-download-alt"></i> Pig
+             <i class="icon-download-alt"></i> ${ apps['pig'].nice_name }
             </a>
           </li>
         % endif
