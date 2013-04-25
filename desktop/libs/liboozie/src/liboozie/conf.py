@@ -38,6 +38,17 @@ REMOTE_DEPLOYMENT_DIR = Config(
   help=_t("Location on HDFS where the workflows/coordinators are deployed when submitted by a non-owner."))
 
 
+def get_oozie_status():
+  from liboozie.oozie_api import get_oozie
+
+  status = 'down'
+
+  try:
+    status = str(get_oozie().get_oozie_status())
+  except:
+    pass
+
+  return status
 
 def config_validator():
   """
@@ -46,15 +57,10 @@ def config_validator():
   Called by core check_config() view.
   """
   from hadoop.cluster import get_all_hdfs
-  from liboozie.oozie_api import get_oozie
 
   res = []
 
-  status = 'down'
-  try:
-    status = str(get_oozie().get_oozie_status())
-  except:
-    pass
+  status = get_oozie_status()
   if 'NORMAL' not in status:
     res.append((status, _('The Oozie server is not available')))
 
