@@ -21,12 +21,8 @@
 ${ commonheader(_('Home'), "home", user) | n,unicode }
 
 
-<%def name="app_link(current_app, label, extra_path = '')">
-  %for app in apps:
-    %if app == current_app:
-      <li><a href="/${app}${extra_path}"><i class="icon-double-angle-right"></i> ${label}</a></li>
-    %endif
-  %endfor
+<%def name="app_link(app, label=None, extra_path = '')">
+  <li><a href="/${ app }${ extra_path }"><i class="icon-double-angle-right"></i> ${ label is not None and label or apps[app].nice_name }</a></li>
 </%def>
 
 
@@ -55,7 +51,7 @@ ${ commonheader(_('Home'), "home", user) | n,unicode }
           <ul>
             ${ app_link("beeswax", _('Hive')) }
             ${ app_link("impala", _('Impala')) }
-            ${ app_link("pig", _('Pig')) }
+            ${ app_link("pig") }
             ${ app_link("shell", _('Shell')) }
           </ul>
         </div>
