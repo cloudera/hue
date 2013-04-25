@@ -624,12 +624,12 @@ def test_ensure_home_directory_add_ldap_users():
   response = c.post(URL, dict(username_pattern='*r*', password1='test', password2='test', ensure_home_directory=True))
   assert_true('/useradmin/users' in response['Location'])
   assert_true(cluster.fs.exists('/user/curly'))
-  assert_true(cluster.fs.exists('/user/lårry'))
+  assert_true(cluster.fs.exists(u'/user/lårry'))
   assert_true(cluster.fs.exists('/user/otherguy'))
 
   # Clean up
   cluster.fs.rmtree('/user/curly')
-  cluster.fs.rmtree('/user/lårry')
+  cluster.fs.rmtree(u'/user/lårry')
   cluster.fs.rmtree('/user/otherguy')
 
 @attr('requires_hadoop')
