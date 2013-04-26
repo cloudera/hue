@@ -5,259 +5,241 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
-"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-03-20 17:39-0700\n"
+"Project-Id-Version: 项目版本\n"
+"Report-Msgid-Bugs-To: 电子邮件地址\n"
+"POT-Creation-Date: 2013-04-11 10:03-0700\n"
 "PO-Revision-Date: 2012-07-30 18:51-0700\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Last-Translator: 全名 <电子邮件地址>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
 "Plural-Forms: nplurals=1; plural=0\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
-"Content-Transfer-Encoding: 8bit\n"
+"Content-Transfer-Encoding: 8 位\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/catalog/forms.py:48 src/catalog/templates/describe_partitions.mako:33
+#: src/catalog/forms.py:48 src/catalog/templates/describe_partitions.mako:36
 msgid "Path"
-msgstr ""
+msgstr "路径"
 
 #: src/catalog/forms.py:49
 msgid "Overwrite?"
-msgstr ""
+msgstr "是否覆盖？"
 
 #: src/catalog/forms.py:62
 #, python-format
 msgid "%(column_name)s (partition key with type %(column_type)s)"
-msgstr ""
+msgstr "%(column_name)s（类型为 %(column_type)s 的分区键）"
 
-#: src/catalog/views.py:109
+#: src/catalog/views.py:72
+#, fuzzy, python-format
+msgid "Failed to remove %(databases)s.  Error: %(error)s"
+msgstr "无法删除 %(databases)s。错误：%(error)s"
+
+#: src/catalog/views.py:73 src/catalog/views.py:161
+msgid "Beeswax Error"
+msgstr "Beeswax 错误"
+
+#: src/catalog/views.py:75
+msgid "Do you really want to delete the database(s)?"
+msgstr "是否确实要删除数据库？"
+
+#: src/catalog/views.py:160
 #, fuzzy, python-format
 msgid "Failed to remove %(tables)s.  Error: %(error)s"
-msgstr "无法从查询保存结果：%(error)s"
+msgstr "无法删除 %(tables)s。错误：%(error)s"
 
-#: src/catalog/views.py:110
-#, fuzzy
-msgid "Beeswax Error"
-msgstr "Beeswax"
-
-#: src/catalog/views.py:112
+#: src/catalog/views.py:163
 msgid "Do you really want to delete the table(s)?"
-msgstr ""
+msgstr "是否确实要删除表？"
 
-#: src/catalog/views.py:126
-#, fuzzy
+#: src/catalog/views.py:177
 msgid "Can read table"
-msgstr "创建表"
+msgstr "可读取表"
 
-#: src/catalog/views.py:147
+#: src/catalog/views.py:198
 msgid "Can't load the data: "
-msgstr ""
+msgstr "无法加载数据： "
 
-#: src/catalog/views.py:168
+#: src/catalog/views.py:219
 #, python-format
 msgid "Table '%(table)s' is not partitioned."
-msgstr ""
+msgstr "表 '%(table)s' 未分区。"
 
-#: src/catalog/templates/components.mako:198
-msgid "Beginning of List"
-msgstr "列表开头"
+#: src/catalog/templates/components.mako:27
+#: src/catalog/templates/databases.mako:24
+#: src/catalog/templates/databases.mako:27
+msgid "Databases"
+msgstr "数据库"
 
-#: src/catalog/templates/components.mako:199
-msgid "Previous Page"
-msgstr "上一页"
+#: src/catalog/templates/databases.mako:33
+msgid "Create a new database"
+msgstr "创建新数据库"
 
-#: src/catalog/templates/components.mako:200
-msgid "Next page"
-msgstr "下一页"
+#: src/catalog/templates/databases.mako:40
+msgid "Drop the selected databases"
+msgstr "删除所选数据库"
 
-#: src/catalog/templates/components.mako:200
-msgid "Next Page"
-msgstr "下一页"
-
-#: src/catalog/templates/components.mako:201
-msgid "End of List"
-msgstr "列表结尾"
-
-#: src/catalog/templates/components.mako:203
-#, python-format
-msgid ""
-"Showing %(start)s to %(end)s of %(count)s items, page %(page)s of "
-"%(pages)s"
-msgstr "正在显示第 %(page)s 页 %(start)s - %(end)s (共 %(pages)s 页 %(count)s 项)"
-
-#: src/catalog/templates/describe_partitions.mako:22
-#, python-format
-msgid "Table Partitions: %(tableName)s"
-msgstr ""
-
-#: src/catalog/templates/describe_partitions.mako:25
-#, fuzzy
-msgid "Partitions"
-msgstr "添加一个分区"
-
-#: src/catalog/templates/describe_partitions.mako:51
-#, fuzzy
-msgid "Table has no partitions."
-msgstr "添加一个分区"
-
-#: src/catalog/templates/describe_table.mako:25
+#: src/catalog/templates/databases.mako:40
+#: src/catalog/templates/describe_table.mako:65
 #: src/catalog/templates/tables.mako:51
-#, fuzzy
-msgid "View"
-msgstr "预览"
-
-#: src/catalog/templates/describe_table.mako:27
-#, fuzzy
-msgid "Table"
-msgstr "表"
-
-#: src/catalog/templates/describe_table.mako:29
-#, python-format
-msgid "%s Metadata: %s"
-msgstr ""
-
-#: src/catalog/templates/describe_table.mako:35
-msgid "Name"
-msgstr "名称"
-
-#: src/catalog/templates/describe_table.mako:36
-msgid "Type"
-msgstr ""
-
-#: src/catalog/templates/describe_table.mako:37
-#, fuzzy
-msgid "Comment"
-msgstr "逗号"
-
-#: src/catalog/templates/describe_table.mako:54
-msgid "Table Metadata:"
-msgstr ""
-
-#: src/catalog/templates/describe_table.mako:59
-#: src/catalog/templates/tables.mako:39
-msgid "Actions"
-msgstr "操作"
-
-#: src/catalog/templates/describe_table.mako:60
-msgid "Import Data"
-msgstr "导入数据"
-
-#: src/catalog/templates/describe_table.mako:61
-#: src/catalog/templates/tables.mako:52
-msgid "Browse Data"
-msgstr ""
-
-#: src/catalog/templates/describe_table.mako:62
-#: src/catalog/templates/tables.mako:53
 msgid "Drop"
-msgstr ""
+msgstr "丢弃"
 
-#: src/catalog/templates/describe_table.mako:63
-#, fuzzy
-msgid "View File Location"
-msgstr "结果位置"
+#: src/catalog/templates/databases.mako:47
+msgid "Database Name"
+msgstr "数据库名称"
 
-#: src/catalog/templates/describe_table.mako:73
-msgid "Columns"
-msgstr "列"
+#: src/catalog/templates/databases.mako:74 src/catalog/templates/tables.mako:86
+msgid "Confirm action"
+msgstr "确认操作"
 
-#: src/catalog/templates/describe_table.mako:75
-msgid "Partition Columns"
-msgstr ""
-
-#: src/catalog/templates/describe_table.mako:78
-#, fuzzy
-msgid "Sample"
-msgstr "示例"
-
-#: src/catalog/templates/describe_table.mako:90
-#, fuzzy
-msgid "Show Partitions"
-msgstr "显示自动操作"
-
-#: src/catalog/templates/describe_table.mako:98
-msgid "Error!"
-msgstr "错误！"
-
-#: src/catalog/templates/describe_table.mako:135
-#, fuzzy
-msgid "Drop Table"
-msgstr "创建表"
-
-#: src/catalog/templates/describe_table.mako:142
-#: src/catalog/templates/tables.mako:96 src/catalog/templates/tables.mako:109
+#: src/catalog/templates/databases.mako:77
+#: src/catalog/templates/describe_table.mako:145
+#: src/catalog/templates/tables.mako:89
 #: src/catalog/templates/popups/load_data.mako:60
 msgid "Cancel"
 msgstr "取消"
 
-#: src/catalog/templates/describe_table.mako:143
-msgid "Yes, drop this table"
-msgstr ""
-
-#: src/catalog/templates/describe_table.mako:172
-#: src/catalog/templates/describe_table.mako:195
-#: src/catalog/templates/tables.mako:141
-#, fuzzy
-msgid "No data available"
-msgstr "表中无可用数据"
-
-#: src/catalog/templates/describe_table.mako:173
-#: src/catalog/templates/describe_table.mako:196
-#: src/catalog/templates/tables.mako:142
-#, fuzzy
-msgid "No matching records"
-msgstr "未找到匹配记录"
-
-#: src/catalog/templates/layout.mako:34 src/catalog/templates/tables.mako:23
-#: src/catalog/templates/tables.mako:26
-msgid "Tables"
-msgstr "表"
-
-#: src/catalog/templates/tables.mako:32
-msgid "database"
-msgstr "数据库"
-
-#: src/catalog/templates/tables.mako:41 src/catalog/templates/tables.mako:88
-msgid "Install samples"
-msgstr "安装样本"
-
-#: src/catalog/templates/tables.mako:43
-msgid "Create a new table from a file"
-msgstr "从文件中创建一个新表"
-
-#: src/catalog/templates/tables.mako:44
-msgid "Create a new table manually"
-msgstr "手动创建一个新表"
-
-#: src/catalog/templates/tables.mako:51 src/catalog/templates/tables.mako:52
-#, fuzzy
-msgid "Browse the selected table"
-msgstr "编辑此查询。"
-
-#: src/catalog/templates/tables.mako:53
-#, fuzzy
-msgid "Delete the selected tables"
-msgstr "删除此查询。"
-
-#: src/catalog/templates/tables.mako:60
-msgid "Table Name"
-msgstr "表名"
-
-#: src/catalog/templates/tables.mako:97
-msgid "Yes, install samples"
-msgstr "是，安装示例"
-
-#: src/catalog/templates/tables.mako:106
-msgid "Confirm action"
-msgstr "确认操作"
-
-#: src/catalog/templates/tables.mako:110
+#: src/catalog/templates/databases.mako:78 src/catalog/templates/tables.mako:90
 msgid "Yes"
 msgstr "是"
 
-#: src/catalog/templates/tables.mako:171
-msgid "There was an error processing your request:"
-msgstr "处理请求时发生错误："
+#: src/catalog/templates/databases.mako:111
+#: src/catalog/templates/describe_table.mako:177
+#: src/catalog/templates/describe_table.mako:200
+#: src/catalog/templates/tables.mako:123
+msgid "No data available"
+msgstr "没有可用数据"
+
+#: src/catalog/templates/databases.mako:112
+#: src/catalog/templates/describe_table.mako:178
+#: src/catalog/templates/describe_table.mako:201
+#: src/catalog/templates/tables.mako:124
+msgid "No matching records"
+msgstr "没有匹配记录"
+
+#: src/catalog/templates/describe_partitions.mako:24
+#, python-format
+msgid "Table Partitions: %(tableName)s"
+msgstr "表分区：%(tableName)s"
+
+#: src/catalog/templates/describe_partitions.mako:27
+msgid "Partitions"
+msgstr "分区"
+
+#: src/catalog/templates/describe_partitions.mako:54
+msgid "Table has no partitions."
+msgstr "表没有分区。"
+
+#: src/catalog/templates/describe_table.mako:26
+#: src/catalog/templates/tables.mako:49
+msgid "View"
+msgstr "查看"
+
+#: src/catalog/templates/describe_table.mako:28
+#: src/catalog/templates/describe_table.mako:55
+msgid "Table"
+msgstr "表"
+
+#: src/catalog/templates/describe_table.mako:30
+#, python-format
+msgid "%s : %s"
+msgstr "%s : %s"
+
+#: src/catalog/templates/describe_table.mako:36
+msgid "Name"
+msgstr "名称"
+
+#: src/catalog/templates/describe_table.mako:37
+msgid "Type"
+msgstr "类型"
+
+#: src/catalog/templates/describe_table.mako:38
+msgid "Comment"
+msgstr "备注"
+
+#: src/catalog/templates/describe_table.mako:62
+#: src/catalog/templates/tables.mako:40
+msgid "Actions"
+msgstr "操作"
+
+#: src/catalog/templates/describe_table.mako:63
+msgid "Import Data"
+msgstr "导入数据"
+
+#: src/catalog/templates/describe_table.mako:64
+#: src/catalog/templates/tables.mako:50
+msgid "Browse Data"
+msgstr "浏览数据"
+
+#: src/catalog/templates/describe_table.mako:66
+msgid "View File Location"
+msgstr "查看文件位置"
+
+#: src/catalog/templates/describe_table.mako:72
+msgid "Comment:"
+msgstr "备注："
+
+#: src/catalog/templates/describe_table.mako:76
+msgid "Columns"
+msgstr "列"
+
+#: src/catalog/templates/describe_table.mako:78
+msgid "Partition Columns"
+msgstr "分区列"
+
+#: src/catalog/templates/describe_table.mako:81
+msgid "Sample"
+msgstr "样本"
+
+#: src/catalog/templates/describe_table.mako:93
+msgid "Show Partitions"
+msgstr "显示分区"
+
+#: src/catalog/templates/describe_table.mako:101
+msgid "Error!"
+msgstr "错误！"
+
+#: src/catalog/templates/describe_table.mako:138
+msgid "Drop Table"
+msgstr "删除表"
+
+#: src/catalog/templates/describe_table.mako:146
+msgid "Yes, drop this table"
+msgstr "是，删除此表"
+
+#: src/catalog/templates/tables.mako:23
+msgid "Tables"
+msgstr "表"
+
+#: src/catalog/templates/tables.mako:26
+#, fuzzy, python-format
+msgid "Database %s"
+msgstr "数据库 %s"
+
+#: src/catalog/templates/tables.mako:33
+msgid "database"
+msgstr "数据库"
+
+#: src/catalog/templates/tables.mako:41
+msgid "Create a new table from a file"
+msgstr "从文件中创建一个新表"
+
+#: src/catalog/templates/tables.mako:42
+msgid "Create a new table manually"
+msgstr "手动创建一个新表"
+
+#: src/catalog/templates/tables.mako:49 src/catalog/templates/tables.mako:50
+msgid "Browse the selected table"
+msgstr "浏览所选表"
+
+#: src/catalog/templates/tables.mako:51
+msgid "Delete the selected tables"
+msgstr "删除所选表"
+
+#: src/catalog/templates/tables.mako:58
+msgid "Table Name"
+msgstr "表名"
 
 #: src/catalog/templates/util.mako:66
 msgid "Unsaved Query"
@@ -268,1083 +250,43 @@ msgid "Query Results"
 msgstr "查询结果"
 
 #: src/catalog/templates/popups/load_data.mako:25
-#, fuzzy
 msgid "Import data"
 msgstr "导入数据"
 
 #: src/catalog/templates/popups/load_data.mako:50
 msgid "Overwrite existing data"
-msgstr ""
+msgstr "覆盖现有数据"
 
 #: src/catalog/templates/popups/load_data.mako:55
-msgid ""
-"Note that loading data will move data from its location into the table's "
-"storage location."
-msgstr ""
+msgid "Note that loading data will move data from its location into the table's storage location."
+msgstr "请注意，数据加载过程会将数据从其位置移至表的存储位置。"
 
 #: src/catalog/templates/popups/load_data.mako:61
 msgid "Submit"
-msgstr ""
-
-#~ msgid ""
-#~ "Beeswax or Hive Server 2 Thrift "
-#~ "API used. Choices are: 'beeswax' or "
-#~ "'hiveserver2'."
-#~ msgstr "已使用 Beeswax 或 Hive Server 2 Thrift API。选择是：'beeswax' 或 'hiveserver2'。"
-
-#~ msgid ""
-#~ "Host where Beeswax server Thrift daemon"
-#~ " is running. If Kerberos security is"
-#~ " enabled, the fully-qualified domain "
-#~ "name (FQDN) is required, even if "
-#~ "the Thrift daemon is running on "
-#~ "the same host as Hue."
-#~ msgstr ""
-
-#~ msgid "Configure the port the Beeswax Thrift server runs on."
-#~ msgstr "配置运行 Beeswax Thrift 服务器的端口。"
-
-#~ msgid "Host where internal metastore Thrift daemon is running."
-#~ msgstr "运行内部 metastore Thrift 守护程序的主机。"
-
-#~ msgid ""
-#~ "Configure the port the internal "
-#~ "metastore daemon runs on. Used only "
-#~ "if hive.metastore.local is true."
-#~ msgstr "配置内部元数据库守护程序所运行的端口。仅在 hive.metastore.local 为真时使用。"
-
-#~ msgid "Path to beeswax_server.sh"
-#~ msgstr "beeswax_server.sh 的路径"
-
-#~ msgid ""
-#~ "Maximum Java heap size (in megabytes)"
-#~ " used by Beeswax Server.  Note that"
-#~ " the setting of HADOOP_HEAPSIZE in "
-#~ "$HADOOP_CONF_DIR/hadoop-env.sh may override "
-#~ "this setting."
-#~ msgstr ""
-#~ "Beeswax 服务器使用的最大 Java "
-#~ "堆大小（单位：兆字节）。请注意，$HADOOP_CONF_DIR/hadoop-env.sh 中的 "
-#~ "HADOOP_HEAPSIZE 设置可能会覆盖此设置。"
-
-#~ msgid ""
-#~ "Path to the root of the Hive "
-#~ "installation; defaults to environment variable"
-#~ " when not set."
-#~ msgstr "Hive 安装的根路径；默认为环境变量（若未设置）。"
-
-#~ msgid "Hive configuration directory, where hive-site.xml is located."
-#~ msgstr "Hive 配置目录，即 hive-site.xml 的所在位置。"
-
-#~ msgid "The local filesystem path containing the Beeswax examples."
-#~ msgstr "包含 Beeswax 示例的本地文件系统路径。"
-
-#~ msgid "Timeout in seconds for Thrift calls to Beeswax service."
-#~ msgstr "Thrift 调用 Beeswax 服务的超时时间（秒数）"
-
-#~ msgid ""
-#~ "Timeouts in seconds for Thrift calls "
-#~ "to the Hive metastore. This timeout "
-#~ "should take into account that the "
-#~ "metastore could talk to an external "
-#~ "database."
-#~ msgstr "Thrift 调用 Hive 元数据仓的超时时间（秒数）。此超时值应考虑到元数据仓可与外部数据库通信。"
-
-#~ msgid "Time in seconds for Beeswax to persist queries in its cache."
-#~ msgstr "Beeswax 在缓存中进行持续查询的时间（秒数）。"
-
-#~ msgid ""
-#~ "Set a LIMIT clause when browsing a"
-#~ " partitioned table. A positive value "
-#~ "will be set as the LIMIT. If "
-#~ "0 or negative, do not set any "
-#~ "limit."
-#~ msgstr "浏览分区表时设置 LIMIT 子句。数值为正则将其设置为 LIMIT。"
-
-#~ msgid ""
-#~ "Share saved queries with all users. "
-#~ "If set to false, saved queries are"
-#~ " visible only to the owner and "
-#~ "administrators."
-#~ msgstr "与所有用户共享保存的查询。如果设置为 false，保存的查询仅对该查询的所有者和管理员可见。"
-
-#~ msgid "ctrl-As"
-#~ msgstr "ctrl-A"
-
-#~ msgid "ctrl-Bs"
-#~ msgstr "ctrl-B"
-
-#~ msgid "ctrl-Cs"
-#~ msgstr "ctrl-C"
-
-#~ msgid "tabs"
-#~ msgstr "制表符"
-
-#~ msgid "spaces"
-#~ msgstr "空格"
-
-#~ msgid "Internal error when constructing the delimiter form: %(error)s"
-#~ msgstr "构建分隔符形式时出现内部错误：%(error)s"
-
-#~ msgid ""
-#~ "Failed to decode file '%(path)s' into"
-#~ " printable characters under %(encoding)s"
-#~ msgstr "无法将文件 '%(path)s' 解码为采用 %(encoding)s 的可打印字符"
-
-#~ msgid "Could not find any columns to import"
-#~ msgstr ""
-
-#~ msgid "Failed to open file '%(path)s': %(error)s"
-#~ msgstr "无法打开文件 '%(path)s'：%(error)s"
-
-#~ msgid "Internal error: Missing needed parameter to load data into table"
-#~ msgstr "内部错误：缺少将数据加载到表中所需的参数"
-
-#~ msgid "Change the name to save as a new design."
-#~ msgstr "更改名称以将其另存为新设计。"
-
-#~ msgid "Description"
-#~ msgstr "描述"
-
-#~ msgid "Save"
-#~ msgstr "保存"
-
-#~ msgid "Save As"
-#~ msgstr "另存为"
-
-#~ msgid "Please enter a name"
-#~ msgstr "请输入名称"
-
-#~ msgid "Name of the new table"
-#~ msgstr "新表的名称"
-
-#~ msgid "Results Location"
-#~ msgstr "结果位置"
-
-#~ msgid "Empty directory in HDFS to put the results"
-#~ msgstr "HDFS 中用于存放结果的目录为空"
-
-#~ msgid "Table already exists"
-#~ msgstr "表已存在"
-
-#~ msgid "Query Editor"
-#~ msgstr "查询编辑器"
-
-#~ msgid "jar"
-#~ msgstr "jar"
-
-#~ msgid "archive"
-#~ msgstr "存档"
-
-#~ msgid ""
-#~ "Resources to upload with your Hive "
-#~ "job.  Use 'jar' for UDFs.  Use "
-#~ "'file' and 'archive' for files to "
-#~ "be copied and made locally available "
-#~ "during MAP/TRANSFORM. Paths are on HDFS."
-#~ msgstr ""
-#~ "要通过您的 Hive 作业上载的资源。对 UDF 使用 'jar'。对要在"
-#~ " MAP/TRANSFORM 期间复制且在本地提供的文件使用 'file' 和 "
-#~ "'archive'。路径位于 HDFS 上。"
-
-#~ msgid "Path to file on HDFS."
-#~ msgstr "HDFS 上的文件路径。"
-
-#~ msgid "Field terminator"
-#~ msgstr "字段终止符"
-
-#~ msgid "Collection terminator"
-#~ msgstr "集合终结符"
-
-#~ msgid "Map key terminator"
-#~ msgstr "Map 键终止符"
-
-#~ msgid "SerDe Name"
-#~ msgstr "SerDe 名称"
-
-#~ msgid "Comma-separated list of key-value pairs, eg., 'p1=v1, p2=v2'"
-#~ msgstr "逗号分隔的键值对列表，如 'p1=v1, p2=v2'"
-
-#~ msgid "InputFormat Class"
-#~ msgstr "InputFormat 类"
-
-#~ msgid "OutputFormat Class"
-#~ msgstr "OutputFormat 类"
-
-#~ msgid "Use default location"
-#~ msgstr "使用默认位置"
-
-#~ msgid "Path to HDFS directory or file of table data."
-#~ msgstr "HDFS 目录或表数据文件的路径。"
-
-#~ msgid "Table \"%(name)s\" already exists"
-#~ msgstr "表 \"%(name)s\" 已存在"
-
-#~ msgid "Terminator must be exactly one character."
-#~ msgstr "终结符必须严格为一个字符。"
-
-#~ msgid "Input File"
-#~ msgstr "输入文件"
-
-#~ msgid "Import data from file"
-#~ msgstr "从文件导入数据"
-
-#~ msgid "Automatically load this file into the table after creation."
-#~ msgstr "创建后自动将此文件加载到表中。"
-
-#~ msgid "Delimiter"
-#~ msgstr "分隔符"
-
-#~ msgid "Delimiter value must be smaller than 256."
-#~ msgstr "分隔符值必须小于 256。"
-
-#~ msgid "Delimiter value is required."
-#~ msgstr "需要分隔符值。"
-
-#~ msgid "Column Name"
-#~ msgstr "列名称"
-
-#~ msgid "Column Type"
-#~ msgstr "列类型"
-
-#~ msgid "Array Value Type"
-#~ msgstr "数组值类型"
-
-#~ msgid "Specify if column_type is map."
-#~ msgstr "指定 column_type 是否为 map。"
-
-#~ msgid "add a column"
-#~ msgstr "添加一列"
-
-#~ msgid "Host of the query server."
-#~ msgstr "查询服务器主机。"
-
-#~ msgid "Port of the query server."
-#~ msgstr "查询服务器端口。"
-
-#~ msgid "Name of the query server."
-#~ msgstr "查询服务器名称。"
-
-#~ msgid "Type of the query server."
-#~ msgstr "查询服务器类型。"
-
-#~ msgid "My saved query"
-#~ msgstr "我保存的查询"
-
-#~ msgid " (new)"
-#~ msgstr " （新）"
-
-#~ msgid "Cannot retrieve Beeswax design id %(id)s"
-#~ msgstr "无法检索 Beeswax 设计 ID %(id)s"
-
-#~ msgid "Design id %(id)s does not belong to user %(user)s"
-#~ msgstr "设计 ID %(id)s 不属于用户 %(user)s"
-
-#~ msgid ""
-#~ "Type mismatch for design id %(id)s "
-#~ "(owner %(owner)s) - Expected %(expected_type)s"
-#~ " got %(real_type)s"
-#~ msgstr ""
-#~ "设计 ID %(id)s（所有者为 %(owner)s）的类型不匹配 - 需要"
-#~ " %(expected_type)s，但得到 %(real_type)s"
-
-#~ msgid "Last used"
-#~ msgstr "上次使用"
-
-#~ msgid "Application we communicate with."
-#~ msgstr ""
-
-#~ msgid "Invalid design type %(type)s"
-#~ msgstr "无效设计类型 %(type)s"
-
-#~ msgid "Saved design \"%(name)s\""
-#~ msgstr "保存的设计 \"%(name)s\""
-
-#~ msgid "Delete design(s)?"
-#~ msgstr "删除设计？"
-
-#~ msgid "Copied design: %(name)s"
-#~ msgstr "复制的设计：%(name)s"
-
-#~ msgid "This query has %(state)s. Results unavailable."
-#~ msgstr "此查询具有 %(state)s。结果不可用。"
-
-#~ msgid "The result of this query is not available yet."
-#~ msgstr "此查询的结果尚不可用。"
-
-#~ msgid "Cannot find query."
-#~ msgstr "找不到查询。"
-
-#~ msgid ""
-#~ "Saving results from a partitioned table"
-#~ " is not supported. You may copy "
-#~ "from the HDFS location manually."
-#~ msgstr "不支持从分区表保存结果。您可手动从 HDFS 位置复制。"
-
-#~ msgid ""
-#~ "Saving results from a query with "
-#~ "no MapReduce jobs is not supported. "
-#~ "You may copy manually from the "
-#~ "HDFS location %(path)s."
-#~ msgstr "不支持从无 MapReduce 作业的查询保存结果。您可手动从 HDFS 位置 %(path)s 复制。"
-
-#~ msgid "The table could not be saved."
-#~ msgstr "无法保存表。"
-
-#~ msgid "Saved query results as new table %(table)s"
-#~ msgstr "已将查询结果保存为新表 %(table)s"
-
-#~ msgid "Install sample tables and Beeswax examples?"
-#~ msgstr "是否安装示例表和 Beeswax 示例？"
-
-#~ msgid "Beeswax query completed"
-#~ msgstr "Beeswax 查询已完成"
-
-#~ msgid ""
-#~ "%(subject)s. You may see the results here: %(link)s\n"
-#~ "\n"
-#~ "Query:\n"
-#~ "%(query)s"
-#~ msgstr ""
-#~ "%(subject)s。您在此处可能会看到：%(link)s\n"
-#~ "\"\n"
-#~ "\"\n"
-#~ "\"\n"
-#~ "\"查询：\n"
-#~ "\"\n"
-#~ "\"%(query)s"
-
-#~ msgid "Design %(id)s does not exist."
-#~ msgstr "设计 %(id)s 不存在。"
-
-#~ msgid "Cannot access design %(id)s"
-#~ msgstr "无法访问设计 %(id)s"
-
-#~ msgid "QueryHistory %(id)s does not exist."
-#~ msgstr "查询历史 %(id)s 不存在。"
-
-#~ msgid "Cannot access QueryHistory %(id)s"
-#~ msgstr "无法访问查询历史 %(id)s"
-
-#~ msgid "Design does not exist"
-#~ msgstr "设计不存在"
-
-#~ msgid "Query is not parameterizable."
-#~ msgstr "查询不可参数化。"
-
-#~ msgid "Failed to retrieve query state from the Query Server."
-#~ msgstr "无法从 Beeswax 服务器检索查询状态。"
-
-#~ msgid "Failed to contact Beeswax Server to check query status."
-#~ msgstr "无法联系 Beeswax 服务器来检查查询状态。"
-
-#~ msgid "Beeswax examples already installed."
-#~ msgstr "已安装 Beeswax 示例。"
-
-#~ msgid "Cannot find table data in \"%(file)s\""
-#~ msgstr "在 \"%(file)s\" 中找不到表数据"
-
-#~ msgid "Table \"%(table)s\" already exists."
-#~ msgstr "表 \"%(table)s\" 已存在。"
-
-#~ msgid "Error creating table %(table)s: Operation timeout."
-#~ msgstr "创建表 %(table)s 时出错：操作超时。"
-
-#~ msgid "Error creating table %(table)s: %(error)s"
-#~ msgstr "创建表 %(table)s 时出错：%(error)s"
-
-#~ msgid "Error loading table %(table)s: Operation timeout."
-#~ msgstr "加载表 %(table)s 时出错：操作超时。"
-
-#~ msgid "Error loading table %(table)s: %(error)s"
-#~ msgstr "加载表 %(table)s 时出错：%(error)s"
-
-#~ msgid "Sample design %(name)s already exists."
-#~ msgstr "样本设计 %(name)s 已存在。"
-
-#~ msgid "Server returning invalid handle for query id %(id)d [%(query)s]..."
-#~ msgstr "服务器正在返回 ID 为 %(id)d 的查询 [%(query)s] 的无效句柄..."
-
-#~ msgid "No server logs for this query"
-#~ msgstr "请为此查询指定参数："
-
-#~ msgid "Could not retrieve logs: %s"
-#~ msgstr "无法检索日志。"
-
-#~ msgid "Unknown exception."
-#~ msgstr "未知异常。"
-
-#~ msgid "Create table from file"
-#~ msgstr "从文件中创建一个表"
-
-#~ msgid "Step 1: Choose File"
-#~ msgstr "第 1 步：选择文件"
-
-#~ msgid "Step 2: Choose Delimiter"
-#~ msgstr "第 2 步：选择分隔符"
-
-#~ msgid "Step 3: Define Columns"
-#~ msgstr "第 3 步：定义列"
-
-#~ msgid "Choose a Delimiter"
-#~ msgstr "选择分隔符"
-
-#~ msgid "Beeswax has determined that this file is delimited by"
-#~ msgstr "Beeswax 已确定此文件被分隔"
-
-#~ msgid ""
-#~ "Enter the column delimiter. Must be "
-#~ "a single character. Use syntax like "
-#~ "\"\\001\" or \"\t\" for special "
-#~ "characters."
-#~ msgstr "输入列分隔符。必须是单个字符。对于特殊字符，请使用 \"\" 或 \"\t\" 等语法。"
-
-#~ msgid "Table preview"
-#~ msgstr "表预览"
-
-#~ msgid "Previous"
+msgstr "提交"
+
+#~ msgid "Beginning of List"
+#~ msgstr "列表开头"
+#~ msgid "Previous Page"
 #~ msgstr "上一页"
-
-#~ msgid "Next"
+#~ msgid "Next page"
 #~ msgstr "下一页"
-
-#~ msgid "Please type your delimiter here"
-#~ msgstr "请在此处输入您的分隔符"
-
-#~ msgid "Name Your Table and Choose A File"
-#~ msgstr "为表命名并选择一个文件"
-
-#~ msgid "table_name"
-#~ msgstr "表名"
-
-#~ msgid ""
-#~ "Name of the new table. Table names"
-#~ " must be globally unique. Table names"
-#~ " tend to correspond as well to "
-#~ "the directory where the data will "
-#~ "be stored."
-#~ msgstr "新表的名称。表名必须具有全局唯一性。表名应与将存储数据的目录对应。"
-
-#~ msgid "Optional"
-#~ msgstr "可选"
-
-#~ msgid ""
-#~ "Use a table comment to describe "
-#~ "your table.  For example, you might "
-#~ "note the data's provenance and any "
-#~ "caveats users need to know."
-#~ msgstr "使用表备注描述您的表。例如，您可以注释数据的出处以及用户需要了解的注意事项。"
-
-#~ msgid ""
-#~ "The HDFS path to the file that "
-#~ "you would like to base this new"
-#~ " table definition on. It can be "
-#~ "compressed (gzip) or not."
-#~ msgstr "您想作为此新表定义基础的文件的 HDFS 路径。可以是或不是压缩 (gzip) 文件。"
-
-#~ msgid ""
-#~ "Check this box if you want to "
-#~ "import the data in this file after"
-#~ " creating the table definition. Leave "
-#~ "it unchecked if you want to define"
-#~ " an empty table."
-#~ msgstr "如果您想在创建表定义后导入此文件中的数据，请选中此复选框。如果您想定义一个空表，请将其留空。"
-
-#~ msgid "Warning!"
-#~ msgstr "警告！"
-
-#~ msgid "The selected file is going to be moved during the import."
-#~ msgstr "导入期间将移动选定文件。"
-
-#~ msgid "Choose a file"
-#~ msgstr "选择文件"
-
-#~ msgid "Settings"
-#~ msgstr "设置"
-
-#~ msgid "Filter:"
-#~ msgstr "过滤器："
-
-#~ msgid "Search for key, value, etc..."
-#~ msgstr "搜索键、值等..."
-
-#~ msgid "Clear"
-#~ msgstr "清除"
-
-#~ msgid "Key"
-#~ msgstr "键"
-
-#~ msgid "Value"
-#~ msgstr "值"
-
-#~ msgid "Create table manually"
-#~ msgstr "手动创建表"
-
-#~ msgid "Step 1: Name"
-#~ msgstr "第 1 步：名称"
-
-#~ msgid "Step 2: Record Format"
-#~ msgstr "第 2 步：记录格式"
-
-#~ msgid "Step 3: Serialization"
-#~ msgstr "第 3 步：序列化"
-
-#~ msgid "Step 4: File Format"
-#~ msgstr "第 4 步：文件格式"
-
-#~ msgid "Step 5: Location"
-#~ msgstr "第 5 步：位置"
-
-#~ msgid "Step 6: Columns"
-#~ msgstr "第 6 步：列"
-
-#~ msgid "Create a table"
-#~ msgstr "创建表"
-
-#~ msgid ""
-#~ "Let's start with a name and "
-#~ "description for where we'll store your"
-#~ " data."
-#~ msgstr "让我们从数据存储位置的名称和描述开始。"
-
-#~ msgid "This field is required. Spaces are not allowed."
-#~ msgstr "此字段为必填字段。不允许有空格。"
-
-#~ msgid "Choose Your Record Format"
-#~ msgstr "选择您的记录格式"
-
-#~ msgid ""
-#~ "Individual records are broken up into"
-#~ " columns either with delimiters (e.g., "
-#~ "CSV or TSV) or using a specific"
-#~ " serialization / deserialization (SerDe) "
-#~ "implementation. (One common specialized SerDe"
-#~ " is for parsing out columns with "
-#~ "a regular expression.)"
-#~ msgstr ""
-#~ "单独的记录将使用分隔符（例如，CSV 或 TSV）或使用特定的序列化/反序列化 (SerDe) "
-#~ "实施分割为多个列。（一个常见的专用 SerDe 是使用正则表达式解析列。）"
-
-#~ msgid "Record format"
-#~ msgstr "记录格式"
-
-#~ msgid "Delimited"
-#~ msgstr "已分隔"
-
-#~ msgid "(Data files use delimiters, like commas (CSV) or tabs.)"
-#~ msgstr "（数据文件使用分隔符，如逗号 (CSV) 或制表符。）"
-
-#~ msgid "SerDe"
-#~ msgstr "SerDe"
-
-#~ msgid "(Enter a specialized serialization implementation.)"
-#~ msgstr "（输入一个专用的序列化实施。）"
-
-#~ msgid "Configure Record Serialization"
-#~ msgstr "配置记录序列"
-
-#~ msgid "Only supports single-character delimiters."
-#~ msgstr "仅支持单字符分隔符。"
-
-#~ msgid ""
-#~ "This field is required. Spaces are "
-#~ "not allowed. Terminator must be exactly"
-#~ " one character."
-#~ msgstr "此字段为必填字段。不允许有空格。分隔符必须只有一个字符。"
-
-#~ msgid "Use for array types."
-#~ msgstr "用于数组类型。"
-
-#~ msgid "Use for map types."
-#~ msgstr "用于 map 类型。"
-
-#~ msgid "The Java class name of your SerDe."
-#~ msgstr "您的 SerDe 的 Java 类名。"
-
-#~ msgid "e.g."
-#~ msgstr "例如"
-
-#~ msgid "Properties to pass to the (de)serialization mechanism."
-#~ msgstr "要传递给（反）序列化机制的属性。"
-
-#~ msgid "Choose a File Format"
-#~ msgstr "选择文件格式"
-
-#~ msgid "Use"
-#~ msgstr "使用"
-
-#~ msgid "for newline-delimited text files."
-#~ msgstr "用于换行分隔的文本文件。"
-
-#~ msgid "for Hadoop's binary serialization format."
-#~ msgstr "用于 Hadoop 的二进制序列化格式。"
-
-#~ msgid "to choose a custom implementation."
-#~ msgstr "以选择自定义实现。"
-
-#~ msgid "File format"
-#~ msgstr "文件格式"
-
-#~ msgid "Java class used to read data"
-#~ msgstr "用于读取数据的 Java 类"
-
-#~ msgid "Java class used to write data"
-#~ msgstr "用于写入数据的 Java 类"
-
-#~ msgid "Choose Where Your Table's Data is Stored"
-#~ msgstr "选择表数据的存储位置"
-
-#~ msgid "Location"
-#~ msgstr "位置"
-
-#~ msgid ""
-#~ "Store your table in the default "
-#~ "location (controlled by Hive, and "
-#~ "typically"
-#~ msgstr "将表存储在默认位置（由 Hive 控制，通常"
-
-#~ msgid "Enter the path (on HDFS) to your table's data location"
-#~ msgstr "输入表数据位置的路径（HDFS 上）"
-
-#~ msgid "Configure Table Columns"
-#~ msgstr "配置表列"
-
-#~ msgid "Add a column"
-#~ msgstr "添加一列"
-
-#~ msgid "Configure Partitions"
-#~ msgstr "配置分区"
-
-#~ msgid ""
-#~ "If your data is naturally partitioned"
-#~ " (by date, for example), partitions "
-#~ "are a way to tell the query "
-#~ "server that data for a specific "
-#~ "partition value are stored together."
-#~ msgstr "如果您的数据本身已分区（例如，按日期），则分区是一种告诉查询服务器特定分区值的数据将存储在一起的方式。"
-
-#~ msgid "The query server establishes a mapping between directories on disk"
-#~ msgstr "查询服务器在磁盘上的目录之间建立 mapping"
-
-#~ msgid ""
-#~ "and the data for that day.  "
-#~ "Partitions are virtual columns; they are"
-#~ " not represented in the data itself,"
-#~ " but are determined by the data "
-#~ "location. The query server implements "
-#~ "query optimizations such that queries "
-#~ "that are specific to a single "
-#~ "partition need not read the data "
-#~ "in other partitions."
-#~ msgstr "以及该日的数据。分区是虚拟列；数据本身中并不反映分区，而是由数据位置决定。查询服务器实施查询优化，以使特定于单个分区的查询不需要读取其他分区中的数据。"
-
-#~ msgid "Add a partition"
-#~ msgstr "添加一个分区"
-
-#~ msgid "Back"
-#~ msgstr "返回"
-
-#~ msgid "Delete this column"
-#~ msgstr "删除此列"
-
-#~ msgid "Column name"
-#~ msgstr "列名"
-
-#~ msgid "There is another field with the same name."
-#~ msgstr "另一个字段具有相同名称。"
-
-#~ msgid "Column name must be single words that start with a letter or a digit."
-#~ msgstr "列名称必须是以字母或数字开始的单个单词。"
-
-#~ msgid "Column type"
-#~ msgstr "列类型"
-
-#~ msgid ""
-#~ "Type for this column. Certain advanced"
-#~ " types (namely, structs) are not "
-#~ "exposed in this interface."
-#~ msgstr "此列的类型。某些高级类型（即 structs）不会在此界面中显示。"
-
-#~ msgid "Array value type"
-#~ msgstr "数组值类型"
-
-#~ msgid "Type of the array values."
-#~ msgstr "数组值的类型。"
-
-#~ msgid "Map Key type"
-#~ msgstr "Map 键类型"
-
-#~ msgid "Type of the map keys."
-#~ msgstr "Map 键的类型。"
-
-#~ msgid "Map Value type"
-#~ msgstr "Map 值类型"
-
-#~ msgid "Type of the map values."
-#~ msgstr "Map 值的类型。"
-
-#~ msgid "Type your field terminator here"
-#~ msgstr "此处输入您的字段终止符"
-
-#~ msgid "Type your collection terminator here"
-#~ msgstr "此处输入您的集合终止符"
-
-#~ msgid "Type your map key terminator here"
-#~ msgstr "此处输入您的 Map 键终止符"
-
-#~ msgid "Define your columns"
-#~ msgstr "定义列"
-
-#~ msgid "Row"
-#~ msgstr "行"
-
-#~ msgid "Create Table"
-#~ msgstr "创建表"
-
-#~ msgid "Your query has the following error(s):"
-#~ msgstr "您的查询有下列错误："
-
-#~ msgid "click the"
-#~ msgstr "单击"
-
-#~ msgid "Error Log"
-#~ msgstr "错误日志"
-
-#~ msgid "tab below for details"
-#~ msgstr "下方选项卡了解详细信息"
-
-#~ msgid "Example: SELECT * FROM tablename"
-#~ msgstr "示例：从表名称中选择 *"
-
-#~ msgid "Execute"
-#~ msgstr "执行"
-
-#~ msgid "Download"
-#~ msgstr "下载"
-
-#~ msgid "Save as..."
-#~ msgstr "另存为..."
-
-#~ msgid "Explain"
-#~ msgstr "解释"
-
-#~ msgid "or create a"
-#~ msgstr "或创建一个"
-
-#~ msgid "New query"
-#~ msgstr "新查询"
-
-#~ msgid "Query"
-#~ msgstr "查询"
-
-#~ msgid "settings"
-#~ msgstr "设置"
-
-#~ msgid "Delete this setting"
-#~ msgstr "删除此设置"
-
-#~ msgid "Add"
-#~ msgstr "添加"
-
-#~ msgid "File Resources"
-#~ msgstr "文件资源"
-
-#~ msgid "User-defined Functions"
-#~ msgstr "用户定义的函数"
-
-#~ msgid "myFunction"
-#~ msgstr "myFunction（我的功能）"
-
-#~ msgid "Parameterization"
-#~ msgstr "参数化"
-
-#~ msgid ""
-#~ "If checked (the default), you can "
-#~ "include parameters like $parameter_name in "
-#~ "your query, and users will be "
-#~ "prompted for a value when the "
-#~ "query is run."
-#~ msgstr "如果选中（默认值），您可在查询中包括 $parameter_name 之类的参数，并且在运行查询时会提示用户输入值。"
-
-#~ msgid "Enable Parameterization"
-#~ msgstr "启用参数化"
-
-#~ msgid "Email Notification"
-#~ msgstr "电子邮件通知"
-
-#~ msgid ""
-#~ "If checked, you will receive an "
-#~ "email notification when the query "
-#~ "completes."
-#~ msgstr "如果选中，您将在查询完成时收到一封电子邮件通知。"
-
-#~ msgid "Email me on completion"
-#~ msgstr "完成时给我发送电子邮件"
-
-#~ msgid "Did you know?"
-#~ msgstr "您知道吗？"
-
-#~ msgid ""
-#~ "You can execute queries with multiple"
-#~ " SQL statements delimited by a "
-#~ "semicolon ';'."
-#~ msgstr ""
-
-#~ msgid "Use '\\059' instead of ';' if you have some conflicts."
-#~ msgstr ""
-
-#~ msgid "You can highlight and run a fragment of a query."
-#~ msgstr ""
-
-#~ msgid "Choose a name"
-#~ msgstr "选择名称"
-
-#~ msgid "Press \"tab\", then \"enter\"."
-#~ msgstr ""
-
-#~ msgid "Query Explanation"
-#~ msgstr "查询解释"
-
-#~ msgid "Query Explanation:"
-#~ msgstr "查询解释："
-
-#~ msgid "Explanation"
-#~ msgstr "解释"
-
-#~ msgid "Install Samples"
-#~ msgstr "安装示例"
-
-#~ msgid "Show Tables"
-#~ msgstr "显示表"
-
-#~ msgid "Queries"
-#~ msgstr "查询"
-
-#~ msgid "Saved Queries"
-#~ msgstr "保存的查询"
-
-#~ msgid "Execute Query"
-#~ msgstr "执行查询"
-
-#~ msgid "Query History"
-#~ msgstr "查询历史"
-
-#~ msgid "Configuration"
-#~ msgstr "配置"
-
-#~ msgid "Extended Configuration"
-#~ msgstr "扩展配置"
-
-#~ msgid "Welcome to Beeswax for Hive"
-#~ msgstr "欢迎使用 Hive Beeswax"
-
-#~ msgid "To get started with Beeswax you'll first need set up some data:"
-#~ msgstr "要着手使用 Beeswax，您需要先设置一些数据："
-
-#~ msgid "or"
-#~ msgstr "或"
-
-#~ msgid "My Queries"
-#~ msgstr "我的查询"
-
-#~ msgid "History"
-#~ msgstr "历史记录"
-
-#~ msgid "Edit"
-#~ msgstr "编辑"
-
-#~ msgid "Clone the selected query"
-#~ msgstr ""
-
-#~ msgid "Clone"
-#~ msgstr "克隆"
-
-#~ msgid "View the usage history of the selected query"
-#~ msgstr "查看此查询的使用历史记录。"
-
-#~ msgid "Usage history"
-#~ msgstr "使用历史记录"
-
-#~ msgid "Delete"
-#~ msgstr "删除"
-
-#~ msgid "Create New Query"
-#~ msgstr "创建新查询"
-
-#~ msgid "Owner"
-#~ msgstr "所有者"
-
-#~ msgid "Last Modified"
-#~ msgstr "上次修改"
-
-#~ msgid "ago"
-#~ msgstr "前"
-
-#~ msgid "Unsaved"
-#~ msgstr "未保存"
-
-#~ msgid "Copy this query."
-#~ msgstr "复制此查询。"
-
-#~ msgid "Auto generated action"
-#~ msgstr "自动生成的操作"
-
-#~ msgid "Show my queries"
-#~ msgstr "显示我的查询"
-
-#~ msgid "Show everyone's queries"
-#~ msgstr "显示所有人的查询"
-
-#~ msgid "Show user queries"
-#~ msgstr "显示用户查询"
-
-#~ msgid "Time"
-#~ msgstr "时间"
-
-#~ msgid "User"
-#~ msgstr "用户"
-
-#~ msgid "State"
-#~ msgstr "状态"
-
-#~ msgid "Result"
-#~ msgstr "结果"
-
-#~ msgid "Results"
-#~ msgstr "结果"
-
-#~ msgid "Showing _START_ to _END_ of _TOTAL_ entries"
-#~ msgstr "显示 _START_ - _END_，共 _TOTAL_ 个条目"
-
-#~ msgid "Showing 0 to 0 of 0 entries"
-#~ msgstr "显示 0－0，共 0 个条目"
-
-#~ msgid "(filtered from _MAX_ total entries)"
-#~ msgstr "（已从 _MAX_ 个总条目中过滤）"
-
-#~ msgid "First"
-#~ msgstr "第一个"
-
-#~ msgid "Last"
-#~ msgstr "最后一个"
-
-#~ msgid "View the result of the selected"
-#~ msgstr ""
-
-#~ msgid "View result"
-#~ msgstr "保存查询结果"
-
-#~ msgid "Recent Saved Queries"
-#~ msgstr "最近保存的查询"
-
-#~ msgid "Recent Run Queries"
-#~ msgstr "最近运行的查询"
-
-#~ msgid "Desc"
-#~ msgstr "描述"
-
-#~ msgid "View all my queries"
-#~ msgstr "查看我的所有查询"
-
-#~ msgid "View my entire query history"
-#~ msgstr "查看我的整个查询历史"
-
-#~ msgid "Parameterize Query"
-#~ msgstr "参数化查询"
-
-#~ msgid "Explain query"
-#~ msgstr "解释查询"
-
-#~ msgid "Execute query"
-#~ msgstr "执行查询"
-
-#~ msgid "Please specify parameters for this query:"
-#~ msgstr "请为此查询指定参数："
-
-#~ msgid "Save Query Results"
-#~ msgstr "保存查询结果"
-
-#~ msgid "In a new table"
-#~ msgstr "在新表中"
-
-#~ msgid "In an HDFS directory"
-#~ msgstr "在 HDFS 目录中"
-
-#~ msgid "Query Results:"
-#~ msgstr "查询结果："
-
-#~ msgid "Collapse this panel"
-#~ msgstr "折叠此面板"
-
-#~ msgid "Downloads"
-#~ msgstr "下载"
-
-#~ msgid "Download as CSV"
-#~ msgstr "以 CSV 格式下载"
-
-#~ msgid "Download as XLS"
-#~ msgstr "以 XLS 格式下载"
-
-#~ msgid "MR Job"
-#~ msgstr "MR 作业"
-
-#~ msgid "MR Jobs"
-#~ msgstr "MR 作业"
-
-#~ msgid "No Hadoop jobs were launched in running this query."
-#~ msgstr "运行此查询时未启动 Hadoop 作业。"
-
-#~ msgid "Multi-statement query"
-#~ msgstr ""
-
-#~ msgid "Hue stopped as one of your query contains some results."
-#~ msgstr ""
-
-#~ msgid "Click on"
-#~ msgstr "单击"
-
-#~ msgid "next"
+#~ msgid "Next Page"
 #~ msgstr "下一页"
-
-#~ msgid "for continuing the execution of the remaining statements."
-#~ msgstr ""
-
+#~ msgid "End of List"
+#~ msgstr "列表结尾"
 #~ msgid ""
-#~ "If the result contains a large "
-#~ "number of columns, click a row to"
-#~ " select a column to jump to."
-#~ msgstr "您可单击一行，选择您希望跳转至的列。"
-
-#~ msgid ""
-#~ "As you type into the field, a "
-#~ "drop-down list displays column names "
-#~ "that match the string."
+#~ "Showing %(start)s to %(end)s of "
+#~ "%(count)s items, page %(page)s of "
+#~ "%(pages)s"
+#~ msgstr "正在显示第 %(page)s 页 %(start)s - %(end)s (共 %(pages)s 页 %(count)s 项)"
+#~ msgid "%s Metadata: %s"
 #~ msgstr ""
-
-#~ msgid "Error"
-#~ msgstr "错误"
-
-#~ msgid "Log"
-#~ msgstr "日志"
-
-#~ msgid "The query result has expired."
+#~ msgid "Table Metadata:"
 #~ msgstr ""
-
-#~ msgid "You can rerun it from "
-#~ msgstr ""
-
-#~ msgid "Warning:"
-#~ msgstr "警告："
-
-#~ msgid "Page offset may have incremented since last view."
-#~ msgstr "上次查看后页面偏移量可能已增加。"
-
-#~ msgid "Sorry, name is required."
-#~ msgstr "很抱歉，需要名称。"
-
-#~ msgid "Download results from the left."
-#~ msgstr ""
-
-#~ msgid "Waiting for query..."
-#~ msgstr "等待查询..."
-
+#~ msgid "Install samples"
+#~ msgstr "安装样本"
+#~ msgid "Yes, install samples"
+#~ msgstr "是，安装示例"
+#~ msgid "There was an error processing your request:"
+#~ msgstr "处理请求时发生错误："

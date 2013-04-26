@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-01-31 16:57-0800\n"
+"POT-Creation-Date: 2013-04-11 10:03-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -17,11 +17,19 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/impala/conf.py:25
+#: src/impala/conf.py:26
 msgid "Host of the Impala Server."
 msgstr "Hôte du serveur Impala."
 
-#: src/impala/conf.py:31
+#: src/impala/conf.py:32
 msgid "Port of the Impala Server."
 msgstr "Port du serveur Impala."
+
+#: src/impala/conf.py:38
+msgid "Kerberos principal name for Impala. Typically 'impala/hostname.foo.com'."
+msgstr "Nom Kerberos principal pour Impala. En général \"impala/hostname.foo.com\"."
+
+#: src/impala/views.py:34
+msgid "A POST request is required."
+msgstr "Requête POST requise."
 
