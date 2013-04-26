@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-01-31 16:57-0800\n"
+"POT-Creation-Date: 2013-04-11 10:03-0700\n"
 "PO-Revision-Date: 2012-07-30 18:51-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -18,17 +18,12 @@ msgstr ""
 "Generated-By: Babel 0.9.6\n"
 
 #: src/beeswax/conf.py:26
-msgid ""
-"Beeswax or Hive Server 2 Thrift API used. Choices are: 'beeswax' or "
-"'hiveserver2'."
+msgid "Beeswax or Hive Server 2 Thrift API used. Choices are: 'beeswax' or 'hiveserver2'."
 msgstr "已使用 Beeswax 或 Hive Server 2 Thrift API。选择是：'beeswax' 或 'hiveserver2'。"
 
 #: src/beeswax/conf.py:33
-msgid ""
-"Host where Beeswax server Thrift daemon is running. If Kerberos security "
-"is enabled, the fully-qualified domain name (FQDN) is required, even if "
-"the Thrift daemon is running on the same host as Hue."
-msgstr ""
+msgid "Host where Beeswax server Thrift daemon is running. If Kerberos security is enabled, the fully-qualified domain name (FQDN) is required, even if the Thrift daemon is running on the same host as Hue."
+msgstr "运行 Beeswax 服务器 Thrift 守护程序的主机。如果启用了 Kerberos 安全性，则即使在与 Hue 相同的主机上运行 Thrift 守护程序，也需要完全限定的域名（FQDN）。"
 
 #: src/beeswax/conf.py:41
 msgid "Configure the port the Beeswax Thrift server runs on."
@@ -39,9 +34,7 @@ msgid "Host where internal metastore Thrift daemon is running."
 msgstr "运行内部 metastore Thrift 守护程序的主机。"
 
 #: src/beeswax/conf.py:54
-msgid ""
-"Configure the port the internal metastore daemon runs on. Used only if "
-"hive.metastore.local is true."
+msgid "Configure the port the internal metastore daemon runs on. Used only if hive.metastore.local is true."
 msgstr "配置内部元数据库守护程序所运行的端口。仅在 hive.metastore.local 为真时使用。"
 
 #: src/beeswax/conf.py:61
@@ -49,18 +42,11 @@ msgid "Path to beeswax_server.sh"
 msgstr "beeswax_server.sh 的路径"
 
 #: src/beeswax/conf.py:67
-msgid ""
-"Maximum Java heap size (in megabytes) used by Beeswax Server.  Note that "
-"the setting of HADOOP_HEAPSIZE in $HADOOP_CONF_DIR/hadoop-env.sh may "
-"override this setting."
-msgstr ""
-"Beeswax 服务器使用的最大 Java 堆大小（单位：兆字节）。请注意，$HADOOP_CONF_DIR/hadoop-env.sh 中的 "
-"HADOOP_HEAPSIZE 设置可能会覆盖此设置。"
+msgid "Maximum Java heap size (in megabytes) used by Beeswax Server.  Note that the setting of HADOOP_HEAPSIZE in $HADOOP_CONF_DIR/hadoop-env.sh may override this setting."
+msgstr "Beeswax 服务器使用的最大 Java 堆大小（单位：兆字节）。请注意，$HADOOP_CONF_DIR/hadoop-env.sh 中的 HADOOP_HEAPSIZE 设置可能会覆盖此设置。"
 
 #: src/beeswax/conf.py:75
-msgid ""
-"Path to the root of the Hive installation; defaults to environment "
-"variable when not set."
+msgid "Path to the root of the Hive installation; defaults to environment variable when not set."
 msgstr "Hive 安装的根路径；默认为环境变量（若未设置）。"
 
 #: src/beeswax/conf.py:80
@@ -76,26 +62,19 @@ msgid "Timeout in seconds for Thrift calls to Beeswax service."
 msgstr "Thrift 调用 Beeswax 服务的超时时间（秒数）"
 
 #: src/beeswax/conf.py:98
-msgid ""
-"Timeouts in seconds for Thrift calls to the Hive metastore. This timeout "
-"should take into account that the metastore could talk to an external "
-"database."
+msgid "Timeouts in seconds for Thrift calls to the Hive metastore. This timeout should take into account that the metastore could talk to an external database."
 msgstr "Thrift 调用 Hive 元数据仓的超时时间（秒数）。此超时值应考虑到元数据仓可与外部数据库通信。"
 
 #: src/beeswax/conf.py:104
-msgid "Time in seconds for Beeswax to persist queries in its cache."
-msgstr "Beeswax 在缓存中进行持续查询的时间（秒数）。"
+msgid "Time in milliseconds for Beeswax to persist queries in its cache."
+msgstr "Beeswax 在缓存中进行持续查询的时间（毫秒）。"
 
 #: src/beeswax/conf.py:110
-msgid ""
-"Set a LIMIT clause when browsing a partitioned table. A positive value "
-"will be set as the LIMIT. If 0 or negative, do not set any limit."
+msgid "Set a LIMIT clause when browsing a partitioned table. A positive value will be set as the LIMIT. If 0 or negative, do not set any limit."
 msgstr "浏览分区表时设置 LIMIT 子句。数值为正则将其设置为 LIMIT。"
 
 #: src/beeswax/conf.py:116
-msgid ""
-"Share saved queries with all users. If set to false, saved queries are "
-"visible only to the owner and administrators."
+msgid "Share saved queries with all users. If set to false, saved queries are visible only to the owner and administrators."
 msgstr "与所有用户共享保存的查询。如果设置为 false，保存的查询仅对该查询的所有者和管理员可见。"
 
 #: src/beeswax/create_table.py:92
@@ -129,454 +108,415 @@ msgstr "构建分隔符形式时出现内部错误：%(error)s"
 
 #: src/beeswax/create_table.py:341
 #, python-format
-msgid ""
-"Failed to decode file '%(path)s' into printable characters under "
-"%(encoding)s"
+msgid "Failed to decode file '%(path)s' into printable characters under %(encoding)s"
 msgstr "无法将文件 '%(path)s' 解码为采用 %(encoding)s 的可打印字符"
 
-#: src/beeswax/create_table.py:403
+#: src/beeswax/create_table.py:364
+msgid "Could not find any columns to import"
+msgstr "找不到任何要导入的列"
+
+#: src/beeswax/create_table.py:406
 #, python-format
 msgid "Failed to open file '%(path)s': %(error)s"
 msgstr "无法打开文件 '%(path)s'：%(error)s"
 
-#: src/beeswax/create_table.py:455
+#: src/beeswax/create_table.py:458
 msgid "Internal error: Missing needed parameter to load data into table"
 msgstr "内部错误：缺少将数据加载到表中所需的参数"
 
-#: src/beeswax/forms.py:61
+#: src/beeswax/forms.py:46
 msgid "Change the name to save as a new design."
 msgstr "更改名称以将其另存为新设计。"
 
-#: src/beeswax/forms.py:62 src/beeswax/forms.py:193 src/beeswax/forms.py:277
-#: src/beeswax/templates/configuration.mako:42
-#: src/beeswax/templates/execute.mako:320
-#: src/beeswax/templates/list_designs.mako:51
+#: src/beeswax/forms.py:47 src/beeswax/forms.py:180 src/beeswax/forms.py:264
+#: src/beeswax/forms.py:354 src/beeswax/templates/configuration.mako:42
+#: src/beeswax/templates/execute.mako:352
+#: src/beeswax/templates/list_designs.mako:52
 msgid "Description"
 msgstr "描述"
 
-#: src/beeswax/forms.py:68 src/beeswax/forms.py:69
-#: src/beeswax/templates/execute.mako:50 src/beeswax/templates/execute.mako:329
+#: src/beeswax/forms.py:53 src/beeswax/forms.py:54
+#: src/beeswax/templates/execute.mako:50 src/beeswax/templates/execute.mako:361
 #: src/beeswax/templates/save_results.mako:67
-#: src/beeswax/templates/watch_results.mako:79
-#: src/beeswax/templates/watch_results.mako:248
+#: src/beeswax/templates/watch_results.mako:80
+#: src/beeswax/templates/watch_results.mako:245
 msgid "Save"
 msgstr "保存"
 
-#: src/beeswax/forms.py:70 src/beeswax/forms.py:71
+#: src/beeswax/forms.py:55 src/beeswax/forms.py:56
 msgid "Save As"
 msgstr "另存为"
 
-#: src/beeswax/forms.py:83
+#: src/beeswax/forms.py:70
 msgid "Please enter a name"
 msgstr "请输入名称"
 
-#: src/beeswax/forms.py:103 src/beeswax/forms.py:192 src/beeswax/forms.py:276
-#: src/beeswax/templates/show_tables.mako:65
-#: src/beeswax/templates/watch_results.mako:230
+#: src/beeswax/forms.py:90 src/beeswax/forms.py:179 src/beeswax/forms.py:263
+#: src/beeswax/templates/watch_results.mako:227
 msgid "Table Name"
 msgstr "表名"
 
-#: src/beeswax/forms.py:105
+#: src/beeswax/forms.py:92
 msgid "Name of the new table"
 msgstr "新表的名称"
 
-#: src/beeswax/forms.py:106
+#: src/beeswax/forms.py:93
 msgid "Results Location"
 msgstr "结果位置"
 
-#: src/beeswax/forms.py:108
+#: src/beeswax/forms.py:95
 msgid "Empty directory in HDFS to put the results"
 msgstr "HDFS 中用于存放结果的目录为空"
 
-#: src/beeswax/forms.py:127
+#: src/beeswax/forms.py:114
 msgid "Table already exists"
 msgstr "表已存在"
 
-#: src/beeswax/forms.py:136 src/beeswax/templates/execute.mako:246
-#: src/beeswax/templates/execute.mako:251 src/beeswax/templates/layout.mako:34
+#: src/beeswax/forms.py:123 src/beeswax/templates/execute.mako:258
+#: src/beeswax/templates/layout.mako:34
 msgid "Query Editor"
 msgstr "查询编辑器"
 
-#: src/beeswax/forms.py:159
+#: src/beeswax/forms.py:146
 msgid "jar"
 msgstr "jar"
 
-#: src/beeswax/forms.py:160
+#: src/beeswax/forms.py:147
 msgid "archive"
 msgstr "存档"
 
-#: src/beeswax/forms.py:162
-msgid ""
-"Resources to upload with your Hive job.  Use 'jar' for UDFs.  Use 'file' "
-"and 'archive' for files to be copied and made locally available during "
-"MAP/TRANSFORM. Paths are on HDFS."
-msgstr ""
-"要通过您的 Hive 作业上载的资源。对 UDF 使用 'jar'。对要在 MAP/TRANSFORM 期间复制且在本地提供的文件使用 "
-"'file' 和 'archive'。路径位于 HDFS 上。"
+#: src/beeswax/forms.py:149
+msgid "Resources to upload with your Hive job.  Use 'jar' for UDFs.  Use 'file' and 'archive' for files to be copied and made locally available during MAP/TRANSFORM. Paths are on HDFS."
+msgstr "要通过您的 Hive 作业上载的资源。对 UDF 使用 'jar'。对要在 MAP/TRANSFORM 期间复制且在本地提供的文件使用 'file' 和 'archive'。路径位于 HDFS 上。"
 
-#: src/beeswax/forms.py:168
+#: src/beeswax/forms.py:155
 msgid "Path to file on HDFS."
 msgstr "HDFS 上的文件路径。"
 
-#: src/beeswax/forms.py:202
+#: src/beeswax/forms.py:189
 msgid "Field terminator"
 msgstr "字段终止符"
 
-#: src/beeswax/forms.py:204
+#: src/beeswax/forms.py:191
 msgid "Collection terminator"
 msgstr "集合终结符"
 
-#: src/beeswax/forms.py:206
+#: src/beeswax/forms.py:193
 msgid "Map key terminator"
 msgstr "Map 键终止符"
 
-#: src/beeswax/forms.py:215
+#: src/beeswax/forms.py:202
 msgid "SerDe Name"
 msgstr "SerDe 名称"
 
-#: src/beeswax/forms.py:218
+#: src/beeswax/forms.py:205
 msgid "Comma-separated list of key-value pairs, eg., 'p1=v1, p2=v2'"
 msgstr "逗号分隔的键值对列表，如 'p1=v1, p2=v2'"
 
-#: src/beeswax/forms.py:229
+#: src/beeswax/forms.py:216
 msgid "InputFormat Class"
 msgstr "InputFormat 类"
 
-#: src/beeswax/forms.py:230
+#: src/beeswax/forms.py:217
 msgid "OutputFormat Class"
 msgstr "OutputFormat 类"
 
-#: src/beeswax/forms.py:238
+#: src/beeswax/forms.py:225 src/beeswax/forms.py:357
+#: src/beeswax/templates/create_database.mako:91
 #: src/beeswax/templates/create_table_manually.mako:251
 msgid "Use default location"
 msgstr "使用默认位置"
 
-#: src/beeswax/forms.py:239
+#: src/beeswax/forms.py:226
 msgid "Path to HDFS directory or file of table data."
 msgstr "HDFS 目录或表数据文件的路径。"
 
-#: src/beeswax/forms.py:262
+#: src/beeswax/forms.py:249
 #, python-format
 msgid "Table \"%(name)s\" already exists"
 msgstr "表 \"%(name)s\" 已存在"
 
-#: src/beeswax/forms.py:269
+#: src/beeswax/forms.py:256
 msgid "Terminator must be exactly one character."
 msgstr "终结符必须严格为一个字符。"
 
-#: src/beeswax/forms.py:280
+#: src/beeswax/forms.py:267
 msgid "Input File"
 msgstr "输入文件"
 
-#: src/beeswax/forms.py:282
+#: src/beeswax/forms.py:269
 msgid "Import data from file"
 msgstr "从文件导入数据"
 
-#: src/beeswax/forms.py:283
+#: src/beeswax/forms.py:270
 msgid "Automatically load this file into the table after creation."
 msgstr "创建后自动将此文件加载到表中。"
 
-#: src/beeswax/forms.py:295
+#: src/beeswax/forms.py:282
 msgid "Delimiter"
 msgstr "分隔符"
 
-#: src/beeswax/forms.py:307
+#: src/beeswax/forms.py:294
 msgid "Delimiter value must be smaller than 256."
 msgstr "分隔符值必须小于 256。"
 
-#: src/beeswax/forms.py:309
+#: src/beeswax/forms.py:296
 msgid "Delimiter value is required."
 msgstr "需要分隔符值。"
 
-#: src/beeswax/forms.py:334
+#: src/beeswax/forms.py:321
 #: src/beeswax/templates/create_table_manually.mako:331
 msgid "Column Name"
 msgstr "列名称"
 
-#: src/beeswax/forms.py:335
+#: src/beeswax/forms.py:322
 msgid "Column Type"
 msgstr "列类型"
 
-#: src/beeswax/forms.py:338
+#: src/beeswax/forms.py:325
 msgid "Array Value Type"
 msgstr "数组值类型"
 
-#: src/beeswax/forms.py:341 src/beeswax/forms.py:344
+#: src/beeswax/forms.py:328 src/beeswax/forms.py:331
 msgid "Specify if column_type is map."
 msgstr "指定 column_type 是否为 map。"
 
-#: src/beeswax/forms.py:346
+#: src/beeswax/forms.py:333
 msgid "add a column"
 msgstr "添加一列"
 
-#: src/beeswax/forms.py:348
+#: src/beeswax/forms.py:335
 msgid "add a partition"
 msgstr "添加一个分区"
 
-#: src/beeswax/forms.py:353 src/beeswax/templates/describe_partitions.mako:36
-msgid "Path"
-msgstr "路径"
+#: src/beeswax/forms.py:341
+#, fuzzy, python-format
+msgid "Database \"%(name)s\" already exists"
+msgstr "数据库“%(name)s”已存在"
 
-#: src/beeswax/forms.py:354
-msgid "Overwrite?"
-msgstr "是否覆盖？"
+#: src/beeswax/forms.py:353
+msgid "Database Name"
+msgstr "数据库名称"
 
-#: src/beeswax/forms.py:367
-#, python-format
-msgid "%(column_name)s (partition key with type %(column_type)s)"
-msgstr "%(column_name)s（类型为 %(column_type)s 的分区键）"
+#: src/beeswax/forms.py:358
+msgid "Path to HDFS directory or file of database data."
+msgstr "数据库数据的 HDFS 目录或文件的路径。"
 
-#: src/beeswax/models.py:70
+#: src/beeswax/models.py:69
 msgid "Host of the query server."
 msgstr "查询服务器主机。"
 
-#: src/beeswax/models.py:71
+#: src/beeswax/models.py:70
 msgid "Port of the query server."
 msgstr "查询服务器端口。"
 
-#: src/beeswax/models.py:72
+#: src/beeswax/models.py:71
 msgid "Name of the query server."
 msgstr "查询服务器名称。"
 
-#: src/beeswax/models.py:73
+#: src/beeswax/models.py:72
 msgid "Type of the query server."
 msgstr "查询服务器类型。"
 
-#: src/beeswax/models.py:251
+#: src/beeswax/models.py:255
 msgid "My saved query"
 msgstr "我保存的查询"
 
-#: src/beeswax/models.py:252
+#: src/beeswax/models.py:256
 msgid " (new)"
 msgstr " （新）"
 
-#: src/beeswax/models.py:294
+#: src/beeswax/models.py:309
 #, python-format
 msgid "Cannot retrieve Beeswax design id %(id)s"
 msgstr "无法检索 Beeswax 设计 ID %(id)s"
 
-#: src/beeswax/models.py:298
+#: src/beeswax/models.py:313
 #, python-format
 msgid "Design id %(id)s does not belong to user %(user)s"
 msgstr "设计 ID %(id)s 不属于用户 %(user)s"
 
-#: src/beeswax/models.py:303
+#: src/beeswax/models.py:318
 #, python-format
-msgid ""
-"Type mismatch for design id %(id)s (owner %(owner)s) - Expected "
-"%(expected_type)s got %(real_type)s"
-msgstr ""
-"设计 ID %(id)s（所有者为 %(owner)s）的类型不匹配 - 需要 %(expected_type)s，但得到 "
-"%(real_type)s"
+msgid "Type mismatch for design id %(id)s (owner %(owner)s) - Expected %(expected_type)s got %(real_type)s"
+msgstr "设计 ID %(id)s（所有者为 %(owner)s）的类型不匹配 - 需要 %(expected_type)s，但得到 %(real_type)s"
 
-#: src/beeswax/models.py:334
+#: src/beeswax/models.py:352
 msgid "Last used"
 msgstr "上次使用"
 
-#: src/beeswax/views.py:97
+#: src/beeswax/models.py:353
+msgid "Application we communicate with."
+msgstr "我们与其通信的应用程序。"
+
+#: src/beeswax/views.py:88
 #, python-format
 msgid "Invalid design type %(type)s"
 msgstr "无效设计类型 %(type)s"
 
-#: src/beeswax/views.py:128
+#: src/beeswax/views.py:119
 #, python-format
 msgid "Saved design \"%(name)s\""
 msgstr "保存的设计 \"%(name)s\""
 
-#: src/beeswax/views.py:146
-msgid "Delete design?"
+#: src/beeswax/views.py:129
+msgid "POST request required."
+msgstr "需要 POST 请求。"
+
+#: src/beeswax/views.py:159
+msgid "Delete design(s)?"
 msgstr "删除设计？"
 
-#: src/beeswax/views.py:161
+#: src/beeswax/views.py:174
 #, python-format
 msgid "Copied design: %(name)s"
 msgstr "复制的设计：%(name)s"
 
-#: src/beeswax/views.py:348
-#, python-format
-msgid "Failed to remove %(table)s.  Error: %(error)s"
-msgstr "无法删除 %(table)s。错误：%(error)s"
-
-#: src/beeswax/views.py:349
-msgid "Beeswax Error"
-msgstr "Beeswax 错误"
-
-#: src/beeswax/views.py:352
-#, python-format
-msgid "Do you really want to drop the view '%(table)s'?"
-msgstr "是否确实要丢弃视图 '%(table)s'？"
-
-#: src/beeswax/views.py:354
-#, python-format
-msgid ""
-"This may delete the underlying data as well as the metadata. Drop table "
-"'%(table)s'?"
-msgstr "这可能会删除基础数据及元数据。删除 '%(table)s'？"
-
-#: src/beeswax/views.py:370
-msgid "Can read table"
-msgstr "可读取表格"
-
-#: src/beeswax/views.py:407
-#, python-format
-msgid "Table '%(table)s' is not partitioned."
-msgstr "表 '%(table)s' 未分区。"
-
-#: src/beeswax/views.py:734
+#: src/beeswax/views.py:642
 #, python-format
 msgid "This query has %(state)s. Results unavailable."
 msgstr "此查询具有 %(state)s。结果不可用。"
 
-#: src/beeswax/views.py:736
+#: src/beeswax/views.py:644
 msgid "The result of this query is not available yet."
 msgstr "此查询的结果尚不可用。"
 
-#: src/beeswax/views.py:755
+#: src/beeswax/views.py:663
 msgid "Cannot find query."
 msgstr "找不到查询。"
 
-#: src/beeswax/views.py:761
-msgid ""
-"Saving results from a partitioned table is not supported. You may copy "
-"from the HDFS location manually."
+#: src/beeswax/views.py:669
+msgid "Saving results from a partitioned table is not supported. You may copy from the HDFS location manually."
 msgstr "不支持从分区表保存结果。您可手动从 HDFS 位置复制。"
 
-#: src/beeswax/views.py:768
+#: src/beeswax/views.py:676
 #, python-format
-msgid ""
-"Saving results from a query with no MapReduce jobs is not supported. You "
-"may copy manually from the HDFS location %(path)s."
+msgid "Saving results from a query with no MapReduce jobs is not supported. You may copy manually from the HDFS location %(path)s."
 msgstr "不支持从无 MapReduce 作业的查询保存结果。您可手动从 HDFS 位置 %(path)s 复制。"
 
-#: src/beeswax/views.py:783
+#: src/beeswax/views.py:691
 msgid "The table could not be saved."
 msgstr "无法保存表。"
 
-#: src/beeswax/views.py:791
+#: src/beeswax/views.py:699
 #, python-format
 msgid "Failed to save results from query: %(error)s"
 msgstr "无法从查询保存结果：%(error)s"
 
-#: src/beeswax/views.py:849
+#: src/beeswax/views.py:757
 #, python-format
 msgid "Saved query results as new table %(table)s"
 msgstr "已将查询结果保存为新表 %(table)s"
 
-#: src/beeswax/views.py:914
+#: src/beeswax/views.py:834
 msgid "Install sample tables and Beeswax examples?"
 msgstr "是否安装示例表和 Beeswax 示例？"
 
-#: src/beeswax/views.py:955
+#: src/beeswax/views.py:863
 msgid "Beeswax query completed"
 msgstr "Beeswax 查询已完成"
 
-#: src/beeswax/views.py:963
+#: src/beeswax/views.py:871
 #, fuzzy, python-format
-msgid ""
-"%(subject)s. You may see the results here: %(link)s\n"
+msgid "%(subject)s. You may see the results here: %(link)s\n"
 "\n"
 "Query:\n"
 "%(query)s"
-msgstr ""
-"%(subject)s。您在此处可能会看到：%(link)s\n"
-"\"\n"
-"\"\n"
-"\"\n"
-"\"查询：\n"
-"\"\n"
-"\"%(query)s"
+msgstr "%(subject)s。您在此处可能会看到：%(link)s\n"
+"\n"
+"查询：\n"
+"%(query)s"
 
-#: src/beeswax/views.py:988
+#: src/beeswax/views.py:896
 #, python-format
 msgid "Design %(id)s does not exist."
 msgstr "设计 %(id)s 不存在。"
 
-#: src/beeswax/views.py:994
+#: src/beeswax/views.py:902
 #, python-format
 msgid "Cannot access design %(id)s"
 msgstr "无法访问设计 %(id)s"
 
-#: src/beeswax/views.py:1005
+#: src/beeswax/views.py:913
 #, python-format
 msgid "QueryHistory %(id)s does not exist."
 msgstr "查询历史 %(id)s 不存在。"
 
-#: src/beeswax/views.py:1011
+#: src/beeswax/views.py:919
 #, python-format
 msgid "Cannot access QueryHistory %(id)s"
 msgstr "无法访问查询历史 %(id)s"
 
-#: src/beeswax/views.py:1028
+#: src/beeswax/views.py:936
 msgid "Design does not exist"
 msgstr "设计不存在"
 
-#: src/beeswax/views.py:1088
+#: src/beeswax/views.py:996
 msgid "Query is not parameterizable."
 msgstr "查询不可参数化。"
 
-#: src/beeswax/views.py:1254
-#, fuzzy
+#: src/beeswax/views.py:1162
 msgid "Failed to retrieve query state from the Query Server."
-msgstr "无法从 Beeswax 服务器检索查询状态。"
+msgstr "无法从查询服务器检索查询状态。"
 
-#: src/beeswax/views.py:1259
-msgid "Failed to contact Beeswax Server to check query status."
-msgstr "无法联系 Beeswax 服务器来检查查询状态。"
+#: src/beeswax/views.py:1172
+msgid "Failed to contact Server to check query status."
+msgstr "无法联系服务器以检查查询状态。"
 
-#: src/beeswax/management/commands/beeswax_install_examples.py:82
-msgid "Beeswax examples already installed."
-msgstr "已安装 Beeswax 示例。"
-
-#: src/beeswax/management/commands/beeswax_install_examples.py:164
+#: src/beeswax/management/commands/beeswax_install_examples.py:167
 #, python-format
 msgid "Cannot find table data in \"%(file)s\""
 msgstr "在 \"%(file)s\" 中找不到表数据"
 
-#: src/beeswax/management/commands/beeswax_install_examples.py:181
+#: src/beeswax/management/commands/beeswax_install_examples.py:184
 #, python-format
 msgid "Table \"%(table)s\" already exists."
 msgstr "表 \"%(table)s\" 已存在。"
 
-#: src/beeswax/management/commands/beeswax_install_examples.py:189
+#: src/beeswax/management/commands/beeswax_install_examples.py:192
 #, python-format
 msgid "Error creating table %(table)s: Operation timeout."
 msgstr "创建表 %(table)s 时出错：操作超时。"
 
-#: src/beeswax/management/commands/beeswax_install_examples.py:193
+#: src/beeswax/management/commands/beeswax_install_examples.py:196
 #, python-format
 msgid "Error creating table %(table)s: %(error)s"
 msgstr "创建表 %(table)s 时出错：%(error)s"
 
-#: src/beeswax/management/commands/beeswax_install_examples.py:213
+#: src/beeswax/management/commands/beeswax_install_examples.py:216
 #, python-format
 msgid "Error loading table %(table)s: Operation timeout."
 msgstr "加载表 %(table)s 时出错：操作超时。"
 
-#: src/beeswax/management/commands/beeswax_install_examples.py:217
+#: src/beeswax/management/commands/beeswax_install_examples.py:220
 #, python-format
 msgid "Error loading table %(table)s: %(error)s"
 msgstr "加载表 %(table)s 时出错：%(error)s"
 
-#: src/beeswax/management/commands/beeswax_install_examples.py:238
+#: src/beeswax/management/commands/beeswax_install_examples.py:241
 #, python-format
 msgid "Sample design %(name)s already exists."
 msgstr "样本设计 %(name)s 已存在。"
 
-#: src/beeswax/server/dbms.py:208
+#: src/beeswax/server/dbms.py:270
 #, python-format
 msgid "Server returning invalid handle for query id %(id)d [%(query)s]..."
 msgstr "服务器正在返回 ID 为 %(id)d 的查询 [%(query)s] 的无效句柄..."
 
-#: src/beeswax/server/dbms.py:299
-msgid "Could not retrieve logs."
-msgstr "无法检索日志。"
+#: src/beeswax/server/dbms.py:362
+msgid "No server logs for this query"
+msgstr "此查询没有服务器日志"
 
-#: src/beeswax/server/dbms.py:302
+#: src/beeswax/server/dbms.py:365
+#, fuzzy, python-format
+msgid "Could not retrieve logs: %s"
+msgstr "无法检索日志：%s"
+
+#: src/beeswax/server/dbms.py:368
 msgid "Unknown exception."
 msgstr "未知异常。"
 
 #: src/beeswax/templates/beeswax_components.mako:198
-#: src/beeswax/templates/watch_results.mako:177
 msgid "Beginning of List"
 msgstr "列表开头"
 
@@ -585,12 +525,10 @@ msgid "Previous Page"
 msgstr "上一页"
 
 #: src/beeswax/templates/beeswax_components.mako:200
-#: src/beeswax/templates/watch_results.mako:181
 msgid "Next page"
 msgstr "下一页"
 
 #: src/beeswax/templates/beeswax_components.mako:200
-#: src/beeswax/templates/watch_results.mako:181
 msgid "Next Page"
 msgstr "下一页"
 
@@ -600,9 +538,7 @@ msgstr "列表结尾"
 
 #: src/beeswax/templates/beeswax_components.mako:203
 #, python-format
-msgid ""
-"Showing %(start)s to %(end)s of %(count)s items, page %(page)s of "
-"%(pages)s"
+msgid "Showing %(start)s to %(end)s of %(count)s items, page %(page)s of %(pages)s"
 msgstr "正在显示第 %(page)s 页 %(start)s - %(end)s (共 %(pages)s 页 %(count)s 项)"
 
 #: src/beeswax/templates/choose_delimiter.mako:25
@@ -619,17 +555,15 @@ msgstr "从文件中创建一个表"
 #: src/beeswax/templates/create_table_manually.mako:34
 #: src/beeswax/templates/define_columns.mako:29
 #: src/beeswax/templates/define_columns.mako:35
-#: src/beeswax/templates/show_tables.mako:48
 msgid "Create a new table from a file"
 msgstr "从文件中创建一个新表"
 
 #: src/beeswax/templates/choose_delimiter.mako:34
 #: src/beeswax/templates/choose_file.mako:34
+#: src/beeswax/templates/create_database.mako:35
 #: src/beeswax/templates/create_table_manually.mako:33
 #: src/beeswax/templates/define_columns.mako:34
-#: src/beeswax/templates/describe_table.mako:61
-#: src/beeswax/templates/list_history.mako:56
-#: src/beeswax/templates/show_tables.mako:44
+#: src/beeswax/templates/list_history.mako:57
 msgid "Actions"
 msgstr "操作"
 
@@ -638,7 +572,6 @@ msgstr "操作"
 #: src/beeswax/templates/create_table_manually.mako:28
 #: src/beeswax/templates/create_table_manually.mako:35
 #: src/beeswax/templates/define_columns.mako:36
-#: src/beeswax/templates/show_tables.mako:49
 msgid "Create a new table manually"
 msgstr "手动创建一个新表"
 
@@ -674,9 +607,7 @@ msgstr "预览"
 
 #: src/beeswax/templates/choose_delimiter.mako:63
 #: src/beeswax/templates/create_table_manually.mako:134
-msgid ""
-"Enter the column delimiter. Must be a single character. Use syntax like "
-"\"\\001\" or \"\t\" for special characters."
+msgid "Enter the column delimiter. Must be a single character. Use syntax like \"\\001\" or \"\t\" for special characters."
 msgstr "输入列分隔符。必须是单个字符。对于特殊字符，请使用 \"\" 或 \"\t\" 等语法。"
 
 #: src/beeswax/templates/choose_delimiter.mako:68
@@ -685,14 +616,15 @@ msgstr "表预览"
 
 #: src/beeswax/templates/choose_delimiter.mako:95
 #: src/beeswax/templates/define_columns.mako:94
-#: src/beeswax/templates/list_history.mako:166
+#: src/beeswax/templates/list_history.mako:162
 msgid "Previous"
 msgstr "上一页"
 
 #: src/beeswax/templates/choose_delimiter.mako:96
 #: src/beeswax/templates/choose_file.mako:102
+#: src/beeswax/templates/create_database.mako:119
 #: src/beeswax/templates/create_table_manually.mako:308
-#: src/beeswax/templates/list_history.mako:165
+#: src/beeswax/templates/list_history.mako:161
 msgid "Next"
 msgstr "下一页"
 
@@ -711,35 +643,26 @@ msgstr "表名"
 
 #: src/beeswax/templates/choose_file.mako:55
 #: src/beeswax/templates/create_table_manually.mako:65
-msgid ""
-"Name of the new table. Table names must be globally unique. Table names "
-"tend to correspond as well to the directory where the data will be "
-"stored."
+msgid "Name of the new table. Table names must be globally unique. Table names tend to correspond as well to the directory where the data will be stored."
 msgstr "新表的名称。表名必须具有全局唯一性。表名应与将存储数据的目录对应。"
 
 #: src/beeswax/templates/choose_file.mako:63
+#: src/beeswax/templates/create_database.mako:69
 #: src/beeswax/templates/create_table_manually.mako:73
 msgid "Optional"
 msgstr "可选"
 
 #: src/beeswax/templates/choose_file.mako:69
 #: src/beeswax/templates/create_table_manually.mako:77
-msgid ""
-"Use a table comment to describe your table.  For example, you might note "
-"the data's provenance and any caveats users need to know."
+msgid "Use a table comment to describe your table.  For example, you might note the data's provenance and any caveats users need to know."
 msgstr "使用表备注描述您的表。例如，您可以注释数据的出处以及用户需要了解的注意事项。"
 
 #: src/beeswax/templates/choose_file.mako:84
-msgid ""
-"The HDFS path to the file that you would like to base this new table "
-"definition on. It can be compressed (gzip) or not."
+msgid "The HDFS path to the file that you would like to base this new table definition on. It can be compressed (gzip) or not."
 msgstr "您想作为此新表定义基础的文件的 HDFS 路径。可以是或不是压缩 (gzip) 文件。"
 
 #: src/beeswax/templates/choose_file.mako:93
-msgid ""
-"Check this box if you want to import the data in this file after creating"
-" the table definition. Leave it unchecked if you want to define an empty "
-"table."
+msgid "Check this box if you want to import the data in this file after creating the table definition. Leave it unchecked if you want to define an empty table."
 msgstr "如果您想在创建表定义后导入此文件中的数据，请选中此复选框。如果您想定义一个空表，请将其留空。"
 
 #: src/beeswax/templates/choose_file.mako:95
@@ -751,14 +674,15 @@ msgid "The selected file is going to be moved during the import."
 msgstr "导入期间将移动选定文件。"
 
 #: src/beeswax/templates/choose_file.mako:113
+#: src/beeswax/templates/create_database.mako:131
 #: src/beeswax/templates/create_table_manually.mako:395
-#: src/beeswax/templates/execute.mako:296
+#: src/beeswax/templates/execute.mako:328
 msgid "Choose a file"
 msgstr "选择文件"
 
 #: src/beeswax/templates/configuration.mako:24
 #: src/beeswax/templates/configuration.mako:28
-#: src/beeswax/templates/layout.mako:41
+#: src/beeswax/templates/layout.mako:38
 msgid "Settings"
 msgstr "设置"
 
@@ -783,38 +707,101 @@ msgid "Value"
 msgstr "值"
 
 #: src/beeswax/templates/configuration.mako:63
-#: src/beeswax/templates/describe_table.mako:248
-#: src/beeswax/templates/describe_table.mako:271
-#: src/beeswax/templates/list_designs.mako:131
-#: src/beeswax/templates/list_history.mako:157
-#: src/beeswax/templates/my_queries.mako:188
-#: src/beeswax/templates/my_queries.mako:209
-#: src/beeswax/templates/show_tables.mako:136
-#: src/beeswax/templates/watch_results.mako:265
-#, fuzzy
+#: src/beeswax/templates/list_designs.mako:139
+#: src/beeswax/templates/list_history.mako:153
+#: src/beeswax/templates/my_queries.mako:190
+#: src/beeswax/templates/my_queries.mako:211
+#: src/beeswax/templates/watch_results.mako:260
 msgid "No data available"
-msgstr "表中无可用数据"
+msgstr "没有可用数据"
 
 #: src/beeswax/templates/configuration.mako:64
-#: src/beeswax/templates/describe_table.mako:249
-#: src/beeswax/templates/describe_table.mako:272
-#: src/beeswax/templates/list_designs.mako:132
-#: src/beeswax/templates/list_history.mako:161
-#: src/beeswax/templates/my_queries.mako:189
-#: src/beeswax/templates/my_queries.mako:210
-#: src/beeswax/templates/show_tables.mako:137
-#: src/beeswax/templates/watch_results.mako:266
-#, fuzzy
+#: src/beeswax/templates/list_designs.mako:140
+#: src/beeswax/templates/list_history.mako:157
+#: src/beeswax/templates/my_queries.mako:191
+#: src/beeswax/templates/my_queries.mako:212
+#: src/beeswax/templates/watch_results.mako:261
 msgid "No matching records"
-msgstr "未找到匹配记录"
+msgstr "没有匹配记录"
+
+#: src/beeswax/templates/create_database.mako:24
+#: src/beeswax/templates/create_database.mako:120
+msgid "Create database"
+msgstr "创建数据库"
+
+#: src/beeswax/templates/create_database.mako:30
+#: src/beeswax/templates/create_database.mako:36
+msgid "Create a new database"
+msgstr "创建新数据库"
+
+#: src/beeswax/templates/create_database.mako:43
+#: src/beeswax/templates/create_table_manually.mako:42
+msgid "Step 1: Name"
+msgstr "第 1 步：名称"
+
+#: src/beeswax/templates/create_database.mako:44
+msgid "Step 2: Location"
+msgstr "步骤 2：位置"
+
+#: src/beeswax/templates/create_database.mako:51
+msgid "Create a database"
+msgstr "创建数据库"
+
+#: src/beeswax/templates/create_database.mako:51
+#: src/beeswax/templates/create_table_manually.mako:55
+msgid "Let's start with a name and description for where we'll store your data."
+msgstr "让我们从数据存储位置的名称和描述开始。"
+
+#: src/beeswax/templates/create_database.mako:56
+msgid "database_name"
+msgstr "database_name"
+
+#: src/beeswax/templates/create_database.mako:59
+#: src/beeswax/templates/create_table_manually.mako:63
+#: src/beeswax/templates/create_table_manually.mako:217
+#: src/beeswax/templates/create_table_manually.mako:230
+#: src/beeswax/templates/create_table_manually.mako:332
+msgid "This field is required. Spaces are not allowed."
+msgstr "此字段为必填字段。不允许有空格。"
+
+#: src/beeswax/templates/create_database.mako:61
+msgid "Name of the new database. Database names must be globally unique. Database names tend to correspond as well to the directory where the data will be stored."
+msgstr "新数据库的名称。数据库名称必须具有全局唯一性。数据库名称应与数据存储目录对应。"
+
+#: src/beeswax/templates/create_database.mako:73
+msgid "Use a database comment to describe your database. For example, you might note the data's provenance and any caveats users need to know."
+msgstr "使用数据库备注描述您的数据库。例如，您可注明数据的出处以及用户需要了解的任何注意事项。"
+
+#: src/beeswax/templates/create_database.mako:82
+msgid "Choose Where Your Database's Data is Stored"
+msgstr "选择数据库数据的存储位置"
+
+#: src/beeswax/templates/create_database.mako:85
+#: src/beeswax/templates/create_table_manually.mako:245
+msgid "Location"
+msgstr "位置"
+
+#: src/beeswax/templates/create_database.mako:94
+msgid "Store your database in the default location (controlled by Hive, and typically"
+msgstr "将数据库存储在默认位置（由 Hive 控制，通常"
+
+#: src/beeswax/templates/create_database.mako:108
+msgid "This field is required."
+msgstr "此字段为必填字段。"
+
+#: src/beeswax/templates/create_database.mako:110
+msgid "Enter the path (on HDFS) to your database's data location"
+msgstr "输入数据库数据位置的路径（位于 HDFS 上）"
+
+#: src/beeswax/templates/create_database.mako:118
+#: src/beeswax/templates/create_table_manually.mako:307
+#: src/beeswax/templates/explain.mako:46
+msgid "Back"
+msgstr "返回"
 
 #: src/beeswax/templates/create_table_manually.mako:24
 msgid "Create table manually"
 msgstr "手动创建表"
-
-#: src/beeswax/templates/create_table_manually.mako:42
-msgid "Step 1: Name"
-msgstr "第 1 步：名称"
 
 #: src/beeswax/templates/create_table_manually.mako:43
 msgid "Step 2: Record Format"
@@ -830,40 +817,23 @@ msgstr "第 4 步：文件格式"
 
 #: src/beeswax/templates/create_table_manually.mako:46
 msgid "Step 5: Location"
-msgstr "第 5 步：位置"
+msgstr "步骤 5：位置"
 
 #: src/beeswax/templates/create_table_manually.mako:47
 msgid "Step 6: Columns"
-msgstr "第 6 步：列"
+msgstr "步骤 6：列"
 
 #: src/beeswax/templates/create_table_manually.mako:55
 msgid "Create a table"
 msgstr "创建表"
-
-#: src/beeswax/templates/create_table_manually.mako:55
-msgid "Let's start with a name and description for where we'll store your data."
-msgstr "让我们从数据存储位置的名称和描述开始。"
-
-#: src/beeswax/templates/create_table_manually.mako:63
-#: src/beeswax/templates/create_table_manually.mako:217
-#: src/beeswax/templates/create_table_manually.mako:230
-#: src/beeswax/templates/create_table_manually.mako:332
-msgid "This field is required. Spaces are not allowed."
-msgstr "此字段为必填字段。不允许有空格。"
 
 #: src/beeswax/templates/create_table_manually.mako:86
 msgid "Choose Your Record Format"
 msgstr "选择您的记录格式"
 
 #: src/beeswax/templates/create_table_manually.mako:87
-msgid ""
-"Individual records are broken up into columns either with delimiters "
-"(e.g., CSV or TSV) or using a specific serialization / deserialization "
-"(SerDe) implementation. (One common specialized SerDe is for parsing out "
-"columns with a regular expression.)"
-msgstr ""
-"单独的记录将使用分隔符（例如，CSV 或 TSV）或使用特定的序列化/反序列化 (SerDe) 实施分割为多个列。（一个常见的专用 SerDe "
-"是使用正则表达式解析列。）"
+msgid "Individual records are broken up into columns either with delimiters (e.g., CSV or TSV) or using a specific serialization / deserialization (SerDe) implementation. (One common specialized SerDe is for parsing out columns with a regular expression.)"
+msgstr "单独的记录将使用分隔符（例如，CSV 或 TSV）或使用特定的序列化/反序列化 (SerDe) 实施分割为多个列。（一个常见的专用 SerDe 是使用正则表达式解析列。）"
 
 #: src/beeswax/templates/create_table_manually.mako:93
 msgid "Record format"
@@ -897,10 +867,8 @@ msgstr "仅支持单字符分隔符。"
 #: src/beeswax/templates/create_table_manually.mako:132
 #: src/beeswax/templates/create_table_manually.mako:142
 #: src/beeswax/templates/create_table_manually.mako:152
-msgid ""
-"This field is required. Spaces are not allowed. Terminator must be "
-"exactly one character."
-msgstr "此字段为必填字段。不允许有空格。分隔符必须只有一个字符。"
+msgid "This field is required. Spaces are not allowed. Terminator must be exactly one character."
+msgstr "此字段为必填字段。不允许有空格。终止符必须严格要求为一个字符。"
 
 #: src/beeswax/templates/create_table_manually.mako:144
 msgid "Use for array types."
@@ -912,7 +880,7 @@ msgstr "用于 map 类型。"
 
 #: src/beeswax/templates/create_table_manually.mako:170
 msgid "The Java class name of your SerDe."
-msgstr "您的 SerDe 的 Java 类名。"
+msgstr "SerDe 的 Java 类名称。"
 
 #: src/beeswax/templates/create_table_manually.mako:170
 #: src/beeswax/templates/create_table_manually.mako:182
@@ -962,19 +930,13 @@ msgstr "用于写入数据的 Java 类"
 msgid "Choose Where Your Table's Data is Stored"
 msgstr "选择表数据的存储位置"
 
-#: src/beeswax/templates/create_table_manually.mako:245
-msgid "Location"
-msgstr "位置"
-
 #: src/beeswax/templates/create_table_manually.mako:254
-msgid ""
-"Store your table in the default location (controlled by Hive, and "
-"typically"
+msgid "Store your table in the default location (controlled by Hive, and typically"
 msgstr "将表存储在默认位置（由 Hive 控制，通常"
 
 #: src/beeswax/templates/create_table_manually.mako:269
 msgid "Enter the path (on HDFS) to your table's data location"
-msgstr "输入表数据位置的路径（HDFS 上）"
+msgstr "输入表数据位置的路径（位于 HDFS 上）"
 
 #: src/beeswax/templates/create_table_manually.mako:278
 msgid "Configure Table Columns"
@@ -989,10 +951,7 @@ msgid "Configure Partitions"
 msgstr "配置分区"
 
 #: src/beeswax/templates/create_table_manually.mako:291
-msgid ""
-"If your data is naturally partitioned (by date, for example), partitions "
-"are a way to tell the query server that data for a specific partition "
-"value are stored together."
+msgid "If your data is naturally partitioned (by date, for example), partitions are a way to tell the query server that data for a specific partition value are stored together."
 msgstr "如果您的数据本身已分区（例如，按日期），则分区是一种告诉查询服务器特定分区值的数据将存储在一起的方式。"
 
 #: src/beeswax/templates/create_table_manually.mako:292
@@ -1000,22 +959,12 @@ msgid "The query server establishes a mapping between directories on disk"
 msgstr "查询服务器在磁盘上的目录之间建立 mapping"
 
 #: src/beeswax/templates/create_table_manually.mako:294
-msgid ""
-"and the data for that day.  Partitions are virtual columns; they are not "
-"represented in the data itself, but are determined by the data location. "
-"The query server implements query optimizations such that queries that "
-"are specific to a single partition need not read the data in other "
-"partitions."
+msgid "and the data for that day.  Partitions are virtual columns; they are not represented in the data itself, but are determined by the data location. The query server implements query optimizations such that queries that are specific to a single partition need not read the data in other partitions."
 msgstr "以及该日的数据。分区是虚拟列；数据本身中并不反映分区，而是由数据位置决定。查询服务器实施查询优化，以使特定于单个分区的查询不需要读取其他分区中的数据。"
 
 #: src/beeswax/templates/create_table_manually.mako:302
 msgid "Add a partition"
 msgstr "添加一个分区"
-
-#: src/beeswax/templates/create_table_manually.mako:307
-#: src/beeswax/templates/explain.mako:46
-msgid "Back"
-msgstr "返回"
 
 #: src/beeswax/templates/create_table_manually.mako:309
 msgid "Create table"
@@ -1043,10 +992,8 @@ msgid "Column type"
 msgstr "列类型"
 
 #: src/beeswax/templates/create_table_manually.mako:346
-msgid ""
-"Type for this column. Certain advanced types (namely, structs) are not "
-"exposed in this interface."
-msgstr "此列的类型。某些高级类型（即 structs）不会在此界面中显示。"
+msgid "Type for this column. Certain advanced types (namely, structs) are not exposed in this interface."
+msgstr "此列的类型。此界面不呈现某些高级类型（即 structs）。"
 
 #: src/beeswax/templates/create_table_manually.mako:353
 msgid "Array value type"
@@ -1088,146 +1035,25 @@ msgstr "此处输入您的 Map 键终止符"
 msgid "Define your columns"
 msgstr "定义列"
 
+#: src/beeswax/templates/define_columns.mako:63
+msgid "Bulk edit names"
+msgstr "批编辑名称"
+
 #: src/beeswax/templates/define_columns.mako:82
 msgid "Row"
 msgstr "行"
 
 #: src/beeswax/templates/define_columns.mako:95
-#: src/beeswax/templates/index.mako:38
 msgid "Create Table"
 msgstr "创建表"
 
-#: src/beeswax/templates/describe_partitions.mako:24
-#, python-format
-msgid "Beeswax Table Partitions: %(tableName)s"
-msgstr "Beeswax 表分区：%(tableName)s"
+#: src/beeswax/templates/define_columns.mako:105
+msgid "Write or paste comma separated column names"
+msgstr "写入或粘贴由逗号分隔的列名称"
 
-#: src/beeswax/templates/describe_partitions.mako:28
-msgid "Partitions"
-msgstr "分区"
-
-#: src/beeswax/templates/describe_partitions.mako:54
-msgid "Table has no partitions."
-msgstr "表中无分区。"
-
-#: src/beeswax/templates/describe_table.mako:26
-#: src/beeswax/templates/show_tables.mako:56
-msgid "View"
-msgstr "视图"
-
-#: src/beeswax/templates/describe_table.mako:28
-msgid "Table"
-msgstr "表"
-
-#: src/beeswax/templates/describe_table.mako:30
-#, python-format
-msgid "%s Metadata: %s"
-msgstr "%s 元数据：%s"
-
-#: src/beeswax/templates/describe_table.mako:37
-#: src/beeswax/templates/execute.mako:314
-#: src/beeswax/templates/list_designs.mako:50
-#: src/beeswax/templates/list_history.mako:95
-#: src/beeswax/templates/my_queries.mako:64
-#: src/beeswax/templates/my_queries.mako:107
-#: src/beeswax/templates/watch_results.mako:200
-msgid "Name"
-msgstr "名称"
-
-#: src/beeswax/templates/describe_table.mako:38
-#: src/beeswax/templates/list_designs.mako:53
-#: src/beeswax/templates/my_queries.mako:66
-msgid "Type"
-msgstr "类型"
-
-#: src/beeswax/templates/describe_table.mako:39
-msgid "Comment"
-msgstr "备注"
-
-#: src/beeswax/templates/describe_table.mako:56
-msgid "Table Metadata:"
-msgstr "表元数据："
-
-#: src/beeswax/templates/describe_table.mako:62
-#: src/beeswax/templates/index.mako:52
-msgid "Import Data"
-msgstr "导入数据"
-
-#: src/beeswax/templates/describe_table.mako:63
-#: src/beeswax/templates/show_tables.mako:57
-msgid "Browse Data"
-msgstr "浏览数据"
-
-#: src/beeswax/templates/describe_table.mako:64
-#: src/beeswax/templates/show_tables.mako:58
-msgid "Drop"
-msgstr "丢弃"
-
-#: src/beeswax/templates/describe_table.mako:65
-msgid "View File Location"
-msgstr "查看文件位置"
-
-#: src/beeswax/templates/describe_table.mako:75
-#: src/beeswax/templates/watch_results.mako:132
-msgid "Columns"
-msgstr "列"
-
-#: src/beeswax/templates/describe_table.mako:77
-msgid "Partition Columns"
-msgstr "分区列"
-
-#: src/beeswax/templates/describe_table.mako:80
-msgid "Sample"
-msgstr "样本"
-
-#: src/beeswax/templates/describe_table.mako:92
-msgid "Show Partitions"
-msgstr "显示分区"
-
-#: src/beeswax/templates/describe_table.mako:100
-#: src/beeswax/templates/watch_results.mako:140
-msgid "Error!"
-msgstr "错误！"
-
-#: src/beeswax/templates/describe_table.mako:137
-msgid "Drop Table"
-msgstr "删除表"
-
-#: src/beeswax/templates/describe_table.mako:144
-#: src/beeswax/templates/describe_table.mako:195
-#: src/beeswax/templates/execute.mako:328 src/beeswax/templates/index.mako:67
-#: src/beeswax/templates/list_designs.mako:106
-#: src/beeswax/templates/my_queries.mako:161
-#: src/beeswax/templates/parameterization.mako:49
-#: src/beeswax/templates/save_results.mako:68
-#: src/beeswax/templates/show_tables.mako:102
-#: src/beeswax/templates/show_tables.mako:115
-#: src/beeswax/templates/watch_results.mako:247
-msgid "Cancel"
-msgstr "取消"
-
-#: src/beeswax/templates/describe_table.mako:145
-msgid "Yes, drop this table"
-msgstr "是，删除此表"
-
-#: src/beeswax/templates/describe_table.mako:156
-msgid "Import data"
-msgstr "导入数据"
-
-#: src/beeswax/templates/describe_table.mako:186
-msgid "Overwrite existing data"
-msgstr "覆盖现有数据"
-
-#: src/beeswax/templates/describe_table.mako:191
-#: src/beeswax/templates/load_table.mako:49
-msgid ""
-"Note that loading data will move data from its location into the table's "
-"storage location."
-msgstr "请注意，加载数据会将数据从其位置移至表的存储位置。"
-
-#: src/beeswax/templates/describe_table.mako:196
-msgid "Submit"
-msgstr "提交"
+#: src/beeswax/templates/define_columns.mako:113
+msgid "e.g. id, name, salary"
+msgstr "例如，ID、名称、薪资"
 
 #: src/beeswax/templates/execute.mako:28
 msgid "Your query has the following error(s):"
@@ -1237,7 +1063,7 @@ msgstr "您的查询有下列错误："
 msgid "click the"
 msgstr "单击"
 
-#: src/beeswax/templates/execute.mako:31 src/beeswax/templates/execute.mako:263
+#: src/beeswax/templates/execute.mako:31 src/beeswax/templates/execute.mako:291
 msgid "Error Log"
 msgstr "错误日志"
 
@@ -1245,16 +1071,11 @@ msgstr "错误日志"
 msgid "tab below for details"
 msgstr "下方选项卡了解详细信息"
 
-#: src/beeswax/templates/execute.mako:36
-msgid "Example: SELECT * FROM tablename"
-msgstr "示例：从表名称中选择 *"
-
 #: src/beeswax/templates/execute.mako:45
 msgid "Execute"
 msgstr "执行"
 
 #: src/beeswax/templates/execute.mako:47
-#, fuzzy
 msgid "Download"
 msgstr "下载"
 
@@ -1274,96 +1095,150 @@ msgstr "或创建一个"
 msgid "New query"
 msgstr "新查询"
 
-#: src/beeswax/templates/execute.mako:61 src/beeswax/templates/execute.mako:257
+#: src/beeswax/templates/execute.mako:61 src/beeswax/templates/execute.mako:285
 #: src/beeswax/templates/explain.mako:33
-#: src/beeswax/templates/list_designs.mako:89
-#: src/beeswax/templates/list_history.mako:96
-#: src/beeswax/templates/my_queries.mako:89
-#: src/beeswax/templates/my_queries.mako:108
-#: src/beeswax/templates/watch_results.mako:129
+#: src/beeswax/templates/list_history.mako:97
+#: src/beeswax/templates/my_queries.mako:107
+#: src/beeswax/templates/watch_results.mako:130
 #: src/beeswax/templates/watch_wait.mako:59
 msgid "Query"
 msgstr "查询"
 
-#: src/beeswax/templates/execute.mako:74
-#: src/beeswax/templates/show_tables.mako:37
+#: src/beeswax/templates/execute.mako:70
 msgid "database"
 msgstr "数据库"
 
-#: src/beeswax/templates/execute.mako:82
+#: src/beeswax/templates/execute.mako:74
 msgid "settings"
 msgstr "设置"
 
-#: src/beeswax/templates/execute.mako:89 src/beeswax/templates/execute.mako:133
-#: src/beeswax/templates/execute.mako:178
+#: src/beeswax/templates/execute.mako:81 src/beeswax/templates/execute.mako:126
+#: src/beeswax/templates/execute.mako:171
 msgid "Delete this setting"
 msgstr "删除此设置"
 
-#: src/beeswax/templates/execute.mako:113
-#: src/beeswax/templates/execute.mako:158
-#: src/beeswax/templates/execute.mako:203
+#: src/beeswax/templates/execute.mako:106
+#: src/beeswax/templates/execute.mako:151
+#: src/beeswax/templates/execute.mako:196
 msgid "Add"
 msgstr "添加"
 
-#: src/beeswax/templates/execute.mako:121
+#: src/beeswax/templates/execute.mako:114
 msgid "File Resources"
 msgstr "文件资源"
 
-#: src/beeswax/templates/execute.mako:166
+#: src/beeswax/templates/execute.mako:159
 msgid "User-defined Functions"
 msgstr "用户定义的函数"
 
-#: src/beeswax/templates/execute.mako:186
+#: src/beeswax/templates/execute.mako:179
 msgid "myFunction"
 msgstr "myFunction（我的功能）"
 
-#: src/beeswax/templates/execute.mako:206
+#: src/beeswax/templates/execute.mako:199
 msgid "Parameterization"
 msgstr "参数化"
 
-#: src/beeswax/templates/execute.mako:208
-msgid ""
-"If checked (the default), you can include parameters like $parameter_name"
-" in your query, and users will be prompted for a value when the query is "
-"run."
+#: src/beeswax/templates/execute.mako:201
+msgid "If checked (the default), you can include parameters like $parameter_name in your query, and users will be prompted for a value when the query is run."
 msgstr "如果选中（默认值），您可在查询中包括 $parameter_name 之类的参数，并且在运行查询时会提示用户输入值。"
 
-#: src/beeswax/templates/execute.mako:210
+#: src/beeswax/templates/execute.mako:203
 msgid "Enable Parameterization"
 msgstr "启用参数化"
 
-#: src/beeswax/templates/execute.mako:217
+#: src/beeswax/templates/execute.mako:210
 msgid "Email Notification"
 msgstr "电子邮件通知"
 
-#: src/beeswax/templates/execute.mako:223
-msgid ""
-"If checked, you will receive an email notification when the query "
-"completes."
+#: src/beeswax/templates/execute.mako:216
+msgid "If checked, you will receive an email notification when the query completes."
 msgstr "如果选中，您将在查询完成时收到一封电子邮件通知。"
 
-#: src/beeswax/templates/execute.mako:225
+#: src/beeswax/templates/execute.mako:218
 msgid "Email me on completion"
 msgstr "完成时给我发送电子邮件"
 
-#: src/beeswax/templates/execute.mako:235
-#: src/beeswax/templates/watch_results.mako:114
-msgid "Did you know?"
-msgstr "您知道吗？"
+#: src/beeswax/templates/execute.mako:223
+msgid "Metastore Catalog"
+msgstr "Metastore 目录"
 
-#: src/beeswax/templates/execute.mako:236
-msgid ""
-"You can execute queries with multiple SQL statements delimited by a "
-"semicolon ';'."
-msgstr ""
+#: src/beeswax/templates/execute.mako:227
+msgid "Update the list of tables seen by Impala. It can take a few seconds..."
+msgstr "更新由 Impala 查看的表列表。可能需要几秒时间..."
 
-#: src/beeswax/templates/execute.mako:237
-msgid "Use '\\059' instead of ';' if you have some conflicts."
-msgstr ""
+#: src/beeswax/templates/execute.mako:228
+msgid "Refresh"
+msgstr "刷新"
 
-#: src/beeswax/templates/execute.mako:309
+#: src/beeswax/templates/execute.mako:239
+msgid "Press Shift + Space to autocomplete"
+msgstr "按 Shift + 空格键可自动完成"
+
+#: src/beeswax/templates/execute.mako:240
+msgid "You can execute queries with multiple SQL statements delimited by a semicolon ';'"
+msgstr "您可使用多个由分号“;”分隔的 SQL 语句执行查询"
+
+#: src/beeswax/templates/execute.mako:241
+msgid "You can highlight and run a fragment of a query"
+msgstr "您可突出显示并运行查询的片段"
+
+#: src/beeswax/templates/execute.mako:264
+msgid "Query name"
+msgstr "查询名称"
+
+#: src/beeswax/templates/execute.mako:275
+msgid "Query description"
+msgstr "查询描述"
+
+#: src/beeswax/templates/execute.mako:341
 msgid "Choose a name"
 msgstr "选择名称"
+
+#: src/beeswax/templates/execute.mako:346
+#: src/beeswax/templates/list_designs.mako:51
+#: src/beeswax/templates/list_history.mako:96
+#: src/beeswax/templates/my_queries.mako:66
+#: src/beeswax/templates/my_queries.mako:106
+#: src/beeswax/templates/watch_results.mako:197
+msgid "Name"
+msgstr "名称"
+
+#: src/beeswax/templates/execute.mako:360
+#: src/beeswax/templates/list_designs.mako:103
+#: src/beeswax/templates/my_queries.mako:153
+#: src/beeswax/templates/parameterization.mako:49
+#: src/beeswax/templates/save_results.mako:68
+#: src/beeswax/templates/watch_results.mako:244
+msgid "Cancel"
+msgstr "取消"
+
+#: src/beeswax/templates/execute.mako:438
+msgid "Example: SELECT * FROM tablename"
+msgstr "示例：从表名称中选择 *"
+
+#: src/beeswax/templates/execute.mako:442
+#: src/beeswax/templates/execute.mako:655
+#: src/beeswax/templates/execute.mako:660
+msgid "Problem: "
+msgstr "问题： "
+
+#: src/beeswax/templates/execute.mako:449
+msgid "This field is required"
+msgstr "此字段为必填字段"
+
+#: src/beeswax/templates/execute.mako:521
+msgid "Press \"tab\", then \"enter\"."
+msgstr "按“tab”键，再按“enter”。"
+
+#: src/beeswax/templates/execute.mako:657
+msgid "Refresh successful!"
+msgstr "刷新成功！"
+
+#: src/beeswax/templates/execute.mako:676
+#: src/beeswax/templates/watch_results.mako:115
+msgid "Did you know?"
+msgstr "您知道吗？"
 
 #: src/beeswax/templates/explain.mako:25
 msgid "Query Explanation"
@@ -1377,277 +1252,190 @@ msgstr "查询解释："
 msgid "Explanation"
 msgstr "解释"
 
-#: src/beeswax/templates/index.mako:24
-msgid "Beeswax"
-msgstr "Beeswax"
-
-#: src/beeswax/templates/index.mako:33
-msgid "Examples"
-msgstr "示例"
-
-#: src/beeswax/templates/index.mako:34 src/beeswax/templates/index.mako:53
-msgid "Install Samples"
-msgstr "安装示例"
-
-#: src/beeswax/templates/index.mako:36 src/beeswax/templates/layout.mako:39
-#: src/beeswax/templates/show_tables.mako:23
-#: src/beeswax/templates/show_tables.mako:27
-msgid "Tables"
-msgstr "表"
-
-#: src/beeswax/templates/index.mako:37
-msgid "Show Tables"
-msgstr "显示表"
-
-#: src/beeswax/templates/index.mako:39
-msgid "Queries"
-msgstr "查询"
-
-#: src/beeswax/templates/index.mako:40 src/beeswax/templates/layout.mako:36
-#: src/beeswax/templates/list_designs.mako:26
-#: src/beeswax/templates/list_designs.mako:31
-msgid "Saved Queries"
-msgstr "保存的查询"
-
-#: src/beeswax/templates/index.mako:41
-msgid "Execute Query"
-msgstr "执行查询"
-
-#: src/beeswax/templates/index.mako:42
-msgid "Query History"
-msgstr "查询历史"
-
-#: src/beeswax/templates/index.mako:43 src/beeswax/templates/index.mako:44
-msgid "Configuration"
-msgstr "配置"
-
-#: src/beeswax/templates/index.mako:45
-msgid "Extended Configuration"
-msgstr "扩展配置"
-
-#: src/beeswax/templates/index.mako:50
-msgid "Welcome to Beeswax for Hive"
-msgstr "欢迎使用 Hive Beeswax"
-
-#: src/beeswax/templates/index.mako:51
-msgid "To get started with Beeswax you'll first need set up some data:"
-msgstr "要着手使用 Beeswax，您需要先设置一些数据："
-
-#: src/beeswax/templates/index.mako:53
-msgid "or"
-msgstr "或"
-
-#: src/beeswax/templates/index.mako:61
-#: src/beeswax/templates/show_tables.mako:46
-#: src/beeswax/templates/show_tables.mako:94
-msgid "Install samples"
-msgstr "安装样本"
-
-#: src/beeswax/templates/index.mako:68
-#: src/beeswax/templates/show_tables.mako:103
-msgid "Yes, install samples"
-msgstr "是，安装示例"
-
-#: src/beeswax/templates/index.mako:88
-#: src/beeswax/templates/show_tables.mako:166
-msgid "There was an error processing your request:"
-msgstr "处理请求时发生错误："
-
 #: src/beeswax/templates/layout.mako:35
-#: src/beeswax/templates/my_queries.mako:27
-#: src/beeswax/templates/my_queries.mako:37
+#: src/beeswax/templates/my_queries.mako:29
+#: src/beeswax/templates/my_queries.mako:39
 msgid "My Queries"
 msgstr "我的查询"
 
+#: src/beeswax/templates/layout.mako:36
+#: src/beeswax/templates/list_designs.mako:27
+#: src/beeswax/templates/list_designs.mako:32
+msgid "Saved Queries"
+msgstr "保存的查询"
+
 #: src/beeswax/templates/layout.mako:37
-#: src/beeswax/templates/list_history.mako:26
-#: src/beeswax/templates/list_history.mako:51
+#: src/beeswax/templates/list_history.mako:27
+#: src/beeswax/templates/list_history.mako:52
 msgid "History"
 msgstr "历史记录"
 
-#: src/beeswax/templates/list_designs.mako:35
-#: src/beeswax/templates/my_queries.mako:42
-#, fuzzy
+#: src/beeswax/templates/list_designs.mako:36
+#: src/beeswax/templates/my_queries.mako:44
 msgid "Edit the selected query"
-msgstr "编辑此查询。"
+msgstr "编辑所选查询"
 
-#: src/beeswax/templates/list_designs.mako:35
-#: src/beeswax/templates/my_queries.mako:42
+#: src/beeswax/templates/list_designs.mako:36
+#: src/beeswax/templates/my_queries.mako:44
 msgid "Edit"
 msgstr "编辑"
 
-#: src/beeswax/templates/list_designs.mako:36
-#: src/beeswax/templates/my_queries.mako:43
+#: src/beeswax/templates/list_designs.mako:37
+#: src/beeswax/templates/my_queries.mako:45
 msgid "Clone the selected query"
-msgstr ""
+msgstr "克隆所选查询"
 
-#: src/beeswax/templates/list_designs.mako:36
-#: src/beeswax/templates/list_history.mako:43
-#: src/beeswax/templates/my_queries.mako:43
+#: src/beeswax/templates/list_designs.mako:37
+#: src/beeswax/templates/list_history.mako:44
+#: src/beeswax/templates/my_queries.mako:45
 msgid "Clone"
 msgstr "克隆"
 
-#: src/beeswax/templates/list_designs.mako:37
-#: src/beeswax/templates/my_queries.mako:44
-#, fuzzy
+#: src/beeswax/templates/list_designs.mako:38
+#: src/beeswax/templates/my_queries.mako:46
 msgid "View the usage history of the selected query"
-msgstr "查看此查询的使用历史记录。"
+msgstr "查看所选查询的使用历史记录"
 
-#: src/beeswax/templates/list_designs.mako:37
-#: src/beeswax/templates/my_queries.mako:44
-#, fuzzy
+#: src/beeswax/templates/list_designs.mako:38
+#: src/beeswax/templates/my_queries.mako:46
 msgid "Usage history"
 msgstr "使用历史记录"
 
-#: src/beeswax/templates/list_designs.mako:38
-#: src/beeswax/templates/my_queries.mako:45
-#, fuzzy
+#: src/beeswax/templates/list_designs.mako:39
+#: src/beeswax/templates/my_queries.mako:47
 msgid "Delete the selected queries"
-msgstr "删除此查询。"
+msgstr "删除所选查询"
 
-#: src/beeswax/templates/list_designs.mako:38
-#: src/beeswax/templates/my_queries.mako:45
+#: src/beeswax/templates/list_designs.mako:39
+#: src/beeswax/templates/my_queries.mako:47
 msgid "Delete"
 msgstr "删除"
 
-#: src/beeswax/templates/list_designs.mako:42
-#: src/beeswax/templates/my_queries.mako:49
+#: src/beeswax/templates/list_designs.mako:43
+#: src/beeswax/templates/my_queries.mako:51
 msgid "Create New Query"
 msgstr "创建新查询"
 
-#: src/beeswax/templates/list_designs.mako:52
+#: src/beeswax/templates/list_designs.mako:53
 msgid "Owner"
 msgstr "所有者"
 
 #: src/beeswax/templates/list_designs.mako:54
-#: src/beeswax/templates/my_queries.mako:67
+#: src/beeswax/templates/my_queries.mako:68
 msgid "Last Modified"
 msgstr "上次修改"
 
-#: src/beeswax/templates/list_designs.mako:91
-#: src/beeswax/templates/my_queries.mako:91
+#: src/beeswax/templates/list_designs.mako:88
+#: src/beeswax/templates/my_queries.mako:90
 msgid "ago"
 msgstr "前"
 
-#: src/beeswax/templates/list_designs.mako:103
-#: src/beeswax/templates/my_queries.mako:158
-#: src/beeswax/templates/show_tables.mako:112
+#: src/beeswax/templates/list_designs.mako:100
+#: src/beeswax/templates/my_queries.mako:150
 msgid "Confirm action"
 msgstr "确认操作"
 
-#: src/beeswax/templates/list_designs.mako:107
-#: src/beeswax/templates/my_queries.mako:162
-#: src/beeswax/templates/show_tables.mako:116
+#: src/beeswax/templates/list_designs.mako:104
+#: src/beeswax/templates/my_queries.mako:154
 msgid "Yes"
 msgstr "是"
 
-#: src/beeswax/templates/list_history.mako:35
+#: src/beeswax/templates/list_history.mako:36
 msgid "Unsaved"
 msgstr "未保存"
 
-#: src/beeswax/templates/list_history.mako:43
+#: src/beeswax/templates/list_history.mako:44
 msgid "Copy this query."
 msgstr "复制此查询。"
 
-#: src/beeswax/templates/list_history.mako:46
+#: src/beeswax/templates/list_history.mako:47
 msgid "Auto generated action"
 msgstr "自动生成的操作"
 
-#: src/beeswax/templates/list_history.mako:63
+#: src/beeswax/templates/list_history.mako:64
 msgid "Show my queries"
 msgstr "显示我的查询"
 
-#: src/beeswax/templates/list_history.mako:69
+#: src/beeswax/templates/list_history.mako:70
 msgid "Show everyone's queries"
 msgstr "显示所有人的查询"
 
-#: src/beeswax/templates/list_history.mako:78
+#: src/beeswax/templates/list_history.mako:79
 msgid "Show user queries"
 msgstr "显示用户查询"
 
-#: src/beeswax/templates/list_history.mako:84
+#: src/beeswax/templates/list_history.mako:85
 msgid "Show auto actions"
 msgstr "显示自动操作"
 
-#: src/beeswax/templates/list_history.mako:94
-#: src/beeswax/templates/my_queries.mako:106
+#: src/beeswax/templates/list_history.mako:95
+#: src/beeswax/templates/my_queries.mako:105
 msgid "Time"
 msgstr "时间"
 
-#: src/beeswax/templates/list_history.mako:97
+#: src/beeswax/templates/list_history.mako:98
 msgid "User"
 msgstr "用户"
 
-#: src/beeswax/templates/list_history.mako:98
-#: src/beeswax/templates/my_queries.mako:109
+#: src/beeswax/templates/list_history.mako:99
+#: src/beeswax/templates/my_queries.mako:108
 msgid "State"
 msgstr "状态"
 
-#: src/beeswax/templates/list_history.mako:99
+#: src/beeswax/templates/list_history.mako:100
 msgid "Result"
 msgstr "结果"
 
-#: src/beeswax/templates/list_history.mako:126
-#: src/beeswax/templates/watch_results.mako:126
+#: src/beeswax/templates/list_history.mako:122
+#: src/beeswax/templates/watch_results.mako:127
 msgid "Results"
 msgstr "结果"
 
-#: src/beeswax/templates/list_history.mako:158
+#: src/beeswax/templates/list_history.mako:154
 msgid "Showing _START_ to _END_ of _TOTAL_ entries"
 msgstr "显示 _START_ - _END_，共 _TOTAL_ 个条目"
 
-#: src/beeswax/templates/list_history.mako:159
+#: src/beeswax/templates/list_history.mako:155
 msgid "Showing 0 to 0 of 0 entries"
 msgstr "显示 0－0，共 0 个条目"
 
-#: src/beeswax/templates/list_history.mako:160
+#: src/beeswax/templates/list_history.mako:156
 msgid "(filtered from _MAX_ total entries)"
 msgstr "（已从 _MAX_ 个总条目中过滤）"
 
-#: src/beeswax/templates/list_history.mako:163
+#: src/beeswax/templates/list_history.mako:159
 msgid "First"
 msgstr "第一个"
 
-#: src/beeswax/templates/list_history.mako:164
+#: src/beeswax/templates/list_history.mako:160
 msgid "Last"
 msgstr "最后一个"
 
-#: src/beeswax/templates/load_table.mako:24
-#: src/beeswax/templates/load_table.mako:29
-#, python-format
-msgid "Load Data into %(table)s"
-msgstr "将数据加载到 %(table)s"
-
-#: src/beeswax/templates/load_table.mako:36
-msgid "Open File Chooser"
-msgstr "打开文件选择器"
-
-#: src/beeswax/templates/my_queries.mako:41
+#: src/beeswax/templates/my_queries.mako:43
 msgid "View the result of the selected"
-msgstr ""
+msgstr "查看选定项的结果"
 
-#: src/beeswax/templates/my_queries.mako:41
-#, fuzzy
+#: src/beeswax/templates/my_queries.mako:43
 msgid "View result"
-msgstr "保存查询结果"
+msgstr "查看结果"
 
-#: src/beeswax/templates/my_queries.mako:54
+#: src/beeswax/templates/my_queries.mako:56
 msgid "Recent Saved Queries"
 msgstr "最近保存的查询"
 
-#: src/beeswax/templates/my_queries.mako:55
+#: src/beeswax/templates/my_queries.mako:57
 msgid "Recent Run Queries"
 msgstr "最近运行的查询"
 
-#: src/beeswax/templates/my_queries.mako:65
+#: src/beeswax/templates/my_queries.mako:67
 msgid "Desc"
 msgstr "描述"
 
-#: src/beeswax/templates/my_queries.mako:97
+#: src/beeswax/templates/my_queries.mako:96
 msgid "View all my queries"
 msgstr "查看我的所有查询"
 
-#: src/beeswax/templates/my_queries.mako:148
+#: src/beeswax/templates/my_queries.mako:140
 msgid "View my entire query history"
 msgstr "查看我的整个查询历史"
 
@@ -1665,153 +1453,266 @@ msgstr "执行查询"
 
 #: src/beeswax/templates/parameterization.mako:39
 msgid "Please specify parameters for this query:"
-msgstr "请为此查询指定参数："
+msgstr "请指定此查询的参数："
 
 #: src/beeswax/templates/save_results.mako:36
-#: src/beeswax/templates/watch_results.mako:223
+#: src/beeswax/templates/watch_results.mako:220
 msgid "Save Query Results"
 msgstr "保存查询结果"
 
 #: src/beeswax/templates/save_results.mako:44
-#: src/beeswax/templates/watch_results.mako:228
+#: src/beeswax/templates/watch_results.mako:225
 msgid "In a new table"
 msgstr "在新表中"
 
 #: src/beeswax/templates/save_results.mako:55
-#: src/beeswax/templates/watch_results.mako:234
+#: src/beeswax/templates/watch_results.mako:231
 msgid "In an HDFS directory"
 msgstr "在 HDFS 目录中"
 
 #: src/beeswax/templates/save_results.mako:58
-#: src/beeswax/templates/watch_results.mako:236
+#: src/beeswax/templates/watch_results.mako:233
 msgid "Results location"
 msgstr "结果位置"
-
-#: src/beeswax/templates/show_tables.mako:56
-#: src/beeswax/templates/show_tables.mako:57
-msgid "Browse the selected table"
-msgstr ""
-
-#: src/beeswax/templates/show_tables.mako:58
-msgid "Delete the selected tables"
-msgstr ""
 
 #: src/beeswax/templates/util.mako:66
 msgid "Unsaved Query"
 msgstr "未保存的查询"
 
 #: src/beeswax/templates/util.mako:71
-#: src/beeswax/templates/watch_results.mako:25
+#: src/beeswax/templates/watch_results.mako:26
 msgid "Query Results"
 msgstr "查询结果"
 
-#: src/beeswax/templates/watch_results.mako:66
+#: src/beeswax/templates/watch_results.mako:67
 msgid "Query Results:"
 msgstr "查询结果："
 
-#: src/beeswax/templates/watch_results.mako:71
+#: src/beeswax/templates/watch_results.mako:72
 msgid "Collapse this panel"
 msgstr "折叠此面板"
 
-#: src/beeswax/templates/watch_results.mako:74
+#: src/beeswax/templates/watch_results.mako:75
 msgid "Downloads"
 msgstr "下载"
 
-#: src/beeswax/templates/watch_results.mako:75
+#: src/beeswax/templates/watch_results.mako:76
 msgid "Download as CSV"
 msgstr "以 CSV 格式下载"
 
-#: src/beeswax/templates/watch_results.mako:76
+#: src/beeswax/templates/watch_results.mako:77
 msgid "Download as XLS"
 msgstr "以 XLS 格式下载"
 
-#: src/beeswax/templates/watch_results.mako:84
+#: src/beeswax/templates/watch_results.mako:85
 #: src/beeswax/templates/watch_wait.mako:42
 #: src/beeswax/templates/watch_wait.mako:79
 msgid "MR Job"
 msgstr "MR 作业"
 
-#: src/beeswax/templates/watch_results.mako:84
+#: src/beeswax/templates/watch_results.mako:85
 #: src/beeswax/templates/watch_wait.mako:42
 #: src/beeswax/templates/watch_wait.mako:80
 msgid "MR Jobs"
 msgstr "MR 作业"
 
-#: src/beeswax/templates/watch_results.mako:93
+#: src/beeswax/templates/watch_results.mako:94
 #: src/beeswax/templates/watch_wait.mako:51
 msgid "No Hadoop jobs were launched in running this query."
 msgstr "运行此查询时未启动 Hadoop 作业。"
 
-#: src/beeswax/templates/watch_results.mako:102
-msgid "Multi-statement query"
-msgstr ""
-
 #: src/beeswax/templates/watch_results.mako:103
-msgid "Hue stopped as one of your query contains some results."
-msgstr ""
+msgid "Multi-statement query"
+msgstr "多语句查询"
 
 #: src/beeswax/templates/watch_results.mako:104
-#, fuzzy
+msgid "Hue stopped as one of your query contains some results."
+msgstr "Hue 已停止，因为有一个查询包含某些结果。"
+
+#: src/beeswax/templates/watch_results.mako:105
 msgid "Click on"
 msgstr "单击"
 
-#: src/beeswax/templates/watch_results.mako:106
-#, fuzzy
+#: src/beeswax/templates/watch_results.mako:107
 msgid "next"
-msgstr "下一页"
+msgstr "下一步"
 
-#: src/beeswax/templates/watch_results.mako:108
+#: src/beeswax/templates/watch_results.mako:109
 msgid "for continuing the execution of the remaining statements."
-msgstr ""
-
-#: src/beeswax/templates/watch_results.mako:115
-#, fuzzy
-msgid ""
-"If the result contains a large number of columns, click a row to select a"
-" column to jump to."
-msgstr "您可单击一行，选择您希望跳转至的列。"
+msgstr "用于继续执行剩余的语句。"
 
 #: src/beeswax/templates/watch_results.mako:116
-msgid ""
-"As you type into the field, a drop-down list displays column names that "
-"match the string."
-msgstr ""
+msgid "If the result contains a large number of columns, click a row to select a column to jump to."
+msgstr "如果结果包含大量列，则单击某行以选择要跳转到的列。"
 
-#: src/beeswax/templates/watch_results.mako:124
+#: src/beeswax/templates/watch_results.mako:117
+msgid "As you type into the field, a drop-down list displays column names that match the string."
+msgstr "在字段中键入内容时，将有一个下拉列表显示与字符串匹配的列名称。"
+
+#: src/beeswax/templates/watch_results.mako:125
 msgid "Error"
 msgstr "错误"
 
-#: src/beeswax/templates/watch_results.mako:130
+#: src/beeswax/templates/watch_results.mako:131
 #: src/beeswax/templates/watch_wait.mako:58
 msgid "Log"
 msgstr "日志"
 
-#: src/beeswax/templates/watch_results.mako:144
-msgid "The query result has expired."
-msgstr ""
+#: src/beeswax/templates/watch_results.mako:133
+msgid "Columns"
+msgstr "列"
+
+#: src/beeswax/templates/watch_results.mako:141
+msgid "Error!"
+msgstr "错误！"
 
 #: src/beeswax/templates/watch_results.mako:145
-msgid "You can rerun it from "
-msgstr ""
+msgid "The query result has expired."
+msgstr "查询结果已到期。"
 
-#: src/beeswax/templates/watch_results.mako:151
+#: src/beeswax/templates/watch_results.mako:146
+msgid "You can rerun it from "
+msgstr "您可从以下位置对其重新运行： "
+
+#: src/beeswax/templates/watch_results.mako:152
 msgid "Warning:"
 msgstr "警告："
 
-#: src/beeswax/templates/watch_results.mako:151
+#: src/beeswax/templates/watch_results.mako:152
 msgid "Page offset may have incremented since last view."
 msgstr "上次查看后页面偏移量可能已增加。"
 
-#: src/beeswax/templates/watch_results.mako:245
-msgid "Sorry, name is required."
-msgstr "很抱歉，需要名称。"
+#: src/beeswax/templates/watch_results.mako:177
+msgid "You have reached the last record for this query."
+msgstr "您已达到了此查询的最后一个记录。"
 
-#: src/beeswax/templates/watch_results.mako:367
+#: src/beeswax/templates/watch_results.mako:242
+msgid "Sorry, name is required."
+msgstr "很抱歉，需要提供名称。"
+
+#: src/beeswax/templates/watch_results.mako:362
 msgid "Download results from the left."
-msgstr ""
+msgstr "从左侧下载结果。"
 
 #: src/beeswax/templates/watch_wait.mako:24
 #: src/beeswax/templates/watch_wait.mako:31
 msgid "Waiting for query..."
-msgstr "等待查询..."
+msgstr "正在等待查询..."
 
+#~ msgid "Path"
+#~ msgstr "路径"
+#~ msgid "Overwrite?"
+#~ msgstr "是否覆盖？"
+#~ msgid "%(column_name)s (partition key with type %(column_type)s)"
+#~ msgstr "%(column_name)s（类型为 %(column_type)s 的分区键）"
+#~ msgid "Failed to remove %(table)s.  Error: %(error)s"
+#~ msgstr "无法删除 %(table)s。错误：%(error)s"
+#~ msgid "Beeswax Error"
+#~ msgstr "Beeswax 错误"
+#~ msgid "Do you really want to drop the view '%(table)s'?"
+#~ msgstr "是否确实要丢弃视图 '%(table)s'？"
+#~ msgid ""
+#~ "This may delete the underlying data "
+#~ "as well as the metadata. Drop "
+#~ "table '%(table)s'?"
+#~ msgstr "这可能会删除基础数据及元数据。删除 '%(table)s'？"
+#~ msgid "Can read table"
+#~ msgstr "可读取表格"
+#~ msgid "Table '%(table)s' is not partitioned."
+#~ msgstr "表 '%(table)s' 未分区。"
+#~ msgid "Beeswax examples already installed."
+#~ msgstr "已安装 Beeswax 示例。"
+#~ msgid "Beeswax Table Partitions: %(tableName)s"
+#~ msgstr "Beeswax 表分区：%(tableName)s"
+#~ msgid "Partitions"
+#~ msgstr "分区"
+#~ msgid "Table has no partitions."
+#~ msgstr "表中无分区。"
+#~ msgid "View"
+#~ msgstr "视图"
+#~ msgid "Table"
+#~ msgstr "表"
+#~ msgid "%s Metadata: %s"
+#~ msgstr "%s 元数据：%s"
+#~ msgid "Type"
+#~ msgstr "类型"
+#~ msgid "Comment"
+#~ msgstr "备注"
+#~ msgid "Table Metadata:"
+#~ msgstr "表元数据："
+#~ msgid "Import Data"
+#~ msgstr "导入数据"
+#~ msgid "Browse Data"
+#~ msgstr "浏览数据"
+#~ msgid "Drop"
+#~ msgstr "丢弃"
+#~ msgid "View File Location"
+#~ msgstr "查看文件位置"
+#~ msgid "Partition Columns"
+#~ msgstr "分区列"
+#~ msgid "Sample"
+#~ msgstr "样本"
+#~ msgid "Show Partitions"
+#~ msgstr "显示分区"
+#~ msgid "Drop Table"
+#~ msgstr "删除表"
+#~ msgid "Yes, drop this table"
+#~ msgstr "是，删除此表"
+#~ msgid "Import data"
+#~ msgstr "导入数据"
+#~ msgid "Overwrite existing data"
+#~ msgstr "覆盖现有数据"
+#~ msgid ""
+#~ "Note that loading data will move "
+#~ "data from its location into the "
+#~ "table's storage location."
+#~ msgstr "请注意，加载数据会将数据从其位置移至表的存储位置。"
+#~ msgid "Submit"
+#~ msgstr "提交"
+#~ msgid ""
+#~ "You can execute queries with multiple"
+#~ " SQL statements delimited by a "
+#~ "semicolon ';'."
+#~ msgstr ""
+#~ msgid "Use '\\059' instead of ';' if you have some conflicts."
+#~ msgstr ""
+#~ msgid "Beeswax"
+#~ msgstr "Beeswax"
+#~ msgid "Examples"
+#~ msgstr "示例"
+#~ msgid "Install Samples"
+#~ msgstr "安装示例"
+#~ msgid "Tables"
+#~ msgstr "表"
+#~ msgid "Show Tables"
+#~ msgstr "显示表"
+#~ msgid "Queries"
+#~ msgstr "查询"
+#~ msgid "Execute Query"
+#~ msgstr "执行查询"
+#~ msgid "Query History"
+#~ msgstr "查询历史"
+#~ msgid "Configuration"
+#~ msgstr "配置"
+#~ msgid "Extended Configuration"
+#~ msgstr "扩展配置"
+#~ msgid "Welcome to Beeswax for Hive"
+#~ msgstr "欢迎使用 Hive Beeswax"
+#~ msgid "To get started with Beeswax you'll first need set up some data:"
+#~ msgstr "要着手使用 Beeswax，您需要先设置一些数据："
+#~ msgid "or"
+#~ msgstr "或"
+#~ msgid "Install samples"
+#~ msgstr "安装样本"
+#~ msgid "Yes, install samples"
+#~ msgstr "是，安装示例"
+#~ msgid "There was an error processing your request:"
+#~ msgstr "处理请求时发生错误："
+#~ msgid "Load Data into %(table)s"
+#~ msgstr "将数据加载到 %(table)s"
+#~ msgid "Open File Chooser"
+#~ msgstr "打开文件选择器"
+#~ msgid "Browse the selected table"
+#~ msgstr ""
+#~ msgid "Delete the selected tables"
+#~ msgstr ""

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-03-20 17:39-0700\n"
+"POT-Creation-Date: 2013-04-11 10:03-0700\n"
 "PO-Revision-Date: 2012-07-30 18:51-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -17,249 +17,229 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/catalog/forms.py:48 src/catalog/templates/describe_partitions.mako:33
+#: src/catalog/forms.py:48 src/catalog/templates/describe_partitions.mako:36
 msgid "Path"
-msgstr ""
+msgstr "パス"
 
 #: src/catalog/forms.py:49
 msgid "Overwrite?"
-msgstr ""
+msgstr "上書きしますか?"
 
 #: src/catalog/forms.py:62
 #, python-format
 msgid "%(column_name)s (partition key with type %(column_type)s)"
-msgstr ""
+msgstr "%(column_name)s（%(column_type)s タイプのパーティションキー）"
 
-#: src/catalog/views.py:109
+#: src/catalog/views.py:72
+#, fuzzy, python-format
+msgid "Failed to remove %(databases)s.  Error: %(error)s"
+msgstr "%(databases)s を削除できませんでした。エラー：%(error)s"
+
+#: src/catalog/views.py:73 src/catalog/views.py:161
+msgid "Beeswax Error"
+msgstr "Beeswax のエラー"
+
+#: src/catalog/views.py:75
+msgid "Do you really want to delete the database(s)?"
+msgstr "データベースを削除してもよろしいですか?"
+
+#: src/catalog/views.py:160
 #, fuzzy, python-format
 msgid "Failed to remove %(tables)s.  Error: %(error)s"
-msgstr "クエリの結果を保存できませんでした：エラー %(error)s"
+msgstr "%(tables)s を削除できませんでした。エラー：%(error)s"
 
-#: src/catalog/views.py:110
-#, fuzzy
-msgid "Beeswax Error"
-msgstr "Beeswax"
-
-#: src/catalog/views.py:112
+#: src/catalog/views.py:163
 msgid "Do you really want to delete the table(s)?"
-msgstr ""
+msgstr "テーブルを削除してもよろしいですか?"
 
-#: src/catalog/views.py:126
-#, fuzzy
+#: src/catalog/views.py:177
 msgid "Can read table"
-msgstr "テーブルを作成"
+msgstr "テーブルは読み取り可能"
 
-#: src/catalog/views.py:147
+#: src/catalog/views.py:198
 msgid "Can't load the data: "
-msgstr ""
+msgstr "データを読み込むことができません： "
 
-#: src/catalog/views.py:168
+#: src/catalog/views.py:219
 #, python-format
 msgid "Table '%(table)s' is not partitioned."
-msgstr ""
+msgstr "テーブル '%(table)s' はパーティション化されていません。"
 
-#: src/catalog/templates/components.mako:198
-msgid "Beginning of List"
-msgstr "リストの先頭"
+#: src/catalog/templates/components.mako:27
+#: src/catalog/templates/databases.mako:24
+#: src/catalog/templates/databases.mako:27
+msgid "Databases"
+msgstr "データベース"
 
-#: src/catalog/templates/components.mako:199
-msgid "Previous Page"
-msgstr "前のページ"
+#: src/catalog/templates/databases.mako:33
+msgid "Create a new database"
+msgstr "新しいデータベースを作成"
 
-#: src/catalog/templates/components.mako:200
-msgid "Next page"
-msgstr "次のページ"
+#: src/catalog/templates/databases.mako:40
+msgid "Drop the selected databases"
+msgstr "選択したデータベースをドロップ"
 
-#: src/catalog/templates/components.mako:200
-msgid "Next Page"
-msgstr "次のページ"
-
-#: src/catalog/templates/components.mako:201
-msgid "End of List"
-msgstr "リストの末尾"
-
-#: src/catalog/templates/components.mako:203
-#, python-format
-msgid ""
-"Showing %(start)s to %(end)s of %(count)s items, page %(page)s of "
-"%(pages)s"
-msgstr ""
-"%(page)s/%(pages)s ページで %(count)s 件のアイテムのうち、%(start)s から %(end)s "
-"までを表示しています"
-
-#: src/catalog/templates/describe_partitions.mako:22
-#, python-format
-msgid "Table Partitions: %(tableName)s"
-msgstr ""
-
-#: src/catalog/templates/describe_partitions.mako:25
-#, fuzzy
-msgid "Partitions"
-msgstr "パーティションを追加"
-
-#: src/catalog/templates/describe_partitions.mako:51
-#, fuzzy
-msgid "Table has no partitions."
-msgstr "パーティションを追加"
-
-#: src/catalog/templates/describe_table.mako:25
+#: src/catalog/templates/databases.mako:40
+#: src/catalog/templates/describe_table.mako:65
 #: src/catalog/templates/tables.mako:51
-#, fuzzy
-msgid "View"
-msgstr "プレビュー"
-
-#: src/catalog/templates/describe_table.mako:27
-#, fuzzy
-msgid "Table"
-msgstr "テーブル"
-
-#: src/catalog/templates/describe_table.mako:29
-#, python-format
-msgid "%s Metadata: %s"
-msgstr ""
-
-#: src/catalog/templates/describe_table.mako:35
-msgid "Name"
-msgstr "名前"
-
-#: src/catalog/templates/describe_table.mako:36
-msgid "Type"
-msgstr ""
-
-#: src/catalog/templates/describe_table.mako:37
-#, fuzzy
-msgid "Comment"
-msgstr "カンマ"
-
-#: src/catalog/templates/describe_table.mako:54
-msgid "Table Metadata:"
-msgstr ""
-
-#: src/catalog/templates/describe_table.mako:59
-#: src/catalog/templates/tables.mako:39
-msgid "Actions"
-msgstr "アクション"
-
-#: src/catalog/templates/describe_table.mako:60
-msgid "Import Data"
-msgstr "データのインポート"
-
-#: src/catalog/templates/describe_table.mako:61
-#: src/catalog/templates/tables.mako:52
-msgid "Browse Data"
-msgstr ""
-
-#: src/catalog/templates/describe_table.mako:62
-#: src/catalog/templates/tables.mako:53
 msgid "Drop"
-msgstr ""
+msgstr "ドロップ"
 
-#: src/catalog/templates/describe_table.mako:63
-#, fuzzy
-msgid "View File Location"
-msgstr "結果の場所"
+#: src/catalog/templates/databases.mako:47
+msgid "Database Name"
+msgstr "データベース名"
 
-#: src/catalog/templates/describe_table.mako:73
-msgid "Columns"
-msgstr "列"
+#: src/catalog/templates/databases.mako:74 src/catalog/templates/tables.mako:86
+msgid "Confirm action"
+msgstr "アクションを確認"
 
-#: src/catalog/templates/describe_table.mako:75
-msgid "Partition Columns"
-msgstr ""
-
-#: src/catalog/templates/describe_table.mako:78
-#, fuzzy
-msgid "Sample"
-msgstr "例"
-
-#: src/catalog/templates/describe_table.mako:90
-#, fuzzy
-msgid "Show Partitions"
-msgstr "自動アクションを表示"
-
-#: src/catalog/templates/describe_table.mako:98
-msgid "Error!"
-msgstr "エラー。"
-
-#: src/catalog/templates/describe_table.mako:135
-#, fuzzy
-msgid "Drop Table"
-msgstr "テーブルを作成"
-
-#: src/catalog/templates/describe_table.mako:142
-#: src/catalog/templates/tables.mako:96 src/catalog/templates/tables.mako:109
+#: src/catalog/templates/databases.mako:77
+#: src/catalog/templates/describe_table.mako:145
+#: src/catalog/templates/tables.mako:89
 #: src/catalog/templates/popups/load_data.mako:60
 msgid "Cancel"
 msgstr "キャンセル"
 
-#: src/catalog/templates/describe_table.mako:143
-msgid "Yes, drop this table"
-msgstr ""
-
-#: src/catalog/templates/describe_table.mako:172
-#: src/catalog/templates/describe_table.mako:195
-#: src/catalog/templates/tables.mako:141
-#, fuzzy
-msgid "No data available"
-msgstr "テーブルにデータがありません"
-
-#: src/catalog/templates/describe_table.mako:173
-#: src/catalog/templates/describe_table.mako:196
-#: src/catalog/templates/tables.mako:142
-#, fuzzy
-msgid "No matching records"
-msgstr "一致するレコードが見つかりません"
-
-#: src/catalog/templates/layout.mako:34 src/catalog/templates/tables.mako:23
-#: src/catalog/templates/tables.mako:26
-msgid "Tables"
-msgstr "テーブル"
-
-#: src/catalog/templates/tables.mako:32
-msgid "database"
-msgstr "データベース"
-
-#: src/catalog/templates/tables.mako:41 src/catalog/templates/tables.mako:88
-msgid "Install samples"
-msgstr "サンプルをインストール"
-
-#: src/catalog/templates/tables.mako:43
-msgid "Create a new table from a file"
-msgstr "ファイルから新しいテーブルを作成"
-
-#: src/catalog/templates/tables.mako:44
-msgid "Create a new table manually"
-msgstr "手動で新しいテーブルを作成"
-
-#: src/catalog/templates/tables.mako:51 src/catalog/templates/tables.mako:52
-#, fuzzy
-msgid "Browse the selected table"
-msgstr "このクエリを編集"
-
-#: src/catalog/templates/tables.mako:53
-#, fuzzy
-msgid "Delete the selected tables"
-msgstr "このクエリを削除します。"
-
-#: src/catalog/templates/tables.mako:60
-msgid "Table Name"
-msgstr "テーブル名"
-
-#: src/catalog/templates/tables.mako:97
-msgid "Yes, install samples"
-msgstr "はい、サンプルをインストールします"
-
-#: src/catalog/templates/tables.mako:106
-msgid "Confirm action"
-msgstr "アクションを確認"
-
-#: src/catalog/templates/tables.mako:110
+#: src/catalog/templates/databases.mako:78 src/catalog/templates/tables.mako:90
 msgid "Yes"
 msgstr "はい"
 
-#: src/catalog/templates/tables.mako:171
-msgid "There was an error processing your request:"
-msgstr "要求の処理中にエラーが発生しました："
+#: src/catalog/templates/databases.mako:111
+#: src/catalog/templates/describe_table.mako:177
+#: src/catalog/templates/describe_table.mako:200
+#: src/catalog/templates/tables.mako:123
+msgid "No data available"
+msgstr "利用可能なデータがありません"
+
+#: src/catalog/templates/databases.mako:112
+#: src/catalog/templates/describe_table.mako:178
+#: src/catalog/templates/describe_table.mako:201
+#: src/catalog/templates/tables.mako:124
+msgid "No matching records"
+msgstr "一致するレコードがありません"
+
+#: src/catalog/templates/describe_partitions.mako:24
+#, python-format
+msgid "Table Partitions: %(tableName)s"
+msgstr "テーブルパーティション：%(tableName)s"
+
+#: src/catalog/templates/describe_partitions.mako:27
+msgid "Partitions"
+msgstr "パーティション"
+
+#: src/catalog/templates/describe_partitions.mako:54
+msgid "Table has no partitions."
+msgstr "テーブルにパーティションがありません。"
+
+#: src/catalog/templates/describe_table.mako:26
+#: src/catalog/templates/tables.mako:49
+msgid "View"
+msgstr "表示"
+
+#: src/catalog/templates/describe_table.mako:28
+#: src/catalog/templates/describe_table.mako:55
+msgid "Table"
+msgstr "テーブル"
+
+#: src/catalog/templates/describe_table.mako:30
+#, python-format
+msgid "%s : %s"
+msgstr "%s : %s"
+
+#: src/catalog/templates/describe_table.mako:36
+msgid "Name"
+msgstr "名前"
+
+#: src/catalog/templates/describe_table.mako:37
+msgid "Type"
+msgstr "タイプ"
+
+#: src/catalog/templates/describe_table.mako:38
+msgid "Comment"
+msgstr "コメント"
+
+#: src/catalog/templates/describe_table.mako:62
+#: src/catalog/templates/tables.mako:40
+msgid "Actions"
+msgstr "アクション"
+
+#: src/catalog/templates/describe_table.mako:63
+msgid "Import Data"
+msgstr "データをインポート"
+
+#: src/catalog/templates/describe_table.mako:64
+#: src/catalog/templates/tables.mako:50
+msgid "Browse Data"
+msgstr "データを参照"
+
+#: src/catalog/templates/describe_table.mako:66
+msgid "View File Location"
+msgstr "ファイルの場所を表示"
+
+#: src/catalog/templates/describe_table.mako:72
+msgid "Comment:"
+msgstr "コメント："
+
+#: src/catalog/templates/describe_table.mako:76
+msgid "Columns"
+msgstr "列"
+
+#: src/catalog/templates/describe_table.mako:78
+msgid "Partition Columns"
+msgstr "パーティション列"
+
+#: src/catalog/templates/describe_table.mako:81
+msgid "Sample"
+msgstr "サンプル"
+
+#: src/catalog/templates/describe_table.mako:93
+msgid "Show Partitions"
+msgstr "パーティションを表示"
+
+#: src/catalog/templates/describe_table.mako:101
+msgid "Error!"
+msgstr "エラーが発生しました。"
+
+#: src/catalog/templates/describe_table.mako:138
+msgid "Drop Table"
+msgstr "テーブルをドロップ"
+
+#: src/catalog/templates/describe_table.mako:146
+msgid "Yes, drop this table"
+msgstr "はい、このテーブルをドロップします"
+
+#: src/catalog/templates/tables.mako:23
+msgid "Tables"
+msgstr "テーブル"
+
+#: src/catalog/templates/tables.mako:26
+#, fuzzy, python-format
+msgid "Database %s"
+msgstr "データベース %s"
+
+#: src/catalog/templates/tables.mako:33
+msgid "database"
+msgstr "データベース"
+
+#: src/catalog/templates/tables.mako:41
+msgid "Create a new table from a file"
+msgstr "ファイルから新しいテーブルを作成"
+
+#: src/catalog/templates/tables.mako:42
+msgid "Create a new table manually"
+msgstr "手動で新しいテーブルを作成"
+
+#: src/catalog/templates/tables.mako:49 src/catalog/templates/tables.mako:50
+msgid "Browse the selected table"
+msgstr "選択したテーブルを参照"
+
+#: src/catalog/templates/tables.mako:51
+msgid "Delete the selected tables"
+msgstr "選択したテーブルを削除"
+
+#: src/catalog/templates/tables.mako:58
+msgid "Table Name"
+msgstr "テーブル名"
 
 #: src/catalog/templates/util.mako:66
 msgid "Unsaved Query"
@@ -267,1101 +247,48 @@ msgstr "未保存のクエリ"
 
 #: src/catalog/templates/util.mako:71
 msgid "Query Results"
-msgstr "クエリ結果"
+msgstr "クエリの結果"
 
 #: src/catalog/templates/popups/load_data.mako:25
-#, fuzzy
 msgid "Import data"
-msgstr "データのインポート"
+msgstr "データをインポート"
 
 #: src/catalog/templates/popups/load_data.mako:50
 msgid "Overwrite existing data"
-msgstr ""
+msgstr "既存のデータを上書き"
 
 #: src/catalog/templates/popups/load_data.mako:55
-msgid ""
-"Note that loading data will move data from its location into the table's "
-"storage location."
-msgstr ""
+msgid "Note that loading data will move data from its location into the table's storage location."
+msgstr "データを読み込むと、データの場所からテーブルの保存場所にデータが移動されます。"
 
 #: src/catalog/templates/popups/load_data.mako:61
 msgid "Submit"
-msgstr ""
+msgstr "サブミット"
 
+#~ msgid "Beginning of List"
+#~ msgstr "リストの先頭"
+#~ msgid "Previous Page"
+#~ msgstr "前のページ"
+#~ msgid "Next page"
+#~ msgstr "次のページ"
+#~ msgid "Next Page"
+#~ msgstr "次のページ"
+#~ msgid "End of List"
+#~ msgstr "リストの末尾"
 #~ msgid ""
-#~ "Beeswax or Hive Server 2 Thrift "
-#~ "API used. Choices are: 'beeswax' or "
-#~ "'hiveserver2'."
+#~ "Showing %(start)s to %(end)s of "
+#~ "%(count)s items, page %(page)s of "
+#~ "%(pages)s"
 #~ msgstr ""
-#~ "Beeswax または Hive Server 2 Thrift "
-#~ "API を使用します。選択肢には 'beeswax' と 'hiveserver2' "
-#~ "があります。"
-
-#~ msgid ""
-#~ "Host where Beeswax server Thrift daemon"
-#~ " is running. If Kerberos security is"
-#~ " enabled, the fully-qualified domain "
-#~ "name (FQDN) is required, even if "
-#~ "the Thrift daemon is running on "
-#~ "the same host as Hue."
+#~ "%(page)s/%(pages)s ページで %(count)s "
+#~ "件のアイテムのうち、%(start)s から %(end)s までを表示しています"
+#~ msgid "%s Metadata: %s"
 #~ msgstr ""
-
-#~ msgid "Configure the port the Beeswax Thrift server runs on."
-#~ msgstr "Beeswax Thrift サーバーが動作するポートを設定します。"
-
-#~ msgid "Host where internal metastore Thrift daemon is running."
-#~ msgstr "内部 metastore の Thrift デーモンを実行しているホストです。"
-
-#~ msgid ""
-#~ "Configure the port the internal "
-#~ "metastore daemon runs on. Used only "
-#~ "if hive.metastore.local is true."
-#~ msgstr "内部メタストアのデーモンを実行するポートを設定します。hive.metastore.local が true の場合にのみ使用します。"
-
-#~ msgid "Path to beeswax_server.sh"
-#~ msgstr "beeswax_server.sh のパス"
-
-#~ msgid ""
-#~ "Maximum Java heap size (in megabytes)"
-#~ " used by Beeswax Server.  Note that"
-#~ " the setting of HADOOP_HEAPSIZE in "
-#~ "$HADOOP_CONF_DIR/hadoop-env.sh may override "
-#~ "this setting."
+#~ msgid "Table Metadata:"
 #~ msgstr ""
-#~ "Beeswax Server で使用する最大 Java "
-#~ "ヒープサイズ（MB）です。$HADOOP_CONF_DIR/hadoop-env.sh での "
-#~ "HADOOP_HEAPSIZE の設定は、この設定をオーバーライドします。"
-
-#~ msgid ""
-#~ "Path to the root of the Hive "
-#~ "installation; defaults to environment variable"
-#~ " when not set."
-#~ msgstr "Hive インストールのルートへのパス。設定していない場合は、デフォルトで環境変数で設定されます。"
-
-#~ msgid "Hive configuration directory, where hive-site.xml is located."
-#~ msgstr "hive-site.xml を保存する Hive 設定ディレクトリ。"
-
-#~ msgid "The local filesystem path containing the Beeswax examples."
-#~ msgstr "Beeswax の例を保存しているローカルファイルシステムのパス。"
-
-#~ msgid "Timeout in seconds for Thrift calls to Beeswax service."
-#~ msgstr "Thrift からの Beeswax サービスの呼び出しのタイムアウト（秒）。"
-
-#~ msgid ""
-#~ "Timeouts in seconds for Thrift calls "
-#~ "to the Hive metastore. This timeout "
-#~ "should take into account that the "
-#~ "metastore could talk to an external "
-#~ "database."
-#~ msgstr ""
-#~ "Thrift からの Hive "
-#~ "メタストアの呼び出しのタイムアウト（秒）。このタイムアウトでは、メタストアが外部データベースと対話する可能性があることを考慮します。"
-
-#~ msgid "Time in seconds for Beeswax to persist queries in its cache."
-#~ msgstr "Beeswax が自身のキャッシュにクエリを保持する期間（秒）。"
-
-#~ msgid ""
-#~ "Set a LIMIT clause when browsing a"
-#~ " partitioned table. A positive value "
-#~ "will be set as the LIMIT. If "
-#~ "0 or negative, do not set any "
-#~ "limit."
-#~ msgstr ""
-#~ "パーティション化したテーブルを参照するときに LIMIT 句を設定します。LIMIT "
-#~ "として設定するのは正の値です。0 または負の値を設定した場合はどの制限も設定されません。"
-
-#~ msgid ""
-#~ "Share saved queries with all users. "
-#~ "If set to false, saved queries are"
-#~ " visible only to the owner and "
-#~ "administrators."
-#~ msgstr "保存したクエリをすべてのユーザーと共有します。false に設定した場合、保存したクエリはその所有者と管理者のみが表示できます。"
-
-#~ msgid "ctrl-As"
-#~ msgstr "Ctrl + A"
-
-#~ msgid "ctrl-Bs"
-#~ msgstr "Ctrl + B"
-
-#~ msgid "ctrl-Cs"
-#~ msgstr "Ctrl + C"
-
-#~ msgid "tabs"
-#~ msgstr "タブ"
-
-#~ msgid "spaces"
-#~ msgstr "スペース"
-
-#~ msgid "Internal error when constructing the delimiter form: %(error)s"
-#~ msgstr "区切り文字フォームの構成時に内部エラーが発生しました：%(error)s"
-
-#~ msgid ""
-#~ "Failed to decode file '%(path)s' into"
-#~ " printable characters under %(encoding)s"
-#~ msgstr "%(encoding)s でファイル '%(path)s' を印刷可能な文字にデコードできませんでした"
-
-#~ msgid "Could not find any columns to import"
-#~ msgstr ""
-
-#~ msgid "Failed to open file '%(path)s': %(error)s"
-#~ msgstr "ファイル '%(path)s' を開くことができませんした：%(error)s"
-
-#~ msgid "Internal error: Missing needed parameter to load data into table"
-#~ msgstr "内部エラー：テーブルにデータをロードするために必要なパラメータがありません"
-
-#~ msgid "Change the name to save as a new design."
-#~ msgstr "名前を変更して新しい設計として保存します。"
-
-#~ msgid "Description"
-#~ msgstr "説明"
-
-#~ msgid "Save"
-#~ msgstr "保存"
-
-#~ msgid "Save As"
-#~ msgstr "名前を付けて保存"
-
-#~ msgid "Please enter a name"
-#~ msgstr "名前を入力してください"
-
-#~ msgid "Name of the new table"
-#~ msgstr "新しいテーブルの名前"
-
-#~ msgid "Results Location"
-#~ msgstr "結果の場所"
-
-#~ msgid "Empty directory in HDFS to put the results"
-#~ msgstr "HDFS の中で結果の配置先とする空ディレクトリ"
-
-#~ msgid "Table already exists"
-#~ msgstr "テーブルはすでに存在します"
-
-#~ msgid "Query Editor"
-#~ msgstr "Query Editor"
-
-#~ msgid "jar"
-#~ msgstr "jar"
-
-#~ msgid "archive"
-#~ msgstr "archive"
-
-#~ msgid ""
-#~ "Resources to upload with your Hive "
-#~ "job.  Use 'jar' for UDFs.  Use "
-#~ "'file' and 'archive' for files to "
-#~ "be copied and made locally available "
-#~ "during MAP/TRANSFORM. Paths are on HDFS."
-#~ msgstr ""
-#~ "Hive ジョブでアップロードするリソースです。UDF には 'jar' "
-#~ "を使用します。コピーして MAP/TRANSFORM の際にローカルで使用可能にするファイルには "
-#~ "'file' と 'archive' を使用します。パスは HDFS "
-#~ "上とします。"
-
-#~ msgid "Path to file on HDFS."
-#~ msgstr "HDFS 上のファイルのパスです。"
-
-#~ msgid "Field terminator"
-#~ msgstr "フィールドの終端文字"
-
-#~ msgid "Collection terminator"
-#~ msgstr "コレクションの終端文字"
-
-#~ msgid "Map key terminator"
-#~ msgstr "map キーの終端文字"
-
-#~ msgid "SerDe Name"
-#~ msgstr "SerDe の名前"
-
-#~ msgid "Comma-separated list of key-value pairs, eg., 'p1=v1, p2=v2'"
-#~ msgstr "キーと値のペアのカンマ区切りリスト（'p1=v1, p2=v2' など）"
-
-#~ msgid "InputFormat Class"
-#~ msgstr "InputFormat クラス"
-
-#~ msgid "OutputFormat Class"
-#~ msgstr "OutputFormat クラス"
-
-#~ msgid "Use default location"
-#~ msgstr "デフォルトの場所を使用"
-
-#~ msgid "Path to HDFS directory or file of table data."
-#~ msgstr "HDFS ディレクトリまたはテーブルデータのファイルへのパス。"
-
-#~ msgid "Table \"%(name)s\" already exists"
-#~ msgstr "テーブル \"%(name)s\" はすでに存在します"
-
-#~ msgid "Terminator must be exactly one character."
-#~ msgstr "終端文字は 1 文字のみとする必要があります。"
-
-#~ msgid "Input File"
-#~ msgstr "入力ファイル"
-
-#~ msgid "Import data from file"
-#~ msgstr "ファイルからデータをインポート"
-
-#~ msgid "Automatically load this file into the table after creation."
-#~ msgstr "作成したテーブルにこのファイルを自動的にロードします。"
-
-#~ msgid "Delimiter"
-#~ msgstr "区切り文字"
-
-#~ msgid "Delimiter value must be smaller than 256."
-#~ msgstr "区切り文字の値は 256 未満とする必要があります。"
-
-#~ msgid "Delimiter value is required."
-#~ msgstr "区切り文字の値が必要です。"
-
-#~ msgid "Column Name"
-#~ msgstr "列名"
-
-#~ msgid "Column Type"
-#~ msgstr "列タイプ"
-
-#~ msgid "Array Value Type"
-#~ msgstr "配列値のタイプ"
-
-#~ msgid "Specify if column_type is map."
-#~ msgstr "column_type が map かどうかを指定します。"
-
-#~ msgid "add a column"
-#~ msgstr "列を追加"
-
-#~ msgid "Host of the query server."
-#~ msgstr "クエリサーバーのホストです。"
-
-#~ msgid "Port of the query server."
-#~ msgstr "クエリサーバーのポートです。"
-
-#~ msgid "Name of the query server."
-#~ msgstr "クエリサーバーの名前です。"
-
-#~ msgid "Type of the query server."
-#~ msgstr "クエリサーバーのタイプです。"
-
-#~ msgid "My saved query"
-#~ msgstr "マイ保存済みクエリ"
-
-#~ msgid " (new)"
-#~ msgstr " （新規）"
-
-#~ msgid "Cannot retrieve Beeswax design id %(id)s"
-#~ msgstr "Beeswax の設計 ID %(id)s を取得できません"
-
-#~ msgid "Design id %(id)s does not belong to user %(user)s"
-#~ msgstr "設計 ID %(id)s はユーザー %(user)s に属していません"
-
-#~ msgid ""
-#~ "Type mismatch for design id %(id)s "
-#~ "(owner %(owner)s) - Expected %(expected_type)s"
-#~ " got %(real_type)s"
-#~ msgstr ""
-#~ "設計 ID %(id)s（所有者 %(owner)s）のタイプが一致しません - "
-#~ "%(expected_type)s を想定しましたが取得したのは %(real_type)s です"
-
-#~ msgid "Last used"
-#~ msgstr "前回の使用"
-
-#~ msgid "Application we communicate with."
-#~ msgstr ""
-
-#~ msgid "Invalid design type %(type)s"
-#~ msgstr "無効な設計タイプ %(type)s"
-
-#~ msgid "Saved design \"%(name)s\""
-#~ msgstr "保存した設計 \"%(name)s\""
-
-#~ msgid "Delete design(s)?"
-#~ msgstr "設計を削除しますか?"
-
-#~ msgid "Copied design: %(name)s"
-#~ msgstr "コピーした設計：%(name)s"
-
-#~ msgid "This query has %(state)s. Results unavailable."
-#~ msgstr "このクエリの状態は %(state)s です。結果は得られません。"
-
-#~ msgid "The result of this query is not available yet."
-#~ msgstr "このクエリの結果はまだ得られていません。"
-
-#~ msgid "Cannot find query."
-#~ msgstr "クエリが見つかりません。"
-
-#~ msgid ""
-#~ "Saving results from a partitioned table"
-#~ " is not supported. You may copy "
-#~ "from the HDFS location manually."
-#~ msgstr "パーティション化したテーブルにある結果は保存できません。HDFS の場所から手動でコピーできます。"
-
-#~ msgid ""
-#~ "Saving results from a query with "
-#~ "no MapReduce jobs is not supported. "
-#~ "You may copy manually from the "
-#~ "HDFS location %(path)s."
-#~ msgstr "MapReduce ジョブのないクエリからは結果を保存できません。HDFS の場所である %(path)s から手動でコピーできます。"
-
-#~ msgid "The table could not be saved."
-#~ msgstr "テーブルを保存できませんでした。"
-
-#~ msgid "Saved query results as new table %(table)s"
-#~ msgstr "クエリの結果を新しいテーブル %(table)s として保存しました"
-
-#~ msgid "Install sample tables and Beeswax examples?"
-#~ msgstr "サンプルテーブルと Beeswax の例をインストールしますか。"
-
-#~ msgid "Beeswax query completed"
-#~ msgstr "Beeswax のクエリが完了しました"
-
-#~ msgid ""
-#~ "%(subject)s. You may see the results here: %(link)s\n"
-#~ "\n"
-#~ "Query:\n"
-#~ "%(query)s"
-#~ msgstr ""
-#~ "%(subject)s。結果は %(link)s で確認できます。\n"
-#~ "\"\n"
-#~ "\"\n"
-#~ "\"\n"
-#~ "\"クエリ：\n"
-#~ "\"\n"
-#~ "\"%(query)s"
-
-#~ msgid "Design %(id)s does not exist."
-#~ msgstr "設計 %(id)s は存在しません。"
-
-#~ msgid "Cannot access design %(id)s"
-#~ msgstr "設計 %(id)s にアクセスできません"
-
-#~ msgid "QueryHistory %(id)s does not exist."
-#~ msgstr "QueryHistory %(id)s は存在しません。"
-
-#~ msgid "Cannot access QueryHistory %(id)s"
-#~ msgstr "QueryHistory %(id)s にアクセスできません"
-
-#~ msgid "Design does not exist"
-#~ msgstr "設計が存在しません。"
-
-#~ msgid "Query is not parameterizable."
-#~ msgstr "クエリをパラメータ化できません。"
-
-#~ msgid "Failed to retrieve query state from the Query Server."
-#~ msgstr "Beeswax Server からクエリの状態を取得できませんでした。"
-
-#~ msgid "Failed to contact Beeswax Server to check query status."
-#~ msgstr "Beeswax Server に接続してクエリのステータスを確認できませんでした。"
-
-#~ msgid "Beeswax examples already installed."
-#~ msgstr "Beeswax の例はインストール済みです。"
-
-#~ msgid "Cannot find table data in \"%(file)s\""
-#~ msgstr "\"%(file)s\" にテーブルデータが見つかりません"
-
-#~ msgid "Table \"%(table)s\" already exists."
-#~ msgstr "テーブル \"%(table)s\" はすでに存在します"
-
-#~ msgid "Error creating table %(table)s: Operation timeout."
-#~ msgstr "テーブル %(table)s の作成でエラーが発生しました。操作はタイムアウトします。"
-
-#~ msgid "Error creating table %(table)s: %(error)s"
-#~ msgstr "テーブル %(table)s の作成中にエラーが発生しました：%(error)s"
-
-#~ msgid "Error loading table %(table)s: Operation timeout."
-#~ msgstr "テーブル %(table)s のロードでエラーが発生しました。操作はタイムアウトします。"
-
-#~ msgid "Error loading table %(table)s: %(error)s"
-#~ msgstr "テーブル %(table)s のロード中にエラーが発生しました：%(error)s"
-
-#~ msgid "Sample design %(name)s already exists."
-#~ msgstr "サンプルの設計 %(name)s はすでに存在します。"
-
-#~ msgid "Server returning invalid handle for query id %(id)d [%(query)s]..."
-#~ msgstr "Server がクエリ ID %(id)d [%(query)s] の無効なハンドルを返しています..."
-
-#~ msgid "No server logs for this query"
-#~ msgstr "このクエリのパラメータを指定してください："
-
-#~ msgid "Could not retrieve logs: %s"
-#~ msgstr "ログを取得できませんでした。"
-
-#~ msgid "Unknown exception."
-#~ msgstr "不明な例外です。"
-
-#~ msgid "Create table from file"
-#~ msgstr "ファイルからテーブルを作成"
-
-#~ msgid "Step 1: Choose File"
-#~ msgstr "手順 1：ファイルの選択"
-
-#~ msgid "Step 2: Choose Delimiter"
-#~ msgstr "手順 2：区切り文字の選択"
-
-#~ msgid "Step 3: Define Columns"
-#~ msgstr "手順 3：列の定義"
-
-#~ msgid "Choose a Delimiter"
-#~ msgstr "区切り文字の選択"
-
-#~ msgid "Beeswax has determined that this file is delimited by"
-#~ msgstr "Beeswax は、このファイルが次の文字で区切られていると判断しました："
-
-#~ msgid ""
-#~ "Enter the column delimiter. Must be "
-#~ "a single character. Use syntax like "
-#~ "\"\\001\" or \"\t\" for special "
-#~ "characters."
-#~ msgstr ""
-#~ "列の区切り文字を入力します。これは 1 文字とする必要があります。特殊文字には \"\\001\""
-#~ " や \"\t\" のような構文を使用します。"
-
-#~ msgid "Table preview"
-#~ msgstr "テーブルのプレビュー"
-
-#~ msgid "Previous"
-#~ msgstr "前"
-
-#~ msgid "Next"
-#~ msgstr "次"
-
-#~ msgid "Please type your delimiter here"
-#~ msgstr "ここに区切り文字を入力してください"
-
-#~ msgid "Name Your Table and Choose A File"
-#~ msgstr "テーブル名の指定とファイルの選択"
-
-#~ msgid "table_name"
-#~ msgstr "table_name"
-
-#~ msgid ""
-#~ "Name of the new table. Table names"
-#~ " must be globally unique. Table names"
-#~ " tend to correspond as well to "
-#~ "the directory where the data will "
-#~ "be stored."
-#~ msgstr "新しいテーブルの名前。テーブル名はグローバルに一意であることが必要です。テーブル名は、そのデータの保存場所とするディレクトリに対応していることが普通です。"
-
-#~ msgid "Optional"
-#~ msgstr "オプション"
-
-#~ msgid ""
-#~ "Use a table comment to describe "
-#~ "your table.  For example, you might "
-#~ "note the data's provenance and any "
-#~ "caveats users need to know."
-#~ msgstr "テーブルのコメントを使用してテーブルを説明します。たとえば、データの出所や注意など、ユーザーが知る必要がある内容を記します。"
-
-#~ msgid ""
-#~ "The HDFS path to the file that "
-#~ "you would like to base this new"
-#~ " table definition on. It can be "
-#~ "compressed (gzip) or not."
-#~ msgstr "この新しいテーブル定義の基礎とするファイルの HDFS パス。ファイルは圧縮（gzip）でも非圧縮でもかまいません。"
-
-#~ msgid ""
-#~ "Check this box if you want to "
-#~ "import the data in this file after"
-#~ " creating the table definition. Leave "
-#~ "it unchecked if you want to define"
-#~ " an empty table."
-#~ msgstr "テーブル定義の後でこのファイルのデータをインポートする場合は、このボックスをチェックします。空のテーブルを定義する場合は、チェックしないままとします。"
-
-#~ msgid "Warning!"
-#~ msgstr "警告："
-
-#~ msgid "The selected file is going to be moved during the import."
-#~ msgstr "選択したファイルはインポートの際に移動します。"
-
-#~ msgid "Choose a file"
-#~ msgstr "ファイルを選択"
-
-#~ msgid "Settings"
-#~ msgstr "設定"
-
-#~ msgid "Filter:"
-#~ msgstr "フィルタ："
-
-#~ msgid "Search for key, value, etc..."
-#~ msgstr "キー、値などを検索"
-
-#~ msgid "Clear"
-#~ msgstr "クリア"
-
-#~ msgid "Key"
-#~ msgstr "キー"
-
-#~ msgid "Value"
-#~ msgstr "値"
-
-#~ msgid "Create table manually"
-#~ msgstr "手動でテーブルを作成"
-
-#~ msgid "Step 1: Name"
-#~ msgstr "手順 1：名前"
-
-#~ msgid "Step 2: Record Format"
-#~ msgstr "手順 2：レコードのフォーマット"
-
-#~ msgid "Step 3: Serialization"
-#~ msgstr "手順 3：シリアル化"
-
-#~ msgid "Step 4: File Format"
-#~ msgstr "手順 4：ファイルのフォーマット"
-
-#~ msgid "Step 5: Location"
-#~ msgstr "手順 5：場所"
-
-#~ msgid "Step 6: Columns"
-#~ msgstr "手順 6：列"
-
-#~ msgid "Create a table"
-#~ msgstr "テーブルを作成"
-
-#~ msgid ""
-#~ "Let's start with a name and "
-#~ "description for where we'll store your"
-#~ " data."
-#~ msgstr "データの保存先の名前と説明から開始します。"
-
-#~ msgid "This field is required. Spaces are not allowed."
-#~ msgstr "これは必須フィールドです。スペースは使用できません。"
-
-#~ msgid "Choose Your Record Format"
-#~ msgstr "レコードのフォーマットの選択"
-
-#~ msgid ""
-#~ "Individual records are broken up into"
-#~ " columns either with delimiters (e.g., "
-#~ "CSV or TSV) or using a specific"
-#~ " serialization / deserialization (SerDe) "
-#~ "implementation. (One common specialized SerDe"
-#~ " is for parsing out columns with "
-#~ "a regular expression.)"
-#~ msgstr ""
-#~ "個々のレコードは、区切り文字（CSV、TSV "
-#~ "など）または固有のシリアル化と非シリアル化（SerDe）の実装を使用して列の集合に分解されます（広く使用する専用の SerDe"
-#~ " として、正規表現を使用して列を解析するものがあります）。"
-
-#~ msgid "Record format"
-#~ msgstr "レコードのフォーマット"
-
-#~ msgid "Delimited"
-#~ msgstr "区切り文字付き"
-
-#~ msgid "(Data files use delimiters, like commas (CSV) or tabs.)"
-#~ msgstr "（カンマ（CSV）やタブなどの区切り文字をデータファイルで使用します。）"
-
-#~ msgid "SerDe"
-#~ msgstr "SerDe"
-
-#~ msgid "(Enter a specialized serialization implementation.)"
-#~ msgstr "（専用のシリアル化実装を入力します。）"
-
-#~ msgid "Configure Record Serialization"
-#~ msgstr "レコードのシリアル化の設定"
-
-#~ msgid "Only supports single-character delimiters."
-#~ msgstr "1 文字の区切り文字のみを使用できます。"
-
-#~ msgid ""
-#~ "This field is required. Spaces are "
-#~ "not allowed. Terminator must be exactly"
-#~ " one character."
-#~ msgstr "これは必須フィールドです。スペースは使用できません。終端文字は 1 文字のみとする必要があります。"
-
-#~ msgid "Use for array types."
-#~ msgstr "配列タイプに使用します。"
-
-#~ msgid "Use for map types."
-#~ msgstr "map タイプに使用します。"
-
-#~ msgid "The Java class name of your SerDe."
-#~ msgstr "使用する SerDe の Java クラス名です。"
-
-#~ msgid "e.g."
-#~ msgstr "たとえば、"
-
-#~ msgid "Properties to pass to the (de)serialization mechanism."
-#~ msgstr "シリアル化（非シリアル化）機能に渡すプロパティ。"
-
-#~ msgid "Choose a File Format"
-#~ msgstr "ファイルフォーマットの選択"
-
-#~ msgid "Use"
-#~ msgstr "を使用。"
-
-#~ msgid "for newline-delimited text files."
-#~ msgstr "改行区切りテキストファイルには"
-
-#~ msgid "for Hadoop's binary serialization format."
-#~ msgstr "Hadoop のバイナリシリアル化フォーマットには"
-
-#~ msgid "to choose a custom implementation."
-#~ msgstr "カスタム実装の選択をするには"
-
-#~ msgid "File format"
-#~ msgstr "ファイルフォーマット"
-
-#~ msgid "Java class used to read data"
-#~ msgstr "データの読み取りに使用する Java クラス"
-
-#~ msgid "Java class used to write data"
-#~ msgstr "データの書き込みに使用する Java クラス"
-
-#~ msgid "Choose Where Your Table's Data is Stored"
-#~ msgstr "テーブルのデータを保存する場所の選択"
-
-#~ msgid "Location"
-#~ msgstr "場所"
-
-#~ msgid ""
-#~ "Store your table in the default "
-#~ "location (controlled by Hive, and "
-#~ "typically"
-#~ msgstr "デフォルトの場所にテーブルを保存（Hive で制御され、多くの場合は"
-
-#~ msgid "Enter the path (on HDFS) to your table's data location"
-#~ msgstr "テーブルのデータを保存する場所のパス（HDFS 上）を入力します"
-
-#~ msgid "Configure Table Columns"
-#~ msgstr "テーブル列の設定"
-
-#~ msgid "Add a column"
-#~ msgstr "列を追加"
-
-#~ msgid "Configure Partitions"
-#~ msgstr "パーティションの設定"
-
-#~ msgid ""
-#~ "If your data is naturally partitioned"
-#~ " (by date, for example), partitions "
-#~ "are a way to tell the query "
-#~ "server that data for a specific "
-#~ "partition value are stored together."
-#~ msgstr "自然な方法（日付別など）でデータをパーティション化すると、クエリサーバーでは特定のパーティション値を持つデータをまとめて保存できます。"
-
-#~ msgid "The query server establishes a mapping between directories on disk"
-#~ msgstr "クエリサーバーは、ディスク上のディレクトリと"
-
-#~ msgid ""
-#~ "and the data for that day.  "
-#~ "Partitions are virtual columns; they are"
-#~ " not represented in the data itself,"
-#~ " but are determined by the data "
-#~ "location. The query server implements "
-#~ "query optimizations such that queries "
-#~ "that are specific to a single "
-#~ "partition need not read the data "
-#~ "in other partitions."
-#~ msgstr ""
-#~ "その日のデータとの mapping "
-#~ "を確立します。パーティションはデータの場所で決まりますが、仮想的な列であるため、データ自体には記録されません。クエリサーバーでは、クエリの最適化を実装して、特定のパーティションに固有のクエリでは他のパーティションのデータを読み取る必要がないようにしています。"
-
-#~ msgid "Add a partition"
-#~ msgstr "パーティションを追加"
-
-#~ msgid "Back"
-#~ msgstr "戻る"
-
-#~ msgid "Delete this column"
-#~ msgstr "この列を削除"
-
-#~ msgid "Column name"
-#~ msgstr "列名"
-
-#~ msgid "There is another field with the same name."
-#~ msgstr "同じ名前を持つ別のフィールドが存在します。"
-
-#~ msgid "Column name must be single words that start with a letter or a digit."
-#~ msgstr "列名は、先頭を文字または数字とした一連の単語とする必要があります。"
-
-#~ msgid "Column type"
-#~ msgstr "列タイプ"
-
-#~ msgid ""
-#~ "Type for this column. Certain advanced"
-#~ " types (namely, structs) are not "
-#~ "exposed in this interface."
-#~ msgstr "この列のタイプです。高度なタイプ（構造体）の中には、このインターフェースで使用できないものがあります。"
-
-#~ msgid "Array value type"
-#~ msgstr "配列値のタイプ"
-
-#~ msgid "Type of the array values."
-#~ msgstr "配列値のタイプです。"
-
-#~ msgid "Map Key type"
-#~ msgstr "map キーのタイプ"
-
-#~ msgid "Type of the map keys."
-#~ msgstr "map キーのタイプです。"
-
-#~ msgid "Map Value type"
-#~ msgstr "map 値のタイプ"
-
-#~ msgid "Type of the map values."
-#~ msgstr "map 値のタイプです。"
-
-#~ msgid "Type your field terminator here"
-#~ msgstr "フィールドの終端文字をここに入力"
-
-#~ msgid "Type your collection terminator here"
-#~ msgstr "コレクションの終端文字をここに入力"
-
-#~ msgid "Type your map key terminator here"
-#~ msgstr "map キーの終端文字をここに入力"
-
-#~ msgid "Define your columns"
-#~ msgstr "列を定義"
-
-#~ msgid "Row"
-#~ msgstr "行"
-
-#~ msgid "Create Table"
-#~ msgstr "テーブルの作成"
-
-#~ msgid "Your query has the following error(s):"
-#~ msgstr "このクエリには次のエラーがあります："
-
-#~ msgid "click the"
-#~ msgstr "詳細については"
-
-#~ msgid "Error Log"
-#~ msgstr "次の [エラーログ] タブを"
-
-#~ msgid "tab below for details"
-#~ msgstr "クリックしてください"
-
-#~ msgid "Example: SELECT * FROM tablename"
-#~ msgstr "例：SELECT * FROM tablename"
-
-#~ msgid "Execute"
-#~ msgstr "実行"
-
-#~ msgid "Download"
-#~ msgstr "ダウンロード"
-
-#~ msgid "Save as..."
-#~ msgstr "名前を付けて保存..."
-
-#~ msgid "Explain"
-#~ msgstr "新しい"
-
-#~ msgid "or create a"
-#~ msgstr "クエリを説明"
-
-#~ msgid "New query"
-#~ msgstr "または作成"
-
-#~ msgid "Query"
-#~ msgstr "クエリ"
-
-#~ msgid "settings"
-#~ msgstr "設定"
-
-#~ msgid "Delete this setting"
-#~ msgstr "この設定を削除"
-
-#~ msgid "Add"
-#~ msgstr "追加"
-
-#~ msgid "File Resources"
-#~ msgstr "ファイルのリソース"
-
-#~ msgid "User-defined Functions"
-#~ msgstr "ユーザー定義関数"
-
-#~ msgid "myFunction"
-#~ msgstr "myFunction"
-
-#~ msgid "Parameterization"
-#~ msgstr "パラメータ化"
-
-#~ msgid ""
-#~ "If checked (the default), you can "
-#~ "include parameters like $parameter_name in "
-#~ "your query, and users will be "
-#~ "prompted for a value when the "
-#~ "query is run."
-#~ msgstr ""
-#~ "チェックすると（デフォルトの設定）、$parameter_name "
-#~ "などのパラメータをクエリで使用でき、クエリを実行したユーザーにはそのパラメータ値の指定が要求されます。"
-
-#~ msgid "Enable Parameterization"
-#~ msgstr "パラメータ化の有効化"
-
-#~ msgid "Email Notification"
-#~ msgstr "電子メール通知"
-
-#~ msgid ""
-#~ "If checked, you will receive an "
-#~ "email notification when the query "
-#~ "completes."
-#~ msgstr "チェックしておくと、クエリの完了が電子メールで通知されます。"
-
-#~ msgid "Email me on completion"
-#~ msgstr "完了時に電子メールで通知"
-
-#~ msgid "Did you know?"
-#~ msgstr "便利な使い方"
-
-#~ msgid ""
-#~ "You can execute queries with multiple"
-#~ " SQL statements delimited by a "
-#~ "semicolon ';'."
-#~ msgstr ""
-
-#~ msgid "Use '\\059' instead of ';' if you have some conflicts."
-#~ msgstr ""
-
-#~ msgid "You can highlight and run a fragment of a query."
-#~ msgstr ""
-
-#~ msgid "Choose a name"
-#~ msgstr "名前を選択"
-
-#~ msgid "Press \"tab\", then \"enter\"."
-#~ msgstr ""
-
-#~ msgid "Query Explanation"
-#~ msgstr "クエリの説明"
-
-#~ msgid "Query Explanation:"
-#~ msgstr "クエリの説明："
-
-#~ msgid "Explanation"
-#~ msgstr "説明"
-
-#~ msgid "Install Samples"
-#~ msgstr "サンプルのインストール"
-
-#~ msgid "Show Tables"
-#~ msgstr "テーブルの表示"
-
-#~ msgid "Queries"
-#~ msgstr "クエリ"
-
-#~ msgid "Saved Queries"
-#~ msgstr "保存したクエリ"
-
-#~ msgid "Execute Query"
-#~ msgstr "クエリの実行"
-
-#~ msgid "Query History"
-#~ msgstr "クエリ履歴"
-
-#~ msgid "Configuration"
-#~ msgstr "設定"
-
-#~ msgid "Extended Configuration"
-#~ msgstr "拡張設定"
-
-#~ msgid "Welcome to Beeswax for Hive"
-#~ msgstr "Beeswax for Hive へようこそ"
-
-#~ msgid "To get started with Beeswax you'll first need set up some data:"
-#~ msgstr "Beeswax を使用するには、先にいくつかのデータを設定する必要があります。"
-
-#~ msgid "or"
-#~ msgstr "または"
-
-#~ msgid "My Queries"
-#~ msgstr "マイクエリ"
-
-#~ msgid "History"
-#~ msgstr "履歴"
-
-#~ msgid "Edit"
-#~ msgstr "編集"
-
-#~ msgid "Clone the selected query"
-#~ msgstr ""
-
-#~ msgid "Clone"
-#~ msgstr "複製"
-
-#~ msgid "View the usage history of the selected query"
-#~ msgstr "このクエリの使用履歴を表示します。"
-
-#~ msgid "Usage history"
-#~ msgstr "使用履歴"
-
-#~ msgid "Delete"
-#~ msgstr "削除"
-
-#~ msgid "Create New Query"
-#~ msgstr "クエリの新規作成"
-
-#~ msgid "Owner"
-#~ msgstr "所有者"
-
-#~ msgid "Last Modified"
-#~ msgstr "前回の変更"
-
-#~ msgid "ago"
-#~ msgstr "前"
-
-#~ msgid "Unsaved"
-#~ msgstr "未保存"
-
-#~ msgid "Copy this query."
-#~ msgstr "このクエリをコピーします。"
-
-#~ msgid "Auto generated action"
-#~ msgstr "自動生成のアクション"
-
-#~ msgid "Show my queries"
-#~ msgstr "自分のクエリを表示"
-
-#~ msgid "Show everyone's queries"
-#~ msgstr "全員のクエリを表示"
-
-#~ msgid "Show user queries"
-#~ msgstr "ユーザーのクエリを表示"
-
-#~ msgid "Time"
-#~ msgstr "時間"
-
-#~ msgid "User"
-#~ msgstr "ユーザー"
-
-#~ msgid "State"
-#~ msgstr "状態"
-
-#~ msgid "Result"
-#~ msgstr "結果"
-
-#~ msgid "Results"
-#~ msgstr "結果"
-
-#~ msgid "Showing _START_ to _END_ of _TOTAL_ entries"
-#~ msgstr "_TOTAL_ 件のエントリのうち _START_ ～ _END_ を表示しています"
-
-#~ msgid "Showing 0 to 0 of 0 entries"
-#~ msgstr "0 件のエントリのうち 0 ～ 0 を表示しています"
-
-#~ msgid "(filtered from _MAX_ total entries)"
-#~ msgstr "（合計 _MAX_ 件のエントリからフィルタ処理）"
-
-#~ msgid "First"
-#~ msgstr "先頭"
-
-#~ msgid "Last"
-#~ msgstr "末尾"
-
-#~ msgid "View the result of the selected"
-#~ msgstr ""
-
-#~ msgid "View result"
-#~ msgstr "クエリ結果の保存"
-
-#~ msgid "Recent Saved Queries"
-#~ msgstr "最近保存したクエリ"
-
-#~ msgid "Recent Run Queries"
-#~ msgstr "最近実行したクエリ"
-
-#~ msgid "Desc"
-#~ msgstr "降順"
-
-#~ msgid "View all my queries"
-#~ msgstr "自分のクエリをすべて表示"
-
-#~ msgid "View my entire query history"
-#~ msgstr "自分のクエリ履歴全体を表示"
-
-#~ msgid "Parameterize Query"
-#~ msgstr "クエリのパラメータ化"
-
-#~ msgid "Explain query"
-#~ msgstr "クエリを説明"
-
-#~ msgid "Execute query"
-#~ msgstr "クエリを実行"
-
-#~ msgid "Please specify parameters for this query:"
-#~ msgstr "このクエリのパラメータを指定してください："
-
-#~ msgid "Save Query Results"
-#~ msgstr "クエリ結果の保存"
-
-#~ msgid "In a new table"
-#~ msgstr "新しいテーブル内"
-
-#~ msgid "In an HDFS directory"
-#~ msgstr "HDFS ディレクトリ"
-
-#~ msgid "Query Results:"
-#~ msgstr "クエリ結果："
-
-#~ msgid "Collapse this panel"
-#~ msgstr "このパネルを折りたたむ"
-
-#~ msgid "Downloads"
-#~ msgstr "ダウンロード"
-
-#~ msgid "Download as CSV"
-#~ msgstr "CSV としてダウンロード"
-
-#~ msgid "Download as XLS"
-#~ msgstr "XLS としてダウンロード"
-
-#~ msgid "MR Job"
-#~ msgstr "MR Job"
-
-#~ msgid "MR Jobs"
-#~ msgstr "MR Job"
-
-#~ msgid "No Hadoop jobs were launched in running this query."
-#~ msgstr "このクエリの実行では Hadoop ジョブが起動しませんでした。"
-
-#~ msgid "Multi-statement query"
-#~ msgstr ""
-
-#~ msgid "Hue stopped as one of your query contains some results."
-#~ msgstr ""
-
-#~ msgid "Click on"
-#~ msgstr "詳細については"
-
-#~ msgid "next"
-#~ msgstr "次"
-
-#~ msgid "for continuing the execution of the remaining statements."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "If the result contains a large "
-#~ "number of columns, click a row to"
-#~ " select a column to jump to."
-#~ msgstr "行をクリックすると、移動先の列を選択できます。"
-
-#~ msgid ""
-#~ "As you type into the field, a "
-#~ "drop-down list displays column names "
-#~ "that match the string."
-#~ msgstr ""
-
-#~ msgid "Error"
-#~ msgstr "エラー"
-
-#~ msgid "Log"
-#~ msgstr "ログ"
-
-#~ msgid "The query result has expired."
-#~ msgstr ""
-
-#~ msgid "You can rerun it from "
-#~ msgstr ""
-
-#~ msgid "Warning:"
-#~ msgstr "警告："
-
-#~ msgid "Page offset may have incremented since last view."
-#~ msgstr "前回の表示時点からページのオフセットが増加している可能性があります。"
-
-#~ msgid "Sorry, name is required."
-#~ msgstr "申し訳ありませんが名前が必要です。"
-
-#~ msgid "Download results from the left."
-#~ msgstr ""
-
-#~ msgid "Waiting for query..."
-#~ msgstr "クエリを待機中..."
-
+#~ msgid "Install samples"
+#~ msgstr "サンプルをインストール"
+#~ msgid "Yes, install samples"
+#~ msgstr "はい、サンプルをインストールします"
+#~ msgid "There was an error processing your request:"
+#~ msgstr "要求の処理中にエラーが発生しました："

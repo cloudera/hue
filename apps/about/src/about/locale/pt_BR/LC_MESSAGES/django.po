@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-01-31 16:56-0800\n"
+"POT-Creation-Date: 2013-04-11 10:03-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: pt_BR <LL@li.org>\n"
@@ -17,19 +17,93 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/about/templates/index.mako:20
+#: src/about/templates/admin_wizard.mako:21
 msgid "About Hue"
 msgstr "Sobre o Hue"
 
-#: src/about/templates/index.mako:25
+#: src/about/templates/admin_wizard.mako:28
+msgid "Quick start"
+msgstr "Início rápido"
+
+#: src/about/templates/admin_wizard.mako:29
 msgid "Configuration"
 msgstr "Configuração"
 
-#: src/about/templates/index.mako:26
-msgid "Check for misconfiguration"
-msgstr "Verificar configurações incorretas"
-
-#: src/about/templates/index.mako:27
+#: src/about/templates/admin_wizard.mako:30
 msgid "Server Logs"
 msgstr "Logs de servidor"
+
+#: src/about/templates/admin_wizard.mako:42
+msgid "Quick Start Wizard"
+msgstr "Assistente de início rápido"
+
+#: src/about/templates/admin_wizard.mako:56
+msgid "Step 1:"
+msgstr "Passo 1:"
+
+#: src/about/templates/admin_wizard.mako:56
+msgid "Check Configuration"
+msgstr "Verificar configuração"
+
+#: src/about/templates/admin_wizard.mako:57
+msgid "Step 2:"
+msgstr "Passo 2:"
+
+#: src/about/templates/admin_wizard.mako:57
+msgid "Examples"
+msgstr "Exemplos"
+
+#: src/about/templates/admin_wizard.mako:58
+msgid "Step 3:"
+msgstr "Passo 3:"
+
+#: src/about/templates/admin_wizard.mako:58
+msgid "Users"
+msgstr "Usuários"
+
+#: src/about/templates/admin_wizard.mako:59
+msgid "Step 4:"
+msgstr "Passo 4:"
+
+#: src/about/templates/admin_wizard.mako:59
+msgid "Go !"
+msgstr "Ir !"
+
+#: src/about/templates/admin_wizard.mako:78
+msgid "Install or re-install the application examples"
+msgstr "Instalar ou reinstalar os exemplos de aplicativo"
+
+#: src/about/templates/admin_wizard.mako:84
+#: src/about/templates/admin_wizard.mako:91
+#: src/about/templates/admin_wizard.mako:98
+msgid "Installing..."
+msgstr "Instalando..."
+
+#: src/about/templates/admin_wizard.mako:114
+msgid "Go create or import users"
+msgstr "Criar ou importar usuários"
+
+#: src/about/templates/admin_wizard.mako:117
+msgid "User Admin"
+msgstr "Admin do usuário"
+
+#: src/about/templates/admin_wizard.mako:128
+msgid "Go use the apps"
+msgstr "Usar os aplicativos"
+
+#: src/about/templates/admin_wizard.mako:131
+msgid "Hue Home"
+msgstr "Página inicial do Hue"
+
+#: src/about/templates/admin_wizard.mako:138
+msgid "Back"
+msgstr "Voltar"
+
+#: src/about/templates/admin_wizard.mako:139
+msgid "Next"
+msgstr "Próximo"
+
+#: src/about/templates/admin_wizard.mako:168
+msgid "Done!"
+msgstr "Concluído!"
 

@@ -5,11 +5,11 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
-"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-03-20 17:39-0700\n"
+"Project-Id-Version: VERSÃO DO PROJETO\n"
+"Report-Msgid-Bugs-To: ENDEREÇO DE@E-MAIL\n"
+"POT-Creation-Date: 2013-04-11 10:03-0700\n"
 "PO-Revision-Date: 2012-07-30 18:51-0700\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Last-Translator: NOME COMPLETO <ENDEREÇO DE@E-MAIL>\n"
 "Language-Team: pt_BR <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n > 1)\n"
 "MIME-Version: 1.0\n"
@@ -17,1485 +17,279 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/catalog/forms.py:48 src/catalog/templates/describe_partitions.mako:33
+#: src/catalog/forms.py:48 src/catalog/templates/describe_partitions.mako:36
 msgid "Path"
-msgstr ""
+msgstr "Caminho"
 
 #: src/catalog/forms.py:49
 msgid "Overwrite?"
-msgstr ""
+msgstr "Sobrescrever?"
 
 #: src/catalog/forms.py:62
 #, python-format
 msgid "%(column_name)s (partition key with type %(column_type)s)"
-msgstr ""
+msgstr "%(column_name)s (partição principal com o tipo %(column_type)s)"
 
-#: src/catalog/views.py:109
+#: src/catalog/views.py:72
+#, fuzzy, python-format
+msgid "Failed to remove %(databases)s.  Error: %(error)s"
+msgstr "Falha ao remover %(databases)s.  Erro: %(error)s"
+
+#: src/catalog/views.py:73 src/catalog/views.py:161
+msgid "Beeswax Error"
+msgstr "Erro do Beeswax"
+
+#: src/catalog/views.py:75
+msgid "Do you really want to delete the database(s)?"
+msgstr "Tem certeza de que deseja realmente excluir os bancos de dados?"
+
+#: src/catalog/views.py:160
 #, fuzzy, python-format
 msgid "Failed to remove %(tables)s.  Error: %(error)s"
-msgstr "Falha em salvar os resultados de uma consulta: %(error)s"
+msgstr "Falha ao remover %(tables)s.  Erro: %(error)s"
 
-#: src/catalog/views.py:110
-#, fuzzy
-msgid "Beeswax Error"
-msgstr "Beeswax"
-
-#: src/catalog/views.py:112
+#: src/catalog/views.py:163
 msgid "Do you really want to delete the table(s)?"
-msgstr ""
+msgstr "Tem certeza de que deseja realmente excluir as tabelas?"
 
-#: src/catalog/views.py:126
-#, fuzzy
+#: src/catalog/views.py:177
 msgid "Can read table"
-msgstr "Criar uma tabela"
+msgstr "É possível ler tabela"
 
-#: src/catalog/views.py:147
+#: src/catalog/views.py:198
 msgid "Can't load the data: "
-msgstr ""
+msgstr "Não é possível carregar os dados: "
 
-#: src/catalog/views.py:168
+#: src/catalog/views.py:219
 #, python-format
 msgid "Table '%(table)s' is not partitioned."
-msgstr ""
+msgstr "A tabela '%(table)s' não está particionada."
 
-#: src/catalog/templates/components.mako:198
-msgid "Beginning of List"
-msgstr "Começo da lista"
+#: src/catalog/templates/components.mako:27
+#: src/catalog/templates/databases.mako:24
+#: src/catalog/templates/databases.mako:27
+msgid "Databases"
+msgstr "Bancos de dados"
 
-#: src/catalog/templates/components.mako:199
-msgid "Previous Page"
-msgstr "Página anterior"
+#: src/catalog/templates/databases.mako:33
+msgid "Create a new database"
+msgstr "Criar um novo banco de dados"
 
-#: src/catalog/templates/components.mako:200
-msgid "Next page"
-msgstr "Próxima página"
+#: src/catalog/templates/databases.mako:40
+msgid "Drop the selected databases"
+msgstr "Descartar os bancos de dados selecionados"
 
-#: src/catalog/templates/components.mako:200
-msgid "Next Page"
-msgstr "Próxima página"
-
-#: src/catalog/templates/components.mako:201
-msgid "End of List"
-msgstr "Final da lista"
-
-#: src/catalog/templates/components.mako:203
-#, python-format
-msgid ""
-"Showing %(start)s to %(end)s of %(count)s items, page %(page)s of "
-"%(pages)s"
-msgstr ""
-"Exibindo %(start)s até o %(end)s de %(count)s itens, página %(page)s de "
-"%(pages)s"
-
-#: src/catalog/templates/describe_partitions.mako:22
-#, python-format
-msgid "Table Partitions: %(tableName)s"
-msgstr ""
-
-#: src/catalog/templates/describe_partitions.mako:25
-#, fuzzy
-msgid "Partitions"
-msgstr "adicionar uma partição"
-
-#: src/catalog/templates/describe_partitions.mako:51
-#, fuzzy
-msgid "Table has no partitions."
-msgstr "adicionar uma partição"
-
-#: src/catalog/templates/describe_table.mako:25
+#: src/catalog/templates/databases.mako:40
+#: src/catalog/templates/describe_table.mako:65
 #: src/catalog/templates/tables.mako:51
-#, fuzzy
-msgid "View"
-msgstr "Visualização"
-
-#: src/catalog/templates/describe_table.mako:27
-#, fuzzy
-msgid "Table"
-msgstr "Tabelas"
-
-#: src/catalog/templates/describe_table.mako:29
-#, python-format
-msgid "%s Metadata: %s"
-msgstr ""
-
-#: src/catalog/templates/describe_table.mako:35
-msgid "Name"
-msgstr "Nome"
-
-#: src/catalog/templates/describe_table.mako:36
-msgid "Type"
-msgstr ""
-
-#: src/catalog/templates/describe_table.mako:37
-#, fuzzy
-msgid "Comment"
-msgstr "vírgulas"
-
-#: src/catalog/templates/describe_table.mako:54
-msgid "Table Metadata:"
-msgstr ""
-
-#: src/catalog/templates/describe_table.mako:59
-#: src/catalog/templates/tables.mako:39
-msgid "Actions"
-msgstr "Ações"
-
-#: src/catalog/templates/describe_table.mako:60
-msgid "Import Data"
-msgstr "Importar dados"
-
-#: src/catalog/templates/describe_table.mako:61
-#: src/catalog/templates/tables.mako:52
-msgid "Browse Data"
-msgstr ""
-
-#: src/catalog/templates/describe_table.mako:62
-#: src/catalog/templates/tables.mako:53
 msgid "Drop"
-msgstr ""
+msgstr "Drop"
 
-#: src/catalog/templates/describe_table.mako:63
-#, fuzzy
-msgid "View File Location"
-msgstr "Local dos resultados"
+#: src/catalog/templates/databases.mako:47
+msgid "Database Name"
+msgstr "Nome do banco de dados"
 
-#: src/catalog/templates/describe_table.mako:73
-msgid "Columns"
-msgstr "Colunas"
+#: src/catalog/templates/databases.mako:74 src/catalog/templates/tables.mako:86
+msgid "Confirm action"
+msgstr "Confirmar ação"
 
-#: src/catalog/templates/describe_table.mako:75
-msgid "Partition Columns"
-msgstr ""
-
-#: src/catalog/templates/describe_table.mako:78
-#, fuzzy
-msgid "Sample"
-msgstr "Exemplos"
-
-#: src/catalog/templates/describe_table.mako:90
-#, fuzzy
-msgid "Show Partitions"
-msgstr "Exibir ações automáticas"
-
-#: src/catalog/templates/describe_table.mako:98
-msgid "Error!"
-msgstr "Error!"
-
-#: src/catalog/templates/describe_table.mako:135
-#, fuzzy
-msgid "Drop Table"
-msgstr "Criar uma tabela"
-
-#: src/catalog/templates/describe_table.mako:142
-#: src/catalog/templates/tables.mako:96 src/catalog/templates/tables.mako:109
+#: src/catalog/templates/databases.mako:77
+#: src/catalog/templates/describe_table.mako:145
+#: src/catalog/templates/tables.mako:89
 #: src/catalog/templates/popups/load_data.mako:60
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: src/catalog/templates/describe_table.mako:143
-msgid "Yes, drop this table"
-msgstr ""
-
-#: src/catalog/templates/describe_table.mako:172
-#: src/catalog/templates/describe_table.mako:195
-#: src/catalog/templates/tables.mako:141
-#, fuzzy
-msgid "No data available"
-msgstr "Nenhum dado disponível na tabela"
-
-#: src/catalog/templates/describe_table.mako:173
-#: src/catalog/templates/describe_table.mako:196
-#: src/catalog/templates/tables.mako:142
-#, fuzzy
-msgid "No matching records"
-msgstr "Não foram encontrados registros correspondentes"
-
-#: src/catalog/templates/layout.mako:34 src/catalog/templates/tables.mako:23
-#: src/catalog/templates/tables.mako:26
-msgid "Tables"
-msgstr "Tabelas"
-
-#: src/catalog/templates/tables.mako:32
-msgid "database"
-msgstr "banco de dados"
-
-#: src/catalog/templates/tables.mako:41 src/catalog/templates/tables.mako:88
-msgid "Install samples"
-msgstr "Instalar exemplos"
-
-#: src/catalog/templates/tables.mako:43
-msgid "Create a new table from a file"
-msgstr "Criar nova tabela de um arquivo"
-
-#: src/catalog/templates/tables.mako:44
-msgid "Create a new table manually"
-msgstr "Criar uma nova tabela manualmente"
-
-#: src/catalog/templates/tables.mako:51 src/catalog/templates/tables.mako:52
-#, fuzzy
-msgid "Browse the selected table"
-msgstr "Editar esta consulta."
-
-#: src/catalog/templates/tables.mako:53
-#, fuzzy
-msgid "Delete the selected tables"
-msgstr "Excluir esta consulta."
-
-#: src/catalog/templates/tables.mako:60
-msgid "Table Name"
-msgstr "Nome da tabela"
-
-#: src/catalog/templates/tables.mako:97
-msgid "Yes, install samples"
-msgstr "Sim, instalar amostras"
-
-#: src/catalog/templates/tables.mako:106
-msgid "Confirm action"
-msgstr "Confirmar ação"
-
-#: src/catalog/templates/tables.mako:110
+#: src/catalog/templates/databases.mako:78 src/catalog/templates/tables.mako:90
 msgid "Yes"
 msgstr "Sim"
 
-#: src/catalog/templates/tables.mako:171
-msgid "There was an error processing your request:"
-msgstr "Ocorreu um erro ao processar sua solicitação:"
+#: src/catalog/templates/databases.mako:111
+#: src/catalog/templates/describe_table.mako:177
+#: src/catalog/templates/describe_table.mako:200
+#: src/catalog/templates/tables.mako:123
+msgid "No data available"
+msgstr "Nenhum dado disponível"
+
+#: src/catalog/templates/databases.mako:112
+#: src/catalog/templates/describe_table.mako:178
+#: src/catalog/templates/describe_table.mako:201
+#: src/catalog/templates/tables.mako:124
+msgid "No matching records"
+msgstr "Nenhum registro correspondente"
+
+#: src/catalog/templates/describe_partitions.mako:24
+#, python-format
+msgid "Table Partitions: %(tableName)s"
+msgstr "Partições de tabela: %(tableName)s"
+
+#: src/catalog/templates/describe_partitions.mako:27
+msgid "Partitions"
+msgstr "Partições"
+
+#: src/catalog/templates/describe_partitions.mako:54
+msgid "Table has no partitions."
+msgstr "A tabela não tem nenhuma partição."
+
+#: src/catalog/templates/describe_table.mako:26
+#: src/catalog/templates/tables.mako:49
+msgid "View"
+msgstr "Exibir"
+
+#: src/catalog/templates/describe_table.mako:28
+#: src/catalog/templates/describe_table.mako:55
+msgid "Table"
+msgstr "Tabela"
+
+#: src/catalog/templates/describe_table.mako:30
+#, python-format
+msgid "%s : %s"
+msgstr "%s : %s"
+
+#: src/catalog/templates/describe_table.mako:36
+msgid "Name"
+msgstr "Nome"
+
+#: src/catalog/templates/describe_table.mako:37
+msgid "Type"
+msgstr "Tipo"
+
+#: src/catalog/templates/describe_table.mako:38
+msgid "Comment"
+msgstr "Comentário"
+
+#: src/catalog/templates/describe_table.mako:62
+#: src/catalog/templates/tables.mako:40
+msgid "Actions"
+msgstr "Ações"
+
+#: src/catalog/templates/describe_table.mako:63
+msgid "Import Data"
+msgstr "Importar dados"
+
+#: src/catalog/templates/describe_table.mako:64
+#: src/catalog/templates/tables.mako:50
+msgid "Browse Data"
+msgstr "Procurar dados"
+
+#: src/catalog/templates/describe_table.mako:66
+msgid "View File Location"
+msgstr "Visualizar local do arquivo"
+
+#: src/catalog/templates/describe_table.mako:72
+msgid "Comment:"
+msgstr "Comentário:"
+
+#: src/catalog/templates/describe_table.mako:76
+msgid "Columns"
+msgstr "Colunas"
+
+#: src/catalog/templates/describe_table.mako:78
+msgid "Partition Columns"
+msgstr "Colunas de partição"
+
+#: src/catalog/templates/describe_table.mako:81
+msgid "Sample"
+msgstr "Amostra"
+
+#: src/catalog/templates/describe_table.mako:93
+msgid "Show Partitions"
+msgstr "Exibir partições"
+
+#: src/catalog/templates/describe_table.mako:101
+msgid "Error!"
+msgstr "Erro!"
+
+#: src/catalog/templates/describe_table.mako:138
+msgid "Drop Table"
+msgstr "Soltar tabela"
+
+#: src/catalog/templates/describe_table.mako:146
+msgid "Yes, drop this table"
+msgstr "Sim, descartar essa tabela"
+
+#: src/catalog/templates/tables.mako:23
+msgid "Tables"
+msgstr "Tabelas"
+
+#: src/catalog/templates/tables.mako:26
+#, fuzzy, python-format
+msgid "Database %s"
+msgstr "Banco de dados %s"
+
+#: src/catalog/templates/tables.mako:33
+msgid "database"
+msgstr "banco de dados"
+
+#: src/catalog/templates/tables.mako:41
+msgid "Create a new table from a file"
+msgstr "Criar nova tabela de um arquivo"
+
+#: src/catalog/templates/tables.mako:42
+msgid "Create a new table manually"
+msgstr "Criar uma nova tabela manualmente"
+
+#: src/catalog/templates/tables.mako:49 src/catalog/templates/tables.mako:50
+msgid "Browse the selected table"
+msgstr "Pesquisar a tabela selecionada"
+
+#: src/catalog/templates/tables.mako:51
+msgid "Delete the selected tables"
+msgstr "Excluir as tabelas selecionadas"
+
+#: src/catalog/templates/tables.mako:58
+msgid "Table Name"
+msgstr "Nome da tabela"
 
 #: src/catalog/templates/util.mako:66
 msgid "Unsaved Query"
-msgstr "Consultas não salvas"
+msgstr "Consulta não salva"
 
 #: src/catalog/templates/util.mako:71
 msgid "Query Results"
-msgstr "Resultados de consultas"
+msgstr "Resultados da consulta"
 
 #: src/catalog/templates/popups/load_data.mako:25
-#, fuzzy
 msgid "Import data"
 msgstr "Importar dados"
 
 #: src/catalog/templates/popups/load_data.mako:50
 msgid "Overwrite existing data"
-msgstr ""
+msgstr "Sobrescrever os dados existentes"
 
 #: src/catalog/templates/popups/load_data.mako:55
-msgid ""
-"Note that loading data will move data from its location into the table's "
-"storage location."
-msgstr ""
+msgid "Note that loading data will move data from its location into the table's storage location."
+msgstr "Observe que o carregamento dos dados moverá os dados de seu local para o local de armazenamento na tabela."
 
 #: src/catalog/templates/popups/load_data.mako:61
 msgid "Submit"
-msgstr ""
+msgstr "Enviar"
 
+#~ msgid "Beginning of List"
+#~ msgstr "Começo da lista"
+#~ msgid "Previous Page"
+#~ msgstr "Página anterior"
+#~ msgid "Next page"
+#~ msgstr "Próxima página"
+#~ msgid "Next Page"
+#~ msgstr "Próxima página"
+#~ msgid "End of List"
+#~ msgstr "Final da lista"
 #~ msgid ""
-#~ "Beeswax or Hive Server 2 Thrift "
-#~ "API used. Choices are: 'beeswax' or "
-#~ "'hiveserver2'."
+#~ "Showing %(start)s to %(end)s of "
+#~ "%(count)s items, page %(page)s of "
+#~ "%(pages)s"
 #~ msgstr ""
-#~ "API Thrift do Beeswax ou Hive "
-#~ "Server 2 usada. As opções são: "
-#~ "'beeswax' ou 'hiveserver2'."
-
-#~ msgid ""
-#~ "Host where Beeswax server Thrift daemon"
-#~ " is running. If Kerberos security is"
-#~ " enabled, the fully-qualified domain "
-#~ "name (FQDN) is required, even if "
-#~ "the Thrift daemon is running on "
-#~ "the same host as Hue."
+#~ "Exibindo %(start)s até o %(end)s de "
+#~ "%(count)s itens, página %(page)s de "
+#~ "%(pages)s"
+#~ msgid "%s Metadata: %s"
 #~ msgstr ""
-
-#~ msgid "Configure the port the Beeswax Thrift server runs on."
-#~ msgstr "Configurar a porta onde o servidor Beeswax Thrift está sendo executado."
-
-#~ msgid "Host where internal metastore Thrift daemon is running."
+#~ msgid "Table Metadata:"
 #~ msgstr ""
-#~ "Host em que o deamon Thrift do "
-#~ "meta-armazenamento interno está em "
-#~ "execução."
-
-#~ msgid ""
-#~ "Configure the port the internal "
-#~ "metastore daemon runs on. Used only "
-#~ "if hive.metastore.local is true."
-#~ msgstr ""
-#~ "Configure a porta na qual o deamon"
-#~ " do meta-armazenamento interno é "
-#~ "executada. Usada somente se "
-#~ "hive.metastore.local for true (verdadeiro)."
-
-#~ msgid "Path to beeswax_server.sh"
-#~ msgstr "Caminho para beeswax_server.sh"
-
-#~ msgid ""
-#~ "Maximum Java heap size (in megabytes)"
-#~ " used by Beeswax Server.  Note that"
-#~ " the setting of HADOOP_HEAPSIZE in "
-#~ "$HADOOP_CONF_DIR/hadoop-env.sh may override "
-#~ "this setting."
-#~ msgstr ""
-#~ "Tamanho máximo do heap do Java "
-#~ "máximo (em megabytes) usado pelo "
-#~ "servidor Beeswax.  Observe que a "
-#~ "configuração de HADOOP_HEAPSIZE em "
-#~ "$HADOOP_CONF_DIR/hadoop-env.sh pode anular "
-#~ "esta configuração."
-
-#~ msgid ""
-#~ "Path to the root of the Hive "
-#~ "installation; defaults to environment variable"
-#~ " when not set."
-#~ msgstr ""
-#~ "Caminho para a raiz da instalação "
-#~ "do Hive; padrão para o ambiente "
-#~ "quando não configurado."
-
-#~ msgid "Hive configuration directory, where hive-site.xml is located."
-#~ msgstr ""
-#~ "A configuração do diretório do Hive, "
-#~ "onde hive-site.xml está localizado."
-
-#~ msgid "The local filesystem path containing the Beeswax examples."
-#~ msgstr "O sistema de arquivos local contém exemplos do  Beeswax."
-
-#~ msgid "Timeout in seconds for Thrift calls to Beeswax service."
-#~ msgstr "Tempo máximo para as chamadas do Thrift para o serviço Beeswax."
-
-#~ msgid ""
-#~ "Timeouts in seconds for Thrift calls "
-#~ "to the Hive metastore. This timeout "
-#~ "should take into account that the "
-#~ "metastore could talk to an external "
-#~ "database."
-#~ msgstr ""
-#~ "Tempo máximo em segundos para as "
-#~ "chamadas do meta-armazenamento do Hive."
-#~ " Este tempo máximo deve levar em "
-#~ "conta que o meta-armazenamento possa "
-#~ "se relacionar com um banco de "
-#~ "dados externo."
-
-#~ msgid "Time in seconds for Beeswax to persist queries in its cache."
-#~ msgstr ""
-#~ "O tempo em segundos para o Beeswax"
-#~ " insistir nas consultas com seu "
-#~ "cache."
-
-#~ msgid ""
-#~ "Set a LIMIT clause when browsing a"
-#~ " partitioned table. A positive value "
-#~ "will be set as the LIMIT. If "
-#~ "0 or negative, do not set any "
-#~ "limit."
-#~ msgstr ""
-#~ "Configura uma cláusula LIIT quando "
-#~ "navega em uma tabela particionada. Um"
-#~ " valor positivo será configurado como "
-#~ "o LIMIT. Se 0 ou negativo, não "
-#~ "configure nenhum limite."
-
-#~ msgid ""
-#~ "Share saved queries with all users. "
-#~ "If set to false, saved queries are"
-#~ " visible only to the owner and "
-#~ "administrators."
-#~ msgstr ""
-#~ "Compartilha consultas salvas com todos "
-#~ "os usuários. Se configurado como falso,"
-#~ " as consultas salvas estarão visíveis "
-#~ "somente para o proprietário e "
-#~ "administradores."
-
-#~ msgid "ctrl-As"
-#~ msgstr "ctrl-As"
-
-#~ msgid "ctrl-Bs"
-#~ msgstr "ctrl-Bs"
-
-#~ msgid "ctrl-Cs"
-#~ msgstr "ctrl-Cs"
-
-#~ msgid "tabs"
-#~ msgstr "tabulações"
-
-#~ msgid "spaces"
-#~ msgstr "espaços"
-
-#~ msgid "Internal error when constructing the delimiter form: %(error)s"
-#~ msgstr "Erro interno ao construir o formulário do delimitador: %(error)s"
-
-#~ msgid ""
-#~ "Failed to decode file '%(path)s' into"
-#~ " printable characters under %(encoding)s"
-#~ msgstr ""
-#~ "Fala ao decodificar o arquivo '%(path)s'"
-#~ " em caracteres que podem ser "
-#~ "impressos na %(encoding)s"
-
-#~ msgid "Could not find any columns to import"
-#~ msgstr ""
-
-#~ msgid "Failed to open file '%(path)s': %(error)s"
-#~ msgstr "Falha para abrir o arquivo '%(path)s': %(error)s"
-
-#~ msgid "Internal error: Missing needed parameter to load data into table"
-#~ msgstr ""
-#~ "Erro interino: Falta parâmetro obrigatório "
-#~ "para carregar dados na tabela"
-
-#~ msgid "Change the name to save as a new design."
-#~ msgstr "Alterar o nome do servidor como um novo projeto."
-
-#~ msgid "Description"
-#~ msgstr "Descrição"
-
-#~ msgid "Save"
-#~ msgstr "Salvar"
-
-#~ msgid "Save As"
-#~ msgstr "Salvar como"
-
-#~ msgid "Please enter a name"
-#~ msgstr "Insira um nome"
-
-#~ msgid "Name of the new table"
-#~ msgstr "Nome da nova tabela"
-
-#~ msgid "Results Location"
-#~ msgstr "Local dos resultados"
-
-#~ msgid "Empty directory in HDFS to put the results"
-#~ msgstr "Diretório vazio no HDFS para colocar os resultados"
-
-#~ msgid "Table already exists"
-#~ msgstr "Tabela já existe"
-
-#~ msgid "Query Editor"
-#~ msgstr "Editor de consultas"
-
-#~ msgid "jar"
-#~ msgstr "jar"
-
-#~ msgid "archive"
-#~ msgstr "arquivo"
-
-#~ msgid ""
-#~ "Resources to upload with your Hive "
-#~ "job.  Use 'jar' for UDFs.  Use "
-#~ "'file' and 'archive' for files to "
-#~ "be copied and made locally available "
-#~ "during MAP/TRANSFORM. Paths are on HDFS."
-#~ msgstr ""
-#~ "Recursos para fazer o upload de "
-#~ "sua tarefa do Hive.  Use 'jar' "
-#~ "para UDFs.  Use 'file' e 'archive' "
-#~ "para arquivos a serem copiados e "
-#~ "disponibilizados localmente durante o "
-#~ "MAP/TRANSFORM. Os caminhos estão no "
-#~ "HDFS."
-
-#~ msgid "Path to file on HDFS."
-#~ msgstr "Caminho para arquivo no HDFS."
-
-#~ msgid "Field terminator"
-#~ msgstr "Finalizador de campo"
-
-#~ msgid "Collection terminator"
-#~ msgstr "Finalizador de coleção"
-
-#~ msgid "Map key terminator"
-#~ msgstr "Finalizador de chave de map"
-
-#~ msgid "SerDe Name"
-#~ msgstr "Nome SerDe"
-
-#~ msgid "Comma-separated list of key-value pairs, eg., 'p1=v1, p2=v2'"
-#~ msgstr ""
-#~ "A vírgula separou a lista de pares"
-#~ " dos valores-chave, por ex., 'p1=v1,"
-#~ " p2=v2'"
-
-#~ msgid "InputFormat Class"
-#~ msgstr "InputFormat Class"
-
-#~ msgid "OutputFormat Class"
-#~ msgstr "Classe do OutputFormat"
-
-#~ msgid "Use default location"
-#~ msgstr "Usar o local padrão"
-
-#~ msgid "Path to HDFS directory or file of table data."
-#~ msgstr "Caminho para o diretório HDFS do arquivo de dados da tabela."
-
-#~ msgid "Table \"%(name)s\" already exists"
-#~ msgstr "A tabela \"%(name)s\" já existe"
-
-#~ msgid "Terminator must be exactly one character."
-#~ msgstr "O finalizador deve ter exatamente um caractere."
-
-#~ msgid "Input File"
-#~ msgstr "Input File"
-
-#~ msgid "Import data from file"
-#~ msgstr "Importar dados de arquivo"
-
-#~ msgid "Automatically load this file into the table after creation."
-#~ msgstr "Carregar automaticamente este arquivo para a tabela depois da criação."
-
-#~ msgid "Delimiter"
-#~ msgstr "Delimitador"
-
-#~ msgid "Delimiter value must be smaller than 256."
-#~ msgstr "O valor do delimitador deve ser menor do que 256."
-
-#~ msgid "Delimiter value is required."
-#~ msgstr "O valor do delimitador obrigatório."
-
-#~ msgid "Column Name"
-#~ msgstr "Nome da coluna"
-
-#~ msgid "Column Type"
-#~ msgstr "Tipo de coluna"
-
-#~ msgid "Array Value Type"
-#~ msgstr "Tipo do valor do conjunto"
-
-#~ msgid "Specify if column_type is map."
-#~ msgstr "Especificar se column_type é um map."
-
-#~ msgid "add a column"
-#~ msgstr "adicionar uma coluna"
-
-#~ msgid "Host of the query server."
-#~ msgstr "Host do servidor de consultas."
-
-#~ msgid "Port of the query server."
-#~ msgstr "Porta do servidor de consultas."
-
-#~ msgid "Name of the query server."
-#~ msgstr "Nome do servidor de consultas."
-
-#~ msgid "Type of the query server."
-#~ msgstr "Tipo do servidor de consultas."
-
-#~ msgid "My saved query"
-#~ msgstr "Minha consulta salva"
-
-#~ msgid " (new)"
-#~ msgstr " (novo)"
-
-#~ msgid "Cannot retrieve Beeswax design id %(id)s"
-#~ msgstr "Não é possível projetar a id de projeto %(id)s do Beeswax"
-
-#~ msgid "Design id %(id)s does not belong to user %(user)s"
-#~ msgstr "O projeto com id %(id)s não pertence ao usuário %(user)s"
-
-#~ msgid ""
-#~ "Type mismatch for design id %(id)s "
-#~ "(owner %(owner)s) - Expected %(expected_type)s"
-#~ " got %(real_type)s"
-#~ msgstr ""
-#~ "O tipo não corresponde à id de "
-#~ "projeto %(id)s (proprietário %(owner)s) - "
-#~ "Esperado %(expected_type)s obteve %(real_type)s"
-
-#~ msgid "Last used"
-#~ msgstr "Última utilização"
-
-#~ msgid "Application we communicate with."
-#~ msgstr ""
-
-#~ msgid "Invalid design type %(type)s"
-#~ msgstr "Tipo de projeto inválido %(type)s"
-
-#~ msgid "Saved design \"%(name)s\""
-#~ msgstr "Projeto salvo \"%(name)s\""
-
-#~ msgid "Delete design(s)?"
-#~ msgstr "Excluir projeto?"
-
-#~ msgid "Copied design: %(name)s"
-#~ msgstr "Projeto copiado: %(name)s"
-
-#~ msgid "This query has %(state)s. Results unavailable."
-#~ msgstr "Esta consulta está em %(state)s. Resultados indisponíveis."
-
-#~ msgid "The result of this query is not available yet."
-#~ msgstr "O resultado desta consulta ainda não está disponível."
-
-#~ msgid "Cannot find query."
-#~ msgstr "Não é possível encontrar a consulta."
-
-#~ msgid ""
-#~ "Saving results from a partitioned table"
-#~ " is not supported. You may copy "
-#~ "from the HDFS location manually."
-#~ msgstr ""
-#~ "Não é possível salvar os resultados "
-#~ "de uma tabela particionada. Você poderá"
-#~ " copiar do local do HDFS manualmente."
-
-#~ msgid ""
-#~ "Saving results from a query with "
-#~ "no MapReduce jobs is not supported. "
-#~ "You may copy manually from the "
-#~ "HDFS location %(path)s."
-#~ msgstr ""
-#~ "Não há suporte para salvar os "
-#~ "resultados de uma consulta sem tarefas"
-#~ " MapReduce. Você poderá copiar manualmente"
-#~ " do local do HDFS %(path)s."
-
-#~ msgid "The table could not be saved."
-#~ msgstr "A tabela não pode ser salva."
-
-#~ msgid "Saved query results as new table %(table)s"
-#~ msgstr "Resultados da consulta salvos como nova tabela  %(table)s"
-
-#~ msgid "Install sample tables and Beeswax examples?"
-#~ msgstr "Instalar as tabelas de amostra e exemplo do Beeswax?"
-
-#~ msgid "Beeswax query completed"
-#~ msgstr "Consulta do Beeswax concluída"
-
-#~ msgid ""
-#~ "%(subject)s. You may see the results here: %(link)s\n"
-#~ "\n"
-#~ "Query:\n"
-#~ "%(query)s"
-#~ msgstr ""
-#~ "%(subject)s. É possível ver os resultados aqui: %(link)s\n"
-#~ "\"\n"
-#~ "\"\n"
-#~ "\"\n"
-#~ "\"Consulte:\n"
-#~ "\"\n"
-#~ "\"%(query)s"
-
-#~ msgid "Design %(id)s does not exist."
-#~ msgstr "O projeto %(id)s não existe."
-
-#~ msgid "Cannot access design %(id)s"
-#~ msgstr "Não é possível acessar o projeto %(id)s"
-
-#~ msgid "QueryHistory %(id)s does not exist."
-#~ msgstr "QueryHistory %(id)s não existe."
-
-#~ msgid "Cannot access QueryHistory %(id)s"
-#~ msgstr "Não é possível acessar a QueryHistory %(id)s"
-
-#~ msgid "Design does not exist"
-#~ msgstr "O projeto não existe"
-
-#~ msgid "Query is not parameterizable."
-#~ msgstr "Consulta não é parametrizável."
-
-#~ msgid "Failed to retrieve query state from the Query Server."
-#~ msgstr "Falha ao recuperar o estado da consulta do servidor Beeswax."
-
-#~ msgid "Failed to contact Beeswax Server to check query status."
-#~ msgstr ""
-#~ "Falha ao entrar em contato com o"
-#~ " servidor Beeswax para verificar o "
-#~ "status da consulta."
-
-#~ msgid "Beeswax examples already installed."
-#~ msgstr "Os exemplos da Beeswax já foram instalados."
-
-#~ msgid "Cannot find table data in \"%(file)s\""
-#~ msgstr "Não é possível encontrar os dados da tabela em \"%(file)s\""
-
-#~ msgid "Table \"%(table)s\" already exists."
-#~ msgstr "A tabela \"%(table)s\" já existe."
-
-#~ msgid "Error creating table %(table)s: Operation timeout."
-#~ msgstr ""
-#~ "Erro ao criar a tabela %(table)s: "
-#~ "A operação atingiu limite de tempo "
-#~ "máximo."
-
-#~ msgid "Error creating table %(table)s: %(error)s"
-#~ msgstr "Erro ao criar a tabela %(table)s: %(error)s"
-
-#~ msgid "Error loading table %(table)s: Operation timeout."
-#~ msgstr ""
-#~ "Erro ao carregar a tabela %(table)s: "
-#~ "A operação atingiu o limite de "
-#~ "tempo máximo."
-
-#~ msgid "Error loading table %(table)s: %(error)s"
-#~ msgstr "Erro ao carregar a tabela %(table)s: %(error)s"
-
-#~ msgid "Sample design %(name)s already exists."
-#~ msgstr "O projeto de amostra %(name)s já existe."
-
-#~ msgid "Server returning invalid handle for query id %(id)d [%(query)s]..."
-#~ msgstr ""
-#~ "O servidor retorna uma manipulação "
-#~ "inválida para a Id de consulta "
-#~ "%(id)d [%(query)s]..."
-
-#~ msgid "No server logs for this query"
-#~ msgstr "Especifique os parâmetros desta consulta:"
-
-#~ msgid "Could not retrieve logs: %s"
-#~ msgstr "Não foi possível recuperar os registros."
-
-#~ msgid "Unknown exception."
-#~ msgstr "Exceção desconhecida."
-
-#~ msgid "Create table from file"
-#~ msgstr "Criar uma tabela de um arquivo"
-
-#~ msgid "Step 1: Choose File"
-#~ msgstr "Passo 1: Escolher arquivo"
-
-#~ msgid "Step 2: Choose Delimiter"
-#~ msgstr "Passo 2: Escolher delimitador"
-
-#~ msgid "Step 3: Define Columns"
-#~ msgstr "Passo 3: Definir colunas"
-
-#~ msgid "Choose a Delimiter"
-#~ msgstr "Escolher delimitador"
-
-#~ msgid "Beeswax has determined that this file is delimited by"
-#~ msgstr "Beeswax determinou que este arquivo seja delimitado por"
-
-#~ msgid ""
-#~ "Enter the column delimiter. Must be "
-#~ "a single character. Use syntax like "
-#~ "\"\\001\" or \"\t\" for special "
-#~ "characters."
-#~ msgstr ""
-#~ "Inserir o delimitador de coluna. Deve"
-#~ " ser um único caractere. Use uma "
-#~ "sintaxe como \"\\001\" ou \"\t\" "
-#~ "para caracteres especiais."
-
-#~ msgid "Table preview"
-#~ msgstr "Visualização da tabela"
-
-#~ msgid "Previous"
-#~ msgstr "Anterior"
-
-#~ msgid "Next"
-#~ msgstr "Próximo"
-
-#~ msgid "Please type your delimiter here"
-#~ msgstr "Digite seu delimitador aqui"
-
-#~ msgid "Name Your Table and Choose A File"
-#~ msgstr "Nomeie sua tabela e escolha um arquivo"
-
-#~ msgid "table_name"
-#~ msgstr "nome_tabela"
-
-#~ msgid ""
-#~ "Name of the new table. Table names"
-#~ " must be globally unique. Table names"
-#~ " tend to correspond as well to "
-#~ "the directory where the data will "
-#~ "be stored."
-#~ msgstr ""
-#~ "Nome da nova tabela. Os nomes de"
-#~ " tabela devem ser globalmente únicos. "
-#~ "Os nomes de tabela tendem a "
-#~ "corresponder, da mesma forma, com os "
-#~ "diretórios onde os dados serão "
-#~ "armazenados."
-
-#~ msgid "Optional"
-#~ msgstr "Opcional"
-
-#~ msgid ""
-#~ "Use a table comment to describe "
-#~ "your table.  For example, you might "
-#~ "note the data's provenance and any "
-#~ "caveats users need to know."
-#~ msgstr ""
-#~ "Use um comentário de tabela para "
-#~ "descrever sua tabela. Por exemplo, você"
-#~ " pode notar a procedência dos dados"
-#~ " e as advertências que os usuários"
-#~ " precisam saber."
-
-#~ msgid ""
-#~ "The HDFS path to the file that "
-#~ "you would like to base this new"
-#~ " table definition on. It can be "
-#~ "compressed (gzip) or not."
-#~ msgstr ""
-#~ "O caminho HDFS para o arquivo no"
-#~ " qual você gostaria de basear esta"
-#~ " definição da nova tabela. Ele pode"
-#~ " ser ser compactado (gzip) ou não."
-
-#~ msgid ""
-#~ "Check this box if you want to "
-#~ "import the data in this file after"
-#~ " creating the table definition. Leave "
-#~ "it unchecked if you want to define"
-#~ " an empty table."
-#~ msgstr ""
-#~ "Marque esta caixa se você desejar "
-#~ "importar os dados deste arquivo, depois"
-#~ " de criar a definição da tabela. "
-#~ "Deixe-a desmarcada se você desejar "
-#~ "definir uma tabela vazia."
-
-#~ msgid "Warning!"
-#~ msgstr "Aviso!"
-
-#~ msgid "The selected file is going to be moved during the import."
-#~ msgstr "O arquivo selecionado será movido durante a importação."
-
-#~ msgid "Choose a file"
-#~ msgstr "Escolha um arquivo"
-
-#~ msgid "Settings"
-#~ msgstr "Configurações"
-
-#~ msgid "Filter:"
-#~ msgstr "Filtro:"
-
-#~ msgid "Search for key, value, etc..."
-#~ msgstr "Pesquise por uma chave, valor, etc..."
-
-#~ msgid "Clear"
-#~ msgstr "Apagar"
-
-#~ msgid "Key"
-#~ msgstr "Chave"
-
-#~ msgid "Value"
-#~ msgstr "Valor"
-
-#~ msgid "Create table manually"
-#~ msgstr "Criar uma tabela manualmente"
-
-#~ msgid "Step 1: Name"
-#~ msgstr "Passo 1: Nome"
-
-#~ msgid "Step 2: Record Format"
-#~ msgstr "Passo 2: Formato de registros"
-
-#~ msgid "Step 3: Serialization"
-#~ msgstr "Passo 3: Serialização"
-
-#~ msgid "Step 4: File Format"
-#~ msgstr "Passo 4: Formato de arquivo"
-
-#~ msgid "Step 5: Location"
-#~ msgstr "Passo 5: Local"
-
-#~ msgid "Step 6: Columns"
-#~ msgstr "Passo 6: Colunas"
-
-#~ msgid "Create a table"
-#~ msgstr "Criar uma tabela"
-
-#~ msgid ""
-#~ "Let's start with a name and "
-#~ "description for where we'll store your"
-#~ " data."
-#~ msgstr ""
-#~ "Vamos começar com o nome e a "
-#~ "descrição do local onde armazenaremos "
-#~ "seus dados."
-
-#~ msgid "This field is required. Spaces are not allowed."
-#~ msgstr "O campo é obrigatório. Espaços não são permitidos."
-
-#~ msgid "Choose Your Record Format"
-#~ msgstr "Escolha seu formato de registros"
-
-#~ msgid ""
-#~ "Individual records are broken up into"
-#~ " columns either with delimiters (e.g., "
-#~ "CSV or TSV) or using a specific"
-#~ " serialization / deserialization (SerDe) "
-#~ "implementation. (One common specialized SerDe"
-#~ " is for parsing out columns with "
-#~ "a regular expression.)"
-#~ msgstr ""
-#~ "Os registros individuais são quebrados "
-#~ "em colunas com delimitadores (por "
-#~ "exemplo, CSV ou TSV) ou usando "
-#~ "serialização específica / implementação de "
-#~ "quebra de serialização (SerDe). (Um "
-#~ "SerDe especializado comum para análise "
-#~ "de colunas com uma expressão regular)."
-
-#~ msgid "Record format"
-#~ msgstr "Formato de registro"
-
-#~ msgid "Delimited"
-#~ msgstr "Delimitado"
-
-#~ msgid "(Data files use delimiters, like commas (CSV) or tabs.)"
-#~ msgstr ""
-#~ "(Os arquivos de dados usam "
-#~ "delimitadores, como vírgulas (CSV) ou "
-#~ "tabulações.)"
-
-#~ msgid "SerDe"
-#~ msgstr "SerDe"
-
-#~ msgid "(Enter a specialized serialization implementation.)"
-#~ msgstr "(Insira uma implementação de serialização especializada)."
-
-#~ msgid "Configure Record Serialization"
-#~ msgstr "Configurar uma serialização de registro"
-
-#~ msgid "Only supports single-character delimiters."
-#~ msgstr "Há suporte somente para delimitadores de caractere único."
-
-#~ msgid ""
-#~ "This field is required. Spaces are "
-#~ "not allowed. Terminator must be exactly"
-#~ " one character."
-#~ msgstr ""
-#~ "O campo é obrigatório. Espaços não "
-#~ "são permitidos. O terminador deve ter"
-#~ " exatamente um caractere."
-
-#~ msgid "Use for array types."
-#~ msgstr "Usar para os tipos de conjunto."
-
-#~ msgid "Use for map types."
-#~ msgstr "Usar para tipos de map."
-
-#~ msgid "The Java class name of your SerDe."
-#~ msgstr "O nome da classe Java do seu SerDe."
-
-#~ msgid "e.g."
-#~ msgstr "por exemplo"
-
-#~ msgid "Properties to pass to the (de)serialization mechanism."
-#~ msgstr ""
-#~ "Os níveis de propriedade para passar "
-#~ "pelo mecanismo de serialização ou quebra"
-#~ " de serialização."
-
-#~ msgid "Choose a File Format"
-#~ msgstr "Escolha um formato de arquivo"
-
-#~ msgid "Use"
-#~ msgstr "Use"
-
-#~ msgid "for newline-delimited text files."
-#~ msgstr "para arquivos de texto delimitados por quebras de linha."
-
-#~ msgid "for Hadoop's binary serialization format."
-#~ msgstr "para formato de serialização binária do Hadoop."
-
-#~ msgid "to choose a custom implementation."
-#~ msgstr "para escolher uma implementação personalizada."
-
-#~ msgid "File format"
-#~ msgstr "Formato de arquivo"
-
-#~ msgid "Java class used to read data"
-#~ msgstr "Classe Java usada para ler dados"
-
-#~ msgid "Java class used to write data"
-#~ msgstr "Classe Java usada para gravar dados"
-
-#~ msgid "Choose Where Your Table's Data is Stored"
-#~ msgstr "Escolher quando os dados de sua tabela serão armazenados"
-
-#~ msgid "Location"
-#~ msgstr "Local"
-
-#~ msgid ""
-#~ "Store your table in the default "
-#~ "location (controlled by Hive, and "
-#~ "typically"
-#~ msgstr ""
-#~ "Armazenar sua tabela no local padrão "
-#~ "(controlado pelo Hive e, normalmente"
-
-#~ msgid "Enter the path (on HDFS) to your table's data location"
-#~ msgstr "Inserir o caminho (no HDFS) para o local dos dados de sua tabela"
-
-#~ msgid "Configure Table Columns"
-#~ msgstr "Configurar colunas da tabela"
-
-#~ msgid "Add a column"
-#~ msgstr "Adicionar coluna"
-
-#~ msgid "Configure Partitions"
-#~ msgstr "Configurar partições"
-
-#~ msgid ""
-#~ "If your data is naturally partitioned"
-#~ " (by date, for example), partitions "
-#~ "are a way to tell the query "
-#~ "server that data for a specific "
-#~ "partition value are stored together."
-#~ msgstr ""
-#~ "Se seus dados forem particionados "
-#~ "naturalmente (por data, por exemplo), a"
-#~ " partição é uma forma de informar "
-#~ "ao Hive que os dados para um "
-#~ "valor específico de partição são "
-#~ "armazenados juntos."
-
-#~ msgid "The query server establishes a mapping between directories on disk"
-#~ msgstr "O servidor de consultas estabelece um mapping entre diretórios no disco"
-
-#~ msgid ""
-#~ "and the data for that day.  "
-#~ "Partitions are virtual columns; they are"
-#~ " not represented in the data itself,"
-#~ " but are determined by the data "
-#~ "location. The query server implements "
-#~ "query optimizations such that queries "
-#~ "that are specific to a single "
-#~ "partition need not read the data "
-#~ "in other partitions."
-#~ msgstr ""
-#~ "e os dados para aquele dia. As "
-#~ "partições são colunas virtuais; elas não"
-#~ " são representadas nos dados, mas são"
-#~ " determinadas pelo local dos dados. O"
-#~ " servidor de consultas implementa "
-#~ "otimizações de consulta de tal forma "
-#~ "que as consultas específicas para uma"
-#~ " única partição não precisam ler os"
-#~ " dados em outras partições."
-
-#~ msgid "Add a partition"
-#~ msgstr "Adicionar uma partição"
-
-#~ msgid "Back"
-#~ msgstr "Voltar"
-
-#~ msgid "Delete this column"
-#~ msgstr "Excluir uma coluna"
-
-#~ msgid "Column name"
-#~ msgstr "Nome da coluna"
-
-#~ msgid "There is another field with the same name."
-#~ msgstr "Existe outro campo com o mesmo nome."
-
-#~ msgid "Column name must be single words that start with a letter or a digit."
-#~ msgstr ""
-#~ "O nome da coluna deve ter uma "
-#~ "só palavra que comece com uma "
-#~ "letra ou um dígito."
-
-#~ msgid "Column type"
-#~ msgstr "Tipo de coluna"
-
-#~ msgid ""
-#~ "Type for this column. Certain advanced"
-#~ " types (namely, structs) are not "
-#~ "exposed in this interface."
-#~ msgstr ""
-#~ "Tipo desta coluna. Determinados tipos "
-#~ "avançados (isto é, structs) não são "
-#~ "expostos nesta interface."
-
-#~ msgid "Array value type"
-#~ msgstr "Tipo do valor do conjunto"
-
-#~ msgid "Type of the array values."
-#~ msgstr "Tipo de valores do conjunto."
-
-#~ msgid "Map Key type"
-#~ msgstr "Tipo de chave de map"
-
-#~ msgid "Type of the map keys."
-#~ msgstr "Tipo de chaves de map."
-
-#~ msgid "Map Value type"
-#~ msgstr "Tipo do valor do map"
-
-#~ msgid "Type of the map values."
-#~ msgstr "Tipo de valores do map."
-
-#~ msgid "Type your field terminator here"
-#~ msgstr "Digite o finalizador de campo aqui."
-
-#~ msgid "Type your collection terminator here"
-#~ msgstr "Digite o finalizador de coleção aqui"
-
-#~ msgid "Type your map key terminator here"
-#~ msgstr "Digite o finalizador da chave de map aqui"
-
-#~ msgid "Define your columns"
-#~ msgstr "Defina as colunas"
-
-#~ msgid "Row"
-#~ msgstr "Linha"
-
-#~ msgid "Create Table"
-#~ msgstr "Criar tabela"
-
-#~ msgid "Your query has the following error(s):"
-#~ msgstr "Sua consulta tem o(s) seguinte(s) erro(s):"
-
-#~ msgid "click the"
-#~ msgstr "clique na guia"
-
-#~ msgid "Error Log"
-#~ msgstr "Log de erros"
-
-#~ msgid "tab below for details"
-#~ msgstr "a seguir para saber os detalhes"
-
-#~ msgid "Example: SELECT * FROM tablename"
-#~ msgstr "Exemplo: SELECT * FROM nometabela"
-
-#~ msgid "Execute"
-#~ msgstr "Executar"
-
-#~ msgid "Download"
-#~ msgstr "Downloads"
-
-#~ msgid "Save as..."
-#~ msgstr "Salvar como..."
-
-#~ msgid "Explain"
-#~ msgstr "Explicar"
-
-#~ msgid "or create a"
-#~ msgstr "ou criar uma"
-
-#~ msgid "New query"
-#~ msgstr "Nova consulta"
-
-#~ msgid "Query"
-#~ msgstr "Consulta"
-
-#~ msgid "settings"
-#~ msgstr "configurações"
-
-#~ msgid "Delete this setting"
-#~ msgstr "Excluir esta configuração"
-
-#~ msgid "Add"
-#~ msgstr "Adicionar"
-
-#~ msgid "File Resources"
-#~ msgstr "Recursos de arquivo"
-
-#~ msgid "User-defined Functions"
-#~ msgstr "Funções definidas pelo usuário"
-
-#~ msgid "myFunction"
-#~ msgstr "myFunction"
-
-#~ msgid "Parameterization"
-#~ msgstr "Parametrização"
-
-#~ msgid ""
-#~ "If checked (the default), you can "
-#~ "include parameters like $parameter_name in "
-#~ "your query, and users will be "
-#~ "prompted for a value when the "
-#~ "query is run."
-#~ msgstr ""
-#~ "Se marcado (o padrão), você poderá "
-#~ "incluir parâmetros como e $parameter_name "
-#~ "em sua consulta, e os usuários "
-#~ "serão solicitados a informar um valor"
-#~ " quando a consulta for executada."
-
-#~ msgid "Enable Parameterization"
-#~ msgstr "Habilitar parametrização"
-
-#~ msgid "Email Notification"
-#~ msgstr "Notificação de e-mail"
-
-#~ msgid ""
-#~ "If checked, you will receive an "
-#~ "email notification when the query "
-#~ "completes."
-#~ msgstr ""
-#~ "Se marcado, você receberá uma "
-#~ "notificação de e-mail quando a consulta"
-#~ " estiver concluída."
-
-#~ msgid "Email me on completion"
-#~ msgstr "Enviar um e-mail para mim depois de concluído"
-
-#~ msgid "Did you know?"
-#~ msgstr "Você sabia?"
-
-#~ msgid ""
-#~ "You can execute queries with multiple"
-#~ " SQL statements delimited by a "
-#~ "semicolon ';'."
-#~ msgstr ""
-
-#~ msgid "Use '\\059' instead of ';' if you have some conflicts."
-#~ msgstr ""
-
-#~ msgid "You can highlight and run a fragment of a query."
-#~ msgstr ""
-
-#~ msgid "Choose a name"
-#~ msgstr "Escolha um nome"
-
-#~ msgid "Press \"tab\", then \"enter\"."
-#~ msgstr ""
-
-#~ msgid "Query Explanation"
-#~ msgstr "Explicação da consulta"
-
-#~ msgid "Query Explanation:"
-#~ msgstr "Explicação da consulta:"
-
-#~ msgid "Explanation"
-#~ msgstr "Explicação"
-
-#~ msgid "Install Samples"
-#~ msgstr "Instalar amostras"
-
-#~ msgid "Show Tables"
-#~ msgstr "Exibir tabelas"
-
-#~ msgid "Queries"
-#~ msgstr "Consultas"
-
-#~ msgid "Saved Queries"
-#~ msgstr "Consultas salvas"
-
-#~ msgid "Execute Query"
-#~ msgstr "Executar consulta"
-
-#~ msgid "Query History"
-#~ msgstr "Histórico de consultas"
-
-#~ msgid "Configuration"
-#~ msgstr "Configuração"
-
-#~ msgid "Extended Configuration"
-#~ msgstr "Configuração estendida"
-
-#~ msgid "Welcome to Beeswax for Hive"
-#~ msgstr "Bem-vindo ao Beeswax for Hive"
-
-#~ msgid "To get started with Beeswax you'll first need set up some data:"
-#~ msgstr ""
-#~ "Para obter uma introdução ao Beeswax,"
-#~ " primeiramente, você precisa configurar "
-#~ "alguns dados:"
-
-#~ msgid "or"
-#~ msgstr "ou"
-
-#~ msgid "My Queries"
-#~ msgstr "Minhas consultas"
-
-#~ msgid "History"
-#~ msgstr "Histórico"
-
-#~ msgid "Edit"
-#~ msgstr "Editar"
-
-#~ msgid "Clone the selected query"
-#~ msgstr ""
-
-#~ msgid "Clone"
-#~ msgstr "Clonar"
-
-#~ msgid "View the usage history of the selected query"
-#~ msgstr "Exibir o histórico de uso desta consulta."
-
-#~ msgid "Usage history"
-#~ msgstr "Histórico de uso"
-
-#~ msgid "Delete"
-#~ msgstr "Excluir"
-
-#~ msgid "Create New Query"
-#~ msgstr "Criar nova consulta"
-
-#~ msgid "Owner"
-#~ msgstr "Proprietário"
-
-#~ msgid "Last Modified"
-#~ msgstr "Última modificação"
-
-#~ msgid "ago"
-#~ msgstr "atrás"
-
-#~ msgid "Unsaved"
-#~ msgstr "Não salvou"
-
-#~ msgid "Copy this query."
-#~ msgstr "Copiar esta consulta."
-
-#~ msgid "Auto generated action"
-#~ msgstr "Ação gerada automaticamente"
-
-#~ msgid "Show my queries"
-#~ msgstr "Exibir minhas consultas"
-
-#~ msgid "Show everyone's queries"
-#~ msgstr "Exibir consultas de todos"
-
-#~ msgid "Show user queries"
-#~ msgstr "Exibir consultas do usuário"
-
-#~ msgid "Time"
-#~ msgstr "Horário"
-
-#~ msgid "User"
-#~ msgstr "Usuário"
-
-#~ msgid "State"
-#~ msgstr "Estado"
-
-#~ msgid "Result"
-#~ msgstr "Resultado"
-
-#~ msgid "Results"
-#~ msgstr "Resultados"
-
-#~ msgid "Showing _START_ to _END_ of _TOTAL_ entries"
-#~ msgstr "Exibindo _START_ ao _END_ do _TOTAL_ de entradas"
-
-#~ msgid "Showing 0 to 0 of 0 entries"
-#~ msgstr "Exibindo 0 a 0 de 0 entradas"
-
-#~ msgid "(filtered from _MAX_ total entries)"
-#~ msgstr "(filtrado de um total de _MAX_ entradas)"
-
-#~ msgid "First"
-#~ msgstr "Primeiro"
-
-#~ msgid "Last"
-#~ msgstr "Último"
-
-#~ msgid "View the result of the selected"
-#~ msgstr ""
-
-#~ msgid "View result"
-#~ msgstr "Salvar resultados de consulta"
-
-#~ msgid "Recent Saved Queries"
-#~ msgstr "Consultas salvas recentemente"
-
-#~ msgid "Recent Run Queries"
-#~ msgstr "Consultas executadas recentemente"
-
-#~ msgid "Desc"
-#~ msgstr "Desc"
-
-#~ msgid "View all my queries"
-#~ msgstr "Visualizar todas as minhas consultas"
-
-#~ msgid "View my entire query history"
-#~ msgstr "Visualizar todo o meu histórico de consultas"
-
-#~ msgid "Parameterize Query"
-#~ msgstr "Parametrizar consulta"
-
-#~ msgid "Explain query"
-#~ msgstr "Explicar consulta"
-
-#~ msgid "Execute query"
-#~ msgstr "Executar consulta"
-
-#~ msgid "Please specify parameters for this query:"
-#~ msgstr "Especifique os parâmetros desta consulta:"
-
-#~ msgid "Save Query Results"
-#~ msgstr "Salvar resultados de consulta"
-
-#~ msgid "In a new table"
-#~ msgstr "Em uma nova tabela"
-
-#~ msgid "In an HDFS directory"
-#~ msgstr "Em um diretório HDFS"
-
-#~ msgid "Query Results:"
-#~ msgstr "Resultados de consultas:"
-
-#~ msgid "Collapse this panel"
-#~ msgstr "Recolher este painel"
-
-#~ msgid "Downloads"
-#~ msgstr "Downloads"
-
-#~ msgid "Download as CSV"
-#~ msgstr "Download como CSV"
-
-#~ msgid "Download as XLS"
-#~ msgstr "Download como XLS"
-
-#~ msgid "MR Job"
-#~ msgstr "Tarefa MR"
-
-#~ msgid "MR Jobs"
-#~ msgstr "Tarefas MR"
-
-#~ msgid "No Hadoop jobs were launched in running this query."
-#~ msgstr "Nenhuma tarefa Hadoop foi iniciada ao executar esta consulta."
-
-#~ msgid "Multi-statement query"
-#~ msgstr ""
-
-#~ msgid "Hue stopped as one of your query contains some results."
-#~ msgstr ""
-
-#~ msgid "Click on"
-#~ msgstr "clique na guia"
-
-#~ msgid "next"
-#~ msgstr "Próximo"
-
-#~ msgid "for continuing the execution of the remaining statements."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "If the result contains a large "
-#~ "number of columns, click a row to"
-#~ " select a column to jump to."
-#~ msgstr ""
-#~ "É possível clicar em uma linha "
-#~ "para selecionar uma coluna para a "
-#~ "qual deseja saltar."
-
-#~ msgid ""
-#~ "As you type into the field, a "
-#~ "drop-down list displays column names "
-#~ "that match the string."
-#~ msgstr ""
-
-#~ msgid "Error"
-#~ msgstr "Erro"
-
-#~ msgid "Log"
-#~ msgstr "Log"
-
-#~ msgid "The query result has expired."
-#~ msgstr ""
-
-#~ msgid "You can rerun it from "
-#~ msgstr ""
-
-#~ msgid "Warning:"
-#~ msgstr "Aviso:"
-
-#~ msgid "Page offset may have incremented since last view."
-#~ msgstr ""
-#~ "O deslocamento de página pode ter "
-#~ "sido aumentado desde a última exibição."
-
-#~ msgid "Sorry, name is required."
-#~ msgstr "Desculpe, o nome é obrigatório."
-
-#~ msgid "Download results from the left."
-#~ msgstr ""
-
-#~ msgid "Waiting for query..."
-#~ msgstr "Aguardando consulta..."
-
+#~ msgid "Install samples"
+#~ msgstr "Instalar exemplos"
+#~ msgid "Yes, install samples"
+#~ msgstr "Sim, instalar amostras"
+#~ msgid "There was an error processing your request:"
+#~ msgstr "Ocorreu um erro ao processar sua solicitação:"
