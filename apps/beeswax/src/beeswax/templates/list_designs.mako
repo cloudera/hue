@@ -50,7 +50,7 @@ ${layout.menubar(section='saved queries')}
     </%def>
 
     <%def name="creation()">
-      <a class="btn" href="${ url(app_name + ':execute_query') }" title="${_('New query')}"><i class="icon-plus-sign"></i> ${_('Create New Query')}</a>
+      <a class="btn" href="${ url(app_name + ':execute_query') }" title="${_('Create new query')}"><i class="icon-plus-sign"></i> ${_('New Query')}</a>
       <a class="btn" href="${ url(app_name + ':list_trashed_designs') }" title="${_('Go to the trash')}"><i class="icon-trash"></i> ${_('Trash')}</a>
     </%def>
   </%actionbar:render>
@@ -76,7 +76,7 @@ ${layout.menubar(section='saved queries')}
             % if may_edit:
               data-edit-url="${ url(app_name + ':execute_query', design_id=design.id) }"
               data-delete-name="${ design.id }"
-              data-history-url="${ url(app_name + ':list_query_history') }?design_id=${design.id}"
+              data-history-url="${ url(app_name + ':list_query_history') }?q-design_id=${design.id}"
             % endif
             data-clone-url="${ url(app_name + ':clone_design', design_id=design.id) }" data-row-selector-exclude="true"></div>
         </td>

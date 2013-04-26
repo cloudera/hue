@@ -104,7 +104,7 @@ ${layout.menubar(section='query')}
               ${_('Hue stopped as one of your query contains some results.') }
               ${_('Click on') }
               <form action="${ url(app_name + ':watch_query', query.id) }?context=${ query.design.get_query_context() }" method="POST">
-                <input type="submit" value="${ _("next") }"/ class="btn btn-danger">
+                <input type="submit" value="${ _("next") }"/ class="btn btn-primary">
               </form>
               ${_('for continuing the execution of the remaining statements.') }
             </div>
