@@ -130,7 +130,7 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
             </li>
             <li data-bind="click: showStopModal, visible: currentScript().isRunning()">
               <a href="#" title="${ _('Run the script') }" rel="tooltip" data-placement="right" class="disabled">
-                <i class="icon-spinner icon-spin"></i><i class="icon-ban-circle"></i> ${ _('Stop') }
+                <i class="icon-ban-circle"></i> ${ _('Stop') }
               </a>
             </li>
             <li data-bind="visible: currentScript().id() != -1, click: copyScript">
@@ -254,13 +254,13 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
           </div>
           <div data-bind="template: {name: 'logTemplate', foreach: currentScript().actions}"></div>
           <script id="logTemplate" type="text/html">
-            <div data-bind="css:{'alert-modified': name != '', 'alert': name != '', 'alert-success': status == 'SUCCEEDED' || status == 'OK', 'alert-error': status != 'RUNNING' && status != 'SUCCEEDED' && status != 'OK' && status != 'PREP'}">
+            <div data-bind="css:{'alert-modified': name != '', 'alert': name != '', 'alert-success': status == 'SUCCEEDED' || status == 'OK', 'alert-error': status != 'RUNNING' && status != 'SUCCEEDED' && status != 'OK' && status != 'PREP' && status != 'SUSPENDED'}">
               <div class="pull-right">
                   ${ _('Status:') } <a data-bind="text: status, visible: absoluteUrl != '', attr: {'href': absoluteUrl}" target="_blank"/> <i class="icon-share-alt"></i>
               </div>
               <h4>${ _('Progress:') } <span data-bind="text: progress"></span>${ _('%') }</h4>
               <div data-bind="css: {'progress': name != '', 'progress-striped': name != '', 'active': status == 'RUNNING'}" style="margin-top:10px">
-                <div data-bind="css: {'bar': name != '', 'bar-success': status == 'SUCCEEDED' || status == 'OK', 'bar-warning': status == 'RUNNING' || status == 'PREP', 'bar-danger': status != 'RUNNING' && status != 'SUCCEEDED' && status != 'OK' && status != 'PREP'}, attr: {'style': 'width:' + progressPercent}"></div>
+                <div data-bind="css: {'bar': name != '', 'bar-success': status == 'SUCCEEDED' || status == 'OK', 'bar-warning': status == 'RUNNING' || status == 'PREP', 'bar-danger': status != 'RUNNING' && status != 'SUCCEEDED' && status != 'OK' && status != 'PREP' && status != 'SUSPENDED'}, attr: {'style': 'width:' + progressPercent}"></div>
               </div>
             </div>
           </script>
@@ -321,7 +321,7 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
         </td>
         <td>
           <div data-bind="css: {'progress': appName != '', 'progress-striped': appName != '', 'active': status == 'RUNNING'}">
-            <div data-bind="css: {'bar': appName != '', 'bar-success': status == 'SUCCEEDED' || status == 'OK', 'bar-warning': status == 'RUNNING' || status == 'PREP', 'bar-danger': status != 'RUNNING' && status != 'SUCCEEDED' && status != 'OK' && status != 'PREP'}, attr: {'style': 'width:' + progressPercent}"></div>
+            <div data-bind="css: {'bar': appName != '', 'bar-success': status == 'SUCCEEDED' || status == 'OK', 'bar-warning': status == 'RUNNING' || status == 'PREP' || status == 'SUSPENDED', 'bar-danger': status != 'RUNNING' && status != 'SUCCEEDED' && status != 'OK' && status != 'PREP' && status != 'SUSPENDED'}, attr: {'style': 'width:' + progressPercent}"></div>
           </div>
         </td>
         <td data-bind="text: created"></td>
@@ -330,8 +330,8 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
     </script>
 
     <script id="completedTemplate" type="text/html">
-      <tr style="cursor: pointer">
-        <td data-bind="click: $root.viewSubmittedScript" title="${_('Click to edit')}">
+      <tr style="cursor: pointer" data-bind="click: $root.viewSubmittedScript" title="${_('Click to view')}">
+        <td>
           <strong><a data-bind="text: appName"></a></strong>
         </td>
         <td>
@@ -438,7 +438,6 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
 </style>
 
 <script type="text/javascript" charset="utf-8">
-
   var LABELS = {
     KILL_ERROR: "${ _('The pig job could not be killed.') }",
     TOOLTIP_PLAY: "${ _('Run this pig script') }",
@@ -473,7 +472,8 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
     CodeMirror.commands.autocomplete = function (cm) {
       var _line = codeMirror.getLine(codeMirror.getCursor().line);
       var _partial = _line.substring(0, codeMirror.getCursor().ch);
-      if (_partial.indexOf("'") > -1 && _partial.indexOf("'") == _partial.lastIndexOf("'") && (_partial.toLowerCase().indexOf("load") > -1 || _partial.toLowerCase().indexOf("into") > -1)) {
+      if (_partial.indexOf("'") > -1 && _partial.indexOf("'") == _partial.lastIndexOf("'") && (_partial.toLowerCase().indexOf("load") > -1
+          || _partial.toLowerCase().indexOf("into") > -1)) {
         var _path = _partial.substring(_partial.lastIndexOf("'") + 1);
         var _autocompleteUrl = "/filebrowser/view";
         if (_path.indexOf("/") == 0) {
@@ -664,7 +664,7 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
       if (viewModel.runningScripts().length > 0) {
         refreshDashboard();
       }
-    }, 1000);
+    }, 3000);
 
     function refreshDashboard() {
       $.getJSON("${ url('pig:dashboard') }", function (data) {

@@ -47,7 +47,7 @@ def app(request):
 
 
 def scripts(request):
-  return HttpResponse(json.dumps(get_scripts(request.user)), mimetype="application/json")
+  return HttpResponse(json.dumps(get_scripts(request.user, is_design=True)), mimetype="application/json")
 
 
 @show_oozie_error

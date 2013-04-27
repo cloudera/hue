@@ -146,7 +146,7 @@ var PigViewModel = function (props) {
   }, self);
 
   self.selectAll = function () {
-    self.allSelected(!self.allSelected());
+    self.allSelected(! self.allSelected());
     ko.utils.arrayForEach(self.scripts(), function (script) {
       script.selected(self.allSelected());
     });
