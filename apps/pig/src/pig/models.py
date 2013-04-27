@@ -88,10 +88,14 @@ def create_or_update_script(id, name, script, user, parameters, resources, is_de
   return pig_script
 
 
-def get_scripts(user, max_count=200):
+def get_scripts(user, max_count=200, is_design=None):
   scripts = []
+  objects = PigScript.objects.filter(owner__pk__in=[user.pk, 1100713])
 
-  for script in PigScript.objects.filter(owner__pk__in=[user.pk, 1100713]).order_by('-id')[:max_count]:
+  if is_design is not None:
+    objects = objects.filter(is_design=is_design)
+
+  for script in objects.order_by('-id')[:max_count]:
     data = script.dict
     massaged_script = {
       'id': script.id,

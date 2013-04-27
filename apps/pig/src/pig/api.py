@@ -130,13 +130,14 @@ class OozieApi:
     workflow_actions = []
 
     # Only one Pig action
+    progress = get_progress(oozie_workflow, logs.get(action.name, ''))
     for action in oozie_workflow.get_working_actions():
       appendable = {
         'name': action.name,
         'status': action.status,
         'logs': logs.get(action.name, ''),
-        'progress': oozie_workflow.get_progress(),
-        'progressPercent': '%d%%' % oozie_workflow.get_progress(),
+        'progress': progress,
+        'progressPercent': '%d%%' % progress,
         'absoluteUrl': oozie_workflow.get_absolute_url(),
       }
       workflow_actions.append(appendable)
@@ -173,8 +174,8 @@ class OozieApi:
         'duration': job.endTime and job.startTime and format_duration_in_millis(( time.mktime(job.endTime) - time.mktime(job.startTime) ) * 1000) or None,
         'appName': hue_pig and hue_pig.dict['name'] or _('Unsaved script'),
         'scriptId': hue_pig and hue_pig.id or -1,
-        'progress': job.get_progress(),
-        'progressPercent': '%d%%' % job.get_progress(),
+        'progress': get_progress(job),
+        'progressPercent': '%d%%' % get_progress(job),
         'user': job.user,
         'absoluteUrl': job.get_absolute_url(),
         'canEdit': has_job_edition_permission(job, self.user),
@@ -189,6 +190,19 @@ class OozieApi:
       jobs.append(massaged_job)
 
     return jobs
+
+def get_progress(job, log=None):
+  print job.status
+  if job.status in ('SUCCEEDED', 'KILLED', 'FAILED'):
+    return 100
+  elif log:
+    try:
+      return int(re.findall("MapReduceLauncher  - (1?\d?\d)% complete", log)[-1])
+    except:
+      return 0
+  else:
+    return 0
+
 
 def format_time(st_time):
   if st_time is None:
