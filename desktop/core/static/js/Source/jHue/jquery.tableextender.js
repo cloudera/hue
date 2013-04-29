@@ -75,15 +75,19 @@
     jHueTableExtenderNavigator.appendTo($("body"));
 
     $(_this.element).find("tbody").click(function (event) {
-      $(".rowSelected").removeClass("rowSelected");
-      $(".columnSelected").removeClass("columnSelected");
-      $(".cellSelected").removeClass("cellSelected");
-      $(event.target.parentNode).addClass("rowSelected");
-      $(event.target.parentNode).find("td").addClass("rowSelected");
-      jHueTableExtenderNavigator
-          .css("left", (event.clientX + jHueTableExtenderNavigator.width() > $(window).width() - 10 ? event.clientX - jHueTableExtenderNavigator.width() - 10 : event.clientX) + "px")
-          .css("top", (event.clientY + 10) + "px").show();
-      jHueTableExtenderNavigator.find("input").focus();
+      if ($.trim(getSelection()) == "") {
+        window.setTimeout(function () {
+          $(".rowSelected").removeClass("rowSelected");
+          $(".columnSelected").removeClass("columnSelected");
+          $(".cellSelected").removeClass("cellSelected");
+          $(event.target.parentNode).addClass("rowSelected");
+          $(event.target.parentNode).find("td").addClass("rowSelected");
+          jHueTableExtenderNavigator
+              .css("left", (event.clientX + jHueTableExtenderNavigator.width() > $(window).width() - 10 ? event.clientX - jHueTableExtenderNavigator.width() - 10 : event.clientX) + "px")
+              .css("top", (event.clientY + 10) + "px").show();
+          jHueTableExtenderNavigator.find("input").focus();
+        }, 100);
+      }
     });
 
     var source = [];
@@ -178,6 +182,18 @@
     }
 
   };
+
+  function getSelection() {
+    var t = '';
+    if (window.getSelection) {
+      t = window.getSelection();
+    } else if (document.getSelection) {
+      t = document.getSelection();
+    } else if (document.selection) {
+      t = document.selection.createRange().text;
+    }
+    return t.toString();
+  }
 
   $.fn[pluginName] = function (options) {
     return this.each(function () {
