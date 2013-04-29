@@ -71,19 +71,19 @@ ${layout.menubar(section='tables')}
                                 <table class="table table-striped table-condensed">
                                     <thead>
                                     <tr>
-                                            % for i in range(n_cols):
-                                                <th>col_${i+1}</th>
-                                            % endfor
+                                      % for i in range(n_cols):
+                                          <th>col_${i+1}</th>
+                                      % endfor
                                     </tr>
                                     </thead>
                                     <tbody>
-                                            % for row in fields_list:
-                                            <tr>
-                                                % for val in row:
-                                                    <td>${val}</td>
-                                                % endfor
-                                            </tr>
-                                            % endfor
+                                      % for row in fields_list:
+                                      <tr>
+                                        % for val in row:
+                                          ${ comps.getEllipsifiedCell(val, "left")}
+                                        % endfor
+                                      </tr>
+                                      % endfor
                                     </tbody>
                                 </table>
                             </div>
@@ -100,45 +100,47 @@ ${layout.menubar(section='tables')}
     </div>
 </div>
 
-<style>
-    .scrollable {
-        width: 100%;
-        overflow-x: auto;
-    }
+<style type="text/css">
+  .scrollable {
+    width: 100%;
+    overflow-x: auto;
+  }
 </style>
 
 <script type="text/javascript" charset="utf-8">
-    $(document).ready(function(){
-        $(".scrollable").width($(".form-actions").width());
+  $(document).ready(function () {
+    $("[rel='tooltip']").tooltip();
 
-        $("#id_delimiter_1").css("margin-left","4px").attr("placeholder","${_('Please type your delimiter here')}").hide();
-        $("#id_delimiter_0").change(function(){
-            if ($(this).val() == "__other__"){
-                $("#id_delimiter_1").show();
-            }
-            else {
-                $("#id_delimiter_1").hide();
-                $("#id_delimiter_1").val('');
-            }
-        });
+    $(".scrollable").width($(".form-actions").width());
 
-        $("#id_delimiter_0").change();
-
-        $("#step1").click(function(e){
-            e.preventDefault();
-            $("input[name='cancel_delim']").click();
-        });
-        $("#step3").click(function(e){
-            e.preventDefault();
-            $("input[name='submit_delim']").click();
-        });
-        $("body").keypress(function(e){
-            if(e.which == 13){
-                e.preventDefault();
-                $("input[name='submit_delim']").click();
-            }
-        });
+    $("#id_delimiter_1").css("margin-left", "4px").attr("placeholder", "${_('Please type your delimiter here')}").hide();
+    $("#id_delimiter_0").change(function () {
+      if ($(this).val() == "__other__") {
+        $("#id_delimiter_1").show();
+      }
+      else {
+        $("#id_delimiter_1").hide();
+        $("#id_delimiter_1").val('');
+      }
     });
+
+    $("#id_delimiter_0").change();
+
+    $("#step1").click(function (e) {
+      e.preventDefault();
+      $("input[name='cancel_delim']").click();
+    });
+    $("#step3").click(function (e) {
+      e.preventDefault();
+      $("input[name='submit_delim']").click();
+    });
+    $("body").keypress(function (e) {
+      if (e.which == 13) {
+        e.preventDefault();
+        $("input[name='submit_delim']").click();
+      }
+    });
+  });
 </script>
 
 ${ commonfooter(messages) | n,unicode }

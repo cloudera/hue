@@ -18,6 +18,14 @@
   from django.utils.translation import ugettext as _
 %>
 
+<%def name="getEllipsifiedCell(val, placement='bottom', klass='')">
+  % if len(val) > 25:
+    <td class="${ klass }" rel="tooltip" title="${ val[:300] }" data-placement="${ placement }" >${ (val[:25]) }&hellip;</td>
+  % else:
+    <td class="${ klass }">${ val }</td>
+  % endif
+</%def>
+
 <%def name="fieldName(field)">
 </%def>
 
