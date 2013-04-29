@@ -432,6 +432,11 @@ ${layout.menubar(section='query')}
     font-size: 11px;
   }
 
+  .editable-empty, .editable-empty:hover {
+    color: #666;
+    font-style: normal;
+  }
+
 </style>
 
 <script src="/static/ext/js/jquery/plugins/jquery.cookie.js"></script>
@@ -442,22 +447,25 @@ ${layout.menubar(section='query')}
     $(document).ready(function(){
       var queryPlaceholder = "${_('Example: SELECT * FROM tablename, or press CTRL + space')}";
 
-      var successfunction = function(response, newValue) {
+      var successfunction = function (response, newValue) {
         if (response.status != 0) {
           $.jHueNotify.error("${ _('Problem: ') }" + response.data);
-        };
+        }
       }
 
       $("#query-name").editable({
-        'validate': function(value) {
-          if($.trim(value) == '') {
+        validate: function (value) {
+          if ($.trim(value) == '') {
             return "${ _('This field is required') }";
           }
         },
-        'success': successfunction
+        success: successfunction,
+        emptytext: "${ _('Query name') }"
       });
+
       $("#query-description").editable({
-         'success': successfunction
+        success: successfunction,
+        emptytext: "${ _('Empty description') }"
       });
 
       $("*[rel=tooltip]").tooltip({
