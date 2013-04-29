@@ -131,6 +131,8 @@ ${layout.menubar(section='dashboard')}
       absoluteUrl: c.absoluteUrl,
       canEdit: c.canEdit,
       killUrl: c.killUrl,
+      suspendUrl: c.suspendUrl,
+      resumeUrl: c.resumeUrl,
       frequency: c.frequency,
       timeUnit: c.timeUnit,
       startTime: c.startTime
@@ -341,18 +343,36 @@ ${layout.menubar(section='dashboard')}
                 foundRow = node;
               }
             });
+            var killCell = "";
+            var suspendCell = "";
+            var resumeCell = "";
+            if (coord.canEdit) {
+              killCell = '<a class="btn btn-small confirmationModal" ' +
+                      'href="javascript:void(0)" ' +
+                      'data-url="' + coord.killUrl + '" ' +
+                      'title="${ _('Kill') } ' + coord.id + '"' +
+                      'alt="${ _('Are you sure you want to kill coordinator ')}' + coord.id + '?" ' +
+                      'data-message="${ _('The coordinator was killed!') }" ' +
+                      'data-confirmation-message="${ _('Are you sure you\'d like to kill this job?') }"' +
+                      '>${ _('Kill') }</a>';
+              suspendCell = '<a class="btn btn-small confirmationModal" ' +
+                      'href="javascript:void(0)" ' +
+                      'data-url="' + coord.suspendUrl + '" ' +
+                      'title="${ _('Suspend') } ' + coord.id + '"' +
+                      'alt="${ _('Are you sure you want to suspend coordinator ')}' + coord.id + '?" ' +
+                      'data-message="${ _('The coordinator was suspended!') }" ' +
+                      'data-confirmation-message="${ _('Are you sure you\'d like to suspend this job?') }"' +
+                      '>${ _('Suspend') }</a>';
+              resumeCell = '<a class="btn btn-small confirmationModal" ' +
+                      'href="javascript:void(0)" ' +
+                      'data-url="' + coord.resumeUrl + '" ' +
+                      'title="${ _('Resume') } ' + coord.id + '"' +
+                      'alt="${ _('Are you sure you want to resume coordinator ')}' + coord.id + '?" ' +
+                      'data-message="${ _('The coordinator was resumed!') }" ' +
+                      'data-confirmation-message="${ _('Are you sure you\'d like to resume this job?') }"' +
+                      '>${ _('Resume') }</a>';
+            }
             if (foundRow == null) {
-              var killCell = "";
-              if (coord.canEdit) {
-                killCell = '<a class="btn btn-small confirmationModal" ' +
-                        'href="javascript:void(0)" ' +
-                        'data-url="' + coord.killUrl + '" ' +
-                        'title="${ _('Kill') } ' + coord.id + '"' +
-                        'alt="${ _('Are you sure you want to kill coordinator ')}' + coord.id + '?" ' +
-                        'data-message="${ _('The coordinator was killed!') }" ' +
-                        'data-confirmation-message="${ _('Are you sure you\'d like to kill this job?') }"' +
-                        '>${ _('Kill') }</a>';
-              }
               if (['RUNNING', 'PREP', 'WAITING', 'SUSPENDED', 'PREPSUSPENDED', 'PREPPAUSED', 'PAUSED'].indexOf(coord.status) > -1) {
                 try {
                   runningTable.fnAddData([
@@ -365,7 +385,7 @@ ${layout.menubar(section='dashboard')}
                     emptyStringIfNull(coord.timeUnit),
                     emptyStringIfNull(coord.startTime),
                     '<a href="' + coord.absoluteUrl + '" data-row-selector="true">' + coord.id + '</a>',
-                    killCell
+                    killCell + " " + (['RUNNING', 'PREP', 'WAITING'].indexOf(coord.status) > -1?suspendCell:resumeCell)
                   ]);
                 }
                 catch (error) {
@@ -376,6 +396,7 @@ ${layout.menubar(section='dashboard')}
             else {
               runningTable.fnUpdate('<span class="' + coord.statusClass + '">' + coord.status + '</span>', foundRow, 1, false);
               runningTable.fnUpdate('<div class="progress"><div class="' + coord.progressClass + '" style="width:' + coord.progress + '%">' + coord.progress + '%</div></div>', foundRow, 3, false);
+              runningTable.fnUpdate(killCell + " " + (['RUNNING', 'PREP', 'WAITING'].indexOf(coord.status) > -1?suspendCell:resumeCell), foundRow, 9, false);
             }
           });
         }

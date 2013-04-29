@@ -133,6 +133,8 @@ ${ layout.menubar(section='dashboard') }
       absoluteUrl: wf.absoluteUrl,
       canEdit: wf.canEdit,
       killUrl: wf.killUrl,
+      suspendUrl: wf.suspendUrl,
+      resumeUrl: wf.resumeUrl,
       created: wf.created,
       run: wf.run
     }
@@ -337,18 +339,36 @@ ${ layout.menubar(section='dashboard') }
                 foundRow = node;
               }
             });
+            var killCell = "";
+            var suspendCell = "";
+            var resumeCell = "";
+            if (wf.canEdit) {
+              killCell = '<a class="btn btn-small confirmationModal" ' +
+                      'href="javascript:void(0)" ' +
+                      'data-url="' + wf.killUrl + '" ' +
+                      'title="${ _('Kill') } ' + wf.id + '"' +
+                      'alt="${ _('Are you sure you want to kill workflow ')}' + wf.id + '?" ' +
+                      'data-message="${ _('The workflow was killed!') }" ' +
+                      'data-confirmation-message="${ _('Are you sure you\'d like to kill this job?') }"' +
+                      '>${ _('Kill') }</a>';
+              suspendCell = '<a class="btn btn-small confirmationModal" ' +
+                      'href="javascript:void(0)" ' +
+                      'data-url="' + wf.suspendUrl + '" ' +
+                      'title="${ _('Suspend') } ' + wf.id + '"' +
+                      'alt="${ _('Are you sure you want to suspend workflow ')}' + wf.id + '?" ' +
+                      'data-message="${ _('The workflow was suspended!') }" ' +
+                      'data-confirmation-message="${ _('Are you sure you\'d like to suspend this job?') }"' +
+                      '>${ _('Suspend') }</a>';
+              resumeCell = '<a class="btn btn-small confirmationModal" ' +
+                      'href="javascript:void(0)" ' +
+                      'data-url="' + wf.resumeUrl + '" ' +
+                      'title="${ _('Resume') } ' + wf.id + '"' +
+                      'alt="${ _('Are you sure you want to resume workflow ')}' + wf.id + '?" ' +
+                      'data-message="${ _('The workflow was resumed!') }" ' +
+                      'data-confirmation-message="${ _('Are you sure you\'d like to resume this job?') }"' +
+                      '>${ _('Resume') }</a>';
+            }
             if (foundRow == null) {
-              var killCell = "";
-              if (wf.canEdit) {
-                killCell = '<a class="btn btn-small confirmationModal" ' +
-                        'href="javascript:void(0)" ' +
-                        'data-url="' + wf.killUrl + '" ' +
-                        'title="${ _('Kill') } ' + wf.id + '"' +
-                        'alt="${ _('Are you sure you want to kill workflow ')}' + wf.id + '?" ' +
-                        'data-message="${ _('The workflow was killed!') }" ' +
-                        'data-confirmation-message="${ _('Are you sure you\'d like to kill this job?') }"' +
-                        '>${ _('Kill') }</a>';
-              }
               if (['RUNNING', 'PREP', 'WAITING', 'SUSPENDED', 'PREPSUSPENDED', 'PREPPAUSED', 'PAUSED'].indexOf(wf.status) > -1) {
                 try {
                   runningTable.fnAddData([
@@ -361,7 +381,7 @@ ${ layout.menubar(section='dashboard') }
                     emptyStringIfNull(wf.lastModTime),
                     wf.run,
                     '<a href="' + wf.absoluteUrl + '" data-row-selector="true">' + wf.id + '</a>',
-                    killCell
+                    killCell + " " + (['RUNNING', 'PREP', 'WAITING'].indexOf(wf.status) > -1?suspendCell:resumeCell)
                   ]);
                 }
                 catch (error) {
@@ -372,6 +392,7 @@ ${ layout.menubar(section='dashboard') }
             else {
               runningTable.fnUpdate('<span class="' + wf.statusClass + '">' + wf.status + '</span>', foundRow, 1, false);
               runningTable.fnUpdate('<div class="progress"><div class="' + wf.progressClass + '" style="width:' + wf.progress + '%">' + wf.progress + '%</div></div>', foundRow, 3, false);
+              runningTable.fnUpdate(killCell + " " + (['RUNNING', 'PREP', 'WAITING'].indexOf(wf.status) > -1?suspendCell:resumeCell), foundRow, 9, false);
             }
           });
         }

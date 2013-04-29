@@ -621,6 +621,8 @@ def massaged_oozie_jobs_for_json(oozie_jobs, user):
       'absoluteUrl': job.get_absolute_url(),
       'canEdit': has_job_edition_permission(job, user),
       'killUrl': reverse('oozie:manage_oozie_jobs', kwargs={'job_id':job.id, 'action':'kill'}),
+      'suspendUrl': reverse('oozie:manage_oozie_jobs', kwargs={'job_id':job.id, 'action':'suspend'}),
+      'resumeUrl': reverse('oozie:manage_oozie_jobs', kwargs={'job_id':job.id, 'action':'resume'}),
       'created': hasattr(job, 'createdTime') and job.createdTime and job.createdTime and ((job.type == 'Bundle' and job.createdTime) or format_time(job.createdTime)),
       'startTime': hasattr(job, 'startTime') and format_time(job.startTime) or None,
       'run': hasattr(job, 'run') and job.run or 0,
