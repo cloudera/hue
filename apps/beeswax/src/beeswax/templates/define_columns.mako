@@ -59,33 +59,36 @@ ${layout.menubar(section='tables')}
                         <div class="controls">
                             <div class="scrollable">
                                 <table class="table table-striped">
-                                    <tr>
-                                        <td id="editColumns"><i class="icon-edit" rel="tooltip" data-placement="left" title="${ _('Bulk edit names') }"></i></td>
-                                        % for form in column_formset.forms:
-                                                <td class="cols">
-                                                ${comps.label(form["column_name"])}
-                                                ${comps.field(form["column_name"],
-                                                render_default=False,
-                                                placeholder=_("Column name")
-                                                )}
-                                                    <br/><br/>
-                                                ${comps.label(form["column_type"])}
-                                                ${comps.field(form["column_type"],
-                                                render_default=True
-                                                )}
-                                                ${unicode(form["_exists"]) | n}
-                                                </td>
-                                        %endfor
-                                    </tr>
-                                    % for i, row in enumerate(fields_list[:n_rows]):
-                                        <tr>
-                                            <td><em>${_('Row')} #${i + 1}</em></td>
-                                        % for val in row:
-                                                <td>${val}</td>
+                                    <thead>
+                                      <th id="editColumns">${ _('Column name') } &nbsp;<i class="icon-edit" rel="tooltip" data-placement="right" title="${ _('Bulk edit names') }"></i></th>
+                                      <th>${ _('Column Type') }</th>
+                                      % for i in range(0, n_rows):
+                                        <th><em>${_('Sample Row')} #${i + 1}</em></th>
+                                      % endfor
+                                    </thead>
+                                    <tbody>
+                                      % for col, form in zip(range(len(column_formset.forms)), column_formset.forms):
+                                      <tr>
+                                        <td class="cols">
+                                          ${comps.field(form["column_name"],
+                                              render_default=False,
+                                              placeholder=_("Column name")
+                                            )}
+                                        </td>
+                                        <td>
+                                          ${comps.field(form["column_type"],
+                                              render_default=True
+                                            )}
+                                          ${unicode(form["_exists"]) | n}
+                                        </td>
+                                        % for row in fields_list[:n_rows]:
+                                          ${ comps.getEllipsifiedCell(row[col], "bottom", "dataSample")}
                                         % endfor
-                                        </tr>
-                                    % endfor
+                                      </tr>
+                                      %endfor
+                                    </tbody>
                                 </table>
+
                             </div>
                         </div>
                     </div>
@@ -126,7 +129,8 @@ ${layout.menubar(section='tables')}
 </div>
 
 <link href="/static/ext/css/bootstrap-editable.css" rel="stylesheet">
-<style>
+
+<style type="text/css">
   .scrollable {
     width: 100%;
     overflow-x: auto;
@@ -134,8 +138,6 @@ ${layout.menubar(section='tables')}
 
   #editColumns {
     cursor: pointer;
-    text-align: right;
-    padding-top: 36px;
   }
 </style>
 
@@ -181,13 +183,61 @@ ${layout.menubar(section='tables')}
     });
 
     $("#columnNamesPopover .editable-submit").click(function () {
+      parseEditable();
+    });
+
+    $(".editable-input input").keypress(function (e) {
+      if (e.keyCode == 13) {
+        parseEditable();
+        return false;
+      }
+    });
+
+    function parseEditable() {
       parseJSON($(".editable-input input").val());
       $("#columnNamesPopover").hide();
       $(".editable-input input").val("");
-    });
+    }
 
     $("#columnNamesPopover .editable-cancel").click(function () {
       $("#columnNamesPopover").hide();
+    });
+
+    $(".dataSample").each(function () {
+      var _val = $.trim($(this).text());
+      var _field = $(this).siblings().find("select");
+      var _foundType = "string";
+      if ($.isNumeric(_val)) {
+        _val = _val * 1;
+        if (isInt(_val)) {
+          // it's an int
+          _foundType = "int";
+        }
+        else {
+          // it's possibly a float
+          _foundType = "float";
+        }
+      }
+      else {
+        if (_val.toLowerCase().indexOf("true") > -1 || _val.toLowerCase().indexOf("false") > -1) {
+          // it's a boolean
+          _foundType = "boolean";
+        }
+        else {
+          // it's most probably a string
+          _foundType = "string";
+        }
+      }
+      if (_field.data("possibleType") != null && _field.data("possibleType") != _foundType) {
+        _field.data("possibleType", "string");
+      }
+      else {
+        _field.data("possibleType", _foundType);
+      }
+    });
+
+    $("select").each(function () {
+      $(this).val($(this).data("possibleType"));
     });
 
     function parseJSON(val) {
@@ -209,6 +259,10 @@ ${layout.menubar(section='tables')}
       }
       catch (err) {
       }
+    }
+
+    function isInt(n) {
+      return typeof n === 'number' && parseFloat(n) == parseInt(n, 10) && !isNaN(n);
     }
   });
 </script>
