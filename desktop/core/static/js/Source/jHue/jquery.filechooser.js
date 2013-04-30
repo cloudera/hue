@@ -74,7 +74,15 @@
     Plugin.prototype.setOptions = function (options) {
         this.options = $.extend({}, defaults, options);
         if (this.options.forceRefresh){
-          this.navigateTo(this.options.initialPath);
+          if ($.trim(this.options.initialPath) != "") {
+            this.navigateTo(this.options.initialPath);
+          }
+          else if ($.cookie("hueFileBrowserLastPath") != null) {
+            this.navigateTo($.cookie("hueFileBrowserLastPath"));
+          }
+          else {
+            this.navigateTo("/?default_to_home");
+          }
         }
         else {
           if ($.trim(this.options.initialPath) != "") {

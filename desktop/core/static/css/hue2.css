@@ -948,7 +948,7 @@ div.box {
     border-top: 1px dashed #EEEEEE;
 }
 
-.pathChooser, .pathChooserKo {
+.pathChooser, .pathChooserKo, .pathFolderChooserKo {
     border-radius: 3px 0 0 3px!important;
     border-right:0!important;
 }

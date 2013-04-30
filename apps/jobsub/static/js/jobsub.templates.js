@@ -34,7 +34,7 @@ var Templates = (function($, ko) {
         ssh: 'static/templates/actions/ssh.html',
         shell: 'static/templates/actions/shell.html',
         email: 'static/templates/actions/email.html',
-        distcp: 'static/templates/actions/distcp.html',
+        distcp: 'static/templates/actions/distcp.html'
       },
       partials: {
         name: 'static/templates/widgets/text.html',
@@ -44,8 +44,8 @@ var Templates = (function($, ko) {
         parameters: 'static/templates/widgets/parameters.html',
         archives: 'static/templates/widgets/filechooser.html',
         files: 'static/templates/widgets/filechooser.html',
-        mkdirs: 'static/templates/widgets/filechooser.html',
-        deletes: 'static/templates/widgets/filechooser.html',
+        mkdirs: 'static/templates/widgets/folderchooser.html',
+        deletes: 'static/templates/widgets/folderchooser.html',
         touchzs: 'static/templates/widgets/filechooser.html',
         chmods: 'static/templates/widgets/filechooser.html',
         moves: 'static/templates/widgets/filechooser.html',
@@ -57,7 +57,7 @@ var Templates = (function($, ko) {
         arguments_envvars: 'static/templates/widgets/params.html',
         params_arguments: 'static/templates/widgets/params.html',
         capture_output: 'static/templates/widgets/checkbox.html'
-      },
+      }
     }, options);
 
     self.initialize(options);
