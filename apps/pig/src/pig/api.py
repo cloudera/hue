@@ -192,7 +192,6 @@ class OozieApi:
     return jobs
 
 def get_progress(job, log=None):
-  print job.status
   if job.status in ('SUCCEEDED', 'KILLED', 'FAILED'):
     return 100
   elif log:
