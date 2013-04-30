@@ -124,6 +124,8 @@ var PigViewModel = function (props) {
   self.runningScripts = ko.observableArray([]);
   self.completedScripts = ko.observableArray([]);
 
+  self.isDashboardLoaded = false;
+
   var _defaultScript = {
     id: -1,
     name: self.LABELS.NEW_SCRIPT_NAME,
@@ -261,6 +263,7 @@ var PigViewModel = function (props) {
   };
 
   self.updateDashboard = function (workflows) {
+    self.isDashboardLoaded = true;
     var koWorkflows = ko.utils.arrayMap(workflows, function (wf) {
       return new Workflow(wf);
     });
