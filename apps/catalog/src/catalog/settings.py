@@ -16,7 +16,7 @@
 # limitations under the License.
 
 DJANGO_APPS = ['catalog']
-NICE_NAME = "Table Browser"
+NICE_NAME = "Metastore Manager"
 REQUIRES_HADOOP = True
 ICON = "/catalog/static/art/table-browser-24-1.png"
 MENU_INDEX = 20
