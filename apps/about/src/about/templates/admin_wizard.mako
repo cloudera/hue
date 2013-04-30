@@ -33,7 +33,7 @@ ${ commonheader(_('About Hue'), "quick_start", user, "100px") | n,unicode }
     </div>
   </div>
 % endif
-
+<div style="position: absolute;top:110px;right:30px"><img src="/static/art/hue-logo-subtle.png"/></div>
 <div class="container-fluid">
 
   <div class="row-fluid">
@@ -41,7 +41,7 @@ ${ commonheader(_('About Hue'), "quick_start", user, "100px") | n,unicode }
       % if user.is_superuser:
         ${ _('Quick Start Wizard') } -
       % endif
-      Hue ${version} <img src="/static/art/hue-login-logo.png"/>
+      Hue ${version}
     </h2>
   </div>
 

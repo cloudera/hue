@@ -25,6 +25,7 @@ ${ commonheader(_('Home'), "home", user) | n,unicode }
   <li><a href="/${ app }${ extra_path }"><i class="icon-double-angle-right"></i> ${ label is not None and label or apps[app].nice_name }</a></li>
 </%def>
 
+<div style="position: absolute;top:80px;right:30px"><img src="/static/art/hue-logo-subtle.png"/></div>
 
 <div class="container-fluid">
   <h1>${_('Welcome Home.')}</h1>
