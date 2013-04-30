@@ -12,7 +12,7 @@
       <tbody data-bind="foreach: {{ ko.items }}">
         <tr>
           <td data-bind="text: type"></td>
-          <td><input type="text" class="span4 required pathChooserKo" data-bind="fileChooser: $data, value: value, uniqueName: false" /></td>
+          <td><input type="text" class="span4 required pathFolderChooserKo" data-bind="fileChooser: $data, value: value, uniqueName: false" /></td>
           <td><a class="btn btn-small" href="javascript:void(0);" data-bind="click: {{ delete.func }}">{{ delete.name }}</a></td>
         </tr>
       </tbody>

@@ -144,22 +144,44 @@ function showSection(section) {
   // Filechooser.
   $(".pathChooserKo").each(function(){
     var self = $(this);
-    self.after(getFileBrowseButton(self));
+    self.after(getFileBrowseButton(self, false));
+  });
+
+  $(".pathFolderChooserKo").each(function(){
+    var self = $(this);
+    self.after(getFileBrowseButton(self, true));
   });
 }
 
-function getFileBrowseButton(inputElement) {
+function getFileBrowseButton(inputElement, isFolder) {
   return $("<button>").addClass("btn").addClass("fileChooserBtn").text("..").click(function(e){
     e.preventDefault();
     $("#fileChooserModal").jHueFileChooser({
       initialPath: inputElement.val(),
       onFileChoose: function(filePath) {
+        if (!isFolder){
+          inputElement.val(filePath);
+          inputElement.change();
+          addFileBrowseButton();
+          $("#chooseFile").modal("hide");
+        }
+      },
+      onFolderChange: function(filePath) {
         inputElement.val(filePath);
         inputElement.change();
-        addFileBrowseButton();
-        $("#chooseFile").modal("hide");
       },
-      createFolder: false
+      onFolderChoose: function(filePath) {
+        if (isFolder){
+          inputElement.val(filePath);
+          inputElement.change();
+          addFileBrowseButton();
+          $("#chooseFile").modal("hide");
+        }
+      },
+      createFolder: isFolder,
+      selectFolder: isFolder,
+      uploadFile: !isFolder,
+      forceRefresh: true
     });
     $("#chooseFile").modal("show");
   })
@@ -170,7 +192,14 @@ function addFileBrowseButton() {
   $(".pathChooserKo").each(function(){
     var self = $(this);
     if (!self.siblings().hasClass('fileChooserBtn')) {
-      self.after(getFileBrowseButton(self));
+      self.after(getFileBrowseButton(self, false));
+    }
+  });
+
+  $(".pathFolderChooserKo").each(function(){
+    var self = $(this);
+    if (!self.siblings().hasClass('fileChooserBtn')) {
+      self.after(getFileBrowseButton(self, true));
     }
   });
 }
