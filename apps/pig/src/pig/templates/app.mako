@@ -678,14 +678,20 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
       if (viewModel.currentScript().watchUrl() != "") {
         $.getJSON(viewModel.currentScript().watchUrl(), function (data) {
           if (data.logs.pig) {
-            $("#withoutLogs").addClass("hide");
-            $("#withLogs").removeClass("hide");
+            if ($("#withLogs").is(":hidden")) {
+              $("#withoutLogs").addClass("hide");
+              $("#withLogs").removeClass("hide");
+              resizeLogs();
+            }
             var _logsEl = $("#withLogs");
             var newLines = data.logs.pig.split("\n").slice(_logsEl.text().split("\n").length);
             _logsEl.text(_logsEl.text() + newLines.join("\n"));
-            if (logsAtEnd) {
-              _logsEl.scrollTop(_logsEl[0].scrollHeight - _logsEl.height());
-            }
+            window.setTimeout(function () {
+              resizeLogs();
+              if (logsAtEnd) {
+                _logsEl.scrollTop(_logsEl[0].scrollHeight - _logsEl.height());
+              }
+            }, 100);
           }
           if (data.workflow && data.workflow.isRunning) {
             viewModel.currentScript().actions(data.workflow.actions);
@@ -746,6 +752,8 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
       $("li[data-section='" + section + "']").addClass("active");
     }
 
+    var dashboardLoadedInterval = -1;
+
     routie({
       "editor": function () {
         showMainSection("editor");
@@ -782,8 +790,27 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
       },
       "logs/:scriptId": function (scriptId) {
         if (scriptId !== "undefined" && scriptId != viewModel.currentScript().id()) {
-          viewModel.loadScript(scriptId);
-          $(document).trigger("loadEditor");
+          dashboardLoadedInterval = window.setInterval(function () {
+            if (viewModel.isDashboardLoaded) {
+              window.clearInterval(dashboardLoadedInterval);
+              viewModel.loadScript(scriptId);
+              if (viewModel.currentScript().id() == -1) {
+                viewModel.newScript();
+              }
+              else {
+                viewModel.currentScript().isRunning(true);
+                var _foundLastRun = null;
+                $.each(viewModel.completedScripts(), function (cnt, pastScript) {
+                  if (pastScript.scriptId == scriptId && _foundLastRun == null) {
+                    _foundLastRun = pastScript;
+                  }
+                });
+                viewModel.currentScript().watchUrl(_foundLastRun.watchUrl);
+                $(document).trigger("startLogsRefresh");
+                showSection("editor", "logs");
+              }
+            }
+          }, 200)
         }
         showSection("editor", "logs");
       }
