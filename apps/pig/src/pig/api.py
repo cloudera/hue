@@ -130,8 +130,8 @@ class OozieApi:
     workflow_actions = []
 
     # Only one Pig action
-    progress = get_progress(oozie_workflow, logs.get(action.name, ''))
     for action in oozie_workflow.get_working_actions():
+      progress = get_progress(oozie_workflow, logs.get(action.name, ''))
       appendable = {
         'name': action.name,
         'status': action.status,
