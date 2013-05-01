@@ -522,7 +522,7 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
       readOnly: false,
       lineNumbers: true,
       mode: "text/x-pig",
-      extraKeys: {"Shift-Space": "autocomplete"},
+      extraKeys: {"Ctrl-Space": "autocomplete"},
       onKeyEvent: function (e, s) {
         if (s.type == "keyup") {
           if (s.keyCode == 191) {
