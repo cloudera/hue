@@ -119,7 +119,7 @@ ${ commonheader(_('Job Designer'), "jobsub", user, "60px") | n,unicode }
     </%def>
   </%actionbar:render>
 
-  <div id="design" class="section" data-bind="template: {name: temporary().template(), data: temporary().design(), if: temporary().design()}"></div>
+  <div id="design" class="section" data-bind="template: {'name': temporary().template(), 'data': temporary().design(), 'if': temporary().design()}"></div>
 
   <div id="list-designs" class="section">
     <table id="designTable" class="table table-condensed datatables">
@@ -362,7 +362,7 @@ $(document).ready(function() {
       title: "${ _('Oozie parameters') }",
       name: "${ _('Name') }",
       value: "${ _('Value') }",
-      delete: {
+      'delete': {
         name: "${ _('Delete') }",
         func: 'function(data, event) { $parent.removeParameter.call($parent, data, event) }'
       },
@@ -436,7 +436,7 @@ $(document).ready(function() {
       title: "${ _('Job Properties') }",
       name: "${ _('Property name') }",
       value: "${ _('Value') }",
-      delete: {
+      'delete': {
         name: "${ _('Delete') }",
         func: 'function(data, event) { $parent.removeProperty.call($parent, data, event) }'
       },
@@ -454,12 +454,12 @@ $(document).ready(function() {
       title: "${ _('Prepare') }",
       name: "${ _('Type') }",
       value: "${ _('Value') }",
-      delete: {
+      'delete': {
         name: "${ _('Delete') }",
         func: 'function(data, event) { $parent.removePrepare.call($parent, data, event) }'
       },
       add: {
-        delete: {
+        'delete': {
           name: "${ _('Add delete') }",
           func: 'addPrepareDelete'
         },
@@ -478,7 +478,7 @@ $(document).ready(function() {
       title: "${ _('Params') }",
       name: "${ _('Type') }",
       value: "${ _('Value') }",
-      delete: {
+      'delete': {
         name: "${ _('Delete') }",
         func: 'function(data, event) { $parent.removeParam.call($parent, data, event) }'
       },
@@ -494,7 +494,7 @@ $(document).ready(function() {
     },
     files: {
       title: "${ _('Files') }",
-      delete: {
+      'delete': {
         name: "${ _('Delete') }",
         func: 'function(data, event) { $parent.removeFile.call($parent, data, event) }'
       },
@@ -510,7 +510,7 @@ $(document).ready(function() {
     },
     archives: {
       title: "${ _('Archives') }",
-      delete: {
+      'delete': {
         name: "${ _('Delete') }",
         func: 'function(data, event) { $parent.removeArchive.call($parent, data, event) }'
       },
@@ -545,7 +545,7 @@ $(document).ready(function() {
         title: "${ _('Params') }",
         name: "${ _('Type') }",
         value: "${ _('Value') }",
-        delete: {
+        'delete': {
           name: "${ _('Delete') }",
           func: 'function(data, event) { $parent.removeParam.call($parent, data, event) }'
         },
@@ -573,7 +573,7 @@ $(document).ready(function() {
         title: "${ _('Params') }",
         name: "${ _('Type') }",
         value: "${ _('Value') }",
-        delete: {
+        'delete': {
           name: "${ _('Delete') }",
           func: 'function(data, event) { $parent.removeParam.call($parent, data, event) }'
         },
@@ -592,7 +592,7 @@ $(document).ready(function() {
       title: "${ _('Job Design (fs type)') }",
       deletes: {
         title: "${ _('Delete path') }",
-        delete: {
+        'delete': {
           name: "${ _('Delete') }",
           func: 'function(data, event) { $parent.removeDelete.call($parent, data, event) }'
         },
@@ -608,7 +608,7 @@ $(document).ready(function() {
       },
       mkdirs: {
         title: "${ _('Create directory') }",
-        delete: {
+        'delete': {
           name: "${ _('Delete') }",
           func: 'function(data, event) { $parent.removeMkdir.call($parent, data, event) }'
         },
@@ -624,7 +624,7 @@ $(document).ready(function() {
       },
       touchzs: {
         title: "${ _('Create or touch file') }",
-        delete: {
+        'delete': {
           name: "${ _('Delete') }",
           func: 'function(data, event) { $parent.removeTouchz.call($parent, data, event) }'
         },
@@ -640,7 +640,7 @@ $(document).ready(function() {
       },
       chmods: {
         title: "${ _('Change permissions') }",
-        delete: {
+        'delete': {
           name: "${ _('Delete') }",
           func: 'function(data, event) { $parent.removeChmod.call($parent, data, event) }'
         },
@@ -656,7 +656,7 @@ $(document).ready(function() {
       },
       moves: {
         title: "${ _('Move file') }",
-        delete: {
+        'delete': {
           name: "${ _('Delete') }",
           func: 'function(data, event) { $parent.removeMove.call($parent, data, event) }'
         },
@@ -677,7 +677,7 @@ $(document).ready(function() {
         title: "${ _('Params') }",
         name: "${ _('Type') }",
         value: "${ _('Value') }",
-        delete: {
+        'delete': {
           name: "${ _('Delete') }",
           func: 'function(data, event) { $parent.removeParam.call($parent, data, event) }'
         },
@@ -698,7 +698,7 @@ $(document).ready(function() {
         title: "${ _('Params') }",
         name: "${ _('Type') }",
         value: "${ _('Value') }",
-        delete: {
+        'delete': {
           name: "${ _('Delete') }",
           func: 'function(data, event) { $parent.removeParam.call($parent, data, event) }'
         },
@@ -725,7 +725,7 @@ $(document).ready(function() {
         title: "${ _('Params') }",
         name: "${ _('Type') }",
         value: "${ _('Value') }",
-        delete: {
+        'delete': {
           name: "${ _('Delete') }",
           func: 'function(data, event) { $parent.removeParam.call($parent, data, event) }'
         },

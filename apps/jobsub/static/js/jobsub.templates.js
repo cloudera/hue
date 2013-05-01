@@ -107,11 +107,12 @@ var Templates = (function($, ko) {
         return el;
       } else {
         var html = Mustache.to_html(self.actions[id], context, self.partials);
-        if (el.length  == 0) el = $('<script/>');
-        el.attr('id', id);
-        el.attr('type', 'text/html');
-        el.html(html);
-        $(document.body).append(el);
+        // no jQuery here, IE8 doesn't like it.
+        var scriptTag = document.createElement('script');
+        scriptTag.setAttribute('id', id);
+        scriptTag.setAttribute('type', 'text/html');
+        scriptTag.text = html;
+        document.body.appendChild(scriptTag);
         return $('#' + id);
       }
     }
