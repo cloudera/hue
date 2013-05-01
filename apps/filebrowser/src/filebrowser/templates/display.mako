@@ -45,19 +45,19 @@ ${ commonheader(_('%(filename)s - File Viewer') % dict(filename=truncate(filenam
         <ul class="nav nav-list">
           <li class="nav-header">${_('Actions')}</li>
           % if view['mode'] == "binary":
-            <li><a href="${base_url}?offset=${view['offset']}&length=${view['length']}&mode=text&compression=${view['compression']}">${_('View As Text')}</a></li>
+            <li><a href="${base_url}?offset=${view['offset']}&length=${view['length']}&mode=text&compression=${view['compression']}">${_('View as text')}</a></li>
           % endif
 
           % if view['mode'] == "text":
-            <li><a href="${base_url}?offset=${view['offset']}&length=${view['length']}&mode=binary&compression=${view['compression']}">${_('View As Binary')}</a></li>
+            <li><a href="${base_url}?offset=${view['offset']}&length=${view['length']}&mode=binary&compression=${view['compression']}">${_('View as binary')}</a></li>
           % endif
 
           % if view['compression'] != "gzip" and path.endswith('.gz'):
-            <li><a href="${base_url}?offset=0&length=2000&mode=${view['mode']}&compression=gzip">${_('Preview As Gzip')}</a></li>
+            <li><a href="${base_url}?offset=0&length=2000&mode=${view['mode']}&compression=gzip">${_('Preview as Gzip')}</a></li>
           % endif
 
           % if view['compression'] != "avro" and view['compression'] != "snappy_avro" and path.endswith('.avro'):
-            <li><a href="${base_url}?offset=0&length=2000&mode=${view['mode']}&compression=avro">${_('Preview As Avro')}</a></li>
+            <li><a href="${base_url}?offset=0&length=2000&mode=${view['mode']}&compression=avro">${_('Preview as Avro')}</a></li>
           % endif
 
           % if view['compression'] and view['compression'] != "none":
@@ -65,16 +65,16 @@ ${ commonheader(_('%(filename)s - File Viewer') % dict(filename=truncate(filenam
           % endif
 
           % if editable and view['compression'] == "none":
-            <li><a href="${url('filebrowser.views.edit', path=path_enc)}">${_('Edit File')}</a></li>
+            <li><a href="${url('filebrowser.views.edit', path=path_enc)}">${_('Edit file')}</a></li>
           % endif
 
            <li><a href="${url('filebrowser.views.download', path=path_enc)}">${_('Download')}</a></li>
-           <li><a href="${url('filebrowser.views.view', path=dirname_enc)}">${_('View File Location')}</a></li>
+           <li><a href="${url('filebrowser.views.view', path=dirname_enc)}">${_('View file location')}</a></li>
            <li><a id="refreshBtn">${_('Refresh')}</a></li>
           <li class="nav-header">${_('Info')}</li>
           <li>
             <dl>
-              <dt>${_('Last Modified')}</dt>
+              <dt>${_('Last modified')}</dt>
               <dd>${date(datetime.datetime.fromtimestamp(stats['mtime']))} ${time(datetime.datetime.fromtimestamp(stats['mtime']))}</dd>
               <dt>${_('User')}</dt>
               <dd>${stats['user']}</dd>

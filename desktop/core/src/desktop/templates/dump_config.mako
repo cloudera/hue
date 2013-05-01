@@ -23,32 +23,75 @@ from django.utils.translation import ugettext as _
 
 <%namespace name="layout" file="about_layout.mako" />
 
-${ commonheader(_('About'), "about", user, "100px") | n,unicode }
+${ commonheader(_('Configuration'), "about", user, "100px") | n,unicode }
 ${layout.menubar(section='dump_config')}
 
+<style type="text/css">
+  #installedApps {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+  }
+
+  #installedApps li {
+    display: inline;
+  }
+
+  .widget-content {
+    padding: 10px;
+  }
+</style>
+
     <div class="container-fluid">
+      <div class="row-fluid">
 
         ${_('Configuration files located in')} <code>${conf_dir}</code>
         <br/><br/>
 
-        <h2>${_('Installed applications')}</h2>
-        <ul>
-        % for app in apps:
-            <li>${app.name}</li>
-        % endfor
-        </ul>
-
-        <h2>${_('Configuration Sections and Variables')}</h2>
-
-        <ul class="nav nav-tabs">
-            % for obj in top_level:
-                <li
-                    % if loop.first:
-                        class="active"
-                    % endif
-                ><a href="#${obj.config.key}Conf" data-toggle="tab">${obj.config.key}</a></li>
+        <div class="widget-box">
+          <div class="widget-title">
+            <span class="icon">
+              <i class="icon-th-list"></i>
+            </span>
+            <h5>${_('Installed Applications')}</h5>
+          </div>
+          <div class="widget-content">
+            <ul id="installedAppsz" class="nav nav-pills">
+            % for app in apps:
+                <li><a href="/${app.display_name}">${app.name}</a></li>
             % endfor
-        </ul>
+            </ul>
+          </div>
+        </div>
+
+        <div class="widget-box" style="margin-top: 40px">
+          <div class="widget-title">
+            <span class="icon">
+              <i class="icon-th-list"></i>
+            </span>
+            <h5>${_('Configuration Sections and Variables')}</h5>
+          </div>
+          <div class="widget-content">
+            <ul class="nav nav-tabs">
+              % for obj in top_level:
+                <li
+                  % if loop.first:
+                      class="active"
+                  % endif
+                ><a href="#${obj.config.key}Conf" data-toggle="tab">${obj.config.key}</a></li>
+              % endfor
+            </ul>
+
+            ${showTopLevel(top_level)}
+
+              <br/>
+              <br/>
+              <br/>
+          </div>
+        </div>
+
+      </div>
+
 
         <%def name="showTopLevel(config_obj, depth=0)">
             <div class="tab-content">
@@ -107,11 +150,7 @@ ${layout.menubar(section='dump_config')}
             </table>
         </%def>
 
-        ${showTopLevel(top_level)}
 
-        <br/>
-        <br/>
-        <br/>
 
     </div>
 

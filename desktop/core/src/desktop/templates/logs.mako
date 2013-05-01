@@ -24,7 +24,7 @@ import re
 <%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="layout" file="about_layout.mako" />
 
-${ commonheader(_('About'), "about", user, "100px") | n,unicode }
+${ commonheader(_('Server Logs'), "about", user, "100px") | n,unicode }
 ${layout.menubar(section='log_view')}
 
 <style>
@@ -56,8 +56,6 @@ ${layout.menubar(section='log_view')}
 </style>
 
 <div class="container-fluid">
-  <h1>${_('Log entries (most recent first)')}</h1>
-
   <%actionbar:render>
     <%def name="search()">
         <input type="text" class="input-xxlarge search-query" placeholder="${_('Search...')}" value="${query}">
@@ -76,6 +74,8 @@ ${layout.menubar(section='log_view')}
         <pre>${smart_unicode(l, errors='ignore')}</pre>
       % endfor
   </div>
+
+  <br/>
 
 </div>
 

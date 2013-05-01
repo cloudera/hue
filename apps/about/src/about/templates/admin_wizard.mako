@@ -18,14 +18,14 @@ from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
 
-${ commonheader(_('About Hue'), "quick_start", user, "100px") | n,unicode }
+${ commonheader(_('Quick Start'), "quick_start", user, "100px") | n,unicode }
 
 % if user.is_superuser:
   <div class="row-fluid">
     <div class="subnav subnav-fixed">
       <div class="container-fluid">
         <ul class="nav nav-pills">
-          <li class="active"><a href="${url("about:admin_wizard")}">${_('Quick start')}</a></li>
+          <li class="active"><a href="${url("about:admin_wizard")}">${_('Quick Start')}</a></li>
           <li><a href="${url("desktop.views.dump_config")}">${_('Configuration')}</a></li>
           <li><a href="${url("desktop.views.log_view")}">${_('Server Logs')}</a></li>
         </ul>
