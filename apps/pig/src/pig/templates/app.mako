@@ -118,11 +118,6 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
             ##<li><a href="#createDataset">${ _('New') }</a></li>
             ##<li><a href="#createDataset">${ _('List') }</a></li>
             <li class="nav-header">${_('Actions')}</li>
-            <li data-bind="click: saveScript">
-              <a href="#" title="${ _('Save the script') }" rel="tooltip" data-placement="right">
-                <i class="icon-save"></i> ${ _('Save') }
-              </a>
-            </li>
             <li data-bind="click: runOrShowSubmissionModal, visible: !currentScript().isRunning()">
               <a href="#" title="${ _('Run the script') }" rel="tooltip" data-placement="right">
                 <i class="icon-play"></i> ${ _('Run') }
@@ -131,6 +126,11 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
             <li data-bind="click: showStopModal, visible: currentScript().isRunning()">
               <a href="#" title="${ _('Run the script') }" rel="tooltip" data-placement="right" class="disabled">
                 <i class="icon-ban-circle"></i> ${ _('Stop') }
+              </a>
+            </li>
+            <li data-bind="click: saveScript">
+              <a href="#" title="${ _('Save the script') }" rel="tooltip" data-placement="right">
+                <i class="icon-save"></i> ${ _('Save') }
               </a>
             </li>
             <li data-bind="visible: currentScript().id() != -1, click: copyScript">
@@ -249,9 +249,6 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
 
       <div id="logs" class="section hide">
           <div class="alert alert-info"><h3>${ _('Logs for') } '<span data-bind="text: currentScript().name"></span>'</h3></div>
-          <div data-bind="visible: currentScript().actions().length == 0">
-            <img src="/static/art/spinner.gif" />
-          </div>
           <div data-bind="template: {name: 'logTemplate', foreach: currentScript().actions}"></div>
           <script id="logTemplate" type="text/html">
             <div data-bind="css:{'alert-modified': name != '', 'alert': name != '', 'alert-success': status == 'SUCCEEDED' || status == 'OK', 'alert-error': status != 'RUNNING' && status != 'SUCCEEDED' && status != 'OK' && status != 'PREP' && status != 'SUSPENDED'}">
@@ -264,7 +261,7 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
               </div>
             </div>
           </script>
-          <pre id="withoutLogs" class="hide">${ _('No available logs.') }</pre>
+          <pre id="withoutLogs" class="hide"><img src="/static/art/spinner.gif" /> ${ _('No available logs.') }</pre>
           <pre id="withLogs" class="hide scroll"></pre>
         </div>
 
