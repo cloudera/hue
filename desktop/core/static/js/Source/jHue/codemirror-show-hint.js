@@ -148,6 +148,9 @@ CodeMirror.showHint = function(cm, getHints, options) {
         }
       }
       cm.replaceRange(_insertion, data.from, data.to);
+      if (CodeMirror.onAutocomplete !== "undefined" && CodeMirror.onAutocomplete != null) {
+        CodeMirror.onAutocomplete(_insertion, data.from, data.to);
+      }
       close();
     }
     function strip(html){
