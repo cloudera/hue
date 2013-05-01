@@ -54,7 +54,6 @@
     context.push(tprop);
 
     var completionList = getCompletions(token, context);
-    completionList = completionList.sort();
     //prevent autocomplete for last word, instead show dropdown with one word
     if (completionList.length == 1) {
       completionList.push(" ");
@@ -78,7 +77,7 @@
       + "JOIN CROSS UNION SPLIT INTO IF OTHERWISE ALL AS BY USING INNER OUTER ONSCHEMA PARALLEL "
       + "PARTITION GROUP AND OR NOT GENERATE FLATTEN ASC DESC IS STREAM THROUGH STORE MAPREDUCE "
       + "SHIP CACHE INPUT OUTPUT STDERROR STDIN STDOUT LIMIT SAMPLE LEFT RIGHT FULL EQ GT LT GTE LTE "
-      + "NEQ MATCHES TRUE FALSE";
+      + "NEQ MATCHES TRUE FALSE DUMP";
   var pigKeywordsU = pigKeywords.split(" ");
   var pigKeywordsL = pigKeywords.toLowerCase().split(" ");
 
@@ -107,11 +106,15 @@
       + "StringMin StringSize TextLoader TupleSize Utf8StorageConverter").split(" ").join("() ").split(" ");
 
   function getCompletions(token, context) {
-    var found = [], start = token.string;
+    var found = [], start = token.string, extraFound = [];
 
     function maybeAdd(str) {
       var stripped = strip(str).replace(/(?:(?:^|\n)\s+|\s+(?:$|\n))/g,'').replace(/\s+/g,' ');
       if (stripped.indexOf(start) == 0 && !arrayContains(found, str)) found.push(str);
+    }
+
+    function maybeAddToExtra(str) {
+      if (str.indexOf(start) == 0 && !arrayContains(found, str)) extraFound.push(str);
     }
 
     function strip(html){
@@ -136,6 +139,7 @@
           forEach(pigTypesL, maybeAdd);
           forEach(pigKeywordsU, maybeAdd);
           forEach(pigKeywordsL, maybeAdd);
+          forEach(CodeMirror.availableVariables, maybeAddToExtra);
         }
       }
     }
@@ -150,6 +154,6 @@
         base = base[context.pop().string];
       if (base != null) gatherCompletions(base);
     }
-    return found;
+    return extraFound.sort().concat(found.sort());
   }
 })();
