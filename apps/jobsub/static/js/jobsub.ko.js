@@ -135,7 +135,7 @@ var Design = (function($, ko, NodeFields) {
       }
 
       if (!('new' in self)) {
-        self.new = ko.computed(function() {
+        self['new'] = ko.computed(function() {
           return !self.id();
         });
       }
@@ -208,7 +208,7 @@ var Design = (function($, ko, NodeFields) {
           $(document).trigger('saved.design', [options, data]);
         }
       }, options);
-      self.request((self.new()) ? '/jobsub/designs/'+self.node_type()+'/new' : '/jobsub/designs/'+self.id()+'/save', options);
+      self.request((self['new']()) ? '/jobsub/designs/'+self.node_type()+'/new' : '/jobsub/designs/'+self.id()+'/save', options);
     },
     clone: function(options) {
       var self = this;
@@ -221,7 +221,7 @@ var Design = (function($, ko, NodeFields) {
       }, options);
       this.request('/jobsub/designs/' + self.id() + '/clone', options);
     },
-    delete: function(skip_trash, options) {
+    'delete': function(skip_trash, options) {
       var self = this;
       $(document).trigger('delete.design', [options]);
       var options = $.extend({
@@ -457,19 +457,19 @@ var Designs = (function($, ko, NodeModelChooser) {
     trashDesigns: function() {
       var self = this;
       $.each(self.selectedDesignObjects(), function(index, designObject) {
-        designObject.design().delete();
+        designObject.design()['delete']();
       });
     },
     destroyDesigns: function() {
       var self = this;
       $.each(self.selectedDesignObjects(), function(index, designObject) {
-        designObject.design().delete(true);
+        designObject.design()['delete'](true);
       });
     },
     destroyAllTrashedDesigns: function() {
       var self = this;
       $.each(self.trashedDesignObjects(), function(index, designObject) {
-        designObject.design().delete(true);
+        designObject.design()['delete'](true);
       });
     },
     restoreDesigns: function() {
