@@ -24,4 +24,4 @@ if os.getenv('HUE_SPAWNING', 'no') == 'yes':
   #
   # A cleaner solution would be to avoid this magic and find a way to have
   # the eventlet.green imports done at the very beginning (i.e. before 'socket').
-  eventlet.monkey_patch()
+  eventlet.monkey_patch(thread=True)

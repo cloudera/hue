@@ -89,9 +89,7 @@ class HDFStemporaryUploadedFile(object):
 
   def remove(self):
     try:
-      original = self._fs.setskiptrash(True)
-      self._fs.remove(self._path)
-      self._fs.setskiptrash(original)
+      self._fs.remove(self._path, True)
       self._do_cleanup = False
     except IOError, ex:
       if ex.errno != errno.ENOENT:
