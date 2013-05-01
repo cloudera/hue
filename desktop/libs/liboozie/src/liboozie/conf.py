@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
+
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
 from desktop.lib.conf import Config, coerce_bool, validate_path
@@ -39,17 +41,17 @@ REMOTE_DEPLOYMENT_DIR = Config(
 
 
 def get_oozie_status():
-  return 'NORMAL'
-#  from liboozie.oozie_api import get_oozie
-#
-#  status = 'down'
-#
-#  try:
-#    status = str(get_oozie().get_oozie_status())
-#  except:
-#    pass
-#
-#  return status
+  from liboozie.oozie_api import get_oozie
+
+  status = 'down'
+
+  try:
+    if not 'test' in sys.argv: # Avoid tests hanging
+      status = str(get_oozie().get_oozie_status())
+  except:
+    pass
+
+  return status
 
 def config_validator():
   """

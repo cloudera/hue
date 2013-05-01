@@ -277,7 +277,7 @@ var PigViewModel = function (props) {
 
   self.runOrShowSubmissionModal = function runOrShowSubmissionModal() {
     var script = self.currentScript();
-    if (script.getParameters().length > 0) {
+    if (! $.isEmptyObject(script.getParameters())) {
       self.submissionVariables.removeAll();
       $.each(script.getParameters(), function (key, value) {
         self.submissionVariables.push({'name': key, 'value': value});
