@@ -72,7 +72,6 @@ ${layout.menubar(section='query')}
 </div>
 
 <script>
-
   $(document).ready(function(){
     var fwdUrl = "${url(app_name + ':watch_query', query.id)}?${fwd_params}";
     var labels = {
@@ -97,8 +96,13 @@ ${layout.menubar(section='query')}
           }
         }
         var _logsEl = $("#log pre");
-        var newLines = data.log.split("\n").slice(_logsEl.text().split("\n").length);
-        _logsEl.text(_logsEl.text() + newLines.join("\n"));
+        % if app_name == 'impala':
+          _logsEl.text($.trim(data.log));
+        % else:
+          var newLines = data.log.split("\n").slice(_logsEl.text().split("\n").length);
+          _logsEl.text(_logsEl.text() + newLines.join("\n"));
+        % endif
+
         if (logsAtEnd) {
           _logsEl.scrollTop(_logsEl[0].scrollHeight - _logsEl.height());
         }
@@ -128,7 +132,6 @@ ${layout.menubar(section='query')}
     }
 
   });
-
 </script>
 
 
