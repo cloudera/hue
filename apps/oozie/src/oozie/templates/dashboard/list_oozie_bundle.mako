@@ -1,3 +1,4 @@
+## -*- coding: utf-8 -*-
 ## Licensed to Cloudera, Inc. under one
 ## or more contributor license agreements.  See the NOTICE file
 ## distributed with this work for additional information
@@ -260,11 +261,11 @@ ${ layout.menubar(section='dashboard') }
       </div>
 
       <div class="tab-pane" id="log">
-        <pre>${ oozie_bundle.log }</pre>
+        <pre>${ oozie_bundle.log.decode('utf-8', 'replace') }</pre>
       </div>
 
       <div class="tab-pane" id="definition">
-        <textarea id="definitionEditor">${ oozie_bundle.definition }</textarea>
+        <textarea id="definitionEditor">${ oozie_bundle.definition.decode('utf-8', 'replace') }</textarea>
       </div>
     </div>
 

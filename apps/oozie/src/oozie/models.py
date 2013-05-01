@@ -32,6 +32,7 @@ from django.core.urlresolvers import reverse
 from django.core.validators import RegexValidator
 from django.contrib.auth.models import User
 from django.forms.models import inlineformset_factory
+from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
 from desktop.log.access import access_warn
@@ -152,7 +153,8 @@ class Job(models.Model):
     return self.deployment_dir != '' and fs.exists(self.deployment_dir)
 
   def __str__(self):
-    return '%s - %s' % (self.name, self.owner)
+    res = '%s - %s' % (force_unicode(self.name), self.owner)
+    return res.encode('utf-8', 'xmlcharrefreplace')
 
   def get_full_node(self):
     try:
@@ -470,7 +472,7 @@ class Workflow(Job):
     if mapping is None:
       mapping = {}
     tmpl = 'editor/gen/workflow.xml.mako'
-    return re.sub(re.compile('\s*\n+', re.MULTILINE), '\n', django_mako.render_to_string(tmpl, {'workflow': self, 'mapping': mapping}))
+    return re.sub(re.compile('\s*\n+', re.MULTILINE), '\n', django_mako.render_to_string(tmpl, {'workflow': self, 'mapping': mapping})).encode('utf-8', 'xmlcharrefreplace')
 
 
 class Link(models.Model):
@@ -1262,7 +1264,7 @@ class Coordinator(Job):
     if mapping is None:
       mapping = {}
     tmpl = "editor/gen/coordinator.xml.mako"
-    return re.sub(re.compile('\s*\n+', re.MULTILINE), '\n', django_mako.render_to_string(tmpl, {'coord': self, 'mapping': mapping}))
+    return re.sub(re.compile('\s*\n+', re.MULTILINE), '\n', django_mako.render_to_string(tmpl, {'coord': self, 'mapping': mapping})).encode('utf-8', 'xmlcharrefreplace')
 
   def clone(self, new_owner=None):
     datasets = Dataset.objects.filter(coordinator=self)
@@ -1516,7 +1518,7 @@ class Bundle(Job):
     if mapping is None:
       mapping = {}
     tmpl = "editor/gen/bundle.xml.mako"
-    return re.sub(re.compile('\s*\n+', re.MULTILINE), '\n', django_mako.render_to_string(tmpl, {'bundle': self, 'mapping': mapping}))
+    return re.sub(re.compile('\s*\n+', re.MULTILINE), '\n', django_mako.render_to_string(tmpl, {'bundle': self, 'mapping': mapping})).encode('utf-8', 'xmlcharrefreplace')
 
   def clone(self, new_owner=None):
     bundleds = BundledCoordinator.objects.filter(bundle=self)

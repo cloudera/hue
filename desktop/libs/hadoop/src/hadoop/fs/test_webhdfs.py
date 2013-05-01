@@ -24,7 +24,7 @@ import logging
 import posixfile
 import random
 import sys
-from threading
+import threading
 import unittest
 
 from hadoop import conf, pseudo_hdfs4
