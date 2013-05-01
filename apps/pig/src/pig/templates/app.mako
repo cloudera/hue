@@ -466,7 +466,33 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
 
     var scriptEditor = $("#scriptEditor")[0];
 
+    function storeVariables() {
+      CodeMirror.availableVariables = [];
+      var _val = codeMirror.getValue();
+      var _groups = _val.replace(/==/gi, "").split("=");
+      $.each(_groups, function (cnt, item) {
+        if (cnt < _groups.length - 1) {
+          var _blocks = $.trim(item).replace(/\n/gi, " ").split(" ");
+          CodeMirror.availableVariables.push(_blocks[_blocks.length - 1]);
+        }
+        if (item.toLowerCase().indexOf("split") > -1 && item.toLowerCase().indexOf("into") > -1) {
+          try {
+            var _split = item.substring(item.toLowerCase().indexOf("into"));
+            var _possibleVariables = $.trim(_split.substring(4, _split.indexOf(";"))).split(",");
+            $.each(_possibleVariables, function (icnt, iitem) {
+              if (iitem.toLowerCase().indexOf("if") > -1) {
+                CodeMirror.availableVariables.push($.trim(iitem).split(" ")[0]);
+              }
+            });
+          }
+          catch (e) {
+          }
+        }
+      });
+    }
+
     CodeMirror.commands.autocomplete = function (cm) {
+      storeVariables();
       var _line = codeMirror.getLine(codeMirror.getCursor().line);
       var _partial = _line.substring(0, codeMirror.getCursor().ch);
       if (_partial.indexOf("'") > -1 && _partial.indexOf("'") == _partial.lastIndexOf("'") && (_partial.toLowerCase().indexOf("load") > -1
@@ -496,7 +522,7 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
       readOnly: false,
       lineNumbers: true,
       mode: "text/x-pig",
-      extraKeys: {"Ctrl-Space": "autocomplete"},
+      extraKeys: {"Shift-Space": "autocomplete"},
       onKeyEvent: function (e, s) {
         if (s.type == "keyup") {
           if (s.keyCode == 191) {
@@ -767,8 +793,16 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
       },
       "edit/:scriptId": function (scriptId) {
         if (scriptId !== "undefined" && scriptId != viewModel.currentScript().id()) {
-          viewModel.loadScript(scriptId);
-          $(document).trigger("loadEditor");
+          dashboardLoadedInterval = window.setInterval(function () {
+            if (viewModel.isDashboardLoaded) {
+              window.clearInterval(dashboardLoadedInterval);
+              viewModel.loadScript(scriptId);
+              if (viewModel.currentScript().id() == -1) {
+                viewModel.newScript();
+              }
+              $(document).trigger("loadEditor");
+            }
+          }, 200);
         }
         showSection("editor", "edit");
       },
@@ -777,8 +811,16 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
       },
       "properties/:scriptId": function (scriptId) {
         if (scriptId !== "undefined" && scriptId != viewModel.currentScript().id()) {
-          viewModel.loadScript(scriptId);
-          $(document).trigger("loadEditor");
+          dashboardLoadedInterval = window.setInterval(function () {
+            if (viewModel.isDashboardLoaded) {
+              window.clearInterval(dashboardLoadedInterval);
+              viewModel.loadScript(scriptId);
+              if (viewModel.currentScript().id() == -1) {
+                viewModel.newScript();
+              }
+              $(document).trigger("loadEditor");
+            }
+          }, 200);
         }
         showSection("editor", "properties");
       },
