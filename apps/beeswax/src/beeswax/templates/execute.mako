@@ -729,7 +729,16 @@ ${layout.menubar(section='query')}
         var AUTOCOMPLETE_SET = CodeMirror.hiveQLHint;
       % endif
 
+      CodeMirror.onAutocomplete = function (data, from, to) {
+        if (CodeMirror.tableFieldMagic) {
+          codeMirror.replaceRange(" ", from, from);
+          codeMirror.setCursor(from);
+          codeMirror.execCommand("autocomplete");
+        }
+      };
+
       CodeMirror.commands.autocomplete = function (cm) {
+        tableMagic = false;
         if ($.totalStorage('tables_' + $("#id_query-database").val()) == null) {
           CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
           getTables(function () {}); // if preload didn't work, tries again
@@ -739,6 +748,7 @@ ${layout.menubar(section='query')}
             CodeMirror.catalogTables = tables;
             var _before = codeMirror.getRange({line: 0, ch: 0}, {line: codeMirror.getCursor().line, ch: codeMirror.getCursor().ch}).replace(/(\r\n|\n|\r)/gm, " ");
             CodeMirror.possibleTable = false;
+            CodeMirror.tableFieldMagic = false;
             if (_before.toUpperCase().indexOf(" FROM ") > -1 && _before.toUpperCase().indexOf(" ON ") == -1 && _before.toUpperCase().indexOf(" WHERE ") == -1) {
               CodeMirror.possibleTable = true;
             }
@@ -772,6 +782,7 @@ ${layout.menubar(section='query')}
                 }
               }
               else {
+                CodeMirror.tableFieldMagic = true;
                 CodeMirror.showHint(cm, CodeMirror.hiveQLHint);
               }
             }

@@ -60,6 +60,7 @@
   CodeMirror.catalogFields = "";
   CodeMirror.possibleTable = false;
   CodeMirror.possibleSoloField = false;
+  CodeMirror.tableFieldMagic = false;
 
   CodeMirror.impalaSQLHint = function (editor) {
     return scriptHint(editor, impalaSQLKeywordsU, function (e, cur) {
@@ -103,6 +104,13 @@
       }
       else {
         if (!CodeMirror.possibleTable) {
+          if (CodeMirror.tableFieldMagic) {
+            var _specialCatalogTablesL = CodeMirror.catalogTables.toLowerCase().split(" ");
+            for (var i = 0; i < _specialCatalogTablesL.length; i++) {
+              _specialCatalogTablesL[i] = "<i class='icon-magic'></i> FROM " + _specialCatalogTablesL[i];
+            }
+            forEach(_specialCatalogTablesL, maybeAddToExtra);
+          }
           if (CodeMirror.possibleSoloField) {
             forEach(catalogFieldsL, maybeAddToExtra);
           }
