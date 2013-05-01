@@ -811,7 +811,7 @@ for x in sys.stdin:
     self.client.post('/beeswax/install_examples')
 
     # New tables exists
-    resp = self.client.get('/catalog/tables/')
+    resp = self.client.get('/metastore/tables/')
     assert_true('sample_08' in resp.content)
     assert_true('sample_07' in resp.content)
 
@@ -879,7 +879,7 @@ for x in sys.stdin:
           STORED AS TextFile LOCATION "/tmp/foo"
     """, resp.context['query'].query)
 
-    assert_true('on_success_url=%2Fcatalog%2Ftable%2Fdefault%2Fmy_table' in resp.context['fwd_params'], resp.context['fwd_params'])
+    assert_true('on_success_url=%2Fmetastore%2Ftable%2Fdefault%2Fmy_table' in resp.context['fwd_params'], resp.context['fwd_params'])
 
   def test_create_table_timestamp(self):
     # Check form
@@ -893,14 +893,14 @@ for x in sys.stdin:
     self._make_custom_data_file(filename, [0, 0, 0])
     self._make_table('timestamp_invalid_data', 'CREATE TABLE timestamp_invalid_data (timestamp1 TIMESTAMP)', filename)
 
-    response = self.client.get("/catalog/table/default/timestamp_invalid_data")
+    response = self.client.get("/metastore/table/default/timestamp_invalid_data")
     assert_true('Error!' in response.content, response.content)
 
     # Good format
     self._make_custom_data_file(filename, ['2012-01-01 10:11:30', '2012-01-01 10:11:31'])
     self._make_table('timestamp_valid_data', 'CREATE TABLE timestamp_valid_data (timestamp1 TIMESTAMP)', filename)
 
-    response = self.client.get("/catalog/table/default/timestamp_valid_data")
+    response = self.client.get("/metastore/table/default/timestamp_valid_data")
     assert_true('2012-01-01 10:11:30' in response.content, response.content)
 
   def test_partitioned_create_table(self):
@@ -1081,7 +1081,7 @@ for x in sys.stdin:
     resp = wait_for_query_to_finish(self.client, resp, max=180.0)
 
     # Check data is in the table (by describing it)
-    resp = self.client.get('/catalog/table/default/test_create_import')
+    resp = self.client.get('/metastore/table/default/test_create_import')
     cols = resp.context['table'].cols
     assert_equal(len(cols), 3)
     assert_equal([ col.name for col in cols ], [ 'col_a', 'col_b', 'col_c' ])

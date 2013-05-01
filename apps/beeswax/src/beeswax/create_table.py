@@ -268,7 +268,7 @@ def _submit_create_and_load(request, create_hql, table_name, path, do_load, data
     on_success_params['path'] = path
     on_success_url = reverse(app_name + ':load_after_create', kwargs={'database': database})
   else:
-    on_success_url = reverse('catalog:describe_table', kwargs={'database': database, 'table': table_name})
+    on_success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': table_name})
 
   query = hql_query(create_hql, database=database)
   return execute_directly(request, query,
@@ -463,6 +463,6 @@ def load_after_create(request, database):
   hql = "LOAD DATA INPATH '%s' INTO TABLE `%s.%s`" % (path, database, tablename)
   query = hql_query(hql)
   app_name = get_app_name(request)
-  on_success_url = reverse('catalog:describe_table', kwargs={'database': database, 'table': tablename})
+  on_success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': tablename})
 
   return execute_directly(request, query, on_success_url=on_success_url)
