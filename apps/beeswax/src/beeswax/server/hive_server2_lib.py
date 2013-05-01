@@ -557,11 +557,8 @@ class HiveServerClientCompatible:
 
 
   def get_log(self, handle):
-    if self.query_server['server_name'] == 'impala':
-      return 'Impala does not support GetLog()'
-    else:
-      operationHandle = handle.get_rpc_handle()
-      return self._client.get_log(operationHandle)
+    operationHandle = handle.get_rpc_handle()
+    return self._client.get_log(operationHandle)
 
 
   def get_databases(self):
