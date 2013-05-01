@@ -39,9 +39,9 @@ ${ commonheader(_('File Browser'), 'filebrowser', user) | n,unicode }
             <button class="btn fileToolbarBtn" title="${_('Move')}" data-bind="click: move, enable: selectedFiles().length > 0"><i class="icon-random"></i> ${_('Move')}</button>
             <button class="btn fileToolbarBtn" title="${_('Copy')}" data-bind="click: copy, enable: selectedFiles().length > 0"><i class="icon-retweet"></i> ${_('Copy')}</button>
             %if is_fs_superuser:
-                <button class="btn fileToolbarBtn" title="${_('Change Owner / Group')}" data-bind="visible: !inTrash(), click: changeOwner, enable: selectedFiles().length > 0"><i class="icon-user"></i> ${_('Change Owner / Group')}</button>
+                <button class="btn fileToolbarBtn" title="${_('Change owner / group')}" data-bind="visible: !inTrash(), click: changeOwner, enable: selectedFiles().length > 0"><i class="icon-user"></i> ${_('Change owner / group')}</button>
             %endif
-            <button class="btn fileToolbarBtn" title="${_('Change Permissions')}" data-bind="visible: !inTrash(), click: changePermissions, enable: selectedFiles().length > 0"><i class="icon-list-alt"></i> ${_('Change Permissions')}</button>
+            <button class="btn fileToolbarBtn" title="${_('Change permissions')}" data-bind="visible: !inTrash(), click: changePermissions, enable: selectedFiles().length > 0"><i class="icon-list-alt"></i> ${_('Change permissions')}</button>
             <button class="btn fileToolbarBtn" title="${_('Download')}" data-bind="visible: !inTrash(), click: downloadFile, enable: selectedFiles().length == 1 && selectedFile().type == 'file'"><i class="icon-download-alt"></i> ${_('Download')}</button>
             &nbsp;&nbsp;
             <button class="btn fileToolbarBtn" title="${_('Empty trash')}" data-bind="visible: inTrash(), click: purgeTrash"><i class="icon-fire"></i> ${_('Empty')}</button>
@@ -53,7 +53,7 @@ ${ commonheader(_('File Browser'), 'filebrowser', user) | n,unicode }
                 <span class="caret"></span>
               </button>
               <ul class="dropdown-menu" style="top: auto">
-                <li data-bind="visible: trashEnabled"><a href="#" class="delete-link" title="${_('Move to Trash')}" data-bind="enable: selectedFiles().length > 0, click: trashSelected"><i class="icon-trash"></i> ${_('Move to Trash')}</a></li>
+                <li data-bind="visible: trashEnabled"><a href="#" class="delete-link" title="${_('Move to trash')}" data-bind="enable: selectedFiles().length > 0, click: trashSelected"><i class="icon-trash"></i> ${_('Move to trash')}</a></li>
                 <li><a href="#" class="delete-link" title="${_('Delete forever')}" data-bind="enable: selectedFiles().length > 0, click: deleteSelected"><i class="icon-bolt"></i> ${_('Delete forever')}</a></li>
               </ul>
             </div>

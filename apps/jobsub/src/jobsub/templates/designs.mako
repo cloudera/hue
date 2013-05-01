@@ -56,7 +56,7 @@ ${ commonheader(_('Job Designer'), "jobsub", user, "60px") | n,unicode }
             <span class="caret"></span>
           </button>
           <ul class="dropdown-menu" style="top: auto">
-            <li><a href="javascript:void(0);" id="trash-designs" title="${_('Move to Trash')}"><i class="icon-trash"></i> ${_('Move to Trash')}</a></li>
+            <li><a href="javascript:void(0);" id="trash-designs" title="${_('Move to trash')}"><i class="icon-trash"></i> ${_('Move to trash')}</a></li>
             <li><a href="javascript:void(0);" id="destroy-designs" title="${_('Delete forever')}"><i class="icon-bolt"></i> ${_('Delete forever')}</a></li>
           </ul>
         </div>
@@ -70,43 +70,43 @@ ${ commonheader(_('Job Designer'), "jobsub", user, "60px") | n,unicode }
     <%def name="creation()">
       <!-- ko ifnot: inTrash -->
         <div id="new-action-dropdown" class="btn-group" style="display: inline">
-          <a href="#" class="btn new-action-link dropdown-toggle" title="${_('New Action')}" data-toggle="dropdown">
-            <i class="icon-plus-sign"></i> ${_('New Action')}
+          <a href="#" class="btn new-action-link dropdown-toggle" title="${_('New action')}" data-toggle="dropdown">
+            <i class="icon-plus-sign"></i> ${_('New action')}
             <span class="caret"></span>
           </a>
           <ul class="dropdown-menu" style="top: auto">
             <li>
-              <a href="#new-design/mapreduce" class="new-node-link" title="${_('Create MapReduce Design')}" rel="tooltip"><i class="icon-plus-sign"></i> MapReduce</a>
+              <a href="#new-design/mapreduce" class="new-node-link" title="${_('Create MapReduce design')}" rel="tooltip"><i class="icon-plus-sign"></i> MapReduce</a>
             </li>
             <li>
-              <a href="#new-design/java" class="new-node-link" title="${_('Create Java Design')}" rel="tooltip"><i class="icon-plus-sign"></i> Java</a>
+              <a href="#new-design/java" class="new-node-link" title="${_('Create Java design')}" rel="tooltip"><i class="icon-plus-sign"></i> Java</a>
             </li>
             <li>
-              <a href="#new-design/streaming" class="new-node-link" title="${_('Create Streaming Design')}" rel="tooltip"><i class="icon-plus-sign"></i> Streaming</a>
+              <a href="#new-design/streaming" class="new-node-link" title="${_('Create Streaming design')}" rel="tooltip"><i class="icon-plus-sign"></i> Streaming</a>
             </li>
             <li>
-              <a href="#new-design/hive" class="new-node-link" title="${_('Create Hive Design')}" rel="tooltip"><i class="icon-plus-sign"></i> Hive</a>
+              <a href="#new-design/hive" class="new-node-link" title="${_('Create Hive design')}" rel="tooltip"><i class="icon-plus-sign"></i> Hive</a>
             </li>
             <li>
-              <a href="#new-design/pig" class="new-node-link" title="${_('Create Pig Design')}" rel="tooltip"><i class="icon-plus-sign"></i> Pig</a>
+              <a href="#new-design/pig" class="new-node-link" title="${_('Create Pig design')}" rel="tooltip"><i class="icon-plus-sign"></i> Pig</a>
             </li>
             <li>
-              <a href="#new-design/sqoop" class="new-node-link" title="${_('Create Sqoop Design')}" rel="tooltip"><i class="icon-plus-sign"></i> Sqoop</a>
+              <a href="#new-design/sqoop" class="new-node-link" title="${_('Create Sqoop design')}" rel="tooltip"><i class="icon-plus-sign"></i> Sqoop</a>
             </li>
             <li>
-              <a href="#new-design/fs" class="new-node-link" title="${_('Create Fs Design')}" rel="tooltip"><i class="icon-plus-sign"></i> Fs</a>
+              <a href="#new-design/fs" class="new-node-link" title="${_('Create Fs design')}" rel="tooltip"><i class="icon-plus-sign"></i> Fs</a>
             </li>
             <li>
-              <a href="#new-design/ssh" class="new-node-link" title="${_('Create Ssh Design')}" rel="tooltip"><i class="icon-plus-sign"></i> Ssh</a>
+              <a href="#new-design/ssh" class="new-node-link" title="${_('Create Ssh design')}" rel="tooltip"><i class="icon-plus-sign"></i> Ssh</a>
             </li>
             <li>
-              <a href="#new-design/shell" class="new-node-link" title="${_('Create Shell Design')}" rel="tooltip"><i class="icon-plus-sign"></i> Shell</a>
+              <a href="#new-design/shell" class="new-node-link" title="${_('Create Shell design')}" rel="tooltip"><i class="icon-plus-sign"></i> Shell</a>
             </li>
             <li>
-              <a href="#new-design/email" class="new-node-link" title="${_('Create Email Design')}" rel="tooltip"><i class="icon-plus-sign"></i> Email</a>
+              <a href="#new-design/email" class="new-node-link" title="${_('Create Email design')}" rel="tooltip"><i class="icon-plus-sign"></i> Email</a>
             </li>
             <li>
-              <a href="#new-design/distcp" class="new-node-link" title="${_('Create DistCp Design')}" rel="tooltip"><i class="icon-plus-sign"></i> DistCp</a>
+              <a href="#new-design/distcp" class="new-node-link" title="${_('Create DistCp design')}" rel="tooltip"><i class="icon-plus-sign"></i> DistCp</a>
             </li>
           </ul>
         </div>
@@ -433,7 +433,7 @@ $(document).ready(function() {
       popover: "${ _('Body') }"
     },
     job_properties: {
-      title: "${ _('Job Properties') }",
+      title: "${ _('Job properties') }",
       name: "${ _('Property name') }",
       value: "${ _('Value') }",
       'delete': {
@@ -441,7 +441,7 @@ $(document).ready(function() {
         func: 'function(data, event) { $parent.removeProperty.call($parent, data, event) }'
       },
       add: {
-        name: "${ _('Add Property') }",
+        name: "${ _('Add property') }",
         func: 'addProperty'
       },
       ko: {
@@ -499,7 +499,7 @@ $(document).ready(function() {
         func: 'function(data, event) { $parent.removeFile.call($parent, data, event) }'
       },
       add: {
-        name: "${ _('Add File') }",
+        name: "${ _('Add file') }",
         func: 'addFile'
       },
       ko: {
@@ -515,7 +515,7 @@ $(document).ready(function() {
         func: 'function(data, event) { $parent.removeArchive.call($parent, data, event) }'
       },
       add: {
-        name: "${ _('Add Archive') }",
+        name: "${ _('Add archive') }",
         func: 'addArchive'
       },
       ko: {
@@ -597,7 +597,7 @@ $(document).ready(function() {
           func: 'function(data, event) { $parent.removeDelete.call($parent, data, event) }'
         },
         add: {
-          name: "${ _('Add Path') }",
+          name: "${ _('Add path') }",
           func: 'addDelete'
         },
         ko: {
@@ -613,7 +613,7 @@ $(document).ready(function() {
           func: 'function(data, event) { $parent.removeMkdir.call($parent, data, event) }'
         },
         add: {
-          name: "${ _('Add Path') }",
+          name: "${ _('Add path') }",
           func: 'addMkdir'
         },
         ko: {
@@ -629,7 +629,7 @@ $(document).ready(function() {
           func: 'function(data, event) { $parent.removeTouchz.call($parent, data, event) }'
         },
         add: {
-          name: "${ _('Add Path') }",
+          name: "${ _('Add path') }",
           func: 'addTouchz'
         },
         ko: {
@@ -706,7 +706,7 @@ $(document).ready(function() {
           name: "${ _('Add argument') }",
           func: 'addArgument'
         },{
-          name: "${ _('Add Env-Var') }",
+          name: "${ _('Add env-var') }",
           func: 'addEnvVar'
         }],
         ko: {
@@ -730,7 +730,7 @@ $(document).ready(function() {
           func: 'function(data, event) { $parent.removeParam.call($parent, data, event) }'
         },
         add: [{
-          name: "${ _('Add Argument') }",
+          name: "${ _('Add argument') }",
           func: 'addArgument'
         }],
         ko: {

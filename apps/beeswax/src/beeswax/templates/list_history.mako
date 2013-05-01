@@ -48,10 +48,15 @@ ${ layout.menubar(section='history') }
   % endif
 </%def>
 
+<style type="text/css">
+  .sidebar-nav {
+    padding: 9px 0;
+  }
+</style>
+
 <div class="container-fluid">
-    <h1>${_('History')}</h1>
     <div class="row-fluid">
-        <div class="span3">
+        <div class="span2">
             <div class="well sidebar-nav">
                 <ul class="nav nav-list">
                     <li class="nav-header">${_('Actions')}</li>
@@ -87,8 +92,8 @@ ${ layout.menubar(section='history') }
                 </ul>
             </div>
         </div>
-        <div class="span9">
-
+        <div class="span10">
+        <h1>${_('History')}</h1>
         <table class="table table-striped table-condensed datatables">
             <thead>
               <tr>

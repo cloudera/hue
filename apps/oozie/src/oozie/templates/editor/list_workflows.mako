@@ -41,7 +41,7 @@ ${ layout.menubar(section='workflows') }
           <span class="caret"></span>
         </button>
         <ul class="dropdown-menu" style="top: auto">
-          <li><a href="javascript:void(0);" id="trash-btn" title="${_('Move to Trash')}"><i class="icon-trash"></i> ${_('Move to Trash')}</a></li>
+          <li><a href="javascript:void(0);" id="trash-btn" title="${_('Move to trash')}"><i class="icon-trash"></i> ${_('Move to trash')}</a></li>
           <li><a href="javascript:void(0);" id="destroy-btn" title="${_('Delete forever')}"><i class="icon-bolt"></i> ${_('Delete forever')}</a></li>
         </ul>
       </div>

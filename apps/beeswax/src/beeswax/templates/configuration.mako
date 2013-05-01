@@ -50,6 +50,7 @@ ${layout.menubar(section='configuration')}
 	    % endfor
 		</tbody>
 	</table>
+  <br/>
 </div>
 
 <script type="text/javascript" charset="utf-8">

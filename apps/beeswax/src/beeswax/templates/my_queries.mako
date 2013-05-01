@@ -50,7 +50,7 @@ ${layout.menubar(section='my queries')}
           <span class="caret"></span>
         </button>
         <ul class="dropdown-menu" style="top: auto">
-          <li><a href="#" id="trashQueryBtn" title="${_('Move to Trash')}"><i class="icon-trash"></i> ${_('Move to Trash')}</a></li>
+          <li><a href="#" id="trashQueryBtn" title="${_('Move to trash')}"><i class="icon-trash"></i> ${_('Move to trash')}</a></li>
           <li><a href="#" id="deleteQueryBtn" title="${_('Delete forever')}"><i class="icon-bolt"></i> ${_('Delete forever')}</a></li>
         </ul>
       </div>

@@ -38,7 +38,7 @@ ${ commonheader(_('%(filename)s - File Viewer') % dict(filename=truncate(filenam
 <div class="well" >
     <form class="form-stacked" method="post" action="${url('filebrowser.views.save_file')}">
     <div class="toolbar">
-		<a class="btn" href="${url('filebrowser.views.view', path=dirname_enc)}">${_('View Location')}</a>
+		<a class="btn" href="${url('filebrowser.views.view', path=dirname_enc)}">${_('Browse location')}</a>
 	</div>
 	<br/>
 
@@ -57,7 +57,7 @@ ${ commonheader(_('%(filename)s - File Viewer') % dict(filename=truncate(filenam
         <div style="width: 100%; height: 100%;">${edit.render_field(form["contents"], tag="textarea", notitle=True, attrs=dict(
           style="width:100%; height:400px;")) | n}</div>
         <input class="btn btn-primary" type="submit" name="save" value="${_('Save')}">
-        <a id="saveAsBtn" class="btn">${_('Save As')}</a>
+        <a id="saveAsBtn" class="btn">${_('Save as')}</a>
     </form>
 </div>
 
@@ -66,7 +66,7 @@ ${ commonheader(_('%(filename)s - File Viewer') % dict(filename=truncate(filenam
     <form id="saveAsForm" action="${url('filebrowser.views.save_file')}" method="POST" class="form-stacked form-padding-fix">
     <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3>${_('Save As')}</h3>
+        <h3>${_('Save as')}</h3>
     </div>
     <div class="modal-body">
 		${edit.render_field(form["path"], notitle=True, klass="xlarge")}

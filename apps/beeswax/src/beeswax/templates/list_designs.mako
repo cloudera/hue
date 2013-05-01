@@ -43,14 +43,14 @@ ${layout.menubar(section='saved queries')}
           <span class="caret"></span>
         </button>
         <ul class="dropdown-menu" style="top: auto">
-          <li><a href="#" id="trashQueryBtn" title="${_('Move to Trash')}"><i class="icon-trash"></i> ${_('Move to Trash')}</a></li>
+          <li><a href="#" id="trashQueryBtn" title="${_('Move to trash')}"><i class="icon-trash"></i> ${_('Move to trash')}</a></li>
           <li><a href="#" id="deleteQueryBtn" title="${_('Delete forever')}"><i class="icon-bolt"></i> ${_('Delete forever')}</a></li>
         </ul>
       </div>
     </%def>
 
     <%def name="creation()">
-      <a class="btn" href="${ url(app_name + ':execute_query') }" title="${_('Create new query')}"><i class="icon-plus-sign"></i> ${_('New Query')}</a>
+      <a class="btn" href="${ url(app_name + ':execute_query') }" title="${_('Create new query')}"><i class="icon-plus-sign"></i> ${_('New query')}</a>
       <a class="btn" href="${ url(app_name + ':list_trashed_designs') }" title="${_('Go to the trash')}"><i class="icon-trash"></i> ${_('Trash')}</a>
     </%def>
   </%actionbar:render>

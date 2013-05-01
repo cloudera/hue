@@ -176,8 +176,8 @@
               params_field(action_form['params'], {
                 'name': 'params',
                 'add': [
-                  {'label': _('Add Param'), 'method': 'addParam'},
-                  {'label': _('Add Argument'), 'method': 'addArgument'},
+                  {'label': _('Add param'), 'method': 'addParam'},
+                  {'label': _('Add argument'), 'method': 'addArgument'},
                 ],
                 'remove': '$parent.removeParam.bind($parent)'
               })
@@ -189,8 +189,8 @@
               params_field(action_form['params'], {
                 'name': 'params',
                 'add': [
-                  {'label': _('Add Argument'), 'method': 'addArgument'},
-                  {'label': _('Add Env-Var'), 'method': 'addEnvVar'},
+                  {'label': _('Add argument'), 'method': 'addArgument'},
+                  {'label': _('Add env-var'), 'method': 'addEnvVar'},
                 ],
                 'remove': '$parent.removeParam.bind($parent)'
               })
@@ -202,7 +202,7 @@
               params_field(action_form['params'], {
                 'name': 'params',
                 'add': [
-                  {'label': _('Add Param'), 'method': 'addParam'},
+                  {'label': _('Add param'), 'method': 'addParam'},
                 ],
                 'remove': '$parent.removeParam.bind($parent)'
               })
@@ -214,7 +214,7 @@
               params_field(action_form['params'], {
                 'name': 'params',
                 'add': [
-                  {'label': _('Add Argument'), 'method': 'addArgument'},
+                  {'label': _('Add argument'), 'method': 'addArgument'},
                 ],
                 'remove': '$parent.removeParam.bind($parent)'
               })
@@ -226,7 +226,7 @@
               params_field(action_form['params'], {
                 'name': 'params',
                 'add': [
-                  {'label': _('Add Arg'), 'method': 'addArg'},
+                  {'label': _('Add arg'), 'method': 'addArg'},
                 ],
                 'remove': '$parent.removeParam.bind($parent)'
               })
@@ -354,7 +354,7 @@
       </table>
 
       % if 'add' in javascript_attrs:
-        <button class="btn" data-bind="disable: $root.context().read_only, click: ${ javascript_attrs['add'] }">${ _('Add Path') }</button>
+        <button class="btn" data-bind="disable: $root.context().read_only, click: ${ javascript_attrs['add'] }">${ _('Add path') }</button>
       % endif
     % endif
   </div>
@@ -382,7 +382,7 @@
       </table>
 
       % if 'add' in javascript_attrs:
-        <button class="btn" data-bind="disable: $root.context().read_only, click: ${ javascript_attrs['add'] }">${ _('Add Archive') }</button>
+        <button class="btn" data-bind="disable: $root.context().read_only, click: ${ javascript_attrs['add'] }">${ _('Add archive') }</button>
       % endif
     % endif
   </div>
@@ -391,7 +391,7 @@
 
 <%def name="job_properties_field(field, javascript_attrs={})">
 <div class="control-group" rel="popover" data-original-title="${ field.label }" data-content="${ field.help_text }">
-  <label class="control-label">${ _('Job Properties') }</label>
+  <label class="control-label">${ _('Job properties') }</label>
   <div class="controls">
     % if 'name' in javascript_attrs:
       <table class="table-condensed designTable" data-bind="visible: ${ javascript_attrs['name'] }().length > 0">
@@ -416,7 +416,7 @@
       </table>
 
       % if 'add' in javascript_attrs:
-        <button class="btn" data-bind="disable: $root.context().read_only, click: ${ javascript_attrs['add'] }">${ _('Add Property') }</button>
+        <button class="btn" data-bind="disable: $root.context().read_only, click: ${ javascript_attrs['add'] }">${ _('Add property') }</button>
       % endif
     % endif
   </div>
