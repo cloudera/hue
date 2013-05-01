@@ -48,7 +48,7 @@ def create_database(request):
       # Mako outputs bytestring in utf8
       proposed_query = proposed_query.decode('utf-8')
       query = hql_query(proposed_query)
-      return execute_directly(request, query, on_success_url=reverse('catalog:databases'))
+      return execute_directly(request, query, on_success_url=reverse('metastore:databases'))
   else:
     form = CreateDatabaseForm()
 

@@ -1,0 +1,272 @@
+# Translations template for Hue.
+# Copyright (C) 2013 Cloudera, Inc
+# This file is distributed under the same license as the Hue project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Hue VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2013-03-20 17:39-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.6\n"
+
+#: src/metastore/forms.py:48 src/metastore/templates/describe_partitions.mako:33
+msgid "Path"
+msgstr ""
+
+#: src/metastore/forms.py:49
+msgid "Overwrite?"
+msgstr ""
+
+#: src/metastore/forms.py:62
+#, python-format
+msgid "%(column_name)s (partition key with type %(column_type)s)"
+msgstr ""
+
+#: src/metastore/views.py:109
+#, python-format
+msgid "Failed to remove %(tables)s.  Error: %(error)s"
+msgstr ""
+
+#: src/metastore/views.py:110
+msgid "Beeswax Error"
+msgstr ""
+
+#: src/metastore/views.py:112
+msgid "Do you really want to delete the table(s)?"
+msgstr ""
+
+#: src/metastore/views.py:126
+msgid "Can read table"
+msgstr ""
+
+#: src/metastore/views.py:147
+msgid "Can't load the data: "
+msgstr ""
+
+#: src/metastore/views.py:168
+#, python-format
+msgid "Table '%(table)s' is not partitioned."
+msgstr ""
+
+#: src/metastore/templates/components.mako:198
+msgid "Beginning of List"
+msgstr ""
+
+#: src/metastore/templates/components.mako:199
+msgid "Previous Page"
+msgstr ""
+
+#: src/metastore/templates/components.mako:200
+msgid "Next page"
+msgstr ""
+
+#: src/metastore/templates/components.mako:200
+msgid "Next Page"
+msgstr ""
+
+#: src/metastore/templates/components.mako:201
+msgid "End of List"
+msgstr ""
+
+#: src/metastore/templates/components.mako:203
+#, python-format
+msgid ""
+"Showing %(start)s to %(end)s of %(count)s items, page %(page)s of "
+"%(pages)s"
+msgstr ""
+
+#: src/metastore/templates/describe_partitions.mako:22
+#, python-format
+msgid "Table Partitions: %(tableName)s"
+msgstr ""
+
+#: src/metastore/templates/describe_partitions.mako:25
+msgid "Partitions"
+msgstr ""
+
+#: src/metastore/templates/describe_partitions.mako:51
+msgid "Table has no partitions."
+msgstr ""
+
+#: src/metastore/templates/describe_table.mako:25
+#: src/metastore/templates/tables.mako:51
+msgid "View"
+msgstr ""
+
+#: src/metastore/templates/describe_table.mako:27
+msgid "Table"
+msgstr ""
+
+#: src/metastore/templates/describe_table.mako:29
+#, python-format
+msgid "%s Metadata: %s"
+msgstr ""
+
+#: src/metastore/templates/describe_table.mako:35
+msgid "Name"
+msgstr ""
+
+#: src/metastore/templates/describe_table.mako:36
+msgid "Type"
+msgstr ""
+
+#: src/metastore/templates/describe_table.mako:37
+msgid "Comment"
+msgstr ""
+
+#: src/metastore/templates/describe_table.mako:54
+msgid "Table Metadata:"
+msgstr ""
+
+#: src/metastore/templates/describe_table.mako:59
+#: src/metastore/templates/tables.mako:39
+msgid "Actions"
+msgstr ""
+
+#: src/metastore/templates/describe_table.mako:60
+msgid "Import Data"
+msgstr ""
+
+#: src/metastore/templates/describe_table.mako:61
+#: src/metastore/templates/tables.mako:52
+msgid "Browse Data"
+msgstr ""
+
+#: src/metastore/templates/describe_table.mako:62
+#: src/metastore/templates/tables.mako:53
+msgid "Drop"
+msgstr ""
+
+#: src/metastore/templates/describe_table.mako:63
+msgid "View File Location"
+msgstr ""
+
+#: src/metastore/templates/describe_table.mako:73
+msgid "Columns"
+msgstr ""
+
+#: src/metastore/templates/describe_table.mako:75
+msgid "Partition Columns"
+msgstr ""
+
+#: src/metastore/templates/describe_table.mako:78
+msgid "Sample"
+msgstr ""
+
+#: src/metastore/templates/describe_table.mako:90
+msgid "Show Partitions"
+msgstr ""
+
+#: src/metastore/templates/describe_table.mako:98
+msgid "Error!"
+msgstr ""
+
+#: src/metastore/templates/describe_table.mako:135
+msgid "Drop Table"
+msgstr ""
+
+#: src/metastore/templates/describe_table.mako:142
+#: src/metastore/templates/tables.mako:96 src/metastore/templates/tables.mako:109
+#: src/metastore/templates/popups/load_data.mako:60
+msgid "Cancel"
+msgstr ""
+
+#: src/metastore/templates/describe_table.mako:143
+msgid "Yes, drop this table"
+msgstr ""
+
+#: src/metastore/templates/describe_table.mako:172
+#: src/metastore/templates/describe_table.mako:195
+#: src/metastore/templates/tables.mako:141
+msgid "No data available"
+msgstr ""
+
+#: src/metastore/templates/describe_table.mako:173
+#: src/metastore/templates/describe_table.mako:196
+#: src/metastore/templates/tables.mako:142
+msgid "No matching records"
+msgstr ""
+
+#: src/metastore/templates/layout.mako:34 src/metastore/templates/tables.mako:23
+#: src/metastore/templates/tables.mako:26
+msgid "Tables"
+msgstr ""
+
+#: src/metastore/templates/tables.mako:32
+msgid "database"
+msgstr ""
+
+#: src/metastore/templates/tables.mako:41 src/metastore/templates/tables.mako:88
+msgid "Install samples"
+msgstr ""
+
+#: src/metastore/templates/tables.mako:43
+msgid "Create a new table from a file"
+msgstr ""
+
+#: src/metastore/templates/tables.mako:44
+msgid "Create a new table manually"
+msgstr ""
+
+#: src/metastore/templates/tables.mako:51 src/metastore/templates/tables.mako:52
+msgid "Browse the selected table"
+msgstr ""
+
+#: src/metastore/templates/tables.mako:53
+msgid "Delete the selected tables"
+msgstr ""
+
+#: src/metastore/templates/tables.mako:60
+msgid "Table Name"
+msgstr ""
+
+#: src/metastore/templates/tables.mako:97
+msgid "Yes, install samples"
+msgstr ""
+
+#: src/metastore/templates/tables.mako:106
+msgid "Confirm action"
+msgstr ""
+
+#: src/metastore/templates/tables.mako:110
+msgid "Yes"
+msgstr ""
+
+#: src/metastore/templates/tables.mako:171
+msgid "There was an error processing your request:"
+msgstr ""
+
+#: src/metastore/templates/util.mako:66
+msgid "Unsaved Query"
+msgstr ""
+
+#: src/metastore/templates/util.mako:71
+msgid "Query Results"
+msgstr ""
+
+#: src/metastore/templates/popups/load_data.mako:25
+msgid "Import data"
+msgstr ""
+
+#: src/metastore/templates/popups/load_data.mako:50
+msgid "Overwrite existing data"
+msgstr ""
+
+#: src/metastore/templates/popups/load_data.mako:55
+msgid ""
+"Note that loading data will move data from its location into the table's "
+"storage location."
+msgstr ""
+
+#: src/metastore/templates/popups/load_data.mako:61
+msgid "Submit"
+msgstr ""
+
