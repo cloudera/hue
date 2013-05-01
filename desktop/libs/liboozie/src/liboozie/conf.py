@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
+
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
 from desktop.lib.conf import Config, coerce_bool, validate_path
@@ -44,7 +46,8 @@ def get_oozie_status():
   status = 'down'
 
   try:
-    status = str(get_oozie().get_oozie_status())
+    if not 'test' in sys.argv: # Avoid tests hanging
+      status = str(get_oozie().get_oozie_status())
   except:
     pass
 
