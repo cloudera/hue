@@ -742,7 +742,7 @@ def get_create_bundled_coordinator_html(request, bundle, bundled_coordinator_for
   return render('editor/create_bundled_coordinator.mako', request, {
                             'bundle': bundle,
                             'bundled_coordinator_form': bundled_coordinator_form,
-                          }, force_template=True).content
+                          }, force_template=True).content.decode('utf-8', 'replace')
 
 
 @check_job_access_permission()
