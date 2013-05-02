@@ -71,7 +71,8 @@ from django.utils.translation import ugettext as _
           FILE_NOT_FOUND:"${_('The file has not been found')}",
           UPLOAD_FILE:"${_('Upload a file')}",
           FAILED:"${_('Failed')}"
-        }
+        },
+        user: "${ user.username }"
       };
 
       jHueTableExtenderGlobals = {
@@ -93,6 +94,7 @@ from django.utils.translation import ugettext as _
   <script src="/static/js/Source/jHue/jquery.tableextender.js"></script>
   <script src="/static/js/Source/jHue/jquery.scrollup.js"></script>
   <script src="/static/ext/js/jquery/plugins/jquery.cookie.js"></script>
+  <script src="/static/ext/js/jquery/plugins/jquery.total-storage.min.js"></script>
   <script src="/static/ext/js/jquery/plugins/jquery.simpleplaceholder.js"></script>
   <script src="/static/ext/js/jquery/plugins/jquery.dataTables.1.8.2.min.js"></script>
   <script src="/static/js/Source/jHue/jquery.datatables.sorting.js"></script>
