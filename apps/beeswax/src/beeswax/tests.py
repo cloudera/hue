@@ -26,6 +26,7 @@ import logging
 import os
 import re
 import shutil
+import socket
 import tempfile
 import threading
 
@@ -1307,6 +1308,58 @@ def test_hive_site():
     assert_equal(port, 9999)
     assert_equal(beeswax.hive_site.get_conf()['hive.metastore.warehouse.dir'], u'/abc')
     assert_equal(kerberos_principal, 'test/test.com@TEST.COM')
+  finally:
+    beeswax.hive_site.reset()
+    if saved is not None:
+      beeswax.conf.BEESWAX_HIVE_CONF_DIR = saved
+    shutil.rmtree(tmpdir)
+
+def test_hive_site_host_pattern():
+  """Test hive-site parsing"""
+  HIVE_SITE = """
+    <configuration>
+      <property>
+        <name>hive.metastore.local</name>
+        <value>false</value>
+      </property>
+
+      <property>
+        <name>hive.metastore.uris</name>
+        <value>thrift://%s:9999</value>
+      </property>
+
+      <property>
+        <name>hive.metastore.warehouse.dir</name>
+        <value>/abc</value>
+      </property>
+
+      <property>
+        <name>hive.metastore.kerberos.principal</name>
+        <value>test/_HOST@TEST.COM</value>
+      </property>
+    </configuration>
+  """ % socket.getfqdn()
+
+  beeswax.hive_site.reset()
+  tmpdir = tempfile.mkdtemp()
+  saved = None
+  try:
+    file(os.path.join(tmpdir, 'hive-site.xml'), 'w').write(HIVE_SITE)
+
+    # We just replace the Beeswax conf variable
+    class Getter(object):
+      def get(self):
+        return tmpdir
+
+    saved = beeswax.conf.BEESWAX_HIVE_CONF_DIR
+    beeswax.conf.BEESWAX_HIVE_CONF_DIR = Getter()
+
+    is_local, host, port, kerberos_principal = beeswax.hive_site.get_metastore()
+    assert_false(is_local)
+    assert_equal(host, socket.getfqdn())
+    assert_equal(port, 9999)
+    assert_equal(beeswax.hive_site.get_conf()['hive.metastore.warehouse.dir'], u'/abc')
+    assert_equal(kerberos_principal, 'test/' + socket.getfqdn().lower() + '@TEST.COM')
   finally:
     beeswax.hive_site.reset()
     if saved is not None:
