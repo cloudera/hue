@@ -327,10 +327,10 @@ def list_query_history(request):
 
   querydict_query = request.GET.copy()
   if not share_queries:
-    querydict_query['user'] = request.user.username
+    querydict_query[prefix + 'user'] = request.user.username
 
   app_name= get_app_name(request)
-  querydict_query['type'] = app_name
+  querydict_query[prefix + 'type'] = app_name
 
   page, filter_params = _list_query_history(request.user, querydict_query, DEFAULT_PAGE_SIZE, prefix)
 
