@@ -18,14 +18,20 @@
 import re
 import socket
 
+from django.utils.translation import ugettext as _
+
 # Pattern to replace with hostname
 HOSTNAME_PATTERN = '_HOST'
 
 
-def get_kerberos_principal(principal, host=None):
+def get_kerberos_principal(principal, host):
   components = get_components(principal)
   if not components or len(components) != 3 or components[1] != HOSTNAME_PATTERN:
     return principal
+  else:
+    if not host:
+      raise IOError(_("Can't replace %s pattern since host is null.") % HOSTNAME_PATTERN)
+    return replace_hostname_pattern(components, host)
 
 
 def get_components(principal):
@@ -42,7 +48,7 @@ def replace_hostname_pattern(components, host):
   fqdn = host
   if not fqdn or fqdn == '0.0.0.0':
     fqdn = get_localhost_name()
-  return '%s/%s@%s' % (components[0], fqdn.lowercase(), components[2])
+  return '%s/%s@%s' % (components[0], fqdn.lower(), components[2])
 
 def get_localhost_name():
   return socket.get_localhost()

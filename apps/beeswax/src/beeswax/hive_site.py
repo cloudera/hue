@@ -22,6 +22,7 @@ import errno
 import logging
 import os.path
 import re
+import socket
 
 from desktop.lib import security_util
 
@@ -73,7 +74,7 @@ def get_metastore():
   """
   global _METASTORE_LOC_CACHE
   if not _METASTORE_LOC_CACHE:
-    kerberos_principal = security_util.get_kerberos_principal(get_conf().get(_CNF_METASTORE_KERBEROS_PRINCIPAL, None))
+    kerberos_principal = security_util.get_kerberos_principal(get_conf().get(_CNF_METASTORE_KERBEROS_PRINCIPAL, None), socket.getfqdn())
     kerberos_principal_components = security_util.get_components(kerberos_principal)
     thrift_uris = get_conf().get(_CNF_METASTORE_URIS)
     is_local = thrift_uris is None or thrift_uris == ''
