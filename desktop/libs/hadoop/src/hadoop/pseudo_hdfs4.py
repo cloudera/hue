@@ -417,7 +417,8 @@ class PseudoHdfs4(object):
       'dfs.datanode.http.address': '0.0.0.0:0',
       'dfs.datanode.ipc.address': '%s:0' % self._fqdn,
       'dfs.replication': 1,
-      'dfs.safemode.min.datanodes': 1
+      'dfs.safemode.min.datanodes': 1,
+      'dfs.namenode.fs-limits.min-block-size': '1000'
     }
     self._hdfs_site = self._tmppath('conf/hdfs-site.xml')
     write_config(hdfs_configs, self._hdfs_site)
