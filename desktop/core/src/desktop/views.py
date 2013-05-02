@@ -37,7 +37,7 @@ from desktop.lib.conf import GLOBAL_CONFIG
 from desktop.lib.django_util import login_notrequired, render_json, render, render_to_string
 from desktop.lib.paths import get_desktop_root
 from desktop.log.access import access_log_level, access_warn
-from desktop.models import UserPreferences
+from desktop.models import UserPreferences, Settings
 from desktop import appmanager
 import desktop.conf
 import desktop.log.log_buffer
@@ -316,10 +316,13 @@ def commonfooter(messages=None):
   """
   if messages is None:
     messages = {}
+
+  hue_settings = Settings.get_settings()
+  print hue_settings.collect_usage
   return render_to_string("common_footer.html", {
     'messages': messages,
     'version': settings.HUE_DESKTOP_VERSION,
-    'display_analytics': True
+    'collect_usage': hue_settings.collect_usage
   })
 
 

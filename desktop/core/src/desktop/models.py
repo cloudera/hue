@@ -27,4 +27,9 @@ class UserPreferences(models.Model):
 
 
 class Settings(models.Model):
-  usage_collection = models.BooleanField(db_index=True, default=True)
+  collect_usage = models.BooleanField(db_index=True, default=True)
+
+  @classmethod
+  def get_settings(cls):
+    settings, created = Settings.objects.get_or_create(id=1)
+    return settings
