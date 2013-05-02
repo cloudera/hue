@@ -255,13 +255,13 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
               <div class="pull-right">
                   ${ _('Status:') } <a data-bind="text: status, visible: absoluteUrl != '', attr: {'href': absoluteUrl}" target="_blank"/> <i class="icon-share-alt"></i>
               </div>
-              <h4>${ _('Progress:') } <span data-bind="text: progress"></span>${ _('%') }</h4>
+              <h4>${ _('Progress:') } <span data-bind="text: progress"></span>${ _('%') } <img src="/static/art/spinner.gif" data-bind="visible: progress != 100"/></h4>
               <div data-bind="css: {'progress': name != '', 'progress-striped': name != '', 'active': status == 'RUNNING'}" style="margin-top:10px">
                 <div data-bind="css: {'bar': name != '', 'bar-success': status == 'SUCCEEDED' || status == 'OK', 'bar-warning': status == 'RUNNING' || status == 'PREP', 'bar-danger': status != 'RUNNING' && status != 'SUCCEEDED' && status != 'OK' && status != 'PREP' && status != 'SUSPENDED'}, attr: {'style': 'width:' + progressPercent}"></div>
               </div>
             </div>
           </script>
-          <pre id="withoutLogs" class="hide"><img src="/static/art/spinner.gif" /> ${ _('No available logs.') }</pre>
+          <pre id="withoutLogs" class="hide">${ _('No available logs.') }</pre>
           <pre id="withLogs" class="hide scroll"></pre>
         </div>
 
@@ -269,13 +269,16 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
   </div>
 
   <div id="dashboard" class="row-fluid mainSection hide">
-    <ul class="nav nav-tabs">
-      <li class="active"><a href="#runningScripts" data-toggle="tab">${ _('Running') }</a></li>
-      <li><a href="#completedScripts" data-toggle="tab">${ _('Completed') }</a></li>
-    </ul>
-    <div class="tab-content">
-      <div class="tab-pane active" id="runningScripts">
-        <div class="alert alert-info" data-bind="visible: runningScripts().length == 0">
+
+    <div class="widget-box">
+      <div class="widget-title">
+        <span class="icon">
+          <i class="icon-cogs"></i>
+        </span>
+        <h5>${ _('Running') }</h5>
+      </div>
+      <div class="widget-content">
+        <div class="alert alert-info" data-bind="visible: runningScripts().length == 0" style="margin-bottom:0">
           ${_('There are currently no running scripts.')}
         </div>
         <table class="table table-striped table-condensed datatables tablescroller-disable" data-bind="visible: runningScripts().length > 0">
@@ -292,7 +295,16 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
           </tbody>
         </table>
       </div>
-      <div class="tab-pane" id="completedScripts">
+    </div>
+
+    <div class="widget-box">
+      <div class="widget-title">
+        <span class="icon">
+          <i class="icon-th-list"></i>
+        </span>
+        <h5>${ _('Completed') }</h5>
+      </div>
+      <div class="widget-content">
         <div class="alert alert-info" data-bind="visible: completedScripts().length == 0">
           ${_('There are currently no completed scripts.')}
         </div>
@@ -465,6 +477,9 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
     var USER_HOME = "/user/${ user }/";
 
     var scriptEditor = $("#scriptEditor")[0];
+
+    var logsAtEnd = true;
+    var forceLogsAtEnd = false;
 
     function storeVariables() {
       CodeMirror.availableVariables = [];
@@ -663,6 +678,13 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
       window.clearInterval(logsRefreshInterval);
     });
 
+    $(document).on("clearLogs", function () {
+      $("#withoutLogs").removeClass("hide");
+      $("#withLogs").text("").addClass("hide");
+      logsAtEnd = true;
+      forceLogsAtEnd = true;
+    });
+
     var _resizeTimeout = -1;
     $(window).on("resize", function () {
       window.clearTimeout(_resizeTimeout);
@@ -695,8 +717,6 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
       });
     }
 
-    var logsAtEnd = true;
-
     function refreshLogs() {
       if (viewModel.currentScript().watchUrl() != "") {
         $.getJSON(viewModel.currentScript().watchUrl(), function (data) {
@@ -708,11 +728,14 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
             }
             var _logsEl = $("#withLogs");
             var newLines = data.logs.pig.split("\n").slice(_logsEl.text().split("\n").length);
-            _logsEl.text(_logsEl.text() + newLines.join("\n"));
+            if (newLines.length > 0){
+              _logsEl.text(_logsEl.text() + newLines.join("\n") + "\n");
+            }
             window.setTimeout(function () {
               resizeLogs();
-              if (logsAtEnd) {
+              if (logsAtEnd || forceLogsAtEnd) {
                 _logsEl.scrollTop(_logsEl[0].scrollHeight - _logsEl.height());
+                forceLogsAtEnd = false;
               }
             }, 100);
           }
@@ -833,6 +856,7 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
             if (viewModel.isDashboardLoaded) {
               window.clearInterval(dashboardLoadedInterval);
               viewModel.loadScript(scriptId);
+              $(document).trigger("loadEditor");
               if (viewModel.currentScript().id() == -1) {
                 viewModel.newScript();
               }
