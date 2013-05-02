@@ -100,28 +100,11 @@ limitations under the License.
       {% if display_analytics %}
 
       var _gaq = _gaq || [];
-      _gaq.push(['_setAccount', 'UA-37637545-1']);
+      _gaq.push(['_setAccount', 'UA-40351920-1']);
 
       var _pathName = location.pathname;
-      if (_pathName.indexOf("oozie") > -1){
-        if (_pathName.indexOf("list_oozie_") > -1 || _pathName == "/oozie/"){
-          _pathName = "oozie/dashboard";
-        }
-        else {
-          if (_pathName.indexOf("workflow") > -1){
-            _pathName = "oozie/workflows";
-          }
-          else if (_pathName.indexOf("coordinator") > -1){
-            _pathName = "oozie/coordinators";
-          }
-          else {
-            _pathName = "oozie/bundles";
-          }
-        }
-      }
-      else {
-        _pathName = _pathName.substr(1).split("/")[0];
-      }
+      var _splits = _pathName.substr(1).split("/");
+      _pathName = _splits[0] + (_splits.length > 1 && $.trim(_splits[1]) != "" ? "/" + _splits[1] : "");
 
       _gaq.push(['_trackPageview', '/remote/{{ version }}/' + _pathName]);
 
