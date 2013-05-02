@@ -97,7 +97,6 @@ ${ commonheader(_('Tables'), 'metastore', user) | n,unicode }
 
 <link rel="stylesheet" href="/metastore/static/css/metastore.css" type="text/css">
 
-<script src="/static/ext/js/jquery/plugins/jquery.cookie.js"></script>
 <script src="/static/ext/js/knockout-2.1.0.js" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript" charset="utf-8">

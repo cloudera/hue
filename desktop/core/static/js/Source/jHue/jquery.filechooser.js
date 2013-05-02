@@ -39,6 +39,7 @@
                 UPLOAD_FILE: "Upload a file",
                 FAILED: "Failed"
             },
+            user: "",
             onFileChoose:function () {
             },
             onFolderChoose:function () {
@@ -47,7 +48,8 @@
             },
             onError:function () {
             }
-        };
+        },
+        STORAGE_PREFIX = "hueFileBrowserLastPathForUser_";
 
     function Plugin(element, options) {
         this.element = element;
@@ -77,8 +79,8 @@
           if ($.trim(this.options.initialPath) != "") {
             this.navigateTo(this.options.initialPath);
           }
-          else if ($.cookie("hueFileBrowserLastPath") != null) {
-            this.navigateTo($.cookie("hueFileBrowserLastPath"));
+          else if ($.totalStorage(STORAGE_PREFIX + this.options.user) != null) {
+            this.navigateTo($.totalStorage(STORAGE_PREFIX + this.options.user));
           }
           else {
             this.navigateTo("/?default_to_home");
@@ -111,7 +113,7 @@
                     _parent.navigateTo(data.view.dirname);
                     return;
                 }
-                $.cookie("hueFileBrowserLastPath", path, { expires: 90 });
+                $.totalStorage(STORAGE_PREFIX + _parent.options.user, path);
                 _parent.previousPath = path;
                 var _breadcrumbs = $("<ul>").addClass("hueBreadcrumb").css("padding", "0");
                 var _home = $("<li>");
@@ -294,8 +296,8 @@
         if ($.trim(this.options.initialPath) != "") {
             this.navigateTo(this.options.initialPath);
         }
-        else if ($.cookie("hueFileBrowserLastPath") != null) {
-            this.navigateTo($.cookie("hueFileBrowserLastPath"));
+        else if ($.totalStorage(STORAGE_PREFIX + this.options.user) != null) {
+            this.navigateTo($.totalStorage(STORAGE_PREFIX + this.options.user));
         }
         else {
             this.navigateTo("/?default_to_home");

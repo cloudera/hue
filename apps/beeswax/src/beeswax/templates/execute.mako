@@ -439,8 +439,6 @@ ${layout.menubar(section='query')}
 
 </style>
 
-<script src="/static/ext/js/jquery/plugins/jquery.cookie.js"></script>
-<script src="/static/ext/js/jquery/plugins/jquery.total-storage.min.js"></script>
 <script src="/static/ext/js/jquery/plugins/jquery-fieldselection.js" type="text/javascript"></script>
 
 <script type="text/javascript" charset="utf-8">

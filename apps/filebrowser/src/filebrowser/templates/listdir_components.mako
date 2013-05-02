@@ -33,7 +33,6 @@ from django.utils.translation import ugettext as _
 </%def>
 
 <%def name="_table(files, path, current_request_path, view)">
-    <script src="/static/ext/js/jquery/plugins/jquery.cookie.js"></script>
     <script src="/static/ext/js/knockout-2.1.0.js" type="text/javascript" charset="utf-8"></script>
     <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
     <style type="text/css">
