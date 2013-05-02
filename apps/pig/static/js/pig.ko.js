@@ -439,6 +439,8 @@ var PigViewModel = function (props) {
     self.loadScript(workflow.scriptId);
     self.currentScript().isRunning(true);
     self.currentScript().watchUrl(workflow.watchUrl);
+    $(document).trigger("loadEditor");
+    $(document).trigger("clearLogs");
     $(document).trigger("startLogsRefresh");
     $(document).trigger("showLogs");
   };
@@ -470,7 +472,9 @@ var PigViewModel = function (props) {
             $("#logsModal pre").removeClass("hide");
             var _logsEl = $("#logsModal pre");
             var newLines = data.logs.pig.split("\n").slice(_logsEl.text().split("\n").length);
-            _logsEl.text(_logsEl.text() + newLines.join("\n"));
+            if (newLines.length > 0){
+              _logsEl.text(_logsEl.text() + newLines.join("\n") + "\n");
+            }
             if (self.showLogsAtEnd) {
               _logsEl.scrollTop(_logsEl[0].scrollHeight - _logsEl.height());
             }
