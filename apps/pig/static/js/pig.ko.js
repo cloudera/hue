@@ -80,6 +80,7 @@ var Workflow = function (wf) {
   return {
     id: wf.id,
     scriptId: wf.scriptId,
+    scriptContent: wf.scriptContent,
     lastModTime: wf.lastModTime,
     endTime: wf.endTime,
     status: wf.status,
@@ -437,6 +438,7 @@ var PigViewModel = function (props) {
 
   self.viewSubmittedScript = function (workflow) {
     self.loadScript(workflow.scriptId);
+    self.currentScript().script(workflow.scriptContent);
     self.currentScript().isRunning(true);
     self.currentScript().watchUrl(workflow.watchUrl);
     $(document).trigger("loadEditor");

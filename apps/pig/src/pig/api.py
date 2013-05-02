@@ -174,6 +174,7 @@ class OozieApi:
         'duration': job.endTime and job.startTime and format_duration_in_millis(( time.mktime(job.endTime) - time.mktime(job.startTime) ) * 1000) or None,
         'appName': hue_pig and hue_pig.dict['name'] or _('Unsaved script'),
         'scriptId': hue_pig and hue_pig.id or -1,
+        'scriptContent': hue_pig and hue_pig.dict['script'] or '',
         'progress': get_progress(job),
         'progressPercent': '%d%%' % get_progress(job),
         'user': job.user,
