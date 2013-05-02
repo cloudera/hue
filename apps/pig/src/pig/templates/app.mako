@@ -666,6 +666,7 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
 
     var logsRefreshInterval;
     $(document).on("startLogsRefresh", function () {
+      logsAtEnd = true;
       window.clearInterval(logsRefreshInterval);
       $("#withLogs").text("");
       refreshLogs();
