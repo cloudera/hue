@@ -867,15 +867,20 @@ def list_history_record(request, record_id):
 
 
 def install_examples(request):
+  result = {'status': -1, 'message': ''}
+
   if request.method != 'POST':
-    raise PopupException(_('A POST request is required.'))
-  try:
-    oozie_setup.Command().handle_noargs()
-    activate_translation(request.LANGUAGE_CODE)
-    request.info(_('Workspaces and examples installed.'))
-  except WebHdfsException, e:
-    raise PopupException(_('The app setup could complete.'), detail=e)
-  return redirect(reverse('oozie:list_workflows'))
+    result['message'] = _('A POST request is required.')
+  else:
+    try:
+      oozie_setup.Command().handle_noargs()
+      activate_translation(request.LANGUAGE_CODE)
+      result['status'] = 0
+    except Exception, e:
+      LOG.exception(e)
+      result['message'] = str(e)
+
+  return HttpResponse(json.dumps(result), mimetype="application/json")
 
 
 def jasmine(request):
