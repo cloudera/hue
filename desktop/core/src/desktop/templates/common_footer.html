@@ -97,11 +97,12 @@ limitations under the License.
         $(".btn-primary:not(.disable-feedback), .btn-danger:not(.disable-feedback)").button("reset");
       }
 
-      {% if display_analytics %}
+      {% if collect_usage %}
 
       var _gaq = _gaq || [];
       _gaq.push(['_setAccount', 'UA-40351920-1']);
 
+      // We collect only 2 path levels: not hostname, no IDs, no anchors...
       var _pathName = location.pathname;
       var _splits = _pathName.substr(1).split("/");
       _pathName = _splits[0] + (_splits.length > 1 && $.trim(_splits[1]) != "" ? "/" + _splits[1] : "");

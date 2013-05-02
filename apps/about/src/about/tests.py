@@ -15,13 +15,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+try:
+  import json
+except ImportError:
+  import simplejson as json
+
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
-from nose.tools import assert_true, assert_false
+from nose.tools import assert_true, assert_false, assert_equal
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
+from desktop.models import Settings
 from oozie.tests import OozieBase
 
 
@@ -43,3 +49,25 @@ class TestAbout(TestAboutBase):
 
     response = self.client.get(reverse('about:index'))
     assert_false('Check Configuration' in response.content, response.content)
+
+
+def test_collect_usage():
+  client = make_logged_in_client(username="about", is_superuser=False)
+  grant_access("about", "about", "about")
+
+  collect_usage = Settings.get_settings().collect_usage
+
+  try:
+    response = client.post(reverse('about:collect_usage'), {'collect_usage': False})
+    data = json.loads(response.content)
+    assert_equal(data['status'], 0)
+    assert_false(data['collect_usage'] == True) # Weird but works
+
+    response = client.post(reverse('about:collect_usage'), {'collect_usage': True})
+    data = json.loads(response.content)
+    assert_equal(data['status'], 0)
+    assert_true(data['collect_usage'])
+  finally:
+    settings = Settings.get_settings()
+    settings.collect_usage = collect_usage
+    settings.save()

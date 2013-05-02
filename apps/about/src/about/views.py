@@ -34,11 +34,14 @@ def admin_wizard(request):
   apps = appmanager.get_apps(request.user)
   app_names = [app.name for app in sorted(apps, key=lambda app: app.menu_index)]
 
+  collect_usage = Settings.get_settings().collect_usage
+
   return render('admin_wizard.mako', request, {
       'version': settings.HUE_DESKTOP_VERSION,
       'check_config': check_config(request),
       'apps': dict([(app.name, app) for app in apps]),
       'app_names': app_names,
+      'collect_usage': collect_usage,
   })
 
 
@@ -46,11 +49,15 @@ def collect_usage(request):
   response = {'status': -1, 'data': ''}
 
   if request.method == 'POST':
-    settings, created = Settings.objects.get_or_create(id=1)
-    settings.usage_collection = request.POST.get('analytics')
-    settings.save()
-    response['status'] = 0
+    try:
+      settings = Settings.get_settings()
+      settings.collect_usage = request.POST.get('collect_usage', False)
+      settings.save()
+      response['status'] = 0
+      response['collect_usage'] = settings.collect_usage
+    except Exception, e:
+      response['data'] = str(e)
   else:
     response['data'] = _('POST request required.')
-      
+
   return HttpResponse(json.dumps(response), mimetype="application/json")

@@ -22,7 +22,11 @@ ${ commonheader(_('Home'), "home", user) | n,unicode }
 
 
 <%def name="app_link(app, label=None, extra_path = '')">
-  <li><a href="/${ app }${ extra_path }"><i class="icon-double-angle-right"></i> ${ label is not None and label or apps[app].nice_name }</a></li>
+  <li>
+    <a href="/${ app }${ extra_path }"  title="${ apps[app].nice_name }" class="app-tooltips">
+      <i class="icon-double-angle-right"></i> ${ label }
+    </a>
+  </li>
 </%def>
 
 <div style="position: absolute;top:80px;right:30px"><img src="/static/art/hue-logo-subtle.png"/></div>
@@ -50,9 +54,9 @@ ${ commonheader(_('Home'), "home", user) | n,unicode }
         </div>
         <div class="widget-content">
           <ul>
-            ${ app_link("beeswax", _('Hive')) }
-            ${ app_link("impala", _('Impala')) }
-            ${ app_link("pig") }
+            ${ app_link("beeswax", "Hive") }
+            ${ app_link("impala", "Impala") }
+            ${ app_link("pig", "Pig") }
             ${ app_link("shell", _('Shell')) }
           </ul>
         </div>
@@ -71,7 +75,7 @@ ${ commonheader(_('Home'), "home", user) | n,unicode }
           <ul>
             ${ app_link("filebrowser", _('Files')) }
             ${ app_link("jobbrowser", _('Jobs')) }
-            ${ app_link("catalog", _('Tables')) }
+            ${ app_link("metastore", _('Tables')) }
             ${ app_link("jobsub", _('Designs')) }
           </ul>
         </div>
@@ -95,7 +99,12 @@ ${ commonheader(_('Home'), "home", user) | n,unicode }
       </div>
     </div>
   </div>
-
 </div>
+
+<script type="text/javascript" charset="utf-8">
+  $(document).ready(function(){
+    $(".app-tooltips").tooltip();
+  });
+</script>
 
 ${ commonfooter(messages) | n,unicode }

@@ -120,9 +120,9 @@ ${ commonheader(_('Quick Start'), "quick_start", user, "100px") | n,unicode }
 	      <a  href="${ url('useradmin.views.list_users') }" target="_blank">${ _('User Admin') } <img src="/useradmin/static/art/icon_useradmin_24.png"></a>
         </div>
       </div>
-      
+
       <br/>
-      
+
       <div class="widget-box">
         <div class="widget-title">
           <span class="icon">
@@ -132,11 +132,16 @@ ${ commonheader(_('Quick Start'), "quick_start", user, "100px") | n,unicode }
         </div>
         <div class="widget-content" style="padding-left: 14px">
           <label class="checkbox">
-          <input id="analyticsBtn" type="checkbox" name="analytics" style="margin-right: 10px" title="${ ('Check to enable usage analytics') }">
-              ${ ('Help improve Hue with anonymous usage analytics.') } <a href="javascript:void(0)" style="display: inline" data-trigger="hover" data-toggle="popover" data-placement="right" rel="popover" title="${_('How does it work?') }" data-content="${ ('We are using Google Analytics to track how many times an application or specific section of an application is used, nothing more.') }" ><i class="icon-question-sign"></i></a>
-            </label>
+            <input id="collectUsageBtn" type="checkbox" name="collect_usage" style="margin-right: 10px" title="${ ('Check to enable usage analytics') }" ${ collect_usage and "checked" }/>
+            ${ ('Help improve Hue with anonymous usage analytics.') }
+            <a href="javascript:void(0)" style="display: inline" data-trigger="hover" data-toggle="popover" data-placement="right" rel="popover"
+               title="${_('How does it work?') }"
+               data-content="${ ('We are using Google Analytics to see how many times an application or specific section of an application is used, nothing more.') }">
+               <i class="icon-question-sign"></i>
+            </a>
+          </label>
         </div>
-      </div>      
+      </div>
     </div>
 
     <div id="step4" class="stepDetails hide">
@@ -245,11 +250,15 @@ $(document).ready(function(){
       routie("step" + nextStep);
     }
   });
-  
-  $("#analyticsBtn").click(function () {
-    $.post("${ url('about:collect_usage') }", function(data) {
-      $.jHueNotify.info(data);
-    });    
+
+  $("#collectUsageBtn").click(function () {
+    $.post("${ url('about:collect_usage') }", $("input").serialize(), function(data) {
+      if (data.status == 0) {
+        $.jHueNotify.info('${ _("Configuration updated") }');
+      } else {
+        $.jHueNotify.error(data.data);
+      }
+    });
   });
 });
 </script>
