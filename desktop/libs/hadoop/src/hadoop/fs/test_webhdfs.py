@@ -15,11 +15,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""
-Tests for Hadoop FS.
-"""
-from nose.tools import assert_false, assert_true, assert_equals, assert_raises, assert_not_equals
-from nose.plugins.attrib import attr
+
 import logging
 import posixfile
 import random
@@ -27,11 +23,14 @@ import sys
 import threading
 import unittest
 
-from hadoop import conf, pseudo_hdfs4
+from nose.tools import assert_false, assert_true, assert_equals, assert_raises, assert_not_equals
+
+from hadoop import pseudo_hdfs4
 from hadoop.fs.exceptions import WebHdfsException
 from hadoop.fs.hadoopfs import Hdfs
 
 LOG = logging.getLogger(__name__)
+
 
 class WebhdfsTests(unittest.TestCase):
   requires_hadoop = True
