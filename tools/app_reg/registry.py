@@ -37,7 +37,7 @@ class AppRegistry(object):
   """
   def __init__(self):
     """Open the existing registry"""
-    self._reg_path = os.path.join(common.INSTALL_ROOT, 'app.reg')
+    self._reg_path = os.path.join(os.environ.get("HUE_APP_REG_DIR", common.INSTALL_ROOT), 'app.reg')
     self._initialized = False
     self._apps = { }    # Map of name -> HueApp
     self._open()
