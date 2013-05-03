@@ -800,9 +800,6 @@ for x in sys.stdin:
 
 
   def test_install_examples(self):
-    """
-    Test installation of examples
-    """
     assert_true(not beeswax.models.MetaInstall.get().installed_example)
 
     # Check popup
@@ -823,19 +820,9 @@ for x in sys.stdin:
     assert_true('Sample: Top salary' in resp.content)
     assert_true(beeswax.models.MetaInstall.get().installed_example)
 
-    # Now install it a second time, and expect an error
+    # Now install it a second time, and no error
     resp = self.client.post('/beeswax/install_examples')
-    assert_true('true' in resp.content)
-    assert_equal('', json.loads(resp.content)['message'])
-
-    # First, unset the db entry to allow installation to re-run
-    meta = beeswax.models.MetaInstall.get()
-    meta.installed_example = False
-    meta.save()
-
-    # Now it should complain
-    resp = self.client.post('/beeswax/install_examples')
-    assert_true('true' in resp.content)
+    assert_equal(0, json.loads(resp.content)['status'])
     assert_equal('', json.loads(resp.content)['message'])
 
 

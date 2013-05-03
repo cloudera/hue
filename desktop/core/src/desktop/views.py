@@ -318,7 +318,7 @@ def commonfooter(messages=None):
     messages = {}
 
   hue_settings = Settings.get_settings()
-  print hue_settings.collect_usage
+
   return render_to_string("common_footer.html", {
     'messages': messages,
     'version': settings.HUE_DESKTOP_VERSION,

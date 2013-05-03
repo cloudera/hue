@@ -862,24 +862,21 @@ Other views
 """
 
 def install_examples(request):
-  """
-  Handle installing sample data and example queries.
-  """
+  response = {'status': -1, 'message': ''}
+
   if request.method == 'POST':
-    result = {}
-    result['creationSucceeded'] = False
-    result['message'] = ''
     try:
-      beeswax.management.commands.beeswax_install_examples.Command().handle_noargs()
-      if models.MetaInstall.get().installed_example:
-        result['creationSucceeded'] = True
+      app_name = get_app_name(request)
+      beeswax.management.commands.beeswax_install_examples.Command().handle_noargs(app_name=app_name)
+      response['status'] = 0
     except Exception, err:
       LOG.exception(err)
-      result['message'] = str(err)
-    return HttpResponse(json.dumps(result), mimetype="application/json")
+      response['message'] = str(err)
   else:
-    return render('confirm.html', request,
-                  {'url': request.path, 'title': _('Install sample tables and Beeswax examples?')})
+    response['message'] = _('A POST request is required.')
+
+  return HttpResponse(json.dumps(response), mimetype="application/json")
+
 
 
 

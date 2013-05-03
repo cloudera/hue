@@ -15,23 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-Install sample table data and designs.
-
-Expects 2 files in the beeswax.conf.LOCAL_EXAMPLES_DATA_DIR:
-  - tables.json: Describes the list of tables to create. Each item in the list has
-    the key-value pairs:
-      * table_name: the table name
-      * data_file: path of the data file, relative to LOCAL_EXAMPLES_DATA_DIR
-      * create_hql: the hql to create this table
-  - designs.json: Describes the list of designs to populate. Each item in the list
-    has key-value pairs:
-      * name: design name
-      * desc: design description
-      * type: HQL design type
-      * data: the json design data
-"""
-
 import logging
 import os
 import pwd
@@ -41,10 +24,11 @@ from django.core.management.base import NoArgsCommand
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 
+import beeswax.conf
 import hive_metastore.ttypes
 from beeswaxd.ttypes import BeeswaxException
-
-import beeswax.conf
+from beeswax.models import SavedQuery
+from beeswax.server.dbms import get_query_server_config
 
 from beeswax import models
 from beeswax.design import hql_query
@@ -73,35 +57,17 @@ class InstallException(Exception):
 
 class Command(NoArgsCommand):
   """
-  The handler for the sample installation action.
+  Install examples but do not overwrite them.
   """
-
   def handle_noargs(self, **options):
     """Main entry point to install or re-install examples. May raise InstallException"""
-
     try:
       user = self._install_user()
-      self._install_tables(user)
-      self._install_queries(user)
-      self._set_installed()
-      LOG.info('Beeswax examples installed')
+      self._install_tables(user, options['app_name'])
+      self._install_queries(user, options['app_name'])
     except Exception, ex:
       LOG.exception(ex)
-      LOG.error('Beeswax examples installation failed: %s' % (ex,))
       raise InstallException(ex)
-
-
-  def _check_installed(self):
-    """_check_installed() -> True/False whether examples have been installed"""
-    model = models.MetaInstall.get()
-    return model.installed_example
-
-  def _set_installed(self):
-    """_set_installed() -> Set that the examples have been installed"""
-    model = models.MetaInstall.get()
-    model.installed_example = True
-    model.save()
-
 
   def _install_user(self):
     """
@@ -115,50 +81,45 @@ class Command(NoArgsCommand):
       LOG.info('Installed a user called "%s"' % (USERNAME,))
     return user
 
-  def _install_tables(self, django_user):
-    """
-    Install the tables into HDFS and create them in Hive.
-    """
+  def _install_tables(self, django_user, app_name):
     data_dir = beeswax.conf.LOCAL_EXAMPLES_DATA_DIR.get()
     table_file = file(os.path.join(data_dir, 'tables.json'))
     table_list = simplejson.load(table_file)
     table_file.close()
 
     for table_dict in table_list:
-      table = SampleTable(table_dict)
+      table = SampleTable(table_dict, app_name)
       try:
         table.install(django_user)
       except Exception, ex:
         LOG.exception(ex)
         LOG.error('Could not install table: %s' % (ex,))
-    LOG.info('Successfully created sample tables with data')
 
-  def _install_queries(self, django_user):
-    """
-    Install design designs.
-    """
+  def _install_queries(self, django_user, app_name):
     design_file = file(os.path.join(beeswax.conf.LOCAL_EXAMPLES_DATA_DIR.get(), 'designs.json'))
     design_list = simplejson.load(design_file)
     design_file.close()
 
     for design_dict in design_list:
+      if app_name == 'impala':
+        design_dict['type'] = SavedQuery.IMPALA
       design = SampleDesign(design_dict)
       try:
         design.install(django_user)
       except Exception, ex:
         LOG.exception(ex)
         LOG.error('Could not install query: %s' % (ex,))
-    LOG.info('Successfully installed all sample queries')
 
 
 class SampleTable(object):
   """
   Represents a table loaded from the tables.json file
   """
-  def __init__(self, data_dict):
+  def __init__(self, data_dict, app_name):
     self.name = data_dict['table_name']
     self.filename = data_dict['data_file']
     self.hql = data_dict['create_hql']
+    self.query_server = get_query_server_config(app_name)
 
     # Sanity check
     self._data_dir = beeswax.conf.LOCAL_EXAMPLES_DATA_DIR.get()
@@ -176,23 +137,23 @@ class SampleTable(object):
     """
     Create in Hive. Raise InstallException on failure.
     """
-    # Create table
     LOG.info('Creating table "%s"' % (self.name,))
+    db = dbms.get(django_user, self.query_server)
+
     try:
       # Already exists?
-      dbms.get(django_user).get_table('default', self.name)
+      db.get_table('default', self.name)
       msg = _('Table "%(table)s" already exists.') % {'table': self.name}
       LOG.error(msg)
-      raise InstallException(msg)
-    except hive_metastore.ttypes.NoSuchObjectException:
+    except Exception:
       query = hql_query(self.hql)
       try:
-        results = dbms.get(django_user).execute_and_wait(query)
+        results = db.execute_and_wait(query)
         if not results:
           msg = _('Error creating table %(table)s: Operation timeout.') % {'table': self.name}
           LOG.error(msg)
           raise InstallException(msg)
-      except BeeswaxException, ex:
+      except Exception, ex:
         msg = _('Error creating table %(table)s: %(error)s') % {'table': self.name, 'error': ex}
         LOG.error(msg)
         raise InstallException(msg)
@@ -211,7 +172,7 @@ class SampleTable(object):
     hql = LOAD_HQL % dict(tablename=self.name, filename=self._contents_file)
     query = hql_query(hql)
     try:
-      results = dbms.get(django_user).execute_and_wait(query)
+      results = dbms.get(django_user, self.query_server).execute_and_wait(query)
       if not results:
         msg = _('Error loading table %(table)s: Operation timeout.') % {'table': self.name}
         LOG.error(msg)
@@ -223,7 +184,7 @@ class SampleTable(object):
 
 
 class SampleDesign(object):
-  """Represents a design loaded from the designs.json file"""
+  """Represents a query loaded from the designs.json file"""
   def __init__(self, data_dict):
     self.name = data_dict['name']
     self.desc = data_dict['desc']
@@ -232,12 +193,12 @@ class SampleDesign(object):
 
   def install(self, django_user):
     """
-    Install design. Raise InstallException on failure.
+    Install queries. Raise InstallException on failure.
     """
-    LOG.info('Installing sample design: %s' % (self.name,))
+    LOG.info('Installing sample query: %s' % (self.name,))
     try:
       # Don't overwrite
-      model = models.SavedQuery.objects.get(owner=django_user, name=self.name)
+      model = models.SavedQuery.objects.get(owner=django_user, name=self.name, type=self.type)
       msg = _('Sample design %(name)s already exists.') % {'name': self.name}
       LOG.error(msg)
       raise InstallException(msg)

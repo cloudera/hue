@@ -743,7 +743,7 @@ class PrincipalPrivilegeSet(object):
       if fid == 1:
         if ftype == TType.MAP:
           self.userPrivileges = {}
-          (_ktype22, _vtype23, _size21 ) = iprot.readMapBegin() 
+          (_ktype22, _vtype23, _size21 ) = iprot.readMapBegin()
           for _i25 in xrange(_size21):
             _key26 = iprot.readString();
             _val27 = []
@@ -760,7 +760,7 @@ class PrincipalPrivilegeSet(object):
       elif fid == 2:
         if ftype == TType.MAP:
           self.groupPrivileges = {}
-          (_ktype35, _vtype36, _size34 ) = iprot.readMapBegin() 
+          (_ktype35, _vtype36, _size34 ) = iprot.readMapBegin()
           for _i38 in xrange(_size34):
             _key39 = iprot.readString();
             _val40 = []
@@ -777,7 +777,7 @@ class PrincipalPrivilegeSet(object):
       elif fid == 3:
         if ftype == TType.MAP:
           self.rolePrivileges = {}
-          (_ktype48, _vtype49, _size47 ) = iprot.readMapBegin() 
+          (_ktype48, _vtype49, _size47 ) = iprot.readMapBegin()
           for _i51 in xrange(_size47):
             _key52 = iprot.readString();
             _val53 = []
@@ -989,7 +989,7 @@ class Database(object):
       elif fid == 4:
         if ftype == TType.MAP:
           self.parameters = {}
-          (_ktype70, _vtype71, _size69 ) = iprot.readMapBegin() 
+          (_ktype70, _vtype71, _size69 ) = iprot.readMapBegin()
           for _i73 in xrange(_size69):
             _key74 = iprot.readString();
             _val75 = iprot.readString();
@@ -1097,7 +1097,7 @@ class SerDeInfo(object):
       elif fid == 3:
         if ftype == TType.MAP:
           self.parameters = {}
-          (_ktype79, _vtype80, _size78 ) = iprot.readMapBegin() 
+          (_ktype79, _vtype80, _size78 ) = iprot.readMapBegin()
           for _i82 in xrange(_size78):
             _key83 = iprot.readString();
             _val84 = iprot.readString();
@@ -1337,7 +1337,7 @@ class StorageDescriptor(object):
       elif fid == 10:
         if ftype == TType.MAP:
           self.parameters = {}
-          (_ktype106, _vtype107, _size105 ) = iprot.readMapBegin() 
+          (_ktype106, _vtype107, _size105 ) = iprot.readMapBegin()
           for _i109 in xrange(_size105):
             _key110 = iprot.readString();
             _val111 = iprot.readString();
@@ -1535,7 +1535,7 @@ class Table(object):
       elif fid == 9:
         if ftype == TType.MAP:
           self.parameters = {}
-          (_ktype124, _vtype125, _size123 ) = iprot.readMapBegin() 
+          (_ktype124, _vtype125, _size123 ) = iprot.readMapBegin()
           for _i127 in xrange(_size123):
             _key128 = iprot.readString();
             _val129 = iprot.readString();
@@ -1734,7 +1734,7 @@ class Partition(object):
       elif fid == 7:
         if ftype == TType.MAP:
           self.parameters = {}
-          (_ktype140, _vtype141, _size139 ) = iprot.readMapBegin() 
+          (_ktype140, _vtype141, _size139 ) = iprot.readMapBegin()
           for _i143 in xrange(_size139):
             _key144 = iprot.readString();
             _val145 = iprot.readString();
@@ -1909,7 +1909,7 @@ class Index(object):
       elif fid == 9:
         if ftype == TType.MAP:
           self.parameters = {}
-          (_ktype150, _vtype151, _size149 ) = iprot.readMapBegin() 
+          (_ktype150, _vtype151, _size149 ) = iprot.readMapBegin()
           for _i153 in xrange(_size149):
             _key154 = iprot.readString();
             _val155 = iprot.readString();
@@ -2034,7 +2034,7 @@ class Schema(object):
       elif fid == 2:
         if ftype == TType.MAP:
           self.properties = {}
-          (_ktype165, _vtype166, _size164 ) = iprot.readMapBegin() 
+          (_ktype165, _vtype166, _size164 ) = iprot.readMapBegin()
           for _i168 in xrange(_size164):
             _key169 = iprot.readString();
             _val170 = iprot.readString();

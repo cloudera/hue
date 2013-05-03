@@ -61,8 +61,7 @@ def create_table(request, database='default'):
       if form.is_valid():
         columns = [ f.cleaned_data for f in form.columns.forms ]
         partition_columns = [ f.cleaned_data for f in form.partitions.forms ]
-        proposed_query = django_mako.render_to_string("create_table_statement.mako",
-          {
+        proposed_query = django_mako.render_to_string("create_table_statement.mako", {
             'database': database,
             'table': form.table.cleaned_data,
             'columns': columns,
@@ -231,8 +230,7 @@ def import_wizard(request, database='default'):
       if do_hive_create:
         delim = s2_delim_form.cleaned_data['delimiter']
         table_name = s1_file_form.cleaned_data['name']
-        proposed_query = django_mako.render_to_string("create_table_statement.mako",
-          {
+        proposed_query = django_mako.render_to_string("create_table_statement.mako", {
             'table': dict(name=table_name,
                           comment=s1_file_form.cleaned_data['comment'],
                           row_format='Delimited',
@@ -289,8 +287,7 @@ def _delim_preview(fs, file_form, encoding, file_types, delimiters):
   path = file_form.cleaned_data['path']
   try:
     file_obj = fs.open(path)
-    delim, file_type, fields_list = _parse_fields(
-              path, file_obj, encoding, file_types, delimiters)
+    delim, file_type, fields_list = _parse_fields(path, file_obj, encoding, file_types, delimiters)
     file_obj.close()
   except IOError, ex:
     msg = "Failed to open file '%s': %s" % (path, ex)

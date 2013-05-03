@@ -866,7 +866,7 @@ def list_history_record(request, record_id):
   })
 
 
-def setup_app(request):
+def install_examples(request):
   if request.method != 'POST':
     raise PopupException(_('A POST request is required.'))
   try:

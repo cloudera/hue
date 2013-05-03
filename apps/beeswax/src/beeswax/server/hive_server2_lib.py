@@ -439,10 +439,12 @@ class HiveServerClient:
 
 
   def get_log(self, operation_handle):
-    req = TGetLogReq(operationHandle=operation_handle)
-    res = self.call(self._client.GetLog, req)
-
-    return res.log
+    try:
+      req = TGetLogReq(operationHandle=operation_handle)
+      res = self.call(self._client.GetLog, req)
+      return res.log
+    except:
+      return 'Server does not support GetLog()'
 
 
   def get_partitions(self, database, table_name, max_parts):

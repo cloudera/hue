@@ -4900,7 +4900,7 @@ class get_type_all_result(object):
       if fid == 0:
         if ftype == TType.MAP:
           self.success = {}
-          (_ktype189, _vtype190, _size188 ) = iprot.readMapBegin() 
+          (_ktype189, _vtype190, _size188 ) = iprot.readMapBegin()
           for _i192 in xrange(_size188):
             _key193 = iprot.readString();
             _val194 = Type()
@@ -9575,7 +9575,7 @@ class partition_name_to_spec_result(object):
       if fid == 0:
         if ftype == TType.MAP:
           self.success = {}
-          (_ktype352, _vtype353, _size351 ) = iprot.readMapBegin() 
+          (_ktype352, _vtype353, _size351 ) = iprot.readMapBegin()
           for _i355 in xrange(_size351):
             _key356 = iprot.readString();
             _val357 = iprot.readString();

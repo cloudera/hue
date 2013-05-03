@@ -91,7 +91,7 @@ class TInsertResult(object):
       if fid == 1:
         if ftype == TType.MAP:
           self.rows_appended = {}
-          (_ktype1, _vtype2, _size0 ) = iprot.readMapBegin() 
+          (_ktype1, _vtype2, _size0 ) = iprot.readMapBegin()
           for _i4 in xrange(_size0):
             _key5 = iprot.readString();
             _val6 = iprot.readI64();
