@@ -153,13 +153,20 @@ class OozieApi:
       i = logs.index(group.group(1)) + len(group.group(1))
       return logs[i:]
 
-  def massaged_jobs_for_json(self, oozie_jobs, hue_jobs):
+  def massaged_jobs_for_json(self, request, oozie_jobs, hue_jobs):
     jobs = []
     hue_jobs = dict([(script.dict.get('job_id'), script) for script in hue_jobs if script.dict.get('job_id')])
 
     for job in oozie_jobs:
       if job.is_running():
         job = get_oozie().get_job(job.id)
+        get_copy = request.GET.copy() # Hacky, would need to refactor JobBrowser get logs
+        get_copy['format'] = 'python'
+        request.GET = get_copy
+        logs, workflow_action = self.get_log(request, job)
+        progress = workflow_action[0]['progress']
+      else:
+        progress = 100
 
       hue_pig = hue_jobs.get(job.id) and hue_jobs.get(job.id) or None
 
@@ -175,8 +182,8 @@ class OozieApi:
         'appName': hue_pig and hue_pig.dict['name'] or _('Unsaved script'),
         'scriptId': hue_pig and hue_pig.id or -1,
         'scriptContent': hue_pig and hue_pig.dict['script'] or '',
-        'progress': get_progress(job),
-        'progressPercent': '%d%%' % get_progress(job),
+        'progress': progress,
+        'progressPercent': '%d%%' % progress,
         'user': job.user,
         'absoluteUrl': job.get_absolute_url(),
         'canEdit': has_job_edition_permission(job, self.user),
@@ -192,16 +199,14 @@ class OozieApi:
 
     return jobs
 
-def get_progress(job, log=None):
+def get_progress(job, log):
   if job.status in ('SUCCEEDED', 'KILLED', 'FAILED'):
     return 100
-  elif log:
+  else:
     try:
       return int(re.findall("MapReduceLauncher  - (1?\d?\d)% complete", log)[-1])
     except:
       return 0
-  else:
-    return 0
 
 
 def format_time(st_time):

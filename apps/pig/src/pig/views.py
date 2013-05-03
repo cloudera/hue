@@ -56,7 +56,7 @@ def dashboard(request):
 
   jobs = pig_api.get_jobs()
   hue_jobs = PigScript.objects.filter(owner=request.user)
-  massaged_jobs = pig_api.massaged_jobs_for_json(jobs, hue_jobs)
+  massaged_jobs = pig_api.massaged_jobs_for_json(request, jobs, hue_jobs)
 
   return HttpResponse(json.dumps(massaged_jobs), mimetype="application/json")
 
