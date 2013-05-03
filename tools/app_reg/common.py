@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import glob
+import logging
 import os.path
 
 # The root of the Hue installation
@@ -32,3 +34,17 @@ ENV_PYTHON = os.path.join(VIRTUAL_ENV, 'bin', 'python')
 def cmp_version(ver1, ver2):
   """Compare two version strings in the form of 1.2.34"""
   return cmp(ver1.split('.'), ver2.split('.'))
+
+def _get_python_lib_dir():
+  glob_path = os.path.join(VIRTUAL_ENV, 'lib', 'python*')
+  res = glob.glob(glob_path)
+  if len(res) == 0:
+    raise SystemError("Cannot find a Python installation in %s. "
+                      "Did you do `make hue'?" % glob_path)
+  elif len(res) > 1:
+    raise SystemError("Found multiple Python installations in %s. "
+                      "Please `make clean' first." % glob_path)
+  return res[0]
+
+def _get_python_site_packages_dir():
+  return os.path.join(_get_python_lib_dir(), 'site-packages')
