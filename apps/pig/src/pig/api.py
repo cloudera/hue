@@ -71,8 +71,8 @@ class OozieApi:
 
       pig_params = []
       for param in json.loads(params):
-        pig_params.append({"type":"argument","value":"-param"})
-        pig_params.append({"type":"argument","value":"%(name)s=%(value)s" % param})
+        pig_params.append({"type": "argument", "value": "-param"})
+        pig_params.append({"type": "argument", "value": "%(name)s=%(value)s" % param})
 
       files = []
       archives = []

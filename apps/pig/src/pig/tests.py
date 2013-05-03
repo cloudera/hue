@@ -34,20 +34,22 @@ from oozie.tests import OozieBase
 
 
 class TestPigBase(object):
+  SCRIPT_ATTRS = {
+      'id': 1000,
+      'name': 'Test',
+      'script': 'A = LOAD "$data"; STORE A INTO "$output";',
+      'parameters': [],
+      'resources': [],
+  }
+
   def setUp(self):
     self.c = make_logged_in_client(is_superuser=False)
     grant_access("test", "test", "pig")
     self.user = User.objects.get(username='test')
 
   def create_script(self):
-    attrs = {
-      'id': 1000,
-      'name': 'Test',
-      'script': 'A = LOAD "$data"; STORE A INTO "$output";',
-      'user': self.user,
-      'parameters': [],
-      'resources': [],
-    }
+    attrs = {'user': self.user,}
+    attrs.update(TestPigBase.SCRIPT_ATTRS)
     return create_or_update_script(**attrs)
 
 
@@ -56,6 +58,18 @@ class TestMock(TestPigBase):
   def test_create_script(self):
     pig_script = self.create_script()
     assert_equal('Test', pig_script.dict['name'])
+
+  def test_save(self):
+    attrs = {'user': self.user,}
+    attrs.update(TestPigBase.SCRIPT_ATTRS)
+    attrs['parameters'] = json.dumps([])
+    attrs['resources'] = json.dumps([])
+
+    # Save
+    self.c.post(reverse('pig:save'), data=attrs, follow=True)
+
+    # Update
+    self.c.post(reverse('pig:save'), data=attrs, follow=True)
 
 
 class TestWithHadoop(OozieBase):
@@ -102,7 +116,9 @@ class TestWithHadoop(OozieBase):
     }
 
     response = self.c.post(reverse('pig:run'), data=post_data, follow=True)
-    self.wait_until_completion(json.loads(response.content)['id'])
+    job_id = json.loads(response.content)['id']
+
+    self.wait_until_completion(job_id)
 
   def test_stop(self):
     script = PigScript.objects.get(id=1)
@@ -122,5 +138,5 @@ class TestWithHadoop(OozieBase):
     script = PigScript.objects.get(id=json.loads(submit_response.content)['id'])
     assert_true(script.dict['job_id'], script.dict)
 
-    stop_response = self.c.post(reverse('pig:stop'), data={'id': script.id}, follow=True)
+    self.c.post(reverse('pig:stop'), data={'id': script.id}, follow=True)
     self.wait_until_completion(json.loads(submit_response.content)['id'], expected_status='KILLED')

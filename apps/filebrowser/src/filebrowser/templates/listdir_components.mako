@@ -283,7 +283,7 @@ from django.utils.translation import ugettext as _
                     <label>${_('Group')}</label>
                     ${ edit.selection("group", groups, 'supergroup', "group_other") }
                     <br />
-                    <label style="display: inline;">${_('Recursive')}</label><input type="checkbox" name="recursive">
+                    <label style="display: inline;">${_('Recursive')}</label> <input type="checkbox" name="recursive" style="margin-bottom:4px">
                 </div>
 
 

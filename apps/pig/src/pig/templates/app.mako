@@ -255,13 +255,13 @@ ${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
               <div class="pull-right">
                   ${ _('Status:') } <a data-bind="text: status, visible: absoluteUrl != '', attr: {'href': absoluteUrl}" target="_blank"/> <i class="icon-share-alt"></i>
               </div>
-              <h4>${ _('Progress:') } <span data-bind="text: progress"></span>${ _('%') } <img src="/static/art/spinner.gif" data-bind="visible: progress != 100"/></h4>
+              <h4>${ _('Progress:') } <span data-bind="text: progress"></span>${ _('%') }</h4>
               <div data-bind="css: {'progress': name != '', 'progress-striped': name != '', 'active': status == 'RUNNING'}" style="margin-top:10px">
                 <div data-bind="css: {'bar': name != '', 'bar-success': status == 'SUCCEEDED' || status == 'OK', 'bar-warning': status == 'RUNNING' || status == 'PREP', 'bar-danger': status != 'RUNNING' && status != 'SUCCEEDED' && status != 'OK' && status != 'PREP' && status != 'SUSPENDED'}, attr: {'style': 'width:' + progressPercent}"></div>
               </div>
             </div>
           </script>
-          <pre id="withoutLogs" class="hide">${ _('No available logs.') }</pre>
+          <pre id="withoutLogs" class="hide">${ _('No available logs.') } <img src="/static/art/spinner.gif"/></pre>
           <pre id="withLogs" class="hide scroll"></pre>
         </div>
 
