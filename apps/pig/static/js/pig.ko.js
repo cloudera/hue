@@ -372,6 +372,7 @@ var PigViewModel = function (props) {
   }
 
   function callRun(script) {
+    self.currentScript(script);
     $(document).trigger("running");
     $.post(self.RUN_URL,
         {
@@ -384,7 +385,6 @@ var PigViewModel = function (props) {
         },
         function (data) {
           if (data.id && self.currentScript().id() != data.id){
-            self.currentScript(script);
             script.id(data.id);
             $(document).trigger("loadEditor");
           }
