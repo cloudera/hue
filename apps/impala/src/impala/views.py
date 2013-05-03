@@ -24,20 +24,29 @@ except ImportError:
 
 from django.http import HttpResponse
 from django.utils.translation import ugettext as _
-from desktop.lib.exceptions_renderable import PopupException
-
+from beeswax.views import install_examples as beeswax_install_examples
 from impala import server
 
 
 def refresh_catalog(request):
-  if request.method != 'POST':
-    raise PopupException(_('A POST request is required.'))
+  response = {'status': -1, 'message': ''}
 
-  try:
-    db = server.get(request.user)
-    res = db.resetCatalog()
-    response = {'status': res.status_code, 'data': res.error_msgs}
-  except Exception, e:
-    response = {'status': -1, 'data': str(e)}
+  if request.method != 'POST':
+    response['message'] = _('A POST request is required.')
+  else:
+    try:
+      db = server.get(request.user)
+      res = db.resetCatalog()
+      if res.status_code is None:
+        status = 0
+      else:
+        status = res.status_code
+      response = {'status': status, 'message': res.error_msgs}
+    except Exception, e:
+      response = {'message': str(e)}
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
+
+
+def install_examples(request):
+  return beeswax_install_examples(request)

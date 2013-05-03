@@ -569,7 +569,7 @@ class TStructTypeEntry(object):
       if fid == 1:
         if ftype == TType.MAP:
           self.nameToTypePtr = {}
-          (_ktype1, _vtype2, _size0 ) = iprot.readMapBegin() 
+          (_ktype1, _vtype2, _size0 ) = iprot.readMapBegin()
           for _i4 in xrange(_size0):
             _key5 = iprot.readString();
             _val6 = iprot.readI32();
@@ -641,7 +641,7 @@ class TUnionTypeEntry(object):
       if fid == 1:
         if ftype == TType.MAP:
           self.nameToTypePtr = {}
-          (_ktype10, _vtype11, _size9 ) = iprot.readMapBegin() 
+          (_ktype10, _vtype11, _size9 ) = iprot.readMapBegin()
           for _i13 in xrange(_size9):
             _key14 = iprot.readString();
             _val15 = iprot.readI32();
@@ -2461,7 +2461,7 @@ class TOpenSessionReq(object):
       elif fid == 4:
         if ftype == TType.MAP:
           self.configuration = {}
-          (_ktype110, _vtype111, _size109 ) = iprot.readMapBegin() 
+          (_ktype110, _vtype111, _size109 ) = iprot.readMapBegin()
           for _i113 in xrange(_size109):
             _key114 = iprot.readString();
             _val115 = iprot.readString();
@@ -2571,7 +2571,7 @@ class TOpenSessionResp(object):
       elif fid == 4:
         if ftype == TType.MAP:
           self.configuration = {}
-          (_ktype119, _vtype120, _size118 ) = iprot.readMapBegin() 
+          (_ktype119, _vtype120, _size118 ) = iprot.readMapBegin()
           for _i122 in xrange(_size118):
             _key123 = iprot.readString();
             _val124 = iprot.readString();
@@ -3075,7 +3075,7 @@ class TExecuteStatementReq(object):
       elif fid == 3:
         if ftype == TType.MAP:
           self.confOverlay = {}
-          (_ktype128, _vtype129, _size127 ) = iprot.readMapBegin() 
+          (_ktype128, _vtype129, _size127 ) = iprot.readMapBegin()
           for _i131 in xrange(_size127):
             _key132 = iprot.readString();
             _val133 = iprot.readString();

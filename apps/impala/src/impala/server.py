@@ -22,7 +22,6 @@ from beeswax import conf
 from beeswax.models import HIVE_SERVER2
 from beeswax.server.beeswax_lib import BeeswaxClient
 from beeswax.server.dbms import get_query_server_config
-from beeswax.conf import SERVER_INTERFACE
 
 
 def get(user, query_server=None):
@@ -32,7 +31,7 @@ def get(user, query_server=None):
   if query_server is None:
     query_server = get_query_server_config(name='impala')
 
-  if SERVER_INTERFACE.get() == HIVE_SERVER2:
+  if query_server['server_interface'] == HIVE_SERVER2:
     return ImpalaServerClient(ImpalaHiveServer2Service, query_server, user)
   else:
     return ImpalaServerClient(ImpalaService, query_server, user)

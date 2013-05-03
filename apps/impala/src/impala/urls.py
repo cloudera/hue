@@ -22,6 +22,9 @@ from beeswax.urls import urlpatterns as beeswax_urls
 
 urlpatterns = patterns('impala.views',
   url(r'^refresh_catalog$', 'refresh_catalog', name='refresh_catalog'),
+
+  # Override Beeswax
+  url(r'^install_examples$', 'install_examples', name='install_examples'),
 )
 
 urlpatterns += beeswax_urls

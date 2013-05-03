@@ -880,7 +880,7 @@ ${layout.menubar(section='query')}
           $.post('/impala/refresh_catalog',
             function(response) {
               if (response['status'] != 0) {
-                $.jHueNotify.error("${ _('Problem: ') }" + response['data']);
+                $.jHueNotify.error("${ _('Problem: ') }" + response['message']);
               } else {
                 $.jHueNotify.info("${ _('Refresh successful!') }")
               }

@@ -85,14 +85,28 @@ ${ commonheader(_('Quick Start'), "quick_start", user, "100px") | n,unicode }
         % if 'beeswax' in app_names:
           <li>
             <a href="#" class="installBtn" data-loading-text="${ _('Installing...') }" data-url="${ url('beeswax:install_examples') }">
-             <i class="icon-download-alt"></i> Beeswax
+             <i class="icon-download-alt"></i> ${ apps['beeswax'].nice_name }
             </a>
           </li>
         % endif
-        % if 'oozie' in app_names or 'jobsub' in app_names:
+        % if 'impala' in app_names:
           <li>
-            <a href="#" class="installBtn" data-loading-text="${ _('Installing...') }" data-url="${ url('oozie:setup_app') }">
-              <i class="icon-download-alt"></i> Oozie / Job Designer
+            <a href="#" class="installBtn" data-loading-text="${ _('Installing...') }" data-url="${ url('impala:install_examples') }">
+             <i class="icon-download-alt"></i> ${ apps['impala'].nice_name }
+            </a>
+          </li>
+        % endif
+        % if 'jobsub' in app_names:
+          <li>
+            <a href="#" class="installBtn" data-loading-text="${ _('Installing...') }" data-url="${ url('oozie:install_examples') }">
+              <i class="icon-download-alt"></i> ${ apps['jobsub'].nice_name }
+            </a>
+          </li>
+        % endif
+        % if 'oozie' in app_names:
+          <li>
+            <a href="#" class="installBtn" data-loading-text="${ _('Installing...') }" data-url="${ url('oozie:install_examples') }">
+              <i class="icon-download-alt"></i> ${ apps['oozie'].nice_name }
             </a>
           </li>
         % endif
@@ -190,9 +204,13 @@ $(document).ready(function(){
     var button = $(this);
     $(button).button('loading');
     $.post($(this).data("url"), function(data) {
+      if (data.status == 0) {
+        $.jHueNotify.info('${ _("Examples refreshed") }');
+      } else {
+        $.jHueNotify.error(data.message);
+      }
     })
     .always(function(data) {
-      $.jHueNotify.info("${ _('Done!') }");
       $(button).button('reset');
     });
   });

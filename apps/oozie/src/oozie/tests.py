@@ -268,7 +268,7 @@ class OozieBase(OozieServerProvider):
     if _INITIALIZED:
       return
 
-    self.c.post(reverse('oozie:setup_app'))
+    self.c.post(reverse('oozie:install_examples'))
     self.cluster.fs.do_as_user('test', self.cluster.fs.create_home_dir, '/user/test')
     self.cluster.fs.do_as_superuser(self.cluster.fs.chmod, '/user/test', 0777, True)
     try:
@@ -1210,8 +1210,8 @@ class TestEditor(OozieMockBase):
     create_coordinator_data(coord, self.c)
 
 
-  def test_setup_app(self):
-    self.c.post(reverse('oozie:setup_app'))
+  def test_install_examples(self):
+    self.c.post(reverse('oozie:install_examples'))
 
 
   def test_workflow_prepare(self):

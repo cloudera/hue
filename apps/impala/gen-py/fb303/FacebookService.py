@@ -1118,7 +1118,7 @@ class getCounters_result(object):
       if fid == 0:
         if ftype == TType.MAP:
           self.success = {}
-          (_ktype1, _vtype2, _size0 ) = iprot.readMapBegin() 
+          (_ktype1, _vtype2, _size0 ) = iprot.readMapBegin()
           for _i4 in xrange(_size0):
             _key5 = iprot.readString();
             _val6 = iprot.readI64();
@@ -1581,7 +1581,7 @@ class getOptions_result(object):
       if fid == 0:
         if ftype == TType.MAP:
           self.success = {}
-          (_ktype10, _vtype11, _size9 ) = iprot.readMapBegin() 
+          (_ktype10, _vtype11, _size9 ) = iprot.readMapBegin()
           for _i13 in xrange(_size9):
             _key14 = iprot.readString();
             _val15 = iprot.readString();
