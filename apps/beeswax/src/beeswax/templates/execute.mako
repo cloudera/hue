@@ -781,7 +781,7 @@ ${layout.menubar(section='query')}
               }
               else {
                 CodeMirror.tableFieldMagic = true;
-                CodeMirror.showHint(cm, CodeMirror.hiveQLHint);
+                CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
               }
             }
             else {
