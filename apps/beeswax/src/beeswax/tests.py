@@ -805,7 +805,7 @@ for x in sys.stdin:
 
     # Check popup
     resp = self.client.get('/beeswax/install_examples')
-    assert_true('Install sample tables' in resp.content)
+    assert_true('POST request is required.' in json.loads(resp.content)['message'])
 
     self.client.post('/beeswax/install_examples')
 
@@ -819,7 +819,6 @@ for x in sys.stdin:
     assert_true('Sample: Job loss' in resp.content)
     assert_true('Sample: Salary growth' in resp.content)
     assert_true('Sample: Top salary' in resp.content)
-    assert_true(beeswax.models.MetaInstall.get().installed_example)
 
     # Now install it a second time, and no error
     resp = self.client.post('/beeswax/install_examples')

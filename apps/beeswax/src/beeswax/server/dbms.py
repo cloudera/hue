@@ -27,10 +27,9 @@ from desktop.conf import KERBEROS
 from filebrowser.views import location_to_url
 
 from beeswax.conf import BEESWAX_SERVER_HOST, BEESWAX_SERVER_PORT,\
-  BROWSE_PARTITIONED_TABLE_LIMIT
+  BROWSE_PARTITIONED_TABLE_LIMIT, SERVER_INTERFACE
 from beeswax.design import hql_query
 from beeswax.models import QueryHistory, HIVE_SERVER2
-from beeswax.conf import SERVER_INTERFACE
 
 
 LOG = logging.getLogger(__name__)

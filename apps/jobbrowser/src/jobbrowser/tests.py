@@ -138,7 +138,7 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
     if _INITIALIZED:
       return
 
-    self.client.post(reverse('oozie:setup_app'))
+    self.client.post(reverse('oozie:install_examples'))
     self.cluster.fs.do_as_user(self.username, self.cluster.fs.create_home_dir, self.home_dir)
     self.cluster.fs.do_as_superuser(self.cluster.fs.chmod, self.home_dir, 0777, True)
     hue = User.objects.create_user('hue', 'hue' + '@localhost', 'hue')
