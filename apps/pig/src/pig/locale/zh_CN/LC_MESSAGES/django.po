@@ -1,0 +1,370 @@
+# Chinese (China) translations for Hue.
+# Copyright (C) 2012 Cloudera
+# This file is distributed under the same license as the Hue project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 项目版本\n"
+"Report-Msgid-Bugs-To: 电子邮件地址\n"
+"POT-Creation-Date: 2013-04-11 10:03-0700\n"
+"PO-Revision-Date: 2012-07-30 18:50-0700\n"
+"Last-Translator: 全名 <电子邮件地址>\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8 位\n"
+"Generated-By: Babel 0.9.6\n"
+
+#: src/pig/api.py:165 src/pig/templates/app.mako:436
+msgid "Unsaved script"
+msgstr "未保存的脚本"
+
+#: src/pig/conf.py:28
+msgid "Location on local filesystem where the examples are stored."
+msgstr "本地文件系统中存储示例的位置。"
+
+#: src/pig/conf.py:34
+msgid "Location on HDFS where the Pig examples are stored."
+msgstr "HDFS 中存储 Pig 示例的位置。"
+
+#: src/pig/models.py:35
+msgid "Owner"
+msgstr "所有者"
+
+#: src/pig/models.py:35
+msgid "User who can modify the job."
+msgstr "可修改作业的用户。"
+
+#: src/pig/models.py:36
+msgid "Is a user document, not a document submission."
+msgstr "为用户文档，而非文档提交。"
+
+#: src/pig/models.py:37
+msgid "If the document is not a submitted job but a real query, script, workflow."
+msgstr "该文档不是已提交的作业，而是真正的查询、脚本、workflow。"
+
+#: src/pig/models.py:46
+#, python-format
+msgid "Only superusers and %s are allowed to modify this document."
+msgstr "只有超级用户和 %s 可修改此文档。"
+
+#: src/pig/views.py:64 src/pig/views.py:89 src/pig/views.py:119
+#: src/pig/views.py:143
+msgid "POST request required."
+msgstr "需要 POST 请求。"
+
+#: src/pig/views.py:125
+msgid " (Copy)"
+msgstr " （副本）"
+
+#: src/pig/views.py:191
+msgid "A POST request is required."
+msgstr "需要 POST 请求。"
+
+#: src/pig/management/commands/pig_setup.py:46
+#, python-format
+msgid "Copying examples %(local_dir)s to %(remote_data_dir)s\n"
+msgstr "复制示例 %(local_dir)s 至  %(remote_data_dir)s\n"
+
+#: src/pig/management/commands/pig_setup.py:53
+#, python-format
+msgid "Copying data %(local_dir)s to %(remote_data_dir)s\n"
+msgstr "复制示例 %(local_dir)s 至  %(remote_data_dir)s\n"
+
+#: src/pig/templates/app.mako:23
+msgid "Pig"
+msgstr "Pig"
+
+#: src/pig/templates/app.mako:28 src/pig/templates/app.mako:104
+msgid "Editor"
+msgstr "编辑器"
+
+#: src/pig/templates/app.mako:29
+msgid "Scripts"
+msgstr "脚本"
+
+#: src/pig/templates/app.mako:30
+msgid "Dashboard"
+msgstr "控制面板"
+
+#: src/pig/templates/app.mako:40
+msgid "Search for script name or content"
+msgstr "搜索脚本名称或内容"
+
+#: src/pig/templates/app.mako:44
+msgid "Run this script"
+msgstr "运行此脚本"
+
+#: src/pig/templates/app.mako:44 src/pig/templates/app.mako:128
+msgid "Run"
+msgstr "运行"
+
+#: src/pig/templates/app.mako:45
+msgid "Copy this script"
+msgstr "复制此脚本"
+
+#: src/pig/templates/app.mako:45 src/pig/templates/app.mako:138
+msgid "Copy"
+msgstr "复制"
+
+#: src/pig/templates/app.mako:46
+msgid "Delete this script"
+msgstr "删除此脚本"
+
+#: src/pig/templates/app.mako:46 src/pig/templates/app.mako:143
+msgid "Delete"
+msgstr "删除"
+
+#: src/pig/templates/app.mako:50
+msgid "Create a new script"
+msgstr "创建新脚本"
+
+#: src/pig/templates/app.mako:50 src/pig/templates/app.mako:109
+#: src/pig/templates/app.mako:110
+msgid "New script"
+msgstr "新脚本"
+
+#: src/pig/templates/app.mako:54
+msgid "There are currently no scripts defined. Please add a new script clicking on \"New script\""
+msgstr "当前未定义脚本。请通过单击“新脚本”添加新脚本"
+
+#: src/pig/templates/app.mako:61 src/pig/templates/app.mako:181
+#: src/pig/templates/app.mako:287 src/pig/templates/app.mako:305
+msgid "Name"
+msgstr "名称"
+
+#: src/pig/templates/app.mako:62
+msgid "Script"
+msgstr "脚本"
+
+#: src/pig/templates/app.mako:77
+msgid "There are no scripts matching the search criteria."
+msgstr "没有符合搜索条件的脚本。"
+
+#: src/pig/templates/app.mako:106
+msgid "Edit script"
+msgstr "编辑脚本"
+
+#: src/pig/templates/app.mako:113
+msgid "Properties"
+msgstr "属性"
+
+#: src/pig/templates/app.mako:115
+msgid "Edit properties"
+msgstr "编辑属性"
+
+#: src/pig/templates/app.mako:120
+msgid "Actions"
+msgstr "操作"
+
+#: src/pig/templates/app.mako:122
+msgid "Save the script"
+msgstr "保存脚本"
+
+#: src/pig/templates/app.mako:123
+msgid "Save"
+msgstr "保存"
+
+#: src/pig/templates/app.mako:127 src/pig/templates/app.mako:132
+msgid "Run the script"
+msgstr "运行脚本"
+
+#: src/pig/templates/app.mako:133
+msgid "Running..."
+msgstr "正在运行..."
+
+#: src/pig/templates/app.mako:137
+msgid "Copy the script"
+msgstr "复制脚本"
+
+#: src/pig/templates/app.mako:142
+msgid "Delete the script"
+msgstr "删除脚本"
+
+#: src/pig/templates/app.mako:146 src/pig/templates/app.mako:365
+msgid "Logs"
+msgstr "日志"
+
+#: src/pig/templates/app.mako:148
+msgid "Show Logs"
+msgstr "显示日志"
+
+#: src/pig/templates/app.mako:148
+msgid "Current Logs"
+msgstr "当前日志"
+
+#: src/pig/templates/app.mako:157
+msgid "Edit"
+msgstr "编辑"
+
+#: src/pig/templates/app.mako:164
+msgid "Edit properties for"
+msgstr "编辑以下项的属性"
+
+#: src/pig/templates/app.mako:167
+msgid "Script name"
+msgstr "脚本名称"
+
+#: src/pig/templates/app.mako:172
+msgid "Parameters"
+msgstr "参数"
+
+#: src/pig/templates/app.mako:174 src/pig/templates/app.mako:196
+#: src/pig/templates/app.mako:205 src/pig/templates/app.mako:241
+msgid "Add"
+msgstr "添加"
+
+#: src/pig/templates/app.mako:182 src/pig/templates/app.mako:213
+msgid "Value"
+msgstr "值"
+
+#: src/pig/templates/app.mako:190 src/pig/templates/app.mako:234
+msgid "Remove"
+msgstr "删除"
+
+#: src/pig/templates/app.mako:203
+msgid "Resources"
+msgstr "资源"
+
+#: src/pig/templates/app.mako:212
+msgid "Type"
+msgstr "类型"
+
+#: src/pig/templates/app.mako:222
+msgid "File"
+msgstr "文件"
+
+#: src/pig/templates/app.mako:223
+msgid "Archive"
+msgstr "存档"
+
+#: src/pig/templates/app.mako:251
+msgid "Logs for"
+msgstr "以下项的日志"
+
+#: src/pig/templates/app.mako:259
+msgid "Status:"
+msgstr "状态："
+
+#: src/pig/templates/app.mako:261
+msgid "Progress:"
+msgstr "进度："
+
+#: src/pig/templates/app.mako:261
+msgid "%"
+msgstr "%"
+
+#: src/pig/templates/app.mako:267
+msgid "No available logs."
+msgstr "没有可用日志。"
+
+#: src/pig/templates/app.mako:276 src/pig/templates/app.mako:528
+msgid "Running"
+msgstr "正在运行"
+
+#: src/pig/templates/app.mako:277
+msgid "Completed"
+msgstr "已完成"
+
+#: src/pig/templates/app.mako:282
+msgid "There are currently no running scripts."
+msgstr "当前没有正在运行的脚本。"
+
+#: src/pig/templates/app.mako:288
+msgid "Progress"
+msgstr "进度"
+
+#: src/pig/templates/app.mako:289 src/pig/templates/app.mako:307
+msgid "Created on"
+msgstr "创建日期"
+
+#: src/pig/templates/app.mako:300
+msgid "There are currently no completed scripts."
+msgstr "当前没有已完成的脚本。"
+
+#: src/pig/templates/app.mako:306
+msgid "Status"
+msgstr "状态"
+
+#: src/pig/templates/app.mako:319 src/pig/templates/app.mako:334
+msgid "Click to edit"
+msgstr "单击以编辑"
+
+#: src/pig/templates/app.mako:350
+msgid "Confirm Delete"
+msgstr "确认删除"
+
+#: src/pig/templates/app.mako:353
+msgid "Are you sure you want to delete this script?"
+msgstr "是否确定要删除此脚本？"
+
+#: src/pig/templates/app.mako:354
+msgid "Are you sure you want to delete these scripts?"
+msgstr "是否确定要删除这些脚本？"
+
+#: src/pig/templates/app.mako:357 src/pig/templates/app.mako:391
+msgid "No"
+msgstr "否"
+
+#: src/pig/templates/app.mako:358 src/pig/templates/app.mako:392
+msgid "Yes"
+msgstr "是"
+
+#: src/pig/templates/app.mako:372
+msgid "Close"
+msgstr "关闭"
+
+#: src/pig/templates/app.mako:379
+msgid "Run Script"
+msgstr "运行脚本"
+
+#: src/pig/templates/app.mako:379
+msgid "?"
+msgstr "?"
+
+#: src/pig/templates/app.mako:382
+msgid "Script variables"
+msgstr "脚本变量"
+
+#: src/pig/templates/app.mako:399
+msgid "Choose a file"
+msgstr "选择文件"
+
+#: src/pig/templates/app.mako:432
+msgid "The pig job could not be killed."
+msgstr "无法停止 pig 作业。"
+
+#: src/pig/templates/app.mako:433
+msgid "Run this pig script"
+msgstr "运行此 pig 脚本"
+
+#: src/pig/templates/app.mako:434
+msgid "Stop the execution"
+msgstr "停止执行"
+
+#: src/pig/templates/app.mako:435
+msgid "Saved"
+msgstr "已保存"
+
+#: src/pig/templates/app.mako:521
+msgid "Saving"
+msgstr "正在保存"
+
+#: src/pig/templates/app.mako:532
+msgid "has been saved correctly."
+msgstr "已正确保存。"
+
+#: src/pig/templates/app.mako:536
+msgid "There was an error with your request!"
+msgstr "您的请求有错误！"
+
+#~ msgid "About Hue"
+#~ msgstr "关于 Hue"
+#~ msgid "Configuration"
+#~ msgstr "配置"
+#~ msgid "Check for misconfiguration"
+#~ msgstr "检查错误配置"
+#~ msgid "Server Logs"
+#~ msgstr "服务器日志"

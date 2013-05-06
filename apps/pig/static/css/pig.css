@@ -1,0 +1,70 @@
+.running {
+  background-color: #faa732;
+  border-left: 2px solid #faa732;
+}
+
+.succeeded {
+  background-color: #5eb95e;
+  border-left: 2px solid #5eb95e;
+}
+
+.failed {
+  background-color: #dd514c;
+  border-left: 2px solid #dd514c;
+}
+
+.sidebar-nav {
+  padding: 9px 0;
+}
+
+.CodeMirror {
+  border: 1px solid #eee;
+}
+
+.bottomAlert {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  margin: 0;
+  width: 100%;
+  text-align: center;
+  display: none;
+}
+
+#logs .alert-modified {
+  padding-right: 14px;
+}
+
+#logs pre {
+  margin: 0;
+  color: #666;
+  border-color: #DDD;
+}
+
+.parameterTable {
+  background-color: #eeeeee;
+}
+
+.parameterTable td {
+  padding: 7px;
+}
+
+.span2 .pull-right {
+  display: none;
+}
+
+#logsModal {
+  width: 90%;
+  left: 5%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.scroll {
+  overflow-y: scroll;
+  height: 300px;
+}
+
+.widget-content {
+    padding: 10px;
+  }
