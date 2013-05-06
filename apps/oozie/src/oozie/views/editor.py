@@ -202,7 +202,7 @@ def submit_workflow(request, workflow):
     if params_form.is_valid():
       mapping = dict([(param['name'], param['value']) for param in params_form.cleaned_data])
 
-      job_id = _submit_workflow(request, workflow, mapping)
+      job_id = _submit_workflow(request.user, request.fs, workflow, mapping)
 
       request.info(_('Workflow submitted'))
       return redirect(reverse('oozie:list_oozie_workflow', kwargs={'job_id': job_id}))
@@ -220,9 +220,9 @@ def submit_workflow(request, workflow):
   return HttpResponse(json.dumps(popup), mimetype="application/json")
 
 
-def _submit_workflow(request, workflow, mapping):
+def _submit_workflow(user, fs, workflow, mapping):
   try:
-    submission = Submission(request.user, workflow, request.fs, mapping)
+    submission = Submission(user, workflow, fs, mapping)
     job_id = submission.run()
     History.objects.create_from_submission(submission)
     return job_id
@@ -232,7 +232,6 @@ def _submit_workflow(request, workflow, mapping):
       detail = '%s: %s' % (_('The Oozie server is not running'), detail)
     raise PopupException(_("Error submitting workflow %s") % (workflow,), detail=detail)
 
-  request.info(_('Workflow submitted'))
   return redirect(reverse('oozie:list_oozie_workflow', kwargs={'job_id': job_id}))
 
 

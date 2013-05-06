@@ -620,6 +620,12 @@ class Action(Node):
     # Cloning does not work anymore if not abstract
     abstract = True
 
+  def add_node(self, child):
+    Link.objects.filter(parent=self, name='ok').delete()
+    Link.objects.create(parent=self, child=child, name='ok')
+    if not Link.objects.filter(parent=self, name='error').exists():
+      Link.objects.create(parent=self, child=Kill.objects.get(name='kill', workflow=self.workflow), name='error')
+
 # The fields with '[]' as default value are JSON dictionaries
 # When adding a new action, also update
 #  - Action.types below
