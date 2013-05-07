@@ -25,7 +25,7 @@ from TCLIService import TCLIService
 from TCLIService.ttypes import TOpenSessionReq, TGetTablesReq, TFetchResultsReq,\
   TStatusCode, TGetResultSetMetadataReq, TGetColumnsReq, TType,\
   TExecuteStatementReq, TGetOperationStatusReq, TFetchOrientation,\
-  TCloseSessionReq, TGetSchemasReq, TGetLogReq
+  TCloseSessionReq, TGetSchemasReq, TGetLogReq, TCancelOperationReq
 
 from beeswax import conf
 from beeswax.models import Session, HiveServerQueryHandle, HiveServerQueryHistory
@@ -413,6 +413,11 @@ class HiveServerClient:
     return HiveServerDataTable(results, schema)
 
 
+  def cancel_operation(self, operation_handle):
+    req = TCancelOperationReq(operationHandle=operation_handle)
+    return self.call(self._client.CancelOperation, req)
+
+
   def get_columns(self, database, table):
     req = TGetColumnsReq(schemaName=database, tableName=table)
     res = self.call(self._client.GetColumns, req)
@@ -548,6 +553,11 @@ class HiveServerClientCompatible:
     data_table = self._client.fetch_data(operationHandle, orientation=orientation, max_rows=max_rows)
 
     return ResultCompatible(data_table)
+
+
+  def cancel_operation(self, handle):
+    operationHandle = handle.get_rpc_handle()
+    return self._client.cancel_operation(operationHandle)
 
 
   def dump_config(self):

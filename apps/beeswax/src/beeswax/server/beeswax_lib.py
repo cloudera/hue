@@ -20,6 +20,7 @@ import re
 import thrift
 
 from django.utils.encoding import smart_str, force_unicode
+from django.utils.translation import ugettext as _
 
 import hadoop.cluster
 
@@ -158,6 +159,10 @@ class BeeswaxClient:
       if self.query_server['server_name'] == 'impala':
         results.columns = [column.name for column in self.get_results_metadata(handle).schema.fieldSchemas]
       return BeeswaxDataTable(results)
+
+
+  def cancel_operation(self, handle):
+    raise Exception(_('Query cancelation is not supported by the Beeswax interface. Please use the Hive Server 2 interface instead.'))
 
 
   def get_log(self, handle):

@@ -224,7 +224,7 @@ ${layout.menubar(section='query')}
                           </li>
                           <li>
                             <div class="control-group">
-                              <button id="refresh-btn" class="btn btn-small" data-loading-text="Refreshing..." rel="tooltip" data-placement="right" data-original-title="${ _('Update the list of tables seen by Impala. It can take a few seconds...') }">
+                              <button id="refresh-btn" class="btn btn-small" data-loading-text="${ _('Refreshing...') }" rel="tooltip" data-placement="right" data-original-title="${ _('Update the list of tables seen by Impala. It can take a few seconds...') }">
                                 ${ _('Refresh') }
                               </button>
                             </div>
@@ -436,7 +436,6 @@ ${layout.menubar(section='query')}
     color: #666;
     font-style: normal;
   }
-
 </style>
 
 <script src="/static/ext/js/jquery/plugins/jquery-fieldselection.js" type="text/javascript"></script>
