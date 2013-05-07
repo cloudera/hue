@@ -1466,6 +1466,23 @@ class TestImportWorkflow04(OozieMockBase):
     workflow.delete(skip_trash=True)
 
 
+  def test_import_workflow_basic_global_config(self):
+    """
+    Validates import for basic workflow: start, end, and global configuration.
+    """
+    workflow = Workflow.objects.new_workflow(self.user)
+    workflow.save()
+    f = open('apps/oozie/src/oozie/test_data/0.4/test-basic-global-config.xml')
+    import_workflow(workflow, f.read())
+    f.close()
+    workflow.save()
+    assert_equal(2, len(Node.objects.filter(workflow=workflow)))
+    assert_equal(2, len(Link.objects.filter(parent__workflow=workflow)))
+    assert_equal('done', Node.objects.get(workflow=workflow, node_type='end').name)
+    assert_equal('uri:oozie:workflow:0.4', workflow.schema_version)
+    workflow.delete(skip_trash=True)
+
+
   def test_import_workflow_decision(self):
     """
     Validates import for decision node: link comments (conditions), default link, decision end.
