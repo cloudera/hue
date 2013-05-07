@@ -1,0 +1,42 @@
+@media (max-width: 767px) {
+    	 
+    .container {
+        padding-left: 8px;
+        padding-right: 8px;
+    }    
+	
+    .navbar .brand {
+        float: none;
+        margin-bottom: 15px;
+    }
+    
+    .navbar .nav {
+        clear: both;        
+        float: none;
+		margin-top: 15px;
+    }
+    
+    .navbar .nav li {			
+        float: left;		
+        padding: 6px 36px 6px 0px;
+		margin: 4px 0px;
+    }
+    
+    .navbar .nav li a {	
+		text-align: left;		
+        padding-left: 0px;		
+        padding-right: 0px;
+    }
+}
+
+@media (max-width: 480px) {
+    h2 {
+        font-size:32px;
+        line-height:52px;
+    }
+    
+    h3 {
+        font-size:20px;
+        line-height:32px;
+    }   
+}

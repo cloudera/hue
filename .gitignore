@@ -1,0 +1,8 @@
+# OS X nonsense
+.DS_Store
+._*
+
+# Intellij project files
+.idea/
+*.iml
+

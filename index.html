@@ -1,471 +1,358 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
+  <meta charset="UTF-8">
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-  <meta name="keywords" content="hadoop UI,cloudera,django,hadoop,hdfs,hive,hue,impala,mapreduce,oozie,pig,python,tutorial,apache" />
-
-  <title>Hue - Hadoop User Experience</title>
-
-  <link href="static/ext/css/bootstrap.min.css" rel="stylesheet">
-
-  <style type="text/css">
-    h1 { font-size: 7em; color: #1767b6; margin-bottom: 30px; }
-    h1 .small { font-size: 0.4em; }
-    h1 a { text-decoration: none }
-    h2 { font-size: 1.5em; color: #1767b6; }
-    h3 { color: #1767b6; }
-    a { color: #1767b6; }
-    ul { list-style-type: none; }
-    section { margin-top: 0px; }
-    .tab-content { padding: 82px; }
-    .item { text-align: center; padding: 15px; }
-    .legend { text-align: center;  font-size: 1.2em; padding-bottom: 10px; }
-    p.item img { border-style:solid; border-width: 1px;}
-    body { font-size: 110%; }
-    #logo { margin-top: -10px; margin-bottom: -8px; padding-right: 15px; }
-  </style>
+  <title>Hue - Hadoop User Experience - The Apache Hadoop UI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="static/ext/css/bootstrap.css" type="text/css">
+  <link rel="stylesheet" href="static/ext/css/bootstrap-responsive.css" type="text/css">
+  <link rel="stylesheet" href="static/ext/css/font-awesome.min.css" type="text/css">
+  <link rel="stylesheet" href="static/ext/css/strip.css" type="text/css">
+  <link rel="stylesheet" href="static/ext/css/strip-responsive.css" type="text/css">
+  <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,700,600" rel="stylesheet">
+  <link href='http://fonts.googleapis.com/css?family=Merriweather:400,700' rel='stylesheet' type='text/css'>
 </head>
-
 <body>
-    <div class="navbar navbar-fixed-top">
-      <div class="navbar-inner">
-        <div class="container">
-          <a class="brand" href="./index.html"><img id="logo" class="image" src="static/images/hue-logo.png"/></a>
-          <div class="nav-collapse collapse">
-            <ul class="nav nav-tabs">
-              <li class="active">
-                <a href="#home" data-toggle="tab">Home</a>
-              </li>
-              <li>
-                <a href="#hue" data-toggle="tab">What is Hue?</a>
-              </li>              
-              <li>
-                <a href="#apps" data-toggle="tab">Apps</a>
-              </li>
-              <li>
-                <a href="#releases" data-toggle="tab">Releases</a>
-              </li>
-              <li>
-                <a href="#source" data-toggle="tab">Source</h2></a>
-              </li>
-              <li>
-                <a href="#community" data-toggle="tab">Community</a>
-              </li>
-              <li>
-                <a href="http://gethue.tumblr.com/">Tutorials</a>
-              </li>
-            </ul>
-            </ul>
-          </div>
-        </div>
+
+<section class="container" id="home">
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <div class="container">
+        <a href="/" class="brand"><img src="static/images/hue-logo.png"/></a>
+        <ul class="nav">
+          <li><a href="#home">Home</a></li>
+          <li><a href="#tour">Applications</a></li>
+          <li><a href="http://gethue.tumblr.com/tagged/release">Releases</a></li>
+          <li><a href="http://gethue.tumblr.com">Tutorials</a></li>
+          <li><a href="http://twitter.com/gethue/" target="_blank"><i class="icon-twitter icon-large"></i></a></li>
+        </ul>
       </div>
     </div>
+  </nav>
+</section>
 
-  <div class="container-fluid">
-    <div class="row-fluid">
-      <div class="span2"></div>
-      <div class="span8">
-        <div class="tab-content">
-          <div class="tab-pane active" id="home">
-          <h1>
-            <a href="http://github.com/cloudera/hue">hue</a>
-          </h1>
+<section class="container">
+  <div class="row">
+    <header class="highlight span12">
+      <h2><strong>Hue</strong>, the open source Apache Hadoop UI.</h2>
+      <img id="feature-screenshot" src="static/images/shot.png" alt="screenshot">
 
-        <div class="hero-unit">
-          <p style="font-size: 1.5em;">Hue is an open source UI for making it easier to use Apache Hadoop.</p>
-          <p>Hue features a File Browser for HDFS, a Job Designer/Browser for MapReduce, query editors for Hive, Pig and Cloudera Impala, an Oozie Application for creating workflows, various Shells, a collection of Hadoop API.</p>
-            <p class style="text-align:center; padding-top:10px">
-             <a class="btn btn-primary btn-large" href="http://cloudera.github.com/hue/releases/2.3.0/hue-2.3.0.tgz">
-               Download Hue
-             </a>
-            <a class="btn btn-inverse btn-large" href="http://github.com/cloudera/hue">
-              GitHub Project
-            </a>
+      <p>
+        <a href="http://cloudera.github.com/hue/releases/2.3.0/hue-2.3.0.tgz" class="big-btn big-btn-blue"><i
+                class="icon-download"></i> Download Hue</a>
+        <a href="https://github.com/cloudera/hue" target="_blank" class="big-btn big-btn-black"><i
+                class="icon-github"></i> View on Github</a>
+      </p>
 
-           </p>
+      <p><strong>Hue</strong> features a File Browser for HDFS, a Job Designer/Browser for MapReduce, query editors for
+        Hive, Pig and Cloudera Impala.<br/>
+        It also ships with an Oozie Application for creating workflows, various Shells and a collection of Hadoop API.
+      </p>
+    </header>
+  </div>
+  <div class="row">
+    <div class="offset3 span6">
+      <hr class="shadow-line"/>
+    </div>
+  </div>
+</section>
+<section class="container" id="tour">
+  <div class="highlight row">
+    <div id="myCarousel" class="carousel slide">
+      <div class="carousel-inner">
+        <div class="item active">
+          <p>
+            <img src="static/images/screenshots/pig.png" alt="pig editor"/>
+          </p>
+          <article class="carousel-caption">
+            <h3><strong>Pig Editor</strong></h3>
+
+            <p class="center-align">The Pig Editor lets you edit your Pig script with autocompletion and syntax
+              highlighting.
+              Logs and results are displayed within this one-page app for a better interactivity. You can save your
+              scripts or look at the already submitted ones.</p>
+          </article>
         </div>
-        <div id="myCarousel" class="carousel slide" data-interval="4000">
-          <div class="carousel-inner">
-            <div class="active item">
-              <img class="image" src="static/images/beeswax.png"/>
-              <div class="carousel-caption">
-                <h4>Beeswax Hive UI</h4>
-                <p>The Beeswax application enables you to perform queries on Apache Hive, a SQL like data warehousing system designed to work with Hadoop. You can run and manage Hive queries and download the results in a Microsoft Office Excel worksheet file or a comma-separated values file.</p>
-              </div>
-            </div>
-           <div class="item">
-             <img class="image" src="static/images/fb.png"/>
-              <div class="carousel-caption">
-                <h4>File Browser</h4>
-                <p>The File Browser application lets you browse and manipulate files and directories in the Hadoop Distributed File System (HDFS) while using Hue.</p>
-              </div>
-           </div>
-           <div class="item">
-             <img class="image" src="static/images/oozie.jpg"/>
-              <div class="carousel-caption">
-                <h4>Oozie Editor/Dashboard</h4>
-                <p>The Oozie Editor/Dashboard application allows you to define Oozie workflow/coordinator/bundle applications, run them, and view their information, logs and stop, pause, rerun them.</p>
-              </div>
-           </div>
-           <div class="item">
-             <img class="image" src="static/images/pig-app.png"/>
-              <div class="carousel-caption">
-                <h4>Pig Editor</h4>
-                <p>The Pig Editor lets you edit your Pig script with autocompletion and syntax highlighting. Logs and results are displayed within this one-page app for a better interactivity. You can save your scripts or look at the already submitted ones</p>
-              </div>
-           </div>
-           <div class="item">
-             <img class="image" src="static/images/catalog-app.png"/>
-              <div class="carousel-caption">
-                <h4>Table Browser</h4>
-                <p>You can list and manage Hive tables and switch between databases easily. Table creation is available through a wizard as well as statistics, data loading and partition creation.</p>
-              </div>
-           </div>           
-           <div class="item">
-             <img class="image" src="static/images/shell.png"/>
-              <div class="carousel-caption">
-                <h4>Shell</h4>
-                <p>The Hue Shell application provides access to the Pig and HBase command-line shells. The Shell application is designed to have the same look and feel as a Unix terminal. In addition to the shells configured by default, it is possible to include almost any process that exposes a command-line interface as an option in this Hue application.</p>
-              </div>
-           </div>
-           <div class="item">
-             <img class="image" src="static/images/jb.png"/>
-              <div class="carousel-caption">
-                <h4>Job Browser</h4>
-                <p>The Job Browser application lets you to examine the Hadoop MapReduce jobs running on your Hadoop cluster. Job Browser presents the job and tasks in layers. The top layer is a list of jobs, and you can link to a list of that job's tasks. You can then view a task's attempts and the properties of each attempt, such as state, start and end time, and output size. To troubleshoot failed jobs, you can also view the logs of each attempt.</p>
-              </div>
-           </div>
-           <div class="item">
-             <img class="image" src="static/images/jobsub.png"/>
-              <div class="carousel-caption">
-                <h4>Job Designer</h4>
-                <p>The Job Designer application enables you to create and submit Hadoop MapReduce jobs to the Hadoop cluster. You can include variables with your jobs to enable you and other users to enter values for the variables when they run your job. The Job Designer supports MapReduce, streaming, and Java jobs.</p>
-              </div>
-           </div>
-           <div class="item">
-             <img class="image" src="static/images/useradmin.png"/>
-              <div class="carousel-caption">
-                <h4>User Admin</h4>
-                <p>The User Admin application lets an administrator add, delete, and manage Hue user accounts and groups, and configure group permissions. The permissions allow users, based on their group membership, to launch Hue applications and use application features. You can add users and groups individually, or import them from an LDAP directory.</p>
-              </div>
-            </div>
-          </div>
-          <a class="carousel-control left" href="#myCarousel" data-slide="prev">&lsaquo;</a>
-          <a class="carousel-control right" href="#myCarousel" data-slide="next">&rsaquo;</a>
-        </div>
-          </div>
+        <div class="item">
+          <p>
+            <img src="static/images/screenshots/oozieeditor.png" alt="oozie dashboard editor"/>
+          </p>
+          <article class="carousel-caption">
+            <h3><strong>Oozie Editor / Dashboard</strong></h3>
 
-          <div class="tab-pane" id="hue">
-            <h3>What is Hue?</h3>
-
-            <div class="container-fluid">
-              <div class="span3">
-              </div>
-              <div class="span9">
-                <section id="whats">
-                  <h2>A starting point for exploration and real time interaction with <a href="http://hadoop.apache.org/">Apache Hadoop</a></h2>
-                  <p>
-                     Hue is a <a href="#releases" class="link">mature</a> web-based application used from fortune 500 companies to startups, students and data scientist/analysts.
-                  </p>
-                  <p>
-                    With Hue, one can get started with Hadoop and become familiar with and explore different angles of the platform. 
-                    Hue’s target is the Hadoop user experience and lets users avoid the command line interface and have them focus on visibility and getting results quickly.
-                  <p>
-                  </p>
-                   Hue is composed of various <a href="#apps" class="link">applications</a>. The major query and scripting solutions are leveraged in specific editors (e.g. <a href="#apps" class="link" data-anchor="beeswax">Hive</a>, <a href="#apps" class="link" data-anchor="impala">Impala</a>, <a href="#apps" class="link" data-anchor="pig">Pig</a>) for quick interaction with big data. A Hadoop <a href="#apps" class="link" data-anchor="jb">JobBrowser</a> and <a href="#apps" class="link" data-anchor="fb">FileBrowser</a> are included for monitoring MapReduce tasks and intuitively manipulating the data (also observable in <a href="#apps" class="link" data-anchor="catalog">Table Browser</a>). An <a href="#apps" class="link" data-anchor="oozie">Oozie application</a> lets users create complex workflows of Hadoop jobs in a drag & drop editor and schedule them repetitively in a few clicks. This integration brings new ways to discover insights.
-                   </p>
-                  <p>
-                    Moreover, Hue comes with a <a href="docs-2.3.0/sdk/sdk.html">SDK</a> for letting developers reuse Hue’s libraries and start building apps on top of Hadoop.
-                  </p>
-                </section>                
-              </div>
-            </div>
-          </div>
-
-          <div class="tab-pane" id="apps">
-            <h3>Apps</h3>
-
-            <div class="container-fluid">
-              <div class="span3">
-                 <ul class="affix" data-spy="affix" data-offset-top="200">
-                   <li><a href="#fb"><i class="icon-chevron-right"></i> File Browser</a></li>                 
-                   <li><a href="#beeswax"><i class="icon-chevron-right"></i> Beeswax/Hive</a></li>
-                   <li><a href="#oozie"><i class="icon-chevron-right"></i> Oozie</a></li>
-                   <li><a href="#pig"><i class="icon-chevron-right"></i> Pig</a></li>                   
-                   <li><a href="#impala"><i class="icon-chevron-right"></i> Impala</a></li>
-                   <li><a href="#catalog"><i class="icon-chevron-right"></i> Table Browser</a></li>                                      
-                   <li><a href="#jb"><i class="icon-chevron-right"></i> Job Browser</a></li>
-                   <li><a href="#jobsub"><i class="icon-chevron-right"></i> Job Designer</a></li>
-                   <li><a href="#shell"><i class="icon-chevron-right"></i> Shell</a></li>
-                   <li><a href="#useradmin"><i class="icon-chevron-right"></i> User Admin</a></li>
-                 </ul>
-              </div>
-              <div class="span9">
-                <section id="fb">
-                  <h2>File Browser</h2>
-                  <p class="item">
-                     <a href="static/images/fb.png" title="Click to see" rel="tooltip"><img class="image" src="static/images/fb.png"/></a>
-                     <p class="legend">Bulk operations</p>
-                  </p>
-                </section>              
-                <section id="beeswax">
-                  <h2>Beeswax/Hive</h2>
-                  <p class="item">
-                    <a href="static/images/beeswax.png" title="Click to see" rel="tooltip"><img class="image" src="static/images/beeswax.png"/></a>
-                    <p class="legend">Query Editor</p>
-                  </p>
-                  <p class="item">
-                    <a href="static/images/beeswax-result.jpg" title="Click to see" rel="tooltip""><img class="image" src="static/images/beeswax-result.jpg"/></a>
-                    <p class="legend">Result Browsing</p>
-                  </p>
-                  <p class="item">
-                    <a href="static/images/beeswax-error.jpg" title="Click to see" rel="tooltip"><img class="image" src="static/images/beeswax-error.jpg"/></a>
-                    <p class="legend">Error highlighting</p>
-                  </p>
-                </section>
-                <section id="oozie">
-                  <h2>Oozie</h2>
-                  <p class="item">
-                     <a href="static/images/oozie.jpg" title="Click to see" rel="tooltip"><img class="image" src="static/images/oozie.jpg"/></a>
-                     <p class="legend">Running workflow dashboard</p>
-                  </p>
-                  <p class="item">
-                     <a href="static/images/oozie-dashboard.jpg" title="Click to see" rel="tooltip"><img class="image" src="static/images/oozie-dashboard.jpg"/></a>
-                     <p class="legend">Dashboard</p>
-                  </p>
-                  <p class="item">
-                     <a href="static/images/oozie-coord.jpg" title="Click to see" rel="tooltip"><img class="image" src="static/images/oozie-coord.jpg"/></a>
-                     <p class="legend">Coordinator wizard</p>
-                  </p>
-                  <p class="item">
-                     <a href="static/images/oozie-drag.png" title="Click to see" rel="tooltip"><img class="image" src="static/images/oozie-drag.png"/></a>
-                     <p class="legend">Drag & Drop workflow editor</p>
-                  </p>
-                  <p class="item">
-                     <a href="static/images/oozie-bundle.png" title="Click to see" rel="tooltip"><img class="image" src="static/images/oozie-bundle.png"/></a>
-                     <p class="legend">Bundle editor</p>
-                  </p>                  
-                </section>
-                <section id="pig">
-                  <h2>Pig</h2>
-                  <p class="item">
-                     <a href="static/images/pig-app.png" title="Click to see" rel="tooltip"><img class="image" src="static/images/pig-app.png"/></a>
-                     <p class="legend">Pig Editor</p>
-                  </p>
-                </section>                
-                <section id="impala">
-                  <h2>Impala</h2>
-                  <p class="item">
-                     <a href="static/images/impala.jpg" title="Click to see" rel="tooltip"><img class="image" src="static/images/impala.jpg"/></a>
-                     <p class="legend">Query Editor</p>
-                  </p>
-                </section>
-                <section id="catalog">
-                  <h2>Table Browser</h2>
-                  <p class="item">
-                     <a href="static/images/catalog-app.png" title="Click to see" rel="tooltip"><img class="image" src="static/images/catalog-app.png"/></a>
-                     <p class="legend">Table listing</p>
-                  </p>
-                </section>                
-                <section id="jb">
-                  <h2>Job Browser</h2>
-                  <p class="item">
-                     <a href="static/images/jb.png" title="Click to see" rel="tooltip"><img class="image" src="static/images/jb.png"/></a>
-                     <p class="legend">Jobs information and direct log access</p>
-                  </p>
-                </section>
-                <section id="jobsub">
-                  <h2>Job Designer</h2>
-                  <p class="item">
-                     <a href="static/images/jobsub.png" title="Click to see" rel="tooltip"><img class="image" src="static/images/jobsub.png"/></a>
-                     <p class="legend">Configure and run MapReduce jobs</p>
-                  </p>
-                </section>
-                <section id="shell">
-                  <h2>Shell</h2>
-                  <p class="item">
-                     <a href="static/images/shell.png" title="Click to see" rel="tooltip"><img class="image" src="static/images/shell.png"/></a>
-                     <p class="legend">Pig, HBase, Sqoop2 shells</p>
-                  </p>
-                </section>
-                <section id="useradmin">
-                  <h2>User Admin</h2>
-                  <p class="item">
-                     <a href="static/images/useradmin.png" title="Click to see" rel="tooltip"><img class="image" src="static/images/useradmin.png"/></a>
-                     <p class="legend">Users, groups and permissions management</p>
-                  </p>
-                </section>
-              </div>
-            </div>
-          </div>
-
-          <div class="tab-pane" id="releases">
-            <h3 id="releases-2.3.0">Hue 2.3.0 - April 15th, 2013</h3>
-            <ul>
-              <li>Pig App: new application for editing and running Pig scripts with UDF and parameters</li>
-              <li>Catalog App: new application for managing databases, viewing table schemas and sampling of content</li>
-              <li>Oozie Bundles are now supported</li>
-              <li>SQL highlighting and autocompletion for Hive / Impala apps</li>
-              <li>Multi query and query section execution</li>                                          
-              <li>Job Designer was totally restyled and now support all the Oozie actions</li>                                          
-              <li>Oracle (11.2) databases are now supported</li>                                          
-            </ul>
-            <p>Hue works best with <a href="https://ccp.cloudera.com/display/CDH4DOC/CDH4+Quick+Start+Guide">Cloudera's Distribution for Apache Hadoop (CDH) version 4.2</a>.</p>
-            <ul>
-              <li><a href="docs-2.3.0/index.html">Documentation</a></li>
-              <li><a href="http://cloudera.github.com/hue/releases/2.3.0/hue-2.3.0.tgz">Download tarball</a></li>
-            </ul>
-          
-            <h3 id="releases-2.2.0">Hue 2.2.0 - Feb 25th, 2013</h3>
-            <ul>
-              <li>The Oozie application has been restyled completely and now supports Ajax refreshes</li>
-              <li>A Cloudera Impala app was added</li>
-              <li>Beeswax/Hive editor is more user friendly</li>
-              <li>FileBrowser was restyled and now includes bulk and recursive operations (e.g. multiple deletes)</li>                                          
-              <li>JobBrowser is compatible with YARN and job logs can be accessed in one click</li>                                          
-              <li>UserAdmin was restyled and LDAP integration was improved</li>                                          
-              <li>MySql InnoDB and PostgreSQL are officially supported</li>                                                                                    
-            </ul>
-            <p>Hue works best with <a href="https://ccp.cloudera.com/display/CDH4DOC/CDH4+Quick+Start+Guide">Cloudera's Distribution for Apache Hadoop (CDH) version 4.2</a>.</p>
-            <ul>
-              <li><a href="docs-2.2.0/index.html">Documentation</a></li>
-              <li><a href="http://cloudera.github.com/hue/releases/2.2.0/hue-2.2.0.tgz">Download tarball</a></li>
-              <li><a href="https://ccp.cloudera.com/display/CDH4DOC/Hue+Installation#HueInstallation-InstallingHue">Install packages</a></li>
-            </ul>
-          
-            <h3 id="releases-2.1.0">Hue 2.1.0 - Oct 2, 2012</h3>
-            <p>Hue now provides an Apache Oozie application for creating workflows of Apache MapReduce, Apache Pig, Apache Hive, Apache Sqoop, Java, Shell, Ssh and Streaming jobs and scheduling them repetitively. Hue is now available in German, Spanish, French, Japanese, Korean, Portuguese, Brazilian and simplified Chinese.</p>
-            <ul>
-              <li><a href="docs-2.1.0/index.html">Documentation</a></li>
-              <li><a href="http://cloudera.github.com/hue/releases/2.1.0/hue-2.1.0.tgz">Download tarball</a></li>
-            </ul>
-
-            <h3>Hue 2.0.1 - June 4, 2012</h3>
-            <p>Hue 2.0.1 is a major upgrade with many fixes and key new features. The frontend has been re-implemented, LDAP (OpenLDAP and Active Directory) and per-application authorization are supported, a Shell application was added.</p>
-            <ul>
-              <li><a href="docs-2.0.1/index.html">Documentation</a></li>
-              <li><a href="http://cloudera.github.com/hue/releases/2.0.1/hue-2.0.1.tgz">Download tarball</a></li>
-            </ul>
-
-            <h3>Hue 1.2.0 - Feb 21, 2011</h3>
-            <p>Hue 1.2.0 is a minor release, largely focused on bug fixes and compatibility with <a href="https://ccp.cloudera.com/display/CDHDOC/CDH3+Quick+Start+Guide">CDH3</a>.</p>
-            <ul>
-              <li><a href="docs-1.2.0/index.html">Documentation</a></li>
-              <li><a href="http://cloudera.github.com/hue/releases/1.2.0/hue-1.2.0.tgz">Download tarball</a></li>
-            </ul>
-
-           <h3>Hue 1.1.0 - Oct 11, 2010</h3>
-            <p>Hue 1.1.0 supports Kerberos integration with using a secured Hadoop cluster.</p>
-            <ul>
-              <li><a href="docs-1.1.0/index.html">Documentation</a></li>
-              <li><a href="http://cloudera.github.com/hue/releases/1.1.0/hue-1.1.0.tgz">Download tarball</a></li>
-            </ul>
-
-            <h3>Hue 1.0.1 - Aug 20, 2010</h3>
-            <p>Hue 1.0.1 works with a traditional Hadoop cluster that does not have
-            security features.</p>
-            <ul>
-              <li><a href="docs-1.0.1/index.html">Documentation</a></li>
-              <li><a href="http://cloudera.github.com/hue/releases/1.0.1/hue-1.0.1.tgz">Download tarball</a></li>
-            </ul>
-          </div>
-
-          <div class="tab-pane" id="source">
-            <h3>Download</h3>
-            <ul>
-              <li>
-                Download Hue's project source in either
-                <a href="http://github.com/cloudera/hue/zipball/master">zip</a> or
-                <a href="http://github.com/cloudera/hue/tarball/master">tar</a> formats.
-              </li>
-              <li>
-                Get the source code on GitHub : <a href="http://github.com/cloudera/hue">cloudera/hue</a>
-              </li>
-              <li>Clone the project with <a href="http://git-scm.com">Git</a>
-                by running:
-                <div class="well well-small">$ git clone git://github.com/cloudera/hue</div>
-              </li>
-            </ul>
-
-            <h3>License</h3>
-            <p>Apache License v2.0
-               <br/>
-               <a href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a>
+            <p class="center-align">
+              The Oozie Editor/Dashboard application allows you to define Oozie workflow/coordinator/bundle
+              applications, run them, and view their information, logs and stop, pause, rerun them.
             </p>
-          </div>
+          </article>
+        </div>
+        <div class="item">
+          <p>
+            <img src="static/images/screenshots/beeswax.png" alt="beeswax hive ui"/>
+          </p>
+          <article class="carousel-caption">
+            <h3><strong>Beeswax Hive UI</strong></h3>
 
-          <div class="tab-pane" id="community">
-            <h2>Users</h2>
-            <ul>
-              <li><a href="http://groups.google.com/a/cloudera.org/group/hue-user">Hue users</a></li>
-              <li><a href="http://hue.meetup.com/">Hue Meetup</a></li>
-            </ul>
-            <h2>Developers</h2>
-            <ul>
-              <li><a href="http://groups.google.com/a/cloudera.org/group/hue-dev">Hue developers</a></li>
-              <li><a href="https://issues.cloudera.org/browse/HUE">JIRA</a></li>
-              <li><a href="https://review.cloudera.org/dashboard/?view=to-group&group=hue">Code Reviews</a></li>
-            </ul>
-          </div>
+            <p class="center-align">
+              The Beeswax application enables you to perform queries on Apache Hive, a SQL like data warehousing system
+              designed to work with Hadoop.
+              You can run and manage Hive queries and download the results in a Microsoft Office Excel worksheet file or
+              a comma-separated values file.
+            </p>
+          </article>
+        </div>
+        <div class="item">
+          <p>
+            <img src="static/images/screenshots/metastore.png" alt="metastore"/>
+          </p>
+          <article class="carousel-caption">
+            <h3><strong>Metastore Manager</strong></h3>
+
+            <p class="center-align">You can list and manage Hive tables and switch between databases easily.
+              Table creation is available through a wizard as well as statistics, data loading and partition creation.
+            </p>
+          </article>
+        </div>
+        <div class="item">
+          <p>
+            <img src="static/images/screenshots/fb.png" alt="file browser"/>
+          </p>
+          <article class="carousel-caption">
+            <h3><strong>File Browser</strong></h3>
+
+            <p class="center-align">The File Browser application lets you browse, upload and manipulate files and directories in
+              the
+              Hadoop Distributed File System (HDFS).</p>
+          </article>
+        </div>
+        <div class="item">
+          <p>
+            <img src="static/images/screenshots/shell.png" alt="shell"/>
+          </p>
+          <article class="carousel-caption">
+            <h3><strong>Shell</strong></h3>
+
+            <p class="center-align">The Hue Shell application provides access to the Pig and HBase command-line shells.
+              The Shell application is designed to have the same look and feel as a Unix terminal.
+              In addition to the shells configured by default, it is possible to include almost any process that exposes
+              a command-line interface as an option in this Hue application.</p>
+          </article>
         </div>
 
-        <div class="span2"></div>
+        <div class="item">
+          <p>
+            <img src="static/images/screenshots/jobdesigner.png" alt="job designer"/>
+          </p>
+          <article class="carousel-caption">
+            <h3><strong>Job Designer</strong></h3>
+
+            <p class="center-align">The Job Designer application enables you to create and submit Hadoop MapReduce jobs
+              to the Hadoop cluster.
+              You can include variables with your jobs to enable you and other users to enter values for the variables
+              when they run your job.
+              The Job Designer supports MapReduce, streaming, and Java jobs.</p>
+          </article>
+        </div>
+        <div class="item">
+          <p>
+            <img src="static/images/screenshots/jobbrowser.png" alt="job browser"/>
+          </p>
+          <article class="carousel-caption">
+            <h3><strong>Job Browser</strong></h3>
+
+            <p class="center-align">
+              The Job Browser application lets you to examine the Hadoop MapReduce jobs running on your Hadoop cluster.
+              Job Browser presents the job and tasks in layers.
+              The top layer is a list of jobs, and you can link to a list of that job's tasks.
+              You can then view a
+              task's attempts and the properties of each attempt, such as state, start and end time, and output
+              size. To troubleshoot failed jobs, you can also view the logs of each attempt in one click.
+            </p>
+          </article>
+        </div>
+        <div class="item">
+          <p>
+            <img src="static/images/screenshots/useradmin.png" alt="user admin"/>
+          </p>
+          <article class="carousel-caption">
+            <h3><strong>User Admin</strong></h3>
+
+            <p class="center-align">
+              The User Admin application lets an administrator add, delete, and manage Hue user accounts and groups, and
+              configure group permissions.
+              The permissions allow users, based on their group membership, to launch Hue applications and use
+              application features.
+              You can add users and groups individually, or import them from an LDAP directory.
+            </p>
+          </article>
+        </div>
+      </div>
+      <a class="left carousel-control" href="#myCarousel" data-slide="prev">‹</a>
+      <a class="right carousel-control" href="#myCarousel" data-slide="next">›</a>
+    </div>
+  </div>
+</section>
+<section class="section-box shadow">
+  <div class="container">
+    <div class="row">
+      <article class="span4 center-align">
+        <img src="static/images/elephant.gif" alt="hadoop" class="overable"/>
+
+        <h3>Explore Hadoop.</h3>
+
+        <p>
+          Hue is a starting point for exploration and real time interaction with <a href="http://hadoop.apache.org"
+                                                                                    target="_blank">Apache Hadoop</a>.
+        </p>
+
+        <p>
+          Hue's target is the Hadoop user experience and lets users avoid the command line interface and have them focus
+          on getting results faster and sooner.
+        </p>
+      </article>
+      <article class="span4 center-align">
+        <img src="static/images/mature.gif" alt="mature" class="overable"/>
+
+        <h3>A mature application.</h3>
+
+        <p>
+          <strong>Hue</strong> is a <a href="#">mature</a> web-based application used from fortune 500 companies to
+          startups, students and data scientist/analysts.
+        </p>
+
+        <p>
+          Hue 2.3.0 is the latest and it was released on April 15th, 2013. For more info about the releases, <a
+                href="#">click here</a>.
+        </p>
+
+      </article>
+      <article class="span4 center-align">
+
+        <img src="static/images/sdk.gif" alt="sdk" class="overable"/>
+
+        <h3>Build your own app.</h3>
+
+        <p>
+          <strong>Hue</strong> comes with an <a href="docs-2.3.0/sdk/sdk.html" target="_blank">SDK</a> that lets you
+          reuse Hue's libraries so you can start building apps on top of Hadoop.
+        </p>
+
+        <p>
+          Clone the project with <a href="http://git-scm.com">Git</a> and start building awesome software for Hadoop:
+        <pre>$ git clone git://github.com/cloudera/hue</pre>
+        </p>
+
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="container">
+  <div class="row">
+    <div class="offset3 span6">
+
+    </div>
+  </div>
+  <div class="row">
+    <div class="highlight span12">
+      <h3 class="subhead">It's easy to enter the <strong>Hue</strong> world</h3>
+
+      <div class="container">
+        <div class="row">
+          <article class="span4 center-align">
+            <h3>Hue Users</h3>
+
+            <p>
+              You can discuss about your ideas, ask your questions or make us aware of bugs online on the <a
+                    href="http://groups.google.com/a/cloudera.org/group/hue-user" target="_blank">Hue User Google
+              Group</a> or
+              in real life, joining one of the regular <a href="http://hue.meetup.com/" target="_blank">Hue Meetups</a>.
+            </p>
+          </article>
+          <article class="span4 center-align">
+            <h3>Hue Developers</h3>
+
+            <p>
+              If you want to show us what you've built or encounter problems while using the SDK, feel free to write on
+              the <a href="http://groups.google.com/a/cloudera.org/group/hue-dev" target="_blank">Hue Dev Google
+              Group</a>. <br/>
+              You can see the what the <a href="https://issues.cloudera.org/browse/HUE" target="_blank">current
+              backlog</a> looks like and have a look at the <a
+                    href="https://review.cloudera.org/dashboard/?view=to-group&group=hue" target="_blank">Code
+              Reviews</a> for the issues.
+            </p>
+          </article>
+          <article class="span4 center-align">
+            <h3>Cloudera's CDH</h3>
+
+            <p>
+              The quickest way to get a general feeling of <strong>Hue</strong> is through <a
+                    href="https://ccp.cloudera.com/display/CDH4DOC/CDH4+Quick+Start+Guide" target="_blank">Cloudera's
+              Distribution for Apache Hadoop (CDH) version 4.2</a>. <br/>
+              There are several <a href="https://ccp.cloudera.com/display/SUPPORT/Cloudera+QuickStart+VM"
+                                   target="_blank">Quick start Virtual Machines</a> available for you.
+            </p>
+          </article>
+
+        </div>
       </div>
     </div>
   </div>
+</section>
+
+<footer class="container footer-box">
+  <hr class="shadow-line"/>
+  <nav class="links">
+    <a class="btn btn-mini" href="http://cloudera.github.com/hue/releases/2.3.0/hue-2.3.0.tgz"><i
+            class="icon-download icon-large"></i> Download Hue</a>
+    <a class="btn btn-mini" href="https://github.com/cloudera/hue" target="_blank"><i
+            class="icon-github icon-large"></i> View on Github</a>
+    <a class="btn btn-mini" href="http://twitter.com/gethue/" target="_blank"><i class="icon-twitter icon-large"></i>
+      Follow @gethue</a>
+  </nav>
+  <p><strong>Hue</strong> is released with under the <a class="normal" href="http://www.apache.org/licenses/LICENSE-2.0"
+                                                        target="_blank">Apache License, version 2.0</a>.</p>
+</footer>
+<script src="static/ext/js/jquery/jquery-1.8.1.min.js"></script>
+<script src="static/ext/js/bootstrap.min.js"></script>
+<script src="static/js/jquery.scrollup.js"></script>
+
+<script type="text/javascript" charset="utf-8">
+  $.fn.preload = function () {
+    this.each(function () {
+      $("<img/>")[0].src = this;
+    });
+  }
+
+  $(document).ready(function () {
+    $(['static/images/elephant_over.gif', 'static/images/mature_over.gif', 'static/images/sdk_over.gif']).preload();
+    $(".overable").each(function () {
+      var _originalSrc = $(this).attr("src");
+      $(this).hover(function () {
+        $(this).attr("src", _originalSrc.substring(0, _originalSrc.length - 4) + "_over.gif");
+      }, function () {
+        $(this).attr("src", _originalSrc);
+      });
+    });
+    $.jHueScrollUp();
+
+  });
+</script>
 
 <script type="text/javascript">
   var _gaq = _gaq || [];
   _gaq.push(['_setAccount', 'UA-37637545-1']);
   _gaq.push(['_trackPageview']);
 
-  (function() {
-    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  (function () {
+    var ga = document.createElement('script');
+    ga.type = 'text/javascript';
+    ga.async = true;
     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(ga, s);
   })();
 </script>
-
-<script src="static/ext/js/jquery/jquery-1.8.1.min.js"></script>
-<script src="static/ext/js/bootstrap.min.js"></script>
-
-<script>
-  $(document).ready(function () {
-	  $('#myCarousel').carousel();
-	
-    $("a.link").click(function (e) {
-      var _link = $(this);
-      if (_link.attr("href").indexOf("#") == 0) {
-        e.preventDefault();
-        var section = decodeURIComponent(_link.attr("href").substring(1));
-        $(".tab-pane").removeClass("active");
-        $("#" + section).addClass("active");
-        $(".nav-tabs li").removeClass("active");
-        $("a[href='#" + section + "']").parent().addClass("active"); 
-        
-        if ($(_link).data('anchor')) {
-          var _anchor = $("section#" + $(_link).data('anchor'));
-          $("html, body").animate({
-           scrollTop:(_anchor.position().top - $(".navbar-fixed-top").height() - $(".subnav-fixed").height()) + "px"
-          }, 300);
-        }
-      }
-	  });
-	
-    $("ul.affix li a").click(function (e) {
-      var _link = $(this);
-      if (_link.attr("href").indexOf("#") == 0) {
-        e.preventDefault();
-        var _anchor = $("section#" + decodeURIComponent(_link.attr("href").substring(1)));
-        $("html, body").animate({
-          scrollTop:(_anchor.position().top - $(".navbar-fixed-top").height() - $(".subnav-fixed").height()) + "px"
-        }, 300);
-      }
-    });
-  });
-</script>
-
 </body>
 </html>
