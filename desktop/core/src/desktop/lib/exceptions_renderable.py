@@ -22,6 +22,8 @@ This file exists to remove circular reference caused by importing django_util.
 import sys
 import traceback
 
+from django.utils.encoding import force_unicode
+
 # Need full import statement
 import desktop.lib.django_util
 
@@ -42,14 +44,7 @@ class PopupException(Exception):
     self.traceback = traceback.extract_tb(tb)
 
   def response(self, request):
-    if self.detail:
-      if not isinstance(self.detail, basestring):
-        detail = str(self.detail).decode('utf-8', 'replace')
-      else:
-        detail = self.detail.decode('utf-8', 'replace')
-    else:
-      detail = None
-    data = dict(title=self.title, message=self.message, detail=detail, traceback=self.traceback)
+    data = dict(title=force_unicode(self.title), message=force_unicode(self.message), detail=force_unicode(self.detail), traceback=self.traceback)
     if not request.ajax:
       data['request'] = request
     response = desktop.lib.django_util.render("popup_error.mako", request, data)

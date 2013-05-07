@@ -1,0 +1,5 @@
+<workflow-app name="test-workflow" xmlns="uri:oozie:workflow:0.4">
+  <global></global>
+  <start to="done"/>
+  <end name="done"/>
+</workflow-app>

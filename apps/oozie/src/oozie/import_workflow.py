@@ -40,6 +40,7 @@ import logging
 from lxml import etree
 
 from django.core import serializers
+from django.utils.encoding import smart_str
 from django.utils.translation import ugettext as _
 
 from conf import DEFINITION_XSLT_DIR
@@ -79,7 +80,10 @@ def _save_links(workflow, root):
 
   Note: The nodes that these links point to should exist already.
   Note: Nodes are looked up by workflow and name.
+  Note: Skip global configuration explicitly. Unknown knows should throw an error.
   """
+  LOG.debug("Start resolving links for workflow %s" % smart_str(workflow.name))
+
   # Iterate over nodes
   for child_el in root:
     # Skip special nodes (like comments).
@@ -90,10 +94,25 @@ def _save_links(workflow, root):
     if child_el.tag.endswith('kill'):
       continue
 
+    # Skip global configuration.
+    if child_el.tag.endswith('global'):
+      continue
+
+    tag = xml_tag(child_el)
+    name = child_el.attrib.get('name', tag)
+    LOG.debug("Getting node with data - XML TAG: %(tag)s\tLINK NAME: %(node_name)s\tWORKFLOW NAME: %(workflow_name)s" % {
+      'tag': smart_str(tag),
+      'node_name': smart_str(name),
+      'workflow_name': smart_str(workflow.name)
+    })
+
     # Iterate over node members
     # Join nodes have attributes which point to the next node
     # Start node has attribute which points to first node
-    parent = Node.objects.get(workflow=workflow, name=child_el.attrib.get('name', xml_tag(child_el))).get_full_node()
+    try:
+      parent = Node.objects.get(name=name, workflow=workflow).get_full_node()
+    except Node.DoesNotExist, e:
+      raise RuntimeError(_('Node with name %s for workflow %s does not exist.') % (name, workflow.name))
 
     if isinstance(parent, Start):
       _start_relationships(workflow, parent, child_el)
@@ -113,6 +132,8 @@ def _save_links(workflow, root):
   _resolve_start_relationships(workflow)
   _resolve_fork_relationships(workflow)
   _resolve_decision_relationships(workflow)
+
+  LOG.debug("Finished resolving links for workflow %s" % smart_str(workflow.name))
 
 
 def _start_relationships(workflow, parent, child_el):
@@ -417,7 +438,9 @@ def _resolve_decision_relationships(workflow):
 
 def _prepare_nodes(workflow, root):
   """
-  Deserialize
+  Prepare nodes for groking by Django
+  - Deserialize
+  - Automatically skip undefined nodes.
   """
   objs = serializers.deserialize('xml', etree.tostring(root))
 
@@ -548,7 +571,7 @@ def import_workflow(workflow, workflow_definition, fs=None):
 
   # Ensure namespace exists
   if schema_version not in OOZIE_NAMESPACES:
-    raise RuntimeError(_("Tag with namespace %(namespace)s is not a valid. Please use one of the following namespaces: %(namespaces)s") % {
+    raise RuntimeError(_("Tag with namespace %(namespace)s is not valid. Please use one of the following namespaces: %(namespaces)s") % {
       'namespace': workflow_definition_root.tag,
       'namespaces': ', '.join(OOZIE_NAMESPACES)
     })

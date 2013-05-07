@@ -24,7 +24,7 @@ ${ commonheader(title, "", user) | n,unicode }
 
   <div class="container-fluid">
     <div class="alert">
-      <p><strong>${smart_unicode(message)}</strong></p>
+      <p><strong>${message}</strong></p>
 
       % if detail:
         <p>${ detail }</p>
