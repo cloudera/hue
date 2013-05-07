@@ -29,14 +29,13 @@ SERVER_HOST = Config(
 SERVER_PORT = Config(
   key="server_port",
   help=_("Port of the Impala Server."),
-  default=21000,
+  default=21050,
   type=int)
 
 SERVER_INTERFACE = Config(
   key="server_interface",
-  help=_("Beeswax or Hive Server 2 Thrift API used. Choices are: 'beeswax' or 'hiveserver2'."
-         "'beeswax' requires Beeswax to run for proxying the metadata requests"),
-  default="beeswax")
+  help=_("Beeswax or Hive Server 2 Thrift API used. Choices are: 'beeswax' or 'hiveserver2'."),
+  default="hiveserver2")
 
 IMPALA_PRINCIPAL=Config(
   key='impala_principal',

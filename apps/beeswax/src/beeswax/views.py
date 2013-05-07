@@ -547,6 +547,24 @@ def watch_query_refresh_json(request, id):
   return HttpResponse(json.dumps(result), mimetype="application/json")
 
 
+def cancel_operation(request, query_id):
+  response = {'status': -1, 'message': ''}
+
+  if request.method != 'POST':
+    response['message'] = _('A POST request is required.')
+  else:
+    try:
+      query_history = authorized_get_history(request, query_id, must_exist=True)
+      db = dbms.get(request.user, query_history.get_query_server_config())
+      db.cancel_operation(query_history.get_handle())
+      _get_query_handle_and_state(query_history)
+      response = {'status': 0}
+    except Exception, e:
+      response = {'message': unicode(e)}
+
+  return HttpResponse(json.dumps(response), mimetype="application/json")
+
+
 def view_results(request, id, first_row=0):
   """
   Returns the view for the results of the QueryHistory with the given id.

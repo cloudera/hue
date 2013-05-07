@@ -28,47 +28,56 @@ ${layout.menubar(section='query')}
 <!-- <meta http-equiv="refresh" content="3;${url(app_name + ':watch_query', query.id)}?${fwd_params}" /> -->
 
 <div class="container-fluid">
-	<h1>${_('Waiting for query...')} ${util.render_query_context(query_context)}</h1>
-	<div class="row-fluid">
-		<div class="span3">
-			<div class="well sidebar-nav
-			    % if app_name == 'impala':
-			      hide
-			    % endif
-			">
-				<ul class="nav nav-list">
-					<%
-			          n_jobs = hadoop_jobs and len(hadoop_jobs) or 0
-			          mr_jobs = (n_jobs == 1) and _('MR Job') or _('MR Jobs')
-			        %>
-				 	% if n_jobs > 0:
-						<li id="jobsHeader" class="nav-header">${mr_jobs} (${n_jobs})</li>
-						% for jobid in hadoop_jobs:
-						    <li><a class="jobLink" href="${url("jobbrowser.views.single_job", job=jobid)}">${jobid.replace("job_", "")}</a></li>
-						% endfor
-					% else:
-						<li id="jobsHeader" class="nav-header">${mr_jobs}</li>
-						<li class="jobLink">${_('No Hadoop jobs were launched in running this query.')}</li>
-					% endif
-				</ul>
-			</div>
-		</div>
-		<div class="span9">
-			<ul class="nav nav-tabs">
-				<li class="active"><a href="#log" data-toggle="tab">${_('Log')}</a></li>
-				<li><a href="#query" data-toggle="tab">${_('Query')}</a></li>
-			</ul>
+    <h1>${_('Waiting for query...')} ${util.render_query_context(query_context)}</h1>
+    <div class="row-fluid">
+        <div class="span3">
+            % if app_name == 'impala':
+              <li class="nav">
+                <div class="control-group">
+                  <button id="cancel-btn" class="btn btn-small" data-loading-text="${ _('Canceling...') }" rel="tooltip" data-placement="right" data-original-title="${ _('Cancel the query') }">
+                    ${ _('Cancel') }
+                  </button>
+                </div>
+              </li>
+            % endif
+            <div class="well sidebar-nav
+                % if app_name == 'impala':
+                  hide
+                % endif
+            ">
+                <ul class="nav nav-list">
+                    <%
+                      n_jobs = hadoop_jobs and len(hadoop_jobs) or 0
+                      mr_jobs = (n_jobs == 1) and _('MR Job') or _('MR Jobs')
+                    %>
+                     % if n_jobs > 0:
+                        <li id="jobsHeader" class="nav-header">${mr_jobs} (${n_jobs})</li>
+                        % for jobid in hadoop_jobs:
+                            <li><a class="jobLink" href="${url("jobbrowser.views.single_job", job=jobid)}">${jobid.replace("job_", "")}</a></li>
+                        % endfor
+                    % else:
+                        <li id="jobsHeader" class="nav-header">${mr_jobs}</li>
+                        <li class="jobLink">${_('No Hadoop jobs were launched in running this query.')}</li>
+                    % endif
+                </ul>
+            </div>
+        </div>
+        <div class="span9">
+            <ul class="nav nav-tabs">
+                <li class="active"><a href="#log" data-toggle="tab">${_('Log')}</a></li>
+                <li><a href="#query" data-toggle="tab">${_('Query')}</a></li>
+            </ul>
 
-		   	<div class="tab-content">
-				<div class="active tab-pane" id="log">
-					<pre>${ log }</pre>
-				</div>
-				<div class="tab-pane" id="query">
-					<pre>${ query.get_current_statement() }</pre>
-				</div>
-			</div>
-		</div>
-	</div>
+               <div class="tab-content">
+                <div class="active tab-pane" id="log">
+                    <pre>${ log }</pre>
+                </div>
+                <div class="tab-pane" id="query">
+                    <pre>${ query.get_current_statement() }</pre>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -131,8 +140,23 @@ ${layout.menubar(section='query')}
       $("#log pre").css("overflow", "auto").height($(window).height() - $("#log pre").position().top - 40);
     }
 
+    % if app_name == 'impala':
+      $("#cancel-btn").click(function() {
+        var _this = this;
+        $(_this).button('loading');
+        $.post("${ url(app_name + ':cancel_operation', query.id) }",
+          function(response) {
+            if (response['status'] != 0) {
+              $.jHueNotify.error("${ _('Problem: ') }" + response['message']);
+            } else {
+              $.jHueNotify.info("${ _('Query canceled!') }")
+            }
+          }
+        );
+        return false;
+      });
+    % endif
   });
 </script>
-
 
 ${ commonfooter(messages) | n,unicode }

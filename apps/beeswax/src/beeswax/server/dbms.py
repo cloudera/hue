@@ -129,6 +129,10 @@ class Dbms:
     return self.client.fetch(query_handle, start_over, rows)
 
 
+  def cancel_operation(self, query_handle):
+    return self.client.cancel_operation(query_handle)
+
+
   def get_sample(self, database, table):
     """No samples if it's a view (HUE-526)"""
     if not table.is_view:
