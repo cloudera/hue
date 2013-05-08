@@ -48,7 +48,7 @@ ${ commonheader(_('Job Designer'), "jobsub", user, "60px") | n,unicode }
       &nbsp;
       <!-- ko ifnot: inTrash -->
         <button id="submit-design" class="btn" title="${_('Submit')}" data-bind="enable: selectedDesignObjects().length == 1"><i class="icon-play"></i> ${_('Submit')}</button>
-        <button id="edit-design" class="btn" title="${_('Edit')}" data-bind="enable: selectedDesignObjects().length == 1 && window.location.hash.substring(0,12) != '#edit-design'"><i class="icon-pencil"></i> ${_('Edit')}</button>
+        <button id="edit-design" class="btn" title="${_('Edit')}" data-bind="enable: selectedDesignObjects().length == 1"><i class="icon-pencil"></i> ${_('Edit')}</button>
         <button id="copy-designs" class="btn" title="${_('Copy')}" data-bind="enable: selectedDesignObjects().length > 0"><i class="icon-retweet"></i> ${_('Copy')}</button>
         <div id="delete-dropdown" class="btn-group" style="display: inline">
           <button id="delete-btn" class="btn toolbarBtn dropdown-toggle" title="${_('Delete')}" data-toggle="dropdown" data-bind="enable: selectedDesignObjects().length > 0">
@@ -784,6 +784,7 @@ $(document).ready(function() {
           $('#design textarea').attr('disabled', 'disabled');
           $('#design button').attr('disabled', 'disabled');
         }
+
         showSection('design');
       });
 
