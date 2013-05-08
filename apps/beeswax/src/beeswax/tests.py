@@ -134,6 +134,7 @@ class TestBeeswaxWithHadoop(BeeswaxSampleProvider):
     assert_true("A base for other temporary directories" in response_verbose.content)
 
   def test_query_with_resource(self):
+    raise SkipTest
     script = self.cluster.fs.open("/square.py", "w")
     script.write(
       """#!/usr/bin/python
@@ -1217,7 +1218,7 @@ def test_history_page():
 
   # Only show Beeswax queries
   response = do_view('')
-  assert_equal({}, response.context['filter_params'])
+  assert_equal({u'q-type': [u'beeswax']}, response.context['filter_params'])
 
   # Test pagination
   response = do_view('q-page=100')
