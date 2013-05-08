@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import os
+import sys
 
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
@@ -40,9 +41,10 @@ REMOTE_SAMPLE_DIR = Config(
 def config_validator():
   res = []
 
-  status = get_oozie_status()
-
-  if 'NORMAL' not in status:
-    res.append((NICE_NAME, _("The app won't work without a running Oozie server")))
+  if not 'test' in sys.argv: # Avoid tests hanging
+    status = get_oozie_status()
+  
+    if 'NORMAL' not in status:
+      res.append((NICE_NAME, _("The app won't work without a running Oozie server")))
 
   return res
