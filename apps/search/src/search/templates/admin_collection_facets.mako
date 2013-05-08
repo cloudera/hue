@@ -26,10 +26,10 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 
 <%layout:skeleton>
   <%def name="title()">
-    <h1>${_('Search Admin - ')}${hue_core.label}</h1>
+    <h1>${_('Search Admin - ')}${hue_collection.label}</h1>
   </%def>
   <%def name="navigation()">
-    ${ layout.sidebar(hue_core.name, 'facets') }
+    ${ layout.sidebar(hue_collection.name, 'facets') }
   </%def>
   <%def name="content()">
     <form method="POST" class="form-horizontal" data-bind="submit: submit">
@@ -287,26 +287,26 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 
     self.isSaveBtnVisible = ko.observable(false);
 
-    self.fields = ko.observableArray(${ hue_core.fields | n,unicode });
+    self.fields = ko.observableArray(${ hue_collection.fields | n,unicode });
 
     self.fullFields = {}
-    $.each(${ hue_core.fields_data | n,unicode }, function(index, field) {
+    $.each(${ hue_collection.fields_data | n,unicode }, function(index, field) {
       self.fullFields[field.name] = field;
     });
 
-    self.properties = ko.observable(new Properties(${ hue_core.facets.data | n,unicode }.properties));
+    self.properties = ko.observable(new Properties(${ hue_collection.facets.data | n,unicode }.properties));
 
-    self.fieldFacets = ko.observableArray(ko.utils.arrayMap(${ hue_core.facets.data | n,unicode }.fields, function (obj) {
+    self.fieldFacets = ko.observableArray(ko.utils.arrayMap(${ hue_collection.facets.data | n,unicode }.fields, function (obj) {
       return new FieldFacet(obj);
     }));
 
     // Remove already selected fields
-    self.fieldFacetsList = ko.observableArray(${ hue_core.fields | n,unicode });
+    self.fieldFacetsList = ko.observableArray(${ hue_collection.fields | n,unicode });
     $.each(self.fieldFacets(), function(index, field) {
       self.fieldFacetsList.remove(field.field);
     });
 
-    self.rangeFacets = ko.observableArray(ko.utils.arrayMap(${ hue_core.facets.data | n,unicode }.ranges, function (obj) {
+    self.rangeFacets = ko.observableArray(ko.utils.arrayMap(${ hue_collection.facets.data | n,unicode }.ranges, function (obj) {
       return new RangeFacet(obj);
     }));
 
@@ -318,7 +318,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
       }
     });
 
-    self.dateFacets = ko.observableArray(ko.utils.arrayMap(${ hue_core.facets.data | n,unicode }.dates, function (obj) {
+    self.dateFacets = ko.observableArray(ko.utils.arrayMap(${ hue_collection.facets.data | n,unicode }.dates, function (obj) {
       return new DateFacet({
           field: obj.field,
           label: obj.label,
@@ -339,7 +339,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     // List of all facets sorted by UUID
     self.sortableFacets = ko.observableArray(self.fieldFacets().concat(self.rangeFacets()).concat(self.dateFacets()));
     self.sortableFacets.sort(function(left, right) {
-      var sorted_ids = ${ hue_core.facets.data | n,unicode }.order;
+      var sorted_ids = ${ hue_collection.facets.data | n,unicode }.order;
       return sorted_ids.indexOf(left.uuid) > sorted_ids.indexOf(right.uuid);
     })
 
@@ -461,7 +461,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     };
 
     self.submit = function () {
-      $.ajax("${ url('search:admin_core_facets', core=hue_core.name) }", {
+      $.ajax("${ url('search:admin_collection_facets', collection=hue_collection.name) }", {
         data: {
           'properties': ko.toJSON(self.properties),
           'fields': ko.utils.stringifyJson(self.fieldFacets),

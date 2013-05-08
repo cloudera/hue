@@ -26,11 +26,11 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 
 <%layout:skeleton>
   <%def name="title()">
-    <h1>${_('Search Admin - ')}${hue_core.label}</h1>
+    <h1>${_('Search Admin - ')}${hue_collection.label}</h1>
   </%def>
 
   <%def name="navigation()">
-    ${ layout.sidebar(hue_core.name, 'highlighting') }
+    ${ layout.sidebar(hue_collection.name, 'highlighting') }
   </%def>
 
   <%def name="content()">
@@ -91,16 +91,16 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 <script type="text/javascript">
   function ViewModel() {
     var self = this;
-    self.fields = ko.observableArray(${ hue_core.fields | n,unicode });
+    self.fields = ko.observableArray(${ hue_collection.fields | n,unicode });
 
-    var highlighting = ${ hue_core.result.get_highlighting() | n,unicode };
-    var properties = ${ hue_core.result.get_properties() | n,unicode };
+    var highlighting = ${ hue_collection.result.get_highlighting() | n,unicode };
+    var properties = ${ hue_collection.result.get_properties() | n,unicode };
 
     self.highlightedFields = ko.observableArray(highlighting != null ? highlighting : []);
     self.isEnabled = ko.observable(properties.highlighting_enabled);
 
     self.submit = function () {
-      $.ajax("${ url('search:admin_core_highlighting', core=hue_core.name) }", {
+      $.ajax("${ url('search:admin_collection_highlighting', collection=hue_collection.name) }", {
         data: {
           'properties': ko.utils.stringifyJson({'highlighting_enabled': self.isEnabled()}),
           'highlighting': ko.utils.stringifyJson(self.highlightedFields)

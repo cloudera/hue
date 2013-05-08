@@ -17,7 +17,7 @@
 
 
 from django import forms
-from search.models import Core
+from search.models import Collection
 
 
 class QueryForm(forms.Form):
@@ -33,7 +33,7 @@ class QueryForm(forms.Form):
 
   def __init__(self, *args, **kwargs):
     super(QueryForm, self).__init__(*args, **kwargs)
-    choices = [(core.name, core.label) for core in Core.objects.filter(enabled=True)]
+    choices = [(core.name, core.label) for core in Collection.objects.filter(enabled=True)]
     initial_choice = self._initial_core(choices)
     self.fields['collection'] = forms.ChoiceField(choices=choices, initial=initial_choice, required=False, label='', widget=forms.Select(attrs={'class':'hide'}))
 
@@ -59,7 +59,7 @@ class HighlightingForm(forms.Form):
 
 
 
-class CoreForm(forms.ModelForm):
+class CollectionForm(forms.ModelForm):
   class Meta:
-    model = Core
+    model = Collection
     exclude = ('facets', 'result', 'sorting', 'properties')

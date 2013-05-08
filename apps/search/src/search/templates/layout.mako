@@ -54,39 +54,39 @@
   </div>
   <script type="text/javascript">
     $(document).ready(function () {
-      $("#change-core").change(function(){
-        location.href = $("#change-core").val();
+      $("#change-collection").change(function(){
+        location.href = $("#change-collection").val();
       });
     });
   </script>
 </%def>
 
-<%def name="sidebar(core, section='')">
+<%def name="sidebar(collection, section='')">
   <div class="well sidebar-nav" style="min-height: 250px">
     <ul class="nav nav-list">
 
     <li class="nav-header">${_('Core')}</li>
       <li class="${ utils.is_selected(section, 'properties') }">
-        <a href="${ url('search:admin_core_properties', core=core) }"><i class="icon-reorder"></i> ${_('Properties')}</a>
+        <a href="${ url('search:admin_collection_properties', collection=collection) }"><i class="icon-reorder"></i> ${_('Properties')}</a>
       </li>
 
       <li class="nav-header">${_('Template')}</li>
       <li class="${ utils.is_selected(section, 'template') }">
-        <a href="${ url('search:admin_core_template', core=core) }">${_('1. Snippet')}</a>
+        <a href="${ url('search:admin_collection_template', collection=collection) }">${_('1. Snippet')}</a>
       </li>
       <li class="${ utils.is_selected(section, 'facets') }">
-        <a href="${ url('search:admin_core_facets', core=core) }">${_('2. Facets')}</a>
+        <a href="${ url('search:admin_collection_facets', collection=collection) }">${_('2. Facets')}</a>
       </li>
       <li class="${ utils.is_selected(section, 'sorting') }">
-        <a href="${ url('search:admin_core_sorting', core=core) }">${_('3. Sorting')}</a>
+        <a href="${ url('search:admin_collection_sorting', collection=collection) }">${_('3. Sorting')}</a>
       </li>
       <li class="${ utils.is_selected(section, 'highlighting') }">
-        <a href="${ url('search:admin_core_highlighting', core=core) }">${_('4. Highlighting')}</a>
+        <a href="${ url('search:admin_collection_highlighting', collection=collection) }">${_('4. Highlighting')}</a>
       </li>
 
       <li class="nav-header">${_('Search')}</li>
       <li>
-        <a href="${ url('search:index') }?collection=${ core }"><i class="icon-share-alt"></i> ${ _('Query') }</a>
+        <a href="${ url('search:index') }?collection=${ collection }"><i class="icon-share-alt"></i> ${ _('Query') }</a>
       </li>
     </ul>
   </div>

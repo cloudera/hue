@@ -26,11 +26,11 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 
 <%layout:skeleton>
   <%def name="title()">
-    <h1>${_('Search Admin - ')}${hue_core.label}</h1>
+    <h1>${_('Search Admin - ')}${hue_collection.label}</h1>
   </%def>
 
   <%def name="navigation()">
-    ${ layout.sidebar(hue_core.name, 'sorting') }
+    ${ layout.sidebar(hue_collection.name, 'sorting') }
   </%def>
 
   <%def name="content()">
@@ -121,16 +121,16 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 
   function ViewModel() {
     var self = this;
-    self.fields = ko.observableArray(${ hue_core.fields | n,unicode });
+    self.fields = ko.observableArray(${ hue_collection.fields | n,unicode });
 
-    self.isEnabled = ko.observable(${ hue_core.sorting.data | n,unicode }.properties.is_enabled);
+    self.isEnabled = ko.observable(${ hue_collection.sorting.data | n,unicode }.properties.is_enabled);
 
-    self.sortingFields = ko.observableArray(ko.utils.arrayMap(${ hue_core.sorting.data | n,unicode }.fields, function (obj) {
+    self.sortingFields = ko.observableArray(ko.utils.arrayMap(${ hue_collection.sorting.data | n,unicode }.fields, function (obj) {
       return new SortingField(obj.field, obj.label, obj.asc);
     }));
 
     // Remove already selected fields
-    self.sortingFieldsList = ko.observableArray(${ hue_core.fields | n,unicode });
+    self.sortingFieldsList = ko.observableArray(${ hue_collection.fields | n,unicode });
     $.each(self.sortingFields(), function(index, field) {
       self.sortingFieldsList.remove(field.field);
     });
@@ -160,7 +160,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     };
 
     self.submit = function () {
-      $.ajax("${ url('search:admin_core_sorting', core=hue_core.name) }", {
+      $.ajax("${ url('search:admin_collection_sorting', collection=hue_collection.name) }", {
         data: {
           'properties': ko.utils.stringifyJson({'is_enabled': self.isEnabled()}),
           'fields': ko.utils.stringifyJson(self.sortingFields)

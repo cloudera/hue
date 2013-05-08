@@ -23,14 +23,14 @@
 
 
 <%def name="indexProperty(key)">
-  %if key in solr_core["status"][hue_core.name]["index"]:
-      ${ solr_core["status"][hue_core.name]["index"][key] }
+  %if key in solr_collection["status"][hue_collection.name]["index"]:
+      ${ solr_collection["status"][hue_collection.name]["index"][key] }
     %endif
 </%def>
 
-<%def name="coreProperty(key)">
-  %if key in solr_core["status"][hue_core.name]:
-      ${ solr_core["status"][hue_core.name][key] }
+<%def name="collectionProperty(key)">
+  %if key in solr_collection["status"][hue_collection.name]:
+      ${ solr_collection["status"][hue_collection.name][key] }
     %endif
 </%def>
 
@@ -41,7 +41,7 @@
   <%def name="content()">
     <ul class="nav nav-tabs">
       <li class="active"><a href="#index_properties" data-toggle="tab">${_('Index properties')}</a></li>
-      <li><a href="#core_properties" data-toggle="tab">${_('Core properties')}</a></li>
+      <li><a href="#collection_properties" data-toggle="tab">${_('Core properties')}</a></li>
     </ul>
 
     <div class="tab-content">
@@ -97,7 +97,7 @@
           </tbody>
         </table>
       </div>
-      <div class="tab-pane" id="core_properties">
+      <div class="tab-pane" id="collection_properties">
         <table class="table">
           <thead>
           <tr>
@@ -108,35 +108,35 @@
           <tbody>
           <tr>
             <td>uptime</td>
-            <td>${ coreProperty('uptime') }</td>
+            <td>${ collectionProperty('uptime') }</td>
           </tr>
           <tr>
             <td>name</td>
-            <td>${ coreProperty('name') }</td>
+            <td>${ collectionProperty('name') }</td>
           </tr>
           <tr>
             <td>isDefaultCore</td>
-            <td>${ coreProperty('isDefaultCore') }</td>
+            <td>${ collectionProperty('isDefaultCore') }</td>
           </tr>
           <tr>
             <td>dataDir</td>
-            <td>${ coreProperty('dataDir') }</td>
+            <td>${ collectionProperty('dataDir') }</td>
           </tr>
           <tr>
             <td>instanceDir</td>
-            <td>${ coreProperty('instanceDir') }</td>
+            <td>${ collectionProperty('instanceDir') }</td>
           </tr>
           <tr>
             <td>startTime</td>
-            <td>${ coreProperty('startTime') }</td>
+            <td>${ collectionProperty('startTime') }</td>
           </tr>
           <tr>
             <td>config</td>
-            <td>${ coreProperty('config') }</td>
+            <td>${ collectionProperty('config') }</td>
           </tr>
           <tr>
             <td>schema</td>
-            <td>${ coreProperty('schema') }</td>
+            <td>${ collectionProperty('schema') }</td>
           </tr>
           </tbody>
         </table>

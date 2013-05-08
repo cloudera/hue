@@ -31,20 +31,22 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 <div class="search-bar">
   % if user.is_superuser:
     <div class="pull-right" style="margin-top: 4px">
+      <a href="${ url('search:admin_collections') }"><i class="icon-edit"></i> ${ _('Collection manager') }</a>
+      <a href="${ url('search:admin_collections_wizard') }"><i class="icon-edit"></i> ${ _('Add collection') }</a>
       <a class="change-settings" href="#"><i class="icon-edit"></i> ${ _('Customize result display') }</a>
     </div>
   % endif
   <form class="form-search" style="margin: 0">
     <div class="dropdown" style="display: inline">
-      Search in <a href="#" data-toggle="dropdown"><strong class="current-core"></strong> <i class="icon-caret-down"></i></a>
+      Search in <a href="#" data-toggle="dropdown"><strong class="current-collection"></strong> <i class="icon-caret-down"></i></a>
       <ul class="dropdown-menu">
         % if user.is_superuser:
-          % for core in hue_cores:
-            <li><a class="dropdown-core" href="#" data-value="${ core.name }" data-settings-url="${ core.get_absolute_url() }">${ core.label }</a></li>
+          % for collection in hue_collections:
+            <li><a class="dropdown-collection" href="#" data-value="${ collection.name }" data-settings-url="${ collection.get_absolute_url() }">${ collection.label }</a></li>
           % endfor
         % else:
-          % for core in hue_cores:
-            <li><a class="dropdown-core" href="#" data-value="${ core.name }">${ core.label }</a></li>
+          % for collection in hue_collections:
+            <li><a class="dropdown-collection" href="#" data-value="${ collection.name }">${ collection.label }</a></li>
           % endfor
         % endif
       </ul>
@@ -90,24 +92,24 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
           % for group, count in macros.pairwise(fld['counts']):
             % if count > 0 and group != "" and found_value == "":
               % if fld['type'] == 'field':
-                <li><a href='?collection=${ current_core }&query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ fld['field'] }:"${ urllib.quote_plus(group.encode('ascii', 'xmlcharrefreplace')) }"${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}'>${group}</a> <span class="counter">(${ count })</span></li>
+                <li><a href='?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ fld['field'] }:"${ urllib.quote_plus(group.encode('ascii', 'xmlcharrefreplace')) }"${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}'>${group}</a> <span class="counter">(${ count })</span></li>
               % endif
               % if fld['type'] == 'range':
-                <li><a href='?collection=${ current_core }&query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ fld['field'] }:["${ group }" TO "${ str(int(group) + int(fld['gap']) - 1) }"]${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}'>${ group } (${ count })</a></li>
+                <li><a href='?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ fld['field'] }:["${ group }" TO "${ str(int(group) + int(fld['gap']) - 1) }"]${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}'>${ group } (${ count })</a></li>
               % endif
               % if fld['type'] == 'date':
-                <li class="dateFacetItem"><a href='?collection=${ current_core }&query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ fld['field'] }:"${ group }"${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}'><span class="dateFacet">${ group }</span> (${ count })</a></li>
+                <li class="dateFacetItem"><a href='?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ fld['field'] }:"${ group }"${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}'><span class="dateFacet">${ group }</span> (${ count })</a></li>
               % endif
             % endif
             % if found_value != "":
               % if fld['type'] == 'field' and '"' + group + '"' == found_value:
-                <li><strong>${ group }</strong> <a href="?collection=${ current_core }&query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}"><i class="icon-remove"></i></a></li>
+                <li><strong>${ group }</strong> <a href="?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}"><i class="icon-remove"></i></a></li>
               % endif
               % if fld['type'] == 'range' and '["' + group + '" TO "' + str(int(group) + int(fld['gap']) - 1) + '"]' == found_value:
-                <li><strong>${ group }</strong> <a href="?collection=${ current_core }&query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}"><i class="icon-remove"></i></a></li>
+                <li><strong>${ group }</strong> <a href="?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}"><i class="icon-remove"></i></a></li>
               % endif
               % if fld['type'] == 'date' and '"' + group + '"' == found_value:
-                <li><strong><span class="dateFacet">${group}</span></strong> <a href="?collection=${ current_core }&query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}"><i class="icon-remove"></i></a></li>
+                <li><strong><span class="dateFacet">${group}</span></strong> <a href="?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}"><i class="icon-remove"></i></a></li>
               % endif
             % endif
           % endfor
@@ -142,7 +144,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 
       <div id="result-container"></div>
 
-      <textarea id="mustacheTmpl" class="hide">${ hue_core.result.get_template(with_highlighting=True) | n,unicode }</textarea>
+      <textarea id="mustacheTmpl" class="hide">${ hue_collection.result.get_template(with_highlighting=True) | n,unicode }</textarea>
       <script>
 
       <%
@@ -151,6 +153,16 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
           if doc['id'] in response.get('highlighting', []):
             doc.update(response['highlighting'][doc['id']])
         %>
+
+        function genericFormatDate(val, item, format){
+          var d = moment(Mustache.render(val, item));
+          if (d.isValid()) {
+            return d.format(format);
+          }
+          else {
+            return Mustache.render(val, item);
+          }
+        }
 
         var _mustacheTmpl = fixTemplateDots($("#mustacheTmpl").text());
         $.each(${ json.dumps([result for result in docs]) | n,unicode }, function (index, item) {
@@ -196,7 +208,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 </div>
 
 
-${ hue_core.result.get_extracode() | n,unicode }
+${ hue_collection.result.get_extracode() | n,unicode }
 
 <script>
   $(document).ready(function () {
@@ -228,23 +240,23 @@ ${ hue_core.result.get_extracode() | n,unicode }
     });
     $(".dateFacetHeader").after(orderedDateFacets);
 
-    $(".current-core").text("${ current_core }");
+    $(".current-collection").text("${ current_collection }");
     % if user.is_superuser:
-        $(".dropdown-core").each(function () {
+        $(".dropdown-collection").each(function () {
           if ($(this).data("value") == $("select[name='collection']").val()) {
             $(".change-settings").attr("href", $(this).data("settings-url"));
           }
         });
     % endif
 
-    $(".dropdown-core").click(function (e) {
+    $(".dropdown-collection").click(function (e) {
       e.preventDefault();
-      $(".current-core").text($(this).text());
+      $(".current-collection").text($(this).text());
       $("select[name='collection']").val($(this).data("value"));
       % if user.is_superuser:
           $(".change-settings").attr("href", $(this).data("settings-url"));
       % endif
-      $.cookie("hueSearchLastCore", $(this).text(), {expires: 90});
+      $.cookie("hueSearchLastCollection", $(this).text(), {expires: 90});
       $("form").submit();
     });
 
@@ -254,7 +266,7 @@ ${ hue_core.result.get_extracode() | n,unicode }
     });
     $("#recordsPerPage").val($("input[name='rows']").val());
 
-    var sortingData = ${ hue_core.sorting.data | n,unicode };
+    var sortingData = ${ hue_collection.sorting.data | n,unicode };
     if (sortingData && sortingData.fields && sortingData.fields.length > 0) {
       $.each(sortingData.fields, function (index, item) {
         $("<option>").attr("value", item.label).text(item.label).data("field", item.field).data("asc", item.asc).appendTo($(".sort-by"));
@@ -313,7 +325,7 @@ ${ hue_core.result.get_extracode() | n,unicode }
       var query = $("#id_query").val();
       if ($.trim(query) != "") {
         $("#id_query").addClass("deletable");
-        $.ajax("${ url('search:query_suggest', core=hue_core.name) }" + query, {
+        $.ajax("${ url('search:query_suggest', collection=hue_collection.name) }" + query, {
           type: 'GET',
           success: function (data) {
             if (data.message.spellcheck && ! jQuery.isEmptyObject(data.message.spellcheck.suggestions)) {

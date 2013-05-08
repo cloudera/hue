@@ -27,26 +27,48 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 <link rel="stylesheet" href="/search/static/css/admin.css">
 
 <div class="container-fluid">
+  % if collections:
+  <h1>${_('Import a new collection')}</h1>
 
-  <h1>${_('Search Admin - Cores')}</h1>
-  <%actionbar:render>
-    <%def name="search()">
-      <input type="text" placeholder="${_('Filter collections by name...')}" class="input-xxlarge search-query" id="filterInput">
-    </%def>
-    
-  </%actionbar:render>
   <div class="row-fluid">
     <div class="span12">
       <ul id="collections">
-      % for collection in hue_collections:
-        <li style="cursor: move" data-collection="${ collection.name }">
-          <a href="${ collection.get_absolute_url() }" class="pull-right" style="margin-top: 10px;margin-right: 10px"><i class="icon-edit"></i> ${_('Edit')}</a>
-          <h4><i class="icon-list"></i> ${ collection.name }</h4>
+      % for collection in collections:
+        <li>
+          <a class="addCollection" data-name="${ collection }">
+            <h4><i class="icon-list"></i> ${ collection }</h4>
+          </a>
         </li>
       % endfor
       </ul>
     </div>
   </div>
+  % endif
+  
+  % if cores:
+  <h1>${_('Import a new core')}</h1>
+
+  <div class="row-fluid">
+    <div class="span12">
+      <ul id="collections">
+      % for core in cores:
+        <li>
+          <h4><i class="icon-list"></i> ${ core }</h4>
+        </li>
+      % endfor
+      </ul>
+    </div>
+  </div>  
+  % endif
+  
+  % if not collections and not cores:
+  <h1>${_('No available indexes')}</h1>
+
+  <div class="row-fluid">
+    ${ _('Already installed all the collections. You can change the indexes URL in hue.ini.') }
+  </div>      
+  % endif
+  
 </div>
 
 <style type="text/css">
@@ -71,41 +93,18 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
   }
 </style>
 
-<script src="/static/ext/js/jquery/plugins/jquery-ui-draggable-droppable-sortable-1.8.23.min.js"></script>
-
 <script type="text/javascript">
   $(document).ready(function () {
-    var orderedCores;
-    serializeList();
-    $("#collections").sortable({
-      placeholder: "placeholder",
-      update: function (event, ui) {
-        serializeList();
-        ##TODO: serialize via ajax the order of collections
-        ## the array is: orderedCores
-        ## console.log(orderedCores)
-      }
-    });
-    $("#collections").disableSelection();
-
-    function serializeList() {
-      orderedCores = [];
-      $("#collections li").each(function () {
-        orderedCores.push($(this).data("collection"));
-      });
-    }
-
-    var filter = -1;
-    $("#filterInput").on("keyup", function () {
-      clearTimeout(filter);
-      filter = window.setTimeout(function () {
-        $("#collections li").removeClass("hide");
-        $("#collections li").each(function () {
-          if ($(this).data("collection").toLowerCase().indexOf($("#filterInput").val().toLowerCase()) == -1) {
-            $(this).addClass("hide");
+    $(".addCollection").click(function() {
+      var collectionName = $(this).data('name');
+      $.post('${ url("search:admin_collections_wizard") }', {type: 'collection', name: collectionName},
+        function(response) {
+          if (response['status'] != 0) {
+            $.jHueNotify.error("${ _('Problem: ') }" + response['message']);
+          } else {
+            window.location = "/search/admin/collection/" + collectionName;
           }
-        });
-      }, 300);
+	  });
     });
   });
 </script>

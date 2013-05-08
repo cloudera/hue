@@ -124,11 +124,11 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 
 <%layout:skeleton>
   <%def name="title()">
-    <h1>${ _('Template Editor ') } : ${ hue_core.name }</h1>
+    <h1>${ _('Template Editor ') } : ${ hue_collection.name }</h1>
   </%def>
 
   <%def name="navigation()">
-    ${ layout.sidebar(hue_core.name, 'template') }
+    ${ layout.sidebar(hue_collection.name, 'template') }
   </%def>
 
   <%def name="content()">
@@ -144,7 +144,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
         <div class="row-fluid">
           <div class="span9">
             <div id="toolbar"></div>
-            <div id="content-editor" class="clear">${ hue_core.result.get_template() | n,unicode }</div>
+            <div id="content-editor" class="clear">${ hue_collection.result.get_template() | n,unicode }</div>
             <div id="load-template" class="btn-group">
               <a title="Layout" class="btn toolbar-btn toolbar-cmd">
                 <i class="icon-th-large" style="margin-top:2px;"></i>
@@ -261,7 +261,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
         <div class="row-fluid">
           <div class="span12">
             <span class="muted"> ${ _('Here you can define custom CSS classes or Javascript functions that you can use in your template.') }</span><br/><br/>
-            <textarea id="template-extra">${ hue_core.result.get_extracode() | n,unicode }</textarea>
+            <textarea id="template-extra">${ hue_collection.result.get_extracode() | n,unicode }</textarea>
           </div>
         </div>
 
@@ -393,7 +393,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 </%layout:skeleton>
 
 <span id="extraCode">
-  ${ hue_core.result.get_extracode() | n,unicode }
+  ${ hue_collection.result.get_extracode() | n,unicode }
 </span>
 
 <link rel="stylesheet" href="/static/ext/farbtastic/farbtastic.css">
@@ -484,7 +484,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 
     function ViewModel() {
       var self = this;
-      self.availableFields = ko.observableArray(${ hue_core.fields | n,unicode });
+      self.availableFields = ko.observableArray(${ hue_collection.fields | n,unicode });
       self.selectedVisualField = ko.observable();
       self.selectedVisualFunction = ko.observable();
       self.selectedVisualFunction.subscribe(function (newValue) {
@@ -618,7 +618,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     });
 
     $("#save-template").click(function () {
-      $.ajax("${ url('search:admin_core_template', core=hue_core.name) }", {
+      $.ajax("${ url('search:admin_collection_template', collection=hue_collection.name) }", {
         data: {
           'template': ko.utils.stringifyJson($("#content-editor").html()),
           'extracode': ko.utils.stringifyJson(templateExtraMirror.getValue())

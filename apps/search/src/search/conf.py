@@ -25,3 +25,18 @@ SOLR_URL = Config(
   help=_("URL of the Solr Server."),
   private=False,
   default="http://localhost:1978/solr/")
+
+#SOLR_URLS = UnspecifiedConfigSection(
+#  "solr_urls",
+#  help="One entry for each Solr server",
+#  each=ConfigSection(
+#    help="Information about a single HDFS cluster",
+#    members=dict(
+#      # Deprecated
+#      NN_HOST=Config("namenode_host", help="Host/IP for name node"),
+#    )
+#  )
+#)
+                                     
+# ZOOKEEPER URL
+# for COLLECTIONS                                     

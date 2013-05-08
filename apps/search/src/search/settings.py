@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 DJANGO_APPS = [ "search" ]
-NICE_NAME = "Search"
+NICE_NAME = "Solr Search"
 MENU_INDEX = 42
 ICON = "/search/static/art/icon_search_24.png"
 
