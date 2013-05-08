@@ -438,8 +438,8 @@
         </thead>
         <tbody data-bind="foreach: ${ javascript_attrs['name'] }">
           <tr>
-            <td><input type="text" class="span4 required propKey" data-bind="disable: $root.context().read_only, fileChooser: $data, value: source, uniqueName: false" /></td>
-            <td><input type="text" class="span4 required pathChooserKo" data-bind="disable: $root.context().read_only, fileChooser: $data, value: destination, uniqueName: false" /></td>
+            <td><input type="text" class="span3 required propKey" data-bind="disable: $root.context().read_only, fileChooser: $data, value: source, uniqueName: false" /></td>
+            <td><input type="text" class="span3 required pathChooserKo" data-bind="disable: $root.context().read_only, fileChooser: $data, value: destination, uniqueName: false" /></td>
             <td>
             % if 'remove' in javascript_attrs:
               <a class="btn" href="#" data-bind="disable: $root.context().read_only, click: ${ javascript_attrs['remove'] }">${ _('Delete') }</a>
