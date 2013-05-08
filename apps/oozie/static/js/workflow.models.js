@@ -171,15 +171,34 @@ var MAPPING_OPTIONS = {
   deletes: {
     create: function(options) {
       return map_params(options, function() {});
-    }
+    },
+    update: function(options) {
+      return map_params(options, function() {});
+    },
   },
   mkdirs: {
     create: function(options) {
       return map_params(options, function() {});
-    }
+    },
+    update: function(options) {
+      return map_params(options, function() {});
+    },
   },
   moves: {
     create: function(options) {
+      var parent = options.parent;
+      var subscribe = function(mapping) {
+        mapping.source.subscribe(function(value) {
+          parent.moves.valueHasMutated();
+        });
+        mapping.destination.subscribe(function(value) {
+          parent.moves.valueHasMutated();
+        });
+      };
+
+      return map_params(options, subscribe);
+    },
+    update: function(options) {
       var parent = options.parent;
       var subscribe = function(mapping) {
         mapping.source.subscribe(function(value) {
@@ -209,10 +228,29 @@ var MAPPING_OPTIONS = {
        };
 
        return map_params(options, subscribe);
-     }
+     },
+     update: function(options) {
+       var parent = options.parent;
+       var subscribe = function(mapping) {
+         mapping.path.subscribe(function(value) {
+           parent.chmods.valueHasMutated();
+         });
+         mapping.permissions.subscribe(function(value) {
+           parent.chmods.valueHasMutated();
+         });
+         mapping.recursive.subscribe(function(value) {
+           parent.chmods.valueHasMutated();
+         });
+       };
+
+       return map_params(options, subscribe);
+     },
    },
    touchzs: {
      create: function(options) {
+       return map_params(options, function() {});
+     },
+     update: function(options) {
        return map_params(options, function() {});
      }
    }
