@@ -126,7 +126,7 @@ ${ commonheader(_('Job Designer'), "jobsub", user, "60px") | n,unicode }
       <thead>
         <tr>
           <th width="1%">
-            <div id="selectAll" data-bind="click: toggleSelectAll, css: {hueCheckbox: true, 'icon-ok': allSelected}"></div>
+            <div id="selectAll" data-bind="click: toggleSelectAll, css: {'hueCheckbox': true, 'icon-ok': allSelected}"></div>
           </th>
           <th>${_('Name')}</th>
           <th>${_('Description')}</th>
@@ -137,7 +137,7 @@ ${ commonheader(_('Job Designer'), "jobsub", user, "60px") | n,unicode }
           <th>${_('Trashed')}</th>
         </tr>
       </thead>
-      <tbody id="designs" data-bind="template: {name: 'designTemplate', foreach: designs}">
+      <tbody id="designs" data-bind="template: {'name': 'designTemplate', 'foreach': designs}">
 
       </tbody>
     </table>
@@ -148,7 +148,7 @@ ${ commonheader(_('Job Designer'), "jobsub", user, "60px") | n,unicode }
 <script id="designTemplate" type="text/html">
   <tr style="cursor: pointer" data-bind="with: design">
     <td data-row-selector-exclude="true" data-bind="click: function(data, event) {$root.toggleSelect.call($root, $index());}" class="center" style="cursor: default">
-      <div class="hueCheckbox savedCheck" data-row-selector-exclude="true" data-bind="css: {hueCheckbox: name != '..', 'icon-ok': $parent.selected()}"></div>
+      <div class="hueCheckbox savedCheck" data-row-selector-exclude="true" data-bind="css: {'hueCheckbox': name != '..', 'icon-ok': $parent.selected()}"></div>
     </td>
     <td data-bind="click: function(data, event) { window.location = '#edit-design/' + $index() }, text: name"></td>
     <td data-bind="click: function(data, event) { window.location = '#edit-design/' + $index() }, text: description"></td>
@@ -235,6 +235,436 @@ ${ commonheader(_('Job Designer'), "jobsub", user, "60px") | n,unicode }
 </div>
 
 <script type="text/javascript" charset="utf-8">
+//// Contexts
+// Context matches up with jobsub.templates.js and various templates defined there.
+// If there is an update to any of the templates,
+// This global context may need to be updated.
+// Global context is extended to provide any uniqueness.
+var global_action_context = {
+  'alert': "${_('You can parameterize the values, using')} <code>$myVar</code> ${_('or')} <code>${"${"}myVar}</code>. ${_('When the design is submitted, you will be prompted for the actual value of ')}<code>myVar</code>.",
+  'paths_alert': "${_('All the paths are relative to the deployment directory. They can be absolute but this is not recommended.')}",
+  'smtp_alert': "${_('Requires some SMTP server configuration to be present (in oozie-site.xml).')}",
+  'ssh_alert': "${_('The ssh server requires passwordless login.')}",
+  'save': {
+    'name': "${_('Save')}",
+    'func': "function(data, event) {$root.saveDesign.call($root, data, event);}"
+  },
+  'cancel': {
+    'name': "${_('Cancel')}",
+    'func': "function(data, event) {$root.closeDesign.call($parent, {}); reload();}"
+  },
+  'name': {
+    'name': "${ _('Name') }",
+    'popover': "${ _('Name of the design.') }",
+    'js': {
+      'name': 'name'
+    }
+  },
+  'description': {
+    'name': "${ _('Description') }",
+    'popover': "${ _('Description of the design.') }",
+    'js': {
+      'name': 'description'
+    }
+  },
+  'is_shared': {
+    'name': "${ _('Is shared') }",
+    'popover': "${ _('Enable other users to have access to this job.') }",
+    'js': {
+      'name': 'is_shared'
+    }
+  },
+  'capture_output': {
+    'name': "${ _('Capture output') }",
+    'popover': "${ _('Capture the output of this job.') }",
+    'js': {
+      'name': 'capture_output'
+    }
+  },
+  'parameters': {
+    'title': "${ _('Oozie parameters') }",
+    'name': "${ _('Name') }",
+    'value': "${ _('Value') }",
+    'delete': {
+      'name': "${ _('Delete') }",
+      'func': 'function(data, event) { $parent.removeParameter.call($parent, data, event) }'
+    },
+    'add': {
+      'name': "${ _('Add') }",
+      'func': 'addParameter'
+    },
+    'ko': {
+      'items': "parameters",
+      'error_class': "parameters_error_class",
+      'condition': "parameters_condition"
+    }
+  },
+  'user': {
+    'name': "${ _('User') }",
+    'popover': "${ _('User to authenticate with.') }"
+  },
+  'host': {
+    'name': "${ _('Host') }",
+    'popover': "${ _('Host to execute command on.') }"
+  },
+  'command': {
+    'name': "${ _('Command') }",
+    'popover': "${ _('Command to execute.') }"
+  },
+  'script_path': {
+    'name': "${ _('Script name') }",
+    'popover': "${ _('Path to the script to execute.') }"
+  },
+  'jar_path': {
+    'name': "${ _('Jar path') }",
+    'popover': "${ _('Path to jar files on HDFS.') }"
+  },
+  'main_class': {
+    'name': "${ _('Main class') }",
+    'popover': "${ _('Main class') }"
+  },
+  'args': {
+    'name': "${ _('Args') }",
+    'popover': "${ _('Args') }"
+  },
+  'java_opts': {
+    'name': "${ _('Java opts') }",
+    'popover': "${ _('Java opts') }"
+  },
+  'mapper': {
+    'name': "${ _('Mapper') }",
+    'popover': "${ _('Mapper') }"
+  },
+  'reducer': {
+    'name': "${ _('Reducer') }",
+    'popover': "${ _('Reducer') }"
+  },
+  'to': {
+    'name': "${ _('TO addresses') }",
+    'popover': "${ _('TO addresses') }"
+  },
+  'cc': {
+    'name': "${ _('CC addresses (optional)') }",
+    'popover': "${ _('CC addresses (optional)') }"
+  },
+  'subject': {
+    'name': "${ _('Subject') }",
+    'popover': "${ _('Subject') }"
+  },
+  'body': {
+    'name': "${ _('Body') }",
+    'popover': "${ _('Body') }"
+  },
+  'job_properties': {
+    'title': "${ _('Job properties') }",
+    'name': "${ _('Property name') }",
+    'value': "${ _('Value') }",
+    'delete': {
+      'name': "${ _('Delete') }",
+      'func': 'function(data, event) { $parent.removeProperty.call($parent, data, event) }'
+    },
+    'add': {
+      'name': "${ _('Add property') }",
+      'func': 'addProperty'
+    },
+    'ko': {
+      'items': "job_properties",
+      'error_class': "job_properties_error_class",
+      'condition': "job_properties_condition"
+    }
+  },
+  'prepares': {
+    'title': "${ _('Prepare') }",
+    'name': "${ _('Type') }",
+    'value': "${ _('Value') }",
+    'delete': {
+      'name': "${ _('Delete') }",
+      'func': 'function(data, event) { $parent.removePrepare.call($parent, data, event) }'
+    },
+    'add': {
+      'delete': {
+        'name': "${ _('Add delete') }",
+        'func': 'addPrepareDelete'
+      },
+      'mkdir': {
+        'name': "${ _('Add mkdir') }",
+        'func': 'addPrepareMkdir'
+      }
+    },
+    'ko': {
+      'items': "prepares",
+      'error_class': "prepares_error_class",
+      'condition': "prepares_condition"
+    }
+  },
+  'params': {
+    'title': "${ _('Params') }",
+    'name': "${ _('Type') }",
+    'value': "${ _('Value') }",
+    'delete': {
+      'name': "${ _('Delete') }",
+      'func': 'function(data, event) { $parent.removeParam.call($parent, data, event) }'
+    },
+    'add': [{
+      'name': "${ _('Add param') }",
+      'func': 'addParam'
+    }],
+    'ko': {
+      'items': "params",
+      'error_class': "params_error_class",
+      'condition': "params_condition"
+    }
+  },
+  'files': {
+    'title': "${ _('Files') }",
+    'delete': {
+      'name': "${ _('Delete') }",
+      'func': 'function(data, event) { $parent.removeFile.call($parent, data, event) }'
+    },
+    'add': {
+      'name': "${ _('Add file') }",
+      'func': 'addFile'
+    },
+    'ko': {
+      'items': "files",
+      'error_class': "files_error_class",
+      'condition': "files_condition"
+    }
+  },
+  'archives': {
+    'title': "${ _('Archives') }",
+    'delete': {
+      'name': "${ _('Delete') }",
+      'func': 'function(data, event) { $parent.removeArchive.call($parent, data, event) }'
+    },
+    'add': {
+      'name': "${ _('Add archive') }",
+      'func': 'addArchive'
+    },
+    'ko': {
+      'items': "archives",
+      'error_class': "archives_error_class",
+      'condition': "archives_condition"
+    }
+  }
+};
+
+var contexts = {
+  'mapreduce': {
+    'title': "${ _('Job Design (mapreduce type)') }"
+  },
+  'java': {
+    'title': "${ _('Job Design (java type)') }"
+  },
+  'streaming': {
+    'title': "${ _('Job Design (streaming type)') }"
+  },
+  'hive': {
+    'title': "${ _('Job Design (hive type)') }"
+  },
+  'pig': {
+    'title': "${ _('Job Design (pig type)') }",
+    'params': {
+      'title': "${ _('Params') }",
+      'name': "${ _('Type') }",
+      'value': "${ _('Value') }",
+      'delete': {
+        'name': "${ _('Delete') }",
+        'func': 'function(data, event) { $parent.removeParam.call($parent, data, event) }'
+      },
+      'add': [{
+        'name': "${ _('Add param') }",
+        'func': 'addParam'
+      },{
+        'name': "${ _('Add argument') }",
+        'func': 'addArgument'
+      }],
+      'ko': {
+        'items': "params",
+        'error_class': "params_error_class",
+        'condition': "params_condition"
+      }
+    },
+  },
+  'sqoop': {
+    'title': "${ _('Job Design (sqoop type)') }",
+    'script_path': {
+      'name': "${ _('Command') }",
+      'popover': "${ _('Command to execute.') }"
+    },
+    'params': {
+      'title': "${ _('Params') }",
+      'name': "${ _('Type') }",
+      'value': "${ _('Value') }",
+      'delete': {
+        'name': "${ _('Delete') }",
+        'func': 'function(data, event) { $parent.removeParam.call($parent, data, event) }'
+      },
+      'add': [{
+        'name': "${ _('Add arg') }",
+        'func': 'addArg'
+      }],
+      'ko': {
+        'items': "params",
+        'error_class': "params_error_class",
+        'condition': "params_condition"
+      }
+    }
+  },
+  'fs': {
+    'title': "${ _('Job Design (fs type)') }",
+    'deletes': {
+      'title': "${ _('Delete path') }",
+      'delete': {
+        'name': "${ _('Delete') }",
+        'func': 'function(data, event) { $parent.removeDelete.call($parent, data, event) }'
+      },
+      'add': {
+        'name': "${ _('Add path') }",
+        'func': 'addDelete'
+      },
+      'ko': {
+        'items': "deletes",
+        'error_class': "deletes_error_class",
+        'condition': "deletes_condition"
+      }
+    },
+    'mkdirs': {
+      'title': "${ _('Create directory') }",
+      'delete': {
+        'name': "${ _('Delete') }",
+        'func': 'function(data, event) { $parent.removeMkdir.call($parent, data, event) }'
+      },
+      'add': {
+        'name': "${ _('Add path') }",
+        'func': 'addMkdir'
+      },
+      'ko': {
+        'items': "mkdirs",
+        'error_class': "mkdirs_error_class",
+        'condition': "mkdirs_condition"
+      }
+    },
+    'touchzs': {
+      'title': "${ _('Create or touch file') }",
+      'delete': {
+        'name': "${ _('Delete') }",
+        'func': 'function(data, event) { $parent.removeTouchz.call($parent, data, event) }'
+      },
+      'add': {
+        'name': "${ _('Add path') }",
+        'func': 'addTouchz'
+      },
+      'ko': {
+        'items': "touchzs",
+        'error_class': "touchzs_error_class",
+        'condition': "touchzs_condition"
+      }
+    },
+    'chmods': {
+      'title': "${ _('Change permissions') }",
+      'delete': {
+        'name': "${ _('Delete') }",
+        'func': 'function(data, event) { $parent.removeChmod.call($parent, data, event) }'
+      },
+      'add': {
+        'name': "${ _('Add chmod') }",
+        'func': 'addChmod'
+      },
+      'ko': {
+        'items': "chmods",
+        'error_class': "chmods_error_class",
+        'condition': "chmods_condition"
+      }
+    },
+    'moves': {
+      'title': "${ _('Move file') }",
+      'delete': {
+        'name': "${ _('Delete') }",
+        'func': 'function(data, event) { $parent.removeMove.call($parent, data, event) }'
+      },
+      'add': {
+        'name': "${ _('Add move') }",
+        'func': 'addMove'
+      },
+      'ko': {
+        'items': "moves",
+        'error_class': "moves_error_class",
+        'condition': "moves_condition"
+      }
+    }
+  },
+  'ssh': {
+    'title': "${ _('Job Design (ssh type)') }",
+    'params': {
+      'title': "${ _('Params') }",
+      'name': "${ _('Type') }",
+      'value': "${ _('Value') }",
+      'delete': {
+        'name': "${ _('Delete') }",
+        'func': 'function(data, event) { $parent.removeParam.call($parent, data, event) }'
+      },
+      'add': [{
+        'name': "${ _('Add arg') }",
+        'func': 'addArg'
+      }],
+      'ko': {
+        'items': "params",
+        'error_class': "params_error_class",
+        'condition': "params_condition"
+      }
+    },
+  },
+  'shell': {
+    'title': "${ _('Job Design (shell type)') }",
+    'params': {
+      'title': "${ _('Params') }",
+      'name': "${ _('Type') }",
+      'value': "${ _('Value') }",
+      'delete': {
+        'name': "${ _('Delete') }",
+        'func': 'function(data, event) { $parent.removeParam.call($parent, data, event) }'
+      },
+      'add': [{
+        'name': "${ _('Add argument') }",
+        'func': 'addArgument'
+      },{
+        'name': "${ _('Add env-var') }",
+        'func': 'addEnvVar'
+      }],
+      'ko': {
+        'items': "params",
+        'error_class': "params_error_class",
+        'condition': "params_condition"
+      }
+    },
+  },
+  'email': {
+    'title': "${ _('Job Design (email type)') }"
+  },
+  'distcp': {
+    'title': "${ _('Job Design (distcp type)') }",
+    'params': {
+      'title': "${ _('Params') }",
+      'name': "${ _('Type') }",
+      'value': "${ _('Value') }",
+      'delete': {
+        'name': "${ _('Delete') }",
+        'func': 'function(data, event) { $parent.removeParam.call($parent, data, event) }'
+      },
+      'add': [{
+        'name': "${ _('Add argument') }",
+        'func': 'addArgument'
+      }],
+      'ko': {
+        'items': "params",
+        'error_class': "params_error_class",
+        'condition': "params_condition"
+      }
+    },
+  }
+}
+
 //// Binding
 var designs = new Designs();
 ko.applyBindings(designs);
@@ -272,26 +702,34 @@ var designTableOptions = {
 };
 var designTable = $('#designTable').dataTable( designTableOptions );
 
+/**
+ * Redraw a table after the table has been dynamically updated.
+ * This is necessary because KO and datatables don't play well together.
+ */
 function redraw() {
   designTable.fnDestroy();
   designTable = $('#designTable').dataTable( designTableOptions );
   designTable.fnFilter(designs.inTrash().toString(), 7);
 }
 
+/**
+ * Reload with datatables.
+ * Remove datatables, reload, then reinitialize datatables.
+ * Knockout doesn't work without this.
+ */
 function reload() {
-  // Reload with datatables and knockout doesn't work without this.
-  // Remove datatables, reload, then reinitialize datatables.
   $(document).one('load.designs', function() {
     designTable.fnDestroy();
   });
   designs.load();
-  $(document).one('loaded.designs', function() {
+  $(document).one('initialized.designs', function() {
     designTable = $('#designTable').dataTable( designTableOptions );
     designTable.fnFilter(designs.inTrash().toString(), 7);
   });
 }
 
-$(document).bind('initialized.designs', function() {
+$(document).bind('loaded.designs', function() {
+  // Filter should be added again after datatable has been recreated.
   $("#filterInput").keyup(function() {
     if (designTable != null){
       designTable.fnFilter($(this).val());
@@ -309,509 +747,89 @@ reload();
  * Using Mustache templating system: http://mustache.github.com/
  * Templates and partials are loaded in jobsub.templates.js
  * Context is matched up with templates and partials.
- * Global context is extended to provide any uniqueness.
  * Routie is used to provide hash routing: http://projects.jga.me/routie/.
  */
-$(document).ready(function() {
-  //// Routes
-  // Context matches up with jobsub.templates.js and various templates defined there.
-  // If there is an update to any of the templates,
-  // This global context may need to be updated.
-  var global_action_context = {
-    alert: "${_('You can parameterize the values, using')} <code>$myVar</code> ${_('or')} <code>${"${"}myVar}</code>. ${_('When the design is submitted, you will be prompted for the actual value of ')}<code>myVar</code>.",
-    paths_alert: "${_('All the paths are relative to the deployment directory. They can be absolute but this is not recommended.')}",
-    smtp_alert: "${_('Requires some SMTP server configuration to be present (in oozie-site.xml).')}",
-    ssh_alert: "${_('The ssh server requires passwordless login.')}",
-    save: {
-      name: "${_('Save')}",
-      func: "function(data, event) {$root.saveDesign.call($root, data, event);}"
-    },
-    cancel: {
-      name: "${_('Cancel')}",
-      func: "function(data, event) {$root.closeDesign.call($parent, {}); reload();}"
-    },
-    name: {
-      name: "${ _('Name') }",
-      popover: "${ _('Name of the design.') }",
-      js: {
-        name: 'name'
-      }
-    },
-    description: {
-      name: "${ _('Description') }",
-      popover: "${ _('Description of the design.') }",
-      js: {
-        name: 'description'
-      }
-    },
-    is_shared: {
-      name: "${ _('Is shared') }",
-      popover: "${ _('Enable other users to have access to this job.') }",
-      js: {
-        name: 'is_shared'
-      }
-    },
-    capture_output: {
-      name: "${ _('Capture output') }",
-      popover: "${ _('Capture the output of this job.') }",
-      js: {
-        name: 'capture_output'
-      }
-    },
-    parameters: {
-      title: "${ _('Oozie parameters') }",
-      name: "${ _('Name') }",
-      value: "${ _('Value') }",
-      'delete': {
-        name: "${ _('Delete') }",
-        func: 'function(data, event) { $parent.removeParameter.call($parent, data, event) }'
-      },
-      add: {
-        name: "${ _('Add') }",
-        func: 'addParameter'
-      },
-      ko: {
-        items: "parameters",
-        error_class: "parameters_error_class",
-        condition: "parameters_condition"
-      }
-    },
-    user: {
-      name: "${ _('User') }",
-      popover: "${ _('User to authenticate with.') }"
-    },
-    host: {
-      name: "${ _('Host') }",
-      popover: "${ _('Host to execute command on.') }"
-    },
-    command: {
-      name: "${ _('Command') }",
-      popover: "${ _('Command to execute.') }"
-    },
-    script_path: {
-      name: "${ _('Script name') }",
-      popover: "${ _('Path to the script to execute.') }"
-    },
-    jar_path: {
-      name: "${ _('Jar path') }",
-      popover: "${ _('Path to jar files on HDFS.') }"
-    },
-    main_class: {
-      name: "${ _('Main class') }",
-      popover: "${ _('Main class') }"
-    },
-    args: {
-      name: "${ _('Args') }",
-      popover: "${ _('Args') }"
-    },
-    java_opts: {
-      name: "${ _('Java opts') }",
-      popover: "${ _('Java opts') }"
-    },
-    mapper: {
-      name: "${ _('Mapper') }",
-      popover: "${ _('Mapper') }"
-    },
-    reducer: {
-      name: "${ _('Reducer') }",
-      popover: "${ _('Reducer') }"
-    },
-    to: {
-      name: "${ _('TO addresses') }",
-      popover: "${ _('TO addresses') }"
-    },
-    cc: {
-      name: "${ _('CC addresses (optional)') }",
-      popover: "${ _('CC addresses (optional)') }"
-    },
-    subject: {
-      name: "${ _('Subject') }",
-      popover: "${ _('Subject') }"
-    },
-    body: {
-      name: "${ _('Body') }",
-      popover: "${ _('Body') }"
-    },
-    job_properties: {
-      title: "${ _('Job properties') }",
-      name: "${ _('Property name') }",
-      value: "${ _('Value') }",
-      'delete': {
-        name: "${ _('Delete') }",
-        func: 'function(data, event) { $parent.removeProperty.call($parent, data, event) }'
-      },
-      add: {
-        name: "${ _('Add property') }",
-        func: 'addProperty'
-      },
-      ko: {
-        items: "job_properties",
-        error_class: "job_properties_error_class",
-        condition: "job_properties_condition"
-      }
-    },
-    prepares: {
-      title: "${ _('Prepare') }",
-      name: "${ _('Type') }",
-      value: "${ _('Value') }",
-      'delete': {
-        name: "${ _('Delete') }",
-        func: 'function(data, event) { $parent.removePrepare.call($parent, data, event) }'
-      },
-      add: {
-        'delete': {
-          name: "${ _('Add delete') }",
-          func: 'addPrepareDelete'
-        },
-        mkdir: {
-          name: "${ _('Add mkdir') }",
-          func: 'addPrepareMkdir'
-        }
-      },
-      ko: {
-        items: "prepares",
-        error_class: "prepares_error_class",
-        condition: "prepares_condition"
-      }
-    },
-    params: {
-      title: "${ _('Params') }",
-      name: "${ _('Type') }",
-      value: "${ _('Value') }",
-      'delete': {
-        name: "${ _('Delete') }",
-        func: 'function(data, event) { $parent.removeParam.call($parent, data, event) }'
-      },
-      add: [{
-        name: "${ _('Add param') }",
-        func: 'addParam'
-      }],
-      ko: {
-        items: "params",
-        error_class: "params_error_class",
-        condition: "params_condition"
-      }
-    },
-    files: {
-      title: "${ _('Files') }",
-      'delete': {
-        name: "${ _('Delete') }",
-        func: 'function(data, event) { $parent.removeFile.call($parent, data, event) }'
-      },
-      add: {
-        name: "${ _('Add file') }",
-        func: 'addFile'
-      },
-      ko: {
-        items: "files",
-        error_class: "files_error_class",
-        condition: "files_condition"
-      }
-    },
-    archives: {
-      title: "${ _('Archives') }",
-      'delete': {
-        name: "${ _('Delete') }",
-        func: 'function(data, event) { $parent.removeArchive.call($parent, data, event) }'
-      },
-      add: {
-        name: "${ _('Add archive') }",
-        func: 'addArchive'
-      },
-      ko: {
-        items: "archives",
-        error_class: "archives_error_class",
-        condition: "archives_condition"
-      }
-    }
-  };
+var setupRoutes = (function() {
+  var eventCount = 0;
 
-  var contexts = {
-    mapreduce: {
-      title: "${ _('Job Design (mapreduce type)') }"
-    },
-    java: {
-      title: "${ _('Job Design (java type)') }"
-    },
-    streaming: {
-      title: "${ _('Job Design (streaming type)') }"
-    },
-    hive: {
-      title: "${ _('Job Design (hive type)') }"
-    },
-    pig: {
-      title: "${ _('Job Design (pig type)') }",
-      params: {
-        title: "${ _('Params') }",
-        name: "${ _('Type') }",
-        value: "${ _('Value') }",
-        'delete': {
-          name: "${ _('Delete') }",
-          func: 'function(data, event) { $parent.removeParam.call($parent, data, event) }'
+  return function(e) {
+    if (++eventCount > 1) {
+      //// Routes
+      routie({
+        'new-design/:node_type': function(node_type) {
+          /**
+           * Update context with correct title.
+           * Create empty design to fill.
+           * Create template by calling `getActionTemplate`.
+           */
+          // Show section only after we've finished the new design process.
+          $(document).one('created.design', function() {
+            showSection('design');
+          });
+
+          designs.closeDesign();
+
+          var context = $.extend(true, {}, global_action_context, contexts[node_type]);
+          templates.getActionTemplate(node_type, context);
+          designs.newDesign(node_type);
         },
-        add: [{
-          name: "${ _('Add param') }",
-          func: 'addParam'
-        },{
-          name: "${ _('Add argument') }",
-          func: 'addArgument'
-        }],
-        ko: {
-          items: "params",
-          error_class: "params_error_class",
-          condition: "params_condition"
+        'edit-design/:index': function(index) {
+          /**
+           * Update context with correct title.
+           * Design is selected through 'list-designs'.
+           */
+          designs.closeDesign();
+
+          var designObject = designs.designs()[index];
+          if (!designObject) {
+            routie('list-designs');
+            return;
+          }
+
+          // Show section only after we've finished the edit design process.
+          $(document).one('edited.design', function() {
+            if (designObject.design().editable()) {
+              $('#design input').removeAttr('disabled');
+              $('#design textarea').removeAttr('disabled');
+              $('#design button').removeAttr('disabled');
+            } else {
+              $('#design input').attr('disabled', 'disabled');
+              $('#design textarea').attr('disabled', 'disabled');
+              $('#design button').attr('disabled', 'disabled');
+            }
+            showSection('design');
+          });
+
+          var node_type = designObject.design().node_type();
+          var context = $.extend(true, {}, global_action_context, contexts[node_type]);
+          templates.getActionTemplate(node_type, context);
+          designs.deselectAll();
+          designs.select(index);
+          designs.editDesign();
+        },
+        'trashed-designs': function() {
+          $('#home').removeAttr('disabled');
+          designs.inTrash(true);
+          showSection('list-designs');
+          redraw();
+        },
+        'list-designs': function() {
+          $('#home').removeAttr('disabled');
+          designs.inTrash(false);
+          showSection('list-designs');
+          redraw();
         }
-      },
-    },
-    sqoop: {
-      title: "${ _('Job Design (sqoop type)') }",
-      script_path: {
-        name: "${ _('Command') }",
-        popover: "${ _('Command to execute.') }"
-      },
-      params: {
-        title: "${ _('Params') }",
-        name: "${ _('Type') }",
-        value: "${ _('Value') }",
-        'delete': {
-          name: "${ _('Delete') }",
-          func: 'function(data, event) { $parent.removeParam.call($parent, data, event) }'
-        },
-        add: [{
-          name: "${ _('Add arg') }",
-          func: 'addArg'
-        }],
-        ko: {
-          items: "params",
-          error_class: "params_error_class",
-          condition: "params_condition"
-        }
-      }
-    },
-    fs: {
-      title: "${ _('Job Design (fs type)') }",
-      deletes: {
-        title: "${ _('Delete path') }",
-        'delete': {
-          name: "${ _('Delete') }",
-          func: 'function(data, event) { $parent.removeDelete.call($parent, data, event) }'
-        },
-        add: {
-          name: "${ _('Add path') }",
-          func: 'addDelete'
-        },
-        ko: {
-          items: "deletes",
-          error_class: "deletes_error_class",
-          condition: "deletes_condition"
-        }
-      },
-      mkdirs: {
-        title: "${ _('Create directory') }",
-        'delete': {
-          name: "${ _('Delete') }",
-          func: 'function(data, event) { $parent.removeMkdir.call($parent, data, event) }'
-        },
-        add: {
-          name: "${ _('Add path') }",
-          func: 'addMkdir'
-        },
-        ko: {
-          items: "mkdirs",
-          error_class: "mkdirs_error_class",
-          condition: "mkdirs_condition"
-        }
-      },
-      touchzs: {
-        title: "${ _('Create or touch file') }",
-        'delete': {
-          name: "${ _('Delete') }",
-          func: 'function(data, event) { $parent.removeTouchz.call($parent, data, event) }'
-        },
-        add: {
-          name: "${ _('Add path') }",
-          func: 'addTouchz'
-        },
-        ko: {
-          items: "touchzs",
-          error_class: "touchzs_error_class",
-          condition: "touchzs_condition"
-        }
-      },
-      chmods: {
-        title: "${ _('Change permissions') }",
-        'delete': {
-          name: "${ _('Delete') }",
-          func: 'function(data, event) { $parent.removeChmod.call($parent, data, event) }'
-        },
-        add: {
-          name: "${ _('Add chmod') }",
-          func: 'addChmod'
-        },
-        ko: {
-          items: "chmods",
-          error_class: "chmods_error_class",
-          condition: "chmods_condition"
-        }
-      },
-      moves: {
-        title: "${ _('Move file') }",
-        'delete': {
-          name: "${ _('Delete') }",
-          func: 'function(data, event) { $parent.removeMove.call($parent, data, event) }'
-        },
-        add: {
-          name: "${ _('Add move') }",
-          func: 'addMove'
-        },
-        ko: {
-          items: "moves",
-          error_class: "moves_error_class",
-          condition: "moves_condition"
-        }
-      }
-    },
-    ssh: {
-      title: "${ _('Job Design (ssh type)') }",
-      params: {
-        title: "${ _('Params') }",
-        name: "${ _('Type') }",
-        value: "${ _('Value') }",
-        'delete': {
-          name: "${ _('Delete') }",
-          func: 'function(data, event) { $parent.removeParam.call($parent, data, event) }'
-        },
-        add: [{
-          name: "${ _('Add arg') }",
-          func: 'addArg'
-        }],
-        ko: {
-          items: "params",
-          error_class: "params_error_class",
-          condition: "params_condition"
-        }
-      },
-    },
-    shell: {
-      title: "${ _('Job Design (shell type)') }",
-      params: {
-        title: "${ _('Params') }",
-        name: "${ _('Type') }",
-        value: "${ _('Value') }",
-        'delete': {
-          name: "${ _('Delete') }",
-          func: 'function(data, event) { $parent.removeParam.call($parent, data, event) }'
-        },
-        add: [{
-          name: "${ _('Add argument') }",
-          func: 'addArgument'
-        },{
-          name: "${ _('Add env-var') }",
-          func: 'addEnvVar'
-        }],
-        ko: {
-          items: "params",
-          error_class: "params_error_class",
-          condition: "params_condition"
-        }
-      },
-    },
-    email: {
-      title: "${ _('Job Design (email type)') }"
-    },
-    distcp: {
-      title: "${ _('Job Design (distcp type)') }",
-      params: {
-        title: "${ _('Params') }",
-        name: "${ _('Type') }",
-        value: "${ _('Value') }",
-        'delete': {
-          name: "${ _('Delete') }",
-          func: 'function(data, event) { $parent.removeParam.call($parent, data, event) }'
-        },
-        add: [{
-          name: "${ _('Add argument') }",
-          func: 'addArgument'
-        }],
-        ko: {
-          items: "params",
-          error_class: "params_error_class",
-          condition: "params_condition"
-        }
-      },
+      });
     }
+    routie('list-designs');
   }
+})();
 
-  routie({
-    'new-design/:node_type': function(node_type) {
-      /**
-       * Update context with correct title.
-       * Create empty design to fill.
-       * Create template by calling `getActionTemplate`.
-       */
-      // Show section only after we've finished the new design process.
-      $(document).one('created.design', function() {
-        showSection('design');
-      });
-
-      designs.closeDesign();
-
-      var context = $.extend(true, {}, global_action_context, contexts[node_type]);
-      templates.getActionTemplate(node_type, context);
-      designs.newDesign(node_type);
-    },
-    'edit-design/:index': function(index) {
-      /**
-       * Update context with correct title.
-       * Design is selected through 'list-designs'.
-       */
-      designs.closeDesign();
-
-      var designObject = designs.designs()[index];
-      if (!designObject) {
-        routie('list-designs');
-        return;
-      }
-
-      // Show section only after we've finished the edit design process.
-      $(document).one('edited.design', function() {
-        if (designObject.design().editable()) {
-          $('#design input').removeAttr('disabled');
-          $('#design textarea').removeAttr('disabled');
-          $('#design button').removeAttr('disabled');
-        } else {
-          $('#design input').attr('disabled', 'disabled');
-          $('#design textarea').attr('disabled', 'disabled');
-          $('#design button').attr('disabled', 'disabled');
-        }
-
-        showSection('design');
-      });
-
-      var node_type = designObject.design().node_type();
-      var context = $.extend(true, {}, global_action_context, contexts[node_type]);
-      templates.getActionTemplate(node_type, context);
-      designs.deselectAll();
-      designs.select(index);
-      designs.editDesign();
-    },
-    'trashed-designs': function() {
-      $('#home').removeAttr('disabled');
-      designs.inTrash(true);
-      showSection('list-designs');
-      redraw();
-    },
-    'list-designs': function() {
-      $('#home').removeAttr('disabled');
-      designs.inTrash(false);
-      showSection('list-designs');
-      redraw();
-    }
-  });
-  routie('list-designs');
-
+$(document).ready(setupRoutes);
+$(document).one('loaded.designs', setupRoutes);
+$(document).ready(function(e) {
   //// Row selector, buttons, and various features.
-  $(".btn[rel='tooltip']").tooltip({placement:'bottom'});
+  $(".btn[rel='tooltip']").tooltip({'placement':'bottom'});
   $("a[data-row-selector='true']").jHueRowSelector();
   $('#submit-design').click(function() {
     var url = '/oozie/submit_workflow/' + designs.selectedDesign().id();
