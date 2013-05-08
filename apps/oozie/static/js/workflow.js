@@ -676,14 +676,12 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
     build: function() {
       var self = this;
 
-      var maximum = 50;
+      var maximum = 100;
       var count = 0;
 
       var methodChooser = function(node, collection, skip_parents_check) {
         if (count++ >= maximum) {
-          if (window.error) {
-            console.error('Hit maximum number of node recursion: ' + maximum);
-          }
+          console.error('Hit maximum number of node recursion: ' + maximum);
           return null;
         }
 
