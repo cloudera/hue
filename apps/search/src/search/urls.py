@@ -22,17 +22,20 @@ urlpatterns = patterns('search.views',
   url(r'^query$', 'index', name='query'),
   url(r'^admin$', 'admin', name='admin'),
 
-  url(r'^admin/cores$', 'admin', name='admin_cores'),
+  url(r'^admin/collections_$', 'admin_collections', name='admin_collections'),
+  url(r'^admin/collections_wizard$', 'admin_collections_wizard', name='admin_collections_wizard'),
 
-  url(r'^admin/core/(?P<core>\w+)$', 'admin_core_template', name='admin_core'),
-  url(r'^admin/core/(?P<core>\w+)/properties$', 'admin_core_properties', name='admin_core_properties'),
-  url(r'^admin/core/(?P<core>\w+)/template$', 'admin_core_template', name='admin_core_template'),
-  url(r'^admin/core/(?P<core>\w+)/facets$', 'admin_core_facets', name='admin_core_facets'),
-  url(r'^admin/core/(?P<core>\w+)/highlighting$', 'admin_core_highlighting', name='admin_core_highlighting'),
-  url(r'^admin/core/(?P<core>\w+)/sorting$', 'admin_core_sorting', name='admin_core_sorting'),
+  #url(r'^admin/collections$', 'admin', name='admin_collections'),
+
+  url(r'^admin/collection/(?P<collection>\w+)$', 'admin_collection_template', name='admin_collection'),
+  url(r'^admin/collection/(?P<collection>\w+)/properties$', 'admin_collection_properties', name='admin_collection_properties'),
+  url(r'^admin/collection/(?P<collection>\w+)/template$', 'admin_collection_template', name='admin_collection_template'),
+  url(r'^admin/collection/(?P<collection>\w+)/facets$', 'admin_collection_facets', name='admin_collection_facets'),
+  url(r'^admin/collection/(?P<collection>\w+)/highlighting$', 'admin_collection_highlighting', name='admin_collection_highlighting'),
+  url(r'^admin/collection/(?P<collection>\w+)/sorting$', 'admin_collection_sorting', name='admin_collection_sorting'),
 
   # Ajax
-  url(r'^suggest/(?P<core>\w+)/(?P<query>\w+)?$', 'query_suggest', name='query_suggest'),
-  url(r'^admin/core/(?P<core>\w+)/schema$', 'admin_core_schema', name='admin_core_schema'),
-  url(r'^admin/core/(?P<core>\w+)/solr_properties$', 'admin_core_solr_properties', name='admin_core_solr_properties'),
+  url(r'^suggest/(?P<collection>\w+)/(?P<query>\w+)?$', 'query_suggest', name='query_suggest'),
+  url(r'^admin/collection/(?P<collection>\w+)/schema$', 'admin_collection_schema', name='admin_collection_schema'),
+  url(r'^admin/collection/(?P<collection>\w+)/solr_properties$', 'admin_collection_solr_properties', name='admin_collection_solr_properties'),
 )

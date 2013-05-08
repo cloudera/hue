@@ -60,7 +60,7 @@ class SolrApi(object):
       print solr_query
       print params
 
-      response = self._root.get('%(core)s/select' % solr_query, params)
+      response = self._root.get('%(collection)s/select' % solr_query, params)
       return json.loads(response)
     except RestException, e:
       raise PopupException('Error while accessing Solr: %s' % e)
@@ -73,6 +73,19 @@ class SolrApi(object):
       )
       response = self._root.get('%(core)s/suggest' % solr_query, params)
       return json.loads(response)
+    except RestException, e:
+      raise PopupException('Error while accessing Solr: %s' % e)
+
+  def collections(self):
+    try:
+      response = self._root.get('zookeeper', params={'detail': 'true', 'path': '/clusterstate.json'})
+      return json.loads(response['znode']['data'])
+    except RestException, e:
+      raise PopupException('Error while accessing Solr: %s' % e)
+
+  def collection(self, core):
+    try:
+      return self._root.get('admin/cores', params={'wt': 'json', 'core': core})
     except RestException, e:
       raise PopupException('Error while accessing Solr: %s' % e)
 
@@ -93,4 +106,3 @@ class SolrApi(object):
       return self._root.get('%(core)s/admin/file' % {'core': core}, params={'wt': 'json', 'file': 'schema.xml'})
     except RestException, e:
       raise PopupException('Error while accessing Solr: %s' % e)
-

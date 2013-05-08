@@ -185,11 +185,11 @@ class Sorting(models.Model):
     ('sort', solr_query['sort']),
 
 
-class CoreManager(models.Manager):
+class CollectionManager(models.Manager):
   def get_or_create(self, name):
     try:
       return self.get(name=name)
-    except Core.DoesNotExist:
+    except Collection.DoesNotExist:
       facets = Facet.objects.create(data=json.dumps({
                    'properties': {'isEnabled': False, 'limit': 10, 'mincount': 1, 'sort': 'count'},
                    'ranges': [],
@@ -353,27 +353,31 @@ margin-top: 2px;
               }))
       sorting = Sorting.objects.create(data=json.dumps({'properties': {'is_enabled': False}, 'fields': []}))
 
-      return Core.objects.create(name=name, label=name, facets=facets, result=result, sorting=sorting)
+      return Collection.objects.create(name=name, label=name, facets=facets, result=result, sorting=sorting)
 
 
-class Core(models.Model):
+class Collection(models.Model):
+  # Perms coming with https://issues.cloudera.org/browse/HUE-950
   enabled = models.BooleanField(default=True)
-  name = models.CharField(max_length=40, unique=True, verbose_name=_t('Solr collection'))
+  name = models.CharField(max_length=40, verbose_name=_t('Solr name'))
   label = models.CharField(max_length=100)
-  # solr_address?
-  # results by pages number, autocomplete off...
-  properties = models.TextField(default='[]', verbose_name=_t('Core properties'), help_text=_t('Properties (e.g. facets off, results by pages number)'))
+  is_core_only = models.BooleanField(default=False)
+  cores = models.TextField(default=json.dumps({}), verbose_name=_t('Core data'), help_text=_t('Cores or shards data'))
+  properties = models.TextField(
+      default=json.dumps({}), verbose_name=_t('Properties'),
+      help_text=_t('Properties (e.g. results by pages number)'))
+  
   facets = models.ForeignKey(Facet)
   result = models.ForeignKey(Result)
   sorting = models.ForeignKey(Sorting)
 
-  objects = CoreManager()
+  objects = CollectionManager()
 
   def get_query(self):
     return self.facets.get_query_params() + self.result.get_query_params() + self.sorting.get_query_params()
 
   def get_absolute_url(self):
-    return reverse('search:admin_core', kwargs={'core': self.name})
+    return reverse('search:admin_collection', kwargs={'collection': self.name})
 
   @property
   def fields(self):

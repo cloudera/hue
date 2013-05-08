@@ -27,31 +27,31 @@
 ${ commonheader(_('Search'), "search", user) | n,unicode }
 
 <%def name="indexProperty(key)">
-  %if key in solr_core["status"][hue_core.name]["index"]:
-      ${ solr_core["status"][hue_core.name]["index"][key] }
+  %if key in solr_collection["status"][hue_collection.name]["index"]:
+      ${ solr_collection["status"][hue_collection.name]["index"][key] }
     %endif
 </%def>
 
-<%def name="coreProperty(key)">
-  %if key in solr_core["status"][hue_core.name]:
-      ${ solr_core["status"][hue_core.name][key] }
+<%def name="collectionProperty(key)">
+  %if key in solr_collection["status"][hue_collection.name]:
+      ${ solr_collection["status"][hue_collection.name][key] }
     %endif
 </%def>
 
 <%layout:skeleton>
   <%def name="title()">
-    <h1>${_('Search Admin - ')}${hue_core.label}</h1>
+    <h1>${_('Search Admin - ')} ${ hue_collection.label }</h1>
   </%def>
 
   <%def name="navigation()">
-    ${ layout.sidebar(hue_core.name, 'properties') }
+    ${ layout.sidebar(hue_collection.name, 'properties') }
   </%def>
 
   <%def name="content()">
   <form method="POST">
     <ul class="nav nav-tabs">
       <li class="active">
-        <a href="#index" data-toggle="tab">${_('Core')}</a>
+        <a href="#index" data-toggle="tab">${_('Collection')}</a>
       </li>
       <li>
         <a href="#schema" data-toggle="tab">${_('Schema')}</a>
@@ -63,9 +63,9 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     <div class="tab-content">
       <div class="tab-pane active" id="index">
         <div class="fieldWrapper">
-          ${ utils.render_field(core_form['enabled']) }
-          ${ utils.render_field(core_form['name']) }
-          ${ utils.render_field(core_form['label']) }
+          ${ utils.render_field(collection_form['enabled']) }
+          ${ utils.render_field(collection_form['name']) }
+          ${ utils.render_field(collection_form['label']) }
         </div>
 
 	    <div class="form-actions">
@@ -88,10 +88,10 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 
 <script type="text/javascript" charset="utf-8">
   $(document).ready(function(){
-    $.get("${ url('search:admin_core_schema', core=hue_core.name) }", function(data) {
+    $.get("${ url('search:admin_collection_schema', collection=hue_collection.name) }", function(data) {
         $("#schema").html(data.content); // Need to scroll to refresh
     });
-    $.get("${ url('search:admin_core_solr_properties', core=hue_core.name) }", function(data) {
+    $.get("${ url('search:admin_collection_solr_properties', collection=hue_collection.name) }", function(data) {
         $("#properties").html(data.content);
     });
  });
