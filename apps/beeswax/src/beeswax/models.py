@@ -29,7 +29,6 @@ from enum import Enum
 
 from desktop.lib.exceptions_renderable import PopupException
 
-from beeswax.conf import SERVER_INTERFACE
 from beeswax.design import HQLdesign, hql_query
 from beeswaxd.ttypes import QueryHandle as BeeswaxdQueryHandle, QueryState
 from TCLIService.ttypes import TSessionHandle, THandleIdentifier,\
@@ -43,6 +42,7 @@ QUERY_SUBMISSION_TIMEOUT = datetime.timedelta(0, 60 * 60)               # 1 hour
 # Constants for DB fields, hue ini
 BEESWAX = 'beeswax'
 HIVE_SERVER2 = 'hiveserver2'
+QUERY_TYPES = (HQL, IMPALA) = range(2)
 
 
 class QueryHistory(models.Model):
@@ -70,6 +70,7 @@ class QueryHistory(models.Model):
   server_port = models.SmallIntegerField(help_text=_('Port of the query server.'), default=0)
   server_name = models.CharField(max_length=128, help_text=_('Name of the query server.'), default='')
   server_type = models.CharField(max_length=128, help_text=_('Type of the query server.'), default=BEESWAX, choices=SERVER_TYPE)
+  query_type = models.SmallIntegerField(help_text=_('Type of the query.'), default=HQL, choices=((HQL, 'HQL'), (IMPALA, 'IMPALA')))
 
   design = models.ForeignKey('SavedQuery', to_field='id', null=True) # Some queries (like read/create table) don't have a design
   notify = models.BooleanField(default=False)                        # Notify on completion
@@ -79,7 +80,7 @@ class QueryHistory(models.Model):
 
   @staticmethod
   def build(*args, **kwargs):
-    if SERVER_INTERFACE.get() == HIVE_SERVER2:
+    if kwargs['server_type'] == HIVE_SERVER2:
       return HiveServerQueryHistory(*args, **kwargs)
     else:
       return BeeswaxQueryHistory(*args, **kwargs)
@@ -87,7 +88,6 @@ class QueryHistory(models.Model):
   def get_full_object(self):
     if self.server_type == HiveServerQueryHistory.node_type:
       return HiveServerQueryHistory.objects.get(id=self.id)
-    # Default is Beeswax
     else:
       return BeeswaxQueryHistory.objects.get(id=self.id)
 
@@ -98,11 +98,16 @@ class QueryHistory(models.Model):
     else:
       return HiveServerQueryHistory.objects.get(id=id)
 
+  def get_type_name(self):
+    if self.query_type == 1:
+      return 'impala'
+    else:
+      return 'beeswax'
 
   def get_query_server_config(self):
     from beeswax.server.dbms import get_query_server_config
 
-    query_server = get_query_server_config(self.server_type)
+    query_server = get_query_server_config(self.get_type_name())
     query_server.update({
         'server_name': self.server_name,
         'server_host': self.server_host,
@@ -261,7 +266,7 @@ class SavedQuery(models.Model):
   """
   DEFAULT_NEW_DESIGN_NAME = _('My saved query')
   AUTO_DESIGN_SUFFIX = _(' (new)')
-  TYPES = (HQL, IMPALA) = range(2)
+  TYPES = QUERY_TYPES
   TYPES_MAPPING = {'beeswax': HQL, 'hql': HQL, 'impala': IMPALA}
 
   type = models.IntegerField(null=False)

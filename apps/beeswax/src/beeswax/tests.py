@@ -155,7 +155,6 @@ class TestBeeswaxWithHadoop(BeeswaxSampleProvider):
     assert_true("A base for other temporary directories" in response_verbose.content)
 
   def test_query_with_resource(self):
-    raise SkipTest
     script = self.cluster.fs.open("/square.py", "w")
     script.write(
       """#!/usr/bin/python

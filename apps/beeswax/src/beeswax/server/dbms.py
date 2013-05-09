@@ -256,16 +256,18 @@ class Dbms:
     hql_query = query.hql_query
     if query_history is None:
       query_history = QueryHistory.build(
-                                  owner=self.client.user,
-                                  query=hql_query,
-                                  server_host='%(server_host)s' % self.client.query_server,
-                                  server_port='%(server_port)d' % self.client.query_server,
-                                  server_name='%(server_name)s' % self.client.query_server,
-                                  server_type=self.server_type,
-                                  last_state=QueryHistory.STATE.submitted.index,
-                                  design=design,
-                                  notify=query.query.get('email_notify', False),
-                                  statement_number=0)
+          owner=self.client.user,
+          query=hql_query,
+          server_host='%(server_host)s' % self.client.query_server,
+          server_port='%(server_port)d' % self.client.query_server,
+          server_name='%(server_name)s' % self.client.query_server,
+          server_type=self.server_type,
+          last_state=QueryHistory.STATE.submitted.index,
+          design=design,
+          notify=query.query.get('email_notify', False),
+          query_type=query.query['type'],
+          statement_number=0
+      )
       query_history.save()
 
       LOG.debug("Made new QueryHistory id %s user %s query: %s..." % (query_history.id, self.client.user, query_history.query[:25]))
@@ -291,6 +293,7 @@ class Dbms:
     query_history.has_results = handle.has_result_set
     query_history.modified_row_count = handle.modified_row_count
     query_history.log_context = handle.log_context
+    query_history.query_type = query.query['type']
     query_history.set_to_running()
     query_history.save()
 
