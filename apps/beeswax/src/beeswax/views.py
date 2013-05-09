@@ -80,9 +80,9 @@ def save_design(request, form, type, design, explicit_save):
   """
   assert form.saveform.is_valid()
 
-  if type == models.SavedQuery.HQL:
+  if type == models.HQL:
     design_cls = beeswax.design.HQLdesign
-  elif type == models.SavedQuery.IMPALA:
+  elif type == models.IMPALA:
     design_cls = beeswax.design.HQLdesign
   else:
     raise ValueError(_('Invalid design type %(type)s') % {'type': type})
@@ -411,7 +411,7 @@ def execute_query(request, design_id=None):
           return parameterization
 
         try:
-          query = HQLdesign(form)
+          query = HQLdesign(form, query_type=query_type)
           if to_explain:
             return explain_directly(request, query, design, query_server)
           else:

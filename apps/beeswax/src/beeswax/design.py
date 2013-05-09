@@ -66,7 +66,7 @@ class HQLdesign(object):
   _FILE_RES_ATTRS = [ 'type', 'path' ]
   _FUNCTIONS_ATTRS = [ 'name', 'class_name' ]
 
-  def __init__(self, form=None):
+  def __init__(self, form=None, query_type=None):
     """Initialize the design from a valid form data."""
     if form is not None:
       assert isinstance(form, MultiForm)
@@ -75,6 +75,8 @@ class HQLdesign(object):
           settings = normalize_formset_dict(form.settings, HQLdesign._SETTINGS_ATTRS),
           file_resources = normalize_formset_dict(form.file_resources, HQLdesign._FILE_RES_ATTRS),
           functions = normalize_formset_dict(form.functions, HQLdesign._FUNCTIONS_ATTRS))
+      if query_type is not None:
+        self._data_dict['query']['type'] = query_type
 
   def dumps(self):
     """Returns the serialized form of the design in a string"""
