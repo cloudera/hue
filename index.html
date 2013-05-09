@@ -36,8 +36,10 @@
   <div class="row">
     <header class="highlight span12">
       <h2><strong>Hue</strong>, the open source Apache Hadoop UI.</h2>
-      <img id="feature-screenshot" src="static/images/shot.png" alt="screenshot">
-
+      <div>
+        <div id="playBtn" class="container"><i class="icon-play-circle"></i></div>
+        <img id="feature-screenshot" src="static/images/shot.png" alt="screenshot">
+      </div>
       <p>
         <a href="http://cloudera.github.com/hue/releases/2.3.0/hue-2.3.0.tgz" class="big-btn big-btn-blue"><i
                 class="icon-download"></i> Download Hue</a>
@@ -314,6 +316,17 @@
   <p><strong>Hue</strong> is released under the <a class="normal" href="http://www.apache.org/licenses/LICENSE-2.0"
                                                         target="_blank">Apache License, version 2.0</a>.</p>
 </footer>
+
+<div id="video" class="modal hide fade" style="width: 730px;margin-left: -365px;">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>What's new in Hue 2.3</h3>
+  </div>
+  <div class="modal-body">
+    <iframe id="videoFrame" src="http://player.vimeo.com/video/64825639" width="700" height="350" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
+  </div>
+</div>
+
 <script src="static/ext/js/jquery/jquery-1.8.1.min.js"></script>
 <script src="static/ext/js/bootstrap.min.js"></script>
 <script src="static/js/jquery.scrollup.js"></script>
@@ -326,6 +339,13 @@
   }
 
   $(document).ready(function () {
+    $("#playBtn i").click(function(){
+      $("#video").modal("show");
+    });
+    $("#video").on("hide", function(){
+      $("#videoFrame").attr("src", "about:blank").attr("src", "http://player.vimeo.com/video/64825639");
+    });
+
     $(['static/images/elephant_over.gif', 'static/images/mature_over.gif', 'static/images/sdk_over.gif']).preload();
     $(".overable").each(function () {
       var _originalSrc = $(this).attr("src");

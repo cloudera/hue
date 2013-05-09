@@ -410,3 +410,20 @@ a.normal {
   opacity: 0.85;
   filter: alpha(opacity=85);
 }
+
+#playBtn {
+  position: absolute;
+  text-align: center;
+  margin-top: 60px;
+}
+
+#playBtn i {
+  font-size: 128px;
+  opacity: 0.4;
+  color: #338bb8;
+  cursor: pointer;
+}
+
+#playBtn i:hover {
+  opacity: 0.75;
+}
