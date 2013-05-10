@@ -52,39 +52,15 @@ build_hadoop() {
   fi
 
   HADOOP_DIR=$HUE_ROOT/ext/hadoop
-  export HADOOP_HDFS_HOME="$HADOOP_DIR/${CDH_VERSION}"
-  export HADOOP_BIN=$HADOOP_HDFS_HOME/bin/hadoop
+  export HADOOP_HDFS_HOME="$HADOOP_DIR/${CDH_VERSION}/share/hadoop/hdfs"
+  export HADOOP_BIN="$HADOOP_DIR/${CDH_VERSION}/bin/hadoop"
+  export HADOOP_MR1_HOME="$HADOOP_DIR/${CDH_VERSION}/share/hadoop/mapreduce1"
+  export HADOOP_MR1_BIN="$HADOOP_DIR/${CDH_VERSION}/bin-mapreduce1/hadoop"
 
   mkdir -p $HADOOP_DIR
   rm -rf $HADOOP_HDFS_HOME
   echo "Unpacking $CDH_CACHE to $HADOOP_DIR"
   tar -C $HADOOP_DIR -xzf $CDH_CACHE
-}
-
-##########
-
-MR1_URL=${MR1_URL:-http://nightly.cloudera.com/cdh4/cdh/4/mr1-2.0.0-mr1-cdh4.3.0-SNAPSHOT.tar.gz}
-
-MR1_TGZ=$(basename $MR1_URL)
-MR1_VERSION=${MR1_TGZ/.tar.gz/}
-MR1_VERSION=${MR1_VERSION/mr1/hadoop}
-MR1_CACHE="$HOME/.hue_cache/${MR1_TGZ}"
-MR1_MTIME_FILE="$HOME/.hue_cache/.mr1_mtime"
-
-build_mr1() {
-  if ! check_mtime ${MR1_MTIME_FILE} ${MR1_URL} || [ ! -f $MR1_CACHE ]; then
-    echo "Downloading $MR1_URL..."
-    wget $MR1_URL -O $MR1_CACHE
-  fi
-
-  MR1_DIR=$HUE_ROOT/ext/mr1
-  export HADOOP_MR1_HOME="$MR1_DIR/${MR1_VERSION}"
-  export HADOOP_MR1_BIN="$HADOOP_MR1_HOME/bin/hadoop"
-
-  mkdir -p $MR1_DIR
-  rm -rf $HADOOP_MR1_HOME
-  echo "Unpacking $MR1_CACHE to $MR1_DIR"
-  tar -C $MR1_DIR -xzf $MR1_CACHE
 }
 
 ##########
