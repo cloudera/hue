@@ -149,15 +149,10 @@ def edit_user(request, username=None):
     if form.is_valid(): # All validation rules pass
       if instance is None:
         instance = form.save()
-        # Create profile for new users.
         get_profile(instance)
       else:
-        #
-        # Check for 3 more conditions:
-        # (1) A user cannot inactivate oneself;
-        # (2) Non-superuser cannot promote himself; and
-        # (3) The last active superuser cannot demote/inactivate himself.
-        #
+        if username != form.instance.username:
+          raise PopupException(_("You cannot change a username."), error_code=401)
         if request.user.username == username and not form.instance.is_active:
           raise PopupException(_("You cannot make yourself inactive."), error_code=401)
 

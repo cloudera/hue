@@ -38,7 +38,7 @@ ${ commonheader(_('Hue Users'), "useradmin", user, "100px") | n,unicode }
       <div id="properties" class="section">
         <ul class="nav nav-tabs">
           <li class="active"><a href="#step1" class="step">${ _('Step 1: Credentials (required)') }</a></li>
-          <li><a href="#step2" class="step">${ _('Step 2: Names and Groups') }</a></li>
+          <li><a href="#step2" class="step">${ user.is_superuser and _('Step 2: Names and Groups') or _('Step 2: Names') }</a></li>
           % if user.is_superuser:
           <li><a href="#step3" class="step">${ _('Step 3: Advanced') }</a></li>
           % endif
@@ -48,8 +48,8 @@ ${ commonheader(_('Hue Users'), "useradmin", user, "100px") | n,unicode }
           <div id="step1" class="stepDetails">
             ${layout.render_field(form["username"], extra_attrs={'validate':'true'})}
             % if "password1" in form.fields:
-              ${layout.render_field(form["password1"], extra_attrs={'validate':'true'})}
-              ${layout.render_field(form["password2"], extra_attrs={'validate':'true'})}
+              ${layout.render_field(form["password1"], extra_attrs=username is None and {'validate':'true'} or {})}
+              ${layout.render_field(form["password2"], extra_attrs=username is None and {'validate':'true'} or {})}
             % endif
             ${layout.render_field(form["ensure_home_directory"])}
           </div>

@@ -306,6 +306,15 @@ def test_user_admin():
                     follow=True)
   assert_true("User information updated" in response.content,
               "Notification should be displayed in: %s" % response.content)
+  # Edit it, can't change username
+  response = c.post('/useradmin/users/edit/test',
+                    dict(username="test2",
+                         first_name=u"Inglés",
+                         last_name=u"Español",
+                         is_superuser="True",
+                         is_active="True"),
+                    follow=True)
+  assert_true("You cannot change a username" in response.content)
   # Now make sure that those were materialized
   response = c.get('/useradmin/users/edit/test')
   assert_equal(smart_unicode("Inglés"), response.context["form"].instance.first_name)

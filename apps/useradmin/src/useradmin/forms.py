@@ -52,6 +52,12 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
                                             initial=True,
                                             required=False)
 
+  def __init__(self, *args, **kwargs):
+    super(UserChangeForm, self).__init__(*args, **kwargs)
+
+    if self.instance.id:
+      self.fields['username'].widget.attrs['readonly'] = True
+
   class Meta(django.contrib.auth.forms.UserChangeForm.Meta):
     fields = ["username", "first_name", "last_name", "email", "ensure_home_directory"]
 
