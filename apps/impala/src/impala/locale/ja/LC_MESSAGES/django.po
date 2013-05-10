@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-04-11 10:03-0700\n"
+"POT-Creation-Date: 2013-05-10 11:59-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -21,15 +21,24 @@ msgstr ""
 msgid "Host of the Impala Server."
 msgstr "Impala Server のホストです。"
 
-#: src/impala/conf.py:32
+#: src/impala/conf.py:31
 msgid "Port of the Impala Server."
 msgstr "Impala Server のポートです。"
 
-#: src/impala/conf.py:38
-msgid "Kerberos principal name for Impala. Typically 'impala/hostname.foo.com'."
-msgstr "Impala の Kerberos プリンシパル名です。普通は 'impala/hostname.foo.com' です。"
+#: src/impala/conf.py:37
+#, fuzzy
+msgid ""
+"Beeswax or Hive Server 2 Thrift API used. Choices are: 'beeswax' or "
+"'hiveserver2'."
+msgstr ""
+"Beeswax または Hive Server 2 Thrift API が使用されました。選択肢は、'beeswax' または "
+"'hiveserver2' です。'beeswax' の場合は、メタデータ要求をプロキシするために Beeswax を実行する必要があります。"
 
-#: src/impala/views.py:34
+#: src/impala/conf.py:42
+msgid "Kerberos principal name for Impala. Typically 'impala/hostname.foo.com'."
+msgstr "Impala の Kerberos プリンシパル名。普通は 'impala/hostname.foo.com' です。"
+
+#: src/impala/views.py:35
 msgid "A POST request is required."
 msgstr "POST 要求が必要です。"
 

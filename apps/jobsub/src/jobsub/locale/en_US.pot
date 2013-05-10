@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-01-31 16:57-0800\n"
+"POT-Creation-Date: 2013-05-10 11:59-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,34 +17,33 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/jobsub/conf.py:28
+#: src/jobsub/conf.py:31
 msgid "Location on HDFS where the jobsub examples and templates are stored."
 msgstr ""
 
-#: src/jobsub/conf.py:33
+#: src/jobsub/conf.py:36
 msgid "Location on local filesystem where examples and template are stored."
 msgstr ""
 
-#: src/jobsub/conf.py:39
+#: src/jobsub/conf.py:42
 msgid "Location on local filesystem where sample data is stored."
 msgstr ""
 
-#: src/jobsub/conf.py:49
+#: src/jobsub/conf.py:52
 msgid ""
 "Deprecated, use liboozie.conf.OOZIE_URL instead. URL of Oozie server. "
 "This is required for job submission."
 msgstr ""
 
-#: src/jobsub/conf.py:55
+#: src/jobsub/conf.py:58
 msgid ""
 "Deprecated, use liboozie.conf.SECURITY_ENABLED instead. Whether Oozie "
 "requires client to do perform Kerberos authentication"
 msgstr ""
 
 #: src/jobsub/forms.py:39 src/jobsub/forms.py:58 src/jobsub/forms.py:77
-#: src/jobsub/forms.py:95 src/jobsub/templates/list_designs.mako:64
-#: src/jobsub/templates/list_history.mako:42
-#: src/jobsub/templates/workflow.mako:55 src/jobsub/templates/workflow.mako:100
+#: src/jobsub/forms.py:95 src/jobsub/templates/designs.mako:131
+#: src/jobsub/templates/designs.mako:257 src/jobsub/templates/designs.mako:286
 msgid "Name"
 msgstr ""
 
@@ -55,48 +54,53 @@ msgid ""
 msgstr ""
 
 #: src/jobsub/forms.py:59 src/jobsub/forms.py:78 src/jobsub/forms.py:96
-#: src/jobsub/templates/list_designs.mako:66
-#: src/jobsub/templates/list_history.mako:44
+#: src/jobsub/templates/designs.mako:132 src/jobsub/templates/designs.mako:264
 msgid "Description"
 msgstr ""
 
-#: src/jobsub/forms.py:60
+#: src/jobsub/forms.py:60 src/jobsub/templates/designs.mako:323
+#: src/jobsub/templates/designs.mako:324
 msgid "Main class"
 msgstr ""
 
 #: src/jobsub/forms.py:61 src/jobsub/forms.py:79
+#: src/jobsub/templates/designs.mako:319
 msgid "Jar path"
 msgstr ""
 
-#: src/jobsub/forms.py:62
+#: src/jobsub/forms.py:62 src/jobsub/templates/designs.mako:327
+#: src/jobsub/templates/designs.mako:328
 msgid "Args"
 msgstr ""
 
-#: src/jobsub/forms.py:63
+#: src/jobsub/forms.py:63 src/jobsub/templates/designs.mako:331
+#: src/jobsub/templates/designs.mako:332
 msgid "Java opts"
 msgstr ""
 
-#: src/jobsub/forms.py:80
+#: src/jobsub/forms.py:80 src/jobsub/templates/designs.mako:335
+#: src/jobsub/templates/designs.mako:336
 msgid "Mapper"
 msgstr ""
 
-#: src/jobsub/forms.py:81
+#: src/jobsub/forms.py:81 src/jobsub/templates/designs.mako:339
+#: src/jobsub/templates/designs.mako:340
 msgid "Reducer"
 msgstr ""
 
-#: src/jobsub/models.py:128
+#: src/jobsub/models.py:136
 msgid "Name of the design, which must be unique per user."
 msgstr ""
 
-#: src/jobsub/models.py:184 src/jobsub/models.py:225
+#: src/jobsub/models.py:196 src/jobsub/models.py:245
 msgid "List of paths to files to be added to the distributed cache."
 msgstr ""
 
-#: src/jobsub/models.py:186 src/jobsub/models.py:227
+#: src/jobsub/models.py:198 src/jobsub/models.py:247
 msgid "List of paths to archives to be added to the distributed cache."
 msgstr ""
 
-#: src/jobsub/models.py:191
+#: src/jobsub/models.py:203 src/jobsub/templates/designs.mako:320
 msgid "Path to jar files on HDFS."
 msgstr ""
 
@@ -118,63 +122,36 @@ msgstr ""
 msgid "Failed to obtain HDFS reference. Check your configuration."
 msgstr ""
 
-#: src/jobsub/views.py:60
-#, python-format
-msgid "Access denied: view job %(id)s."
+#: src/jobsub/views.py:117
+msgid "Workflow not found"
 msgstr ""
 
-#: src/jobsub/views.py:66
-#, python-format
-msgid "Error accessing Oozie job %(id)s."
-msgstr ""
-
-#: src/jobsub/views.py:199
+#: src/jobsub/views.py:125
 msgid "Permission denied. You are not the owner."
 msgstr ""
 
-#: src/jobsub/views.py:207
+#: src/jobsub/views.py:129 src/jobsub/views.py:153 src/jobsub/views.py:225
+#: src/jobsub/views.py:260
+msgid "Must be POST request."
+msgstr ""
+
+#: src/jobsub/views.py:136 src/jobsub/views.py:158
 #, python-format
 msgid "Access denied: delete design %(id)s."
 msgstr ""
 
-#: src/jobsub/views.py:215
-msgid "Workflow not found."
+#: src/jobsub/views.py:144 src/jobsub/views.py:164
+#, python-format
+msgid "Could not find design %s."
 msgstr ""
 
-#: src/jobsub/views.py:223
+#: src/jobsub/views.py:184
 #, python-format
 msgid "Access denied: edit design %(id)s."
 msgstr ""
 
-#: src/jobsub/views.py:254
-#, python-format
-msgid "Access denied: design parameters %(id)s."
-msgstr ""
-
-#: src/jobsub/views.py:266
-msgid "Use a POST request to submit a design."
-msgstr ""
-
-#: src/jobsub/views.py:270
-#, python-format
-msgid "Access denied: submit design %(id)s."
-msgstr ""
-
-#: src/jobsub/views.py:281
-msgid "The Oozie server is not running"
-msgstr ""
-
-#: src/jobsub/views.py:282
-#, python-format
-msgid "Error submitting design %(id)s."
-msgstr ""
-
-#: src/jobsub/views.py:296
-msgid "Use a POST request to install the examples."
-msgstr ""
-
-#: src/jobsub/views.py:301
-msgid "The examples could not be installed."
+#: src/jobsub/views.py:190 src/jobsub/views.py:232
+msgid "Error saving design"
 msgstr ""
 
 #: src/jobsub/management/commands/jobsub_setup.py:88
@@ -185,315 +162,474 @@ msgstr ""
 msgid "Expected sample user fixture."
 msgstr ""
 
-#: src/jobsub/templates/edit_design.mako:26
-#: src/jobsub/templates/list_designs.mako:27
-#: src/jobsub/templates/list_history.mako:27
-#: src/jobsub/templates/workflow.mako:25
+#: src/jobsub/migrations/0005_unify_with_oozie.py:18
+#, python-format
+msgid "Cannot convert %s design into an Oozie action."
+msgstr ""
+
+#: src/jobsub/migrations/0005_unify_with_oozie.py:34
+#: src/jobsub/migrations/0006_chg_varchars_to_textfields.py:22
+msgid "Cannot backwards migrate this change."
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:26
 msgid "Job Designer"
 msgstr ""
 
-#: src/jobsub/templates/edit_design.mako:58
-#, python-format
-msgid "Job Design (%(type)s type)"
+#: src/jobsub/templates/designs.mako:43
+msgid "Job Designs"
 msgstr ""
 
-#: src/jobsub/templates/edit_design.mako:70
+#: src/jobsub/templates/designs.mako:47
+msgid "Home"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:50
+msgid "Submit"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:51
+msgid "Edit"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:52
+msgid "Copy"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:54 src/jobsub/templates/designs.mako:55
+#: src/jobsub/templates/designs.mako:289 src/jobsub/templates/designs.mako:363
+#: src/jobsub/templates/designs.mako:381 src/jobsub/templates/designs.mako:405
+#: src/jobsub/templates/designs.mako:421 src/jobsub/templates/designs.mako:437
+#: src/jobsub/templates/designs.mako:472 src/jobsub/templates/designs.mako:500
+#: src/jobsub/templates/designs.mako:519 src/jobsub/templates/designs.mako:535
+#: src/jobsub/templates/designs.mako:551 src/jobsub/templates/designs.mako:567
+#: src/jobsub/templates/designs.mako:583 src/jobsub/templates/designs.mako:604
+#: src/jobsub/templates/designs.mako:625 src/jobsub/templates/designs.mako:652
+msgid "Delete"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:59
+msgid "Move to trash"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:60 src/jobsub/templates/designs.mako:66
+msgid "Delete forever"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:65
+msgid "Restore"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:73 src/jobsub/templates/designs.mako:74
+msgid "New action"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:79
+msgid "Create MapReduce design"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:82
+msgid "Create Java design"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:85
+msgid "Create Streaming design"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:88
+msgid "Create Hive design"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:91
+msgid "Create Pig design"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:94
+msgid "Create Sqoop design"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:97
+msgid "Create Fs design"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:100
+msgid "Create Ssh design"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:103
+msgid "Create Shell design"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:106
+msgid "Create Email design"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:109
+msgid "Create DistCp design"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:114
+msgid "Trash"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:117
+msgid "Delete all the designs"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:117
+msgid "Empty"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:133
+msgid "Owner"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:134 src/jobsub/templates/designs.mako:378
+#: src/jobsub/templates/designs.mako:402 src/jobsub/templates/designs.mako:469
+#: src/jobsub/templates/designs.mako:497 src/jobsub/templates/designs.mako:601
+#: src/jobsub/templates/designs.mako:622 src/jobsub/templates/designs.mako:649
+msgid "Type"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:135
+msgid "Status"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:136
+msgid "Last modified"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:137
+msgid "Trashed"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:176
+msgid "Move the selected designs to trash?"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:179 src/jobsub/templates/designs.mako:192
+#: src/jobsub/templates/designs.mako:205 src/jobsub/templates/designs.mako:218
+msgid "No"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:180 src/jobsub/templates/designs.mako:193
+#: src/jobsub/templates/designs.mako:206 src/jobsub/templates/designs.mako:219
+msgid "Yes"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:189
+msgid "Delete the selected designs?"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:202
+msgid "Delete all trashed designs?"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:215
+msgid "Restore the selected designs?"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:227
+msgid "Choose a file"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:244
 msgid "You can parameterize the values, using"
 msgstr ""
 
-#: src/jobsub/templates/edit_design.mako:70
+#: src/jobsub/templates/designs.mako:244
 msgid "or"
 msgstr ""
 
-#: src/jobsub/templates/edit_design.mako:72
+#: src/jobsub/templates/designs.mako:244
 msgid ""
 "When the design is submitted, you will be prompted for the actual value "
 "of "
 msgstr ""
 
-#: src/jobsub/templates/edit_design.mako:80
-msgid "Job Properties"
+#: src/jobsub/templates/designs.mako:245
+msgid ""
+"All the paths are relative to the deployment directory. They can be "
+"absolute but this is not recommended."
 msgstr ""
 
-#: src/jobsub/templates/edit_design.mako:86
-msgid "Property name"
+#: src/jobsub/templates/designs.mako:246
+msgid "Requires some SMTP server configuration to be present (in oozie-site.xml)."
 msgstr ""
 
-#: src/jobsub/templates/edit_design.mako:87
-#: src/jobsub/templates/workflow.mako:56
-msgid "Value"
+#: src/jobsub/templates/designs.mako:247
+msgid "The ssh server requires passwordless login."
 msgstr ""
 
-#: src/jobsub/templates/edit_design.mako:95
-#: src/jobsub/templates/edit_design.mako:120
-#: src/jobsub/templates/edit_design.mako:143
-#: src/jobsub/templates/list_designs.mako:44
-msgid "Delete"
-msgstr ""
-
-#: src/jobsub/templates/edit_design.mako:107
-msgid "Add Property"
-msgstr ""
-
-#: src/jobsub/templates/edit_design.mako:112
-msgid "Files"
-msgstr ""
-
-#: src/jobsub/templates/edit_design.mako:130
-msgid "Add File"
-msgstr ""
-
-#: src/jobsub/templates/edit_design.mako:135
-msgid "Archives"
-msgstr ""
-
-#: src/jobsub/templates/edit_design.mako:153
-msgid "Add Archive"
-msgstr ""
-
-#: src/jobsub/templates/edit_design.mako:160
+#: src/jobsub/templates/designs.mako:249
 msgid "Save"
 msgstr ""
 
-#: src/jobsub/templates/edit_design.mako:161
-#: src/jobsub/templates/list_designs.mako:106
+#: src/jobsub/templates/designs.mako:253
 msgid "Cancel"
 msgstr ""
 
-#: src/jobsub/templates/edit_design.mako:171
-msgid "Choose a file"
+#: src/jobsub/templates/designs.mako:258
+msgid "Name of the design."
 msgstr ""
 
-#: src/jobsub/templates/layout.mako:34
-msgid "Designs"
+#: src/jobsub/templates/designs.mako:265
+msgid "Description of the design."
 msgstr ""
 
-#: src/jobsub/templates/layout.mako:35
-msgid "History"
+#: src/jobsub/templates/designs.mako:271
+msgid "Is shared"
 msgstr ""
 
-#: src/jobsub/templates/list_designs.mako:38
-msgid "Job Designs"
+#: src/jobsub/templates/designs.mako:272
+msgid "Enable other users to have access to this job."
 msgstr ""
 
-#: src/jobsub/templates/list_designs.mako:42
-#: src/jobsub/templates/list_designs.mako:107
-msgid "Submit"
+#: src/jobsub/templates/designs.mako:278
+msgid "Capture output"
 msgstr ""
 
-#: src/jobsub/templates/list_designs.mako:43
-msgid "Edit"
+#: src/jobsub/templates/designs.mako:279
+msgid "Capture the output of this job."
 msgstr ""
 
-#: src/jobsub/templates/list_designs.mako:45
-msgid "Clone"
+#: src/jobsub/templates/designs.mako:285
+msgid "Oozie parameters"
 msgstr ""
 
-#: src/jobsub/templates/list_designs.mako:49
-msgid "Create MapReduce Design"
+#: src/jobsub/templates/designs.mako:287 src/jobsub/templates/designs.mako:361
+#: src/jobsub/templates/designs.mako:379 src/jobsub/templates/designs.mako:403
+#: src/jobsub/templates/designs.mako:470 src/jobsub/templates/designs.mako:498
+#: src/jobsub/templates/designs.mako:602 src/jobsub/templates/designs.mako:623
+#: src/jobsub/templates/designs.mako:650
+msgid "Value"
 msgstr ""
 
-#: src/jobsub/templates/list_designs.mako:49
-msgid "MapReduce"
+#: src/jobsub/templates/designs.mako:293
+msgid "Add"
 msgstr ""
 
-#: src/jobsub/templates/list_designs.mako:50
-msgid "Create Streaming Design"
-msgstr ""
-
-#: src/jobsub/templates/list_designs.mako:51
-msgid "Create Java Design"
-msgstr ""
-
-#: src/jobsub/templates/list_designs.mako:51
-msgid "Java"
-msgstr ""
-
-#: src/jobsub/templates/list_designs.mako:54
-msgid "Install Samples"
-msgstr ""
-
-#: src/jobsub/templates/list_designs.mako:63
-#: src/jobsub/templates/list_history.mako:41
-msgid "Owner"
-msgstr ""
-
-#: src/jobsub/templates/list_designs.mako:65
-#: src/jobsub/templates/list_history.mako:43
-#: src/jobsub/templates/workflow.mako:101
-msgid "Type"
-msgstr ""
-
-#: src/jobsub/templates/list_designs.mako:67
-msgid "Last Modified"
-msgstr ""
-
-#: src/jobsub/templates/list_designs.mako:97
-msgid "Submit this design?"
-msgstr ""
-
-#: src/jobsub/templates/list_designs.mako:116
-msgid "Delete this design?"
-msgstr ""
-
-#: src/jobsub/templates/list_designs.mako:119
-#: src/jobsub/templates/list_designs.mako:135
-msgid "No"
-msgstr ""
-
-#: src/jobsub/templates/list_designs.mako:120
-#: src/jobsub/templates/list_designs.mako:136
-msgid "Yes"
-msgstr ""
-
-#: src/jobsub/templates/list_designs.mako:129
-msgid "Install sample job designs?"
-msgstr ""
-
-#: src/jobsub/templates/list_designs.mako:132
-msgid "It will take a few seconds to install."
-msgstr ""
-
-#: src/jobsub/templates/list_designs.mako:144
-#, python-format
-msgid "Are you sure you want to delete %(name)s?"
-msgstr ""
-
-#: src/jobsub/templates/list_designs.mako:145
-#, python-format
-msgid "Submit %(name)s to the cluster"
-msgstr ""
-
-#: src/jobsub/templates/list_designs.mako:181
-#: src/jobsub/templates/list_history.mako:80
-msgid "No data available"
-msgstr ""
-
-#: src/jobsub/templates/list_designs.mako:182
-#: src/jobsub/templates/list_history.mako:81
-msgid "Showing _START_ to _END_ of _TOTAL_ entries"
-msgstr ""
-
-#: src/jobsub/templates/list_designs.mako:183
-#: src/jobsub/templates/list_history.mako:82
-msgid "Showing 0 to 0 of 0 entries"
-msgstr ""
-
-#: src/jobsub/templates/list_designs.mako:184
-#: src/jobsub/templates/list_history.mako:83
-msgid "(filtered from _MAX_ total entries)"
-msgstr ""
-
-#: src/jobsub/templates/list_designs.mako:185
-#: src/jobsub/templates/list_history.mako:84
-msgid "No matching records"
-msgstr ""
-
-#: src/jobsub/templates/list_designs.mako:187
-#: src/jobsub/templates/list_history.mako:86
-msgid "First"
-msgstr ""
-
-#: src/jobsub/templates/list_designs.mako:188
-#: src/jobsub/templates/list_history.mako:87
-msgid "Last"
-msgstr ""
-
-#: src/jobsub/templates/list_designs.mako:189
-#: src/jobsub/templates/list_history.mako:88
-msgid "Next"
-msgstr ""
-
-#: src/jobsub/templates/list_designs.mako:190
-#: src/jobsub/templates/list_history.mako:89
-msgid "Previous"
-msgstr ""
-
-#: src/jobsub/templates/list_history.mako:33
-msgid "Job Submission History"
-msgstr ""
-
-#: src/jobsub/templates/list_history.mako:40
-msgid "Oozie Job ID"
-msgstr ""
-
-#: src/jobsub/templates/list_history.mako:45
-msgid "Submission Date"
-msgstr ""
-
-#: src/jobsub/templates/workflow.mako:81
-msgid "Edit design"
-msgstr ""
-
-#: src/jobsub/templates/workflow.mako:88
-msgid "Actions"
-msgstr ""
-
-#: src/jobsub/templates/workflow.mako:89
-msgid "Details"
-msgstr ""
-
-#: src/jobsub/templates/workflow.mako:90
-msgid "Definition"
-msgstr ""
-
-#: src/jobsub/templates/workflow.mako:91
-msgid "Log"
-msgstr ""
-
-#: src/jobsub/templates/workflow.mako:102
-#: src/jobsub/templates/workflow.mako:171
-msgid "Status"
-msgstr ""
-
-#: src/jobsub/templates/workflow.mako:103
-#: src/jobsub/templates/workflow.mako:175
-msgid "External Id"
-msgstr ""
-
-#: src/jobsub/templates/workflow.mako:105
-#: src/jobsub/templates/workflow.mako:179
-msgid "Start Time"
-msgstr ""
-
-#: src/jobsub/templates/workflow.mako:106
-#: src/jobsub/templates/workflow.mako:187
-msgid "End Time"
-msgstr ""
-
-#: src/jobsub/templates/workflow.mako:108
-msgid "Retries"
-msgstr ""
-
-#: src/jobsub/templates/workflow.mako:109
-msgid "Error Message"
-msgstr ""
-
-#: src/jobsub/templates/workflow.mako:110
-msgid "Transition"
-msgstr ""
-
-#: src/jobsub/templates/workflow.mako:112
-msgid "Data"
-msgstr ""
-
-#: src/jobsub/templates/workflow.mako:155
-msgid "Application Name"
-msgstr ""
-
-#: src/jobsub/templates/workflow.mako:163
+#: src/jobsub/templates/designs.mako:303
 msgid "User"
 msgstr ""
 
-#: src/jobsub/templates/workflow.mako:167
-msgid "Group"
+#: src/jobsub/templates/designs.mako:304
+msgid "User to authenticate with."
 msgstr ""
 
-#: src/jobsub/templates/workflow.mako:183
-msgid "Created Time"
+#: src/jobsub/templates/designs.mako:307
+msgid "Host"
 msgstr ""
 
-#: src/jobsub/templates/workflow.mako:191
-msgid "Application Path"
+#: src/jobsub/templates/designs.mako:308
+msgid "Host to execute command on."
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:311 src/jobsub/templates/designs.mako:492
+msgid "Command"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:312 src/jobsub/templates/designs.mako:493
+msgid "Command to execute."
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:315
+msgid "Script name"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:316
+msgid "Path to the script to execute."
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:343 src/jobsub/templates/designs.mako:344
+msgid "TO addresses"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:347 src/jobsub/templates/designs.mako:348
+msgid "CC addresses (optional)"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:351 src/jobsub/templates/designs.mako:352
+msgid "Subject"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:355 src/jobsub/templates/designs.mako:356
+msgid "Body"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:359
+msgid "Job properties"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:360
+msgid "Property name"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:367
+msgid "Add property"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:377
+msgid "Prepare"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:386
+msgid "Add delete"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:390
+msgid "Add mkdir"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:401 src/jobsub/templates/designs.mako:468
+#: src/jobsub/templates/designs.mako:496 src/jobsub/templates/designs.mako:600
+#: src/jobsub/templates/designs.mako:621 src/jobsub/templates/designs.mako:648
+msgid "Params"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:409 src/jobsub/templates/designs.mako:476
+msgid "Add param"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:419
+msgid "Files"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:425
+msgid "Add file"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:435
+msgid "Archives"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:441
+msgid "Add archive"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:454
+msgid "Job Design (mapreduce type)"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:457
+msgid "Job Design (java type)"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:460
+msgid "Job Design (streaming type)"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:463
+msgid "Job Design (hive type)"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:466
+msgid "Job Design (pig type)"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:479 src/jobsub/templates/designs.mako:629
+#: src/jobsub/templates/designs.mako:656
+msgid "Add argument"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:490
+msgid "Job Design (sqoop type)"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:504 src/jobsub/templates/designs.mako:608
+msgid "Add arg"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:515
+msgid "Job Design (fs type)"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:517
+msgid "Delete path"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:523 src/jobsub/templates/designs.mako:539
+#: src/jobsub/templates/designs.mako:555
+msgid "Add path"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:533
+msgid "Create directory"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:549
+msgid "Create or touch file"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:565
+msgid "Change permissions"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:571
+msgid "Add chmod"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:581
+msgid "Move file"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:587
+msgid "Add move"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:598
+msgid "Job Design (ssh type)"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:619
+msgid "Job Design (shell type)"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:632
+msgid "Add env-var"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:643
+msgid "Job Design (email type)"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:646
+msgid "Job Design (distcp type)"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:690
+msgid "No data available"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:691
+msgid "Showing _START_ to _END_ of _TOTAL_ entries"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:692
+msgid "Showing 0 to 0 of 0 entries"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:693
+msgid "(filtered from _MAX_ total entries)"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:694
+msgid "No matching records"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:696
+msgid "First"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:697
+msgid "Last"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:698
+msgid "Next"
+msgstr ""
+
+#: src/jobsub/templates/designs.mako:699
+msgid "Previous"
 msgstr ""
 

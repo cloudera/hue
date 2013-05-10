@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-04-11 10:03-0700\n"
+"POT-Creation-Date: 2013-05-10 11:58-0700\n"
 "PO-Revision-Date: 2012-08-10 13:58-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -22,7 +22,9 @@ msgid "load_apps has already been called."
 msgstr "load_apps はすでに呼び出されています。"
 
 #: src/desktop/conf.py:32
-msgid "If set to true, CherryPy will be used. Otherwise, Spawning will be used as the webserver."
+msgid ""
+"If set to true, CherryPy will be used. Otherwise, Spawning will be used "
+"as the webserver."
 msgstr "true に設定すると CherryPy が使用されます。false に設定すると、Spawning が Web サーバーとして使用されます。"
 
 #: src/desktop/conf.py:38
@@ -42,8 +44,12 @@ msgid "Filename of SSL RSA Private Key"
 msgstr "SSL RSA 秘密鍵のファイル名"
 
 #: src/desktop/conf.py:56
-msgid "If set to false, runcpserver will not actually start the web server.  Used if Apache is being used as a WSGI container."
-msgstr "false に設定すると、runcpserver からは Web サーバーが起動しなくなります。WSGI コンテナとして Apache を使用している場合に使用されます。"
+msgid ""
+"If set to false, runcpserver will not actually start the web server.  "
+"Used if Apache is being used as a WSGI container."
+msgstr ""
+"false に設定すると、runcpserver からは Web サーバーが起動しなくなります。WSGI コンテナとして Apache "
+"を使用している場合に使用されます。"
 
 #: src/desktop/conf.py:61
 msgid "Number of threads used by the CherryPy web server."
@@ -86,10 +92,16 @@ msgid "Default email address to use for various automated notifications from Hue
 msgstr "Hue からのさまざまな自動通知で使用するデフォルトの電子メールアドレスです。"
 
 #: src/desktop/conf.py:144
-msgid "Configuration options for specifying the Desktop Database.\n"
-"          For more info, see http://docs.djangoproject.com/en/1.1/ref/settings/#database-engine"
-msgstr "Desktop Database.を指定する設定オプション\n"
-"          詳細については、http://docs.djangoproject.com/en/1.1/ref/settings/#database-engine を確認してください。"
+#, fuzzy
+msgid ""
+"Configuration options for specifying the Desktop Database.\n"
+"          For more info, see "
+"http://docs.djangoproject.com/en/1.1/ref/settings/#database-engine"
+msgstr ""
+"Desktop Database.を指定する設定オプション\n"
+"\"\n"
+"\"          詳細については、http://docs.djangoproject.com/en/1.1/ref/settings"
+"/#database-engine を確認してください。"
 
 #: src/desktop/conf.py:149
 msgid "Database engine, such as postgresql_psycopg2, mysql, or sqlite3."
@@ -116,10 +128,14 @@ msgid "Database port."
 msgstr "データベースのポートです。"
 
 #: src/desktop/conf.py:188
-msgid "Configuration options for specifying Hue's Kerberos integration for\n"
+#, fuzzy
+msgid ""
+"Configuration options for specifying Hue's Kerberos integration for\n"
 "          secured Hadoop clusters."
-msgstr "セキュアな Hadoop クラスタに向けて Hue の Kerberos 統合を指定する\n"
-"          設定オプションです。"
+msgstr ""
+"セキュアな Hadoop クラスタに向けて Hue の Kerberos 統合を指定する\n"
+"\"\n"
+"\"          設定オプションです。"
 
 #: src/desktop/conf.py:193
 msgid "Path to a Kerberos keytab file containing Hue's service credentials."
@@ -162,28 +178,54 @@ msgid "Customizations to the UI."
 msgstr "UI のカスタマイズです。"
 
 #: src/desktop/conf.py:255
-msgid "Top banner HTML code. This code will be placed in the navigation bar so that it will reside at the top of the page in a fixed position. One common value is `<img src=\"http://www.example.com/example.gif\" />`"
-msgstr "トップバナー HTML コードです。このコードはナビゲーションバーに配置され、ページ上部の固定位置に常駐するようになります。共通値の 1 つは `<img src=\"http://www.example.com/example.gif\" />` です。"
+msgid ""
+"Top banner HTML code. This code will be placed in the navigation bar so "
+"that it will reside at the top of the page in a fixed position. One "
+"common value is `<img src=\"http://www.example.com/example.gif\" />`"
+msgstr ""
+"トップバナー HTML コードです。このコードはナビゲーションバーに配置され、ページ上部の固定位置に常駐するようになります。共通値の 1 つは "
+"`<img src=\"http://www.example.com/example.gif\" />` です。"
 
 #: src/desktop/conf.py:262
 msgid "Configuration options for user authentication into the web application."
 msgstr "Web アプリケーションに対するユーザー認証の設定オプションです。"
 
 #: src/desktop/conf.py:266
-msgid "Authentication backend.  Common settings are django.contrib.auth.backends.ModelBackend (fully Django backend), desktop.auth.backend.AllowAllBackend (allows everyone), desktop.auth.backend.AllowFirstUserDjangoBackend (relies on Django and user manager, after the first login). "
-msgstr "認証バックエンド。多く使用される設定は、django.contrib.auth.backends.ModelBackend（全面的に Django バックエンド）、desktop.auth.backend.AllowAllBackend（全員を許可）、desktop.auth.backend.AllowFirstUserDjangoBackend（最初のログイン以降は Django およびユーザーマネージャを使用）です。 "
+msgid ""
+"Authentication backend.  Common settings are "
+"django.contrib.auth.backends.ModelBackend (fully Django backend), "
+"desktop.auth.backend.AllowAllBackend (allows everyone), "
+"desktop.auth.backend.AllowFirstUserDjangoBackend (relies on Django and "
+"user manager, after the first login). "
+msgstr ""
+"認証バックエンド。多く使用される設定は、django.contrib.auth.backends.ModelBackend（全面的に Django"
+" "
+"バックエンド）、desktop.auth.backend.AllowAllBackend（全員を許可）、desktop.auth.backend.AllowFirstUserDjangoBackend（最初のログイン以降は"
+" Django およびユーザーマネージャを使用）です。 "
 
 #: src/desktop/conf.py:272
 msgid "Class which defines extra accessor methods for User objects."
 msgstr "User オブジェクトに対する余計なアクセサメソッドを定義するクラスです。"
 
 #: src/desktop/conf.py:275
-msgid "The service to use when querying PAM. The service usually corresponds to a single filename in /etc/pam.d"
+msgid ""
+"The service to use when querying PAM. The service usually corresponds to "
+"a single filename in /etc/pam.d"
 msgstr "PAM をクエリする際に使用するサービスです。このサービスは、/etc/pam.d 内の単一のファイル名に通常は対応します。"
 
 #: src/desktop/conf.py:279
-msgid "When using the desktop.auth.backend.RemoteUserDjangoBackend, this sets the normalized name of the header that contains the remote user. The HTTP header in the request is converted to a key by converting all characters to uppercase, replacing any hyphens with underscores and adding an HTTP_ prefix to the name. So, for example, if the header is called Remote-User that would be configured as HTTP_REMOTE_USER"
-msgstr "desktop.auth.backend.RemoteUserDjangoBackend を使用する際に、リモートユーザーを含むヘッダーの正規化名がこれによって設定されます。すべての文字を大文字に変換し、ハイフンをアンダースコアで置換して、HTTP_ プレフィックスを名前に追加することにより、要求の HTTP ヘッダーはキーに変換されます。そのため、ヘッダーがたとえば Remote-User と呼ばれる場合、これは HTTP_REMOTE_USER と設定されます。"
+msgid ""
+"When using the desktop.auth.backend.RemoteUserDjangoBackend, this sets "
+"the normalized name of the header that contains the remote user. The HTTP"
+" header in the request is converted to a key by converting all characters"
+" to uppercase, replacing any hyphens with underscores and adding an HTTP_"
+" prefix to the name. So, for example, if the header is called Remote-User"
+" that would be configured as HTTP_REMOTE_USER"
+msgstr ""
+"desktop.auth.backend.RemoteUserDjangoBackend "
+"を使用する際に、リモートユーザーを含むヘッダーの正規化名がこれによって設定されます。すべての文字を大文字に変換し、ハイフンをアンダースコアで置換して、HTTP_"
+" プレフィックスを名前に追加することにより、要求の HTTP ヘッダーはキーに変換されます。そのため、ヘッダーがたとえば Remote-User "
+"と呼ばれる場合、これは HTTP_REMOTE_USER と設定されます。"
 
 #: src/desktop/conf.py:289
 msgid "Configuration options for LDAP connectivity."
@@ -206,8 +248,16 @@ msgid "Use StartTLS when communicating with LDAP server."
 msgstr "LDAP サーバーとの通信時に StartTLS を使用します。"
 
 #: src/desktop/conf.py:306
-msgid "A PEM-format file containing certificates for the CA's that Hue will trust for authentication over TLS. The certificate for the CA that signed the LDAP server certificate must be included among these certificates. See more here http://www.openldap.org/doc/admin24/tls.html."
-msgstr "TLS 経由での認証で Hue が信頼する CA の証明書を格納している PEM 形式のファイルです。これらの証明書に、LDAP サーバー証明書に署名した CA の証明書を含める必要があります。詳細については、http://www.openldap.org/doc/admin24/tls.html を参照してください。"
+msgid ""
+"A PEM-format file containing certificates for the CA's that Hue will "
+"trust for authentication over TLS. The certificate for the CA that signed"
+" the LDAP server certificate must be included among these certificates. "
+"See more here http://www.openldap.org/doc/admin24/tls.html."
+msgstr ""
+"TLS 経由での認証で Hue が信頼する CA の証明書を格納している PEM 形式のファイルです。これらの証明書に、LDAP "
+"サーバー証明書に署名した CA "
+"の証明書を含める必要があります。詳細については、http://www.openldap.org/doc/admin24/tls.html "
+"を参照してください。"
 
 #: src/desktop/conf.py:309
 msgid "A pattern to use for constructing LDAP usernames."
@@ -234,7 +284,9 @@ msgid "A base filter for use when searching for users."
 msgstr "ユーザーを検索するときに使用する基本フィルタです。"
 
 #: src/desktop/conf.py:330
-msgid "The username attribute in the LDAP schema. Typically, this is 'sAMAccountName' for AD and 'uid' for other LDAP systems."
+msgid ""
+"The username attribute in the LDAP schema. Typically, this is "
+"'sAMAccountName' for AD and 'uid' for other LDAP systems."
 msgstr "LDAP スキーマでのユーザー名属性。多くの場合、AD では 'sAMAccountName'、他の LDAP システムでは 'uid' です。"
 
 #: src/desktop/conf.py:338
@@ -314,8 +366,14 @@ msgid "Enable or disable Django debug mode."
 msgstr "Django のデバッグモードを有効化または無効化します。"
 
 #: src/desktop/conf.py:452
-msgid "Enable or disable debugging information in the 500 internal server error response. Note that the debugging information may contain sensitive data. If django_debug_mode is True, this is automatically enabled."
-msgstr "500 の内部サーバーのエラー応答でデバッグ情報を有効化または無効化します。デバッグ情報には機密データが記録されていることがあります。django_debug_mode が true の場合は、この設定が自動的に有効になります。"
+msgid ""
+"Enable or disable debugging information in the 500 internal server error "
+"response. Note that the debugging information may contain sensitive data."
+" If django_debug_mode is True, this is automatically enabled."
+msgstr ""
+"500 "
+"の内部サーバーのエラー応答でデバッグ情報を有効化または無効化します。デバッグ情報には機密データが記録されていることがあります。django_debug_mode"
+" が true の場合は、この設定が自動的に有効になります。"
 
 #: src/desktop/conf.py:461
 msgid "Email address that internal error messages should send as."
@@ -347,11 +405,15 @@ msgid "LDAP is only partially configured. An LDAP URL must be provided."
 msgstr "LDAP の設定は部分的です。LDAP の URL を指定する必要があります。"
 
 #: src/desktop/conf.py:520
-msgid "LDAP is only partially configured. An NT Domain or username search pattern must be provided."
+msgid ""
+"LDAP is only partially configured. An NT Domain or username search "
+"pattern must be provided."
 msgstr "LDAP の設定は部分的です。NT ドメインまたはユーザー名の検索パターンを指定する必要があります。"
 
 #: src/desktop/conf.py:526
-msgid "The LDAP username pattern should contain the special<username> replacement string for authentication."
+msgid ""
+"The LDAP username pattern should contain the special<username> "
+"replacement string for authentication."
 msgstr "LDAP ユーザー名のパターンは、認証用に特殊な <username> 置換文字列を含んでいる必要があります。"
 
 #: src/desktop/decorators.py:40
@@ -381,33 +443,37 @@ msgstr "ミドルウェアモジュール \"%(module)s\" では \"%(class)s\" �
 
 #: src/desktop/middleware.py:261
 #, python-format
-msgid "AppSpecificMiddleware module \"%(module)s\" has a process_request function which is impossible."
-msgstr "AppSpecificMiddleware モジュール \"%(module)s\" には、実行不可能な process_request 関数が含まれています。"
+msgid ""
+"AppSpecificMiddleware module \"%(module)s\" has a process_request "
+"function which is impossible."
+msgstr ""
+"AppSpecificMiddleware モジュール \"%(module)s\" には、実行不可能な process_request "
+"関数が含まれています。"
 
 #: src/desktop/middleware.py:312
 #, python-format
 msgid "You do not have permission to access the %(app_name)s application."
 msgstr "%(app_name)s アプリケーションにアクセスするパーミッションがありません。"
 
-#: src/desktop/views.py:62 src/desktop/views.py:77 src/desktop/views.py:187
-#: src/desktop/views.py:214 src/desktop/views.py:362
+#: src/desktop/views.py:63 src/desktop/views.py:78 src/desktop/views.py:188
+#: src/desktop/views.py:215 src/desktop/views.py:370
 msgid "You must be a superuser."
 msgstr "スーパーユーザーであることが必要です。"
 
-#: src/desktop/views.py:69
+#: src/desktop/views.py:70
 msgid "No logs found!"
 msgstr "ログが見つかりません。"
 
-#: src/desktop/views.py:110
+#: src/desktop/views.py:111
 msgid "No logs found."
 msgstr "ログが見つかりません。"
 
-#: src/desktop/auth/forms.py:28 src/desktop/templates/login.mako:70
+#: src/desktop/auth/forms.py:28 src/desktop/templates/login.mako:119
 msgid "Username"
 msgstr "ユーザー名"
 
 #: src/desktop/auth/forms.py:29 src/desktop/auth/forms.py:38
-#: src/desktop/templates/login.mako:78
+#: src/desktop/templates/login.mako:127
 msgid "Password"
 msgstr "パスワード"
 
@@ -483,14 +549,19 @@ msgstr "%(separator)s %(number)d 個の%(type)s"
 msgid "%(separator)s %(number)d %(type)s"
 msgstr "%(separator)s %(number)d 個の%(type)s"
 
+#: src/desktop/lib/security_util.py:33
+#, python-format
+msgid "Can't replace %s pattern since host is null."
+msgstr ""
+
 #: src/desktop/management/commands/config_dump.py:39
 msgid "Dumping configuration..."
 msgstr "設定をダンプしています..."
 
 #: src/desktop/management/commands/config_dump.py:60
 #: src/desktop/management/commands/config_dump.py:70
-#: src/desktop/templates/dump_config.mako:90
-#: src/desktop/templates/dump_config.mako:102
+#: src/desktop/templates/dump_config.mako:133
+#: src/desktop/templates/dump_config.mako:145
 msgid "No help available."
 msgstr "ヘルプがありません。"
 
@@ -536,7 +607,9 @@ msgstr "テンプレートパス %(path)r は存在しません。"
 
 #: src/desktop/management/commands/create_desktop_app.py:52
 #, python-format
-msgid "%(name)r is not a valid application name. Use only numbers, letters and underscores."
+msgid ""
+"%(name)r is not a valid application name. Use only numbers, letters and "
+"underscores."
 msgstr "%(name)r は有効なアプリケーション名ではありません。数字、文字、およびアンダースコアのみを使用してください。"
 
 #: src/desktop/management/commands/create_test_fs.py:31
@@ -558,32 +631,49 @@ msgid "Web server for Hue."
 msgstr "Hue の Web サーバーです。"
 
 #: src/desktop/management/commands/runpylint.py:28
-msgid "\n"
+#, fuzzy
+msgid ""
+"\n"
 "  Runs pylint on desktop and app code.\n"
 "\n"
 "  With no arguments, or with \"all\", this will run pylint on all\n"
 "  installed apps.  Otherwise, specify modules to run, as well\n"
-"  as other parameters to pylint.  Note that you'll want to preface the section\n"
-"  of pylint arguments with \"--\" so Django's manage.py passes them along.\n"
+"  as other parameters to pylint.  Note that you'll want to preface the "
+"section\n"
+"  of pylint arguments with \"--\" so Django's manage.py passes them "
+"along.\n"
 "\n"
 "  Examples:\n"
 "    python core/manage.py runpylint all -- -f parseable\n"
 "    python core/manage.py runpylint filebrowser\n"
 "    python core/manage.py runpylint\n"
 "  "
-msgstr "\n"
-"  デスクトップおよびアプリコードで pylint を実行します。\n"
+msgstr ""
 "\n"
-"  引数を指定しなかった場合、および \"all\" を指定した場合、インストールされた\n"
-"  すべてのアプリケーションで pylint が実行されます。それ以外の場合は、実行\n"
-"  するモジュール、および pylint への他のパラメータを指定します。pylint の引数\n"
-"  セクションの前に \"--\" を付けると、Django の manage.py はその引数を伝えます。\n"
-"\n"
-"  例：\n"
-"    python core/manage.py runpylint all -- -f parseable\n"
-"    python core/manage.py runpylint filebrowser\n"
-"    python core/manage.py runpylint\n"
-"  "
+"\"\n"
+"\"  デスクトップおよびアプリコードで pylint を実行します。\n"
+"\"\n"
+"\"\n"
+"\"\n"
+"\"  引数を指定しなかった場合、および \"all\" を指定した場合、インストールされた\n"
+"\"\n"
+"\"  すべてのアプリケーションで pylint が実行されます。それ以外の場合は、実行\n"
+"\"\n"
+"\"  するモジュール、および pylint への他のパラメータを指定します。pylint の引数\n"
+"\"\n"
+"\"  セクションの前に \"--\" を付けると、Django の manage.py はその引数を伝えます。\n"
+"\"\n"
+"\"\n"
+"\"\n"
+"\"  例：\n"
+"\"\n"
+"\"    python core/manage.py runpylint all -- -f parseable\n"
+"\"\n"
+"\"    python core/manage.py runpylint filebrowser\n"
+"\"\n"
+"\"    python core/manage.py runpylint\n"
+"\"\n"
+"\"  "
 
 #: src/desktop/management/commands/runpylint.py:61
 #, python-format
@@ -615,28 +705,30 @@ msgid "Server Error (500)"
 msgstr "サーバーエラー（500）"
 
 #: src/desktop/templates/500.mako:25
-msgid "Sorry, there's been an error. An email was sent to your administrators. Thank you for your patience."
+msgid ""
+"Sorry, there's been an error. An email was sent to your administrators. "
+"Thank you for your patience."
 msgstr "申し訳ありません。エラーが発生しました。管理者に電子メールが送信されました。お待たせしました。"
 
-#: src/desktop/templates/500.mako:28 src/desktop/templates/popup_error.mako:36
+#: src/desktop/templates/500.mako:28 src/desktop/templates/popup_error.mako:37
 msgid "More Info"
 msgstr "詳細情報"
 
 #: src/desktop/templates/500.mako:30 src/desktop/templates/500.mako:54
-#: src/desktop/templates/popup_error.mako:38
-#: src/desktop/templates/popup_error.mako:62
+#: src/desktop/templates/popup_error.mako:39
+#: src/desktop/templates/popup_error.mako:63
 msgid "View Logs"
 msgstr "ログの表示"
 
-#: src/desktop/templates/500.mako:37 src/desktop/templates/popup_error.mako:45
+#: src/desktop/templates/500.mako:37 src/desktop/templates/popup_error.mako:46
 msgid "File Name"
 msgstr "ファイル名"
 
-#: src/desktop/templates/500.mako:38 src/desktop/templates/popup_error.mako:46
+#: src/desktop/templates/500.mako:38 src/desktop/templates/popup_error.mako:47
 msgid "Line Number"
 msgstr "行番号"
 
-#: src/desktop/templates/500.mako:39 src/desktop/templates/popup_error.mako:47
+#: src/desktop/templates/500.mako:39 src/desktop/templates/popup_error.mako:48
 msgid "Function Name"
 msgstr "関数名"
 
@@ -645,19 +737,21 @@ msgid "Quick start"
 msgstr "クイックスタート"
 
 #: src/desktop/templates/about_layout.mako:35
+#: src/desktop/templates/dump_config.mako:26
 msgid "Configuration"
 msgstr "設定"
 
 #: src/desktop/templates/about_layout.mako:36
+#: src/desktop/templates/logs.mako:27
 msgid "Server Logs"
 msgstr "サーバーログ"
 
-#: src/desktop/templates/actionbar.mako:31 src/desktop/templates/logs.mako:63
+#: src/desktop/templates/actionbar.mako:31 src/desktop/templates/logs.mako:61
 msgid "Search..."
 msgstr "検索..."
 
 #: src/desktop/templates/check_config.mako:22
-#: src/desktop/templates/dump_config.mako:31
+#: src/desktop/templates/dump_config.mako:48
 msgid "Configuration files located in"
 msgstr "設定ファイルの保存場所："
 
@@ -706,27 +800,27 @@ msgstr "ファイルをアップロード"
 msgid "Failed"
 msgstr "失敗しました"
 
-#: src/desktop/templates/common_header.mako:79
+#: src/desktop/templates/common_header.mako:80
 msgid "Go to column:"
 msgstr "列に移動："
 
-#: src/desktop/templates/common_header.mako:80
+#: src/desktop/templates/common_header.mako:81
 msgid "column name..."
 msgstr "列名..."
 
-#: src/desktop/templates/common_header.mako:137
+#: src/desktop/templates/common_header.mako:139
 msgid "About Hue"
 msgstr "Hue のバージョン情報"
 
-#: src/desktop/templates/common_header.mako:144
+#: src/desktop/templates/common_header.mako:146
 msgid "Profile"
 msgstr "プロファイル"
 
-#: src/desktop/templates/common_header.mako:146
+#: src/desktop/templates/common_header.mako:148
 msgid "Sign Out"
 msgstr "サインアウト"
 
-#: src/desktop/templates/common_header.mako:153
+#: src/desktop/templates/common_header.mako:155
 #: src/desktop/templates/home.mako:21
 msgid "Home"
 msgstr "ホーム"
@@ -735,119 +829,105 @@ msgstr "ホーム"
 msgid "Misconfiguration detected"
 msgstr "誤設定が見つかりました"
 
-#: src/desktop/templates/dump_config.mako:26 src/desktop/templates/logs.mako:27
-msgid "About"
-msgstr "バージョン情報"
-
-#: src/desktop/templates/dump_config.mako:34
-msgid "Installed applications"
+#: src/desktop/templates/dump_config.mako:56
+msgid "Installed Applications"
 msgstr "インストール済みアプリケーション"
 
-#: src/desktop/templates/dump_config.mako:41
+#: src/desktop/templates/dump_config.mako:72
 msgid "Configuration Sections and Variables"
 msgstr "設定のセクションと変数"
 
-#: src/desktop/templates/dump_config.mako:103
+#: src/desktop/templates/dump_config.mako:146
 msgid "Default:"
 msgstr "デフォルト："
 
-#: src/desktop/templates/error.mako:25 src/desktop/templates/login.mako:94
+#: src/desktop/templates/error.mako:25 src/desktop/templates/login.mako:134
 msgid "Error!"
 msgstr "エラーが発生しました。"
 
-#: src/desktop/templates/home.mako:34
+#: src/desktop/templates/home.mako:35
 msgid "Welcome Home."
 msgstr "おかえりなさい。"
 
-#: src/desktop/templates/home.mako:39
+#: src/desktop/templates/home.mako:40
 msgid "Hue is a Web UI for Apache Hadoop. Please select an application below."
 msgstr "Hue は Apache Hadoop 用の Web UI です。下でアプリケーションを選択してください。"
 
-#: src/desktop/templates/home.mako:52
+#: src/desktop/templates/home.mako:53
 msgid "Query"
 msgstr "クエリ"
 
-#: src/desktop/templates/home.mako:56
-msgid "Hive"
-msgstr "Hive"
-
-#: src/desktop/templates/home.mako:57
-msgid "Impala"
-msgstr "Impala"
-
-#: src/desktop/templates/home.mako:58
-msgid "Pig"
-msgstr "Pig"
-
-#: src/desktop/templates/home.mako:59
+#: src/desktop/templates/home.mako:60
 msgid "Shell"
 msgstr "Shell"
 
-#: src/desktop/templates/home.mako:71
+#: src/desktop/templates/home.mako:72
 msgid "Hadoop"
 msgstr "Hadoop"
 
-#: src/desktop/templates/home.mako:75
+#: src/desktop/templates/home.mako:76
 msgid "Files"
 msgstr "ファイル"
 
-#: src/desktop/templates/home.mako:76
+#: src/desktop/templates/home.mako:77
 msgid "Jobs"
 msgstr "ジョブ"
 
-#: src/desktop/templates/home.mako:77
+#: src/desktop/templates/home.mako:78
 msgid "Tables"
 msgstr "テーブル"
 
-#: src/desktop/templates/home.mako:78
+#: src/desktop/templates/home.mako:79
 msgid "Designs"
 msgstr "設計"
 
-#: src/desktop/templates/home.mako:90
+#: src/desktop/templates/home.mako:91
 msgid "Workflow"
 msgstr "Workflow"
 
-#: src/desktop/templates/home.mako:94
+#: src/desktop/templates/home.mako:95
 msgid "Dashboard"
 msgstr "ダッシュボード"
 
-#: src/desktop/templates/home.mako:95
+#: src/desktop/templates/home.mako:96
 msgid "Editor"
 msgstr "エディタ"
 
-#: src/desktop/templates/login.mako:84
-msgid "Sign up"
-msgstr "サインアップ"
+#: src/desktop/templates/login.mako:25
+msgid "Hue - Sign up"
+msgstr "Hue - サインアップ"
 
-#: src/desktop/templates/login.mako:86
-msgid "Sign in"
-msgstr "サインイン"
+#: src/desktop/templates/login.mako:27
+msgid "Hue - Sign in"
+msgstr "Hue - サインイン"
 
-#: src/desktop/templates/login.mako:94
+#: src/desktop/templates/login.mako:134
 msgid "Invalid username or password."
 msgstr "無効なユーザー名またはパスワードです。"
 
-#: src/desktop/templates/login.mako:105
-msgid "Since this is your first time logging in, pick any username and password. Be sure to remember these, as"
+#: src/desktop/templates/login.mako:141
+msgid ""
+"Since this is your first time logging in, pick any username and password."
+" Be sure to remember these, as"
 msgstr "初回のログインのため、任意のユーザー名とパスワードを選んでください。これらを忘れないでください。"
 
-#: src/desktop/templates/login.mako:106
+#: src/desktop/templates/login.mako:142
 msgid "they will become your Hue superuser credentials."
 msgstr "Hue スーパーユーザーの資格情報になるからです。"
 
-#: src/desktop/templates/logs.mako:59
-msgid "Log entries (most recent first)"
-msgstr "ログのエントリ（最新のものから順に表示）"
+#: src/desktop/templates/login.mako:145
+msgid "Sign up"
+msgstr "サインアップ"
 
-#: src/desktop/templates/logs.mako:67
+#: src/desktop/templates/login.mako:148
+msgid "Sign in"
+msgstr "サインイン"
+
+#: src/desktop/templates/logs.mako:65
 msgid "Download entire log as zip"
 msgstr "ログ全体を zip としてダウンロード"
 
-#: src/desktop/templates/popup_error.mako:69
+#: src/desktop/templates/popup_error.mako:70
 msgid "Go back"
 msgstr "戻る"
 
-#~ msgid "The LDAP certificate for authentication over TLS."
-#~ msgstr "TLS 経由での認証に使用する LDAP 証明書です。"
-#~ msgid "Check for misconfiguration"
-#~ msgstr "誤設定がないか確認します"

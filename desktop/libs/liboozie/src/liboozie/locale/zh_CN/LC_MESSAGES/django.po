@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-04-11 10:03-0700\n"
+"POT-Creation-Date: 2013-05-10 11:59-0700\n"
 "PO-Revision-Date: 2012-11-07 13:08-0800\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -17,23 +17,25 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/liboozie/conf.py:25
+#: src/liboozie/conf.py:27
 msgid "URL of Oozie server. This is required for job submission."
 msgstr "Oozie 服务器的 URL。提交作业时需要此 URL。"
 
-#: src/liboozie/conf.py:31
+#: src/liboozie/conf.py:33
 msgid "Whether Oozie requires client to perform Kerberos authentication."
 msgstr "Oozie 是否需要客户端执行 Kerberos 身份验证。"
 
-#: src/liboozie/conf.py:38
-msgid "Location on HDFS where the workflows/coordinators are deployed when submitted by a non-owner."
+#: src/liboozie/conf.py:40
+msgid ""
+"Location on HDFS where the workflows/coordinators are deployed when "
+"submitted by a non-owner."
 msgstr "由非所有者提交时，workflow/coordinator 在 HDFS 上部署的位置。"
 
-#: src/liboozie/conf.py:59
-msgid "The deployment directory of Oozie workflows does not exist. Run \"Setup Examples\" on the Oozie workflow page."
-msgstr "Oozie workflow 的部署目录不存在。运行 Oozie workflow 页面上的“安装程序示例”。"
+#: src/liboozie/conf.py:68
+msgid "The Oozie server is not available"
+msgstr "Oozie Server 不适用"
 
-#: src/liboozie/conf.py:62
+#: src/liboozie/conf.py:77
 msgid "Oozie Share Lib not installed in default location."
 msgstr "Oozie 分享库 (Oozie Share Lib) 无法安装到默认位置。"
 

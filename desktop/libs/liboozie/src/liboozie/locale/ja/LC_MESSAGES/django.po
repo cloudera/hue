@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-04-11 10:03-0700\n"
+"POT-Creation-Date: 2013-05-10 11:59-0700\n"
 "PO-Revision-Date: 2012-11-07 13:08-0800\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -17,23 +17,25 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/liboozie/conf.py:25
+#: src/liboozie/conf.py:27
 msgid "URL of Oozie server. This is required for job submission."
 msgstr "Oozie サーバーの URL です。これはジョブのサブミッションに必要です。"
 
-#: src/liboozie/conf.py:31
+#: src/liboozie/conf.py:33
 msgid "Whether Oozie requires client to perform Kerberos authentication."
 msgstr "Oozie が Kerberos 認証の実行をクライアントに要求するかどうかの指定です。"
 
-#: src/liboozie/conf.py:38
-msgid "Location on HDFS where the workflows/coordinators are deployed when submitted by a non-owner."
+#: src/liboozie/conf.py:40
+msgid ""
+"Location on HDFS where the workflows/coordinators are deployed when "
+"submitted by a non-owner."
 msgstr "非所有者によるサブミット時に Workflow／Coordinator が配置される HDFS 上の場所です。"
 
-#: src/liboozie/conf.py:59
-msgid "The deployment directory of Oozie workflows does not exist. Run \"Setup Examples\" on the Oozie workflow page."
-msgstr "Oozie Workflow の展開ディレクトリが存在しません。Oozie Workflow ページで「例のセットアップ」を実行してください。"
+#: src/liboozie/conf.py:68
+msgid "The Oozie server is not available"
+msgstr "Oozie サーバーが利用できません"
 
-#: src/liboozie/conf.py:62
+#: src/liboozie/conf.py:77
 msgid "Oozie Share Lib not installed in default location."
 msgstr "Oozie 共有ライブラリがデフォルトの場所にインストールされていません。"
 

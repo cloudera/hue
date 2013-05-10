@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-01-31 16:57-0800\n"
+"POT-Creation-Date: 2013-05-10 11:59-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/shell/shellmanager.py:153
+#: src/shell/shellmanager.py:156
 #, python-format
 msgid "bin/hadoop return non-zero %(retcode)d while trying to merge credentials."
 msgstr ""
@@ -62,6 +62,10 @@ msgstr ""
 msgid ""
 "You do not have permission to access any shell or there is no configured "
 "shell."
+msgstr ""
+
+#: src/shell/templates/index.mako:97
+msgid "The shell is not present on the Hue host."
 msgstr ""
 
 #: src/shell/templates/no_such_user.mako:24

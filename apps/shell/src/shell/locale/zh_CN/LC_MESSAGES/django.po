@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-04-11 10:03-0700\n"
+"POT-Creation-Date: 2013-05-10 11:59-0700\n"
 "PO-Revision-Date: 2012-07-30 18:56-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/shell/shellmanager.py:153
+#: src/shell/shellmanager.py:156
 #, python-format
 msgid "bin/hadoop return non-zero %(retcode)d while trying to merge credentials."
 msgstr "尝试合并凭据期间，bin/hadoop 返回了非零 %(retcode)d。"
@@ -29,7 +29,9 @@ msgid "Hue Shell"
 msgstr "Hue Shell"
 
 #: src/shell/templates/failed_to_create.mako:24
-msgid "Failed to create a shell of the given type. The possible reasons for this are:"
+msgid ""
+"Failed to create a shell of the given type. The possible reasons for this"
+" are:"
 msgstr "无法创建给定类型的 shell。造成这种情况的原因可能是："
 
 #: src/shell/templates/failed_to_create.mako:26
@@ -57,7 +59,9 @@ msgid "Select one of the available shells from the toolbar above."
 msgstr "请从上面的工具栏中选择其中一个可用的 shell。"
 
 #: src/shell/templates/index.mako:88
-msgid "You do not have permission to access any shell or there is no configured shell."
+msgid ""
+"You do not have permission to access any shell or there is no configured "
+"shell."
 msgstr "您无权访问任何 shell，或者不存在配置 shell。"
 
 #: src/shell/templates/index.mako:97
@@ -65,14 +69,20 @@ msgid "The shell is not present on the Hue host."
 msgstr "在 Hue 主机上不存在 shell。"
 
 #: src/shell/templates/no_such_user.mako:24
-msgid "The Shell application requires a Unix user account for every user of Hue on the remote web server."
+msgid ""
+"The Shell application requires a Unix user account for every user of Hue "
+"on the remote web server."
 msgstr "对于远程 Web 服务器上的每个 Hue 用户，Shell 应用程序都需要一个 Unix 用户帐户。"
 
 #: src/shell/templates/no_such_user.mako:26
-msgid "Ask your administrator to create a user account for you on the remote web server as described in the Shell documentation."
+msgid ""
+"Ask your administrator to create a user account for you on the remote web"
+" server as described in the Shell documentation."
 msgstr "请要求您的管理员根据 Shell 文档中的描述，为您在远程 Web 服务器上创建一个用户帐户。"
 
 #: src/shell/templates/not_running_spawning.mako:24
-msgid "The webserver currently running Hue does not support the Shell application. Please contact your administrator."
+msgid ""
+"The webserver currently running Hue does not support the Shell "
+"application. Please contact your administrator."
 msgstr "当前正在运行 Hue 的 Web 服务器不支持 Shell 应用程序。请与您的管理员联系。"
 

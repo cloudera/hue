@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 프로젝트 버전\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-04-11 10:03-0700\n"
+"POT-Creation-Date: 2013-05-10 11:59-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: 전체 이름 <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -17,49 +17,57 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/pig/api.py:165 src/pig/templates/app.mako:436
+#: src/pig/api.py:182 src/pig/templates/app.mako:455
 msgid "Unsaved script"
 msgstr "저장 안 된 스크립트"
 
-#: src/pig/conf.py:28
+#: src/pig/conf.py:32
 msgid "Location on local filesystem where the examples are stored."
 msgstr "예제가 저장되는 로컬 파일 시스템상의 위치입니다."
 
-#: src/pig/conf.py:34
+#: src/pig/conf.py:38
 msgid "Location on HDFS where the Pig examples are stored."
 msgstr "Pig 예제가 저장되는 HDFS상의 위치입니다."
 
-#: src/pig/models.py:35
+#: src/pig/conf.py:48
+msgid "The app won't work without a running Oozie server"
+msgstr "Oozie Server를 실행하지 않으면 이 앱을 사용할 수 없습니다."
+
+#: src/pig/models.py:33
 msgid "Owner"
 msgstr "소유자"
 
-#: src/pig/models.py:35
+#: src/pig/models.py:33
 msgid "User who can modify the job."
 msgstr "Job을 수정할 수 있는 사람입니다."
 
-#: src/pig/models.py:36
+#: src/pig/models.py:34
 msgid "Is a user document, not a document submission."
 msgstr "문서 제출이 아닌 사용자 문서입니다."
 
-#: src/pig/models.py:37
+#: src/pig/models.py:35
 msgid "If the document is not a submitted job but a real query, script, workflow."
 msgstr "문서가 제출된 Job이 아니라 실제 쿼리, 스크립트, workflow인 경우"
 
-#: src/pig/models.py:46
+#: src/pig/models.py:44
 #, python-format
 msgid "Only superusers and %s are allowed to modify this document."
 msgstr "superuser 및 %s만 이 문서를 수정할 수 있습니다."
 
-#: src/pig/views.py:64 src/pig/views.py:89 src/pig/views.py:119
-#: src/pig/views.py:143
+#: src/pig/views.py:66 src/pig/views.py:90 src/pig/views.py:109
+#: src/pig/views.py:139 src/pig/views.py:163
 msgid "POST request required."
 msgstr "POST 요청이 필요합니다."
 
-#: src/pig/views.py:125
+#: src/pig/views.py:101
+msgid "Error stopping Pig script."
+msgstr "Pig 스크립트를 중지하는 중 오류가 발생했습니다."
+
+#: src/pig/views.py:145
 msgid " (Copy)"
 msgstr " (복사)"
 
-#: src/pig/views.py:191
+#: src/pig/views.py:211
 msgid "A POST request is required."
 msgstr "POST 요청이 필요합니다."
 
@@ -97,7 +105,7 @@ msgstr "스크립트 이름 또는 콘텐츠 검색"
 msgid "Run this script"
 msgstr "이 스크립트 실행"
 
-#: src/pig/templates/app.mako:44 src/pig/templates/app.mako:128
+#: src/pig/templates/app.mako:44 src/pig/templates/app.mako:123
 msgid "Run"
 msgstr "실행"
 
@@ -127,11 +135,13 @@ msgid "New script"
 msgstr "새 스크립트"
 
 #: src/pig/templates/app.mako:54
-msgid "There are currently no scripts defined. Please add a new script clicking on \"New script\""
+msgid ""
+"There are currently no scripts defined. Please add a new script clicking "
+"on \"New script\""
 msgstr "현재 정의된 스크립트가 없습니다. \"새 스크립트\"를 클릭하여 새 스크립트를 추가하십시오."
 
 #: src/pig/templates/app.mako:61 src/pig/templates/app.mako:181
-#: src/pig/templates/app.mako:287 src/pig/templates/app.mako:305
+#: src/pig/templates/app.mako:287 src/pig/templates/app.mako:314
 msgid "Name"
 msgstr "이름"
 
@@ -159,21 +169,21 @@ msgstr "속성 편집"
 msgid "Actions"
 msgstr "작업"
 
-#: src/pig/templates/app.mako:122
-msgid "Save the script"
-msgstr "스크립트 저장"
-
-#: src/pig/templates/app.mako:123
-msgid "Save"
-msgstr "저장"
-
-#: src/pig/templates/app.mako:127 src/pig/templates/app.mako:132
+#: src/pig/templates/app.mako:122 src/pig/templates/app.mako:127
 msgid "Run the script"
 msgstr "스크립트 실행"
 
+#: src/pig/templates/app.mako:128
+msgid "Stop"
+msgstr "중지"
+
+#: src/pig/templates/app.mako:132
+msgid "Save the script"
+msgstr "스크립트 저장"
+
 #: src/pig/templates/app.mako:133
-msgid "Running..."
-msgstr "실행 중..."
+msgid "Save"
+msgstr "저장"
 
 #: src/pig/templates/app.mako:137
 msgid "Copy the script"
@@ -183,7 +193,7 @@ msgstr "스크립트 복사"
 msgid "Delete the script"
 msgstr "스크립트 삭제"
 
-#: src/pig/templates/app.mako:146 src/pig/templates/app.mako:365
+#: src/pig/templates/app.mako:146 src/pig/templates/app.mako:374
 msgid "Logs"
 msgstr "로그"
 
@@ -244,29 +254,25 @@ msgstr "아카이브"
 msgid "Logs for"
 msgstr "다음에 대한 로그"
 
-#: src/pig/templates/app.mako:259
+#: src/pig/templates/app.mako:256
 msgid "Status:"
 msgstr "상태:"
 
-#: src/pig/templates/app.mako:261
+#: src/pig/templates/app.mako:258
 msgid "Progress:"
 msgstr "진행률:"
 
-#: src/pig/templates/app.mako:261
+#: src/pig/templates/app.mako:258
 msgid "%"
 msgstr "%"
 
-#: src/pig/templates/app.mako:267
+#: src/pig/templates/app.mako:264
 msgid "No available logs."
 msgstr "사용할 수 있는 로그가 없습니다."
 
-#: src/pig/templates/app.mako:276 src/pig/templates/app.mako:528
+#: src/pig/templates/app.mako:278 src/pig/templates/app.mako:640
 msgid "Running"
 msgstr "실행 중"
-
-#: src/pig/templates/app.mako:277
-msgid "Completed"
-msgstr "완료됨"
 
 #: src/pig/templates/app.mako:282
 msgid "There are currently no running scripts."
@@ -276,95 +282,101 @@ msgstr "현재 실행 중인 스크립트가 없습니다."
 msgid "Progress"
 msgstr "진행률"
 
-#: src/pig/templates/app.mako:289 src/pig/templates/app.mako:307
+#: src/pig/templates/app.mako:289 src/pig/templates/app.mako:316
 msgid "Created on"
 msgstr "생성 위치"
 
-#: src/pig/templates/app.mako:300
+#: src/pig/templates/app.mako:305
+msgid "Completed"
+msgstr "완료됨"
+
+#: src/pig/templates/app.mako:309
 msgid "There are currently no completed scripts."
 msgstr "현재 완료된 스크립트가 없습니다."
 
-#: src/pig/templates/app.mako:306
+#: src/pig/templates/app.mako:315
 msgid "Status"
 msgstr "상태"
 
-#: src/pig/templates/app.mako:319 src/pig/templates/app.mako:334
+#: src/pig/templates/app.mako:328
 msgid "Click to edit"
 msgstr "편집하려면 클릭"
 
-#: src/pig/templates/app.mako:350
+#: src/pig/templates/app.mako:342
+msgid "Click to view"
+msgstr "보려면 클릭"
+
+#: src/pig/templates/app.mako:359
 msgid "Confirm Delete"
 msgstr "삭제 확인"
 
-#: src/pig/templates/app.mako:353
+#: src/pig/templates/app.mako:362
 msgid "Are you sure you want to delete this script?"
 msgstr "이 스크립트를 삭제하시겠습니까?"
 
-#: src/pig/templates/app.mako:354
+#: src/pig/templates/app.mako:363
 msgid "Are you sure you want to delete these scripts?"
 msgstr "이 스크립트를 삭제하시겠습니까?"
 
-#: src/pig/templates/app.mako:357 src/pig/templates/app.mako:391
+#: src/pig/templates/app.mako:366 src/pig/templates/app.mako:400
+#: src/pig/templates/app.mako:411
 msgid "No"
 msgstr "아니요"
 
-#: src/pig/templates/app.mako:358 src/pig/templates/app.mako:392
+#: src/pig/templates/app.mako:367 src/pig/templates/app.mako:401
+#: src/pig/templates/app.mako:412
 msgid "Yes"
 msgstr "예"
 
-#: src/pig/templates/app.mako:372
+#: src/pig/templates/app.mako:381
 msgid "Close"
 msgstr "닫기"
 
-#: src/pig/templates/app.mako:379
+#: src/pig/templates/app.mako:388
 msgid "Run Script"
 msgstr "스크립트 실행"
 
-#: src/pig/templates/app.mako:379
+#: src/pig/templates/app.mako:388 src/pig/templates/app.mako:408
 msgid "?"
 msgstr "?"
 
-#: src/pig/templates/app.mako:382
+#: src/pig/templates/app.mako:391
 msgid "Script variables"
 msgstr "스크립트 변수"
 
-#: src/pig/templates/app.mako:399
+#: src/pig/templates/app.mako:408
+msgid "Stop Script"
+msgstr "스크립트 중지"
+
+#: src/pig/templates/app.mako:419
 msgid "Choose a file"
 msgstr "파일 선택"
 
-#: src/pig/templates/app.mako:432
+#: src/pig/templates/app.mako:451
 msgid "The pig job could not be killed."
 msgstr "Pig 작업을 중지할 수 없습니다."
 
-#: src/pig/templates/app.mako:433
+#: src/pig/templates/app.mako:452
 msgid "Run this pig script"
-msgstr "이 pig 스크립트 실행"
+msgstr "이 Pig 스크립트 실행"
 
-#: src/pig/templates/app.mako:434
+#: src/pig/templates/app.mako:453
 msgid "Stop the execution"
 msgstr "실행 중지"
 
-#: src/pig/templates/app.mako:435
+#: src/pig/templates/app.mako:454
 msgid "Saved"
 msgstr "저장됨"
 
-#: src/pig/templates/app.mako:521
+#: src/pig/templates/app.mako:633
 msgid "Saving"
 msgstr "저장하는 중"
 
-#: src/pig/templates/app.mako:532
+#: src/pig/templates/app.mako:644
 msgid "has been saved correctly."
 msgstr "저장되었습니다."
 
-#: src/pig/templates/app.mako:536
+#: src/pig/templates/app.mako:648
 msgid "There was an error with your request!"
 msgstr "요청에 오류가 있습니다!"
 
-#~ msgid "About Hue"
-#~ msgstr "Hue 정보"
-#~ msgid "Configuration"
-#~ msgstr "구성"
-#~ msgid "Check for misconfiguration"
-#~ msgstr "잘못된 구성 검사"
-#~ msgid "Server Logs"
-#~ msgstr "서버 로그"
