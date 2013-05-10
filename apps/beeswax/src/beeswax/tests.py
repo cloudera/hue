@@ -109,6 +109,27 @@ class TestBeeswaxWithHadoop(BeeswaxSampleProvider):
     assert_equal(beeswax.models.QueryHistory.STATE[last_state], state)
     return history.id
 
+  def test_beeswax_get_kerberos_security():
+    principal = get_query_server_config('beeswax')['principal']
+    assert_true(principal.startswith('hue/'), principal)
+
+    principal = get_query_server_config('impala')['principal']
+    assert_true(principal.startswith('impala/'), principal)
+
+    beeswax_query_server = {'server_name': 'beeswax', 'principal': 'hue'}
+    impala_query_server = {'server_name': 'impala', 'principal': 'impala'}
+
+    assert_equal((False, 'hue'), BeeswaxClient.get_security(beeswax_query_server))
+    assert_equal((False, 'impala'), BeeswaxClient.get_security(impala_query_server))
+
+    cluster_conf = hadoop.cluster.get_cluster_conf_for_job_submission()
+    finish = cluster_conf.SECURITY_ENABLED.set_for_testing(True)
+    try:
+      assert_equal((True, 'hue'), BeeswaxClient.get_security(beeswax_query_server))
+      assert_equal((True, 'impala'), BeeswaxClient.get_security(impala_query_server))
+    finally:
+      finish()
+
   def test_query_with_error(self):
     """
     Creating a table "again" should not work; error should be displayed.
@@ -1493,28 +1514,6 @@ def test_search_log_line():
     Error: line 1:31 cannot recognize input near '''' '_this_is_not' 'SQL' in constant
     """
   assert_false(search_log_line('ql.Driver', 'FAILED: Parse Error', logs))
-
-
-def test_beeswax_get_kerberos_security():
-  principal = get_query_server_config('beeswax')['principal']
-  assert_true(principal.startswith('hue/'), principal)
-
-  principal = get_query_server_config('impala')['principal']
-  assert_true(principal.startswith('impala/'), principal)
-
-  beeswax_query_server = {'server_name': 'beeswax', 'principal': 'hue'}
-  impala_query_server = {'server_name': 'impala', 'principal': 'impala'}
-
-  assert_equal((False, 'hue'), BeeswaxClient.get_security(beeswax_query_server))
-  assert_equal((False, 'impala'), BeeswaxClient.get_security(impala_query_server))
-
-  cluster_conf = hadoop.cluster.get_cluster_conf_for_job_submission()
-  finish = cluster_conf.SECURITY_ENABLED.set_for_testing(True)
-  try:
-    assert_equal((True, 'hue'), BeeswaxClient.get_security(beeswax_query_server))
-    assert_equal((True, 'impala'), BeeswaxClient.get_security(impala_query_server))
-  finally:
-    finish()
 
 
 class MockDbms:
