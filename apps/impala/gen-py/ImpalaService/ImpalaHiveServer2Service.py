@@ -22,6 +22,13 @@ class Iface(cli_service.TCLIService.Iface):
   def ResetCatalog(self, ):
     pass
 
+  def ResetTable(self, request):
+    """
+    Parameters:
+     - request
+    """
+    pass
+
 
 class Client(cli_service.TCLIService.Client, Iface):
   def __init__(self, iprot, oprot=None):
@@ -52,11 +59,42 @@ class Client(cli_service.TCLIService.Client, Iface):
       return result.success
     raise TApplicationException(TApplicationException.MISSING_RESULT, "ResetCatalog failed: unknown result");
 
+  def ResetTable(self, request):
+    """
+    Parameters:
+     - request
+    """
+    self.send_ResetTable(request)
+    return self.recv_ResetTable()
+
+  def send_ResetTable(self, request):
+    self._oprot.writeMessageBegin('ResetTable', TMessageType.CALL, self._seqid)
+    args = ResetTable_args()
+    args.request = request
+    args.write(self._oprot)
+    self._oprot.writeMessageEnd()
+    self._oprot.trans.flush()
+
+  def recv_ResetTable(self, ):
+    (fname, mtype, rseqid) = self._iprot.readMessageBegin()
+    if mtype == TMessageType.EXCEPTION:
+      x = TApplicationException()
+      x.read(self._iprot)
+      self._iprot.readMessageEnd()
+      raise x
+    result = ResetTable_result()
+    result.read(self._iprot)
+    self._iprot.readMessageEnd()
+    if result.success is not None:
+      return result.success
+    raise TApplicationException(TApplicationException.MISSING_RESULT, "ResetTable failed: unknown result");
+
 
 class Processor(cli_service.TCLIService.Processor, Iface, TProcessor):
   def __init__(self, handler):
     cli_service.TCLIService.Processor.__init__(self, handler)
     self._processMap["ResetCatalog"] = Processor.process_ResetCatalog
+    self._processMap["ResetTable"] = Processor.process_ResetTable
 
   def process(self, iprot, oprot):
     (name, type, seqid) = iprot.readMessageBegin()
@@ -80,6 +118,17 @@ class Processor(cli_service.TCLIService.Processor, Iface, TProcessor):
     result = ResetCatalog_result()
     result.success = self._handler.ResetCatalog()
     oprot.writeMessageBegin("ResetCatalog", TMessageType.REPLY, seqid)
+    result.write(oprot)
+    oprot.writeMessageEnd()
+    oprot.trans.flush()
+
+  def process_ResetTable(self, seqid, iprot, oprot):
+    args = ResetTable_args()
+    args.read(iprot)
+    iprot.readMessageEnd()
+    result = ResetTable_result()
+    result.success = self._handler.ResetTable(args.request)
+    oprot.writeMessageBegin("ResetTable", TMessageType.REPLY, seqid)
     result.write(oprot)
     oprot.writeMessageEnd()
     oprot.trans.flush()
@@ -136,7 +185,7 @@ class ResetCatalog_result(object):
   """
 
   thrift_spec = (
-    (0, TType.STRUCT, 'success', (Status.ttypes.TStatus, Status.ttypes.TStatus.thrift_spec), None, ), # 0
+    (0, TType.STRUCT, 'success', (TResetCatalogResp, TResetCatalogResp.thrift_spec), None, ), # 0
   )
 
   def __init__(self, success=None,):
@@ -153,7 +202,7 @@ class ResetCatalog_result(object):
         break
       if fid == 0:
         if ftype == TType.STRUCT:
-          self.success = Status.ttypes.TStatus()
+          self.success = TResetCatalogResp()
           self.success.read(iprot)
         else:
           iprot.skip(ftype)
@@ -167,6 +216,127 @@ class ResetCatalog_result(object):
       oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
       return
     oprot.writeStructBegin('ResetCatalog_result')
+    if self.success is not None:
+      oprot.writeFieldBegin('success', TType.STRUCT, 0)
+      self.success.write(oprot)
+      oprot.writeFieldEnd()
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+
+  def validate(self):
+    return
+
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
+class ResetTable_args(object):
+  """
+  Attributes:
+   - request
+  """
+
+  thrift_spec = (
+    None, # 0
+    (1, TType.STRUCT, 'request', (TResetTableReq, TResetTableReq.thrift_spec), None, ), # 1
+  )
+
+  def __init__(self, request=None,):
+    self.request = request
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      if fid == 1:
+        if ftype == TType.STRUCT:
+          self.request = TResetTableReq()
+          self.request.read(iprot)
+        else:
+          iprot.skip(ftype)
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('ResetTable_args')
+    if self.request is not None:
+      oprot.writeFieldBegin('request', TType.STRUCT, 1)
+      self.request.write(oprot)
+      oprot.writeFieldEnd()
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+
+  def validate(self):
+    return
+
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
+class ResetTable_result(object):
+  """
+  Attributes:
+   - success
+  """
+
+  thrift_spec = (
+    (0, TType.STRUCT, 'success', (TResetTableResp, TResetTableResp.thrift_spec), None, ), # 0
+  )
+
+  def __init__(self, success=None,):
+    self.success = success
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      if fid == 0:
+        if ftype == TType.STRUCT:
+          self.success = TResetTableResp()
+          self.success.read(iprot)
+        else:
+          iprot.skip(ftype)
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('ResetTable_result')
     if self.success is not None:
       oprot.writeFieldBegin('success', TType.STRUCT, 0)
       self.success.write(oprot)

@@ -109,7 +109,7 @@ class TestBeeswaxWithHadoop(BeeswaxSampleProvider):
     assert_equal(beeswax.models.QueryHistory.STATE[last_state], state)
     return history.id
 
-  def test_beeswax_get_kerberos_security():
+  def test_beeswax_get_kerberos_security(self):
     principal = get_query_server_config('beeswax')['principal']
     assert_true(principal.startswith('hue/'), principal)
 

@@ -29,6 +29,20 @@ class Iface(beeswaxd.BeeswaxService.Iface):
   def ResetCatalog(self, ):
     pass
 
+  def ResetTable(self, request):
+    """
+    Parameters:
+     - request
+    """
+    pass
+
+  def GetRuntimeProfile(self, query_id):
+    """
+    Parameters:
+     - query_id
+    """
+    pass
+
   def CloseInsert(self, handle):
     """
     Parameters:
@@ -101,6 +115,68 @@ class Client(beeswaxd.BeeswaxService.Client, Iface):
       return result.success
     raise TApplicationException(TApplicationException.MISSING_RESULT, "ResetCatalog failed: unknown result");
 
+  def ResetTable(self, request):
+    """
+    Parameters:
+     - request
+    """
+    self.send_ResetTable(request)
+    return self.recv_ResetTable()
+
+  def send_ResetTable(self, request):
+    self._oprot.writeMessageBegin('ResetTable', TMessageType.CALL, self._seqid)
+    args = ResetTable_args()
+    args.request = request
+    args.write(self._oprot)
+    self._oprot.writeMessageEnd()
+    self._oprot.trans.flush()
+
+  def recv_ResetTable(self, ):
+    (fname, mtype, rseqid) = self._iprot.readMessageBegin()
+    if mtype == TMessageType.EXCEPTION:
+      x = TApplicationException()
+      x.read(self._iprot)
+      self._iprot.readMessageEnd()
+      raise x
+    result = ResetTable_result()
+    result.read(self._iprot)
+    self._iprot.readMessageEnd()
+    if result.success is not None:
+      return result.success
+    raise TApplicationException(TApplicationException.MISSING_RESULT, "ResetTable failed: unknown result");
+
+  def GetRuntimeProfile(self, query_id):
+    """
+    Parameters:
+     - query_id
+    """
+    self.send_GetRuntimeProfile(query_id)
+    return self.recv_GetRuntimeProfile()
+
+  def send_GetRuntimeProfile(self, query_id):
+    self._oprot.writeMessageBegin('GetRuntimeProfile', TMessageType.CALL, self._seqid)
+    args = GetRuntimeProfile_args()
+    args.query_id = query_id
+    args.write(self._oprot)
+    self._oprot.writeMessageEnd()
+    self._oprot.trans.flush()
+
+  def recv_GetRuntimeProfile(self, ):
+    (fname, mtype, rseqid) = self._iprot.readMessageBegin()
+    if mtype == TMessageType.EXCEPTION:
+      x = TApplicationException()
+      x.read(self._iprot)
+      self._iprot.readMessageEnd()
+      raise x
+    result = GetRuntimeProfile_result()
+    result.read(self._iprot)
+    self._iprot.readMessageEnd()
+    if result.success is not None:
+      return result.success
+    if result.error is not None:
+      raise result.error
+    raise TApplicationException(TApplicationException.MISSING_RESULT, "GetRuntimeProfile failed: unknown result");
+
   def CloseInsert(self, handle):
     """
     Parameters:
@@ -137,7 +213,7 @@ class Client(beeswaxd.BeeswaxService.Client, Iface):
 
   def PingImpalaService(self, ):
     self.send_PingImpalaService()
-    self.recv_PingImpalaService()
+    return self.recv_PingImpalaService()
 
   def send_PingImpalaService(self, ):
     self._oprot.writeMessageBegin('PingImpalaService', TMessageType.CALL, self._seqid)
@@ -156,7 +232,9 @@ class Client(beeswaxd.BeeswaxService.Client, Iface):
     result = PingImpalaService_result()
     result.read(self._iprot)
     self._iprot.readMessageEnd()
-    return
+    if result.success is not None:
+      return result.success
+    raise TApplicationException(TApplicationException.MISSING_RESULT, "PingImpalaService failed: unknown result");
 
 
 class Processor(beeswaxd.BeeswaxService.Processor, Iface, TProcessor):
@@ -164,6 +242,8 @@ class Processor(beeswaxd.BeeswaxService.Processor, Iface, TProcessor):
     beeswaxd.BeeswaxService.Processor.__init__(self, handler)
     self._processMap["Cancel"] = Processor.process_Cancel
     self._processMap["ResetCatalog"] = Processor.process_ResetCatalog
+    self._processMap["ResetTable"] = Processor.process_ResetTable
+    self._processMap["GetRuntimeProfile"] = Processor.process_GetRuntimeProfile
     self._processMap["CloseInsert"] = Processor.process_CloseInsert
     self._processMap["PingImpalaService"] = Processor.process_PingImpalaService
 
@@ -207,6 +287,31 @@ class Processor(beeswaxd.BeeswaxService.Processor, Iface, TProcessor):
     oprot.writeMessageEnd()
     oprot.trans.flush()
 
+  def process_ResetTable(self, seqid, iprot, oprot):
+    args = ResetTable_args()
+    args.read(iprot)
+    iprot.readMessageEnd()
+    result = ResetTable_result()
+    result.success = self._handler.ResetTable(args.request)
+    oprot.writeMessageBegin("ResetTable", TMessageType.REPLY, seqid)
+    result.write(oprot)
+    oprot.writeMessageEnd()
+    oprot.trans.flush()
+
+  def process_GetRuntimeProfile(self, seqid, iprot, oprot):
+    args = GetRuntimeProfile_args()
+    args.read(iprot)
+    iprot.readMessageEnd()
+    result = GetRuntimeProfile_result()
+    try:
+      result.success = self._handler.GetRuntimeProfile(args.query_id)
+    except beeswaxd.ttypes.BeeswaxException as error:
+      result.error = error
+    oprot.writeMessageBegin("GetRuntimeProfile", TMessageType.REPLY, seqid)
+    result.write(oprot)
+    oprot.writeMessageEnd()
+    oprot.trans.flush()
+
   def process_CloseInsert(self, seqid, iprot, oprot):
     args = CloseInsert_args()
     args.read(iprot)
@@ -228,7 +333,7 @@ class Processor(beeswaxd.BeeswaxService.Processor, Iface, TProcessor):
     args.read(iprot)
     iprot.readMessageEnd()
     result = PingImpalaService_result()
-    self._handler.PingImpalaService()
+    result.success = self._handler.PingImpalaService()
     oprot.writeMessageBegin("PingImpalaService", TMessageType.REPLY, seqid)
     result.write(oprot)
     oprot.writeMessageEnd()
@@ -473,6 +578,260 @@ class ResetCatalog_result(object):
   def __ne__(self, other):
     return not (self == other)
 
+class ResetTable_args(object):
+  """
+  Attributes:
+   - request
+  """
+
+  thrift_spec = (
+    None, # 0
+    (1, TType.STRUCT, 'request', (TResetTableReq, TResetTableReq.thrift_spec), None, ), # 1
+  )
+
+  def __init__(self, request=None,):
+    self.request = request
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      if fid == 1:
+        if ftype == TType.STRUCT:
+          self.request = TResetTableReq()
+          self.request.read(iprot)
+        else:
+          iprot.skip(ftype)
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('ResetTable_args')
+    if self.request is not None:
+      oprot.writeFieldBegin('request', TType.STRUCT, 1)
+      self.request.write(oprot)
+      oprot.writeFieldEnd()
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+
+  def validate(self):
+    return
+
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
+class ResetTable_result(object):
+  """
+  Attributes:
+   - success
+  """
+
+  thrift_spec = (
+    (0, TType.STRUCT, 'success', (Status.ttypes.TStatus, Status.ttypes.TStatus.thrift_spec), None, ), # 0
+  )
+
+  def __init__(self, success=None,):
+    self.success = success
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      if fid == 0:
+        if ftype == TType.STRUCT:
+          self.success = Status.ttypes.TStatus()
+          self.success.read(iprot)
+        else:
+          iprot.skip(ftype)
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('ResetTable_result')
+    if self.success is not None:
+      oprot.writeFieldBegin('success', TType.STRUCT, 0)
+      self.success.write(oprot)
+      oprot.writeFieldEnd()
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+
+  def validate(self):
+    return
+
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
+class GetRuntimeProfile_args(object):
+  """
+  Attributes:
+   - query_id
+  """
+
+  thrift_spec = (
+    None, # 0
+    (1, TType.STRUCT, 'query_id', (beeswaxd.ttypes.QueryHandle, beeswaxd.ttypes.QueryHandle.thrift_spec), None, ), # 1
+  )
+
+  def __init__(self, query_id=None,):
+    self.query_id = query_id
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      if fid == 1:
+        if ftype == TType.STRUCT:
+          self.query_id = beeswaxd.ttypes.QueryHandle()
+          self.query_id.read(iprot)
+        else:
+          iprot.skip(ftype)
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('GetRuntimeProfile_args')
+    if self.query_id is not None:
+      oprot.writeFieldBegin('query_id', TType.STRUCT, 1)
+      self.query_id.write(oprot)
+      oprot.writeFieldEnd()
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+
+  def validate(self):
+    return
+
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
+class GetRuntimeProfile_result(object):
+  """
+  Attributes:
+   - success
+   - error
+  """
+
+  thrift_spec = (
+    (0, TType.STRING, 'success', None, None, ), # 0
+    (1, TType.STRUCT, 'error', (beeswaxd.ttypes.BeeswaxException, beeswaxd.ttypes.BeeswaxException.thrift_spec), None, ), # 1
+  )
+
+  def __init__(self, success=None, error=None,):
+    self.success = success
+    self.error = error
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      if fid == 0:
+        if ftype == TType.STRING:
+          self.success = iprot.readString();
+        else:
+          iprot.skip(ftype)
+      elif fid == 1:
+        if ftype == TType.STRUCT:
+          self.error = beeswaxd.ttypes.BeeswaxException()
+          self.error.read(iprot)
+        else:
+          iprot.skip(ftype)
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('GetRuntimeProfile_result')
+    if self.success is not None:
+      oprot.writeFieldBegin('success', TType.STRING, 0)
+      oprot.writeString(self.success)
+      oprot.writeFieldEnd()
+    if self.error is not None:
+      oprot.writeFieldBegin('error', TType.STRUCT, 1)
+      self.error.write(oprot)
+      oprot.writeFieldEnd()
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+
+  def validate(self):
+    return
+
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
 class CloseInsert_args(object):
   """
   Attributes:
@@ -663,9 +1022,17 @@ class PingImpalaService_args(object):
     return not (self == other)
 
 class PingImpalaService_result(object):
+  """
+  Attributes:
+   - success
+  """
 
   thrift_spec = (
+    (0, TType.STRUCT, 'success', (TPingImpalaServiceResp, TPingImpalaServiceResp.thrift_spec), None, ), # 0
   )
+
+  def __init__(self, success=None,):
+    self.success = success
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -676,6 +1043,12 @@ class PingImpalaService_result(object):
       (fname, ftype, fid) = iprot.readFieldBegin()
       if ftype == TType.STOP:
         break
+      if fid == 0:
+        if ftype == TType.STRUCT:
+          self.success = TPingImpalaServiceResp()
+          self.success.read(iprot)
+        else:
+          iprot.skip(ftype)
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()
@@ -686,6 +1059,10 @@ class PingImpalaService_result(object):
       oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
       return
     oprot.writeStructBegin('PingImpalaService_result')
+    if self.success is not None:
+      oprot.writeFieldBegin('success', TType.STRUCT, 0)
+      self.success.write(oprot)
+      oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
 

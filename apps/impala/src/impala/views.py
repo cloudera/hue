@@ -15,8 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-## All the other views are inherited from Beeswax currently.
-
 try:
   import json
 except ImportError:
@@ -26,6 +24,8 @@ from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 from beeswax.views import install_examples as beeswax_install_examples
 from impala import server
+
+## Most of the views are inherited from Beeswax.
 
 
 def refresh_catalog(request):
@@ -37,11 +37,7 @@ def refresh_catalog(request):
     try:
       db = server.get(request.user)
       res = db.resetCatalog()
-      if res.status_code is None:
-        status = 0
-      else:
-        status = res.status_code
-      response = {'status': status, 'message': res.error_msgs}
+      response = {'status': res.status.status_code, 'message': res.status.error_msgs}
     except Exception, e:
       response = {'message': str(e)}
 
@@ -49,4 +45,9 @@ def refresh_catalog(request):
 
 
 def install_examples(request):
-  return beeswax_install_examples(request)
+  response = beeswax_install_examples(request)
+  catalog_response = json.loads(refresh_catalog(request).content)
+
+  if catalog_response['status'] != 0: # Simpler than aggregating the errors
+    request.error(catalog_response['message'])
+  return response
