@@ -84,8 +84,8 @@ class Shell(object):
     except tty.error:
       LOG.debug("Could not set parent fd to raw mode, user will see duplicated input.")
 
-    subprocess_env[constants.HOME] = user_info.pw_dir
-    command_to_use = [_SETUID_PROG, str(user_info.pw_uid), str(user_info.pw_gid)]
+    subprocess_env[constants.HOME] = str(user_info.pw_dir)
+    command_to_use = [str(_SETUID_PROG), str(user_info.pw_uid), str(user_info.pw_gid)]
     command_to_use.extend(shell_command)
 
     delegation_token_files = self._get_delegation_tokens(username, delegation_token_dir)
@@ -421,7 +421,10 @@ class ShellManager(object):
 
     shell_types = [] # List of available shell types. For each shell type, we have a nice name (e.g. "Python Shell") and a short name (e.g. "python")
     for item in shell.conf.SHELL_TYPES.keys():
-      env_for_shell = { constants.HADOOP_MAPRED_HOME: mapred_home }
+      if mapred_home:
+        env_for_shell = { constants.HADOOP_MAPRED_HOME: mapred_home }
+      else:
+        env_for_shell = {}
       command = shell.conf.SHELL_TYPES[item].command.get().strip().split()
       nice_name = shell.conf.SHELL_TYPES[item].nice_name.get().strip()
       executable_exists = utils.executable_exists(command)
