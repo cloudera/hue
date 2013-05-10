@@ -100,12 +100,15 @@ class PthFile(object):
     file(tmp_path, 'w').write('\n'.join(sorted(self._entries)))
     os.rename(tmp_path, self._path)
     LOG.info('=== Saved %s' % self._path)
+
+    # relpath defined in common.py for python 2.4 and 2.5
     rel_symlink_path = os.path.relpath(self._path, os.path.dirname(self._symlink_path))
 
     # overwrite symlink if the path it points to is different from desired PTH.
-    # relpath defined in common.py for python 2.4 and 2.5
-    if not os.path.exists(self._symlink_path) or os.path.realpath(self._symlink_path) != rel_symlink_path:
+    if os.path.exists(self._symlink_path) and os.path.realpath(self._symlink_path) != rel_symlink_path:
       os.remove(self._symlink_path)
+
+    if not os.path.exists(self._symlink_path):
       os.symlink(rel_symlink_path, self._symlink_path)
       LOG.debug('=== Create symbolic link at %s to %s' % (self._symlink_path, rel_symlink_path))
 
