@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-04-11 10:03-0700\n"
+"POT-Creation-Date: 2013-05-10 11:59-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: de <LL@li.org>\n"
@@ -21,15 +21,25 @@ msgstr ""
 msgid "Host of the Impala Server."
 msgstr "Host des Impala-Servers."
 
-#: src/impala/conf.py:32
+#: src/impala/conf.py:31
 msgid "Port of the Impala Server."
 msgstr "Port des Impala-Servers."
 
-#: src/impala/conf.py:38
+#: src/impala/conf.py:37
+#, fuzzy
+msgid ""
+"Beeswax or Hive Server 2 Thrift API used. Choices are: 'beeswax' or "
+"'hiveserver2'."
+msgstr ""
+"Beeswax oder Hive Server 2 Thrift API wird verwendet. Möglichkeiten: "
+"'beeswax' oder 'hiveserver2'. 'beeswax' erfordert die Ausführung von "
+"Beeswax als Proxy für Metadaten-Anfragen"
+
+#: src/impala/conf.py:42
 msgid "Kerberos principal name for Impala. Typically 'impala/hostname.foo.com'."
 msgstr "Kerberos-Hauptname für Impala. Typischerweise 'impala/hostname.foo.com'."
 
-#: src/impala/views.py:34
+#: src/impala/views.py:35
 msgid "A POST request is required."
 msgstr "Eine POST-Anforderung ist erforderlich."
 

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-04-11 10:03-0700\n"
+"POT-Creation-Date: 2013-05-10 11:59-0700\n"
 "PO-Revision-Date: 2012-07-30 18:47-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -110,7 +110,9 @@ msgid "Create home directories"
 msgstr "ホームディレクトリを作成"
 
 #: src/useradmin/forms.py:155
-msgid "Create home directories for every member imported, if members are being imported."
+msgid ""
+"Create home directories for every member imported, if members are being "
+"imported."
 msgstr "インポートされる各メンバーのホームディレクトリを作成してください（メンバーをインポートする場合）。"
 
 #: src/useradmin/forms.py:188
@@ -267,7 +269,9 @@ msgstr "パターン %s のユーザーの LDAP 詳細を取得できません�
 
 #: src/useradmin/views.py:482
 #, python-format
-msgid "There was a naming conflict while importing user %(username)s in pattern %(username_pattern)s"
+msgid ""
+"There was a naming conflict while importing user %(username)s in pattern "
+"%(username_pattern)s"
 msgstr "パターン %(username_pattern)s のユーザー %(username)s をインポートしている間に名前の競合が発生しました"
 
 #: src/useradmin/views.py:517
@@ -277,23 +281,10 @@ msgstr "パターン %s のグループの LDAP 詳細を取得できません�
 
 #: src/useradmin/views.py:525
 #, python-format
-msgid "There was a naming conflict while importing group %(groupname)s in pattern %(groupname_pattern)s"
+msgid ""
+"There was a naming conflict while importing group %(groupname)s in "
+"pattern %(groupname_pattern)s"
 msgstr "パターン %(groupname_pattern)s のグループ %(groupname)s をインポートしている間に名前の競合が発生しました"
-
-#: src/useradmin/views.py:546
-#, python-format
-msgid "Importing user %s"
-msgstr "ユーザー %s をインポートしています"
-
-#: src/useradmin/views.py:552
-#, python-format
-msgid "Found multiple users for member %s."
-msgstr "メンバー %s に対して複数のユーザーが見つかりました。"
-
-#: src/useradmin/views.py:566
-#, python-format
-msgid "Adding member %s represented as users (should be a single user) %s to group %s"
-msgstr "メンバー %s はユーザー（1 人のユーザー）%s として表されていますが、これをグループ %s に追加しています"
 
 #: src/useradmin/management/commands/import_ldap_group.py:39
 msgid "Import users from the group."
@@ -612,20 +603,18 @@ msgid "Sync LDAP users and groups"
 msgstr "LDAP ユーザー／グループを同期"
 
 #: src/useradmin/templates/sync_ldap_users_groups.mako:41
-msgid "This will not import any users or groups that don't already exist in Hue. Only users and groups imported from LDAP can be synced."
+msgid ""
+"This will not import any users or groups that don't already exist in Hue."
+" Only users and groups imported from LDAP can be synced."
 msgstr "Hue にまだ存在しないユーザーおよびグループはインポートされません。LDAP からインポートされたユーザーおよびグループのみを同期できます。"
 
 #: src/useradmin/templates/sync_ldap_users_groups.mako:42
-msgid "All user information and group memberships will be updated based on the LDAP server's current state."
+msgid ""
+"All user information and group memberships will be updated based on the "
+"LDAP server's current state."
 msgstr "すべてのユーザー情報とグループメンバーシップは、LDAP サーバーの現在の状態に基づいて更新されます。"
 
 #: src/useradmin/templates/sync_ldap_users_groups.mako:50
 msgid "Sync"
 msgstr "同期"
 
-#~ msgid "User not found."
-#~ msgstr "ユーザーが見つかりません。"
-#~ msgid "Information"
-#~ msgstr "情報"
-#~ msgid "Optional"
-#~ msgstr "オプション"

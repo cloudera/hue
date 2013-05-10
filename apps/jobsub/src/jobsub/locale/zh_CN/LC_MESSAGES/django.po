@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-04-11 10:03-0700\n"
+"POT-Creation-Date: 2013-05-10 11:59-0700\n"
 "PO-Revision-Date: 2012-07-30 18:54-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -30,55 +30,61 @@ msgid "Location on local filesystem where sample data is stored."
 msgstr "本地文件系统上存储示例数据的位置。"
 
 #: src/jobsub/conf.py:52
-msgid "Deprecated, use liboozie.conf.OOZIE_URL instead. URL of Oozie server. This is required for job submission."
+msgid ""
+"Deprecated, use liboozie.conf.OOZIE_URL instead. URL of Oozie server. "
+"This is required for job submission."
 msgstr "已弃用，请用 liboozie.conf.OOZIE_URL 替代。Oozie 服务器的 URL。提交作业时需要此 URL。"
 
 #: src/jobsub/conf.py:58
-msgid "Deprecated, use liboozie.conf.SECURITY_ENABLED instead. Whether Oozie requires client to do perform Kerberos authentication"
+msgid ""
+"Deprecated, use liboozie.conf.SECURITY_ENABLED instead. Whether Oozie "
+"requires client to do perform Kerberos authentication"
 msgstr "已弃用，请用 liboozie.conf.SECURITY_ENABLED 替代。Oozie 是否需要客户端执行 Kerberos 身份验证"
 
 #: src/jobsub/forms.py:39 src/jobsub/forms.py:58 src/jobsub/forms.py:77
-#: src/jobsub/forms.py:95 src/jobsub/templates/designs.mako:109
-#: src/jobsub/templates/designs.mako:256 src/jobsub/templates/designs.mako:285
+#: src/jobsub/forms.py:95 src/jobsub/templates/designs.mako:131
+#: src/jobsub/templates/designs.mako:257 src/jobsub/templates/designs.mako:286
 msgid "Name"
 msgstr "名称"
 
 #: src/jobsub/forms.py:43
-msgid "Allows letters, digits, '_', and '-'. The first character must be a letter or '_'."
+msgid ""
+"Allows letters, digits, '_', and '-'. The first character must be a "
+"letter or '_'."
 msgstr "允许字母、数字、'_' 和 '-'。第一个字符必须是字母或 '_'。"
 
 #: src/jobsub/forms.py:59 src/jobsub/forms.py:78 src/jobsub/forms.py:96
-#: src/jobsub/templates/designs.mako:110 src/jobsub/templates/designs.mako:263
+#: src/jobsub/templates/designs.mako:132 src/jobsub/templates/designs.mako:264
 msgid "Description"
 msgstr "描述"
 
-#: src/jobsub/forms.py:60 src/jobsub/templates/designs.mako:322
-#: src/jobsub/templates/designs.mako:323
+#: src/jobsub/forms.py:60 src/jobsub/templates/designs.mako:323
+#: src/jobsub/templates/designs.mako:324
 msgid "Main class"
 msgstr "Main class"
 
 #: src/jobsub/forms.py:61 src/jobsub/forms.py:79
-#: src/jobsub/templates/designs.mako:318
+#: src/jobsub/templates/designs.mako:319
 msgid "Jar path"
 msgstr "Jar 路径"
 
-#: src/jobsub/forms.py:62 src/jobsub/templates/designs.mako:326
-#: src/jobsub/templates/designs.mako:327
+#: src/jobsub/forms.py:62 src/jobsub/templates/designs.mako:327
+#: src/jobsub/templates/designs.mako:328
 msgid "Args"
 msgstr "Args"
 
-#: src/jobsub/forms.py:63 src/jobsub/templates/designs.mako:330
-#: src/jobsub/templates/designs.mako:331
+#: src/jobsub/forms.py:63 src/jobsub/templates/designs.mako:331
+#: src/jobsub/templates/designs.mako:332
 msgid "Java opts"
 msgstr "Java 选项"
 
-#: src/jobsub/forms.py:80 src/jobsub/templates/designs.mako:334
-#: src/jobsub/templates/designs.mako:335
+#: src/jobsub/forms.py:80 src/jobsub/templates/designs.mako:335
+#: src/jobsub/templates/designs.mako:336
 msgid "Mapper"
 msgstr "Mapper"
 
-#: src/jobsub/forms.py:81 src/jobsub/templates/designs.mako:338
-#: src/jobsub/templates/designs.mako:339
+#: src/jobsub/forms.py:81 src/jobsub/templates/designs.mako:339
+#: src/jobsub/templates/designs.mako:340
 msgid "Reducer"
 msgstr "Reducer"
 
@@ -94,7 +100,7 @@ msgstr "要添加到分布式缓存的文件的路径列表。"
 msgid "List of paths to archives to be added to the distributed cache."
 msgstr "要添加到分布式缓存的存档的路径列表。"
 
-#: src/jobsub/models.py:203 src/jobsub/templates/designs.mako:319
+#: src/jobsub/models.py:203 src/jobsub/templates/designs.mako:320
 msgid "Path to jar files on HDFS."
 msgstr "HDFS 上的 jar 文件路径。"
 
@@ -116,34 +122,35 @@ msgstr "无法访问部署目录。"
 msgid "Failed to obtain HDFS reference. Check your configuration."
 msgstr "无法获得 HDFS 引用。请检查您的配置。"
 
-#: src/jobsub/views.py:100
+#: src/jobsub/views.py:117
 msgid "Workflow not found"
 msgstr "未找到 Workflow"
 
-#: src/jobsub/views.py:108
+#: src/jobsub/views.py:125
 msgid "Permission denied. You are not the owner."
 msgstr "权限被拒绝。您不是所有者。"
 
-#: src/jobsub/views.py:112 src/jobsub/views.py:182 src/jobsub/views.py:217
+#: src/jobsub/views.py:129 src/jobsub/views.py:153 src/jobsub/views.py:225
+#: src/jobsub/views.py:260
 msgid "Must be POST request."
 msgstr "必须是 POST 请求。"
 
-#: src/jobsub/views.py:117
-#, fuzzy, python-format
-msgid "Access denied: delete workflow %(id)s."
-msgstr "访问被拒绝：删除 workflow  %(id)s.。"
+#: src/jobsub/views.py:136 src/jobsub/views.py:158
+#, python-format
+msgid "Access denied: delete design %(id)s."
+msgstr "访问被拒绝：删除设计 %(id)s。"
 
-#: src/jobsub/views.py:123
-msgid "Could not find design."
-msgstr "找不到设计。"
+#: src/jobsub/views.py:144 src/jobsub/views.py:164
+#, python-format
+msgid "Could not find design %s."
+msgstr "找不到设计 %s。"
 
-#: src/jobsub/views.py:141
+#: src/jobsub/views.py:184
 #, python-format
 msgid "Access denied: edit design %(id)s."
 msgstr "访问被拒绝：编辑设计 %(id)s。"
 
-#: src/jobsub/views.py:147 src/jobsub/views.py:189
-#, fuzzy, python-format
+#: src/jobsub/views.py:190 src/jobsub/views.py:232
 msgid "Error saving design"
 msgstr "保存设计时出错"
 
@@ -177,496 +184,452 @@ msgstr "作业设计"
 msgid "Home"
 msgstr "主页"
 
-#: src/jobsub/templates/designs.mako:49
+#: src/jobsub/templates/designs.mako:50
 msgid "Submit"
 msgstr "提交"
 
-#: src/jobsub/templates/designs.mako:50
+#: src/jobsub/templates/designs.mako:51
 msgid "Edit"
 msgstr "编辑"
-
-#: src/jobsub/templates/designs.mako:51 src/jobsub/templates/designs.mako:288
-#: src/jobsub/templates/designs.mako:362 src/jobsub/templates/designs.mako:380
-#: src/jobsub/templates/designs.mako:404 src/jobsub/templates/designs.mako:420
-#: src/jobsub/templates/designs.mako:436 src/jobsub/templates/designs.mako:471
-#: src/jobsub/templates/designs.mako:499 src/jobsub/templates/designs.mako:518
-#: src/jobsub/templates/designs.mako:534 src/jobsub/templates/designs.mako:550
-#: src/jobsub/templates/designs.mako:566 src/jobsub/templates/designs.mako:582
-#: src/jobsub/templates/designs.mako:603 src/jobsub/templates/designs.mako:624
-#: src/jobsub/templates/designs.mako:651
-msgid "Delete"
-msgstr "删除"
 
 #: src/jobsub/templates/designs.mako:52
 msgid "Copy"
 msgstr "复制"
 
-#: src/jobsub/templates/designs.mako:57 src/jobsub/templates/designs.mako:58
-msgid "New Action"
+#: src/jobsub/templates/designs.mako:54 src/jobsub/templates/designs.mako:55
+#: src/jobsub/templates/designs.mako:289 src/jobsub/templates/designs.mako:363
+#: src/jobsub/templates/designs.mako:381 src/jobsub/templates/designs.mako:405
+#: src/jobsub/templates/designs.mako:421 src/jobsub/templates/designs.mako:437
+#: src/jobsub/templates/designs.mako:472 src/jobsub/templates/designs.mako:500
+#: src/jobsub/templates/designs.mako:519 src/jobsub/templates/designs.mako:535
+#: src/jobsub/templates/designs.mako:551 src/jobsub/templates/designs.mako:567
+#: src/jobsub/templates/designs.mako:583 src/jobsub/templates/designs.mako:604
+#: src/jobsub/templates/designs.mako:625 src/jobsub/templates/designs.mako:652
+msgid "Delete"
+msgstr "删除"
+
+#: src/jobsub/templates/designs.mako:59
+msgid "Move to trash"
+msgstr "移至垃圾桶"
+
+#: src/jobsub/templates/designs.mako:60 src/jobsub/templates/designs.mako:66
+msgid "Delete forever"
+msgstr "永久删除"
+
+#: src/jobsub/templates/designs.mako:65
+msgid "Restore"
+msgstr "还原"
+
+#: src/jobsub/templates/designs.mako:73 src/jobsub/templates/designs.mako:74
+msgid "New action"
 msgstr "新操作"
 
-#: src/jobsub/templates/designs.mako:63
-msgid "Create MapReduce Design"
+#: src/jobsub/templates/designs.mako:79
+msgid "Create MapReduce design"
 msgstr "创建 MapReduce 设计"
 
-#: src/jobsub/templates/designs.mako:66
-msgid "Create Java Design"
+#: src/jobsub/templates/designs.mako:82
+msgid "Create Java design"
 msgstr "创建 Java 设计"
 
-#: src/jobsub/templates/designs.mako:69
-msgid "Create Streaming Design"
+#: src/jobsub/templates/designs.mako:85
+msgid "Create Streaming design"
 msgstr "创建流设计"
 
-#: src/jobsub/templates/designs.mako:72
-msgid "Create Hive Design"
+#: src/jobsub/templates/designs.mako:88
+msgid "Create Hive design"
 msgstr "创建 Hive 设计"
 
-#: src/jobsub/templates/designs.mako:75
-msgid "Create Pig Design"
+#: src/jobsub/templates/designs.mako:91
+msgid "Create Pig design"
 msgstr "创建 Pig 设计"
 
-#: src/jobsub/templates/designs.mako:78
-msgid "Create Sqoop Design"
+#: src/jobsub/templates/designs.mako:94
+msgid "Create Sqoop design"
 msgstr "创建 Sqoop 设计"
 
-#: src/jobsub/templates/designs.mako:81
-msgid "Create Fs Design"
+#: src/jobsub/templates/designs.mako:97
+msgid "Create Fs design"
 msgstr "创建 Fs 设计"
 
-#: src/jobsub/templates/designs.mako:84
-msgid "Create Ssh Design"
+#: src/jobsub/templates/designs.mako:100
+msgid "Create Ssh design"
 msgstr "创建 Ssh 设计"
 
-#: src/jobsub/templates/designs.mako:87
-msgid "Create Shell Design"
+#: src/jobsub/templates/designs.mako:103
+msgid "Create Shell design"
 msgstr "创建 Shell 设计"
 
-#: src/jobsub/templates/designs.mako:90
-msgid "Create Email Design"
+#: src/jobsub/templates/designs.mako:106
+msgid "Create Email design"
 msgstr "创建电子邮件设计"
 
-#: src/jobsub/templates/designs.mako:93
-msgid "Create DistCp Design"
+#: src/jobsub/templates/designs.mako:109
+msgid "Create DistCp design"
 msgstr "创建 DistCp 设计"
 
-#: src/jobsub/templates/designs.mako:111
+#: src/jobsub/templates/designs.mako:114
+msgid "Trash"
+msgstr "垃圾桶"
+
+#: src/jobsub/templates/designs.mako:117
+msgid "Delete all the designs"
+msgstr "删除所有设计"
+
+#: src/jobsub/templates/designs.mako:117
+msgid "Empty"
+msgstr "清空"
+
+#: src/jobsub/templates/designs.mako:133
 msgid "Owner"
 msgstr "所有者"
 
-#: src/jobsub/templates/designs.mako:112 src/jobsub/templates/designs.mako:377
-#: src/jobsub/templates/designs.mako:401 src/jobsub/templates/designs.mako:468
-#: src/jobsub/templates/designs.mako:496 src/jobsub/templates/designs.mako:600
-#: src/jobsub/templates/designs.mako:621 src/jobsub/templates/designs.mako:648
+#: src/jobsub/templates/designs.mako:134 src/jobsub/templates/designs.mako:378
+#: src/jobsub/templates/designs.mako:402 src/jobsub/templates/designs.mako:469
+#: src/jobsub/templates/designs.mako:497 src/jobsub/templates/designs.mako:601
+#: src/jobsub/templates/designs.mako:622 src/jobsub/templates/designs.mako:649
 msgid "Type"
 msgstr "类型"
 
-#: src/jobsub/templates/designs.mako:113
+#: src/jobsub/templates/designs.mako:135
 msgid "Status"
 msgstr "状态"
 
-#: src/jobsub/templates/designs.mako:114
+#: src/jobsub/templates/designs.mako:136
 msgid "Last modified"
 msgstr "上次修改"
 
-#: src/jobsub/templates/designs.mako:152
-msgid "Delete the selected designs?"
-msgstr "删除所选设计？"
+#: src/jobsub/templates/designs.mako:137
+msgid "Trashed"
+msgstr "已移至垃圾桶"
 
-#: src/jobsub/templates/designs.mako:155
+#: src/jobsub/templates/designs.mako:176
+msgid "Move the selected designs to trash?"
+msgstr "将所选设计移至垃圾桶？"
+
+#: src/jobsub/templates/designs.mako:179 src/jobsub/templates/designs.mako:192
+#: src/jobsub/templates/designs.mako:205 src/jobsub/templates/designs.mako:218
 msgid "No"
 msgstr "否"
 
-#: src/jobsub/templates/designs.mako:156
+#: src/jobsub/templates/designs.mako:180 src/jobsub/templates/designs.mako:193
+#: src/jobsub/templates/designs.mako:206 src/jobsub/templates/designs.mako:219
 msgid "Yes"
 msgstr "是"
 
-#: src/jobsub/templates/designs.mako:164
+#: src/jobsub/templates/designs.mako:189
+msgid "Delete the selected designs?"
+msgstr "删除所选设计？"
+
+#: src/jobsub/templates/designs.mako:202
+msgid "Delete all trashed designs?"
+msgstr "删除所有位于垃圾桶的设计？"
+
+#: src/jobsub/templates/designs.mako:215
+msgid "Restore the selected designs?"
+msgstr "恢复所选设计？"
+
+#: src/jobsub/templates/designs.mako:227
 msgid "Choose a file"
 msgstr "选择文件"
 
-#: src/jobsub/templates/designs.mako:207
-msgid "No data available"
-msgstr "没有可用数据"
-
-#: src/jobsub/templates/designs.mako:208
-msgid "Showing _START_ to _END_ of _TOTAL_ entries"
-msgstr "显示 _START_ - _END_，共 _TOTAL_ 个条目"
-
-#: src/jobsub/templates/designs.mako:209
-msgid "Showing 0 to 0 of 0 entries"
-msgstr "显示 0－0，共 0 个条目"
-
-#: src/jobsub/templates/designs.mako:210
-msgid "(filtered from _MAX_ total entries)"
-msgstr "（已从 _MAX_ 个总条目中过滤）"
-
-#: src/jobsub/templates/designs.mako:211
-msgid "No matching records"
-msgstr "没有匹配记录"
-
-#: src/jobsub/templates/designs.mako:213
-msgid "First"
-msgstr "第一个"
-
-#: src/jobsub/templates/designs.mako:214
-msgid "Last"
-msgstr "最后一个"
-
-#: src/jobsub/templates/designs.mako:215
-msgid "Next"
-msgstr "下一页"
-
-#: src/jobsub/templates/designs.mako:216
-msgid "Previous"
-msgstr "上一页"
-
-#: src/jobsub/templates/designs.mako:243
+#: src/jobsub/templates/designs.mako:244
 msgid "You can parameterize the values, using"
 msgstr "您可以参数化该值，使用"
 
-#: src/jobsub/templates/designs.mako:243
+#: src/jobsub/templates/designs.mako:244
 msgid "or"
 msgstr "或"
 
-#: src/jobsub/templates/designs.mako:243
-msgid "When the design is submitted, you will be prompted for the actual value of "
+#: src/jobsub/templates/designs.mako:244
+msgid ""
+"When the design is submitted, you will be prompted for the actual value "
+"of "
 msgstr "提交设计后，将提示您如下项的实际值： "
 
-#: src/jobsub/templates/designs.mako:244
-msgid "All the paths are relative to the deployment directory. They can be absolute but this is not recommended."
+#: src/jobsub/templates/designs.mako:245
+msgid ""
+"All the paths are relative to the deployment directory. They can be "
+"absolute but this is not recommended."
 msgstr "所有路径均与部署目录相对。它们可以是绝对路径，但是不建议如此。"
 
-#: src/jobsub/templates/designs.mako:245
+#: src/jobsub/templates/designs.mako:246
 msgid "Requires some SMTP server configuration to be present (in oozie-site.xml)."
 msgstr "需要呈现某些 SMTP 服务器配置（格式为 oozie-site.xml）。"
 
-#: src/jobsub/templates/designs.mako:246
+#: src/jobsub/templates/designs.mako:247
 msgid "The ssh server requires passwordless login."
 msgstr "ssh 服务器需要无密码登录。"
 
-#: src/jobsub/templates/designs.mako:248
+#: src/jobsub/templates/designs.mako:249
 msgid "Save"
 msgstr "保存"
 
-#: src/jobsub/templates/designs.mako:252
+#: src/jobsub/templates/designs.mako:253
 msgid "Cancel"
 msgstr "取消"
 
-#: src/jobsub/templates/designs.mako:257
+#: src/jobsub/templates/designs.mako:258
 msgid "Name of the design."
 msgstr "设计的名称。"
 
-#: src/jobsub/templates/designs.mako:264
+#: src/jobsub/templates/designs.mako:265
 msgid "Description of the design."
 msgstr "设计的描述。"
 
-#: src/jobsub/templates/designs.mako:270
+#: src/jobsub/templates/designs.mako:271
 msgid "Is shared"
 msgstr "已共享"
 
-#: src/jobsub/templates/designs.mako:271
+#: src/jobsub/templates/designs.mako:272
 msgid "Enable other users to have access to this job."
 msgstr "使其他用户能够访问此作业。"
 
-#: src/jobsub/templates/designs.mako:277
+#: src/jobsub/templates/designs.mako:278
 msgid "Capture output"
 msgstr "捕获输出"
 
-#: src/jobsub/templates/designs.mako:278
+#: src/jobsub/templates/designs.mako:279
 msgid "Capture the output of this job."
 msgstr "捕获此作业的输出。"
 
-#: src/jobsub/templates/designs.mako:284
+#: src/jobsub/templates/designs.mako:285
 msgid "Oozie parameters"
 msgstr "Oozie 参数"
 
-#: src/jobsub/templates/designs.mako:286 src/jobsub/templates/designs.mako:360
-#: src/jobsub/templates/designs.mako:378 src/jobsub/templates/designs.mako:402
-#: src/jobsub/templates/designs.mako:469 src/jobsub/templates/designs.mako:497
-#: src/jobsub/templates/designs.mako:601 src/jobsub/templates/designs.mako:622
-#: src/jobsub/templates/designs.mako:649
+#: src/jobsub/templates/designs.mako:287 src/jobsub/templates/designs.mako:361
+#: src/jobsub/templates/designs.mako:379 src/jobsub/templates/designs.mako:403
+#: src/jobsub/templates/designs.mako:470 src/jobsub/templates/designs.mako:498
+#: src/jobsub/templates/designs.mako:602 src/jobsub/templates/designs.mako:623
+#: src/jobsub/templates/designs.mako:650
 msgid "Value"
 msgstr "值"
 
-#: src/jobsub/templates/designs.mako:292
+#: src/jobsub/templates/designs.mako:293
 msgid "Add"
 msgstr "添加"
 
-#: src/jobsub/templates/designs.mako:302
+#: src/jobsub/templates/designs.mako:303
 msgid "User"
 msgstr "用户"
 
-#: src/jobsub/templates/designs.mako:303
+#: src/jobsub/templates/designs.mako:304
 msgid "User to authenticate with."
 msgstr "要验证身份的用户。"
 
-#: src/jobsub/templates/designs.mako:306
+#: src/jobsub/templates/designs.mako:307
 msgid "Host"
 msgstr "主机"
 
-#: src/jobsub/templates/designs.mako:307
+#: src/jobsub/templates/designs.mako:308
 msgid "Host to execute command on."
 msgstr "要在其上执行命令的主机。"
 
-#: src/jobsub/templates/designs.mako:310 src/jobsub/templates/designs.mako:491
+#: src/jobsub/templates/designs.mako:311 src/jobsub/templates/designs.mako:492
 msgid "Command"
 msgstr "命令"
 
-#: src/jobsub/templates/designs.mako:311 src/jobsub/templates/designs.mako:492
+#: src/jobsub/templates/designs.mako:312 src/jobsub/templates/designs.mako:493
 msgid "Command to execute."
 msgstr "要执行的命令。"
 
-#: src/jobsub/templates/designs.mako:314
+#: src/jobsub/templates/designs.mako:315
 msgid "Script name"
 msgstr "脚本名称"
 
-#: src/jobsub/templates/designs.mako:315
+#: src/jobsub/templates/designs.mako:316
 msgid "Path to the script to execute."
 msgstr "要执行的脚本的路径。"
 
-#: src/jobsub/templates/designs.mako:342 src/jobsub/templates/designs.mako:343
+#: src/jobsub/templates/designs.mako:343 src/jobsub/templates/designs.mako:344
 msgid "TO addresses"
 msgstr "接收地址"
 
-#: src/jobsub/templates/designs.mako:346 src/jobsub/templates/designs.mako:347
+#: src/jobsub/templates/designs.mako:347 src/jobsub/templates/designs.mako:348
 msgid "CC addresses (optional)"
 msgstr "抄送地址（可选）"
 
-#: src/jobsub/templates/designs.mako:350 src/jobsub/templates/designs.mako:351
+#: src/jobsub/templates/designs.mako:351 src/jobsub/templates/designs.mako:352
 msgid "Subject"
 msgstr "主题"
 
-#: src/jobsub/templates/designs.mako:354 src/jobsub/templates/designs.mako:355
+#: src/jobsub/templates/designs.mako:355 src/jobsub/templates/designs.mako:356
 msgid "Body"
 msgstr "主体"
 
-#: src/jobsub/templates/designs.mako:358
-msgid "Job Properties"
+#: src/jobsub/templates/designs.mako:359
+msgid "Job properties"
 msgstr "Job 属性"
 
-#: src/jobsub/templates/designs.mako:359
+#: src/jobsub/templates/designs.mako:360
 msgid "Property name"
 msgstr "属性名称"
 
-#: src/jobsub/templates/designs.mako:366
-msgid "Add Property"
+#: src/jobsub/templates/designs.mako:367
+msgid "Add property"
 msgstr "添加属性"
 
-#: src/jobsub/templates/designs.mako:376
+#: src/jobsub/templates/designs.mako:377
 msgid "Prepare"
 msgstr "准备"
 
-#: src/jobsub/templates/designs.mako:385
+#: src/jobsub/templates/designs.mako:386
 msgid "Add delete"
 msgstr "添加删除"
 
-#: src/jobsub/templates/designs.mako:389
+#: src/jobsub/templates/designs.mako:390
 msgid "Add mkdir"
 msgstr "添加 mkdir"
 
-#: src/jobsub/templates/designs.mako:400 src/jobsub/templates/designs.mako:467
-#: src/jobsub/templates/designs.mako:495 src/jobsub/templates/designs.mako:599
-#: src/jobsub/templates/designs.mako:620 src/jobsub/templates/designs.mako:647
+#: src/jobsub/templates/designs.mako:401 src/jobsub/templates/designs.mako:468
+#: src/jobsub/templates/designs.mako:496 src/jobsub/templates/designs.mako:600
+#: src/jobsub/templates/designs.mako:621 src/jobsub/templates/designs.mako:648
 msgid "Params"
 msgstr "参数"
 
-#: src/jobsub/templates/designs.mako:408 src/jobsub/templates/designs.mako:475
+#: src/jobsub/templates/designs.mako:409 src/jobsub/templates/designs.mako:476
 msgid "Add param"
 msgstr "添加参数"
 
-#: src/jobsub/templates/designs.mako:418
+#: src/jobsub/templates/designs.mako:419
 msgid "Files"
 msgstr "文件"
 
-#: src/jobsub/templates/designs.mako:424
-msgid "Add File"
+#: src/jobsub/templates/designs.mako:425
+msgid "Add file"
 msgstr "添加文件"
 
-#: src/jobsub/templates/designs.mako:434
+#: src/jobsub/templates/designs.mako:435
 msgid "Archives"
 msgstr "存档"
 
-#: src/jobsub/templates/designs.mako:440
-msgid "Add Archive"
+#: src/jobsub/templates/designs.mako:441
+msgid "Add archive"
 msgstr "添加存档"
 
-#: src/jobsub/templates/designs.mako:453
-#, fuzzy, python-format
+#: src/jobsub/templates/designs.mako:454
 msgid "Job Design (mapreduce type)"
 msgstr "作业设计（mapreduce 类型）"
 
-#: src/jobsub/templates/designs.mako:456
-#, fuzzy, python-format
+#: src/jobsub/templates/designs.mako:457
 msgid "Job Design (java type)"
 msgstr "作业设计（java 类型）"
 
-#: src/jobsub/templates/designs.mako:459
-#, fuzzy, python-format
+#: src/jobsub/templates/designs.mako:460
 msgid "Job Design (streaming type)"
 msgstr "作业设计（流类型）"
 
-#: src/jobsub/templates/designs.mako:462
-#, fuzzy, python-format
+#: src/jobsub/templates/designs.mako:463
 msgid "Job Design (hive type)"
 msgstr "作业设计（hive 类型）"
 
-#: src/jobsub/templates/designs.mako:465
-#, fuzzy, python-format
+#: src/jobsub/templates/designs.mako:466
 msgid "Job Design (pig type)"
 msgstr "作业设计（pig 类型）"
 
-#: src/jobsub/templates/designs.mako:478 src/jobsub/templates/designs.mako:628
+#: src/jobsub/templates/designs.mako:479 src/jobsub/templates/designs.mako:629
+#: src/jobsub/templates/designs.mako:656
 msgid "Add argument"
 msgstr "添加自变量"
 
-#: src/jobsub/templates/designs.mako:489
-#, fuzzy, python-format
+#: src/jobsub/templates/designs.mako:490
 msgid "Job Design (sqoop type)"
 msgstr "作业设计（sqoop 类型）"
 
-#: src/jobsub/templates/designs.mako:503 src/jobsub/templates/designs.mako:607
+#: src/jobsub/templates/designs.mako:504 src/jobsub/templates/designs.mako:608
 msgid "Add arg"
 msgstr "添加自变量"
 
-#: src/jobsub/templates/designs.mako:514
-#, fuzzy, python-format
+#: src/jobsub/templates/designs.mako:515
 msgid "Job Design (fs type)"
 msgstr "作业设计（fs 类型）"
 
-#: src/jobsub/templates/designs.mako:516
+#: src/jobsub/templates/designs.mako:517
 msgid "Delete path"
 msgstr "删除路径"
 
-#: src/jobsub/templates/designs.mako:522 src/jobsub/templates/designs.mako:538
-#: src/jobsub/templates/designs.mako:554
-msgid "Add Path"
+#: src/jobsub/templates/designs.mako:523 src/jobsub/templates/designs.mako:539
+#: src/jobsub/templates/designs.mako:555
+msgid "Add path"
 msgstr "添加路径"
 
-#: src/jobsub/templates/designs.mako:532
+#: src/jobsub/templates/designs.mako:533
 msgid "Create directory"
 msgstr "创建目录"
 
-#: src/jobsub/templates/designs.mako:548
+#: src/jobsub/templates/designs.mako:549
 msgid "Create or touch file"
 msgstr "创建或触按文件"
 
-#: src/jobsub/templates/designs.mako:564
+#: src/jobsub/templates/designs.mako:565
 msgid "Change permissions"
 msgstr "更改权限"
 
-#: src/jobsub/templates/designs.mako:570
+#: src/jobsub/templates/designs.mako:571
 msgid "Add chmod"
 msgstr "添加 chmod"
 
-#: src/jobsub/templates/designs.mako:580
+#: src/jobsub/templates/designs.mako:581
 msgid "Move file"
 msgstr "移动文件"
 
-#: src/jobsub/templates/designs.mako:586
+#: src/jobsub/templates/designs.mako:587
 msgid "Add move"
 msgstr "添加 move"
 
-#: src/jobsub/templates/designs.mako:597
-#, fuzzy, python-format
+#: src/jobsub/templates/designs.mako:598
 msgid "Job Design (ssh type)"
 msgstr "作业设计（ssh 类型）"
 
-#: src/jobsub/templates/designs.mako:618
-#, fuzzy, python-format
+#: src/jobsub/templates/designs.mako:619
 msgid "Job Design (shell type)"
 msgstr "作业设计（shell 类型）"
 
-#: src/jobsub/templates/designs.mako:631
-msgid "Add Env-Var"
-msgstr "添加 Env-Var"
+#: src/jobsub/templates/designs.mako:632
+msgid "Add env-var"
+msgstr "添加 env-var"
 
-#: src/jobsub/templates/designs.mako:642
-#, fuzzy, python-format
+#: src/jobsub/templates/designs.mako:643
 msgid "Job Design (email type)"
 msgstr "作业设计（电子邮件类型）"
 
-#: src/jobsub/templates/designs.mako:645
-#, fuzzy, python-format
+#: src/jobsub/templates/designs.mako:646
 msgid "Job Design (distcp type)"
 msgstr "作业设计（distcp 类型）"
 
-#: src/jobsub/templates/designs.mako:655
-msgid "Add Argument"
-msgstr "添加自变量"
+#: src/jobsub/templates/designs.mako:690
+msgid "No data available"
+msgstr "没有可用数据"
 
-#~ msgid "Access denied: view job %(id)s."
-#~ msgstr "访问被拒绝：查看作业 %(id)s。"
-#~ msgid "Error accessing Oozie job %(id)s."
-#~ msgstr "访问 Oozie 作业 %(id)s 时出错。"
-#~ msgid "Access denied: design parameters %(id)s."
-#~ msgstr "访问被拒绝：设计参数 %(id)s。"
-#~ msgid "Use a POST request to submit a design."
-#~ msgstr "请使用 POST 请求提交设计。"
-#~ msgid "Access denied: submit design %(id)s."
-#~ msgstr "访问被拒绝：提交设计 %(id)s。"
-#~ msgid "The Oozie server is not running"
-#~ msgstr "Oozie 服务器未运行"
-#~ msgid "Use a POST request to install the examples."
-#~ msgstr "请使用 POST 请求安装示例。"
-#~ msgid "The examples could not be installed."
-#~ msgstr "无法安装示例。"
-#~ msgid "Designs"
-#~ msgstr "设计"
-#~ msgid "History"
-#~ msgstr "历史记录"
-#~ msgid "Clone"
-#~ msgstr "克隆"
-#~ msgid "MapReduce"
-#~ msgstr "MapReduce"
-#~ msgid "Java"
-#~ msgstr "Java"
-#~ msgid "Install Samples"
-#~ msgstr "安装示例"
-#~ msgid "Submit this design?"
-#~ msgstr "提交此设计？"
-#~ msgid "Install sample job designs?"
-#~ msgstr "安装样本作业设计？"
-#~ msgid "It will take a few seconds to install."
-#~ msgstr "安装将需要几秒钟时间。"
-#~ msgid "Are you sure you want to delete %(name)s?"
-#~ msgstr "是否确定要删除 %(name)s？"
-#~ msgid "Submit %(name)s to the cluster"
-#~ msgstr "将 %(name)s 提交给集群"
-#~ msgid "Job Submission History"
-#~ msgstr "作业提交历史"
-#~ msgid "Oozie Job ID"
-#~ msgstr "Oozie 作业 ID"
-#~ msgid "Submission Date"
-#~ msgstr "提交日期"
-#~ msgid "Edit design"
-#~ msgstr "编辑设计"
-#~ msgid "Actions"
-#~ msgstr "操作"
-#~ msgid "Details"
-#~ msgstr "详细信息"
-#~ msgid "Definition"
-#~ msgstr "定义"
-#~ msgid "Log"
-#~ msgstr "日志"
-#~ msgid "External Id"
-#~ msgstr "外部 ID"
-#~ msgid "Start Time"
-#~ msgstr "开始时间"
-#~ msgid "End Time"
-#~ msgstr "结束时间"
-#~ msgid "Retries"
-#~ msgstr "重试"
-#~ msgid "Error Message"
-#~ msgstr "错误消息"
-#~ msgid "Transition"
-#~ msgstr "转变"
-#~ msgid "Data"
-#~ msgstr "数据"
-#~ msgid "Application Name"
-#~ msgstr "应用程序名称"
-#~ msgid "Group"
-#~ msgstr "组"
-#~ msgid "Created Time"
-#~ msgstr "创建时间"
-#~ msgid "Application Path"
-#~ msgstr "应用程序路径"
+#: src/jobsub/templates/designs.mako:691
+msgid "Showing _START_ to _END_ of _TOTAL_ entries"
+msgstr "显示 _START_ - _END_，共 _TOTAL_ 个条目"
+
+#: src/jobsub/templates/designs.mako:692
+msgid "Showing 0 to 0 of 0 entries"
+msgstr "显示 0－0，共 0 个条目"
+
+#: src/jobsub/templates/designs.mako:693
+msgid "(filtered from _MAX_ total entries)"
+msgstr "（已从 _MAX_ 个总条目中过滤）"
+
+#: src/jobsub/templates/designs.mako:694
+msgid "No matching records"
+msgstr "没有匹配记录"
+
+#: src/jobsub/templates/designs.mako:696
+msgid "First"
+msgstr "第一个"
+
+#: src/jobsub/templates/designs.mako:697
+msgid "Last"
+msgstr "最后一个"
+
+#: src/jobsub/templates/designs.mako:698
+msgid "Next"
+msgstr "下一页"
+
+#: src/jobsub/templates/designs.mako:699
+msgid "Previous"
+msgstr "上一页"
+

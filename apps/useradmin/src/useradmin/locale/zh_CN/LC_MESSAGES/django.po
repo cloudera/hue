@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-04-11 10:03-0700\n"
+"POT-Creation-Date: 2013-05-10 11:59-0700\n"
 "PO-Revision-Date: 2012-07-30 18:47-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -110,7 +110,9 @@ msgid "Create home directories"
 msgstr "创建主目录"
 
 #: src/useradmin/forms.py:155
-msgid "Create home directories for every member imported, if members are being imported."
+msgid ""
+"Create home directories for every member imported, if members are being "
+"imported."
 msgstr "为导入的每个成员创建主目录（如果成员已导入）。"
 
 #: src/useradmin/forms.py:188
@@ -267,7 +269,9 @@ msgstr "无法获取用户 %s 的 LDAP 详细信息"
 
 #: src/useradmin/views.py:482
 #, python-format
-msgid "There was a naming conflict while importing user %(username)s in pattern %(username_pattern)s"
+msgid ""
+"There was a naming conflict while importing user %(username)s in pattern "
+"%(username_pattern)s"
 msgstr "导入以 %(username_pattern)s 形式命名的用户 %(username)s 时发生命名冲突"
 
 #: src/useradmin/views.py:517
@@ -277,23 +281,10 @@ msgstr "无法获取组 %s 的 LDAP 详细信息"
 
 #: src/useradmin/views.py:525
 #, python-format
-msgid "There was a naming conflict while importing group %(groupname)s in pattern %(groupname_pattern)s"
+msgid ""
+"There was a naming conflict while importing group %(groupname)s in "
+"pattern %(groupname_pattern)s"
 msgstr "导入以 %(groupname_pattern)s 形式命名的组 %(groupname)s 时发生命名冲突"
-
-#: src/useradmin/views.py:546
-#, python-format
-msgid "Importing user %s"
-msgstr "导入用户 %s"
-
-#: src/useradmin/views.py:552
-#, python-format
-msgid "Found multiple users for member %s."
-msgstr "为成员 %s 找到多个用户。"
-
-#: src/useradmin/views.py:566
-#, python-format
-msgid "Adding member %s represented as users (should be a single user) %s to group %s"
-msgstr "%s 将作为用户（应为单个用户）的成员 %s 添加至组 %s"
 
 #: src/useradmin/management/commands/import_ldap_group.py:39
 msgid "Import users from the group."
@@ -612,20 +603,18 @@ msgid "Sync LDAP users and groups"
 msgstr "同步 LDAP 用户和组"
 
 #: src/useradmin/templates/sync_ldap_users_groups.mako:41
-msgid "This will not import any users or groups that don't already exist in Hue. Only users and groups imported from LDAP can be synced."
+msgid ""
+"This will not import any users or groups that don't already exist in Hue."
+" Only users and groups imported from LDAP can be synced."
 msgstr "这不会导入任何尚不在 Hue 中的用户或组。只能同步从 LDAP 导入的用户和组。"
 
 #: src/useradmin/templates/sync_ldap_users_groups.mako:42
-msgid "All user information and group memberships will be updated based on the LDAP server's current state."
+msgid ""
+"All user information and group memberships will be updated based on the "
+"LDAP server's current state."
 msgstr "所有用户信息和组成员身份将根据 LDAP 服务器的当前状态进行更新。"
 
 #: src/useradmin/templates/sync_ldap_users_groups.mako:50
 msgid "Sync"
 msgstr "同步"
 
-#~ msgid "User not found."
-#~ msgstr "未找到用户。"
-#~ msgid "Information"
-#~ msgstr "信息"
-#~ msgid "Optional"
-#~ msgstr "可选"

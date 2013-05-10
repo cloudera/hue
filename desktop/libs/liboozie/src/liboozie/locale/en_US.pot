@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-01-31 16:56-0800\n"
+"POT-Creation-Date: 2013-05-10 11:59-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,54 +17,52 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/liboozie/conf.py:25
+#: src/liboozie/conf.py:27
 msgid "URL of Oozie server. This is required for job submission."
 msgstr ""
 
-#: src/liboozie/conf.py:31
+#: src/liboozie/conf.py:33
 msgid "Whether Oozie requires client to perform Kerberos authentication."
 msgstr ""
 
-#: src/liboozie/conf.py:38
+#: src/liboozie/conf.py:40
 msgid ""
 "Location on HDFS where the workflows/coordinators are deployed when "
 "submitted by a non-owner."
 msgstr ""
 
-#: src/liboozie/conf.py:69
-msgid ""
-"The deployment directory of Oozie workflows does not exist. Run \"Setup "
-"Examples\" on the Oozie workflow page."
+#: src/liboozie/conf.py:68
+msgid "The Oozie server is not available"
 msgstr ""
 
-#: src/liboozie/conf.py:72
+#: src/liboozie/conf.py:77
 msgid "Oozie Share Lib not installed in default location."
 msgstr ""
 
-#: src/liboozie/submittion.py:69
+#: src/liboozie/submittion.py:68
 #, python-format
 msgid "Submission already submitted (Oozie job id %s)"
 msgstr ""
 
-#: src/liboozie/submittion.py:133
+#: src/liboozie/submittion.py:147
 msgid "Failed to access deployment directory."
 msgstr ""
 
-#: src/liboozie/submittion.py:187
+#: src/liboozie/submittion.py:204
 #, python-format
 msgid "Path is not a directory: %s."
 msgstr ""
 
-#: src/liboozie/submittion.py:192
+#: src/liboozie/submittion.py:209
 #, python-format
 msgid "Error accessing directory '%s': %s."
 msgstr ""
 
-#: src/liboozie/types.py:286
+#: src/liboozie/types.py:356
 msgid "Insufficient permission."
 msgstr ""
 
-#: src/liboozie/types.py:287
+#: src/liboozie/types.py:357
 #, python-format
 msgid "Permission denied. User %(username)s cannot modify user %(user)s's job."
 msgstr ""

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-04-11 10:03-0700\n"
+"POT-Creation-Date: 2013-05-10 11:59-0700\n"
 "PO-Revision-Date: 2012-07-30 18:47-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: pt <LL@li.org>\n"
@@ -110,8 +110,12 @@ msgid "Create home directories"
 msgstr "Criar directórios iniciais"
 
 #: src/useradmin/forms.py:155
-msgid "Create home directories for every member imported, if members are being imported."
-msgstr "Criar directórios iniciais para todos os membros importados, se estiverem a ser importados membros."
+msgid ""
+"Create home directories for every member imported, if members are being "
+"imported."
+msgstr ""
+"Criar directórios iniciais para todos os membros importados, se estiverem"
+" a ser importados membros."
 
 #: src/useradmin/forms.py:188
 msgid "Group name may only contain letters, numbers, hyphens or underscores."
@@ -135,7 +139,9 @@ msgstr "Criar Directórios Iniciais"
 
 #: src/useradmin/forms.py:283
 msgid "Create home directory for every user, if one doesn't already exist."
-msgstr "Criar directório inicial para todos os utilizadores, caso ainda não exista."
+msgstr ""
+"Criar directório inicial para todos os utilizadores, caso ainda não "
+"exista."
 
 #: src/useradmin/models.py:125
 #, python-format
@@ -176,7 +182,9 @@ msgstr "Grupo não encontrado."
 
 #: src/useradmin/views.py:135
 msgid "You must be a superuser to add or edit another user."
-msgstr "Tem de ser um super-utilizador para poder adicionar ou editar outro utilizador."
+msgstr ""
+"Tem de ser um super-utilizador para poder adicionar ou editar outro "
+"utilizador."
 
 #: src/useradmin/views.py:162
 msgid "You cannot make yourself inactive."
@@ -241,7 +249,9 @@ msgstr "Não foi possível obter os detalhes LDAP dos grupos no padrão %s"
 
 #: src/useradmin/views.py:354
 msgid "You must be a superuser to sync the LDAP users/groups."
-msgstr "Tem de ser um super-utilizador para poder sincronizar utilizadores/grupos de LDAP."
+msgstr ""
+"Tem de ser um super-utilizador para poder sincronizar utilizadores/grupos"
+" de LDAP."
 
 #: src/useradmin/views.py:372
 msgid "The import may not be complete, sync again."
@@ -267,8 +277,12 @@ msgstr "Não foi possível obter os detalhes LDAP dos utilizadores com padrão %
 
 #: src/useradmin/views.py:482
 #, python-format
-msgid "There was a naming conflict while importing user %(username)s in pattern %(username_pattern)s"
-msgstr "Ocorreu um conflito de nomes ao importar o utilizador %(username)s no padrão %(username_pattern)s"
+msgid ""
+"There was a naming conflict while importing user %(username)s in pattern "
+"%(username_pattern)s"
+msgstr ""
+"Ocorreu um conflito de nomes ao importar o utilizador %(username)s no "
+"padrão %(username_pattern)s"
 
 #: src/useradmin/views.py:517
 #, python-format
@@ -277,23 +291,12 @@ msgstr "Não foi possível obter os detalhes LDAP para o padrão de grupo %s"
 
 #: src/useradmin/views.py:525
 #, python-format
-msgid "There was a naming conflict while importing group %(groupname)s in pattern %(groupname_pattern)s"
-msgstr "Ocorreu um conflito de nomes ao importar o grupo %(groupname)s no padrão %(groupname_pattern)s"
-
-#: src/useradmin/views.py:546
-#, python-format
-msgid "Importing user %s"
-msgstr "A importar utilizador %s"
-
-#: src/useradmin/views.py:552
-#, python-format
-msgid "Found multiple users for member %s."
-msgstr "Foram encontrados vários utilizadores para o membro %s."
-
-#: src/useradmin/views.py:566
-#, python-format
-msgid "Adding member %s represented as users (should be a single user) %s to group %s"
-msgstr "Adicionar membro %s representado pelos utilizadores (deve ser um único utilizador) %s ao grupo %s"
+msgid ""
+"There was a naming conflict while importing group %(groupname)s in "
+"pattern %(groupname_pattern)s"
+msgstr ""
+"Ocorreu um conflito de nomes ao importar o grupo %(groupname)s no padrão "
+"%(groupname_pattern)s"
 
 #: src/useradmin/management/commands/import_ldap_group.py:39
 msgid "Import users from the group."
@@ -612,20 +615,23 @@ msgid "Sync LDAP users and groups"
 msgstr "Sincronizar utilizadores e grupos do LDAP"
 
 #: src/useradmin/templates/sync_ldap_users_groups.mako:41
-msgid "This will not import any users or groups that don't already exist in Hue. Only users and groups imported from LDAP can be synced."
-msgstr "Isto não irá importar quaisquer utilizadores ou grupos que não existam já no Hue. Só podem ser sincronizados os utilizadores e os grupos importados do LDAP."
+msgid ""
+"This will not import any users or groups that don't already exist in Hue."
+" Only users and groups imported from LDAP can be synced."
+msgstr ""
+"Isto não irá importar quaisquer utilizadores ou grupos que não existam já"
+" no Hue. Só podem ser sincronizados os utilizadores e os grupos "
+"importados do LDAP."
 
 #: src/useradmin/templates/sync_ldap_users_groups.mako:42
-msgid "All user information and group memberships will be updated based on the LDAP server's current state."
-msgstr "Todas as informações de utilizadores e de adesão a grupos serão actualizadas, com base no estado actual do servidor LDAP."
+msgid ""
+"All user information and group memberships will be updated based on the "
+"LDAP server's current state."
+msgstr ""
+"Todas as informações de utilizadores e de adesão a grupos serão "
+"actualizadas, com base no estado actual do servidor LDAP."
 
 #: src/useradmin/templates/sync_ldap_users_groups.mako:50
 msgid "Sync"
 msgstr "Sincronizar"
 
-#~ msgid "User not found."
-#~ msgstr "Utilizador não encontrado."
-#~ msgid "Information"
-#~ msgstr "Informações"
-#~ msgid "Optional"
-#~ msgstr "Opcional"

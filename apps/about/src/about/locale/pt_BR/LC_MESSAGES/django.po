@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-04-11 10:03-0700\n"
+"POT-Creation-Date: 2013-05-10 11:59-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: pt_BR <LL@li.org>\n"
@@ -17,12 +17,13 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/about/templates/admin_wizard.mako:21
-msgid "About Hue"
-msgstr "Sobre o Hue"
+#: src/about/views.py:61
+msgid "POST request required."
+msgstr ""
 
+#: src/about/templates/admin_wizard.mako:21
 #: src/about/templates/admin_wizard.mako:28
-msgid "Quick start"
+msgid "Quick Start"
 msgstr "Início rápido"
 
 #: src/about/templates/admin_wizard.mako:29
@@ -37,73 +38,92 @@ msgstr "Logs de servidor"
 msgid "Quick Start Wizard"
 msgstr "Assistente de início rápido"
 
-#: src/about/templates/admin_wizard.mako:56
+#: src/about/templates/admin_wizard.mako:54
 msgid "Step 1:"
 msgstr "Passo 1:"
 
-#: src/about/templates/admin_wizard.mako:56
+#: src/about/templates/admin_wizard.mako:54
 msgid "Check Configuration"
 msgstr "Verificar configuração"
 
-#: src/about/templates/admin_wizard.mako:57
+#: src/about/templates/admin_wizard.mako:55
 msgid "Step 2:"
 msgstr "Passo 2:"
 
-#: src/about/templates/admin_wizard.mako:57
+#: src/about/templates/admin_wizard.mako:55
 msgid "Examples"
 msgstr "Exemplos"
 
-#: src/about/templates/admin_wizard.mako:58
+#: src/about/templates/admin_wizard.mako:56
 msgid "Step 3:"
 msgstr "Passo 3:"
 
-#: src/about/templates/admin_wizard.mako:58
+#: src/about/templates/admin_wizard.mako:56
 msgid "Users"
 msgstr "Usuários"
 
-#: src/about/templates/admin_wizard.mako:59
+#: src/about/templates/admin_wizard.mako:57
 msgid "Step 4:"
 msgstr "Passo 4:"
 
-#: src/about/templates/admin_wizard.mako:59
+#: src/about/templates/admin_wizard.mako:57
 msgid "Go !"
 msgstr "Ir !"
 
-#: src/about/templates/admin_wizard.mako:78
+#: src/about/templates/admin_wizard.mako:67
+msgid "Check your current configuration"
+msgstr "Verificar sua configuração atual"
+
+#: src/about/templates/admin_wizard.mako:81
 msgid "Install or re-install the application examples"
 msgstr "Instalar ou reinstalar os exemplos de aplicativo"
 
-#: src/about/templates/admin_wizard.mako:84
-#: src/about/templates/admin_wizard.mako:91
-#: src/about/templates/admin_wizard.mako:98
+#: src/about/templates/admin_wizard.mako:87
+#: src/about/templates/admin_wizard.mako:94
+#: src/about/templates/admin_wizard.mako:101
+#: src/about/templates/admin_wizard.mako:108
+#: src/about/templates/admin_wizard.mako:115
 msgid "Installing..."
 msgstr "Instalando..."
 
-#: src/about/templates/admin_wizard.mako:114
+#: src/about/templates/admin_wizard.mako:131
 msgid "Go create or import users"
 msgstr "Criar ou importar usuários"
 
-#: src/about/templates/admin_wizard.mako:117
+#: src/about/templates/admin_wizard.mako:134
 msgid "User Admin"
 msgstr "Admin do usuário"
 
-#: src/about/templates/admin_wizard.mako:128
+#: src/about/templates/admin_wizard.mako:145
+msgid "Anonymous usage analytics"
+msgstr ""
+
+#: src/about/templates/admin_wizard.mako:152
+msgid "How does it work?"
+msgstr ""
+
+#: src/about/templates/admin_wizard.mako:167
 msgid "Go use the apps"
 msgstr "Usar os aplicativos"
 
-#: src/about/templates/admin_wizard.mako:131
+#: src/about/templates/admin_wizard.mako:170
 msgid "Hue Home"
 msgstr "Página inicial do Hue"
 
-#: src/about/templates/admin_wizard.mako:138
+#: src/about/templates/admin_wizard.mako:177
 msgid "Back"
 msgstr "Voltar"
 
-#: src/about/templates/admin_wizard.mako:139
+#: src/about/templates/admin_wizard.mako:178
 msgid "Next"
 msgstr "Próximo"
 
-#: src/about/templates/admin_wizard.mako:168
-msgid "Done!"
-msgstr "Concluído!"
+#: src/about/templates/admin_wizard.mako:208
+msgid "Examples refreshed"
+msgstr ""
+
+#: src/about/templates/admin_wizard.mako:275
+#, fuzzy
+msgid "Configuration updated"
+msgstr "Configuração"
 
