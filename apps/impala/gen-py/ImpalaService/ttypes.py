@@ -33,6 +33,7 @@ class TImpalaQueryOptions(object):
   ALLOW_UNSUPPORTED_FORMATS = 9
   DEFAULT_ORDER_BY_LIMIT = 10
   DEBUG_ACTION = 11
+  ABORT_ON_DEFAULT_LIMIT_EXCEEDED = 12
 
   _VALUES_TO_NAMES = {
     0: "ABORT_ON_ERROR",
@@ -47,6 +48,7 @@ class TImpalaQueryOptions(object):
     9: "ALLOW_UNSUPPORTED_FORMATS",
     10: "DEFAULT_ORDER_BY_LIMIT",
     11: "DEBUG_ACTION",
+    12: "ABORT_ON_DEFAULT_LIMIT_EXCEEDED",
   }
 
   _NAMES_TO_VALUES = {
@@ -62,6 +64,7 @@ class TImpalaQueryOptions(object):
     "ALLOW_UNSUPPORTED_FORMATS": 9,
     "DEFAULT_ORDER_BY_LIMIT": 10,
     "DEBUG_ACTION": 11,
+    "ABORT_ON_DEFAULT_LIMIT_EXCEEDED": 12,
   }
 
 
@@ -123,6 +126,268 @@ class TInsertResult(object):
   def validate(self):
     if self.rows_appended is None:
       raise TProtocol.TProtocolException(message='Required field rows_appended is unset!')
+    return
+
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
+class TPingImpalaServiceResp(object):
+  """
+  Attributes:
+   - version
+  """
+
+  thrift_spec = (
+    None, # 0
+    (1, TType.STRING, 'version', None, None, ), # 1
+  )
+
+  def __init__(self, version=None,):
+    self.version = version
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      if fid == 1:
+        if ftype == TType.STRING:
+          self.version = iprot.readString();
+        else:
+          iprot.skip(ftype)
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('TPingImpalaServiceResp')
+    if self.version is not None:
+      oprot.writeFieldBegin('version', TType.STRING, 1)
+      oprot.writeString(self.version)
+      oprot.writeFieldEnd()
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+
+  def validate(self):
+    return
+
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
+class TResetTableReq(object):
+  """
+  Attributes:
+   - db_name
+   - table_name
+  """
+
+  thrift_spec = (
+    None, # 0
+    (1, TType.STRING, 'db_name', None, None, ), # 1
+    (2, TType.STRING, 'table_name', None, None, ), # 2
+  )
+
+  def __init__(self, db_name=None, table_name=None,):
+    self.db_name = db_name
+    self.table_name = table_name
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      if fid == 1:
+        if ftype == TType.STRING:
+          self.db_name = iprot.readString();
+        else:
+          iprot.skip(ftype)
+      elif fid == 2:
+        if ftype == TType.STRING:
+          self.table_name = iprot.readString();
+        else:
+          iprot.skip(ftype)
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('TResetTableReq')
+    if self.db_name is not None:
+      oprot.writeFieldBegin('db_name', TType.STRING, 1)
+      oprot.writeString(self.db_name)
+      oprot.writeFieldEnd()
+    if self.table_name is not None:
+      oprot.writeFieldBegin('table_name', TType.STRING, 2)
+      oprot.writeString(self.table_name)
+      oprot.writeFieldEnd()
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+
+  def validate(self):
+    if self.db_name is None:
+      raise TProtocol.TProtocolException(message='Required field db_name is unset!')
+    if self.table_name is None:
+      raise TProtocol.TProtocolException(message='Required field table_name is unset!')
+    return
+
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
+class TResetCatalogResp(object):
+  """
+  Attributes:
+   - status
+  """
+
+  thrift_spec = (
+    None, # 0
+    (1, TType.STRUCT, 'status', (Status.ttypes.TStatus, Status.ttypes.TStatus.thrift_spec), None, ), # 1
+  )
+
+  def __init__(self, status=None,):
+    self.status = status
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      if fid == 1:
+        if ftype == TType.STRUCT:
+          self.status = Status.ttypes.TStatus()
+          self.status.read(iprot)
+        else:
+          iprot.skip(ftype)
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('TResetCatalogResp')
+    if self.status is not None:
+      oprot.writeFieldBegin('status', TType.STRUCT, 1)
+      self.status.write(oprot)
+      oprot.writeFieldEnd()
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+
+  def validate(self):
+    if self.status is None:
+      raise TProtocol.TProtocolException(message='Required field status is unset!')
+    return
+
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
+class TResetTableResp(object):
+  """
+  Attributes:
+   - status
+  """
+
+  thrift_spec = (
+    None, # 0
+    (1, TType.STRUCT, 'status', (Status.ttypes.TStatus, Status.ttypes.TStatus.thrift_spec), None, ), # 1
+  )
+
+  def __init__(self, status=None,):
+    self.status = status
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      if fid == 1:
+        if ftype == TType.STRUCT:
+          self.status = Status.ttypes.TStatus()
+          self.status.read(iprot)
+        else:
+          iprot.skip(ftype)
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('TResetTableResp')
+    if self.status is not None:
+      oprot.writeFieldBegin('status', TType.STRUCT, 1)
+      self.status.write(oprot)
+      oprot.writeFieldEnd()
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+
+  def validate(self):
+    if self.status is None:
+      raise TProtocol.TProtocolException(message='Required field status is unset!')
     return
 
 
