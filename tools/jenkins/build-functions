@@ -61,6 +61,8 @@ build_hadoop() {
   rm -rf "$HADOOP_DIR/${CDH_VERSION}"
   echo "Unpacking $CDH_CACHE to $HADOOP_DIR"
   tar -C $HADOOP_DIR -xzf $CDH_CACHE
+  # For Hive
+  ln -s "$HADOOP_DIR/${CDH_VERSION}/bin-mapreduce1" $HADOOP_MR1_HOME/bin
 }
 
 ##########
