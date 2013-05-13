@@ -53,6 +53,8 @@ def index(request):
 
   if search_form.is_valid():
     core = search_form.cleaned_data['collection']
+    if request.GET.get('collection') is None:
+      core = request.COOKIES.get('hueSearchLastCore', cores['status'].keys()[0])
     solr_query['core'] = core
     solr_query['q'] = search_form.cleaned_data['query']
     solr_query['fq'] = search_form.cleaned_data['fq']
@@ -68,7 +70,7 @@ def index(request):
     except Exception, e:
       error['message'] = unicode(str(e), "utf8")
   else:
-    core = cores['status'].keys()[0]
+    core = request.COOKIES.get('hueSearchLastCore', cores['status'].keys()[0])
     hue_core = Core.objects.get_or_create(name=core)
 
   return render('search.mako', request, {
@@ -155,7 +157,6 @@ def admin_core_facets(request, core):
   hue_cores = Core.objects.all()
 
   if request.method == 'POST':
-    print request.POST
     hue_core.facets.update_from_post(request.POST)
     hue_core.facets.save()
     return HttpResponse(json.dumps({}), mimetype="application/json")
