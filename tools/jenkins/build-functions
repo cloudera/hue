@@ -63,6 +63,9 @@ build_hadoop() {
   tar -C $HADOOP_DIR -xzf $CDH_CACHE
   # For Hive
   ln -s "$HADOOP_DIR/${CDH_VERSION}/bin-mapreduce1" $HADOOP_MR1_HOME/bin
+  # For MR1
+  rm -f "$HADOOP_DIR/${CDH_VERSION}/share/hadoop/mapreduce"
+  ln -sf "mapreduce1" "$HADOOP_DIR/${CDH_VERSION}/share/hadoop/mapreduce"
 }
 
 ##########
