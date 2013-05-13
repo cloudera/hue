@@ -57,7 +57,10 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 </div>
 
 <div class="container-fluid">
-  <div class="row-fluid">
+  <div id="loader" class="row-fluid">
+    <img src="/static/art/spinner.gif" />
+  </div>
+  <div id="mainContent" class="row-fluid hide">
     % if error:
     <div class="span12">
       <div class="alert">
@@ -276,6 +279,13 @@ ${ hue_core.result.get_extracode() | n,unicode }
 
 <script>
   $(document).ready(function () {
+    $("#loader").hide();
+    $("#mainContent").removeClass("hide");
+    window.onbeforeunload = function (e) {
+      $("#loader").show();
+      $("#mainContent").addClass("hide");
+    };
+
     $(".dateFacet").each(function () {
       var _m = moment($(this).text());
       $(this).text(_m.fromNow());
@@ -296,7 +306,7 @@ ${ hue_core.result.get_extracode() | n,unicode }
     });
     $(".dateFacetHeader").after(orderedDateFacets);
 
-    $(".current-core").text($("select[name='collection'] option:selected").text());
+    $(".current-core").text("${ current_core }");
     % if user.is_superuser:
         $(".dropdown-core").each(function () {
           if ($(this).data("value") == $("select[name='collection']").val()) {
@@ -312,6 +322,7 @@ ${ hue_core.result.get_extracode() | n,unicode }
       % if user.is_superuser:
           $(".change-settings").attr("href", $(this).data("settings-url"));
       % endif
+      $.cookie("hueSearchLastCore", $(this).text(), {expires: 90});
       $("form").submit();
     });
 
