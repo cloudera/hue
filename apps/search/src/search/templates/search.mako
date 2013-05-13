@@ -216,8 +216,23 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
               }
             }
           };
+
+          // fix the fields that contain dots in the name
+          for (var prop in item) {
+            if (item.hasOwnProperty(prop) && prop.indexOf(".") > -1) {
+              item[prop.replace(/\./gi, "_")] = item[prop];
+            }
+          }
+          var _mustacheTmpl = $("#mustacheTmpl").text();
+          var _mustacheTags = _mustacheTmpl.match(/{{(.*?)}}/g);
+          $.each(_mustacheTags, function (cnt, tag) {
+            if (tag.indexOf(".") > -1) {
+              _mustacheTmpl = _mustacheTmpl.replace(tag, tag.replace(/\./gi, "_"))
+            }
+          });
+
           $("<div>").addClass("result-row").html(
-            Mustache.render($("#mustacheTmpl").text(), item)
+            Mustache.render(_mustacheTmpl, item)
           ).appendTo($("#result-container"));
         });
       </script>
