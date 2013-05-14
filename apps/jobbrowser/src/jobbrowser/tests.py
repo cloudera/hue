@@ -20,6 +20,7 @@ try:
 except ImportError:
     import simplejson as json
 import logging
+import re
 import time
 import unittest
 
@@ -352,6 +353,14 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
     assert_false(hadoop_job_id_short in response.content)
     response = self.client.get('/jobbrowser/jobs/?state=killed')
     assert_false(hadoop_job_id_short in response.content)
+
+    # Test tracker page
+    early_task_id = hadoop_job_id.replace('job', 'task') + '_m_000000'
+    response = self.client.get('/jobbrowser/jobs/%s/tasks/%s' % (hadoop_job_id, early_task_id))
+
+    tracker_url = re.search('<a href="(/jobbrowser/trackers/.+?)"', response.content).group(1)
+    response = self.client.get(tracker_url)
+    assert_true('Tracker at' in response.content)
 
     # Check sharing permissions
     # Login as ourself

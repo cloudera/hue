@@ -491,6 +491,7 @@ class Tracker(object):
     self.maxMapTasks = self.tracker.maxMapTasks
     self.maxReduceTasks = self.tracker.maxReduceTasks
     self.taskReports = self.tracker.taskReports
+    self.is_mr2 = False
 
 
 class Cluster(object):
