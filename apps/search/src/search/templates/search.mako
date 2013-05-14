@@ -152,16 +152,6 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
             doc.update(response['highlighting'][doc['id']])
         %>
 
-        function genericFormatDate(val, item, format){
-          var d = moment(Mustache.render(val, item));
-          if (d.isValid()) {
-            return d.format(format);
-          }
-          else {
-            return Mustache.render(val, item);
-          }
-        }
-
         var _mustacheTmpl = fixTemplateDots($("#mustacheTmpl").text());
         $.each(${ json.dumps([result for result in docs]) | n,unicode }, function (index, item) {
           addTemplateFunctions(item);
