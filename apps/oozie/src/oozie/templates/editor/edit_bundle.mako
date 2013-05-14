@@ -24,7 +24,7 @@
 <%namespace name="properties" file="coordinator_properties.mako" />
 <%namespace name="utils" file="../utils.inc.mako" />
 
-${ commonheader(_("Oozie App"), "oozie", user, "100px") | n,unicode }
+${ commonheader(_("Edit Bundle"), "oozie", user, "100px") | n,unicode }
 ${ layout.menubar(section='bundles') }
 
 <style type="text/css">

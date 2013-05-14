@@ -20,11 +20,31 @@ from desktop.lib.i18n import smart_unicode
 from django.utils.translation import ugettext as _
 %>
 
+<%def name="is_selected(section, matcher)">
+  %if section == matcher:
+    class="active"
+  %endif
+</%def>
+
+<%def name="get_nice_name(apps, section)">
+  % for app in apps:
+    % if section == app.display_name:
+      - ${app.nice_name}
+    % endif
+  % endfor
+</%def>
+
+<%def name="get_title(title)">
+  % if title:
+    - ${smart_unicode(title)}
+  % endif
+</%def>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Hue - ${smart_unicode(title)}</title>
+  <title>Hue ${get_nice_name(apps, section)} ${get_title(title)}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
   <meta name="author" content="">
@@ -121,12 +141,6 @@ from django.utils.translation import ugettext as _
   </script>
 </head>
 <body>
-
-<%def name="is_selected(section, matcher)">
-  %if section == matcher:
-    class="active"
-  %endif
-</%def>
 
 <div class="navbar navbar-fixed-top">
     % if conf.CUSTOM.BANNER_TOP_HTML.get():

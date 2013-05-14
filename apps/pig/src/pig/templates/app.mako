@@ -20,7 +20,7 @@
 
 <%namespace name="actionbar" file="actionbar.mako" />
 
-${ commonheader(_('Pig'), "pig", user, "100px") | n,unicode }
+${ commonheader(None, "pig", user, "100px") | n,unicode }
 
 <div class="subnav subnav-fixed">
   <div class="container-fluid">
