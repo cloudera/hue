@@ -31,7 +31,9 @@ from django.utils.translation import ugettext as _
                 <input id="hueBreadcrumbText" type="text" class="input-xxlarge" style="margin-top:4px;margin-right:4px;display:none" data-bind="value: currentPath" />
             </li>
             <li class="pull-right">
-                <a href="${url('filebrowser.views.view', path=urlencode(path))}?default_to_trash" style="line-height:18px" data-bind="visible: trashEnabled"><i class="icon-trash"></i> ${_('Trash')}</a>
+                <a href="${url('filebrowser.views.view', path=urlencode(path))}?default_to_trash" style="line-height:18px" data-bind="visible: trashEnabled" title="${_('View trash')}">
+                  <i class="icon-trash"></i> ${_('Trash')}
+                </a>
             </li>
         </ul>
     % else:
