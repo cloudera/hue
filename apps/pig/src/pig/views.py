@@ -144,15 +144,19 @@ def copy(request):
   existing_script_data = pig_script.dict
   name = existing_script_data["name"] + _(' (Copy)')
   script = existing_script_data["script"]
+  parameters = existing_script_data["parameters"]
+  resources = existing_script_data["resources"]
 
   pig_script = PigScript.objects.create(owner=request.user)
-  pig_script.update_from_dict({'name': name, 'script': script})
+  pig_script.update_from_dict({'name': name, 'script': script, 'parameters': parameters, 'resources': resources})
   pig_script.save()
 
   response = {
     'id': pig_script.id,
     'name': name,
-    'script': script
+    'script': script,
+    'parameters': parameters,
+    'resources': resources
   }
 
   return HttpResponse(json.dumps(response), content_type="text/plain")
