@@ -543,16 +543,6 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     });
     $("#content-editor").freshereditor("edit", true);
 
-    function genericFormatDate(val, item, format){
-      var d = moment(Mustache.render(val, item));
-      if (d.isValid()) {
-        return d.format(format);
-      }
-      else {
-        return Mustache.render(val, item);
-      }
-    }
-
     // Force refresh on tab change
     $("a[data-toggle='tab']").on("shown", function (e) {
       if ($(e.target).attr("href") == "#source") {

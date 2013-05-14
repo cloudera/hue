@@ -18,6 +18,15 @@ function addTemplateFunctions(item) {
   if (Mustache == "undefined") {
     return;
   }
+  function genericFormatDate(val, item, format) {
+    var d = moment(Mustache.render(val, item));
+    if (d.isValid()) {
+      return d.format(format);
+    }
+    else {
+      return Mustache.render(val, item);
+    }
+  }
 
   item.preview = function () {
     return function (val) {

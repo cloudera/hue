@@ -73,6 +73,9 @@ def index(request):
     core = request.COOKIES.get('hueSearchLastCore', cores['status'].keys()[0])
     hue_core = Core.objects.get_or_create(name=core)
 
+  if request.GET.get('format') == 'json':
+    return HttpResponse(json.dumps(augment_solr_response(response, hue_core.facets.get_data())), mimetype="application/json")
+
   return render('search.mako', request, {
     'search_form': search_form,
     'response': augment_solr_response(response, hue_core.facets.get_data()),
