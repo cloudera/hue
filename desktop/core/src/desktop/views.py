@@ -182,7 +182,7 @@ def status_bar(request):
 def dump_config(request):
   # Note that this requires login (as do most apps).
   show_private = False
-  conf_dir = os.path.realpath(get_desktop_root('conf'))
+  conf_dir = os.path.realpath(os.getenv("HUE_CONF_DIR", get_desktop_root("conf")))
 
   if not request.user.is_superuser:
     return HttpResponse(_("You must be a superuser."))
@@ -369,7 +369,7 @@ def check_config(request):
   if not request.user.is_superuser:
     return HttpResponse(_("You must be a superuser."))
 
-  conf_dir = os.path.realpath(get_desktop_root('conf'))
+  conf_dir = os.path.realpath(os.getenv("HUE_CONF_DIR", get_desktop_root("conf")))
   return render('check_config.mako', request, dict(
                     error_list=_get_config_errors(cache=False),
                     conf_dir=conf_dir))
