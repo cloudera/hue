@@ -26,6 +26,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 
 <link rel="stylesheet" href="/search/static/css/search.css">
 <script src="/static/ext/js/moment.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/search/static/js/search.utils.js" type="text/javascript" charset="utf-8"></script>
 
 <div class="search-bar">
   % if user.is_superuser:
@@ -51,16 +52,16 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
     <div class="input-append">
       ${ search_form | n,unicode }
       <div class="icon-search" style="position: absolute;top: 7px;left: 11px;background-image: url('http://twitter.github.com/bootstrap/assets/img/glyphicons-halflings.png');"></div>
-      <button type="submit" class="btn">${ _('Go') }</button>
+      <button type="submit" class="btn"><i class="icon-search"></i></button>
     </div>
   </form>
 </div>
 
-<div class="container-fluid">
-  <div id="loader" class="row-fluid">
+<div class="container">
+  <div id="loader" class="row" style="text-align: center">
     <img src="/static/art/spinner.gif" />
   </div>
-  <div id="mainContent" class="row-fluid hide">
+  <div id="mainContent" class="row hide">
     % if error:
     <div class="span12">
       <div class="alert">
@@ -161,79 +162,9 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
           }
         }
 
+        var _mustacheTmpl = fixTemplateDots($("#mustacheTmpl").text());
         $.each(${ json.dumps([result for result in docs]) | n,unicode }, function (index, item) {
-          item.preview = function () {
-            return function (val) {
-              return '<a href="/filebrowser/view/' + $.trim(Mustache.render(val, item)) + '">' + $.trim(Mustache.render(val, item)) + '</a>';
-            }
-          };
-          item.embeddeddownload = function () {
-            return function (val) {
-              return '<a href="/filebrowser/download/' + $.trim(Mustache.render(val, item)) + '?disposition=inline">' + $.trim(Mustache.render(val, item)) + '</a>';
-            }
-          };
-          item.download = function () {
-            return function (val) {
-              return '<a href="/filebrowser/download/' + $.trim(Mustache.render(val, item)) + '>' + $.trim(Mustache.render(val, item)) + '</a>';
-            }
-          };
-          item.date = function () {
-            return function (val) {
-              return genericFormatDate(val, item, "DD-MM-YYYY");
-            }
-          };
-          item.time = function () {
-            return function (val) {
-              return genericFormatDate(val, item, "HH:mm:ss");
-            }
-          };
-          item.datetime = function () {
-            return function (val) {
-              return genericFormatDate(val, item, "DD-MM-YYYY HH:mm:ss");
-            }
-          };
-          item.fulldate = function () {
-            return function (val) {
-              return genericFormatDate(val, item, null);
-            }
-          };
-          item.timestamp = function () {
-            return function (val) {
-              var d = moment(Mustache.render(val, item));
-              if (d.isValid()) {
-                return d.valueOf();
-              }
-              else {
-                return Mustache.render(val, item);
-              }
-            }
-          };
-          item.fromnow = function () {
-            return function (val) {
-              var d = moment(Mustache.render(val, item));
-              if (d.isValid()) {
-                return d.fromNow();
-              }
-              else {
-                return Mustache.render(val, item);
-              }
-            }
-          };
-
-          // fix the fields that contain dots in the name
-          for (var prop in item) {
-            if (item.hasOwnProperty(prop) && prop.indexOf(".") > -1) {
-              item[prop.replace(/\./gi, "_")] = item[prop];
-            }
-          }
-          var _mustacheTmpl = $("#mustacheTmpl").text();
-          var _mustacheTags = _mustacheTmpl.match(/{{(.*?)}}/g);
-          $.each(_mustacheTags, function (cnt, tag) {
-            if (tag.indexOf(".") > -1) {
-              _mustacheTmpl = _mustacheTmpl.replace(tag, tag.replace(/\./gi, "_"))
-            }
-          });
-
+          addTemplateFunctions(item);
           $("<div>").addClass("result-row").html(
             Mustache.render(_mustacheTmpl, item)
           ).appendTo($("#result-container"));
@@ -279,6 +210,7 @@ ${ hue_core.result.get_extracode() | n,unicode }
 
 <script>
   $(document).ready(function () {
+
     $("#loader").hide();
     $("#mainContent").removeClass("hide");
     window.onbeforeunload = function (e) {
@@ -356,6 +288,15 @@ ${ hue_core.result.get_extracode() | n,unicode }
         _sort = "";
       }
       location.href = "?query=${solr_query["q"]}&fq=${solr_query["fq"]}&rows=${solr_query["rows"]}&start=${solr_query["start"]}" + (_sort != "" ? "&sort=" + _sort : "");
+    });
+
+    $("#id_query").focus();
+
+    $(document).on("keydown", function () {
+      if (!$("#id_query").is(":focus")) {
+        $("#id_query").focus();
+        $("#id_query").val($("#id_query").val());
+      }
     });
 
     $("#id_query").on("click", function (e) {
