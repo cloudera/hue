@@ -23,7 +23,7 @@
 <%namespace name="layout" file="../navigation-bar.mako" />
 <%namespace name="utils" file="../utils.inc.mako" />
 
-${ commonheader(_("Oozie App"), "oozie", user, "100px") | n,unicode }
+${ commonheader(_("Create Bundle"), "oozie", user, "100px") | n,unicode }
 ${ layout.menubar(section='bundles') }
 
 

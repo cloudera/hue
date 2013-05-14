@@ -20,7 +20,7 @@
 
 <%namespace name="comps" file="jobbrowser_components.mako" />
 
-${ commonheader(_('Tracker: %(trackerId)s - Job Browser') % dict(trackerId=tracker.trackerId), "jobbrowser", user) | n,unicode }
+${ commonheader(_('Tracker: %(trackerId)s') % dict(trackerId=tracker.trackerId), "jobbrowser", user) | n,unicode }
 
 <div class="container-fluid">
     <h1>${_('Tracker at %(trackerHost)s on port %(trackerPort)s') % dict(trackerHost=tracker.host, trackerPort=tracker.httpPort)}</h1>

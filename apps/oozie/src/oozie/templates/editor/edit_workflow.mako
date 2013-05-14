@@ -25,7 +25,7 @@
 <%namespace name="controls" file="control_utils.mako" />
 <%namespace name="workflows" file="workflow_utils.mako" />
 
-${ commonheader(_("Oozie App"), "oozie", user, "100px") | n,unicode }
+${ commonheader(_("Edit Workflow"), "oozie", user, "100px") | n,unicode }
 ${ layout.menubar(section='workflows') }
 
 

@@ -27,7 +27,7 @@
 %   endif
 </%def>
 
-${ commonheader(_('Job Browser'), "jobbrowser", user) | n,unicode }
+${ commonheader(None, "jobbrowser", user) | n,unicode }
 <div class="container-fluid">
   <h1>${_('Job Browser')}</h1>
   <form class="well form-inline" action="/jobbrowser/jobs" method="GET">

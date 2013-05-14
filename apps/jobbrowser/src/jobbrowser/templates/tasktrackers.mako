@@ -19,7 +19,7 @@
 %>
 
 <%namespace name="comps" file="jobbrowser_components.mako" />
-${ commonheader(_('Task Trackers - Job Browser'), "jobbrowser", user) | n,unicode }
+${ commonheader(_('Task Trackers'), "jobbrowser", user) | n,unicode }
 
 <div class="container-fluid">
 

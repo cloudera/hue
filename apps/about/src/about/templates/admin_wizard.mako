@@ -18,7 +18,7 @@ from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
 
-${ commonheader(_('Quick Start'), "quick_start", user, "100px") | n,unicode }
+${ commonheader(_('Quick Start'), "quickstart", user, "100px") | n,unicode }
 
 % if user.is_superuser:
   <div class="row-fluid">

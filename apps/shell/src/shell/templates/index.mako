@@ -19,7 +19,7 @@ from django.utils.translation import ugettext as _
 %>
 
 
-${ commonheader(_('Hue Shell'), "shell", user, "100px") | n,unicode }
+${ commonheader(None, "shell", user, "100px") | n,unicode }
 
 <div class="subnav subnav-fixed">
     <div class="container-fluid">
