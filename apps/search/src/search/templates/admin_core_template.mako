@@ -183,6 +183,9 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
                   <option title="${ _('Downloads and embed the file in the browser') }" value="{{#embeddeddownload}} {{/embeddeddownload}}">{{#embeddeddownload}}</option>
                   <option title="${ _('Downloads the linked file') }" value="{{#download}} {{/download}}">{{#download}}</option>
                   <option title="${ _('Preview file in File Browser') }" value="{{#preview}} {{/preview}}">{{#preview}}</option>
+                  <option title="${ _('Truncate a value after 100 characters') }" value="{{#truncate100}} {{/truncate100}}">{{#truncate100}}</option>
+                  <option title="${ _('Truncate a value after 250 characters') }" value="{{#truncate250}} {{/truncate250}}">{{#truncate250}}</option>
+                  <option title="${ _('Truncate a value after 500 characters') }" value="{{#truncate500}} {{/truncate500}}">{{#truncate500}}</option>
                 </select>
                 <a title="${ _('Click on this button to add the field') }" class="btn btn-small" data-bind="click: $root.addFunctionToVisual">
                   <i class="icon-plus"></i>
@@ -234,6 +237,9 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
                   <option title="${ _('Downloads and embed the file in the browser') }" value="{{#embeddeddownload}} {{/embeddeddownload}}">{{#embeddeddownload}}</option>
                   <option title="${ _('Downloads the linked file') }" value="{{#download}} {{/download}}">{{#download}}</option>
                   <option title="${ _('Preview file in File Browser') }" value="{{#preview}} {{/preview}}">{{#preview}}</option>
+                  <option title="${ _('Truncate a value after 100 characters') }" value="{{#truncate100}} {{/truncate100}}">{{#truncate100}}</option>
+                  <option title="${ _('Truncate a value after 250 characters') }" value="{{#truncate250}} {{/truncate250}}">{{#truncate250}}</option>
+                  <option title="${ _('Truncate a value after 500 characters') }" value="{{#truncate500}} {{/truncate500}}">{{#truncate500}}</option>
                 </select>
                 <a title="${ _('Click on this button to add the field') }" class="btn btn-small" data-bind="click: $root.addFunctionToSource">
                   <i class="icon-plus"></i>
@@ -402,6 +408,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 <script src="/static/ext/js/moment.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/codemirror-xml.js"></script>
 <script src="/static/ext/js/mustache.js"></script>
+<script src="/search/static/js/search.utils.js"></script>
 
 <script type="text/javascript">
 
@@ -559,65 +566,10 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
       }
       if ($(e.target).attr("href") == "#preview") {
         $("#preview-container").empty();
+        var _mustacheTmpl = fixTemplateDots($("#content-editor").html());
         $(samples).each(function (cnt, item) {
-          item.preview = function () {
-            return function (val) {
-              return '<a href="/filebrowser/view/' + $.trim(Mustache.render(val, item)) + '">' + $.trim(Mustache.render(val, item)) + '</a>';
-            }
-          };
-          item.embeddeddownload = function () {
-            return function (val) {
-              return '<a href="/filebrowser/download/' + $.trim(Mustache.render(val, item)) + '?disposition=inline">' + $.trim(Mustache.render(val, item)) + '</a>';
-            }
-          };
-          item.download = function () {
-            return function (val) {
-              return '<a href="/filebrowser/download/' + $.trim(Mustache.render(val, item)) + '>' + $.trim(Mustache.render(val, item)) + '</a>';
-            }
-          };
-          item.date = function () {
-            return function (val) {
-              return genericFormatDate(val, item, "DD-MM-YYYY");
-            }
-          };
-          item.time = function () {
-            return function (val) {
-              return genericFormatDate(val, item, "HH:mm:ss");
-            }
-          };
-          item.datetime = function () {
-            return function (val) {
-              return genericFormatDate(val, item, "DD-MM-YYYY HH:mm:ss");
-            }
-          };
-          item.fulldate = function () {
-            return function (val) {
-              return genericFormatDate(val, item, null);
-            }
-          };
-          item.timestamp = function () {
-            return function (val) {
-              var d = moment(Mustache.render(val, item));
-              if (d.isValid()) {
-                return d.valueOf();
-              }
-              else {
-                return Mustache.render(val, item);
-              }
-            }
-          };
-          item.fromnow = function () {
-            return function (val) {
-              var d = moment(Mustache.render(val, item));
-              if (d.isValid()) {
-                return d.fromNow();
-              }
-              else {
-                return Mustache.render(val, item);
-              }
-            }
-          };
-          $("<div>").addClass("preview-row").html(Mustache.render($("#content-editor").html(), item)).appendTo($("#preview-container"));
+          addTemplateFunctions(item);
+          $("<div>").addClass("preview-row").html(Mustache.render(_mustacheTmpl, item)).appendTo($("#preview-container"));
         });
       }
     });
