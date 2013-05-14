@@ -20,6 +20,7 @@ import desktop
 import desktop.urls
 import desktop.conf
 import logging
+import os
 import time
 
 import desktop.views as views
@@ -137,6 +138,11 @@ def test_dump_config():
 
   response = client_not_me.get('/dump_config')
   assert_equal("You must be a superuser.", response.content)
+
+  os.environ["HUE_CONF_DIR"] = "/tmp/test_hue_conf_dir"
+  resp = c.get('/dump_config')
+  del os.environ["HUE_CONF_DIR"]
+  assert_true('/tmp/test_hue_conf_dir' in resp.content, resp)
 
 
 def test_prefs():
@@ -408,6 +414,12 @@ def test_config_check():
     assert_true('SSL private key file should be set' in resp.content, resp)
     assert_true('klingon' in resp.content, resp)
     assert_true('Encoding not supported' in resp.content, resp)
+
+    # Set HUE_CONF_DIR and make sure check_config returns appropriate conf
+    os.environ["HUE_CONF_DIR"] = "/tmp/test_hue_conf_dir"
+    resp = cli.get('/debug/check_config')
+    del os.environ["HUE_CONF_DIR"]
+    assert_true('/tmp/test_hue_conf_dir' in resp.content, resp)
 
     # Alert present in the status bar
     resp = cli.get('/about', follow=True)
