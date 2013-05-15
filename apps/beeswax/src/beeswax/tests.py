@@ -55,7 +55,7 @@ from beeswax.test_base import make_query, wait_for_query_to_finish, verify_histo
   BEESWAXD_TEST_PORT
 from beeswax.design import hql_query, _strip_trailing_semicolon
 from beeswax.data_export import download
-from beeswax.models import SavedQuery
+from beeswax.models import SavedQuery, QueryHistory, HQL
 from beeswax.server import dbms
 from beeswax.server.beeswax_lib import BeeswaxDataTable, BeeswaxClient
 from beeswax.test_base import BeeswaxSampleProvider
@@ -1213,18 +1213,41 @@ def test_history_page():
   Exercise the query history view.
   """
   client = make_logged_in_client()
+  test_user = User.objects.get(username='test')
 
-  def do_view(param):
+  query, created = SavedQuery.objects.get_or_create(
+    type=HQL,
+    owner=test_user,
+    data='HQL query...',
+    name='Test query',
+    desc='Description',
+  )
+
+  QueryHistory.objects.get_or_create(
+      owner=test_user,
+      query='SELECT',
+      design=query,
+      last_state=0,
+      has_results=True,
+      query_type=HQL
+  )
+
+  def do_view(param, n=1):
     resp = client.get('/beeswax/query_history?' + param)
-    assert_true(len(resp.context['page'].object_list) >= 0)     # Make the query run
+    if n == 0:
+      assert_equal(len(resp.context['page'].object_list), 0)
+    else:
+      assert_true(len(resp.context['page'].object_list) >= n)     # Make the query run
     return resp
 
-  do_view('user=test')
-  do_view('user=:all')
-  do_view('design_id=1')
-  do_view('auto_query=0')
-  do_view('auto_query=1')
-  do_view('type=hql')
+  do_view('')
+  do_view('q-user=test')
+  do_view('q-user=test_who', 0)
+  do_view('q-user=:all')
+  do_view('q-design_id=%s' % query.id)
+  do_view('q-design_id=9999999', 0)
+  do_view('q-auto_query=0')
+  do_view('q-auto_query=1')
   do_view('sort=date')
   do_view('sort=-date')
   do_view('sort=state')
@@ -1241,8 +1264,13 @@ def test_history_page():
   assert_equal({u'q-type': [u'beeswax']}, response.context['filter_params'])
 
   # Test pagination
-  response = do_view('q-page=100')
+  response = do_view('q-page=100', 0)
   assert_equal(0, len(response.context['page'].object_list))
+
+  client = make_logged_in_client(username='test_who')
+  grant_access('test_who', 'test_who', 'test_who')
+  do_view('q-user=test_who', 0)
+  do_view('q-user=:all')
 
 def test_strip_trailing_semicolon():
   # Note that there are two queries (both an execute and an explain) scattered

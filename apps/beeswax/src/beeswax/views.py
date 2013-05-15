@@ -329,7 +329,7 @@ def list_query_history(request):
   if not share_queries:
     querydict_query[prefix + 'user'] = request.user.username
 
-  app_name= get_app_name(request)
+  app_name = get_app_name(request)
   querydict_query[prefix + 'type'] = app_name
 
   page, filter_params = _list_query_history(request.user, querydict_query, DEFAULT_PAGE_SIZE, prefix)
@@ -339,6 +339,7 @@ def list_query_history(request):
     'page': page,
     'filter_params': filter_params,
     'share_queries': share_queries,
+    'prefix': prefix,
   })
 
 
