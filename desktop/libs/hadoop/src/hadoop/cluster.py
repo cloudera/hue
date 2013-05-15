@@ -86,19 +86,23 @@ def get_next_ha_mrcluster():
   org.apache.hadoop.ha.HAServiceStatus#getServiceStatus().
   """
   candidates = all_mrclusters()
+  has_ha = sum([conf.MR_CLUSTERS[name].SUBMIT_TO.get() for name in conf.MR_CLUSTERS.keys()]) >= 2
 
   for name in conf.MR_CLUSTERS.keys():
     config = conf.MR_CLUSTERS[name]
     if config.SUBMIT_TO.get():
-      try:
-        jt = candidates[name]
-        status = jt.cluster_status()
-        if status.stateAsString == 'RUNNING':
-          return (config, jt)
-        else:
-          LOG.info('JobTracker %s is not RUNNING, skipping it: %s' % (name, status))
-      except Exception, ex:
-        LOG.info('JobTracker %s is not available, skipping it: %s' % (name, ex))
+      jt = candidates[name]
+      if has_ha:
+        try:
+          status = jt.cluster_status()
+          if status.stateAsString == 'RUNNING':
+            return (config, jt)
+          else:
+            LOG.info('JobTracker %s is not RUNNING, skipping it: %s' % (name, status))
+        except Exception, ex:
+          LOG.info('JobTracker %s is not available, skipping it: %s' % (name, ex))
+      else:
+        return (config, jt)
   return None
 
 def get_mrcluster(identifier="default"):
