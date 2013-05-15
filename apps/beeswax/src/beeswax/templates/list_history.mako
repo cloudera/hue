@@ -61,31 +61,31 @@ ${ layout.menubar(section='history') }
                 <ul class="nav nav-list">
                     <li class="nav-header">${_('Actions')}</li>
                     % if share_queries:
-                        % if filter_params.get('user') == ':all':
+                        % if filter_params.get(prefix + 'user') == ':all':
                           <%
                             my_querydict = filter_params.copy()
-                            my_querydict['user'] = request.user.username
+                            my_querydict[prefix + 'user'] = request.user.username
                           %>
                         <li><a href="?${my_querydict.urlencode()}">${_('Show my queries')}</a></li>
                         % else:
                           <%
                             my_querydict = filter_params.copy()
-                            my_querydict['user'] = ':all'
+                            my_querydict[prefix + 'user'] = ':all'
                           %>
                           <li><a href="?${my_querydict.urlencode()}">${_("Show everyone's queries")}</a></li>
                         % endif
                     % endif
 
-                     % if filter_params.get('auto_query', None):
+                     % if filter_params.get(prefix + 'auto_query', None):
                       <%
                         my_querydict = filter_params.copy()
-                        my_querydict['auto_query'] = ''
+                        my_querydict[prefix + 'auto_query'] = ''
                       %>
                       <li><a href="?${my_querydict.urlencode()}">${_('Show user queries')}</a></li>
                     % else:
                       <%
                         my_querydict = filter_params.copy()
-                        my_querydict['auto_query'] = 'on'
+                        my_querydict[prefix + 'auto_query'] = 'on'
                       %>
                       <li><a href="?${my_querydict.urlencode()}">${_('Show auto actions')}</a></li>
                     % endif
