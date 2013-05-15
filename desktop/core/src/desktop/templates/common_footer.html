@@ -97,6 +97,31 @@ limitations under the License.
         $(".btn-primary:not(.disable-feedback), .btn-danger:not(.disable-feedback)").button("reset");
       }
 
+      var _catchEnterKeyOnModals = false;
+
+      $(".modal").on("shown", function () {
+        _catchEnterKeyOnModals = true;
+        // safe ux enhancement: focus on the first editable input
+        $(".modal:visible").find("input:visible:first").focus();
+      });
+
+      $(".modal").on("hidden", function () {
+        _catchEnterKeyOnModals = false;
+      });
+
+      $(document).on("keyup", function (e) {
+        var _code = (e.keyCode ? e.keyCode : e.which);
+        if (_catchEnterKeyOnModals && $(".modal").is(":visible") && _code == 13) {
+          var _currentModal = $(".modal:visible");
+          if (_currentModal.find(".btn-primary").length > 0) {
+            _currentModal.find(".btn-primary").click();
+          }
+          else if (_currentModal.find(".btn-danger").length > 0) {
+            _currentModal.find(".btn-danger").click();
+          }
+        }
+      });
+
       {% if collect_usage %}
 
       var _gaq = _gaq || [];
