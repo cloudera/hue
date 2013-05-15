@@ -44,13 +44,14 @@ ${ commonheader(None, "jobsub", user, "60px") | n,unicode }
 
   <%actionbar:render>
     <%def name="actions()">
-      <button id="home" class="btn" title="${_('Home')}"><i class="icon-share"></i> ${_('Home')}</button>
-      &nbsp;
+      <div class="btn-toolbar" style="display: inline; vertical-align: middle">
+        <button id="home" class="btn" title="${_('Home')}"><i class="icon-share"></i> ${_('Home')}</button>
+        &nbsp;
       <!-- ko ifnot: inTrash -->
         <button id="submit-design" class="btn" title="${_('Submit')}" data-bind="enable: selectedDesignObjects().length == 1"><i class="icon-play"></i> ${_('Submit')}</button>
         <button id="edit-design" class="btn" title="${_('Edit')}" data-bind="enable: selectedDesignObjects().length == 1"><i class="icon-pencil"></i> ${_('Edit')}</button>
         <button id="copy-designs" class="btn" title="${_('Copy')}" data-bind="enable: selectedDesignObjects().length > 0"><i class="icon-retweet"></i> ${_('Copy')}</button>
-        <div id="delete-dropdown" class="btn-group" style="display: inline">
+        <div id="delete-dropdown" class="btn-group" style="vertical-align: middle">
           <button id="delete-btn" class="btn toolbarBtn dropdown-toggle" title="${_('Delete')}" data-toggle="dropdown" data-bind="enable: selectedDesignObjects().length > 0">
             <i class="icon-remove"></i> ${_('Delete')}
             <span class="caret"></span>
@@ -65,11 +66,13 @@ ${ commonheader(None, "jobsub", user, "60px") | n,unicode }
         <button id="restore-designs" class="btn" title="${_('Restore')}" data-bind="enable: selectedDesignObjects().length > 0"><i class="icon-cloud-upload"></i> ${_('Restore')}</button>
         <button id="destroy-designs" class="btn" title="${_('Delete forever')}" data-bind="enable: selectedDesignObjects().length > 0"><i class="icon-bolt"></i> ${_('Delete forever')}</button>
       <!-- /ko -->
+      </div>
     </%def>
 
     <%def name="creation()">
+      <div class="btn-toolbar" style="display: inline; vertical-align: middle">
       <!-- ko ifnot: inTrash -->
-        <div id="new-action-dropdown" class="btn-group" style="display: inline">
+        <div id="new-action-dropdown" class="btn-group" style="vertical-align: middle">
           <a href="#" class="btn new-action-link dropdown-toggle" title="${_('New action')}" data-toggle="dropdown">
             <i class="icon-plus-sign"></i> ${_('New action')}
             <span class="caret"></span>
@@ -116,6 +119,7 @@ ${ commonheader(None, "jobsub", user, "60px") | n,unicode }
       <!-- ko if: inTrash -->
         <button type="button" id="purge-trashed-designs" class="btn" title="${ _('Delete all the designs') }"><i class="icon-fire"></i> ${ _('Empty') }</button>
       <!-- /ko -->
+      </div>
     </%def>
   </%actionbar:render>
 

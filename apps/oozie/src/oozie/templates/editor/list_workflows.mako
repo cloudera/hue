@@ -26,24 +26,31 @@
 ${ commonheader(_("Workflows"), "oozie", user, "100px") | n,unicode }
 ${ layout.menubar(section='workflows') }
 
+<style type="text/css">
+  input.search-query {
+    vertical-align: top;
+  }
+</style>
 
 <div class="container-fluid">
   <h1>${ _('Workflow Manager') }</h1>
 
   <%actionbar:render>
     <%def name="actions()">
-      <button class="btn toolbarBtn" id="submit-btn" disabled="disabled"><i class="icon-play"></i> ${ _('Submit') }</button>
-      <button class="btn toolbarBtn" id="schedule-btn" disabled="disabled"><i class="icon-calendar"></i> ${ _('Schedule') }</button>
-      <button class="btn toolbarBtn" id="clone-btn" disabled="disabled"><i class="icon-retweet"></i> ${ _('Copy') }</button>
-      <div id="delete-dropdown" class="btn-group" style="display: inline">
-        <button id="delete-btn" class="btn toolbarBtn dropdown-toggle" title="${_('Delete')}" data-toggle="dropdown" disabled="disabled">
-          <i class="icon-remove"></i> ${_('Delete')}
-          <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu" style="top: auto">
-          <li><a href="javascript:void(0);" id="trash-btn" title="${_('Move to trash')}"><i class="icon-trash"></i> ${_('Move to trash')}</a></li>
-          <li><a href="javascript:void(0);" id="destroy-btn" title="${_('Delete forever')}"><i class="icon-bolt"></i> ${_('Delete forever')}</a></li>
-        </ul>
+      <div class="btn-toolbar" style="display: inline; vertical-align: middle">
+        <button class="btn toolbarBtn" id="submit-btn" disabled="disabled"><i class="icon-play"></i> ${ _('Submit') }</button>
+        <button class="btn toolbarBtn" id="schedule-btn" disabled="disabled"><i class="icon-calendar"></i> ${ _('Schedule') }</button>
+        <button class="btn toolbarBtn" id="clone-btn" disabled="disabled"><i class="icon-retweet"></i> ${ _('Copy') }</button>
+        <div id="delete-dropdown" class="btn-group" style="vertical-align: middle;">
+          <button id="delete-btn" class="btn toolbarBtn dropdown-toggle" title="${_('Delete')}" data-toggle="dropdown" disabled="disabled">
+            <i class="icon-remove"></i> ${_('Delete')}
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu" style="top: auto">
+            <li><a href="javascript:void(0);" id="trash-btn" title="${_('Move to trash')}"><i class="icon-trash"></i> ${_('Move to trash')}</a></li>
+            <li><a href="javascript:void(0);" id="destroy-btn" title="${_('Delete forever')}"><i class="icon-bolt"></i> ${_('Delete forever')}</a></li>
+          </ul>
+        </div>
       </div>
     </%def>
 

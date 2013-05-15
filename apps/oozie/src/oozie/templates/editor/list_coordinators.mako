@@ -26,15 +26,21 @@
 ${ commonheader(_("Coordinators"), "oozie", user, "100px") | n,unicode }
 ${ layout.menubar(section='coordinators') }
 
+<style type="text/css">
+  input.search-query {
+    vertical-align: top;
+  }
+</style>
 
 <div class="container-fluid">
   <h1>${ _('Coordinator Manager') }</h1>
 
   <%actionbar:render>
     <%def name="actions()">
+      <div class="btn-toolbar" style="display: inline; vertical-align: middle">
         <button class="btn toolbarBtn" id="submit-btn" disabled="disabled"><i class="icon-play"></i> ${ _('Submit') }</button>
         <button class="btn toolbarBtn" id="clone-btn" disabled="disabled"><i class="icon-retweet"></i> ${ _('Copy') }</button>
-        <div id="delete-dropdown" class="btn-group" style="display: inline">
+        <div id="delete-dropdown" class="btn-group" style="vertical-align: middle;">
           <button id="delete-btn" class="btn toolbarBtn dropdown-toggle" title="${_('Delete')}" data-toggle="dropdown" disabled="disabled">
             <i class="icon-remove"></i> ${_('Delete')}
             <span class="caret"></span>
@@ -44,12 +50,13 @@ ${ layout.menubar(section='coordinators') }
             <li><a href="javascript:void(0);" id="destroy-btn" title="${_('Delete forever')}"><i class="icon-bolt"></i> ${_('Delete forever')}</a></li>
           </ul>
         </div>
+      </div>
     </%def>
 
     <%def name="creation()">
-        <a href="${ url('oozie:create_coordinator') }" class="btn"><i class="icon-plus-sign"></i> ${ _('Create') }</a>
-        &nbsp;&nbsp;
-        <a href="${ url('oozie:list_trashed_coordinators') }" class="btn"><i class="icon-trash"></i> ${ _('Trash') }</a>
+      <a href="${ url('oozie:create_coordinator') }" class="btn"><i class="icon-plus-sign"></i> ${ _('Create') }</a>
+      &nbsp;&nbsp;
+      <a href="${ url('oozie:list_trashed_coordinators') }" class="btn"><i class="icon-trash"></i> ${ _('Trash') }</a>
     </%def>
   </%actionbar:render>
 
