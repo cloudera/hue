@@ -242,6 +242,7 @@ class WorkflowManager(TrashManager):
     self.check_workspace(workflow, fs)
 
   def check_workspace(self, workflow, fs):
+    create_directories(fs, [REMOTE_SAMPLE_DIR.get()])
     create_directories(fs)
 
     if workflow.is_shared:
