@@ -334,12 +334,15 @@ def list_query_history(request):
 
   page, filter_params = _list_query_history(request.user, querydict_query, DEFAULT_PAGE_SIZE, prefix)
 
+  filter = request.GET.get(prefix + 'search') and request.GET.get(prefix + 'search') or ''
+
   return render('list_history.mako', request, {
     'request': request,
     'page': page,
     'filter_params': filter_params,
     'share_queries': share_queries,
     'prefix': prefix,
+    'filter': filter,
   })
 
 
@@ -1347,6 +1350,11 @@ def _list_query_history(user, querydict, page_size, prefix=""):
   design_id = querydict.get(prefix + 'design_id')
   if design_id:
     db_queryset = db_queryset.filter(design__id=int(design_id))
+
+  # Search
+  search_filter = querydict.get(prefix + 'search')
+  if search_filter:
+    db_queryset = db_queryset.filter(Q(design__name__icontains=search_filter) | Q(query__icontains=search_filter) | Q(owner__username__icontains=search_filter))
 
   # Design type
   d_type = querydict.get(prefix + 'type')

@@ -21,6 +21,7 @@ from beeswax import models
 from beeswax.views import collapse_whitespace
 %>
 
+<%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="comps" file="beeswax_components.mako" />
 
@@ -65,12 +66,16 @@ ${ layout.menubar(section='history') }
                           <%
                             my_querydict = filter_params.copy()
                             my_querydict[prefix + 'user'] = request.user.username
+                            if filter:
+                              my_querydict[prefix + 'search'] = filter
                           %>
                         <li><a href="?${my_querydict.urlencode()}">${_('Show my queries')}</a></li>
                         % else:
                           <%
                             my_querydict = filter_params.copy()
                             my_querydict[prefix + 'user'] = ':all'
+                            if filter:
+                              my_querydict[prefix + 'search'] = filter
                           %>
                           <li><a href="?${my_querydict.urlencode()}">${_("Show everyone's queries")}</a></li>
                         % endif
@@ -80,12 +85,16 @@ ${ layout.menubar(section='history') }
                       <%
                         my_querydict = filter_params.copy()
                         my_querydict[prefix + 'auto_query'] = ''
+                        if filter:
+                          my_querydict[prefix + 'search'] = filter
                       %>
                       <li><a href="?${my_querydict.urlencode()}">${_('Show user queries')}</a></li>
                     % else:
                       <%
                         my_querydict = filter_params.copy()
                         my_querydict[prefix + 'auto_query'] = 'on'
+                        if filter:
+                          my_querydict[prefix + 'search'] = filter
                       %>
                       <li><a href="?${my_querydict.urlencode()}">${_('Show auto actions')}</a></li>
                     % endif
@@ -94,6 +103,15 @@ ${ layout.menubar(section='history') }
         </div>
         <div class="span10">
         <h1>${_('History')}</h1>
+
+        <%actionbar:render>
+          <%def name="search()">
+            <input id="filter" type="text" class="input-xxlarge search-query" placeholder="${_('Search for name, query, etc...')}" value="${ filter }">
+          </%def>
+        </%actionbar:render>
+
+        <img id="spinner" src="/static/art/spinner.gif" class="hide" />
+
         <table class="table table-striped table-condensed datatables">
             <thead>
               <tr>
@@ -171,6 +189,20 @@ ${ layout.menubar(section='history') }
       },
       "bStateSave": true
     });
+
+    var filterTimeout = -1;
+    $(".search-query").keyup(function () {
+      window.clearTimeout(filterTimeout);
+      filterTimeout = window.setTimeout(function () {
+        $("#spinner").show();
+        $(".datatables").hide();
+        $(".pagination").hide();
+        location.href = '?${ filter_params.get(prefix + 'user') and (prefix + 'user=' + filter_params.get(prefix + 'user') + '&') or '' }${ prefix }search='+$(".search-query").val();
+      }, 500);
+    });
+
+    var _val = $(".search-query").val();
+    $(".search-query").focus().val("").val(_val);
 
     $("a[data-row-selector='true']").jHueRowSelector();
   });
