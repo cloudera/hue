@@ -66,7 +66,7 @@ ${ layout.menubar(section='dashboard') }
           <th width="5%">${ _('Progress') }</th>
           <th width="5%">${ _('Submitter') }</th>
           <th width="13%">${ _('Created') }</th>
-          <th width="13%">${ _('Last modified') }</th>
+          <th width="13%">${ _('Last Modified') }</th>
           <th width="2%">${ _('Run') }</th>
           <th width="15%">${ _('Id') }</th>
           <th width="10%">${ _('Action') }</th>
@@ -90,7 +90,7 @@ ${ layout.menubar(section='dashboard') }
           <th width="5%">${ _('Duration') }</th>
           <th width="5%">${ _('Submitter') }</th>
           <th width="13%">${ _('Created') }</th>
-          <th width="13%">${ _('Last modified') }</th>
+          <th width="13%">${ _('Last Modified') }</th>
           <th width="2%">${ _('Run') }</th>
           <th width="25%">${ _('Id') }</th>
         </tr>

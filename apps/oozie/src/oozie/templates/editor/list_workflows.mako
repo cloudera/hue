@@ -73,7 +73,7 @@ ${ layout.menubar(section='workflows') }
         <th width="1%"><div class="hueCheckbox selectAll" data-selectables="workflowCheck"></div></th>
         <th>${ _('Name') }</th>
         <th>${ _('Description') }</th>
-        <th>${ _('Last Modification') }</th>
+        <th>${ _('Last Modified') }</th>
         <th>${ _('Steps') }</th>
         <th>${ _('Status') }</th>
         <th>${ _('Owner') }</th>

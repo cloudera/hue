@@ -246,7 +246,7 @@ ${ layout.menubar(section='dashboard') }
               <td>${ oozie_workflow.externalId or '-' }</td>
             </tr>
             <tr>
-              <td>${ _('Last Modification time') }</td>
+              <td>${ _('Last Modified') }</td>
               <td>${ utils.format_time(oozie_workflow.lastModTime) }</td>
             </tr>
             <tr>

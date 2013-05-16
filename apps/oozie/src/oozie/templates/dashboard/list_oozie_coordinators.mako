@@ -59,13 +59,13 @@ ${layout.menubar(section='dashboard')}
     <table class="table table-condensed" id="running-table">
       <thead>
         <tr>
-          <th width="12%">${ _('Next submission') }</th>
+          <th width="12%">${ _('Next Submission') }</th>
           <th width="5%">${ _('Status') }</th>
           <th width="20%">${ _('Name') }</th>
           <th width="5%">${ _('Progress') }</th>
           <th width="10%">${ _('Submitter') }</th>
           <th width="3%">${ _('Frequency') }</th>
-          <th width="5%">${ _('Time unit') }</th>
+          <th width="5%">${ _('Time Unit') }</th>
           <th width="12%">${ _('Start Time') }</th>
           <th width="15%">${ _('Id') }</th>
           <th width="10%">${ _('Action') }</th>
@@ -88,7 +88,7 @@ ${layout.menubar(section='dashboard')}
           <th width="10%">${ _('Duration') }</th>
           <th width="10%">${ _('Submitter') }</th>
           <th width="5%">${ _('Frequency') }</th>
-          <th width="5%">${ _('Time unit') }</th>
+          <th width="5%">${ _('Time Unit') }</th>
           <th width="13%">${ _('Start Time') }</th>
           <th width="20%">${ _('Id') }</th>
         </tr>
