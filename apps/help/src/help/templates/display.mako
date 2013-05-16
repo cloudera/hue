@@ -17,6 +17,13 @@
 from desktop.views import commonheader, commonfooter
 %>
 ${ commonheader("Hue Help", "help", user, "100px") | n,unicode }
+
+<style type="text/css">
+  .nav-pills li a {
+    font-size: 13px;
+  }
+</style>
+
 	<div class="subnav subnav-fixed">
 		<div class="container-fluid">
 		<ul class="nav nav-pills">
@@ -33,6 +40,28 @@ ${ commonheader("Hue Help", "help", user, "100px") | n,unicode }
   <script>
     $(document).ready(function () {
       $.jHueScrollUp();
+
+      resizeSubnav();
+
+      var resizeTimeout = -1;
+      var winWidth = $(window).width();
+      var winHeight = $(window).height();
+
+      $(window).on("resize", function () {
+        window.clearTimeout(resizeTimeout);
+        resizeTimeout = window.setTimeout(function () {
+          // prevents endless loop in IE8
+          if (winWidth != $(window).width() || winHeight != $(window).height()) {
+            resizeSubnav();
+            winWidth = $(window).width();
+            winHeight = $(window).height();
+          }
+        }, 200);
+      });
+
+      function resizeSubnav(){
+        $(".subnav").height($(".nav-pills").outerHeight());
+      }
     });
   </script>
 
