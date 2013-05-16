@@ -408,7 +408,7 @@ class Workflow(Job):
     return reverse('oozie:edit_workflow', kwargs={'workflow': self.id})
 
   def get_hierarchy(self):
-    node = self.start
+    node = Start.objects.get(workflow=self) # Uncached version of start.
     return self.get_hierarchy_rec(node=node) + [[Kill.objects.get(workflow=node.workflow)],
                                            [End.objects.get(workflow=node.workflow)]]
 
