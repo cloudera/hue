@@ -36,6 +36,10 @@ ${ layout.menubar(section='workflows') }
   <h1>${ _('Workflow Manager') }</h1>
 
   <%actionbar:render>
+    <%def name="search()">
+      <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for name, description, etc...')}">
+    </%def>
+
     <%def name="actions()">
       <div class="btn-toolbar" style="display: inline; vertical-align: middle">
         <button class="btn toolbarBtn" id="submit-btn" disabled="disabled"><i class="icon-play"></i> ${ _('Submit') }</button>

@@ -31,6 +31,10 @@ ${ layout.menubar(section='workflows') }
   <h1>${ _('Workflow Trash') }</h1>
 
   <%actionbar:render>
+    <%def name="search()">
+      <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for name, description, etc...')}">
+    </%def>
+
     <%def name="actions()">
       <a href="${ url('oozie:list_workflows') }" id="home-btn" class="btn" title="${ _('Got to workflow manager') }">
         <i class="icon-home"></i> ${ _('Workflows') }

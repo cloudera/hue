@@ -222,7 +222,7 @@ ${ commonheader(_('Job: %(jobId)s') % dict(jobId=job.jobId_short), "jobbrowser",
                 <div id="metadata" class="tab-pane">
                     <div class="well hueWell">
                         <form class="form-search">
-                            ${_('Filter: ')}<input type="text" id="metadataFilter" class="input-xlarge search-query" placeholder="${_('Text Filter')}">
+                            <input type="text" id="metadataFilter" class="input-xlarge search-query" placeholder="${_('Text Filter')}">
                         </form>
                     </div>
                     <table id="metadataTable" class="table table-striped table-condensed">

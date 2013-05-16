@@ -45,6 +45,10 @@ ${ commonheader(_('Tables'), 'metastore', user) | n,unicode }
         </div>
         <div class="span9">
           <%actionbar:render>
+            <%def name="search()">
+              <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for table name')}">
+            </%def>
+
             <%def name="actions()">
                 <button id="viewBtn" class="btn toolbarBtn" title="${_('Browse the selected table')}" disabled="disabled"><i class="icon-eye-open"></i> ${_('View')}</button>
                 <button id="browseBtn" class="btn toolbarBtn" title="${_('Browse the selected table')}" disabled="disabled"><i class="icon-list"></i> ${_('Browse Data')}</button>

@@ -55,7 +55,7 @@ ${ layout.menubar(section='dashboard') }
       <div class="tab-pane active" id="instrumentation">
         <div class="well hueWell">
             <form class="form-search">
-                ${_('Filter: ')}<input type="text" class="searchFilter input-xlarge search-query" placeholder="${_('Text Filter')}">
+                <input type="text" class="searchFilter input-xlarge search-query" placeholder="${_('Text Filter')}">
             </form>
         </div>
        <div class="tabbable">

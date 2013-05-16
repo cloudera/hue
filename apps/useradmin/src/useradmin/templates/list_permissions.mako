@@ -28,7 +28,11 @@ ${layout.menubar(section='permissions', _=_)}
 
 <div class="container-fluid">
     <h1>${_('Hue Permissions')}</h1>
-    <%actionbar:render />
+    <%actionbar:render>
+      <%def name="search()">
+        <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for application, group, etc...')}">
+      </%def>
+    </%actionbar:render>
 
     <table class="table table-striped table-condensed datatables">
         <thead>

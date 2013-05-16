@@ -39,6 +39,10 @@ ${layout.menubar(section='my queries')}
   <h1>${_('My Queries')}</h1>
 
   <%actionbar:render>
+    <%def name="search()">
+      <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for query')}">
+    </%def>
+
     <%def name="actions()">
       <button id="viewBtn" class="btn toolbarBtn" title="${_('View the result of the selected')}" disabled="disabled"><i class="icon-eye-open"></i> ${_('View result')}</button>
       <button id="editBtn" class="btn toolbarBtn" title="${_('Edit the selected query')}" disabled="disabled"><i class="icon-edit"></i> ${_('Edit')}</button>

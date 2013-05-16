@@ -43,6 +43,10 @@ ${ commonheader(None, "jobsub", user, "60px") | n,unicode }
   <h1>${_('Job Designs')}</h1>
 
   <%actionbar:render>
+    <%def name="search()">
+      <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for design name')}">
+    </%def>
+
     <%def name="actions()">
       <div class="btn-toolbar" style="display: inline; vertical-align: middle">
         <button id="home" class="btn" title="${_('Home')}"><i class="icon-share"></i> ${_('Home')}</button>

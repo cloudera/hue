@@ -29,6 +29,9 @@ ${layout.menubar(section='users', _=_)}
     <h1>${_('Hue Users')}</h1>
 
     <%actionbar:render>
+        <%def name="search()">
+          <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for name, group, etc...')}">
+        </%def>
         <%def name="actions()">
             %if user.is_superuser:
                 <button id="deleteUserBtn" class="btn" title="${_('Delete')}" disabled="disabled"><i class="icon-trash"></i> ${_('Delete')}</button>

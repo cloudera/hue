@@ -32,6 +32,10 @@ ${layout.menubar(section='saved queries')}
   <h1>${_('Trashed Queries')}</h1>
 
   <%actionbar:render>
+    <%def name="search()">
+      <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for query')}">
+    </%def>
+
     <%def name="actions()">
       <button id="deleteQueryBtn" class="btn toolbarBtn" title="${_('Delete forever')}" disabled="disabled">
         <i class="icon-bolt"></i> ${_('Delete forever')}

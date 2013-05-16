@@ -36,6 +36,10 @@ ${ commonheader(_('Databases'), 'metastore', user) | n,unicode }
         </div>
         <div class="span9">
           <%actionbar:render>
+            <%def name="search()">
+              <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for database name')}">
+            </%def>
+
             <%def name="actions()">
                 <button id="dropBtn" class="btn toolbarBtn" title="${_('Drop the selected databases')}" disabled="disabled"><i class="icon-trash"></i>  ${_('Drop')}</button>
             </%def>

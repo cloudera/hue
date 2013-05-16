@@ -31,6 +31,10 @@ ${ layout.menubar(section='coordinators') }
   <h1>${ _('Coordinator Trash') }</h1>
 
   <%actionbar:render>
+    <%def name="search()">
+      <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for name, description, etc...')}">
+    </%def>
+
     <%def name="actions()">
         <a href="${ url('oozie:list_coordinators') }" id="home-btn" class="btn" title="${ _('Got to coordinator manager') }">
           <i class="icon-home"></i> ${ _('Coordinators') }

@@ -32,7 +32,6 @@ ${layout.menubar(section='dashboard')}
 
   <div class="well hueWell">
     <form>
-      ${ _('Filter:') }
       <input type="text" id="filterInput" class="input-xlarge search-query" placeholder="${ _('Search for username, name, etc...') }">
 
       <span class="pull-right">

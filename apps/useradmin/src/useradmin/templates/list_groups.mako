@@ -29,6 +29,9 @@ ${layout.menubar(section='groups', _=_)}
     <h1>${_('Hue Groups')}</h1>
 
     <%actionbar:render>
+        <%def name="search()">
+          <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for name, members, etc...')}">
+        </%def>
         <%def name="actions()">
             %if user.is_superuser:
                 <button id="deleteGroupBtn" class="btn confirmationModal" title="${_('Delete')}" disabled="disabled"><i class="icon-trash"></i> ${_('Delete')}</button>

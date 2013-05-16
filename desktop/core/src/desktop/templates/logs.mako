@@ -58,7 +58,7 @@ ${layout.menubar(section='log_view')}
 <div class="container-fluid">
   <%actionbar:render>
     <%def name="search()">
-        <input type="text" class="input-xxlarge search-query" placeholder="${_('Search...')}" value="${query}">
+        <input type="text" class="input-xxlarge search-query" placeholder="${_('Search in the logs')}" value="${query}">
     </%def>
     <%def name="creation()">
         <span class="btn-group">
