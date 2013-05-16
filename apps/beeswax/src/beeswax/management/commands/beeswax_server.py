@@ -34,6 +34,10 @@ class Command(NoArgsCommand):
   """ Starts beeswax daemon.  """
 
   def handle_noargs(self, **options):
+    if beeswax.conf.SERVER_INTERFACE.get() != 'beeswax':
+      LOG.debug("Hue is not configured to use Beeswaxd, not starting it.")
+      sys.exit(0)
+
     cluster_conf = hadoop.cluster.get_cluster_conf_for_job_submission()
     if cluster_conf is None:
       LOG.error("Configuration does not contain any MR/Yarn clusters with "
