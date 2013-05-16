@@ -40,7 +40,7 @@ from oozie.utils import model_to_dict, format_dict_field_values, format_field_va
 LOG = logging.getLogger(__name__)
 
 
-def get_or_create_node(workflow, node_data):
+def get_or_create_node(workflow, node_data, save=True):
   node = None
   id = str(node_data['id'])
   separator_index = id.find(':')
@@ -56,7 +56,10 @@ def get_or_create_node(workflow, node_data):
     node = node_model(**kwargs)
   else:
     raise StructuredException(code="INVALID_REQUEST_ERROR", message=_('Could not find node of type'), data=node_data, error_code=500)
-  node.save()
+
+  if save:
+    node.save()
+
   return node
 
 
@@ -191,16 +194,17 @@ def _update_workflow_nodes_json(workflow, json_nodes, id_map, user):
   nodes = []
 
   for json_node in json_nodes:
-    node = get_or_create_node(workflow, json_node)
-
-    if node.node_type == 'fork' and json_node['node_type'] == 'decision':
-      node = node.convert_to_decision()
+    node = get_or_create_node(workflow, json_node, save=False)
 
     if node.node_type == 'subworkflow':
       try:
         node.sub_workflow = Workflow.objects.get(id=int(json_node['sub_workflow']))
+        node.save()
       except Workflow.DoesNotExist:
-        pass
+        raise StructuredException(code="INVALID_REQUEST_ERROR", message=_('Error saving workflow'), data={'errors': 'Chosen subworkflow does not exist.'}, error_code=400)
+    elif node.node_type == 'fork' and json_node['node_type'] == 'decision':
+      node.save() # Need to save in case database throws error when performing delete.
+      node = node.convert_to_decision()
 
     id_map[str(json_node['id'])] = node.id
 
