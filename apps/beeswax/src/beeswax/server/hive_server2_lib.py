@@ -443,6 +443,10 @@ class HiveServerClient:
     return self.call(self._client.GetOperationStatus, req)
 
 
+  def explain(self, query):
+    return self.execute_query_statement('EXPLAIN %s' % query.query['query'])
+
+
   def get_log(self, operation_handle):
     try:
       req = TGetLogReq(operationHandle=operation_handle)
@@ -512,6 +516,12 @@ class PartitionValueCompatible:
     self.sd = type('Sd', (object,), {'location': '%s/%s' % (table.path_location, ','.join(partition)),})
 
 
+class ExplainCompatible:
+
+  def __init__(self, data_table):
+    self.textual = '\n'.join([line[0] for line in data_table.rows()])
+
+
 class HiveServerClientCompatible:
   """Same API as Beeswax"""
 
@@ -533,7 +543,8 @@ class HiveServerClientCompatible:
 
 
   def explain(self, query):
-    raise NotImplementedError()
+    data_table = self._client.explain(query)
+    return ExplainCompatible(data_table)
 
 
   def fetch(self, handle, start_over=False, max_rows=None):

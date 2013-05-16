@@ -50,9 +50,7 @@
         <button type="button" id="saveQuery" class="btn">${_('Save')}</button>
         % endif
         <button type="button" id="saveQueryAs" class="btn">${_('Save as...')}</button>
-        % if app_name != 'impala':
         <button type="button" id="explainQuery" class="btn">${_('Explain')}</button>
-        % endif
         &nbsp; ${_('or create a')} &nbsp;<a type="button" class="btn" href="${ url(app_name + ':execute_query') }">${_('New query')}</a>
     </div>
 </%def>
