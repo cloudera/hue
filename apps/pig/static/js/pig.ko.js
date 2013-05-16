@@ -228,7 +228,8 @@ var PigViewModel = function (props) {
   };
 
   self.listRunScript = function () {
-    callRun(self.selectedScript());
+    self.currentScript(self.selectedScript());
+    self.runOrShowSubmissionModal();
   };
 
   self.listCopyScript = function () {
