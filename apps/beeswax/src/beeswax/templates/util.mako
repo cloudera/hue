@@ -55,17 +55,17 @@ from django.utils.translation import ugettext as _
   % endfor
 </%def>
 
-<%def name="render_query_context(query_context)">
+<%def name="render_query_context(query_context, label=None, klass='')">
   % if query_context:
     % if query_context[0] == 'table':
       <% tablename, database = query_context[1].split(':') %>
-      <a href="${ url('metastore:describe_table', database, tablename) }">${tablename}</a>
+      <a href="${ url('metastore:describe_table', database, tablename) }" class="${ klass }">${ label or tablename }</a>
     % elif query_context[0] == 'design':
       <% design = query_context[1] %>
       % if design.is_auto:
-		<a href="${ url(app_name + ':execute_query', design.id)}">${_('Unsaved Query')}</a>
+		<a href="${ url(app_name + ':execute_query', design.id)}" class="${ klass }">${ label or _('Unsaved Query')}</a>
       % else:
-        <a href="${ url(app_name + ':execute_query', design.id)}">${design.name}</a>
+        <a href="${ url(app_name + ':execute_query', design.id)}" class="${ klass }">${ label or design.name}</a>
       % endif
     % else:
       ${_('Query Results')}

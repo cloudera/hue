@@ -25,7 +25,7 @@ from django.utils.translation import ugettext as _
 ${ commonheader(_('Query Explanation'), app_name, user, '100px') | n,unicode }
 ${layout.menubar(section='saved queries')}
 
-<div class="container-fluid">
+<div class="container-fluid" style="margin-bottom: 14px">
     <h1>${_('Query Explanation:')} ${util.render_query_context(query_context)}</h1>
 
     <ul class="nav nav-tabs">
@@ -43,7 +43,7 @@ ${layout.menubar(section='saved queries')}
     </div>
 
   <br/>
-  <a class="btn" onclick="history.back()">${ _('Back') }</a>
+  ${util.render_query_context(query_context, _('Back'), 'btn')}
 
 </div>
 

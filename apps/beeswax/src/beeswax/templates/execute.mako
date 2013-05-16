@@ -521,6 +521,7 @@ ${layout.menubar(section='query')}
       % endif
 
       var executeQuery = function () {
+        $("input[name='button-explain']").remove();
         $("<input>").attr("type", "hidden").attr("name", "button-submit").attr("value", "Execute").appendTo($("#advancedSettingsForm"));
         checkAndSubmit();
       }
@@ -566,6 +567,7 @@ ${layout.menubar(section='query')}
       });
 
       $("#explainQuery").click(function () {
+        $("input[name='button-execute']").remove();
         $("<input>").attr("type", "hidden").attr("name", "button-explain").attr("value", "Explain").appendTo($("#advancedSettingsForm"));
         checkAndSubmit();
       });
