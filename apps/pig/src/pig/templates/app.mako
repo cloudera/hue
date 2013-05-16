@@ -150,6 +150,13 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
           </ul>
         </form>
       </div>
+      <i class="icon-question-sign" id="help"></i>
+      <div id="help-content" class="hide">
+        <ul style="text-align: left;">
+          <li>${ _("Press CTRL + Space to autocomplete") }</li>
+          <li>${ _("You can execute the current script by pressing CTRL + ENTER or CTRL + . in the editor") }</li>
+        </ul>
+      </div>
     </div>
 
     <div class="span10">
@@ -537,7 +544,19 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
       readOnly: false,
       lineNumbers: true,
       mode: "text/x-pig",
-      extraKeys: {"Ctrl-Space": "autocomplete"},
+      extraKeys: {
+        "Ctrl-Space": "autocomplete",
+        "Ctrl-Enter": function () {
+          if (!viewModel.currentScript().isRunning()) {
+            viewModel.runOrShowSubmissionModal();
+          }
+        },
+        "Ctrl-.": function () {
+          if (!viewModel.currentScript().isRunning()) {
+            viewModel.runOrShowSubmissionModal();
+          }
+        }
+      },
       onKeyEvent: function (e, s) {
         if (s.type == "keyup") {
           if (s.keyCode == 191) {
@@ -879,6 +898,14 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
         showSection("editor", "logs");
       }
     });
+
+    $("#help").popover({
+      'title': "${_('Did you know?')}",
+      'content': $("#help-content").html(),
+      'trigger': 'hover',
+      'html': true
+    });
+
   });
 
   var _bottomAlertFade = -1;
