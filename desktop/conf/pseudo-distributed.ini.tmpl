@@ -383,7 +383,13 @@
   # required, even if the Thrift daemon is running on the same host as Hue.
   ## beeswax_server_host=<FQDN of Beeswax Server>
 
+  # The type of Thrift interface used for contacting the backend for sending
+  # queries/metadata requests.
+  # Choices are 'beeswax' (default), 'hiveserver2'.
+  ## server_interface=beeswax
+
   # Port where Beeswax Thrift server runs on.
+  # Use 10000 when using the HiveServer2 interface.
   ## beeswax_server_port=8002
 
   # Host where internal metastore Thrift daemon is running.
@@ -413,10 +419,6 @@
   # Share saved queries with all users. If set to false, saved queries are
   # visible only to the owner and administrators.
   ## share_saved_queries=true
-
-  # The backend to contact for queries/metadata requests
-  # Choices are 'beeswax' (default), 'hiveserver2'.
-  ## server_interface=beeswax
 
   # Time in milliseconds for Beeswax to persist queries in its cache.
   # 7*24*60*60*1000 = 1 week
