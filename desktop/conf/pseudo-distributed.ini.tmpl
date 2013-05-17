@@ -426,6 +426,33 @@
 
 
 ###########################################################################
+# Settings to configure Pig
+###########################################################################
+
+[pig]
+  # Location of piggybank.jar on local filesystem.
+  ## local_sample_dir=/usr/share/hue/apps/pig/examples
+
+  # Location piggybank.jar will be copied to in HDFS.
+  ## remote_data_dir=/user/hue/pig/examples
+
+
+###########################################################################
+# Settings to configure Proxy
+###########################################################################
+
+[proxy]
+  # Comma-separated list of regular expressions,
+  # which match 'host:port' of requested proxy target.
+  ## whitelist=(localhost|127\.0\.0\.1):(50030|50070|50060|50075)
+
+  # Comma-separated list of regular expressions,
+  # which match any prefix of 'host:port/path' of requested proxy target.
+  # This does not support matching GET parameters.
+  ## blacklist=()
+
+
+###########################################################################
 # Settings to configure Impala
 ###########################################################################
 
