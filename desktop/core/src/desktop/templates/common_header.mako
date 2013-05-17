@@ -133,7 +133,7 @@ from django.utils.translation import ugettext as _
     % endif
     <div class="navbar-inner">
       <div class="container-fluid">
-        <a class="brand nav-tooltip" title="${_('About Oozie UI')}" href="/about"><img width="70%" src="/static/art/oozie_200x.png" style="margin-top: -5px; margin-bottom: -5px"> UI</a>
+        <a class="brand nav-tooltip" title="${_('About Oozie UI')}" href="/about"><img src="/static/art/oozie_logo.png"></a>
         <div id="usernameDropdown" class="btn-group pull-right">
           <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
             <i class="icon-user"></i> ${user.username}

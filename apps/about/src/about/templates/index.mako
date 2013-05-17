@@ -17,9 +17,9 @@
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
-${ commonheader(_('About Hue'), "about", user, "100px") | n,unicode }
+${ commonheader(_('About Oozie UI'), "about", user, "100px") | n,unicode }
 
-	<div class="subnav subnav-fixed" style="margin-top:10px">
+	<div class="subnav subnav-fixed" style="margin-top:4px">
 		<div class="container-fluid">
 		<ul class="nav nav-pills">
 			##<li><a href="${url("desktop.views.dump_config")}">${_('Configuration')}</a></li>
@@ -29,9 +29,25 @@ ${ commonheader(_('About Hue'), "about", user, "100px") | n,unicode }
 		</div>
 	</div>
 
-	<div class="container-fluid">
-		<img src="/static/art/hue-login-logo.png" />
-		<p>Hue ${version}</p>
+	<div class="container-fluid" style="margin-top: 30px">
+
+    <div class="row-fluid">
+      <div class="span2 center">
+        <img src="/static/art/oozie_200x.png" />
+      </div>
+      <div class="span2 center">
+        <img src="/static/art/hue-login-logo.png" />
+      </div>
+    </div>
+    <div class="row-fluid" style="margin-top: 15px">
+      <div class="span2 center">
+        tested on <a href="http://oozie.apache.org" target="_blank">Oozie 3.3.x</a>
+      </div>
+      <div class="span2 center">
+        based on <a href="http://gethue.com" target="_blank">Hue 2.3</a>
+      </div>
+    </div>
+
 	</div>
 
 ${ commonfooter(messages) | n,unicode }

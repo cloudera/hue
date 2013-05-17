@@ -28,7 +28,7 @@ def is_selected(section, matcher):
 %>
 
 <%def name="menubar(section='')">
-	<div class="subnav subnav-fixed" style="margin-top:10px">
+	<div class="subnav subnav-fixed" style="margin-top:4px">
 		<div class="container-fluid">
 		<ul class="nav nav-pills">
 			##<li class="${is_selected(section, 'dump_config')}"><a href="${url("desktop.views.dump_config")}">${_('Configuration')}</a></li>
