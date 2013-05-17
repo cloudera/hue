@@ -460,7 +460,7 @@ class TestAPI(OozieMockBase):
       test_response_json_object = json.loads(test_response_json)
       assert_equal(0, test_response_json_object['status'], workflow_json)
     finally:
-      wf.delete()
+      wf.delete(skip_trash=True)
 
 
   def test_workflow_add_mapreduce_node(self):
@@ -512,7 +512,7 @@ class TestAPI(OozieMockBase):
       test_response_json_object = json.loads(test_response_json)
       assert_equal(0, test_response_json_object['status'], workflow_json)
     finally:
-      wf.delete()
+      wf.delete(skip_trash=True)
 
   def test_workflow(self):
     response = self.c.get(reverse('oozie:workflow', kwargs={'workflow': self.wf.pk}))
@@ -2366,7 +2366,8 @@ class TestOozieSubmissions(OozieBase):
   def test_submit_mapreduce_action(self):
     wf = Workflow.objects.get(name='MapReduce', managed=True)
     post_data = {u'form-MAX_NUM_FORMS': [u''], u'form-INITIAL_FORMS': [u'1'],
-                 u'form-0-name': [u'REDUCER_SLEEP_TIME'], u'form-0-value': [u'1'], u'form-TOTAL_FORMS': [u'1']}
+                 u'form-0-name': [u'REDUCER_SLEEP_TIME'], u'form-0-value': [u'1'],
+                 u'form-TOTAL_FORMS': [u'1']}
 
     response = self.c.post(reverse('oozie:submit_workflow', args=[wf.id]), data=post_data, follow=True)
     job = OozieServerProvider.wait_until_completion(response.context['oozie_workflow'].id)
