@@ -199,12 +199,12 @@ def _update_workflow_nodes_json(workflow, json_nodes, id_map, user):
     if node.node_type == 'subworkflow':
       try:
         node.sub_workflow = Workflow.objects.get(id=int(json_node['sub_workflow']))
-        node.save()
       except Workflow.DoesNotExist:
         raise StructuredException(code="INVALID_REQUEST_ERROR", message=_('Error saving workflow'), data={'errors': 'Chosen subworkflow does not exist.'}, error_code=400)
     elif node.node_type == 'fork' and json_node['node_type'] == 'decision':
       node.save() # Need to save in case database throws error when performing delete.
       node = node.convert_to_decision()
+    node.save()
 
     id_map[str(json_node['id'])] = node.id
 

@@ -412,54 +412,107 @@ class TestAPI(OozieMockBase):
     response = self.c.post(reverse('oozie:workflow_save', kwargs={'workflow': self.wf.pk}), data={'workflow': workflow_json}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
     assert_equal(200, response.status_code)
 
-  def test_workflow_save_subworkflow(self):
-    subworkflow_name = "subworkflow-1"
-    subworkflow_id = "subworkflow:1"
-    subworkflow_json = """{
-      "description": "",
-      "workflow": %(workflow)d,
-      "child_links": [
-        {
-          "comment": "",
-          "name": "ok",
-          "parent": "%(id)s",
-          "child": %(end)d
-        },
-        {
-          "comment": "",
-          "name": "error",
-          "parent": "%(id)s",
-          "child": %(kill)d
-        }
-      ],
-      "node_type": "subworkflow",
-      "sub_workflow": %(subworkflow)d,
-      "job_properties": "[]",
-      "name": "%(name)s",
-      "id": "%(id)s",
-      "propagate_configuration": true
-    }"""
-
+  def test_workflow_add_subworkflow_node(self):
     wf = self.create_noop_workflow()
-    subworkflow_json = subworkflow_json % {
-      'workflow': wf.id,
-      'subworkflow': self.wf.id,
-      'end': wf.end.id,
-      'kill': Kill.objects.get(workflow=wf).id,
-      'name': subworkflow_name,
-      'id': subworkflow_id
-    }
-    workflow_dict = workflow_to_dict(wf)
-    workflow_dict['nodes'].append(json.loads(subworkflow_json))
-    workflow_dict['nodes'][0]['child_links'][1]['child'] = subworkflow_id
-    del workflow_dict['nodes'][0]['child_links'][1]['id']
-    workflow_json = json.dumps(workflow_dict)
+    try:
+      subworkflow_name = "subworkflow-1"
+      subworkflow_id = "subworkflow:1"
+      subworkflow_json = """{
+        "description": "",
+        "workflow": %(workflow)d,
+        "child_links": [
+          {
+            "comment": "",
+            "name": "ok",
+            "parent": "%(id)s",
+            "child": %(end)d
+          },
+          {
+            "comment": "",
+            "name": "error",
+            "parent": "%(id)s",
+            "child": %(kill)d
+          }
+        ],
+        "node_type": "subworkflow",
+        "sub_workflow": %(subworkflow)d,
+        "job_properties": "[]",
+        "name": "%(name)s",
+        "id": "%(id)s",
+        "propagate_configuration": true
+      }"""
+      subworkflow_json = subworkflow_json % {
+        'workflow': wf.id,
+        'subworkflow': self.wf.id,
+        'end': wf.end.id,
+        'kill': Kill.objects.get(workflow=wf).id,
+        'name': subworkflow_name,
+        'id': subworkflow_id
+      }
+      workflow_dict = workflow_to_dict(wf)
+      workflow_dict['nodes'].append(json.loads(subworkflow_json))
+      workflow_dict['nodes'][0]['child_links'][1]['child'] = subworkflow_id
+      del workflow_dict['nodes'][0]['child_links'][1]['id']
+      workflow_json = json.dumps(workflow_dict)
 
-    response = self.c.post(reverse('oozie:workflow_save', kwargs={'workflow': wf.pk}), data={'workflow': workflow_json})
-    test_response_json = response.content
-    test_response_json_object = json.loads(test_response_json)
-    assert_equal(0, test_response_json_object['status'], workflow_json)
+      response = self.c.post(reverse('oozie:workflow_save', kwargs={'workflow': wf.pk}), data={'workflow': workflow_json})
+      test_response_json = response.content
+      test_response_json_object = json.loads(test_response_json)
+      assert_equal(0, test_response_json_object['status'], workflow_json)
+    finally:
+      wf.delete()
 
+
+  def test_workflow_add_mapreduce_node(self):
+    wf = self.create_noop_workflow()
+    try:
+      node_name = "mr-1"
+      node_id = "mapreduce:1"
+      node_json = """{
+        "description": "",
+        "workflow": %(workflow)d,
+        "child_links": [
+          {
+            "comment": "",
+            "name": "ok",
+            "parent": "%(id)s",
+            "child": %(end)d
+          },
+          {
+            "comment": "",
+            "name": "error",
+            "parent": "%(id)s",
+            "child": %(kill)d
+          }
+        ],
+        "node_type": "mapreduce",
+        "jar_path": "test",
+        "job_properties": "[]",
+        "files": "[]",
+        "archives": "[]",
+        "prepares": "[]",
+        "name": "%(name)s",
+        "id": "%(id)s"
+      }"""
+      node_json = node_json % {
+        'workflow': wf.id,
+        'end': wf.end.id,
+        'kill': Kill.objects.get(workflow=wf).id,
+        'name': node_name,
+        'id': node_id
+      }
+      workflow_dict = workflow_to_dict(wf)
+      workflow_dict['nodes'].append(json.loads(node_json))
+      workflow_dict['nodes'][0]['child_links'][1]['child'] = node_id
+      del workflow_dict['nodes'][0]['child_links'][1]['id']
+      workflow_json = json.dumps(workflow_dict)
+
+      response = self.c.post(reverse('oozie:workflow_save', kwargs={'workflow': wf.pk}), data={'workflow': workflow_json})
+      test_response_json = response.content
+      test_response_json_object = json.loads(test_response_json)
+      assert_equal(0, test_response_json_object['status'], workflow_json)
+    finally:
+      wf.delete()
 
   def test_workflow(self):
     response = self.c.get(reverse('oozie:workflow', kwargs={'workflow': self.wf.pk}))
