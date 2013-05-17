@@ -53,10 +53,16 @@ def get(user, query_server=None):
 def get_query_server_config(name='beeswax'):
   if name == 'impala':
     from impala.conf import SERVER_HOST, SERVER_PORT, IMPALA_PRINCIPAL, SERVER_INTERFACE as IMPALA_SERVER_INTERFACE
+    # Backward compatibility until Hue 3.0
+    # If no interface specified and port is beeswax, switch port to HS2 default as we want to use HS2 from now on
+    if IMPALA_SERVER_INTERFACE.get() == 'hiveserver2' and SERVER_PORT.get() == 21000:
+      port = 21050
+    else:
+      port = SERVER_PORT.get()
     query_server = {
         'server_name': 'impala',
         'server_host': SERVER_HOST.get(),
-        'server_port': SERVER_PORT.get(),
+        'server_port': port,
         'server_interface': IMPALA_SERVER_INTERFACE.get(),
         'principal': IMPALA_PRINCIPAL.get(),
     }
