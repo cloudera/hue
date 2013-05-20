@@ -106,14 +106,26 @@ ${layout.menubar(section='dump_config')}
                         active
                     % endif
                     ">
-                        ${recurse(v, depth + 1)}
+                    ${recurse(v, depth + 1)}
                   </div>
                 % endfor
             </div>
         </%def>
 
+        <%def name="recurseList(config_obj, depth=0)">
+          <table class="table table-striped recurse">
+          % for v in config_obj:
+              <%
+                # Don't recurse into private variables.
+                if v.config.private and not show_private:
+                  continue
+              %>
+              ${recurse(v, depth + 1)}
+          % endfor
+          </table>
+        </%def>
+
         <%def name="recurse(config_obj, depth=0)">
-            <table class="table table-striped">
             <tr>
              % if depth > 1:
               <th>
@@ -130,16 +142,8 @@ ${layout.menubar(section='dump_config')}
                   <td>
              % endif
               % if isinstance(config_obj, BoundContainer):
-                <p class="dump_config_help"><i>${config_obj.config.help or _('No help available.')}</i></p>
-
-                % for v in config_obj.get().values():
-            <%
-                  # Don't recurse into private variables.
-                  if v.config.private and not show_private:
-                    continue
-            %>
-                ${recurse(v, depth + 1)}
-                % endfor
+                  <p class="dump_config_help"><i>${config_obj.config.help or _('No help available.')}</i></p>            
+                  ${recurseList(config_obj.get().values(), depth + 1)}
               % else:
                 <p>${str(config_obj.get_raw())}</p>
                 <p class="dump_config_help"><i>${config_obj.config.help or _('No help available.')}</i></p>
@@ -147,7 +151,6 @@ ${layout.menubar(section='dump_config')}
               % endif
               </td>
             </tr>
-            </table>
         </%def>
 
 
