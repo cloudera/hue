@@ -126,6 +126,7 @@ var PigViewModel = function (props) {
   self.completedScripts = ko.observableArray([]);
 
   self.isDashboardLoaded = false;
+  self.isDirty = ko.observable(false);
 
   var _defaultScript = {
     id: -1,
@@ -208,6 +209,7 @@ var PigViewModel = function (props) {
 
   self.saveScript = function () {
     callSave(self.currentScript());
+    viewModel.isDirty(false);
   };
 
   self.runScript = function () {
@@ -216,6 +218,7 @@ var PigViewModel = function (props) {
 
   self.copyScript = function () {
     callCopy(self.currentScript());
+    viewModel.isDirty(true);
   };
 
   self.confirmDeleteScript = function () {
@@ -427,14 +430,14 @@ var PigViewModel = function (props) {
       self.currentScript(new PigScript(_defaultScript));
       $(document).trigger("loadEditor");
     }
-    $.post(self.DELETE_URL,
-        {
-          ids: ids.join(",")
-        },
-        function (data) {
-          self.updateScripts();
-          $("#deleteModal").modal("hide");
-        }, "json");
+    $.post(self.DELETE_URL, {
+      ids: ids.join(",")
+    },
+    function (data) {
+      self.updateScripts();
+      $("#deleteModal").modal("hide");
+      viewModel.isDirty(false);
+    }, "json");
   }
 
   self.viewSubmittedScript = function (workflow) {

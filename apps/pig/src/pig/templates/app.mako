@@ -160,6 +160,10 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
     </div>
 
     <div class="span10">
+      <div class="ribbon-wrapper" data-bind="visible: isDirty">
+        <div class="ribbon">${ _('Unsaved') }</div>
+      </div>
+
       <div id="edit" class="section">
         <div class="alert alert-info"><h3>${ _('Edit') } '<span data-bind="text: currentScript().name"></span>'</h3></div>
         <form id="queryForm">
@@ -607,7 +611,10 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
     });
 
     codeMirror.on("change", function () {
-      viewModel.currentScript().script(codeMirror.getValue());
+      if (viewModel.currentScript().script() != codeMirror.getValue()) {
+        viewModel.currentScript().script(codeMirror.getValue());
+        viewModel.isDirty(true);
+      }
     });
 
     showMainSection("editor");
@@ -907,6 +914,22 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
     });
 
   });
+
+  window.onbeforeunload = function (e) {
+    if (viewModel.isDirty()) {
+      var message = "${ _('You have unsaved changes in this pig script.') }";
+
+      if (!e) e = window.event;
+      e.cancelBubble = true;
+      e.returnValue = message;
+
+      if (e.stopPropagation) {
+        e.stopPropagation();
+        e.preventDefault();
+      }
+      return message;
+    }
+  };
 
   var _bottomAlertFade = -1;
   function showAlert(msg, extraClass) {
