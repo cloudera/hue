@@ -1320,6 +1320,11 @@ def test_hive_site():
         <name>hive.metastore.kerberos.principal</name>
         <value>test/test.com@TEST.COM</value>
       </property>
+
+      <property>
+        <name>hive.server2.authentication.kerberos.principal</name>
+        <value>hs2test/test.com@TEST.COM</value>
+      </property>
     </configuration>
   """
 
@@ -1343,6 +1348,7 @@ def test_hive_site():
     assert_equal(port, 9999)
     assert_equal(beeswax.hive_site.get_conf()['hive.metastore.warehouse.dir'], u'/abc')
     assert_equal(kerberos_principal, 'test/test.com@TEST.COM')
+    assert_equal(beeswax.hive_site.get_hiveserver2_kerberos_principal(), 'hs2test/test.com@TEST.COM')
   finally:
     beeswax.hive_site.reset()
     if saved is not None:

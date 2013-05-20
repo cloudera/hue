@@ -26,6 +26,7 @@ from beeswaxd.ttypes import BeeswaxException
 from desktop.conf import KERBEROS
 from filebrowser.views import location_to_url
 
+from beeswax import hive_site
 from beeswax.conf import BEESWAX_SERVER_HOST, BEESWAX_SERVER_PORT,\
   BROWSE_PARTITIONED_TABLE_LIMIT, SERVER_INTERFACE
 from beeswax.design import hql_query
@@ -67,13 +68,20 @@ def get_query_server_config(name='beeswax'):
         'principal': IMPALA_PRINCIPAL.get(),
     }
   else:
+    if SERVER_INTERFACE.get() == 'hiveserver2':
+      kerberos_principal = hive_site.get_hiveserver2_kerberos_principal()
+    else:
+      # Beeswaxd runs as 'hue'
+      kerberos_principal = KERBEROS.HUE_PRINCIPAL.get()
+
     query_server = {
         'server_name': 'beeswax',
         'server_host': BEESWAX_SERVER_HOST.get(),
         'server_port': BEESWAX_SERVER_PORT.get(),
         'server_interface': SERVER_INTERFACE.get(),
-        'principal': KERBEROS.HUE_PRINCIPAL.get()
+        'principal': kerberos_principal
     }
+    LOG.debug("Query Server:\n\tName: %(server_name)s\n\tHost: %(server_host)s\n\tPort: %(server_port)s\n\tInterface: %(server_interface)s\n\tKerberos Principal: %(principal)s" % query_server)
 
   return query_server
 
