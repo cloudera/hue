@@ -28,7 +28,7 @@
             <p><strong>${_('Your query has the following error(s):')}</strong></p>
             <p class="queryErrorMessage">${error_message}</p>
             % if log:
-                <small>${_('click the')} <b>${_('Error Log')}</b> ${_('tab below for details')}</small>
+                <small>${_('click the')} <b>${_('Error Log')}</b> ${_('tab above for details')}</small>
             % endif
         </div>
     % endif
