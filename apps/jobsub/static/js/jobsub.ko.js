@@ -279,11 +279,12 @@ var Designs = (function($, ko, NodeModelChooser) {
     var self = this;
 
     self.options = options || {
-      models: [],
+      models: []
     };
 
     self.temporary = ko.observable();
     self.inTrash = ko.observable(false);
+    self.isEditing = ko.observable(false);
     self.designs = ko.observableArray([]);
     self.trashedDesignObjects = ko.computed(function() {
       var selected = [];

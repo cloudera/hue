@@ -37,18 +37,25 @@ ${layout.menubar(section='saved queries')}
     </%def>
 
     <%def name="actions()">
-      <button id="deleteQueryBtn" class="btn toolbarBtn" title="${_('Delete forever')}" disabled="disabled">
-        <i class="icon-bolt"></i> ${_('Delete forever')}
-      </button>
-      <button id="restoreQueryBtn" class="btn toolbarBtn" title="${_('Restore from trash')}" disabled="disabled">
-        <i class="icon-cloud-upload"></i> ${_('Restore')}
-      </button>
+      <div class="btn-toolbar" style="display: inline; vertical-align: middle">
+        <button id="deleteQueryBtn" class="btn toolbarBtn" title="${_('Delete forever')}" disabled="disabled">
+          <i class="icon-bolt"></i> ${_('Delete forever')}
+        </button>
+        <button id="restoreQueryBtn" class="btn toolbarBtn" title="${_('Restore from trash')}" disabled="disabled">
+          <i class="icon-cloud-upload"></i> ${_('Restore')}
+        </button>
+      </div>
     </%def>
 
     <%def name="creation()">
-      <button id="emptyTrashBtn" class="btn" title="${_('Empty trash')}" data-bind="enabled: availableSavedQueries().length > 0">
-        <i class="icon-fire"></i> ${_('Empty')}
-      </button>
+      <div class="btn-toolbar" style="display: inline; vertical-align: middle">
+        <button id="viewQueriesBtn" class="btn" title="${_('View queries')}">
+          <i class="icon-home"></i> ${_('View queries')}
+        </button>
+        <button id="emptyTrashBtn" class="btn" title="${_('Empty trash')}" data-bind="enabled: availableSavedQueries().length > 0">
+          <i class="icon-fire"></i> ${_('Empty trash')}
+        </button>
+      </div>
     </%def>
   </%actionbar:render>
 
@@ -211,6 +218,10 @@ ${layout.menubar(section='saved queries')}
       });
 
       $("#deleteQuery").modal("show");
+    });
+
+    $("#viewQueriesBtn").click(function(){
+      history.back();
     });
 
     $("a[data-row-selector='true']").jHueRowSelector();

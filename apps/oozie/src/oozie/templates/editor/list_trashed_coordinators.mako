@@ -36,10 +36,6 @@ ${ layout.menubar(section='coordinators') }
     </%def>
 
     <%def name="actions()">
-        <a href="${ url('oozie:list_coordinators') }" id="home-btn" class="btn" title="${ _('Got to coordinator manager') }">
-          <i class="icon-home"></i> ${ _('Coordinators') }
-        </a>
-        &nbsp;&nbsp;
         <button class="btn toolbarBtn" id="restore-btn" disabled="disabled" title="${_('Restore the selected coordinators')}">
           <i class="icon-cloud-upload"></i> ${ _('Restore') }
         </button>
@@ -49,7 +45,10 @@ ${ layout.menubar(section='coordinators') }
     </%def>
 
     <%def name="creation()">
-        <button class="btn" id="purge-btn"><i class="icon-fire"></i> ${ _('Empty') }</button>
+        <a href="${ url('oozie:list_coordinators') }" id="home-btn" class="btn" title="${ _('Got to coordinator manager') }">
+          <i class="icon-home"></i> ${ _('View coordinators') }
+        </a>
+        <button class="btn" id="purge-btn"><i class="icon-fire"></i> ${ _('Empty trash') }</button>
     </%def>
   </%actionbar:render>
 

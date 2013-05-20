@@ -15,6 +15,7 @@
 ## limitations under the License.
 
 <%!
+from django.template.defaultfilters import urlencode
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
@@ -35,32 +36,47 @@ ${ commonheader(None, 'filebrowser', user) | n,unicode }
         </%def>
 
         <%def name="actions()">
+          <div class="btn-toolbar" style="display: inline; vertical-align: middle">
             <button class="btn fileToolbarBtn" title="${_('Rename')}" data-bind="visible: !inTrash(), click: renameFile, enable: selectedFiles().length == 1"><i class="icon-font"></i> ${_('Rename')}</button>
             <button class="btn fileToolbarBtn" title="${_('Move')}" data-bind="click: move, enable: selectedFiles().length > 0"><i class="icon-random"></i> ${_('Move')}</button>
             <button class="btn fileToolbarBtn" title="${_('Copy')}" data-bind="click: copy, enable: selectedFiles().length > 0"><i class="icon-retweet"></i> ${_('Copy')}</button>
             %if is_fs_superuser:
-                <button class="btn fileToolbarBtn" title="${_('Change owner / group')}" data-bind="visible: !inTrash(), click: changeOwner, enable: selectedFiles().length > 0"><i class="icon-user"></i> ${_('Change owner / group')}</button>
-            %endif
-            <button class="btn fileToolbarBtn" title="${_('Change permissions')}" data-bind="visible: !inTrash(), click: changePermissions, enable: selectedFiles().length > 0"><i class="icon-list-alt"></i> ${_('Change permissions')}</button>
-            <button class="btn fileToolbarBtn" title="${_('Download')}" data-bind="visible: !inTrash(), click: downloadFile, enable: selectedFiles().length == 1 && selectedFile().type == 'file'"><i class="icon-download-alt"></i> ${_('Download')}</button>
-            &nbsp;&nbsp;
-            <button class="btn fileToolbarBtn" title="${_('Empty trash')}" data-bind="visible: inTrash(), click: purgeTrash"><i class="icon-fire"></i> ${_('Empty')}</button>
-            <button class="btn fileToolbarBtn" title="${_('Restore from trash')}" data-bind="visible: inRestorableTrash(), click: restoreTrashSelected, enable: selectedFiles().length > 0"><i class="icon-cloud-upload"></i> ${_('Restore')}</button>
-
-            <div id="delete-dropdown" class="btn-group" style="display: inline">
-              <button href="#" class="btn delete-link dropdown-toggle" title="${_('Delete')}" data-toggle="dropdown" data-bind="visible: !inTrash(), enable: selectedFiles().length > 0">
-                <i class="icon-remove"></i> ${_('Delete')}
+            <div id="ch-dropdown" class="btn-group" style="vertical-align: middle">
+              <button href="#" class="btn dropdown-toggle" title="${_('Chown / Chmod')}" data-toggle="dropdown" data-bind="visible: !inTrash(), enable: selectedFiles().length > 0">
+                <i class="icon-remove"></i> ${_('Chmod / Chown')}
                 <span class="caret"></span>
               </button>
               <ul class="dropdown-menu" style="top: auto">
-                <li data-bind="visible: trashEnabled"><a href="#" class="delete-link" title="${_('Move to trash')}" data-bind="enable: selectedFiles().length > 0, click: trashSelected"><i class="icon-trash"></i> ${_('Move to trash')}</a></li>
-                <li><a href="#" class="delete-link" title="${_('Delete forever')}" data-bind="enable: selectedFiles().length > 0, click: deleteSelected"><i class="icon-bolt"></i> ${_('Delete forever')}</a></li>
+                <li><a href="#" title="${_('Change owner / group')}" data-bind="visible: !inTrash(), click: changeOwner, enable: selectedFiles().length > 0"><i class="icon-user"></i> ${_('Change owner / group')}</a></li>
+                <li><a href="#" title="${_('Change permissions')}" data-bind="visible: !inTrash(), click: changePermissions, enable: selectedFiles().length > 0"><i class="icon-list-alt"></i> ${_('Change permissions')}</a></li>
               </ul>
             </div>
+            %else:
+              <button class="btn fileToolbarBtn" title="${_('Change permissions')}" data-bind="visible: !inTrash(), click: changePermissions, enable: selectedFiles().length > 0"><i class="icon-list-alt"></i> ${_('Change permissions')}</button>
+            %endif
+            <button class="btn fileToolbarBtn" title="${_('Download')}" data-bind="visible: !inTrash(), click: downloadFile, enable: selectedFiles().length == 1 && selectedFile().type == 'file'"><i class="icon-download-alt"></i> ${_('Download')}</button>
+            <button class="btn fileToolbarBtn" title="${_('Restore from trash')}" data-bind="visible: inRestorableTrash(), click: restoreTrashSelected, enable: selectedFiles().length > 0"><i class="icon-cloud-upload"></i> ${_('Restore')}</button>
+            <!-- ko ifnot: inTrash -->
+              <div id="delete-dropdown" class="btn-group" style="vertical-align: middle">
+                <button id="trash-btn" class="btn toolbarBtn" data-bind="enable: selectedFiles().length > 0, click: trashSelected"><i class="icon-remove"></i> ${_('Move to trash')}</button>
+                <button id="trash-btn-caret" class="btn toolbarBtn dropdown-toggle" data-toggle="dropdown" data-bind="enable: selectedFiles().length > 0">
+                  <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                  <li><a href="#" class="delete-link" title="${_('Delete forever')}" data-bind="enable: selectedFiles().length > 0, click: deleteSelected"><i class="icon-bolt"></i> ${_('Delete forever')}</a></li>
+                </ul>
+              </div>
+            <!-- /ko -->
+            <!-- ko ifnot: trashEnabled -->
+            <button class="btn fileToolbarBtn delete-link" title="${_('Delete forever')}" data-bind="enable: selectedFiles().length > 0, click: deleteSelected"><i class="icon-bolt"></i> ${_('Delete forever')}</button>
+            <!-- /ko -->
+          </div>
         </%def>
 
         <%def name="creation()">
-            <div id="upload-dropdown" class="btn-group pull-right" style="display: inline-block; margin-top:0">
+          <button class="btn fileToolbarBtn" title="${_('Empty trash')}" data-bind="visible: inTrash(), click: purgeTrash"><i class="icon-fire"></i> ${_('Empty trash')}</button>
+          <div class="btn-toolbar" style="display: inline; vertical-align: middle">
+            <div id="upload-dropdown" class="btn-group" style="vertical-align: middle">
               <a href="#" class="btn upload-link dropdown-toggle" title="${_('Upload')}" data-toggle="dropdown" data-bind="visible: !inTrash()">
                 <i class="icon-upload"></i> ${_('Upload')}
                 <span class="caret"></span>
@@ -70,7 +86,7 @@ ${ commonheader(None, 'filebrowser', user) | n,unicode }
                 <li><a href="#" class="upload-link" title="${_('Archive')}" data-bind="click: uploadArchive"><i class="icon-gift"></i> ${_('Zip file')}</a></li>
               </ul>
             </div>
-            <div class="btn-group" style="display: inline">
+            <div class="btn-group" style="vertical-align: middle">
               <a href="#" data-toggle="dropdown" class="btn dropdown-toggle" data-bind="visible: !inTrash()">
                 <i class="icon-plus-sign"></i> ${_('New')}
                 <span class="caret"></span>
@@ -80,6 +96,7 @@ ${ commonheader(None, 'filebrowser', user) | n,unicode }
                 <li><a href="#" class="create-directory-link" title="${_('Directory')}"><i class="icon-folder-close"></i> ${_('Directory')}</a></li>
               </ul>
             </div>
+          </div>
         </%def>
     </%actionbar:render>
     </div>

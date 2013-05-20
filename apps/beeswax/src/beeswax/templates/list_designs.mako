@@ -37,25 +37,28 @@ ${layout.menubar(section='saved queries')}
     </%def>
 
     <%def name="actions()">
-      <button id="editBtn" class="btn toolbarBtn" title="${_('Edit the selected query')}" disabled="disabled"><i class="icon-edit"></i> ${_('Edit')}</button>
-      <button id="cloneBtn" class="btn toolbarBtn" title="${_('Copy the selected query')}" disabled="disabled"><i class="icon-retweet"></i> ${_('Copy')}</button>
-      <button id="historyBtn" class="btn toolbarBtn" title="${_('View the usage history of the selected query')}" disabled="disabled"><i class="icon-tasks"></i> ${_('Usage history')}</button>
+      <div class="btn-toolbar" style="display: inline; vertical-align: middle">
+        <button id="editBtn" class="btn toolbarBtn" title="${_('Edit the selected query')}" disabled="disabled"><i class="icon-edit"></i> ${_('Edit')}</button>
+        <button id="cloneBtn" class="btn toolbarBtn" title="${_('Copy the selected query')}" disabled="disabled"><i class="icon-retweet"></i> ${_('Copy')}</button>
+        <button id="historyBtn" class="btn toolbarBtn" title="${_('View the usage history of the selected query')}" disabled="disabled"><i class="icon-tasks"></i> ${_('Usage history')}</button>
 
-      <div id="delete-dropdown" class="btn-group" style="display: inline">
-        <button href="#" class="btn dropdown-toggle" title="${_('Delete selected queries')}" data-toggle="dropdown" disabled="disabled">
-          <i class="icon-remove"></i> ${_('Delete')}
-          <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu" style="top: auto">
-          <li><a href="#" id="trashQueryBtn" title="${_('Move to trash')}"><i class="icon-trash"></i> ${_('Move to trash')}</a></li>
-          <li><a href="#" id="deleteQueryBtn" title="${_('Delete forever')}"><i class="icon-bolt"></i> ${_('Delete forever')}</a></li>
-        </ul>
+        <div id="delete-dropdown" class="btn-group" style="vertical-align: middle">
+          <button id="trashQueryBtn" class="btn toolbarBtn" disabled="disabled"><i class="icon-remove"></i> ${_('Move to trash')}</button>
+          <button id="trashQueryCaretBtn" class="btn toolbarBtn dropdown-toggle" data-toggle="dropdown" disabled="disabled">
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu">
+            <li><a href="#" id="deleteQueryBtn" title="${_('Delete forever')}"><i class="icon-bolt"></i> ${_('Delete forever')}</a></li>
+          </ul>
+        </div>
       </div>
     </%def>
 
     <%def name="creation()">
-      <a class="btn" href="${ url(app_name + ':execute_query') }" title="${_('Create new query')}"><i class="icon-plus-sign"></i> ${_('New query')}</a>
-      <a class="btn" href="${ url(app_name + ':list_trashed_designs') }" title="${_('Go to the trash')}"><i class="icon-trash"></i> ${_('Trash')}</a>
+      <div class="btn-toolbar" style="display: inline; vertical-align: middle">
+        <a class="btn" href="${ url(app_name + ':list_trashed_designs') }" title="${_('Go to the trash')}"><i class="icon-trash"></i> ${_('View trash')}</a>
+        <a class="btn" href="${ url(app_name + ':execute_query') }" title="${_('Create new query')}"><i class="icon-plus-sign"></i> ${_('New query')}</a>
+      </div>
     </%def>
   </%actionbar:render>
 
@@ -184,7 +187,6 @@ ${layout.menubar(section='saved queries')}
 
     function toggleActions() {
       $(".toolbarBtn").attr("disabled", "disabled");
-      $(".btn.dropdown-toggle").attr("disabled", "disabled");
 
       var selector = $(".hueCheckbox[checked='checked']");
       if (selector.length == 1) {
@@ -205,7 +207,8 @@ ${layout.menubar(section='saved queries')}
         }
       }
       if (selector.length >= 1) {
-        $(".btn.dropdown-toggle").removeAttr("disabled");
+        $("#trashQueryBtn").removeAttr("disabled");
+        $("#trashQueryCaretBtn").removeAttr("disabled");
       }
     }
 

@@ -44,13 +44,12 @@ ${ layout.menubar(section='coordinators') }
       <div class="btn-toolbar" style="display: inline; vertical-align: middle">
         <button class="btn toolbarBtn" id="submit-btn" disabled="disabled"><i class="icon-play"></i> ${ _('Submit') }</button>
         <button class="btn toolbarBtn" id="clone-btn" disabled="disabled"><i class="icon-retweet"></i> ${ _('Copy') }</button>
-        <div id="delete-dropdown" class="btn-group" style="vertical-align: middle;">
-          <button id="delete-btn" class="btn toolbarBtn dropdown-toggle" title="${_('Delete')}" data-toggle="dropdown" disabled="disabled">
-            <i class="icon-remove"></i> ${_('Delete')}
+        <div id="delete-dropdown" class="btn-group" style="vertical-align: middle">
+          <button id="trash-btn" class="btn toolbarBtn" disabled="disabled"><i class="icon-remove"></i> ${_('Move to trash')}</button>
+          <button id="trash-btn-caret" class="btn toolbarBtn dropdown-toggle" data-toggle="dropdown" disabled="disabled">
             <span class="caret"></span>
           </button>
-          <ul class="dropdown-menu" style="top: auto">
-            <li><a href="javascript:void(0);" id="trash-btn" title="${_('Move to trash')}"><i class="icon-trash"></i> ${_('Move to trash')}</a></li>
+          <ul class="dropdown-menu">
             <li><a href="javascript:void(0);" id="destroy-btn" title="${_('Delete forever')}"><i class="icon-bolt"></i> ${_('Delete forever')}</a></li>
           </ul>
         </div>
@@ -58,9 +57,9 @@ ${ layout.menubar(section='coordinators') }
     </%def>
 
     <%def name="creation()">
-      <a href="${ url('oozie:create_coordinator') }" class="btn"><i class="icon-plus-sign"></i> ${ _('Create') }</a>
+      <a href="${ url('oozie:list_trashed_coordinators') }" class="btn"><i class="icon-trash"></i> ${ _('View trash') }</a>
       &nbsp;&nbsp;
-      <a href="${ url('oozie:list_trashed_coordinators') }" class="btn"><i class="icon-trash"></i> ${ _('Trash') }</a>
+      <a href="${ url('oozie:create_coordinator') }" class="btn"><i class="icon-plus-sign"></i> ${ _('Create') }</a>
     </%def>
   </%actionbar:render>
 
@@ -203,7 +202,8 @@ ${ layout.menubar(section='coordinators') }
       }
       var can_delete = $(".hueCheckbox[checked='checked'][data-delete-id]");
       if (can_delete.length >= 1 && can_delete.length == selector.length) {
-        $("#delete-btn").removeAttr("disabled");
+        $("#trash-btn").removeAttr("disabled");
+        $("#trash-btn-caret").removeAttr("disabled");
       }
     }
 

@@ -36,10 +36,6 @@ ${ layout.menubar(section='workflows') }
     </%def>
 
     <%def name="actions()">
-      <a href="${ url('oozie:list_workflows') }" id="home-btn" class="btn" title="${ _('Got to workflow manager') }">
-        <i class="icon-home"></i> ${ _('Workflows') }
-      </a>
-      &nbsp;&nbsp;
       <button type="button" id="restore-btn" class="btn" title="${ _('Restore the selected workflows') }">
         <i class="icon-cloud-upload"></i> ${ _('Restore') }
       </button>
@@ -49,8 +45,11 @@ ${ layout.menubar(section='workflows') }
     </%def>
 
     <%def name="creation()">
+      <a href="${ url('oozie:list_workflows') }" id="home-btn" class="btn" title="${ _('Go to workflow manager') }">
+        <i class="icon-home"></i> ${ _('View workflows') }
+      </a>
       <button type="button" id="purge-btn" class="btn" title="${ _('Delete all the workflows') }">
-        <i class="icon-fire"></i> ${ _('Empty') }
+        <i class="icon-fire"></i> ${ _('Empty trash') }
       </button>
     </%def>
   </%actionbar:render>

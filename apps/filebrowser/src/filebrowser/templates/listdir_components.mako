@@ -45,10 +45,6 @@ from django.utils.translation import ugettext as _
         box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
       }
 
-      .pull-right {
-        margin: 4px;
-      }
-
       .sortable {
         cursor: pointer;
       }
@@ -91,15 +87,6 @@ from django.utils.translation import ugettext as _
       .pagination ul {
         margin-bottom: 10px;
         margin-right: 20px;
-      }
-
-      .btn-group {
-        font-size: 14px;
-        vertical-align: baseline;
-      }
-
-      #delete-dropdown {
-        margin-left: -11px;
       }
 
       .actionbar {
