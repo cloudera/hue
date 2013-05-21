@@ -1,338 +1,765 @@
-<h1><a name="UserAdmin-IntroducingUserAdmin"></a>Introducing User Admin</h1>
-
-<p>The User Admin application lets an administrator add, delete, and manage Hue user accounts and groups, and configure group permissions. The permissions allow users, based on their group membership, to launch Hue applications and use application features.  You can add users and groups individually, or import them from an LDAP directory.</p>
-
-
-
-<h2><a name="UserAdmin-Contents"></a>Contents</h2>
-
-<style type='text/css'>/*<![CDATA[*/
-div.rbtoc1355772985424 {margin-left: 1.5em;padding: 0px;}
-div.rbtoc1355772985424 ul {margin-left: 0px;padding-left: 20px;}
-div.rbtoc1355772985424 li {margin-left: 0px;padding-left: 0px;}
-
-/*]]>*/</style><div class='rbtoc1355772985424'>
-<ul>
-    <li><a href='#UserAdmin-IntroducingUserAdmin'>Introducing User Admin</a></li>
-    <li><a href='#UserAdmin-StartingUserAdmin'>Starting User Admin</a></li>
-    <li><a href='#UserAdmin-WorkingwithUserAccounts'>Working with User Accounts</a></li>
-<ul>
-    <li><a href='#UserAdmin-AddingaUserAccount'>Adding a User Account</a></li>
-    <li><a href='#UserAdmin-DeletingaUserAccount'>Deleting a User Account</a></li>
-    <li><a href='#UserAdmin-EditingaUserAccount'>Editing a User Account</a></li>
-    <li><a href='#UserAdmin-ImportingUsersfromanLDAPDirectory'>Importing Users from an LDAP Directory</a></li>
-    <li><a href='#UserAdmin-SyncingUsersandGroupswithanLDAPdirectory'>Syncing Users and Groups with an LDAP directory</a></li>
-</ul>
-    <li><a href='#UserAdmin-WorkingwithGroups'>Working with Groups</a></li>
-<ul>
-    <li><a href='#UserAdmin-AddingaGroup'>Adding a Group</a></li>
-    <li><a href='#UserAdmin-AddingUserstoaGroup'>Adding Users to a Group</a></li>
-    <li><a href='#UserAdmin-DeletingaGroup'>Deleting a Group</a></li>
-    <li><a href='#UserAdmin-EditingaGroup'>Editing a Group</a></li>
-    <li><a href='#UserAdmin-ImportingGroupsfromanLDAPDirectory'>Importing Groups from an LDAP Directory</a></li>
-</ul>
-    <li><a href='#UserAdmin-ManagingApplicationPermissions'>Managing Application Permissions</a></li>
-</ul></div>
-<p><br class="atl-forced-newline" /></p>
-
-<h1><a name="UserAdmin-StartingUserAdmin"></a>Starting User Admin</h1>
-
-<p><b>To start User Admin:</b></p>
-
-<ul>
-	<li>Click the <b>User Admin</b> icon ( <span class="image-wrap" style=""><img src="/useradmin/static/help/images/23888159.png" width="30" style="border: 0px solid black"/></span> ) in the navigation bar at the top of the Hue browser page.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" /></li>
-</ul>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<link rel="stylesheet" type="text/css" href="commonltr.css"/>
+<title>User Admin</title>
+</head>
+<body id="topic_11"><a name="topic_11"><!-- --></a>
 
 
-<h1><a name="UserAdmin-WorkingwithUserAccounts"></a>Working with User Accounts</h1>
 
-<p>The Hue User Admin application provides two levels of user privileges: superusers and users.</p>
-<ul>
-	<li>Superusers &#8212; The first user who logs into Hue after its initial installation becomes the first superuser. Superusers have permissions to perform administrative functions:
-	<ul>
-		<li>add and delete users</li>
-		<li>add and delete groups</li>
-		<li>assign permissions to groups</li>
-		<li>change a user into a superuser</li>
-		<li>import users and groups from an LDAP server</li>
-	</ul>
-	</li>
-	<li>Users &#8212; can change their name, e-mail address, and password and log in to Hue and run Hue applications, subject to the permissions provided by the Hue groups to which they belong.</li>
-</ul>
+  <h1 class="title topictitle1">User Admin </h1>
 
 
-<h2><a name="UserAdmin-AddingaUserAccount"></a>Adding a User Account</h2>
+  <div class="body conbody">
 
-<p><b>To add a user account:</b>
-<br class="atl-forced-newline" /></p>
-<ol>
-	<li>In the <b>User Admin</b> page, click <b>Add User</b>.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" /></li>
-	<li>In the <b>Add User</b> dialog box, add information about the user.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" />
-The following table describes the options in the <b>Add User</b> dialog box.
+    <p class="p">The User Admin application lets a superuser add, delete, and manage Hue
+      users and groups, and configure group permissions. Superusers can add users and groups
+      individually, or import them from an LDAP directory. Group permissions define the Hue
+      applications visible to group members when they log into Hue and the application features
+      available to them.  </p>
 
-<style type="text/css">
-td.confluenceTd {
-border: #dddddd solid 1px;
-height: 36px;
-padding: 5px 10px;
-vertical-align: top;
-}
-th.confluenceTh {
-border: #dddddd solid 1px;
-height: 40px;
-padding: 5px 10px;
-vertical-align: center;
-}
-</style>
 
-<div class='table-wrap'>
-<table class='confluenceTable'><tbody>
-<tr>
-<th class='confluenceTh'> <b>User Account Option</b> </th>
-<th class='confluenceTh'> <b>Description</b> </th>
-</tr>
-<tr>
-<td class='confluenceTd'> <b>Username</b> </td>
-<td class='confluenceTd'> A user name that contains only letters, numbers, and underscores; blank spaces are not allowed and the name cannot begin with a number. The user name is used to log into Hue and in file permissions and job submissions. This is a required field. </td>
-</tr>
-<tr>
-<td class='confluenceTd'> <b>Password</b> and <b>Password confirmation</b></td>
-<td class='confluenceTd'> A password for the user. This is a required field. </td>
-</tr>
-<tr>
-<td class='confluenceTd'> <b>First name</b> and <b>Last name</b> </td>
-<td class='confluenceTd'> The user's first and last name. </td>
-</tr>
-<tr>
-<td class='confluenceTd'> <b>E-mail address</b> </td>
-<td class='confluenceTd'> The user's e-mail address. The e-mail address is used by the Job Designer and Beeswax applications to send users an e-mail message after certain actions have occurred. The Job Designer sends an e-mail message after a user's job has completed. Beeswax sends a message after a query has completed. If an e-mail address is not specified, the application will not attempt to email the user. </td>
-</tr>
-<tr>
-<td class='confluenceTd'> <b>Groups</b> </td>
-<td class='confluenceTd'> The groups to which the user belongs. By default, a user is assigned to the <b>default</b> group, which allows access to all applications. See <a href="#UserAdmin-AssigningPermissions">Assigning Permissions</a>.</td>
-</tr>
-<tr>
-<td class='confluenceTd'> <b>Active</b> </td>
-<td class='confluenceTd'> Indicate that the user account is enabled and the user is allowed to log in. </td>
-</tr>
-<tr>
-<td class='confluenceTd'> <b>Create home directory</b> </td>
-<td class='confluenceTd'> Create a directory named /user/&lt;Username&gt; in HDFS. For non-superusers, the user and group of the directory are &lt;Username&gt;. For superusers, the user and group are &lt;Username&gt; and supergroup. </td>
-</tr>
-<tr>
-<td class='confluenceTd'> <b>Superuser&nbsp;status</b> </td>
-<td class='confluenceTd'> Assign superuser privileges to the user. </td>
-</tr>
-</tbody></table>
+  </div>
+
+
+  <div class="topic concept nested1" xml:lang="en-US" lang="en-US" id="topic_11_1"><a name="topic_11_1"><!-- --></a>
+
+    <h2 class="title topictitle2">Starting User Admin</h2>
+
+
+    <div class="body conbody">
+
+      <p class="p">Click the <strong class="ph b">User Admin</strong> icon (<a name="topic_11_1__image_exr_mp5_wj"><!-- --></a><img class="image" id="topic_11_1__image_exr_mp5_wj" src="/static/art/help/icon_useradmin_24.png"/>) in the navigation bar at the top of the Hue browser page. The Hue
+        Users page opens. </p>
+
+
+    </div>
+
+
+  </div>
+
+
+  <div class="topic concept nested1" xml:lang="en-US" lang="en-US" id="topic_11_2"><a name="topic_11_2"><!-- --></a>
+
+    <h2 class="title topictitle2">Users</h2>
+
+
+    <div class="body conbody">
+
+      <p class="p">The User Admin application provides two levels of user privileges:
+        superusers and users. </p>
+
+
+      <ul class="ul">
+
+        <li class="li">Superusers — The first user who logs into Hue after its initial
+          installation becomes the first superuser. Superusers have permissions to perform
+          administrative functions:<ul class="ul">
+            <li class="li">Add and delete users</li>
+
+            <li class="li">Add and delete groups</li>
+
+            <li class="li">Assign permissions to groups</li>
+
+            <li class="li">Change a user into a superuser</li>
+
+            <li class="li">Import users and groups from an LDAP server</li>
+
+          </ul>
+</li>
+
+
+        <li class="li">Users — can change their name, e-mail address, and password and log in to Hue
+					and run Hue applications, subject to the permissions provided by the Hue groups
+					to which they belong.</li>
+
+
+      </ul>
+
+
+    </div>
+
+
+    <div class="topic concept nested2" xml:lang="en-US" lang="en-US" id="topic_11_2_1"><a name="topic_11_2_1"><!-- --></a>
+
+      <h3 class="title topictitle3">Adding a User</h3>
+
+
+      <div class="body conbody">
+
+        <ol class="ol">
+
+          <li class="li">In the <strong class="ph b">User Admin</strong> page, click <strong class="ph b">Add User</strong>. </li>
+
+
+          <li class="li">In the <strong class="ph b">Credentials</strong> screen, add
+            required information about the user. Once you provide the required information you can
+            click the wizard step tabs to set other information.
+<div class="tablenoborder"><table cellpadding="4" cellspacing="0" summary="" class="table" frame="hsides" border="1" rules="all">
+                
+                
+                <tbody class="tbody">
+                  <tr class="row">
+                    <td class="entry" valign="top" width="25%">
+                      <p class="p"><strong class="ph b">Username</strong>
+                      </p>
+
+                    </td>
+
+                    <td class="entry" valign="top" width="75%">
+                      <p class="p">A user name that contains only letters, numbers, and
+                        underscores; blank spaces are not allowed and the name cannot begin with a
+                        number. The user name is used to log into Hue and in file permissions and
+                        job submissions. This is a required field. </p>
+
+                    </td>
+
+                  </tr>
+
+                  <tr class="row">
+                    <td class="entry" valign="top" width="25%">
+                      <p class="p"><strong class="ph b">Password</strong> and <strong class="ph b">Password confirmation</strong>
+                      </p>
+
+                    </td>
+
+                    <td class="entry" valign="top" width="75%">
+                      <p class="p">A password for the user. This is a required field. </p>
+
+                    </td>
+
+                  </tr>
+
+                  <tr class="row">
+                    <td class="entry" valign="top" width="25%">
+                      <p class="p"><strong class="ph b">Create home directory</strong>
+                      </p>
+
+                    </td>
+
+                    <td class="entry" valign="top" width="75%">
+                      <p class="p" id="topic_11_2_1__p_rll_r1q_2k"><a name="topic_11_2_1__p_rll_r1q_2k"><!-- --></a>Indicate whether <span class="ph" id="topic_11_2_1__homeDir"><a name="topic_11_2_1__homeDir"><!-- --></a>to
+                          create a directory named
+                            <span class="ph filepath">/user/</span><var class="keyword varname">username</var> in HDFS. For
+                          non-superusers, the user and group of the directory are
+                            <var class="keyword varname">username</var>. For superusers, the user and group are
+                            <var class="keyword varname">username</var> and supergroup.</span>
+                      </p>
+
+                    </td>
+
+                  </tr>
+
+                </tbody>
+
+              </table>
 </div>
-
-<p><br class="atl-forced-newline" /></p></li>
-	<li>Click <b>Save</b> to save the information you specified and close the <b>Add User</b> dialog box.</li>
-</ol>
+</li>
 
 
-<h2><a name="UserAdmin-DeletingaUserAccount"></a>Deleting a User Account</h2>
+          <li class="li">Click <strong class="ph b">Add User</strong> to save the
+            information you specified and close the <strong class="ph b">Add User</strong>
+            wizard or click <strong class="ph b">Next</strong>.</li>
 
-<p><b>To delete a user account:</b>
-<br class="atl-forced-newline" /></p>
-<ol>
-	<li>Select <b>Delete</b> in the row with the user name.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" /></li>
-	<li>Click <b>Ok</b> to confirm.
-<br class="atl-forced-newline" /></li>
-</ol>
+          <li class="li">In the <strong class="ph b">Names and Groups</strong> screen, add optional
+            information. 
+<div class="tablenoborder"><a name="topic_11_2_1__table_slr_xzp_2k"><!-- --></a><table cellpadding="4" cellspacing="0" summary="" id="topic_11_2_1__table_slr_xzp_2k" class="table" frame="hsides" border="1" rules="all">
+                
+                
+                <tbody class="tbody">
+                  <tr class="row">
+                    <td class="entry" valign="top" width="25%">
+                      <p class="p"><strong class="ph b">First name</strong> and <strong class="ph b">Last name</strong>
+                      </p>
 
+                    </td>
 
-<h2><a name="UserAdmin-EditingaUserAccount"></a>Editing a User Account</h2>
+                    <td class="entry" valign="top" width="75%">
+                      <p class="p">The user's first and last name. </p>
 
-<p><b>To edit a user account:</b>
-<br class="atl-forced-newline" /></p>
-<ol>
-	<li>Double-click the user account you want to edit in the <b>Hue Users</b> list, or Select <b>Edit</b> in the row with the user name.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" /></li>
-	<li>Make the changes to the user account and then click <b>Save</b>.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" /></li>
-</ol>
+                    </td>
 
+                  </tr>
 
-<h2><a name="UserAdmin-ImportingUsersfromanLDAPDirectory"></a>Importing Users from an LDAP Directory</h2>
+                  <tr class="row">
+                    <td class="entry" valign="top" width="25%">
+                      <p class="p"><strong class="ph b">E-mail address</strong>
+                      </p>
 
-<p>Hue must be configured to use an external LDAP directory (OpenLDAP or Active Directory).  See <a href="https://ccp.cloudera.com/display/CDH4DOC/Hue+Installation">Hue Installation</a>.</p>
+                    </td>
 
-<div class='panelMacro'><table class='noteMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="/static/art/help/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td><b>Note</b><br />Importing users from an LDAP directory does not import any password information.  You must add passwords manually in order for a user to log in.</td></tr></table></div>
+                    <td class="entry" valign="top" width="75%">
+                      <p class="p">The user's e-mail address. The e-mail address is used by
+                        the Job Designer and Beeswax applications to send users an e-mail message
+                        after certain actions have occurred. The Job Designer sends an e-mail
+                        message after a job has completed. Beeswax sends a message after a query has
+                        completed. If an e-mail address is not specified, the application will not
+                        attempt to email the user. </p>
 
-<p>To add a user from an external LDAP directory:</p>
+                    </td>
 
-<ol>
-	<li>Click <b>Add/sync LDAP user</b>.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" /></li>
-	<li>In the <b>Add or Sync a LDAP user</b> dialog, type the user name in the <b>Username</b> field.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" />
-	<ul>
-		<li>Check the <b>Distinguished Name</b> checkbox to use a full distinguished name for the user.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" />
-This imports the user's first and last name, username, and email, but does not store the user password.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" /></li>
-		<li>If the user already exists in the User Admin, this will sync the user information in User Admin with what is currently in the LDAP directory.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" /></li>
-	</ul>
-	</li>
-</ol>
+                  </tr>
 
+                  <tr class="row">
+                    <td class="entry" valign="top" width="25%">
+                      <p class="p"><strong class="ph b">Groups</strong>
+                      </p>
 
-<h2><a name="UserAdmin-SyncingUsersandGroupswithanLDAPdirectory"></a>Syncing Users and Groups with an LDAP directory</h2>
+                    </td>
 
-<p>You can sync the Hue user database with the current state of the LDAP directory using the <b>Sync LDAP users/groups</b> function.  This will update the user/group information for the already imported users and groups. It does not import any new users or groups.</p>
-<ol>
-	<li>Click <b>Sync LDAP users/groups</b>.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" /></li>
-	<li>In the <b>Sync LDAP users and groups</b> dialog, click <b>Sync</b> to perform the sync.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" /></li>
-</ol>
+                    <td class="entry" valign="top" width="75%">
+                      <p class="p">The groups to which the user belongs. By default, a user
+                        is assigned to the <strong class="ph b">default</strong> group, which
+                        allows access to all applications. See <a class="xref" href="#topic_11_4">Managing
+                          Application Permissions</a>. </p>
 
+                    </td>
 
+                  </tr>
 
-<h1><a name="UserAdmin-WorkingwithGroups"></a>Working with Groups</h1>
+                </tbody>
 
-<p>Superusers can add groups, delete the groups they have created, configure group permissions, and assign users to group memberships.</p>
+              </table>
+</div>
+</li>
 
-<h2><a name="UserAdmin-AddingaGroup"></a>Adding a Group</h2>
+          <li class="li">Click <strong class="ph b">Add User</strong> to save the
+            information you specified and close the <strong class="ph b">Add User</strong>
+            wizard or click <strong class="ph b">Next</strong>.</li>
 
-<p>You can add groups, and delete the groups you've added. You can also import groups from an LDAP directory.</p>
+          <li class="li">In the <strong class="ph b">Advanced</strong> screen, add status information.
+<div class="tablenoborder"><a name="topic_11_2_1__table_wqj_d1q_2k"><!-- --></a><table cellpadding="4" cellspacing="0" summary="" id="topic_11_2_1__table_wqj_d1q_2k" class="table" frame="hsides" border="1" rules="all">
+                
+                
+                <tbody class="tbody">
+                  <tr class="row">
+                    <td class="entry" valign="top" width="25%">
+                      <p class="p"><strong class="ph b">Active</strong>
+                      </p>
 
-<p><b>To add a group:</b>
-<br class="atl-forced-newline" /></p>
-<ol>
-	<li>In the <b>User Admin</b> window, click <b>Groups</b> and then click <b>Add Group</b>.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" /></li>
-	<li>In the <b>Add Group</b> dialog box, specify a name for the group. Group names can only be letters, numbers, and underscores; blank spaces are not allowed.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" /></li>
-	<li>To add users to the group, check the names in the list provided or check <b>Select All</b>.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" /></li>
-	<li>Click <b>Save</b> to save the information you specified and close the <b>Add Group</b> dialog box.</li>
-</ol>
+                    </td>
 
+                    <td class="entry" valign="top" width="75%">
+                      <p class="p">Indicate that the user is enabled and allowed to log in. </p>
 
-<h2><a name="UserAdmin-AddingUserstoaGroup"></a>Adding Users to a Group</h2>
+                      <p class="p">Default: checked.</p>
 
-<ol>
-	<li>In the <b>User Admin</b> window, click <b>Groups</b>.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" /></li>
-	<li>In the <b>Groups</b> list, click the <b>Edit</b> button.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" /></li>
-	<li>To add users to the group, check the names in the list provided or check <b>Select All</b>.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" /></li>
-</ol>
+                    </td>
 
+                  </tr>
 
+                  <tr class="row">
+                    <td class="entry" valign="top" width="25%">
+                      <p class="p"><strong class="ph b">Superuser status</strong>
+                      </p>
 
-<h2><a name="UserAdmin-DeletingaGroup"></a>Deleting a Group</h2>
+                    </td>
 
-<p><b>To delete a group:</b>
-<br class="atl-forced-newline" /></p>
-<ol>
-	<li>Click <b>Groups</b> to view the <b>Groups</b> list.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" /></li>
-	<li>Click the <b>Delete</b> button to the right of the group you want to delete.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" /></li>
-	<li>Click <b>Yes</b> to confirm.
-<br class="atl-forced-newline" /></li>
-</ol>
+                    <td class="entry" valign="top" width="75%">
+                      <p class="p">Assign superuser privileges to the user. </p>
+
+                    </td>
+
+                  </tr>
+
+                </tbody>
+
+              </table>
+</div>
+</li>
+
+          <li class="li">Click <strong class="ph b">Add User</strong> to save the
+            information you specified and close the <strong class="ph b">Add User</strong>
+            wizard.</li>
 
 
-<h2><a name="UserAdmin-EditingaGroup"></a>Editing a Group</h2>
-
-<p>You can add and remove users, and create subgroups for groups created manually in Authorization Manager.</p>
-
-<p><b>To edit a group:</b>
-<br class="atl-forced-newline" /></p>
-<ol>
-	<li>Click <b>Groups</b> to view the <b>Groups</b> list.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" /></li>
-	<li>Click the <b>Edit</b> button to the right of the group you want to modify.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" /></li>
-	<li>Make the changes for the group and then click <b>Save</b>.
-<br class="atl-forced-newline" /></li>
-</ol>
+        </ol>
 
 
-<h2><a name="UserAdmin-ImportingGroupsfromanLDAPDirectory"></a>Importing Groups from an LDAP Directory</h2>
-
-<p><b>To add a group from an external LDAP directory:</b></p>
-
-<ol>
-	<li>From the <b>Groups</b> tab, click <b>Add/sync LDAP group</b>.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" /></li>
-	<li>In the <b>Add or Sync a LDAP group</b> dialog, type the group name in the <b>Name</b> field.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" />
-	<ul>
-		<li>Check the <b>Distinguished Name</b> checkbox to use a full distinguished name. <br class="atl-forced-newline" />
-<br class="atl-forced-newline" /></li>
-		<li>Check <b>Import new members</b> to also import the members of the group. or the group.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" /></li>
-	</ul>
-	</li>
-</ol>
+      </div>
 
 
-<h1><a name="UserAdmin-ManagingApplicationPermissions"></a>Managing Application Permissions</h1>
-
-<p>Permissions for Hue applications are granted to groups, with users gaining permissions based on their group membership. Superusers can assign or remove permissions from groups, including groups imported from LDAP.</p>
-
-<p><a name="UserAdmin-AssigningPermissions"></a></p>
-
-<p>Group permissions define the applications within Hue that group members are allowed to launch, and the features they can use.</p>
-
-<p><b>To assign or change Hue application permissions:</b></p>
-
-<ol>
-	<li>Click <b>Permissions</b>.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" /></li>
-	<li>Click the <b>Edit</b> button next to the application for which you want to assign permissions.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" /></li>
-	<li>Select the Groups you want to have permission for the application.  You can check <b>Select All</b> to select all groups.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" /></li>
-	<li>Click <b>Save</b>.<br/>
-The new groups will appear in the Groups column in the <b>Hue Permissions</b> list.</li>
-</ol>
+    </div>
 
 
-				    					    <br/>
-                        </td>
-		    </tr>
-	    </table>
-	    
-    </body>
+    <div class="topic concept nested2" xml:lang="en-US" lang="en-US" id="topic_11_2_2"><a name="topic_11_2_2"><!-- --></a>
+
+      <h3 class="title topictitle3">Deleting a User</h3>
+
+
+      <div class="body conbody">
+
+        <ol class="ol">
+
+          <li class="li">Check the checkbox next to the user name and click <strong class="ph b">Delete</strong>.</li>
+
+
+          <li class="li">Click <strong class="ph b">Yes</strong> to confirm.</li>
+
+
+        </ol>
+
+
+      </div>
+
+
+    </div>
+
+
+    <div class="topic concept nested2" xml:lang="en-US" lang="en-US" id="topic_11_2_3"><a name="topic_11_2_3"><!-- --></a>
+
+      <h3 class="title topictitle3">Editing a User</h3>
+
+
+      <div class="body conbody">
+
+        <ol class="ol">
+
+          <li class="li">Click the user you want to edit in the <strong class="ph b">Hue Users</strong> list.</li>
+
+
+          <li class="li">Make the changes to the user and then click <strong class="ph b">Update user</strong>.</li>
+
+
+        </ol>
+
+
+      </div>
+
+
+    </div>
+
+
+    <div class="topic concept nested2" xml:lang="en-US" lang="en-US" id="topic_11_2_4"><a name="topic_11_2_4"><!-- --></a>
+
+      <h3 class="title topictitle3">Importing Users from an LDAP Directory</h3>
+
+
+      <div class="body conbody">
+
+        <p class="p">Hue must be configured to use an external LDAP directory (OpenLDAP or
+          Active Directory). <span class="ph">See Hue Installation in <a class="xref" href="http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/CDH4-Installation-Guide.html" target="_blank">CDH4
+          Installation</a>. </span></p>
+
+
+        <div class="note note"><span class="notetitle"><img src="/static/art/help/note.jpg"/> 
+      <b>Note</b>:</span> 
+          <p class="p">  Importing users from an LDAP directory does not import any password information. You must add passwords
+            manually in order for a user to log in.
+          </p>
+
+        </div>
+
+
+        <p class="p">To add a user from an external LDAP directory:
+        </p>
+
+
+        <ol class="ol">
+          <li class="li">Click <strong class="ph b">Add/sync LDAP user</strong>. </li>
+
+          <li class="li">Specify the user properties:
+<div class="tablenoborder"><table cellpadding="4" cellspacing="0" summary="" class="table" frame="hsides" border="1" rules="all">
+                
+                
+                <tbody class="tbody">
+                  <tr class="row">
+                    <td class="entry" valign="top" width="25%">
+                      <p class="p"><strong class="ph b">Username</strong></p>
+
+                    </td>
+
+                    <td class="entry" valign="top" width="75%">
+                      <p class="p">The user name.</p>
+
+                    </td>
+
+                  </tr>
+
+                  <tr class="row">
+                    <td class="entry" valign="top" width="25%">
+                      <p class="p"><strong class="ph b">Distinguished name</strong></p>
+
+                    </td>
+
+                    <td class="entry" valign="top" width="75%">
+                      <p class="p">Indicate that Hue should use a full distinguished name for the user. This
+                        imports the user's first and last name, username, and email, but does not
+                        store the user password.</p>
+
+                    </td>
+
+                  </tr>
+
+                  <tr class="row">
+                    <td class="entry" valign="top" width="25%">
+                      <p class="p"><strong class="ph b">Create home directory</strong></p>
+
+                    </td>
+
+                    <td class="entry" valign="top" width="75%">
+                      <p class="p">Indicate that Hue should create a home directory for the user in HDFS.</p>
+
+                    </td>
+
+                  </tr>
+
+                </tbody>
+
+              </table>
+</div>
+</li>
+
+          <li class="li">Click <strong class="ph b">Add/sync user</strong>.<p class="p">If the
+              user already exists in the User Admin, the user information in User Admin is synced
+              with what is currently in the LDAP directory.</p>
+</li>
+
+        </ol>
+
+
+      </div>
+
+
+    </div>
+
+
+    <div class="topic concept nested2" xml:lang="en-US" lang="en-US" id="topic_11_2_5"><a name="topic_11_2_5"><!-- --></a>
+
+      <h3 class="title topictitle3">Syncing Users and Groups with an LDAP Directory</h3>
+
+
+      <div class="body conbody">
+
+        <p class="p">You can sync the Hue user database with the current state of the LDAP
+          directory using the <strong class="ph b">Sync LDAP users/groups</strong> function.
+          This updates the user and group information for the already imported users and groups. It
+          does not import any new users or groups. </p>
+
+
+        <ol class="ol">
+
+          <li class="li">Click <strong class="ph b">Sync LDAP users/groups</strong>.</li>
+
+          <li class="li">The <strong class="ph b">Create Home Directories</strong> checkbox creates home
+            directories in HDFS for existing imported members that don't have home directories.</li>
+
+
+          <li class="li">In the <strong class="ph b">Sync LDAP users and groups</strong> dialog, click <strong class="ph b">Sync</strong> to
+						perform the sync.</li>
+
+
+        </ol>
+
+
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+  <div class="topic concept nested1" xml:lang="en-US" lang="en-US" id="topic_11_3"><a name="topic_11_3"><!-- --></a>
+
+    <h2 class="title topictitle2">Groups</h2>
+
+
+    <div class="body conbody">
+
+      <p class="p">Superusers can add and delete groups, configure group permissions, and
+        assign users to group memberships. </p>
+
+
+    </div>
+
+
+    <div class="topic concept nested2" xml:lang="en-US" lang="en-US" id="topic_11_3_1"><a name="topic_11_3_1"><!-- --></a>
+
+      <h3 class="title topictitle3">Adding a Group</h3>
+
+
+      <div class="body conbody">
+
+        <p class="p">You can add groups, and delete the groups you've added. You can also import groups from an LDAP directory.
+        </p>
+
+
+        <ol class="ol">
+
+          <li class="li">In the <strong class="ph b">User Admin</strong> window, click
+              <strong class="ph b">Groups</strong> and then click <strong class="ph b">Add Group</strong>.</li>
+
+          <li class="li">Specify the group properties:
+<div class="tablenoborder"><a name="topic_11_3_1__table_rxy_gdh_b3"><!-- --></a><table cellpadding="4" cellspacing="0" summary="" id="topic_11_3_1__table_rxy_gdh_b3" class="table" frame="hsides" border="1" rules="all">
+                
+                
+                <tbody class="tbody">
+                  <tr class="row">
+                    <td class="entry" valign="top" width="25%">
+                      <p class="p"><strong class="ph b">Name</strong></p>
+
+                    </td>
+
+                    <td class="entry" valign="top" width="75%">
+                      <p class="p">The name of the group. Group names can only be letters,
+                        numbers, and underscores; blank spaces are not allowed.</p>
+
+                    </td>
+
+                  </tr>
+
+                  <tr class="row">
+                    <td class="entry" valign="top" width="25%">
+                      <p class="p"><strong class="ph b">Members</strong></p>
+
+                    </td>
+
+                    <td class="entry" valign="top" width="75%">
+                      <p class="p">The users in the group. Check user names or check <strong class="ph b">Select all</strong>.</p>
+
+                    </td>
+
+                  </tr>
+
+                  <tr class="row">
+                    <td class="entry" valign="top" width="25%">
+                      <p class="p"><strong class="ph b">Permissions</strong></p>
+
+                    </td>
+
+                    <td class="entry" valign="top" width="75%">
+                      <p class="p">The applications the users in the group can access.
+                        Check application names or check <strong class="ph b">Select
+                          all</strong>.</p>
+
+                    </td>
+
+                  </tr>
+
+                </tbody>
+
+              </table>
+</div>
+</li>
+
+
+          <li class="li">Click <strong class="ph b">Add group</strong>.</li>
+
+
+        </ol>
+
+
+      </div>
+
+
+    </div>
+
+
+    <div class="topic concept nested2" xml:lang="en-US" lang="en-US" id="topic_11_3_2"><a name="topic_11_3_2"><!-- --></a>
+
+      <h3 class="title topictitle3">Adding Users to a Group</h3>
+
+
+      <div class="body conbody">
+
+        <ol class="ol">
+
+          <li class="li">In the <strong class="ph b">User Admin</strong> window, click <strong class="ph b">Groups</strong>.</li>
+
+
+          <li class="li">Click the group.</li>
+
+
+          <li class="li">To add users to the group, check the names in the list provided or check
+							<strong class="ph b">Select All</strong>.</li>
+
+          <li class="li">Click <strong class="ph b">Update group</strong>.</li>
+
+
+        </ol>
+
+
+      </div>
+
+
+    </div>
+
+
+    <div class="topic concept nested2" xml:lang="en-US" lang="en-US" id="topic_11_3_3"><a name="topic_11_3_3"><!-- --></a>
+
+      <h3 class="title topictitle3">Deleting a Group</h3>
+
+
+      <div class="body conbody">
+
+        <ol class="ol">
+
+          <li class="li">Click <strong class="ph b">Groups</strong>.</li>
+
+          <li class="li">Check the checkbox next to the group and click <strong class="ph b">Delete</strong>.</li>
+
+          <li class="li">Click <strong class="ph b">Yes</strong> to confirm.</li>
+
+
+        </ol>
+
+
+      </div>
+
+
+    </div>
+
+
+    <div class="topic concept nested2" xml:lang="en-US" lang="en-US" id="topic_11_3_5"><a name="topic_11_3_5"><!-- --></a>
+
+      <h3 class="title topictitle3">Importing Groups from an LDAP Directory</h3>
+
+
+      <div class="body conbody">
+
+        <ol class="ol">
+
+          <li class="li">From the <strong class="ph b">Groups</strong> tab, click <strong class="ph b">Add/sync LDAP group</strong>.</li>
+
+
+          <li class="li">Specify the group properties:
+<div class="tablenoborder"><a name="topic_11_3_5__table_rxy_gdh_b3"><!-- --></a><table cellpadding="4" cellspacing="0" summary="" id="topic_11_3_5__table_rxy_gdh_b3" class="table" frame="hsides" border="1" rules="all">
+                
+                
+                <tbody class="tbody">
+                  <tr class="row">
+                    <td class="entry" valign="top" width="25%">
+                      <p class="p"><strong class="ph b">Name</strong></p>
+
+                    </td>
+
+                    <td class="entry" valign="top" width="75%">
+                      <p class="p">The group name.</p>
+
+                    </td>
+
+                  </tr>
+
+                  <tr class="row">
+                    <td class="entry" valign="top" width="25%">
+                      <p class="p"><strong class="ph b">Distinguished name</strong></p>
+
+                    </td>
+
+                    <td class="entry" valign="top" width="75%">
+                      <p class="p">Indicate that Hue should use a full distinguished name for the group.</p>
+
+                    </td>
+
+                  </tr>
+
+                  <tr class="row">
+                    <td class="entry" valign="top" width="25%">
+                      <p class="p"><strong class="ph b">Import new members</strong></p>
+
+                    </td>
+
+                    <td class="entry" valign="top" width="75%">
+                      <p class="p">Indicate that Hue should import the members of the group.</p>
+
+                    </td>
+
+                  </tr>
+
+                  <tr class="row">
+                    <td class="entry" valign="top" width="25%">
+                      <p class="p"><strong class="ph b">Import new members from all subgroups
+                        </strong></p>
+
+                    </td>
+
+                    <td class="entry" valign="top" width="75%">
+                      <p class="p">Indicate that Hue should import the members of the subgroups.</p>
+
+                    </td>
+
+                  </tr>
+
+                  <tr class="row">
+                    <td class="entry" valign="top" width="25%">
+                      <p class="p"><strong class="ph b">Create home directories</strong></p>
+
+                    </td>
+
+                    <td class="entry" valign="top" width="75%">
+                      <p class="p">Indicate that Hue should create home directories in HDFS for the imported
+                        members.</p>
+
+                    </td>
+
+                  </tr>
+
+                </tbody>
+
+              </table>
+</div>
+</li>
+
+          <li class="li">Click <strong class="ph b">Add/sync group</strong>.</li>
+
+
+        </ol>
+
+
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+  <div class="topic concept nested1" xml:lang="en-US" lang="en-US" id="topic_11_4"><a name="topic_11_4"><!-- --></a>
+
+    <h2 class="title topictitle2">Permissions</h2>
+
+
+    <div class="body conbody">
+      <p class="p">Permissions for Hue applications are granted to groups, with users
+        gaining permissions based on their group membership. Group permissions define the Hue
+        applications visible to group members when they log into Hue and the application features
+        available to them. </p>
+
+
+      <ol class="ol">
+
+        <li class="li">Click <strong class="ph b">Permissions</strong>.</li>
+
+
+        <li class="li">Click the application for which you want to assign permissions.</li>
+
+
+        <li class="li">Check the checkboxes next to the groups you want to have permission
+          for the application. Check <strong class="ph b">Select all</strong> to select all
+          groups.</li>
+
+
+        <li class="li">Click <strong class="ph b">Update permission</strong>. The new
+          groups will appear in the Groups column in the <strong class="ph b">Hue
+            Permissions</strong> list.</li>
+
+
+      </ol>
+
+
+    </div>
+
+
+  </div>
+
+
+
+</body>
 </html>
