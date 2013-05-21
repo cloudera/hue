@@ -102,7 +102,7 @@ class Command(NoArgsCommand):
 
     for design_dict in design_list:
       if app_name == 'impala':
-        design_dict['type'] = SavedQuery.IMPALA
+        design_dict['type'] = models.IMPALA
       design = SampleDesign(design_dict)
       try:
         design.install(django_user)
