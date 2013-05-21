@@ -1,150 +1,251 @@
-<h1><a name="JobBrowser-IntroducingJobBrowser"></a>Introducing Job Browser</h1>
-
-<p>The Job Browser application lets you to examine the Hadoop MapReduce jobs running on your Hadoop cluster. Job Browser presents the job and tasks in layers. The top layer is a list of jobs, and you can link to a list of that job's tasks. You can then view a task's attempts and the properties of each attempt, such as state, start and end time, and output size. To troubleshoot failed jobs, you can also view the logs of each attempt.</p>
-
-
-
-
-<h2><a name="JobBrowser-Contents"></a>Contents</h2>
-
-<style type='text/css'>/*<![CDATA[*/
-div.rbtoc1359395622915 {margin-left: 1.5em;padding: 0px;}
-div.rbtoc1359395622915 ul {margin-left: 0px;padding-left: 20px;}
-div.rbtoc1359395622915 li {margin-left: 0px;padding-left: 0px;}
-
-/*]]>*/</style><div class='rbtoc1359395622915'>
-<ul>
-    <li><a href='#JobBrowser-IntroducingJobBrowser'>Introducing Job Browser</a></li>
-    <li><a href='#JobBrowser-JobBrowserInstallationandConfiguration'>Job Browser Installation and Configuration</a></li>
-    <li><a href='#JobBrowser-StartingJobBrowser'>Starting Job Browser</a></li>
-    <li><a href='#JobBrowser-FilteringtheJobBrowserList'>Filtering the Job Browser List</a></li>
-    <li><a href='#JobBrowser-ViewingJobInformationandLogs'>Viewing Job Information and Logs</a></li>
-    <li><a href='#JobBrowser-ViewingJobOutput'>Viewing Job Output</a></li>
-</ul></div>
-<p><br class="atl-forced-newline" />
-<a name="JobBrowser-JobBrowserInstallationandConfiguration"></a></p>
-
-<h1><a name="JobBrowser-JobBrowserInstallationandConfiguration"></a>Job Browser Installation and Configuration</h1>
-
-<p>Job Browser is one of the applications that is installed as part of Hue. For information about installing and configuring Hue, see <a href="https://ccp.cloudera.com/display/CDHDOC/Hue+Installation">Hue Installation</a>.</p>
-
-<p>Job Browser can display both MRv1 and MRv2 jobs, but must be configured to display one type at a time in the <tt>[mapred_clusters]</tt> and <tt>[yarn_clusters]</tt> sections in the Hue configuration file.</p>
-
-<p>By default, a JobBrowser user can see submitted job information for all users &#8211; both his/her own jobs and those of other users. To restrict viewing of submitted jobs to the job submitter and Hue administrators, set the <tt>share_jobs</tt> property under the <tt>[jobbrowser]</tt> section in the Hue configuration file to <tt>false</tt>.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" /></p>
-
-<p><a name="JobBrowser-StartingJobBrowser"></a></p>
-
-<h1><a name="JobBrowser-StartingJobBrowser"></a>Starting Job Browser</h1>
-
-<p>To start Job Browser, click the <b>Job Browser</b> icon (<span class="image-wrap" style=""><img src="/jobbrowser/static/help/images/23888158.png" height="26" style="border: 0px solid black"/></span>) in the navigation bar at the top of the Hue web page.</p>
-
-<p>If there are no jobs that have been run, the <b>Welcome to the Job Browser</b> page opens, with links to the Job Designer and Beeswax.</p>
-
-<p>If there are jobs running, then the Job Browser list appears.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" /></p>
-
-<p><a name="JobBrowser-FilteringtheJobBrowserList"></a></p>
-
-<h1><a name="JobBrowser-FilteringtheJobBrowserList"></a>Filtering the Job Browser List</h1>
-
-<p><b>To filter the jobs displayed in the Job Browser list:</b></p>
-
-<ul>
-	<li>To filter the jobs by their state (such as <b>Running</b> or <b>Completed</b>), choose a state from the <b>Job status</b> drop-down menu.</li>
-	<li>To filter by a user who ran the jobs, enter the user's name in the <b>User Name</b> query box.</li>
-	<li>To filter by job name, enter the name in the <b>Text</b> query box.</li>
-	<li>To clear the filters, choose <b>All States</b> from the <b>Job status</b> drop-down menu and delete any text in the <b>User Name</b> and <b>Text</b> query boxes.</li>
-	<li>To display retired jobs, check the <b>Show retired jobs</b> checkbox. Retired jobs show somewhat limited information &#8211; for example, information on maps and reduces and job duration is not available. Jobs are designated as&nbsp;Retired by the JobTracker based on the value of <tt>mapred.jobtracker.retirejob.interval</tt>. The retired jobs no longer display after the JobTracker is restarted.</li>
-</ul>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<link rel="stylesheet" type="text/css" href="commonltr.css"/>
+<title>Job Browser</title>
+</head>
+<body id="topic_7"><a name="topic_7"><!-- --></a>
 
 
-<p><a name="JobBrowser-ViewingJobInformationandLogs"></a></p>
 
-<h1><a name="JobBrowser-ViewingJobInformationandLogs"></a>Viewing Job Information and Logs</h1>
-
-<div class='panelMacro'><table class='noteMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="/static/art/help/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td>At any level you can view the log for an object by click the <span class="image-wrap" style=""><img src="/oozie/static/help/images/23888324.png" style="border: 0px solid black"/></span> icon in the Logs column.</td></tr></table></div>
-
-<p><b>To view job information for an individual job:</b></p>
-
-<ol>
-	<li>In the <b>Job Browser</b> window, click <b>View</b> at the right of the job you want to view.<br/>
-This shows the <b>Job</b> page for the job, with the recent tasks associated with the job are displayed in the <b>Tasks</b> tab.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" /></li>
-	<li>Click the <b>Metadata</b> tab to view the metadata for this job.</li>
-	<li>Click the <b>Counters</b> tab to view the counter metrics for the job.</li>
-</ol>
+  <h1 class="title topictitle1">Job Browser </h1>
 
 
-<p><b>To view details about the tasks associated with the job:</b></p>
+  <div class="body conbody">
 
-<ol>
-	<li>In the <b>Job</b> window, click the <b>View All Tasks</b> link at the right just above the <b>Recent Tasks</b> list.<br/>
-This lists all the tasks associated with the job.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" /></li>
-	<li>Click <b>Attempts</b> to the right of a task to view the attempts for that task.</li>
-</ol>
-
-
-<p><b>To view information about an individual task:</b></p>
-
-<ol>
-	<li>in the <b>Job</b> window, click the <b>View</b> link to the right of the task.<br/>
-The attempts associated with the task are displayed.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" /></li>
-	<li>Click the <b>Metadata</b> tab to view metadata for this task.<br/>
-The metadata associated with the task is displayed.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" /></li>
-	<li>To view the Hadoop counters for a task, click the <b>Counters</b> tab.<br/>
-The counters associated with the task are displayed.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" /></li>
-	<li>To return to the <b>Job</b> window for this job, click the job number in the status panel at the left of the window.</li>
-</ol>
+    <p class="p" id="topic_7__p_65"><a name="topic_7__p_65"><!-- --></a>
+      The Job Browser application lets you to examine the Hadoop MapReduce jobs running on your Hadoop cluster. Job
+      Browser presents the job and tasks in layers. The top layer is a list of jobs, and you can link to a list of that
+      job's tasks. You can then view a task's attempts and the properties of each attempt, such as state, start and end
+      time, and output size. To troubleshoot failed jobs, you can also view the logs of each attempt.
+    </p>
 
 
-<p><b>To view details about a task attempt:</b></p>
-
-<ol>
-	<li>In the <b>Job Task</b> window, click the <b>View</b> link to the right of the task attempt.<br/>
-The metadata associated with the attempt is displayed under the <b>Metadata</b> tab.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" /></li>
-	<li>To view the Hadoop counters for the task attempt, click the <b>Counters</b> tab.<br/>
-The counters associated with the attempt are displayed.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" /></li>
-	<li>To view the logs associated with the task attempt, click the <b>Logs</b> tab.<br/>
-The logs associated with the task attempt are displayed.
-<br class="atl-forced-newline" />
-<br class="atl-forced-newline" /></li>
-	<li>To return to the list of tasks for the current job, click the task number in the status panel at the left of the window.</li>
-</ol>
+  </div>
 
 
-<p><a name="JobBrowser-ViewingJobOutput"></a></p>
+  <div class="topic concept nested1" xml:lang="en-US" lang="en-US" id="topic_7_1"><a name="topic_7_1"><!-- --></a>
 
-<h1><a name="JobBrowser-ViewingJobOutput"></a>Viewing Job Output</h1>
-
-<p><b>To view job output:</b></p>
-
-<ol>
-	<li>In the <b>Job Browser</b> window, click the link in the ID column.</li>
-	<li>To view the output of the job, click the link under <b>OUTPUT</b> in the panel at the left of the window.<br/>
-This takes you to the job output directory in the <b>File Browser</b>.</li>
-</ol>
+    <h2 class="title topictitle2">
+      Job Browser Installation and Configuration
+    </h2>
 
 
-				    					    <br/>
-                        </td>
-		    </tr>
-	    </table>
-	    
-    </body>
+    <div class="body conbody">
+      <p class="p">Job Browser is one of the applications installed as part of Hue. <span class="ph">For information about installing and configuring Hue,
+        see Hue Installation in <a class="xref" href="http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/CDH4-Installation-Guide.html" target="_blank">http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/CDH4-Installation-Guide.html</a>.</span></p>
+
+      <p class="p">Job Browser can display both MRv1 and MRv2 jobs, but must be configured
+        to display one type at a time. See MapReduce (MRv1) and YARN (MRv2) Cluster Configuration in
+          <a class="xref" href="http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/CDH4-Installation-Guide.html" target="_blank">CDH4
+          Installation</a>.</p>
+
+    </div>
+
+
+  </div>
+
+
+  <div class="topic concept nested1" xml:lang="en-US" lang="en-US" id="topic_7_2"><a name="topic_7_2"><!-- --></a>
+
+    <h2 class="title topictitle2">
+      Starting Job Browser
+    </h2>
+
+
+    <div class="body conbody">
+
+      <p class="p">Click the <strong class="ph b">Job Browser</strong> icon (<img class="image" src="/static/art/help/icon_jobbrowser_24.png"/>) in the navigation bar at the top of the Hue web page. </p>
+
+
+      <p class="p">
+        If there are no jobs that have been run, the <strong class="ph b">Welcome to the Job Browser</strong> page opens, with links to the Job
+        Designer and Beeswax.
+      </p>
+
+
+      <p class="p" id="topic_7_2__p_67"><a name="topic_7_2__p_67"><!-- --></a>
+        If there are jobs running, then the Job Browser list appears.
+      </p>
+
+
+    </div>
+
+
+  </div>
+
+
+  <div class="topic concept nested1" xml:lang="en-US" lang="en-US" id="topic_7_3"><a name="topic_7_3"><!-- --></a>
+
+    <h2 class="title topictitle2">
+      Filtering the Job Browser List
+    </h2>
+
+
+    <div class="body conbody">
+
+      <ul class="ul">
+
+        <li class="li">To filter the jobs by their state (such as <strong class="ph b">Running</strong> or <strong class="ph b">Completed</strong>), choose a state from the <strong class="ph b">Job status</strong> drop-down menu.</li>
+
+
+        <li class="li">To filter by a user who ran the jobs, enter the user's name in the <strong class="ph b">User Name</strong> query box.</li>
+
+
+        <li class="li">To filter by job name, enter the name in the <strong class="ph b">Text</strong> query box.</li>
+
+
+        <li class="li">To clear the filters, choose <strong class="ph b">All States</strong> from the <strong class="ph b">Job status</strong> drop-down menu and delete any text in the <strong class="ph b">User Name</strong> and <strong class="ph b">Text</strong> query boxes.</li>
+
+
+        <li class="li" id="topic_7_3__li_68"><a name="topic_7_3__li_68"><!-- --></a>To display retired jobs, check the <strong class="ph b">Show retired jobs</strong> checkbox. Retired jobs show somewhat limited information – for example, information on maps and reduces and job duration is not available. Jobs are designated as Retired by the JobTracker based on the value of <samp class="ph codeph">mapred.jobtracker.retirejob.interval</samp>. The retired jobs no longer display after the JobTracker is restarted.</li>
+
+
+      </ul>
+
+
+    </div>
+
+
+  </div>
+
+
+  <div class="topic concept nested1" xml:lang="en-US" lang="en-US" id="topic_7_4"><a name="topic_7_4"><!-- --></a>
+
+    <h2 class="title topictitle2">
+      Viewing Job Information and Logs
+    </h2>
+
+
+    <div class="body conbody">
+      <div class="note note"><span class="notetitle"><img src="/static/art/help/note.jpg"/> 
+      <b>Note</b>:</span>  At any level you can view the log for an object by clicking the
+          <a name="topic_7_4__image_ym1_fy5_wj"><!-- --></a><img class="image" id="topic_7_4__image_ym1_fy5_wj" src="/static/art/help/log.png"/> icon in the Logs column. </div>
+
+
+      <p class="p">
+        <strong class="ph b">To view job information for an individual job:</strong>
+      </p>
+
+
+      <ol class="ol">
+
+        <li class="li">In the <strong class="ph b">Job Browser</strong> window, click <strong class="ph b">View</strong> at the right of the job you want to view.
+This shows the <strong class="ph b">Job</strong> page for the job, with the recent tasks associated with the job are displayed in the <strong class="ph b">Tasks</strong> tab.</li>
+
+
+        <li class="li">Click the <strong class="ph b">Metadata</strong> tab to view the metadata for this job.</li>
+
+
+        <li class="li">Click the <strong class="ph b">Counters</strong> tab to view the counter metrics for the job.</li>
+
+
+      </ol>
+
+
+      <p class="p">
+        <strong class="ph b">To view details about the tasks associated with the job:</strong>
+      </p>
+
+
+      <ol class="ol">
+
+        <li class="li">In the <strong class="ph b">Job</strong> window, click the <strong class="ph b">View All Tasks</strong> link at the right just above the <strong class="ph b">Recent Tasks</strong> list.
+This lists all the tasks associated with the job.</li>
+
+
+        <li class="li">Click <strong class="ph b">Attempts</strong> to the right of a task to view the attempts for that task.</li>
+
+
+      </ol>
+
+
+      <p class="p">
+        <strong class="ph b">To view information about an individual task:</strong>
+      </p>
+
+
+      <ol class="ol">
+
+        <li class="li">In the <strong class="ph b">Job</strong> window, click the <strong class="ph b">View</strong> link to the right of the task.
+The attempts associated with the task are displayed.</li>
+
+
+        <li class="li">Click the <strong class="ph b">Metadata</strong> tab to view metadata for this task.
+The metadata associated with the task is displayed.</li>
+
+
+        <li class="li">To view the Hadoop counters for a task, click the <strong class="ph b">Counters</strong> tab.
+The counters associated with the task are displayed.</li>
+
+
+        <li class="li">To return to the <strong class="ph b">Job</strong> window for this job, click the job number in the status panel at the left of the window.</li>
+
+
+      </ol>
+
+
+      <p class="p">
+        <strong class="ph b">To view details about a task attempt:</strong>
+      </p>
+
+
+      <ol class="ol">
+
+        <li class="li">In the <strong class="ph b">Job Task</strong> window, click the <strong class="ph b">View</strong> link to the right of the task attempt.
+The metadata associated with the attempt is displayed under the <strong class="ph b">Metadata</strong> tab.</li>
+
+
+        <li class="li">To view the Hadoop counters for the task attempt, click the <strong class="ph b">Counters</strong> tab.
+The counters associated with the attempt are displayed.</li>
+
+
+        <li class="li">To view the logs associated with the task attempt, click the <strong class="ph b">Logs</strong> tab.
+The logs associated with the task attempt are displayed.</li>
+
+
+        <li class="li" id="topic_7_4__li_69"><a name="topic_7_4__li_69"><!-- --></a>To return to the list of tasks for the current job, click the task number in the status panel at the left of the window.</li>
+
+
+      </ol>
+
+
+    </div>
+
+
+  </div>
+
+
+  <div class="topic concept nested1" xml:lang="en-US" lang="en-US" id="topic_7_5"><a name="topic_7_5"><!-- --></a>
+
+    <h2 class="title topictitle2">
+      Viewing Job Output
+    </h2>
+
+
+    <div class="body conbody">
+
+      <ol class="ol">
+
+        <li class="li">In the <strong class="ph b">Job Browser</strong> window, click the link in the ID column.</li>
+
+
+        <li class="li">To view the output of the job, click the link under <strong class="ph b">OUTPUT</strong> in the panel at the left of the window.
+This takes you to the job output directory in the <strong class="ph b">File Browser</strong>.</li>
+
+
+      </ol>
+
+
+    </div>
+
+
+  </div>
+
+
+
+</body>
 </html>
