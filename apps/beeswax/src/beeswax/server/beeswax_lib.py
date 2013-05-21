@@ -218,7 +218,10 @@ class BeeswaxClient:
       principal = KERBEROS.HUE_PRINCIPAL.get()
 
     # We should integrate hive_site.get_metastore() here in the future
-    kerberos_principal_short_name = principal.split('/', 1)[0]
+    if principal:
+      kerberos_principal_short_name = principal.split('/', 1)[0]
+    else:
+      kerberos_principal_short_name = None
 
     return use_sasl, kerberos_principal_short_name
 
