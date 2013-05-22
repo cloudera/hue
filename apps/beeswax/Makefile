@@ -44,14 +44,15 @@ ifneq (,$(HAVE_JAVA_SRC))
 
 # If we have the source, remove the java-lib
 clean::
-	rm -Rf $(BEESWAX_JAVA_LIB)
-	cd $(BEESWAX_JAVA_DIR) && mvn clean $(MAVEN_OPTIONS) || :
+	@echo "skip"
+	#rm -Rf $(BEESWAX_JAVA_LIB)
+	#cd $(BEESWAX_JAVA_DIR) && mvn clean $(MAVEN_OPTIONS) || :
 
 $(BEESWAX): $(shell find $(BEESWAX_JAVA_DIR) -type f)
 	@echo "--- Building Desktop beeswax"
-	cd $(BEESWAX_JAVA_DIR) && mvn clean install -DskipTests $(MAVEN_OPTIONS)
-	@mkdir -p $(BEESWAX_JAVA_LIB)
-	@cp $(BLD_DIR_BEESWAX)/beeswax-server-$(MAVEN_VERSION).jar $@
+	#cd $(BEESWAX_JAVA_DIR) && mvn clean install -DskipTests $(MAVEN_OPTIONS)
+	#@mkdir -p $(BEESWAX_JAVA_LIB)
+	#@cp $(BLD_DIR_BEESWAX)/beeswax-server-$(MAVEN_VERSION).jar $@
 
 else
 $(BEESWAX):
