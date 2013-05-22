@@ -74,11 +74,11 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
       </div>
 
       <div class="tab-pane" id="schema">
-        ${_('Loading...')} <img src="/static/art/login-spinner.gif">
+        ${_('Loading...')} <img src="/static/art/spinner.gif">
       </div>
 
       <div class="tab-pane" id="properties">
-        ${_('Loading...')} <img src="/static/art/login-spinner.gif">
+        ${_('Loading...')} <img src="/static/art/spinner.gif">
       </div>
     </div>
   </form>
