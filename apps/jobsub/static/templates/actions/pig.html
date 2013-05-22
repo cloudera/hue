@@ -37,7 +37,7 @@
       <div class="control-group" rel="popover" data-original-title="{{ script_path.name }}" data-content="{{ script_path.popover }}" data-bind="attr: {'class': ( errors.script_path().length > 0 ) ? 'control-group error' : 'control-group'}">
         <label class="control-label">{{ script_path.name }}</label>
         <div class="controls">
-          <input id="pig-script-path" type="text" class="pathChooserKo" name="script-path" data-bind="fileChooser: $data, value: script_path" />
+          <input id="pig-script-path" type="text" class="pathFileChooserKo" name="script-path" data-bind="fileChooser: $data, value: script_path" />
           <ul class="help-inline" data-bind="foreach: errors.script_path()">
             <li class="error" data-bind="html: $data"></li>
           </ul>

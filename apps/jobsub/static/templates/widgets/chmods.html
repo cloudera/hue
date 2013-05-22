@@ -13,7 +13,7 @@
         </thead>
         <tbody data-bind="foreach: {{ ko.items }}">
           <tr>
-            <td><input type="text" class="input span4 required pathFolderChooserKo" data-bind="fileChooser: $data, value: path, uniqueName: false" /></td>
+            <td><input type="text" class="input span4 required pathChooserKo" data-bind="fileChooser: $data, value: path, uniqueName: false" /></td>
             <td><input type="text" class="input span2 required propKey" data-bind="value: permissions, uniqueName: false" /></td>
             <td><input class="span1 required" type="checkbox" data-bind="checked: recursive, uniqueName: false"></td>
             <td><a class="btn" href="javascript:void(0);" data-bind="click: {{ delete.func }}">{{ delete.name }}</a></td>

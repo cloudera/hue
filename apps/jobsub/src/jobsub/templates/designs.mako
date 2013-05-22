@@ -235,7 +235,33 @@ ${ commonheader(None, "jobsub", user, "60px") | n,unicode }
     <h3>${_('Choose a file')}</h3>
   </div>
   <div class="modal-body">
-    <div id="fileChooserModal">
+    <div class="chooser">
+    </div>
+  </div>
+  <div class="modal-footer">
+  </div>
+</div>
+
+<div id="chooseDirectory" class="modal hide fade">
+  <div class="modal-header">
+    <a href="#" class="close" data-dismiss="modal">&times;</a>
+    <h3>${_('Choose a directory')}</h3>
+  </div>
+  <div class="modal-body">
+    <div class="chooser">
+    </div>
+  </div>
+  <div class="modal-footer">
+  </div>
+</div>
+
+<div id="choosePath" class="modal hide fade">
+  <div class="modal-header">
+    <a href="#" class="close" data-dismiss="modal">&times;</a>
+    <h3>${_('Choose a path')}</h3>
+  </div>
+  <div class="modal-body">
+    <div class="chooser">
     </div>
   </div>
   <div class="modal-footer">

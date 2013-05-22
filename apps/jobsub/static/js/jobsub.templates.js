@@ -45,7 +45,7 @@ var Templates = (function($, ko) {
         archives: 'static/templates/widgets/filechooser.html',
         files: 'static/templates/widgets/filechooser.html',
         mkdirs: 'static/templates/widgets/folderchooser.html',
-        deletes: 'static/templates/widgets/folderchooser.html',
+        deletes: 'static/templates/widgets/pathchooser.html',
         touchzs: 'static/templates/widgets/filechooser.html',
         chmods: 'static/templates/widgets/chmods.html',
         moves: 'static/templates/widgets/moves.html',

@@ -140,30 +140,31 @@ function showSection(section) {
   $('.section').hide();
   $('#' + section).show();
   $(window).scrollTop(0);
-
-  // Filechooser.
-  $(".pathChooserKo").each(function(){
-    var self = $(this);
-    self.after(getFileBrowseButton(self, false));
-  });
-
-  $(".pathFolderChooserKo").each(function(){
-    var self = $(this);
-    self.after(getFileBrowseButton(self, true));
-  });
+  addFileBrowseButton();
 }
 
-function getFileBrowseButton(inputElement, isFolder) {
-  return $("<button>").addClass("btn").addClass("fileChooserBtn").text("..").click(function(e){
+function getFileBrowseButton(inputElement, folderSelectable, fileSelectable, uploadFile, createFolder) {
+  var modal = null;
+  if (fileSelectable && folderSelectable) {
+    modal = "#choosePath";
+  } else if (folderSelectable) {
+    modal = "#chooseDirectory";
+  } else {
+    modal = "#chooseFile";
+  }
+  var chooser = modal + " .chooser";
+
+  return $("<button>").addClass("btn").addClass("chooserBtn").text("..").click(function(e){
     e.preventDefault();
-    $("#fileChooserModal").jHueFileChooser({
+
+    $(chooser).jHueFileChooser({
       initialPath: inputElement.val(),
       onFileChoose: function(filePath) {
-        if (!isFolder){
+        if (fileSelectable){
           inputElement.val(filePath);
           inputElement.change();
           addFileBrowseButton();
-          $("#chooseFile").modal("hide");
+          $(modal).modal("hide");
         }
       },
       onFolderChange: function(filePath) {
@@ -171,19 +172,19 @@ function getFileBrowseButton(inputElement, isFolder) {
         inputElement.change();
       },
       onFolderChoose: function(filePath) {
-        if (isFolder){
+        if (folderSelectable){
           inputElement.val(filePath);
           inputElement.change();
           addFileBrowseButton();
-          $("#chooseFile").modal("hide");
+          $(modal).modal("hide");
         }
       },
-      createFolder: isFolder,
-      selectFolder: isFolder,
-      uploadFile: !isFolder,
+      createFolder: createFolder,
+      selectFolder: folderSelectable,
+      uploadFile: uploadFile,
       forceRefresh: true
     });
-    $("#chooseFile").modal("show");
+    $(modal).modal("show");
   })
 }
 
@@ -191,15 +192,22 @@ function addFileBrowseButton() {
   // Filechooser.
   $(".pathChooserKo").each(function(){
     var self = $(this);
-    if (!self.siblings().hasClass('fileChooserBtn')) {
-      self.after(getFileBrowseButton(self, false));
+    if (!self.siblings().hasClass('chooserBtn')) {
+      self.after(getFileBrowseButton(self, true, true, false, true));
+    }
+  });
+
+  $(".pathFileChooserKo").each(function(){
+    var self = $(this);
+    if (!self.siblings().hasClass('chooserBtn')) {
+      self.after(getFileBrowseButton(self, false, true, true, false));
     }
   });
 
   $(".pathFolderChooserKo").each(function(){
     var self = $(this);
-    if (!self.siblings().hasClass('fileChooserBtn')) {
-      self.after(getFileBrowseButton(self, true));
+    if (!self.siblings().hasClass('chooserBtn')) {
+      self.after(getFileBrowseButton(self, true, false, false, true));
     }
   });
 }

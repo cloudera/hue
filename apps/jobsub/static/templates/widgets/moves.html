@@ -12,8 +12,8 @@
         </thead>
         <tbody data-bind="foreach: {{ ko.items }}">
           <tr>
-            <td><input type="text" class="input span3 required pathFolderChooserKo" data-bind="fileChooser: $data, value: source, uniqueName: false" /></td>
-            <td><input type="text" class="input span3 required pathFolderChooserKo" data-bind="fileChooser: $data, value: destination, uniqueName: false" /></td>
+            <td><input type="text" class="input span3 required pathChooserKo" data-bind="fileChooser: $data, value: source, uniqueName: false" /></td>
+            <td><input type="text" class="input span3 required pathChooserKo" data-bind="fileChooser: $data, value: destination, uniqueName: false" /></td>
             <td><a class="btn" href="javascript:void(0);" data-bind="click: {{ delete.func }}">{{ delete.name }}</a></td>
           </tr>
         </tbody>
