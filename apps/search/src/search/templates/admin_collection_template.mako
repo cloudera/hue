@@ -404,7 +404,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 <script src="/static/ext/farbtastic/farbtastic.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/shortcut.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/freshereditor.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/codemirror-3.0.js"></script>
+<script src="/static/ext/js/codemirror-3.11.js"></script>
 <script src="/static/ext/js/moment.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/codemirror-xml.js"></script>
 <script src="/static/ext/js/mustache.js"></script>
