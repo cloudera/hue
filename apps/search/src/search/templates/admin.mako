@@ -22,18 +22,18 @@
 <%namespace name="macros" file="macros.mako" />
 <%namespace name="actionbar" file="actionbar.mako" />
 
-${ commonheader(_('Search'), "search", user) | n,unicode }
+${ commonheader(_('Manage collections'), "search", user) | n,unicode }
 
 <link rel="stylesheet" href="/search/static/css/admin.css">
 
 <div class="container-fluid">
 
-  <h1>${_('Search Admin - Cores')}</h1>
+  <h1>${_('Search Admin - Collections')}</h1>
   <%actionbar:render>
     <%def name="search()">
       <input type="text" placeholder="${_('Filter collections by name...')}" class="input-xxlarge search-query" id="filterInput">
     </%def>
-    
+
   </%actionbar:render>
   <div class="row-fluid">
     <div class="span12">

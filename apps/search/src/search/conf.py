@@ -37,6 +37,6 @@ SOLR_URL = Config(
 #    )
 #  )
 #)
-                                     
+
 # ZOOKEEPER URL
-# for COLLECTIONS                                     
+# for COLLECTIONS

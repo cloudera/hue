@@ -31,9 +31,9 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 <div class="search-bar">
   % if user.is_superuser:
     <div class="pull-right" style="margin-top: 4px">
+      <a class="change-settings" href="#"><i class="icon-edit"></i> ${ _('Customize collection display') }</a>
       <a href="${ url('search:admin_collections') }"><i class="icon-edit"></i> ${ _('Collection manager') }</a>
       <a href="${ url('search:admin_collections_wizard') }"><i class="icon-edit"></i> ${ _('Add collection') }</a>
-      <a class="change-settings" href="#"><i class="icon-edit"></i> ${ _('Customize result display') }</a>
     </div>
   % endif
   <form class="form-search" style="margin: 0">
@@ -207,8 +207,9 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
   % endif
 </div>
 
-
-${ hue_collection.result.get_extracode() | n,unicode }
+% if hue_collection:
+  ${ hue_collection.result.get_extracode() | n,unicode }
+% endif
 
 <script>
   $(document).ready(function () {
@@ -240,7 +241,7 @@ ${ hue_collection.result.get_extracode() | n,unicode }
     });
     $(".dateFacetHeader").after(orderedDateFacets);
 
-    $(".current-collection").text("${ current_collection }");
+    $(".current-collection").text("${ hue_collection.label }");
     % if user.is_superuser:
         $(".dropdown-collection").each(function () {
           if ($(this).data("value") == $("select[name='collection']").val()) {
@@ -251,12 +252,12 @@ ${ hue_collection.result.get_extracode() | n,unicode }
 
     $(".dropdown-collection").click(function (e) {
       e.preventDefault();
-      $(".current-collection").text($(this).text());
-      $("select[name='collection']").val($(this).data("value"));
+      var solrName = $(this).data("value");
+      $("select[name='collection']").val(solrName);
       % if user.is_superuser:
           $(".change-settings").attr("href", $(this).data("settings-url"));
       % endif
-      $.cookie("hueSearchLastCollection", $(this).text(), {expires: 90});
+      $.cookie("hueSearchLastCollection", solrName, {expires: 90});
       $("form").submit();
     });
 
@@ -266,7 +267,7 @@ ${ hue_collection.result.get_extracode() | n,unicode }
     });
     $("#recordsPerPage").val($("input[name='rows']").val());
 
-    var sortingData = ${ hue_collection.sorting.data | n,unicode };
+    var sortingData = ${ hue_collection and hue_collection.sorting.data or '[]' | n,unicode };
     if (sortingData && sortingData.fields && sortingData.fields.length > 0) {
       $.each(sortingData.fields, function (index, item) {
         $("<option>").attr("value", item.label).text(item.label).data("field", item.field).data("asc", item.asc).appendTo($(".sort-by"));
@@ -321,6 +322,7 @@ ${ hue_collection.result.get_extracode() | n,unicode }
       $("#id_query").addClass("deletable");
     }
 
+    % if hue_collection:
     $("#id_query").on("keyup", function() {
       var query = $("#id_query").val();
       if ($.trim(query) != "") {
@@ -338,6 +340,7 @@ ${ hue_collection.result.get_extracode() | n,unicode }
         $("#id_query").removeClass("deletable");
       }
     });
+    % endif
 
   });
 </script>

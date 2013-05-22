@@ -40,7 +40,7 @@ from search.search_controler import SearchController
 LOG = logging.getLogger(__name__)
 
 
-def index(request):  
+def index(request):
   hue_collections = Collection.objects.all()
 
   if not hue_collections:
@@ -48,14 +48,12 @@ def index(request):
       return admin_collections_wizard(request)
     else:
       raise PopupException(_('No collections! If user message, if admin send to wizard.'))
-#    collections = SolrApi(SOLR_URL.get()).collections()
-#    for collection in collections['status']:
-#      Collection.objects.get_or_create(name=collection)
 
   search_form = QueryForm(request.GET)
   response = {}
   error = {}
   solr_query = {}
+  hue_collection = None
 
   if search_form.is_valid():
     collection = search_form.cleaned_data['collection']
@@ -71,24 +69,23 @@ def index(request):
     solr_query['facets'] = search_form.cleaned_data['facets'] or 1
 
     try:
-      hue_collection = Collection.objects.get_or_create(name=collection)
+      hue_collection = Collection.objects.get(name=collection)
       response = SolrApi(SOLR_URL.get()).query(solr_query, hue_collection)
     except Exception, e:
       error['message'] = unicode(str(e), "utf8")
-  elif hue_collections:    
+  else:
     hue_collection = hue_collections[0]
     collection = hue_collections.name
-  else:
-    #collection = request.COOKIES.get('hueSearchLastCollection', collections['status'].keys()[0])
-    #hue_collection = Collection.objects.get_or_create(name=collection)
-    raise PopupException(_('Please configure hue.ini to point to a Solr URL.'))
+
+  if hue_collection is not None:
+    response = augment_solr_response(response, hue_collection.facets.get_data())
 
   if request.GET.get('format') == 'json':
-    return HttpResponse(json.dumps(augment_solr_response(response, hue_collection.facets.get_data())), mimetype="application/json")
+    return HttpResponse(json.dumps(response), mimetype="application/json")
 
   return render('search.mako', request, {
     'search_form': search_form,
-    'response': augment_solr_response(response, hue_collection.facets.get_data()),
+    'response': response,
     'error': error,
     'solr_query': solr_query,
     'hue_collection': hue_collection,
@@ -105,47 +102,41 @@ def admin_collections(request):
   return render('admin_collections.mako', request, {
     'hue_collections': hue_collections,
   })
-  
-  
+
+
 @allow_admin_only
 def admin_collections_wizard(request):
   searcher = SearchController()
-    
-  if request.method == 'POST':  
+
+  if request.method == 'POST':
     result = {'status': -1, 'message': 'Error'}
-    try:      
+    try:
       searcher.add_new_collection(request.POST.copy())
       result['status'] = 0
       request.info(_('Collection added!'))
     except Exception, e:
       result['message'] = unicode(str(e), "utf8")
-    return HttpResponse(json.dumps(result), mimetype="application/json")    
+    return HttpResponse(json.dumps(result), mimetype="application/json")
   else:
     collections = searcher.get_new_collections()
     cores = searcher.get_new_cores()
     return render('admin_collections_wizard.mako', request, {
       'collections': collections,
-      'cores': cores, 
-    })  
-  
+      'cores': cores,
+    })
+
 
 @allow_admin_only
 def admin(request):
-  # To cross check both
-  collections = SolrApi(SOLR_URL.get()).collections()
   hue_collections = Collection.objects.all()
 
   return render('admin.mako', request, {
-    'collections': collections,
     'hue_collections': hue_collections,
   })
 
 
 @allow_admin_only
 def admin_collection_properties(request, collection):
-  # TODO HACK !!
-  collection = 'collection3_shard2_replica1'
-  
   solr_collection = SolrApi(SOLR_URL.get()).collection(collection)
   hue_collection = Collection.objects.get(name=collection)
 

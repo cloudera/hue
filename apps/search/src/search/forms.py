@@ -62,4 +62,4 @@ class HighlightingForm(forms.Form):
 class CollectionForm(forms.ModelForm):
   class Meta:
     model = Collection
-    exclude = ('facets', 'result', 'sorting', 'properties')
+    exclude = ('facets', 'result', 'sorting', 'properties', 'cores')
