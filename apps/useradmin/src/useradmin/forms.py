@@ -108,9 +108,8 @@ class SuperUserChangeForm(UserChangeForm):
 class AddLdapUsersForm(forms.Form):
   username_pattern = forms.RegexField(
       label=_t("Username"),
-      max_length=64,
       regex='^%s$' % (get_username_re_rule(),),
-      help_text=_t("Required. 30 characters or fewer. No whitespaces or colons."),
+      help_text=_t("Required. 30 characters or fewer with username. 64 characters or fewer with DN. No whitespaces or colons."),
       error_messages={'invalid': _t("Whitespaces and ':' not allowed")})
   dn = forms.BooleanField(label=_t("Distinguished name"),
                           help_text=_t("Whether or not the user should be imported by "
@@ -127,7 +126,13 @@ class AddLdapUsersForm(forms.Form):
     username_pattern = cleaned_data.get("username_pattern")
     dn = cleaned_data.get("dn")
 
-    if not dn:
+    if dn:
+      if username_pattern is not None and len(username_pattern) > 64:
+        msg = _('Too long: 64 characters or fewer and not %s') % username_pattern
+        errors = self._errors.setdefault('username_pattern', ErrorList())
+        errors.append(msg)
+        raise forms.ValidationError(msg)
+    else:
       if username_pattern is not None and len(username_pattern) > 30:
         msg = _('Too long: 30 characters or fewer and not %s') % username_pattern
         errors = self._errors.setdefault('username_pattern', ErrorList())
