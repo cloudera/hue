@@ -44,7 +44,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     </div>
   </div>
   % endif
-  
+
   % if cores:
   <h1>${_('Import a new core')}</h1>
 
@@ -58,17 +58,17 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
       % endfor
       </ul>
     </div>
-  </div>  
+  </div>
   % endif
-  
+
   % if not collections and not cores:
   <h1>${_('No available indexes')}</h1>
 
   <div class="row-fluid">
     ${ _('Already installed all the collections. You can change the indexes URL in hue.ini.') }
-  </div>      
+  </div>
   % endif
-  
+
 </div>
 
 <style type="text/css">

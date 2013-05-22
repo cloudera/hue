@@ -85,6 +85,7 @@ class SolrApi(object):
 
   def collection(self, core):
     try:
+      # TODO: if core get from here, if collection from Zookeeper
       return self._root.get('admin/cores', params={'wt': 'json', 'core': core})
     except RestException, e:
       raise PopupException('Error while accessing Solr: %s' % e)

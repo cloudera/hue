@@ -24,14 +24,10 @@ except ImportError:
 import logging
 
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.rest.http_client import HttpClient, RestException
-from desktop.lib.rest.resource import Resource
 
 from search.api import SolrApi
 from search.conf import SOLR_URL
-from search.decorators import allow_admin_only
-from search.forms import QueryForm, CollectionForm, HighlightingForm
-from search.models import Collection, augment_solr_response
+from search.models import Collection
 
 
 LOG = logging.getLogger(__name__)
@@ -41,7 +37,6 @@ class SearchController(object):
   """
   Glue the models to the views.
   """
-  
   def __init__(self):
     pass
 
@@ -49,27 +44,21 @@ class SearchController(object):
     solr_collections = SolrApi(SOLR_URL.get()).collections()
     for name in Collection.objects.values_list('name', flat=True):
       solr_collections.pop(name)
-    
+
     return solr_collections
 
-  def get_new_cores(self):    
+  def get_new_cores(self):
     # TODO
-    solr_cores = []    
-    
+    solr_cores = []
+
     return solr_cores
 
-  def add_new_collection(self, attrs):    
+  def add_new_collection(self, attrs):
     if attrs['type'] == 'collection':
       collections = self.get_new_collections()
       collection = collections[attrs['name']]
-      hue_collection, created = Collection.objects.get_or_create(
-          name=attrs['name'],
-#          label=attrs['name'],
-#          cores=json.dumps(collection)
-      )
-      print hue_collection
-      print 'aa'
-      hue_collection.label = attrs['name']
-      hue_collection.cores = json.dumps(collection)
-      hue_collection.save()
+
+      hue_collection, created = Collection.objects.get_or_create(name=attrs['name'], solr_properties=collection, is_enabled=True)
       return hue_collection
+    else:
+      raise PopupException(_('Collection type does not exit: %s') % attrs)

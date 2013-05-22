@@ -186,9 +186,10 @@ class Sorting(models.Model):
 
 
 class CollectionManager(models.Manager):
-  def get_or_create(self, name):
+
+  def get_or_create(self, name, solr_properties, is_core_only=False, is_enabled=True):
     try:
-      return self.get(name=name)
+      return self.get(name=name), False
     except Collection.DoesNotExist:
       facets = Facet.objects.create(data=json.dumps({
                    'properties': {'isEnabled': False, 'limit': 10, 'mincount': 1, 'sort': 'count'},
@@ -352,8 +353,18 @@ margin-top: 2px;
                   """
               }))
       sorting = Sorting.objects.create(data=json.dumps({'properties': {'is_enabled': False}, 'fields': []}))
+      cores = json.dumps(solr_properties)
 
-      return Collection.objects.create(name=name, label=name, facets=facets, result=result, sorting=sorting)
+      return Collection.objects.create(
+          name=name,
+          label=name,
+          is_enabled=is_enabled,
+          cores=cores,
+          is_core_only=is_core_only,
+          facets=facets,
+          result=result,
+          sorting=sorting
+      ), True
 
 
 class Collection(models.Model):
@@ -362,11 +373,11 @@ class Collection(models.Model):
   name = models.CharField(max_length=40, verbose_name=_t('Solr name'))
   label = models.CharField(max_length=100)
   is_core_only = models.BooleanField(default=False)
-  cores = models.TextField(default=json.dumps({}), verbose_name=_t('Core data'), help_text=_t('Cores or shards data'))
+  cores = models.TextField(default=json.dumps({}), verbose_name=_t('Collection with cores data'), help_text=_t('Solr json'))
   properties = models.TextField(
       default=json.dumps({}), verbose_name=_t('Properties'),
-      help_text=_t('Properties (e.g. results by pages number)'))
-  
+      help_text=_t('Hue properties (e.g. results by pages number)'))
+
   facets = models.ForeignKey(Facet)
   result = models.ForeignKey(Result)
   sorting = models.ForeignKey(Sorting)
