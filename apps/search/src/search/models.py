@@ -358,7 +358,7 @@ margin-top: 2px;
       return Collection.objects.create(
           name=name,
           label=name,
-          is_enabled=is_enabled,
+          enabled=is_enabled,
           cores=cores,
           is_core_only=is_core_only,
           facets=facets,
