@@ -46,7 +46,7 @@ Edit mapred-site.xml:
 Dependencies
 ------------
 
-You might need some of these library development packages if they not installed on your system:
+You might need some of these library development packages (in particular the python* ones) if they not installed on your system:
 
 Ubuntu:
 * ant
@@ -76,7 +76,6 @@ MacOS (mac port):
 * liblxml
 * libxml2
 * libxslt
-* mysql5-devel
 * simplejson (easy_install)
 * sqlite3
 
