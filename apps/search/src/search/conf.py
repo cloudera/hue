@@ -24,7 +24,7 @@ SOLR_URL = Config(
   key="solr_url",
   help=_("URL of the Solr Server."),
   private=False,
-  default="http://localhost:1978/solr/")
+  default="http://localhost:8983/solr/")
 
 #SOLR_URLS = UnspecifiedConfigSection(
 #  "solr_urls",
