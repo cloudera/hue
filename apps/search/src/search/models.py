@@ -388,7 +388,7 @@ class Collection(models.Model):
     return self.facets.get_query_params() + self.result.get_query_params() + self.sorting.get_query_params()
 
   def get_absolute_url(self):
-    return reverse('search:admin_collection', kwargs={'collection': self.name})
+    return reverse('search:admin_collection', kwargs={'collection_id': self.id})
 
   @property
   def fields(self):

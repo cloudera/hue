@@ -75,7 +75,7 @@ def index(request):
       error['message'] = unicode(str(e), "utf8")
   else:
     hue_collection = hue_collections[0]
-    collection = hue_collections.name
+    collection = hue_collections.id
 
   if hue_collection is not None:
     response = augment_solr_response(response, hue_collection.facets.get_data())
@@ -195,15 +195,15 @@ def admin_collection_copy(request):
 
 
 @allow_admin_only
-def admin_collection_properties(request, collection):
-  hue_collection = Collection.objects.get(name=collection)
+def admin_collection_properties(request, collection_id):
+  hue_collection = Collection.objects.get(id=collection_id)
   solr_collection = SolrApi(SOLR_URL.get()).collection_or_core(hue_collection)
 
   if request.method == 'POST':
     collection_form = CollectionForm(request.POST, instance=hue_collection)
     if collection_form.is_valid():
       hue_collection = collection_form.save()
-      return redirect(reverse('search:admin_collection_properties', kwargs={'collection': hue_collection.name}))
+      return redirect(reverse('search:admin_collection_properties', kwargs={'collection_id': hue_collection.id}))
     else:
       request.error(_('Errors on the form: %s') % collection_form.errors)
   else:
@@ -217,8 +217,8 @@ def admin_collection_properties(request, collection):
 
 
 @allow_admin_only
-def admin_collection_template(request, collection):
-  hue_collection = Collection.objects.get(name=collection)
+def admin_collection_template(request, collection_id):
+  hue_collection = Collection.objects.get(id=collection_id)
   solr_collection = SolrApi(SOLR_URL.get()).collection_or_core(hue_collection)
 
   if request.method == 'POST':
@@ -227,7 +227,7 @@ def admin_collection_template(request, collection):
     return HttpResponse(json.dumps({}), mimetype="application/json")
 
   solr_query = {}
-  solr_query['collection'] = collection
+  solr_query['collection'] = hue_collection.name
   solr_query['q'] = ''
   solr_query['fq'] = ''
   solr_query['rows'] = 5
@@ -244,9 +244,9 @@ def admin_collection_template(request, collection):
 
 
 @allow_admin_only
-def admin_collection_facets(request, collection):
-  solr_collection = SolrApi(SOLR_URL.get()).collection(collection)
-  hue_collection = Collection.objects.get(name=collection)
+def admin_collection_facets(request, collection_id):
+  hue_collection = Collection.objects.get(id=collection_id)
+  solr_collection = SolrApi(SOLR_URL.get()).collection(hue_collection.name)
 
   if request.method == 'POST':
     hue_collection.facets.update_from_post(request.POST)
@@ -260,9 +260,9 @@ def admin_collection_facets(request, collection):
 
 
 @allow_admin_only
-def admin_collection_sorting(request, collection):
-  solr_collection = SolrApi(SOLR_URL.get()).collection(collection)
-  hue_collection = Collection.objects.get(name=collection)
+def admin_collection_sorting(request, collection_id):
+  hue_collection = Collection.objects.get(id=collection_id)
+  solr_collection = SolrApi(SOLR_URL.get()).collection(hue_collection.name)
 
   if request.method == 'POST':
     hue_collection.sorting.update_from_post(request.POST)
@@ -276,9 +276,9 @@ def admin_collection_sorting(request, collection):
 
 
 @allow_admin_only
-def admin_collection_highlighting(request, collection):
-  hue_collection = Collection.objects.get(name=collection)
-  solr_collection = SolrApi(SOLR_URL.get()).collection(collection)
+def admin_collection_highlighting(request, collection_id):
+  hue_collection = Collection.objects.get(id=collection_id)
+  solr_collection = SolrApi(SOLR_URL.get()).collection(hue_collection.name)
 
   if request.method == 'POST':
     hue_collection.result.update_from_post(request.POST)
@@ -294,9 +294,9 @@ def admin_collection_highlighting(request, collection):
 # Ajax below
 
 @allow_admin_only
-def admin_collection_solr_properties(request, collection):
-  solr_collection = SolrApi(SOLR_URL.get()).collection(collection)
-  hue_collection = Collection.objects.get(name=collection)
+def admin_collection_solr_properties(request, collection_id):
+  hue_collection = Collection.objects.get(id=collection_id)
+  solr_collection = SolrApi(SOLR_URL.get()).collection(hue_collection.name)
 
   content = render('admin_collection_properties_solr_properties.mako', request, {
     'solr_collection': solr_collection,
@@ -307,9 +307,9 @@ def admin_collection_solr_properties(request, collection):
 
 
 @allow_admin_only
-def admin_collection_schema(request, collection):
-  solr_schema = SolrApi(SOLR_URL.get()).schema(collection)
-  hue_collection = Collection.objects.get(name=collection)
+def admin_collection_schema(request, collection_id):
+  hue_collection = Collection.objects.get(id=collection_id)
+  solr_schema = SolrApi(SOLR_URL.get()).schema(hue_collection.name)
 
   content = render('admin_collection_properties_solr_schema.mako', request, {
     'solr_schema': solr_schema,
@@ -320,8 +320,8 @@ def admin_collection_schema(request, collection):
 
 
 # TODO security
-def query_suggest(request, collection, query=""):
-  hue_collection = Collection.objects.get(name=collection)
+def query_suggest(request, collection_id, query=""):
+  hue_collection = Collection.objects.get(id=collection_id)
   result = {'status': -1, 'message': 'Error'}
 
   solr_query = {}

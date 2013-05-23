@@ -29,7 +29,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
     <h4>${_('Search Admin - ')}${hue_collection.label}</h4>
   </%def>
   <%def name="navigation()">
-    ${ layout.sidebar(hue_collection.name, 'facets') }
+    ${ layout.sidebar(hue_collection, 'facets') }
   </%def>
   <%def name="content()">
     <form method="POST" class="form-horizontal" data-bind="submit: submit">
@@ -461,7 +461,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
     };
 
     self.submit = function () {
-      $.ajax("${ url('search:admin_collection_facets', collection=hue_collection.name) }", {
+      $.ajax("${ url('search:admin_collection_facets', collection_id=hue_collection.id) }", {
         data: {
           'properties': ko.toJSON(self.properties),
           'fields': ko.utils.stringifyJson(self.fieldFacets),

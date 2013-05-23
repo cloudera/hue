@@ -30,7 +30,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
   </%def>
 
   <%def name="navigation()">
-    ${ layout.sidebar(hue_collection.name, 'sorting') }
+    ${ layout.sidebar(hue_collection, 'sorting') }
   </%def>
 
   <%def name="content()">
@@ -160,7 +160,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
     };
 
     self.submit = function () {
-      $.ajax("${ url('search:admin_collection_sorting', collection=hue_collection.name) }", {
+      $.ajax("${ url('search:admin_collection_sorting', collection_id=hue_collection.id) }", {
         data: {
           'properties': ko.utils.stringifyJson({'is_enabled': self.isEnabled()}),
           'fields': ko.utils.stringifyJson(self.sortingFields)
