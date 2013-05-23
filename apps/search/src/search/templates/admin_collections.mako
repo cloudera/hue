@@ -28,7 +28,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 
 <div class="search-bar" style="height: 30px">
     <div class="pull-right" style="margin-top: 4px; margin-right: 20px">
-      <a href="${ url('search:index') }"><i class="icon-share-alt"></i> ${ _('Query UI') }</a>
+      <a href="${ url('search:index') }"><i class="icon-share-alt"></i> ${ _('Search page') }</a>
     </div>
   <h4>${_('Collection Manager')}</h4>
 </div>
@@ -65,11 +65,10 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
   </div>
 
   <script id="collectionTemplate" type="text/html">
-    <li style="cursor: move">
+    <li style="cursor: pointer" data-bind="click: $root.editCollection">
       <div class="pull-right" style="margin-top: 10px;margin-right: 10px; cursor: pointer">
-        <a data-bind="attr: {'href': absoluteUrl}"><i class="icon-edit"></i> ${_('Edit')}</a> &nbsp;
-        <a data-bind="click: $root.copyCollection"><i class="icon-copy"></i> ${_('Copy')}</a> &nbsp;
-        <a data-bind="click: $root.markForDeletion"><i class="icon-remove"></i> ${_('Delete')}</a>
+        <a data-bind="click: $root.copyCollection, clickBubble: false"><i class="icon-copy"></i> ${_('Copy')}</a> &nbsp;
+        <a data-bind="click: $root.markForDeletion, clickBubble: false"><i class="icon-remove"></i> ${_('Delete')}</a>
       </div>
       <h4><i class="icon-list"></i> <span data-bind="text: label"></span></h4>
     </li>
