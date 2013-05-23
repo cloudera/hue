@@ -54,7 +54,7 @@ var SearchCollectionsModel = function (props) {
   self.DELETE_URL = props.deleteUrl;
   self.COPY_URL = props.copyUrl;
 
-  self.isLoading = ko.observable(false);
+  self.isLoading = ko.observable(true);
   self.isLoadingImportables = ko.observable(false);
   self.allSelected = ko.observable(false);
 
@@ -129,12 +129,14 @@ var SearchCollectionsModel = function (props) {
   };
 
   self.updateCollections = function () {
+    self.isLoading(true);
     $.getJSON(self.LIST_COLLECTIONS_URL, function (data) {
       self.collections(ko.utils.arrayMap(data, function (coll) {
         return new Collection(coll);
       }));
       self.filteredCollections(self.collections());
       $(document).trigger("collectionsRefreshed");
+      self.isLoading(false);
     });
   };
 
