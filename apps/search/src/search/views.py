@@ -35,7 +35,7 @@ from search.conf import SOLR_URL
 from search.decorators import allow_admin_only
 from search.forms import QueryForm, CollectionForm, HighlightingForm
 from search.models import Collection, augment_solr_response
-from search.search_controler import SearchController
+from search.search_controller import SearchController
 
 LOG = logging.getLogger(__name__)
 
@@ -45,7 +45,7 @@ def index(request):
 
   if not hue_collections:
     if request.user.is_superuser:
-      return admin_collections_wizard(request)
+      return admin_collections(request, True)
     else:
       return no_collections(request)
 
@@ -99,34 +99,71 @@ def no_collections(request):
 
 
 @allow_admin_only
-def admin_collections(request):
-  hue_collections = Collection.objects.all()
+def admin_collections(request, is_redirect=False):
+  existing_hue_collections = Collection.objects.all()
+
+  if request.GET.get('format') == 'json':
+    collections = []
+    for collection in existing_hue_collections:
+      massaged_collection = {
+        'id': collection.id,
+        'name': collection.name,
+        'label': collection.label,
+        'isCoreOnly': collection.is_core_only,
+        'absoluteUrl': collection.get_absolute_url()
+      }
+      collections.append(massaged_collection)
+    return HttpResponse(json.dumps(collections), mimetype="application/json")
 
   return render('admin_collections.mako', request, {
-    'hue_collections': hue_collections,
+    'existing_hue_collections': existing_hue_collections,
+    'is_redirect': is_redirect
   })
 
 
 @allow_admin_only
-def admin_collections_wizard(request):
-  searcher = SearchController()
-
+def admin_collections_import(request):
   if request.method == 'POST':
-    result = {'status': -1, 'message': 'Error'}
-    try:
-      searcher.add_new_collection(request.POST.copy())
-      result['status'] = 0
-      request.info(_('Collection added!'))
-    except Exception, e:
-      result['message'] = unicode(str(e), "utf8")
+    searcher = SearchController()
+    status = 0
+    err_message = _('Error')
+    result = {
+      'status': status,
+      'message': err_message
+    }
+    importables = json.loads(request.POST["selected"])
+    for imp in importables:
+      try:
+        searcher.add_new_collection(imp)
+        status += 1
+      except Exception, e:
+        err_message += unicode(str(e), "utf8") + "\n"
+      result['message'] = status == len(importables) and _('Imported successfully') or _('Imported with errors: ') + err_message
     return HttpResponse(json.dumps(result), mimetype="application/json")
   else:
-    collections = searcher.get_new_collections()
-    cores = searcher.get_new_cores()
-    return render('admin_collections_wizard.mako', request, {
-      'collections': collections,
-      'cores': cores,
-    })
+    if request.GET.get('format') == 'json':
+      searcher = SearchController()
+      new_solr_collections = searcher.get_new_collections()
+      massaged_collections = []
+      for coll in new_solr_collections:
+        massaged_collections.append({
+          'type': 'collection',
+          'name': coll
+        })
+      new_solr_cores = searcher.get_new_cores()
+      massaged_cores = []
+      for core in new_solr_cores:
+        massaged_cores.append({
+          'type': 'core',
+          'name': core
+        })
+      response = {
+        'newSolrCollections': list(massaged_collections),
+        'newSolrCores': list(massaged_cores)
+      }
+      return HttpResponse(json.dumps(response), mimetype="application/json")
+    else:
+      return admin_collections(request, True)
 
 
 @allow_admin_only

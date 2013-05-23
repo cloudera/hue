@@ -59,3 +59,17 @@ h3 {
 .select-mini {
   width: 100%;
 }
+
+.search-bar {
+  background-color: #fafafa;
+  border-bottom: 1px solid #e3e3e3;
+  -webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
+  -moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
+  margin: 0;
+  margin-bottom: 20px;
+  padding: 10px;
+  padding-left: 20px;
+  padding-right: 20px;
+  text-align: left;
+}

@@ -21,8 +21,8 @@ urlpatterns = patterns('search.views',
   url(r'^$', 'index', name='index'),
   url(r'^query$', 'index', name='query'),
 
-  url(r'^admin/collections_$', 'admin_collections', name='admin_collections'),
-  url(r'^admin/collections_wizard$', 'admin_collections_wizard', name='admin_collections_wizard'),
+  url(r'^admin/collections$', 'admin_collections', name='admin_collections'),
+  url(r'^admin/collections_import$', 'admin_collections_import', name='admin_collections_import'),
 
   url(r'^admin/collection/(?P<collection>\w+)$', 'admin_collection_template', name='admin_collection'),
   url(r'^admin/collection/(?P<collection>\w+)/properties$', 'admin_collection_properties', name='admin_collection_properties'),

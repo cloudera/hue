@@ -22,9 +22,17 @@
 <%namespace name="macros" file="macros.mako" />
 <%namespace name="actionbar" file="actionbar.mako" />
 
-${ commonheader(_('Search'), "search", user) | n,unicode }
+${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 
 <link rel="stylesheet" href="/search/static/css/admin.css">
+
+<div class="search-bar" style="height: 30px">
+    <div class="pull-right" style="margin-top: 4px; margin-right: 20px">
+      <a href="${ url('search:index') }"><i class="icon-share-alt"></i> ${ _('Query UI') }</a>
+    </div>
+  &nbsp;
+</div>
+
 
 <div class="container-fluid">
   <h1>${_('Indexes')}</h1>
@@ -33,21 +41,65 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
     <%def name="search()">
       <input type="text" placeholder="${_('Filter collections by name...')}" class="input-xxlarge search-query" id="filterInput">
     </%def>
+
+    <%def name="creation()">
+      <button id="importBtn" type="button" class="btn"><i class="icon-plus-sign"></i> ${ _('Import') }</button>
+    </%def>
   </%actionbar:render>
 
   <div class="row-fluid">
     <div class="span12">
-      <ul id="collections">
-      % for collection in hue_collections:
-        <li style="cursor: move" data-collection="${ collection.name }">
-          <a href="${ collection.get_absolute_url() }" class="pull-right" style="margin-top: 10px;margin-right: 10px"><i class="icon-edit"></i> ${_('Edit')}</a>
-          <h4><i class="icon-list"></i> ${ collection.name } - ${ collection.is_core_only }</h4>
-        </li>
-      % endfor
+      <ul id="collections" data-bind="template: {name: 'collectionTemplate', foreach: collections}">
+##      % for collection in existing_hue_collections:
+##        <li style="cursor: move" data-collection="${ collection.name }">
+##          <a href="${ collection.get_absolute_url() }" class="pull-right" style="margin-top: 10px;margin-right: 10px"><i class="icon-edit"></i> ${_('Edit')}</a>
+##          <h4><i class="icon-list"></i> ${ collection.name } - ${ collection.is_core_only } -- ${ collection.label } == ${ collection.id }</h4>
+##        </li>
+##      % endfor
       </ul>
     </div>
   </div>
+
+  <script id="collectionTemplate" type="text/html">
+    <li style="cursor: move">
+      <a data-bind="attr: {'href': absoluteUrl}" class="pull-right" style="margin-top: 10px;margin-right: 10px"><i class="icon-edit"></i> ${_('Edit')}</a>
+      <h4><i class="icon-list"></i> <span data-bind="text: label"></span></h4>
+    </li>
+  </script>
+
 </div>
+
+<div id="importDialog" class="modal hide fade">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <h3>${ _('Import Collections and Cores') }</h3>
+  </div>
+  <div class="modal-body">
+    <img src="/static/art/spinner.gif" data-bind="visible: isLoadingImportables()" />
+    <div data-bind="visible: !isLoadingImportables()">
+      <h5>${ _('Collections') }</h5>
+      <div class="alert" data-bind="visible: importableCollections().length == 0">${ _('All available collections from the Solr URL in hue.ini have been imported.') }</div>
+      <table data-bind="visible: importableCollections().length > 0, template: {name: 'importableTemplate', foreach: importableCollections}"></table>
+
+      <h5 style="margin-top: 20px">${ _('Cores') }</h5>
+      <div class="alert" data-bind="visible: importableCores().length == 0">${ _('All available cores from the Solr URL in hue.ini have been imported.') }</div>
+      <table data-bind="visible: importableCores().length > 0, template: {name: 'importableTemplate', foreach: importableCores}"></table>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <a href="javascript:void(0)" class="btn" data-dismiss="modal">${ _('Cancel') }</a>
+    <button href="javascript:void(0)" class="btn btn-primary" data-bind="enable: selectedImportableCollections().length > 0 || selectedImportableCores().length > 0, click: importCollectionsAndCores">${ _('Import Selected') }</button>
+  </div>
+</div>
+
+<script id="importableTemplate" type="text/html">
+  <tr>
+    <td width="24">
+      <div data-bind="click: handleSelect, css: {hueCheckbox: true, 'icon-ok': selected}"></div>
+    </td>
+    <td data-bind="text: name"></td>
+  </tr>
+</script>
 
 <style type="text/css">
   #collections {
@@ -71,10 +123,25 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
   }
 </style>
 
+<script src="/static/ext/js/knockout-2.1.0.js" type="text/javascript" charset="utf-8"></script>
+<script src="/search/static/js/search.ko.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/jquery/plugins/jquery-ui-draggable-droppable-sortable-1.8.23.min.js"></script>
 
 <script type="text/javascript">
+
+  var appProperties = {
+    labels: [],
+    listCollectionsUrl: "${ url("search:admin_collections") }?format=json",
+    listImportablesUrl: "${ url("search:admin_collections_import") }?format=json",
+    importUrl: "${ url("search:admin_collections_import") }"
+  }
+
+  var viewModel = new SearchCollectionsModel(appProperties);
+  ko.applyBindings(viewModel);
+
   $(document).ready(function () {
+    viewModel.updateCollections();
+
     var orderedCores;
     serializeList();
     $("#collections").sortable({
@@ -107,6 +174,28 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
         });
       }, 300);
     });
+
+    $("#importDialog").modal({
+      show: false
+    });
+
+    % if is_redirect:
+        showImportDialog();
+    % endif
+
+    $("#importBtn").on("click", function () {
+      showImportDialog();
+    });
+
+    function showImportDialog() {
+      $("#importDialog").modal('show');
+      viewModel.updateImportables();
+    }
+
+    $(document).on("imported", function () {
+      $("#importDialog").modal('hide');
+    });
+
   });
 </script>
 
