@@ -51,6 +51,8 @@ var SearchCollectionsModel = function (props) {
   self.LIST_COLLECTIONS_URL = props.listCollectionsUrl;
   self.LIST_IMPORTABLES_URL = props.listImportablesUrl;
   self.IMPORT_URL = props.importUrl;
+  self.DELETE_URL = props.deleteUrl;
+  self.COPY_URL = props.copyUrl;
 
   self.isLoading = ko.observable(false);
   self.isLoadingImportables = ko.observable(false);
@@ -61,6 +63,8 @@ var SearchCollectionsModel = function (props) {
 
   self.importableCollections = ko.observableArray([]);
   self.importableCores = ko.observableArray([]);
+
+  self.collectionToDelete = null;
 
   self.selectedCollections = ko.computed(function () {
     return ko.utils.arrayFilter(self.collections(), function (coll) {
@@ -94,12 +98,34 @@ var SearchCollectionsModel = function (props) {
     }));
   };
 
-  self.deleteCollections = function () {
-    var ids = [];
-    $(self.selectedCollections()).each(function (index, coll) {
-      ids.push(coll.id());
-    });
-    //callDelete(ids);
+  self.markForDeletion = function (collection) {
+    self.collectionToDelete = collection;
+    $(document).trigger("confirmDelete");
+  };
+
+  self.deleteCollection = function () {
+    $(document).trigger("deleting");
+    $.post(self.DELETE_URL,
+      {
+        id: self.collectionToDelete.id()
+      },
+      function (data) {
+        self.updateCollections();
+        $(document).trigger("collectionDeleted");
+      }, "json");
+  };
+
+  self.copyCollection = function (collection) {
+    $(document).trigger("copying");
+    $.post(self.COPY_URL,
+      {
+        id: collection.id(),
+        type: collection.isCoreOnly()?"core":"collection"
+      },
+      function (data) {
+        self.updateCollections();
+        $(document).trigger("collectionCopied");
+      }, "json");
   };
 
   self.updateCollections = function () {
@@ -124,7 +150,6 @@ var SearchCollectionsModel = function (props) {
       self.isLoadingImportables(false);
     });
   };
-
 
   self.importCollectionsAndCores = function () {
     $(document).trigger("importing");

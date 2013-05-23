@@ -165,6 +165,34 @@ def admin_collections_import(request):
     else:
       return admin_collections(request, True)
 
+@allow_admin_only
+def admin_collection_delete(request):
+  if request.method != 'POST':
+    raise PopupException(_('POST request required.'))
+
+  id = request.POST.get('id')
+  searcher = SearchController()
+  response = {
+    'id': searcher.delete_collection(id)
+  }
+
+  return HttpResponse(json.dumps(response), mimetype="application/json")
+
+
+@allow_admin_only
+def admin_collection_copy(request):
+  if request.method != 'POST':
+    raise PopupException(_('POST request required.'))
+
+  id = request.POST.get('id')
+  type = request.POST.get('type')
+  searcher = SearchController()
+  response = {
+    'id': searcher.copy_collection(id, type)
+  }
+
+  return HttpResponse(json.dumps(response), mimetype="application/json")
+
 
 @allow_admin_only
 def admin_collection_properties(request, collection):
