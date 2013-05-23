@@ -32,7 +32,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
   % if user.is_superuser:
     <div class="pull-right" style="margin-top: 4px">
       <a class="change-settings" href="#"><i class="icon-edit"></i> ${ _('Customize this collection') }</a> &nbsp;&nbsp;
-      <a href="${ url('search:admin_collections') }"><i class="icon-edit"></i> ${ _('Collection manager') }</a>
+      <a href="${ url('search:admin_collections') }"><i class="icon-sitemap"></i> ${ _('Collection manager') }</a>
     </div>
   % endif
   <form class="form-search" style="margin: 0">
@@ -246,21 +246,21 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
     % endif
 
     % if user.is_superuser:
-        $(".dropdown-collection").each(function () {
-          if ($(this).data("value") == $("select[name='collection']").val()) {
-            $(".change-settings").attr("href", $(this).data("settings-url"));
-          }
-        });
+      $(".dropdown-collection").each(function () {
+        if ($(this).data("value") == $("select[name='collection']").val()) {
+          $(".change-settings").attr("href", $(this).data("settings-url"));
+        }
+      });
     % endif
 
     $(".dropdown-collection").click(function (e) {
       e.preventDefault();
-      var solrName = $(this).data("value");
-      $("select[name='collection']").val(solrName);
+      var collectionId = $(this).data("value");
+      $("select[name='collection']").val(collectionId);
       % if user.is_superuser:
-          $(".change-settings").attr("href", $(this).data("settings-url"));
+        $(".change-settings").attr("href", $(this).data("settings-url"));
       % endif
-      $.cookie("hueSearchLastCollection", solrName, {expires: 90});
+      $.cookie("hueSearchLastCollection", collectionId, {expires: 90});
       $("form").submit();
     });
 
