@@ -30,16 +30,15 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
     <div class="pull-right" style="margin-top: 4px; margin-right: 20px">
       <a href="${ url('search:index') }"><i class="icon-share-alt"></i> ${ _('Query UI') }</a>
     </div>
-  &nbsp;
+  <h4>${_('Collection Manager')}</h4>
 </div>
 
 
 <div class="container-fluid">
-  <h1>${_('Indexes')}</h1>
 
   <%actionbar:render>
     <%def name="search()">
-      <input type="text" placeholder="${_('Filter collections by name...')}" class="input-xxlarge search-query" id="filterInput">
+      <input type="text" placeholder="${_('Filter collections by name...')}" class="input-xlarge search-query" id="filterInput">
     </%def>
 
     <%def name="creation()">
@@ -49,7 +48,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 
   <div class="row-fluid">
     <div class="span12">
-      <ul id="collections" data-bind="template: {name: 'collectionTemplate', foreach: collections}">
+      <ul id="collections" data-bind="template: {name: 'collectionTemplate', foreach: filteredCollections}">
 ##      % for collection in existing_hue_collections:
 ##        <li style="cursor: move" data-collection="${ collection.name }">
 ##          <a href="${ collection.get_absolute_url() }" class="pull-right" style="margin-top: 10px;margin-right: 10px"><i class="icon-edit"></i> ${_('Edit')}</a>
@@ -166,12 +165,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
     $("#filterInput").on("keyup", function () {
       clearTimeout(filter);
       filter = window.setTimeout(function () {
-        $("#collections li").removeClass("hide");
-        $("#collections li").each(function () {
-          if ($(this).data("collection").toLowerCase().indexOf($("#filterInput").val().toLowerCase()) == -1) {
-            $(this).addClass("hide");
-          }
-        });
+        viewModel.filterCollections($("#filterInput").val());
       }, 300);
     });
 

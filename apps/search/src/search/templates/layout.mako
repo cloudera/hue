@@ -32,15 +32,15 @@
         <a href="${ url('search:index') }"><i class="icon-share-alt"></i> ${ _('Query UI') }</a> &nbsp; &nbsp;
         <a href="${ url('search:admin_collections') }"><i class="icon-edit"></i> ${ _('Collection manager') }</a>
       </div>
-    &nbsp;
-  </div>
-
-  <div class="container-fluid">
     %if hasattr(caller, "title"):
       ${caller.title()}
     %else:
-        <h1>${_('Search Admin')}</h1>
+        <h4>${_('Search Admin')}</h4>
     %endif
+  </div>
+
+  <div class="container-fluid">
+
     <div class="row-fluid">
       %if hasattr(caller, "navigation"):
           <div class="span2">

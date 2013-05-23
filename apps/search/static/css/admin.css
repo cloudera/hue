@@ -73,3 +73,7 @@ h3 {
   padding-right: 20px;
   text-align: left;
 }
+
+.search-bar h4 {
+  margin-top: 4px;
+}
