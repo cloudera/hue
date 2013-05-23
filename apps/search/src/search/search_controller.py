@@ -41,16 +41,24 @@ class SearchController(object):
     pass
 
   def get_new_collections(self):
-    solr_collections = SolrApi(SOLR_URL.get()).collections()
-    for name in Collection.objects.values_list('name', flat=True):
-      solr_collections.pop(name, None)
+    try:
+      solr_collections = SolrApi(SOLR_URL.get()).collections()
+      for name in Collection.objects.values_list('name', flat=True):
+        solr_collections.pop(name, None)      
+    except Exception, e:
+      LOG.warn('No Zookeeper servlet running on Solr server: %s' % e)
+      solr_collections = []
 
     return solr_collections
 
   def get_new_cores(self):
-    solr_cores = SolrApi(SOLR_URL.get()).cores()
-    for name in Collection.objects.values_list('name', flat=True):
-      solr_cores.pop(name, None)
+    try:
+      solr_cores = SolrApi(SOLR_URL.get()).cores()
+      for name in Collection.objects.values_list('name', flat=True):
+        solr_cores.pop(name, None)
+    except Exception, e:
+      solr_cores = []
+      LOG.warn('No Single core setup on Solr server: %s' % e)
 
     return solr_cores
 
