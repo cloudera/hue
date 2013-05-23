@@ -74,7 +74,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
       </div>
 
       <div class="tab-pane" id="schema">
-        ${_('Loading...')} <img src="/static/art/spinner.gif">
+        <textarea id="schema_field">${_('Loading...')}</textarea>
       </div>
 
       <div class="tab-pane" id="properties">
@@ -86,13 +86,39 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 
 </%layout:skeleton>
 
+<script src="/static/ext/js/codemirror-3.11.js"></script>
+<link rel="stylesheet" href="/static/ext/css/codemirror.css">
+<script src="/static/ext/js/codemirror-xml.js"></script>
+
 <script type="text/javascript" charset="utf-8">
   $(document).ready(function(){
+    var schemaViewer = $("#schema_field")[0];
+
+    var codeMirror = CodeMirror(function (elt) {
+      schemaViewer.parentNode.replaceChild(elt, schemaViewer);
+    }, {
+      value: schemaViewer.value,
+      readOnly: true,
+      lineNumbers: true
+    });
+
+    codeMirror.setSize("100%", $(document).height() - 150 - $(".form-actions").outerHeight());
+
     $.get("${ url('search:admin_collection_schema', collection_id=hue_collection.id) }", function(data) {
-        $("#schema").html(data.content); // Need to scroll to refresh
+      console.log(data);
+      codeMirror.setValue(data.solr_schema);
+        //$("#schema").html(data.content); // Need to scroll to refresh
     });
     $.get("${ url('search:admin_collection_solr_properties', collection_id=hue_collection.id) }", function(data) {
         $("#properties").html(data.content);
+    });
+
+
+    // Force refresh on tab change
+    $("a[data-toggle='tab']").on("shown", function (e) {
+      if ($(e.target).attr("href") == "#schema") {
+        codeMirror.refresh();
+      }
     });
  });
 </script>

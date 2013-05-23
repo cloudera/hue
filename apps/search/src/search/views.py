@@ -311,12 +311,10 @@ def admin_collection_schema(request, collection_id):
   hue_collection = Collection.objects.get(id=collection_id)
   solr_schema = SolrApi(SOLR_URL.get()).schema(hue_collection.name)
 
-  content = render('admin_collection_properties_solr_schema.mako', request, {
-    'solr_schema': solr_schema,
-    'hue_collection': hue_collection,
-  }, force_template=True).content
-
-  return HttpResponse(json.dumps({'content': content}), mimetype="application/json")
+  content = {
+    'solr_schema': solr_schema.decode('utf-8')
+  }
+  return HttpResponse(json.dumps(content), mimetype="application/json")
 
 
 # TODO security
