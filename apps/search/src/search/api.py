@@ -26,6 +26,7 @@ import logging
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.rest.http_client import HttpClient, RestException
 from desktop.lib.rest.resource import Resource
+from search.conf import EMPTY_QUERY
 
 
 LOG = logging.getLogger(__name__)
@@ -43,7 +44,7 @@ class SolrApi(object):
   def query(self, solr_query, hue_core):
     try:
       params = (
-          ('q', solr_query['q'] or '*'),
+          ('q', solr_query['q'] or EMPTY_QUERY.get()),
           ('wt', 'json'),
           ('rows', solr_query['rows']),
           ('start', solr_query['start']),

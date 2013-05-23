@@ -167,7 +167,7 @@ def admin_collections_import(request):
 
 
 @allow_admin_only
-def admin_collection_properties(request, collection):  
+def admin_collection_properties(request, collection):
   hue_collection = Collection.objects.get(name=collection)
   solr_collection = SolrApi(SOLR_URL.get()).collection_or_core(hue_collection)
 
@@ -190,8 +190,8 @@ def admin_collection_properties(request, collection):
 
 @allow_admin_only
 def admin_collection_template(request, collection):
-  hue_collection = Collection.objects.get(name=collection)  
-  solr_collection = SolrApi(SOLR_URL.get()).collection_or_core(hue_collection)  
+  hue_collection = Collection.objects.get(name=collection)
+  solr_collection = SolrApi(SOLR_URL.get()).collection_or_core(hue_collection)
 
   if request.method == 'POST':
     hue_collection.result.update_from_post(request.POST)
