@@ -124,7 +124,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 
 <%layout:skeleton>
   <%def name="title()">
-    <h1>${ _('Template Editor ') } : ${ hue_collection.name }</h1>
+    <h4>${ _('Template Editor ') } : ${ hue_collection.name }</h4>
   </%def>
 
   <%def name="navigation()">
