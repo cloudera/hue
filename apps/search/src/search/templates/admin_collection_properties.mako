@@ -104,15 +104,12 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 
     codeMirror.setSize("100%", $(document).height() - 150 - $(".form-actions").outerHeight());
 
-    $.get("${ url('search:admin_collection_schema', collection_id=hue_collection.id) }", function(data) {
-      console.log(data);
+    $.get("${ url('search:admin_collection_schema', collection_id=hue_collection.id) }", function (data) {
       codeMirror.setValue(data.solr_schema);
-        //$("#schema").html(data.content); // Need to scroll to refresh
     });
-    $.get("${ url('search:admin_collection_solr_properties', collection_id=hue_collection.id) }", function(data) {
-        $("#properties").html(data.content);
+    $.get("${ url('search:admin_collection_solr_properties', collection_id=hue_collection.id) }", function (data) {
+      $("#properties").html(data.content);
     });
-
 
     // Force refresh on tab change
     $("a[data-toggle='tab']").on("shown", function (e) {
