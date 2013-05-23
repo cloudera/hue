@@ -98,6 +98,13 @@ var SearchCollectionsModel = function (props) {
     }));
   };
 
+  self.editCollection = function (collection) {
+    self.isLoading(true);
+    self.collections.removeAll();
+    self.filteredCollections.removeAll();
+    location.href = collection.absoluteUrl();
+  };
+
   self.markForDeletion = function (collection) {
     self.collectionToDelete = collection;
     $(document).trigger("confirmDelete");

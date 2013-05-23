@@ -30,7 +30,7 @@
   <div class="search-bar" style="height: 30px">
       <div class="pull-right" style="margin-top: 4px; margin-right: 20px">
         <a href="${ url('search:index') }"><i class="icon-share-alt"></i> ${ _('Search page') }</a> &nbsp; &nbsp;
-        <a href="${ url('search:admin_collections') }"><i class="icon-edit"></i> ${ _('Collection manager') }</a>
+        <a href="${ url('search:admin_collections') }"><i class="icon-sitemap"></i> ${ _('Collection manager') }</a>
       </div>
     %if hasattr(caller, "title"):
       ${caller.title()}
