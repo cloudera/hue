@@ -261,6 +261,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
         $(".change-settings").attr("href", $(this).data("settings-url"));
       % endif
       $.cookie("hueSearchLastCollection", collectionId, {expires: 90});
+      $("form").find("input[type='hidden']").val("");
       $("form").submit();
     });
 
