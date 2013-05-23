@@ -159,9 +159,8 @@ def admin_collection_properties(request, collection):
 
 @allow_admin_only
 def admin_collection_template(request, collection):
-  solr_collection = SolrApi(SOLR_URL.get()).collection(collection)
-  hue_collection = Collection.objects.get(name=collection)
-  hue_collections = Collection.objects.all()
+  hue_collection = Collection.objects.get(name=collection)  
+  solr_collection = SolrApi(SOLR_URL.get()).collection(collection)  
 
   if request.method == 'POST':
     hue_collection.result.update_from_post(request.POST)
@@ -181,7 +180,6 @@ def admin_collection_template(request, collection):
   return render('admin_collection_template.mako', request, {
     'solr_collection': solr_collection,
     'hue_collection': hue_collection,
-    'hue_collections': hue_collections,
     'sample_data': json.dumps(response["response"]["docs"]),
   })
 
@@ -190,7 +188,6 @@ def admin_collection_template(request, collection):
 def admin_collection_facets(request, collection):
   solr_collection = SolrApi(SOLR_URL.get()).collection(collection)
   hue_collection = Collection.objects.get(name=collection)
-  hue_collections = Collection.objects.all()
 
   if request.method == 'POST':
     hue_collection.facets.update_from_post(request.POST)
@@ -200,7 +197,6 @@ def admin_collection_facets(request, collection):
   return render('admin_collection_facets.mako', request, {
     'solr_collection': solr_collection,
     'hue_collection': hue_collection,
-    'hue_collections': hue_collections,
   })
 
 
@@ -208,7 +204,6 @@ def admin_collection_facets(request, collection):
 def admin_collection_sorting(request, collection):
   solr_collection = SolrApi(SOLR_URL.get()).collection(collection)
   hue_collection = Collection.objects.get(name=collection)
-  hue_collections = Collection.objects.all()
 
   if request.method == 'POST':
     hue_collection.sorting.update_from_post(request.POST)
@@ -218,15 +213,13 @@ def admin_collection_sorting(request, collection):
   return render('admin_collection_sorting.mako', request, {
     'solr_collection': solr_collection,
     'hue_collection': hue_collection,
-    'hue_collections': hue_collections,
   })
 
 
 @allow_admin_only
 def admin_collection_highlighting(request, collection):
-  solr_collection = SolrApi(SOLR_URL.get()).collection(collection)
   hue_collection = Collection.objects.get(name=collection)
-  hue_collections = Collection.objects.all()
+  solr_collection = SolrApi(SOLR_URL.get()).collection(collection)
 
   if request.method == 'POST':
     hue_collection.result.update_from_post(request.POST)
@@ -236,7 +229,6 @@ def admin_collection_highlighting(request, collection):
   return render('admin_collection_highlighting.mako', request, {
     'solr_collection': solr_collection,
     'hue_collection': hue_collection,
-    'hue_collections': hue_collections,
   })
 
 
@@ -246,12 +238,10 @@ def admin_collection_highlighting(request, collection):
 def admin_collection_solr_properties(request, collection):
   solr_collection = SolrApi(SOLR_URL.get()).collection(collection)
   hue_collection = Collection.objects.get(name=collection)
-  hue_collections = Collection.objects.all()
 
   content = render('admin_collection_properties_solr_properties.mako', request, {
     'solr_collection': solr_collection,
     'hue_collection': hue_collection,
-    'hue_collections': hue_collections,
   }, force_template=True).content
 
   return HttpResponse(json.dumps({'content': content}), mimetype="application/json")
@@ -261,12 +251,10 @@ def admin_collection_solr_properties(request, collection):
 def admin_collection_schema(request, collection):
   solr_schema = SolrApi(SOLR_URL.get()).schema(collection)
   hue_collection = Collection.objects.get(name=collection)
-  hue_collections = Collection.objects.all()
 
   content = render('admin_collection_properties_solr_schema.mako', request, {
     'solr_schema': solr_schema,
     'hue_collection': hue_collection,
-    'hue_collections': hue_collections,
   }, force_template=True).content
 
   return HttpResponse(json.dumps({'content': content}), mimetype="application/json")

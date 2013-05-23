@@ -65,7 +65,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
   <h1>${_('No available indexes')}</h1>
 
   <div class="row-fluid">
-    ${ _('Already installed all the collections. You can change the indexes URL in hue.ini.') }
+    ${ _('All the available collections have been installed or you are pointing to a bad Solr URL in hue.ini.') }
   </div>
   % endif
 

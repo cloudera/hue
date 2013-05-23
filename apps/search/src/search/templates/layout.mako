@@ -69,9 +69,8 @@
       <li class="${ utils.is_selected(section, 'properties') }">
         <a href="${ url('search:admin_collection_properties', collection=collection) }"><i class="icon-reorder"></i> ${_('Properties')}</a>
       </li>
-      ## Yes or no????? No for now
-      <li class="${ utils.is_selected(section, 'cores') }">
-        <a href="${ url('search:admin_collection_properties', collection=collection) }"><i class="icon-reorder"></i> ${_('Cores')}</a>
+      <li>
+        <a href="${ url('search:index') }?collection=${ collection }"><i class="icon-share-alt"></i> ${ _('Query') }</a>
       </li>
 
       <li class="nav-header">${_('Template')}</li>
@@ -88,10 +87,6 @@
         <a href="${ url('search:admin_collection_highlighting', collection=collection) }">${_('4. Highlighting')}</a>
       </li>
 
-      <li class="nav-header">${_('Search')}</li>
-      <li>
-        <a href="${ url('search:index') }?collection=${ collection }"><i class="icon-share-alt"></i> ${ _('Query') }</a>
-      </li>
     </ul>
   </div>
 </%def>
