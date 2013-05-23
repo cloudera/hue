@@ -71,6 +71,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
     margin-top: 10px;
     margin-bottom: 16px;
     position: relative;
+    min-width: 260px;
   }
 
   .widget-title {
@@ -105,7 +106,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
   }
 
   .widget-content {
-    padding: 12px 15px;
+    padding: 12px 8px;
     border-bottom: 1px solid #cdcdcd;
   }
 
@@ -119,6 +120,16 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 
   .tab-content {
     overflow: inherit;
+  }
+
+  .chzn-container, .chzn-select {
+    float: left;
+  }
+
+  .plus-btn {
+    float: left;
+    margin-left: 4px;
+    height: 30px;
   }
 </style>
 
@@ -154,23 +165,24 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
           <div class="span3">
             <div class="widget-box">
               <div class="widget-title">
-				<span class="icon">
-					<i class="icon-th-list"></i>
-				</span>
+                <span class="icon">
+                  <i class="icon-th-list"></i>
+                </span>
                 <h5>${_('Available Fields')}</h5>
               </div>
               <div class="widget-content">
                 <select data-bind="options: availableFields, value: selectedVisualField" class="input-large chzn-select"></select>
-                <a title="${ _('Click on this button to add the field') }" class="btn btn-small" data-bind="click: $root.addFieldToVisual">
+                <button title="${ _('Click on this button to add the field') }" class="btn btn-small plus-btn" data-bind="click: $root.addFieldToVisual">
                   <i class="icon-plus"></i>
-                </a>
+                </button>
+                <div class="clearfix"></div>
               </div>
             </div>
             <div class="widget-box">
               <div class="widget-title">
-				<span class="icon">
-					<i class="icon-magic"></i>
-				</span>
+                <span class="icon">
+                  <i class="icon-magic"></i>
+                </span>
                 <h5>${_('Available Functions')}</h5>
               </div>
               <div class="widget-content">
@@ -188,11 +200,11 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
                   <option title="${ _('Truncate a value after 250 characters') }" value="{{#truncate250}} {{/truncate250}}">{{#truncate250}}</option>
                   <option title="${ _('Truncate a value after 500 characters') }" value="{{#truncate500}} {{/truncate500}}">{{#truncate500}}</option>
                 </select>
-                <a title="${ _('Click on this button to add the field') }" class="btn btn-small" data-bind="click: $root.addFunctionToVisual">
+                <button title="${ _('Click on this button to add the field') }" class="btn btn-small plus-btn" data-bind="click: $root.addFunctionToVisual">
                   <i class="icon-plus"></i>
-                </a>
-                <br/>
-                <p class="muted"></p>
+                </button>
+                <div class="clearfix"></div>
+                <p class="muted" style="margin-top: 10px"></p>
               </div>
             </div>
           </div>
@@ -215,9 +227,10 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
               </div>
               <div class="widget-content">
                 <select data-bind="options: availableFields, value: selectedSourceField" class="input-medium chzn-select"></select>
-                <a title="${ _('Click on this button to add the field') }" class="btn btn-small" data-bind="click: $root.addFieldToSource">
+                <button title="${ _('Click on this button to add the field') }" class="btn btn-small plus-btn" data-bind="click: $root.addFieldToSource">
                   <i class="icon-plus"></i>
-                </a>
+                </button>
+                <div class="clearfix"></div>
               </div>
             </div>
             <div class="widget-box">
@@ -242,11 +255,11 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
                   <option title="${ _('Truncate a value after 250 characters') }" value="{{#truncate250}} {{/truncate250}}">{{#truncate250}}</option>
                   <option title="${ _('Truncate a value after 500 characters') }" value="{{#truncate500}} {{/truncate500}}">{{#truncate500}}</option>
                 </select>
-                <a title="${ _('Click on this button to add the field') }" class="btn btn-small" data-bind="click: $root.addFunctionToSource">
+                <button title="${ _('Click on this button to add the field') }" class="btn btn-small plus-btn" data-bind="click: $root.addFunctionToSource">
                   <i class="icon-plus"></i>
-                </a>
-                <br/>
-                <p class="muted"></p>
+                </button>
+                <div class="clearfix"></div>
+                <p class="muted" style="margin-top: 10px"></p>
               </div>
             </div>
           </div>
