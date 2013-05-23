@@ -88,15 +88,34 @@ class SearchController(object):
 
     return id
 
-  def copy_collection(self, collection_id, collection_type):
+  def copy_collection(self, collection_id):
     id = -1
-    try:
-      collection = Collection.objects.get(id=collection_id)
-      collection.label = collection.label + _(' (Copy)')
-      collection.id = None
-      collection.save()
-      id = collection.id
 
+    try:
+      copy = Collection.objects.get(id=collection_id)
+      copy.label += _(' (Copy)')
+      copy.id = copy.pk = None      
+      copy.save()
+
+      facets = copy.facets
+      facets.id = None
+      facets.save()
+      copy.facets = facets
+
+      result = copy.result
+      result.id = None
+      result.save()
+      copy.result = result
+
+
+      sorting = copy.sorting
+      sorting.id = None
+      sorting.save()
+      copy.sorting = sorting
+      
+      copy.save() 
+                
+      id = copy.id
     except Exception, e:
       LOG.warn('Error copying collection: %s' % e)
 

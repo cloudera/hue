@@ -185,10 +185,9 @@ def admin_collection_copy(request):
     raise PopupException(_('POST request required.'))
 
   id = request.POST.get('id')
-  type = request.POST.get('type')
   searcher = SearchController()
   response = {
-    'id': searcher.copy_collection(id, type)
+    'id': searcher.copy_collection(id)
   }
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
