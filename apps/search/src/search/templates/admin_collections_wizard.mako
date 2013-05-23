@@ -27,7 +27,6 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 <link rel="stylesheet" href="/search/static/css/admin.css">
 
 <div class="container-fluid">
-  % if collections:
   <h1>${_('Import a new collection')}</h1>
 
   <div class="row-fluid">
@@ -35,17 +34,19 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
       <ul id="collections">
       % for collection in collections:
         <li>
-          <a class="addCollection" data-name="${ collection }">
+          <a class="addCollection" data-name="${ collection }" data-type="collection">
             <h4><i class="icon-list"></i> ${ collection }</h4>
           </a>
         </li>
       % endfor
+      % if not collections:
+        ## TODO: maybe better to list them as disabled with imported icon etc
+        ${ _('All available collections from the Solr URL in hue.ini have been imported.') }      
+      % endif
       </ul>
     </div>
   </div>
-  % endif
 
-  % if cores:
   <h1>${_('Import a new core')}</h1>
 
   <div class="row-fluid">
@@ -53,21 +54,17 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
       <ul id="collections">
       % for core in cores:
         <li>
-          <h4><i class="icon-list"></i> ${ core }</h4>
+          <a class="addCollection" data-name="${ core }" data-type="core">
+            <h4><i class="icon-list"></i> ${ core }</h4>
+          </a>
         </li>
       % endfor
+      % if not cores:
+        ${ _('All available cores Solr URL in hue.ini have been imported.') }      
+      % endif      
       </ul>
     </div>
   </div>
-  % endif
-
-  % if not collections and not cores:
-  <h1>${_('No available indexes')}</h1>
-
-  <div class="row-fluid">
-    ${ _('All the available collections have been installed or you are pointing to a bad Solr URL in hue.ini.') }
-  </div>
-  % endif
 
 </div>
 
@@ -97,7 +94,8 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
   $(document).ready(function () {
     $(".addCollection").click(function() {
       var collectionName = $(this).data('name');
-      $.post('${ url("search:admin_collections_wizard") }', {type: 'collection', name: collectionName},
+      var collectionType = $(this).data('type');
+      $.post('${ url("search:admin_collections_wizard") }', {type: collectionType, name: collectionName},
         function(response) {
           if (response['status'] != 0) {
             $.jHueNotify.error("${ _('Problem: ') }" + response['message']);

@@ -48,8 +48,9 @@ class SearchController(object):
     return solr_collections
 
   def get_new_cores(self):
-    # TODO
-    solr_cores = []
+    solr_cores = SolrApi(SOLR_URL.get()).cores()
+    for name in Collection.objects.values_list('name', flat=True):
+      solr_cores.pop(name, None)
 
     return solr_cores
 
@@ -60,5 +61,11 @@ class SearchController(object):
 
       hue_collection, created = Collection.objects.get_or_create(name=attrs['name'], solr_properties=collection, is_enabled=True)
       return hue_collection
+    elif attrs['type'] == 'core':
+      cores = self.get_new_cores()
+      core = cores[attrs['name']]
+
+      hue_collection, created = Collection.objects.get_or_create(name=attrs['name'], solr_properties=core, is_enabled=True, is_core_only=True)
+      return hue_collection      
     else:
       raise PopupException(_('Collection type does not exit: %s') % attrs)
