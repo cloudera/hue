@@ -22,7 +22,7 @@
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="macros" file="macros.mako" />
 
-${ commonheader(_('Search'), "search", user) | n,unicode }
+${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 
 <%layout:skeleton>
   <%def name="title()">

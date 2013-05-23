@@ -60,6 +60,11 @@
 
 .facet-list li {
   padding-left: 8px;
+  padding-right: 3px;
+}
+
+.facet-list li a {
+  word-wrap: break-word;
 }
 
 .counter {

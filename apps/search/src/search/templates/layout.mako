@@ -26,6 +26,15 @@
   <script src="/static/ext/chosen/chosen.jquery.min.js" type="text/javascript" charset="utf-8"></script>
   <script src="/static/ext/js/knockout-2.1.0.js" type="text/javascript" charset="utf-8"></script>
 
+
+  <div class="search-bar" style="height: 30px">
+      <div class="pull-right" style="margin-top: 4px; margin-right: 20px">
+        <a href="${ url('search:index') }"><i class="icon-share-alt"></i> ${ _('Query UI') }</a> &nbsp; &nbsp;
+        <a href="${ url('search:admin_collections') }"><i class="icon-edit"></i> ${ _('Collection manager') }</a>
+      </div>
+    &nbsp;
+  </div>
+
   <div class="container-fluid">
     %if hasattr(caller, "title"):
       ${caller.title()}
