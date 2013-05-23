@@ -241,7 +241,10 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
     });
     $(".dateFacetHeader").after(orderedDateFacets);
 
-    $(".current-collection").text("${ hue_collection.label }");
+    % if hue_collection:
+      $(".current-collection").text("${ hue_collection.label }");
+    % endif
+
     % if user.is_superuser:
         $(".dropdown-collection").each(function () {
           if ($(this).data("value") == $("select[name='collection']").val()) {
