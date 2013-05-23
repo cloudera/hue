@@ -46,23 +46,20 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
     </%def>
   </%actionbar:render>
 
-  <div class="row-fluid" data-bind="visible: collections().length == 0">
+  <div class="row-fluid" data-bind="visible: collections().length == 0 && !isLoading()">
     <div class="span10 offset1 center">
-
       <i class="icon-plus-sign waiting"></i>
       <h1 class="emptyMessage">${ _('There are currently no collections defined.') }<br/>${ _('Please click on Import to add one or more.') }</h1>
-
+    </div>
+  </div>
+  <div class="row-fluid" data-bind="visible: isLoading()">
+    <div class="span10 offset1 center">
+      <i class="icon-spinner icon-spin" style="font-size: 60px; color: #DDD"></i>
     </div>
   </div>
   <div class="row-fluid">
     <div class="span12">
       <ul id="collections" data-bind="template: {name: 'collectionTemplate', foreach: filteredCollections}">
-##      % for collection in existing_hue_collections:
-##        <li style="cursor: move" data-collection="${ collection.name }">
-##          <a href="${ collection.get_absolute_url() }" class="pull-right" style="margin-top: 10px;margin-right: 10px"><i class="icon-edit"></i> ${_('Edit')}</a>
-##          <h4><i class="icon-list"></i> ${ collection.name } - ${ collection.is_core_only } -- ${ collection.label } == ${ collection.id }</h4>
-##        </li>
-##      % endfor
       </ul>
     </div>
   </div>
