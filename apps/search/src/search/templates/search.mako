@@ -58,20 +58,20 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
   </form>
 </div>
 
-<div class="container">
+<div class="container results">
   <div id="loader" class="row" style="text-align: center">
     <img src="/static/art/spinner.gif" />
   </div>
   <div id="mainContent" class="row hide">
     % if error:
-    <div class="span12">
+    <div class="span12 results">
       <div class="alert">
         ${ error['message'] }
       </div>
     </div>
     %else:
     % if response and response['response']['docs'] and len(response['response']['docs']) > 0 and response['normalized_facets']:
-    <div class="span2">
+    <div class="span2 results">
       <ul class="facet-list">
         % for fld in response['normalized_facets']:
           % if fld['type'] == 'date':
@@ -119,9 +119,9 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 
     % if response and response['response']['docs'] and len(response['response']['docs']) > 0:
       % if response['normalized_facets']:
-      <div class="span10">
+      <div class="span10 results">
       % else:
-      <div class="span12">
+      <div class="span12 results">
       % endif
       <ul class="breadcrumb">
         <li class="pull-right">
