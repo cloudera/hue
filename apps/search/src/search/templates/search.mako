@@ -147,11 +147,12 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
       <textarea id="mustacheTmpl" class="hide">${ hue_collection.result.get_template(with_highlighting=True) | n,unicode }</textarea>
       <script>
 
-      <%
-        docs = response['response']['docs']
-        for doc in response['response']['docs']:
-          if doc['id'] in response.get('highlighting', []):
-            doc.update(response['highlighting'][doc['id']])
+        <%
+          docs = response['response']['docs']
+          for doc in response['response']['docs']:
+            # Beware, schema requires an 'id' field, silently do nothing
+            if 'id' in doc and doc['id'] in response.get('highlighting', []):
+              doc.update(response['highlighting'][doc['id']])
         %>
 
         function genericFormatDate(val, item, format){

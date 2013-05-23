@@ -43,7 +43,7 @@ class SearchController(object):
   def get_new_collections(self):
     solr_collections = SolrApi(SOLR_URL.get()).collections()
     for name in Collection.objects.values_list('name', flat=True):
-      solr_collections.pop(name)
+      solr_collections.pop(name, None)
 
     return solr_collections
 
