@@ -56,10 +56,10 @@ def index(request):
   hue_collection = None
 
   if search_form.is_valid():
-    collection = search_form.cleaned_data['collection']
+    collection_id = search_form.cleaned_data['collection']
     if request.GET.get('collection') is None:
-      collection = request.COOKIES.get('hueSearchLastCollection', hue_collections[0].name)
-    solr_query['collection'] = collection
+      collection_id = request.COOKIES.get('hueSearchLastCollection', hue_collections[0].id)
+    solr_query['collection'] = collection_id
     solr_query['q'] = search_form.cleaned_data['query']
     solr_query['fq'] = search_form.cleaned_data['fq']
     if search_form.cleaned_data['sort']:
@@ -69,7 +69,7 @@ def index(request):
     solr_query['facets'] = search_form.cleaned_data['facets'] or 1
 
     try:
-      hue_collection = Collection.objects.get(name=collection)
+      hue_collection = Collection.objects.get(id=collection_id)
       response = SolrApi(SOLR_URL.get()).query(solr_query, hue_collection)
     except Exception, e:
       error['message'] = unicode(str(e), "utf8")
@@ -90,7 +90,7 @@ def index(request):
     'solr_query': solr_query,
     'hue_collection': hue_collection,
     'hue_collections': hue_collections,
-    'current_collection': collection,
+    'current_collection': collection_id,
     'json': json,
   })
 
