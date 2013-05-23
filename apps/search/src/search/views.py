@@ -295,7 +295,7 @@ def admin_collection_highlighting(request, collection_id):
 @allow_admin_only
 def admin_collection_solr_properties(request, collection_id):
   hue_collection = Collection.objects.get(id=collection_id)
-  solr_collection = SolrApi(SOLR_URL.get()).collection(hue_collection.name)
+  solr_collection = SolrApi(SOLR_URL.get()).collection_or_core(hue_collection)
 
   content = render('admin_collection_properties_solr_properties.mako', request, {
     'solr_collection': solr_collection,
