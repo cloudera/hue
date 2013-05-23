@@ -44,7 +44,7 @@ class SearchController(object):
     try:
       solr_collections = SolrApi(SOLR_URL.get()).collections()
       for name in Collection.objects.values_list('name', flat=True):
-        solr_collections.pop(name, None)      
+        solr_collections.pop(name, None)
     except Exception, e:
       LOG.warn('No Zookeeper servlet running on Solr server: %s' % e)
       solr_collections = []
@@ -74,6 +74,6 @@ class SearchController(object):
       core = cores[attrs['name']]
 
       hue_collection, created = Collection.objects.get_or_create(name=attrs['name'], solr_properties=core, is_enabled=True, is_core_only=True)
-      return hue_collection      
+      return hue_collection
     else:
       raise PopupException(_('Collection type does not exit: %s') % attrs)

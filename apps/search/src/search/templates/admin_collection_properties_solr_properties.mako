@@ -30,7 +30,7 @@
   % else:
     % for key, value in solr_collection.iteritems():
       ${ key } : ${ value }
-    % endfor  
+    % endfor
   % endif
 </%def>
 
@@ -42,7 +42,7 @@
   % else:
     % for key, value in solr_collection.iteritems():
       ${ key } : ${ value }
-    % endfor  
+    % endfor
   % endif
 </%def>
 
@@ -51,9 +51,9 @@
   </%def>
 
   <%def name="content()">
-  
+
   % if not hue_collection.is_core_only:
-    <div class="tab-content">         
+    <div class="tab-content">
       <div class="tab-pane active" id="index_properties">
         <table class="table">
           <thead>
@@ -67,7 +67,7 @@
             % for key, value in solr_collection.iteritems():
               <td>${ key }</td>
               <td>${ value }</td>
-            % endfor          
+            % endfor
           </tr>
           </tbody>
         </table>
@@ -79,7 +79,7 @@
       <li><a href="#collection_properties" data-toggle="tab">${_('Collection properties')}</a></li>
     </ul>
 
-    <div class="tab-content">         
+    <div class="tab-content">
       <div class="tab-pane active" id="index_properties">
         <table class="table">
           <thead>
@@ -93,7 +93,7 @@
             % for key, value in solr_collection.iteritems():
               <td>${ key }</td>
               <td>${ value }</td>
-            % endfor          
+            % endfor
           </tr>
           </tbody>
         </table>
@@ -111,7 +111,7 @@
             % for key, value in solr_collection.iteritems():
               <td>${ key }</td>
               <td>${ value }</td>
-            % endfor          
+            % endfor
           </tr>
           </tbody>
         </table>

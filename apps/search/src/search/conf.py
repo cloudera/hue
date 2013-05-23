@@ -39,3 +39,9 @@ SOLR_URL = Config(
 
 # ZOOKEEPER URL
 # for COLLECTIONS
+
+
+EMPTY_QUERY = Config(
+  key="empty_query",
+  help=_("Query sent when no term is entered."),
+  default="*:*")
