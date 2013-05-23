@@ -23,15 +23,27 @@
 
 
 <%def name="indexProperty(key)">
-  %if key in solr_collection["status"][hue_collection.name]["index"]:
+  % if hue_collection.is_core_only:
+    % if key in solr_collection["status"][hue_collection.name]["index"]:
       ${ solr_collection["status"][hue_collection.name]["index"][key] }
-    %endif
+    % endif
+  % else:
+    % for key, value in solr_collection.iteritems():
+      ${ key } : ${ value }
+    % endfor  
+  % endif
 </%def>
 
 <%def name="collectionProperty(key)">
-  %if key in solr_collection["status"][hue_collection.name]:
+  % if hue_collection.is_core_only:
+    % if key in solr_collection["status"][hue_collection.name]:
       ${ solr_collection["status"][hue_collection.name][key] }
-    %endif
+    % endif
+  % else:
+    % for key, value in solr_collection.iteritems():
+      ${ key } : ${ value }
+    % endfor  
+  % endif
 </%def>
 
 <%layout:skeleton>
@@ -39,12 +51,9 @@
   </%def>
 
   <%def name="content()">
-    <ul class="nav nav-tabs">
-      <li class="active"><a href="#index_properties" data-toggle="tab">${_('Index properties')}</a></li>
-      <li><a href="#collection_properties" data-toggle="tab">${_('Core properties')}</a></li>
-    </ul>
-
-    <div class="tab-content">
+  
+  % if not hue_collection.is_core_only:
+    <div class="tab-content">         
       <div class="tab-pane active" id="index_properties">
         <table class="table">
           <thead>
@@ -55,44 +64,36 @@
           </thead>
           <tbody>
           <tr>
-            <td>sizeInBytes</td>
-            <td>${ indexProperty('sizeInBytes') }</td>
+            % for key, value in solr_collection.iteritems():
+              <td>${ key }</td>
+              <td>${ value }</td>
+            % endfor          
           </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  % else:
+    <ul class="nav nav-tabs">
+      <li class="active"><a href="#index_properties" data-toggle="tab">${_('Index properties')}</a></li>
+      <li><a href="#collection_properties" data-toggle="tab">${_('Collection properties')}</a></li>
+    </ul>
+
+    <div class="tab-content">         
+      <div class="tab-pane active" id="index_properties">
+        <table class="table">
+          <thead>
           <tr>
-            <td>segmentCount</td>
-            <td>${ indexProperty('segmentCount') }</td>
+            <th width="20%">${_('Property')}</th>
+            <th>${_('Value')}</th>
           </tr>
+          </thead>
+          <tbody>
           <tr>
-            <td>maxDoc</td>
-            <td>${ indexProperty('maxDoc') }</td>
-          </tr>
-          <tr>
-            <td>lastModified</td>
-            <td>${ indexProperty('lastModified') }</td>
-          </tr>
-          <tr>
-            <td>current</td>
-            <td>${ indexProperty('current') }</td>
-          </tr>
-          <tr>
-            <td>version</td>
-            <td>${ indexProperty('version') }</td>
-          </tr>
-          <tr>
-            <td>directory</td>
-            <td>${ indexProperty('directory') }</td>
-          </tr>
-          <tr>
-            <td>numDocs</td>
-            <td>${ indexProperty('numDocs') }</td>
-          </tr>
-          <tr>
-            <td>hasDeletions</td>
-            <td>${ indexProperty('hasDeletions') }</td>
-          </tr>
-          <tr>
-            <td>size</td>
-            <td>${ indexProperty('size') }</td>
+            % for key, value in solr_collection.iteritems():
+              <td>${ key }</td>
+              <td>${ value }</td>
+            % endfor          
           </tr>
           </tbody>
         </table>
@@ -107,41 +108,16 @@
           </thead>
           <tbody>
           <tr>
-            <td>uptime</td>
-            <td>${ collectionProperty('uptime') }</td>
-          </tr>
-          <tr>
-            <td>name</td>
-            <td>${ collectionProperty('name') }</td>
-          </tr>
-          <tr>
-            <td>isDefaultCore</td>
-            <td>${ collectionProperty('isDefaultCore') }</td>
-          </tr>
-          <tr>
-            <td>dataDir</td>
-            <td>${ collectionProperty('dataDir') }</td>
-          </tr>
-          <tr>
-            <td>instanceDir</td>
-            <td>${ collectionProperty('instanceDir') }</td>
-          </tr>
-          <tr>
-            <td>startTime</td>
-            <td>${ collectionProperty('startTime') }</td>
-          </tr>
-          <tr>
-            <td>config</td>
-            <td>${ collectionProperty('config') }</td>
-          </tr>
-          <tr>
-            <td>schema</td>
-            <td>${ collectionProperty('schema') }</td>
+            % for key, value in solr_collection.iteritems():
+              <td>${ key }</td>
+              <td>${ value }</td>
+            % endfor          
           </tr>
           </tbody>
         </table>
       </div>
     </div>
+  % endif
 
   </%def>
 </%layout:skeleton>

@@ -65,9 +65,13 @@
   <div class="well sidebar-nav" style="min-height: 250px">
     <ul class="nav nav-list">
 
-    <li class="nav-header">${_('Core')}</li>
+    <li class="nav-header">${_('Collection')}</li>
       <li class="${ utils.is_selected(section, 'properties') }">
         <a href="${ url('search:admin_collection_properties', collection=collection) }"><i class="icon-reorder"></i> ${_('Properties')}</a>
+      </li>
+      ## Yes or no????? No for now
+      <li class="${ utils.is_selected(section, 'cores') }">
+        <a href="${ url('search:admin_collection_properties', collection=collection) }"><i class="icon-reorder"></i> ${_('Cores')}</a>
       </li>
 
       <li class="nav-header">${_('Template')}</li>

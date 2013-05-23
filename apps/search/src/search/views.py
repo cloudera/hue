@@ -136,9 +136,9 @@ def admin(request):
 
 
 @allow_admin_only
-def admin_collection_properties(request, collection):
-  solr_collection = SolrApi(SOLR_URL.get()).collection(collection)
+def admin_collection_properties(request, collection):  
   hue_collection = Collection.objects.get(name=collection)
+  solr_collection = SolrApi(SOLR_URL.get()).collection_or_core(hue_collection)
 
   if request.method == 'POST':
     collection_form = CollectionForm(request.POST, instance=hue_collection)

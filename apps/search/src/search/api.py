@@ -83,11 +83,17 @@ class SolrApi(object):
     except RestException, e:
       raise PopupException('Error while accessing Solr: %s' % e)
 
-  def collection(self, core):
+  def collection_or_core(self, hue_collection):
+    if hue_collection.is_core_only:
+      return self.core(hue_collection.name)
+    else:
+      return self.collection(hue_collection.name)
+
+  def collection(self, name):
     try:
-      # TODO: if core get from here, if collection from Zookeeper
-      return self._root.get('admin/cores', params={'wt': 'json', 'core': core})
-    except RestException, e:
+      collections = self.collections()
+      return collections[name]
+    except Exception, e:
       raise PopupException('Error while accessing Solr: %s' % e)
 
   def cores(self):

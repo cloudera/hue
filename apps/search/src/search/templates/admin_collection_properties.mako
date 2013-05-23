@@ -40,7 +40,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 
 <%layout:skeleton>
   <%def name="title()">
-    <h1>${_('Search Admin - ')} ${ hue_collection.label }</h1>
+    <h1>${_('Customize ')} ${ hue_collection.label }</h1>
   </%def>
 
   <%def name="navigation()">
@@ -57,7 +57,7 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
         <a href="#schema" data-toggle="tab">${_('Schema')}</a>
       </li>
       <li>
-        <a href="#properties" data-toggle="tab">${_('Properties')}</a>
+        <a href="#properties" data-toggle="tab">${_('Cores')}</a>
       </li>
     </ul>
     <div class="tab-content">
