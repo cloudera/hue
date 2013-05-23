@@ -47,7 +47,7 @@ def index(request):
     if request.user.is_superuser:
       return admin_collections_wizard(request)
     else:
-      raise PopupException(_('No collections! If user message, if admin send to wizard.'))
+      return no_collections(request)
 
   search_form = QueryForm(request.GET)
   response = {}
@@ -93,6 +93,9 @@ def index(request):
     'current_collection': collection,
     'json': json,
   })
+
+def no_collections(request):
+  return render('no_collections.mako', request, {})
 
 
 @allow_admin_only
