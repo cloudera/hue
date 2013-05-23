@@ -298,10 +298,12 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 
     $("#id_query").focus();
 
-    $(document).on("keydown", function () {
-      if (!$("#id_query").is(":focus")) {
-        $("#id_query").focus();
-        $("#id_query").val($("#id_query").val());
+    $(document).on("keydown", function (e) {
+      if (!e.ctrlKey && !e.altKey && !e.metaKey){
+        if (!$("#id_query").is(":focus")) {
+          $("#id_query").focus();
+          $("#id_query").val($("#id_query").val());
+        }
       }
     });
 
