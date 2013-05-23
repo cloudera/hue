@@ -18,15 +18,34 @@ function addTemplateFunctions(item) {
   if (Mustache == "undefined") {
     return;
   }
-  function genericFormatDate(val, item, format) {
+
+  function genericDate(val, item) {
     var d = moment(Mustache.render(val, item));
     if (d.isValid()) {
+      return d;
+    }
+    else {
+      var number = parseInt(Mustache.render(val, item)) || '';
+      if (number) {
+        var d = moment(number * 1000); // timestamp * 1000
+        if (d.isValid()) {
+          return d;
+        }
+      }
+    }
+  }
+
+  function genericFormatDate(val, item, format) {
+    var d = genericDate(val, item);
+    if (d) {
       return d.format(format);
     }
     else {
       return Mustache.render(val, item);
     }
   }
+
+  // Functions
 
   item.preview = function () {
     return function (val) {
@@ -76,8 +95,8 @@ function addTemplateFunctions(item) {
   };
   item.fromnow = function () {
     return function (val) {
-      var d = moment(Mustache.render(val, item));
-      if (d.isValid()) {
+      var d = genericDate(val, item);
+      if (d && d.isValid()) {
         return d.fromNow();
       }
       else {
