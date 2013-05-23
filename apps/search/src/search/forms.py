@@ -21,7 +21,7 @@ from search.models import Collection
 
 
 class QueryForm(forms.Form):
-  collection = forms.ChoiceField()
+  collection = forms.ChoiceField() # collection_id
 
   query = forms.CharField(label='', max_length=256, required=False, initial='',
                           widget=forms.TextInput(attrs={'class': 'search-query input-xxlarge', 'placeholder': 'Search...'}))
@@ -33,7 +33,7 @@ class QueryForm(forms.Form):
 
   def __init__(self, *args, **kwargs):
     super(QueryForm, self).__init__(*args, **kwargs)
-    choices = [(core.name, core.label) for core in Collection.objects.filter(enabled=True)]
+    choices = [(core.id, core.label) for core in Collection.objects.filter(enabled=True)]
     initial_choice = self._initial_core(choices)
     self.fields['collection'] = forms.ChoiceField(choices=choices, initial=initial_choice, required=False, label='', widget=forms.Select(attrs={'class':'hide'}))
 

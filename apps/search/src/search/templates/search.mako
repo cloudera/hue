@@ -41,11 +41,11 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
       <ul class="dropdown-menu">
         % if user.is_superuser:
           % for collection in hue_collections:
-            <li><a class="dropdown-collection" href="#" data-value="${ collection.name }" data-settings-url="${ collection.get_absolute_url() }">${ collection.label }</a></li>
+            <li><a class="dropdown-collection" href="#" data-value="${ collection.id }" data-settings-url="${ collection.get_absolute_url() }">${ collection.label }</a></li>
           % endfor
         % else:
           % for collection in hue_collections:
-            <li><a class="dropdown-collection" href="#" data-value="${ collection.name }">${ collection.label }</a></li>
+            <li><a class="dropdown-collection" href="#" data-value="${ collection.id }">${ collection.label }</a></li>
           % endfor
         % endif
       </ul>
@@ -330,7 +330,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
       var query = $("#id_query").val();
       if ($.trim(query) != "") {
         $("#id_query").addClass("deletable");
-        $.ajax("${ url('search:query_suggest', collection=hue_collection.name) }" + query, {
+        $.ajax("${ url('search:query_suggest', collection_id=hue_collection.id) }" + query, {
           type: 'GET',
           success: function (data) {
             if (data.message.spellcheck && ! jQuery.isEmptyObject(data.message.spellcheck.suggestions)) {

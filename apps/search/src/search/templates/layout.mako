@@ -70,30 +70,30 @@
   </script>
 </%def>
 
-<%def name="sidebar(collection, section='')">
+<%def name="sidebar(hue_collection, section='')">
   <div class="well sidebar-nav" style="min-height: 250px">
     <ul class="nav nav-list">
 
     <li class="nav-header">${_('Collection')}</li>
       <li class="${ utils.is_selected(section, 'properties') }">
-        <a href="${ url('search:admin_collection_properties', collection=collection) }"><i class="icon-reorder"></i> ${_('Properties')}</a>
+        <a href="${ url('search:admin_collection_properties', collection_id=hue_collection.id) }"><i class="icon-reorder"></i> ${_('Properties')}</a>
       </li>
       <li>
-        <a href="${ url('search:index') }?collection=${ collection }"><i class="icon-share-alt"></i> ${ _('Query') }</a>
+        <a href="${ url('search:index') }?collection_id=${ hue_collection.id }"><i class="icon-share-alt"></i> ${ _('Query') }</a>
       </li>
 
       <li class="nav-header">${_('Template')}</li>
       <li class="${ utils.is_selected(section, 'template') }">
-        <a href="${ url('search:admin_collection_template', collection=collection) }">${_('1. Snippet')}</a>
+        <a href="${ url('search:admin_collection_template', collection_id=hue_collection.id) }">${_('1. Snippet')}</a>
       </li>
       <li class="${ utils.is_selected(section, 'facets') }">
-        <a href="${ url('search:admin_collection_facets', collection=collection) }">${_('2. Facets')}</a>
+        <a href="${ url('search:admin_collection_facets', collection_id=hue_collection.id) }">${_('2. Facets')}</a>
       </li>
       <li class="${ utils.is_selected(section, 'sorting') }">
-        <a href="${ url('search:admin_collection_sorting', collection=collection) }">${_('3. Sorting')}</a>
+        <a href="${ url('search:admin_collection_sorting', collection_id=hue_collection.id) }">${_('3. Sorting')}</a>
       </li>
       <li class="${ utils.is_selected(section, 'highlighting') }">
-        <a href="${ url('search:admin_collection_highlighting', collection=collection) }">${_('4. Highlighting')}</a>
+        <a href="${ url('search:admin_collection_highlighting', collection_id=hue_collection.id) }">${_('4. Highlighting')}</a>
       </li>
 
     </ul>

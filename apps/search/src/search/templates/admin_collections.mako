@@ -172,6 +172,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 
     var orderedCores;
     serializeList();
+    /**
     $("#collections").sortable({
       placeholder: "placeholder",
       update: function (event, ui) {
@@ -182,6 +183,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
       }
     });
     $("#collections").disableSelection();
+    */
 
     function serializeList() {
       orderedCores = [];

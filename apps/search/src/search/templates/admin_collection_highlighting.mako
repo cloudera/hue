@@ -30,7 +30,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
   </%def>
 
   <%def name="navigation()">
-    ${ layout.sidebar(hue_collection.name, 'highlighting') }
+    ${ layout.sidebar(hue_collection, 'highlighting') }
   </%def>
 
   <%def name="content()">
@@ -102,7 +102,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
     self.isEnabled = ko.observable(properties.highlighting_enabled);
 
     self.submit = function () {
-      $.ajax("${ url('search:admin_collection_highlighting', collection=hue_collection.name) }", {
+      $.ajax("${ url('search:admin_collection_highlighting', collection_id=hue_collection.id) }", {
         data: {
           'properties': ko.utils.stringifyJson({'highlighting_enabled': self.isEnabled()}),
           'highlighting': ko.utils.stringifyJson(self.highlightedFields)

@@ -44,7 +44,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
   </%def>
 
   <%def name="navigation()">
-    ${ layout.sidebar(hue_collection.name, 'properties') }
+    ${ layout.sidebar(hue_collection, 'properties') }
   </%def>
 
   <%def name="content()">
@@ -88,10 +88,10 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 
 <script type="text/javascript" charset="utf-8">
   $(document).ready(function(){
-    $.get("${ url('search:admin_collection_schema', collection=hue_collection.name) }", function(data) {
+    $.get("${ url('search:admin_collection_schema', collection_id=hue_collection.id) }", function(data) {
         $("#schema").html(data.content); // Need to scroll to refresh
     });
-    $.get("${ url('search:admin_collection_solr_properties', collection=hue_collection.name) }", function(data) {
+    $.get("${ url('search:admin_collection_solr_properties', collection_id=hue_collection.id) }", function(data) {
         $("#properties").html(data.content);
     });
  });

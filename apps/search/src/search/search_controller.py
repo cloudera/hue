@@ -92,7 +92,6 @@ class SearchController(object):
     id = -1
     try:
       collection = Collection.objects.get(id=collection_id)
-      collection.name = collection.name + _('_copy')
       collection.label = collection.label + _(' (Copy)')
       collection.id = None
       collection.save()

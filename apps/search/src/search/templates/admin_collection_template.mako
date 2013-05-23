@@ -128,7 +128,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
   </%def>
 
   <%def name="navigation()">
-    ${ layout.sidebar(hue_collection.name, 'template') }
+    ${ layout.sidebar(hue_collection, 'template') }
   </%def>
 
   <%def name="content()">
@@ -618,7 +618,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
     });
 
     $("#save-template").click(function () {
-      $.ajax("${ url('search:admin_collection_template', collection=hue_collection.name) }", {
+      $.ajax("${ url('search:admin_collection_template', collection_id=hue_collection.id) }", {
         data: {
           'template': ko.utils.stringifyJson($("#content-editor").html()),
           'extracode': ko.utils.stringifyJson(templateExtraMirror.getValue())
