@@ -35,4 +35,6 @@ urlpatterns = patterns('search.views',
   url(r'^suggest/(?P<collection>\w+)/(?P<query>\w+)?$', 'query_suggest', name='query_suggest'),
   url(r'^admin/collection/(?P<collection>\w+)/schema$', 'admin_collection_schema', name='admin_collection_schema'),
   url(r'^admin/collection/(?P<collection>\w+)/solr_properties$', 'admin_collection_solr_properties', name='admin_collection_solr_properties'),
+  url(r'^admin/collection_delete$', 'admin_collection_delete', name='admin_collection_delete'),
+  url(r'^admin/collection_copy$', 'admin_collection_copy', name='admin_collection_copy'),
 )

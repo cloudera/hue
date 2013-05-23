@@ -28,7 +28,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from search.api import SolrApi
 from search.conf import SOLR_URL
 from search.models import Collection
-
+from django.utils.translation import ugettext as _
 
 LOG = logging.getLogger(__name__)
 
@@ -77,3 +77,28 @@ class SearchController(object):
       return hue_collection
     else:
       raise PopupException(_('Collection type does not exit: %s') % attrs)
+
+  def delete_collection(self, collection_id):
+    id = collection_id
+    try:
+      Collection.objects.get(id=collection_id).delete()
+    except Exception, e:
+      LOG.warn('Error deleting collection: %s' % e)
+      id = -1
+
+    return id
+
+  def copy_collection(self, collection_id, collection_type):
+    id = -1
+    try:
+      collection = Collection.objects.get(id=collection_id)
+      collection.name = collection.name + _('_copy')
+      collection.label = collection.label + _(' (Copy)')
+      collection.id = None
+      collection.save()
+      id = collection.id
+
+    except Exception, e:
+      LOG.warn('Error copying collection: %s' % e)
+
+    return id

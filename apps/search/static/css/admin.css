@@ -77,3 +77,14 @@ h3 {
 .search-bar h4 {
   margin-top: 4px;
 }
+
+.waiting {
+  font-size: 196px;
+  color: #DDD;
+}
+
+h1.emptyMessage {
+  margin-top: 50px;
+  color: #BBB;
+  line-height: 60px;
+}
