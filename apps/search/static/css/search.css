@@ -80,3 +80,19 @@
   padding: 8px 15px;
   text-align: center;
 }
+
+.results.container {
+  width: 1180px;
+}
+
+.results.span2 {
+  width: 180px;
+}
+
+.results.span10 {
+  width: 980px;
+}
+
+.results.span12 {
+  width: 1180px;
+}
