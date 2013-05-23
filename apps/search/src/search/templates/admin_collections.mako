@@ -27,19 +27,21 @@ ${ commonheader(_('Search'), "search", user) | n,unicode }
 <link rel="stylesheet" href="/search/static/css/admin.css">
 
 <div class="container-fluid">
-  <h1>${_('Search Admin - Cores')}</h1>
+  <h1>${_('Indexes')}</h1>
+
   <%actionbar:render>
     <%def name="search()">
       <input type="text" placeholder="${_('Filter collections by name...')}" class="input-xxlarge search-query" id="filterInput">
     </%def>
   </%actionbar:render>
+
   <div class="row-fluid">
     <div class="span12">
       <ul id="collections">
       % for collection in hue_collections:
         <li style="cursor: move" data-collection="${ collection.name }">
           <a href="${ collection.get_absolute_url() }" class="pull-right" style="margin-top: 10px;margin-right: 10px"><i class="icon-edit"></i> ${_('Edit')}</a>
-          <h4><i class="icon-list"></i> ${ collection.name }</h4>
+          <h4><i class="icon-list"></i> ${ collection.name } - ${ collection.is_core_only }</h4>
         </li>
       % endfor
       </ul>

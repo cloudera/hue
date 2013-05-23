@@ -98,7 +98,7 @@ class SolrApi(object):
 
   def cores(self):
     try:
-      return self._root.get('admin/cores', params={'wt': 'json'})
+      return self._root.get('admin/cores', params={'wt': 'json'})['status']
     except RestException, e:
       raise PopupException('Error while accessing Solr: %s' % e)
 
