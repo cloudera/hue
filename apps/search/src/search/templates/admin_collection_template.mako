@@ -570,7 +570,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
       }
       if ($(e.target).attr("href") == "#preview") {
         $("#preview-container").empty();
-        var _mustacheTmpl = fixTemplateDots($("#content-editor").html());
+        var _mustacheTmpl = fixTemplateDotsAndFunctionNames($("#content-editor").html());
         $(samples).each(function (cnt, item) {
           addTemplateFunctions(item);
           $("<div>").addClass("preview-row").html(Mustache.render(_mustacheTmpl, item)).appendTo($("#preview-container"));

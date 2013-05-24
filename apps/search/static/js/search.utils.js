@@ -47,42 +47,42 @@ function addTemplateFunctions(item) {
 
   // Functions
 
-  item.preview = function () {
+  item.hue_fn_preview = function () {
     return function (val) {
       return '<a href="/filebrowser/view/' + $.trim(Mustache.render(val, item)) + '">' + $.trim(Mustache.render(val, item)) + '</a>';
     }
   };
-  item.embeddeddownload = function () {
+  item.hue_fn_embeddeddownload = function () {
     return function (val) {
       return '<a href="/filebrowser/download/' + $.trim(Mustache.render(val, item)) + '?disposition=inline">' + $.trim(Mustache.render(val, item)) + '</a>';
     }
   };
-  item.download = function () {
+  item.hue_fn_download = function () {
     return function (val) {
       return '<a href="/filebrowser/download/' + $.trim(Mustache.render(val, item)) + '>' + $.trim(Mustache.render(val, item)) + '</a>';
     }
   };
-  item.date = function () {
+  item.hue_fn_date = function () {
     return function (val) {
       return genericFormatDate(val, item, "DD-MM-YYYY");
     }
   };
-  item.time = function () {
+  item.hue_fn_time = function () {
     return function (val) {
       return genericFormatDate(val, item, "HH:mm:ss");
     }
   };
-  item.datetime = function () {
+  item.hue_fn_datetime = function () {
     return function (val) {
       return genericFormatDate(val, item, "DD-MM-YYYY HH:mm:ss");
     }
   };
-  item.fulldate = function () {
+  item.hue_fn_fulldate = function () {
     return function (val) {
       return genericFormatDate(val, item, null);
     }
   };
-  item.timestamp = function () {
+  item.hue_fn_timestamp = function () {
     return function (val) {
       var d = moment(Mustache.render(val, item));
       if (d.isValid()) {
@@ -93,7 +93,7 @@ function addTemplateFunctions(item) {
       }
     }
   };
-  item.fromnow = function () {
+  item.hue_fn_fromnow = function () {
     return function (val) {
       var d = genericDate(val, item);
       if (d && d.isValid()) {
@@ -104,22 +104,22 @@ function addTemplateFunctions(item) {
       }
     }
   };
-  item.truncate50 = function () {
+  item.hue_fn_truncate50 = function () {
     return _truncate(50);
   };
-  item.truncate100 = function () {
+  item.hue_fn_truncate100 = function () {
     return _truncate(100);
   };
-  item.truncate200 = function () {
+  item.hue_fn_truncate200 = function () {
     return _truncate(200);
   };
-  item.truncate250 = function () {
+  item.hue_fn_truncate250 = function () {
     return _truncate(250);
   };
-  item.truncate500 = function () {
+  item.hue_fn_truncate500 = function () {
     return _truncate(500);
   };
-  item.truncate1000 = function () {
+  item.hue_fn_truncate1000 = function () {
     return _truncate(1000);
   };
 
@@ -141,10 +141,16 @@ function addTemplateFunctions(item) {
   }
 }
 
-function fixTemplateDots(template) {
+function fixTemplateDotsAndFunctionNames(template) {
   var _mustacheTmpl = template;
   var _mustacheTags = _mustacheTmpl.match(/{{(.*?)}}/g);
   $.each(_mustacheTags, function (cnt, tag) {
+    if (tag.indexOf("{#") > -1) {
+      _mustacheTmpl = _mustacheTmpl.replace(tag, tag.replace(/\#/gi, "#hue_fn_"))
+    }
+    if (tag.indexOf("{/") > -1) {
+      _mustacheTmpl = _mustacheTmpl.replace(tag, tag.replace(/\//gi, "/hue_fn_"))
+    }
     if (tag.indexOf(".") > -1) {
       _mustacheTmpl = _mustacheTmpl.replace(tag, tag.replace(/\./gi, "_"))
     }
