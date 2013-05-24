@@ -25,18 +25,20 @@
   <link rel="stylesheet" href="/static/ext/chosen/chosen.css">
   <script src="/static/ext/chosen/chosen.jquery.min.js" type="text/javascript" charset="utf-8"></script>
   <script src="/static/ext/js/knockout-2.1.0.js" type="text/javascript" charset="utf-8"></script>
-
-
+  
   <div class="search-bar" style="height: 30px">
+    % if not hasattr(caller, "no_navigation"):
       <div class="pull-right" style="margin-top: 4px; margin-right: 20px">
         <a href="${ url('search:index') }"><i class="icon-share-alt"></i> ${ _('Search page') }</a> &nbsp; &nbsp;
         <a href="${ url('search:admin_collections') }"><i class="icon-sitemap"></i> ${ _('Collection manager') }</a>
       </div>
-    %if hasattr(caller, "title"):
-      ${caller.title()}
-    %else:
-        <h4>${_('Search Admin')}</h4>
-    %endif
+    % endif
+
+    % if hasattr(caller, "title"):
+      ${ caller.title() }
+    % else:
+        <h4>${ _('Search Admin') }</h4>
+    % endif
   </div>
 
   <div class="container-fluid">
@@ -79,7 +81,7 @@
         <a href="${ url('search:admin_collection_properties', collection_id=hue_collection.id) }"><i class="icon-reorder"></i> ${_('Properties')}</a>
       </li>
       <li>
-        <a href="${ url('search:index') }?collection_id=${ hue_collection.id }"><i class="icon-search"></i> ${ _('Search this collection') }</a>
+        <a href="${ url('search:index') }?collection_id=${ hue_collection.id }"><i class="icon-search"></i> ${ _('Search it') }</a>
       </li>
 
       <li class="nav-header">${_('Template')}</li>
