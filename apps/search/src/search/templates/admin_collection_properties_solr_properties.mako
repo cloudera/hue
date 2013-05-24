@@ -22,37 +22,14 @@
 <%namespace name="macros" file="macros.mako" />
 
 
-<%def name="indexProperty(key)">
-  % if hue_collection.is_core_only:
-    % if key in solr_collection["status"][hue_collection.name]["index"]:
-      ${ solr_collection["status"][hue_collection.name]["index"][key] }
-    % endif
-  % else:
-    % for key, value in solr_collection.iteritems():
-      ${ key } : ${ value }
-    % endfor
-  % endif
-</%def>
-
-<%def name="collectionProperty(key)">
-  % if hue_collection.is_core_only:
-    % if key in solr_collection["status"][hue_collection.name]:
-      ${ solr_collection["status"][hue_collection.name][key] }
-    % endif
-  % else:
-    % for key, value in solr_collection.iteritems():
-      ${ key } : ${ value }
-    % endfor
-  % endif
-</%def>
-
 <%layout:skeleton>
+  <%def name="no_navigation()">
+  </%def>
+
   <%def name="title()">
   </%def>
 
   <%def name="content()">
-
-  % if not hue_collection.is_core_only:
     <div class="tab-content">
       <div class="tab-pane active" id="index_properties">
         <table class="table">
@@ -73,51 +50,5 @@
         </table>
       </div>
     </div>
-  % else:
-    <ul class="nav nav-tabs">
-      <li class="active"><a href="#index_properties" data-toggle="tab">${_('Index properties')}</a></li>
-      <li><a href="#collection_properties" data-toggle="tab">${_('Collection properties')}</a></li>
-    </ul>
-
-    <div class="tab-content">
-      <div class="tab-pane active" id="index_properties">
-        <table class="table">
-          <thead>
-          <tr>
-            <th width="20%">${_('Property')}</th>
-            <th>${_('Value')}</th>
-          </tr>
-          </thead>
-          <tbody>
-          <tr>
-            % for key, value in solr_collection.iteritems():
-              <td>${ key }</td>
-              <td>${ value }</td>
-            % endfor
-          </tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="tab-pane" id="collection_properties">
-        <table class="table">
-          <thead>
-          <tr>
-            <th width="20%">${_('Property')}</th>
-            <th>${_('Value')}</th>
-          </tr>
-          </thead>
-          <tbody>
-          <tr>
-            % for key, value in solr_collection.iteritems():
-              <td>${ key }</td>
-              <td>${ value }</td>
-            % endfor
-          </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  % endif
-
   </%def>
 </%layout:skeleton>

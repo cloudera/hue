@@ -370,8 +370,8 @@ margin-top: 2px;
 class Collection(models.Model):
   # Perms coming with https://issues.cloudera.org/browse/HUE-950
   enabled = models.BooleanField(default=True)
-  name = models.CharField(max_length=40, verbose_name=_t('Solr name'))
-  label = models.CharField(max_length=100)
+  name = models.CharField(max_length=40, verbose_name=_t('Solr index name pointing to'))
+  label = models.CharField(max_length=100, verbose_name=_t('Friendlier name in UI'))
   is_core_only = models.BooleanField(default=False)
   cores = models.TextField(default=json.dumps({}), verbose_name=_t('Collection with cores data'), help_text=_t('Solr json'))
   properties = models.TextField(
