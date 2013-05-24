@@ -63,9 +63,9 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
     <div class="tab-content">
       <div class="tab-pane active" id="index">
         <div class="fieldWrapper">
-          ${ utils.render_field(collection_form['enabled']) }          
+          ${ utils.render_field(collection_form['enabled']) }
           ${ utils.render_field(collection_form['label']) }
-          ${ utils.render_field(collection_form['name']) }          
+          ${ utils.render_field(collection_form['name']) }
         </div>
 
 	    <div class="form-actions">

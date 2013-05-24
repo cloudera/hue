@@ -198,154 +198,15 @@ class CollectionManager(models.Manager):
                    'dates': []
                 }))
       result = Result.objects.create(data=json.dumps({
-                  'template': """
-<div class="row-fluid">
-  <div class="span1"><img src="http://twitter.com/api/users/profile_image/{{user_screen_name}}" style="margin:10px"></div>
-  <div class="span9">
-    <h5><a href="https://twitter.com/{{user_screen_name}}/status/{{id}}" target="_blank" title="Open in Twitter"></a><a target="_blank" href="https://twitter.com/{{user_screen_name}}">{{user_name}}</a></h5>
-
-    {{text}}
-
-    <br>
-    <a href="/filebrowser/view/{{file_path}}">
-      {{file_name}} {{file_length}}{{#file_length}} bytes {{content_type}}{{/file_length}}
-    </a>
-    {{#file_path}}
-    <a href="/filebrowser/download{{file_path}}?disposition=inline">
-      Download
-    </a>
-    {{/file_path}}
-     <div class="stream-item-footer">
-        <ul class="tweet-actions">
-          <li class="action">
-            <a href="https://twitter.com/intent/tweet?in_reply_to={{id}}" target="_blank">
-              <i class="icon icon-reply"></i>
-              <b>Reply</b>
-            </a>
-          </li>
-          <li class="action">
-            <a href="https://twitter.com/intent/retweet?tweet_id={{id}}" target="_blank">
-              <i class="icon icon-retweet"></i>
-              <b>Retweet</b>
-            </a>
-          </li>
-        </ul>
-      </div>
-
-  </div>
-  <div class="span2">
-    <br><a class="btn" href="https://twitter.com/{{user_screen_name}}/status/{{id}}" target="_blank" title="Open in Twitter">
-    <i class="icon-share-alt"></i></a>
-    <small class="time">
-      <a href="https://twitter.com/{{user_screen_name}}/status/{{id}}" target="_blank" data-dt="{{created_at}}" rel="tooltip" data-placement="left" title="{{created_at}}">{{created_at}}</a>
-    </small>
-  </div>
-</div>
-                  """,
+                  'template': '',
                   'highlighting': [],
                   'properties': {'highlighting_enabled': False},
-                  'extracode': #"<style>\n</style>\n\n<script>\n</script>"
+                  'extracode':
                   """
 <style>
-.content {
-margin-left: 58px;
+em {
+  color: red;
 }
-
-.action {
-margin-right: 5px;
-}
-
-.action a, .time a, .account-group, .retweeted {
-color: #999999;
-}
-
-.account-group a {
-text-decoration: none;
-font-weight: normal;
-}
-
-.username {
-font-size: 12px;
-}
-
-.time {
-color: #BBBBBB;
-float: right;
-margin-top: 1px;
-position: relative;
-}
-
-.avatar {
-position: absolute;
-margin-left: -56px!important;
-margin-top: 4px!important;
--webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, .2);
--moz-box-shadow: 0 1px 1px rgba(0, 0, 0, .2);
-box-shadow: 0 1px 1px rgba(0, 0, 0, .2);
--webkit-border-radius: 5px;
--moz-border-radius: 5px;
-border-radius: 5px;
-}
-
-.text {
-margin-bottom: 4px;
-cursor: pointer;
-}
-
-.tweet-actions li {
-display: inline;
-}
-
-.stream-item-footer {
-font-size: 12px;
-color: #999999;
-}
-
-ul.tweet-actions {
-list-style: none outside none;
-}
-
-ul.tweet-actions {
-margin: 0;
-padding: 0;
-}
-
-.fullname {
-color: #333333;
-font-weight: bold;
-}
-
-.stream-item-footer, .retweeted {
-font-size: 12px;
-padding-top: 1px;
-}
-
-.icon {
-background-position: 0 0;
-background-repeat: no-repeat;
-display: inline-block;
-vertical-align: text-top;
-height: 13px;
-width: 14px;
-margin-top: 0;
-margin-left: -2px;
-}
-.icon-reply {
-background-image: url("/search/static/art/reply.png");
-}
-.icon-retweet {
-background-image: url("/search/static/art/retweet.png");
-}
-.twitter-logo {
-background-image: url("/search/static/art/bird_gray_32.png");
-width: 32px;
-height: 32px;
-background-repeat: no-repeat;
-display: inline-block;
-vertical-align: top;
-margin-top: 2px;
-}
-
 </style>
 
 <script>
@@ -355,7 +216,7 @@ margin-top: 2px;
       sorting = Sorting.objects.create(data=json.dumps({'properties': {'is_enabled': False}, 'fields': []}))
       cores = json.dumps(solr_properties)
 
-      return Collection.objects.create(
+      collection = Collection.objects.create(
           name=name,
           label=name,
           enabled=is_enabled,
@@ -364,7 +225,19 @@ margin-top: 2px;
           facets=facets,
           result=result,
           sorting=sorting
-      ), True
+      )
+
+      template = """
+<div class="row-fluid">
+  <div class="row-fluid">
+    <div class="span12">%s</div>
+  </div>
+</div>""" % ' '.join(['{{%s}}' % field for field in collection.fields])
+
+      result.update_from_post({'template': json.dumps(template)})
+      result.save()
+
+      return collection, True
 
 
 class Collection(models.Model):

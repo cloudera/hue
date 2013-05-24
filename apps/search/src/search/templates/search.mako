@@ -255,7 +255,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
         $(".change-settings").attr("href", collectionUrl);
       % endif
     % endif
-    
+
     $(".dropdown-collection").click(function (e) {
       e.preventDefault();
       var collectionId = $(this).data("value");

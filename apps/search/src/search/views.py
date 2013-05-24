@@ -58,7 +58,7 @@ def index(request):
   if search_form.is_valid():
     collection_id = search_form.cleaned_data['collection']
     if request.GET.get('collection') is None:
-      collection_id = request.COOKIES.get('hueSearchLastCollection', collection_id)    
+      collection_id = request.COOKIES.get('hueSearchLastCollection', collection_id)
     solr_query['q'] = search_form.cleaned_data['query']
     solr_query['fq'] = search_form.cleaned_data['fq']
     if search_form.cleaned_data['sort']:
