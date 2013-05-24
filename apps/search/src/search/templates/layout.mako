@@ -81,7 +81,7 @@
         <a href="${ url('search:admin_collection_properties', collection_id=hue_collection.id) }"><i class="icon-reorder"></i> ${_('Properties')}</a>
       </li>
       <li>
-        <a href="${ url('search:index') }?collection_id=${ hue_collection.id }"><i class="icon-search"></i> ${ _('Search it') }</a>
+        <a href="${ url('search:index') }?collection=${ hue_collection.id }"><i class="icon-search"></i> ${ _('Search it') }</a>
       </li>
 
       <li class="nav-header">${_('Template')}</li>

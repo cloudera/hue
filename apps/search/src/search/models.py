@@ -232,6 +232,7 @@ em {
   <div class="row-fluid">
     <div class="span12">%s</div>
   </div>
+  <br/>  
 </div>""" % ' '.join(['{{%s}}' % field for field in collection.fields])
 
       result.update_from_post({'template': json.dumps(template)})
