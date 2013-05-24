@@ -96,3 +96,7 @@
 .results.span12 {
   width: 1180px;
 }
+
+.errorlist {
+  display: none;
+}

@@ -75,10 +75,11 @@ def index(request):
       error['message'] = unicode(str(e), "utf8")
   else:
     hue_collection = hue_collections[0]
-    collection = hue_collections.id
+    collection_id = hue_collection.id
 
   if hue_collection is not None:
     response = augment_solr_response(response, hue_collection.facets.get_data())
+    print response
 
   if request.GET.get('format') == 'json':
     return HttpResponse(json.dumps(response), mimetype="application/json")
