@@ -1,160 +1,80 @@
-Welcome to the repository for Hue
-=================================
+=========================================
+          Hue Oozie UI v1.1
+=========================================
 
-.. note::
-    This is the development-oriented readme. If you want to write notes for
-    end users, please put them in ``dist/README``.
-
-Hue is both a Web UI for Hadoop and a framework to create interactive Web
-applications. It features:
-
-      * FileBrowser for accessing HDFS
-      * Job Designer for creating MapReduce/Streaming/Java jobs
-      * Beeswax application for executing Hive queries
-      * Impala App for executing Cloudera Impala queries
-      * Oozie App for submitting and scheduling workflows
-      * JobBrowser for viewing MapReduce jobs
-      * A Pig/HBase/Sqoop2 shell
-
-On top of that, a SDK is available for creating new apps integrated with Hadoop.
-
-More user and developer documentation is available at http://cloudera.github.com/hue/.
+Instructions to install the tarball release of Hue Oozie.
 
 
-Getting Started
-===============
-To build and get the core server running::
+## Install in any directory. 
+## If you don't have the permissions, you will need to 'sudo' the commands.
+$ PREFIX=/usr/share make install
 
-    $ git clone http://github.com/cloudera/hue.git
-    $ cd hue
-    $ make apps
-    $ build/env/bin/hue runserver
+## Run
+$ /usr/share/hue/build/env/bin/hue runspawningserver
 
-If using the Beeswax application, start the daemon::
+## Goto: http://localhost:11011 !
 
-    $ build/env/bin/hue beeswax_server
-
-Now Hue should be running on http://localhost:8000.
-
-The configuration in development mode is ``desktop/conf/pseudo-distributed.ini``.
+## Enter the username you want
 
 
-Note: to start all the servers in one command (but lose the automatic reloading after source modification)::
 
-   $ build/env/bin/supervisor
+Optional
+--------
 
-To run the tests::
+## Install plug-ins (for direct access to logs. Requires Hadoop 1.2 or 0.23)
+$ cd /usr/lib/hadoop-0.20-mapreduce/lib
+$ ln -s /usr/share/hue/desktop/libs/hadoop/java-lib/hue*jar
 
-   $ build/env/bin/hue test all
-   $ build/env/bin/hue test specific filebrowser
-   $ build/env/bin/hue test specific jobbrowser.tests:test_get_path
+## Configure Hadoop (for HDFS file links)
+Edit hdfs-site.xml:
 
+<property>
+  <name>dfs.webhdfs.enable</name>
+  <value>true</value>
+</property>
 
-Development Prerequisites
-===========================
-You'll need these library development packages and tools installed on
-your system:
+Edit mapred-site.xml:
 
-    Ubuntu:
-      * ant
-      * gcc
-      * g++
-      * libkrb5-dev
-      * libmysqlclient-dev
-      * libssl-dev
-      * libsasl2-dev
-      * libsasl2-modules-gssapi-mit
-      * libsqlite3-dev
-      * libtidy-0.99-0 (for unit tests only)
-      * libxml2-dev
-      * libxslt-dev
-      * mvn (from ``maven2`` package or tarball)
-      * openldap-dev / libldap2-dev
-      * python-dev
-      * python-simplejson
-      * python-setuptools
-
-    CentOS:
-      * ant
-      * asciidoc
-      * cyrus-sasl-devel
-      * cyrus-sasl-gssapi
-      * gcc
-      * gcc-c++
-      * krb5-devel
-      * libtidy (for unit tests only)
-      * libxml2-devel
-      * libxslt-devel
-      * mvn (from ``maven2`` package or tarball)
-      * mysql
-      * mysql-devel
-      * openldap-devel
-      * python-devel
-      * python-simplejson
-      * sqlite-devel
-
-    MacOS (mac port):
-      * liblxml
-      * libxml2
-      * libxslt
-      * mysql5-devel
-      * simplejson (easy_install)
-      * sqlite3
+<property>
+  <name>mapred.jobtracker.plugins</name>
+  <value>org.apache.hadoop.thriftfs.ThriftJobTrackerPlugin</value>
+  <description>Comma-separated list of jobtracker plug-ins to be activated.
+  </description>
+</property>
 
 
-File Layout
-===========
-The Hue "framework" is in ``desktop``. ``/core/`` contains the Web components and
-``desktop/libs/`` the API for talking to Hadoop.
-The installable apps live in ``apps/``.  Please place third-party dependencies in the app's ext-py/
-directory.
+Dependencies
+------------
 
-The typical directory structure for inside an application includes:
+You might need some of these library development packages (in particular the python* ones) if they not installed on your system:
 
-  src/
-    for Python/Django code
-      models.py
-      urls.py
-      views.py
-      forms.py
-      settings.py
+Ubuntu:
+* ant
+* gcc
+* g++
+* libsqlite3-dev
+* libxml2-dev
+* libxslt-dev
+* mvn (from maven2 package or tarball)
+* python-dev
+* python-simplejson
+* python-setuptools
 
-  conf/
-    for configuration (``.ini``) files to be installed
+CentOS:
+* ant
+* asciidoc
+* gcc
+* gcc-c++
+* libxml2-devel
+* libxslt-devel
+* mvn (from maven2 package or tarball)
+* python-devel
+* python-simplejson
+* sqlite-devel
 
-  static/
-    for static HTML/js resources and help doc
-
-  templates/
-    for data to be put through a template engine
-
-  locales/
-    for localizations in multiple languages
-
-For the URLs within your application, you should make your own ``urls.py``
-which will be automatically rooted at ``/yourappname/`` in the global
-namespace.  See ``apps/about/src/about/urls.py`` for an example.
-
-
-Main Stack
-==========
-
-   * Python 2.4 - 2.7
-   * Django 1.2 https://docs.djangoproject.com/en/1.2/
-   * Mako
-   * jQuery
-   * Bootstrap
-
-
-Community
-=========
-   * User group: http://groups.google.com/a/cloudera.org/group/hue-user
-   * Jira: https://issues.cloudera.org/browse/HUE
-
-
-License
-=======
-Apache License, Version 2.0
-http://www.apache.org/licenses/LICENSE-2.0
-
-
+MacOS (mac port):
+* liblxml
+* libxml2
+* libxslt
+* simplejson (easy_install)
+* sqlite3
