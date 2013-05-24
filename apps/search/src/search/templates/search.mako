@@ -28,6 +28,17 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 <script src="/static/ext/js/moment.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/search/static/js/search.utils.js" type="text/javascript" charset="utf-8"></script>
 
+<%
+  if "q" not in solr_query:
+    solr_query["q"] = ""
+  if "fq" not in solr_query:
+    solr_query["fq"] = ""
+  if "rows" not in solr_query:
+    solr_query["rows"] = ""
+  if "start" not in solr_query:
+    solr_query["start"] = ""
+%>
+
 <div class="search-bar">
   % if user.is_superuser:
     <div class="pull-right" style="margin-top: 4px">
@@ -70,7 +81,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
       </div>
     </div>
     %else:
-    % if response and response['response']['docs'] and len(response['response']['docs']) > 0 and response['normalized_facets']:
+    % if response and 'response' in response and 'docs' in response['response'] and len(response['response']['docs']) > 0 and 'normalized_facets' in response:
     <div class="span2 results">
       <ul class="facet-list">
         % for fld in response['normalized_facets']:
@@ -117,7 +128,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
     </div>
     % endif
 
-    % if response and response['response']['docs'] and len(response['response']['docs']) > 0:
+    % if response and 'response' in response and 'docs' in response['response'] and len(response['response']['docs']) > 0:
       % if response['normalized_facets']:
       <div class="span10 results">
       % else:
@@ -213,6 +224,11 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 
 <script>
   $(document).ready(function () {
+    if ($(".errorlist").length > 0) {
+      $(".errorlist li").each(function () {
+        $.jHueNotify.error($(this).text());
+      });
+    }
 
     $("#loader").hide();
     $("#mainContent").removeClass("hide");
@@ -333,14 +349,6 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
       var query = $("#id_query").val();
       if ($.trim(query) != "") {
         $("#id_query").addClass("deletable");
-        $.ajax("${ url('search:query_suggest', collection_id=hue_collection.id) }" + query, {
-          type: 'GET',
-          success: function (data) {
-            if (data.message.spellcheck && ! jQuery.isEmptyObject(data.message.spellcheck.suggestions)) {
-              $('#id_query').typeahead({source: data.message.spellcheck.suggestions[1].suggestion});
-            }
-          }
-        });
       }
       else {
         $("#id_query").removeClass("deletable");
