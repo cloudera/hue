@@ -246,7 +246,7 @@ def admin_collection_template(request, collection_id):
 @allow_admin_only
 def admin_collection_facets(request, collection_id):
   hue_collection = Collection.objects.get(id=collection_id)
-  solr_collection = SolrApi(SOLR_URL.get()).collection(hue_collection.name)
+  solr_collection = SolrApi(SOLR_URL.get()).collection_or_core(hue_collection)
 
   if request.method == 'POST':
     hue_collection.facets.update_from_post(request.POST)
@@ -262,7 +262,7 @@ def admin_collection_facets(request, collection_id):
 @allow_admin_only
 def admin_collection_sorting(request, collection_id):
   hue_collection = Collection.objects.get(id=collection_id)
-  solr_collection = SolrApi(SOLR_URL.get()).collection(hue_collection.name)
+  solr_collection = SolrApi(SOLR_URL.get()).collection_or_core(hue_collection)
 
   if request.method == 'POST':
     hue_collection.sorting.update_from_post(request.POST)
@@ -278,7 +278,7 @@ def admin_collection_sorting(request, collection_id):
 @allow_admin_only
 def admin_collection_highlighting(request, collection_id):
   hue_collection = Collection.objects.get(id=collection_id)
-  solr_collection = SolrApi(SOLR_URL.get()).collection(hue_collection.name)
+  solr_collection = SolrApi(SOLR_URL.get()).collection_or_core(hue_collection)
 
   if request.method == 'POST':
     hue_collection.result.update_from_post(request.POST)
