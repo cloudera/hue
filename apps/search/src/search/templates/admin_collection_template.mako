@@ -410,14 +410,14 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
   ${ hue_collection.result.get_extracode() | n,unicode }
 </span>
 
-<link rel="stylesheet" href="/static/ext/farbtastic/farbtastic.css">
-<link rel="stylesheet" href="/static/ext/css/freshereditor.css">
+<link rel="stylesheet" href="/search/static/farbtastic/farbtastic.css">
+<link rel="stylesheet" href="/search/static/css/freshereditor.css">
 <link rel="stylesheet" href="/static/ext/css/codemirror.css">
 
 <script src="/static/ext/js/knockout-2.1.0.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/farbtastic/farbtastic.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/shortcut.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/freshereditor.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/search/static/farbtastic/farbtastic.js" type="text/javascript" charset="utf-8"></script>
+<script src="/search/static/js/shortcut.js" type="text/javascript" charset="utf-8"></script>
+<script src="/search/static/js/freshereditor.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/codemirror-3.11.js"></script>
 <script src="/static/ext/js/moment.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/codemirror-xml.js"></script>

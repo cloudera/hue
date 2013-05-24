@@ -1,0 +1,11 @@
+a.dropdown-toggle, a.dropdown-toggle:hover {
+  text-decoration: none;
+}
+
+.dropdown a.dropdown-toggle {
+  color: gray;
+}
+
+.dropdown:hover a.dropdown-toggle, .open a.dropdown-toggle {
+  color: black;
+}

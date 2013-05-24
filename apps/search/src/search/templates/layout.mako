@@ -22,8 +22,8 @@
 
 <%def name="skeleton()">
   <link rel="stylesheet" href="/search/static/css/admin.css">
-  <link rel="stylesheet" href="/static/ext/chosen/chosen.css">
-  <script src="/static/ext/chosen/chosen.jquery.min.js" type="text/javascript" charset="utf-8"></script>
+  <link rel="stylesheet" href="/search/static/chosen/chosen.css">
+  <script src="/search/static/chosen/chosen.jquery.min.js" type="text/javascript" charset="utf-8"></script>
   <script src="/static/ext/js/knockout-2.1.0.js" type="text/javascript" charset="utf-8"></script>
 
   <div class="search-bar" style="height: 30px">

@@ -1,0 +1,13 @@
+﻿.fresheditor-toolbar 
+{
+	font-family:"Georgia", Serif;
+	line-height:1.67em;
+	font-size:1em;
+}
+.toolbar-btn {
+	height: 20px;
+}
+.colorpanel {
+	background-color: #333;
+}
+
