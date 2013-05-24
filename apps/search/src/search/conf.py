@@ -25,6 +25,12 @@ SOLR_URL = Config(
   help=_("URL of the Solr Server."),
   default="http://localhost:8983/solr/")
 
+EMPTY_QUERY = Config(
+  key="empty_query",
+  help=_("Query sent when no term is entered."),
+  default="*:*")
+
+
 #SOLR_URLS = UnspecifiedConfigSection(
 #  "solr_urls",
 #  help="One entry for each Solr server",
@@ -38,10 +44,3 @@ SOLR_URL = Config(
 #)
 
 # ZOOKEEPER URL
-# for COLLECTIONS
-
-
-EMPTY_QUERY = Config(
-  key="empty_query",
-  help=_("Query sent when no term is entered."),
-  default="*:*")

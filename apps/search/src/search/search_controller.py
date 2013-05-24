@@ -94,7 +94,7 @@ class SearchController(object):
     try:
       copy = Collection.objects.get(id=collection_id)
       copy.label += _(' (Copy)')
-      copy.id = copy.pk = None      
+      copy.id = copy.pk = None
       copy.save()
 
       facets = copy.facets
@@ -112,9 +112,9 @@ class SearchController(object):
       sorting.id = None
       sorting.save()
       copy.sorting = sorting
-      
-      copy.save() 
-                
+
+      copy.save()
+
       id = copy.id
     except Exception, e:
       LOG.warn('Error copying collection: %s' % e)

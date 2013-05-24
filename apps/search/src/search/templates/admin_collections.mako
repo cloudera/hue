@@ -65,7 +65,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
   </div>
 
   <script id="collectionTemplate" type="text/html">
-    <li style="cursor: pointer" data-bind="click: $root.editCollection">
+    <li style="cursor: pointer" data-bind="click: $root.editCollection" title="${ _('Click to edit') }">
       <div class="pull-right" style="margin-top: 10px;margin-right: 10px; cursor: pointer">
         <a data-bind="click: $root.copyCollection, clickBubble: false"><i class="icon-copy"></i> ${_('Copy')}</a> &nbsp;
         <a data-bind="click: $root.markForDeletion, clickBubble: false"><i class="icon-remove"></i> ${_('Delete')}</a>
