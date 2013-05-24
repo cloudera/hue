@@ -249,16 +249,13 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 
     % if hue_collection:
       $(".current-collection").text("${ hue_collection.label }");
-    % endif
 
-    % if user.is_superuser:
-      $(".dropdown-collection").each(function () {
-        if ($(this).data("value") == $("select[name='collection']").val()) {
-          $(".change-settings").attr("href", $(this).data("settings-url"));
-        }
-      });
+      % if user.is_superuser:
+        var collectionUrl = $(".dropdown-collection[data-value=${ hue_collection.id }]").data("settings-url");
+        $(".change-settings").attr("href", collectionUrl);
+      % endif
     % endif
-
+    
     $(".dropdown-collection").click(function (e) {
       e.preventDefault();
       var collectionId = $(this).data("value");
