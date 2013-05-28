@@ -68,53 +68,32 @@
   CodeMirror.currentFiles = [];
 
   CodeMirror.pigHint = function (editor) {
-    return scriptHint(editor, pigKeywordsU, function (e, cur) {
+    return scriptHint(editor, pigCaseInsensitive, function (e, cur) {
       return e.getTokenAt(cur);
     });
   };
 
-  var pigKeywords = "VOID IMPORT RETURNS DEFINE LOAD FILTER FOREACH ORDER CUBE DISTINCT COGROUP "
-      + "JOIN CROSS UNION SPLIT INTO IF OTHERWISE ALL AS BY USING INNER OUTER ONSCHEMA PARALLEL "
-      + "PARTITION GROUP AND OR NOT GENERATE FLATTEN ASC DESC IS STREAM THROUGH STORE MAPREDUCE "
-      + "SHIP CACHE INPUT OUTPUT STDERROR STDIN STDOUT LIMIT SAMPLE LEFT RIGHT FULL EQ GT LT GTE LTE "
-      + "NEQ MATCHES TRUE FALSE DUMP";
-  var pigKeywordsU = pigKeywords.split(" ");
-  var pigKeywordsL = pigKeywords.toLowerCase().split(" ");
+  var pigCaseInsensitive = "and any all arrange as asc bag by bytearray boolean cache cat cd chararray cogroup cp cross " +
+      "datetime %declare %default define desc describe distinct double du dump e eval exec explain f filter " +
+      "flatten float foreach full generate group help if illustrate import inner input int into is join kill" +
+      "l left limit load long ls map matches mkdir mv not null onschema or order outer output parallel pig pwd" +
+      "quit register right rm rmf run sample set ship split stderr stdin stdout store stream through tuple union using";
 
-  var pigTypes = "BOOLEAN INT LONG FLOAT DOUBLE CHARARRAY BYTEARRAY BAG TUPLE MAP";
-  var pigTypesU = pigTypes.split(" ");
-  var pigTypesL = pigTypes.toLowerCase().split(" ");
+  var pigCaseInsensitiveU = pigCaseInsensitive.toUpperCase().split(" ");
+  var pigCaseInsensitiveL = pigCaseInsensitive.toLowerCase().split(" ");
 
-  var pigBuiltins = "ABS ACOS ARITY ASIN ATAN AVG BAGSIZE BINSTORAGE BLOOM BUILDBLOOM CBRT CEIL "
-      + "CONCAT COR COS COSH COUNT COUNT_STAR COV CONSTANTSIZE CUBEDIMENSIONS DIFF DISTINCT DOUBLEABS "
-      + "DOUBLEAVG DOUBLEBASE DOUBLEMAX DOUBLEMIN DOUBLEROUND DOUBLESUM EXP FLOOR FLOATABS FLOATAVG "
-      + "FLOATMAX FLOATMIN FLOATROUND FLOATSUM GENERICINVOKER INDEXOF INTABS INTAVG INTMAX INTMIN "
-      + "INTSUM INVOKEFORDOUBLE INVOKEFORFLOAT INVOKEFORINT INVOKEFORLONG INVOKEFORSTRING INVOKER "
-      + "ISEMPTY JSONLOADER JSONMETADATA JSONSTORAGE LAST_INDEX_OF LCFIRST LOG LOG10 LOWER LONGABS "
-      + "LONGAVG LONGMAX LONGMIN LONGSUM MAX MIN MAPSIZE MONITOREDUDF NONDETERMINISTIC OUTPUTSCHEMA  "
-      + "PIGSTORAGE PIGSTREAMING RANDOM REGEX_EXTRACT REGEX_EXTRACT_ALL REPLACE ROUND SIN SINH SIZE "
-      + "SQRT STRSPLIT SUBSTRING SUM STRINGCONCAT STRINGMAX STRINGMIN STRINGSIZE TAN TANH TOBAG "
-      + "TOKENIZE TOMAP TOP TOTUPLE TRIM TEXTLOADER TUPLESIZE UCFIRST UPPER UTF8STORAGECONVERTER";
-  var pigBuiltinsU = pigBuiltins.split(" ").join("() ").split(" ");
-  var pigBuiltinsL = pigBuiltins.toLowerCase().split(" ").join("() ").split(" ");
-  var pigBuiltinsC = ("BagSize BinStorage Bloom BuildBloom ConstantSize CubeDimensions DoubleAbs "
-      + "DoubleAvg DoubleBase DoubleMax DoubleMin DoubleRound DoubleSum FloatAbs FloatAvg FloatMax "
-      + "FloatMin FloatRound FloatSum GenericInvoker IntAbs IntAvg IntMax IntMin IntSum "
-      + "InvokeForDouble InvokeForFloat InvokeForInt InvokeForLong InvokeForString Invoker "
-      + "IsEmpty JsonLoader JsonMetadata JsonStorage LongAbs LongAvg LongMax LongMin LongSum MapSize "
-      + "MonitoredUDF Nondeterministic OutputSchema PigStorage PigStreaming StringConcat StringMax "
-      + "StringMin StringSize TextLoader TupleSize Utf8StorageConverter").split(" ").join("() ").split(" ");
+  var pigCaseSensitive = "AVG BinStorage CONCAT copyFromLocal copyToLocal COUNT DIFF MAX MIN  PigDump PigStorage SIZE SUM TextLoader TOKENIZE".split(" ");
 
   function getCompletions(token, context) {
     var found = [], start = token.string, extraFound = [];
 
     function maybeAdd(str) {
       var stripped = strip(str).replace(/(?:(?:^|\n)\s+|\s+(?:$|\n))/g,'').replace(/\s+/g,' ');
-      if (stripped.indexOf(start) == 0 && !arrayContains(found, str)) found.push(str);
+      if (stripped.toLowerCase().indexOf(start.toLowerCase()) == 0 && !arrayContains(found, str)) found.push(str);
     }
 
     function maybeAddToExtra(str) {
-      if (str.indexOf(start) == 0 && !arrayContains(found, str)) extraFound.push(str);
+      if (str.toLowerCase().indexOf(start.toLowerCase()) == 0 && !arrayContains(found, str)) extraFound.push(str);
     }
 
     function strip(html){
@@ -128,19 +107,10 @@
         forEach(CodeMirror.currentFiles, maybeAdd);
       }
       else {
-        if (obj == ":") {
-          forEach(pigTypesL, maybeAdd);
-        }
-        else {
-          forEach(pigBuiltinsU, maybeAdd);
-          forEach(pigBuiltinsL, maybeAdd);
-          forEach(pigBuiltinsC, maybeAdd);
-          forEach(pigTypesU, maybeAdd);
-          forEach(pigTypesL, maybeAdd);
-          forEach(pigKeywordsU, maybeAdd);
-          forEach(pigKeywordsL, maybeAdd);
-          forEach(CodeMirror.availableVariables, maybeAddToExtra);
-        }
+        forEach(pigCaseInsensitiveU, maybeAdd);
+        forEach(pigCaseInsensitiveL, maybeAdd);
+        forEach(pigCaseSensitive, maybeAdd);
+        forEach(CodeMirror.availableVariables, maybeAddToExtra);
       }
     }
 
