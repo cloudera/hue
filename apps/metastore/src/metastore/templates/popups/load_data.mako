@@ -58,7 +58,7 @@ from django.utils.translation import ugettext as _
 
     <div class="modal-footer">
         <a href="#" class="btn" data-dismiss="modal">${_('Cancel')}</a>
-        <a href="#" class="btn btn-primary" id="load-data-submit-btn">${_('Submit')}</a>
+        <button href="#" class="btn btn-primary" id="load-data-submit-btn" disabled="disabled">${_('Submit')}</button>
     </div>
 </form>
 
@@ -84,45 +84,62 @@ from django.utils.translation import ugettext as _
 
 <script type="text/javascript" charset="utf-8">
   $(document).ready(function () {
-     $(".fileChooserBtn").click(function(e){
-       e.preventDefault();
-       var _destination = $(this).attr("data-filechooser-destination");
-       $("#filechooser").jHueFileChooser({
-         initialPath: $("input[name='"+_destination+"']").val(),
-         onFileChoose: function(filePath){
-           $("input[name='"+_destination+"']").val(filePath);
-           $("#filechooser").slideUp();
-         },
-         onFolderChange: function (filePath) {
-           $("input[name='"+_destination+"']").val(filePath);
-         },
-         onFolderChoose: function (filePath) {
-           $("input[name='"+_destination+"']").val(filePath);
-           $("#filechooser").slideUp();
-         },
-         createFolder: false,
-         selectFolder: true,
-         uploadFile: true
-       });
-       $("#filechooser").slideDown();
-     });
+    $(".fileChooserBtn").click(function (e) {
+      e.preventDefault();
+      var _destination = $(this).attr("data-filechooser-destination");
+      $("#filechooser").jHueFileChooser({
+        initialPath: $("input[name='" + _destination + "']").val(),
+        onFileChoose: function (filePath) {
+          $("input[name='" + _destination + "']").val(filePath);
+          toggleLoadBtn($("input[name='" + _destination + "']"));
+          $("#filechooser").slideUp();
+        },
+        onFolderChange: function (filePath) {
+          $("input[name='" + _destination + "']").val(filePath);
+        },
+        onFolderChoose: function (filePath) {
+          $("input[name='" + _destination + "']").val(filePath);
+          $("#filechooser").slideUp();
+        },
+        createFolder: false,
+        selectFolder: true,
+        uploadFile: true
+      });
+      $("#filechooser").slideDown();
+    });
 
-   $("#load-data-submit-btn").click(function(e){
-     $.post("${ url('metastore:load_table', database=database, table=table.name) }",
-       $("#load-data-form").serialize(),
-        function (response) {
-          if (response['status'] != 0) {
-            if (response['status'] == 1) {
-              $('#load-data-error').html(response['data']);
-              $('#load-data-error').show();
-            } else {
-              $('#import-data-modal').html(response['data']);
-            }
-          } else {
-            window.location.replace(response['data']);
-          }
-        }
-     );
+    var _keydownTimeout = -1;
+    $("input[name='" + $(".fileChooserBtn").data("filechooser-destination") + "']").on("keydown", function () {
+      window.clearTimeout(_keydownTimeout);
+      var _fld = $(this);
+      window.setTimeout(function () {
+        toggleLoadBtn(_fld);
+      }, 300)
+    });
+
+    function toggleLoadBtn(fld) {
+      $("#load-data-submit-btn").attr("disabled", "disabled");
+      if ($.trim(fld.val()) != "") {
+        $("#load-data-submit-btn").removeAttr("disabled");
+      }
+    }
+
+    $("#load-data-submit-btn").click(function (e) {
+      $.post("${ url('metastore:load_table', database=database, table=table.name) }",
+              $("#load-data-form").serialize(),
+              function (response) {
+                if (response['status'] != 0) {
+                  if (response['status'] == 1) {
+                    $('#load-data-error').html(response['data']);
+                    $('#load-data-error').show();
+                  } else {
+                    $('#import-data-modal').html(response['data']);
+                  }
+                } else {
+                  window.location.replace(response['data']);
+                }
+              }
+      );
     });
   });
 </script>
