@@ -1,32 +1,55 @@
 # encoding: utf-8
 import datetime
+from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 from south.db import db
 from south.v2 import DataMigration
 from django.db import models
 from oozie.import_jobsub import convert_jobsub_design
-from oozie.models import Workflow
+from oozie.models import Workflow, Kill, Start, End
 
 
 class Migration(DataMigration):
+    depends_on = (
+        # Need to ensure oozie is completely sync'd before jobsub.
+        # This migration relies on the existence of the complete oozie model in the DB.
+        # If a new oozie schema migration is added, then this will need to be updated as well.
+        ("oozie", "0021_auto__chg_field_java_args__add_field_job_is_trashed"),
+    )
+
     def forwards(self, orm):
         """ Find every design and move them into Oozie. """
-        for design in orm.JobDesign.objects.all():
+        for design in orm.OozieDesign.objects.all():
             action = convert_jobsub_design(design)
 
             if not action:
                 raise RuntimeError(_("Cannot convert %s design into an Oozie action.") % design.name)
 
-            workflow = Workflow.objects.new_workflow(request.user)
+            # User is guaranteed to exist since this executes for upgrades only.
+            workflow = Workflow.objects.new_workflow(User.objects.get(id=design.owner.pk))
             workflow.name = action.name
-            workflow.owner = design.owner
             workflow.description = design.description
             # Inform oozie to not manage this workflow.
             workflow.managed = False
+            workflow.save()
+
+            workflow.start.workflow = workflow
+            workflow.start.save()
+            workflow.start = Start.objects.get(id=workflow.start.id)
+
+            workflow.end.workflow = workflow
+            workflow.end.save()
+            workflow.end = End.objects.get(id=workflow.end.id)
+
+            Kill.objects.create(name='kill', workflow=workflow, node_type=Kill.node_type)
+
             action.workflow = workflow
+            action.save()
+
+            workflow.start.add_node(action)
+            action.add_node(workflow.end)
 
             workflow.save()
-            action.save()
 
 
     def backwards(self, orm):

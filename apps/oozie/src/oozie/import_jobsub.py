@@ -6,9 +6,25 @@ from jobsub.models import OozieDesign, OozieMapreduceAction, OozieStreamingActio
 from oozie.models import Mapreduce, Java, Streaming
 
 
+def get_root_action(design):
+  root = design.root_action
+  if root is None:
+    return None
+  if root.action_type == OozieMapreduceAction.ACTION_TYPE:
+    return root.ooziemapreduceaction
+  elif root.action_type == OozieStreamingAction.ACTION_TYPE:
+    return root.ooziestreamingaction
+  elif root.action_type == OozieJavaAction.ACTION_TYPE:
+    return root.ooziejavaaction
+
+  LOG.error("Oozie action type '%s' is not valid (jobsub_oozieaction.id %s)"
+            % (root.action_type, root.id))
+  return None
+
+
 def convert_jobsub_design(jobsub_design):
   """Creates an oozie action from a jobsub design"""
-  action = jobsub_design.get_root_action()
+  action = get_root_action(jobsub_design)
   if action is None:
     return None
   if action.action_type == OozieMapreduceAction.ACTION_TYPE:
