@@ -1189,7 +1189,7 @@ class TestEditor(OozieMockBase):
         '<coordinator-app name="MyCoord"\n'
         '  frequency="${coord:days(1)}"\n'
         '  start="2012-07-01T00:00Z" end="2012-07-04T00:00Z" timezone="America/Los_Angeles"\n'
-        '  xmlns="uri:oozie:coordinator:0.1">\n'
+        '  xmlns="uri:oozie:coordinator:0.2">\n'
         '  <controls>\n'
         '    <timeout>100</timeout>\n'
         '    <concurrency>3</concurrency>\n'
@@ -1237,7 +1237,7 @@ class TestEditor(OozieMockBase):
 """<coordinator-app name="MyCoord"
   frequency="${coord:days(1)}"
   start="2012-07-01T00:00Z" end="2012-07-04T00:00Z" timezone="America/Los_Angeles"
-  xmlns="uri:oozie:coordinator:0.1">
+  xmlns="uri:oozie:coordinator:0.2">
   <controls>
     <timeout>100</timeout>
     <concurrency>3</concurrency>
@@ -1472,7 +1472,7 @@ class TestEditorBundle(OozieMockBase):
     assert_true(
 """<bundle-app name="MyBundle"
   xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
-  xmlns="uri:oozie:coordinator:0.1">
+  xmlns="uri:oozie:coordinator:0.2">
   <parameters>
     <property>
         <name>market</name>
@@ -1518,7 +1518,7 @@ class TestEditorBundle(OozieMockBase):
     assert_true(
 """<bundle-app name="MyBundle"
   xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
-  xmlns="uri:oozie:coordinator:0.1">
+  xmlns="uri:oozie:coordinator:0.2">
   <parameters>
     <property>
         <name>market</name>
@@ -2875,13 +2875,13 @@ COORDINATOR_DICT = {
     u'concurrency': [u'3'],
     u'execution': [u'FIFO'],
     u'throttle': [u'10'],
-    u'schema_version': [u'uri:oozie:coordinator:0.1']
+    u'schema_version': [u'uri:oozie:coordinator:0.2']
 }
 BUNDLE_DICT = {
     u'name': [u'MyBundle'], u'description': [u'Description of my bundle'],
     u'parameters': [u'[{"name":"market","value":"US,France"}]'],
     u'kick_off_time_0': [u'07/01/2012'], u'kick_off_time_1': [u'12:00 AM'],
-    u'schema_version': [u'uri:oozie:coordinator:0.1']
+    u'schema_version': [u'uri:oozie:coordinator:0.2']
 }
 
 

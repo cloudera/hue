@@ -352,9 +352,9 @@ def schedule_workflow(request, workflow):
 @check_job_access_permission()
 def create_coordinator(request, workflow=None):
   if workflow is not None:
-    coordinator = Coordinator(owner=request.user, schema_version="uri:oozie:coordinator:0.1", workflow=workflow)
+    coordinator = Coordinator(owner=request.user, schema_version="uri:oozie:coordinator:0.2", workflow=workflow)
   else:
-    coordinator = Coordinator(owner=request.user, schema_version="uri:oozie:coordinator:0.1")
+    coordinator = Coordinator(owner=request.user, schema_version="uri:oozie:coordinator:0.2")
 
   if request.method == 'POST':
     coordinator_form = CoordinatorForm(request.POST, instance=coordinator, user=request.user)
