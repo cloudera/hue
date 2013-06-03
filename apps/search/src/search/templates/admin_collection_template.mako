@@ -560,11 +560,14 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
     // Force refresh on tab change
     $("a[data-toggle='tab']").on("shown", function (e) {
       if ($(e.target).attr("href") == "#source") {
-        templateSourceMirror.setValue($("#content-editor").html());
+        templateSourceMirror.setValue(stripHtmlFromFunctions($("#content-editor").html()));
         templateSourceMirror.setSize("100%", 450);
-        for (var i = 0; i < templateSourceMirror.lineCount(); i++) {
-          templateSourceMirror.indentLine(i);
-        }
+        window.setTimeout(function(){
+          for (var i = 0; i < templateSourceMirror.lineCount(); i++) {
+            templateSourceMirror.indentLine(i);
+          }
+        }, 100);
+
         templateSourceMirror.refresh();
       }
       if ($(e.target).attr("href") == "#extra") {
@@ -585,7 +588,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
     templateSourceMirror.on("change", function () {
       clearTimeout(sourceDelay);
       sourceDelay = setTimeout(function () {
-        $("#content-editor").html(templateSourceMirror.getValue());
+        $("#content-editor").html(stripHtmlFromFunctions(templateSourceMirror.getValue()));
       }, 300);
     });
 
