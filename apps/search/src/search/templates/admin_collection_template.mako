@@ -562,6 +562,9 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
       if ($(e.target).attr("href") == "#source") {
         templateSourceMirror.setValue($("#content-editor").html());
         templateSourceMirror.setSize("100%", 450);
+        for (var i = 0; i < templateSourceMirror.lineCount(); i++) {
+          templateSourceMirror.indentLine(i);
+        }
         templateSourceMirror.refresh();
       }
       if ($(e.target).attr("href") == "#extra") {
