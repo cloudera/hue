@@ -1243,7 +1243,7 @@ class Coordinator(Job):
   execution = models.CharField(max_length=10, null=True, blank=True, verbose_name=_t('Execution'),
                                choices=(('FIFO', _t('FIFO (oldest first) default')),
                                         ('LIFO', _t('LIFO (newest first)')),
-                                        ('LAST ONLY', _t('LAST_ONLY (discards all older materializations)'))),
+                                        ('LAST_ONLY', _t('LAST_ONLY (discards all older materializations)'))),
                                  help_text=_t('Execution strategy of its coordinator actions when there is backlog of coordinator '
                                               'actions in the coordinator engine. The different execution strategies are \'oldest first\', '
                                               '\'newest first\' and \'last one only\'. A backlog normally happens because of delayed '
