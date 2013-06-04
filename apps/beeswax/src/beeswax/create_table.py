@@ -110,31 +110,27 @@ def import_wizard(request, database='default'):
   app_name = get_app_name(request)
 
   if request.method == 'POST':
-    # Have a while loop to allow an easy way to break
-    for _ in range(1):
-      #
-      # General processing logic:
-      # - We have 3 steps. Each requires the previous.
-      #   * Step 1      : Table name and file location
-      #   * Step 2a     : Display sample with auto chosen delim
-      #   * Step 2b     : Display sample with user chosen delim (if user chooses one)
-      #   * Step 3      : Display sample, and define columns
-      # - Each step is represented by a different form. The form of an earlier step
-      #   should be present when submitting to a later step.
-      # - To preserve the data from the earlier steps, we send the forms back as
-      #   hidden fields. This way, when users revisit a previous step, the data would
-      #   be there as well.
-      #
-      delim_is_auto = False
-      fields_list, n_cols = [ [] ], 0
-      s3_col_formset = None
+    #
+    # General processing logic:
+    # - We have 3 steps. Each requires the previous.
+    #   * Step 1      : Table name and file location
+    #   * Step 2a     : Display sample with auto chosen delim
+    #   * Step 2b     : Display sample with user chosen delim (if user chooses one)
+    #   * Step 3      : Display sample, and define columns
+    # - Each step is represented by a different form. The form of an earlier step
+    #   should be present when submitting to a later step.
+    # - To preserve the data from the earlier steps, we send the forms back as
+    #   hidden fields. This way, when users revisit a previous step, the data would
+    #   be there as well.
+    #
+    delim_is_auto = False
+    fields_list, n_cols = [[]], 0
+    s3_col_formset = None
 
-      # Everything requires a valid file form
-      db = dbms.get(request.user)
-      s1_file_form = CreateByImportFileForm(request.POST, db=db)
-      if not s1_file_form.is_valid():
-        break
+    db = dbms.get(request.user)
+    s1_file_form = CreateByImportFileForm(request.POST, db=db)
 
+    if s1_file_form.is_valid():
       do_s2_auto_delim = request.POST.get('submit_file')        # Step 1 -> 2
       do_s2_user_delim = request.POST.get('submit_preview')     # Step 2 -> 2
       do_s3_column_def = request.POST.get('submit_delim')       # Step 2 -> 3
@@ -144,23 +140,15 @@ def import_wizard(request, database='default'):
       cancel_s3_column_def = request.POST.get('cancel_create')  # Step 3 -> 2
 
       # Exactly one of these should be True
-      assert len(filter(None, (do_s2_auto_delim,
-                               do_s2_user_delim,
-                               do_s3_column_def,
-                               do_hive_create,
-                               cancel_s2_user_delim,
-                               cancel_s3_column_def))) == 1, 'Invalid form submission'
+      if len(filter(None, (do_s2_auto_delim, do_s2_user_delim, do_s3_column_def, do_hive_create, cancel_s2_user_delim, cancel_s3_column_def))) != 1:
+        raise PopupException(_('Invalid form submission'))
 
-      #
-      # Fix up what we should do in case any form is invalid
-      #
       if not do_s2_auto_delim:
         # We should have a valid delim form
         s2_delim_form = CreateByImportDelimForm(request.POST)
         if not s2_delim_form.is_valid():
           # Go back to picking delimiter
           do_s2_user_delim, do_s3_column_def, do_hive_create = True, False, False
-
       if do_hive_create:
         # We should have a valid columns formset
         s3_col_formset = ColumnTypeFormSet(prefix='cols', data=request.POST)
@@ -173,21 +161,12 @@ def import_wizard(request, database='default'):
       #
       if do_s2_auto_delim:
         delim_is_auto = True
-        fields_list, n_cols, s2_delim_form = _delim_preview(
-                                              request.fs,
-                                              s1_file_form,
-                                              encoding,
-                                              [ reader.TYPE for reader in FILE_READERS ],
-                                              DELIMITERS)
+        fields_list, n_cols, s2_delim_form = _delim_preview(request.fs, s1_file_form, encoding, [reader.TYPE for reader in FILE_READERS], DELIMITERS)
 
       if (do_s2_user_delim or do_s3_column_def or cancel_s3_column_def) and s2_delim_form.is_valid():
         # Delimit based on input
-        fields_list, n_cols, s2_delim_form = _delim_preview(
-                                              request.fs,
-                                              s1_file_form,
-                                              encoding,
-                                              (s2_delim_form.cleaned_data['file_type'],),
-                                              (s2_delim_form.cleaned_data['delimiter'],))
+        fields_list, n_cols, s2_delim_form = _delim_preview(request.fs, s1_file_form, encoding, (s2_delim_form.cleaned_data['file_type'],),
+                                                            (s2_delim_form.cleaned_data['delimiter'],))
 
       if do_s2_auto_delim or do_s2_user_delim or cancel_s3_column_def:
         return render('choose_delimiter.mako', request, {
@@ -221,11 +200,11 @@ def import_wizard(request, database='default'):
           'column_formset': s3_col_formset,
           'fields_list': fields_list,
           'n_cols': n_cols,
-           'database': database,
+          'database': database,
         })
 
       #
-      # Finale: Execute
+      # Final: Execute
       #
       if do_hive_create:
         delim = s2_delim_form.cleaned_data['delimiter']

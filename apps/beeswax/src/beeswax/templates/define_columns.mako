@@ -46,8 +46,8 @@ ${layout.menubar(section='tables')}
             <form action="${action}" method="POST" class="form-stacked">
                 <div class="hide">
                     ${util.render_form(file_form)}
-                ${util.render_form(delim_form)}
-                ${unicode(column_formset.management_form) | n}
+                    ${util.render_form(delim_form)}
+                    ${unicode(column_formset.management_form) | n}
                 </div>
                 <%
                     n_rows = len(fields_list)
@@ -146,14 +146,17 @@ ${layout.menubar(section='tables')}
     $("[rel='tooltip']").tooltip();
 
     $(".scrollable").width($(".form-actions").width());
+
     $("#step1").click(function (e) {
       e.preventDefault();
       $("input[name='cancel_create']").attr("name", "cancel_delim").click();
     });
+
     $("#step2").click(function (e) {
       e.preventDefault();
       $("input[name='cancel_create']").click();
     });
+
     $("body").keypress(function (e) {
       if (e.which == 13) {
         e.preventDefault();
@@ -205,7 +208,7 @@ ${layout.menubar(section='tables')}
 
     $(".dataSample").each(function () {
       var _val = $.trim($(this).text());
-      var _field = $(this).siblings().find("select");
+      var _field = $(this).siblings().find("select#id_cols-0-column_type");
       var _foundType = "string";
       if ($.isNumeric(_val)) {
         _val = _val * 1;
@@ -236,7 +239,7 @@ ${layout.menubar(section='tables')}
       }
     });
 
-    $("select").each(function () {
+    $("select#id_cols-0-column_type").each(function () {
       $(this).val($(this).data("possibleType"));
     });
 
@@ -266,4 +269,5 @@ ${layout.menubar(section='tables')}
     }
   });
 </script>
+
 ${ commonfooter(messages) | n,unicode }

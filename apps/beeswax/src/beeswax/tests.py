@@ -867,7 +867,7 @@ for x in sys.stdin:
       'table-name': 'my_table',
       'table-comment': 'Yo>>>>dude',  # Make sure escaping is sort of ok.
       'table-row_format': 'Delimited',
-      'table-field_terminator_0': r'\001',
+      'table-field_terminator_0': r',',
       'table-collection_terminator_0': r'\002',
       'table-map_key_terminator_0': r'\003',
       'table-file_format': 'TextFile',
@@ -888,7 +888,7 @@ for x in sys.stdin:
         )
         COMMENT "Yo>>>>dude"
         ROW FORMAT DELIMITED
-          FIELDS TERMINATED BY '\\001'
+          FIELDS TERMINATED BY ','
           COLLECTION ITEMS TERMINATED BY '\\002'
           MAP KEYS TERMINATED BY '\\003'
           STORED AS TextFile LOCATION "/tmp/foo"
