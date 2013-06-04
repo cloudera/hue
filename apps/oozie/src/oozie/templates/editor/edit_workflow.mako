@@ -39,14 +39,14 @@ ${ layout.menubar(section='workflows') }
 
   <div class="row-fluid">
   <div class="span2">
-    <div class="well sidebar-nav">
+    <div id="workflowControls" class="well sidebar-nav">
       <ul class="nav nav-list">
         <li class="nav-header">${ _('Properties') }</li>
         <li><a href="#properties">${ _('Edit properties') }</a></li>
 
         <li class="nav-header">${ _('Editor') }</li>
         <li><a href="#editWorkflow">${ _('Edit workflow') }</a></li>
-        <li><a href="javascript:void(0)" class="import-jobsub-node-link" title="${ _('Click to import a Job Designer action and add it to the end of the flow') }" rel="tooltip" data-placement="right">${ _('Import action') }</a></li>
+        <li><a href="#importAction" title="${ _('Click to import an Oozie workflow action or Job Designer action') }" rel="tooltip" data-placement="right">${ _('Import action') }</a></li>
         % if user_can_edit_job:
           <li>
             <a data-bind="attr: {href: '/filebrowser/view' + deployment_dir() }" target="_blank" title="${ _('Upload additional files and libraries to the deployment directory') }" rel="tooltip" data-placement="right"><i class="icon-share-alt"></i> ${ _('Upload') }</a>
@@ -114,6 +114,96 @@ ${ layout.menubar(section='workflows') }
       </div>
 
       </fieldset>
+    </div>
+
+    <div id="importAction" class="section hide">
+      <ul class="nav nav-tabs">
+        <li class="active"><a href="#importJobsub" data-toggle="tab">${ _('Job Designer') }</a></li>
+        <li><a href="#importOozie" data-toggle="tab">${ _('Oozie') }</a></li>
+      </ul>
+
+      <div class="tab-content">
+        <div class="tab-pane active" id="importJobsub" data-bind="with: jobsub">
+          <div class="alert alert-info">
+            <h3>${ _('Import Action from Job Designer') }</h3>
+            <p>${_('Click on a row to import the design as an action in the workflow. The action will be added to the beginning of the flow.')}</p>
+          </div>
+          <table id="jobsubActionsTable" class="table">
+            <thead>
+              <tr>
+                <th>${ _('Name') }</th>
+                <th>${ _('Description') }</th>
+              </tr>
+            </thead>
+            <tbody data-bind="visible: workflows().length > 0, foreach: workflows">
+              <tr class="action-row" rel="tooltip" title="${ _('Click to import action to workflow') }">
+                <td>
+                  <a href="javascript:void(0);" data-bind="text: $data.name"></a>
+                </td>
+                <td data-bind="text: $data.description"></td>
+              </tr>
+            </tbody>
+            <tbody data-bind="visible: workflows().length == 0">
+              <tr class="action-row">
+                <td>${ _('N/A') }</td><td></td><td></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="tab-pane" id="importOozie" data-bind="with: oozie">
+          <div class="alert alert-info"><h3>${ _('Import Action from Oozie') }</h3></div>
+          <table id="oozieWorkflowsTable" class="table">
+            <thead>
+              <tr>
+                <th>${ _('Name') }</th>
+                <th>${ _('Description') }</th>
+              </tr>
+            </thead>
+            <tbody data-bind="visible: workflows().length > 0, foreach: workflows">
+              <tr class="action-row">
+                <td>
+                  <a href="javascript:void(0);" data-bind="text: $data.name"></a>
+                </td>
+                <td data-bind="text: $data.description"></td>
+              </tr>
+            </tbody>
+            <tbody data-bind="visible: workflows().length == 0">
+              <tr class="action-row">
+                <td>${ _('N/A') }</td><td></td><td></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="importOozieAction" class="section hide" data-bind="if: selected_workflow()">
+      <div class="alert alert-info">
+        <h3>${ _('Import Action from Workflow: ') } <span data-bind="text: selected_workflow().name"></span></h3>
+        <p>${_('Click on a row to import the action.')}</p>
+      </div>
+      <table id="oozieActionsTable" class="table">
+        <thead>
+          <tr>
+            <th>${ _('Name') }</th>
+            <th>${ _('Description') }</th>
+          </tr>
+        </thead>
+        <tbody data-bind="visible: nodes().length > 0, foreach: nodes">
+          <tr class="action-row" rel="tooltip" title="${ _('Click to import action to workflow') }">
+            <td>
+              <a href="javascript:void(0);" data-bind="text: $data.name"></a>
+            </td>
+            <td data-bind="text: $data.description"></td>
+          </tr>
+        </tbody>
+        <tbody data-bind="visible: nodes().length == 0">
+          <tr class="action-row">
+            <td>${ _('N/A') }</td><td></td><td></td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
     <div id="editWorkflow" class="section hide">
@@ -241,7 +331,7 @@ ${ layout.menubar(section='workflows') }
   </div>
   </div>
 
-  <div class="form-actions center">
+  <div id="formActions" class="form-actions center">
   % if user_can_edit_job:
     <button data-bind="disable: workflow.read_only, visible: !workflow.read_only(), click: function() { workflow.loading(true); workflow.save({ success: workflow_save_success, error: workflow_save_error }) }" class="btn btn-primary" id="btn-save-wf">${ _('Save') }</button>
   % endif
@@ -280,6 +370,7 @@ ${ layout.menubar(section='workflows') }
 <script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/jquery/plugins/jquery-ui-draggable-droppable-sortable-1.8.23.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/routie-0.3.0.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
 
 <link rel="stylesheet" href="/oozie/static/css/workflow.css">
 <script type="text/javascript" src="/oozie/static/js/workflow.utils.js"></script>
@@ -290,13 +381,12 @@ ${ layout.menubar(section='workflows') }
 <script type="text/javascript" src="/oozie/static/js/workflow.node-fields.js"></script>
 <script type="text/javascript" src="/oozie/static/js/workflow.node.js"></script>
 <script type="text/javascript" src="/oozie/static/js/workflow.js"></script>
+<script type="text/javascript" src="/oozie/static/js/workflow.import-node.js"></script>
 
 
 % for form_info in action_forms:
   ${ actions.action_form(action_form=form_info[1], node_type=form_info[0], template=True) }
 % endfor
-
-${ actions.import_jobsub_form(template=True) }
 
 ${ controls.fork_convert_form(node_type='fork', template=True, javascript_attrs={'convert': 'function(data, event) { $data.convertToDecision(); $data._workflow.rebuild(); }'}) }
 ${ controls.fork_edit_form(form=node_form, node_type='fork', template=True) }
@@ -433,11 +523,19 @@ ${ controls.decision_form(node_form, link_form, default_link_form, 'decision', T
  * Initialize the workflow, registry, modal, and import objects.
  */
  // Custom handlers for saving, loading, error checking, etc.
-function import_load_available_nodes_success(data) {
+function import_jobsub_load_success(data) {
   if (data.status == 0) {
-    import_node.initialize(data.data);
+    import_jobsub_action.initialize(data.data);
   } else {
-    $.jHueNotify.error("${ _('Received invalid response from server: ') }" + JSON.stringify(data));
+    $.jHueNotify.error("${ _('Received invalid response from server: ') } " + JSON.stringify(data));
+  }
+}
+
+function import_workflow_load_success(data) {
+  if (data.status == 0) {
+    import_workflow_action.initialize(data.data);
+  } else {
+    $.jHueNotify.error("${ _('Received invalid response from server: ') } " + JSON.stringify(data));
   }
 }
 
@@ -487,12 +585,16 @@ var workflow = new Workflow({
   model: workflow_model,
   registry: registry,
   read_only: ${ str(not user_can_edit_job).lower() },
-  read_only_error_handler: workflow_read_only_handler
+  read_only_error_handler: workflow_read_only_handler,
+  el: '#editWorkflow'
 });
-var import_node = new ImportNode({workflow: workflow});
+var import_jobsub_action = new ImportJobsubAction({workflow: workflow});
+var import_workflow_action = new ImportWorkflowAction({workflow: workflow});
 var modal = new Modal($('#node-modal'));
 
 // Load data.
+import_jobsub_action.fetchWorkflows({ success: import_jobsub_load_success });
+import_workflow_action.fetchWorkflows({ success: import_workflow_load_success });
 {
   var spinner = $('<img src="/static/art/spinner.gif" />');
   workflow.loading.subscribe(function(value) {
@@ -505,7 +607,6 @@ var modal = new Modal($('#node-modal'));
   workflow.loading(true);
   workflow.load({ success: workflow_load_success });
 }
-import_node.loadAvailableNodes({ success: import_load_available_nodes_success });
 
 /**
  * Modals
@@ -553,7 +654,7 @@ function edit_node_modal(node, save, cancel, template) {
 }
 
 // Drag a new node onto the canvas
-$('#workflow').on('mousedown', '.new-node-link', function(e) {
+workflow.el.on('mousedown', '.new-node-link', function(e) {
   e.preventDefault();
 
   // Node starts off graph, then is validated/dropped onto graph, after being dragged onto graph.
@@ -585,7 +686,7 @@ $('#workflow').on('mousedown', '.new-node-link', function(e) {
     node.erase();
     modal.hide();
     workflow.is_dirty( is_dirty );
-    $('#workflow').trigger('workflow:rebuild');
+    workflow.el.trigger('workflow:rebuild');
   };
 
   var try_save = function(e) {
@@ -593,7 +694,7 @@ $('#workflow').on('mousedown', '.new-node-link', function(e) {
       workflow.is_dirty( true );
       modal.hide();
       node.addChild(workflow.kill);
-      $('#workflow').trigger('workflow:rebuild');
+      workflow.el.trigger('workflow:rebuild');
     }
   };
 
@@ -610,19 +711,19 @@ $('#workflow').on('mousedown', '.new-node-link', function(e) {
 });
 
 // Modal for editing a node
-$('#workflow').on('click', '.edit-node-link', function(e) {
+workflow.el.on('click', '.edit-node-link', function(e) {
   var node = ko.contextFor(this).$data;
   edit_node_modal(node);
 });
 
 // Modal for converting to a decision node
-$('#workflow').on('click', '.convert-node-link', function(e) {
+workflow.el.on('click', '.convert-node-link', function(e) {
   var node = ko.contextFor(this).$data;
   edit_node_modal(node, null, null, 'forkConvertTemplate');
 });
 
 // Modal for cloning a node
-$('#workflow').on('click', '.clone-node-btn', function(e) {
+workflow.el.on('click', '.clone-node-btn', function(e) {
   var node = ko.contextFor(this).$data;
   var model = node.model.copy();
   model.id = IdGeneratorTable[model.node_type].nextId();
@@ -644,7 +745,7 @@ $('#workflow').on('click', '.clone-node-btn', function(e) {
       // save, add kill, add node to workflow.
       new_node.addChild(workflow.kill);
       node.append(new_node);
-      $('#workflow').trigger('workflow:rebuild');
+      workflow.el.trigger('workflow:rebuild');
     }
   };
 
@@ -652,7 +753,7 @@ $('#workflow').on('click', '.clone-node-btn', function(e) {
 });
 
 // Modal for deleting a node
-$('#workflow').on('click', '.delete-node-btn', function(e) {
+workflow.el.on('click', '.delete-node-btn', function(e) {
   var node = ko.contextFor(this).$data;
   $('#confirmation').find('h3').text('${ _('Confirm Delete') }');
   $('#confirmation').find('.modal-body').html('${ _('Are you sure you want to delete ') }<strong>' + node.name() + '</strong>?');
@@ -670,66 +771,88 @@ $('#workflow').on('click', '.delete-node-btn', function(e) {
   $('#confirmation').modal('show');
 });
 
-// Modal for importing a node
-$('#workflow').on('click', '.import-jobsub-node-link', function(e) {
-  var tempModelView = {
-    selected_node: ko.observable(),
-    available_nodes: ko.observableArray(import_node.getAvailableNodes()),
-    setJobDesignerId: function(data, event) {
-      tempModelView.selected_node(data);
-      return true;
-    }
-  };
+//// Import actions
+var import_view_model = {
+  jobsub: ko.observable(import_jobsub_action),
+  oozie: ko.observable(import_workflow_action),
+};
 
-  modal.hide();
-  modal.setTemplate('ImportNodeTemplate');
-  modal.show({node: tempModelView, read_only: workflow.read_only()});
-  modal.recenter(280, 250);
-  modal.addDecorations();
+function importAction(workflow, model) {
+  model.id = IdGeneratorTable[model.node_type].nextId();
+  var node = new Node(workflow, model, workflow.registry);
+  workflow.registry.add(model.id, node);
 
-  var cancel_edit = function() {
-    modal.hide();
+  // Add kill, add node to workflow as child of start.
+  workflow.is_dirty( true );
+  node.addChild(workflow.kill);
+  workflow.registry.get(workflow.start()).append(node);
+}
 
-    // Prevent event propagation
-    return false;
-  };
-
-  var try_save = function() {
-    import_node.convertNode({
+// Step 1 - Jobsub
+// Select and import action
+$('#importJobsub').on('click', '.action-row', function(e) {
+  // Check ID to make sure we are not hitting N/A
+  if ('id' in ko.contextFor($(this)[0]).$data) {
+    // Select workflow, then fetch jobsub workflow.
+    // Current KO context for clicked element should be the workflow.
+    import_view_model.jobsub().selected_workflow(ko.contextFor($(this)[0]).$data);
+    // Should only have 1 node since jobsub workflows are single node workflows.
+    import_view_model.jobsub().fetchNodes({
       success: function(data) {
-        var node = data.data.node;
-        var NodeModel = nodeModelChooser(node.node_type);
-        node.id = IdGeneratorTable[node.node_type].nextId();
-        node.child_links = [];
-        var model = new NodeModel(node);
-        var new_node = new Node(workflow, model, workflow.registry);
-        workflow.registry.add(new_node.id(), new_node);
+        if (data.status == 0) {
+          import_view_model.jobsub().initialize({nodes: data.data.actions});
 
-        // save, add kill, add node to workflow.
-        new_node.addChild(workflow.kill);
-        workflow.nodes()[workflow.nodes().length - 2].append(new_node);
-        workflow.is_dirty( true );
-        $('#workflow').trigger('workflow:rebuild');
+          // Remember, jobsub guarantees exactly one node.
+          importAction(workflow, import_view_model.jobsub().nodes()[0]);
 
-        $.jHueNotify.info("${ _('Imported Job Designer workflow as node.') }");
-        routie('editWorkflow');
-        $('html, body').animate({ scrollTop: $(document).height() });
-      },
-      error: function() {
-        $.jHueNotify.error("${ _('Could not import Job Designer workflow as node.') }");
+          workflow.el.trigger('workflow:rebuild');
+          routie('editWorkflow');
+          $.jHueNotify.success("${ _('Action imported at the top of the workflow.') } ");
+        } else {
+          $.jHueNotify.error("${ _('Received invalid response from server: ') } " + JSON.stringify(data));
+        }
       }
-    }, tempModelView.selected_node().id);
-    modal.hide();
-  };
-
-  $('.modal-backdrop').on('click', cancel_edit);
-  modal.el.on('click', '.close', cancel_edit);
-  modal.el.on('click', '.cancelButton', cancel_edit);
-  modal.el.on('click', '.doneButton', try_save);
+    });
+  }
 });
 
 
+// Step 1 - Oozie
+// Select workflow
+$('#importOozie').on('click', '.action-row', function(e) {
+  // Check ID to make sure we are not hitting N/A
+  if ('id' in ko.contextFor($(this)[0]).$data) {
+    // Select workflow, then fetch oozie workflow.
+    // Current KO context for clicked element should be the workflow.
+    import_view_model.oozie().selected_workflow(ko.contextFor($(this)[0]).$data);
+    import_view_model.oozie().fetchNodes({
+      success: function(data) {
+        if (data.status == 0) {
+          import_view_model.oozie().initialize({nodes: data.data.actions});
+          routie('importAction/oozie');
+        } else {
+          $.jHueNotify.error("${ _('Received invalid response from server: ') } " + JSON.stringify(data));
+        }
+      }
+    });
+  }
+});
 
+// Step 2 - Oozie
+// Select and import action
+$('#importOozieAction').on('click', '.action-row', function(e) {
+  // Check ID to make sure we are not hitting N/A
+  if ('id'  in ko.contextFor($(this)[0]).$data) {
+    // Current KO context for clicked element should be the action
+    importAction(workflow, ko.contextFor($(this)[0]).$data);
+
+    workflow.el.trigger('workflow:rebuild');
+    routie('editWorkflow');
+    $.jHueNotify.success("${ _('Action imported at the top of the workflow.') } ");
+  }
+});
+
+// Bindings
 ko.bindingHandlers.fileChooser = {
   init: function(element, valueAccessor, allBindings, model) {
     var self = $(element);
@@ -737,7 +860,12 @@ ko.bindingHandlers.fileChooser = {
   }
 };
 
-ko.applyBindings(workflow, $('#workflow')[0]);
+ko.applyBindings(workflow, workflow.el[0]);
+ko.applyBindings(workflow, $('#formActions')[0]);
+ko.applyBindings(workflow, $('#properties')[0]);
+ko.applyBindings(workflow, $('#workflowControls')[0]);
+ko.applyBindings(import_view_model, $('#importAction')[0]);
+ko.applyBindings(import_view_model.oozie(), $('#importOozieAction')[0]);
 
 window.onbeforeunload = function (e) {
   if (workflow.is_dirty()) {
@@ -816,7 +944,15 @@ $(document).ready(function () {
     'properties':function () {
       showSection('properties');
     },
-    'editWorkflow':function () {
+    'importAction':function() {
+      $("#importAction *[rel=tooltip]").tooltip();
+      showSection('importAction');
+    },
+    'importAction/oozie':function() {
+      $("#importOozieAction *[rel=tooltip]").tooltip();
+      showSection('importOozieAction');
+    },
+    'editWorkflow':function() {
       showSection('editWorkflow');
     },
     'listHistory':function () {
@@ -826,6 +962,9 @@ $(document).ready(function () {
 
   function highlightMenu(section) {
     $('.nav-list li').removeClass('active');
+    if (section == 'importOozieAction') {
+      section = 'importAction';
+    }
     $('a[href="#' + section + '"]:first').parent().addClass('active');
   }
 

@@ -68,10 +68,11 @@ urlpatterns = patterns(
 urlpatterns += patterns(
   'oozie.views.api',
 
+  url(r'^workflows$', 'workflows', name='workflows'),
   url(r'^workflows/(?P<workflow>\d+)$', 'workflow', name='workflow'),
   url(r'^workflows/(?P<workflow>\d+)/save$', 'workflow_save', name='workflow_save'),
+  url(r'^workflows/(?P<workflow>\d+)/actions$', 'workflow_actions', name='workflow_actions'),
   url(r'^workflows/(?P<workflow>\d+)/nodes/(?P<node_type>\w+)/validate$', 'workflow_validate_node', name='workflow_validate_node'),
-  url(r'^workflows/(?P<workflow>\d+)/jobsub/actions$', 'workflow_jobsub_actions', name='workflow_jobsub_actions'),
   url(r'^workflows/autocomplete_properties/$', 'autocomplete_properties', name='autocomplete_properties'),
 )
 

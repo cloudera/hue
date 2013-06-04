@@ -18,78 +18,6 @@ var Registry = RegistryModule($);
 
 var Modal = ModalModule($, ko);
 
-/**
- * Import node module
- * Assists in the conversion of a jobsub node.
- * Assists in the population of available nodes.
- */
-var ImportNodeModule = function($) {
-  var module = function(options) {
-    var self = this;
-
-    self.workflow = options.workflow;
-    self.available_nodes = [];
-    self.url = ko.computed(function() {
-      return '/oozie/workflows/' + options.workflow.id() + '/jobsub/actions'
-    });
-
-    module.prototype.initialize.apply(self, arguments);
-
-    return self;
-  };
-
-  $.extend(module.prototype, {
-    initialize: function(options) {
-      var self = this;
-
-      if (options.nodes) {
-        $.each(options.nodes, function(index, node) {
-          self.available_nodes.push(node);
-        });
-      }
-    },
-
-    getAvailableNodes: function() {
-      var self = this;
-
-      return self.available_nodes;
-    },
-
-    loadAvailableNodes: function(options) {
-      var self = this;
-
-      var request = $.extend({
-        url: self.url(),
-        dataType: 'json',
-        type: 'GET',
-        success: $.noop,
-        error: $.noop
-      }, options || {});
-
-      $.ajax(request);
-    },
-
-    convertNode: function(options, jobsub_id) {
-      var self = this;
-
-      var options = options || {};
-
-      var request = $.extend({
-        url: self.url(),
-        type: 'POST',
-        data: { 'jobsub_id': jobsub_id },
-        success: $.noop,
-        error: $.noop
-      }, options);
-
-      $.ajax(request);
-    }
-  });
-
-  return module;
-};
-var ImportNode = ImportNodeModule($);
-
 var Node = NodeModule($, IdGeneratorTable, NodeFields);
 
 var StartNode = NodeModule($, IdGeneratorTable, NodeFields);
@@ -434,7 +362,7 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
     self.model = options.model;
     self.registry = options.registry;
     self.options = options;
-    self.el = $('#workflow');
+    self.el = (options.el) ? $(options.el) : $('#workflow');
     self.nodes = ko.observableArray([]);
     self.kill = null;
     self.is_dirty = ko.observable( false );

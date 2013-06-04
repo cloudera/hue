@@ -43,6 +43,7 @@ from oozie.models import Workflow, Node, Kill, Streaming, Link, Job, Coordinator
 from oozie.conf import SHARE_JOBS
 from oozie.utils import workflow_to_dict, model_to_dict, smart_path
 from oozie.import_workflow import import_workflow
+from oozie.import_jobsub import convert_jobsub_design
 
 
 LOG = logging.getLogger(__name__)
@@ -600,40 +601,33 @@ class TestAPI(OozieMockBase):
     assert_true('archives' in test_response_json_object['data'], test_response_json_object['data'])
     assert_equal(0, len(test_response_json_object['data']['archives']), test_response_json_object['data'])
 
+  def test_workflows(self):
+    response = self.c.get(reverse('oozie:workflows') + "?managed=true", HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+    response_json_dict = json.loads(response.content)
+    assert_equal(0, response_json_dict['status'])
+    assert_equal(1, len(response_json_dict['data']['workflows']))
+
+    response = self.c.get(reverse('oozie:workflows') + "?managed=false", HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+    response_json_dict = json.loads(response.content)
+    assert_equal(0, response_json_dict['status'])
+    assert_equal(0, len(response_json_dict['data']['workflows']))
+
+  def test_workflow_actions(self):
+    response = self.c.get(reverse('oozie:workflow_actions', kwargs={'workflow': self.wf.pk}), HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+    response_json_dict = json.loads(response.content)
+    assert_equal(0, response_json_dict['status'])
+    assert_equal(0, len(response_json_dict['data']['actions']))
+
+    self.setup_simple_workflow()
+    response = self.c.get(reverse('oozie:workflow_actions', kwargs={'workflow': self.wf.pk}), HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+    response_json_dict = json.loads(response.content)
+    assert_equal(0, response_json_dict['status'])
+    assert_equal(3, len(response_json_dict['data']['actions']))
+
   def test_autocomplete(self):
     response = self.c.get(reverse('oozie:autocomplete_properties'))
     test_response_json = response.content
     assert_true('mapred.input.dir' in test_response_json)
-
-
-class TestAPIWithOozie(OozieBase):
-  def setUp(self):
-    OozieBase.setUp(self)
-
-    # When updating wf, update wf_json as well!
-    self.wf = Workflow.objects.get(name='MapReduce', managed=True).clone(self.cluster.fs, self.user)
-
-  def test_import_jobsub_actions(self):
-    # Setup jobsub examples
-    if not jobsub_setup.Command().has_been_setup():
-      jobsub_setup.Command().handle()
-
-    # There should be 3 from examples
-    jobsub_design = OozieDesign.objects.filter(root_action__action_type='streaming')[0]
-    response = self.c.post(reverse('oozie:workflow_jobsub_actions', kwargs={'workflow': self.wf.id}), data={'jobsub_id': jobsub_design.id}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-    assert_equal(200, response.status_code)
-    response_dict = json.loads(response.content)
-    assert_equal(0, response_dict['status'], response)
-    assert_equal(jobsub_design.name, response_dict['data']['node']['name'], response)
-    assert_equal(jobsub_design.description, response_dict['data']['node']['description'], response)
-    assert_equal('streaming', response_dict['data']['node']['node_type'], response)
-
-    # There should now be an imported action at the end of Node list
-    # Need to test properties to make sure we got it right
-    # Must also make sure that jobsub field values are translated
-    translation_regex = re.compile('(?<!\$)\$(\w+)')
-    for field in Streaming.PARAM_FIELDS:
-      assert_equal(translation_regex.sub(r'${\1}', getattr(jobsub_design.get_root_action(), field)), response_dict['data']['node'][field], response)
 
 
 class TestApiPermissionsWithOozie(OozieBase):
@@ -2793,6 +2787,23 @@ class TestDashboard(OozieMockBase):
 
     assert_true(response.context['workflow_graph'] is None)
     assert_equal(Workflow.objects.available().count(), workflow_count)
+
+
+class GeneralTestsWithOozie(OozieBase):
+  def setUp(self):
+    OozieBase.setUp(self)
+
+  def test_import_jobsub_actions(self):
+    # Setup jobsub examples
+    if not jobsub_setup.Command().has_been_setup():
+      jobsub_setup.Command().handle()
+
+    # There should be 3 from examples
+    jobsub_design = OozieDesign.objects.filter(root_action__action_type='streaming')[0]
+    action = convert_jobsub_design(jobsub_design)
+    assert_equal(jobsub_design.name, action.name)
+    assert_equal(jobsub_design.description, action.description)
+    assert_equal('streaming', action.node_type)
 
 
 class TestUtils(OozieMockBase):

@@ -149,3 +149,7 @@ ul {
 .typeahead {
   z-index: 2000;
 }
+
+#importAction .action-row, #importOozieAction .action-row {
+  cursor: pointer;
+}

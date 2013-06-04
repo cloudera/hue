@@ -26,11 +26,8 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions import StructuredException
 
-from jobsub.models import OozieDesign
-
-from oozie.forms import WorkflowForm, ImportJobsubDesignForm, NodeForm, design_form_by_type
-from oozie.import_jobsub import convert_jobsub_design
-from oozie.models import Workflow, Node, Start, End, Kill, Mapreduce, Java, Streaming,\
+from oozie.forms import WorkflowForm, NodeForm, design_form_by_type
+from oozie.models import Job, Workflow, Node, Start, End, Kill,\
                          Link, Decision, Fork, DecisionEnd, Join,\
                          NODE_TYPES, ACTION_TYPES, _STD_PROPERTIES_JSON
 from oozie.decorators import check_job_access_permission, check_job_edition_permission
@@ -244,6 +241,7 @@ def _workflow(request, workflow):
   response = {'status': -1, 'data': 'None'}
 
   workflow_dict = model_to_dict(workflow)
+
   node_list = [node.get_full_node() for node in workflow.node_list]
   nodes = [model_to_dict(node) for node in node_list]
 
@@ -335,47 +333,34 @@ def workflow(request, workflow):
 
 
 @check_job_access_permission(exception_class=(lambda x: StructuredException(code="UNAUTHORIZED_REQUEST_ERROR", message=x, data=None, error_code=401)))
-@check_job_edition_permission(exception_class=(lambda x: StructuredException(code="UNAUTHORIZED_REQUEST_ERROR", message=x, data=None, error_code=401)))
-def workflow_jobsub_actions(request, workflow):
-  if request.method not in ['GET', 'POST']:
-    raise StructuredException(code="METHOD_NOT_ALLOWED_ERROR", message=_('Must be GET or POST request.'), error_code=405)
+def workflow_actions(request, workflow):
+  if request.method != 'GET':
+    raise StructuredException(code="METHOD_NOT_ALLOWED_ERROR", message=_('Must be GET request.'), error_code=405)
 
-  available_actions = OozieDesign.objects.all()
-  if request.method == 'POST':
-    form = ImportJobsubDesignForm(data=request.POST, choices=[(action.id, action.name) for action in available_actions])
-    if form.is_valid():
-      try:
-        design = OozieDesign.objects.get(id=form.cleaned_data['jobsub_id'])
-        action = convert_jobsub_design(design)
-        action.workflow = workflow
-
-        response = {
-          'status': 0,
-          'data': {
-            'node': model_to_dict(action)
-          }
-        }
-        response['data']['node']['child_links'] = []
-        return HttpResponse(json.dumps(response), mimetype="application/json")
-      except OozieDesign.DoesNotExist, e:
-        raise StructuredException(code="INVALID_REQUEST_ERROR", message=_('Job Designer design does not exist.'), data={'exception': str(e)}, error_code=400)
-      except (Mapreduce.DoesNotExist, Streaming.DoesNotExist, Java.DoesNotExist), e:
-        raise StructuredException(code="INVALID_REQUEST_ERROR", message=_('Could not convert Job Designer design.'), data={'exception': str(e)}, error_code=400)
-      except Exception, e:
-        raise StructuredException(code="INVALID_REQUEST_ERROR", message=_('Error importing node from Job Designer'), data={'exception': str(e)}, error_code=400)
-    else:
-      raise StructuredException(code="INVALID_REQUEST_ERROR", message=_('Error importing node from Job Designer'), data={'errors': form.errors}, error_code=400)
-
-  else:
-    available_actions = OozieDesign.objects.all()
-    response = {
-      'status': 0,
-      'data': {
-        'nodes': [model_to_dict(action) for action in available_actions]
-      }
+  action_list = [action.get_full_node() for action in workflow.actions]
+  response = {
+    'status': 0,
+    'data': {
+      'actions': [model_to_dict(action) for action in action_list]
     }
-    return HttpResponse(json.dumps(response), mimetype="application/json")
+  }
+  return HttpResponse(json.dumps(response), mimetype="application/json")
+
+
+def workflows(request):
+  if request.method not in ['GET']:
+    raise StructuredException(code="METHOD_NOT_ALLOWED_ERROR", message=_('Must be GET request.'), error_code=405)
+
+  workflows = request.GET.get('managed', 'false').lower() == 'true' and Workflow.objects.managed() or Workflow.objects.unmanaged()
+  workflows_accessible = filter(lambda x: Job.objects.is_accessible(request.user, x.id), workflows)
+  response = {
+    'status': 0,
+    'data': {
+      'workflows': [model_to_dict(workflow) for workflow in workflows_accessible]
+    }
+  }
+  return HttpResponse(json.dumps(response), mimetype="application/json")
+
 
 def autocomplete_properties(request):
   return HttpResponse(_STD_PROPERTIES_JSON, mimetype="application/json")
-

@@ -44,13 +44,13 @@ var RegistryModule = function($) {
 
     add: function(id, node) {
       var self = this;
-      $(self).trigger('registry:add');
+      $(self).trigger('registry.add');
       self.nodes[String(id)] = node;
     },
 
     remove: function(id) {
       var self = this;
-      $(self).trigger('registry:remove');
+      $(self).trigger('registry.remove');
       delete self.nodes[String(id)];
     },
 

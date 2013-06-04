@@ -77,6 +77,10 @@ A Workflow/Coordinator can be modified only by its owner or a superuser.
 Permissions checking happens by adding the decorators.
 """
 class JobManager(models.Manager):
+  def is_accessible(self, user, job_id):
+    job = Job.objects.select_related().get(pk=job_id).get_full_node()
+    return job.is_accessible(user)
+
   def is_accessible_or_exception(self, request, job_id, exception_class=PopupException):
     if job_id is None:
       return
@@ -260,6 +264,12 @@ class WorkflowManager(TrashManager):
       pass
     workflow.save()
     workflow.delete(skip_trash=True)
+
+  def managed(self):
+    return self.filter(managed=True)
+
+  def unmanaged(self):
+    return self.filter(managed=False)
 
 
 class Workflow(Job):
