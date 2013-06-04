@@ -144,17 +144,19 @@ function addTemplateFunctions(item) {
 function fixTemplateDotsAndFunctionNames(template) {
   var _mustacheTmpl = stripHtmlFromFunctions(template);
   var _mustacheTags = _mustacheTmpl.match(/{{(.*?)}}/g);
-  $.each(_mustacheTags, function (cnt, tag) {
-    if (tag.indexOf("{#") > -1) {
-      _mustacheTmpl = _mustacheTmpl.replace(tag, tag.replace(/\#/gi, "#hue_fn_"))
-    }
-    if (tag.indexOf("{/") > -1) {
-      _mustacheTmpl = _mustacheTmpl.replace(tag, tag.replace(/\//gi, "/hue_fn_"))
-    }
-    if (tag.indexOf(".") > -1) {
-      _mustacheTmpl = _mustacheTmpl.replace(tag, tag.replace(/\./gi, "_"))
-    }
-  });
+  if (_mustacheTags){
+    $.each(_mustacheTags, function (cnt, tag) {
+      if (tag.indexOf("{#") > -1) {
+        _mustacheTmpl = _mustacheTmpl.replace(tag, tag.replace(/\#/gi, "#hue_fn_"))
+      }
+      if (tag.indexOf("{/") > -1) {
+        _mustacheTmpl = _mustacheTmpl.replace(tag, tag.replace(/\//gi, "/hue_fn_"))
+      }
+      if (tag.indexOf(".") > -1) {
+        _mustacheTmpl = _mustacheTmpl.replace(tag, tag.replace(/\./gi, "_"))
+      }
+    });
+  }
   return _mustacheTmpl;
 }
 
@@ -162,9 +164,11 @@ function stripHtmlFromFunctions(template) {
   // strips HTML from inside the functions
   var _tmpl = template;
   var _mustacheFunctions = _tmpl.match(/{{#(.[\s\S]*?){{\//g);
-  $.each(_mustacheFunctions, function (cnt, fn) {
-    _tmpl = _tmpl.replace(fn, fn.substr(0, fn.indexOf("}}") + 2) + $.trim(stripHtml(fn.substr(fn.indexOf("}}") + 2).slice(0, -3))) + "{{/");
-  });
+  if (_mustacheFunctions){
+    $.each(_mustacheFunctions, function (cnt, fn) {
+      _tmpl = _tmpl.replace(fn, fn.substr(0, fn.indexOf("}}") + 2) + $.trim(stripHtml(fn.substr(fn.indexOf("}}") + 2).slice(0, -3))) + "{{/");
+    });
+  }
   return _tmpl;
 }
 
