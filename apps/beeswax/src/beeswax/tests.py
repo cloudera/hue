@@ -377,21 +377,28 @@ for x in sys.stdin:
     assert_true("parameterization.mako", response.template)
 
     # Now fill it out
-    response = self.client.post("/beeswax/execute_parameterized/%d" % design_id,
-      { "parameterization-x": str(1), "parameterization-y": str(2)}, follow=True)
-
+    response = self.client.post("/beeswax/execute_parameterized/%d" % design_id, {
+                                "parameterization-x": str(1), "parameterization-y": str(2)}, follow=True)
     assert_true("watch_wait.mako" in response.template)
+
     # Check that substitution happened!
-    assert_equal("SELECT foo FROM test WHERE foo='1' and bar='2'",
-      response.context["query"].query)
+    assert_equal("SELECT foo FROM test WHERE foo='1' and bar='2'", response.context["query"].query)
 
     # Check that error handling is reasonable
     response = self.client.post("/beeswax/execute_parameterized/%d" % design_id,
-      { "parameterization-x": "'_this_is_not SQL ", "parameterization-y": str(2) },
-      follow=True)
+                                {"parameterization-x": "'_this_is_not SQL ", "parameterization-y": str(2)},
+                                follow=True)
     assert_true("execute.mako" in response.template)
     log = response.context["log"]
     assert_true(search_log_line('ql.Driver', 'FAILED: ParseException', log), log)
+
+    # Check multi DB with a non default DB
+    response = _make_query(self.client, "SELECT foo FROM test WHERE foo='$x' and bar='$y'", database='other_db')
+    assert_true("parameterization.mako", response.template)
+    design_id = response.context["design"].id
+    response = self.client.post("/beeswax/execute_parameterized/%d" % design_id, {
+                                "parameterization-x": str(1), "parameterization-y": str(2)}, follow=True)
+    assert_equal('other_db', response.context['design'].get_design().query['database'])
 
   def test_explain_query(self):
     c = self.client

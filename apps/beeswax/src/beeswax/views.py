@@ -382,8 +382,7 @@ def execute_query(request, design_id=None):
 
   query_server = get_query_server_config(app_name)
   db = dbms.get(request.user, query_server)
-  dbs = db.get_databases()
-  databases = ((db, db) for db in dbs)
+  databases = _get_db_choices(request)
 
   if request.method == 'POST':
     form.bind(request.POST)
@@ -1073,8 +1072,13 @@ def _run_parameterized_query(request, design_id, explain):
   query_form = QueryForm()
   params = design_obj.get_query_dict()
   params.update(request.POST)
+
+  databases = _get_db_choices(request)
   query_form.bind(params)
-  assert query_form.is_valid()
+  query_form.query.fields['database'].choices = databases # Could not do it in the form
+
+  if not query_form.is_valid():
+    raise PopupException(_("Query form is invalid: %s") % query_form.errors)
 
   query_str = query_form.query.cleaned_data["query"]
   query_server = get_query_server_config(get_app_name(request))
@@ -1421,6 +1425,13 @@ def _update_query_state(query_history):
       state_enum = models.QueryHistory.STATE.failed
     query_history.save_state(state_enum)
   return True
+
+def _get_db_choices(request):
+  app_name = get_app_name(request)
+  query_server = get_query_server_config(app_name)
+  db = dbms.get(request.user, query_server)
+  dbs = db.get_databases()
+  return ((db, db) for db in dbs)
 
 WHITESPACE = re.compile("\s+", re.MULTILINE)
 def collapse_whitespace(s):

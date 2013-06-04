@@ -81,7 +81,7 @@ def get_query_server_config(name='beeswax'):
         'server_interface': SERVER_INTERFACE.get(),
         'principal': kerberos_principal
     }
-    LOG.debug("Query Server:\n\tName: %(server_name)s\n\tHost: %(server_host)s\n\tPort: %(server_port)s\n\tInterface: %(server_interface)s\n\tKerberos Principal: %(principal)s" % query_server)
+    LOG.debug("Query Server: %s" % query_server)
 
   return query_server
 
