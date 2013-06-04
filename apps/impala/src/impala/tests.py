@@ -23,6 +23,7 @@ from django.contrib.auth.models import User
 from desktop.lib.django_test_util import make_logged_in_client
 from beeswax.models import SavedQuery, QueryHistory
 from beeswax.server import dbms
+from beeswax.design import hql_query
 
 
 class MockDbms:
@@ -67,6 +68,9 @@ class TestImpala:
       response = self.client.get("/impala/list_designs")
       assert_equal(len(response.context['page'].object_list), 1)
 
+      response = self.client.get("/impala/execute_parameterized/%s" % impala_query.id)
+      assert_true('specify parameters' in response.content)
+
       # Test my query page
       QueryHistory.objects.create(owner=user, design=impala_query, query='', last_state=QueryHistory.STATE.available.index)
 
@@ -86,7 +90,7 @@ def create_saved_query(app_name, owner):
     design = SavedQuery(owner=owner, type=query_type)
     design.name = SavedQuery.DEFAULT_NEW_DESIGN_NAME
     design.desc = ''
-    design.data = ''
+    design.data = hql_query('show $tables').dumps()
     design.is_auto = False
     design.save()
     return design

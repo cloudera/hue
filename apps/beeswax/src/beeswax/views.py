@@ -603,7 +603,7 @@ def view_results(request, id, first_row=0):
   context_param = request.GET.get('context', '')
   query_context = _parse_query_context(context_param)
 
-  # To remove in Hue 2.3
+  # To remove in Hue 2.4
   download  = request.GET.get('download', '')
 
   # Update the status as expired should not be accessible
@@ -1081,7 +1081,9 @@ def _run_parameterized_query(request, design_id, explain):
     raise PopupException(_("Query form is invalid: %s") % query_form.errors)
 
   query_str = query_form.query.cleaned_data["query"]
-  query_server = get_query_server_config(get_app_name(request))
+  app_name = get_app_name(request)
+  query_server = get_query_server_config(app_name)  
+  query_type = SavedQuery.TYPES_MAPPING[app_name]
 
   parameterization_form_cls = make_parameterization_form(query_str)
   if not parameterization_form_cls:
@@ -1091,7 +1093,7 @@ def _run_parameterized_query(request, design_id, explain):
 
   if parameterization_form.is_valid():
     real_query = substitute_variables(query_str, parameterization_form.cleaned_data)
-    query = HQLdesign(query_form)
+    query = HQLdesign(query_form, query_type=query_type)
     query._data_dict['query']['query'] = real_query
     try:
       if explain:
