@@ -34,24 +34,26 @@ class MockDbms:
     return ['table1', 'table2']
 
 
-class TestImpala:
+class TestMockedImpala:
   def setUp(self):
     self.client = make_logged_in_client()
 
+    # Mock DB calls as we don't need the real ones
+    self.prev_dbms = dbms.get
+    dbms.get = lambda a, b: MockDbms()
+
+  def tearDown(self):
+    # Remove monkey patching
+    dbms.get = self.prev_dbms
+
   def test_basic_flow(self):
-    try:
-      # Mock DB calls as we don't need the real ones
-      self.prev_dbms = dbms.get
-      dbms.get = lambda a, b: MockDbms()
+    response = self.client.get("/impala/")
+    assert_true(re.search('<li id="impalaIcon"\W+class="active', response.content), response.content)
+    assert_true('Query Editor' in response.content)
 
-      response = self.client.get("/impala/")
-      assert_true(re.search('<li id="impalaIcon"\W+class="active', response.content), response.content)
-      assert_true('Query Editor' in response.content)
+    response = self.client.get("/impala/execute/")
+    assert_true('Query Editor' in response.content)
 
-      response = self.client.get("/impala/execute/")
-      assert_true('Query Editor' in response.content)
-    finally:
-      dbms.get = self.prev_dbms
 
   def test_saved_queries(self):
     user = User.objects.get(username='test')
@@ -90,7 +92,7 @@ def create_saved_query(app_name, owner):
     design = SavedQuery(owner=owner, type=query_type)
     design.name = SavedQuery.DEFAULT_NEW_DESIGN_NAME
     design.desc = ''
-    design.data = hql_query('show $tables').dumps()
+    design.data = hql_query('show $tables', database='db1').dumps()
     design.is_auto = False
     design.save()
     return design
