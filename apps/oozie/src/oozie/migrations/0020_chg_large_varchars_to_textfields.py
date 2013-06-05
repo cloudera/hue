@@ -8,9 +8,7 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # ('args', self.gf('django.db.models.fields.TextField')(blank=True)),
         db.alter_column('oozie_java', 'args', self.gf('django.db.models.fields.TextField')(blank=True))
-        db.alter_column('jobsub_ooziejavaaction', 'args', self.gf('django.db.models.fields.TextField')(blank=True))
 
 
     def backwards(self, orm):
