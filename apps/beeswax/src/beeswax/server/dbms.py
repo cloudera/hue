@@ -339,7 +339,7 @@ class Dbms:
 
     partition_query = ""
     for idx, key in enumerate(partitions[partition_id].values):
-      partition_query += (idx > 0 and " AND " or "") + table.partition_keys[idx].name + "=" + key
+      partition_query += (idx > 0 and " AND " or "") + table.partition_keys[idx].name + "='%s'" % key
 
     hql = "SELECT * FROM `%s.%s` WHERE %s" % (db_name, table_name, partition_query)
 

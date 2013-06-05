@@ -19,7 +19,7 @@ from django.utils.translation import ugettext as _
 
 <%namespace name="comps" file="../components.mako" />
 
-<form method="POST" class="form-horizontal" id="load-data-form">
+<form method="POST" class="form-horizontal" id="load-data-form" onsubmit="return false;">
     <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
         <h3>${_('Import data')}</h3>
@@ -58,7 +58,7 @@ from django.utils.translation import ugettext as _
 
     <div class="modal-footer">
         <a href="#" class="btn" data-dismiss="modal">${_('Cancel')}</a>
-        <button href="#" class="btn btn-primary" id="load-data-submit-btn" disabled="disabled">${_('Submit')}</button>
+        <button class="btn btn-primary" id="load-data-submit-btn" disabled="disabled">${_('Submit')}</button>
     </div>
 </form>
 

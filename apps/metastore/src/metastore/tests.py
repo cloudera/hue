@@ -126,7 +126,7 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     response = self.client.get("/metastore/table/default/test/partitions", follow=True)
     assert_true("is not partitioned." in response.content)
 
-  def test_browse_partitions_with_limit(self):
+  def test_browse_partitioned_table_with_limit(self):
     # Limit to 90
     finish = BROWSE_PARTITIONED_TABLE_LIMIT.set_for_testing("90")
     try:
@@ -135,6 +135,11 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
       assert_false("0x%x" % 90 in response.content, response.content)
     finally:
       finish()
+
+  def test_browse_partitions(self):
+    response = self.client.get("/metastore/table/default/test_partitions/partitions/0", follow=True)
+    response = wait_for_query_to_finish(self.client, response, max=30.0)
+    assert_true(len(response.context['results']) > 10)
 
   def test_drop_multi_tables(self):
     hql = """
