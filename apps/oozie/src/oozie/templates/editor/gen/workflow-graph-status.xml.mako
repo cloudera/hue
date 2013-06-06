@@ -44,7 +44,6 @@
   %>
 
   % if form.instance.get_full_node().is_visible():
-
       <div class="span12 action ${ box_class }">
         <div class="row-fluid">
           <div class="span12">
@@ -87,7 +86,6 @@
         % endif
 
       </div>
-
   % endif
 
 </%def>

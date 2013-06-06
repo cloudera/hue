@@ -29,7 +29,7 @@ function getStatusClass(status, prefix){
     prefix = "label-";
   }
   var klass = "";
-  if (['SUCCEEDED', 'OK'].indexOf(status) > -1){
+  if (['SUCCEEDED', 'OK', 'DONE'].indexOf(status) > -1){
     klass = prefix + "success";
   }
   else if (['RUNNING', 'READY', 'PREP', 'WAITING', 'SUSPENDED', 'PREPSUSPENDED', 'PREPPAUSED', 'PAUSED',

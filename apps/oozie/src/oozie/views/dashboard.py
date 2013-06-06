@@ -191,14 +191,15 @@ def list_oozie_workflow(request, job_id, coordinator_job_id=None, bundle_job_id=
 
   if hue_workflow:
     workflow_graph = hue_workflow.gen_status_graph(oozie_workflow)
+    full_node_list = hue_workflow.node_list
   else:
-    workflow_graph = Workflow.gen_status_graph_from_xml(request.user, oozie_workflow)
+    workflow_graph, full_node_list = Workflow.gen_status_graph_from_xml(request.user, oozie_workflow)
 
   if request.GET.get('format') == 'json':
     return_obj = {
       'id': oozie_workflow.id,
       'status':  oozie_workflow.status,
-      'progress': oozie_workflow.get_progress(),
+      'progress': oozie_workflow.get_progress(full_node_list),
       'graph': workflow_graph,
       'log': oozie_workflow.log,
       'actions': massaged_workflow_actions_for_json(oozie_workflow.get_working_actions(), oozie_coordinator, oozie_bundle)

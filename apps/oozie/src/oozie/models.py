@@ -463,11 +463,13 @@ class Workflow(Job):
       workflow.save()
       try:
         import_workflow(workflow, oozie_workflow.definition)
-        return workflow.gen_status_graph(oozie_workflow)
+        graph =  workflow.gen_status_graph(oozie_workflow)
+        return graph, workflow.node_list
       except Exception, e:
-        LOG.info('Workflow %s could not be converted to a graph: %s' % (oozie_workflow.id, e))
+        LOG.warn('Workflow %s could not be converted to a graph: %s' % (oozie_workflow.id, e))
     finally:
       workflow.delete()
+    return None, []
 
   def to_xml(self, mapping=None):
     if mapping is None:

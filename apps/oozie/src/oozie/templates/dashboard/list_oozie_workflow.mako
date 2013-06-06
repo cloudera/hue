@@ -488,7 +488,7 @@ ${ layout.menubar(section='dashboard') }
           $("#rerun-btn").show();
         }
 
-        $("#progress .bar").text(data.progress+"%").css("width", data.progress+"%").attr("class", "bar "+getStatusClass(data.status, "bar-"));
+        $("#progress .bar").text(data.progress+"%").css("width", data.progress+"%").attr("class", "bar " + getStatusClass(data.status, "bar-"));
         $("#graph").html(data.graph);
 
         var _logsEl = $("#log pre");

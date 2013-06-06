@@ -414,9 +414,15 @@ class Workflow(Job):
       kwargs['bundle_job_id'] = self.oozie_bundle.id
     return reverse('oozie:list_oozie_workflow', kwargs=kwargs)
 
-  def get_progress(self):
-    """How many actions are finished on the total of actions."""
-    return int(sum([action.is_finished() for action in self.actions]) / float(max(len(self.actions), 1)) * 100)
+  def get_progress(self, full_node_list=None):
+    if self.status == 'SUCCEEDED':
+      return 100 # Case of decision nodes
+    else:
+      if full_node_list is not None:            # Should remove the un-reached branches if decision node
+        total_actions = len(full_node_list) - 1 # -1 because of Kill node
+      else:
+        total_actions = len(self.actions)
+      return int(sum([action.is_finished() for action in self.actions]) / float(max(total_actions, 1)) * 100)
 
 
 class Coordinator(Job):

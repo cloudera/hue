@@ -2372,6 +2372,7 @@ class TestOozieSubmissions(OozieBase):
     response = self.c.post(reverse('oozie:submit_workflow', args=[wf.id]), data=post_data, follow=True)
     job = OozieServerProvider.wait_until_completion(response.context['oozie_workflow'].id)
     assert_equal('SUCCEEDED', job.status)
+    assert_equal(100, job.get_progress())
 
     # Rerun with default options
     post_data.update({u'rerun_form_choice': [u'skip_nodes']})
@@ -2379,6 +2380,7 @@ class TestOozieSubmissions(OozieBase):
     response = self.c.post(reverse('oozie:rerun_oozie_job', kwargs={'job_id': job.id, 'app_path': job.appPath}), data=post_data, follow=True)
     job = OozieServerProvider.wait_until_completion(response.context['oozie_workflow'].id)
     assert_equal('SUCCEEDED', job.status)
+    assert_equal(100, job.get_progress())
 
     # Rerun with skip OK actions skipped
     post_data.update({u'rerun_form_choice': [u'skip_nodes'], u'skip_nodes': [u'Sleep']})
@@ -2386,6 +2388,7 @@ class TestOozieSubmissions(OozieBase):
     response = self.c.post(reverse('oozie:rerun_oozie_job', kwargs={'job_id': job.id, 'app_path': job.appPath}), data=post_data, follow=True)
     job = OozieServerProvider.wait_until_completion(response.context['oozie_workflow'].id)
     assert_equal('SUCCEEDED', job.status)
+    assert_equal(100, job.get_progress())
 
     # Rerun with failed nodes too
     post_data.update({u'rerun_form_choice': [u'failed_nodes']})
