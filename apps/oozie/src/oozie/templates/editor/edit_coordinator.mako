@@ -137,7 +137,7 @@ ${ layout.menubar(section='coordinators') }
               </div>
               <div class="row-fluid">
                 <div class="span6">
-                ${ utils.render_field_popover(coordinator_form['start']) }
+                ${ utils.render_field_no_popover(coordinator_form['start']) }
                 </div>
                 <div class="span6">
                 ${ utils.render_field_no_popover(coordinator_form['end']) }
