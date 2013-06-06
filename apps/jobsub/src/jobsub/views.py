@@ -45,9 +45,6 @@ from oozie.forms import design_form_by_type
 from oozie.utils import model_to_dict, format_dict_field_values,\
                         sanitize_node_dict
 
-# To re-enable
-from jobsub.management.commands import jobsub_setup
-
 
 LOG = logging.getLogger(__name__)
 

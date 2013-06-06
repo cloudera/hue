@@ -30,8 +30,7 @@ from django.core.urlresolvers import reverse
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_permission
-from jobsub.management.commands import jobsub_setup
-from jobsub.models import OozieDesign
+from jobsub.models import OozieDesign, OozieMapreduceAction
 from liboozie import oozie_api
 from liboozie.conf import OOZIE_URL
 from liboozie.oozie_api_test import OozieServerProvider
@@ -2794,16 +2793,22 @@ class GeneralTestsWithOozie(OozieBase):
     OozieBase.setUp(self)
 
   def test_import_jobsub_actions(self):
-    # Setup jobsub examples
-    if not jobsub_setup.Command().has_been_setup():
-      jobsub_setup.Command().handle()
+    design = OozieDesign(owner=self.user, name="test")
+    action = OozieMapreduceAction(jar_path='/tmp/test.jar')
+    action.action_type = OozieMapreduceAction.ACTION_TYPE
+    action.save()
+    design.root_action = action
+    design.save()
 
-    # There should be 3 from examples
-    jobsub_design = OozieDesign.objects.filter(root_action__action_type='streaming')[0]
-    action = convert_jobsub_design(jobsub_design)
-    assert_equal(jobsub_design.name, action.name)
-    assert_equal(jobsub_design.description, action.description)
-    assert_equal('streaming', action.node_type)
+    try:
+      # There should be 3 from examples
+      action = convert_jobsub_design(design)
+      assert_equal(design.name, action.name)
+      assert_equal(design.description, action.description)
+      assert_equal(OozieMapreduceAction.ACTION_TYPE, action.node_type)
+    finally:
+      OozieDesign.objects.all().delete()
+      OozieMapreduceAction.objects.all().delete()
 
 
 class TestUtils(OozieMockBase):
