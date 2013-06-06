@@ -57,6 +57,7 @@ ${ commonheader(_('Home'), "home", user) | n,unicode }
             ${ app_link("beeswax", "Hive") }
             ${ app_link("impala", "Impala") }
             ${ app_link("pig", "Pig") }
+            ${ app_link("search", _('Search')) }
             ${ app_link("shell", _('Shell')) }
           </ul>
         </div>
