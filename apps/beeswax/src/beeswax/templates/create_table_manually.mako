@@ -14,15 +14,13 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-    from desktop.views import commonheader, commonfooter
-    from django.utils.translation import ugettext as _
+from desktop.views import commonheader, commonfooter
+from django.utils.translation import ugettext as _
 %>
 
 <%namespace name="comps" file="beeswax_components.mako" />
-<%namespace name="layout" file="layout.mako" />
 
-${ commonheader(_("Create table manually"), app_name, user, '100px') | n,unicode }
-${layout.menubar(section='tables')}
+${ commonheader(_("Create table manually"), 'metastore', user) | n,unicode }
 
 <div class="container-fluid">
 <h1>${_('Create a new table manually')}</h1>

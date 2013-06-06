@@ -14,17 +14,14 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-    from desktop.views import commonheader, commonfooter
-    from django.utils.translation import ugettext as _
+from desktop.views import commonheader, commonfooter
+from django.utils.translation import ugettext as _
 %>
 
 <%namespace name="comps" file="beeswax_components.mako" />
-<%namespace name="layout" file="layout.mako" />
 
-${ commonheader(_("Create database"), app_name, user, '100px') | n,unicode }
-${layout.menubar(section='databases')}
+${ commonheader(_("Create database"), 'metastore', user) | n,unicode }
 
-<script src="/static/ext/js/routie-0.3.0.min.js" type="text/javascript" charset="utf-8"></script>
 
 <div class="container-fluid">
   <h1>${_('Create a new database')}</h1>
@@ -171,6 +168,9 @@ ${layout.menubar(section='databases')}
 </style>
 
 </div>
+
+
+<script src="/static/ext/js/routie-0.3.0.min.js" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript" charset="utf-8">
 $(document).ready(function () {
