@@ -124,24 +124,27 @@ class LdapConnection(object):
     if result_data and result_type == ldap.RES_SEARCH_RESULT:
       for dn, data in result_data:
 
-        # Skip unnamed entries.
-        if user_name_attr not in data:
-          LOG.warn('Could not find %s in ldap attributes' % user_name_attr)
-          continue
+        # Skip Active Directory # refldap entries.
+        if dn is not None:
 
-        ldap_info = {
-          'dn': dn,
-          'username': data[user_name_attr][0]
-        }
+          # Skip unnamed entries.
+          if user_name_attr not in data:
+            LOG.warn('Could not find %s in ldap attributes' % user_name_attr)
+            continue
 
-        if 'givenName' in data:
-          ldap_info['first'] = data['givenName'][0]
-        if 'sn' in data:
-          ldap_info['last'] = data['sn'][0]
-        if 'mail' in data:
-          ldap_info['email'] = data['mail'][0]
+          ldap_info = {
+            'dn': dn,
+            'username': data[user_name_attr][0]
+          }
 
-        user_info.append(ldap_info)
+          if 'givenName' in data:
+            ldap_info['first'] = data['givenName'][0]
+          if 'sn' in data:
+            ldap_info['last'] = data['sn'][0]
+          if 'mail' in data:
+            ldap_info['email'] = data['mail'][0]
+
+          user_info.append(ldap_info)
 
     return user_info
 
@@ -169,23 +172,26 @@ class LdapConnection(object):
     if result_data and result_type == ldap.RES_SEARCH_RESULT:
       for dn, data in result_data:
 
-        # Skip unnamed entries.
-        if group_name_attr not in data:
-          LOG.warn('Could not find %s in ldap attributes' % group_name_attr)
-          continue
+        # Skip Active Directory # refldap entries.
+        if dn is not None:
 
-        ldap_info = {
-          'dn': dn,
-          'name': data[group_name_attr][0]
-        }
+          # Skip unnamed entries.
+          if group_name_attr not in data:
+            LOG.warn('Could not find %s in ldap attributes' % group_name_attr)
+            continue
 
-        member_attr = desktop.conf.LDAP.GROUPS.GROUP_MEMBER_ATTR.get()
-        if member_attr in data:
-          ldap_info['members'] = data[member_attr]
-        else:
-          ldap_info['members'] = []
+          ldap_info = {
+            'dn': dn,
+            'name': data[group_name_attr][0]
+          }
 
-        group_info.append(ldap_info)
+          member_attr = desktop.conf.LDAP.GROUPS.GROUP_MEMBER_ATTR.get()
+          if member_attr in data:
+            ldap_info['members'] = data[member_attr]
+          else:
+            ldap_info['members'] = []
+
+          group_info.append(ldap_info)
 
     return group_info
 
