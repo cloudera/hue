@@ -470,7 +470,7 @@ DJANGO_EMAIL_BACKEND = Config(
 )
 
 
-def config_validator():
+def config_validator(user):
   """
   config_validator() -> [ (config_variable, error_message) ]
 

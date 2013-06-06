@@ -38,7 +38,7 @@ REMOTE_SAMPLE_DIR = Config(
   help=_t("Location on HDFS where the Pig examples are stored."))
 
 
-def config_validator():
+def config_validator(user):
   res = []
 
   if not 'test' in sys.argv: # Avoid tests hanging

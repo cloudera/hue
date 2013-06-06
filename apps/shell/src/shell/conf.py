@@ -91,7 +91,7 @@ SHELL_DELEGATION_TOKEN_DIR = Config(
   type=str
 )
 
-def config_validator():
+def config_validator(user):
   """
   config_validator() -> [ (config_variable, error_message) ]
 

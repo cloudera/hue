@@ -509,9 +509,9 @@ the admin. To take advantage of this feature, create a `config_validator`
 function in your `conf.py`:
 
 <pre>
-  def config_validator():
+  def config_validator(user):
     """
-    config_validator() -> [(config_variable, error_msg)] or None
+    config_validator(user) -> [(config_variable, error_msg)] or None
     Called by core check_config() view.
     """
     res = [ ]

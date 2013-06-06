@@ -63,7 +63,7 @@ OOZIE_JOBS_COUNT = Config(
   help=_t('Maximum number of Oozie workflows or coodinators to retrieve in one API call.'))
 
 
-def config_validator():
+def config_validator(user):
   res = []
 
   status = get_oozie_status()

@@ -338,7 +338,7 @@ CONFIG_VALIDATOR = 'config_validator'
 #
 _CONFIG_ERROR_LIST = None
 
-def _get_config_errors(cache=True):
+def _get_config_errors(request, cache=True):
   """Returns a list of (confvar, err_msg) tuples."""
   global _CONFIG_ERROR_LIST
 
@@ -357,7 +357,7 @@ def _get_config_errors(cache=True):
         continue
 
       try:
-        error_list.extend(validator())
+        error_list.extend(validator(request.user))
       except Exception, ex:
         LOG.exception("Error in config validation by %s: %s" % (module.nice_name, ex))
     _CONFIG_ERROR_LIST = error_list
@@ -371,7 +371,7 @@ def check_config(request):
 
   conf_dir = os.path.realpath(os.getenv("HUE_CONF_DIR", get_desktop_root("conf")))
   return render('check_config.mako', request, dict(
-                    error_list=_get_config_errors(cache=False),
+                    error_list=_get_config_errors(request, cache=False),
                     conf_dir=conf_dir))
 
 def check_config_ajax(request):
@@ -379,7 +379,7 @@ def check_config_ajax(request):
   if not request.user.is_superuser:
     return HttpResponse('')
 
-  error_list = _get_config_errors()
+  error_list = _get_config_errors(request)
   if not error_list:
     # Return an empty response, rather than using the mako template, for performance.
     return HttpResponse('')
