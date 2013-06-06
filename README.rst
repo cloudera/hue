@@ -15,7 +15,8 @@ applications. It features:
       * Oozie App for submitting and scheduling workflows and bundles
       * Pig App for submitting Pig scripts
       * Table Browser for accessing Hive metadata
-      * JobBrowser for viewing MapReduce jobs
+      * Search app for querying Solr and Solr Cloud
+      * JobBrowser for accessing MapReduce jobs (MR1/MR2-YARN)
       * A Pig/HBase/Sqoop2 shell
 
 On top of that, a SDK is available for creating new apps integrated with Hadoop.
