@@ -24,6 +24,9 @@ from posixpath import curdir, sep, pardir, join
 # The root of the Hue installation
 INSTALL_ROOT = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', '..'))
 
+# The apps location
+APPS_ROOT = os.path.join(INSTALL_ROOT, 'apps')
+
 # The Hue config directory
 HUE_CONF_DIR = os.path.join(INSTALL_ROOT, 'desktop', 'conf')
 

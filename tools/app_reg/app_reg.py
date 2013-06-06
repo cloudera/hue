@@ -101,10 +101,11 @@ def get_app_info(app_loc):
     os.chdir(save_cwd)
 
 
-def _do_install_one(reg, app_loc):
+def _do_install_one(reg, app_loc, relative_path):
   """Install one app, without saving. Returns True/False."""
   LOG.info("=== Installing app at %s" % (app_loc,))
   try:
+    # Relative to cwd.
     app_loc = os.path.realpath(app_loc)
     app_name, version, desc, author = get_app_info(app_loc)
   except (ValueError, OSError), ex:
@@ -112,17 +113,21 @@ def _do_install_one(reg, app_loc):
     return False
 
   app = registry.HueApp(app_name, version, app_loc, desc, author)
+  if relative_path:
+    app.use_rel_path()
+  else:
+    app.use_abs_path()
   if reg.contains(app):
     LOG.warn("=== %s is already installed" % (app,))
     return True
   return reg.register(app) and build.make_app(app) and app.install_conf()
 
 
-def do_install(app_loc_list):
+def do_install(app_loc_list, relative_paths=False):
   """Install the apps. Returns True/False."""
   reg = registry.AppRegistry()
   for app_loc in app_loc_list:
-    if not _do_install_one(reg, app_loc):
+    if not _do_install_one(reg, app_loc, relative_paths):
       return False
   reg.save()
 
@@ -218,7 +223,10 @@ def main():
       LOG_LEVEL = logging.DEBUG
 
   if action == DO_INSTALL:
-    app_loc_list = tail
+    # ['..', '--relative-paths', 'a', 'b'] => True
+    # ['..', 'a', 'b'] -> False
+    relative_paths = reduce(lambda accum, x: accum or x, map(lambda x: x in ['--relative-paths'], tail))
+    app_loc_list = filter(lambda x: x not in ['--relative-paths'], tail)
   elif len(tail) != 0:
     usage("Unknown trailing arguments: %s" % ' '.join(tail))
 
@@ -230,7 +238,7 @@ def main():
 
   # Dispatch
   if action == DO_INSTALL:
-    ok = do_install(app_loc_list)
+    ok = do_install(app_loc_list, relative_paths)
   elif action == DO_REMOVE:
     ok = do_remove(app)
   elif action == DO_LIST:

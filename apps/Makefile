@@ -54,7 +54,7 @@ EGG_INFO_TARGETS := $(APPS:%=.recursive-egg-info/%)
 
 .PHONY: env-install
 env-install: $(EGG_INFO_TARGETS)
-	$(APP_REG) --install $(APPS)
+	$(APP_REG) --install $(APPS) --relative-paths
 
 
 ################################################
