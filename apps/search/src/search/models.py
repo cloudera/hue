@@ -181,10 +181,6 @@ class Sorting(models.Model):
     return params
 
 
-  def get_query(self):
-    ('sort', solr_query['sort']),
-
-
 class CollectionManager(models.Manager):
 
   def get_or_create(self, name, solr_properties, is_core_only=False, is_enabled=True):
