@@ -147,15 +147,18 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
             <li data-bind="visible: currentScript().isRunning(), click: showScriptLogs" data-section="logs">
               <a href="#" title="${ _('Show Logs') }" rel="tooltip" data-placement="right">${ _('Current Logs') }</a>
             </li>
+            <li>
+            <br/>
+            <i class="icon-question-sign" id="help"></i>
+            <div id="help-content" class="hide">
+              <ul style="text-align: left;">
+                <li>${ _("Press CTRL + Space to autocomplete") }</li>
+                <li>${ _("You can execute the current script by pressing CTRL + ENTER or CTRL + . in the editor") }</li>
+              </ul>
+            </div>
+            </li>
           </ul>
         </form>
-      </div>
-      <i class="icon-question-sign" id="help"></i>
-      <div id="help-content" class="hide">
-        <ul style="text-align: left;">
-          <li>${ _("Press CTRL + Space to autocomplete") }</li>
-          <li>${ _("You can execute the current script by pressing CTRL + ENTER or CTRL + . in the editor") }</li>
-        </ul>
       </div>
     </div>
 

@@ -27,7 +27,7 @@ from django.utils.translation import ugettext as _
         <table class="table table-striped">
       % for confvar, error in error_list:
         <tr>
-            <td width="5%">
+            <td width="15%">
                 <code>
                 % if isinstance(confvar, str):
                   ${confvar | n}
@@ -47,6 +47,6 @@ from django.utils.translation import ugettext as _
       % endfor
     </table>
     % else:
-      <h2>${_('All OK. Configuration check passed.')}</h2>
+      <h5>${_('All OK. Configuration check passed.')}</h5>
     % endif
 </div>

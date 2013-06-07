@@ -17,28 +17,47 @@
 
 import socket
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _t, ugettext as _
 from desktop.lib.conf import Config
+
+from impala.settings import NICE_NAME
 
 
 SERVER_HOST = Config(
   key="server_host",
-  help=_("Host of the Impala Server."),
+  help=_t("Host of the Impala Server."),
   default="localhost")
 
 SERVER_PORT = Config(
   key="server_port",
-  help=_("Port of the Impala Server."),
+  help=_t("Port of the Impala Server."),
   default=21050,
   type=int)
 
 SERVER_INTERFACE = Config(
   key="server_interface",
-  help=_("Beeswax or Hive Server 2 Thrift API used. Choices are: 'beeswax' or 'hiveserver2'."),
+  help=_t("Beeswax or Hive Server 2 Thrift API used. Choices are: 'beeswax' or 'hiveserver2'."),
   default="hiveserver2")
 
 IMPALA_PRINCIPAL=Config(
   key='impala_principal',
-  help=_("Kerberos principal name for Impala. Typically 'impala/hostname.foo.com'."),
+  help=_t("Kerberos principal name for Impala. Typically 'impala/hostname.foo.com'."),
   type=str,
   default="impala/%s" % socket.getfqdn())
+
+
+def config_validator(user):
+  # dbms is dependent on beeswax.conf (this file)
+  # import in method to avoid circular dependency
+  from beeswax.server import dbms
+  from beeswax.server.dbms import get_query_server_config
+
+  res = []
+  try:
+    query_server = get_query_server_config(name='impala')
+    server = dbms.get(user, query_server)
+    server.get_databases()
+  except:
+    res.append((NICE_NAME, _("No available Impalad to send queries to.")))
+
+  return res
