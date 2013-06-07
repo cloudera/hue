@@ -57,10 +57,6 @@ class SolrApi(object):
         if fq:
           params += (('fq', fq),)
 
-      # Debug for now
-      print solr_query
-      print params
-
       response = self._root.get('%(collection)s/select' % solr_query, params)
       return json.loads(response)
     except RestException, e:
