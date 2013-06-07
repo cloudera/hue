@@ -78,41 +78,59 @@ ${ commonheader(_('Quick Start'), "quickstart", user, "100px") | n,unicode }
           <span class="icon">
             <i class="icon-th-list"></i>
           </span>
-          <h5>${ _('Install or re-install the application examples') }</h5>
+          <h5>${ _('Install all the application examples') }</h5>
+        </div>
+        <div class="widget-content">
+          <ul>
+          <li>
+            <a href="#" class="installAllBtn" data-loading-text="${ _('Installing...') }">
+             <i class="icon-download-alt"></i> ${ _('All') }
+            </a>
+          </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="widget-box">
+        <div class="widget-title">
+          <span class="icon">
+            <i class="icon-th-list"></i>
+          </span>
+          <h5>${ _('Install individual application examples') }</h5>
         </div>
         <div class="widget-content">
           <ul>
         % if 'beeswax' in app_names:
           <li>
-            <a href="#" class="installBtn" data-loading-text="${ _('Installing...') }" data-url="${ url('beeswax:install_examples') }">
+            <a href="#" class="installBtn" data-loading-text="${ _('Installing...') }" data-sample-url="${ url('beeswax:install_examples') }">
              <i class="icon-download-alt"></i> ${ apps['beeswax'].nice_name }
             </a>
           </li>
         % endif
         % if 'impala' in app_names:
           <li>
-            <a href="#" class="installBtn" data-loading-text="${ _('Installing...') }" data-url="${ url('impala:install_examples') }">
+            <a href="#" class="installBtn" data-loading-text="${ _('Installing...') }" data-sample-url="${ url('impala:install_examples') }">
              <i class="icon-download-alt"></i> ${ apps['impala'].nice_name }
             </a>
           </li>
         % endif
         % if 'jobsub' in app_names:
           <li>
-            <a href="#" class="installBtn" data-loading-text="${ _('Installing...') }" data-url="${ url('oozie:install_examples') }">
+            <a href="#" class="installBtn" data-loading-text="${ _('Installing...') }" data-sample-url="${ url('oozie:install_examples') }">
               <i class="icon-download-alt"></i> ${ apps['jobsub'].nice_name }
             </a>
           </li>
         % endif
         % if 'oozie' in app_names:
           <li>
-            <a href="#" class="installBtn" data-loading-text="${ _('Installing...') }" data-url="${ url('oozie:install_examples') }">
+            <a href="#" class="installBtn" data-loading-text="${ _('Installing...') }" data-sample-url="${ url('oozie:install_examples') }">
               <i class="icon-download-alt"></i> ${ apps['oozie'].nice_name }
             </a>
           </li>
         % endif
         % if 'pig' in app_names:
           <li>
-            <a href="#" class="installBtn" data-loading-text="${ _('Installing...') }" data-url="${ url('pig:install_examples') }">
+            <a href="#" class="installBtn" data-loading-text="${ _('Installing...') }" data-sample-url="${ url('pig:install_examples') }">
              <i class="icon-download-alt"></i> ${ apps['pig'].nice_name }
             </a>
           </li>
@@ -131,7 +149,7 @@ ${ commonheader(_('Quick Start'), "quickstart", user, "100px") | n,unicode }
           <h5>${ _('Go create or import users') }</h5>
         </div>
         <div class="widget-content">
-	      <a  href="${ url('useradmin.views.list_users') }" target="_blank">${ _('User Admin') } <img src="/useradmin/static/art/icon_useradmin_24.png"></a>
+        <a  href="${ url('useradmin.views.list_users') }" target="_blank"><img src="/useradmin/static/art/icon_useradmin_24.png"> ${ _('User Admin') }</a>
         </div>
       </div>
 
@@ -203,7 +221,7 @@ $(document).ready(function(){
   $(".installBtn").click(function() {
     var button = $(this);
     $(button).button('loading');
-    $.post($(this).data("url"), function(data) {
+    $.post($(this).data("sample-url"), function(data) {
       if (data.status == 0) {
         $.jHueNotify.info('${ _("Examples refreshed") }');
       } else {
@@ -213,6 +231,21 @@ $(document).ready(function(){
     .always(function(data) {
       $(button).button('reset');
     });
+  });
+
+  $(".installAllBtn").click(function() {
+    var button = $(this);
+    $(button).button('loading');
+    var calls = jQuery.map($("[data-sample-url]"), function(app) {
+      return $.post($(app).data("sample-url"));
+    });
+    $.when.apply(this, calls)
+      .then(function() {
+        $.jHueNotify.info('${ _("Examples refreshed") }');
+      })
+      .always(function(data) {
+        $(button).button('reset');
+      });
   });
 
   var currentStep = "step1";

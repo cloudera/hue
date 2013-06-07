@@ -889,7 +889,7 @@ def install_examples(request):
     try:
       app_name = get_app_name(request)
       beeswax.management.commands.beeswax_install_examples.Command().handle_noargs(app_name=app_name)
-      response['status'] = 0
+      response['status'] = 0 # Always return 0 currently
     except Exception, err:
       LOG.exception(err)
       response['message'] = str(err)
