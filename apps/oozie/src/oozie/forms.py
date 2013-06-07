@@ -44,12 +44,14 @@ class ParameterForm(forms.Form):
       'oozie.wf.rerun.skip.nodes',
       'oozie.wf.application.path',
       'oozie.coord.application.path',
+      'oozie.bundle.application.path',
       'mapreduce.job.user.name',
       'wf_application_path',
       'jobTracker',
       'nameNode',
       'hue-id-w',
       'hue-id-c',
+      'hue-id-b',
   )
 
   @staticmethod

@@ -32,7 +32,7 @@
   ${ properties.print_key_value(bundled_coordinator_form['parameters'], 'create_bundled_coordinator_parameters') }
 
   <div class="form-actions" style="padding-left:10px">
-    <a id="createBundledCoordinatorFormBtn" class="btn btn-primary">${ _('Save') }</a>
+    <a id="createBundledCoordinatorFormBtn" class="btn btn-primary">${ _('Add') }</a>
   </div>
 </div>
 

@@ -8,8 +8,9 @@
       "parameters": "[]",
       "deployment_dir": "/user/hue/oozie/workspaces/managed/sleep",
       "schema_version": "uri:oozie:workflow:0.4",
-      "last_modified": "2013-01-01 00:00:00",
+      "last_modified": "2013-06-01 00:00:00",
       "owner": 1100713,
+      "is_trashed": false,
       "description": "Example of MapReduce action that sleeps"
     }
   },
@@ -22,8 +23,9 @@
       "parameters": "[]",
       "deployment_dir": "/user/hue/oozie/workspaces/managed/sleep",
       "schema_version": "uri:oozie:coordinator:0.2",
-      "last_modified": "2013-01-01 00:00:00",
+      "last_modified": "2013-06-01 00:00:00",
       "owner": 1100713,
+      "is_trashed": false,
       "description": "Run a daily sleep job"
     }
   },
@@ -36,8 +38,9 @@
       "parameters": "[]",
       "deployment_dir": "/user/hue/oozie/workspaces/managed/terasort",
       "schema_version": "uri:oozie:workflow:0.4",
-      "last_modified": "2013-01-01 00:00:00",
+      "last_modified": "2013-06-01 00:00:00",
       "owner": 1100713,
+      "is_trashed": false,
       "description": "Example of sequential Java actions"
     }
   },
@@ -50,8 +53,9 @@
       "parameters": "[]",
       "deployment_dir": "/user/hue/oozie/workspaces/managed/sleepfork",
       "schema_version": "uri:oozie:workflow:0.4",
-      "last_modified": "2013-01-01 00:00:00",
+      "last_modified": "2013-06-01 00:00:00",
       "owner": 1100713,
+      "is_trashed": false,
       "description": "Example of multiple forks"
     }
   },
@@ -64,8 +68,9 @@
       "parameters": "[{\"name\":\"oozie.use.system.libpath\",\"value\":\"true\"}]",
       "deployment_dir": "/user/hue/oozie/workspaces/managed/hive",
       "schema_version": "uri:oozie:workflow:0.4",
-      "last_modified": "2013-01-01 00:00:00",
+      "last_modified": "2013-06-01 00:00:00",
       "owner": 1100713,
+      "is_trashed": false,
       "description": "Example of Hive action"
     }
   },
@@ -78,8 +83,9 @@
       "parameters": "[{\"name\":\"oozie.use.system.libpath\",\"value\":\"true\"}]",
       "deployment_dir": "/user/hue/oozie/workspaces/managed/pig",
       "schema_version": "uri:oozie:workflow:0.4",
-      "last_modified": "2013-01-01 00:00:00",
+      "last_modified": "2013-06-01 00:00:00",
       "owner": 1100713,
+      "is_trashed": false,
       "description": "Example of Pig action"
     }
   },
@@ -92,8 +98,9 @@
       "parameters": "[{\"name\":\"oozie.use.system.libpath\",\"value\":\"true\"}]",
       "deployment_dir": "/user/hue/oozie/workspaces/managed/sqoop",
       "schema_version": "uri:oozie:workflow:0.4",
-      "last_modified": "2013-01-01 00:00:00",
+      "last_modified": "2013-06-01 00:00:00",
       "owner": 1100713,
+      "is_trashed": false,
       "description": "Example of Sqoop action"
     }
   },
@@ -106,8 +113,9 @@
       "parameters": "[]",
       "deployment_dir": "/user/hue/oozie/workspaces/managed/ssh",
       "schema_version": "uri:oozie:workflow:0.4",
-      "last_modified": "2013-01-01 00:00:00",
+      "last_modified": "2013-06-01 00:00:00",
       "owner": 1100713,
+      "is_trashed": false,
       "description": "Example of Ssh action"
     }
   },
@@ -120,8 +128,9 @@
       "parameters": "[]",
       "deployment_dir": "/user/hue/oozie/workspaces/managed/shell",
       "schema_version": "uri:oozie:workflow:0.4",
-      "last_modified": "2013-01-01 00:00:00",
+      "last_modified": "2013-06-01 00:00:00",
       "owner": 1100713,
+      "is_trashed": false,
       "description": "Example of Shell action"
     }
   },
@@ -134,8 +143,9 @@
       "parameters": "[{\"name\":\"oozie.use.system.libpath\",\"value\":\"true\"}]",
       "deployment_dir": "/user/hue/oozie/workspaces/managed/distcp",
       "schema_version": "uri:oozie:workflow:0.4",
-      "last_modified": "2013-01-01 00:00:00",
+      "last_modified": "2013-06-01 00:00:00",
       "owner": 1100713,
+      "is_trashed": false,
       "description": "Example of DistCp action"
     }
   },
@@ -148,8 +158,9 @@
       "parameters": "[{\"name\": \"oozie.use.system.libpath\", \"value\": \"true\"}]",
       "deployment_dir": "/user/hue/oozie/workspaces/managed/email",
       "schema_version": "uri:oozie:workflow:0.4",
-      "last_modified": "2013-01-01 00:00:00",
+      "last_modified": "2013-06-01 00:00:00",
       "owner": 1100713,
+      "is_trashed": false,
       "description": "Example of Email action"
     }
   },
@@ -162,8 +173,9 @@
       "parameters": "[{\"name\": \"oozie.use.system.libpath\", \"value\": \"true\"}]",
       "deployment_dir": "/user/hue/oozie/workspaces/managed/fs",
       "schema_version": "uri:oozie:workflow:0.4",
-      "last_modified": "2013-01-01 00:00:00",
+      "last_modified": "2013-06-01 00:00:00",
       "owner": 1100713,
+      "is_trashed": false,
       "description": "Example of sequential Fs actions"
     }
   },
@@ -176,8 +188,9 @@
       "parameters": "[{\"name\": \"oozie.use.system.libpath\", \"value\": \"true\"}]",
       "deployment_dir": "/user/hue/oozie/workspaces/managed/generic",
       "schema_version": "uri:oozie:workflow:0.4",
-      "last_modified": "2013-01-01 00:00:00",
+      "last_modified": "2013-06-01 00:00:00",
       "owner": 1100713,
+      "is_trashed": false,
       "description": "Execute a generic action with a custom extension"
     }
   },
@@ -190,8 +203,9 @@
       "parameters": "[]",
       "deployment_dir": "/user/hue/oozie/workspaces/coordinators/range",
       "schema_version": "uri:oozie:coordinator:0.2",
-      "last_modified": "2013-01-01 00:00:00",
+      "last_modified": "2013-06-01 00:00:00",
       "owner": 1100713,
+      "is_trashed": false,
       "description": "Run daily a workflow with a date range of input data"
     }
   },
@@ -206,6 +220,7 @@
       "schema_version": "uri:oozie:workflow:0.4",
       "last_modified": "2013-03-11 15:12:02",
       "owner": 1100713,
+      "is_trashed": false,
       "description": "Example of DistCp action"
     }
   },
@@ -220,6 +235,7 @@
       "schema_version": "uri:oozie:workflow:0.4",
       "last_modified": "2013-03-11 15:12:11",
       "owner": 1100713,
+      "is_trashed": false,
       "description": "Example of Email action"
     }
   },
@@ -234,6 +250,7 @@
       "schema_version": "uri:oozie:workflow:0.4",
       "last_modified": "2013-03-11 15:12:21",
       "owner": 1100713,
+      "is_trashed": false,
       "description": "Example of sequential Fs actions"
     }
   },
@@ -248,6 +265,7 @@
       "schema_version": "uri:oozie:workflow:0.4",
       "last_modified": "2013-03-11 15:12:31",
       "owner": 1100713,
+      "is_trashed": false,
       "description": "Example of Hive action"
     }
   },
@@ -262,6 +280,7 @@
       "schema_version": "uri:oozie:workflow:0.4",
       "last_modified": "2013-03-11 15:12:43",
       "owner": 1100713,
+      "is_trashed": false,
       "description": "Example of MapReduce action that sleeps"
     }
   },
@@ -276,6 +295,7 @@
       "schema_version": "uri:oozie:workflow:0.4",
       "last_modified": "2013-03-11 15:12:52",
       "owner": 1100713,
+      "is_trashed": false,
       "description": "Example of Pig action"
     }
   },
@@ -290,6 +310,7 @@
       "schema_version": "uri:oozie:workflow:0.4",
       "last_modified": "2013-03-11 15:13:00",
       "owner": 1100713,
+      "is_trashed": false,
       "description": "Example of Shell action"
     }
   },
@@ -304,6 +325,7 @@
       "schema_version": "uri:oozie:workflow:0.4",
       "last_modified": "2013-03-11 15:13:08",
       "owner": 1100713,
+      "is_trashed": false,
       "description": "Example of Sqoop action"
     }
   },
@@ -318,7 +340,23 @@
       "schema_version": "uri:oozie:workflow:0.4",
       "last_modified": "2013-03-11 15:13:18",
       "owner": 1100713,
+      "is_trashed": false,
       "description": "Example of Ssh action"
+    }
+  },
+  {
+    "pk": 31,
+    "model": "oozie.job",
+    "fields": {
+      "is_shared": true,
+      "name": "Aggregate",
+      "parameters": "[{\"name\":\"oozie.use.system.libpath\",\"value\":\"true\"}]",
+      "deployment_dir": "/user/hue/oozie/workspaces/bundles/aggregate",
+      "schema_version": "uri:oozie:bundle:0.2",
+      "last_modified": "2013-06-06 18:15:37",
+      "owner": 1100713,
+      "is_trashed": false,
+      "description": "Aggregate together and batch 2 coordinators"
     }
   },
   {
@@ -3266,13 +3304,13 @@
     "pk": 6,
     "model": "oozie.coordinator",
     "fields": {
-      "end": "2013-01-05 00:00:00",
+      "end": "2013-06-05 00:00:00",
       "concurrency": null,
       "frequency_number": 1,
       "workflow": 5,
       "frequency_unit": "days",
       "job_properties": "[]",
-      "start": "2013-01-01 00:00:00",
+      "start": "2013-06-01 00:00:00",
       "timeout": null,
       "timezone": "America/Los_Angeles",
       "throttle": null,
@@ -3283,13 +3321,13 @@
     "pk": 21,
     "model": "oozie.coordinator",
     "fields": {
-      "end": "2013-01-05 00:00:00",
+      "end": "2013-06-05 00:00:00",
       "concurrency": null,
       "frequency_number": 1,
       "workflow": 11,
       "frequency_unit": "days",
       "job_properties": "[]",
-      "start": "2013-01-03 00:00:00",
+      "start": "2013-06-03 00:00:00",
       "timeout": null,
       "timezone": "America/Los_Angeles",
       "throttle": null,
@@ -3306,7 +3344,7 @@
       "advanced_start_instance": "0",
       "frequency_unit": "days",
       "uri": "${DAY}",
-      "start": "2012-12-31 00:00:00",
+      "start": "2012-05-31 00:00:00",
       "instance_choice": "default",
       "timezone": "America/Los_Angeles",
       "advanced_end_instance": "0",
@@ -3324,7 +3362,7 @@
       "advanced_start_instance": "-1",
       "frequency_unit": "days",
       "uri": "/user/hue/oozie/workspaces/data/${YEAR}${MONTH}${DAY}",
-      "start": "2012-12-31 00:00:00",
+      "start": "2012-05-31 00:00:00",
       "instance_choice": "range",
       "timezone": "America/Los_Angeles",
       "advanced_end_instance": "${coord:current(0)}",
@@ -3342,7 +3380,7 @@
       "advanced_start_instance": "0",
       "frequency_unit": "days",
       "uri": "/tmp/test-coord-${coord:user()}/${YEAR}${MONTH}${DAY}",
-      "start": "2012-12-31 00:00:00",
+      "start": "2012-05-31 00:00:00",
       "instance_choice": "default",
       "timezone": "America/Los_Angeles",
       "advanced_end_instance": "0",
@@ -3375,6 +3413,31 @@
       "coordinator": 21,
       "name": "output",
       "dataset": 5
+    }
+  },
+  {
+    "pk": 1,
+    "model": "oozie.bundledcoordinator",
+    "fields": {
+      "coordinator": 6,
+      "parameters": "[]",
+      "bundle": 31
+    }
+  },
+  {
+    "pk": 2,
+    "model": "oozie.bundledcoordinator",
+    "fields": {
+      "coordinator": 21,
+      "parameters": "[]",
+      "bundle": 31
+    }
+  },
+  {
+    "pk": 31,
+    "model": "oozie.bundle",
+    "fields": {
+      "kick_off_time": "2013-06-01 00:00:00"
     }
   }
 ]
