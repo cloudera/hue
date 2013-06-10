@@ -67,7 +67,7 @@ ${ commonheader(_('Quick Start'), "quickstart", user, "100px") | n,unicode }
           <h5>${ _('Check your current configuration') }</h5>
         </div>
         <div class="widget-content">
-          ${ check_config.content | n,unicode }
+          ${ check_config | n,unicode }
         </div>
       </div>
     </div>

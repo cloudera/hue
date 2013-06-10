@@ -142,18 +142,16 @@ ${layout.menubar(section='dump_config')}
                   <td>
              % endif
               % if isinstance(config_obj, BoundContainer):
-                  <p class="dump_config_help"><i>${config_obj.config.help or _('No help available.')}</i></p>            
+                  <p class="dump_config_help"><i>${config_obj.config.help or _('No help available.')}</i></p>
                   ${recurseList(config_obj.get().values(), depth + 1)}
               % else:
-                <p>${str(config_obj.get_raw())}</p>
+                <p>${ str(config_obj.get_raw()).decode('utf-8', 'replace') }</p>
                 <p class="dump_config_help"><i>${config_obj.config.help or _('No help available.')}</i></p>
-                <p class="dump_config_default">${_('Default:')} <i>${config_obj.config.default}</i></p>
+                <p class="dump_config_default">${_('Default:')} <i>${str(config_obj.config.default).decode('utf-8', 'replace')}</i></p>
               % endif
               </td>
             </tr>
         </%def>
-
-
 
     </div>
 

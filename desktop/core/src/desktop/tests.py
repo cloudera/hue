@@ -132,6 +132,14 @@ def test_dump_config():
 
   clear()
 
+  CANARY = '/tmp/spacé.dat'
+  finish = proxy.conf.WHITELIST.set_for_testing(CANARY)
+  try:
+    response = c.get('/dump_config')
+    assert_true(CANARY in response.content, response.content)
+  finally:
+    finish()
+
   # Login as someone else
   client_not_me = make_logged_in_client(username='not_me', is_superuser=False, groupname='test')
   grant_access("not_me", "test", "desktop")
@@ -383,7 +391,7 @@ def test_log_event():
   c.post("/log_frontend_event", {
     "message": "01234567" * 1024})
   assert_equal("INFO", handler.records[-1].levelname)
-  assert_equal("Untrusted log event from user test: " + "01234567"*(1024/8), 
+  assert_equal("Untrusted log event from user test: " + "01234567"*(1024/8),
     handler.records[-1].message)
 
   root.removeHandler(handler)
