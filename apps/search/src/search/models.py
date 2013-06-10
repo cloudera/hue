@@ -166,13 +166,17 @@ class Sorting(models.Model):
     self.data = json.dumps(data_dict)
 
 
-  def get_query_params(self):
+  def get_query_params(self, client_query=None):
+    params = ()
     data_dict = json.loads(self.data)
 
-    params = ()
-
+    fields = []
     if data_dict.get('properties', {}).get('is_enabled') and 'true' or 'false':
-      if data_dict.get('fields'):
+      if client_query is not None and client_query.get('sort'):
+        params += (
+          ('sort', client_query.get('sort')),
+        )
+      elif data_dict.get('fields'):
         fields = ['%s %s' % (field['field'], field['asc'] and 'asc' or 'desc') for field in data_dict.get('fields')]
         params += (
           ('sort', ','.join(fields)),
@@ -254,8 +258,8 @@ class Collection(models.Model):
 
   objects = CollectionManager()
 
-  def get_query(self):
-    return self.facets.get_query_params() + self.result.get_query_params() + self.sorting.get_query_params()
+  def get_query(self, client_query=None):
+    return self.facets.get_query_params() + self.result.get_query_params() + self.sorting.get_query_params(client_query)
 
   def get_absolute_url(self):
     return reverse('search:admin_collection', kwargs={'collection_id': self.id})

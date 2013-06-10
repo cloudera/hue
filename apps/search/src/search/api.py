@@ -50,7 +50,7 @@ class SolrApi(object):
           ('start', solr_query['start']),
       )
 
-      params += hue_core.get_query()
+      params += hue_core.get_query(solr_query)
 
       fqs = solr_query['fq'].split('|')
       for fq in fqs:
