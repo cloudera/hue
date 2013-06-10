@@ -31,7 +31,8 @@ from desktop.models import Settings
 from oozie.tests import OozieBase
 
 
-class TestAboutBase(OozieBase):
+
+class TestAboutBase(object):
   def setUp(self):
     self.client = make_logged_in_client(username="about", is_superuser=False)
     grant_access("about", "about", "about")
@@ -40,10 +41,9 @@ class TestAboutBase(OozieBase):
     grant_access("about_admin", "about_admin", "about")
 
 
-class TestAbout(TestAboutBase):
+class TestAbout(TestAboutBase, OozieBase):
 
   def test_admin_wizard_permissions(self):
-
     response = self.client_admin.get(reverse('about:index'))
     assert_true('Check Configuration' in response.content, response.content)
 
@@ -51,23 +51,22 @@ class TestAbout(TestAboutBase):
     assert_false('Check Configuration' in response.content, response.content)
 
 
-def test_collect_usage():
-  client = make_logged_in_client(username="about", is_superuser=False)
-  grant_access("about", "about", "about")
+class TestAboutWithNoCluster(TestAboutBase):
 
-  collect_usage = Settings.get_settings().collect_usage
+  def test_collect_usage(self):
+    collect_usage = Settings.get_settings().collect_usage
 
-  try:
-    response = client.post(reverse('about:collect_usage'), {'collect_usage': False})
-    data = json.loads(response.content)
-    assert_equal(data['status'], 0)
-    assert_false(data['collect_usage'] == True) # Weird but works
+    try:
+      response = self.client.post(reverse('about:collect_usage'), {'collect_usage': False})
+      data = json.loads(response.content)
+      assert_equal(data['status'], 0)
+      assert_false(data['collect_usage'] == True) # Weird but works
 
-    response = client.post(reverse('about:collect_usage'), {'collect_usage': True})
-    data = json.loads(response.content)
-    assert_equal(data['status'], 0)
-    assert_true(data['collect_usage'])
-  finally:
-    settings = Settings.get_settings()
-    settings.collect_usage = collect_usage
-    settings.save()
+      response = self.client.post(reverse('about:collect_usage'), {'collect_usage': True})
+      data = json.loads(response.content)
+      assert_equal(data['status'], 0)
+      assert_true(data['collect_usage'])
+    finally:
+      settings = Settings.get_settings()
+      settings.collect_usage = collect_usage
+      settings.save()

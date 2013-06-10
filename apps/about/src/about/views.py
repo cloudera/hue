@@ -38,7 +38,7 @@ def admin_wizard(request):
 
   return render('admin_wizard.mako', request, {
       'version': settings.HUE_DESKTOP_VERSION,
-      'check_config': check_config(request),
+      'check_config': check_config(request).content,
       'apps': dict([(app.name, app) for app in apps]),
       'app_names': app_names,
       'collect_usage': collect_usage,
