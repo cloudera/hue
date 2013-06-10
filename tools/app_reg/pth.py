@@ -70,7 +70,7 @@ class PthFile(object):
     PTH files need paths relative to the pth file, not APPS_ROOT
     """
     abs_module_path = os.path.join(app.abs_path, 'src')
-    rel_module_path = os.path.relpath(abs_module_path, self._path)
+    rel_module_path = os.path.relpath(abs_module_path, os.path.dirname(self._path))
     LOG.debug('Add to %s: %s' % (self._path, rel_module_path))
     self._entries.add(rel_module_path)
 
@@ -79,12 +79,12 @@ class PthFile(object):
     for py in ext_pys:
       ext_egg = glob.glob(os.path.join(py, 'dist', '*.egg'))
       LOG.debug('Add to %s: %s' % (self._path, ext_egg))
-      self._entries.update(os.path.relpath(ext_egg, self._path))
+      self._entries.update(os.path.relpath(ext_egg, os.path.dirname(self._path)))
 
     # And eggs could also be in ext-eggs/*.egg
     for egg_file in glob.glob(os.path.join(app.path, 'ext-eggs', '*.egg')):
       LOG.debug('Add to %s: %s' % (self._path, egg_file))
-      self._entries.add(os.path.relpath(egg_file, self._path))
+      self._entries.add(os.path.relpath(egg_file, os.path.dirname(self._path)))
 
   def remove(self, app):
     """
