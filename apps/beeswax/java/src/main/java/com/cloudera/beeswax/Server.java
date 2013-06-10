@@ -349,10 +349,30 @@ public class Server {
     Iface handler = new HMSHandler("new db based metaserver");
     FacebookService.Processor processor = new ThriftHiveMetastore.Processor(handler);
 
+    TTransportFactory transFactory;
+
+    if (useKerberos) {
+      final String names[] = SaslRpcServer.splitKerberosName(kerberosName);
+      if (names.length < 2) {
+        throw new IllegalArgumentException(
+            "Kerberos principal should have at least 2 parts: " + kerberosName);
+      }
+
+      TSaslServerTransport.Factory saslFactory =
+          new TSaslServerTransport.Factory(AuthMethod.KERBEROS.getMechanismName(),
+              names[0], names[1] , // two parts of kerberos principal
+              SaslRpcServer.SASL_PROPS,
+              new SaslRpcServer.SaslGssCallbackHandler());
+      transFactory = new KbrSaslTransportFactory(saslFactory, bwUgi);
+    } else {
+      transFactory = new TTransportFactory();
+    }
+
+
     TThreadPoolServer.Args args = new TThreadPoolServer.Args(serverTransport)
         .processor(processor)
         .protocolFactory(new TBinaryProtocol.Factory())
-        .transportFactory(new TTransportFactory());
+        .transportFactory(transFactory);
     TServer server = new TThreadPoolServer(args);
 
     LOG.info("Started new Beeswax Thrift metaserver on port [" + port + "]...");
