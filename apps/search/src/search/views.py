@@ -79,7 +79,6 @@ def index(request):
 
   if hue_collection is not None:
     response = augment_solr_response(response, hue_collection.facets.get_data())
-    print response
 
   if request.GET.get('format') == 'json':
     return HttpResponse(json.dumps(response), mimetype="application/json")

@@ -129,11 +129,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
       return new SortingField(obj.field, obj.label, obj.asc);
     }));
 
-    // Remove already selected fields
     self.sortingFieldsList = ko.observableArray(${ hue_collection.fields | n,unicode });
-    $.each(self.sortingFields(), function(index, field) {
-      self.sortingFieldsList.remove(field.field);
-    });
 
     self.newFieldSelect = ko.observable();
     self.newFieldLabel = ko.observable("");
@@ -141,7 +137,6 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 
     self.removeSortingField = function (field) {
       self.sortingFields.remove(field);
-      self.sortingFieldsList.push(field.field);
       self.sortingFieldsList.sort();
       if (self.sortingFields().length == 0) {
         self.isEnabled(false);
@@ -155,7 +150,6 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
       self.sortingFields.push(new SortingField(self.newFieldSelect(), self.newFieldLabel(), self.newFieldAscDesc()=="asc"));
       self.newFieldLabel("");
       self.newFieldAscDesc("asc");
-      self.sortingFieldsList.remove(self.newFieldSelect());
       self.isEnabled(true);
     };
 
