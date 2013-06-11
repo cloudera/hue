@@ -1424,10 +1424,12 @@ def test_hive_site_local_metastore():
     # No sasl
     reset = []
     reset.append(KERBEROS.HUE_PRINCIPAL.set_for_testing('hue/test.com@TEST.COM'))
+    reset.append(conf.BEESWAX_META_SERVER_HOST.set_for_testing('local-test.com'))
+    reset.append(conf.BEESWAX_META_SERVER_PORT.set_for_testing(5002))
     is_local, host, port, kerberos_principal = beeswax.hive_site.get_metastore()
     assert_true(is_local)
-    assert_equal(host, 'localhost')
-    assert_equal(port, 8003)
+    assert_equal(host, 'local-test.com')
+    assert_equal(port, 5002)
     assert_equal(beeswax.hive_site.get_conf()['hive.metastore.warehouse.dir'], u'/abc')
     assert_equal(kerberos_principal, 'hue/test.com@TEST.COM')
 
@@ -1441,7 +1443,7 @@ def test_hive_site_local_metastore():
     is_local, host, port, kerberos_principal = beeswax.hive_site.get_metastore()
     assert_true(is_local)
     assert_equal(host, 'test.com')
-    assert_equal(port, 8003)
+    assert_equal(port, 5002)
     assert_equal(beeswax.hive_site.get_conf()['hive.metastore.warehouse.dir'], u'/abc')
     assert_equal(kerberos_principal, 'hue/test.com@TEST.COM')
   finally:
