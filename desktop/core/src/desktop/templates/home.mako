@@ -22,11 +22,13 @@ ${ commonheader(_('Home'), "home", user) | n,unicode }
 
 
 <%def name="app_link(app, label=None, extra_path = '')">
+  % if app in apps:
   <li>
     <a href="/${ app }${ extra_path }"  title="${ apps[app].nice_name }" class="app-tooltips">
       <i class="icon-double-angle-right"></i> ${ label }
     </a>
   </li>
+  % endif
 </%def>
 
 <div style="position: absolute;top:80px;right:30px"><img src="/static/art/hue-logo-subtle.png"/></div>
