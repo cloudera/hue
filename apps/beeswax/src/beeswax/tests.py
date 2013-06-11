@@ -37,6 +37,7 @@ from django.utils.encoding import smart_str
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
+from desktop.conf import KERBEROS
 from desktop.lib.django_test_util import make_logged_in_client, assert_equal_mod_whitespace
 from desktop.lib.django_test_util import assert_similar_pages
 from desktop.lib.test_utils import grant_access
@@ -1303,49 +1304,20 @@ Starting Job = job_201003191517_0003, Tracking URL = http://localhost:50030/jobd
     beeswax.views._parse_out_hadoop_jobs(sample_log))
   assert_equal([], beeswax.views._parse_out_hadoop_jobs("nothing to see here"))
 
-
 def test_hive_site():
   """Test hive-site parsing"""
-  HIVE_SITE = """
-    <configuration>
-      <property>
-        <name>hive.metastore.local</name>
-        <value>false</value>
-      </property>
-
-      <property>
-        <name>hive.metastore.uris</name>
-        <value>thrift://darkside-1234:9999</value>
-      </property>
-
-      <property>
-        <name>hive.metastore.warehouse.dir</name>
-        <value>/abc</value>
-      </property>
-
-      <property>
-        <name>hive.metastore.kerberos.principal</name>
-        <value>test/test.com@TEST.COM</value>
-      </property>
-
-      <property>
-        <name>hive.server2.authentication.kerberos.principal</name>
-        <value>hs2test/test.com@TEST.COM</value>
-      </property>
-    </configuration>
-  """
-
-  beeswax.hive_site.reset()
   tmpdir = tempfile.mkdtemp()
   saved = None
   try:
-    file(os.path.join(tmpdir, 'hive-site.xml'), 'w').write(HIVE_SITE)
-
     # We just replace the Beeswax conf variable
     class Getter(object):
       def get(self):
         return tmpdir
 
+    xml = hive_site_xml(is_local=False, use_sasl=False)
+    file(os.path.join(tmpdir, 'hive-site.xml'), 'w').write(xml)
+
+    beeswax.hive_site.reset()
     saved = beeswax.conf.BEESWAX_HIVE_CONF_DIR
     beeswax.conf.BEESWAX_HIVE_CONF_DIR = Getter()
 
@@ -1364,41 +1336,19 @@ def test_hive_site():
 
 def test_hive_site_host_pattern():
   """Test hive-site parsing"""
-  HIVE_SITE = """
-    <configuration>
-      <property>
-        <name>hive.metastore.local</name>
-        <value>false</value>
-      </property>
-
-      <property>
-        <name>hive.metastore.uris</name>
-        <value>thrift://%s:9999</value>
-      </property>
-
-      <property>
-        <name>hive.metastore.warehouse.dir</name>
-        <value>/abc</value>
-      </property>
-
-      <property>
-        <name>hive.metastore.kerberos.principal</name>
-        <value>test/_HOST@TEST.COM</value>
-      </property>
-    </configuration>
-  """ % socket.getfqdn()
-
-  beeswax.hive_site.reset()
   tmpdir = tempfile.mkdtemp()
   saved = None
   try:
-    file(os.path.join(tmpdir, 'hive-site.xml'), 'w').write(HIVE_SITE)
-
     # We just replace the Beeswax conf variable
     class Getter(object):
       def get(self):
         return tmpdir
 
+    thrift_uris = 'thrift://%s:9999' % socket.getfqdn()
+    xml = hive_site_xml(is_local=False, use_sasl=False, thrift_uris=thrift_uris, kerberos_principal='test/_HOST@TEST.COM')
+    file(os.path.join(tmpdir, 'hive-site.xml'), 'w').write(xml)
+
+    beeswax.hive_site.reset()
     saved = beeswax.conf.BEESWAX_HIVE_CONF_DIR
     beeswax.conf.BEESWAX_HIVE_CONF_DIR = Getter()
 
@@ -1414,54 +1364,36 @@ def test_hive_site_host_pattern():
       beeswax.conf.BEESWAX_HIVE_CONF_DIR = saved
     shutil.rmtree(tmpdir)
 
-def test_hive_site_sasl():
-  """Test hive-site parsing with sasl enabled"""
-  HIVE_SITE = """
-    <configuration>
-      <property>
-        <name>hive.metastore.local</name>
-        <value>false</value>
-      </property>
-
-      <property>
-        <name>hive.metastore.uris</name>
-        <value>thrift://darkside-1234:9999</value>
-      </property>
-
-      <property>
-        <name>hive.metastore.warehouse.dir</name>
-        <value>/abc</value>
-      </property>
-
-      <property>
-        <name>hive.metastore.kerberos.principal</name>
-        <value>test/test.com@TEST.COM</value>
-      </property>
-
-      <property>
-        <name>hive.metastore.sasl.enabled</name>
-        <value>true</value>
-      </property>
-    </configuration>
-  """
-
-  beeswax.hive_site.reset()
+def test_hive_site_external_metastore():
+  """Test hive-site parsing with sasl enabled and external metastore"""
   tmpdir = tempfile.mkdtemp()
   saved = None
   try:
-    file(os.path.join(tmpdir, 'hive-site.xml'), 'w').write(HIVE_SITE)
-
     # We just replace the Beeswax conf variable
     class Getter(object):
       def get(self):
         return tmpdir
 
+    xml = hive_site_xml(is_local=False, use_sasl=False)
+    file(os.path.join(tmpdir, 'hive-site.xml'), 'w').write(xml)
+
+    beeswax.hive_site.reset()
     saved = beeswax.conf.BEESWAX_HIVE_CONF_DIR
     beeswax.conf.BEESWAX_HIVE_CONF_DIR = Getter()
 
+    # No sasl
     is_local, host, port, kerberos_principal = beeswax.hive_site.get_metastore()
     assert_false(is_local)
-    # Should look at kerberos instance for host.
+    assert_equal(host, 'darkside-1234')
+    assert_equal(port, 9999)
+    assert_equal(beeswax.hive_site.get_conf()['hive.metastore.warehouse.dir'], u'/abc')
+    assert_equal(kerberos_principal, 'test/test.com@TEST.COM')
+
+    # Sasl
+    file(os.path.join(tmpdir, 'hive-site.xml'), 'w').write(hive_site_xml(is_local=False, use_sasl=True))
+    beeswax.hive_site.reset()
+    is_local, host, port, kerberos_principal = beeswax.hive_site.get_metastore()
+    assert_false(is_local)
     assert_equal(host, 'test.com')
     assert_equal(port, 9999)
     assert_equal(beeswax.hive_site.get_conf()['hive.metastore.warehouse.dir'], u'/abc')
@@ -1472,44 +1404,69 @@ def test_hive_site_sasl():
       beeswax.conf.BEESWAX_HIVE_CONF_DIR = saved
     shutil.rmtree(tmpdir)
 
-
-def test_hive_site_multi_metastore_uris():
-  """Test hive-site parsing"""
-  HIVE_SITE = """
-    <configuration>
-      <property>
-        <name>hive.metastore.local</name>
-        <value>false</value>
-      </property>
-
-      <property>
-        <name>hive.metastore.uris</name>
-        <value>thrift://darkside-12345:9998,thrift://darkside-1234:9999</value>
-      </property>
-
-      <property>
-        <name>hive.metastore.warehouse.dir</name>
-        <value>/abc</value>
-      </property>
-
-      <property>
-        <name>hive.metastore.kerberos.principal</name>
-        <value>test/test.com@TEST.COM</value>
-      </property>
-    </configuration>
-  """
-
-  beeswax.hive_site.reset()
+def test_hive_site_local_metastore():
+  """Test hive-site parsing with sasl enabled and local metastore"""
   tmpdir = tempfile.mkdtemp()
   saved = None
   try:
-    file(os.path.join(tmpdir, 'hive-site.xml'), 'w').write(HIVE_SITE)
-
     # We just replace the Beeswax conf variable
     class Getter(object):
       def get(self):
         return tmpdir
 
+    xml = hive_site_xml(is_local=True, use_sasl=True, thrift_uris='')
+    file(os.path.join(tmpdir, 'hive-site.xml'), 'w').write(xml)
+
+    beeswax.hive_site.reset()
+    saved = beeswax.conf.BEESWAX_HIVE_CONF_DIR
+    beeswax.conf.BEESWAX_HIVE_CONF_DIR = Getter()
+
+    # No sasl
+    reset = []
+    reset.append(KERBEROS.HUE_PRINCIPAL.set_for_testing('hue/test.com@TEST.COM'))
+    is_local, host, port, kerberos_principal = beeswax.hive_site.get_metastore()
+    assert_true(is_local)
+    assert_equal(host, 'localhost')
+    assert_equal(port, 8003)
+    assert_equal(beeswax.hive_site.get_conf()['hive.metastore.warehouse.dir'], u'/abc')
+    assert_equal(kerberos_principal, 'hue/test.com@TEST.COM')
+
+    # Sasl
+    reset.extend([
+      hadoop.conf.HDFS_CLUSTERS['default'].SECURITY_ENABLED.set_for_testing(True),
+      hadoop.conf.MR_CLUSTERS['default'].SECURITY_ENABLED.set_for_testing(True),
+      hadoop.conf.YARN_CLUSTERS['default'].SECURITY_ENABLED.set_for_testing(True)
+    ])
+    beeswax.hive_site.reset()
+    is_local, host, port, kerberos_principal = beeswax.hive_site.get_metastore()
+    assert_true(is_local)
+    assert_equal(host, 'test.com')
+    assert_equal(port, 8003)
+    assert_equal(beeswax.hive_site.get_conf()['hive.metastore.warehouse.dir'], u'/abc')
+    assert_equal(kerberos_principal, 'hue/test.com@TEST.COM')
+  finally:
+    for finish in reset:
+      finish()
+    beeswax.hive_site.reset()
+    if saved is not None:
+      beeswax.conf.BEESWAX_HIVE_CONF_DIR = saved
+    shutil.rmtree(tmpdir)
+
+
+def test_hive_site_multi_metastore_uris():
+  """Test hive-site parsing"""
+  tmpdir = tempfile.mkdtemp()
+  saved = None
+  try:
+    # We just replace the Beeswax conf variable
+    class Getter(object):
+      def get(self):
+        return tmpdir
+
+    xml = hive_site_xml(is_local=False, use_sasl=False, thrift_uris='thrift://darkside-12345:9998,thrift://darkside-1234:9999')
+    file(os.path.join(tmpdir, 'hive-site.xml'), 'w').write(xml)
+
+    beeswax.hive_site.reset()
     saved = beeswax.conf.BEESWAX_HIVE_CONF_DIR
     beeswax.conf.BEESWAX_HIVE_CONF_DIR = Getter()
 
@@ -1661,3 +1618,47 @@ class TestWithMockedServer(object):
 def search_log_line(component, expected_log, all_logs):
   """Checks if 'expected_log' can be found in one line of 'all_logs' outputed by the logging component 'component'."""
   return re.compile('.+?%(component)s(.+?)%(expected_log)s' % {'component': component, 'expected_log': expected_log}).search(all_logs)
+
+def hive_site_xml(is_local=False, use_sasl=False, thrift_uris='thrift://darkside-1234:9999',
+                  warehouse_dir='/abc', kerberos_principal='test/test.com@TEST.COM',
+                  hs2_kerberos_principal='hs2test/test.com@TEST.COM'):
+  return """
+    <configuration>
+      <property>
+        <name>hive.metastore.local</name>
+        <value>%(is_local)s</value>
+      </property>
+
+      <property>
+        <name>hive.metastore.uris</name>
+        <value>%(thrift_uris)s</value>
+      </property>
+
+      <property>
+        <name>hive.metastore.warehouse.dir</name>
+        <value>%(warehouse_dir)s</value>
+      </property>
+
+      <property>
+        <name>hive.metastore.kerberos.principal</name>
+        <value>%(kerberos_principal)s</value>
+      </property>
+
+      <property>
+        <name>hive.server2.authentication.kerberos.principal</name>
+        <value>%(hs2_kerberos_principal)s</value>
+      </property>
+
+      <property>
+        <name>hive.metastore.sasl.enabled</name>
+        <value>%(use_sasl)s</value>
+      </property>
+    </configuration>
+  """ % {
+    'is_local': str(is_local).lower(),
+    'thrift_uris': thrift_uris,
+    'warehouse_dir': warehouse_dir,
+    'kerberos_principal': kerberos_principal,
+    'hs2_kerberos_principal': hs2_kerberos_principal,
+    'use_sasl': str(use_sasl).lower()
+  }
