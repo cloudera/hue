@@ -43,7 +43,7 @@ ${ layout.menubar(section='coordinators') }
     <%def name="actions()">
       <div class="btn-toolbar" style="display: inline; vertical-align: middle">
         <button class="btn toolbarBtn" id="submit-btn" disabled="disabled"><i class="icon-play"></i> ${ _('Submit') }</button>
-        <button class="btn toolbarBtn" id="clone-btn" disabled="disabled"><i class="icon-retweet"></i> ${ _('Copy') }</button>
+        <button class="btn toolbarBtn" id="clone-btn" disabled="disabled"><i class="icon-copy"></i> ${ _('Copy') }</button>
         <div id="delete-dropdown" class="btn-group" style="vertical-align: middle">
           <button id="trash-btn" class="btn toolbarBtn" disabled="disabled"><i class="icon-remove"></i> ${_('Move to trash')}</button>
           <button id="trash-btn-caret" class="btn toolbarBtn dropdown-toggle" data-toggle="dropdown" disabled="disabled">

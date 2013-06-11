@@ -39,7 +39,7 @@ ${layout.menubar(section='saved queries')}
     <%def name="actions()">
       <div class="btn-toolbar" style="display: inline; vertical-align: middle">
         <button id="editBtn" class="btn toolbarBtn" title="${_('Edit the selected query')}" disabled="disabled"><i class="icon-edit"></i> ${_('Edit')}</button>
-        <button id="cloneBtn" class="btn toolbarBtn" title="${_('Copy the selected query')}" disabled="disabled"><i class="icon-retweet"></i> ${_('Copy')}</button>
+        <button id="cloneBtn" class="btn toolbarBtn" title="${_('Copy the selected query')}" disabled="disabled"><i class="icon-copy"></i> ${_('Copy')}</button>
         <button id="historyBtn" class="btn toolbarBtn" title="${_('View the usage history of the selected query')}" disabled="disabled"><i class="icon-tasks"></i> ${_('Usage history')}</button>
 
         <div id="delete-dropdown" class="btn-group" style="vertical-align: middle">

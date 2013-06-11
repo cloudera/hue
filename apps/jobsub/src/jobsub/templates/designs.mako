@@ -52,7 +52,7 @@ ${ commonheader(None, "jobsub", user, "60px") | n,unicode }
       <!-- ko ifnot: inTrash -->
         <button id="submit-design" class="btn" title="${_('Submit')}" data-bind="enable: selectedDesignObjects().length == 1"><i class="icon-play"></i> ${_('Submit')}</button>
         <button id="edit-design" class="btn" title="${_('Edit')}" data-bind="enable: selectedDesignObjects().length == 1"><i class="icon-pencil"></i> ${_('Edit')}</button>
-        <button id="copy-designs" class="btn" title="${_('Copy')}" data-bind="enable: selectedDesignObjects().length > 0"><i class="icon-retweet"></i> ${_('Copy')}</button>
+        <button id="copy-designs" class="btn" title="${_('Copy')}" data-bind="enable: selectedDesignObjects().length > 0"><i class="icon-copy"></i> ${_('Copy')}</button>
         <div id="delete-dropdown" class="btn-group" style="vertical-align: middle">
           <button id="trash-designs" class="btn" data-bind="enable: selectedDesignObjects().length > 0"><i class="icon-remove"></i> ${_('Move to trash')}</button>
           <button class="btn dropdown-toggle" data-toggle="dropdown" data-bind="enable: selectedDesignObjects().length > 0">

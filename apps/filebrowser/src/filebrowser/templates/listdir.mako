@@ -39,7 +39,7 @@ ${ commonheader(None, 'filebrowser', user) | n,unicode }
           <div class="btn-toolbar" style="display: inline; vertical-align: middle">
             <button class="btn fileToolbarBtn" title="${_('Rename')}" data-bind="visible: !inTrash(), click: renameFile, enable: selectedFiles().length == 1"><i class="icon-font"></i> ${_('Rename')}</button>
             <button class="btn fileToolbarBtn" title="${_('Move')}" data-bind="click: move, enable: selectedFiles().length > 0"><i class="icon-random"></i> ${_('Move')}</button>
-            <button class="btn fileToolbarBtn" title="${_('Copy')}" data-bind="click: copy, enable: selectedFiles().length > 0"><i class="icon-retweet"></i> ${_('Copy')}</button>
+            <button class="btn fileToolbarBtn" title="${_('Copy')}" data-bind="click: copy, enable: selectedFiles().length > 0"><i class="icon-copy"></i> ${_('Copy')}</button>
             %if is_fs_superuser:
             <div id="ch-dropdown" class="btn-group" style="vertical-align: middle">
               <button href="#" class="btn dropdown-toggle" title="${_('Chown / Chmod')}" data-toggle="dropdown" data-bind="visible: !inTrash(), enable: selectedFiles().length > 0">

@@ -67,7 +67,7 @@ ${ layout.menubar(section='workflows') }
             <a href="${ url('oozie:schedule_workflow', workflow=workflow.id) }" title="${ _('Schedule this workflow') }" rel="tooltip" data-placement="right"><i class="icon-calendar"></i> ${ _('Schedule') }</a>
           </li>
           <li>
-            <a id="clone-btn" href="#" data-clone-url="${ url('oozie:clone_workflow', workflow=workflow.id) }" title="${ _('Copy this workflow') }" rel="tooltip" data-placement="right"><i class="icon-retweet"></i> ${ _('Copy') }</a>
+            <a id="clone-btn" href="#" data-clone-url="${ url('oozie:clone_workflow', workflow=workflow.id) }" title="${ _('Copy this workflow') }" rel="tooltip" data-placement="right"><i class="icon-copy"></i> ${ _('Copy') }</a>
           </li>
         % endif
       </ul>
@@ -433,7 +433,7 @@ ${ controls.decision_form(node_form, link_form, default_link_form, 'decision', T
       <div class="row-fluid node-action-bar">
         <div class="span12" style="text-align:right">
           <a class="btn btn-mini edit-node-link" title="${ _('Edit') }" rel="tooltip" data-bind="attr: { 'data-node-type': node_type() }"><i class="icon-pencil"></i></a>
-          <a class="btn btn-mini clone-node-btn" title="${ _('Copy') }" rel="tooltip"><i class="icon-retweet"></i></a>
+          <a class="btn btn-mini clone-node-btn" title="${ _('Copy') }" rel="tooltip"><i class="icon-copy"></i></a>
           <a class="btn btn-mini delete-node-btn" title="${ _('Delete') }" rel="tooltip"><i class="icon-trash"></i></a>
           &nbsp;
         </div>
