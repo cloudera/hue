@@ -26,6 +26,7 @@ import time
 import desktop.views as views
 import proxy.conf
 
+from nose.plugins.attrib import attr
 from nose.tools import assert_true, assert_equal, assert_not_equal
 from django.conf.urls.defaults import patterns, url
 from django.core.urlresolvers import reverse
@@ -405,6 +406,7 @@ def test_validate_path():
   assert_not_equal([], validate_path(desktop.conf.SSL_PRIVATE_KEY, is_dir=True))
   reset()
 
+@attr('requires_hadoop')
 def test_config_check():
   reset = (
     desktop.conf.SECRET_KEY.set_for_testing(''),
@@ -472,6 +474,7 @@ def test_ui_customizations():
       old_conf()
 
 
+@attr('requires_hadoop')
 def test_check_config_ajax():
   c = make_logged_in_client()
   response = c.get(reverse(check_config_ajax))
