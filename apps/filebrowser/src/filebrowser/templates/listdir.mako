@@ -43,7 +43,7 @@ ${ commonheader(None, 'filebrowser', user) | n,unicode }
             %if is_fs_superuser:
             <div id="ch-dropdown" class="btn-group" style="vertical-align: middle">
               <button href="#" class="btn dropdown-toggle" title="${_('Chown / Chmod')}" data-toggle="dropdown" data-bind="visible: !inTrash(), enable: selectedFiles().length > 0">
-                <i class="icon-remove"></i> ${_('Chmod / Chown')}
+                <i class="icon-user"></i> ${_('Chmod / Chown')}
                 <span class="caret"></span>
               </button>
               <ul class="dropdown-menu" style="top: auto">
@@ -57,18 +57,20 @@ ${ commonheader(None, 'filebrowser', user) | n,unicode }
             <button class="btn fileToolbarBtn" title="${_('Download')}" data-bind="visible: !inTrash(), click: downloadFile, enable: selectedFiles().length == 1 && selectedFile().type == 'file'"><i class="icon-download-alt"></i> ${_('Download')}</button>
             <button class="btn fileToolbarBtn" title="${_('Restore from trash')}" data-bind="visible: inRestorableTrash(), click: restoreTrashSelected, enable: selectedFiles().length > 0"><i class="icon-cloud-upload"></i> ${_('Restore')}</button>
             <!-- ko ifnot: inTrash -->
-              <div id="delete-dropdown" class="btn-group" style="vertical-align: middle">
-                <button id="trash-btn" class="btn toolbarBtn" data-bind="enable: selectedFiles().length > 0, click: trashSelected"><i class="icon-remove"></i> ${_('Move to trash')}</button>
-                <button id="trash-btn-caret" class="btn toolbarBtn dropdown-toggle" data-toggle="dropdown" data-bind="enable: selectedFiles().length > 0">
-                  <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu">
-                  <li><a href="#" class="delete-link" title="${_('Delete forever')}" data-bind="enable: selectedFiles().length > 0, click: deleteSelected"><i class="icon-bolt"></i> ${_('Delete forever')}</a></li>
-                </ul>
-              </div>
+              <!-- ko if: trashEnabled -->
+                <div id="delete-dropdown" class="btn-group" style="vertical-align: middle">
+                  <button id="trash-btn" class="btn toolbarBtn" data-bind="enable: selectedFiles().length > 0, click: trashSelected"><i class="icon-remove"></i> ${_('Move to trash')}</button>
+                  <button id="trash-btn-caret" class="btn toolbarBtn dropdown-toggle" data-toggle="dropdown" data-bind="enable: selectedFiles().length > 0">
+                    <span class="caret"></span>
+                  </button>
+                  <ul class="dropdown-menu">
+                    <li><a href="#" class="delete-link" title="${_('Delete forever')}" data-bind="enable: selectedFiles().length > 0, click: deleteSelected"><i class="icon-bolt"></i> ${_('Delete forever')}</a></li>
+                  </ul>
+                </div>
+              <!-- /ko -->
             <!-- /ko -->
             <!-- ko ifnot: trashEnabled -->
-            <button class="btn fileToolbarBtn delete-link" title="${_('Delete forever')}" data-bind="enable: selectedFiles().length > 0, click: deleteSelected"><i class="icon-bolt"></i> ${_('Delete forever')}</button>
+              <button class="btn fileToolbarBtn delete-link" title="${_('Delete forever')}" data-bind="enable: selectedFiles().length > 0, click: deleteSelected"><i class="icon-bolt"></i> ${_('Delete forever')}</button>
             <!-- /ko -->
           </div>
         </%def>

@@ -29,6 +29,8 @@ from desktop.models import Settings
 from desktop.views import check_config
 from desktop import appmanager
 
+from hadoop.core_site import get_trash_interval
+
 
 def admin_wizard(request):
   apps = appmanager.get_apps(request.user)
@@ -42,6 +44,7 @@ def admin_wizard(request):
       'apps': dict([(app.name, app) for app in apps]),
       'app_names': app_names,
       'collect_usage': collect_usage,
+      'trash_enabled': get_trash_interval()
   })
 
 

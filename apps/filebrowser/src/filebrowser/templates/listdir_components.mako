@@ -758,6 +758,15 @@ from django.utils.translation import ugettext as _
         $("#editBreadcrumb").show();
       });
 
+      % if not trash_enabled and is_superuser:
+        $("#trash-help").popover({
+            'title': "${_('Did you know?')}",
+            'content': '${_('You can activate HDFS trash by setting fs.trash.interval in core-site.xml.')}',
+            'trigger': 'hover',
+            'html': true,
+            'placement': 'left'
+        });
+      % endif
       $.ajaxSetup({
         error:function (x, e) {
           if (x.status == 500) {
@@ -979,6 +988,7 @@ from django.utils.translation import ugettext as _
         self.breadcrumbs(ko.utils.arrayMap(breadcrumbs, function (breadcrumb) {
           return new Breadcrumb(breadcrumb);
         }));
+
         self.currentPath(currentDirPath);
 
         $('.uploader').trigger('fb:updatePath', {dest:self.currentPath()});

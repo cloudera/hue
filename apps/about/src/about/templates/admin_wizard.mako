@@ -76,6 +76,29 @@ ${ commonheader(_('Quick Start'), "quickstart", user, "100px") | n,unicode }
           ${ check_config | n,smart_unicode }
         </div>
       </div>
+
+      <div class="widget-box">
+        <div class="widget-title">
+          <span class="icon">
+            <i class="icon-trash"></i>
+          </span>
+          <h5>${ _('HDFS Trash configuration') }</h5>
+        </div>
+        <div class="widget-content">
+          <div class="container-fluid">
+          % if trash_enabled:
+            <h5>${ _('Trash is active.')}</h5>
+          % else:
+          ${ _('You can activate trash collection by setting fs.trash.interval in core-site.xml:')}<br/><br/>
+            <pre>
+  &#60;property&#62;
+    &#60;name&#62;fs.trash.interval&#60;/name&#62;
+    &#60;value&#62;10060&#60;/value&#62;
+  &#60;/property&#62;</pre>
+          % endif
+          </div>
+        </div>
+      </div>
     </div>
 
     <div id="step2" class="stepDetails hide">
