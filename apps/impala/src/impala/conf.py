@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
 import socket
 
 from django.utils.translation import ugettext_lazy as _t, ugettext as _
@@ -54,9 +55,10 @@ def config_validator(user):
 
   res = []
   try:
-    query_server = get_query_server_config(name='impala')
-    server = dbms.get(user, query_server)
-    server.get_databases()
+    if not 'test' in sys.argv: # Avoid tests hanging
+      query_server = get_query_server_config(name='impala')
+      server = dbms.get(user, query_server)
+      server.get_databases()
   except:
     res.append((NICE_NAME, _("No available Impalad to send queries to.")))
 
