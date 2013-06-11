@@ -1,6 +1,5 @@
-% About Hue
-% 
-% 
+
+<link rel="stylesheet" href="docbook.css" type="text/css" media="screen" title="no title" charset="utf-8"></link>
 
 About Hue
 =========

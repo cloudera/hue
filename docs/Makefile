@@ -31,8 +31,8 @@ NO_TOC := --xsltproc-opts='--stringparam generate.toc ""'
 # Being lazy/loose with the prerequsite. Include all files except sdk and
 # release notes, which are handled separately below.
 #
-DOC_FILES := $(shell find . -name sdk -prune -o -name release-notes -o -print)
-$(BLD_DIR_DOC): sdk release-notes $(DOC_FILES)
+DOC_FILES := $(shell find . -name sdk -prune -o -name release-notes -name user-guide -o -print)
+$(BLD_DIR_DOC): sdk release-notes user-guide $(DOC_FILES)
 	@echo '--- Generating doc at $@'
 	@mkdir -p $@
 
@@ -53,6 +53,20 @@ $(BLD_DIR_DOC)/release-notes: $(wildcard release-notes/*.txt)
 	@mkdir -p $@
 	@for i in $? ; do asciidoc $$i ; done
 	@mv release-notes/*.html $@/
+	@echo "--- Generated $@"
+
+
+.PHONY: user-guide
+user-guide: $(BLD_DIR_DOC)/user-guide
+$(BLD_DIR_DOC)/user-guide: $(wildcard user-guide/*.md)
+	@echo '--- Generating user-guide doc at $@'
+	@mkdir -p $@
+	@cp -r user-guide/images $@
+	@cp docbook.css $@
+	@for i in $? ; do PYTHONPATH=$(DESKTOP_DIR)/core/ext-py/markdown:$(DESKTOP_DIR)/core/ext-py/elementtree \
+	  $(DESKTOP_DIR)/core/ext-py/markdown/bin/markdown \
+	  $$i > $(BLD_DIR_DOC)/$$i ; done
+	@rename 's/\.md/\.html/' $@/*.md
 	@echo "--- Generated $@"
 
 
