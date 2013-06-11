@@ -245,7 +245,6 @@ SERVER_GROUP = Config(
   type=str,
   default="hue")
 
-
 CUSTOM = ConfigSection(
   key="custom",
   help=_("Customizations to the UI."),
@@ -267,6 +266,12 @@ AUTH = ConfigSection(
                         "django.contrib.auth.backends.ModelBackend (fully Django backend), " +
                         "desktop.auth.backend.AllowAllBackend (allows everyone), " +
                         "desktop.auth.backend.AllowFirstUserDjangoBackend (relies on Django and user manager, after the first login). ")),
+    USER_GROUP_MEMBERSHIP_SYNCHRONIZATION_BACKEND = Config(
+      key="user_group_membership_synchronization_backend",
+      help=_("Backend to synchronize user-group membership with."),
+      type=str,
+      default='',
+    ),
     USER_AUGMENTOR=Config("user_augmentor",
                    default="desktop.auth.backend.DefaultUserAugmentor",
                    help=_("Class which defines extra accessor methods for User objects.")),

@@ -36,6 +36,7 @@ import desktop.conf
 from django.utils.importlib import import_module
 from django.core.exceptions import ImproperlyConfigured
 from useradmin.models import get_profile, get_default_user_group, UserProfile
+from useradmin.views import import_ldap_users
 
 import pam
 from django_auth_ldap.backend import LDAPBackend, ldap_settings
@@ -137,8 +138,17 @@ class DesktopBackendBase(object):
     Implementors should return a boolean value which determines
     whether the given username and password pair is valid.
     """
-    raise Exception("Abstract class - must implement check_auth")
+    raise NotImplemented("Abstract class - must implement check_auth")
 
+
+class DesktopSynchronizationBackendBase(object):
+  """
+  Abstract base class for providing user-group membership sync'ing.
+
+  Extend this class and implement sync.
+  """
+  def sync(self, user):
+    raise NotImplemented("Abstract class - must implement sync")
 
 
 class AllowFirstUserDjangoBackend(django.contrib.auth.backends.ModelBackend):
@@ -265,7 +275,6 @@ class PamBackend(DesktopBackendBase):
     return True
 
 
-
 class LdapBackend(object):
   """
   Authentication backend that uses LDAP to authenticate logins.
@@ -346,6 +355,28 @@ class LdapBackend(object):
   @classmethod
   def manages_passwords_externally(cls):
     return True
+
+
+class LdapSynchronizationBackend(DesktopSynchronizationBackendBase):
+  """
+  Synchronize against LDAP authority.
+  """
+  USER_CACHE_NAME = 'ldap_use_group_sync_cache'
+
+  def sync(self, request):
+    user = request.user
+
+    if not user or not user.is_authenticated():
+      return
+
+    if not User.objects.filter(username=user.username, userprofile__creation_method=str(UserProfile.CreationMethod.EXTERNAL)).exists():
+      LOG.warn("User %s is not an Ldap user" % user.username)
+      return
+
+    # Cache should be cleared when user logs out.
+    if self.USER_CACHE_NAME not in request.session:
+      request.session[self.USER_CACHE_NAME] = import_ldap_users(user.username, sync_groups=True, import_by_dn=False)
+      request.session.modified = True
 
 
 class SpnegoDjangoBackend(django.contrib.auth.backends.ModelBackend):

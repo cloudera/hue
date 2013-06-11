@@ -115,7 +115,7 @@ MIDDLEWARE_CLASSES = [
     'desktop.middleware.ExceptionMiddleware',
     'desktop.middleware.ClusterMiddleware',
     'desktop.middleware.AppSpecificMiddleware',
-    'django.middleware.transaction.TransactionMiddleware',
+    'django.middleware.transaction.TransactionMiddleware'
     # 'debug_toolbar.middleware.DebugToolbarMiddleware'
 ]
 
@@ -283,3 +283,7 @@ if default_db['ENGINE'] == 'moxy':
 # Set up environment variable so Kerberos libraries look at our private
 # ticket cache
 os.environ['KRB5CCNAME'] = desktop.conf.KERBEROS.CCACHE_PATH.get()
+
+#######
+if desktop.conf.AUTH.USER_GROUP_MEMBERSHIP_SYNCHRONIZATION_BACKEND.get():
+  MIDDLEWARE_CLASSES.append('desktop.middleware.UserGroupSynchronizationMiddleware')

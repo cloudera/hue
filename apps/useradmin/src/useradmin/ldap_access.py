@@ -117,13 +117,13 @@ class LdapConnection(object):
     sanitized_name = ldap.filter.escape_filter_chars(username_pattern).replace(r'\2a', r'*')
     search_dn, user_name_filter = self._get_search_params(sanitized_name, user_name_attr, find_by_dn)
     ldap_filter = '(&' + user_filter + user_name_filter + ')'
+    attrlist = ['isMemberOf', 'memberOf', 'givenName', 'sn', 'mail', 'dn', user_name_attr]
 
-    ldap_result_id = self.ldap_handle.search(search_dn, scope, ldap_filter)
+    ldap_result_id = self.ldap_handle.search(search_dn, scope, ldap_filter, attrlist)
     result_type, result_data = self.ldap_handle.result(ldap_result_id)
     user_info = []
     if result_data and result_type == ldap.RES_SEARCH_RESULT:
       for dn, data in result_data:
-
         # Skip Active Directory # refldap entries.
         if dn is not None:
 
@@ -143,6 +143,11 @@ class LdapConnection(object):
             ldap_info['last'] = data['sn'][0]
           if 'mail' in data:
             ldap_info['email'] = data['mail'][0]
+          # memberOf and isMemberOf should be the same if they both exist
+          if 'memberOf' in data:
+            ldap_info['groups'] = data['memberOf']
+          if 'isMemberOf' in data:
+            ldap_info['groups'] = data['isMemberOf']
 
           user_info.append(ldap_info)
 
@@ -153,7 +158,6 @@ class LdapConnection(object):
     LDAP search helper method for finding groups
     """
     base_dn = self._get_root_dn()
-    scope = ldap.SCOPE_SUBTREE
 
     group_filter = desktop.conf.LDAP.GROUPS.GROUP_FILTER.get()
     if not group_filter.startswith('('):

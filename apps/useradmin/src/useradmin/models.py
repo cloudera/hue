@@ -64,6 +64,7 @@ import useradmin.conf
 
 LOG = logging.getLogger(__name__)
 
+
 class UserProfile(models.Model):
   """
   WARNING: Some of the columns in the UserProfile object have been added
