@@ -9,7 +9,7 @@ Website: http://gethue.com
 Notable Features
 ----------------
 
-- Search app: Integrate with Solr, Solr Cloud and Cloudera Search and customize search index pages
+- Search app: Integrate with Solr, Solr Cloud and Cloudera Search and customize search results and facets
 
 
 Notable Fixes
@@ -20,7 +20,6 @@ Notable Fixes
 - HUE-1303 [metastore] Create a new table wizard uses CTRL+A
 - HUE-1296 [impala] Support parameterized queries
 - HUE-1255 [beeswax] Fix show all the queries history toggling
-- [impala] Update hue.ini to point to HiveServer2 interface
 - [impala] Update hue.ini to point to HiveServer2 interface
 - [catalog] Rename Table Browser application to Metastore Manager
 
