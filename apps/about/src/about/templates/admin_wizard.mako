@@ -15,6 +15,7 @@
 ## limitations under the License.
 <%!
 from desktop.views import commonheader, commonfooter
+from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext as _
 %>
 
@@ -67,7 +68,7 @@ ${ commonheader(_('Quick Start'), "quickstart", user, "100px") | n,unicode }
           <h5>${ _('Check your current configuration') }</h5>
         </div>
         <div class="widget-content">
-          ${ check_config | n,unicode }
+          ${ check_config | n,smart_unicode }
         </div>
       </div>
     </div>
