@@ -53,6 +53,10 @@ class TestAbout(TestAboutBase, OozieBase):
 
 class TestAboutWithNoCluster(TestAboutBase):
 
+  def test_dump_config(self):
+    # Exception raised if bad unicode
+    self.client_admin.get(reverse('about:index'), HTTP_ACCEPT_LANGUAGE='fr-fr')
+
   def test_collect_usage(self):
     collect_usage = Settings.get_settings().collect_usage
 
