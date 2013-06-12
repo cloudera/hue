@@ -36,7 +36,6 @@ from desktop.lib.django_util import copy_query_dict, format_preserving_redirect,
 from desktop.lib.django_util import login_notrequired, get_desktop_uri_prefix
 from desktop.lib.exceptions_renderable import PopupException
 
-from hadoop.fs.exceptions import WebHdfsException
 from jobsub.parameterization import find_variables, substitute_variables
 
 import beeswax.forms
@@ -45,15 +44,13 @@ import beeswax.management.commands.beeswax_install_examples
 
 from beeswax import common, data_export, models, conf
 from beeswax.forms import QueryForm
-from beeswax.design import HQLdesign, hql_query
+from beeswax.design import HQLdesign
 from beeswax.models import SavedQuery, make_query_context, QueryHistory
 from beeswax.server import dbms
 from beeswax.server.dbms import expand_exception, get_query_server_config
 
 
 LOG = logging.getLogger(__name__)
-SAVE_RESULTS_CTAS_TIMEOUT = 300         # seconds
-
 
 
 def index(request):
@@ -694,147 +691,58 @@ def view_results(request, id, first_row=0):
 
 def save_results(request, id):
   """
-  Save the results of a query to an HDFS directory
+  Save the results of a query to an HDFS directory or Hive table.
   """
   query_history = authorized_get_history(request, id, must_exist=True)
 
+  app_name = get_app_name(request)
   server_id, state = _get_query_handle_and_state(query_history)
   query_history.save_state(state)
   error_msg, log = None, None
 
   if request.method == 'POST':
-    # Make sure the result is available.
-    # Note that we may still hit errors during the actual save
     if not query_history.is_success():
-      if query_history.is_failure():
-        msg = _('This query has %(state)s. Results unavailable.') % {'state': state}
-      else:
-        msg = _('The result of this query is not available yet.')
+      msg = _('This query is %(state)s. Results unavailable.') % {'state': state}
       raise PopupException(msg)
 
     db = dbms.get(request.user, query_history.get_query_server_config())
     form = beeswax.forms.SaveResultsForm(request.POST, db=db)
 
-    # Cancel goes back to results
     if request.POST.get('cancel'):
-      return format_preserving_redirect(request, '/beeswax/watch/%s' % (id,))
+      return format_preserving_redirect(request, '/%s/watch/%s' % (app_name, id))
 
     if form.is_valid():
-      # Do save
-      # 1. Get the results metadata
-      assert request.POST.get('save')
       try:
         handle, state = _get_query_handle_and_state(query_history)
         result_meta = db.get_results_metadata(handle)
       except Exception, ex:
-        LOG.exception(ex)
-        raise PopupException(_('Cannot find query.'))
-      if result_meta.table_dir:
-        result_meta.table_dir = request.fs.urlsplit(result_meta.table_dir)[2]
+        raise PopupException(_('Cannot find query: %s') % ex)
 
-      # 2. Check for partitioned tables
-      if result_meta.table_dir is None:
-        raise PopupException(_('Saving results from a partitioned table is not supported. You may copy from the HDFS location manually.'))
-
-      # 3. Actual saving of results
       try:
         if form.cleaned_data['save_target'] == form.SAVE_TYPE_DIR:
-          # To dir
-          if result_meta.in_tablename:
-            raise PopupException(_('Saving results from a query with no MapReduce jobs is not supported. '
-                                   'You may copy manually from the HDFS location %(path)s.') % {'path': result_meta.table_dir})
           target_dir = form.cleaned_data['target_dir']
-          request.fs.rename_star(result_meta.table_dir, target_dir)
-          LOG.debug("Moved results from %s to %s" % (result_meta.table_dir, target_dir))
-          query_history.save_state(models.QueryHistory.STATE.expired)
-          return redirect(reverse('filebrowser.views.view', kwargs={'path': target_dir}))
+          query_history = db.insert_query_into_directory(query_history, target_dir)
+          redirected = redirect(reverse('beeswax:watch_query', args=[query_history.id]) \
+                                + '?on_success_url=' + reverse('filebrowser.views.view', kwargs={'path': target_dir}))
         elif form.cleaned_data['save_target'] == form.SAVE_TYPE_TBL:
-          # To new table
-          try:
-            return _save_results_ctas(request, query_history, form.cleaned_data['target_table'], result_meta)
-          except Exception, bex:
-            LOG.exception(bex)
-            error_msg, log = expand_exception(bex, db)
-      except WebHdfsException, ex:
-        raise PopupException(_('The table could not be saved.'), detail=ex)
-      except IOError, ex:
-        LOG.exception(ex)
-        error_msg = str(ex)
+          redirected = db.create_table_as_a_select(request, query_history, form.cleaned_data['target_table'], result_meta)
+      except Exception, ex:
+        error_msg, log = expand_exception(ex, db)
+        raise PopupException(_('The result could not be saved: %s') % log, detail=ex)
+
+      return redirected
   else:
     form = beeswax.forms.SaveResultsForm()
 
   if error_msg:
     error_msg = _('Failed to save results from query: %(error)s') % {'error': error_msg}
-  return render('save_results.mako', request, dict(
-    action=reverse(get_app_name(request) + ':save_results', kwargs={'id': str(id)}),
-    form=form,
-    error_msg=error_msg,
-    log=log,
-  ))
 
-
-def _save_results_ctas(request, query_history, target_table, result_meta):
-  """
-  Handle saving results as a new table. Returns HTTP response.
-  May raise Exception, IOError.
-  """
-  query_server = query_history.get_query_server_config() # Query server requires DDL support
-  db = dbms.get(request.user)
-
-  # Case 1: The results are straight from an existing table
-  if result_meta.in_tablename:
-    hql = 'CREATE TABLE `%s` AS SELECT * FROM %s' % (target_table, result_meta.in_tablename)
-    query = hql_query(hql)
-    # Display the CTAS running. Could take a long time.
-    return execute_directly(request, query, query_server, on_success_url=reverse('metastore:index'))
-
-  # Case 2: The results are in some temporary location
-  # 1. Create table
-  cols = ''
-  schema = result_meta.schema
-  for i, field in enumerate(schema.fieldSchemas):
-    if i != 0:
-      cols += ',\n'
-    cols += '`%s` %s' % (field.name, field.type)
-
-  # The representation of the delimiter is messy.
-  # It came from Java as a string, which might has been converted from an integer.
-  # So it could be "1" (^A), or "10" (\n), or "," (a comma literally).
-  delim = result_meta.delim
-  if not delim.isdigit():
-    delim = str(ord(delim))
-
-  hql = '''
-        CREATE TABLE `%s` (
-        %s
-        )
-        ROW FORMAT DELIMITED
-        FIELDS TERMINATED BY '\%s'
-        STORED AS TextFile
-        ''' % (target_table, cols, delim.zfill(3))
-
-  query = hql_query(hql)
-  db.execute_and_wait(query)
-
-  try:
-    # 2. Move the results into the table's storage
-    table_obj = db.get_table('default', target_table)
-    table_loc = request.fs.urlsplit(table_obj.path_location)[2]
-    request.fs.rename_star(result_meta.table_dir, table_loc)
-    LOG.debug("Moved results from %s to %s" % (result_meta.table_dir, table_loc))
-    messages.info(request, _('Saved query results as new table %(table)s') % {'table': target_table})
-    query_history.save_state(models.QueryHistory.STATE.expired)
-  except Exception, ex:
-    LOG.error('Error moving data into storage of table %s. Will drop table.' % (target_table,))
-    query = hql_query('DROP TABLE `%s`' % (target_table,))
-    try:
-      db.execute_directly(query)        # Don't wait for results
-    except Exception, double_trouble:
-      LOG.exception('Failed to drop table "%s" as well: %s' % (target_table, double_trouble))
-    raise ex
-
-  # Show tables upon success
-  return format_preserving_redirect(request, reverse('metastore:index'))
+  return render('save_results.mako', request, {
+    'action': reverse(get_app_name(request) + ':save_results', kwargs={'id': str(id)}),
+    'form': form,
+    'error_msg': error_msg,
+    'log': log,
+  })
 
 
 def confirm_query(request, query, on_success_url=None):
@@ -1082,7 +990,7 @@ def _run_parameterized_query(request, design_id, explain):
 
   query_str = query_form.query.cleaned_data["query"]
   app_name = get_app_name(request)
-  query_server = get_query_server_config(app_name)  
+  query_server = get_query_server_config(app_name)
   query_type = SavedQuery.TYPES_MAPPING[app_name]
 
   parameterization_form_cls = make_parameterization_form(query_str)

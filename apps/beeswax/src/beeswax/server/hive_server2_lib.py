@@ -522,6 +522,12 @@ class ExplainCompatible:
     self.textual = '\n'.join([line[0] for line in data_table.rows()])
 
 
+class ResultMetaCompatible:
+
+  def __init__(self):
+    self.in_tablename = True
+
+
 class HiveServerClientCompatible:
   """Same API as Beeswax"""
 
@@ -603,6 +609,11 @@ class HiveServerClientCompatible:
 
   def get_default_configuration(self, *args, **kwargs):
     return {}
+
+
+  def get_results_metadata(self, handle):
+    # We just need to mock
+    return ResultMetaCompatible()
 
 
   def create_database(self, name, description): raise NotImplementedError()

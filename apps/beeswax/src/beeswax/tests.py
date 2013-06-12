@@ -754,7 +754,7 @@ for x in sys.stdin:
         'save': True
       }
       resp = self.client.post('/beeswax/save_results/%s' % (qid,), save_data, follow=True)
-      wait_for_query_to_finish(self.client, resp, max=60)
+      resp = wait_for_query_to_finish(self.client, resp, max=60)
 
       # Check that data is right
       if verify:
@@ -775,24 +775,24 @@ for x in sys.stdin:
       self.cluster.fs.mkdir(TARGET_DIR_ROOT)
       self.cluster.fs.chown(TARGET_DIR_ROOT, user='test')
 
-    # Not supported. SELECT *. (Result dir is same as table dir.)
+    # SELECT *. (Result dir is same as table dir.)
     hql = "SELECT * FROM test"
     resp = _make_query(self.client, hql, wait=True, local=False, max=180.0)
     resp = save_and_verify(resp, TARGET_DIR_ROOT + '/1', verify=False)
-    assert_true('not supported' in resp.content)
+    # Success and went to FB
+    assert_true('File Browser' in resp.content, resp.content)
 
     # SELECT columns. (Result dir is in /tmp.)
     hql = "SELECT foo, bar FROM test"
     resp = _make_query(self.client, hql, wait=True, local=False, max=180.0)
     resp = save_and_verify(resp, TARGET_DIR_ROOT + '/2')
-    # Results has a link to the FB
-    assert_true('/filebrowser/view' in resp.content)
+    assert_true('File Browser' in resp.content, resp.content)
 
-    # Not supported. Partition tables
+    # Partition tables
     hql = "SELECT * FROM test_partitions"
     resp = _make_query(self.client, hql, wait=True, local=False, max=180.0)
     resp = save_and_verify(resp, TARGET_DIR_ROOT + '/3', verify=False)
-    assert_true('not supported' in resp.content)
+    assert_true('File Browser' in resp.content, resp.content)
 
 
   def test_save_results_to_tbl(self):
@@ -810,8 +810,7 @@ for x in sys.stdin:
       wait_for_query_to_finish(self.client, resp, max=120)
 
       # Check that data is right. The SELECT may not give us the whole table.
-      resp = _make_query(self.client, 'SELECT * FROM %s' % (target_tbl,), wait=True,
-                        local=False)
+      resp = _make_query(self.client, 'SELECT * FROM %s' % (target_tbl,), wait=True, local=False)
       for i in xrange(90):
         assert_equal([str(i), '0x%x' % (i,)], resp.context['results'][i])
 
