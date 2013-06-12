@@ -59,6 +59,9 @@ class PthFile(object):
     self._entries = [ ]
     self._read()
 
+  def _relpath(self, path):
+    return os.path.relpath(path, os.path.dirname(self._path))
+
   def _read(self):
     if os.path.exists(self._path):
       self._entries = set(file(self._path).read().split('\n'))
@@ -69,30 +72,53 @@ class PthFile(object):
 
     PTH files need paths relative to the pth file, not APPS_ROOT
     """
-    abs_module_path = os.path.join(app.abs_path, 'src')
-    rel_module_path = os.path.relpath(abs_module_path, os.path.dirname(self._path))
-    LOG.debug('Add to %s: %s' % (self._path, rel_module_path))
-    self._entries.add(rel_module_path)
+    if os.path.isabs(app.path):
+      # Absolute path
+      module_path = os.path.join(app.abs_path, 'src')
+      self._entries.add(module_path)
+      LOG.debug('Add to %s: %s' % (self._path, module_path))
 
-    # Eggs could be in ext-py/<pkg>/dist/*.egg
-    ext_pys = app.find_ext_pys()
-    for py in ext_pys:
-      ext_egg = glob.glob(os.path.join(py, 'dist', '*.egg'))
-      LOG.debug('Add to %s: %s' % (self._path, ext_egg))
-      self._entries.update(os.path.relpath(ext_egg, os.path.dirname(self._path)))
+      # Eggs could be in ext-py/<pkg>/dist/*.egg
+      for py in app.find_ext_pys():
+        ext_eggs = glob.glob(os.path.join(py, 'dist', '*.egg'))
+        self._entries.update(ext_eggs)
+        LOG.debug('Add to %s: %s' % (self._path, ext_eggs))
 
-    # And eggs could also be in ext-eggs/*.egg
-    for egg_file in glob.glob(os.path.join(app.path, 'ext-eggs', '*.egg')):
-      LOG.debug('Add to %s: %s' % (self._path, egg_file))
-      self._entries.add(os.path.relpath(egg_file, os.path.dirname(self._path)))
+      # And eggs could also be in ext-eggs/*.egg
+      egg_files = glob.glob(os.path.join(app.path, 'ext-eggs', '*.egg'))
+      self._entries.update(egg_files)
+      LOG.debug('Add to %s: %s' % (self._path, egg_files))
+
+    else:
+      # Relative paths require some transformation.
+      # Paths are relative to directory of pth file
+      module_path = self._relpath(os.path.join(app.abs_path, 'src'))
+      self._entries.add(module_path)
+      LOG.debug('Add to %s: %s' % (self._path, module_path))
+
+      # Eggs could be in ext-py/<pkg>/dist/*.egg
+      for py in app.find_ext_pys():
+        ext_eggs = [self._relpath(egg) for egg in glob.glob(os.path.join(py, 'dist', '*.egg'))]
+        self._entries.update(ext_eggs)
+        LOG.debug('Add to %s: %s' % (self._path, ext_eggs))
+
+      # And eggs could also be in ext-eggs/*.egg
+      egg_files = [self._relpath(egg_file) for egg_file in glob.glob(os.path.join(app.path, 'ext-eggs', '*.egg'))]
+      self._entries.update(egg_files)
+      LOG.debug('Add to %s: %s' % (self._path, egg_files))
 
   def remove(self, app):
     """
     Remove the app and its ext eggs from the pth file
     """
     for path in self._entries.copy():
-      if path.startswith(app.path):
-        self._entries.remove(path)
+      module_path = os.path.join(app.abs_path, 'src')
+      if path.startswith(module_path):
+        self._entries.remove(module_path)
+
+      rel_module_path = self._relpath(module_path)
+      if path.startswith(rel_module_path):
+        self._entries.remove(rel_module_path)
 
   def save(self):
     """

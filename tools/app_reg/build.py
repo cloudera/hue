@@ -45,7 +45,7 @@ def make_app(app):
 
   Call `make egg-info ext-eggs' on the app.
   """
-  cmdv = [ 'make', '-C', app.rel_path, 'egg-info', 'ext-eggs' ]
+  cmdv = [ 'make', '-C', app.abs_path, 'egg-info', 'ext-eggs' ]
   return runcmd(cmdv, dict(ROOT=common.INSTALL_ROOT)) == 0
 
 
