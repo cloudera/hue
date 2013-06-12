@@ -34,9 +34,14 @@ ${ commonheader(_('Quick Start'), "quickstart", user, "100px") | n,unicode }
     </div>
   </div>
 % endif
-<div style="position: absolute;top:110px;right:30px"><img src="/static/art/hue-logo-subtle.png"/></div>
-<div class="container-fluid">
 
+<div style="position: absolute;top:110px;right:30px">
+  <a href="http://gethue.com" target="_blank" title="${ _('Visit Hue website !') }">
+    <img src="/static/art/hue-logo-subtle.png"/>
+  </a>
+</div>
+
+<div class="container-fluid">
   <div class="row-fluid">
     <h2>
       % if user.is_superuser:
