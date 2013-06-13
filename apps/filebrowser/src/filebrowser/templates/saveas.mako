@@ -13,9 +13,11 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
+
 <%namespace name="edit" file="editor_components.mako" />
+
 <html>
-  <head><title>Save File As...</title></head>
+  <head><title>${ _('Save File As...') }</title></head>
   <body>
     % if form.errors:
       <div class="alert_popup">
@@ -28,7 +30,7 @@
     % endif
     <div class="saveAsPrompt_popup">
       <form method="post" action="${url('filebrowser.views.save_file')}">
-          Please enter the location where you'd like to save the file.
+          ${ _('Please enter the location where you'd like to save the file.') }
           ${edit.render_field(form["path"], notitle=True)}
           <div>${edit.render_field(form["contents"], hidden=True)}</div>
           <div>${edit.render_field(form["encoding"], hidden=True)}</div>

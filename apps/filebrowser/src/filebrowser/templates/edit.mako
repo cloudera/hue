@@ -13,34 +13,38 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
-<%namespace name="edit" file="editor_components.mako" />
+
 <%!
   from django.template.defaultfilters import urlencode
   from filebrowser.views import truncate
   from desktop.views import commonheader, commonfooter
   from django.utils.translation import ugettext as _
 %>
+
 <%
   path_enc = urlencode(path)
   dirname_enc = urlencode(dirname)
 %>
+
+<%namespace name="edit" file="editor_components.mako" />
 <%namespace name="fb_components" file="fb_components.mako" />
 
 ${ commonheader(_('%(filename)s - File Viewer') % dict(filename=truncate(filename)), 'filebrowser', user) | n,unicode }
 
+
 <div class="container-fluid">
-	% if breadcrumbs:
+    % if breadcrumbs:
         ${fb_components.breadcrumbs(path, breadcrumbs)}
-	%endif
+    %endif
 </div>
 
 <div class="container-fluid">
 <div class="well" >
     <form class="form-stacked" method="post" action="${url('filebrowser.views.save_file')}">
     <div class="toolbar">
-		<a class="btn" href="${url('filebrowser.views.view', path=dirname_enc)}">${_('Browse location')}</a>
-	</div>
-	<br/>
+        <a class="btn" href="${url('filebrowser.views.view', path=dirname_enc)}"><i class="icon-file-text"></i> ${_('Browse location')}</a>
+    </div>
+    <br/>
 
 % if form.errors:
   <div class="alert-message">
@@ -69,15 +73,17 @@ ${ commonheader(_('%(filename)s - File Viewer') % dict(filename=truncate(filenam
         <h3>${_('Save as')}</h3>
     </div>
     <div class="modal-body">
-		${edit.render_field(form["path"], notitle=True, klass="xlarge")}
-		<span class="help-block">${_("Enter the location where you'd like to save the file.")}</span>
+        <span class="help-block">${_("Enter the location where you would like to save the file.")}</span>
+        ${ edit.render_field(form["path"], notitle=True, nolabel=True, klass="pathChooser input-xxlarge") }
+        <br/>
+        <div id="fileChooserSaveModal" class="hide"></div>
     </div>
     <div class="modal-footer">
         <div id="saveAsNameRequiredAlert" class="alert-message error hide" style="position: absolute; left: 10;">
             <p><strong>${_('Name is required.')}</strong>
         </div>
-		${edit.render_field(form["contents"], hidden=True)}
-		${edit.render_field(form["encoding"], hidden=True)}
+        ${edit.render_field(form["contents"], hidden=True)}
+        ${edit.render_field(form["encoding"], hidden=True)}
         <a id="cancelSaveAsBtn" class="btn">${_('Cancel')}</a>
         <input type="submit" value="${_('Save')}" class="btn btn-primary" />
     </div>
@@ -112,9 +118,23 @@ ${ commonheader(_('%(filename)s - File Viewer') % dict(filename=truncate(filenam
         $(this).removeClass("fieldError");
         $("#saveAsNameRequiredAlert").hide();
       });
+
+      $(".pathChooser").click(function() {
+        var self = this;
+        $("#fileChooserSaveModal").jHueFileChooser({
+          initialPath:$(self).val(),
+          onFileChoose:function (filePath) {
+            $(self).val(filePath);
+          },
+          onFolderChange:function (folderPath) {
+            $(self).val(folderPath);
+          },
+          createFolder:false,
+          uploadFile:false
+        });
+        $("#fileChooserSaveModal").slideDown();
+      });
     });
   </script>
 
 ${ commonfooter(messages) | n,unicode }
-
-

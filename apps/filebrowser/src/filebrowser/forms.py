@@ -63,6 +63,9 @@ class EditorForm(forms.Form):
   contents = CharField(widget=Textarea, label=_("Contents"), required=False)
   encoding = CharField(label=_('Encoding'), required=False)
 
+  def clean_contents(self):
+    return self.cleaned_data.get('contents', '').replace('\r\n', '\n')
+
   def clean_encoding(self):
     encoding = self.cleaned_data.get('encoding', '').strip()
     if not encoding:

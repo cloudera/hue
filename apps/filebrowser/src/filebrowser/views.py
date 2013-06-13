@@ -232,11 +232,10 @@ def save_file(request):
         if not is_valid:
             return edit(request, path, form=form)
         else:
-            data = dict(form=form)
-            return render("saveas.mako", request, data)
+            return render("saveas.mako", request, {'form': form})
 
     if not path:
-        raise PopupException("No path specified")
+        raise PopupException(_("No path specified"))
     if not is_valid:
         return edit(request, path, form=form)
 
@@ -250,7 +249,6 @@ def save_file(request):
                          form.cleaned_data['encoding'])
 
     messages.info(request, _('Saved %(path)s.') % {'path': os.path.basename(path)})
-    """ Changing path to reflect the request path of the JFrame that will actually be returned."""
     request.path = urlresolvers.reverse("filebrowser.views.edit", kwargs=dict(path=path))
     return edit(request, path, form)
 

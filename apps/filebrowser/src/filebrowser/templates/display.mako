@@ -45,32 +45,33 @@ ${ commonheader(_('%(filename)s - File Viewer') % dict(filename=truncate(filenam
         <ul class="nav nav-list">
           <li class="nav-header">${_('Actions')}</li>
           % if view['mode'] == "binary":
-            <li><a href="${base_url}?offset=${view['offset']}&length=${view['length']}&mode=text&compression=${view['compression']}">${_('View as text')}</a></li>
+            <li><a href="${base_url}?offset=${view['offset']}&length=${view['length']}&mode=text&compression=${view['compression']}"><i class="icon-icon-font"></i> ${_('View as text')}</a></li>
           % endif
 
           % if view['mode'] == "text":
-            <li><a href="${base_url}?offset=${view['offset']}&length=${view['length']}&mode=binary&compression=${view['compression']}">${_('View as binary')}</a></li>
+            <li><a href="${base_url}?offset=${view['offset']}&length=${view['length']}&mode=binary&compression=${view['compression']}"><i class="icon-barcode"></i> ${_('View as binary')}</a></li>
           % endif
 
           % if view['compression'] != "gzip" and path.endswith('.gz'):
-            <li><a href="${base_url}?offset=0&length=2000&mode=${view['mode']}&compression=gzip">${_('Preview as Gzip')}</a></li>
+            <li><a href="${base_url}?offset=0&length=2000&mode=${view['mode']}&compression=gzip"><i class="icon-youtube-play"></i> ${_('Preview as Gzip')}</a></li>
           % endif
 
           % if view['compression'] != "avro" and view['compression'] != "snappy_avro" and path.endswith('.avro'):
-            <li><a href="${base_url}?offset=0&length=2000&mode=${view['mode']}&compression=avro">${_('Preview as Avro')}</a></li>
+            <li><a href="${base_url}?offset=0&length=2000&mode=${view['mode']}&compression=avro"><i class="icon-youtube-play"></i> ${_('Preview as Avro')}</a></li>
           % endif
 
           % if view['compression'] and view['compression'] != "none":
-            <li><a href="${base_url}?offset=0&length=2000&mode=${view['mode']}&compression=none">${_('Stop preview')}</a></li>
+            <li><a href="${base_url}?offset=0&length=2000&mode=${view['mode']}&compression=none"><i class="icon-remove-circle"></i> ${_('Stop preview')}</a></li>
           % endif
 
           % if editable and view['compression'] == "none":
-            <li><a href="${url('filebrowser.views.edit', path=path_enc)}">${_('Edit file')}</a></li>
+            <li><a href="${url('filebrowser.views.edit', path=path_enc)}"><i class="icon-pencil"></i> ${_('Edit file')}</a></li>
           % endif
 
-           <li><a href="${url('filebrowser.views.download', path=path_enc)}">${_('Download')}</a></li>
-           <li><a href="${url('filebrowser.views.view', path=dirname_enc)}">${_('View file location')}</a></li>
-           <li><a id="refreshBtn">${_('Refresh')}</a></li>
+           <li><a href="${url('filebrowser.views.download', path=path_enc)}"><i class="icon-download-alt"></i> ${_('Download')}</a></li>
+           <li><a href="${url('filebrowser.views.view', path=dirname_enc)}"><i class="icon-file-text"></i> ${_('View file location')}</a></li>
+           <li><a id="refreshBtn"><i class="icon-refresh"></i> ${_('Refresh')}</a></li>
+
           <li class="nav-header">${_('Info')}</li>
           <li>
             <dl>

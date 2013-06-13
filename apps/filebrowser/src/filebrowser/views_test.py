@@ -941,6 +941,7 @@ def edit_helper(cluster, encoding, contents_pass_1, contents_pass_2):
     # And its contents should be what we expect
     f = cluster.fs.open(filename)
     assert_equal(f.read(), contents_pass_1.encode(encoding))
+    assert_false('\r\n' in f.read()) # No CRLF line terminators
     f.close()
 
     # We should be able to overwrite the file with another save
@@ -952,6 +953,7 @@ def edit_helper(cluster, encoding, contents_pass_1, contents_pass_2):
     assert_equal(response.context['form'].data['contents'], contents_pass_2)
     f = cluster.fs.open(filename)
     assert_equal(f.read(), contents_pass_2.encode(encoding))
+    assert_false('\r\n' in f.read()) # No CRLF line terminators
     f.close()
 
     # TODO(todd) add test for maintaining ownership/permissions
