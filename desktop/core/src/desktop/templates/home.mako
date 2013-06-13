@@ -24,7 +24,7 @@ ${ commonheader(_('Home'), "home", user) | n,unicode }
 <%def name="app_link(app, label=None, extra_path = '')">
   % if app in apps:
   <li>
-    <a href="/${ app }${ extra_path }"  title="${ apps[app].nice_name }" class="app-tooltips">
+    <a href="/${ app }/${ extra_path }"  title="${ apps[app].nice_name }" class="app-tooltips">
       <i class="icon-double-angle-right"></i> ${ label }
     </a>
   </li>
@@ -96,7 +96,7 @@ ${ commonheader(_('Home'), "home", user) | n,unicode }
         <div class="widget-content">
           <ul>
             ${ app_link("oozie", _('Dashboard')) }
-            ${ app_link("oozie", _('Editor'), "/list_workflows/") }
+            ${ app_link("oozie", _('Editor'), "list_workflows/") }
           </ul>
         </div>
       </div>

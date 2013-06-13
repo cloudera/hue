@@ -1111,7 +1111,7 @@ for x in sys.stdin:
       'create': 'Create database',
       'use_default_location': True,
     }, follow=True)
-    assert_equal_mod_whitespace("CREATE DATABASE my_db COMMENT \"foo\"", resp.context['query'].query)
+    assert_equal_mod_whitespace("CREATE DATABASE my_db COMMENT \"foo\"", resp.context['query'].query, resp.content)
 
     resp = wait_for_query_to_finish(self.client, resp, max=180.0)
     assert_true('my_db' in resp.context['databases'], resp)
