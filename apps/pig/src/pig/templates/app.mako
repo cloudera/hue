@@ -47,7 +47,7 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
       </%def>
 
       <%def name="creation()">
-          <button class="btn fileToolbarBtn" title="${_('Create a new script')}" data-bind="click: newScript"><i class="icon-plus-sign"></i> ${_('New script')}</button>
+          <button class="btn fileToolbarBtn" title="${_('Create a new script')}" data-bind="click: confirmNewScript"><i class="icon-plus-sign"></i> ${_('New script')}</button>
       </%def>
     </%actionbar:render>
     <div class="alert alert-info" data-bind="visible: scripts().length == 0">
@@ -86,10 +86,10 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
         <td class="center" data-bind="click: handleSelect" style="cursor: default">
           <div data-bind="css: {hueCheckbox: true, 'icon-ok': selected}"></div>
         </td>
-        <td data-bind="click: $root.viewScript">
-          <strong><a href="#" data-bind="click: $root.viewScript, text: name"></a></strong>
+        <td data-bind="click: $root.confirmViewScript">
+          <strong><a href="#" data-bind="click: $root.confirmViewScript, text: name"></a></strong>
         </td>
-        <td data-bind="click: $root.viewScript">
+        <td data-bind="click: $root.confirmViewScript">
           <span data-bind="text: scriptSumup"></span>
         </td>
       </tr>
@@ -105,7 +105,7 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
             <li data-bind="click: editScript" class="active" data-section="edit">
               <a href="#"><i class="icon-edit"></i> ${ _('Edit script') }</a>
             </li>
-            <li data-bind="click: newScript">
+            <li data-bind="click: confirmNewScript">
               <a href="#" title="${ _('New script') }" rel="tooltip" data-placement="right">
                 <i class="icon-plus-sign"></i> ${ _('New script') }
               </a>
@@ -439,6 +439,23 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
     <div class="modal-footer">
     </div>
 </div>
+
+<div id="confirmModal" class="modal hide fade">
+  <div class="modal-header">
+    <a href="#" class="close" data-dismiss="modal">&times;</a>
+    <h3>${_('Are you sure?')}</h3>
+  </div>
+  <div class="modal-body">
+    <p>
+      ${_('The current script has unsaved changes. Are you sure you want to discard the changes?')}
+    </p>
+  </div>
+  <div class="modal-footer">
+    <a class="btn" data-dismiss="modal">${_('No')}</a>
+    <a class="btn btn-danger disable-feedback" data-bind="click: confirmScript">${_('Yes')}</a>
+  </div>
+</div>
+
 
 <div class="bottomAlert alert"></div>
 
@@ -851,7 +868,7 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
               window.clearInterval(dashboardLoadedInterval);
               viewModel.loadScript(scriptId);
               if (viewModel.currentScript().id() == -1) {
-                viewModel.newScript();
+                viewModel.confirmNewScript();
               }
               $(document).trigger("loadEditor");
             }
@@ -869,7 +886,7 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
               window.clearInterval(dashboardLoadedInterval);
               viewModel.loadScript(scriptId);
               if (viewModel.currentScript().id() == -1) {
-                viewModel.newScript();
+                viewModel.confirmNewScript();
               }
               $(document).trigger("loadEditor");
             }
@@ -888,7 +905,7 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
               viewModel.loadScript(scriptId);
               $(document).trigger("loadEditor");
               if (viewModel.currentScript().id() == -1) {
-                viewModel.newScript();
+                viewModel.confirmNewScript();
               }
               else {
                 viewModel.currentScript().isRunning(true);

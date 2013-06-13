@@ -137,6 +137,7 @@ var PigViewModel = function (props) {
   };
 
   self.currentScript = ko.observable(new PigScript(_defaultScript));
+  self.loadingScript = null;
   self.currentDeleteType = ko.observable("");
 
   self.selectedScripts = ko.computed(function () {
@@ -183,8 +184,29 @@ var PigViewModel = function (props) {
     }
   }
 
+  self.confirmNewScript = function () {
+    if (self.isDirty()) {
+      showConfirmModal();
+    }
+    else {
+      self.newScript();
+    }
+  };
+
+  self.confirmScript = function () {
+    if (self.loadingScript != null){
+      self.viewScript(self.loadingScript);
+    }
+    else {
+      self.newScript();
+    }
+  };
+
   self.newScript = function () {
+    self.loadingScript = null;
     self.currentScript(new PigScript(_defaultScript));
+    self.isDirty(false);
+    $("#confirmModal").modal("hide");
     $(document).trigger("loadEditor");
     $(document).trigger("showEditor");
   };
@@ -201,8 +223,21 @@ var PigViewModel = function (props) {
     $(document).trigger("showLogs");
   };
 
+  self.confirmViewScript = function (script) {
+    if (self.isDirty()) {
+      self.loadingScript = script;
+      showConfirmModal();
+    }
+    else {
+      self.viewScript(script);
+    }
+  };
+
   self.viewScript = function (script) {
+    self.loadingScript = null;
     self.currentScript(script);
+    self.isDirty(false);
+    $("#confirmModal").modal("hide");
     $(document).trigger("loadEditor");
     $(document).trigger("showEditor");
   };
@@ -357,6 +392,15 @@ var PigViewModel = function (props) {
       show: true
     });
   }
+
+  function showConfirmModal() {
+    $("#confirmModal").modal({
+      keyboard: true,
+      show: true
+    });
+  }
+
+
 
   function callSave(script) {
     $(document).trigger("saving");
