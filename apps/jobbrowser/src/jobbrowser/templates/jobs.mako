@@ -195,7 +195,7 @@ ${ commonheader(None, "jobbrowser", user) | n,unicode }
             }
         });
 
-        $(".kill").live("click", function(e){
+        $(document).on("click", ".kill", function(e){
             $("#kill-job").attr("action", $(e.target).attr("kill-action"));
             $("#killModal").modal({
                 keyboard: true,

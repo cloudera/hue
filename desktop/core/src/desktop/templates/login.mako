@@ -35,11 +35,6 @@ from django.utils.translation import ugettext as _
   <link href="/static/ext/css/font-awesome.min.css" rel="stylesheet">
   <link href="/static/css/hue2.css" rel="stylesheet">
 
-  <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
-  <!--[if lt IE 9]>
-  <script src="/static/ext/js/html5.js"></script>
-  <![endif]-->
-
   <style type="text/css">
     body {
       padding-top: 80px;
@@ -153,7 +148,7 @@ from django.utils.translation import ugettext as _
     </div>
   </div>
 
-  <script src="/static/ext/js/jquery/jquery-1.8.1.min.js"></script>
+  <script src="/static/ext/js/jquery/jquery-2.0.2.min.js"></script>
   <script>
     $(document).ready(function(){
 

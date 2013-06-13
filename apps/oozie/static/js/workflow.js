@@ -444,7 +444,13 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
               case 'parameters':
                 // These may be serialized JSON data since that is how they are stored
                 self[key].removeAll();
-                var arr = $.parseJSON(value) || value;
+                var arr;
+                try {
+                  arr = $.parseJSON(value);
+                }
+                catch (error){
+                  arr = value;
+                }
 
                 $.each(arr, function(index, obj) {
                   var mapping = ko.mapping.fromJS(obj);

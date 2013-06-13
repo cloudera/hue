@@ -596,7 +596,7 @@ from django.utils.translation import ugettext as _
         $("#newNameInput").removeClass("fieldError");
       });
 
-      $("#moveForm").live("submit", function () {
+      $("#moveForm").on("submit", function () {
         if ($.trim($("#moveForm").find("input.pathChooser").val()) == "") {
           $("#moveNameRequiredAlert").show();
           $("#moveForm").find("input[name='*dest_path']").addClass("fieldError");
@@ -606,7 +606,7 @@ from django.utils.translation import ugettext as _
         return true;
       });
 
-      $("#moveForm").find("input[name='dest_path']").live("focus", function () {
+      $("#moveForm").on("focus", "input[name='dest_path']", function () {
         $("#moveNameRequiredAlert").hide();
         $("#moveForm").find("input[name='dest_path']").removeClass("fieldError");
       });

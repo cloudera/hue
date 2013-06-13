@@ -54,11 +54,6 @@ from django.utils.translation import ugettext as _
   <link href="/static/css/hue2.css" rel="stylesheet">
   <link href="/static/ext/css/fileuploader.css" rel="stylesheet">
 
-  <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
-  <!--[if lt IE 9]>
-  <script src="/static/ext/js/html5.js"></script>
-  <![endif]-->
-
   <style type="text/css">
     % if conf.CUSTOM.BANNER_TOP_HTML.get():
       body {
@@ -104,7 +99,8 @@ from django.utils.translation import ugettext as _
 
   </script>
 
-  <script src="/static/ext/js/jquery/jquery-1.8.1.min.js"></script>
+  <script src="/static/ext/js/jquery/jquery-2.0.2.min.js"></script>
+  <script src="/static/js/Source/jHue/jquery.migration.js"></script>
   <script src="/static/js/Source/jHue/jquery.filechooser.js"></script>
   <script src="/static/js/Source/jHue/jquery.selector.js"></script>
   <script src="/static/js/Source/jHue/jquery.alert.js"></script>
@@ -115,7 +111,7 @@ from django.utils.translation import ugettext as _
   <script src="/static/js/Source/jHue/jquery.scrollup.js"></script>
   <script src="/static/ext/js/jquery/plugins/jquery.cookie.js"></script>
   <script src="/static/ext/js/jquery/plugins/jquery.total-storage.min.js"></script>
-  <script src="/static/ext/js/jquery/plugins/jquery.simpleplaceholder.js"></script>
+  <script src="/static/ext/js/jquery/plugins/jquery.placeholder.min.js"></script>
   <script src="/static/ext/js/jquery/plugins/jquery.dataTables.1.8.2.min.js"></script>
   <script src="/static/js/Source/jHue/jquery.datatables.sorting.js"></script>
   <script src="/static/ext/js/bootstrap.min.js"></script>
@@ -123,7 +119,7 @@ from django.utils.translation import ugettext as _
 
   <script type="text/javascript" charset="utf-8">
     $(document).ready(function(){
-      $("input:text[placeholder]").simplePlaceholder();
+      $("input, textarea").placeholder();
       $(".submitter").keydown(function(e){
         if (e.keyCode==13){
           $(this).closest("form").submit();

@@ -147,7 +147,6 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 
 <script src="/static/ext/js/knockout-2.1.0.js" type="text/javascript" charset="utf-8"></script>
 <script src="/search/static/js/search.ko.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/jquery/plugins/jquery-ui-draggable-droppable-sortable-1.8.23.min.js"></script>
 
 <script type="text/javascript">
 
@@ -168,18 +167,6 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 
     var orderedCores;
     serializeList();
-    /**
-    $("#collections").sortable({
-      placeholder: "placeholder",
-      update: function (event, ui) {
-        serializeList();
-        ##TODO: serialize via ajax the order of collections
-        ## the array is: orderedCores
-        ## console.log(orderedCores)
-      }
-    });
-    $("#collections").disableSelection();
-    */
 
     function serializeList() {
       orderedCores = [];
