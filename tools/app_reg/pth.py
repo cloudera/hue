@@ -44,7 +44,7 @@ def _get_pth_filename():
   Location can be defined via HUE_PTH_DIR environment variable.
   May raise SystemError if the virtual env is absent.
   """
-  pth_dir = os.environ.get('HUE_PTH_DIR', None)
+  pth_dir = common.HUE_PTH_DIR
   if pth_dir:
     return os.path.join(pth_dir, PTH_FILE)
   else:

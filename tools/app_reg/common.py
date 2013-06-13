@@ -27,6 +27,12 @@ INSTALL_ROOT = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', '.
 # The apps location
 APPS_ROOT = os.path.join(INSTALL_ROOT, 'apps')
 
+# Directory holding app.reg
+HUE_APP_REG_DIR = os.environ.get("HUE_APP_REG_DIR", INSTALL_ROOT) 
+
+# Directory holding hue.pth
+HUE_PTH_DIR = os.environ.get('HUE_PTH_DIR', None)
+
 # The Hue config directory
 HUE_CONF_DIR = os.path.join(INSTALL_ROOT, 'desktop', 'conf')
 
