@@ -1247,7 +1247,7 @@ from django.utils.translation import ugettext as _
           onComplete:function (id, fileName, response) {
             num_of_pending_uploads--;
             if (response.status != 0) {
-              $.jHueNotify.error("${ _('Error: ') }" + (response['data'] ? response['data'] : "${ _('Check file permissions') }"));
+              $.jHueNotify.error("${ _('Error: ') }" + response['data']);
             } else if (num_of_pending_uploads == 0) {
               window.location = "/filebrowser/view" + self.currentPath();
             }

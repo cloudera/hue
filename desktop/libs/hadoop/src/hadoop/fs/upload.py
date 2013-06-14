@@ -126,6 +126,7 @@ class HDFSfileUploadHandler(FileUploadHandler):
     self._starttime = 0
     self._activated = False
     self._destination = request.GET.get('dest', None)
+    self.request = request
     # Need to directly modify FileUploadHandler.chunk_size
     FileUploadHandler.chunk_size = UPLOAD_CHUNK_SIZE.get()
 
@@ -139,13 +140,13 @@ class HDFSfileUploadHandler(FileUploadHandler):
         self._starttime = time.time()
       except Exception, ex:
         LOG.error("Not using HDFS upload handler: %s" % (ex,))
-        raise ex
+        self.request.META['upload_failed'] = ex
 
       raise StopFutureHandlers()
 
   def receive_data_chunk(self, raw_data, start):
     if not self._activated:
-      return raw_data
+      raise StopUpload()
 
     try:
       self._file.write(raw_data)

@@ -40,10 +40,13 @@ from datetime import datetime
 from django.contrib import messages
 from django.contrib.auth.models import User, Group
 from django.core import urlresolvers
+from django.core.urlresolvers import reverse
 from django.template.defaultfilters import stringformat, filesizeformat
 from django.http import Http404, HttpResponse, HttpResponseNotModified
 from django.views.decorators.http import require_http_methods
 from django.views.static import was_modified_since
+from django.shortcuts import redirect
+from django.template.defaultfilters import urlencode
 from django.utils.functional import curry
 from django.utils.http import http_date, urlquote
 from django.utils.html import escape
@@ -80,6 +83,10 @@ BYTES_PER_SENTENCE = 2
 
 # The maximum size the file editor will allow you to edit
 MAX_FILEEDITOR_SIZE = 256 * 1024
+
+INLINE_DISPLAY_MIMETYPE = re.compile('video/|image/|audio/|application/pdf|application/msword|application/excel|'
+                                     'application/vnd\.ms|'
+                                     'application/vnd\.openxmlformats')
 
 logger = logging.getLogger(__name__)
 
@@ -138,12 +145,12 @@ def view(request, path):
     if 'default_to_home' in request.GET:
         home_dir_path = request.user.get_home_directory()
         if request.fs.isdir(home_dir_path):
-            return format_preserving_redirect(request, urlresolvers.reverse(view, kwargs=dict(path=home_dir_path)))
+            return format_preserving_redirect(request, reverse(view, kwargs=dict(path=home_dir_path)))
 
     # default_to_home is set in bootstrap.js
     if 'default_to_trash' in request.GET:
         if request.fs.isdir(request.fs.trash_path):
-            return format_preserving_redirect(request, urlresolvers.reverse(view, kwargs=dict(path=request.fs.trash_path)))
+            return format_preserving_redirect(request, reverse(view, kwargs=dict(path=request.fs.trash_path)))
 
     try:
         stats = request.fs.stats(path)
@@ -249,7 +256,7 @@ def save_file(request):
                          form.cleaned_data['encoding'])
 
     messages.info(request, _('Saved %(path)s.') % {'path': os.path.basename(path)})
-    request.path = urlresolvers.reverse("filebrowser.views.edit", kwargs=dict(path=path))
+    request.path = reverse("filebrowser.views.edit", kwargs=dict(path=path))
     return edit(request, path, form)
 
 
@@ -566,6 +573,12 @@ def display(request, path):
     """
     if not request.fs.isfile(path):
         raise PopupException(_("Not a file: '%(path)s'") % {'path': path})
+
+    mimetype = mimetypes.guess_type(path)[0]
+
+    if mimetype is not None and INLINE_DISPLAY_MIMETYPE.search(mimetype):
+      path_enc = urlencode(path)
+      return redirect(reverse('filebrowser.views.download', args=[path_enc]) + '?disposition=inline')
 
     stats = request.fs.stats(path)
     encoding = request.GET.get('encoding') or i18n.get_site_encoding()
@@ -1158,6 +1171,9 @@ def _upload_file(request):
     """
     form = UploadFileForm(request.POST, request.FILES)
 
+    if request.META.get('upload_failed'):
+      raise PopupException(request.META.get('upload_failed'))
+
     if form.is_valid():
         uploaded_file = request.FILES['hdfs_file']
         dest = form.cleaned_data['dest']
@@ -1303,7 +1319,7 @@ def location_to_url(location, strict=True):
     if strict and not split_path[1]:
       # No netloc, not full url
       return None
-    return urlresolvers.reverse("filebrowser.views.view", kwargs=dict(path=split_path[2]))
+    return reverse("filebrowser.views.view", kwargs=dict(path=split_path[2]))
 
 def truncate(toTruncate, charsToKeep=50):
     """
