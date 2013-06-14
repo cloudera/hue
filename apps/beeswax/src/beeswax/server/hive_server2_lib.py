@@ -357,15 +357,16 @@ class HiveServerClient:
 
 
   def execute_query(self, query, max_rows=100):
-    return self.execute_query_statement(statement=query.query['query'], max_rows=max_rows)
+    configuration = self._get_query_configuration(query)
+    return self.execute_query_statement(statement=query.query['query'], max_rows=max_rows, configuration=configuration)
 
 
-  def execute_query_statement(self, statement, max_rows=100):
+  def execute_query_statement(self, statement, max_rows=100, configuration={}):
     # Only execute_async_query() supports configuration
     if self.query_server['server_name'] == 'beeswax':
       self.execute_statement(statement='SET hive.server2.blocking.query=true')
 
-    results, schema = self.execute_statement(statement=statement, max_rows=max_rows)
+    results, schema = self.execute_statement(statement=statement, max_rows=max_rows, configuration=configuration)
     return HiveServerDataTable(results, schema)
 
 
@@ -375,28 +376,26 @@ class HiveServerClient:
     if statement == 0:
       if self.query_server['server_name'] == 'beeswax':
         self.execute_statement(statement='SET hive.server2.blocking.query=true')
-      for resource in query.get_configuration():
-        self.execute_statement(resource.strip())
+        for resource in query.get_configuration():
+          self.execute_statement(resource.strip())
 
     if self.query_server['server_name'] == 'beeswax':
       self.execute_statement(statement='SET hive.server2.blocking.query=false')
 
-    confOverlay = {}
-    confOverlay.update(dict([(setting['key'], setting['value']) for setting in query.settings]))
+    configuration = self._get_query_configuration(query)
 
     query_statement =  query.get_query_statement(statement)
-    return self.execute_async_statement(statement=query_statement, confOverlay=confOverlay)
+    return self.execute_async_statement(statement=query_statement, confOverlay=configuration)
 
 
-  def execute_statement(self, statement, max_rows=100):
-    req = TExecuteStatementReq(statement=statement, confOverlay={})
+  def execute_statement(self, statement, max_rows=100, configuration={}):
+    req = TExecuteStatementReq(statement=statement, confOverlay=configuration)
     res = self.call(self._client.ExecuteStatement, req)
 
     return self.fetch_result(res.operationHandle, max_rows=max_rows)
 
 
   def execute_async_statement(self, statement, confOverlay):
-    # confOverlay is not used by Hive Server 2
     req = TExecuteStatementReq(statement=statement, confOverlay=confOverlay)
     res = self.call(self._client.ExecuteStatement, req)
 
@@ -463,6 +462,10 @@ class HiveServerClient:
 
     partitionTable = self.execute_query_statement('SHOW PARTITIONS %s' % table_name) # DB prefix not supported
     return [PartitionValueCompatible(partition, table) for partition in partitionTable.rows()][-max_parts:]
+
+
+  def _get_query_configuration(self, query):
+    return dict([(setting['key'], setting['value']) for setting in query.settings])
 
 
 class HiveServerTableCompatible(HiveServerTable):
