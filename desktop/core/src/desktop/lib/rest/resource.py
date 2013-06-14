@@ -45,28 +45,18 @@ class Resource(object):
       return self._path
     return self._path + posixpath.normpath('/' + relpath)
 
-  def invoke(self, method, relpath=None, params=None, data=None, headers=None):
-    """
-    Invoke an API method.
-    @return: Raw body or JSON dictionary (if response content type is JSON).
-    """
-    path = self._join_uri(relpath)
-    resp = self._client.execute(method,
-                                path,
-                                params=params,
-                                data=data,
-                                headers=headers)
+  def _get_body(self, resp):
     try:
       body = resp.read()
     except Exception, ex:
       raise Exception("Command '%s %s' failed: %s" %
                       (method, path, ex))
+    return body
 
-    self._client.logger.debug(
-        "%s Got response: %s%s" %
-        (method, body[:32], len(body) > 32 and "..." or ""))
-
-    # Is the response application/json?
+  def _format_body(self, resp, body):
+    """
+    Decide whether the body should be a json dict or string
+    """
     if len(body) != 0 and \
           resp.info().getmaintype() == "application" and \
           resp.info().getsubtype() == "json":
@@ -78,6 +68,25 @@ class Resource(object):
         raise ex
     else:
       return body
+
+  def invoke(self, method, relpath=None, params=None, data=None, headers=None):
+    """
+    Invoke an API method.
+    @return: Raw body or JSON dictionary (if response content type is JSON).
+    """
+    path = self._join_uri(relpath)
+    resp = self._client.execute(method,
+                                path,
+                                params=params,
+                                data=data,
+                                headers=headers)
+    body = self._get_body(resp)
+
+    self._client.logger.debug(
+        "%s Got response: %s%s" %
+        (method, body[:32], len(body) > 32 and "..." or ""))
+
+    return self._format_body(resp, body)
 
 
   def get(self, relpath=None, params=None, headers=None):

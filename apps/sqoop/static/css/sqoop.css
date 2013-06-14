@@ -1,0 +1,20 @@
+.row-selectable tr {
+  cursor: pointer;
+}
+
+ul.major-list {
+  margin: 0px;
+  padding: 0px;
+}
+
+ul.major-list li {
+  cursor: pointer;
+  list-style: none;
+  margin: 3px;
+  padding: 5px;
+}
+
+ul.major-list h4 {
+  margin: 5px 0px;
+  padding: 0px;
+}
