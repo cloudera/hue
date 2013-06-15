@@ -41,11 +41,8 @@ class Application:
     self.is_mr2 = True
     jobid = self.id
     if self.state in ('FINISHED', 'FAILED', 'KILLED'):
-      # When a job is finished
-      jobid = jobid.replace('application', 'job')
       setattr(self, 'status', self.finalStatus)
     else:
-      jobid = jobid.replace('job', 'application')
       setattr(self, 'status', self.state)
     setattr(self, 'jobId', jobid)
     setattr(self, 'jobId_short', re.sub('(application|job)_', '', self.jobId))
@@ -82,13 +79,7 @@ class Job:
   def _fixup(self):
     jobid = self.id
 
-    if self.state in ('SUCCEEDED', 'FAILED', 'KILL_WAIT', 'KILLED', 'ERROR'):
-      setattr(self, 'status', self.state)
-      # When a job is finished, just use 'job' instead of 'application'
-      jobid = jobid.replace('application', 'job')
-    else:
-      jobid = jobid.replace('job', 'application')
-      setattr(self, 'status', self.state)
+    setattr(self, 'status', self.state)
     setattr(self, 'jobId', jobid)
     setattr(self, 'jobId_short', self.jobId.replace('job_', ''))
     setattr(self, 'is_retired', True)
@@ -192,7 +183,7 @@ class Attempt:
   def _fixup(self):
     setattr(self, 'attemptId', self.id)
     setattr(self, 'attemptId_short', self.id)
-    setattr(self, 'taskTrackerId', self.assignedContainerId)
+    setattr(self, 'taskTrackerId', getattr(self, 'assignedContainerId', None))
     setattr(self, 'startTimeFormatted', self.startTime)
     setattr(self, 'finishTimeFormatted', self.finishTime)
     setattr(self, 'outputSize', None)

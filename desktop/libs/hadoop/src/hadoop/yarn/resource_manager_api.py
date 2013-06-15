@@ -67,3 +67,6 @@ class ResourceManagerApi(object):
 
   def apps(self, **kwargs):
     return self._root.get('cluster/apps', params=kwargs, headers={'Accept': _JSON_CONTENT_TYPE})
+
+  def app(self, app_id):
+    return self._root.get('cluster/apps/%(app_id)s' % {'app_id': app_id}, headers={'Accept': _JSON_CONTENT_TYPE})

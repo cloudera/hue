@@ -1006,19 +1006,18 @@ def test_upload_file():
     assert_equal(actual, expected)
 
     # Upload again and so fails because file already exits
-    resp = client.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR,
+    resp = client.post('/filebrowser/upload/file',
                        dict(dest=HDFS_DEST_DIR, hdfs_file=file(LOCAL_FILE)))
     response = json.loads(resp.content)
     assert_equal(-1, response['status'], response)
     assert_true('already exists' in response['data'], response)
 
-    # Upload in tmp and fails because of missing permissions
-    try:
-      resp = client_not_me.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR,
-                                dict(dest=HDFS_DEST_DIR, hdfs_file=file(LOCAL_FILE)))
-      raise Exception('Should have sent a permissions exception!')
-    except Exception, e:
-      assert_true('Permission denied' in str(e), e)
+    # Upload in / and fails because of missing permissions
+    resp = client_not_me.post('/filebrowser/upload/file',
+                              dict(dest='/', hdfs_file=file(LOCAL_FILE)))
+    response = json.loads(resp.content)
+    assert_equal(-1, response['status'], response)
+    assert_true('Permission denied' in response['data'], response)
   finally:
     try:
       cluster.fs.remove(HDFS_DEST_DIR)

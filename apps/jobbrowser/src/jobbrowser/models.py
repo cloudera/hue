@@ -525,8 +525,7 @@ class Cluster(object):
     self.blacklistedTrackerNames = self.status.blacklistedTrackerNames
     self.hostname = self.status.hostname
     self.httpPort = self.status.httpPort
-    # self.currentTimeMs = curtime
-    # self.currentTimeFormatted = format_unixtime_ms(curtime)
+
 
 def get_jobconf(jt, jobid):
   """

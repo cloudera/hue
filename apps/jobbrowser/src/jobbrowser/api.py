@@ -31,6 +31,7 @@ from jobbrowser.conf import SHARE_JOBS
 from jobbrowser.models import Job, JobLinkage, TaskList, Tracker
 from jobbrowser.yarn_models import Application, Job as YarnJob, Container
 from hadoop.cluster import get_next_ha_mrcluster
+from desktop.lib.exceptions_renderable import PopupException
 
 
 LOG = logging.getLogger(__name__)
@@ -229,18 +230,23 @@ class YarnApi(JobBrowserApi):
                   job.user == user.username, jobs)
 
   def get_job(self, jobid):
-    """
-    Try first as if it was a running job, then as a finished job.
-    """
     try:
-      if jobid.startswith('application'):
-        json = self.mapreduce_api.job(self.user, jobid.replace('application', 'job'))
-        return YarnJob(self.mapreduce_api, json['job'])
+      # App id
+      jobid = jobid.replace('job', 'application')
+      job = self.resource_manager_api.app(jobid)['app']
+
+      # MR id
+      jobid = jobid.replace('application', 'job')
+      if job['state'] in ('NEW', 'SUBMITTED', 'ACCEPTED', 'RUNNING'):
+        json = self.mapreduce_api.job(self.user, jobid)
+        job = YarnJob(self.mapreduce_api, json['job'])
+      else:
+        json = self.history_server_api.job(self.user, jobid)
+        job = YarnJob(self.history_server_api, json['job'])
     except Exception, e:
-      LOG.info('Job %s not running: %s' % (jobid, e))
-    jobid = jobid.replace('application', 'job')
-    json = self.history_server_api.job(self.user, jobid)
-    return YarnJob(self.history_server_api, json['job'])
+      raise PopupException('Job %s could not be found: %s' % (jobid, e), detail=e)
+
+    return job
 
   def get_tasks(self, jobid, **filters):
     filters.pop('pagenum')

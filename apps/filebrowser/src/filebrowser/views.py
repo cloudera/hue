@@ -1170,6 +1170,7 @@ def _upload_file(request):
     We just need to rename it to the destination path.
     """
     form = UploadFileForm(request.POST, request.FILES)
+    response = {'status': -1, 'data': ''}
 
     if request.META.get('upload_failed'):
       raise PopupException(request.META.get('upload_failed'))
@@ -1188,6 +1189,7 @@ def _upload_file(request):
         try:
             # Remove tmp suffix of the file
             request.fs.do_as_user(username, request.fs.rename, tmp_file, dest)
+            response['status'] = 0
         except IOError, ex:
             already_exists = False
             try:
@@ -1200,12 +1202,13 @@ def _upload_file(request):
                 msg = _('Copy to %(name)s failed: %(error)s') % {'name': dest, 'error': ex}
             raise PopupException(msg)
 
-        return {
-          'status': 0,
+        response.update({
           'path': dest,
           'result': _massage_stats(request, request.fs.stats(dest)),
           'next': request.GET.get("next")
-          }
+        })
+
+        return response
     else:
         raise PopupException(_("Error in upload form: %s") % (form.errors,))
 
@@ -1248,6 +1251,7 @@ def _upload_archive(request):
     We need to extract it and rename it.
     """
     form = UploadArchiveForm(request.POST, request.FILES)
+    response = {'status': -1, 'data': ''}
 
     if form.is_valid():
         uploaded_file = request.FILES['archive']
@@ -1268,6 +1272,7 @@ def _upload_archive(request):
                 dest = dest[:-4]
                 request.fs.copyFromLocal(temp_path, dest)
                 shutil.rmtree(temp_path)
+                response['status'] = 0
             else:
                 raise PopupException(_('Could not interpret archive type.'))
 
@@ -1283,12 +1288,13 @@ def _upload_archive(request):
                 msg = _('Copy to %(name)s failed: %(error)s') % {'name': dest, 'error': ex}
             raise PopupException(msg)
 
-        return {
-          'status': 0,
+        response.update({
           'path': dest,
           'result': _massage_stats(request, request.fs.stats(dest)),
           'next': request.GET.get("next")
-          }
+        })
+
+        return response
     else:
         raise PopupException(_("Error in upload form: %s") % (form.errors,))
 
