@@ -45,8 +45,8 @@ class OozieApi:
   """
   WORKFLOW_NAME = 'pig-app-hue-script'
   RE_LOG_END = re.compile('(<<< Invocation of Pig command completed <<<|<<< Invocation of Main class completed <<<)')
-  RE_LOG_START_RUNNING = re.compile('>>> Invoking Pig command line now >>>\n\n\nRun pig script using PigRunner.run\(\) for Pig version [^\n]+?\n(.+?)(<<< Invocation of Pig command completed <<<|<<< Invocation of Main class completed)', re.M | re.DOTALL)
-  RE_LOG_START_FINISHED = re.compile('(>>> Invoking Pig command line now >>>\n\n\nRun pig script using PigRunner.run\(\) for Pig version [^\n]+?)\n', re.M | re.DOTALL)
+  RE_LOG_START_RUNNING = re.compile('>>> Invoking Pig command line now >>>(.+?)(<<< Invocation of Pig command completed <<<|<<< Invocation of Main class completed)', re.M | re.DOTALL)
+  RE_LOG_START_FINISHED = re.compile('(>>> Invoking Pig command line now >>>)', re.M | re.DOTALL)
   MAX_DASHBOARD_JOBS = 100
 
   def __init__(self, fs, user):
@@ -121,9 +121,9 @@ class OozieApi:
     for action in oozie_workflow.get_working_actions():
       try:
         if action.externalId:
-          log = job_single_logs(request, **{'job': action.externalId})
-          if log:
-            logs[action.name] = self._match_logs(log['logs'][1])
+          data = job_single_logs(request, **{'job': action.externalId})
+          if data:
+            logs[action.name] = self._match_logs(data)
       except Exception, e:
         LOG.error('An error happen while watching the demo running: %(error)s' % {'error': e})
 
@@ -144,14 +144,16 @@ class OozieApi:
 
     return logs, workflow_actions
 
-  def _match_logs(self, logs):
+  def _match_logs(self, data):
     """Difficult to match multi lines of text"""
+    logs = data['logs'][1]
+
     if OozieApi.RE_LOG_END.search(logs):
-      return re.search(OozieApi.RE_LOG_START_RUNNING, logs).group(1)
+      return re.search(OozieApi.RE_LOG_START_RUNNING, logs).group(1).strip()
     else:
       group = re.search(OozieApi.RE_LOG_START_FINISHED, logs)
       i = logs.index(group.group(1)) + len(group.group(1))
-      return logs[i:]
+      return logs[i:].strip()
 
   def massaged_jobs_for_json(self, request, oozie_jobs, hue_jobs):
     jobs = []

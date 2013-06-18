@@ -478,7 +478,7 @@ class TestMapReduce2:
 
   def test_running_job(self):
     response = self.c.get('/jobbrowser/jobs/application_1356251510842_0054')
-    assert_equal(response.context['job'].jobId, 'application_1356251510842_0054')
+    assert_equal(response.context['job'].jobId, 'job_1356251510842_0054')
 
     response = self.c.get('/jobbrowser/jobs/job_1356251510842_0054')
     assert_false('job' in response.context)
@@ -492,26 +492,36 @@ class TestMapReduce2:
 
 
 class MockResourceManagerApi:
+  APPS = {
+    'application_1356251510842_0054': {u'finishedTime': 1356961070119, u'name': u'oozie:launcher:T=map-reduce:W=MapReduce-copy:A=Sleep:ID=0000004-121223003201296-oozie-oozi-W',
+    u'amContainerLogs': u'http://runreal:8042/node/containerlogs/container_1356251510842_0054_01_000001/romain', u'clusterId': 1356251510842,
+    u'trackingUrl': u'http://localhost:8088/proxy/application_1356251510842_0054/jobhistory/job/job_1356251510842_0054', u'amHostHttpAddress': u'runreal:8042',
+    u'startedTime': 1356961057225, u'queue': u'default', u'state': u'RUNNING', u'elapsedTime': 12894, u'finalStatus': u'UNDEFINED', u'diagnostics': u'',
+    u'progress': 100.0, u'trackingUI': u'History', u'id': u'application_1356251510842_0054', u'user': u'romain'},
+  'application_1356251510842_0009': {u'finishedTime': 1356467118570, u'name': u'oozie:action:T=map-reduce:W=MapReduce-copy2:A=Sleep:ID=0000002-121223003201296-oozie-oozi-W',
+    u'amContainerLogs': u'http://runreal:8042/node/containerlogs/container_1356251510842_0009_01_000001/romain', u'clusterId': 1356251510842,
+    u'trackingUrl': u'http://localhost:8088/proxy/application_1356251510842_0009/jobhistory/job/job_1356251510842_0009', u'amHostHttpAddress': u'runreal:8042',
+    u'startedTime': 1356467081121, u'queue': u'default', u'state': u'FINISHED', u'elapsedTime': 37449, u'finalStatus': u'SUCCEEDED', u'diagnostics': u'',
+    u'progress': 100.0, u'trackingUI': u'History', u'id': u'application_1356251510842_0009', u'user': u'romain'}
+  }
 
   def __init__(self, oozie_url=None): pass
 
   def apps(self, **kwargs):
     return {
-      u'apps':
-        {u'app': [
-           # RUNNING application_1356251510842_0054
-           {u'finishedTime': 1356961070119, u'name': u'oozie:launcher:T=map-reduce:W=MapReduce-copy:A=Sleep:ID=0000004-121223003201296-oozie-oozi-W',
-            u'amContainerLogs': u'http://runreal:8042/node/containerlogs/container_1356251510842_0054_01_000001/romain', u'clusterId': 1356251510842,
-            u'trackingUrl': u'http://localhost:8088/proxy/application_1356251510842_0054/jobhistory/job/job_1356251510842_0054', u'amHostHttpAddress': u'runreal:8042',
-            u'startedTime': 1356961057225, u'queue': u'default', u'state': u'RUNNING', u'elapsedTime': 12894, u'finalStatus': u'UNDEFINED', u'diagnostics': u'',
-            u'progress': 100.0, u'trackingUI': u'History', u'id': u'application_1356251510842_0054', u'user': u'romain'},
-           # FINISHED application_1356251510842_0009
-           {u'finishedTime': 1356467118570, u'name': u'oozie:action:T=map-reduce:W=MapReduce-copy2:A=Sleep:ID=0000002-121223003201296-oozie-oozi-W',
-            u'amContainerLogs': u'http://runreal:8042/node/containerlogs/container_1356251510842_0009_01_000001/romain', u'clusterId': 1356251510842,
-            u'trackingUrl': u'http://localhost:8088/proxy/application_1356251510842_0009/jobhistory/job/job_1356251510842_0009', u'amHostHttpAddress': u'runreal:8042',
-            u'startedTime': 1356467081121, u'queue': u'default', u'state': u'FINISHED', u'elapsedTime': 37449, u'finalStatus': u'SUCCEEDED', u'diagnostics': u'',
-            u'progress': 100.0, u'trackingUI': u'History', u'id': u'application_1356251510842_0009', u'user': u'romain'}]
+     'apps': {
+       'app': [
+         # RUNNING
+         MockResourceManagerApi.APPS['application_1356251510842_0054'],
+         # FINISHED
+         MockResourceManagerApi.APPS['application_1356251510842_0009'],
+        ]
       }
+    }
+
+  def app(self, job_id):
+    return {
+      u'app': MockResourceManagerApi.APPS[job_id]
     }
 
 

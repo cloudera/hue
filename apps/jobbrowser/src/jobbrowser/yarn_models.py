@@ -202,9 +202,10 @@ class Attempt:
 
   def get_task_log(self, offset=0):
     logs = []
-
     attempt = self.task.job.job_attempts['jobAttempt'][0]
     log_link = attempt['logsLink']
+    # Get MR task logs
+    log_link = log_link.replace(attempt['containerId'], self.assignedContainerId)
 
     for name in ('stdout', 'stderr', 'syslog'):
       link = '/%s/' % name

@@ -168,10 +168,9 @@ def job_attempt_logs_json(request, job, attempt_index=0, name='syslog', offset=0
 
 @check_job_permission
 def job_single_logs(request, job):
-
-  if job.is_mr2:
-    return job_attempt_logs(request, job=job.jobId)
-
+  """
+  Try to smartly detect the most useful task attempt (e.g. Oozie launcher, failed task) and get its MR logs.
+  """
   def cmp_exec_time(task1, task2):
     return cmp(task1.execStartTimeMs, task2.execStartTimeMs)
 
@@ -350,7 +349,10 @@ def trackers(request):
 def single_tracker(request, trackerid):
   jt = get_api(request.user, request.jt)
 
-  tracker = jt.get_tracker(trackerid)
+  try:
+    tracker = jt.get_tracker(trackerid)
+  except Exception, e:
+    raise PopupException(_('The container disappears as soon as the job finishes.'), detail=e)
   return render("tasktracker.mako", request, {'tracker':tracker})
 
 def clusterstatus(request):
