@@ -235,8 +235,8 @@ def config_validator(user):
   """
   from hadoop.fs import webhdfs
   from hadoop import job_tracker
-  res = [ ]
-  submit_to = [ ]
+  res = []
+  submit_to = []
 
   # HDFS_CLUSTERS
   has_default = False
@@ -270,12 +270,7 @@ def config_validator(user):
     if cluster.SUBMIT_TO.get():
       submit_to.append('yarn_clusters.' + name)
 
-  # Only one cluster should have submit_to
-  if len(submit_to) > 1:
-    res.append(("hadoop", "Only one cluster may enable 'submit_to'. "
-                "But it is enabled in the following clusters: " + 
-                ', '.join(submit_to)))
-  elif len(submit_to) == 0:
+  if not submit_to:
     res.append(("hadoop", "Please designate one of the MapReduce or "
                 "Yarn clusters with `submit_to=true' in order to run jobs."))
 

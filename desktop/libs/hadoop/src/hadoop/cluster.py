@@ -25,6 +25,12 @@ import logging
 
 LOG = logging.getLogger(__name__)
 
+
+FS_CACHE = None
+MR_CACHE = None
+MR_NAME_CACHE = 'default'
+
+
 def _make_filesystem(identifier):
   choice = os.getenv("FB_FS")
   if choice == "testing":
@@ -48,7 +54,6 @@ def _make_mrcluster(identifier):
   cluster_conf = conf.MR_CLUSTERS[identifier]
   return LiveJobTracker.from_conf(cluster_conf)
 
-FS_CACHE = None
 def get_hdfs(identifier="default"):
   global FS_CACHE
   get_all_hdfs()
@@ -64,12 +69,16 @@ def get_all_hdfs():
     FS_CACHE[identifier] = _make_filesystem(identifier)
   return FS_CACHE
 
-MR_CACHE = None
-
 def get_default_mrcluster():
+  """
+  Get the default JT (not necessarily HA).
+  """
   global MR_CACHE
+  global MR_NAME_CACHE
+
   try:
-    return get_mrcluster()
+    all_mrclusters()
+    return MR_CACHE.get(MR_NAME_CACHE)
   except KeyError:
     # Return an arbitrary cluster
     candidates = all_mrclusters()
@@ -79,12 +88,13 @@ def get_default_mrcluster():
 
 def get_next_ha_mrcluster():
   """
-  Return the next available JT instance or None
-  
+  Return the next available JT instance and cache its name.
+
   This method currently works for distincting between active/standby JT as a standby JT does not respond.
   A cleaner but more complicated way would be to do something like the MRHAAdmin tool and
   org.apache.hadoop.ha.HAServiceStatus#getServiceStatus().
   """
+  global MR_NAME_CACHE
   candidates = all_mrclusters()
   has_ha = sum([conf.MR_CLUSTERS[name].SUBMIT_TO.get() for name in conf.MR_CLUSTERS.keys()]) >= 2
 
@@ -96,6 +106,7 @@ def get_next_ha_mrcluster():
         try:
           status = jt.cluster_status()
           if status.stateAsString == 'RUNNING':
+            MR_NAME_CACHE = name
             return (config, jt)
           else:
             LOG.info('JobTracker %s is not RUNNING, skipping it: %s' % (name, status))
