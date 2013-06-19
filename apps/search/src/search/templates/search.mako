@@ -63,7 +63,6 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
     </div>
     <div class="input-append">
       ${ search_form | n,unicode }
-      <div class="icon-search" style="position: absolute;top: 7px;left: 11px;background-image: url('http://twitter.github.com/bootstrap/assets/img/glyphicons-halflings.png');"></div>
       <button type="submit" class="btn"><i class="icon-search"></i></button>
     </div>
   </form>

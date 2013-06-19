@@ -45,7 +45,6 @@ class QueryForm(forms.Form):
     else:
       return self._initial_core(self.fields['collection'].choices)
 
-
   def _initial_core(self, choices):
     return choices and choices[0][0] or None
 
