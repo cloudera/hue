@@ -201,7 +201,10 @@ def admin_collection_properties(request, collection_id):
   if request.method == 'POST':
     collection_form = CollectionForm(request.POST, instance=hue_collection)
     if collection_form.is_valid():
-      hue_collection = collection_form.save()
+      searcher = SearchController()
+      hue_collection = collection_form.save(commit=False)
+      hue_collection.is_core_only = not searcher.is_collection(hue_collection.name)
+      hue_collection.save()
       return redirect(reverse('search:admin_collection_properties', kwargs={'collection_id': hue_collection.id}))
     else:
       request.error(_('Errors on the form: %s') % collection_form.errors)

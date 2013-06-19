@@ -119,4 +119,10 @@ class SearchController(object):
     except Exception, e:
       LOG.warn('Error copying collection: %s' % e)
 
-    return id
+  def is_collection(self, collection_name):
+    solr_collections = SolrApi(SOLR_URL.get()).collections()
+    return collection_name in solr_collections
+
+  def is_core(self, core_name):
+    solr_cores = SolrApi(SOLR_URL.get()).cores()
+    return core_name in solr_cores
