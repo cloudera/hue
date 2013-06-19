@@ -971,16 +971,12 @@ def test_upload_file():
 
   try:
     USER_NAME = 'test'
-    USER_NAME_NOT_ME = 'not_me'
     HDFS_DEST_DIR = "/tmp/fb-upload-test"
     LOCAL_FILE = __file__
     HDFS_FILE = HDFS_DEST_DIR + '/' + os.path.basename(__file__)
 
     cluster.fs.setuser(USER_NAME)
     client = make_logged_in_client(USER_NAME)
-
-    client_not_me = make_logged_in_client(username=USER_NAME_NOT_ME, is_superuser=False, groupname='test')
-    grant_access(USER_NAME_NOT_ME, "test", "filebrowser")
 
     cluster.fs.do_as_superuser(cluster.fs.mkdir, HDFS_DEST_DIR)
     cluster.fs.do_as_superuser(cluster.fs.chown, HDFS_DEST_DIR, USER_NAME, USER_NAME)
@@ -1013,8 +1009,8 @@ def test_upload_file():
     assert_true('already exists' in response['data'], response)
 
     # Upload in / and fails because of missing permissions
-    resp = client_not_me.post('/filebrowser/upload/file',
-                              dict(dest='/', hdfs_file=file(LOCAL_FILE)))
+    resp = client.post('/filebrowser/upload/file',
+                       dict(dest='/', hdfs_file=file(LOCAL_FILE)))
     response = json.loads(resp.content)
     assert_equal(-1, response['status'], response)
     assert_true('Permission denied' in response['data'], response)
