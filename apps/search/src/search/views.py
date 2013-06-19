@@ -41,7 +41,7 @@ LOG = logging.getLogger(__name__)
 
 
 def index(request):
-  hue_collections = Collection.objects.all()
+  hue_collections = Collection.objects.filter(enabled=True)
 
   if not hue_collections:
     if request.user.is_superuser:
@@ -58,7 +58,9 @@ def index(request):
   if search_form.is_valid():
     collection_id = search_form.cleaned_data['collection']
     if request.GET.get('collection') is None:
-      collection_id = request.COOKIES.get('hueSearchLastCollection', collection_id)
+      cookie_collection_id = request.COOKIES.get('hueSearchLastCollection', collection_id)
+      if hue_collections.filter(id=cookie_collection_id).exists():
+        collection_id = cookie_collection_id
     solr_query['q'] = search_form.cleaned_data['query']
     solr_query['fq'] = search_form.cleaned_data['fq']
     if search_form.cleaned_data['sort']:
