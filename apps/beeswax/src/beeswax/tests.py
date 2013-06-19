@@ -775,6 +775,12 @@ for x in sys.stdin:
       self.cluster.fs.mkdir(TARGET_DIR_ROOT)
       self.cluster.fs.chown(TARGET_DIR_ROOT, user='test')
 
+    # Already existing dir
+    hql = "SELECT * FROM test"
+    resp = _make_query(self.client, hql, wait=True, local=False, max=180.0)
+    resp = save_and_verify(resp, TARGET_DIR_ROOT, verify=False)
+    assert_true('Directory already exists' in resp.content, resp.content)
+
     # SELECT *. (Result dir is same as table dir.)
     hql = "SELECT * FROM test"
     resp = _make_query(self.client, hql, wait=True, local=False, max=180.0)

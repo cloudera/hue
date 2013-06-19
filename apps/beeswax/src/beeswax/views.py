@@ -706,7 +706,7 @@ def save_results(request, id):
       raise PopupException(msg)
 
     db = dbms.get(request.user, query_history.get_query_server_config())
-    form = beeswax.forms.SaveResultsForm(request.POST, db=db)
+    form = beeswax.forms.SaveResultsForm(request.POST, db=db, fs=request.fs)
 
     if request.POST.get('cancel'):
       return format_preserving_redirect(request, '/%s/watch/%s' % (app_name, id))

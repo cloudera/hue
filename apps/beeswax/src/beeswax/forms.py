@@ -100,6 +100,7 @@ class SaveResultsForm(DependencyAwareForm):
 
   def __init__(self, *args, **kwargs):
     self.db = kwargs.pop('db', None)
+    self.fs = kwargs.pop('fs', None)
     super(SaveResultsForm, self).__init__(*args, **kwargs)
 
   def clean(self):
@@ -115,6 +116,12 @@ class SaveResultsForm(DependencyAwareForm):
           del cleaned_data['target_table']
         except Exception:
           pass
+    elif cleaned_data['save_target'] == SaveResultsForm.SAVE_TYPE_DIR:
+      target_dir = cleaned_data['target_dir']
+      if not target_dir.startswith('/'):
+        self._errors['target_dir'] = self.error_class([_('Directory should start with /')])
+      elif self.fs.exists(target_dir):
+        self._errors['target_dir'] = self.error_class([_('Directory already exists')]) # Overwrite destination directory content
 
     return cleaned_data
 

@@ -113,8 +113,10 @@ ${layout.menubar(section='query')}
           <div id="jumpToColumnAlert" class="alert hide">
             <button type="button" class="close" data-dismiss="alert">&times;</button>
             <strong>${_('Did you know?')}</strong>
-            ${_('If the result contains a large number of columns, click a row to select a column to jump to.') }
-            ${ _('As you type into the field, a drop-down list displays column names that match the string.')}
+            <ul>
+              <li>${ _('If the result contains a large number of columns, click a row to select a column to jump to') }</li>
+              <li>${ _('Save huge results on HDFS and download them with FileBrowser') }</li>
+            </ul>
           </div>
         </div>
 
@@ -226,20 +228,26 @@ ${layout.menubar(section='query')}
       </label>
       ${comps.field(save_form['target_table'], notitle=True, placeholder=_('Table Name'))}
       <br/>
+
       <label class="radio">
         <input id="id_save_target_1" type="radio" name="save_target" value="to HDFS directory">
         &nbsp;${_('In an HDFS directory')}
       </label>
-      ${comps.field(save_form['target_dir'], notitle=True, hidden=True, placeholder=_('Results location'), klass="pathChooser")}
-      <br/>
-      <br/>
+      <span id="hdfs" class="hide">
+        ${comps.field(save_form['target_dir'], notitle=True, hidden=False, placeholder=_('Results location'), klass="pathChooser input-xlarge")}
+        <br/>
+        <br/>
+        <div class="alert alert-warn">
+          ${ _('In text with columns separated by ^A and rows separated by newlines. JSON for non primitive type columns.') }
+        </div>
+      </span>
       <div id="fileChooserModal" class="smallModal well hide">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
       </div>
     </div>
     <div class="modal-footer">
       <div id="fieldRequired" class="hide" style="position: absolute; left: 10;">
-        <span class="label label-important">${_('Sorry, name is required.')}</span>
+        <span class="label label-important">${_('Name or directory required.')}</span>
       </div>
       <a class="btn" data-dismiss="modal">${_('Cancel')}</a>
       <a id="saveBtn" class="btn btn-primary">${_('Save')}</a>
@@ -278,12 +286,12 @@ $(document).ready(function () {
     $("input[name='target_table']").removeClass("fieldError");
     if ($(this).val().indexOf("HDFS") > -1) {
       $("input[name='target_table']").addClass("hide");
-      $("input[name='target_dir']").removeClass("hide");
+      $("#hdfs").removeClass("hide");
       $(".fileChooserBtn").removeClass("hide");
     }
     else {
       $("input[name='target_table']").removeClass("hide");
-      $("input[name='target_dir']").addClass("hide");
+      $("#hdfs").addClass("hide");
       $(".fileChooserBtn").addClass("hide");
     }
   });
