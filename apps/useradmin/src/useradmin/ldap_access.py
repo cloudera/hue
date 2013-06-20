@@ -52,6 +52,7 @@ def get_ldap_username(username, nt_domain):
   else:
     return username
 
+
 class LdapConnection(object):
   """
   Constructor creates LDAP connection. Contains methods
@@ -103,26 +104,22 @@ class LdapConnection(object):
     else:
       return (base_dn, '(' + attr + '=' + name + ')')
 
-  def find_users(self, username_pattern, find_by_dn=False, scope=ldap.SCOPE_SUBTREE):
+  def _transform_find_user_results(self, result_data, user_name_attr):
     """
-    LDAP search helper method finding users. This supports searching for users
-    by distinguished name, or the configured username attribute.
+    :param result_data: List of dictionaries that have ldap attributes and their associated values. Generally the result list from an ldapsearch request.
+    :param user_name_attr: The ldap attribute that is returned by the server to map to ``username`` in the return dictionary.
+    
+    :returns list of dictionaries that take on the following form: {
+      'dn': <distinguished name of entry>,
+      'username': <ldap attribute associated with user_name_attr>
+      'first': <first name>
+      'last': <last name>
+      'email': <email>
+      'groups': <list of DNs of groups that user is a member of>
+    }
     """
-    user_filter = desktop.conf.LDAP.USERS.USER_FILTER.get()
-    if not user_filter.startswith('('):
-      user_filter = '(' + user_filter + ')'
-    user_name_attr = desktop.conf.LDAP.USERS.USER_NAME_ATTR.get()
-
-    # Allow wild cards on non distinguished names
-    sanitized_name = ldap.filter.escape_filter_chars(username_pattern).replace(r'\2a', r'*')
-    search_dn, user_name_filter = self._get_search_params(sanitized_name, user_name_attr, find_by_dn)
-    ldap_filter = '(&' + user_filter + user_name_filter + ')'
-    attrlist = ['isMemberOf', 'memberOf', 'givenName', 'sn', 'mail', 'dn', user_name_attr]
-
-    ldap_result_id = self.ldap_handle.search(search_dn, scope, ldap_filter, attrlist)
-    result_type, result_data = self.ldap_handle.result(ldap_result_id)
     user_info = []
-    if result_data and result_type == ldap.RES_SEARCH_RESULT:
+    if result_data:
       for dn, data in result_data:
         # Skip Active Directory # refldap entries.
         if dn is not None:
@@ -150,30 +147,12 @@ class LdapConnection(object):
             ldap_info['groups'] = data['isMemberOf']
 
           user_info.append(ldap_info)
-
     return user_info
 
-  def find_groups(self, groupname_pattern, find_by_dn=False, scope=ldap.SCOPE_SUBTREE):
-    """
-    LDAP search helper method for finding groups
-    """
-    base_dn = self._get_root_dn()
 
-    group_filter = desktop.conf.LDAP.GROUPS.GROUP_FILTER.get()
-    if not group_filter.startswith('('):
-      group_filter = '(' + group_filter + ')'
-    group_name_attr = desktop.conf.LDAP.GROUPS.GROUP_NAME_ATTR.get()
-
-    # Allow wild cards on non distinguished names
-    sanitized_name = ldap.filter.escape_filter_chars(groupname_pattern).replace(r'\2a', r'*')
-    search_dn, group_name_filter = self._get_search_params(sanitized_name, group_name_attr, find_by_dn)
-    ldap_filter = '(&' + group_filter + group_name_filter + ')'
-
-    ldap_result_id = self.ldap_handle.search(search_dn, scope, ldap_filter)
-    result_type, result_data = self.ldap_handle.result(ldap_result_id)
-
+  def _transform_find_group_results(self, result_data, group_name_attr):
     group_info = []
-    if result_data and result_type == ldap.RES_SEARCH_RESULT:
+    if result_data:
       for dn, data in result_data:
 
         # Skip Active Directory # refldap entries.
@@ -195,9 +174,100 @@ class LdapConnection(object):
           else:
             ldap_info['members'] = []
 
+          if 'posixGroup' in data['objectClass'] and 'memberUid' in data:
+            ldap_info['posix_members'] = data['memberUid']
+          else:
+            ldap_info['posix_members'] = []
+
           group_info.append(ldap_info)
 
     return group_info
+
+  def find_users(self, username_pattern, search_attr=None, user_name_attr=None, find_by_dn=False, scope=ldap.SCOPE_SUBTREE):
+    """
+    LDAP search helper method finding users. This supports searching for users
+    by distinguished name, or the configured username attribute.
+
+    :param username_pattern: The pattern to match ``search_attr`` against. Defaults to ``search_attr`` if none.
+    :param search_attr: The ldap attribute to search for ``username_pattern``. Defaults to LDAP -> USERS -> USER_NAME_ATTR config value.
+    :param user_name_attr: The ldap attribute that is returned by the server to map to ``username`` in the return dictionary.
+    :param find_by_dn: Search by distinguished name.
+    :param scope: ldapsearch scope.
+    
+    :returns: List of dictionaries that take on the following form: {
+      'dn': <distinguished name of entry>,
+      'username': <ldap attribute associated with user_name_attr>
+      'first': <first name>
+      'last': <last name>
+      'email': <email>
+      'groups': <list of DNs of groups that user is a member of>
+    }
+    ``
+    """
+    if not search_attr:
+      search_attr = desktop.conf.LDAP.USERS.USER_NAME_ATTR.get()
+    if not user_name_attr:
+      user_name_attr = search_attr
+
+    user_filter = desktop.conf.LDAP.USERS.USER_FILTER.get()
+    if not user_filter.startswith('('):
+      user_filter = '(' + user_filter + ')'
+
+    # Allow wild cards on non distinguished names
+    sanitized_name = ldap.filter.escape_filter_chars(username_pattern).replace(r'\2a', r'*')
+    search_dn, user_name_filter = self._get_search_params(sanitized_name, search_attr, find_by_dn)
+    ldap_filter = '(&' + user_filter + user_name_filter + ')'
+    attrlist = ['objectClass', 'isMemberOf', 'memberOf', 'givenName', 'sn', 'mail', 'dn', user_name_attr]
+
+    ldap_result_id = self.ldap_handle.search(search_dn, scope, ldap_filter, attrlist)
+    result_type, result_data = self.ldap_handle.result(ldap_result_id)
+
+    if result_type == ldap.RES_SEARCH_RESULT:
+      return self._transform_find_user_results(result_data, user_name_attr)
+    else:
+      return []
+
+  def find_groups(self, groupname_pattern, search_attr=None, group_name_attr=None, find_by_dn=False, scope=ldap.SCOPE_SUBTREE):
+    """
+    LDAP search helper method for finding groups
+
+    :param groupname_pattern: The pattern to match ``search_attr`` against. Defaults to ``search_attr`` if none.
+    :param search_attr: The ldap attribute to search for ``groupname_pattern``. Defaults to LDAP -> GROUPS -> GROUP_NAME_ATTR config value.
+    :param group_name_attr: The ldap attribute that is returned by the server to map to ``name`` in the return dictionary.
+    :param find_by_dn: Search by distinguished name.
+    :param scope: ldapsearch scope.
+    
+    :returns: List of dictionaries that take on the following form: {
+      'dn': <distinguished name of entry>,
+      'name': <ldap attribute associated with group_name_attr>
+      'first': <first name>
+      'last': <last name>
+      'email': <email>
+      'groups': <list of DNs of groups that user is a member of>
+    }
+    """
+    if not search_attr:
+      search_attr = desktop.conf.LDAP.GROUPS.GROUP_NAME_ATTR.get()
+    if not group_name_attr:
+      group_name_attr = search_attr
+
+    group_filter = desktop.conf.LDAP.GROUPS.GROUP_FILTER.get()
+    if not group_filter.startswith('('):
+      group_filter = '(' + group_filter + ')'
+
+    # Allow wild cards on non distinguished names
+    sanitized_name = ldap.filter.escape_filter_chars(groupname_pattern).replace(r'\2a', r'*')
+    search_dn, group_name_filter = self._get_search_params(sanitized_name, search_attr, find_by_dn)
+    ldap_filter = '(&' + group_filter + group_name_filter + ')'
+    attrlist = ['objectClass', 'dn', 'memberUid', desktop.conf.LDAP.GROUPS.GROUP_MEMBER_ATTR.get(), group_name_attr]
+
+    ldap_result_id = self.ldap_handle.search(search_dn, scope, ldap_filter, attrlist)
+    result_type, result_data = self.ldap_handle.result(ldap_result_id)
+
+    if result_type == ldap.RES_SEARCH_RESULT:
+      return self._transform_find_group_results(result_data, group_name_attr)
+    else:
+      return []
 
   def _get_root_dn(self):
     """

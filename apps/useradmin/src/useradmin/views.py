@@ -40,6 +40,7 @@ from django.utils.translation import ugettext as _
 from django.forms.util import ErrorList
 from django.shortcuts import redirect
 
+import desktop.conf
 from hadoop.fs.exceptions import WebHdfsException
 from useradmin.models import HuePermission, UserProfile, LdapGroup
 from useradmin.models import get_profile, get_default_user_group
@@ -463,20 +464,26 @@ def _import_ldap_users(username_pattern, sync_groups=False, import_by_dn=False):
   the distinguished name, rather than the configured username attribute.
   """
   conn = ldap_access.get_connection()
-  user_info = conn.find_users(username_pattern, import_by_dn)
+  user_info = conn.find_users(username_pattern, find_by_dn=import_by_dn)
   if not user_info:
-    LOG.warn(_("Could not get LDAP details for users with pattern %s") % username_pattern)
+    LOG.warn("Could not get LDAP details for users with pattern %s" % username_pattern)
     return None
 
+  return _import_ldap_users_info(user_info, sync_groups, import_by_dn)
+
+
+def _import_ldap_users_info(user_info, sync_groups=False, import_by_dn=False):
+  """
+  Import user_info found through ldap_access.find_users.
+  """
   imported_users = []
   for ldap_info in user_info:
     user, created = User.objects.get_or_create(username=ldap_info['username'])
     profile = get_profile(user)
     if not created and profile.creation_method == str(UserProfile.CreationMethod.HUE):
       # This is a Hue user, and shouldn't be overwritten
-      LOG.warn(_('There was a naming conflict while importing user %(username)s in pattern %(username_pattern)s') % {
-        'username': ldap_info['username'],
-        'username_pattern': username_pattern
+      LOG.warn(_('There was a naming conflict while importing user %(username)s') % {
+        'username': ldap_info['username']
       })
       return None
 
@@ -498,6 +505,7 @@ def _import_ldap_users(username_pattern, sync_groups=False, import_by_dn=False):
 
     # sync groups
     if sync_groups and 'groups' in ldap_info:
+      conn = ldap_access.get_connection()
       old_groups = set(user.groups.all())
       new_groups = set()
       # Skip if 'memberOf' or 'isMemberOf' are not set
@@ -532,10 +540,10 @@ def _import_ldap_groups(groupname_pattern, import_members=False, recursive_impor
     scope = ldap.SCOPE_BASE
   else:
     scope = ldap.SCOPE_SUBTREE
-  group_info = conn.find_groups(groupname_pattern, import_by_dn, scope)
+  group_info = conn.find_groups(groupname_pattern, find_by_dn=import_by_dn, scope=scope)
 
   if not group_info:
-    LOG.warn(_("Could not get LDAP details for group pattern %s") % groupname_pattern)
+    LOG.warn("Could not get LDAP details for group pattern %s" % groupname_pattern)
     return None
 
   groups = []
@@ -552,12 +560,14 @@ def _import_ldap_groups(groupname_pattern, import_members=False, recursive_impor
     LdapGroup.objects.get_or_create(group=group)
     group.user_set.clear()
 
-    # Find members for group and subgoups
+    # Find members and posix members for group and subgoups
     members = ldap_info['members']
+    posix_members = ldap_info['posix_members']
     if recursive_import_members:
-      sub_group_info = conn.find_groups(ldap_info['dn'], True)
+      sub_group_info = conn.find_groups(ldap_info['dn'], find_by_dn=True)
       for sub_ldap_info in sub_group_info:
         members.extend(sub_ldap_info['members'])
+        posix_members.extend(sub_ldap_info['posix_members'])
 
     # Import/fetch users
     for member in members:
@@ -575,18 +585,41 @@ def _import_ldap_groups(groupname_pattern, import_members=False, recursive_impor
           for ldap_info in user_info:
             try:
               user = User.objects.get(username=ldap_info['username'])
+              users.append(user)
             except User.DoesNotExist:
-              continue
-            users.append(user)
+              pass
 
-      if not users:
-        # There was a naming conflict, or for some other reason, we couldn't get
-        # at the user
-        continue
+      if users:
+        LOG.debug("Adding member %s represented as users (should be a single user) %s to group %s" % (str(member), str(users), str(group.name)))
+        group.user_set.add(*users)
 
-      LOG.debug("Adding member %s represented as users (should be a single user) %s to group %s" % (str(member), str(users), str(group.name)))
-      for user in users:
-        group.user_set.add(user)
+
+    # Import/fetch posix users
+    for posix_member in posix_members:
+      users = []
+
+      if import_members:
+        LOG.debug("Importing user %s" % str(posix_member))
+        # posixGroup class defines 'memberUid' to be login names,
+        # which are defined by 'uid'.
+        user_info = conn.find_users(posix_member, search_attr='uid', user_name_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), find_by_dn=False)
+        users = _import_ldap_users_info(user_info, import_by_dn=False)
+
+      elif sync_users:
+        user_info = conn.find_users(posix_member, search_attr='uid', user_name_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), find_by_dn=False)
+        if len(user_info) > 1:
+          LOG.warn('Found multiple users for member %s.' % member)
+        else:
+          for ldap_info in user_info:
+            try:
+              user = User.objects.get(username=ldap_info['username'])
+              users.append(user)
+            except User.DoesNotExist:
+              pass
+
+      if users:
+        LOG.debug("Adding member %s represented as users (should be a single user) %s to group %s" % (str(posix_member), str(users), str(group.name)))
+        group.user_set.add(*users)
 
     group.save()
     groups.append(group)

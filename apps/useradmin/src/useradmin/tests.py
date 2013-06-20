@@ -62,6 +62,8 @@ class LdapTestConnection(object):
   Test class which mimics the behaviour of LdapConnection (from ldap_access.py).
   It also includes functionality to fake modifications to an LDAP server.  It is designed
   as a singleton, to allow for changes to persist across discrete connections.
+
+  This class assumes uid is the user_name_attr.
   """
   def __init__(self):
     self._instance = LdapTestConnection.Data()
@@ -72,17 +74,23 @@ class LdapTestConnection(object):
   def remove_user_group_for_test(self, user, group):
     self._instance.groups[group]['members'].remove(user)
 
-  def find_users(self, username_pattern, find_by_dn=False, scope=ldap.SCOPE_SUBTREE):
+  def add_posix_user_group_for_test(self, user, group):
+    self._instance.groups[group]['posix_members'].append(user)
+
+  def remove_posix_user_group_for_test(self, user, group):
+    self._instance.groups[group]['posix_members'].remove(user)
+
+  def find_users(self, username_pattern, search_attr=None, user_name_attr=None, find_by_dn=False, scope=ldap.SCOPE_SUBTREE):
     """ Returns info for a particular user """
     if find_by_dn:
       data = filter(lambda attrs: attrs['dn'] == username_pattern, self._instance.users.values())
     else:
-      username_pattern = username_pattern.replace('.','\\.').replace('*', '.*')
+      username_pattern = "^%s$" % username_pattern.replace('.','\\.').replace('*', '.*')
       usernames = filter(lambda username: re.match(username_pattern, username), self._instance.users.keys())
       data = [self._instance.users.get(username) for username in usernames]
     return data
 
-  def find_groups(self, groupname_pattern, find_by_dn=False, scope=ldap.SCOPE_SUBTREE):
+  def find_groups(self, groupname_pattern, search_attr=None, group_name_attr=None, find_by_dn=False, scope=ldap.SCOPE_SUBTREE):
     """ Return all groups in the system with parents and children """
     if find_by_dn:
       data = filter(lambda attrs: attrs['dn'] == groupname_pattern, self._instance.groups.values())
@@ -91,7 +99,7 @@ class LdapTestConnection(object):
         sub_data = filter(lambda attrs: attrs['dn'].endswith(data[0]['dn']), self._instance.groups.values())
         data.extend(sub_data)
     else:
-      groupname_pattern = groupname_pattern.replace('.','\\.').replace('*', '.*')
+      groupname_pattern = "^%s$" % groupname_pattern.replace('.','\\.').replace('*', '.*')
       groupnames = filter(lambda username: re.match(groupname_pattern, username), self._instance.groups.keys())
       data = [self._instance.groups.get(groupname) for groupname in groupnames]
     return data
@@ -102,21 +110,36 @@ class LdapTestConnection(object):
                     'lårry': {'dn': 'uid=lårry,ou=People,dc=example,dc=com', 'username':'lårry', 'first':'Larry', 'last':'Stooge', 'email':'larry@stooges.com', 'groups': ['cn=TestUsers,ou=Groups,dc=example,dc=com', 'cn=Test Administrators,cn=TestUsers,ou=Groups,dc=example,dc=com']},
                     'curly': {'dn': 'uid=curly,ou=People,dc=example,dc=com', 'username':'curly', 'first':'Curly', 'last':'Stooge', 'email':'curly@stooges.com', 'groups': ['cn=TestUsers,ou=Groups,dc=example,dc=com', 'cn=Test Administrators,cn=TestUsers,ou=Groups,dc=example,dc=com']},
                     'rock': {'dn': 'uid=rock,ou=People,dc=example,dc=com', 'username':'rock', 'first':'rock', 'last':'man', 'email':'rockman@stooges.com', 'groups': ['cn=Test Administrators,cn=TestUsers,ou=Groups,dc=example,dc=com']},
-                    'otherguy': {'dn': 'uid=otherguy,ou=People,dc=example,dc=com', 'username':'otherguy', 'first':'Other', 'last':'Guy', 'email':'other@guy.com'}}
+                    'otherguy': {'dn': 'uid=otherguy,ou=People,dc=example,dc=com', 'username':'otherguy', 'first':'Other', 'last':'Guy', 'email':'other@guy.com'},
+                    'posix_person': {'dn': 'uid=posix_person,ou=People,dc=example,dc=com', 'username': 'posix_person', 'first': 'pos', 'last': 'ix', 'email': 'pos@ix.com'},
+                    'posix_person2': {'dn': 'uid=posix_person2,ou=People,dc=example,dc=com', 'username': 'posix_person2', 'first': 'pos', 'last': 'ix', 'email': 'pos@ix.com'}}
 
       self.groups = {'TestUsers': {
                         'dn': 'cn=TestUsers,ou=Groups,dc=example,dc=com',
                         'name':'TestUsers',
-                        'members':['uid=moe,ou=People,dc=example,dc=com','uid=lårry,ou=People,dc=example,dc=com','uid=curly,ou=People,dc=example,dc=com']},
+                        'members':['uid=moe,ou=People,dc=example,dc=com','uid=lårry,ou=People,dc=example,dc=com','uid=curly,ou=People,dc=example,dc=com'],
+                        'posix_members':[]},
                      'Test Administrators': {
                         'dn': 'cn=Test Administrators,cn=TestUsers,ou=Groups,dc=example,dc=com',
                         'name':'Test Administrators',
-                        'members':['uid=rock,ou=People,dc=example,dc=com','uid=lårry,ou=People,dc=example,dc=com','uid=curly,ou=People,dc=example,dc=com']},
+                        'members':['uid=rock,ou=People,dc=example,dc=com','uid=lårry,ou=People,dc=example,dc=com','uid=curly,ou=People,dc=example,dc=com'],
+                        'posix_members':[]},
                      'OtherGroup': {
                         'dn': 'cn=OtherGroup,cn=TestUsers,ou=Groups,dc=example,dc=com',
                         'name':'OtherGroup',
-                        'members':[]}}
-
+                        'members':[],
+                        'posix_members':[]},
+                     'PosixGroup': {
+                        'dn': 'cn=PosixGroup,ou=Groups,dc=example,dc=com',
+                        'name':'PosixGroup',
+                        'members':[],
+                        'posix_members':['posix_person','lårry']},
+                     'PosixGroup1': {
+                        'dn': 'cn=PosixGroup1,cn=PosixGroup,ou=Groups,dc=example,dc=com',
+                        'name':'PosixGroup1',
+                        'members':[],
+                        'posix_members':['posix_person2']},
+                     }
 
 
 def test_invalid_username():
@@ -539,6 +562,63 @@ def test_useradmin_ldap_group_integration():
   import_ldap_groups('OtherGroup', import_members=False, import_members_recursive=False, sync_users=True, import_by_dn=False)
   assert_false(LdapGroup.objects.filter(group=hue_group).exists())
   assert_true(hue_group.user_set.filter(username=hue_user.username).exists())
+
+
+def test_useradmin_ldap_posix_group_integration():
+  reset_all_users()
+  reset_all_groups()
+
+  # Set up LDAP tests to use a LdapTestConnection instead of an actual LDAP connection
+  ldap_access.CACHED_LDAP_CONN = LdapTestConnection()
+
+  # Import groups only
+  import_ldap_groups('PosixGroup', import_members=False, import_members_recursive=False, sync_users=False, import_by_dn=False)
+  test_users = Group.objects.get(name='PosixGroup')
+  assert_true(LdapGroup.objects.filter(group=test_users).exists())
+  assert_equal(test_users.user_set.all().count(), 0)
+
+  # Import all members of TestUsers
+  import_ldap_groups('PosixGroup', import_members=True, import_members_recursive=False, sync_users=True, import_by_dn=False)
+  test_users = Group.objects.get(name='PosixGroup')
+  assert_true(LdapGroup.objects.filter(group=test_users).exists())
+  assert_equal(test_users.user_set.all().count(), 2)
+
+  # Should import a group, but will only sync already-imported members
+  import_ldap_groups('Test Administrators', import_members=False, import_members_recursive=False, sync_users=True, import_by_dn=False)
+  assert_equal(User.objects.all().count(), 2, User.objects.all())
+  assert_equal(Group.objects.all().count(), 2, Group.objects.all())
+  test_admins = Group.objects.get(name='Test Administrators')
+  assert_equal(test_admins.user_set.all().count(), 1)
+  larry = User.objects.get(username='lårry')
+  assert_equal(test_admins.user_set.all()[0].username, larry.username)
+
+  # Only sync already imported
+  ldap_access.CACHED_LDAP_CONN.remove_posix_user_group_for_test('posix_person', 'PosixGroup')
+  import_ldap_groups('PosixGroup', import_members=False, import_members_recursive=False, sync_users=True, import_by_dn=False)
+  assert_equal(test_users.user_set.all().count(), 1)
+  assert_equal(User.objects.get(username='posix_person').groups.all().count(), 0)
+
+  # Import missing user
+  ldap_access.CACHED_LDAP_CONN.add_posix_user_group_for_test('posix_person', 'PosixGroup')
+  import_ldap_groups('PosixGroup', import_members=True, import_members_recursive=False, sync_users=True, import_by_dn=False)
+  assert_equal(test_users.user_set.all().count(), 2)
+  assert_equal(User.objects.get(username='posix_person').groups.all().count(), 1)
+
+  # Import all members of PosixGroup and members of subgroups
+  import_ldap_groups('PosixGroup', import_members=True, import_members_recursive=True, sync_users=True, import_by_dn=False)
+  test_users = Group.objects.get(name='PosixGroup')
+  assert_true(LdapGroup.objects.filter(group=test_users).exists())
+  assert_equal(test_users.user_set.all().count(), 3)
+
+  # Make sure Hue groups with naming collisions don't get marked as LDAP groups
+  hue_user = User.objects.create(username='otherguy', first_name='Different', last_name='Guy')
+  hue_group = Group.objects.create(name='OtherGroup')
+  hue_group.user_set.add(hue_user)
+  hue_group.save()
+  import_ldap_groups('OtherGroup', import_members=False, import_members_recursive=False, sync_users=True, import_by_dn=False)
+  assert_false(LdapGroup.objects.filter(group=hue_group).exists())
+  assert_true(hue_group.user_set.filter(username=hue_user.username).exists())
+
 
 def test_useradmin_ldap_user_integration():
   reset_all_users()
