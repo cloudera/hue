@@ -89,7 +89,7 @@ ${ commonheader(_('Databases'), 'metastore', user) | n,unicode }
 
 <link rel="stylesheet" href="/metastore/static/css/metastore.css" type="text/css">
 
-<script src="/static/ext/js/knockout-2.1.0.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript" charset="utf-8">
   $(document).ready(function () {

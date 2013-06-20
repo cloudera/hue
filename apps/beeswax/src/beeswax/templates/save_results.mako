@@ -27,7 +27,7 @@ from django.utils.translation import ugettext as _
 ${ commonheader(_('Create table from file'), app_name, user, '100px') | n,unicode }
 ${layout.menubar(section='query')}
 
-<script src="/static/ext/js/knockout-2.1.0.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
 
 <div class="container-fluid">
 % if error_msg:

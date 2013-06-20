@@ -479,7 +479,7 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
 
 <div class="bottomAlert alert"></div>
 
-<script src="/static/ext/js/knockout-2.1.0.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/pig/static/js/utils.js" type="text/javascript" charset="utf-8"></script>
 <script src="/pig/static/js/pig.ko.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/routie-0.3.0.min.js" type="text/javascript" charset="utf-8"></script>

@@ -414,7 +414,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 <link rel="stylesheet" href="/search/static/css/freshereditor.css">
 <link rel="stylesheet" href="/static/ext/css/codemirror.css">
 
-<script src="/static/ext/js/knockout-2.1.0.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/search/static/farbtastic/farbtastic.js" type="text/javascript" charset="utf-8"></script>
 <script src="/search/static/js/shortcut.js" type="text/javascript" charset="utf-8"></script>
 <script src="/search/static/js/freshereditor.min.js" type="text/javascript" charset="utf-8"></script>

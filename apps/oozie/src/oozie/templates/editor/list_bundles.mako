@@ -1,4 +1,4 @@
-## Licensed to Cloudera, Inc. under one
+s## Licensed to Cloudera, Inc. under one
 ## or more contributor license agreements.  See the NOTICE file
 ## distributed with this work for additional information
 ## regarding copyright ownership.  Cloudera, Inc. licenses this file
@@ -153,7 +153,7 @@ ${ layout.menubar(section='bundles') }
 </div>
 
 <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
-<script src="/static/ext/js/knockout-2.1.0.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript" charset="utf-8">
   $(document).ready(function () {
