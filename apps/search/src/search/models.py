@@ -276,6 +276,24 @@ class Collection(models.Model):
     return sorted([{'name': field.get('name'),'type': field.get('type')}
                    for fields in schema.iter('fields') for field in fields.iter('field')])
 
+def get_facet_field_format(field, type, facets):
+  format = ""
+  try:
+    if type == 'field':
+      for fld in facets['fields']:
+        if fld['field'] == field:
+          format = fld['format']
+    elif type == 'range':
+      for fld in facets['ranges']:
+        if fld['field'] == field:
+          format = fld['format']
+    elif type == 'date':
+      for fld in facets['dates']:
+        if fld['field'] == field:
+          format = fld['format']
+  except:
+    pass
+  return format
 
 def get_facet_field_label(field, type, facets):
   label = field
@@ -355,6 +373,7 @@ def augment_solr_response(response, facets):
           'field': cat,
           'type': 'date',
           'label': get_facet_field_label(cat, 'date', facets),
+          'format': get_facet_field_format(cat, 'date', facets),
           'start': response['facet_counts']['facet_dates'][cat]['start'],
           'end': response['facet_counts']['facet_dates'][cat]['end'],
           'gap': response['facet_counts']['facet_dates'][cat]['gap'],

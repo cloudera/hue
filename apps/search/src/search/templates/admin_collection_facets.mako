@@ -97,8 +97,10 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
             ${_('Field')}
             <select id="select-field-facet" data-bind="options: fieldFacetsList, value: selectedFieldFacet"></select>
             &nbsp;${_('Label')}
-            <input type="text" data-bind="value: selectedFieldLabel" class="input" />
-            <a class="btn" data-bind="click: $root.addFieldFacet"><i class="icon-plus"></i> ${_('Add')}</a>
+            <input id="selectedFieldLabel" type="text" data-bind="value: selectedFieldLabel" class="input" />
+            <br/>
+            <br/>
+            <a class="btn" data-bind="click: $root.addFieldFacet"><i class="icon-plus-sign"></i> ${_('Add to Field Facets')}</a>
             &nbsp;<span id="field-facet-error" class="label label-important hide">${_('The field you are trying to add is already in the list.')}</span>
           </div>
         </div>
@@ -122,14 +124,18 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
           ${_('Field')}
           <select data-bind="options: rangeFacetsList, value: selectedRangeFacet"></select>
           &nbsp;${_('Label')}
-          <input type="text" data-bind="value: selectedRangeLabel" class="input" />
-          &nbsp;${_('Start')}
+          <input id="selectedRangeLabel" type="text" data-bind="value: selectedRangeLabel" class="input" />
+          <br/>
+          <br/>
+          ${_('Start')}
           <input type="number" data-bind="value: selectedRangeStartFacet" class="input-mini" />
           &nbsp;${_('End')}
           <input type="number" data-bind="value: selectedRangeEndFacet" class="input-mini" />
           &nbsp;${_('Gap')}
           <input type="number" data-bind="value: selectedRangeGapFacet" class="input-mini" />
-          <a class="btn" data-bind="click: $root.addRangeFacet"><i class="icon-plus"></i> ${_('Add')}</a>
+          <br/>
+          <br/>
+          <a class="btn" data-bind="click: $root.addRangeFacet"><i class="icon-plus-sign"></i> ${_('Add to Range Facets')}</a>
         </div>
       </div>
 
@@ -142,7 +148,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
             <strong><span data-bind="text: label"></span></strong>
             <span style="color:#666;font-size: 12px">
               (<span data-bind="text: field"></span>, <span data-bind="text: start"></span> <i class="icon-double-angle-right"></i> <span data-bind="text: end"></span>,
-              <i class="icon-resize-horizontal"></i> <span data-bind="text: gap"></span>)
+              <i class="icon-resize-horizontal"></i> <span data-bind="text: gap"></span><span data-bind="visible: format != ''">, <i class="icon-calendar"></i> <span data-bind="text: format"></span></span>)
             </span>
             <a class="btn btn-small" data-bind="click: $root.removeDateFacet"><i class="icon-trash"></i></a>
           </div>
@@ -152,7 +158,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
           ${_('Field')}
           <select data-bind="options: dateFacetsList, value: selectedDateFacet"></select>
           &nbsp;${_('Label')}
-          <input type="text" data-bind="value: selectedDateLabel" class="input" />
+          <input id="selectedDateLabel" type="text" data-bind="value: selectedDateLabel" class="input" />
           <br/>
           <br/>
           <span>
@@ -167,7 +173,13 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
             &nbsp;${_('before today. Goes up by increments of')}
             <span id="scriptTable" data-bind="template: {name: 'scriptDateMath', data: selectedDateDateMaths()[2]}"/>
           </span>
-          <a class="btn" data-bind="click: $root.addDateFacet"><i class="icon-plus"></i> ${_('Add')}</a>
+          <br/>
+          <br/>
+          ${_('Date format')}
+          <input id="dateFormatInput" type="text" data-bind="value: selectedDateFormat" class="input" /> <a href="#formatHelpModal" class="btn btn-mini" data-toggle="modal"><i class="icon-question-sign"></i></a>
+          <br/>
+          <br/>
+          <a class="btn" data-bind="click: $root.addDateFacet"><i class="icon-plus-sign"></i> ${_('Add to Date Facets')}</a>
         </div>
       </div>
 
@@ -209,6 +221,263 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
   </%def>
 </%layout:skeleton>
 
+
+<div id="formatHelpModal" class="modal hide fade">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>${ _('Format Help') }</h3>
+  </div>
+  <div class="modal-body">
+    <p>
+      ${ _('You can specify here how you want the date to be formatted.')}
+      <br/>
+      ${ _('Use a predefined format:')}
+      <br/>
+      <table class="table table-striped table-bordered">
+      <tr>
+        <td>
+          <a href="javascript:void(0)" class="formatChooser">FROMNOW</a>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <a href="javascript:void(0)" class="formatChooser">YYYY/MM/DD</a>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <a href="javascript:void(0)" class="formatChooser">YYYY/MM/DD HH:mm</a>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <a href="javascript:void(0)" class="formatChooser">YYYY/MM/DD HH:mm:ss</a>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <a href="javascript:void(0)" class="formatChooser">HH:mm</a>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <a href="javascript:void(0)" class="formatChooser">HH:mm:ss</a>
+        </td>
+      </tr>
+    </table>
+    ${ _('or any combination of these fields:')} <br/><br/>
+
+    <table class="table table-striped table-bordered">
+  <tbody>
+    <tr>
+      <th></th>
+      <th>${ _('Token')}</th>
+      <th>${ _('Output')}</th>
+    </tr>
+    <tr>
+      <td><b>${ _('Relative time')}</b></td>
+      <td>FROMNOW</td>
+      <td>${_('9 hours ago')}</td>
+    </tr>
+    <tr>
+      <td><b>${ _('Month')}</b></td>
+      <td>M</td>
+      <td>1 2 ... 11 12</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>Mo</td>
+      <td>1st 2nd ... 11th 12th</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>MM</td>
+      <td>01 02 ... 11 12</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>MMM</td>
+      <td>${ _('Jan Feb ... Nov Dec')}</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>MMMM</td>
+      <td>${ _('January February ... November December')}</td>
+    </tr>
+    <tr>
+      <td><b>${ _('Day of Month')}</b></td>
+      <td>D</td>
+      <td>1 2 ... 30 30</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>Do</td>
+      <td>${ _('1st 2nd ... 30th 31st')}</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>DD</td>
+      <td>01 02 ... 30 31</td>
+    </tr>
+    <tr>
+      <td><b>${ _('Day of Year')}</b></td>
+      <td>DDD</td>
+      <td>1 2 ... 364 365</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>DDDo</td>
+      <td>${ _('1st 2nd ... 364th 365th')}</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>DDDD</td>
+      <td>001 002 ... 364 365</td>
+    </tr>
+    <tr>
+      <td><b>${ _('Day of Week')}</b></td>
+      <td>d</td>
+      <td>0 1 ... 5 6</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>do</td>
+      <td>${ _('0th 1st ... 5th 6th')}</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>ddd</td>
+      <td>${ _('Sun Mon ... Fri Sat')}</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>dddd</td>
+      <td>${ _('Sunday Monday ... Friday Saturday')}</td>
+    </tr>
+    <tr>
+      <td><b>${ _('Week of Year')}</b></td>
+      <td>w</td>
+      <td>1 2 ... 52 53</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>wo</td>
+      <td>${ _('1st 2nd ... 52nd 53rd')}</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>ww</td>
+      <td>01 02 ... 52 53</td>
+    </tr>
+    <tr>
+      <td><b>${ _('ISO Week of Year')}</b></td>
+      <td>W</td>
+      <td>1 2 ... 52 53</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>Wo</td>
+      <td>${ _('1st 2nd ... 52nd 53rd')}</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>WW</td>
+      <td>01 02 ... 52 53</td>
+    </tr>
+    <tr>
+      <td><b>${ _('Year')}</b></td>
+      <td>YY</td>
+      <td>70 71 ... 29 30</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>YYYY</td>
+      <td>1970 1971 ... 2029 2030</td>
+    </tr>
+    <tr>
+      <td><b>AM/PM</b></td>
+      <td>A</td>
+      <td>AM PM</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>a</td>
+      <td>am pm</td>
+    </tr>
+    <tr>
+      <td><b>${ _('Hour')}</b></td>
+      <td>H</td>
+      <td>0 1 ... 22 23</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>HH</td>
+      <td>00 01 ... 22 23</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>h</td>
+      <td>1 2 ... 11 12</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>hh</td>
+      <td>01 02 ... 11 12</td>
+    </tr>
+    <tr>
+      <td><b>${ _('Minute')}</b></td>
+      <td>m</td>
+      <td>0 1 ... 58 59</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>mm</td>
+      <td>00 01 ... 58 59</td>
+    </tr>
+    <tr>
+      <td><b>${ _('Second')}</b></td>
+      <td>s</td>
+      <td>0 1 ... 58 59</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>ss</td>
+      <td>00 01 ... 58 59</td>
+    </tr>
+    <tr>
+      <td><b>${ _('Fractional Second')}</b></td>
+      <td>S</td>
+      <td>0 1 ... 8 9</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>SS</td>
+      <td>0 1 ... 98 99</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>SSS</td>
+      <td>0 1 ... 998 999</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>ss</td>
+      <td>00 01 ... 58 59</td>
+    </tr>
+    <tr>
+      <td><b>${ _('Unix Timestamp')}</b></td>
+      <td>X</td>
+      <td>1360013296</td>
+    </tr>
+  </tbody>
+</table>
+    </p>
+  </div>
+  <div class="modal-footer">
+    <a href="javascript:void(0)" class="btn" data-dismiss="modal">${ _('Close')}</a>
+  </div>
+</div>
+
 <link rel="stylesheet" href="/static/ext/css/bootstrap-datepicker.min.css" type="text/css" media="screen" title="no title" charset="utf-8" />
 <link href="/static/ext/css/bootstrap-editable.css" rel="stylesheet">
 
@@ -239,6 +508,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
       type: args['type'],
       field: args['field'],
       label: args['label'],
+      format: args['format'],
       start: args['start'],
       end: args['end'],
       gap: args['gap'],
@@ -256,7 +526,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
   }
 
   var DateFacet = function (obj) {
-    return new Facet({type: "date", field: obj.field, label: obj.label, start: obj.start, end: obj.end, gap: obj.gap, uuid: obj.uuid});
+    return new Facet({type: "date", field: obj.field, label: obj.label, format: obj.format, start: obj.start, end: obj.end, gap: obj.gap, uuid: obj.uuid});
   }
 
   var Properties = function (properties) {
@@ -322,6 +592,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
       return new DateFacet({
           field: obj.field,
           label: obj.label,
+          format: obj.format,
           start: new DateMath(obj.start),
           end: new DateMath(obj.end),
           gap: new DateMath(obj.gap),
@@ -344,15 +615,26 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
     })
 
     self.selectedFieldFacet = ko.observable();
+    self.selectedFieldFacet.subscribe(function (newValue) {
+      $("#selectedFieldLabel").prop("placeholder", newValue);
+    });
     self.selectedFieldLabel = ko.observable("");
+
     self.selectedRangeFacet = ko.observable();
+    self.selectedRangeFacet.subscribe(function (newValue) {
+      $("#selectedRangeLabel").prop("placeholder", newValue);
+    });
     self.selectedRangeLabel = ko.observable("");
     self.selectedRangeStartFacet = ko.observable(0);
     self.selectedRangeEndFacet = ko.observable(100);
     self.selectedRangeGapFacet = ko.observable(10);
 
     self.selectedDateFacet = ko.observable();
+    self.selectedDateFacet.subscribe(function (newValue) {
+      $("#selectedDateLabel").prop("placeholder", newValue);
+    });
     self.selectedDateLabel = ko.observable("");
+    self.selectedDateFormat = ko.observable("");
 
     self.selectedDateDateMaths = ko.observableArray([
         // Same as addDateFacet()
@@ -443,6 +725,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
       var newFacet = new DateFacet({
           field: self.selectedDateFacet(),
           label: self.selectedDateLabel(),
+          format: self.selectedDateFormat(),
           start: self.selectedDateDateMaths()[0],
           end: self.selectedDateDateMaths()[1],
           gap: self.selectedDateDateMaths()[2]
@@ -450,6 +733,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
       self.dateFacets.push(newFacet);
       self.sortableFacets.push(newFacet);
       self.selectedDateLabel("");
+      self.selectedDateFormat("");
       self.selectedDateDateMaths([
         new DateMath({frequency: 10, unit: 'DAYS'}),
         new DateMath({frequency: 0, unit: 'DAYS'}),
@@ -578,6 +862,20 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
           routie("step" + nextStep);
         }
       });
+
+      $(".formatChooser").on("click", function(){
+        viewModel.selectedDateFormat($(this).text());
+        $("#formatHelpModal").modal("hide");
+      });
+      var _typeSource = [];
+      $(".formatChooser").each(function(){
+        _typeSource.push($(this).text());
+      });
+
+      $("#dateFormatInput").typeahead({
+        source: _typeSource
+      });
+
   });
 </script>
 
