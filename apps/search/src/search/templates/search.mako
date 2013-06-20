@@ -104,10 +104,10 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
                 <li><a href='?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ fld['field'] }:"${ urllib.quote_plus(group.encode('ascii', 'xmlcharrefreplace')) }"${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}'>${group}</a> <span class="counter">(${ count })</span></li>
               % endif
               % if fld['type'] == 'range':
-                <li><a href='?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ fld['field'] }:["${ group }" TO "${ str(int(group) + int(fld['gap']) - 1) }"]${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}'>${ group } (${ count })</a></li>
+                <li><a href='?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ fld['field'] }:["${ group }" TO "${ str(int(group) + int(fld['gap']) - 1) }"]${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}'>${ group } - ${ str(int(group) + int(fld['gap']) - 1) }</a> <span class="counter">(${ count })</span></li>
               % endif
               % if fld['type'] == 'date':
-                <li class="dateFacetItem"><a href='?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ fld['field'] }:[${ group } TO ${ group }${ urllib.quote_plus(fld['gap']) }]${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}'><span class="dateFacet">${ group }</span> (${ count })</a></li>
+                <li class="dateFacetItem"><a href='?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ fld['field'] }:[${ group } TO ${ group }${ urllib.quote_plus(fld['gap']) }]${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}'><span class="dateFacet" data-format="${fld['format']}">${ group }<span class="dateFacetGap hide">${ fld['gap'] }</span></span></a> <span class="counter">(${ count })</span></li>
               % endif
             % endif
             % if found_value != "":
@@ -115,10 +115,10 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
                 <li><strong>${ group }</strong> <a href="?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}"><i class="icon-remove"></i></a></li>
               % endif
               % if fld['type'] == 'range' and '["' + group + '" TO "' + str(int(group) + int(fld['gap']) - 1) + '"]' == found_value:
-                <li><strong>${ group }</strong> <a href="?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}"><i class="icon-remove"></i></a></li>
+                <li><strong>${ group } - ${ str(int(group) + int(fld['gap']) - 1) }</strong> <a href="?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}"><i class="icon-remove"></i></a></li>
               % endif
               % if fld['type'] == 'date' and found_value.startswith('[' + group + ' TO'):
-                <li><strong><span class="dateFacet">${group}</span></strong> <a href="?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}"><i class="icon-remove"></i></a></li>
+                <li><strong><span class="dateFacet" data-format="${fld['format']}">${ group }<span class="dateFacetGap hide">${ fld['gap'] }</span></span></strong> <a href="?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}"><i class="icon-remove"></i></a></li>
               % endif
             % endif
           % endfor
@@ -228,7 +228,24 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 
     $(".dateFacet").each(function () {
       var _m = moment($(this).text());
-      $(this).text(_m.fromNow());
+      var _em = moment($(this).text());
+      var _format = $(this).data("format");
+      var _gap = $(this).find(".dateFacetGap").text();
+      var _how = _gap.match(/\d+/)[0];
+      var _what = _gap.substring(_how.length + 1).toLowerCase();
+      _em.add(_what, _how * 1);
+
+      if (_format != null && _format != "") {
+        if (_format.toLowerCase().indexOf("fromnow") > -1){
+          $(this).text(_m.fromNow() + " - " + _em.fromNow());
+        }
+        else {
+          $(this).text(_m.format(_format) + " - " + _em.format(_format));
+        }
+      }
+      else {
+        $(this).text(_m.format() + " - " + _em.format());
+      }
       $(this).parents(".dateFacetItem").data("epoch", _m.valueOf());
     });
 

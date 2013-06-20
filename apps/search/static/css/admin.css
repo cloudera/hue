@@ -88,3 +88,7 @@ h1.emptyMessage {
   color: #BBB;
   line-height: 60px;
 }
+
+.stepDetails {
+  padding: 5px;
+}

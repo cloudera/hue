@@ -49,7 +49,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
         </div>
       </div>
 
-      <div class="section">
+      <div class="section" style="padding: 5px">
         <div data-bind="visible: sortingFields().length == 0" style="padding-left: 10px;margin-bottom: 20px">
           <em>${_('There are currently no fields defined.')}</em>
         </div>
@@ -67,13 +67,15 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
           ${_('Field')}
           <select data-bind="options: sortingFieldsList, value: newFieldSelect"></select>
           &nbsp;${_('Label')}
-          <input type="text" data-bind="value: newFieldLabel" class="input" />
+          <input id="newFieldLabel" type="text" data-bind="value: newFieldLabel" class="input" />
           &nbsp;${_('Sorting')}
           <div class="btn-group" style="display: inline">
             <button id="newFieldAsc" type="button" data-bind="css: {'active': newFieldAscDesc() == 'asc', 'btn': true}"><i class="icon-arrow-up"></i></button>
             <button id="newFieldDesc" type="button" data-bind="css: {'active': newFieldAscDesc() == 'desc', 'btn': true}"><i class="icon-arrow-down"></i></button>
           </div>
-          &nbsp;&nbsp;<a class="btn" data-bind="click: $root.addSortingField"><i class="icon-plus"></i> ${_('Add')}</a>
+          <br/>
+          <br/>
+          <a class="btn" data-bind="click: $root.addSortingField"><i class="icon-plus-sign"></i> ${_('Add to Sorting')}</a>
         </div>
       </div>
 
@@ -132,6 +134,10 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
     self.sortingFieldsList = ko.observableArray(${ hue_collection.fields | n,unicode });
 
     self.newFieldSelect = ko.observable();
+    self.newFieldSelect.subscribe(function (newValue) {
+      $("#newFieldLabel").prop("placeholder", newValue);
+    });
+
     self.newFieldLabel = ko.observable("");
     self.newFieldAscDesc = ko.observable("asc");
 
