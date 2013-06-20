@@ -867,7 +867,7 @@ Version 1.1.4
 
  * MySQLdb/connections.py: fix super class reference in autocommit()
 
- * Tested against MySQL-4.1.4a with InnoDB tables
+ * Tested against MySQL-4.1.5a with InnoDB tables
 
 ------------------------------------------------------------------------
 r320 | adustman | 2004-09-11 00:57:19 -0500 (Sat, 11 Sep 2004) | 2 lines

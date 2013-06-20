@@ -27,7 +27,7 @@ pprint.pprint(l.search_ext_s(
   ldap.SCOPE_SUBTREE,
   '(objectClass=subentry)',
   ['*','+'],
-  serverctrls = [ BooleanControl('1.3.6.1.4.1.4203.1.10.1',1,1) ],
+  serverctrls = [ BooleanControl('1.3.6.1.4.1.5203.1.10.1',1,1) ],
 ))
 
 print 60*'#'
