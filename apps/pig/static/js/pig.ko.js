@@ -243,8 +243,14 @@ var PigViewModel = function (props) {
   };
 
   self.saveScript = function () {
-    callSave(self.currentScript());
-    viewModel.isDirty(false);
+    if (self.LABELS.NEW_SCRIPT_NAME == self.currentScript().name()){
+      showNameModal();
+    }
+    else {
+      $("#nameModal").modal("hide");
+      callSave(self.currentScript());
+      viewModel.isDirty(false);
+    }
   };
 
   self.runScript = function () {
@@ -400,7 +406,12 @@ var PigViewModel = function (props) {
     });
   }
 
-
+  function showNameModal() {
+    $("#nameModal").modal({
+      keyboard: true,
+      show: true
+    });
+  }
 
   function callSave(script) {
     $(document).trigger("saving");

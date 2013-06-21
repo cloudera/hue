@@ -456,6 +456,26 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
   </div>
 </div>
 
+<div id="nameModal" class="modal hide fade">
+  <div class="modal-header">
+    <a href="#" class="close" data-dismiss="modal">&times;</a>
+    <h3>${_('Save script')}</h3>
+  </div>
+  <div class="modal-body">
+    <p>
+      ${_('Please give a meaningful name to this script.')}<br/><br/>
+      <label>
+        ${ _('Script name') } &nbsp;
+        <input type="text" class="input-xlarge" data-bind="value: currentScript().name" />
+      </label>
+    </p>
+  </div>
+  <div class="modal-footer">
+    <a class="btn" data-dismiss="modal">${_('Cancel')}</a>
+    <button class="btn btn-primary disable-feedback" data-bind="click: saveScript, enable: currentScript().name() != '' && currentScript().name() != $root.LABELS.NEW_SCRIPT_NAME">${_('Save')}</button>
+  </div>
+</div>
+
 
 <div class="bottomAlert alert"></div>
 
