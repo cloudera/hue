@@ -1,0 +1,73 @@
+TODO for python-daemon library
+##############################
+
+=======
+PENDING
+=======
+
+Tests
+=====
+
+* Write full unit tests for every new or changed behaviour at time of
+  commit.
+
+Features
+========
+
+Important
+---------
+
+Wishlist
+--------
+
+* Allow specification of a syslog service name to log as (default:
+  output to stdout and stderr, not syslog).
+
+Documentation
+=============
+
+Standard library inclusion
+==========================
+
+* Convert to Python 3.
+
+
+====
+DONE
+====
+
+* Detect whether started by another process that handles
+  daemonisation, such as ‘inetd’, and behave appropriately.
+
+* Detach to new process and session group.
+
+* Allow specification of working directory (default: '/').
+
+* Allow specification of umask (default: 0000).
+
+* Drop ‘suid’ and ‘sgid’ privileges if set.
+
+* Close all open file handles.
+
+* Re-open stdin, stdout, stderr to user-specified files.
+
+* Default re-open stdin, stdout, stderr to ‘/dev/null’.
+
+* Allow specification of a non-root user and group to drop to, if
+  started as ‘root’ (default: no change of user or group).
+
+* Implement context manager protocol for daemon context.
+
+* Allow specification of PID file with its own context manager
+  (default: no PID file).
+
+* Full docstrings for functions, classes, and modules.
+
+* PEP 3143 for adding this library to the Python standard library.
+
+..
+    Local variables:
+    mode: rst
+    coding: utf-8
+    End:
+    vim: filetype=rst fileencoding=utf-8 :

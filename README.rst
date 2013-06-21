@@ -5,17 +5,20 @@
 Instructions to install the tarball release of Hue Oozie.
 
 
-## Install in any directory. 
-## If you don't have the permissions, you will need to 'sudo' the commands.
-$ PREFIX=/usr/share make install
+## Install in any directory the user running it has write permissions:
+$ PREFIX=/home/oozie/webui make install
 
 ## Run
-$ /usr/share/hue/build/env/bin/hue runspawningserver
+$ /home/oozie/webui/hue/build/env/bin/hue runspawningserver
 
 ## Goto: http://localhost:11011 !
 
 ## Enter the username you want
 
+
+Problems?
+--------
+Feel free to ask on the user group http://groups.google.com/a/cloudera.org/group/hue-user
 
 
 Optional
@@ -73,8 +76,7 @@ CentOS:
 * sqlite-devel
 
 MacOS (mac port):
-* liblxml
 * libxml2
-* libxslt
-* simplejson (easy_install)
+* libxslt (simplejson (easy_install))
 * sqlite3
+
