@@ -51,6 +51,13 @@
         Hive, Pig, Cloudera Impala and Solr Search.<br/>
         It also ships with an Oozie Application for creating workflows, various Shells and a collection of Hadoop API.
       </p>
+
+        <form action="http://gethue.createsend.com/t/i/s/jihrk/" method="post" id="subFormUp" style="vertical-align: middle; margin-top: 20px">
+            Get the latest news about Hue in your inbox!
+            <input type="text" class="input-medium" name="cm-jihrk-jihrk" id="jihrk-jihrk" placeholder="Your email" style="margin-top: 8px; margin-left: 10px" />
+            <a id="subscribeBtnUp" class="btn" value="Subscribe"><i class="icon-envelope icon-large"></i> Subscribe</a>
+        </form>
+
     </header>
   </div>
   <div class="row">
@@ -344,6 +351,10 @@
             class="icon-github icon-large"></i> View on Github</a>
     <a class="btn btn-mini" href="http://twitter.com/gethue/" target="_blank"><i class="icon-twitter icon-large"></i>
       Follow @gethue</a>
+    <form action="http://gethue.createsend.com/t/i/s/jihrk/" method="post" id="subForm" style="display:inline">
+    <input type="text" class="input-medium" name="cm-jihrk-jihrk" id="jihrk-jihrk" placeholder="Your email" style="margin-top: 8px; margin-left: 10px" />
+    <a id="subscribeBtn" class="btn btn-mini" value="Subscribe"><i class="icon-envelope-alt icon-large"></i> Subscribe</a>
+      </form>
   </nav>
   <p><strong>Hue</strong> is released under the <a class="normal" href="http://www.apache.org/licenses/LICENSE-2.0"
                                                         target="_blank">Apache License, version 2.0</a>.</p>
@@ -371,6 +382,12 @@
   }
 
   $(document).ready(function () {
+    $("#subscribeBtn").click(function() {
+        $("#subForm").submit();
+    });
+    $("#subscribeBtnUp").click(function() {
+      $("#subFormUp").submit();
+    });
     $("#playBtn i").click(function(){
       $("#video").modal("show");
     });

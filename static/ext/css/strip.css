@@ -5,7 +5,7 @@ body {
   background-image: url("../img/bg.png");
 }
 
-p {
+p, form {
   font: 14px/23px 'Open Sans', sans-serif;
   text-shadow: #ffffff 0 1px 0;
 }
