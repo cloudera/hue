@@ -987,7 +987,7 @@ def test_upload_file():
     assert_equal(stats['group'], USER_NAME)
 
     # Just upload the current python file
-    resp = client.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR,
+    resp = client.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR, # GET param avoids infinite looping 
                        dict(dest=HDFS_DEST_DIR, hdfs_file=file(LOCAL_FILE)))
     response = json.loads(resp.content)
 
@@ -1002,14 +1002,14 @@ def test_upload_file():
     assert_equal(actual, expected)
 
     # Upload again and so fails because file already exits
-    resp = client.post('/filebrowser/upload/file',
+    resp = client.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR,
                        dict(dest=HDFS_DEST_DIR, hdfs_file=file(LOCAL_FILE)))
     response = json.loads(resp.content)
     assert_equal(-1, response['status'], response)
     assert_true('already exists' in response['data'], response)
 
     # Upload in / and fails because of missing permissions
-    resp = client.post('/filebrowser/upload/file',
+    resp = client.post('/filebrowser/upload/file?dest=%s' % '/',
                        dict(dest='/', hdfs_file=file(LOCAL_FILE)))
     response = json.loads(resp.content)
     assert_equal(-1, response['status'], response)
