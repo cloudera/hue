@@ -58,7 +58,11 @@ class SolrApi(object):
           params += (('fq', fq),)
 
       response = self._root.get('%(collection)s/select' % solr_query, params)
-      return json.loads(response)
+
+      if type(response) != dict:
+        # Got 'plain/text' mimetype instead of 'application/json'
+        response = json.loads(response)
+      return response
     except RestException, e:
       raise PopupException('Error while accessing Solr: %s' % e)
 
@@ -69,7 +73,9 @@ class SolrApi(object):
           ('wt', 'json'),
       )
       response = self._root.get('%(core)s/suggest' % solr_query, params)
-      return json.loads(response)
+      if type(response) != dict:
+        response = json.loads(response)
+      return response
     except RestException, e:
       raise PopupException('Error while accessing Solr: %s' % e)
 
