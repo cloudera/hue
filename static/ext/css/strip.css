@@ -427,3 +427,13 @@ a.normal {
 #playBtn i:hover {
   opacity: 0.75;
 }
+
+.popover-content a {
+  font-size: 15px;
+  font-weight: bold;
+  margin-top: 6px;
+}
+
+.popover-content .nav-list {
+  padding: 0!important;
+}
