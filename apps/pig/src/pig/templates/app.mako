@@ -466,7 +466,7 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
       ${_('Please give a meaningful name to this script.')}<br/><br/>
       <label>
         ${ _('Script name') } &nbsp;
-        <input type="text" class="input-xlarge" data-bind="value: currentScript().name" />
+        <input type="text" class="input-xlarge" data-bind="value: currentScript().name, valueUpdate:'afterkeydown'" />
       </label>
     </p>
   </div>
