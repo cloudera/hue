@@ -139,6 +139,12 @@ limitations under the License.
         var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
       })();
 
+      function trackOnGA(path) {
+        if (_gaq != undefined && _gaq != null){
+          _gaq.push(['_trackPageview', '/remote/{{ version }}/' + path]);
+        }
+      }
+
       {% endif %}
 
     </script>

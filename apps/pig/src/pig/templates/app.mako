@@ -833,7 +833,7 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
       resizeLogs();
     });
 
-    function showMainSection(mainSection) {
+    function showMainSection(mainSection, includeGA) {
       window.setTimeout(function () {
         codeMirror.refresh();
         codeMirror.setSize("100%", $(window).height() - 250);
@@ -844,14 +844,21 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
         $("#" + mainSection).show();
         highlightMainMenu(mainSection);
       }
+      if (typeof trackOnGA == 'function' && includeGA == undefined){
+        trackOnGA(mainSection);
+      }
     }
 
     function showSection(mainSection, section) {
-      showMainSection(mainSection);
+      showMainSection(mainSection, false);
       if ($("#" + section).is(":hidden")) {
         $(".section").hide();
         $("#" + section).show();
         highlightMenu(section);
+      }
+
+      if (typeof trackOnGA == 'function'){
+        trackOnGA(mainSection + "/" + section);
       }
     }
 
