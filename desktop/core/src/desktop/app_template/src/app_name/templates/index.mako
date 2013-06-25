@@ -16,7 +16,7 @@
 ${'<'}%!from desktop.views import commonheader, commonfooter %>
 ${'<'}%namespace name="shared" file="shared_components.mako" />
 
-${'$'}{commonheader("${" ".join(word.capitalize() for word in app_name.split("_"))}", "${app_name}", "100px")}
+${'$'}{commonheader("${" ".join(word.capitalize() for word in app_name.split("_"))}", "${app_name}", user, "100px")}
 ${'$'}{shared.menubar(section='mytab')}
 
 ${'#'}# Use double hashes for a mako template comment

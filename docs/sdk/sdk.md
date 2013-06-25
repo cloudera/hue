@@ -270,7 +270,7 @@ to include a simple form:
     <%!from desktop.views import commonheader, commonfooter %>
     <%namespace name="shared" file="shared_components.mako" />
 
-    ${commonheader("Calculator", "calculator", "100px")}
+    ${commonheader("Calculator", "calculator", user, "100px")}
 
     ## Main body
 
