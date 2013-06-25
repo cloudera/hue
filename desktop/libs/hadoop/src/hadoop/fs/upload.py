@@ -146,7 +146,7 @@ class HDFSfileUploadHandler(FileUploadHandler):
 
   def receive_data_chunk(self, raw_data, start):
     if not self._activated:
-      raise StopUpload()
+      return raw_data
 
     try:
       self._file.write(raw_data)
