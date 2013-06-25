@@ -50,7 +50,7 @@ var PigScript = function (pigScript) {
   };
   self.getParameters = function () {
     var params = {};
-    var variables = this.script().match(/\$(\w)+/g);
+    var variables = this.script().match(/\$\D(\w*)/g);
     if (variables) {
       $.each(variables, function(index, param) {
         var p = param.substring(1);
