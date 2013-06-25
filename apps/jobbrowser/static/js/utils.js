@@ -17,7 +17,7 @@
 function initLogsElement(element) {
   element.data("logsAtEnd", true);
   element.scroll(function () {
-    element("logsAtEnd", ($(this).scrollTop() + $(this).height() + 20 >= $(this)[0].scrollHeight));
+    element.data("logsAtEnd", ($(this).scrollTop() + $(this).height() + 20 >= $(this)[0].scrollHeight));
   });
   element.css("overflow", "auto").height($(window).height() - element.offset().top - 50);
 }
@@ -34,18 +34,83 @@ function resizeLogs(element) {
   element.css("overflow", "auto").height($(window).height() - element.offset().top - 50);
 }
 
-var resizeTimeout = -1;
-var winWidth = $(window).width();
-var winHeight = $(window).height();
+var _resizeTimeout = -1;
+var _winWidth = $(window).width();
+var _winHeight = $(window).height();
 
-$(window).on("resize", function () {
-  window.clearTimeout(resizeTimeout);
-  resizeTimeout = window.setTimeout(function () {
-    // prevents endless loop in IE8
-    if (winWidth != $(window).width() || winHeight != $(window).height()) {
-      $(document).trigger("resized");
-      winWidth = $(window).width();
-      winHeight = $(window).height();
+function enableResizeLogs() {
+  $(window).on("resize", function () {
+    window.clearTimeout(_resizeTimeout);
+    _resizeTimeout = window.setTimeout(function () {
+      // prevents endless loop in IE8
+      if (_winWidth != $(window).width() || _winHeight != $(window).height()) {
+        $(document).trigger("resized");
+        _winWidth = $(window).width();
+        _winHeight = $(window).height();
+      }
+    }, 200);
+  });
+}
+
+function getQueryStringParameter(name) {
+  name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+  var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+    results = regex.exec(location.search);
+  return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+}
+
+function getStatusClass(status, prefix) {
+  if (!Array.prototype.indexOf) {
+    Array.prototype.indexOf = function (needle) {
+      for (var i = 0; i < this.length; i++) {
+        if (this[i] === needle) {
+          return i;
+        }
+      }
+      return -1;
+    };
+  }
+  if (prefix == null) {
+    prefix = "label-";
+  }
+  var klass = "";
+  if (['SUCCEEDED', 'OK', 'DONE'].indexOf(status) > -1) {
+    klass = prefix + "success";
+  }
+  else if (['RUNNING', 'READY', 'PREP', 'WAITING', 'SUSPENDED', 'PREPSUSPENDED', 'PREPPAUSED', 'PAUSED',
+    'SUBMITTED',
+    'SUSPENDEDWITHERROR',
+    'PAUSEDWITHERROR'].indexOf(status) > -1) {
+    klass = prefix + "warning";
+  }
+  else {
+    klass = prefix + "important";
+    if (prefix == "bar-") {
+      klass = prefix + "danger";
     }
-  }, 200);
-});
+  }
+  return klass;
+}
+
+function emptyStringIfNull(obj) {
+  if (obj != null && obj != undefined) {
+    return obj;
+  }
+  return "";
+}
+
+jQuery.fn.dataTableExt.oSort['title-numeric-asc'] = function (a, b) {
+  var x = a.match(/title="*(-?[0-9\.]+)/)[1];
+  var y = b.match(/title="*(-?[0-9\.]+)/)[1];
+  x = parseFloat(x);
+  y = parseFloat(y);
+  return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+};
+
+jQuery.fn.dataTableExt.oSort['title-numeric-desc'] = function (a, b) {
+  var x = a.match(/title="*(-?[0-9\.]+)/)[1];
+  var y = b.match(/title="*(-?[0-9\.]+)/)[1];
+  x = parseFloat(x);
+  y = parseFloat(y);
+  return ((x < y) ? 1 : ((x > y) ? -1 : 0));
+};

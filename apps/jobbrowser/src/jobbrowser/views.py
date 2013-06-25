@@ -30,10 +30,11 @@ except ImportError:
 from django.http import HttpResponseRedirect, HttpResponse
 from django.utils.functional import wraps
 from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
 
 from desktop.log.access import access_warn, access_log_level
 from desktop.lib.rest.http_client import RestException
-from desktop.lib.django_util import render_json, render, copy_query_dict
+from desktop.lib.django_util import render_json, render, copy_query_dict, encode_json_for_js
 from desktop.lib.exceptions import MessageException
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.views import register_status_bar_view
@@ -69,10 +70,12 @@ def jobs(request):
   text = request.GET.get('text')
   retired = request.GET.get('retired')
 
-  jobs = get_api(request.user, request.jt).get_jobs(user=request.user, username=user, state=state, text=text, retired=retired)
+  if request.GET.get('format') == 'json':
+    jobs = get_api(request.user, request.jt).get_jobs(user=request.user, username=user, state=state, text=text, retired=retired)
+    json_jobs  = [massage_job_for_json(job, request) for job in jobs]
+    return HttpResponse(encode_json_for_js(json_jobs), mimetype="application/json")
 
   return render('jobs.mako', request, {
-    'jobs': jobs,
     'request': request,
     'state_filter': state,
     'user_filter': user,
@@ -80,6 +83,54 @@ def jobs(request):
     'retired': retired,
     'filtered': not (state == 'all' and user == '' and text == '')
   })
+
+def massage_job_for_json(job, request):
+  job = {
+    'id': job.jobId,
+    'shortId': job.jobId_short,
+    'name': hasattr(job, 'jobName') and job.jobName or '',
+    'status': job.status,
+    'url': job.jobId and reverse('jobbrowser.views.single_job', kwargs={'job': job.jobId}) or '',
+    'logs': job.jobId and reverse('jobbrowser.views.job_single_logs', kwargs={'job': job.jobId}) or '',
+    'queueName': hasattr(job, 'queueName') and job.queueName or _('N/A'),
+    'priority': hasattr(job, 'priority') and job.priority.lower() or _('N/A'),
+    'user': job.user,
+    'isRetired': job.is_retired,
+    'isMR2': job.is_mr2,
+    'mapProgress': hasattr(job, 'mapProgress') and job.mapProgress or '',
+    'reduceProgress': hasattr(job, 'reduceProgress') and job.reduceProgress or '',
+    'setupProgress': hasattr(job, 'setupProgress') and job.setupProgress or '',
+    'cleanupProgress': hasattr(job, 'cleanupProgress') and job.cleanupProgress or '',
+    'desiredMaps': job.desiredMaps,
+    'desiredReduces': job.desiredReduces,
+    'mapsPercentComplete': job.maps_percent_complete,
+    'finishedMaps': job.finishedMaps,
+    'finishedReduces': job.finishedReduces,
+    'reducesPercentComplete': job.reduces_percent_complete,
+    'jobFile': hasattr(job, 'jobFile') and job.jobFile or '',
+    'launchTimeMs': hasattr(job, 'launchTimeMs') and job.launchTimeMs or '',
+    'launchTimeFormatted': hasattr(job, 'launchTimeFormatted') and job.launchTimeFormatted or '',
+    'startTimeMs': hasattr(job, 'startTimeMs') and job.startTimeMs or '',
+    'startTimeFormatted': hasattr(job, 'startTimeFormatted') and job.startTimeFormatted or '',
+    'finishTimeMs': hasattr(job, 'finishTimeMs') and job.finishTimeMs or '',
+    'finishTimeFormatted': hasattr(job, 'finishTimeFormatted') and job.finishTimeFormatted or '',
+    'durationFormatted': hasattr(job, 'durationFormatted') and job.durationFormatted or '',
+    'durationMs': hasattr(job, 'durationInMillis') and job.durationInMillis or '',
+    'canKill': (job.status.lower() == 'running' or job.status.lower() == 'pending') and not job.is_mr2 and (request.user.is_superuser or request.user.username == job.user),
+    'killUrl': job.jobId and reverse('jobbrowser.views.kill_job', kwargs={'job': job.jobId}) or ''
+  }
+  return job
+
+
+def massage_task_for_json(task):
+  task = {
+    'id': task.taskId,
+    'shortId': task.taskId_short,
+    'url': task.taskId and reverse('jobbrowser.views.single_task', kwargs={'job': task.jobId, 'taskid': task.taskId}) or '',
+    'logs': task.taskAttemptIds and reverse('jobbrowser.views.single_task_attempt_logs', kwargs={'job': task.jobId, 'taskid': task.taskId, 'attemptid': task.taskAttemptIds[-1]}) or '',
+    'type': task.taskType
+  }
+  return task
 
 
 @check_job_permission
@@ -92,11 +143,21 @@ def single_job(request, job):
   recent_tasks = job.filter_tasks(task_states=('running', 'succeeded',))
   recent_tasks.sort(cmp_exec_time, reverse=True)
 
+  if request.REQUEST.get('format') == 'json':
+    json_failed_tasks = [massage_task_for_json(task) for task in failed_tasks]
+    json_recent_tasks = [massage_task_for_json(task) for task in recent_tasks]
+    json_job = {
+      'job': massage_job_for_json(job, request),
+      'failedTasks': json_failed_tasks,
+      'recentTasks': json_recent_tasks
+    }
+    return HttpResponse(encode_json_for_js(json_job), mimetype="application/json")
+
   return render('job.mako', request, {
     'request': request,
     'job': job,
-    'failed_tasks': failed_tasks[:5],
-    'recent_tasks': recent_tasks[:5],
+    'failed_tasks': failed_tasks and failed_tasks[:5] or [],
+    'recent_tasks': recent_tasks and recent_tasks[:5] or [],
   })
 
 
@@ -124,6 +185,8 @@ def kill_job(request, job):
     if job.status not in ["RUNNING", "QUEUED"]:
       if request.REQUEST.get("next"):
         return HttpResponseRedirect(request.REQUEST.get("next"))
+      elif request.REQUEST.get("format") == "json":
+        return HttpResponse(encode_json_for_js({'status': 0}), mimetype="application/json")
       else:
         raise MessageException("Job Killed")
     time.sleep(1)

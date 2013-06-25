@@ -26,8 +26,8 @@
   from django.utils.translation import ugettext as _
 %>
 
-<%def name="task_table(tasks)">
-    <table class="taskTable table table-striped table-condensed">
+<%def name="task_table(dom_id, tasks)">
+    <table id="${ dom_id }" class="taskTable table table-striped table-condensed">
         <thead>
         <tr>
             <th>${_('Logs')}</th>
@@ -92,6 +92,17 @@
 
 ${ commonheader(_('Job: %(jobId)s') % dict(jobId=job.jobId_short), "jobbrowser", user) | n,unicode }
 
+<style type="text/css">
+  .killJob {
+    display: none;
+  }
+  %if not failed_tasks:
+    #failedTasksContainer {
+      display: none;
+    }
+  %endif
+</style>
+
 <div class="container-fluid">
     <h1>${_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId_short)}</h1>
     <div class="row-fluid">
@@ -103,24 +114,19 @@ ${ commonheader(_('Job: %(jobId)s') % dict(jobId=job.jobId_short), "jobbrowser",
                     <li class="nav-header">${_('User')}</li>
                     <li>${job.user}</li>
                     <li class="nav-header">${_('Status')}</li>
-                    <li>
-                        ${comps.get_status(job)}
-                    </li>
+                    <li id="jobStatus">&nbsp;</li>
                     <li class="nav-header">${_('Logs')}</li>
                     <li><a href="${ url('jobbrowser.views.job_single_logs', job=job.jobId) }"><i class="icon-tasks"></i> ${_('Logs')}</a></li>
-                    % if not job.is_mr2 and (job.status.lower() in ('running', 'pending')):
-                        <li class="nav-header">${_('Kill Job')}</li>
-                        <li>
-                          <a href="#" title="${_('Kill this job')}" onclick="$('#kill-job').submit()">${_('Kill this job')}</a>
-                          <form id="kill-job" action="${url('jobbrowser.views.kill_job', job=job.jobId)}?next=${request.get_full_path()|urlencode}" method="POST"></form>
-                        </li>
-                    % endif
+
                     % if not job.is_retired:
                         <li class="nav-header">${_('Maps:')}</li>
-                        <li>${comps.mr_graph_maps(job)}</li>
+                        <li id="jobMaps">&nbsp;</li>
                         <li class="nav-header">${_('Reduces:')}</li>
-                        <li>${comps.mr_graph_reduces(job)}</li>
+                        <li id="jobReduces">&nbsp;</li>
                     % endif
+
+                    <li class="nav-header">${_('Duration:')}</li>
+                    <li id="jobDuration">&nbsp;</li>
 
                     <%
                         output_dir = job.conf_keys.get('mapredOutputDir', "")
@@ -146,6 +152,9 @@ ${ commonheader(_('Job: %(jobId)s') % dict(jobId=job.jobId_short), "jobbrowser",
                         % endif
                         </li>
                     % endif
+
+                    <li class="nav-header killJob">${_('Actions')}</li>
+                    <li id="killJobContainer" class="killJob"></li>
                 </ul>
             </div>
         </div>
@@ -168,8 +177,8 @@ ${ commonheader(_('Job: %(jobId)s') % dict(jobId=job.jobId_short), "jobbrowser",
                     <div class="tab-pane active" id="attempts">
                         <table id="jobAttemptTable" class="table table-striped table-condensed">
                             <thead>
-                                <th>${_('Logs')}</th>
-                                <th>${_('Id')}</th>
+                                <th width="20">${_('Logs')}</th>
+                                <th width="30">${_('Id')}</th>
                                 <th>${_('Container')}</th>
                             </thead>
                             <tbody>
@@ -197,24 +206,22 @@ ${ commonheader(_('Job: %(jobId)s') % dict(jobId=job.jobId_short), "jobbrowser",
                        <br/>
                        <br/>
                     % else:
-                        %if failed_tasks:
+                        <div id="failedTasksContainer">
+                            <a style="float:right;margin-right:10px;margin-top: 10px" href="${url('jobbrowser.views.tasks', job=job.jobId)}?taskstate=failed">${_('View All Failed Tasks')} &raquo;</a>
+                            <h3>
+                                ${_('Failed Tasks')}
+                            </h3>
                             <div>
-                                <h3>
-                                    <a href="${url('jobbrowser.views.tasks', job=job.jobId)}?taskstate=failed">${_('View Failed Tasks')} &raquo;</a>
-                                    ${_('Failed Tasks')}
-                                </h3>
-                                <div>
-                                ${task_table(failed_tasks)}
-                                </div>
+                            ${task_table('failedTasks', failed_tasks)}
                             </div>
-                        %endif
+                        </div>
                         <div>
-                            <a style="float:right;margin-right:10px" href="${url('jobbrowser.views.tasks', job=job.jobId)}">${_('View All Tasks')} &raquo;</a>
+                            <a style="float:right;margin-right:10px;margin-top: 10px" href="${url('jobbrowser.views.tasks', job=job.jobId)}">${_('View All Tasks')} &raquo;</a>
                             <h3>
                                 ${_('Recent Tasks')}
                             </h3>
                             <div>
-                                ${task_table(recent_tasks)}
+                                ${task_table('recentTasks', recent_tasks)}
                             </div>
                         </div>
                     % endif
@@ -318,81 +325,253 @@ ${ commonheader(_('Job: %(jobId)s') % dict(jobId=job.jobId_short), "jobbrowser",
     </div>
 </div>
 
+
+<div id="killModal" class="modal hide fade">
+  <div class="modal-header">
+    <a href="#" class="close" data-dismiss="modal">&times;</a>
+    <h3>${_('Please Confirm')}</h3>
+  </div>
+  <div class="modal-body">
+    <p>${_('Are you sure you want to kill this job?')}</p>
+  </div>
+  <div class="modal-footer">
+    <a class="btn" data-dismiss="modal">${_('No')}</a>
+    <a id="killJobBtn" class="btn btn-danger disable-feedback">${_('Yes')}</a>
+  </div>
+</div>
+
+<script src="/jobbrowser/static/js/utils.js" type="text/javascript" charset="utf-8"></script>
+
 <script type="text/javascript" charset="utf-8">
-    $(document).ready(function(){
-        $(".taskTable").dataTable({
-            "bPaginate": false,
-            "bLengthChange": false,
-            "bInfo": false,
-            "bAutoWidth": false,
-            "aoColumns": [
-                { "sWidth": "1%", "bSortable": false },
-                { "sWidth": "50%" },
-                { "sWidth": "49%" }
-            ],
-            "aaSorting": [[ 1, "asc" ]],
-            "oLanguage": {
-                "sEmptyTable": "${_('No data available')}",
-                "sZeroRecords": "${_('No matching records')}"
-            }
-        });
+$(document).ready(function () {
+  $(".taskTable").dataTable({
+    "bPaginate": false,
+    "bLengthChange": false,
+    "bInfo": false,
+    "bAutoWidth": false,
+    "aoColumns": [
+      { "sWidth": "1%", "bSortable": false },
+      { "sWidth": "50%" },
+      { "sWidth": "49%" }
+    ],
+    "aaSorting": [
+      [ 1, "asc" ]
+    ],
+    "oLanguage": {
+      "sEmptyTable": "${_('No data available')}",
+      "sZeroRecords": "${_('No matching records')}"
+    }
+  });
 
-        var _metadataTable = $("#metadataTable").dataTable({
-            "bPaginate": false,
-            "bLengthChange": false,
-            "bInfo": false,
-            "bAutoWidth": false,
-            "aoColumns": [
-                { "sWidth": "30%" },
-                { "sWidth": "70%" }
-            ],
-            "oLanguage": {
-                "sEmptyTable": "${_('No data available')}",
-                "sZeroRecords": "${_('No matching records')}"
-            }
-        });
+  var _metadataTable = $("#metadataTable").dataTable({
+    "bPaginate": false,
+    "bLengthChange": false,
+    "bInfo": false,
+    "bAutoWidth": false,
+    "aoColumns": [
+      { "sWidth": "30%" },
+      { "sWidth": "70%" }
+    ],
+    "oLanguage": {
+      "sEmptyTable": "${_('No data available')}",
+      "sZeroRecords": "${_('No matching records')}"
+    }
+  });
 
-        var _rawConfigurationTable = $("#rawConfigurationTable").dataTable({
-            "bPaginate": false,
-            "bLengthChange": false,
-            "bInfo": false,
-            "bAutoWidth": false,
-            "aoColumns": [
-                { "sWidth": "30%" },
-                { "sWidth": "70%" }
-            ],
-            "oLanguage": {
-                "sEmptyTable": "${_('No data available')}",
-                "sZeroRecords": "${_('No matching records')}"
-            }
-        });
+  var _rawConfigurationTable = $("#rawConfigurationTable").dataTable({
+    "bPaginate": false,
+    "bLengthChange": false,
+    "bInfo": false,
+    "bAutoWidth": false,
+    "aoColumns": [
+      { "sWidth": "30%" },
+      { "sWidth": "70%" }
+    ],
+    "oLanguage": {
+      "sEmptyTable": "${_('No data available')}",
+      "sZeroRecords": "${_('No matching records')}"
+    }
+  });
 
-        $("#metadataFilter").keyup(function(){
-            _metadataTable.fnFilter($(this).val());
-            _rawConfigurationTable.fnFilter($(this).val());
-        });
+  $("#metadataFilter").keyup(function () {
+    _metadataTable.fnFilter($(this).val());
+    _rawConfigurationTable.fnFilter($(this).val());
+  });
 
-        $(".jobCountersTable").dataTable({
-            "bPaginate": false,
-            "bLengthChange": false,
-            "bInfo": false,
-            "bAutoWidth": false,
-            "aoColumns": [
-                { "sWidth": "40%" },
-                { "sWidth": "20%" },
-                { "sWidth": "20%" },
-                { "sWidth": "20%" }
-            ],
-            "oLanguage": {
-                "sEmptyTable": "${_('No data available')}",
-                "sZeroRecords": "${_('No matching records')}"
-            }
-        });
+  $(".jobCountersTable").dataTable({
+    "bPaginate": false,
+    "bLengthChange": false,
+    "bInfo": false,
+    "bAutoWidth": false,
+    "aoColumns": [
+      { "sWidth": "40%" },
+      { "sWidth": "20%" },
+      { "sWidth": "20%" },
+      { "sWidth": "20%" }
+    ],
+    "oLanguage": {
+      "sEmptyTable": "${_('No data available')}",
+      "sZeroRecords": "${_('No matching records')}"
+    }
+  });
 
-        $(".dataTables_wrapper").css("min-height","0");
-        $(".dataTables_filter").hide();
-        $("a[data-row-selector='true']").jHueRowSelector();
+  $(".dataTables_wrapper").css("min-height", "0");
+  $(".dataTables_filter").hide();
+
+  $(document).ajaxError(function (event, jqxhr, settings, exception) {
+    if (jqxhr.status == 500) {
+      window.clearInterval(_runningInterval);
+      $.jHueNotify.error("${_('There was a problem communicating with the server. Please refresh the page.')}");
+    }
+  });
+
+  var _isUpdating = true;
+
+  function callJobDetails() {
+    _isUpdating = true;
+    $.getJSON("?format=json&rnd=" + Math.random(), function (data) { // Need to add random to prevent the cached of IE9
+      if (data != null && data.job != null) {
+        updateJob(data.job);
+        updateFailedTasks(data.failedTasks);
+        updateRecentTasks(data.recentTasks);
+      }
+      _isUpdating = false;
     });
+  }
+
+  function updateJob(job) {
+    var killCell = "";
+    if (job.canKill) {
+      killCell = '<button class="btn kill" ' +
+              'href="javascript:void(0)" ' +
+              'data-url="' + job.url + '" ' +
+              'data-killurl="' + job.killUrl + '" ' +
+              'data-shortid="' + job.shortId + '" ' +
+              'title="${ _('Kill this job') }" ' +
+              '>${ _('Kill this job') }</button>';
+      $(".killJob").show();
+    }
+    else {
+      $(".killJob").hide();
+    }
+    $("#killJobContainer").html(killCell);
+    $("#jobStatus").html('<span class="label ' + getStatusClass(job.status) + '">' + (job.isRetired && !job.isMR2 ? '<i class="icon-briefcase icon-white" title="${ _('Retired') }"></i> ' : '') + job.status + '</span>');
+    if (job.desiredMaps > 0) {
+      $("#jobMaps").html('<span title="' + emptyStringIfNull(job.mapsPercentComplete) + '">' + (job.isRetired ? '${_('N/A')}' : '<div class="progress" title="' + (job.isMR2 ? job.mapsPercentComplete : job.finishedMaps + '/' + job.desiredMaps) + '"><div class="bar-label">' + job.mapsPercentComplete + '%</div><div class="' + 'bar ' + getStatusClass(job.status, "bar-") + '" style="margin-top:-20px;width:' + job.mapsPercentComplete + '%"></div></div>') + '</span>');
+    }
+    else {
+      $("#jobMaps").html('${_('N/A')}');
+    }
+    if (job.desiredReduces > 0) {
+      $("#jobReduces").html('<span title="' + emptyStringIfNull(job.reducesPercentComplete) + '">' + (job.isRetired ? '${_('N/A')}' : '<div class="progress" title="' + (job.isMR2 ? job.reducesPercentComplete : job.finishedReduces + '/' + job.desiredReduces) + '"><div class="bar-label">' + job.reducesPercentComplete + '%</div><div class="' + 'bar ' + getStatusClass(job.status, "bar-") + '" style="margin-top:-20px;width:' + job.reducesPercentComplete + '%"></div></div>') + '</span>');
+    }
+    else {
+      $("#jobReduces").html('${_('N/A')}');
+    }
+    $("#jobDuration").html('<span title="' + emptyStringIfNull(job.durationMs) + '">' + (job.isRetired ? '${_('N/A')}' : emptyStringIfNull(job.durationFormatted)) + '</span>');
+
+    if (['RUNNING', 'PREP', 'WAITING', 'SUSPENDED', 'PREPSUSPENDED', 'PREPPAUSED', 'PAUSED'].indexOf(job.status.toUpperCase()) == -1) {
+      window.clearInterval(_runningInterval);
+      removeFailedTasksFromRecent();
+    }
+  }
+
+  function updateFailedTasks(tasks) {
+    if (tasks != null && tasks.length > 0 && $("#failedTasks").length > 0) {
+      $("#failedTasksContainer").show();
+      var _failedTasksTableNodes = $("#failedTasks").dataTable().fnGetNodes();
+      $(tasks).each(function (cnt, task) {
+        var _foundRow = null;
+        $(_failedTasksTableNodes).each(function (iNode, node) {
+          if ($(node).children("td").eq(1).text().trim() == task.shortId) {
+            _foundRow = node;
+          }
+        });
+        if (_foundRow == null) {
+          $("#failedTasks").dataTable().fnAddData(getTaskRow(task));
+        }
+      });
+    }
+  }
+
+  function updateRecentTasks(tasks) {
+    if (tasks != null && tasks.length > 0 && $("#recentTasks").length > 0) {
+      var _recentTasksTableNodes = $("#recentTasks").dataTable().fnGetNodes();
+      $(tasks).each(function (cnt, task) {
+        var _foundRow = null;
+        $(_recentTasksTableNodes).each(function (iNode, node) {
+          if ($(node).children("td").eq(1).text().trim() == task.shortId) {
+            _foundRow = node;
+          }
+        });
+        if (_foundRow == null) {
+          $("#recentTasks").dataTable().fnAddData(getTaskRow(task));
+        }
+      });
+    }
+  }
+
+  function removeFailedTasksFromRecent() {
+    var _failedTasksTableNodes = $("#failedTasks").dataTable().fnGetNodes();
+    var _recentTasksTableNodes = $("#recentTasks").dataTable().fnGetNodes();
+    $(_failedTasksTableNodes).each(function (fCnt, fNode) {
+      $(_recentTasksTableNodes).each(function (rCnt, rNode) {
+        if ($(rNode).children("td").eq(1).text().trim() == $(fNode).children("td").eq(1).text().trim()) {
+          $("#recentTasks").dataTable().fnDeleteRow(rCnt);
+        }
+      });
+    });
+  }
+
+  function getTaskRow(task) {
+    return [
+      '<a href="' + emptyStringIfNull(task.logs) + '" data-row-selector-exclude="true"><i class="icon-tasks"></i></a>',
+      '<a href="' + emptyStringIfNull(task.url) + '" title="${_('View this task')}" data-row-selector="true">' + emptyStringIfNull(task.shortId) + '</a>',
+      emptyStringIfNull(task.type)
+    ]
+  }
+
+  $(document).on("click", ".kill", function (e) {
+    var _this = $(this);
+    $("#killJobBtn").data("url", _this.data("url"));
+    $("#killJobBtn").data("killurl", _this.data("killurl"));
+    $("#killModal").modal({
+      keyboard: true,
+      show: true
+    });
+  });
+
+  $("#killJobBtn").on("click", function () {
+    var _this = $(this);
+    _this.attr("data-loading-text", _this.text() + " ...");
+    _this.button("loading");
+    $.post(_this.data("killurl"),
+            {
+              "format": "json"
+            },
+            function (response) {
+              _this.button("reset");
+              $("#killModal").modal("hide");
+              if (response.status != 0) {
+                $.jHueNotify.error("${ _('There was a problem killing this job.') }");
+              }
+              else {
+                callJobDetails({ url: _this.data("url")});
+              }
+            }
+    );
+  });
+
+  callJobDetails();
+
+  var _runningInterval = window.setInterval(function () {
+    if (!_isUpdating){
+      callJobDetails();
+    }
+  }, 2000);
+
+  $("a[data-row-selector='true']").jHueRowSelector();
+});
 </script>
 
 

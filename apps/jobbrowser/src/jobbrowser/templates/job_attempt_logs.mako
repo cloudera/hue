@@ -73,6 +73,8 @@ ${ commonheader(_('Job Attempt: %(attempt_index)s') % {'attempt_index': attempt_
 
 <script type="text/javascript" charset="utf-8">
   $(document).ready(function () {
+    enableResizeLogs();
+
     $("#metadataTable").dataTable({
       "bPaginate": false,
       "bLengthChange": false,

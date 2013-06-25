@@ -120,6 +120,8 @@ ${ line | unicode,trim }
 
 <script type="text/javascript" charset="utf-8">
   $(document).ready(function () {
+    enableResizeLogs();
+
     $("#metadataTable").dataTable({
       "bPaginate": false,
       "bLengthChange": false,
