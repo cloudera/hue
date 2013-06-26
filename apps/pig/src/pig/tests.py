@@ -28,6 +28,7 @@ from nose.tools import assert_true, assert_equal
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
+from hadoop import pseudo_hdfs4
 from liboozie.oozie_api_test import OozieServerProvider
 from oozie.tests import OozieBase
 
@@ -42,6 +43,7 @@ class TestPigBase(object):
       'script': 'A = LOAD "$data"; STORE A INTO "$output";',
       'parameters': [],
       'resources': [],
+      'hadoopProperties': []
   }
 
   def setUp(self):
@@ -50,9 +52,15 @@ class TestPigBase(object):
     self.user = User.objects.get(username='test')
 
   def create_script(self):
-    attrs = {'user': self.user,}
-    attrs.update(TestPigBase.SCRIPT_ATTRS)
-    return create_or_update_script(**attrs)
+    return create_script(self.user)
+
+
+def create_script(user, xattrs=None):
+  attrs = {'user': user}
+  attrs.update(TestPigBase.SCRIPT_ATTRS)
+  if xattrs is not None:
+    attrs.update(xattrs)
+  return create_or_update_script(**attrs)
 
   def make_log_links(self):
     # FileBrowser
@@ -109,8 +117,9 @@ class TestMock(TestPigBase):
   def test_save(self):
     attrs = {'user': self.user,}
     attrs.update(TestPigBase.SCRIPT_ATTRS)
-    attrs['parameters'] = json.dumps([])
-    attrs['resources'] = json.dumps([])
+    attrs['parameters'] = json.dumps(TestPigBase.SCRIPT_ATTRS['parameters'])
+    attrs['resources'] = json.dumps(TestPigBase.SCRIPT_ATTRS['resources'])
+    attrs['hadoopProperties'] = json.dumps(TestPigBase.SCRIPT_ATTRS['hadoopProperties'])
 
     # Save
     self.c.post(reverse('pig:save'), data=attrs, follow=True)
@@ -125,6 +134,53 @@ class TestWithHadoop(OozieBase):
     super(TestWithHadoop, self).setUp()
     grant_access("test", "test", "pig")
     self.c.post(reverse('pig:install_examples'))
+
+  def test_create_workflow(self):
+    cluster = pseudo_hdfs4.shared_cluster()
+    api = OozieApi(cluster.fs, self.user)
+
+    xattrs = {
+      'parameters': [
+        {'name': 'output', 'value': '/tmp'},
+        {'name': '-param', 'value': 'input=/data'}, # Alternative way for params
+        {'name': '-optimizer_off', 'value': 'SplitFilter'},
+        {'name': '-v', 'value': ''},
+       ],
+      'resources': [
+        {'type': 'file', 'value': '/tmp/file'},
+        {'type': 'archive', 'value': '/tmp/file.zip'},
+      ],
+      'hadoopProperties': [
+        {'name': 'mapred.map.tasks.speculative.execution', 'value': 'false'},
+        {'name': 'mapred.job.queue', 'value': 'fast'},
+      ]
+    }
+
+    pig_script = create_script(self.user, xattrs)
+    params = json.dumps([
+      {'name': 'output', 'value': '/tmp2'},
+    ])
+
+    workflow = api._create_workflow(pig_script, params)
+    pig_action = workflow.start.get_child('to').get_full_node()
+
+    assert_equal([
+        {u'type': u'argument', u'value': u'-param'}, {u'type': u'argument', u'value': u'output=/tmp2'},
+        {u'type': u'argument', u'value': u'-param'}, {u'type': u'argument', u'value': u'input=/data'},
+        {u'type': u'argument', u'value': u'-optimizer_off'}, {u'type': u'argument', u'value': u'SplitFilter'},
+        {u'type': u'argument', u'value': u'-v'},
+    ], pig_action.get_params())
+
+    assert_equal([
+        {u'name': u'mapred.map.tasks.speculative.execution', u'value': u'false'},
+        {u'name': u'mapred.job.queue', u'value': u'fast'},
+    ], pig_action.get_properties())
+
+    assert_equal(['/tmp/file'], pig_action.get_files())
+
+    assert_equal([
+        {u'dummy': u'', u'name': u'/tmp/file.zip'},
+    ], pig_action.get_archives())
 
   def wait_until_completion(self, pig_script_id, timeout=300.0, step=5, expected_status='SUCCEEDED'):
     script = PigScript.objects.get(id=pig_script_id)
@@ -159,6 +215,7 @@ class TestWithHadoop(OozieBase):
       'user': script.owner,
       'parameters': json.dumps(script_dict['parameters']),
       'resources': json.dumps(script_dict['resources']),
+      'hadoopProperties': json.dumps(script_dict['hadoopProperties']),
       'submissionVariables': json.dumps([{"name": "output", "value": '/tmp/test_pig'}]),
     }
 
@@ -178,6 +235,7 @@ class TestWithHadoop(OozieBase):
       'user': script.owner,
       'parameters': json.dumps(script_dict['parameters']),
       'resources': json.dumps(script_dict['resources']),
+      'hadoopProperties': json.dumps(script_dict['hadoopProperties']),
       'submissionVariables': json.dumps([{"name": "output", "value": '/tmp/test_pig'}]),
     }
 

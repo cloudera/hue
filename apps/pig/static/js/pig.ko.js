@@ -21,6 +21,16 @@ var Resource = function (resource) {
   self.value = ko.observable(resource.value);
 };
 
+var HadoopProperty = function (property) {
+  var self = this;
+
+  self.name = ko.observable(property.name);
+  self.value = ko.observable(property.value);
+};
+
+var PigParameter = HadoopProperty;
+
+
 var PigScript = function (pigScript) {
   var self = this;
 
@@ -41,9 +51,13 @@ var PigScript = function (pigScript) {
   self.toggleHover = function (row, e) {
     this.hovered(!this.hovered());
   };
-  self.parameters = ko.observableArray(pigScript.parameters);
+
+  self.parameters = ko.observableArray([]);
+  ko.utils.arrayForEach(pigScript.parameters, function (parameter) {
+    self.parameters.push(new PigParameter({name: parameter.name, value: parameter.value}));
+  });
   self.addParameter = function () {
-    self.parameters.push({name: '', value: ''});
+    self.parameters.push(new PigParameter({name: '', value: ''}));
   };
   self.removeParameter = function () {
     self.parameters.remove(this);
@@ -55,15 +69,25 @@ var PigScript = function (pigScript) {
       $.each(variables, function(index, param) {
         var p = param.substring(1);
         params[p] = '';
-        $.each(self.parameters(), function(index, param) {
-          if (param['name'] == p) {
-            params[p] = param['value'];
-          }
-        });
       });
     }
+    $.each(self.parameters(), function(index, param) {
+        params[param.name()] = param.value();
+    });
     return params;
   };
+
+  self.hadoopProperties = ko.observableArray([]);
+  ko.utils.arrayForEach(pigScript.hadoopProperties, function (property) {
+    self.hadoopProperties.push(new HadoopProperty({name: property.name, value: property.value}));
+  });
+  self.addHadoopProperties = function () {
+    self.hadoopProperties.push(new HadoopProperty({name: '', value: ''}));
+  };
+  self.removeHadoopProperties = function () {
+    self.hadoopProperties.remove(this);
+  };
+
   self.resources = ko.observableArray([]);
   ko.utils.arrayForEach(pigScript.resources, function (resource) {
     self.resources.push(new Resource({type: resource.type, value: resource.value}));
@@ -133,7 +157,8 @@ var PigViewModel = function (props) {
     name: self.LABELS.NEW_SCRIPT_NAME,
     script: self.LABELS.NEW_SCRIPT_CONTENT,
     parameters: self.LABELS.NEW_SCRIPT_PARAMETERS,
-    resources: self.LABELS.NEW_SCRIPT_RESOURCES
+    resources: self.LABELS.NEW_SCRIPT_RESOURCES,
+    hadoopProperties: self.LABELS.NEW_SCRIPT_HADOOP_PROPERTIES
   };
 
   self.currentScript = ko.observable(new PigScript(_defaultScript));
@@ -420,8 +445,9 @@ var PigViewModel = function (props) {
           id: script.id(),
           name: script.name(),
           script: script.script(),
-          parameters: ko.utils.stringifyJson(script.parameters()),
-          resources: ko.toJSON(script.resources())
+          parameters: ko.toJSON(script.parameters()),
+          resources: ko.toJSON(script.resources()),
+          hadoopProperties: ko.toJSON(script.hadoopProperties()),
         },
         function (data) {
           self.currentScript().id(data.id);
@@ -438,9 +464,10 @@ var PigViewModel = function (props) {
           id: script.id(),
           name: script.name(),
           script: script.script(),
-          parameters: ko.utils.stringifyJson(script.parameters()),
+          parameters: ko.toJSON(script.parameters()),
           submissionVariables: ko.utils.stringifyJson(self.submissionVariables()),
-          resources: ko.toJSON(script.resources())
+          resources: ko.toJSON(script.resources()),
+          hadoopProperties: ko.toJSON(script.hadoopProperties())
         },
         function (data) {
           if (data.id && self.currentScript().id() != data.id){

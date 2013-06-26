@@ -60,52 +60,78 @@ class OozieApi:
       'oozie.use.system.libpath':  'true',
     }
 
-    workflow = Workflow.objects.new_workflow(self.user)
+    workflow = None
 
     try:
-      workflow.name = OozieApi.WORKFLOW_NAME
-      workflow.is_history = True
-      workflow.save()
-      Workflow.objects.initialize(workflow, self.fs)
+      workflow = self._create_workflow(pig_script, params)
+      oozie_wf = _submit_workflow(self.user, self.fs, workflow, mapping)
+    finally:
+      if workflow:
+        workflow.delete()
 
-      script_path = workflow.deployment_dir + '/script.pig'
-      self.fs.create(script_path, data=pig_script.dict['script'])
+    return oozie_wf
 
-      pig_params = []
-      for param in json.loads(params):
+  def _create_workflow(self, pig_script, params):
+    workflow = Workflow.objects.new_workflow(self.user)
+    workflow.name = OozieApi.WORKFLOW_NAME
+    workflow.is_history = True
+    workflow.save()
+    Workflow.objects.initialize(workflow, self.fs)
+
+    script_path = workflow.deployment_dir + '/script.pig'
+    self.fs.create(script_path, data=pig_script.dict['script'])
+
+    files = []
+    archives = []
+
+    popup_params = json.loads(params)
+    popup_params_names = [param['name'] for param in popup_params]
+    pig_params = self._build_parameters(popup_params)
+    script_params = [param for param in pig_script.dict['parameters'] if param['name'] not in popup_params_names]
+
+    pig_params += self._build_parameters(script_params)
+
+    job_properties = [{"name": prop['name'], "value": prop['value']} for prop in pig_script.dict['hadoopProperties']]
+
+    for resource in pig_script.dict['resources']:
+      if resource['type'] == 'file':
+        files.append(resource['value'])
+      if resource['type'] == 'archive':
+        archives.append({"dummy": "", "name": resource['value']})
+
+    action = Pig.objects.create(
+        name='pig',
+        script_path=script_path,
+        workflow=workflow,
+        node_type='pig',
+        params=json.dumps(pig_params),
+        files=json.dumps(files),
+        archives=json.dumps(archives),
+        job_properties=json.dumps(job_properties),
+    )
+
+    action.add_node(workflow.end)
+
+    start_link = workflow.start.get_link()
+    start_link.child = action
+    start_link.save()
+
+    return workflow
+
+  def _build_parameters(self, params):
+    pig_params = []
+
+    for param in params:
+      if param['name'].startswith('-'):
+        pig_params.append({"type": "argument", "value": "%(name)s" % param})
+        if param['value']:
+          pig_params.append({"type": "argument", "value": "%(value)s" % param})
+      else:
+        # Simpler way and backward compatibility for parameters
         pig_params.append({"type": "argument", "value": "-param"})
         pig_params.append({"type": "argument", "value": "%(name)s=%(value)s" % param})
 
-      files = []
-      archives = []
-
-      for resource in pig_script.dict['resources']:
-        if resource['type'] == 'file':
-          files.append(resource['value'])
-        if resource['type'] == 'archive':
-          archives.append({"dummy": "", "name": resource['value']})
-
-      action = Pig.objects.create(
-          name='pig',
-          script_path=script_path,
-          workflow=workflow,
-          node_type='pig',
-          params=json.dumps(pig_params),
-          files=json.dumps(files),
-          archives=json.dumps(archives),
-      )
-
-      action.add_node(workflow.end)
-
-      start_link = workflow.start.get_link()
-      start_link.child = action
-      start_link.save()
-
-      oozie_wf = _submit_workflow(self.user, self.fs, workflow, mapping)
-    finally:
-      workflow.delete()
-
-    return oozie_wf
+    return pig_params
 
   def stop(self, job_id):
     return get_oozie().job_control(job_id, 'kill')

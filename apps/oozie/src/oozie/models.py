@@ -46,7 +46,6 @@ from liboozie.submittion import Submission
 from liboozie.submittion import create_directories
 
 from oozie.conf import REMOTE_SAMPLE_DIR, SHARE_JOBS
-from oozie.management.commands import oozie_setup
 from timezones import TIMEZONES
 
 

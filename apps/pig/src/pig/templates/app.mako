@@ -103,21 +103,16 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
           <ul class="nav nav-list">
             <li class="nav-header">${_('Editor')}</li>
             <li data-bind="click: editScript" class="active" data-section="edit">
-              <a href="#"><i class="icon-edit"></i> ${ _('Edit script') }</a>
+              <a href="#"><i class="icon-edit"></i> ${ _('Script') }</a>
             </li>
-            <li data-bind="click: confirmNewScript">
-              <a href="#" title="${ _('New script') }" rel="tooltip" data-placement="right">
-                <i class="icon-plus-sign"></i> ${ _('New script') }
+            <li data-bind="click: editScriptProperties" data-section="properties">
+              <a href="#"><i class="icon-reorder"></i> ${ _('Properties') }</a>
+            </li>
+            <li data-bind="click: saveScript">
+              <a href="#" title="${ _('Save the script') }" rel="tooltip" data-placement="right">
+                <i class="icon-save"></i> ${ _('Save') }
               </a>
             </li>
-            <li class="nav-header">${_('Properties')}</li>
-            <li data-bind="click: editScriptProperties" data-section="properties">
-              <a href="#"><i class="icon-reorder"></i> ${ _('Edit properties') }</a>
-            </li>
-            ##<li class="nav-header">${_('Python UDF')}</li>
-            ##<li><a href="#createDataset">${ _('New') }</a></li>
-            ##<li><a href="#createDataset">${ _('List') }</a></li>
-            <li class="nav-header">${_('Actions')}</li>
             <li data-bind="click: runOrShowSubmissionModal, visible: !currentScript().isRunning()">
               <a href="#" title="${ _('Run the script') }" rel="tooltip" data-placement="right">
                 <i class="icon-play"></i> ${ _('Run') }
@@ -128,9 +123,13 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
                 <i class="icon-ban-circle"></i> ${ _('Stop') }
               </a>
             </li>
-            <li data-bind="click: saveScript">
-              <a href="#" title="${ _('Save the script') }" rel="tooltip" data-placement="right">
-                <i class="icon-save"></i> ${ _('Save') }
+            ##<li class="nav-header">${_('UDF')}</li>
+            ##<li><a href="#createDataset">${ _('Python') }</a></li>
+            ##<li><a href="#createDataset">${ _('Ruby') }</a></li>
+            <li class="nav-header">${_('Actions')}</li>
+            <li data-bind="click: confirmNewScript">
+              <a href="#" title="${ _('New script') }" rel="tooltip" data-placement="right">
+                <i class="icon-plus-sign"></i> ${ _('New script') }
               </a>
             </li>
             <li data-bind="visible: currentScript().id() != -1, click: copyScript">
@@ -143,9 +142,11 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
                 <i class="icon-trash"></i> ${ _('Delete') }
               </a>
             </li>
-            <li class="nav-header" data-bind="visible: currentScript().isRunning()">${_('Logs')}</li>
-            <li data-bind="visible: currentScript().isRunning(), click: showScriptLogs" data-section="logs">
-              <a href="#" title="${ _('Show Logs') }" rel="tooltip" data-placement="right">${ _('Current Logs') }</a>
+            <li class="nav-header">${_('Logs')}</li>
+            <li data-bind="click: showScriptLogs" data-section="logs">
+              <a href="#" title="${ _('Show Logs') }" rel="tooltip" data-placement="right">
+                <i class="icon-tasks"></i> ${ _('Current Logs') }
+              </a>
             </li>
             <li>
             <br/>
@@ -181,9 +182,19 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
             ${ _('Script name') } &nbsp;
             <input type="text" id="scriptName" class="input-xlarge" data-bind="value: currentScript().name" />
           </label>
+
           <br/>
           <br/>
-          <label>${ _('Parameters') } &nbsp;
+
+          <label>${ _('Parameters') } &nbsp; <i id="parameters-dyk" class="icon-question-sign"></i>
+            <div id="parameters-dyk-content" class="hide">
+              <ul style="text-align: left;">
+                <li>input /user/data</li>
+                <li>-param input=/user/data</li>
+                <li>-optimizer_off SplitFilter</li>
+                <li>-verbose</li>
+              </ul>
+            </div>
             <button class="btn" data-bind="click: currentScript().addParameter, visible: currentScript().parameters().length == 0" style="margin-left: 4px">
               <i class="icon-plus"></i> ${ _('Add') }
             </button>
@@ -199,8 +210,11 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
               </thead>
               <tbody data-bind="foreach: currentScript().parameters">
                 <tr>
-                  <td><input type="text" data-bind="value: name" class="input-large" /></td>
-                  <td><input type="text" data-bind="value: value" class="input-large" /></td>
+                  <td><input type="text" data-bind="value: name" class="input-xlarge" /></td>
+                  <td>
+                    <input type="text" data-bind="value: value" class="input-xxlarge" />
+                    <button class="btn fileChooserBtn" data-bind="click: $root.showFileChooser">..</button>
+                  </td>
                   <td><button data-bind="click: viewModel.currentScript().removeParameter" class="btn"><i class="icon-trash"></i> ${ _('Remove') }</button></td>
                 </tr>
               </tbody>
@@ -213,8 +227,57 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
               </tfoot>
             </table>
           </div>
+
           <br/>
-          <label>${ _('Resources') } &nbsp;
+
+          <label>${ _('Hadoop properties') } &nbsp; <i id="properties-dyk" class="icon-question-sign"></i>
+            <div id="properties-dyk-content" class="hide">
+              <ul style="text-align: left; word-wrap:break-word">
+                <li>mapred.job.queue.name production</li>
+                <li>mapred.map.tasks.speculative.execution false</li>
+              </ul>
+            </div>
+            <button class="btn" data-bind="click: currentScript().addHadoopProperties, visible: currentScript().hadoopProperties().length == 0" style="margin-left: 4px">
+              <i class="icon-plus"></i> ${ _('Add') }
+            </button>
+          </label>
+          <div>
+            <table data-bind="css: {'parameterTable': currentScript().hadoopProperties().length > 0}">
+              <thead data-bind="visible: currentScript().hadoopProperties().length > 0">
+                <tr>
+                  <th>${ _('Name') }</th>
+                  <th>${ _('Value') }</th>
+                  <th>&nbsp;</th>
+                </tr>
+              </thead>
+              <tbody data-bind="foreach: currentScript().hadoopProperties">
+                <tr>
+                  <td><input type="text" data-bind="value: name" class="input-xlarge" /></td>
+                  <td>
+                    <input type="text" data-bind="value: value" class="input-xxlarge" />
+                    <button class="btn fileChooserBtn" data-bind="click: $root.showFileChooser">..</button>
+                  </td>
+                  <td><button data-bind="click: viewModel.currentScript().removeHadoopProperties" class="btn"><i class="icon-trash"></i> ${ _('Remove') }</button></td>
+                </tr>
+              </tbody>
+              <tfoot data-bind="visible: currentScript().hadoopProperties().length > 0">
+                <tr>
+                  <td colspan="3">
+                    <button class="btn" data-bind="click: currentScript().addHadoopProperties"><i class="icon-plus"></i> ${ _('Add') }</button>
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <br/>
+
+          <label>${ _('Resources') } &nbsp; <i id="resources-dyk" class="icon-question-sign"></i>
+            <div id="resources-dyk-content" class="hide">
+              <ul style="text-align: left;">
+                <li>${ _("Path to a HDFS file or zip file to add to the workspace of the running script") }</li>
+              </ul>
+            </div>
             <button class="btn" data-bind="click: currentScript().addResource, visible: currentScript().resources().length == 0" style="margin-left: 4px">
               <i class="icon-plus"></i> ${ _('Add') }
             </button>
@@ -231,7 +294,7 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
               <tbody data-bind="foreach: currentScript().resources">
                 <tr>
                   <td>
-                    <select type="text" data-bind="value: type" class="input-large">
+                    <select type="text" data-bind="value: type" class="input-xlarge">
                       ##<option value="udf">${ _('UDF') }</option>
                       <option value="file">${ _('File') }</option>
                       <option value="archive">${ _('Archive') }</option>
@@ -506,7 +569,8 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
     NEW_SCRIPT_NAME: "${ _('Unsaved script') }",
     NEW_SCRIPT_CONTENT: "ie. A = LOAD '/user/${ user }/data';",
     NEW_SCRIPT_PARAMETERS: [],
-    NEW_SCRIPT_RESOURCES: []
+    NEW_SCRIPT_RESOURCES: [],
+    NEW_SCRIPT_HADOOP_PROPERTIES: []
   };
 
   var appProperties = {
@@ -960,6 +1024,26 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
       'html': true
     });
 
+    $("#parameters-dyk").popover({
+      'title': "${_('Names and values of Pig parameters and options, e.g.')}",
+      'content': $("#parameters-dyk-content").html(),
+      'trigger': 'hover',
+      'html': true
+    });
+
+    $("#properties-dyk").popover({
+      'title': "${_('Names and values of Hadoop properties, e.g.')}",
+      'content': $("#properties-dyk-content").html(),
+      'trigger': 'hover',
+      'html': true
+    });
+
+    $("#resources-dyk").popover({
+      'title': "${_('Include files or compressed files')}",
+      'content': $("#resources-dyk-content").html(),
+      'trigger': 'hover',
+      'html': true
+    });
   });
 
   window.onbeforeunload = function (e) {

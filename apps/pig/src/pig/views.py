@@ -72,6 +72,7 @@ def save(request):
     'user': request.user,
     'parameters': json.loads(request.POST.get('parameters')),
     'resources': json.loads(request.POST.get('resources')),
+    'hadoopProperties': json.loads(request.POST.get('hadoopProperties')),
   }
   pig_script = create_or_update_script(**attrs)
   pig_script.is_design = True
@@ -115,6 +116,7 @@ def run(request):
     'user': request.user,
     'parameters': json.loads(request.POST.get('parameters')),
     'resources': json.loads(request.POST.get('resources')),
+    'hadoopProperties': json.loads(request.POST.get('hadoopProperties')),
     'is_design': False
   }
 
@@ -146,9 +148,16 @@ def copy(request):
   script = existing_script_data["script"]
   parameters = existing_script_data["parameters"]
   resources = existing_script_data["resources"]
+  hadoopProperties = existing_script_data["hadoopProperties"]
 
   pig_script = PigScript.objects.create(owner=request.user)
-  pig_script.update_from_dict({'name': name, 'script': script, 'parameters': parameters, 'resources': resources})
+  pig_script.update_from_dict({
+      'name': name,
+      'script': script,
+      'parameters': parameters,
+      'resources': resources,
+      'hadoopProperties': hadoopProperties
+  })
   pig_script.save()
 
   response = {
@@ -156,7 +165,8 @@ def copy(request):
     'name': name,
     'script': script,
     'parameters': parameters,
-    'resources': resources
+    'resources': resources,
+    'hadoopProperties': hadoopProperties
   }
 
   return HttpResponse(json.dumps(response), content_type="text/plain")

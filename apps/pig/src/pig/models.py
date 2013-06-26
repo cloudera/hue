@@ -45,7 +45,7 @@ class Document(models.Model):
 
 
 class PigScript(Document):
-  _ATTRIBUTES = ['script', 'name', 'properties', 'job_id', 'parameters', 'resources']
+  _ATTRIBUTES = ['script', 'name', 'properties', 'job_id', 'parameters', 'resources', 'hadoopProperties']
 
   data = models.TextField(default=json.dumps({
       'script': '',
@@ -53,7 +53,8 @@ class PigScript(Document):
       'properties': [],
       'job_id': None,
       'parameters': [],
-      'resources': []
+      'resources': [],
+      'hadoopProperties': []
   }))
 
   def update_from_dict(self, attrs):
@@ -70,7 +71,7 @@ class PigScript(Document):
     return json.loads(self.data)
 
 
-def create_or_update_script(id, name, script, user, parameters, resources, is_design=True):
+def create_or_update_script(id, name, script, user, parameters, resources, hadoopProperties, is_design=True):
   """This take care of security"""
   try:
     pig_script = PigScript.objects.get(id=id)
@@ -82,7 +83,8 @@ def create_or_update_script(id, name, script, user, parameters, resources, is_de
       'name': name,
       'script': script,
       'parameters': parameters,
-      'resources': resources
+      'resources': resources,
+      'hadoopProperties': hadoopProperties
   })
 
   return pig_script
@@ -103,6 +105,7 @@ def get_scripts(user, max_count=200, is_design=None):
       'script': data['script'],
       'parameters': data['parameters'],
       'resources': data['resources'],
+      'hadoopProperties': data.get('hadoopProperties', []),
       'isDesign': script.is_design,
     }
     scripts.append(massaged_script)
