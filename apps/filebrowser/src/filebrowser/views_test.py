@@ -15,9 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #!/usr/bin/env python
-"""
-Tests for filebrowser views
-"""
+
 try:
   import json
 except ImportError:
@@ -35,8 +33,8 @@ from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal
 
 from desktop.lib.django_test_util import make_logged_in_client
-from desktop.lib.test_utils import grant_access
 from hadoop import pseudo_hdfs4
+from filebrowser.views import location_to_url
 
 from conf import MAX_SNAPPY_DECOMPRESSION_SIZE
 from lib.rwx import expand_mode
@@ -1010,6 +1008,7 @@ def test_upload_file():
 
     # Upload in / and fails because of missing permissions
     LOG.debug('HDFS superuser: %s' % cluster.fs._superuser)
+    LOG.debug('HDFS list: %s' % cluster.fs.listdir_stats('/'))
     try:
       resp = client.post('/filebrowser/upload/file?dest=%s' % '/',
                          dict(dest='/', hdfs_file=file(LOCAL_FILE)))
@@ -1065,3 +1064,9 @@ def test_upload_archive():
       cluster.fs.remove(HDFS_DEST_DIR)
     except Exception, ex:
       pass
+
+def test_location_to_url():
+  assert_equal('/filebrowser/view/var/lib/hadoop-hdfs', location_to_url('/var/lib/hadoop-hdfs', False))
+  assert_equal('/filebrowser/view/var/lib/hadoop-hdfs', location_to_url('hdfs://localhost:8020/var/lib/hadoop-hdfs'))
+  assert_equal('/filebrowser/view/', location_to_url('hdfs://localhost:8020'))
+  assert_equal(None, location_to_url('thrift://10.0.0.1:9083'))

@@ -1322,8 +1322,8 @@ def location_to_url(location, strict=True):
     if location is None:
       return None
     split_path = Hdfs.urlsplit(location)
-    if strict and not split_path[1]:
-      # No netloc, not full url
+    if strict and not split_path[1] or not split_path[2]:
+      # No netloc not full url or no URL
       return None
     return reverse("filebrowser.views.view", kwargs=dict(path=split_path[2]))
 
