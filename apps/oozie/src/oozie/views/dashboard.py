@@ -498,9 +498,9 @@ def massaged_workflow_actions_for_json(workflow_actions, oozie_coordinator, oozi
 
   for action in workflow_actions:
     if oozie_coordinator is not None:
-      setattr(action, 'oozie_coordinator', oozie_coordinator.id)
+      setattr(action, 'oozie_coordinator', oozie_coordinator)
     if oozie_bundle is not None:
-      setattr(action, 'oozie_bundle', oozie_bundle.id)
+      setattr(action, 'oozie_bundle', oozie_bundle)
 
     massaged_action = {
       'id': action.id,
