@@ -32,6 +32,11 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
     ${ layout.sidebar(hue_collection, 'facets') }
   </%def>
   <%def name="content()">
+
+    <link href="/static/ext/css/bootstrap-editable.css" rel="stylesheet">
+    <script src="/static/ext/js/bootstrap-editable.min.js"></script>
+    <script src="/search/static/js/knockout.x-editable.js"></script>
+
     <form method="POST" class="form-horizontal" data-bind="submit: submit">
 
       <div class="section">
@@ -87,7 +92,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
           </div>
           <div data-bind="foreach: fieldFacets">
             <div class="bubble">
-              <strong><span data-bind="text: label"></span></strong>
+              <strong><span data-bind="editable: label"></span></strong>
               <span style="color:#666;font-size: 12px">(<span data-bind="text: field"></span>)</span>
               <a class="btn btn-small" data-bind="click: $root.removeFieldFacet"><i class="icon-trash"></i></a>
             </div>
@@ -111,10 +116,10 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
         </div>
         <div data-bind="foreach: rangeFacets">
           <div class="bubble">
-            <strong><span data-bind="text: label"></span></strong>
+            <strong><span data-bind="editable: label"></span></strong>
             <span style="color:#666;font-size: 12px">
-              (<span data-bind="text: field"></span>, <span data-bind="text: start"></span> <i class="icon-double-angle-right"></i> <span data-bind="text: end"></span>,
-              <i class="icon-resize-horizontal"></i> <span data-bind="text: gap"></span>)
+              (<span data-bind="text: field"></span>, <span data-bind="editable: start"></span> <i class="icon-double-angle-right"></i> <span data-bind="editable: end"></span>,
+              <i class="icon-resize-horizontal"></i> <span data-bind="editable: gap"></span>)
             </span>
             <a class="btn btn-small" data-bind="click: $root.removeRangeFacet"><i class="icon-trash"></i></a>
           </div>
@@ -145,10 +150,10 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
         </div>
         <div data-bind="foreach: dateFacets">
           <div class="bubble">
-            <strong><span data-bind="text: label"></span></strong>
+            <strong><span data-bind="editable: label"></span></strong>
             <span style="color:#666;font-size: 12px">
-              (<span data-bind="text: field"></span>, <span data-bind="text: start"></span> <i class="icon-double-angle-right"></i> <span data-bind="text: end"></span>,
-              <i class="icon-resize-horizontal"></i> <span data-bind="text: gap"></span><span data-bind="visible: format != ''">, <i class="icon-calendar"></i> <span data-bind="text: format"></span></span>)
+              (<span data-bind="text: field"></span>, <span data-bind="editable: start"></span> <i class="icon-double-angle-right"></i> <span data-bind="editable: end"></span>,
+              <i class="icon-resize-horizontal"></i> <span data-bind="editable: gap"></span>, <i class="icon-calendar"></i> <span data-bind="editable: format"></span>)
             </span>
             <a class="btn btn-small" data-bind="click: $root.removeDateFacet"><i class="icon-trash"></i></a>
           </div>
@@ -503,17 +508,56 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
   }
 
   var Facet = function (args) {
-    return {
+    var _facet = {
       uuid: (typeof args['uuid'] !== 'undefined' && args['uuid'] != null) ? args['uuid'] : UUID(),
       type: args['type'],
       field: args['field'],
-      label: args['label'],
-      format: args['format'],
-      start: args['start'],
-      end: args['end'],
-      gap: args['gap'],
+      label: ko.observable(args['label']),
+      format: ko.observable(args['format']),
+      start: ko.observable(args['start']),
+      end: ko.observable(args['end']),
+      gap: ko.observable(args['gap']),
       isVerbatim: false,
       verbatim: ""
+    }
+    _facet.label.subscribe(function (newValue) {
+      if ($.trim(newValue) == ""){
+        _facet.label(_facet.field);
+      }
+      viewModel.isSaveBtnVisible(true);
+    });
+    _facet.format.subscribe(function (newValue) {
+      viewModel.isSaveBtnVisible(true);
+    });
+    _facet.start.subscribe(function (newValue) {
+      if (_facet.type == "date" && typeof newValue == "string"){
+        valueParseHelper(newValue, _facet.start, 10);
+      }
+      viewModel.isSaveBtnVisible(true);
+    });
+    _facet.end.subscribe(function (newValue) {
+      if (_facet.type == "date" && typeof newValue == "string"){
+        valueParseHelper(newValue, _facet.end, 0);
+      }
+      viewModel.isSaveBtnVisible(true);
+    });
+    _facet.gap.subscribe(function (newValue) {
+      if (_facet.type == "date" && typeof newValue == "string"){
+        valueParseHelper(newValue, _facet.gap, 1);
+      }
+      viewModel.isSaveBtnVisible(true);
+    });
+    return _facet;
+  }
+
+  function valueParseHelper(value, field, defaultFrequency){
+    // try to parse the user free input
+    try {
+      field(new DateMath({frequency: parseFloat($.trim(value).split(" ")[0]), unit: $.trim(value).split(" ")[1]}));
+    }
+    catch (exception){
+      $.jHueNotify.error("${ _('There was an error parsing your input') }");
+      field(new DateMath({frequency: defaultFrequency, unit: 'DAYS'}));
     }
   }
 
@@ -748,8 +792,8 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
       $.ajax("${ url('search:admin_collection_facets', collection_id=hue_collection.id) }", {
         data: {
           'properties': ko.toJSON(self.properties),
-          'fields': ko.utils.stringifyJson(self.fieldFacets),
-          'ranges': ko.utils.stringifyJson(self.rangeFacets),
+          'fields': ko.toJSON(self.fieldFacets),
+          'ranges': ko.toJSON(self.rangeFacets),
           'dates': ko.toJSON(self.dateFacets),
           'order': ko.toJSON(ko.utils.arrayMap(self.sortableFacets(), function (obj) {
                       return obj.uuid;

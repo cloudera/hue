@@ -17,11 +17,13 @@
 
 
 from django import forms
+from django.utils.translation import ugettext as _
 from search.models import Collection
+from search_controller import SearchController
 
 
 class QueryForm(forms.Form):
-  collection = forms.ChoiceField() # collection_id
+  collection = forms.ChoiceField() # Aka collection_id
 
   query = forms.CharField(label='', max_length=256, required=False, initial='',
                           widget=forms.TextInput(attrs={'class': 'search-query input-xxlarge', 'placeholder': 'Search...'}))
@@ -32,19 +34,17 @@ class QueryForm(forms.Form):
   facets = forms.CharField(label='', required=False, initial='', widget=forms.HiddenInput(), help_text='Show hide facet search')
 
   def __init__(self, *args, **kwargs):
+    self.initial_collection = kwargs.pop('initial_collection')
     super(QueryForm, self).__init__(*args, **kwargs)
     choices = [(core.id, core.label) for core in Collection.objects.filter(enabled=True)]
-    initial_choice = self._initial_core(choices)
-    self.fields['collection'] = forms.ChoiceField(choices=choices, initial=initial_choice, required=False, label='', widget=forms.Select(attrs={'class':'hide'}))
+    # Beware: initial not working, set in the js
+    self.fields['collection'] = forms.ChoiceField(choices=choices, initial=self.initial_collection, required=False, label='', widget=forms.Select(attrs={'class':'hide'}))
 
   def clean_collection(self):
     if self.cleaned_data.get('collection'):
       return self.cleaned_data['collection']
     else:
-      return self._initial_core(self.fields['collection'].choices)
-
-  def _initial_core(self, choices):
-    return choices and choices[0][0] or None
+      return self.initial_collection
 
 
 class HighlightingForm(forms.Form):
@@ -62,3 +62,10 @@ class CollectionForm(forms.ModelForm):
   class Meta:
     model = Collection
     exclude = ('facets', 'result', 'sorting', 'properties', 'cores')
+
+  def clean_name(self):
+    searcher = SearchController()
+    name = self.cleaned_data['name']
+    if not searcher.is_collection(name) and not searcher.is_core(name):
+      raise forms.ValidationError(_('No live Solr collection or core by the name %s') % name)
+    return name

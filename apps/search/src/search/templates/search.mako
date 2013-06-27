@@ -265,6 +265,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 
     % if hue_collection:
       $(".current-collection").text("${ hue_collection.label }");
+      $("#id_collection").val(${ hue_collection.id });
 
       % if user.is_superuser:
         var collectionUrl = $(".dropdown-collection[data-value=${ hue_collection.id }]").data("settings-url");

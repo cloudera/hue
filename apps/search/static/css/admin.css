@@ -92,3 +92,7 @@ h1.emptyMessage {
 .stepDetails {
   padding: 5px;
 }
+
+.editable {
+  cursor: pointer;
+}

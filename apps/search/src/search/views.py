@@ -49,7 +49,8 @@ def index(request):
     else:
       return no_collections(request)
 
-  search_form = QueryForm(request.GET)
+  initial_collection = request.COOKIES.get('hueSearchLastCollection', 0)
+  search_form = QueryForm(request.GET, initial_collection=initial_collection)
   response = {}
   error = {}
   solr_query = {}
@@ -57,10 +58,6 @@ def index(request):
 
   if search_form.is_valid():
     collection_id = search_form.cleaned_data['collection']
-    if request.GET.get('collection') is None:
-      cookie_collection_id = request.COOKIES.get('hueSearchLastCollection', collection_id)
-      if hue_collections.filter(id=cookie_collection_id).exists():
-        collection_id = cookie_collection_id
     solr_query['q'] = search_form.cleaned_data['query']
     solr_query['fq'] = search_form.cleaned_data['fq']
     if search_form.cleaned_data['sort']:
@@ -76,8 +73,7 @@ def index(request):
     except Exception, e:
       error['message'] = unicode(str(e), "utf8")
   else:
-    hue_collection = hue_collections[0]
-    collection_id = hue_collection.id
+    error['message'] = _('There is no collection to search.')
 
   if hue_collection is not None:
     response = augment_solr_response(response, hue_collection.facets.get_data())
@@ -95,6 +91,7 @@ def index(request):
     'current_collection': collection_id,
     'json': json,
   })
+
 
 def no_collections(request):
   return render('no_collections.mako', request, {})
@@ -203,7 +200,10 @@ def admin_collection_properties(request, collection_id):
   if request.method == 'POST':
     collection_form = CollectionForm(request.POST, instance=hue_collection)
     if collection_form.is_valid():
-      hue_collection = collection_form.save()
+      searcher = SearchController()
+      hue_collection = collection_form.save(commit=False)
+      hue_collection.is_core_only = not searcher.is_collection(hue_collection.name)
+      hue_collection.save()
       return redirect(reverse('search:admin_collection_properties', kwargs={'collection_id': hue_collection.id}))
     else:
       request.error(_('Errors on the form: %s') % collection_form.errors)

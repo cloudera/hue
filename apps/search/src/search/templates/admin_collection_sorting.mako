@@ -34,6 +34,11 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
   </%def>
 
   <%def name="content()">
+
+    <link href="/static/ext/css/bootstrap-editable.css" rel="stylesheet">
+    <script src="/static/ext/js/bootstrap-editable.min.js"></script>
+    <script src="/search/static/js/knockout.x-editable.js"></script>
+
     <form method="POST" class="form-horizontal" data-bind="submit: submit">
       <div class="section">
         <div class="alert alert-info">
@@ -55,9 +60,9 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
         </div>
         <div data-bind="foreach: sortingFields">
           <div class="bubble">
-            <strong><span data-bind="text: label"></span></strong>
+            <strong><span data-bind="editable: label"></span></strong>
             <span style="color:#666;font-size: 12px">
-              (<span data-bind="text: field"></span> <i class="icon-arrow-up" data-bind="visible: asc == true"></i><i class="icon-arrow-down" data-bind="visible: asc == false"></i> )
+              (<span data-bind="text: field"></span> <i class="icon-arrow-up" data-bind="visible: asc() == true"></i><i class="icon-arrow-down" data-bind="visible: asc() == false"></i> <span data-bind="editable: order"></span> )
             </span>
             <a class="btn btn-small" data-bind="click: $root.removeSortingField"><i class="icon-trash"></i></a>
           </div>
@@ -114,11 +119,26 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 <script type="text/javascript">
 
   var SortingField = function (field, label, asc) {
-    return {
+    var _field = {
       field: field,
-      label: label,
-      asc: asc
-    }
+      label: ko.observable(label),
+      asc: ko.observable(asc),
+      order: ko.observable(asc ? "ASC" : "DESC")
+    };
+    _field.label.subscribe(function (newValue) {
+      if ($().trim(newValue) == "") {
+        _field.label(f.field);
+      }
+    });
+    _field.order.subscribe(function (newValue) {
+      if ($.trim(newValue).toUpperCase() == "DESC") {
+        _field.asc(false);
+      }
+      else {
+        _field.asc(true);
+      }
+    });
+    return _field;
   }
 
   function ViewModel() {
@@ -162,8 +182,8 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
     self.submit = function () {
       $.ajax("${ url('search:admin_collection_sorting', collection_id=hue_collection.id) }", {
         data: {
-          'properties': ko.utils.stringifyJson({'is_enabled': self.isEnabled()}),
-          'fields': ko.utils.stringifyJson(self.sortingFields)
+          'properties': ko.toJSON({'is_enabled': self.isEnabled()}),
+          'fields': ko.toJSON(self.sortingFields)
         },
         contentType: 'application/json',
         type: 'POST',
