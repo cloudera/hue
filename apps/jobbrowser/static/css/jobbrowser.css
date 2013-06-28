@@ -20,3 +20,22 @@
   padding: 20px;
   display: none;
 }
+
+.sidebar-nav {
+  padding: 9px 0;
+}
+
+.nochrome::-moz-focus-inner {
+  border: 0;
+  padding: 0
+}
+
+.nochrome {
+  width: auto;
+  border: 0 none;
+  margin: 0;
+  margin-top: -4px;
+  padding: 0;
+  background: transparent;
+  overflow: visible;
+}

@@ -21,6 +21,8 @@
 
 ${ commonheader(_('Job Task: %(taskId)s') % dict(taskId=task.taskId_short), "jobbrowser", user) | n,unicode }
 
+<link href="/jobbrowser/static/css/jobbrowser.css" rel="stylesheet">
+
 <div class="container-fluid">
     <h1>${_('Job Task: %(taskId)s - Job Browser') % dict(taskId=task.taskId_short)}</h1>
     <div class="row-fluid">
@@ -28,9 +30,9 @@ ${ commonheader(_('Job Task: %(taskId)s') % dict(taskId=task.taskId_short), "job
             <div class="well sidebar-nav">
                 <ul class="nav nav-list">
                     <li class="nav-header">${_('Task ID')}</li>
-                    <li>${task.taskId_short}</li>
+                    <li class="hellipsify">${task.taskId_short}</li>
                     <li class="nav-header">${_('Job')}</li>
-                    <li><a href="${url('jobbrowser.views.single_job', job=joblnk.jobId)}" title="${_('View this job')}">${joblnk.jobId_short}</a></li>
+                    <li><a href="${url('jobbrowser.views.single_job', job=joblnk.jobId)}" class="hellipsify">${joblnk.jobId_short}</a></li>
                     <li class="nav-header">${_('Status')}</li>
                     <li>
                             % if task.state.lower() == 'running' or task.state.lower() == 'pending':
@@ -155,54 +157,60 @@ ${ commonheader(_('Job Task: %(taskId)s') % dict(taskId=task.taskId_short), "job
     </div>
 </div>
 
+<script src="/jobbrowser/static/js/utils.js" type="text/javascript" charset="utf-8"></script>
+
 <script type="text/javascript" charset="utf-8">
-    $(document).ready(function(){
-        $("#attemptsTable").dataTable({
-            "bPaginate": false,
-            "bLengthChange": false,
-            "bInfo": false,
-            "bFilter": false,
-            "aaSorting": [[ 1, "asc" ]],
-            "oLanguage": {
-                "sEmptyTable": "${_('No data available')}",
-                "sZeroRecords": "${_('No matching records')}",
-            }
-        });
-
-        $("#metadataTable").dataTable({
-            "bPaginate": false,
-            "bLengthChange": false,
-            "bInfo": false,
-            "bAutoWidth": false,
-            "bFilter": false,
-            "aoColumns": [
-                { "sWidth": "30%" },
-                { "sWidth": "70%" }
-            ],
-            "oLanguage": {
-                "sEmptyTable": "${_('No data available')}",
-                "sZeroRecords": "${_('No matching records')}",
-            }
-        });
-
-        $(".taskCountersTable").dataTable({
-            "bPaginate": false,
-            "bLengthChange": false,
-            "bInfo": false,
-            "bFilter": false,
-            "bAutoWidth": false,
-            "aoColumns": [
-                { "sWidth": "30%" },
-                { "sWidth": "70%" }
-            ],
-            "oLanguage": {
-                "sEmptyTable": "${_('No data available')}",
-                "sZeroRecords": "${_('No matching records')}",
-            }
-        });
-
-        $("a[data-row-selector='true']").jHueRowSelector();
+  $(document).ready(function () {
+    $("#attemptsTable").dataTable({
+      "bPaginate": false,
+      "bLengthChange": false,
+      "bInfo": false,
+      "bFilter": false,
+      "aaSorting": [
+        [ 1, "asc" ]
+      ],
+      "oLanguage": {
+        "sEmptyTable": "${_('No data available')}",
+        "sZeroRecords": "${_('No matching records')}",
+      }
     });
+
+    $("#metadataTable").dataTable({
+      "bPaginate": false,
+      "bLengthChange": false,
+      "bInfo": false,
+      "bAutoWidth": false,
+      "bFilter": false,
+      "aoColumns": [
+        { "sWidth": "30%" },
+        { "sWidth": "70%" }
+      ],
+      "oLanguage": {
+        "sEmptyTable": "${_('No data available')}",
+        "sZeroRecords": "${_('No matching records')}",
+      }
+    });
+
+    $(".taskCountersTable").dataTable({
+      "bPaginate": false,
+      "bLengthChange": false,
+      "bInfo": false,
+      "bFilter": false,
+      "bAutoWidth": false,
+      "aoColumns": [
+        { "sWidth": "30%" },
+        { "sWidth": "70%" }
+      ],
+      "oLanguage": {
+        "sEmptyTable": "${_('No data available')}",
+        "sZeroRecords": "${_('No matching records')}",
+      }
+    });
+
+    hellipsify();
+
+    $("a[data-row-selector='true']").jHueRowSelector();
+  });
 </script>
 
 

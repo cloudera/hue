@@ -20,6 +20,9 @@
 <%namespace name="comps" file="jobbrowser_components.mako" />
 
 ${ commonheader(_('Task Attempt: %(attemptId)s') % dict(attemptId=attempt.attemptId_short), "jobbrowser", user) | n,unicode }
+
+<link href="/jobbrowser/static/css/jobbrowser.css" rel="stylesheet">
+
 <div class="container-fluid">
     <h1>${_('Task Attempt: %(attemptId)s - Job Browser') % dict(attemptId=attempt.attemptId_short)}</h1>
     <div class="row-fluid">
@@ -27,12 +30,12 @@ ${ commonheader(_('Task Attempt: %(attemptId)s') % dict(attemptId=attempt.attemp
             <div class="well sidebar-nav">
                 <ul class="nav nav-list">
                     <li class="nav-header">${_('Attempt ID')}</li>
-                    <li>${attempt.attemptId_short}</li>
+                    <li class="hellipsify">${attempt.attemptId_short}</li>
                     <li class="nav-header">${_('Task')}</li>
-                    <li><a href="${url('jobbrowser.views.single_task', job=joblnk.jobId, taskid=taskid)}" title="${_('View this task')}">${task.taskId_short}</a>
+                    <li><a href="${url('jobbrowser.views.single_task', job=joblnk.jobId, taskid=taskid)}" class="hellipsify">${task.taskId_short}</a>
                     </li>
                     <li class="nav-header">${_('Job')}</li>
-                    <li><a href="${url('jobbrowser.views.single_job', job=joblnk.jobId)}" title="${_('View this job')}">${joblnk.jobId_short}</a></li>
+                    <li><a href="${url('jobbrowser.views.single_job', job=joblnk.jobId)}" class="hellipsify">${joblnk.jobId_short}</a></li>
                     <li class="nav-header">${_('Status')}</li>
                     <li>
                         <%
@@ -133,44 +136,48 @@ ${ commonheader(_('Task Attempt: %(attemptId)s') % dict(attemptId=attempt.attemp
     </div>
 </div>
 
+<script src="/jobbrowser/static/js/utils.js" type="text/javascript" charset="utf-8"></script>
+
 <script type="text/javascript" charset="utf-8">
-    $(document).ready(function(){
-        $("#metadataTable").dataTable({
-            "bPaginate": false,
-            "bLengthChange": false,
-            "bInfo": false,
-            "bAutoWidth": false,
-            "bFilter": false,
-            "aoColumns": [
-                { "sWidth": "30%" },
-                { "sWidth": "70%" }
-            ],
-            "oLanguage": {
-                "sEmptyTable": "${_('No data available')}",
-                "sZeroRecords": "${_('No matching records')}",
-            }
-        });
-
-        $(".taskCountersTable").dataTable({
-            "bPaginate": false,
-            "bLengthChange": false,
-            "bInfo": false,
-            "bFilter": false,
-            "bAutoWidth": false,
-            "aoColumns": [
-                { "sWidth": "30%" },
-                { "sWidth": "70%" }
-            ],
-            "oLanguage": {
-                "sEmptyTable": "${_('No data available')}",
-                "sZeroRecords": "${_('No matching records')}",
-            }
-        });
-
-        if (window.location.hash != null && window.location.hash.length > 1){
-            $('#tabs a[href="#'+window.location.hash.substring(2)+'"]').tab('show');
-        }
+  $(document).ready(function () {
+    $("#metadataTable").dataTable({
+      "bPaginate": false,
+      "bLengthChange": false,
+      "bInfo": false,
+      "bAutoWidth": false,
+      "bFilter": false,
+      "aoColumns": [
+        { "sWidth": "30%" },
+        { "sWidth": "70%" }
+      ],
+      "oLanguage": {
+        "sEmptyTable": "${_('No data available')}",
+        "sZeroRecords": "${_('No matching records')}",
+      }
     });
+
+    $(".taskCountersTable").dataTable({
+      "bPaginate": false,
+      "bLengthChange": false,
+      "bInfo": false,
+      "bFilter": false,
+      "bAutoWidth": false,
+      "aoColumns": [
+        { "sWidth": "30%" },
+        { "sWidth": "70%" }
+      ],
+      "oLanguage": {
+        "sEmptyTable": "${_('No data available')}",
+        "sZeroRecords": "${_('No matching records')}",
+      }
+    });
+
+    if (window.location.hash != null && window.location.hash.length > 1) {
+      $('#tabs a[href="#' + window.location.hash.substring(2) + '"]').tab('show');
+    }
+
+    hellipsify();
+  });
 </script>
 
 ${ commonfooter(messages) | n,unicode }

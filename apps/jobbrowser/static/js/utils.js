@@ -114,3 +114,38 @@ jQuery.fn.dataTableExt.oSort['title-numeric-desc'] = function (a, b) {
   y = parseFloat(y);
   return ((x < y) ? 1 : ((x > y) ? -1 : 0));
 };
+
+function hellipsify() {
+  var MAX_LENGTH = 20;
+  $(".hellipsify").each(function () {
+    var _this = $(this);
+    if (_this.text().length > MAX_LENGTH) {
+      var _oText = _this.text();
+      var _clone = $("<div>");
+      _clone.html(_this.html());
+      _clone.css("position", "absolute").css("background-color", "#F5F5F5");
+      _clone.css("top", (_this.is("a") ? _this.position().top + 3 : _this.position().top)).css("left", _this.position().left)
+      _clone.css("z-index", "9999").css("display", "none");
+      _clone.appendTo($("body"));
+      _clone.mouseout(function () {
+        $(this).hide();
+      })
+      $(this).html(_oText.substr(0, MAX_LENGTH - 1) + "&hellip;&nbsp;");
+      var _eye = $("<button class='nochrome btn-small'></button>");
+      _eye.html("<i class='icon-eye-open'></i>");
+      _eye.css("cursor", "pointer");
+      _eye.on("click", function (e) {
+        e.stopImmediatePropagation();
+        e.preventDefault();
+        _clone.show();
+        _this.tooltip("hide");
+      });
+      _eye.appendTo(_this);
+      _this.data("original-text", _oText);
+      _this.tooltip({
+        title: _oText,
+        placement: "right"
+      });
+    }
+  });
+}

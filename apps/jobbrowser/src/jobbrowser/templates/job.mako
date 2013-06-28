@@ -92,6 +92,8 @@
 
 ${ commonheader(_('Job: %(jobId)s') % dict(jobId=job.jobId_short), "jobbrowser", user) | n,unicode }
 
+<link href="/jobbrowser/static/css/jobbrowser.css" rel="stylesheet">
+
 <style type="text/css">
   .killJob {
     display: none;
@@ -110,7 +112,7 @@ ${ commonheader(_('Job: %(jobId)s') % dict(jobId=job.jobId_short), "jobbrowser",
             <div class="well sidebar-nav">
                 <ul class="nav nav-list">
                     <li class="nav-header">${_('Job ID')}</li>
-                    <li>${job.jobId_short}</li>
+                    <li class="hellipsify">${job.jobId_short}</li>
                     <li class="nav-header">${_('User')}</li>
                     <li>${job.user}</li>
                     <li class="nav-header">${_('Status')}</li>
@@ -425,17 +427,17 @@ $(document).ready(function () {
     }
   });
 
-  var _isUpdating = true;
+  var isUpdating = true;
 
   function callJobDetails() {
-    _isUpdating = true;
+    isUpdating = true;
     $.getJSON("?format=json&rnd=" + Math.random(), function (data) { // Need to add random to prevent the cached of IE9
       if (data != null && data.job != null) {
         updateJob(data.job);
         updateFailedTasks(data.failedTasks);
         updateRecentTasks(data.recentTasks);
       }
-      _isUpdating = false;
+      isUpdating = false;
     });
   }
 
@@ -457,13 +459,13 @@ $(document).ready(function () {
     $("#killJobContainer").html(killCell);
     $("#jobStatus").html('<span class="label ' + getStatusClass(job.status) + '">' + (job.isRetired && !job.isMR2 ? '<i class="icon-briefcase icon-white" title="${ _('Retired') }"></i> ' : '') + job.status + '</span>');
     if (job.desiredMaps > 0) {
-      $("#jobMaps").html('<span title="' + emptyStringIfNull(job.mapsPercentComplete) + '">' + (job.isRetired ? '${_('N/A')}' : '<div class="progress" title="' + (job.isMR2 ? job.mapsPercentComplete : job.finishedMaps + '/' + job.desiredMaps) + '"><div class="bar-label">' + job.mapsPercentComplete + '%</div><div class="' + 'bar ' + getStatusClass(job.status, "bar-") + '" style="margin-top:-20px;width:' + job.mapsPercentComplete + '%"></div></div>') + '</span>');
+      $("#jobMaps").html((job.isRetired ? '${_('N/A')}' : '<div class="progress" style="width:100px" title="' + (job.isMR2 ? job.mapsPercentComplete : job.finishedMaps + '/' + job.desiredMaps) + '"><div class="bar-label">' + job.mapsPercentComplete + '%</div><div class="' + 'bar ' + getStatusClass(job.status, "bar-") + '" style="margin-top:-20px;width:' + job.mapsPercentComplete + '%"></div></div>'));
     }
     else {
       $("#jobMaps").html('${_('N/A')}');
     }
     if (job.desiredReduces > 0) {
-      $("#jobReduces").html('<span title="' + emptyStringIfNull(job.reducesPercentComplete) + '">' + (job.isRetired ? '${_('N/A')}' : '<div class="progress" title="' + (job.isMR2 ? job.reducesPercentComplete : job.finishedReduces + '/' + job.desiredReduces) + '"><div class="bar-label">' + job.reducesPercentComplete + '%</div><div class="' + 'bar ' + getStatusClass(job.status, "bar-") + '" style="margin-top:-20px;width:' + job.reducesPercentComplete + '%"></div></div>') + '</span>');
+      $("#jobReduces").html((job.isRetired ? '${_('N/A')}' : '<div class="progress" style="width:100px" title="' + (job.isMR2 ? job.reducesPercentComplete : job.finishedReduces + '/' + job.desiredReduces) + '"><div class="bar-label">' + job.reducesPercentComplete + '%</div><div class="' + 'bar ' + getStatusClass(job.status, "bar-") + '" style="margin-top:-20px;width:' + job.reducesPercentComplete + '%"></div></div>'));
     }
     else {
       $("#jobReduces").html('${_('N/A')}');
@@ -565,10 +567,12 @@ $(document).ready(function () {
   callJobDetails();
 
   var _runningInterval = window.setInterval(function () {
-    if (!_isUpdating){
+    if (!isUpdating){
       callJobDetails();
     }
   }, 2000);
+
+  hellipsify();
 
   $("a[data-row-selector='true']").jHueRowSelector();
 });
