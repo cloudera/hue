@@ -532,9 +532,9 @@ var PigViewModel = function (props) {
             $("#logsModal img").addClass("hide");
             $("#logsModal pre").removeClass("hide");
             var _logsEl = $("#logsModal pre");
-            var newLines = data.logs.pig.split("\n").slice(_logsEl.text().split("\n").length);
+            var newLines = data.logs.pig.split("\n").slice(_logsEl.html().split("<br>").length);
             if (newLines.length > 0){
-              _logsEl.text(_logsEl.text() + newLines.join("\n") + "\n");
+              _logsEl.html(_logsEl.html() + newLines.join("<br>") + "<br>");
             }
             if (self.showLogsAtEnd) {
               _logsEl.scrollTop(_logsEl[0].scrollHeight - _logsEl.height());

@@ -794,9 +794,9 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
               resizeLogs();
             }
             var _logsEl = $("#withLogs");
-            var newLines = data.logs.pig.split("\n").slice(_logsEl.text().split("\n").length);
+            var newLines = data.logs.pig.split("\n").slice(_logsEl.html().split("<br>").length);
             if (newLines.length > 0){
-              _logsEl.text(_logsEl.text() + newLines.join("\n") + "\n");
+              _logsEl.html(_logsEl.html() + newLines.join("<br>") + "<br>");
             }
             window.setTimeout(function () {
               resizeLogs();

@@ -14,6 +14,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from filebrowser.views import location_to_url
 
 try:
   import json
@@ -24,6 +25,7 @@ import re
 import time
 
 from django.core.urlresolvers import reverse
+from django.utils.html import escape
 from django.utils.translation import ugettext as _
 
 from jobbrowser.views import job_single_logs
@@ -123,7 +125,8 @@ class OozieApi:
         if action.externalId:
           data = job_single_logs(request, **{'job': action.externalId})
           if data:
-            logs[action.name] = self._match_logs(data)
+            matched_logs = self._match_logs(data)
+            logs[action.name] = self._make_links(matched_logs)
       except Exception, e:
         LOG.error('An error happen while watching the demo running: %(error)s' % {'error': e})
 
@@ -154,6 +157,26 @@ class OozieApi:
       group = re.search(OozieApi.RE_LOG_START_FINISHED, logs)
       i = logs.index(group.group(1)) + len(group.group(1))
       return logs[i:].strip()
+
+  @classmethod
+  def _make_links(cls, log):
+    escaped_logs = escape(log)
+    hdfs_links = re.sub('((?<= |;)/|hdfs://)[^ <&\t;,\n]+', OozieApi._make_hdfs_link, escaped_logs)
+    return re.sub('job_[a-z0-9_]*', OozieApi._make_mr_link, hdfs_links)
+
+  @classmethod
+  def _make_hdfs_link(self, match):
+    try:
+      return '<a href="%s" target="_blank">%s</a>' % (location_to_url(match.group(0), strict=False), match.group(0))
+    except:
+      return match.group(0)
+
+  @classmethod
+  def _make_mr_link(self, match):
+    try:
+      return '<a href="%s" target="_blank">%s</a>' % (reverse('jobbrowser.views.single_job', kwargs={'job': match.group(0)}), match.group(0))
+    except:
+      return match.group(0)
 
   def massaged_jobs_for_json(self, request, oozie_jobs, hue_jobs):
     jobs = []
