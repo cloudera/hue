@@ -49,7 +49,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
           <h3>${_('Facets')}</h3>
           ${_('Facets provide an intuitive way to filter the results.')}
           ${_('Different types of facets can be added on the following steps.')}
-          <span data-bind="visible: !properties().isEnabled()"><strong>${_('Facets are currently disabled.')}</strong></span>
+          <strong>&nbsp;<span data-bind="visible: !properties().isEnabled()">${_('Facets are currently disabled.')}</span></strong>
         </div>
       </div>
 
@@ -580,6 +580,22 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
     self.limit = ko.observable(properties.limit);
     self.mincount = ko.observable(properties.mincount);
     self.sort = ko.observable(properties.sort);
+
+    self.isEnabled.subscribe(function (newValue) {
+      viewModel.isSaveBtnVisible(true);
+    });
+
+    self.limit.subscribe(function (newValue) {
+      viewModel.isSaveBtnVisible(true);
+    });
+
+    self.mincount.subscribe(function (newValue) {
+      viewModel.isSaveBtnVisible(true);
+    });
+
+    self.sort.subscribe(function (newValue) {
+      viewModel.isSaveBtnVisible(true);
+    });
   }
 
   var DateMath = function (args) {
