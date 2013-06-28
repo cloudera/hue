@@ -157,7 +157,7 @@ ${ commonheader(None, "jobbrowser", user) | n,unicode }
       }
     }
 
-    var _isUpdating = false;
+    var isUpdating = false;
     var newRows = [];
 
     function updateRunning(data) {
@@ -205,7 +205,7 @@ ${ commonheader(None, "jobbrowser", user) | n,unicode }
           newRows.splice(i);
         }
       }
-      _isUpdating = false;
+      isUpdating = false;
     }
 
     function getJobRow(job) {
@@ -254,17 +254,17 @@ ${ commonheader(None, "jobbrowser", user) | n,unicode }
     }
 
     function callJobDetails(job) {
-      $.getJSON(job.url + "?format=json&rnd=" + Math.random(), function (job) {
-        if (job != null) {
+      $.getJSON(job.url + "?format=json&rnd=" + Math.random(), function (data) {
+        if (data != null && data.job) {
           var jobTableNodes = jobTable.fnGetNodes();
           var _foundRow = null;
           $(jobTableNodes).each(function (iNode, node) {
-            if ($(node).children("td").eq(1).text().trim() == job.shortId) {
+            if ($(node).children("td").eq(1).text().trim() == data.job.shortId) {
               _foundRow = node;
             }
           });
           if (_foundRow != null) {
-            updateJobRow(job, _foundRow);
+            updateJobRow(data.job, _foundRow);
           }
         }
       });
@@ -281,7 +281,7 @@ ${ commonheader(None, "jobbrowser", user) | n,unicode }
         }
       }
       else {
-        _isUpdating = true;
+        isUpdating = true;
         _url += "&state=running";
       }
       _url += "&user=" + $("#userFilter").val().trim();
@@ -356,7 +356,7 @@ ${ commonheader(None, "jobbrowser", user) | n,unicode }
     callJsonData(populateTable);
 
     var _runningInterval = window.setInterval(function () {
-      if (!_isUpdating) {
+      if (!isUpdating) {
         callJsonData(updateRunning, true);
       }
     }, 2000);
