@@ -204,12 +204,12 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
 
     # Select only killed jobs (should be absent)
     # Taking advantage of the fact new jobs are at the top of the list!
-    response = self.client.get('/jobbrowser/jobs/?state=killed')
+    response = self.client.get('/jobbrowser/jobs/?format=json&state=killed')
     assert_false(hadoop_job_id_short in response.content)
 
     # Select only failed jobs (should be present)
     # Map job should succeed. Reduce job should fail.
-    response = self.client.get('/jobbrowser/jobs/?state=failed')
+    response = self.client.get('/jobbrowser/jobs/?format=json&state=failed')
     assert_true(hadoop_job_id_short in response.content)
 
     # The single job view should have the failed task table
@@ -274,12 +274,12 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
     self.client.post('/jobbrowser/jobs/%s/kill' % (hadoop_job_id,))
 
     # It should say killed at some point
-    response = self.client.get('/jobbrowser/jobs/%s' % (hadoop_job_id,))
+    response = self.client.get('/jobbrowser/jobs/%s?format=json' % (hadoop_job_id,))
     html = response.content.lower()
     i = 0
     while 'killed' not in html and i < 10:
       time.sleep(5)
-      response = self.client.get('/jobbrowser/jobs/%s' % (hadoop_job_id,))
+      response = self.client.get('/jobbrowser/jobs/%s?format=json' % (hadoop_job_id,))
       html = response.content.lower()
       i += 1
 
@@ -341,17 +341,17 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
 
     # All jobs page and fetch job ID
     # Taking advantage of the fact new jobs are at the top of the list!
-    response = self.client.get('/jobbrowser/jobs/')
+    response = self.client.get('/jobbrowser/jobs/?format=json')
     assert_true(hadoop_job_id_short in response.content, response.content)
 
     # Make sure job succeeded
-    response = self.client.get('/jobbrowser/jobs/?state=completed')
+    response = self.client.get('/jobbrowser/jobs/?format=json&state=completed')
     assert_true(hadoop_job_id_short in response.content)
-    response = self.client.get('/jobbrowser/jobs/?state=failed')
+    response = self.client.get('/jobbrowser/jobs/?format=json&state=failed')
     assert_false(hadoop_job_id_short in response.content)
-    response = self.client.get('/jobbrowser/jobs/?state=running')
+    response = self.client.get('/jobbrowser/jobs/?format=json&state=running')
     assert_false(hadoop_job_id_short in response.content)
-    response = self.client.get('/jobbrowser/jobs/?state=killed')
+    response = self.client.get('/jobbrowser/jobs/?format=json&state=killed')
     assert_false(hadoop_job_id_short in response.content)
 
     # Test tracker page
@@ -366,14 +366,14 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
     # Login as ourself
     finish = SHARE_JOBS.set_for_testing(True)
     try:
-      response = self.client.get('/jobbrowser/jobs/?user=')
+      response = self.client.get('/jobbrowser/jobs/?format=json&user=')
       assert_true(hadoop_job_id_short in response.content)
     finally:
       finish()
 
     finish = SHARE_JOBS.set_for_testing(False)
     try:
-      response = self.client.get('/jobbrowser/jobs/?user=')
+      response = self.client.get('/jobbrowser/jobs/?format=json&user=')
       assert_true(hadoop_job_id_short in response.content)
     finally:
       finish()
@@ -384,14 +384,14 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
 
     finish = SHARE_JOBS.set_for_testing(True)
     try:
-      response = client_not_me.get('/jobbrowser/jobs/?user=')
+      response = client_not_me.get('/jobbrowser/jobs/?format=json&user=')
       assert_true(hadoop_job_id_short in response.content)
     finally:
       finish()
 
     finish = SHARE_JOBS.set_for_testing(False)
     try:
-      response = client_not_me.get('/jobbrowser/jobs/?user=')
+      response = client_not_me.get('/jobbrowser/jobs/?format=json&user=')
       assert_false(hadoop_job_id_short in response.content)
     finally:
       finish()
@@ -468,13 +468,13 @@ class TestMapReduce2:
 
 
   def test_jobs(self):
-    response = self.c.get('/jobbrowser/')
-    assert_equal(len(response.context['jobs']), 2)
+    response = self.c.get('/jobbrowser/?format=json')
+    assert_equal(len(json.loads(response.content)), 2)
 
     # state=running comes from the API and so can't be mocked
 
-    response = self.c.get('/jobbrowser/jobs/?text=W=MapReduce-copy2')
-    assert_equal(len(response.context['jobs']), 1)
+    response = self.c.get('/jobbrowser/jobs/?format=json&text=W=MapReduce-copy2')
+    assert_equal(len(json.loads(response.content)), 1)
 
   def test_running_job(self):
     response = self.c.get('/jobbrowser/jobs/application_1356251510842_0054')
