@@ -58,18 +58,18 @@ ${ commonheader(None, "jobbrowser", user) | n,unicode }
   <table id="jobsTable" class="datatables table table-striped table-condensed">
     <thead>
     <tr>
-      <th width="4%">${_('Logs')}</th>
-      <th width="10%">${_('ID')}</th>
-      <th width="49%">${_('Name')}</th>
-      <th width="5%">${_('Status')}</th>
-      <th width="5%">${_('User')}</th>
-      <th width="2%">${_('Maps')}</th>
-      <th width="2%">${_('Reduces')}</th>
-      <th width="5%">${_('Queue')}</th>
-      <th width="4%">${_('Priority')}</th>
-      <th width="4%">${_('Duration')}</th>
-      <th width="12%">${_('Date')}</th>
-      <th width="3%" data-row-selector-exclude="true"></th>
+      <th>${_('Logs')}</th>
+      <th>${_('ID')}</th>
+      <th>${_('Name')}</th>
+      <th>${_('Status')}</th>
+      <th>${_('User')}</th>
+      <th>${_('Maps')}</th>
+      <th>${_('Reduces')}</th>
+      <th>${_('Queue')}</th>
+      <th>${_('Priority')}</th>
+      <th>${_('Duration')}</th>
+      <th>${_('Date')}</th>
+      <th data-row-selector-exclude="true"></th>
     </tr>
     </thead>
     <tbody>
@@ -102,23 +102,24 @@ ${ commonheader(None, "jobbrowser", user) | n,unicode }
       "sPaginationType": "bootstrap",
       "iDisplayLength": 30,
       "bLengthChange": false,
+      "bAutoWidth": false,
       "sDom": "<'row'r>t<'row'<'span6'i><''p>>",
       "aaSorting": [
         [1, "desc"]
       ],
       "aoColumns": [
         {"bSortable": false, "sWidth": "20px"},
+        {"sWidth": "10%"},
         null,
-        null,
-        null,
-        null,
-        { "sType": "title-numeric", "sWidth": "60px" },
-        { "sType": "title-numeric", "sWidth": "60px" },
-        null,
-        null,
-        { "sType": "title-numeric" },
-        { "sType": "title-numeric" },
-        {"bSortable": false}
+        {"sWidth": "5%"},
+        {"sWidth": "5%"},
+        { "sType": "title-numeric", "sWidth": "50px"},
+        { "sType": "title-numeric", "sWidth": "50px"},
+        {"sWidth": "5%"},
+        {"sWidth": "4%"},
+        { "sType": "title-numeric", "sWidth": "4%" },
+        { "sType": "title-numeric", "sWidth": "12%" },
+        {"bSortable": false, "sWidth": "20px"}
       ],
       "oLanguage": {
         "sEmptyTable": "${_('No data available')}",
@@ -187,6 +188,10 @@ ${ commonheader(None, "jobbrowser", user) | n,unicode }
               newRows.push(job);
               try {
                 jobTable.fnAddData(getJobRow(job));
+                if ($("#noJobs").is(":visible")) {
+                  $("#noJobs").hide();
+                  $(".datatables").show();
+                }
                 $("a[data-row-selector='true']").jHueRowSelector();
               }
               catch (error) {
