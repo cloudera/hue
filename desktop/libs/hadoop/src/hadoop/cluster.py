@@ -107,6 +107,7 @@ def get_next_ha_mrcluster():
           status = jt.cluster_status()
           if status.stateAsString == 'RUNNING':
             MR_NAME_CACHE = name
+            LOG.warn('Picking HA JobTracker: %s' % name)
             return (config, jt)
           else:
             LOG.info('JobTracker %s is not RUNNING, skipping it: %s' % (name, status))

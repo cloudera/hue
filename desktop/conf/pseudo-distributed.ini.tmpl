@@ -270,10 +270,9 @@
       # Defaults to $HADOOP_CONF_DIR or /etc/hadoop/conf
       ## hadoop_conf_dir=/etc/hadoop/conf
 
-  # Configuration for MapReduce JobTracker
+  # Configuration for MapReduce 0.20 JobTracker (MR1)
   # ------------------------------------------------------------------------
   [[mapred_clusters]]
-    # HA support by specifying multiple configs
 
     [[[default]]]
       # Enter the host on which you are running the Hadoop JobTracker
@@ -283,8 +282,9 @@
       # Thrift plug-in port for the JobTracker
       ## thrift_port=9290
       # Whether to submit jobs to this cluster
-      ## submit_to=False
+      ## submit_to=True
 
+      # Change this if your MapReduce cluster is Kerberos-secured
       ## security_enabled=false
 
       # Settings about this MR1 cluster. If you install MR1 in a
@@ -298,6 +298,14 @@
 
       # Defaults to $HADOOP_CONF_DIR or /etc/hadoop/conf
       ## hadoop_conf_dir=/etc/hadoop/conf
+
+    # HA support by specifying multiple clusters
+    # e.g.
+
+    # [[[ha]]]
+      # Enter the host on which you are running the failover JobTracker
+      # jobtracker_host=localhost-ha
+
 
   # Configuration for Yarn
   # ------------------------------------------------------------------------
