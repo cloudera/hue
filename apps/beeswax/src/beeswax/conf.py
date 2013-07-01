@@ -35,7 +35,6 @@ BEESWAX_SERVER_HOST = Config(
   help=_t("Host where Beeswax server Thrift daemon is running. If Kerberos security is enabled, "
          "the fully-qualified domain name (FQDN) is required, even if the Thrift daemon is running "
          "on the same host as Hue."),
-  private=True,
   default="localhost")
 
 BEESWAX_SERVER_PORT = Config(
