@@ -33,6 +33,7 @@ from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal
 
 from desktop.lib.django_test_util import make_logged_in_client
+from desktop.lib.test_utils import grant_access
 from hadoop import pseudo_hdfs4
 from filebrowser.views import location_to_url
 
@@ -1007,11 +1008,11 @@ def test_upload_file():
     assert_true('already exists' in response['data'], response)
 
     # Upload in / and fails because of missing permissions
-    LOG.debug('HDFS superuser: %s' % cluster.fs._superuser)
-    LOG.debug('HDFS list: %s' % cluster.fs.listdir_stats('/'))
+    not_me = make_logged_in_client("not_me", is_superuser=False)
+    grant_access("not_me", "not_me", "filebrowser")
     try:
-      resp = client.post('/filebrowser/upload/file?dest=%s' % '/',
-                         dict(dest='/', hdfs_file=file(LOCAL_FILE)))
+      resp = not_me.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR,
+                         dict(dest=HDFS_DEST_DIR, hdfs_file=file(LOCAL_FILE)))
       response = json.loads(resp.content)
       assert_equal(-1, response['status'], response)
       assert_true('Permission denied' in response['data'], response)
