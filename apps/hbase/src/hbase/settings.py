@@ -15,7 +15,7 @@
 # limitations under the License.
 DJANGO_APPS = ['hbase']
 NICE_NAME = 'HBase Browser'
-MENU_INDEX = 12
+MENU_INDEX = 55
 ICON = '/hbase/static/art/icon_24.png'
 
 REQUIRES_HADOOP = False
