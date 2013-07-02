@@ -42,61 +42,46 @@ superusers and users.
 2.  In the **Credentials** screen, add required information about the
     user. Once you provide the required information you can click the
     wizard step tabs to set other information.
-
-    **Username**
-
-    A user name that contains only letters, numbers, and underscores;
+    
+ <table>
+<tr><td>Username</td><td>  A user name that contains only letters, numbers, and underscores;
     blank spaces are not allowed and the name cannot begin with a
     number. The user name is used to log into Hue and in file
     permissions and job submissions. This is a required field.
-
-    **Password** and **Password confirmation**
-
-    A password for the user. This is a required field.
-
-    **Create home directory**
-
-    Indicate whether to create a directory named /user/username in HDFS.
+</td></tr>
+<tr><td>Password and Password confirmation</td><td>    A password for the user. This is a required field.</td></tr>
+<tr><td>Create home directory</td><td>   Indicate whether to create a directory named /user/username in HDFS.
     For non-superusers, the user and group of the directory are
     username. For superusers, the user and group are username and
-    supergroup.
+    supergroup.</td></tr></table>
+
+ 
 
 3.  Click **Add User** to save the information you specified and close
     the **Add User** wizard or click **Next**.
 4.  In the **Names and Groups** screen, add optional information.
 
-    **First name** and **Last name**
-
-    The user's first and last name.
-
-    **E-mail address**
-
-    The user's e-mail address. The e-mail address is used by the Job
+<table>
+<tr><td>First name and Last name</td><td> The user's first and last name.
+</td></tr>
+<tr><td>E-mail address</td><td>The user's e-mail address. The e-mail address is used by the Job
     Designer and Beeswax applications to send users an e-mail message
     after certain actions have occurred. The Job Designer sends an
     e-mail message after a job has completed. Beeswax sends a message
     after a query has completed. If an e-mail address is not specified,
-    the application will not attempt to email the user.
-
-    **Groups**
-
-    The groups to which the user belongs. By default, a user is assigned
+    the application will not attempt to email the user.</td></tr>
+<tr><td>Groups</td><td> The groups to which the user belongs. By default, a user is assigned
     to the **default** group, which allows access to all applications.
-    See [Managing Application Permissions](#topic_11_4).
+    See [Managing Application Permissions](#topic_11_4).</td></tr></table>
+    
 
 5.  Click **Add User** to save the information you specified and close
     the **Add User** wizard or click **Next**.
 6.  In the **Advanced** screen, add status information.
 
-    **Active**
-
-    Indicate that the user is enabled and allowed to log in.
-
-    Default: checked.
-
-    **Superuser status**
-
-    Assign superuser privileges to the user.
+<table>
+<tr><td>Active</td><td> Indicate that the user is enabled and allowed to log in. Default: checked.</td></tr>
+<tr><td>Superuser status</td><td> Assign superuser privileges to the user.</td></tr></table>
 
 7.  Click **Add User** to save the information you specified and close
     the **Add User** wizard.
@@ -128,20 +113,14 @@ To add a user from an external LDAP directory:
 1.  Click **Add/sync LDAP user**.
 2.  Specify the user properties:
 
-    **Username**
-
-    The user name.
-
-    **Distinguished name**
-
-    Indicate that Hue should use a full distinguished name for the user.
+<table>
+<tr><td>Username</td><td>The user name.</td></tr>
+<tr><td>Distinguished name</td><td>Indicate that Hue should use a full distinguished name for the user.
     This imports the user's first and last name, username, and email,
-    but does not store the user password.
+    but does not store the user password.</td></tr>
+    <tr><td>Create home directory</td><td> Indicate that Hue should create a home directory for the user in
+    HDFS.</td></tr></table>
 
-    **Create home directory**
-
-    Indicate that Hue should create a home directory for the user in
-    HDFS.
 
 3.  Click **Add/sync user**.
 
@@ -177,19 +156,12 @@ import groups from an LDAP directory.
     Group**.
 2.  Specify the group properties:
 
-    **Name**
-
-    The name of the group. Group names can only be letters, numbers, and
-    underscores; blank spaces are not allowed.
-
-    **Members**
-
-    The users in the group. Check user names or check **Select all**.
-
-    **Permissions**
-
-    The applications the users in the group can access. Check
-    application names or check **Select all**.
+<table>
+<tr><td>Name</td><td> The name of the group. Group names can only be letters, numbers, and
+    underscores; blank spaces are not allowed.</td></tr>
+<tr><td>Members</td><td>The users in the group. Check user names or check Select all.</td></tr>
+    <tr><td>Permissions</td><td>The applications the users in the group can access. Check
+    application names or check Select all.</td></tr></table>
 
 3.  Click **Add group**.
 
@@ -212,27 +184,15 @@ import groups from an LDAP directory.
 1.  From the **Groups** tab, click **Add/sync LDAP group**.
 2.  Specify the group properties:
 
-    **Name**
-
-    The group name.
-
-    **Distinguished name**
-
-    Indicate that Hue should use a full distinguished name for the
-    group.
-
-    **Import new members**
-
-    Indicate that Hue should import the members of the group.
-
-    **Import new members from all subgroups**
-
-    Indicate that Hue should import the members of the subgroups.
-
-    **Create home directories**
-
-    Indicate that Hue should create home directories in HDFS for the
-    imported members.
+<table>
+<tr><td>Name</td><td> The name of the group.</td></tr>
+<tr><td>Distinguished name</td><td> Indicate that Hue should use a full distinguished name for the
+    group.</td></tr>
+    <tr><td>Import new members</td><td>  Indicate that Hue should import the members of the group.</td></tr>
+        <tr><td>Import new members from all subgroups</td><td>
+    Indicate that Hue should import the members of the subgroups.</td></tr>
+            <tr><td>Create home directories</td><td> Indicate that Hue should create home directories in HDFS for the
+    imported members.</td></tr></table>
 
 3.  Click **Add/sync group**.
 

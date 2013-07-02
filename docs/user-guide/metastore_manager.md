@@ -27,9 +27,8 @@ Metastore Manager Installation and Configuration
 ------------------------------------------------
 
 Metastore Manager is one of the applications installed as part of Hue.
-For information about installing and configuring Hue, see Hue
-Installation in
-[http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/CDH4-Installation-Guide.html](http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/CDH4-Installation-Guide.html).
+For information about installing and configuring Hue, see the Hue Installation
+manual.
 
 Starting Metastore Manager
 --------------------------
@@ -100,10 +99,6 @@ automatically upon table creation. When you create a file manually, you
 specify all the properties of the table, and then execute the resulting
 query to actually create the table. You then import data into the table
 as an additional step.
-
-Create a Table
-
-Procedure
 
 **From a File**
 

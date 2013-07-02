@@ -16,13 +16,11 @@ Job Designer Installation and Configuration
 -------------------------------------------
 
 Job Designer is one of the applications installed as part of Hue. For
-information about installing and configuring Hue, see Hue Installation
-in
-[http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/CDH4-Installation-Guide.html](http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/CDH4-Installation-Guide.html).
+information about installing and configuring Hue, see the Hue Installation
+manual..
 
 In order to run DistCp, Streaming, Pig, Sqoop, and Hive jobs, Oozie must
-be configured to use the Oozie ShareLib. See Oozie Installation in
-[http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/CDH4-Installation-Guide.html](http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/CDH4-Installation-Guide.html).
+be configured to use the Oozie ShareLib. See the Oozie Installation manual.
 
 Starting Job Designer
 ---------------------
@@ -112,48 +110,21 @@ All job design settings except Name and Description support the use of
 variables of the form $variable\_name. When you run the job, a dialog
 box will appear to enable you to specify the values of the variables.
 
-**Name**
-
-Identifies the job and its collection of properties and parameters.
-
-**Description**
-
-A description of the job. The description is displayed in the dialog box
-that appears if you specify variables for the job.
-
-**Advanced**
-
--   **Is shared** - Indicate whether to share the action with all users.
--   **Oozie parameters** -
-
-**Prepare**
-
-Specifies paths to create or delete before starting the workflow job.
-
-**Params**
-
-Parameters to pass to a script or command. The parameters are expressed
+<table>
+<tr><td>Name</td><td>Identifies the job and its collection of properties and parameters.</td></tr>
+<tr><td>Description</td><td>A description of the job. The description is displayed in the dialog box
+that appears if you specify variables for the job.</td></tr>
+<tr><td>Advanced</td><td>Advanced settings:<ul><li>Is shared- Indicate whether to share the action with all users.<li>Oozie parameters - parameters to pass to Oozie</td></tr>
+<tr><td>Prepare</td><td>Specifies paths to create or delete before starting the workflow job.</td></tr>
+<tr><td>Params</td>Parameters to pass to a script or command. The parameters are expressed
 using the [JSP 2.0 Specification (JSP.2.3) Expression
 Language](http://jcp.org/aboutJava/communityprocess/final/jsr152/),
-allowing variables, functions, and complex expressions as parameters.
+allowing variables, functions, and complex expressions as parameters.<td></td></tr>
+<tr><td>Job Properties</td><td>Job properties. To set a property value, click <b>Add Property</b>.<ol><li>Property name -  a configuration property name. This field provides autocompletion, so you can type the first few characters of a property name and then select the one you want from the drop-down
+    list.<li>Valuethe property value.</td></tr>
+<tr><td>Files</td><td>Files to pass to the job. Equivalent to the Hadoop -files option.</td></tr>
+<tr><td>Archives</td><td>Files to pass to the job. Archives to pass to the job. Equivalent to the Hadoop -archives option.</td></tr></table>
 
-**Job Properties**
-
-Job properties. To set a property value, click **Add Property**.
-
--   **Property name -** a configuration property name. This field
-    provides autocompletion, so you can type the first few characters of
-    a property name and then select the one you want from the drop-down
-    list.
--   **Value -** the property value.
-
-**Files**
-
-Files to pass to the job. Equivalent to the Hadoop -files option.
-
-**Archives**
-
-Archives to pass to the job. Equivalent to the Hadoop -archives option.
 
 #### MapReduce Job Design
 
@@ -163,10 +134,10 @@ classes without having to write a main Java class. You must specify the
 mapper and reducer classes as well as other MapReduce properties in the
 Job Properties setting.
 
-**Jar path**
-
-The fully-qualified path to a JAR file containing the classes that
-implement the Mapper and Reducer functions.
+<table>
+<tr><td>Jar path</td><td>The fully-qualified path to a JAR file containing the classes that
+implement the Mapper and Reducer functions.</td></tr>
+</table>
 
 #### Streaming Job Design
 
@@ -176,139 +147,104 @@ Unix output. For more information about Hadoop streaming jobs, see
 [Hadoop
 Streaming](http://archive.cloudera.com/cdh/3/hadoop-0.20.2+320/streaming.html).
 
-**Mapper**
-
-The path to the mapper script or class. If the mapper file is not on the
-machines on the cluster, use the **Files** option to pass it as a part
-of job submission. Equivalent to the Hadoop -mapper option.
-
-**Reducer**
-
-The path to the reducer script or class. If the reducer file is not on
-the machines on the cluster, use the **Files** option to pass it as a
-part of job submission. Equivalent to the Hadoop -reducer option.
+<table>
+<tr><td>Mapper</td><td>The path to the mapper script or class. If the mapper file is not on the
+machines on the cluster, use the Files option to pass it as a part
+of job submission. Equivalent to the Hadoop -mapper option.</td></tr>
+<tr><td>Reducer</td><td>The path to the reducer script or class. If the reducer file is not on
+the machines on the cluster, use the Files option to pass it as a
+part of job submission. Equivalent to the Hadoop -reducer option.</td></tr>
+</table>
 
 #### Java Job Design
 
 A Java job design consists of a main class written in Java.
 
-**Jar path**
+<table>
+<tr><td>Jar path</td><td>The fully-qualified path to a JAR file containing the main class.</td></tr>
+<tr><td>Main class</td><td>The main class to invoke the program.</td></tr>
+<tr><td>Args</td><td>The arguments to pass to the main class.</td></tr>
+<tr><td>Java opts</td><td>The options to pass to the JVM.</td></tr>
+</table>
 
-The fully-qualified path to a JAR file containing the main class.
-
-**Main class**
-
-The main class to invoke the program.
-
-**Args**
-
-The arguments to pass to the main class.
-
-**Java opts**
-
-The options to pass to the JVM.
 
 #### Pig Job Design
 
+
 A Pig job design consists of a Pig script.
 
-**Script name**
-
-Script name or path to the Pig script.
+<table>
+<tr><td>Script name</td><td>Script name or path to the Pig script.</td></tr>
+<tr><td></td><td></td></tr>
+<tr><td></td><td></td></tr>
+</table>
 
 #### Hive Job Design
 
 A Hive job design consists of a Hive script.
 
-**Script name**
+<table>
+<tr><td>Script name</td><td>Script name or path to the Hive script.</td></tr>
+</table>
 
-Script name or path to the Hive script.
+
 
 #### Sqoop Job Design
 
 A Sqoop job design consists of a Sqoop command.
 
-**Command**
-
-The Sqoop command.
+<table>
+<tr><td>Command</td><td>The Sqoop command.</td></tr>
+</table>
 
 #### Shell Job Design
 
 A Shell job design consists of a shell command.
 
-**Command**
+<table>
+<tr><td>Command</td><td>The shell command.</td></tr>
+<tr><td></td>Capture output<td>Indicate whether to capture the output of the command.</td></tr>
+</table>
 
-The shell command.
-
-**Capture output**
-
-Indicate whether to capture the output of the command.
 
 #### Ssh Job Design
 
 A Ssh job design consists of an ssh command.
 
-**User**
-
-The name of the user to run the command as.
-
-**Host**
-
-The name of the host to run the command on.
-
-**Command**
-
-The ssh command.
-
-**Capture output**
-
-Indicate whether to capture the output of the command.
+<table>
+<tr><td>User</td><td>The name of the user to run the command as.</td></tr>
+<tr><td>Host</td><td>The name of the host to run the command on.</td></tr>
+<tr><td>Command</td><td>The ssh command.</td></tr>
+<tr><td></td>Capture output<td>Indicate whether to capture the output of the command.</td></tr>
+</table>
 
 #### DistCp Job Design
 
-A DistCp job design consists of a .
+A DistCp job design consists of a DistCp command.
 
 #### Fs Job Design
 
 A Fs job design consists of a command that operates on HDFS.
 
-**Delete path**
-
-The path to delete. If it is a directory, it deletes recursively all its
-content and then deletes the directory.
-
-**Create directory**
-
-The path of a directory to create.
-
-**Move file**
-
-The source and destination paths to the file to be moved.
-
-**Change permissions**
-
-The path whose permissions are to be changed, the permissions, and an
-indicator of whether to change permission recursively.
+<table>
+<tr><td>Delete path</td><td>The path to delete. If it is a directory, it deletes recursively all its
+content and then deletes the directory.</td></tr>
+<tr><td></td>Create directory<td>The path of a directory to create.</td></tr>
+<tr><td>Move file</td><td>The source and destination paths to the file to be moved.</td></tr>
+<tr><td>Change permissions</td><td>The path whose permissions are to be changed, the permissions, and an
+indicator of whether to change permission recursively.</td></tr></table>
 
 #### Email Job Design
 
 A Email job design consists of an email message.
 
-**To addresses**
+<table>
+<tr><td>To addresses</td><td>The recipient of the email message.</td></tr>
+<tr><td>CC addresses (optional)</td><td>The cc recipients of the email message.</td></tr>
+<tr><td>Subject</td><td>The subject of the email message.</td></tr>
+<tr><td>Body</td><td>The body of the email message.</td></tr>
+</table>
 
-The recipient of the email message.
-
-**CC addresses (optional)**
-
-The cc recipients of the email message.
-
-**Subject**
-
-The subject of the email message.
-
-**Body**
-
-The body of the email message.
 
 ### Submitting a Job Design
 
@@ -339,9 +275,6 @@ Results of Submitting a Job](#topic_8_5).
 If you want to edit and use a job but you don't own it, you can make a
 copy of it and then edit and use the copied job.
 
-Action
-
-Procedure
 
 **Copy**
 

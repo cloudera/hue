@@ -16,14 +16,11 @@ Job Browser Installation and Configuration
 ------------------------------------------
 
 Job Browser is one of the applications installed as part of Hue. For
-information about installing and configuring Hue, see Hue Installation
-in
-[http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/CDH4-Installation-Guide.html](http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/CDH4-Installation-Guide.html).
+information about installing and configuring Hue, see the Hue Installation
+manual.
 
 Job Browser can display both MRv1 and MRv2 jobs, but must be configured
-to display one type at a time. See MapReduce (MRv1) and YARN (MRv2)
-Cluster Configuration in [CDH4
-Installation](http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/CDH4-Installation-Guide.html).
+to display one type at a time. 
 
 Starting Job Browser
 --------------------

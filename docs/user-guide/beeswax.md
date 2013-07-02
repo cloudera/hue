@@ -16,15 +16,15 @@ Beeswax and Hive Installation and Configuration
 -----------------------------------------------
 
 Beeswax is installed and configured as part of Hue. For information
-about installing and configuring Hue, see Hue Installation in
-[http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/CDH4-Installation-Guide.html](http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/CDH4-Installation-Guide.html).
+about installing and configuring Hue, see the Hue Installation
+manual..
 
 Beeswax assumes an existing Hive installation. The Hue installation
 instructions include the configuration necessary for Beeswax to access
 Hive. You can view the current Hive configuration from the **Settings**
 tab in the Beeswax application.
 
-By default, a Beeswax user can see the saved queries for all users –
+By default, a Beeswax user can see the saved queries for all users -
 both his/her own queries and those of other Beeswax users. To restrict
 viewing saved queries to the query owner and Hue administrators, set the
 share\_saved\_queries property under the [beeswax] section in the Hue
@@ -155,80 +155,67 @@ MapReduce jobs that the query generated.
 The pane to the left of the Query Editor lets you specify the following
 options:
 
-**Option**
 
-**Description**
-
-**DATABASE**
-
-The database containing the table definitions.
-
-**SETTINGS**
-
-Override the Hive and Hadoop default settings. To configure a new
+<table>
+<tr><td>DATABASE</td><td>The database containing the table definitions.</td></tr>
+<tr><td>SETTINGS</td><td>Override the Hive and Hadoop default settings. To configure a new
 setting:
 
-1.  Click **Add**.
-2.  For **Key**, enter a Hive or Hadoop configuration variable name.
-3.  For **Value**, enter the value you want to use for the variable.
+<ol>
+<li> Click Add.
+<li> For Key, enter a Hive or Hadoop configuration variable name.
+<li> For Value, enter the value you want to use for the variable.
 
 For example, to override the directory where structured Hive query logs
-are created, you would enter hive.querylog.location for **Key**, and a
-path for **Value.**
+are created, you would enter hive.querylog.location for Key, and a
+path for Value.
+</ol>
 
-To view the default settings, click the **Settings** tab at the top of
+To view the default settings, click the Settings tab at the top of
 the page. For information about Hive configuration variables, see:
 [http://wiki.apache.org/hadoop/Hive/AdminManual/Configuration](http://wiki.apache.org/hadoop/Hive/AdminManual/Configuration).
 For information about Hadoop configuration variables, see:
-[http://hadoop.apache.org/docs/current/hadoop-mapreduce-client/hadoop-mapreduce-client-core/mapred-default.xml](http://hadoop.apache.org/docs/current/hadoop-mapreduce-client/hadoop-mapreduce-client-core/mapred-default.xml).
-
-**FILE RESOURCES**
-
-Make files locally accessible at query execution time available on the
+[http://hadoop.apache.org/docs/current/hadoop-mapreduce-client/hadoop-mapreduce-client-core/mapred-default.xml](http://hadoop.apache.org/docs/current/hadoop-mapreduce-client/hadoop-mapreduce-client-core/mapred-default.xml).</td></tr>
+<tr><td>FILE RESOURCES</td><td>Make files locally accessible at query execution time available on the
 Hadoop cluster. Hive uses the Hadoop Distributed Cache to distribute the
 added files to all machines in the cluster at query execution time.
 
-1.  Click **Add** to configure a new setting.
-2.  From the **Type** drop-down menu, choose one of the following:
-    -   **jar** — Adds the specified resources to the Java classpath.
-    -   **archive** — Unarchives the specified resources when
+<ol>
+<li>  Click Add to configure a new setting.
+<li>   From the Type drop-down menu, choose one of the following:
+<ul>
+   <li>jar - Adds the specified resources to the Java classpath.
+   <li>archive - Unarchives the specified resources when
         distributing them.
-    -   **file** — Adds the specified resources to the distributed
+    <li>file - Adds the specified resources to the distributed
         cache. Typically, this might be a transform script (or similar)
         to be executed.
 
-3.  For **Path**, enter the path to the file or click
+<li>   For Path, enter the path to the file or click
     ![image](images/browse.png) to browse and select the file.
+</ol>
 
-![image](images/note.jpg) **Note**: It is not necessary to specify files
+![image](images/note.jpg) Note: It is not necessary to specify files
 used in a transform script if the files are available in the same path
-on all machines in the Hadoop cluster.
+on all machines in the Hadoop cluster.</td></tr>
+<tr><td>USER-DEFINED FUNCTIONS</td><td>Specify user-defined functions. Click Add to configure a new
+setting. Specify the function name in the Name field, and specify
+the class name for Classname.
 
-**USER-DEFINED FUNCTIONS**
-
-Specify user-defined functions. Click **Add** to configure a new
-setting. Specify the function name in the **Name** field, and specify
-the class name for **Class** **name**.
-
-You *must* specify a JAR file for the user-defined functions in ****FILE
-RESOURCES****.
+You *must* specify a JAR file for the user-defined functions in FILE RESOURCES.
 
 To include a user-defined function in a query, add a $ (dollar sign)
 before the function name in the query. For example, if MyTable is a
-user-defined function name in the query, you would type: SELECT \*
-$MyTable
-
-**PARAMETERIZATION**
-
-Indicate that a dialog box should display to enter parameter values when
+user-defined function name in the query, you would type: SELECT $MyTable
+</td></tr>
+<tr><td>PARAMETERIZATION</td><td>Indicate that a dialog box should display to enter parameter values when
 a query containing the string $parametername is executed. Enabled by
-default.
-
-**EMAIL NOTIFICATION**
-
-Indicate that an email message should be sent after a query completes.
+default.</td></tr>
+<tr><td>EMAIL NOTIFICATION</td><td>Indicate that an email message should be sent after a query completes.
 The email is sent to the email address specified in the logged-in user's
-profile.
+profile.</td></tr>
+</table>
+
 
 ### Viewing Query History
 
@@ -252,9 +239,6 @@ Queries tab to display the respective queries or clicking **Saved
 Queries**. You can copy any query, but you can edit, delete, and view
 the history of only your own queries.
 
-Saved Query
-
-Procedure
 
 **Edit**
 

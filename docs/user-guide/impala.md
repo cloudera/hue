@@ -16,8 +16,8 @@ Cloudera Impala Query UI Installation and Configuration
 
 The Cloudera Impala Query UI application is one of the applications
 installed as part of Hue. For information about installing and
-configuring Hue, see Hue Installation in
-[http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/CDH4-Installation-Guide.html](http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/CDH4-Installation-Guide.html).
+configuring Hue, see the Hue Installation
+manual..
 
 The Cloudera Impala Query UI assumes an existing Cloudera Impala
 installation. The Hue installation instructions include the
@@ -126,35 +126,30 @@ server.
 The pane to the left of the Query Editor lets you specify the following
 options:
 
-**Option**
+<table>
+<tr><td>DATABASE</td><td>The database containing the table definitions.</td></tr>
+<tr><td>SETTINGS</td><td>Override the Cloudera Impala  default settings. To configure a new
+setting:
 
-**Description**
+<ol>
+<li> Click Add.
+<li> For Key, enter a Hive or Hadoop configuration variable name.
+<li> For Value, enter the value you want to use for the variable.
 
-**DATABASE**
-
-The database containing the table definitions.
-
-**SETTINGS**
-
-Override Cloudera Impala default settings. To configure a new setting:
-
-1.  Click **Add**.
-2.  For **Key**, enter a Cloudera Impala configuration variable name.
-3.  For **Value**, enter the value you want to use for the variable.
-
-To view the default settings, click the **Settings** tab at the top of
-the page.
-
-**PARAMETERIZATION**
-
-Indicate that a dialog box should display to enter parameter values when
+For example, to override the directory where structured Hive query logs
+are created, you would enter hive.querylog.location for Key, and a
+path for Value.
+</ol>
+To view the default settings, click the Settings tab at the top of
+the page. 
+</td></tr>  
+<tr><td>PARAMETERIZATION</td><td>Indicate that a dialog box should display to enter parameter values when
 a query containing the string $parametername is executed. Enabled by
-default.
+default.</td></tr>
+<tr><td>METASTORE CATALOG</td><td>Refresh metadata. It is best to refresh metadata after making changes to
+databases such as adding or dropping a table.</td></tr>
+</table>
 
-**METASTORE CATALOG**
-
-Refresh metadata. It is best to refresh metadata after making changes to
-databases such as adding or dropping a table.
 
 ### Viewing Query History
 
@@ -178,9 +173,6 @@ Queries tab to display the respective queries or clicking **Saved
 Queries**. You can copy any query, but you can edit, delete, and view
 the history of only your own queries.
 
-Saved Query
-
-Procedure
 
 **Edit**
 

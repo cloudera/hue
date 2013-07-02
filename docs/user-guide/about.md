@@ -47,8 +47,7 @@ settings are in the hue.ini configuration file.
 
 Click the tabs under **Configuration Sections and Variables** to see the
 settings configured for each application. For information on configuring
-these settings, see Hue Configuration in [CDH4
-Installation](http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/CDH4-Installation-Guide.html).
+these settings, see Hue Configuration in the Hue installation manual.
 
 Server Logs
 -----------

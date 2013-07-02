@@ -29,9 +29,8 @@ acyclic graph (DAG). It includes two types of nodes:
     [Email](hue2.0ug_topic_8.html#concept_gt5_bh3_zj__section_qjt_lh3_zj))
 
     In order to run DistCp, Streaming, Pig, Sqoop, and Hive jobs, Oozie
-    must be configured to use the Oozie ShareLib. See Oozie Installation
-    in
-    [http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/CDH4-Installation-Guide.html](http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/CDH4-Installation-Guide.html).
+    must be configured to use the Oozie ShareLib. See the Oozie Installation
+   manual.
 
 A coordinator application allows you to define and execute recurrent and
 interdependent workflow jobs. The coordinator application defines the
@@ -44,9 +43,8 @@ Oozie Editor/Dashboard Installation and Configuration
 -----------------------------------------------------
 
 Oozie Editor/Dashboard is one of the applications installed as part of
-Hue. For information about installing and configuring Hue, see Hue
-Installation in
-[http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/CDH4-Installation-Guide.html](http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/CDH4-Installation-Guide.html).
+Hue. For information about installing and configuring Hue, see the Hue Installation
+manual.
 
 Starting Oozie Editor/Dashboard
 -------------------------------
@@ -94,29 +92,13 @@ viewed, submitted, and modified by their owner or a superuser.
 Editor permissions for performing actions on workflows, coordinators,
 and bundles are summarized in the following table:
 
-**Action**
+<table>
+<th><td>Action</td><td>Superuser or Owner</td><td>All</td></th>
+<tr><td>View</td><td>Y.</td><td>Only if "Is shared" is set</td></tr>
+<tr><td>Submit</td><td>Y.</td><td>Only if "Is shared" is set</td></tr>
+<tr><td>Modify</td><td>Y.</td><td>N</td></tr>
+</table>
 
-**Superuser or Owner**
-
-**All**
-
-View
-
-Y
-
-Only if "Is shared" is set
-
-Submit
-
-Y
-
-Only if "Is shared" is set
-
-Modify
-
-Y
-
-N
 
 Deleting and Restoring Workflows, Coordinators, and Bundles
 -----------------------------------------------------------
@@ -160,8 +142,7 @@ Click a workflow row in the Running or Completed table to view detailed
 information about that workflow job.
 
 In the left pane contains a link to the workflow and the variable values
-specified.\
-![image](images/workflow.jpg)\
+specified.![image](images/workflow.jpg)
 
 For the selected job, the following information is available in the
 right area.

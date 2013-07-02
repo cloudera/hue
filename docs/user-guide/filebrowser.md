@@ -21,9 +21,8 @@ File Browser Installation and Configuration
 -------------------------------------------
 
 File Browser is one of the applications installed as part of Hue. For
-information about installing and configuring Hue, see Hue Installation
-in
-[http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/CDH4-Installation-Guide.html](http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/CDH4-Installation-Guide.html).
+information about installing and configuring Hue, see the Hue Installation
+manual.
 
 Starting File Browser
 ---------------------
@@ -113,9 +112,6 @@ information on how to configure the HDFS trash folder, see Enabling
 Trash. in
 [http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/CDH4-Installation-Guide.html](http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/CDH4-Installation-Guide.html).
 
-Action
-
-Procedure
 
 **Open**
 
@@ -134,9 +130,6 @@ Procedure
 
 ### Renaming, Moving, Deleting, and Restoring Files and Directories
 
-Action
-
-Procedure
 
 **Rename**
 
@@ -184,10 +177,6 @@ Hue superuser account. If you create a Hue user (in User Admin) with the
 same user name and password as the Hadoop superuser, then that Hue user
 can change a file's or directory's owner, group, or permissions.
 
-Change
-
-Procedure
-
 **Owner or Group**
 
 1.  In the **File Browser** window, check the checkbox next to the
@@ -221,9 +210,6 @@ Viewing and Editing Files
 
 You can view and edit files as text or binary.
 
-Action
-
-Procedure
 
 **View**
 
