@@ -30,7 +30,7 @@ from filebrowser.views import location_to_url
 
 from beeswax import hive_site
 from beeswax.conf import BEESWAX_SERVER_HOST, BEESWAX_SERVER_PORT,\
-  BROWSE_PARTITIONED_TABLE_LIMIT, SERVER_INTERFACE
+  BROWSE_PARTITIONED_TABLE_LIMIT
 from beeswax.design import hql_query
 from beeswax.models import QueryHistory, HIVE_SERVER2
 from desktop.lib.django_util import format_preserving_redirect
@@ -293,7 +293,7 @@ class Dbms:
 
   def use(self, database):
     """Beeswax interface does not support use directly."""
-    if SERVER_INTERFACE.get() == HIVE_SERVER2:
+    if self.server_type == HIVE_SERVER2:
       query = hql_query('USE %s' % database)
       self.client.query(query)
 
