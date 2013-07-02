@@ -21,7 +21,7 @@
 %>
 
 
-<%def name="filelink(path)">${ path + '#' + posixpath.basename(path) }</%def>
+<%def name="filelink(path)">${ '#' in path and path or path + '#' + posixpath.basename(path) }</%def>
 
 
 <%def name="prepares(prepares)">

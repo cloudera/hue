@@ -8,6 +8,8 @@
                   <delete path="${nameNode}${output}"/>
             </prepare>
             <command>import --connect jdbc:hsqldb:file:db.hsqldb --table TT --target-dir ${output} -m 1</command>
+            <arg>My invalid arg</arg>
+            <arg>My invalid arg 2</arg>
             <file>db.hsqldb.properties#db.hsqldb.properties</file>
             <file>db.hsqldb.script#db.hsqldb.script</file>
         </sqoop>

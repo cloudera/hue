@@ -1707,6 +1707,7 @@ class TestImportWorkflow04(OozieMockBase):
     node = Node.objects.get(workflow=workflow, node_type='sqoop').get_full_node()
     assert_equal('["db.hsqldb.properties#db.hsqldb.properties","db.hsqldb.script#db.hsqldb.script"]', node.files)
     assert_equal('import --connect jdbc:hsqldb:file:db.hsqldb --table TT --target-dir ${output} -m 1', node.script_path)
+    assert_equal('[{"type":"arg","value":"My invalid arg"},{"type":"arg","value":"My invalid arg 2"}]', node.params)
     workflow.delete(skip_trash=True)
 
 
@@ -1748,6 +1749,7 @@ class TestImportWorkflow04(OozieMockBase):
     assert_equal('shell-2', nodes[1].name)
     assert_equal('my-job.xml', nodes[0].job_xml)
     assert_equal('hello.py', nodes[0].command)
+    assert_equal('[{"type":"argument","value":"World!"}]', nodes[0].params)
     assert_true(nodes[0].capture_output)
     assert_false(nodes[1].capture_output)
     workflow.delete(skip_trash=True)

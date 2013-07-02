@@ -6,7 +6,7 @@
 <xsl:import href="../nodes/fields/files.xslt"/>
 <xsl:import href="../nodes/fields/job_properties.xslt"/>
 <xsl:import href="../nodes/fields/job_xml.xslt"/>
-<xsl:import href="../nodes/fields/params.xslt"/>
+<xsl:import href="../nodes/fields/arg_params.xslt"/>
 <xsl:import href="../nodes/fields/prepares.xslt"/>
 <xsl:import href="../nodes/fields/script_path.xslt"/>
 
@@ -18,7 +18,7 @@
     <xsl:call-template name="files"/>
     <xsl:call-template name="job_properties"/>
     <xsl:call-template name="job_xml"/>
-    <xsl:call-template name="params"/>
+    <xsl:call-template name="arg_params"/>
     <xsl:call-template name="prepares"/>
     <xsl:call-template name="script_path"/>
 
