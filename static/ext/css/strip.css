@@ -437,3 +437,24 @@ a.normal {
 .popover-content .nav-list {
   padding: 0!important;
 }
+
+.videoList li {
+  padding: 5px;
+  margin-bottom: 10px;
+  margin-left: 6px;
+  background-color: #F3F3F3;
+  border-bottom: 1px solid #F3F3F3;
+  cursor: pointer;
+  color: #338bb8;
+}
+
+.videoList li.active {
+  font-weight: bold;
+  background-color: #EFEFEF;
+  border-bottom: 1px solid #338bb8;
+}
+
+.videoList li:hover {
+  background-color: #EFEFEF;
+  border-bottom: 1px solid #338bb8;
+}

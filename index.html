@@ -48,7 +48,7 @@
       </p>
 
       <p><strong>Hue</strong> features a File Browser for HDFS, a Job Designer/Browser for MapReduce, query editors for
-        Hive, Pig, Cloudera Impala and Solr Search.<br/>
+        Hive, Pig, Cloudera Impala, Solr Search and an HBase browser.<br/>
         It also ships with an Oozie Application for creating workflows, various Shells and a collection of Hadoop API.
       </p>
 
@@ -111,6 +111,20 @@
             <p class="center-align">
               The Oozie Editor/Dashboard application allows you to define Oozie workflow/coordinator/bundle
               applications, run them, and view their information, logs and stop, pause, rerun them.
+            </p>
+          </article>
+        </div>
+
+        <div class="item">
+          <p>
+            <img src="static/images/screenshots/hbase.png" alt="HBase"/>
+          </p>
+          <article class="carousel-caption">
+            <h3><strong>HBase Browser</strong></h3>
+
+            <p class="center-align">
+              The HBase Browser application is tailored for quickly browsing huge tables and accessing any content.
+              You can also create new tables, add data, modify existing cells and filter data with the autocompleting search bar.
             </p>
           </article>
         </div>
@@ -360,13 +374,24 @@
                                                         target="_blank">Apache License, version 2.0</a>.</p>
 </footer>
 
-<div id="video" class="modal hide fade" style="width: 730px;margin-left: -365px;">
+<div id="video" class="modal hide fade" style="width: 930px;margin-left: -465px;">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3>What's good in Hue</h3>
+    <h3>Welcome to the Hue cinema.</h3>
   </div>
   <div class="modal-body">
-    <iframe id="videoFrame" src="http://player.vimeo.com/video/64825639" width="700" height="350" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
+    <div style="float: left; width: 705px"><iframe id="videoFrame" src="http://player.vimeo.com/video/68257054" width="700" height="350" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe></div>
+    <div style="float: left; width: 187px">
+      <ul class="videoList unstyled">
+        <li class="active" data-video="http://player.vimeo.com/video/68257054">Hue 2.4 and the search app</li>
+        <li data-video="http://player.vimeo.com/video/66661052">The Pig Editor</li>
+        <li data-video="http://player.vimeo.com/video/66732338">A new UI for Oozie</li>
+        <li data-video="http://player.vimeo.com/video/64825639">What's new in Hue 2.3</li>
+        <li data-video="http://player.vimeo.com/video/63859033">The Yelp dataset challenge</li>
+        <li data-video="http://player.vimeo.com/video/63343487">HDFS File Operations Made Easy with Hue</li>
+      </ul>
+
+    </div>
   </div>
 </div>
 
@@ -383,6 +408,7 @@
 
   $(document).ready(function () {
     var CURRENT = "http://cloudera.github.com/hue/releases/2.4.0/hue-2.4.0.tgz";
+    var _lastSeenVideo = $("#videoFrame").attr("src");
 
     $("#subscribeBtn").click(function() {
         $("#subForm").submit();
@@ -394,7 +420,13 @@
       $("#video").modal("show");
     });
     $("#video").on("hide", function(){
-      $("#videoFrame").attr("src", "about:blank").attr("src", "http://player.vimeo.com/video/64825639");
+      $("#videoFrame").attr("src", "about:blank").attr("src", _lastSeenVideo);
+    });
+    $(".videoList li").on("click", function(){
+      $(".videoList li").removeClass("active");
+      $(this).addClass("active");
+      $("#videoFrame").attr("src", $(this).data("video") + "?autoplay=1");
+      _lastSeenVideo = $(this).data("video");
     });
     $("#downloadBtn").popover({
         html: true,
