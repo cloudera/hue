@@ -336,7 +336,7 @@
             createFolder:false,
             uploadFile:true,
             initialPath:$.trim(inputElement.val()) != "" ? pathAddition + inputElement.val() : "${ workflow.deployment_dir }",
-            errorRedirectPath:"${ workflow.deployment_dir }",
+            errorRedirectPath:"",
             forceRefresh:true
           });
           $("#chooseFile").modal("show");
