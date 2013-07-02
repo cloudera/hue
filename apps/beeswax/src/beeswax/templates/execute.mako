@@ -743,7 +743,6 @@ ${layout.menubar(section='query')}
       };
 
       CodeMirror.commands.autocomplete = function (cm) {
-        tableMagic = false;
         if ($.totalStorage('tables_' + $("#id_query-database").val()) == null) {
           CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
           getTables(function () {}); // if preload didn't work, tries again
@@ -761,31 +760,7 @@ ${layout.menubar(section='query')}
             CodeMirror.possibleSoloField = false;
             if (_before.toUpperCase().indexOf("SELECT ") > -1 && _before.toUpperCase().indexOf(" FROM ") == -1 && !CodeMirror.fromDot) {
               if (codeMirror.getValue().toUpperCase().indexOf("FROM") > -1) {
-                CodeMirror.possibleSoloField = true;
-                try {
-                  var _possibleTables = $.trim(codeMirror.getValue().substr(codeMirror.getValue().toUpperCase().indexOf("FROM") + 4)).split(" ");
-                  var _foundTable = "";
-                  for (var i = 0; i < _possibleTables.length; i++) {
-                    if ($.trim(_possibleTables[i]) != "" && _foundTable == "") {
-                      _foundTable = _possibleTables[i];
-                    }
-                  }
-                  if (_foundTable != "") {
-                    if (tableHasAlias(_foundTable)) {
-                      CodeMirror.possibleSoloField = false;
-                      CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
-                    }
-                    else {
-                      getTableColumns(_foundTable,
-                              function (columns) {
-                                CodeMirror.catalogFields = columns;
-                                CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
-                              });
-                    }
-                  }
-                }
-                catch (e) {
-                }
+                fieldsAutocomplete(cm);
               }
               else {
                 CodeMirror.tableFieldMagic = true;
@@ -793,9 +768,42 @@ ${layout.menubar(section='query')}
               }
             }
             else {
-              CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
+              if (_before.toUpperCase().indexOf("WHERE ") > -1 && !CodeMirror.fromDot && _before.match(/ON|GROUP|SORT/) == null) {
+                fieldsAutocomplete(cm);
+              }
+              else {
+                CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
+              }
             }
           });
+        }
+      }
+
+      function fieldsAutocomplete(cm) {
+        CodeMirror.possibleSoloField = true;
+        try {
+          var _possibleTables = $.trim(codeMirror.getValue().substr(codeMirror.getValue().toUpperCase().indexOf("FROM") + 4)).split(" ");
+          var _foundTable = "";
+          for (var i = 0; i < _possibleTables.length; i++) {
+            if ($.trim(_possibleTables[i]) != "" && _foundTable == "") {
+              _foundTable = _possibleTables[i];
+            }
+          }
+          if (_foundTable != "") {
+            if (tableHasAlias(_foundTable)) {
+              CodeMirror.possibleSoloField = false;
+              CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
+            }
+            else {
+              getTableColumns(_foundTable,
+                  function (columns) {
+                    CodeMirror.catalogFields = columns;
+                    CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
+                  });
+            }
+          }
+        }
+        catch (e) {
         }
       }
 
