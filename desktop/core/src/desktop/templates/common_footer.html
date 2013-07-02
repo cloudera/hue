@@ -140,7 +140,7 @@ limitations under the License.
       })();
 
       function trackOnGA(path) {
-        if (_gaq != undefined && _gaq != null){
+        if (typeof _gaq != "undefined" && _gaq != null){
           _gaq.push(['_trackPageview', '/remote/{{ version }}/' + path]);
         }
       }

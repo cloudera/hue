@@ -29,6 +29,7 @@
   width: 100%;
   text-align: center;
   display: none;
+  z-index: 1000;
 }
 
 #logs .alert-modified {
@@ -41,8 +42,8 @@
   border-color: #DDD;
 }
 
-.parameterTable {
-  background-color: #eeeeee;
+.parameterTableCnt {
+  background-color: #F5F5F5;
 }
 
 .parameterTable td {
@@ -67,4 +68,38 @@
 
 .widget-content {
   padding: 10px;
+}
+
+.editable {
+  cursor: pointer;
+}
+
+.editable-container h3 {
+  display: none;
+}
+
+#properties h4 {
+  color: #3A87AD;
+}
+
+.mainAction {
+  float: right;
+  font-size: 48px;
+  opacity: 0.4;
+  color: #338bb8;
+  cursor: pointer;
+  margin-top: 6px;
+}
+
+.mainAction i {
+  cursor: pointer;
+}
+
+.mainAction:hover {
+  opacity: 0.88;
+  text-decoration: none;
+}
+
+.unsaved {
+  border-bottom: 1px solid #C63D37;
 }

@@ -497,8 +497,6 @@ ul.errorlist li {
   position: fixed;
   top: 74px;
   right: -3px;
-  right: 20px\9; /* IE8 */
-  width: 125px\9; /* IE8 */
   z-index: 1001;
 }
 
