@@ -902,7 +902,7 @@ for x in sys.stdin:
     self._make_table('timestamp_invalid_data', 'CREATE TABLE timestamp_invalid_data (timestamp1 TIMESTAMP)', filename)
 
     response = self.client.get("/metastore/table/default/timestamp_invalid_data")
-    assert_true('Error!' in response.content, response.content)
+    assert_true('NULL' in response.content, response.content)
 
     # Good format
     self._make_custom_data_file(filename, ['2012-01-01 10:11:30', '2012-01-01 10:11:31'])
