@@ -610,6 +610,7 @@ for x in sys.stdin:
 
     # Retrieve that design and check correct DB is selected
     design = beeswax.models.SavedQuery.objects.filter(name='rubbish')[0]
+    assert_equal('', design.desc)
     resp = cli.get('/beeswax/execute/%s' % (design.id,))
     assert_true('selected="selected">other_db</option>' in resp.content)
     assert_similar_pages(resp.content, exe_resp.content)
