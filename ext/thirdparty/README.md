@@ -9,7 +9,6 @@ Checked-in third party dependencies
 |--------------|-------|-------|-------|----------|
 |Y|A Midsummer Nights Dream by Shakespeare|?|Public Domain from Gutenberg|http://www.gutenberg.org/dirs/etext98/2ws1710.txt|
 |Y|Avro|1.5.0|ASL2|http://avro.apache.org/|
-|Y|Beaker|1.4.2|BSD|http://beaker.groovie.org/|
 |Y|CherryPy|3.1.2|BSD|http://www.cherrypy.org/|
 |Y|ConfigObj|4.6.0|BSD|http://www.voidspace.org.uk/python/configobj.html|
 |Y|ctypes|1.0.2|MIT|http://pypi.python.org/pypi/ctypes|
@@ -30,7 +29,6 @@ Checked-in third party dependencies
 |Y|Markdown|2.0.3|BSD|http://pypi.python.org/packages/source/M/Markdown/Markdown-2.0.3.tar.gz|
 |Y|MarkupSafe|0.9.3|BSD|http://pypi.python.org/pypi/MarkupSafe|
 |Y|MySQL for Python|1.2.3c1|GPL or the original license based on Python 1.5.2|http://sourceforge.net/projects/mysql-python/|
-|Y|processing|0.52|BSD|http://developer.berlios.de/projects/pyprocessing|
 |Y|Pygments|1.3.1|BSD|http://pypi.python.org/pypi/Pygments|
 |Y|PyOpenSSL|0.13|ASL2|https://launchpad.net/pyopenssl|
 |Y|pysqlite|2.55|zlib/libpng|http://oss.itsystementwicklung.de/download/pysqlite/2.5/2.5.5/|
@@ -48,10 +46,8 @@ Checked-in third party dependencies
 |Y|ssl|1.15|Python|http://pypi.python.org/pypi/ssl/1.15|
 |Y|threadframe|0.2|Python|http://www.majid.info/mylos/stories/2004/06/10/threadframe.html|
 |Y|Thrift|?|Apache|http://incubator.apache.org/thrift/download/|
-|Y|Twisted|8.2.0|MIT|http://twistedmatrix.com/trac/|
 |Y|urllib2_kerberos|0.1.6|ASL2|http://pypi.python.org/pypi/urllib2_kerberos|
 |Y|Werkzeug|0.5.1|BSD|http://pypi.python.org/packages/source/W/Werkzeug/Werkzeug-0.5.1.zip|
-|Y|zope.interface|3.5.2|ZPL(MIT-like)|http://pypi.python.org/pypi/zope.interface|
 
 ---
 Downloaded third party dependencies during build
