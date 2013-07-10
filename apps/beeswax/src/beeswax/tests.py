@@ -30,7 +30,7 @@ import socket
 import tempfile
 import threading
 
-from nose.tools import assert_true, assert_equal, assert_false
+from nose.tools import assert_true, assert_equal, assert_false, assert_not_equal
 from nose.plugins.skip import SkipTest
 
 from django.utils.encoding import smart_str
@@ -50,7 +50,7 @@ import beeswax.hive_site
 import beeswax.models
 import beeswax.views
 
-from beeswax import conf
+from beeswax import conf, hive_site
 from beeswax.views import collapse_whitespace
 from beeswax.test_base import make_query, wait_for_query_to_finish, verify_history, get_query_server_config,\
   BEESWAXD_TEST_PORT
@@ -59,6 +59,7 @@ from beeswax.data_export import download
 from beeswax.models import SavedQuery, QueryHistory, HQL
 from beeswax.server import dbms
 from beeswax.server.beeswax_lib import BeeswaxDataTable, BeeswaxClient
+from beeswax.server.hive_server2_lib import HiveServerClient
 from beeswax.test_base import BeeswaxSampleProvider
 import hadoop
 
@@ -109,27 +110,6 @@ class TestBeeswaxWithHadoop(BeeswaxSampleProvider):
     last_state = history.last_state
     assert_equal(beeswax.models.QueryHistory.STATE[last_state], state)
     return history.id
-
-  def test_beeswax_get_kerberos_security(self):
-    principal = get_query_server_config('beeswax')['principal']
-    assert_true(principal.startswith('hue/'), principal)
-
-    principal = get_query_server_config('impala')['principal']
-    assert_true(principal.startswith('impala/'), principal)
-
-    beeswax_query_server = {'server_name': 'beeswax', 'principal': 'hue'}
-    impala_query_server = {'server_name': 'impala', 'principal': 'impala'}
-
-    assert_equal((False, 'hue'), BeeswaxClient.get_security(beeswax_query_server))
-    assert_equal((False, 'impala'), BeeswaxClient.get_security(impala_query_server))
-
-    cluster_conf = hadoop.cluster.get_cluster_conf_for_job_submission()
-    finish = cluster_conf.SECURITY_ENABLED.set_for_testing(True)
-    try:
-      assert_equal((True, 'hue'), BeeswaxClient.get_security(beeswax_query_server))
-      assert_equal((True, 'impala'), BeeswaxClient.get_security(impala_query_server))
-    finally:
-      finish()
 
   def test_query_with_error(self):
     """
@@ -1320,7 +1300,7 @@ def test_hive_site():
       def get(self):
         return tmpdir
 
-    xml = hive_site_xml(is_local=False, use_sasl=False)
+    xml = hive_site_xml(is_local=True, use_sasl=False)
     file(os.path.join(tmpdir, 'hive-site.xml'), 'w').write(xml)
 
     beeswax.hive_site.reset()
@@ -1328,12 +1308,14 @@ def test_hive_site():
     beeswax.conf.BEESWAX_HIVE_CONF_DIR = Getter()
 
     is_local, host, port, kerberos_principal = beeswax.hive_site.get_metastore()
-    assert_false(is_local)
-    assert_equal(host, 'darkside-1234')
-    assert_equal(port, 9999)
+    assert_true(is_local)
+    # Local so don't use hive-site.xml
+    assert_not_equal(host, 'darkside-1234')
+    assert_not_equal(port, 9999)
+    assert_not_equal(kerberos_principal, 'test/test.com@TEST.COM')
     assert_equal(beeswax.hive_site.get_conf()['hive.metastore.warehouse.dir'], u'/abc')
-    assert_equal(kerberos_principal, 'test/test.com@TEST.COM')
     assert_equal(beeswax.hive_site.get_hiveserver2_kerberos_principal(), 'hs2test/test.com@TEST.COM')
+    assert_equal(beeswax.hive_site.get_hiveserver2_authentication(), 'NONE')
   finally:
     beeswax.hive_site.reset()
     if saved is not None:
@@ -1400,7 +1382,7 @@ def test_hive_site_external_metastore():
     beeswax.hive_site.reset()
     is_local, host, port, kerberos_principal = beeswax.hive_site.get_metastore()
     assert_false(is_local)
-    assert_equal(host, 'test.com')
+    assert_equal(host, 'darkside-1234')
     assert_equal(port, 9999)
     assert_equal(beeswax.hive_site.get_conf()['hive.metastore.warehouse.dir'], u'/abc')
     assert_equal(kerberos_principal, 'test/test.com@TEST.COM')
@@ -1627,21 +1609,78 @@ def search_log_line(component, expected_log, all_logs):
   """Checks if 'expected_log' can be found in one line of 'all_logs' outputed by the logging component 'component'."""
   return re.compile('.+?%(component)s(.+?)%(expected_log)s' % {'component': component, 'expected_log': expected_log}).search(all_logs)
 
+def test_beeswax_get_kerberos_security():
+  principal = get_query_server_config('beeswax')['principal']
+  assert_true(principal.startswith('hue/'), principal)
+
+  principal = get_query_server_config('impala')['principal']
+  assert_true(principal.startswith('impala/'), principal)
+
+  beeswax_query_server = {'server_name': 'beeswax', 'principal': 'hue'}
+  impala_query_server = {'server_name': 'impala', 'principal': 'impala'}
+
+  assert_equal((False, 'hue'), BeeswaxClient.get_security(beeswax_query_server))
+  assert_equal((False, 'impala'), BeeswaxClient.get_security(impala_query_server))
+
+  cluster_conf = hadoop.cluster.get_cluster_conf_for_job_submission()
+  finish = cluster_conf.SECURITY_ENABLED.set_for_testing(True)
+  try:
+    assert_equal((True, 'hue'), BeeswaxClient.get_security(beeswax_query_server))
+    assert_equal((True, 'impala'), BeeswaxClient.get_security(impala_query_server))
+  finally:
+    finish()
+
+def test_hiveserver2_get_security():
+  principal = get_query_server_config('beeswax')['principal']
+  assert_true(principal.startswith('hue/'), principal)
+
+  principal = get_query_server_config('impala')['principal']
+  assert_true(principal.startswith('impala/'), principal)
+
+  beeswax_query_server = {'server_name': 'beeswax', 'principal': 'hue'}
+  impala_query_server = {'server_name': 'impala', 'principal': 'impala'}
+
+  assert_equal((True, 'PLAIN', 'hue'), HiveServerClient.get_security(beeswax_query_server))
+  assert_equal((False, 'GSSAPI', 'impala'), HiveServerClient.get_security(impala_query_server))
+
+  cluster_conf = hadoop.cluster.get_cluster_conf_for_job_submission()
+  finish = cluster_conf.SECURITY_ENABLED.set_for_testing(True)
+  try:
+    assert_equal((True, 'GSSAPI', 'impala'), HiveServerClient.get_security(impala_query_server))
+  finally:
+    finish()
+
+  # Bad but easy mocking
+  prev = hive_site._HIVE_SITE_DICT.get(hive_site._CNF_HIVESERVER2_AUTHENTICATION)
+  try:
+    hive_site._HIVE_SITE_DICT[hive_site._CNF_HIVESERVER2_AUTHENTICATION] = 'NOSASL'
+    assert_equal((False, 'NOSASL', 'hue'), HiveServerClient.get_security(beeswax_query_server))
+    hive_site._HIVE_SITE_DICT[hive_site._CNF_HIVESERVER2_AUTHENTICATION] = 'KERBEROS'
+    assert_equal((True, 'GSSAPI', 'hue'), HiveServerClient.get_security(beeswax_query_server))
+  finally:
+    if prev is not None:
+      hive_site._HIVE_SITE_DICT[hive_site._CNF_HIVESERVER2_AUTHENTICATION] = prev
+    else:
+      del hive_site._HIVE_SITE_DICT[hive_site._CNF_HIVESERVER2_AUTHENTICATION]
+
+
 def hive_site_xml(is_local=False, use_sasl=False, thrift_uris='thrift://darkside-1234:9999',
                   warehouse_dir='/abc', kerberos_principal='test/test.com@TEST.COM',
-                  hs2_kerberos_principal='hs2test/test.com@TEST.COM'):
-  return """
-    <configuration>
-      <property>
-        <name>hive.metastore.local</name>
-        <value>%(is_local)s</value>
-      </property>
-
-      <property>
+                  hs2_kerberos_principal='hs2test/test.com@TEST.COM',
+                  hs2_kauthentication='NOSASL'):
+  if not is_local:
+    uris = """
+       <property>
         <name>hive.metastore.uris</name>
         <value>%(thrift_uris)s</value>
       </property>
+    """ % {'thrift_uris': thrift_uris}
+  else:
+    uris = ''
 
+  return """
+    <configuration>
+      %(uris)s
       <property>
         <name>hive.metastore.warehouse.dir</name>
         <value>%(warehouse_dir)s</value>
@@ -1659,14 +1698,19 @@ def hive_site_xml(is_local=False, use_sasl=False, thrift_uris='thrift://darkside
 
       <property>
         <name>hive.metastore.sasl.enabled</name>
+        <value>%(hs2_kauthentication)s</value>
+      </property>
+
+      <property>
+        <name>hive.metastore.sasl.enabled</name>
         <value>%(use_sasl)s</value>
       </property>
     </configuration>
   """ % {
-    'is_local': str(is_local).lower(),
-    'thrift_uris': thrift_uris,
+    'uris': uris,
     'warehouse_dir': warehouse_dir,
     'kerberos_principal': kerberos_principal,
     'hs2_kerberos_principal': hs2_kerberos_principal,
+    'hs2_kauthentication': hs2_kauthentication,
     'use_sasl': str(use_sasl).lower()
   }

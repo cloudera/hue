@@ -37,11 +37,11 @@ _HIVE_SITE_PATH = None                  # Path to hive-site.xml
 _HIVE_SITE_DICT = None                  # A dictionary of name/value config options
 _METASTORE_LOC_CACHE = None
 
-_CNF_METASTORE_LOCAL = 'hive.metastore.local'
 _CNF_METASTORE_SASL = 'hive.metastore.sasl.enabled'
 _CNF_METASTORE_URIS = 'hive.metastore.uris'
 _CNF_METASTORE_KERBEROS_PRINCIPAL = 'hive.metastore.kerberos.principal'
 _CNF_HIVESERVER2_KERBEROS_PRINCIPAL = 'hive.server2.authentication.kerberos.principal'
+_CNF_HIVESERVER2_AUTHENTICATION = 'hive.server2.authentication'
 
 # Host is whatever up to the colon. Allow and ignore a trailing slash.
 _THRIFT_URI_RE = re.compile("^thrift://([^:]+):(\d+)[/]?$")
@@ -108,6 +108,8 @@ def get_metastore():
 def get_hiveserver2_kerberos_principal():
   return security_util.get_kerberos_principal(get_conf().get(_CNF_HIVESERVER2_KERBEROS_PRINCIPAL, None), socket.getfqdn())
 
+def get_hiveserver2_authentication():
+  return get_conf().get(_CNF_HIVESERVER2_AUTHENTICATION, 'NONE').upper() # NONE == PLAIN SASL
 
 def _parse_hive_site():
   """

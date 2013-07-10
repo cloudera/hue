@@ -20,6 +20,7 @@ import re
 import thrift
 
 from desktop.lib import thrift_util
+from hadoop import cluster
 
 from TCLIService import TCLIService
 from TCLIService.ttypes import TOpenSessionReq, TGetTablesReq, TFetchResultsReq,\
@@ -28,10 +29,10 @@ from TCLIService.ttypes import TOpenSessionReq, TGetTablesReq, TFetchResultsReq,
   TCloseSessionReq, TGetSchemasReq, TGetLogReq, TCancelOperationReq
 
 from beeswax import conf
+from beeswax import hive_site
 from beeswax.models import Session, HiveServerQueryHandle, HiveServerQueryHistory
 from beeswax.server.dbms import Table, NoSuchObjectException, DataTable,\
   QueryServerException
-from beeswax.server.beeswax_lib import BeeswaxClient
 
 
 LOG = logging.getLogger(__name__)
@@ -249,12 +250,13 @@ class HiveServerTColumnDesc:
 
 
 class HiveServerClient:
+  HS2_MECHANISMS = {'KERBEROS': 'GSSAPI', 'NONE': 'PLAIN', 'NOSASL': 'NOSASL'}
 
   def __init__(self, query_server, user):
     self.query_server = query_server
     self.user = user
 
-    use_sasl, kerberos_principal_short_name = BeeswaxClient.get_security(query_server)
+    use_sasl, mechanism, kerberos_principal_short_name = HiveServerClient.get_security(query_server)
 
     self._client = thrift_util.get_client(TCLIService.Client,
                                           query_server['server_host'],
@@ -262,7 +264,34 @@ class HiveServerClient:
                                           service_name=query_server['server_name'],
                                           kerberos_principal=kerberos_principal_short_name,
                                           use_sasl=use_sasl,
+                                          mechanism=mechanism,
+                                          username=user.username,
                                           timeout_seconds=conf.BEESWAX_SERVER_CONN_TIMEOUT.get())
+
+
+  @classmethod
+  def get_security(cls, query_server):
+    principal = query_server['principal']
+
+    if query_server['server_name'] == 'impala':
+      cluster_conf = cluster.get_cluster_conf_for_job_submission()
+      use_sasl = cluster_conf is not None and cluster_conf.SECURITY_ENABLED.get()
+      mechanism = HiveServerClient.HS2_MECHANISMS['KERBEROS']
+    else:
+      hive_mechanism = hive_site.get_hiveserver2_authentication()
+      if hive_mechanism not in HiveServerClient.HS2_MECHANISMS:
+        raise Exception(_('%s server authentication not supported. Valid are %s.' % (hive_mechanism, HiveServerClient.HS2_MECHANISMS.keys())))
+      use_sasl = hive_mechanism in ('KERBEROS', 'NONE')
+      mechanism = 'NOSASL'
+      if use_sasl:
+        mechanism = HiveServerClient.HS2_MECHANISMS[hive_mechanism]
+
+    if principal:
+      kerberos_principal_short_name = principal.split('/', 1)[0]
+    else:
+      kerberos_principal_short_name = None
+
+    return use_sasl, mechanism, kerberos_principal_short_name
 
 
   def open_session(self, user):

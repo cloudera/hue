@@ -78,7 +78,7 @@ def get_query_server_config(name='beeswax'):
       kerberos_principal = KERBEROS.HUE_PRINCIPAL.get()
 
     query_server = {
-        'server_name': 'beeswax',
+        'server_name': 'beeswax', # Aka HS2 too
         'server_host': BEESWAX_SERVER_HOST.get(),
         'server_port': BEESWAX_SERVER_PORT.get(),
         'server_interface': SERVER_INTERFACE.get(),

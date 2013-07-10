@@ -70,13 +70,17 @@ class ConnectionConfig(object):
   def __init__(self, klass, host, port, service_name,
                use_sasl=False,
                kerberos_principal="thrift",
+               mechanism='GSSAPI',
+               username='hue',
                timeout_seconds=45):
     """
     @param klass The thrift client class
     @param host Host to connect to
     @param port Port to connect to
     @param service_name A human-readable name to describe the service
-    @param use_sasl If true, will use Kerberos over SASL to authenticate
+    @param use_sasl If true, will use KERBEROS or PLAIN over SASL to authenticate
+    @param mechanism: GSSAPI or PLAIN if SASL
+    @param username: username if PLAIN SASL only
     @param kerberos_principal The Kerberos service name to connect to.
               NOTE: for a service like fooservice/foo.blah.com@REALM only
               specify "fooservice", NOT the full principal name.
@@ -87,11 +91,14 @@ class ConnectionConfig(object):
     self.port = port
     self.service_name = service_name
     self.use_sasl = use_sasl
+    self.mechanism = mechanism
+    self.username = username
     self.kerberos_principal = kerberos_principal
     self.timeout_seconds = timeout_seconds
 
   def __str__(self):
-    return ', '.join(map(str, [self.klass, self.host, self.port, self.service_name, self.use_sasl, self.kerberos_principal, self.timeout_seconds]))
+    return ', '.join(map(str, [self.klass, self.host, self.port, self.service_name, self.use_sasl, self.kerberos_principal, self.timeout_seconds,
+                               self.mechanism, self.username]))
 
 class ConnectionPooler(object):
   """
@@ -209,16 +216,19 @@ def connect_to_thrift(conf):
   if conf.timeout_seconds:
     # Thrift trivia: You can do this after the fact with
     # _grab_transport_from_wrapper(self.wrapped.transport).setTimeout(seconds*1000)
-    sock.setTimeout(conf.timeout_seconds*1000.0)
+    sock.setTimeout(conf.timeout_seconds * 1000.0)
   if conf.use_sasl:
     def sasl_factory():
       saslc = sasl.Client()
       saslc.setAttr("host", str(conf.host))
       saslc.setAttr("service", str(conf.kerberos_principal))
+      if conf.mechanism == 'PLAIN':
+        saslc.setAttr("username", str(conf.username))
+        saslc.setAttr("password", 'hue') # Just a non empty string
       saslc.init()
       return saslc
 
-    transport = TSaslClientTransport(sasl_factory, "GSSAPI", sock)
+    transport = TSaslClientTransport(sasl_factory, conf.mechanism, sock)
   else:
     transport = TBufferedTransport(sock)
 
@@ -432,7 +442,7 @@ def thrift2json(tft):
       N.B.: For maximal compatibility, the key type for map should be a basic type
       rather than a struct or container type. There are some languages which do not
       support more complex key types in their native map types. In addition the
-      JSON protocol only supports key types that are base types. 
+      JSON protocol only supports key types that are base types.
   I believe this ought to be true for sets, as well.
   """
   if isinstance(tft,type(None)):
@@ -468,7 +478,7 @@ def _jsonable2thrift_helper(jsonable, type_enum, spec_args, default, recursion_d
   Recursive implementation method of jsonable2thrift.
 
   type_enum corresponds to TType.  spec_args is part of the
-  thrift_spec explained in Thrift's code generator.  See 
+  thrift_spec explained in Thrift's code generator.  See
   compiler/cpp/src/generate/t_py_generator.cc .
   default is the default value.
 
@@ -490,7 +500,7 @@ def _jsonable2thrift_helper(jsonable, type_enum, spec_args, default, recursion_d
     """
     Helper function to check bounds.
 
-    The Thrift IDL specifies how many bytes numbers can be, and always uses 
+    The Thrift IDL specifies how many bytes numbers can be, and always uses
     signed integers.  This makes sure that the Thrift struct that comes out
     conforms to that schema.
     """
@@ -542,7 +552,7 @@ def _jsonable2thrift_helper(jsonable, type_enum, spec_args, default, recursion_d
         # thrift_spec is indexed by thrift tag id, so None shows up
         continue
       _, cur_type_enum, cur_name, cur_spec_args, cur_default = spec
-      value = _jsonable2thrift_helper(jsonable.get(cur_name), 
+      value = _jsonable2thrift_helper(jsonable.get(cur_name),
         cur_type_enum, cur_spec_args, cur_default, recursion_depth + 1)
       setattr(out, cur_name, value)
     return out
@@ -577,7 +587,7 @@ def _jsonable2thrift_helper(jsonable, type_enum, spec_args, default, recursion_d
 
   else:
     raise Exception("Unrecognized type: %s.  Value was %s." % (repr(type_enum), repr(jsonable)))
-    
+
 def jsonable2thrift(jsonable, thrift_class):
   """
   Converts a JSON-able x that represents a thrift struct
@@ -588,9 +598,9 @@ def jsonable2thrift(jsonable, thrift_class):
   This is compatible with thrift2json.
   """
   return _jsonable2thrift_helper(
-    jsonable, 
-    TType.STRUCT, 
-    (thrift_class, thrift_class.thrift_spec), 
+    jsonable,
+    TType.STRUCT,
+    (thrift_class, thrift_class.thrift_spec),
     default=None,
     recursion_depth=0
   )
