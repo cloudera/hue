@@ -256,16 +256,16 @@ ${ layout.menubar(section='coordinators') }
             <div class="alert alert-info"><h3>${ _('Advanced settings') }</h3></div>
             ${ properties.print_key_value(coordinator_form['parameters'], 'parameters') }
             ${ properties.print_key_value(coordinator_form['job_properties'], 'job_properties') }
-            ${ utils.render_field_no_popover(coordinator_form['timeout']) }
+            ${ utils.render_field(coordinator_form['timeout']) }
             <div class="row-fluid">
               <div class="span6">
-                ${ utils.render_field_no_popover(coordinator_form['concurrency']) }
+                ${ utils.render_field(coordinator_form['concurrency']) }
               </div>
               <div class="span6">
-                ${ utils.render_field_no_popover(coordinator_form['throttle']) }
+                ${ utils.render_field(coordinator_form['throttle']) }
               </div>
             </div>
-            ${ utils.render_field_no_popover(coordinator_form['execution']) }
+            ${ utils.render_field(coordinator_form['execution']) }
             ${ coordinator_form['schema_version'] | n,unicode }
           </div>
 

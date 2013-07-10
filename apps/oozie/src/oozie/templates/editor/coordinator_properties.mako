@@ -37,7 +37,7 @@
         <tbody data-bind="foreach: ${ element }">
           <tr>
             <td><input type="text" class="required" data-bind="value: name, uniqueName: false" /></td>
-            <td><input type="text" class="required" data-bind="value: value, uniqueName: false" /></td>
+            <td><input type="text" class="required input-xxlarge" data-bind="value: value, uniqueName: false" /></td>
             <td><a class="btn btn-small" href="#" data-bind="click: $root.remove_${ element }">${ _('Delete') }</a></td>
           </tr>
         </tbody>

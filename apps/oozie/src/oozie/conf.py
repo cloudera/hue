@@ -53,14 +53,14 @@ SHARE_JOBS = Config(
   key='share_jobs',
   default=True,
   type=coerce_bool,
-  help=_t('Share workflows and coordinators information with all users. If set to false, '
+  help=_t('Share workflows, coordinators and bundles information with all users. If set to false, '
          'they will be visible only to the owner and administrators.'))
 
 OOZIE_JOBS_COUNT = Config(
   key='oozie_jobs_count',
   default=100,
   type=int,
-  help=_t('Maximum number of Oozie workflows or coodinators to retrieve in one API call.'))
+  help=_t('Maximum number of Oozie workflows or coodinators or bundles to retrieve in one API call.'))
 
 
 def config_validator(user):

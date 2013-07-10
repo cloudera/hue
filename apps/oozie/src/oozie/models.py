@@ -1263,7 +1263,7 @@ class Coordinator(Job):
                                  help_text=_t('The materialization or creation throttle value for its coordinator actions. '
                                               'How many maximum coordinator actions are allowed to be in WAITING state concurrently.'))
   job_properties = models.TextField(default='[]', verbose_name=_t('Workflow properties'),
-                                    help_text=_t('Configuration properties to transmit to the workflow (e.g. limit=100, username=${coord:user()})'))
+                                    help_text=_t('Configuration properties to transmit to the workflow, e.g. limit=100, and EL functions, e.g. username=${coord:user()}'))
 
   objects = TrashManager()
 

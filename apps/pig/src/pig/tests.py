@@ -132,7 +132,9 @@ class TestWithHadoop(OozieBase):
 
   def setUp(self):
     super(TestWithHadoop, self).setUp()
+    self.c = make_logged_in_client(is_superuser=False)
     grant_access("test", "test", "pig")
+    self.user = User.objects.get(username='test')
     self.c.post(reverse('pig:install_examples'))
 
   def test_create_workflow(self):

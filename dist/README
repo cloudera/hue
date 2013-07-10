@@ -1,17 +1,33 @@
+=========================================
+          Hue - Hadoop UI
+=========================================
+
 Instructions to install the tarball release of Hue are available
-in the manual from the website where you downloaded Hue.
+in the manual from http://gethue.com.
 
 If you're impatient, these are the key steps.  Please check the full manual
 for more details.
 
-## Install
-$ PREFIX=/usr/share make install
-$ sudo chmod 4750 $PREFIX/hue/apps/shell/src/shell/build/setui
-$ sudo chown root:$USER $PREFIX/hue/apps/shell/src/shell/build/setui
 
-## Install plug-ins
-$ cd /usr/lib/hadoop-0.20-mapreduce/lib
-$ ln -s /usr/share/hue/desktop/libs/hadoop/java-lib/hue*jar
+Install
+-------
+## Install in any directory, e.g. /home/hue, /usr/share, /home/my_user
+PREFIX=/usr/share make install
+
+
+## If you don't have the permissions, you will need to 'sudo' the command and
+## make sure that the 'hue' user has write access to the 'logs' directory and 'desktop/desktop.db'.
+
+## Run!
+$ /usr/share/hue/build/env/bin/supervisor
+
+
+Configure Hadoop
+----------------
+
+## Install JobTracker plug-in
+cd /usr/lib/hadoop-0.20-mapreduce/lib
+ln -s /usr/share/hue/desktop/libs/hadoop/java-lib/hue*jar
 
 ## Configure Hadoop
 Edit hdfs-site.xml:
@@ -30,5 +46,12 @@ Edit mapred-site.xml:
   </description>
 </property>
 
-## Run!
-$ /usr/share/hue/build/env/bin/supervisor
+
+Problems?
+---------
+
+Search or ask questions on the forum and http://groups.google.com/a/cloudera.org/group/hue-user
+
+Some packages might be required during the 'make install': https://github.com/cloudera/hue#development-prerequisites)
+
+Download a pre-built packaged version of Hue on http://gethue.com
