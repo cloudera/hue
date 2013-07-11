@@ -222,17 +222,9 @@ ${layout.menubar(section='query')}
                           </li>
                           <li>
                             <div class="control-group">
-                              <span id="refresh-dyk">
-                                <i class="icon-refresh"></i>
-                                ${ _('Sync tables tips') }
-                              </span>
-                              <div id="refresh-content" class="hide">
-                                <ul style="text-align: left;">
-                                  <li>"invalidate metadata" ${ _("invalidates the entire catalog metadata. All table metadata will be reloaded on the next access.") }</li>
-                                  <li>"invalidate metadata &lt;table&gt;" ${ _("invalidates the metadata, load on the next access") }</li>
-                                  <li>"refresh &lt;table&gt;" ${ _("refreshes the metadata immediately. It's an incremental refresh. Much faster") }</li>
-                                </ul>
-                              </div>
+                              <button id="refresh-btn" class="btn btn-small" data-loading-text="${ _('Refreshing...') }" rel="tooltip" data-placement="right" data-original-title="${ _('Update the list of tables seen by Impala. It can take a few seconds...') }">
+                                ${ _('Refresh') }
+                              </button>
                             </div>
                           </li>
                         % endif
@@ -753,8 +745,7 @@ ${layout.menubar(section='query')}
             var _before = codeMirror.getRange({line: 0, ch: 0}, {line: codeMirror.getCursor().line, ch: codeMirror.getCursor().ch}).replace(/(\r\n|\n|\r)/gm, " ");
             CodeMirror.possibleTable = false;
             CodeMirror.tableFieldMagic = false;
-            if (_before.toUpperCase().indexOf(" FROM ") > -1 && _before.toUpperCase().indexOf(" ON ") == -1 && _before.toUpperCase().indexOf(" WHERE ") == -1 ||
-                _before.toUpperCase().indexOf("REFRESH") > -1 || _before.toUpperCase().indexOf("METADATA") > -1 ) {
+            if (_before.toUpperCase().indexOf(" FROM ") > -1 && _before.toUpperCase().indexOf(" ON ") == -1 && _before.toUpperCase().indexOf(" WHERE ") == -1) {
               CodeMirror.possibleTable = true;
             }
             CodeMirror.possibleSoloField = false;
@@ -890,11 +881,20 @@ ${layout.menubar(section='query')}
       }
 
       % if app_name == 'impala':
-        $("#refresh-dyk").popover({
-          'title': "${_('Missing some tables? In order to update the list of tables/metadata seen by Impala, execute one of these queries:')}",
-          'content': $("#refresh-content").html(),
-          'trigger': 'hover',
-          'html': true
+        $("#refresh-btn").click(function() {
+          var _this = this;
+          $(_this).button('loading');
+          $.post('/impala/refresh_catalog',
+            function(response) {
+              if (response['status'] != 0) {
+                $.jHueNotify.error("${ _('Problem: ') }" + response['message']);
+              } else {
+                $.jHueNotify.info("${ _('Refresh successful!') }")
+              }
+            }
+          ).fail(function(e) { $.jHueNotify.error("${ _('Problem: ') }" + e) })
+           .always(function() { $(_this).button('reset') });
+          return false;
         });
       % endif
     });

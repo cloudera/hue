@@ -86,7 +86,7 @@ class TestMockedImpala:
         impala_query.delete()
 
 
-# Could be refactored with SavedQuery.create_empty()
+# Can be refactored with SavedQuery.create_empty() in Hue 2.3
 def create_saved_query(app_name, owner):
     query_type = SavedQuery.TYPES_MAPPING[app_name]
     design = SavedQuery(owner=owner, type=query_type)

@@ -27,6 +27,7 @@ from django.utils.translation import ugettext as _
 import beeswax.conf
 import hive_metastore.ttypes
 from beeswaxd.ttypes import BeeswaxException
+from beeswax.models import SavedQuery
 from beeswax.server.dbms import get_query_server_config
 
 from beeswax import models
