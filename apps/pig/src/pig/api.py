@@ -79,7 +79,7 @@ class OozieApi:
     Workflow.objects.initialize(workflow, self.fs)
 
     script_path = workflow.deployment_dir + '/script.pig'
-    self.fs.create(script_path, data=pig_script.dict['script'])
+    self.fs.do_as_user(self.user.username, self.fs.create, script_path, data=pig_script.dict['script'])
 
     files = []
     archives = []
