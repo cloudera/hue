@@ -168,7 +168,36 @@ class HQLdesign(object):
   @property
   def statements(self):
     hql_query = _strip_trailing_semicolon(self.hql_query)
-    return [statement.strip() for statement in hql_query.split(';')]
+    return [_strip_trailing_semicolon(statement.strip()) for statement in split_statements(hql_query)]
+
+
+def split_statements(hql):
+  """
+  Just check if the semicolon is between two non escaped quotes,
+  meaning it is inside a string or a real separator.
+  """
+  statements = []
+  current = ''
+  prev = ''
+  between_quotes = None
+
+  for c in hql:
+    current += c
+    if c in ('"', "'") and prev != '\\':
+      if between_quotes == c:
+        between_quotes = None
+      elif between_quotes is None:
+        between_quotes = c
+    elif c == ';':
+      if between_quotes is None:
+        statements.append(current)
+        current = ''
+    prev = c
+
+  if current and current != ';':
+    statements.append(current)
+
+  return statements
 
 
 def normalize_form_dict(form, attr_list):
