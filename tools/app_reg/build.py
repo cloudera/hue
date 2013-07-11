@@ -53,5 +53,5 @@ def make_syncdb():
   """
   make_syncdb() -> True/False
   """
-  cmdv = [ 'make', '-C', os.path.join(common.INSTALL_ROOT, 'desktop'), '-B', 'syncdb' ]
+  cmdv = [ os.path.join(common.INSTALL_ROOT, 'build', 'env', 'bin', 'hue'), 'syncdb', '--noinput' ]
   return runcmd(cmdv) == 0
