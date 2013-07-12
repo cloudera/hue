@@ -29,9 +29,11 @@ ${ commonheader(_('Databases'), 'metastore', user) | n,unicode }
     <div class="row-fluid">
         <div class="span3">
             <div class="well sidebar-nav">
+              % if has_write_access:
                 <ul class="nav nav-list">
                     <li><a href="${ url('beeswax:create_database') }">${_('Create a new database')}</a></li>
                 </ul>
+              % endif
             </div>
         </div>
         <div class="span9">
@@ -41,7 +43,9 @@ ${ commonheader(_('Databases'), 'metastore', user) | n,unicode }
             </%def>
 
             <%def name="actions()">
+              % if has_write_access:
                 <button id="dropBtn" class="btn toolbarBtn" title="${_('Drop the selected databases')}" disabled="disabled"><i class="icon-trash"></i>  ${_('Drop')}</button>
+              % endif
             </%def>
           </%actionbar:render>
             <table class="table table-condensed table-striped datatables">

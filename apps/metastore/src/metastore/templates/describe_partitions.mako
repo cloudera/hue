@@ -25,6 +25,7 @@ ${ commonheader(_('Table Partitions: %(tableName)s') % dict(tableName=table.name
 
 <div class="container-fluid">
   <h1>${_('Partitions')}</h1>
+
   ${ components.breadcrumbs(breadcrumbs) }
 
   <div class="row-fluid">

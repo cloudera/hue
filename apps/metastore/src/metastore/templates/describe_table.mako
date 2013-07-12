@@ -53,6 +53,7 @@ ${ commonheader(_("%s : %s") % (view_or_table_noun, table.name), app_name, user)
 
 <div class="container-fluid">
     <h1>${_('Table')} ${table.name}</h1>
+
     ${ components.breadcrumbs(breadcrumbs) }
 
     <div class="row-fluid">
@@ -60,9 +61,13 @@ ${ commonheader(_("%s : %s") % (view_or_table_noun, table.name), app_name, user)
             <div class="well sidebar-nav">
                 <ul class="nav nav-list">
                     <li class="nav-header">${_('Actions')}</li>
+                    % if has_write_access:
                     <li><a href="#" id="import-data-btn">${_('Import Data')}</a></li>
+                    % endif
                     <li><a href="${ url('metastore:read_table', database=database, table=table.name) }">${_('Browse Data')}</a></li>
+                    % if has_write_access:
                     <li><a href="#dropTable" data-toggle="modal">${_('Drop')} ${view_or_table_noun}</a></li>
+                    % endif
                     <li><a href="${ table.hdfs_link }" rel="${ table.path_location }">${_('View File Location')}</a></li>
                     % if table.partition_keys:
                       <li><a href="${ url('metastore:describe_partitions', database=database, table=table.name) }">${_('Show Partitions')} (${ len(partitions) })</a></li>
@@ -181,9 +186,11 @@ ${ commonheader(_("%s : %s") % (view_or_table_noun, table.name), app_name, user)
        }
      });
 
+     % if has_write_access:
      $.getJSON("${ url('metastore:drop_table', database=database) }", function(data) {
        $("#dropTableMessage").text(data.title);
      });
+     % endif
 
      $('a[data-toggle="tab"]').on('shown', function() {
        $(".sampleTable").not('.initialized').addClass('initialized').dataTable({

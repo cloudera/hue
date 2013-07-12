@@ -23,6 +23,7 @@ import logging
 
 from django.http import HttpResponse
 from django.shortcuts import redirect
+from django.utils.functional import wraps
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 
@@ -33,9 +34,22 @@ from beeswax.models import SavedQuery, MetaInstall
 from beeswax.server import dbms
 
 from metastore.forms import LoadDataForm, DbForm
+from metastore.settings import DJANGO_APPS
 
 LOG = logging.getLogger(__name__)
 SAVE_RESULTS_CTAS_TIMEOUT = 300         # seconds
+
+
+def check_has_write_access_permission(view_func):
+  """
+  Decorator ensuring that the user is not a read only user.
+  """
+  def decorate(request, *args, **kwargs):
+    if not has_write_access(request.user):
+      raise PopupException(_('You are not allowed to modify the metastore.'), detail=_('You have metastore:read_only_access permissions'))
+
+    return view_func(request, *args, **kwargs)
+  return wraps(view_func)(decorate)
 
 
 def index(request):
@@ -54,9 +68,11 @@ def databases(request):
     'breadcrumbs': [],
     'databases': databases,
     'databases_json': json.dumps(databases),
+    'has_write_access': has_write_access(request.user),
   })
 
 
+@check_has_write_access_permission
 def drop_database(request):
   db = dbms.get(request.user)
 
@@ -110,6 +126,7 @@ def show_tables(request, database=None):
     'db_form': db_form,
     'database': database,
     'tables_json': json.dumps(tables),
+    'has_write_access': has_write_access(request.user),
   })
   resp.set_cookie("hueBeeswaxLastDatabase", database, expires=90)
   return resp
@@ -144,9 +161,11 @@ def describe_table(request, database, table):
     'sample': table_data and table_data.rows(),
     'error_message': error_message,
     'database': database,
+    'has_write_access': has_write_access(request.user),
   })
 
 
+@check_has_write_access_permission
 def drop_table(request, database):
   db = dbms.get(request.user)
 
@@ -191,6 +210,7 @@ def read_partition(request, database, table, partition_id):
     raise PopupException(_('Cannot read table'), detail=e)
 
 
+@check_has_write_access_permission
 def load_table(request, database, table):
   db = dbms.get(request.user)
   table = db.get_table(database, table)
@@ -250,3 +270,7 @@ def describe_partitions(request, database, table):
         },
       ],
       'database': database, 'table': table_obj, 'partitions': partitions, 'request': request})
+
+
+def has_write_access(user):
+  return user.is_superuser or not user.has_hue_permission(action="read_only_access", app=DJANGO_APPS[0])

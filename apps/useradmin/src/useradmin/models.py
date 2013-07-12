@@ -260,7 +260,8 @@ def update_app_permissions(**kwargs):
     default_group = get_default_user_group()
     if default_group:
       for new_dp in added:
-        if not (new_dp.app == 'useradmin' and new_dp.action == 'access'):
+        if not (new_dp.app == 'useradmin' and new_dp.action == 'access') and \
+           not (new_dp.app == 'metastore' and new_dp.action == 'read_only_access'):
           GroupPermission.objects.create(group=default_group, hue_permission=new_dp)
 
     available = HuePermission.objects.count()
