@@ -17,17 +17,3 @@
 cd $(dirname $0)
 
 thrift --gen py thrift/hbase.thrift
-
-cat <<EOF
-======================================================================
-NOTE:
-======================================================================
-
-This script does *not* remove old generated files that may not be necessary anymore.
-You should probably do something like:
- > git rm -rf java/src/main/gen-java gen-py
- > ./regenerate_thrift.sh
- > git add java/src/main/gen-java gen-py
-
-======================================================================
-EOF
