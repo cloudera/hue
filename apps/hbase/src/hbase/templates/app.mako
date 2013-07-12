@@ -227,8 +227,6 @@ ${ commonheader(None, "hbase", user) | n,unicode }
             <span class="smartview-row-controls pull-right" data-bind="if: views.tabledata.items().length > 0 && views.tabledata.selected().length > 0">
               <button class="btn" data-bind="click: views.tabledata.batchSelectedAlias.bind(null, 'toggleSelectedCollapse'), clickBubble: false" data-toggle="tooltip" title="${_('Toggle Collapse Selected')}"><i class="icon-resize-small"></i></button>
               <button class="btn" data-bind="click: views.tabledata.batchSelectedAlias.bind(null, 'toggleSelectAllVisible'), clickBubble: false" data-toggle="tooltip" title="${_('Select All Visible')}"><i class="icon-check"></i></button>
-              ${#sortBtn('views.tabledata.items()[0].sortDropDown')
-            }
               % if user.is_superuser:
                 <button class="btn" data-bind="enable: views.tabledata.items()[0].selected().length > 0, click: views.tabledata.items()[0].dropSelected, clickBubble: false"><i class="icon-trash"></i> ${_('Drop Columns')}</button>
               % endif
