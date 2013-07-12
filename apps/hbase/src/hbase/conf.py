@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env python
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -14,21 +14,21 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+"""
+Configuration options for the hbase application.
+"""
+import re
 
-set -o errexit
-set -o xtrace
+from desktop.lib.conf import Config
 
-cd $(dirname $0)
+HBASE_CLUSTERS = Config(
+  key="hbase_clusters",
+  default="(Cluster|localhost:9090)",
+  help="Comma-separated list of HBase Thrift servers for clusters in the format of '(name|host:port)'.",
+  type=str)
 
-thrift -I thrift/include -r --gen py:new_style -o ./ thrift/beeswax.thrift
-thrift -I thrift/include -r --gen java:hashcode -o java/src/main thrift/beeswax.thrift
-thrift -I thrift/include -r --gen py:new_style -o ./ thrift/TCLIService.thrift
-
-# We don't need to have generated code for the metastore, since that's
-# in one of the hive jars that we include
-rm -Rf java/src/main/gen-java/com/facebook java/src/main/gen-java/org/apache
-
-# This is based on thirdparty.
-# thrift -r --gen py:new_style -o ../ ../../../../ext/thirdparty/py/thrift/contrib/fb303/if/fb303.thrift
-# C++ compilation for ODBC
-#thrift -I thrift/include  --gen cpp -o ./ thrift/beeswax.thrift
+TRUNCATE_LIMIT = Config(
+  key="truncate_limit",
+  default="500",
+  help="Hard limit of rows or columns per row fetched before truncating.",
+  type=int)

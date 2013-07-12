@@ -491,6 +491,18 @@
 
 
 ###########################################################################
+# Settings to configure Hbase
+###########################################################################
+
+[hbase]
+  # Comma-separated list of HBase Thrift servers for
+  # clusters in the format of '(name|host:port)'.
+  ## hbase_clusters=(Cluster|localhost:9090)
+
+  # Hard limit of rows or columns per row fetched before truncating.
+  ## truncate_limit = 500
+
+###########################################################################
 # Settings to configure Solr Search
 ###########################################################################
 

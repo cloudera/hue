@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env python
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -15,20 +15,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set -o errexit
-set -o xtrace
+try:
+  import json
+except ImportError:
+  import simplejson as json
+import posixpath
 
-cd $(dirname $0)
+from django.db import models
+from django.contrib.auth.models import User
+from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
-thrift -I thrift/include -r --gen py:new_style -o ./ thrift/beeswax.thrift
-thrift -I thrift/include -r --gen java:hashcode -o java/src/main thrift/beeswax.thrift
-thrift -I thrift/include -r --gen py:new_style -o ./ thrift/TCLIService.thrift
+from desktop.lib.exceptions_renderable import PopupException
 
-# We don't need to have generated code for the metastore, since that's
-# in one of the hive jars that we include
-rm -Rf java/src/main/gen-java/com/facebook java/src/main/gen-java/org/apache
 
-# This is based on thirdparty.
-# thrift -r --gen py:new_style -o ../ ../../../../ext/thirdparty/py/thrift/contrib/fb303/if/fb303.thrift
-# C++ compilation for ODBC
-#thrift -I thrift/include  --gen cpp -o ./ thrift/beeswax.thrift
+class PresetView(models.Model): # preset views for loading toggled/untoggled columns/rows
+	pass
+
+class TypeAlias(models.Model): # non-native data types, default alias of string, parsed in custom user-defined way
+	pass

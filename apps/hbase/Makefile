@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -14,21 +14,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
 
-set -o errexit
-set -o xtrace
+ifeq ($(ROOT),)
+  $(error "Error: Expect the environment variable $$ROOT to point to the Desktop installation")
+endif
 
-cd $(dirname $0)
-
-thrift -I thrift/include -r --gen py:new_style -o ./ thrift/beeswax.thrift
-thrift -I thrift/include -r --gen java:hashcode -o java/src/main thrift/beeswax.thrift
-thrift -I thrift/include -r --gen py:new_style -o ./ thrift/TCLIService.thrift
-
-# We don't need to have generated code for the metastore, since that's
-# in one of the hive jars that we include
-rm -Rf java/src/main/gen-java/com/facebook java/src/main/gen-java/org/apache
-
-# This is based on thirdparty.
-# thrift -r --gen py:new_style -o ../ ../../../../ext/thirdparty/py/thrift/contrib/fb303/if/fb303.thrift
-# C++ compilation for ODBC
-#thrift -I thrift/include  --gen cpp -o ./ thrift/beeswax.thrift
+APP_NAME = hbase
+include $(ROOT)/Makefile.sdk
