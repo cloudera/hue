@@ -14,12 +14,11 @@ Install
 ## Install in any directory, e.g. /home/hue, /usr/share, /home/my_user
 PREFIX=/usr/share make install
 
-
 ## If you don't have the permissions, you will need to 'sudo' the command and
 ## make sure that the 'hue' user has write access to the 'logs' directory and 'desktop/desktop.db'.
 
 ## Run!
-$ /usr/share/hue/build/env/bin/supervisor
+${PREFIX}/hue/build/env/bin/supervisor
 
 
 Configure Hadoop
@@ -27,7 +26,7 @@ Configure Hadoop
 
 ## Install JobTracker plug-in
 cd /usr/lib/hadoop-0.20-mapreduce/lib
-ln -s /usr/share/hue/desktop/libs/hadoop/java-lib/hue*jar
+ln -s ${PREFIX}/hue/desktop/libs/hadoop/java-lib/hue*jar
 
 ## Configure Hadoop
 Edit hdfs-site.xml:
