@@ -193,3 +193,12 @@ Viewing a Table's Location
     window displays.
 2.  Click **View File Location**. The file location of the selected
     table displays in its directory in the File Browser window.
+
+Permissions
+-----------
+
+1.  Ideally install the Sentry project for getting full Hive security.
+2.  Make the Metastore App read only for a certain group of user: In
+    UserAdmin, add the permissions 'read_only_access' to their group.
+
+

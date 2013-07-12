@@ -22,10 +22,14 @@ from nose.tools import assert_true, assert_equal, assert_false
 from nose.plugins.skip import SkipTest
 
 from django.utils.encoding import smart_str
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.core.urlresolvers import reverse
 
+import hadoop
 from desktop.lib.django_test_util import make_logged_in_client, assert_equal_mod_whitespace
+from desktop.lib.test_utils import add_permission, grant_access
+from useradmin.models import HuePermission, GroupPermission,\
+  group_has_permission
 
 from beeswax.conf import BROWSE_PARTITIONED_TABLE_LIMIT
 from beeswax.views import collapse_whitespace
@@ -33,7 +37,6 @@ from beeswax.test_base import make_query, wait_for_query_to_finish, verify_histo
 from beeswax.models import QueryHistory
 from beeswax.server import dbms
 from beeswax.test_base import BeeswaxSampleProvider
-import hadoop
 
 
 LOG = logging.getLogger(__name__)
@@ -196,5 +199,55 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     # Try it with partitions
     resp = self.client.post("/metastore/table/default/test_partitions/load", dict(path="/tmp/foo", partition_0="alpha", partition_1="beta"), follow=True)
     query = QueryHistory.objects.latest('id')
-    assert_equal_mod_whitespace("LOAD DATA INPATH '/tmp/foo' INTO TABLE `default.test_partitions` PARTITION (baz='alpha', boom='beta')",
-        query.query)
+    assert_equal_mod_whitespace("LOAD DATA INPATH '/tmp/foo' INTO TABLE `default.test_partitions` PARTITION (baz='alpha', boom='beta')", query.query)
+
+
+  def test_has_write_access_frontend(self):
+    client = make_logged_in_client(username='write_access_frontend', groupname='write_access_frontend', is_superuser=False)
+    grant_access("write_access_frontend", "write_access_frontend", "metastore")
+    user = User.objects.get(username='write_access_frontend')
+
+    def check(client, assertz):
+      response = client.get("/metastore/databases")
+      assertz("Drop</button>" in response.content, response.content)
+      assertz("Create a new database" in response.content, response.content)
+
+      response = client.get("/metastore/tables/")
+      assertz("Drop</button>" in response.content, response.content)
+      assertz("Create a new table" in response.content, response.content)
+
+    check(client, assert_true)
+
+    # Remove access
+    group, created = Group.objects.get_or_create(name='write_access_frontend')
+    perm, created = HuePermission.objects.get_or_create(app='metastore', action='read_only_access')
+    GroupPermission.objects.get_or_create(group=group, hue_permission=perm)
+
+    check(client, assert_false)
+
+
+  def test_has_write_access_backend(self):
+    client = make_logged_in_client(username='write_access_backend', groupname='write_access_backend', is_superuser=False)
+    grant_access("write_access_backend", "write_access_backend", "metastore")
+    grant_access("write_access_backend", "write_access_backend", "beeswax")
+    user = User.objects.get(username='write_access_backend')
+
+    def check(client, http_code):
+      resp = _make_query(client, 'CREATE TABLE test_perm_1 (a int);')
+      resp = wait_for_query_to_finish(client, resp, max=30.0)
+
+      resp = client.get('/metastore/tables/drop/default', follow=True)
+      #assert_true('want to delete' in resp.content, resp.content)
+      assert_equal(resp.status_code, http_code, resp.content)
+
+      resp = client.post('/metastore/tables/drop/default', {u'table_selection': [u'test_perm_1']}, follow=True)
+      assert_equal(resp.status_code, http_code, resp.content)
+
+    check(client, 200)
+
+    # Remove access
+    group, created = Group.objects.get_or_create(name='write_access_backend')
+    perm, created = HuePermission.objects.get_or_create(app='metastore', action='read_only_access')
+    GroupPermission.objects.get_or_create(group=group, hue_permission=perm)
+
+    check(client, 500)

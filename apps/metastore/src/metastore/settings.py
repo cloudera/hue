@@ -22,3 +22,7 @@ ICON = "/metastore/static/art/table-browser-24-1.png"
 MENU_INDEX = 20
 
 IS_URL_NAMESPACED = True
+
+PERMISSION_ACTIONS = (
+  ("read_only_access", "Means you are readonly, no DDL. Need the app access too."),
+)

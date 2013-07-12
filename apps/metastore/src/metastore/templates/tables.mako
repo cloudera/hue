@@ -17,6 +17,7 @@
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
+
 <%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="components" file="components.mako" />
 
@@ -37,9 +38,11 @@ ${ commonheader(_('Tables'), 'metastore', user) | n,unicode }
                        </form>
                     </li>
                     </span>
+                    % if has_write_access:
                     <li class="nav-header">${_('Actions')}</li>
                     <li><a href="${ url('beeswax:import_wizard', database=database) }">${_('Create a new table from a file')}</a></li>
                     <li><a href="${ url('beeswax:create_table', database=database) }">${_('Create a new table manually')}</a></li>
+                    % endif
                 </ul>
             </div>
         </div>
@@ -52,7 +55,9 @@ ${ commonheader(_('Tables'), 'metastore', user) | n,unicode }
             <%def name="actions()">
                 <button id="viewBtn" class="btn toolbarBtn" title="${_('Browse the selected table')}" disabled="disabled"><i class="icon-eye-open"></i> ${_('View')}</button>
                 <button id="browseBtn" class="btn toolbarBtn" title="${_('Browse the selected table')}" disabled="disabled"><i class="icon-list"></i> ${_('Browse Data')}</button>
+                % if has_write_access:
                 <button id="dropBtn" class="btn toolbarBtn" title="${_('Delete the selected tables')}" disabled="disabled"><i class="icon-trash"></i>  ${_('Drop')}</button>
+                % endif
             </%def>
           </%actionbar:render>
             <table class="table table-condensed table-striped datatables">
