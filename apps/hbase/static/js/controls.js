@@ -144,6 +144,7 @@ var SmartViewModel = function(options)
   self.searchQuery.subscribe(function goToRow(value) //make this as nice as the renderfucnction and split into two, also fire not down on keyup events
   {
     var inputs = value.split(searchRenderers['rowkey']['select']);
+    self.querySet.removeAll();
     for(var i=0;i<inputs.length;i++)
     {
       if(inputs[i].trim() != "" && inputs[i].trim() != ',')
