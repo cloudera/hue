@@ -161,6 +161,7 @@ var SmartViewModel = function(options)
       }
     }
     routie(app.cluster() + '/' + app.views.tabledata.name() +'/query/' + value);
+    self.evaluateQuery();
   });
 
   self._reloadcfs = function()
