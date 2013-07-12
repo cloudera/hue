@@ -1,22 +1,20 @@
 Welcome to the repository for Hue
 =================================
 
-.. note::
-    This is the development-oriented readme. If you want to write notes for
-    end users, please put them in ``dist/README``.
 
 Hue is both a Web UI for Hadoop and a framework to create interactive Web
 applications. It features:
 
-      * FileBrowser for accessing HDFS
-      * Job Designer for creating MapReduce/Streaming/Java jobs
+      * FileBrowser for accessing HDFS      
       * Beeswax application for executing Hive queries
       * Impala App for executing Cloudera Impala queries
       * Oozie App for submitting and scheduling workflows and bundles
       * Pig App for submitting Pig scripts
+      * HBase Browser for exploring and modifying HBase tables and data
       * Table Browser for accessing Hive metadata
       * Search app for querying Solr and Solr Cloud
       * JobBrowser for accessing MapReduce jobs (MR1/MR2-YARN)
+      * Job Designer for creating MapReduce/Streaming/Java jobs
       * A Pig/HBase/Sqoop2 shell
 
 On top of that, a SDK is available for creating new apps integrated with Hadoop.
