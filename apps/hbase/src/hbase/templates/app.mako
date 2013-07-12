@@ -175,7 +175,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
     <!-- New Table Modal -->
     <form id="new_table_modal" action="createTable" method="POST" class="modal hide fade ajaxSubmit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
         <h3>${_('Create New Table')} - <span class="pageTitle"></span></h3>
       </div>
       <div class="modal-body controls">
@@ -269,7 +269,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
     <!-- New Row Modal -->
     <form id="new_row_modal" action="putRow" method="POST" class="modal hide fade ajaxSubmit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
         <h3>${_('Insert New Row')} - <span data-bind="text: pageTitle"></span></h3>
       </div>
       <div class="modal-body controls">
@@ -290,7 +290,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
     <!-- New Column Modal -->
     <form id="new_column_modal" action="putColumn" method="POST" class="modal hide fade ajaxSubmit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
         <h3>${_('Create New Column')} - <span data-bind="text: pageTitle"></span></h3>
       </div>
       <div class="modal-body controls">
@@ -314,7 +314,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
 
     <script id="cell_edit_modal_template" type="text/html">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
         <h3>Edit Cell - <span data-bind="text: content.name"></span> <code data-bind="text: mime"></code></h3>
       </div>
       <div class="modal-body container-fluid">
@@ -366,7 +366,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
   <div id="confirm-modal" action="createTable" method="POST" class="modal hide fade"></div>
   <script id="confirm_template" type="text/html">
     <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
       <h3 data-bind="text: title"></h3>
     </div>
     <div class="modal-body" data-bind="text: text">
