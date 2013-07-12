@@ -28,6 +28,21 @@ thrift -I thrift/include -r --gen py:new_style -o ./ thrift/TCLIService.thrift
 # in one of the hive jars that we include
 rm -Rf java/src/main/gen-java/com/facebook java/src/main/gen-java/org/apache
 
+cat <<EOF
+======================================================================
+NOTE:
+======================================================================
+
+This script does *not* remove old generated files that may not be necessary anymore.
+You should probably do something like:
+ > git rm -rf java/src/main/gen-java gen-py
+ > ./regenerate_thrift.sh
+ > git add java/src/main/gen-java gen-py
+
+======================================================================
+
+EOF
+
 # This is based on thirdparty.
 # thrift -r --gen py:new_style -o ../ ../../../../ext/thirdparty/py/thrift/contrib/fb303/if/fb303.thrift
 # C++ compilation for ODBC
