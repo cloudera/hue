@@ -814,7 +814,7 @@ The Help application guides users through the various installed applications.
 Supported Browsers
 ~~~~~~~~~~~~~~~~~~
 
-* Windows: Chrome, Firefox 3.6+, Internet Explorer 8+, Safari 5+
+* Windows: Chrome, Firefox 3.6+, Internet Explorer 9+, Safari 5+
 * Linux : Chrome, Firefox 3.6+
 * Mac: Chrome, Firefox 3.6+, Safari 5+
 
