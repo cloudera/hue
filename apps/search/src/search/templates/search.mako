@@ -31,6 +31,8 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 <%
   if "q" not in solr_query:
     solr_query["q"] = ""
+  else:
+    solr_query["q"] = solr_query["q"].decode("utf8")
   if "fq" not in solr_query:
     solr_query["fq"] = ""
   if "rows" not in solr_query:
