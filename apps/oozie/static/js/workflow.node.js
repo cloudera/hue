@@ -358,6 +358,31 @@ var NodeModule = function($, IdGeneratorTable, NodeFields) {
     },
 
     /**
+     * Remove error child
+     * 1. Find child node link
+     * 2. Remove child node link
+     */
+    removeErrorChildren: function() {
+      var self = this;
+      var spliceIndexes = [];
+
+      $.each(self.child_links(), function(index, link) {
+        if (link.name() == 'error') {
+          spliceIndexes.push(index);
+        }
+      });
+
+      var spliceCount = 0;
+      if (spliceIndexes.length > 0) {
+        $.each(spliceIndexes, function(index, spliceIndex) {
+          self.child_links.splice(spliceIndex - spliceCount++, 1);
+        });
+      }
+
+      return spliceIndexes.length > 0;
+    },
+
+    /**
      * Remove all children
      * Removes all children except for related, default, and error links
      * Note: we hold on to related, default, and error links because
@@ -414,6 +439,65 @@ var NodeModule = function($, IdGeneratorTable, NodeFields) {
       }
 
       return index != -1;
+    },
+
+    /**
+     * Replace or add error node with another node in the following way:
+     * 1. Find child index
+     * 2. Remove child index
+     * 3. Remove and remember every element after child
+     * 4. Add replacement node
+     * 5. Add every child that was remembered
+     */
+    putErrorChild: function(node) {
+      var self = this;
+      var index = -1;
+
+      $.each(self.child_links(), function(i, link) {
+        if (link.name() == 'error') {
+          index = i;
+        }
+      });
+
+      var link = {
+        parent: ko.observable(self.id()),
+        child: ko.observable(node.id()),
+        name: ko.observable('error'),
+        comment: ko.observable('')
+      };
+
+      if (index > -1) {
+        var child_links = self.child_links();
+        child_links.splice(index, 1);
+        var links = child_links.splice(index);
+        child_links.push(link);
+
+        $.each(links, function(index, link) {
+          child_links.push(link);
+        });
+
+        self.child_links(child_links);
+      } else {
+        self.child_links.push(link);
+      }
+
+      return index != -1;
+    },
+
+    /**
+     * Get the error child
+     */
+    getErrorChild: function() {
+      var self = this;
+
+      var children = [];
+      $.each(self.meta_links(), function(index, link) {
+        if (link.name() == 'error') {
+          children.push(self.registry.get(link.child()));
+        }
+      });
+
+      return (children.length > 0) ? children[0] : null;
     },
 
     isChild: function(node) {

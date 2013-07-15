@@ -43,6 +43,32 @@
 
           ${ utils.render_constant(_('Action type'), node_type) }
 
+          <div class="control-group ">
+            <label class="control-label">
+              <a href="javascript:void(0);" id="advanced-btn" onclick="$('#node-advanced-container').toggle('hide')">
+                <i class="icon-share-alt"></i> ${ _('advanced') }</a>
+            </label>
+            <div class="controls"></div>
+          </div>
+
+          <div id="node-advanced-container" class="hide">
+            <div class="control-group">
+              <label class="control-label">${_('Error link to')}</label>
+              <div class="controls">
+                <div style="padding-top:4px">
+                  <select data-bind="options: $root.context().nodes,
+                                     optionsText: function(item) {
+                                       return item.name();
+                                     },
+                                     optionsValue: function(item) {
+                                       return item.id();
+                                     },
+                                     value: $root.context().error_node"></select>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <hr/>
 
           <div class="control-group">

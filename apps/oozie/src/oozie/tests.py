@@ -1813,7 +1813,7 @@ class TestImportWorkflow04(OozieMockBase):
     workflow.delete(skip_trash=True)
 
 
-  def test_import_multi_kill_node(self):
+  def test_import_workflow_multi_kill_node(self):
     """
     Validates import for multiple kill nodes: xml.
 
@@ -1836,6 +1836,32 @@ class TestImportWorkflow04(OozieMockBase):
     assert_equal('${output_dir}/teragen ${output_dir}/terasort', nodes[1].args)
     assert_true(nodes[0].capture_output)
     assert_false(nodes[1].capture_output)
+    workflow.delete(skip_trash=True)
+
+  def test_import_workflow_different_error_link(self):
+    """
+    Validates import with error link to end: main_class, args.
+
+    If an error link cannot be resolved, default to 'kill' node.
+    """
+    workflow = Workflow.objects.new_workflow(self.user)
+    workflow.save()
+    f = open('apps/oozie/src/oozie/test_data/0.4/test-java-different-error-links.xml')
+    import_workflow(workflow, f.read())
+    f.close()
+    workflow.save()
+    assert_equal(5, len(Node.objects.filter(workflow=workflow)))
+    assert_equal(6, len(Link.objects.filter(parent__workflow=workflow)))
+    nodes = [Node.objects.filter(workflow=workflow, node_type='java')[0].get_full_node(),
+             Node.objects.filter(workflow=workflow, node_type='java')[1].get_full_node()]
+    assert_equal('org.apache.hadoop.examples.terasort.TeraGen', nodes[0].main_class)
+    assert_equal('${records} ${output_dir}/teragen', nodes[0].args)
+    assert_equal('org.apache.hadoop.examples.terasort.TeraSort', nodes[1].main_class)
+    assert_equal('${output_dir}/teragen ${output_dir}/terasort', nodes[1].args)
+    assert_true(nodes[0].capture_output)
+    assert_false(nodes[1].capture_output)
+    assert_equal(1, len(Link.objects.filter(parent__workflow=workflow).filter(parent__name='TeraGenWorkflow').filter(name='error').filter(child__node_type='java')))
+    assert_equal(1, len(Link.objects.filter(parent__workflow=workflow).filter(parent__name='TeraSort').filter(name='error').filter(child__node_type='kill')))
     workflow.delete(skip_trash=True)
 
 

@@ -618,7 +618,35 @@ function edit_node_modal(node, save, cancel, template) {
 
   modal.hide();
   modal.setTemplate(template || node.edit_template);
-  modal.show({node: node, read_only: workflow.read_only()});
+  // Provide node, readonly mode, and error link updater.
+  // Kill node is manually added to list of nodes that users can select from.
+  // Kill node is placed at the front of the list so that it is automatically selected.
+  var context = {
+    node: node,
+    read_only: workflow.read_only(),
+    nodes: ko.computed({
+      read: function() {
+        var arr = ko.utils.arrayFilter(workflow.nodes(), function(value) {
+          return value.id() && value.id() != node.id();
+        });
+        arr.unshift(workflow.kill);
+        return arr;
+      }
+    }),
+    error_node: ko.computed({
+      read: function() {
+        var error_child  = node.getErrorChild();
+        return (error_child) ? error_child.id() : null;
+      },
+      write: function(node_id) {
+        var error_child = workflow.registry.get(node_id);
+        if (error_child) {
+          node.putErrorChild(error_child);
+        }
+      }
+    })
+  };
+  modal.show(context);
   modal.recenter(280, 250);
   modal.addDecorations();
 
@@ -693,7 +721,10 @@ workflow.el.on('mousedown', '.new-node-link', function(e) {
     if (node.validate()) {
       workflow.is_dirty( true );
       modal.hide();
-      node.addChild(workflow.kill);
+      if (!node.getErrorChild()) {
+        node.addChild(workflow.kill);
+      }
+      ko.cleanNode(modal.el[0]);
       workflow.el.trigger('workflow:rebuild');
     }
   };
