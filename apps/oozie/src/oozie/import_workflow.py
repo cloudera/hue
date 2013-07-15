@@ -230,8 +230,7 @@ def _node_relationships(workflow, parent, child_el):
           raise RuntimeError(_("Node %s has a link that is missing 'start' attribute.") % parent.name)
         to = el.attrib['start']
         name = 'start'
-      elif name == 'error':
-        to = 'kill'
+
       else:
         if 'to' not in el.attrib:
           raise RuntimeError(_("Node %s has a link that is missing 'to' attribute.") % parent.name)
@@ -240,7 +239,10 @@ def _node_relationships(workflow, parent, child_el):
       try:
         child = Node.objects.get(workflow=workflow, name=to)
       except Node.DoesNotExist, e:
-        raise RuntimeError("Node %s has not been defined" % to)
+        if name == 'error':
+          child, create = Kill.objects.get_or_create(name='kill', workflow=workflow, node_type=Kill.node_type)
+        else:
+          raise RuntimeError("Node %s has not been defined" % to)
 
       obj = Link.objects.create(name=name, parent=parent, child=child)
       obj.save()
@@ -404,11 +406,6 @@ def _resolve_decision_relationships(workflow):
     # Assume receive full node.
     children = [link.child.get_full_node() for link in node.get_children_links().exclude(name__in=['error','default'])]
 
-    # Will not be a kill node because we skip error links.
-    # Error links should not go to a regular node.
-    if node.get_parent_links().filter(name='error').exists():
-      raise RuntimeError(_('Error links cannot point to an ordinary node.'))
-
     # Multiple parents means that we've found an end.
     # Joins will always have more than one parent.
     fan_in_count = len(node.get_parent_links().exclude(name__in=['error','default']))
@@ -548,11 +545,6 @@ def _save_nodes(workflow, nodes):
       Node.objects.get(workflow=workflow, node_type=node.node_type, name=node.name)
     except Node.DoesNotExist:
       node.save()
-
-  # Create kill node
-  # Only need it if we have a node to reference it with.
-  if len(nodes) > 2:
-    Kill.objects.create(name='kill', workflow=workflow, node_type=Kill.node_type)
 
 
 def import_workflow(workflow, workflow_definition, fs=None):

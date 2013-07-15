@@ -20,98 +20,96 @@ describe("WorkflowModel", function(){
 
   function create_three_step_workflow(workflow_id) {
     var workflow_model = new WorkflowModel({
-      id: 1,
-      name: "Test-Three-Step-Workflow",
-      start: 1,
-      end: 5
+      "id": workflow_id,
+      "name": "Test-Three-Step-Workflow",
+      "start": 1,
+      "end": 5,
+      "nodes":[{
+          "description":"",
+          "workflow":workflow_id,
+          "child_links":[{
+              "comment":"",
+              "name":"to",
+              "parent":1,
+              "child":2
+            },{
+              "comment":"",
+              "name":"related",
+              "parent":1,
+              "child":5
+          }],
+          "node_type":"start",
+          "id":1,
+          "name":"start"
+        },{
+          "id":2,
+          "name":"Sleep-1",
+          "workflow":workflow_id,
+          "node_type":"mapreduce",
+          "jar_path":"/user/hue/oozie/workspaces/lib/hadoop-examples.jar",
+          "child_links":[{
+              "comment":"",
+              "name":"ok",
+              "parent":2,
+              "child":3
+            },{
+              "comment":"",
+              "name":"error",
+              "parent":2,
+              "child":6
+            }],
+      },{
+        "id":3,
+        "name":"Sleep-2",
+        "workflow":workflow_id,
+        "node_type":"mapreduce",
+        "jar_path":"/user/hue/oozie/workspaces/lib/hadoop-examples.jar",
+        "child_links":[{
+            "comment":"",
+            "name":"ok",
+            "parent":3,
+            "child":4
+          },{
+            "comment":"",
+            "name":"error",
+            "parent":3,
+            "child":6
+          }],
+      },{
+        "id":4,
+        "name":"Sleep-3",
+        "workflow":workflow_id,
+        "node_type":"mapreduce",
+        "jar_path":"/user/hue/oozie/workspaces/lib/hadoop-examples.jar",
+        "child_links":[{
+            "comment":"",
+            "name":"ok",
+            "parent":4,
+            "child":5
+          },{
+            "comment":"",
+            "name":"error",
+            "parent":4,
+            "child":6
+          }],
+      },{
+        "id":6,
+        "name":"kill",
+        "workflow":workflow_id,
+        "node_type":"kill",
+        "child_links":[],
+        "message":"Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]",
+      },{
+        "id":5,
+        "name":"end",
+        "workflow":workflow_id,
+        "node_type":"end",
+        "child_links":[],
+      }],
     });
     var registry = new Registry();
     var workflow = new Workflow({
       model: workflow_model,
-      data: {
-        "nodes":[{
-            "description":"",
-            "workflow":workflow_id,
-            "child_links":[{
-                "comment":"",
-                "name":"to",
-                "parent":1,
-                "child":2
-              },{
-                "comment":"",
-                "name":"related",
-                "parent":1,
-                "child":5
-            }],
-            "node_type":"start",
-            "id":1,
-            "name":"start"
-          },{
-            "id":2,
-            "name":"Sleep-1",
-            "workflow":workflow_id,
-            "node_type":"mapreduce",
-            "jar_path":"/user/hue/oozie/workspaces/lib/hadoop-examples.jar",
-            "child_links":[{
-                "comment":"",
-                "name":"ok",
-                "parent":2,
-                "child":3
-              },{
-                "comment":"",
-                "name":"error",
-                "parent":2,
-                "child":6
-              }],
-        },{
-          "id":3,
-          "name":"Sleep-2",
-          "workflow":workflow_id,
-          "node_type":"mapreduce",
-          "jar_path":"/user/hue/oozie/workspaces/lib/hadoop-examples.jar",
-          "child_links":[{
-              "comment":"",
-              "name":"ok",
-              "parent":3,
-              "child":4
-            },{
-              "comment":"",
-              "name":"error",
-              "parent":3,
-              "child":6
-            }],
-        },{
-          "id":4,
-          "name":"Sleep-3",
-          "workflow":workflow_id,
-          "node_type":"mapreduce",
-          "jar_path":"/user/hue/oozie/workspaces/lib/hadoop-examples.jar",
-          "child_links":[{
-              "comment":"",
-              "name":"ok",
-              "parent":4,
-              "child":5
-            },{
-              "comment":"",
-              "name":"error",
-              "parent":4,
-              "child":6
-            }],
-        },{
-          "id":6,
-          "name":"kill",
-          "workflow":workflow_id,
-          "node_type":"kill",
-          "child_links":[],
-          "message":"Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]",
-        },{
-          "id":5,
-          "name":"end",
-          "workflow":workflow_id,
-          "node_type":"end",
-          "child_links":[],
-        }],
-      },
       registry: registry
     });
     return workflow;
@@ -119,77 +117,75 @@ describe("WorkflowModel", function(){
 
   function create_pig_workflow(workflow_id) {
     var workflow_model = new WorkflowModel({
-      id: 1,
-      name: "Test-pig-Workflow",
-      start: 1,
-      end: 5
-    });
+      "id": workflow_id,
+      "name": "Test-pig-Workflow",
+      "start": 1,
+      "end": 5,
+      "nodes":[{
+          "description":"",
+          "workflow":workflow_id,
+          "child_links":[{
+              "comment":"",
+              "name":"to",
+              "parent":1,
+              "child":2
+            },{
+              "comment":"",
+              "name":"related",
+              "parent":1,
+              "child":5
+          }],
+          "node_type":"start",
+          "id":1,
+          "name":"start"
+        },{
+          "id":2,
+          "name":"Pig-1",
+          "workflow":workflow_id,
+          "node_type":"pig",
+          "script_path":"test.pig",
+          "child_links":[{
+              "comment":"",
+              "name":"ok",
+              "parent":2,
+              "child":3
+            },{
+              "comment":"",
+              "name":"error",
+              "parent":2,
+              "child":4
+            }],
+      },{
+        "id":4,
+        "name":"kill",
+        "workflow":workflow_id,
+        "node_type":"kill",
+        "child_links":[],
+        "message":"Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]",
+      },{
+        "id":3,
+        "name":"end",
+        "workflow":workflow_id,
+        "node_type":"end",
+        "child_links":[],
+      }],
+    })
     var registry = new Registry();
     var workflow = new Workflow({
       model: workflow_model,
-      data: {
-        "nodes":[{
-            "description":"",
-            "workflow":workflow_id,
-            "child_links":[{
-                "comment":"",
-                "name":"to",
-                "parent":1,
-                "child":2
-              },{
-                "comment":"",
-                "name":"related",
-                "parent":1,
-                "child":5
-            }],
-            "node_type":"start",
-            "id":1,
-            "name":"start"
-          },{
-            "id":2,
-            "name":"Pig-1",
-            "workflow":workflow_id,
-            "node_type":"pig",
-            "script_path":"test.pig",
-            "child_links":[{
-                "comment":"",
-                "name":"ok",
-                "parent":2,
-                "child":3
-              },{
-                "comment":"",
-                "name":"error",
-                "parent":2,
-                "child":4
-              }],
-        },{
-          "id":4,
-          "name":"kill",
-          "workflow":workflow_id,
-          "node_type":"kill",
-          "child_links":[],
-          "message":"Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]",
-        },{
-          "id":3,
-          "name":"end",
-          "workflow":workflow_id,
-          "node_type":"end",
-          "child_links":[],
-        }],
-      },
       registry: registry
     });
     return workflow;
   }
 
   describe("Workflow operations", function(){
-    var json = '{"id":1,"name":"Test-pig-Workflow","start":1,"end":5,"description":"","schema_version":0.4,"deployment_dir":"","is_shared":true,"parameters":"[]","job_xml":"","nodes":[{"description":"","workflow":1,"child_links":[{"comment":"","name":"to","parent":1,"child":2},{"comment":"","name":"related","parent":1,"child":5}],"node_type":"start","id":1,"name":"start"},{"id":2,"name":"Pig-1","workflow":1,"node_type":"pig","script_path":"test.pig","child_links":[{"comment":"","name":"ok","parent":2,"child":3},{"comment":"","name":"error","parent":2,"child":4}],"description":"","files":"[]","archives":"[]","job_properties":"[]","prepares":"[]","job_xml":"","params":"[]"},{"id":4,"name":"kill","workflow":1,"node_type":"kill","child_links":[],"message":"Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]","description":""},{"id":3,"name":"end","workflow":1,"node_type":"end","child_links":[],"description":""}]}';
+    var json = '{"id":1,"name":"Test-pig-Workflow","start":1,"end":5,"nodes":[{"description":"","workflow":1,"child_links":[{"comment":"","name":"to","parent":1,"child":2},{"comment":"","name":"related","parent":1,"child":5}],"node_type":"start","id":1,"name":"start"},{"id":2,"name":"Pig-1","workflow":1,"node_type":"pig","script_path":"test.pig","child_links":[{"comment":"","name":"ok","parent":2,"child":3},{"comment":"","name":"error","parent":2,"child":4}],"description":"","files":"[]","archives":"[]","job_properties":"[]","prepares":"[]","job_xml":"","params":"[]"},{"id":3,"name":"end","workflow":1,"node_type":"end","child_links":[],"description":""},{"id":4,"name":"kill","workflow":1,"node_type":"kill","child_links":[],"message":"Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]","description":""}],"parameters":[],"description":"","schema_version":0.4,"deployment_dir":"","is_shared":true,"job_xml":""}';
     var node = null;
     var viewModel = create_pig_workflow(1);
     viewModel.rebuild();
 
     it("Ensure serialized data sent to server is proper", function() {
-      expect(viewModel.toJSON()).toEqual(json);
+      expect(viewModel.toJSON()).toEqual(ko.toJSON($.parseJSON(json)));
     });
 
     it("Ensure data received from server can be loaded", function() {
@@ -230,6 +226,23 @@ describe("WorkflowModel", function(){
       viewModel.nodes()[1].append(node);
       viewModel.rebuild();
       expect(viewModel.nodes().length).toEqual(5);
+    });
+
+    it("Should be able to add error node", function() {
+      viewModel.nodes()[1].putErrorChild(viewModel.nodes()[2]);
+      viewModel.rebuild();
+      expect(viewModel.nodes().length).toEqual(5);
+      expect(viewModel.nodes()[1].meta_links().length).toEqual(1);
+      expect(viewModel.nodes()[1].meta_links()[0].name()).toEqual("error");
+      expect(viewModel.nodes()[1].meta_links()[0].parent()).toEqual(viewModel.nodes()[1].id());
+      expect(viewModel.nodes()[1].meta_links()[0].child()).toEqual(viewModel.nodes()[2].id());
+    });
+
+    it("Should be able to get error node", function() {
+      viewModel.nodes()[1].putErrorChild(viewModel.nodes()[2]);
+      viewModel.rebuild();
+      expect(viewModel.nodes().length).toEqual(5);
+      expect(viewModel.nodes()[1].getErrorChild().id()).toEqual(viewModel.nodes()[2].id());
     });
   });
 
