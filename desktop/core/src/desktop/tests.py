@@ -27,7 +27,7 @@ import desktop.views as views
 import proxy.conf
 
 from nose.plugins.attrib import attr
-from nose.tools import assert_true, assert_equal, assert_not_equal
+from nose.tools import assert_true, assert_equal, assert_not_equal, assert_raises
 from django.conf.urls.defaults import patterns, url
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
@@ -322,7 +322,7 @@ def test_error_handling():
 def test_error_handling_failure():
   # Change rewrite_user to call has_hue_permission
   # Try to get filebrowser page
-  # test for werkzeug debugger
+  # test for default 500 page
   # Restore rewrite_user
   import desktop.auth.backend
 
@@ -338,15 +338,13 @@ def test_error_handling_failure():
     delattr(user, 'has_hue_permission')
     return user
 
-  def store_exc_info(*args, **kwargs): pass
-  c.store_exc_info = store_exc_info
-
   original_rewrite_user = desktop.auth.backend.rewrite_user
   desktop.auth.backend.rewrite_user = rewrite_user
 
   try:
-    response = c.get('/dump_config')
-    assert_true('AttributeError at /dump_config' in response.content, response)
+    # Make sure we are showing default 500.html page.
+    # See django.test.client#L246
+    assert_raises(AttributeError, c.get, '/dump_config')
   finally:
     # Restore the world
     restore_django_debug()
