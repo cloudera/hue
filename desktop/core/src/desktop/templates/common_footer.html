@@ -90,6 +90,21 @@ limitations under the License.
             }
           }, 200);
         }
+
+        $.jHueTour({});
+        if ($.totalStorage("jHueTourExtras") != null) {
+          $.jHueTour({tours: $.totalStorage("jHueTourExtras")});
+        }
+        var _qs = location.search;
+        if (_qs !== undefined && _qs.indexOf("tour=") > -1) {
+          $.jHueTour(getParameterByName("tour"), 1);
+        }
+        function getParameterByName(name) {
+          name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+          var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+                  results = regex.exec(_qs);
+          return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+        }
       });
 
       function resetPrimaryButtonsStatus() {
@@ -149,5 +164,6 @@ limitations under the License.
 
     </script>
 
-	</body>
+    <script src="/static/js/Source/jHue/available.tours.js"></script>
+  </body>
 </html>
