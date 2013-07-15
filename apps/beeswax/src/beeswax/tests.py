@@ -868,20 +868,25 @@ for x in sys.stdin:
       'create': 'Create table',
     }, follow=True)
 
-    assert_equal_mod_whitespace("""
-        CREATE EXTERNAL TABLE `default.my_table`
-        (
-         `my_col` string
-        )
-        COMMENT "Yo>>>>dude"
-        ROW FORMAT DELIMITED
-          FIELDS TERMINATED BY ','
-          COLLECTION ITEMS TERMINATED BY '\\002'
-          MAP KEYS TERMINATED BY '\\003'
-          STORED AS TextFile LOCATION "/tmp/foo"
-    """, resp.context['query'].query)
+    if "watch_wait.mako" in resp.template:
+      assert_equal_mod_whitespace("""
+          CREATE EXTERNAL TABLE `default.my_table`
+          (
+           `my_col` string
+          )
+          COMMENT "Yo>>>>dude"
+          ROW FORMAT DELIMITED
+            FIELDS TERMINATED BY ','
+            COLLECTION ITEMS TERMINATED BY '\\002'
+            MAP KEYS TERMINATED BY '\\003'
+            STORED AS TextFile LOCATION "/tmp/foo"
+      """, resp.context['query'].query)
+      assert_true('on_success_url=%2Fmetastore%2Ftable%2Fdefault%2Fmy_table' in resp.context['fwd_params'], resp.context['fwd_params'])
+    else:
+      # Create was fast
+      assert_true('describe_table.mako' in resp.template, resp.template)
+      assert_true('Table my_table' in resp.content, resp.content)
 
-    assert_true('on_success_url=%2Fmetastore%2Ftable%2Fdefault%2Fmy_table' in resp.context['fwd_params'], resp.context['fwd_params'])
 
   def test_create_table_timestamp(self):
     # Check form
