@@ -75,27 +75,34 @@ from django.utils.translation import ugettext as _
 
   <script type="text/javascript" charset="utf-8">
 
-      // jHue plugins global configuration
-      jHueFileChooserGlobals = {
-        labels:{
-          BACK:"${_('Back')}",
-          SELECT_FOLDER:"${_('Select this folder')}",
-          CREATE_FOLDER:"${_('Create folder')}",
-          FOLDER_NAME:"${_('Folder name')}",
-          CANCEL:"${_('Cancel')}",
-          FILE_NOT_FOUND:"${_('The file has not been found')}",
-          UPLOAD_FILE:"${_('Upload a file')}",
-          FAILED:"${_('Failed')}"
-        },
-        user: "${ user.username }"
-      };
+    // jHue plugins global configuration
+    jHueFileChooserGlobals = {
+      labels: {
+        BACK: "${_('Back')}",
+        SELECT_FOLDER: "${_('Select this folder')}",
+        CREATE_FOLDER: "${_('Create folder')}",
+        FOLDER_NAME: "${_('Folder name')}",
+        CANCEL: "${_('Cancel')}",
+        FILE_NOT_FOUND: "${_('The file has not been found')}",
+        UPLOAD_FILE: "${_('Upload a file')}",
+        FAILED: "${_('Failed')}"
+      },
+      user: "${ user.username }"
+    };
 
-      jHueTableExtenderGlobals = {
-        labels:{
-          GO_TO_COLUMN: "${_('Go to column:')}",
-          PLACEHOLDER: "${_('column name...')}"
-        }
+    jHueTableExtenderGlobals = {
+      labels: {
+        GO_TO_COLUMN: "${_('Go to column:')}",
+        PLACEHOLDER: "${_('column name...')}"
       }
+    };
+
+    jHueTourGlobals = {
+      labels: {
+        AVAILABLE_TOURS: "${_('Available tours')}",
+        NO_AVAILABLE_TOURS: "${_('None for this page.')}"
+      }
+    };
 
   </script>
 
@@ -109,6 +116,7 @@ from django.utils.translation import ugettext as _
   <script src="/static/js/Source/jHue/jquery.tablescroller.js"></script>
   <script src="/static/js/Source/jHue/jquery.tableextender.js"></script>
   <script src="/static/js/Source/jHue/jquery.scrollup.js"></script>
+  <script src="/static/js/Source/jHue/jquery.tour.js"></script>
   <script src="/static/ext/js/jquery/plugins/jquery.cookie.js"></script>
   <script src="/static/ext/js/jquery/plugins/jquery.total-storage.min.js"></script>
   <script src="/static/ext/js/jquery/plugins/jquery.placeholder.min.js"></script>
