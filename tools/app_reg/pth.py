@@ -134,12 +134,15 @@ class PthFile(object):
     rel_symlink_path = os.path.relpath(self._path, os.path.dirname(self._symlink_path))
 
     # overwrite symlink if the path it points to is different from desired PTH.
-    if os.path.exists(self._symlink_path) and os.path.realpath(self._symlink_path) != rel_symlink_path:
-      os.remove(self._symlink_path)
+    if os.path.islink(self._symlink_path) and os.readlink(self._symlink_path) != rel_symlink_path:
+      LOG.info('=== Removing symbolic link at %s' % (self._symlink_path))
+      os.unlink(self._symlink_path)
+      LOG.info('=== Removed symbolic link at %s' % (self._symlink_path))
 
-    if not os.path.exists(self._symlink_path):
+    if not os.path.islink(self._symlink_path):
+      LOG.info('=== Creating symbolic link at %s to %s' % (self._symlink_path, rel_symlink_path))
       os.symlink(rel_symlink_path, self._symlink_path)
-      LOG.debug('=== Create symbolic link at %s to %s' % (self._symlink_path, rel_symlink_path))
+      LOG.info('=== Created symbolic link at %s to %s' % (self._symlink_path, rel_symlink_path))
 
   def sync(self, apps):
     """Sync the .pth file with the installed apps"""
