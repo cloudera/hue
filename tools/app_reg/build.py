@@ -34,7 +34,7 @@ def runcmd(cmdv, additional_env=None):
   env = os.environ.copy()
   if additional_env is not None:
     env.update(additional_env)
-  LOG.debug("Running '%s' with %r" % (' '.join(cmdv), additional_env))
+  LOG.info("Running '%s' with %r" % (' '.join(cmdv), additional_env))
   popen = subprocess.Popen(cmdv, env=env)
   return popen.wait()
 
@@ -53,5 +53,9 @@ def make_syncdb():
   """
   make_syncdb() -> True/False
   """
-  cmdv = [ os.path.join(common.INSTALL_ROOT, 'build', 'env', 'bin', 'hue'), 'syncdb', '--noinput' ]
-  return runcmd(cmdv) == 0
+  status = -1
+  hue_exec = os.path.join(common.INSTALL_ROOT, 'build', 'env', 'bin', 'hue')
+  if os.path.exists(hue_exec):
+    cmdv = [ hue_exec, 'syncdb', '--noinput' ]
+    status = runcmd(cmdv)
+  return status == 0
