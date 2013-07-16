@@ -44,7 +44,7 @@ ${ commonheader(_('Search'), "search", user, "120px") | n,unicode }
     <div class="span10 offset1 center">
 
       <i class="icon-search waiting"></i>
-      <h1>${ _('Oh no! It seems there is nothing to search on...') }</h1>
+      <h1>${ _('It seems there is nothing to search on ...') }</h1>
 
     </div>
   </div>

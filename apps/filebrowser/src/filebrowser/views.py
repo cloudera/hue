@@ -117,9 +117,9 @@ def download(request, path):
     ?disposition={attachment, inline}
     """
     if not request.fs.exists(path):
-        raise Http404(_("File not found: %(path)s") % {'path': escape(path)})
+        raise Http404(_("File not found: %(path)s.") % {'path': escape(path)})
     if not request.fs.isfile(path):
-        raise PopupException(_("'%(path)s' is not a file") % {'path': path})
+        raise PopupException(_("'%(path)s' is not a file.") % {'path': path})
 
     mimetype = mimetypes.guess_type(path)[0] or 'application/octet-stream'
     stats = request.fs.stats(path)
@@ -161,7 +161,7 @@ def view(request, path):
     except (IOError, WebHdfsException), e:
         msg = _("Cannot access: %(path)s.") % {'path': escape(path)}
         if request.user.is_superuser and not request.user == request.fs.superuser:
-            msg += _(' Note: you are a Hue admin but not a HDFS superuser (which is "%(superuser)s").') % {'superuser': request.fs.superuser}
+            msg += _(' Note: You are a Hue admin but not a HDFS superuser (which is "%(superuser)s").') % {'superuser': request.fs.superuser}
         if request.is_ajax():
           exception = {
             'error': msg
@@ -207,7 +207,7 @@ def edit(request, path, form=None):
                 try:
                     current_contents = unicode(f.read(), encoding)
                 except UnicodeDecodeError:
-                    raise PopupException(_("File is not encoded in %(encoding)s; cannot be edited: %(path)s") % {'encoding': encoding, 'path': path})
+                    raise PopupException(_("File is not encoded in %(encoding)s; cannot be edited: %(path)s.") % {'encoding': encoding, 'path': path})
             finally:
                 f.close()
         else:
@@ -616,7 +616,7 @@ def display(request, path):
     if length < 0:
         raise PopupException(_("Length may not be less than zero."))
     if length > MAX_CHUNK_SIZE_BYTES:
-        raise PopupException(_("Cannot request chunks greater than %(bytes)d bytes") % {'bytes': MAX_CHUNK_SIZE_BYTES})
+        raise PopupException(_("Cannot request chunks greater than %(bytes)d bytes.") % {'bytes': MAX_CHUNK_SIZE_BYTES})
 
     # Do not decompress in binary mode.
     if mode == 'binary':
@@ -701,7 +701,7 @@ def read_contents(codec_type, path, fs, offset, length):
                     codec_type = 'avro'
                 elif snappy_installed():
                     if stats.size > MAX_SNAPPY_DECOMPRESSION_SIZE.get():
-                        raise PopupException(_('Failed to validate snappy compressed file. File size is greater than allowed max snappy decompression size of %d') % MAX_SNAPPY_DECOMPRESSION_SIZE.get())
+                        raise PopupException(_('Failed to validate snappy compressed file. File size is greater than allowed max snappy decompression size of %d.') % MAX_SNAPPY_DECOMPRESSION_SIZE.get())
 
                     if detect_snappy(contents + fhandle.read()):
                         codec_type = 'snappy_avro'
@@ -737,10 +737,10 @@ def _decompress_snappy(compressed_content):
 
 def _read_snappy_avro(fhandle, path, offset, length, stats):
     if not snappy_installed():
-        raise PopupException(_('Failed to decompress snappy compressed file. Snappy is not installed!'))
+        raise PopupException(_('Failed to decompress snappy compressed file. Snappy is not installed.'))
 
     if stats.size > MAX_SNAPPY_DECOMPRESSION_SIZE.get():
-        raise PopupException(_('Failed to decompress snappy compressed file. File size is greater than allowed max snappy decompression size of %d') % MAX_SNAPPY_DECOMPRESSION_SIZE.get())
+        raise PopupException(_('Failed to decompress snappy compressed file. File size is greater than allowed max snappy decompression size of %d.') % MAX_SNAPPY_DECOMPRESSION_SIZE.get())
 
     return _read_avro(StringIO(_decompress_snappy(fhandle.read())), path, offset, length, stats)
 
@@ -1237,9 +1237,9 @@ def upload_archive(request):
         response['data'] = _('A POST request is required.')
 
     if response['status'] == 0:
-        request.info(_('%(destination)s upload succeeded') % {'destination': response['path']})
+        request.info(_('%(destination)s upload succeeded.') % {'destination': response['path']})
     else:
-        request.error(_('Upload failed: %(data)s') % {'data': response['data']})
+        request.error(_('Upload failed: %(data)s.') % {'data': response['data']})
 
     return HttpResponse(json.dumps(response), content_type="text/plain")
 
@@ -1258,7 +1258,7 @@ def _upload_archive(request):
 
         # Always a dir
         if request.fs.isdir(form.cleaned_data['dest']) and posixpath.sep in uploaded_file.name:
-            raise PopupException(_('Sorry, no "%(sep)s" in the filename %(name)s.' % {'sep': posixpath.sep, 'name': uploaded_file.name}))
+            raise PopupException(_('No "%(sep)s" allowed in the filename %(name)s.' % {'sep': posixpath.sep, 'name': uploaded_file.name}))
 
         dest = request.fs.join(form.cleaned_data['dest'], uploaded_file.name)
         try:

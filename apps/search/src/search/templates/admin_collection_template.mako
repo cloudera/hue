@@ -144,7 +144,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 
   <%def name="content()">
     <ul class="nav nav-tabs">
-      <li class="active"><a href="#visual" data-toggle="tab">${_('Visual editor')}</a></li>
+      <li class="active"><a href="#visual" data-toggle="tab">${_('Visual Editor')}</a></li>
       <li><a href="#preview" data-toggle="tab">${_('Preview')}</a></li>
       <li><a href="#source" data-toggle="tab">${_('Source')}</a></li>
       <li><a href="#extra" data-toggle="tab">${_('Advanced')}</a></li>

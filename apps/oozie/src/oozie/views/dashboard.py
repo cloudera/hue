@@ -88,7 +88,7 @@ def show_oozie_error(view_func):
       detail = ex._headers.get('oozie-error-message', ex)
       if 'urlopen error' in str(detail):
         detail = '%s: %s' % (_('The Oozie server is not running'), detail)
-      raise PopupException(_('An error with Oozie occurred.'), detail=detail)
+      raise PopupException(_('An error occurred with Oozie.'), detail=detail)
   return wraps(view_func)(decorate)
 
 
@@ -348,7 +348,7 @@ def rerun_oozie_job(request, job_id, app_path):
 
       _rerun_workflow(request, job_id, args, mapping)
 
-      request.info(_('Workflow re-running!'))
+      request.info(_('Workflow re-running.'))
       return redirect(reverse('oozie:list_oozie_workflow', kwargs={'job_id': job_id}))
     else:
       request.error(_('Invalid submission form: %s %s' % (rerun_form.errors, params_form.errors)))
@@ -372,7 +372,7 @@ def _rerun_workflow(request, oozie_id, run_args, mapping):
     job_id = submission.rerun(**run_args)
     return job_id
   except RestException, ex:
-    raise PopupException(_("Error re-running workflow %s") % (oozie_id,),
+    raise PopupException(_("Error re-running workflow %s.") % (oozie_id,),
                          detail=ex._headers.get('oozie-error-message', ex))
 
 
@@ -401,7 +401,7 @@ def rerun_oozie_coordinator(request, job_id, app_path):
 
       _rerun_coordinator(request, job_id, args, params, properties)
 
-      request.info(_('Coordinator re-running!'))
+      request.info(_('Coordinator re-running.'))
       return redirect(reverse('oozie:list_oozie_coordinator', kwargs={'job_id': job_id}))
     else:
       request.error(_('Invalid submission form: %s' % (rerun_form.errors,)))
@@ -426,7 +426,7 @@ def _rerun_coordinator(request, oozie_id, args, params, properties):
     job_id = submission.rerun_coord(params=params, **args)
     return job_id
   except RestException, ex:
-    raise PopupException(_("Error re-running coordinator %s") % (oozie_id,),
+    raise PopupException(_("Error re-running coordinator %s.") % (oozie_id,),
                          detail=ex._headers.get('oozie-error-message', ex))
 
 
@@ -464,7 +464,7 @@ def rerun_oozie_bundle(request, job_id, app_path):
 
       _rerun_bundle(request, job_id, args, params, properties)
 
-      request.info(_('Bundle re-running!'))
+      request.info(_('Bundle re-running.'))
       return redirect(reverse('oozie:list_oozie_bundle', kwargs={'job_id': job_id}))
     else:
       request.error(_('Invalid submission form: %s' % (rerun_form.errors,)))
@@ -489,7 +489,7 @@ def _rerun_bundle(request, oozie_id, args, params, properties):
     job_id = submission.rerun_bundle(params=params, **args)
     return job_id
   except RestException, ex:
-    raise PopupException(_("Error re-running bundle %s") % (oozie_id,),
+    raise PopupException(_("Error re-running bundle %s.") % (oozie_id,),
                          detail=ex._headers.get('oozie-error-message', ex))
 
 
@@ -687,7 +687,7 @@ def check_job_access_permission(request, job_id):
       or has_dashboard_jobs_access(request.user):
     return oozie_job
   else:
-    message = _("Permission denied. %(username)s don't have the permissions to access job %(id)s.") % \
+    message = _("Permission denied. %(username)s does not have the permissions to access job %(id)s.") % \
         {'username': request.user.username, 'id': oozie_job.id}
     access_warn(request, message)
     raise PopupException(message)
@@ -697,7 +697,7 @@ def check_job_edition_permission(oozie_job, user):
   if has_job_edition_permission(oozie_job, user):
     return oozie_job
   else:
-    message = _("Permission denied. %(username)s don't have the permissions to modify job %(id)s.") % \
+    message = _("Permission denied. %(username)s does not have the permissions to modify job %(id)s.") % \
         {'username': user.username, 'id': oozie_job.id}
     raise PopupException(message)
 

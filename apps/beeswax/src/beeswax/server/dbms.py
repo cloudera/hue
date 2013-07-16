@@ -277,7 +277,7 @@ class Dbms:
         result_dir = request.fs.urlsplit(result_meta.table_dir)[2]
         request.fs.rename_star(result_dir, table_loc)
         LOG.debug("Moved results from %s to %s" % (result_meta.table_dir, table_loc))
-        request.info(request, _('Saved query results as new table %(table)s') % {'table': target_table})
+        request.info(request, _('Saved query results as new table %(table)s.') % {'table': target_table})
         query_history.save_state(QueryHistory.STATE.expired)
       except Exception, ex:
         query = hql_query('DROP TABLE `%s`' % target_table)
@@ -467,10 +467,10 @@ def expand_exception(exc, db, handle=None):
     elif hasattr(exc, 'get_rpc_handle') or hasattr(exc, 'log_context'):
       log = db.get_log(exc)
     else:
-      log = _("No server logs for this query")
+      log = _("No server logs for this query.")
   except Exception, e:
     # Always show something, even if server has died on the job.
-    log = _("Could not retrieve logs: %s" % e)
+    log = _("Could not retrieve logs: %s." % e)
 
   if not exc.message:
     error_message = _("Unknown exception.")

@@ -254,7 +254,7 @@ def new_design(request, node_type):
 
 def clone_design(request, design_id):
   if request.method != 'POST':
-    raise StructuredException(code="METHOD_NOT_ALLOWED_ERROR", message=_('Must be POST request.'), error_code=405)
+    raise StructuredException(code="METHOD_NOT_ALLOWED_ERROR", message=_('Must be a POST request.'), error_code=405)
 
   workflow = _get_design(design_id)
   clone = workflow.clone(request.fs, request.user)

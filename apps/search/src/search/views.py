@@ -206,7 +206,7 @@ def admin_collection_properties(request, collection_id):
       hue_collection.save()
       return redirect(reverse('search:admin_collection_properties', kwargs={'collection_id': hue_collection.id}))
     else:
-      request.error(_('Errors on the form: %s') % collection_form.errors)
+      request.error(_('Errors on the form: %s.') % collection_form.errors)
   else:
     collection_form = CollectionForm(instance=hue_collection)
 

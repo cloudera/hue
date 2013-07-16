@@ -128,13 +128,13 @@ class AddLdapUsersForm(forms.Form):
 
     if dn:
       if username_pattern is not None and len(username_pattern) > 64:
-        msg = _('Too long: 64 characters or fewer and not %s') % username_pattern
+        msg = _('Too long: 64 characters or fewer and not %s.') % username_pattern
         errors = self._errors.setdefault('username_pattern', ErrorList())
         errors.append(msg)
         raise forms.ValidationError(msg)
     else:
       if username_pattern is not None and len(username_pattern) > 30:
-        msg = _('Too long: 30 characters or fewer and not %s') % username_pattern
+        msg = _('Too long: 30 characters or fewer and not %s.') % username_pattern
         errors = self._errors.setdefault('username_pattern', ErrorList())
         errors.append(msg)
         raise forms.ValidationError(msg)

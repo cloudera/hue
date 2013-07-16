@@ -36,7 +36,7 @@ ${ commonheader(_('Quick Start'), "quickstart", user, "100px") | n,unicode }
 % endif
 
 <div style="position: absolute;top:110px;right:30px">
-  <a href="http://gethue.com" target="_blank" title="${ _('Visit Hue website !') }">
+  <a href="http://gethue.com" target="_blank" title="${ _('Visit the Hue website.') }">
     <img src="/static/art/hue-logo-subtle.png"/>
   </a>
 </div>
@@ -60,7 +60,7 @@ ${ commonheader(_('Quick Start'), "quickstart", user, "100px") | n,unicode }
       <li class="active"><a href="#step1" class="step">${ _('Step 1:') } <i class="icon-cogs"></i> ${ _('Check Configuration') }</a></li>
       <li><a href="#step2" class="step">${ _('Step 2:') } <i class="icon-book"></i> ${ _('Examples') }</a></li>
       <li><a href="#step3" class="step">${ _('Step 3:') } <i class="icon-group"></i> ${ _('Users') }</a></li>
-      <li><a id="lastStep" href="#step4" class="step">${ _('Step 4:') } <i class="icon-flag"></i> ${_('Go !') }</a></li>
+      <li><a id="lastStep" href="#step4" class="step">${ _('Step 4:') } <i class="icon-flag"></i> ${_('Go!') }</a></li>
     </ul>
 
     <div class="steps" >
@@ -82,7 +82,7 @@ ${ commonheader(_('Quick Start'), "quickstart", user, "100px") | n,unicode }
           <span class="icon">
             <i class="icon-trash"></i>
           </span>
-          <h5>${ _('HDFS Trash configuration') }</h5>
+          <h5>${ _('HDFS Trash Configuration') }</h5>
         </div>
         <div class="widget-content">
           <div class="container-fluid">
@@ -175,7 +175,7 @@ ${ commonheader(_('Quick Start'), "quickstart", user, "100px") | n,unicode }
           <span class="icon">
             <i class="icon-th-list"></i>
           </span>
-          <h5>${ _('Go create or import users') }</h5>
+          <h5>${ _('Create or import users.') }</h5>
         </div>
         <div class="widget-content">
         <a  href="${ url('useradmin.views.list_users') }" target="_blank"><img src="/useradmin/static/art/icon_useradmin_24.png"> ${ _('User Admin') }</a>
@@ -211,7 +211,7 @@ ${ commonheader(_('Quick Start'), "quickstart", user, "100px") | n,unicode }
           <span class="icon">
             <i class="icon-th-list"></i>
           </span>
-          <h5>${ _('Go use the apps') }</h5>
+          <h5>${ _('Use the applications') }</h5>
         </div>
         <div class="widget-content">
           <a href="${ url('desktop.views.home') }" class="step"><i class="icon-home"></i> ${_('Hue Home') }</a>

@@ -80,7 +80,7 @@ ${ commonheader(None, "jobbrowser", user) | n,unicode }
 <div id="killModal" class="modal hide fade">
   <div class="modal-header">
     <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${_('Please Confirm')}</h3>
+    <h3>${_('Confirm Kill')}</h3>
   </div>
   <div class="modal-body">
     <p>${_('Are you sure you want to kill this job?')}</p>
@@ -130,7 +130,7 @@ ${ commonheader(None, "jobbrowser", user) | n,unicode }
     $(document).ajaxError(function (event, jqxhr, settings, exception) {
       if (jqxhr.status == 500) {
         window.clearInterval(_runningInterval);
-        $.jHueNotify.error("${_('There was a problem communicating with the server. Please refresh the page.')}");
+        $.jHueNotify.error("${_('There was a problem communicating with the server. Refresh the page.')}");
       }
     });
 

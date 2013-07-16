@@ -88,14 +88,14 @@ class JobManager(models.Manager):
       if job.is_accessible(request.user):
         return job
       else:
-        message = _("Permission denied. %(username)s don't have the permissions to access job %(id)s") % \
+        message = _("Permission denied. %(username)s does not have the permissions required to access job %(id)s") % \
             {'username': request.user.username, 'id': job.id}
         access_warn(request, message)
         request.error(message)
         raise exception_class(message)
 
     except Job.DoesNotExist:
-      raise exception_class(_('job %(id)s not exist') % {'id': job_id})
+      raise exception_class(_('job %(id)s does not exist') % {'id': job_id})
 
   def can_edit_or_exception(self, request, job, exception_class=PopupException):
     if job.is_editable(request.user):
@@ -760,7 +760,7 @@ class Java(Action):
                                        'and they are passed to the main method in the same order.'))
   java_opts = models.CharField(max_length=256, blank=True, verbose_name=_t('Java options'),
                                help_text=_t('Command-line parameters used to start the JVM that will execute '
-                                            'the Java application. Using this element is equivalent to use the mapred.child.java.opts '
+                                            'the Java application. Using this element is equivalent to using the mapred.child.java.opts '
                                             'configuration property. E.g. -Dexample-property=hue'))
   job_properties = models.TextField(default='[]', verbose_name=_t('Hadoop job properties'),
                                     help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production)'))
@@ -844,7 +844,7 @@ class Hive(Action):
                                     verbose_name=_t('Hadoop job properties'),
                                     help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production)'))
   prepares = models.TextField(default="[]", verbose_name=_t('Prepares'),
-                              help_text=_t('List of absolute paths to delete then to create before starting the application. '
+                              help_text=_t('List of absolute paths to delete, then create, before starting the application. '
                                            'This should be used exclusively for directory cleanup.'))
   job_xml = models.CharField(max_length=PATH_MAX, default='', blank=True, verbose_name=_t('Job XML'),
                              help_text=_t('Refer to a Hive hive-site.xml file bundled in the workflow deployment directory. '))
@@ -917,7 +917,7 @@ class Ssh(Action):
   command = models.CharField(max_length=256, verbose_name=_t('%(type)s command') % {'type': node_type.title()},
                              help_text=_t('The command that will be executed.'))
   params = models.TextField(default="[]", verbose_name=_t('Arguments'),
-                            help_text=_t('The arguments of the %(type)s command')  % {'type': node_type.title()})
+                            help_text=_t('The arguments of the %(type)s command.')  % {'type': node_type.title()})
   capture_output = models.BooleanField(default=False, verbose_name=_t('Capture output'),
                               help_text=_t('Capture output of the stdout of the %(program)s command execution. The %(program)s '
                                            'command output must be in Java properties file format and it must not exceed 2KB. '
@@ -933,7 +933,7 @@ class Shell(Action):
   node_type = 'shell'
 
   command = models.CharField(max_length=256, blank=False, verbose_name=_t('%(type)s command') % {'type': node_type.title()},
-                             help_text=_t('The path of the Shell command to execute'))
+                             help_text=_t('The path of the Shell command to execute.'))
   params = models.TextField(default="[]", verbose_name=_t('Arguments'),
                             help_text=_t('The arguments of Shell command can then be specified using one or more argument element.'))
   files = models.TextField(default="[]", verbose_name=_t('Files'),
@@ -1048,8 +1048,8 @@ class SubWorkflow(Action):
   PARAM_FIELDS = ('subworkflow', 'propagate_configuration', 'job_properties')
   node_type = 'subworkflow'
 
-  sub_workflow = models.ForeignKey(Workflow, db_index=True, verbose_name=_t('Sub workflow'),
-                            help_text=_t('The sub workflow application to include. You must own all the sub-workflows.'))
+  sub_workflow = models.ForeignKey(Workflow, db_index=True, verbose_name=_t('Sub-workflow'),
+                            help_text=_t('The sub-workflow application to include. You must own all the sub-workflows.'))
   propagate_configuration = models.BooleanField(default=True, verbose_name=_t('Propagate configuration'), blank=True,
                             help_text=_t('If the workflow job configuration should be propagated to the child workflow.'))
   job_properties = models.TextField(default='[]', verbose_name=_t('Hadoop job properties'),
@@ -1065,7 +1065,7 @@ class Generic(Action):
 
   xml = models.TextField(default='', verbose_name=_t('XML of the custom action'),
                          help_text=_t('This will be inserted verbatim in the action %(action)s. '
-                                      'e.g. all the XML content like %(xml_action)s '
+                                      'E.g. all the XML content like %(xml_action)s '
                                       'will be inserted into the action and produce %(full_action)s') % {
                                       'action': '&lt;action name="email"&gt;...&lt;/action&gt;',
                                       'xml_action': '&lt;email&gt;&lt;cc&gt;hue@hue.org&lt;/cc&gt;&lt;/email&gt;',
@@ -1246,10 +1246,10 @@ class Coordinator(Job):
   workflow = models.ForeignKey(Workflow, null=True, verbose_name=_t('Workflow'),
                                help_text=_t('The workflow to schedule repeatedly.'))
   timeout = models.SmallIntegerField(null=True, blank=True, verbose_name=_t('Timeout'),
-                                     help_text=_t('How long in minutes the coordinator action will be in '
+                                     help_text=_t('Number of minutes the coordinator action will be in '
                                                   'WAITING or READY status before giving up on its execution.'))
   concurrency = models.PositiveSmallIntegerField(null=True, blank=True, choices=FREQUENCY_NUMBERS, verbose_name=_t('Concurrency'),
-                                 help_text=_t('How many coordinator actions are allowed to run concurrently (RUNNING status) '
+                                 help_text=_t('The number of coordinator actions that are allowed to run concurrently (RUNNING status) '
                                               'before the coordinator engine starts throttling them.'))
   execution = models.CharField(max_length=10, null=True, blank=True, verbose_name=_t('Execution'),
                                choices=(('FIFO', _t('FIFO (oldest first) default')),
@@ -1261,7 +1261,7 @@ class Coordinator(Job):
                                               'input data, concurrency control or because manual re-runs of coordinator jobs.'))
   throttle = models.PositiveSmallIntegerField(null=True, blank=True, choices=FREQUENCY_NUMBERS, verbose_name=_t('Throttle'),
                                  help_text=_t('The materialization or creation throttle value for its coordinator actions. '
-                                              'How many maximum coordinator actions are allowed to be in WAITING state concurrently.'))
+                                              'Number of maximum coordinator actions that are allowed to be in WAITING state concurrently.'))
   job_properties = models.TextField(default='[]', verbose_name=_t('Workflow properties'),
                                     help_text=_t('Configuration properties to transmit to the workflow, e.g. limit=100, and EL functions, e.g. username=${coord:user()}'))
 
@@ -1385,7 +1385,7 @@ class DatasetManager(models.Manager):
       if dataset.coordinator.is_accessible(request.user):
         return dataset
       else:
-        message = _("Permission denied. %(username)s don't have the permissions to access dataset %(id)s") % \
+        message = _("Permission denied. %(username)s does not have the permissions to access dataset %(id)s.") % \
             {'username': request.user.username, 'id': dataset.id}
         access_warn(request, message)
         request.error(message)
@@ -1418,7 +1418,7 @@ class Dataset(models.Model):
   timezone = models.CharField(max_length=24, choices=TIMEZONES, default='America/Los_Angeles', verbose_name=_t('Timezone'),
                               help_text=_t('The timezone of the dataset.'))
   done_flag = models.CharField(max_length=64, blank=True, default='', verbose_name=_t('Done flag'),
-                               help_text=_t('The done file for the data set. If Done flag is not specified, then Oozie '
+                               help_text=_t('The done file for the data set. If the Done flag is not specified, then Oozie '
                                             'configures Hadoop to create a _SUCCESS file in the output directory. If Done '
                                             'flag is set to empty, then Coordinator looks for the existence of the directory itself.'))
   coordinator = models.ForeignKey(Coordinator, verbose_name=_t('Coordinator'),
@@ -1428,7 +1428,7 @@ class Dataset(models.Model):
   advanced_start_instance  = models.CharField(max_length=128, default='0', verbose_name=_t('Start instance'),
                                help_text=_t('Shift the frequency for gettting past/future start date or enter verbatim the Oozie start instance, e.g. ${coord:current(0)}'))
   advanced_end_instance  = models.CharField(max_length=128, blank=True, default='0', verbose_name=_t('End instance'),
-                               help_text=_t('Optional: shift the frequency for gettting past/future end dates or enter verbatim the Oozie end instance'))
+                               help_text=_t('Optional: Shift the frequency for gettting past/future end dates or enter verbatim the Oozie end instance.'))
 
   objects = DatasetManager()
   unique_together = ('coordinator', 'name')

@@ -49,7 +49,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
   <div class="row-fluid" data-bind="visible: collections().length == 0 && !isLoading()">
     <div class="span10 offset1 center">
       <i class="icon-plus-sign waiting"></i>
-      <h1 class="emptyMessage">${ _('There are currently no collections defined.') }<br/>${ _('Please click on Import to add one or more.') }</h1>
+      <h1 class="emptyMessage">${ _('There are currently no collections defined.') }<br/>${ _('Click on Import to add one or more.') }</h1>
     </div>
   </div>
   <div class="row-fluid" data-bind="visible: isLoading()">

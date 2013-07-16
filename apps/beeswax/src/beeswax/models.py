@@ -320,16 +320,16 @@ class SavedQuery(models.Model):
     try:
       design = SavedQuery.objects.get(id=id)
     except SavedQuery.DoesNotExist, err:
-      msg = _('Cannot retrieve Beeswax design id %(id)s') % {'id': id}
+      msg = _('Cannot retrieve Beeswax design id %(id)s.') % {'id': id}
       raise err
 
     if owner is not None and design.owner != owner:
-      msg = _('Design id %(id)s does not belong to user %(user)s') % {'id': id, 'user': owner}
+      msg = _('Design id %(id)s does not belong to user %(user)s.') % {'id': id, 'user': owner}
       LOG.error(msg)
       raise PopupException(msg)
 
     if type is not None and design.type != type:
-      msg = _('Type mismatch for design id %(id)s (owner %(owner)s) - Expected %(expected_type)s got %(real_type)s') % \
+      msg = _('Type mismatch for design id %(id)s (owner %(owner)s) - Expected %(expected_type)s, got %(real_type)s.') % \
             {'id': id, 'owner': owner, 'expected_type': design.type, 'real_type': type}
       LOG.error(msg)
       raise PopupException(msg)

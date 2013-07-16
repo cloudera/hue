@@ -126,6 +126,6 @@ def config_validator(user):
       server = dbms.get(user)
       server.get_databases()
   except:
-    res.append((NICE_NAME, _("The app won't work without a running Beeswax/HiveServer2 server and/or Hive Metastore.")))
+    res.append((NICE_NAME, _("The application won't work without a running Beeswax/HiveServer2 server and/or Hive Metastore.")))
 
   return res

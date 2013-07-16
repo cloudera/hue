@@ -47,7 +47,7 @@ ${ commonheader(None, 'filebrowser', user) | n,unicode }
                 <span class="caret"></span>
               </button>
               <ul class="dropdown-menu" style="top: auto">
-                <li><a href="#" title="${_('Change owner / group')}" data-bind="visible: !inTrash(), click: changeOwner, enable: selectedFiles().length > 0"><i class="icon-user"></i> ${_('Change owner / group')}</a></li>
+                <li><a href="#" title="${_('Change owner/group')}" data-bind="visible: !inTrash(), click: changeOwner, enable: selectedFiles().length > 0"><i class="icon-user"></i> ${_('Change owner / group')}</a></li>
                 <li><a href="#" title="${_('Change permissions')}" data-bind="visible: !inTrash(), click: changePermissions, enable: selectedFiles().length > 0"><i class="icon-list-alt"></i> ${_('Change permissions')}</a></li>
               </ul>
             </div>
@@ -106,7 +106,7 @@ ${ commonheader(None, 'filebrowser', user) | n,unicode }
 
     <div class="scrollable">
       <div class="alert alert-warn" data-bind="visible: inTrash">
-        ${ _("You are in Hadoop trash. Your files will be under a checkpoint, or timestamp named, directory.") }
+        ${ _("This is Hadoop trash. Files will be under a checkpoint, or timestamp named, directory.") }
       </div>
 
       % if breadcrumbs:
