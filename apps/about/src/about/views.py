@@ -37,6 +37,7 @@ def admin_wizard(request):
   app_names = [app.name for app in sorted(apps, key=lambda app: app.menu_index)]
 
   collect_usage = Settings.get_settings().collect_usage
+  tours_and_tutorials = Settings.get_settings().tours_and_tutorials
 
   return render('admin_wizard.mako', request, {
       'version': settings.HUE_DESKTOP_VERSION,
@@ -44,20 +45,23 @@ def admin_wizard(request):
       'apps': dict([(app.name, app) for app in apps]),
       'app_names': app_names,
       'collect_usage': collect_usage,
+      'tours_and_tutorials': tours_and_tutorials,
       'trash_enabled': get_trash_interval()
   })
 
 
-def collect_usage(request):
+def update_preferences(request):
   response = {'status': -1, 'data': ''}
 
   if request.method == 'POST':
     try:
       settings = Settings.get_settings()
       settings.collect_usage = request.POST.get('collect_usage', False)
+      settings.tours_and_tutorials = request.POST.get('tours_and_tutorials', False)
       settings.save()
       response['status'] = 0
       response['collect_usage'] = settings.collect_usage
+      response['tours_and_tutorials'] = settings.tours_and_tutorials
     except Exception, e:
       response['data'] = str(e)
   else:

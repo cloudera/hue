@@ -28,6 +28,7 @@ class UserPreferences(models.Model):
 
 class Settings(models.Model):
   collect_usage = models.BooleanField(db_index=True, default=True)
+  tours_and_tutorials = models.BooleanField(db_index=True, default=True)
 
   @classmethod
   def get_settings(cls):

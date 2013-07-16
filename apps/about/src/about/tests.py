@@ -59,18 +59,20 @@ class TestAboutWithNoCluster(TestAboutBase):
 
   def test_collect_usage(self):
     collect_usage = Settings.get_settings().collect_usage
+    tours_and_tutorials = Settings.get_settings().tours_and_tutorials
 
     try:
-      response = self.client.post(reverse('about:collect_usage'), {'collect_usage': False})
+      response = self.client.post(reverse('about:update_preferences'), {'collect_usage': False})
       data = json.loads(response.content)
       assert_equal(data['status'], 0)
       assert_false(data['collect_usage'] == True) # Weird but works
 
-      response = self.client.post(reverse('about:collect_usage'), {'collect_usage': True})
+      response = self.client.post(reverse('about:update_preferences'), {'collect_usage': True})
       data = json.loads(response.content)
       assert_equal(data['status'], 0)
       assert_true(data['collect_usage'])
     finally:
       settings = Settings.get_settings()
       settings.collect_usage = collect_usage
+      settings.tours_and_tutorials = tours_and_tutorials
       settings.save()
