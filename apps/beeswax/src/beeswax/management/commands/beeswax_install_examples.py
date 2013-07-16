@@ -125,7 +125,7 @@ class SampleTable(object):
     self._data_dir = beeswax.conf.LOCAL_EXAMPLES_DATA_DIR.get()
     self._contents_file = os.path.join(self._data_dir, self.filename)
     if not os.path.isfile(self._contents_file):
-      msg = _('Cannot find table data in "%(file)s"') % {'file': self._contents_file}
+      msg = _('Cannot find table data in "%(file)s".') % {'file': self._contents_file}
       LOG.error(msg)
       raise ValueError(msg)
 
@@ -154,7 +154,7 @@ class SampleTable(object):
           LOG.error(msg)
           raise InstallException(msg)
       except Exception, ex:
-        msg = _('Error creating table %(table)s: %(error)s') % {'table': self.name, 'error': ex}
+        msg = _('Error creating table %(table)s: %(error)s.') % {'table': self.name, 'error': ex}
         LOG.error(msg)
         raise InstallException(msg)
 
@@ -178,7 +178,7 @@ class SampleTable(object):
         LOG.error(msg)
         raise InstallException(msg)
     except BeeswaxException, ex:
-      msg = _('Error loading table %(table)s: %(error)s') % {'table': self.name, 'error': ex}
+      msg = _('Error loading table %(table)s: %(error)s.') % {'table': self.name, 'error': ex}
       LOG.error(msg)
       raise InstallException(msg)
 

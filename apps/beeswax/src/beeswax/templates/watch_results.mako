@@ -106,7 +106,7 @@ ${layout.menubar(section='query')}
               <form action="${ url(app_name + ':watch_query', query.id) }?context=${ query.design.get_query_context() }" method="POST">
                 <input type="submit" value="${ _("next") }"/ class="btn btn-primary">
               </form>
-              ${_('for continuing the execution of the remaining statements.') }
+              ${_('to continue execution of the remaining statements.') }
             </div>
           % endif
 
@@ -140,7 +140,7 @@ ${layout.menubar(section='query')}
         <div class="active tab-pane" id="results">
             % if error:
               <div class="alert alert-error">
-                <h3>${_('Error!')}</h3>
+                <h3>${_('Error')}</h3>
                 <pre>${ error_message }</pre>
                 % if expired and query_context:
                     <div class="well">
@@ -238,7 +238,7 @@ ${layout.menubar(section='query')}
         <br/>
         <br/>
         <div class="alert alert-warn">
-          ${ _('In text with columns separated by ^A and rows separated by newlines. JSON for non primitive type columns.') }
+          ${ _('In text with columns separated by ^A and rows separated by newlines. JSON for non-primitive type columns.') }
         </div>
       </span>
       <div id="fileChooserModal" class="smallModal well hide">

@@ -106,7 +106,7 @@ ${ layout.menubar(section='history') }
 
         <%actionbar:render>
           <%def name="search()">
-            <input id="filter" type="text" class="input-xxlarge search-query" placeholder="${_('Search for name, query, etc...')}" value="${ filter }">
+            <input id="filter" type="text" class="input-xxlarge search-query" placeholder="${_('Search for name, query, etc.')}" value="${ filter }">
           </%def>
         </%actionbar:render>
 

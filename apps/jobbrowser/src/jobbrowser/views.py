@@ -58,7 +58,7 @@ def check_job_permission(view_func):
       raise PopupException(_('Could not find job %s. The job might not be running yet.') % jobid, detail=e)
     if not conf.SHARE_JOBS.get() and not request.user.is_superuser \
       and job.user != request.user.username:
-      raise PopupException(_("You don't have the permissions to access job %(id)s.") % {'id': jobid})
+      raise PopupException(_("You don't have permission to access job %(id)s.") % {'id': jobid})
     kwargs['job'] = job
     return view_func(request, *args, **kwargs)
   return wraps(view_func)(decorate)
@@ -192,7 +192,7 @@ def kill_job(request, job):
     time.sleep(1)
     job = Job.from_id(jt=request.jt, jobid=job.jobId)
 
-  raise Exception(_("Job did not appear as killed within 15 seconds"))
+  raise Exception(_("Job did not appear as killed within 15 seconds."))
 
 
 @check_job_permission
@@ -212,7 +212,7 @@ def job_attempt_logs_json(request, job, attempt_index=0, name='syslog', offset=0
     attempt = job.job_attempts['jobAttempt'][attempt_index]
     log_link = attempt['logsLink']
   except (KeyError, RestException), e:
-    raise KeyError(_("Cannot find job attempt '%(id)s'") % {'id': job.jobId}, e)
+    raise KeyError(_("Cannot find job attempt '%(id)s'.") % {'id': job.jobId}, e)
 
   link = '/%s/' % name
   if offset and int(offset) >= 0:
@@ -250,7 +250,7 @@ def job_single_logs(request, job):
       task = recent_tasks[0]
 
   if task is None:
-    raise PopupException(_("No tasks found for job %(id)s") % {'id': job.jobId})
+    raise PopupException(_("No tasks found for job %(id)s.") % {'id': job.jobId})
 
   return single_task_attempt_logs(request, **{'job': job.jobId, 'taskid': task.taskId, 'attemptid': task.taskAttemptIds[-1]})
 

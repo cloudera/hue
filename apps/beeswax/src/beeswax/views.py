@@ -728,14 +728,14 @@ def save_results(request, id):
           redirected = db.create_table_as_a_select(request, query_history, form.cleaned_data['target_table'], result_meta)
       except Exception, ex:
         error_msg, log = expand_exception(ex, db)
-        raise PopupException(_('The result could not be saved: %s') % log, detail=ex)
+        raise PopupException(_('The result could not be saved: %s.') % log, detail=ex)
 
       return redirected
   else:
     form = beeswax.forms.SaveResultsForm()
 
   if error_msg:
-    error_msg = _('Failed to save results from query: %(error)s') % {'error': error_msg}
+    error_msg = _('Failed to save results from query: %(error)s.') % {'error': error_msg}
 
   return render('save_results.mako', request, {
     'action': reverse(get_app_name(request) + ':save_results', kwargs={'id': str(id)}),
@@ -834,7 +834,7 @@ def query_done_cb(request, server_id):
 
     design = query_history.design
     user = query_history.owner
-    subject = _("Beeswax query completed")
+    subject = _("Beeswax query completed.")
 
     if design:
       subject += ": %s" % (design.name,)
@@ -842,7 +842,7 @@ def query_done_cb(request, server_id):
     link = "%s%s" % \
               (get_desktop_uri_prefix(),
                reverse(get_app_name(request) + ':watch_query', kwargs={'id': query_history.id}))
-    body = _("%(subject)s. You may see the results here: %(link)s\n\nQuery:\n%(query)s") % {
+    body = _("%(subject)s. See the results here: %(link)s\n\nQuery:\n%(query)s") % {
                'subject': subject, 'link': link, 'query': query_history.query
              }
 
@@ -894,7 +894,7 @@ def authorized_get_design(request, design_id, owner_only=False, must_exist=False
 
   if not conf.SHARE_SAVED_QUERIES.get() and (not request.user.is_superuser or owner_only) \
       and design.owner != request.user:
-    raise PopupException(_('Cannot access design %(id)s') % {'id': design_id})
+    raise PopupException(_('Cannot access design %(id)s.') % {'id': design_id})
   else:
     return design
 
@@ -911,7 +911,7 @@ def authorized_get_history(request, query_history_id, owner_only=False, must_exi
 
   if not conf.SHARE_SAVED_QUERIES.get() and (not request.user.is_superuser or owner_only) \
       and query_history.owner != request.user:
-    raise PopupException(_('Cannot access QueryHistory %(id)s') % {'id': query_history_id})
+    raise PopupException(_('Cannot access QueryHistory %(id)s.') % {'id': query_history_id})
   else:
     return query_history
 
@@ -928,7 +928,7 @@ def safe_get_design(request, design_type, design_id=None):
     try:
       design = models.SavedQuery.get(design_id, request.user, design_type)
     except models.SavedQuery.DoesNotExist:
-      messages.error(request, _('Design does not exist'))
+      messages.error(request, _('Design does not exist.'))
 
   if design is None:
     design = models.SavedQuery(owner=request.user, type=design_type)

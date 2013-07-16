@@ -29,7 +29,7 @@ def allow_admin_only(view_func):
   def decorate(request, *args, **kwargs):
 
     if not request.user.is_superuser:
-      message = _("Permission denied. You are not an Administrator")
+      message = _("Permission denied. You are not an Administrator.")
       raise PopupException(message)
 
     return view_func(request, *args, **kwargs)

@@ -553,7 +553,7 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
   </div>
   <div class="modal-body">
     <p>
-      ${_('Please give a meaningful name to this script.')}<br/><br/>
+      ${_('Give a meaningful name to this script.')}<br/><br/>
       <label>
         ${ _('Script name') } &nbsp;
         <input type="text" class="input-xlarge" data-bind="value: currentScript().name, valueUpdate:'afterkeydown'" />
@@ -589,9 +589,9 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
 
 <script type="text/javascript" charset="utf-8">
   var LABELS = {
-    KILL_ERROR: "${ _('The pig job could not be killed.') }",
-    TOOLTIP_PLAY: "${ _('Run this pig script') }",
-    TOOLTIP_STOP: "${ _('Stop the execution') }",
+    KILL_ERROR: "${ _('The Pig job could not be killed.') }",
+    TOOLTIP_PLAY: "${ _('Run this Pig script.') }",
+    TOOLTIP_STOP: "${ _('Stop execution.') }",
     SAVED: "${ _('Saved') }",
     NEW_SCRIPT_NAME: "${ _('Unsaved script') }",
     NEW_SCRIPT_CONTENT: "ie. A = LOAD '/user/${ user }/data';",

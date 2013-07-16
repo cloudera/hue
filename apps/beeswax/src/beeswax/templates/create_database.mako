@@ -55,7 +55,7 @@ ${ commonheader(_("Create database"), 'metastore', user) | n,unicode }
                           )}
                           <span  class="help-inline error-inline hide">${_('This field is required. Spaces are not allowed.')}</span>
                           <p class="help-block">
-                              ${_('Name of the new database. Database names must be globally unique. Database names tend to correspond as well to the directory where the data will be stored.')}
+                              ${_('Name of the new database. Database names must be globally unique. Database names tend to correspond to the directory where the data will be stored.')}
                           </p>
                       </div>
                   </div>
@@ -67,7 +67,7 @@ ${ commonheader(_("Create database"), 'metastore', user) | n,unicode }
                             )
                           )}
                           <p class="help-block">
-                              ${_("Use a database comment to describe your database. For example, you might note the data's provenance and any caveats users need to know.")}
+                              ${_("Use a database comment to describe the database. For example, note the data's provenance and any caveats users need to know.")}
                           </p>
                       </div>
                   </div>
@@ -104,7 +104,7 @@ ${ commonheader(_("Create database"), 'metastore', user) | n,unicode }
                         )}
                         <span  class="help-inline error-inline hide">${_('This field is required.')}</span>
                         <span class="help-block">
-                        ${_("Enter the path (on HDFS) to your database's data location")}
+                        ${_("Enter the path (on HDFS) to your database's data location.")}
                         </span>
                     </div>
                 </div>

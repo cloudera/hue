@@ -260,7 +260,7 @@ from django.utils.translation import ugettext as _
         <form id="chownForm" action="/filebrowser/chown" method="POST" enctype="multipart/form-data" class="form-stacked form-padding-fix">
             <div class="modal-header">
                 <a href="#" class="close" data-dismiss="modal">&times;</a>
-                <h3>${_('Change Owner / Group')}</h3>
+                <h3>${_('Change Owner/Group')}</h3>
             </div>
             <div class="modal-body change-owner-modal-body clearfix" >
                 <div class="alert alert-message block-message info">${_('Note: Only the Hadoop superuser, "%(superuser)s" on this file system, may change the owner of a file.') % dict(superuser=superuser)}</div>

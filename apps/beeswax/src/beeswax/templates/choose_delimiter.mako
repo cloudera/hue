@@ -58,7 +58,7 @@ ${ commonheader(_('Create table from file'), 'metastore', user) | n,unicode }
                             ${comps.field(delim_form["delimiter"], render_default=True)}
                             <input id="submit_preview" class="btn btn-info" type="submit" value="${_('Preview')}" name="submit_preview"/>
                             <span class="help-block">
-                            ${_('Enter the column delimiter. Must be a single character. Use syntax like "\\001" or "\\t" for special characters.')}
+                            ${_('Enter the column delimiter which must be a single character. Use syntax like "\\001" or "\\t" for special characters.')}
                             </span>
                         </div>
                     </div>
@@ -111,7 +111,7 @@ ${ commonheader(_('Create table from file'), 'metastore', user) | n,unicode }
 
     $(".scrollable").width($(".form-actions").width());
 
-    $("#id_delimiter_1").css("margin-left", "4px").attr("placeholder", "${_('Please type your delimiter here')}").hide();
+    $("#id_delimiter_1").css("margin-left", "4px").attr("placeholder", "${_('Type your delimiter here')}").hide();
     $("#id_delimiter_0").change(function () {
       if ($(this).val() == "__other__") {
         $("#id_delimiter_1").show();

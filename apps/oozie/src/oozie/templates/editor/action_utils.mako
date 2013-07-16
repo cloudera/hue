@@ -59,7 +59,7 @@
             </p>
             % if node_type == 'ssh':
               <p class="alert alert-warn span5">
-                ${ _('The ssh server requires passwordless login') }.
+                ${ _('The SSH server requires passwordless login') }.
               </p>
             % endif
             % if node_type == 'java':

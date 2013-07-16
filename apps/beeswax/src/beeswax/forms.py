@@ -67,7 +67,7 @@ class SaveForm(forms.Form):
     name = cleaned_data.get('name')
     if save and not name:
       # Bother with name iff we're saving
-      raise forms.ValidationError(_('Please enter a name'))
+      raise forms.ValidationError(_('Enter a name.'))
     return cleaned_data
 
   def set_data(self, name, desc=''):
@@ -92,7 +92,7 @@ class SaveResultsForm(DependencyAwareForm):
                                   help_text=_t("Name of the new table"))
   target_dir = PathField(label=_t("Results Location"),
                          required=False,
-                         help_text=_t("Empty directory in HDFS to put the results"))
+                         help_text=_t("Empty directory in HDFS to store results."))
   dependencies = [
     ('save_target', SAVE_TYPE_TBL, 'target_table'),
     ('save_target', SAVE_TYPE_DIR, 'target_dir'),
@@ -121,7 +121,7 @@ class SaveResultsForm(DependencyAwareForm):
       if not target_dir.startswith('/'):
         self._errors['target_dir'] = self.error_class([_('Directory should start with /')])
       elif self.fs.exists(target_dir):
-        self._errors['target_dir'] = self.error_class([_('Directory already exists')]) # Overwrite destination directory content
+        self._errors['target_dir'] = self.error_class([_('Directory already exists.')]) # Overwrite destination directory content
 
     return cleaned_data
 
@@ -209,7 +209,7 @@ class CreateTableForm(DependencyAwareForm):
   serde_name = forms.CharField(required=False, label=_t("SerDe Name"))
   serde_properties = forms.CharField(
                         required=False,
-                        help_text=_t("Comma-separated list of key-value pairs, eg., 'p1=v1, p2=v2'"))
+                        help_text=_t("Comma-separated list of key-value pairs. E.g. 'p1=v1, p2=v2'"))
 
   dependencies += [
     ("row_format", "SerDe", "serde_name"),
@@ -229,7 +229,7 @@ class CreateTableForm(DependencyAwareForm):
   ]
 
   # External?
-  use_default_location = forms.BooleanField(required=False, initial=True, label=_t("Use default location"))
+  use_default_location = forms.BooleanField(required=False, initial=True, label=_t("Use default location."))
   external_location = forms.CharField(required=False, help_text=_t("Path to HDFS directory or file of table data."))
 
   dependencies += [
@@ -253,7 +253,7 @@ def _clean_tablename(db, name):
   try:
     table = db.get_table("default", name)
     if table.name:
-      raise forms.ValidationError(_('Table "%(name)s" already exists') % {'name': name})
+      raise forms.ValidationError(_('Table "%(name)s" already exists.') % {'name': name})
   except Exception:
     return name
 
@@ -337,15 +337,15 @@ class ColumnTypeForm(DependencyAwareForm):
                                      choices=common.to_choices(HIVE_PRIMITIVE_TYPES),
                                      help_text=_t("Specify if column_type is map."))
 
-ColumnTypeFormSet = simple_formset_factory(ColumnTypeForm, initial=[{}], add_label=_t("add a column"))
+ColumnTypeFormSet = simple_formset_factory(ColumnTypeForm, initial=[{}], add_label=_t("Add a column"))
 # Default to no partitions
-PartitionTypeFormSet = simple_formset_factory(PartitionTypeForm, add_label=_t("add a partition"))
+PartitionTypeFormSet = simple_formset_factory(PartitionTypeForm, add_label=_t("Add a partition"))
 
 
 def _clean_databasename(name):
   try:
     if name in db.get_databases():
-      raise forms.ValidationError(_('Database "%(name)s" already exists') % {'name': name})
+      raise forms.ValidationError(_('Database "%(name)s" already exists.') % {'name': name})
   except Exception:
     return name
 

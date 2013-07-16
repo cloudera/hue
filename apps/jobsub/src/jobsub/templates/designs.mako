@@ -108,7 +108,7 @@ ${ commonheader(None, "jobsub", user, "60px") | n,unicode }
               <a href="#new-design/fs" class="new-node-link" title="${_('Create Fs design')}" rel="tooltip"><i class="icon-plus-sign"></i> Fs</a>
             </li>
             <li>
-              <a href="#new-design/ssh" class="new-node-link" title="${_('Create Ssh design')}" rel="tooltip"><i class="icon-plus-sign"></i> Ssh</a>
+              <a href="#new-design/ssh" class="new-node-link" title="${_('Create SSH design')}" rel="tooltip"><i class="icon-plus-sign"></i> Ssh</a>
             </li>
             <li>
               <a href="#new-design/shell" class="new-node-link" title="${_('Create Shell design')}" rel="tooltip"><i class="icon-plus-sign"></i> Shell</a>
@@ -194,7 +194,7 @@ ${ commonheader(None, "jobsub", user, "60px") | n,unicode }
   <form id="destroyWfForm" action="#" method="POST" style="margin:0">
     <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3 id="destroyWfMessage">${_('Delete the selected designs?')}</h3>
+      <h3 id="destroyWfMessage">${_('Delete selected designs?')}</h3>
     </div>
     <div class="modal-footer">
       <a href="#" class="btn" data-dismiss="modal">${_('No')}</a>
@@ -220,7 +220,7 @@ ${ commonheader(None, "jobsub", user, "60px") | n,unicode }
   <form id="restoreWfForm" action="#" method="POST" style="margin:0">
     <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3 id="restoreWfMessage">${_('Restore the selected designs?')}</h3>
+      <h3 id="restoreWfMessage">${_('Restore selected designs?')}</h3>
     </div>
     <div class="modal-footer">
       <a href="#" class="btn" data-dismiss="modal">${_('No')}</a>

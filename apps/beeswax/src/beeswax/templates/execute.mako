@@ -213,7 +213,7 @@ ${layout.menubar(section='query')}
                           >
                             <label class="checkbox" rel="tooltip" data-original-title="${_("If checked, you will receive an email notification when the query completes.")}">
                                 <input type="checkbox" id="id_${form.query["email_notify"].html_name | n}" name="${form.query["email_notify"].html_name | n}" ${extract_field_data(form.query["email_notify"]) and "CHECKED" or ""}/>
-                                ${_("Email me on completion")}
+                                ${_("Email me on completion.")}
                             </label>
                           </li>
                         % if app_name == 'impala':
@@ -238,7 +238,7 @@ ${layout.menubar(section='query')}
                                 <ul style="text-align: left;">
                                   <li>"invalidate metadata" ${ _("invalidates the entire catalog metadata. All table metadata will be reloaded on the next access.") }</li>
                                   <li>"invalidate metadata &lt;table&gt;" ${ _("invalidates the metadata, load on the next access") }</li>
-                                  <li>"refresh &lt;table&gt;" ${ _("refreshes the metadata immediately. It's an incremental refresh. Much faster") }</li>
+                                  <li>"refresh &lt;table&gt;" ${ _("refreshes the metadata immediately. It is a faster, incremental refresh.") }</li>
                                 </ul>
                               </div>
                             </div>
@@ -467,7 +467,7 @@ ${layout.menubar(section='query')}
       $("#query-name").editable({
         validate: function (value) {
           if ($.trim(value) == '') {
-            return "${ _('This field is required') }";
+            return "${ _('This field is required.') }";
           }
         },
         success: successfunction,

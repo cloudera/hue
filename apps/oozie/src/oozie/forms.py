@@ -287,7 +287,7 @@ class SubWorkflowForm(forms.ModelForm):
     try:
       return Workflow.objects.get(id=int(self.cleaned_data.get('sub_workflow')))
     except Exception, e:
-      raise ValidationError(_('The sub-workflow could not be found: %s' % e))
+      raise ValidationError(_('The sub-workflow could not be found: %s.' % e))
 
 
 class GenericForm(forms.ModelForm):

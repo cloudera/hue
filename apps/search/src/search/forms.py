@@ -67,5 +67,5 @@ class CollectionForm(forms.ModelForm):
     searcher = SearchController()
     name = self.cleaned_data['name']
     if not searcher.is_collection(name) and not searcher.is_core(name):
-      raise forms.ValidationError(_('No live Solr collection or core by the name %s') % name)
+      raise forms.ValidationError(_('No live Solr collection or core by the name %s.') % name)
     return name

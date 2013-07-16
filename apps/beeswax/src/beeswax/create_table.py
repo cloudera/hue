@@ -287,7 +287,7 @@ def _delim_preview(fs, file_form, encoding, file_types, delimiters):
                                             file_type=file_type,
                                             n_cols=n_cols))
   if not delim_form.is_valid():
-    assert False, _('Internal error when constructing the delimiter form: %(error)s') % {'error': delim_form.errors}
+    assert False, _('Internal error when constructing the delimiter form: %(error)s.') % {'error': delim_form.errors}
   return fields_list, n_cols, delim_form
 
 
@@ -314,7 +314,7 @@ def _parse_fields(path, file_obj, encoding, filetypes, delimiters):
       return delim, reader.TYPE, fields_list
   else:
     # Even TextFileReader doesn't work
-    msg = _("Failed to decode file '%(path)s' into printable characters under %(encoding)s") % {'path': path, 'encoding': encoding}
+    msg = _("Failed to decode file '%(path)s' into printable characters under %(encoding)s.") % {'path': path, 'encoding': encoding}
     LOG.error(msg)
     raise PopupException(msg)
 
@@ -379,7 +379,7 @@ def _peek_file(fs, file_form):
     file_obj.close()
     return (path, file_head)
   except IOError, ex:
-    msg = _("Failed to open file '%(path)s': %(error)s") % {'path': path, 'error': ex}
+    msg = _("Failed to open file '%(path)s': %(error)s.") % {'path': path, 'error': ex}
     LOG.exception(msg)
     raise PopupException(msg)
 
@@ -431,7 +431,7 @@ def load_after_create(request, database):
   path = request.REQUEST.get('path')
 
   if not tablename or not path:
-    msg = _('Internal error: Missing needed parameter to load data into table')
+    msg = _('Internal error: Missing needed parameter to load data into table.')
     LOG.error(msg)
     raise PopupException(msg)
 

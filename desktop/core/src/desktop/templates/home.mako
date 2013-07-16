@@ -39,7 +39,7 @@ ${ commonheader(_('Home'), "home", user) | n,unicode }
   <div class="row-fluid">
     <div class="span12">
       <p>
-        ${ _('Hue is a Web UI for Apache Hadoop. Please select an application below.') }
+        ${ _('Hue is a Web UI for Apache Hadoop. Select an application below.') }
       </p>
     </div>
   </div>
