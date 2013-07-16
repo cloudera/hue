@@ -352,7 +352,10 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
       </div>
 
       <div id="logs" class="section hide">
-          <div class="alert alert-info"><h3><span data-bind="text: currentScript().name"></span></h3></div>
+          <div class="alert alert-info">
+            <a class="mainAction" href="#" title="${ _('Stop this script') }" data-bind="click: showStopModal, visible: currentScript().isRunning()"><i class="icon-stop"></i></a>
+            <h3><span data-bind="text: currentScript().name"></span></h3>
+          </div>
           <div data-bind="template: {name: 'logTemplate', foreach: currentScript().actions}"></div>
           <script id="logTemplate" type="text/html">
             <div data-bind="css:{'alert-modified': name != '', 'alert': name != '', 'alert-success': status == 'SUCCEEDED' || status == 'OK', 'alert-error': status != 'RUNNING' && status != 'SUCCEEDED' && status != 'OK' && status != 'PREP' && status != 'SUSPENDED'}">
