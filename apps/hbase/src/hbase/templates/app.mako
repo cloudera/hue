@@ -67,7 +67,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
         <span class="smartview-row-controls pull-right">
           <button class="btn" data-bind="click: $data.toggleSelectedCollapse, enable: $data.selected().length > 0, clickBubble: false" data-toggle="tooltip" title="${_('Toggle Collapse Selected')}"><i class="icon-resize-small"></i></button>
           <button class="btn" data-bind="click: $data.toggleSelectAllVisible, enable: $data.displayedItems().length > 0, clickBubble: false" data-toggle="tooltip" title="${_('Select All Visible')}"><i class="icon-check"></i></button>
-          <input type="text" placeholder="Filter Column Names/Family" data-bind="value: $data.searchQuery, valueUpdate: $data.items().length < 100 ? 'afterkeydown' : 'change', clickBubble: false"/>
+          <input type="text" placeholder="${('Filter Column Names/Family')}" data-bind="value: $data.searchQuery, valueUpdate: $data.items().length < 100 ? 'afterkeydown' : 'change', clickBubble: false"/>
           ${sortBtn('$data.sortDropDown')}
           % if user.is_superuser:
             <button class="btn" data-bind="enable: $data.selected().length > 0, click: $data.dropSelected, clickBubble: false"><i class="icon-trash"></i> Drop Columns</button>
@@ -198,10 +198,10 @@ ${ commonheader(None, "hbase", user) | n,unicode }
     <div class="subnav sticky">
       <div class="container-fluid">
         <div class="row-fluid">
-            <div id="searchbar-main" class="span4" data-bind="click: function(){search.focused(true)}">
-              <div id="search-tags" data-bind="html: search.renderedValue()">
+          <div class="span6">
+            <div id="searchbar-main" class="span10" data-bind="click: search.clickTagBar">
+              <div id="search-tags" contenteditable="true" data-bind="editableText: search.cur_input, hasfocus: search.focused, css: { 'active': search.cur_input() != '' }, event: { 'keydown': search.onKeyDown, click: search.updateMenu.bind(null) }" data-placeholder="${_('row_key, row_key_prefix* + scan_length, row_key [family:col1, family2:col2, family3:]')}">
               </div>
-              <input id="tag-input" class="tag-searchbar" type="text" autocomplete="off" placeholder="${_('row_key1, row_key2 + scan_length, row[ cf:column ], [ cf:col1 cf:col2 ]')}" title="${_('ie: row_key1, row_key2 + scan_length, row[ cf:column ], [ cf:col1 cf:col2 ]')}" data-bind="event: { keydown: search.onKeyDown, keyup: search.onKeyDown, change: search.onKeyDown }, value: search.cur_input, valueUpdate: 'afterkeydown', click: function(){$($element).attr('placeholder','').addClass('active')}, hasfocus: search.focused, css: { 'active': search.cur_input() != '' }">
             </div>
             <ul id="search-typeahead" data-bind="visible: search.focused()">
               <!-- ko if: search.mode() != 'idle' -->
