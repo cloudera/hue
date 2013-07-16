@@ -68,7 +68,8 @@
       },
       tours: [],
       showRemote: false,
-      placement: "right"
+      questionMarkPlacement: "right",
+      hideIfNoneAvailable: true
     };
 
   function Plugin(element, options) {
@@ -98,10 +99,6 @@
     var _this = this;
     _this.initQuestionMark();
     var _tourMask = $("<div>").attr("id", "jHueTourMask");
-    _tourMask.addClass("jHueTourBadge");
-    if (_this.options.placement == "left"){
-      _tourMask.addClass("jHueTourBadgeLeft");
-    }
     _tourMask.width($(document).width()).height($(document).height())
     _tourMask.click(function () {
       _this.closeCurtains();
@@ -120,24 +117,20 @@
     var _this = this;
     $("#jHueTourQuestion").remove();
     var _questionMark = $("<div>").attr("id", "jHueTourQuestion").html('<i class="icon-question"></i>').addClass("jHueTourBadge");
-    _questionMark.click(function () {
-      if ($.totalStorage("jHueTourExtras") != null) {
-        var _newTours = [];
-        $.each(_this.options.tours, function (cnt, tour) {
-          if (tour.remote == undefined || !tour.remote) {
-            _newTours.push(tour);
-          }
-        });
-        _this.options.tours = _newTours.concat($.totalStorage("jHueTourExtras"));
-      }
-
-      var _closeBtn = $("<a>");
-      _closeBtn.addClass("btn").addClass("btn-mini").html('<i class="icon-remove"></i>').css("float", "right").css("margin-top", "-4px").css("margin-right", "-6px");
-      _closeBtn.click(function () {
-        $(".popover").remove();
+    if (_this.options.questionMarkPlacement == "left"){
+      _questionMark.addClass("jHueTourBadgeLeft");
+    }
+    if ($.totalStorage("jHueTourExtras") != null) {
+      var _newTours = [];
+      $.each(_this.options.tours, function (cnt, tour) {
+        if (tour.remote == undefined || !tour.remote) {
+          _newTours.push(tour);
+        }
       });
+      _this.options.tours = _newTours.concat($.totalStorage("jHueTourExtras"));
+    }
 
-      var _toursHtml = '<ul class="nav nav-pills nav-stacked">'
+    var _toursHtml = '<ul class="nav nav-pills nav-stacked">'
       var _added = 0;
       $.each(_this.options.tours, function (ctn, tour) {
         if (tour.path === undefined || RegExp(tour.path).test(location.pathname)) {
@@ -161,7 +154,12 @@
         }
       });
       if (_added == 0) {
-        _toursHtml += '<li>' + _this.options.labels.NO_AVAILABLE_TOURS + '</li>';
+        if (_this.options.hideIfNoneAvailable){
+          _questionMark.css("display", "none");
+        }
+        else {
+          _toursHtml += '<li>' + _this.options.labels.NO_AVAILABLE_TOURS + '</li>';
+        }
       }
       if (_this.options.showRemote){
         _toursHtml += '<li>' +
@@ -172,19 +170,28 @@
           ' </div>' +
           '</li>';
       }
-      _toursHtml += '</ul>';
+    _toursHtml += '</ul>';
+
+    _questionMark.click(function () {
+
+      var _closeBtn = $("<a>");
+      _closeBtn.addClass("btn").addClass("btn-mini").html('<i class="icon-remove"></i>').css("float", "right").css("margin-top", "-4px").css("margin-right", "-6px");
+      _closeBtn.click(function () {
+        $(".popover").remove();
+      });
 
       _questionMark.popover("destroy").popover({
         title: _this.options.labels.AVAILABLE_TOURS,
         content: _toursHtml,
         html: true,
         trigger: "manual",
-        placement: "left"
+        placement: _this.options.questionMarkPlacement == "left"?"right":"left"
       }).popover("show");
       if ($(".popover").position().top <= 0) {
         $(".popover").css("top", "10px");
       }
       _closeBtn.prependTo($(".popover-title"));
+
     });
     _questionMark.appendTo($("body"));
   };

@@ -21,5 +21,5 @@ urlpatterns = patterns('about.views',
   url(r'^$', 'admin_wizard', name='index'),
   url(r'^admin_wizard$', 'admin_wizard', name='admin_wizard'),
 
-  url(r'^collect_usage$', 'collect_usage', name='collect_usage'),
+  url(r'^update_preferences$', 'update_preferences', name='update_preferences'),
 )

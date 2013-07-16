@@ -90,7 +90,7 @@ limitations under the License.
             }
           }, 200);
         }
-
+        {% if tours_and_tutorials %}
         $.jHueTour({});
         if ($.totalStorage("jHueTourExtras") != null) {
           $.jHueTour({tours: $.totalStorage("jHueTourExtras")});
@@ -105,6 +105,7 @@ limitations under the License.
                   results = regex.exec(_qs);
           return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
         }
+        {% endif %}
       });
 
       function resetPrimaryButtonsStatus() {
@@ -163,7 +164,8 @@ limitations under the License.
       {% endif %}
 
     </script>
-
+    {% if tours_and_tutorials %}
     <script src="/static/js/Source/jHue/available.tours.js"></script>
+    {% endif %}
   </body>
 </html>

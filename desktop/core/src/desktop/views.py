@@ -329,7 +329,8 @@ def commonfooter(messages=None):
   return render_to_string("common_footer.html", {
     'messages': messages,
     'version': settings.HUE_DESKTOP_VERSION,
-    'collect_usage': hue_settings.collect_usage
+    'collect_usage': hue_settings.collect_usage,
+    'tours_and_tutorials': hue_settings.tours_and_tutorials
   })
 
 

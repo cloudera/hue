@@ -182,7 +182,20 @@ ${ commonheader(_('Quick Start'), "quickstart", user, "100px") | n,unicode }
         </div>
       </div>
 
-      <br/>
+      <div class="widget-box">
+        <div class="widget-title">
+          <span class="icon">
+            <i class="icon-th-list"></i>
+          </span>
+          <h5>${ _('Tours and tutorials') }</h5>
+        </div>
+        <div class="widget-content" style="padding-left: 14px">
+          <label class="checkbox">
+            <input class="updatePreferences" type="checkbox" name="tours_and_tutorials" style="margin-right: 10px" title="${ ('Check to enable the tours and tutorials') }" ${ tours_and_tutorials and "checked" }/>
+            ${ ('Display the "Available Tours" question mark when tours are available for a specific page.') }
+          </label>
+        </div>
+      </div>
 
       <div class="widget-box">
         <div class="widget-title">
@@ -193,7 +206,7 @@ ${ commonheader(_('Quick Start'), "quickstart", user, "100px") | n,unicode }
         </div>
         <div class="widget-content" style="padding-left: 14px">
           <label class="checkbox">
-            <input id="collectUsageBtn" type="checkbox" name="collect_usage" style="margin-right: 10px" title="${ ('Check to enable usage analytics') }" ${ collect_usage and "checked" }/>
+            <input class="updatePreferences" type="checkbox" name="collect_usage" style="margin-right: 10px" title="${ ('Check to enable usage analytics') }" ${ collect_usage and "checked" }/>
             ${ ('Help improve Hue with anonymous usage analytics.') }
             <a href="javascript:void(0)" style="display: inline" data-trigger="hover" data-toggle="popover" data-placement="right" rel="popover"
                title="${_('How does it work?') }"
@@ -331,8 +344,8 @@ $(document).ready(function(){
     }
   });
 
-  $("#collectUsageBtn").click(function () {
-    $.post("${ url('about:collect_usage') }", $("input").serialize(), function(data) {
+  $(".updatePreferences").click(function () {
+    $.post("${ url('about:update_preferences') }", $("input").serialize(), function(data) {
       if (data.status == 0) {
         $.jHueNotify.info('${ _("Configuration updated") }');
       } else {
@@ -340,6 +353,7 @@ $(document).ready(function(){
       }
     });
   });
+
 });
 </script>
 % endif
