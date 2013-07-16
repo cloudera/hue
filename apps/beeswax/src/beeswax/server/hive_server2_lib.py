@@ -19,6 +19,7 @@ import logging
 import re
 import thrift
 
+from desktop.conf import KERBEROS
 from desktop.lib import thrift_util
 from hadoop import cluster
 
@@ -256,8 +257,9 @@ class HiveServerClient:
     self.query_server = query_server
     self.user = user
 
-    use_sasl, mechanism, kerberos_principal_short_name = HiveServerClient.get_security(query_server)
+    use_sasl, mechanism, kerberos_principal_short_name, has_hiveserver2_impersonation = HiveServerClient.get_security(query_server)
 
+    self.has_hiveserver2_impersonation = has_hiveserver2_impersonation
     self._client = thrift_util.get_client(TCLIService.Client,
                                           query_server['server_host'],
                                           query_server['server_port'],
@@ -272,6 +274,7 @@ class HiveServerClient:
   @classmethod
   def get_security(cls, query_server):
     principal = query_server['principal']
+    has_hiveserver2_impersonation = False # Specific to HiveServer2 protocol only
 
     if query_server['server_name'] == 'impala':
       cluster_conf = cluster.get_cluster_conf_for_job_submission()
@@ -285,17 +288,24 @@ class HiveServerClient:
       mechanism = 'NOSASL'
       if use_sasl:
         mechanism = HiveServerClient.HS2_MECHANISMS[hive_mechanism]
+      has_hiveserver2_impersonation = hive_site.has_hiveserver2_impersonation()
 
     if principal:
       kerberos_principal_short_name = principal.split('/', 1)[0]
     else:
       kerberos_principal_short_name = None
 
-    return use_sasl, mechanism, kerberos_principal_short_name
+    return use_sasl, mechanism, kerberos_principal_short_name, has_hiveserver2_impersonation
 
 
   def open_session(self, user):
-    req = TOpenSessionReq(username=user.username, configuration={})
+    if self.has_hiveserver2_impersonation:
+      kerberos_principal_short_name = KERBEROS.HUE_PRINCIPAL.get().split('/', 1)[0]
+      kwargs = {'username': kerberos_principal_short_name, 'configuration': {'hive.server2.proxy.user': user.username}}
+    else:
+      kwargs = {'username': user.username, 'configuration': {}}
+
+    req = TOpenSessionReq(**kwargs)
     res = self._client.OpenSession(req)
 
     sessionId = res.sessionHandle.sessionId

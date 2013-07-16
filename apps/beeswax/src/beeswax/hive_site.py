@@ -42,9 +42,11 @@ _CNF_METASTORE_URIS = 'hive.metastore.uris'
 _CNF_METASTORE_KERBEROS_PRINCIPAL = 'hive.metastore.kerberos.principal'
 _CNF_HIVESERVER2_KERBEROS_PRINCIPAL = 'hive.server2.authentication.kerberos.principal'
 _CNF_HIVESERVER2_AUTHENTICATION = 'hive.server2.authentication'
+_CNF_HIVESERVER2_IMPERSONATION = 'hive.server2.allow.user.substitution'
 
 # Host is whatever up to the colon. Allow and ignore a trailing slash.
 _THRIFT_URI_RE = re.compile("^thrift://([^:]+):(\d+)[/]?$")
+
 
 class MalformedHiveSiteException(Exception):
   """Parsing error class used internally"""
@@ -110,6 +112,9 @@ def get_hiveserver2_kerberos_principal():
 
 def get_hiveserver2_authentication():
   return get_conf().get(_CNF_HIVESERVER2_AUTHENTICATION, 'NONE').upper() # NONE == PLAIN SASL
+
+def has_hiveserver2_impersonation():
+  return get_conf().get(_CNF_HIVESERVER2_IMPERSONATION, 'FALSE').upper() == 'TRUE'
 
 def _parse_hive_site():
   """
