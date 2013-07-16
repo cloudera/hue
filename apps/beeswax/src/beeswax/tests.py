@@ -1661,13 +1661,13 @@ def test_hiveserver2_get_security():
   beeswax_query_server = {'server_name': 'beeswax', 'principal': 'hue'}
   impala_query_server = {'server_name': 'impala', 'principal': 'impala'}
 
-  assert_equal((True, 'PLAIN', 'hue'), HiveServerClient.get_security(beeswax_query_server))
-  assert_equal((False, 'GSSAPI', 'impala'), HiveServerClient.get_security(impala_query_server))
+  assert_equal((True, 'PLAIN', 'hue', False), HiveServerClient.get_security(beeswax_query_server))
+  assert_equal((False, 'GSSAPI', 'impala', False), HiveServerClient.get_security(impala_query_server))
 
   cluster_conf = hadoop.cluster.get_cluster_conf_for_job_submission()
   finish = cluster_conf.SECURITY_ENABLED.set_for_testing(True)
   try:
-    assert_equal((True, 'GSSAPI', 'impala'), HiveServerClient.get_security(impala_query_server))
+    assert_equal((True, 'GSSAPI', 'impala', False), HiveServerClient.get_security(impala_query_server))
   finally:
     finish()
 
@@ -1675,9 +1675,10 @@ def test_hiveserver2_get_security():
   prev = hive_site._HIVE_SITE_DICT.get(hive_site._CNF_HIVESERVER2_AUTHENTICATION)
   try:
     hive_site._HIVE_SITE_DICT[hive_site._CNF_HIVESERVER2_AUTHENTICATION] = 'NOSASL'
-    assert_equal((False, 'NOSASL', 'hue'), HiveServerClient.get_security(beeswax_query_server))
+    hive_site._HIVE_SITE_DICT[hive_site._CNF_HIVESERVER2_IMPERSONATION] = 'true'
+    assert_equal((False, 'NOSASL', 'hue', True), HiveServerClient.get_security(beeswax_query_server))
     hive_site._HIVE_SITE_DICT[hive_site._CNF_HIVESERVER2_AUTHENTICATION] = 'KERBEROS'
-    assert_equal((True, 'GSSAPI', 'hue'), HiveServerClient.get_security(beeswax_query_server))
+    assert_equal((True, 'GSSAPI', 'hue', True), HiveServerClient.get_security(beeswax_query_server))
   finally:
     if prev is not None:
       hive_site._HIVE_SITE_DICT[hive_site._CNF_HIVESERVER2_AUTHENTICATION] = prev
@@ -1688,7 +1689,7 @@ def test_hiveserver2_get_security():
 def hive_site_xml(is_local=False, use_sasl=False, thrift_uris='thrift://darkside-1234:9999',
                   warehouse_dir='/abc', kerberos_principal='test/test.com@TEST.COM',
                   hs2_kerberos_principal='hs2test/test.com@TEST.COM',
-                  hs2_kauthentication='NOSASL'):
+                  hs2_authentication='NOSASL', hs2_impersonation='false'):
   if not is_local:
     uris = """
        <property>
@@ -1718,8 +1719,13 @@ def hive_site_xml(is_local=False, use_sasl=False, thrift_uris='thrift://darkside
       </property>
 
       <property>
+        <name>hive.server2.allow.user.substitution</name>
+        <value>%(hs2_impersonation)s</value>
+      </property>
+
+      <property>
         <name>hive.metastore.sasl.enabled</name>
-        <value>%(hs2_kauthentication)s</value>
+        <value>%(hs2_authentication)s</value>
       </property>
 
       <property>
@@ -1732,6 +1738,7 @@ def hive_site_xml(is_local=False, use_sasl=False, thrift_uris='thrift://darkside
     'warehouse_dir': warehouse_dir,
     'kerberos_principal': kerberos_principal,
     'hs2_kerberos_principal': hs2_kerberos_principal,
-    'hs2_kauthentication': hs2_kauthentication,
-    'use_sasl': str(use_sasl).lower()
+    'hs2_authentication': hs2_authentication,
+    'use_sasl': str(use_sasl).lower(),
+    'hs2_impersonation': hs2_impersonation,
   }
