@@ -60,6 +60,7 @@ ${ commonheader(_('Home'), "home", user) | n,unicode }
             ${ app_link("impala", "Impala") }
             ${ app_link("pig", "Pig") }
             ${ app_link("search", _('Search')) }
+            ${ app_link("hbase", _('HBase')) }
             ${ app_link("shell", _('Shell')) }
           </ul>
         </div>
@@ -79,6 +80,7 @@ ${ commonheader(_('Home'), "home", user) | n,unicode }
             ${ app_link("filebrowser", _('Files')) }
             ${ app_link("jobbrowser", _('Jobs')) }
             ${ app_link("metastore", _('Tables')) }
+            ${ app_link("sqoop", _('Sqoop 2')) }
             ${ app_link("jobsub", _('Designs')) }
           </ul>
         </div>
