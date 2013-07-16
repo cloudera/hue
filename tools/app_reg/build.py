@@ -34,8 +34,9 @@ def runcmd(cmdv, additional_env=None):
   env = os.environ.copy()
   if additional_env is not None:
     env.update(additional_env)
-  LOG.info("Running '%s' with %r" % (' '.join(cmdv), additional_env))
-  popen = subprocess.Popen(cmdv, env=env)
+  shell_command = ' '.join(cmdv)
+  LOG.info("Running '%s' with %r" % (shell_command, additional_env))
+  popen = subprocess.Popen(shell_command, env=env, shell=True)
   return popen.wait()
 
 
