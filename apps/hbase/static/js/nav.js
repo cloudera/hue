@@ -27,13 +27,14 @@ var Router =
     Router.setCluster(cluster);
     app.pageTitle(cluster + ' / ' + table);
     app.views.tabledata.name(table);
-      app.views.tabledata.name(table);
-      app.focusModel(app.views.tabledata);
+    app.views.tabledata.name(table);
+    app.focusModel(app.views.tabledata);
   },
   setCluster: function(cluster)
   {
     Router.set();
     app.cluster(cluster);
+    logGA();
   },
   set: function()
   {

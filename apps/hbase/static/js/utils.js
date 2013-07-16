@@ -240,6 +240,91 @@ function logGA(postfix)
   if(postfix == null)
     postfix = ""
   if (typeof _gaq != 'undefined' && _gaq != null && _gaq != undefined){
-       _gaq.push(['_trackPageview', '/hbase/' + document.URL.slice(document.URL.indexOf('/hbase')) + postfix]);
+       _gaq.push(['_trackPageview', document.URL.slice(document.URL.indexOf('/hbase')) + postfix]);
     }
+};
+
+function getEditablePosition(contentEditable, trimWhitespaceNodes) {
+  var el = contentEditable;
+  if(window.getSelection().getRangeAt(0).startContainer == el) //raw reference for FF fix
+    return 0;
+  var index = window.getSelection().getRangeAt(0).startOffset; //ff
+  var cur_node = window.getSelection().getRangeAt(0).startContainer; //ff
+  while(cur_node != null && cur_node != el) {
+    var cur_sib = cur_node.previousSibling || cur_node.previousElementSibling;
+    while(cur_sib != null) {
+      var val = $(cur_sib).text() || cur_sib.nodeValue;
+      if(typeof val !== "undefined" && val != null) {
+        index += trimWhitespaceNodes ? val.length : val.length;
+      }
+      cur_sib = cur_sib.previousSibling;
+    }
+    cur_node = cur_node.parentNode;
+  }
+  return index;
+};
+
+function setCursor(node, pos, trimWhitespaceNodes){
+  var sel = window.getSelection();
+  var range = document.createRange();
+  node = function selectNode(node) {
+    var nodes = node.childNodes;
+    if(pos > 0) {
+      for(var i=0; i<nodes.length; i++) {
+        var val = trimWhitespaceNodes ? nodes[i].nodeValue.trim() : nodes[i].nodeValue;
+        if(val) {
+          if(val.length >= pos) {
+            return nodes[i];
+          } else {
+            pos -= val.length;
+          }
+        }
+        var n = selectNode(nodes[i]);
+        if (n) return n;
+      }
+    }
+    return false;
+  }(node);
+  try {
+    range.setStart(node, pos);
+    range.setEnd(node, pos);
+    range.collapse(true);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  } catch (err) { }
+}
+
+window.selectIndex = null;
+var fallback = typeof window.getSelection === "undefined";
+ko.bindingHandlers.editableText = {
+  init: function(element, valueAccessor, allBindingsAccessor) {
+    $(element).on('keydown', function() {
+      setTimeout(function() {
+        var modelValue = valueAccessor();
+        var elementValue = $(element).text();
+        if (ko.isWriteableObservable(modelValue) && elementValue != modelValue()) {
+          if(!fallback)
+            window.selectIndex = getEditablePosition(element); //firefox does some tricky predictive stuff here
+          modelValue(elementValue);
+        }
+        else { //handle non-observable one-way binding
+            var allBindings = allBindingsAccessor();
+            if (allBindings['_ko_property_writers'] && allBindings['_ko_property_writers'].htmlValue) allBindings['_ko_property_writers'].htmlValue(elementValue);
+        }}, 1);
+      });
+  },
+  update: function(element, valueAccessor) {
+    var value = ko.utils.unwrapObservable(valueAccessor()) || "";
+    if(value.trim() == "" && !app.search.focused()) {
+      app.search.doBlur();
+    } else {
+      if(!fallback) {
+        element.innerHTML = app.search.render(value, searchRenderers);
+        if(window.selectIndex != null)
+        {
+          setCursor(element, window.selectIndex);
+        }
+      }
+    }
+  }
 };

@@ -20,8 +20,8 @@ var searchRenderers = {
      tag: /.+/g, //select the matches to wrap with tags
      strip: /,(?![^\[\]\:]+[^\]\[]+\])/g, //strip delimiters and post-process string to make nice
      nested: {
-       'scan': { select: /\+[0-9 ]+/g, tag: /.+/g, strip: /a^/g },
-        'columns': { select: /\[.+\]/g, tag: /[^:,\[\]]+:([^,\[\]]+|)/g, strip: /[\[\]]/g }, //forced to do this select due to lack of lookbehinds
+        'scan': { select: /\+[0-9 ]+/g, tag: /.+/g, strip: /a^/g },
+        'columns': { select: /\[.+\]/g, tag: /[^:,\[\]]+:([^,\[\]]+|)/g, strip: /a^/g }, //forced to do this select due to lack of lookbehinds /[\[\]]/g
         'prefix': { select: /[^\*]+\*/g, tag: /\*/g, strip: /a^/g }
      }
   }
@@ -675,7 +675,7 @@ var tagsearch = function()
         var processed = selected.replace(renderers[keys[i]].tag, function(tagged)
         {
           hasMatched = true;
-          return " <span class='" + keys[i] + " tagsearchTag' title='" + keys[i] + "' data-toggle='tooltip'>" + ('nested' in renderers[keys[i]] ? self.render(tagged, renderers[keys[i]].nested) : tagged).trim() + "</span> ";
+          return "<span class='" + keys[i] + " tagsearchTag' title='" + keys[i] + "' data-toggle='tooltip'>" + ('nested' in renderers[keys[i]] ? self.render(tagged, renderers[keys[i]].nested) : tagged) + "</span>";
         });
         if(hasMatched)
           processed = processed.replace(renderers[keys[i]].strip, '');
@@ -684,7 +684,6 @@ var tagsearch = function()
     }
     return input;
   };
-
 
   self.updateMode = function(value)
   {
@@ -720,15 +719,6 @@ var tagsearch = function()
   self.selectionStart = ko.observable(0);
   self.selectionEnd = ko.observable(0);
 
-  self.renderedValue = ko.computed(function()
-  {
-    var pre = self.cur_input();
-    var s = self.selectionStart(), e = self.selectionEnd();
-    var indicator = (self.focused()) ? '<i class="tagIndicator">|</i>' : '';
-    self.updateMode(self.cur_input());
-    return self.render(pre.slice(0, e) + indicator + pre.slice(e), searchRenderers);
-  });
-
   self.hintText = ko.computed(function()
   {
     var value = self.cur_input();
@@ -747,19 +737,48 @@ var tagsearch = function()
 
   self.onKeyDown = function(target, ev)
   {
-    self.selectionStart($('#tag-input')[0].selectionStart);
-    self.selectionEnd($('#tag-input')[0].selectionEnd);
     if(ev.keyCode == 13 && self.cur_input().slice(self.cur_input().lastIndexOf(',')).trim() != ",")
     {
         self.evaluate();
+        return false;
     }
+    setTimeout(self.updateMenu, 1);
     return true;
-  }
+  };
+
+  self.updateMenu = function() {
+    try{
+    	var pos = getEditablePosition(document.getElementById('search-tags'));
+	  	self.selectionStart(pos);
+	  	self.selectionEnd(pos);
+    } catch (err) {}
+	self.updateMode(self.cur_input());
+  };
 
   self.evaluate = function()
   {
     app.views.tabledata.searchQuery(self.cur_input());
+  };
+
+  $('#search-tags').blur(function(){
+  	self.focused(false);
+  });
+
+  self.doBlur = function() {
+  	if(self.cur_input().trim() == "") {
+  	  function doClick() {
+        $('#search-tags').html('');
+        setTimeout(function() {
+        	$('#search-tags').focus();
+        }, 1);
+      }
+      $('#search-tags').html('<small>' + $('#search-tags').data("placeholder") + '</small>').one('click', doClick).find('small').on('mousedown', doClick);
+    }
   }
+
+  $('#search-tags').focus(function(){
+  	self.focused(true);
+  });
 };
 
 var CellHistoryPage = function(options)
