@@ -257,9 +257,9 @@ class HiveServerClient:
     self.query_server = query_server
     self.user = user
 
-    use_sasl, mechanism, kerberos_principal_short_name, has_hiveserver2_impersonation = HiveServerClient.get_security(query_server)
+    use_sasl, mechanism, kerberos_principal_short_name, hiveserver2_impersonation_enabled = HiveServerClient.get_security(query_server)
 
-    self.has_hiveserver2_impersonation = has_hiveserver2_impersonation
+    self.hiveserver2_impersonation_enabled = hiveserver2_impersonation_enabled
     self._client = thrift_util.get_client(TCLIService.Client,
                                           query_server['server_host'],
                                           query_server['server_port'],
@@ -274,7 +274,7 @@ class HiveServerClient:
   @classmethod
   def get_security(cls, query_server):
     principal = query_server['principal']
-    has_hiveserver2_impersonation = False # Specific to HiveServer2 protocol only
+    hiveserver2_impersonation_enabled = False # Specific to HiveServer2 protocol only
 
     if query_server['server_name'] == 'impala':
       cluster_conf = cluster.get_cluster_conf_for_job_submission()
@@ -288,18 +288,18 @@ class HiveServerClient:
       mechanism = 'NOSASL'
       if use_sasl:
         mechanism = HiveServerClient.HS2_MECHANISMS[hive_mechanism]
-      has_hiveserver2_impersonation = hive_site.has_hiveserver2_impersonation()
+      hiveserver2_impersonation_enabled = hive_site.hiveserver2_impersonation_enabled()
 
     if principal:
       kerberos_principal_short_name = principal.split('/', 1)[0]
     else:
       kerberos_principal_short_name = None
 
-    return use_sasl, mechanism, kerberos_principal_short_name, has_hiveserver2_impersonation
+    return use_sasl, mechanism, kerberos_principal_short_name, hiveserver2_impersonation_enabled
 
 
   def open_session(self, user):
-    if self.has_hiveserver2_impersonation:
+    if self.hiveserver2_impersonation_enabled:
       kerberos_principal_short_name = KERBEROS.HUE_PRINCIPAL.get().split('/', 1)[0]
       kwargs = {'username': kerberos_principal_short_name, 'configuration': {'hive.server2.proxy.user': user.username}}
     else:
@@ -364,11 +364,7 @@ class HiveServerClient:
 
     results, schema = self.fetch_result(res.operationHandle)
 
-    if self.query_server['server_name'] == 'impala':
-      col = 'TABLE_SCHEM'
-    else:
-      col = 'TABLE_SCHEMA'
-
+    col = 'TABLE_SCHEM'
     return HiveServerTRowSet(results.results, schema.schema).cols((col,))
 
 
@@ -633,10 +629,7 @@ class HiveServerClientCompatible:
 
 
   def get_databases(self):
-    if self.query_server['server_name'] == 'impala':
-      col = 'TABLE_SCHEM'
-    else:
-      col = 'TABLE_SCHEMA'
+    col = 'TABLE_SCHEM'
     return [table[col] for table in self._client.get_databases()]
 
 
