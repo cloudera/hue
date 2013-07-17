@@ -239,6 +239,11 @@ var viewModel = new (function() {
     }
   });
 
+  self.job.subscribe(function() {
+    self.errors({});
+    self.warnings({});
+  });
+
   self.newConnection = function() {
     var self = this;
     if (!self.connection() || self.connection().persisted()) {

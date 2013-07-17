@@ -48,3 +48,28 @@ ko.bindingHandlers.routie = {
     });
   }
 };
+
+ko.bindingHandlers.editableText = {
+  init: function(element, valueAccessor) {
+    $(element).on('blur', function() {
+      var observable = valueAccessor();
+      observable( $(this).text() );
+    });
+  },
+  update: function(element, valueAccessor) {
+    var value = ko.utils.unwrapObservable(valueAccessor());
+    $(element).text(value);
+  }
+};
+
+//// JQuery Utils
+if (jQuery) {
+  jQuery.extend({
+    setdefault: function(obj, accessor, default_value) {
+      if (!(accessor in obj)) {
+        obj[accessor] = default_value;
+      }
+      return obj[accessor];
+    }
+  });
+}

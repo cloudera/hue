@@ -99,11 +99,6 @@ ${ commonheader(None, "sqoop", user, "60px") | n,unicode }
       <div class="well sidebar-nav span2">
         <form id="advanced-settings" method="POST" class="form form-horizontal noPadding">
           <ul class="nav nav-list">
-            <li>
-              <a data-placement="right" rel="tooltip" title="${_('Back to jobs list')}" href="#jobs">
-                <i class="icon-share-alt"></i> ${_('Back to jobs list')}
-              </a>
-            </li>
             <li class="nav-header" data-bind="visible: $root.job().persisted">${_('Actions')}</li>
             <li data-bind="visible: $root.job().persisted() && !$root.job().isRunning()">
               <a data-placement="right" rel="tooltip" title="${_('Run the job')}" href="#job/save-and-run">
@@ -125,38 +120,49 @@ ${ commonheader(None, "sqoop", user, "60px") | n,unicode }
                 <i class="icon-remove"></i> ${_('Delete')}
               </a>
             </li>
+            <li>&nbsp;</li>
+            <li>
+              <a data-placement="right" rel="tooltip" title="${_('Back to jobs list')}" href="#jobs">
+                <i class="icon-share-alt"></i> ${_('Back to jobs list')}
+              </a>
+            </li>
           </ul>
         </form>
       </div>
 
       <div id="job-forms" class="span10">
+        <!-- ko ifnot: $root.job().persisted -->
         <h3>${_('Create a job')}</h3>
-          <!-- ko if: $root.jobWizard.page -->
-            <!-- ko with: $root.jobWizard -->
-            <ul class="nav nav-pills" data-bind="foreach: pages">
-              <li data-bind="css: {'active': $parent.index() == $index()}">
-                <a href="javascript:void(0);" data-bind="routie: 'job/edit/wizard/' + identifier(), text: caption"></a>
-              </li>
-            </ul>
-            <form method="POST" class="form form-horizontal noPadding" data-bind="with: page">
-              <div data-bind="template: {'name': template(), 'data': node}">
-              </div>
+        <!-- /ko -->
+        <!-- ko if: $root.job().persisted -->
+        <h3>${_('Edit: ')} <span data-bind="editableText: $root.job().name" id="job-editor-name" contenteditable="true"></span>&nbsp;&nbsp;<i class="icon-pencil" style="font-size: 12px; vertical-align: middle;"></i></h3>
+        <!-- /ko -->
+        <!-- ko if: $root.jobWizard.page -->
+          <!-- ko with: $root.jobWizard -->
+          <ul class="nav nav-pills" data-bind="foreach: pages">
+            <li data-bind="css: {'active': $parent.index() == $index()}">
+              <a href="javascript:void(0);" data-bind="routie: 'job/edit/wizard/' + identifier(), text: caption"></a>
+            </li>
+          </ul>
+          <form method="POST" class="form form-horizontal noPadding" data-bind="with: page">
+            <div data-bind="template: {'name': template(), 'data': node}">
+            </div>
 
-              <div class="form-actions">
-                <!-- ko if: $parent.hasPrevious -->
-                <a class="btn" data-bind="routie: 'job/edit/wizard/' + $parent.previousIndex()">${_('Previous')}</a>
-                &nbsp;
-                <!-- /ko -->
-                <!-- ko if: $parent.hasNext -->
-                <a class="btn btn-primary" data-bind="routie: 'job/edit/wizard/' + $parent.nextIndex()">${_('Next')}</a>
-                <!-- /ko -->
-                <!-- ko ifnot: $parent.hasNext -->
-                <a class="btn btn-primary" href="#job/save">${_('Save')}</a>
-                <!-- /ko -->
-              </div>
-            </form>
-            <!-- /ko -->
+            <div class="form-actions">
+              <!-- ko if: $parent.hasPrevious -->
+              <a class="btn" data-bind="routie: 'job/edit/wizard/' + $parent.previousIndex()">${_('Previous')}</a>
+              &nbsp;
+              <!-- /ko -->
+              <!-- ko if: $parent.hasNext -->
+              <a class="btn btn-primary" data-bind="routie: 'job/edit/wizard/' + $parent.nextIndex()">${_('Next')}</a>
+              <!-- /ko -->
+              <!-- ko ifnot: $parent.hasNext -->
+              <a class="btn btn-primary" href="#job/save">${_('Save')}</a>
+              <!-- /ko -->
+            </div>
+          </form>
           <!-- /ko -->
+        <!-- /ko -->
       </div>
     </div>
 
@@ -240,14 +246,51 @@ ${ commonheader(None, "sqoop", user, "60px") | n,unicode }
 </div>
 
 
-<script type="text/html" id="job-editor-type-and-connection">
-<fieldset style="width: 500px;">
+<script type="text/html" id="job-editor-form-error">
+<!-- ko if: name() in $root.errors() -->
+  <div class="alert alert-error">
+  <!-- ko foreach: $root.errors()[name()]  -->
+    <span data-bind="text: message"></span>
+  <!-- /ko -->
+  </div>
+<!-- /ko -->
+<!-- ko if: name() in $root.warnings() -->
+  <div class="alert">
+  <!-- ko foreach: $root.warnings()[name()]  -->
+    <span data-bind="text: message"></span>
+  <!-- /ko -->
+  </div>
+<!-- /ko -->
+</script>
+
+<script type="text/html" id="job-editor-form-field-error">
+<!-- ko if: name() in $root.errors() -->
+  <!-- ko foreach: $root.errors()[name()]  -->
+    <span data-bind="text: message" class="help-inline"></span>
+  <!-- /ko -->
+<!-- /ko -->
+<!-- ko if: name() in $root.warnings() -->
+  <!-- ko foreach: $root.warnings()[name()]  -->
+    <span data-bind="text: message" class="help-inline"></span>
+  <!-- /ko -->
+<!-- /ko -->
+</script>
+
+<script type="text/html" id="job-editor-begin">
+<fieldset>
+  <div class="control-group">
+    <label class="control-label">${ _('Name') }</label>
+    <div class="controls">
+      <input type="text" name="connection-name" data-bind="value: name">
+    </div>
+  </div>
+
   <div class="control-group">
     <label class="control-label">${ _('Select job type') }</label>
     <div class="controls">
       <select data-bind="'options': ['IMPORT', 'EXPORT'], 'value': type"
               name="type"
-              class="span12"></select>
+              class="span3"></select>
     </div>
   </div>
 
@@ -260,8 +303,8 @@ ${ commonheader(None, "sqoop", user, "60px") | n,unicode }
                          },
                          'value': $root.connection"
               name="connection"
-              class="span8"></select>
-      <div class="pull-right span4">
+              class="span3"></select>
+      <div class="pull-right span9">
         <a data-bind="routie: 'connection/new'" href="javascript:void(0);">
           <i class="icon-plus">&nbsp;</i>
         </a>
@@ -279,15 +322,11 @@ ${ commonheader(None, "sqoop", user, "60px") | n,unicode }
 </fieldset>
 </script>
 
-<script type="text/html" id="job-editor-name-and-connector">
-<div class="control-group">
-  <label class="control-label">${ _('Name') }</label>
-  <div class="controls">
-    <input type="text" name="connection-name" data-bind="value: name">
-  </div>
-</div>
-
+<script type="text/html" id="job-editor-connector">
 <fieldset data-bind="foreach: connector">
+  <div data-bind="template: {
+                    'name': 'job-editor-form-error'
+                  }" class=""></div>
   <div data-bind="foreach: inputs">
     <div data-bind="template: 'connector-' + type().toLowerCase()"></div>
   </div>
@@ -296,6 +335,9 @@ ${ commonheader(None, "sqoop", user, "60px") | n,unicode }
 
 <script type="text/html" id="job-editor-framework">
 <fieldset data-bind="foreach: framework">
+  <div data-bind="template: {
+                    'name': 'job-editor-form-error'
+                  }" class=""></div>
   <div data-bind="foreach: inputs">
     <div data-bind="template: 'framework-' + type().toLowerCase()"></div>
   </div>
@@ -316,16 +358,9 @@ ${ commonheader(None, "sqoop", user, "60px") | n,unicode }
                          'name': name,
                          'title': $root.help('framework', name())
                         }" rel="tooltip">
-    <!-- ko if: name() in $root.errors() -->
-      <!-- ko foreach: $root.errors()[name()]  -->
-        <span data-bind="text: message" class="help-inline"></span>
-      <!-- /ko -->
-    <!-- /ko -->
-    <!-- ko if: name() in $root.warnings() -->
-      <!-- ko foreach: $root.warnings()[name()]  -->
-        <span data-bind="text: message" class="help-inline"></span>
-      <!-- /ko -->
-    <!-- /ko -->
+    <span data-bind="template: {
+                       'name': 'job-editor-form-field-error'
+                     }" class="help-inline"></span>
   </div>
 </div>
 </script>
@@ -345,16 +380,9 @@ ${ commonheader(None, "sqoop", user, "60px") | n,unicode }
                         'name': name,
                         'title': $root.help('framework', name())
                       }" rel="tooltip">
-    <!-- ko if: name() in $root.errors() -->
-      <!-- ko foreach: $root.errors()[name()]  -->
-        <span data-bind="text: message" class="help-inline"></span>
-      <!-- /ko -->
-    <!-- /ko -->
-    <!-- ko if: name() in $root.warnings() -->
-      <!-- ko foreach: $root.warnings()[name()]  -->
-        <span data-bind="text: message" class="help-inline"></span>
-      <!-- /ko -->
-    <!-- /ko -->
+    <span data-bind="template: {
+                       'name': 'job-editor-form-field-error'
+                     }" class="help-inline"></span>
   </div>
 </div>
 </script>
@@ -375,16 +403,9 @@ ${ commonheader(None, "sqoop", user, "60px") | n,unicode }
                         'name': name,
                         'title': $root.help('framework', name())
                       }" rel="tooltip">
-    <!-- ko if: name() in $root.errors() -->
-      <!-- ko foreach: $root.errors()[name()]  -->
-        <span data-bind="text: message" class="help-inline"></span>
-      <!-- /ko -->
-    <!-- /ko -->
-    <!-- ko if: name() in $root.warnings() -->
-      <!-- ko foreach: $root.warnings()[name()]  -->
-        <span data-bind="text: message" class="help-inline"></span>
-      <!-- /ko -->
-    <!-- /ko -->
+    <span data-bind="template: {
+                       'name': 'job-editor-form-field-error'
+                     }" class="help-inline"></span>
   </div>
 </div>
 </script>
@@ -404,16 +425,9 @@ ${ commonheader(None, "sqoop", user, "60px") | n,unicode }
                         'type': (sensitive() ? 'password' : 'text'), 'name': name,
                         'title': $root.help('framework', name())
                       }" rel="tooltip">
-    <!-- ko if: name() in $root.errors() -->
-      <!-- ko foreach: $root.errors()[name()]  -->
-        <span data-bind="text: message" class="help-inline"></span>
-      <!-- /ko -->
-    <!-- /ko -->
-    <!-- ko if: name() in $root.warnings() -->
-      <!-- ko foreach: $root.warnings()[name()]  -->
-        <span data-bind="text: message" class="help-inline"></span>
-      <!-- /ko -->
-    <!-- /ko -->
+    <span data-bind="template: {
+                       'name': 'job-editor-form-field-error'
+                     }" class="help-inline"></span>
   </div>
 </div>
 </script>
@@ -435,16 +449,9 @@ ${ commonheader(None, "sqoop", user, "60px") | n,unicode }
                         'name': name,
                         'title': $root.help('connector', name())
                        }" rel="tooltip">
-    <!-- ko if: name() in $root.errors() -->
-      <!-- ko foreach: $root.errors()[name()]  -->
-        <span data-bind="text: message" class="help-inline"></span>
-      <!-- /ko -->
-    <!-- /ko -->
-    <!-- ko if: name() in $root.warnings() -->
-      <!-- ko foreach: $root.warnings()[name()]  -->
-        <span data-bind="text: message" class="help-inline"></span>
-      <!-- /ko -->
-    <!-- /ko -->
+    <span data-bind="template: {
+                       'name': 'job-editor-form-field-error'
+                     }" class="help-inline"></span>
   </div>
 </div>
 </script>
@@ -465,16 +472,9 @@ ${ commonheader(None, "sqoop", user, "60px") | n,unicode }
                         'name': name,
                         'title': $root.help('connector', name())
                       }" rel="tooltip">
-    <!-- ko if: name() in $root.errors() -->
-      <!-- ko foreach: $root.errors()[name()]  -->
-        <span data-bind="text: message" class="help-inline"></span>
-      <!-- /ko -->
-    <!-- /ko -->
-    <!-- ko if: name() in $root.warnings() -->
-      <!-- ko foreach: $root.warnings()[name()]  -->
-        <span data-bind="text: message" class="help-inline"></span>
-      <!-- /ko -->
-    <!-- /ko -->
+    <span data-bind="template: {
+                       'name': 'job-editor-form-field-error'
+                     }" class="help-inline"></span>
   </div>
 </div>
 </script>
@@ -495,16 +495,9 @@ ${ commonheader(None, "sqoop", user, "60px") | n,unicode }
                         'name': name,
                         'title': $root.help('connector', name())
                       }" rel="tooltip">
-    <!-- ko if: name() in $root.errors() -->
-      <!-- ko foreach: $root.errors()[name()]  -->
-        <span data-bind="text: message" class="help-inline"></span>
-      <!-- /ko -->
-    <!-- /ko -->
-    <!-- ko if: name() in $root.warnings() -->
-      <!-- ko foreach: $root.warnings()[name()]  -->
-        <span data-bind="text: message" class="help-inline"></span>
-      <!-- /ko -->
-    <!-- /ko -->
+    <span data-bind="template: {
+                       'name': 'job-editor-form-field-error'
+                     }" class="help-inline"></span>
   </div>
 </div>
 </script>
@@ -525,16 +518,9 @@ ${ commonheader(None, "sqoop", user, "60px") | n,unicode }
                         'name': name,
                         'title': $root.help('connector', name())
                       }" rel="tooltip">
-    <!-- ko if: name() in $root.errors() -->
-      <!-- ko foreach: $root.errors()[name()]  -->
-        <span data-bind="text: message" class="help-inline"></span>
-      <!-- /ko -->
-    <!-- /ko -->
-    <!-- ko if: name() in $root.warnings() -->
-      <!-- ko foreach: $root.warnings()[name()]  -->
-        <span data-bind="text: message" class="help-inline"></span>
-      <!-- /ko -->
-    <!-- /ko -->
+    <span data-bind="template: {
+                       'name': 'job-editor-form-field-error'
+                     }" class="help-inline"></span>
   </div>
 </div>
 </script>
@@ -565,10 +551,10 @@ viewModel.job.subscribe(function(job) {
     viewModel.jobWizard.clearPages();
     if (job.persisted()) {
       viewModel.jobWizard.addPage(new wizard.Page({
-        'identifier': 'job-editor-name-and-connector',
+        'identifier': 'job-editor-connector',
         'caption': '${_("Step 1: Job info")}',
         'node': job,
-        'template': 'job-editor-name-and-connector',
+        'template': 'job-editor-connector',
       }));
       viewModel.jobWizard.addPage(new wizard.Page({
         'identifier': 'job-editor-framework',
@@ -578,16 +564,16 @@ viewModel.job.subscribe(function(job) {
       }));
     } else {
       viewModel.jobWizard.addPage(new wizard.Page({
-        'identifier': 'job-editor-type-and-connection',
+        'identifier': 'job-editor-begin',
         'caption': '${_("Step 1: Manage connections")}',
         'node': job,
-        'template': 'job-editor-type-and-connection',
+        'template': 'job-editor-begin',
       }));
       viewModel.jobWizard.addPage(new wizard.Page({
-        'identifier': 'job-editor-name-and-connector',
+        'identifier': 'job-editor-connector',
         'caption': '${_("Step 2: Job info")}',
         'node': job,
-        'template': 'job-editor-name-and-connector',
+        'template': 'job-editor-connector',
       }));
       viewModel.jobWizard.addPage(new wizard.Page({
         'identifier': 'job-editor-framework',
@@ -617,28 +603,24 @@ function handle_form_errors(e, node, options, data) {
     case 100:
     $.each(errors, function(component, dict) {
       $.each(dict['messages'], function(resource, message_dict) {
-        var name = '*[name="' + resource + '"]';
-        var el = $(name);
-        if (el.length > 0) {
-          var err_node = ko.dataFor(el[0]);
-          switch(message_dict.status) {
-            case 'ACCEPTABLE':
-            if (!(resource in viewModel.errors())) {
-              viewModel.warnings()[resource] = [];
-            }
-            viewModel.warnings()[resource].push(message_dict);
-            err_node.name.valueHasMutated();
-            break;
+        var el = $('*[name="' + resource + '"]');
+        var has_error = false;
 
-            default:
-            case 'UNACCEPTABLE':
-            if (!(resource in viewModel.errors())) {
-              viewModel.errors()[resource] = [];
-            }
-            viewModel.errors()[resource].push(message_dict);
-            err_node.name.valueHasMutated();
-            break;
-          }
+        switch(message_dict.status) {
+          case 'ACCEPTABLE':
+          $.setdefault(viewModel.warnings(), resource, []).push(message_dict);
+          has_error = true;
+          break;
+
+          default:
+          case 'UNACCEPTABLE':
+          $.setdefault(viewModel.errors(), resource, []).push(message_dict);
+          has_error = true;
+          break;
+        }
+
+        if (has_error && el.length > 0) {
+          ko.dataFor(el[0]).name.valueHasMutated();
         }
       });
     });
