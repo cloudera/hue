@@ -120,6 +120,12 @@ ${ commonheader(None, "sqoop", user, "60px") | n,unicode }
                 <i class="icon-remove"></i> ${_('Delete')}
               </a>
             </li>
+            <li class="nav-header" data-bind="visible: $root.job().persisted">${_('Submissions')}</li>
+            <li data-bind="visible: $root.job().persisted()">
+              <a data-bind="attr: { 'href': $root.job().outputDirectoryFilebrowserURL }" data-placement="right" rel="tooltip" title="${_('Output directory')}" href="javascript:void(0);" target="_new">
+                <i class="icon-folder-open"></i> ${_('Output directory')}
+              </a>
+            </li>
             <li>&nbsp;</li>
             <li>
               <a data-placement="right" rel="tooltip" title="${_('Back to jobs list')}" href="#jobs">
