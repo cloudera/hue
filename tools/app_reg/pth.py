@@ -140,6 +140,9 @@ class PthFile(object):
       LOG.info('=== Removed symbolic link at %s' % (self._symlink_path))
 
     if not os.path.islink(self._symlink_path):
+      if os.path.exists(self._symlink_path):
+        raise RuntimeError("Path %s already exists and is not a symbolic link." % self._symlink_path)
+
       LOG.info('=== Creating symbolic link at %s to %s' % (self._symlink_path, rel_symlink_path))
       os.symlink(rel_symlink_path, self._symlink_path)
       LOG.info('=== Created symbolic link at %s to %s' % (self._symlink_path, rel_symlink_path))
