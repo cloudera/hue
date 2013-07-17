@@ -188,7 +188,7 @@ class OozieApi:
   def _make_links(cls, log):
     escaped_logs = escape(log)
     hdfs_links = re.sub('((?<= |;)/|hdfs://)[^ <&\t;,\n]+', OozieApi._make_hdfs_link, escaped_logs)
-    return re.sub('job_[a-z0-9_]*', OozieApi._make_mr_link, hdfs_links)
+    return re.sub('(job_[0-9_]+(/|\.)?)', OozieApi._make_mr_link, hdfs_links)
 
   @classmethod
   def _make_hdfs_link(self, match):
