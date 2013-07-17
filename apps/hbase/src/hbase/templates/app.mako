@@ -198,11 +198,10 @@ ${ commonheader(None, "hbase", user) | n,unicode }
     <div class="subnav sticky">
       <div class="container-fluid">
         <div class="row-fluid">
-          <div class="span6">
-            <div id="searchbar-main" class="span10" data-bind="click: function(){search.focused(true)}">
+            <div id="searchbar-main" class="span4" data-bind="click: function(){search.focused(true)}">
               <div id="search-tags" data-bind="html: search.renderedValue()">
               </div>
-              <input id="tag-input" class="tag-searchbar" type="text" autocomplete="off" placeholder="${_('row_key1, row_key2 + scan_length, row[ cf:column ], [ cf:col1 cf:col2 ]')}" data-bind="event: { keydown: search.onKeyDown, keyup: search.onKeyDown, change: search.onKeyDown }, value: search.cur_input, valueUpdate: 'afterkeydown', click: function(){$($element).attr('placeholder','').addClass('active')}, hasfocus: search.focused, css: { 'active': search.cur_input() != '' }">
+              <input id="tag-input" class="tag-searchbar" type="text" autocomplete="off" placeholder="${_('row_key1, row_key2 + scan_length, row[ cf:column ], [ cf:col1 cf:col2 ]')}" title="${_('ie: row_key1, row_key2 + scan_length, row[ cf:column ], [ cf:col1 cf:col2 ]')}" data-bind="event: { keydown: search.onKeyDown, keyup: search.onKeyDown, change: search.onKeyDown }, value: search.cur_input, valueUpdate: 'afterkeydown', click: function(){$($element).attr('placeholder','').addClass('active')}, hasfocus: search.focused, css: { 'active': search.cur_input() != '' }">
             </div>
             <ul id="search-typeahead" data-bind="visible: search.focused()">
               <!-- ko if: search.mode() != 'idle' -->
@@ -217,8 +216,6 @@ ${ commonheader(None, "hbase", user) | n,unicode }
               <span class="label" data-bind="text: $data.name, style: {'backgroundColor': ($data.enabled()) ? stringHashColor($data.name.split(':')[0]) : '#ccc' ,'cursor':'pointer'}, click: $data.toggle"></span>
             <!-- /ko -->
            </span>
-          </div>
-          <div class="span6">
             <span class="pull-right">
               <input type="text" placeholder="Filter Columns/Families" style="margin-left: 5px;" data-bind="value: app.views.tabledata.columnQuery, clickBubble: false"/>
               <button class="btn" data-bind="click: views.tabledata.toggleSelectAll" style="margin-left: 5px;" data-toggle="tooltip" title="${_('Toggle Select All Rows')}"><i class="icon-check-sign"></i> ${_('All')}</button>
@@ -231,7 +228,6 @@ ${ commonheader(None, "hbase", user) | n,unicode }
                 <button class="btn" data-bind="enable: views.tabledata.items()[0].selected().length > 0, click: views.tabledata.items()[0].dropSelected, clickBubble: false"><i class="icon-trash"></i> ${_('Drop Columns')}</button>
               % endif
             </span>
-          </div>
         </div>
       </div>
     </div>
