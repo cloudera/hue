@@ -36,6 +36,7 @@ function showMainSection(mainSection) {
 
 function showSection(mainSection, section) {
   showMainSection(mainSection);
+  $(document).trigger('show_section', section);
   if ($("#" + section).is(":hidden")) {
     $(".section").hide();
     $("#" + section).show();
@@ -91,6 +92,7 @@ var viewModel = new (function() {
   self.connection = ko.observable();
   self.editConnection = ko.observable();
   self.filter = ko.observable("");
+  self.shownSection = ko.observable("");
   self.isDirty = ko.observable(false);
   // Must always have a value.
   self.connector = ko.computed(function() {
@@ -274,10 +276,11 @@ var viewModel = new (function() {
     });
   };
 
-  self.newJob = function() {
+  self.newJob = function(defaultName) {
     var self = this;
     if (!self.job() || self.job().persisted()) {
       var job = create_job();
+      job.name = defaultName;
       self.jobs.push(job);
       self.deselectAllJobs();
       job.selected(true);
