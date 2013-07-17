@@ -82,7 +82,7 @@ var jobs = (function($) {
               }
 
               self.getStatus();
-            }, 1000);
+            }, 2000);
           }
 
           self.id.valueHasMutated();

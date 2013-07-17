@@ -20,71 +20,81 @@
 
 <%namespace name="actionbar" file="actionbar.mako" />
 
-${ commonheader(None, "sqoop", user, "60px") | n,unicode }
+${ commonheader(None, "sqoop", user, "40px") | n,unicode }
+
+<div class="top-bar" data-bind="visible:shownSection() == 'jobs-list'">
+  <div style="margin-top: 4px; margin-right: 20px" class="pull-right">
+    <a title="${_('Create a new job')}" href="#job/new"><i class="icon-plus-sign"></i> ${_('New job')}</a>
+  </div>
+  <h4>${_('Sqoop Jobs')}</h4>
+  <input id="filter" type="text" class="input-xlarge search-query" placeholder="${_('Search for job name or content')}"  data-bind="visible: !isLoading()">
+</div>
+
+<div class="top-bar" data-bind="visible:shownSection() == 'job-editor', with: job">
+  <!-- ko ifnot: $root.job().persisted -->
+  <h4><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> ${_('New Job')}</h4>
+  <!-- /ko -->
+  <!-- ko if: $root.job().persisted -->
+  <h4><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> <span data-bind="editableText: $root.job().name" id="job-editor-name" contenteditable="true"></span></h4>
+  <!-- /ko -->
+</div>
+
+<div class="top-bar" data-bind="visible:shownSection() == 'connection-editor', with: editConnection">
+  <!-- ko ifnot: persisted -->
+  <h4><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> <a href="#connection/edit-cancel" data-bind="text: $root.job().name"></a> <span class="muted">/</span> ${_('New Connection')}</h4>
+  <!-- /ko -->
+  <!-- ko if: persisted -->
+  <h4><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> <a href="#connection/edit-cancel" data-bind="text: $root.job().name"></a> <span class="muted">/</span> <span data-bind="text: name"></span></h4>
+  <!-- /ko -->
+</div>
 
 <div class="container-fluid">
   <div id="sqoop-error" class="row-fluid mainSection hide">
-    <h2>${_('Sqoop error')}</h2>
-    <div class="error message well"></div>
+    <div class="alert alert-error"><i class="icon-warning-sign"></i> <strong>${_('Sqoop error')}:</strong> <span class="message"></span></div>
   </div>
 
   <div id="jobs" class="row-fluid mainSection hide">
     <div id="jobs-list" class="row-fluid section hide">
       <div class="row-fluid" data-bind="if: !isLoading()">
-        <%actionbar:render>
-          <%def name="search()">
-            <input id="filter" type="text" class="input-xlarge search-query" placeholder="${_('Search for job name or content')}">
-          </%def>
-
-          <%def name="actionbar()"></%def>
-
-          <%def name="creation()">
-            <a class="btn fileToolbarBtn" title="${_('Create a new job')}" href="#job/new"><i class="icon-plus-sign"></i> ${_('New job')}</a>
-          </%def>
-        </%actionbar:render>
-
         <!-- ko if: filteredJobs().length > 0 -->
         <ul class="major-list" data-bind="foreach: filteredJobs">
           <!-- ko if: submission() -->
           <li data-bind="routie: 'job/edit/' + id()" title="${ _('Click to edit') }">
-            <div class="pull-right" style="padding-top: 5px">
-              <a data-bind="visible: $.inArray(submission().status(), ['BOOTING', 'RUNNING']) > -1, routie: 'job/stop/' + id()"><i class="icon-stop"></i> ${_('Stop')}</a> &nbsp;
-              <a data-bind="visible: $.inArray(submission().status(), ['BOOTING', 'RUNNING']) == -1, routie: 'job/run/' + id()"><i class="icon-play"></i> ${_('Run')}</a> &nbsp;
-              <a data-bind="routie: 'job/copy/' + id()"><i class="icon-copy"></i> ${_('Copy')}</a> &nbsp;
-              <a data-bind="visible: $.inArray(submission().status(), ['BOOTING', 'RUNNING']) == -1, routie: 'job/delete/' + id()"><i class="icon-remove"></i> ${_('Delete')}</a>
+            <div class="pull-right">
+              <span class="label label-success" data-bind="visible: submission().status() == 'SUCCEEDED'">
+                <span data-bind="text: ('${_('Last run: ')}' + submission().createdFormatted()), routie: 'job/status/' + id()"></span>
+              </span>
+              <span class="label label-warning" data-bind="visible: $.inArray(submission().status(), ['BOOTING', 'RUNNING', 'UNKNOWN']) > -1">
+                <span data-bind="text: submission().status, routie: 'job/status/' + id()"></span>
+              </span>
+              <span class="label label-error" style="display: inline-block" data-bind="visible: $.inArray(submission().status(), ['FAILURE_ON_SUBMIT', 'FAILED']) > -1">
+                <span data-bind="text: ('${_('Last run: ')}' + submission().createdFormatted()), routie: 'job/status/' + id()"></span>
+              </span>
             </div>
-            <h4 style="display: inline-block">
-              <i class="icon-list"></i> <span data-bind="text: name"></span>
-            </h4>
-            &nbsp;
-            <span class="label label-success" data-bind="visible: $.inArray(submission().status(), ['BOOTING', 'RUNNING', 'SUCCEEDED']) > -1">
-              <span data-bind="visible: submission().status() != 'SUCCEEDED', text: submission().status, routie: 'job/status/' + id()"></span>
-              <span data-bind="visible: submission().status() == 'SUCCEEDED', text: submission().createdFormatted, routie: 'job/status/' + id()"></span>
-            </span>
-            <span class="label label-warning" style="display: inline-block" data-bind="visible: $.inArray(submission().status(), ['FAILURE_ON_SUBMIT', 'FAILED', 'UNKNOWN']) > -1">
-              <span data-bind="visible: submission().status() == 'UNKNOWN', text: submission().status"></span>
-              <span data-bind="visible: submission().status() != 'UNKNOWN', text: submission().createdFormatted, routie: 'job/status/' + id()"></span>
-            </span>
+            <div class="main">
+              <h4 style="display: inline-block">
+                <i data-bind="css:{'icon-download-alt': type() == 'IMPORT', 'icon-upload-alt': type() == 'EXPORT'}"></i> &nbsp;<span data-bind="text: type"></span> <span class="muted" data-bind="text: name"></span>
+              </h4>
+            </div>
+            <div class="sqoop-progress" data-bind="style:{ width: submission().progressFormatted() }"></div>
           </li>
           <!-- /ko -->
 
           <!-- ko ifnot: submission() -->
           <li data-bind="routie: 'job/edit/' + id()" title="${ _('Click to edit') }">
-            <div class="pull-right" style="padding-top: 5px">
-              <a data-bind="routie: 'job/run/' + id()"><i class="icon-play"></i> ${_('Run')}</a> &nbsp;
-              <a data-bind="routie: 'job/copy/' + id()"><i class="icon-copy"></i> ${_('Copy')}</a> &nbsp;
-              <a data-bind="routie: 'job/delete/' + id()"><i class="icon-remove"></i> ${_('Delete')}</a>
+            <div class="main">
+              <h4 style="display: inline-block">
+                <i class="icon-list"></i> <span data-bind="text: name"></span>
+              </h4>
             </div>
-            <h4 style="display: inline-block">
-              <i class="icon-list"></i> <span data-bind="text: name"></span>
-            </h4>
           </li>
           <!-- /ko -->
         </ul>
         <!-- /ko -->
 
         <div class="span10 offset1 center" data-bind="if: filteredJobs().length == 0">
-          <h1 class="emptyMessage">${ _('There are currently no jobs.') }<br/>${ _('Please click on "New Job" to add one.') }</h1>
+          <i class="icon-plus-sign waiting"></i>
+          <h1 class="emptyMessage">${ _('There are currently no jobs.') }<br/>${ _('Please click on New Job to add one.') }</h1>
         </div>
       </div>
 
@@ -96,14 +106,9 @@ ${ commonheader(None, "sqoop", user, "60px") | n,unicode }
     </div>
 
     <div id="job-editor" class="row-fluid section hide" data-bind="with: job">
-      <div class="well sidebar-nav span2">
+      <div class="well sidebar-nav span2" data-bind="visible: $root.job().persisted">
         <form id="advanced-settings" method="POST" class="form form-horizontal noPadding">
           <ul class="nav nav-list">
-            <li>
-              <a data-placement="right" rel="tooltip" title="${_('Back to jobs list')}" href="#jobs">
-                <i class="icon-reorder"></i> ${_('Dashboard')}
-              </a>
-            </li>
             <li class="nav-header" data-bind="visible: $root.job().persisted">${_('Actions')}</li>
             <li data-bind="visible: $root.job().persisted() && !$root.job().isRunning()">
               <a data-placement="right" rel="tooltip" title="${_('Run the job')}" href="#job/save-and-run">
@@ -127,21 +132,32 @@ ${ commonheader(None, "sqoop", user, "60px") | n,unicode }
             </li>
             <li class="nav-header" data-bind="visible: $root.job().persisted">${_('Submissions')}</li>
             <li data-bind="visible: $root.job().persisted()">
-              <a data-bind="attr: { 'href': $root.job().outputDirectoryFilebrowserURL }" data-placement="right" rel="tooltip" title="${_('Output directory')}" href="javascript:void(0);" target="_new">
+              <a data-bind="attr: { 'href': $root.job().outputDirectoryFilebrowserURL }" data-placement="right" rel="tooltip" title="${_('Browse output directory')}" href="javascript:void(0);" target="_new">
                 <i class="icon-folder-open"></i> ${_('Output directory')}
               </a>
+            </li>
+            <li class="nav-header" data-bind="visible: $root.job().persisted">${_('Last status')}</li>
+            <li data-bind="visible: $root.job().persisted">
+              <span class="label label-success" data-bind="visible: submission().status() == 'SUCCEEDED'">
+                <span data-bind="text:  submission().createdFormatted(), routie: 'job/status/' + id()"></span>
+              </span>
+              <span class="label label-warning" data-bind="visible: $.inArray(submission().status(), ['BOOTING', 'RUNNING', 'UNKNOWN']) > -1">
+                <span data-bind="text: submission().status, routie: 'job/status/' + id()"></span>
+              </span>
+              <span class="label label-error" style="display: inline-block" data-bind="visible: $.inArray(submission().status(), ['FAILURE_ON_SUBMIT', 'FAILED']) > -1">
+                <span data-bind="text: submission().createdFormatted(), routie: 'job/status/' + id()"></span>
+              </span>
+            </li>
+            <li data-bind="visible: $root.job().isRunning()">
+              <div class="progress progress-striped active" style="margin-top: 10px">
+                <div class="bar bar-warning" data-bind="style:{ width: submission().progressFormatted() }"></div>
+              </div>
             </li>
           </ul>
         </form>
       </div>
 
-      <div id="job-forms" class="span10">
-        <!-- ko ifnot: $root.job().persisted -->
-        <h3>${_('Create a job')}</h3>
-        <!-- /ko -->
-        <!-- ko if: $root.job().persisted -->
-        <h3>${_('Edit: ')} <span data-bind="editableText: $root.job().name" id="job-editor-name" contenteditable="true"></span>&nbsp;&nbsp;<i class="icon-pencil" style="font-size: 12px; vertical-align: middle;"></i></h3>
-        <!-- /ko -->
+      <div id="job-forms" data-bind="css: { span10: $root.job().persisted, span12: !$root.job().persisted}">
         <!-- ko if: $root.jobWizard.page -->
           <!-- ko with: $root.jobWizard -->
           <ul class="nav nav-pills" data-bind="foreach: pages">
@@ -150,12 +166,13 @@ ${ commonheader(None, "sqoop", user, "60px") | n,unicode }
             </li>
           </ul>
           <form method="POST" class="form form-horizontal noPadding" data-bind="with: page">
-            <div data-bind="template: {'name': template(), 'data': node}">
+            <div class="job-form" data-bind="template: {'name': template(), 'data': node}">
             </div>
 
-            <div class="form-actions">
+            <div class="form-actions row-fluid">
+              <div data-bind="css: { span10: $root.job().persisted, offset2: $root.job().persisted, span12: !$root.job().persisted}">
               <!-- ko if: $parent.hasPrevious -->
-              <a class="btn" data-bind="routie: 'job/edit/wizard/' + $parent.previousIndex()">${_('Previous')}</a>
+              <a class="btn" data-bind="routie: 'job/edit/wizard/' + $parent.previousIndex()">${_('Back')}</a>
               &nbsp;
               <!-- /ko -->
               <!-- ko if: $parent.hasNext -->
@@ -166,6 +183,7 @@ ${ commonheader(None, "sqoop", user, "60px") | n,unicode }
               &nbsp;
               <a class="btn btn-primary" href="#job/save-and-run">${_('Save and run')}</a>
               <!-- /ko -->
+              </div>
             </div>
           </form>
           <!-- /ko -->
@@ -174,36 +192,20 @@ ${ commonheader(None, "sqoop", user, "60px") | n,unicode }
     </div>
 
     <div id="connection-editor" class="row-fluid section hide" data-bind="with: editConnection">
-      <div class="well sidebar-nav span2">
-        <form id="advanced-settings" method="POST" class="form form-horizontal noPadding">
-          <ul class="nav nav-list">
-            <li class="nav-header">${_('Connector')}</li>
-            <li data-bind="if: !persisted()">
-              <select name="connector"
-                      data-bind="'options': $root.connectors,
-                                 'optionsText': function(item) {
-                                   return item.name();
-                                 },
-                                 'optionsValue': function(item) {
-                                   return item.id();
-                                 },
-                                 'value': connector_id"
-                      class="span12"></select>
-            </li>
-            <li>&nbsp;</li>
-            <li><a href="#connection/edit-cancel">${_('Back to job')}</a></li>
-          </ul>
-        </form>
-      </div>
-
-      <div id="connection-forms" class="span10">
-        <h3>${_('Create a connection')}</h3>
+      <div id="connection-forms" class="span12">
         <form method="POST" class="form form-horizontal noPadding">
           <div class="control-group">
             <label class="control-label">${ _('Name') }</label>
             <div class="controls">
               <input type="text" name="connection-name" data-bind="value: name">
             </div>
+          </div>
+          <div class="control-group" data-bind="visible: !persisted()">
+            <label class="control-label">${ _('Connector') }</label>
+            <div class="controls">
+              <select class="input-xlarge" name="connector" data-bind="'options': $root.connectors, 'optionsText': function(item) { return item.name(); }, 'optionsValue': function(item) { return item.id(); }, 'value': connector_id">
+              </select>
+              </div>
           </div>
           <fieldset data-bind="foreach: connector">
             <div data-bind="foreach: inputs">
@@ -215,8 +217,10 @@ ${ commonheader(None, "sqoop", user, "60px") | n,unicode }
               <div data-bind="template: 'framework-' + type().toLowerCase()"></div>
             </div>
           </fieldset>
-          <a href="#connection/edit-cancel" class="btn">${_('Cancel')}</a>
-          <a href="#connection/save" class="btn btn-primary">${_('Save')}</a>
+          <div class="form-actions">
+            <a href="#connection/edit-cancel" class="btn">${_('Cancel and return to job')}</a>
+            <a href="#connection/save" class="btn btn-primary">${_('Save')}</a>
+          </div>
         </form>
       </div>
     </div>
@@ -241,13 +245,6 @@ ${ commonheader(None, "sqoop", user, "60px") | n,unicode }
         </form>
       </div>
 
-      <div class="span10">
-        <div class="progress center" data-bind="if: submission()">
-          <div class="bar center" data-bind="style: {width: submission().progressFormatted, height: '100%'}, text: submission().progressFormatted">
-            
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </div>
@@ -295,35 +292,29 @@ ${ commonheader(None, "sqoop", user, "60px") | n,unicode }
   <div class="control-group">
     <label class="control-label">${ _('Select job type') }</label>
     <div class="controls">
-      <select data-bind="'options': ['IMPORT', 'EXPORT'], 'value': type"
-              name="type"
-              class="span3"></select>
+      <select name="type" class="input-xlarge" data-bind="'options': ['IMPORT', 'EXPORT'], 'value': type"></select>
     </div>
   </div>
 
   <div class="control-group">
     <label class="control-label">${ _('Select connection') }</label>
     <div class="controls">
-      <select data-bind="'options': $root.persistedConnections,
-                         'optionsText': function(item) {
-                           return item.name();
-                         },
-                         'value': $root.connection"
-              name="connection"
-              class="span3"></select>
-      <div class="pull-right span9">
-        <a data-bind="routie: 'connection/new'" href="javascript:void(0);">
-          <i class="icon-plus">&nbsp;</i>
+      <select name="connection" class="input-xlarge" data-bind="'options': $root.persistedConnections, 'optionsText': function(item) {return item.name();}, 'value': $root.connection">
+      </select>
+      <!-- ko if: $root.connection() -->
+      <div style="display:inline">
+        <a data-bind="routie: 'connection/edit/' + $root.connection().id()" href="javascript:void(0);" class="subbtn" style="margin-left: 5px">
+          <i class="icon-edit"></i> ${_('Edit')}
         </a>
-        <!-- ko if: $root.connection() -->
-        <a data-bind="routie: 'connection/edit/' + $root.connection().id()" href="javascript:void(0);" class="subbtn">
-          <i class="icon-reorder">&nbsp;</i>
+        <a data-bind="routie: 'connection/delete/' + $root.connection().id()" href="javascript:void(0);" class="subbtn" style="margin-left: 5px">
+          <i class="icon-remove"></i> ${_('Delete')}
         </a>
-        <a data-bind="routie: 'connection/delete/' + $root.connection().id()" href="javascript:void(0);" class="subbtn">
-          <i class="icon-trash">&nbsp;</i>
-        </a>
-        <!-- /ko -->
       </div>
+      <!-- /ko -->
+      <div class="clearfix"></div>
+      <a data-bind="routie: 'connection/new'" href="javascript:void(0);" style="margin: 5px; display: block">
+        <i class="icon-plus"></i> ${_('Add a new connection')}
+      </a>
     </div>
   </div>
 </fieldset>
@@ -331,9 +322,7 @@ ${ commonheader(None, "sqoop", user, "60px") | n,unicode }
 
 <script type="text/html" id="job-editor-connector">
 <fieldset data-bind="foreach: connector">
-  <div data-bind="template: {
-                    'name': 'job-editor-form-error'
-                  }" class=""></div>
+  <div data-bind="template: {'name': 'job-editor-form-error'}" class=""></div>
   <div data-bind="foreach: inputs">
     <div data-bind="template: 'connector-' + type().toLowerCase()"></div>
   </div>
@@ -342,9 +331,7 @@ ${ commonheader(None, "sqoop", user, "60px") | n,unicode }
 
 <script type="text/html" id="job-editor-framework">
 <fieldset data-bind="foreach: framework">
-  <div data-bind="template: {
-                    'name': 'job-editor-form-error'
-                  }" class=""></div>
+  <div data-bind="template: {'name': 'job-editor-form-error'}" class=""></div>
   <div data-bind="foreach: inputs">
     <div data-bind="template: 'framework-' + type().toLowerCase()"></div>
   </div>
@@ -352,182 +339,83 @@ ${ commonheader(None, "sqoop", user, "60px") | n,unicode }
 </script>
 
 <script type="text/html" id="framework-enum">
-<div data-bind="css: {
-                  warning: name() in $root.warnings(),
-                  error: name() in $root.errors()
-                }" class="control-group">
+<div data-bind="css:{'control-group': id() != null, warning: name() in $root.warnings(), error: name() in $root.errors()}">
   <label class="control-label" data-bind="text: $root.label('framework', name())"></label>
   <div class="controls">
-    <select data-bind="'options': values,
-                       'value': value,
-                       'optionsCaption': 'Choose...',
-                       'attr': {
-                         'name': name,
-                         'title': $root.help('framework', name())
-                        }" rel="tooltip">
-    <span data-bind="template: {
-                       'name': 'job-editor-form-field-error'
-                     }" class="help-inline"></span>
+    <select class="input-xlarge" data-bind="'options': values, 'value': value, 'optionsCaption': '${ _('Choose...') }', 'attr': { 'name': name, 'title': $root.help('framework', name())}" rel="tooltip">
+    </select>
+    <span data-bind="template: {'name': 'job-editor-form-field-error'}" class="help-inline"></span>
   </div>
 </div>
 </script>
 
 <script type="text/html" id="framework-map">
-<div data-bind="css: {
-                  warning: name() in $root.warnings(),
-                  error: name() in $root.errors()
-                }" class="control-group">
-  <label class="control-label" data-bind="text: $root.label('framework', name()),
-                                          attr: {
-                                            'title': $root.help('framework', name())
-                                          }" rel="tooltip"></label>
+<div data-bind="css: {'control-group': id() != null, warning: name() in $root.warnings(), error: name() in $root.errors()}">
+  <label class="control-label" data-bind="text: $root.label('framework', name()), attr: { 'title': $root.help('framework', name()) }" rel="tooltip"></label>
   <div class="controls">
-    <input data-bind="value: value,
-                      attr: {'type': (sensitive() ? 'password' : 'text'),
-                        'name': name,
-                        'title': $root.help('framework', name())
-                      }" rel="tooltip">
-    <span data-bind="template: {
-                       'name': 'job-editor-form-field-error'
-                     }" class="help-inline"></span>
+    <input class="input-xlarge" data-bind="value: value, attr: {'type': (sensitive() ? 'password' : 'text'), 'name': name, 'title': $root.help('framework', name())}" rel="tooltip">
+    <span data-bind="template: {'name': 'job-editor-form-field-error'}" class="help-inline"></span>
   </div>
 </div>
 </script>
 
 <script type="text/html" id="framework-string">
-<div data-bind="css: {
-                  warning: name() in $root.warnings(),
-                  error: name() in $root.errors()
-                }" class="control-group">
-  <label class="control-label" data-bind="text: $root.label('framework', name()),
-                                          attr: {
-                                            'title': $root.help('framework', name())
-                                          }" rel="tooltip"></label>
+<div data-bind="css: {'control-group': id() != null, warning: name() in $root.warnings(), error: name() in $root.errors()}">
+  <label class="control-label" data-bind="text: $root.label('framework', name()),attr: { 'title': $root.help('framework', name()) }" rel="tooltip"></label>
   <div class="controls">
-    <input data-bind="value: value,
-                      attr: {
-                        'type': (sensitive() ? 'password' : 'text'),
-                        'name': name,
-                        'title': $root.help('framework', name())
-                      }" rel="tooltip">
-    <span data-bind="template: {
-                       'name': 'job-editor-form-field-error'
-                     }" class="help-inline"></span>
+    <input class="input-xlarge" data-bind="value: value, attr: { 'type': (sensitive() ? 'password' : 'text'), 'name': name, 'title': $root.help('framework', name()) }" rel="tooltip">
+    <span data-bind="template: { 'name': 'job-editor-form-field-error' }" class="help-inline"></span>
   </div>
 </div>
 </script>
 
 <script type="text/html" id="framework-integer">
-<div data-bind="css: {
-                  warning: name() in $root.warnings(),
-                  error: name() in $root.errors()
-                }" class="control-group">
-  <label class="control-label" data-bind="text: $root.label('framework', name()),
-                                          attr: {
-                                            'title': $root.help('framework', name())
-                                          }" rel="tooltip"></label>
+<div data-bind="css: {'control-group': id() != null, warning: name() in $root.warnings(), error: name() in $root.errors() }">
+  <label class="control-label" data-bind="text: $root.label('framework', name()), attr: { 'title': $root.help('framework', name()) }" rel="tooltip"></label>
   <div class="controls">
-    <input data-bind="value: value,
-                      attr: {
-                        'type': (sensitive() ? 'password' : 'text'), 'name': name,
-                        'title': $root.help('framework', name())
-                      }" rel="tooltip">
-    <span data-bind="template: {
-                       'name': 'job-editor-form-field-error'
-                     }" class="help-inline"></span>
+    <input class="input-xlarge" data-bind="value: value, attr: { 'type': (sensitive() ? 'password' : 'text'), 'name': name, 'title': $root.help('framework', name()) }" rel="tooltip">
+    <span data-bind="template: { 'name': 'job-editor-form-field-error' }" class="help-inline"></span>
   </div>
 </div>
 </script>
 
 <script type="text/html" id="connector-enum">
-<div data-bind="css: {
-                  warning: name() in $root.warnings(),
-                  error: name() in $root.errors()
-                }" class="control-group">
-  <label class="control-label" data-bind="text: $root.label('connector', name()),
-                                          attr: {
-                                            'title': $root.help('connector', name())
-                                          }" rel="tooltip"></label>
+<div data-bind="css: {'control-group': id() != null,  warning: name() in $root.warnings(), error: name() in $root.errors() }">
+  <label class="control-label" data-bind="text: $root.label('connector', name()), attr: { 'title': $root.help('connector', name()) }" rel="tooltip"></label>
   <div class="controls">
-    <select data-bind="'options': values,
-                       'value': value,
-                       'optionsCaption': 'Choose...',
-                       attr: {
-                        'name': name,
-                        'title': $root.help('connector', name())
-                       }" rel="tooltip">
-    <span data-bind="template: {
-                       'name': 'job-editor-form-field-error'
-                     }" class="help-inline"></span>
+    <select class="input-xlarge" data-bind="'options': values, 'value': value, 'optionsCaption': '${ _('Choose...') }', attr: { 'name': name, 'title': $root.help('connector', name()) }" rel="tooltip">
+    </select>
+    <span data-bind="template: { 'name': 'job-editor-form-field-error' }" class="help-inline"></span>
   </div>
 </div>
 </script>
 
 <script type="text/html" id="connector-map">
-<div data-bind="css: {
-                  warning: name() in $root.warnings(),
-                  error: name() in $root.errors()
-                }" class="control-group">
-  <label class="control-label" data-bind="text: $root.label('connector', name()),
-                                          attr: {
-                                            'title': $root.help('connector', name())
-                                          }" rel="tooltip"></label>
+<div data-bind="css: {'control-group': id() != null,  warning: name() in $root.warnings(), error: name() in $root.errors() }">
+  <label class="control-label" data-bind="text: $root.label('connector', name()), attr: { 'title': $root.help('connector', name()) }" rel="tooltip"></label>
   <div class="controls">
-    <input data-bind="value: value,
-                      attr: {
-                        'type': (sensitive() ? 'password' : 'text'),
-                        'name': name,
-                        'title': $root.help('connector', name())
-                      }" rel="tooltip">
-    <span data-bind="template: {
-                       'name': 'job-editor-form-field-error'
-                     }" class="help-inline"></span>
+    <input class="input-xlarge" data-bind="value: value, attr: { 'type': (sensitive() ? 'password' : 'text'), 'name': name, 'title': $root.help('connector', name()) }" rel="tooltip">
+    <span data-bind="template: { 'name': 'job-editor-form-field-error' }" class="help-inline"></span>
   </div>
 </div>
 </script>
 
 <script type="text/html" id="connector-string">
-<div data-bind="css: {
-                  warning: name() in $root.warnings(),
-                  error: name() in $root.errors()
-                }" class="control-group">
-  <label class="control-label" data-bind="text: $root.label('connector', name()),
-                                          attr: {
-                                            'title': $root.help('connector', name())
-                                          }" rel="tooltip"></label>
+<div data-bind="css: {'control-group': id() != null, warning: name() in $root.warnings(), error: name() in $root.errors() }">
+  <label class="control-label" data-bind="text: $root.label('connector', name()), attr: { 'title': $root.help('connector', name()) }" rel="tooltip"></label>
   <div class="controls">
-    <input data-bind="value: value,
-                      attr: {
-                        'type': (sensitive() ? 'password' : 'text'),
-                        'name': name,
-                        'title': $root.help('connector', name())
-                      }" rel="tooltip">
-    <span data-bind="template: {
-                       'name': 'job-editor-form-field-error'
-                     }" class="help-inline"></span>
+    <input class="input-xlarge" data-bind="value: value, attr: { 'type': (sensitive() ? 'password' : 'text'), 'name': name, 'title': $root.help('connector', name()) }" rel="tooltip">
+    <span data-bind="template: { 'name': 'job-editor-form-field-error' }" class="help-inline"></span>
   </div>
 </div>
 </script>
 
 <script type="text/html" id="connector-integer">
-<div data-bind="css: {
-                  warning: name() in $root.warnings(),
-                  error: name() in $root.errors()
-                }" class="control-group">
-  <label class="control-label" data-bind="text: $root.label('connector', name()),
-                                          attr: {
-                                            'title': $root.help('connector', name())
-                                          }" rel="tooltip"></label>
+<div data-bind="css: {'control-group': id() != null, warning: name() in $root.warnings(), error: name() in $root.errors() }">
+  <label class="control-label" data-bind="text: $root.label('connector', name()), attr: { 'title': $root.help('connector', name()) }" rel="tooltip"></label>
   <div class="controls">
-    <input data-bind="value: value, 
-                      attr: {
-                        'type': (sensitive() ? 'password' : 'text'),
-                        'name': name,
-                        'title': $root.help('connector', name())
-                      }" rel="tooltip">
-    <span data-bind="template: {
-                       'name': 'job-editor-form-field-error'
-                     }" class="help-inline"></span>
+    <input class="input-xlarge" data-bind="value: value, attr: { 'type': (sensitive() ? 'password' : 'text'), 'name': name, 'title': $root.help('connector', name())}" rel="tooltip">
+    <span data-bind="template: {'name': 'job-editor-form-field-error'}" class="help-inline"></span>
   </div>
 </div>
 </script>
@@ -593,7 +481,7 @@ viewModel.job.subscribe(function(job) {
 });
 
 //// Render all data
-ko.applyBindings(viewModel, $('#jobs')[0]);
+ko.applyBindings(viewModel);
 
 //// Events
 function handle_form_errors(e, node, options, data) {
@@ -660,6 +548,10 @@ $(document).on('save_fail.job', handle_form_errors);
 $(document).on('save_fail.connection', handle_form_errors);
 $(document).on('delete_fail.job', handle_form_errors);
 
+$(document).on('show_section', function(e, section){
+  viewModel.shownSection(section);
+});
+
 $(document).on('keyup', 'input#filter', function() {
   viewModel.filter($('#filter').val());
 });
@@ -718,7 +610,7 @@ $(document).ready(function () {
       });
     },
     "job/new": function() {
-      viewModel.newJob();
+      viewModel.newJob("${_('Untitled Job')}");
       showSection("jobs", "job-editor");
       $("*[rel=tooltip]").tooltip({
         placement: 'right'

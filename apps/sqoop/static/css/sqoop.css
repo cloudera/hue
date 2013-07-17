@@ -3,18 +3,85 @@
 }
 
 ul.major-list {
-  margin: 0px;
-  padding: 0px;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
 }
 
 ul.major-list li {
   cursor: pointer;
-  list-style: none;
-  margin: 3px;
-  padding: 5px;
+  border: 1px solid #E3E3E3;
+  height: 60px;
+  margin-bottom: 10px;
 }
 
-ul.major-list h4 {
-  margin: 5px 0px;
-  padding: 0px;
+ul.major-list li div.main {
+  padding: 10px;
+}
+
+ul.major-list li .pull-right {
+  margin-right: 10px;
+  margin-top: 18px;
+}
+
+.main i {
+  color: #999999;
+}
+
+.sqoop-progress {
+  width: 0%;
+  background-color: #F89406;
+  height: 3px;
+  margin-top: -2px;
+}
+
+.waiting {
+  color: #DDDDDD;
+  font-size: 196px;
+}
+
+h1.emptyMessage {
+  color: #BBBBBB;
+  line-height: 60px;
+  margin-top: 50px;
+}
+
+.sidebar-nav {
+  padding: 9px 0;
+  min-height: 150px !important;
+}
+
+.top-bar {
+  background-color: #FAFAFA;
+  border-bottom: 1px solid #E3E3E3;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.067);
+  margin: 0 0 20px;
+  padding: 10px 20px;
+  text-align: left;
+  height: 30px;
+}
+
+.top-bar h4 {
+  margin-top: 4px;
+  display: inline-block;
+  margin-right: 20px;
+}
+
+.top-bar .pull-right {
+  margin-top: 4px;
+  margin-right: 20px;
+}
+
+.form-actions {
+  bottom: 0;
+  left: 0;
+  margin: 0;
+  position: fixed;
+  width: 100%;
+  padding-left: 20px !important;
+}
+
+.job-form {
+  margin-bottom: 80px;
 }
