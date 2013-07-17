@@ -257,13 +257,12 @@ class PseudoHdfs4(object):
 
     # Make sure /tmp is 1777
     self.fs.setuser(self.superuser)
-    if not self.fs.isdir('/tmp'):
+    if not self.fs.exists('/tmp'):
       self.fs.mkdir('/tmp', 01777)
-    else:
-      self.fs.chmod('/tmp', 01777)
+    self.fs.chmod('/tmp', 01777)
 
-    self.fs.chmod(self._tmpdir, 01777)
     self.fs.chmod(self._tmpdir + '/hadoop_tmp_dir/mapred', 01777)
+    self.fs.mkdir(self._tmpdir + '/hadoop_tmp_dir/mapred/staging', 01777)
 
 
   def _start_mr1(self, env):

@@ -74,38 +74,29 @@ def get_hadoop_job_id(oozie_api, oozie_jobid, action_index=1, timeout=60, step=5
 
 
 class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
-  """
-  Tests for JobBrowser that requires Hadoop. Use the same mini_cluster and jobsubd.
-  """
+
   requires_hadoop = True
   user_count = 0
 
   @classmethod
   def setup_class(cls):
     OozieServerProvider.setup_class()
-    if not cls.cluster.fs.exists("/tmp"):
-      cls.cluster.fs.do_as_superuser(cls.cluster.fs.mkdir, "/tmp")
-    cls.cluster.fs.do_as_superuser(cls.cluster.fs.chmod, "/tmp", 0777)
-
-
 
   def setUp(self):
+    """
+    Beware: creating test1, test2, test3...users
+    """
     TestJobBrowserWithHadoop.user_count += 1
     self.username = 'test' + str(TestJobBrowserWithHadoop.user_count)
     self.home_dir = '/user/%s' % self.username
-
     self.cluster.fs.do_as_user(self.username, self.cluster.fs.create_home_dir, self.home_dir)
-    self.cluster.fs.do_as_superuser(self.cluster.fs.chmod, self.home_dir, 0777, True)
-    self.cluster.fs.do_as_superuser(self.cluster.fs.chown, self.home_dir, self.username, "test", recursive=True)
 
     self.client = make_logged_in_client(username=self.username, is_superuser=False, groupname='test')
     grant_access(self.username, 'test', 'jobsub')
     grant_access(self.username, 'test', 'jobbrowser')
     grant_access(self.username, 'test', 'oozie')
 
-    # Ensure access to MR folder
-    self.cluster.fs.do_as_superuser(self.cluster.fs.chmod, '/tmp', 0777, recursive=True)
-
+    self.prev_user = self.cluster.fs.user
     self.cluster.fs.setuser(self.username)
 
     self.install_examples()
@@ -118,6 +109,7 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
       self.cluster.fs.do_as_superuser(self.cluster.fs.rmtree, self.home_dir)
     except:
       pass
+    self.cluster.fs.setuser(self.prev_user)
 
   def create_design(self):
     response = self.client.post(reverse('jobsub.views.new_design',
