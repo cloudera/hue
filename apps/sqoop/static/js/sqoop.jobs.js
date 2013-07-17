@@ -94,6 +94,19 @@ var jobs = (function($) {
       self.isRunning = ko.computed(function() {
         return self.submission() && $.inArray(self.submission().status(), ['BOOTING', 'RUNNING']) > -1;
       });
+      self.outputDirectoryFilebrowserURL = ko.computed(function() {
+        var output_directory = null;
+        $.each(self.framework(), function(index, form) {
+          if (form.name() == 'output') {
+            $.each(form.inputs(), function(index, input) {
+              if (input.name() == 'output.outputDirectory') {
+                output_directory = input.value();
+              }
+            });
+          }
+        });
+        return (output_directory) ? '/filebrowser/view' + output_directory : null;
+      });
 
       self.runningInterval = 0;
     },
