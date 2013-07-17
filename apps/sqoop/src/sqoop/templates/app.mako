@@ -99,6 +99,11 @@ ${ commonheader(None, "sqoop", user, "60px") | n,unicode }
       <div class="well sidebar-nav span2">
         <form id="advanced-settings" method="POST" class="form form-horizontal noPadding">
           <ul class="nav nav-list">
+            <li>
+              <a data-placement="right" rel="tooltip" title="${_('Back to jobs list')}" href="#jobs">
+                <i class="icon-reorder"></i> ${_('Dashboard')}
+              </a>
+            </li>
             <li class="nav-header" data-bind="visible: $root.job().persisted">${_('Actions')}</li>
             <li data-bind="visible: $root.job().persisted() && !$root.job().isRunning()">
               <a data-placement="right" rel="tooltip" title="${_('Run the job')}" href="#job/save-and-run">
@@ -124,12 +129,6 @@ ${ commonheader(None, "sqoop", user, "60px") | n,unicode }
             <li data-bind="visible: $root.job().persisted()">
               <a data-bind="attr: { 'href': $root.job().outputDirectoryFilebrowserURL }" data-placement="right" rel="tooltip" title="${_('Output directory')}" href="javascript:void(0);" target="_new">
                 <i class="icon-folder-open"></i> ${_('Output directory')}
-              </a>
-            </li>
-            <li>&nbsp;</li>
-            <li>
-              <a data-placement="right" rel="tooltip" title="${_('Back to jobs list')}" href="#jobs">
-                <i class="icon-share-alt"></i> ${_('Back to jobs list')}
               </a>
             </li>
           </ul>
@@ -163,7 +162,9 @@ ${ commonheader(None, "sqoop", user, "60px") | n,unicode }
               <a class="btn btn-primary" data-bind="routie: 'job/edit/wizard/' + $parent.nextIndex()">${_('Next')}</a>
               <!-- /ko -->
               <!-- ko ifnot: $parent.hasNext -->
-              <a class="btn btn-primary" href="#job/save">${_('Save')}</a>
+              <a class="btn" href="#job/save">${_('Save')}</a>
+              &nbsp;
+              <a class="btn btn-primary" href="#job/save-and-run">${_('Save and run')}</a>
               <!-- /ko -->
             </div>
           </form>
