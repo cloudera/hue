@@ -70,6 +70,7 @@ var DataTableViewModel = function(options)
   var _reload = self.reload;
   self.reload = function(callback)
   {
+    logGA('view_cluster');
     if(self._table)
     {
       self._table.fnClearTable();
@@ -224,6 +225,7 @@ var SmartViewModel = function(options)
   var _reload = self.reload;
   self.reload = function(callback)
   {
+  	logGA('view_table');
     self.truncated = ko.observable(false);
     var queryStart = new Date();
     _reload(function()
@@ -405,6 +407,7 @@ var SmartViewDataRow = function(options)
   var _reload = self.reload;
   self.reload = function(callback)
   {
+  	logGA('get_row');
     _reload(function()
     {
       if(callback!=null)
@@ -426,6 +429,7 @@ var ColumnRow = function(options)
   {
     function doDrop()
     {
+      logGA('filter_columns');
       self.parent.isLoading(true);
       return API.queryTable('deleteColumn', self.parent.row, self.name).done(function(data)
       {
@@ -453,7 +457,7 @@ var ColumnRow = function(options)
   self.value.subscribe(function(value)
   {
     //change transport prep to object wrapper
-    logGA();
+    logGA('put_column');
     API.queryTable('putColumn', self.parent.row, self.name, "hbase-post-key-" + value).done(function(data)
     {
       self.reload(function(){}, true);

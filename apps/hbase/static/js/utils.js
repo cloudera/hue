@@ -132,7 +132,7 @@ function launchModal(modal, data)
       break;
   }
   element.modal('show');
-  logGA('#' + modal);
+  logGA(modal.slice(0, modal.indexOf('_modal') != -1 ? modal.indexOf('_modal') : modal.length));
 }
 
 function parseXML(xml)
@@ -239,9 +239,9 @@ function logGA(postfix)
 {
   if(postfix == null)
     postfix = ""
-  if (typeof _gaq != 'undefined' && _gaq != null && _gaq != undefined){
-       _gaq.push(['_trackPageview', document.URL.slice(document.URL.indexOf('/hbase')) + postfix]);
-    }
+  if (typeof trackOnGA == 'function'){
+    trackOnGA('hbase/' + postfix);
+  }
 };
 
 function getEditablePosition(contentEditable, trimWhitespaceNodes) {

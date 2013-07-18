@@ -118,7 +118,6 @@ var ListViewModel = function(options)
     });
   };
   self.reload = function(callback){
-    logGA();
     self.items.removeAll();
     self.isLoading(true);
     options.reload.apply(self,[function()

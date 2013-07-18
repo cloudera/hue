@@ -110,7 +110,7 @@ routed = false;
 routie({
   ':cluster/:table/query/:query': function(cluster, table, query)
     {
-      //logGA();
+      logGA('query_table');
       Router.setTable(cluster, table);
       Views.render('dataview');
       app.station('table');
@@ -120,7 +120,7 @@ routie({
     },
     ':cluster/:table': function(cluster, table)
     {
-      //logGA();
+      //logGA('view_table'); taken care of in reload()
       Router.setTable(cluster, table);
       app.station('table');
       Views.render('dataview');
@@ -128,7 +128,7 @@ routie({
     },
     ':cluster': function(cluster)
     {
-      //logGA();
+      logGA('view_cluster');
       Breadcrumbs.render();
       app.station('cluster');
       app.cluster(cluster);
@@ -139,7 +139,7 @@ routie({
     },
     'error': function()
     {
-      logGA();
+      logGA('error');
       routed = true;
     },
     '': function(){
