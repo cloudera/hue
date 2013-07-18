@@ -34,7 +34,6 @@ var Router =
   {
     Router.set();
     app.cluster(cluster);
-    logGA();
   },
   set: function()
   {

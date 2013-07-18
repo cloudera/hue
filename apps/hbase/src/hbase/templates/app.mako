@@ -72,7 +72,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
           % if user.is_superuser:
             <button class="btn" data-bind="enable: $data.selected().length > 0, click: $data.dropSelected, clickBubble: false"><i class="icon-trash"></i> Drop Columns</button>
           % endif
-          <a href="#new_column_modal" data-bind="click:function(){$('#new_column_row_key').val($data.row);app.focusModel($data);logGA('#new_column_modal');}" class="btn" data-toggle="modal" title="${_('Add New Column/Cell')}"><i class="icon-plus"></i></a>
+          <a href="#new_column_modal" data-bind="click:function(){$('#new_column_row_key').val($data.row);app.focusModel($data);logGA('new_column_modal');}" class="btn" data-toggle="modal" title="${_('Add New Column/Cell')}"><i class="icon-plus"></i></a>
         </span>
       </h5>
       <ul class="smartview-cells" data-bind="event: {scroll: onScroll}">
@@ -198,19 +198,18 @@ ${ commonheader(None, "hbase", user) | n,unicode }
     <div class="subnav sticky">
       <div class="container-fluid">
         <div class="row-fluid">
-          <div class="span6">
-            <div id="searchbar-main" class="span10" data-bind="click: search.clickTagBar">
-              <div id="search-tags" contenteditable="true" data-bind="editableText: search.cur_input, hasfocus: search.focused, css: { 'active': search.cur_input() != '' }, event: { 'keydown': search.onKeyDown, click: search.updateMenu.bind(null) }" data-placeholder="${_('row_key, row_key_prefix* + scan_length, row_key [family:col1, family2:col2, family3:]')}">
-              </div>
+          <div id="searchbar-main" class="span6" data-bind="click: search.clickTagBar">
+            <div id="search-tags" contenteditable="true" data-bind="editableText: search.cur_input, hasfocus: search.focused, css: { 'active': search.cur_input() != '' }, event: { 'keydown': search.onKeyDown, click: search.updateMenu.bind(null) }" data-placeholder="${_('row_key, row_key_prefix* + scan_length, row_key [family:col1, family2:col2, family3:]')}">
             </div>
-            <ul id="search-typeahead" data-bind="visible: search.focused()">
-              <!-- ko if: search.mode() != 'idle' -->
-              <li><a><b data-bind="text: search.modes[search.mode()].hint"></b>: <span data-bind="html: search.hintText()"></span> <code class="pull-right" data-bind="text: search.modes[search.mode()].type"></code></a></li>
-              <!-- /ko -->
-              <!-- ko foreach: search.activeHints() -->
-              <li data-bind="event: { mousedown: function(){app.search.cur_input(app.search.cur_input() + $data.shortcut);} }, css: {active: self.activeHint}"><a><span data-bind="text: $data.hint"></span> <code class="pull-right" data-bind="text: $data.shortcut"></code></a></li>
-              <!-- /ko -->
-            </ul>
+          </div>
+          <ul id="search-typeahead" data-bind="visible: search.focused()">
+            <!-- ko if: search.mode() != 'idle' -->
+            <li><a><b data-bind="text: search.modes[search.mode()].hint"></b>: <span data-bind="html: search.hintText()"></span> <code class="pull-right" data-bind="text: search.modes[search.mode()].type"></code></a></li>
+            <!-- /ko -->
+            <!-- ko foreach: search.activeHints() -->
+            <li data-bind="event: { mousedown: function(){app.search.cur_input(app.search.cur_input() + $data.shortcut);} }, css: {active: self.activeHint}"><a><span data-bind="text: $data.hint"></span> <code class="pull-right" data-bind="text: $data.shortcut"></code></a></li>
+            <!-- /ko -->
+          </ul>
           <span id="column-family-selectors">
             <!-- ko foreach: views.tabledata.columnFamilies() -->
               <span class="label" data-bind="text: $data.name, style: {'backgroundColor': ($data.enabled()) ? stringHashColor($data.name.split(':')[0]) : '#ccc' ,'cursor':'pointer'}, click: $data.toggle"></span>
@@ -255,7 +254,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
             % if user.is_superuser:
               <button class="btn" data-bind="enable: views.tabledata.selected().length > 0, click: views.tabledata.dropSelected"><i class="icon-trash"></i> ${_('Drop Rows')}</button>
             % endif
-            <a href="#new_row_modal" data-bind="click:function(){app.focusModel(app.views.tabledata);logGA('#new_row_modal');}" role="button" class="btn btn-primary" data-callback="" data-toggle="modal"><i class='icon-plus-sign'></i> ${_('New Row')}</a>
+            <a href="#new_row_modal" data-bind="click:function(){app.focusModel(app.views.tabledata);logGA('new_row_modal');}" role="button" class="btn btn-primary" data-callback="" data-toggle="modal"><i class='icon-plus-sign'></i> ${_('New Row')}</a>
           </span>
         </div>
     </div>
