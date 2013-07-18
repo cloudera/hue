@@ -37,23 +37,23 @@ var jobs = (function($) {
     },
     'initialize': function(attrs) {
       var self = this;
-      var attrs = $.extend(true, attrs, {});
-      attrs = transform_keys(attrs, {
+      var _attrs = $.extend(true, {}, attrs);
+      _attrs = transform_keys(_attrs, {
         'connector-id': 'connector_id',
         'connection-id': 'connection_id'
       });
-      attrs = transform_values(attrs, {
+      _attrs = transform_values(_attrs, {
         'connector': to_forms,
         'framework': to_forms
       });
-      return attrs;
+      return _attrs;
     }
   });
 
   var Job = koify.Node.extend({
     'identifier': 'job',
     'persists': true,
-    'modelClass': JobModel,
+    'model_class': JobModel,
     'base_url': '/sqoop/api/jobs/',
     'initialize': function() {
       var self = this;
@@ -149,6 +149,18 @@ var jobs = (function($) {
       });
 
       self.runningInterval = 0;
+    },
+    map: function() {
+      var self = this;
+      var mapping_options = $.extend(true, {
+        'ignore': ['parent', 'initialize']
+      }, forms.MapProperties);
+      if ('__ko_mapping__' in self) {
+        ko.mapping.fromJS(self.model, mapping_options, self);
+      } else {
+        var mapped = ko.mapping.fromJS(self.model, mapping_options);
+        $.extend(self, mapped);
+      }
     },
     'start': function(options) {
       var self = this;

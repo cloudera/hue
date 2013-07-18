@@ -90,6 +90,93 @@ ko.bindingHandlers.clickValue = {
   }
 };
 
+ko.sqoop = {
+  'fixModel' : function(root) {
+    function parsePropertyName(propertyName) {
+      var properties = [];
+      if (propertyName) {
+        // get object keys in form of array
+        var propertyNames = propertyName.split('.');
+        // add indexes to array
+        $.each(propertyNames, function(index, property) {
+          if (property.indexOf(']') !== -1) {
+            var left = property.indexOf('[');
+            var right = property.indexOf(']');
+            var index = parseInt(property.substring(left+1, right));
+
+            properties.push(property.substring(0, left), index);
+          } else {
+            properties.push(property);
+          }
+        });
+      }
+
+      return properties;
+    }
+
+    function getPropertyByName(root, propertyName) {
+      var parts = parsePropertyName(propertyName);
+      var obj = root;
+      $.each(parts, function(index, property) {
+        if (ko.isObservable(obj)) {
+          obj = obj()[property];
+        } else {
+          obj = obj[property];
+        }
+      });
+      return obj;
+    }
+
+    function setPropertyByName(root, propertyName, propertyValue) {
+      var parts = parsePropertyName(propertyName);
+      var obj = root;
+      var parent = null;
+      var propertyName = null;
+      if (parts.length != 0) {
+        $.each(parts, function(index, property) {
+          propertyName = property;
+          parent = obj;
+          if (ko.isObservable(obj)) {
+            obj = obj()[property];
+          } else {
+            obj = obj[property];
+          }
+        });
+
+        if (ko.isObservable(parent)) {
+          parent()[propertyName] = propertyValue;
+        } else {
+          parent[propertyName] = propertyValue;
+        }
+      }
+    }
+
+    var models = [];
+
+    // Map to original model
+    var root_model = ko.mapping.toJS(root);
+
+    // ko.mapping.visitModel performs a breadth first search.
+    ko.mapping.visitModel(root, function(value, parent_name) {
+      if (value['fixModel']) {
+        models.push(parent_name);
+      }
+    });
+    // Need a depth first search result
+    models = models.reverse();
+    console.log(models);
+
+    // Call fixModel on every node that has that method.
+    $.each(models, function(index, parent_name) {
+      var old_model = getPropertyByName(root_model, parent_name);
+      var new_model = getPropertyByName(root, parent_name).fixModel(old_model);
+      setPropertyByName(root_model, parent_name, new_model);
+    });
+
+    return root_model;
+  }
+};
+
 //// JQuery Utils
 if (jQuery) {
   jQuery.extend({

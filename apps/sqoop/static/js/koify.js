@@ -45,37 +45,45 @@ var koify = (function($, undefined) {
   });
 
 
-  var Node = KOClass(function(options) {
+  var MinimalNode = KOClass(function(options) {
     var self = this;
     var options = options || {};
 
     self.options = options;
     self.initialize(options);
   }, {
-    persist: true,
-    identifier: undefined,
-    modelClass: undefined,
+    model_class: undefined,
 
     initialize: function(options) {
       var self = this;
 
       if (options.modelDict) {
-        self.model = new self.modelClass(options.modelDict);
+        self.model = new self.model_class(options.modelDict);
       } else {
-        self.model = $.extend(true, options.model, {});
+        self.model = $.extend(true, {}, options.model);
       }
 
+      self.map();
+    },
+    map: function() {
+      var self = this;
+      var mapping_options = {
+        'ignore': ['parent', 'initialize']
+      };
       if ('__ko_mapping__' in self) {
-        ko.mapping.fromJS(self.model, {
-          'ignore': ['parent', 'initialize']
-        }, self);
+        ko.mapping.fromJS(self.model, mapping_options, self);
       } else {
-        var mapped = ko.mapping.fromJS(self.model, {
-          'ignore': ['parent', 'initialize']
-        });
+        var mapped = ko.mapping.fromJS(self.model, mapping_options);
         $.extend(self, mapped);
       }
-    },
+    }
+  });
+
+
+  var Node = MinimalNode.extend({
+    persist: true,
+    identifier: undefined,
+
     request: function(url, options) {
       var self = this;
       var request = $.extend({
@@ -178,8 +186,9 @@ var koify = (function($, undefined) {
     },
     getData: function() {
       var self = this;
-      data = {};
-      data[self.identifier] = ko.mapping.toJSON(self);
+      var model = ko.sqoop.fixModel(self);
+      var data = {};
+      data[self.identifier] = ko.utils.stringifyJson(model);
       return data;
     },
     loadUrl: function(persist) {
@@ -204,10 +213,10 @@ var koify = (function($, undefined) {
     }
   });
 
-
   return {
-    KOClass: KOClass,
-    Node: Node,
-    Model: Model
+    'KOClass': KOClass,
+    'MinimalNode': MinimalNode,
+    'Node': Node,
+    'Model': Model
   }
 })($, undefined);

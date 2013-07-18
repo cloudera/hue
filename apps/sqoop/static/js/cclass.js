@@ -15,7 +15,10 @@
 // limitations under the License.
 
 /**
- * cclass is a javascript Class inheritance implementation
+ * cclass is a javascript Class inheritance implementation.
+ * Methods and class members should be in the second argument.
+ * This ensures that they end up in the prototype of the function
+ * and makes them available to each new object.
  *
  * Example Usage:
  * var A = cclass.create(function() {
@@ -41,11 +44,20 @@
 var cclass = (function($, undefined) {
   function extend(ext_fn, attrs) {
     function parent() {};
+    // Need a function to create an object from.
+    // The 'fn' function will use 'ext_fn' as its initializer.
+    // We don't use 'ext_fn' itself since we modify the function extensively.
     function fn() {
       ext_fn.apply(this, arguments);
     };
+    // 'this' should be the caller.
+    // Should be a 'cclass' object.
     parent.prototype = this.prototype;
+    // Create a 'class' members region via prototype chain.
+    // If a method is not part of the object, it will check its
+    // prototype chain.
     fn.prototype = new parent();
+    // The constructor should be the copy of 'ext_fn'.
     fn.prototype.constructor = fn;
     fn.extend = extend;
     $.extend(fn.prototype, attrs || {}, {

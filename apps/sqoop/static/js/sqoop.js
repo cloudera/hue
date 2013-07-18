@@ -61,10 +61,10 @@ function create_connection(attrs, options) {
   // Need a copy of the forms so that when editing
   // we don't re-use forms.
   $.each(viewModel.connector().con_forms(), function(index, form) {
-    node.connector.push($.extend(true, form, {}));
+    node.connector.push($.extend(true, {}, form));
   });
   $.each(viewModel.framework().con_forms(), function(index, form) {
-    node.framework.push($.extend(true, form, {}));
+    node.framework.push($.extend(true, {}, form));
   });
   return node;
 }
@@ -112,7 +112,7 @@ var viewModel = new (function() {
       return self.connectors()[0];
     }
     var connectorArr = ko.utils.arrayFilter(self.connectors(), function (connector) {
-      return connector.id() == self.connection().connector();
+      return connector.id() == self.connection().connector_id();
     });
     return (connectorArr.length > 0) ? connectorArr[0] : self.connectors()[0];
   });
@@ -295,7 +295,7 @@ var viewModel = new (function() {
     var self = this;
     if (!self.job() || self.job().persisted()) {
       var job = create_job();
-      job.name = defaultName;
+      job.name(defaultName);
       self.jobs.push(job);
       self.deselectAllJobs();
       job.selected(true);
@@ -312,13 +312,16 @@ var viewModel = new (function() {
   };
 
   self.chooseJobById = function(id) {
+    var found_job = false;
     $.each(self.jobs(), function(index, job) {
       if (job.id() == id) {
+        found_job = true;
         job.selected(true);
       } else {
         job.selected(false);
       }
     });
+    return found_job;
   };
 
   self.toggleAllJobsSelected = function() {

@@ -27,12 +27,12 @@ var framework = (function($) {
     'resources': {},
     'initialize': function(attrs) {
       var self = this;
-      var attrs = $.extend(true, attrs, {});
-      attrs = transform_keys(attrs, {
+      var _attrs = $.extend(true, {}, attrs);
+      _attrs = transform_keys(_attrs, {
         'job-forms': 'job_forms',
         'con-forms': 'con_forms'
       });
-      attrs = transform_values(attrs, {
+      _attrs = transform_values(_attrs, {
         'con_forms': to_forms,
         'job_forms': function(key, value) {
           transform_values(value, {
@@ -42,18 +42,31 @@ var framework = (function($) {
           return value;
         }
       });
-      return attrs;
+      return _attrs;
     }
   });
 
   var Framework = koify.Node.extend({
     'identifier': 'framework',
     'persists': false,
-    'modelClass': FrameworkModel,
+    'model_class': FrameworkModel,
     'base_url': '/sqoop/api/framework/',
     'initialize': function() {
       var self = this;
       self.parent.initialize.apply(self, arguments);
+      self.selected = ko.observable();
+    },
+    'map': function() {
+      var self = this;
+      var mapping_options = $.extend(true, {
+        'ignore': ['parent', 'initialize']
+      }, forms.MapProperties);
+      if ('__ko_mapping__' in self) {
+        ko.mapping.fromJS(self.model, mapping_options, self);
+      } else {
+        var mapped = ko.mapping.fromJS(self.model, mapping_options);
+        $.extend(self, mapped);
+      }
     }
   });
 
