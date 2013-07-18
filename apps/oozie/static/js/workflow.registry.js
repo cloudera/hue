@@ -64,6 +64,15 @@ var RegistryModule = function($) {
 
       delete self.nodes;
       self.nodes = {};
+    },
+
+    allNodes: function() {
+      var self = this;
+      var nodes = [];
+      $.each(self.nodes, function(key, node) {
+        nodes.push(node);
+      });
+      return nodes;
     }
   });
 

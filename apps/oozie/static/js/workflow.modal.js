@@ -51,13 +51,18 @@ var ModalModule = function($, ko) {
   module.prototype.hide = function() {
     var self = this;
 
-    self.el.modal('hide');
+    self.modal.modal('hide');
+    if (self.modal.length > 0 && !!ko.dataFor(self.modal[0])) {
+      ko.cleanNode(self.modal[0]);
+    }
   };
 
   module.prototype.setTemplate = function(template) {
     var self = this;
 
-    ko.cleanNode(self.modal[0]);
+    if (self.modal.length > 0 && !!ko.dataFor(self.modal[0])) {
+      ko.cleanNode(self.modal[0]);
+    }
     self.template( template );
   };
 

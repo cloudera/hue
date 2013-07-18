@@ -21,4 +21,10 @@
     <h1>Buongiorno, world!</h1>
     <div id="graph"></div>
   </div>
+
+  <div id="modal-window" class="modal hide fade">
+    <a class="doneButton"></a>
+    <a class="cancelButton"></a>
+    <a class="closeButton"></a>
+  </div>
 </%block>
