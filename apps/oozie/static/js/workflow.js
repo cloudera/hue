@@ -32,7 +32,7 @@ $.extend(StartNode.prototype, Node.prototype, {
     var self = this;
     var index = -1;
 
-    $.each(self.child_links(), function(i, link) {
+    $.each(self.non_error_links(), function(i, link) {
       if (link.child() == child.id()) {
         index = i;
       }

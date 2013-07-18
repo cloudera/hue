@@ -61,6 +61,13 @@ var NodeModule = function($, IdGeneratorTable, NodeFields) {
       return links;
     });
 
+    self.non_error_links = ko.computed(function() {
+      var links = self.child_links().filter(function(element, index, arr) {
+        return element.name() != 'error';
+      });
+      return links;
+    });
+
     self._workflow = workflow;
 
     self.registry = registry;
@@ -285,6 +292,20 @@ var NodeModule = function($, IdGeneratorTable, NodeFields) {
       return parents;
     },
 
+    findErrorParents: function() {
+      var self = this;
+
+      var parents = [];
+      $.each(self.registry.nodes, function(id, node) {
+        $.each(node.meta_links(), function(index, link) {
+          if (link.child() == self.id()) {
+            parents.push(node);
+          }
+        });
+      });
+      return parents;
+    },
+
     /**
      * Find all children of current node
      */
@@ -313,6 +334,11 @@ var NodeModule = function($, IdGeneratorTable, NodeFields) {
           var node = self.registry.get(link.child());
           parent.replaceChild(self, node);
         });
+      });
+
+      // Error links of parents reset to kill node.
+      $.each(self.findErrorParents(), function(index, parent) {
+        parent.putErrorChild(self._workflow.kill);
       });
 
       $(self).trigger('detached');
@@ -416,7 +442,7 @@ var NodeModule = function($, IdGeneratorTable, NodeFields) {
       var self = this;
       var index = -1;
 
-      $.each(self.child_links(), function(i, link) {
+      $.each(self.non_error_links(), function(i, link) {
         if (link.child() == child.id()) {
           index = i;
         }

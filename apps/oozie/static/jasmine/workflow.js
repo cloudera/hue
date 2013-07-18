@@ -16,6 +16,10 @@
  limitations under the License.
 */
 
+
+function getFileBrowseButton() {}
+
+
 describe("WorkflowModel", function(){
 
   function create_three_step_workflow(workflow_id) {
@@ -246,43 +250,30 @@ describe("WorkflowModel", function(){
     });
   });
 
-  // describe("Node movement", function(){
-  //   it("Should be able to move a node up", function() {
+  describe("Workflow node modal", function(){
+    var node = null;
+    var viewModel = create_three_step_workflow(2);
+    var modal = new Modal($('#node-modal'));
+    viewModel.rebuild();
 
-  //   });
+    it("Ensure can open and close modal", function() {
+      edit_node_modal(modal, viewModel, viewModel.nodes()[1]);
+      expect(modal.el.is(":visible"));
+      $('.doneButton').click();
+      expect(!modal.el.is(":visible"));
 
-  //   it("Should be able to move a node down", function() {
+      edit_node_modal(modal, viewModel, viewModel.nodes()[1]);
+      expect(modal.el.is(":visible"));
+      $('.cancelButton').click();
+      expect(!modal.el.is(":visible"));
+    });
 
-  //   });
-
-  //   it("Should be able to create a fork", function() {
-
-  //   });
-
-  //   it("Should be able to create a decision", function() {
-
-  //   });
-  // });
-
-  // describe("Node operations", function(){
-  //   it("Should be able to edit a node", function() {
-  //     $('.edit-node-link')[0].click();
-  //     expect($("#node-modal").length).toBeGreaterThan(0);
-  //   });
-
-  //   it("Should be able to create a node", function() {
-  //     $('.new-node-link[data-node-type=mapreduce]')[0].click();
-  //     expect($("#node-modal").length).toBeGreaterThan(0);
-  //   });
-
-  //   it("Should be able to clone a node", function() {
-  //     $('.clone-node-link')[0].click();
-  //     expect($("#node-modal").length).toBeGreaterThan(0);
-  //   });
-
-  //   it("Should be able to remove a node", function() {
-  //     $('.delete-node-btn')[0].click();
-  //     expect($("#node-modal").length).toBeGreaterThan(0);
-  //   });
-  // });
+    it("Ensure can change kill node of existing node", function() {
+      edit_node_modal(modal, viewModel, viewModel.nodes()[1]);
+      modal.context().error_node(viewModel.nodes()[0].id());
+      expect(viewModel.nodes()[1].getErrorChild().id()).toEqual(viewModel.nodes()[0].id());
+      $('.done').click();
+      expect(viewModel.nodes()[1].getErrorChild().id()).toEqual(viewModel.nodes()[0].id());
+    });
+  });
 });

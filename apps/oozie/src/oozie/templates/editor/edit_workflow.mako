@@ -611,76 +611,6 @@ import_workflow_action.fetchWorkflows({ success: import_workflow_load_success })
 /**
  * Modals
  */
-// open a modal window for editing a node
-function edit_node_modal(node, save, cancel, template) {
-  var backup = ko.mapping.toJS(node);
-  normalize_model_fields(backup);
-
-  modal.hide();
-  modal.setTemplate(template || node.edit_template);
-  // Provide node, readonly mode, and error link updater.
-  // Kill node is manually added to list of nodes that users can select from.
-  // Kill node is placed at the front of the list so that it is automatically selected.
-  var context = {
-    node: node,
-    read_only: workflow.read_only(),
-    nodes: ko.computed({
-      read: function() {
-        var arr = ko.utils.arrayFilter(workflow.nodes(), function(value) {
-          return value.id() && value.id() != node.id();
-        });
-        arr.unshift(workflow.kill);
-        return arr;
-      }
-    }),
-    error_node: ko.computed({
-      read: function() {
-        var error_child  = node.getErrorChild();
-        return (error_child) ? error_child.id() : null;
-      },
-      write: function(node_id) {
-        var error_child = workflow.registry.get(node_id);
-        if (error_child) {
-          node.putErrorChild(error_child);
-        }
-      }
-    })
-  };
-  modal.show(context);
-  modal.recenter(280, 250);
-  modal.addDecorations();
-
-  var cancel_edit = cancel || function() {
-    ko.mapping.fromJS(backup, node);
-    modal.hide();
-
-    // Prevent event propagation
-    return false;
-  };
-
-  var try_save = save || function() {
-    if (node.validate()) {
-      workflow.is_dirty( true );
-      modal.hide();
-    }
-  };
-
-  $('.modal-backdrop').on('click', cancel_edit);
-  modal.el.on('click', '.close', cancel_edit);
-  modal.el.on('click', '.cancelButton', cancel_edit);
-  modal.el.on('click', '.doneButton', try_save);
-
-  modal.el.on('click', '.edit-node-link', function() {
-    var link = ko.contextFor(this).$data;
-    var parent = ko.contextFor(this).$parent;
-    var node = parent.registry.get(link.child());
-
-    cancel_edit();
-
-    edit_node_modal(node);
-  });
-}
-
 // Drag a new node onto the canvas
 workflow.el.on('mousedown', '.new-node-link', function(e) {
   e.preventDefault();
@@ -722,9 +652,8 @@ workflow.el.on('mousedown', '.new-node-link', function(e) {
       workflow.is_dirty( true );
       modal.hide();
       if (!node.getErrorChild()) {
-        node.addChild(workflow.kill);
+        node.putErrorChild(workflow.kill);
       }
-      ko.cleanNode(modal.el[0]);
       workflow.el.trigger('workflow:rebuild');
     }
   };
@@ -734,7 +663,7 @@ workflow.el.on('mousedown', '.new-node-link', function(e) {
     workflow.new_node(null);
     el.offset(old_position);
     if (node.findChildren().length > 0 || node.findParents().length > 1) {
-      edit_node_modal(node, try_save, cancel_edit);
+      edit_node_modal(modal, workflow, node, try_save, cancel_edit);
     } else {
       node.erase();
     }
@@ -744,13 +673,13 @@ workflow.el.on('mousedown', '.new-node-link', function(e) {
 // Modal for editing a node
 workflow.el.on('click', '.edit-node-link', function(e) {
   var node = ko.contextFor(this).$data;
-  edit_node_modal(node);
+  edit_node_modal(modal, workflow, node);
 });
 
 // Modal for converting to a decision node
 workflow.el.on('click', '.convert-node-link', function(e) {
   var node = ko.contextFor(this).$data;
-  edit_node_modal(node, null, null, 'forkConvertTemplate');
+  edit_node_modal(modal, workflow, node, null, null, 'forkConvertTemplate');
 });
 
 // Modal for cloning a node
@@ -761,6 +690,7 @@ workflow.el.on('click', '.clone-node-btn', function(e) {
   model.name += '-copy';
   model.child_links = [];
   var new_node = new Node(workflow, model, workflow.registry);
+  new_node.child_links.removeAll();
   workflow.registry.add(new_node.id(), new_node);
 
   var cancel_edit = function(e) {
@@ -773,14 +703,15 @@ workflow.el.on('click', '.clone-node-btn', function(e) {
     if (node.validate()) {
       workflow.is_dirty( true );
       modal.hide();
-      // save, add kill, add node to workflow.
-      new_node.addChild(workflow.kill);
       node.append(new_node);
+      if (!new_node.getErrorChild()) {
+        new_node.putErrorChild(workflow.kill);
+      }
       workflow.el.trigger('workflow:rebuild');
     }
   };
 
-  edit_node_modal(new_node, try_save, cancel_edit);
+  edit_node_modal(modal, workflow, new_node, try_save, cancel_edit);
 });
 
 // Modal for deleting a node
