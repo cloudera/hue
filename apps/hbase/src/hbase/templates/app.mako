@@ -371,13 +371,11 @@ ${ commonheader(None, "hbase", user) | n,unicode }
 
 
 <script type="text/javascript" charset="utf-8">
-var i18n_message_cache =
-{
+var i18n_message_cache = {
 
 };
 
-function _(text)
-{
+function _(text) {
   return MSG[text];
 };
 

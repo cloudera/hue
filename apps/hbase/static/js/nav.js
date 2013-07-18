@@ -14,50 +14,40 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var Router =
-{
-  go: function(page)
-  {
+var Router = {
+  go: function(page) {
     if(!Views.render(page))
       return history.back();
     return page;
   },
-  setTable: function(cluster, table)
-  {
+  setTable: function(cluster, table) {
     Router.setCluster(cluster);
     app.pageTitle(cluster + ' / ' + table);
     app.views.tabledata.name(table);
     app.focusModel(app.views.tabledata);
   },
-  setCluster: function(cluster)
-  {
+  setCluster: function(cluster) {
     Router.set();
     app.cluster(cluster);
   },
-  set: function()
-  {
+  set: function() {
       Breadcrumbs.render();
   }
 }
 
-var Breadcrumbs =
-{
+var Breadcrumbs = {
   _selector_root:'#hbase-breadcrumbs',
   //renders breadcrumbs automaticall
-  render:function(mutators)
-  {
+  render:function(mutators) {
     root = $(Breadcrumbs._selector_root).html('');
     crumbs = ['/hbase'].concat(document.URL.split('/').splice(4));
     biglink = "";
-    for(i=0;i<crumbs.length;i++)
-    {
+    for(i=0;i<crumbs.length;i++) {
       biglink += crumbs[i] + '/'
-      function clean_url(url)
-      {
+      function clean_url(url) {
         replacers = {'/': '', '#': '', '_': ' ', '^[a-z]': function(a) { return a.toUpperCase(); }};
         keys = Object.keys(replacers);
-        for(q=0;q<keys.length;q++)
-        {
+        for(q=0;q<keys.length;q++) {
           url = url.replace(new RegExp(keys[q],'g'), replacers[keys[q]]);
         }
         return url;
@@ -69,10 +59,8 @@ var Breadcrumbs =
   }
 }
 
-var Views =
-{
-  render:function(view)
-  {
+var Views = {
+  render:function(view) {
     page = $('.hbase-page#hbase-page-' + view);
     if(!page)
       return false;
@@ -80,8 +68,7 @@ var Views =
     page.addClass('active');
     return page;
   },
-  displayError:function(error)
-  {
+  displayError:function(error) {
     console.log(error);
   }
 }
