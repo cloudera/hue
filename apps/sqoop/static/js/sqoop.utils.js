@@ -62,6 +62,26 @@ ko.bindingHandlers.editableText = {
   }
 };
 
+ko.bindingHandlers.clickValue = {
+  init: function(element, valueAccessor) {
+    var value = ko.utils.unwrapObservable(valueAccessor());
+    if ($(element).val() == value) {
+      $(element).click();
+    }
+
+    $(element).on('click', function() {
+      var observable = valueAccessor();
+      observable( $(this).val() );
+    });
+  },
+  update: function(element, valueAccessor) {
+    var value = ko.utils.unwrapObservable(valueAccessor());
+    if ($(element).val() == value) {
+      $(element).click();
+    }
+  }
+};
+
 //// JQuery Utils
 if (jQuery) {
   jQuery.extend({

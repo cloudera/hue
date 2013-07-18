@@ -350,8 +350,11 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
 </script>
 
 <script type="text/html" id="framework-map">
-<div data-bind="css: {'control-group': id() != null, warning: name() in $root.warnings(), error: name() in $root.errors()}">
-  <label class="control-label" data-bind="text: $root.label('framework', name()), attr: { 'title': $root.help('framework', name()) }" rel="tooltip"></label>
+<div data-bind="css: {
+                  warning: name() in $root.warnings(),
+                  error: name() in $root.errors()
+                }" class="control-group">
+  <label class="control-label" data-bind="text: $root.label('framework', name())" rel="tooltip"></label>
   <div class="controls">
     <input class="input-xlarge" data-bind="value: value, attr: {'type': (sensitive() ? 'password' : 'text'), 'name': name, 'title': $root.help('framework', name())}" rel="tooltip">
     <span data-bind="template: {'name': 'job-editor-form-field-error'}" class="help-inline"></span>
@@ -360,8 +363,11 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
 </script>
 
 <script type="text/html" id="framework-string">
-<div data-bind="css: {'control-group': id() != null, warning: name() in $root.warnings(), error: name() in $root.errors()}">
-  <label class="control-label" data-bind="text: $root.label('framework', name()),attr: { 'title': $root.help('framework', name()) }" rel="tooltip"></label>
+<div data-bind="css: {
+                  warning: name() in $root.warnings(),
+                  error: name() in $root.errors()
+                }" class="control-group">
+  <label class="control-label" data-bind="text: $root.label('framework', name())" rel="tooltip"></label>
   <div class="controls">
     <input class="input-xlarge" data-bind="value: value, attr: { 'type': (sensitive() ? 'password' : 'text'), 'name': name, 'title': $root.help('framework', name()) }" rel="tooltip">
     <span data-bind="template: { 'name': 'job-editor-form-field-error' }" class="help-inline"></span>
@@ -370,8 +376,11 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
 </script>
 
 <script type="text/html" id="framework-integer">
-<div data-bind="css: {'control-group': id() != null, warning: name() in $root.warnings(), error: name() in $root.errors() }">
-  <label class="control-label" data-bind="text: $root.label('framework', name()), attr: { 'title': $root.help('framework', name()) }" rel="tooltip"></label>
+<div data-bind="css: {
+                  warning: name() in $root.warnings(),
+                  error: name() in $root.errors()
+                }" class="control-group">
+  <label class="control-label" data-bind="text: $root.label('framework', name())" rel="tooltip"></label>
   <div class="controls">
     <input class="input-xlarge" data-bind="value: value, attr: { 'type': (sensitive() ? 'password' : 'text'), 'name': name, 'title': $root.help('framework', name()) }" rel="tooltip">
     <span data-bind="template: { 'name': 'job-editor-form-field-error' }" class="help-inline"></span>
@@ -379,9 +388,30 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
 </div>
 </script>
 
+<script type="text/html" id="framework-boolean">
+<div data-bind="css: {
+                  warning: name() in $root.warnings(),
+                  error: name() in $root.errors()
+                }" class="control-group">
+  <label class="control-label" data-bind="text: $root.label('framework', name())" rel="tooltip"></label>
+  <div class="controls">
+    <div class="btn-group inline" data-toggle="buttons-radio" style="display: inline">
+      <button data-bind="clickValue: value, attr: {'name': name}" type="button" value="true" class="btn" data-toggle="button">${_('True')}</button>
+      <button data-bind="clickValue: value, attr: {'name': name}" type="button" value="false" class="btn" data-toggle="button">${_('False')}</button>
+    </div>
+    <span data-bind="template: {
+                       'name': 'job-editor-form-field-error'
+                     }" class="help-inline"></span>
+  </div>
+</div>
+</script>
+
 <script type="text/html" id="connector-enum">
-<div data-bind="css: {'control-group': id() != null,  warning: name() in $root.warnings(), error: name() in $root.errors() }">
-  <label class="control-label" data-bind="text: $root.label('connector', name()), attr: { 'title': $root.help('connector', name()) }" rel="tooltip"></label>
+<div data-bind="css: {
+                  warning: name() in $root.warnings(),
+                  error: name() in $root.errors()
+                }" class="control-group">
+  <label class="control-label" data-bind="text: $root.label('connector', name())" rel="tooltip"></label>
   <div class="controls">
     <select class="input-xlarge" data-bind="'options': values, 'value': value, 'optionsCaption': '${ _('Choose...') }', attr: { 'name': name, 'title': $root.help('connector', name()) }" rel="tooltip">
     </select>
@@ -391,8 +421,11 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
 </script>
 
 <script type="text/html" id="connector-map">
-<div data-bind="css: {'control-group': id() != null,  warning: name() in $root.warnings(), error: name() in $root.errors() }">
-  <label class="control-label" data-bind="text: $root.label('connector', name()), attr: { 'title': $root.help('connector', name()) }" rel="tooltip"></label>
+<div data-bind="css: {
+                  warning: name() in $root.warnings(),
+                  error: name() in $root.errors()
+                }" class="control-group">
+  <label class="control-label" data-bind="text: $root.label('connector', name())" rel="tooltip"></label>
   <div class="controls">
     <input class="input-xlarge" data-bind="value: value, attr: { 'type': (sensitive() ? 'password' : 'text'), 'name': name, 'title': $root.help('connector', name()) }" rel="tooltip">
     <span data-bind="template: { 'name': 'job-editor-form-field-error' }" class="help-inline"></span>
@@ -401,8 +434,11 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
 </script>
 
 <script type="text/html" id="connector-string">
-<div data-bind="css: {'control-group': id() != null, warning: name() in $root.warnings(), error: name() in $root.errors() }">
-  <label class="control-label" data-bind="text: $root.label('connector', name()), attr: { 'title': $root.help('connector', name()) }" rel="tooltip"></label>
+<div data-bind="css: {
+                  warning: name() in $root.warnings(),
+                  error: name() in $root.errors()
+                }" class="control-group">
+  <label class="control-label" data-bind="text: $root.label('connector', name())" rel="tooltip"></label>
   <div class="controls">
     <input class="input-xlarge" data-bind="value: value, attr: { 'type': (sensitive() ? 'password' : 'text'), 'name': name, 'title': $root.help('connector', name()) }" rel="tooltip">
     <span data-bind="template: { 'name': 'job-editor-form-field-error' }" class="help-inline"></span>
@@ -411,11 +447,32 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
 </script>
 
 <script type="text/html" id="connector-integer">
-<div data-bind="css: {'control-group': id() != null, warning: name() in $root.warnings(), error: name() in $root.errors() }">
-  <label class="control-label" data-bind="text: $root.label('connector', name()), attr: { 'title': $root.help('connector', name()) }" rel="tooltip"></label>
+<div data-bind="css: {
+                  warning: name() in $root.warnings(),
+                  error: name() in $root.errors()
+                }" class="control-group">
+  <label class="control-label" data-bind="text: $root.label('connector', name())" rel="tooltip"></label>
   <div class="controls">
     <input class="input-xlarge" data-bind="value: value, attr: { 'type': (sensitive() ? 'password' : 'text'), 'name': name, 'title': $root.help('connector', name())}" rel="tooltip">
     <span data-bind="template: {'name': 'job-editor-form-field-error'}" class="help-inline"></span>
+  </div>
+</div>
+</script>
+
+<script type="text/html" id="connector-boolean">
+<div data-bind="css: {
+                  warning: name() in $root.warnings(),
+                  error: name() in $root.errors()
+                }" class="control-group">
+  <label class="control-label" data-bind="text: $root.label('connector', name())" rel="tooltip"></label>
+  <div class="controls">
+    <div class="btn-group inline" data-toggle="buttons-radio" style="display: inline">
+      <button data-bind="clickValue: value, attr: {'name': name}" type="button" value="true" class="btn" data-toggle="button">${_('True')}</button>
+      <button data-bind="clickValue: value, attr: {'name': name}" type="button" value="false" class="btn" data-toggle="button">${_('False')}</button>
+    </div>
+    <span data-bind="template: {
+                       'name': 'job-editor-form-field-error'
+                     }" class="help-inline"></span>
   </div>
 </div>
 </script>
