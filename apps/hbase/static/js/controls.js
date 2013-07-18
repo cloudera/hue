@@ -40,14 +40,12 @@ var searchRenderers = {
   }
 };
 
-var DataTableViewModel = function(options)
-{
+var DataTableViewModel = function(options) {
   var self = this, _defaults = {
     name: '',
     columns: [],
     items: [],
-    reload: function()
-    {
+    reload: function() {
 
     },
     el:''
@@ -56,20 +54,16 @@ var DataTableViewModel = function(options)
   ListViewModel.apply(this, [options]);
 
   self.name = ko.observable(options.name);
-  self.searchQuery.subscribe(function(value)
-  {
+  self.searchQuery.subscribe(function(value) {
     self._table.fnFilter(value);
   });
   self.columns = ko.observableArray(options.columns);
   self._el = $('table[data-datasource="' + options.el + '"]');
   self._table = null;
-  self._initTable = function()
-  {
-    if(!self._table)
-    {
+  self._initTable = function() {
+    if(!self._table) {
       self._table = self._el.dataTable({
-        "aoColumnDefs": [
-          { "bSortable": false, "aTargets": [ 0 ] }
+        "aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 ] }
         ],
       "sDom": 'tr',//this has to be in, change to sDom so you can call filter()
       'bAutoWidth':false,
@@ -81,17 +75,14 @@ var DataTableViewModel = function(options)
       var el = $(event.currentTarget);
   };
   var _reload = self.reload;
-  self.reload = function(callback)
-  {
+  self.reload = function(callback) {
     logGA('view_cluster');
-    if(self._table)
-    {
+    if(self._table) {
       self._table.fnClearTable();
       self._table.fnDestroy();
       self._table = null;
     }
-    _reload(function()
-    {
+    _reload(function() {
       self._initTable();
       if(callback!=null)
         callback();
@@ -127,24 +118,20 @@ var DataTableViewModel = function(options)
 };
 
 //a Listview of Listviews
-var SmartViewModel = function(options)
-{
+var SmartViewModel = function(options) {
   var self = this;
   options = ko.utils.extend({
     name: '',
     items: [],
-    reload: function()
-    {
+    reload: function() {
 
     },
     el:'',
     sortFields: {
-      'Row Key': function(a, b)
-      {
+      'Row Key': function(a, b) {
         return a.row.localeCompare(b.row);
       },
-      'Column Count': function(a, b)
-      {
+      'Column Count': function(a, b) {
         a = a.items().length;
         b = b.items().length;
         if(a > b)
@@ -153,8 +140,7 @@ var SmartViewModel = function(options)
           return -1;
         return 0;
       },
-      'Row Key Length': function(a, b)
-      {
+      'Row Key Length': function(a, b) {
         a = a.row.length;
         b = b.row.length;
         if(a > b)
@@ -186,10 +172,8 @@ var SmartViewModel = function(options)
   {
     var inputs = value.match(searchRenderers['rowkey']['select']);
     self.querySet.removeAll();
-    for(var i=0;i<inputs.length;i++)
-    {
-      if(inputs[i].trim() != "" && inputs[i].trim() != ',')
-      {
+    for(var i=0; i<inputs.length; i++) {
+      if(inputs[i].trim() != "" && inputs[i].trim() != ',') {
         var p = inputs[i].split('+');
         var scan = p.length > 1 ? parseInt(p[1].trim()) : 0;
         var extract = inputs[i].match(searchRenderers['rowkey']['nested']['columns']['select']);
@@ -208,14 +192,11 @@ var SmartViewModel = function(options)
     self.evaluateQuery();
   });
 
-  self._reloadcfs = function()
-  {
-    return API.queryTable("getColumnDescriptors").done(function(data)
-    {
+  self._reloadcfs = function() {
+    return API.queryTable("getColumnDescriptors").done(function(data) {
       self.columnFamilies.removeAll();
       var keys = Object.keys(data);
-      for(var i=0;i<keys.length;i++)
-      {
+      for(var i=0;i<keys.length;i++) {
         self.columnFamilies.push(new ColumnFamily({name:keys[i], enabled:false}));
       }
       self.reload();
@@ -223,55 +204,44 @@ var SmartViewModel = function(options)
   };
 
   self.columnQuery = ko.observable("");
-  self.columnQuery.subscribe(function(query)
-  {
-    $(self.items()).each(function()
-    {
+  self.columnQuery.subscribe(function(query) {
+    $(self.items()).each(function() {
       this.searchQuery(query);
     });
   });
 
-  self.rows = ko.computed(function()
-  {
+  self.rows = ko.computed(function() {
     var a = [];
     var items = this.items();
-    for(var i=0; i<items.length; i++)
-    {
+    for(var i=0; i<items.length; i++) {
       a.push(items[i].row);
     }
     return a;
   }, self);
 
   self.querySet = ko.observableArray();
-  self.validateQuery = function()
-  {
-    $(self.querySet()).each(function()
-    {
+  self.validateQuery = function() {
+    $(self.querySet()).each(function() {
       this.validate();
       this.editing(false);
     });
   };
-  self.addQuery = function()
-  {
+  self.addQuery = function() {
     self.validateQuery();
-    self.querySet.push(new QuerySetPeice({onValidate: function()
-    {
+    self.querySet.push(new QuerySetPeice({onValidate: function() {
       //self.reload();
     }}))
   };
-  self.evaluateQuery = function(callback)
-  {
+  self.evaluateQuery = function(callback) {
     self.validateQuery();
     self.reload(callback);
   };
   var _reload = self.reload;
-  self.reload = function(callback)
-  {
+  self.reload = function(callback) {
   	logGA('view_table');
     self.truncated = ko.observable(false);
     var queryStart = new Date();
-    _reload(function()
-    {
+    _reload(function() {
       self.lastReloadTime((new Date() - queryStart)/1000);
       if(callback!=null)
         callback();
@@ -284,21 +254,17 @@ var SmartViewModel = function(options)
   self.truncateCount = ko.observable(0);
 };
 
-var SmartViewDataRow = function(options)
-{
+var SmartViewDataRow = function(options) {
   var self = this;
   options = ko.utils.extend({
     sortFields: {
-      'Column Family': function(a, b)
-      {
+      'Column Family': function(a, b) {
         return a.name.localeCompare(b.name);
       },
-      'Column Name': function(a, b)
-      {
+      'Column Name': function(a, b) {
         return a.name.split(':')[1].localeCompare(b.name.split(':')[1]);
       },
-      'Cell Value': function(a, b)
-      {
+      'Cell Value': function(a, b) {
         a = a.value.length;
         b = b.value.length;
         if(a > b)
@@ -307,8 +273,7 @@ var SmartViewDataRow = function(options)
           return -1;
         return 0;
       },
-      'Timestamp': function(a, b)
-      {
+      'Timestamp': function(a, b) {
         a = parseInt(a.timestamp);
         b = parseInt(b.timestamp);
         if(a > b)
@@ -317,12 +282,10 @@ var SmartViewDataRow = function(options)
           return -1;
         return 0;
       },
-      'MIME Type': function()
-      {
+      'MIME Type': function() {
 
       },
-      'Column Name Length': function(a, b)
-      {
+      'Column Name Length': function(a, b) {
         a = a.name.split(':')[1].length;
         b = b.name.split(':')[1].length;
         if(a > b)
@@ -340,17 +303,14 @@ var SmartViewDataRow = function(options)
 
   self.displayRangeStart = 0;
   self.displayRangeLength = 20;
-  self.items.subscribe(function()
-  {
+  self.items.subscribe(function() {
     self.displayedItems([]);
     self.updateDisplayedItems();
   });
 
-  self.searchQuery.subscribe(function(searchValue)
-  {
+  self.searchQuery.subscribe(function(searchValue) {
     self.scrollLoadSource = ko.computed(function(){
-      return self.items().filter(function(column)
-      {
+      return self.items().filter(function(column) {
         return column.name.toLowerCase().indexOf(searchValue.toLowerCase()) != -1;
       });
     });
@@ -360,50 +320,39 @@ var SmartViewDataRow = function(options)
 
   self.scrollLoadSource = self.items;
 
-  self.updateDisplayedItems = function()
-  {
+  self.updateDisplayedItems = function() {
     var x = self.displayRangeStart;
     self.displayedItems(self.scrollLoadSource().slice(x, x + self.displayRangeLength));
   };
 
-  self.resetScrollLoad = function()
-  {
+  self.resetScrollLoad = function() {
     self.scrollLoadSource = self.items;
     self.updateDisplayedItems();
   };
 
-  self.toggleSelectedCollapse = function()
-  {
-    if(self.displayedItems().length == self.displayRangeStart + self.displayRangeLength)
-    {
-      self.displayedItems(self.displayedItems().filter(function(item)
-      {
+  self.toggleSelectedCollapse = function() {
+    if(self.displayedItems().length == self.displayRangeStart + self.displayRangeLength) {
+      self.displayedItems(self.displayedItems().filter(function(item) {
         return item.isSelected();
       }));
       self.scrollLoadSource = self.displayedItems;
     }
-    else
-    {
+    else {
       self.resetScrollLoad();
     }
   };
 
-  self.onScroll = function(target, ev)
-  {
-    if($(ev.target).scrollLeft() == ev.target.scrollWidth - ev.target.clientWidth && self.displayedItems().length < self.scrollLoadSource().length)
-    {
+  self.onScroll = function(target, ev) {
+    if($(ev.target).scrollLeft() == ev.target.scrollWidth - ev.target.clientWidth && self.displayedItems().length < self.scrollLoadSource().length) {
       self.displayRangeLength += 15;
       self.updateDisplayedItems();
     }
   };
 
-  self.drop = function(cont)
-  {
-    function doDrop()
-    {
+  self.drop = function(cont) {
+    function doDrop() {
       self.isLoading(true);
-      return API.queryTable('deleteAllRow', self.row, "{}").complete(function()
-      {
+      return API.queryTable('deleteAllRow', self.row, "{}").complete(function() {
         app.views.tabledata.items.remove(self); //decouple later
         self.isLoading(false);
       });
@@ -412,12 +361,10 @@ var SmartViewDataRow = function(options)
     (cont === true) ? doDrop() : confirm("Confirm Delete", 'Delete row ' + self.row + '? (This cannot be undone)', doDrop);
   };
 
-  self.setItems = function(cols)
-  {
+  self.setItems = function(cols) {
     var colKeys = Object.keys(cols);
     var items = [];
-    for(var q=0;q<colKeys.length;q++)
-    {
+    for(var q=0; q<colKeys.length; q++) {
       items.push(new ColumnRow({name: colKeys[q],
              timestamp: cols[colKeys[q]].timestamp,
              value: cols[colKeys[q]].value,
@@ -428,30 +375,26 @@ var SmartViewDataRow = function(options)
   };
 
   self.selectAllVisible = function(){
-    for(t=0;t<self.displayedItems().length;t++)
+    for(t=0; t<self.displayedItems().length; t++)
       self.displayedItems()[t].isSelected(true);
     return self;
   };
 
-  self.toggleSelectAllVisible = function()
-  {
+  self.toggleSelectAllVisible = function() {
     if(self.selected().length != self.displayedItems().length)
       return self.selectAllVisible();
     return self.deselectAll();
   };
 
-  self.push = function(item)
-  {
+  self.push = function(item) {
     var column = new ColumnRow(item);
     self.items.push(column);
   };
 
   var _reload = self.reload;
-  self.reload = function(callback)
-  {
+  self.reload = function(callback) {
   	logGA('get_row');
-    _reload(function()
-    {
+    _reload(function() {
       if(callback!=null)
         callback();
       self.isLoading(false);
@@ -459,22 +402,18 @@ var SmartViewDataRow = function(options)
   };
 };
 
-var ColumnRow = function(options)
-{
+var ColumnRow = function(options) {
   var self = this;
   ko.utils.extend(self,options);
   DataRow.apply(self,[options]);
 
   self.value = ko.observable(self.value);
   self.history = new CellHistoryPage({row: self.parent.row, column: self.name, timestamp: self.timestamp, items: []});
-  self.drop = function(cont)
-  {
-    function doDrop()
-    {
+  self.drop = function(cont) {
+    function doDrop() {
       logGA('filter_columns');
       self.parent.isLoading(true);
-      return API.queryTable('deleteColumn', self.parent.row, self.name).done(function(data)
-      {
+      return API.queryTable('deleteColumn', self.parent.row, self.name).done(function(data) {
         self.parent.items.remove(self);
         if(self.parent.items().length > 0)
           self.parent.reload(); //change later
@@ -484,11 +423,9 @@ var ColumnRow = function(options)
     (cont === true) ? doDrop() : confirm("Confirm Delete", "Are you sure you want to drop this column?", doDrop);
   };
 
-  self.reload = function(callback, skipPut)
-  {
+  self.reload = function(callback, skipPut) {
     self.isLoading(true);
-    API.queryTable('get', self.parent.row, self.name, 'null').done(function(data)
-    {
+    API.queryTable('get', self.parent.row, self.name, 'null').done(function(data) {
       if(data.length > 0 && !skipPut)
         self.value(data[0].value);
       if(typeof callback !== "undefined" && callback != null)
@@ -497,12 +434,10 @@ var ColumnRow = function(options)
     });
   };
 
-  self.value.subscribe(function(value)
-  {
+  self.value.subscribe(function(value) {
     //change transport prep to object wrapper
     logGA('put_column');
-    API.queryTable('putColumn', self.parent.row, self.name, "hbase-post-key-" + JSON.stringify(value)).done(function(data)
-    {
+    API.queryTable('putColumn', self.parent.row, self.name, "hbase-post-key-" + JSON.stringify(value)).done(function(data) {
       self.reload(function(){}, true);
     });
     self.editing(false);
@@ -510,11 +445,10 @@ var ColumnRow = function(options)
 
   self.editing = ko.observable(false);
 
-  self.isLoading = ko.observable(false); //move to baseclass 
+  self.isLoading = ko.observable(false); //move to baseclass
 };
 
-var SortDropDownView = function(options)
-{
+var SortDropDownView = function(options) {
   var self = this;
   options = ko.utils.extend({
     sortFields: {},
@@ -529,22 +463,18 @@ var SortDropDownView = function(options)
   self.sortField.subscribe(function(){self.sort()});
   self.sortFields = ko.observableArray(Object.keys(options.sortFields)); // change to ko.computed?
   self.sortFunctionHash = ko.observable(options.sortFields);
-  self.toggleSortMode = function()
-  {
+  self.toggleSortMode = function() {
     self.sortAsc(!self.sortAsc());
   };
-  self.sort = function()
-  {
+  self.sort = function() {
     if (!self.target || !(self.sortFields().length > 0)) return;
-    self.target.sort(function(a, b)
-    {
+    self.target.sort(function(a, b) {
       return (self.sortAsc() ? 1 : -1) * self.sortFunctionHash()[self.sortField() ? self.sortField() : self.sortFields()[0]](a,b); //all sort functions must sort by ASC for default
     });
   };
 };
 
-var TableDataRow = function(options)
-{
+var TableDataRow = function(options) {
   var self = this;
   options = ko.utils.extend({
     name:"",
@@ -556,37 +486,30 @@ var TableDataRow = function(options)
   self.enabled = ko.observable(options['enabled']);
   self.toggle = function(viewModel,event){
     var action = ['enable','disable'][self.enabled() << 0], el = $(event.currentTarget);
-    confirm("Confirm "+action, "Are you sure you want to " + action + " this table?", function() //gotta i18n this!
+    confirm("Confirm "+action, "Are you sure you want to " + action + " this table?", function() //gotta i18n this! 
     {
       el.showIndicator();
-      return self[action](el).complete(function()
-      {
+      return self[action](el).complete(function() {
         el.hideIndicator();
       });
     });
   };
-  self.enable = function(el)
-  {
-    return API.queryCluster('enableTable',self.name).complete(function()
-    {
+  self.enable = function(el) {
+    return API.queryCluster('enableTable',self.name).complete(function() {
       self.enabled(true);
     });
   };
-  self.disable = function(el)
-  {
-    return API.queryCluster('disableTable',self.name).complete(function()
-    {
+  self.disable = function(el) {
+    return API.queryCluster('disableTable',self.name).complete(function() {
       self.enabled(false);
     });
   };
-  self.drop = function(el)
-  {
+  self.drop = function(el) {
     return API.queryCluster('deleteTable',self.name);
   };
 };
 
-var QuerySetPeice = function(options)
-{
+var QuerySetPeice = function(options) {
   var self = this;
   options = ko.utils.extend({
     row_key: "null",
@@ -605,8 +528,7 @@ var QuerySetPeice = function(options)
   self.filter = ko.observable(options.filter);
   self.editing = ko.observable(true);
 
-  self.validate = function()
-  {
+  self.validate = function() {
     if(self.scan_length() <= 0 || self.row_key() == "")
       return app.views.tabledata.querySet.remove(self); //change later
     return options.onValidate();
@@ -615,12 +537,10 @@ var QuerySetPeice = function(options)
   self.scan_length.subscribe(self.validate.bind());
 };
 
-var ColumnFamily = function(options)
-{
+var ColumnFamily = function(options) {
   this.name = options.name;
   this.enabled = ko.observable(options.enabled);
-  this.toggle = function()
-  {
+  this.toggle = function() {
     this.enabled(!this.enabled());
     app.views.tabledata.reload();
   };
@@ -628,44 +548,37 @@ var ColumnFamily = function(options)
 
 
 //tagsearch
-var tagsearch = function()
-{
+var tagsearch = function() {
   var self = this;
   self.tags = ko.observableArray();
   self.mode = ko.observable('idle');
   self.cur_input = ko.observable('');
-  self.hints = ko.observableArray([
-    {
+  self.hints = ko.observableArray([ {
       hint: 'End Query',
       shortcut: ',',
       mode: ['rowkey', 'prefix', 'scan'],
       selected: false
-    },
-    {
+    }, {
       hint: 'Mark Row Prefix',
       shortcut: '*',
       mode: ['rowkey'],
       selected: false
-    },
-    {
+    }, {
       hint: 'Start Scan',
       shortcut: '+',
       mode: ['rowkey', 'prefix'],
       selected: false
-    },
-    {
+    }, {
       hint: 'Start Select Columns',
       shortcut: '[',
       mode: ['rowkey', 'prefix'],
       selected: false
-    },
-    {
+    }, {
       hint: 'End Column/Family',
       shortcut: ',',
       mode: ['columns'],
       selected: false
-    },
-    {
+    }, {
       hint: 'End Select Columns',
       shortcut: ']',
       mode: ['columns'],
@@ -684,19 +597,16 @@ var tagsearch = function()
       selected: false
     }
   ]);
-  self.activeHints = ko.computed(function()
-  {
+  self.activeHints = ko.computed(function() {
     var ret = [];
-    $(self.hints()).each(function(i, hint)
-    {
+    $(self.hints()).each(function(i, hint) {
       if (hint.mode.indexOf(self.mode()) > -1)
         ret.push(hint);
     });
     return ret;
   });
   self.activeHint = ko.observable(-1);
-  self.modes =
-  {
+  self.modes = {
     'rowkey': {
       hint: 'Row Key Value',
       type: 'String'
@@ -722,23 +632,18 @@ var tagsearch = function()
   self.modeQueue = ['idle'];
   self.focused = ko.observable(false);
 
-  self.insertTag = function(tag)
-  {
+  self.insertTag = function(tag) {
     var mode = tag.indexOf('+') != -1 ? 'scan' : 'rowkey';
     var tag = {value: tag, tag: mode} //parse mode
     self.tags.push(tag);
   }
 
-  self.render = function(input, renderers)
-  {
+  self.render = function(input, renderers) {
     var keys = Object.keys(renderers);
-    for(var i=0; i<keys.length; i++)
-    {
-      input = input.replace(renderers[keys[i]].select, function(selected)
-      {
+    for(var i=0; i<keys.length; i++) {
+      input = input.replace(renderers[keys[i]].select, function(selected) {
         var hasMatched = false;
-        var processed = selected.replace(renderers[keys[i]].tag, function(tagged)
-        {
+        var processed = selected.replace(renderers[keys[i]].tag, function(tagged) {
           hasMatched = true;
           return "<span class='" + keys[i] + " tagsearchTag' title='" + keys[i] + "' data-toggle='tooltip'>" + ('nested' in renderers[keys[i]] ? self.render(tagged, renderers[keys[i]].nested) : tagged) + "</span>";
         });
@@ -750,23 +655,19 @@ var tagsearch = function()
     return input;
   };
 
-  self.updateMode = function(value)
-  {
+  self.updateMode = function(value) {
     var selection = value.slice(0, self.selectionEnd());
     var endindex = selection.slice(selection.lastIndexOf(',')).indexOf(',');
     if(endindex == -1) endindex = selection.length;
     var lastbit = value.substring(selection.lastIndexOf(','), endindex).trim();
-    if(lastbit == "," || lastbit == "")
-    {
+    if(lastbit == "," || lastbit == "") {
       self.mode('idle');
       return;
     }
     var tokens = "[]+,*{}";
     var m = 'rowkey';
-    for(var i=selection.length - 1; i>=0; i--)
-    {
-      if(tokens.indexOf(selection[i]) != -1)
-      {
+    for(var i=selection.length - 1; i>=0; i--) {
+      if(tokens.indexOf(selection[i]) != -1) {
         if(selection[i] == '{')
           m = 'filter';
         else if(selection[i] == '[')
@@ -786,8 +687,7 @@ var tagsearch = function()
   self.selectionStart = ko.observable(0);
   self.selectionEnd = ko.observable(0);
 
-  self.hintText = ko.computed(function()
-  {
+  self.hintText = ko.computed(function() {
     var value = self.cur_input();
     var selection = value.slice(0, self.selectionEnd());
     var index = selection.lastIndexOf(',') + 1;
@@ -802,10 +702,8 @@ var tagsearch = function()
     return pre.slice(0, s) + "<span class='selection'>" + pre.slice(s, e) + "</span>" + pre.slice(e);
   });
 
-  self.onKeyDown = function(target, ev)
-  {
-    if(ev.keyCode == 13 && self.cur_input().slice(self.cur_input().lastIndexOf(',')).trim() != ",")
-    {
+  self.onKeyDown = function(target, ev) {
+    if(ev.keyCode == 13 && self.cur_input().slice(self.cur_input().lastIndexOf(',')).trim() != ",") {
         self.evaluate();
         return false;
     }
@@ -822,8 +720,7 @@ var tagsearch = function()
 	self.updateMode(self.cur_input());
   };
 
-  self.evaluate = function()
-  {
+  self.evaluate = function() {
     app.views.tabledata.searchQuery(self.cur_input());
   };
 
@@ -848,19 +745,16 @@ var tagsearch = function()
   });
 };
 
-var CellHistoryPage = function(options)
-{
+var CellHistoryPage = function(options) {
   var self = this;
 
   self.items = ko.observableArray(options.items);
   self.loading = ko.observable(false);
 
-  self.reload = function(timestamp, append)
-  {
+  self.reload = function(timestamp, append) {
     if(!timestamp)
       timestamp = options.timestamp
-    API.queryTable("getVerTs", options.row, options.column, timestamp, 10, 'null').done(function(res)
-    {
+    API.queryTable("getVerTs", options.row, options.column, timestamp, 10, 'null').done(function(res) {
       self.loading = ko.observable(true);
       if(!append)
         self.items(res);

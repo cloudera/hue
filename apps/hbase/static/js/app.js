@@ -14,8 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var AppViewModel = function()
-{
+var AppViewModel = function() {
   var self = this;
 
   self.station = ko.observable("");
@@ -23,22 +22,18 @@ var AppViewModel = function()
   self.focusModel = ko.observable();
   self.cluster = ko.observable("");
   self.clusters = ko.observableArray();
-  API.query('getClusters').done(function(data)
-  {
+  API.query('getClusters').done(function(data) {
     app.clusters(data);
   });
   self.search = new tagsearch();
 
   self.views = {
-    tables: new DataTableViewModel({columns:['Table Name', 'Enabled'], el: 'views.tables', reload: function(callback)
-    {
+    tables: new DataTableViewModel({columns:['Table Name', 'Enabled'], el: 'views.tables', reload: function(callback) {
       var d_self = this;
       d_self.items.removeAll();
-      API.queryCluster("getTableList").done(function(data)
-      {
+      API.queryCluster("getTableList").done(function(data) {
         d_self.items.removeAll(); //need to remove again before callback executes
-        for(q=0;q<data.length;q++)
-        {
+        for(q=0; q<data.length; q++) {
           d_self.items.push(new TableDataRow(data[q]));
         }
         d_self._el.find('a[data-row-selector=true]').jHueRowSelector();
@@ -46,40 +41,32 @@ var AppViewModel = function()
           callback();
       });
     }}),
-    tabledata: new SmartViewModel({el: 'views.tabledata', reload: function(callback) //move inside SmartViewModel class?
+    tabledata: new SmartViewModel({el: 'views.tabledata', reload: function(callback) //move inside SmartViewModel class? 
     {
       var t_self = this;
-      function getColumnFamilies()
-      {
+      function getColumnFamilies() {
         var cols = [];
         var cfs = t_self.columnFamilies();
-        for(var i=0;i<cfs.length;i++)
-        {
-          if(cfs[i].enabled())
-          {
+        for(var i=0; i<cfs.length; i++) {
+          if(cfs[i].enabled()) {
             cols.push(cfs[i].name);
           }
         }
         return cols;
       }
-      API.queryTable("getRowQuerySet", JSON.stringify(getColumnFamilies()), ko.toJSON(t_self.querySet())).done(function(data)
-      {
-        if(data.length>0)
-        {
+      API.queryTable("getRowQuerySet", JSON.stringify(getColumnFamilies()), ko.toJSON(t_self.querySet())).done(function(data) {
+        if(data.length > 0) {
           var keys = Object.keys(data);
           var items = [];
-          for(var i=0;i<keys.length;i++)
-          {
-            var row = new SmartViewDataRow({items: [], row:data[keys[i]].row, reload:function(options)
-            {
+          for(var i=0; i<keys.length; i++) {
+            var row = new SmartViewDataRow({items: [], row:data[keys[i]].row, reload: function(options) {
               var self = this;
               options = (options == null) ? {} : options;
               options = ko.utils.extend({
                 callback:function(data){},
                 columns: getColumnFamilies()
               }, options);
-              API.queryTable("getRow", JSON.stringify(options.columns), self.row).done(function(data)
-              {
+              API.queryTable("getRow", JSON.stringify(options.columns), self.row).done(function(data) {
                 self.setItems(data.columns);
                 callback(data);
                 self.isLoading(false);
@@ -107,8 +94,7 @@ ko.applyBindings(app);
 
 routed = false;
 routie({
-  ':cluster/:table/query/:query': function(cluster, table, query)
-    {
+  ':cluster/:table/query/:query': function(cluster, table, query) {
       logGA('query_table');
       Router.setTable(cluster, table);
       Views.render('dataview');
@@ -117,16 +103,14 @@ routie({
       app.search.evaluate();
       routed = true;
     },
-    ':cluster/:table': function(cluster, table)
-    {
+    ':cluster/:table': function(cluster, table) {
       //logGA('view_table'); taken care of in reload()
       Router.setTable(cluster, table);
       app.station('table');
       Views.render('dataview');
       routed = true;
     },
-    ':cluster': function(cluster)
-    {
+    ':cluster': function(cluster) {
       logGA('view_cluster');
       Breadcrumbs.render();
       app.station('cluster');
@@ -136,14 +120,12 @@ routie({
       app.views.tables.reload();
       routed = true;
     },
-    'error': function()
-    {
+    'error': function() {
       logGA('error');
       routed = true;
     },
     '': function(){
-    var redirect = app.clusters.subscribe(function(data)
-    {
+    var redirect = app.clusters.subscribe(function(data) {
       routie(data[0].name);
       redirect.dispose();
     });
@@ -160,41 +142,33 @@ routie({
 
 $.fn.renderElement = function(data){utils.renderElement($(this,data))};
 
-$.fn.showIndicator = function()
-{
+$.fn.showIndicator = function() {
   $(this).addClass('isLoading');
 }
 
-$.fn.hideIndicator = function()
-{
+$.fn.hideIndicator = function() {
   $(this).removeClass('isLoading');
 }
 
-$.fn.toggleIndicator = function()
-{
+$.fn.toggleIndicator = function() {
   $(this).toggleClass('isLoading');
 }
 
-function bindSubmit()
-{
+function bindSubmit() {
   var self = this;
   var data = [];
   var hash_cache = {};
-  $(this).find('.controls > input, .controls > textarea, .controls > ul input').not('input[type=submit]').each(function()
-  {
+  $(this).find('.controls > input, .controls > textarea, .controls > ul input').not('input[type=submit]').each(function() {
     if($(this).hasClass('ignore'))
       return;
     var use_post = $(this).data('use-post');
     var submitVal = null;
-    if($(this).data('subscribe'))
-    {
+    if($(this).data('subscribe')) {
       var target = $($(this).data('subscribe'));
-      switch(target[0].tagName)
-      {
+      switch(target[0].tagName) {
         case "UL":
           var serialized = {};
-          target.find('li').each(function()
-          {
+          target.find('li').each(function() {
             serialized[$(this).find('input')[0].value] = $(this).find('input')[1].value;
           });
           submitVal = JSON.stringify(serialized);
@@ -202,20 +176,17 @@ function bindSubmit()
           break;
       }
     }
-    else if($(this).hasClass('serializeHash'))
-    {
+    else if($(this).hasClass('serializeHash')) {
       var target = $(this).attr('name');
       if(!hash_cache[target])
         hash_cache[target] = {};
       hash_cache[target][$(this).data(key)] = $(this).val();
     }
-    else
-    {
+    else {
       submitVal = $(this).val();
       //change reload next
     }
-    if(submitVal)
-    {
+    if(submitVal) {
       if(use_post)
         submitVal = "hbase-post-key-" + JSON.stringify(submitVal);
       else
@@ -227,13 +198,11 @@ function bindSubmit()
   var ui = app.focusModel();
   if(ui)
     ui.isLoading(true);
-  API.queryArray($(this).attr('action'), data).complete(function()
-  {
+  API.queryArray($(this).attr('action'), data).complete(function() {
     $(self).find('input[type=submit]').removeClass('disabled').hideIndicator();
     if(ui)
       ui.isLoading(false);
-  }).success(function()
-  {
+  }).success(function() {
     if(ui)
       app.focusModel().reload();
     $(self).modal('hide').trigger('reset');
@@ -242,19 +211,16 @@ function bindSubmit()
 }
 $('form.ajaxSubmit').submit(bindSubmit);
 
-$('a.action_addColumn').click(function()
-{
+$('a.action_addColumn').click(function() {
   $(this).parent().find("ul").append("<li><input type=\"text\" name=\"table_columns\" placeholder = \"family:column_name\"/></li>")
 });
-$('a.action_addColumnValue').click(function()
-{
+$('a.action_addColumnValue').click(function() {
   $(this).parent().find("ul").append("<li><input type=\"text\" name=\"column_values\" class=\"ignore\" placeholder = \"family:column_name\"/> <input type=\"text\" name=\"column_values\" class=\"ignore\" placeholder = \"cell_value\"/></li>")
 });
 
 var konami = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65, 13];
 var konami_index = 0;
-$(window).keydown(function(ev)
-{
+$(window).keydown(function(ev) {
   if(ev.keyCode == konami[konami_index])
     konami_index++;
   else
