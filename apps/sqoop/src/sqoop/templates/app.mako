@@ -382,25 +382,51 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
 </fieldset>
 </script>
 
+<script type="text/html" id="framework-map">
+<div data-bind="css: {
+                  warning: name() in $root.warnings(),
+                  error: name() in $root.errors()
+                }" class="control-group">
+  <label class="control-label" data-bind="text: $root.label('framework', name())"></label>
+  <div class="controls">
+
+    <table data-bind="visible: value() && value().length > 0" style="margin-bottom: 4px">
+      <thead>
+        <tr>
+          <th>${ _('Property name') }</th>
+          <th>${ _('Value') }</th>
+          <th/>
+        </tr>
+      </thead>
+      <tbody data-bind="foreach: value()">
+        <tr>
+          <td>
+            <input data-bind="'value': key,
+                              'attr': {
+                                'title': $root.help('framework', $parent.name())
+                              }" type="text" class="span12 required propKey" />
+          </td>
+          <td>
+            <input data-bind="value: value" type="text" class="span12 required" />
+          </td>
+          <td>
+            <a data-bind="click: $parent.removeFromMap.bind($parent, [$index()])" class="btn" href="javascript:void(0);">${ _('Delete') }</a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <a data-bind="click: $data.addToMap.bind($data, [])" href="javascript:void(0);" class="btn">${_('Add')}</a>
+  </div>
+</div>
+</script>
+
 <script type="text/html" id="framework-enum">
 <div data-bind="css:{'control-group': id() != null, warning: name() in $root.warnings(), error: name() in $root.errors()}">
   <label class="control-label" data-bind="text: $root.label('framework', name())"></label>
   <div class="controls">
     <select class="input-xlarge" data-bind="'options': values, 'value': value, 'optionsCaption': '${ _('Choose...') }', 'attr': { 'name': name, 'title': $root.help('framework', name())}" rel="tooltip">
     </select>
-    <span data-bind="template: {'name': 'job-editor-form-field-error'}" class="help-inline"></span>
-  </div>
-</div>
-</script>
-
-<script type="text/html" id="framework-map">
-<div data-bind="css: {
-                  warning: name() in $root.warnings(),
-                  error: name() in $root.errors()
-                }" class="control-group">
-  <label class="control-label" data-bind="text: $root.label('framework', name())" rel="tooltip"></label>
-  <div class="controls">
-    <input class="input-xlarge" data-bind="value: value, attr: {'type': (sensitive() ? 'password' : 'text'), 'name': name, 'title': $root.help('framework', name())}" rel="tooltip">
     <span data-bind="template: {'name': 'job-editor-form-field-error'}" class="help-inline"></span>
   </div>
 </div>
@@ -450,6 +476,45 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
 </div>
 </script>
 
+<script type="text/html" id="connector-map">
+<div data-bind="css: {
+                  warning: name() in $root.warnings(),
+                  error: name() in $root.errors()
+                }" class="control-group">
+  <label class="control-label" data-bind="text: $root.label('connector', name())"></label>
+  <div class="controls">
+
+    <table data-bind="visible: value() && value().length > 0" style="margin-bottom: 4px">
+      <thead>
+        <tr>
+          <th>${ _('Property name') }</th>
+          <th>${ _('Value') }</th>
+          <th/>
+        </tr>
+      </thead>
+      <tbody data-bind="foreach: value()">
+        <tr>
+          <td>
+            <input data-bind="'value': key,
+                              'attr': {
+                                'title': $root.help('connector', $parent.name())
+                              }" type="text" class="span12 required propKey" />
+          </td>
+          <td>
+            <input data-bind="value: value" type="text" class="span12 required" />
+          </td>
+          <td>
+            <a data-bind="click: $parent.removeFromMap.bind($parent, [$index()])" class="btn" href="javascript:void(0);">${ _('Delete') }</a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <a data-bind="click: $data.addToMap.bind($data, [])" href="javascript:void(0);" class="btn">${_('Add')}</a>
+  </div>
+</div>
+</script>
+
 <script type="text/html" id="connector-enum">
 <div data-bind="css: {
                   warning: name() in $root.warnings(),
@@ -459,19 +524,6 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
   <div class="controls">
     <select class="input-xlarge" data-bind="'options': values, 'value': value, 'optionsCaption': '${ _('Choose...') }', attr: { 'name': name, 'title': $root.help('connector', name()) }" rel="tooltip">
     </select>
-    <span data-bind="template: { 'name': 'job-editor-form-field-error' }" class="help-inline"></span>
-  </div>
-</div>
-</script>
-
-<script type="text/html" id="connector-map">
-<div data-bind="css: {
-                  warning: name() in $root.warnings(),
-                  error: name() in $root.errors()
-                }" class="control-group">
-  <label class="control-label" data-bind="text: $root.label('connector', name())" rel="tooltip"></label>
-  <div class="controls">
-    <input class="input-xlarge" data-bind="value: value, attr: { 'type': (sensitive() ? 'password' : 'text'), 'name': name, 'title': $root.help('connector', name()) }" rel="tooltip">
     <span data-bind="template: { 'name': 'job-editor-form-field-error' }" class="help-inline"></span>
   </div>
 </div>
@@ -532,7 +584,7 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
 <script src="/sqoop/static/js/koify.js" type="text/javascript" charset="utf-8"></script>
 <script src="/sqoop/static/js/sqoop.utils.js" type="text/javascript" charset="utf-8"></script>
 <script src="/sqoop/static/js/sqoop.wizard.js" type="text/javascript" charset="utf-8"></script>
-<script src="/sqoop/static/js/sqoop.models.js" type="text/javascript" charset="utf-8"></script>
+<script src="/sqoop/static/js/sqoop.forms.js" type="text/javascript" charset="utf-8"></script>
 <script src="/sqoop/static/js/sqoop.framework.js" type="text/javascript" charset="utf-8"></script>
 <script src="/sqoop/static/js/sqoop.connectors.js" type="text/javascript" charset="utf-8"></script>
 <script src="/sqoop/static/js/sqoop.connections.js" type="text/javascript" charset="utf-8"></script>

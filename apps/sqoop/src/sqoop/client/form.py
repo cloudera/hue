@@ -59,6 +59,9 @@ class Form(object):
           "id": 5,
           "name": "connection.jdbcProperties",
           "type": "MAP",
+          "value": {
+            "key": "value"
+          },
           "sensitive": false
         }
       ],

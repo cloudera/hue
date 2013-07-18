@@ -26,24 +26,24 @@ var connections = (function($) {
     'framework': [],
     'initialize': function(attrs) {
       var self = this;
-      var attrs = $.extend(true, attrs, {});
-      attrs = transform_keys(attrs, {
+      var _attrs = $.extend(true, {}, attrs);
+      _attrs = transform_keys(_attrs, {
         'connector-id': 'connector_id'
       });
-      attrs = transform_values(attrs, {
+      _attrs = transform_values(_attrs, {
         'connector': to_forms,
         'framework': to_forms
       });
-      return attrs;
+      return _attrs;
     }
   });
 
   var Connection = koify.Node.extend({
     'identifier': 'connection',
     'persists': true,
-    'modelClass': ConnectionModel,
+    'model_class': ConnectionModel,
     'base_url': '/sqoop/api/connections/',
-    'initialize': function() {
+    'initialize': function(options) {
       var self = this;
       self.parent.initialize.apply(self, arguments);
       self.selected = ko.observable();
@@ -63,7 +63,19 @@ var connections = (function($) {
         });
         return connection_string;
       });
-    }
+    },
+    'map': function() {
+      var self = this;
+      var mapping_options = $.extend(true, {
+        'ignore': ['parent', 'initialize']
+      }, forms.MapProperties);
+      if ('__ko_mapping__' in self) {
+        ko.mapping.fromJS(self.model, mapping_options, self);
+      } else {
+        var mapped = ko.mapping.fromJS(self.model, mapping_options);
+        $.extend(self, mapped);
+      }
+    },
   });
 
   function fetch_connections(options) {

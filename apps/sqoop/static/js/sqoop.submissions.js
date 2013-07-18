@@ -28,14 +28,14 @@ var submissions = (function($) {
     'external_link': null,
     'initialize': function(attrs) {
       var self = this;
-      var attrs = $.extend(true, attrs || {}, {});
-      attrs = transform_keys(attrs, {
+      var _attrs = $.extend(true, {}, attrs || {});
+      _attrs = transform_keys(_attrs, {
         'creation-date': 'creation_date',
         'last-update-date': 'last_update_date',
         'external-id': 'external_id',
         'external-link': 'external_link'
       });
-      return attrs;
+      return _attrs;
     }
   });
 
@@ -43,7 +43,7 @@ var submissions = (function($) {
   var Submission = koify.Node.extend({
     'identifier': 'submission',
     'persists': false,
-    'modelClass': SubmissionModel,
+    'model_class': SubmissionModel,
     'base_url': '/sqoop/api/submissions/',
     'initialize': function() {
       var self = this;
