@@ -1719,7 +1719,7 @@ def hive_site_xml(is_local=False, use_sasl=False, thrift_uris='thrift://darkside
       </property>
 
       <property>
-        <name>hive.server2.allow.user.substitution</name>
+        <name>hive.server2.enable.impersonation</name>
         <value>%(hs2_impersonation)s</value>
       </property>
 
