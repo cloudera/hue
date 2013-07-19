@@ -13,11 +13,13 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
+
 <%!
 from desktop.lib.i18n import smart_unicode
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
+
 ${ commonheader(_('Error'), "", user) | n,unicode }
 
   <div class="container-fluid">
@@ -25,9 +27,11 @@ ${ commonheader(_('Error'), "", user) | n,unicode }
     <p>${_("Sorry, there's been an error. An email was sent to your administrators. Thank you for your patience.")}</p>
     <div class="details">
     % if traceback:
-      <a href="javascript:toggleDisplay('#traceback');"><i class="icon-share-alt"></i> ${_('More Info')}</a>
-      &nbsp;
-      <a href="/logs" target="_new">${_('View Logs')}</a>
+      <a href="javascript:toggleDisplay('#traceback');" title="${ _('See the stacktrace') }"><i class="icon-share-alt"></i> ${_('More Info')}</a>
+      % if user.is_superuser:
+        &nbsp;
+        <a href="/logs" target="_new" title="${ _('View server logs') }"><i class="icon-tasks"></i> ${_('View Logs')}</a>
+      % endif
       <br />
       <br />
       <div id="traceback" class="hide">
@@ -51,7 +55,9 @@ ${ commonheader(_('Error'), "", user) | n,unicode }
         </table>
       </div>
     % else:
-      <a href="/logs" target="_new">${_('View Logs')}</a>
+      % if user.is_superuser:
+        <a href="/logs" target="_new" title="${ _('View server logs') }"><i class="icon-tasks"></i> ${_('View Logs')}</a>
+      % endif
     % endif
     </div>
   </div>
