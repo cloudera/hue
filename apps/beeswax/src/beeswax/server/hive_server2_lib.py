@@ -258,6 +258,8 @@ class HiveServerClient:
     self.user = user
 
     use_sasl, mechanism, kerberos_principal_short_name, hiveserver2_impersonation_enabled = HiveServerClient.get_security(query_server)
+    LOG.info('use_sasl=%s, mechanism=%s, kerberos_principal_short_name=%s, hiveserver2_impersonation_enabled=%s' % (
+             use_sasl, mechanism, kerberos_principal_short_name, hiveserver2_impersonation_enabled))
 
     self.hiveserver2_impersonation_enabled = hiveserver2_impersonation_enabled
     self._client = thrift_util.get_client(TCLIService.Client,
