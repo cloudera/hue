@@ -242,7 +242,7 @@ def _node_relationships(workflow, parent, child_el):
         if name == 'error':
           child, create = Kill.objects.get_or_create(name='kill', workflow=workflow, node_type=Kill.node_type)
         else:
-          raise RuntimeError("Node %s has not been defined" % to)
+          raise RuntimeError(_("Node %s has not been defined") % to)
 
       obj = Link.objects.create(name=name, parent=parent, child=child)
       obj.save()
