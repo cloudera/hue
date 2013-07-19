@@ -175,7 +175,7 @@ ${ commonheader(_('Quick Start'), "quickstart", user, "100px") | n,unicode }
           <span class="icon">
             <i class="icon-th-list"></i>
           </span>
-          <h5>${ _('Create or import users.') }</h5>
+          <h5>${ _('Create or import users') }</h5>
         </div>
         <div class="widget-content">
         <a  href="${ url('useradmin.views.list_users') }" target="_blank"><img src="/useradmin/static/art/icon_useradmin_24.png"> ${ _('User Admin') }</a>
@@ -196,27 +196,6 @@ ${ commonheader(_('Quick Start'), "quickstart", user, "100px") | n,unicode }
           </label>
         </div>
       </div>
-
-      <div class="widget-box">
-        <div class="widget-title">
-          <span class="icon">
-            <i class="icon-th-list"></i>
-          </span>
-          <h5>${ _('Anonymous usage analytics') }</h5>
-        </div>
-        <div class="widget-content" style="padding-left: 14px">
-          <label class="checkbox">
-            <input class="updatePreferences" type="checkbox" name="collect_usage" style="margin-right: 10px" title="${ ('Check to enable usage analytics') }" ${ collect_usage and "checked" }/>
-            ${ ('Help improve Hue with anonymous usage analytics.') }
-            <a href="javascript:void(0)" style="display: inline" data-trigger="hover" data-toggle="popover" data-placement="right" rel="popover"
-               title="${_('How does it work?') }"
-               data-content="${ ('We are using Google Analytics to see how many times an application or specific section of an application is used, nothing more.') }">
-               <i class="icon-question-sign"></i>
-            </a>
-          </label>
-        </div>
-      </div>
-    </div>
 
     <div id="step4" class="stepDetails hide">
       <div class="widget-box">

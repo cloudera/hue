@@ -38,29 +38,35 @@ HTTP_HOST = Config(
   help=_("HTTP host to bind to."),
   type=str,
   default="0.0.0.0")
+
 HTTP_PORT = Config(
   key="http_port",
   help=_("HTTP port to bind to."),
   type=int,
   default=8888)
+
 SSL_CERTIFICATE = Config(
   key="ssl_certificate",
   help=_("Filename of SSL Certificate"),
   default=None)
+
 SSL_PRIVATE_KEY = Config(
   key="ssl_private_key",
   help=_("Filename of SSL RSA Private Key"),
   default=None)
+
 ENABLE_SERVER = Config(
   key="enable_server",
   help=_("If set to false, runcpserver will not actually start the web server.  Used if Apache is being used as a WSGI container."),
   type=coerce_bool,
   default=True)
+
 CHERRYPY_SERVER_THREADS = Config(
   key="cherrypy_server_threads",
   help=_("Number of threads used by the CherryPy web server."),
   type=int,
   default=10)
+
 SECRET_KEY = Config(
   key="secret_key",
   help=_("Used in hashing algorithms for sessions."),
@@ -71,6 +77,14 @@ USER_ACCESS_HISTORY_SIZE = Config(
   help=_("Number of user access to remember per view per user."),
   type=int,
   default=10)
+
+COLLECT_USAGE = Config(
+  key="collect_usage",
+  help=_("Help improve Hue with anonymous usage analytics."
+         "Use Google Analytics to see how many times an application or specific section of an application is used, nothing more."),
+  type=coerce_bool,
+  default=True)
+
 
 def is_https_enabled():
   return bool(SSL_CERTIFICATE.get() and SSL_PRIVATE_KEY.get())
