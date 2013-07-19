@@ -46,7 +46,7 @@
           <div class="control-group ">
             <label class="control-label">
               <a href="javascript:void(0);" id="advanced-btn" onclick="$('#node-advanced-container').toggle('hide')">
-                <i class="icon-share-alt"></i> ${ _('advanced') }</a>
+                <i class="icon-share-alt"></i> ${ _('Advanced') }</a>
             </label>
             <div class="controls"></div>
           </div>
@@ -58,7 +58,7 @@
                 <div style="padding-top:4px">
                   <select data-bind="options: $root.context().nodes,
                                      optionsText: function(item) {
-                                       return item.name();
+                                       return (item.name()) ? item.name() : item.node_type() + '-' + item.id();
                                      },
                                      optionsValue: function(item) {
                                        return item.id();

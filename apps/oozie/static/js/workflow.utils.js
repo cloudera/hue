@@ -41,7 +41,7 @@ function edit_node_modal(modal, workflow, node, save, cancel, template) {
     nodes: ko.computed({
       read: function() {
         var arr = ko.utils.arrayFilter(workflow.registry.allNodes(), function(_node) {
-          return _node.id() && _node.id() != node.id() && $.inArray(_node.node_type(), ['fork', 'join', 'decision']) == -1;
+          return _node.id() && _node.id() != node.id() && $.inArray(_node.node_type(), ['start']) == -1;
         });
         return arr;
       }
