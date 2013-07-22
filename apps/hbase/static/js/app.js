@@ -29,9 +29,8 @@ var AppViewModel = function()
   });
   self.search = new tagsearch();
 
-  self.views =
-  {
-    tables: new DataTableViewModel({columns:['Table Name', 'Enabled'],el: 'views.tables', reload: function(callback)
+  self.views = {
+    tables: new DataTableViewModel({columns:['Table Name', 'Enabled'], el: 'views.tables', reload: function(callback)
     {
       var d_self = this;
       d_self.items.removeAll();
