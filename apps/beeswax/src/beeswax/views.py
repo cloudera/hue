@@ -47,7 +47,8 @@ from beeswax.forms import QueryForm
 from beeswax.design import HQLdesign
 from beeswax.models import SavedQuery, make_query_context, QueryHistory
 from beeswax.server import dbms
-from beeswax.server.dbms import expand_exception, get_query_server_config
+from beeswax.server.dbms import expand_exception, get_query_server_config,\
+  QueryServerException
 
 
 LOG = logging.getLogger(__name__)
@@ -1169,7 +1170,10 @@ def _get_query_handle_and_state(query_history):
   if query_server['server_name'] == 'impala' and not handle.has_result_set:
     state = QueryHistory.STATE.available
   else:
-    state = dbms.get(query_history.owner, query_history.get_query_server_config()).get_state(handle)
+    try:
+      state = dbms.get(query_history.owner, query_history.get_query_server_config()).get_state(handle)
+    except QueryServerException, e:
+      raise PopupException(_("Failed to contact Server to check query status."), detail=e)
 
   if state is None:
     raise PopupException(_("Failed to contact Server to check query status."))
