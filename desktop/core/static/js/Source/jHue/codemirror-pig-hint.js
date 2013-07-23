@@ -97,9 +97,14 @@
     }
 
     function strip(html){
-      var tmp = document.createElement("DIV");
-      tmp.innerHTML = html;
-      return tmp.textContent||tmp.innerText;
+      if (jQuery) {
+        return $("<div>").html(html).text();
+      }
+      else {
+        var tmp = document.createElement("DIV");
+        tmp.innerHTML = html;
+        return tmp.textContent || tmp.innerText;
+      }
     }
 
     function gatherCompletions(obj) {
