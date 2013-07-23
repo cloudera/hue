@@ -751,6 +751,9 @@ ${layout.menubar(section='query')}
       };
 
       CodeMirror.commands.autocomplete = function (cm) {
+        $(document.body).on("contextmenu", function (e) {
+          e.preventDefault(); // prevents native menu on FF for Mac from being shown
+        });
         if ($.totalStorage('tables_' + $("#id_query-database").val()) == null) {
           CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
           getTables(function () {}); // if preload didn't work, tries again
@@ -876,6 +879,10 @@ ${layout.menubar(section='query')}
           errorWidget.clear();
         }
         $("#validationResults").empty();
+      });
+
+      codeMirror.on("blur", function () {
+        $(document.body).off("contextmenu");
       });
 
       codeMirror.on("change", function () {

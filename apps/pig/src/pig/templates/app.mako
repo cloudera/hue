@@ -652,6 +652,9 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
     }
 
     CodeMirror.commands.autocomplete = function (cm) {
+      $(document.body).on("contextmenu", function (e) {
+        e.preventDefault(); // prevents native menu on FF for Mac from being shown
+      });
       storeVariables();
       var _line = codeMirror.getLine(codeMirror.getCursor().line);
       var _partial = _line.substring(0, codeMirror.getCursor().ch);
@@ -742,6 +745,10 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
       if (codeMirror.getValue() == LABELS.NEW_SCRIPT_CONTENT) {
         codeMirror.setValue("");
       }
+    });
+
+    codeMirror.on("blur", function () {
+      $(document.body).off("contextmenu");
     });
 
     codeMirror.on("change", function () {
