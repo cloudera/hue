@@ -184,15 +184,15 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
           %>
           % if int(solr_query["start"]) > 0:
             <li>
-              <a title="${_('Beginning of List')}" href="?query=${solr_query["q"]}&fq=${solr_query["fq"]}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}&rows=${solr_query["rows"]}&start=${beginning}">&larr; ${_('Beginning of List')}</a>
+              <a title="${_('Beginning of List')}" href="?query=${solr_query["q"]}&fq=${urllib.quote_plus(solr_query["fq"])}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}&rows=${solr_query["rows"]}&start=${beginning}">&larr; ${_('Beginning of List')}</a>
             </li>
             <li>
-              <a title="Previous Page" href="?query=${solr_query["q"]}&fq=${solr_query["fq"]}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}&rows=${solr_query["rows"]}&start=${previous}">${_('Previous Page')}</a>
+              <a title="Previous Page" href="?query=${solr_query["q"]}&fq=${urllib.quote_plus(solr_query["fq"])}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}&rows=${solr_query["rows"]}&start=${previous}">${_('Previous Page')}</a>
             </li>
           % endif
           % if end_record < int(response["response"]["numFound"]):
             <li>
-              <a title="Next page" href="?query=${solr_query["q"]}&fq=${solr_query["fq"]}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}&rows=${solr_query["rows"]}&start=${next}">${_('Next Page')}</a>
+              <a title="Next page" href="?query=${solr_query["q"]}&fq=${urllib.quote_plus(solr_query["fq"])}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}&rows=${solr_query["rows"]}&start=${next}">${_('Next Page')}</a>
             </li>
           % endif
         </ul>
