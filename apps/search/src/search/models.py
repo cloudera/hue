@@ -400,4 +400,3 @@ def augment_solr_response(response, facets):
     augmented['normalized_facets'].extend(default_facets)
 
   return augmented
-
