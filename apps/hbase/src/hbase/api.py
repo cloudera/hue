@@ -148,8 +148,14 @@ class HbaseApi(object):
       scan_length = int(query['scan_length'])
       if query['row_key'] == "null":
         query['row_key'] = ""
-      if scan_length == 1:
-        aggregate_data += self.getRows(cluster, tableName, query['columns'] or columns, query['row_key'], query['scan_length'], query['prefix']) #to be replaced in future
-      elif scan_length > 1:
-        aggregate_data += self.getRows(cluster, tableName, query['columns'] or columns, query['row_key'], query['scan_length'], query['prefix'])
+      filterstring = query.get('filter', None)
+      if filterstring:
+        scan = get_thrift_type('TScan')(startRow=query['row_key'], stopRow=None, timestamp=None, columns=query['columns'] or columns, caching=None, filterString=filterstring, batchSize=None)
+        scanner = client.scannerOpenWithScan(tableName, scan, None)
+        aggregate_data += client.scannerGetList(scanner, query['scan_length'])
+      else:
+        if scan_length == 1:
+          aggregate_data += self.getRows(cluster, tableName, query['columns'] or columns, query['row_key'], query['scan_length'], query['prefix']) #to be replaced in future
+        elif scan_length > 1:
+          aggregate_data += self.getRows(cluster, tableName, query['columns'] or columns, query['row_key'], query['scan_length'], query['prefix'])
     return aggregate_data

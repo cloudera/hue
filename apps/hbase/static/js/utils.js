@@ -118,8 +118,8 @@ function launchModal(modal, data)
         }
             var cm = CodeMirror.fromTextArea(target, {
               mode: mime,
-            tabMode: 'indent',
-            lineNumbers: true
+              tabMode: 'indent',
+              lineNumbers: true
             });
             setTimeout(function(){cm.refresh()}, 401); //CM invis bug workaround
             element.find('input[type=submit]').click(function()
@@ -132,7 +132,7 @@ function launchModal(modal, data)
       break;
   }
   element.modal('show');
-  logGA(modal.slice(0, modal.indexOf('_modal') != -1 ? modal.indexOf('_modal') : modal.length));
+logGA(modal.slice(0, modal.indexOf('_modal') != -1 ? modal.indexOf('_modal') : modal.length));
 }
 
 function parseXML(xml)
@@ -229,9 +229,9 @@ function resetElements()
 
 function prepForTransport(value)
 {
-  value = value.replace(/\"/g,'\\"').replace(/\//g,'\\/');
+  value = value.replace(/\"/g,'\\\"').replace(/\//g,'\\/');
   if(isNaN(parseInt(value)) && value.trim() != '')
-    value = '"'+value+'"';
+    value = '"' + value + '"';
   return encodeURIComponent(value);
 };
 

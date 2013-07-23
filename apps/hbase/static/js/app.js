@@ -217,7 +217,7 @@ function bindSubmit()
     if(submitVal)
     {
       if(use_post)
-        submitVal = "hbase-post-key-" + submitVal;
+        submitVal = "hbase-post-key-" + JSON.stringify(submitVal);
       else
         submitVal = prepForTransport(submitVal);
       data.push(submitVal);

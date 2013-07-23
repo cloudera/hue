@@ -433,6 +433,26 @@ ul#hbase-breadcrumbs li a
 	background: #5EB568;
 }
 
+#search-tags span.filter
+{
+	color: #2DA2E0;
+}
+
+#search-tags span.filter span.compare_op
+{
+	color: #8746DB;
+}
+
+#search-tags span.filter span.arg
+{
+	color: #8746DB;
+}
+
+#search-tags span.filter span.linker
+{
+	color: #46A35C;
+}
+
 #search-tags span.selection, #search-typeahead span.selection
 {
 	background: yellow;
@@ -587,3 +607,5 @@ textarea
 {
 	font-size: 50px;
 }
+
+
