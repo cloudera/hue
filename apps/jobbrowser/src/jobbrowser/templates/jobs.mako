@@ -172,7 +172,7 @@ ${ commonheader(None, "jobbrowser", user) | n,unicode }
           });
           if (isDone) {
             callJobDetails(newRows[i]);
-            newRows.splice(i);
+            newRows.splice(i, 1);
           }
         }
         $(data).each(function (cnt, job) {
@@ -207,7 +207,7 @@ ${ commonheader(None, "jobbrowser", user) | n,unicode }
       else {
         for (var i = 0; i < newRows.length; i++) {
           callJobDetails(newRows[i]);
-          newRows.splice(i);
+          newRows.splice(i, 1);
         }
       }
       isUpdating = false;
