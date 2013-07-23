@@ -16,13 +16,26 @@
 
 var searchRenderers = {
   'rowkey': { //class to tag selection
-     select: /([^,]+\[[^\]\[]+\]|[^,]+)/g, //select the substring to process, useful as JS has no lookbehinds old: ([^,]+\[([^,]+(,|)+)+\]|[^,]+)
+     select: /[^\,\{\[]+(([\{\[][^\}\]]+[\}\]])+|)([^\,]+|)/g, //select the substring to process, useful as JS has no lookbehinds old: ([^,]+\[([^,]+(,|)+)+\]|[^,]+)
      tag: /.+/g, //select the matches to wrap with tags
-     strip: /,(?![^\[\]\:]+[^\]\[]+\])/g, //strip delimiters and post-process string to make nice
      nested: {
-        'scan': { select: /\+[0-9 ]+/g, tag: /.+/g, strip: /a^/g },
-        'columns': { select: /\[.+\]/g, tag: /[^:,\[\]]+:([^,\[\]]+|)/g, strip: /a^/g }, //forced to do this select due to lack of lookbehinds /[\[\]]/g
-        'prefix': { select: /[^\*]+\*/g, tag: /\*/g, strip: /a^/g }
+        'scan': { select: /\+[0-9 ]+/g, tag: /.+/g},
+        'columns': { select: /\[.+\]/g, tag: /[^:,\[\]]+:([^,\[\]]+|)/g}, //forced to do this select due to lack of lookbehinds /[\[\]]/g
+        'prefix': { select: /[^\*]+\*/g, tag: /\*/g},
+        'filter': {
+          select: /\{[^\{\}]+\}/,
+          tag:/.+/g,
+          nested: {
+            'linker': {
+              select: /AND|OR|SKIP|WHILE/g,
+              tag: /.+/g
+            }/*,
+            'compare_op': {
+              select: /[\<\=\!\>]{1,2}/g,
+              tag: /.+/g
+            }*/ //will be added eventually after html bug is figured out
+          }
+        }
      }
   }
 };
@@ -144,21 +157,23 @@ var SmartViewModel = function(options)
 
   self.searchQuery.subscribe(function goToRow(value) //make this as nice as the renderfucnction and split into two, also fire not down on keyup events
   {
-    var inputs = value.split(searchRenderers['rowkey']['select']);
+    var inputs = value.match(searchRenderers['rowkey']['select']);
     self.querySet.removeAll();
     for(var i=0;i<inputs.length;i++)
     {
       if(inputs[i].trim() != "" && inputs[i].trim() != ',')
       {
         var p = inputs[i].split('+');
-        var scan = p.length > 1 ? parseInt(p[1]) : 0;
+        var scan = p.length > 1 ? parseInt(p[1].trim()) : 0;
         var extract = inputs[i].match(searchRenderers['rowkey']['nested']['columns']['select']);
         var columns = extract != null ? extract[0].match(searchRenderers['rowkey']['nested']['columns']['tag']) : [];
+        var filter = inputs[i].match(searchRenderers['rowkey']['nested']['filter']['select']);
         self.querySet.push(new QuerySetPeice({
-          'row_key': p[0].replace(/\[.+\]|\*/g,'').trim(), //clean up with column regex selectors instead
+          'row_key': p[0].replace(/[\[\{].+[\]\}]|\*/g,'').trim(), //clean up with column regex selectors instead
           'scan_length': scan ? scan + 1 : 1,
           'columns': columns,
-          'prefix': inputs[i].match(searchRenderers['rowkey']['nested']['prefix']['select']) != null
+          'prefix': inputs[i].match(searchRenderers['rowkey']['nested']['prefix']['select']) != null,
+          'filter': filter != null && filter.length > 0 ? escape(filter[0].slice(1, -1)) : null
         }));
       }
     }
@@ -449,7 +464,8 @@ var ColumnRow = function(options)
     {
       if(data.length > 0 && !skipPut)
         self.value(data[0].value);
-      callback();
+      if(typeof callback !== "undefined" && callback != null)
+        callback();
       self.isLoading(false);
     });
   };
@@ -458,7 +474,7 @@ var ColumnRow = function(options)
   {
     //change transport prep to object wrapper
     logGA('put_column');
-    API.queryTable('putColumn', self.parent.row, self.name, "hbase-post-key-" + value).done(function(data)
+    API.queryTable('putColumn', self.parent.row, self.name, "hbase-post-key-" + JSON.stringify(value)).done(function(data)
     {
       self.reload(function(){}, true);
     });
@@ -550,6 +566,7 @@ var QuerySetPeice = function(options)
     scan_length: 1,
     prefix: false,
     columns: [],
+    filter: null,
     onValidate: function(){}
   }, options);
   BaseModel.apply(self,[options]);
@@ -558,6 +575,7 @@ var QuerySetPeice = function(options)
   self.scan_length = ko.observable(options.scan_length);
   self.columns = ko.observableArray(options.columns);
   self.prefix = ko.observable(options.prefix);
+  self.filter = ko.observable(options.filter);
   self.editing = ko.observable(true);
 
   self.validate = function()
@@ -625,6 +643,18 @@ var tagsearch = function()
       shortcut: ']',
       mode: ['columns'],
       selected: false
+    },
+    {
+      hint: 'Start FilterString',
+      shortcut: '{',
+      mode: ['rowkey'],
+      selected: false
+    },
+    {
+      hint: 'End FilterString',
+      shortcut: '}',
+      mode: ['filter'],
+      selected: false
     }
   ]);
   self.activeHints = ko.computed(function()
@@ -655,6 +685,10 @@ var tagsearch = function()
     'prefix': {
       hint: 'Rows starting with',
       type: 'String'
+    },
+    'filter': {
+      hint: 'Thrift FilterString',
+      type: 'String'
     }
   }
 
@@ -681,7 +715,7 @@ var tagsearch = function()
           hasMatched = true;
           return "<span class='" + keys[i] + " tagsearchTag' title='" + keys[i] + "' data-toggle='tooltip'>" + ('nested' in renderers[keys[i]] ? self.render(tagged, renderers[keys[i]].nested) : tagged) + "</span>";
         });
-        if(hasMatched)
+        if(hasMatched && renderers[keys[i]]['strip'])
           processed = processed.replace(renderers[keys[i]].strip, '');
         return processed;
       });
@@ -700,15 +734,17 @@ var tagsearch = function()
       self.mode('idle');
       return;
     }
-    var tokens = "[]+,-";
+    var tokens = "[]+,*{}";
     var m = 'rowkey';
     for(var i=selection.length - 1; i>=0; i--)
     {
       if(tokens.indexOf(selection[i]) != -1)
       {
-        if(selection[i] == '[')
+        if(selection[i] == '{')
+          m = 'filter';
+        else if(selection[i] == '[')
           m = 'columns';
-        else if(selection[i] == ']')
+        else if(selection[i] == ']' || selection[i] == '}')
           m = 'rowkey';
         else if(selection[i] == '+')
           m = 'scan';

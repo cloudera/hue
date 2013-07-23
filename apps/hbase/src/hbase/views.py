@@ -44,7 +44,7 @@ def app(request):
 def api_router(request, url): #on split, deserialize anything
   def safe_json_load(raw):
     try:
-      return json.loads(re.sub(r'(?:\")([0-9]+)(?:\")', r'\1', str(raw).replace("'", "\"")))
+      return json.loads(re.sub(r'(?:\")([0-9]+)(?:\")', r'\1', str(raw)))
     except:
       return raw
   def deserialize(data):
