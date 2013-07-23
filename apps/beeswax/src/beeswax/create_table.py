@@ -192,6 +192,11 @@ def import_wizard(request, database='default'):
                 column_name='col_%s' % (i,),
                 column_type='string',
             ))
+          col_length = map(len, fields_list)
+          if col_length != [n_cols] * len(fields_list):
+            raise PopupException(_('Some rows do not have %s columns. Delimiter "%s" is probably not escaped properly.') %
+                                 (n_cols, DELIMITER_READABLE.get(s2_delim_form['delimiter'].data[0], s2_delim_form['delimiter'].data[1])),
+                                 detail='Number of columns by row: %s' % col_length)
           s3_col_formset = ColumnTypeFormSet(prefix='cols', initial=columns)
         return render('define_columns.mako', request, {
           'action': reverse(app_name + ':import_wizard', kwargs={'database': database}),

@@ -42,20 +42,20 @@ ${ layout.menubar(section='workflows') }
     <div id="workflowControls" class="well sidebar-nav">
       <ul class="nav nav-list">
         <li class="nav-header">${ _('Properties') }</li>
-        <li><a href="#properties">${ _('Edit properties') }</a></li>
+        <li><a href="#properties"><i class="icon-reorder"></i> ${ _('Edit properties') }</a></li>
 
         <li class="nav-header">${ _('Editor') }</li>
-        <li><a href="#editWorkflow">${ _('Edit workflow') }</a></li>
-        <li><a href="#importAction" title="${ _('Click to import an Oozie workflow action or Job Designer action') }" rel="tooltip" data-placement="right">${ _('Import action') }</a></li>
+        <li><a href="#editWorkflow"><i class="icon-code-fork"></i> ${ _('Edit workflow') }</a></li>
+        <li><a href="#importAction" title="${ _('Click to import an Oozie workflow action or Job Designer action') }" rel="tooltip" data-placement="right"><i class="icon-download-alt"></i> ${ _('Import action') }</a></li>
         % if user_can_edit_job:
           <li>
-            <a data-bind="attr: {href: '/filebrowser/view' + deployment_dir() }" target="_blank" title="${ _('Upload additional files and libraries to the deployment directory') }" rel="tooltip" data-placement="right"><i class="icon-share-alt"></i> ${ _('Upload') }</a>
+            <a data-bind="attr: {href: '/filebrowser/view' + deployment_dir() }" target="_blank" title="${ _('Go upload additional files and libraries to the deployment directory on HDFS') }" rel="tooltip" data-placement="right"><i class="icon-folder-open"></i> ${ _('Workspace') }</a>
           </li>
         % endif
 
         % if user_can_edit_job:
           <li class="nav-header">${ _('History') }</li>
-          <li><a href="#listHistory">${ _('Show history') }</a></li>
+          <li><a href="#listHistory"><i class="icon-archive"></i> ${ _('Show history') }</a></li>
         % endif
 
         <li class="nav-header">${ _('Actions') }</li>

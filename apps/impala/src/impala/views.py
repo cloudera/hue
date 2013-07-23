@@ -48,6 +48,6 @@ def install_examples(request):
   response = beeswax_install_examples(request)
   catalog_response = json.loads(refresh_catalog(request).content)
 
-  if catalog_response['status'] != 0: # Simpler than aggregating the errors
+  if 'status' in catalog_response and catalog_response['status'] != 0: # Simpler than aggregating the errors
     request.error(catalog_response['message'])
   return response

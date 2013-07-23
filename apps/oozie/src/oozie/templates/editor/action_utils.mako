@@ -222,7 +222,7 @@
           % endif
 
           % if 'job_xml' in action_form.fields:
-            ${ utils.render_field_with_error_js(action_form['job_xml'], action_form['job_xml'].name, extra_attrs={'data-bind': 'disable: $root.context().read_only, value: %s' % action_form['job_xml'].name}) }
+            ${ utils.render_field_with_error_js(action_form['job_xml'], action_form['job_xml'].name, extra_attrs={'data-bind': 'disable: $root.context().read_only, fileChooser: $data, value: %s' % action_form['job_xml'].name}) }
           % endif
 
           % if 'deletes' in action_form.fields:

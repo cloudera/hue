@@ -80,7 +80,7 @@ ${ commonheader(_('Create table from file'), 'metastore', user) | n,unicode }
                                           ${unicode(form["_exists"]) | n}
                                         </td>
                                         % for row in fields_list[:n_rows]:
-                                          ${ comps.getEllipsifiedCell(row[col], "bottom", "dataSample")}
+                                          ${ comps.getEllipsifiedCell(row[col], "bottom", "dataSample") }
                                         % endfor
                                       </tr>
                                       %endfor
