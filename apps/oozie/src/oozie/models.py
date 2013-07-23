@@ -835,7 +835,7 @@ class Hive(Action):
   script_path = models.CharField(max_length=256, blank=False, verbose_name=_t('Script name'),
                                  help_text=_t('Script name or path to the %(type)s script. E.g. my_script.sql.') % {'type': node_type.title()})
   params = models.TextField(default="[]", verbose_name=_t('Parameters'),
-                            help_text=_t('The %(type)s parameters of the script. E.g. "-param", "INPUT=${inputDir}"')  % {'type': node_type.title()})
+                            help_text=_t('The %(type)s parameters of the script. E.g. N=5, INPUT=${inputDir}')  % {'type': node_type.title()})
   files = models.TextField(default="[]", verbose_name=_t('Files'),
       help_text=_t('List of names or paths of files to be added to the distributed cache and the task running directory.'))
   archives = models.TextField(default="[]", verbose_name=_t('Archives'),

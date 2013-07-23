@@ -118,7 +118,7 @@ class JavaForm(forms.ModelForm):
       'main_class': forms.TextInput(attrs={'class': 'span5'}),
       'args': forms.TextInput(attrs={'class': 'span5'}),
       'java_opts': forms.TextInput(attrs={'class': 'span5'}),
-      'job_xml': forms.TextInput(attrs={'class': 'span5'}),
+      'job_xml': forms.TextInput(attrs={'class': 'pathChooser span5'}),
     }
 
 
@@ -134,7 +134,7 @@ class MapreduceForm(forms.ModelForm):
       'archives': forms.HiddenInput(),
       'jar_path': forms.TextInput(attrs={'class': 'pathChooser span5'}),
       'description': forms.TextInput(attrs={'class': 'span5'}),
-      'job_xml': forms.TextInput(attrs={'class': 'span5'}),
+      'job_xml': forms.TextInput(attrs={'class': 'pathChooser span5'}),
     }
 
 
@@ -148,7 +148,7 @@ class StreamingForm(forms.ModelForm):
       'files': forms.widgets.HiddenInput(),
       'archives': forms.widgets.HiddenInput(),
       'description': forms.TextInput(attrs={'class': 'span5'}),
-      'job_xml': forms.TextInput(attrs={'class': 'span5'}),
+      'job_xml': forms.TextInput(attrs={'class': 'pathChooser span5'}),
       'mapper': forms.TextInput(attrs={'class': 'span5'}),
       'reducer': forms.TextInput(attrs={'class': 'span5'}),
     }
@@ -166,7 +166,7 @@ class PigForm(forms.ModelForm):
       'files': forms.widgets.HiddenInput(),
       'archives': forms.widgets.HiddenInput(),
       'description': forms.TextInput(attrs={'class': 'span5'}),
-      'job_xml': forms.TextInput(attrs={'class': 'span5'}),
+      'job_xml': forms.TextInput(attrs={'class': 'pathChooser span5'}),
     }
 
 
@@ -182,7 +182,7 @@ class HiveForm(forms.ModelForm):
       'files': forms.widgets.HiddenInput(),
       'archives': forms.widgets.HiddenInput(),
       'description': forms.TextInput(attrs={'class': 'span5'}),
-      'job_xml': forms.TextInput(attrs={'class': 'span5'}),
+      'job_xml': forms.TextInput(attrs={'class': 'pathChooser span5'}),
     }
 
 
@@ -198,7 +198,7 @@ class SqoopForm(forms.ModelForm):
       'files': forms.widgets.HiddenInput(),
       'archives': forms.widgets.HiddenInput(),
       'description': forms.TextInput(attrs={'class': 'span5'}),
-      'job_xml': forms.TextInput(attrs={'class': 'span5'}),
+      'job_xml': forms.TextInput(attrs={'class': 'pathChooser span5'}),
     }
 
 
@@ -225,7 +225,7 @@ class ShellForm(forms.ModelForm):
       'files': forms.widgets.HiddenInput(),
       'archives': forms.widgets.HiddenInput(),
       'description': forms.TextInput(attrs={'class': 'span5'}),
-      'job_xml': forms.TextInput(attrs={'class': 'span5'}),
+      'job_xml': forms.TextInput(attrs={'class': 'pathChooser span5'}),
     }
 
 
@@ -239,7 +239,7 @@ class DistCpForm(forms.ModelForm):
       'params': forms.widgets.HiddenInput(),
       'command': forms.TextInput(attrs={'class': 'pathChooser span5'}),
       'description': forms.TextInput(attrs={'class': 'span5'}),
-      'job_xml': forms.TextInput(attrs={'class': 'span5'}),
+      'job_xml': forms.TextInput(attrs={'class': 'pathChooser span5'}),
     }
 
 

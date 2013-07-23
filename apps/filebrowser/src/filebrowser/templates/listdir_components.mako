@@ -246,7 +246,7 @@ from django.utils.translation import ugettext as _
 
             <input id="renameSrcPath" type="hidden" name="src_path" type="text">
             <a class="btn" data-dismiss="modal">${_('Cancel')}</a>
-            <input type="submit" value="${_('Submit')}" class="btn btn-primary" />
+            <input type="submit" value="${_('Rename')}" class="btn btn-primary" />
         </div>
         </form>
     </div>
@@ -369,7 +369,7 @@ from django.utils.translation import ugettext as _
                     <span class="label label-important">${_('Name is required.')}</span>
                 </div>
                 <a class="btn" onclick="$('#moveModal').modal('hide');">${_('Cancel')}</a>
-                <input class="btn btn-primary" type="submit" value="${_('Submit')}"/>
+                <input class="btn btn-primary" type="submit" value="${_('Move')}"/>
             </div>
         </form>
     </div>
@@ -395,7 +395,7 @@ from django.utils.translation import ugettext as _
                     <span class="label label-important">${_('Name is required.')}</span>
                 </div>
                 <a class="btn" onclick="$('#copyModal').modal('hide');">${_('Cancel')}</a>
-                <input class="btn btn-primary" type="submit" value="${_('Submit')}"/>
+                <input class="btn btn-primary" type="submit" value="${_('Copy')}"/>
             </div>
         </form>
     </div>
@@ -452,12 +452,12 @@ from django.utils.translation import ugettext as _
                 <span class="label label-important"><span class="newName"></span> ${_('already exists.')}</span>
             </div>
             <a class="btn" href="#" data-dismiss="modal">${_('Cancel')}</a>
-            <input class="btn btn-primary" type="submit" value="${_('Submit')}" />
+            <input class="btn btn-primary" type="submit" value="${_('Create')}" />
         </div>
         </form>
     </div>
 
-    <!-- new directory modal -->
+    <!-- new file modal -->
     <div id="createFileModal" class="modal hide fade">
         <form id="createFileForm" data-bind="submit: createFile" method="POST" enctype="multipart/form-data" class="form-inline form-padding-fix">
         <div class="modal-header">
@@ -476,7 +476,7 @@ from django.utils.translation import ugettext as _
                 <span class="label label-important"><span class="newName"></span> ${_('already exists.')}</span>
             </div>
             <a class="btn" href="#" data-dismiss="modal">${_('Cancel')}</a>
-            <input class="btn btn-primary" type="submit" value="${_('Submit')}" />
+            <input class="btn btn-primary" type="submit" value="${_('Create')}" />
         </div>
         </form>
     </div>

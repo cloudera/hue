@@ -58,22 +58,22 @@ ${ layout.menubar(section='coordinators') }
       <div class="well sidebar-nav">
         <ul class="nav nav-list">
           <li class="nav-header">${ _('Properties') }</li>
-          <li class="active"><a href="#properties">${ _('Edit properties') }</a></li>
+          <li class="active"><a href="#properties"><i class="icon-reorder"></i> ${ _('Edit properties') }</a></li>
 
           % if coordinator.workflow:
             <li class="nav-header">${ _('Workflow') }</li>
-            <li id="workflowName"><a href="${ coordinator.workflow.get_absolute_url() }" target="_blank"><i class="icon-share-alt"></i> ${ coordinator.workflow }</a></li>
+            <li id="workflowName"><a href="${ coordinator.workflow.get_absolute_url() }" target="_blank"><i class="icon-code-fork"></i> ${ coordinator.workflow }</a></li>
           % endif
 
           <li class="nav-header">${ _('Datasets') }</li>
           % if coordinator.is_editable(user):
-          <li><a href="#createDataset">${ _('Create new') }</a></li>
+          <li><a href="#createDataset"><i class="icon-plus"></i> ${ _('Create new') }</a></li>
           % endif
-          <li><a href="#listDataset">${ _('Show existing') }</a></li>
+          <li><a href="#listDataset"><i class="icon-cloud"></i> ${ _('Show existing') }</a></li>
 
           % if coordinator.is_editable(user):
               <li class="nav-header">${ _('History') }</li>
-              <li><a href="#listHistory">${ _('Show history') }</a></li>
+              <li><a href="#listHistory"><i class="icon-archive"></i> ${ _('Show history') }</a></li>
           % endif
 
           % if coordinator:

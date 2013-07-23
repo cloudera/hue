@@ -58,17 +58,17 @@ ${ layout.menubar(section='bundles') }
       <div class="well sidebar-nav">
         <ul class="nav nav-list">
           <li class="nav-header">${ _('Properties') }</li>
-          <li class="active"><a href="#properties">${ _('Edit properties') }</a></li>
+          <li class="active"><a href="#properties"><i class="icon-reorder"></i> ${ _('Edit properties') }</a></li>
 
           <li class="nav-header">${ _('Coordinators') }</li>
           % if bundle.is_editable(user):
-          <li><a href="#addBundledCoordinator">${ _('Add') }</a></li>
+          <li><a href="#addBundledCoordinator"><i class="icon-plus"></i>${ _('Add') }</a></li>
           % endif
-          <li><a href="#listCoordinators">${ _('Show selected') }</a></li>
+          <li><a href="#listCoordinators"><i class="icon-cloud"></i> ${ _('Show selected') }</a></li>
 
           % if bundle.is_editable(user):
               <li class="nav-header">${ _('History') }</li>
-              <li><a href="#listHistory">${ _('Show history') }</a></li>
+              <li><a href="#listHistory"><i class="icon-archive"></i> ${ _('Show history') }</a></li>
           % endif
 
           % if bundle:
