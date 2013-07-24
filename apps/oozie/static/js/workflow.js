@@ -284,6 +284,7 @@ $.extend(DecisionNode.prototype, ForkNode.prototype, {
  * Workflow module
  */
 var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode, IdGeneratorTable) {
+
   var module = function(options) {
     var self = this;
 
@@ -981,3 +982,83 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
   return module;
 };
 var Workflow = WorkflowModule($, nodeModelChooser, Node, ForkNode, DecisionNode, IdGeneratorTable);
+
+// Manage Kill Module
+function ManageKillModule($, workflow, NodeModelChooser, Node, NodeModel) {
+  var email_action = null;
+  var parents = workflow.kill.findParents();
+  var email_enabled = ko.observable();
+  if (parents.length > 0) {
+    email_action = parents[0];
+    email_enabled(true);
+  } else {
+    var email_json = {
+      "description": "",
+      "workflow": workflow.id(),
+      "child_links": [],
+      "node_type": "email",
+      "message": "Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]",
+      "name": 'killemail',
+      "id": IdGeneratorTable['email'].nextId()
+    };
+    var NodeModel = NodeModelChooser(email_json.node_type);
+    var model = new NodeModel(email_json);
+    email_action = new Node(workflow, model, workflow.registry);
+    email_enabled(false);
+  }
+
+  var replace_email = function(email_action) {
+    email_action.removeAllChildren();
+    email_action.removeErrorChildren();
+
+    $.each(workflow.registry.nodes, function(index, node) {
+      if (node.getErrorChild() && node.id() != email_action.id()) {
+        node.putErrorChild(workflow.kill);
+      }
+    });
+  };
+
+  var replace_kill = function(email_action) {
+    if (email_action.findChildren().length == 0) {
+      email_action.addChild(workflow.kill, 'ok');
+    }
+
+    if (!email_action.getErrorChild()) {
+      email_action.putErrorChild(workflow.kill);
+    }
+
+    $.each(workflow.registry.nodes, function(index, node) {
+      if (node.getErrorChild() && node.id() != email_action.id()) {
+        node.putErrorChild(email_action);
+      }
+    });
+  };
+
+  // Add/Remove kill email action node from registry so that it is not sent to server.
+  email_action.to.subscribe(function(value) {
+    if (value && !email_enabled()) {
+      workflow.registry.add(email_action.id(), email_action);
+      replace_kill(email_action);
+      email_enabled(true);
+    } else if (email_enabled()) {
+      replace_email(email_action);
+      email_enabled(false);
+      workflow.registry.remove(email_action.id());
+      email_action.id(IdGeneratorTable['email'].nextId());
+    }
+
+    return value;
+  });
+
+  // View model
+  return {
+    'enabled': email_enabled,
+    'isValid': function() {
+      return email_action.validate();
+    },
+    'context': ko.observable({
+      'node': ko.observable(email_action),
+      'read_only': ko.observable(workflow.read_only())
+    })
+  };
+};

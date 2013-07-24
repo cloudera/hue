@@ -350,12 +350,13 @@ var NodeModule = function($, IdGeneratorTable, NodeFields) {
      * Add child
      * Update child links for this node.
      */
-    addChild: function(node) {
+    addChild: function(node, link_type) {
       var self = this;
+      var link_type = link_type || linkTypeChooser(self, node);
       var link = {
         parent: ko.observable(self.id()),
         child: ko.observable(node.id()),
-        name: ko.observable(linkTypeChooser(self, node)),
+        name: ko.observable(link_type),
         comment: ko.observable('')
       };
       self.child_links.unshift(link);

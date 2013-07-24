@@ -419,8 +419,13 @@ class Workflow(Job):
 
   def get_hierarchy(self):
     node = Start.objects.get(workflow=self) # Uncached version of start.
-    return self.get_hierarchy_rec(node=node) + [[Kill.objects.get(workflow=node.workflow)],
-                                           [End.objects.get(workflow=node.workflow)]]
+    kill = Kill.objects.get(workflow=node.workflow)
+    # Special case: manage error email actions separately
+    try:
+      kill_nodes = [Link.objects.filter(child=kill).get(name='ok').parent, kill]
+    except Link.DoesNotExist:
+      kill_nodes = [kill]
+    return self.get_hierarchy_rec(node=node) + [kill_nodes, [End.objects.get(workflow=node.workflow)]]
 
   def get_hierarchy_rec(self, node=None):
     if node is None:
