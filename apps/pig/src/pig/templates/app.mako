@@ -102,7 +102,7 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
           <ul class="nav nav-list">
             <li class="nav-header">${_('Editor')}</li>
             <li data-bind="click: editScript" class="active" data-section="edit">
-              <a href="#"><i class="icon-edit"></i> ${ _('Script') }</a>
+              <a href="#"><i class="icon-edit"></i> ${ _('Pig') }</a>
             </li>
             <li data-bind="click: editScriptProperties" data-section="properties">
               <a href="#"><i class="icon-reorder"></i> ${ _('Properties') }</a>
@@ -115,10 +115,10 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
             ##<li class="nav-header">${_('UDF')}</li>
             ##<li><a href="#createDataset">${ _('Python') }</a></li>
             ##<li><a href="#createDataset">${ _('Ruby') }</a></li>
-            <li class="nav-header">${_('Actions')}</li>
+            <li class="nav-header">${_('Run')}</li>
             <li data-bind="click: runOrShowSubmissionModal, visible: !currentScript().isRunning()">
               <a href="#" title="${ _('Run the script') }" rel="tooltip" data-placement="right">
-                <i class="icon-play"></i> ${ _('Run') }
+                <i class="icon-play"></i> ${ _('Submit') }
               </a>
             </li>
             <li data-bind="click: showStopModal, visible: currentScript().isRunning()">
@@ -126,6 +126,12 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
                 <i class="icon-ban-circle"></i> ${ _('Stop') }
               </a>
             </li>
+            <li data-bind="click: showScriptLogs" data-section="logs">
+              <a href="#" title="${ _('Show Logs') }" rel="tooltip" data-placement="right">
+                <i class="icon-tasks"></i> ${ _('Logs') }
+              </a>
+            </li>
+            <li class="nav-header">${_('File')}</li>
             <li data-bind="visible: currentScript().id() != -1, click: copyScript">
               <a href="#" title="${ _('Copy the script') }" rel="tooltip" data-placement="right">
                 <i class="icon-copy"></i> ${ _('Copy') }
@@ -138,13 +144,7 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
             </li>
             <li data-bind="click: confirmNewScript">
               <a href="#" title="${ _('New script') }" rel="tooltip" data-placement="right">
-                <i class="icon-plus-sign"></i> ${ _('New script') }
-              </a>
-            </li>
-            <li class="nav-header">${_('Logs')}</li>
-            <li data-bind="click: showScriptLogs" data-section="logs">
-              <a href="#" title="${ _('Show Logs') }" rel="tooltip" data-placement="right">
-                <i class="icon-tasks"></i> ${ _('Current Logs') }
+                <i class="icon-plus-sign"></i> ${ _('Script') }
               </a>
             </li>
             <li>
@@ -783,6 +783,8 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
     });
 
     $(document).on("showLogs", function () {
+      logsAtEnd = true;
+      forceLogsAtEnd = true;
       if (viewModel.currentScript().id() != -1) {
         routie("logs/" + viewModel.currentScript().id());
       }
