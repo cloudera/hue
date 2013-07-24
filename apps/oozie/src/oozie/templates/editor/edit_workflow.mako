@@ -51,6 +51,9 @@ ${ layout.menubar(section='workflows') }
           <li>
             <a data-bind="attr: {href: '/filebrowser/view' + deployment_dir() }" target="_blank" title="${ _('Go upload additional files and libraries to the deployment directory on HDFS') }" rel="tooltip" data-placement="right"><i class="icon-folder-open"></i> ${ _('Workspace') }</a>
           </li>
+          <li data-bind="visible: !loading()">
+            <a title="${ _('Edit kill node') }" rel="tooltip" data-placement="right" href="#kill"><i class="icon-off"></i> ${ _('Kill node') }</a>
+          </li>
         % endif
 
         % if user_can_edit_job:
@@ -113,6 +116,17 @@ ${ layout.menubar(section='workflows') }
         ${ utils.render_field(workflow_form['job_xml'], extra_attrs={'data-bind': 'value: %s' % workflow_form['job_xml'].name}) }
       </div>
 
+      </fieldset>
+    </div>
+
+    <div id="editKill" class="section hide span12">
+      <div class="alert alert-info"><h3>${ _('Kill node') }</h3></div>
+      <fieldset data-bind="with: context().node">
+        % for form_info in action_forms:
+          % if form_info[0] == 'email':
+            ${ actions.action_form_fields(action_form=form_info[1], node_type=form_info[0], show_primary=False) }
+          % endif
+        % endfor
       </fieldset>
     </div>
 
@@ -333,7 +347,7 @@ ${ layout.menubar(section='workflows') }
 
   <div id="formActions" class="form-actions center">
   % if user_can_edit_job:
-    <button data-bind="disable: workflow.read_only, visible: !workflow.read_only(), click: function() { workflow.loading(true); workflow.save({ success: workflow_save_success, error: workflow_save_error }) }" class="btn btn-primary" id="btn-save-wf">${ _('Save') }</button>
+    <button data-bind="disable: workflow.read_only, visible: !workflow.read_only(), click: save_workflow" class="btn btn-primary" id="btn-save-wf">${ _('Save') }</button>
   % endif
     <a href="${ url('oozie:list_workflows') }" class="btn">${ _('Back') }</a>
   </div>
@@ -385,7 +399,7 @@ ${ layout.menubar(section='workflows') }
 
 
 % for form_info in action_forms:
-  ${ actions.action_form(action_form=form_info[1], node_type=form_info[0], template=True) }
+  ${ actions.action_form_modal_template(action_form=form_info[1], node_type=form_info[0], template=True) }
 % endfor
 
 ${ controls.fork_convert_form(node_type='fork', template=True, javascript_attrs={'convert': 'function(data, event) { $data.convertToDecision(); $data._workflow.rebuild(); }'}) }
@@ -553,18 +567,35 @@ function workflow_save_error(data) {
   $("#btn-save-wf").button('reset');
 }
 
+function workflow_read_only_handler() {
+  $.jHueNotify.error("${ _('Workflow is in read only mode.') }");
+  workflow.loading(false);
+}
+
+var kill_view_model = null;
 function workflow_load_success(data) {
   if (data.status == 0) {
     workflow.reload(data.data);
+
+    //// Kill node
+    kill_view_model = ManageKillModule($, workflow, nodeModelChooser, Node, NodeModel);
+    ko.applyBindings(kill_view_model, $('#editKill')[0]);
+
   } else {
     $.jHueNotify.error("${ _('Received invalid response from server: ') }" + JSON.stringify(data));
   }
   workflow.loading(false);
 }
 
-function workflow_read_only_handler() {
-  $.jHueNotify.error("${ _('Workflow is in read only mode.') }");
-  workflow.loading(false);
+function save_workflow() {
+  workflow.loading(true);
+  if (kill_view_model.enabled()) {
+    if (kill_view_model.isValid()) {
+      workflow.save({ success: workflow_save_success, error: workflow_save_error });
+    }
+  } else {
+    workflow.save({ success: workflow_save_success, error: workflow_save_error });
+  }
 }
 
 // Fetch all nodes from server.
@@ -905,6 +936,9 @@ $(document).ready(function () {
   routie({
     'properties':function () {
       showSection('properties');
+    },
+    'kill':function() {
+      showSection('editKill');
     },
     'importAction':function() {
       $("#importAction *[rel=tooltip]").tooltip();
