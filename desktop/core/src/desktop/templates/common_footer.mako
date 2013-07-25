@@ -171,6 +171,27 @@ from django.template.defaultfilters import escape, escapejs
 </script>
 %if tours_and_tutorials:
   <script src="/static/js/Source/jHue/available.tours.js"></script>
+  <div id="jHueTourModal" class="modal hide fade">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+      <h3>${_('Did you know?')}</h3>
+    </div>
+    <div class="modal-body">
+      <div class="pull-left" style="color: #DDDDDD;font-size: 116px;margin: 10px; margin-right: 20px"><i class="icon-flag-checkered"></i></div>
+      <div style="margin: 10px">
+      <p>
+        ${_('There is one or more tours available for this page. These tours were created to guide you around.')}
+      </p>
+      <p>
+        ${_('You can see the list of the tours by clicking on the checkered flag badge on the side of this page.')}
+      </p>
+        </div>
+    </div>
+    <div class="modal-footer">
+      <label class="checkbox" style="float:left"><input id="jHueTourModalChk" type="checkbox" />${_('Do not show this dialog again')}</label>
+      <a href="#" class="btn btn-primary disable-feedback" data-dismiss="modal">${_('Got it, prof!')}</a>
+    </div>
+  </div>
 %endif
   </body>
 </html>
