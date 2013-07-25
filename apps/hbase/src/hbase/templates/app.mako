@@ -143,18 +143,15 @@ ${ commonheader(None, "hbase", user) | n,unicode }
   <div id="hbase-page-clusterview" class="hbase-page"> <!-- maybe turn these into script tags, then populate them into #main and then rerender + apply bindings to old viemodels to have modular viewmodels? -->
     <div class="actionbar">
       <div class="well well-small">
-        <input type="text" class="input-large search-query" placeholder="Search for Table Name" data-bind="value: views.tables.searchQuery">
+        <input type="text" class="input-large search-query" placeholder="${_('Search for Table Name')}" data-bind="value: views.tables.searchQuery, valueUpdate: 'afterkeydown'">
         % if user.is_superuser:
           <span class="btn-group">
-            <button class="btn" data-bind="enable: views.tables.selected().length > 0, click: views.tables.enableSelected"><i class="icon-check-sign"></i> ${_('Enable')}</button>
-            <button class="btn dropdown-toggle" data-toggle="dropdown" data-bind="clickBubble: false, enable: views.tables.selected().length > 0">
-              <span class="caret"></span>
+            <button class="btn" data-bind="enable: views.tables.canEnable, click: views.tables.enableSelected"><i class="icon-check-sign"></i> ${_('Enable')}</button>
+            <button class="btn" data-bind="enable: views.tables.canDisable, click: views.tables.disableSelected">
+              <i class="icon-check-empty"></i> ${_('Disable')}
             </button>
-            <ul class="dropdown-menu">
-              <li><a data-bind="click: views.tables.disableSelected"><i class="icon-remove-sign"></i> ${_('Disable')}</a></li>
-            </ul>
           </span>
-          <button class="btn" data-bind="enable: views.tables.selected().length > 0, click: views.tables.dropSelected"><i class="icon-trash"></i> ${_('Drop')}</button>
+          <button class="btn" data-bind="enable: views.tables.canDrop, click: views.tables.dropSelected"><i class="icon-trash"></i> ${_('Drop')}</button>
         % endif
         <span class="pull-right">
           <a href="#new_table_modal" role="button" data-bind="click: function(){app.focusModel(app.views.tables);}" class="btn" data-toggle="modal"><i class='icon-plus-sign'></i> ${_('New Table')}</a>
@@ -168,7 +165,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
       <tr>
         <td><div data-bind="click: $data.select, css: {hueCheckbox: true,'icon-ok':$data.isSelected}" data-row-selector-exclude="true"></div></td>
         <td width="90%"><a data-bind="text:$data.name,attr: {href: '#'+app.cluster()+'/'+$data.name}" data-row-selector="true"></a></td>
-        <td width="5%"><div data-bind="click: $data.toggle, css: {hueCheckbox: true,'icon-ok':$data.enabled}" data-row-selector-exclude="true"></div></td>
+        <td width="5%"><i data-bind="click: $data.toggle, css: {'icon-check-sign':$data.enabled, 'icon-check-empty':$data.enabled != true}" data-row-selector-exclude="true"></i></td>
       </tr>
     </script>
 
@@ -183,6 +180,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
         <label>${_('Table Name')}:</label> <input name="tableName" placeholder="Table1" type="text"/>
         <label>${_('Column Families')}:</label> <!-- clean up later -->
         <ul>
+          <li><input type="text" name="table_columns" placeholder="family:column_name"></li>
         </ul>
         <a class="btn action_addColumn"><i class="icon-plus-sign"></i> ${_('Add Column Family')}</a>
       </div>
