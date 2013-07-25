@@ -576,12 +576,14 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
 <script src="/pig/static/js/utils.js" type="text/javascript" charset="utf-8"></script>
 <script src="/pig/static/js/pig.ko.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/routie-0.3.0.min.js" type="text/javascript" charset="utf-8"></script>
-<link rel="stylesheet" href="/pig/static/css/pig.css">
 <script src="/static/ext/js/codemirror-3.11.js"></script>
-<link rel="stylesheet" href="/static/ext/css/codemirror.css">
 <script src="/static/ext/js/codemirror-pig.js"></script>
 <script src="/static/js/Source/jHue/codemirror-show-hint.js"></script>
 <script src="/static/js/Source/jHue/codemirror-pig-hint.js"></script>
+<script src="/beeswax/static/js/autocomplete.utils.js" type="text/javascript" charset="utf-8"></script>
+
+<link rel="stylesheet" href="/pig/static/css/pig.css">
+<link rel="stylesheet" href="/static/ext/css/codemirror.css">
 <link rel="stylesheet" href="/static/ext/css/codemirror-show-hint.css">
 
 <style>
@@ -615,6 +617,8 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
 
   var viewModel = new PigViewModel(appProperties);
   ko.applyBindings(viewModel);
+
+  var HIVE_AUTOCOMPLETE_BASE_URL = "${ autocomplete_base_url | n,unicode }";
 
   $(document).ready(function () {
     viewModel.updateScripts();
@@ -651,6 +655,17 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
       });
     }
 
+    var KLASS = "org.apache.hcatalog.pig.HCatLoader";
+
+    CodeMirror.onAutocomplete = function (data, from, to) {
+      if (CodeMirror.isHCatHint && data.indexOf(KLASS) > -1) {
+        codeMirror.replaceRange(" ", to, to);
+        codeMirror.setCursor(to);
+        CodeMirror.isHCatHint = false;
+        showHiveAutocomplete("default");
+      }
+    };
+
     CodeMirror.commands.autocomplete = function (cm) {
       $(document.body).on("contextmenu", function (e) {
         e.preventDefault(); // prevents native menu on FF for Mac from being shown
@@ -658,23 +673,43 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
       storeVariables();
       var _line = codeMirror.getLine(codeMirror.getCursor().line);
       var _partial = _line.substring(0, codeMirror.getCursor().ch);
-      if (_partial.indexOf("'") > -1 && _partial.indexOf("'") == _partial.lastIndexOf("'") && (_partial.toLowerCase().indexOf("load") > -1
-          || _partial.toLowerCase().indexOf("into") > -1)) {
-        var _path = _partial.substring(_partial.lastIndexOf("'") + 1);
-        var _autocompleteUrl = "/filebrowser/view";
-        if (_path.indexOf("/") == 0) {
-          _autocompleteUrl += _path.substr(0, _path.lastIndexOf("/"));
+      if (_partial.indexOf("'") > -1 && _partial.indexOf("'") == _partial.lastIndexOf("'")) {
+        CodeMirror.isHCatHint = false;
+        CodeMirror.isTable = false;
+        if (_partial.toLowerCase().indexOf("load") > -1 || _partial.toLowerCase().indexOf("into") > -1) {
+          var _path = _partial.substring(_partial.lastIndexOf("'") + 1);
+          var _autocompleteUrl = "/filebrowser/view";
+          if (_path.indexOf("/") == 0) {
+            _autocompleteUrl += _path.substr(0, _path.lastIndexOf("/"));
+          }
+          else if (_path.indexOf("/") > 0) {
+            _autocompleteUrl += USER_HOME + _path.substr(0, _path.lastIndexOf("/"));
+          }
+          else {
+            _autocompleteUrl += USER_HOME;
+          }
+          var _showHCatHint = false;
+          if (_line.indexOf(KLASS) == -1) {
+            if (_partial.indexOf("'") == _partial.length - 1) {
+              _showHCatHint = true;
+            }
+            showHdfsAutocomplete(_autocompleteUrl + "?format=json", _showHCatHint);
+          }
+          else {
+            var _db = _partial.substring(_partial.lastIndexOf("'") + 1);
+            if (_db.indexOf(".") > -1) {
+              showHiveAutocomplete(_db.substring(0, _db.length - 1));
+            }
+            else {
+              showHiveAutocomplete("default");
+            }
+          }
         }
-        else if (_path.indexOf("/") > 0) {
-          _autocompleteUrl += USER_HOME + _path.substr(0, _path.lastIndexOf("/"));
-        }
-        else {
-          _autocompleteUrl += USER_HOME;
-        }
-        showHdfsAutocomplete(_autocompleteUrl + "?format=json");
       }
       else {
         CodeMirror.isPath = false;
+        CodeMirror.isTable = false;
+        CodeMirror.isHCatHint = false;
         CodeMirror.showHint(cm, CodeMirror.pigHint);
       }
     }
@@ -700,24 +735,34 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
       },
       onKeyEvent: function (e, s) {
         if (s.type == "keyup") {
+          if (s.keyCode == 190) {
+            if (codeMirror.getValue().indexOf(KLASS) > -1) {
+              var _line = codeMirror.getLine(codeMirror.getCursor().line);
+              var _partial = _line.substring(0, codeMirror.getCursor().ch);
+              var _db = _partial.substring(_partial.lastIndexOf("'") + 1);
+              if (_partial.replace(/ /g, '').toUpperCase().indexOf("LOAD") == _partial.replace(/ /g, '').lastIndexOf("'") - 4) {
+                showHiveAutocomplete(_db.substring(0, _db.length - 1));
+              }
+            }
+          }
           if (s.keyCode == 191) {
             var _line = codeMirror.getLine(codeMirror.getCursor().line);
             var _partial = _line.substring(0, codeMirror.getCursor().ch);
             var _path = _partial.substring(_partial.lastIndexOf("'") + 1);
             if (_path[0] == "/") {
               if (_path.lastIndexOf("/") != 0) {
-                showHdfsAutocomplete("/filebrowser/view" + _partial.substring(_partial.lastIndexOf("'") + 1) + "?format=json");
+                showHdfsAutocomplete("/filebrowser/view" + _partial.substring(_partial.lastIndexOf("'") + 1) + "?format=json", false);
               }
             }
             else {
-              showHdfsAutocomplete("/filebrowser/view" + USER_HOME + _partial.substring(_partial.lastIndexOf("'") + 1) + "?format=json");
+              showHdfsAutocomplete("/filebrowser/view" + USER_HOME + _partial.substring(_partial.lastIndexOf("'") + 1) + "?format=json", false);
             }
           }
         }
       }
     });
 
-    function showHdfsAutocomplete(path) {
+    function showHdfsAutocomplete(path, showHCatHint) {
       $.getJSON(path, function (data) {
         CodeMirror.currentFiles = [];
         if (data.error != null) {
@@ -734,10 +779,23 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
             }
           });
           CodeMirror.isPath = true;
+          CodeMirror.isHCatHint = showHCatHint;
           window.setTimeout(function () {
             CodeMirror.showHint(codeMirror, CodeMirror.pigHint);
           }, 100);  // timeout for IE8
         }
+      });
+    }
+
+    hac_getTables("default", function(){}); //preload tables for the default db
+
+    function showHiveAutocomplete(databaseName) {
+      CodeMirror.isPath = false;
+      CodeMirror.isTable = true;
+      CodeMirror.isHCatHint = false;
+      hac_getTables(databaseName, function (tables) {
+        CodeMirror.catalogTables = tables;
+        CodeMirror.showHint(codeMirror, CodeMirror.pigHint);
       });
     }
 
