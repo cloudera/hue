@@ -37,6 +37,10 @@ ul {
   padding: 5px;
 }
 
+#editKill [class*="span"] {
+    margin-left: 0;
+}
+
 .action {
   border: 1px solid #DDD;
   padding: 0px;
