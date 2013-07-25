@@ -119,8 +119,13 @@ ${ layout.menubar(section='workflows') }
       </fieldset>
     </div>
 
-    <div id="editKill" class="section hide span12">
-      <div class="alert alert-info"><h3>${ _('Kill node') }</h3></div>
+    <div id="editKill" class="section hide">
+      <div class="alert alert-info">
+        <h3>${ _('Kill node') }</h3>
+        <p>${_('If the "to" field has content, then the workflow editor assumes that the defined email action is to be placed before the kill action.')}</p>
+        <p data-bind="if: context().node().to"><i class="icon-check"></i>&nbsp;${_('Email action before kill node enabled.')}</p>
+        <p data-bind="ifnot: context().node().to"><i class="icon-check"></i>&nbsp;${_('Email action before kill node disabled.')}</p>
+      </div>
       <fieldset data-bind="with: context().node">
         % for form_info in action_forms:
           % if form_info[0] == 'email':
@@ -800,7 +805,7 @@ $('#importJobsub').on('click', '.action-row', function(e) {
 
           workflow.el.trigger('workflow:rebuild');
           routie('editWorkflow');
-          $.jHueNotify.success("${ _('Action imported at the top of the workflow.') } ");
+          $.jHueNotify.info("${ _('Action imported at the top of the workflow.') } ");
         } else {
           $.jHueNotify.error("${ _('Received invalid response from server: ') } " + JSON.stringify(data));
         }
@@ -841,7 +846,7 @@ $('#importOozieAction').on('click', '.action-row', function(e) {
 
     workflow.el.trigger('workflow:rebuild');
     routie('editWorkflow');
-    $.jHueNotify.success("${ _('Action imported at the top of the workflow.') } ");
+    $.jHueNotify.info("${ _('Action imported at the top of the workflow.') } ");
   }
 });
 
