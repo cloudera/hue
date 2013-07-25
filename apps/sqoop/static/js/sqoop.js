@@ -120,7 +120,7 @@ var viewModel = new (function() {
     var filter = self.filter().toLowerCase();
     return ko.utils.arrayFilter(self.persistedJobs(), function (job) {
       if (job.name()) {
-        return job.name().toLowerCase().indexOf(filter) > -1;
+        return job.name().toLowerCase().indexOf(filter) > -1 || job.type().toLowerCase().indexOf(filter) > -1;
       } else {
         return false;
       }
