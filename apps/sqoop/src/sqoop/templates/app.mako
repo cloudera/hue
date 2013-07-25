@@ -71,22 +71,14 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
                 <span data-bind="text: ('${_('Last run: ')}' + submission().createdFormatted()), routie: 'job/status/' + id()"></span>
               </span>
             </div>
-            <div class="main">
-              <h4 style="display: inline-block">
-                <i data-bind="css:{'icon-download-alt': type() == 'IMPORT', 'icon-upload-alt': type() == 'EXPORT'}"></i> &nbsp;<span data-bind="text: type"></span> <span class="muted" data-bind="text: name"></span>
-              </h4>
-            </div>
+            <div class="main" data-bind="template: {name: 'job-list-item'}"></div>
             <div class="sqoop-progress" data-bind="style:{ width: submission().progressFormatted() }"></div>
           </li>
           <!-- /ko -->
 
           <!-- ko ifnot: submission() -->
           <li data-bind="routie: 'job/edit/' + id()" title="${ _('Click to edit') }">
-            <div class="main">
-              <h4 style="display: inline-block">
-                <i class="icon-list"></i> <span data-bind="text: name"></span>
-              </h4>
-            </div>
+            <div class="main" data-bind="template: {name: 'job-list-item'}"></div>
           </li>
           <!-- /ko -->
         </ul>
@@ -249,6 +241,32 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
   </div>
 </div>
 
+
+<script type="text/html" id="job-list-item">
+<h4 style="display: inline-block">
+  <!-- ko if: type() == 'IMPORT' -->
+  <i class="icon-download-alt"></i>&nbsp;
+  <span data-bind="text: type"></span>
+  <span data-bind="text: name"></span>
+  <span class="muted">
+    <span>${_('From ')}</span>
+    <span data-bind="text: $root.getDatabaseByConnectionId(connection_id())"></span>
+    <span>${_('To ')}</span>
+    <span data-bind="text: storageType"></span>
+  </span>
+  <!-- /ko -->
+  <!-- ko if: type() == 'EXPORT' -->
+  <i class="icon-upload-alt"></i>&nbsp;
+  <span data-bind="text: type"></span>
+  <span class="muted">
+    <span>${_('From ')}</span>
+    <span data-bind="text: storageType"></span>
+    <span>${_('To ')}</span>
+    <span data-bind="text: $root.getDatabaseByConnectionId(connection_id())"></span>
+  </span>
+  <!-- /ko -->
+</h4>
+</script>
 
 <script type="text/html" id="job-editor-form-error">
 <!-- ko if: name() in $root.errors() -->

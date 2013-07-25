@@ -262,12 +262,19 @@ var viewModel = new (function() {
     }
   };
 
-  self.chooseConnectionById = function(id) {
+  self.getConnectionById = function(id) {
+    var connection = null;
     $.each(self.connections(), function(index, conn) {
       if (conn.id() == id) {
-        self.editConnection(conn);
+        connection = conn;
       }
     });
+    return connection;
+  };
+
+  self.chooseConnectionById = function(id) {
+    var self = this;
+    self.editConnection(self.getConnectionById(id) || self.editConnection());
   };
 
   self.deselectAllConnections = function() {
@@ -334,6 +341,21 @@ var viewModel = new (function() {
   self.help = function(component, name) {
     var self = this;
     return self[component]().resources[name + '.help'];
+  };
+
+  self.getDatabaseByConnectionId = function(id) {
+    var self = this;
+    var connection = self.getConnectionById(id);
+    if (connection) {
+      var connection_string = connection.connectionString();
+      if (connection_string) {
+        var connection_string_parts = connection.connectionString().split(':');
+        if (connection_string_parts.length > 2) {
+          return connection_string_parts[1].toUpperCase();
+        }
+      }
+    }
+    return null;
   }
 })();
 
