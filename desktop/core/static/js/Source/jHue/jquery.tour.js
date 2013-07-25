@@ -116,7 +116,7 @@
   Plugin.prototype.initQuestionMark = function () {
     var _this = this;
     $("#jHueTourQuestion").remove();
-    var _questionMark = $("<div>").attr("id", "jHueTourQuestion").html('<i class="icon-question"></i>').addClass("jHueTourBadge");
+    var _questionMark = $("<div>").attr("id", "jHueTourQuestion").html('<i class="icon-flag-checkered" style=""></i>').addClass("jHueTourBadge");
     if (_this.options.questionMarkPlacement == "left"){
       _questionMark.addClass("jHueTourBadgeLeft");
     }
@@ -160,6 +160,16 @@
         else {
           _toursHtml += '<li>' + _this.options.labels.NO_AVAILABLE_TOURS + '</li>';
         }
+      }
+      if (_added > 0 && typeof $.totalStorage !== "undefined" && ($.totalStorage("jHueTourHideModal") == null || $.totalStorage("jHueTourHideModal") == false)) {
+        $(document).ready(function () {
+          $("#jHueTourModal").modal();
+          $.totalStorage("jHueTourHideModal", true);
+          $("#jHueTourModalChk").attr("checked", "checked");
+          $("#jHueTourModalChk").on("change", function () {
+            $.totalStorage("jHueTourHideModal", $(this).is(":checked"));
+          });
+        });
       }
       if (_this.options.showRemote){
         _toursHtml += '<li>' +
