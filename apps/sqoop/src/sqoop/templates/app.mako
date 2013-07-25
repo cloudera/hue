@@ -62,13 +62,13 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
           <li data-bind="routie: 'job/edit/' + id()" title="${ _('Click to edit') }">
             <div class="pull-right">
               <span class="label label-success" data-bind="visible: submission().status() == 'SUCCEEDED'">
-                <span data-bind="text: ('${_('Last run: ')}' + submission().createdFormatted()), routie: 'job/status/' + id()"></span>
+                <span data-bind="text: ('${_('Last run: ')}' + submission().createdFormatted())"></span>
               </span>
               <span class="label label-warning" data-bind="visible: $.inArray(submission().status(), ['BOOTING', 'RUNNING', 'UNKNOWN']) > -1">
-                <span data-bind="text: submission().status, routie: 'job/status/' + id()"></span>
+                <span data-bind="text: submission().status"></span>
               </span>
               <span class="label label-error" style="display: inline-block" data-bind="visible: $.inArray(submission().status(), ['FAILURE_ON_SUBMIT', 'FAILED']) > -1">
-                <span data-bind="text: ('${_('Last run: ')}' + submission().createdFormatted()), routie: 'job/status/' + id()"></span>
+                <span data-bind="text: ('${_('Last run: ')}' + submission().createdFormatted())"></span>
               </span>
             </div>
             <div class="main" data-bind="template: {name: 'job-list-item'}"></div>
@@ -128,16 +128,22 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
                 <i class="icon-folder-open"></i> ${_('Output directory')}
               </a>
             </li>
+            <li>
+              <a rel="tooltip" title="${_('Logs')}" href="javascript:void(0);" target="_new" data-bind="attr: {href: '/jobbrowser/jobs/' + $root.job().submission().external_id()}">
+                <i class="icon-list"></i>
+                ${_('Logs')}
+              </a>
+            </li>
             <li class="nav-header" data-bind="visible: $root.job().persisted">${_('Last status')}</li>
             <li data-bind="visible: $root.job().persisted">
               <span class="label label-success" data-bind="visible: submission().status() == 'SUCCEEDED'">
-                <span data-bind="text:  submission().createdFormatted(), routie: 'job/status/' + id()"></span>
+                <span data-bind="text:  submission().createdFormatted()"></span>
               </span>
               <span class="label label-warning" data-bind="visible: $.inArray(submission().status(), ['BOOTING', 'RUNNING', 'UNKNOWN']) > -1">
-                <span data-bind="text: submission().status, routie: 'job/status/' + id()"></span>
+                <span data-bind="text: submission().status"></span>
               </span>
               <span class="label label-error" style="display: inline-block" data-bind="visible: $.inArray(submission().status(), ['FAILURE_ON_SUBMIT', 'FAILED']) > -1">
-                <span data-bind="text: submission().createdFormatted(), routie: 'job/status/' + id()"></span>
+                <span data-bind="text: submission().createdFormatted()"></span>
               </span>
             </li>
             <li data-bind="visible: $root.job().isRunning()">
@@ -215,28 +221,6 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
           </div>
         </form>
       </div>
-    </div>
-
-    <div id="job-status" class="row-fluid section hide" data-bind="with: job">
-      <div class="well sidebar-nav span2">
-        <form id="advanced-settings" method="POST" class="form form-horizontal noPadding">
-          <ul class="nav nav-list">
-            <li>
-              <a rel="tooltip" title="${_('Logs')}" href="javascript:void(0);" target="_new" data-bind="attr: {href: '/jobbrowser/jobs/' + $root.job().submission().external_id()}">
-                <i class="icon-list"></i>
-                ${_('Logs')}
-              </a>
-            </li>
-            <li>
-              <a rel="tooltip" title="${_('Back to editing a job')}" href="#job/edit">
-                <i class="icon-arrow-left"></i>
-                ${_('Back to job')}
-              </a>
-            </li>
-          </ul>
-        </form>
-      </div>
-
     </div>
   </div>
 </div>
@@ -649,13 +633,27 @@ $("#jobs-list tbody").on('click', 'tr', function() {
 
 //// Load all the data
 var framework = new framework.Framework({modelDict: {}});
-$(document).one('loaded.jobs', function() {
-  framework.load();
-  connectors.fetchConnectors();
-  connections.fetchConnections();
-  submissions.fetchSubmissions();
-});
-jobs.fetchJobs();
+(function() {
+  var count = 0;
+  function check() {
+    if (++count == 5) {
+      viewModel.isLoading(false);
+    }
+  }
+  $(document).one('loaded.jobs', check);
+  $(document).one('loaded.framework', check);
+  $(document).one('loaded.connectors', check);
+  $(document).one('loaded.connections', check);
+  $(document).one('loaded.submissions', check);
+  $(document).one('loaded.jobs', function() {
+    framework.load();
+    connectors.fetchConnectors();
+    connections.fetchConnections();
+    submissions.fetchSubmissions();
+  });
+  viewModel.isLoading(true);
+  jobs.fetchJobs();
+})();
 
 
 //// Routes
@@ -740,13 +738,6 @@ $(document).ready(function () {
     "job/stop/:id": function(id) {
       viewModel.chooseJobById(id);
       routie('job/stop');
-    },
-    "job/status": function() {
-      showSection("jobs", "job-status");
-    },
-    "job/status/:id": function(id) {
-      viewModel.chooseJobById(id);
-      routie('job/status');
     },
     "job/copy": function() {
       if (viewModel.job()) {

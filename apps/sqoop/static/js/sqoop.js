@@ -94,6 +94,7 @@ var viewModel = new (function() {
   self.filter = ko.observable("");
   self.shownSection = ko.observable("");
   self.isDirty = ko.observable(false);
+  self.isLoading = ko.observable(false);
   // Must always have a value.
   self.connector = ko.computed(function() {
     // Fall back to first connector so that a connector is selected when we are creating a connection.
@@ -138,9 +139,6 @@ var viewModel = new (function() {
   });
   self.allJobsSelected = ko.computed(function () {
     return self.selectedJobs().length > 0 && self.selectedJobs().length == self.jobs().length;
-  });
-  self.isLoading = ko.computed(function() {
-    return !self.framework() && self.connectors().length == 0;
   });
 
 
