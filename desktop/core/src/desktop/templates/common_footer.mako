@@ -15,6 +15,7 @@
 ## limitations under the License.
 <%!
 from django.utils.translation import ugettext as _
+from django.template.defaultfilters import escape, escapejs
 %>
 
 
@@ -22,9 +23,9 @@ from django.utils.translation import ugettext as _
   <script>
     %for message in messages:
       %if message.tags == 'error':
-        $.jHueNotify.error('{{ message|escape|escapejs }}');
+        $.jHueNotify.error('${ escapejs(escape(message)) }');
       %else:
-        $.jHueNotify.info('{{ message|escape|escapejs }}');
+        $.jHueNotify.info('${ escapejs(escape(message)) }');
       %endif
     %endfor
   </script>
@@ -148,7 +149,7 @@ from django.utils.translation import ugettext as _
       var _splits = _pathName.substr(1).split("/");
       _pathName = _splits[0] + (_splits.length > 1 && $.trim(_splits[1]) != "" ? "/" + _splits[1] : "");
 
-      _gaq.push(['_trackPageview', '/remote/{{ version }}/' + _pathName]);
+      _gaq.push(['_trackPageview', '/remote/${ version }/' + _pathName]);
 
       (function () {
         var ga = document.createElement('script');
@@ -161,7 +162,7 @@ from django.utils.translation import ugettext as _
 
       function trackOnGA(path) {
         if (typeof _gaq != "undefined" && _gaq != null) {
-          _gaq.push(['_trackPageview', '/remote/{{ version }}/' + path]);
+          _gaq.push(['_trackPageview', '/remote/${ version }/' + path]);
         }
       }
 
