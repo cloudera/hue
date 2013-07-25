@@ -50,6 +50,19 @@ var connections = (function($) {
       self.persisted = ko.computed(function() {
         return self.id() > -1;
       });
+      self.connectionString = ko.computed(function() {
+        var connection_string = null;
+        $.each(self.connector(), function(index, form) {
+          if (form.name() == 'connection') {
+            $.each(form.inputs(), function(index, input) {
+              if (input.name() == 'connection.connectionString') {
+                connection_string = input.value();
+              }
+            });
+          }
+        });
+        return connection_string;
+      });
     }
   });
 

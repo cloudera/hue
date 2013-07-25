@@ -113,6 +113,19 @@ var jobs = (function($) {
         });
         return (output_directory) ? '/filebrowser/view' + output_directory : null;
       });
+      self.storageType = ko.computed(function() {
+        var storage_type = null;
+        $.each(self.framework(), function(index, form) {
+          if (form.name() == 'output') {
+            $.each(form.inputs(), function(index, input) {
+              if (input.name() == 'output.storageType') {
+                storage_type = input.value();
+              }
+            });
+          }
+        });
+        return storage_type;
+      });
 
       self.runningInterval = 0;
     },
