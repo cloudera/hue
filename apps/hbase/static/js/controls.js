@@ -97,6 +97,33 @@ var DataTableViewModel = function(options)
         callback();
     });
   };
+
+  self.canDrop = ko.computed(function() {
+    var selected = self.selected();
+    if(selected.length <= 0) return false;
+    for(var i=0; i<selected.length; i++) {
+      if(selected[i].enabled()) return false;
+    }
+    return true;
+  });
+
+  self.canDisable = ko.computed(function() {
+    var selected = self.selected();
+    if(selected.length <= 0) return false;
+    for(var i=0; i<selected.length; i++) {
+      if(!selected[i].enabled()) return false;
+    }
+    return true;
+  });
+
+  self.canEnable = ko.computed(function() {
+    var selected = self.selected();
+    if(selected.length <= 0) return false;
+    for(var i=0; i<selected.length; i++) {
+      if(selected[i].enabled()) return false;
+    }
+    return true;
+  });
 };
 
 //a Listview of Listviews
