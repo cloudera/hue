@@ -116,7 +116,7 @@ class HDFSfileUploadHandler(FileUploadHandler):
   In practice, the middlewares (which access the request.REQUEST/POST/FILES objects) triggers
   the upload before reaching the view in case of permissions error. Read about Django
   uploading documentation.
-  
+
   This might trigger the upload before executing the hue auth middleware. HDFS destination
   permissions will be doing the checks.
   """
@@ -146,7 +146,10 @@ class HDFSfileUploadHandler(FileUploadHandler):
 
   def receive_data_chunk(self, raw_data, start):
     if not self._activated:
-      return raw_data
+      if self.request.META.get('PATH_INFO') == '/filebrowser/upload/archive':
+        return raw_data
+      else:
+        raise StopUpload()
 
     try:
       self._file.write(raw_data)
