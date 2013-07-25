@@ -25,7 +25,7 @@ ul.major-list li .pull-right {
   margin-top: 18px;
 }
 
-.main i {
+.main i, .top-bar h4 i {
   color: #999999;
 }
 
@@ -84,4 +84,33 @@ h1.emptyMessage {
 
 .job-form {
   margin-bottom: 80px;
+}
+
+.big-btn {
+  background-color: #F0F0F0;
+  width: 80px;
+  height: 80px;
+  text-align: center;
+  display: inline-block;
+  margin-right: 10px;
+  padding: 10px;
+  padding-top: 20px;
+  cursor: pointer;
+  line-height: 32px;
+  border: 1px solid #F0F0F0;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+}
+
+.big-btn:hover, .big-btn.selected {
+  background-color: #DDDDDD;
+}
+
+.big-btn.selected {
+  border-color: #CCCCCC;
+}
+
+.big-btn i{
+  font-size: 40px;
 }

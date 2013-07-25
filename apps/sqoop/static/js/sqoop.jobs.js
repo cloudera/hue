@@ -29,6 +29,12 @@ var jobs = (function($) {
     'framework': [],
     'created': null,
     'updated': null,
+    'setImport': function(){
+      this.type("IMPORT");
+    },
+    'setExport': function(){
+      this.type("EXPORT");
+    },
     'initialize': function(attrs) {
       var self = this;
       var attrs = $.extend(true, attrs, {});

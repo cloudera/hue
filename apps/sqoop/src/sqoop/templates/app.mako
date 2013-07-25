@@ -35,7 +35,7 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
   <h4><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> ${_('New Job')}</h4>
   <!-- /ko -->
   <!-- ko if: $root.job().persisted -->
-  <h4><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> <span data-bind="editableText: $root.job().name" id="job-editor-name" contenteditable="true"></span></h4>
+  <h4><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> <i data-bind="css:{'icon-download-alt': $root.job().type() == 'IMPORT', 'icon-upload-alt': $root.job().type() == 'EXPORT'}"></i> &nbsp;<span data-bind="text: $root.job().type"></span> <span class="muted" data-bind="editable: $root.job().name, editableOptions: {'placement': 'right'}"></span></h4>
   <!-- /ko -->
 </div>
 
@@ -44,7 +44,7 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
   <h4><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> <a href="#connection/edit-cancel" data-bind="text: $root.job().name"></a> <span class="muted">/</span> ${_('New Connection')}</h4>
   <!-- /ko -->
   <!-- ko if: persisted -->
-  <h4><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> <a href="#connection/edit-cancel" data-bind="text: $root.job().name"></a> <span class="muted">/</span> <span data-bind="text: name"></span></h4>
+  <h4><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> <a href="#connection/edit-cancel"><i data-bind="css:{'icon-download-alt': $root.job().type() == 'IMPORT', 'icon-upload-alt': $root.job().type() == 'EXPORT'}"></i> &nbsp;<span data-bind="text: $root.job().type"></span> <span data-bind="text: $root.job().name"></span></a> <span class="muted">/</span> <span data-bind="text: name"></span></h4>
   <!-- /ko -->
 </div>
 
@@ -290,14 +290,22 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
   </div>
 
   <div class="control-group">
-    <label class="control-label">${ _('Select job type') }</label>
+    <label class="control-label">${ _('Job type') }</label>
     <div class="controls">
-      <select name="type" class="input-xlarge" data-bind="'options': ['IMPORT', 'EXPORT'], 'value': type"></select>
+      <div data-bind="css:{ 'big-btn': type() != '', 'selected': type() == 'IMPORT' }, click: setImport">
+        <i class="icon-download-alt"></i><br/>
+        ${ _('Import') }
+      </div>
+      <div data-bind="css:{ 'big-btn': type() != '', 'selected': type() == 'EXPORT' }, click: setExport">
+        <i class="icon-upload-alt"></i><br/>
+        ${ _('Export') }
+      </div>
+      <input name="type" type="hidden" data-bind="value: type" />
     </div>
   </div>
 
   <div class="control-group">
-    <label class="control-label">${ _('Select connection') }</label>
+    <label class="control-label">${ _('Connection') }</label>
     <div class="controls">
       <select name="connection" class="input-xlarge" data-bind="'options': $root.persistedConnections, 'optionsText': function(item) {return item.name();}, 'value': $root.connection">
       </select>
@@ -482,6 +490,8 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
 <script src="/static/ext/js/moment.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/bootstrap-editable.min.js"></script>
+<script src="/static/ext/js/knockout.x-editable.js"></script>
 <script src="/sqoop/static/js/cclass.js" type="text/javascript" charset="utf-8"></script>
 <script src="/sqoop/static/js/koify.js" type="text/javascript" charset="utf-8"></script>
 <script src="/sqoop/static/js/sqoop.utils.js" type="text/javascript" charset="utf-8"></script>
@@ -494,7 +504,8 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
 <script src="/sqoop/static/js/sqoop.submissions.js" type="text/javascript" charset="utf-8"></script>
 <script src="/sqoop/static/js/sqoop.js" type="text/javascript" charset="utf-8"></script>
 
-<link rel="stylesheet" href="/sqoop/static/css/sqoop.css">
+<link href="/static/ext/css/bootstrap-editable.css" rel="stylesheet">
+<link href="/sqoop/static/css/sqoop.css" rel="stylesheet">
 
 <script type="text/javascript" charset="utf-8">
 //// Job Wizard
