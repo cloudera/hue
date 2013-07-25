@@ -38,7 +38,7 @@
     // If it's not a 'word-style' token, ignore the token.
 
     if (token.string.indexOf("'") == 0){
-      CodeMirror.isPath = true;
+      CodeMirror.isPath = !CodeMirror.isTable;
       token.string = token.string.substring(1, token.string.length);
     }
     if (token.string.indexOf("/") > -1){
@@ -65,7 +65,10 @@
   }
 
   CodeMirror.isPath = false;
+  CodeMirror.isTable = false;
+  CodeMirror.isHCatHint = false;
   CodeMirror.currentFiles = [];
+  CodeMirror.catalogTables = "";
 
   CodeMirror.pigHint = function (editor) {
     return scriptHint(editor, pigCaseInsensitive, function (e, cur) {
@@ -85,6 +88,8 @@
   var pigCaseSensitive = "AVG BinStorage CONCAT copyFromLocal copyToLocal COUNT DIFF MAX MIN  PigDump PigStorage SIZE SUM TextLoader TOKENIZE".split(" ");
 
   function getCompletions(token, context) {
+    var catalogTablesL = CodeMirror.catalogTables.toLowerCase().split(" ");
+
     var found = [], start = token.string, extraFound = [];
 
     function maybeAdd(str) {
@@ -108,14 +113,20 @@
     }
 
     function gatherCompletions(obj) {
-      if (CodeMirror.isPath || obj.indexOf("'") == 0){
+      if (CodeMirror.isPath || (obj.indexOf("'") == 0 && !CodeMirror.isTable)){
         forEach(CodeMirror.currentFiles, maybeAdd);
+      }
+      else if (CodeMirror.isTable) {
+        forEach(catalogTablesL, maybeAddToExtra);
       }
       else {
         forEach(pigCaseInsensitiveU, maybeAdd);
         forEach(pigCaseInsensitiveL, maybeAdd);
         forEach(pigCaseSensitive, maybeAdd);
         forEach(CodeMirror.availableVariables, maybeAddToExtra);
+      }
+      if (CodeMirror.isHCatHint){
+        maybeAdd("<i class='icon-magic'></i> USING org.apache.hcatalog.pig.HCatLoader();");
       }
     }
 

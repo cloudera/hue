@@ -453,8 +453,11 @@ ${layout.menubar(section='query')}
 </style>
 
 <script src="/static/ext/js/jquery/plugins/jquery-fieldselection.js" type="text/javascript"></script>
+<script src="/beeswax/static/js/autocomplete.utils.js" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript" charset="utf-8">
+    var HIVE_AUTOCOMPLETE_BASE_URL = "${ autocomplete_base_url | n,unicode }";
+
     $(document).ready(function(){
       var queryPlaceholder = "${_('Example: SELECT * FROM tablename, or press CTRL + space')}";
 
@@ -526,7 +529,7 @@ ${layout.menubar(section='query')}
 
       $("#id_query-database").change(function () {
         $.cookie("hueBeeswaxLastDatabase", $(this).val(), {expires: 90});
-        getTables(function(){}); //preload tables for current DB
+        hac_getTables($("#id_query-database").val(), function(){}); //preload tables for the default db
       });
 
       ## If no particular query is loaded
@@ -612,129 +615,9 @@ ${layout.menubar(section='query')}
         }
       }
 
-      var AUTOCOMPLETE_BASE_URL = "${ autocomplete_base_url | n,unicode }";
-
-      function autocomplete(options) {
-        if (options.database == null) {
-          $.getJSON(AUTOCOMPLETE_BASE_URL, options.onDataReceived);
-        }
-        if (options.database != null) {
-          if (options.table != null) {
-            $.getJSON(AUTOCOMPLETE_BASE_URL + options.database + "/" + options.table, options.onDataReceived);
-          }
-          else {
-            $.getJSON(AUTOCOMPLETE_BASE_URL + options.database + "/", options.onDataReceived);
-          }
-        }
-      }
-
-      function getTableAliases() {
-        var _aliases = {};
-        var _val = codeMirror.getValue();
-        var _from = _val.toUpperCase().indexOf("FROM");
-        if (_from > -1) {
-          var _match = _val.toUpperCase().substring(_from).match(/ON|WHERE|GROUP|SORT/);
-          var _to = _val.length;
-          if (_match) {
-            _to = _match.index;
-          }
-          var _found = _val.substr(_from, _to).replace(/(\r\n|\n|\r)/gm, "").replace(/from/gi, "").replace(/join/gi, ",").split(",");
-          for (var i = 0; i < _found.length; i++) {
-            var _tablealias = $.trim(_found[i]).split(" ");
-            if (_tablealias.length > 1) {
-              _aliases[_tablealias[1]] = _tablealias[0];
-            }
-          }
-        }
-        return _aliases;
-      }
-
-      function getTableColumns(tableName, callback) {
-        if (tableName.indexOf("(") > -1) {
-          tableName = tableName.substr(tableName.indexOf("(") + 1);
-        }
-
-        var _aliases = getTableAliases();
-        if (_aliases[tableName]) {
-          tableName = _aliases[tableName];
-        }
-
-        if ($.totalStorage('columns_' + $("#id_query-database").val() + '_' + tableName) != null) {
-          callback($.totalStorage('columns_' + $("#id_query-database").val() + '_' + tableName));
-          autocomplete({
-            database: $("#id_query-database").val(),
-            table: tableName,
-            onDataReceived: function (data) {
-              if (data.error) {
-                $.jHueNotify.error(data.error);
-              }
-              else {
-                $.totalStorage('columns_' + $("#id_query-database").val() + '_' + tableName, (data.columns ? data.columns.join(" ") : ""));
-              }
-            }
-          });
-        }
-        else {
-          autocomplete({
-            database: $("#id_query-database").val(),
-            table: tableName,
-            onDataReceived: function (data) {
-              if (data.error) {
-                $.jHueNotify.error(data.error);
-              }
-              else {
-                $.totalStorage('columns_' + $("#id_query-database").val() + '_' + tableName, (data.columns ? data.columns.join(" ") : ""));
-                callback($.totalStorage('columns_' + $("#id_query-database").val() + '_' + tableName));
-              }
-            }
-          });
-        }
-      }
-
-      function tableHasAlias(tableName) {
-        var _aliases = getTableAliases();
-        for (var alias in _aliases) {
-          if (_aliases[alias] == tableName) {
-            return true;
-          }
-        }
-        return false;
-      }
-
-      function getTables(callback) {
-        if ($.totalStorage('tables_' + $("#id_query-database").val()) != null) {
-          callback($.totalStorage('tables_' + $("#id_query-database").val()));
-          autocomplete({
-            database: $("#id_query-database").val(),
-            onDataReceived: function (data) {
-              if (data.error) {
-                $.jHueNotify.error(data.error);
-              }
-              else {
-                $.totalStorage('tables_' + $("#id_query-database").val(), data.tables.join(" "));
-              }
-            }
-          });
-        }
-        else {
-          autocomplete({
-            database: $("#id_query-database").val(),
-            onDataReceived: function (data) {
-              if (data.error) {
-                $.jHueNotify.error(data.error);
-              }
-              else {
-                $.totalStorage('tables_' + $("#id_query-database").val(), data.tables.join(" "));
-                callback($.totalStorage('tables_' + $("#id_query-database").val()));
-              }
-            }
-          });
-        }
-      }
-
       var queryEditor = $("#queryField")[0];
 
-      getTables(function(){}); //preload tables for current DB
+      hac_getTables($("#id_query-database").val(), function(){}); //preload tables for the default db
 
       % if app_name == 'impala':
         var AUTOCOMPLETE_SET = CodeMirror.impalaSQLHint;
@@ -756,10 +639,10 @@ ${layout.menubar(section='query')}
         });
         if ($.totalStorage('tables_' + $("#id_query-database").val()) == null) {
           CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
-          getTables(function () {}); // if preload didn't work, tries again
+          hac_getTables($("#id_query-database").val(), function () {}); // if preload didn't work, tries again
         }
         else {
-          getTables(function (tables) {
+          hac_getTables($("#id_query-database").val(), function (tables) {
             CodeMirror.catalogTables = tables;
             var _before = codeMirror.getRange({line: 0, ch: 0}, {line: codeMirror.getCursor().line, ch: codeMirror.getCursor().ch}).replace(/(\r\n|\n|\r)/gm, " ");
             CodeMirror.possibleTable = false;
@@ -801,12 +684,12 @@ ${layout.menubar(section='query')}
             }
           }
           if (_foundTable != "") {
-            if (tableHasAlias(_foundTable)) {
+            if (hac_tableHasAlias(_foundTable, codeMirror.getValue())) {
               CodeMirror.possibleSoloField = false;
               CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
             }
             else {
-              getTableColumns(_foundTable,
+              hac_getTableColumns($("#id_query-database").val(), _foundTable, codeMirror.getValue(),
                   function (columns) {
                     CodeMirror.catalogFields = columns;
                     CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
@@ -843,7 +726,7 @@ ${layout.menubar(section='query')}
               var _partial = _line.substring(0, codeMirror.getCursor().ch);
               var _table = _partial.substring(_partial.lastIndexOf(" ") + 1, _partial.length - 1);
               if (codeMirror.getValue().toUpperCase().indexOf("FROM") > -1) {
-                getTableColumns(_table, function (columns) {
+                hac_getTableColumns($("#id_query-database").val(), _table, codeMirror.getValue(), function (columns) {
                   var _cols = columns.split(" ");
                   for (var col in _cols){
                     _cols[col] = "." + _cols[col];
