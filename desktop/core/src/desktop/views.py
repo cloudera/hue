@@ -309,13 +309,13 @@ def commonheader(title, section, user, padding="60px"):
   apps = appmanager.get_apps(user)
   apps_list = sorted(apps, key=lambda app: app.menu_index)
 
-  return django_mako.render_to_string("common_header.mako", dict(
-    apps=apps_list,
-    title=title,
-    section=section,
-    padding=padding,
-    user=user
-  ))
+  return django_mako.render_to_string("common_header.mako", {
+    'apps': apps_list,
+    'title': title,
+    'section': section,
+    'padding': padding,
+    'user': user
+  })
 
 def commonfooter(messages=None):
   """
@@ -326,12 +326,12 @@ def commonfooter(messages=None):
 
   hue_settings = Settings.get_settings()
 
-  return django_mako.render_to_string("common_footer.mako", dict(
-    messages=messages,
-    version=settings.HUE_DESKTOP_VERSION,
-    collect_usage=desktop.conf.COLLECT_USAGE.get(),
-    tours_and_tutorials=hue_settings.tours_and_tutorials
-  ))
+  return django_mako.render_to_string("common_footer.mako", {
+    'messages': messages,
+    'version': settings.HUE_DESKTOP_VERSION,
+    'collect_usage': desktop.conf.COLLECT_USAGE.get(),
+    'tours_and_tutorials': hue_settings.tours_and_tutorials
+  })
 
 
 # If the app's conf.py has a config_validator() method, call it.
