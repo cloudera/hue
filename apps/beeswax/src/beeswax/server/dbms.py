@@ -32,8 +32,9 @@ from beeswax import hive_site
 from beeswax.conf import BEESWAX_SERVER_HOST, BEESWAX_SERVER_PORT,\
   BROWSE_PARTITIONED_TABLE_LIMIT, SERVER_INTERFACE
 from beeswax.design import hql_query
-from beeswax.models import QueryHistory, HIVE_SERVER2
+from beeswax.models import QueryHistory, HIVE_SERVER2, BEESWAX
 from desktop.lib.django_util import format_preserving_redirect
+from desktop.lib.exceptions_renderable import PopupException
 
 
 LOG = logging.getLogger(__name__)
@@ -146,8 +147,18 @@ class Dbms:
     return self.client.fetch(query_handle, start_over, rows)
 
 
+  def close_operation(self, query_handle):
+    if self.server_type == BEESWAX:
+      raise PopupException(_('%s interface does not support close_operation. %s interface does.') % (BEESWAX, HIVE_SERVER2))
+
+    return self.client.close_operation(query_handle)
+
+
   def cancel_operation(self, query_handle):
-    return self.client.cancel_operation(query_handle)
+    resp = self.client.cancel_operation(query_handle)
+    if self.client.query_server['server_name'] == 'impala':
+      resp = self.client.close_operation(query_handle)
+    return resp
 
 
   def get_sample(self, database, table):
@@ -296,7 +307,7 @@ class Dbms:
     if self.server_type == HIVE_SERVER2:
       query = hql_query('USE %s' % database)
       self.client.query(query)
-
+      # TODO sync + close query
 
   def get_log(self, query_handle):
     return self.client.get_log(query_handle)
