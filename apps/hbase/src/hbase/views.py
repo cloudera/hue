@@ -61,9 +61,7 @@ def api_router(request, url): #on split, deserialize anything
 
 def api_dump(response):
   ignored_fields = ('thrift_spec', "__.+__")
-  HARD_LIMIT = conf.TRUNCATE_LIMIT.get()
-  truncateCount = [0]
-  truncated = [False]
+  trunc_limit = conf.TRUNCATE_LIMIT.get()
   def clean(data):
     try:
       json.dumps(data)
@@ -71,34 +69,23 @@ def api_dump(response):
     except:
       cleaned = {}
       lim = [0]
-      def step(data):
-        lim[0] += 1
-        if lim[0] > HARD_LIMIT:
-          truncateCount[0] += len(data) - HARD_LIMIT
-          truncated[0] = True
-          return True
-        return False
       if isinstance(data, str): #not JSON dumpable, meaning some sort of bytestring or byte data
         return base64.b64encode(data)
       if hasattr(data, "__iter__"):
         if type(data) is dict:
           for i in data:
             cleaned[i] = clean(data[i])
-            if step(data): break
         elif type(data) is list:
           cleaned = []
           for i, item in enumerate(data):
             cleaned += [clean(item)]
-            if step(data): break
         else:
           for i, item in enumerate(data):
             cleaned[i] = clean(item)
-            if step(data): break
       else:
         for key in dir(data):
           value = getattr(data, key)
           if value is not None and not hasattr(value, '__call__') and sum([int(bool(re.search(ignore, key))) for ignore in ignored_fields]) == 0:
             cleaned[key] = clean(value)
-            if step(dir(data)): break
       return cleaned
-  return HttpResponse(json.dumps({ 'data': clean(response), 'truncated': truncated[0], 'limit': HARD_LIMIT, 'truncate_count': truncateCount[0] }), content_type="application/json")
+  return HttpResponse(json.dumps({ 'data': clean(response), 'truncated': True, 'limit': trunc_limit }), content_type="application/json")

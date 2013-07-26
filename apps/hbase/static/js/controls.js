@@ -239,7 +239,6 @@ var SmartViewModel = function(options) {
   var _reload = self.reload;
   self.reload = function(callback) {
   	logGA('view_table');
-    self.truncated = ko.observable(false);
     var queryStart = new Date();
     _reload(function() {
       self.lastReloadTime((new Date() - queryStart)/1000);
@@ -249,9 +248,7 @@ var SmartViewModel = function(options) {
     });
   };
 
-  self.truncated = ko.observable(false);
   self.truncateLimit = ko.observable(1500);
-  self.truncateCount = ko.observable(0);
 };
 
 var SmartViewDataRow = function(options) {
