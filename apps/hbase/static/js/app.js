@@ -117,6 +117,7 @@ routie({
       app.cluster(cluster);
       app.pageTitle(cluster);
       Views.render('clusterview');
+      resetElements();
       app.views.tables.reload();
       routed = true;
     },
