@@ -177,7 +177,7 @@ function convertTimestamp(timestamp) {
 function resetElements() {
   $(window).scroll(function(e) {
     $(".subnav.sticky").each(function() {
-      var padder = $(this).data('padder'), top = $(this).position().top;
+      var padder = $(this).data('padder'), top = $(this).position().top + (padder ? window.scrollY : 0);
       if(padder && top <= padder.position().top) {
         $(this).removeClass('subnav-fixed').data('padder').remove();
         $(this).removeData('padder');
