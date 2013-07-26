@@ -116,7 +116,7 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
               </a>
             </li>
             <li data-bind="visible: $root.job().persisted">
-              <a data-placement="right" rel="tooltip" title="${_('Delete the job')}" href="#job/delete">
+              <a data-bind="click: $root.showDeleteJobModal.bind($root)" data-placement="right" rel="tooltip" title="${_('Delete the job')}" href="javascript:void(0);">
                 <i class="icon-remove"></i> ${_('Delete')}
               </a>
             </li>
@@ -223,6 +223,32 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
   </div>
 </div>
 
+<div data-bind="template: {'name': modal.name(), 'if': modal.name()}" id="modal-container" class="modal hide fade"></div>
+
+
+<script type="text/html" id="delete-job-modal">
+<div class="modal-header">
+  <a href="javascript:void(0);" class="close" data-dismiss="modal">&times;</a>
+  <h3 class="message">${_("Are you sure you'd like to delete this job?") }</h3>
+</div>
+<div class="modal-body"></div>
+<div class="modal-footer" data-bind="if: $root.job">
+  <a class="btn" href="javascript:void(0);" data-dismiss="modal">${_('No')}</a>
+  <a data-bind="routie: {'url': 'job/delete/' + $root.job().id(), 'bubble': true}" data-dismiss="modal" class="btn btn-primary" href="javascript:void(0);">${_('Yes')}</a>
+</div>
+</script>
+
+<script type="text/html" id="delete-connection-modal">
+<div class="modal-header">
+  <a href="javascript:void(0);" class="close" data-dismiss="modal">&times;</a>
+  <h3 class="message">${_("Are you sure you'd like to delete this connection?") }</h3>
+</div>
+<div class="modal-body"></div>
+<div class="modal-footer" data-bind="if: $root.connection">
+  <a class="btn" href="javascript:void(0);" data-dismiss="modal">${_('No')}</a>
+  <a data-bind="routie: {'url': 'connection/delete/' + $root.connection().id(), 'bubble': true}" data-dismiss="modal" class="btn btn-primary" href="javascript:void(0);">${_('Yes')}</a>
+</div>
+</script>
 
 <script type="text/html" id="job-list-item">
 <h4 style="display: inline-block">
@@ -311,7 +337,7 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
         <a data-bind="routie: 'connection/edit/' + $root.connection().id()" href="javascript:void(0);" class="subbtn" style="margin-left: 5px">
           <i class="icon-edit"></i> ${_('Edit')}
         </a>
-        <a data-bind="routie: 'connection/delete/' + $root.connection().id()" href="javascript:void(0);" class="subbtn" style="margin-left: 5px">
+        <a data-bind="click: $root.showDeleteConnectionModal.bind($root)" href="javascript:void(0);" class="subbtn" style="margin-left: 5px">
           <i class="icon-remove"></i> ${_('Delete')}
         </a>
       </div>

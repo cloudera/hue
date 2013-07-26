@@ -91,6 +91,9 @@ var viewModel = new (function() {
   self.jobs = ko.observableArray();
   self.connection = ko.observable();
   self.editConnection = ko.observable();
+  self.modal = {
+    'name': ko.observable()
+  };
   self.filter = ko.observable("");
   self.shownSection = ko.observable("");
   self.isDirty = ko.observable(false);
@@ -354,6 +357,24 @@ var viewModel = new (function() {
       }
     }
     return null;
+  };
+
+  self.showModal = function(name) {
+    var self = this;
+    self.modal.name(name);
+    $('#modal-container').modal();
+  };
+
+  self.showDeleteJobModal = function() {
+    var self = this;
+    var name = 'delete-job-modal';
+    self.showModal(name);
+  };
+
+  self.showDeleteConnectionModal = function() {
+    var self = this;
+    var name = 'delete-connection-modal';
+    self.showModal(name);
   }
 })();
 
