@@ -288,7 +288,6 @@ ul#hbase-breadcrumbs li a {
 	background-color: rgb(255, 255, 255);
 	border-bottom-color: rgb(204, 204, 204);
 	border-bottom-left-radius: 3px;
-	border-bottom-right-radius: 3px;
 	border-bottom-style: solid;
 	border-bottom-width: 1px;
 	border-image-outset: 0px;
@@ -304,7 +303,6 @@ ul#hbase-breadcrumbs li a {
 	border-right-width: 1px;
 	border-top-color: rgb(204, 204, 204);
 	border-top-left-radius: 3px;
-	border-top-right-radius: 3px;
 	border-top-style: solid;
 	border-top-width: 1px;
 	box-shadow: rgba(0, 0, 0, 0.0745098) 0px 1px 1px 0px inset;
@@ -334,7 +332,7 @@ ul#hbase-breadcrumbs li a {
 	transition-property: border, box-shadow;
 	transition-timing-function: linear, linear;
 	vertical-align: middle;
-	height:35px;
+	height:36px;
 	font-size: 18px;
 	white-space: nowrap;
 	position: relative;
@@ -551,3 +549,32 @@ textarea {
 	margin: 0px;
 }
 
+.add-on
+{
+	border-radius: 1.5em;
+	border-bottom-left-radius: 0px;
+	border-top-left-radius: 0px;
+	padding: .5em 1em .5em .8em;
+	margin-left:-1px;
+}
+
+.add-on i
+{
+	font-size: 17px;
+}
+
+.search-remove
+{
+	position: relative;
+	left: -65px;
+	top: 2px;
+	text-decoration: none;
+	cursor: pointer;
+	color: #ccc;
+}
+
+.search-remove:hover
+{
+	color: #777;
+	text-decoration: none;
+}
