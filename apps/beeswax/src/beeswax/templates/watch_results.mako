@@ -60,7 +60,6 @@ ${layout.menubar(section='query')}
   .noLeftMargin {
     margin-left: 0!important;
   }
-
 </style>
 
 <div class="container-fluid">
@@ -260,6 +259,7 @@ ${layout.menubar(section='query')}
 
 <script type="text/javascript" charset="utf-8">
 $(document).ready(function () {
+
   var dataTable = $(".resultTable").dataTable({
     "bPaginate": false,
     "bLengthChange": false,
@@ -401,6 +401,12 @@ $(document).ready(function () {
   });
 
   _dt.jHueScrollUp();
+
+  % if app_name == 'impala':
+    window.onbeforeunload = function(e) {
+      $.ajax({url: "${ url(app_name + ':close_operation', query.id) }", type: 'post', async: false});
+    }
+  % endif
 });
 </script>
 
