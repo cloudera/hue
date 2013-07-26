@@ -63,7 +63,7 @@ var submissions = (function($) {
         }
       });
       self.progressFormatted = ko.computed(function() {
-        return (self.progress() * 100) + "%";
+        return (self.progress() * 2 * 100) + "%";
       });
       self.selected = ko.observable();
     }
