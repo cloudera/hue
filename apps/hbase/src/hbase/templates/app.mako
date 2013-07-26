@@ -196,11 +196,11 @@ ${ commonheader(None, "hbase", user) | n,unicode }
     <div class="subnav sticky">
       <div class="container-fluid">
         <div class="row-fluid">
-          <div id="searchbar-main" class="span6" data-bind="click: search.clickTagBar">
+          <div id="searchbar-main" class="span5" data-bind="click: search.clickTagBar">
             <div id="search-tags" contenteditable="true" data-bind="editableText: search.cur_input, hasfocus: search.focused, css: { 'active': search.cur_input() != '' }, event: { 'keydown': search.onKeyDown, click: search.updateMenu.bind(null) }" data-placeholder="${_('row_key, row_key_prefix* + scan_length, row_key [family:col1, family2:col2, family3:]')}">
             </div>
           </div>
-          <ul id="search-typeahead" data-bind="visible: search.focused()">
+          <ul id="search-typeahead" data-bind="visible: search.focused() && !search.submitted()">
             <!-- ko if: search.mode() != 'idle' -->
             <li><a><b data-bind="text: search.modes[search.mode()].hint"></b>: <span data-bind="html: search.hintText()"></span> <code class="pull-right" data-bind="text: search.modes[search.mode()].type"></code></a></li>
             <!-- /ko -->
@@ -208,6 +208,8 @@ ${ commonheader(None, "hbase", user) | n,unicode }
             <li data-bind="event: { mousedown: function(){app.search.cur_input(app.search.cur_input() + $data.shortcut);} }, css: {active: self.activeHint}"><a><span data-bind="text: $data.hint"></span> <code class="pull-right" data-bind="text: $data.shortcut"></code></a></li>
             <!-- /ko -->
           </ul>
+          <button class="btn btn-primary add-on" data-bind="enabled: !search.submitted(), click: search.evaluate.bind(null)"><i class="icon-search"></i></button>
+          <a class="search-remove" data-bind="click: function(){ app.search.cur_input(''); }"><i class="icon-remove-sign"></i></a>
           <span id="column-family-selectors">
             <!-- ko foreach: views.tabledata.columnFamilies() -->
               <span class="label" data-bind="text: $data.name, style: {'backgroundColor': ($data.enabled()) ? stringHashColor($data.name.split(':')[0]) : '#ccc' ,'cursor':'pointer'}, click: $data.toggle"></span>

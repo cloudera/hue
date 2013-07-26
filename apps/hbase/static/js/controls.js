@@ -556,6 +556,7 @@ var tagsearch = function() {
   self.tags = ko.observableArray();
   self.mode = ko.observable('idle');
   self.cur_input = ko.observable('');
+  self.submitted = ko.observable(false);
   self.hints = ko.observableArray([ {
       hint: 'End Query',
       shortcut: ',',
@@ -659,6 +660,7 @@ var tagsearch = function() {
   };
 
   self.updateMode = function(value) {
+    self.submitted(false);
     var selection = value.slice(0, self.selectionEnd());
     var endindex = selection.slice(selection.lastIndexOf(',')).indexOf(',');
     if(endindex == -1) endindex = selection.length;
@@ -725,6 +727,8 @@ var tagsearch = function() {
 
   self.evaluate = function() {
     app.views.tabledata.searchQuery(self.cur_input());
+    self.submitted(true);
+    self.mode('idle');
   };
 
   $('#search-tags').blur(function(){
