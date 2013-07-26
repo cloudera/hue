@@ -28,7 +28,7 @@ var submissions = (function($) {
     'external_link': null,
     'initialize': function(attrs) {
       var self = this;
-      var attrs = $.extend(true, attrs, {});
+      var attrs = $.extend(true, attrs || {}, {});
       attrs = transform_keys(attrs, {
         'creation-date': 'creation_date',
         'last-update-date': 'last_update_date',

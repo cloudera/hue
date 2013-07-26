@@ -56,18 +56,17 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
   <div id="jobs" class="row-fluid mainSection hide">
     <div id="jobs-list" class="row-fluid section hide">
       <div class="row-fluid" data-bind="if: !isLoading()">
-        <!-- ko if: filteredJobs().length > 0 -->
-        <ul class="major-list" data-bind="foreach: filteredJobs">
-          <!-- ko if: submission() -->
+        <ul class="major-list" data-bind="foreach: filteredJobs() ? filteredJobs() : []">
+          <!-- ko if: submission -->
           <li data-bind="routie: 'job/edit/' + id()" title="${ _('Click to edit') }">
             <div class="pull-right">
-              <span class="label label-success" data-bind="visible: submission().status() == 'SUCCEEDED'">
+              <span class="label label-success" data-bind="visible: hasSucceeded">
                 <span data-bind="text: ('${_('Last run: ')}' + submission().createdFormatted())"></span>
               </span>
-              <span class="label label-warning" data-bind="visible: $.inArray(submission().status(), ['BOOTING', 'RUNNING', 'UNKNOWN']) > -1">
+              <span class="label label-warning" data-bind="visible: isRunning">
                 <span data-bind="text: submission().status"></span>
               </span>
-              <span class="label label-error" style="display: inline-block" data-bind="visible: $.inArray(submission().status(), ['FAILURE_ON_SUBMIT', 'FAILED']) > -1">
+              <span class="label label-error" style="display: inline-block" data-bind="visible: hasFailed">
                 <span data-bind="text: ('${_('Last run: ')}' + submission().createdFormatted())"></span>
               </span>
             </div>
@@ -76,13 +75,12 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
           </li>
           <!-- /ko -->
 
-          <!-- ko ifnot: submission() -->
+          <!-- ko ifnot: submission -->
           <li data-bind="routie: 'job/edit/' + id()" title="${ _('Click to edit') }">
             <div class="main" data-bind="template: {name: 'job-list-item'}"></div>
           </li>
           <!-- /ko -->
         </ul>
-        <!-- /ko -->
 
         <div class="span10 offset1 center" data-bind="if: filteredJobs().length == 0">
           <i class="icon-plus-sign waiting"></i>
@@ -231,23 +229,20 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
   <!-- ko if: type() == 'IMPORT' -->
   <i class="icon-download-alt"></i>&nbsp;
   <span data-bind="text: type"></span>
-  <span data-bind="text: name"></span>
-  <span class="muted">
-    <span>${_('From ')}</span>
-    <span data-bind="text: $root.getDatabaseByConnectionId(connection_id())"></span>
-    <span>${_('To ')}</span>
-    <span data-bind="text: storageType"></span>
-  </span>
+  <span>${_('from ')}</span>
+  <span data-bind="text: $root.getDatabaseByConnectionId(connection_id())"></span>
+  <span>${_('to ')}</span>
+  <span data-bind="text: storageType"></span>
+  <span data-bind="text: name" class="muted"></span>
   <!-- /ko -->
   <!-- ko if: type() == 'EXPORT' -->
   <i class="icon-upload-alt"></i>&nbsp;
   <span data-bind="text: type"></span>
-  <span class="muted">
-    <span>${_('From ')}</span>
-    <span data-bind="text: storageType"></span>
-    <span>${_('To ')}</span>
-    <span data-bind="text: $root.getDatabaseByConnectionId(connection_id())"></span>
-  </span>
+  <span>${_('from ')}</span>
+  <span data-bind="text: storageType"></span>
+  <span>${_('to ')}</span>
+  <span data-bind="text: $root.getDatabaseByConnectionId(connection_id())"></span>
+  <span data-bind="text: name" class="muted"></span>
   <!-- /ko -->
 </h4>
 </script>
@@ -611,7 +606,11 @@ $(document).on('stopped.job', function(e, job, options, submission_dict) {
 });
 
 $(document).on('stop_fail.job', function(e, job, options, submission_dict) {
-  $.jHueNotify.info("${ _('Could not stop job.') }");
+  $.jHueNotify.error("${ _('Could not stop job.') }");
+});
+
+$(document).one('load_fail.job', function() {
+  $.jHueNotify.error("${ _('Could not load node.') }");
 });
 
 $(document).on('save_fail.job', handle_form_errors);
@@ -632,7 +631,7 @@ $("#jobs-list tbody").on('click', 'tr', function() {
 });
 
 //// Load all the data
-var framework = new framework.Framework({modelDict: {}});
+var framework = new framework.Framework();
 (function() {
   var count = 0;
   function check() {
@@ -724,6 +723,8 @@ $(document).ready(function () {
       viewModel.saveJob();
       $(document).one('saved.job', function(e, node, options, data) {
         var options = $.extend(true, {}, node.options);
+
+        // To get all properties correct.
         if ('model' in options) {
           delete options['model'];
         }
@@ -732,7 +733,15 @@ $(document).ready(function () {
         }
         options['modelDict'] = data.job;
         node.initialize(options);
-        routie('job/run/' + node.id());
+
+        // Reload node.
+        $(document).one('loaded.job', function() {
+          routie('job/run/' + node.id());
+        });
+        $(document).one('load_fail.job', function() {
+          routie('jobs');
+        });
+        node.load();
       });
       $(document).one('save_fail.connection', function(){
         routie('job/edit');

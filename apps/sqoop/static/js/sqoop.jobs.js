@@ -76,11 +76,13 @@ var jobs = (function($) {
       self.submission = ko.computed({
         owner: self,
         read: function () {
-          return submissions.setDefaultSubmission(self.id());
+          return submissions.setDefaultSubmission(this.id());
         },
         write: function (submission) {
           submissions.putSubmission(submission);
-          if (self.runningInterval == 0 && $.inArray(submission.status(), ['BOOTING', 'RUNNING']) != -1) {
+          self.id.valueHasMutated();
+
+          if (self.runningInterval == 0 && self.isRunning()) {
             self.runningInterval = setInterval(function() {
               if (!self.isRunning()) {
                 clearInterval(self.runningInterval);
@@ -90,8 +92,6 @@ var jobs = (function($) {
               self.getStatus();
             }, 2000);
           }
-
-          self.id.valueHasMutated();
         }
       });
       self.persisted = ko.computed(function() {
@@ -99,6 +99,12 @@ var jobs = (function($) {
       });
       self.isRunning = ko.computed(function() {
         return self.submission() && $.inArray(self.submission().status(), ['BOOTING', 'RUNNING']) > -1;
+      });
+      self.hasSucceeded = ko.computed(function() {
+        return self.submission() && $.inArray(self.submission().status(), ['SUCCEEDED']) > -1;
+      });
+      self.hasFailed = ko.computed(function() {
+        return self.submission() && $.inArray(self.submission().status(), ['FAILURE_ON_SUBMIT', 'FAILED']) > -1;
       });
       self.outputDirectoryFilebrowserURL = ko.computed(function() {
         var output_directory = null;
@@ -138,7 +144,7 @@ var jobs = (function($) {
           switch(data.status) {
             case 0:
               self.submission(new submissions.Submission({modelDict: data.submission}));
-              $(document).trigger('started.job', [self, options, data]);
+              $(document).trigger('started.job', [self, options, data.submission]);
             break;
             default:
             case 1:
