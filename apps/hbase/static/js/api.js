@@ -40,10 +40,9 @@ var API = {
     var doneHandle = handler.done;
     handler.done = function() {
       var cb = arguments[0];
-      return doneHandle.apply(handler, [function(data) {
-        app.views.tabledata.truncated(data.truncated); //change later
+      return doneHandle.apply(handler, [function(data)
+      {
         app.views.tabledata.truncateLimit(data.limit);
-        app.views.tabledata.truncateCount(data.truncate_count);
         data = data.data;
         return cb(data);
       }].concat(Array.prototype.slice.call(arguments).slice(1)));

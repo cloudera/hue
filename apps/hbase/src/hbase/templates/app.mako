@@ -95,8 +95,8 @@ ${ commonheader(None, "hbase", user) | n,unicode }
     </div>
   </div>
   <br/>
-  <div class="alert alert-error" data-bind="visible: ${datasource}.truncateCount() > 0 && !${datasource}.isLoading()">
-    <b>${_('Notice:')} <i data-bind="text: ${datasource}.truncateCount"></i> ${_('entries truncated')}</b> ${_('at')} <i data-bind="text: ${datasource}.truncateLimit"></i> ${_('items per set.')}
+  <div class="alert alert-error" data-bind="visible: !${datasource}.isLoading()">
+    <b>${_('Notice:')}</b> ${_(' entries may be truncated with limit set at')} <i data-bind="text: ${datasource}.truncateLimit"></i> ${_('items per set.')}
   </div>
   <div class="alert alert-warning" data-bind="visible: !${datasource}.isLoading()">
       ${_('Query executed in')} <i data-bind="text:${datasource}.lastReloadTime() + 's'"></i> ${_('fetching')} <i data-bind="text: ${datasource}.items().length"></i> ${_('rows')}.

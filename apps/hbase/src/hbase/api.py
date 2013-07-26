@@ -143,19 +143,17 @@ class HbaseApi(object):
   def getRowQuerySet(self, cluster, tableName, columns, queries):
     client = self.connectCluster(cluster)
     aggregate_data = []
+    limit = conf.TRUNCATE_LIMIT.get()
     queries = sorted(queries, key=lambda query: query['scan_length']) #sort by scan length
     for query in queries:
       scan_length = int(query['scan_length'])
       if query['row_key'] == "null":
         query['row_key'] = ""
-      filterstring = query.get('filter', None)
-      if filterstring:
-        scan = get_thrift_type('TScan')(startRow=query['row_key'], stopRow=None, timestamp=None, columns=query['columns'] or columns, caching=None, filterString=filterstring, batchSize=None)
-        scanner = client.scannerOpenWithScan(tableName, scan, None)
-        aggregate_data += client.scannerGetList(scanner, query['scan_length'])
-      else:
-        if scan_length == 1:
-          aggregate_data += self.getRows(cluster, tableName, query['columns'] or columns, query['row_key'], query['scan_length'], query['prefix']) #to be replaced in future
-        elif scan_length > 1:
-          aggregate_data += self.getRows(cluster, tableName, query['columns'] or columns, query['row_key'], query['scan_length'], query['prefix'])
+      fs = query.get('filter', None)
+      if fs:
+        fs = " AND (" + fs + ")"
+      filterstring = "(ColumnPaginationFilter(" + str(limit) + ",0) AND PageFilter(" + str(limit) + "))" + (fs or "")
+      scan = get_thrift_type('TScan')(startRow=query['row_key'], stopRow=None, timestamp=None, columns=query['columns'] or columns, caching=None, filterString=filterstring, batchSize=None)
+      scanner = client.scannerOpenWithScan(tableName, scan, None)
+      aggregate_data += client.scannerGetList(scanner, query['scan_length'])
     return aggregate_data
