@@ -157,12 +157,8 @@ var SmartViewModel = function(options) {
   self.name = ko.observable(options.name);
   self.name.subscribe(function(){
     self.querySet.removeAll();
-    self.querySet.push(new QuerySetPeice({
-      'row_key': 'null',
-      'scan_length': 10,
-      'prefix': 'false'
-    }));
     self._reloadcfs();
+    self.evaluateQuery();
   }); //fix and decouple
 
   self.lastReloadTime = ko.observable(1);
@@ -172,20 +168,22 @@ var SmartViewModel = function(options) {
   {
     var inputs = value.match(searchRenderers['rowkey']['select']);
     self.querySet.removeAll();
-    for(var i=0; i<inputs.length; i++) {
-      if(inputs[i].trim() != "" && inputs[i].trim() != ',') {
-        var p = inputs[i].split('+');
-        var scan = p.length > 1 ? parseInt(p[1].trim()) : 0;
-        var extract = inputs[i].match(searchRenderers['rowkey']['nested']['columns']['select']);
-        var columns = extract != null ? extract[0].match(searchRenderers['rowkey']['nested']['columns']['tag']) : [];
-        var filter = inputs[i].match(searchRenderers['rowkey']['nested']['filter']['select']);
-        self.querySet.push(new QuerySetPeice({
-          'row_key': p[0].replace(/[\[\{].+[\]\}]|\*/g,'').trim(), //clean up with column regex selectors instead
-          'scan_length': scan ? scan + 1 : 1,
-          'columns': columns,
-          'prefix': inputs[i].match(searchRenderers['rowkey']['nested']['prefix']['select']) != null,
-          'filter': filter != null && filter.length > 0 ? escape(filter[0].slice(1, -1)) : null
-        }));
+    if(inputs) {
+      for(var i=0; i<inputs.length; i++) {
+        if(inputs[i].trim() != "" && inputs[i].trim() != ',') {
+          var p = inputs[i].split('+');
+          var scan = p.length > 1 ? parseInt(p[1].trim()) : 0;
+          var extract = inputs[i].match(searchRenderers['rowkey']['nested']['columns']['select']);
+          var columns = extract != null ? extract[0].match(searchRenderers['rowkey']['nested']['columns']['tag']) : [];
+          var filter = inputs[i].match(searchRenderers['rowkey']['nested']['filter']['select']);
+          self.querySet.push(new QuerySetPiece({
+            'row_key': p[0].replace(/[\[\{].+[\]\}]|\*/g,'').trim(), //clean up with column regex selectors instead
+            'scan_length': scan ? scan + 1 : 1,
+            'columns': columns,
+            'prefix': inputs[i].match(searchRenderers['rowkey']['nested']['prefix']['select']) != null,
+            'filter': filter != null && filter.length > 0 ? escape(filter[0].slice(1, -1)) : null
+          }));
+        }
       }
     }
     routie(app.cluster() + '/' + app.views.tabledata.name() +'/query/' + value);
@@ -221,14 +219,22 @@ var SmartViewModel = function(options) {
 
   self.querySet = ko.observableArray();
   self.validateQuery = function() {
-    $(self.querySet()).each(function() {
-      this.validate();
-      this.editing(false);
-    });
+    if(self.querySet().length == 0) {
+      self.querySet.push(new QuerySetPiece({
+        'row_key': 'null',
+        'scan_length': 10,
+        'prefix': 'false'
+      }));
+    } else {
+      $(self.querySet()).each(function() {
+        this.validate();
+        this.editing(false);
+      });
+    }
   };
   self.addQuery = function() {
     self.validateQuery();
-    self.querySet.push(new QuerySetPeice({onValidate: function() {
+    self.querySet.push(new QuerySetPiece({onValidate: function() {
       //self.reload();
     }}))
   };
@@ -506,7 +512,7 @@ var TableDataRow = function(options) {
   };
 };
 
-var QuerySetPeice = function(options) {
+var QuerySetPiece = function(options) {
   var self = this;
   options = ko.utils.extend({
     row_key: "null",

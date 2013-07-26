@@ -175,6 +175,7 @@ function convertTimestamp(timestamp) {
 }
 
 function resetElements() {
+  $(window).unbind('scroll');
   $(window).scroll(function(e) {
     $(".subnav.sticky").each(function() {
       var padder = $(this).data('padder'), top = $(this).position().top + (padder ? window.scrollY : 0);
@@ -187,6 +188,8 @@ function resetElements() {
       }
     });
   });
+  app.views.tabledata.searchQuery('');
+  app.search.cur_input('');
 };
 
 function prepForTransport(value) {
