@@ -42,9 +42,17 @@ function fetcher_success(name, Node, options) {
 ko.bindingHandlers.routie = {
   init: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
     $(element).click(function() {
-      var url = ko.utils.unwrapObservable(valueAccessor());
+      var obj = ko.utils.unwrapObservable(valueAccessor());
+      var url = null;
+      var bubble = false;
+      if ($.isPlainObject(obj)) {
+        url = obj.url;
+        bubble = !!obj.bubble;
+      } else {
+        url = obj;
+      }
       routie(url);
-      return false;
+      return bubble;
     });
   }
 };
