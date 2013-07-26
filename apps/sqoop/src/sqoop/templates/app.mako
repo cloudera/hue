@@ -722,8 +722,17 @@ $(document).ready(function () {
     },
     "job/save-and-run": function() {
       viewModel.saveJob();
-      $(document).one('saved.job', function(){
-        routie('job/run');
+      $(document).one('saved.job', function(e, node, options, data) {
+        var options = $.extend(true, {}, node.options);
+        if ('model' in options) {
+          delete options['model'];
+        }
+        if ('modelDict' in options) {
+          delete options['modelDict'];
+        }
+        options['modelDict'] = data.job;
+        node.initialize(options);
+        routie('job/run/' + node.id());
       });
       $(document).one('save_fail.connection', function(){
         routie('job/edit');
