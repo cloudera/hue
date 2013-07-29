@@ -3,4 +3,205 @@
 # This file is distributed under the same license as the Hue project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
 #
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2013-07-15 18:44-0700\n"
+"PO-Revision-Date: 2013-07-13 20:35-0700\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: ko <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.6\n"
+
+#: src/hbase/api.py:46
+#, python-format
+msgid "Api Error: %s"
+msgstr "Api 오류: %s"
+
+#: src/hbase/api.py:76
+#, python-format
+msgid "Cluster by the name of %s does not exist in configuration."
+msgstr "%s 이름별 클러스타가 구성에 존재하지 않습니다."
+
+#: src/hbase/templates/app.mako:49
+msgid "There are no tables matching the search criteria."
+msgstr "검색 기준과 일치하는 테이블이 없습니다."
+
+#: src/hbase/templates/app.mako:62
+msgid "Refresh Row"
+msgstr "행 새로 고침"
+
+#: src/hbase/templates/app.mako:64
+msgid "Delete Row"
+msgstr "행 삭제"
+
+#: src/hbase/templates/app.mako:68 src/hbase/templates/app.mako:228
+msgid "Toggle Collapse Selected"
+msgstr "선택 항목 축소 전환"
+
+#: src/hbase/templates/app.mako:69 src/hbase/templates/app.mako:229
+msgid "Select All Visible"
+msgstr "모든 표시 선택"
+
+#: src/hbase/templates/app.mako:75
+msgid "Add New Column/Cell"
+msgstr "새 열/셀 추가"
+
+#: src/hbase/templates/app.mako:87
+msgid "Full Editor"
+msgstr "전체 편집기"
+
+#: src/hbase/templates/app.mako:99
+msgid "Notice:"
+msgstr "알림:"
+
+#: src/hbase/templates/app.mako:99
+msgid "entries truncated"
+msgstr "잘린 항목"
+
+#: src/hbase/templates/app.mako:99
+msgid "at"
+msgstr ":"
+
+#: src/hbase/templates/app.mako:99
+msgid "items per set."
+msgstr "세트당 항목 수."
+
+#: src/hbase/templates/app.mako:102
+msgid "Query executed in"
+msgstr "쿼리 실행 위치:"
+
+#: src/hbase/templates/app.mako:102
+msgid "fetching"
+msgstr "가져오는 중"
+
+#: src/hbase/templates/app.mako:102
+msgid "rows"
+msgstr "행"
+
+#: src/hbase/templates/app.mako:109
+msgid "Sort By"
+msgstr "정렬 기준:"
+
+#: src/hbase/templates/app.mako:149
+msgid "Enable"
+msgstr "설정"
+
+#: src/hbase/templates/app.mako:154
+msgid "Disable"
+msgstr "해제"
+
+#: src/hbase/templates/app.mako:157
+msgid "Drop"
+msgstr "삭제"
+
+#: src/hbase/templates/app.mako:160
+msgid "New Table"
+msgstr "새 테이블"
+
+#: src/hbase/templates/app.mako:179
+msgid "Create New Table"
+msgstr "새 테이블 생성"
+
+#: src/hbase/templates/app.mako:183
+msgid "Table Name"
+msgstr "테이블 이름"
+
+#: src/hbase/templates/app.mako:184
+msgid "Column Families"
+msgstr "열 패밀리"
+
+#: src/hbase/templates/app.mako:187
+msgid "Add Column Family"
+msgstr "열 패밀리 추가"
+
+#: src/hbase/templates/app.mako:190 src/hbase/templates/app.mako:283
+#: src/hbase/templates/app.mako:304 src/hbase/templates/app.mako:342
+#: src/hbase/templates/app.mako:373
+msgid "Cancel"
+msgstr "취소"
+
+#: src/hbase/templates/app.mako:191
+msgid "Submit"
+msgstr "제출"
+
+#: src/hbase/templates/app.mako:205
+msgid "row_key1, row_key2 + scan_length, row[ cf:column ], [ cf:col1 cf:col2 ]"
+msgstr "row_key1, row_key2 + scan_length, row[ cf:column ], [ cf:col1 cf:col2 ]"
+
+#: src/hbase/templates/app.mako:224
+msgid "Toggle Select All Rows"
+msgstr "모든 행 선택 전환"
+
+#: src/hbase/templates/app.mako:224
+msgid "All"
+msgstr "모두"
+
+#: src/hbase/templates/app.mako:231
+msgid "Drop Columns"
+msgstr "열 삭제"
+
+#: src/hbase/templates/app.mako:246
+msgid "Displaying"
+msgstr "표시 중"
+
+#: src/hbase/templates/app.mako:250
+msgid "starting from"
+msgstr "시작:"
+
+#: src/hbase/templates/app.mako:255
+msgid "Add Query Field"
+msgstr "쿼리 필드 추가"
+
+#: src/hbase/templates/app.mako:256
+msgid "Go"
+msgstr "이동"
+
+#: src/hbase/templates/app.mako:260
+msgid "Drop Rows"
+msgstr "행 삭제"
+
+#: src/hbase/templates/app.mako:262
+msgid "New Row"
+msgstr "새 행"
+
+#: src/hbase/templates/app.mako:271
+msgid "Insert New Row"
+msgstr "새 행 삽입"
+
+#: src/hbase/templates/app.mako:276
+msgid "Row Key"
+msgstr "행 키"
+
+#: src/hbase/templates/app.mako:280
+msgid "Add Field"
+msgstr "필드 추가"
+
+#: src/hbase/templates/app.mako:292
+msgid "Create New Column"
+msgstr "새 열 생성"
+
+#: src/hbase/templates/app.mako:298
+msgid "Column Name"
+msgstr "열 이름"
+
+#: src/hbase/templates/app.mako:300 src/hbase/templates/app.mako:301
+msgid "Cell Value"
+msgstr "셀 값"
+
+#: src/hbase/templates/app.mako:343
+msgid "Save"
+msgstr "저장"
+
+#: src/hbase/templates/app.mako:345
+msgid "OK"
+msgstr "확인"
+
+#: src/hbase/templates/app.mako:374
+msgid "Confirm"
+msgstr "확인"
 

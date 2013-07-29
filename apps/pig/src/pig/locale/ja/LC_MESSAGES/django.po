@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-05-10 11:59-0700\n"
+"POT-Creation-Date: 2013-07-15 18:44-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/pig/api.py:182 src/pig/templates/app.mako:455
+#: src/pig/api.py:233 src/pig/templates/app.mako:596
 msgid "Unsaved script"
 msgstr "未保存のスクリプト"
 
@@ -54,20 +54,20 @@ msgstr "ドキュメントがサブミットしたジョブではなく実際の
 msgid "Only superusers and %s are allowed to modify this document."
 msgstr "スーパーユーザーと %s のみが、このドキュメントを変更できます。"
 
-#: src/pig/views.py:66 src/pig/views.py:90 src/pig/views.py:109
-#: src/pig/views.py:139 src/pig/views.py:163
+#: src/pig/views.py:66 src/pig/views.py:91 src/pig/views.py:110
+#: src/pig/views.py:141 src/pig/views.py:177
 msgid "POST request required."
 msgstr "POST 要求が必要です。"
 
-#: src/pig/views.py:101
+#: src/pig/views.py:102
 msgid "Error stopping Pig script."
 msgstr "Pig スクリプトの停止中にエラーが発生しました。"
 
-#: src/pig/views.py:145
+#: src/pig/views.py:147
 msgid " (Copy)"
 msgstr " （コピー）"
 
-#: src/pig/views.py:211
+#: src/pig/views.py:225
 msgid "A POST request is required."
 msgstr "POST 要求が必要です。"
 
@@ -81,11 +81,7 @@ msgstr "例を %(local_dir)s から %(remote_data_dir)s にコピーしていま
 msgid "Copying data %(local_dir)s to %(remote_data_dir)s\n"
 msgstr "データを %(local_dir)s から %(remote_data_dir)s にコピーしています\n"
 
-#: src/pig/templates/app.mako:23
-msgid "Pig"
-msgstr "Pig"
-
-#: src/pig/templates/app.mako:28 src/pig/templates/app.mako:104
+#: src/pig/templates/app.mako:28 src/pig/templates/app.mako:103
 msgid "Editor"
 msgstr "エディタ"
 
@@ -101,11 +97,12 @@ msgstr "ダッシュボード"
 msgid "Search for script name or content"
 msgstr "スクリプト名または内容の検索"
 
-#: src/pig/templates/app.mako:44
+#: src/pig/templates/app.mako:44 src/pig/templates/app.mako:171
+#: src/pig/templates/app.mako:182
 msgid "Run this script"
 msgstr "このスクリプトを実行"
 
-#: src/pig/templates/app.mako:44 src/pig/templates/app.mako:123
+#: src/pig/templates/app.mako:44 src/pig/templates/app.mako:121
 msgid "Run"
 msgstr "実行"
 
@@ -113,7 +110,7 @@ msgstr "実行"
 msgid "Copy this script"
 msgstr "このスクリプトをコピー"
 
-#: src/pig/templates/app.mako:45 src/pig/templates/app.mako:138
+#: src/pig/templates/app.mako:45 src/pig/templates/app.mako:131
 msgid "Copy"
 msgstr "コピー"
 
@@ -121,7 +118,7 @@ msgstr "コピー"
 msgid "Delete this script"
 msgstr "このスクリプトを削除"
 
-#: src/pig/templates/app.mako:46 src/pig/templates/app.mako:143
+#: src/pig/templates/app.mako:46 src/pig/templates/app.mako:136
 msgid "Delete"
 msgstr "削除"
 
@@ -129,23 +126,22 @@ msgstr "削除"
 msgid "Create a new script"
 msgstr "新しいスクリプトを作成"
 
-#: src/pig/templates/app.mako:50 src/pig/templates/app.mako:109
-#: src/pig/templates/app.mako:110
+#: src/pig/templates/app.mako:50 src/pig/templates/app.mako:140
+#: src/pig/templates/app.mako:141
 msgid "New script"
 msgstr "新しいスクリプト"
 
 #: src/pig/templates/app.mako:54
-msgid ""
-"There are currently no scripts defined. Please add a new script clicking "
-"on \"New script\""
+msgid "There are currently no scripts defined. Please add a new script clicking on \"New script\""
 msgstr "現在、スクリプトは定義されていません。［新しいスクリプト］をクリックして、新しいスクリプトを追加してください。"
 
-#: src/pig/templates/app.mako:61 src/pig/templates/app.mako:181
-#: src/pig/templates/app.mako:287 src/pig/templates/app.mako:314
+#: src/pig/templates/app.mako:61 src/pig/templates/app.mako:218
+#: src/pig/templates/app.mako:267 src/pig/templates/app.mako:391
+#: src/pig/templates/app.mako:418
 msgid "Name"
 msgstr "名前"
 
-#: src/pig/templates/app.mako:62
+#: src/pig/templates/app.mako:62 src/pig/templates/app.mako:105
 msgid "Script"
 msgstr "スクリプト"
 
@@ -153,230 +149,306 @@ msgstr "スクリプト"
 msgid "There are no scripts matching the search criteria."
 msgstr "検索条件に一致するスクリプトが存在しません。"
 
-#: src/pig/templates/app.mako:106
-msgid "Edit script"
-msgstr "スクリプトを編集"
-
-#: src/pig/templates/app.mako:113
+#: src/pig/templates/app.mako:108
 msgid "Properties"
 msgstr "プロパティ"
 
-#: src/pig/templates/app.mako:115
-msgid "Edit properties"
-msgstr "プロパティを編集"
-
-#: src/pig/templates/app.mako:120
-msgid "Actions"
-msgstr "アクション"
-
-#: src/pig/templates/app.mako:122 src/pig/templates/app.mako:127
-msgid "Run the script"
-msgstr "スクリプトを実行"
-
-#: src/pig/templates/app.mako:128
-msgid "Stop"
-msgstr "停止"
-
-#: src/pig/templates/app.mako:132
+#: src/pig/templates/app.mako:111
 msgid "Save the script"
 msgstr "スクリプトを保存"
 
-#: src/pig/templates/app.mako:133
+#: src/pig/templates/app.mako:112 src/pig/templates/app.mako:565
 msgid "Save"
 msgstr "保存"
 
-#: src/pig/templates/app.mako:137
+#: src/pig/templates/app.mako:118
+msgid "Actions"
+msgstr "アクション"
+
+#: src/pig/templates/app.mako:120
+msgid "Run the script"
+msgstr "スクリプトを実行"
+
+#: src/pig/templates/app.mako:125
+#, fuzzy
+msgid "Stop the script"
+msgstr "スクリプトを停止"
+
+#: src/pig/templates/app.mako:126
+msgid "Stop"
+msgstr "停止"
+
+#: src/pig/templates/app.mako:130
 msgid "Copy the script"
 msgstr "スクリプトをコピー"
 
-#: src/pig/templates/app.mako:142
+#: src/pig/templates/app.mako:135
 msgid "Delete the script"
 msgstr "スクリプトを削除"
 
-#: src/pig/templates/app.mako:146 src/pig/templates/app.mako:374
+#: src/pig/templates/app.mako:144 src/pig/templates/app.mako:478
 msgid "Logs"
 msgstr "ログ"
 
-#: src/pig/templates/app.mako:148
+#: src/pig/templates/app.mako:146
 msgid "Show Logs"
 msgstr "ログを表示"
 
-#: src/pig/templates/app.mako:148
+#: src/pig/templates/app.mako:147
 msgid "Current Logs"
 msgstr "現在のログ"
 
-#: src/pig/templates/app.mako:157
-msgid "Edit"
-msgstr "編集"
+#: src/pig/templates/app.mako:155
+msgid "Press CTRL + Space to autocomplete"
+msgstr "Ctrl キーを押したまま Space キーを押すと、オートコンプリート"
 
-#: src/pig/templates/app.mako:164
-msgid "Edit properties for"
-msgstr "次のプロパティを編集："
+#: src/pig/templates/app.mako:156
+msgid "You can execute the current script by pressing CTRL + ENTER or CTRL + . in the editor"
+msgstr "エディタで Ctrl キーを押したまま ENTER キーを押すか、Ctrl キーを押したまま .（ピリオド）を押すと、現在のスクリプトを実行できます"
 
-#: src/pig/templates/app.mako:167
+#: src/pig/templates/app.mako:166
+#, fuzzy
+msgid "Unsaved"
+msgstr "未保存"
+
+#: src/pig/templates/app.mako:172 src/pig/templates/app.mako:183
+#, fuzzy
+msgid "Stop this script"
+msgstr "このスクリプトを停止"
+
+#: src/pig/templates/app.mako:188 src/pig/templates/app.mako:558
 msgid "Script name"
 msgstr "スクリプト名"
 
-#: src/pig/templates/app.mako:172
+#: src/pig/templates/app.mako:195
 msgid "Parameters"
 msgstr "パラメータ"
 
-#: src/pig/templates/app.mako:174 src/pig/templates/app.mako:196
-#: src/pig/templates/app.mako:205 src/pig/templates/app.mako:241
+#: src/pig/templates/app.mako:208
+#, fuzzy
+msgid "There are currently no defined parameters."
+msgstr "現在、定義されているパラメータはありません。"
+
+#: src/pig/templates/app.mako:210 src/pig/templates/app.mako:238
+#: src/pig/templates/app.mako:259 src/pig/templates/app.mako:287
+#: src/pig/templates/app.mako:308 src/pig/templates/app.mako:345
 msgid "Add"
 msgstr "追加"
 
-#: src/pig/templates/app.mako:182 src/pig/templates/app.mako:213
+#: src/pig/templates/app.mako:219 src/pig/templates/app.mako:268
+#: src/pig/templates/app.mako:317
 msgid "Value"
 msgstr "値"
 
-#: src/pig/templates/app.mako:190 src/pig/templates/app.mako:234
+#: src/pig/templates/app.mako:232 src/pig/templates/app.mako:281
+#: src/pig/templates/app.mako:338
 msgid "Remove"
 msgstr "削除"
 
-#: src/pig/templates/app.mako:203
+#: src/pig/templates/app.mako:246
+#, fuzzy
+msgid "Hadoop properties"
+msgstr "Hadoop プロパティ"
+
+#: src/pig/templates/app.mako:257
+#, fuzzy
+msgid "There are currently no defined Hadoop properties."
+msgstr "現在、定義された Hadoop プロパティはありません。"
+
+#: src/pig/templates/app.mako:296
 msgid "Resources"
 msgstr "リソース"
 
-#: src/pig/templates/app.mako:212
+#: src/pig/templates/app.mako:299
+msgid "Path to a HDFS file or zip file to add to the workspace of the running script"
+msgstr "実行中のスクリプトの Workspace に追加する HDFS ファイルまたは zip ファイルへのパス"
+
+#: src/pig/templates/app.mako:306
+#, fuzzy
+msgid "There are currently no defined resources."
+msgstr "現在、定義されているリソースはありません。"
+
+#: src/pig/templates/app.mako:316
 msgid "Type"
 msgstr "タイプ"
 
-#: src/pig/templates/app.mako:222
+#: src/pig/templates/app.mako:326
 msgid "File"
 msgstr "ファイル"
 
-#: src/pig/templates/app.mako:223
+#: src/pig/templates/app.mako:327
 msgid "Archive"
 msgstr "アーカイブ"
 
-#: src/pig/templates/app.mako:251
-msgid "Logs for"
-msgstr "次のログ："
-
-#: src/pig/templates/app.mako:256
+#: src/pig/templates/app.mako:360
 msgid "Status:"
 msgstr "ステータス："
 
-#: src/pig/templates/app.mako:258
+#: src/pig/templates/app.mako:362
 msgid "Progress:"
 msgstr "進行状況："
 
-#: src/pig/templates/app.mako:258
+#: src/pig/templates/app.mako:362
 msgid "%"
 msgstr "%"
 
-#: src/pig/templates/app.mako:264
+#: src/pig/templates/app.mako:368
 msgid "No available logs."
 msgstr "利用可能なログがありません。"
 
-#: src/pig/templates/app.mako:278 src/pig/templates/app.mako:640
+#: src/pig/templates/app.mako:382 src/pig/templates/app.mako:797
 msgid "Running"
 msgstr "実行中"
 
-#: src/pig/templates/app.mako:282
+#: src/pig/templates/app.mako:386
 msgid "There are currently no running scripts."
 msgstr "現在実行中のスクリプトはありません。"
 
-#: src/pig/templates/app.mako:288
+#: src/pig/templates/app.mako:392
 msgid "Progress"
 msgstr "進行状況"
 
-#: src/pig/templates/app.mako:289 src/pig/templates/app.mako:316
+#: src/pig/templates/app.mako:393 src/pig/templates/app.mako:420
 msgid "Created on"
 msgstr "作成日"
 
-#: src/pig/templates/app.mako:305
+#: src/pig/templates/app.mako:409
 msgid "Completed"
 msgstr "完了"
 
-#: src/pig/templates/app.mako:309
+#: src/pig/templates/app.mako:413
 msgid "There are currently no completed scripts."
 msgstr "現在完了したスクリプトはありません。"
 
-#: src/pig/templates/app.mako:315
+#: src/pig/templates/app.mako:419
 msgid "Status"
 msgstr "ステータス"
 
-#: src/pig/templates/app.mako:328
+#: src/pig/templates/app.mako:432
 msgid "Click to edit"
 msgstr "クリックして編集"
 
-#: src/pig/templates/app.mako:342
+#: src/pig/templates/app.mako:446
 msgid "Click to view"
 msgstr "クリックして表示"
 
-#: src/pig/templates/app.mako:359
+#: src/pig/templates/app.mako:463
 msgid "Confirm Delete"
 msgstr "削除を確認"
 
-#: src/pig/templates/app.mako:362
+#: src/pig/templates/app.mako:466
 msgid "Are you sure you want to delete this script?"
 msgstr "このスクリプトを削除してもよろしいですか?"
 
-#: src/pig/templates/app.mako:363
+#: src/pig/templates/app.mako:467
 msgid "Are you sure you want to delete these scripts?"
 msgstr "これらのスクリプトを削除してもよろしいですか?"
 
-#: src/pig/templates/app.mako:366 src/pig/templates/app.mako:400
-#: src/pig/templates/app.mako:411
+#: src/pig/templates/app.mako:470 src/pig/templates/app.mako:504
+#: src/pig/templates/app.mako:515 src/pig/templates/app.mako:544
 msgid "No"
 msgstr "いいえ"
 
-#: src/pig/templates/app.mako:367 src/pig/templates/app.mako:401
-#: src/pig/templates/app.mako:412
+#: src/pig/templates/app.mako:471 src/pig/templates/app.mako:505
+#: src/pig/templates/app.mako:516 src/pig/templates/app.mako:545
 msgid "Yes"
 msgstr "はい"
 
-#: src/pig/templates/app.mako:381
+#: src/pig/templates/app.mako:485
 msgid "Close"
 msgstr "閉じる"
 
-#: src/pig/templates/app.mako:388
+#: src/pig/templates/app.mako:492
 msgid "Run Script"
 msgstr "スクリプトを実行"
 
-#: src/pig/templates/app.mako:388 src/pig/templates/app.mako:408
+#: src/pig/templates/app.mako:492 src/pig/templates/app.mako:512
 msgid "?"
 msgstr "?"
 
-#: src/pig/templates/app.mako:391
+#: src/pig/templates/app.mako:495
 msgid "Script variables"
 msgstr "スクリプト変数"
 
-#: src/pig/templates/app.mako:408
+#: src/pig/templates/app.mako:512
 msgid "Stop Script"
 msgstr "スクリプトを停止"
 
-#: src/pig/templates/app.mako:419
+#: src/pig/templates/app.mako:523
 msgid "Choose a file"
 msgstr "ファイルを選択"
 
-#: src/pig/templates/app.mako:451
-msgid "The pig job could not be killed."
-msgstr "Pig スクリプトは強制終了できません。"
+#: src/pig/templates/app.mako:536
+msgid "Are you sure?"
+msgstr "よろしいですか？"
 
-#: src/pig/templates/app.mako:452
-msgid "Run this pig script"
-msgstr "この Pig スクリプトを実行"
+#: src/pig/templates/app.mako:540
+msgid "The current script has unsaved changes. Are you sure you want to discard the changes?"
+msgstr "現在のスクリプトには、未保存の変更があります。変更を破棄してもよろしいですか？"
 
-#: src/pig/templates/app.mako:453
-msgid "Stop the execution"
-msgstr "実行を停止"
+#: src/pig/templates/app.mako:552
+#, fuzzy
+msgid "Save script"
+msgstr "スクリプトの保存"
 
-#: src/pig/templates/app.mako:454
+#: src/pig/templates/app.mako:556
+msgid "Give a meaningful name to this script."
+msgstr "このスクリプトに意味のある名前を付けます。"
+
+#: src/pig/templates/app.mako:564
+msgid "Cancel"
+msgstr "キャンセル"
+
+#: src/pig/templates/app.mako:592
+#, fuzzy
+msgid "The Pig job could not be killed."
+msgstr "Pig ジョブを強制終了できませんでした。"
+
+#: src/pig/templates/app.mako:593
+#, fuzzy
+msgid "Run this Pig script."
+msgstr "この Pig スクリプトを実行します。"
+
+#: src/pig/templates/app.mako:594
+#, fuzzy
+msgid "Stop execution."
+msgstr "実行を停止します。"
+
+#: src/pig/templates/app.mako:595
 msgid "Saved"
 msgstr "保存済み"
 
-#: src/pig/templates/app.mako:633
+#: src/pig/templates/app.mako:790
 msgid "Saving"
 msgstr "保存中"
 
-#: src/pig/templates/app.mako:644
+#: src/pig/templates/app.mako:801
 msgid "has been saved correctly."
 msgstr "が正しく保存されました。"
 
-#: src/pig/templates/app.mako:648
+#: src/pig/templates/app.mako:805
 msgid "There was an error with your request!"
 msgstr "要求に関するエラーがあります。"
 
+#: src/pig/templates/app.mako:1048
+msgid "Did you know?"
+msgstr "便利な使い方"
+
+#: src/pig/templates/app.mako:1055
+msgid "Names and values of Pig parameters and options, e.g."
+msgstr "Pig パラメータとオプションの名前と値、例"
+
+#: src/pig/templates/app.mako:1062
+msgid "Names and values of Hadoop properties, e.g."
+msgstr "Hadoop プロパティの名前と値、例"
+
+#: src/pig/templates/app.mako:1069
+msgid "Include files or compressed files"
+msgstr "ファイルまたは圧縮ファイルを含む"
+
+#: src/pig/templates/app.mako:1078
+msgid "You have unsaved changes in this pig script."
+msgstr "この Pig スクリプトには、未保存の変更があります。"
+
+#~ msgid "Please give a meaningful name to this script."
+#~ msgstr ""

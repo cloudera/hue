@@ -3,4 +3,205 @@
 # This file is distributed under the same license as the Hue project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
 #
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2013-07-15 18:44-0700\n"
+"PO-Revision-Date: 2013-07-13 20:35-0700\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: ja <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.6\n"
+
+#: src/hbase/api.py:46
+#, python-format
+msgid "Api Error: %s"
+msgstr "Api エラー：%s"
+
+#: src/hbase/api.py:76
+#, python-format
+msgid "Cluster by the name of %s does not exist in configuration."
+msgstr "%s の名前ごとのクラスタは設定に存在しません。"
+
+#: src/hbase/templates/app.mako:49
+msgid "There are no tables matching the search criteria."
+msgstr "検索条件に一致するテーブルが存在しません。"
+
+#: src/hbase/templates/app.mako:62
+msgid "Refresh Row"
+msgstr "行の更新"
+
+#: src/hbase/templates/app.mako:64
+msgid "Delete Row"
+msgstr "行の削除"
+
+#: src/hbase/templates/app.mako:68 src/hbase/templates/app.mako:228
+msgid "Toggle Collapse Selected"
+msgstr "選択済みの折りたたみをトグル"
+
+#: src/hbase/templates/app.mako:69 src/hbase/templates/app.mako:229
+msgid "Select All Visible"
+msgstr "表示されているものすべての選択"
+
+#: src/hbase/templates/app.mako:75
+msgid "Add New Column/Cell"
+msgstr "新しい列／セルの追加"
+
+#: src/hbase/templates/app.mako:87
+msgid "Full Editor"
+msgstr "フルエディタ"
+
+#: src/hbase/templates/app.mako:99
+msgid "Notice:"
+msgstr "注意："
+
+#: src/hbase/templates/app.mako:99
+msgid "entries truncated"
+msgstr "切り捨てられたエントリ"
+
+#: src/hbase/templates/app.mako:99
+msgid "at"
+msgstr "場所"
+
+#: src/hbase/templates/app.mako:99
+msgid "items per set."
+msgstr "セットあたりのアイテム数。"
+
+#: src/hbase/templates/app.mako:102
+msgid "Query executed in"
+msgstr "クエリの実行場所"
+
+#: src/hbase/templates/app.mako:102
+msgid "fetching"
+msgstr "取得中"
+
+#: src/hbase/templates/app.mako:102
+msgid "rows"
+msgstr "行"
+
+#: src/hbase/templates/app.mako:109
+msgid "Sort By"
+msgstr "ソートの基準"
+
+#: src/hbase/templates/app.mako:149
+msgid "Enable"
+msgstr "有効にする"
+
+#: src/hbase/templates/app.mako:154
+msgid "Disable"
+msgstr "無効にする"
+
+#: src/hbase/templates/app.mako:157
+msgid "Drop"
+msgstr "ドロップ"
+
+#: src/hbase/templates/app.mako:160
+msgid "New Table"
+msgstr "新しいテーブル"
+
+#: src/hbase/templates/app.mako:179
+msgid "Create New Table"
+msgstr "新しいテーブルの作成"
+
+#: src/hbase/templates/app.mako:183
+msgid "Table Name"
+msgstr "テーブル名"
+
+#: src/hbase/templates/app.mako:184
+msgid "Column Families"
+msgstr "列ファミリ"
+
+#: src/hbase/templates/app.mako:187
+msgid "Add Column Family"
+msgstr "列ファミリの追加"
+
+#: src/hbase/templates/app.mako:190 src/hbase/templates/app.mako:283
+#: src/hbase/templates/app.mako:304 src/hbase/templates/app.mako:342
+#: src/hbase/templates/app.mako:373
+msgid "Cancel"
+msgstr "キャンセル"
+
+#: src/hbase/templates/app.mako:191
+msgid "Submit"
+msgstr "サブミット"
+
+#: src/hbase/templates/app.mako:205
+msgid "row_key1, row_key2 + scan_length, row[ cf:column ], [ cf:col1 cf:col2 ]"
+msgstr "row_key1、row_key2 + scan_length、row[ cf:column ]、[ cf:col1 cf:col2 ]"
+
+#: src/hbase/templates/app.mako:224
+msgid "Toggle Select All Rows"
+msgstr "すべての行の選択をトグル"
+
+#: src/hbase/templates/app.mako:224
+msgid "All"
+msgstr "すべて"
+
+#: src/hbase/templates/app.mako:231
+msgid "Drop Columns"
+msgstr "列のドロップ"
+
+#: src/hbase/templates/app.mako:246
+msgid "Displaying"
+msgstr "表示中"
+
+#: src/hbase/templates/app.mako:250
+msgid "starting from"
+msgstr "次から開始"
+
+#: src/hbase/templates/app.mako:255
+msgid "Add Query Field"
+msgstr "クエリフィールドの追加"
+
+#: src/hbase/templates/app.mako:256
+msgid "Go"
+msgstr "さあ、始めましょう。"
+
+#: src/hbase/templates/app.mako:260
+msgid "Drop Rows"
+msgstr "行のドロップ"
+
+#: src/hbase/templates/app.mako:262
+msgid "New Row"
+msgstr "新しい行"
+
+#: src/hbase/templates/app.mako:271
+msgid "Insert New Row"
+msgstr "新しい行の挿入"
+
+#: src/hbase/templates/app.mako:276
+msgid "Row Key"
+msgstr "行キー"
+
+#: src/hbase/templates/app.mako:280
+msgid "Add Field"
+msgstr "フィールドの追加"
+
+#: src/hbase/templates/app.mako:292
+msgid "Create New Column"
+msgstr "新しい列の作成"
+
+#: src/hbase/templates/app.mako:298
+msgid "Column Name"
+msgstr "列名"
+
+#: src/hbase/templates/app.mako:300 src/hbase/templates/app.mako:301
+msgid "Cell Value"
+msgstr "セル値"
+
+#: src/hbase/templates/app.mako:343
+msgid "Save"
+msgstr "保存"
+
+#: src/hbase/templates/app.mako:345
+msgid "OK"
+msgstr "OK"
+
+#: src/hbase/templates/app.mako:374
+msgid "Confirm"
+msgstr "確認"
 

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-05-10 11:59-0700\n"
+"POT-Creation-Date: 2013-07-15 18:44-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -17,29 +17,26 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/impala/conf.py:26
+#: src/impala/conf.py:29
 msgid "Host of the Impala Server."
 msgstr "Host del servidor Impala."
 
-#: src/impala/conf.py:31
+#: src/impala/conf.py:34
 msgid "Port of the Impala Server."
 msgstr "Puerto del servidor Impala."
 
-#: src/impala/conf.py:37
+#: src/impala/conf.py:40
 #, fuzzy
-msgid ""
-"Beeswax or Hive Server 2 Thrift API used. Choices are: 'beeswax' or "
-"'hiveserver2'."
-msgstr ""
-"Se utiliza Beeswax o Hive Server 2 Thrift API. Las opciones son: "
-"'beeswax' o 'hiveserver2'.'beeswax' requiere la ejecución de Beeswax para"
-" procesar las solicitudes de metadatos"
+msgid "Beeswax or Hive Server 2 Thrift API used. Choices are: 'beeswax' or 'hiveserver2'."
+msgstr "Se utiliza la API Thrift de Beeswax o de Hive Server 2. Las opciones son: 'beeswax' o 'hiveserver2'."
 
-#: src/impala/conf.py:42
+#: src/impala/conf.py:45
 msgid "Kerberos principal name for Impala. Typically 'impala/hostname.foo.com'."
-msgstr ""
-"Nombre de la entidad de seguridad de Kerberos para Hue. Normalmente "
-"'hue/hostname.foo.com'."
+msgstr "Nombre de la entidad de seguridad de Kerberos para Hue. Normalmente 'hue/hostname.foo.com'."
+
+#: src/impala/conf.py:63
+msgid "No available Impalad to send queries to."
+msgstr "No hay ningún Impalad disponible al que enviar las consultas."
 
 #: src/impala/views.py:35
 msgid "A POST request is required."

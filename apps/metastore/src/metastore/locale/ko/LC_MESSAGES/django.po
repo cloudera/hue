@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 프로젝트 버전\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-05-10 11:59-0700\n"
+"POT-Creation-Date: 2013-07-15 18:44-0700\n"
 "PO-Revision-Date: 2012-07-30 18:51-0700\n"
 "Last-Translator: 전체 이름 <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -77,47 +77,51 @@ msgid "Create a new database"
 msgstr "새 데이터베이스 생성"
 
 #: src/metastore/templates/databases.mako:40
+msgid "Search for database name"
+msgstr "데이터베이스 이름 검색"
+
+#: src/metastore/templates/databases.mako:44
 msgid "Drop the selected databases"
 msgstr "선택한 데이터베이스 삭제"
 
-#: src/metastore/templates/databases.mako:40
+#: src/metastore/templates/databases.mako:44
 #: src/metastore/templates/describe_table.mako:65
-#: src/metastore/templates/tables.mako:51
+#: src/metastore/templates/tables.mako:55
 msgid "Drop"
 msgstr "삭제"
 
-#: src/metastore/templates/databases.mako:47
+#: src/metastore/templates/databases.mako:51
 msgid "Database Name"
 msgstr "데이터베이스 이름"
 
-#: src/metastore/templates/databases.mako:74
-#: src/metastore/templates/tables.mako:86
+#: src/metastore/templates/databases.mako:78
+#: src/metastore/templates/tables.mako:90
 msgid "Confirm action"
 msgstr "작업 확인"
 
-#: src/metastore/templates/databases.mako:77
+#: src/metastore/templates/databases.mako:81
 #: src/metastore/templates/describe_table.mako:147
-#: src/metastore/templates/tables.mako:89
+#: src/metastore/templates/tables.mako:93
 #: src/metastore/templates/popups/load_data.mako:60
 msgid "Cancel"
 msgstr "취소"
 
-#: src/metastore/templates/databases.mako:78
-#: src/metastore/templates/tables.mako:90
+#: src/metastore/templates/databases.mako:82
+#: src/metastore/templates/tables.mako:94
 msgid "Yes"
 msgstr "예"
 
-#: src/metastore/templates/databases.mako:110
+#: src/metastore/templates/databases.mako:114
 #: src/metastore/templates/describe_table.mako:179
 #: src/metastore/templates/describe_table.mako:202
-#: src/metastore/templates/tables.mako:122
+#: src/metastore/templates/tables.mako:126
 msgid "No data available"
 msgstr "데이터를 이용할 수 없음"
 
-#: src/metastore/templates/databases.mako:111
+#: src/metastore/templates/databases.mako:115
 #: src/metastore/templates/describe_table.mako:180
 #: src/metastore/templates/describe_table.mako:203
-#: src/metastore/templates/tables.mako:123
+#: src/metastore/templates/tables.mako:127
 msgid "No matching records"
 msgstr "일치하는 레코드가 없음"
 
@@ -145,7 +149,7 @@ msgid "Table has no partitions."
 msgstr "테이블에 파티션이 없습니다."
 
 #: src/metastore/templates/describe_table.mako:26
-#: src/metastore/templates/tables.mako:49
+#: src/metastore/templates/tables.mako:53
 msgid "View"
 msgstr "보기"
 
@@ -176,7 +180,7 @@ msgid "Import Data"
 msgstr "데이터 가져오기"
 
 #: src/metastore/templates/describe_table.mako:64
-#: src/metastore/templates/tables.mako:50
+#: src/metastore/templates/tables.mako:54
 msgid "Browse Data"
 msgstr "데이터 찾아보기"
 
@@ -238,15 +242,19 @@ msgid "Create a new table manually"
 msgstr "새 테이블을 직접 생성합니다."
 
 #: src/metastore/templates/tables.mako:49
-#: src/metastore/templates/tables.mako:50
+msgid "Search for table name"
+msgstr "테이블 이름 검색"
+
+#: src/metastore/templates/tables.mako:53
+#: src/metastore/templates/tables.mako:54
 msgid "Browse the selected table"
 msgstr "선택한 테이블 찾아보기"
 
-#: src/metastore/templates/tables.mako:51
+#: src/metastore/templates/tables.mako:55
 msgid "Delete the selected tables"
 msgstr "선택한 테이블 삭제"
 
-#: src/metastore/templates/tables.mako:58
+#: src/metastore/templates/tables.mako:62
 msgid "Table Name"
 msgstr "테이블 이름"
 
@@ -267,9 +275,7 @@ msgid "Overwrite existing data"
 msgstr "기존 데이터 덮어쓰기"
 
 #: src/metastore/templates/popups/load_data.mako:55
-msgid ""
-"Note that loading data will move data from its location into the table's "
-"storage location."
+msgid "Note that loading data will move data from its location into the table's storage location."
 msgstr "데이터를 로드하면 해당 위치에서 테이블의 스토리지 위치로 데이터가 이동됩니다."
 
 #: src/metastore/templates/popups/load_data.mako:61

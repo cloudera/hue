@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-05-10 11:59-0700\n"
+"POT-Creation-Date: 2013-07-15 18:43-0700\n"
 "PO-Revision-Date: 2012-11-07 13:05-0800\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -144,9 +144,7 @@ msgstr "Fichier non ouvert pour l'écriture"
 
 #: src/hadoop/fs/webhdfs.py:763
 msgid "Filesystem root '/' should be owned by 'hdfs'"
-msgstr ""
-"La racine du système de fichiers \"/\" ne doit pas être détenue par "
-"\"hdfs\""
+msgstr "La racine du système de fichiers \"/\" ne doit pas être détenue par \"hdfs\""
 
 #: src/hadoop/fs/webhdfs.py:766
 msgid "Failed to access filesystem root"

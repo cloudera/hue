@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-05-10 11:59-0700\n"
+"POT-Creation-Date: 2013-07-15 18:44-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -17,26 +17,26 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/impala/conf.py:26
+#: src/impala/conf.py:29
 msgid "Host of the Impala Server."
 msgstr "Impala 服务器主机。"
 
-#: src/impala/conf.py:31
+#: src/impala/conf.py:34
 msgid "Port of the Impala Server."
 msgstr "Impala 服务器端口。"
 
-#: src/impala/conf.py:37
+#: src/impala/conf.py:40
 #, fuzzy
-msgid ""
-"Beeswax or Hive Server 2 Thrift API used. Choices are: 'beeswax' or "
-"'hiveserver2'."
-msgstr ""
-"使用 Beeswax 或 Hive Server 2 Thrift API。选择有：'beeswax' 或 "
-"'hiveserver2'。'beeswax' 需要 Beeswax 运行以便代理元数据请求"
+msgid "Beeswax or Hive Server 2 Thrift API used. Choices are: 'beeswax' or 'hiveserver2'."
+msgstr "已使用 Beeswax 或 Hive Server 2 Thrift API。选择是：'beeswax' 或 'hiveserver2'。"
 
-#: src/impala/conf.py:42
+#: src/impala/conf.py:45
 msgid "Kerberos principal name for Impala. Typically 'impala/hostname.foo.com'."
 msgstr "Impala 的 Kerberos 主体名称。通常为“impala/hostname.foo.com”。"
+
+#: src/impala/conf.py:63
+msgid "No available Impalad to send queries to."
+msgstr "没有可向其发送查询的 Impalad。"
 
 #: src/impala/views.py:35
 msgid "A POST request is required."
