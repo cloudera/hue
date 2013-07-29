@@ -565,9 +565,9 @@ textarea {
 
 .search-remove
 {
-	position: relative;
-	left: -65px;
-	top: 2px;
+	position: absolute;
+	right: 10px;
+	top: 5px;
 	text-decoration: none;
 	cursor: pointer;
 	color: #ccc;

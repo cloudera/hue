@@ -41,7 +41,7 @@ var AppViewModel = function() {
           callback();
       });
     }}),
-    tabledata: new SmartViewModel({el: 'views.tabledata', reload: function(callback) //move inside SmartViewModel class? 
+    tabledata: new SmartViewModel({el: 'views.tabledata', reload: function(callback) //move inside SmartViewModel class?
     {
       var t_self = this;
       function getColumnFamilies() {
@@ -96,23 +96,24 @@ routed = false;
 routie({
   ':cluster/:table/query/:query': function(cluster, table, query) {
       logGA('query_table');
+      app.station('table');
       Router.setTable(cluster, table);
       Views.render('dataview');
-      app.station('table');
       app.search.cur_input(query);
       app.search.evaluate();
+      app.views.tabledata.searchQuery(query);
       routed = true;
     },
     ':cluster/:table': function(cluster, table) {
-      //logGA('view_table'); taken care of in reload()
+      //logGA('view_table'); taken care of in reload()\
       Router.setTable(cluster, table);
+      resetSearch();
       app.station('table');
       Views.render('dataview');
       routed = true;
     },
     ':cluster': function(cluster) {
       logGA('view_cluster');
-      Breadcrumbs.render();
       app.station('cluster');
       app.cluster(cluster);
       app.pageTitle(cluster);
@@ -126,15 +127,15 @@ routie({
       routed = true;
     },
     '': function(){
-    var redirect = app.clusters.subscribe(function(data) {
-      routie(data[0].name);
-      redirect.dispose();
-    });
+      var redirect = app.clusters.subscribe(function(data) {
+        routie(data[0].name);
+        redirect.dispose();
+      });
+      resetElements();
       routed = true;
     },
     '*': function() {
       logGA();
-      resetElements();
       if(!routed)
         history.back();
       routed = false;

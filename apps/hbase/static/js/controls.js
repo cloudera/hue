@@ -156,16 +156,21 @@ var SmartViewModel = function(options) {
   self.columnFamilies = ko.observableArray();
   self.name = ko.observable(options.name);
   self.name.subscribe(function(){
-    self.querySet.removeAll();
     self._reloadcfs();
+    if(app.station() == 'table')
+      return;
+    self.querySet.removeAll();
     self.evaluateQuery();
   }); //fix and decouple
 
   self.lastReloadTime = ko.observable(1);
-  //self.columnFamilies.subscribe(function(){self.reload();});
 
   self.searchQuery.subscribe(function goToRow(value) //make this as nice as the renderfucnction and split into two, also fire not down on keyup events
   {
+    if(app.station() != 'table')
+      return;
+    if(value.replace(/\s/g, "") == '' || value == null)
+      routie(app.cluster() + '/' + app.views.tabledata.name());
     var inputs = value.match(searchRenderers['rowkey']['select']);
     self.querySet.removeAll();
     if(inputs) {
@@ -186,7 +191,6 @@ var SmartViewModel = function(options) {
         }
       }
     }
-    routie(app.cluster() + '/' + app.views.tabledata.name() +'/query/' + value);
     self.evaluateQuery();
   });
 
@@ -204,7 +208,7 @@ var SmartViewModel = function(options) {
   self.columnQuery = ko.observable("");
   self.columnQuery.subscribe(function(query) {
     $(self.items()).each(function() {
-      this.searchQuery(query);
+      table_search(query);
     });
   });
 
@@ -726,7 +730,7 @@ var tagsearch = function() {
   };
 
   self.evaluate = function() {
-    app.views.tabledata.searchQuery(self.cur_input());
+    table_search(self.cur_input());
     self.submitted(true);
     self.mode('idle');
   };
