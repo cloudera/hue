@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-07-13 20:19-0700\n"
+"POT-Creation-Date: 2013-07-15 18:44-0700\n"
 "PO-Revision-Date: 2012-07-30 18:56-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -19,334 +19,274 @@ msgstr ""
 
 #: src/sqoop/conf.py:26
 msgid "The sqoop server URL."
-msgstr ""
+msgstr "sqoop サーバーの URL です。"
 
 #: src/sqoop/api/connection.py:53
 msgid "Could not get connections."
-msgstr ""
+msgstr "接続を取得できませんでした。"
 
 #: src/sqoop/api/connection.py:64 src/sqoop/api/connection.py:87
 msgid "Error saving connection"
-msgstr ""
+msgstr "接続を保存中にエラーが発生しました"
 
 #: src/sqoop/api/connection.py:73
 msgid "Could not create connection."
-msgstr ""
+msgstr "接続を作成できませんでした。"
 
 #: src/sqoop/api/connection.py:95
 msgid "Could not update connection."
-msgstr ""
+msgstr "接続を更新できませんでした。"
 
 #: src/sqoop/api/connection.py:107 src/sqoop/api/connection.py:122
 #: src/sqoop/api/job.py:115 src/sqoop/api/job.py:130
 msgid "GET or POST request required."
-msgstr ""
+msgstr "GET または POST 要求が必要です。"
 
 #: src/sqoop/api/connection.py:127 src/sqoop/api/connection.py:150
 #: src/sqoop/api/job.py:59 src/sqoop/api/job.py:85 src/sqoop/api/job.py:135
 #: src/sqoop/api/job.py:158 src/sqoop/api/job.py:179 src/sqoop/api/job.py:200
 msgid "POST request required."
-msgstr ""
+msgstr "POST 要求が必要です。"
 
 #: src/sqoop/api/connection.py:141
 msgid "Could not clone connection."
-msgstr ""
+msgstr "接続を複製できませんでした。"
 
 #: src/sqoop/api/connection.py:161
 msgid "Could not delete connection."
-msgstr ""
+msgstr "接続を削除できませんでした。"
 
 #: src/sqoop/api/connector.py:52
 msgid "Could not get connectors."
-msgstr ""
+msgstr "コネクタを取得できませんでした。"
 
 #: src/sqoop/api/connector.py:59 src/sqoop/api/connector.py:72
 #: src/sqoop/api/framework.py:54 src/sqoop/api/job.py:221
 #: src/sqoop/api/submission.py:61
 msgid "GET request required."
-msgstr ""
+msgstr "GET 要求が必要です。"
 
 #: src/sqoop/api/decorators.py:53
 msgid "Could not get connector."
-msgstr ""
+msgstr "コネクタを取得できませんでした。"
 
 #: src/sqoop/api/decorators.py:72
 msgid "Could not get connection."
-msgstr ""
+msgstr "接続を取得できませんでした。"
 
 #: src/sqoop/api/decorators.py:91
 msgid "Could not get job."
-msgstr ""
+msgstr "ジョブを取得できませんでした。"
 
 #: src/sqoop/api/decorators.py:110
 msgid "Could not get submission."
-msgstr ""
+msgstr "サブミッションを取得できませんでした。"
 
 #: src/sqoop/api/exception.py:37
 #, python-format
 msgid "Could not connect to sqoop server. %s (%s)"
-msgstr ""
+msgstr "sqoop サーバーに接続できませんでした。%s（%s）"
 
 #: src/sqoop/api/framework.py:51
 msgid "Could not get framework."
-msgstr ""
+msgstr "フレームワークを取得できませんでした。"
 
 #: src/sqoop/api/job.py:54
 msgid "Could not get jobs."
-msgstr ""
+msgstr "ジョブを取得できませんでした。"
 
 #: src/sqoop/api/job.py:68 src/sqoop/api/job.py:94
 msgid "Error saving job"
-msgstr ""
+msgstr "ジョブを保存中にエラーが発生しました"
 
 #: src/sqoop/api/job.py:77
 msgid "Could not create job."
-msgstr ""
+msgstr "ジョブを作成できませんでした。"
 
 #: src/sqoop/api/job.py:102
 msgid "Could not update job."
-msgstr ""
+msgstr "ジョブを更新できませんでした。"
 
 #: src/sqoop/api/job.py:149
 msgid "Could not clone job."
-msgstr ""
+msgstr "ジョブを複製できませんでした。"
 
 #: src/sqoop/api/job.py:170
 msgid "Could not delete job."
-msgstr ""
+msgstr "ジョブを削除できませんでした。"
 
 #: src/sqoop/api/job.py:191
 msgid "Could not start job."
-msgstr ""
+msgstr "ジョブを開始できませんでした。"
 
 #: src/sqoop/api/job.py:212 src/sqoop/templates/app.mako:667
 msgid "Could not stop job."
-msgstr ""
+msgstr "ジョブを停止できませんでした。"
 
 #: src/sqoop/api/job.py:233
 msgid "Could not get job status."
-msgstr ""
+msgstr "ジョブステータスを取得できませんでした。"
 
 #: src/sqoop/api/submission.py:54
 msgid "Could not get submissions."
-msgstr ""
+msgstr "サブミッションを取得できませんでした。"
 
 #: src/sqoop/templates/app.mako:27
 msgid "Sqoop error"
-msgstr ""
+msgstr "Sqoop エラー"
 
 #: src/sqoop/templates/app.mako:36
 msgid "Search for job name or content"
-msgstr ""
+msgstr "ジョブ名または内容の検索"
 
 #: src/sqoop/templates/app.mako:42
 msgid "Create a new job"
-msgstr ""
+msgstr "新しいジョブの作成"
 
 #: src/sqoop/templates/app.mako:42
 msgid "New job"
-msgstr ""
+msgstr "新しいジョブ"
 
 #: src/sqoop/templates/app.mako:49 src/sqoop/templates/app.mako:72
 msgid "Click to edit"
-msgstr ""
+msgstr "クリックして編集"
 
 #: src/sqoop/templates/app.mako:51 src/sqoop/templates/app.mako:115
 msgid "Stop"
-msgstr ""
+msgstr "停止"
 
 #: src/sqoop/templates/app.mako:52 src/sqoop/templates/app.mako:74
 #: src/sqoop/templates/app.mako:110
 msgid "Run"
-msgstr ""
+msgstr "実行"
 
 #: src/sqoop/templates/app.mako:53 src/sqoop/templates/app.mako:75
 #: src/sqoop/templates/app.mako:120
 msgid "Copy"
-msgstr ""
+msgstr "コピー"
 
 #: src/sqoop/templates/app.mako:54 src/sqoop/templates/app.mako:76
 #: src/sqoop/templates/app.mako:125
 msgid "Delete"
-msgstr ""
+msgstr "削除"
 
 #: src/sqoop/templates/app.mako:87
 msgid "There are currently no jobs."
-msgstr ""
+msgstr "現在、ジョブはありません。"
 
 #: src/sqoop/templates/app.mako:87
 msgid "Please click on \"New Job\" to add one."
-msgstr ""
+msgstr "新しいジョブを作成するには、［新しいジョブの作成］をクリックしてください。"
 
 #: src/sqoop/templates/app.mako:103 src/sqoop/templates/app.mako:104
 msgid "Back to jobs list"
-msgstr ""
+msgstr "ジョブリストに戻る"
 
 #: src/sqoop/templates/app.mako:107
 msgid "Actions"
-msgstr ""
+msgstr "アクション"
 
 #: src/sqoop/templates/app.mako:109
 msgid "Run the job"
-msgstr ""
+msgstr "ジョブの実行"
 
 #: src/sqoop/templates/app.mako:114
 msgid "Stop the job"
-msgstr ""
+msgstr "ジョブの停止"
 
 #: src/sqoop/templates/app.mako:119
 msgid "Copy the job"
-msgstr ""
+msgstr "ジョブのコピー"
 
 #: src/sqoop/templates/app.mako:124
 msgid "Delete the job"
-msgstr ""
+msgstr "ジョブの削除"
 
 #: src/sqoop/templates/app.mako:133
 msgid "Create a job"
-msgstr ""
+msgstr "ジョブの作成"
 
 #: src/sqoop/templates/app.mako:147
 msgid "Previous"
-msgstr ""
+msgstr "前"
 
 #: src/sqoop/templates/app.mako:151
 msgid "Next"
-msgstr ""
+msgstr "次へ"
 
 #: src/sqoop/templates/app.mako:154 src/sqoop/templates/app.mako:206
 msgid "Save"
-msgstr ""
+msgstr "保存"
 
 #: src/sqoop/templates/app.mako:167
 msgid "Connector"
-msgstr ""
+msgstr "コネクタ"
 
 #: src/sqoop/templates/app.mako:181 src/sqoop/templates/app.mako:224
 msgid "Back to job"
-msgstr ""
+msgstr "ジョブに戻る"
 
 #: src/sqoop/templates/app.mako:187
 msgid "Create a connection"
-msgstr ""
+msgstr "接続の作成"
 
 #: src/sqoop/templates/app.mako:190 src/sqoop/templates/app.mako:284
 msgid "Name"
-msgstr ""
+msgstr "名前"
 
 #: src/sqoop/templates/app.mako:205
 msgid "Cancel"
-msgstr ""
+msgstr "キャンセル"
 
 #: src/sqoop/templates/app.mako:216 src/sqoop/templates/app.mako:218
 msgid "Logs"
-msgstr ""
+msgstr "ログ"
 
 #: src/sqoop/templates/app.mako:222
 msgid "Back to editing a job"
-msgstr ""
+msgstr "ジョブの編集に戻る"
 
 #: src/sqoop/templates/app.mako:246
 msgid "Select job type"
-msgstr ""
+msgstr "ジョブタイプの選択"
 
 #: src/sqoop/templates/app.mako:255
 msgid "Select connection"
-msgstr ""
+msgstr "接続の選択"
 
 #: src/sqoop/templates/app.mako:569
 msgid "Step 1: Job info"
-msgstr ""
+msgstr "手順 1：ジョブ情報"
 
 #: src/sqoop/templates/app.mako:575
 msgid "Step 2: Sqoop specific"
-msgstr ""
+msgstr "手順 2：Sqoop 固有"
 
 #: src/sqoop/templates/app.mako:582
 msgid "Step 1: Manage connections"
-msgstr ""
+msgstr "手順 1：接続の管理"
 
 #: src/sqoop/templates/app.mako:588
 msgid "Step 2: Job info"
-msgstr ""
+msgstr "手順 2：ジョブ情報"
 
 #: src/sqoop/templates/app.mako:594
 msgid "Step 3: Sqoop specific job info"
-msgstr ""
+msgstr "手順 3：Sqoop 固有のジョブ情報"
 
 #: src/sqoop/templates/app.mako:650
 msgid "Cannot connect to sqoop server."
-msgstr ""
+msgstr "sqoop サーバーに接続できません。"
 
 #: src/sqoop/templates/app.mako:655
 msgid "Started job."
-msgstr ""
+msgstr "開始済みのジョブです。"
 
 #: src/sqoop/templates/app.mako:659
 msgid "Could not start job: "
-msgstr ""
+msgstr "ジョブを開始できませんでした： "
 
 #: src/sqoop/templates/app.mako:663
 msgid "Stopped job."
-msgstr ""
-
-#~ msgid ""
-#~ "bin/hadoop return non-zero %(retcode)d "
-#~ "while trying to merge credentials."
-#~ msgstr "bin/hadoop は、資格情報をマージしようとしている間に、ゼロではない %(retcode)d を返します。"
-
-#~ msgid "Hue Shell"
-#~ msgstr "Hue シェル"
-
-#~ msgid ""
-#~ "Failed to create a shell of the"
-#~ " given type. The possible reasons for"
-#~ " this are:"
-#~ msgstr "指定されたタイプのシェルを作成できませんでした。考えられる原因は次のとおりです。"
-
-#~ msgid "The system is out of PTYs."
-#~ msgstr "システムが PTY 外です。"
-
-#~ msgid "The system cannot create more subprocesses."
-#~ msgstr "サブプロセスをこれ以上作成できません。"
-
-#~ msgid "You do not have permission to create shells of this type."
-#~ msgstr "このタイプのシェルを作成するパーミッションがありません。"
-
-#~ msgid "There is no shell with that name."
-#~ msgstr "指定された名前のシェルがありません。"
-
-#~ msgid "There is no Unix user account for you."
-#~ msgstr "使用できる UNIX ユーザーアカウントがありません。"
-
-#~ msgid "Select one of the available shells from the toolbar above."
-#~ msgstr "上のツールバーにある使用可能なシェルの中から 1 つ選択してください。"
-
-#~ msgid ""
-#~ "You do not have permission to "
-#~ "access any shell or there is no"
-#~ " configured shell."
-#~ msgstr "どのシェルにもアクセスするパーミッションがないか、シェルが 1 つも設定されていません。"
-
-#~ msgid "The shell is not present on the Hue host."
-#~ msgstr "シェルが Hue ホストに存在しません。"
-
-#~ msgid ""
-#~ "The Shell application requires a Unix"
-#~ " user account for every user of "
-#~ "Hue on the remote web server."
-#~ msgstr "このシェルアプリケーションでは、リモート Web サーバー上にある Hue のすべてのユーザーに Unix のユーザーアカウントが必要です。"
-
-#~ msgid ""
-#~ "Ask your administrator to create a "
-#~ "user account for you on the remote"
-#~ " web server as described in the "
-#~ "Shell documentation."
-#~ msgstr "シェルのマニュアルに従ってリモート Web サーバー上にユーザーアカウントを作成することを担当の管理者に依頼してください。"
-
-#~ msgid ""
-#~ "The webserver currently running Hue does"
-#~ " not support the Shell application. "
-#~ "Please contact your administrator."
-#~ msgstr "現在 Hue を実行している Web サーバーは、Shell アプリケーションをサポートしていません。管理者に問い合わせてください。"
+msgstr "ジョブを停止しました。"
 

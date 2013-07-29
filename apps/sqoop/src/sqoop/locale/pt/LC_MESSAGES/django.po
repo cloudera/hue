@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-07-13 20:19-0700\n"
+"POT-Creation-Date: 2013-07-15 18:44-0700\n"
 "PO-Revision-Date: 2012-07-30 18:56-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: pt <LL@li.org>\n"
@@ -19,351 +19,274 @@ msgstr ""
 
 #: src/sqoop/conf.py:26
 msgid "The sqoop server URL."
-msgstr ""
+msgstr "URL do servidor sqoop."
 
 #: src/sqoop/api/connection.py:53
 msgid "Could not get connections."
-msgstr ""
+msgstr "Não foi possível obter ligações."
 
 #: src/sqoop/api/connection.py:64 src/sqoop/api/connection.py:87
 msgid "Error saving connection"
-msgstr ""
+msgstr "Erro ao guardar ligação"
 
 #: src/sqoop/api/connection.py:73
 msgid "Could not create connection."
-msgstr ""
+msgstr "Não foi possível criar a ligação."
 
 #: src/sqoop/api/connection.py:95
 msgid "Could not update connection."
-msgstr ""
+msgstr "Não foi possível actualizar a ligação."
 
 #: src/sqoop/api/connection.py:107 src/sqoop/api/connection.py:122
 #: src/sqoop/api/job.py:115 src/sqoop/api/job.py:130
 msgid "GET or POST request required."
-msgstr ""
+msgstr "Pedido POST ou GET necessário."
 
 #: src/sqoop/api/connection.py:127 src/sqoop/api/connection.py:150
 #: src/sqoop/api/job.py:59 src/sqoop/api/job.py:85 src/sqoop/api/job.py:135
 #: src/sqoop/api/job.py:158 src/sqoop/api/job.py:179 src/sqoop/api/job.py:200
 msgid "POST request required."
-msgstr ""
+msgstr "É necessário um pedido POST."
 
 #: src/sqoop/api/connection.py:141
 msgid "Could not clone connection."
-msgstr ""
+msgstr "Não foi possível clonar a ligação."
 
 #: src/sqoop/api/connection.py:161
 msgid "Could not delete connection."
-msgstr ""
+msgstr "Não foi possível eliminar a ligação."
 
 #: src/sqoop/api/connector.py:52
 msgid "Could not get connectors."
-msgstr ""
+msgstr "Não foi possível obter conectores."
 
 #: src/sqoop/api/connector.py:59 src/sqoop/api/connector.py:72
 #: src/sqoop/api/framework.py:54 src/sqoop/api/job.py:221
 #: src/sqoop/api/submission.py:61
 msgid "GET request required."
-msgstr ""
+msgstr "É necessário um pedido GET."
 
 #: src/sqoop/api/decorators.py:53
 msgid "Could not get connector."
-msgstr ""
+msgstr "Não foi possível obter conector."
 
 #: src/sqoop/api/decorators.py:72
 msgid "Could not get connection."
-msgstr ""
+msgstr "Não foi possível obter ligação."
 
 #: src/sqoop/api/decorators.py:91
 msgid "Could not get job."
-msgstr ""
+msgstr "Não foi possível obter o trabalho."
 
 #: src/sqoop/api/decorators.py:110
 msgid "Could not get submission."
-msgstr ""
+msgstr "Não foi possível obter o envio."
 
 #: src/sqoop/api/exception.py:37
 #, python-format
 msgid "Could not connect to sqoop server. %s (%s)"
-msgstr ""
+msgstr "Não foi possível ligar ao servidor sqoop. %s (%s)"
 
 #: src/sqoop/api/framework.py:51
 msgid "Could not get framework."
-msgstr ""
+msgstr "Não foi possível obter a estrutura."
 
 #: src/sqoop/api/job.py:54
 msgid "Could not get jobs."
-msgstr ""
+msgstr "Não foi possível obter os trabalhos."
 
 #: src/sqoop/api/job.py:68 src/sqoop/api/job.py:94
 msgid "Error saving job"
-msgstr ""
+msgstr "Erro ao guardar o trabalho"
 
 #: src/sqoop/api/job.py:77
 msgid "Could not create job."
-msgstr ""
+msgstr "Não foi possível criar o trabalho."
 
 #: src/sqoop/api/job.py:102
 msgid "Could not update job."
-msgstr ""
+msgstr "Não foi possível actualizar o trabalho."
 
 #: src/sqoop/api/job.py:149
 msgid "Could not clone job."
-msgstr ""
+msgstr "Não foi possível clonar o trabalho."
 
 #: src/sqoop/api/job.py:170
 msgid "Could not delete job."
-msgstr ""
+msgstr "Não foi possível eliminar o trabalho."
 
 #: src/sqoop/api/job.py:191
 msgid "Could not start job."
-msgstr ""
+msgstr "Não foi possível iniciar o trabalho."
 
 #: src/sqoop/api/job.py:212 src/sqoop/templates/app.mako:667
 msgid "Could not stop job."
-msgstr ""
+msgstr "Não foi possível parar o trabalho."
 
 #: src/sqoop/api/job.py:233
 msgid "Could not get job status."
-msgstr ""
+msgstr "Não foi possível obter o estado do trabalho."
 
 #: src/sqoop/api/submission.py:54
 msgid "Could not get submissions."
-msgstr ""
+msgstr "Não foi possível obter os envios."
 
 #: src/sqoop/templates/app.mako:27
 msgid "Sqoop error"
-msgstr ""
+msgstr "Erro Sqoop"
 
 #: src/sqoop/templates/app.mako:36
 msgid "Search for job name or content"
-msgstr ""
+msgstr "Procurar nome ou conteúdo do trabalho"
 
 #: src/sqoop/templates/app.mako:42
 msgid "Create a new job"
-msgstr ""
+msgstr "Criar um novo trabalho"
 
 #: src/sqoop/templates/app.mako:42
 msgid "New job"
-msgstr ""
+msgstr "Novo trabalho"
 
 #: src/sqoop/templates/app.mako:49 src/sqoop/templates/app.mako:72
 msgid "Click to edit"
-msgstr ""
+msgstr "Clique para editar"
 
 #: src/sqoop/templates/app.mako:51 src/sqoop/templates/app.mako:115
 msgid "Stop"
-msgstr ""
+msgstr "Parar"
 
 #: src/sqoop/templates/app.mako:52 src/sqoop/templates/app.mako:74
 #: src/sqoop/templates/app.mako:110
 msgid "Run"
-msgstr ""
+msgstr "Executar"
 
 #: src/sqoop/templates/app.mako:53 src/sqoop/templates/app.mako:75
 #: src/sqoop/templates/app.mako:120
 msgid "Copy"
-msgstr ""
+msgstr "Copiar"
 
 #: src/sqoop/templates/app.mako:54 src/sqoop/templates/app.mako:76
 #: src/sqoop/templates/app.mako:125
 msgid "Delete"
-msgstr ""
+msgstr "Eliminar"
 
 #: src/sqoop/templates/app.mako:87
 msgid "There are currently no jobs."
-msgstr ""
+msgstr "De momento, não existem trabalhos."
 
 #: src/sqoop/templates/app.mako:87
 msgid "Please click on \"New Job\" to add one."
-msgstr ""
+msgstr "Clique em \"Novo trabalho\" para adicionar um novo trabalho."
 
 #: src/sqoop/templates/app.mako:103 src/sqoop/templates/app.mako:104
 msgid "Back to jobs list"
-msgstr ""
+msgstr "Voltar à lista de trabalhos"
 
 #: src/sqoop/templates/app.mako:107
 msgid "Actions"
-msgstr ""
+msgstr "Acções"
 
 #: src/sqoop/templates/app.mako:109
 msgid "Run the job"
-msgstr ""
+msgstr "Executar o trabalho"
 
 #: src/sqoop/templates/app.mako:114
 msgid "Stop the job"
-msgstr ""
+msgstr "Parar o trabalho"
 
 #: src/sqoop/templates/app.mako:119
 msgid "Copy the job"
-msgstr ""
+msgstr "Copiar o trabalho"
 
 #: src/sqoop/templates/app.mako:124
 msgid "Delete the job"
-msgstr ""
+msgstr "Eliminar o trabalho"
 
 #: src/sqoop/templates/app.mako:133
 msgid "Create a job"
-msgstr ""
+msgstr "Criar um trabalho"
 
 #: src/sqoop/templates/app.mako:147
 msgid "Previous"
-msgstr ""
+msgstr "Anterior"
 
 #: src/sqoop/templates/app.mako:151
 msgid "Next"
-msgstr ""
+msgstr "Seguinte"
 
 #: src/sqoop/templates/app.mako:154 src/sqoop/templates/app.mako:206
 msgid "Save"
-msgstr ""
+msgstr "Guardar"
 
 #: src/sqoop/templates/app.mako:167
 msgid "Connector"
-msgstr ""
+msgstr "Conector"
 
 #: src/sqoop/templates/app.mako:181 src/sqoop/templates/app.mako:224
 msgid "Back to job"
-msgstr ""
+msgstr "Voltar ao trabalho"
 
 #: src/sqoop/templates/app.mako:187
 msgid "Create a connection"
-msgstr ""
+msgstr "Criar uma ligação"
 
 #: src/sqoop/templates/app.mako:190 src/sqoop/templates/app.mako:284
 msgid "Name"
-msgstr ""
+msgstr "Nome"
 
 #: src/sqoop/templates/app.mako:205
 msgid "Cancel"
-msgstr ""
+msgstr "Cancelar"
 
 #: src/sqoop/templates/app.mako:216 src/sqoop/templates/app.mako:218
 msgid "Logs"
-msgstr ""
+msgstr "Registos"
 
 #: src/sqoop/templates/app.mako:222
 msgid "Back to editing a job"
-msgstr ""
+msgstr "Voltar à edição de trabalhos"
 
 #: src/sqoop/templates/app.mako:246
 msgid "Select job type"
-msgstr ""
+msgstr "Seleccionar o tipo de trabalho"
 
 #: src/sqoop/templates/app.mako:255
 msgid "Select connection"
-msgstr ""
+msgstr "Seleccionar ligação"
 
 #: src/sqoop/templates/app.mako:569
 msgid "Step 1: Job info"
-msgstr ""
+msgstr "Passo 1: informação do trabalho"
 
 #: src/sqoop/templates/app.mako:575
 msgid "Step 2: Sqoop specific"
-msgstr ""
+msgstr "Passo 2: específico do Sqoop"
 
 #: src/sqoop/templates/app.mako:582
 msgid "Step 1: Manage connections"
-msgstr ""
+msgstr "Passo 1: gerir ligações"
 
 #: src/sqoop/templates/app.mako:588
 msgid "Step 2: Job info"
-msgstr ""
+msgstr "Passo 2: informação do trabalho"
 
 #: src/sqoop/templates/app.mako:594
 msgid "Step 3: Sqoop specific job info"
-msgstr ""
+msgstr "Passo 3: informação do trabalho específica do Sqoop"
 
 #: src/sqoop/templates/app.mako:650
 msgid "Cannot connect to sqoop server."
-msgstr ""
+msgstr "Não é possível ligar ao servidor sqoop."
 
 #: src/sqoop/templates/app.mako:655
 msgid "Started job."
-msgstr ""
+msgstr "Trabalho iniciado."
 
 #: src/sqoop/templates/app.mako:659
 msgid "Could not start job: "
-msgstr ""
+msgstr "Não foi possível iniciar o trabalho: "
 
 #: src/sqoop/templates/app.mako:663
 msgid "Stopped job."
-msgstr ""
-
-#~ msgid ""
-#~ "bin/hadoop return non-zero %(retcode)d "
-#~ "while trying to merge credentials."
-#~ msgstr "bin/hadoop devolveu %(retcode)d não zero ao tentar unir credenciais."
-
-#~ msgid "Hue Shell"
-#~ msgstr "Shell da Hue"
-
-#~ msgid ""
-#~ "Failed to create a shell of the"
-#~ " given type. The possible reasons for"
-#~ " this are:"
-#~ msgstr ""
-#~ "Falha ao criar uma shell do tipo"
-#~ " indicado. Os motivos possíveis para "
-#~ "tal são:"
-
-#~ msgid "The system is out of PTYs."
-#~ msgstr "O sistema já não tem mais PTYs."
-
-#~ msgid "The system cannot create more subprocesses."
-#~ msgstr "O sistema não pode criar mais subprocessos."
-
-#~ msgid "You do not have permission to create shells of this type."
-#~ msgstr "Não tem permissão para criar shells deste tipo."
-
-#~ msgid "There is no shell with that name."
-#~ msgstr "Não existe uma shell com o nome indicado."
-
-#~ msgid "There is no Unix user account for you."
-#~ msgstr "Não existe qualquer conta de utilizador de Unix associada a si."
-
-#~ msgid "Select one of the available shells from the toolbar above."
-#~ msgstr "Seleccione uma das shells disponíveis na barra de ferramentas acima."
-
-#~ msgid ""
-#~ "You do not have permission to "
-#~ "access any shell or there is no"
-#~ " configured shell."
-#~ msgstr ""
-#~ "Não tem permissão para aceder a "
-#~ "qualquer shell ou não existe qualquer"
-#~ " shell configurada."
-
-#~ msgid "The shell is not present on the Hue host."
-#~ msgstr "A shell não está presente no anfitrião do Hue."
-
-#~ msgid ""
-#~ "The Shell application requires a Unix"
-#~ " user account for every user of "
-#~ "Hue on the remote web server."
-#~ msgstr ""
-#~ "A aplicação Shell requer uma conta "
-#~ "de utilizador Unix para cada utilizador"
-#~ " da Hue no servidor web remoto."
-
-#~ msgid ""
-#~ "Ask your administrator to create a "
-#~ "user account for you on the remote"
-#~ " web server as described in the "
-#~ "Shell documentation."
-#~ msgstr ""
-#~ "Solicite ao seu administrador que lhe"
-#~ " crie uma conta de utilizador no "
-#~ "servidor web remoto, conforme descrito "
-#~ "na documentação da Shell."
-
-#~ msgid ""
-#~ "The webserver currently running Hue does"
-#~ " not support the Shell application. "
-#~ "Please contact your administrator."
-#~ msgstr ""
-#~ "O servidor de Internet que está a"
-#~ " executar actualmente o Hue não "
-#~ "suporta a aplicação Shell. Contacte o"
-#~ " seu administrador."
+msgstr "Trabalho parado."
 

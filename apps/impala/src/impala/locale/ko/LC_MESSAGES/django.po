@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-05-10 11:59-0700\n"
+"POT-Creation-Date: 2013-07-15 18:44-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -17,26 +17,26 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/impala/conf.py:26
+#: src/impala/conf.py:29
 msgid "Host of the Impala Server."
 msgstr "Impala 서버의 호스트입니다."
 
-#: src/impala/conf.py:31
+#: src/impala/conf.py:34
 msgid "Port of the Impala Server."
 msgstr "Impala 서버의 포트입니다."
 
-#: src/impala/conf.py:37
+#: src/impala/conf.py:40
 #, fuzzy
-msgid ""
-"Beeswax or Hive Server 2 Thrift API used. Choices are: 'beeswax' or "
-"'hiveserver2'."
-msgstr ""
-"Impala 또는 Hive Server 2 Thrift API를 사용합니다.'beeswax' 또는 'hiveserver2' 중에서 "
-"선택하십시오.  'beeswax'는 메타데이터 요청을 프록시하기 위해 실행할 Beeswax가 필요합니다."
+msgid "Beeswax or Hive Server 2 Thrift API used. Choices are: 'beeswax' or 'hiveserver2'."
+msgstr "Beeswax 또는 Hive Server 2 Thrift API를 사용 중입니다. 'beeswax' 또는 'hiveserver2' 중에서 선택할 수 있습니다."
 
-#: src/impala/conf.py:42
+#: src/impala/conf.py:45
 msgid "Kerberos principal name for Impala. Typically 'impala/hostname.foo.com'."
 msgstr "Impala의 Kerberos 원칙 이름입니다. 일반적으로 'impala/hostname.foo.com'입니다."
+
+#: src/impala/conf.py:63
+msgid "No available Impalad to send queries to."
+msgstr "쿼리를 전송할 사용 가능한 Impalad가 없습니다."
 
 #: src/impala/views.py:35
 msgid "A POST request is required."

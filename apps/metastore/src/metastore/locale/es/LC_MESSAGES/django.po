@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VERSIÓN DEL PROYECTO\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-05-10 11:59-0700\n"
+"POT-Creation-Date: 2013-07-15 18:44-0700\n"
 "PO-Revision-Date: 2012-07-30 18:51-0700\n"
 "Last-Translator: NOMBRE COMPLETO <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -77,47 +77,51 @@ msgid "Create a new database"
 msgstr "Crear una nueva base de datos"
 
 #: src/metastore/templates/databases.mako:40
+msgid "Search for database name"
+msgstr "Buscar nombre de base de datos"
+
+#: src/metastore/templates/databases.mako:44
 msgid "Drop the selected databases"
 msgstr "Descartar las bases de datos seleccionadas"
 
-#: src/metastore/templates/databases.mako:40
+#: src/metastore/templates/databases.mako:44
 #: src/metastore/templates/describe_table.mako:65
-#: src/metastore/templates/tables.mako:51
+#: src/metastore/templates/tables.mako:55
 msgid "Drop"
 msgstr "Descartar"
 
-#: src/metastore/templates/databases.mako:47
+#: src/metastore/templates/databases.mako:51
 msgid "Database Name"
 msgstr "Nombre de base de datos"
 
-#: src/metastore/templates/databases.mako:74
-#: src/metastore/templates/tables.mako:86
+#: src/metastore/templates/databases.mako:78
+#: src/metastore/templates/tables.mako:90
 msgid "Confirm action"
 msgstr "Confirmar acción"
 
-#: src/metastore/templates/databases.mako:77
+#: src/metastore/templates/databases.mako:81
 #: src/metastore/templates/describe_table.mako:147
-#: src/metastore/templates/tables.mako:89
+#: src/metastore/templates/tables.mako:93
 #: src/metastore/templates/popups/load_data.mako:60
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: src/metastore/templates/databases.mako:78
-#: src/metastore/templates/tables.mako:90
+#: src/metastore/templates/databases.mako:82
+#: src/metastore/templates/tables.mako:94
 msgid "Yes"
 msgstr "Sí"
 
-#: src/metastore/templates/databases.mako:110
+#: src/metastore/templates/databases.mako:114
 #: src/metastore/templates/describe_table.mako:179
 #: src/metastore/templates/describe_table.mako:202
-#: src/metastore/templates/tables.mako:122
+#: src/metastore/templates/tables.mako:126
 msgid "No data available"
 msgstr "No hay datos disponibles"
 
-#: src/metastore/templates/databases.mako:111
+#: src/metastore/templates/databases.mako:115
 #: src/metastore/templates/describe_table.mako:180
 #: src/metastore/templates/describe_table.mako:203
-#: src/metastore/templates/tables.mako:123
+#: src/metastore/templates/tables.mako:127
 msgid "No matching records"
 msgstr "No hay registros coincidentes"
 
@@ -145,7 +149,7 @@ msgid "Table has no partitions."
 msgstr "Tabla sin particiones"
 
 #: src/metastore/templates/describe_table.mako:26
-#: src/metastore/templates/tables.mako:49
+#: src/metastore/templates/tables.mako:53
 msgid "View"
 msgstr "Vista"
 
@@ -176,7 +180,7 @@ msgid "Import Data"
 msgstr "Importar datos"
 
 #: src/metastore/templates/describe_table.mako:64
-#: src/metastore/templates/tables.mako:50
+#: src/metastore/templates/tables.mako:54
 msgid "Browse Data"
 msgstr "Explorar datos"
 
@@ -238,15 +242,19 @@ msgid "Create a new table manually"
 msgstr "Crear una nueva tabla manualmente"
 
 #: src/metastore/templates/tables.mako:49
-#: src/metastore/templates/tables.mako:50
+msgid "Search for table name"
+msgstr "Buscar nombre de tabla"
+
+#: src/metastore/templates/tables.mako:53
+#: src/metastore/templates/tables.mako:54
 msgid "Browse the selected table"
 msgstr "Explorar la tabla seleccionada"
 
-#: src/metastore/templates/tables.mako:51
+#: src/metastore/templates/tables.mako:55
 msgid "Delete the selected tables"
 msgstr "Eliminar las tablas seleccionadas"
 
-#: src/metastore/templates/tables.mako:58
+#: src/metastore/templates/tables.mako:62
 msgid "Table Name"
 msgstr "Nombre de tabla"
 
@@ -267,12 +275,8 @@ msgid "Overwrite existing data"
 msgstr "Sobrescribir datos existentes"
 
 #: src/metastore/templates/popups/load_data.mako:55
-msgid ""
-"Note that loading data will move data from its location into the table's "
-"storage location."
-msgstr ""
-"Tenga en cuenta que, al cargar los datos, estos se trasladarán de su "
-"ubicación a la ubicación de almacenamiento de la tabla."
+msgid "Note that loading data will move data from its location into the table's storage location."
+msgstr "Tenga en cuenta que, al cargar los datos, estos se trasladarán de su ubicación a la ubicación de almacenamiento de la tabla."
 
 #: src/metastore/templates/popups/load_data.mako:61
 msgid "Submit"

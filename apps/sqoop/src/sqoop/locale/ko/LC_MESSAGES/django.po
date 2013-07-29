@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-07-13 20:19-0700\n"
+"POT-Creation-Date: 2013-07-15 18:44-0700\n"
 "PO-Revision-Date: 2012-07-30 18:56-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -19,334 +19,274 @@ msgstr ""
 
 #: src/sqoop/conf.py:26
 msgid "The sqoop server URL."
-msgstr ""
+msgstr "Sqoop 서버 URL입니다."
 
 #: src/sqoop/api/connection.py:53
 msgid "Could not get connections."
-msgstr ""
+msgstr "연결을 가져올 수 없습니다."
 
 #: src/sqoop/api/connection.py:64 src/sqoop/api/connection.py:87
 msgid "Error saving connection"
-msgstr ""
+msgstr "연결 저장 중 오류 발생"
 
 #: src/sqoop/api/connection.py:73
 msgid "Could not create connection."
-msgstr ""
+msgstr "연결을 생성할 수 없습니다."
 
 #: src/sqoop/api/connection.py:95
 msgid "Could not update connection."
-msgstr ""
+msgstr "연결을 업데이트할 수 없습니다."
 
 #: src/sqoop/api/connection.py:107 src/sqoop/api/connection.py:122
 #: src/sqoop/api/job.py:115 src/sqoop/api/job.py:130
 msgid "GET or POST request required."
-msgstr ""
+msgstr "GET 또는 POST 요청이 필요합니다."
 
 #: src/sqoop/api/connection.py:127 src/sqoop/api/connection.py:150
 #: src/sqoop/api/job.py:59 src/sqoop/api/job.py:85 src/sqoop/api/job.py:135
 #: src/sqoop/api/job.py:158 src/sqoop/api/job.py:179 src/sqoop/api/job.py:200
 msgid "POST request required."
-msgstr ""
+msgstr "POST 요청이 필요합니다."
 
 #: src/sqoop/api/connection.py:141
 msgid "Could not clone connection."
-msgstr ""
+msgstr "연결을 복제할 수 없습니다."
 
 #: src/sqoop/api/connection.py:161
 msgid "Could not delete connection."
-msgstr ""
+msgstr "연결을 삭제할 수 없습니다."
 
 #: src/sqoop/api/connector.py:52
 msgid "Could not get connectors."
-msgstr ""
+msgstr "커넥터를 가져올 수 없습니다."
 
 #: src/sqoop/api/connector.py:59 src/sqoop/api/connector.py:72
 #: src/sqoop/api/framework.py:54 src/sqoop/api/job.py:221
 #: src/sqoop/api/submission.py:61
 msgid "GET request required."
-msgstr ""
+msgstr "GET 요청이 필요합니다."
 
 #: src/sqoop/api/decorators.py:53
 msgid "Could not get connector."
-msgstr ""
+msgstr "커넥터를 가져올 수 없습니다."
 
 #: src/sqoop/api/decorators.py:72
 msgid "Could not get connection."
-msgstr ""
+msgstr "연결을 가져올 수 없습니다."
 
 #: src/sqoop/api/decorators.py:91
 msgid "Could not get job."
-msgstr ""
+msgstr "Job을 가져올 수 없습니다."
 
 #: src/sqoop/api/decorators.py:110
 msgid "Could not get submission."
-msgstr ""
+msgstr "제출을 가져올 수 없습니다."
 
 #: src/sqoop/api/exception.py:37
 #, python-format
 msgid "Could not connect to sqoop server. %s (%s)"
-msgstr ""
+msgstr "Sqoop 서버에 연결할 수 없습니다. %s (%s)"
 
 #: src/sqoop/api/framework.py:51
 msgid "Could not get framework."
-msgstr ""
+msgstr "프레임워크를 가져올 수 없습니다."
 
 #: src/sqoop/api/job.py:54
 msgid "Could not get jobs."
-msgstr ""
+msgstr "Job을 가져올 수 없습니다."
 
 #: src/sqoop/api/job.py:68 src/sqoop/api/job.py:94
 msgid "Error saving job"
-msgstr ""
+msgstr "Job 저장 중 오류 발생"
 
 #: src/sqoop/api/job.py:77
 msgid "Could not create job."
-msgstr ""
+msgstr "Job을 생성할 수 없습니다."
 
 #: src/sqoop/api/job.py:102
 msgid "Could not update job."
-msgstr ""
+msgstr "Job을 업데이트할 수 없습니다."
 
 #: src/sqoop/api/job.py:149
 msgid "Could not clone job."
-msgstr ""
+msgstr "Job을 복제할 수 없습니다."
 
 #: src/sqoop/api/job.py:170
 msgid "Could not delete job."
-msgstr ""
+msgstr "Job을 삭제할 수 없습니다."
 
 #: src/sqoop/api/job.py:191
 msgid "Could not start job."
-msgstr ""
+msgstr "Job을 시작할 수 없습니다."
 
 #: src/sqoop/api/job.py:212 src/sqoop/templates/app.mako:667
 msgid "Could not stop job."
-msgstr ""
+msgstr "Job을 중지할 수 없습니다."
 
 #: src/sqoop/api/job.py:233
 msgid "Could not get job status."
-msgstr ""
+msgstr "Job 상태를 가져올 수 없습니다."
 
 #: src/sqoop/api/submission.py:54
 msgid "Could not get submissions."
-msgstr ""
+msgstr "제출을 가져올 수 없습니다."
 
 #: src/sqoop/templates/app.mako:27
 msgid "Sqoop error"
-msgstr ""
+msgstr "Sqoop 오류"
 
 #: src/sqoop/templates/app.mako:36
 msgid "Search for job name or content"
-msgstr ""
+msgstr "Job 이름 또는 콘텐츠 검색"
 
 #: src/sqoop/templates/app.mako:42
 msgid "Create a new job"
-msgstr ""
+msgstr "새로운 Job 생성"
 
 #: src/sqoop/templates/app.mako:42
 msgid "New job"
-msgstr ""
+msgstr "Job 새로 만들기"
 
 #: src/sqoop/templates/app.mako:49 src/sqoop/templates/app.mako:72
 msgid "Click to edit"
-msgstr ""
+msgstr "편집하려면 클릭"
 
 #: src/sqoop/templates/app.mako:51 src/sqoop/templates/app.mako:115
 msgid "Stop"
-msgstr ""
+msgstr "중지"
 
 #: src/sqoop/templates/app.mako:52 src/sqoop/templates/app.mako:74
 #: src/sqoop/templates/app.mako:110
 msgid "Run"
-msgstr ""
+msgstr "실행"
 
 #: src/sqoop/templates/app.mako:53 src/sqoop/templates/app.mako:75
 #: src/sqoop/templates/app.mako:120
 msgid "Copy"
-msgstr ""
+msgstr "복사"
 
 #: src/sqoop/templates/app.mako:54 src/sqoop/templates/app.mako:76
 #: src/sqoop/templates/app.mako:125
 msgid "Delete"
-msgstr ""
+msgstr "삭제"
 
 #: src/sqoop/templates/app.mako:87
 msgid "There are currently no jobs."
-msgstr ""
+msgstr "현재 Job이 없습니다."
 
 #: src/sqoop/templates/app.mako:87
 msgid "Please click on \"New Job\" to add one."
-msgstr ""
+msgstr "Job을 추가하려면 \"Job 새로 만들기\"를 클릭하십시오."
 
 #: src/sqoop/templates/app.mako:103 src/sqoop/templates/app.mako:104
 msgid "Back to jobs list"
-msgstr ""
+msgstr "Job 목록으로 돌아가기"
 
 #: src/sqoop/templates/app.mako:107
 msgid "Actions"
-msgstr ""
+msgstr "작업"
 
 #: src/sqoop/templates/app.mako:109
 msgid "Run the job"
-msgstr ""
+msgstr "Job 실행"
 
 #: src/sqoop/templates/app.mako:114
 msgid "Stop the job"
-msgstr ""
+msgstr "Job 중지"
 
 #: src/sqoop/templates/app.mako:119
 msgid "Copy the job"
-msgstr ""
+msgstr "Job 복사"
 
 #: src/sqoop/templates/app.mako:124
 msgid "Delete the job"
-msgstr ""
+msgstr "Job 삭제"
 
 #: src/sqoop/templates/app.mako:133
 msgid "Create a job"
-msgstr ""
+msgstr "Job 생성"
 
 #: src/sqoop/templates/app.mako:147
 msgid "Previous"
-msgstr ""
+msgstr "이전"
 
 #: src/sqoop/templates/app.mako:151
 msgid "Next"
-msgstr ""
+msgstr "다음"
 
 #: src/sqoop/templates/app.mako:154 src/sqoop/templates/app.mako:206
 msgid "Save"
-msgstr ""
+msgstr "저장"
 
 #: src/sqoop/templates/app.mako:167
 msgid "Connector"
-msgstr ""
+msgstr "커넥터"
 
 #: src/sqoop/templates/app.mako:181 src/sqoop/templates/app.mako:224
 msgid "Back to job"
-msgstr ""
+msgstr "Job으로 돌아가기"
 
 #: src/sqoop/templates/app.mako:187
 msgid "Create a connection"
-msgstr ""
+msgstr "연결 생성"
 
 #: src/sqoop/templates/app.mako:190 src/sqoop/templates/app.mako:284
 msgid "Name"
-msgstr ""
+msgstr "이름"
 
 #: src/sqoop/templates/app.mako:205
 msgid "Cancel"
-msgstr ""
+msgstr "취소"
 
 #: src/sqoop/templates/app.mako:216 src/sqoop/templates/app.mako:218
 msgid "Logs"
-msgstr ""
+msgstr "로그"
 
 #: src/sqoop/templates/app.mako:222
 msgid "Back to editing a job"
-msgstr ""
+msgstr "Job 편집으로 돌아가기"
 
 #: src/sqoop/templates/app.mako:246
 msgid "Select job type"
-msgstr ""
+msgstr "Job 유형 선택"
 
 #: src/sqoop/templates/app.mako:255
 msgid "Select connection"
-msgstr ""
+msgstr "연결 선택"
 
 #: src/sqoop/templates/app.mako:569
 msgid "Step 1: Job info"
-msgstr ""
+msgstr "1단계: Job 정보"
 
 #: src/sqoop/templates/app.mako:575
 msgid "Step 2: Sqoop specific"
-msgstr ""
+msgstr "2단계: Sqoop 특정"
 
 #: src/sqoop/templates/app.mako:582
 msgid "Step 1: Manage connections"
-msgstr ""
+msgstr "1단계: 연결 관리"
 
 #: src/sqoop/templates/app.mako:588
 msgid "Step 2: Job info"
-msgstr ""
+msgstr "2단계: Job 정보"
 
 #: src/sqoop/templates/app.mako:594
 msgid "Step 3: Sqoop specific job info"
-msgstr ""
+msgstr "3단계: Sqoop 특정 Job 정보"
 
 #: src/sqoop/templates/app.mako:650
 msgid "Cannot connect to sqoop server."
-msgstr ""
+msgstr "Sqoop 서버에 연결할 수 없습니다."
 
 #: src/sqoop/templates/app.mako:655
 msgid "Started job."
-msgstr ""
+msgstr "Job을 시작했습니다."
 
 #: src/sqoop/templates/app.mako:659
 msgid "Could not start job: "
-msgstr ""
+msgstr "Job을 시작할 수 없음: "
 
 #: src/sqoop/templates/app.mako:663
 msgid "Stopped job."
-msgstr ""
-
-#~ msgid ""
-#~ "bin/hadoop return non-zero %(retcode)d "
-#~ "while trying to merge credentials."
-#~ msgstr "자격 증명을 병합하는 동안 bin/hadoop이 0이 아닌 값 %(retcode)d을(를) 반환했습니다."
-
-#~ msgid "Hue Shell"
-#~ msgstr "Hue Shell"
-
-#~ msgid ""
-#~ "Failed to create a shell of the"
-#~ " given type. The possible reasons for"
-#~ " this are:"
-#~ msgstr "주어진 유형의 Shell을 생성하지 못했습니다. 가능한 원인:"
-
-#~ msgid "The system is out of PTYs."
-#~ msgstr "이 시스템이 PTY 밖에 있습니다."
-
-#~ msgid "The system cannot create more subprocesses."
-#~ msgstr "이 시스템은 추가 하위 프로세스를 생성할 수 없습니다."
-
-#~ msgid "You do not have permission to create shells of this type."
-#~ msgstr "이 유형의 Shell을 생성할 권한이 없습니다."
-
-#~ msgid "There is no shell with that name."
-#~ msgstr "이 이름을 갖는 Shell이 없습니다."
-
-#~ msgid "There is no Unix user account for you."
-#~ msgstr "귀하의 Unix 사용자 계정이 없습니다."
-
-#~ msgid "Select one of the available shells from the toolbar above."
-#~ msgstr "위 도구 모음에서 사용 가능한 Shell 하나를 선택하십시오."
-
-#~ msgid ""
-#~ "You do not have permission to "
-#~ "access any shell or there is no"
-#~ " configured shell."
-#~ msgstr "Shell에 대한 액세스 권한이 없거나 구성된 Shell이 없습니다."
-
-#~ msgid "The shell is not present on the Hue host."
-#~ msgstr "Shell이 Hue 호스트에 없습니다."
-
-#~ msgid ""
-#~ "The Shell application requires a Unix"
-#~ " user account for every user of "
-#~ "Hue on the remote web server."
-#~ msgstr "Shell 애플리케이션에서는 원격 웹 서버에 있는 Hue의 모든 사용자에 대한  Unix 사용자 계정이 필요합니다."
-
-#~ msgid ""
-#~ "Ask your administrator to create a "
-#~ "user account for you on the remote"
-#~ " web server as described in the "
-#~ "Shell documentation."
-#~ msgstr "Shell 설명서에 나와 있는 대로 관리자에게 원격 웹 서버에 대한 사용자 계정을 생성해주도록 요청하십시오."
-
-#~ msgid ""
-#~ "The webserver currently running Hue does"
-#~ " not support the Shell application. "
-#~ "Please contact your administrator."
-#~ msgstr "현재 Hue를 실행하는 웹 서버가 Shell 애플리케이션을 지원하지 않습니다. 관리자에게 문의하십시오."
+msgstr "Job을 중지했습니다."
 

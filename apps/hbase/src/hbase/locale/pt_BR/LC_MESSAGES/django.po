@@ -3,4 +3,205 @@
 # This file is distributed under the same license as the Hue project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
 #
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2013-07-15 18:44-0700\n"
+"PO-Revision-Date: 2013-07-13 20:35-0700\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: pt_BR <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n > 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.6\n"
+
+#: src/hbase/api.py:46
+#, python-format
+msgid "Api Error: %s"
+msgstr "Erro de api: %s"
+
+#: src/hbase/api.py:76
+#, python-format
+msgid "Cluster by the name of %s does not exist in configuration."
+msgstr "Cluster com o nome de %s não existe na configuração."
+
+#: src/hbase/templates/app.mako:49
+msgid "There are no tables matching the search criteria."
+msgstr "Não existem tabelas que correspondam aos critérios de pesquisa."
+
+#: src/hbase/templates/app.mako:62
+msgid "Refresh Row"
+msgstr "Atualizar agora"
+
+#: src/hbase/templates/app.mako:64
+msgid "Delete Row"
+msgstr "Excluir linha"
+
+#: src/hbase/templates/app.mako:68 src/hbase/templates/app.mako:228
+msgid "Toggle Collapse Selected"
+msgstr "Alternar recolhimento selecionado"
+
+#: src/hbase/templates/app.mako:69 src/hbase/templates/app.mako:229
+msgid "Select All Visible"
+msgstr "Selecionar todos os visíveis"
+
+#: src/hbase/templates/app.mako:75
+msgid "Add New Column/Cell"
+msgstr "Adicionar nova coluna/célula"
+
+#: src/hbase/templates/app.mako:87
+msgid "Full Editor"
+msgstr "Editor completo"
+
+#: src/hbase/templates/app.mako:99
+msgid "Notice:"
+msgstr "Aviso:"
+
+#: src/hbase/templates/app.mako:99
+msgid "entries truncated"
+msgstr "itens truncados"
+
+#: src/hbase/templates/app.mako:99
+msgid "at"
+msgstr "em"
+
+#: src/hbase/templates/app.mako:99
+msgid "items per set."
+msgstr "itens por conjunto."
+
+#: src/hbase/templates/app.mako:102
+msgid "Query executed in"
+msgstr "Consulta executada"
+
+#: src/hbase/templates/app.mako:102
+msgid "fetching"
+msgstr "buscando"
+
+#: src/hbase/templates/app.mako:102
+msgid "rows"
+msgstr "linhas"
+
+#: src/hbase/templates/app.mako:109
+msgid "Sort By"
+msgstr "Classificar por"
+
+#: src/hbase/templates/app.mako:149
+msgid "Enable"
+msgstr "Ativar"
+
+#: src/hbase/templates/app.mako:154
+msgid "Disable"
+msgstr "Desativar"
+
+#: src/hbase/templates/app.mako:157
+msgid "Drop"
+msgstr "Descartar"
+
+#: src/hbase/templates/app.mako:160
+msgid "New Table"
+msgstr "Nova tabela"
+
+#: src/hbase/templates/app.mako:179
+msgid "Create New Table"
+msgstr "Criar nova tabela"
+
+#: src/hbase/templates/app.mako:183
+msgid "Table Name"
+msgstr "Nome da tabela"
+
+#: src/hbase/templates/app.mako:184
+msgid "Column Families"
+msgstr "Famílias de colunas"
+
+#: src/hbase/templates/app.mako:187
+msgid "Add Column Family"
+msgstr "Adicionar família de coluna"
+
+#: src/hbase/templates/app.mako:190 src/hbase/templates/app.mako:283
+#: src/hbase/templates/app.mako:304 src/hbase/templates/app.mako:342
+#: src/hbase/templates/app.mako:373
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: src/hbase/templates/app.mako:191
+msgid "Submit"
+msgstr "Enviar"
+
+#: src/hbase/templates/app.mako:205
+msgid "row_key1, row_key2 + scan_length, row[ cf:column ], [ cf:col1 cf:col2 ]"
+msgstr "row_key1, row_key2 + scan_length, row[ cf:column ], [ cf:col1 cf:col2 ]"
+
+#: src/hbase/templates/app.mako:224
+msgid "Toggle Select All Rows"
+msgstr "Alternar a seleção de todas as linhas"
+
+#: src/hbase/templates/app.mako:224
+msgid "All"
+msgstr "Tudo"
+
+#: src/hbase/templates/app.mako:231
+msgid "Drop Columns"
+msgstr "Descartar colunas"
+
+#: src/hbase/templates/app.mako:246
+msgid "Displaying"
+msgstr "Exibindo"
+
+#: src/hbase/templates/app.mako:250
+msgid "starting from"
+msgstr "começando de"
+
+#: src/hbase/templates/app.mako:255
+msgid "Add Query Field"
+msgstr "Adicionar campo de consulta"
+
+#: src/hbase/templates/app.mako:256
+msgid "Go"
+msgstr "Ir"
+
+#: src/hbase/templates/app.mako:260
+msgid "Drop Rows"
+msgstr "Descartar colunas"
+
+#: src/hbase/templates/app.mako:262
+msgid "New Row"
+msgstr "Nova linha"
+
+#: src/hbase/templates/app.mako:271
+msgid "Insert New Row"
+msgstr "Inserir nova linha"
+
+#: src/hbase/templates/app.mako:276
+msgid "Row Key"
+msgstr "Chave da linha"
+
+#: src/hbase/templates/app.mako:280
+msgid "Add Field"
+msgstr "Adicionar campo"
+
+#: src/hbase/templates/app.mako:292
+msgid "Create New Column"
+msgstr "Criar nova coluna"
+
+#: src/hbase/templates/app.mako:298
+msgid "Column Name"
+msgstr "Nome da coluna"
+
+#: src/hbase/templates/app.mako:300 src/hbase/templates/app.mako:301
+msgid "Cell Value"
+msgstr "Valor da célula"
+
+#: src/hbase/templates/app.mako:343
+msgid "Save"
+msgstr "Salvar"
+
+#: src/hbase/templates/app.mako:345
+msgid "OK"
+msgstr "OK"
+
+#: src/hbase/templates/app.mako:374
+msgid "Confirm"
+msgstr "Confirmar"
 
