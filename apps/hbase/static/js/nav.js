@@ -27,35 +27,7 @@ var Router = {
     app.focusModel(app.views.tabledata);
   },
   setCluster: function(cluster) {
-    Router.set();
     app.cluster(cluster);
-  },
-  set: function() {
-      Breadcrumbs.render();
-  }
-}
-
-var Breadcrumbs = {
-  _selector_root:'#hbase-breadcrumbs',
-  //renders breadcrumbs automaticall
-  render:function(mutators) {
-    root = $(Breadcrumbs._selector_root).html('');
-    crumbs = ['/hbase'].concat(document.URL.split('/').splice(4));
-    biglink = "";
-    for(i=0;i<crumbs.length;i++) {
-      biglink += crumbs[i] + '/'
-      function clean_url(url) {
-        replacers = {'/': '', '#': '', '_': ' ', '^[a-z]': function(a) { return a.toUpperCase(); }};
-        keys = Object.keys(replacers);
-        for(q=0;q<keys.length;q++) {
-          url = url.replace(new RegExp(keys[q],'g'), replacers[keys[q]]);
-        }
-        return url;
-      }
-      if(crumbs[i]!="")
-        root.append('<li><a href="' + biglink + '">' + clean_url(crumbs[i]) + '</a></li><li><a href="' + biglink + '">/</a></li>');
-    }
-    return root.find('li:last-child').remove();
   }
 }
 

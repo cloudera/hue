@@ -188,6 +188,10 @@ function resetElements() {
       }
     });
   });
+  resetSearch();
+};
+
+function resetSearch() {
   app.views.tabledata.searchQuery('');
   app.search.cur_input('');
 };
@@ -205,6 +209,10 @@ function logGA(postfix) {
   if (typeof trackOnGA == 'function') {
     trackOnGA('hbase/' + postfix);
   }
+};
+
+function table_search(value) {
+  routie(app.cluster() + '/' + app.views.tabledata.name() +'/query/' + value);
 };
 
 function getEditablePosition(contentEditable, trimWhitespaceNodes) {
