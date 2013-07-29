@@ -442,6 +442,7 @@ a.normal {
   padding: 5px;
   margin-bottom: 10px;
   margin-left: 6px;
+  margin-top: 5px;
   background-color: #F3F3F3;
   border-bottom: 1px solid #F3F3F3;
   cursor: pointer;
@@ -457,4 +458,11 @@ a.normal {
 .videoList li:hover {
   background-color: #EFEFEF;
   border-bottom: 1px solid #338bb8;
+}
+
+.videoNavigator {
+  text-align: center;
+  background-color: #338bb8;
+  color: #FFFFFF;
+  cursor: pointer;
 }
