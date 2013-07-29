@@ -41,24 +41,25 @@ ${ layout.menubar(section='workflows') }
   <div class="span2">
     <div id="workflowControls" class="well sidebar-nav">
       <ul class="nav nav-list">
-        <li class="nav-header">${ _('Properties') }</li>
-        <li><a href="#properties"><i class="icon-reorder"></i> ${ _('Edit properties') }</a></li>
-
         <li class="nav-header">${ _('Editor') }</li>
-        <li><a href="#editWorkflow"><i class="icon-code-fork"></i> ${ _('Edit workflow') }</a></li>
-        <li><a href="#importAction" title="${ _('Click to import an Oozie workflow action or Job Designer action') }" rel="tooltip" data-placement="right"><i class="icon-download-alt"></i> ${ _('Import action') }</a></li>
+        <li><a href="#editWorkflow"><i class="icon-code-fork"></i> ${ _('Workflow') }</a></li>
+        <li><a href="#properties"><i class="icon-reorder"></i> ${ _('Properties') }</a></li>
         % if user_can_edit_job:
           <li>
             <a data-bind="attr: {href: '/filebrowser/view' + deployment_dir() }" target="_blank" title="${ _('Go upload additional files and libraries to the deployment directory on HDFS') }" rel="tooltip" data-placement="right"><i class="icon-folder-open"></i> ${ _('Workspace') }</a>
           </li>
-          <li data-bind="visible: !loading()">
+        % endif
+
+        <li class="nav-header">${ _('Advanced') }</li>
+        <li><a href="#importAction" title="${ _('Click to import an Oozie workflow action or Job Designer action') }" rel="tooltip" data-placement="right"><i class="icon-download-alt"></i> ${ _('Import action') }</a></li>
+        % if user_can_edit_job:
+          <li>
             <a title="${ _('Edit kill node') }" rel="tooltip" data-placement="right" href="#kill"><i class="icon-off"></i> ${ _('Kill node') }</a>
           </li>
         % endif
 
         % if user_can_edit_job:
-          <li class="nav-header">${ _('History') }</li>
-          <li><a href="#listHistory"><i class="icon-archive"></i> ${ _('Show history') }</a></li>
+          <li><a href="#listHistory"><i class="icon-archive"></i> ${ _('History') }</a></li>
         % endif
 
         <li class="nav-header">${ _('Actions') }</li>
@@ -123,10 +124,10 @@ ${ layout.menubar(section='workflows') }
       <div class="alert alert-info">
         <h3>${ _('Kill node') }</h3>
         <p>${_('If the "to" field has content, then the workflow editor assumes that the defined email action is to be placed before the kill action.')}</p>
-        <p data-bind="if: context().node().to"><i class="icon-check"></i>&nbsp;${_('Email action before kill node enabled.')}</p>
-        <p data-bind="ifnot: context().node().to"><i class="icon-check"></i>&nbsp;${_('Email action before kill node disabled.')}</p>
       </div>
       <fieldset data-bind="with: context().node">
+        <p >&nbsp;${_('Action enabled: ')} <i class="icon-check" data-bind="visible: to().length > 0"></i><i class="icon-check-empty" data-bind="visible: to().length == 0"></i></p>
+
         % for form_info in action_forms:
           % if form_info[0] == 'email':
             ${ actions.action_form_fields(action_form=form_info[1], node_type=form_info[0], show_primary=False) }
