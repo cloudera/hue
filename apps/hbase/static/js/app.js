@@ -173,7 +173,7 @@ function bindSubmit() {
           target.find('li').each(function() {
             serialized[$(this).find('input')[0].value] = $(this).find('input')[1].value;
           });
-          submitVal = JSON.stringify(serialized);
+          submitVal = serialized;
           use_post = true;
           break;
       }
