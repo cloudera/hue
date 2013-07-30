@@ -112,7 +112,7 @@ var viewModel = new (function() {
   self.persistedJobs = ko.computed(function() {
     return ko.utils.arrayFilter(self.jobs(), function (job) {
       return job.persisted();
-    }); 
+    });
   });
   self.persistedConnections = ko.computed(function() {
     return ko.utils.arrayFilter(self.connections(), function (connection) {
@@ -376,6 +376,26 @@ var viewModel = new (function() {
     var name = 'delete-connection-modal';
     self.showModal(name);
   }
+
+  self.showFileChooser = function showFileChooser() {
+    var inputPath = this;
+    var path = inputPath.value();
+    $("#filechooser").jHueFileChooser({
+      initialPath: path,
+      onFolderChoose: function (filePath) {
+    	inputPath.value(filePath);
+        $("#chooseFile").modal("hide");
+      },
+      onFileChoose:function (filePath) {
+    	inputPath.value(filePath);
+        $("#chooseFile").modal("hide");
+      },
+      createFolder: false,
+      selectFolder: true,
+      uploadFile:true
+    });
+    $("#chooseFile").modal("show");
+  };
 })();
 
 //// Event handling

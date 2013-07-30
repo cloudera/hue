@@ -82,7 +82,7 @@ var submissions = (function($) {
 
   function put_submission(submission) {
     if (submission_registry[submission.job()]) {
-      if (submission_registry[submission.job()].creation_date() < submission.creation_date() || 
+      if (submission_registry[submission.job()].creation_date() < submission.creation_date() ||
           (submission_registry[submission.job()].creation_date() == submission.creation_date() && submission_registry[submission.job()].last_update_date() < submission.last_update_date())) {
         submission_registry[submission.job()] = submission;
       }

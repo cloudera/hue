@@ -121,13 +121,18 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
               </a>
             </li>
             <li class="nav-header" data-bind="visible: $root.job().persisted">${_('Submissions')}</li>
-            <li data-bind="visible: $root.job().persisted()">
+            <li data-bind="visible: $root.job().persisted() && $root.job().outputDirectoryFilebrowserURL">
               <a data-bind="attr: { 'href': $root.job().outputDirectoryFilebrowserURL }" data-placement="right" rel="tooltip" title="${_('Browse output directory')}" href="javascript:void(0);" target="_new">
                 <i class="icon-folder-open"></i> ${_('Output directory')}
               </a>
             </li>
-            <li>
-              <a rel="tooltip" title="${_('Logs')}" href="javascript:void(0);" target="_new" data-bind="attr: {href: '/jobbrowser/jobs/' + $root.job().submission().external_id()}">
+            <li data-bind="visible: $root.job().persisted() && $root.job().inputDirectoryFilebrowserURL">
+              <a data-bind="attr: { 'href': $root.job().inputDirectoryFilebrowserURL }" data-placement="right" rel="tooltip" title="${_('Browse input directory')}" href="javascript:void(0);" target="_new">
+                <i class="icon-folder-open"></i> ${_('Input directory')}
+              </a>
+            </li>
+            <li data-bind="visible: $root.job().submission().external_id()">
+              <a rel="tooltip" title="${_('Logs')}" href="javascript:void(0);" target="_new" data-bind="attr: {href: '/jobbrowser/jobs/' + $root.job().submission().external_id() + '/single_logs'}">
                 <i class="icon-list"></i>
                 ${_('Logs')}
               </a>
@@ -153,7 +158,7 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
         </form>
       </div>
 
-      <div id="job-forms" data-bind="css: { span10: $root.job().persisted, span12: !$root.job().persisted}">
+      <div id="job-forms" data-bind="css: {span10: $root.job().persisted, span12: !$root.job().persisted}">
         <!-- ko if: $root.jobWizard.page -->
           <!-- ko with: $root.jobWizard -->
           <ul class="nav nav-pills" data-bind="foreach: pages">
@@ -161,12 +166,13 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
               <a href="javascript:void(0);" data-bind="routie: 'job/edit/wizard/' + identifier(), text: caption"></a>
             </li>
           </ul>
+
           <form method="POST" class="form form-horizontal noPadding" data-bind="with: page">
             <div class="job-form" data-bind="template: {'name': template(), 'data': node}">
             </div>
 
             <div class="form-actions row-fluid">
-              <div data-bind="css: { span10: $root.job().persisted, offset2: $root.job().persisted, span12: !$root.job().persisted}">
+              <div data-bind="css: {span10: $root.job().persisted, offset2: $root.job().persisted, span12: !$root.job().persisted}">
               <!-- ko if: $parent.hasPrevious -->
               <a class="btn" data-bind="routie: 'job/edit/wizard/' + $parent.previousIndex()">${_('Back')}</a>
               &nbsp;
@@ -225,6 +231,18 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
 
 <div data-bind="template: {'name': modal.name(), 'if': modal.name()}" id="modal-container" class="modal hide fade"></div>
 
+<div id="chooseFile" class="modal hide fade">
+    <div class="modal-header">
+        <a href="#" class="close" data-dismiss="modal">&times;</a>
+        <h3>${_('Choose a folder')}</h3>
+    </div>
+    <div class="modal-body">
+        <div id="filechooser">
+        </div>
+    </div>
+    <div class="modal-footer">
+    </div>
+</div>
 
 <script type="text/html" id="delete-job-modal">
 <div class="modal-header">
@@ -315,11 +333,11 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
   <div class="control-group">
     <label class="control-label">${ _('Job type') }</label>
     <div class="controls">
-      <div data-bind="css:{ 'big-btn': type() != '', 'selected': type() == 'IMPORT' }, click: setImport">
+      <div title="${ _('Import from a Database to Hadoop') }" data-bind="css:{ 'big-btn': type() != '', 'selected': type() == 'IMPORT' }, click: setImport">
         <i class="icon-download-alt"></i><br/>
         ${ _('Import') }
       </div>
-      <div data-bind="css:{ 'big-btn': type() != '', 'selected': type() == 'EXPORT' }, click: setExport">
+      <div title="${ _('Import from Hadoop to a Database') }"data-bind="css:{ 'big-btn': type() != '', 'selected': type() == 'EXPORT' }, click: setExport">
         <i class="icon-upload-alt"></i><br/>
         ${ _('Export') }
       </div>
@@ -400,7 +418,8 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
                 }" class="control-group">
   <label class="control-label" data-bind="text: $root.label('framework', name())" rel="tooltip"></label>
   <div class="controls">
-    <input class="input-xlarge" data-bind="value: value, attr: { 'type': (sensitive() ? 'password' : 'text'), 'name': name, 'title': $root.help('framework', name()) }" rel="tooltip">
+    <input class="input-xxlarge" data-bind="value: value, attr: { 'type': (sensitive() ? 'password' : 'text'), 'name': name, 'title': $root.help('framework', name()) }" rel="tooltip">
+    <button class="btn fileChooserBtn" data-bind="click: $root.showFileChooser">..</button>
     <span data-bind="template: { 'name': 'job-editor-form-field-error' }" class="help-inline"></span>
   </div>
 </div>
@@ -538,13 +557,13 @@ viewModel.job.subscribe(function(job) {
     if (job.persisted()) {
       viewModel.jobWizard.addPage(new wizard.Page({
         'identifier': 'job-editor-connector',
-        'caption': '${_("Step 1: Job info")}',
+        'caption': '${_("Step 1: From")}',
         'node': job,
         'template': 'job-editor-connector',
       }));
       viewModel.jobWizard.addPage(new wizard.Page({
         'identifier': 'job-editor-framework',
-        'caption': '${_("Step 2: Sqoop specific")}',
+        'caption': '${_("Step 2: to")}',
         'node': job,
         'template': 'job-editor-framework',
       }));
@@ -557,13 +576,13 @@ viewModel.job.subscribe(function(job) {
       }));
       viewModel.jobWizard.addPage(new wizard.Page({
         'identifier': 'job-editor-connector',
-        'caption': '${_("Step 2: Job info")}',
+        'caption': '${_("Step 2: From")}',
         'node': job,
         'template': 'job-editor-connector',
       }));
       viewModel.jobWizard.addPage(new wizard.Page({
         'identifier': 'job-editor-framework',
-        'caption': '${_("Step 3: Sqoop specific job info")}',
+        'caption': '${_("Step 3: To")}',
         'node': job,
         'template': 'job-editor-framework',
       }));
