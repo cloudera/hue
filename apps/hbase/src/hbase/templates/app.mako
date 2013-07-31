@@ -170,16 +170,16 @@ ${ commonheader(None, "hbase", user) | n,unicode }
     <form id="new_table_modal" action="createTable" method="POST" class="modal hide fade ajaxSubmit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h3>${_('Create New Table')} - <span class="pageTitle"></span></h3>
+        <h3>${_('Create New Table')}</h3>
       </div>
       <div class="modal-body controls">
         <input type="hidden" name="cluster" data-bind="value:app.cluster"/>
-        <label>${_('Table Name')}:</label> <input name="tableName" placeholder="Table1" type="text"/>
+        <label>${_('Table Name')}:</label> <input name="tableName" placeholder="MyTable" type="text"/>
         <label>${_('Column Families')}:</label> <!-- clean up later -->
         <ul>
-          <li><input type="text" name="table_columns" placeholder="family:column_name"></li>
+          <li><input type="text" name="table_columns" placeholder="family_name"></li>
         </ul>
-        <a class="btn action_addColumn"><i class="icon-plus-sign"></i> ${_('Add Column Family')}</a>
+        <a class="btn action_addColumn"><i class="icon-plus-sign"></i> ${_('Additional Column Family')}</a>
       </div>
       <div class="modal-footer">
         <button class="btn" data-dismiss="modal" aria-hidden="true">${_('Cancel')}</button>
