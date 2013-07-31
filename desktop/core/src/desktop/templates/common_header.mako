@@ -155,6 +155,7 @@ from django.utils.translation import ugettext as _
     <div class="navbar-inner">
       <div class="container-fluid">
         <a class="brand nav-tooltip" title="${_('About Hue')}" href="/about"><img src="/static/art/hue-logo-mini-letterpress.png" /></a>
+        % if user.is_authenticated():
         <div id="usernameDropdown" class="btn-group pull-right">
           <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
             <i class="icon-user"></i> ${user.username}
@@ -166,6 +167,7 @@ from django.utils.translation import ugettext as _
             <li><a href="/accounts/logout/">${_('Sign Out')}</a></li>
           </ul>
         </div>
+        % endif
 
         <div class="nav-collapse">
           <ul class="nav">
