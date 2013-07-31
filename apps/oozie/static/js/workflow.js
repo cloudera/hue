@@ -1040,7 +1040,7 @@ function ManageKillModule($, workflow, NodeModelChooser, Node, NodeModel) {
       workflow.registry.add(email_action.id(), email_action);
       replace_kill(email_action);
       email_enabled(true);
-    } else if (email_enabled()) {
+    } else if (!value && email_enabled()) {
       replace_email(email_action);
       email_enabled(false);
       workflow.registry.remove(email_action.id());
