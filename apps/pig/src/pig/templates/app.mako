@@ -47,7 +47,7 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
       </%def>
 
       <%def name="creation()">
-          <button class="btn fileToolbarBtn" title="${_('Create a new script')}" data-bind="click: confirmNewScript"><i class="icon-plus-sign"></i> ${_('New script')}</button>
+          <button class="btn fileToolbarBtn" title="${_('Create a new script')}" data-bind="click: confirmNewScript"><i class="icon-plus-sign"></i> ${_('New Script')}</button>
       </%def>
     </%actionbar:render>
     <div class="alert alert-info" data-bind="visible: scripts().length == 0">
@@ -577,7 +577,7 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
 <script src="/pig/static/js/pig.ko.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/routie-0.3.0.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/codemirror-3.11.js"></script>
-<script src="/static/ext/js/codemirror-pig.js"></script>
+<script src="/static/js/Source/jHue/codemirror-pig.js"></script>
 <script src="/static/js/Source/jHue/codemirror-show-hint.js"></script>
 <script src="/static/js/Source/jHue/codemirror-pig-hint.js"></script>
 <script src="/beeswax/static/js/autocomplete.utils.js" type="text/javascript" charset="utf-8"></script>
@@ -619,6 +619,8 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
   ko.applyBindings(viewModel);
 
   var HIVE_AUTOCOMPLETE_BASE_URL = "${ autocomplete_base_url | n,unicode }";
+
+  var codeMirror;
 
   $(document).ready(function () {
     viewModel.updateScripts();
@@ -713,7 +715,7 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
         CodeMirror.showHint(cm, CodeMirror.pigHint);
       }
     }
-    var codeMirror = CodeMirror(function (elt) {
+    codeMirror = CodeMirror(function (elt) {
       scriptEditor.parentNode.replaceChild(elt, scriptEditor);
     }, {
       value: scriptEditor.value,
@@ -802,6 +804,10 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
     codeMirror.on("focus", function () {
       if (codeMirror.getValue() == LABELS.NEW_SCRIPT_CONTENT) {
         codeMirror.setValue("");
+      }
+      if (errorWidget != null) {
+        errorWidget.clear();
+        errorWidget = null;
       }
     });
 
@@ -945,6 +951,22 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
       });
     }
 
+    var errorWidget = null;
+
+    function checkForErrors(newLines) {
+      $(newLines).each(function (cnt, line) {
+        if (line.indexOf(" ERROR ") > -1) {
+          var _lineNo = line.match(/[Ll]ine \d*/) != null ? line.match(/[Ll]ine \d*/)[0].split(" ")[1] * 1 : -1;
+          var _colNo = line.match(/[Cc]olumn \d*/) != null ? line.match(/[Cc]olumn \d*/)[0].split(" ")[1] * 1 : -1;
+          if (_lineNo != -1 && _colNo != -1 && errorWidget == null) {
+            errorWidget = codeMirror.addLineWidget(_lineNo - 1, $("<div>").addClass("editorError").html("<i class='icon-exclamation-sign'></i> " + line)[0], {coverGutter: true, noHScroll: true});
+            codeMirror.setSelection({line: _lineNo - 1, ch: _colNo}, {line: _lineNo - 1, ch: _colNo + codeMirror.getLine(_lineNo - 1).substring(_colNo).split(" ")[0].length});
+            $(document).trigger("showEditor");
+          }
+        }
+      });
+    }
+
     function refreshLogs() {
       if (viewModel.currentScript().watchUrl() != "") {
         $.getJSON(viewModel.currentScript().watchUrl(), function (data) {
@@ -958,6 +980,7 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
             var newLines = data.logs.pig.split("\n").slice(_logsEl.html().split("<br>").length);
             if (newLines.length > 0){
               _logsEl.html(_logsEl.html() + newLines.join("<br>") + "<br>");
+              checkForErrors(newLines);
             }
             window.setTimeout(function () {
               resizeLogs();
@@ -1103,7 +1126,7 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
                     _foundLastRun = pastScript;
                   }
                 });
-                viewModel.currentScript().watchUrl(_foundLastRun.watchUrl);
+                viewModel.currentScript().watchUrl(_foundLastRun != null ? _foundLastRun.watchUrl : "");
                 $(document).trigger("startLogsRefresh");
                 showSection("editor", "logs");
               }
