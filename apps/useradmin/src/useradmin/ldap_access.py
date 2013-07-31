@@ -215,6 +215,9 @@ class LdapConnection(object):
 
     # Allow wild cards on non distinguished names
     sanitized_name = ldap.filter.escape_filter_chars(username_pattern).replace(r'\2a', r'*')
+    # Fix issue where \, is converted to \5c,
+    sanitized_name = sanitized_name.replace(r'\5c,', r'\2c')
+
     search_dn, user_name_filter = self._get_search_params(sanitized_name, search_attr, find_by_dn)
     ldap_filter = '(&' + user_filter + user_name_filter + ')'
     attrlist = ['objectClass', 'isMemberOf', 'memberOf', 'givenName', 'sn', 'mail', 'dn', user_name_attr]
