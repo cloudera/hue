@@ -164,7 +164,7 @@ var jobs = (function($) {
             default:
             case 1:
               var error = data.errors[0];
-              $(document).trigger('start_fail.job', [self, options, error.exception]);
+              $(document).trigger('start_fail.job', [self, options, error]);
             break;
           }
         }
