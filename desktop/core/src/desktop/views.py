@@ -306,8 +306,11 @@ def commonheader(title, section, user, padding="60px"):
   """
   Returns the rendered common header
   """
-  apps = appmanager.get_apps(user)
-  apps_list = sorted(apps, key=lambda app: app.menu_index)
+  if user.is_authenticated():
+    apps = appmanager.get_apps(user)
+    apps_list = sorted(apps, key=lambda app: app.menu_index)
+  else:
+    apps_list = []
 
   return django_mako.render_to_string("common_header.mako", {
     'apps': apps_list,
