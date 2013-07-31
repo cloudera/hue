@@ -74,15 +74,12 @@ h1.emptyMessage {
 }
 
 .form-actions {
-  bottom: 0;
-  left: 0;
-  margin: 0;
-  width: 100%;
   padding-left: 20px !important;
 }
 
 .job-form {
   margin-bottom: 80px;
+  min-height: 300px;
 }
 
 .big-btn {

@@ -98,6 +98,13 @@ var viewModel = new (function() {
   self.shownSection = ko.observable("");
   self.isDirty = ko.observable(false);
   self.isLoading = ko.observable(false);
+
+  self.isLoading.subscribe(function(value) {  // fixes problem with too fast rendering engines that display chunks of html before KO bindings
+    if (!value){
+      $(document).trigger('notloading');
+    }
+  });
+
   // Must always have a value.
   self.connector = ko.computed(function() {
     // Fall back to first connector so that a connector is selected when we are creating a connection.

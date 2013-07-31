@@ -21,36 +21,38 @@
 <%namespace name="actionbar" file="actionbar.mako" />
 
 ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
-
+<div id="top-bar-container" class="hide">
 <div class="top-bar" data-bind="visible:shownSection() == 'jobs-list'">
   <div style="margin-top: 4px; margin-right: 20px" class="pull-right">
-    <a title="${_('Create a new job')}" href="#job/new"><i class="icon-plus-sign"></i> ${_('New job')}</a>
+    <a title="${_('Create a new job')}" href="#job/new" data-bind="visible: !isLoading()"><i class="icon-plus-sign"></i> ${_('New job')}</a>
   </div>
   <h4>${_('Sqoop Jobs')}</h4>
   <input id="filter" type="text" class="input-xlarge search-query" placeholder="${_('Search for job name or content')}"  data-bind="visible: !isLoading()">
 </div>
 
 <div class="top-bar" data-bind="visible:shownSection() == 'job-editor', with: job">
-  <!-- ko ifnot: $root.job().persisted -->
-  <h4><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> ${_('New Job')}</h4>
-  <!-- /ko -->
-  <!-- ko if: $root.job().persisted -->
-  <h4><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> <i data-bind="css:{'icon-download-alt': $root.job().type() == 'IMPORT', 'icon-upload-alt': $root.job().type() == 'EXPORT'}"></i> &nbsp;<span data-bind="text: $root.job().type"></span> <span class="muted" data-bind="editable: $root.job().name, editableOptions: {'placement': 'right'}"></span></h4>
-  <!-- /ko -->
+  <div style="margin-top: 4px; margin-right: 20px" class="pull-right">
+    <a title="${_('Create a new job')}" href="#job/new"><i class="icon-plus-sign"></i> ${_('New job')}</a>
+  </div>
+  <h4 data-bind="visible: (!$root.job().persisted())"><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> ${_('New Job')}</h4>
+  <h4 data-bind="visible: $root.job().persisted()"><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> <i data-bind="css:{'icon-download-alt': $root.job().type() == 'IMPORT', 'icon-upload-alt': $root.job().type() == 'EXPORT'}"></i> &nbsp;<span data-bind="text: $root.job().type"></span> <span class="muted" data-bind="editable: $root.job().name, editableOptions: {'placement': 'right'}"></span></h4>
 </div>
 
 <div class="top-bar" data-bind="visible:shownSection() == 'connection-editor', with: editConnection">
-  <!-- ko ifnot: persisted -->
-  <h4><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> <a href="#connection/edit-cancel" data-bind="text: $root.job().name"></a> <span class="muted">/</span> ${_('New Connection')}</h4>
-  <!-- /ko -->
-  <!-- ko if: persisted -->
-  <h4><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> <a href="#connection/edit-cancel"><i data-bind="css:{'icon-download-alt': $root.job().type() == 'IMPORT', 'icon-upload-alt': $root.job().type() == 'EXPORT'}"></i> &nbsp;<span data-bind="text: $root.job().type"></span> <span data-bind="text: $root.job().name"></span></a> <span class="muted">/</span> <span data-bind="text: name"></span></h4>
-  <!-- /ko -->
+  <h4 data-bind="visible: !persisted()"><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> <a href="#connection/edit-cancel" data-bind="text: $root.job().name"></a> <span class="muted">/</span> ${_('New Connection')}</h4>
+  <h4 data-bind="visible: persisted()"><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> <a href="#connection/edit-cancel"><i data-bind="css:{'icon-download-alt': $root.job().type() == 'IMPORT', 'icon-upload-alt': $root.job().type() == 'EXPORT'}"></i> &nbsp;<span data-bind="text: $root.job().type"></span> <span data-bind="text: $root.job().name"></span></a> <span class="muted">/</span> <span data-bind="text: name"></span></h4>
+</div>
 </div>
 
 <div class="container-fluid">
-  <div id="sqoop-error" class="row-fluid mainSection hide">
+  <div id="sqoop-error" class="row-fluid mainSection hide" style="margin-top: 30px">
     <div class="alert alert-error"><i class="icon-warning-sign"></i> <strong>${_('Sqoop error')}:</strong> <span class="message"></span></div>
+  </div>
+
+  <div class="row-fluid" data-bind="if: isLoading()">
+    <div class="span10 offset1 center" style="margin-top: 30px">
+      <i class="icon-spinner icon-spin" style="font-size: 60px; color: #DDD"></i>
+    </div>
   </div>
 
   <div id="jobs" class="row-fluid mainSection hide">
@@ -71,7 +73,7 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
               </span>
             </div>
             <div class="main" data-bind="template: {name: 'job-list-item'}"></div>
-            <div class="sqoop-progress" data-bind="style:{ width: submission().progressFormatted() }"></div>
+            <div class="sqoop-progress" data-bind="style:{ width: submission().progressFormatted() }, visible: submission().progress() > 0"></div>
           </li>
           <!-- /ko -->
 
@@ -85,12 +87,6 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
         <div class="span10 offset1 center" data-bind="if: filteredJobs().length == 0">
           <i class="icon-plus-sign waiting"></i>
           <h1 class="emptyMessage">${ _('There are currently no jobs.') }<br/>${ _('Please click on New Job to add one.') }</h1>
-        </div>
-      </div>
-
-      <div class="row-fluid" data-bind="if: isLoading">
-        <div class="span10 offset1 center">
-          <i class="icon-spinner icon-spin" style="font-size: 60px; color: #DDD"></i>
         </div>
       </div>
     </div>
@@ -171,8 +167,7 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
             <div class="job-form" data-bind="template: {'name': template(), 'data': node}">
             </div>
 
-            <div class="form-actions row-fluid">
-              <div data-bind="css: {span10: $root.job().persisted, offset2: $root.job().persisted, span12: !$root.job().persisted}">
+            <div class="form-actions">
               <!-- ko if: $parent.hasPrevious -->
               <a class="btn" data-bind="routie: 'job/edit/wizard/' + $parent.previousIndex()">${_('Back')}</a>
               &nbsp;
@@ -183,9 +178,8 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
               <!-- ko ifnot: $parent.hasNext -->
               <a class="btn" href="#job/save">${_('Save')}</a>
               &nbsp;
-              <a class="btn btn-primary" href="#job/save-and-run">${_('Save and run')}</a>
+              <a id="save-run-btn" class="btn btn-primary disable-feedback" href="#job/save-and-run">${_('Save and run')}</a>
               <!-- /ko -->
-              </div>
             </div>
           </form>
           <!-- /ko -->
@@ -252,7 +246,7 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
 <div class="modal-body"></div>
 <div class="modal-footer" data-bind="if: $root.job">
   <a class="btn" href="javascript:void(0);" data-dismiss="modal">${_('No')}</a>
-  <a data-bind="routie: {'url': 'job/delete/' + $root.job().id(), 'bubble': true}" data-dismiss="modal" class="btn btn-primary" href="javascript:void(0);">${_('Yes')}</a>
+  <a data-bind="routie: {'url': 'job/delete/' + $root.job().id(), 'bubble': true}" data-dismiss="modal" class="btn btn-danger" href="javascript:void(0);">${_('Yes, delete it')}</a>
 </div>
 </script>
 
@@ -264,7 +258,7 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
 <div class="modal-body"></div>
 <div class="modal-footer" data-bind="if: $root.connection">
   <a class="btn" href="javascript:void(0);" data-dismiss="modal">${_('No')}</a>
-  <a data-bind="routie: {'url': 'connection/delete/' + $root.connection().id(), 'bubble': true}" data-dismiss="modal" class="btn btn-primary" href="javascript:void(0);">${_('Yes')}</a>
+  <a data-bind="routie: {'url': 'connection/delete/' + $root.connection().id(), 'bubble': true}" data-dismiss="modal" class="btn btn-danger" href="javascript:void(0);">${_('Yes, delete it')}</a>
 </div>
 </script>
 
@@ -418,8 +412,7 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
                 }" class="control-group">
   <label class="control-label" data-bind="text: $root.label('framework', name())" rel="tooltip"></label>
   <div class="controls">
-    <input class="input-xxlarge" data-bind="value: value, attr: { 'type': (sensitive() ? 'password' : 'text'), 'name': name, 'title': $root.help('framework', name()) }" rel="tooltip">
-    <button class="btn fileChooserBtn" data-bind="click: $root.showFileChooser">..</button>
+    <input class="input-xxlarge pathChooser" data-bind="value: value, attr: { 'type': (sensitive() ? 'password' : 'text'), 'name': name, 'title': $root.help('framework', name()) }" rel="tooltip"><button class="btn fileChooserBtn" data-bind="click: $root.showFileChooser">..</button>
     <span data-bind="template: { 'name': 'job-editor-form-field-error' }" class="help-inline"></span>
   </div>
 </div>
@@ -633,17 +626,27 @@ function handle_form_errors(e, node, options, data) {
   }
 }
 
+$(document).on('notloading', function(e) { // fixes problem with too fast rendering engines that display chunks of html before KO bindings
+  if ($("#top-bar-container").hasClass("hide")){
+    $("#top-bar-container").removeClass("hide");
+  }
+});
+
 $(document).on('connection_error.jobs', function(e, name, options, jqXHR) {
   $('#sqoop-error .message').text("${ _('Cannot connect to sqoop server.') }");
   routie('error');
+});
+
+$(document).on('start.job', function(e, options, job) {
+  $.jHueNotify.info("${ _('The job is starting...') }");
 });
 
 $(document).on('started.job', function(e, job, options, submission_dict) {
   $.jHueNotify.info("${ _('Started job.') }");
 });
 
-$(document).on('start_fail.job', function(e, job, options, message) {
-  $.jHueNotify.error("${ _('Could not start job: ') }" + message);
+$(document).on('start_fail.job', function(e, job, options, error) {
+  $.jHueNotify.error("${ _('Error: ') }" + (typeof error.exception != "undefined" ? error.exception : error));
 });
 
 $(document).on('stopped.job', function(e, job, options, submission_dict) {
@@ -702,7 +705,31 @@ var framework = new framework.Framework();
 
 //// Routes
 $(document).ready(function () {
-  window.location.hash = 'jobs';
+  function isAllowedRefreshHash(hash){
+    var _allowedRefresh = ["job/edit/\\d", "job/new?", "job/run/\\d"];
+    for (var i=0;i<_allowedRefresh.length;i++){
+      if (hash.match(_allowedRefresh[i]) != null){
+        return true;
+      }
+    }
+    return false;
+  }
+
+  if (window.location.hash == "" || !isAllowedRefreshHash(window.location.hash)){
+    window.location.hash = 'jobs';
+  }
+
+  function retryUntilLoaded(fn) {
+    var _args = arguments;
+    if (viewModel.isLoading()) {
+      window.setTimeout(function () {
+        retryUntilLoaded(_args[0]);
+      }, 200);
+    } else {
+      fn.apply(this, _args[0]);
+    }
+  }
+
   routie({
     "error": function() {
       showMainSection("sqoop-error");
@@ -731,17 +758,21 @@ $(document).ready(function () {
       });
     },
     "job/edit/:id": function(id) {
-      viewModel.chooseJobById(id);
-      showSection("jobs", "job-editor");
-      $("*[rel=tooltip]").tooltip({
-        placement: 'right'
+      retryUntilLoaded(function () {
+        viewModel.chooseJobById(id);
+        showSection("jobs", "job-editor");
+        $("*[rel=tooltip]").tooltip({
+          placement: 'right'
+        });
       });
     },
-    "job/new": function() {
-      viewModel.newJob("${_('Untitled Job')}");
-      showSection("jobs", "job-editor");
-      $("*[rel=tooltip]").tooltip({
-        placement: 'right'
+    "job/new": function () {
+      retryUntilLoaded(function () {
+        viewModel.newJob("${_('Untitled Job')}");
+        showSection("jobs", "job-editor");
+        $("*[rel=tooltip]").tooltip({
+          placement: 'right'
+        });
       });
     },
     "job/save": function() {
@@ -759,12 +790,16 @@ $(document).ready(function () {
       }
       routie('jobs');
     },
-    "job/run/:id": function(id) {
-      viewModel.chooseJobById(id);
-      viewModel.job().start();
-      routie('jobs');
+    "job/run/:id": function (id) {
+      retryUntilLoaded(function () {
+        viewModel.chooseJobById(id);
+        viewModel.job().start();
+        routie('jobs');
+      });
     },
     "job/save-and-run": function() {
+      $("#save-run-btn").attr("data-loading-text", $("#save-run-btn").text() + " ...");
+      $("#save-run-btn").button("loading");
       viewModel.saveJob();
       $(document).one('saved.job', function(e, node, options, data) {
         var options = $.extend(true, {}, node.options);
