@@ -175,7 +175,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
       <div class="modal-body controls">
         <input type="hidden" name="cluster" data-bind="value:app.cluster"/>
         <label>${_('Table Name')}:</label> <input name="tableName" placeholder="MyTable" type="text"/>
-        <label>${_('Column Families')}:</label> <!-- clean up later -->
+        <label>${_('Column Families')}:</label>
         <ul>
           <li><input type="text" name="table_columns" placeholder="family_name"></li>
         </ul>

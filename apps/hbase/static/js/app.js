@@ -215,7 +215,7 @@ $('form.ajaxSubmit').submit(bindSubmit).on('hidden', function() {
 });
 
 $('a.action_addColumn').click(function() {
-  $(this).parent().find("ul").append("<li><input type=\"text\" name=\"table_columns\" placeholder = \"family:column_name\"/></li>")
+  $(this).parent().find("ul").append("<li><input type=\"text\" name=\"table_columns\" placeholder = \"family_name\"/></li>")
 });
 $('a.action_addColumnValue').click(function() {
   $(this).parent().find("ul").append("<li><input type=\"text\" name=\"column_values\" class=\"ignore\" placeholder = \"family:column_name\"/> <input type=\"text\" name=\"column_values\" class=\"ignore\" placeholder = \"cell_value\"/></li>")
