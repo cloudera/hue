@@ -121,3 +121,10 @@
 .unsaved {
   border-bottom: 1px solid #C63D37;
 }
+
+.editorError {
+  color: #B94A48;
+  background-color: #F2DEDE;
+  padding: 4px;
+  font-size: 11px;
+}
