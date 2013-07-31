@@ -91,13 +91,13 @@ def get_metastore():
     else:
       use_sasl = str(get_conf().get(_CNF_METASTORE_SASL, 'false')).lower() == 'true'
       thrift_uri = thrift_uris.split(",")[0]
-      host, port = 'undefined', '0'
+      host, port = socket.getfqdn(), '0'
       match = _THRIFT_URI_RE.match(thrift_uri)
       if not match:
         LOG.fatal('Cannot understand remote metastore uri "%s"' % thrift_uri)
       else:
         host, port = match.groups()
-      kerberos_principal = security_util.get_kerberos_principal(get_conf().get(_CNF_METASTORE_KERBEROS_PRINCIPAL, None), socket.getfqdn())
+      kerberos_principal = security_util.get_kerberos_principal(get_conf().get(_CNF_METASTORE_KERBEROS_PRINCIPAL, None), host)
 
     kerberos_principal_components = security_util.get_components(kerberos_principal)
     if use_sasl and len(kerberos_principal_components) == 3:
