@@ -1324,7 +1324,7 @@ def test_hive_site():
     assert_not_equal(port, 9999)
     assert_not_equal(kerberos_principal, 'test/test.com@TEST.COM')
     assert_equal(beeswax.hive_site.get_conf()['hive.metastore.warehouse.dir'], u'/abc')
-    assert_equal(beeswax.hive_site.get_hiveserver2_kerberos_principal(), 'hs2test/test.com@TEST.COM')
+    assert_equal(beeswax.hive_site.get_hiveserver2_kerberos_principal('localhost'), 'hs2test/test.com@TEST.COM')
     assert_equal(beeswax.hive_site.get_hiveserver2_authentication(), 'NONE')
   finally:
     beeswax.hive_site.reset()
@@ -1332,8 +1332,9 @@ def test_hive_site():
       beeswax.conf.BEESWAX_HIVE_CONF_DIR = saved
     shutil.rmtree(tmpdir)
 
-def test_hive_site_host_pattern():
+def test_hive_site_host_pattern_local_host():
   """Test hive-site parsing"""
+  hostname = socket.getfqdn()
   tmpdir = tempfile.mkdtemp()
   saved = None
   try:
@@ -1342,21 +1343,64 @@ def test_hive_site_host_pattern():
       def get(self):
         return tmpdir
 
-    thrift_uris = 'thrift://%s:9999' % socket.getfqdn()
-    xml = hive_site_xml(is_local=False, use_sasl=False, thrift_uris=thrift_uris, kerberos_principal='test/_HOST@TEST.COM')
+    thrift_uris = 'thrift://%s:9999' % hostname
+    xml = hive_site_xml(is_local=False, use_sasl=False, thrift_uris=thrift_uris, kerberos_principal='test/_HOST@TEST.COM', hs2_kerberos_principal='test/_HOST@TEST.COM')
     file(os.path.join(tmpdir, 'hive-site.xml'), 'w').write(xml)
 
     beeswax.hive_site.reset()
     saved = beeswax.conf.BEESWAX_HIVE_CONF_DIR
     beeswax.conf.BEESWAX_HIVE_CONF_DIR = Getter()
 
+    reset = []
+    reset.append(beeswax.conf.BEESWAX_SERVER_HOST.set_for_testing(hostname))
+
     is_local, host, port, kerberos_principal = beeswax.hive_site.get_metastore()
     assert_false(is_local)
-    assert_equal(host, socket.getfqdn())
+    assert_equal(host, hostname)
     assert_equal(port, 9999)
     assert_equal(beeswax.hive_site.get_conf()['hive.metastore.warehouse.dir'], u'/abc')
     assert_equal(kerberos_principal, 'test/' + socket.getfqdn().lower() + '@TEST.COM')
+    assert_equal(beeswax.hive_site.get_hiveserver2_kerberos_principal(hostname), 'test/' + socket.getfqdn().lower() + '@TEST.COM')
   finally:
+    for finish in reset:
+      finish()
+    beeswax.hive_site.reset()
+    if saved is not None:
+      beeswax.conf.BEESWAX_HIVE_CONF_DIR = saved
+    shutil.rmtree(tmpdir)
+
+def test_hive_site_host_pattern_remote_host():
+  """Test hive-site parsing"""
+  hostname = 'darkside-12345'
+  tmpdir = tempfile.mkdtemp()
+  saved = None
+  try:
+    # We just replace the Beeswax conf variable
+    class Getter(object):
+      def get(self):
+        return tmpdir
+
+    thrift_uris = 'thrift://%s:9999' % hostname
+    xml = hive_site_xml(is_local=False, use_sasl=False, thrift_uris=thrift_uris, kerberos_principal='test/_HOST@TEST.COM', hs2_kerberos_principal='test/_HOST@TEST.COM')
+    file(os.path.join(tmpdir, 'hive-site.xml'), 'w').write(xml)
+
+    beeswax.hive_site.reset()
+    saved = beeswax.conf.BEESWAX_HIVE_CONF_DIR
+    beeswax.conf.BEESWAX_HIVE_CONF_DIR = Getter()
+
+    reset = []
+    reset.append(beeswax.conf.BEESWAX_SERVER_HOST.set_for_testing(hostname))
+
+    is_local, host, port, kerberos_principal = beeswax.hive_site.get_metastore()
+    assert_false(is_local)
+    assert_equal(host, hostname)
+    assert_equal(port, 9999)
+    assert_equal(beeswax.hive_site.get_conf()['hive.metastore.warehouse.dir'], u'/abc')
+    assert_equal(kerberos_principal, 'test/%s@TEST.COM' % hostname)
+    assert_equal(beeswax.hive_site.get_hiveserver2_kerberos_principal(hostname), 'test/%s@TEST.COM' % hostname)
+  finally:
+    for finish in reset:
+      finish()
     beeswax.hive_site.reset()
     if saved is not None:
       beeswax.conf.BEESWAX_HIVE_CONF_DIR = saved
@@ -1447,6 +1491,39 @@ def test_hive_site_local_metastore():
   finally:
     for finish in reset:
       finish()
+    beeswax.hive_site.reset()
+    if saved is not None:
+      beeswax.conf.BEESWAX_HIVE_CONF_DIR = saved
+    shutil.rmtree(tmpdir)
+
+
+def test_hive_site_null_hs2krb():
+  """Test hive-site parsing with null hs2 kerberos principal"""
+  tmpdir = tempfile.mkdtemp()
+  saved = None
+  try:
+    # We just replace the Beeswax conf variable
+    class Getter(object):
+      def get(self):
+        return tmpdir
+
+    xml = hive_site_xml(is_local=True, use_sasl=False, hs2_kerberos_principal=None)
+    file(os.path.join(tmpdir, 'hive-site.xml'), 'w').write(xml)
+
+    beeswax.hive_site.reset()
+    saved = beeswax.conf.BEESWAX_HIVE_CONF_DIR
+    beeswax.conf.BEESWAX_HIVE_CONF_DIR = Getter()
+
+    is_local, host, port, kerberos_principal = beeswax.hive_site.get_metastore()
+    assert_true(is_local)
+    # Local so don't use hive-site.xml
+    assert_not_equal(host, 'darkside-1234')
+    assert_not_equal(port, 9999)
+    assert_not_equal(kerberos_principal, 'test/test.com@TEST.COM')
+    assert_equal(beeswax.hive_site.get_conf()['hive.metastore.warehouse.dir'], u'/abc')
+    assert_equal(beeswax.hive_site.get_hiveserver2_kerberos_principal('localhost'), None)
+    assert_equal(beeswax.hive_site.get_hiveserver2_authentication(), 'NONE')
+  finally:
     beeswax.hive_site.reset()
     if saved is not None:
       beeswax.conf.BEESWAX_HIVE_CONF_DIR = saved
@@ -1700,6 +1777,16 @@ def hive_site_xml(is_local=False, use_sasl=False, thrift_uris='thrift://darkside
   else:
     uris = ''
 
+  if hs2_kerberos_principal:
+    hs2_krb_princ = """
+      <property>
+        <name>hive.server2.authentication.kerberos.principal</name>
+        <value>%(hs2_kerberos_principal)s</value>
+      </property>
+    """ % {'hs2_kerberos_principal': hs2_kerberos_principal}
+  else:
+    hs2_krb_princ = ""
+
   return """
     <configuration>
       %(uris)s
@@ -1713,10 +1800,7 @@ def hive_site_xml(is_local=False, use_sasl=False, thrift_uris='thrift://darkside
         <value>%(kerberos_principal)s</value>
       </property>
 
-      <property>
-        <name>hive.server2.authentication.kerberos.principal</name>
-        <value>%(hs2_kerberos_principal)s</value>
-      </property>
+      %(hs2_krb_princ)s
 
       <property>
         <name>hive.server2.enable.impersonation</name>
@@ -1737,7 +1821,7 @@ def hive_site_xml(is_local=False, use_sasl=False, thrift_uris='thrift://darkside
     'uris': uris,
     'warehouse_dir': warehouse_dir,
     'kerberos_principal': kerberos_principal,
-    'hs2_kerberos_principal': hs2_kerberos_principal,
+    'hs2_krb_princ': hs2_krb_princ,
     'hs2_authentication': hs2_authentication,
     'use_sasl': str(use_sasl).lower(),
     'hs2_impersonation': hs2_impersonation,

@@ -107,8 +107,19 @@ def get_metastore():
   return _METASTORE_LOC_CACHE
 
 
-def get_hiveserver2_kerberos_principal():
-  return security_util.get_kerberos_principal(get_conf().get(_CNF_HIVESERVER2_KERBEROS_PRINCIPAL, None), socket.getfqdn())
+def get_hiveserver2_kerberos_principal(hostname_or_ip):
+  """
+  Retrieves principal for HiveServer 2.
+
+  Raises socket.herror
+  """
+  fqdn = security_util.get_fqdn(hostname_or_ip)
+  # Get kerberos principal and replace host pattern
+  principal = get_conf().get(_CNF_HIVESERVER2_KERBEROS_PRINCIPAL, None)
+  if principal:
+    return security_util.get_kerberos_principal(principal, fqdn)
+  else:
+    return None
 
 def get_hiveserver2_authentication():
   return get_conf().get(_CNF_HIVESERVER2_AUTHENTICATION, 'NONE').upper() # NONE == PLAIN SASL
