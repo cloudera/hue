@@ -207,11 +207,12 @@ function bindSubmit() {
   }).success(function() {
     if(ui)
       app.focusModel().reload();
-    $(self).modal('hide').trigger('reset');
   });
   return false;
 }
-$('form.ajaxSubmit').submit(bindSubmit);
+$('form.ajaxSubmit').submit(bindSubmit).on('hidden', function() {
+  $(this).trigger('reset');
+});
 
 $('a.action_addColumn').click(function() {
   $(this).parent().find("ul").append("<li><input type=\"text\" name=\"table_columns\" placeholder = \"family:column_name\"/></li>")
