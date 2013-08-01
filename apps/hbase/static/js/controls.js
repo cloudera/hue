@@ -271,14 +271,17 @@ var SmartViewDataRow = function(options) {
       'Column Name': function(a, b) {
         return a.name.split(':')[1].localeCompare(b.name.split(':')[1]);
       },
-      'Cell Value': function(a, b) {
-        a = a.value.length;
-        b = b.value.length;
+      'Cell Size': function(a, b) {
+        a = a.value().length;
+        b = b.value().length;
         if(a > b)
           return 1;
         if(a < b)
           return -1;
         return 0;
+      },
+      'Cell Value': function(a, b) {
+        return a.value().localeCompare(b.value());
       },
       'Timestamp': function(a, b) {
         a = parseInt(a.timestamp);
@@ -288,9 +291,6 @@ var SmartViewDataRow = function(options) {
         if(a < b)
           return -1;
         return 0;
-      },
-      'MIME Type': function() {
-
       },
       'Column Name Length': function(a, b) {
         a = a.name.split(':')[1].length;
