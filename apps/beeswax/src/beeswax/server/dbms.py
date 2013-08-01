@@ -73,7 +73,7 @@ def get_query_server_config(name='beeswax'):
     }
   else:
     if SERVER_INTERFACE.get() == 'hiveserver2':
-      kerberos_principal = hive_site.get_hiveserver2_kerberos_principal()
+      kerberos_principal = hive_site.get_hiveserver2_kerberos_principal(BEESWAX_SERVER_HOST.get())
     else:
       # Beeswaxd runs as 'hue'
       kerberos_principal = KERBEROS.HUE_PRINCIPAL.get()

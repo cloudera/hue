@@ -51,4 +51,16 @@ def replace_hostname_pattern(components, host):
   return '%s/%s@%s' % (components[0], fqdn.lower(), components[2])
 
 def get_localhost_name():
-  return socket.get_localhost()
+  return socket.getfqdn()
+
+def get_fqdn(hostname_or_ip):
+  # Get hostname
+  try:
+    fqdn = socket.gethostbyaddr(hostname_or_ip)[0]
+  except:
+    fqdn = hostname_or_ip
+
+  if fqdn == 'localhost':
+    fqdn = get_localhost_name()
+
+  return fqdn
