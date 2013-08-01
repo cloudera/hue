@@ -24,10 +24,10 @@ var searchRenderers = {
         'prefix': { select: /[^\*]+\*/g, tag: /\*/g},
         'filter': {
           select: /\{[^\{\}]+\}/,
-          tag:/.+/g,
+          tag:/[^\{\}]+/g,
           nested: {
             'linker': {
-              select: /AND|OR|SKIP|WHILE/g,
+              select: /\ (AND|OR|SKIP|WHILE)\ /g,
               tag: /.+/g
             }/*,
             'compare_op': {
@@ -562,6 +562,7 @@ var tagsearch = function() {
   self.mode = ko.observable('idle');
   self.cur_input = ko.observable('');
   self.submitted = ko.observable(false);
+  self.filters = ["KeyOnlyFilter ()", "FirstKeyOnlyFilter ()", "PrefixFilter (‘row_prefix’)", "ColumnPrefixFilter(‘column_prefix’)", "MultipleColumnPrefixFilter(‘column_prefix’, ‘column_prefix’, …, ‘column_prefix’)", "ColumnCountGetFilter (‘limit’)", "PageFilter (‘page_size’)", "ColumnPaginationFilter(‘limit’, ‘offest')", "InclusiveStopFilter(‘stop_row_key’)", "TimeStampsFilter (timestamp, timestamp, ... ,timestamp)", "RowFilter (compareOp, ‘row_comparator’)", "QualifierFilter (compareOp, ‘qualifier_comparator’)", "QualifierFilter (compareOp,‘qualifier_comparator’)", "ValueFilter (compareOp,‘value_comparator’)", "DependentColumnFilter (‘family’, ‘qualifier’, boolean, compare operator, ‘value comparator’)", "DependentColumnFilter (‘family’, ‘qualifier’, boolean)", "DependentColumnFilter (‘family’, ‘qualifier’)", "SingleColumnValueFilter(‘family’, ‘qualifier’, compare operator, ‘comparator’, filterIfColumnMissing_boolean, latest_version_boolean)", "SingleColumnValueFilter(‘family’, ‘qualifier, compare operator, ‘comparator’)", "SingleColumnValueExcludeFilter('family', 'qualifier', compare operator, 'comparator', latest_version_boolean, filterIfColumnMissing_boolean)", "SingleColumnValueExcludeFilter('family', 'qualifier', compare operator, 'comparator')", "ColumnRangeFilter (‘minColumn’, minColumnInclusive_bool, ‘maxColumn’, maxColumnInclusive_bool)"];
   self.hints = ko.observableArray([ {
       hint: 'End Query',
       shortcut: ',',
@@ -640,6 +641,7 @@ var tagsearch = function() {
 
   self.modeQueue = ['idle'];
   self.focused = ko.observable(false);
+  self.activeSuggestions = ko.observableArray();
 
   self.insertTag = function(tag) {
     var mode = tag.indexOf('+') != -1 ? 'scan' : 'rowkey';
@@ -674,7 +676,7 @@ var tagsearch = function() {
       self.mode('idle');
       return;
     }
-    var tokens = "[]+,*{}";
+    var tokens = "[]+*{}";
     var m = 'rowkey';
     for(var i=selection.length - 1; i>=0; i--) {
       if(tokens.indexOf(selection[i]) != -1) {
@@ -698,17 +700,27 @@ var tagsearch = function() {
   self.selectionEnd = ko.observable(0);
 
   self.hintText = ko.computed(function() {
-    var value = self.cur_input();
-    var selection = value.slice(0, self.selectionEnd());
-    var index = selection.lastIndexOf(',') + 1;
-    var endindex = value.slice(index).indexOf(',');
-    endindex = endindex == -1 ? value.length : endindex;
-    var pre = value.substring(index, index + endindex);
-    var s = self.selectionStart() - index, e = self.selectionEnd() - index;
-    if(s == e)
-      e += 1;
-    s = s < 0 ? 0 : s;
-    e = e > pre.length ? pre.length : e;
+    var pre, s, e;
+    try {
+      var r = window.getSelection().getRangeAt(0);
+      pre = r.startContainer.nodeValue;
+      s = r.startOffset;
+      e = r.endOffset;
+      return pre.slice(0, s) + "<span class='selection'>" + pre.slice(s, e) + "</span>" + pre.slice(e);
+    } catch (e) {
+      var value = self.cur_input();
+      var selection = value.slice(0, self.selectionEnd());
+      var index = selection.lastIndexOf(',') + 1;
+      var endindex = value.slice(index).indexOf(',');
+      endindex = endindex == -1 ? value.length : endindex;
+      pre = value.substring(index, index + endindex);
+      s = self.selectionStart() - index;
+      e = self.selectionEnd() - index;
+      if(s == e)
+        e += 1;
+      s = s < 0 ? 0 : s;
+      e = e > pre.length ? pre.length : e;
+    }
     return pre.slice(0, s) + "<span class='selection'>" + pre.slice(s, e) + "</span>" + pre.slice(e);
   });
 
@@ -723,12 +735,32 @@ var tagsearch = function() {
 
   self.updateMenu = function() {
     try{
-    	var pos = getEditablePosition(document.getElementById('search-tags'));
-	  	self.selectionStart(pos);
-	  	self.selectionEnd(pos);
+      var pos = getEditablePosition(document.getElementById('search-tags'));
+      self.selectionStart(pos);
+      self.selectionEnd(pos);
     } catch (err) {}
-	self.updateMode(self.cur_input());
+	  self.updateMode(self.cur_input());
+    self.updateSuggestions();
   };
+
+  self.replaceFocusNode = function(text) {
+    window.getSelection().getRangeAt(0).startContainer.nodeValue = text;
+  };
+
+  self.updateSuggestions = function() {
+    var val = window.getSelection().getRangeAt(0).startContainer.nodeValue;
+    switch(self.mode()) {
+      case 'filter':
+        var focus = val.replace(/\{|\}|\s|&[^;]+?;/g,"").split(/(AND|OR|SKIP|WHILE)/).slice(-1)[0];
+        self.activeSuggestions(self.filters.filter(function(a) {
+          return a.replace(" ","").indexOf(focus) != -1;
+        }));
+        return;
+      default:
+        self.activeSuggestions([]);
+        return;
+    }
+  }
 
   self.evaluate = function() {
     table_search(self.cur_input());

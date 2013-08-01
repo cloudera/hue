@@ -205,6 +205,10 @@ ${ commonheader(None, "hbase", user) | n,unicode }
             <!-- ko foreach: search.activeHints() -->
             <li data-bind="event: { mousedown: function(){app.search.cur_input(app.search.cur_input() + $data.shortcut);} }, css: {active: self.activeHint}"><a><span data-bind="text: $data.hint"></span> <code class="pull-right" data-bind="text: $data.shortcut"></code></a></li>
             <!-- /ko -->
+            <li class="search-suggestion-header" data-bind="visible: search.activeSuggestions().length > 0"><a>${_('Autocomplete Suggestions:')}</a></li>
+            <!-- ko foreach: search.activeSuggestions() -->
+            <li class="search-suggestion" data-bind="event: { mousedown: app.search.replaceFocusNode.bind(null, $data) }"><a><span data-bind="text: $data"></span></a></li>
+            <!-- /ko -->
           </ul>
           <button class="btn btn-primary add-on" data-bind="enabled: !search.submitted(), click: search.evaluate.bind(null)"><i class="icon-search"></i></button>
           <span id="column-family-selectors">

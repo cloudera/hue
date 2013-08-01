@@ -578,3 +578,27 @@ textarea {
 	color: #777;
 	text-decoration: none;
 }
+
+#search-typeahead .search-suggestion a
+{
+	color: #eee;
+	background: #333;
+	border-color: #777;
+}
+
+#search-typeahead .search-suggestion-header a
+{
+	padding: 5px;
+	color: #4DB8EA;
+	font-weight: bold;
+	background: #292b2d; /* Old browsers */
+	background: -moz-linear-gradient(top,  #292b2d 0%, #000000 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#292b2d), color-stop(100%,#000000)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  #292b2d 0%,#000000 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  #292b2d 0%,#000000 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  #292b2d 0%,#000000 100%); /* IE10+ */
+	background: linear-gradient(to bottom,  #292b2d 0%,#000000 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#292b2d', endColorstr='#000000',GradientType=0 ); /* IE6-9 */
+	border-color: #333;
+	box-shadow: 0px 3px 5px rgba(0,0,0,.3);
+}
