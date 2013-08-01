@@ -16,6 +16,7 @@
 <%!
   from desktop.views import commonheader, commonfooter
   from django.utils.translation import ugettext as _
+  from django.core.urlresolvers import reverse
 %>
 
 <%namespace name="actionbar" file="actionbar.mako" />
@@ -412,7 +413,7 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
                 }" class="control-group">
   <label class="control-label" data-bind="text: $root.label('framework', name())" rel="tooltip"></label>
   <div class="controls">
-    <input class="input-xxlarge pathChooser" data-bind="value: value, attr: { 'type': (sensitive() ? 'password' : 'text'), 'name': name, 'title': $root.help('framework', name()) }" rel="tooltip"><button class="btn fileChooserBtn" data-bind="click: $root.showFileChooser">..</button>
+    <input data-bind="css: {'input-xxlarge': name != '', 'pathChooser': name != '', 'pathChooserExport': $root.job().type() == 'EXPORT'}, value: value, attr: { 'type': (sensitive() ? 'password' : 'text'), 'name': name, 'title': $root.help('framework', name()) }" rel="tooltip"><button class="btn fileChooserBtn" data-bind="click: $root.showFileChooser">..</button>
     <span data-bind="template: { 'name': 'job-editor-form-field-error' }" class="help-inline"></span>
   </div>
 </div>
@@ -543,6 +544,9 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
 <link href="/sqoop/static/css/sqoop.css" rel="stylesheet">
 
 <script type="text/javascript" charset="utf-8">
+
+var FB_STAT = '${reverse('filebrowser.views.stat', kwargs={'path': '/'})}';
+
 //// Job Wizard
 viewModel.job.subscribe(function(job) {
   if (job) {
@@ -705,6 +709,38 @@ var framework = new framework.Framework();
 
 //// Routes
 $(document).ready(function () {
+  $(document).on("blur", ".pathChooserExport", function () {
+    var _fld = $(this);
+    if (_fld.val().trim() != "") {
+      $.ajax({
+        type: "GET",
+        url: FB_STAT + _fld.val().trim(),
+        dataType: "json",
+        success: function (results) {
+          _fld.parents(".control-group").removeClass("warning");
+          $(".tooltip").remove();
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+          _fld.parents(".control-group").addClass("warning");
+          _fld.parents(".control-group").tooltip({
+            placement: "top",
+            trigger: "manual",
+            title: "${ _('Watch out! This path currently does not exist.') }"
+          }).tooltip("show");
+          $(".tooltip").css("left", $(".tooltip").position().left - 200);
+          window.setTimeout(function () {
+            $(".tooltip").remove();
+          }, 5000);
+        }
+      });
+    }
+  });
+
+  $(document).on("focus", ".pathChooserExport", function () {
+    $(this).parents(".control-group").removeClass("warning");
+    $(".tooltip").remove();
+  });
+
   function isAllowedRefreshHash(hash){
     var _allowedRefresh = ["job/edit/\\d", "job/new?", "job/run/\\d"];
     for (var i=0;i<_allowedRefresh.length;i++){
