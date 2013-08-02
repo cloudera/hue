@@ -142,6 +142,7 @@ class HiveServerTRowSet:
 
 class HiveServerDataTable(DataTable):
   def __init__(self, results, schema):
+    print results, schema
     self.schema = schema and schema.schema
     self.row_set = HiveServerTRowSet(results.results, schema)
     self.has_more = not self.row_set.is_empty()    # Should be results.hasMoreRows but always True in HS2
@@ -271,7 +272,7 @@ class HiveServerClient:
                                           use_sasl=use_sasl,
                                           mechanism=mechanism,
                                           username=user.username,
-                                          timeout_seconds=conf.BEESWAX_SERVER_CONN_TIMEOUT.get())
+                                          timeout_seconds=conf.SERVER_CONN_TIMEOUT.get())
 
 
   @classmethod
@@ -632,10 +633,6 @@ class HiveServerClientCompatible:
     return 'Does not exist in HS2'
 
 
-  def echo(self, msg):
-    return 'Does not exist in HS2'
-
-
   def get_log(self, handle):
     operationHandle = handle.get_rpc_handle()
     return self._client.get_log(operationHandle)
@@ -671,6 +668,10 @@ class HiveServerClientCompatible:
 
 
   def alter_table(self, dbname, tbl_name, new_tbl): raise NotImplementedError()
+
+
+  def open_session(self, user):
+    return self._client.open_session(user)
 
 
   def add_partition(self, new_part): raise NotImplementedError()

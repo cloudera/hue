@@ -24,15 +24,13 @@ from django.shortcuts import redirect
 from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext as _
 
-from beeswaxd.ttypes import BeeswaxException
-from desktop.conf import KERBEROS
-from filebrowser.views import location_to_url
-
 from beeswax import hive_site
-from beeswax.conf import BEESWAX_SERVER_HOST, BEESWAX_SERVER_PORT,\
-  BROWSE_PARTITIONED_TABLE_LIMIT, SERVER_INTERFACE
+from beeswax.conf import HIVE_SERVER_HOST, HIVE_SERVER_PORT,\
+  BROWSE_PARTITIONED_TABLE_LIMIT
 from beeswax.design import hql_query
 from beeswax.models import QueryHistory, HIVE_SERVER2, BEESWAX
+
+from filebrowser.views import location_to_url
 from desktop.lib.django_util import format_preserving_redirect
 from desktop.lib.exceptions_renderable import PopupException
 
@@ -43,46 +41,30 @@ LOG = logging.getLogger(__name__)
 def get(user, query_server=None):
   # Avoid circular dependency
   from beeswax.server.hive_server2_lib import HiveServerClientCompatible, HiveServerClient
-  from beeswax.server.beeswax_lib import BeeswaxClient
 
   if query_server is None:
     query_server = get_query_server_config()
 
-  if query_server['server_interface'] == HIVE_SERVER2:
-    return Dbms(HiveServerClientCompatible(HiveServerClient(query_server, user)), QueryHistory.SERVER_TYPE[1][0])
-  else:
-    return Dbms(BeeswaxClient(query_server, user), QueryHistory.SERVER_TYPE[0][0])
-
+  return Dbms(HiveServerClientCompatible(HiveServerClient(query_server, user)), QueryHistory.SERVER_TYPE[1][0])
 
 
 def get_query_server_config(name='beeswax'):
   if name == 'impala':
-    from impala.conf import SERVER_HOST, SERVER_PORT, IMPALA_PRINCIPAL, SERVER_INTERFACE as IMPALA_SERVER_INTERFACE
-    # Backward compatibility until Hue 3.0
-    # If no interface specified and port is beeswax, switch port to HS2 default as we want to use HS2 from now on
-    if IMPALA_SERVER_INTERFACE.get() == 'hiveserver2' and SERVER_PORT.get() == 21000:
-      port = 21050
-    else:
-      port = SERVER_PORT.get()
+    from impala.conf import SERVER_HOST as IMPALA_SERVER_HOST, SERVER_PORT as IMPALA_SERVER_PORT, IMPALA_PRINCIPAL
+
     query_server = {
         'server_name': 'impala',
-        'server_host': SERVER_HOST.get(),
-        'server_port': port,
-        'server_interface': IMPALA_SERVER_INTERFACE.get(),
+        'server_host': IMPALA_SERVER_HOST.get(),
+        'server_port': IMPALA_SERVER_PORT.get(),
         'principal': IMPALA_PRINCIPAL.get(),
     }
   else:
-    if SERVER_INTERFACE.get() == 'hiveserver2':
-      kerberos_principal = hive_site.get_hiveserver2_kerberos_principal(BEESWAX_SERVER_HOST.get())
-    else:
-      # Beeswaxd runs as 'hue'
-      kerberos_principal = KERBEROS.HUE_PRINCIPAL.get()
+    kerberos_principal = hive_site.get_hiveserver2_kerberos_principal(HIVE_SERVER_HOST.get())
 
     query_server = {
-        'server_name': 'beeswax', # Aka HS2 too
-        'server_host': BEESWAX_SERVER_HOST.get(),
-        'server_port': BEESWAX_SERVER_PORT.get(),
-        'server_interface': SERVER_INTERFACE.get(),
+        'server_name': 'beeswax', # Aka HiveServer2 now
+        'server_host': HIVE_SERVER_HOST.get(),
+        'server_port': HIVE_SERVER_PORT.get(),
         'principal': kerberos_principal
     }
     LOG.debug("Query Server: %s" % query_server)
@@ -153,6 +135,8 @@ class Dbms:
 
     return self.client.close_operation(query_handle)
 
+  def open_session(self, user):
+    return self.client.open_session(user)
 
   def cancel_operation(self, query_handle):
     resp = self.client.cancel_operation(query_handle)
@@ -303,11 +287,9 @@ class Dbms:
 
 
   def use(self, database):
-    """Beeswax interface does not support use directly."""
-    if self.server_type == HIVE_SERVER2:
-      query = hql_query('USE %s' % database)
-      self.client.query(query)
-      # TODO sync + close query
+    query = hql_query('USE %s' % database)
+    self.client.query(query)
+    # TODO sync + close query
 
   def get_log(self, query_handle):
     return self.client.get_log(query_handle)
@@ -372,8 +354,8 @@ class Dbms:
       if not handle.is_valid():
         msg = _("Server returning invalid handle for query id %(id)d [%(query)s]...") % \
               {'id': query_history.id, 'query': query[:40]}
-        raise BeeswaxException(msg)
-    except BeeswaxException, ex: # TODO HS2
+        raise QueryServerException(msg)
+    except QueryServerException, ex:
       LOG.exception(ex)
       # Kind of expected (hql compile/syntax error, etc.)
       if hasattr(ex, 'handle') and ex.handle:
@@ -429,10 +411,6 @@ class Dbms:
 
   def explain(self, statement):
     return self.client.explain(statement)
-
-
-  def echo(self, text):
-    return self.client.echo(text)
 
 
   def getStatus(self):

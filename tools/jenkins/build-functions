@@ -66,6 +66,7 @@ build_hadoop() {
   # For MR1
   rm -f "$HADOOP_DIR/${CDH_VERSION}/share/hadoop/mapreduce"
   ln -sf "mapreduce1" "$HADOOP_DIR/${CDH_VERSION}/share/hadoop/mapreduce"
+  ln -s $HADOOP_DIR/${CDH_VERSION} $HADOOP_DIR/hadoop
 }
 
 ##########
@@ -90,6 +91,7 @@ build_hive() {
   rm -rf $HIVE_HOME
   echo "Unpacking $HIVE_CACHE to $HIVE_DIR"
   tar -C $HIVE_DIR -xzf $HIVE_CACHE
+  ln -s $HIVE_DIR/${HIVE_VERSION} $HIVE_DIR/hive
   export HIVE_CONF_DIR=$HIVE_HOME/conf
 }
 
@@ -117,7 +119,7 @@ build_oozie() {
   export OOZIE_CONF_DIR=$OOZIE_HOME/conf
 
   rm -rf $OOZIE_DIR/oozie
-  ln -s $OOZIE_DIR/${OOZIE_VERSION} $OOZIE_DIR/oozie # easier to reference later
+  ln -s $OOZIE_DIR/${OOZIE_VERSION} $OOZIE_DIR/oozie
 
   mkdir -p $OOZIE_HOME/libext
   tar -C $OOZIE_HOME/libext -zxvf $OOZIE_HOME/oozie-hadooplibs-*-cdh*.tar.gz

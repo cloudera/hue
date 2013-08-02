@@ -26,9 +26,8 @@ from django.utils.translation import ugettext as _
 
 import beeswax.conf
 import hive_metastore.ttypes
-from beeswaxd.ttypes import BeeswaxException
 from beeswax.models import SavedQuery
-from beeswax.server.dbms import get_query_server_config
+from beeswax.server.dbms import get_query_server_config, QueryServerException
 
 from beeswax import models
 from beeswax.design import hql_query
@@ -177,7 +176,7 @@ class SampleTable(object):
         msg = _('Error loading table %(table)s: Operation timeout.') % {'table': self.name}
         LOG.error(msg)
         raise InstallException(msg)
-    except BeeswaxException, ex:
+    except QueryServerException, ex:
       msg = _('Error loading table %(table)s: %(error)s.') % {'table': self.name, 'error': ex}
       LOG.error(msg)
       raise InstallException(msg)
@@ -198,12 +197,12 @@ class SampleDesign(object):
     LOG.info('Installing sample query: %s' % (self.name,))
     try:
       # Don't overwrite
-      model = models.SavedQuery.objects.get(owner=django_user, name=self.name, type=self.type)
+      model = SavedQuery.objects.get(owner=django_user, name=self.name, type=self.type)
       msg = _('Sample design %(name)s already exists.') % {'name': self.name}
       LOG.error(msg)
       raise InstallException(msg)
-    except models.SavedQuery.DoesNotExist:
-      model = models.SavedQuery(owner=django_user, name=self.name)
+    except SavedQuery.DoesNotExist:
+      model = SavedQuery(owner=django_user, name=self.name)
       model.type = self.type
       # The data field needs to be a string. The sample file writes it
       # as json (without encoding into a string) for readability.

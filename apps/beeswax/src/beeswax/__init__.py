@@ -17,7 +17,5 @@
 
 import sys
 import os
-from desktop.supervisor import DjangoCommandSupervisee
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'gen-py'))
-SUPERVISOR_SPEC = DjangoCommandSupervisee("beeswax_server")
