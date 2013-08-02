@@ -19,8 +19,6 @@
 from desktop.lib import thrift_util
 
 from beeswax import conf
-from beeswax.models import HIVE_SERVER2
-from beeswax.server.beeswax_lib import BeeswaxClient
 from beeswax.server.dbms import get_query_server_config
 
 
@@ -31,10 +29,7 @@ def get(user, query_server=None):
   if query_server is None:
     query_server = get_query_server_config(name='impala')
 
-  if query_server['server_interface'] == HIVE_SERVER2:
-    return ImpalaServerClient(ImpalaHiveServer2Service, query_server, user)
-  else:
-    return ImpalaServerClient(ImpalaService, query_server, user)
+  return ImpalaServerClient(ImpalaHiveServer2Service, query_server, user)
 
 
 class ImpalaServerClient:
@@ -44,6 +39,8 @@ class ImpalaServerClient:
     self.query_server = query_server
     self.user = user
 
+    # To delete anyway !!
+
     use_sasl, kerberos_principal_short_name = BeeswaxClient.get_security(query_server)
 
     self._client = thrift_util.get_client(client_class.Client,
@@ -52,6 +49,6 @@ class ImpalaServerClient:
                                           service_name='Impala',
                                           kerberos_principal=kerberos_principal_short_name,
                                           use_sasl=use_sasl,
-                                          timeout_seconds=conf.BEESWAX_SERVER_CONN_TIMEOUT.get())
+                                          timeout_seconds=conf.SERVER_CONN_TIMEOUT.get())
   def resetCatalog(self):
     return self._client.ResetCatalog()
