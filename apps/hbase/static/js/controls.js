@@ -742,7 +742,7 @@ var tagsearch = function() {
   self.doBlur = function() {
   	if(self.cur_input().trim() == "") {
   	  function doClick() {
-        $('#search-tags').html('');
+        if(self.cur_input().trim() != "") return false;
         setTimeout(function() {
         	$('#search-tags').focus();
         }, 1);
