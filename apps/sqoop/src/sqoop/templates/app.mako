@@ -596,6 +596,8 @@ function handle_form_errors(e, node, options, data) {
   var errors = data.errors;
   viewModel.errors({});
   viewModel.warnings({});
+  var first_error_component = null;
+
   switch(data.status) {
     case 1:
     $.each(errors, function(component, err) {
@@ -621,12 +623,23 @@ function handle_form_errors(e, node, options, data) {
           break;
         }
 
-        if (has_error && el.length > 0) {
-          ko.dataFor(el[0]).name.valueHasMutated();
+        if (has_error) {
+          if (!first_error_component) {
+            first_error_component = component;
+          }
+          if (el.length > 0) {
+            ko.dataFor(el[0]).name.valueHasMutated();
+          }
         }
       });
     });
     break;
+  }
+
+  if (first_error_component == 'connector') {
+    routie('job/edit/wizard/job-editor-connector');
+  } else if (first_error_component == 'framework') {
+    routie('job/edit/wizard/job-editor-framework');
   }
 }
 
@@ -816,9 +829,6 @@ $(document).ready(function () {
       $(document).one('saved.job', function(){
         routie('jobs');
       });
-      $(document).one('save_fail.job', function(){
-        routie('job/edit');
-      });
     },
     "job/run": function() {
       if (viewModel.job()) {
@@ -836,7 +846,6 @@ $(document).ready(function () {
     "job/save-and-run": function() {
       $("#save-run-btn").attr("data-loading-text", $("#save-run-btn").text() + " ...");
       $("#save-run-btn").button("loading");
-      viewModel.saveJob();
       $(document).one('saved.job', function(e, node, options, data) {
         var options = $.extend(true, {}, node.options);
 
@@ -859,9 +868,7 @@ $(document).ready(function () {
         });
         node.load();
       });
-      $(document).one('save_fail.connection', function(){
-        routie('job/edit');
-      });
+      viewModel.saveJob();
     },
     "job/stop": function() {
       if (viewModel.job()) {
