@@ -35,7 +35,6 @@ def get_connection():
     return CACHED_LDAP_CONN
 
   ldap_url = desktop.conf.LDAP.LDAP_URL.get()
-  nt_domain = desktop.conf.LDAP.NT_DOMAIN.get()
   username = desktop.conf.LDAP.BIND_DN.get()
   password = desktop.conf.LDAP.BIND_PASSWORD.get()
   ldap_cert = desktop.conf.LDAP.LDAP_CERT.get()
@@ -43,15 +42,7 @@ def get_connection():
   if ldap_url is None:
     raise Exception('No LDAP URL was specified')
 
-  return LdapConnection(ldap_url, get_ldap_username(username, nt_domain),
-                        password, ldap_cert)
-
-def get_ldap_username(username, nt_domain):
-  if nt_domain:
-    return '%s@%s' % (username, nt_domain)
-  else:
-    return username
-
+  return LdapConnection(ldap_url, username, password, ldap_cert)
 
 class LdapConnection(object):
   """
