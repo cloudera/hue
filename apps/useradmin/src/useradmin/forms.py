@@ -173,8 +173,8 @@ class AddLdapGroupsForm(forms.Form):
     dn = cleaned_data.get("dn")
 
     if not dn:
-      if groupname_pattern is not None and len(groupname_pattern) > 30:
-        msg = _('Too long: 30 characters or fewer and not %s') % groupname_pattern
+      if groupname_pattern is not None and len(groupname_pattern) > 80:
+        msg = _('Too long: 80 characters or fewer and not %s') % groupname_pattern
         errors = self._errors.setdefault('groupname_pattern', ErrorList())
         errors.append(msg)
         raise forms.ValidationError(msg)
