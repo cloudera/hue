@@ -153,10 +153,11 @@ class Job(object):
   """
   SKIP = ('id', 'created', 'updated')
 
-  def __init__(self, type, name, connection_id, connector_id, connector=None, framework=None, **kwargs):
+  def __init__(self, type, name, connection_id, connector_id, connector=None, framework=None, enabled=True, **kwargs):
     self.id = kwargs.setdefault('id', -1)
     self.created = kwargs.setdefault('created', 0)
     self.updated = kwargs.setdefault('updated', 0)
+    self.enabled = enabled
     self.type = type
     self.name = name
     self.connection_id = connection_id
@@ -190,7 +191,8 @@ class Job(object):
       'connection-id': self.connection_id,
       'connector-id': self.connector_id,
       'connector': [ connector.to_dict() for connector in self.connector ],
-      'framework': [ framework.to_dict() for framework in self.framework ]
+      'framework': [ framework.to_dict() for framework in self.framework ],
+      'enabled': self.enabled
     }
     return d
 

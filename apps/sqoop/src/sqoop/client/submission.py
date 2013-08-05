@@ -34,7 +34,7 @@ class Submission(object):
     "external-link": "http://solaris:50030/jobdetails.jsp?jobid=job_201306201740_0001"
   }
   """
-  def __init__(self, job_id, status, progress, created, updated, **kwargs):
+  def __init__(self, job_id, status, progress, created, updated, enabled=True, **kwargs):
     self.job_id = job_id
     self.status = status
     self.progress = progress
@@ -42,6 +42,7 @@ class Submission(object):
     self.updated = updated
     self.external_id = kwargs.get('external_id', None)
     self.external_link = kwargs.get('external_link', None)
+    self.enabled = enabled
 
   @staticmethod
   def from_dict(submission_dict):
@@ -58,7 +59,8 @@ class Submission(object):
       'status': self.status,
       'progress': self.progress,
       'creation-date': self.created,
-      'last-update-date': self.updated
+      'last-update-date': self.updated,
+      'enabled': self.enabled
     }
 
     if self.external_id:
