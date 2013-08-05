@@ -101,7 +101,10 @@ ${ commonheader(None, "hbase", user) | n,unicode }
   <div class="alert alert-warning" data-bind="visible: !${datasource}.isLoading()">
       ${_('Query executed in')} <i data-bind="text:${datasource}.lastReloadTime() + 's'"></i> ${_('fetching')} <i data-bind="text: ${datasource}.items().length"></i> ${_('rows')}.
   </div>
-  <center data-bind="visible: ${datasource}.isLoading()"><i class="icon-spinner icon-spin loader-main"></i></center>
+  <center data-bind="visible: ${datasource}.isLoading()">
+  <!--[if !IE]><!--><i class="icon-spinner icon-spin loader-main"></i><!--<![endif]-->
+  <!--[if IE]><img src="/hbase/static/art/loader.gif" /><![endif]-->
+  </center>
 </%def>
 
 <%def name="sortBtn(datasource)">
