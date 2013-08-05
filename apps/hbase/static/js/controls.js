@@ -156,6 +156,7 @@ var SmartViewModel = function(options) {
   self.columnFamilies = ko.observableArray();
   self.name = ko.observable(options.name);
   self.name.subscribe(function(){
+    self.columnFamilies([]);
     self._reloadcfs();
     if(app.station() == 'table')
       return;
