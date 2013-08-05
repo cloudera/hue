@@ -57,7 +57,7 @@ class HbaseApi(object):
     except:
       full_config = [conf.HBASE_CLUSTERS.get()]
     for config in full_config: #hack cause get() is weird
-      match = re.match('\((?P<name>\w+)\|(?P<host>.+):(?P<port>[0-9]+)\)', config)
+      match = re.match('\((?P<name>[^\(\)\|]+)\|(?P<host>.+):(?P<port>[0-9]+)\)', config)
       clusters += [{
         'name': match.group('name'),
         'host': match.group('host'),
