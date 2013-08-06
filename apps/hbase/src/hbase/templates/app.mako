@@ -325,7 +325,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
               <ul class="nav nav-list well well-small">
                 <li class="nav-header">Cell History:</li>
                 <!-- ko foreach: $data.content.history.items() -->
-                  <li><a data-bind="click: alert.bind(null, $data.value), text: convertTimestamp($data.timestamp)"></a></li>
+                  <li><a data-bind="click: function(){$parent.content.value($data.value);}, text: convertTimestamp($data.timestamp)"></a></li>
                 <!-- /ko -->
                 <li data-bind="visible: $data.content.history.loading()"><img src="/static/art/spinner.gif" /></li>
               </ul>
