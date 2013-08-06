@@ -104,6 +104,15 @@ class HbaseApi(object):
     client.scannerClose(scanner)
     return data
 
+  def getAutocompleteRows(self, cluster, tableName, numRows, query):
+    try:
+      client = self.connectCluster(cluster)
+      scan = get_thrift_type('TScan')(startRow=query, stopRow=None, timestamp=None, columns=[], caching=None, filterString="PrefixFilter('" + query + "') AND ColumnPaginationFilter(1,0)", batchSize=None)
+      scanner = client.scannerOpenWithScan(tableName, scan, None)
+      return [result.row for result in client.scannerGetList(scanner, numRows)]
+    except:
+      return []
+
   def getRow(self, cluster, tableName, columns, startRowKey):
     row = self.getRows(cluster, tableName, columns, startRowKey, 1)
     if len(row) > 0:
