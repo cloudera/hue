@@ -507,9 +507,10 @@ var TableDataRow = function(options) {
       self.enabled(true);
     });
   };
-  self.disable = function(el) {
+  self.disable = function(callback) {
     return API.queryCluster('disableTable',self.name).complete(function() {
       self.enabled(false);
+      if($.isFunction(callback)) callback();
     });
   };
   self.drop = function(el) {

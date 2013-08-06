@@ -148,7 +148,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
               <i class="icon-check-empty"></i> ${_('Disable')}
             </button>
           </span>
-          <button class="btn" data-bind="enable: views.tables.canDrop, click: views.tables.dropSelected"><i class="icon-trash"></i> ${_('Drop')}</button>
+          <button class="btn" data-bind="enable: views.tables.selected().length > 0, click: views.tables.dropSelected"><i class="icon-trash"></i> ${_('Drop')}</button>
         % endif
         <span class="pull-right">
           <a href="#new_table_modal" role="button" data-bind="click: function(){app.focusModel(app.views.tables);}" class="btn" data-toggle="modal"><i class='icon-plus-sign'></i> ${_('New Table')}</a>

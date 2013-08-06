@@ -68,10 +68,13 @@ var ListViewModel = function(options) {
           self.isLoading(false);
         }
       };
-      if(call != null && 'complete' in call)
+      if(call === true) {
+        callback();
+      } else if (call != null && 'complete' in call) {
         call.complete(callback);
-      else
+      } else {
         self.isLoading(false);
+      }
     }
   };
   self.batchSelectedAlias = function(actionAlias) {
@@ -92,9 +95,17 @@ var ListViewModel = function(options) {
     });
   };
   self.dropSelected = function() {
-    confirm("Confirm Delete", "Are you sure you want to delete the selected items? (WARNING: This cannot be undone!)", function() {
+    confirm("Confirm Delete", "Are you sure you want to drop the selected items? (WARNING: This cannot be undone!)", function() {
       self.batchSelected(function() {
-        return this.drop(true);
+        var s = this;
+        if(s.enabled()) {
+          self.isLoading(true);
+          return s.disable(function() {
+            s.drop(true);
+          });
+        } else {
+          return s.drop(true);
+        }
       });
     });
   };
