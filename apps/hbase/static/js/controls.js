@@ -19,9 +19,9 @@ var searchRenderers = {
      select: /[^\,\{\[]+(([\{\[][^\}\]]+[\}\]])+|)([^\,]+|)/g, //select the substring to process, useful as JS has no lookbehinds old: ([^,]+\[([^,]+(,|)+)+\]|[^,]+)
      tag: /.+/g, //select the matches to wrap with tags
      nested: {
-        'scan': { select: /\+[0-9 ]+/g, tag: /.+/g},
+        'scan': { select: /(([^\\]|\b)\+[0-9]+)/g, tag: /\+[0-9]+/g},
         'columns': { select: /\[.+\]/g, tag: /[^:,\[\]]+:([^,\[\]]+|)/g}, //forced to do this select due to lack of lookbehinds /[\[\]]/g
-        'prefix': { select: /[^\*]+\*/g, tag: /\*/g},
+        'prefix': { select: /[^\*\\]+\*/g, tag: /\*/g},
         'filter': {
           select: /\{[^\{\}]+\}/,
           tag:/[^\{\}]+/g,
@@ -177,13 +177,15 @@ var SmartViewModel = function(options) {
     if(inputs) {
       for(var i=0; i<inputs.length; i++) {
         if(inputs[i].trim() != "" && inputs[i].trim() != ',') {
-          var p = inputs[i].split('+');
+          var p = pullFromRenderer(inputs[i], searchRenderers['rowkey']['nested']['scan']);
+          inputs[i] = inputs[i].replace(p, '');
+          p = p.split('+');
           var scan = p.length > 1 ? parseInt(p[1].trim()) : 0;
           var extract = inputs[i].match(searchRenderers['rowkey']['nested']['columns']['select']);
           var columns = extract != null ? extract[0].match(searchRenderers['rowkey']['nested']['columns']['tag']) : [];
           var filter = inputs[i].match(searchRenderers['rowkey']['nested']['filter']['select']);
           self.querySet.push(new QuerySetPiece({
-            'row_key': p[0].replace(/[\[\{].+[\]\}]|\*/g,'').trim(), //clean up with column regex selectors instead
+            'row_key': inputs[i].replace(/\\(\+|\*|\,)/g, '$1').replace(/[\[\{].+[\]\}]|\*/g,'').trim(), //clean up with column regex selectors instead
             'scan_length': scan ? scan + 1 : 1,
             'columns': columns,
             'prefix': inputs[i].match(searchRenderers['rowkey']['nested']['prefix']['select']) != null,
