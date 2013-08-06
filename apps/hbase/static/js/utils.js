@@ -110,6 +110,17 @@ function launchModal(modal, data) {
           }
           app.focusModel(data.content);
       data.content.history.reload();
+
+      var path = '/hbase/api/putUpload/"' + app.cluster() + '"/"' + app.views.tabledata.name() + '"/"' + data.content.parent.row + '"/"' + data.content.name + '"';
+      var uploader = new qq.FileUploaderBasic({
+        button: document.getElementById("file-upload-btn"),
+        action: path,
+        fileFieldLabel: 'hbase_file',
+        multiple: false,
+        onComplete:function (id, fileName, response) {
+          data.content.reload();
+        }
+      });
       break;
   }
   element.modal('show');
