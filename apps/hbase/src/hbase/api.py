@@ -149,6 +149,11 @@ class HbaseApi(object):
   def putColumn(self, cluster, tableName, row, column, value):
     return self.putRow(cluster, tableName, row, {column: value})
 
+  def putUpload(self, cluster, tableName, row, column, value):
+    client = self.connectCluster(cluster)
+    Mutation = get_thrift_type('Mutation')
+    return client.mutateRow(tableName, row, [Mutation(column=column, value=value.file.read(value.size))], None)
+
   def getRowQuerySet(self, cluster, tableName, columns, queries):
     client = self.connectCluster(cluster)
     aggregate_data = []

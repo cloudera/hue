@@ -339,6 +339,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
       <div class="modal-footer">
         % if user.is_superuser:
           <button class="btn" data-dismiss="modal" aria-hidden="true">${_('Cancel')}</button>
+          <button id="file-upload-btn" class="btn fileChooserBtn" aria-hidden="true"><i class="icon-upload"></i> ${_('Upload')}</button>
           <input type="submit" class="btn btn-primary" value="${_('Save')}">
         % else:
           <button class="btn" data-dismiss="modal" aria-hidden="true">${_('OK')}</button>
