@@ -98,7 +98,7 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
           <ul class="nav nav-list">
             <li class="nav-header" data-bind="visible: $root.job().persisted">${_('Actions')}</li>
             <li data-bind="visible: $root.job().persisted() && !$root.job().isRunning()">
-              <a data-placement="right" rel="tooltip" title="${_('Run the job')}" href="#job/save-and-run">
+              <a id="save-run-link" data-placement="right" rel="tooltip" title="${_('Run the job')}" href="#job/save-and-run">
                 <i class="icon-play"></i> ${_('Run')}
               </a>
             </li>
@@ -177,7 +177,7 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
               <a class="btn btn-primary" data-bind="routie: 'job/edit/wizard/' + $parent.nextIndex()">${_('Next')}</a>
               <!-- /ko -->
               <!-- ko ifnot: $parent.hasNext -->
-              <a class="btn" href="#job/save">${_('Save')}</a>
+              <a id="save-btn" class="btn" href="#job/save">${_('Save')}</a>
               &nbsp;
               <a id="save-run-btn" class="btn btn-primary disable-feedback" href="#job/save-and-run">${_('Save and run')}</a>
               <!-- /ko -->
@@ -556,32 +556,32 @@ viewModel.job.subscribe(function(job) {
         'identifier': 'job-editor-connector',
         'caption': '${_("Step 1: From")}',
         'node': job,
-        'template': 'job-editor-connector',
+        'template': 'job-editor-connector'
       }));
       viewModel.jobWizard.addPage(new wizard.Page({
         'identifier': 'job-editor-framework',
         'caption': '${_("Step 2: to")}',
         'node': job,
-        'template': 'job-editor-framework',
+        'template': 'job-editor-framework'
       }));
     } else {
       viewModel.jobWizard.addPage(new wizard.Page({
         'identifier': 'job-editor-begin',
         'caption': '${_("Step 1: Manage connections")}',
         'node': job,
-        'template': 'job-editor-begin',
+        'template': 'job-editor-begin'
       }));
       viewModel.jobWizard.addPage(new wizard.Page({
         'identifier': 'job-editor-connector',
         'caption': '${_("Step 2: From")}',
         'node': job,
-        'template': 'job-editor-connector',
+        'template': 'job-editor-connector'
       }));
       viewModel.jobWizard.addPage(new wizard.Page({
         'identifier': 'job-editor-framework',
         'caption': '${_("Step 3: To")}',
         'node': job,
-        'template': 'job-editor-framework',
+        'template': 'job-editor-framework'
       }));
     }
   }
@@ -592,6 +592,8 @@ ko.applyBindings(viewModel);
 
 //// Events
 function handle_form_errors(e, node, options, data) {
+  // Resets save and run btns
+  reset_save_buttons();
   // Add errors and warnings to viewModel.errors and viewModel.warnings
   var errors = data.errors;
   viewModel.errors({});
@@ -720,6 +722,20 @@ var framework = new framework.Framework();
 })();
 
 
+function enable_save_buttons() {
+  $("#save-btn").attr("data-loading-text", $("#save-btn").text());
+  $("#save-run-btn").attr("data-loading-text", $("#save-run-btn").text());
+  $("#save-btn").button("loading");
+  $("#save-run-btn").button("loading");
+  $("#save-run-link").addClass("muted");
+}
+
+function reset_save_buttons() {
+  $("#save-btn").button("reset");
+  $("#save-run-btn").button("reset");
+  $("#save-run-link").removeClass("muted");
+}
+
 //// Routes
 $(document).ready(function () {
   $(document).on("blur", ".pathChooserExport", function () {
@@ -825,6 +841,7 @@ $(document).ready(function () {
       });
     },
     "job/save": function() {
+      enable_save_buttons();
       viewModel.saveJob();
       $(document).one('saved.job', function(){
         routie('jobs');
@@ -844,8 +861,7 @@ $(document).ready(function () {
       });
     },
     "job/save-and-run": function() {
-      $("#save-run-btn").attr("data-loading-text", $("#save-run-btn").text() + " ...");
-      $("#save-run-btn").button("loading");
+      enable_save_buttons();
       $(document).one('saved.job', function(e, node, options, data) {
         var options = $.extend(true, {}, node.options);
 
