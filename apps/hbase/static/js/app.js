@@ -63,7 +63,7 @@ var AppViewModel = function() {
               var self = this;
               options = (options == null) ? {} : options;
               options = ko.utils.extend({
-                callback:function(data){},
+                callback: function(data){},
                 columns: getColumnFamilies()
               }, options);
               API.queryTable("getRow", JSON.stringify(options.columns), self.row).done(function(data) {

@@ -759,6 +759,20 @@ var tagsearch = function() {
           return a.replace(" ","").indexOf(focus) != -1;
         }));
         return;
+      case 'rowkey':
+        var validate = window.getSelection().getRangeAt(0).startContainer.nodeValue;
+        function cancel() {
+          return window.getSelection().getRangeAt(0).startContainer.nodeValue != validate;
+        }
+        function callback() {
+          if(cancel()) return false;
+          API.queryTable('getAutocompleteRows', 10, prepForTransport(validate.trim())).done(function(data) {
+            if(cancel()) return false;
+            self.activeSuggestions(data);
+          });
+        }
+        setTimeout(callback, 200);
+        return;
       default:
         self.activeSuggestions([]);
         return;
