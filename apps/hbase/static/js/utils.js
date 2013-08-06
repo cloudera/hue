@@ -265,6 +265,14 @@ function setCursor(node, pos, trimWhitespaceNodes){
   } catch (err) { }
 }
 
+function pullFromRenderer(str, renderer) {
+  try {
+    return str.match(searchRenderers.rowkey.nested.scan.select)[0].match(searchRenderers.rowkey.nested.scan.tag)[0];
+  } catch (e){
+    return "";
+  }
+}
+
 window.selectIndex = null;
 var fallback = typeof window.getSelection === "undefined";
 ko.bindingHandlers.editableText = {
