@@ -25,6 +25,7 @@ import re
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.utils.translation import ugettext as _
+from django.utils.encoding import smart_str
 
 from desktop.lib import thrift_util
 from desktop.lib.exceptions_renderable import PopupException
@@ -99,7 +100,7 @@ class HbaseApi(object):
     if prefix == False:
       scanner = client.scannerOpen(tableName, startRowKey, columns, None)
     else:
-      scanner = client.scannerOpenWithPrefix(tableName, startRowKey, columns, None)
+      scanner = client.scannerOpenWithPrefix(tableName, smart_str(startRowKey), columns, None)
     data = client.scannerGetList(scanner, numRows)
     client.scannerClose(scanner)
     return data
@@ -114,7 +115,7 @@ class HbaseApi(object):
       return []
 
   def getRow(self, cluster, tableName, columns, startRowKey):
-    row = self.getRows(cluster, tableName, columns, startRowKey, 1)
+    row = self.getRows(cluster, tableName, columns, smart_str(startRowKey), 1)
     if len(row) > 0:
       return row[0]
     return None
@@ -124,7 +125,7 @@ class HbaseApi(object):
     return self.getRows(cluster, tableName, [column for column in client.getColumnDescriptors(tableName)], startRowKey, numRows)
 
   def getRowFull(self, cluster, tableName, startRowKey, numRows):
-    row = self.getRowsFull(cluster, tableName, startRowKey, 1)
+    row = self.getRowsFull(cluster, tableName, smart_str(startRowKey), 1)
     if len(row) > 0:
       return row[0]
     return None
@@ -139,21 +140,21 @@ class HbaseApi(object):
     client = self.connectCluster(cluster)
     Mutation = get_thrift_type('Mutation')
     mutations = [Mutation(isDelete = True, column=column) for column in columns]
-    return client.mutateRow(tableName, row, mutations, None)
+    return client.mutateRow(tableName, smart_str(row), mutations, None)
 
   def deleteColumn(self, cluster, tableName, row, column):
-    return self.deleteColumns(cluster, tableName, row, [column])
+    return self.deleteColumns(cluster, tableName, smart_str(row), [column])
 
   def putRow(self, cluster, tableName, row, data):
     client = self.connectCluster(cluster)
     mutations = []
     Mutation = get_thrift_type('Mutation')
     for column in data.keys():
-      mutations.append(Mutation(column=column, value=str(data[column]))) # must use str for API, does thrift coerce by itself?
-    return client.mutateRow(tableName, row, mutations, None)
+      mutations.append(Mutation(column=column, value=smart_str(data[column]))) # must use str for API, does thrift coerce by itself?
+    return client.mutateRow(tableName, smart_str(row), mutations, None)
 
   def putColumn(self, cluster, tableName, row, column, value):
-    return self.putRow(cluster, tableName, row, {column: value})
+    return self.putRow(cluster, tableName, smart_str(row), {column: value})
 
   def putUpload(self, cluster, tableName, row, column, value):
     client = self.connectCluster(cluster)
@@ -172,8 +173,8 @@ class HbaseApi(object):
       fs = query.get('filter', None)
       if fs:
         fs = " AND (" + fs.strip() + ")"
-      filterstring = "(ColumnPaginationFilter(" + str(limit) + ",0) AND PageFilter(" + str(limit) + "))" + (fs or "")
-      scan = get_thrift_type('TScan')(startRow=query['row_key'], stopRow=None, timestamp=None, columns=query['columns'] or columns, caching=None, filterString=filterstring, batchSize=None)
+      filterstring = "(ColumnPaginationFilter(%i,0) AND PageFilter(%i))" % (limit, limit) + (fs or "")
+      scan = get_thrift_type('TScan')(startRow=smart_str(query['row_key']), stopRow=None, timestamp=None, columns=query['columns'] or columns, caching=None, filterString=filterstring, batchSize=None)
       scanner = client.scannerOpenWithScan(tableName, scan, None)
       aggregate_data += client.scannerGetList(scanner, query['scan_length'])
     return aggregate_data
