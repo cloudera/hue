@@ -101,7 +101,7 @@ ${ commonheader(_('Quick Start'), "quickstart", user, "100px") | n,unicode }
       </div>
     </div>
 
-    <div id="step2" class="stepDetails hide">
+      <div id="step2" class="stepDetails hide">
       <div class="widget-box">
         <div class="widget-title">
           <span class="icon">
@@ -169,7 +169,7 @@ ${ commonheader(_('Quick Start'), "quickstart", user, "100px") | n,unicode }
       </div>
     </div>
 
-    <div id="step3" class="stepDetails hide">
+      <div id="step3" class="stepDetails hide">
       <div class="widget-box">
         <div class="widget-title">
           <span class="icon">
@@ -196,8 +196,9 @@ ${ commonheader(_('Quick Start'), "quickstart", user, "100px") | n,unicode }
           </label>
         </div>
       </div>
+    </div>
 
-    <div id="step4" class="stepDetails hide">
+      <div id="step4" class="stepDetails hide">
       <div class="widget-box">
         <div class="widget-title">
           <span class="icon">
@@ -210,12 +211,13 @@ ${ commonheader(_('Quick Start'), "quickstart", user, "100px") | n,unicode }
         </div>
       </div>
     </div>
-  </div>
+    </div>
 
     <div class="form-actions" style="position:fixed;bottom:0;margin:0;margin-left:-20px;width:100%">
       <a id="backBtn" class="btn disabled">${ _('Back') }</a>
       <a id="nextBtn" class="btn btn-primary disable-feedback">${ _('Next') }</a>
     </div>
+   </div>
   </div>
   % endif
 </div>
