@@ -46,8 +46,8 @@
     <hive.version>0.11.0-cdh5.0.0-SNAPSHOT</hive.version>
     <slf4j.version>1.6.1</slf4j.version>
     <commons-logging.version>1.0.4</commons-logging.version>
-    <javaVersion>1.6</javaVersion>
-    <targetJavaVersion>1.6</targetJavaVersion>
+    <javaVersion>1.7</javaVersion>
+    <targetJavaVersion>1.7</targetJavaVersion>
   </properties>
 
   <organization>
