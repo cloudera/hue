@@ -415,7 +415,7 @@ var SmartViewDataRow = function(options) {
       });
     }
 
-    (cont === true) ? doDrop() : confirm("Confirm Delete", 'Delete row ' + self.row + '? (This cannot be undone)', doDrop);
+    (cont === true) ? doDrop() : confirm(i18n("Confirm Delete"), i18n('Delete row ') + self.row + i18n('? (This cannot be undone)'), doDrop);
   };
 
   self.setItems = function(cols) {
@@ -477,7 +477,7 @@ var ColumnRow = function(options) {
         self.parent.isLoading(false);
       });
     }
-    (cont === true) ? doDrop() : confirm("Confirm Delete", "Are you sure you want to drop this column?", doDrop);
+    (cont === true) ? doDrop() : confirm(i18n("Confirm Delete"), i18n("Are you sure you want to drop this column?"), doDrop);
   };
 
   self.reload = function(callback, skipPut) {
@@ -542,8 +542,8 @@ var TableDataRow = function(options) {
   self.name = options['name'];
   self.enabled = ko.observable(options['enabled']);
   self.toggle = function(viewModel,event){
-    var action = ['enable','disable'][self.enabled() << 0], el = $(event.currentTarget);
-    confirm("Confirm "+action, "Are you sure you want to " + action + " this table?", function() //gotta i18n this! 
+    var action = [i18n('enable'), i18n('disable')][self.enabled() << 0], el = $(event.currentTarget);
+    confirm(i18n("Confirm") + " " + action, i18n("Are you sure you want to") + " " + action + " " + i18n("this table?"), function()
     {
       el.showIndicator();
       return self[action](el).complete(function() {
@@ -614,44 +614,44 @@ var tagsearch = function() {
   self.submitted = ko.observable(false);
   self.filters = ["KeyOnlyFilter ()", "FirstKeyOnlyFilter ()", "PrefixFilter (‘row_prefix’)", "ColumnPrefixFilter(‘column_prefix’)", "MultipleColumnPrefixFilter(‘column_prefix’, ‘column_prefix’, …, ‘column_prefix’)", "ColumnCountGetFilter (‘limit’)", "PageFilter (‘page_size’)", "ColumnPaginationFilter(‘limit’, ‘offest')", "InclusiveStopFilter(‘stop_row_key’)", "TimeStampsFilter (timestamp, timestamp, ... ,timestamp)", "RowFilter (compareOp, ‘row_comparator’)", "QualifierFilter (compareOp, ‘qualifier_comparator’)", "QualifierFilter (compareOp,‘qualifier_comparator’)", "ValueFilter (compareOp,‘value_comparator’)", "DependentColumnFilter (‘family’, ‘qualifier’, boolean, compare operator, ‘value comparator’)", "DependentColumnFilter (‘family’, ‘qualifier’, boolean)", "DependentColumnFilter (‘family’, ‘qualifier’)", "SingleColumnValueFilter(‘family’, ‘qualifier’, compare operator, ‘comparator’, filterIfColumnMissing_boolean, latest_version_boolean)", "SingleColumnValueFilter(‘family’, ‘qualifier, compare operator, ‘comparator’)", "SingleColumnValueExcludeFilter('family', 'qualifier', compare operator, 'comparator', latest_version_boolean, filterIfColumnMissing_boolean)", "SingleColumnValueExcludeFilter('family', 'qualifier', compare operator, 'comparator')", "ColumnRangeFilter (‘minColumn’, minColumnInclusive_bool, ‘maxColumn’, maxColumnInclusive_bool)"];
   self.hints = ko.observableArray([ {
-      hint: 'End Query',
+      hint: i18n('End Query'),
       shortcut: ',',
       mode: ['rowkey', 'prefix', 'scan'],
       selected: false
     }, {
-      hint: 'Mark Row/Column Prefix',
+      hint: i18n('Mark Row/Column Prefix'),
       shortcut: '*',
       mode: ['rowkey'],
       selected: false
     }, {
-      hint: 'Start Row/Column Scan',
+      hint: i18n('Start Row/Column Scan'),
       shortcut: '+',
       mode: ['rowkey', 'prefix'],
       selected: false
     }, {
-      hint: 'Start Select Columns',
+      hint: i18n('Start Select Columns'),
       shortcut: '[',
       mode: ['rowkey', 'prefix'],
       selected: false
     }, {
-      hint: 'End Column/Family',
+      hint: i18n('End Column/Family'),
       shortcut: ',',
       mode: ['columns'],
       selected: false
     }, {
-      hint: 'End Select Columns',
+      hint: i18n('End Select Columns'),
       shortcut: ']',
       mode: ['columns'],
       selected: false
     },
     {
-      hint: 'Start FilterString',
+      hint: i18n('Start FilterString'),
       shortcut: '{',
       mode: ['rowkey'],
       selected: false
     },
     {
-      hint: 'End FilterString',
+      hint: i18n('End FilterString'),
       shortcut: '}',
       mode: ['filter'],
       selected: false
@@ -668,24 +668,24 @@ var tagsearch = function() {
   self.activeHint = ko.observable(-1);
   self.modes = {
     'rowkey': {
-      hint: 'Row Key Value',
-      type: 'String'
+      hint: i18n('Row Key Value'),
+      type: i18n('String')
     },
     'scan': {
-      hint: 'Length of Scan or Row Key',
-      type: 'Integer'
+      hint: i18n('Length of Scan or Row Key'),
+      type: i18n('Integer')
     },
     'columns': {
-      hint: 'Column Family: Column Name',
-      type: 'String'
+      hint: i18n('Column Family: Column Name'),
+      type: i18n('String')
     },
     'prefix': {
-      hint: 'Rows starting with',
-      type: 'String'
+      hint: i18n('Rows starting with'),
+      type: i18n('String')
     },
     'filter': {
-      hint: 'Thrift FilterString',
-      type: 'String'
+      hint: i18n('Thrift FilterString'),
+      type: i18n('String')
     }
   }
 
