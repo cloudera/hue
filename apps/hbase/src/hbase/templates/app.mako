@@ -210,7 +210,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
             <!-- /ko -->
             <li class="search-suggestion-header" data-bind="visible: search.activeSuggestions().length > 0"><a>${_('Autocomplete Suggestions:')}</a></li>
             <!-- ko foreach: search.activeSuggestions() -->
-            <li class="search-suggestion" data-bind="event: { mousedown: app.search.replaceFocusNode.bind(null, $data) }"><a><span data-bind="text: $data"></span></a></li>
+            <li class="search-suggestion" data-bind="event: { mousedown: app.search.replaceFocusNode.bind(null, $data) }, css: {active: app.search.activeSuggestion() == $index()}"><a><span data-bind="text: $data"></span></a></li>
             <!-- /ko -->
           </ul>
           <button class="btn btn-primary add-on" data-bind="enabled: !search.submitted(), click: search.evaluate.bind(null)"><i class="icon-search"></i></button>

@@ -273,6 +273,7 @@ function setCursor(node, pos, trimWhitespaceNodes){
     range.collapse(true);
     sel.removeAllRanges();
     sel.addRange(range);
+    return range;
   } catch (err) { }
 }
 

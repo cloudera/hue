@@ -586,6 +586,13 @@ textarea {
 	border-color: #777;
 }
 
+#search-typeahead .search-suggestion.active a
+{
+	background: #3CA3E8;
+	border-color: #3CA3E8;
+	color:#fff;
+}
+
 #search-typeahead .search-suggestion-header a
 {
 	padding: 5px;
