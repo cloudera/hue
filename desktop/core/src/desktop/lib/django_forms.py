@@ -22,6 +22,7 @@ from django import forms
 from django.forms.util import ErrorList, ValidationError, flatatt
 from django.forms.fields import MultiValueField, CharField, ChoiceField, BooleanField
 from django.forms.widgets import MultiWidget, Select, TextInput, Textarea, HiddenInput, Input
+from django.utils import formats
 from django.utils.safestring import mark_safe
 from django.utils.encoding import StrAndUnicode, force_unicode
 
@@ -36,8 +37,8 @@ class SplitDateTimeWidget(forms.MultiWidget):
   The date_class and time_class attributes specify class names to be given
   specifically to the corresponding DateInput and TimeInput widgets.
   """
-  date_format = forms.DateInput.format
-  time_format = forms.TimeInput.format
+  date_format = formats.get_format('DATE_INPUT_FORMATS')[0]
+  time_format = formats.get_format('TIME_INPUT_FORMATS')[0]
 
   def __init__(self, attrs=None, date_format=None, time_format=None, date_class='date', time_class='time'):
     date_attrs = dict(attrs)

@@ -27,7 +27,6 @@ from django.views.decorators.cache import never_cache
 
 LOG = logging.getLogger(__name__)
 
-@never_cache
 def handle_rest_exception(e, msg):
   reason = e.get_parent_ex().reason
   if isinstance(reason, socket.error):

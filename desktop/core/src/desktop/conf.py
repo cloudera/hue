@@ -162,7 +162,7 @@ DATABASE = ConfigSection(
       key='engine',
       help=_('Database engine, such as postgresql_psycopg2, mysql, or sqlite3.'),
       type=str,
-      default='sqlite3',
+      default='django.db.backends.sqlite3',
     ),
     NAME=Config(
       key='name',
