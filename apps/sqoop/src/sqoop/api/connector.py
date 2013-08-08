@@ -31,14 +31,14 @@ from desktop.lib.exceptions import StructuredException
 from desktop.lib.rest.http_client import RestException
 from exception import handle_rest_exception
 from utils import list_to_dict
-
+from django.views.decorators.cache import never_cache
 
 __all__ = ['get_connectors', 'connectors', 'connector']
 
 
 LOG = logging.getLogger(__name__)
 
-
+@never_cache
 def get_connectors(request):
   response = {
     'status': 0,
@@ -58,6 +58,7 @@ def connectors(request):
   else:
     raise StructuredException(code="INVALID_METHOD", message=_('GET request required.'), error_code=405)
 
+@never_cache
 @get_connector_or_exception()
 def connector(request, connector):
   response = {

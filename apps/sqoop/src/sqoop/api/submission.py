@@ -31,14 +31,14 @@ from desktop.lib.exceptions import StructuredException
 from desktop.lib.rest.http_client import RestException
 from exception import handle_rest_exception
 from utils import list_to_dict
-
+from django.views.decorators.cache import never_cache
 
 __all__ = ['get_submissions', 'submissions']
 
 
 LOG = logging.getLogger(__name__)
 
-
+@never_cache
 def get_submissions(request):
   response = {
     'status': 0,
@@ -54,6 +54,7 @@ def get_submissions(request):
     response.update(handle_rest_exception(e, _('Could not get submissions.')))
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
+@never_cache
 def submissions(request):
   if request.method == 'GET':
     return get_submissions(request)

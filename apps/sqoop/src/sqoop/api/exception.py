@@ -23,11 +23,11 @@ from django.utils.encoding import smart_str
 
 from desktop.lib.exceptions import StructuredException
 from desktop.lib.rest.http_client import RestException
-
+from django.views.decorators.cache import never_cache
 
 LOG = logging.getLogger(__name__)
 
-
+@never_cache
 def handle_rest_exception(e, msg):
   reason = e.get_parent_ex().reason
   if isinstance(reason, socket.error):
