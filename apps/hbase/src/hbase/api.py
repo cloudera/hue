@@ -129,6 +129,12 @@ class HbaseApi(object):
       return row[0]
     return None
 
+  def getRowPartial(self, cluster, tableName, rowKey, offset, number):
+    client = self.connectCluster(cluster)
+    scan = get_thrift_type('TScan')(startRow=rowKey, stopRow=None, timestamp=None, columns=[], caching=None, filterString="ColumnPaginationFilter(%i, %i)" % (number, offset), batchSize=None)
+    scanner = client.scannerOpenWithScan(tableName, scan, None)
+    return client.scannerGetList(scanner, 1)
+
   def deleteColumns(self, cluster, tableName, row, columns):
     client = self.connectCluster(cluster)
     Mutation = get_thrift_type('Mutation')

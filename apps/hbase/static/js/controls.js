@@ -380,9 +380,29 @@ var SmartViewDataRow = function(options) {
   };
 
   self.onScroll = function(target, ev) {
-    if($(ev.target).scrollLeft() == ev.target.scrollWidth - ev.target.clientWidth && self.displayedItems().length < self.scrollLoadSource().length) {
-      self.displayRangeLength += 15;
-      self.updateDisplayedItems();
+    var displayRangeDelta = 15;
+    if($(ev.target).scrollLeft() == ev.target.scrollWidth - ev.target.clientWidth) {
+      if(self.displayedItems().length < self.scrollLoadSource().length) {
+        self.displayRangeLength += displayRangeDelta;
+        self.updateDisplayedItems();
+      } else {
+        self.displayRangeLength = self.items().length + displayRangeDelta;
+        var validate = self.items().length;
+        API.queryTable('getRowPartial' , self.row, self.items().length, 50).done(function(data) {
+          if(self.items().length != validate) return false;
+          var cols = data[0].columns;
+          var keys = Object.keys(cols);
+          var temp = [];
+          for(var i=0; i<keys.length; i++) {
+            var col = cols[keys[i]];
+            temp.push(new ColumnRow({name: keys[i],
+             timestamp: col.timestamp,
+             value: col.value,
+             parent: self}));
+          }
+          self.items(self.items().concat(temp));
+        });
+      }
     }
   };
 
