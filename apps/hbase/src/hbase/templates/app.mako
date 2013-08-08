@@ -377,15 +377,38 @@ ${ commonheader(None, "hbase", user) | n,unicode }
 </div>
 
 
-<script type="text/javascript" charset="utf-8">
-var i18n_message_cache = {
-
+<script type="text/javascript">
+var i18n_cache = {
+  "Confirm Delete": "${_('Confirm Delete')}",
+  "Delete row ": "${_('Delete row ')}",
+  '? (This cannot be undone)': "${_('? (This cannot be undone)')}",
+  "Are you sure you want to drop this column?": "${_('Are you sure you want to drop this column?')}",
+  'enable': "${_('enable')}",
+  'disable': "${_('disable')}",
+  'Confirm': "${_('Confirm')}",
+  "Are you sure you want to": "${_('Are you sure you want to')}",
+  "this table?": "${_('this table?')}",
+  'End Query': "${_('End Query')}",
+  'Mark Row/Column Prefix': "${_('Mark Row/Column Prefix')}",
+  'Start Row/Column Scan': "${_('Start Row/Column Scan')}",
+  'Start Select Columns': "${_('Start Select Columns')}",
+  'End Column/Family': "${_('End Column/Family')}",
+  'End Select Columns': "${_('End Select Columns')}",
+  'Start FilterString': "${_('Start FilterString')}",
+  'End FilterString': "${_('End FilterString')}",
+  'Row Key Value': "${_('Row Key Value')}",
+  'Length of Scan or Row Key': "${_('Length of Scan or Row Key')}",
+  'Column Family: Column Name': "${_('Column Family: Column Name')}",
+  'Rows starting with': "${_('Rows starting with')}",
+  'String': "${_('String')}",
+  'Integer': "${_('Integer')}"
 };
 
-function _(text) {
-  return MSG[text];
+function i18n(text) {
+  if(text in i18n_cache)
+    return i18n_cache[text];
+  return text;
 };
-
 </script>
 <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
