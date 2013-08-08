@@ -177,19 +177,46 @@ var SmartViewModel = function(options) {
     if(inputs) {
       for(var i=0; i<inputs.length; i++) {
         if(inputs[i].trim() != "" && inputs[i].trim() != ',') {
+          //pull out columns
+          var extract = inputs[i].match(searchRenderers['rowkey']['nested']['columns']['select']);
+          var columns = extract != null ? extract[0].match(searchRenderers['rowkey']['nested']['columns']['tag']) : [];
+          inputs[i] = inputs[i].replace(extract, '');
+
+          //pull out scan
           var p = pullFromRenderer(inputs[i], searchRenderers['rowkey']['nested']['scan']);
           inputs[i] = inputs[i].replace(p, '');
           p = p.split('+');
           var scan = p.length > 1 ? parseInt(p[1].trim()) : 0;
-          var extract = inputs[i].match(searchRenderers['rowkey']['nested']['columns']['select']);
-          var columns = extract != null ? extract[0].match(searchRenderers['rowkey']['nested']['columns']['tag']) : [];
-          var filter = inputs[i].match(searchRenderers['rowkey']['nested']['filter']['select']);
+
+          //pull out filters
+          var filter = inputs[i].match(searchRenderers['rowkey']['nested']['filter']['select']) || "";
+          filter = filter != null && filter.length > 0 ? escape(filter[0].trim().slice(1, -1)) : "";
+
+          //pull out column filters
+          function filterPostfix(postfix) {
+            return (filter != null && filter.length > 0 ? ' AND ' : ' ' ) + postfix;
+          }
+
+          var cfs = [];
+          $(columns).each(function(i, o) {
+            var colscan = pullFromRenderer(o, searchRenderers['rowkey']['nested']['scan']);
+            if(colscan) {
+              colscan = parseInt(colscan.split('+')[1]) + 1;
+              filter += filterPostfix("ColumnPaginationFilter(" + colscan + ", 0)");
+            }
+            var fc = o.replace(pullFromRenderer(o, searchRenderers['rowkey']['nested']['prefix']), '');
+            if(fc != o) {
+              filter += filterPostfix("ColumnPrefixFilter('" + fc.slice(fc.indexOf(':') + 1).match(/[0-9]+/g)[0] + "')");
+              columns[i] = fc.slice(0, fc.indexOf(':'));
+            }
+          });
+
           self.querySet.push(new QuerySetPiece({
             'row_key': inputs[i].replace(/\\(\+|\*|\,)/g, '$1').replace(/[\[\{].+[\]\}]|\*/g,'').trim(), //clean up with column regex selectors instead
             'scan_length': scan ? scan + 1 : 1,
             'columns': columns,
             'prefix': inputs[i].match(searchRenderers['rowkey']['nested']['prefix']['select']) != null,
-            'filter': filter != null && filter.length > 0 ? escape(filter[0].slice(1, -1)) : null
+            'filter': filter.length > 0 ? filter : null
           }));
         }
       }
@@ -572,12 +599,12 @@ var tagsearch = function() {
       mode: ['rowkey', 'prefix', 'scan'],
       selected: false
     }, {
-      hint: 'Mark Row Prefix',
+      hint: 'Mark Row/Column Prefix',
       shortcut: '*',
       mode: ['rowkey'],
       selected: false
     }, {
-      hint: 'Start Scan',
+      hint: 'Start Row/Column Scan',
       shortcut: '+',
       mode: ['rowkey', 'prefix'],
       selected: false

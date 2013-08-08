@@ -278,7 +278,7 @@ function setCursor(node, pos, trimWhitespaceNodes){
 
 function pullFromRenderer(str, renderer) {
   try {
-    return str.match(searchRenderers.rowkey.nested.scan.select)[0].match(searchRenderers.rowkey.nested.scan.tag)[0];
+    return str.match(renderer.select)[0].match(renderer.tag)[0];
   } catch (e){
     return "";
   }
