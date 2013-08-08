@@ -165,7 +165,7 @@ class HbaseApi(object):
         query['row_key'] = ""
       fs = query.get('filter', None)
       if fs:
-        fs = " AND (" + fs + ")"
+        fs = " AND (" + fs.strip() + ")"
       filterstring = "(ColumnPaginationFilter(" + str(limit) + ",0) AND PageFilter(" + str(limit) + "))" + (fs or "")
       scan = get_thrift_type('TScan')(startRow=query['row_key'], stopRow=None, timestamp=None, columns=query['columns'] or columns, caching=None, filterString=filterstring, batchSize=None)
       scanner = client.scannerOpenWithScan(tableName, scan, None)
