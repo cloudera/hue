@@ -216,7 +216,7 @@ def render(template, request, data, json=None, template_lib=None, force_template
       return render_json(data, request.GET.get("callback"))
   else:
     return _render_to_response(template,
-                               RequestContext(request=request, dict=data),
+                               RequestContext(request=request, dict_=data),
                                template_lib=template_lib,
                                **kwargs)
 
