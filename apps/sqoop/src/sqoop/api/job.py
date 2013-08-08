@@ -32,6 +32,7 @@ from desktop.lib.exceptions import StructuredException
 from desktop.lib.rest.http_client import RestException
 from exception import handle_rest_exception
 from utils import list_to_dict
+from django.views.decorators.cache import never_cache
 
 
 __all__ = ['get_jobs', 'create_job', 'update_job', 'job', 'jobs', 'job_clone', 'job_delete', 'job_start', 'job_stop', 'job_status']
@@ -39,7 +40,7 @@ __all__ = ['get_jobs', 'create_job', 'update_job', 'job', 'jobs', 'job_clone', '
 
 LOG = logging.getLogger(__name__)
 
-
+@never_cache
 def get_jobs(request):
   response = {
     'status': 0,
@@ -54,6 +55,7 @@ def get_jobs(request):
     response.update(handle_rest_exception(e, _('Could not get jobs.')))
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
+@never_cache
 def create_job(request):
   if request.method != 'POST':
     raise StructuredException(code="INVALID_METHOD", message=_('POST request required.'), error_code=405)
@@ -80,6 +82,7 @@ def create_job(request):
     response['errors'] = e.to_dict()
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
+@never_cache
 def update_job(request, job):
   if request.method != 'POST':
     raise StructuredException(code="INVALID_METHOD", message=_('POST request required.'), error_code=405)
@@ -105,7 +108,7 @@ def update_job(request, job):
     response['errors'] = e.to_dict()
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
-
+@never_cache
 def jobs(request):
   if request.method == 'GET':
     return get_jobs(request)
@@ -114,6 +117,7 @@ def jobs(request):
   else:
     raise StructuredException(code="INVALID_METHOD", message=_('GET or POST request required.'), error_code=405)
 
+@never_cache
 @get_job_or_exception()
 def job(request, job):
   response = {
@@ -129,6 +133,7 @@ def job(request, job):
   else:
     raise StructuredException(code="INVALID_METHOD", message=_('GET or POST request required.'), error_code=405)
 
+@never_cache
 @get_job_or_exception()
 def job_clone(request, job):
   if request.method != 'POST':
@@ -152,6 +157,7 @@ def job_clone(request, job):
     response['errors'] = e.to_dict()
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
+@never_cache
 @get_job_or_exception()
 def job_delete(request, job):
   if request.method != 'POST':
@@ -173,6 +179,7 @@ def job_delete(request, job):
     response['errors'] = e.to_dict()
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
+@never_cache
 @get_job_or_exception()
 def job_start(request, job):
   if request.method != 'POST':
@@ -194,6 +201,7 @@ def job_start(request, job):
     response['errors'] = [e.to_dict()]
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
+@never_cache
 @get_job_or_exception()
 def job_stop(request, job):
   if request.method != 'POST':
@@ -215,6 +223,7 @@ def job_stop(request, job):
     response['errors'] = e.to_dict()
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
+@never_cache
 @get_job_or_exception()
 def job_status(request, job):
   if request.method != 'GET':

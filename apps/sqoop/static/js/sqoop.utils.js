@@ -164,7 +164,6 @@ ko.sqoop = {
     });
     // Need a depth first search result
     models = models.reverse();
-    console.log(models);
 
     // Call fixModel on every node that has that method.
     $.each(models, function(index, parent_name) {

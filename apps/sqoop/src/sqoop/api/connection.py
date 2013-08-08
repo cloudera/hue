@@ -32,14 +32,14 @@ from desktop.lib.exceptions import StructuredException
 from desktop.lib.rest.http_client import RestException
 from exception import handle_rest_exception
 from utils import list_to_dict
-
+from django.views.decorators.cache import never_cache
 
 __all__ = ['get_connections', 'create_connection', 'update_connection', 'connection', 'connections', 'connection_clone', 'connection_delete']
 
 
 LOG = logging.getLogger(__name__)
 
-
+@never_cache
 def get_connections(request):
   response = {
     'status': 0,
@@ -53,6 +53,7 @@ def get_connections(request):
     response.update(handle_rest_exception(e, _('Could not get connections.')))
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
+@never_cache
 def create_connection(request):
   response = {
     'status': 0,
@@ -76,6 +77,7 @@ def create_connection(request):
     response['errors'] = e.to_dict()
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
+@never_cache
 def update_connection(request, connection):
   response = {
     'status': 0,
@@ -98,6 +100,7 @@ def update_connection(request, connection):
     response['errors'] = e.to_dict()
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
+@never_cache
 def connections(request):
   if request.method == 'GET':
     return get_connections(request)
@@ -106,6 +109,7 @@ def connections(request):
   else:
     raise StructuredException(code="INVALID_METHOD", message=_('GET or POST request required.'), error_code=405)
 
+@never_cache
 @get_connection_or_exception()
 def connection(request, connection):
   response = {
@@ -121,6 +125,7 @@ def connection(request, connection):
   else:
     raise StructuredException(code="INVALID_METHOD", message=_('GET or POST request required.'), error_code=405)
 
+@never_cache
 @get_connection_or_exception()
 def connection_clone(request, connection):
   if request.method != 'POST':
@@ -144,6 +149,7 @@ def connection_clone(request, connection):
     response['errors'] = e.to_dict()
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
+@never_cache
 @get_connection_or_exception()
 def connection_delete(request, connection):
   if request.method != 'POST':

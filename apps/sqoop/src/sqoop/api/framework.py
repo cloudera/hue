@@ -29,14 +29,14 @@ from sqoop import client, conf
 from desktop.lib.exceptions import StructuredException
 from desktop.lib.rest.http_client import RestException
 from exception import handle_rest_exception
-
+from django.views.decorators.cache import never_cache
 
 __all__ = ['framework']
 
 
 LOG = logging.getLogger(__name__)
 
-
+@never_cache
 def framework(request):
   response = {
     'status': 0,
