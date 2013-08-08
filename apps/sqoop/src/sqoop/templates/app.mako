@@ -52,7 +52,12 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
 
   <div class="row-fluid" data-bind="if: isLoading()">
     <div class="span10 offset1 center" style="margin-top: 30px">
-      <i class="icon-spinner icon-spin" style="font-size: 60px; color: #DDD"></i>
+      <!--[if lte IE 9]>
+        <img src="/static/art/spinner-big.gif" />
+      <![endif]-->
+      <!--[if !IE]> -->
+        <i class="icon-spinner icon-spin" style="font-size: 60px; color: #DDD"></i>
+      <!-- <![endif]-->
     </div>
   </div>
 
