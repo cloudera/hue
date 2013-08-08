@@ -612,7 +612,7 @@ var tagsearch = function() {
   self.mode = ko.observable('idle');
   self.cur_input = ko.observable('');
   self.submitted = ko.observable(false);
-  self.filters = ["KeyOnlyFilter ()", "FirstKeyOnlyFilter ()", "PrefixFilter (‘row_prefix’)", "ColumnPrefixFilter(‘column_prefix’)", "MultipleColumnPrefixFilter(‘column_prefix’, ‘column_prefix’, …, ‘column_prefix’)", "ColumnCountGetFilter (‘limit’)", "PageFilter (‘page_size’)", "ColumnPaginationFilter(‘limit’, ‘offest')", "InclusiveStopFilter(‘stop_row_key’)", "TimeStampsFilter (timestamp, timestamp, ... ,timestamp)", "RowFilter (compareOp, ‘row_comparator’)", "QualifierFilter (compareOp, ‘qualifier_comparator’)", "QualifierFilter (compareOp,‘qualifier_comparator’)", "ValueFilter (compareOp,‘value_comparator’)", "DependentColumnFilter (‘family’, ‘qualifier’, boolean, compare operator, ‘value comparator’)", "DependentColumnFilter (‘family’, ‘qualifier’, boolean)", "DependentColumnFilter (‘family’, ‘qualifier’)", "SingleColumnValueFilter(‘family’, ‘qualifier’, compare operator, ‘comparator’, filterIfColumnMissing_boolean, latest_version_boolean)", "SingleColumnValueFilter(‘family’, ‘qualifier, compare operator, ‘comparator’)", "SingleColumnValueExcludeFilter('family', 'qualifier', compare operator, 'comparator', latest_version_boolean, filterIfColumnMissing_boolean)", "SingleColumnValueExcludeFilter('family', 'qualifier', compare operator, 'comparator')", "ColumnRangeFilter (‘minColumn’, minColumnInclusive_bool, ‘maxColumn’, maxColumnInclusive_bool)"];
+  self.filters = ["KeyOnlyFilter ()", "FirstKeyOnlyFilter ()", "PrefixFilter ('row_prefix')", "ColumnPrefixFilter('column_prefix')", "MultipleColumnPrefixFilter('column_prefix', 'column_prefix', …, 'column_prefix')", "ColumnCountGetFilter ('limit')", "PageFilter ('page_size')", "ColumnPaginationFilter('limit', 'offest')", "InclusiveStopFilter('stop_row_key')", "TimeStampsFilter (timestamp, timestamp, ... ,timestamp)", "RowFilter (compareOp, 'row_comparator')", "QualifierFilter (compareOp, 'qualifier_comparator')", "QualifierFilter (compareOp,'qualifier_comparator')", "ValueFilter (compareOp,'value_comparator')", "DependentColumnFilter ('family', 'qualifier', boolean, compare operator, 'value comparator')", "DependentColumnFilter ('family', 'qualifier', boolean)", "DependentColumnFilter ('family', 'qualifier')", "SingleColumnValueFilter('family', 'qualifier', compare operator, 'comparator', filterIfColumnMissing_boolean, latest_version_boolean)", "SingleColumnValueFilter('family', 'qualifier, compare operator, 'comparator')", "SingleColumnValueExcludeFilter('family', 'qualifier', compare operator, 'comparator', latest_version_boolean, filterIfColumnMissing_boolean)", "SingleColumnValueExcludeFilter('family', 'qualifier', compare operator, 'comparator')", "ColumnRangeFilter ('minColumn', minColumnInclusive_bool, 'maxColumn', maxColumnInclusive_bool)"];
   self.hints = ko.observableArray([ {
       hint: i18n('End Query'),
       shortcut: ',',
@@ -692,6 +692,7 @@ var tagsearch = function() {
   self.modeQueue = ['idle'];
   self.focused = ko.observable(false);
   self.activeSuggestions = ko.observableArray();
+  self.activeSuggestion = ko.observable(-1);
 
   self.insertTag = function(tag) {
     var mode = tag.indexOf('+') != -1 ? 'scan' : 'rowkey';
@@ -776,14 +777,41 @@ var tagsearch = function() {
 
   self.onKeyDown = function(target, ev) {
     if(ev.keyCode == 13 && self.cur_input().slice(self.cur_input().lastIndexOf(',')).trim() != ",") {
+      if(self.activeSuggestion() > -1) {
+        self.replaceFocusNode(self.activeSuggestions()[self.activeSuggestion()]);
+        self.activeSuggestion(-1);
+        setTimeout(function() {
+          var s = self.cur_input();
+          var r = setCursor($('#search-tags')[0], s.lastIndexOf('(') + 1);
+          r.setEnd(r.endContainer, r.startOffset + (s.lastIndexOf(')') - s.lastIndexOf('(') - 1));
+          var sel = window.getSelection();
+          sel.removeAllRanges();
+          sel.addRange(r);
+        }, 1);
+      } else {
         self.evaluate();
-        return false;
+      }
+      return false;
+    } else if (ev.keyCode == 219) {
+      setTimeout(function() {
+        var ep = getEditablePosition($('#search-tags')[0], true);
+        self.cur_input(self.cur_input().slice(0, ep) + (ev.shiftKey ? '}' : ']') + self.cur_input().slice(ep));
+      }, 1);
+    } else if (ev.keyCode == 40) {
+      if(self.activeSuggestion() < self.activeSuggestions().length - 1)
+        self.activeSuggestion(self.activeSuggestion() + 1);
+      return false;
+    } else if(ev.keyCode == 38) {
+      if(self.activeSuggestion() > 0)
+        self.activeSuggestion(self.activeSuggestion() - 1);
+      return false;
     }
     setTimeout(self.updateMenu, 1);
     return true;
   };
 
   self.updateMenu = function() {
+    self.activeSuggestion(-1);
     try{
       var pos = getEditablePosition(document.getElementById('search-tags'));
       self.selectionStart(pos);
