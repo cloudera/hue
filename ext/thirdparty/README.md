@@ -16,12 +16,9 @@ Checked-in third party dependencies
 |Y|django-auth-ldap|1.0.7|BSD|http://bitbucket.org/psagers/django-auth-ldap/|
 |Y|Django_cpserver|19739bea057d824d9cd6c10c4caec622e8e1c0b9|BSD|http://github.com/lincolnloop/django-cpserver/|
 |Y|Django Extensions|0.5|New BSD|http://pypi.python.org/pypi/django-extensions/0.5|
-|Y|django-moxy|||https://github.com/rtyler/django-moxy|
 |Y|Django_nose (part of basie)|?|MIT|http://code.basieproject.org/trunk/apps/django_nose/nose_runner.py|
 |Y|elementtree|1.2.6-20050316|Python(MIT)|http://effbot.org/downloads#elementtree|
 |Y|enum|0.4.4|Python|http://pypi.python.org/pypi/enum/|
-|Y|eventlet|0.9.14|MIT|http://pypi.python.org/pypi/eventlet/|
-|Y|greenlet|0.3.1|MIT|http://pypi.python.org/pypi/greenlet/|
 |Y|kerberos|1.1.1|ASL2|http://pypi.python.org/pypi/kerberos|
 |Y|lockfile|0.8|MIT|http://smontanaro.dyndns.org/python/lockfile-0.8.tar.gz|
 |Y|lxml|2.2.2|BSD|http://codespeak.net/lxml/|
@@ -42,7 +39,6 @@ Checked-in third party dependencies
 |Y|sasl|0.1.1|Apache|http://pypi.python.org/pypi/sasl/0.1.1|
 |Y|simplejson|2.0.9|MIT|http://pypi.python.org/packages/source/s/simplejson/simplejson-2.0.9.tar.gz|
 |Y|South|0.7|Apache|http://south.aeracode.org/|
-|Y|Spawning|0.9.6|MIT|http://pypi.python.org/pypi/Spawning/0.9.6/|
 |Y|ssl|1.15|Python|http://pypi.python.org/pypi/ssl/1.15|
 |Y|threadframe|0.2|Python|http://www.majid.info/mylos/stories/2004/06/10/threadframe.html|
 |Y|Thrift|?|Apache|http://incubator.apache.org/thrift/download/|

@@ -392,9 +392,9 @@ the `hue.ini` configuration file.
 Specifying the Hue HTTP Address
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Hue uses a Spawning or a CherryPy web server (configurable).  You can use
-the following options to change the IP address and port that the web server
-listens on. The default setting is port 8888 on all configured IP addresses.
+Hue uses CherryPy web server.  You can use the following options to
+change the IP address and port that the web server listens on.
+The default setting is port 8888 on all configured IP addresses.
 
     # Webserver listens on this address and port
     http_host=0.0.0.0
