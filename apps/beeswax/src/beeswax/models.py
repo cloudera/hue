@@ -198,6 +198,8 @@ class HiveServerQueryHistory(QueryHistory):
     self.save()
 
 
+# Deprecated!
+
 class BeeswaxQueryHistory(QueryHistory):
   # Map from (thrift) server state
   STATE_MAP = {
