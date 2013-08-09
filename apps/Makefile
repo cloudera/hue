@@ -39,7 +39,6 @@ APPS := about \
   jobsub \
   oozie \
   proxy \
-  shell \
   useradmin \
   impala \
   pig \
@@ -112,7 +111,6 @@ I18N_APPS := about \
   filebrowser \
   jobbrowser \
   jobsub \
-  shell \
   useradmin \
   oozie \
   impala \

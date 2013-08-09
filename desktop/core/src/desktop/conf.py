@@ -27,12 +27,6 @@ from desktop.lib.conf import coerce_bool, validate_path
 from desktop.lib.paths import get_desktop_root
 
 
-USE_CHERRYPY_SERVER = Config(
-  key="use_cherrypy_server",
-  help=_("If set to true, CherryPy will be used. Otherwise, Spawning will be used as the webserver."),
-  type=coerce_bool,
-  default=False)
-
 HTTP_HOST = Config(
   key="http_host",
   help=_("HTTP host to bind to."),

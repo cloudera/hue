@@ -564,11 +564,8 @@ The next time Hue restarts, your `my_daemon` will start automatically.
 If your daemon program dies (exits with a non-zero exit code), Hue will
 restart it.
 
-"Under the covers:" Threading.  Hue, by default, runs a Spawning web server. It
-can also be configured to run under a CherryPy WSGI server.
-This server is multi-threaded, so you can use python
-threading support (such as it is).  The "runserver_plus" version
-is single-threaded.  If Hue is configured (and it may be, in the future)
+"Under the covers:" Threading.  Hue, by default, runs CherryPy web server.
+If Hue is configured (and it may be, in the future)
 to use mod_wsgi under Apache httpd, then there would be multiple python
 processes serving the backend.  This means that your Django application
 code should avoid depending on shared process state.  Instead, place

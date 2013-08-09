@@ -245,10 +245,6 @@ else:
     "TEST_NAME" : get_desktop_root('desktop-test.db')
   }
 
-if os.getenv('HUE_SPAWNING', 'no') == 'yes':
-  if default_db['ENGINE'].lower() == 'mysql':
-    default_db['ENGINE'] = 'moxy'
-
 DATABASES = {
   'default': default_db
 }
@@ -280,12 +276,6 @@ if SECRET_KEY == "":
 
 # Necessary for South to not fuzz with tests.  Fixed in South 0.7.1
 SKIP_SOUTH_TESTS = True
-
-# South database adapters mapping for eventlet backends
-if default_db['ENGINE'] == 'moxy':
-  SOUTH_DATABASE_ADAPTERS = {
-    'default': 'south.db.mysql'
-  }
 
 # Set up environment variable so Kerberos libraries look at our private
 # ticket cache
