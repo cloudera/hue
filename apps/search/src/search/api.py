@@ -26,7 +26,7 @@ import logging
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.rest.http_client import HttpClient, RestException
 from desktop.lib.rest.resource import Resource
-from search.conf import EMPTY_QUERY
+from search.conf import EMPTY_QUERY, SECURITY_ENABLED
 
 
 LOG = logging.getLogger(__name__)
@@ -39,6 +39,8 @@ class SolrApi(object):
   def __init__(self, solr_url):
     self._url = solr_url
     self._client = HttpClient(self._url, logger=LOG)
+    if SECURITY_ENABLED.get():
+      self._client.set_kerberos_auth()
     self._root = Resource(self._client)
 
   def query(self, solr_query, hue_core):
