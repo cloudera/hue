@@ -612,7 +612,7 @@ var tagsearch = function() {
   self.mode = ko.observable('idle');
   self.cur_input = ko.observable('');
   self.submitted = ko.observable(false);
-  self.filters = ["KeyOnlyFilter ()", "FirstKeyOnlyFilter ()", "PrefixFilter ('row_prefix')", "ColumnPrefixFilter('column_prefix')", "MultipleColumnPrefixFilter('column_prefix', 'column_prefix', …, 'column_prefix')", "ColumnCountGetFilter ('limit')", "PageFilter ('page_size')", "ColumnPaginationFilter('limit', 'offest')", "InclusiveStopFilter('stop_row_key')", "TimeStampsFilter (timestamp, timestamp, ... ,timestamp)", "RowFilter (compareOp, 'row_comparator')", "QualifierFilter (compareOp, 'qualifier_comparator')", "QualifierFilter (compareOp,'qualifier_comparator')", "ValueFilter (compareOp,'value_comparator')", "DependentColumnFilter ('family', 'qualifier', boolean, compare operator, 'value comparator')", "DependentColumnFilter ('family', 'qualifier', boolean)", "DependentColumnFilter ('family', 'qualifier')", "SingleColumnValueFilter('family', 'qualifier', compare operator, 'comparator', filterIfColumnMissing_boolean, latest_version_boolean)", "SingleColumnValueFilter('family', 'qualifier, compare operator, 'comparator')", "SingleColumnValueExcludeFilter('family', 'qualifier', compare operator, 'comparator', latest_version_boolean, filterIfColumnMissing_boolean)", "SingleColumnValueExcludeFilter('family', 'qualifier', compare operator, 'comparator')", "ColumnRangeFilter ('minColumn', minColumnInclusive_bool, 'maxColumn', maxColumnInclusive_bool)"];
+  self.filters = ["KeyOnlyFilter ()", "FirstKeyOnlyFilter ()", "PrefixFilter ('row_prefix')", "ColumnPrefixFilter('column_prefix')", "MultipleColumnPrefixFilter('column_prefix', 'column_prefix', …, 'column_prefix')", "ColumnCountGetFilter (limit)", "PageFilter (page_size)", "ColumnPaginationFilter(limit, offset)", "InclusiveStopFilter('stop_row_key')", "TimeStampsFilter (timestamp, timestamp, ... ,timestamp)", "RowFilter (compareOp, 'row_comparator')", "QualifierFilter (compareOp, 'qualifier_comparator')", "QualifierFilter (compareOp,'qualifier_comparator')", "ValueFilter (compareOp,'value_comparator')", "DependentColumnFilter ('family', 'qualifier', boolean, compare operator, 'value comparator')", "DependentColumnFilter ('family', 'qualifier', boolean)", "DependentColumnFilter ('family', 'qualifier')", "SingleColumnValueFilter('family', 'qualifier', compare operator, 'comparator', filterIfColumnMissing_boolean, latest_version_boolean)", "SingleColumnValueFilter('family', 'qualifier', compare operator, 'comparator')", "SingleColumnValueExcludeFilter('family', 'qualifier', compare operator, 'comparator', latest_version_boolean, filterIfColumnMissing_boolean)", "SingleColumnValueExcludeFilter('family', 'qualifier', compare operator, 'comparator')", "ColumnRangeFilter ('minColumn', minColumnInclusive_bool, 'maxColumn', maxColumnInclusive_bool)"];
   self.hints = ko.observableArray([ {
       hint: i18n('End Query'),
       shortcut: ',',
@@ -621,12 +621,12 @@ var tagsearch = function() {
     }, {
       hint: i18n('Mark Row/Column Prefix'),
       shortcut: '*',
-      mode: ['rowkey'],
+      mode: ['rowkey', 'columns'],
       selected: false
     }, {
       hint: i18n('Start Row/Column Scan'),
       shortcut: '+',
-      mode: ['rowkey', 'prefix'],
+      mode: ['rowkey', 'prefix', 'columns'],
       selected: false
     }, {
       hint: i18n('Start Select Columns'),
