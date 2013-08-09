@@ -30,17 +30,8 @@ EMPTY_QUERY = Config(
   help=_("Query sent when no term is entered."),
   default="*:*")
 
-
-#SOLR_URLS = UnspecifiedConfigSection(
-#  "solr_urls",
-#  help="One entry for each Solr server",
-#  each=ConfigSection(
-#    help="Information about a single HDFS cluster",
-#    members=dict(
-#      # Deprecated
-#      NN_HOST=Config("namenode_host", help="Host/IP for name node"),
-#    )
-#  )
-#)
-
-# ZOOKEEPER URL
+SECURITY_ENABLED = Config(
+  key="security_enabled",
+  help=_t("Whether Solr requires client to perform Kerberos authentication."),
+  default=False,
+  type=coerce_bool)
