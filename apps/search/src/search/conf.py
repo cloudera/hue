@@ -17,7 +17,7 @@
 
 from django.utils.translation import ugettext_lazy as _
 
-from desktop.lib.conf import Config
+from desktop.lib.conf import Config, coerce_bool
 
 
 SOLR_URL = Config(
