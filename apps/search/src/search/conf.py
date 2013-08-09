@@ -32,6 +32,6 @@ EMPTY_QUERY = Config(
 
 SECURITY_ENABLED = Config(
   key="security_enabled",
-  help=_t("Whether Solr requires client to perform Kerberos authentication."),
+  help=_("Whether Solr requires client to perform Kerberos authentication."),
   default=False,
   type=coerce_bool)
