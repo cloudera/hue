@@ -415,7 +415,7 @@
   }
 
   $(document).ready(function () {
-    var CURRENT = "http://cloudera.github.com/hue/releases/2.5.0/hue-2.5.0.tgz";
+    var CURRENT = "https://dl.dropboxusercontent.com/u/730827/hue/releases/2.5.0/hue-2.5.0.tgz";
     var _lastSeenVideo = $("#videoFrame").attr("src");
 
     $("#subscribeBtn").click(function() {
@@ -441,7 +441,7 @@
         placement: 'left',
         trigger: 'click',
         title: 'How to get Hue?',
-        content: '<ul class="nav nav-list"><li><a href="'+ CURRENT +'">Download the .tgz release</a></li>' +
+        content: '<ul class="nav nav-list"><li><a class="trackLink" href="'+ CURRENT +'">Download the .tgz release</a></li>' +
             '<li><a href="http://archive.cloudera.com/cdh4/one-click-install/">Install with CDH (recommended)</a></li>' +
             '<li class="muted">Pick your distribution, architecture and install the package. Install the \'hue\' component and its dependencies.</li>' +
             '<li><a href="http://www.apache.org/dyn/closer.cgi/bigtop/bigtop-0.6.0/">Install with Apache Bigtop</a></li>' +
@@ -459,7 +459,7 @@
         placement: 'top',
         trigger: 'click',
         title: 'How to get Hue?',
-        content: '<ul class="nav nav-list"><li><a href="' + CURRENT + '">Download the .tgz release</a></li>' +
+        content: '<ul class="nav nav-list"><li><a class="trackLink" href="' + CURRENT + '">Download the .tgz release</a></li>' +
             '<li><a href="http://archive.cloudera.com/cdh4/one-click-install/">Install with CDH (recommended)</a></li>' +
             '<li class="muted">Pick your distribution, architecture and install the package. Install the \'hue\' component and its dependencies.</li>' +
             '<li><a href="http://www.apache.org/dyn/closer.cgi/bigtop/bigtop-0.6.0/">Install with Apache Bigtop</a></li>' +
@@ -501,6 +501,12 @@
 
     });
 
+    $(document).on("click", ".trackLink", function(e){
+      e.preventDefault();
+      trackOnGA($(this).attr("href").substr($(this).attr("href").lastIndexOf("/")));
+      location.href = $(this).attr("href");
+    });
+
   });
 </script>
 
@@ -517,6 +523,12 @@
     var s = document.getElementsByTagName('script')[0];
     s.parentNode.insertBefore(ga, s);
   })();
+  function trackOnGA(path) {
+    if (typeof _gaq != "undefined" && _gaq != null) {
+      _gaq.push(['_trackPageview', '/downloads' + path]);
+    }
+  }
+
 </script>
 </body>
 </html>
