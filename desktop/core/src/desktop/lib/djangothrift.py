@@ -73,7 +73,7 @@ class ThriftField(models.TextField):
     tft = thrift_util.jsonable2thrift(jsonable, self.thrift_class)
     return tft
 
-  def get_db_prep_save(self, value):
+  def get_db_prep_save(self, value, *args, **kwargs):
     if value is None: 
       return None
     jsonable = thrift_util.thrift2json(value)

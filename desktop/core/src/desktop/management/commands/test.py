@@ -20,8 +20,11 @@ Desktop-aware test runner.
 Django's "test" command merely executes the test_runner,
 so we circumvent it entirely and create our own.
 """
+from django.test.utils import setup_test_environment
+from django.conf import settings
 from django.core.management.base import BaseCommand
-from django_nose import nose_runner
+from django.test.utils import get_runner
+from django_nose import runner
 
 import south.management.commands.syncdb
 import sys
@@ -79,23 +82,26 @@ class Command(BaseCommand):
     all_apps = [ app.module.__name__ for app in appmanager.DESKTOP_MODULES ]
 
     if args[0] == "all":
-      nose_args = args + all_apps + ["-v"]
+      nose_args = args + all_apps
     elif args[0] == "fast":
       test_apps = [ app.module.__name__ for app in appmanager.DESKTOP_MODULES ]
-      nose_args = args + all_apps + ["-v", "-a", "!requires_hadoop"]
-    elif args[0] in ("specific", "nose"):
-      nose_args = args + ['-v']
+      nose_args = args + all_apps + ["-a", "!requires_hadoop"]
     elif args[0] == "windmill":
       args = args[1:]
       ret = test_windmill.Command().handle(*args)
+    elif args[0] in ("specific", "nose"):
+      nose_args = args
     else:
       print self.help
       sys.exit(1)
 
     if nose_args:
-      ret = nose_runner.run_tests_explicit(nose_args, interactive=True, verbosity=1)
-
-    logging.info("Tests (%s) returned %s" % (' '.join(nose_args), ret))
-
-    if not ret:
+      TestRunner = get_runner(settings)
+      test_runner = TestRunner(verbosity=1, interactive=False)
+      nose_args.remove(args[0])
+      ret = test_runner.run_tests(nose_args)
+    
+    if ret:
+      logging.info("Tests (%s) returned %s" % (' '.join(nose_args), ret))
+    else:
       sys.exit(1)

@@ -154,6 +154,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
   'django.core.context_processors.debug',
   'django.core.context_processors.i18n',
   'django.core.context_processors.media',
+  'django.core.context_processors.request',
   'django.contrib.messages.context_processors.messages',
    # Not default
   'desktop.context_processors.app_name',
@@ -251,6 +252,12 @@ if os.getenv('HUE_SPAWNING', 'no') == 'yes':
 DATABASES = {
   'default': default_db
 }
+
+# django-nose test specifics
+TEST_RUNNER = 'desktop.lib.test_runners.HueTestRunner'
+# Turn off cache middleware
+if 'test' in sys.argv:
+   CACHE_MIDDLEWARE_SECONDS = 0
 
 TIME_ZONE = desktop.conf.TIME_ZONE.get()
 # Desktop supports only one authentication backend.

@@ -1,0 +1,710 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+<head>
+<title>
+    
+                The Mako Runtime Environment
+             &mdash; 
+    Mako 0.8.1 Documentation
+</title>
+
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/docs.css" type="text/css" />
+
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+          URL_ROOT:    '#',
+          VERSION:     '0.8.1',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
+      };
+    </script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="Mako 0.8.1 Documentation" href="index.html" />
+        <link rel="next" title="Namespaces" href="namespaces.html" />
+        <link rel="prev" title="Defs and Blocks" href="defs.html" />
+
+<link rel="stylesheet" href="_static/site.css"></link>
+
+
+</head>
+<body>
+    <div id="wrap">
+    <div class="rightbar">
+
+
+    <div class="slogan">
+    Hyperfast and lightweight templating for the Python platform.
+    </div>
+
+
+    </div>
+
+    <a href="http://www.makotemplates.org/"><img src="_static/makoLogo.png" /></a>
+
+    <hr/>
+
+    
+
+
+
+
+
+
+
+
+
+<div id="docs-container">
+
+
+
+<div id="docs-header">
+    <h1>Mako 0.8.1 Documentation</h1>
+
+    <div id="docs-search">
+    Search:
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" /> <input type="submit" value="Search" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+
+    <div id="docs-version-header">
+        Release: <span class="version-num">0.8.1</span>
+
+    </div>
+
+</div>
+
+<div id="docs-top-navigation">
+    <div id="docs-top-page-control" class="docs-navigation-links">
+        <ul>
+            <li>Prev:
+            <a href="defs.html" title="previous chapter">Defs and Blocks</a>
+            </li>
+            <li>Next:
+            <a href="namespaces.html" title="next chapter">Namespaces</a>
+            </li>
+
+        <li>
+            <a href="index.html">Table of Contents</a> |
+            <a href="genindex.html">Index</a>
+            | <a href="_sources/runtime.txt">view source
+        </li>
+        </ul>
+    </div>
+
+    <div id="docs-navigation-banner">
+        <a href="index.html">Mako 0.8.1 Documentation</a>
+        » 
+                The Mako Runtime Environment
+             
+
+        <h2>
+            
+                The Mako Runtime Environment
+            
+        </h2>
+    </div>
+
+</div>
+
+<div id="docs-body-container">
+
+    <div id="docs-sidebar">
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">The Mako Runtime Environment</a><ul>
+<li><a class="reference internal" href="#context">Context</a><ul>
+<li><a class="reference internal" href="#the-buffer">The Buffer</a></li>
+<li><a class="reference internal" href="#context-variables">Context Variables</a></li>
+<li><a class="reference internal" href="#context-methods-and-accessors">Context Methods and Accessors</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#the-loop-context">The Loop Context</a><ul>
+<li><a class="reference internal" href="#iterations">Iterations</a></li>
+<li><a class="reference internal" href="#cycling">Cycling</a></li>
+<li><a class="reference internal" href="#parent-loops">Parent Loops</a></li>
+<li><a class="reference internal" href="#migrating-legacy-templates-that-use-the-word-loop">Migrating Legacy Templates that Use the Word &#8220;loop&#8221;</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#all-the-built-in-names">All the Built-in Names</a><ul>
+<li><a class="reference internal" href="#reserved-names">Reserved Names</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#api-reference">API Reference</a></li>
+</ul>
+</li>
+</ul>
+
+
+    <h4>Previous Topic</h4>
+    <p>
+    <a href="defs.html" title="previous chapter">Defs and Blocks</a>
+    </p>
+    <h4>Next Topic</h4>
+    <p>
+    <a href="namespaces.html" title="next chapter">Namespaces</a>
+    </p>
+
+    <h4>Quick Search</h4>
+    <p>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" /> <input type="submit" value="Search" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </p>
+
+    </div>
+
+    <div id="docs-body" class="withsidebar" >
+        
+<div class="section" id="the-mako-runtime-environment">
+<span id="runtime-toplevel"></span><h1>The Mako Runtime Environment<a class="headerlink" href="#the-mako-runtime-environment" title="Permalink to this headline">¶</a></h1>
+<p>This section describes a little bit about the objects and
+built-in functions that are available in templates.</p>
+<div class="section" id="context">
+<span id="id1"></span><h2>Context<a class="headerlink" href="#context" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference internal" href="#mako.runtime.Context" title="mako.runtime.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a> is the central object that is created when
+a template is first executed, and is responsible for handling
+all communication with the outside world.  Within the template
+environment, it is available via the <a class="reference internal" href="#reserved-names"><em>reserved name</em></a>
+<tt class="docutils literal"><span class="pre">context</span></tt>.  The <a class="reference internal" href="#mako.runtime.Context" title="mako.runtime.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a> includes two
+major components, one of which is the output buffer, which is a
+file-like object such as Python&#8217;s <tt class="docutils literal"><span class="pre">StringIO</span></tt> or similar, and
+the other a dictionary of variables that can be freely
+referenced within a template; this dictionary is a combination
+of the arguments sent to the <a class="reference internal" href="usage.html#mako.template.Template.render" title="mako.template.Template.render"><tt class="xref py py-meth docutils literal"><span class="pre">render()</span></tt></a> function and
+some built-in variables provided by Mako&#8217;s runtime environment.</p>
+<div class="section" id="the-buffer">
+<h3>The Buffer<a class="headerlink" href="#the-buffer" title="Permalink to this headline">¶</a></h3>
+<p>The buffer is stored within the <a class="reference internal" href="#mako.runtime.Context" title="mako.runtime.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a>, and writing
+to it is achieved by calling the <a class="reference internal" href="#mako.runtime.Context.write" title="mako.runtime.Context.write"><tt class="xref py py-meth docutils literal"><span class="pre">write()</span></tt></a> method
+&#8211; in a template this looks like <tt class="docutils literal"><span class="pre">context.write('some</span> <span class="pre">string')</span></tt>.
+You usually don&#8217;t need to care about this, as all text within a template, as
+well as all expressions provided by <tt class="docutils literal"><span class="pre">${}</span></tt>, automatically send
+everything to this method. The cases you might want to be aware
+of its existence are if you are dealing with various
+filtering/buffering scenarios, which are described in
+<a class="reference internal" href="filtering.html"><em>Filtering and Buffering</em></a>, or if you want to programmatically
+send content to the output stream, such as within a <tt class="docutils literal"><span class="pre">&lt;%</span> <span class="pre">%&gt;</span></tt>
+block.</p>
+<div class="highlight-mako"><div class="highlight"><pre><span class="cp">&lt;%</span>
+    <span class="n">context</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;some programmatic text&quot;</span><span class="p">)</span>
+<span class="cp">%&gt;</span><span class="x"></span>
+</pre></div>
+</div>
+<p>The actual buffer may or may not be the original buffer sent to
+the <a class="reference internal" href="#mako.runtime.Context" title="mako.runtime.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a> object, as various filtering/caching
+scenarios may &#8220;push&#8221; a new buffer onto the context&#8217;s underlying
+buffer stack. For this reason, just stick with
+<tt class="docutils literal"><span class="pre">context.write()</span></tt> and content will always go to the topmost
+buffer.</p>
+</div>
+<div class="section" id="context-variables">
+<span id="context-vars"></span><h3>Context Variables<a class="headerlink" href="#context-variables" title="Permalink to this headline">¶</a></h3>
+<p>When your template is compiled into a Python module, the body
+content is enclosed within a Python function called
+<tt class="docutils literal"><span class="pre">render_body</span></tt>. Other top-level defs defined in the template are
+defined within their own function bodies which are named after
+the def&#8217;s name with the prefix <tt class="docutils literal"><span class="pre">render_</span></tt> (i.e. <tt class="docutils literal"><span class="pre">render_mydef</span></tt>).
+One of the first things that happens within these functions is
+that all variable names that are referenced within the function
+which are not defined in some other way (i.e. such as via
+assignment, module level imports, etc.) are pulled from the
+<a class="reference internal" href="#mako.runtime.Context" title="mako.runtime.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a> object&#8217;s dictionary of variables. This is how you&#8217;re
+able to freely reference variable names in a template which
+automatically correspond to what was passed into the current
+<a class="reference internal" href="#mako.runtime.Context" title="mako.runtime.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a>.</p>
+<ul>
+<li><p class="first"><strong>What happens if I reference a variable name that is not in
+the current context?</strong> - The value you get back is a special
+value called <tt class="docutils literal"><span class="pre">UNDEFINED</span></tt>, or if the <tt class="docutils literal"><span class="pre">strict_undefined=True</span></tt> flag
+is used a <tt class="docutils literal"><span class="pre">NameError</span></tt> is raised. <tt class="docutils literal"><span class="pre">UNDEFINED</span></tt> is just a simple global
+variable with the class <a class="reference internal" href="#mako.runtime.Undefined" title="mako.runtime.Undefined"><tt class="xref py py-class docutils literal"><span class="pre">mako.runtime.Undefined</span></tt></a>. The
+<tt class="docutils literal"><span class="pre">UNDEFINED</span></tt> object throws an error when you call <tt class="docutils literal"><span class="pre">str()</span></tt> on
+it, which is what happens if you try to use it in an
+expression.</p>
+</li>
+<li><p class="first"><strong>UNDEFINED makes it hard for me to find what name is missing</strong> - An alternative
+is to specify the option <tt class="docutils literal"><span class="pre">strict_undefined=True</span></tt>
+to the <a class="reference internal" href="usage.html#mako.template.Template" title="mako.template.Template"><tt class="xref py py-class docutils literal"><span class="pre">Template</span></tt></a> or <a class="reference internal" href="usage.html#mako.lookup.TemplateLookup" title="mako.lookup.TemplateLookup"><tt class="xref py py-class docutils literal"><span class="pre">TemplateLookup</span></tt></a>.  This will cause
+any non-present variables to raise an immediate <tt class="docutils literal"><span class="pre">NameError</span></tt>
+which includes the name of the variable in its message
+when <a class="reference internal" href="usage.html#mako.template.Template.render" title="mako.template.Template.render"><tt class="xref py py-meth docutils literal"><span class="pre">render()</span></tt></a> is called &#8211; <tt class="docutils literal"><span class="pre">UNDEFINED</span></tt> is not used.</p>
+<p class="versionadded">
+<span class="versionmodified">New in version 0.3.6.</span></p>
+</li>
+<li><p class="first"><strong>Why not just return None?</strong> Using <tt class="docutils literal"><span class="pre">UNDEFINED</span></tt>, or
+raising a <tt class="docutils literal"><span class="pre">NameError</span></tt> is more
+explicit and allows differentiation between a value of <tt class="docutils literal"><span class="pre">None</span></tt>
+that was explicitly passed to the <a class="reference internal" href="#mako.runtime.Context" title="mako.runtime.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a> and a value that
+wasn&#8217;t present at all.</p>
+</li>
+<li><p class="first"><strong>Why raise an exception when you call str() on it ? Why not
+just return a blank string?</strong> - Mako tries to stick to the
+Python philosophy of &#8220;explicit is better than implicit&#8221;. In
+this case, it&#8217;s decided that the template author should be made
+to specifically handle a missing value rather than
+experiencing what may be a silent failure. Since <tt class="docutils literal"><span class="pre">UNDEFINED</span></tt>
+is a singleton object just like Python&#8217;s <tt class="docutils literal"><span class="pre">True</span></tt> or <tt class="docutils literal"><span class="pre">False</span></tt>,
+you can use the <tt class="docutils literal"><span class="pre">is</span></tt> operator to check for it:</p>
+<div class="highlight-mako"><div class="highlight"><pre><span class="cp">%</span> <span class="k">if</span> <span class="n">someval</span> <span class="ow">is</span> <span class="n">UNDEFINED</span><span class="p">:</span><span class="x"></span>
+<span class="x">    someval is: no value</span>
+<span class="cp">%</span> <span class="k">else</span><span class="p">:</span><span class="x"></span>
+<span class="x">    someval is: </span><span class="cp">${</span><span class="n">someval</span><span class="cp">}</span>
+<span class="cp">%</span><span class="k"> endif</span><span class="x"></span>
+</pre></div>
+</div>
+</li>
+</ul>
+<p>Another facet of the <a class="reference internal" href="#mako.runtime.Context" title="mako.runtime.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a> is that its dictionary of
+variables is <strong>immutable</strong>. Whatever is set when
+<a class="reference internal" href="usage.html#mako.template.Template.render" title="mako.template.Template.render"><tt class="xref py py-meth docutils literal"><span class="pre">render()</span></tt></a> is called is what stays. Of course, since
+its Python, you can hack around this and change values in the
+context&#8217;s internal dictionary, but this will probably will not
+work as well as you&#8217;d think. The reason for this is that Mako in
+many cases creates copies of the <a class="reference internal" href="#mako.runtime.Context" title="mako.runtime.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a> object, which
+get sent to various elements of the template and inheriting
+templates used in an execution. So changing the value in your
+local <a class="reference internal" href="#mako.runtime.Context" title="mako.runtime.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a> will not necessarily make that value
+available in other parts of the template&#8217;s execution. Examples
+of where Mako creates copies of the <a class="reference internal" href="#mako.runtime.Context" title="mako.runtime.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a> include
+within top-level def calls from the main body of the template
+(the context is used to propagate locally assigned variables
+into the scope of defs; since in the template&#8217;s body they appear
+as inlined functions, Mako tries to make them act that way), and
+within an inheritance chain (each template in an inheritance
+chain has a different notion of <tt class="docutils literal"><span class="pre">parent</span></tt> and <tt class="docutils literal"><span class="pre">next</span></tt>, which
+are all stored in unique <a class="reference internal" href="#mako.runtime.Context" title="mako.runtime.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a> instances).</p>
+<ul>
+<li><p class="first"><strong>So what if I want to set values that are global to everyone
+within a template request?</strong> - All you have to do is provide a
+dictionary to your <a class="reference internal" href="#mako.runtime.Context" title="mako.runtime.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a> when the template first
+runs, and everyone can just get/set variables from that. Lets
+say its called <tt class="docutils literal"><span class="pre">attributes</span></tt>.</p>
+<p>Running the template looks like:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">output</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">attributes</span><span class="o">=</span><span class="p">{})</span>
+</pre></div>
+</div>
+<p>Within a template, just reference the dictionary:</p>
+<div class="highlight-mako"><div class="highlight"><pre><span class="cp">&lt;%</span>
+    <span class="n">attributes</span><span class="p">[</span><span class="s">&#39;foo&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;bar&#39;</span>
+<span class="cp">%&gt;</span><span class="x"></span>
+<span class="x">&#39;foo&#39; attribute is: </span><span class="cp">${</span><span class="n">attributes</span><span class="p">[</span><span class="s">&#39;foo&#39;</span><span class="p">]</span><span class="cp">}</span><span class="x"></span>
+</pre></div>
+</div>
+</li>
+<li><p class="first"><strong>Why can&#8217;t &#8220;attributes&#8221; be a built-in feature of the
+Context?</strong> - This is an area where Mako is trying to make as
+few decisions about your application as it possibly can.
+Perhaps you don&#8217;t want your templates to use this technique of
+assigning and sharing data, or perhaps you have a different
+notion of the names and kinds of data structures that should
+be passed around. Once again Mako would rather ask the user to
+be explicit.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="context-methods-and-accessors">
+<h3>Context Methods and Accessors<a class="headerlink" href="#context-methods-and-accessors" title="Permalink to this headline">¶</a></h3>
+<p>Significant members of <a class="reference internal" href="#mako.runtime.Context" title="mako.runtime.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a> include:</p>
+<ul>
+<li><p class="first"><tt class="docutils literal"><span class="pre">context[key]</span></tt> / <tt class="docutils literal"><span class="pre">context.get(key,</span> <span class="pre">default=None)</span></tt> -
+dictionary-like accessors for the context. Normally, any
+variable you use in your template is automatically pulled from
+the context if it isn&#8217;t defined somewhere already. Use the
+dictionary accessor and/or <tt class="docutils literal"><span class="pre">get</span></tt> method when you want a
+variable that <em>is</em> already defined somewhere else, such as in
+the local arguments sent to a <tt class="docutils literal"><span class="pre">%def</span></tt> call. If a key is not
+present, like a dictionary it raises <tt class="docutils literal"><span class="pre">KeyError</span></tt>.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">keys()</span></tt> - all the names defined within this context.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">kwargs</span></tt> - this returns a <strong>copy</strong> of the context&#8217;s
+dictionary of variables. This is useful when you want to
+propagate the variables in the current context to a function
+as keyword arguments, i.e.:</p>
+<div class="highlight-mako"><div class="highlight"><pre><span class="cp">${</span><span class="nb">next</span><span class="o">.</span><span class="n">body</span><span class="p">(</span><span class="o">**</span><span class="n">context</span><span class="o">.</span><span class="n">kwargs</span><span class="p">)</span><span class="cp">}</span><span class="x"></span>
+</pre></div>
+</div>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">write(text)</span></tt> - write some text to the current output
+stream.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">lookup</span></tt> - returns the <a class="reference internal" href="usage.html#mako.lookup.TemplateLookup" title="mako.lookup.TemplateLookup"><tt class="xref py py-class docutils literal"><span class="pre">TemplateLookup</span></tt></a> instance that is
+used for all file-lookups within the current execution (even
+though individual <a class="reference internal" href="usage.html#mako.template.Template" title="mako.template.Template"><tt class="xref py py-class docutils literal"><span class="pre">Template</span></tt></a> instances can conceivably have
+different instances of a <a class="reference internal" href="usage.html#mako.lookup.TemplateLookup" title="mako.lookup.TemplateLookup"><tt class="xref py py-class docutils literal"><span class="pre">TemplateLookup</span></tt></a>, only the
+<a class="reference internal" href="usage.html#mako.lookup.TemplateLookup" title="mako.lookup.TemplateLookup"><tt class="xref py py-class docutils literal"><span class="pre">TemplateLookup</span></tt></a> of the originally-called <a class="reference internal" href="usage.html#mako.template.Template" title="mako.template.Template"><tt class="xref py py-class docutils literal"><span class="pre">Template</span></tt></a> gets
+used in a particular execution).</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="the-loop-context">
+<span id="loop-context"></span><h2>The Loop Context<a class="headerlink" href="#the-loop-context" title="Permalink to this headline">¶</a></h2>
+<p>Within <tt class="docutils literal"><span class="pre">%</span> <span class="pre">for</span></tt> blocks, the <a class="reference internal" href="#reserved-names"><em>reserved name</em></a> <tt class="docutils literal"><span class="pre">loop</span></tt>
+is available.  <tt class="docutils literal"><span class="pre">loop</span></tt> tracks the progress of
+the <tt class="docutils literal"><span class="pre">for</span></tt> loop and makes it easy to use the iteration state to control
+template behavior:</p>
+<div class="highlight-mako"><div class="highlight"><pre><span class="x">&lt;ul&gt;</span>
+<span class="cp">%</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&quot;one&quot;</span><span class="p">,</span> <span class="s">&quot;two&quot;</span><span class="p">,</span> <span class="s">&quot;three&quot;</span><span class="p">):</span><span class="x"></span>
+<span class="x">    &lt;li&gt;Item </span><span class="cp">${</span><span class="n">loop</span><span class="o">.</span><span class="n">index</span><span class="cp">}</span><span class="x">: </span><span class="cp">${</span><span class="n">a</span><span class="cp">}</span><span class="x">&lt;/li&gt;</span>
+<span class="cp">%</span><span class="k"> endfor</span><span class="x"></span>
+<span class="x">&lt;/ul&gt;</span>
+</pre></div>
+</div>
+<p class="versionadded">
+<span class="versionmodified">New in version 0.7.</span></p>
+<div class="section" id="iterations">
+<h3>Iterations<a class="headerlink" href="#iterations" title="Permalink to this headline">¶</a></h3>
+<p>Regardless of the type of iterable you&#8217;re looping over, <tt class="docutils literal"><span class="pre">loop</span></tt> always tracks
+the 0-indexed iteration count (available at <tt class="docutils literal"><span class="pre">loop.index</span></tt>), its parity
+(through the <tt class="docutils literal"><span class="pre">loop.even</span></tt> and <tt class="docutils literal"><span class="pre">loop.odd</span></tt> bools), and <tt class="docutils literal"><span class="pre">loop.first</span></tt>, a bool
+indicating whether the loop is on its first iteration.  If your iterable
+provides a <tt class="docutils literal"><span class="pre">__len__</span></tt> method, <tt class="docutils literal"><span class="pre">loop</span></tt> also provides access to
+a count of iterations remaining at <tt class="docutils literal"><span class="pre">loop.reverse_index</span></tt> and <tt class="docutils literal"><span class="pre">loop.last</span></tt>,
+a bool indicating whether the loop is on its last iteration; accessing these
+without <tt class="docutils literal"><span class="pre">__len__</span></tt> will raise a <tt class="docutils literal"><span class="pre">TypeError</span></tt>.</p>
+</div>
+<div class="section" id="cycling">
+<h3>Cycling<a class="headerlink" href="#cycling" title="Permalink to this headline">¶</a></h3>
+<p>Cycling is available regardless of whether the iterable you&#8217;re using provides
+a <tt class="docutils literal"><span class="pre">__len__</span></tt> method.  Prior to Mako 0.7, you might have generated a simple
+zebra striped list using <tt class="docutils literal"><span class="pre">enumerate</span></tt>:</p>
+<div class="highlight-mako"><div class="highlight"><pre><span class="x">&lt;ul&gt;</span>
+<span class="cp">%</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">((</span><span class="s">&#39;spam&#39;</span><span class="p">,</span> <span class="s">&#39;ham&#39;</span><span class="p">,</span> <span class="s">&#39;eggs&#39;</span><span class="p">)):</span><span class="x"></span>
+<span class="x">  &lt;li class=&quot;</span><span class="cp">${</span><span class="s">&#39;odd&#39;</span> <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">2</span> <span class="k">else</span> <span class="s">&#39;even&#39;</span><span class="cp">}</span><span class="x">&quot;&gt;</span><span class="cp">${</span><span class="n">item</span><span class="cp">}</span><span class="x">&lt;/li&gt;</span>
+<span class="cp">%</span><span class="k"> endfor</span><span class="x"></span>
+<span class="x">&lt;/ul&gt;</span>
+</pre></div>
+</div>
+<p>With <tt class="docutils literal"><span class="pre">loop.cycle</span></tt>, you get the same results with cleaner code and less prep work:</p>
+<div class="highlight-mako"><div class="highlight"><pre><span class="x">&lt;ul&gt;</span>
+<span class="cp">%</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;spam&#39;</span><span class="p">,</span> <span class="s">&#39;ham&#39;</span><span class="p">,</span> <span class="s">&#39;eggs&#39;</span><span class="p">):</span><span class="x"></span>
+<span class="x">  &lt;li class=&quot;</span><span class="cp">${</span><span class="n">loop</span><span class="o">.</span><span class="n">cycle</span><span class="p">(</span><span class="s">&#39;even&#39;</span><span class="p">,</span> <span class="s">&#39;odd&#39;</span><span class="p">)</span><span class="cp">}</span><span class="x">&quot;&gt;</span><span class="cp">${</span><span class="n">item</span><span class="cp">}</span><span class="x">&lt;/li&gt;</span>
+<span class="cp">%</span><span class="k"> endfor</span><span class="x"></span>
+<span class="x">&lt;/ul&gt;</span>
+</pre></div>
+</div>
+<p>Both approaches produce output like the following:</p>
+<div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;ul&gt;</span>
+  <span class="nt">&lt;li</span> <span class="na">class=</span><span class="s">&quot;even&quot;</span><span class="nt">&gt;</span>spam<span class="nt">&lt;/li&gt;</span>
+  <span class="nt">&lt;li</span> <span class="na">class=</span><span class="s">&quot;odd&quot;</span><span class="nt">&gt;</span>ham<span class="nt">&lt;/li&gt;</span>
+  <span class="nt">&lt;li</span> <span class="na">class=</span><span class="s">&quot;even&quot;</span><span class="nt">&gt;</span>eggs<span class="nt">&lt;/li&gt;</span>
+<span class="nt">&lt;/ul&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="parent-loops">
+<h3>Parent Loops<a class="headerlink" href="#parent-loops" title="Permalink to this headline">¶</a></h3>
+<p>Loop contexts can also be transparently nested, and the Mako runtime will do
+the right thing and manage the scope for you.  You can access the parent loop
+context through <tt class="docutils literal"><span class="pre">loop.parent</span></tt>.</p>
+<p>This allows you to reach all the way back up through the loop stack by
+chaining <tt class="docutils literal"><span class="pre">parent</span></tt> attribute accesses, i.e. <tt class="docutils literal"><span class="pre">loop.parent.parent....</span></tt> as
+long as the stack depth isn&#8217;t exceeded.  For example, you can use the parent
+loop to make a checkered table:</p>
+<div class="highlight-mako"><div class="highlight"><pre><span class="x">&lt;table&gt;</span>
+<span class="cp">%</span> <span class="k">for</span> <span class="n">consonant</span> <span class="ow">in</span> <span class="s">&#39;pbj&#39;</span><span class="p">:</span><span class="x"></span>
+<span class="x">  &lt;tr&gt;</span>
+  <span class="cp">%</span> <span class="k">for</span> <span class="n">vowel</span> <span class="ow">in</span> <span class="s">&#39;iou&#39;</span><span class="p">:</span><span class="x"></span>
+<span class="x">    &lt;td class=&quot;</span><span class="cp">${</span><span class="s">&#39;black&#39;</span> <span class="k">if</span> <span class="p">(</span><span class="n">loop</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">even</span> <span class="o">==</span> <span class="n">loop</span><span class="o">.</span><span class="n">even</span><span class="p">)</span> <span class="k">else</span> <span class="s">&#39;red&#39;</span><span class="cp">}</span><span class="x">&quot;&gt;</span>
+<span class="x">      </span><span class="cp">${</span><span class="n">consonant</span> <span class="o">+</span> <span class="n">vowel</span><span class="cp">}</span><span class="x">t</span>
+<span class="x">    &lt;/td&gt;</span>
+  <span class="cp">%</span><span class="k"> endfor</span><span class="x"></span>
+<span class="x">  &lt;/tr&gt;</span>
+<span class="cp">%</span><span class="k"> endfor</span><span class="x"></span>
+<span class="x">&lt;/table&gt;</span>
+</pre></div>
+</div>
+<div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;table&gt;</span>
+  <span class="nt">&lt;tr&gt;</span>
+    <span class="nt">&lt;td</span> <span class="na">class=</span><span class="s">&quot;black&quot;</span><span class="nt">&gt;</span>
+      pit
+    <span class="nt">&lt;/td&gt;</span>
+    <span class="nt">&lt;td</span> <span class="na">class=</span><span class="s">&quot;red&quot;</span><span class="nt">&gt;</span>
+      pot
+    <span class="nt">&lt;/td&gt;</span>
+    <span class="nt">&lt;td</span> <span class="na">class=</span><span class="s">&quot;black&quot;</span><span class="nt">&gt;</span>
+      put
+    <span class="nt">&lt;/td&gt;</span>
+  <span class="nt">&lt;/tr&gt;</span>
+  <span class="nt">&lt;tr&gt;</span>
+    <span class="nt">&lt;td</span> <span class="na">class=</span><span class="s">&quot;red&quot;</span><span class="nt">&gt;</span>
+      bit
+    <span class="nt">&lt;/td&gt;</span>
+    <span class="nt">&lt;td</span> <span class="na">class=</span><span class="s">&quot;black&quot;</span><span class="nt">&gt;</span>
+      bot
+    <span class="nt">&lt;/td&gt;</span>
+    <span class="nt">&lt;td</span> <span class="na">class=</span><span class="s">&quot;red&quot;</span><span class="nt">&gt;</span>
+      but
+    <span class="nt">&lt;/td&gt;</span>
+  <span class="nt">&lt;/tr&gt;</span>
+  <span class="nt">&lt;tr&gt;</span>
+    <span class="nt">&lt;td</span> <span class="na">class=</span><span class="s">&quot;black&quot;</span><span class="nt">&gt;</span>
+      jit
+    <span class="nt">&lt;/td&gt;</span>
+    <span class="nt">&lt;td</span> <span class="na">class=</span><span class="s">&quot;red&quot;</span><span class="nt">&gt;</span>
+      jot
+    <span class="nt">&lt;/td&gt;</span>
+    <span class="nt">&lt;td</span> <span class="na">class=</span><span class="s">&quot;black&quot;</span><span class="nt">&gt;</span>
+      jut
+    <span class="nt">&lt;/td&gt;</span>
+  <span class="nt">&lt;/tr&gt;</span>
+<span class="nt">&lt;/table&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="migrating-legacy-templates-that-use-the-word-loop">
+<span id="migrating-loop"></span><h3>Migrating Legacy Templates that Use the Word &#8220;loop&#8221;<a class="headerlink" href="#migrating-legacy-templates-that-use-the-word-loop" title="Permalink to this headline">¶</a></h3>
+<p class="versionchanged">
+<span class="versionmodified">Changed in version 0.7: </span>The <tt class="docutils literal"><span class="pre">loop</span></tt> name is now <a class="reference internal" href="#reserved-names"><em>reserved</em></a> in Mako,
+which means a template that refers to a variable named <tt class="docutils literal"><span class="pre">loop</span></tt>
+won&#8217;t function correctly when used in Mako 0.7.</p>
+<p>To ease the transition for such systems, the feature can be disabled across the board for
+all templates, then re-enabled on a per-template basis for those templates which wish
+to make use of the new system.</p>
+<p>First, the <tt class="docutils literal"><span class="pre">enable_loop=False</span></tt> flag is passed to either the <a class="reference internal" href="usage.html#mako.lookup.TemplateLookup" title="mako.lookup.TemplateLookup"><tt class="xref py py-class docutils literal"><span class="pre">TemplateLookup</span></tt></a>
+or <a class="reference internal" href="usage.html#mako.template.Template" title="mako.template.Template"><tt class="xref py py-class docutils literal"><span class="pre">Template</span></tt></a> object in use:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">lookup</span> <span class="o">=</span> <span class="n">TemplateLookup</span><span class="p">(</span><span class="n">directories</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;/docs&#39;</span><span class="p">],</span> <span class="n">enable_loop</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>or:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">template</span> <span class="o">=</span> <span class="n">Template</span><span class="p">(</span><span class="s">&quot;some template&quot;</span><span class="p">,</span> <span class="n">enable_loop</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>An individual template can make usage of the feature when <tt class="docutils literal"><span class="pre">enable_loop</span></tt> is set to
+<tt class="docutils literal"><span class="pre">False</span></tt> by switching it back on within the <tt class="docutils literal"><span class="pre">&lt;%page&gt;</span></tt> tag:</p>
+<div class="highlight-mako"><div class="highlight"><pre><span class="cp">&lt;%</span><span class="nb">page</span> <span class="na">enable_loop=</span><span class="s">&quot;True&quot;</span><span class="cp">/&gt;</span>
+
+<span class="cp">%</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">collection</span><span class="p">:</span><span class="x"></span>
+<span class="x">    </span><span class="cp">${</span><span class="n">i</span><span class="cp">}</span><span class="x"> </span><span class="cp">${</span><span class="n">loop</span><span class="o">.</span><span class="n">index</span><span class="cp">}</span>
+<span class="cp">%</span><span class="k"> endfor</span><span class="x"></span>
+</pre></div>
+</div>
+<p>Using the above scheme, it&#8217;s safe to pass the name <tt class="docutils literal"><span class="pre">loop</span></tt> to the <a class="reference internal" href="usage.html#mako.template.Template.render" title="mako.template.Template.render"><tt class="xref py py-meth docutils literal"><span class="pre">Template.render()</span></tt></a>
+method as well as to freely make usage of a variable named <tt class="docutils literal"><span class="pre">loop</span></tt> within a template, provided
+the <tt class="docutils literal"><span class="pre">&lt;%page&gt;</span></tt> tag doesn&#8217;t override it.  New templates that want to use the <tt class="docutils literal"><span class="pre">loop</span></tt> context
+can then set up <tt class="docutils literal"><span class="pre">&lt;%page</span> <span class="pre">enable_loop=&quot;True&quot;/&gt;</span></tt> to use the new feature without affecting
+old templates.</p>
+</div>
+</div>
+<div class="section" id="all-the-built-in-names">
+<h2>All the Built-in Names<a class="headerlink" href="#all-the-built-in-names" title="Permalink to this headline">¶</a></h2>
+<p>A one-stop shop for all the names Mako defines. Most of these
+names are instances of <a class="reference internal" href="namespaces.html#mako.runtime.Namespace" title="mako.runtime.Namespace"><tt class="xref py py-class docutils literal"><span class="pre">Namespace</span></tt></a>, which are described
+in the next section, <a class="reference internal" href="namespaces.html"><em>Namespaces</em></a>. Also, most of
+these names other than <tt class="docutils literal"><span class="pre">context</span></tt>, <tt class="docutils literal"><span class="pre">UNDEFINED</span></tt>, and <tt class="docutils literal"><span class="pre">loop</span></tt> are
+also present <em>within</em> the <a class="reference internal" href="#mako.runtime.Context" title="mako.runtime.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a> itself.   The names
+<tt class="docutils literal"><span class="pre">context</span></tt>, <tt class="docutils literal"><span class="pre">loop</span></tt> and <tt class="docutils literal"><span class="pre">UNDEFINED</span></tt> themselves can&#8217;t be passed
+to the context and can&#8217;t be substituted &#8211; see the section <a class="reference internal" href="#reserved-names"><em>Reserved Names</em></a>.</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">context</span></tt> - this is the <a class="reference internal" href="#mako.runtime.Context" title="mako.runtime.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a> object, introduced
+at <a class="reference internal" href="#context"><em>Context</em></a>.</li>
+<li><tt class="docutils literal"><span class="pre">local</span></tt> - the namespace of the current template, described
+in <a class="reference internal" href="namespaces.html#namespaces-builtin"><em>Built-in Namespaces</em></a>.</li>
+<li><tt class="docutils literal"><span class="pre">self</span></tt> - the namespace of the topmost template in an
+inheritance chain (if any, otherwise the same as <tt class="docutils literal"><span class="pre">local</span></tt>),
+mostly described in <a class="reference internal" href="inheritance.html"><em>Inheritance</em></a>.</li>
+<li><tt class="docutils literal"><span class="pre">parent</span></tt> - the namespace of the parent template in an
+inheritance chain (otherwise undefined); see
+<a class="reference internal" href="inheritance.html"><em>Inheritance</em></a>.</li>
+<li><tt class="docutils literal"><span class="pre">next</span></tt> - the namespace of the next template in an
+inheritance chain (otherwise undefined); see
+<a class="reference internal" href="inheritance.html"><em>Inheritance</em></a>.</li>
+<li><tt class="docutils literal"><span class="pre">caller</span></tt> - a &#8220;mini&#8221; namespace created when using the
+<tt class="docutils literal"><span class="pre">&lt;%call&gt;</span></tt> tag to define a &#8220;def call with content&#8221;; described
+in <a class="reference internal" href="defs.html#defs-with-content"><em>Calling a Def with Embedded Content and/or Other Defs</em></a>.</li>
+<li><tt class="docutils literal"><span class="pre">loop</span></tt> - this provides access to <a class="reference internal" href="#mako.runtime.LoopContext" title="mako.runtime.LoopContext"><tt class="xref py py-class docutils literal"><span class="pre">LoopContext</span></tt></a> objects when
+they are requested within <tt class="docutils literal"><span class="pre">%</span> <span class="pre">for</span></tt> loops, introduced at <a class="reference internal" href="#loop-context"><em>The Loop Context</em></a>.</li>
+<li><tt class="docutils literal"><span class="pre">capture</span></tt> - a function that calls a given def and captures
+its resulting content into a string, which is returned. Usage
+is described in <a class="reference internal" href="filtering.html"><em>Filtering and Buffering</em></a>.</li>
+<li><tt class="docutils literal"><span class="pre">UNDEFINED</span></tt> - a global singleton that is applied to all
+otherwise uninitialized template variables that were not
+located within the <a class="reference internal" href="#mako.runtime.Context" title="mako.runtime.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a> when rendering began,
+unless the <a class="reference internal" href="usage.html#mako.template.Template" title="mako.template.Template"><tt class="xref py py-class docutils literal"><span class="pre">Template</span></tt></a> flag <tt class="docutils literal"><span class="pre">strict_undefined</span></tt>
+is set to <tt class="docutils literal"><span class="pre">True</span></tt>. <tt class="docutils literal"><span class="pre">UNDEFINED</span></tt> is
+an instance of <a class="reference internal" href="#mako.runtime.Undefined" title="mako.runtime.Undefined"><tt class="xref py py-class docutils literal"><span class="pre">Undefined</span></tt></a>, and raises an
+exception when its <tt class="docutils literal"><span class="pre">__str__()</span></tt> method is called.</li>
+<li><tt class="docutils literal"><span class="pre">pageargs</span></tt> - this is a dictionary which is present in a
+template which does not define any <tt class="docutils literal"><span class="pre">**kwargs</span></tt> section in its
+<tt class="docutils literal"><span class="pre">&lt;%page&gt;</span></tt> tag. All keyword arguments sent to the <tt class="docutils literal"><span class="pre">body()</span></tt>
+function of a template (when used via namespaces) go here by
+default unless otherwise defined as a page argument. If this
+makes no sense, it shouldn&#8217;t; read the section
+<a class="reference internal" href="namespaces.html#namespaces-body"><em>The body() Method</em></a>.</li>
+</ul>
+<div class="section" id="reserved-names">
+<span id="id2"></span><h3>Reserved Names<a class="headerlink" href="#reserved-names" title="Permalink to this headline">¶</a></h3>
+<p>Mako has a few names that are considered to be &#8220;reserved&#8221; and can&#8217;t be used
+as variable names.</p>
+<p class="versionchanged">
+<span class="versionmodified">Changed in version 0.7: </span>Mako raises an error if these words are found passed to the template
+as context arguments, whereas in previous versions they&#8217;d be silently
+ignored or lead to other error messages.</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">context</span></tt> - see <a class="reference internal" href="#context"><em>Context</em></a>.</li>
+<li><tt class="docutils literal"><span class="pre">UNDEFINED</span></tt> - see <a class="reference internal" href="#context-vars"><em>Context Variables</em></a>.</li>
+<li><tt class="docutils literal"><span class="pre">loop</span></tt> - see <a class="reference internal" href="#loop-context"><em>The Loop Context</em></a>.  Note this can be disabled for legacy templates
+via the <tt class="docutils literal"><span class="pre">enable_loop=False</span></tt> argument; see <a class="reference internal" href="#migrating-loop"><em>Migrating Legacy Templates that Use the Word &#8220;loop&#8221;</em></a>.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="api-reference">
+<h2>API Reference<a class="headerlink" href="#api-reference" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="mako.runtime.Context">
+<em class="property">class </em><tt class="descclassname">mako.runtime.</tt><tt class="descname">Context</tt><big>(</big><em>buffer</em>, <em>**data</em><big>)</big><a class="headerlink" href="#mako.runtime.Context" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Provides runtime namespace, output buffer, and various
+callstacks for templates.</p>
+<p>See <a class="reference internal" href="#"><em>The Mako Runtime Environment</em></a> for detail on the usage of
+<a class="reference internal" href="#mako.runtime.Context" title="mako.runtime.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a>.</p>
+<dl class="method">
+<dt id="mako.runtime.Context.get">
+<tt class="descname">get</tt><big>(</big><em>key</em>, <em>default=None</em><big>)</big><a class="headerlink" href="#mako.runtime.Context.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a value from this <a class="reference internal" href="#mako.runtime.Context" title="mako.runtime.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mako.runtime.Context.keys">
+<tt class="descname">keys</tt><big>(</big><big>)</big><a class="headerlink" href="#mako.runtime.Context.keys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of all names established in this <a class="reference internal" href="#mako.runtime.Context" title="mako.runtime.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mako.runtime.Context.kwargs">
+<tt class="descname">kwargs</tt><a class="headerlink" href="#mako.runtime.Context.kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the dictionary of keyword arguments associated with this
+<a class="reference internal" href="#mako.runtime.Context" title="mako.runtime.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mako.runtime.Context.locals_">
+<tt class="descname">locals_</tt><big>(</big><em>d</em><big>)</big><a class="headerlink" href="#mako.runtime.Context.locals_" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new <a class="reference internal" href="#mako.runtime.Context" title="mako.runtime.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a> with a copy of this
+<a class="reference internal" href="#mako.runtime.Context" title="mako.runtime.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a>&#8216;s current state, updated with the given dictionary.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mako.runtime.Context.lookup">
+<tt class="descname">lookup</tt><a class="headerlink" href="#mako.runtime.Context.lookup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the <a class="reference internal" href="usage.html#mako.lookup.TemplateLookup" title="mako.lookup.TemplateLookup"><tt class="xref py py-class docutils literal"><span class="pre">TemplateLookup</span></tt></a> associated
+with this <a class="reference internal" href="#mako.runtime.Context" title="mako.runtime.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mako.runtime.Context.pop_caller">
+<tt class="descname">pop_caller</tt><big>(</big><big>)</big><a class="headerlink" href="#mako.runtime.Context.pop_caller" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pop a <tt class="docutils literal"><span class="pre">caller</span></tt> callable onto the callstack for this
+<a class="reference internal" href="#mako.runtime.Context" title="mako.runtime.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mako.runtime.Context.push_caller">
+<tt class="descname">push_caller</tt><big>(</big><em>caller</em><big>)</big><a class="headerlink" href="#mako.runtime.Context.push_caller" title="Permalink to this definition">¶</a></dt>
+<dd><p>Push a <tt class="docutils literal"><span class="pre">caller</span></tt> callable onto the callstack for
+this <a class="reference internal" href="#mako.runtime.Context" title="mako.runtime.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mako.runtime.Context.write">
+<tt class="descname">write</tt><big>(</big><em>string</em><big>)</big><a class="headerlink" href="#mako.runtime.Context.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a string to this <a class="reference internal" href="#mako.runtime.Context" title="mako.runtime.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a> object&#8217;s
+underlying output buffer.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mako.runtime.Context.writer">
+<tt class="descname">writer</tt><big>(</big><big>)</big><a class="headerlink" href="#mako.runtime.Context.writer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the current writer function.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mako.runtime.LoopContext">
+<em class="property">class </em><tt class="descclassname">mako.runtime.</tt><tt class="descname">LoopContext</tt><big>(</big><em>iterable</em><big>)</big><a class="headerlink" href="#mako.runtime.LoopContext" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>A magic loop variable.
+Automatically accessible in any <tt class="docutils literal"><span class="pre">%</span> <span class="pre">for</span></tt> block.</p>
+<p>See the section <a class="reference internal" href="#loop-context"><em>The Loop Context</em></a> for usage
+notes.</p>
+<dl class="docutils">
+<dt><tt class="xref py py-attr docutils literal"><span class="pre">parent</span></tt> -&gt; <a class="reference internal" href="#mako.runtime.LoopContext" title="mako.runtime.LoopContext"><tt class="xref py py-class docutils literal"><span class="pre">LoopContext</span></tt></a> or <tt class="docutils literal"><span class="pre">None</span></tt></dt>
+<dd>The parent loop, if one exists.</dd>
+<dt><tt class="xref py py-attr docutils literal"><span class="pre">index</span></tt> -&gt; <cite>int</cite></dt>
+<dd>The 0-based iteration count.</dd>
+<dt><tt class="xref py py-attr docutils literal"><span class="pre">reverse_index</span></tt> -&gt; <cite>int</cite></dt>
+<dd>The number of iterations remaining.</dd>
+<dt><tt class="xref py py-attr docutils literal"><span class="pre">first</span></tt> -&gt; <cite>bool</cite></dt>
+<dd><tt class="docutils literal"><span class="pre">True</span></tt> on the first iteration, <tt class="docutils literal"><span class="pre">False</span></tt> otherwise.</dd>
+<dt><tt class="xref py py-attr docutils literal"><span class="pre">last</span></tt> -&gt; <cite>bool</cite></dt>
+<dd><tt class="docutils literal"><span class="pre">True</span></tt> on the last iteration, <tt class="docutils literal"><span class="pre">False</span></tt> otherwise.</dd>
+<dt><tt class="xref py py-attr docutils literal"><span class="pre">even</span></tt> -&gt; <cite>bool</cite></dt>
+<dd><tt class="docutils literal"><span class="pre">True</span></tt> when <tt class="docutils literal"><span class="pre">index</span></tt> is even.</dd>
+<dt><tt class="xref py py-attr docutils literal"><span class="pre">odd</span></tt> -&gt; <cite>bool</cite></dt>
+<dd><tt class="docutils literal"><span class="pre">True</span></tt> when <tt class="docutils literal"><span class="pre">index</span></tt> is odd.</dd>
+</dl>
+<dl class="method">
+<dt id="mako.runtime.LoopContext.cycle">
+<tt class="descname">cycle</tt><big>(</big><em>*values</em><big>)</big><a class="headerlink" href="#mako.runtime.LoopContext.cycle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cycle through values as the loop progresses.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mako.runtime.Undefined">
+<em class="property">class </em><tt class="descclassname">mako.runtime.</tt><tt class="descname">Undefined</tt><a class="headerlink" href="#mako.runtime.Undefined" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Represents an undefined value in a template.</p>
+<p>All template modules have a constant value
+<tt class="docutils literal"><span class="pre">UNDEFINED</span></tt> present which is an instance of this
+object.</p>
+</dd></dl>
+
+</div>
+</div>
+
+    </div>
+
+</div>
+
+<div id="docs-bottom-navigation" class="docs-navigation-links">
+        Previous:
+        <a href="defs.html" title="previous chapter">Defs and Blocks</a>
+        Next:
+        <a href="namespaces.html" title="next chapter">Namespaces</a>
+
+    <div id="docs-copyright">
+        &copy; Copyright the Mako authors and contributors.
+        Documentation generated using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3 
+        with Mako templates.
+    </div>
+</div>
+
+</div>
+
+<div class="clearfix">
+
+<hr/>
+
+<div class="copyright">Website content copyright &copy; by Michael Bayer.
+    All rights reserved.  Mako and its documentation are licensed
+    under the MIT license.  mike(&)zzzcomputing.com</div>
+
+</div>
+</div>
+</body>
+</html>
