@@ -270,7 +270,7 @@ to include a simple form:
     <%!from desktop.views import commonheader, commonfooter %>
     <%namespace name="shared" file="shared_components.mako" />
 
-    ${commonheader("Calculator", "calculator", user, "100px")}
+    ${commonheader("Calculator", "calculator", user, "100px") | n,unicode}
 
     ## Main body
 
@@ -288,7 +288,7 @@ to include a simple form:
         <input type="submit" value="Calculate">
       </form>
     </div>
-    ${commonfooter(messages)}
+    ${commonfooter(messages) | n,unicode}
 
 The template language here is <a href="http://www.makotemplates.org/docs/">Mako</a>,
 which is flexible and powerful.  If you use the "`.html`" extension, Hue
