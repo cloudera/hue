@@ -65,7 +65,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
           % endif
         </span>
         <span class="smartview-row-controls pull-right">
-          <button class="btn" data-bind="click: $data.toggleSelectedCollapse, enable: $data.selected().length > 0, clickBubble: false" data-toggle="tooltip" title="${_('Toggle Collapse Selected')}"><i class="icon-resize-small"></i></button>
+          <button class="btn" data-bind="click: $data.toggleSelectedCollapse, enable: $data.selected().length > 0, clickBubble: false" data-toggle="tooltip" title="${_('Toggle Collapse Selected')}"><i data-bind="css: { 'icon-resize-small': !$data.isCollapsed(), 'icon-resize-full': $data.isCollapsed() }"></i></button>
           <button class="btn" data-bind="click: $data.toggleSelectAllVisible, enable: $data.displayedItems().length > 0, clickBubble: false" data-toggle="tooltip" title="${_('Select All Visible')}"><i class="icon-check"></i></button>
           <input type="text" placeholder="${('Filter Column Names/Family')}" data-bind="value: $data.searchQuery, valueUpdate: $data.items().length < 100 ? 'afterkeydown' : 'change', clickBubble: false"/>
           ${sortBtn('$data.sortDropDown')}
@@ -95,12 +95,6 @@ ${ commonheader(None, "hbase", user) | n,unicode }
     </div>
   </div>
   <br/>
-  <div class="alert alert-error" data-bind="visible: !${datasource}.isLoading()">
-    <b>${_('Notice:')}</b> ${_(' entries may be truncated with limit set at')} <i data-bind="text: ${datasource}.truncateLimit"></i> ${_('items per set.')}
-  </div>
-  <div class="alert alert-warning" data-bind="visible: !${datasource}.isLoading()">
-      ${_('Query executed in')} <i data-bind="text:${datasource}.lastReloadTime() + 's'"></i> ${_('fetching')} <i data-bind="text: ${datasource}.items().length"></i> ${_('rows')}.
-  </div>
   <center data-bind="visible: ${datasource}.isLoading()">
   <!--[if !IE]><!--><i class="icon-spinner icon-spin loader-main"></i><!--<![endif]-->
   <!--[if IE]><img src="/hbase/static/art/loader.gif" /><![endif]-->
@@ -242,17 +236,18 @@ ${ commonheader(None, "hbase", user) | n,unicode }
     <div class="subnav navbar-fixed-bottom well-small">
         <div class="container-fluid">
           <div class="footer-slider">
-            <b>${_('Displaying')}</b>
-            <!-- ko foreach: app.views.tabledata.querySet -->
-            <span data-bind="visible: $data.scan_length() > 1 || $data.editing()"><b data-bind="text: $data.scan_length, visible: !$data.editing(), click: $data.editing.bind(true)"></b>
-            <input type="number" style="width:30px" data-bind="value: $data.scan_length, visible: $data.editing()"/>
-            entr<span data-bind="text: $data.scan_length() > 1 ? 'ies' : 'y'"></span> ${_('starting from')}</span>
-            <code data-bind="text: $data.row_key, visible: !$data.editing(), click: $data.editing.bind(true)"></code><input type="text" class="input-small" placeholder="row_key" data-bind="value: $data.row_key, visible: $data.editing()"/>
-            <span data-bind="visible: $data != app.views.tabledata.querySet()[app.views.tabledata.querySet().length - 1],
-                             text: $data == app.views.tabledata.querySet()[app.views.tabledata.querySet().length - 2] ? 'and' : ','"></span>
-            <!-- /ko -->
-            <a class="btn" data-bind="click: app.views.tabledata.addQuery"><i class="icon-plus-sign"></i> ${_('Add Query Field')}</a>
-            <a class="btn btn-primary" data-bind="click: app.views.tabledata.evaluateQuery">${_('Go')}</a>
+            <span data-bind="visible: !app.views.tabledata.isLoading()">
+              ${_('Fetched')}
+              <!-- ko foreach: app.views.tabledata.querySet -->
+              <span data-bind="visible: $data.scan_length() > 1"><b data-bind="text: $data.scan_length"></b>
+              entr<span data-bind="text: $data.scan_length() > 1 ? 'ies' : 'y'"></span> ${_('starting from')}</span>
+              <code data-bind="text: $data.row_key"></code>
+              <span data-bind="visible: $data != app.views.tabledata.querySet()[app.views.tabledata.querySet().length - 1],
+                               text: $data == app.views.tabledata.querySet()[app.views.tabledata.querySet().length - 2] ? 'and' : ','"></span>
+              <!-- /ko -->
+              ${_('in')} <i data-bind="text: app.views.tabledata.lastReloadTime()"></i> ${_('seconds')}.
+              <b data-bind="visible: app.views.tabledata.reachedLimit()">${_('Entries after')} <i data-bind="text: app.views.tabledata.truncateLimit"></i> ${_('were truncated.')}</b>
+            </span>
           </div>
           <span class="pull-right">
             % if user.is_superuser:
@@ -389,8 +384,8 @@ var i18n_cache = {
   "Are you sure you want to": "${_('Are you sure you want to')}",
   "this table?": "${_('this table?')}",
   'End Query': "${_('End Query')}",
-  'Mark Row/Column Prefix': "${_('Mark Row/Column Prefix')}",
-  'Start Row/Column Scan': "${_('Start Row/Column Scan')}",
+  'Prefix Scan': "${_('Prefix Scan')}",
+  'Start Scan': "${_('Start Scan')}",
   'Start Select Columns': "${_('Start Select Columns')}",
   'End Column/Family': "${_('End Column/Family')}",
   'End Select Columns': "${_('End Select Columns')}",
