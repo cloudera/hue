@@ -831,7 +831,7 @@ var tagsearch = function() {
       case 'filter':
         var focus = val.replace(/\{|\}|\s|&[^;]+?;/g,"").split(/(AND|OR|SKIP|WHILE)/).slice(-1)[0];
         self.activeSuggestions(self.filters.filter(function(a) {
-          return a.replace(" ","").indexOf(focus) != -1;
+          return a.toLowerCase().replace(" ","").indexOf(focus.toLowerCase()) != -1;
         }));
         return;
       case 'rowkey':
