@@ -34,7 +34,7 @@ class TestModel(models.Model):
 
   my_int = models.IntegerField()
   my_str = models.TextField(max_length=100)
-  last_modified = models.DateField(auto_now=True)
+  last_modified = models.DateTimeField(auto_now=True)
 
 class TestDjangoUtil(object):
   def test_update_if_dirty(self):

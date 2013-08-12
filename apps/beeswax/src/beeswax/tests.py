@@ -346,7 +346,7 @@ for x in sys.stdin:
     """
     response = _make_query(self.client, "SELECT foo FROM test WHERE foo='$x' and bar='$y'", is_parameterized=False)
     # Assert no parameterization was offered
-    assert_true("watch_wait.mako" in response.template, "we should have seen the template for a query executing")
+    assert_true(any(["watch_wait.mako" in _template.filename for _template in response.template]), "we should have seen the template for a query executing")
 
     response = _make_query(self.client, "SELECT foo FROM test WHERE foo='$x' and bar='$y'")
     assert_true("parameterization.mako", response.template)
@@ -360,7 +360,7 @@ for x in sys.stdin:
     # Now fill it out
     response = self.client.post("/beeswax/execute_parameterized/%d" % design_id, {
                                 "parameterization-x": str(1), "parameterization-y": str(2)}, follow=True)
-    assert_true("watch_wait.mako" in response.template)
+    assert_true(any(["watch_wait.mako" in _template.filename for _template in response.template]))
 
     # Check that substitution happened!
     assert_equal("SELECT foo FROM test WHERE foo='1' and bar='2'", response.context["query"].query)
@@ -369,7 +369,7 @@ for x in sys.stdin:
     response = self.client.post("/beeswax/execute_parameterized/%d" % design_id,
                                 {"parameterization-x": "'_this_is_not SQL ", "parameterization-y": str(2)},
                                 follow=True)
-    assert_true("execute.mako" in response.template)
+    assert_true(any(["execute.mako" in _template.filename for _template in response.template]))
     log = response.context["log"]
     assert_true(search_log_line('ql.Driver', 'FAILED: ParseException', log), log)
 

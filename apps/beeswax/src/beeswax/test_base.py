@@ -173,7 +173,7 @@ REFRESH_RE = re.compile('<\s*meta\s+http-equiv="refresh"\s+content="\d*;([^"]*)"
 
 
 def wait_for_query_to_finish(client, response, max=30.0):
-  logging.info(str(response.template) + ": " + str(response.content))
+  # logging.info(str(response.template.filename) + ": " + str(response.content))
   start = time.time()
   sleep_time = 0.05
   # We don't check response.template == "watch_wait.mako" here,

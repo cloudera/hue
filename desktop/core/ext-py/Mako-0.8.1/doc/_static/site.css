@@ -1,0 +1,86 @@
+body {
+    font-family: Tahoma, Geneva, sans-serif;
+    line-height:1.4em;
+    margin:15px;
+    background-color:#FFFFFF;
+}
+img {border:none;}
+a { text-decoration: none;}
+a:visited  { color: #2929ff;}
+a:hover { color: #0000ff;}
+
+#wrap {
+    margin:0 auto;
+    max-width:1024px;
+    min-width:480px;
+    position:relative;
+
+}
+h1 {
+    font-size:1.6em;
+    font-weight:bold;
+}
+
+h2 {
+    font-size:1.1em;
+    font-weight:bold;
+    margin:10px 0px 10px 0px;
+}
+
+.clearfix{
+    clear:both;
+}
+
+.red {
+	font-weight:bold;
+	color:#FF0000;
+}
+.rightbar {
+    float:right;
+}
+.slogan {
+    margin-top:10px;
+}
+#gittip_nav {
+    float:right;
+    margin:10px 0px 0px 0px;
+}
+
+.toolbar {
+    margin-top:20px;
+}
+.copyright {
+    font-size:.8em;
+    text-align:center;
+    color:909090;
+}
+.pylogo {
+	text-align:right;
+	float:right;
+}
+.code {
+    font-family:monospace;
+}
+
+li {
+    margin:1px 0px 1px 0px;
+}
+
+.speedchart td {
+    font-size:small;
+}
+
+pre.codesample {
+    margin: 1.5em;
+    padding: .5em;
+    font-size: .95em;
+    line-height:1em;
+    background-color: #eee;
+    border: 1px solid #ccc;
+    width:450px;
+    overflow:auto;
+}
+
+#speedchart {
+    margin:5px 10px 5px 10px;
+}

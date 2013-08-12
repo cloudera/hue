@@ -1,0 +1,27 @@
+language: python
+python:
+  - "2.6"
+  - "2.7"
+env:
+  - DJANGO=Django==1.3.3
+  - DJANGO=Django==1.4.1
+  - DJANGO=Django==1.5
+  - DJANGO=https://github.com/django/django/archive/master.zip
+matrix:
+  include:
+    - python: "3.3"
+      env: DJANGO=Django==1.5
+    - python: "3.3"
+      env: DJANGO=https://github.com/django/django/archive/master.zip
+  exclude:
+    - python: "2.6"
+      env: DJANGO=https://github.com/django/django/archive/master.zip
+before_install:
+  - export PIP_USE_MIRRORS=true
+  - export PIP_INDEX_URL=https://simple.crate.io/
+install:
+  - pip install south
+  - pip install $DJANGO
+  - pip install -e .
+script:
+  - ./runtests.sh

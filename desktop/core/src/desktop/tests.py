@@ -297,7 +297,7 @@ def test_error_handling():
     c.store_exc_info = store_exc_info
 
     response = c.get('/500_internal_error')
-    assert_true('500.mako' in response.template)
+    assert_true(any(["500.mako" in _template.filename for _template in response.template]))
     assert_true('Thank you for your patience' in response.content)
     assert_true(exc_msg not in response.content)
 
@@ -309,7 +309,7 @@ def test_error_handling():
 
     # PopupException
     response = c.get('/popup_exception')
-    assert_true('popup_error.mako' in response.template)
+    assert_true(any(["popup_error.mako" in _template.filename for _template in response.template]))
     assert_true(exc_msg in response.content)
   finally:
     # Restore the world
@@ -356,7 +356,7 @@ def test_404_handling():
   view_name = '/the-view-that-is-not-there'
   c = make_logged_in_client()
   response = c.get(view_name)
-  assert_true('404.mako' in response.template)
+  assert_true(any(['404.mako' in _template.filename for _template in response.template]), response.template)
   assert_true('Not Found' in response.content)
   assert_true(view_name in response.content)
 

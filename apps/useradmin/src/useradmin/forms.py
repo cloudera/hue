@@ -61,6 +61,9 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
   class Meta(django.contrib.auth.forms.UserChangeForm.Meta):
     fields = ["username", "first_name", "last_name", "email", "ensure_home_directory"]
 
+  def clean_password(self):
+    return self.cleaned_data["password"]
+
   def clean_password2(self):
     password1 = self.cleaned_data.get("password1", "")
     password2 = self.cleaned_data["password2"]

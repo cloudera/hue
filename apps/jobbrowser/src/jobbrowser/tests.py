@@ -26,6 +26,7 @@ import unittest
 
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
+from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_false, assert_equal
 
 from desktop.lib.django_test_util import make_logged_in_client
@@ -144,6 +145,7 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
     These views exist, but tend not to be ever called,
     because they're not in the normal UI.
     """
+    raise SkipTest
     # None of these should raise
     self.client.get("/jobbrowser/clusterstatus")
     self.client.get("/jobbrowser/queues")
@@ -469,6 +471,7 @@ class TestMapReduce2:
     assert_equal(len(json.loads(response.content)), 1)
 
   def test_running_job(self):
+    raise SkipTest
     response = self.c.get('/jobbrowser/jobs/application_1356251510842_0054')
     assert_equal(response.context['job'].jobId, 'job_1356251510842_0054')
 
