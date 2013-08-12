@@ -56,6 +56,7 @@ def create_table(request, database='default'):
   if request.method == "POST":
     form.bind(request.POST)
     form.table.db = db  # curry is invalid
+    form.table.database = database
 
     if request.POST.get('create'):
       if form.is_valid():

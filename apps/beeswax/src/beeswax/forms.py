@@ -246,12 +246,12 @@ class CreateTableForm(DependencyAwareForm):
     return _clean_terminator(self.cleaned_data.get('map_key_terminator'))
 
   def clean_name(self):
-    return _clean_tablename(self.db, self.cleaned_data['name'])
+    return _clean_tablename(self.db, self.cleaned_data['name'], self.database)
 
 
-def _clean_tablename(db, name):
+def _clean_tablename(db, name, database='default'):
   try:
-    table = db.get_table("default", name)
+    table = db.get_table(database, name)
     if table.name:
       raise forms.ValidationError(_('Table "%(name)s" already exists.') % {'name': name})
   except Exception:
