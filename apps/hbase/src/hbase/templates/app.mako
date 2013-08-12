@@ -199,7 +199,6 @@ ${ commonheader(None, "hbase", user) | n,unicode }
           <div id="searchbar-main" class="span5" data-bind="click: search.clickTagBar">
             <div id="search-tags" contenteditable="true" data-bind="editableText: search.cur_input, hasfocus: search.focused, css: { 'active': search.cur_input() != '' }, event: { 'keydown': search.onKeyDown, click: search.updateMenu.bind(null) }" data-placeholder="${_('row_key, row_key_prefix* + scan_length, row_key [family:col1, family2:col2, family3:]')}">
             </div>
-            <a class="search-remove" data-bind="visible: search.cur_input() != '', click: function(){ app.search.cur_input(''); }"><i class="icon-remove-sign"></i></a>
           </div>
           <ul id="search-typeahead" data-bind="visible: search.focused() && !search.submitted()">
             <!-- ko if: search.mode() != 'idle' -->
@@ -213,6 +212,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
             <li class="search-suggestion" data-bind="event: { mousedown: app.search.replaceFocusNode.bind(null, $data) }, css: {active: app.search.activeSuggestion() == $index()}"><a><span data-bind="text: $data"></span></a></li>
             <!-- /ko -->
           </ul>
+          <a class="search-remove" data-bind="visible: search.cur_input() != '', click: function(){ app.search.cur_input(''); }"><i class="icon-remove-sign"></i></a>
           <button class="btn btn-primary add-on" data-bind="enabled: !search.submitted(), click: search.evaluate.bind(null)"><i class="icon-search"></i></button>
           <span id="column-family-selectors">
             <!-- ko foreach: views.tabledata.columnFamilies() -->

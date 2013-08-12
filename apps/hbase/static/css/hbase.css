@@ -565,12 +565,17 @@ textarea {
 
 .search-remove
 {
-	position: absolute;
-	right: 10px;
-	top: 5px;
+	position: relative;
+	right: 25px;
+	top: 3px;
 	text-decoration: none;
 	cursor: pointer;
 	color: #ccc;
+	z-index: 100;
+	width: 0px;
+	height: 0px;
+	overflow: visible;
+	display: block;
 }
 
 .search-remove:hover
