@@ -37,7 +37,7 @@ from liboozie.oozie_api_test import OozieServerProvider
 from liboozie.types import WorkflowList, Workflow as OozieWorkflow, Coordinator as OozieCoordinator,\
   Bundle as OozieBundle, CoordinatorList, WorkflowAction, BundleList
 
-from oozie.models import Workflow, Node, Kill, Streaming, Link, Job, Coordinator, History,\
+from oozie.models import Workflow, Node, Kill, Link, Job, Coordinator, History,\
   find_parameters, NODE_TYPES, Bundle
 from oozie.conf import SHARE_JOBS
 from oozie.utils import workflow_to_dict, model_to_dict, smart_path
@@ -1178,33 +1178,37 @@ class TestEditor(OozieMockBase):
   def test_coordinator_gen_xml(self):
     coord = create_coordinator(self.wf, self.c)
 
-    assert_equal(
-        '<coordinator-app name="MyCoord"\n'
-        '  frequency="${coord:days(1)}"\n'
-        '  start="2012-07-01T00:00Z" end="2012-07-04T00:00Z" timezone="America/Los_Angeles"\n'
-        '  xmlns="uri:oozie:coordinator:0.2">\n'
-        '  <controls>\n'
-        '    <timeout>100</timeout>\n'
-        '    <concurrency>3</concurrency>\n'
-        '    <execution>FIFO</execution>\n'
-        '    <throttle>10</throttle>\n'
-        '  </controls>\n'
-        '  <action>\n'
-        '    <workflow>\n'
-        '      <app-path>${wf_application_path}</app-path>\n'
-        '      <configuration>\n'
-        '        <property>\n'
-        '          <name>username</name>\n'
-        '          <value>${coord:user()}</value>\n'
-        '        </property>\n'
-        '        <property>\n'
-        '          <name>SLEEP</name>\n'
-        '          <value>1000</value>\n'
-        '        </property>\n'
-        '      </configuration>\n'
-        '   </workflow>\n'
-        '  </action>\n'
-        '</coordinator-app>\n'.split(), coord.to_xml().split())
+    assert_true(
+"""<coordinator-app name="MyCoord"
+  frequency="${coord:days(1)}"
+  start="2012-07-01T00:00Z" end="2012-07-04T00:00Z" timezone="America/Los_Angeles"
+  xmlns="uri:oozie:coordinator:0.2">
+  <controls>
+    <timeout>100</timeout>
+    <concurrency>3</concurrency>
+    <execution>FIFO</execution>
+    <throttle>10</throttle>
+  </controls>
+  <action>
+    <workflow>
+      <app-path>${wf_application_path}</app-path>
+      <configuration>
+        <property>
+          <name>username</name>
+          <value>${coord:user()}</value>
+        </property>
+        <property>
+          <name>SLEEP</name>
+          <value>1000</value>
+        </property>
+        <property>
+          <name>market</name>
+          <value>US</value>
+        </property>
+      </configuration>
+   </workflow>
+  </action>
+</coordinator-app>""" in coord.to_xml(), coord.to_xml())
 
 
   def test_coordinator_with_data_input_gen_xml(self):
@@ -1221,7 +1225,7 @@ class TestEditor(OozieMockBase):
                           u'create-advanced_end_instance': [u'0'],
                           u'create-start_0': [u'07/01/2012'], u'create-start_1': [u'12:00 AM'],
                           u'create-timezone': [u'America/Los_Angeles'], u'create-done_flag': [u''],
-                        u'create-description': [u'']})
+                          u'create-description': [u'']})
 
     self.c.post(reverse('oozie:create_coordinator_data', args=[coord.id, 'output']),
                          {u'output-name': [u'output_dir'], u'output-dataset': [u'2']})
@@ -1283,6 +1287,10 @@ class TestEditor(OozieMockBase):
         <property>
           <name>SLEEP</name>
           <value>1000</value>
+        </property>
+        <property>
+          <name>market</name>
+          <value>US</value>
         </property>
       </configuration>
    </workflow>
