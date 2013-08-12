@@ -289,6 +289,14 @@ var SmartViewModel = function(options) {
   };
 
   self.truncateLimit = ko.observable(1500);
+
+  self.reachedLimit = ko.computed(function() {
+    var items = self.items();
+    for(var i=0; i<items.length; i++) {
+      if(self.truncateLimit() < items[i].items().length) return true;
+    }
+    return false;
+  });
 };
 
 var SmartViewDataRow = function(options) {
@@ -367,14 +375,18 @@ var SmartViewDataRow = function(options) {
     self.updateDisplayedItems();
   };
 
+  self.isCollapsed = ko.observable(false);
+
   self.toggleSelectedCollapse = function() {
-    if(self.displayedItems().length == self.displayRangeStart + self.displayRangeLength) {
+    if(!self.isCollapsed()) {
       self.displayedItems(self.displayedItems().filter(function(item) {
         return item.isSelected();
       }));
       self.scrollLoadSource = self.displayedItems;
+      self.isCollapsed(true);
     }
     else {
+      self.isCollapsed(false);
       self.resetScrollLoad();
     }
   };
@@ -388,7 +400,7 @@ var SmartViewDataRow = function(options) {
       } else {
         self.displayRangeLength = self.items().length + displayRangeDelta;
         var validate = self.items().length;
-        API.queryTable('getRowPartial' , self.row, self.items().length, 50).done(function(data) {
+        API.queryTable('getRowPartial' , self.row, self.items().length, 100).done(function(data) {
           if(self.items().length != validate) return false;
           var cols = data[0].columns;
           var keys = Object.keys(cols);
@@ -619,12 +631,12 @@ var tagsearch = function() {
       mode: ['rowkey', 'prefix', 'scan'],
       selected: false
     }, {
-      hint: i18n('Mark Row/Column Prefix'),
+      hint: i18n('Prefix Scan'),
       shortcut: '*',
       mode: ['rowkey', 'columns'],
       selected: false
     }, {
-      hint: i18n('Start Row/Column Scan'),
+      hint: i18n('Start Scan'),
       shortcut: '+',
       mode: ['rowkey', 'prefix', 'columns'],
       selected: false
