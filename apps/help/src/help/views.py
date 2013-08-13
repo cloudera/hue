@@ -80,6 +80,7 @@ def view(request, app, path):
     'content': content,
     'apps': sorted([ x for x in appmanager.DESKTOP_MODULES if x.help_dir ],
       key = lambda app: app.menu_index),
-    'title': appmanager.get_desktop_module(app).nice_name
+    'title': appmanager.get_desktop_module(app).nice_name,
+    'current': app
   }
   return render("display.mako", request, data)

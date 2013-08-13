@@ -31,9 +31,9 @@ from django.utils.translation import ugettext as _
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <link href="/static/ext/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/static/ext/css/bootplus.css" rel="stylesheet">
   <link href="/static/ext/css/font-awesome.min.css" rel="stylesheet">
-  <link href="/static/css/hue2.css" rel="stylesheet">
+  <link href="/static/css/hue3.css" rel="stylesheet">
 
   <style type="text/css">
     body {
@@ -89,24 +89,12 @@ from django.utils.translation import ugettext as _
 </head>
 
 <body>
-  <div class="navbar navbar-fixed-top">
-    % if conf.CUSTOM.BANNER_TOP_HTML.get():
-    <div id="banner-top" class="banner">
-      ${conf.CUSTOM.BANNER_TOP_HTML.get()}
-    </div>
-    % endif
-    <div class="navbar-inner">
-      <div class="container-fluid"></div>
-    </div>
-  </div>
 
   <div class="container">
     <div class="row">
-      <img id="logo" src="/static/art/hue-login-logo.png" />
-    </div>
-    <div class="row">
       <div class="login-content">
         <form method="POST" action="${action}" class="well">
+        <img id="logo" src="/static/art/hue-login-logo.png" />
           <label
           % if backend_name == 'OAuthBackend':
             class="hide"

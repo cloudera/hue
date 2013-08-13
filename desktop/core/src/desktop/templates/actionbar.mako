@@ -18,7 +18,7 @@
 %>
 
 <%def name="render()">
-    <div class="well" style="padding-top: 10px; padding-bottom: 0">
+    <div style="padding: 10px;">
         <div class="pull-right" style="margin:0">
             %if hasattr(caller, "creation"):
                 ${caller.creation()}
