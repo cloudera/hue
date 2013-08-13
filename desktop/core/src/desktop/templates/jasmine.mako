@@ -26,13 +26,13 @@
   <script src="/static/ext/js/jquery/plugins/jquery.dataTables.1.8.2.min.js"></script>
   <script src="/static/ext/js/bootstrap.min.js"></script>
 
-  <script src="/static/js/Source/jHue/jquery.selector.js"></script>
+  <script src="/static/js/jquery.selector.js"></script>
   <script src="static/jasmine/jHueSelectorSpec.js"></script>
 
-  <script src="/static/js/Source/jHue/jquery.tableextender.js"></script>
+  <script src="/static/js/jquery.tableextender.js"></script>
   <script src="static/jasmine/jHueTableExtenderSpec.js"></script>
 
-  <script src="/static/js/Source/jHue/jquery.tablescroller.js"></script>
+  <script src="/static/js/jquery.tablescroller.js"></script>
   <script src="static/jasmine/jHueTableScrollerSpec.js"></script>
 </%block>
 

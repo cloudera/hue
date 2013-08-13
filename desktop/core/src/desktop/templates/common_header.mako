@@ -107,21 +107,21 @@ from django.utils.translation import ugettext as _
   </script>
 
   <script src="/static/ext/js/jquery/jquery-2.0.2.min.js"></script>
-  <script src="/static/js/Source/jHue/jquery.migration.js"></script>
-  <script src="/static/js/Source/jHue/jquery.filechooser.js"></script>
-  <script src="/static/js/Source/jHue/jquery.selector.js"></script>
-  <script src="/static/js/Source/jHue/jquery.alert.js"></script>
-  <script src="/static/js/Source/jHue/jquery.rowselector.js"></script>
-  <script src="/static/js/Source/jHue/jquery.notify.js"></script>
-  <script src="/static/js/Source/jHue/jquery.tablescroller.js"></script>
-  <script src="/static/js/Source/jHue/jquery.tableextender.js"></script>
-  <script src="/static/js/Source/jHue/jquery.scrollup.js"></script>
-  <script src="/static/js/Source/jHue/jquery.tour.js"></script>
+  <script src="/static/js/jquery.migration.js"></script>
+  <script src="/static/js/jquery.filechooser.js"></script>
+  <script src="/static/js/jquery.selector.js"></script>
+  <script src="/static/js/jquery.alert.js"></script>
+  <script src="/static/js/jquery.rowselector.js"></script>
+  <script src="/static/js/jquery.notify.js"></script>
+  <script src="/static/js/jquery.tablescroller.js"></script>
+  <script src="/static/js/jquery.tableextender.js"></script>
+  <script src="/static/js/jquery.scrollup.js"></script>
+  <script src="/static/js/jquery.tour.js"></script>
   <script src="/static/ext/js/jquery/plugins/jquery.cookie.js"></script>
   <script src="/static/ext/js/jquery/plugins/jquery.total-storage.min.js"></script>
   <script src="/static/ext/js/jquery/plugins/jquery.placeholder.min.js"></script>
   <script src="/static/ext/js/jquery/plugins/jquery.dataTables.1.8.2.min.js"></script>
-  <script src="/static/js/Source/jHue/jquery.datatables.sorting.js"></script>
+  <script src="/static/js/jquery.datatables.sorting.js"></script>
   <script src="/static/ext/js/bootstrap.min.js"></script>
   <script src="/static/ext/js/fileuploader.js"></script>
 

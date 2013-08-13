@@ -378,13 +378,13 @@ ${layout.menubar(section='query')}
 
 <script src="/static/ext/js/codemirror-3.11.js"></script>
 <link rel="stylesheet" href="/static/ext/css/codemirror.css">
-<script src="/static/js/Source/jHue/codemirror-hql.js"></script>
+<script src="/static/js/codemirror-hql.js"></script>
 % if app_name == 'impala':
-  <script src="/static/js/Source/jHue/codemirror-isql-hint.js"></script>
+  <script src="/static/js/codemirror-isql-hint.js"></script>
 % else:
-  <script src="/static/js/Source/jHue/codemirror-hql-hint.js"></script>
+  <script src="/static/js/codemirror-hql-hint.js"></script>
 % endif
-<script src="/static/js/Source/jHue/codemirror-show-hint.js"></script>
+<script src="/static/js/codemirror-show-hint.js"></script>
 
 <link rel="stylesheet" href="/static/ext/css/codemirror-show-hint.css">
 
