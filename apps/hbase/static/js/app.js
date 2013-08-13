@@ -205,6 +205,7 @@ function bindSubmit() {
     if(ui)
       ui.isLoading(false);
   }).success(function() {
+    $(self).modal('hide');
     if(ui)
       app.focusModel().reload();
   });
