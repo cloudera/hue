@@ -19,8 +19,17 @@ var searchRenderers = {
      select: /[^\,\{\[]+(([\{\[][^\}\]]+[\}\]])+|)([^\,]+|)/g, //select the substring to process, useful as JS has no lookbehinds old: ([^,]+\[([^,]+(,|)+)+\]|[^,]+)
      tag: /.+/g, //select the matches to wrap with tags
      nested: {
-        'scan': { select: /(([^\\]|\b)\+[0-9]+)/g, tag: /\+[0-9]+/g},
-        'columns': { select: /\[.+\]/g, tag: /[^:,\[\]]+:([^,\[\]]+|)/g}, //forced to do this select due to lack of lookbehinds /[\[\]]/g
+        'scan': { select: /(([^\\]|\b)\+[0-9]+)/g, tag: /\+[0-9]+/g },
+        'columns': {
+          select: /\[.+\]/g,
+          tag: /[^,\[\]]+/g, //forced to do this select due to lack of lookbehinds /[\[\]]/g
+          nested: {
+            'range': {
+              select: /\sto\s/g,
+              tag: /.+/g
+            }
+          }
+        },
         'prefix': { select: /[^\*\\]+\*/g, tag: /\*/g},
         'filter': {
           select: /\{[^\{\}]+\}/,
@@ -177,6 +186,14 @@ var SmartViewModel = function(options) {
     if(inputs) {
       for(var i=0; i<inputs.length; i++) {
         if(inputs[i].trim() != "" && inputs[i].trim() != ',') {
+          //pull out filters
+          var filter = inputs[i].match(searchRenderers['rowkey']['nested']['filter']['select']) || "";
+          filter = filter != null && filter.length > 0 ? escape(filter[0].trim().slice(1, -1)) : "";
+
+          function filterPostfix(postfix) {
+            return (filter != null && filter.length > 0 ? ' AND ' : ' ' ) + postfix;
+          }
+
           //pull out columns
           var extract = inputs[i].match(searchRenderers['rowkey']['nested']['columns']['select']);
           var columns = extract != null ? extract[0].match(searchRenderers['rowkey']['nested']['columns']['tag']) : [];
@@ -188,27 +205,30 @@ var SmartViewModel = function(options) {
           p = p.split('+');
           var scan = p.length > 1 ? parseInt(p[1].trim()) : 0;
 
-          //pull out filters
-          var filter = inputs[i].match(searchRenderers['rowkey']['nested']['filter']['select']) || "";
-          filter = filter != null && filter.length > 0 ? escape(filter[0].trim().slice(1, -1)) : "";
-
           //pull out column filters
-          function filterPostfix(postfix) {
-            return (filter != null && filter.length > 0 ? ' AND ' : ' ' ) + postfix;
-          }
-
+          var toRemove = [];
           var cfs = [];
           $(columns).each(function(i, o) {
-            var colscan = pullFromRenderer(o, searchRenderers['rowkey']['nested']['scan']);
-            if(colscan) {
-              colscan = parseInt(colscan.split('+')[1]) + 1;
-              filter += filterPostfix("ColumnPaginationFilter(" + colscan + ", 0)");
+            if(columns[i].match(searchRenderers['rowkey']['nested']['columns']['nested']['range']['select'])) {
+              var partitions = columns[i].split(searchRenderers['rowkey']['nested']['columns']['nested']['range']['select']);
+              filter += filterPostfix("ColumnRangeFilter('" + partitions[0] + "', false, '" + partitions[1] + "', true)");
+              toRemove.push(i);
+            } else {
+              var colscan = pullFromRenderer(o, searchRenderers['rowkey']['nested']['scan']);
+              if(colscan) {
+                colscan = parseInt(colscan.split('+')[1]) + 1;
+                filter += filterPostfix("ColumnPaginationFilter(" + colscan + ", 0)");
+              }
+              var fc = o.replace(pullFromRenderer(o, searchRenderers['rowkey']['nested']['prefix']), '');
+              if(fc != o) {
+                filter += filterPostfix("ColumnPrefixFilter('" + fc.slice(fc.indexOf(':') + 1).match(/[0-9]+/g)[0] + "')");
+                columns[i] = fc.slice(0, fc.indexOf(':'));
+              }
             }
-            var fc = o.replace(pullFromRenderer(o, searchRenderers['rowkey']['nested']['prefix']), '');
-            if(fc != o) {
-              filter += filterPostfix("ColumnPrefixFilter('" + fc.slice(fc.indexOf(':') + 1).match(/[0-9]+/g)[0] + "')");
-              columns[i] = fc.slice(0, fc.indexOf(':'));
-            }
+          });
+
+          $(toRemove).each(function(i) {
+            columns.splice(toRemove[i], 1);
           });
 
           self.querySet.push(new QuerySetPiece({
@@ -653,6 +673,11 @@ var tagsearch = function() {
     }, {
       hint: i18n('End Select Columns'),
       shortcut: ']',
+      mode: ['columns'],
+      selected: false
+    }, {
+      hint: i18n('Column Range'),
+      shortcut: ' to ',
       mode: ['columns'],
       selected: false
     },

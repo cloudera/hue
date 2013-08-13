@@ -378,7 +378,7 @@ ul#hbase-breadcrumbs li a {
 	border-radius: 3px;
 }
 
-#search-tags span.prefix {
+#search-tags span.prefix, #search-tags span.range {
 	color: #fff;
 	background: #5EB568;
 }

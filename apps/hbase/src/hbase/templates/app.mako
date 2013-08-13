@@ -196,7 +196,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
           </div>
           <ul id="search-typeahead" data-bind="visible: search.focused() && !search.submitted()">
             <!-- ko if: search.mode() != 'idle' -->
-            <li><a><b data-bind="text: search.modes[search.mode()].hint"></b>: <span data-bind="html: search.hintText()"></span> <code class="pull-right" data-bind="text: search.modes[search.mode()].type"></code></a></li>
+            <li><a><b data-bind="text: search.modes[search.mode()].hint"></b> <code class="pull-right" data-bind="text: search.modes[search.mode()].type"></code></a></li>
             <!-- /ko -->
             <!-- ko foreach: search.activeHints() -->
             <li data-bind="event: { mousedown: function(){app.search.cur_input(app.search.cur_input() + $data.shortcut);} }, css: {active: self.activeHint}"><a><span data-bind="text: $data.hint"></span> <code class="pull-right" data-bind="text: $data.shortcut"></code></a></li>
@@ -396,7 +396,8 @@ var i18n_cache = {
   'Column Family: Column Name': "${_('Column Family: Column Name')}",
   'Rows starting with': "${_('Rows starting with')}",
   'String': "${_('String')}",
-  'Integer': "${_('Integer')}"
+  'Integer': "${_('Integer')}",
+  'Column Range': "${_('Column Range')}"
 };
 
 function i18n(text) {
