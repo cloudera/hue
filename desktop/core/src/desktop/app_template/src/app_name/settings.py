@@ -16,4 +16,4 @@
 DJANGO_APPS = [ "${app_name}" ]
 REQUIRES_HADOOP = False
 MENU_INDEX = 100
-ICON = "/${app_name}/static/art/${app_name}.png"
+ICON = "/${app_name}/static/art/icon_${app_name}_24.png"
