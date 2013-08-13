@@ -15,54 +15,36 @@
 ## limitations under the License.
 <%!
 from desktop.views import commonheader, commonfooter
+
+def is_selected(section, matcher):
+  if section == matcher:
+    return "active"
+  else:
+    return ""
 %>
-${ commonheader("Hue Help", "help", user, "100px") | n,unicode }
+${ commonheader("Hue Help", "help", user, "70px") | n,unicode }
 
-<style type="text/css">
-  .nav-pills li a {
-    font-size: 13px;
-  }
-</style>
+<div class="container-fluid">
+  <div class="row-fluid">
+    <div class="span2">
+      <div class="sidebar-nav">
+        <ul class="nav nav-list">
+            % for app in apps:
+              <li class="${is_selected(app.name, current)}"><a href="${url("help.views.view", app=app.name, path="/")}">${app.nice_name}</a></li>
+            % endfor
+        </ul>
+      </div>
+    </div>
+    <div class="span10 well">
+      ${content|n}
+    </div>
+  </div>
+</div>
 
-	<div class="subnav subnav-fixed">
-		<div class="container-fluid">
-		<ul class="nav nav-pills">
-			% for app in apps:
-				<li><a href="${url("help.views.view", app=app.name, path="/")}">${app.nice_name}</a></li>
-			% endfor
-		</ul>
-		</div>
-	</div>
-	<div class="container-fluid">
-		${content|n}
-	</div>
-
-  <script>
-    $(document).ready(function () {
-      $.jHueScrollUp();
-
-      resizeSubnav();
-
-      var resizeTimeout = -1;
-      var winWidth = $(window).width();
-      var winHeight = $(window).height();
-
-      $(window).on("resize", function () {
-        window.clearTimeout(resizeTimeout);
-        resizeTimeout = window.setTimeout(function () {
-          // prevents endless loop in IE8
-          if (winWidth != $(window).width() || winHeight != $(window).height()) {
-            resizeSubnav();
-            winWidth = $(window).width();
-            winHeight = $(window).height();
-          }
-        }, 200);
-      });
-
-      function resizeSubnav(){
-        $(".subnav").height($(".nav-pills").outerHeight());
-      }
-    });
-  </script>
+<script>
+  $(document).ready(function () {
+    $.jHueScrollUp();
+  });
+</script>
 
 ${ commonfooter(messages) | n,unicode }

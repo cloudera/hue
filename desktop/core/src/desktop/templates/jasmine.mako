@@ -21,7 +21,7 @@
 <%inherit file="common_jasmine.mako"/>
 
 <%block name="specs">
-  <link href="/static/css/hue2.css" rel="stylesheet">
+  <link href="/static/css/hue3.css" rel="stylesheet">
 
   <script src="/static/ext/js/jquery/plugins/jquery.dataTables.1.8.2.min.js"></script>
   <script src="/static/ext/js/bootstrap.min.js"></script>

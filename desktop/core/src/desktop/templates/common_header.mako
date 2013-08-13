@@ -49,9 +49,9 @@ from django.utils.translation import ugettext as _
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <link href="/static/ext/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/static/ext/css/bootplus.css" rel="stylesheet">
   <link href="/static/ext/css/font-awesome.min.css" rel="stylesheet">
-  <link href="/static/css/hue2.css" rel="stylesheet">
+  <link href="/static/css/hue3.css" rel="stylesheet">
   <link href="/static/ext/css/fileuploader.css" rel="stylesheet">
 
   <style type="text/css">
@@ -140,13 +140,14 @@ from django.utils.translation import ugettext as _
       % endif
       $(".navbar .nav-tooltip").tooltip({
         delay:0,
+
         placement:'bottom'});
     });
   </script>
 </head>
 <body>
 
-<div class="navbar navbar-fixed-top">
+<div class="navbar navbar-inverse navbar-fixed-top">
     % if conf.CUSTOM.BANNER_TOP_HTML.get():
     <div id="banner-top" class="banner">
         ${conf.CUSTOM.BANNER_TOP_HTML.get()}
@@ -154,7 +155,7 @@ from django.utils.translation import ugettext as _
     % endif
     <div class="navbar-inner">
       <div class="container-fluid">
-        <a class="brand nav-tooltip" title="${_('About Hue')}" href="/about"><img src="/static/art/hue-logo-mini-letterpress.png" /></a>
+        <a class="brand nav-tooltip" title="${_('About Hue')}" href="/about"><img src="/static/art/hue-logo-mini.png" /></a>
         % if user.is_authenticated():
         <div id="usernameDropdown" class="btn-group pull-right">
           <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
