@@ -577,9 +577,9 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
 <script src="/pig/static/js/pig.ko.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/routie-0.3.0.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/codemirror-3.11.js"></script>
-<script src="/static/js/Source/jHue/codemirror-pig.js"></script>
-<script src="/static/js/Source/jHue/codemirror-show-hint.js"></script>
-<script src="/static/js/Source/jHue/codemirror-pig-hint.js"></script>
+<script src="/static/js/codemirror-pig.js"></script>
+<script src="/static/js/codemirror-show-hint.js"></script>
+<script src="/static/js/codemirror-pig-hint.js"></script>
 <script src="/beeswax/static/js/autocomplete.utils.js" type="text/javascript" charset="utf-8"></script>
 
 <link rel="stylesheet" href="/pig/static/css/pig.css">

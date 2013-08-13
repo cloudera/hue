@@ -24,7 +24,7 @@
     <script type="text/javascript" src="/static/ext/js/jasmine/jasmine-1.2.0.js"></script>
     <script type="text/javascript" src="/static/ext/js/jasmine/jasmine-html-1.2.0.js"></script>
     <script type="text/javascript" src="/static/ext/js/jquery/jquery-2.0.2.min.js"></script>
-    <script type="text/javascript" src="/static/js/Source/jHue/jquery.migration.js"></script>
+    <script type="text/javascript" src="/static/js/jquery.migration.js"></script>
     <script type="text/javascript" src="/static/ext/js/jasmine/jasmine-jquery-1.3.1.js"></script>
     <script type="text/javascript" src="/static/ext/js/knockout-min.js"></script>
 
