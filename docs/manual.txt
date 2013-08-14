@@ -45,7 +45,7 @@ overly restrictive firewalls. For small clusters of less than 10 nodes,
 you can use your existing master node as the Hue Server.
 
 You can download the Hue tarball here:
-http://github.com/cloudera/hue/downloads/
+gethue.tumblr.com/tagged/release
 
 Hue Dependencies
 ^^^^^^^^^^^^^^^^
@@ -88,8 +88,6 @@ Configure `$PREFIX` with the path where you want to install Hue by running:
 
   $ PREFIX=/usr/share make install
   $ cd /usr/share/hue
-  $ sudo chmod 4750 apps/shell/src/shell/build/setuid
-  $ sudo chown root:$USER apps/shell/src/shell/build/setuid
 
 You can install Hue anywhere on your system, and run Hue as a non-root user.
 The Shell application needs root privileges to launch various sub-processes as
@@ -141,9 +139,9 @@ proceeding.
   Yarn        No         JobDesigner, Beeswax               Transitive dependency via Hive or Oozie
   Oozie       No         JobDesigner, Oozie                 Oozie access through REST API
   Hive        No         Beeswax                            Beeswax uses the Hive client libraries
-  Flume       No         Shell                              Optionally provides access to the Flume shell
-  HBase       No         Shell                              Optionally provides access to the HBase shell
-  Pig         No         Shell                              Optionally provides access to the Pig shell
+  HBase       No         HBase Browser                      Requires Thrift 1 service
+  Pig         No         Pig Editor                         Requires Oozie
+  Sqoop2      No         Sqoop Editor                       Requires Sqoop2 server
 -------------------------------------------------------------------------------------
 
 
@@ -305,7 +303,7 @@ Hive Configuration
 ~~~~~~~~~~~~~~~~~~
 
 Hue's Beeswax application helps you use Hive to query your data.
-It depends on a Hive installation on your system. Please read
+It depends on a Hive Server 2 running in the cluster. Please read
 this section to ensure a proper integration.
 
 Your Hive data is stored in HDFS, normally under `/user/hive/warehouse`
@@ -315,15 +313,7 @@ the users whom you expect to be creating tables.  `/tmp` (on the local file
 system) must be world-writable (1777), as Hive makes extensive use of it.
 
 [NOTE]
-If you used the embedded Hive MetaStore functionality of Beeswax in Hue from
-versions prior to Hue 1.2, read this section. Hue 1.2 includes changes in the
-Hive MetaStore schema that are part of the Hive 0.7 release. If you want to use
-Beeswax in Hue 1.2, it is imperative that you upgrade the Hive MetaStore schema
-by running the appropriate schema upgrade script located in the
-`apps/beeswax/hive/scripts/metastore/upgrade` directory in the Hue installation.
-Scripts for Derby and MySQL databases are available. If you are using a
-different database for your MetaStore, you will need to provide your own
-upgrade script.
+
 
 No Existing Hive Installation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -572,7 +562,7 @@ In the `[beeswax]` section of the configuration file, you can
 _optionally_ specify the following:
 
 beeswax_server_host::
-  The hostname or IP that the Beeswax Server should bind to. By
+  The hostname or IP that the Hive Server should bind to. By
   default it binds to `localhost`, and therefore only serves local
   IPC clients.
 
@@ -582,9 +572,6 @@ hive_home_dir::
 hive_conf_dir::
   The directory containing your `hive-site.xml` Hive
   configuration file.
-
-beeswax_server_heapsize::
-  The heap size (-Xmx) of the Beeswax Server.
 
 
 JobDesigner and Oozie Configuration
@@ -657,7 +644,6 @@ A standard Hue installation starts and monitors the following processes:
 
 * `runcpserver` - a web server based on CherryPy that provides the core web
 functionality of Hue
-* `beeswax server` - a daemon that manages concurrent Hive queries
 
 If you have installed other applications into your Hue instance, you may see
 other daemons running under the supervisor as well.
@@ -666,7 +652,6 @@ You can see the supervised processes running in the output of `ps -f -u hue`:
 
   UID        PID  PPID  C STIME TTY          TIME CMD
   hue       8685  8679  0 Aug05 ?        00:01:39 /usr/share/hue/build/env/bin/python /usr/share/hue/build/env/bin/desktop runcpserver
-  hue       8695  8679  0 Aug05 ?        00:00:06 /usr/java/jdk1.6.0_14/bin/java -Xmx1000m -Dhadoop.log.dir=/usr/lib/hadoop-0.20/logs -Dhadoop.log.file=hadoop.log ...
 
 Note that the supervisor automatically restarts these processes if they fail for
 any reason. If the processes fail repeatedly within a short time, the supervisor

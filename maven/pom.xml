@@ -43,9 +43,9 @@
 
   <properties>
     <hadoop.version>2.1.0-mr1-cdh5.0.0-SNAPSHOT</hadoop.version>
-    <hive.version>0.11.0-cdh5.0.0-SNAPSHOT</hive.version>
     <slf4j.version>1.6.1</slf4j.version>
     <commons-logging.version>1.0.4</commons-logging.version>
+    <thrift.version>0.9.0</thrift.version>
     <javaVersion>1.7</javaVersion>
     <targetJavaVersion>1.7</targetJavaVersion>
   </properties>
@@ -134,21 +134,6 @@
         <version>${hadoop.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.apache.hive</groupId>
-        <artifactId>hive-metastore</artifactId>
-        <version>${hive.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.hive</groupId>
-        <artifactId>hive-exec</artifactId>
-        <version>${hive.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.hive</groupId>
-        <artifactId>hive-common</artifactId>
-        <version>${hive.version}</version>
-      </dependency>
-      <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
         <version>${slf4j.version}</version>
@@ -195,14 +180,13 @@
       <dependency>
         <groupId>org.apache.thrift</groupId>
         <artifactId>libthrift</artifactId>
-        <version>0.9.0</version>
+        <version>${thrift.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.thrift</groupId>
         <artifactId>libfb303</artifactId>
-        <version>0.9.0</version>
+        <version>${thrift.version}</version>
       </dependency>
-
 
     </dependencies>
   </dependencyManagement>
