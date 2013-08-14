@@ -15,6 +15,7 @@
 ## limitations under the License.
 <%!
 from desktop.views import commonheader, commonfooter
+from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext as _
 %>
 
@@ -70,7 +71,7 @@ ${layout.menubar(section='query')}
 
                <div class="tab-content">
                 <div class="active tab-pane" id="log">
-                    <pre>${ log }</pre>
+                    <pre>${ force_unicode(log) }</pre>
                 </div>
                 <div class="tab-pane" id="query">
                     <pre>${ query.get_current_statement() }</pre>

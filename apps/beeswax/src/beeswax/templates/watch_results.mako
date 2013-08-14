@@ -16,6 +16,7 @@
 <%!
 from desktop.lib.i18n import smart_unicode
 from desktop.views import commonheader, commonfooter
+from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext as _
 %>
 
@@ -188,7 +189,7 @@ ${layout.menubar(section='query')}
         </div>
 
         <div class="tab-pane" id="log">
-          <pre>${ log }</pre>
+          <pre>${ force_unicode(log) }</pre>
         </div>
 
         % if not error:
