@@ -98,10 +98,11 @@ var viewModel = new (function() {
   self.shownSection = ko.observable("");
   self.isDirty = ko.observable(false);
   self.isLoading = ko.observable(false);
+  self.isReady = ko.observable(false);
 
-  self.isLoading.subscribe(function(value) {  // fixes problem with too fast rendering engines that display chunks of html before KO bindings
-    if (!value){
-      $(document).trigger('notloading');
+  self.isReady.subscribe(function(value) {  // fixes problem with too fast rendering engines that display chunks of html before KO bindings
+    if (value){
+      $(document).trigger('isready');
     }
   });
 
