@@ -35,20 +35,22 @@ ${ commonheader(_('Home'), "home", user) | n,unicode }
 
 <div class="container-fluid">
   <div class="row-fluid">
-  <div class="span12">
-    <h1>${_('Welcome Home.')}</h1>
-    <p>
-      ${ _('Hue is a Web UI for Apache Hadoop. Select an application below.') }
-    </p>
+    <div class="span12">
+      <h1>${_('Welcome Home.')}</h1>
+
+      <p>
+        ${ _('Hue is a Web UI for Apache Hadoop. Select an application below.') }
+      </p>
+    </div>
   </div>
-</div>
   <div class="row-fluid" style="margin-top: 30px">
 
     <div class="span4">
-      <div class="card">
-         <h2 class="card-heading simple">${_('Query')}</h2>
-      <div class="card-body">
-        <p>
+      <div class="card card-home">
+        <h2 class="card-heading simple">${_('Query')}</h2>
+
+        <div class="card-body">
+          <p>
           <ul>
             ${ app_link("beeswax", "Hive") }
             ${ app_link("impala", "Impala") }
@@ -57,16 +59,17 @@ ${ commonheader(_('Home'), "home", user) | n,unicode }
             ${ app_link("hbase", _('HBase')) }
             ${ app_link("shell", _('Shell')) }
           </ul>
-        </p>
+          </p>
+        </div>
       </div>
-       </div>
-     </div>
+    </div>
 
     <div class="span4">
-      <div class="card">
+      <div class="card card-home">
         <h2 class="card-heading simple">${_('Hadoop')}</h2>
+
         <div class="card-body">
-        <p>
+          <p>
           <ul>
             ${ app_link("filebrowser", _('Files')) }
             ${ app_link("jobbrowser", _('Jobs')) }
@@ -74,24 +77,25 @@ ${ commonheader(_('Home'), "home", user) | n,unicode }
             ${ app_link("sqoop", _('Sqoop 2')) }
             ${ app_link("jobsub", _('Designs')) }
           </ul>
-        </p>
+          </p>
+        </div>
       </div>
     </div>
-      </div>
 
     <div class="span4">
-      <div class="card">
+      <div class="card card-home">
         <h2 class="card-heading simple">${_('Workflow')}</h2>
+
         <div class="card-body">
-        <p>
+          <p>
           <ul>
             ${ app_link("oozie", _('Dashboard')) }
             ${ app_link("oozie", _('Editor'), "list_workflows/") }
           </ul>
         </div>
       </div>
-     </div>
     </div>
+  </div>
 </div>
 
 <script type="text/javascript" charset="utf-8">
