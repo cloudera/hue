@@ -25,10 +25,10 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
 <div id="top-bar-container" class="hide">
 <div class="top-bar" data-bind="visible:shownSection() == 'jobs-list'">
   <div style="margin-top: 4px; margin-right: 20px" class="pull-right">
-    <a title="${_('Create a new job')}" href="#job/new" data-bind="visible: !isLoading()"><i class="icon-plus-sign"></i> ${_('New job')}</a>
+    <a title="${_('Create a new job')}" href="#job/new" data-bind="visible: isReady"><i class="icon-plus-sign"></i> ${_('New job')}</a>
   </div>
   <h4>${_('Sqoop Jobs')}</h4>
-  <input id="filter" type="text" class="input-xlarge search-query" placeholder="${_('Search for job name or content')}"  data-bind="visible: !isLoading()">
+  <input id="filter" type="text" class="input-xlarge search-query" placeholder="${_('Search for job name or content')}"  data-bind="visible: isReady">
 </div>
 
 <div class="top-bar" data-bind="visible:shownSection() == 'job-editor', with: job">
@@ -50,7 +50,7 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
     <div class="alert alert-error"><i class="icon-warning-sign"></i> <strong>${_('Sqoop error')}:</strong> <span class="message"></span></div>
   </div>
 
-  <div class="row-fluid" data-bind="if: isLoading()">
+  <div class="row-fluid" data-bind="if: isLoading">
     <div class="span10 offset1 center" style="margin-top: 30px">
       <!--[if lte IE 9]>
         <img src="/static/art/spinner-big.gif" />
@@ -63,7 +63,7 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
 
   <div id="jobs" class="row-fluid mainSection hide">
     <div id="jobs-list" class="row-fluid section hide">
-      <div class="row-fluid" data-bind="if: !isLoading()">
+      <div class="row-fluid" data-bind="if: isReady">
         <ul class="major-list" data-bind="foreach: filteredJobs() ? filteredJobs() : []">
           <!-- ko if: submission -->
           <li data-bind="routie: 'job/edit/' + id()" title="${ _('Click to edit') }">
@@ -708,7 +708,7 @@ function handle_form_errors(e, node, options, data) {
   }
 }
 
-$(document).on('notloading', function(e) { // fixes problem with too fast rendering engines that display chunks of html before KO bindings
+$(document).on('isready', function(e) { // fixes problem with too fast rendering engines that display chunks of html before KO bindings
   if ($("#top-bar-container").hasClass("hide")){
     $("#top-bar-container").removeClass("hide");
   }
@@ -763,12 +763,29 @@ $("#jobs-list tbody").on('click', 'tr', function() {
 //// Load all the data
 var framework = new framework.Framework();
 (function() {
+  function fail() {
+    viewModel.isLoading(false);
+    viewModel.isReady(false);
+  }
+  $(document).one('load_error.jobs', fail);
+  $(document).one('load_error.framework', fail);
+  $(document).one('load_error.connectors', fail);
+  $(document).one('load_error.connections', fail);
+  $(document).one('load_error.submissions', fail);
+  $(document).one('connection_error.jobs', fail);
+  $(document).one('connection_error.framework', fail);
+  $(document).one('connection_error.connectors', fail);
+  $(document).one('connection_error.connections', fail);
+  $(document).one('connection_error.submissions', fail);
+
   var count = 0;
   function check() {
     if (++count == 5) {
       viewModel.isLoading(false);
+      viewModel.isReady(true);
     }
   }
+
   $(document).one('loaded.jobs', check);
   $(document).one('loaded.framework', check);
   $(document).one('loaded.connectors', check);
@@ -781,6 +798,7 @@ var framework = new framework.Framework();
     submissions.fetchSubmissions();
   });
   viewModel.isLoading(true);
+  viewModel.isReady(false);
   jobs.fetchJobs();
 })();
 
