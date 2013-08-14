@@ -428,14 +428,14 @@ class HiveServerClient:
 
 
   def execute_statement(self, statement, max_rows=100, configuration={}):
-    req = TExecuteStatementReq(statement=statement, confOverlay=configuration)
+    req = TExecuteStatementReq(statement=statement.encode('utf-8'), confOverlay=configuration)
     res = self.call(self._client.ExecuteStatement, req)
 
     return self.fetch_result(res.operationHandle, max_rows=max_rows)
 
 
   def execute_async_statement(self, statement, confOverlay):
-    req = TExecuteStatementReq(statement=statement, confOverlay=confOverlay)
+    req = TExecuteStatementReq(statement=statement.encode('utf-8'), confOverlay=confOverlay)
     res = self.call(self._client.ExecuteStatement, req)
 
     return HiveServerQueryHandle(secret=res.operationHandle.operationId.secret,
