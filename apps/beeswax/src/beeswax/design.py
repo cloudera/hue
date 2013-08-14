@@ -104,11 +104,8 @@ class HQLdesign(object):
   def functions(self):
     return list(self._data_dict['functions'])
 
-  def get_configuration(self):
+  def get_configuration_statements(self):
     configuration = []
-
-    for f in self.settings:
-      configuration.append(render_to_string("hql_set.mako", f))
 
     for f in self.file_resources:
       configuration.append(render_to_string("hql_resource.mako", dict(type=f['type'], path=f['path'])))
@@ -119,7 +116,6 @@ class HQLdesign(object):
     return configuration
 
   def get_query_dict(self):
-    """get_query_dict() -> QueryDict"""
     # We construct the mform to use its structure and prefix. We don't actually bind data to the forms.
     from beeswax.forms import QueryForm
     mform = QueryForm()
