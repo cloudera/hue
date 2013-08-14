@@ -142,7 +142,6 @@ class HiveServerTRowSet:
 
 class HiveServerDataTable(DataTable):
   def __init__(self, results, schema):
-    print results, schema
     self.schema = schema and schema.schema
     self.row_set = HiveServerTRowSet(results.results, schema)
     self.has_more = not self.row_set.is_empty()    # Should be results.hasMoreRows but always True in HS2
@@ -387,10 +386,6 @@ class HiveServerClient:
 
     table_results, table_schema = self.fetch_result(res.operationHandle)
 
-    # Using 'SELECT * from table' does not show column comments in the metadata
-    if self.query_server['server_name'] == 'beeswax':
-      self.execute_statement(statement='SET hive.server2.blocking.query=true')
-
     desc_results, desc_schema = self.execute_statement('DESCRIBE EXTENDED %s' % table_name)
     return HiveServerTable(table_results.results, table_schema.schema, desc_results.results, desc_schema.schema)
 
@@ -401,27 +396,20 @@ class HiveServerClient:
 
 
   def execute_query_statement(self, statement, max_rows=100, configuration={}):
-    # Only execute_async_query() supports configuration
-    if self.query_server['server_name'] == 'beeswax':
-      self.execute_statement(statement='SET hive.server2.blocking.query=true')
-
     results, schema = self.execute_statement(statement=statement, max_rows=max_rows, configuration=configuration)
     return HiveServerDataTable(results, schema)
 
 
   def execute_async_query(self, query, statement=0):
-    # Set configuration manually until Hive Server 2 supports confOverlay
-    # This will leak the config in the session
     if statement == 0:
+      # Impala just has settings currently
       if self.query_server['server_name'] == 'beeswax':
-        self.execute_statement(statement='SET hive.server2.blocking.query=true')
-        for resource in query.get_configuration():
+        for resource in query.get_configuration_statements():
           self.execute_statement(resource.strip())
 
-    if self.query_server['server_name'] == 'beeswax':
-      self.execute_statement(statement='SET hive.server2.blocking.query=false')
-
     configuration = self._get_query_configuration(query)
+    if self.query_server['server_name'] == 'beeswax':
+      configuration.update({'hive.server2.blocking.query': 'false'})
 
     query_statement =  query.get_query_statement(statement)
     return self.execute_async_statement(statement=query_statement, confOverlay=configuration)
@@ -501,8 +489,6 @@ class HiveServerClient:
 
   def get_partitions(self, database, table_name, max_parts):
     table = self.get_table(database, table_name)
-    if self.query_server['server_name'] == 'beeswax':
-      self.execute_statement(statement='SET hive.server2.blocking.query=true')
 
     partitionTable = self.execute_query_statement('SHOW PARTITIONS %s' % table_name) # DB prefix not supported
     return [PartitionValueCompatible(partition, table) for partition in partitionTable.rows()][-max_parts:]
