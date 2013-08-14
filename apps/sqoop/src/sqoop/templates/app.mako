@@ -22,27 +22,29 @@
 <%namespace name="actionbar" file="actionbar.mako" />
 
 ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
-<div id="top-bar-container" class="hide">
-<div class="top-bar" data-bind="visible:shownSection() == 'jobs-list'">
-  <div style="margin-top: 4px; margin-right: 20px" class="pull-right">
-    <a title="${_('Create a new job')}" href="#job/new" data-bind="visible: isReady"><i class="icon-plus-sign"></i> ${_('New job')}</a>
+<div data-bind="if: !isLoading(), css: {'hide': isLoading}" id="top-bar-container" class="hide">
+  <div class="top-bar" data-bind="visible:shownSection() == 'jobs-list'">
+    <div style="margin-top: 4px; margin-right: 20px" class="pull-right">
+      <a title="${_('Create a new job')}" href="#job/new" data-bind="visible: isReady"><i class="icon-plus-sign"></i> ${_('New job')}</a>
+    </div>
+    <h4>${_('Sqoop Jobs')}</h4>
+    <input id="filter" type="text" class="input-xlarge search-query" placeholder="${_('Search for job name or content')}"  data-bind="visible: isReady">
   </div>
-  <h4>${_('Sqoop Jobs')}</h4>
-  <input id="filter" type="text" class="input-xlarge search-query" placeholder="${_('Search for job name or content')}"  data-bind="visible: isReady">
-</div>
 
-<div class="top-bar" data-bind="visible:shownSection() == 'job-editor', with: job">
-  <div style="margin-top: 4px; margin-right: 20px" class="pull-right">
-    <a title="${_('Create a new job')}" href="#job/new"><i class="icon-plus-sign"></i> ${_('New job')}</a>
+  <!-- ko if: job -->
+  <div class="top-bar" data-bind="visible:shownSection() == 'job-editor', with: job">
+    <div style="margin-top: 4px; margin-right: 20px" class="pull-right">
+      <a title="${_('Create a new job')}" href="#job/new"><i class="icon-plus-sign"></i> ${_('New job')}</a>
+    </div>
+    <h4 data-bind="visible: !persisted()"><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> ${_('New Job')}</h4>
+    <h4 data-bind="visible: persisted"><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> <i data-bind="css:{'icon-download-alt': type() == 'IMPORT', 'icon-upload-alt': type() == 'EXPORT'}"></i> &nbsp;<span data-bind="text: type"></span> <span class="muted" data-bind="editable: name, editableOptions: {'placement': 'right'}"></span></h4>
   </div>
-  <h4 data-bind="visible: (!$root.job().persisted())"><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> ${_('New Job')}</h4>
-  <h4 data-bind="visible: $root.job().persisted()"><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> <i data-bind="css:{'icon-download-alt': $root.job().type() == 'IMPORT', 'icon-upload-alt': $root.job().type() == 'EXPORT'}"></i> &nbsp;<span data-bind="text: $root.job().type"></span> <span class="muted" data-bind="editable: $root.job().name, editableOptions: {'placement': 'right'}"></span></h4>
-</div>
 
-<div class="top-bar" data-bind="visible:shownSection() == 'connection-editor', with: editConnection">
-  <h4 data-bind="visible: !persisted()"><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> <a href="#connection/edit-cancel" data-bind="text: $root.job().name"></a> <span class="muted">/</span> ${_('New Connection')}</h4>
-  <h4 data-bind="visible: persisted()"><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> <a href="#connection/edit-cancel"><i data-bind="css:{'icon-download-alt': $root.job().type() == 'IMPORT', 'icon-upload-alt': $root.job().type() == 'EXPORT'}"></i> &nbsp;<span data-bind="text: $root.job().type"></span> <span data-bind="text: $root.job().name"></span></a> <span class="muted">/</span> <span data-bind="text: name"></span></h4>
-</div>
+  <div class="top-bar" data-bind="visible:shownSection() == 'connection-editor', with: editConnection">
+    <h4 data-bind="visible: !persisted()"><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> <a href="#connection/edit-cancel" data-bind="text: name"></a> <span class="muted">/</span> ${_('New Connection')}</h4>
+    <h4 data-bind="visible: persisted()"><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> <a href="#connection/edit-cancel"><i data-bind="css:{'icon-download-alt': $root.job().type() == 'IMPORT', 'icon-upload-alt': $root.job().type() == 'EXPORT'}"></i> &nbsp;<span data-bind="text: $root.job().type"></span> <span data-bind="text: $root.job().name"></span></a> <span class="muted">/</span> <span data-bind="text: $root.job().name"></span></h4>
+  </div>
+  <!-- /ko -->
 </div>
 
 <div class="container-fluid">
@@ -708,12 +710,6 @@ function handle_form_errors(e, node, options, data) {
   }
 }
 
-$(document).on('isready', function(e) { // fixes problem with too fast rendering engines that display chunks of html before KO bindings
-  if ($("#top-bar-container").hasClass("hide")){
-    $("#top-bar-container").removeClass("hide");
-  }
-});
-
 $(document).on('connection_error.jobs', function(e, name, options, jqXHR) {
   $('#sqoop-error .message').text("${ _('Cannot connect to sqoop server.') }");
   routie('error');
@@ -802,6 +798,34 @@ var framework = new framework.Framework();
   jobs.fetchJobs();
 })();
 
+var fetch_connections = function() {
+  viewModel.isLoading(true);
+  connections.fetchConnections();
+  $(document).one('loaded.connections', function() {
+    viewModel.isLoading(false);
+  });
+  $(document).one('load_error.connections', function() {
+    viewModel.isLoading(false);
+  });
+};
+
+var fetch_jobs = function() {
+  viewModel.isLoading(true);
+  jobs.fetchJobs();
+  $(document).one('loaded.jobs', function() {
+    viewModel.isLoading(false);
+  });
+  $(document).one('load_error.jobs', function() {
+    viewModel.isLoading(false);
+  });
+};
+
+$(document).on('saved.connection', fetch_connections);
+$(document).on('saved.job', fetch_jobs);
+$(document).on('cloned.connection', fetch_connections);
+$(document).on('cloned.job', fetch_jobs);
+$(document).on('deleted.connection', fetch_connections);
+$(document).on('deleted.job', fetch_jobs);
 
 function enable_save_buttons() {
   $("#save-btn").attr("data-loading-text", $("#save-btn").text());
