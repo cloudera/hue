@@ -1228,3 +1228,38 @@ a#advanced-btn:hover {
   padding: 10px 20px!important;
   margin-top: 4px!important;
 }
+
+.card-home {
+  padding-top: 4px;
+}
+
+.card-home ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.card-home ul li {
+  margin: 0;
+  padding: 0;
+}
+
+.card-home a {
+  padding: 5px 15px;
+  display: block;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.card-home a i {
+  color: #999999;
+}
+
+.card-home a:hover {
+  background-color: #EEEEEE;
+  text-decoration: none;
+}
+
+.card-home a:hover i {
+  color: #333333;
+}

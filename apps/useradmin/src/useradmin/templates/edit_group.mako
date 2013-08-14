@@ -31,69 +31,74 @@ ${layout.menubar(section='groups', _=_)}
     <% group_class = len(field.errors) and "error" or "" %>
     <div class="control-group ${group_class}">
       <label class="control-label" for="id_${field.html_name}">${field.label}</label>
-      <div class="controls">
-		${unicode(field) | n}
-        % if len(field.errors):
-          <span class="help-inline">${unicode(field.errors) | n}</span>
-        % endif
-      </div>
+    <div class="controls">
+    ${unicode(field) | n}
+    % if len(field.errors):
+        <span class="help-inline">${unicode(field.errors) | n}</span>
+    % endif
+    </div>
     </div>
   %endif
 </%def>
 
 
 <div class="container-fluid">
-	% if name:
-		<h1>${_('Hue Groups - Edit group: %(name)s') % dict(name=name)}</h1>
-	% else:
-		% if ldap:
-			<h1>${_('Hue Groups - Add/Sync LDAP group')}</h1>
-		% else:
-			<h1>${_('Hue Groups - Create group')}</h1>
-		% endif
-	% endif
+  <div class="card">
+    % if name:
+        <h1 class="card-heading simple">${_('Hue Groups - Edit group: %(name)s') % dict(name=name)}</h1>
+    % else:
+      % if ldap:
+          <h1 class="card-heading simple">${_('Hue Groups - Add/Sync LDAP group')}</h1>
+      % else:
+          <h1 class="card-heading simple">${_('Hue Groups - Create group')}</h1>
+      % endif
+    % endif
 
     <br/>
 
-	<form id="editForm" action="${urllib.quote(action)}" method="POST" class="form form-horizontal" autocomplete="off">
-		<fieldset>
-		% for field in form:
-			${render_field(field)}
-		% endfor
-        </fieldset>
-		<br/>
-		<div class="form-actions">
-			% if name:
-				<input type="submit" class="btn btn-primary" value="${_('Update group')}"/>
-			% else:
-				% if ldap:
-					<input type="submit" class="btn btn-primary" value="${_('Add/Sync group')}"/>
-				% else:
-					<input type="submit" class="btn btn-primary" value="${_('Add group')}"/>
-				% endif
-			% endif
-			<a href="/useradmin/groups" class="btn">${_('Cancel')}</a>
-		</div>
-	</form>
+    <form id="editForm" action="${urllib.quote(action)}" method="POST" class="form form-horizontal" autocomplete="off">
+      <fieldset>
+          % for field in form:
+        ${render_field(field)}
+          % endfor
+      </fieldset>
+      <br/>
+
+      <div class="form-actions">
+        % if name:
+            <input type="submit" class="btn btn-primary" value="${_('Update group')}"/>
+        % else:
+          % if ldap:
+              <input type="submit" class="btn btn-primary" value="${_('Add/Sync group')}"/>
+          % else:
+              <input type="submit" class="btn btn-primary" value="${_('Add group')}"/>
+          % endif
+        % endif
+        <a href="/useradmin/groups" class="btn">${_('Cancel')}</a>
+      </div>
+    </form>
+  </div>
 </div>
 
 <script type="text/javascript" charset="utf-8">
-	$(document).ready(function(){
-		$("#id_members").jHueSelector({
-            selectAllLabel: "${_('Select all')}",
-            searchPlaceholder: "${_('Search')}",
-            noChoicesFound: "${_('No users found.')} <a href='${url('useradmin.views.edit_user')}'>${_('Create a new user now')} &raquo;</a>",
-            width:600,
-            height:240
-        });
-		$("#id_permissions").jHueSelector({
-            selectAllLabel: "${_('Select all')}",
-            searchPlaceholder: "${_('Search')}",
-            noChoicesFound: "${_('No permissions found.')}",
-            width:600,
-            height:240
-        });
-	});
+  $(document).ready(function () {
+    $("#id_members").jHueSelector({
+      selectAllLabel: "${_('Select all')}",
+      searchPlaceholder: "${_('Search')}",
+      noChoicesFound: "${_('No users found.')} <a href='${url('useradmin.views.edit_user')}'>${_('Create a new user now')} &raquo;</a>",
+      width: 600,
+      height: 240
+    });
+    $("#id_permissions").jHueSelector({
+      selectAllLabel: "${_('Select all')}",
+      searchPlaceholder: "${_('Search')}",
+      noChoicesFound: "${_('No permissions found.')}",
+      width: 600,
+      height: 240
+    });
+  });
 </script>
+
+${layout.commons()}
 
 ${ commonfooter(messages) | n,unicode }

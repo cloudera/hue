@@ -27,83 +27,65 @@ ${ commonheader(_('Hue Users'), "useradmin", user, "100px") | n,unicode }
 % endif
 
 <div class="container-fluid">
+  <div class="card">
     % if username:
-        <h1>${_('Hue Users - Edit user: %(username)s') % dict(username=username)}</h1>
+      <h1 class="card-heading simple">${_('Hue Users - Edit user: %(username)s') % dict(username=username)}</h1>
     % else:
-        <h1>${_('Hue Users - Create user')}</h1>
+      <h1 class="card-heading simple">${_('Hue Users - Create user')}</h1>
     % endif
 
-  <form id="editForm" method="POST" class="form form-horizontal" autocomplete="off">
-
-      <div id="properties" class="section">
-        <ul class="nav nav-tabs">
-          <li class="active"><a href="#step1" class="step">${ _('Step 1: Credentials (required)') }</a></li>
-          <li><a href="#step2" class="step">${ user.is_superuser and _('Step 2: Names and Groups') or _('Step 2: Names') }</a></li>
-          % if user.is_superuser:
-          <li><a href="#step3" class="step">${ _('Step 3: Advanced') }</a></li>
-          % endif
-        </ul>
-
-        <div class="steps" >
-          <div id="step1" class="stepDetails">
-            ${layout.render_field(form["username"], extra_attrs={'validate':'true'})}
-            % if "password1" in form.fields:
-              ${layout.render_field(form["password1"], extra_attrs=username is None and {'validate':'true'} or {})}
-              ${layout.render_field(form["password2"], extra_attrs=username is None and {'validate':'true'} or {})}
-            % endif
-            ${layout.render_field(form["ensure_home_directory"])}
-          </div>
-
-          <div id="step2" class="stepDetails hide">
-            % if "first_name" in form.fields:
-              ${layout.render_field(form["first_name"])}
-              ${layout.render_field(form["last_name"])}
-            % endif
-
-            ${layout.render_field(form["email"])}
-            % if user.is_superuser:
-              ${layout.render_field(form["groups"])}
-            % endif
-        </div>
+    <br/>
+    <form id="editForm" method="POST" class="form form-horizontal" autocomplete="off">
+    <div id="properties" class="section">
+      <ul class="nav nav-tabs">
+        <li class="active"><a href="#step1" class="step">${ _('Step 1: Credentials (required)') }</a></li>
+        <li><a href="#step2" class="step">${ user.is_superuser and _('Step 2: Names and Groups') or _('Step 2: Names') }</a>
+        </li>
         % if user.is_superuser:
-        <div id="step3" class="stepDetails hide">
-            ${layout.render_field(form["is_active"])}
-            ${'is_superuser' in form.fields and layout.render_field(form["is_superuser"])}
-        </div>
+            <li><a href="#step3" class="step">${ _('Step 3: Advanced') }</a></li>
         % endif
-      </div>
+      </ul>
 
-        <div class="form-actions">
-          <a id="backBtn" class="btn disabled">${ _('Back') }</a>
-          <a id="nextBtn" class="btn btn-primary disable-feedback">${ _('Next') }</a>
-
-          % if username:
-            <input type="submit" class="btn btn-primary" value="${_('Update user')}"/>
-          % else:
-            <input type="submit" class="btn btn-primary" value="${_('Add user')}"/>
-          % endif
+    <div class="steps">
+      <div id="step1" class="stepDetails">
+        ${layout.render_field(form["username"], extra_attrs={'validate':'true'})}
+        % if "password1" in form.fields:
+        ${layout.render_field(form["password1"], extra_attrs=username is None and {'validate':'true'} or {})}
+        ${layout.render_field(form["password2"], extra_attrs=username is None and {'validate':'true'} or {})}
+        % endif
+        ${layout.render_field(form["ensure_home_directory"])}
         </div>
-  </form>
+        <div id="step2" class="stepDetails hide">
+        % if "first_name" in form.fields:
+                  ${layout.render_field(form["first_name"])}
+                  ${layout.render_field(form["last_name"])}
+                % endif
+
+                ${layout.render_field(form["email"])}
+                % if user.is_superuser:
+                  ${layout.render_field(form["groups"])}
+                % endif
+        </div>
+      % if user.is_superuser:
+        <div id="step3" class="stepDetails hide">
+        ${layout.render_field(form["is_active"])}
+                ${'is_superuser' in form.fields and layout.render_field(form["is_superuser"])}
+        </div>
+      % endif
+      </div>
+      <div class="form-actions">
+        <a id="backBtn" class="btn disabled">${ _('Back') }</a>
+        <a id="nextBtn" class="btn btn-primary disable-feedback">${ _('Next') }</a>
+
+      % if username:
+        <input type="submit" class="btn btn-primary" value="${_('Update user')}"/>
+      % else:
+        <input type="submit" class="btn btn-primary" value="${_('Add user')}"/>
+      % endif
+      </div>
+    </form>
+  </div>
 </div>
-
-<style type="text/css">
-  .steps {
-    padding-top: 20px;
-    margin-bottom: 100px;
-  }
-
-  input[type=submit] {
-    margin-left: 50px;
-  }
-
-  .form-actions {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    margin: 0;
-  }
-</style>
 
 <script src="/static/ext/js/routie-0.3.0.min.js" type="text/javascript" charset="utf-8"></script>
 
@@ -188,7 +170,16 @@ $(document).ready(function(){
     $(this).parents(".control-group").removeClass("error");
     $(this).parent().find(".help-inline").remove();
   });
+
+  $("#editForm").on("submit", function(){
+    if (validateStep("step1") && validateStep("step2")) {
+      return true;
+    }
+    return false;
+  })
 });
 </script>
+
+${layout.commons()}
 
 ${ commonfooter(messages) | n,unicode }
