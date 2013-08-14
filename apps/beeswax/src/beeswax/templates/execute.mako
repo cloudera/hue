@@ -222,18 +222,10 @@ ${layout.menubar(section='query')}
                           </li>
                           <li>
                             <div class="control-group">
-                              <button id="refresh-btn" class="btn btn-small hide" data-loading-text="${ _('Refreshing...') }" rel="tooltip" data-placement="right" data-original-title="${ _('Update the list of tables seen by Impala. It can take a few seconds...') }">
-                                <i class="icon-refresh"></i>
-                                ${ _('Refresh') }
-                              </button>
-                              <span id="refresh-tip">
+                              <span id="refresh-dyk">
                                 <i class="icon-refresh"></i>
                                 ${ _('Sync tables tips') }
                               </span>
-                              <i id="refresh-tip" onclick="$('#refresh-btn,#refresh-tip').toggle('hide')"
-                                rel="tooltip" data-placement="right" data-original-title="${ _('Using an Impala version inferior to 1.1? Click to use the refresh button.') }"
-                                class="icon-plus-sign-alt" style="cursor: pointer;">
-                              </i>
                               <div id="refresh-content" class="hide">
                                 <ul style="text-align: left;">
                                   <li>"invalidate metadata" ${ _("invalidates the entire catalog metadata. All table metadata will be reloaded on the next access.") }</li>
@@ -788,20 +780,11 @@ ${layout.menubar(section='query')}
       }
 
       % if app_name == 'impala':
-        $("#refresh-btn").click(function() {
-          var _this = this;
-          $(_this).button('loading');
-          $.post('/impala/refresh_catalog',
-            function(response) {
-              if (response['status'] != 0) {
-                $.jHueNotify.error("${ _('Problem: ') }" + response['message']);
-              } else {
-                $.jHueNotify.info("${ _('Refresh successful!') }")
-              }
-            }
-          ).fail(function(e) { $.jHueNotify.error("${ _('Problem: ') }" + e) })
-           .always(function() { $(_this).button('reset') });
-          return false;
+        $("#refresh-dyk").popover({
+          'title': "${_('Missing some tables? In order to update the list of tables/metadata seen by Impala, execute one of these queries:')}",
+          'content': $("#refresh-content").html(),
+          'trigger': 'hover',
+          'html': true
         });
 
         $("#refresh-tip").popover({
