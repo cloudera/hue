@@ -53,4 +53,4 @@ Search or ask questions on the forum and http://groups.google.com/a/cloudera.org
 
 Some packages might be required during the 'make install': https://github.com/cloudera/hue#development-prerequisites)
 
-Download a pre-built packaged version of Hue on http://gethue.com
+Download a pre-built packaged version (apt-get/yum install...) of Hue on http://gethue.com
