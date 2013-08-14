@@ -444,10 +444,3 @@ $(document).on('loaded.connectors', set_connectors);
 $(document).on('loaded.connections', set_connections);
 $(document).on('loaded.jobs', set_jobs);
 $(document).on('loaded.submissions', update_job_submissions);
-
-$(document).on('saved.connection', function(){ connections.fetchConnections(); });
-$(document).on('saved.job', function() { jobs.fetchJobs(); });
-$(document).on('cloned.connection', function(){ connections.fetchConnections(); });
-$(document).on('cloned.job', function() { jobs.fetchJobs(); });
-$(document).on('deleted.connection', function(){ connections.fetchConnections(); });
-$(document).on('deleted.job', function() { jobs.fetchJobs(); });
