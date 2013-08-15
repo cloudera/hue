@@ -143,7 +143,7 @@ function parseXML(xml) {
 
 function detectMimeType(data) {
   var MIME_TESTS = {
-    'type/null':function(data){return !data;},
+    'text/plain':function(data){return !data;},
     'type/int':function(data){return !isNaN(parseInt(data));},
     'text/json':function(data) {
       try {

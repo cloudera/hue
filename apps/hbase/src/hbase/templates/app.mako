@@ -85,7 +85,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
               <a class="corner-btn btn" data-bind="click: $data.drop, clickBubble: false"><i class="icon-trash"></i></a>
             % endif
             <a class="corner-btn btn" data-bind="visible: $data.editing(), event: { mousedown: function(){launchModal('cell_edit_modal',{content:$data, mime: detectMimeType($data.value())})} }"><i class="icon-pencil"></i> ${_('Full Editor')}</a>
-            <pre data-bind="text: $data.value().length > 146 ? $data.value().substring(0, 144)+'...' : $data.value(), click: $data.value().length > 146 ? function(){launchModal('cell_edit_modal',{content:$data, mime: detectMimeType($data.value())})} : function(){$data.editing(true)}, clickBubble: false, visible: !$data.isLoading() && !$data.editing()"></pre>
+            <pre data-bind="text: ($data.value().length > 146 ? $data.value().substring(0, 144)+'...' : $data.value()).replace(/(\r\n|\n|\r)/gm,''), click: $data.value().length > 146 ? function(){launchModal('cell_edit_modal',{content:$data, mime: detectMimeType($data.value())})} : function(){$data.editing(true)}, clickBubble: false, visible: !$data.isLoading() && !$data.editing()"></pre>
             <textarea data-bind="visible: !$data.isLoading() && $data.editing(), hasfocus: $data.editing, value: $data.value, click:function(){}, clickBubble: false"></textarea>
             <img src="/static/art/spinner.gif" data-bind="visible: $data.isLoading() " />
           </div>
@@ -351,7 +351,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
       <iframe width="100%" height="100%" data-bind="attr:{src: 'data:' + $data.mime + ';base64,' + $data.content.value()}"></iframe>
     </script>
     <script id="cell_type_template" type="text/html">
-      <textarea style="width:100%" data-bind="text: $data.content.value()" data-use-post="true"></textarea>
+      <textarea style="width:100%; height: 450px;" data-bind="text: $data.content.value()" data-use-post="true"></textarea>
     </script>
   </div>
 
