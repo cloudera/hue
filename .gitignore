@@ -78,3 +78,15 @@ desktop/libs/hadoop/java/dependency-reduced-pom.xml
 
 # Reviewboard config file
 .reviewboardrc
+
+# Make files
+JAVASCRIPTLINT.txt
+PYLINT.txt
+desktop/desktop-test.db
+ext/hadoop/
+ext/hive/
+ext/oozie/
+nosetests.xml
+oozie.sql
+tools/jenkins/ext/
+tools/jenkins/oozie.sql
