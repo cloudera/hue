@@ -15,8 +15,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from beeswax.server.dbms import QueryServerException
-
 try:
   import json
 except ImportError:
@@ -31,6 +29,8 @@ import socket
 import tempfile
 import threading
 
+import hadoop
+
 from nose.tools import assert_true, assert_equal, assert_false, assert_not_equal
 from nose.plugins.skip import SkipTest
 
@@ -41,8 +41,6 @@ from django.core.urlresolvers import reverse
 from desktop.lib.django_test_util import make_logged_in_client, assert_equal_mod_whitespace
 from desktop.lib.django_test_util import assert_similar_pages
 from desktop.lib.test_utils import grant_access
-
-from beeswaxd import ttypes
 
 import beeswax.create_table
 import beeswax.forms
@@ -58,10 +56,9 @@ from beeswax.design import hql_query, _strip_trailing_semicolon
 from beeswax.data_export import download
 from beeswax.models import SavedQuery, QueryHistory, HQL
 from beeswax.server import dbms
-from beeswax.server.hive_server2_lib import HiveServerClient,\
-  HiveServerDataTable
+from beeswax.server.dbms import QueryServerException
+from beeswax.server.hive_server2_lib import HiveServerClient
 from beeswax.test_base import BeeswaxSampleProvider
-import hadoop
 
 
 LOG = logging.getLogger(__name__)

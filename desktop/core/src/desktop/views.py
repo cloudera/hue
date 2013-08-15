@@ -34,7 +34,8 @@ import django.views.debug
 
 from desktop.lib import django_mako
 from desktop.lib.conf import GLOBAL_CONFIG
-from desktop.lib.django_util import login_notrequired, render_json, render, render_to_string
+from desktop.lib.django_util import login_notrequired, render_json, render
+from desktop.lib.i18n import smart_str
 from desktop.lib.paths import get_desktop_root
 from desktop.log.access import access_log_level, access_warn
 from desktop.models import UserPreferences, Settings
@@ -87,7 +88,7 @@ def download_log_view(request):
         tmp = tempfile.NamedTemporaryFile()
         log_tmp = tempfile.NamedTemporaryFile("w+t")
         for l in h.buf:
-          log_tmp.write(l + '\n')
+          log_tmp.write(smart_str(l) + '\n')
         # This is not just for show - w/out flush, we often get truncated logs
         log_tmp.flush()
         t = time.time()
@@ -100,7 +101,7 @@ def download_log_view(request):
         # if we don't seek to start of file, no bytes will be written
         tmp.seek(0)
         wrapper = FileWrapper(tmp)
-        response = HttpResponse(wrapper,content_type="application/zip")
+        response = HttpResponse(wrapper, content_type="application/zip")
         response['Content-Disposition'] = 'attachment; filename=hue-logs-%s.zip' % t
         response['Content-Length'] = length
         return response
