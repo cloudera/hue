@@ -139,7 +139,7 @@ class HbaseApi(object):
   def deleteColumns(self, cluster, tableName, row, columns):
     client = self.connectCluster(cluster)
     Mutation = get_thrift_type('Mutation')
-    mutations = [Mutation(isDelete = True, column=column) for column in columns]
+    mutations = [Mutation(isDelete = True, column=smart_str(column)) for column in columns]
     return client.mutateRow(tableName, smart_str(row), mutations, None)
 
   def deleteColumn(self, cluster, tableName, row, column):
@@ -150,7 +150,7 @@ class HbaseApi(object):
     mutations = []
     Mutation = get_thrift_type('Mutation')
     for column in data.keys():
-      mutations.append(Mutation(column=column, value=smart_str(data[column]))) # must use str for API, does thrift coerce by itself?
+      mutations.append(Mutation(column=smart_str(column), value=smart_str(data[column]))) # must use str for API, does thrift coerce by itself?
     return client.mutateRow(tableName, smart_str(row), mutations, None)
 
   def putColumn(self, cluster, tableName, row, column, value):
@@ -159,7 +159,7 @@ class HbaseApi(object):
   def putUpload(self, cluster, tableName, row, column, value):
     client = self.connectCluster(cluster)
     Mutation = get_thrift_type('Mutation')
-    return client.mutateRow(tableName, row, [Mutation(column=column, value=value.file.read(value.size))], None)
+    return client.mutateRow(tableName, row, [Mutation(column=smart_str(column), value=value.file.read(value.size))], None)
 
   def getRowQuerySet(self, cluster, tableName, columns, queries):
     client = self.connectCluster(cluster)
@@ -174,7 +174,7 @@ class HbaseApi(object):
       if fs:
         fs = " AND (" + fs.strip() + ")"
       filterstring = "(ColumnPaginationFilter(%i,0) AND PageFilter(%i))" % (limit, limit) + (fs or "")
-      scan = get_thrift_type('TScan')(startRow=smart_str(query['row_key']), stopRow=None, timestamp=None, columns=query['columns'] or columns, caching=None, filterString=filterstring, batchSize=None)
+      scan = get_thrift_type('TScan')(startRow=smart_str(query['row_key']), stopRow=None, timestamp=None, columns=[smart_str(column) for column in (query['columns'] or columns)], caching=None, filterString=filterstring, batchSize=None)
       scanner = client.scannerOpenWithScan(tableName, scan, None)
       aggregate_data += client.scannerGetList(scanner, query['scan_length'])
     return aggregate_data

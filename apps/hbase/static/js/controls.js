@@ -208,12 +208,23 @@ var SmartViewModel = function(options) {
           //pull out column filters
           var toRemove = [];
           var cfs = [];
-          $(columns).each(function(i, o) {
-            if(columns[i].match(searchRenderers['rowkey']['nested']['columns']['nested']['range']['select'])) {
-              var partitions = columns[i].split(searchRenderers['rowkey']['nested']['columns']['nested']['range']['select']);
+          for(var n = 0; n < columns.length; n++) {
+            var o = columns[n];
+            if(columns[n].match(searchRenderers['rowkey']['nested']['columns']['nested']['range']['select'])) {
+              var partitions = columns[n].split(searchRenderers['rowkey']['nested']['columns']['nested']['range']['select']);
               filter += filterPostfix("ColumnRangeFilter('" + partitions[0] + "', false, '" + partitions[1] + "', true)");
-              toRemove.push(i);
+              toRemove.push(n);
             } else {
+              if(o.indexOf(':') == -1) {
+                toRemove.push(n);
+                //for each column family push cf and then column
+                $(self.columnFamilies()).each(function(i, item) {
+                  columns.push(item.name + o);
+                });
+                continue;
+              } else {
+                o = o.slice(o.indexOf(':') + 1);
+              }
               var colscan = pullFromRenderer(o, searchRenderers['rowkey']['nested']['scan']);
               if(colscan) {
                 colscan = parseInt(colscan.split('+')[1]) + 1;
@@ -221,15 +232,15 @@ var SmartViewModel = function(options) {
               }
               var fc = o.replace(pullFromRenderer(o, searchRenderers['rowkey']['nested']['prefix']), '');
               if(fc != o) {
-                filter += filterPostfix("ColumnPrefixFilter('" + fc.slice(fc.indexOf(':') + 1).match(/[0-9]+/g)[0] + "')");
-                columns[i] = fc.slice(0, fc.indexOf(':'));
+                filter += filterPostfix("ColumnPrefixFilter('" + o.match(/[0-9]+/g)[0] + "')");
+                columns[n] = columns[n].split(':')[0] + ':';
               }
             }
-          });
+          }
 
-          $(toRemove).each(function(i) {
-            columns.splice(toRemove[i], 1);
-          });
+          for(var n = toRemove.length - 1; n>=0; n--) {
+            columns.splice(toRemove[n], 1);
+          };
 
           self.querySet.push(new QuerySetPiece({
             'row_key': inputs[i].replace(/\\(\+|\*|\,)/g, '$1').replace(/[\[\{].+[\]\}]|\*/g,'').trim(), //clean up with column regex selectors instead
