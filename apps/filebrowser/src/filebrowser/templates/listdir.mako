@@ -27,7 +27,9 @@ from django.utils.translation import ugettext as _
 ${ commonheader(None, 'filebrowser', user) | n,unicode }
 
 <div class="container-fluid">
-    <h1>${_('File Browser')}</h1>
+
+  <div class="card">
+    <h1 class="card-heading simple">${_('File Browser')}</h1>
 
     <div class="actionbar">
     <%actionbar:render>
@@ -115,6 +117,7 @@ ${ commonheader(None, 'filebrowser', user) | n,unicode }
 
         ${dir.list_table_browser(files, path_enc, current_request_path, cwd_set)}
     </div>
+  </div>
 </div>
 
 ${ commonfooter(messages) | n,unicode }

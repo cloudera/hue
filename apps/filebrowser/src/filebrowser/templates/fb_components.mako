@@ -24,7 +24,7 @@ from django.utils.translation import ugettext as _
         <li><a href="${url('filebrowser.views.view', path=urlencode(path))}?default_to_home" style="line-height:18px"><i class="icon-home"></i> ${_('Home')}</a></li>
         <li>
             <span style="float:right; margin-top:10px;"><i id="editBreadcrumb" class="icon-pencil hand" rel="tooltip" title="${_('Edit path')}"></i></span>
-            <ul class="hueBreadcrumb" data-bind="foreach: breadcrumbs" style="padding-right:40px">
+            <ul class="hueBreadcrumb" data-bind="foreach: breadcrumbs" style="padding-right:40px; padding-top: 12px">
                 <li data-bind="visible: label == '/'"><a href="#" data-bind="click: show"><span class="divider" data-bind="text: label"></span></a></li>
                 <li data-bind="visible: label != '/'"><a href="#" data-bind="text: label, click: show"></a><span class="divider">/</span></li>
             </ul>

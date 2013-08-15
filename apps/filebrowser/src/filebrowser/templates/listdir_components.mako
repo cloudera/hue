@@ -76,12 +76,17 @@ from django.utils.translation import ugettext as _
         -webkit-box-shadow: 0px -1px 3px rgba(50, 50, 50, 0.1);
         -moz-box-shadow: 0px -1px 3px rgba(50, 50, 50, 0.1);
         box-shadow: 0px -1px 3px rgba(50, 50, 50, 0.1);
-        padding-bottom: 16px;
+        padding: 0px;
       }
 
       .pagination p {
         padding-top: 10px;
         padding-left: 10px;
+        margin: 0;
+      }
+
+      .pagination select {
+        margin-top: 4px;
       }
 
       .pagination ul {
@@ -105,7 +110,7 @@ from django.utils.translation import ugettext as _
       }
     </style>
 
-    <table class="table table-striped table-condensed datatables tablescroller-disable">
+    <table class="table table-condensed datatables tablescroller-disable">
         <thead>
             <tr>
                 <th width="1%"><div data-bind="click: selectAll, css: {hueCheckbox: true, 'icon-ok': allSelected}"></div></th>
