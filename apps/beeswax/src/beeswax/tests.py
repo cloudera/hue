@@ -1533,30 +1533,30 @@ def search_log_line(component, expected_log, all_logs):
 def test_hiveserver2_get_security():
   # Bad but easy mocking
   hive_site.get_conf()
-  
+
   prev = hive_site._HIVE_SITE_DICT.get(hive_site._CNF_HIVESERVER2_AUTHENTICATION)
   try:
     hive_site._HIVE_SITE_DICT[hive_site._CNF_HIVESERVER2_KERBEROS_PRINCIPAL] = 'hive/hive@test.com'
-    
+
     principal = get_query_server_config('beeswax')['principal']
     assert_true(principal.startswith('hive/'), principal)
-  
+
     principal = get_query_server_config('impala')['principal']
     assert_true(principal.startswith('impala/'), principal)
-  
+
     beeswax_query_server = {'server_name': 'beeswax', 'principal': 'hive'}
     impala_query_server = {'server_name': 'impala', 'principal': 'impala'}
-  
+
     assert_equal((True, 'PLAIN', 'hive', False), HiveServerClient.get_security(beeswax_query_server))
     assert_equal((False, 'GSSAPI', 'impala', False), HiveServerClient.get_security(impala_query_server))
-  
+
     cluster_conf = hadoop.cluster.get_cluster_conf_for_job_submission()
     finish = cluster_conf.SECURITY_ENABLED.set_for_testing(True)
     try:
       assert_equal((True, 'GSSAPI', 'impala', False), HiveServerClient.get_security(impala_query_server))
     finally:
-      finish()    
-    
+      finish()
+
     hive_site._HIVE_SITE_DICT[hive_site._CNF_HIVESERVER2_AUTHENTICATION] = 'NOSASL'
     hive_site._HIVE_SITE_DICT[hive_site._CNF_HIVESERVER2_IMPERSONATION] = 'true'
     assert_equal((False, 'NOSASL', 'hive', True), HiveServerClient.get_security(beeswax_query_server))

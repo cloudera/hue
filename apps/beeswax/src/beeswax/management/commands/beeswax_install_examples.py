@@ -25,7 +25,6 @@ from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 
 import beeswax.conf
-import hive_metastore.ttypes
 from beeswax.models import SavedQuery
 from beeswax.server.dbms import get_query_server_config, QueryServerException
 
