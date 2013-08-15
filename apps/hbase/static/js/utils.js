@@ -220,10 +220,15 @@ function prepForTransport(value) {
 };
 
 function logGA(postfix) {
-  if(postfix == null)
-    postfix = ""
-  if (typeof trackOnGA == 'function') {
+  function doLog() {
     trackOnGA('hbase/' + postfix);
+  }
+  if(postfix == null)
+    postfix = "";
+  if (typeof trackOnGA == 'function') {
+    doLog();
+  } else {
+    setTimeout(doLog, 10);
   }
 };
 

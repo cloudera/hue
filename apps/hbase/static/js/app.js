@@ -107,7 +107,7 @@ routie({
       routed = true;
     },
     ':cluster/:table': function(cluster, table) {
-      //logGA('view_table'); taken care of in reload()\
+      logGA('view_table');
       Router.setTable(cluster, table);
       resetSearch();
       app.station('table');
@@ -137,7 +137,7 @@ routie({
       routed = true;
     },
     '*': function() {
-      logGA();
+      logGA('');
       if(!routed)
         history.back();
       routed = false;
