@@ -41,7 +41,7 @@ ${ commonheader(_('%(filename)s - File Viewer') % dict(filename=truncate(filenam
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="span2">
-      <div class="well sidebar-nav">
+      <div class="sidebar-nav">
         <ul class="nav nav-list">
           <li class="nav-header">${_('Actions')}</li>
           % if view['mode'] == "binary":
