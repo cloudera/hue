@@ -18,7 +18,7 @@
 """Create a "virtual" Python installation
 """
 
-virtualenv_version = "1.4.5"
+virtualenv_version = "1.10.1"
 
 import sys
 import os
@@ -32,7 +32,7 @@ try:
 except ImportError, e:
     if sys.version_info <= (2, 3):
         print 'ERROR: %s' % e
-        print 'ERROR: this script requires Python 2.4 or greater; or at least the subprocess module.'
+        print 'ERROR: this script requires Python 2.6 or greater; or at least the subprocess module.'
         print 'If you copy subprocess.py from a newer version of Python this script will probably work'
         sys.exit(101)
     else:
