@@ -85,7 +85,6 @@ var DataTableViewModel = function(options) {
   };
   var _reload = self.reload;
   self.reload = function(callback) {
-    logGA('view_cluster');
     if(self._table) {
       self._table.fnClearTable();
       self._table.fnDestroy();
@@ -310,7 +309,6 @@ var SmartViewModel = function(options) {
   };
   var _reload = self.reload;
   self.reload = function(callback) {
-  	logGA('view_table');
     var queryStart = new Date();
     _reload(function() {
       self.lastReloadTime((new Date() - queryStart)/1000);
