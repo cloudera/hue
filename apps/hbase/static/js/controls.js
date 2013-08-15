@@ -232,7 +232,7 @@ var SmartViewModel = function(options) {
               }
               var fc = o.replace(pullFromRenderer(o, searchRenderers['rowkey']['nested']['prefix']), '');
               if(fc != o) {
-                filter += filterPostfix("ColumnPrefixFilter('" + o.match(/[0-9]+/g)[0] + "')");
+                filter += filterPostfix("ColumnPrefixFilter('" + o.match(/[^:*]+/g)[0] + "')");
                 columns[n] = columns[n].split(':')[0] + ':';
               }
             }
