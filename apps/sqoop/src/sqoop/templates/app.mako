@@ -172,6 +172,7 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
           </ul>
 
           <form method="POST" class="form form-horizontal noPadding" data-bind="with: page">
+            <div class="alert alert-info"><h3 data-bind="text: description"></h3></div>
             <div class="job-form" data-bind="template: {'name': template(), 'data': node}">
             </div>
 
@@ -613,32 +614,37 @@ viewModel.job.subscribe(function(job) {
     if (job.persisted()) {
       viewModel.jobWizard.addPage(new wizard.Page({
         'identifier': 'job-editor-connector',
-        'caption': '${_("Step 1: From")}',
+        'caption': job.type() == 'IMPORT' ? '${_("Step 1: From")}' : '${_("Step 1: To")}',
+        'description': '${_("Database")}',
         'node': job,
         'template': 'job-editor-connector'
       }));
       viewModel.jobWizard.addPage(new wizard.Page({
         'identifier': 'job-editor-framework',
-        'caption': '${_("Step 2: to")}',
+        'caption': job.type() == 'IMPORT' ? '${_("Step 2: To")}' : '${_("Step 2: From")}',
+        'description': '${_("HDFS")}',
         'node': job,
         'template': 'job-editor-framework'
       }));
     } else {
       viewModel.jobWizard.addPage(new wizard.Page({
         'identifier': 'job-editor-begin',
-        'caption': '${_("Step 1: Manage connections")}',
+        'caption': '${_("Step 1: Type")}',
+        'description': '${_("Connection")}',
         'node': job,
         'template': 'job-editor-begin'
       }));
       viewModel.jobWizard.addPage(new wizard.Page({
         'identifier': 'job-editor-connector',
         'caption': '${_("Step 2: From")}',
+        'description': '${_("Database")}',
         'node': job,
         'template': 'job-editor-connector'
       }));
       viewModel.jobWizard.addPage(new wizard.Page({
         'identifier': 'job-editor-framework',
         'caption': '${_("Step 3: To")}',
+        'description': '${_("HDFS")}',
         'node': job,
         'template': 'job-editor-framework'
       }));

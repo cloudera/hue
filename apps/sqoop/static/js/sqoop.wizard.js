@@ -87,6 +87,7 @@ var wizard = (function($) {
 
     self.identifier = ko.observable();
     self.caption = ko.observable();
+    self.description= ko.observable();
     self.template = ko.observable();
     self.node = ko.observable();
 
@@ -97,6 +98,7 @@ var wizard = (function($) {
       self.options = options || {};
       self.identifier(self.options.identifier);
       self.caption(self.options.caption);
+      self.description(self.options.description);
       self.node(self.options.node);
       self.template(self.options.template);
     }

@@ -31,9 +31,14 @@ var jobs = (function($) {
     'updated': null,
     'setImport': function(){
       this.type("IMPORT");
+      // Huge hack for now
+      $('a').filter(function(index) { return $(this).text() === "Step 2: To"; }).text("Step 2: From");
+      $('a').filter(function(index) { return $(this).text() === "Step 3: From"; }).text("Step 3: To");
     },
     'setExport': function(){
       this.type("EXPORT");
+      $('a').filter(function(index) { return $(this).text() === "Step 2: From"; }).text("Step 2: To");
+      $('a').filter(function(index) { return $(this).text() === "Step 3: To"; }).text("Step 3: From");
     },
     'initialize': function(attrs) {
       var self = this;
