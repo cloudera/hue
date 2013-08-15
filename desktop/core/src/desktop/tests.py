@@ -99,6 +99,18 @@ def test_log_view():
   response = c.get(URL)
   assert_equal(200, response.status_code)
 
+def test_download_log_view():
+  c = make_logged_in_client()
+
+  URL = reverse(views.download_log_view)
+
+  LOG = logging.getLogger(__name__)
+  LOG.warn(u'une voix m’a réveillé')
+
+  # UnicodeDecodeError: 'ascii' codec can't decode byte... should not happen
+  response = c.get(URL)
+  assert_equal("application/zip", response.get('Content-Type', ''))
+
 def test_dump_config():
   c = make_logged_in_client()
 
