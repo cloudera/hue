@@ -18,15 +18,17 @@
 This module provides access to LDAP servers, along with some basic functionality required for Hue and
 User Admin to work seamlessly with LDAP.
 """
+import ldap
+import ldap.filter
+import logging
 import re
 
 from django.contrib.auth.models import User
 
 import desktop.conf
-import ldap
-import ldap.filter
+from desktop.lib.python_util import CaseInsensitiveDict
 
-import logging
+
 LOG = logging.getLogger(__name__)
 
 CACHED_LDAP_CONN = None
@@ -154,6 +156,8 @@ class LdapConnection(object):
       for dn, data in result_data:
         # Skip Active Directory # refldap entries.
         if dn is not None:
+          # Case insensitivity
+          data = CaseInsensitiveDict.from_dict(data)
 
           # Skip unnamed entries.
           if user_name_attr not in data:
@@ -162,7 +166,7 @@ class LdapConnection(object):
 
           ldap_info = {
             'dn': dn,
-            'username': data[user_name_attr][0]
+            'name': data[user_name_attr][0]
           }
 
           if 'givenName' in data:
@@ -185,6 +189,9 @@ class LdapConnection(object):
     group_info = []
     if result_data:
       for dn, data in result_data:
+        # Case insensitivity
+        data = CaseInsensitiveDict.from_dict(data)
+
         # Skip Active Directory # refldap entries.
         if dn is not None:
           # Case insensitivity
