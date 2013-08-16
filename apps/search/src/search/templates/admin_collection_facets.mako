@@ -38,7 +38,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
     <script src="/static/ext/js/knockout.x-editable.js"></script>
 
     <form method="POST" class="form-horizontal" data-bind="submit: submit">
-
+      <div class="well">
       <div class="section">
         <div class="alert alert-info">
           <div class="pull-right" style="margin-top: 10px">
@@ -222,6 +222,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
         <a id="nextBtn" class="btn btn-primary disable-feedback">${ _('Next') }</a>
         <button type="submit" class="btn btn-primary" data-bind="visible: isSaveBtnVisible()" id="save-facets">${_('Save')}</button>
       </div>
+    </div>
     </form>
   </%def>
 </%layout:skeleton>

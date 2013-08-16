@@ -49,7 +49,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 
   <%def name="content()">
   <form method="POST">
-    <ul class="nav nav-tabs">
+    <ul class="nav nav-tabs" style="margin-bottom:0; margin-top:10px">
       <li class="active">
         <a href="#index" data-toggle="tab">${_('Collection')}</a>
       </li>
@@ -60,6 +60,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
         <a href="#properties" data-toggle="tab">${_('Indexes')}</a>
       </li>
     </ul>
+    <div class="well">
     <div class="tab-content">
       <div class="tab-pane active" id="index">
         <div class="fieldWrapper">
@@ -80,6 +81,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
       <div class="tab-pane" id="properties">
         ${_('Loading...')} <img src="/static/art/spinner.gif">
       </div>
+    </div>
     </div>
   </form>
   </%def>

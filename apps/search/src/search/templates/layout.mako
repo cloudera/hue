@@ -22,7 +22,7 @@
 
 <%def name="skeleton()">
   <link rel="stylesheet" href="/search/static/css/admin.css">
-  <link rel="stylesheet" href="/search/static/chosen/chosen.css">
+  <link rel="stylesheet" href="/search/static/chosen/chosen.min.css">
   <script src="/search/static/chosen/chosen.jquery.min.js" type="text/javascript" charset="utf-8"></script>
   <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
 
@@ -73,7 +73,7 @@
 </%def>
 
 <%def name="sidebar(hue_collection, section='')">
-  <div class="well sidebar-nav" style="min-height: 250px">
+  <div class="sidebar-nav" style="min-height: 250px">
     <ul class="nav nav-list">
 
     <li class="nav-header">${_('Collection')}</li>

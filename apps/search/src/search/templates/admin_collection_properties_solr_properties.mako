@@ -22,33 +22,23 @@
 <%namespace name="macros" file="macros.mako" />
 
 
-<%layout:skeleton>
-  <%def name="no_navigation()">
-  </%def>
-
-  <%def name="title()">
-  </%def>
-
-  <%def name="content()">
-    <div class="tab-content">
-      <div class="tab-pane active" id="index_properties">
-        <table class="table">
-          <thead>
-          <tr>
-            <th width="20%">${_('Property')}</th>
-            <th>${_('Value')}</th>
-          </tr>
-          </thead>
-          <tbody>
-          <tr>
-            % for key, value in solr_collection.iteritems():
-              <td>${ key }</td>
-              <td>${ value }</td>
-            % endfor
-          </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </%def>
-</%layout:skeleton>
+<div class="tab-content">
+  <div class="tab-pane active" id="index_properties">
+    <table class="table">
+      <thead>
+      <tr>
+        <th width="20%">${_('Property')}</th>
+        <th>${_('Value')}</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+        % for key, value in solr_collection.iteritems():
+          <td>${ key }</td>
+          <td>${ value }</td>
+        % endfor
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -40,6 +40,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
     <script src="/static/ext/js/knockout.x-editable.js"></script>
 
     <form method="POST" class="form-horizontal" data-bind="submit: submit">
+      <div class="well">
       <div class="section">
         <div class="alert alert-info">
           <div class="pull-right" style="margin-top: 10px">
@@ -86,6 +87,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 
       <div class="form-actions" style="margin-top: 80px">
         <button type="submit" class="btn btn-primary" id="save-sorting">${_('Save')}</button>
+      </div>
       </div>
     </form>
   </%def>

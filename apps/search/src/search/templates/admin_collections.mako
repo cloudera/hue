@@ -35,21 +35,21 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 
 
 <div class="container-fluid">
-
+  <div class="card">
   <%actionbar:render>
     <%def name="search()">
-      <input type="text" placeholder="${_('Filter collections by name...')}" class="input-xlarge search-query" id="filterInput">
+      <input type="text" placeholder="${_('Filter collections by name...')}" class="input-xlarge search-query" id="filterInput" data-bind="visible: collections().length > 0 && !isLoading()">
     </%def>
 
     <%def name="creation()">
-      <button id="importBtn" type="button" class="btn"><i class="icon-plus-sign"></i> ${ _('Import') }</button>
+      <button type="button" class="btn importBtn" data-bind="visible: collections().length > 0 && !isLoading()"><i class="icon-plus-sign"></i> ${ _('Import') }</button>
     </%def>
   </%actionbar:render>
 
   <div class="row-fluid" data-bind="visible: collections().length == 0 && !isLoading()">
-    <div class="span10 offset1 center">
+    <div class="span10 offset1 center importBtn" style="cursor: pointer">
       <i class="icon-plus-sign waiting"></i>
-      <h1 class="emptyMessage">${ _('There are currently no collections defined.') }<br/>${ _('Click on Import to add one or more.') }</h1>
+      <h1 class="emptyMessage">${ _('There are currently no collections defined.') }<br/><a href="javascript:void(0)" class="importBtn">${ _('Click here to add') }</a> ${ _('one or more.') }</h1>
     </div>
   </div>
   <div class="row-fluid" data-bind="visible: isLoading()">
@@ -59,13 +59,15 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
   </div>
   <div class="row-fluid">
     <div class="span12">
+      <p>
       <ul id="collections" data-bind="template: {name: 'collectionTemplate', foreach: filteredCollections}">
       </ul>
+      </p>
     </div>
   </div>
 
   <script id="collectionTemplate" type="text/html">
-    <li style="cursor: pointer" data-bind="click: $root.editCollection" title="${ _('Click to edit') }">
+    <li class="collectionRow" data-bind="click: $root.editCollection" title="${ _('Click to edit') }">
       <div class="pull-right" style="margin-top: 10px;margin-right: 10px; cursor: pointer">
         <a data-bind="click: $root.copyCollection, clickBubble: false"><i class="icon-copy"></i> ${_('Copy')}</a> &nbsp;
         <a data-bind="click: $root.markForDeletion, clickBubble: false"><i class="icon-remove"></i> ${_('Delete')}</a>
@@ -73,6 +75,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
       <h4><i class="icon-list"></i> <span data-bind="text: label"></span></h4>
     </li>
   </script>
+  </div>
 
 </div>
 
@@ -129,13 +132,6 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
     margin: 0;
     padding: 0;
     width: 100%;
-  }
-
-  #collections li {
-    margin-bottom: 10px;
-    padding: 10px;
-    border: 1px solid #E3E3E3;
-    height: 40px;
   }
 
   .placeholder {
@@ -195,7 +191,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
         showImportModal();
     % endif
 
-    $("#importBtn").on("click", function () {
+    $(".importBtn").on("click", function () {
       showImportModal();
     });
 
