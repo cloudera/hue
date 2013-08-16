@@ -5,16 +5,16 @@
 .label,
 .badge {
    // Important (red)
-   &-important         { background-color: @errorBackground; }
+   &-important         { background-color: @errorBackground; color: @errorText; }
    &-important[href]   { background-color: darken(@errorBackground, 10%); }
    // Warnings (orange)
-   &-warning           { background-color: @orange; }
-   &-warning[href]     { background-color: darken(@orange, 10%); }
+   &-warning           { background-color: @warningBackground; color: @warningText; }
+   &-warning[href]     { background-color: darken(@warningBackground, 10%); }
    // Success (green)
-   &-success           { background-color: @successBackground; }
+   &-success           { background-color: @successBackground; color: @successText; }
    &-success[href]     { background-color: darken(@successBackground, 10%); }
    // Info (turquoise)
-   &-info              { background-color: @infoBackground; }
+   &-info              { background-color: @infoBackground; color: @infoText; }
    &-info[href]        { background-color: darken(@infoBackground, 10%); }
    // Inverse (black)
    &-inverse           { background-color: @grayDark; }

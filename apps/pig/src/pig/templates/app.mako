@@ -35,70 +35,72 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
 
 <div class="container-fluid">
   <div id="scripts" class="row-fluid mainSection hide">
-    <%actionbar:render>
-      <%def name="search()">
-          <input id="filter" type="text" class="input-xlarge search-query" placeholder="${_('Search for script name or content')}">
-      </%def>
+    <div class="card">
+      <%actionbar:render>
+        <%def name="search()">
+            <input id="filter" type="text" class="input-xlarge search-query" placeholder="${_('Search for script name or content')}">
+        </%def>
 
-      <%def name="actions()">
-          <button class="btn fileToolbarBtn" title="${_('Run this script')}" data-bind="enable: selectedScripts().length == 1, click: listRunScript, visible: scripts().length > 0"><i class="icon-play"></i> ${_('Run')}</button>
-          <button class="btn fileToolbarBtn" title="${_('Copy this script')}" data-bind="enable: selectedScripts().length == 1, click: listCopyScript, visible: scripts().length > 0"><i class="icon-copy"></i> ${_('Copy')}</button>
-          <button class="btn fileToolbarBtn" title="${_('Delete this script')}" data-bind="enable: selectedScripts().length > 0, click: listConfirmDeleteScripts, visible: scripts().length > 0"><i class="icon-trash"></i> ${_('Delete')}</button>
-      </%def>
+        <%def name="actions()">
+            <button class="btn fileToolbarBtn" title="${_('Run this script')}" data-bind="enable: selectedScripts().length == 1, click: listRunScript, visible: scripts().length > 0"><i class="icon-play"></i> ${_('Run')}</button>
+            <button class="btn fileToolbarBtn" title="${_('Copy this script')}" data-bind="enable: selectedScripts().length == 1, click: listCopyScript, visible: scripts().length > 0"><i class="icon-copy"></i> ${_('Copy')}</button>
+            <button class="btn fileToolbarBtn" title="${_('Delete this script')}" data-bind="enable: selectedScripts().length > 0, click: listConfirmDeleteScripts, visible: scripts().length > 0"><i class="icon-trash"></i> ${_('Delete')}</button>
+        </%def>
 
-      <%def name="creation()">
-          <button class="btn fileToolbarBtn" title="${_('Create a new script')}" data-bind="click: confirmNewScript"><i class="icon-plus-sign"></i> ${_('New Script')}</button>
-      </%def>
-    </%actionbar:render>
-    <div class="alert alert-info" data-bind="visible: scripts().length == 0">
-      ${_('There are currently no scripts defined. Please add a new script clicking on "New script"')}
+        <%def name="creation()">
+            <button class="btn fileToolbarBtn" title="${_('Create a new script')}" data-bind="click: confirmNewScript"><i class="icon-plus-sign"></i> ${_('New Script')}</button>
+        </%def>
+      </%actionbar:render>
+      <div class="alert alert-info" data-bind="visible: scripts().length == 0">
+        ${_('There are currently no scripts defined. Please add a new script clicking on "New script"')}
+      </div>
+
+      <table class="table table-striped table-condensed tablescroller-disable" data-bind="visible: scripts().length > 0">
+        <thead>
+        <tr>
+          <th width="1%"><div data-bind="click: selectAll, css: {hueCheckbox: true, 'icon-ok': allSelected}"></div></th>
+          <th width="20%">${_('Name')}</th>
+          <th width="79%">${_('Script')}</th>
+        </tr>
+        </thead>
+        <tbody id="scriptTable" data-bind="template: {name: 'scriptTemplate', foreach: filteredScripts}">
+
+        </tbody>
+        <tfoot>
+        <tr data-bind="visible: isLoading()">
+          <td colspan="3" class="left">
+            <img src="/static/art/spinner.gif" />
+          </td>
+        </tr>
+        <tr data-bind="visible: filteredScripts().length == 0 && !isLoading()">
+          <td colspan="3">
+            <div class="alert">
+                ${_('There are no scripts matching the search criteria.')}
+            </div>
+          </td>
+        </tr>
+        </tfoot>
+      </table>
+
+      <script id="scriptTemplate" type="text/html">
+        <tr style="cursor: pointer" data-bind="event: { mouseover: toggleHover, mouseout: toggleHover}">
+          <td class="center" data-bind="click: handleSelect" style="cursor: default">
+            <div data-bind="css: {hueCheckbox: true, 'icon-ok': selected}"></div>
+          </td>
+          <td data-bind="click: $root.confirmViewScript">
+            <strong><a href="#" data-bind="click: $root.confirmViewScript, text: name"></a></strong>
+          </td>
+          <td data-bind="click: $root.confirmViewScript">
+            <span data-bind="text: scriptSumup"></span>
+          </td>
+        </tr>
+      </script>
     </div>
-
-    <table class="table table-striped table-condensed tablescroller-disable" data-bind="visible: scripts().length > 0">
-      <thead>
-      <tr>
-        <th width="1%"><div data-bind="click: selectAll, css: {hueCheckbox: true, 'icon-ok': allSelected}"></div></th>
-        <th width="20%">${_('Name')}</th>
-        <th width="79%">${_('Script')}</th>
-      </tr>
-      </thead>
-      <tbody id="scriptTable" data-bind="template: {name: 'scriptTemplate', foreach: filteredScripts}">
-
-      </tbody>
-      <tfoot>
-      <tr data-bind="visible: isLoading()">
-        <td colspan="3" class="left">
-          <img src="/static/art/spinner.gif" />
-        </td>
-      </tr>
-      <tr data-bind="visible: filteredScripts().length == 0 && !isLoading()">
-        <td colspan="3">
-          <div class="alert">
-              ${_('There are no scripts matching the search criteria.')}
-          </div>
-        </td>
-      </tr>
-      </tfoot>
-    </table>
-
-    <script id="scriptTemplate" type="text/html">
-      <tr style="cursor: pointer" data-bind="event: { mouseover: toggleHover, mouseout: toggleHover}">
-        <td class="center" data-bind="click: handleSelect" style="cursor: default">
-          <div data-bind="css: {hueCheckbox: true, 'icon-ok': selected}"></div>
-        </td>
-        <td data-bind="click: $root.confirmViewScript">
-          <strong><a href="#" data-bind="click: $root.confirmViewScript, text: name"></a></strong>
-        </td>
-        <td data-bind="click: $root.confirmViewScript">
-          <span data-bind="text: scriptSumup"></span>
-        </td>
-      </tr>
-    </script>
   </div>
 
   <div id="editor" class="row-fluid mainSection hide">
     <div class="span2">
-      <div class="well sidebar-nav">
+      <div class="sidebar-nav">
           <ul class="nav nav-list">
             <li class="nav-header">${_('Editor')}</li>
             <li data-bind="click: editScript" class="active" data-section="edit">
@@ -148,8 +150,9 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
               </a>
             </li>
             <li>
-            <br/>
-            <i class="icon-question-sign" id="help"></i>
+            <a href="#" id="help">
+              <i class="icon-question-sign"></i>
+            </a>
             <div id="help-content" class="hide">
               <ul style="text-align: left;">
                 <li>${ _("Press CTRL + Space to autocomplete") }</li>
@@ -165,6 +168,8 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
       <div class="ribbon-wrapper" data-bind="visible: isDirty">
         <div class="ribbon">${ _('Unsaved') }</div>
       </div>
+
+      <div class="card">
 
       <div id="edit" class="section">
         <div class="alert alert-info">
@@ -371,20 +376,16 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
           <pre id="withoutLogs">${ _('No available logs.') } <img src="/static/art/spinner.gif"/></pre>
           <pre id="withLogs" class="hide scroll"></pre>
         </div>
-
+      </div>
       </div>
   </div>
 
   <div id="dashboard" class="row-fluid mainSection hide">
 
-    <div class="widget-box">
-      <div class="widget-title">
-        <span class="icon">
-          <i class="icon-cogs"></i>
-        </span>
-        <h5>${ _('Running') }</h5>
-      </div>
-      <div class="widget-content">
+    <div class="card card-home">
+      <h2 class="card-heading simple">${ _('Running') }</h2>
+      <div class="card-body">
+        <p>
         <div class="alert alert-info" data-bind="visible: runningScripts().length == 0" style="margin-bottom:0">
           ${_('There are currently no running scripts.')}
         </div>
@@ -401,17 +402,14 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
 
           </tbody>
         </table>
+        </p>
       </div>
     </div>
 
-    <div class="widget-box">
-      <div class="widget-title">
-        <span class="icon">
-          <i class="icon-th-list"></i>
-        </span>
-        <h5>${ _('Completed') }</h5>
-      </div>
-      <div class="widget-content">
+    <div class="card card-home">
+      <h2 class="card-heading simple">${ _('Completed') }</h2>
+      <div class="card-body">
+        <p>
         <div class="alert alert-info" data-bind="visible: completedScripts().length == 0">
           ${_('There are currently no completed scripts.')}
         </div>
@@ -427,6 +425,7 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
 
           </tbody>
         </table>
+        </p>
       </div>
     </div>
 

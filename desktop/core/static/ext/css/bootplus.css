@@ -6488,56 +6488,6 @@ input.search-query {
   color: #737373;
 }
 
-.label-important,
-.badge-important {
-  background-color: #f2dede;
-}
-
-.label-important[href],
-.badge-important[href] {
-  background-color: #e4b9b9;
-}
-
-.label-warning,
-.badge-warning {
-  background-color: #f89406;
-}
-
-.label-warning[href],
-.badge-warning[href] {
-  background-color: #c67605;
-}
-
-.label-success,
-.badge-success {
-  background-color: #dff0d8;
-}
-
-.label-success[href],
-.badge-success[href] {
-  background-color: #c1e2b3;
-}
-
-.label-info,
-.badge-info {
-  background-color: #d9edf7;
-}
-
-.label-info[href],
-.badge-info[href] {
-  background-color: #afd9ee;
-}
-
-.label-inverse,
-.badge-inverse {
-  background-color: #444444;
-}
-
-.label-inverse[href],
-.badge-inverse[href] {
-  background-color: #2b2b2b;
-}
-
 .progress {
   height: 10px;
   padding: 1px;
