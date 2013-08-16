@@ -88,7 +88,7 @@ def drop_database(request):
     except Exception, ex:
       error_message, log = dbms.expand_exception(ex, db)
       error = _("Failed to remove %(databases)s.  Error: %(error)s") % {'databases': ','.join(databases), 'error': error_message}
-      raise PopupException(error, title=_("Beeswax Error"), detail=log)
+      raise PopupException(error, title=_("Hive Error"), detail=log)
   else:
     title = _("Do you really want to delete the database(s)?")
     return render('confirm.html', request, dict(url=request.path, title=title))
@@ -137,7 +137,10 @@ def describe_table(request, database, table):
   error_message = ''
   table_data = ''
 
-  table = db.get_table(database, table)
+  try:
+    table = db.get_table(database, table)
+  except Exception, e:
+    raise PopupException(_("Hive Error"), detail=e)
   partitions = None
   if table.partition_keys:
     partitions = db.get_partitions(database, table, max_parts=None)
@@ -181,7 +184,7 @@ def drop_table(request, database):
     except Exception, ex:
       error_message, log = dbms.expand_exception(ex, db)
       error = _("Failed to remove %(tables)s.  Error: %(error)s") % {'tables': ','.join(tables), 'error': error_message}
-      raise PopupException(error, title=_("Beeswax Error"), detail=log)
+      raise PopupException(error, title=_("Hive Error"), detail=log)
   else:
     title = _("Do you really want to delete the table(s)?")
     return render('confirm.html', request, dict(url=request.path, title=title))

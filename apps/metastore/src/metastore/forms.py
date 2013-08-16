@@ -18,8 +18,6 @@
 from django import forms
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
-import hive_metastore
-
 from desktop.lib.django_forms import simple_formset_factory, DependencyAwareForm
 from desktop.lib.django_forms import ChoiceOrOtherField, MultiForm, SubmitButton
 from filebrowser.forms import PathField
