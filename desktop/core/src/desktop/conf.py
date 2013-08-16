@@ -27,6 +27,19 @@ from desktop.lib.conf import coerce_bool, validate_path
 from desktop.lib.paths import get_desktop_root
 
 
+def coerce_database(database):
+  if database == 'mysql':
+    return 'django.db.backends.mysql'
+  elif database == 'postgres':
+    return 'django.db.backends.postgresql_psycopg2'
+  elif database == 'oracle':
+    return 'django.db.backends.oracle'
+  elif database == 'sqlite':
+    return 'django.db.backends.sqlite3'
+  else:
+    return str(database)
+
+
 HTTP_HOST = Config(
   key="http_host",
   help=_("HTTP host to bind to."),
@@ -155,7 +168,7 @@ DATABASE = ConfigSection(
     ENGINE=Config(
       key='engine',
       help=_('Database engine, such as postgresql_psycopg2, mysql, or sqlite3.'),
-      type=str,
+      type=coerce_database,
       default='django.db.backends.sqlite3',
     ),
     NAME=Config(
