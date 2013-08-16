@@ -20,10 +20,14 @@ from django.utils.translation import ugettext as _
 ${ commonheader(_('Not Found'), "", user) | n,unicode }
 
   <div class="container-fluid">
-    <h1>${_('Page not found')}</h1>
-    <p>${_("We're sorry, but the requested page could not be found:")}</p>
-    <br/>
-    <code>${uri}</code>
+    <div class="row-fluid">
+      <div class="span12 well">
+        <div class="hero-unit">
+          <h1>${_('Page not found.')}</h1>
+          <p>${_("We're sorry, but the requested page could not be found:")} <code>${uri}</code></p>
+        </div>
+      </div>
+    </div>
   </div>
 
 ${ commonfooter(messages) | n,unicode }

@@ -35,203 +35,195 @@ ${ commonheader(_('Quick Start'), "quickstart", user, "100px") | n,unicode }
   </div>
 % endif
 
-<div style="position: absolute;top:110px;right:30px">
-  <a href="http://gethue.com" target="_blank" title="${ _('Visit the Hue website.') }">
-    <img src="/static/art/hue-logo-subtle.png"/>
-  </a>
-</div>
-
 <div class="container-fluid">
   <div class="row-fluid">
-    <h2>
-      % if user.is_superuser:
-        ${ _('Quick Start Wizard') } -
-      % endif
-      Hue ${version}
-    </h2>
-  </div>
+    <div class="card" style="margin-bottom: 100px;">
+      <h2 class="card-heading simple">
+        % if user.is_superuser:
+          ${ _('Quick Start Wizard') } -
+        % endif
+        Hue ${version}
+      </h2>
 
-  % if user.is_superuser:
-  <br/>
+      <div class="card-body">
+          % if user.is_superuser:
+            <br/>
 
-  <div class="row-fluid">
-   <div id="properties" class="section">
-    <ul class="nav nav-tabs">
-      <li class="active"><a href="#step1" class="step">${ _('Step 1:') } <i class="icon-cogs"></i> ${ _('Check Configuration') }</a></li>
-      <li><a href="#step2" class="step">${ _('Step 2:') } <i class="icon-book"></i> ${ _('Examples') }</a></li>
-      <li><a href="#step3" class="step">${ _('Step 3:') } <i class="icon-group"></i> ${ _('Users') }</a></li>
-      <li><a id="lastStep" href="#step4" class="step">${ _('Step 4:') } <i class="icon-flag"></i> ${_('Go!') }</a></li>
-    </ul>
+          <div class="row-fluid">
+          <div id="properties" class="section">
+            <ul class="nav nav-tabs" style="margin-bottom: 0">
+              <li class="active"><a href="#step1" class="step">${ _('Step 1:') } <i
+                  class="icon-cogs"></i> ${ _('Check Configuration') }</a></li>
+              <li><a href="#step2" class="step">${ _('Step 2:') } <i class="icon-book"></i> ${ _('Examples') }</a></li>
+              <li><a href="#step3" class="step">${ _('Step 3:') } <i class="icon-group"></i> ${ _('Users') }</a></li>
+              <li><a id="lastStep" href="#step4" class="step">${ _('Step 4:') } <i class="icon-flag"></i> ${_('Go!') }
+              </a></li>
+            </ul>
 
-    <div class="steps" >
-      <div id="step1" class="stepDetails">
-      <div class="widget-box">
-        <div class="widget-title">
-          <span class="icon">
-            <i class="icon-th-list"></i>
-          </span>
-          <h5>${ _('Check your current configuration') }</h5>
-        </div>
-        <div class="widget-content">
-          ${ check_config | n,smart_unicode }
-        </div>
-      </div>
+          <div class="steps">
+          <div id="step1" class="stepDetails">
+            <div class="card card-tab">
+              <h2 class="card-heading simple">${ _('Check your current configuration') }</h2>
 
-      <div class="widget-box">
-        <div class="widget-title">
-          <span class="icon">
-            <i class="icon-trash"></i>
-          </span>
-          <h5>${ _('HDFS Trash Configuration') }</h5>
-        </div>
-        <div class="widget-content">
-          <div class="container-fluid">
-          % if trash_enabled:
+              <div class="card-body">
+              ${ check_config | n,smart_unicode }
+              </div>
+            </div>
+
+          <div class="card card-home card-tab card-tab-bordertop">
+            <h2 class="card-heading simple">${ _('HDFS Trash Configuration') }</h2>
+          <div class="card-body">
+          <p>
+            % if not trash_enabled:
             <h5>${ _('Trash is active.')}</h5>
-          % else:
-          ${ _('You can activate trash collection by setting fs.trash.interval in core-site.xml:')}<br/><br/>
+            % else:
+            ${ _('You can activate trash collection by setting fs.trash.interval in core-site.xml:')}<br/><br/>
             <pre>
   &#60;property&#62;
     &#60;name&#62;fs.trash.interval&#60;/name&#62;
     &#60;value&#62;10060&#60;/value&#62;
   &#60;/property&#62;</pre>
-          % endif
+            % endif
+          </p>
           </div>
-        </div>
-      </div>
-    </div>
+          </div>
+          </div>
 
-      <div id="step2" class="stepDetails hide">
-      <div class="widget-box">
-        <div class="widget-title">
-          <span class="icon">
-            <i class="icon-th-list"></i>
-          </span>
-          <h5>${ _('Install all the application examples') }</h5>
-        </div>
-        <div class="widget-content">
+          <div id="step2" class="stepDetails hide">
+            <div class="card card-tab card-listcontent">
+              <h2 class="card-heading simple">${ _('Install all the application examples') }</h2>
+
+              <div class="card-body">
+                <p>
+                <ul>
+                  <li>
+                    <a href="#" class="installAllBtn" data-loading-text="${ _('Installing...') }">
+                      <i class="icon-download-alt"></i> ${ _('All') }
+                    </a>
+                  </li>
+                </ul>
+                </p>
+              </div>
+            </div>
+
+          <div class="card card-home card-tab card-tab-bordertop card-listcontent">
+            <h2 class="card-heading simple">${ _('Install individual application examples') }</h2>
+          <div class="card-body">
+            <p>
           <ul>
-          <li>
-            <a href="#" class="installAllBtn" data-loading-text="${ _('Installing...') }">
-             <i class="icon-download-alt"></i> ${ _('All') }
-            </a>
-          </li>
+          % if 'beeswax' in app_names:
+              <li>
+                <a href="#" class="installBtn" data-loading-text="${ _('Installing...') }"
+                   data-sample-url="${ url('beeswax:install_examples') }">
+                  <i class="icon-download-alt"></i> ${ apps['beeswax'].nice_name }
+                </a>
+              </li>
+          % endif
+          % if 'impala' in app_names:
+              <li>
+                <a href="#" class="installBtn" data-loading-text="${ _('Installing...') }"
+                   data-sample-url="${ url('impala:install_examples') }">
+                  <i class="icon-download-alt"></i> ${ apps['impala'].nice_name }
+                </a>
+              </li>
+          % endif
+          % if 'jobsub' in app_names:
+              <li>
+                <a href="#" class="installBtn" data-loading-text="${ _('Installing...') }"
+                   data-sample-url="${ url('oozie:install_examples') }">
+                  <i class="icon-download-alt"></i> ${ apps['jobsub'].nice_name }
+                </a>
+              </li>
+          % endif
+          % if 'oozie' in app_names:
+              <li>
+                <a href="#" class="installBtn" data-loading-text="${ _('Installing...') }"
+                   data-sample-url="${ url('oozie:install_examples') }">
+                  <i class="icon-download-alt"></i> ${ apps['oozie'].nice_name }
+                </a>
+              </li>
+          % endif
+          % if 'pig' in app_names:
+              <li>
+                <a href="#" class="installBtn" data-loading-text="${ _('Installing...') }"
+                   data-sample-url="${ url('pig:install_examples') }">
+                  <i class="icon-download-alt"></i> ${ apps['pig'].nice_name }
+                </a>
+              </li>
+          % endif
           </ul>
-        </div>
-      </div>
+            </p>
+          </div>
+          </div>
+          </div>
 
-      <div class="widget-box">
-        <div class="widget-title">
-          <span class="icon">
-            <i class="icon-th-list"></i>
-          </span>
-          <h5>${ _('Install individual application examples') }</h5>
-        </div>
-        <div class="widget-content">
-          <ul>
-        % if 'beeswax' in app_names:
-          <li>
-            <a href="#" class="installBtn" data-loading-text="${ _('Installing...') }" data-sample-url="${ url('beeswax:install_examples') }">
-             <i class="icon-download-alt"></i> ${ apps['beeswax'].nice_name }
-            </a>
-          </li>
-        % endif
-        % if 'impala' in app_names:
-          <li>
-            <a href="#" class="installBtn" data-loading-text="${ _('Installing...') }" data-sample-url="${ url('impala:install_examples') }">
-             <i class="icon-download-alt"></i> ${ apps['impala'].nice_name }
-            </a>
-          </li>
-        % endif
-        % if 'jobsub' in app_names:
-          <li>
-            <a href="#" class="installBtn" data-loading-text="${ _('Installing...') }" data-sample-url="${ url('oozie:install_examples') }">
-              <i class="icon-download-alt"></i> ${ apps['jobsub'].nice_name }
-            </a>
-          </li>
-        % endif
-        % if 'oozie' in app_names:
-          <li>
-            <a href="#" class="installBtn" data-loading-text="${ _('Installing...') }" data-sample-url="${ url('oozie:install_examples') }">
-              <i class="icon-download-alt"></i> ${ apps['oozie'].nice_name }
-            </a>
-          </li>
-        % endif
-        % if 'pig' in app_names:
-          <li>
-            <a href="#" class="installBtn" data-loading-text="${ _('Installing...') }" data-sample-url="${ url('pig:install_examples') }">
-             <i class="icon-download-alt"></i> ${ apps['pig'].nice_name }
-            </a>
-          </li>
-        % endif
-          </ul>
-        </div>
-      </div>
-    </div>
+            <div id="step3" class="stepDetails hide">
+              <div class="card card-tab card-listcontent">
+                <h2 class="card-heading simple">${ _('Create or import users') }</h2>
 
-      <div id="step3" class="stepDetails hide">
-      <div class="widget-box">
-        <div class="widget-title">
-          <span class="icon">
-            <i class="icon-th-list"></i>
-          </span>
-          <h5>${ _('Create or import users') }</h5>
-        </div>
-        <div class="widget-content">
-        <a  href="${ url('useradmin.views.list_users') }" target="_blank"><img src="/useradmin/static/art/icon_useradmin_24.png"> ${ _('User Admin') }</a>
-        </div>
-      </div>
+                <div class="card-body">
+                  <p>
+                    <a href="${ url('useradmin.views.list_users') }" target="_blank" style="padding-left: 2px"><img
+                        src="/useradmin/static/art/icon_useradmin_24.png"
+                        style="margin-right: 4px;"> ${ _('User Admin') }</a>
+                  </p>
+                </div>
+              </div>
 
-      <div class="widget-box">
-        <div class="widget-title">
-          <span class="icon">
-            <i class="icon-th-list"></i>
-          </span>
-          <h5>${ _('Tours and tutorials') }</h5>
-        </div>
-        <div class="widget-content" style="padding-left: 14px">
-          <label class="checkbox">
-            <input class="updatePreferences" type="checkbox" name="tours_and_tutorials" style="margin-right: 10px" title="${ ('Check to enable the tours and tutorials') }" ${ tours_and_tutorials and "checked" }/>
-            ${ ('Display the "Available Tours" question mark when tours are available for a specific page.') }
-          </label>
-        </div>
+              <div class="card card-home card-tab card-tab-bordertop card-listcontent">
+                <h2 class="card-heading simple">${ _('Tours and tutorials') }</h2>
+
+                <div class="card-body">
+                  <p>
+                    <label class="checkbox">
+                      <input class="updatePreferences" type="checkbox" name="tours_and_tutorials"
+                             style="margin-right: 10px"
+                             title="${ ('Check to enable the tours and tutorials') }" ${ tours_and_tutorials and "checked" }/>
+                    ${ ('Display the "Available Tours" question mark when tours are available for a specific page.') }
+                    </label>
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div id="step4" class="stepDetails hide">
+              <div class="card card-tab card-listcontent">
+                <h2 class="card-heading simple">${ _('Use the applications') }</h2>
+
+                <div class="card-body">
+                  <p>
+                    <a href="${ url('desktop.views.home') }" class="step"><i class="icon-home"></i> ${_('Hue Home') }
+                    </a>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          </div>
+          </div>
+          % endif
       </div>
     </div>
-
-      <div id="step4" class="stepDetails hide">
-      <div class="widget-box">
-        <div class="widget-title">
-          <span class="icon">
-            <i class="icon-th-list"></i>
-          </span>
-          <h5>${ _('Use the applications') }</h5>
-        </div>
-        <div class="widget-content">
-          <a href="${ url('desktop.views.home') }" class="step"><i class="icon-home"></i> ${_('Hue Home') }</a>
-        </div>
-      </div>
-    </div>
-    </div>
-
-    <div class="form-actions" style="position:fixed;bottom:0;margin:0;margin-left:-20px;width:100%">
-      <a id="backBtn" class="btn disabled">${ _('Back') }</a>
-      <a id="nextBtn" class="btn btn-primary disable-feedback">${ _('Next') }</a>
-    </div>
-   </div>
   </div>
-  % endif
+
+  <div class="form-actions" style="position:fixed;bottom:0;margin:0;margin-left:-20px;width:100%">
+    <a id="backBtn" class="btn disabled">${ _('Back') }</a>
+    <a id="nextBtn" class="btn btn-primary disable-feedback">${ _('Next') }</a>
+  </div>
+
 </div>
 
 % if user.is_superuser:
 <style type="text/css">
   .steps {
     min-height: 300px;
-    margin-bottom: 80px;
   }
 
   input[type=submit] {
     margin-left: 50px;
   }
+
 </style>
 
 <script src="/static/ext/js/routie-0.3.0.min.js" type="text/javascript" charset="utf-8"></script>

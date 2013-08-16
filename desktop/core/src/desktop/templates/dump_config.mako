@@ -44,34 +44,27 @@ ${layout.menubar(section='dump_config')}
 
     <div class="container-fluid">
       <div class="row-fluid">
-
+        <div class="well">
         ${_('Configuration files located in')} <code>${conf_dir}</code>
-        <br/><br/>
+        </div>
 
-        <div class="widget-box">
-          <div class="widget-title">
-            <span class="icon">
-              <i class="icon-th-list"></i>
-            </span>
-            <h5>${_('Installed Applications')}</h5>
-          </div>
-          <div class="widget-content">
+        <div class="card card-home">
+            <h2 class="card-heading simple">${_('Installed Applications')}</h2>
+          <div class="card-body">
+            <p>
             <ul id="installedAppsz" class="nav nav-pills">
             % for app in apps:
                 <li><a href="/${app.display_name}">${app.name}</a></li>
             % endfor
             </ul>
+           </p>
           </div>
         </div>
 
-        <div class="widget-box" style="margin-top: 40px">
-          <div class="widget-title">
-            <span class="icon">
-              <i class="icon-th-list"></i>
-            </span>
-            <h5>${_('Configuration Sections and Variables')}</h5>
-          </div>
-          <div class="widget-content">
+        <div class="card card-home">
+            <h2 class="card-heading simple">${_('Configuration Sections and Variables')}</h2>
+          <div class="card-body">
+            <p>
             <ul class="nav nav-tabs">
               % for obj in top_level:
                 <li
@@ -87,6 +80,7 @@ ${layout.menubar(section='dump_config')}
               <br/>
               <br/>
               <br/>
+            </p>
           </div>
         </div>
 

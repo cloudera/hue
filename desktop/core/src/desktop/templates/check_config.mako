@@ -18,7 +18,6 @@ from desktop.lib.conf import BoundConfig
 from django.utils.translation import ugettext as _
 %>
 
-<div class="container-fluid">
     ${_('Configuration files located in')} <code>${conf_dir}</code>
     <br/><br/>
     % if error_list:
@@ -49,4 +48,3 @@ from django.utils.translation import ugettext as _
     % else:
       <h5>${_('All OK. Configuration check passed.')}</h5>
     % endif
-</div>

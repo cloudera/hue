@@ -974,7 +974,7 @@ div.box {
 }
 
 .table tbody tr:hover td, .table tbody tr:hover th {
-  background-color: #E8F1FB;
+  background-color: #EFEFEF;
 }
 
 .nounderline:hover {
@@ -1229,33 +1229,42 @@ a#advanced-btn:hover {
   padding-top: 4px;
 }
 
-.card-home ul {
+.card-listcontent ul {
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.card-home ul li {
+.card-listcontent ul li {
   margin: 0;
   padding: 0;
 }
 
-.card-home a {
+.card-listcontent a {
   padding: 5px 15px;
   display: block;
   font-size: 14px;
   font-weight: bold;
 }
 
-.card-home a i {
+.card-listcontent a i {
   color: #999999;
 }
 
-.card-home a:hover {
+.card-listcontent a:hover {
   background-color: #EEEEEE;
   text-decoration: none;
 }
 
-.card-home a:hover i {
+.card-listcontent a:hover i {
   color: #333333;
+}
+
+.card-tab {
+  margin-top: 0;
+  border-bottom: 1px solid #D8D8D8;
+}
+
+.card-tab-bordertop {
+   border-top: 1px solid #D8D8D8;
 }
