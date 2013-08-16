@@ -29,3 +29,12 @@ a.advanced, a.advanced:link, a.advanced:hover {
 input.search-query {
   vertical-align: top;
 }
+
+.dt-records {
+  margin-left: 10px;
+}
+
+.dt-pages {
+  margin-right: 10px;
+  float: right;
+}

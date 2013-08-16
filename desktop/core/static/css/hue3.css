@@ -1268,3 +1268,11 @@ a#advanced-btn:hover {
 .card-tab-bordertop {
    border-top: 1px solid #D8D8D8;
 }
+
+.card-marginbottom {
+  margin-bottom: 20px!important;
+}
+
+.card-heading-blue {
+  color: #338BB8!important;
+}

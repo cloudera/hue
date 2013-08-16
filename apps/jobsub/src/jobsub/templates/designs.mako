@@ -40,7 +40,8 @@ ${ commonheader(None, "jobsub", user, "60px") | n,unicode }
 <script src="/jobsub/static/js/jobsub.js" type="text/javascript" charset="utf-8"></script>
 
 <div class="container-fluid">
-  <h1>${_('Job Designs')}</h1>
+  <div class="card">
+  <h1 class="card-heading simple">${_('Job Designs')}</h1>
 
   <%actionbar:render>
     <%def name="search()">
@@ -149,6 +150,8 @@ ${ commonheader(None, "jobsub", user, "60px") | n,unicode }
 
       </tbody>
     </table>
+  </div>
+
   </div>
 
 </div>
@@ -707,7 +710,7 @@ ko.applyBindings(designs);
 var designTableOptions = {
   "sPaginationType": "bootstrap",
   "bLengthChange": false,
-  "sDom": "<'row'r>t<'row'<'span8'i><''p>>",
+  "sDom": "<'row'r>t<'row-fluid'<'dt-pages'p><'dt-records'i>>",
   "bDestroy": true,
   "aoColumnDefs": [
     { "bSortable": false, "aTargets": [ 0 ] },
