@@ -431,9 +431,9 @@ ul.errorlist li {
   height: 88px;
   overflow: hidden;
   position: fixed;
-  top: 74px;
+  top: 50px;
   right: -3px;
-  z-index: 1001;
+  z-index: 10001;
 }
 
 .ribbon {
