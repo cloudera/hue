@@ -32,6 +32,11 @@ ${layout.menubar(section='log_view')}
     margin: 0;
     padding: 2px;
     border: 0;
+    white-space: pre-wrap;
+  }
+
+  pre.nowrap {
+    white-space: nowrap;
   }
 
   pre.highlighted {
@@ -40,6 +45,7 @@ ${layout.menubar(section='log_view')}
 
   #logs {
     overflow: auto;
+    background-color: #F5F5F5;
   }
 
   #logs pre:first-child {
@@ -56,26 +62,26 @@ ${layout.menubar(section='log_view')}
 </style>
 
 <div class="container-fluid">
-  <%actionbar:render>
-    <%def name="search()">
+  <div class="card">
+    <%actionbar:render>
+      <%def name="search()">
         <input type="text" class="input-xxlarge search-query" placeholder="${_('Search in the logs')}" value="${query}">
-    </%def>
-    <%def name="creation()">
-        <span class="btn-group">
-          <a href="/download_logs" class="btn"><i class="icon-download-alt"></i> ${_('Download entire log as zip')}</a>
-        </span>
-    </%def>
-  </%actionbar:render>
+      </%def>
+      <%def name="creation()">
+        <label class="checkbox" style="display: inline-block; margin-right: 10px"><input id="wrapLogs" type="checkbox" checked="checked">${_('Wrap logs')}</label>
+        <a href="/download_logs" class="btn"><i class="icon-download-alt"></i> ${_('Download entire log as zip')}</a>
+      </%def>
+    </%actionbar:render>
 
-  <% log.reverse() %>
+    <% log.reverse() %>
 
-  <div id="logs">
-      % for l in log:
-        <pre>${smart_unicode(l, errors='ignore')}</pre>
-      % endfor
+    <div id="logs">
+        % for l in log:
+          <pre>${smart_unicode(l, errors='ignore')}</pre>
+        % endfor
+    </div>
+
   </div>
-
-  <br/>
 
 </div>
 
@@ -114,7 +120,7 @@ ${layout.menubar(section='log_view')}
         heightAfter += $(this).outerHeight(true);
       });
       if (_el.height() > ($(window).height() - _el.offset().top - heightAfter)) {
-        _el.css("overflow-y", "auto").height($(window).height() - _el.offset().top - heightAfter);
+        _el.css("overflow-y", "auto").height($(window).height() - _el.offset().top - heightAfter - 30);
       }
     }
 
@@ -140,6 +146,15 @@ ${layout.menubar(section='log_view')}
         $("#logs").scrollTop(0);
       }
     }
+
+    $("#wrapLogs").on("change", function(){
+      if ($(this).is(":checked")){
+        $("pre").removeClass("nowrap");
+      }
+      else {
+        $("pre").addClass("nowrap");
+      }
+    });
   });
 </script>
 

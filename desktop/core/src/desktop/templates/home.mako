@@ -46,7 +46,7 @@ ${ commonheader(_('Home'), "home", user) | n,unicode }
   <div class="row-fluid" style="margin-top: 30px">
 
     <div class="span4">
-      <div class="card card-home">
+      <div class="card card-home card-listcontent">
         <h2 class="card-heading simple">${_('Query')}</h2>
 
         <div class="card-body">
@@ -65,7 +65,7 @@ ${ commonheader(_('Home'), "home", user) | n,unicode }
     </div>
 
     <div class="span4">
-      <div class="card card-home">
+      <div class="card card-home card-listcontent">
         <h2 class="card-heading simple">${_('Hadoop')}</h2>
 
         <div class="card-body">
@@ -83,7 +83,7 @@ ${ commonheader(_('Home'), "home", user) | n,unicode }
     </div>
 
     <div class="span4">
-      <div class="card card-home">
+      <div class="card card-home card-listcontent">
         <h2 class="card-heading simple">${_('Workflow')}</h2>
 
         <div class="card-body">
