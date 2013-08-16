@@ -35,6 +35,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 
   <%def name="content()">
     <form method="POST" class="form" data-bind="submit: submit">
+      <div class="well">
       <div class="section">
         <div class="alert alert-info">
           <div class="pull-right" style="margin-top: 10px">
@@ -58,6 +59,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 
       <div class="form-actions" style="margin-top: 80px">
         <button type="submit" class="btn btn-primary" id="save-btn">${_('Save')}</button>
+      </div>
       </div>
     </form>
   </%def>

@@ -46,7 +46,7 @@ h3 {
 }
 
 .form-actions {
-  padding-left: 20px!important;
+  padding-left: 0px!important;
 }
 
 .bubble {
@@ -90,6 +90,7 @@ h3 {
   padding-left: 20px;
   padding-right: 20px;
   text-align: left;
+  margin-top: 10px;
 }
 
 .search-bar h4 {
@@ -113,4 +114,15 @@ h1.emptyMessage {
 
 .editable {
   cursor: pointer;
+}
+
+.collectionRow {
+  cursor: pointer;
+  margin-bottom: 10px;
+  padding: 10px;
+  height: 40px;
+}
+
+.collectionRow:hover {
+  background-color: #EFEFEF;
 }

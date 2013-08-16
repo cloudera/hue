@@ -122,14 +122,16 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
     overflow: inherit;
   }
 
-  .chzn-container, .chzn-select {
+  .chosen-container, .chosen-select {
     float: left;
   }
 
   .plus-btn {
     float: left;
+    height: 25px;
+    line-height: 15px!important;
     margin-left: 4px;
-    height: 30px;
+    min-height: 25px;
   }
 </style>
 
@@ -143,15 +145,15 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
   </%def>
 
   <%def name="content()">
-    <ul class="nav nav-tabs">
+    <ul class="nav nav-tabs" style="margin-bottom:0; margin-top:10px">
       <li class="active"><a href="#visual" data-toggle="tab">${_('Visual Editor')}</a></li>
       <li><a href="#preview" data-toggle="tab">${_('Preview')}</a></li>
       <li><a href="#source" data-toggle="tab">${_('Source')}</a></li>
       <li><a href="#extra" data-toggle="tab">${_('Advanced')}</a></li>
     </ul>
+    <div class="well">
     <div class="tab-content">
       <div class="tab-pane active" id="visual">
-
         <div class="row-fluid">
           <div class="span9">
             <div id="toolbar"></div>
@@ -163,30 +165,22 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
             </div>
           </div>
           <div class="span3">
-            <div class="widget-box">
-              <div class="widget-title">
-                <span class="icon">
-                  <i class="icon-th-list"></i>
-                </span>
-                <h5>${_('Available Fields')}</h5>
-              </div>
-              <div class="widget-content">
-                <select data-bind="options: availableFields, value: selectedVisualField" class="input-large chzn-select"></select>
-                <button title="${ _('Click on this button to add the field') }" class="btn btn-small plus-btn" data-bind="click: $root.addFieldToVisual">
-                  <i class="icon-plus"></i>
-                </button>
-                <div class="clearfix"></div>
+            <div class="card card-home">
+              <h2 class="card-heading simple">${_('Available Fields')}</h2>
+              <div class="card-body">
+                <p>
+                  <select data-bind="options: availableFields, value: selectedVisualField" class="input-large chosen-select"></select>
+                  <button title="${ _('Click on this button to add the field') }" class="btn plus-btn" data-bind="click: $root.addFieldToVisual">
+                    <i class="icon-plus"></i>
+                  </button>
+                  <div class="clearfix"></div>
+                </p>
               </div>
             </div>
-            <div class="widget-box">
-              <div class="widget-title">
-                <span class="icon">
-                  <i class="icon-magic"></i>
-                </span>
-                <h5>${_('Available Functions')}</h5>
-              </div>
-              <div class="widget-content">
-                <select id="visualFunctions" data-bind="value: selectedVisualFunction" class="input-large chzn-select">
+            <div class="card card-home">
+              <h2 class="card-heading simple">${_('Available Functions')}</h2>
+              <div class="card-body">
+                <select id="visualFunctions" data-bind="value: selectedVisualFunction" class="input-large chosen-select">
                   <option title="${ _('Formats date or timestamp in DD-MM-YYYY') }" value="{{#date}} {{/date}}">{{#date}}</option>
                   <option title="${ _('Formats date or timestamp in HH:mm:ss') }" value="{{#time}} {{/time}}">{{#time}}</option>
                   <option title="${ _('Formats date or timestamp in DD-MM-YYYY HH:mm:ss') }" value="{{#datetime}} {{/datetime}}">{{#datetime}}</option>
@@ -200,7 +194,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
                   <option title="${ _('Truncate a value after 250 characters') }" value="{{#truncate250}} {{/truncate250}}">{{#truncate250}}</option>
                   <option title="${ _('Truncate a value after 500 characters') }" value="{{#truncate500}} {{/truncate500}}">{{#truncate500}}</option>
                 </select>
-                <button title="${ _('Click on this button to add the field') }" class="btn btn-small plus-btn" data-bind="click: $root.addFunctionToVisual">
+                <button title="${ _('Click on this button to add the field') }" class="btn plus-btn" data-bind="click: $root.addFunctionToVisual">
                   <i class="icon-plus"></i>
                 </button>
                 <div class="clearfix"></div>
@@ -209,39 +203,30 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
             </div>
           </div>
         </div>
-
-
       </div>
+
       <div class="tab-pane" id="source">
         <div class="row-fluid">
           <div class="span9" style="padding-top: 10px">
             <textarea id="template-source"></textarea>
           </div>
           <div class="span3">
-            <div class="widget-box">
-              <div class="widget-title">
-                <span class="icon">
-                  <i class="icon-th-list"></i>
-                </span>
-                <h5>${_('Available Fields')}</h5>
-              </div>
-              <div class="widget-content">
-                <select data-bind="options: availableFields, value: selectedSourceField" class="input-medium chzn-select"></select>
-                <button title="${ _('Click on this button to add the field') }" class="btn btn-small plus-btn" data-bind="click: $root.addFieldToSource">
-                  <i class="icon-plus"></i>
-                </button>
-                <div class="clearfix"></div>
+            <div class="card card-home">
+              <h2 class="card-heading simple">${_('Available Fields')}</h2>
+              <div class="card-body">
+                <p>
+                  <select data-bind="options: availableFields, value: selectedSourceField" class="input-medium chosen-select"></select>
+                  <button title="${ _('Click on this button to add the field') }" class="btn plus-btn" data-bind="click: $root.addFieldToSource">
+                    <i class="icon-plus"></i>
+                  </button>
+                  <div class="clearfix"></div>
+                </p>
               </div>
             </div>
-            <div class="widget-box">
-              <div class="widget-title">
-                <span class="icon">
-                  <i class="icon-magic"></i>
-                </span>
-                <h5>${_('Available Functions')}</h5>
-              </div>
-              <div class="widget-content">
-                <select id="sourceFunctions" data-bind="value: selectedSourceFunction" class="input-medium chzn-select">
+            <div class="card card-home">
+              <h2 class="card-heading simple">${_('Available Functions')}</h2>
+              <div class="card-body">
+                <select id="sourceFunctions" data-bind="value: selectedSourceFunction" class="input-medium chosen-select">
                   <option title="${ _('Formats a date in the DD-MM-YYYY format') }" value="{{#date}} {{/date}}">{{#date}}</option>
                   <option title="${ _('Formats a date in the HH:mm:ss format') }" value="{{#time}} {{/time}}">{{#time}}</option>
                   <option title="${ _('Formats a date in the DD-MM-YYYY HH:mm:ss format') }" value="{{#datetime}} {{/datetime}}">{{#datetime}}</option>
@@ -255,7 +240,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
                   <option title="${ _('Truncate a value after 250 characters') }" value="{{#truncate250}} {{/truncate250}}">{{#truncate250}}</option>
                   <option title="${ _('Truncate a value after 500 characters') }" value="{{#truncate500}} {{/truncate500}}">{{#truncate500}}</option>
                 </select>
-                <button title="${ _('Click on this button to add the field') }" class="btn btn-small plus-btn" data-bind="click: $root.addFunctionToSource">
+                <button title="${ _('Click on this button to add the field') }" class="btn plus-btn" data-bind="click: $root.addFunctionToSource">
                   <i class="icon-plus"></i>
                 </button>
                 <div class="clearfix"></div>
@@ -402,7 +387,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
         <button type="button" id="load-template-btn" href="#" class="btn btn-primary" disabled="disabled">${_('Insert layout')}</button>
       </div>
     </div>
-
+    </div>
   </%def>
 </%layout:skeleton>
 
@@ -530,7 +515,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 
     var viewModel = new ViewModel();
     ko.applyBindings(viewModel);
-    $(".chzn-select").chosen();
+    $(".chosen-select").chosen({width: "75%"});
 
     var samples = ${ sample_data | n,unicode };
     var templateSourceEl = $("#template-source")[0];

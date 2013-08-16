@@ -50,7 +50,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
   % endif
   <form class="form-search" style="margin: 0">
     <div class="dropdown" style="display: inline">
-      Search in <a href="#" data-toggle="dropdown"><strong class="current-collection"></strong> <i class="icon-caret-down"></i></a>
+      ${ _('Search in')} <a href="#" data-toggle="dropdown"><strong class="current-collection"></strong> <i class="icon-caret-down"></i></a>
       <ul class="dropdown-menu">
         % if user.is_superuser:
           % for collection in hue_collections:
@@ -69,7 +69,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
     </div>
   </form>
 </div>
-
+<div class="well">
 <div class="container results">
   <div id="loader" class="row" style="text-align: center">
     <img src="/static/art/spinner.gif" />
@@ -207,6 +207,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
     % endif
   </div>
   % endif
+</div>
 </div>
 
 % if hue_collection:
