@@ -643,7 +643,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
     // Only ranges
     self.rangeFacetsList = ko.observableArray([]);
     $.each(self.fields(), function(index, field) {
-      if (self.fullFields[field] && ['tdate', 'tint', 'long'].indexOf(self.fullFields[field].type) >= 0) {
+      if (self.fullFields[field] && ['tdate', 'date', 'tint', 'long'].indexOf(self.fullFields[field].type) >= 0) {
         self.rangeFacetsList.push(field);
       }
     });
@@ -662,7 +662,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
     // Only dates
     self.dateFacetsList = ko.observableArray([]);
     $.each(self.fields(), function(index, field) {
-      if (self.fullFields[field] && self.fullFields[field].type == 'tdate') {
+      if (self.fullFields[field] && ['tdate', 'date'].indexOf(self.fullFields[field].type) >= 0) {
         self.dateFacetsList.push(field);
       }
     });
