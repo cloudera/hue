@@ -22,6 +22,9 @@ except ImportError:
 import logging
 import re
 import base64
+import StringIO
+
+from avro import schema, datafile, io
 
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
@@ -72,6 +75,16 @@ def api_dump(response):
       cleaned = {}
       lim = [0]
       if isinstance(data, str): #not JSON dumpable, meaning some sort of bytestring or byte data
+        #detect if avro file
+        if(data[:3] == '\x4F\x62\x6A'):
+          #write data to file in memory
+          output = StringIO.StringIO()
+          output.write(data)
+
+          #read and parse avro
+          rec_reader = io.DatumReader()
+          df_reader = datafile.DataFileReader(output, rec_reader)
+          return json.dumps(clean([record for record in df_reader]))
         return base64.b64encode(data)
       if hasattr(data, "__iter__"):
         if type(data) is dict:
