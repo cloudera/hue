@@ -72,7 +72,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
           % if user.is_superuser:
             <button class="btn" data-bind="enable: $data.selected().length > 0, click: $data.dropSelected, clickBubble: false"><i class="icon-trash"></i> Drop Columns</button>
           % endif
-          <a href="#new_column_modal" data-bind="click:function(){$('#new_column_row_key').val($data.row);app.focusModel($data);logGA('new_column_modal');}" class="btn" data-toggle="modal" title="${_('Add New Column/Cell')}"><i class="icon-plus"></i></a>
+          <a href="#new_column_modal" data-bind="click:function(){app.focusModel($data);launchModal('new_column_modal', $data);}" class="btn" title="${_('Add New Column/Cell')}"><i class="icon-plus"></i></a>
         </span>
       </h5>
       <ul class="smartview-cells" data-bind="event: {scroll: onScroll}">
@@ -289,24 +289,27 @@ ${ commonheader(None, "hbase", user) | n,unicode }
 
     <!-- New Column Modal -->
     <form id="new_column_modal" action="putColumn" method="POST" class="modal hide fade ajaxSubmit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h3>${_('Create New Column')} - <span data-bind="text: pageTitle"></span></h3>
-      </div>
-      <div class="modal-body controls">
-        <input type="hidden" data-bind="value: app.cluster"/>
-        <input type="hidden" data-bind="value: app.views.tabledata.name"/>
-        <input id="new_column_row_key" type="hidden"/>
-        <label class="control-label">${_('Column Name')}</label>
-        <input type="text" placeholder = "family:column_name">
-        <label class="control-label">${_('Cell Value')}</label>
-        <input type="text" placeholder = "${_('Cell Value')}">
-      </div>
-      <div class="modal-footer">
-        <button class="btn" data-dismiss="modal" aria-hidden="true">${_('Cancel')}</button>
-        <input type="submit" class="btn btn-primary" value="Submit">
-      </div>
     </form>
+    <script id="new_column_modal_template" type="text/html">
+      <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h3>${_('Create New Column')}</h3>
+        </div>
+        <div class="modal-body controls">
+          <input type="hidden" data-bind="value: app.cluster"/>
+          <input type="hidden" data-bind="value: app.views.tabledata.name"/>
+          <input type="hidden" data-bind="value: $data.row"/>
+          <label class="control-label">${_('Column Name')}</label>
+          <input id="new_column_name" type="text" placeholder = "family:column_name">
+          <label class="control-label">${_('Cell Value')}</label>
+          <textarea placeholder = "${_('Cell Value')}"></textarea>
+        </div>
+        <div class="modal-footer">
+          <button class="btn" data-dismiss="modal" aria-hidden="true">${_('Cancel')}</button>
+          <a id="column-upload-btn" class="btn fileChooserBtn" aria-hidden="true"><i class="icon-upload"></i> ${_('Upload')}</a>
+          <input type="submit" class="btn btn-primary" value="Submit">
+        </div>
+    </script>
 
     <!-- Cell Edit Modal -->
     <form id="cell_edit_modal" action="putColumn" method="POST" class="modal hide fade ajaxSubmit">
