@@ -14,22 +14,3 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-try:
-  import json
-except ImportError:
-  import simplejson as json
-import posixpath
-
-from django.db import models
-from django.contrib.auth.models import User
-from django.utils.translation import ugettext as _, ugettext_lazy as _t
-
-from desktop.lib.exceptions_renderable import PopupException
-
-
-class PresetView(models.Model): # preset views for loading toggled/untoggled columns/rows
-	pass
-
-class TypeAlias(models.Model): # non-native data types, default alias of string, parsed in custom user-defined way
-	pass
