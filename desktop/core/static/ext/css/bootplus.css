@@ -7,6 +7,8 @@
  * based on Twitter Bootstrap v2.3.2
  */
 
+/*darken(@btnPrimaryBackground, 5%);*/
+
 .clearfix {
   *zoom: 1;
 }
@@ -2816,18 +2818,18 @@ input[type="button"].btn-block {
 .btn-primary {
   color: #ffffff;
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
-  background-color: #4699c3;
-  *background-color: #64aed4;
-  background-image: -moz-linear-gradient(top, #338bb8, #64aed4);
-  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#338bb8), to(#64aed4));
-  background-image: -webkit-linear-gradient(top, #338bb8, #64aed4);
-  background-image: -o-linear-gradient(top, #338bb8, #64aed4);
-  background-image: linear-gradient(to bottom, #338bb8, #64aed4);
+  background-color: #3893c2;
+  *background-color: #338bb8;
+  background-image: -moz-linear-gradient(top, #3c99c9, #338bb8);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#3c99c9), to(#338bb8));
+  background-image: -webkit-linear-gradient(top, #3c99c9, #338bb8);
+  background-image: -o-linear-gradient(top, #3c99c9, #338bb8);
+  background-image: linear-gradient(to bottom, #3c99c9, #338bb8);
   background-repeat: repeat-x;
-  border-color: #64aed4 #64aed4 #338bb8;
+  border-color: #338bb8 #338bb8 #225e7c;
   border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
   border-color: rgba(0, 0, 0, 0.1);
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff338bb8', endColorstr='#ff64aed4', GradientType=0);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff3c99c9', endColorstr='#ff338bb8', GradientType=0);
   filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
 }
 
@@ -2838,13 +2840,13 @@ input[type="button"].btn-block {
 .btn-primary.disabled,
 .btn-primary[disabled] {
   color: #ffffff;
-  background-color: #64aed4;
-  *background-color: #50a3ce;
+  background-color: #338bb8;
+  *background-color: #2d7ca4;
 }
 
 .btn-primary:active,
 .btn-primary.active {
-  background-color: #3c99c9 \9;
+  background-color: #286d90 \9;
 }
 
 .btn-warning {
@@ -3232,7 +3234,7 @@ input[type="submit"].btn.btn-mini {
 }
 
 .btn-group.open .btn-primary.dropdown-toggle {
-  background-color: #64aed4;
+  background-color: #338bb8;
 }
 
 .btn-group.open .btn-warning.dropdown-toggle {
@@ -5725,18 +5727,18 @@ input.search-query {
   margin: 0 15px;
   color: #ffffff;
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
-  background-color: #4699c3;
-  *background-color: #64aed4;
-  background-image: -moz-linear-gradient(top, #338bb8, #64aed4);
-  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#338bb8), to(#64aed4));
-  background-image: -webkit-linear-gradient(top, #338bb8, #64aed4);
-  background-image: -o-linear-gradient(top, #338bb8, #64aed4);
-  background-image: linear-gradient(to bottom, #338bb8, #64aed4);
+  background-color: #3893c2;
+  *background-color: #338bb8;
+  background-image: -moz-linear-gradient(top, #3c99c9, #338bb8);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#3c99c9), to(#338bb8));
+  background-image: -webkit-linear-gradient(top, #3c99c9, #338bb8);
+  background-image: -o-linear-gradient(top, #3c99c9, #338bb8);
+  background-image: linear-gradient(to bottom, #3c99c9, #338bb8);
   background-repeat: repeat-x;
-  border-color: #64aed4 #64aed4 #338bb8;
+  border-color: #338bb8 #338bb8 #225e7c;
   border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
   border-color: rgba(0, 0, 0, 0.1);
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff338bb8', endColorstr='#ff64aed4', GradientType=0);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff3c99c9', endColorstr='#ff338bb8', GradientType=0);
   filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
 }
 
@@ -5747,13 +5749,13 @@ input.search-query {
 .form-search > .btn[type="submit"].disabled,
 .form-search > .btn[type="submit"][disabled] {
   color: #ffffff;
-  background-color: #64aed4;
-  *background-color: #50a3ce;
+  background-color: #338bb8;
+  *background-color: #2d7ca4;
 }
 
 .form-search > .btn[type="submit"]:active,
 .form-search > .btn[type="submit"].active {
-  background-color: #3c99c9 \9;
+  background-color: #286d90 \9;
 }
 
 .form-search > .btn[type="submit"] .caret {
