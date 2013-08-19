@@ -312,18 +312,20 @@ ${ commonheader(None, "hbase", user) | n,unicode }
       <div class="modal-body container-fluid">
           <div class="row-fluid">
             <div class="span10 controls">
+              <!-- ko if: !$data.readonly -->
               <input type="hidden" data-bind="value: app.cluster"/>
               <input type="hidden" data-bind="value: app.views.tabledata.name"/>
               <input type="hidden" data-bind="value: $data.content.parent.row"/>
               <input type="hidden" data-bind="value: $data.content.name"/>
+              <!-- /ko -->
               <!-- ko template: {name: 'cell_'+mime.split('/')[0].toLowerCase()+'_template'} -->
               <!-- /ko -->
             </div>
             <div class="span2">
               <ul class="nav nav-list well well-small">
-                <li class="nav-header">Cell History:</li>
+                <li class="nav-header">${_('Cell History:')}</li>
                 <!-- ko foreach: $data.content.history.items() -->
-                  <li><a data-bind="click: function(){$parent.content.value($data.value);}, text: convertTimestamp($data.timestamp)"></a></li>
+                  <li><a data-bind="click: $parent.content.history.pickHistory.bind(null, $data), text: formatTimestamp($data.timestamp)"></a></li>
                 <!-- /ko -->
                 <li data-bind="visible: $data.content.history.loading()"><img src="/static/art/spinner.gif" /></li>
               </ul>
@@ -331,7 +333,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
           </div>
         </div>
       </div>
-      <div class="modal-footer">
+      <div class="modal-footer" data-bind="if: !$data.readonly">
         % if user.is_superuser:
           <button class="btn" data-dismiss="modal" aria-hidden="true">${_('Cancel')}</button>
           <button id="file-upload-btn" class="btn fileChooserBtn" aria-hidden="true"><i class="icon-upload"></i> ${_('Upload')}</button>
@@ -345,13 +347,13 @@ ${ commonheader(None, "hbase", user) | n,unicode }
       <img data-bind="attr:{src: 'data:image/' + $data.mime + ';base64,' + $data.content.value()}"/>
     </script>
     <script id="cell_text_template" type="text/html">
-      <textarea id="codemirror_target" data-bind="text: $data.content.value()" data-use-post="true"></textarea>
+      <textarea id="codemirror_target" data-bind="text: $data.content.value" data-use-post="true"></textarea>
     </script>
     <script id="cell_application_template" type="text/html">
       <iframe width="100%" height="100%" data-bind="attr:{src: 'data:' + $data.mime + ';base64,' + $data.content.value()}"></iframe>
     </script>
     <script id="cell_type_template" type="text/html">
-      <textarea style="width:100%; height: 450px;" data-bind="text: $data.content.value()" data-use-post="true"></textarea>
+      <textarea style="width:100%; height: 450px;" data-bind="text: $data.content.value" data-use-post="true"></textarea>
     </script>
   </div>
 
