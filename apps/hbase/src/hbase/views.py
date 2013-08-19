@@ -61,7 +61,7 @@ def api_router(request, url): #on split, deserialize anything
     return data
   url_params = [safe_json_load((arg, request.POST.get(arg[0:16], arg))[arg[0:15] == 'hbase-post-key-']) for arg in re.split(r'(?<!\\)/', url.strip('/'))] #deserialize later
   if request.POST.get('dest', False):
-    url_params += [request.FILES.get(request.POST.get('dest'))]
+    url_params += [request.FILES.get(request.REQUEST.get('dest'))]
   return api_dump(HbaseApi().query(*url_params))
 
 def api_dump(response):
