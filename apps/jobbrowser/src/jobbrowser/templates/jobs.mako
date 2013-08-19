@@ -26,7 +26,8 @@ ${ commonheader(None, "jobbrowser", user) | n,unicode }
 <link href="/jobbrowser/static/css/jobbrowser.css" rel="stylesheet">
 
 <div class="container-fluid">
-  <h1>${_('Job Browser')}</h1>
+  <div class="card">
+  <h1 class="card-heading simple">${_('Job Browser')}</h1>
 
   <%actionbar:render>
     <%def name="search()">
@@ -55,7 +56,7 @@ ${ commonheader(None, "jobbrowser", user) | n,unicode }
 
   <div id="noJobs" class="alert"><i class="icon-warning-sign"></i>&nbsp; ${_('There are no jobs that match your search criteria.')}</div>
 
-  <table id="jobsTable" class="datatables table table-striped table-condensed">
+  <table id="jobsTable" class="datatables table table-condensed">
     <thead>
     <tr>
       <th>${_('Logs')}</th>
@@ -75,6 +76,7 @@ ${ commonheader(None, "jobbrowser", user) | n,unicode }
     <tbody>
     </tbody>
   </table>
+    </div>
 </div>
 
 <div id="killModal" class="modal hide fade">
@@ -103,7 +105,7 @@ ${ commonheader(None, "jobbrowser", user) | n,unicode }
       "iDisplayLength": 30,
       "bLengthChange": false,
       "bAutoWidth": false,
-      "sDom": "<'row'r>t<'row'<'span6'i><''p>>",
+      "sDom": "<'row'r>t<'row-fluid'<'dt-pages'p><'dt-records'i>>",
       "aaSorting": [
         [1, "desc"]
       ],

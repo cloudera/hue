@@ -23,50 +23,55 @@
 ${ commonheader(_('Job Attempt: %(attempt_index)s') % {'attempt_index': attempt_index}, "jobbrowser", user) | n,unicode }
 
 <div class="container-fluid">
-    <h1>
-        ${ _('Job Browser') } -
-        ${ _('Job') } <a href="${url('jobbrowser.views.single_job', job=job.jobId)}" title="${_('View this job')}">${ job.jobId_short }</a>
-        ${ _('Attempt: %(attempt_index)s') % {'attempt_index': attempt_index} }
-    </h1>
-    <br/>
-    <div class="row-fluid">
-        <div class="span2">
-            <div class="well sidebar-nav">
-                <ul class="nav nav-list">
-                    <li class="nav-header">${ _('Attempt ID') }</li>
-                    <li>${ attempt_index }</li>
-                </ul>
-            </div>
-        </div>
+  <div class="row-fluid">
+    <div class="span2">
+      <div class="sidebar-nav">
+        <ul class="nav nav-list">
+          <li class="nav-header">${ _('Attempt ID') }</li>
+          <li class="white">${ attempt_index }</li>
+        </ul>
+      </div>
+    </div>
 
-        <div class="span10">
+    <div class="span10">
+      <div class="card">
+        <h1 class="card-heading simple">
+          ${ _('Job Browser') } -
+          ${ _('Job') } <a href="${url('jobbrowser.views.single_job', job=job.jobId)}" title="${_('View this job')}">${ job.jobId_short }</a>
+          ${ _('Attempt: %(attempt_index)s') % {'attempt_index': attempt_index} }
+        </h1>
+        <div class="card-body">
+          <p>
             <ul class="nav nav-pills">
-                <li class="active"><a href="#stdout" data-toggle="tab">${_('stdout')}</a></li>
-                <li><a href="#stderr" data-toggle="tab">${_('stderr')}</a></li>
-                <li><a href="#syslog" data-toggle="tab">${_('syslog')}</a></li>
+              <li class="active"><a href="#stdout" data-toggle="tab">${_('stdout')}</a></li>
+              <li><a href="#stderr" data-toggle="tab">${_('stderr')}</a></li>
+              <li><a href="#syslog" data-toggle="tab">${_('syslog')}</a></li>
             </ul>
 
             <div class="tab-content">
-                <div class="tab-pane active" id="stdout">
-                    <pre id="stdout-container">
-                        ${_('Loading...')} <img src="/static/art/login-spinner.gif">
-                    </pre>
-                </div>
+              <div class="tab-pane active" id="stdout">
+                <pre id="stdout-container">
+                  ${_('Loading...')} <img src="/static/art/login-spinner.gif">
+                </pre>
+              </div>
 
-                <div class="tab-pane" id="stderr">
-                    <pre id="stderr-container">
-                        ${_('Loading...')} <img src="/static/art/login-spinner.gif">
-                    </pre>
-                </div>
+              <div class="tab-pane" id="stderr">
+                <pre id="stderr-container">
+                  ${_('Loading...')} <img src="/static/art/login-spinner.gif">
+                </pre>
+              </div>
 
-                <div class="tab-pane" id="syslog">
-                    <pre id="syslog-container">
-                        ${_('Loading...')} <img src="/static/art/login-spinner.gif">
-                    </pre>
-                </div>
+              <div class="tab-pane" id="syslog">
+                <pre id="syslog-container">
+                  ${_('Loading...')} <img src="/static/art/login-spinner.gif">
+                </pre>
+              </div>
             </div>
+          </p>
         </div>
+      </div>
     </div>
+  </div>
 </div>
 
 <script src="/jobbrowser/static/js/utils.js" type="text/javascript" charset="utf-8"></script>

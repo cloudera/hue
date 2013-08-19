@@ -1276,3 +1276,29 @@ a#advanced-btn:hover {
 .card-heading-blue {
   color: #338BB8!important;
 }
+
+.dt-records {
+  margin-left: 10px;
+}
+
+.dt-pages {
+  margin-right: 10px;
+  float: right;
+}
+
+.progress {
+  height: 20px;
+  margin-bottom: 0;
+  padding: 0;
+}
+
+.nav-list > li.white {
+  margin-left: -15px;
+  margin-right: -15px;
+  background-color: #FFFFFF;
+  border-left: 2px solid transparent;
+  margin-top: 1px;
+  padding: 9px 18px;
+  text-shadow: none;
+  transition: border 0.218s ease 0s;
+}
