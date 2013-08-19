@@ -99,9 +99,11 @@ routie({
       app.station('table');
       Router.setTable(cluster, table);
       Views.render('dataview');
-      app.search.cur_input(query);
-      app.search.evaluate();
-      app.views.tabledata.searchQuery(query);
+      app.views.tabledata._reloadcfs(function(){
+        app.search.cur_input(query);
+        app.search.evaluate();
+        app.views.tabledata.searchQuery(query);
+      });
       routed = true;
     },
     ':cluster/:table': function(cluster, table) {

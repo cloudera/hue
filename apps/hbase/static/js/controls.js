@@ -255,7 +255,7 @@ var SmartViewModel = function(options) {
     self.evaluateQuery();
   });
 
-  self._reloadcfs = function() {
+  self._reloadcfs = function(callback) {
     return API.queryTable("getColumnDescriptors").done(function(data) {
       self.columnFamilies.removeAll();
       var keys = Object.keys(data);
@@ -263,6 +263,8 @@ var SmartViewModel = function(options) {
         self.columnFamilies.push(new ColumnFamily({name:keys[i], enabled:false}));
       }
       self.reload();
+      if(callback!=null)
+        callback();
     });
   };
 
