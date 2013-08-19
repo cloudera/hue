@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-07-15 18:44-0700\n"
+"POT-Creation-Date: 2013-08-02 20:43-0700\n"
 "PO-Revision-Date: 2012-07-30 18:52-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: pt <LL@li.org>\n"
@@ -319,7 +319,7 @@ msgstr "Não foi possível alterar o nome da pasta \"%s\": Não são permitidas 
 msgid "Could not name file \"%s\": Slashes are not allowed in filenames."
 msgstr "Não foi possível alterar o nome do ficheiro\"%s\": não são permitidas barras em nomes de ficheiros."
 
-#: src/filebrowser/views.py:1156 src/filebrowser/views.py:1237
+#: src/filebrowser/views.py:1156 src/filebrowser/views.py:1235
 msgid "A POST request is required."
 msgstr "É necessário um pedido POST."
 
@@ -328,51 +328,46 @@ msgstr "É necessário um pedido POST."
 msgid "%(destination)s upload succeeded"
 msgstr "Upload para %(destination)s bem-sucedido"
 
-#: src/filebrowser/views.py:1161
-#, python-format
-msgid "Upload failed: %(data)s"
-msgstr "Falha no upload: %(data)s"
-
-#: src/filebrowser/views.py:1183
+#: src/filebrowser/views.py:1181
 #, python-format
 msgid "Sorry, no \"%(sep)s\" in the filename %(name)s.sep"
 msgstr "Lamentamos, mas não existe \"%(sep)s\" no nome do ficheiro %(name)s.sep"
 
-#: src/filebrowser/views.py:1200 src/filebrowser/views.py:1286
+#: src/filebrowser/views.py:1198 src/filebrowser/views.py:1284
 #, python-format
 msgid "Destination %(name)s already exists."
 msgstr "O destino %(name)s já existe."
 
-#: src/filebrowser/views.py:1202 src/filebrowser/views.py:1288
+#: src/filebrowser/views.py:1200 src/filebrowser/views.py:1286
 #, python-format
 msgid "Copy to %(name)s failed: %(error)s"
 msgstr "Falha ao copiar para %(name)s: %(error)s"
 
-#: src/filebrowser/views.py:1213 src/filebrowser/views.py:1299
+#: src/filebrowser/views.py:1211 src/filebrowser/views.py:1297
 #, python-format
 msgid "Error in upload form: %s"
 msgstr "Erro ao fazer upload do formulário: %s"
 
-#: src/filebrowser/views.py:1240
+#: src/filebrowser/views.py:1238
 #, fuzzy, python-format
 msgid "%(destination)s upload succeeded."
 msgstr "Carregamento de %(destination)s bem-sucedido."
 
-#: src/filebrowser/views.py:1242
+#: src/filebrowser/views.py:1240
 #, fuzzy, python-format
 msgid "Upload failed: %(data)s."
 msgstr "Falha ao carregar: %(data)s."
 
-#: src/filebrowser/views.py:1261
+#: src/filebrowser/views.py:1259
 #, fuzzy, python-format
 msgid "No \"%(sep)s\" allowed in the filename %(name)s.sep"
 msgstr "Não são permitidos \"%(sep)s\" no nome do ficheiro %(name)s.sep"
 
-#: src/filebrowser/views.py:1270
+#: src/filebrowser/views.py:1268
 msgid "Could not extract contents of file."
 msgstr "Não foi possível extrair o conteúdo do ficheiro."
 
-#: src/filebrowser/views.py:1277
+#: src/filebrowser/views.py:1275
 msgid "Could not interpret archive type."
 msgstr "Não foi possível interpretar o tipo de ficheiro."
 
@@ -527,14 +522,17 @@ msgid "Search for file name"
 msgstr "Pesquisar por nome de ficheiro"
 
 #: src/filebrowser/templates/listdir.mako:40
+#: src/filebrowser/templates/listdir_components.mako:249
 msgid "Rename"
 msgstr "Mudar o nome"
 
 #: src/filebrowser/templates/listdir.mako:41
+#: src/filebrowser/templates/listdir_components.mako:372
 msgid "Move"
 msgstr "Mover"
 
 #: src/filebrowser/templates/listdir.mako:42
+#: src/filebrowser/templates/listdir_components.mako:398
 msgid "Copy"
 msgstr "Copiar"
 
@@ -720,16 +718,6 @@ msgstr "A renomear:"
 msgid "already exists."
 msgstr "já existe."
 
-#: src/filebrowser/templates/listdir_components.mako:249
-#: src/filebrowser/templates/listdir_components.mako:283
-#: src/filebrowser/templates/listdir_components.mako:346
-#: src/filebrowser/templates/listdir_components.mako:372
-#: src/filebrowser/templates/listdir_components.mako:398
-#: src/filebrowser/templates/listdir_components.mako:455
-#: src/filebrowser/templates/listdir_components.mako:479
-msgid "Submit"
-msgstr "Enviar"
-
 #: src/filebrowser/templates/listdir_components.mako:263
 #, fuzzy
 msgid "Change Owner/Group"
@@ -739,6 +727,11 @@ msgstr "Alterar proprietário/grupo"
 #, python-format
 msgid "Note: Only the Hadoop superuser, \"%(superuser)s\" on this file system, may change the owner of a file."
 msgstr "Nota: apenas o superutilizador Hadoop, \"%(superuser)s\" existe neste sistema de ficheiros, pode alterar o proprietário de um ficheiro."
+
+#: src/filebrowser/templates/listdir_components.mako:283
+#: src/filebrowser/templates/listdir_components.mako:346
+msgid "Submit"
+msgstr "Enviar"
 
 #: src/filebrowser/templates/listdir_components.mako:294
 msgid "Change Permissions:"
@@ -798,6 +791,12 @@ msgstr "Criar directório"
 #: src/filebrowser/templates/listdir_components.mako:449
 msgid "Directory name is required."
 msgstr "É necessário o nome do directório."
+
+#: src/filebrowser/templates/listdir_components.mako:455
+#: src/filebrowser/templates/listdir_components.mako:479
+#, fuzzy
+msgid "Create"
+msgstr "Criar"
 
 #: src/filebrowser/templates/listdir_components.mako:465
 msgid "Create File"
@@ -863,13 +862,11 @@ msgstr "Erro: "
 
 #: src/filebrowser/templates/listdir_components.mako:1283
 msgid "Upload a zip file"
-msgstr "Carregar um ficheiro zip"
+msgstr "Fazer upload de um ficheiro zip"
 
 #: src/filebrowser/templates/saveas.mako:20
 msgid "Save File As..."
 msgstr "Guardar ficheiro como..."
 
-#~ msgid "Change Owner / Group"
-#~ msgstr "Alterar proprietário/grupo"
-#~ msgid "Please enter the location where you would like to save the file."
-#~ msgstr "Introduza a localização onde pretende guardar o ficheiro."
+#~ msgid "Upload failed: %(data)s"
+#~ msgstr "Falha no upload: %(data)s"
