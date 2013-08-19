@@ -115,9 +115,8 @@ class PthFile(object):
     Save the pth file
     Create a symlink to the path if it does not already exist.
     """
-    tmp_path = self._path + '.new'
-    file(tmp_path, 'w').write('\n'.join(sorted(self._entries)))
-    os.rename(tmp_path, self._path)
+    with open(self._path, 'w') as _file:
+      _file.write('\n'.join(sorted(self._entries)))
     LOG.info('=== Saved %s' % self._path)
 
   def sync(self, apps):

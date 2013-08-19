@@ -20,8 +20,9 @@ A tool to manage Hue applications. This does not stop/restart a
 running Hue instance.
 
 Usage:
-    %(PROG_NAME)s [flags] --install <path_to_app> [<path_to_app> ...]
+    %(PROG_NAME)s [flags] --install <path_to_app> [<path_to_app> ...] [--relative-paths]
         To register and install new application(s).
+        Add '--relative-paths' to the end of the args list to force the app manager to register the new application using its path relative to the hue root.
 
     %(PROG_NAME)s [flags] --remove <application_name>
         To unregister and remove an installed application.
