@@ -28,7 +28,8 @@
 
   var pluginName = "jHueTableScroller",
       defaults = {
-        minHeight: 400
+        minHeight: 300,
+        heightAfterCorrection: 40
       };
 
   function Plugin(element, options) {
@@ -69,7 +70,7 @@
 
     function resizeScrollingTable(el) {
       $(el).css("overflow-y", "").css("height", "");
-      var heightAfter = 0;
+      var heightAfter = _this.options.heightAfterCorrection;
       $(el).nextAll(":visible").each(function () {
         heightAfter += $(this).outerHeight(true);
       });

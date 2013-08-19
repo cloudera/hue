@@ -24,23 +24,20 @@
 ${ commonheader(_('Table Partitions: %(tableName)s') % dict(tableName=table.name), app_name, user) | n,unicode }
 
 <div class="container-fluid">
-  <h1>${_('Partitions')}</h1>
-
-  ${ components.breadcrumbs(breadcrumbs) }
-
   <div class="row-fluid">
-    <div class="span2">
-      <div class="well sidebar-nav">
+    <div class="span3">
+      <div class="sidebar-nav">
         <ul class="nav nav-list">
           <li class="nav-header">${_('Actions')}</li>
           <li><a href="${ url('metastore:describe_table', database=database, table=table.name) }">${_('Show Table')}</a></li>
-          <li style="height: 30px"></li>
         </ul>
       </div>
     </div>
-    <div class="span10">
-      <table class="table table-striped table-condensed datatables">
+    <div class="span9">
+      <div class="card">
+        <h1 class="card-heading simple">${ components.breadcrumbs(breadcrumbs) }</h1>
           % if partitions:
+          <table class="table table-striped table-condensed datatables">
           <tr>
           % for field in table.partition_keys:
               <th>${field.name}</th>
@@ -64,10 +61,15 @@ ${ commonheader(_('Table Partitions: %(tableName)s') % dict(tableName=table.name
             % endif
             </tr>
           % endfor
+          </table>
           % else:
-            <tr><td>${_('Table has no partitions.')}</td></tr>
+            <div class="card-body">
+              <p>
+                <div class="alert">${_('The table %s has no partitions.' % table.name)}</div>
+              </p>
+            </div>
           % endif
-      </table>
+        </div>
     </div>
   </div>
 </div>
