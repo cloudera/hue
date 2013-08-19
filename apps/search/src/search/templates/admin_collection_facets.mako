@@ -26,7 +26,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 
 <%layout:skeleton>
   <%def name="title()">
-    <h4>${_('Search Admin - ')}${hue_collection.label}</h4>
+    <h4>${ _('Facets for') } <strong>${ hue_collection.name }</strong></h4>
   </%def>
   <%def name="navigation()">
     ${ layout.sidebar(hue_collection, 'facets') }
