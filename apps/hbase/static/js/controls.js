@@ -879,7 +879,7 @@ var tagsearch = function() {
     var val = window.getSelection().getRangeAt(0).startContainer.nodeValue;
     switch(self.mode()) {
       case 'filter':
-        var focus = val.replace(/\{|\}|\s|&[^;]+?;/g,"").split(/(AND|OR|SKIP|WHILE)/).slice(-1)[0];
+        var focus = val.replace(/\{|\}|\s|&[^;]+?;/g,"").split(searchRenderers.rowkey.nested.filter.nested.linker.select).slice(-1)[0];
         self.activeSuggestions(self.filters.filter(function(a) {
           return a.toLowerCase().replace(" ","").indexOf(focus.toLowerCase()) != -1;
         }));
