@@ -87,7 +87,7 @@ function confirm(title, text, callback) {
 function launchModal(modal, data) {
   var element = $('#'+modal);
   ko.cleanNode(element[0]);
-  element.attr('data-bind','template: {name: "'+modal+'_template"}');
+  element.attr('data-bind','template: {name: "' + modal + '_template"}');
   ko.applyBindings(data, element[0]);
   element.is('.ajaxSubmit') ? element.submit(bindSubmit) : '';
   switch(modal) {
@@ -181,8 +181,13 @@ function detectMimeType(data) {
 }
 
 function convertTimestamp(timestamp) {
-  var date = new Date(parseInt(timestamp)*1000);
-  return date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+  var date = new Date(parseInt(timestamp));
+  return date.toLocaleString();
+}
+
+function formatTimestamp(timestamp) {
+  var date = new Date(parseInt(timestamp));
+  return date.toUTCString();
 }
 
 function resetElements() {
