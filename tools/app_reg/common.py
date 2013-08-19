@@ -59,26 +59,3 @@ def _get_python_lib_dir():
 
 def _get_python_site_packages_dir():
   return os.path.join(_get_python_lib_dir(), 'site-packages')
-
-
-# Creates os.path.relpath for Python 2.4 and 2.5
-if not hasattr(os.path, 'relpath'):
-  # default to posixpath definition
-  # no windows support
-  def relpath(path, start=os.path.curdir):
-    """Return a relative version of a path"""
-
-    if not path:
-      raise ValueError("no path specified")
-
-    start_list = os.path.abspath(start).split(os.path.sep)
-    path_list = os.path.abspath(path).split(os.path.sep)
-
-    # Work out how much of the filepath is shared by start and path.
-    i = len(os.path.commonprefix([start_list, path_list]))
-
-    rel_list = [os.path.pardir] * (len(start_list)-i) + path_list[i:]
-    if not rel_list:
-        return os.path.curdir
-    return os.path.join(*rel_list)
-  os.path.relpath = relpath

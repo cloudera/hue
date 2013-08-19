@@ -26,16 +26,7 @@ import os
 import common
 
 LOG = logging.getLogger(__name__)
-PTH_SYMLINK = 'hue.link.pth'
 PTH_FILE = 'hue.pth'
-
-
-def _get_pth_symlink():
-  """
-  _get_pth_symlink -> Path to the .pth symlink.
-  May raise SystemError if the virtual env is absent.
-  """
-  return os.path.join(common._get_python_site_packages_dir(), PTH_SYMLINK)
 
 
 def _get_pth_filename():
@@ -54,7 +45,6 @@ def _get_pth_filename():
 class PthFile(object):
   def __init__(self):
     """May raise SystemError if the virtual env is absent"""
-    self._symlink_path = _get_pth_symlink()
     self._path = _get_pth_filename()
     self._entries = [ ]
     self._read()
@@ -129,23 +119,6 @@ class PthFile(object):
     file(tmp_path, 'w').write('\n'.join(sorted(self._entries)))
     os.rename(tmp_path, self._path)
     LOG.info('=== Saved %s' % self._path)
-
-    # relpath defined in common.py for python 2.4 and 2.5
-    rel_symlink_path = os.path.relpath(self._path, os.path.dirname(self._symlink_path))
-
-    # overwrite symlink if the path it points to is different from desired PTH.
-    if os.path.islink(self._symlink_path) and os.readlink(self._symlink_path) != rel_symlink_path:
-      LOG.info('=== Removing symbolic link at %s' % (self._symlink_path))
-      os.unlink(self._symlink_path)
-      LOG.info('=== Removed symbolic link at %s' % (self._symlink_path))
-
-    if not os.path.islink(self._symlink_path):
-      if os.path.exists(self._symlink_path):
-        raise RuntimeError("Path %s already exists and is not a symbolic link." % self._symlink_path)
-
-      LOG.info('=== Creating symbolic link at %s to %s' % (self._symlink_path, rel_symlink_path))
-      os.symlink(rel_symlink_path, self._symlink_path)
-      LOG.info('=== Created symbolic link at %s to %s' % (self._symlink_path, rel_symlink_path))
 
   def sync(self, apps):
     """Sync the .pth file with the installed apps"""
