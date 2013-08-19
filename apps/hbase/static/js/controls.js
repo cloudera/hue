@@ -262,7 +262,6 @@ var SmartViewModel = function(options) {
       for(var i=0;i<keys.length;i++) {
         self.columnFamilies.push(new ColumnFamily({name:keys[i], enabled:false}));
       }
-      self.reload();
       if(callback!=null)
         callback();
     });

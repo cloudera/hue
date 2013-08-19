@@ -98,7 +98,7 @@ var ListViewModel = function(options) {
     confirm("Confirm Delete", "Are you sure you want to drop the selected items? (WARNING: This cannot be undone!)", function() {
       self.batchSelected(function() {
         var s = this;
-        if(s.enabled()) {
+        if(s.enabled && s.enabled()) {
           self.isLoading(true);
           return s.disable(function() {
             s.drop(true);

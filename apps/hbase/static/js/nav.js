@@ -25,6 +25,19 @@ var Router = {
     app.pageTitle(cluster + ' / ' + table);
     app.views.tabledata.name(table);
     app.focusModel(app.views.tabledata);
+
+    var bulkUploader = new qq.FileUploaderBasic({
+      button: document.getElementById("bulk-upload-btn"),
+      action: '/hbase/api/bulkUpload/"' + app.cluster() + '"/"' + app.views.tabledata.name() + '"',
+      fileFieldLabel: 'hbase_file',
+      multiple: false,
+      onComplete: function (id, fileName, response) {
+        if(response.response != null)
+          $.jHueNotify.error($(response.response).find('.alert strong').text());
+        else
+          app.views.tabledata.reload();
+      }
+    });
   },
   setCluster: function(cluster) {
     app.cluster(cluster);
