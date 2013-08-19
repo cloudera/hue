@@ -19,7 +19,7 @@ function initLogsElement(element) {
   element.scroll(function () {
     element.data("logsAtEnd", ($(this).scrollTop() + $(this).height() + 20 >= $(this)[0].scrollHeight));
   });
-  element.css("overflow", "auto").height($(window).height() - element.offset().top - 50);
+  element.css("overflow", "auto").height($(window).height() - element.offset().top - 80);
 }
 
 function appendAndScroll(element, logs) {
@@ -31,7 +31,7 @@ function appendAndScroll(element, logs) {
 }
 
 function resizeLogs(element) {
-  element.css("overflow", "auto").height($(window).height() - element.offset().top - 50);
+  element.css("overflow", "auto").height($(window).height() - element.offset().top - 80);
 }
 
 var _resizeTimeout = -1;

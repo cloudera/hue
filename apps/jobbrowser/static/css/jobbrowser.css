@@ -39,10 +39,6 @@
   display: none;
 }
 
-.sidebar-nav {
-  padding: 9px 0;
-}
-
 .nochrome::-moz-focus-inner {
   border: 0;
   padding: 0

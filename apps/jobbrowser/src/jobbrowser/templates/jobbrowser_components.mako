@@ -23,7 +23,7 @@
     %>
     % for group in counters.groups:
         <h3>${format_counter_name(group.displayName)}</h3>
-        <table class="taskCountersTable table table-striped table-condensed">
+        <table class="taskCountersTable table table-condensed">
             <thead>
             <tr>
                 <th>${_('Counter Name')}</th>
@@ -49,7 +49,7 @@
     %>
     % for group in counters.get('taskCounterGroup', []):
         <h3>${ format_counter_name(group['counterGroupName']) }</h3>
-        <table class="taskCountersTable table table-striped table-condensed">
+        <table class="taskCountersTable table table-condensed">
             <thead>
             <tr>
                 <th>${_('Counter Name')}</th>
@@ -75,7 +75,7 @@
     %>
     % for group in counters.itervalues():
         <h3>${format_counter_name(group['displayName'])}</h3>
-        <table class="jobCountersTable table table-striped table-condensed">
+        <table class="jobCountersTable table table-condensed">
             <thead>
             <tr>
                 <th>${_('Name')}</th>
@@ -116,7 +116,7 @@
     %>
     % for counter_group in counters.get('counterGroup', []):
         <h3>${ format_counter_name(counter_group['counterGroupName']) }</h3>
-        <table class="jobCountersTable table table-striped table-condensed">
+        <table class="jobCountersTable table table-condensed">
             <thead>
             <tr>
                 <th>${_('Name')}</th>

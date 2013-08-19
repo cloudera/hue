@@ -24,116 +24,130 @@ ${ commonheader(_('Task Attempt: %(attemptId)s') % dict(attemptId=attempt.attemp
 <link href="/jobbrowser/static/css/jobbrowser.css" rel="stylesheet">
 
 <div class="container-fluid">
-    <h1>${_('Task Attempt: %(attemptId)s - Job Browser') % dict(attemptId=attempt.attemptId_short)}</h1>
-    <div class="row-fluid">
-        <div class="span2">
-            <div class="well sidebar-nav">
-                <ul class="nav nav-list">
-                    <li class="nav-header">${_('Attempt ID')}</li>
-                    <li class="hellipsify">${attempt.attemptId_short}</li>
-                    <li class="nav-header">${_('Task')}</li>
-                    <li><a href="${url('jobbrowser.views.single_task', job=joblnk.jobId, taskid=taskid)}" class="hellipsify">${task.taskId_short}</a>
-                    </li>
-                    <li class="nav-header">${_('Job')}</li>
-                    <li><a href="${url('jobbrowser.views.single_job', job=joblnk.jobId)}" class="hellipsify">${joblnk.jobId_short}</a></li>
-                    <li class="nav-header">${_('Status')}</li>
-                    <li>
-                        <%
-                            status = attempt.state.lower()
-                        %>
-                        % if status == 'running' or status == 'pending':
-                                <span class="label label-warning">${status}</span>
-                        % elif status == 'succeeded':
-                                <span class="label label-success">${status}</span>
-                        % else:
-                                <span class="label">${status}</span>
-                        % endif
-                    </li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="span10">
-            <ul id="tabs" class="nav nav-tabs">
-                <li class="active"><a href="#metadata" data-toggle="tab">${_('Metadata')}</a></li>
-                <li><a href="#counters" data-toggle="tab">${_('Counters')}</a></li>
-                <li><a href="${ url('jobbrowser.views.single_task_attempt_logs', job=task.jobId, taskid=task.taskId, attemptid=attempt.attemptId) }">${_('Logs')}</a></li>
-            </ul>
-
-            <div class="tab-content">
-                <div class="tab-pane active" id="metadata">
-                    <table id="metadataTable" class="table table-striped table-condensed">
-                        <thead>
-                        <tr>
-                            <th>${_('Name')}</th>
-                            <th>${_('Value')}</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                            <td>${_('Attempt ID')}</td>
-                            <td>${attempt.attemptId_short}</td>
-                        </tr>
-                        <tr>
-                            <td>${_('Task ID')}</td>
-                            <td><a href="${url('jobbrowser.views.single_task', job=joblnk.jobId, taskid=taskid)}" title="${_('View this task')}">${task.taskId_short}</a></td>
-                        </tr>
-                        <tr>
-                            <td>${_('Task Type')}</td>
-                            <td>${task.taskType}</td>
-                        </tr>
-                        <tr>
-                            <td>${_('JobId')}</td>
-                            <td><a href="${url('jobbrowser.views.single_job', job=joblnk.jobId)}" title="${_('View this job')}">${joblnk.jobId_short}</a></td>
-                        </tr>
-                        <tr>
-                            <td>${_('State')}</td>
-                            <td>${attempt.state}</td>
-                        </tr>
-                        <tr>
-                            <td>${_('Start Time')}</td>
-                            <td>${attempt.startTimeFormatted}</td>
-                        </tr>
-                        <tr>
-                            <td>${_('Finish Time')}</td>
-                            <td>${attempt.finishTimeFormatted}</td>
-                        </tr>
-                        <tr>
-                            <td>${_('Progress')}</td>
-                            <td>${"%d" % (attempt.progress * 100)}%</td>
-                        </tr>
-                        <tr>
-                            <td>${_('Task Tracker')}</td>
-                            <td>
-                              % if attempt.is_mr2:
-                                ${ comps.get_container_link(status, attempt.taskTrackerId) }
-                              % else:
-                                <a href="/jobbrowser/trackers/${attempt.taskTrackerId}" class="task_tracker_link">${attempt.taskTrackerId}</a>
-                              % endif
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>${_('Phase')}</td>
-                            <td>${attempt.phase}</td>
-                        </tr>
-                        <tr>
-                            <td>${_('Output Size')}</td>
-                            <td>${attempt.outputSize}</td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="tab-pane" id="counters">
-                    % if task.is_mr2:
-                        ${ comps.task_counters_mr2(task.counters) }
-                    % else:
-                        ${ comps.task_counters(task.counters) }
-                    % endif
-                </div>
-            </div>
-        </div>
+  <div class="row-fluid">
+    <div class="span2">
+      <div class="sidebar-nav">
+        <ul class="nav nav-list">
+          <li class="nav-header">${_('Attempt ID')}</li>
+          <li class="white hellipsify">${attempt.attemptId_short}</li>
+          <li class="nav-header">${_('Task')}</li>
+          <li><a href="${url('jobbrowser.views.single_task', job=joblnk.jobId, taskid=taskid)}"
+                 class="hellipsify">${task.taskId_short}</a>
+          </li>
+          <li class="nav-header">${_('Job')}</li>
+          <li><a href="${url('jobbrowser.views.single_job', job=joblnk.jobId)}"
+                 class="hellipsify">${joblnk.jobId_short}</a></li>
+          <li class="nav-header">${_('Status')}</li>
+          <li class="white">
+            <%
+              status = attempt.state.lower()
+            %>
+            % if status == 'running' or status == 'pending':
+                <span class="label label-warning">${status}</span>
+            % elif status == 'succeeded':
+                <span class="label label-success">${status}</span>
+            % else:
+                <span class="label">${status}</span>
+            % endif
+          </li>
+        </ul>
+      </div>
     </div>
+
+    <div class="span10">
+      <div class="card" style="margin-top:0">
+        <h1 class="card-heading simple">${_('Task Attempt: %(attemptId)s - Job Browser') % dict(attemptId=attempt.attemptId_short)}</h1>
+
+        <div class="card-body">
+          <p>
+          <ul id="tabs" class="nav nav-tabs">
+            <li class="active"><a href="#metadata" data-toggle="tab">${_('Metadata')}</a></li>
+            <li><a href="#counters" data-toggle="tab">${_('Counters')}</a></li>
+            <li><a
+                href="${ url('jobbrowser.views.single_task_attempt_logs', job=task.jobId, taskid=task.taskId, attemptid=attempt.attemptId) }">${_('Logs')}</a>
+            </li>
+          </ul>
+
+          <div class="tab-content">
+            <div class="tab-pane active" id="metadata">
+              <table id="metadataTable" class="table table-condensed">
+                <thead>
+                <tr>
+                  <th>${_('Name')}</th>
+                  <th>${_('Value')}</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                  <td>${_('Attempt ID')}</td>
+                  <td>${attempt.attemptId_short}</td>
+                </tr>
+                <tr>
+                  <td>${_('Task ID')}</td>
+                  <td><a href="${url('jobbrowser.views.single_task', job=joblnk.jobId, taskid=taskid)}"
+                         title="${_('View this task')}">${task.taskId_short}</a></td>
+                </tr>
+                <tr>
+                  <td>${_('Task Type')}</td>
+                  <td>${task.taskType}</td>
+                </tr>
+                <tr>
+                  <td>${_('JobId')}</td>
+                  <td><a href="${url('jobbrowser.views.single_job', job=joblnk.jobId)}"
+                         title="${_('View this job')}">${joblnk.jobId_short}</a></td>
+                </tr>
+                <tr>
+                  <td>${_('State')}</td>
+                  <td>${attempt.state}</td>
+                </tr>
+                <tr>
+                  <td>${_('Start Time')}</td>
+                  <td>${attempt.startTimeFormatted}</td>
+                </tr>
+                <tr>
+                  <td>${_('Finish Time')}</td>
+                  <td>${attempt.finishTimeFormatted}</td>
+                </tr>
+                <tr>
+                  <td>${_('Progress')}</td>
+                  <td>${"%d" % (attempt.progress * 100)}%</td>
+                </tr>
+                <tr>
+                  <td>${_('Task Tracker')}</td>
+                  <td>
+                      % if attempt.is_mr2:
+                      ${ comps.get_container_link(status, attempt.taskTrackerId) }
+                      % else:
+                        <a href="/jobbrowser/trackers/${attempt.taskTrackerId}"
+                           class="task_tracker_link">${attempt.taskTrackerId}</a>
+                      % endif
+                  </td>
+                </tr>
+                <tr>
+                  <td>${_('Phase')}</td>
+                  <td>${attempt.phase}</td>
+                </tr>
+                <tr>
+                  <td>${_('Output Size')}</td>
+                  <td>${attempt.outputSize}</td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="tab-pane" id="counters">
+                % if task.is_mr2:
+                        ${ comps.task_counters_mr2(task.counters) }
+                % else:
+                        ${ comps.task_counters(task.counters) }
+                % endif
+            </div>
+          </div>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script src="/jobbrowser/static/js/utils.js" type="text/javascript" charset="utf-8"></script>
