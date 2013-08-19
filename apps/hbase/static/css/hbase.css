@@ -135,6 +135,10 @@ ul#hbase-breadcrumbs li a {
     border-top:0px;
 }
 
+.smartview.gridView ul.smartview-cells > li {
+	width: 200px;
+}
+
 .smartview ul.smartview-cells > li > div {
 	position: relative;
 	margin-bottom: 10px;
