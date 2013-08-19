@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-07-15 18:43-0700\n"
+"POT-Creation-Date: 2013-08-02 20:43-0700\n"
 "PO-Revision-Date: 2012-08-10 13:58-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: de <LL@li.org>\n"
@@ -29,334 +29,338 @@ msgstr "Wenn als wahr gesetzt, wird CherryPy verwendet. Andernfalls wird Spawnin
 msgid "HTTP host to bind to."
 msgstr "Zu verbindender HTTP-Host."
 
-#: src/desktop/conf.py:43
+#: src/desktop/conf.py:44
 msgid "HTTP port to bind to."
 msgstr "Zu verbindender HTTP-Port."
 
-#: src/desktop/conf.py:48
+#: src/desktop/conf.py:50
 msgid "Filename of SSL Certificate"
 msgstr "Dateiname von SSL-Zertifikat"
 
-#: src/desktop/conf.py:52
+#: src/desktop/conf.py:55
 msgid "Filename of SSL RSA Private Key"
 msgstr "Dateiname von SSL-RSA-Privater-Schlüssel"
 
-#: src/desktop/conf.py:56
+#: src/desktop/conf.py:60
 msgid "If set to false, runcpserver will not actually start the web server.  Used if Apache is being used as a WSGI container."
 msgstr "Wenn als falsch gesetzt, startet runcpserver den Webserver tatsächlich nicht. Wird verwendet, wenn Apache als ein WSGI-Container verwendet wird."
 
-#: src/desktop/conf.py:61
+#: src/desktop/conf.py:66
 msgid "Number of threads used by the CherryPy web server."
 msgstr "Anzahl der von CherryPy Webserver verwendeten Threads."
 
-#: src/desktop/conf.py:66
+#: src/desktop/conf.py:72
 msgid "Used in hashing algorithms for sessions."
 msgstr "In Hashing-Algorithmen für Sessions verwendet."
 
-#: src/desktop/conf.py:71
+#: src/desktop/conf.py:77
 msgid "Number of user access to remember per view per user."
 msgstr "Anzahl der zu erfassenden Benutzerzugriffe pro Anzeige pro Benutzer."
 
-#: src/desktop/conf.py:96
+#: src/desktop/conf.py:83
+msgid "Help improve Hue with anonymous usage analytics.Use Google Analytics to see how many times an application or specific section of an application is used, nothing more."
+msgstr "Tragen Sie mithilfe anonymer Nutzungsanalysen zur Verbesserung von Hue bei. Nutzen Sie Google Analytics, um zu erfassen, wie häufig eine Anwendung oder ein bestimmter Bereich einer Anwendung genutzt wird."
+
+#: src/desktop/conf.py:110
 msgid "Configuration options for connecting to an external SMTP server."
 msgstr "Konfigurationsoptionen für die Verbindung mit einem externen SMTP-Server."
 
-#: src/desktop/conf.py:100
+#: src/desktop/conf.py:114
 msgid "The SMTP server for email notification delivery."
 msgstr "Der SMTP-Server für die Zustellung von E-Mail-Benachrichtigungen."
 
-#: src/desktop/conf.py:107
+#: src/desktop/conf.py:121
 msgid "The SMTP server port."
 msgstr "Der SMTP-Serverport."
 
-#: src/desktop/conf.py:114
+#: src/desktop/conf.py:128
 msgid "The username for the SMTP host."
 msgstr "Der Benutzername für den SMTP-Host."
 
-#: src/desktop/conf.py:121
+#: src/desktop/conf.py:135
 msgid "The password for the SMTP user."
 msgstr "Das Kennwort für den SMTP-Benutzer."
 
-#: src/desktop/conf.py:128
+#: src/desktop/conf.py:142
 msgid "Whether to use a TLS (secure) connection when talking to the SMTP server."
 msgstr "Ob eine (sichere) TLS-Verbindung für die Kommunikation mit dem SMTP-Server verwendet wird."
 
-#: src/desktop/conf.py:135
+#: src/desktop/conf.py:149
 msgid "Default email address to use for various automated notifications from Hue."
 msgstr "Für verschiedene automatisierte Benachrichtigungen von Hue zu verwendende Standard-E-Mail-Adresse."
 
-#: src/desktop/conf.py:144
+#: src/desktop/conf.py:158
 #, fuzzy
 msgid "Configuration options for specifying the Desktop Database.\n"
 "          For more info, see http://docs.djangoproject.com/en/1.1/ref/settings/#database-engine"
 msgstr "Konfigurationsoptionen für die Angabe der Desktop-Datenbank.\n"
 "          Für weitere Infos siehe http://docs.djangoproject.com/en/1.1/ref/settings/#database-engine"
 
-#: src/desktop/conf.py:149
+#: src/desktop/conf.py:163
 msgid "Database engine, such as postgresql_psycopg2, mysql, or sqlite3."
 msgstr "Datenbank-Engine wie postgresq_psycopg2, mysql oder sqlite3."
 
-#: src/desktop/conf.py:155
+#: src/desktop/conf.py:169
 msgid "Database name, or path to DB if using sqlite3."
 msgstr "Datenbankname oder Pfad zu DB, wenn sqlite3 verwendet wird."
 
-#: src/desktop/conf.py:161
+#: src/desktop/conf.py:175
 msgid "Database username."
 msgstr "Datenbank-Benutzername."
 
-#: src/desktop/conf.py:167
+#: src/desktop/conf.py:181
 msgid "Database password."
 msgstr "Datenbank-Kennwort."
 
-#: src/desktop/conf.py:173
+#: src/desktop/conf.py:187
 msgid "Database host."
 msgstr "Datenbank-Host."
 
-#: src/desktop/conf.py:179
+#: src/desktop/conf.py:193
 msgid "Database port."
 msgstr "Datenbank-Port."
 
-#: src/desktop/conf.py:188
+#: src/desktop/conf.py:202
 #, fuzzy
 msgid "Configuration options for specifying Hue's Kerberos integration for\n"
 "          secured Hadoop clusters."
 msgstr "Konfigurationsoptionen für Spezifizierung der Kerberos-Integration von Hue\n"
 "          für gesicherte Hadoop-Cluster."
 
-#: src/desktop/conf.py:193
+#: src/desktop/conf.py:207
 msgid "Path to a Kerberos keytab file containing Hue's service credentials."
 msgstr "Pfad zu einer Kerberos-Keytab-Datei, die Hues Dienstkontoinformationen enthält."
 
-#: src/desktop/conf.py:198
+#: src/desktop/conf.py:212
 msgid "Kerberos principal name for Hue. Typically 'hue/hostname.foo.com'."
 msgstr "Kerberos-Hauptname für Hue. Typischerweise 'hue/hostname.foo.com'."
 
-#: src/desktop/conf.py:203
+#: src/desktop/conf.py:217
 msgid "Frequency in seconds with which Hue will renew its keytab."
 msgstr "Frequenz in Sekunden, mit der Hue seinen Keytab erneuert."
 
-#: src/desktop/conf.py:208
+#: src/desktop/conf.py:222
 msgid "Path to keep Kerberos credentials cached."
 msgstr "Pfad, um Kerberos-Kontoinformationen im Cache zu halten."
 
-#: src/desktop/conf.py:215
+#: src/desktop/conf.py:229
 msgid "Path to Kerberos 'kinit' command."
 msgstr "Pfad zu Kerberos-Befehl 'kinit'."
 
-#: src/desktop/conf.py:225
+#: src/desktop/conf.py:239
 msgid "Time zone name."
 msgstr "Name der Zeitzone."
 
-#: src/desktop/conf.py:232
+#: src/desktop/conf.py:246
 msgid "Default system-wide unicode encoding."
 msgstr "Systemweite Standard-Unicode-Kodierung."
 
-#: src/desktop/conf.py:239
+#: src/desktop/conf.py:253
 msgid "Username to run servers as."
 msgstr "Benutzername für die Ausführung von Servern."
 
-#: src/desktop/conf.py:244
+#: src/desktop/conf.py:258
 msgid "Group to run servers as."
 msgstr "Gruppe für die Ausführung von Servern."
 
-#: src/desktop/conf.py:250
+#: src/desktop/conf.py:264
 msgid "Customizations to the UI."
 msgstr "Anpassungen der UI."
 
-#: src/desktop/conf.py:254
+#: src/desktop/conf.py:268
 msgid "Top banner HTML code. This code will be placed in the navigation bar so that it will reside at the top of the page in a fixed position. One common value is `<img src=\"http://www.example.com/example.gif\" />`"
 msgstr "HTML-Code für oberes Banner. Dieser Code wird in der Navigationsleiste eingefügt, sodass er sich oben in der Seite an einer festen Position befindet. Ein gängiger Wert lautet '<img src=\"http://www.example.com/example.gif\" />'."
 
-#: src/desktop/conf.py:261
+#: src/desktop/conf.py:275
 msgid "Configuration options for user authentication into the web application."
 msgstr "Konfigurationsoptionen für Benutzerauthentifizierung in der Webanwendung."
 
-#: src/desktop/conf.py:265
+#: src/desktop/conf.py:279
 msgid "Authentication backend.  Common settings are django.contrib.auth.backends.ModelBackend (fully Django backend), desktop.auth.backend.AllowAllBackend (allows everyone), desktop.auth.backend.AllowFirstUserDjangoBackend (relies on Django and user manager, after the first login). "
 msgstr "Authentifizierungs-Backend. Gängige Einstellungen sind django.contrib.auth.backends.ModelBackend (volles Django-Backend), desktop.auth.backend.AllowAllBackend (allgemeine Berechtigung), desktop.auth.backend.AllowFirstUserDjangoBackend (basiert auf Django und Benutzermanager, nach der ersten Anmeldung). "
 
-#: src/desktop/conf.py:271
+#: src/desktop/conf.py:285
 msgid "Backend to synchronize user-group membership with."
 msgstr "Backend für die Synchronisation mit der Benutzergruppenmitgliedschaft."
 
-#: src/desktop/conf.py:277
+#: src/desktop/conf.py:291
 msgid "Class which defines extra accessor methods for User objects."
 msgstr "Klasse, die besondere Zugriffsmethoden für Benutzerobjekte definiert."
 
-#: src/desktop/conf.py:280
+#: src/desktop/conf.py:294
 msgid "The service to use when querying PAM. The service usually corresponds to a single filename in /etc/pam.d"
 msgstr "Der Dienst, der bei der Abfrage von PAN verwendet werden soll. Der Dienst entspricht in der Regel einem einzelnen Dateinamen unter /etc/pam.d"
 
-#: src/desktop/conf.py:284
+#: src/desktop/conf.py:298
 msgid "When using the desktop.auth.backend.RemoteUserDjangoBackend, this sets the normalized name of the header that contains the remote user. The HTTP header in the request is converted to a key by converting all characters to uppercase, replacing any hyphens with underscores and adding an HTTP_ prefix to the name. So, for example, if the header is called Remote-User that would be configured as HTTP_REMOTE_USER"
 msgstr "Bei Verwendung von desktop.auth.backend.RemoteUserDjangoBackend legt dies den normalisierten Namen des Headers fest, der den Remote-Benutzer enthält. Der HTTP-Header in der Anforderung wird in einen Schlüssel konvertiert, indem alle Zeichen in Großbuchstaben umgewandelt werden, alle Bindestriche durch Unterstriche ersetzt werden und ein HTTP_ Präfix dem Namen vorangestellt wird. Wenn der Header also beispielsweise Remote-User lautet, ergibt sich die Konfiguration HTTP_REMOTE_USER."
 
-#: src/desktop/conf.py:294
+#: src/desktop/conf.py:308
 msgid "Configuration options for LDAP connectivity."
 msgstr "Konfigurationsoptionen für LDAP-Konnektivität."
 
-#: src/desktop/conf.py:298
+#: src/desktop/conf.py:312
 msgid "The base LDAP distinguished name to use for LDAP search."
 msgstr "Der hervorgehobene LDAP-Basisname, der für die LDAP-Suche zu verwenden ist."
 
-#: src/desktop/conf.py:301
+#: src/desktop/conf.py:315
 msgid "The NT domain used for LDAP authentication."
 msgstr "Die für die LDAP-Authentifizierung verwendete NT-Domäne."
 
-#: src/desktop/conf.py:304
+#: src/desktop/conf.py:318
 msgid "The LDAP URL to connect to."
 msgstr "Die LDAP-URL für die Verbindung."
 
-#: src/desktop/conf.py:308
+#: src/desktop/conf.py:322
 msgid "Use StartTLS when communicating with LDAP server."
 msgstr "StartTLS für die Kommunikation mit LDAP-Server verwenden."
 
-#: src/desktop/conf.py:311
+#: src/desktop/conf.py:325
 msgid "A PEM-format file containing certificates for the CA's that Hue will trust for authentication over TLS. The certificate for the CA that signed the LDAP server certificate must be included among these certificates. See more here http://www.openldap.org/doc/admin24/tls.html."
 msgstr "Eine Datei im PEM-Format, die Zertifikate für die CAs enthält, denen Hue für die Authentifizierung von TLS vertraut. Das Zertifikat für die CA, von der das LDAP-Serverzertifikat signiert wurde, muss in diesen Zertifikaten enthalten sein. Weitere Informationen siehe http://www.openldap.org/doc/admin24/tls.html."
 
-#: src/desktop/conf.py:314
+#: src/desktop/conf.py:328
 msgid "A pattern to use for constructing LDAP usernames."
 msgstr "Ein Muster für die Festlegung von LDAP-Benutzernamen."
 
-#: src/desktop/conf.py:317
+#: src/desktop/conf.py:331
 msgid "The distinguished name to bind as, when importing from LDAP."
 msgstr "Der für das Bind hervorgehobene Name beim Import von LDAP."
 
-#: src/desktop/conf.py:320
+#: src/desktop/conf.py:334
 msgid "The password for the bind user."
 msgstr "Das Kennwort für den Bind-Benutzer."
 
-#: src/desktop/conf.py:322
+#: src/desktop/conf.py:336
 msgid "Create users when they login with their LDAP credentials."
 msgstr "Benutzer erstellen, wenn sich diese mit ihren LDAP-Zugangsdaten anmelden."
 
-#: src/desktop/conf.py:328
+#: src/desktop/conf.py:342
 msgid "Configuration for LDAP user schema and search."
 msgstr "Konfiguration für LDAP-Benutzerschema und -suche."
 
-#: src/desktop/conf.py:332
+#: src/desktop/conf.py:346
 msgid "A base filter for use when searching for users."
 msgstr "Ein Basisfilter für die Suche nach Benutzern."
 
-#: src/desktop/conf.py:335
+#: src/desktop/conf.py:349
 msgid "The username attribute in the LDAP schema. Typically, this is 'sAMAccountName' for AD and 'uid' for other LDAP systems."
 msgstr "Das Attribut Benutzername im LDAP-Schema. Typischerweise ist es 'sAMAccountName' für AD und 'uid' für andere LDAP-Systeme."
 
-#: src/desktop/conf.py:343
+#: src/desktop/conf.py:357
 msgid "Configuration for LDAP group schema and search."
 msgstr "Konfiguration für LDAP-Benutzerschema und -suche."
 
-#: src/desktop/conf.py:347
+#: src/desktop/conf.py:361
 msgid "A base filter for use when searching for groups."
 msgstr "Ein Basisfilter für die Verwendung bei der Suche nach Gruppen."
 
-#: src/desktop/conf.py:350
+#: src/desktop/conf.py:364
 msgid "The group name attribute in the LDAP schema. Typically, this is 'cn'."
 msgstr "Das Gruppenname-Attribut im LDAP-Schema. Typischerweise ist es 'cn'."
 
-#: src/desktop/conf.py:354
+#: src/desktop/conf.py:368
 msgid "The LDAP attribute which specifies the members of a group."
 msgstr "Das LDAP-Attribut, das die Mitglieder einer Gruppe spezifiziert."
 
-#: src/desktop/conf.py:363
+#: src/desktop/conf.py:377
 msgid "Configuration options for Oauth 1.0 authentication"
 msgstr "Konfigurationsoptionen für die Authentifizierung mit OAuth 1.0"
 
-#: src/desktop/conf.py:367
+#: src/desktop/conf.py:381
 msgid "The Consumer key of the application."
 msgstr "Der Konsumentenschlüssel der Anwendung."
 
-#: src/desktop/conf.py:374
+#: src/desktop/conf.py:388
 msgid "The Consumer secret of the application."
 msgstr "Die geheime Angabe des Kunden für die Anwendung."
 
-#: src/desktop/conf.py:381
+#: src/desktop/conf.py:395
 msgid "The Request token URL."
 msgstr "Die Anforderungstoken-URL."
 
-#: src/desktop/conf.py:388
+#: src/desktop/conf.py:402
 msgid "The Access token URL."
 msgstr "Die Zugriffstoken-URL."
 
-#: src/desktop/conf.py:395
+#: src/desktop/conf.py:409
 msgid "The Authorize URL."
 msgstr "Die Autorisierungs-URL."
 
-#: src/desktop/conf.py:405
+#: src/desktop/conf.py:419
 msgid "Paths on the local file system that users should be able to browse."
 msgstr "Pfade im lokalen Dateisystem, die Benutzer durchsuchen können sollten."
 
-#: src/desktop/conf.py:410
+#: src/desktop/conf.py:424
 msgid "The path on the local filesystem."
 msgstr "Der Pfad im lokalen Dateisystem."
 
-#: src/desktop/conf.py:418
+#: src/desktop/conf.py:432
 msgid "Link for 'feedback' tab."
 msgstr "Link für Registerkarte 'feedback'."
 
-#: src/desktop/conf.py:425
+#: src/desktop/conf.py:439
 msgid "Whether to send debug messages from JavaScript to the server logs."
 msgstr "Ob Debugging-Nachrichten von JavaScript an die Serverprotokolle gesendet werden."
 
-#: src/desktop/conf.py:432
+#: src/desktop/conf.py:446
 msgid "If true, log all database requests."
 msgstr "Falls wahr, alle Datenbankanfragen protokollieren."
 
-#: src/desktop/conf.py:438
+#: src/desktop/conf.py:452
 msgid "Administrators that should receive error emails."
 msgstr "Administratoren, die E-Mail-Benachrichtigungen bei Fehlern erhalten sollen."
 
-#: src/desktop/conf.py:443
+#: src/desktop/conf.py:457
 msgid "The full name of the admin."
 msgstr "Der vollständige Name des Administrators."
 
-#: src/desktop/conf.py:446
+#: src/desktop/conf.py:460
 msgid "The email address of the admin."
 msgstr "Die E-Mail-Adresse des Administrators."
 
-#: src/desktop/conf.py:450
+#: src/desktop/conf.py:464
 msgid "Enable or disable Django debug mode."
 msgstr "Django-Debugging-Modus aktivieren oder deaktivieren."
 
-#: src/desktop/conf.py:457
+#: src/desktop/conf.py:471
 msgid "Enable or disable debugging information in the 500 internal server error response. Note that the debugging information may contain sensitive data. If django_debug_mode is True, this is automatically enabled."
 msgstr "Debugging-Informationen in der internen Server-Fehlerantwort 500 aktivieren oder deaktivieren. Beachten Sie, dass die Debugging-Informationen sensible Daten enthalten können. Wenn django_debug_mode wahr ist, wird dies automatisch aktiviert."
 
-#: src/desktop/conf.py:466
+#: src/desktop/conf.py:480
 msgid "Email address that internal error messages should send as."
 msgstr "E-Mail-Adresse, mit der interne Fehlermeldungen gesendet werden sollen."
 
-#: src/desktop/conf.py:472
+#: src/desktop/conf.py:486
 msgid "The email backend to use."
 msgstr "Das zu verwendende E-Mail-Backend."
 
-#: src/desktop/conf.py:488
+#: src/desktop/conf.py:502
 msgid "Secret key should be configured as a random string."
 msgstr "Der Geheimschlüssel sollte als zufällige Zeichenkette konfiguriert werden."
 
-#: src/desktop/conf.py:494
+#: src/desktop/conf.py:508
 msgid "SSL private key file should be set to enable HTTPS."
 msgstr "SSL-Privater-Schlüssel sollte so eingestellt werden, dass HTTPS aktiviert ist."
 
-#: src/desktop/conf.py:500
+#: src/desktop/conf.py:514
 msgid "Encoding not supported."
 msgstr "Verschlüsselung wird nicht unterstützt."
 
-#: src/desktop/conf.py:509
+#: src/desktop/conf.py:523
 #, python-format
 msgid "Keytab should have 0600 permissions (has %o)."
 msgstr "Keytab sollte 0600 Berechtigungen haben (hat %o)."
 
-#: src/desktop/conf.py:519
+#: src/desktop/conf.py:533
 msgid "LDAP is only partially configured. An LDAP URL must be provided."
 msgstr "LDAP ist nur teilweise konfiguriert. Eine LDAP-URL muss angegeben werden."
 
-#: src/desktop/conf.py:525
+#: src/desktop/conf.py:539
 msgid "LDAP is only partially configured. An NT Domain or username search pattern must be provided."
 msgstr "LDAP ist nur teilweise konfiguriert. Eine NT-Domäne oder ein Benutzernamen-Suchmuster muss angegeben werden."
 
-#: src/desktop/conf.py:531
+#: src/desktop/conf.py:545
 msgid "The LDAP username pattern should contain the special<username> replacement string for authentication."
 msgstr "Das LDAP-Benutzernamensmuster muss die spezielle Ersatzzeichenfolge <benutzername> für die Authentifizierung enthalten."
 
@@ -396,7 +400,7 @@ msgid "You do not have permission to access the %(app_name)s application."
 msgstr "Sie haben keine Berechtigung für den Zugriff auf die Anwendung %(app_name)s."
 
 #: src/desktop/views.py:63 src/desktop/views.py:78 src/desktop/views.py:188
-#: src/desktop/views.py:215 src/desktop/views.py:377
+#: src/desktop/views.py:215 src/desktop/views.py:381
 msgid "You must be a superuser."
 msgstr "Sie müssen ein Superuser sein."
 
@@ -625,37 +629,46 @@ msgstr "Seite nicht gefunden"
 msgid "We're sorry, but the requested page could not be found:"
 msgstr "Es ist leider ein Fehler aufgetreten. Die angeforderte Seite wurde nicht gefunden:"
 
-#: src/desktop/templates/500.mako:21 src/desktop/templates/error.mako:22
+#: src/desktop/templates/500.mako:23 src/desktop/templates/error.mako:22
 msgid "Error"
 msgstr "Fehler"
 
-#: src/desktop/templates/500.mako:24
+#: src/desktop/templates/500.mako:26
 msgid "Server Error (500)"
 msgstr "Serverfehler (500)"
 
-#: src/desktop/templates/500.mako:25
+#: src/desktop/templates/500.mako:27
 msgid "Sorry, there's been an error. An email was sent to your administrators. Thank you for your patience."
 msgstr "Es ist leider ein Fehler aufgetreten. An Ihre Administratoren wurde eine E-Mail gesendet. Danke für Ihre Geduld."
 
-#: src/desktop/templates/500.mako:28 src/desktop/templates/popup_error.mako:37
+#: src/desktop/templates/500.mako:30
+msgid "See the stacktrace"
+msgstr "Stacktrace anzeigen"
+
+#: src/desktop/templates/500.mako:30 src/desktop/templates/popup_error.mako:37
 msgid "More Info"
 msgstr "Weitere Informationen"
 
-#: src/desktop/templates/500.mako:30 src/desktop/templates/500.mako:54
+#: src/desktop/templates/500.mako:33 src/desktop/templates/500.mako:59
+#, fuzzy
+msgid "View server logs"
+msgstr "Server-Protokolle anzeigen"
+
+#: src/desktop/templates/500.mako:33 src/desktop/templates/500.mako:59
 #: src/desktop/templates/popup_error.mako:39
 #: src/desktop/templates/popup_error.mako:63
 msgid "View Logs"
 msgstr "Protokolle anzeigen"
 
-#: src/desktop/templates/500.mako:37 src/desktop/templates/popup_error.mako:46
+#: src/desktop/templates/500.mako:41 src/desktop/templates/popup_error.mako:46
 msgid "File Name"
 msgstr "Dateiname"
 
-#: src/desktop/templates/500.mako:38 src/desktop/templates/popup_error.mako:47
+#: src/desktop/templates/500.mako:42 src/desktop/templates/popup_error.mako:47
 msgid "Line Number"
 msgstr "Zeilennummer"
 
-#: src/desktop/templates/500.mako:39 src/desktop/templates/popup_error.mako:48
+#: src/desktop/templates/500.mako:43 src/desktop/templates/popup_error.mako:48
 msgid "Function Name"
 msgstr "Funktionsname"
 
@@ -671,7 +684,7 @@ msgstr "Konfiguration"
 #: src/desktop/templates/about_layout.mako:36
 #: src/desktop/templates/logs.mako:27
 msgid "Server Logs"
-msgstr "Serverprotokolle"
+msgstr "Server-Protokolle"
 
 #: src/desktop/templates/actionbar.mako:31
 msgid "Search..."
@@ -693,6 +706,26 @@ msgstr "Aktueller Wert:"
 #: src/desktop/templates/check_config.mako:50
 msgid "All OK. Configuration check passed."
 msgstr "Alles OK. Konfigurationsprüfung bestanden."
+
+#: src/desktop/templates/common_footer.mako:177
+msgid "Did you know?"
+msgstr "Wussten Sie schon?"
+
+#: src/desktop/templates/common_footer.mako:183
+msgid "There is one or more tours available for this page. These tours were created to guide you around."
+msgstr "Für diese Seite ist mindestens eine Tour vorhanden. Diese Touren wurden als Einführung für Benutzer erstellt."
+
+#: src/desktop/templates/common_footer.mako:186
+msgid "You can see the list of the tours by clicking on the checkered flag badge on the side of this page."
+msgstr "Sie können die Liste der Touren einsehen, indem Sie an der Seite dieser Seite auf die karierte Flagge klicken."
+
+#: src/desktop/templates/common_footer.mako:191
+msgid "Do not show this dialog again"
+msgstr "Diesen Dialog nicht mehr anzeigen"
+
+#: src/desktop/templates/common_footer.mako:192
+msgid "Got it, prof!"
+msgstr "Alles klar!"
 
 #: src/desktop/templates/common_header.mako:81
 #: src/desktop/templates/error.mako:34
@@ -747,15 +780,15 @@ msgstr "Keine für diese Seite."
 msgid "About Hue"
 msgstr "Über Hue"
 
-#: src/desktop/templates/common_header.mako:164
+#: src/desktop/templates/common_header.mako:165
 msgid "Profile"
 msgstr "Profil"
 
-#: src/desktop/templates/common_header.mako:166
+#: src/desktop/templates/common_header.mako:167
 msgid "Sign Out"
 msgstr "Abmelden"
 
-#: src/desktop/templates/common_header.mako:173
+#: src/desktop/templates/common_header.mako:175
 #: src/desktop/templates/home.mako:21
 msgid "Home"
 msgstr "Startseite"
@@ -799,38 +832,46 @@ msgid "Search"
 msgstr "Suche"
 
 #: src/desktop/templates/home.mako:63
+msgid "HBase"
+msgstr "HBase"
+
+#: src/desktop/templates/home.mako:64
 msgid "Shell"
 msgstr "Shell"
 
-#: src/desktop/templates/home.mako:75
+#: src/desktop/templates/home.mako:76
 msgid "Hadoop"
 msgstr "Hadoop"
 
-#: src/desktop/templates/home.mako:79
+#: src/desktop/templates/home.mako:80
 msgid "Files"
 msgstr "Dateien"
 
-#: src/desktop/templates/home.mako:80
+#: src/desktop/templates/home.mako:81
 msgid "Jobs"
 msgstr "Jobs"
 
-#: src/desktop/templates/home.mako:81
+#: src/desktop/templates/home.mako:82
 msgid "Tables"
 msgstr "Tabellen"
 
-#: src/desktop/templates/home.mako:82
+#: src/desktop/templates/home.mako:83
+msgid "Sqoop 2"
+msgstr "Sqoop 2"
+
+#: src/desktop/templates/home.mako:84
 msgid "Designs"
 msgstr "Designs"
 
-#: src/desktop/templates/home.mako:94
+#: src/desktop/templates/home.mako:96
 msgid "Workflow"
 msgstr "Workflow"
 
-#: src/desktop/templates/home.mako:98
+#: src/desktop/templates/home.mako:100
 msgid "Dashboard"
 msgstr "Dashboard"
 
-#: src/desktop/templates/home.mako:99
+#: src/desktop/templates/home.mako:101
 msgid "Editor"
 msgstr "Editor"
 

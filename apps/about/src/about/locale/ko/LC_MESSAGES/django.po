@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-07-15 18:43-0700\n"
+"POT-Creation-Date: 2013-08-02 20:43-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -116,49 +116,45 @@ msgstr "개별 애플리케이션 예제 설치"
 
 #: src/about/templates/admin_wizard.mako:178
 #, fuzzy
-msgid "Create or import users."
-msgstr "사용자를 생성 또는 가져옵니다."
+msgid "Create or import users"
+msgstr "사용자를 생성하거나 가져옵니다."
 
 #: src/about/templates/admin_wizard.mako:181
 msgid "User Admin"
 msgstr "관리 사용자"
 
-#: src/about/templates/admin_wizard.mako:192
-msgid "Anonymous usage analytics"
-msgstr "익명 사용량 분석"
+#: src/about/templates/admin_wizard.mako:190
+msgid "Tours and tutorials"
+msgstr "투어 및 튜토리얼"
 
-#: src/about/templates/admin_wizard.mako:199
-msgid "How does it work?"
-msgstr "작동 방식"
-
-#: src/about/templates/admin_wizard.mako:214
+#: src/about/templates/admin_wizard.mako:206
 #, fuzzy
 msgid "Use the applications"
 msgstr "애플리케이션 사용"
 
-#: src/about/templates/admin_wizard.mako:217
+#: src/about/templates/admin_wizard.mako:209
 msgid "Hue Home"
 msgstr "Hue 홈"
 
-#: src/about/templates/admin_wizard.mako:224
+#: src/about/templates/admin_wizard.mako:216
 msgid "Back"
 msgstr "뒤로"
 
-#: src/about/templates/admin_wizard.mako:225
+#: src/about/templates/admin_wizard.mako:217
 msgid "Next"
 msgstr "다음"
 
-#: src/about/templates/admin_wizard.mako:255
-#: src/about/templates/admin_wizard.mako:273
+#: src/about/templates/admin_wizard.mako:247
+#: src/about/templates/admin_wizard.mako:265
 msgid "Examples refreshed"
 msgstr "예제 새로 고침됨"
 
-#: src/about/templates/admin_wizard.mako:337
+#: src/about/templates/admin_wizard.mako:329
 #, fuzzy
 msgid "Configuration updated"
 msgstr "구성 업데이트됨"
 
-#~ msgid "Visit Hue website !"
-#~ msgstr ""
-#~ msgid "Go !"
-#~ msgstr "이동!"
+#~ msgid "Anonymous usage analytics"
+#~ msgstr "익명 사용량 분석"
+#~ msgid "How does it work?"
+#~ msgstr "작동 방식"

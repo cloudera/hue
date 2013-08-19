@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-07-15 18:44-0700\n"
+"POT-Creation-Date: 2013-08-02 20:43-0700\n"
 "PO-Revision-Date: 2013-07-13 20:35-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -39,11 +39,11 @@ msgstr "行の更新"
 msgid "Delete Row"
 msgstr "行の削除"
 
-#: src/hbase/templates/app.mako:68 src/hbase/templates/app.mako:228
+#: src/hbase/templates/app.mako:68 src/hbase/templates/app.mako:221
 msgid "Toggle Collapse Selected"
 msgstr "選択済みの折りたたみをトグル"
 
-#: src/hbase/templates/app.mako:69 src/hbase/templates/app.mako:229
+#: src/hbase/templates/app.mako:69 src/hbase/templates/app.mako:222
 msgid "Select All Visible"
 msgstr "表示されているものすべての選択"
 
@@ -60,12 +60,8 @@ msgid "Notice:"
 msgstr "注意："
 
 #: src/hbase/templates/app.mako:99
-msgid "entries truncated"
-msgstr "切り捨てられたエントリ"
-
-#: src/hbase/templates/app.mako:99
-msgid "at"
-msgstr "場所"
+msgid " entries may be truncated with limit set at"
+msgstr " エントリは以下に設定された制限で切り捨てられる可能性があります"
 
 #: src/hbase/templates/app.mako:99
 msgid "items per set."
@@ -87,121 +83,131 @@ msgstr "行"
 msgid "Sort By"
 msgstr "ソートの基準"
 
-#: src/hbase/templates/app.mako:149
+#: src/hbase/templates/app.mako:143
+msgid "Search for Table Name"
+msgstr "テーブル名を検索"
+
+#: src/hbase/templates/app.mako:146
 msgid "Enable"
 msgstr "有効にする"
 
-#: src/hbase/templates/app.mako:154
+#: src/hbase/templates/app.mako:148
 msgid "Disable"
 msgstr "無効にする"
 
-#: src/hbase/templates/app.mako:157
+#: src/hbase/templates/app.mako:151
 msgid "Drop"
 msgstr "ドロップ"
 
-#: src/hbase/templates/app.mako:160
+#: src/hbase/templates/app.mako:154
 msgid "New Table"
 msgstr "新しいテーブル"
 
-#: src/hbase/templates/app.mako:179
+#: src/hbase/templates/app.mako:173
 msgid "Create New Table"
 msgstr "新しいテーブルの作成"
 
-#: src/hbase/templates/app.mako:183
+#: src/hbase/templates/app.mako:177
 msgid "Table Name"
 msgstr "テーブル名"
 
-#: src/hbase/templates/app.mako:184
+#: src/hbase/templates/app.mako:178
 msgid "Column Families"
 msgstr "列ファミリ"
 
-#: src/hbase/templates/app.mako:187
-msgid "Add Column Family"
-msgstr "列ファミリの追加"
+#: src/hbase/templates/app.mako:182
+#, fuzzy
+msgid "Additional Column Family"
+msgstr "追加のカラムファミリ"
 
-#: src/hbase/templates/app.mako:190 src/hbase/templates/app.mako:283
-#: src/hbase/templates/app.mako:304 src/hbase/templates/app.mako:342
-#: src/hbase/templates/app.mako:373
+#: src/hbase/templates/app.mako:185 src/hbase/templates/app.mako:275
+#: src/hbase/templates/app.mako:296 src/hbase/templates/app.mako:334
+#: src/hbase/templates/app.mako:365
 msgid "Cancel"
 msgstr "キャンセル"
 
-#: src/hbase/templates/app.mako:191
+#: src/hbase/templates/app.mako:186
 msgid "Submit"
 msgstr "サブミット"
 
-#: src/hbase/templates/app.mako:205
-msgid "row_key1, row_key2 + scan_length, row[ cf:column ], [ cf:col1 cf:col2 ]"
-msgstr "row_key1、row_key2 + scan_length、row[ cf:column ]、[ cf:col1 cf:col2 ]"
+#: src/hbase/templates/app.mako:197
+#, fuzzy
+msgid "row_key, row_key_prefix* + scan_length, row_key [family:col1, family2:col2, family3:]"
+msgstr "row_key、row_key_prefix* + scan_length、row_key [family:col1, family2:col2, family3:]"
 
-#: src/hbase/templates/app.mako:224
+#: src/hbase/templates/app.mako:217
 msgid "Toggle Select All Rows"
 msgstr "すべての行の選択をトグル"
 
-#: src/hbase/templates/app.mako:224
+#: src/hbase/templates/app.mako:217
 msgid "All"
 msgstr "すべて"
 
-#: src/hbase/templates/app.mako:231
+#: src/hbase/templates/app.mako:224
 msgid "Drop Columns"
 msgstr "列のドロップ"
 
-#: src/hbase/templates/app.mako:246
+#: src/hbase/templates/app.mako:238
 msgid "Displaying"
 msgstr "表示中"
 
-#: src/hbase/templates/app.mako:250
+#: src/hbase/templates/app.mako:242
 msgid "starting from"
 msgstr "次から開始"
 
-#: src/hbase/templates/app.mako:255
+#: src/hbase/templates/app.mako:247
 msgid "Add Query Field"
 msgstr "クエリフィールドの追加"
 
-#: src/hbase/templates/app.mako:256
+#: src/hbase/templates/app.mako:248
 msgid "Go"
 msgstr "さあ、始めましょう。"
 
-#: src/hbase/templates/app.mako:260
+#: src/hbase/templates/app.mako:252
 msgid "Drop Rows"
 msgstr "行のドロップ"
 
-#: src/hbase/templates/app.mako:262
+#: src/hbase/templates/app.mako:254
 msgid "New Row"
 msgstr "新しい行"
 
-#: src/hbase/templates/app.mako:271
+#: src/hbase/templates/app.mako:263
 msgid "Insert New Row"
 msgstr "新しい行の挿入"
 
-#: src/hbase/templates/app.mako:276
+#: src/hbase/templates/app.mako:268
 msgid "Row Key"
 msgstr "行キー"
 
-#: src/hbase/templates/app.mako:280
+#: src/hbase/templates/app.mako:272
 msgid "Add Field"
 msgstr "フィールドの追加"
 
-#: src/hbase/templates/app.mako:292
+#: src/hbase/templates/app.mako:284
 msgid "Create New Column"
 msgstr "新しい列の作成"
 
-#: src/hbase/templates/app.mako:298
+#: src/hbase/templates/app.mako:290
 msgid "Column Name"
 msgstr "列名"
 
-#: src/hbase/templates/app.mako:300 src/hbase/templates/app.mako:301
+#: src/hbase/templates/app.mako:292 src/hbase/templates/app.mako:293
 msgid "Cell Value"
 msgstr "セル値"
 
-#: src/hbase/templates/app.mako:343
+#: src/hbase/templates/app.mako:335
 msgid "Save"
 msgstr "保存"
 
-#: src/hbase/templates/app.mako:345
+#: src/hbase/templates/app.mako:337
 msgid "OK"
 msgstr "OK"
 
-#: src/hbase/templates/app.mako:374
+#: src/hbase/templates/app.mako:366
 msgid "Confirm"
 msgstr "確認"
 
+#~ msgid "entries truncated"
+#~ msgstr "切り捨てられたエントリ"
+#~ msgid "at"
+#~ msgstr "場所"

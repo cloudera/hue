@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-07-15 18:44-0700\n"
+"POT-Creation-Date: 2013-08-02 20:43-0700\n"
 "PO-Revision-Date: 2012-07-30 18:56-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -119,7 +119,7 @@ msgstr "Job을 삭제할 수 없습니다."
 msgid "Could not start job."
 msgstr "Job을 시작할 수 없습니다."
 
-#: src/sqoop/api/job.py:212 src/sqoop/templates/app.mako:667
+#: src/sqoop/api/job.py:212 src/sqoop/templates/app.mako:661
 msgid "Could not stop job."
 msgstr "Job을 중지할 수 없습니다."
 
@@ -131,162 +131,299 @@ msgstr "Job 상태를 가져올 수 없습니다."
 msgid "Could not get submissions."
 msgstr "제출을 가져올 수 없습니다."
 
-#: src/sqoop/templates/app.mako:27
-msgid "Sqoop error"
-msgstr "Sqoop 오류"
+#: src/sqoop/templates/app.mako:28 src/sqoop/templates/app.mako:36
+msgid "Create a new job"
+msgstr "새 Job 생성"
 
-#: src/sqoop/templates/app.mako:36
+#: src/sqoop/templates/app.mako:28 src/sqoop/templates/app.mako:36
+msgid "New job"
+msgstr "새 Job"
+
+#: src/sqoop/templates/app.mako:30 src/sqoop/templates/app.mako:38
+#: src/sqoop/templates/app.mako:39 src/sqoop/templates/app.mako:43
+#: src/sqoop/templates/app.mako:44
+msgid "Sqoop Jobs"
+msgstr "Sqoop Job"
+
+#: src/sqoop/templates/app.mako:31
 msgid "Search for job name or content"
 msgstr "Job 이름 또는 콘텐츠 검색"
 
-#: src/sqoop/templates/app.mako:42
-msgid "Create a new job"
-msgstr "새로운 Job 생성"
-
-#: src/sqoop/templates/app.mako:42
-msgid "New job"
-msgstr "Job 새로 만들기"
-
-#: src/sqoop/templates/app.mako:49 src/sqoop/templates/app.mako:72
-msgid "Click to edit"
-msgstr "편집하려면 클릭"
-
-#: src/sqoop/templates/app.mako:51 src/sqoop/templates/app.mako:115
-msgid "Stop"
-msgstr "중지"
-
-#: src/sqoop/templates/app.mako:52 src/sqoop/templates/app.mako:74
-#: src/sqoop/templates/app.mako:110
-msgid "Run"
-msgstr "실행"
-
-#: src/sqoop/templates/app.mako:53 src/sqoop/templates/app.mako:75
-#: src/sqoop/templates/app.mako:120
-msgid "Copy"
-msgstr "복사"
-
-#: src/sqoop/templates/app.mako:54 src/sqoop/templates/app.mako:76
-#: src/sqoop/templates/app.mako:125
-msgid "Delete"
-msgstr "삭제"
-
-#: src/sqoop/templates/app.mako:87
-msgid "There are currently no jobs."
-msgstr "현재 Job이 없습니다."
-
-#: src/sqoop/templates/app.mako:87
-msgid "Please click on \"New Job\" to add one."
-msgstr "Job을 추가하려면 \"Job 새로 만들기\"를 클릭하십시오."
-
-#: src/sqoop/templates/app.mako:103 src/sqoop/templates/app.mako:104
+#: src/sqoop/templates/app.mako:38 src/sqoop/templates/app.mako:39
+#: src/sqoop/templates/app.mako:43 src/sqoop/templates/app.mako:44
 msgid "Back to jobs list"
 msgstr "Job 목록으로 돌아가기"
 
-#: src/sqoop/templates/app.mako:107
+#: src/sqoop/templates/app.mako:38
+#, fuzzy
+msgid "New Job"
+msgstr "새 Job"
+
+#: src/sqoop/templates/app.mako:43
+#, fuzzy
+msgid "New Connection"
+msgstr "새 연결"
+
+#: src/sqoop/templates/app.mako:50
+msgid "Sqoop error"
+msgstr "Sqoop 오류"
+
+#: src/sqoop/templates/app.mako:64 src/sqoop/templates/app.mako:82
+msgid "Click to edit"
+msgstr "편집하려면 클릭"
+
+#: src/sqoop/templates/app.mako:67 src/sqoop/templates/app.mako:73
+msgid "Last run: "
+msgstr "마지막 실행: "
+
+#: src/sqoop/templates/app.mako:90
+msgid "There are currently no jobs."
+msgstr "현재 Job이 없습니다."
+
+#: src/sqoop/templates/app.mako:90
+#, fuzzy
+msgid "Please click on New Job to add one."
+msgstr "Job을 추가하려면 새 Job을 클릭하십시오."
+
+#: src/sqoop/templates/app.mako:99
 msgid "Actions"
 msgstr "작업"
 
-#: src/sqoop/templates/app.mako:109
+#: src/sqoop/templates/app.mako:101
 msgid "Run the job"
 msgstr "Job 실행"
 
-#: src/sqoop/templates/app.mako:114
+#: src/sqoop/templates/app.mako:102
+msgid "Run"
+msgstr "실행"
+
+#: src/sqoop/templates/app.mako:106
 msgid "Stop the job"
 msgstr "Job 중지"
 
-#: src/sqoop/templates/app.mako:119
+#: src/sqoop/templates/app.mako:107
+msgid "Stop"
+msgstr "중지"
+
+#: src/sqoop/templates/app.mako:111
 msgid "Copy the job"
 msgstr "Job 복사"
 
-#: src/sqoop/templates/app.mako:124
+#: src/sqoop/templates/app.mako:112
+msgid "Copy"
+msgstr "복사"
+
+#: src/sqoop/templates/app.mako:116
 msgid "Delete the job"
 msgstr "Job 삭제"
 
-#: src/sqoop/templates/app.mako:133
-msgid "Create a job"
-msgstr "Job 생성"
+#: src/sqoop/templates/app.mako:117 src/sqoop/templates/app.mako:354
+msgid "Delete"
+msgstr "삭제"
 
-#: src/sqoop/templates/app.mako:147
-msgid "Previous"
-msgstr "이전"
+#: src/sqoop/templates/app.mako:120
+msgid "Submissions"
+msgstr "제출"
 
-#: src/sqoop/templates/app.mako:151
-msgid "Next"
-msgstr "다음"
+#: src/sqoop/templates/app.mako:122
+msgid "Browse output directory"
+msgstr "출력 디렉토리 찾아보기"
 
-#: src/sqoop/templates/app.mako:154 src/sqoop/templates/app.mako:206
-msgid "Save"
-msgstr "저장"
+#: src/sqoop/templates/app.mako:123
+msgid "Output directory"
+msgstr "출력 디렉토리"
 
-#: src/sqoop/templates/app.mako:167
-msgid "Connector"
-msgstr "커넥터"
+#: src/sqoop/templates/app.mako:127
+msgid "Browse input directory"
+msgstr "입력 디렉토리 찾아보기"
 
-#: src/sqoop/templates/app.mako:181 src/sqoop/templates/app.mako:224
-msgid "Back to job"
-msgstr "Job으로 돌아가기"
+#: src/sqoop/templates/app.mako:128
+msgid "Input directory"
+msgstr "입력 디렉토리"
 
-#: src/sqoop/templates/app.mako:187
-msgid "Create a connection"
-msgstr "연결 생성"
-
-#: src/sqoop/templates/app.mako:190 src/sqoop/templates/app.mako:284
-msgid "Name"
-msgstr "이름"
-
-#: src/sqoop/templates/app.mako:205
-msgid "Cancel"
-msgstr "취소"
-
-#: src/sqoop/templates/app.mako:216 src/sqoop/templates/app.mako:218
+#: src/sqoop/templates/app.mako:132 src/sqoop/templates/app.mako:134
 msgid "Logs"
 msgstr "로그"
 
-#: src/sqoop/templates/app.mako:222
-msgid "Back to editing a job"
-msgstr "Job 편집으로 돌아가기"
+#: src/sqoop/templates/app.mako:137
+msgid "Last status"
+msgstr "마지막 상태"
 
-#: src/sqoop/templates/app.mako:246
-msgid "Select job type"
-msgstr "Job 유형 선택"
+#: src/sqoop/templates/app.mako:173
+msgid "Back"
+msgstr "뒤로"
 
-#: src/sqoop/templates/app.mako:255
-msgid "Select connection"
-msgstr "연결 선택"
+#: src/sqoop/templates/app.mako:177
+msgid "Next"
+msgstr "다음"
 
-#: src/sqoop/templates/app.mako:569
-msgid "Step 1: Job info"
-msgstr "1단계: Job 정보"
+#: src/sqoop/templates/app.mako:180 src/sqoop/templates/app.mako:219
+msgid "Save"
+msgstr "저장"
 
-#: src/sqoop/templates/app.mako:575
-msgid "Step 2: Sqoop specific"
-msgstr "2단계: Sqoop 특정"
+#: src/sqoop/templates/app.mako:182
+msgid "Save and run"
+msgstr "저장 및 실행"
 
-#: src/sqoop/templates/app.mako:582
+#: src/sqoop/templates/app.mako:195 src/sqoop/templates/app.mako:322
+msgid "Name"
+msgstr "이름"
+
+#: src/sqoop/templates/app.mako:201
+msgid "Connector"
+msgstr "커넥터"
+
+#: src/sqoop/templates/app.mako:218
+msgid "Cancel and return to job"
+msgstr "취소한 후 Job으로 돌아가기"
+
+#: src/sqoop/templates/app.mako:232
+msgid "Choose a folder"
+msgstr "폴더 선택"
+
+#: src/sqoop/templates/app.mako:245
+msgid "Are you sure you'd like to delete this job?"
+msgstr "이 Job을 삭제하시겠습니까?"
+
+#: src/sqoop/templates/app.mako:249 src/sqoop/templates/app.mako:261
+msgid "No"
+msgstr "아니요"
+
+#: src/sqoop/templates/app.mako:250 src/sqoop/templates/app.mako:262
+msgid "Yes, delete it"
+msgstr "예, 삭제합니다."
+
+#: src/sqoop/templates/app.mako:257
+msgid "Are you sure you'd like to delete this connection?"
+msgstr "이 연결을 삭제하시겠습니까?"
+
+#: src/sqoop/templates/app.mako:271 src/sqoop/templates/app.mako:280
+msgid "from "
+msgstr "시작 "
+
+#: src/sqoop/templates/app.mako:273 src/sqoop/templates/app.mako:282
+#, fuzzy
+msgid "to "
+msgstr "완료 "
+
+#: src/sqoop/templates/app.mako:329
+#, fuzzy
+msgid "Job type"
+msgstr "Job 유형"
+
+#: src/sqoop/templates/app.mako:331
+msgid "Import from a Database to Hadoop"
+msgstr "데이터베이스에서 Hadoop으로 가져오기"
+
+#: src/sqoop/templates/app.mako:333
+msgid "Import"
+msgstr "가져오기"
+
+#: src/sqoop/templates/app.mako:335
+msgid "Import from Hadoop to a Database"
+msgstr "Hadoop에서 데이터베이스로 가져오기"
+
+#: src/sqoop/templates/app.mako:337
+#, fuzzy
+msgid "Export"
+msgstr "내보내기"
+
+#: src/sqoop/templates/app.mako:344
+#, fuzzy
+msgid "Connection"
+msgstr "연결"
+
+#: src/sqoop/templates/app.mako:351
+msgid "Edit"
+msgstr "편집"
+
+#: src/sqoop/templates/app.mako:360
+#, fuzzy
+msgid "Add a new connection"
+msgstr "새 연결 추가"
+
+#: src/sqoop/templates/app.mako:389 src/sqoop/templates/app.mako:460
+msgid "Choose..."
+msgstr "선택 중..."
+
+#: src/sqoop/templates/app.mako:443 src/sqoop/templates/app.mako:514
+msgid "True"
+msgstr "True"
+
+#: src/sqoop/templates/app.mako:444 src/sqoop/templates/app.mako:515
+msgid "False"
+msgstr "False"
+
+#: src/sqoop/templates/app.mako:557
+msgid "Step 1: From"
+msgstr "1단계: 시작"
+
+#: src/sqoop/templates/app.mako:563
+#, fuzzy
+msgid "Step 2: to"
+msgstr "2단계: 완료"
+
+#: src/sqoop/templates/app.mako:570
 msgid "Step 1: Manage connections"
 msgstr "1단계: 연결 관리"
 
-#: src/sqoop/templates/app.mako:588
-msgid "Step 2: Job info"
-msgstr "2단계: Job 정보"
+#: src/sqoop/templates/app.mako:576
+msgid "Step 2: From"
+msgstr "단계 2: 시작"
 
-#: src/sqoop/templates/app.mako:594
-msgid "Step 3: Sqoop specific job info"
-msgstr "3단계: Sqoop 특정 Job 정보"
+#: src/sqoop/templates/app.mako:582
+msgid "Step 3: To"
+msgstr "단계 3: 완료"
 
-#: src/sqoop/templates/app.mako:650
+#: src/sqoop/templates/app.mako:640
 msgid "Cannot connect to sqoop server."
 msgstr "Sqoop 서버에 연결할 수 없습니다."
 
-#: src/sqoop/templates/app.mako:655
+#: src/sqoop/templates/app.mako:645
+msgid "The job is starting..."
+msgstr "Job 시작 중..."
+
+#: src/sqoop/templates/app.mako:649
 msgid "Started job."
 msgstr "Job을 시작했습니다."
 
-#: src/sqoop/templates/app.mako:659
-msgid "Could not start job: "
-msgstr "Job을 시작할 수 없음: "
+#: src/sqoop/templates/app.mako:653
+msgid "Error: "
+msgstr "오류: "
 
-#: src/sqoop/templates/app.mako:663
+#: src/sqoop/templates/app.mako:657
 msgid "Stopped job."
 msgstr "Job을 중지했습니다."
 
+#: src/sqoop/templates/app.mako:665
+#, fuzzy
+msgid "Could not load node."
+msgstr "노드를 로드할 수 없습니다."
+
+#: src/sqoop/templates/app.mako:728
+msgid "Watch out! This path currently does not exist."
+msgstr "이 경로는 현재 존재하지 않습니다."
+
+#: src/sqoop/templates/app.mako:807
+#, fuzzy
+msgid "Untitled Job"
+msgstr "제목없는 Job"
+
+#~ msgid "Create a job"
+#~ msgstr "Job 생성"
+#~ msgid "Previous"
+#~ msgstr "이전"
+#~ msgid "Back to job"
+#~ msgstr "Job으로 돌아가기"
+#~ msgid "Cancel"
+#~ msgstr "취소"
+#~ msgid "Back to editing a job"
+#~ msgstr "Job 편집으로 돌아가기"
+#~ msgid "Step 1: Job info"
+#~ msgstr "1단계: Job 정보"
+#~ msgid "Step 2: Sqoop specific"
+#~ msgstr "2단계: Sqoop 특정"
+#~ msgid "Step 3: Sqoop specific job info"
+#~ msgstr "3단계: Sqoop 특정 Job 정보"
+#~ msgid "Could not start job: "
+#~ msgstr "Job을 시작할 수 없음: "
