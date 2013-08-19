@@ -318,6 +318,44 @@ var SmartViewModel = function(options) {
     });
   };
 
+  self.showGrid = ko.observable(false);
+  self.showGrid.subscribe(function(val) {
+    if(val) {
+      var rows = self.items();
+      var columns = {};
+      //build full lookup hash of columns
+      for(var i=0; i<rows.length; i++) {
+        var cols = rows[i].items();
+        for(var q=0; q<cols.length; q++) {
+          if(!columns[cols[q].name])
+            columns[cols[q].name] = "";
+        }
+      }
+
+      for(var i=0; i<rows.length; i++) {
+        //clone blank template from hash
+        var new_row = $.extend({}, columns);
+        var cols = rows[i].items();
+        var col_list = [];
+        //set existing values
+        for(var q=0; q<cols.length; q++) {
+          new_row[cols[q].name] = cols[q];
+        }
+        //build actual row from hash
+        var keys = Object.keys(new_row);
+        for(var r=0; r<keys.length; r++) {
+          if(!new_row[keys[r]]) new_row[keys[r]] = new ColumnRow({ name: keys[r], value: '', parent: rows[i] });
+          col_list.push(new_row[keys[r]]);
+        }
+        //set and sort
+        rows[i].items(col_list);
+        rows[i].sortDropDown.sort();
+      }
+    } else {
+      self.reload();
+    }
+  });
+
   self.truncateLimit = ko.observable(1500);
 
   self.reachedLimit = ko.computed(function() {

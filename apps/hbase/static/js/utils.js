@@ -223,6 +223,7 @@ function resetElements() {
       }
     });
   });
+  app.views.tabledata.showGrid(false);
   resetSearch();
 };
 

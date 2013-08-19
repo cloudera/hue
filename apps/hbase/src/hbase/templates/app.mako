@@ -55,7 +55,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
 </%def>
 
 <%def name="smartview(datasource)">
-  <div class="smartview" data-bind="foreach: ${datasource}.items()">
+  <div class="smartview" data-bind="foreach: ${datasource}.items(), css: { 'gridView': ${datasource}.showGrid() }">
     <div class="smartview-row" data-bind="css:{selected:$data.isSelected()}, visible: $data.items().length > 0 || $data.isLoading()">
       <h5 data-bind="click: lockClickOrigin($data.select, $element)"><code class="row_key" data-bind="text: $data.row.slice(0, 100) + ($data.row.length > 100 ? '...' : '')"></code> <i class="icon-check-sign" data-bind="visible:$data.isSelected()"></i> <img data-bind="visible: $data.isLoading()" src="/static/art/spinner.gif" />
         <span class="smartview-row-controls controls-hover-bottom">
@@ -221,6 +221,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
             <!-- /ko -->
            </span>
             <span class="pull-right">
+              <button class="btn" data-bind="click: function(){views.tabledata.showGrid(!views.tabledata.showGrid());}, clickBubble: false" data-toggle="tooltip" title="${_('Toggle Grid')}"><i class="icon-table"></i></button>
               <input type="text" placeholder="Filter Columns/Families" style="margin-left: 5px;" data-bind="value: app.views.tabledata.columnQuery, clickBubble: false"/>
               <button class="btn" data-bind="click: views.tabledata.toggleSelectAll" style="margin-left: 5px;" data-toggle="tooltip" title="${_('Toggle Select All Rows')}"><i class="icon-check-sign"></i> ${_('All')}</button>
               ${sortBtn('views.tabledata.sortDropDown')}
