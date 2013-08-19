@@ -949,4 +949,9 @@ var CellHistoryPage = function(options) {
       self.loading = ko.observable(false);
     });
   };
+
+  self.pickHistory = function(data) {
+    data.history = self;
+    launchModal('cell_edit_modal',{ content: data, mime: detectMimeType(data.value), readonly: true })
+  };
 };
