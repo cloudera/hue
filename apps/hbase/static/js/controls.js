@@ -512,7 +512,7 @@ var ColumnRow = function(options) {
     function doDrop() {
       logGA('filter_columns');
       self.parent.isLoading(true);
-      return API.queryTable('deleteColumn', self.parent.row, self.name).done(function(data) {
+      return API.queryTable('deleteColumn', prepForTransport(self.parent.row), prepForTransport(self.name)).done(function(data) {
         self.parent.items.remove(self);
         if(self.parent.items().length > 0)
           self.parent.reload(); //change later

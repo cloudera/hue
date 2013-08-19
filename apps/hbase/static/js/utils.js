@@ -122,6 +122,25 @@ function launchModal(modal, data) {
         }
       });
       break;
+    case 'new_column_modal':
+      var uploader = new qq.FileUploaderBasic({
+        button: document.getElementById("column-upload-btn"),
+        action: '',
+        fileFieldLabel: 'hbase_file',
+        multiple: false,
+        onComplete:function (id, fileName, response) {
+          if(response.status == null) {
+            data.reload();
+            element.modal('hide');
+          } else {
+            $.jHueNotify.error($(response.response).find('div.alert strong').text());
+          }
+        },
+        onSubmit: function() {
+          uploader._handler._options.action = '/hbase/api/putUpload/"' + app.cluster() + '"/"' + app.views.tabledata.name() + '"/' + prepForTransport(data.row) + '/"' + element.find('#new_column_name').val() + '"';
+        }
+      });
+      break;
   }
   element.modal('show');
 logGA(modal.slice(0, modal.indexOf('_modal') != -1 ? modal.indexOf('_modal') : modal.length));
