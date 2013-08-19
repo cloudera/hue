@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-07-15 18:44-0700\n"
+"POT-Creation-Date: 2013-08-02 20:43-0700\n"
 "PO-Revision-Date: 2012-07-30 18:53-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: pt <LL@li.org>\n"
@@ -542,7 +542,7 @@ msgstr "Falhou"
 
 #: src/jobbrowser/templates/jobs.mako:51
 msgid "Killed"
-msgstr "Mortos"
+msgstr "Eliminados"
 
 #: src/jobbrowser/templates/jobs.mako:56
 #, fuzzy
@@ -791,9 +791,3 @@ msgstr "Máx tarefas de reduce"
 msgid "No time"
 msgstr "Sem hora"
 
-#~ msgid "Please Confirm"
-#~ msgstr "Confirme"
-#~ msgid ""
-#~ "There was a problem communicating with"
-#~ " the server. Please refresh the page."
-#~ msgstr ""

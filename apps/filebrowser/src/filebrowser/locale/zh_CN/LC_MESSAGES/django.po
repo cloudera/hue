@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-07-15 18:44-0700\n"
+"POT-Creation-Date: 2013-08-02 20:43-0700\n"
 "PO-Revision-Date: 2012-07-30 18:52-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -319,7 +319,7 @@ msgstr "无法将文件夹命名为 \"%s\"：文件名中不允许使用斜线�
 msgid "Could not name file \"%s\": Slashes are not allowed in filenames."
 msgstr "无法对“%s”文件命名：文件名中不允许使用斜线。"
 
-#: src/filebrowser/views.py:1156 src/filebrowser/views.py:1237
+#: src/filebrowser/views.py:1156 src/filebrowser/views.py:1235
 msgid "A POST request is required."
 msgstr "需要 POST 请求。"
 
@@ -328,51 +328,46 @@ msgstr "需要 POST 请求。"
 msgid "%(destination)s upload succeeded"
 msgstr "%(destination)s 上载成功"
 
-#: src/filebrowser/views.py:1161
-#, python-format
-msgid "Upload failed: %(data)s"
-msgstr "上载失败：%(data)s"
-
-#: src/filebrowser/views.py:1183
+#: src/filebrowser/views.py:1181
 #, python-format
 msgid "Sorry, no \"%(sep)s\" in the filename %(name)s.sep"
 msgstr "很抱歉，文件名 %(name)s.sep 中没有 \"%(sep)s\""
 
-#: src/filebrowser/views.py:1200 src/filebrowser/views.py:1286
+#: src/filebrowser/views.py:1198 src/filebrowser/views.py:1284
 #, python-format
 msgid "Destination %(name)s already exists."
 msgstr "目标 %(name)s 已存在。"
 
-#: src/filebrowser/views.py:1202 src/filebrowser/views.py:1288
+#: src/filebrowser/views.py:1200 src/filebrowser/views.py:1286
 #, python-format
 msgid "Copy to %(name)s failed: %(error)s"
 msgstr "无法复制到 %(name)s：%(error)s"
 
-#: src/filebrowser/views.py:1213 src/filebrowser/views.py:1299
+#: src/filebrowser/views.py:1211 src/filebrowser/views.py:1297
 #, python-format
 msgid "Error in upload form: %s"
 msgstr "上载表单错误：%s"
 
-#: src/filebrowser/views.py:1240
+#: src/filebrowser/views.py:1238
 #, fuzzy, python-format
 msgid "%(destination)s upload succeeded."
 msgstr "%(destination)s 上传成功。"
 
-#: src/filebrowser/views.py:1242
+#: src/filebrowser/views.py:1240
 #, fuzzy, python-format
 msgid "Upload failed: %(data)s."
 msgstr "上传失败：%(data)s。"
 
-#: src/filebrowser/views.py:1261
+#: src/filebrowser/views.py:1259
 #, fuzzy, python-format
 msgid "No \"%(sep)s\" allowed in the filename %(name)s.sep"
 msgstr "文件名 %(name)s.sep 中不允许出现 \"%(sep)s\""
 
-#: src/filebrowser/views.py:1270
+#: src/filebrowser/views.py:1268
 msgid "Could not extract contents of file."
 msgstr "无法提取文件内容。"
 
-#: src/filebrowser/views.py:1277
+#: src/filebrowser/views.py:1275
 msgid "Could not interpret archive type."
 msgstr "无法解释存档类型。"
 
@@ -527,14 +522,17 @@ msgid "Search for file name"
 msgstr "搜索文件名"
 
 #: src/filebrowser/templates/listdir.mako:40
+#: src/filebrowser/templates/listdir_components.mako:249
 msgid "Rename"
 msgstr "重命名"
 
 #: src/filebrowser/templates/listdir.mako:41
+#: src/filebrowser/templates/listdir_components.mako:372
 msgid "Move"
 msgstr "移动"
 
 #: src/filebrowser/templates/listdir.mako:42
+#: src/filebrowser/templates/listdir_components.mako:398
 msgid "Copy"
 msgstr "复制"
 
@@ -720,16 +718,6 @@ msgstr "正在重命名："
 msgid "already exists."
 msgstr "已存在。"
 
-#: src/filebrowser/templates/listdir_components.mako:249
-#: src/filebrowser/templates/listdir_components.mako:283
-#: src/filebrowser/templates/listdir_components.mako:346
-#: src/filebrowser/templates/listdir_components.mako:372
-#: src/filebrowser/templates/listdir_components.mako:398
-#: src/filebrowser/templates/listdir_components.mako:455
-#: src/filebrowser/templates/listdir_components.mako:479
-msgid "Submit"
-msgstr "提交"
-
 #: src/filebrowser/templates/listdir_components.mako:263
 #, fuzzy
 msgid "Change Owner/Group"
@@ -739,6 +727,11 @@ msgstr "更改所有者/组"
 #, python-format
 msgid "Note: Only the Hadoop superuser, \"%(superuser)s\" on this file system, may change the owner of a file."
 msgstr "注意：只有此文件系统上的 Hadoop 超级用户“%(superuser)s”可更改文件的所有者。"
+
+#: src/filebrowser/templates/listdir_components.mako:283
+#: src/filebrowser/templates/listdir_components.mako:346
+msgid "Submit"
+msgstr "提交"
 
 #: src/filebrowser/templates/listdir_components.mako:294
 msgid "Change Permissions:"
@@ -798,6 +791,12 @@ msgstr "创建目录"
 #: src/filebrowser/templates/listdir_components.mako:449
 msgid "Directory name is required."
 msgstr "需要提供目录名。"
+
+#: src/filebrowser/templates/listdir_components.mako:455
+#: src/filebrowser/templates/listdir_components.mako:479
+#, fuzzy
+msgid "Create"
+msgstr "创建"
 
 #: src/filebrowser/templates/listdir_components.mako:465
 msgid "Create File"
@@ -869,7 +868,5 @@ msgstr "上传 zip 文件"
 msgid "Save File As..."
 msgstr "文件另存为..."
 
-#~ msgid "Change Owner / Group"
-#~ msgstr "更改所有者/组"
-#~ msgid "Please enter the location where you would like to save the file."
-#~ msgstr "输入文件保存位置。"
+#~ msgid "Upload failed: %(data)s"
+#~ msgstr "上载失败：%(data)s"
