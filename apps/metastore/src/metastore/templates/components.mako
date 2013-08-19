@@ -21,20 +21,17 @@
 <%def name="breadcrumbs(breadcrumbs)">
   <ul class="nav nav-pills hueBreadcrumbBar" id="breadcrumbs">
     <li>
-      <a href="${url('metastore:databases')}"><i class="icon-sitemap"></i> ${_('Databases')}</a>
+      <a href="${url('metastore:databases')}">${_('Databases')} <span class="divider">&gt;</span></a>
     </li>
+    % for crumb in breadcrumbs:
     <li>
-      <ul class="hueBreadcrumb">
-        % for crumb in breadcrumbs:
-          <li>
-            <a href="${ crumb['url'] }">${ crumb['name'] }</a>
-            % if not loop.last:
-              <span class="divider">/</span>
-            % endif
-          </li>
-        % endfor
-      </ul>
+      <a href="${ crumb['url'] }">${ crumb['name'] }
+      % if not loop.last:
+        <span class="divider">&gt;</span>
+      % endif
+      </a>
     </li>
+    % endfor
   </ul>
 </%def>
 

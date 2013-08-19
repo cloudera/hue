@@ -17,9 +17,23 @@
 */
 
 .hueBreadcrumb {
-  padding: 7px 14px;
+  padding: 12px 14px;
+}
+
+.hueBreadcrumbBar {
+  padding: 0;
+  margin: 0;
+  margin-bottom: 10px;
+}
+
+.divider {
+  padding-left: 20px;
 }
 
 .sidebar-nav {
   padding: 9px 0;
+}
+
+.card-heading {
+  padding-left: 6px !important;
 }
