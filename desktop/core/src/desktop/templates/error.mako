@@ -22,16 +22,26 @@ from django.utils.translation import ugettext as _
 ${ commonheader(_('Error'), app_name, user) | n,unicode }
 
   <div class="container-fluid">
-    <h1>${ _('Error!') }</h1>
-    <pre>${ smart_unicode(error) }</pre>
+    <div class="row-fluid">
+      <div class="span12">
+        <div class="card">
+          <h1 class="card-heading simple">${ _('Error!') }</h1>
+          <div class="card-body">
+            <p>
+              <pre>${ smart_unicode(error) }</pre>
 
-    %if traceback:
-      <textarea style="width: 100%;" rows=80 readonly="readonly">
-      ${ smart_unicode(traceback) }
-      </textarea>
-    %endif
+              %if traceback:
+                <textarea style="width: 100%;" rows=80 readonly="readonly">
+                ${ smart_unicode(traceback) }
+                </textarea>
+              %endif
 
-    <a class="btn" onclick="history.back()">${ _('Back') }</a>
+              <a class="btn" onclick="history.back()">${ _('Back') }</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
 ${ commonfooter(messages) | n,unicode }
