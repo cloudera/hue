@@ -21,6 +21,7 @@ except ImportError:
   import simplejson as json
 import logging
 import re
+import csv
 
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
@@ -178,3 +179,25 @@ class HbaseApi(object):
       scanner = client.scannerOpenWithScan(tableName, scan, None)
       aggregate_data += client.scannerGetList(scanner, query['scan_length'])
     return aggregate_data
+
+  def bulkUpload(self, cluster, tableName, data):
+    client = self.connectCluster(cluster)
+    BatchMutation = get_thrift_type('BatchMutation')
+    Mutation = get_thrift_type('Mutation')
+    columns = []
+    data = data.read()
+    dialect = csv.Sniffer().sniff(data)
+    reader = csv.reader(data.splitlines(), delimiter=dialect.delimiter)
+    columns = reader.next()
+    batches = []
+    for row in reader:
+      row_key = row[0]
+      row_data = {}
+      mutations = []
+      for column_index in range(1, len(row)):
+        if str(row[column_index]) != "":
+          mutations.append(Mutation(column=smart_str(columns[column_index]), value=smart_str(row[column_index])))
+      batches += [BatchMutation(row=row_key, mutations=mutations)]
+    client.mutateRows(tableName, batches, None)
+    return True
+
