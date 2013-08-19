@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-07-15 18:44-0700\n"
+"POT-Creation-Date: 2013-08-02 20:43-0700\n"
 "PO-Revision-Date: 2012-07-30 18:52-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -319,7 +319,7 @@ msgstr "ファイル名にはスラッシュやハッシュを使用できない
 msgid "Could not name file \"%s\": Slashes are not allowed in filenames."
 msgstr "ファイル名にはスラッシュを使用できないため、ファイルに \"%s\" という名前を付けることはできません。"
 
-#: src/filebrowser/views.py:1156 src/filebrowser/views.py:1237
+#: src/filebrowser/views.py:1156 src/filebrowser/views.py:1235
 msgid "A POST request is required."
 msgstr "POST 要求が必要です。"
 
@@ -328,51 +328,46 @@ msgstr "POST 要求が必要です。"
 msgid "%(destination)s upload succeeded"
 msgstr "%(destination)s へのアップロードに成功しました"
 
-#: src/filebrowser/views.py:1161
-#, python-format
-msgid "Upload failed: %(data)s"
-msgstr "アップロードに失敗しました：%(data)s"
-
-#: src/filebrowser/views.py:1183
+#: src/filebrowser/views.py:1181
 #, python-format
 msgid "Sorry, no \"%(sep)s\" in the filename %(name)s.sep"
 msgstr "申し訳ありませんが、\"%(sep)s\" がファイル名 %(name)s.sep にありません"
 
-#: src/filebrowser/views.py:1200 src/filebrowser/views.py:1286
+#: src/filebrowser/views.py:1198 src/filebrowser/views.py:1284
 #, python-format
 msgid "Destination %(name)s already exists."
 msgstr "宛先 %(name)s はすでに存在します。"
 
-#: src/filebrowser/views.py:1202 src/filebrowser/views.py:1288
+#: src/filebrowser/views.py:1200 src/filebrowser/views.py:1286
 #, python-format
 msgid "Copy to %(name)s failed: %(error)s"
 msgstr "%(name)s へのコピーに失敗しました：%(error)s"
 
-#: src/filebrowser/views.py:1213 src/filebrowser/views.py:1299
+#: src/filebrowser/views.py:1211 src/filebrowser/views.py:1297
 #, python-format
 msgid "Error in upload form: %s"
 msgstr "アップロードフォームのエラー: %s"
 
-#: src/filebrowser/views.py:1240
+#: src/filebrowser/views.py:1238
 #, fuzzy, python-format
 msgid "%(destination)s upload succeeded."
 msgstr "%(destination)s へのアップロードに成功しました。"
 
-#: src/filebrowser/views.py:1242
+#: src/filebrowser/views.py:1240
 #, fuzzy, python-format
 msgid "Upload failed: %(data)s."
 msgstr "アップロードに失敗しました：%(data)s。"
 
-#: src/filebrowser/views.py:1261
+#: src/filebrowser/views.py:1259
 #, fuzzy, python-format
 msgid "No \"%(sep)s\" allowed in the filename %(name)s.sep"
 msgstr "\"%(sep)s\" はファイル名 %(name)s.sep に使用できません"
 
-#: src/filebrowser/views.py:1270
+#: src/filebrowser/views.py:1268
 msgid "Could not extract contents of file."
 msgstr "ファイルの内容を抽出できませんでした。"
 
-#: src/filebrowser/views.py:1277
+#: src/filebrowser/views.py:1275
 msgid "Could not interpret archive type."
 msgstr "アーカイブタイプを解釈できませんでした。"
 
@@ -527,14 +522,17 @@ msgid "Search for file name"
 msgstr "ファイル名を検索"
 
 #: src/filebrowser/templates/listdir.mako:40
+#: src/filebrowser/templates/listdir_components.mako:249
 msgid "Rename"
 msgstr "名前の変更"
 
 #: src/filebrowser/templates/listdir.mako:41
+#: src/filebrowser/templates/listdir_components.mako:372
 msgid "Move"
 msgstr "移動"
 
 #: src/filebrowser/templates/listdir.mako:42
+#: src/filebrowser/templates/listdir_components.mako:398
 msgid "Copy"
 msgstr "コピー"
 
@@ -720,16 +718,6 @@ msgstr "名前変更中："
 msgid "already exists."
 msgstr "すでに存在しています。"
 
-#: src/filebrowser/templates/listdir_components.mako:249
-#: src/filebrowser/templates/listdir_components.mako:283
-#: src/filebrowser/templates/listdir_components.mako:346
-#: src/filebrowser/templates/listdir_components.mako:372
-#: src/filebrowser/templates/listdir_components.mako:398
-#: src/filebrowser/templates/listdir_components.mako:455
-#: src/filebrowser/templates/listdir_components.mako:479
-msgid "Submit"
-msgstr "サブミット"
-
 #: src/filebrowser/templates/listdir_components.mako:263
 #, fuzzy
 msgid "Change Owner/Group"
@@ -739,6 +727,11 @@ msgstr "所有者／グループの変更"
 #, python-format
 msgid "Note: Only the Hadoop superuser, \"%(superuser)s\" on this file system, may change the owner of a file."
 msgstr "注意：このファイルシステムでは \"%(superuser)s\" である Hadoop スーパーユーザーのみがファイルの所有者を変更できます。"
+
+#: src/filebrowser/templates/listdir_components.mako:283
+#: src/filebrowser/templates/listdir_components.mako:346
+msgid "Submit"
+msgstr "サブミット"
 
 #: src/filebrowser/templates/listdir_components.mako:294
 msgid "Change Permissions:"
@@ -798,6 +791,12 @@ msgstr "ディレクトリの作成"
 #: src/filebrowser/templates/listdir_components.mako:449
 msgid "Directory name is required."
 msgstr "ディレクトリ名が必要です。"
+
+#: src/filebrowser/templates/listdir_components.mako:455
+#: src/filebrowser/templates/listdir_components.mako:479
+#, fuzzy
+msgid "Create"
+msgstr "作成"
 
 #: src/filebrowser/templates/listdir_components.mako:465
 msgid "Create File"
@@ -869,7 +868,5 @@ msgstr "zip ファイルをアップロード"
 msgid "Save File As..."
 msgstr "名前を付けてファイルを保存..."
 
-#~ msgid "Change Owner / Group"
-#~ msgstr "所有者/グループを変更"
-#~ msgid "Please enter the location where you would like to save the file."
-#~ msgstr "ファイルの保存先を入力してください。"
+#~ msgid "Upload failed: %(data)s"
+#~ msgstr "アップロードに失敗しました：%(data)s"

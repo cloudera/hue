@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-07-15 18:43-0700\n"
+"POT-Creation-Date: 2013-08-02 20:43-0700\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -116,49 +116,45 @@ msgstr "個々のアプリケーション例をインストール"
 
 #: src/about/templates/admin_wizard.mako:178
 #, fuzzy
-msgid "Create or import users."
-msgstr "ユーザーを作成またはインポートします。"
+msgid "Create or import users"
+msgstr "ユーザーの作成またはインポート"
 
 #: src/about/templates/admin_wizard.mako:181
 msgid "User Admin"
 msgstr "ユーザー管理者"
 
-#: src/about/templates/admin_wizard.mako:192
-msgid "Anonymous usage analytics"
-msgstr "匿名の利用状況分析"
+#: src/about/templates/admin_wizard.mako:190
+msgid "Tours and tutorials"
+msgstr "ツアーとチュートリアル"
 
-#: src/about/templates/admin_wizard.mako:199
-msgid "How does it work?"
-msgstr "どのように機能しますか？"
-
-#: src/about/templates/admin_wizard.mako:214
+#: src/about/templates/admin_wizard.mako:206
 #, fuzzy
 msgid "Use the applications"
 msgstr "アプリケーションの使用"
 
-#: src/about/templates/admin_wizard.mako:217
+#: src/about/templates/admin_wizard.mako:209
 msgid "Hue Home"
 msgstr "Hue ホーム"
 
-#: src/about/templates/admin_wizard.mako:224
+#: src/about/templates/admin_wizard.mako:216
 msgid "Back"
 msgstr "戻る"
 
-#: src/about/templates/admin_wizard.mako:225
+#: src/about/templates/admin_wizard.mako:217
 msgid "Next"
 msgstr "次へ"
 
-#: src/about/templates/admin_wizard.mako:255
-#: src/about/templates/admin_wizard.mako:273
+#: src/about/templates/admin_wizard.mako:247
+#: src/about/templates/admin_wizard.mako:265
 msgid "Examples refreshed"
 msgstr "例が更新されました"
 
-#: src/about/templates/admin_wizard.mako:337
+#: src/about/templates/admin_wizard.mako:329
 #, fuzzy
 msgid "Configuration updated"
 msgstr "設定が更新されました"
 
-#~ msgid "Visit Hue website !"
-#~ msgstr ""
-#~ msgid "Go !"
-#~ msgstr "さあ、始めましょう。"
+#~ msgid "Anonymous usage analytics"
+#~ msgstr "匿名の利用状況分析"
+#~ msgid "How does it work?"
+#~ msgstr "どのように機能しますか？"
