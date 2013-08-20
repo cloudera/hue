@@ -54,7 +54,7 @@
     </div>
   </div>
 
-  <style>
+  <style type="text/css">
     .designTable th {
       text-align:left;
     }

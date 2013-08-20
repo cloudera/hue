@@ -49,12 +49,6 @@ ${ layout.menubar(section='history') }
   % endif
 </%def>
 
-<style type="text/css">
-  .sidebar-nav {
-    padding: 9px 0;
-  }
-</style>
-
 <div class="container-fluid">
     <div class="row-fluid">
         <div class="span2">

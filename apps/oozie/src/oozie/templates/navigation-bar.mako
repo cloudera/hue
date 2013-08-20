@@ -35,13 +35,20 @@
 </%def>
 
 <%def name="dashboard_sub_menubar(section='')">
-  <h1>${ _('Dashboard') }</h1>
-
-  <ul class="nav nav-tabs">
-    <li class="${utils.is_selected(section, 'workflows')}"><a href="${url('oozie:list_oozie_workflows')}">${ _('Workflows') }</a></li>
-    <li class="${utils.is_selected(section, 'coordinators')}"><a href="${url('oozie:list_oozie_coordinators')}">${ _('Coordinators') }</a></li>
-    <li class="${utils.is_selected(section, 'bundles')}"><a href="${url('oozie:list_oozie_bundles')}">${ _('Bundles') }</a></li>
-    <li class="${utils.is_selected(section, 'oozie')}"><a href="${url('oozie:list_oozie_info')}">${ _('Oozie') }</a></li>
-  </ul>
+  <div class="card" style="padding-top:1px;margin-top:1px">
+##    <h1 class="card-heading simple">${ _('Dashboard') }</h1>
+    <div class="card-body">
+      <p>
+        <ul class="nav nav-tabs">
+          <li class="${utils.is_selected(section, 'workflows')}"><a href="${url('oozie:list_oozie_workflows')}">${ _('Workflows') }</a></li>
+          <li class="${utils.is_selected(section, 'coordinators')}"><a href="${url('oozie:list_oozie_coordinators')}">${ _('Coordinators') }</a></li>
+          <li class="${utils.is_selected(section, 'bundles')}"><a href="${url('oozie:list_oozie_bundles')}">${ _('Bundles') }</a></li>
+          <li class="${utils.is_selected(section, 'oozie')}"><a href="${url('oozie:list_oozie_info')}">${ _('Oozie') }</a></li>
+        </ul>
 </%def>
 
+<%def name="dashboard_end_sub_menubar()">
+      </p>
+    </div>
+  </div>
+</%def>

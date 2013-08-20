@@ -41,9 +41,6 @@ ${ layout.menubar(section='bundles') }
   .help-block {
     color: #999999;
   }
-  .sidebar-nav {
-    padding: 9px 0;
-  }
 </style>
 
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
@@ -51,11 +48,10 @@ ${ layout.menubar(section='bundles') }
 
 
 <div class="container-fluid">
-  <h1>${ _('Bundle Editor : ') } ${ bundle.name }</h1>
 
   <div class="row-fluid">
     <div class="span2">
-      <div class="well sidebar-nav">
+      <div class="sidebar-nav">
         <ul class="nav nav-list">
           <li class="nav-header">${ _('Properties') }</li>
           <li class="active"><a href="#properties"><i class="icon-reorder"></i> ${ _('Edit properties') }</a></li>
@@ -90,6 +86,8 @@ ${ layout.menubar(section='bundles') }
     </div>
 
     <div class="span10">
+      <div class="card" style="margin-top:0">
+      <h1 class="card-heading simple">${ _('Bundle Editor : ') } ${ bundle.name }</h1>
       <form id="jobForm" class="form-horizontal" action="${ url('oozie:edit_bundle', bundle=bundle.id) }" method="POST">
 
       <div id="properties" class="section">
@@ -249,7 +247,7 @@ ${ layout.menubar(section='bundles') }
         </div>
 
     </div>
-
+      </div>
   </div>
   </form>
 

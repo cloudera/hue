@@ -585,7 +585,7 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
 <link rel="stylesheet" href="/static/ext/css/codemirror.css">
 <link rel="stylesheet" href="/static/ext/css/codemirror-show-hint.css">
 
-<style>
+<style type="text/css">
   .fileChooserBtn {
     border-radius: 0 3px 3px 0;
   }

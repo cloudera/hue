@@ -58,7 +58,7 @@ from django.utils.safestring import mark_safe
 
   </div>
 
-  <style>
+  <style type="text/css">
     .dataTable th {
       text-align:left;
     }

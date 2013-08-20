@@ -30,59 +30,49 @@ ${ layout.menubar(section='dashboard') }
 <div class="container-fluid">
   ${ layout.dashboard_sub_menubar(section='coordinators') }
 
-  <h1>
-    % if oozie_bundle:
-      ${ _('Bundle') } <a href="${ oozie_bundle.get_absolute_url() }">${ oozie_bundle.appName }</a> :
-    % endif
-    ${ _('Coordinator') } ${ oozie_coordinator.appName }
-  </h1>
-
-
 <div class="row-fluid">
   <div class="span2">
-    <div class="well sidebar-nav">
+    <div class="sidebar-nav">
       <ul class="nav nav-list">
         <li class="nav-header">${ _('Coordinator') }</li>
-        <li>
-            % if coordinator is not None:
-              <a href="${ coordinator.get_absolute_url() }">${ oozie_coordinator.appName }</a>
-            % else:
-              ${ oozie_coordinator.appName }
-            % endif
-        </li>
+        % if coordinator is not None:
+        <li><a href="${ coordinator.get_absolute_url() }">${ oozie_coordinator.appName }</a></li>
+        % else:
+        <li class="white">${ oozie_coordinator.appName }</li>
+        % endif
 
         <li class="nav-header">${ _('Submitter') }</li>
-        <li>${ oozie_coordinator.user }</li>
+        <li class="white">${ oozie_coordinator.user }</li>
 
         <li class="nav-header">${ _('Status') }</li>
-        <li id="status"><span class="label ${ utils.get_status(oozie_coordinator.status) }">${ oozie_coordinator.status }</span></li>
+        <li class="white" id="status"><span class="label ${ utils.get_status(oozie_coordinator.status) }">${ oozie_coordinator.status }</span></li>
 
         <li class="nav-header">${ _('Progress') }</li>
-        <li id="progress">
+        <li class="white" id="progress">
           <div class="progress">
             <div class="bar" style="width: 0">${ oozie_coordinator.get_progress() }%</div>
           </div>
         </li>
 
         <li class="nav-header">${ _('Frequency') }</li>
-        <li>${ oozie_coordinator.frequency } ${ oozie_coordinator.timeUnit }</li>
+        <li class="white">${ oozie_coordinator.frequency } ${ oozie_coordinator.timeUnit }</li>
 
         <li class="nav-header">${ _('Next Materialized Time') }</li>
-        <li id="nextTime">${ utils.format_time(oozie_coordinator.nextMaterializedTime) }</li>
+        <li class="white" id="nextTime">${ utils.format_time(oozie_coordinator.nextMaterializedTime) }</li>
 
         <li class="nav-header">${ _('Id') }</li>
-        <li>${ oozie_coordinator.id }</li>
+        <li class="white">${ oozie_coordinator.id }</li>
 
         % if coordinator:
             <li class="nav-header">${ _('Datasets') }</li>
           % for dataset in coordinator.dataset_set.all():
-            <li rel="tooltip" title="${ dataset.name } : ${ dataset.uri }"><i class="icon-eye-open"></i> <span class="dataset">${ dataset.name }</span></li>
+            <li rel="tooltip" title="${ dataset.name } : ${ dataset.uri }" class="white"><i class="icon-eye-open"></i> <span class="dataset">${ dataset.name }</span></li>
           % endfor
         % endif
 
         % if has_job_edition_permission(oozie_coordinator, user):
           <li class="nav-header">${ _('Manage') }</li>
-          <li>
+          <li class="white">
             <button title="${_('Kill %(coordinator)s') % dict(coordinator=oozie_coordinator.id)}"
               id="kill-btn"
               class="btn btn-small confirmationModal
@@ -134,6 +124,13 @@ ${ layout.menubar(section='dashboard') }
     </div>
   </div>
   <div class="span10">
+    <h1 class="card-heading simple card-heading-nopadding card-heading-noborder card-heading-blue" style="margin-bottom: 10px">
+      % if oozie_bundle:
+        ${ _('Bundle') } <a href="${ oozie_bundle.get_absolute_url() }">${ oozie_bundle.appName }</a> :
+      % endif
+      ${ _('Coordinator') } ${ oozie_coordinator.appName }
+    </h1>
+
     <ul class="nav nav-tabs">
       <li class="active"><a href="#calendar" data-toggle="tab">${ _('Calendar') }</a></li>
       <li><a href="#actions" data-toggle="tab">${ _('Actions') }</a></li>
@@ -304,12 +301,9 @@ ${ layout.menubar(section='dashboard') }
 <link rel="stylesheet" href="/static/ext/css/codemirror.css">
 <script src="/static/ext/js/codemirror-xml.js"></script>
 
-<style>
+<style type="text/css">
   .CodeMirror.cm-s-default {
     height:500px;
-  }
-  .sidebar-nav {
-    padding: 9px 0;
   }
 </style>
 

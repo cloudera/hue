@@ -60,7 +60,7 @@ function edit_node_modal(modal, workflow, node, save, cancel, template) {
     })
   };
   modal.show(context);
-  modal.recenter(280, 250);
+  modal.recenter(280, 0);
   modal.addDecorations();
 
   var cancel_edit = cancel || function() {

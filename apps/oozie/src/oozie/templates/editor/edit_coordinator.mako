@@ -41,9 +41,6 @@ ${ layout.menubar(section='coordinators') }
   .help-block {
     color: #999999;
   }
-  .sidebar-nav {
-    padding: 9px 0;
-  }
 </style>
 
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
@@ -51,11 +48,9 @@ ${ layout.menubar(section='coordinators') }
 
 
 <div class="container-fluid">
-  <h1>${ _('Coordinator Editor : ') } ${ coordinator.name }</h1>
-
   <div class="row-fluid">
     <div class="span2">
-      <div class="well sidebar-nav">
+      <div class="sidebar-nav">
         <ul class="nav nav-list">
           <li class="nav-header">${ _('Properties') }</li>
           <li class="active"><a href="#properties"><i class="icon-reorder"></i> ${ _('Edit properties') }</a></li>
@@ -86,6 +81,8 @@ ${ layout.menubar(section='coordinators') }
       </div>
     </div>
     <div class="span10">
+      <div class="card" style="margin-top: 0">
+        <h1 class="card-heading simple">${ _('Coordinator Editor : ') } ${ coordinator.name }</h1>
       <form id="jobForm" class="form-horizontal" action="${ url('oozie:edit_coordinator', coordinator=coordinator.id) }" method="POST">
       <div id="properties" class="section">
         <ul class="nav nav-pills">
@@ -410,6 +407,7 @@ ${ layout.menubar(section='coordinators') }
 
       </form>
 
+    </div>
     </div>
 
   </div>

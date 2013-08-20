@@ -27,7 +27,7 @@ import re
 ${ commonheader(_('Server Logs'), "about", user, "100px") | n,unicode }
 ${layout.menubar(section='log_view')}
 
-<style>
+<style type="text/css">
   pre {
     margin: 0;
     padding: 2px;

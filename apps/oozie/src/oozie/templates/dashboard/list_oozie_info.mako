@@ -29,37 +29,25 @@ ${ layout.menubar(section='dashboard') }
 <div class="container-fluid">
   ${ layout.dashboard_sub_menubar(section='oozie') }
 
-  <h1>Oozie</h1>
-
-
-<div class="row-fluid">
-  <div class="span2">
-    <div class="well sidebar-nav">
-      <ul class="nav nav-list">
-        <li class="nav-header">${ _('Status') }</li>
-        <li>
-          <span class="label ${ utils.get_status(oozie_status['systemMode']) }">
-            ${ oozie_status['systemMode'] }
-          </span>
-        </li>
-      </ul>
-    </div>
+  <h1 class="card-heading card-heading-noborder simple pull-right" style="margin-top: -4px;">
+  ${ _('Oozie status') }
+  <div class="label ${ utils.get_status(oozie_status['systemMode']) }" style="line-height: 20px; vertical-align: middle">
+    ${ oozie_status['systemMode'] }
   </div>
-  <div class="span10">
-    <ul class="nav nav-tabs">
-      <li class="active"><a href="#instrumentation" data-toggle="tab">${ _('Instrumentation') }</a></li>
-      <li><a href="#configuration" data-toggle="tab">${ _('Configuration') }</a></li>
-    </ul>
+  </h1>
 
-    <div class="tab-content" style="padding-bottom:200px">
-      <div class="tab-pane active" id="instrumentation">
-        <div class="well hueWell">
-            <form class="form-search">
-                <input type="text" class="searchFilter input-xlarge search-query" placeholder="${_('Text Filter')}">
-            </form>
-        </div>
-       <div class="tabbable">
-          <ul class="nav nav-pills">
+  <ul class="nav nav-tabs">
+    <li class="active"><a href="#instrumentation" data-toggle="tab">${ _('Instrumentation') }</a></li>
+    <li><a href="#configuration" data-toggle="tab">${ _('Configuration') }</a></li>
+  </ul>
+
+  <div class="tab-content" style="padding-bottom:200px">
+    <div class="tab-pane active" id="instrumentation">
+      <form class="form-search">
+        <input type="text" class="searchFilter input-xlarge search-query" placeholder="${_('Text Filter')}">
+      </form>
+      <div class="tabbable">
+        <ul class="nav nav-pills">
             % for category in instrumentation.iterkeys():
             <li
             % if loop.first:
@@ -69,64 +57,62 @@ ${ layout.menubar(section='dashboard') }
               <a href="#${ category }" data-toggle="tab">${ category }</a>
             </li>
             % endfor
-          </ul>
+        </ul>
 
-         <div class="tab-content">
-          % for category in instrumentation.iterkeys():
+        <div class="tab-content">
+            % for category in instrumentation.iterkeys():
             <div class="tab-pane
               % if loop.first:
-                active
+              active
               % endif
             " id="${ category }">
 
               % for index, group in enumerate(instrumentation[category]):
-                  <p class="nav-header">${ group['group'] }</p>
-                    <table id="intrumentationTable-${ category }-${ index }" class="table table-striped table-condensed">
-                        <thead>
-                            <th> </th>
-                            <th> </th>
-                        </thead>
-                        <tbody>
-                          % for item in group['data']:
-                            <tr>
-                              <% name = item.pop('name') %>
-                              <td>${ name }</td>
-                              % if category == 'timers':
-                                <td>
-                                  % for label, timer in zip(['ownMinTime', 'ownTimeStdVar', 'totalTimeStdVar', 'ownTimeAvg', 'ticks', 'name', 'ownMaxTime', 'totalMinTime', 'totalMaxTime', 'totalTimeAvg'], item.values()):
-                                  ${ label } :
-                                  % if label == 'name':
-                                    ${ name } -
-                                  % endif
-                                  ${ timer }
-                                  % if not loop.last:
-                                    </br>
-                                  % endif
-                                  % endfor
-                                </td>
-                              % else:
-                                <td>${ ', '.join(map(str, item.values())) }</td>
-                              % endif
-                            </tr>
-                          % endfor
-                        </tbody>
-                    </table>
+                <p class="nav-header">${ group['group'] }</p>
+              <table id="intrumentationTable-${ category }-${ index }" class="table table-striped table-condensed">
+                <thead>
+                <th></th>
+                <th></th>
+                </thead>
+              <tbody>
+                % for item in group['data']:
+                <tr>
+                <% name = item.pop('name') %>
+                  <td>${ name }</td>
+                % if category == 'timers':
+                  <td>
+                    % for label, timer in zip(['ownMinTime', 'ownTimeStdVar', 'totalTimeStdVar', 'ownTimeAvg', 'ticks', 'name', 'ownMaxTime', 'totalMinTime', 'totalMaxTime', 'totalTimeAvg'], item.values()):
+                    ${ label } :
+                    % if label == 'name':
+                      ${ name } -
+                    % endif
+                    ${ timer }
+                    % if not loop.last:
+                        </br>
+                    % endif
+                    % endfor
+                  </td>
+                % else:
+                    <td>${ ', '.join(map(str, item.values())) }</td>
+                % endif
+                </tr>
+                % endfor
+              </tbody>
+              </table>
               % endfor
             </div>
-          % endfor
-         </div>
-       </div>
-
-      </div>
-
-      <div class="tab-pane" id="configuration">
-        <div class="well hueWell">
-            <form class="form-search">
-                ${_('Filter: ')}<input type="text" class="searchFilter input-xlarge search-query" placeholder="${_('Text Filter')}">
-            </form>
+            % endfor
         </div>
-        ${ utils.display_conf(configuration, "configurationTable") }
       </div>
+
+    </div>
+
+    <div class="tab-pane" id="configuration">
+      <form class="form-search">
+        <input type="text" class="searchFilter input-xlarge search-query" placeholder="${_('Text Filter')}">
+      </form>
+      ${ utils.display_conf(configuration, "configurationTable") }
+    </div>
 
 
     <div style="margin-bottom: 16px">
@@ -134,17 +120,9 @@ ${ layout.menubar(section='dashboard') }
     </div>
 
   </div>
-</div>
 
+  ${ layout.dashboard_end_sub_menubar() }
 
-
-</div>
-
-<style>
-  .sidebar-nav {
-    padding: 9px 0;
-  }
-</style>
 
 <script>
   $(document).ready(function(){

@@ -27,7 +27,7 @@ from django.utils.translation import ugettext as _
 ${ commonheader(_('Query Results'), app_name, user, '100px') | n,unicode }
 ${layout.menubar(section='query')}
 
-<style>
+<style type="text/css">
   #collapse {
     float: right;
     cursor: pointer;

@@ -163,7 +163,7 @@ ${ commonheader(_("%s : %s") % (view_or_table_noun, table.name), app_name, user)
 <div id="import-data-modal" class="modal hide fade"></div>
 </div>
 
-<style>
+<style type="text/css">
   .sampleTable td, .sampleTable th {
     white-space: nowrap;
   }

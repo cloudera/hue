@@ -135,7 +135,7 @@ ${ commonheader(_("Create database"), 'metastore', user) | n,unicode }
     </div>
 </div>
 
-<style>
+<style type="text/css">
   #filechooser {
     min-height: 100px;
     overflow-y: scroll;
