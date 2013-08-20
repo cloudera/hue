@@ -432,7 +432,7 @@ var SmartViewDataRow = function(options) {
       } else {
         self.displayRangeLength = self.items().length + displayRangeDelta;
         var validate = self.items().length;
-        API.queryTable('getRowPartial' , self.row, self.items().length, 100).done(function(data) {
+        API.queryTable('getRowPartial' , prepForTransport(self.row), self.items().length, 100).done(function(data) {
           if(self.items().length != validate) return false;
           var cols = data[0].columns;
           var keys = Object.keys(cols);
@@ -526,7 +526,7 @@ var ColumnRow = function(options) {
 
   self.reload = function(callback, skipPut) {
     self.isLoading(true);
-    API.queryTable('get', self.parent.row, self.name, 'null').done(function(data) {
+    API.queryTable('get', prepForTransport(self.parent.row), prepForTransport(self.name), 'null').done(function(data) {
       if(data.length > 0 && !skipPut)
         self.value(data[0].value);
       if(typeof callback !== "undefined" && callback != null)
@@ -538,7 +538,7 @@ var ColumnRow = function(options) {
   self.value.subscribe(function(value) {
     //change transport prep to object wrapper
     logGA('put_column');
-    API.queryTable('putColumn', self.parent.row, self.name, "hbase-post-key-" + JSON.stringify(value)).done(function(data) {
+    API.queryTable('putColumn', prepForTransport(self.parent.row), prepForTransport(self.name), "hbase-post-key-" + JSON.stringify(value)).done(function(data) {
       self.reload(function(){}, true);
     });
     self.editing(false);
@@ -830,9 +830,13 @@ var tagsearch = function() {
         self.replaceFocusNode(self.activeSuggestions()[self.activeSuggestion()]);
         self.activeSuggestion(-1);
         setTimeout(function() {
-          var s = self.cur_input();
-          var r = setCursor($('#search-tags')[0], s.lastIndexOf('(') + 1);
-          r.setEnd(r.endContainer, r.startOffset + (s.lastIndexOf(')') - s.lastIndexOf('(') - 1));
+          var s = self.cur_input(), r;
+          if(s.lastIndexOf('(') != -1 && s.lastIndexOf(')') != -1) {
+            r = setCursor($('#search-tags')[0], s.lastIndexOf('(') + 1);
+            r.setEnd(r.endContainer, r.startOffset + (s.lastIndexOf(')') - s.lastIndexOf('(') - 1));
+          } else {
+            r = setCursor($('#search-tags')[0], s.length);
+          }
           var sel = window.getSelection();
           sel.removeAllRanges();
           sel.addRange(r);
@@ -890,10 +894,12 @@ var tagsearch = function() {
         }
         function callback() {
           if(cancel()) return false;
-          API.queryTable('getAutocompleteRows', 10, prepForTransport(validate.trim())).done(function(data) {
-            if(cancel()) return false;
-            self.activeSuggestions(data);
-          });
+          if(validate.trim() != "") {
+            API.queryTable('getAutocompleteRows', 10, prepForTransport(validate.trim())).done(function(data) {
+              if(cancel()) return false;
+              self.activeSuggestions(data);
+            });
+          }
         }
         setTimeout(callback, 200);
         return;
@@ -939,7 +945,7 @@ var CellHistoryPage = function(options) {
   self.reload = function(timestamp, append) {
     if(!timestamp)
       timestamp = options.timestamp
-    API.queryTable("getVerTs", options.row, options.column, timestamp, 10, 'null').done(function(res) {
+    API.queryTable("getVerTs", prepForTransport(options.row), prepForTransport(options.column), timestamp, 10, 'null').done(function(res) {
       self.loading = ko.observable(true);
       if(!append)
         self.items(res);
