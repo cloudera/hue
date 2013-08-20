@@ -99,6 +99,9 @@ ${ commonheader(None, "hbase", user) | n,unicode }
   <!--[if !IE]><!--><i class="icon-spinner icon-spin loader-main"></i><!--<![endif]-->
   <!--[if IE]><img src="/hbase/static/art/loader.gif" /><![endif]-->
   </center>
+  <div class="alert" data-bind="visible: ${datasource}.items().length == 0 && !${datasource}.isLoading()">
+      ${_('No rows to display.')}
+  </div>
 </%def>
 
 <%def name="sortBtn(datasource)">
@@ -307,7 +310,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
     <script id="cell_edit_modal_template" type="text/html">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h3>Edit Cell - <span data-bind="text: content.name"></span> <code data-bind="text: mime"></code></h3>
+        <h3>Edit Cell - <span data-bind="text: content.name || formatTimestamp(content.timestamp)"></span> <code data-bind="text: mime"></code> <small><i class="icon-time"></i> <span data-bind="text: $data.content.timestamp"></span></small></h3>
       </div>
       <div class="modal-body container-fluid">
           <div class="row-fluid">
@@ -325,7 +328,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
               <ul class="nav nav-list well well-small">
                 <li class="nav-header">${_('Cell History:')}</li>
                 <!-- ko foreach: $data.content.history.items() -->
-                  <li><a data-bind="click: $parent.content.history.pickHistory.bind(null, $data), text: formatTimestamp($data.timestamp)"></a></li>
+                  <li data-bind="css: { 'active': $data.timestamp == $parent.content.timestamp }"><a data-bind="click: $parent.content.history.pickHistory.bind(null, $data), text: formatTimestamp($data.timestamp)"></a></li>
                 <!-- /ko -->
                 <li data-bind="visible: $data.content.history.loading()"><img src="/static/art/spinner.gif" /></li>
               </ul>
