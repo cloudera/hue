@@ -137,6 +137,7 @@ ul#hbase-breadcrumbs li a {
 
 .smartview ul.smartview-cells > li > div {
 	position: relative;
+	margin-bottom: 10px;
 	height: 100%;
 }
 
@@ -175,7 +176,7 @@ ul#hbase-breadcrumbs li a {
 
 .smartview ul.smartview-cells > li .timestamp {
 	position: absolute;
-	bottom:-2px;
+	bottom:-12px;
 	right:-2px;
 	display: none;
 }
@@ -506,7 +507,7 @@ ul#hbase-breadcrumbs li a {
 
 #cell_edit_modal {
 	width: 80%;
-	left: 10%;
+	left: 25%;
 	margin-left: 0px;
 	max-height:100%;
 	top: 10%;
