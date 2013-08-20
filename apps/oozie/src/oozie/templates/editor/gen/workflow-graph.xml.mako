@@ -49,7 +49,7 @@
     ${ print_graph(nodes, print_node) }
   </div>
 
-  <style>
+  <style type="text/css">
     .action2 {text-align: center;}
     .action {border-style:solid; border-width:1px; border-color:LightGrey; padding: 3px; margin:25px;}
     .action-link:hover {cursor: pointer;}

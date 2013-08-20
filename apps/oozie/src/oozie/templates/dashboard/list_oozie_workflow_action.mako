@@ -30,28 +30,17 @@ ${ layout.menubar(section='running') }
 <div class="container-fluid">
   ${ layout.dashboard_sub_menubar(section='workflows') }
 
-  <h1>
-    % if oozie_bundle:
-      ${ _('Bundle') } <a href="${ oozie_bundle.get_absolute_url() }">${ oozie_bundle.appName }</a> :
-    % endif
-    % if oozie_coordinator:
-      ${ _('Coordinator') } <a href="${ oozie_coordinator.get_absolute_url() }">${ oozie_coordinator.appName }</a> :
-    % endif
-    ${ _('Workflow') } <a href="${ workflow.get_absolute_url() }">${ workflow.appName }</a> :
-    ${ _('Action') } ${ action.name }
-  </h1>
-
  <div class="row-fluid">
     <div class="span2">
-      <div class="well sidebar-nav">
-        <ul class="nav nav-list">
+      <div class="sidebar-nav">
+        <ul class="nav nav-list" style="border:none">
           <li class="nav-header">${ _('Workflow') }</li>
           <li>
             <a title="${ _('Edit workflow') }" href="${ workflow.get_absolute_url() }">${ workflow.appName }</a>
           </li>
 
           <li class="nav-header">${ _('Name') }</li>
-          <li>${ action.name }</li>
+          <li class="white">${ action.name }</li>
 
           % if action.externalId:
             <li class="nav-header">${ _('External Id') }</li>
@@ -64,15 +53,25 @@ ${ layout.menubar(section='running') }
           % endif
 
           <li class="nav-header">${ _('Type') }</li>
-          <li>${ action.type }</li>
+          <li class="white">${ action.type }</li>
 
           <li class="nav-header">${ _('Status') }</li>
-          <li id="status"><span class="label ${ utils.get_status(action.status) }">${ action.status }</span></li>
+          <li class="white" id="status"><span class="label ${ utils.get_status(action.status) }">${ action.status }</span></li>
         </ul>
       </div>
     </div>
 
-    <div class="span9">
+    <div class="span10">
+       <h1 class="card-heading simple card-heading-nopadding card-heading-noborder card-heading-blue" style="margin-bottom: 10px">
+        % if oozie_bundle:
+          ${ _('Bundle') } <a href="${ oozie_bundle.get_absolute_url() }">${ oozie_bundle.appName }</a> :
+        % endif
+        % if oozie_coordinator:
+          ${ _('Coordinator') } <a href="${ oozie_coordinator.get_absolute_url() }">${ oozie_coordinator.appName }</a> :
+        % endif
+        ${ _('Workflow') } <a href="${ workflow.get_absolute_url() }">${ workflow.appName }</a> :
+        ${ _('Action') } ${ action.name }
+      </h1>
       <ul class="nav nav-tabs">
         <li class="active"><a href="#details" data-toggle="tab">${ _('Details') }</a></li>
         <li><a href="#configuration" data-toggle="tab">${ _('Configuration') }</a></li>

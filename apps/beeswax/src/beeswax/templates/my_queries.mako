@@ -29,7 +29,7 @@ from beeswax.views import collapse_whitespace
 ${ commonheader(_('My Queries'), app_name, user, '100px') | n,unicode }
 ${layout.menubar(section='my queries')}
 
-<style>
+<style type="text/css">
     .tab-content {
         overflow:visible!important;
     }

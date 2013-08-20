@@ -35,11 +35,9 @@ ${ layout.menubar(section='workflows') }
     <div class="ribbon">${ _('Unsaved') }</div>
   </div>
 
-  <h1 data-bind="text: '${ _('Workflow Editor : ') } ' + name()"></h1>
-
   <div class="row-fluid">
   <div class="span2">
-    <div id="workflowControls" class="well sidebar-nav">
+    <div id="workflowControls" class="sidebar-nav">
       <ul class="nav nav-list">
         <li class="nav-header">${ _('Editor') }</li>
         <li><a href="#editWorkflow"><i class="icon-code-fork"></i> ${ _('Workflow') }</a></li>
@@ -79,8 +77,11 @@ ${ layout.menubar(section='workflows') }
   </div>
   <div class="span10">
     <div id="properties" class="section hide">
-      <div class="alert alert-info"><h3>${ _('Properties') }</h3></div>
-      <fieldset>
+    <div class="card" style="padding-top:0;margin-top: 0">
+      <div class="alert alert-info"><h3 data-bind="text: name()"></h3></div>
+      <div class="card-body">
+        <p>
+            <fieldset>
         ${ utils.render_field(workflow_form['name'], extra_attrs={'data-bind': 'value: %s' % workflow_form['name'].name}) }
         ${ utils.render_field(workflow_form['description'], extra_attrs={'data-bind': 'value: %s' % workflow_form['description'].name}) }
         ${ utils.render_field(workflow_form['is_shared'], extra_attrs={'data-bind': 'checked: %s' % workflow_form['is_shared'].name}) }
@@ -118,30 +119,39 @@ ${ layout.menubar(section='workflows') }
       </div>
 
       </fieldset>
+        </p>
+      </div>
+        </div>
     </div>
 
     <div id="editKill" class="section hide">
+      <div class="card" style="padding-top:0; margin-top:0">
       <div class="alert alert-info">
         <h3>${ _('Kill node') }</h3>
         <p>${_('If the "to" field has content, then the workflow editor assumes that the defined email action is to be placed before the kill action.')}</p>
       </div>
-      <fieldset data-bind="with: context().node">
-        <p >&nbsp;${_('Action enabled: ')} <i class="icon-check" data-bind="visible: to().length > 0"></i><i class="icon-check-empty" data-bind="visible: to().length == 0"></i></p>
+      <div class="card-body">
+        <p>
+          <fieldset data-bind="with: context().node">
+            <p>&nbsp;${_('Action enabled: ')} <i class="icon-check" data-bind="visible: to().length > 0"></i><i class="icon-check-empty" data-bind="visible: to().length == 0"></i></p>
 
-        % for form_info in action_forms:
-          % if form_info[0] == 'email':
-            ${ actions.action_form_fields(action_form=form_info[1], node_type=form_info[0], show_primary=False) }
-          % endif
-        % endfor
-      </fieldset>
+            % for form_info in action_forms:
+              % if form_info[0] == 'email':
+                ${ actions.action_form_fields(action_form=form_info[1], node_type=form_info[0], show_primary=False) }
+              % endif
+            % endfor
+          </fieldset>
+        </p>
+      </div>
+      </div>
     </div>
 
     <div id="importAction" class="section hide">
-      <ul class="nav nav-tabs">
+      <ul class="nav nav-tabs" style="margin-bottom: 0">
         <li class="active"><a href="#importJobsub" data-toggle="tab">${ _('Job Designer') }</a></li>
         <li><a href="#importOozie" data-toggle="tab">${ _('Oozie') }</a></li>
       </ul>
-
+      <div class="card" style="margin-top: 0">
       <div class="tab-content">
         <div class="tab-pane active" id="importJobsub" data-bind="with: jobsub">
           <div class="alert alert-info">
@@ -196,6 +206,7 @@ ${ layout.menubar(section='workflows') }
           </table>
         </div>
       </div>
+      </div>
     </div>
 
     <div id="importOozieAction" class="section hide" data-bind="if: selected_workflow()">
@@ -227,10 +238,11 @@ ${ layout.menubar(section='workflows') }
     </div>
 
     <div id="editWorkflow" class="section hide">
-
-      <div class="alert alert-info"><h3>${ _('Editor') }</h3></div>
-
-      <div id="actionToolbar" class="well">
+      <div class="card" style="padding-top:0; margin-top:0">
+      <div class="alert alert-info"><h3 data-bind="text: name()"></h3></div>
+      <div class="card-body">
+        <p>
+      <div id="actionToolbar">
         <div class="draggable-button">
           <a data-node-type="mapreduce"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
@@ -318,33 +330,42 @@ ${ layout.menubar(section='workflows') }
       <div id="graph" class="row-fluid" data-bind="template: { name: function(item) { return item.view_template() }, foreach: nodes }"></div>
       <div id="new-node" class="row-fluid" data-bind="template: { name: 'nodeTemplate', 'if': new_node, data: new_node }"></div>
 
+      </p>
+    </div>
+    </div>
     </div>
 
     <div id="listHistory" class="section hide">
-      <div class="alert alert-info"><h3>${ _('History') }</h3></div>
-      % if not history:
-        ${ _('N/A') }
-      % else:
-        <table class="table">
-          <thead>
-          <tr>
-            <th>${ _('Date') }</th>
-            <th>${ _('Id') }</th>
-          </tr>
-          </thead>
-          <tbody>
-          % for record in history:
-          <tr>
-            <td>
-              <a href="${ url('oozie:list_history_record', record_id=record.id) }" data-row-selector="true"></a>
-              ${ utils.format_date(record.submission_date) }
-            </td>
-            <td>${ record.oozie_job_id }</td>
-          </tr>
-          % endfor
-          </tbody>
-        </table>
-      % endif
+      <div class="card" style="padding-top:0; margin-top:0">
+        <div class="alert alert-info"><h3>${ _('History') }</h3></div>
+        <div class="card-body">
+          <p>
+            % if not history:
+              ${ _('N/A') }
+            % else:
+              <table class="table">
+                <thead>
+                <tr>
+                  <th>${ _('Date') }</th>
+                  <th>${ _('Id') }</th>
+                </tr>
+                </thead>
+                <tbody>
+                % for record in history:
+                <tr>
+                  <td>
+                    <a href="${ url('oozie:list_history_record', record_id=record.id) }" data-row-selector="true"></a>
+                    ${ utils.format_date(record.submission_date) }
+                  </td>
+                  <td>${ record.oozie_job_id }</td>
+                </tr>
+                % endfor
+                </tbody>
+              </table>
+            % endif
+          </p>
+        </div>
+      </div>
     </div>
 
 
@@ -884,7 +905,7 @@ window.onbeforeunload = function (e) {
 
 window.onresize = function () {
   if (modal) {
-    modal.recenter(280, 250);
+    modal.recenter(280, 0);
   }
 };
 

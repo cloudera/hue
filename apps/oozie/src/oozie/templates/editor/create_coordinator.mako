@@ -1,4 +1,4 @@
-s## Licensed to Cloudera, Inc. under one
+## Licensed to Cloudera, Inc. under one
 ## or more contributor license agreements.  See the NOTICE file
 ## distributed with this work for additional information
 ## regarding copyright ownership.  Cloudera, Inc. licenses this file
@@ -36,21 +36,15 @@ ${ layout.menubar(section='coordinators') }
   .help-block {
     color: #999999;
   }
-  .sidebar-nav {
-    padding: 9px 0;
-  }
-
 </style>
 
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/routie-0.3.0.min.js" type="text/javascript" charset="utf-8"></script>
 
 <div class="container-fluid">
-  <h1>${ _('Coordinator Editor') } ${ coordinator.name }</h1>
-
   <div class="row-fluid">
     <div class="span2">
-      <div class="well sidebar-nav">
+      <div class="sidebar-nav">
         <ul class="nav nav-list" style="min-height: 150px">
           <li class="nav-header">${ _('Properties') }</li>
           <li class="active"><a href="#">${ _('Edit properties') }</a></li>
@@ -58,6 +52,8 @@ ${ layout.menubar(section='coordinators') }
         </div>
     </div>
     <div class="span10">
+      <div class="card" style="margin-top:0">
+        <h1 class="card-heading simple">${ _('Coordinator Editor') } ${ coordinator.name }</h1>
       <ul class="nav nav-pills">
         <li class="active"><a href="#step1" class="step">${ _('Step 1: Details') }</a></li>
         <li><a href="#step2" class="step">${ _('Step 2: Frequency') }</a></li>
@@ -118,6 +114,7 @@ ${ layout.menubar(section='coordinators') }
         </div>
 
       </form>
+    </div>
     </div>
 
   </div>

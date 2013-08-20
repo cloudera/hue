@@ -1277,6 +1277,14 @@ a#advanced-btn:hover {
   color: #338BB8!important;
 }
 
+.card-heading-nopadding {
+  padding-left: 0!important;
+}
+
+.card-heading-noborder {
+  border-bottom: none!important;
+}
+
 .dt-records {
   margin-left: 10px;
 }
@@ -1301,4 +1309,13 @@ a#advanced-btn:hover {
   padding: 9px 18px;
   text-shadow: none;
   transition: border 0.218s ease 0s;
+}
+
+.input-append.date .add-on i, .input-prepend.date .add-on i {
+    line-height: 28px;
+}
+
+.modal {
+  padding: 25px 20px!important;
+  margin-left: -290px!important;
 }

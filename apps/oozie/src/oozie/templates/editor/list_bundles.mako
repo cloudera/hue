@@ -34,7 +34,8 @@ ${ layout.menubar(section='bundles') }
 </style>
 
 <div class="container-fluid">
-  <h1>${ _('Bundle Manager') }</h1>
+  <div class="card">
+  <h1 class="card-heading simple">${ _('Bundle Manager') }</h1>
 
   <%actionbar:render>
     <%def name="search()">
@@ -115,6 +116,7 @@ ${ layout.menubar(section='bundles') }
       %endfor
     </tbody>
   </table>
+</div>
 </div>
 
 
@@ -249,7 +251,7 @@ ${ layout.menubar(section='bundles') }
       "sPaginationType":"bootstrap",
       'iDisplayLength':50,
       "bLengthChange":false,
-      "sDom":"<'row'r>t<'row'<'span8'i><''p>>",
+      "sDom": "<'row'r>t<'row-fluid'<'dt-pages'p><'dt-records'i>>",
       "aoColumns":[
         { "bSortable":false },
         null,

@@ -28,21 +28,20 @@ ${ layout.menubar(section='bundles') }
 
 
 <div class="container-fluid">
-  <h1>${ _('Create Bundle') }</h1>
-
-    <div class="well">
-      <br/>
-    </div>
-
-    <div style="min-height:300px">
-      <form class="form-horizontal" id="bundleForm" action="${ url('oozie:create_bundle') }" method="POST">
-
-      <div class="row-fluid">
-        <div class="span2">
+  <form class="form-horizontal" id="bundleForm" action="${ url('oozie:create_bundle') }" method="POST">
+    <div class="row-fluid">
+      <div class="span2">
+        <div class="sidebar-nav">
+          <ul class="nav nav-list">
+            <li class="nav-header">${ _('Properties') }</li>
+            <li class="active"><a href="#properties"><i class="icon-reorder"></i> ${ _('Edit properties') }</a></li>
+          </ul>
         </div>
-        <div class="span8">
-          <h2>${ _('Properties') }</h2>
-          <br/>
+      </div>
+      <div class="span10">
+        <div class="card" style="margin-top: 0">
+          <h1 class="card-heading simple">${ _('Create Bundle') }</h1>
+          <div class="alert alert-info"><h3>${ _('Bundle data') }</h3></div>
           <fieldset>
             ${ utils.render_field(bundle_form['name']) }
             ${ utils.render_field(bundle_form['description']) }
@@ -51,18 +50,15 @@ ${ layout.menubar(section='bundles') }
 
             ${ bundle_form['schema_version'] | n,unicode }
             ${ bundle_form['parameters'] | n,unicode }
-         </fieldset>
-
-        <div class="span2"></div>
+          </fieldset>
+          <div class="form-actions">
+            <input class="btn btn-primary" type="submit" value="${ _('Save') }" />
+            <a class="btn" onclick="history.back()">${ _('Back') }</a>
+          </div>
         </div>
       </div>
-
-      <div class="form-actions center">
-        <input class="btn btn-primary" type="submit" value="${ _('Save') }" />
-        <a class="btn" onclick="history.back()">${ _('Back') }</a>
-      </div>
-      </form>
     </div>
+  </form>
 </div>
 
 ${ utils.decorate_datetime_fields() }

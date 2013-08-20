@@ -383,7 +383,7 @@ ${layout.menubar(section='query')}
 <link href="/static/ext/css/bootstrap-editable.css" rel="stylesheet">
 <script src="/static/ext/js/bootstrap-editable.min.js"></script>
 
-<style>
+<style type="text/css">
   h1 {
     margin-bottom: 5px;
   }

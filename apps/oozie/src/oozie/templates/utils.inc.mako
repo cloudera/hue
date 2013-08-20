@@ -366,7 +366,7 @@
   <link rel="stylesheet" href="/static/ext/css/bootstrap-datepicker.min.css" type="text/css" media="screen" title="no title" charset="utf-8" />
   <link rel="stylesheet" href="/static/ext/css/bootstrap-timepicker.min.css" type="text/css" media="screen" title="no title" charset="utf-8" />
 
-  <style>
+  <style type="text/css">
     .datepicker {
       z-index: 4999;
     }

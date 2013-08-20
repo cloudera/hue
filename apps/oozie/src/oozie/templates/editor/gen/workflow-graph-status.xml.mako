@@ -92,7 +92,7 @@
 
 ${ graph.display_graph(nodes, print_status_node) }
 
-<style>
+<style type="text/css">
   .node-text-failed {color:white; font-weight:bold;};
   .node-text-pass {color:black; font-weight:bold;};
 </style>
