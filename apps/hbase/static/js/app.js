@@ -66,7 +66,7 @@ var AppViewModel = function() {
                 callback: function(data){},
                 columns: getColumnFamilies()
               }, options);
-              API.queryTable("getRow", JSON.stringify(options.columns), self.row).done(function(data) {
+              API.queryTable("getRow", JSON.stringify(options.columns), prepForTransport(self.row)).done(function(data) {
                 self.setItems(data.columns);
                 callback(data);
                 self.isLoading(false);
