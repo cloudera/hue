@@ -32,6 +32,7 @@ ul.major-list li {
   border: 1px solid #E3E3E3;
   height: 60px;
   margin-bottom: 10px;
+  background-color: #FFFFFF;
 }
 
 ul.major-list li div.main {
@@ -78,6 +79,7 @@ h1.emptyMessage {
   padding: 10px 20px;
   text-align: left;
   height: 30px;
+  margin-top: 10px;
 }
 
 .top-bar h4 {
@@ -96,7 +98,6 @@ h1.emptyMessage {
 }
 
 .job-form {
-  margin-bottom: 80px;
   min-height: 300px;
 }
 
@@ -127,4 +128,8 @@ h1.emptyMessage {
 
 .big-btn i{
   font-size: 40px;
+}
+
+.nojobs {
+  cursor: pointer;
 }

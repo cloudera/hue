@@ -91,16 +91,18 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
           </li>
           <!-- /ko -->
         </ul>
-
-        <div class="span10 offset1 center" data-bind="if: filteredJobs().length == 0">
-          <i class="icon-plus-sign waiting"></i>
-          <h1 class="emptyMessage">${ _('There are currently no jobs.') }<br/>${ _('Please click on New Job to add one.') }</h1>
+        <div class="card" data-bind="visible: filteredJobs().length == 0">
+          <div class="span10 offset1 center nojobs">
+            <i class="icon-plus-sign waiting"></i>
+            <h1 class="emptyMessage">${ _('There are currently no jobs.') }<br/><a href="#job/new">${ _('Click here to add one.') }</a></h1>
+          </div>
+          <div class="clearfix"></div>
         </div>
       </div>
     </div>
 
     <div id="job-editor" class="row-fluid section hide" data-bind="with: job">
-      <div class="well sidebar-nav span2" data-bind="visible: $root.job().persisted">
+      <div class="sidebar-nav span2" data-bind="visible: $root.job().persisted">
         <form id="advanced-settings" method="POST" class="form form-horizontal noPadding">
           <ul class="nav nav-list">
             <li class="nav-header" data-bind="visible: $root.job().persisted">${_('Actions')}</li>
@@ -141,7 +143,7 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
                 ${_('Logs')}
               </a>
             </li>
-            <li class="nav-header" data-bind="visible: $root.job().persisted">${_('Last status')}</li>
+            <li class="nav-header" data-bind="visible: $root.job().persisted && $.inArray(submission().status(), ['BOOTING', 'RUNNING', 'UNKNOWN', 'SUCCEEDED', 'FAILURE_ON_SUBMIT', 'FAILED']) > -1">${_('Last status')}</li>
             <li data-bind="visible: $root.job().persisted">
               <span class="label label-success" data-bind="visible: submission().status() == 'SUCCEEDED'">
                 <span data-bind="text:  submission().createdFormatted()"></span>
@@ -163,6 +165,7 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
       </div>
 
       <div id="job-forms" data-bind="css: {span10: $root.job().persisted, span12: !$root.job().persisted}">
+        <div class="card">
         <!-- ko if: $root.jobWizard.page -->
           <!-- ko with: $root.jobWizard -->
           <ul class="nav nav-pills" data-bind="foreach: pages">
@@ -193,6 +196,7 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
           </form>
           <!-- /ko -->
         <!-- /ko -->
+          </div>
       </div>
     </div>
 
@@ -1081,6 +1085,10 @@ $(document).ready(function () {
         routie('job/edit');
       });
     }
+  });
+
+  $(".nojobs").on("click", function(){
+    routie("job/new");
   });
 
   $("*[rel=tooltip]").tooltip({
