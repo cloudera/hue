@@ -507,8 +507,6 @@ ul#hbase-breadcrumbs li a {
 }
 
 #cell_edit_modal {
-	width: 80%;
-	left: 25%;
 	margin-left: 0px;
 	max-height:100%;
 	top: 10%;

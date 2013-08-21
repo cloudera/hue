@@ -117,8 +117,9 @@ ${ commonheader(None, "hbase", user) | n,unicode }
 </%def>
 
 <div class="container-fluid">
+  <div class="card">
   <!-- Page Header -->
-  <h1>
+  <h1 class="card-heading simple">
     <a href="/hbase/">HBase Browser</a> - <a data-bind="text: app.cluster(), attr: { href: '#' + app.cluster() }"></a>
     <span data-bind="visible: app.station() == 'table'">/ <a data-bind="text: app.views.tabledata.name(), attr: { href: '#' + app.cluster() + '/' + app.views.tabledata.name()}"></a></span>
     <span class="pull-right">
@@ -134,12 +135,15 @@ ${ commonheader(None, "hbase", user) | n,unicode }
     </span>
   </h1>
 
+  <div class="card-body">
+    <p>
+
   <!-- Application Pages -->
   <div id="main"></div>
 
   <div id="hbase-page-clusterview" class="hbase-page"> <!-- maybe turn these into script tags, then populate them into #main and then rerender + apply bindings to old viemodels to have modular viewmodels? -->
     <div class="actionbar">
-      <div class="well well-small">
+      <div style="padding-bottom: 20px">
         <input type="text" class="input-large search-query" placeholder="${_('Search for Table Name')}" data-bind="value: views.tables.searchQuery, valueUpdate: 'afterkeydown'">
         % if user.is_superuser:
           <span class="btn-group">
@@ -315,7 +319,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
       </div>
       <div class="modal-body container-fluid">
           <div class="row-fluid">
-            <div class="span10 controls">
+            <div class="span9 controls">
               <!-- ko if: !$data.readonly -->
               <input type="hidden" data-bind="value: app.cluster"/>
               <input type="hidden" data-bind="value: app.views.tabledata.name"/>
@@ -325,8 +329,8 @@ ${ commonheader(None, "hbase", user) | n,unicode }
               <!-- ko template: {name: 'cell_'+mime.split('/')[0].toLowerCase()+'_template'} -->
               <!-- /ko -->
             </div>
-            <div class="span2">
-              <ul class="nav nav-list well well-small">
+            <div class="span3">
+              <ul class="nav nav-list">
                 <li class="nav-header">${_('Cell History:')}</li>
                 <!-- ko foreach: $data.content.history.items() -->
                   <li data-bind="css: { 'active': $data.timestamp == $parent.content.timestamp }"><a data-bind="click: $parent.content.history.pickHistory.bind(null, $data), text: formatTimestamp($data.timestamp)"></a></li>
@@ -375,8 +379,12 @@ ${ commonheader(None, "hbase", user) | n,unicode }
       <button class="confirm-submit btn btn-danger" data-dismiss="modal">${_('Confirm')}</button>
     </div>
   </script>
-</div>
+  </p>
+  </div>
 
+</div><!-- card -->
+
+</div>
 
 <script type="text/javascript">
 var i18n_cache = {
