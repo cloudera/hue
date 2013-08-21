@@ -29,7 +29,6 @@ ${layout.menubar(section='query')}
 <!-- <meta http-equiv="refresh" content="3;${url(app_name + ':watch_query', query.id)}?${fwd_params}" /> -->
 
 <div class="container-fluid">
-    <h1>${_('Waiting for query...')} ${util.render_query_context(query_context)}</h1>
     <div class="row-fluid">
         <div class="span3">
             % if app_name == 'impala':
@@ -41,7 +40,7 @@ ${layout.menubar(section='query')}
                 </div>
               </li>
             % endif
-            <div class="well sidebar-nav
+            <div class="sidebar-nav
                 % if app_name == 'impala':
                   hide
                 % endif
@@ -58,25 +57,32 @@ ${layout.menubar(section='query')}
                         % endfor
                     % else:
                         <li id="jobsHeader" class="nav-header">${mr_jobs}</li>
-                        <li class="jobLink">${_('No Hadoop jobs were launched in running this query.')}</li>
+                        <li class="white jobLink">${_('No Hadoop jobs were launched in running this query.')}</li>
                     % endif
                 </ul>
             </div>
         </div>
         <div class="span9">
-            <ul class="nav nav-tabs">
-                <li class="active"><a href="#log" data-toggle="tab">${_('Log')}</a></li>
-                <li><a href="#query" data-toggle="tab">${_('Query')}</a></li>
-            </ul>
+          <div class="card" style="margin-top: 0">
+            <h1 class="card-heading simple">${_('Waiting for query...')} ${util.render_query_context(query_context)}</h1>
+            <div class="card-body">
+              <p>
+                <ul class="nav nav-tabs">
+                    <li class="active"><a href="#log" data-toggle="tab">${_('Log')}</a></li>
+                    <li><a href="#query" data-toggle="tab">${_('Query')}</a></li>
+                </ul>
 
-               <div class="tab-content">
-                <div class="active tab-pane" id="log">
-                    <pre>${ force_unicode(log) }</pre>
+                <div class="tab-content">
+                    <div class="active tab-pane" id="log">
+                        <pre>${ force_unicode(log) }</pre>
+                    </div>
+                    <div class="tab-pane" id="query">
+                        <pre>${ query.get_current_statement() }</pre>
+                    </div>
                 </div>
-                <div class="tab-pane" id="query">
-                    <pre>${ query.get_current_statement() }</pre>
-                </div>
+              </p>
             </div>
+          </div>
         </div>
     </div>
 </div>

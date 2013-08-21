@@ -24,10 +24,9 @@ ${ commonheader(_('Create table from file'), 'metastore', user) | n,unicode }
 
 
 <div class="container-fluid">
-    <h1>${_('Create a new table from a file')}</h1>
     <div class="row-fluid">
         <div class="span3">
-            <div class="well sidebar-nav">
+            <div class="sidebar-nav">
                 <ul class="nav nav-list">
                     <li class="nav-header">${_('Actions')}</li>
                     <li><a href="${ url(app_name + ':import_wizard', database=database)}">${_('Create a new table from a file')}</a></li>
@@ -36,12 +35,16 @@ ${ commonheader(_('Create table from file'), 'metastore', user) | n,unicode }
             </div>
         </div>
         <div class="span9">
-            <ul class="nav nav-pills">
+          <div class="card" style="margin-top: 0">
+            <h1 class="card-heading simple">${_('Create a new table from a file')}</h1>
+            <div class="card-body">
+              <p>
+                <ul class="nav nav-pills">
                 <li class="active"><a href="${ url(app_name + ':import_wizard', database=database) }">${_('Step 1: Choose File')}</a></li>
                 <li><a id="step2" href="#">${_('Step 2: Choose Delimiter')}</a></li>
                 <li><a href="#">${_('Step 3: Define Columns')}</a></li>
             </ul>
-            <form action="${action}" method="POST" class="form-horizontal">
+                <form action="${action}" method="POST" class="form-horizontal">
                 <fieldset>
                     <div class="alert alert-info"><h3>${_('Name Your Table and Choose A File')}</h3></div>
                     <div class="control-group">
@@ -96,10 +99,13 @@ ${ commonheader(_('Create table from file'), 'metastore', user) | n,unicode }
                         </div>
                     </div>
                 </fieldset>
-                <div class="form-actions">
+                <div class="form-actions" style="padding-left: 10px">
                     <input type="submit" class="btn btn-primary" name="submit_file" value="${_('Next')}" />
                 </div>
             </form>
+              </p>
+            </div>
+          </div>
         </div>
     </div>
 </div>

@@ -36,47 +36,48 @@ ${layout.menubar(section='my queries')}
 </style>
 
 <div class="container-fluid">
-  <h1>${_('My Queries')}</h1>
+  <div class="card">
+    <h1 class="card-heading simple">${_('My Queries')}</h1>
 
-  <%actionbar:render>
-    <%def name="search()">
-      <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for query')}">
-    </%def>
+    <%actionbar:render>
+      <%def name="search()">
+        <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for query')}">
+      </%def>
 
-    <%def name="actions()">
-      <div class="btn-toolbar" style="display: inline; vertical-align: middle">
-        <button id="viewBtn" class="btn toolbarBtn" title="${_('View the result of the selected')}" disabled="disabled"><i class="icon-eye-open"></i> ${_('View result')}</button>
-        <button id="editBtn" class="btn toolbarBtn" title="${_('Edit the selected query')}" disabled="disabled"><i class="icon-edit"></i> ${_('Edit')}</button>
-        <button id="cloneBtn" class="btn toolbarBtn" title="${_('Copy the selected query')}" disabled="disabled"><i class="icon-copy"></i> ${_('Copy')}</button>
-        <button id="historyBtn" class="btn toolbarBtn" title="${_('View the usage history of the selected query')}" disabled="disabled"><i class="icon-tasks"></i> ${_('Usage history')}</button>
-        <div id="delete-dropdown" class="btn-group" style="vertical-align: middle">
-          <button id="trashQueryBtn" class="btn toolbarBtn" disabled="disabled"><i class="icon-remove"></i> ${_('Move to trash')}</button>
-          <button id="trashQueryCaretBtn" class="btn toolbarBtn dropdown-toggle" data-toggle="dropdown" disabled="disabled">
-            <span class="caret"></span>
-          </button>
-          <ul class="dropdown-menu">
-            <li><a href="#" id="deleteQueryBtn" title="${_('Delete forever')}"><i class="icon-bolt"></i> ${_('Delete forever')}</a></li>
-          </ul>
+      <%def name="actions()">
+        <div class="btn-toolbar" style="display: inline; vertical-align: middle">
+          <button id="viewBtn" class="btn toolbarBtn" title="${_('View the result of the selected')}" disabled="disabled"><i class="icon-eye-open"></i> ${_('View result')}</button>
+          <button id="editBtn" class="btn toolbarBtn" title="${_('Edit the selected query')}" disabled="disabled"><i class="icon-edit"></i> ${_('Edit')}</button>
+          <button id="cloneBtn" class="btn toolbarBtn" title="${_('Copy the selected query')}" disabled="disabled"><i class="icon-copy"></i> ${_('Copy')}</button>
+          <button id="historyBtn" class="btn toolbarBtn" title="${_('View the usage history of the selected query')}" disabled="disabled"><i class="icon-tasks"></i> ${_('Usage history')}</button>
+          <div id="delete-dropdown" class="btn-group" style="vertical-align: middle">
+            <button id="trashQueryBtn" class="btn toolbarBtn" disabled="disabled"><i class="icon-remove"></i> ${_('Move to trash')}</button>
+            <button id="trashQueryCaretBtn" class="btn toolbarBtn dropdown-toggle" data-toggle="dropdown" disabled="disabled">
+              <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+              <li><a href="#" id="deleteQueryBtn" title="${_('Delete forever')}"><i class="icon-bolt"></i> ${_('Delete forever')}</a></li>
+            </ul>
+          </div>
         </div>
-      </div>
-    </%def>
+      </%def>
 
-    <%def name="creation()">
-      <div class="btn-toolbar" style="display: inline; vertical-align: middle">
-        <a class="btn" href="${ url(app_name + ':list_trashed_designs') }" title="${_('Go to the trash')}"><i class="icon-trash"></i> ${_('View trash')}</a>
-        <a class="btn" href="${ url(app_name + ':execute_query') }" title="${_('Create new query')}"><i class="icon-plus-sign"></i> ${_('New query')}</a>
-      </div>
-    </%def>
-  </%actionbar:render>
+      <%def name="creation()">
+        <div class="btn-toolbar" style="display: inline; vertical-align: middle">
+          <a class="btn" href="${ url(app_name + ':list_trashed_designs') }" title="${_('Go to the trash')}"><i class="icon-trash"></i> ${_('View trash')}</a>
+          <a class="btn" href="${ url(app_name + ':execute_query') }" title="${_('Create new query')}"><i class="icon-plus-sign"></i> ${_('New query')}</a>
+        </div>
+      </%def>
+    </%actionbar:render>
 
-  <ul class="nav nav-tabs">
+    <ul class="nav nav-tabs">
     <li class="active"><a href="#recentSavedQueries" data-toggle="tab">${_('Recent Saved Queries')} &nbsp;<span id="recentSavedQueriesFilterCnt" class="badge badge-info"></span></a></li>
     <li><a href="#recentRunQueries" data-toggle="tab">${_('Recent Run Queries')}  &nbsp;<span id="recentRunQueriesFilterCnt" class="badge badge-info"></span></a></li>
   </ul>
 
-  <div class="tab-content">
+    <div class="tab-content">
     <div class="active tab-pane" id="recentSavedQueries">
-      <table id="recentSavedQueriesTable" class="table table-striped table-condensed datatables">
+      <table id="recentSavedQueriesTable" class="table table-condensed datatables">
         <thead>
           <tr>
             <th width="1%"><div class="hueCheckbox selectAll" data-selectables="savedCheck"></div></th>
@@ -157,6 +158,7 @@ ${layout.menubar(section='my queries')}
         <a href="${ url(app_name + ':list_query_history') }">${_('View my entire query history')} &raquo;</a>
       % endif
     </div>
+  </div>
   </div>
 </div>
 

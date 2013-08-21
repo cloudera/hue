@@ -24,10 +24,9 @@ from django.utils.translation import ugettext as _
 ${ commonheader(_('Create table from file'), 'metastore', user) | n,unicode }
 
 <div class="container-fluid">
-    <h1>${_('Create a new table from a file')}</h1>
     <div class="row-fluid">
         <div class="span3">
-            <div class="well sidebar-nav">
+            <div class="sidebar-nav">
                 <ul class="nav nav-list">
                     <li class="nav-header">${_('Actions')}</li>
                     <li><a href="${ url(app_name + ':import_wizard', database=database)}">${_('Create a new table from a file')}</a></li>
@@ -36,12 +35,16 @@ ${ commonheader(_('Create table from file'), 'metastore', user) | n,unicode }
             </div>
         </div>
         <div class="span9">
-            <ul class="nav nav-pills">
+          <div class="card" style="margin-top: 0">
+            <h1 class="card-heading simple">${_('Create a new table from a file')}</h1>
+            <div class="card-body">
+              <p>
+                <ul class="nav nav-pills">
                 <li><a id="step1" href="#">${_('Step 1: Choose File')}</a></li>
                 <li><a id="step2" href="#">${_('Step 2: Choose Delimiter')}</a></li>
                 <li class="active"><a href="#">${_('Step 3: Define Columns')}</a></li>
             </ul>
-            <form action="${action}" method="POST" class="form-stacked">
+                <form action="${action}" method="POST" class="form-stacked">
                 <div class="hide">
                     ${util.render_form(file_form)}
                     ${util.render_form(delim_form)}
@@ -91,11 +94,14 @@ ${ commonheader(_('Create table from file'), 'metastore', user) | n,unicode }
                         </div>
                     </div>
                 </fieldset>
-                <div class="form-actions">
+                <div class="form-actions" style="padding-left: 10px">
                     <input class="btn" type="submit" name="cancel_create" value="${_('Previous')}" />
                     <input class="btn btn-primary" type="submit" name="submit_create" value="${_('Create Table')}" />
                 </div>
             </form>
+              </p>
+            </div>
+          </div>
         </div>
     </div>
 </div>
@@ -114,7 +120,7 @@ ${ commonheader(_('Create table from file'), 'metastore', user) | n,unicode }
                   <input type="text" class="span8" style="padding-right: 24px;" placeholder="${ _('e.g. id, name, salary') }">
                 </div>
                 <div class="editable-buttons">
-                  <button type="button" class="btn btn-primary editable-submit"><i class="icon-ok icon-white"></i></button>
+                  <button type="button" class="btn btn-primary editable-submit"><i class="icon-ok"></i></button>
                   <button type="button" class="btn editable-cancel"><i class="icon-remove"></i></button>
                 </div>
               </div>
@@ -143,7 +149,7 @@ ${ commonheader(_('Create table from file'), 'metastore', user) | n,unicode }
   $(document).ready(function () {
     $("[rel='tooltip']").tooltip();
 
-    $(".scrollable").width($(".form-actions").width());
+    $(".scrollable").width($(".form-actions").width() - 10);
 
     $("#step1").click(function (e) {
       e.preventDefault();
