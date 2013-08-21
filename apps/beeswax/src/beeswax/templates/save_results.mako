@@ -33,41 +33,46 @@ ${layout.menubar(section='query')}
 % if error_msg:
   <h4>${error_msg}</h4>
 % endif
-  <h1>${_('Save Query Results')}</h1>
-
-  <form id="saveForm" action="${action}" method="POST" class="form form-inline">
-    <fieldset>
-      <div class="control-group">
-        <div class="controls">
-          <label class="radio">
-            <input id="id_save_target_0" type="radio" name="save_target" value="${ form.SAVE_TYPE_TBL }" data-bind="checked: toWhere"/>
-            &nbsp;${ _('In a new table') }
-          </label>
-          <span data-bind="visible: toWhere() == 'to a new table'">
-            ${ comps.field(form['target_table'], notitle=True, placeholder='Table Name') }
-          </span>
-        </div>
-      </div>
-      <div class="control-group">
-        <div class="controls">
-          <label class="radio">
-            <input id="id_save_target_1" type="radio" name="save_target" value="${ form.SAVE_TYPE_DIR }" data-bind="checked: toWhere">
-            &nbsp;${ _('In an HDFS directory') }
-          </label>
-          <span data-bind="visible: toWhere() == 'to HDFS directory'">
-            ${ comps.field(form['target_dir'], notitle=True, placeholder=_('Results location'), klass='pathChooser') }
-          </span>
-        </div>
-      </div>
-      <div id="fileChooserModal" class="smallModal well hide">
-        <a href="#" class="close" data-dismiss="modal">&times;</a>
-      </div>
-    </fieldset>
-    <div class="form-actions">
-      <input type="submit" name="save" value="${_('Save')}" class="btn btn-primary"/>
-      <input type="submit" name="cancel" value="${_('Cancel')}" class="btn"/>
+  <div class="card">
+    <h1 class="card-heading simple">${_('Save Query Results')}</h1>
+    <div class="card-body">
+      <p>
+        <form id="saveForm" action="${action}" method="POST" class="form form-inline">
+          <fieldset>
+            <div class="control-group">
+              <div class="controls">
+                <label class="radio">
+                  <input id="id_save_target_0" type="radio" name="save_target" value="${ form.SAVE_TYPE_TBL }" data-bind="checked: toWhere"/>
+                  &nbsp;${ _('In a new table') }
+                </label>
+                <span data-bind="visible: toWhere() == 'to a new table'">
+                  ${ comps.field(form['target_table'], notitle=True, placeholder='Table Name') }
+                </span>
+              </div>
+            </div>
+            <div class="control-group">
+              <div class="controls">
+                <label class="radio">
+                  <input id="id_save_target_1" type="radio" name="save_target" value="${ form.SAVE_TYPE_DIR }" data-bind="checked: toWhere">
+                  &nbsp;${ _('In an HDFS directory') }
+                </label>
+                <span data-bind="visible: toWhere() == 'to HDFS directory'">
+                  ${ comps.field(form['target_dir'], notitle=True, placeholder=_('Results location'), klass='pathChooser') }
+                </span>
+              </div>
+            </div>
+            <div id="fileChooserModal" class="smallModal well hide">
+              <a href="#" class="close" data-dismiss="modal">&times;</a>
+            </div>
+          </fieldset>
+          <div class="form-actions" style="padding-left:10px">
+            <input type="submit" name="save" value="${_('Save')}" class="btn btn-primary"/>
+            <input type="submit" name="cancel" value="${_('Cancel')}" class="btn"/>
+          </div>
+        </form>
+      </p>
     </div>
-  </form>
+  </div>
 </div>
 
 <script type="text/javascript" charset="utf-8">

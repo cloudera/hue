@@ -25,32 +25,33 @@ ${ commonheader(_('Settings'), app_name, user, '100px') | n,unicode }
 ${layout.menubar(section='configuration')}
 
 <div class="container-fluid">
-	<h1>${_('Settings')}</h1>
-	<div class="well">
-		<form class="form-search" method="POST">
-		    <span class="pull-left">
-                <input type="text" id="filterInput" class="input-xlarge search-query" placeholder="${_('Search for key, value, etc.')}">
-		        <a href="#" id="clearFilterBtn" class="btn">${_('Clear')}</a>
-		    </span>
-		</form>
-	</div>
-	<table class="table table-striped table-condensed datatables">
-		<thead>
-			<tr>
-				<th>${_('Key')}</th>
-				<th>${_('Value')}</th>
-				<th>${_('Description')}</th>
-			</tr>
-		</thead>
-		<tbody>
-    	% for config_value in config_values:
-	    	<tr class="confRow" data-search="${config_value.key or ""}${config_value.value or ""}${config_value.description or ""}">
-	      		<td>${config_value.key or ""}</td><td>${config_value.value or ""}</td><td>${config_value.description or ""}</td>
-	    	</tr>
-	    % endfor
-		</tbody>
-	</table>
-  <br/>
+  <div class="card">
+	  <h1 class="card-heading simple">${_('Settings')}</h1>
+    <div class="card-body">
+      <p>
+        <form class="form-search" method="POST">
+          <input type="text" id="filterInput" class="input-xlarge search-query" placeholder="${_('Search for key, value, etc.')}">
+          <a href="#" id="clearFilterBtn" class="btn">${_('Clear')}</a>
+        </form>
+        <table class="table table-striped table-condensed datatables">
+          <thead>
+            <tr>
+              <th>${_('Key')}</th>
+              <th>${_('Value')}</th>
+              <th>${_('Description')}</th>
+            </tr>
+          </thead>
+          <tbody>
+            % for config_value in config_values:
+              <tr class="confRow" data-search="${config_value.key or ""}${config_value.value or ""}${config_value.description or ""}">
+                  <td>${config_value.key or ""}</td><td>${config_value.value or ""}</td><td>${config_value.description or ""}</td>
+              </tr>
+            % endfor
+          </tbody>
+        </table>
+      </p>
+    </div>
+  </div>
 </div>
 
 <script type="text/javascript" charset="utf-8">

@@ -29,8 +29,7 @@ ${layout.menubar(section='query')}
 
 <style type="text/css">
   #collapse {
-    float: right;
-    cursor: pointer;
+    padding: 4px 0 0;
   }
 
   #expand {
@@ -64,13 +63,12 @@ ${layout.menubar(section='query')}
 </style>
 
 <div class="container-fluid">
-  <h1>${_('Query Results:')} ${ util.render_query_context(query_context) }</h1>
-  <div id="expand"><i class="icon-chevron-right icon-white"></i></div>
+  <div id="expand"><i class="icon-chevron-right" style="color: #FFFFFF"></i></div>
     <div class="row-fluid">
         <div class="span3">
-            <div class="well sidebar-nav">
-        <a id="collapse" class="btn btn-small"><i class="icon-chevron-left" rel="tooltip" title="${_('Collapse this panel')}"></i></a>
+            <div class="sidebar-nav">
                 <ul class="nav nav-list">
+                    <li><a id="collapse" class="btn btn-small"><i class="icon-chevron-left" rel="tooltip" title="${_('Collapse this panel')}"></i></a></li>
                     % if download_urls:
                     <li class="nav-header">${_('Downloads')}</li>
                     <li><a target="_blank" href="${download_urls["csv"]}">${_('Download as CSV')}</a></li>
@@ -91,7 +89,7 @@ ${layout.menubar(section='query')}
                         % endfor
                     % else:
                         <li class="nav-header">${mr_jobs}</li>
-                        <li>${_('No Hadoop jobs were launched in running this query.')}</li>
+                        <li class="white">${_('No Hadoop jobs were launched in running this query.')}</li>
                     % endif
                     % endif
                 </ul>
@@ -121,22 +119,26 @@ ${layout.menubar(section='query')}
         </div>
 
         <div class="span9">
-      <ul class="nav nav-tabs">
-        <li class="active"><a href="#results" data-toggle="tab">
-            %if error:
-                  ${_('Error')}
-            %else:
-                  ${_('Results')}
-            %endif
-        </a></li>
-        <li><a href="#query" data-toggle="tab">${_('Query')}</a></li>
-        <li><a href="#log" data-toggle="tab">${_('Log')}</a></li>
-        % if not error:
-        <li><a href="#columns" data-toggle="tab">${_('Columns')}</a></li>
-        % endif
-      </ul>
+          <div class="card" style="margin-top: 0">
+            <h1 class="card-heading simple">${_('Query Results:')} ${ util.render_query_context(query_context) }</h1>
+            <div class="card-body">
+            <p>
+            <ul class="nav nav-tabs">
+              <li class="active"><a href="#results" data-toggle="tab">
+                  %if error:
+                        ${_('Error')}
+                  %else:
+                        ${_('Results')}
+                  %endif
+              </a></li>
+              <li><a href="#query" data-toggle="tab">${_('Query')}</a></li>
+              <li><a href="#log" data-toggle="tab">${_('Log')}</a></li>
+              % if not error:
+              <li><a href="#columns" data-toggle="tab">${_('Columns')}</a></li>
+              % endif
+            </ul>
 
-      <div class="tab-content">
+            <div class="tab-content">
         <div class="active tab-pane" id="results">
             % if error:
               <div class="alert alert-error">
@@ -207,7 +209,9 @@ ${layout.menubar(section='query')}
         </div>
         % endif
       </div>
-
+            </p>
+            </div>
+          </div>
         </div>
     </div>
 </div>

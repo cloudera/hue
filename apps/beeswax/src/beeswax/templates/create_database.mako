@@ -24,10 +24,9 @@ ${ commonheader(_("Create database"), 'metastore', user) | n,unicode }
 
 
 <div class="container-fluid">
-  <h1>${_('Create a new database')}</h1>
   <div class="row-fluid">
     <div class="span3">
-        <div class="well sidebar-nav">
+        <div class="sidebar-nav">
             <ul class="nav nav-list">
                 <li class="nav-header">${_('Actions')}</li>
                 <li><a href="${ url(app_name + ':create_database')}">${_('Create a new database')}</a></li>
@@ -36,6 +35,11 @@ ${ commonheader(_("Create database"), 'metastore', user) | n,unicode }
     </div>
 
     <div class="span9">
+      <div class="card" style="margin-top: 0">
+        <h1 class="card-heading simple">${_('Create a new database')}</h1>
+        <div class="card-body">
+          <p>
+
       <ul id="step-nav" class="nav nav-pills">
           <li class="active"><a href="#step/1" class="step">${_('Step 1: Name')}</a></li>
           <li><a href="#step/2" class="step">${_('Step 2: Location')}</a></li>
@@ -111,12 +115,15 @@ ${ commonheader(_("Create database"), 'metastore', user) | n,unicode }
             </fieldset>
         </div>
         </div>
-        <div class="form-actions">
+        <div class="form-actions" style="padding-left: 10px">
             <button type="button" id="backBtn" class="btn hide">${_('Back')}</button>
             <button type="button" id="nextBtn" class="btn btn-primary">${_('Next')}</button>
             <input id="submit" type="submit" name="create" class="btn btn-primary hide" value="${_('Create database')}" />
         </div>
       </form>
+      </p>
+      </div>
+    </div>
     </div>
   </div>
 </div>

@@ -52,7 +52,7 @@ ${ layout.menubar(section='history') }
 <div class="container-fluid">
     <div class="row-fluid">
         <div class="span2">
-            <div class="well sidebar-nav">
+            <div class="sidebar-nav">
                 <ul class="nav nav-list">
                     <li class="nav-header">${_('Actions')}</li>
                     % if share_queries:
@@ -96,17 +96,21 @@ ${ layout.menubar(section='history') }
             </div>
         </div>
         <div class="span10">
-        <h1>${_('History')}</h1>
+          <div class="card" style="margin-top: 0">
+            <h1 class="card-heading simple">${_('History')}</h1>
 
-        <%actionbar:render>
-          <%def name="search()">
-            <input id="filter" type="text" class="input-xxlarge search-query" placeholder="${_('Search for name, query, etc.')}" value="${ filter }">
-          </%def>
-        </%actionbar:render>
+            <%actionbar:render>
+              <%def name="search()">
+                <input id="filter" type="text" class="input-xxlarge search-query" placeholder="${_('Search for name, query, etc.')}" value="${ filter }">
+              </%def>
+            </%actionbar:render>
 
-        <img id="spinner" src="/static/art/spinner.gif" class="hide" />
+            <div class="card-body">
+              <p>
 
-        <table class="table table-striped table-condensed datatables">
+            <img id="spinner" src="/static/art/spinner.gif" class="hide" />
+
+            <table class="table table-striped table-condensed datatables" style="padding-left: 0;">
             <thead>
               <tr>
                 <th width="10%">${_('Time')}</th>
@@ -145,7 +149,11 @@ ${ layout.menubar(section='history') }
             % endfor
             </tbody>
           </table>
-         ${comps.pagination(page)}
+
+                ${comps.pagination(page)}
+              </p>
+            </div>
+          </div>
         </div>
     </div>
 </div>

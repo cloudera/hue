@@ -26,25 +26,29 @@ ${ commonheader(_('Query Explanation'), app_name, user, '100px') | n,unicode }
 ${layout.menubar(section='saved queries')}
 
 <div class="container-fluid" style="margin-bottom: 14px">
-    <h1>${_('Query Explanation:')} ${util.render_query_context(query_context)}</h1>
+  <div class="card">
+    <h1 class="card-heading simple">${_('Query Explanation:')} ${util.render_query_context(query_context)}</h1>
+    <div class="card-body">
+      <p>
+        <ul class="nav nav-tabs">
+          <li class="active"><a href="#explanation" data-toggle="tab">${_('Explanation')}</a></li>
+          <li><a href="#query" data-toggle="tab">${_('Query')}</a></li>
+        </ul>
 
-    <ul class="nav nav-tabs">
-        <li class="active"><a href="#explanation" data-toggle="tab">${_('Explanation')}</a></li>
-        <li><a href="#query" data-toggle="tab">${_('Query')}</a></li>
-    </ul>
+        <div class="tab-content">
+          <div class="tab-pane active" id="explanation">
+              <pre>${explanation | h}</pre>
+          </div>
+          <div class="tab-pane" id="query">
+              <pre>${query.hql_query | h}</pre>
+          </div>
+        </div>
 
-    <div class="tab-content">
-        <div class="tab-pane active" id="explanation">
-            <pre>${explanation | h}</pre>
-        </div>
-        <div class="tab-pane" id="query">
-            <pre>${query.hql_query | h}</pre>
-        </div>
+        <br/>
+        ${util.render_query_context(query_context, _('Back'), 'btn')}
+      </p>
     </div>
-
-  <br/>
-  ${util.render_query_context(query_context, _('Back'), 'btn')}
-
+  </div>
 </div>
 
 ${ commonfooter(messages) | n,unicode }

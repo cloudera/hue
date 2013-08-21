@@ -29,37 +29,38 @@ ${ commonheader(_('Saved Queries'), app_name, user, '100px') | n,unicode }
 ${layout.menubar(section='saved queries')}
 
 <div class="container-fluid">
-  <h1>${_('Trashed Queries')}</h1>
+  <div class="card">
+    <h1 class="card-heading simple">${_('Trashed Queries')}</h1>
 
-  <%actionbar:render>
-    <%def name="search()">
-      <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for query')}">
-    </%def>
+    <%actionbar:render>
+      <%def name="search()">
+        <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for query')}">
+      </%def>
 
-    <%def name="actions()">
-      <div class="btn-toolbar" style="display: inline; vertical-align: middle">
-        <button id="deleteQueryBtn" class="btn toolbarBtn" title="${_('Delete forever')}" disabled="disabled">
-          <i class="icon-bolt"></i> ${_('Delete forever')}
-        </button>
-        <button id="restoreQueryBtn" class="btn toolbarBtn" title="${_('Restore from trash')}" disabled="disabled">
-          <i class="icon-cloud-upload"></i> ${_('Restore')}
-        </button>
-      </div>
-    </%def>
+      <%def name="actions()">
+        <div class="btn-toolbar" style="display: inline; vertical-align: middle">
+          <button id="deleteQueryBtn" class="btn toolbarBtn" title="${_('Delete forever')}" disabled="disabled">
+            <i class="icon-bolt"></i> ${_('Delete forever')}
+          </button>
+          <button id="restoreQueryBtn" class="btn toolbarBtn" title="${_('Restore from trash')}" disabled="disabled">
+            <i class="icon-cloud-upload"></i> ${_('Restore')}
+          </button>
+        </div>
+      </%def>
 
-    <%def name="creation()">
-      <div class="btn-toolbar" style="display: inline; vertical-align: middle">
-        <button id="viewQueriesBtn" class="btn" title="${_('View queries')}">
-          <i class="icon-home"></i> ${_('View queries')}
-        </button>
-        <button id="emptyTrashBtn" class="btn" title="${_('Empty trash')}" data-bind="enabled: availableSavedQueries().length > 0">
-          <i class="icon-fire"></i> ${_('Empty trash')}
-        </button>
-      </div>
-    </%def>
-  </%actionbar:render>
+      <%def name="creation()">
+        <div class="btn-toolbar" style="display: inline; vertical-align: middle">
+          <button id="viewQueriesBtn" class="btn" title="${_('View queries')}">
+            <i class="icon-home"></i> ${_('View queries')}
+          </button>
+          <button id="emptyTrashBtn" class="btn" title="${_('Empty trash')}" data-bind="enabled: availableSavedQueries().length > 0">
+            <i class="icon-fire"></i> ${_('Empty trash')}
+          </button>
+        </div>
+      </%def>
+    </%actionbar:render>
 
-  <table class="table table-striped table-condensed datatables">
+    <table class="table table-condensed datatables">
     <thead>
       <tr>
         <th width="1%"><div class="hueCheckbox selectAll" data-selectables="savedCheck"></div></th>
@@ -97,7 +98,12 @@ ${layout.menubar(section='saved queries')}
       % endfor
     </tbody>
   </table>
-  ${comps.pagination(page)}
+    <div class="card-body">
+      <p>
+        ${comps.pagination(page)}
+      </p>
+    </div>
+  </div>
 </div>
 
 <div id="deleteQuery" class="modal hide fade">

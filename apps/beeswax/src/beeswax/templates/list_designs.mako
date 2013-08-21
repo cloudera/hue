@@ -29,40 +29,41 @@ ${ commonheader(_('Saved Queries'), app_name, user, '100px') | n,unicode }
 ${layout.menubar(section='saved queries')}
 
 <div class="container-fluid">
-  <h1>${_('Saved Queries')}</h1>
+  <div class="card">
+    <h1 class="card-heading simple">${_('Saved Queries')}</h1>
 
-  <%actionbar:render>
-    <%def name="search()">
-      <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for query')}">
-    </%def>
+    <%actionbar:render>
+      <%def name="search()">
+        <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for query')}">
+      </%def>
 
-    <%def name="actions()">
-      <div class="btn-toolbar" style="display: inline; vertical-align: middle">
-        <button id="editBtn" class="btn toolbarBtn" title="${_('Edit the selected query')}" disabled="disabled"><i class="icon-edit"></i> ${_('Edit')}</button>
-        <button id="cloneBtn" class="btn toolbarBtn" title="${_('Copy the selected query')}" disabled="disabled"><i class="icon-copy"></i> ${_('Copy')}</button>
-        <button id="historyBtn" class="btn toolbarBtn" title="${_('View the usage history of the selected query')}" disabled="disabled"><i class="icon-tasks"></i> ${_('Usage history')}</button>
+      <%def name="actions()">
+        <div class="btn-toolbar" style="display: inline; vertical-align: middle">
+          <button id="editBtn" class="btn toolbarBtn" title="${_('Edit the selected query')}" disabled="disabled"><i class="icon-edit"></i> ${_('Edit')}</button>
+          <button id="cloneBtn" class="btn toolbarBtn" title="${_('Copy the selected query')}" disabled="disabled"><i class="icon-copy"></i> ${_('Copy')}</button>
+          <button id="historyBtn" class="btn toolbarBtn" title="${_('View the usage history of the selected query')}" disabled="disabled"><i class="icon-tasks"></i> ${_('Usage history')}</button>
 
-        <div id="delete-dropdown" class="btn-group" style="vertical-align: middle">
-          <button id="trashQueryBtn" class="btn toolbarBtn" disabled="disabled"><i class="icon-remove"></i> ${_('Move to trash')}</button>
-          <button id="trashQueryCaretBtn" class="btn toolbarBtn dropdown-toggle" data-toggle="dropdown" disabled="disabled">
-            <span class="caret"></span>
-          </button>
-          <ul class="dropdown-menu">
-            <li><a href="#" id="deleteQueryBtn" title="${_('Delete forever')}"><i class="icon-bolt"></i> ${_('Delete forever')}</a></li>
-          </ul>
+          <div id="delete-dropdown" class="btn-group" style="vertical-align: middle">
+            <button id="trashQueryBtn" class="btn toolbarBtn" disabled="disabled"><i class="icon-remove"></i> ${_('Move to trash')}</button>
+            <button id="trashQueryCaretBtn" class="btn toolbarBtn dropdown-toggle" data-toggle="dropdown" disabled="disabled">
+              <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+              <li><a href="#" id="deleteQueryBtn" title="${_('Delete forever')}"><i class="icon-bolt"></i> ${_('Delete forever')}</a></li>
+            </ul>
+          </div>
         </div>
-      </div>
-    </%def>
+      </%def>
 
-    <%def name="creation()">
-      <div class="btn-toolbar" style="display: inline; vertical-align: middle">
-        <a class="btn" href="${ url(app_name + ':list_trashed_designs') }" title="${_('Go to the trash')}"><i class="icon-trash"></i> ${_('View trash')}</a>
-        <a class="btn" href="${ url(app_name + ':execute_query') }" title="${_('Create new query')}"><i class="icon-plus-sign"></i> ${_('New query')}</a>
-      </div>
-    </%def>
-  </%actionbar:render>
+      <%def name="creation()">
+        <div class="btn-toolbar" style="display: inline; vertical-align: middle">
+          <a class="btn" href="${ url(app_name + ':list_trashed_designs') }" title="${_('Go to the trash')}"><i class="icon-trash"></i> ${_('View trash')}</a>
+          <a class="btn" href="${ url(app_name + ':execute_query') }" title="${_('Create new query')}"><i class="icon-plus-sign"></i> ${_('New query')}</a>
+        </div>
+      </%def>
+    </%actionbar:render>
 
-  <table class="table table-striped table-condensed datatables">
+    <table class="table table-condensed datatables">
     <thead>
       <tr>
         <th width="1%"><div class="hueCheckbox selectAll" data-selectables="savedCheck"></div></th>
@@ -105,7 +106,12 @@ ${layout.menubar(section='saved queries')}
       % endfor
     </tbody>
   </table>
-  ${comps.pagination(page)}
+    <div class="card-body">
+      <p>
+        ${comps.pagination(page)}
+      </p>
+    </div>
+  </div>
 </div>
 
 <div id="deleteQuery" class="modal hide fade">

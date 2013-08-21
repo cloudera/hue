@@ -60,207 +60,208 @@ ${ commonheader(_('Query'), app_name, user, '100px') | n,unicode }
 ${layout.menubar(section='query')}
 
 <div class="container-fluid">
-    <div class="row-fluid">
-        <div class="span3">
-            <div class="well sidebar-nav">
-                <form id="advancedSettingsForm" action="${action}" method="POST" class="form form-horizontal noPadding">
-                    <ul class="nav nav-list">
-                        <li class="nav-header">${_('database')}</li>
-                        <li>
-                          ${ form.query['database'] | n,unicode }
-                        </li>
-                        <li class="nav-header">${_('settings')}</li>
-                        <li>
-                            % for i, f in enumerate(form.settings.forms):
-                            <div class="param">
-                                <div class="remove">
-                                    ${comps.field(f['_deleted'], tag="button", button_text="x", notitle=True, attrs=dict(
-                                        type="submit",
-                                        title=_("Delete this setting"),
-                                        klass="btn btn-mini settingsDelete"
-                                    ), value=True)}
-                                </div>
+  <div class="row-fluid">
+    <div class="span3">
+      <form id="advancedSettingsForm" action="${action}" method="POST" class="form form-horizontal">
+        <div class="sidebar-nav">
+          <ul class="nav nav-list">
+            <li class="nav-header">${_('database')}</li>
+            <li class="white">
+              ${ form.query['database'] | n,unicode }
+            </li>
+            <li class="nav-header">${_('settings')}</li>
+            <li class="white">
+            % for i, f in enumerate(form.settings.forms):
+            <div class="param">
+                <div class="remove">
+                    ${comps.field(f['_deleted'], tag="button", button_text="x", notitle=True, attrs=dict(
+                        type="submit",
+                        title=_("Delete this setting"),
+                        klass="btn btn-mini settingsDelete"
+                    ), value=True)}
+                </div>
 
-                                <div class="control-group">
-                                    ${comps.label(f['key'])}
-                                    ${comps.field(f['key'], attrs=dict(placeholder=app_name == 'impala' and "ABORT_ON_ERROR" or "mapred.reduce.tasks",
-                                        klass="settingsField span8",
-                                        autocomplete="off"
-                                    ))}
-                                </div>
+                <div class="control-group">
+                    ${comps.label(f['key'])}
+                    ${comps.field(f['key'], attrs=dict(placeholder=app_name == 'impala' and "ABORT_ON_ERROR" or "mapred.reduce.tasks",
+                        klass="settingsField span8",
+                        autocomplete="off"
+                    ))}
+                </div>
 
-                                <div class="control-group">
-                                    ${comps.label(f['value'])}
-                                    ${comps.field(f['value'], attrs=dict(
-                                        placeholder="1",
-                                        klass="span8"
-                                    ))}
-                                </div>
-                            </div>
-                            ${comps.field(f['_exists'], hidden=True)}
-
-                            % endfor
-                            <div class="control-group">
-                                <a class="btn btn-small" data-form-prefix="settings">${_('Add')}</a>
-                            </div>
-                        </li>
-                        <li class="nav-header
-                        % if app_name == 'impala':
-                            hide
-                        % endif
-                        ">
-                            ${_('File Resources')}
-                        </li>
-                        <li
-                        % if app_name == 'impala':
-                            class="hide"
-                        % endif
-                        >
-                            % for i, f in enumerate(form.file_resources.forms):
-                            <div class="param">
-                                <div class="remove">
-                                    ${comps.field(f['_deleted'], tag="button", button_text="x", notitle=True, attrs=dict(
-                                        type="submit",
-                                        title=_("Delete this setting"),
-                                        klass="btn btn-mini file_resourcesDelete"
-                                    ), value=True)}
-                                </div>
-
-                                <div class="control-group">
-                                    ${comps.label(f['type'])}
-                                    ${comps.field(f['type'], render_default=True, attrs=dict(
-                                        klass="span8"
-                                    ))}
-                                </div>
-
-                                <div class="control-group">
-                                    ${comps.label(f['path'])}
-                                    ${comps.field(f['path'], attrs=dict(
-                                        placeholder="/user/foo/udf.jar",
-                                        klass="input-small file_resourcesField span8",
-                                        data_filters=f['path'].html_name
-                                    ))}
-                                </div>
-                            </div>
-                            ${comps.field(f['_exists'], hidden=True)}
-
-                            % endfor
-                            <div class="control-group">
-                                <a class="btn btn-small" data-form-prefix="file_resources">${_('Add')}</a>
-                            </div>
-                        </li>
-                        <li class="nav-header
-                        % if app_name == 'impala':
-                            hide
-                        % endif
-                        ">
-                            ${_('User-defined Functions')}
-                        </li>
-                        <li
-                        % if app_name == 'impala':
-                            class="hide"
-                        % endif
-                        >
-                            % for i, f in enumerate(form.functions.forms):
-                                <div class="param">
-                                    <div class="remove">
-                                        ${comps.field(f['_deleted'], tag="button", button_text="x", notitle=True, attrs=dict(
-                                            type="submit",
-                                            title=_("Delete this setting"),
-                                            klass="btn btn-mini file_resourcesDelete"
-                                        ), value=True)}
-                                    </div>
-
-                                    <div class="control-group">
-                                        ${comps.label(f['name'])}
-                                        ${comps.field(f['name'], attrs=dict(
-                                            placeholder=_("myFunction"),
-                                            klass="span8 functionsField"
-                                        ))}
-                                    </div>
-
-                                    <div class="control-group">
-                                        ${comps.label(f['class_name'])}
-                                        ${comps.field(f['class_name'], attrs=dict(
-                                            placeholder="com.acme.example",
-                                            klass="span8"
-                                        ))}
-                                    </div>
-                                </div>
-
-                              ${comps.field(f['_exists'], hidden=True)}
-                            % endfor
-                            <div class="control-group">
-                                <a class="btn btn-small" data-form-prefix="functions">${_('Add')}</a>
-                            </div>
-                        </li>
-                        <li class="nav-header">${_('Parameterization')}</li>
-                        <li>
-                            <label class="checkbox" rel="tooltip" data-original-title="${_("If checked (the default), you can include parameters like $parameter_name in your query, and users will be prompted for a value when the query is run.")}">
-                                <input type="checkbox" id="id_${form.query["is_parameterized"].html_name | n}" name="${form.query["is_parameterized"].html_name | n}" ${extract_field_data(form.query["is_parameterized"]) and "CHECKED" or ""}/>
-                                ${_("Enable Parameterization")}
-                            </label>
-                        </li>
-                          <li class="nav-header
-                            % if app_name == 'impala':
-                                hide
-                            % endif
-                          ">${_('Email Notification')}</li>
-                          <li
-                            % if app_name == 'impala':
-                                class="hide"
-                            % endif
-                          >
-                            <label class="checkbox" rel="tooltip" data-original-title="${_("If checked, you will receive an email notification when the query completes.")}">
-                                <input type="checkbox" id="id_${form.query["email_notify"].html_name | n}" name="${form.query["email_notify"].html_name | n}" ${extract_field_data(form.query["email_notify"]) and "CHECKED" or ""}/>
-                                ${_("Email me on completion.")}
-                            </label>
-                          </li>
-                        % if app_name == 'impala':
-                          <li class="nav-header">
-                            ${_('Metastore Catalog')}
-                          </li>
-                          <li>
-                            <div class="control-group">
-                              <span id="refresh-dyk">
-                                <i class="icon-refresh"></i>
-                                ${ _('Sync tables tips') }
-                              </span>
-                              <div id="refresh-content" class="hide">
-                                <ul style="text-align: left;">
-                                  <li>"invalidate metadata" ${ _("invalidates the entire catalog metadata. All table metadata will be reloaded on the next access.") }</li>
-                                  <li>"invalidate metadata &lt;table&gt;" ${ _("invalidates the metadata, load on the next access") }</li>
-                                  <li>"refresh &lt;table&gt;" ${ _("refreshes the metadata immediately. It is a faster, incremental refresh.") }</li>
-                                </ul>
-                              </div>
-                            </div>
-                          </li>
-                        % endif
-                          <li class="nav-header"></li>
-                          <li>
-                            <div class="control-group">
-                              <i class="icon-question-sign" id="help"></i>
-                              <div id="help-content" class="hide">
-                                <ul style="text-align: left;">
-                                  <li>${ _('Press CTRL + Space to autocomplete') }</li>
-                                  <li>${ _("You can execute queries with multiple SQL statements delimited by a semicolon ';'") }</li>
-                                  <li>${ _('You can highlight and run a fragment of a query') }</li>
-                                </ul>
-                              </div>
-                            </div>
-                          </li>
-                       </ul>
-                    <input type="hidden" name="${form.query["query"].html_name | n}" class="query" value="" />
-                </form>
+                <div class="control-group">
+                    ${comps.label(f['value'])}
+                    ${comps.field(f['value'], attrs=dict(
+                        placeholder="1",
+                        klass="span8"
+                    ))}
+                </div>
             </div>
+            ${comps.field(f['_exists'], hidden=True)}
+
+            % endfor
+            <div class="control-group">
+              <a class="btn btn-small" data-form-prefix="settings">${_('Add')}</a>
+            </div>
+            </li>
+            <li class="nav-header
+              % if app_name == 'impala':
+                  hide
+              % endif
+              ">
+            ${_('File Resources')}
+            </li>
+            <li class="white
+              % if app_name == 'impala':
+                  hide
+              % endif
+              ">
+            % for i, f in enumerate(form.file_resources.forms):
+            <div class="param">
+                <div class="remove">
+                    ${comps.field(f['_deleted'], tag="button", button_text="x", notitle=True, attrs=dict(
+                        type="submit",
+                        title=_("Delete this setting"),
+                        klass="btn btn-mini file_resourcesDelete"
+                    ), value=True)}
+                </div>
+
+                <div class="control-group">
+                    ${comps.label(f['type'])}
+                    ${comps.field(f['type'], render_default=True, attrs=dict(
+                        klass="span8"
+                    ))}
+                </div>
+
+                <div class="control-group">
+                    ${comps.label(f['path'])}
+                    ${comps.field(f['path'], attrs=dict(
+                        placeholder="/user/foo/udf.jar",
+                        klass="input-small file_resourcesField span8",
+                        data_filters=f['path'].html_name
+                    ))}
+                </div>
+            </div>
+            ${comps.field(f['_exists'], hidden=True)}
+
+            % endfor
+                <div class="control-group">
+                    <a class="btn btn-small" data-form-prefix="file_resources">${_('Add')}</a>
+                </div>
+            </li>
+            <li class="nav-header
+            % if app_name == 'impala':
+                hide
+            % endif
+            ">
+                ${_('User-defined Functions')}
+            </li>
+            <li class="white
+            % if app_name == 'impala':
+                hide
+            % endif
+            ">
+                % for i, f in enumerate(form.functions.forms):
+                    <div class="param">
+                        <div class="remove">
+                            ${comps.field(f['_deleted'], tag="button", button_text="x", notitle=True, attrs=dict(
+                                type="submit",
+                                title=_("Delete this setting"),
+                                klass="btn btn-mini file_resourcesDelete"
+                            ), value=True)}
+                        </div>
+
+                        <div class="control-group">
+                            ${comps.label(f['name'])}
+                            ${comps.field(f['name'], attrs=dict(
+                                placeholder=_("myFunction"),
+                                klass="span8 functionsField"
+                            ))}
+                        </div>
+
+                        <div class="control-group">
+                            ${comps.label(f['class_name'])}
+                            ${comps.field(f['class_name'], attrs=dict(
+                                placeholder="com.acme.example",
+                                klass="span8"
+                            ))}
+                        </div>
+                    </div>
+
+                  ${comps.field(f['_exists'], hidden=True)}
+                % endfor
+                <div class="control-group">
+                    <a class="btn btn-small" data-form-prefix="functions">${_('Add')}</a>
+                </div>
+            </li>
+            <li class="nav-header">${_('Parameterization')}</li>
+            <li class="white">
+                <label class="checkbox" rel="tooltip" data-original-title="${_("If checked (the default), you can include parameters like $parameter_name in your query, and users will be prompted for a value when the query is run.")}">
+                    <input type="checkbox" id="id_${form.query["is_parameterized"].html_name | n}" name="${form.query["is_parameterized"].html_name | n}" ${extract_field_data(form.query["is_parameterized"]) and "CHECKED" or ""}/>
+                    ${_("Enable Parameterization")}
+                </label>
+            </li>
+              <li class="nav-header
+                % if app_name == 'impala':
+                    hide
+                % endif
+              ">${_('Email Notification')}</li>
+              <li class="white
+                % if app_name == 'impala':
+                    hide
+                % endif
+              ">
+                <label class="checkbox" rel="tooltip" data-original-title="${_("If checked, you will receive an email notification when the query completes.")}">
+                    <input type="checkbox" id="id_${form.query["email_notify"].html_name | n}" name="${form.query["email_notify"].html_name | n}" ${extract_field_data(form.query["email_notify"]) and "CHECKED" or ""}/>
+                    ${_("Email me on completion.")}
+                </label>
+              </li>
+            % if app_name == 'impala':
+              <li class="nav-header">
+                ${_('Metastore Catalog')}
+              </li>
+              <li class="white">
+                <div class="control-group">
+                  <span id="refresh-dyk">
+                    <i class="icon-refresh"></i>
+                    ${ _('Sync tables tips') }
+                  </span>
+                  <div id="refresh-content" class="hide">
+                    <ul style="text-align: left;">
+                      <li>"invalidate metadata" ${ _("invalidates the entire catalog metadata. All table metadata will be reloaded on the next access.") }</li>
+                      <li>"invalidate metadata &lt;table&gt;" ${ _("invalidates the metadata, load on the next access") }</li>
+                      <li>"refresh &lt;table&gt;" ${ _("refreshes the metadata immediately. It is a faster, incremental refresh.") }</li>
+                    </ul>
+                  </div>
+                </div>
+              </li>
+            % endif
+              <li class="nav-header"></li>
+              <li class="white">
+                <div class="control-group">
+                  <i class="icon-question-sign" id="help"></i>
+                  <div id="help-content" class="hide">
+                    <ul style="text-align: left;">
+                      <li>${ _('Press CTRL + Space to autocomplete') }</li>
+                      <li>${ _("You can execute queries with multiple SQL statements delimited by a semicolon ';'") }</li>
+                      <li>${ _('You can highlight and run a fragment of a query') }</li>
+                    </ul>
+                  </div>
+                </div>
+              </li>
+           </ul>
+            <input type="hidden" name="${form.query["query"].html_name | n}" class="query" value="" />
+            </div>
+                </form>
         </div>
 
         <div id="querySide" class="span9">
+          <div class="card" style="margin-top: 0">
             % if on_success_url:
               <input type="hidden" name="on_success_url" value="${on_success_url}"/>
             % endif
             <div style="margin-bottom: 30px">
-              <h1>
+              <h1 class="card-heading simple">
                 ${ _('Query Editor') }
                 % if can_edit_name:
                   :
@@ -274,7 +275,7 @@ ${layout.menubar(section='query')}
                 %endif
               </h1>
               % if can_edit_name:
-                <p>
+                <p style="margin-left: 20px">
                   <a href="#" id="query-description" data-type="textarea" data-pk="${ design.id }"
                      data-name="description"
                      data-url="${ url(app_name + ':save_design_properties') }"
@@ -285,6 +286,10 @@ ${layout.menubar(section='query')}
                 </p>
               % endif
             </div>
+            <div class="card-body">
+              <p>
+
+
             % if error_messages or log:
                 <ul class="nav nav-tabs">
                     <li class="active">
@@ -322,9 +327,11 @@ ${layout.menubar(section='query')}
                 </div>
               </div>
             % endif
-            <br/>
+              </p>
+            </div>
         </div>
     </div>
+  </div>
 </div>
 
 
@@ -392,6 +399,10 @@ ${layout.menubar(section='query')}
     overflow-y: scroll;
   }
 
+  .control-group {
+    margin-bottom: 0!important;
+  }
+
   .control-group label {
     float: left;
     padding-top: 5px;
@@ -399,8 +410,8 @@ ${layout.menubar(section='query')}
     width: 40px;
   }
 
-  .nav-list {
-    padding: 0;
+  .sidebar-nav {
+    margin-bottom: 90px !important;
   }
 
   .param {
