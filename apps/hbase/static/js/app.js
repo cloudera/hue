@@ -98,6 +98,7 @@ routie({
       logGA('query_table');
       app.station('table');
       Router.setTable(cluster, table);
+      resetElements();
       Views.render('dataview');
       app.views.tabledata._reloadcfs(function(){
         app.search.cur_input(query);
@@ -110,6 +111,7 @@ routie({
       logGA('view_table');
       Router.setTable(cluster, table);
       resetSearch();
+      resetElements();
       app.station('table');
       Views.render('dataview');
       routed = true;
