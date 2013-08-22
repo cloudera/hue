@@ -511,8 +511,10 @@ ul#hbase-breadcrumbs li a {
 }
 
 #cell_edit_modal {
-	margin-left: 0px;
+	margin-left: -40% !important;
 	max-height:100%;
+	width: 80%;
+	left: 50%;
 	top: 10%;
 	margin-top:0px;
 	overflow: visible;
