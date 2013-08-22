@@ -766,10 +766,7 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
     function showHdfsAutocomplete(path, showHCatHint) {
       $.getJSON(path, function (data) {
         CodeMirror.currentFiles = [];
-        if (data.error != null) {
-          $.jHueNotify.error(data.error);
-        }
-        else {
+        if (data.error == null) {
           $(data.files).each(function (cnt, item) {
             if (item.name != ".") {
               var _ico = "icon-file-alt";
