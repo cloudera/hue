@@ -258,11 +258,11 @@ class HiveServerClient:
     self.query_server = query_server
     self.user = user
 
-    use_sasl, mechanism, kerberos_principal_short_name, hiveserver2_impersonation_enabled = HiveServerClient.get_security(query_server)
-    LOG.info('use_sasl=%s, mechanism=%s, kerberos_principal_short_name=%s, hiveserver2_impersonation_enabled=%s' % (
-             use_sasl, mechanism, kerberos_principal_short_name, hiveserver2_impersonation_enabled))
+    use_sasl, mechanism, kerberos_principal_short_name, impersonation_enabled = HiveServerClient.get_security(query_server)
+    LOG.info('use_sasl=%s, mechanism=%s, kerberos_principal_short_name=%s, impersonation_enabled=%s' % (
+             use_sasl, mechanism, kerberos_principal_short_name, impersonation_enabled))
 
-    self.hiveserver2_impersonation_enabled = hiveserver2_impersonation_enabled
+    self.impersonation_enabled = impersonation_enabled
     self._client = thrift_util.get_client(TCLIService.Client,
                                           query_server['server_host'],
                                           query_server['server_port'],
@@ -277,12 +277,13 @@ class HiveServerClient:
   @classmethod
   def get_security(cls, query_server):
     principal = query_server['principal']
-    hiveserver2_impersonation_enabled = False # Specific to HiveServer2 protocol only
+    impersonation_enabled = False
 
     if query_server['server_name'] == 'impala':
       cluster_conf = cluster.get_cluster_conf_for_job_submission()
       use_sasl = cluster_conf is not None and cluster_conf.SECURITY_ENABLED.get()
       mechanism = HiveServerClient.HS2_MECHANISMS['KERBEROS']
+      impersonation_enabled = query_server['impersonation_enabled']
     else:
       hive_mechanism = hive_site.get_hiveserver2_authentication()
       if hive_mechanism not in HiveServerClient.HS2_MECHANISMS:
@@ -291,20 +292,23 @@ class HiveServerClient:
       mechanism = 'NOSASL'
       if use_sasl:
         mechanism = HiveServerClient.HS2_MECHANISMS[hive_mechanism]
-      hiveserver2_impersonation_enabled = hive_site.hiveserver2_impersonation_enabled()
+      impersonation_enabled = hive_site.hiveserver2_impersonation_enabled()
 
     if principal:
       kerberos_principal_short_name = principal.split('/', 1)[0]
     else:
       kerberos_principal_short_name = None
 
-    return use_sasl, mechanism, kerberos_principal_short_name, hiveserver2_impersonation_enabled
+    return use_sasl, mechanism, kerberos_principal_short_name, impersonation_enabled
 
 
   def open_session(self, user):
-    if self.hiveserver2_impersonation_enabled:
+    if self.impersonation_enabled:
       kerberos_principal_short_name = KERBEROS.HUE_PRINCIPAL.get().split('/', 1)[0]
-      kwargs = {'username': kerberos_principal_short_name, 'configuration': {'hive.server2.proxy.user': user.username}}
+      if self.query_server['server_name'] == 'impala':
+        kwargs = {'username': kerberos_principal_short_name, 'configuration': {'impala.proxy.user': user.username}}
+      else:
+        kwargs = {'username': kerberos_principal_short_name, 'configuration': {'hive.server2.proxy.user': user.username}}
     else:
       kwargs = {'username': user.username, 'configuration': {}}
 

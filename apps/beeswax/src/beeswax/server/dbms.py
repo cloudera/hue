@@ -50,13 +50,15 @@ def get(user, query_server=None):
 
 def get_query_server_config(name='beeswax'):
   if name == 'impala':
-    from impala.conf import SERVER_HOST as IMPALA_SERVER_HOST, SERVER_PORT as IMPALA_SERVER_PORT, IMPALA_PRINCIPAL
+    from impala.conf import SERVER_HOST as IMPALA_SERVER_HOST, SERVER_PORT as IMPALA_SERVER_PORT, \
+        IMPALA_PRINCIPAL, IMPERSONATION_ENABLED
 
     query_server = {
         'server_name': 'impala',
         'server_host': IMPALA_SERVER_HOST.get(),
         'server_port': IMPALA_SERVER_PORT.get(),
         'principal': IMPALA_PRINCIPAL.get(),
+        'impersonation_enabled': IMPERSONATION_ENABLED.get()
     }
   else:
     kerberos_principal = hive_site.get_hiveserver2_kerberos_principal(HIVE_SERVER_HOST.get())
