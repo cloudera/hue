@@ -31,21 +31,30 @@ from search.conf import EMPTY_QUERY, SECURITY_ENABLED
 
 LOG = logging.getLogger(__name__)
 
+DEFAULT_USER = 'hue'
+
 
 class SolrApi(object):
   """
   http://wiki.apache.org/solr/CoreAdmin#CoreAdminHandler
   """
-  def __init__(self, solr_url):
+  def __init__(self, solr_url, user):
     self._url = solr_url
+    self._user = user
     self._client = HttpClient(self._url, logger=LOG)
-    if SECURITY_ENABLED.get():
+    self.security_enabled = SECURITY_ENABLED.get()
+    if self.security_enabled:
       self._client.set_kerberos_auth()
     self._root = Resource(self._client)
 
+  def _get_params(self):
+    if self.security_enabled:
+      return (('doAs', self._user ),)
+    return (('user.name', DEFAULT_USER), ('doAs', self._user),)
+
   def query(self, solr_query, hue_core):
     try:
-      params = (
+      params = self._get_params() + (
           ('q', solr_query['q'] or EMPTY_QUERY.get()),
           ('wt', 'json'),
           ('rows', solr_query['rows']),
@@ -70,7 +79,7 @@ class SolrApi(object):
 
   def suggest(self, solr_query, hue_core):
     try:
-      params = (
+      params = self._get_params() + (
           ('q', solr_query['q']),
           ('wt', 'json'),
       )
@@ -83,7 +92,11 @@ class SolrApi(object):
 
   def collections(self):
     try:
-      response = self._root.get('zookeeper', params={'detail': 'true', 'path': '/clusterstate.json'})
+      params = self._get_params() + (
+          ('detail', 'true'),
+          ('path', '/clusterstate.json'),
+      )
+      response = self._root.get('zookeeper', params=params)
       return json.loads(response['znode']['data'])
     except RestException, e:
       raise PopupException('Error while accessing Solr: %s' % e)
@@ -103,18 +116,29 @@ class SolrApi(object):
 
   def cores(self):
     try:
-      return self._root.get('admin/cores', params={'wt': 'json'})['status']
+      params = self._get_params() + (
+          ('wt', 'json'),
+      )      
+      return self._root.get('admin/cores', params=params)['status']
     except RestException, e:
       raise PopupException('Error while accessing Solr: %s' % e)
 
   def core(self, core):
     try:
-      return self._root.get('admin/cores', params={'wt': 'json', 'core': core})
+      params = self._get_params() + (
+          ('wt', 'json'),
+          ('core', core),
+      )         
+      return self._root.get('admin/cores', params=params)
     except RestException, e:
       raise PopupException('Error while accessing Solr: %s' % e)
 
   def schema(self, core):
     try:
-      return self._root.get('%(core)s/admin/file' % {'core': core}, params={'wt': 'json', 'file': 'schema.xml'})
+      params = self._get_params() + (
+          ('wt', 'json'),
+          ('file', 'schema.xml'),
+      )       
+      return self._root.get('%(core)s/admin/file' % {'core': core}, params=params)
     except RestException, e:
       raise PopupException('Error while accessing Solr: %s' % e)
