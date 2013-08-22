@@ -546,7 +546,7 @@ textarea {
 	font-size: 50px;
 }
 
-#new_table_modal ul
+#new_table_modal ul, #new_row_field_list
 {
 	list-style-type: none;
 	padding: 0px;

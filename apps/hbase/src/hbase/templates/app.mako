@@ -198,7 +198,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
       <div class="container-fluid">
         <div class="row-fluid">
           <div id="searchbar-main" class="span5" data-bind="click: search.clickTagBar">
-            <div id="search-tags" contenteditable="true" data-bind="editableText: search.cur_input, hasfocus: search.focused, css: { 'active': search.cur_input() != '' }, event: { 'keydown': search.onKeyDown, click: search.updateMenu.bind(null) }" data-placeholder="${_('row_key, row_key_prefix* + scan_length, row_key [family:col1, family2:col2, family3:]')}">
+            <div id="search-tags" contenteditable="true" data-bind="editableText: search.cur_input, hasfocus: search.focused, css: { 'active': search.cur_input() != '' }, event: { 'keydown': search.onKeyDown, click: search.updateMenu.bind(null) }" data-placeholder="${_('row_key, row_prefix* +scan_len [col1, family:col2, fam3:, col_prefix* +3, fam: col2 to col3] {Filter1() AND Filter2()}')}">
             </div>
           </div>
           <ul id="search-typeahead" data-bind="visible: search.focused() && !search.submitted()">
@@ -262,20 +262,22 @@ ${ commonheader(None, "hbase", user) | n,unicode }
               <button class="btn" data-bind="enable: views.tabledata.selected().length > 0, click: views.tabledata.dropSelected"><i class="icon-trash"></i> ${_('Drop Rows')}</button>
             % endif
             <button id="bulk-upload-btn" class="btn fileChooserBtn" data-toggle="tooltip" title="${_('.CSV, .TSV, etc...')}" aria-hidden="true"><i class="icon-upload"></i> ${_('Bulk Upload')}</button>
-            <a href="#new_row_modal" data-bind="click:function(){app.focusModel(app.views.tabledata);logGA('new_row_modal');}" role="button" class="btn btn-primary" data-callback="" data-toggle="modal"><i class='icon-plus-sign'></i> ${_('New Row')}</a>
+            <a href="#new_row_modal" data-bind="click:function(){app.focusModel(app.views.tabledata);launchModal('new_row_modal')}" role="button" class="btn btn-primary" data-callback=""><i class='icon-plus-sign'></i> ${_('New Row')}</a>
           </span>
         </div>
     </div>
 
     <!-- New Row Modal -->
     <form id="new_row_modal" action="putRow" method="POST" class="modal hide fade ajaxSubmit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    </form>
+    <script id="new_row_modal_template" type="text/html">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h3>${_('Insert New Row')} - <span data-bind="text: pageTitle"></span></h3>
+        <h3>${_('Insert New Row')}</h3>
       </div>
       <div class="modal-body controls">
         <input type="hidden" name="cluster" data-bind="value:app.cluster"/>
-        <input type="hidden" name="tableName" data-bind="value:views.tabledata.name"/>
+        <input type="hidden" name="tableName" data-bind="value:app.views.tabledata.name"/>
         <label class="control-label">${_('Row Key')}</label>
         <input type="text" name="row_key" placeholder="row_key">
         <input type="hidden" name="column_data" data-subscribe="#new_row_field_list"/>
@@ -286,7 +288,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
         <button class="btn" data-dismiss="modal" aria-hidden="true">${_('Cancel')}</button>
         <input type="submit" class="btn btn-primary" value="Submit" />
       </div>
-    </form>
+    </script>
 
     <!-- New Column Modal -->
     <form id="new_column_modal" action="putColumn" method="POST" class="modal hide fade ajaxSubmit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">

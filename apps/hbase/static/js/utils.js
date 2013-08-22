@@ -111,15 +111,22 @@ function launchModal(modal, data) {
           app.focusModel(data.content);
       data.content.history.reload();
 
-      var path = '/hbase/api/putUpload/"' + app.cluster() + '"/"' + app.views.tabledata.name() + '"/"' + data.content.parent.row + '"/"' + data.content.name + '"';
-      var uploader = new qq.FileUploaderBasic({
-        button: document.getElementById("file-upload-btn"),
-        action: path,
-        fileFieldLabel: 'hbase_file',
-        multiple: false,
-        onComplete:function (id, fileName, response) {
-          data.content.reload();
-        }
+      if(data.content.parent) {
+        var path = '/hbase/api/putUpload/"' + app.cluster() + '"/"' + app.views.tabledata.name() + '"/"' + data.content.parent.row + '"/"' + data.content.name + '"';
+        var uploader = new qq.FileUploaderBasic({
+          button: document.getElementById("file-upload-btn"),
+          action: path,
+          fileFieldLabel: 'hbase_file',
+          multiple: false,
+          onComplete:function (id, fileName, response) {
+            data.content.reload();
+          }
+        });
+      }
+      break;
+    case 'new_row_modal':
+      $('a.action_addColumnValue').click(function() {
+        $(this).parent().find("ul").append("<li><input type=\"text\" name=\"column_values\" class=\"ignore\" placeholder = \"family:column_name\"/> <input type=\"text\" name=\"column_values\" class=\"ignore\" placeholder = \"cell_value\"/></li>")
       });
       break;
     case 'new_column_modal':
@@ -142,8 +149,9 @@ function launchModal(modal, data) {
       });
       break;
   }
-  element.modal('show');
-logGA(modal.slice(0, modal.indexOf('_modal') != -1 ? modal.indexOf('_modal') : modal.length));
+  if(!element.hasClass('in'))
+    element.modal('show');
+  logGA(modal.slice(0, modal.indexOf('_modal') != -1 ? modal.indexOf('_modal') : modal.length));
 }
 
 function parseXML(xml) {

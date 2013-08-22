@@ -163,10 +163,11 @@ var SmartViewModel = function(options) {
 
   self.columnFamilies = ko.observableArray();
   self.name = ko.observable(options.name);
-  self.name.subscribe(function(){
+  self.name.subscribe(function(val){
+    if(!val) return;
     self.columnFamilies([]);
     self._reloadcfs();
-    if(app.station() == 'table')
+    if(app.station() == 'table' && app.search.cur_input())
       return;
     self.querySet.removeAll();
     self.evaluateQuery();
@@ -919,9 +920,13 @@ var tagsearch = function() {
     switch(self.mode()) {
       case 'filter':
         var focus = val.replace(/\{|\}|\s|&[^;]+?;/g,"").split(searchRenderers.rowkey.nested.filter.nested.linker.select).slice(-1)[0];
-        self.activeSuggestions(self.filters.filter(function(a) {
-          return a.toLowerCase().replace(" ","").indexOf(focus.toLowerCase()) != -1;
-        }));
+        if(focus != "") {
+          self.activeSuggestions(self.filters.filter(function(a) {
+            return a.toLowerCase().replace(" ","").indexOf(focus.toLowerCase()) != -1;
+          }));
+        } else {
+          self.activeSuggestions([]);
+        }
         return;
       case 'rowkey':
         var validate = window.getSelection().getRangeAt(0).startContainer.nodeValue;
@@ -993,6 +998,8 @@ var CellHistoryPage = function(options) {
 
   self.pickHistory = function(data) {
     data.history = self;
-    launchModal('cell_edit_modal',{ content: data, mime: detectMimeType(data.value), readonly: true })
+    if(!ko.isObservable(data.value))
+      data.value = ko.observable(data.value);
+    launchModal('cell_edit_modal',{ content: data, mime: detectMimeType(data.value()), readonly: true })
   };
 };
