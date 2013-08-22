@@ -19,7 +19,7 @@ import sys
 import socket
 
 from django.utils.translation import ugettext_lazy as _t, ugettext as _
-from desktop.lib.conf import Config
+from desktop.lib.conf import Config, coerce_bool
 
 from impala.settings import NICE_NAME
 
@@ -40,6 +40,12 @@ IMPALA_PRINCIPAL=Config(
   help=_t("Kerberos principal name for Impala. Typically 'impala/hostname.foo.com'."),
   type=str,
   default="impala/%s" % socket.getfqdn())
+
+IMPERSONATION_ENABLED=Config(
+  key='impersonation_enabled',
+  help=_t("Turn on/off impersonation mechanism when talking to Impala."),
+  type=coerce_bool,
+  default=False)
 
 
 def config_validator(user):
