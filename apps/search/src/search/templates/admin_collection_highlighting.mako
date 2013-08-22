@@ -95,7 +95,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 <script type="text/javascript">
   function ViewModel() {
     var self = this;
-    self.fields = ko.observableArray(${ hue_collection.fields | n,unicode });
+    self.fields = ko.observableArray(${ hue_collection.fields(user) | n,unicode });
 
     var highlighting = ${ hue_collection.result.get_highlighting() | n,unicode };
     var properties = ${ hue_collection.result.get_properties() | n,unicode };

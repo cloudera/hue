@@ -233,7 +233,7 @@ em {
     <div class="span12">%s</div>
   </div>
   <br/>  
-</div>""" % ' '.join(['{{%s}}' % field for field in collection.fields])
+</div>""" % ' '.join(['{{%s}}' % field for field in collection.fields(user)])
 
       result.update_from_post({'template': json.dumps(template)})
       result.save()
@@ -264,16 +264,14 @@ class Collection(models.Model):
   def get_absolute_url(self):
     return reverse('search:admin_collection', kwargs={'collection_id': self.id})
 
-  @property
-  def fields(self):
-    return sorted([field.get('name') for field in self.fields_data])
+  def fields(self, user):
+    return sorted([field.get('name') for field in self.fields_data(user)])
 
-  @property
-  def fields_data(self):
-    solr_schema = SolrApi(SOLR_URL.get()).schema(self.name)
+  def fields_data(self, user):
+    solr_schema = SolrApi(SOLR_URL.get(), user).schema(self.name)
     schema = etree.fromstring(solr_schema)
 
-    return sorted([{'name': field.get('name'),'type': field.get('type')}
+    return sorted([{'name': field.get('name'), 'type': field.get('type')}
                    for fields in schema.iter('fields') for field in fields.iter('field')])
 
 def get_facet_field_format(field, type, facets):

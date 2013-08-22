@@ -145,7 +145,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 
   function ViewModel() {
     var self = this;
-    self.fields = ko.observableArray(${ hue_collection.fields | n,unicode });
+    self.fields = ko.observableArray(${ hue_collection.fields(user) | n,unicode });
 
     self.isEnabled = ko.observable(${ hue_collection.sorting.data | n,unicode }.properties.is_enabled);
 
@@ -153,7 +153,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
       return new SortingField(obj.field, obj.label, obj.asc);
     }));
 
-    self.sortingFieldsList = ko.observableArray(${ hue_collection.fields | n,unicode });
+    self.sortingFieldsList = ko.observableArray(${ hue_collection.fields(user) | n,unicode });
 
     self.newFieldSelect = ko.observable();
     self.newFieldSelect.subscribe(function (newValue) {
@@ -175,7 +175,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
       if (self.newFieldLabel() == ""){
         self.newFieldLabel(self.newFieldSelect());
       }
-      self.sortingFields.push(new SortingField(self.newFieldSelect(), self.newFieldLabel(), self.newFieldAscDesc()=="asc"));
+      self.sortingFields.push(new SortingField(self.newFieldSelect(), self.newFieldLabel(), self.newFieldAscDesc() == "asc"));
       self.newFieldLabel("");
       self.newFieldAscDesc("asc");
       self.isEnabled(true);

@@ -483,7 +483,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 
     function ViewModel() {
       var self = this;
-      self.availableFields = ko.observableArray(${ hue_collection.fields | n,unicode });
+      self.availableFields = ko.observableArray(${ hue_collection.fields(user) | n,unicode });
       self.selectedVisualField = ko.observable();
       self.selectedVisualFunction = ko.observable();
       self.selectedVisualFunction.subscribe(function (newValue) {

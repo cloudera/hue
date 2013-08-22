@@ -618,10 +618,10 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
 
     self.isSaveBtnVisible = ko.observable(false);
 
-    self.fields = ko.observableArray(${ hue_collection.fields | n,unicode });
+    self.fields = ko.observableArray(${ hue_collection.fields(user) | n,unicode });
 
     self.fullFields = {}
-    $.each(${ hue_collection.fields_data | n,unicode }, function(index, field) {
+    $.each(${ hue_collection.fields_data(user) | n,unicode }, function(index, field) {
       self.fullFields[field.name] = field;
     });
 
@@ -632,7 +632,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
     }));
 
     // Remove already selected fields
-    self.fieldFacetsList = ko.observableArray(${ hue_collection.fields | n,unicode });
+    self.fieldFacetsList = ko.observableArray(${ hue_collection.fields(user) | n,unicode });
     $.each(self.fieldFacets(), function(index, field) {
       self.fieldFacetsList.remove(field.field);
     });

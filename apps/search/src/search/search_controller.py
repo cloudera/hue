@@ -37,12 +37,12 @@ class SearchController(object):
   """
   Glue the models to the views.
   """
-  def __init__(self):
-    pass
+  def __init__(self, user):
+    self.user = user
 
   def get_new_collections(self):
     try:
-      solr_collections = SolrApi(SOLR_URL.get()).collections()
+      solr_collections = SolrApi(SOLR_URL.get(), self.user).collections()
       for name in Collection.objects.values_list('name', flat=True):
         solr_collections.pop(name, None)
     except Exception, e:
@@ -53,7 +53,7 @@ class SearchController(object):
 
   def get_new_cores(self):
     try:
-      solr_cores = SolrApi(SOLR_URL.get()).cores()
+      solr_cores = SolrApi(SOLR_URL.get(), self.user).cores()
       for name in Collection.objects.values_list('name', flat=True):
         solr_cores.pop(name, None)
     except Exception, e:
@@ -120,9 +120,9 @@ class SearchController(object):
       LOG.warn('Error copying collection: %s' % e)
 
   def is_collection(self, collection_name):
-    solr_collections = SolrApi(SOLR_URL.get()).collections()
+    solr_collections = SolrApi(SOLR_URL.get(), self.user).collections()
     return collection_name in solr_collections
 
   def is_core(self, core_name):
-    solr_cores = SolrApi(SOLR_URL.get()).cores()
+    solr_cores = SolrApi(SOLR_URL.get(), self.user).cores()
     return core_name in solr_cores
