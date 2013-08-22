@@ -29,7 +29,7 @@ ${ commonheader(_('Tables'), 'metastore', user) | n,unicode }
       <div class="sidebar-nav">
         <ul class="nav nav-list">
           <li class="nav-header">${_('database')}</li>
-          <li class="nav-header">
+          <li class="white">
             <form action="${ url('metastore:show_tables') }" id="db_form" method="POST" style="margin-bottom: 0">
               ${ db_form | n,unicode }
             </form>
