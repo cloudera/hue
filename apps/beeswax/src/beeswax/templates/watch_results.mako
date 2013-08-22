@@ -108,7 +108,7 @@ ${layout.menubar(section='query')}
             </div>
           % endif
 
-          <div id="jumpToColumnAlert" class="alert hide">
+          <div id="jumpToColumnAlert" class="alert hide" style="margin-top: 12px;">
             <button type="button" class="close" data-dismiss="alert">&times;</button>
             <strong>${_('Did you know?')}</strong>
             <ul>
