@@ -69,7 +69,7 @@ def index(request):
     try:
       hue_collection = Collection.objects.get(id=collection_id)
       solr_query['collection'] = hue_collection.name
-      response = SolrApi(SOLR_URL.get()).query(solr_query, hue_collection)
+      response = SolrApi(SOLR_URL.get(), request.user).query(solr_query, hue_collection)
     except Exception, e:
       error['message'] = unicode(str(e), "utf8")
   else:
@@ -123,7 +123,7 @@ def admin_collections(request, is_redirect=False):
 @allow_admin_only
 def admin_collections_import(request):
   if request.method == 'POST':
-    searcher = SearchController()
+    searcher = SearchController(request.user)
     status = 0
     err_message = _('Error')
     result = {
@@ -141,7 +141,7 @@ def admin_collections_import(request):
     return HttpResponse(json.dumps(result), mimetype="application/json")
   else:
     if request.GET.get('format') == 'json':
-      searcher = SearchController()
+      searcher = SearchController(request.user)
       new_solr_collections = searcher.get_new_collections()
       massaged_collections = []
       for coll in new_solr_collections:
@@ -170,7 +170,7 @@ def admin_collection_delete(request):
     raise PopupException(_('POST request required.'))
 
   id = request.POST.get('id')
-  searcher = SearchController()
+  searcher = SearchController(request.user)
   response = {
     'id': searcher.delete_collection(id)
   }
@@ -184,7 +184,7 @@ def admin_collection_copy(request):
     raise PopupException(_('POST request required.'))
 
   id = request.POST.get('id')
-  searcher = SearchController()
+  searcher = SearchController(request.user)
   response = {
     'id': searcher.copy_collection(id)
   }
@@ -195,12 +195,12 @@ def admin_collection_copy(request):
 @allow_admin_only
 def admin_collection_properties(request, collection_id):
   hue_collection = Collection.objects.get(id=collection_id)
-  solr_collection = SolrApi(SOLR_URL.get()).collection_or_core(hue_collection)
+  solr_collection = SolrApi(SOLR_URL.get(), request.user).collection_or_core(hue_collection)
 
   if request.method == 'POST':
     collection_form = CollectionForm(request.POST, instance=hue_collection)
     if collection_form.is_valid():
-      searcher = SearchController()
+      searcher = SearchController(request.user)
       hue_collection = collection_form.save(commit=False)
       hue_collection.is_core_only = not searcher.is_collection(hue_collection.name)
       hue_collection.save()
@@ -220,7 +220,7 @@ def admin_collection_properties(request, collection_id):
 @allow_admin_only
 def admin_collection_template(request, collection_id):
   hue_collection = Collection.objects.get(id=collection_id)
-  solr_collection = SolrApi(SOLR_URL.get()).collection_or_core(hue_collection)
+  solr_collection = SolrApi(SOLR_URL.get(), request.user).collection_or_core(hue_collection)
 
   if request.method == 'POST':
     hue_collection.result.update_from_post(request.POST)
@@ -235,7 +235,7 @@ def admin_collection_template(request, collection_id):
   solr_query['start'] = 0
   solr_query['facets'] = 0
 
-  response = SolrApi(SOLR_URL.get()).query(solr_query, hue_collection)
+  response = SolrApi(SOLR_URL.get(), request.user).query(solr_query, hue_collection)
 
   return render('admin_collection_template.mako', request, {
     'solr_collection': solr_collection,
@@ -247,7 +247,7 @@ def admin_collection_template(request, collection_id):
 @allow_admin_only
 def admin_collection_facets(request, collection_id):
   hue_collection = Collection.objects.get(id=collection_id)
-  solr_collection = SolrApi(SOLR_URL.get()).collection_or_core(hue_collection)
+  solr_collection = SolrApi(SOLR_URL.get(), request.user).collection_or_core(hue_collection)
 
   if request.method == 'POST':
     hue_collection.facets.update_from_post(request.POST)
@@ -263,7 +263,7 @@ def admin_collection_facets(request, collection_id):
 @allow_admin_only
 def admin_collection_sorting(request, collection_id):
   hue_collection = Collection.objects.get(id=collection_id)
-  solr_collection = SolrApi(SOLR_URL.get()).collection_or_core(hue_collection)
+  solr_collection = SolrApi(SOLR_URL.get(), request.user).collection_or_core(hue_collection)
 
   if request.method == 'POST':
     hue_collection.sorting.update_from_post(request.POST)
@@ -279,7 +279,7 @@ def admin_collection_sorting(request, collection_id):
 @allow_admin_only
 def admin_collection_highlighting(request, collection_id):
   hue_collection = Collection.objects.get(id=collection_id)
-  solr_collection = SolrApi(SOLR_URL.get()).collection_or_core(hue_collection)
+  solr_collection = SolrApi(SOLR_URL.get(), request.user).collection_or_core(hue_collection)
 
   if request.method == 'POST':
     hue_collection.result.update_from_post(request.POST)
@@ -297,7 +297,7 @@ def admin_collection_highlighting(request, collection_id):
 @allow_admin_only
 def admin_collection_solr_properties(request, collection_id):
   hue_collection = Collection.objects.get(id=collection_id)
-  solr_collection = SolrApi(SOLR_URL.get()).collection_or_core(hue_collection)
+  solr_collection = SolrApi(SOLR_URL.get(), request.user).collection_or_core(hue_collection)
 
   content = render('admin_collection_properties_solr_properties.mako', request, {
     'solr_collection': solr_collection,
@@ -310,7 +310,7 @@ def admin_collection_solr_properties(request, collection_id):
 @allow_admin_only
 def admin_collection_schema(request, collection_id):
   hue_collection = Collection.objects.get(id=collection_id)
-  solr_schema = SolrApi(SOLR_URL.get()).schema(hue_collection.name)
+  solr_schema = SolrApi(SOLR_URL.get(), request.user).schema(hue_collection.name)
 
   content = {
     'solr_schema': solr_schema.decode('utf-8')
@@ -328,7 +328,7 @@ def query_suggest(request, collection_id, query=""):
   solr_query['q'] = query
 
   try:
-    response = SolrApi(SOLR_URL.get()).suggest(solr_query, hue_collection)
+    response = SolrApi(SOLR_URL.get(), request.user).suggest(solr_query, hue_collection)
     result['message'] = response
     result['status'] = 0
   except Exception, e:
