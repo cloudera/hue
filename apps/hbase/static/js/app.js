@@ -21,6 +21,9 @@ var AppViewModel = function() {
   self.pageTitle = ko.observable("");
   self.focusModel = ko.observable();
   self.cluster = ko.observable("");
+  self.cluster.subscribe(function() {
+    app.views.tabledata.name('');
+  });
   self.clusters = ko.observableArray();
   API.query('getClusters').done(function(data) {
     app.clusters(data);
@@ -97,11 +100,12 @@ routie({
   ':cluster/:table/query/:query': function(cluster, table, query) {
       logGA('query_table');
       app.station('table');
+      resetSearch();
+      app.search.cur_input(query);
       Router.setTable(cluster, table);
       resetElements();
       Views.render('dataview');
       app.views.tabledata._reloadcfs(function(){
-        app.search.cur_input(query);
         app.search.evaluate();
         app.views.tabledata.searchQuery(query);
       });
@@ -122,7 +126,9 @@ routie({
       app.cluster(cluster);
       app.pageTitle(cluster);
       Views.render('clusterview');
+      resetSearch();
       resetElements();
+      app.views.tabledata.name('');
       app.views.tables.reload();
       routed = true;
     },
@@ -221,9 +227,6 @@ $('form.ajaxSubmit').submit(bindSubmit).on('hidden', function() {
 
 $('a.action_addColumn').click(function() {
   $(this).parent().find("ul").append("<li><input type=\"text\" name=\"table_columns\" placeholder = \"family_name\"/></li>")
-});
-$('a.action_addColumnValue').click(function() {
-  $(this).parent().find("ul").append("<li><input type=\"text\" name=\"column_values\" class=\"ignore\" placeholder = \"family:column_name\"/> <input type=\"text\" name=\"column_values\" class=\"ignore\" placeholder = \"cell_value\"/></li>")
 });
 
 var konami = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65, 13];
