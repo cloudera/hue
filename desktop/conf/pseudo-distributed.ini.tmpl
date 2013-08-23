@@ -516,67 +516,20 @@
 
 
 ###########################################################################
-# Settings to configure the Shell application
+# Settings to configure the Zookeeper application.
 ###########################################################################
 
-[shell]
-  # The shell_buffer_amount specifies the number of bytes of output per shell
-  # that the Shell app will keep in memory. If not specified, it defaults to
-  # 524288 (512 MiB).
-  ## shell_buffer_amount=100
+[zookeeper]
 
-  # If you run Hue against a Hadoop cluster with Kerberos security enabled, the
-  # Shell app needs to acquire delegation tokens for the subprocesses to work
-  # correctly. These delegation tokens are stored as temporary files in some
-  # directory. You can configure this directory here. If not specified, it
-  # defaults to /tmp/hue_delegation_tokens.
-  ## shell_delegation_token_dir=/tmp/hue_delegation_tokens
+  [[clusters]]
 
-  [[ shelltypes ]]
+    [[[default]]]
+      # Zookeeper ensemble. Comma separated list of Host/Port.
+      # e.g. localhost:2181,localhost:2182,localhost:2183
+      ## host_ports=localhost:2181
 
-    # Define and configure a new shell type "pig"
-    # ------------------------------------------------------------------------
-    [[[ pig ]]]
-      nice_name = "Pig Shell (Grunt)"
-      command = "/usr/bin/pig -l /dev/null"
-      help = "The command-line interpreter for Pig"
-
-      [[[[ environment ]]]]
-        # You can specify environment variables for the Pig shell
-        # in this section. Note that JAVA_HOME must be configured
-        # for the Pig shell to run.
-
-        [[[[[ JAVA_HOME ]]]]]
-          value = "/usr/lib/jvm/java-6-sun"
-
-    # Define and configure a new shell type "hbase"
-    # ------------------------------------------------------------------------
-    [[[ hbase ]]]
-      nice_name = "HBase Shell"
-      command = "/usr/bin/hbase shell"
-      help = "The command-line HBase client interface."
-
-      [[[[ environment ]]]]
-        # You can configure environment variables for the HBase shell
-        # in this section.
-
-    # Define and configure a new shell type "Sqoop 2"
-    # ------------------------------------------------------------------------
-    [[[ sqoop2 ]]]
-      nice_name = "Sqoop 2 Shell"
-      command = "/usr/bin/sqoop2"
-      help = "The command-line Sqoop 2 client."
-
-      [[[[ environment ]]]]
-        # You can configure environment variables for the Sqoop 2 shell
-        # in this section.
-
-    # Define and configure a new shell type "bash" for testing only
-    # ------------------------------------------------------------------------
-    [[[ bash ]]]
-      nice_name = "Bash (Test only!!!)"
-      command = "/bin/bash"
-      help = "A shell that does not depend on Hadoop components"
+      # The URL of the REST contrib service
+      ## rest_url=http://localhost:9998
 
 
 ###########################################################################

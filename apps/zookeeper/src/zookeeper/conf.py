@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -14,17 +15,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from setuptools import setup, find_packages
-from hueversion import VERSION
+from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, validate_path, coerce_bool
 
-setup(
-  name = "zookeeper",
-  version = VERSION,
-  author = "Hue",
-  url = 'http://github.com/cloudera/hue',
-  description = "ZooKeeper Browser",
-  packages = find_packages('src'),
-  package_dir = {'': 'src'},
-  install_requires = ['setuptools', 'desktop'],
-  entry_points = { 'desktop.sdk.application': 'zookeeper=zookeeper' },
+
+CLUSTERS = UnspecifiedConfigSection(
+  "clusters",
+  help="One entry for each Zookeeper cluster",
+  each=ConfigSection(
+    help="Information about a single Zookeeper cluster",
+    members=dict(
+      HOST_PORTS=Config(
+          "host_ports",
+          help="Zookeeper ensemble. Comma separated list of Host/Port, e.g. localhost:2181,localhost:2182,localhost:2183",
+          default="localhost:2181",
+      ),
+      REST_URL=Config(
+          "rest_url",
+          help="The URL of the REST contrib service.",
+          default="http://localhost:9998",
+      ),
+    )
+  )
 )
