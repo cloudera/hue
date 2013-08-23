@@ -31,6 +31,7 @@ from thrift.transport.TSocket import TSocket
 from thrift.transport.TTransport import TBufferedTransport, TMemoryBuffer,\
                                         TTransportException
 from thrift.protocol.TBinaryProtocol import TBinaryProtocol
+from desktop.lib.python_util import create_synchronous_io_multiplexer
 from desktop.lib.thrift_sasl import TSaslClientTransport
 from desktop.lib.exceptions import StructuredException, StructuredThriftTransportException
 
@@ -279,17 +280,15 @@ class PooledClient(object):
             # Poke it to see if it's closed on the other end. This can happen if a connection
             # sits in the connection pool longer than the read timeout of the server.
             sock = _grab_transport_from_wrapper(superclient.transport).handle
-            if sock:
-              rlist,wlist,xlist = select.select([sock], [], [], 0)
-              if rlist:
-                # the socket is readable, meaning there is either data from a previous call
-                # (i.e our protocol is out of sync), or the connection was shut down on the
-                # remote side. Either way, we need to reopen the connection.
-                # If the socket was closed remotely, btw, socket.read() will return
-                # an empty string.  This is a fairly normal condition, btw, since
-                # there are timeouts on both the server and client sides.
-                superclient.transport.close()
-                superclient.transport.open()
+            if sock and create_synchronous_io_multiplexer().read([sock]):
+              # the socket is readable, meaning there is either data from a previous call
+              # (i.e our protocol is out of sync), or the connection was shut down on the
+              # remote side. Either way, we need to reopen the connection.
+              # If the socket was closed remotely, btw, socket.read() will return
+              # an empty string.  This is a fairly normal condition, btw, since
+              # there are timeouts on both the server and client sides.
+              superclient.transport.close()
+              superclient.transport.open()
 
             superclient.set_timeout(self.conf.timeout_seconds)
             return res(*args, **kwargs)
@@ -311,7 +310,6 @@ class PooledClient(object):
           _connection_pool.return_client(self.conf, superclient)
       wrapper.attr = attr # Save the name of the attribute as it is replaced by 'wrapper'
       return wrapper
-
 
 
 class SuperClient(object):

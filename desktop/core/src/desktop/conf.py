@@ -92,6 +92,13 @@ COLLECT_USAGE = Config(
   type=coerce_bool,
   default=True)
 
+POLL_ENABLED = Config(
+  key="poll_enabled",
+  help=_("Use poll(2) in Hue thrift pool."),
+  type=coerce_bool,
+  private=True,
+  default=True)
+
 
 def is_https_enabled():
   return bool(SSL_CERTIFICATE.get() and SSL_PRIVATE_KEY.get())
