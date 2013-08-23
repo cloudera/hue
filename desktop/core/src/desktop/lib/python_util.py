@@ -17,6 +17,13 @@
 # 
 # Extra python utils
 
+import select
+from django.utils.translation import ugettext as _
+from desktop import conf
+
+
+__all__ = ['CaseInsensitiveDict', 'create_synchronous_io_multiplexer']
+
 
 class CaseInsensitiveDict(dict):
   def __setitem__(self, key, value):
@@ -31,3 +38,45 @@ class CaseInsensitiveDict(dict):
   @classmethod
   def from_dict(cls, _dict):
     return CaseInsensitiveDict([(isinstance(key, basestring) and key.lower() or key, _dict[key]) for key in _dict])
+
+
+class SynchronousIOMultiplexer(object):
+  def read(self, rd):
+    raise NotImplementedError(_('"read" method is not implemented'))
+
+  def write(self, rd):
+    raise NotImplementedError(_('"write" method is not implemented'))
+
+  def error(self, rd):
+    raise NotImplementedError(_('"error" method is not implemented'))
+
+
+class SelectSynchronousIOMultiplexer(SynchronousIOMultiplexer):
+  def __init__(self, timeout=0):
+    self.timeout = 0
+
+  def read(self, fds):
+    rlist, wlist, xlist = select.select(fds, [], [], self.timeout)
+    return rlist
+
+
+class PollSynchronousIOMultiplexer(SynchronousIOMultiplexer):
+  def __init__(self, timeout=0):
+    self.timeout = 0
+
+  def read(self, fds):
+    poll_obj = select.poll()
+    for fd in fds:
+      poll_obj.register(fd, select.POLLIN)
+    event_list = poll_obj.poll(self.timeout)
+    return [fd_event_tuple[0] for fd_event_tuple in event_list]
+
+
+def create_synchronous_io_multiplexer(timeout=0):
+  if conf.POLL_ENABLED.get():
+    try:
+      from select import poll
+      return PollSynchronousIOMultiplexer(timeout)
+    except ImportError:
+      pass
+  return SelectSynchronousIOMultiplexer(timeout)
