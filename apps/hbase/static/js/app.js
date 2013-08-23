@@ -100,7 +100,6 @@ routie({
   ':cluster/:table/query/:query': function(cluster, table, query) {
       logGA('query_table');
       app.station('table');
-      resetSearch();
       app.search.cur_input(query);
       Router.setTable(cluster, table);
       resetElements();
