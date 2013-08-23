@@ -1,0 +1,62 @@
+/* 
+	zkui styles
+	important: these should be namespaced
+	example:
+		let's say you are creating an app called "calculator"; you should prefix all your styles with your application's name like so
+		
+		.calculator img {
+			border: 1px solid #000;
+		}
+		.calculator p {
+			margin: 10px 0px;
+		}
+		etc...
+
+	other notes:
+	* don't use ids - there may be more than one of your apps open; use classes!
+	* the toolbar element is absolutely positioned and 100% wide (and therefor 0px high);
+	  any elements inside it should also be absolutely positioned
+*/
+
+.zkui img.zkui_icon {
+	width: 55px;
+	height: 55px;
+	position: absolute;
+	top: 27px;
+	left: 3px;
+}
+
+div.zkui .left_col li {
+    margin: 5px 0px;
+    font-size: 16px;
+    background-color: white;
+    color: black;
+    padding: 2px 1px 1px 5px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border: solid black 1px;
+}
+
+div.zkui .left_col li:hover {
+    background-color: lightBlue;
+    color: white;
+}
+
+div.zkui .left_col li a {
+    color: black;
+    display: block;
+}
+
+div.zkui .left_col li a:hover {
+    text-decoration: none;
+}
+
+div.zkui td a.delete {
+//  background: url(/zkui/static/art/line_icons.png) no-repeat 0 -70px;
+}
+
+div.zkui .createZnodeForm td,
+div.zkui .editZnodeForm td {
+  padding: 5px;
+}
+
