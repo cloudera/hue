@@ -1,13 +1,14 @@
-#  Licensed to the Apache Software Foundation (ASF) under one
+#!/usr/bin/env python
+# Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
+# regarding copyright ownership.  Cloudera, Inc. licenses this file
 # to you under the Apache License, Version 2.0 (the
 # "License"); you may not use this file except in compliance
 # with the License.  You may obtain a copy of the License at
-
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,6 +19,7 @@ import socket
 import re
 
 from StringIO import StringIO
+
 
 class Session(object):
 
@@ -33,7 +35,8 @@ class Session(object):
             k,v = d.split("=")
             self.__dict__[k] = v
     else:
-        raise Session.BrokenLine() 
+        raise Session.BrokenLine()
+
 
 class ZooKeeperStats(object):
 
@@ -93,7 +96,7 @@ class ZooKeeperStats(object):
     def _parse(self, data):
         """ Parse the output from the 'mntr' 4letter word command """
         h = StringIO(data)
-        
+
         result = {}
         for line in h.readlines():
             try:
@@ -109,7 +112,7 @@ class ZooKeeperStats(object):
         h = StringIO(data)
 
         result = {}
-        
+
         version = h.readline()
         if version:
             result['zk_version'] = version[version.index(':')+1:].strip()
@@ -150,7 +153,7 @@ class ZooKeeperStats(object):
                 result['zk_znode_count'] = int(m.group(1))
                 continue
 
-        return result 
+        return result
 
     def _parse_line(self, line):
         try:
@@ -167,4 +170,3 @@ class ZooKeeperStats(object):
             pass
 
         return key, value
-

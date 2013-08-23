@@ -1,8 +1,8 @@
-
-# Licensed to the Apache Software Foundation (ASF) under one
+#!/usr/bin/env python
+# Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
+# regarding copyright ownership.  Cloudera, Inc. licenses this file
 # to you under the Apache License, Version 2.0 (the
 # "License"); you may not use this file except in compliance
 # with the License.  You may obtain a copy of the License at
@@ -21,6 +21,7 @@ import simplejson
 
 from contextlib import contextmanager
 
+
 class RequestWithMethod(urllib2.Request):
     """ Request class that know how to set the method name """
     def __init__(self, *args, **kwargs):
@@ -34,6 +35,7 @@ class RequestWithMethod(urllib2.Request):
     def set_method(self, method):
         self._method = method
 
+
 class ZooKeeper(object):
 
     class Error(Exception): pass
@@ -46,7 +48,7 @@ class ZooKeeper(object):
 
     class WrongVersion(Error): pass
 
-    def __init__(self, uri = 'http://localhost:9998'):
+    def __init__(self, uri='http://localhost:9998'):
         self._base = uri
         self._session = None
 
@@ -98,7 +100,7 @@ class ZooKeeper(object):
         for child in resp.get('children', []):
             yield child if not uris else resp['child_uri_template']\
               .replace('{child}', urllib2.quote(child))
-       
+
     def create(self, path, data=None, sequence=False, ephemeral=False):
         """ Create a new node. By default this call creates a persistent znode.
 
@@ -117,19 +119,16 @@ class ZooKeeper(object):
             if self._session:
                 flags['session'] = self._session
             else:
-                raise ZooKeeper.Error, 'You need a session '\
-                    'to create an ephemeral node'
+                raise ZooKeeper.Error, 'You need a session to create an ephemeral node'
         flags = urllib.urlencode(flags)
 
-        url = "%s/znodes/v1%s?op=create&name=%s&%s" % \
-            (self._base, head, name, flags)
+        url = "%s/znodes/v1%s?op=create&name=%s&%s" % (self._base, head, name, flags)
 
         return self._do_post(url, data)
 
     def set(self, path, data=None, version=-1, null=False):
         """ Set the value of node """
-        url = "%s/znodes/v1%s?%s" % (self._base, path, \
-            urllib.urlencode({
+        url = "%s/znodes/v1%s?%s" % (self._base, path, urllib.urlencode({
                 'version': version,
                 'null': 'true' if null else 'false'
         }))
@@ -227,4 +226,3 @@ class ZooKeeper(object):
             if e.code == 412: # precondition failed
                 raise ZooKeeper.WrongVersion(uri)
             raise
-
