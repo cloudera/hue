@@ -21,42 +21,50 @@
 
 <%namespace name="shared" file="shared_components.mako" />
 
-${ commonheader(_('View'), app_name, user, '100px') | n,unicode }
-${ shared.header(clusters) }
+${ commonheader(_('View'), app_name, user, '60px') | n,unicode }
+
+<%
+  _breadcrumbs = [
+    ["ZooKeeper Browser", url('zookeeper:index')]
+  ]
+%>
 
 
-<h2>Overview</h2>
-
-<br />
+${ shared.header(_breadcrumbs, clusters) }
 
 % for i, c in enumerate(clusters):
-  <h3> ${ i + 1 }. <a href="${ url('zookeeper:view', id=i) }">${ c } Cluster Overview</a></h3><br />
-
-  <table data-filters="HtmlTable">
-  <thead>
-    <tr>
-      <th>Node</th>
-      <th>Role</th>
-      <th>Avg Latency</th>
-      <th>Watch Count</th>
-      <th>Version</th>
-    </tr>
-  </thead>
-  % for host, stats in overview[c].items():
-    <tr>
-      <td><a href="${ url('zookeeper:view', id=i) }" data-row-selector="true">${ host }</a></td>
-      <td>${stats.get('zk_server_state', '')}</td>
-      <td>${stats.get('zk_avg_latency', '')}</td>
-      <td>${stats.get('zk_watch_count', '')}</td>
-      <td>${stats.get('zk_version', '')}</td>
-    </tr>
-  % endfor
+  <h3 class="card-heading simple simpler">${ _('Cluster') } <a href="${ url('zookeeper:view', id=i) }">${ c }</a></h3>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Node</th>
+        <th>Role</th>
+        <th>Avg Latency</th>
+        <th>Watch Count</th>
+        <th>Version</th>
+      </tr>
+    </thead>
+    <tbody>
+    % for host, stats in overview[c].items():
+      <tr>
+        <td><a href="${ url('zookeeper:clients', id=i, host=host) }" data-row-selector="true">${ host }</a></td>
+        <td>${stats.get('zk_server_state', '')}</td>
+        <td>${stats.get('zk_avg_latency', '')}</td>
+        <td>${stats.get('zk_watch_count', '')}</td>
+        <td>${stats.get('zk_version', '')}</td>
+      </tr>
+    % endfor
+    </tbody>
   </table>
-
-  <br /><br />
 % endfor
 
 
-<link rel="stylesheet" href="/zookeeper/static/css/zookeeper.css">
+${ shared.footer() }
+
+<script type="text/javascript" charset="utf-8">
+  $(document).ready(function () {
+    $("a[data-row-selector='true']").jHueRowSelector();
+  });
+</script>
 
 ${ commonfooter(messages) | n,unicode }

@@ -21,116 +21,140 @@
 
 <%namespace name="shared" file="shared_components.mako" />
 
-${ commonheader(_('View'), app_name, user, '100px') | n,unicode }
-${ shared.header(clusters) }
+${ commonheader(_('View'), app_name, user, '60px') | n,unicode }
 
-
+<%
+  _breadcrumbs = [
+    ["ZooKeeper Browser", url('zookeeper:index')],
+    [cluster['nice_name'].lower(), url('zookeeper:view', id=cluster['id'])]
+  ]
+%>
 <%def name="show_stats(stats)">
-    <thead>
-      <tr><th>Key</th>
-      <th width="100%">Value</th></tr>
-    </thead>
+  <thead>
+  <tr>
+    <th width="20%">${ _('Key') }</th>
+    <th>${ _('Value') }</th>
+  </tr>
+  </thead>
+  <tr>
+    <td>${ _('Version') }</td>
+    <td>${stats.get('zk_version')}</td>
+  </tr>
 
-    <tr><td>Version</td>
-      <td>${stats.get('zk_version')}</td>
-    </tr>
+  <tr>
+    <td>${ _('Latency') }</td>
+    <td>
+      ${ _('Min:') } ${stats.get('zk_min_latency', '')}
+      ${ _('Avg:') } ${stats.get('zk_avg_latency', '')}
+      ${ _('Max:') } ${stats.get('zk_max_latency', '')}
+    </td>
+  </tr>
 
-    <tr><td>Latency</td><td>
-      Min: ${stats.get('zk_min_latency', '')}
-      Avg: ${stats.get('zk_avg_latency', '')}
-      Max: ${stats.get('zk_max_latency', '')}
-    </td></tr>
+  <tr>
+    <td>${ _('Packets') }</td>
+    <td>${ _('Sent:') } ${stats.get('zk_packets_sent', '')}
+      ${ _('Received:') } ${stats.get('zk_packets_received', '')}
+    </td>
+  </tr>
 
-    <tr><td>Packets</td>
-      <td>Sent: ${stats.get('zk_packets_sent', '')}
-      Received: ${stats.get('zk_packets_received', '')}
-      </td>
-    </tr>
+  <tr>
+    <td>${ _('Outstanding Requests') }</td>
+    <td>${stats.get('zk_outstanding_requests', '')}</td>
+  </tr>
 
-    <tr><td>Outstanding Requests</td>
-      <td>${stats.get('zk_outstanding_requests', '')}</td>
-    </tr>
+  <tr>
+    <td>${ _('Watch Count') }</td>
+    <td>${stats.get('zk_watch_count', '')}</td>
+  </tr>
 
-    <tr><td>Watch Count</td>
-      <td>${stats.get('zk_watch_count', '')}</td>
-    </tr>
+  <tr>
+    <td>${ _('Open FD Count') }</td>
+    <td>${stats.get('zk_open_file_descriptor_count', '')}</td>
+  </tr>
 
-    <tr><td>Open FD Count</td>
-      <td>${stats.get('zk_open_file_descriptor_count', '')}</td>
-    </tr>
-
-    <tr><td>Max FD Count</td>
-      <td>${stats.get('zk_max_file_descriptor_count', '')}</td>
-    </tr>
-
+  <tr>
+    <td>${ _('Max FD Count') }</td>
+    <td>${stats.get('zk_max_file_descriptor_count', '')}</td>
+  </tr>
 </%def>
 
-<h2> ${ cluster['nice_name'] } Cluster Overview </h2>
 
-${ shared.info_button(url('zookeeper:tree', id=cluster['id'], path='/'), 'View Znode Hierarchy') }
+${ shared.header(_breadcrumbs, clusters, False) }
+<div class="row-fluid" style="margin-top: 20px">
+  <div class="span3">
+    <div class="sidebar-nav">
+      <ul class="nav nav-list" style="border: 0">
+        <li class="nav-header">${ _('Znodes') }</li>
+        <li><a href="${url('zookeeper:tree', id=cluster['id'], path='/')}"> ${ _('View Znode Hierarchy') }</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="span9">
+    % if leader:
+    <h2 class="card-heading simple simpler">${ _('General') }</h2>
+    <table class="table">
+      <thead>
+      <tr>
+        <th width="20%">${ _('Key') }</th>
+        <th>${ _('Value') }</th>
+      </tr>
+      </thead>
+      <tr>
+        <td>${ _('ZNode Count') }</td>
+        <td>${leader.get('zk_znode_count', '')}</td>
+      </tr>
 
-<br /><br />
+      <tr>
+        <td>${ _('Ephemerals Count') }</td>
+        <td>${leader.get('zk_ephemerals_count', '')}</td>
+      </tr>
 
-% if leader:
-<h2>General</h2>
+      <tr>
+        <td>${ _('Approximate Data Size') }</td>
+        <td>${leader.get('zk_approximate_data_size', '')} bytes</td>
+      </tr>
 
-<table data-filters="HtmlTable">
-  <thead>
-    <tr><th>Key</th><th width="100%">Value</th></tr>
-  </thead>
+    </table>
+    % endif
 
-  <tr><td>ZNode Count</td>
-    <td>${leader.get('zk_znode_count', '')}</td></tr>
+    % if leader:
+      <h2 class="card-heading simple simpler">
+        <div class="pull-right"><a href="${url('zookeeper:clients', id=cluster['id'], host=leader['host'])}"><i class="icon-eye-open"></i> ${_('Client Connections')}</a></div>
+        ${ _('Node') } ${leader['host']} (${ _('leader') })
+      </h2>
 
-  <tr><td>Ephemerals Count</td>
-    <td>${leader.get('zk_ephemerals_count', '')}</td></tr>
+      <table class="table">
+        ${show_stats(leader)}
 
-  <tr><td>Approximate Data Size</td>
-    <td>${leader.get('zk_approximate_data_size', '')} bytes</td></tr>
+        <tr><td>${ _('Followers') }</td>
+          <td>${leader.get('zk_followers', '')}</td>
+        </tr>
 
-</table>
-<br /><br />
-% endif
+        <tr><td>${ _('Synced Followers') }</td>
+          <td>${leader.get('zk_synced_followers', '')}</td>
+        </tr>
 
-% if leader:
-  <h2>node :: ${leader['host']} :: leader</h2>
+        <tr><td>${ _('Pending Syncs') }</td>
+          <td>${leader.get('zk_pending_syncs', '')}</td>
+        </tr>
 
-  ${shared.info_button(url('zookeeper:clients', host=leader['host']), 'View Client Connections')}
+      </table>
+    % endif
 
-  <br /><br />
-  <table data-filters="HtmlTable">
-    ${show_stats(leader)}
+    % for stats in followers:
+      <h2 class="card-heading simple simpler">
+        <div class="pull-right"><a href="${url('zookeeper:clients', id=cluster['id'], host=stats['host'])}"><i class="icon-eye-open"></i> ${ _('Client Connections') }</a></div>
+      ${ _('Node') } ${stats['host']} (${ _('follower') })
+      </h2>
+      <table class="table">
+        ${show_stats(stats)}
+      </table>
+    % endfor
 
-    <tr><td>Followers</td>
-      <td>${leader.get('zk_followers', '')}</td>
-    </tr>
-
-    <tr><td>Synced Followers</td>
-      <td>${leader.get('zk_synced_followers', '')}</td>
-    </tr>
-
-    <tr><td>Pending Syncs</td>
-      <td>${leader.get('zk_pending_syncs', '')}</td>
-    </tr>
-
-  </table>
-<br /><br />
-% endif
-
-% for stats in followers:
-  <h2>node :: ${stats['host']} :: follower</h2>
-  <br />
-
-  ${shared.info_button(url('zookeeper:clients', host=stats['host']), 'View Client Connections')}
-
-  <br /><br />
-  <table data-filters="HtmlTable">
-    ${show_stats(stats)}
-  </table>
-  <br /><br />
-% endfor
+  </div>
+</div>
 
 
-<link rel="stylesheet" href="/zookeeper/static/css/zookeeper.css">
+${ shared.footer() }
 
 ${ commonfooter(messages) | n,unicode }

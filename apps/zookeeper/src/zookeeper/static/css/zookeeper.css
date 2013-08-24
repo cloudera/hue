@@ -16,44 +16,19 @@
 // limitations under the License.
 */
 
-.zookeeper img.zookeeper_icon {
-	width: 55px;
-	height: 55px;
-	position: absolute;
-	top: 27px;
-	left: 3px;
+.simpler {
+  padding-left: 4px!important;
 }
 
-div.zookeeper .left_col li {
-    margin: 5px 0px;
-    font-size: 16px;
-    background-color: white;
-    color: black;
-    padding: 2px 1px 1px 5px;
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
-    border: solid black 1px;
+.delete {
+  padding: 2px;
+  cursor: pointer;
 }
 
-div.zookeeper .left_col li:hover {
-    background-color: lightBlue;
-    color: white;
+textarea {
+  width: 95%;
 }
 
-div.zookeeper .left_col li a {
-    color: black;
-    display: block;
-}
-
-div.zookeeper .left_col li a:hover {
-    text-decoration: none;
-}
-
-div.zookeeper td a.delete {
-//  background: url(/zookeeper/static/art/line_icons.png) no-repeat 0 -70px;
-}
-
-div.zookeeper .createZnodeForm td,
-div.zookeeper .editZnodeForm td {
-  padding: 5px;
+.tab-pane {
+  margin-bottom: 30px;
 }

@@ -21,22 +21,31 @@
 
 <%namespace name="shared" file="shared_components.mako" />
 
-${ commonheader("ZooKeeper Browser > Edit Znode > %s" % path, app_name, user, '100px') | n,unicode }
-${ shared.header(clusters) }
+${ commonheader("ZooKeeper Browser > Edit Znode > %s" % path, app_name, user, '60px') | n,unicode }
 
-<h2>Edit Znode Data :: ${path}</h2>
-<hr /><br />
+<%
+  _split = path.split("/");
+  _breadcrumbs = [
+    ["ZooKeeper Browser", url('zookeeper:index')],
+    [cluster['nice_name'].lower(), url('zookeeper:view', id=cluster['id'])],
+  ]
+  for idx, p in enumerate(_split):
+    if p != "":
+      _breadcrumbs.append([p, url('zookeeper:tree', id=cluster['id'], path= "/".join(_split[:idx+1]))]);
 
-<form class="editZnodeForm" action="" method="POST">
-  <table align="center">
-    ${form.as_table()|n}
-    <tr><td colspan="2" align="right">
-    <button type="submit">Save</button>
-    </td></tr>
-  </table>
+  _breadcrumbs.append([_('Edit Znode'), ""]);
+%>
+
+${ shared.header(_breadcrumbs,clusters) }
+
+<form action="" method="POST">
+  ${form.as_table()|n}
+  <br/>
+  <input type="submit" class="btn btn-primary" value="${ _('Save') }">
+  <a class="btn" href="${url('zookeeper:tree', id=cluster['id'], path=path)}">${ _('Cancel') }</a>
 </form>
 
 
-<link rel="stylesheet" href="/zookeeper/static/css/zookeeper.css">
+${ shared.footer() }
 
 ${ commonfooter(messages) | n,unicode }

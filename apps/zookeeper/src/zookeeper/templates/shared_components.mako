@@ -15,29 +15,57 @@
 ## limitations under the License.
 
 <%!
-from django.template.defaultfilters import urlencode, escape
+  from django.template.defaultfilters import urlencode, escape
+  from django.utils.translation import ugettext as _
 %>
 
-<%def name="header(clusters)">
-    <div data-filters="SplitView">
-    <div class="left_col jframe_padded" style="width:150px;">
-        <h2>Clusters</h2>
-        <ul>
+<%def name="header(breadcrumbs, clusters, withBody=True)">
+  <div class="container-fluid">
+  <div class="row-fluid">
+    <div class="card">
+      <h1 class="card-heading simple">
+        <div class="btn-group pull-right">
+          <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+            ${ _('Go to cluster') }
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
             % for id, c in enumerate(clusters):
-                <li>
-                  <a href="${ url('zookeeper:view', id=id) }">
-                    ${ c }
-                  </a>
-                </li>
+              <li>
+                <a href="${ url('zookeeper:view', id=id) }">
+                  ${ c }
+                </a>
+              </li>
             % endfor
-        </ul>
+          </ul>
+        </div>
+      % for idx, crumb in enumerate(breadcrumbs):
+        %if crumb[1] != "":
+          <a href="${crumb[1]}">${crumb[0]}</a>
+        %else:
+          ${crumb[0]}
+        %endif
+
+        %if idx < len(breadcrumbs) - 1:
+          &gt;
+        %endif
+      % endfor
+      </h1>
+      %if withBody:
+      <div class="card-body">
+        <p>
+      %endif
+</%def>
+
+<%def name="footer(withBody=True)">
+      %if withBody:
+        </p>
+      </div>
+      %endif
     </div>
+  </div>
+</div>
+<link rel="stylesheet" href="/zookeeper/static/css/zookeeper.css">
+<script src="/zookeeper/static/js/base64.js" type="text/javascript" charset="utf-8"></script>
 </%def>
 
-
-<%def name="info_button(url, text)">
-  <a data-filters="ArtButton" href="${url}" style="background: url(/static/art/info.png) left 50%; padding: 6px 6px 6px 20px; margin: 10px;"
-    data-icon-styles="{'width': 14, 'height': 14}">
-      ${text}
-  </a>
-</%def>

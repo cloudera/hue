@@ -15,8 +15,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+try:
+  import json
+except ImportError:
+  import simplejson as json
+
+import logging
+
 from desktop.lib.django_util import render
-from django.http import Http404
+from django.http import Http404, HttpResponse
+from django.core.urlresolvers import reverse
 
 from zookeeper import settings
 
@@ -49,7 +57,7 @@ def _group_stats_by_role(stats):
   for host, stats in stats.items():
     stats['host'] = host
 
-    if stats.get('zk_server_state') == 'leader':
+    if stats.get('zk_server_state') == 'leader' or stats.get('zk_server_state') == 'standalone':
       leader = stats
 
     elif stats.get('zk_server_state') == 'follower':
@@ -74,12 +82,14 @@ def view(request, id):
   leader, followers = _group_stats_by_role(stats)
 
   return render('view.mako', request, {
-      'cluster': cluster, 'leader': leader, 'followers': followers,
+      'cluster': cluster, 'all_stats': stats, 'leader': leader, 'followers': followers,
       'clusters': CLUSTERS.get(),
   })
 
 
-def clients(request, host):
+def clients(request, id, host):
+  cluster = get_cluster_or_404(id)
+
   parts = host.split(':')
   if len(parts) != 2:
     raise Http404
@@ -88,8 +98,13 @@ def clients(request, host):
   zks = ZooKeeperStats(host, port)
   clients = zks.get_clients()
 
-  return render('clients.mako', request,
-    dict(host=host, port=port, clients=clients))
+  return render('clients.mako', request, {
+    'clusters': CLUSTERS.get(),
+    'cluster': cluster,
+    'host': host,
+    'port': port,
+    'clients': clients
+  })
 
 
 def tree(request, id, path):
@@ -104,14 +119,17 @@ def tree(request, id, path):
 
 def delete(request, id, path):
   cluster = get_cluster_or_404(id)
+  redir = {}
   if request.method == 'POST':
     zk = ZooKeeper(cluster['rest_url'])
     try:
       zk.recursive_delete(path)
     except ZooKeeper.NotFound:
       pass
-
-  return tree(request, id, path[:path.rindex('/')] or '/')
+    redir = {
+      'redirect': reverse('zookeeper:tree', kwargs={'id':id, 'path': path[:path.rindex('/')] or '/'})
+    }
+  return HttpResponse(json.dumps(redir), mimetype="application/json")
 
 
 def create(request, id, path):
@@ -129,7 +147,7 @@ def create(request, id, path):
   else:
     form = CreateZNodeForm()
 
-  return render('create.mako', request, {'path': path, 'form': form, 'clusters': CLUSTERS.get(),})
+  return render('create.mako', request, {'cluster': cluster, 'path': path, 'form': form, 'clusters': CLUSTERS.get(),})
 
 
 def edit_as_base64(request, id, path):
@@ -150,7 +168,7 @@ def edit_as_base64(request, id, path):
       data=node.get('data64', ''),
       version=node.get('version', '-1')))
 
-  return render('edit.mako', request, {'path': path, 'form': form, 'clusters': CLUSTERS.get(),})
+  return render('edit.mako', request, {'cluster': cluster, 'path': path, 'form': form, 'clusters': CLUSTERS.get(),})
 
 
 def edit_as_text(request, id, path):
@@ -167,4 +185,4 @@ def edit_as_text(request, id, path):
   else:
     form = EditZNodeForm(dict(data=node.get('data64', '').decode('base64').strip(), version=node.get('version', '-1')))
 
-  return render('edit.mako', request, {'path': path, 'form': form, 'clusters': CLUSTERS.get(),})
+  return render('edit.mako', request, {'cluster': cluster, 'path': path, 'form': form, 'clusters': CLUSTERS.get(),})
