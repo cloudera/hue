@@ -21,63 +21,125 @@
 
 <%namespace name="shared" file="shared_components.mako" />
 
-${ commonheader("ZooKeeper Browser > Tree > %s > %s" % (cluster['nice_name'], path), app_name, user, '100px') | n,unicode }
-${ shared.header(clusters) }
+${ commonheader("ZooKeeper Browser > Tree > %s > %s" % (cluster['nice_name'], path), app_name, user, '60px') | n,unicode }
+
+<%
+  _split = path.split("/");
+  _breadcrumbs = [
+    ["ZooKeeper Browser", url('zookeeper:index')],
+    [cluster['nice_name'].lower(), url('zookeeper:view', id=cluster['id'])],
+  ]
+  for idx, p in enumerate(_split):
+    if p != "":
+      _breadcrumbs.append([p, url('zookeeper:tree', id=cluster['id'], path= "/".join(_split[:idx+1]))]);
+%>
 
 
-<h1>${cluster['nice_name'].lower()} :: ${path}</h1>
-<br />
+${ shared.header(_breadcrumbs, clusters, False) }
+<div class="row-fluid" style="margin-top: 20px">
+  <div class="span3">
+    <div class="sidebar-nav">
+      <ul class="nav nav-list" style="border: 0">
+        <li class="nav-header">${ _('Znodes') }</li>
+        % for child in children:
+        <li>
+          <a href="${url('zookeeper:tree', id=cluster['id'], path=("%s/%s" % (path, child)).replace('//', '/'))}">${child}</a>
+        </li>
+        % endfor
+        % if len(children) == 0:
+          <li class="white">${ _('No children available') }</li>
+        % endif
+        <li class="white">
+          <button class="btn" onclick="location.href='${url('zookeeper:create', id=cluster['id'], path=path)}'"><i class="icon-plus-sign"></i> ${ _('Add') }</button>
+          <button id="removeBtn" class="btn btn-danger disable-feedback" data-msg="${_('Are you sure you want to delete %s?' % path)}" data-url="${url('zookeeper:delete', id=cluster['id'], path=path)}"><i class="icon-remove-sign"></i> ${ _('Remove current ZNode') }</button>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="span9">
+    <ul class="nav nav-tabs">
+      %if znode.get('dataLength', 0) != 0:
+        <li class="active"><a href="#base64" data-toggle="tab">Base64 (${znode.get('dataLength', 0)})</a></li>
+        <li><a href="#text" data-toggle="tab">${ _('Text') }</a></li>
+        <li><a href="#stats" data-toggle="tab">${ _('Stats') }</a></li>
+      %else:
+        <li><a href="#stats" data-toggle="tab">${ _('Stats') }</a></li>
+      %endif
+    </ul>
+    <div class="tab-content">
+      %if znode.get('dataLength', 0) != 0:
+      <div class="tab-pane active" id="base64">
+        <textarea id="textarea64" rows="14" readonly="readonly">${znode.get('data64', '')}</textarea>
+        <a href="${url('zookeeper:edit_as_base64', id=cluster['id'], path=path)}" class="btn"><i class="icon-pencil"></i> ${_('Edit as Base64')}</a>
+      </div>
+      <div class="tab-pane" id="text">
+        <textarea id="textareaText" rows="14" readonly="readonly"></textarea>
+        <a href="${url('zookeeper:edit_as_text', id=cluster['id'], path=path)}" class="btn"><i class="icon-pencil"></i> ${_('Edit as Text')}</a>
+      </div>
+      <div class="tab-pane" id="stats">
+      %else:
+      <div class="tab-pane active" id="stats">
+      %endif
+        <table class="table">
+          <thead>
+          <tr>
+            <th width="20%">Key</th>
+            <th>Value</th>
+          </tr>
+          </thead>
+          % for key in ('pzxid', 'ctime', 'aversion', 'mzxid', 'ephemeralOwner', 'version', 'mtime', 'cversion', 'czxid'):
+          <tr>
+            <td>${key}</td>
+            <td>${znode[key]}</td>
+          </tr>
+          % endfor
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
 
-<table data-filters="HtmlTable">
-  <thead>
-  <th colspan="2">Children</th>
-  </thead>
-  % for child in children:
-    <tr><td width="100%">
-      <a href="${url('zookeeper:tree', id=cluster['id'], \
-          path=("%s/%s" % (path, child)).replace('//', '/'))}">
-      ${child}</a>
-    </td><td>
-      <a title="Delete ${child}" class="delete frame_tip confirm_and_post" alt="Are you sure you want to delete ${child}?" href="${url('zookeeper:delete', id=cluster['id'], \
-          path=("%s/%s" % (path, child)).replace('//', '/'))}">Delete</a>
-    </td></tr>
-  % endfor
-</table>
-<br />
-<span style="float: right">
-  ${shared.info_button(url('zookeeper:create', id=cluster['id'], path=path), 'Create New')}
-</span>
 
-<div style="clear: both"></div>
+${ shared.footer() }
 
-<h2>data :: base64 :: length :: ${znode.get('dataLength', 0)}</h2>
-<br />
+<div id="removeModal" class="modal hide fade">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>${ _('Delete Znode?') }</h3>
+  </div>
+  <div class="modal-body">
+    <p class="question"></p>
+  </div>
+  <div class="modal-footer">
+    <a href="#" class="btn" data-dismiss="modal">${ _('Cancel') }</a>
+    <a id="removeBtnModal" href="#" class="btn btn-danger disable-feedback">${ _('Yes, delete it!') }</a>
+  </div>
+</div>
 
-<textarea name="data64" style="width: 100%;" rows="5" readonly="readonly">${znode.get('data64', '')}</textarea>
-<div style="clear: both"></div>
-<span style="float: right">
-  ${shared.info_button(url('zookeeper:edit_as_base64', id=cluster['id'], path=path), 'Edit as Base64')}
-  ${shared.info_button(url('zookeeper:edit_as_text', id=cluster['id'], path=path), 'Edit as Text')}
-</span>
-<div style="clear: both"></div>
-<br />
+<script type="text/javascript" charset="utf-8">
+  $(document).ready(function () {
+  %if znode.get('dataLength', 0) != 0:
+    var txt = Base64.decode($("#textarea64").val());
+    $("#textareaText").val(txt);
+  %endif
+    $("#removeModal").modal({
+      show: false
+    });
+    $("#removeBtn").on("click", function(){
+      var _url = $(this).data("url");
+      var _msg = $(this).data("msg");
+      $("#removeModal").find(".question").text(_msg);
+      $("#removeBtnModal").data("url", _url);
+      $("#removeModal").modal("show");
+    });
+    $("#removeBtnModal").on("click", function(){
+      $(this).addClass("disabled");
+      $.post($(this).data("url"), function(data){
+        location.href = data.redirect;
+      })
+    })
+  });
+</script>
 
-<h2>stat information</h2>
-<br />
-
-<table data-filters="HtmlTable">
-  <thead><tr><th>Key</th>
-    <th width="80%">Value</th></tr></thead>
-  % for key in ('pzxid', 'ctime', 'aversion', 'mzxid', \
-      'ephemeralOwner', 'version', 'mtime', 'cversion', 'czxid'):
-    <tr><td>${key}</td><td>${znode[key]}</td></tr>
-  % endfor
-</table>
-
-<br />
-<a target="_blank" href="http://hadoop.apache.org/zookeeper/docs/current/zookeeperProgrammers.html#sc_zkStatStructure">Details on stat information.</a>
-
-
-<link rel="stylesheet" href="/zookeeper/static/css/zookeeper.css">
 
 ${ commonfooter(messages) | n,unicode }

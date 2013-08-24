@@ -21,14 +21,19 @@
 
 <%namespace name="shared" file="shared_components.mako" />
 
-${ commonheader(_('Clients'), app_name, user, '100px') | n,unicode }
-${ shared.header("ZooKeeper Browser > Clients > %s:%s" % (host, port)) }
+${ commonheader(_('Clients'), app_name, user, '60px') | n,unicode }
+<%
+  _breadcrumbs = [
+    ["ZooKeeper Browser", url('zookeeper:index')],
+    [cluster['nice_name'].lower(), url('zookeeper:view', id=cluster['id'])],
+    [host + ":" + port, url('zookeeper:clients', id=cluster['id'], host=host + ":" + port)]
+  ]
+%>
 
-<h1>${host}:${port} :: client connections</h1>
-<br />
+${ shared.header(_breadcrumbs, clusters) }
 
 % if clients:
-  <table data-filters="HtmlTable">
+  <table class="table">
   <thead>
     <tr>
       <th>Host</th>
@@ -51,6 +56,6 @@ ${ shared.header("ZooKeeper Browser > Clients > %s:%s" % (host, port)) }
   </table>
 % endif
 
-<link rel="stylesheet" href="/zookeeper/static/css/zookeeper.css">
+${ shared.footer() }
 
 ${ commonfooter(messages) | n,unicode }
