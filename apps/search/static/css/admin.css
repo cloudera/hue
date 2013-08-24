@@ -114,3 +114,24 @@ h1.emptyMessage {
 .editable {
   cursor: pointer;
 }
+
+.collectionRow {
+  cursor: pointer;
+  margin-bottom: 10px;
+  padding: 10px;
+  height: 40px;
+}
+
+.collectionRow:hover {
+  background-color: #EFEFEF;
+}
+
+.hue-colorchart {
+  width: 100%;
+}
+
+.hue-colorchart td {
+  padding: 4px;
+  cursor: pointer;
+}
+
