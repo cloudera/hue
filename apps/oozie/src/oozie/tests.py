@@ -2234,7 +2234,9 @@ class TestPermissions(OozieBase):
     # Submit
     finish = SHARE_JOBS.set_for_testing(False)
     try:
-      response = client_not_me.post(reverse('oozie:submit_bundle', args=[bundle.id]))
+      response = client_not_me.post(reverse('oozie:submit_bundle', args=[bundle.id]),{
+                     u'form-MAX_NUM_FORMS': [u''], u'form-INITIAL_FORMS': [u'0'], u'form-TOTAL_FORMS': [u'0']
+                 })
       assert_true('Permission denied' in response.content, response.content)
     finally:
       finish()
@@ -2242,7 +2244,9 @@ class TestPermissions(OozieBase):
     finish = SHARE_JOBS.set_for_testing(True)
     try:
       try:
-        response = client_not_me.post(reverse('oozie:submit_bundle', args=[bundle.id]))
+        response = client_not_me.post(reverse('oozie:submit_bundle', args=[bundle.id]), {
+                       u'form-MAX_NUM_FORMS': [u''], u'form-INITIAL_FORMS': [u'0'], u'form-TOTAL_FORMS': [u'0']
+                   })
         assert_false('Permission denied' in response.content, response.content)
       except IOError:
         pass
