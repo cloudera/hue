@@ -96,3 +96,12 @@ h1.emptyMessage {
 .editable {
   cursor: pointer;
 }
+
+.hue-colorchart {
+  width: 100%;
+}
+
+.hue-colorchart td {
+  padding: 4px;
+  cursor: pointer;
+}
