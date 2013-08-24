@@ -126,3 +126,12 @@ h1.emptyMessage {
 .collectionRow:hover {
   background-color: #EFEFEF;
 }
+
+.hue-colorchart {
+  width: 100%;
+}
+
+.hue-colorchart td {
+  padding: 4px;
+  cursor: pointer;
+}
