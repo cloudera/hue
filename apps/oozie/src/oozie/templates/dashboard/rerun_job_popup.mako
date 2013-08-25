@@ -26,23 +26,22 @@
 
   <div class="modal-header">
     <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h2>${ _('Rerun this job?') }</h2>
+    <h3>${ _('Select actions to rerun') }</h3>
   </div>
 
   <div class="modal-body">
     <fieldset>
       <div id="config-container">
-        <h3>${ _('Select actions to rerun') }</h3>
           <div class="fieldWrapper">
             <div class="row-fluid">
-              <div class="span6">
-                <input type="radio" name="rerun_form_choice" value="skip_nodes" id="skip_nodes" checked>
-                  ${ _('All or skip successful') }
+              <div class="span8">
+                <label class="radio" style="padding-left: 24px; margin-bottom: 10px"><input type="radio" name="rerun_form_choice" value="skip_nodes" id="skip_nodes" checked>
+                  ${ _('All or skip successful') }</label>
                   ${ utils.render_field(rerun_form['skip_nodes'], show_label=False) }
                 </div>
-              <div class="span6">
-                <input type="radio" name="rerun_form_choice" value="fail_nodes" id="fail_nodes">
-                ${ _('Only failed') }
+              <div class="span4">
+                <label class="radio"><input type="radio" name="rerun_form_choice" value="fail_nodes" id="fail_nodes">
+                ${ _('Only failed') }</label>
               </div>
             </div>
           </div>
@@ -91,8 +90,8 @@
             selectAllLabel: "${_('Select all')}",
             searchPlaceholder: "${_('Search')}",
             noChoicesFound: "${_('No successful actions found.')}",
-            width:250,
-            height:100
+            width:350,
+            height:150
         });
     });
 </script>
