@@ -44,6 +44,8 @@ from jobbrowser import conf
 from jobbrowser.api import get_api
 from jobbrowser.models import Job, JobLinkage, Tracker, Cluster
 
+import urllib2
+
 
 def check_job_permission(view_func):
   """
@@ -357,6 +359,8 @@ def single_task_attempt_logs(request, job, taskid, attemptid):
     # Four entries,
     # for diagnostic, stdout, stderr and syslog
     logs = [_("Failed to retrieve log. TaskTracker not found.")] * 4
+  except urllib2.URLError:
+    logs = [_("Failed to retrieve log. TaskTracker not ready.")] * 4
 
   context = {
       "attempt": attempt,
