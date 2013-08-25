@@ -159,13 +159,6 @@ ${ commonheader(_('Task Attempt: %(attemptId)s') % dict(attemptId=attempt.attemp
     });
 
     refreshLogs();
-    var logsRefreshInterval = window.setInterval(function () {
-      refreshLogs();
-    }, 1000);
-
-    $(document).on("stopLogsRefresh", function () {
-      window.clearInterval(logsRefreshInterval);
-    });
 
     initLogsElement($("#logsDiagnostic pre"));
     initLogsElement($("#logsStdOut pre"));
@@ -185,12 +178,9 @@ ${ commonheader(_('Task Attempt: %(attemptId)s') % dict(attemptId=attempt.attemp
           appendAndScroll($("#logsStdErr pre"), log_stderr);
           appendAndScroll($("#logsSysLog pre"), log_syslog);
 
-          if (!data.isRunning) {
-            $(document).trigger("stopLogsRefresh");
+          if (data.isRunning) {
+            window.setTimeout(refreshLogs, 1000);
           }
-        }
-        else {
-          $(document).trigger("stopLogsRefresh");
         }
       });
     }
