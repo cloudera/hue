@@ -135,3 +135,24 @@ h1.emptyMessage {
   padding: 4px;
   cursor: pointer;
 }
+
+.cloud-tmpl {
+  border: 1px dashed #FFFFFF;
+  padding: 10px;
+  margin-bottom: 10px;
+  color: #666;
+  cursor: pointer;
+}
+
+.cloud-tmpl h4 {
+  margin-top: 0;
+}
+
+.cloud-tmpl.selected {
+  border: 1px dashed #338BB8;
+}
+
+.cloud-tmpl:hover, .cloud-tmpl.selected:hover  {
+  color: #000;
+  border: 1px dashed #CCCCCC;
+}

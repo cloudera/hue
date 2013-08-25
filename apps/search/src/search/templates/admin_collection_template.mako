@@ -158,8 +158,13 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
           <div class="span9">
             <div id="toolbar"></div>
             <div id="content-editor" class="clear">${ hue_collection.result.get_template() | n,unicode }</div>
+            <div id="cloud-template" class="btn-group">
+              <a title="${_('Cloud Template')}" class="btn toolbar-btn toolbar-cmd">
+                <i class="icon-cloud-download" style="margin-top:2px;"></i>
+              </a>
+            </div>
             <div id="load-template" class="btn-group">
-              <a title="Layout" class="btn toolbar-btn toolbar-cmd">
+              <a title="${_('Layout')}" class="btn toolbar-btn toolbar-cmd">
                 <i class="icon-th-large" style="margin-top:2px;"></i>
               </a>
             </div>
@@ -387,6 +392,22 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
         <button type="button" id="load-template-btn" href="#" class="btn btn-primary" disabled="disabled">${_('Insert layout')}</button>
       </div>
     </div>
+
+    <div id="cloud-template-modal" class="modal hide fade">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h3>${_('Load a template')}</h3>
+      </div>
+      <div class="modal-body">
+        <div id="cloud-loader" style="text-align: center">
+          <img src="/static/art/spinner.gif" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a href="#" class="btn" data-dismiss="modal">${_('Cancel')}</a>
+        <button type="button" id="cloud-template-btn" href="#" class="btn btn-primary" disabled="disabled">${_('Load template')}</button>
+      </div>
+    </div>
     </div>
   </%def>
 </%layout:skeleton>
@@ -584,8 +605,13 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
     });
 
     $("#load-template").prependTo($("#toolbar .btn-toolbar")).removeClass("hide");
+    $("#cloud-template").prependTo($("#toolbar .btn-toolbar")).removeClass("hide");
 
     $("#load-template-modal").modal({
+      show: false
+    });
+
+    $("#cloud-template-modal").modal({
       show: false
     });
 
@@ -597,6 +623,37 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
       $("#load-template-btn").button("reset");
       $("#load-template").popover("hide");
       $("#load-template-modal").modal("show");
+    });
+
+    $("#cloud-template .btn").click(function () {
+      $("#cloud-loader").show();
+      $(".cloud-tmpl").remove();
+      $("#load-template").popover("hide");
+      $("#cloud-template-modal").modal("show");
+      $.get("/search/static/templates/templates.xml", function (xml) {
+        var $xml = $(xml);
+        $.each($xml.find("template"), function () {
+          var _this = $(this);
+          var _tmpl = $("<div>");
+          _tmpl.addClass("cloud-tmpl").html("<h4>" + _this.find("title").text() + "</h4><img src='" + _this.find("img").text() + "'/>");
+          _tmpl.data("source", _this.find("source").text());
+          _tmpl.data("additional", _this.find("additional").text());
+          _tmpl.appendTo("#cloud-template-modal .modal-body");
+          _tmpl.on("click", function () {
+            $(".cloud-tmpl").removeClass("selected");
+            $(this).addClass("selected");
+            $("#cloud-template-btn").button("reset");
+          });
+        });
+        $("#cloud-loader").hide();
+      });
+    });
+
+    $("#cloud-template-btn").on("click", function () {
+      templateSourceMirror.setValue($(".cloud-tmpl.selected").data("source"));
+      $("#content-editor").html(stripHtmlFromFunctions(templateSourceMirror.getValue()));
+      templateExtraMirror.setValue($(".cloud-tmpl.selected").data("additional"));
+      $("#cloud-template-modal").modal("hide");
     });
 
     if ($("#content-editor").text().trim() == "") {
