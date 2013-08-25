@@ -900,14 +900,14 @@ div.box {
  */
 
 .jHueSelector {
-  border: 1px solid #CCC;
+  border: 1px solid #F1F1F1;
   padding: 0;
   margin: 0;
   width: 300px;
 }
 
 .jHueSelectorHeader {
-  background-color: #CCC;
+  background-color: #F1F1F1;
   padding: 4px;
 }
 
@@ -926,7 +926,8 @@ div.box {
   position: absolute;
   margin-left: 180px;
   width: 100px;
-  height: 11px;
+  height: 20px;
+  min-height: 20px;
   border: 1px solid #CCCCCC;
   border-radius: 10px;
   -webkit-border-radius: 10px;
@@ -952,8 +953,9 @@ div.box {
 }
 
 .jHueSelector li.selectorDivider {
-  background-color: #EEE;
+  border-bottom: 1px solid #E5E5E5;
   padding: 4px;
+  color: #338BB8;
 }
 
 .modal-body iframe {

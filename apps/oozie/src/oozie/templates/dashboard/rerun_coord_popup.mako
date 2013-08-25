@@ -25,16 +25,13 @@
 <form action="${ action }" method="POST">
   <div class="modal-header">
     <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h2>${ _('Rerun this job?') }</h2>
+    <h3>${ _('Select actions to rerun') }</h3>
   </div>
 
   <div class="modal-body">
     <fieldset>
       <div id="config-container">
         <div class="fieldWrapper">
-          <div class="row-fluid">
-            <h3>${ _('Select actions to rerun') }</h3>
-          </div>
           <div class="row-fluid">
             ${ utils.render_field(rerun_form['actions'], show_label=False) }
           </div>

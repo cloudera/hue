@@ -33,7 +33,7 @@ ${ layout.menubar(section='dashboard') }
 <div class="row-fluid">
   <div class="span2">
     <div class="sidebar-nav">
-      <ul class="nav nav-list">
+      <ul class="nav nav-list" style="border:none">
         <li class="nav-header">${ _('Bundle') }</li>
         % if bundle is not None:
         <li><a href="${ bundle.get_absolute_url() }">${ oozie_bundle.appName }</a></li>
