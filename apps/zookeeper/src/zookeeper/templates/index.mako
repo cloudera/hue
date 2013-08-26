@@ -33,15 +33,19 @@ ${ commonheader(_('View'), app_name, user, '60px') | n,unicode }
 ${ shared.header(_breadcrumbs, clusters) }
 
 % for i, c in enumerate(clusters):
-  <h3 class="card-heading simple simpler">${ _('Cluster') } <a href="${ url('zookeeper:view', id=i) }">${ c }</a></h3>
+  <h3 class="card-heading simple simpler">${ _('Cluster') } ${ c }</h3>
+  <p>
+    </br>
+    &nbsp;&nbsp;<a href="${ url('zookeeper:view', id=i) }">${ _("Znode Hierarchy") }</a> 
+  </p>
   <table class="table">
     <thead>
       <tr>
-        <th>Node</th>
-        <th>Role</th>
-        <th>Avg Latency</th>
-        <th>Watch Count</th>
-        <th>Version</th>
+        <th>${ _("Node") }</th>
+        <th>${ _("Role") }</th>
+        <th>${ _("Avg Latency") }</th>
+        <th>${ _("Watch Count") }</th>
+        <th>${ _("Version") }</th>
       </tr>
     </thead>
     <tbody>

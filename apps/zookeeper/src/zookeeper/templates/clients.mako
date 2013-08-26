@@ -36,12 +36,12 @@ ${ shared.header(_breadcrumbs, clusters) }
   <table class="table">
   <thead>
     <tr>
-      <th>Host</th>
-      <th>Port</th>
-      <th>Interest Ops</th>
-      <th>Queued</th>
-      <th>Received</th>
-      <th>Sent</th>
+      <th>${ _("Host") }</th>
+      <th>${ _("Port") }</th>
+      <th>${ _("Interest Ops") }</th>
+      <th>${ _("Queued") }</th>
+      <th>${ _("Received") }</th>
+      <th>${ _("Sent") }</th>
   </thead>
   % for client in clients:
     <tr>
