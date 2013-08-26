@@ -1541,24 +1541,29 @@ def test_hiveserver2_get_security():
     principal = get_query_server_config('impala')['principal']
     assert_true(principal.startswith('impala/'), principal)
 
+    # Beeswax
     beeswax_query_server = {'server_name': 'beeswax', 'principal': 'hive'}
-    impala_query_server = {'server_name': 'impala', 'principal': 'impala'}
-
     assert_equal((True, 'PLAIN', 'hive', False), HiveServerClient.get_security(beeswax_query_server))
-    assert_equal((False, 'GSSAPI', 'impala', False), HiveServerClient.get_security(impala_query_server))
-
-    cluster_conf = hadoop.cluster.get_cluster_conf_for_job_submission()
-    finish = cluster_conf.SECURITY_ENABLED.set_for_testing(True)
-    try:
-      assert_equal((True, 'GSSAPI', 'impala', False), HiveServerClient.get_security(impala_query_server))
-    finally:
-      finish()
 
     hive_site._HIVE_SITE_DICT[hive_site._CNF_HIVESERVER2_AUTHENTICATION] = 'NOSASL'
     hive_site._HIVE_SITE_DICT[hive_site._CNF_HIVESERVER2_IMPERSONATION] = 'true'
     assert_equal((False, 'NOSASL', 'hive', True), HiveServerClient.get_security(beeswax_query_server))
     hive_site._HIVE_SITE_DICT[hive_site._CNF_HIVESERVER2_AUTHENTICATION] = 'KERBEROS'
     assert_equal((True, 'GSSAPI', 'hive', True), HiveServerClient.get_security(beeswax_query_server))
+
+    # Impala
+    impala_query_server = {'server_name': 'impala', 'principal': 'impala', 'impersonation_enabled': False}
+    assert_equal((False, 'GSSAPI', 'impala', False), HiveServerClient.get_security(impala_query_server))
+
+    impala_query_server = {'server_name': 'impala', 'principal': 'impala', 'impersonation_enabled': True}
+    assert_equal((False, 'GSSAPI', 'impala', True), HiveServerClient.get_security(impala_query_server))
+
+    cluster_conf = hadoop.cluster.get_cluster_conf_for_job_submission()
+    finish = cluster_conf.SECURITY_ENABLED.set_for_testing(True)
+    try:
+      assert_equal((True, 'GSSAPI', 'impala', True), HiveServerClient.get_security(impala_query_server))
+    finally:
+      finish()
   finally:
     if prev is not None:
       hive_site._HIVE_SITE_DICT[hive_site._CNF_HIVESERVER2_AUTHENTICATION] = prev
