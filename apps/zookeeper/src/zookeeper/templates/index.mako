@@ -32,11 +32,11 @@ ${ commonheader(_('View'), app_name, user, '60px') | n,unicode }
 
 ${ shared.header(_breadcrumbs, clusters) }
 
-% for i, c in enumerate(clusters):
+% for c in clusters:
   <h3 class="card-heading simple simpler">${ _('Cluster') } ${ c }</h3>
   <p>
     </br>
-    &nbsp;&nbsp;<a href="${ url('zookeeper:view', id=i) }">${ _("Znode Hierarchy") }</a> 
+    &nbsp;&nbsp;<a href="${ url('zookeeper:view', id=c) }">${ _("Znode Hierarchy") }</a> 
   </p>
   <table class="table">
     <thead>
@@ -51,7 +51,7 @@ ${ shared.header(_breadcrumbs, clusters) }
     <tbody>
     % for host, stats in overview[c].items():
       <tr>
-        <td><a href="${ url('zookeeper:clients', id=i, host=host) }" data-row-selector="true">${ host }</a></td>
+        <td><a href="${ url('zookeeper:clients', id=c, host=host) }" data-row-selector="true">${ host }</a></td>
         <td>${stats.get('zk_server_state', '')}</td>
         <td>${stats.get('zk_avg_latency', '')}</td>
         <td>${stats.get('zk_watch_count', '')}</td>

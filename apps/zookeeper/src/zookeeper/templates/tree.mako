@@ -59,8 +59,8 @@ ${ shared.header(_breadcrumbs, clusters, False) }
   <div class="span9">
     <ul class="nav nav-tabs">
       %if znode.get('dataLength', 0) != 0:
-        <li class="active"><a href="#base64" data-toggle="tab">Base64 (${znode.get('dataLength', 0)})</a></li>
-        <li><a href="#text" data-toggle="tab">${ _('Text') }</a></li>
+        <li class="active"><a href="#text" data-toggle="tab">${ _('Text') }</a></li>
+        <li><a href="#base64" data-toggle="tab">${ _('Base64') } (${ znode.get('dataLength', 0) })</a></li>        
         <li><a href="#stats" data-toggle="tab">${ _('Stats') }</a></li>
       %else:
         <li><a href="#stats" data-toggle="tab">${ _('Stats') }</a></li>
@@ -68,13 +68,13 @@ ${ shared.header(_breadcrumbs, clusters, False) }
     </ul>
     <div class="tab-content">
       %if znode.get('dataLength', 0) != 0:
-      <div class="tab-pane active" id="base64">
-        <textarea id="textarea64" rows="14" readonly="readonly">${znode.get('data64', '')}</textarea>
-        <a href="${url('zookeeper:edit_as_base64', id=cluster['id'], path=path)}" class="btn"><i class="icon-pencil"></i> ${_('Edit as Base64')}</a>
-      </div>
-      <div class="tab-pane" id="text">
-        <textarea id="textareaText" rows="14" readonly="readonly"></textarea>
+      <div class="tab-pane active" id="text">
+        <textarea id="textareaText" rows="25" readonly="readonly"></textarea>
         <a href="${url('zookeeper:edit_as_text', id=cluster['id'], path=path)}" class="btn"><i class="icon-pencil"></i> ${_('Edit as Text')}</a>
+      </div>      
+      <div class="tab-pane" id="base64">
+        <textarea id="textarea64" rows="25" readonly="readonly">${znode.get('data64', '')}</textarea>
+        <a href="${url('zookeeper:edit_as_base64', id=cluster['id'], path=path)}" class="btn"><i class="icon-pencil"></i> ${_('Edit as Base64')}</a>
       </div>
       <div class="tab-pane" id="stats">
       %else:
