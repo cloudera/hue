@@ -30,9 +30,9 @@
             <span class="caret"></span>
           </a>
           <ul class="dropdown-menu">
-            % for id, c in enumerate(clusters):
+            % for c in clusters:
               <li>
-                <a href="${ url('zookeeper:view', id=id) }">
+                <a href="${ url('zookeeper:view', id=c) }">
                   ${ c }
                 </a>
               </li>

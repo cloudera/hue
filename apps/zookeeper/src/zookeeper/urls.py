@@ -20,11 +20,11 @@ from django.conf.urls.defaults import patterns, url
 
 urlpatterns = patterns('zookeeper.views',
   url(r'^$', 'index', name='index'),
-  url(r'view/(?P<id>\d+)$', 'view', name='view'),
-  url(r'clients/(?P<id>\d+)/(?P<host>.+)$', 'clients', name='clients'),
-  url(r'tree/(?P<id>\d+)(?P<path>.+)$', 'tree', name='tree'),
-  url(r'create/(?P<id>\d+)(?P<path>.*)$', 'create', name='create'),
-  url(r'delete/(?P<id>\d+)(?P<path>.*)$', 'delete', name='delete'),
-  url(r'edit/base64/(?P<id>\d+)(?P<path>.*)$', 'edit_as_base64', name='edit_as_base64'),
-  url(r'edit/text/(?P<id>\d+)(?P<path>.*)$', 'edit_as_text', name='edit_as_text'),
+  url(r'view/(?P<id>\w+)$', 'view', name='view'),
+  url(r'clients/(?P<id>\w+)/(?P<host>.+)$', 'clients', name='clients'),
+  url(r'tree/(?P<id>\w+)/(?P<path>.+)$', 'tree', name='tree'),
+  url(r'create/(?P<id>\w+)/(?P<path>.*)$', 'create', name='create'),
+  url(r'delete/(?P<id>\w+)/(?P<path>.*)$', 'delete', name='delete'),
+  url(r'edit/base64/(?P<id>\w+)/(?P<path>.*)$', 'edit_as_base64', name='edit_as_base64'),
+  url(r'edit/text/(?P<id>\w+)/(?P<path>.*)$', 'edit_as_text', name='edit_as_text'),
 )

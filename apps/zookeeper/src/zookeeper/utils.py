@@ -22,19 +22,14 @@ from zookeeper.conf import CLUSTERS
 
 def get_cluster_or_404(id):
   try:
-    id = int(id)
-    if not (0 <= id < len(CLUSTERS.get())):
-      raise ValueError, 'Undefined cluster id.'
+    name = id
+    cluster = CLUSTERS.get()[name]
   except (TypeError, ValueError):
     raise Http404()
 
-  # Support only one cluster
-  name = [k for (k, v) in CLUSTERS.get().iteritems() if v == 0]
-  cluster = CLUSTERS.get()[k]
-
   cluster = {
     'id': id,
-    'nice_name': k,
+    'nice_name': id,
     'host_ports': cluster.HOST_PORTS.get(),
     'rest_url': cluster.REST_URL.get(),
   }
