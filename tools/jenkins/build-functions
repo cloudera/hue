@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # Common functions for hudson build scripts
-
+#
 if [ ! -e $HOME/.hue_cache ]; then
   mkdir -p $HOME/.hue_cache
 fi;
