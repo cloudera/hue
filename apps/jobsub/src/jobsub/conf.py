@@ -14,21 +14,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Configuration for the job submission application"""
 
 import os.path
 
-from desktop.lib.conf import Config, coerce_bool
+from desktop.lib.conf import Config
 from desktop.lib import paths
 from django.utils.translation import ugettext_lazy as _
 
-
-# Deprecated! To remove in Hue 3.
-# All of the config is now in Oozie app.
-REMOTE_DATA_DIR = Config(
-  key="remote_data_dir",
-  default="/user/hue/jobsub",
-  help=_("Location on HDFS where the jobsub examples and templates are stored."))
 
 LOCAL_DATA_DIR = Config(
   key="local_data_dir",
@@ -41,20 +33,3 @@ SAMPLE_DATA_DIR = Config(
   default=paths.get_thirdparty_root("sample_data"),
   help=_("Location on local filesystem where sample data is stored."),
   private=True)
-
-
-# Deprecated! To remove in Hue 3
-# These configs were moved to desktop liboozie.
-# If liboozie is not configured these settings will be used.
-# They also have priority if liboozie defines them.
-OOZIE_URL = Config(
-  key='oozie_url',
-  help=_('Deprecated, use liboozie.conf.OOZIE_URL instead. '
-         'URL of Oozie server. This is required for job submission.'),
-  type=str)
-
-SECURITY_ENABLED = Config(
-  key="security_enabled",
-  help=_("Deprecated, use liboozie.conf.SECURITY_ENABLED instead. "
-         "Whether Oozie requires client to do perform Kerberos authentication"),
-  type=coerce_bool)
