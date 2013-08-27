@@ -107,8 +107,8 @@ class SqoopClient(object):
       connection.connector = self.get_connectors()[0].con_forms
     if not connection.framework:
       connection.framework = self.get_framework().con_forms
-    connection.created = int( round(time.time() * 1000) )
-    connection.updated = connection.created
+    connection.creation_date = int( round(time.time() * 1000) )
+    connection.update_date = connection.creation_date
     connection_dict = connection.to_dict()
     request_dict = {
       'all': [connection_dict]
@@ -155,8 +155,8 @@ class SqoopClient(object):
       job.connector = self.get_connectors()[0].job_forms[job.type.upper()]
     if not job.framework:
       job.framework = self.get_framework().job_forms[job.type.upper()]
-    job.created = int( round(time.time() * 1000) )
-    job.updated = job.created
+    job.creation_date = int( round(time.time() * 1000) )
+    job.update_date = job.creation_date
     job_dict = job.to_dict()
     request_dict = {
       'all': [job_dict]
