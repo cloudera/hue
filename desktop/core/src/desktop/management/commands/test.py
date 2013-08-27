@@ -42,7 +42,7 @@ class Command(BaseCommand):
                  Additional arguments are passed to nose.
 
       fast       Runs the "fast" tests, namely those that don't start Hadoop.
-              
+
       specific   Explicitly run specific tests using nose.
                  For example, to run all the filebrower tests or
                  to run a specific test function, use
@@ -100,8 +100,8 @@ class Command(BaseCommand):
       test_runner = TestRunner(verbosity=1, interactive=False)
       nose_args.remove(args[0])
       ret = test_runner.run_tests(nose_args)
-    
-    if ret:
-      logging.info("Tests (%s) returned %s" % (' '.join(nose_args), ret))
-    else:
+
+    logging.info("Tests (%s) returned %s" % (' '.join(nose_args), ret))
+
+    if ret != 0:
       sys.exit(1)
