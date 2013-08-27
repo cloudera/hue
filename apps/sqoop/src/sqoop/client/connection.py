@@ -102,12 +102,14 @@ class Connection(object):
 
   @see sqoop.client.form for more information on unstructured forms in sqoop.
   """
-  SKIP = ('id', 'created', 'updated')
+  SKIP = ('id', 'creation_date', 'creation_user', 'update_date', 'update_user')
 
-  def __init__(self, name, connector_id, connector=None, framework=None, enabled=True, **kwargs):
+  def __init__(self, name, connector_id, connector=None, framework=None, enabled=True, creation_user='hue', creation_date=0, update_user='hue', update_date=0, **kwargs):
     self.id = kwargs.setdefault('id', -1)
-    self.created = kwargs.setdefault('created', 0)
-    self.updated = kwargs.setdefault('updated', 0)
+    self.creation_user = creation_user
+    self.creation_date = creation_date
+    self.update_user = update_user
+    self.update_date = update_date
     self.enabled = enabled
     self.name = name
     self.connector_id = connector_id
@@ -125,14 +127,28 @@ class Connection(object):
     if not 'connector_id' in connection_dict:
       connection_dict['connector_id'] = connection_dict.setdefault('connector-id', -1)
 
+    if not 'creation_user' in connection_dict:
+      connection_dict['creation_user'] = connection_dict.setdefault('creation-user', 'hue')
+
+    if not 'creation_date' in connection_dict:
+      connection_dict['creation_date'] = connection_dict.setdefault('creation-date', 0)
+
+    if not 'update_user' in connection_dict:
+      connection_dict['update_user'] = connection_dict.setdefault('update-user', 'hue')
+
+    if not 'update_date' in connection_dict:
+      connection_dict['update_date'] = connection_dict.setdefault('update-date', 0)
+
     return Connection(**connection_dict)
 
   def to_dict(self):
     d = {
       'id': self.id,
       'name': self.name,
-      'created': self.created,
-      'updated': self.updated,
+      'creation-user': self.creation_user,
+      'creation-date': self.creation_date,
+      'update-user': self.update_user,
+      'update-date': self.update_date,
       'connector-id': self.connector_id,
       'connector': [ connector.to_dict() for connector in self.connector ],
       'framework': [ framework.to_dict() for framework in self.framework ],
