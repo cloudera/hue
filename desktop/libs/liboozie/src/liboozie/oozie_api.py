@@ -23,23 +23,12 @@ from desktop.conf import TIME_ZONE
 from desktop.lib.rest.http_client import HttpClient
 from desktop.lib.rest.resource import Resource
 
+from liboozie.conf import SECURITY_ENABLED
+from liboozie.conf import OOZIE_URL
 from liboozie.types import WorkflowList, CoordinatorList, Coordinator, Workflow,\
   CoordinatorAction, WorkflowAction, BundleList, Bundle, BundleAction
 from liboozie.utils import config_gen
 
-# Manage deprecation after HUE-792.
-# To Remove in Hue 3.
-import jobsub.conf as jobsub_conf
-
-if jobsub_conf.SECURITY_ENABLED.get() is not None:
-  from jobsub.conf import SECURITY_ENABLED
-else:
-  from liboozie.conf import SECURITY_ENABLED
-
-if jobsub_conf.OOZIE_URL.get() is not None:
-  from jobsub.conf import OOZIE_URL
-else:
-  from liboozie.conf import OOZIE_URL
 
 LOG = logging.getLogger(__name__)
 DEFAULT_USER = 'hue'
