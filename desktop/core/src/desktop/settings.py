@@ -24,6 +24,7 @@ import logging
 import os
 import sys
 import desktop.conf
+import huesaml.conf
 import desktop.log
 from desktop.lib.paths import get_desktop_root
 import pkg_resources
@@ -272,6 +273,13 @@ SECRET_KEY = desktop.conf.SECRET_KEY.get()
 if SECRET_KEY == "":
   logging.warning("secret_key should be configured")
 
+# SAML
+SAML_AUTHENTICATION = 'huesaml.backend.SAML2Backend' in AUTHENTICATION_BACKENDS
+if SAML_AUTHENTICATION:
+  from huesaml.saml_settings import *
+  INSTALLED_APPS.append('huesaml')
+  LOGIN_URL = '/saml2/login/'
+  SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 ############################################################
 
