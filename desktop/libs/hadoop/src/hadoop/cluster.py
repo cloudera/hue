@@ -98,12 +98,15 @@ def get_next_ha_mrcluster():
   candidates = all_mrclusters()
   has_ha = sum([conf.MR_CLUSTERS[name].SUBMIT_TO.get() for name in conf.MR_CLUSTERS.keys()]) >= 2
 
+  current_user = get_default_mrcluster().user
+
   for name in conf.MR_CLUSTERS.keys():
     config = conf.MR_CLUSTERS[name]
     if config.SUBMIT_TO.get():
       jt = candidates[name]
       if has_ha:
         try:
+          jt.setuser(current_user)
           status = jt.cluster_status()
           if status.stateAsString == 'RUNNING':
             MR_NAME_CACHE = name
@@ -131,6 +134,12 @@ def all_mrclusters():
     MR_CACHE[identifier] = _make_mrcluster(identifier)
   return MR_CACHE
 
+def get_yarn():
+  for name in conf.YARN_CLUSTERS.keys():
+    yarn = conf.YARN_CLUSTERS[name]
+    if yarn.SUBMIT_TO.get():
+      return yarn
+
 def get_cluster_conf_for_job_submission():
   """
   Check the `submit_to' for each MR/Yarn cluster, and return the
@@ -138,10 +147,9 @@ def get_cluster_conf_for_job_submission():
 
   HA support for MR1.
   """
-  for name in conf.YARN_CLUSTERS.keys():
-    yarn = conf.YARN_CLUSTERS[name]
-    if yarn.SUBMIT_TO.get():
-      return yarn
+  yarn = get_yarn()
+  if yarn:
+    return yarn
 
   mr = get_next_ha_mrcluster()
 
@@ -162,8 +170,7 @@ def get_cluster_addr_for_job_submission():
   return "%s:%s" % (conf.HOST.get(), conf.PORT.get())
 
 def is_yarn():
-  cluster = get_cluster_conf_for_job_submission()
-  return cluster is not None and 'IS_YARN' in cluster.config.members
+  return get_yarn() is not None
 
 def clear_caches():
   """
