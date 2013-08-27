@@ -18,11 +18,13 @@
 var connections = (function($) {
   var ConnectionModel = koify.Model.extend({
     'id': -1,
-    'updated': null,
-    'created': null,
     'name': null,
     'connector': [],
     'connector_id': 0,
+    'creation_date': null,
+    'creation_user': null,
+    'update_date': null,
+    'update_user': null,
     'framework': [],
     'initialize': function(attrs) {
       var self = this;
