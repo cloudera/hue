@@ -27,8 +27,10 @@ var jobs = (function($) {
     'connection_id': 0,
     'connector': [],
     'framework': [],
-    'created': null,
-    'updated': null,
+    'creation_date': null,
+    'creation_user': null,
+    'update_date': null,
+    'update_user': null,
     'setImport': function(){
       this.type("IMPORT");
       // Huge hack for now
@@ -64,15 +66,15 @@ var jobs = (function($) {
       var self = this;
       self.parent.initialize.apply(self, arguments);
       self.createdFormatted = ko.computed(function() {
-        if (self.created()) {
-          return moment(self.created()).format('MM/DD/YYYY hh:mm A');
+        if (self.creation_date()) {
+          return moment(self.creation_date()).format('MM/DD/YYYY hh:mm A');
         } else {
           return 0;
         }
       });
       self.updatedFormatted = ko.computed(function() {
-        if (self.updated()) {
-          return moment(self.updated()).format('MM/DD/YYYY hh:mm A');
+        if (self.update_date()) {
+          return moment(self.update_date()).format('MM/DD/YYYY hh:mm A');
         } else {
           return 0;
         }

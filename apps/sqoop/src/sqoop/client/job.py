@@ -151,12 +151,14 @@ class Job(object):
 
   @see sqoop.client.form for more information on unstructured forms in sqoop.
   """
-  SKIP = ('id', 'created', 'updated')
+  SKIP = ('id', 'creation_date', 'creation_user', 'update_date', 'update_user')
 
-  def __init__(self, type, name, connection_id, connector_id, connector=None, framework=None, enabled=True, **kwargs):
+  def __init__(self, type, name, connection_id, connector_id, connector=None, framework=None, enabled=True, creation_user='hue', creation_date=0, update_user='hue', update_date=0, **kwargs):
     self.id = kwargs.setdefault('id', -1)
-    self.created = kwargs.setdefault('created', 0)
-    self.updated = kwargs.setdefault('updated', 0)
+    self.creation_user = creation_user
+    self.creation_date = creation_date
+    self.update_user = update_user
+    self.update_date = update_date
     self.enabled = enabled
     self.type = type
     self.name = name
@@ -179,6 +181,18 @@ class Job(object):
     if not 'connector_id' in job_dict:
       job_dict['connector_id'] = job_dict['connector-id']
 
+    if not 'creation_user' in job_dict:
+      job_dict['creation_user'] = job_dict.setdefault('creation-user', 'hue')
+
+    if not 'creation_date' in job_dict:
+      job_dict['creation_date'] = job_dict.setdefault('creation-date', 0)
+
+    if not 'update_user' in job_dict:
+      job_dict['update_user'] = job_dict.setdefault('update-user', 'hue')
+
+    if not 'update_date' in job_dict:
+      job_dict['update_date'] = job_dict.setdefault('update-date', 0)
+
     return Job(**job_dict)
 
   def to_dict(self):
@@ -186,8 +200,10 @@ class Job(object):
       'id': self.id,
       'type': self.type,
       'name': self.name,
-      'created': self.created,
-      'updated': self.updated,
+      'creation-user': self.creation_user,
+      'creation-date': self.creation_date,
+      'update-user': self.update_user,
+      'update-date': self.update_date,
       'connection-id': self.connection_id,
       'connector-id': self.connector_id,
       'connector': [ connector.to_dict() for connector in self.connector ],
