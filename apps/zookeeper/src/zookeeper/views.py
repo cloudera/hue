@@ -22,12 +22,14 @@ except ImportError:
 
 import logging
 
-from desktop.lib.django_util import render
 from django.http import Http404, HttpResponse
 from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
+
+from desktop.lib.django_util import render
+from desktop.lib.exceptions_renderable import PopupException
 
 from zookeeper import settings
-
 from zookeeper.conf import CLUSTERS
 from zookeeper.forms import CreateZNodeForm, EditZNodeForm
 from zookeeper.stats import ZooKeeperStats
@@ -67,7 +69,10 @@ def _group_stats_by_role(stats):
 
 
 def index(request):
-  overview = _get_global_overview()
+  try:
+    overview = _get_global_overview()
+  except Exception, e:
+    raise PopupException(_('Could not correctly connect to Zookeeper.'), detail=e)
 
   return render('index.mako', request, {
       'clusters': CLUSTERS.get(),
