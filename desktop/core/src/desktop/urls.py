@@ -19,6 +19,7 @@ import logging
 import os
 import re
 
+from django.conf import settings
 from django.conf.urls.defaults import include, patterns
 from django.contrib import admin
 
@@ -74,6 +75,10 @@ dynamic_patterns = patterns('',
 )
 
 static_patterns = []
+
+# SAML specific
+if settings.SAML_AUTHENTICATION:
+  static_patterns.append((r'^saml2/', include('huesaml.urls')))
 
 # Root each app at /appname if they have a "urls" module
 for app in appmanager.DESKTOP_APPS:
