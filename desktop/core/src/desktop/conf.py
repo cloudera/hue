@@ -34,7 +34,7 @@ def coerce_database(database):
     return 'django.db.backends.postgresql_psycopg2'
   elif database == 'oracle':
     return 'django.db.backends.oracle'
-  elif database == 'sqlite':
+  elif database in ('sqlite', 'sqlite3'):
     return 'django.db.backends.sqlite3'
   else:
     return str(database)
