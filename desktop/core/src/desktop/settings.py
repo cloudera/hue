@@ -24,7 +24,6 @@ import logging
 import os
 import sys
 import desktop.conf
-import huesaml.conf
 import desktop.log
 from desktop.lib.paths import get_desktop_root
 import pkg_resources
