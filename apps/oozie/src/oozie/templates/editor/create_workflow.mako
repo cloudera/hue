@@ -46,8 +46,7 @@ ${ layout.menubar(section='workflows') }
               <form class="form-horizontal" id="workflowForm" action="${ url('oozie:create_workflow') }" method="POST">
               <fieldset>
               ${ utils.render_field(workflow_form['name']) }
-              ${ utils.render_field(workflow_form['description']) }
-              ${ utils.render_field(workflow_form['is_shared']) }
+              ${ utils.render_field(workflow_form['description']) }              
 
               <div class="control-group ">
                 <label class="control-label">
@@ -64,6 +63,7 @@ ${ layout.menubar(section='workflows') }
                </div>
 
                <div class="hide">
+                 ${ utils.render_field(workflow_form['is_shared']) }
                  ${ workflow_form['schema_version'] | n,unicode }
                  ${ workflow_form['job_properties'] | n,unicode }
                  ${ workflow_form['parameters'] | n,unicode }

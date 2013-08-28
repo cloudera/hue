@@ -65,12 +65,6 @@ BROWSE_PARTITIONED_TABLE_LIMIT = Config(
   type=int,
   help=_t('Set a LIMIT clause when browsing a partitioned table. A positive value will be set as the LIMIT. If 0 or negative, do not set any limit.'))
 
-SHARE_SAVED_QUERIES = Config(
-  key='share_saved_queries',
-  default=True,
-  type=coerce_bool,
-  help=_t('Share saved queries with all users. If set to false, saved queries are visible only to the owner and administrators.'))
-
 
 def config_validator(user):
   # dbms is dependent on beeswax.conf (this file)

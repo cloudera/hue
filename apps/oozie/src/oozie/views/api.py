@@ -233,6 +233,7 @@ def _update_workflow_json(json_workflow):
       setattr(workflow, key, json_workflow[key])
 
   workflow.save()
+  workflow.doc.update(name=workflow.name, description=workflow.description)
 
   return workflow
 

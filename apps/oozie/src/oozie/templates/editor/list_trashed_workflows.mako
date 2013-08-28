@@ -37,21 +37,21 @@ ${ layout.menubar(section='workflows') }
     </%def>
 
     <%def name="actions()">
-      <button type="button" id="restore-btn" class="btn" title="${ _('Restore the selected workflows') }">
+      <button type="button" id="restore-btn" class="btn toolbarBtn" disabled="disabled" title="${ _('Restore the selected workflows') }">
         <i class="icon-cloud-upload"></i> ${ _('Restore') }
       </button>
-      <button type="button" id="destroy-btn" class="btn" title="${ _('Delete the selected workflows') }">
+      <button type="button" id="destroy-btn" class="btn toolbarBtn" disabled="disabled" title="${ _('Delete the selected workflows') }">
         <i class="icon-bolt"></i> ${ _('Delete forever') }
       </button>
     </%def>
 
     <%def name="creation()">
-      <a href="${ url('oozie:list_workflows') }" id="home-btn" class="btn" title="${ _('Go to workflow manager') }">
-        <i class="icon-home"></i> ${ _('View workflows') }
-      </a>
       <button type="button" id="purge-btn" class="btn" title="${ _('Delete all the workflows') }">
         <i class="icon-fire"></i> ${ _('Empty trash') }
       </button>
+      <a href="${ url('oozie:list_workflows') }" id="home-btn" class="btn" title="${ _('Go to workflow manager') }">
+        <i class="icon-home"></i> ${ _('Back') }
+      </a>
     </%def>
   </%actionbar:render>
 
@@ -180,10 +180,11 @@ ${ layout.menubar(section='workflows') }
 
     function toggleActions() {
       $(".toolbarBtn").attr("disabled", "disabled");
-      var selector = $(".hueCheckbox[checked='checked']");
-      var can_delete = $(".hueCheckbox[checked='checked'][data-workflow-id]");
+      var selector = $(".hueCheckbox.workflowCheck[checked='checked']");
+      var can_delete = $(".hueCheckbox.workflowCheck[checked='checked'][data-workflow-id]");
       if (can_delete.length >= 1 && can_delete.length == selector.length) {
         $("#destroy-btn").removeAttr("disabled");
+        $("#restore-btn").removeAttr("disabled");
       }
     }
 

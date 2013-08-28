@@ -35,10 +35,10 @@ import django.views.debug
 from desktop.lib import django_mako
 from desktop.lib.conf import GLOBAL_CONFIG
 from desktop.lib.django_util import login_notrequired, render_json, render
-from desktop.lib.i18n import smart_str
+from desktop.lib.i18n import smart_str, force_unicode
 from desktop.lib.paths import get_desktop_root
 from desktop.log.access import access_log_level, access_warn
-from desktop.models import UserPreferences, Settings
+from desktop.models import UserPreferences, Settings, Document, DocumentTag
 from desktop import appmanager
 import desktop.conf
 import desktop.log.log_buffer
@@ -46,11 +46,51 @@ import desktop.log.log_buffer
 
 LOG = logging.getLogger(__name__)
 
+
 @access_log_level(logging.WARN)
 def home(request):
-  apps = appmanager.get_apps(request.user)
-  apps = dict([(app.name, app) for app in apps])
-  return render('home.mako', request, dict(apps=apps))
+  return render('home.mako', request, {
+    'documents': Document.objects.get_docs(request.user).order_by('-last_modified')[:100],
+    'tags': DocumentTag.objects.filter(owner=request.user),
+  })
+
+
+def add_or_create_tag(request):
+  response = {'status': -1, 'message': ''}
+  
+  if request.action == 'POST':
+    json = {'tag_id': 1, 'tag': 'hue project', 'doc_id': 1}   # instead ... json.load(request.POST) 
+    try:
+      DocumentTag.add_or_create_tag(request.user, json['doc_id'], json['tag'], json.get('tag_id'))
+    except Exception, e:
+      response['message'] = force_unicode(e)
+  else:
+    response['message'] = _('POST request only')
+  
+  return HttpResponse(json.dumps(response), mimetype="application/json")
+
+
+def remove_tag(request):
+  response = {'status': -1, 'message': _('Error')}
+  
+  if request.action == 'POST':
+    json = {'tag_id': 1, 'tag': 'hue project', 'doc_id': 1}  # instead ... json.load(request.POST)
+    try:
+      DocumentTag.remove_tag(id=json['tag_id'], owner=request.user, doc_id=json['doc_id'])
+      response['message'] = _('Tag removed !')
+    except Exception, e:
+      response['message'] = force_unicode(e)
+  else:
+    response['message'] = _('POST request only')
+  
+  return HttpResponse(json.dumps(response), mimetype="application/json")
+
+
+def add_or_update_permission(request):
+  pass
+
+def remove_permission(request):
+  pass
 
 
 @access_log_level(logging.WARN)

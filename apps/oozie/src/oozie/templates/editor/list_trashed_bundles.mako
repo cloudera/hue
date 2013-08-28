@@ -43,10 +43,11 @@ ${ layout.menubar(section='bundles') }
     </%def>
 
     <%def name="creation()">
-      <a href="${ url('oozie:list_bundles') }" id="home-btn" class="btn" title="${ _('Got to bundle manager') }"><i class="icon-home"></i> ${ _('View bundles') }</a>
       <button class="btn" id="purge-btn" title="${ _('Delete all the bundles') }" data-bind="enabled: availableJobs().length > 0">
         <i class="icon-fire"></i> ${ _('Empty trash') }
       </button>
+      &nbsp;&nbsp;
+      <a href="${ url('oozie:list_bundles') }" id="home-btn" class="btn" title="${ _('Got to bundle manager') }"><i class="icon-home"></i> ${ _('Back') }</a>
     </%def>
   </%actionbar:render>
 

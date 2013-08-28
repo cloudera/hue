@@ -29,6 +29,7 @@ from desktop.lib.django_forms import MultiForm, SplitDateTimeWidget
 from oozie.models import Workflow, Node, Java, Mapreduce, Streaming, Coordinator,\
   Dataset, DataInput, DataOutput, Pig, Link, Hive, Sqoop, Ssh, Shell, DistCp, Fs,\
   Email, SubWorkflow, Generic, Bundle, BundledCoordinator
+from desktop.models import Document
 
 
 LOG = logging.getLogger(__name__)
@@ -273,7 +274,7 @@ class SubWorkflowForm(forms.ModelForm):
     user = kwargs.pop('user')
     workflow = kwargs.pop('workflow')
     super(SubWorkflowForm, self).__init__(*args, **kwargs)
-    choices=((wf.id, wf) for wf in Workflow.objects.available().filter(owner=user).exclude(id=workflow.id))
+    choices=((wf.id, wf) for wf in Document.objects.available(Workflow, user) if workflow.id != id)
     self.fields['sub_workflow'] = forms.ChoiceField(choices=choices, widget=forms.RadioSelect(attrs={'class':'radio'}))
 
   class Meta:
@@ -350,12 +351,12 @@ class CoordinatorForm(forms.ModelForm):
     user = kwargs['user']
     del kwargs['user']
     super(CoordinatorForm, self).__init__(*args, **kwargs)
-    qs = Workflow.objects.available().filter(Q(is_shared=True) | Q(owner=user))
+    qs = Document.objects.available(Workflow, user)
     workflows = []
     for workflow in qs:
       if workflow.is_accessible(user):
         workflows.append(workflow.id)
-    qs = qs.filter(id__in=workflows)
+    qs = Workflow.objects.filter(id__in=workflows)
     self.fields['workflow'].queryset = qs
 
 

@@ -22,11 +22,14 @@ import logging
 
 from django.db import models
 from django.contrib.auth.models import User
+from django.contrib.contenttypes import generic
+from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
 from enum import Enum
 
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.models import Document
 
 from beeswax.design import HQLdesign, hql_query
 from TCLIService.ttypes import TSessionHandle, THandleIdentifier,\
@@ -73,6 +76,7 @@ class QueryHistory(models.Model):
   design = models.ForeignKey('SavedQuery', to_field='id', null=True) # Some queries (like read/create table) don't have a design
   notify = models.BooleanField(default=False)                        # Notify on completion
 
+
   class Meta:
     ordering = ['-submission_date']
 
@@ -87,8 +91,9 @@ class QueryHistory(models.Model):
   def get(id):
     return HiveServerQueryHistory.objects.get(id=id)
 
-  def get_type_name(self):
-    if self.query_type == 1:
+  @staticmethod
+  def get_type_name(query_type):
+    if query_type == IMPALA:
       return 'impala'
     else:
       return 'beeswax'
@@ -96,7 +101,7 @@ class QueryHistory(models.Model):
   def get_query_server_config(self):
     from beeswax.server.dbms import get_query_server_config
 
-    query_server = get_query_server_config(self.get_type_name())
+    query_server = get_query_server_config(QueryHistory.get_type_name(self.query_type))
     query_server.update({
         'server_name': self.server_name,
         'server_host': self.server_host,
@@ -213,6 +218,8 @@ class SavedQuery(models.Model):
   is_trashed = models.BooleanField(default=False, db_index=True, verbose_name=_t('Is trashed'),
                                    help_text=_t('If this query is trashed.'))
 
+  doc = generic.GenericRelation(Document, related_name='hql_doc')
+
   class Meta:
     ordering = ['-mtime']
 
@@ -275,6 +282,9 @@ class SavedQuery(models.Model):
       return make_query_context('design', self.id)
     except:
       return ""
+
+  def get_absolute_url(self):
+    return reverse(QueryHistory.get_type_name(self.type) + ':execute_query', kwargs={'design_id': self.id})
 
 
 class SessionManager(models.Manager):

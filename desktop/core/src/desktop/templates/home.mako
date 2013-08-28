@@ -37,87 +37,69 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
       </div>
   </div>
 
-<%def name="app_link(app, label=None, extra_path = '')">
-  % if app in apps:
-  <li>
-    <a href="/${ app }/${ extra_path }"  title="${ apps[app].nice_name }" class="app-tooltips">
-      <i class="icon-double-angle-right"></i> ${ label }
-    </a>
-  </li>
-  % endif
-</%def>
-
 <div style="position: absolute;top:80px;right:30px"><img src="/static/art/hue-logo-subtle.png"/></div>
 
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="span12">
       <h1>${_('Welcome Home.')}</h1>
-
-      <p>
-        ${ _('Hue is a Web UI for Apache Hadoop. Select an application below.') }
-      </p>
     </div>
   </div>
   <div class="row-fluid" style="margin-top: 30px">
 
-    <div class="span4">
+    <div class="span2">
       <div class="card card-home card-listcontent">
-        <h2 class="card-heading simple">${_('Query')}</h2>
+        <h2 class="card-heading simple">${_('New')}</h2>
+      </div>
+
+      <div class="card card-home card-listcontent">
+        <h2 class="card-heading simple">${_('Tags')}</h2>
 
         <div class="card-body">
           <p>
           <ul>
-            ${ app_link("beeswax", "Hive") }
-            ${ app_link("impala", "Impala") }
-            ${ app_link("pig", "Pig") }
-            ${ app_link("search", _('Search')) }
-            ${ app_link("hbase", _('HBase')) }
-            ${ app_link("shell", _('Shell')) }
+            % for tag in tags:            
+            <li>
+              <span class="label label-info">${ tag.tag }</span>
+              % if loop.first: 
+                (selected)
+              % endif
+            </li>
+            % endfor
           </ul>
           </p>
         </div>
       </div>
     </div>
 
-    <div class="span4">
+    <div class="span10">
       <div class="card card-home card-listcontent">
-        <h2 class="card-heading simple">${_('Hadoop')}</h2>
+        <h2 class="card-heading simple">${_('Documents')}</h2>
 
         <div class="card-body">
           <p>
-          <ul>
-            ${ app_link("filebrowser", _('Files')) }
-            ${ app_link("jobbrowser", _('Jobs')) }
-            ${ app_link("metastore", _('Tables')) }
-            ${ app_link("sqoop", _('Sqoop 2')) }
-            ${ app_link("jobsub", _('Designs')) }
-          </ul>
+          <table>
+            % for doc in documents:
+              <tr>
+                <td>${ doc.content_type }</td>
+                <td><a href="${ doc.content_object.get_absolute_url() }">${ doc.name }</a></td>
+                <td>${ doc.description }</td>
+                <td class="span1">
+                  % for tag in doc.tags.all():
+                    <span class="label label-info">${ tag.tag }</span>
+                  % endfor
+                </td>
+                <td class="span1">${ doc.owner }</td>
+                <td class="span1">${ doc.last_modified }</td>
+              </tr>
+            % endfor
+          </table>
           </p>
         </div>
       </div>
     </div>
 
-    <div class="span4">
-      <div class="card card-home card-listcontent">
-        <h2 class="card-heading simple">${_('Workflow')}</h2>
-
-        <div class="card-body">
-          <p>
-          <ul>
-            ${ app_link("oozie", _('Dashboard')) }
-            ${ app_link("oozie", _('Editor'), "list_workflows/") }
-          </ul>
-        </div>
-      </div>
-    </div>
   </div>
 </div>
-
-<script type="text/javascript" charset="utf-8">
-  $(document).ready(function(){
-    $(".app-tooltips").tooltip();
-  });
-</script>
 
 ${ commonfooter(messages) | n,unicode }

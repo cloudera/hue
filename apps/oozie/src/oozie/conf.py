@@ -49,13 +49,6 @@ REMOTE_SAMPLE_DIR = Config(
   default="/user/hue/oozie/workspaces",
   help=_t("Location on HDFS where the Oozie workflows are stored."))
 
-SHARE_JOBS = Config(
-  key='share_jobs',
-  default=True,
-  type=coerce_bool,
-  help=_t('Share workflows, coordinators and bundles information with all users. If set to false, '
-         'they will be visible only to the owner and administrators.'))
-
 OOZIE_JOBS_COUNT = Config(
   key='oozie_jobs_count',
   default=100,

@@ -45,34 +45,46 @@ def static_pattern(urlprefix, root):
 admin.autodiscover()
 
 # Some django-wide URLs
-dynamic_patterns = patterns('',
-  (r'^accounts/login/$', 'desktop.auth.views.dt_login'),
-  (r'^accounts/logout/$', 'desktop.auth.views.dt_logout', {'next_page': '/'}),
-  (r'^logs$','desktop.views.log_view'),
-  (r'^home$','desktop.views.home'),
-  (r'^dump_config$','desktop.views.dump_config'),
-  (r'^download_logs$','desktop.views.download_log_view'),
-  (r'^bootstrap.js$', 'desktop.views.bootstrap'),
-  (r'^profile$', 'desktop.auth.views.profile'),
-  (r'^prefs/(?P<key>\w+)?$', 'desktop.views.prefs'),
-  (r'^status_bar/?$', 'desktop.views.status_bar'),
-  (r'^admin/', include(admin.site.urls)),
-  (r'^debug/threads$', 'desktop.views.threads'),
-  (r'^debug/who_am_i$', 'desktop.views.who_am_i'),
-  (r'^debug/check_config$', 'desktop.views.check_config'),
-  (r'^debug/check_config_ajax$', 'desktop.views.check_config_ajax'),
-  (r'^log_frontend_event$', 'desktop.views.log_frontend_event'),
+dynamic_patterns = patterns('desktop.auth.views',
+  (r'^accounts/login/$', 'dt_login'),
+  (r'^accounts/logout/$', 'dt_logout', {'next_page': '/'}),
+  (r'^profile$', 'profile'),  
+  (r'^login/oauth/?$', 'oauth_login'),
+  (r'^login/oauth_authenticated/?$', 'oauth_authenticated'),  
+)
+  
+dynamic_patterns += patterns('desktop.views',
+  (r'^logs$','log_view'),
+  (r'^home$','home'),
+  (r'^dump_config$','dump_config'),
+  (r'^download_logs$','download_log_view'),
+  (r'^bootstrap.js$', 'bootstrap'),
+  
+  (r'^prefs/(?P<key>\w+)?$', 'prefs'),
+  (r'^status_bar/?$', 'status_bar'),
+  (r'^debug/threads$', 'threads'),
+  (r'^debug/who_am_i$', 'who_am_i'),
+  (r'^debug/check_config$', 'check_config'),
+  (r'^debug/check_config_ajax$', 'check_config_ajax'),
+  (r'^log_frontend_event$', 'log_frontend_event'),
 
-  # Oauth
-  (r'^login/oauth/?$', 'desktop.auth.views.oauth_login'),
-  (r'^login/oauth_authenticated/?$', 'desktop.auth.views.oauth_authenticated'),
+  # Doc model
+  (r'^doc/add_or_create_tag$', 'add_or_create_tag'),
+  (r'^doc/remove_tag$', 'remove_tag'),
+  (r'^doc/add_or_update_permission$', 'add_or_update_permission'),
+  (r'^doc/remove_permission$', 'remove_permission'),
 
   # Jasmine
-  (r'^jasmine', 'desktop.views.jasmine'),
+  (r'^jasmine', 'jasmine'),
 
   # Top level web page!
-  (r'^$', 'desktop.views.index'),
+  (r'^$', 'index'),
 )
+
+dynamic_patterns += patterns('',
+  (r'^admin/', include(admin.site.urls)),
+)
+
 
 static_patterns = []
 

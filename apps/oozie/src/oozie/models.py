@@ -28,9 +28,12 @@ from string import Template
 from itertools import chain
 
 from django.db import models
+from django.db.models import Q
 from django.core.urlresolvers import reverse
 from django.core.validators import RegexValidator
 from django.contrib.auth.models import User
+from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.models import ContentType
 from django.forms.models import inlineformset_factory
 from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
@@ -39,13 +42,14 @@ from desktop.log.access import access_warn
 from desktop.lib import django_mako
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.json_utils import JSONEncoderForHTML
+from desktop.models import Document
 from hadoop.fs.exceptions import WebHdfsException
 
 from hadoop.fs.hadoopfs import Hdfs
 from liboozie.submittion import Submission
 from liboozie.submittion import create_directories
 
-from oozie.conf import REMOTE_SAMPLE_DIR, SHARE_JOBS
+from oozie.conf import REMOTE_SAMPLE_DIR
 from timezones import TIMEZONES
 
 
@@ -56,13 +60,6 @@ PATH_MAX = 512
 name_validator = RegexValidator(regex='^[a-zA-Z_][\-_a-zA-Z0-9]{1,39}$',
                                 message=_('Enter a valid value: combination of 2 - 40 letters and digits starting by a letter'))
 
-
-class TrashManager(models.Manager):
-  def trashed(self):
-    return super(TrashManager, self).get_query_set().filter(is_trashed=True)
-
-  def available(self):
-    return super(TrashManager, self).get_query_set().filter(is_trashed=False)
 
 
 """
@@ -106,14 +103,12 @@ class JobManager(models.Manager):
 
 class Job(models.Model):
   """
-  Base class for Workflows and Coordinators.
-
-  http://incubator.apache.org/oozie/docs/3.2.0-incubating/docs/index.html
+  Base class for Oozie Workflows, Coordinators and Bundles.
   """
-  owner = models.ForeignKey(User, db_index=True, verbose_name=_t('Owner'), help_text=_t('Person who can modify the job.'))
-  name = models.CharField(max_length=40, blank=False, validators=[name_validator],
+  owner = models.ForeignKey(User, db_index=True, verbose_name=_t('Owner'), help_text=_t('Person who can modify the job.')) # Deprecated
+  name = models.CharField(max_length=40, blank=False, validators=[name_validator], # Deprecated
       help_text=_t('Name of the job, which must be unique per user.'), verbose_name=_t('Name'))
-  description = models.CharField(max_length=1024, blank=True, verbose_name=_t('Description'),
+  description = models.CharField(max_length=1024, blank=True, verbose_name=_t('Description'), # Deprecated
                                  help_text=_t('The purpose of the job.'))
   last_modified = models.DateTimeField(auto_now=True, db_index=True, verbose_name=_t('Last modified'))
   schema_version = models.CharField(max_length=128, verbose_name=_t('Schema version'),
@@ -121,27 +116,27 @@ class Job(models.Model):
   deployment_dir = models.CharField(max_length=1024, blank=True, verbose_name=_t('HDFS deployment directory'),
                                     help_text=_t('The path on the HDFS where all the workflows and '
                                                 'dependencies must be uploaded.'))
-  is_shared = models.BooleanField(default=False, db_index=True, verbose_name=_t('Is shared'),
+  is_shared = models.BooleanField(default=False, db_index=True, verbose_name=_t('Is shared'), # Deprecated
                                   help_text=_t('Enable other users to have access to this job.'))
   parameters = models.TextField(default='[{"name":"oozie.use.system.libpath","value":"true"}]', verbose_name=_t('Oozie parameters'),
                                 help_text=_t('Parameters used at the submission time (e.g. market=US, oozie.use.system.libpath=true).'))
-  is_trashed = models.BooleanField(default=False, db_index=True, verbose_name=_t('Is trashed'),
+  is_trashed = models.BooleanField(default=False, db_index=True, verbose_name=_t('Is trashed'),  blank=True,# Deprecated
                                    help_text=_t('If this job is trashed.'))
+  doc = generic.GenericRelation(Document, related_name='oozie_doc')
 
   objects = JobManager()
   unique_together = ('owner', 'name')
 
   def delete(self, skip_trash=False, *args, **kwargs):
     if skip_trash:
+      self.doc.all().delete()
       return super(Job, self).delete(*args, **kwargs)
     else:
-      self.is_trashed = True
-      self.save()
+      self.doc.get().send_to_trash()
       return self
 
   def restore(self):
-    self.is_trashed = False
-    self.save()
+    self.doc.get().restore_from_trash()
     return self
 
   def save(self):
@@ -191,6 +186,7 @@ class Job(models.Model):
 
   @property
   def status(self):
+    # TODO
     if self.is_shared:
       return _('shared')
     else:
@@ -205,14 +201,15 @@ class Job(models.Model):
     return  [{'name': name, 'value': value} for name, value in params.iteritems()]
 
   def is_accessible(self, user):
-    return user.is_superuser or self.owner == user or (SHARE_JOBS.get() and self.is_shared)
+    return self.doc.get().is_accessible(user)
+    #return user.is_superuser or self.owner == user or (SHARE_JOBS.get() and self.is_shared)
 
   def is_editable(self, user):
     """Only owners or admins can modify a job."""
     return user.is_superuser or self.owner == user
 
 
-class WorkflowManager(TrashManager):
+class WorkflowManager(models.Manager):
   def new_workflow(self, owner):
     workflow = Workflow(owner=owner, schema_version='uri:oozie:workflow:0.4')
 
@@ -241,6 +238,8 @@ class WorkflowManager(TrashManager):
     workflow.start = start
     workflow.end = end
     workflow.save()
+
+    Document.objects.link(workflow, owner=workflow.owner, name=workflow.name, description=workflow.description)
 
     self.check_workspace(workflow, fs)
 
@@ -272,9 +271,6 @@ class WorkflowManager(TrashManager):
 
 
 class Workflow(Job):
-  """
-  http://incubator.apache.org/oozie/docs/3.2.0-incubating/docs/WorkflowFunctionalSpec.html
-  """
   is_single = models.BooleanField(default=False)
   start = models.ForeignKey('Start', related_name='start_workflow', blank=True, null=True)
   end  = models.ForeignKey('End', related_name='end_workflow',  blank=True, null=True)
@@ -300,6 +296,7 @@ class Workflow(Job):
   def clone(self, fs, new_owner=None):
     source_deployment_dir = self.deployment_dir # Needed
     nodes = self.node_set.all()
+    copy_doc = self.doc.get().copy()    
     links = Link.objects.filter(parent__workflow=self)
 
     copy = self
@@ -332,6 +329,10 @@ class Workflow(Job):
     copy.start = old_nodes_mapping[self.start.id]
     copy.end = old_nodes_mapping[self.end.id]
     copy.save()
+
+    copy_doc.name = copy.name
+    copy_doc.save()
+    copy.doc.add(copy_doc)    
 
     try:
       if copy.is_shared:
@@ -415,7 +416,7 @@ class Workflow(Job):
     return 'workflow.xml'
 
   def get_absolute_url(self):
-    return reverse('oozie:edit_workflow', kwargs={'workflow': self.id})
+    return reverse('oozie:edit_workflow', kwargs={'workflow': self.id}) + '#editWorkflow'
 
   def get_hierarchy(self):
     node = Start.objects.get(workflow=self) # Uncached version of start.
@@ -666,9 +667,6 @@ class Node(models.Model):
 
 
 class Action(Node):
-  """
-  http://incubator.apache.org/oozie/docs/3.2.0-incubating/docs/WorkflowFunctionalSpec.html#a3.2_Workflow_Action_Nodes
-  """
   types = ()
 
   class Meta:
@@ -1235,9 +1233,6 @@ DATASET_FREQUENCY = ['MINUTE', 'HOUR', 'DAY', 'MONTH', 'YEAR']
 
 
 class Coordinator(Job):
-  """
-  http://oozie.apache.org/docs/3.3.0/CoordinatorFunctionalSpec.html
-  """
   frequency_number = models.SmallIntegerField(default=1, choices=FREQUENCY_NUMBERS, verbose_name=_t('Frequency number'),
                                               help_text=_t('The number of units of the rate at which '
                                                            'data is periodically created.'))
@@ -1271,8 +1266,6 @@ class Coordinator(Job):
   job_properties = models.TextField(default='[]', verbose_name=_t('Workflow properties'),
                                     help_text=_t('Additional properties to transmit to the workflow, e.g. limit=100, and EL functions, e.g. username=${coord:user()}'))
 
-  objects = TrashManager()
-
   HUE_ID = 'hue-id-c'
 
   def get_type(self):
@@ -1285,6 +1278,7 @@ class Coordinator(Job):
     return re.sub(re.compile('\s*\n+', re.MULTILINE), '\n', django_mako.render_to_string(tmpl, {'coord': self, 'mapping': mapping})).encode('utf-8', 'xmlcharrefreplace')
 
   def clone(self, new_owner=None):
+    copy_doc = self.doc.get()
     datasets = Dataset.objects.filter(coordinator=self)
     data_inputs = DataInput.objects.filter(coordinator=self)
     data_outputs = DataOutput.objects.filter(coordinator=self)
@@ -1321,6 +1315,11 @@ class Coordinator(Job):
       data_output.coordinator = copy
       data_output.dataset = old_dataset_mapping[data_output.dataset.id]
       data_output.save()
+
+    copy_doc.pk = None
+    copy_doc.id = None
+    copy_doc.save()
+    copy.doc.add(copy_doc)
 
     return copy
 
@@ -1528,14 +1527,9 @@ class BundledCoordinator(models.Model):
 
 
 class Bundle(Job):
-  """
-  http://oozie.apache.org/docs/3.3.0/BundleFunctionalSpec.html
-  """
   kick_off_time = models.DateTimeField(default=datetime.today(), verbose_name=_t('Start'),
                                        help_text=_t('When to start the first coordinators.'))
   coordinators = models.ManyToManyField(Coordinator, through='BundledCoordinator')
-
-  objects = TrashManager()
 
   HUE_ID = 'hue-id-b'
 
@@ -1555,6 +1549,7 @@ class Bundle(Job):
 
   def clone(self, new_owner=None):
     bundleds = BundledCoordinator.objects.filter(bundle=self)
+    copy_doc = self.doc.get()
 
     copy = self
     copy.pk = None
@@ -1570,6 +1565,11 @@ class Bundle(Job):
       bundled.id = None
       bundled.bundle = copy
       bundled.save()
+
+    copy_doc.pk = None
+    copy_doc.id = None
+    copy_doc.save()
+    copy.doc.add(copy_doc)
 
     return copy
 

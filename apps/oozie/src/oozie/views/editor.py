@@ -14,6 +14,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from desktop.models import Document
 
 try:
   import json
@@ -35,11 +36,9 @@ from desktop.lib.django_util import render, extract_field_data
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_str
 from desktop.lib.rest.http_client import RestException
-from hadoop.fs.exceptions import WebHdfsException
 from liboozie.submittion import Submission
 
 from filebrowser.lib.archives import archive_factory
-from oozie.conf import SHARE_JOBS
 from oozie.decorators import check_job_access_permission, check_job_edition_permission,\
                              check_dataset_access_permission, check_dataset_edition_permission
 from oozie.import_workflow import import_workflow as _import_workflow
@@ -57,102 +56,61 @@ LOG = logging.getLogger(__name__)
 
 
 def list_workflows(request):
-  data = Workflow.objects.available().filter(managed=True)
-
-  if not SHARE_JOBS.get() and not request.user.is_superuser:
-    data = data.filter(owner=request.user)
-  else:
-    data = data.filter(Q(is_shared=True) | Q(owner=request.user))
-
-  data = data.order_by('-last_modified')
+  data = Document.objects.available(Workflow, request.user)
+  data = [job for job in data if job.managed]
 
   return render('editor/list_workflows.mako', request, {
-    'jobs': list(data),
-    'json_jobs': json.dumps(list(data.values_list('id', flat=True))),
+    'jobs': data,
+    'json_jobs': json.dumps([job.id for job in data]),
   })
 
 
 def list_trashed_workflows(request):
-  data = Workflow.objects.trashed().filter(managed=True)
-
-  if not SHARE_JOBS.get() and not request.user.is_superuser:
-    data = data.filter(owner=request.user)
-  else:
-    data = data.filter(Q(is_shared=True) | Q(owner=request.user))
-
-  data = data.order_by('-last_modified')
+  data = Document.objects.trashed(Workflow, request.user)
+  data = [job for job in data if job.managed]
 
   return render('editor/list_trashed_workflows.mako', request, {
-    'jobs': list(data),
-    'json_jobs': json.dumps(list(data.values_list('id', flat=True))),
+    'jobs': data,
+    'json_jobs': json.dumps([job.id for job in data]),
   })
 
 
 def list_coordinators(request, workflow_id=None):
-  data = Coordinator.objects.available()
+  data = Document.objects.available(Coordinator, request.user)
+    
   if workflow_id is not None:
-    data = data.filter(workflow__id=workflow_id)
-
-  if not SHARE_JOBS.get() and not request.user.is_superuser:
-    data = data.filter(owner=request.user)
-  else:
-    data = data.filter(Q(is_shared=True) | Q(owner=request.user))
-
-  data = data.order_by('-last_modified')
+    data = [job for job in data if job.workflow.id == workflow_id]
 
   return render('editor/list_coordinators.mako', request, {
-    'jobs': list(data),
-    'json_jobs': json.dumps(list(data.values_list('id', flat=True))),
+    'jobs': data,
+    'json_jobs': json.dumps([job.id for job in data]),
   })
 
 
-def list_trashed_coordinators(request, workflow_id=None):
-  data = Coordinator.objects.trashed()
-  if workflow_id is not None:
-    data = data.filter(workflow__id=workflow_id)
-
-  if not SHARE_JOBS.get() and not request.user.is_superuser:
-    data = data.filter(owner=request.user)
-  else:
-    data = data.filter(Q(is_shared=True) | Q(owner=request.user))
-
-  data = data.order_by('-last_modified')
+def list_trashed_coordinators(request):
+  data = Document.objects.trashed(Coordinator, request.user)
 
   return render('editor/list_trashed_coordinators.mako', request, {
-    'jobs': list(data),
-    'json_jobs': json.dumps(list(data.values_list('id', flat=True))),
+    'jobs': data,
+    'json_jobs': json.dumps([job.id for job in data]),
   })
 
 
 def list_bundles(request):
-  data = Bundle.objects.available()
-
-  if not SHARE_JOBS.get() and not request.user.is_superuser:
-    data = data.filter(owner=request.user)
-  else:
-    data = data.filter(Q(is_shared=True) | Q(owner=request.user))
-
-  data = data.order_by('-last_modified')
+  data = Document.objects.available(Bundle, request.user)
 
   return render('editor/list_bundles.mako', request, {
-    'jobs': list(data),
-    'json_jobs': json.dumps(list(data.values_list('id', flat=True))),
+    'jobs': data,
+    'json_jobs': json.dumps([job.id for job in data]),
   })
 
 
 def list_trashed_bundles(request):
-  data = Bundle.objects.trashed()
-
-  if not SHARE_JOBS.get() and not request.user.is_superuser:
-    data = data.filter(owner=request.user)
-  else:
-    data = data.filter(Q(is_shared=True) | Q(owner=request.user))
-
-  data = data.order_by('-last_modified')
+  data = Document.objects.trashed(Bundle, request.user)
 
   return render('editor/list_trashed_bundles.mako', request, {
-    'jobs': list(data),
-    'json_jobs': json.dumps(list(data.values_list('id', flat=True))),
+    'jobs': data,
+    'json_jobs': json.dumps([job.id for job in data]),
   })
 
 
@@ -276,7 +234,7 @@ def restore_workflow(request):
   job_ids = request.POST.getlist('job_selection')
 
   for job_id in job_ids:
-    job = Job.objects.is_accessible_or_exception(request, job_id)
+    job = Document.objects.is_accessible_or_exception(request.user, Job, job_id)
     Job.objects.can_edit_or_exception(request, job)
     job.workflow.restore()
 
@@ -363,6 +321,7 @@ def create_coordinator(request, workflow=None):
 
     if coordinator_form.is_valid():
       coordinator = coordinator_form.save()
+      Document.objects.link(coordinator, owner=coordinator.owner, name=coordinator.name, description=coordinator.description)
       return redirect(reverse('oozie:edit_coordinator', kwargs={'coordinator': coordinator.id}) + "#step3")
     else:
       request.error(_('Errors on the form: %s') % coordinator_form.errors)
@@ -632,6 +591,7 @@ def create_bundle(request):
 
     if bundle_form.is_valid():
       bundle = bundle_form.save()
+      Document.objects.link(bundle, owner=bundle.owner, name=bundle.name, description=bundle.description)
       return redirect(reverse('oozie:edit_bundle', kwargs={'bundle': bundle.id}))
     else:
       request.error(_('Errors on the form: %s') % bundle_form.errors)

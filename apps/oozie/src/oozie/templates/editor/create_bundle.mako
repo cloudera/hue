@@ -46,7 +46,9 @@ ${ layout.menubar(section='bundles') }
             ${ utils.render_field(bundle_form['name']) }
             ${ utils.render_field(bundle_form['description']) }
             ${ utils.render_field(bundle_form['kick_off_time']) }
-            ${ utils.render_field(bundle_form['is_shared']) }
+            <div class="hide">
+              ${ utils.render_field(bundle_form['is_shared']) }
+            </hide>
 
             ${ bundle_form['schema_version'] | n,unicode }
             ${ bundle_form['parameters'] | n,unicode }
