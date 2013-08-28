@@ -14,7 +14,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Settings to configure your Hadoop cluster."""
+
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, validate_path, coerce_bool
 import fnmatch
 import logging
@@ -252,14 +252,18 @@ def config_validator(user):
     res.append("hadoop.hdfs_clusters", "You should have an HDFS called 'default'.")
 
   # MR_CLUSTERS
+  mr_down = []
   for name in MR_CLUSTERS.keys():
     cluster = MR_CLUSTERS[name]
     res.extend(validate_path(cluster.HADOOP_MAPRED_HOME, is_dir=True))
     res.extend(validate_path(cluster.HADOOP_CONF_DIR, is_dir=True))
     res.extend(validate_path(cluster.HADOOP_BIN, is_dir=False))
-    res.extend(job_tracker.test_jt_configuration(cluster))
+    mr_down.extend(job_tracker.test_jt_configuration(cluster))
     if cluster.SUBMIT_TO.get():
       submit_to.append('mapred_clusters.' + name)
+  # If HA still failing
+  if mr_down and len(mr_down) == len(MR_CLUSTERS.keys()):
+    res.extend(mr_down)
 
   # YARN_CLUSTERS
   for name in YARN_CLUSTERS.keys():
