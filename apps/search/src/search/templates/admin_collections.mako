@@ -209,7 +209,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
     $(document).on("imported", function () {
       $("#importModal").modal("hide");
       $("#importModalBtn").button("reset");
-      $.jHueNotify.info("${ _("Collections imported successfully.") }");
+      $.jHueNotify.info("${ _("Collections imported successfully.") }"); // Could fail actually
     });
 
     $(document).on("deleting", function () {
