@@ -56,9 +56,9 @@ ${layout.menubar(section='saved queries')}
       </%def>
 
       <%def name="creation()">
-        <div class="btn-toolbar" style="display: inline; vertical-align: middle">
-          <a class="btn" href="${ url(app_name + ':list_trashed_designs') }" title="${_('Go to the trash')}"><i class="icon-trash"></i> ${_('View trash')}</a>
+        <div class="btn-toolbar" style="display: inline; vertical-align: middle">          
           <a class="btn" href="${ url(app_name + ':execute_query') }" title="${_('Create new query')}"><i class="icon-plus-sign"></i> ${_('New query')}</a>
+          <a class="btn" href="${ url(app_name + ':list_trashed_designs') }" title="${_('Go to the trash')}"><i class="icon-trash"></i> ${_('View trash')}</a>
         </div>
       </%def>
     </%actionbar:render>

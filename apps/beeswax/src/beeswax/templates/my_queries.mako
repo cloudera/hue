@@ -102,7 +102,7 @@ ${layout.menubar(section='my queries')}
             </td>
             <td>
               % if design.desc:
-              ${design.desc}
+                ${ design.desc }
               % endif
             </td>
             <td data-sort-value="${time.mktime(design.mtime.timetuple())}">${ timesince(design.mtime) } ${_('ago')}</td>

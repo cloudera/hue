@@ -46,10 +46,11 @@ ${ layout.menubar(section='coordinators') }
     </%def>
 
     <%def name="creation()">
-        <a href="${ url('oozie:list_coordinators') }" id="home-btn" class="btn" title="${ _('Got to coordinator manager') }">
-          <i class="icon-home"></i> ${ _('View coordinators') }
-        </a>
-        <button class="btn" id="purge-btn"><i class="icon-fire"></i> ${ _('Empty trash') }</button>
+       <button class="btn" id="purge-btn"><i class="icon-fire"></i> ${ _('Empty trash') }</button>
+       &nbsp;&nbsp;
+       <a href="${ url('oozie:list_coordinators') }" id="home-btn" class="btn" title="${ _('Got to coordinator manager') }">
+         <i class="icon-home"></i> ${ _('Back') }
+       </a>        
     </%def>
   </%actionbar:render>
 

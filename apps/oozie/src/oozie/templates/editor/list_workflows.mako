@@ -59,10 +59,10 @@ ${ layout.menubar(section='workflows') }
     </%def>
 
     <%def name="creation()">
-      <a href="${ url('oozie:list_trashed_workflows') }" class="btn"><i class="icon-trash"></i> ${ _('View trash') }</a>
-      &nbsp;&nbsp;
       <a href="${ url('oozie:create_workflow') }" class="btn"><i class="icon-plus-sign"></i> ${ _('Create') }</a>
-      <a href="${ url('oozie:import_workflow') }" class="btn"><i class="icon-download-alt"></i> ${ _('Import') }</a>
+      <a href="${ url('oozie:import_workflow') }" class="btn"><i class="icon-download-alt"></i> ${ _('Import') }</a>      
+      &nbsp;&nbsp;
+      <a href="${ url('oozie:list_trashed_workflows') }" class="btn"><i class="icon-trash"></i> ${ _('Trash') }</a>
     </%def>
   </%actionbar:render>
 

@@ -50,11 +50,11 @@ ${layout.menubar(section='saved queries')}
 
       <%def name="creation()">
         <div class="btn-toolbar" style="display: inline; vertical-align: middle">
-          <button id="viewQueriesBtn" class="btn" title="${_('View queries')}">
-            <i class="icon-home"></i> ${_('View queries')}
-          </button>
           <button id="emptyTrashBtn" class="btn" title="${_('Empty trash')}" data-bind="enabled: availableSavedQueries().length > 0">
             <i class="icon-fire"></i> ${_('Empty trash')}
+          </button>        
+          <button id="viewQueriesBtn" class="btn" title="${_('View queries')}">
+            <i class="icon-home"></i> ${_('Back')}
           </button>
         </div>
       </%def>

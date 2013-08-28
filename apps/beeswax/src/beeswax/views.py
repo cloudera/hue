@@ -35,6 +35,7 @@ from desktop.lib.paginator import Paginator
 from desktop.lib.django_util import copy_query_dict, format_preserving_redirect, render
 from desktop.lib.django_util import login_notrequired, get_desktop_uri_prefix
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.models import Document
 
 from jobsub.parameterization import find_variables, substitute_variables
 
@@ -42,7 +43,7 @@ import beeswax.forms
 import beeswax.design
 import beeswax.management.commands.beeswax_install_examples
 
-from beeswax import common, data_export, models, conf
+from beeswax import common, data_export, models
 from beeswax.forms import QueryForm
 from beeswax.design import HQLdesign
 from beeswax.models import SavedQuery, make_query_context, QueryHistory
@@ -57,7 +58,6 @@ LOG = logging.getLogger(__name__)
 
 def index(request):
   return execute_query(request)
-
 
 """
 Design views
@@ -111,6 +111,9 @@ def save_design(request, form, type, design, explicit_save):
   design.data = new_data
 
   design.save()
+  design.doc.update(name=design.name, description=design.desc)
+
+  Document.objects.link(design, owner=design.owner, name=design.name, extra=design.type)
 
   LOG.info('Saved %s design "%s" (id %s) for %s' %
            (explicit_save and '' or 'auto ', design.name, design.id, design.owner))
@@ -136,6 +139,7 @@ def save_design_properties(request):
     elif field == 'description':
       design.desc = request.POST.get('value')
     design.save()
+    design.doc.update(name=design.name, description=design.desc)
     response['status'] = 0
   except Exception, e:
     response['data'] = str(e)
@@ -146,17 +150,17 @@ def save_design_properties(request):
 def delete_design(request):
   if request.method == 'POST':
     ids = request.POST.getlist('designs_selection')
-    designs = dict([(design_id, authorized_get_design(request, design_id)) for design_id in ids])
-
+    designs = dict([(design_id, authorized_get_design(request, design_id, owner_only=True)) for design_id in ids])
+    print designs
     if None in designs.values():
       LOG.error('Cannot delete non-existent design(s) %s' % ','.join([key for key, name in designs.items() if name is None]))
       return list_designs(request)
 
     for design in designs.values():
       if request.POST.get('skipTrash', 'false') == 'false':
-        design.is_trashed = True
-        design.save()
+        design.doc.get().send_to_trash()
       else:
+        design.doc.all().delete()
         design.delete()
     return redirect(reverse(get_app_name(request) + ':list_designs'))
   else:
@@ -173,8 +177,7 @@ def restore_design(request):
       return list_designs(request)
 
     for design in designs.values():
-      design.is_trashed = False
-      design.save()
+      design.doc.get().restore_from_trash()
     return redirect(reverse(get_app_name(request) + ':list_designs'))
   else:
     return render('confirm.html', request, dict(url=request.path, title=_('Restore design(s)?')))
@@ -193,6 +196,7 @@ def clone_design(request, design_id):
   copy.owner = request.user
   copy.save()
   messages.info(request, _('Copied design: %(name)s') % {'name': design.name})
+
   return format_preserving_redirect(
       request, reverse(get_app_name(request) + ':execute_query', kwargs={'design_id': copy.id}))
 
@@ -218,16 +222,11 @@ def list_designs(request):
   DEFAULT_PAGE_SIZE = 20
   app_name= get_app_name(request)
 
-  if conf.SHARE_SAVED_QUERIES.get() or request.user.is_superuser:
-    user = None
-  else:
-    user = request.user
-
   # Extract the saved query list.
   prefix = 'q-'
   querydict_query = _copy_prefix(prefix, request.GET)
   # Manually limit up the user filter.
-  querydict_query[ prefix + 'user' ] = user
+  querydict_query[ prefix + 'user' ] = request.user
   querydict_query[ prefix + 'type' ] = app_name
   page, filter_params = _list_designs(querydict_query, DEFAULT_PAGE_SIZE, prefix)
 
@@ -276,7 +275,7 @@ def my_queries(request):
   prefix = 'h-'
   querydict_history = _copy_prefix(prefix, request.GET)
   # Manually limit up the user filter.
-  querydict_history[ prefix + 'user' ] = request.user.username
+  querydict_history[ prefix + 'user' ] = request.user
   querydict_history[ prefix + 'type' ] = app_name
 
   hist_page, hist_filter = _list_query_history(request.user,
@@ -287,7 +286,7 @@ def my_queries(request):
   prefix = 'q-'
   querydict_query = _copy_prefix(prefix, request.GET)
   # Manually limit up the user filter.
-  querydict_query[ prefix + 'user' ] = request.user.username
+  querydict_query[ prefix + 'user' ] = request.user
   querydict_query[ prefix + 'type' ] = app_name
 
   query_page, query_filter = _list_designs(querydict_query, DEFAULT_PAGE_SIZE, prefix)
@@ -322,7 +321,7 @@ def list_query_history(request):
   DEFAULT_PAGE_SIZE = 30
   prefix = 'q-'
 
-  share_queries = conf.SHARE_SAVED_QUERIES.get() or request.user.is_superuser
+  share_queries = request.user.is_superuser
 
   querydict_query = request.GET.copy()
   if not share_queries:
@@ -439,7 +438,7 @@ def execute_query(request, design_id=None):
     'log': log,
     'autocomplete_base_url': reverse(get_app_name(request) + ':autocomplete', kwargs={}),
     'on_success_url': on_success_url,
-    'can_edit_name': design and not design.is_auto and design.name,
+    'can_edit_name': design and not design.is_auto,
   })
 
 
@@ -905,39 +904,39 @@ def autocomplete(request, database=None, table=None):
 Utils
 """
 
+# owner_only is deprecated
 def authorized_get_design(request, design_id, owner_only=False, must_exist=False):
   if design_id is None and not must_exist:
     return None
   try:
-    design = models.SavedQuery.objects.get(id=design_id)
-  except models.SavedQuery.DoesNotExist:
+    design = SavedQuery.objects.get(id=design_id)
+  except SavedQuery.DoesNotExist:
     if must_exist:
       raise PopupException(_('Design %(id)s does not exist.') % {'id': design_id})
     else:
       return None
 
-  if not conf.SHARE_SAVED_QUERIES.get() and (not request.user.is_superuser or owner_only) \
-      and design.owner != request.user:
-    raise PopupException(_('Cannot access design %(id)s.') % {'id': design_id})
+  if owner_only:
+    design.doc.get().can_write_or_exception(request.user)
   else:
-    return design
+    design.doc.get().can_read_or_exception(request.user)
+
+  return design
 
 def authorized_get_history(request, query_history_id, owner_only=False, must_exist=False):
   if query_history_id is None and not must_exist:
     return None
   try:
-    query_history = models.QueryHistory.get(id=query_history_id)
-  except models.QueryHistory.DoesNotExist:
+    query_history = QueryHistory.get(id=query_history_id)
+  except QueryHistory.DoesNotExist:
     if must_exist:
       raise PopupException(_('QueryHistory %(id)s does not exist.') % {'id': query_history_id})
     else:
       return None
 
-  if not conf.SHARE_SAVED_QUERIES.get() and (not request.user.is_superuser or owner_only) \
-      and query_history.owner != request.user:
-    raise PopupException(_('Cannot access QueryHistory %(id)s.') % {'id': query_history_id})
-  else:
-    return query_history
+  query_history.design.doc.get().can_read_or_exception(request.user)
+  
+  return query_history
 
 
 def safe_get_design(request, design_type, design_id=None):
@@ -949,10 +948,7 @@ def safe_get_design(request, design_type, design_id=None):
   design = None
 
   if design_id is not None:
-    try:
-      design = models.SavedQuery.get(design_id, request.user, design_type)
-    except models.SavedQuery.DoesNotExist:
-      messages.error(request, _('Design does not exist.'))
+    design = authorized_get_design(request, design_id)
 
   if design is None:
     design = models.SavedQuery(owner=request.user, type=design_type)
@@ -1126,32 +1122,30 @@ def _list_designs(querydict, page_size, prefix="", is_trashed=False):
   DEFAULT_SORT = ('-', 'date')                  # Descending date
 
   SORT_ATTR_TRANSLATION = dict(
-    date='mtime',
+    date='last_modified',
     name='name',
-    desc='desc',
-    type='type',
+    desc='description',
+    type='extra',
   )
 
-  # Filtering. Only display designs explicitly saved.
-  db_queryset = models.SavedQuery.objects.filter(is_auto=False, is_trashed=is_trashed)
-
   user = querydict.get(prefix + 'user')
-  if user is not None:
-    db_queryset = db_queryset.filter(owner__username=user)
+
+  # Trash and security
+  # Discarding is_auto for now
+  if is_trashed:
+    db_queryset = Document.objects.trashed_docs(SavedQuery, user)
+  else:
+    db_queryset = Document.objects.available_docs(SavedQuery, user)
 
   # Design type
   d_type = querydict.get(prefix + 'type')
-  if d_type:
-    d_type = str(d_type)
-    if d_type not in SavedQuery.TYPES_MAPPING.keys():
-      LOG.warn('Bad parameter to list_designs: type=%s' % (d_type,))
-    else:
-      db_queryset = db_queryset.filter(type=SavedQuery.TYPES_MAPPING[d_type])
+  if d_type and d_type in SavedQuery.TYPES_MAPPING.keys():
+    db_queryset = db_queryset.filter(extra=str(SavedQuery.TYPES_MAPPING[d_type]))
 
   # Text search
   frag = querydict.get(prefix + 'text')
   if frag:
-    db_queryset = db_queryset.filter(Q(name__icontains=frag) | Q(desc__icontains=frag))
+    db_queryset = db_queryset.filter(Q(name__icontains=frag) | Q(description__icontains=frag))
 
   # Ordering
   sort_key = querydict.get(prefix + 'sort')
@@ -1168,8 +1162,10 @@ def _list_designs(querydict, page_size, prefix="", is_trashed=False):
     sort_dir, sort_attr = DEFAULT_SORT
   db_queryset = db_queryset.order_by(sort_dir + SORT_ATTR_TRANSLATION[sort_attr])
 
+  designs = [job.content_object for job in db_queryset.all() if job.content_object]
+
   pagenum = int(querydict.get(prefix + 'page', 1))
-  paginator = Paginator(db_queryset, page_size)
+  paginator = Paginator(designs, page_size)
   page = paginator.page(pagenum)
 
   # We need to pass the parameters back to the template to generate links
