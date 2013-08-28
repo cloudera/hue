@@ -25,11 +25,11 @@ class TestFileFormat(unittest.TestCase):
 
 class TestMetadata(unittest.TestCase):
 
-	f = "/Users/joecrow/Code/parquet-compatibility/parquet-testdata/impala/1.0.4-SNAPPY/nation.impala.parquet"
+	f = "/Users/joecrow/Code/parquet-compatibility/parquet-testdata/impala/1.1.1-SNAPPY/nation.impala.parquet"
 	
 	def testFooterBytes(self):
 		with open(self.f) as fo:
-			self.assertEquals(229, parquet._get_footer_size(fo))
+			self.assertEquals(327, parquet._get_footer_size(fo))
 
 	def testReadFOoter(self):
 		parquet.read_footer(self.f)
