@@ -137,7 +137,10 @@ def admin_collections_import(request):
         status += 1
       except Exception, e:
         err_message += unicode(str(e), "utf8") + "\n"
-      result['message'] = status == len(importables) and _('Imported successfully') or _('Imported with errors: ') + err_message
+      if status == len(importables):
+        result['message'] = _('Imported successfully')
+      else:
+        result['message'] = _('Imported with errors: ') + err_message
     return HttpResponse(json.dumps(result), mimetype="application/json")
   else:
     if request.GET.get('format') == 'json':
