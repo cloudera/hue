@@ -14,7 +14,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""General configuration for core Desktop features (authentication, etc)"""
 
 import os
 import socket
@@ -24,6 +23,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from desktop.lib.conf import Config, ConfigSection, UnspecifiedConfigSection
 from desktop.lib.conf import coerce_bool, validate_path
+from desktop.lib.i18n import force_unicode
 from desktop.lib.paths import get_desktop_root
 
 
@@ -528,19 +528,19 @@ def config_validator(user):
     kt_stat = os.stat(KERBEROS.HUE_KEYTAB.get())
     if stat.S_IMODE(kt_stat.st_mode) & 0077:
       res.append((KERBEROS.HUE_KEYTAB,
-                  unicode(_("Keytab should have 0600 permissions (has %o).") %
+                  force_unicode(_("Keytab should have 0600 permissions (has %o).") %
                   stat.S_IMODE(kt_stat.st_mode))))
 
     res.extend(validate_path(KERBEROS.KINIT_PATH, is_dir=False))
     res.extend(validate_path(KERBEROS.CCACHE_PATH, is_dir=False))
 
-  if LDAP.LDAP_URL.get() is None:
+  if LDAP.LDAP_URL.get() is None != LDAP.BASE_DN.get() is None:
     res.append((LDAP.LDAP_URL,
-                unicode(_("LDAP is only partially configured. An LDAP URL must be provided."))))
+                force_unicode(_("LDAP is only partially configured. An LDAP URL and BASE DN must be provided."))))
 
   if LDAP.BIND_DN.get():
     if LDAP.BIND_PASSWORD.get() is None:
       res.append((LDAP.BIND_PASSWORD,
-                  unicode(_("If you set bind_dn, then you must set bind_password."))))
+                  force_unicode(_("If you set bind_dn, then you must set bind_password."))))
 
   return res
