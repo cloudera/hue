@@ -15,5 +15,6 @@ Hue 2 User Guide
 -   [Job Browser](jobbrowser.html)
 -   [Job Designer](jobdesigner.html)
 -   [Oozie Editor and Dashboard](oozie.html)
+-   [Sqoop UI](sqoop.html)
 -   [Hue Shell](shell.html)
 -   [User Admin](admin.html)
