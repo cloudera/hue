@@ -194,7 +194,7 @@ def is_jframe_request(request):
   return request.META.get('HTTP_X_HUE_JFRAME') or \
       request.GET.get("format") == "embed"
 
-def render(template, request, data, json=None, template_lib=None, force_template=False, **kwargs):
+def render(template, request, data, json=None, template_lib=None, force_template=False, status=200, **kwargs):
   """
   Render() is the main shortcut/workhorse for rendering view responses.
   It takes a template (either ".mako" or ".html", or influenced by
@@ -211,13 +211,14 @@ def render(template, request, data, json=None, template_lib=None, force_template
   is_ajax = getattr(request, "ajax", False)
   if not force_template and not is_jframe_request(request) and (is_ajax or template is None):
     if json is not None:
-      return render_json(json, request.GET.get("callback"))
+      return render_json(json, request.GET.get("callback"), status=status)
     else:
-      return render_json(data, request.GET.get("callback"))
+      return render_json(data, request.GET.get("callback"), status=status)
   else:
     return _render_to_response(template,
                                RequestContext(request=request, dict_=data),
                                template_lib=template_lib,
+                               status=status,
                                **kwargs)
 
 
@@ -274,7 +275,7 @@ VALID_JSON_IDENTIFIER = re.compile("^[a-zA-Z_$][a-zA-Z0-9_$]*$")
 class IllegalJsonpCallbackNameException(Exception):
   pass
 
-def render_json(data, jsonp_callback=None, js_safe=False):
+def render_json(data, jsonp_callback=None, js_safe=False, status=200):
   """
   Renders data as json.  If jsonp is specified, wraps
   the result in a function.
@@ -291,7 +292,7 @@ def render_json(data, jsonp_callback=None, js_safe=False):
     if not VALID_JSON_IDENTIFIER.match(jsonp_callback):
       raise IllegalJsonpCallbackNameException("Invalid jsonp callback name: %s" % jsonp_callback)
     json = "%s(%s);" % (jsonp_callback, json)
-  return HttpResponse(json, mimetype='text/javascript')
+  return HttpResponse(json, mimetype='text/javascript', status=status)
 
 def update_if_dirty(model_instance, **kwargs):
   """
