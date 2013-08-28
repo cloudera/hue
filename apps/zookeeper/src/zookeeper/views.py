@@ -30,9 +30,9 @@ from desktop.lib.django_util import render
 from desktop.lib.exceptions_renderable import PopupException
 
 from zookeeper import settings
+from zookeeper import stats
 from zookeeper.conf import CLUSTERS
 from zookeeper.forms import CreateZNodeForm, EditZNodeForm
-from zookeeper.stats import ZooKeeperStats
 from zookeeper.rest import ZooKeeper
 from zookeeper.utils import get_cluster_or_404
 
@@ -43,15 +43,15 @@ def _get_global_overview():
 
 
 def _get_overview(host_ports):
-  stats = {}
+  zstats = {}
 
-  for s in host_ports.split(','):
-    host, port = map(str.strip, s.split(':'))
+  for host_port in host_ports.split(','):
+    host, port = map(str.strip, host_port.split(':'))
 
-    zks = ZooKeeperStats(host, port)
-    stats[s] = zks.get_stats() or {}
+    zks = stats.ZooKeeperStats(host, port)
+    zstats[host_port] = zks.get_stats() or {}
 
-  return stats
+  return zstats
 
 
 def _group_stats_by_role(stats):
@@ -100,7 +100,7 @@ def clients(request, id, host):
     raise Http404
 
   host, port = parts
-  zks = ZooKeeperStats(host, port)
+  zks = stats.ZooKeeperStats(host, port)
   clients = zks.get_clients()
 
   return render('clients.mako', request, {

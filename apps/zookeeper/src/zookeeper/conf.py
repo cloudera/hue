@@ -15,7 +15,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, validate_path, coerce_bool
+from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection
+
+
+def coerce_string(value):
+  if type(value) == list:
+    return ','.join(value)
+  else:
+    return value
 
 
 CLUSTERS = UnspecifiedConfigSection(
@@ -28,11 +35,13 @@ CLUSTERS = UnspecifiedConfigSection(
           "host_ports",
           help="Zookeeper ensemble. Comma separated list of Host/Port, e.g. localhost:2181,localhost:2182,localhost:2183",
           default="localhost:2181",
+          type=coerce_string,
       ),
       REST_URL=Config(
           "rest_url",
           help="The URL of the REST contrib service.",
           default="http://localhost:9998",
+          type=str,
       ),
     )
   )
