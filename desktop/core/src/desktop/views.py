@@ -236,7 +236,7 @@ def index(request):
 def serve_404_error(request, *args, **kwargs):
   """Registered handler for 404. We just return a simple error"""
   access_warn(request, "404 not found")
-  return render("404.mako", request, dict(uri=request.build_absolute_uri()))
+  return render("404.mako", request, dict(uri=request.build_absolute_uri()), status=404)
 
 def serve_500_error(request, *args, **kwargs):
   """Registered handler for 500. We use the debug view to make debugging easier."""
