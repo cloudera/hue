@@ -187,7 +187,7 @@ class Sorting(models.Model):
 
 class CollectionManager(models.Manager):
 
-  def get_or_create(self, name, solr_properties, is_core_only=False, is_enabled=True):
+  def get_or_create(self, name, solr_properties, is_core_only=False, is_enabled=True, user=None):
     try:
       return self.get(name=name), False
     except Collection.DoesNotExist:

@@ -67,13 +67,13 @@ class SearchController(object):
       collections = self.get_new_collections()
       collection = collections[attrs['name']]
 
-      hue_collection, created = Collection.objects.get_or_create(name=attrs['name'], solr_properties=collection, is_enabled=True)
+      hue_collection, created = Collection.objects.get_or_create(name=attrs['name'], solr_properties=collection, is_enabled=True, user=self.user)
       return hue_collection
     elif attrs['type'] == 'core':
       cores = self.get_new_cores()
       core = cores[attrs['name']]
 
-      hue_collection, created = Collection.objects.get_or_create(name=attrs['name'], solr_properties=core, is_enabled=True, is_core_only=True)
+      hue_collection, created = Collection.objects.get_or_create(name=attrs['name'], solr_properties=core, is_enabled=True, is_core_only=True, user=self.user)
       return hue_collection
     else:
       raise PopupException(_('Collection type does not exit: %s') % attrs)
