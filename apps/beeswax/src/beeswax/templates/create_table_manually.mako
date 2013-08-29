@@ -409,7 +409,7 @@ ${ commonheader(_("Create table manually"), 'metastore', user) | n,unicode }
 <style type="text/css">
   #filechooser {
     min-height: 100px;
-    overflow-y: scroll;
+    overflow-y: auto;
     margin-top: 10px;
     height: 250px;
   }
