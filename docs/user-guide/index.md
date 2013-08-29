@@ -9,6 +9,7 @@ Hue 2 User Guide
 -   [Beeswax](beeswax.html)
 -   [Cloudera Impala Query UI](impala.html)
 -   [Pig Editor](pig.html)
+-   [HBase Browser](hbase.html)
 -   [Metastore Manager](metastore_manager.html)
 -   [File Browser](filebrowser.html)
 -   [Job Browser](jobbrowser.html)
