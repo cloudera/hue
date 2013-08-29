@@ -1,5 +1,5 @@
-Hue
-===
+image:images/hue_logo.png[Hue Logo]
+===================================
 
 Installation
 ------------
