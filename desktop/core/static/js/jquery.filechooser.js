@@ -95,10 +95,16 @@
 
     Plugin.prototype.navigateTo = function (path) {
         var _parent = this;
-        $(_parent.element).empty();
+        if (navigator.userAgent.match(/msie/i)) {
+          $(_parent.element).html("<img src='/static/art/spinner.gif' />");
+        }
+        else {
+          $(_parent.element).html("<i style=\"font-size: 24px; color: #DDD\" class=\"icon-spinner icon-spin\"></i>");
+        }
         $.getJSON("/filebrowser/chooser" + path, function (data) {
+            $(_parent.element).empty();
             path = data.current_dir_path; // use real path.
-            var _flist = $("<ul>").addClass("unstyled");
+            var _flist = $("<ul>").addClass("unstyled").css("margin-left", "2px");
             if (data.title != null && data.title == "Error") {
                 var _errorMsg = $("<div>").addClass("alert").addClass("alert-error").text(data.message);
                 _errorMsg.appendTo($(_parent.element));
@@ -115,7 +121,7 @@
                 }
                 $.totalStorage(STORAGE_PREFIX + _parent.options.user, path);
                 _parent.previousPath = path;
-                var _breadcrumbs = $("<ul>").addClass("hueBreadcrumb").css("padding", "0");
+                var _breadcrumbs = $("<ul>").addClass("hueBreadcrumb").css("padding", "0").css("marginLeft", "0");
                 var _home = $("<li>");
                 var _homelink = $("<a>").addClass("nounderline").html('<i class="icon-home"></i> Home').css("cursor", "pointer").click(function () {
                     _parent.navigateTo("/?default_to_home");
@@ -123,33 +129,35 @@
                 _homelink.appendTo(_home);
                 $("<span>").addClass("divider").css("margin-right", "20px").appendTo(_home);
                 _home.appendTo(_breadcrumbs);
-                var _bLength = data.breadcrumbs.length;
-                $(data.breadcrumbs).each(function (cnt, crumb) {
-                    var _crumb = $("<li>");
-                    var _crumbLink = $("<a>");
-                    var _crumbLabel = (crumb.label != null && crumb.label != "") ? crumb.label : "/";
-                    _crumbLink.attr("href", "javascript:void(0)").text(_crumbLabel).appendTo(_crumb);
-                    if (cnt < _bLength - 1) {
-                        if (cnt > 0) {
-                            $("<span>").addClass("divider").text("/").appendTo(_crumb);
-                        }
-                        else {
-                            $("<span>").html("&nbsp;").appendTo(_crumb);
-                        }
-                    }
-                    _crumb.click(function () {
-                        var _url = (crumb.url != null && crumb.url != "") ? crumb.url : "/";
-                        _parent.options.onFolderChange(_url);
-                        _parent.navigateTo(_url);
-                    });
-                    _crumb.appendTo(_breadcrumbs);
-                });
+                if (typeof data.breadcrumbs != "undefined" && data.breadcrumbs != null){
+                  var _bLength = data.breadcrumbs.length;
+                  $(data.breadcrumbs).each(function (cnt, crumb) {
+                      var _crumb = $("<li>");
+                      var _crumbLink = $("<a>");
+                      var _crumbLabel = (crumb.label != null && crumb.label != "") ? crumb.label : "/";
+                      _crumbLink.attr("href", "javascript:void(0)").text(_crumbLabel).appendTo(_crumb);
+                      if (cnt < _bLength - 1) {
+                          if (cnt > 0) {
+                              $("<span>").addClass("divider").text("/").appendTo(_crumb);
+                          }
+                          else {
+                              $("<span>").html("&nbsp;").appendTo(_crumb);
+                          }
+                      }
+                      _crumb.click(function () {
+                          var _url = (crumb.url != null && crumb.url != "") ? crumb.url : "/";
+                          _parent.options.onFolderChange(_url);
+                          _parent.navigateTo(_url);
+                      });
+                      _crumb.appendTo(_breadcrumbs);
+                  });
+                }
                 _breadcrumbs.appendTo($(_parent.element));
 
                 $(data.files).each(function (cnt, file) {
                     var _f = $("<li>");
                     var _flink = $("<a>");
-                    _flink.attr("href", "javascript:void(0)").text(" " + file.name).appendTo(_f);
+                    _flink.attr("href", "javascript:void(0)").text(" " + (file.name != "" ? file.name : "..")).appendTo(_f);
                     if (file.type == "dir") {
                         $("<i class='icon-folder-close'></i>").prependTo(_flink);
                         _f.click(function () {
@@ -248,13 +256,16 @@
                 if (_showActions){
                     _actions.appendTo($(_parent.element));
                 }
+                window.setTimeout(function () {
+                  $(_parent.element).parent().scrollTop(0)
+                }, 100);
             }
         }).error(function(){
-            _parent.options.onError();
-            _parent.navigateTo(_parent.options.errorRedirectPath != "" ? _parent.options.errorRedirectPath : "/?default_to_home");
             if ($.jHueNotify) {
                 $.jHueNotify.info(_parent.options.labels.FILE_NOT_FOUND);
             }
+            _parent.navigateTo(_parent.options.errorRedirectPath != "" ? _parent.options.errorRedirectPath : "/?default_to_home");
+            _parent.options.onError();
         });
     };
 

@@ -129,7 +129,7 @@ ${layout.menubar(section='query')}
                 <div class="control-group">
                     ${comps.label(f['type'])}
                     ${comps.field(f['type'], render_default=True, attrs=dict(
-                        klass="span8"
+                        klass="input-medium"
                     ))}
                 </div>
 
@@ -137,7 +137,7 @@ ${layout.menubar(section='query')}
                     ${comps.label(f['path'])}
                     ${comps.field(f['path'], attrs=dict(
                         placeholder="/user/foo/udf.jar",
-                        klass="input-small file_resourcesField span8",
+                        klass="input-medium file_resourcesField pathChooser",
                         data_filters=f['path'].html_name
                     ))}
                 </div>
@@ -396,11 +396,11 @@ ${layout.menubar(section='query')}
   }
   #filechooser {
     min-height: 100px;
-    overflow-y: scroll;
+    overflow-y: auto;
   }
 
   .control-group {
-    margin-bottom: 0!important;
+    margin-bottom: 3px!important;
   }
 
   .control-group label {
@@ -415,13 +415,9 @@ ${layout.menubar(section='query')}
   }
 
   .param {
-    background: #FDFDFD;
     padding: 8px 8px 1px 8px;
-    border-radius: 4px;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
     margin-bottom: 5px;
-    border: 1px solid #EEE;
+    border-bottom: 1px solid #EEE;
   }
 
   .remove {
@@ -430,7 +426,8 @@ ${layout.menubar(section='query')}
 
   .file_resourcesField {
     border-radius: 3px 0 0 3px;
-    border-right: 0;
+    border-right: 0!important;
+    min-height: 27px!important;
   }
 
   .fileChooserBtn {
@@ -821,6 +818,9 @@ ${layout.menubar(section='query')}
         'trigger': 'hover',
         'html': true
     });
+
+    // hack for select default rendered fields
+    $("select").addClass("input-medium");
 </script>
 
 ${ commonfooter(messages) | n,unicode }
