@@ -28,7 +28,7 @@ docs: $(BLD_DIR_DOC)
 NO_TOC := --xsltproc-opts='--stringparam generate.toc ""'
 
 #
-# Being lazy/loose with the prerequsite. Include all files except sdk and
+# Being lazy/loose with the prerequisite. Include all files except sdk and
 # release notes, which are handled separately below.
 #
 DOC_FILES := $(shell find . -name sdk -prune -o -name release-notes -name user-guide -o -print)
@@ -51,7 +51,13 @@ release-notes: $(BLD_DIR_DOC)/release-notes
 $(BLD_DIR_DOC)/release-notes: $(wildcard release-notes/*.txt)
 	@echo '--- Generating release notes at $@'
 	@mkdir -p $@
-	@for i in $? ; do asciidoc $$i ; done
+	@cp docbook.css $@
+	@cp docbook.css release-notes/
+	@for i in $? ; do \
+	  a2x --format=xhtml --stylesheet=docbook.css $$i ; \
+	  rm -f $$i.xml ; \
+	done;
+	@rm release-notes/docbook.css
 	@mv release-notes/*.html $@/
 	@echo "--- Generated $@"
 
@@ -63,9 +69,9 @@ $(BLD_DIR_DOC)/user-guide: $(wildcard user-guide/*.md)
 	@mkdir -p $@
 	@cp -r user-guide/images $@
 	@cp docbook.css $@
-	@for i in $? ; do PYTHONPATH=$(DESKTOP_DIR)/core/ext-py/markdown:$(DESKTOP_DIR)/core/ext-py/elementtree \
+	@for x in $? ; do PYTHONPATH=$(DESKTOP_DIR)/core/ext-py/markdown:$(DESKTOP_DIR)/core/ext-py/elementtree \
 	  $(DESKTOP_DIR)/core/ext-py/markdown/bin/markdown \
-	  $$i > $(BLD_DIR_DOC)/$$i ; done
+	  $$x > $(BLD_DIR_DOC)/$$x ; done
 	@rename 's/\.md/\.html/' $@/*.md
 	@echo "--- Generated $@"
 
