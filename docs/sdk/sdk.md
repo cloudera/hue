@@ -1,31 +1,6 @@
 
 <link rel="stylesheet" href="docbook.css" type="text/css" media="screen" title="no title" charset="utf-8"></link>
 
-<style>
-.note {
-  margin: 2em ;
-  border: medium outset ;
-  padding: 1em
-}
-pre {
-  font-size: 10px;
-  font-family: monico, courier;
-  overflow: auto;
-  padding: 8px;
-}
-img {
-  border: 1px solid #999;
-  margin: 10px;
-}
-h6 {
-  color:#148BCF;
-  font-family:'lucida grande',helvetica,verdana,sans-serif;
-  font-weight:bold;
-  font-size: 12px;
-  font-style:italic;
-}
-</style>
-
 Hue SDK Documentation
 =====================
 
