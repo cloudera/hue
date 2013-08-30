@@ -12,9 +12,8 @@ Pig Editor Installation and Configuration
 -----------------------------------------
 
 Pig Editor is one of the applications installed as part of Hue. For
-information about installing and configuring Hue, see Hue Installation
-in
-[http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/CDH4-Installation-Guide.html](http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/CDH4-Installation-Guide.html).
+information about installing and configuring Hue, see the Hue Installation manual.
+
 Pig Editor assumes an existing Pig installation. The Hue installation
 instructions include the configuration necessary for Pig Editor to
 access Pig.
