@@ -1,3 +1,5 @@
+import csv
+import os
 import StringIO
 import tempfile
 import unittest
@@ -28,7 +30,7 @@ class TestFileFormat(unittest.TestCase):
 
 class TestMetadata(unittest.TestCase):
 
-    f = "/Users/joecrow/Code/parquet-compatibility/parquet-testdata/impala/1.1.1-SNAPPY/nation.impala.parquet"
+    f = "test-data/nation.impala.parquet"
 
     def test_footer_bytes(self):
         with open(self.f) as fo:
@@ -46,17 +48,38 @@ class TestMetadata(unittest.TestCase):
         parquet.dump_metadata(self.f, data)
 
 
-class TestCompatibility(unittest.TestCase):
+class Options():
+    col = None
+    format = 'csv'
+    no_headers = True
+    limit = -1
 
-    files = []
 
-    def _test_file(self, parquet_file, csv_file):
+class TestCompatibility(object):
+
+    td = "test-data"
+    files = [(os.path.join(td, p), os.path.join(td, "nation.csv")) for p in
+             ["gzip-nation.impala.parquet", "nation.dict.parquet",
+              "nation.impala.parquet", "nation.plain.parquet",
+              "snappy-nation.impala.parquet"]]
+
+    def _test_file_csv(self, parquet_file, csv_file):
         """ Given the parquet_file and csv_file representation, converts the
             parquet_file to a csv using the dump utility and then compares the
             result to the csv_file using column agnostic ordering.
         """
-        pass
+        expected_data = []
+        with open(csv_file, 'rb') as f:
+            expected_data = list(csv.reader(f, delimiter='|'))
+
+        actual_raw_data = StringIO.StringIO()
+        parquet.dump(parquet_file, Options(), out=actual_raw_data)
+        actual_raw_data.seek(0, 0)
+        actual_data = list(csv.reader(actual_raw_data, delimiter='\t'))
+
+        assert expected_data == actual_data, "{0} != {1}".format(
+            str(expected_data), str(actual_data))
 
     def test_all_files(self):
         for parquet_file, csv_file in self.files:
-            yield self._test_file, parquet_file, csv_file
+            yield self._test_file_csv, parquet_file, csv_file
