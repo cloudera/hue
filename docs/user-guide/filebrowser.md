@@ -11,11 +11,11 @@ Hue. With File Browser, you can:
 -   Create files and directories, upload and download files, upload zip
     archives, and rename, move, and delete files and directories. You
     can also change a file's or directory's owner, group, and
-    permissions. See [Working with Files and Directories](#topic_6_3).
+    permissions. See [Files and Directories](#filesAndDirectories).
 -   Search for files, directories, owners, and groups. See [Searching
-    for Files and Directories](#topic_6_4).
+    for Files and Directories](#searching).
 -   View and edit files as text or binary. See [Viewing and Editing
-    Files](#topic_6_5).
+    Files](#viewAndEdit).
 
 File Browser Installation and Configuration
 -------------------------------------------
@@ -31,6 +31,8 @@ Click the **File Browser** icon
 (![image](images/icon_filebrowser_24.png)) in the navigation bar at the
 top of the Hue browser page.
 
+
+<a id="fileAndDirectories"></a>
 Files and Directories
 ---------------------
 
@@ -41,7 +43,7 @@ must have the proper permissions to manipulate other user's files.
 
 ### Creating Directories
 
-1.  In the File Browser window, select **New \> Directory**.
+1.  In the File Browser window, select **New > Directory**.
 2.  In the **Create Directory** dialog box, enter a directory name and
     then click **Submit**.
 
@@ -62,10 +64,12 @@ a Hue administrator to create a home directory for you.
 
 ### Creating Files
 
-1.  In the File Browser window, select **New \> File**.
+1.  In the File Browser window, select **New > File**.
 2.  In the **Create File** dialog box, enter a file name and then click
     **Submit**.
 
+
+<a id="uploadingFiles"></a>
 ### Uploading Files
 
 You can upload text and binary files to the HDFS.
@@ -97,21 +101,17 @@ extracted to a directory named archivename.
 
 1.  In the **File Browser** window, browse to the directory where you
     want to upload the archive.
-2.  Select **Upload \> Zip file**.
+2.  Select **Upload > Zip file**.
 3.  In the box that opens, click **Upload a zip file** to browse to and
     select the archive you want to upload, and then click **Open**.
 
 ### Trash Folder
 
-File Browser supports the HDFS trash folder (home directory/.Trash) to
+File Browser supports the HDFS trash folder (*home directory*/.Trash) to
 contain files and directories before they are permanently deleted. Files
 in the folder have the full path of the deleted files (in order to be
 able to restore them if needed) and checkpoints. The length of time a
-file or directory stays in the trash depends on HDFS properties. For
-information on how to configure the HDFS trash folder, see Enabling
-Trash. in
-[http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/CDH4-Installation-Guide.html](http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/CDH4-Installation-Guide.html).
-
+file or directory stays in the trash depends on HDFS properties.
 
 **Open**
 
@@ -121,12 +121,12 @@ Trash. in
 
 1.  In the **File Browser** window, check the checkbox next to one or
     more files and directories.
-2.  Select Delete \> Move to trash
+2.  Select **Delete > Move to trash**.
 
 **Empty**
 
 1.  In the **File Browser** window, click ![image](images/fbtrash.png).
-2.  Click Empty.
+2.  Click **Empty**.
 
 ### Renaming, Moving, Deleting, and Restoring Files and Directories
 
@@ -153,8 +153,8 @@ Trash. in
     the files and subdirectories contained within that directory are
     also deleted.
 2.  Choose one of the following:
-    -   Delete \> Move to trash
-    -   Delete \> Delete forever
+    -   **Delete > Move to trash**
+    -   **Delete > Delete forever**
 
 3.  Click **Yes** to confirm. When you move a file to trash it is stored
     in the .Trash folder in your home directory.
@@ -197,7 +197,9 @@ can change a file's or directory's owner, group, or permissions.
 2.  Click the **Change Permissions** button.
 3.  In the **Change Permissions** dialog box, select the permissions you
     want to assign and then click **Submit**.
-
+    
+    
+<a id="searching"></a>
 Searching for Files and Directories
 -----------------------------------
 
@@ -205,6 +207,7 @@ To search for files or directories by name using the query search box,
 enter the name of the file or directory in the query search box. File
 Browser lists the files or directories matching the search criteria.
 
+<a id="viewAndEdit"></a>
 Viewing and Editing Files
 -------------------------
 

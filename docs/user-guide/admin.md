@@ -72,7 +72,7 @@ superusers and users.
     the application will not attempt to email the user.</td></tr>
 <tr><td>Groups</td><td> The groups to which the user belongs. By default, a user is assigned
     to the **default** group, which allows access to all applications.
-    See [Managing Application Permissions](#topic_11_4).</td></tr></table>
+    See [Permissions](#permissions).</td></tr></table>
     
 
 5.  Click **Add User** to save the information you specified and close
@@ -196,6 +196,7 @@ import groups from an LDAP directory.
 
 3.  Click **Add/sync group**.
 
+<a id="permissions"></a>
 Permissions
 -----------
 
