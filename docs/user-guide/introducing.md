@@ -19,17 +19,13 @@ The following figure illustrates how Hue works. Hue Server is a
 "container" web application that sits in between CDH and the browser. It
 hosts all the Hue web applications and communicates with CDH components.
 
-\
-![image](images/huearch.jpg)\
+![image](images/huearch.jpg)
 
 Starting Applications
 ---------------------
 
 To open a Hue application, click the appropriate icon in the navigation
-bar at the top of the Hue web browser window:\
-![image](images/applications.png)\
-
-To open a second application concurrently (or a second instance of the
+bar at the top of the Hue web browser window. To open a second application concurrently (or a second instance of the
 same application), right-click the icon and select **Open link in new
 tab**.
 
@@ -53,7 +49,7 @@ Notice of Misconfiguration
 If Hue detects a misconfiguration, an indicator
 ![image](images/misconfiguration.png) appears in the navigation bar at
 the top of the page. Clicking this indicator takes you to the [Check
-Configuration](hue2.0ug_topic_3.html#topic_3__li_h1j_fhk_zj) screen
+Configuration](../about.html) screen
 which will indicate the potential misconfiguration(s) with hints about
 fixing them.
 
@@ -65,7 +61,7 @@ Profile at the right of the Hue navigation bar.
 
 If authentication is managed by Hue (that is, authentication is not
 managed via some external mechanism), and you are a superuser, you can
-use the [User Admin](hue2.0ug_topic_11.html#topic_11) application to
+use the [User Admin](../useradmin.html) application to
 change password and personal details.
 
 Seeking Help, Reporting Bugs, and Providing Feedback

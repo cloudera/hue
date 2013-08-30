@@ -17,7 +17,7 @@ Beeswax and Hive Installation and Configuration
 
 Beeswax is installed and configured as part of Hue. For information
 about installing and configuring Hue, see the Hue Installation
-manual..
+manual.
 
 Beeswax assumes an existing Hive installation. The Hue installation
 instructions include the configuration necessary for Beeswax to access
@@ -45,7 +45,7 @@ statements](http://archive.cloudera.com/cdh4/cdh/4/hive/language_manual/data-man
 in the Beeswax application.
 
 You can also use the [Metastore
-Manager](hue2.0ug_metastore_manager.html#xd_583c10bfdbd326ba-3ca24a24-13d80143249--7f9b)
+Manager](../metastore_manager.html)
 application to manage the databases, tables, and partitions and load
 data.
 
@@ -76,7 +76,7 @@ In the box to the left of the Query field, you can select a database,
 override the default Hive and Hadoop settings, specify file resources
 and user-defined functions, enable users to enter parameters at
 run-time, and request email notification when the job is complete. See
-[Advanced Query Settings](#topic_4_3_2) for details on using these
+[Advanced Query Settings](#advancedQuerySettings) for details on using these
 settings.
 
 ### Creating Queries
@@ -147,9 +147,9 @@ MapReduce jobs that the query generated.
             table**, enter a table name, and then click **Save**.
         -   To save the results in an HDFS file, select **In an HDFS
             directory**, enter a path and then click **Save**. You can
-            then download the file with [File
-            Browser](hue2.0ug_topic_6.html#topic_6).
+            then download the file with [File Browser](../filebrowser.html).
 
+<a id="advancedQuerySettings"></a>
 ### Advanced Query Settings
 
 The pane to the left of the Query Editor lets you specify the following

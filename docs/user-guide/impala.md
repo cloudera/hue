@@ -40,7 +40,7 @@ statements](http://archive.cloudera.com/cdh4/cdh/4/hive/language_manual/data-man
 in the Beeswax application.
 
 You can also use the [Metastore
-Manager](hue2.0ug_metastore_manager.html#xd_583c10bfdbd326ba-3ca24a24-13d80143249--7f9b)
+Manager]()
 application to manage the databases, tables, and partitions and load
 data.
 
@@ -76,7 +76,7 @@ or return later to find the queries in the **History** view.
 
 In the box to the left of the Query field, you can select a database,
 override the default Cloudera Impala settings, enable users to enter
-parameters at run-time. See [Advanced Query Settings](#topic_5_3_2) for
+parameters at run-time. See [Advanced Query Settings](#advancedQuerySettings) for
 details on using these settings.
 
 ### Creating Queries
@@ -121,6 +121,7 @@ server.
 3.  If there are multiple statements in the query, click Next in the
     Multi-statement query pane to execute the remaining statements.
 
+<a id="advancedQuerySettings"></a>
 ### Advanced Query Settings
 
 The pane to the left of the Query Editor lets you specify the following

@@ -7,21 +7,21 @@ Metastore Manager
 The Metastore Manager application enables you to manage the databases,
 tables, and partitions of the
 [Hive](http://archive.cloudera.com/cdh4/cdh/4/hive/) metastore shared by
-the ([Beeswax](hue2.0ug_topic_4.html#topic_4) and [Cloudera Impala Query
-UI](hue2.0ug_topic_5.html#topic_5)) applications. You can use Metastore
+the ([Beeswax](../beeswax.html) and [Cloudera Impala Query
+UI](../impala.html)) applications. You can use Metastore
 Manager to perform the following operations:
 
 -   Databases
-    -   [Select a database](#topic_4_4_1)
-    -   [Create a database](#concept_hz4_snv_wj)
-    -   [Drop databases](#concept_pyc_tgw_wj)
+    -   [Select a database](#selectDatabase)
+    -   [Create a database](#createDatabase)
+    -   [Drop databases](#dropDatabase)
 
 -   Tables
-    -   [Create tables](#topic_4_4_2)
-    -   [Browse tables](#topic_4_4_3)
-    -   [Import data into a table](#topic_4_4_4)
-    -   [Drop tables](#topic_4_4_5)
-    -   [View the location of a table](#topic_4_4_6)
+    -   [Create tables](#createTables)
+    -   [Browse tables](#browseTables)
+    -   [Import data into a table](#importDataIntoTables)
+    -   [Drop tables](#dropTables)
+    -   [View the location of a table](#viewTableLocation)
 
 Metastore Manager Installation and Configuration
 ------------------------------------------------
@@ -50,14 +50,16 @@ this task.
 ### Importing Data
 
 If you want to import your own data instead of installing the sample
-tables, follow the procedure in [Creating Tables](#topic_4_4_2).
+tables, follow the procedure in [Creating Tables](#createTables).
 
+<a id="selectDatabase"></a>
 Selecting a Database
 --------------------
 
 1.  In the pane on the left, select the database from the DATABASE
     drop-down list.
 
+<a id="createDatabase"></a>
 Creating a Database
 -------------------
 
@@ -74,7 +76,8 @@ Creating a Database
                 to a folder and click **Select this folder**.
 
     3.  Click the **Create Database** button.
-
+    
+<a id="selectDatabase"></a>
 Dropping Databases
 ------------------
 
@@ -84,6 +87,7 @@ Dropping Databases
 3.  Click the ![image](images/trash.png) Drop button.
 4.  Confirm whether you want to delete the databases.
 
+<a id="createTables"></a>
 Creating Tables
 ---------------
 
@@ -139,6 +143,7 @@ as an additional step.
 
 3.  Click **Create table**. The Table Metadata window displays.
 
+<a id="browseTables"></a>
 Browsing Tables
 ---------------
 
@@ -162,6 +167,7 @@ Do one of the following:
     clicking **Show Partitions(n)**, where n is the number of partitions
     in the ACTIONS pane on the left.
 
+<a id="importDataIntoTables"></a>
 Importing Data into a Table
 ---------------------------
 
@@ -178,6 +184,7 @@ data with data from a file.
     the table.
 5.  Click **Submit**.
 
+<a id="dropTables"></a>
 Dropping Tables
 ---------------
 
@@ -186,6 +193,7 @@ Dropping Tables
 2.  In the ACTIONS pane, click **Drop Table**.
 3.  Click **Yes** to confirm the deletion.
 
+<a id="viewTableLocation"></a>
 Viewing a Table's Location
 --------------------------
 
@@ -193,12 +201,3 @@ Viewing a Table's Location
     window displays.
 2.  Click **View File Location**. The file location of the selected
     table displays in its directory in the File Browser window.
-
-Permissions
------------
-
-1.  Ideally install the Sentry project for getting full Hive security.
-2.  Make the Metastore App read only for a certain group of user: In
-    UserAdmin, add the permissions 'read_only_access' to their group.
-
-
