@@ -94,17 +94,17 @@ delete them.
 
 Most job design types support all the settings listed in the following
 table. For job type specific settings, see:
-[MapReduce](#concept_gt5_bh3_zj__section_lvq_ch3_zj),
-[Streaming](#concept_gt5_bh3_zj__section_zrd_gh3_zj),
-[Java](#concept_gt5_bh3_zj__section_abl_hh3_zj),
-[Pig](#concept_gt5_bh3_zj__section_tvm_3h3_zj),
-[Hive](#concept_gt5_bh3_zj__section_lxq_3h3_zj),
-[Sqoop](#concept_gt5_bh3_zj__section_xb5_3h3_zj),
-[Shell](#concept_gt5_bh3_zj__section_xvw_3h3_zj),
-[Ssh](#concept_gt5_bh3_zj__section_tnz_3h3_zj),
-[DistCp](#concept_gt5_bh3_zj__section_qsc_jh3_zj),
-[Fs](#concept_gt5_bh3_zj__section_hx4_lh3_zj), and
-[Email](#concept_gt5_bh3_zj__section_qjt_lh3_zj).
+[MapReduce](#mapreduce),
+[Streaming](#streaming),
+[Java](#java),
+[Pig](#pig),
+[Hive](#hive),
+[Sqoop](#sqoop),
+[Shell](#shell),
+[Ssh](#ssh),
+[DistCp](#distcp),
+[Fs](#fs), and
+[Email](#email).
 
 All job design settings except Name and Description support the use of
 variables of the form $variable\_name. When you run the job, a dialog
@@ -125,7 +125,7 @@ allowing variables, functions, and complex expressions as parameters.<td></td></
 <tr><td>Files</td><td>Files to pass to the job. Equivalent to the Hadoop -files option.</td></tr>
 <tr><td>Archives</td><td>Files to pass to the job. Archives to pass to the job. Equivalent to the Hadoop -archives option.</td></tr></table>
 
-
+<a id="mapreduce"></a>
 #### MapReduce Job Design
 
 A MapReduce job design consists of MapReduce functions written in Java.
@@ -139,6 +139,7 @@ Job Properties setting.
 implement the Mapper and Reducer functions.</td></tr>
 </table>
 
+<a id="streaming"></a>
 #### Streaming Job Design
 
 Hadoop streaming jobs enable you to create MapReduce functions in any
@@ -156,6 +157,7 @@ the machines on the cluster, use the Files option to pass it as a
 part of job submission. Equivalent to the Hadoop -reducer option.</td></tr>
 </table>
 
+<a id="java"></a>
 #### Java Job Design
 
 A Java job design consists of a main class written in Java.
@@ -167,7 +169,7 @@ A Java job design consists of a main class written in Java.
 <tr><td>Java opts</td><td>The options to pass to the JVM.</td></tr>
 </table>
 
-
+<a id="pig"></a>
 #### Pig Job Design
 
 
@@ -175,10 +177,9 @@ A Pig job design consists of a Pig script.
 
 <table>
 <tr><td>Script name</td><td>Script name or path to the Pig script.</td></tr>
-<tr><td></td><td></td></tr>
-<tr><td></td><td></td></tr>
 </table>
 
+<a id="hive"></a>
 #### Hive Job Design
 
 A Hive job design consists of a Hive script.
@@ -188,7 +189,7 @@ A Hive job design consists of a Hive script.
 </table>
 
 
-
+<a id="sqoop"></a>
 #### Sqoop Job Design
 
 A Sqoop job design consists of a Sqoop command.
@@ -197,6 +198,7 @@ A Sqoop job design consists of a Sqoop command.
 <tr><td>Command</td><td>The Sqoop command.</td></tr>
 </table>
 
+<a id="shell"></a>
 #### Shell Job Design
 
 A Shell job design consists of a shell command.
@@ -206,7 +208,7 @@ A Shell job design consists of a shell command.
 <tr><td></td>Capture output<td>Indicate whether to capture the output of the command.</td></tr>
 </table>
 
-
+<a id="ssh"></a>
 #### Ssh Job Design
 
 A Ssh job design consists of an ssh command.
@@ -218,10 +220,12 @@ A Ssh job design consists of an ssh command.
 <tr><td></td>Capture output<td>Indicate whether to capture the output of the command.</td></tr>
 </table>
 
+<a id="distcp"></a>
 #### DistCp Job Design
 
 A DistCp job design consists of a DistCp command.
 
+<a id="fs"></a>
 #### Fs Job Design
 
 A Fs job design consists of a command that operates on HDFS.
@@ -234,6 +238,7 @@ content and then deletes the directory.</td></tr>
 <tr><td>Change permissions</td><td>The path whose permissions are to be changed, the permissions, and an
 indicator of whether to change permission recursively.</td></tr></table>
 
+<a id="email"></a>
 #### Email Job Design
 
 A Email job design consists of an email message.
@@ -268,7 +273,7 @@ submit the job.
 
 After the job is complete, the Job Designer displays the results of the
 job. For information about displaying job results, see [Displaying the
-Results of Submitting a Job](#topic_8_5).
+Results of Submitting a Job](#submitJob).
 
 ### Copying, Editing, and Deleting a Job Design
 
@@ -302,6 +307,7 @@ Delete
 3.  Click the **Delete** button.
 4.  Click **OK** to confirm the deletion.
 
+<a id="submitJob"></a>
 Displaying Results of Submitting a Job
 --------------------------------------
 

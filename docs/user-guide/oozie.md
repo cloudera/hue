@@ -14,20 +14,17 @@ A workflow application is a collection of actions arranged in a directed
 acyclic graph (DAG). It includes two types of nodes:
 
 -   Control flow - start, end, fork, join, decision, and kill
--   Action -
-    [MapReduce](hue2.0ug_topic_8.html#concept_gt5_bh3_zj__section_lvq_ch3_zj),
-    [Streaming](hue2.0ug_topic_8.html#concept_gt5_bh3_zj__section_zrd_gh3_zj),
-    [Java](hue2.0ug_topic_8.html#concept_gt5_bh3_zj__section_abl_hh3_zj),
-    [Pig](hue2.0ug_topic_8.html#concept_gt5_bh3_zj__section_tvm_3h3_zj),
-    [Hive](hue2.0ug_topic_8.html#concept_gt5_bh3_zj__section_lxq_3h3_zj),
-    [Sqoop](hue2.0ug_topic_8.html#concept_gt5_bh3_zj__section_xb5_3h3_zj),
-    [Shell](hue2.0ug_topic_8.html#concept_gt5_bh3_zj__section_xvw_3h3_zj),
-    [Ssh](hue2.0ug_topic_8.html#concept_gt5_bh3_zj__section_tnz_3h3_zj),
-    [DistCp](hue2.0ug_topic_8.html#concept_gt5_bh3_zj__section_qsc_jh3_zj),
-    [Fs](hue2.0ug_topic_8.html#concept_gt5_bh3_zj__section_hx4_lh3_zj),
-    and
-    [Email](hue2.0ug_topic_8.html#concept_gt5_bh3_zj__section_qjt_lh3_zj))
-
+-   Action - [MapReduce](../jobdesigner.html#mapreduce),
+[Streaming](../jobdesigner.html#streaming),
+[Java](../jobdesigner.html#java),
+[Pig](../jobdesigner.html#pig),
+[Hive](../jobdesigner.html#hive),
+[Sqoop](../jobdesigner.html#sqoop),
+[Shell](../jobdesigner.html#shell),
+[Ssh](../jobdesigner.html#ssh),
+[DistCp](../jobdesigner.html#distcp),
+[Fs](../jobdesigner.html#fs), and
+[Email](../jobdesigner.html#email).
     In order to run DistCp, Streaming, Pig, Sqoop, and Hive jobs, Oozie
     must be configured to use the Oozie ShareLib. See the Oozie Installation
    manual.
@@ -54,15 +51,15 @@ Click the **Oozie Editor/Dashboard** icon
 the Hue browser page. **Oozie Editor/Dashboard** opens with the
 following screens:
 
--   [Dashboard](#topic_9_6) - shows the running and completed workflow,
+-   [Dashboard](#dashboard) - shows the running and completed workflow,
     coordinator, and bundle jobs and information about Oozie
     instrumentation and configuration. The screen is selected and opened
     to the Workflows page.
--   [Workflow Manager](#topic_9_7) - shows available workflows and
+-   [Workflow Manager](#workflowManager) - shows available workflows and
     allows you to create and import workflows.
--   [Coordinator Manager](#topic_9_8) - shows available coordinators and
+-   [Coordinator Manager](#coordinatorManager) - shows available coordinators and
     allows you to create coordinators.
--   [Bundle Manager](#concept_crd_ttp_wj) - shows available bundles and
+-   [Bundle Manager](#bundleManager) - shows available bundles and
     allows you to create bundles.
 
 Installing Oozie Editor/Dashboard Examples
@@ -121,6 +118,8 @@ restore or permanently delete them.
     bundles.
 3.  Click Restore.
 
+
+<a id="dashboard"></a>
 Dashboard
 ---------
 
@@ -132,6 +131,7 @@ You can view jobs for a period up to the last 30 days.
 You can filter the list by date (1, 7, 15, or 30 days) or status
 (Succeeded, Running, or Killed). The date and status buttons are
 toggles.
+
 
 ### Workflows
 
@@ -174,6 +174,7 @@ For each action in the workflow you can:
 
 -   Click the ![image](images/log.png) icon to view the log in the Job
     Browser.
+
 
 ### Coordinators
 
@@ -219,6 +220,7 @@ For information on the configuration properties supported by Oozie, see
 [Oozie
 Configuration](http://oozie.apache.org/docs/3.3.0/AG_Install.html#Oozie_Configuration).
 
+<a id="workflowManager"></a>
 Workflow Manager
 ----------------
 
@@ -251,7 +253,7 @@ Specification](http://archive.cloudera.com/cdh4/cdh/4/oozie/WorkflowFunctionalSp
 ### Opening a Workflow
 
 To open a workflow, in Workflow Manager, click the workflow. Proceed
-with [Editing a Workflow](#topic_9_7_7).
+with [Editing a Workflow](#editingWorkflow).
 
 ### Creating a Workflow
 
@@ -262,7 +264,7 @@ with [Editing a Workflow](#topic_9_7_7).
 4.  Click **advanced** to specify the deployment directory or a job.xml
     file.
 5.  Click **Save**. The Workflow Editor opens. Proceed with [Editing a
-    Workflow](#topic_9_7_7).
+    Workflow](#editingWorkflow).
 
 ### Importing a Workflow
 
@@ -273,7 +275,7 @@ with [Editing a Workflow](#topic_9_7_7).
 4.  Click **advanced** to specify whether the workflow is shared, the
     deployment directory, or a job.xml file.
 5.  Click **Save**. The Workflow Editor opens. Proceed with [Editing a
-    Workflow](#topic_9_7_7).
+    Workflow](#editingWorkflow).
 
 ### Submitting a Workflow
 
@@ -318,8 +320,9 @@ To schedule a workflow for recurring execution, do one of the following:
 -   In the Workflow Editor, click the **Schedule** button.
 
 A coordinator is created and opened in the Coordinator Editor. Proceed
-with [Editing a Coordinator](#topic_9_8_4).
+with [Editing a Coordinator](#editingCoordinator).
 
+<a id="editingWorkflow"></a>
 ### Editing a Workflow
 
 In the Workflow Editor you can easily perform operations on Oozie action
@@ -372,7 +375,7 @@ In the Workflow Editor, click the **Upload** button.
 
 The workspace of the workflow is opened in the File Browser application.
 Follow the procedure in [Uploading
-Files](hue2.0ug_topic_6.html#topic_6_3_4) to upload the files. You must
+Files](../filebrowser.html#uploadingFiles) to upload the files. You must
 put JAR files in a lib directory in the workspace.
 
 ### Editing Workflow Properties
@@ -393,6 +396,7 @@ put JAR files in a lib directory in the workspace.
 3.  Click a workflow.
 4.  Click the **Actions** tab.
 
+<a id="coordinatorManager"></a>
 Coordinator Manager
 -------------------
 
@@ -421,20 +425,21 @@ Specification](http://archive.cloudera.com/cdh4/cdh/4/oozie/CoordinatorFunctiona
 ### Opening a Coordinator
 
 To open a coordinator, in Coordinator Manager, click the coordinator.
-Proceed with [Editing a Coordinator](#topic_9_8_4).
+Proceed with [Editing a Coordinator](#editingCoordinator).
 
 ### Creating a Coordinator
 
 To create a coordinator, in Coordinator Manager:
 
 1.  Click the **Create** button at the top right. The Coordinator wizard
-    opens. Proceed with [Editing a Coordinator](#topic_9_8_4).
+    opens. Proceed with [Editing a Coordinator](#editingCoordinator).
 
 ### Submitting a Coordinator
 
 To submit a coordinator for execution, check the checkbox next to the
 coordinator and click the **Submit** button.
 
+<a id="editingCoordinator"></a>
 ### Editing a Coordinator
 
 In the Coordinator Editor you specify coordinator properties and the
@@ -454,7 +459,7 @@ screens. The following instructions walk you through the wizard.
     field to America/Los\_Angeles.
 3.  Click **Add** to select an input dataset and click **Next**. If no
     datasets exist, follow the procedure in [Creating a
-    Dataset](#topic_9_8_5).
+    Dataset](#creatingDataset).
 4.  Click **Add** to select an output dataset. Click **Save
     coordinator** or click **Next** to specify advanced settings.
 5.  To share the coordinator with all users, check the **Is****shared**
@@ -465,21 +470,23 @@ screens. The following instructions walk you through the wizard.
     execution policy.
 7.  Click **Save coordinator**.
 
+<a id="creatingDataset"></a>
 ### Creating a Dataset
 
 1.  In the Coordinator Editor, do one of the following:
     -   Click **here** in the Inputs or Outputs pane at the top of the
         editor.
     -   In the pane at the left, click the **Create new** link. Proceed
-        with [Editing a Dataset](#topic_9_8_7).
+        with [Editing a Dataset](#editingDataset).
 
 ### Displaying Datasets
 
 1.  In the Coordinator Editor, click **Show existing** in pane at the
     left.
 2.  To edit a dataset, click the dataset name in the Existing datasets
-    table. Proceed with [Editing a Dataset](#topic_9_8_7).
+    table. Proceed with [Editing a Dataset](#editingDataset).
 
+<a id="editingDataset"></a>
 ### Editing a Dataset
 
 1.  Type a name for the dataset.
@@ -507,6 +514,7 @@ screens. The following instructions walk you through the wizard.
 3.  Click a coordinator.
 4.  Click the **Actions** tab.
 
+<a id="bundleManager"></a>
 Bundle Manager
 --------------
 
@@ -532,7 +540,7 @@ Specification](http://archive.cloudera.com/cdh4/cdh/4/oozie/BundleFunctionalSpec
 ### Opening a Bundle
 
 To open a bundle, in Bundle Manager, click the bundle. Proceed with
-[Editing a Bundle](#concept_ur1_gmj_2k).
+[Editing a Bundle](#editingBundle).
 
 ### Creating a Bundle
 
@@ -542,13 +550,14 @@ To open a bundle, in Bundle Manager, click the bundle. Proceed with
 4.  Check the Is shared checkbox to allow all users to access the
     workflow.
 5.  Click **Save**. The Bundle Editor opens. Proceed with [Editing a
-    Bundle](#concept_ur1_gmj_2k).
+    Bundle](#editingBundle).
 
 ### Submitting a Bundle
 
 To submit a bundle for execution, check the checkbox next to the bundle
 and click the **Submit** button.
 
+<a id="editingBundle"></a>
 ### Editing a Bundle
 
 In the Bundle Editor, you specify properties by stepping through screens
