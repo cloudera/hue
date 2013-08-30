@@ -1,4 +1,5 @@
 import gzip
+import json
 import logging
 import struct
 import StringIO
@@ -95,7 +96,7 @@ def _get_offset(cmd):
     return dict_offset
 
 
-def dump_metadata(filename, out=sys.stdout):
+def dump_metadata(filename, show_row_group_metadata, out=sys.stdout):
     def println(value):
         out.write(value + "\n")
     footer = read_footer(filename)
@@ -121,72 +122,73 @@ def dump_metadata(filename, out=sys.stdout):
                                               se.repetition_type),
                     num_children=se.num_children,
                     converted_type=se.converted_type))
-    println("  row groups: ")
-    for rg in footer.row_groups:
-        num_rows = rg.num_rows
-        bytes = rg.total_byte_size
-        println("  rows={num_rows}, bytes={bytes}".format(num_rows=num_rows,
-                                                          bytes=bytes))
-        println("    chunks:")
-        for cg in rg.columns:
-            cmd = cg.meta_data
-            println("      type={type} file_offset={offset} "
-                    "compression={codec} "
-                    "encodings={encodings} path_in_schema={path_in_schema} "
-                    "num_values={num_values} uncompressed_bytes={raw_bytes} "
-                    "compressed_bytes={compressed_bytes} "
-                    "data_page_offset={data_page_offset} "
-                    "dictionary_page_offset={dictionary_page_offset}".format(
-                        type=cmd.type,
-                        offset=cg.file_offset,
-                        codec=_get_name(CompressionCodec, cmd.codec),
-                        encodings=",".join(
-                            [_get_name(Encoding, s) for s in cmd.encodings]),
-                        path_in_schema=cmd.path_in_schema,
-                        num_values=cmd.num_values,
-                        raw_bytes=cmd.total_uncompressed_size,
-                        compressed_bytes=cmd.total_compressed_size,
-                        data_page_offset=cmd.data_page_offset,
-                        dictionary_page_offset=cmd.dictionary_page_offset))
-            with open(filename, 'rb') as fo:
-                offset = _get_offset(cmd)
-                fo.seek(offset, 0)
-                values_read = 0
-                println("      pages: ")
-                while values_read < num_rows:
-                    ph = _read_page_header(fo)
-                    # seek past current page.
-                    fo.seek(ph.compressed_page_size, 1)
-                    daph = ph.data_page_header
-                    type_ = _get_name(PageType, ph.type)
-                    raw_bytes = ph.uncompressed_page_size
-                    num_values = None
-                    if ph.type == PageType.DATA_PAGE:
-                        num_values = daph.num_values
-                        values_read += num_values
-                    if ph.type == PageType.DICTIONARY_PAGE:
-                        pass
-                        #num_values = diph.num_values
+    if show_row_group_metadata:
+        println("  row groups: ")
+        for rg in footer.row_groups:
+            num_rows = rg.num_rows
+            bytes = rg.total_byte_size
+            println("  rows={num_rows}, bytes={bytes}".format(num_rows=num_rows,
+                                                              bytes=bytes))
+            println("    chunks:")
+            for cg in rg.columns:
+                cmd = cg.meta_data
+                println("      type={type} file_offset={offset} "
+                        "compression={codec} "
+                        "encodings={encodings} path_in_schema={path_in_schema} "
+                        "num_values={num_values} uncompressed_bytes={raw_bytes} "
+                        "compressed_bytes={compressed_bytes} "
+                        "data_page_offset={data_page_offset} "
+                        "dictionary_page_offset={dictionary_page_offset}".format(
+                            type=cmd.type,
+                            offset=cg.file_offset,
+                            codec=_get_name(CompressionCodec, cmd.codec),
+                            encodings=",".join(
+                                [_get_name(Encoding, s) for s in cmd.encodings]),
+                            path_in_schema=cmd.path_in_schema,
+                            num_values=cmd.num_values,
+                            raw_bytes=cmd.total_uncompressed_size,
+                            compressed_bytes=cmd.total_compressed_size,
+                            data_page_offset=cmd.data_page_offset,
+                            dictionary_page_offset=cmd.dictionary_page_offset))
+                with open(filename, 'rb') as fo:
+                    offset = _get_offset(cmd)
+                    fo.seek(offset, 0)
+                    values_read = 0
+                    println("      pages: ")
+                    while values_read < num_rows:
+                        ph = _read_page_header(fo)
+                        # seek past current page.
+                        fo.seek(ph.compressed_page_size, 1)
+                        daph = ph.data_page_header
+                        type_ = _get_name(PageType, ph.type)
+                        raw_bytes = ph.uncompressed_page_size
+                        num_values = None
+                        if ph.type == PageType.DATA_PAGE:
+                            num_values = daph.num_values
+                            values_read += num_values
+                        if ph.type == PageType.DICTIONARY_PAGE:
+                            pass
+                            #num_values = diph.num_values
 
-                    encoding_type = None
-                    def_level_encoding = None
-                    rep_level_encoding = None
-                    if daph:
-                        encoding_type = _get_name(Encoding, daph.encoding)
-                        def_level_encoding = _get_name(Encoding, daph.definition_level_encoding)
-                        rep_level_encoding = _get_name(Encoding, daph.repetition_level_encoding)
+                        encoding_type = None
+                        def_level_encoding = None
+                        rep_level_encoding = None
+                        if daph:
+                            encoding_type = _get_name(Encoding, daph.encoding)
+                            def_level_encoding = _get_name(Encoding, daph.definition_level_encoding)
+                            rep_level_encoding = _get_name(Encoding, daph.repetition_level_encoding)
 
-                    println("        page header: type={type} "
-                            "uncompressed_size={raw_bytes} "
-                            "num_values={num_values} encoding={encoding} "
-                            "def_level_encoding={def_level_encoding} "
-                            "rep_level_encoding={rep_level_encoding}".format(
-                                type=type_,
-                                raw_bytes=raw_bytes,
-                                num_values=num_values,
-                                encoding=encoding_type,
-                                def_level_encoding=def_level_encoding,
-                                rep_level_encoding=rep_level_encoding))
+                        println("        page header: type={type} "
+                                "uncompressed_size={raw_bytes} "
+                                "num_values={num_values} encoding={encoding} "
+                                "def_level_encoding={def_level_encoding} "
+                                "rep_level_encoding={rep_level_encoding}".format(
+                                    type=type_,
+                                    raw_bytes=raw_bytes,
+                                    num_values=num_values,
+                                    encoding=encoding_type,
+                                    def_level_encoding=def_level_encoding,
+                                    rep_level_encoding=rep_level_encoding))
 
 
 def _read_page(fo, page_header, column_metadata):
@@ -279,7 +281,7 @@ def read_data_page(fo, schema_helper, page_header, column_metadata,
         for i in range(daph.num_values):
             vals.append(
                 encoding.read_plain(io_obj, column_metadata.type, None))
-        logger.debug("  Values: ", ",".join([str(x) for x in vals]))
+        logger.debug("  Values: %s", ",".join([str(x) for x in vals]))
     elif daph.encoding == Encoding.PLAIN_DICTIONARY:
         # bit_width is stored as single byte.
         bit_width = struct.unpack("<B", io_obj.read(1))[0]
@@ -318,12 +320,16 @@ def dump(filename, options, out=sys.stdout):
 
     footer = read_footer(filename)
     schema_helper = schema.SchemaHelper(footer.schema)
+    total_count = 0
     for rg in footer.row_groups:
         res = defaultdict(list)
         row_group_rows = rg.num_rows
         for idx, cg in enumerate(rg.columns):
             dict_items = []
             cmd = cg.meta_data
+            # skip if the list of columns is specified and this isn't in it
+            if options.col and not ".".join(cmd.path_in_schema) in options.col:
+                continue
             with open(filename, 'rb') as fo:
                 offset = _get_offset(cmd)
                 fo.seek(offset, 0)
@@ -352,8 +358,14 @@ def dump(filename, options, out=sys.stdout):
                     else:
                         logger.warn("Skipping unknown page type={0}".format(
                             _get_name(PageType, ph.type)))
-        println("Data for row group: ")
         keys = res.keys()
-        println("\t".join(keys))
+        if options.format == "csv" and not options.no_headers:
+            println("\t".join(keys))
         for i in range(rg.num_rows):
-            println("\t".join(str(res[k][i]) for k in keys))
+            if options.limit != -1 and i + total_count >= options.limit:
+                return
+            if options.format == "csv":
+                println("\t".join(str(res[k][i]) for k in keys))
+            elif options.format == "json":
+                println(json.dumps(dict([(k, res[k][i]) for k in keys])))
+        total_count += rg.num_rows
