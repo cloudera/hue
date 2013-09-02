@@ -2,18 +2,21 @@ import argparse
 import logging
 import sys
 
-import parquet
 
-
-def setup_logging(options):
-    level = logging.DEBUG if options.debug else logging.WARNING
-    logging.basicConfig(level=level)
+def setup_logging(options=None):
+    level = logging.DEBUG if options is not None and options.debug \
+        else logging.WARNING
+    console = logging.StreamHandler()
+    console.setLevel(level)
+    formatter = logging.Formatter('%(name)s: %(levelname)-8s %(message)s')
+    console.setFormatter(formatter)
+    logging.getLogger('parquet').addHandler(console)
 
 
 def main(argv=None):
     argv = argv or sys.argv[1:]
 
-    parser = argparse.ArgumentParser(description='Process some integers.')
+    parser = argparse.ArgumentParser(description='Read parquet files')
     parser.add_argument('--metadata', action='store_true',
                         help='show metadata on file')
     parser.add_argument('--row-group-metadata', action='store_true',
@@ -38,6 +41,8 @@ def main(argv=None):
     args = parser.parse_args(argv)
 
     setup_logging(args)
+
+    import parquet
 
     if args.metadata:
         parquet.dump_metadata(args.file, args.row_group_metadata)

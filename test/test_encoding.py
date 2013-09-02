@@ -1,8 +1,85 @@
 import array
+import struct
 import StringIO
 import unittest
 
 import parquet.encoding
+from parquet.ttypes import Type
+
+
+class TestPlain(unittest.TestCase):
+
+    def test_int32(self):
+        self.assertEquals(
+            999,
+            parquet.encoding.read_plain_int32(
+                StringIO.StringIO(struct.pack("<i", 999))))
+
+    def test_int64(self):
+        self.assertEquals(
+            999,
+            parquet.encoding.read_plain_int64(
+                StringIO.StringIO(struct.pack("<q", 999))))
+
+    def test_int96(self):
+        self.assertEquals(
+            999,
+            parquet.encoding.read_plain_int96(
+                StringIO.StringIO(struct.pack("<qi", 0, 999))))
+
+    def test_float(self):
+        self.assertAlmostEquals(
+            9.99,
+            parquet.encoding.read_plain_float(
+                StringIO.StringIO(struct.pack("<f", 9.99))),
+            2)
+
+    def test_double(self):
+        self.assertEquals(
+            9.99,
+            parquet.encoding.read_plain_double(
+                StringIO.StringIO(struct.pack("<d", 9.99))))
+
+    def test_fixed(self):
+        data = "foobar"
+        fo = StringIO.StringIO(data)
+        self.assertEquals(
+            data[:3],
+            parquet.encoding.read_plain_byte_array_fixed(
+                fo, 3))
+        self.assertEquals(
+            data[3:],
+            parquet.encoding.read_plain_byte_array_fixed(
+                fo, 3))
+
+    def test_fixed_read_plain(self):
+        data = "foobar"
+        fo = StringIO.StringIO(data)
+        self.assertEquals(
+            data[:3],
+            parquet.encoding.read_plain(
+                fo, Type.FIXED_LEN_BYTE_ARRAY, 3))
+
+
+class TestRle(unittest.TestCase):
+
+    def testFourByteValue(self):
+        fo = StringIO.StringIO(struct.pack("<i", 1 << 30))
+        out = parquet.encoding.read_rle(fo, 2 << 1, 30)
+        self.assertEquals([1 << 30] * 2, list(out))
+
+
+class TestVarInt(unittest.TestCase):
+
+    def testSingleByte(self):
+        fo = StringIO.StringIO(struct.pack("<B", 0x7F))
+        out = parquet.encoding.read_unsigned_var_int(fo)
+        self.assertEquals(0x7F, out)
+
+    def testFourByte(self):
+        fo = StringIO.StringIO(struct.pack("<BBBB", 0xFF, 0xFF, 0xFF, 0x7F))
+        out = parquet.encoding.read_unsigned_var_int(fo)
+        self.assertEquals(0x0FFFFFFF, out)
 
 
 class TestBitPacked(unittest.TestCase):

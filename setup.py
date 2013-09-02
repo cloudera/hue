@@ -1,4 +1,7 @@
-from distutils.core import setup
+try:
+    from setuptools import setup
+except ImportError:
+    from distutils.core import setup
 
 setup(name='parquet',
     version='1.0',
@@ -6,10 +9,15 @@ setup(name='parquet',
     author='Joe Crobak',
     author_email='joecrow@gmail.com',
     packages=[ 'parquet' ],
-    requires=[
+    install_requires=[
         'thrift',
     ],
     extras_require = {
         'snappy support': ['python-snappy']
+    },
+    entry_points={
+        'console_scripts': [
+            'parquet = parquet.__main__:main',
+        ]
     },
 )

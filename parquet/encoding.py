@@ -28,7 +28,7 @@ def read_plain_int64(fo):
 
 def read_plain_int96(fo):
     """Reads a 96-bit int using the plain encoding"""
-    tup = struct.unpack("<q<i", fo.read(12))
+    tup = struct.unpack("<qi", fo.read(12))
     return tup[0] << 32 | tup[1]
 
 
@@ -103,12 +103,12 @@ def read_rle(fo, header, bit_width):
     width = byte_width(bit_width)
     if width >= 1:
         data += fo.read(1)
-    elif width >= 2:
+    if width >= 2:
         data += fo.read(1)
-    elif width >= 3:
+    if width >= 3:
         data += fo.read(1)
-    elif width == 4:
-        data = fo.read(1)
+    if width == 4:
+        data += fo.read(1)
     data = data + zero_data[len(data):]
     value = struct.unpack("<i", data)[0]
     logger.debug("Read RLE group with value %s of byte-width %s and count %s",
