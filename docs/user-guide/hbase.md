@@ -152,8 +152,3 @@ searchbar, you can use the help menu that pops up while typing, which
 will suggest next steps to complete your query.
 
 
-Et voila!
----------
-
-More future features include Thrift 2 support, kerberos security.
-
