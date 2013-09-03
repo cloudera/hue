@@ -40,7 +40,7 @@ from desktop.lib.conf import validate_path
 from desktop.lib.django_util import TruncatingModel
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.test_utils import grant_access
-from desktop.views import check_config_ajax
+from desktop.views import check_config
 
 
 def setup_test_environment():
@@ -440,10 +440,6 @@ def test_config_check():
     resp = cli.get('/debug/check_config')
     del os.environ["HUE_CONF_DIR"]
     assert_true('/tmp/test_hue_conf_dir' in resp.content, resp)
-
-    # Alert present in the status bar
-    resp = cli.get('/about', follow=True)
-    assert_true('misconfiguration' in resp.content, resp.content)
   finally:
     for old_conf in reset:
       old_conf()
@@ -487,5 +483,5 @@ def test_ui_customizations():
 @attr('requires_hadoop')
 def test_check_config_ajax():
   c = make_logged_in_client()
-  response = c.get(reverse(check_config_ajax))
-  assert_true("Misconfiguration" in response.content, response.content)
+  response = c.get(reverse(check_config))
+  assert_true("misconfiguration" in response.content, response.content)

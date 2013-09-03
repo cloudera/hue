@@ -382,9 +382,12 @@ def check_config(request):
     return HttpResponse(_("You must be a superuser."))
 
   conf_dir = os.path.realpath(os.getenv("HUE_CONF_DIR", get_desktop_root("conf")))
-  return render('check_config.mako', request, dict(
-                    error_list=_get_config_errors(request, cache=False),
-                    conf_dir=conf_dir))
+  return render('check_config.mako', request, {
+                  'error_list': _get_config_errors(request, cache=False),
+                  'conf_dir': conf_dir
+              },
+              force_template=True)
+
 
 def check_config_ajax(request):
   """Alert administrators about configuration problems."""
@@ -399,5 +402,3 @@ def check_config_ajax(request):
                 request,
                 dict(error_list=error_list),
                 force_template=True)
-
-register_status_bar_view(check_config_ajax)

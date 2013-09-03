@@ -17,8 +17,8 @@
 from desktop.lib.conf import BoundConfig
 from django.utils.translation import ugettext as _
 %>
-
     ${_('Configuration files located in')} <code>${conf_dir}</code>
+
     <br/><br/>
     % if error_list:
       <div class="alert alert-warn">${_('Potential misconfiguration detected. Fix and restart Hue.')}</div>

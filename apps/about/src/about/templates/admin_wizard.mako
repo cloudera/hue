@@ -63,10 +63,13 @@ ${ commonheader(_('Quick Start'), "quickstart", user, "100px") | n,unicode }
           <div class="steps">
           <div id="step1" class="stepDetails">
             <div class="card card-tab">
-              <h2 class="card-heading simple">${ _('Check your current configuration') }</h2>
+              <h2 class="card-heading simple">${ _('Checking current configuration') }</h2>
 
               <div class="card-body">
-              ${ check_config | n,smart_unicode }
+                <div id="check-config-section">
+                  <!--[if !IE]><!--><i class="icon-spinner icon-spin" style="font-size: 60px;"></i><!--<![endif]-->
+                  <!--[if IE]><img src="/hbase/static/art/loader.gif" /><![endif]-->
+                </div>
               </div>
             </div>
 
@@ -230,6 +233,11 @@ ${ commonheader(_('Quick Start'), "quickstart", user, "100px") | n,unicode }
 
 <script type="text/javascript" charset="utf-8">
 $(document).ready(function(){
+
+  $.get("${ url('desktop.views.check_config') }", function(response) {
+    $("#check-config-section").html(response);
+  })
+  .fail(function() { $.jHueNotify.error('${ _("Check config failed: ")}'); });
 
   $("[rel='popover']").popover();
 
