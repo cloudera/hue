@@ -53,30 +53,12 @@ CREATE_USERS_ON_LOGIN = Config(
   type=coerce_bool,
   help=_t("Create users from IdP on login."))
 
-ENTITY_ID = Config(
-  key="entity_id",
-  default="http://localhost:8888/saml2/metadata/",
-  type=str,
-  help=_t("Globally unique identifier of the entity."))
-
 ATTRIBUTE_MAP_DIR = Config(
   key="attribute_map_dir",
   default=os.path.abspath( os.path.join(BASEDIR, '..', '..', 'attribute-maps') ),
   type=str,
   private=True,
   help=_t("Attribute map directory contains files that map SAML attributes to pysaml2 attributes."))
-
-ASSERTION_CONSUMER_SERVICE_URI = Config(
-  key="assertion_consumer_service_uri",
-  default="http://localhost:8888/saml2/acs/",
-  type=str,
-  help=_t("Consumes assertions sent back from IdP."))
-
-SINGLE_LOGOUT_SERVICE = Config(
-  key="single_logout_service",
-  default="http://localhost:8888/saml2/ls/",
-  type=str,
-  help=_t("Logout using the IdP."))
 
 ALLOW_UNSOLICITED = Config(
   key="allow_unsolicited",
@@ -87,7 +69,7 @@ ALLOW_UNSOLICITED = Config(
 
 REQUIRED_ATTRIBUTES = Config(
   key="required_attributes",
-  default=[],
+  default=['uid'],
   type=csv,
   help=_t("Required attributes to ask for from IdP."))
 
@@ -105,13 +87,13 @@ METADATA_FILE = Config(
 
 KEY_FILE = Config(
   key="key_file",
-  default=os.path.abspath( os.path.join(BASEDIR, '..', '..', 'examples', 'key.pem') ),
+  default="",
   type=str,
   help=_t("key_file is the name of a PEM formatted file that contains the private key of the Hue service. This is presently used both to encrypt/sign assertions and as client key in a HTTPS session."))
 
 CERT_FILE = Config(
   key="cert_file",
-  default=os.path.abspath( os.path.join(BASEDIR, '..', '..', 'examples', 'cert.pem') ),
+  default="",
   type=str,
   help=_t("This is the public part of the service private/public key pair. cert_file must be a PEM formatted certificate chain file."))
 
