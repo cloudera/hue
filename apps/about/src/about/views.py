@@ -26,7 +26,6 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib.django_util import render
 from desktop.models import Settings
-from desktop.views import check_config
 from desktop import appmanager
 
 from hadoop.core_site import get_trash_interval
@@ -40,7 +39,6 @@ def admin_wizard(request):
 
   return render('admin_wizard.mako', request, {
       'version': settings.HUE_DESKTOP_VERSION,
-      'check_config': check_config(request).content,
       'apps': dict([(app.name, app) for app in apps]),
       'app_names': app_names,
       'tours_and_tutorials': tours_and_tutorials,
