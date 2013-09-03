@@ -97,11 +97,10 @@ class TestBitPacked(unittest.TestCase):
 class TestBitPackedDeprecated(unittest.TestCase):
 
     def testFromExample(self):
-        raise SkipTest
-        encoded_bitstring = array.array('B',
-                                        [0b00000101, 0b00111001, 0b01110111])
+        encoded_bitstring = array.array(
+            'B', [0b00000101, 0b00111001, 0b01110111]).tostring()
         fo = StringIO.StringIO(encoded_bitstring)
-        res = parquet.encoding.read_bitpacked_deprecated(fo, 3, 3)
+        res = parquet.encoding.read_bitpacked_deprecated(fo, 3, 8, 3)
         self.assertEquals(range(8), res)
 
 

@@ -168,14 +168,33 @@ def read_bitpacked(fo, header, width):
     return res
 
 
-def read_bitpacked_deprecated(fo, count, width):
-    res = []
-    raw_bytes = array.array('B', fo.read(count)).tolist()
-    current_byte = 0
-    b = raw_bytes[current_byte]
-    mask = _mask_for_bits(width)
+def read_bitpacked_deprecated(fo, byte_count, count, width):
+    raw_bytes = array.array('B', fo.read(byte_count)).tolist()
 
-    # TODO implement
+    mask = _mask_for_bits(width)
+    index = 0
+    res = []
+    word = 0
+    bits_in_word = 0
+    while len(res) < count and index <= len(raw_bytes):
+        logger.debug("index = %d", index)
+        logger.debug("bits in word = %d", bits_in_word)
+        logger.debug("word = %s", bin(word))
+        if bits_in_word >= width:
+            # how many bits over the value is stored
+            offset = (bits_in_word - width)
+            logger.debug("offset = %d", offset)
+
+            # figure out the value
+            value = (word & (mask << offset)) >> offset
+            logger.debug("value = %d (%s)", value, bin(value))
+            res.append(value)
+
+            bits_in_word -= width
+        else:
+            word = (word << 8) | raw_bytes[index]
+            index += 1
+            bits_in_word += 8
     return res
 
 
