@@ -17,7 +17,7 @@
 from setuptools import setup, find_packages
 
 setup(
-      name = "huesaml",
+      name = "libsaml",
       version = "3.0.0",
       url = 'http://github.com/cloudera/hue',
       description = "SAML Libraries",
@@ -26,5 +26,5 @@ setup(
       install_requires = ['setuptools', 'desktop'],
       # Even libraries need to be registered as desktop_apps,
       # if they have configuration, like this one.
-      entry_points = { 'desktop.sdk.lib': 'huesaml=huesaml' },
+      entry_points = { 'desktop.sdk.lib': 'libsaml=libsaml' },
 )
