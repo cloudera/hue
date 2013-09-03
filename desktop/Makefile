@@ -41,7 +41,8 @@ include $(ROOT)/Makefile.vars.priv
 
 APPS := core \
 	libs/hadoop \
-	libs/liboozie
+	libs/liboozie \
+	libs/libsaml
 
 .PHONY: default
 default:: hue syncdb

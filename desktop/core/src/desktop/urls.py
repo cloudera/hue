@@ -78,7 +78,7 @@ static_patterns = []
 
 # SAML specific
 if settings.SAML_AUTHENTICATION:
-  static_patterns.append((r'^saml2/', include('huesaml.urls')))
+  static_patterns.append((r'^saml2/', include('libsaml.urls')))
 
 # Root each app at /appname if they have a "urls" module
 for app in appmanager.DESKTOP_APPS:

@@ -23,7 +23,7 @@ urlpatterns = patterns(
     url(r'^ls/$', 'logout_service', name='saml2_ls')
 )
 
-urlpatterns += patterns('huesaml.views',
+urlpatterns += patterns('libsaml.views',
                         url(r'^acs/$', 'assertion_consumer_service', name='saml2_acs'),
                         url(r'^login/$', 'login', name='saml2_login'),
                         url(r'^metadata/$', 'metadata', name='saml2_metadata'),
