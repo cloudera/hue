@@ -157,7 +157,7 @@ class Job(models.Model):
 
   def __str__(self):
     res = '%s - %s' % (force_unicode(self.name), self.owner)
-    return res.encode('utf-8', 'xmlcharrefreplace')
+    return force_unicode(res)
 
   def get_full_node(self):
     try:
@@ -489,7 +489,8 @@ class Workflow(Job):
     if mapping is None:
       mapping = {}
     tmpl = 'editor/gen/workflow.xml.mako'
-    return re.sub(re.compile('\s*\n+', re.MULTILINE), '\n', django_mako.render_to_string(tmpl, {'workflow': self, 'mapping': mapping})).encode('utf-8', 'xmlcharrefreplace')
+    xml = re.sub(re.compile('\s*\n+', re.MULTILINE), '\n', django_mako.render_to_string(tmpl, {'workflow': self, 'mapping': mapping}))
+    return force_unicode(xml)
 
 
 class Link(models.Model):
@@ -1367,6 +1368,9 @@ class Coordinator(Job):
   def find_parameters(self):
     params = self.workflow.find_parameters()
 
+    for param in find_parameters(self, ['job_properties']):
+      params[param] = ''
+
     for dataset in self.dataset_set.all():
       for param in find_parameters(dataset, ['uri']):
         if param not in set(DATASET_FREQUENCY):
@@ -1516,7 +1520,7 @@ class BundledCoordinator(models.Model):
   coordinator = models.ForeignKey(Coordinator, verbose_name=_t('Coordinator'),
                                   help_text=_t('The coordinator to batch with other coordinators.'))
 
-  parameters = models.TextField(default='[{"name":"oozie.use.system.libpath","value":"true"}]', verbose_name=_t('Oozie parameters'),
+  parameters = models.TextField(default='[{"name":"oozie.use.system.libpath","value":"true"}]', verbose_name=_t('Parameters'),
                                 help_text=_t('Constants used at the submission time (e.g. market=US, oozie.use.system.libpath=true).'))
 
   def get_parameters(self):
@@ -1542,7 +1546,12 @@ class Bundle(Job):
     if mapping is None:
       mapping = {}
     tmpl = "editor/gen/bundle.xml.mako"
-    return re.sub(re.compile('\s*\n+', re.MULTILINE), '\n', django_mako.render_to_string(tmpl, {'bundle': self, 'mapping': mapping})).encode('utf-8', 'xmlcharrefreplace')
+
+    return force_unicode(
+              re.sub(re.compile('\s*\n+', re.MULTILINE), '\n', django_mako.render_to_string(tmpl, {
+                'bundle': self,
+                'mapping': mapping
+           })))
 
   def clone(self, new_owner=None):
     bundleds = BundledCoordinator.objects.filter(bundle=self)
@@ -1578,12 +1587,12 @@ class Bundle(Job):
   def find_parameters(self):
     params = {}
 
-    for bundled in self.coordinators.all():
+    for bundled in BundledCoordinator.objects.filter(bundle=self):
       for param in bundled.coordinator.find_parameters():
         params[param] = ''
 
-      for param in find_parameters(bundled, ['parameters']):
-        params[param] = ''
+      for param in bundled.get_parameters():
+        params.pop(param['name'], None)
 
     return params
 

@@ -163,20 +163,16 @@ class Submission(object):
     return deployment_dir
 
   def _update_properties(self, jobtracker_addr, deployment_dir):
-    properties = {
+    self.properties.update({
       'jobTracker': jobtracker_addr,
       'nameNode': self.fs.fs_defaultfs,
-    }
+    })
 
     if self.job:
-      properties.update({
+      self.properties.update({
         self.job.get_application_path_key(): self.fs.get_hdfs_path(deployment_dir),
         self.job.HUE_ID: self.job.id
       })
-
-    properties.update(self.properties)
-
-    self.properties = properties
 
   def _create_deployment_dir(self):
     """

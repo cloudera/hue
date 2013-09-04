@@ -15,6 +15,9 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 
+<%!
+  from oozie.models import BundledCoordinator
+%>
 
 <bundle-app name="${ bundle.name }"
   xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
@@ -34,23 +37,22 @@
      <kick-off-time>${ bundle.kick_off_time_utc }</kick-off-time>
   </controls>
 
-  % if bundle.coordinators:
-    % for bundled in bundle.coordinators.all():
-    <coordinator name='${ bundled.coordinator.name }' >
-       <app-path>${'${'}nameNode}${ mapping.pop('coord_%s_dir' % bundled.coordinator.id) }</app-path>
-         <configuration>
-           <property>
-              <name>wf_application_path</name>
-              <value>${ mapping.pop('wf_%s_dir' % bundled.coordinator.workflow.id) }</value>
-          </property>
-           % for param in bundled.get_parameters():
-           <property>
-              <name>${ param['name'] }</name>
-              <value>${ param['value'] }</value>
-          </property>
-          % endfor
-        </configuration>
-    </coordinator>
-    % endfor
-  % endif
+
+  % for bundled in BundledCoordinator.objects.filter(bundle=bundle):
+  <coordinator name='${ bundled.coordinator.name }-${ bundled.id }' >
+     <app-path>${'${'}nameNode}${ mapping['coord_%s_dir' % bundled.coordinator.id] }</app-path>
+       <configuration>
+         <property>
+            <name>wf_application_path</name>
+            <value>${ mapping['wf_%s_dir' % bundled.coordinator.workflow.id] }</value>
+        </property>
+         % for param in bundled.get_parameters():
+         <property>
+            <name>${ param['name'] }</name>
+            <value>${ param['value'] }</value>
+        </property>
+        % endfor
+      </configuration>
+  </coordinator>
+  % endfor
 </bundle-app>

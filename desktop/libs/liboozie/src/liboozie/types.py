@@ -270,7 +270,7 @@ class BundleAction(Action):
 
 
 class Job(object):
-  RUNNING_STATUSES = set(['PREP', 'RUNNING', 'SUSPENDED', 'PREP', # Workflow
+  RUNNING_STATUSES = set(['PREP', 'RUNNING', 'SUSPENDED', # Workflow
                           'RUNNING', 'PREPSUSPENDED', 'SUSPENDED', 'PREPPAUSED', 'PAUSED' # Coordinator
                           ])
   """

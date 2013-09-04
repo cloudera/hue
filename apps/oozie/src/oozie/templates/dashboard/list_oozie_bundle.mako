@@ -62,9 +62,11 @@ ${ layout.menubar(section='dashboard') }
 
         % if bundle:
             <li class="nav-header">${ _('Coordinators') }</li>
-          % for bundled in bundle.coordinators.all():
+          % for bundled in bundle.coordinators.distinct():
             <li rel="tooltip" title="${ bundled.coordinator.name }" class="white">
-              <i class="icon-eye-open"></i> <span class="dataset">${ bundled.coordinator.name }</span>
+              <a href="${ bundled.coordinator.get_absolute_url() }">
+                <i class="icon-eye-open"></i> <span class="dataset">${ bundled.coordinator.name }</span>
+              </a>
             </li>
           % endfor
         % endif
@@ -430,13 +432,14 @@ ${ layout.menubar(section='dashboard') }
 
         $("#status span").attr("class", "label").addClass(getStatusClass(data.status)).text(data.status);
 
-        if (data.id && data.status != "RUNNING" && data.status != "SUSPENDED" && data.status != "KILLED" && data.status != "FAILED"){
+        if (data.id && (data.status == "KILLED" || data.status == "SUCCEEDED" ||  data.status == "DONEWITHERROR" || data.status == "FAILED")) {
           $("#kill-btn").hide();
-          $("#rerun-btn").show();
-        }
-
-        if (data.id && data.status == "KILLED") {
-          $("#kill-btn").hide();
+          if (data.status != "KILLED" ) {
+            $("#rerun-btn").show();
+          }
+        } else {
+          $("#kill-btn").show();
+          $("#rerun-btn").hide();
         }
 
         if (data.id && (data.status == "RUNNING" || data.status == "RUNNINGWITHERROR")){
