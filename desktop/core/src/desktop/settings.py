@@ -249,6 +249,9 @@ DATABASES = {
   'default': default_db
 }
 
+# Configure sessions
+SESSION_COOKIE_AGE = desktop.conf.SESSION.TTL.get()
+
 # django-nose test specifics
 TEST_RUNNER = 'desktop.lib.test_runners.HueTestRunner'
 # Turn off cache middleware

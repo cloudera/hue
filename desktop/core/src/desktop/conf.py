@@ -211,6 +211,20 @@ DATABASE = ConfigSection(
   )
 )
 
+SESSION = ConfigSection(
+  key='session',
+  help=_("""Configuration options for specifying the Desktop session.
+          For more info, see https://docs.djangoproject.com/en/1.4/topics/http/sessions/"""),
+  members=dict(
+    TTL=Config(
+      key='ttl',
+      help=_("The cookie containing the users' session ID will expire after this amount of time in seconds."),
+      type=int,
+      default=60*60*24*14,
+    )
+  )
+)
+
 KERBEROS = ConfigSection(
   key="kerberos",
   help=_("""Configuration options for specifying Hue's Kerberos integration for
