@@ -252,6 +252,9 @@ DATABASES = {
   'default': default_db
 }
 
+# Configure sessions
+SESSION_COOKIE_AGE = desktop.conf.SESSION.TTL.get()
+
 TIME_ZONE = desktop.conf.TIME_ZONE.get()
 # Desktop supports only one authentication backend.
 AUTHENTICATION_BACKENDS = (desktop.conf.AUTH.BACKEND.get(),)
