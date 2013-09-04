@@ -1499,7 +1499,6 @@ class TestEditorBundle(OozieMockBase):
         u'create-bundled-coordinator-parameters': [u'[{"name":"market","value":"US"}]'],
         u'schema_version': [u'uri:oozie:bundle:0.2', u'uri:oozie:bundle:0.2'], u'coordinators-MAX_NUM_FORMS': [u'0'],
         u'coordinators-INITIAL_FORMS': [u'0'],
-        #u'create-bundled-coordinator-coordinator': [u'?'],
         u'parameters': [u'[{"name":"oozie.use.system.libpath","value":"true"}]'], u'coordinators-TOTAL_FORMS': [u'0'],
         u'description': [u'ss']
     }
@@ -1532,19 +1531,19 @@ class TestEditorBundle(OozieMockBase):
   <controls>
      <kick-off-time>2012-07-01T00:00Z</kick-off-time>
   </controls>
-    <coordinator name='MyCoord' >
-       <app-path>${nameNode}/deployment_path_coord</app-path>
-         <configuration>
-           <property>
-              <name>wf_application_path</name>
-              <value>/deployment_path_wf</value>
-          </property>
-           <property>
-              <name>market</name>
-              <value>US</value>
-          </property>
-        </configuration>
-    </coordinator>
+  <coordinator name='MyCoord-1' >
+     <app-path>${nameNode}/deployment_path_coord</app-path>
+       <configuration>
+         <property>
+            <name>wf_application_path</name>
+            <value>/deployment_path_wf</value>
+        </property>
+         <property>
+            <name>market</name>
+            <value>US</value>
+        </property>
+      </configuration>
+  </coordinator>
 </bundle-app>""" in xml, xml)
 
 
