@@ -207,6 +207,12 @@ SESSION = ConfigSection(
       help=_("The cookie containing the users' session ID will expire after this amount of time in seconds."),
       type=int,
       default=60*60*24*14,
+    ),
+    SECURE=Config(
+      key='secure',
+      help=_("The cookie containing the users' session ID will be secure. This should only be enabled with HTTPS."),
+      type=coerce_bool,
+      default=False,
     )
   )
 )
