@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import os
 
 from django.utils.translation import ugettext_lazy as _t
@@ -34,8 +35,10 @@ def csv(value):
 
 def dict_list_map(value):
   if isinstance(value, str):
-    d = json.loads(value)
-    return {k:(v,) for k, v in d.iteritems()}
+    d = {}
+    for k, v in json.loads(value).iteritems():
+      d[k] = (v,)
+    return d
   elif isinstance(value, dict):
     return value
   return None
@@ -65,7 +68,7 @@ ALLOW_UNSOLICITED = Config(
   default=True,
   type=coerce_bool,
   private=True,
-  help=_t("Allow imperfect responses."))
+  help=_t("Allow responses that are initiated by the IdP."))
 
 REQUIRED_ATTRIBUTES = Config(
   key="required_attributes",
