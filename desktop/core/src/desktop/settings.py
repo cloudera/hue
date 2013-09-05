@@ -251,6 +251,7 @@ DATABASES = {
 
 # Configure sessions
 SESSION_COOKIE_AGE = desktop.conf.SESSION.TTL.get()
+SESSION_COOKIE_SECURE = desktop.conf.SESSION.SECURE.get()
 
 # django-nose test specifics
 TEST_RUNNER = 'desktop.lib.test_runners.HueTestRunner'
