@@ -112,10 +112,10 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
         contentType: 'application/json',
         type: 'POST',
         success: function () {
-          $.jHueNotify.info("${_('Updated')}");
+          $(document).trigger("info", "${_('Updated')}");
         },
         error: function (data) {
-          $.jHueNotify.error("${_('Error: ')}" + data);
+          $(document).trigger("error", "${_('Error: ')}" + data);
         },
         complete: function() {
           $("#save-btn").button('reset');

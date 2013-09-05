@@ -261,9 +261,7 @@
                 }, 100);
             }
         }).error(function(){
-            if ($.jHueNotify) {
-                $.jHueNotify.info(_parent.options.labels.FILE_NOT_FOUND);
-            }
+            $(document).trigger("info", _parent.options.labels.FILE_NOT_FOUND);
             _parent.navigateTo(_parent.options.errorRedirectPath != "" ? _parent.options.errorRedirectPath : "/?default_to_home");
             _parent.options.onError();
         });

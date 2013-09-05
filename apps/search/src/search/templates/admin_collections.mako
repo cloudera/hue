@@ -209,7 +209,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
     $(document).on("imported", function () {
       $("#importModal").modal("hide");
       $("#importModalBtn").button("reset");
-      $.jHueNotify.info("${ _("Collections imported successfully.") }"); // Could fail actually
+      $(document).trigger("info", "${ _("Collections imported successfully.") }"); // Could fail actually
     });
 
     $(document).on("deleting", function () {
@@ -221,11 +221,11 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
     $(document).on("collectionDeleted", function () {
       $("#deleteModal").modal("hide");
       $("#deleteModalBtn").button("reset");
-      $.jHueNotify.info("${ _("Collection deleted successfully.") }");
+      $(document).trigger("info", "${ _("Collection deleted successfully.") }");
     });
 
     $(document).on("collectionCopied", function () {
-      $.jHueNotify.info("${ _("Collection copied successfully.") }");
+      $(document).trigger("info", "${ _("Collection copied successfully.") }");
     });
 
     $(document).on("confirmDelete", function () {

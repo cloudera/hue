@@ -568,7 +568,7 @@ function import_jobsub_load_success(data) {
   if (data.status == 0) {
     import_jobsub_action.initialize(data.data);
   } else {
-    $.jHueNotify.error("${ _('Received invalid response from server: ') } " + JSON.stringify(data));
+    $(document).trigger("error", "${ _('Received invalid response from server: ') } " + JSON.stringify(data));
   }
 }
 
@@ -576,12 +576,12 @@ function import_workflow_load_success(data) {
   if (data.status == 0) {
     import_workflow_action.initialize(data.data);
   } else {
-    $.jHueNotify.error("${ _('Received invalid response from server: ') } " + JSON.stringify(data));
+    $(document).trigger("error", "${ _('Received invalid response from server: ') } " + JSON.stringify(data));
   }
 }
 
 function workflow_save_success(data) {
-  $.jHueNotify.info("${ _('Workflow saved') }");
+  $(document).trigger("info", "${ _('Workflow saved') }");
   workflow.reload(data.data);
   workflow.is_dirty( false );
   workflow.loading(false);
@@ -589,13 +589,13 @@ function workflow_save_success(data) {
 }
 
 function workflow_save_error(data) {
-  $.jHueNotify.error("${ _('Could not save workflow') }");
+  $(document).trigger("error", "${ _('Could not save workflow') }");
   workflow.loading(false);
   $("#btn-save-wf").button('reset');
 }
 
 function workflow_read_only_handler() {
-  $.jHueNotify.error("${ _('Workflow is in read only mode.') }");
+  $(document).trigger("error", "${ _('Workflow is in read only mode.') }");
   workflow.loading(false);
 }
 
@@ -609,7 +609,7 @@ function workflow_load_success(data) {
     ko.applyBindings(kill_view_model, $('#editKill')[0]);
 
   } else {
-    $.jHueNotify.error("${ _('Received invalid response from server: ') }" + JSON.stringify(data));
+    $(document).trigger("error", "${ _('Received invalid response from server: ') }" + JSON.stringify(data));
   }
   workflow.loading(false);
 }
@@ -827,9 +827,9 @@ $('#importJobsub').on('click', '.action-row', function(e) {
 
           workflow.el.trigger('workflow:rebuild');
           routie('editWorkflow');
-          $.jHueNotify.info("${ _('Action imported at the top of the workflow.') } ");
+          $(document).trigger("info", "${ _('Action imported at the top of the workflow.') } ");
         } else {
-          $.jHueNotify.error("${ _('Received invalid response from server: ') } " + JSON.stringify(data));
+          $(document).trigger("error", "${ _('Received invalid response from server: ') } " + JSON.stringify(data));
         }
       }
     });
@@ -851,7 +851,7 @@ $('#importOozie').on('click', '.action-row', function(e) {
           import_view_model.oozie().initialize({nodes: data.data.actions});
           routie('importAction/oozie');
         } else {
-          $.jHueNotify.error("${ _('Received invalid response from server: ') } " + JSON.stringify(data));
+          $(document).trigger("error", "${ _('Received invalid response from server: ') } " + JSON.stringify(data));
         }
       }
     });
@@ -868,7 +868,7 @@ $('#importOozieAction').on('click', '.action-row', function(e) {
 
     workflow.el.trigger('workflow:rebuild');
     routie('editWorkflow');
-    $.jHueNotify.info("${ _('Action imported at the top of the workflow.') } ");
+    $(document).trigger("error", "${ _('Action imported at the top of the workflow.') } ");
   }
 });
 

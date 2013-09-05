@@ -237,7 +237,7 @@ $(document).ready(function(){
   $.get("${ url('desktop.views.check_config') }", function(response) {
     $("#check-config-section").html(response);
   })
-  .fail(function() { $.jHueNotify.error('${ _("Check config failed: ")}'); });
+  .fail(function() { $(document).trigger('error', '${ _("Check config failed: ")}'); });
 
   $("[rel='popover']").popover();
 
@@ -246,9 +246,9 @@ $(document).ready(function(){
     $(button).button('loading');
     $.post($(this).data("sample-url"), function(data) {
       if (data.status == 0) {
-        $.jHueNotify.info('${ _("Examples refreshed") }');
+        $(document).trigger('info','${ _("Examples refreshed") }');
       } else {
-        $.jHueNotify.error(data.message);
+        $(document).trigger('error', data.message);
       }
     })
     .always(function(data) {
@@ -264,7 +264,7 @@ $(document).ready(function(){
     });
     $.when.apply(this, calls)
       .then(function() {
-        $.jHueNotify.info('${ _("Examples refreshed") }');
+        $(document).trigger('info', '${ _("Examples refreshed") }');
       })
       .always(function(data) {
         $(button).button('reset');
@@ -328,9 +328,9 @@ $(document).ready(function(){
   $(".updatePreferences").click(function () {
     $.post("${ url('about:update_preferences') }", $("input").serialize(), function(data) {
       if (data.status == 0) {
-        $.jHueNotify.info('${ _("Configuration updated") }');
+        $(document).trigger('info', '${ _("Configuration updated") }');
       } else {
-        $.jHueNotify.error(data.data);
+        $(document).trigger('error', data.data);
       }
     });
   });

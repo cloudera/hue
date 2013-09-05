@@ -218,7 +218,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
   $(document).ready(function () {
     if ($(".errorlist").length > 0) {
       $(".errorlist li").each(function () {
-        $.jHueNotify.error($(this).text());
+        $(document).trigger("error", $(this).text());
       });
     }
 

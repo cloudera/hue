@@ -557,7 +557,7 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
       field(new DateMath({frequency: parseFloat($.trim(value).split(" ")[0]), unit: $.trim(value).split(" ")[1]}));
     }
     catch (exception){
-      $.jHueNotify.error("${ _('There was an error parsing your input') }");
+      $(document).trigger("error", "${ _('There was an error parsing your input') }");
       field(new DateMath({frequency: defaultFrequency, unit: 'DAYS'}));
     }
   }
@@ -819,11 +819,11 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
         contentType: 'application/json',
         type: 'POST',
         success: function () {
-          $.jHueNotify.info("${_('Facets updated')}");
+          $(document).trigger("info", "${_('Facets updated')}");
           self.isSaveBtnVisible(false);
         },
         error: function (data) {
-          $.jHueNotify.error("${_('Error: ')}" + data);
+          $(document).trigger("error", "${_('Error: ')}" + data);
         },
         complete: function() {
           $("#save-facets").button('reset');
