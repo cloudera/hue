@@ -271,9 +271,7 @@
           $("#jHueTourQuestion").click();
         },
         error: function (e) {
-          if ($.jHueNotify !== undefined) {
-            $.jHueNotify.error(e.message)
-          }
+          $(document).trigger("error", e.message);
           $("#jHueTourRemoteTutorial").removeAttr("disabled");
           $("#jHueTourRemoteTutorialBtn").removeAttr("disabled");
         }

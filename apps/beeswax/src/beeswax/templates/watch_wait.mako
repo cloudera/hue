@@ -154,9 +154,9 @@ ${layout.menubar(section='query')}
         $.post("${ url(app_name + ':cancel_operation', query.id) }",
           function(response) {
             if (response['status'] != 0) {
-              $.jHueNotify.error("${ _('Problem: ') }" + response['message']);
+              $(document).trigger("error", "${ _('Problem: ') }" + response['message']);
             } else {
-              $.jHueNotify.info("${ _('Query canceled!') }")
+              $(document).trigger("info", "${ _('Query canceled!') }")
             }
           }
         );

@@ -775,7 +775,7 @@ from django.utils.translation import ugettext as _
       $.ajaxSetup({
         error:function (x, e) {
           if (x.status == 500) {
-            $.jHueNotify.error("${_('There was a problem with your request.')}");
+            $(document).trigger("error", "${_('There was a problem with your request.')}");
             $("#hueBreadcrumbText").blur();
           }
         }
@@ -967,7 +967,7 @@ from django.utils.translation import ugettext as _
         self.isLoading(true);
         $.getJSON(self.targetPath() + "?pagesize=" + self.recordsPerPage() + "&pagenum=" + self.targetPageNum() + "&filter=" + self.searchQuery() + "&sortby=" + self.sortBy() + "&descending=" + self.sortDescending() + "&format=json", function (data) {
           if (data.error){
-            $.jHueNotify.error(data.error);
+            $(document).trigger("error", data.error);
             self.isLoading(false);
             return false;
           }
@@ -1252,7 +1252,7 @@ from django.utils.translation import ugettext as _
           onComplete:function (id, fileName, response) {
             num_of_pending_uploads--;
             if (response.status != 0) {
-              $.jHueNotify.error("${ _('Error: ') }" + response['data']);
+              $(document).trigger("error", "${ _('Error: ') }" + response['data']);
             } else if (num_of_pending_uploads == 0) {
               window.location = "/filebrowser/view" + self.currentPath();
             }

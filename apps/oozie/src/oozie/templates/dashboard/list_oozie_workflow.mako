@@ -400,7 +400,7 @@ ${ layout.menubar(section='dashboard') }
         { 'notification': $(this).data("message") },
         function(response) {
           if (response['status'] != 0) {
-            $.jHueNotify.error("${ _('Error: ') }" + response['data']);
+            $(document).trigger("error", "${ _('Error: ') }" + response['data']);
           } else {
             window.location.reload();
           }
@@ -415,7 +415,7 @@ ${ layout.menubar(section='dashboard') }
         { 'notification': $(this).data("message") },
         function(response) {
           if (response['status'] != 0) {
-            $.jHueNotify.error("${ _('Error: ') }" + response['data']);
+            $(document).trigger("error", "${ _('Error: ') }" + response['data']);
           } else {
             window.location.reload();
           }
@@ -430,7 +430,7 @@ ${ layout.menubar(section='dashboard') }
         { 'notification': $(this).data("message") },
         function(response) {
           if (response['status'] != 0) {
-            $.jHueNotify.error("${ _('Error: ') }" + response['data']);
+            $(document).trigger("error", "${ _('Error: ') }" + response['data']);
           } else {
             window.location.reload();
           }

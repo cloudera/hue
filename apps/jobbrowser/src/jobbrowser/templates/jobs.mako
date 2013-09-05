@@ -132,7 +132,7 @@ ${ commonheader(None, "jobbrowser", user) | n,unicode }
     $(document).ajaxError(function (event, jqxhr, settings, exception) {
       if (jqxhr.status == 500) {
         window.clearInterval(_runningInterval);
-        $.jHueNotify.error("${_('There was a problem communicating with the server. Refresh the page.')}");
+        $(document).trigger("error", "${_('There was a problem communicating with the server. Refresh the page.')}");
       }
     });
 
@@ -153,7 +153,7 @@ ${ commonheader(None, "jobbrowser", user) | n,unicode }
               $("a[data-row-selector='true']").jHueRowSelector();
             }
             catch (error) {
-              $.jHueNotify.error(error);
+              $(document).trigger("error", error);
             }
           });
         }
@@ -197,7 +197,7 @@ ${ commonheader(None, "jobbrowser", user) | n,unicode }
                 $("a[data-row-selector='true']").jHueRowSelector();
               }
               catch (error) {
-                $.jHueNotify.error(error);
+                $(document).trigger("error", error);
               }
             }
           }
@@ -346,7 +346,7 @@ ${ commonheader(None, "jobbrowser", user) | n,unicode }
                 _this.button("reset");
                 $("#killModal").modal("hide");
                 if (response.status != 0) {
-                  $.jHueNotify.error("${ _('There was a problem killing this job.') }");
+                  $(document).trigger("error", "${ _('There was a problem killing this job.') }");
                 }
                 else {
                   callJobDetails({ url: _this.data("url")});

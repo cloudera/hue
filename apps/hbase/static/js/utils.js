@@ -140,7 +140,7 @@ function launchModal(modal, data) {
             data.reload();
             element.modal('hide');
           } else {
-            $.jHueNotify.error($(response.response).find('div.alert strong').text());
+            $(document).trigger("error", $(response.response).find('div.alert strong').text());
           }
         },
         onSubmit: function() {

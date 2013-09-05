@@ -35,7 +35,7 @@ var API = {
     }
     var queryObject = {url:url, method:'POST', startTime: new Date().getTime(), status:'running...'}
     var handler = $.post(url, $_POST).error(function(response) {
-      $.jHueNotify.error(JSON.parse(response.responseText).message);
+      $(document).trigger("error", JSON.parse(response.responseText).message);
     });
     var doneHandle = handler.done;
     handler.done = function() {

@@ -296,7 +296,7 @@ ${layout.menubar(section='dashboard')}
                 { "notification":$(this).attr("data-message") },
                 function (response) {
                   if (response["status"] != 0) {
-                    $.jHueNotify.error("${ _('Problem: ') }" + response["data"]);
+                    $(document).trigger("error", "${ _('Problem: ') }" + response["data"]);
                   } else {
                     window.location.reload();
                   }
@@ -389,7 +389,7 @@ ${layout.menubar(section='dashboard')}
                   ]);
                 }
                 catch (error) {
-                  $.jHueNotify.error(error);
+                  $(document).trigger("error", error);
                 }
               }
             }
@@ -432,7 +432,7 @@ ${layout.menubar(section='dashboard')}
             ], false);
           }
           catch (error) {
-            $.jHueNotify.error(error);
+            $(document).trigger("error", error);
           }
         });
         completedTable.fnDraw();

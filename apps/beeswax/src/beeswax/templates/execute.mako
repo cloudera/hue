@@ -463,7 +463,7 @@ ${layout.menubar(section='query')}
 
       var successfunction = function (response, newValue) {
         if (response.status != 0) {
-          $.jHueNotify.error("${ _('Problem: ') }" + response.data);
+          $(document).trigger("error", "${ _('Problem: ') }" + response.data);
         }
       }
 

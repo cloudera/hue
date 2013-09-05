@@ -686,10 +686,10 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
         contentType: 'application/json',
         type: 'POST',
         success: function () {
-          $.jHueNotify.info("${_('Template updated')}");
+          $(document).trigger("info", "${_('Template updated')}");
         },
         error: function (data) {
-          $.jHueNotify.error("${_('Error: ')}" + data);
+          $(document).trigger("error", "${_('Error: ')}" + data);
         },
         complete: function () {
           $("#save-template").button('reset');
