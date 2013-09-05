@@ -450,7 +450,7 @@ def test_last_access_time():
   c.post('/accounts/login/')
   login = desktop.auth.views.get_current_users()
   before_access_time = time.time()
-  response = c.post('/status_bar')
+  response = c.get('/home')
   after_access_time = time.time()
   access = desktop.auth.views.get_current_users()
 
