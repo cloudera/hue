@@ -521,7 +521,7 @@ def dock_jobs(request):
   username = request.user.username
   matching_jobs = get_job_count_by_state(request, username)
   return render("jobs_dock_info.mako", request, {
-    'jobs':matching_jobs
+    'jobs': matching_jobs
   }, force_template=True)
 register_status_bar_view(dock_jobs)
 
