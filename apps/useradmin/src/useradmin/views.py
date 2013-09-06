@@ -352,26 +352,29 @@ def sync_ldap_users_groups(request):
   if request.method == 'POST':
     form = SyncLdapUsersGroupsForm(request.POST)
     if form.is_valid():
-      try:
-        users = sync_ldap_users()
-        groups = sync_ldap_groups()
-      except ldap.LDAPError:
-        LOG.error("LDAP Exception: %s" % e)
-        raise PopupException(_('There was an error when communicating with LDAP'), detail=str(e))
-
-      # Create home dirs for every user sync'd
-      if form.cleaned_data['ensure_home_directory']:
-        for user in users:
-          try:
-            ensure_home_directory(request.fs, user.username)
-          except (IOError, WebHdfsException), e:
-            raise PopupException(_("The import may not be complete, sync again."), detail=e)
+      ensure_home_directory = form.cleaned_data['ensure_home_directory']
+      sync_ldap_users_and_groups(ensure_home_directory, request.fs)
       return redirect(reverse(list_users))
   else:
     form = SyncLdapUsersGroupsForm()
 
   return render("sync_ldap_users_groups.mako", request, dict(path=request.path, form=form))
 
+def sync_ldap_users_and_groups(ensure_home_directory=False, fs=None):
+  try:
+    users = sync_ldap_users()
+    groups = sync_ldap_groups()
+  except ldap.LDAPError, e:
+    LOG.error("LDAP Exception: %s" % e)
+    raise PopupException(_('There was an error when communicating with LDAP'), detail=str(e))
+
+  # Create home dirs for every user sync'd
+  if ensure_home_directory:
+    for user in users:
+      try:
+        ensure_home_directory(fs, user.username)
+      except (IOError, WebHdfsException), e:
+        raise PopupException(_("The import may not be complete, sync again."), detail=e)
 
 def ensure_home_directory(fs, username):
   """
