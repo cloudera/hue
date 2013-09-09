@@ -41,6 +41,7 @@ fi
 build_hadoop
 build_hive
 build_oozie
+build_sqoop
 
 make apps
 
