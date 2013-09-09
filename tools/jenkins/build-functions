@@ -130,3 +130,41 @@ build_oozie() {
   $OOZIE_HOME/bin/oozie-setup.sh prepare-war
   $OOZIE_HOME/bin/ooziedb.sh create -sqlfile oozie.sql -run
 }
+
+
+##########
+SQOOP_URL=${SQOOP_URL:-http://nightly.cloudera.com/cdh4/cdh/4/sqoop2-1.99.2-cdh4.5.0-SNAPSHOT.tar.gz}
+
+SQOOP_TGZ=$(basename $SQOOP_URL)
+SQOOP_VERSION=${SQOOP_TGZ/.tar.gz/}
+SQOOP_CACHE="$HOME/.hue_cache/${SQOOP_TGZ}"
+SQOOP_MTIME_FILE="$HOME/.hue_cache/.sqoop_mtime"
+
+build_sqoop() {
+  if ! check_mtime ${SQOOP_MTIME_FILE} ${SQOOP_URL} || [ ! -f $SQOOP_CACHE ]; then
+    echo "Downloading $SQOOP_URL..."
+    wget $SQOOP_URL -O $SQOOP_CACHE
+  fi
+
+  SQOOP_DIR=$HUE_ROOT/ext/sqoop
+  export SQOOP_HOME="$SQOOP_DIR/${SQOOP_VERSION}"
+
+  mkdir -p $SQOOP_DIR
+  rm -rf $SQOOP_HOME
+  echo "Unpacking $SQOOP_CACHE to $SQOOP_DIR"
+  tar -C $SQOOP_DIR -xzf $SQOOP_CACHE
+  export SQOOP_CONF_DIR=$SQOOP_HOME/server/conf
+
+  rm -rf $SQOOP_DIR/sqoop
+  ln -s $SQOOP_DIR/${SQOOP_VERSION} $SQOOP_DIR/sqoop
+
+  # Change ports and hostnames to be configurable or replaceable
+  sed -i'.bk' 's/12000/${test.port.http}/g' $SQOOP_CONF_DIR/server.xml
+  sed -i'.bk' 's/12001/${test.port.shutdown}/g' $SQOOP_CONF_DIR/server.xml
+  sed -i'.bk' 's/localhost/${test.host.local}/g' $SQOOP_CONF_DIR/server.xml
+  sed -i'.bk' "s|\(common.loader.*$\)|\1,$HADOOP_DIR/hadoop/share/hadoop/common/lib/*.jar,$HADOOP_DIR/hadoop/share/hadoop/mapreduce1/*.jar,$HADOOP_DIR/hadoop/share/hadoop/mapreduce1/lib/*.jar|g" $SQOOP_CONF_DIR/catalina.properties
+  sed -i'.bk' "s|\${catalina\.base}/logs|\${test.log.dir}|g" $SQOOP_CONF_DIR/logging.properties
+  sed -i'.bk' "s|\@LOGDIR\@|\${test.log.dir}|g" $SQOOP_CONF_DIR/sqoop.properties
+  sed -i'.bk' "s|\@BASEDIR\@|\${test.base.dir}|g" $SQOOP_CONF_DIR/sqoop.properties
+  sed -i'.bk' "s|/etc/hadoop/conf|\${test.hadoop.conf.dir}|g" $SQOOP_CONF_DIR/sqoop.properties
+}
