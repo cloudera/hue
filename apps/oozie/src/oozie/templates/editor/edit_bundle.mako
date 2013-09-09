@@ -521,6 +521,6 @@ ${ layout.menubar(section='bundles') }
 % endif
 
 
-${ utils.decorate_datetime_fields() }
+${ utils.decorate_datetime_fields(False) }
 
 ${ commonfooter(messages) | n,unicode }

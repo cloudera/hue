@@ -61,6 +61,6 @@ ${ layout.menubar(section='bundles') }
   </form>
 </div>
 
-${ utils.decorate_datetime_fields() }
+${ utils.decorate_datetime_fields(False) }
 
 ${ commonfooter(messages) | n,unicode }

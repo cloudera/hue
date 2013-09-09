@@ -361,7 +361,7 @@
 </%def>
 
 
-<%def name="decorate_datetime_fields()">
+<%def name="decorate_datetime_fields(is_range=True)">
 
   <link rel="stylesheet" href="/static/ext/css/bootstrap-datepicker.min.css" type="text/css" media="screen" title="no title" charset="utf-8" />
   <link rel="stylesheet" href="/static/ext/css/bootstrap-timepicker.min.css" type="text/css" media="screen" title="no title" charset="utf-8" />
@@ -393,6 +393,15 @@
 
       $(".dateInput").parent().datepicker({
         format:DATE_FORMAT.toLowerCase()
+      });
+
+      $(".dateInput").on("change", function () {
+        var _this = $(this);
+        var startDate = moment(_this.val() + " " + _this.parent().parent().find(".timepicker-default").val(), DATETIME_FORMAT);
+        _this.parent().datepicker('setValue', startDate.format(DATE_FORMAT));
+        %if is_range:
+          rangeHandler(_this.attr("name").indexOf("start") > -1);
+        %endif
       });
 
       $("input[name='start_0']").parent().datepicker().on("changeDate", function () {
