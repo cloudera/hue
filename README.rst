@@ -15,8 +15,8 @@ applications. It features:
       * Search app for querying Solr and Solr Cloud
       * Job Browser for accessing MapReduce jobs (MR1/MR2-YARN)
       * Job Designer for creating MapReduce/Streaming/Java jobs
-      * A Sqoop2 editor and dashboard
-      * A Zookeeper browser and editor
+      * A Sqoop 2 editor and dashboard
+      * A ZooKeeper browser and editor
 
 On top of that, a SDK is available for creating new apps integrated with Hadoop.
 
