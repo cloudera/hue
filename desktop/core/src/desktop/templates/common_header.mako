@@ -100,7 +100,8 @@ from django.utils.translation import ugettext as _
     jHueTourGlobals = {
       labels: {
         AVAILABLE_TOURS: "${_('Available tours')}",
-        NO_AVAILABLE_TOURS: "${_('None for this page.')}"
+        NO_AVAILABLE_TOURS: "${_('None for this page.')}",
+        MORE_INFO: "${_('More info...')}"
       }
     };
 

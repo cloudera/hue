@@ -1321,3 +1321,8 @@ a#advanced-btn:hover {
   padding: 25px 20px!important;
   margin-left: -290px!important;
 }
+
+#jHueTourVideoPlayer {
+  margin-left: -320px!important;
+  width: 640px;
+}

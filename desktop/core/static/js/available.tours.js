@@ -16,3 +16,20 @@
 
 
 // put the tours here
+$.jHueTour({
+   "tours":[
+      {
+         "name":"pigvideo1",
+         "desc":"Preparing the data for analysis with<br/> Pig and Python UDF",
+         "path":"/pig",
+         "video": "http://player.vimeo.com/video/73849021",
+         "blog": "http://gethue.tumblr.com/post/60376973455/hadoop-tutorials-ii-1-prepare-the-data-for-analysis"
+      },
+       {
+         "name":"pigvideo2",
+         "desc":"The Pig Editor",
+         "path":"/pig",
+         "video": "http://player.vimeo.com/video/66661052"
+      }
+   ]
+});

@@ -41,12 +41,14 @@
                 placement: "bottom",
                 left: "100px"
               }, ...
-            ]
+            ],
+            video: "http://player.vimeo.com/xxxxx", <-- instead of the steps you can specify a video and it will be displayed in a modal
+            blog: "http://gethue.tumblr.com/yyyyy" <-- if specified, a link to this with a "More info..." label will be placed under the video in the modal
           }, ...
         ]
       });
 
-  Calling $.jHueTour({tours: [...]}) more than once will merge the tour data, so you can keep adding tours dinamically to the same page
+  Calling $.jHueTour({tours: [...]}) more than once will merge the tour data, so you can keep adding tours dynamically to the same page
 
   You can interact with:
   - $.jHueTour("start") / $.jHueTour("show") / $.jHueTour("play") : starts the first available tour
@@ -59,12 +61,12 @@
  */
 
 (function ($, window, document, undefined) {
-
   var pluginName = "jHueTour",
     defaults = {
       labels: {
         AVAILABLE_TOURS: "Available tours",
-        NO_AVAILABLE_TOURS: "None for this page"
+        NO_AVAILABLE_TOURS: "None for this page",
+        MORE_INFO: "More info..."
       },
       tours: [],
       showRemote: false,
@@ -88,9 +90,12 @@
     this.currentTour = {
       name: "",
       path: "",
+      desc: "",
       remote: false,
       steps: [],
-      shownStep: 0
+      shownStep: 0,
+      video: "",
+      blog: ""
     };
     this.init();
   }
@@ -136,6 +141,7 @@
         if (tour.path === undefined || RegExp(tour.path).test(location.pathname)) {
           var _tourDone = '';
           var _removeTour = '';
+          var _videoIcon = '';
           if ($.totalStorage !== undefined) {
             var _key = location.pathname;
             if (tour.path !== undefined && tour.path != "") {
@@ -149,7 +155,11 @@
           if (tour.remote) {
             _removeTour = '<div style="color:red;float:right;margin:4px;cursor: pointer" onclick="javascript:$.jHueTour(\'remove_' + tour.name + '\')"><i class="icon-remove-sign"></i></div>';
           }
-          _toursHtml += '<li>' + _removeTour + _tourDone + '<a href="javascript:$.jHueTour(\'' + tour.name + '\', 1)" style="padding-left:0">' + tour.desc + '</a></li>';
+
+          if (typeof tour.video != "undefined" && tour.video != null && tour.video != ""){
+            _videoIcon = '<i class="icon-youtube-play"></i> ';
+          }
+          _toursHtml += '<li>' + _removeTour + _tourDone + '<a href="javascript:$.jHueTour(\'' + tour.name + '\', 1)" style="padding-left:0">' + _videoIcon + tour.desc + '</a></li>';
           _added++;
         }
       });
@@ -185,7 +195,7 @@
     _questionMark.click(function () {
 
       var _closeBtn = $("<a>");
-      _closeBtn.addClass("btn").addClass("btn-mini").html('<i class="icon-remove"></i>').css("float", "right").css("margin-top", "-4px").css("margin-right", "-6px");
+      _closeBtn.html('<i class="icon-remove"></i>').addClass("btn-mini").css("cursor", "pointer").css("margin-left", "7px").css("float", "right").css("margin-top", "-4px").css("margin-right", "-6px");
       _closeBtn.click(function () {
         $(".popover").remove();
       });
@@ -299,6 +309,9 @@
         _this.currentTour.name = _this.options.tours[0].name;
         _this.currentTour.path = _this.options.tours[0].path;
         _this.currentTour.steps = _this.options.tours[0].steps;
+        _this.currentTour.desc = _this.options.tours[0].desc;
+        _this.currentTour.video = _this.options.tours[0].video;
+        _this.currentTour.blog = _this.options.tours[0].blog;
       }
       this.showStep(1);
     }
@@ -333,6 +346,9 @@
           _this.currentTour.name = tour.name;
           _this.currentTour.path = tour.path;
           _this.currentTour.steps = tour.steps;
+          _this.currentTour.desc = tour.desc;
+          _this.currentTour.video = tour.video;
+          _this.currentTour.blog = tour.blog;
           if (stepNo === undefined) {
             _this.showStep(1);
           }
@@ -347,105 +363,131 @@
 
   Plugin.prototype.showStep = function (stepNo) {
     var _this = this;
-    if (_this.currentTour.steps[stepNo - 1] != null) {
-      var _step = _this.currentTour.steps[stepNo - 1];
-      _this.currentTour.shownStep = stepNo;
-      var _navigation = "";
-
-      if (_step.visitUrl != undefined) {
-        location.href = _step.visitUrl;
+    if (typeof _this.currentTour.video != "undefined" && _this.currentTour.video != null && _this.currentTour.video != "") {
+      if ($("#jHueTourVideoPlayer").length == 0) {
+        var _playerHTML = '<div class="modal-header">' +
+            '<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>' +
+            '<h3>' + _this.currentTour.desc + '</h3>' +
+            '</div>' +
+            '<div class="modal-body">' +
+            '<iframe id="jHueTourVideoFrame" src="' + _this.currentTour.video + '?autoplay=1" width="700" height="350" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen="" style="height:360px;width:640px"></iframe><div class="moreInfo">' +
+            (typeof _this.currentTour.blog != "undefined" && _this.currentTour.blog != "" ? '<a href="' + _this.currentTour.blog + '" target="_blank"><i class="icon-link"></i> ' + _this.options.labels.MORE_INFO + '</a>' : '') +
+            '</div></div>';
+        var _player = $("<div>").attr("id", "jHueTourVideoPlayer").addClass("modal").addClass("hide").addClass("fade");
+        _player.html(_playerHTML);
+        _player.appendTo($("body"));
       }
-
-      if (_step.onShown != undefined) {
-        window.setTimeout(_step.onShown, 10);
+      else {
+        $("#jHueTourVideoPlayer").find("h3").text(_this.currentTour.desc);
+        $("#jHueTourVideoPlayer").find(".moreInfo").html(typeof _this.currentTour.blog != "undefined" && _this.currentTour.blog != "" ? '<a href="' + _this.currentTour.blog + '" target="_blank"><i class="icon-link"></i> ' + _this.options.labels.MORE_INFO + '</a>' : '');
+        $("#jHueTourVideoFrame").attr("src", _this.currentTour.video + "?autoplay=1");
       }
-
-      $(".popover").remove();
-      $(".jHueTourExposed").removeClass("jHueTourExposed");
-      if ($(".jHueTourExposed").css("position") == "relative") {
-        $(".jHueTourExposed").css("position", "relative");
-      }
-      $("#jHueTourMask").width($(document).width()).height($(document).height()).show();
-
-      var _closeBtn = $("<a>");
-      _closeBtn.addClass("btn").addClass("btn-mini").html('<i class="icon-remove"></i>').css("float", "right").css("margin-top", "-4px").css("margin-right", "-6px");
-      _closeBtn.click(function () {
-        _this.performOperation("close");
+      $("#jHueTourVideoPlayer").modal().modal("show");
+      $("#jHueTourVideoPlayer").on("hidden", function () {
+        $("#jHueTourVideoFrame").attr("src", "about:blank");
       });
+    }
+    else {
+      if (_this.currentTour.steps[stepNo - 1] != null) {
+        var _step = _this.currentTour.steps[stepNo - 1];
+        _this.currentTour.shownStep = stepNo;
+        var _navigation = "";
 
-      var _nextBtn = $("<a>");
-      _nextBtn.addClass("btn").addClass("btn-mini").html('<i class="icon-chevron-sign-right"></i>').css("margin-top", "10px");
-      _nextBtn.click(function () {
-        _this.showStep(_this.currentTour.shownStep + 1);
-      });
-
-      var _prevBtn = $("<a>");
-      _prevBtn.addClass("btn").addClass("btn-mini").html('<i class="icon-chevron-sign-left"></i>').css("margin-top", "10px").css("margin-right", "10px");
-      _prevBtn.click(function () {
-        _this.showStep(_this.currentTour.shownStep - 1);
-      });
-
-      var _arrowOn = _step.arrowOn;
-      var _additionalContent = "";
-      if ($(_arrowOn).length == 0 || !($(_arrowOn).is(":visible"))){
-        _arrowOn = "body";
-        _additionalContent = "<b>MISSING POINTER OF STEP "+ _this.currentTour.shownStep +"</b> ";
-      }
-      $(_arrowOn).popover('destroy').popover({
-        title: _step.title,
-        content: _additionalContent + _step.content + "<br/>",
-        html: true,
-        trigger: 'manual',
-        placement: (_step.placement != "" && _step.placement != undefined) ? _step.placement : "left"
-      }).popover('show');
-
-      if (_step.top != undefined) {
-        if ($.isNumeric(_step.top)) {
-          $(".popover").css("top", ($(".popover").position().top + _step.top) + "px");
+        if (_step.visitUrl != undefined) {
+          location.href = _step.visitUrl;
         }
-        else {
-          $(".popover").css("top", _step.top);
-        }
-      }
 
-      if (_step.left != undefined) {
-        if ($.isNumeric(_step.left)) {
-          $(".popover").css("left", ($(".popover").position().left + _step.left) + "px");
+        if (_step.onShown != undefined) {
+          window.setTimeout(_step.onShown, 10);
         }
-        else {
-          $(".popover").css("left", _step.left);
-        }
-      }
-      $(".popover-title").html(_step.title);
-      _closeBtn.prependTo($(".popover-title"));
 
-      if (_this.currentTour.shownStep > 1) {
-        _prevBtn.appendTo($(".popover-content p"));
-      }
-      if (_this.currentTour.shownStep < _this.currentTour.steps.length && (_step.waitForAction == undefined || _step.waitForAction == false)) {
-        _nextBtn.appendTo($(".popover-content p"));
-      }
-
-      // last step, mark tour/tutorial as done
-      if ($.totalStorage !== undefined && _this.currentTour.shownStep == _this.currentTour.steps.length) {
-        var _key = location.pathname;
-        if (_this.currentTour.path !== undefined && _this.currentTour.path != "") {
-          _key = _this.currentTour.path;
+        $(".popover").remove();
+        $(".jHueTourExposed").removeClass("jHueTourExposed");
+        if ($(".jHueTourExposed").css("position") == "relative") {
+          $(".jHueTourExposed").css("position", "relative");
         }
-        _key += "_" + _this.currentTour.name;
-        var _history = $.totalStorage("jHueTourHistory");
-        if (_history == null) {
-          _history = {}
-        }
-        _history[_key] = true;
-        $.totalStorage("jHueTourHistory", _history);
-      }
+        $("#jHueTourMask").width($(document).width()).height($(document).height()).show();
 
-      var _exposedElement = $((_step.expose != undefined && _step.expose != "" ? _step.expose : _arrowOn));
-      if (_exposedElement.css("position") === undefined || _exposedElement.css("position") != "fixed") {
-        _exposedElement.css("position", "relative");
+        var _closeBtn = $("<a>");
+        _closeBtn.addClass("btn").addClass("btn-mini").html('<i class="icon-remove"></i>').css("float", "right").css("margin-top", "-4px").css("margin-right", "-6px");
+        _closeBtn.click(function () {
+          _this.performOperation("close");
+        });
+
+        var _nextBtn = $("<a>");
+        _nextBtn.addClass("btn").addClass("btn-mini").html('<i class="icon-chevron-sign-right"></i>').css("margin-top", "10px");
+        _nextBtn.click(function () {
+          _this.showStep(_this.currentTour.shownStep + 1);
+        });
+
+        var _prevBtn = $("<a>");
+        _prevBtn.addClass("btn").addClass("btn-mini").html('<i class="icon-chevron-sign-left"></i>').css("margin-top", "10px").css("margin-right", "10px");
+        _prevBtn.click(function () {
+          _this.showStep(_this.currentTour.shownStep - 1);
+        });
+
+        var _arrowOn = _step.arrowOn;
+        var _additionalContent = "";
+        if ($(_arrowOn).length == 0 || !($(_arrowOn).is(":visible"))) {
+          _arrowOn = "body";
+          _additionalContent = "<b>MISSING POINTER OF STEP " + _this.currentTour.shownStep + "</b> ";
+        }
+        $(_arrowOn).popover('destroy').popover({
+          title: _step.title,
+          content: _additionalContent + _step.content + "<br/>",
+          html: true,
+          trigger: 'manual',
+          placement: (_step.placement != "" && _step.placement != undefined) ? _step.placement : "left"
+        }).popover('show');
+
+        if (_step.top != undefined) {
+          if ($.isNumeric(_step.top)) {
+            $(".popover").css("top", ($(".popover").position().top + _step.top) + "px");
+          }
+          else {
+            $(".popover").css("top", _step.top);
+          }
+        }
+
+        if (_step.left != undefined) {
+          if ($.isNumeric(_step.left)) {
+            $(".popover").css("left", ($(".popover").position().left + _step.left) + "px");
+          }
+          else {
+            $(".popover").css("left", _step.left);
+          }
+        }
+        $(".popover-title").html(_step.title);
+        _closeBtn.prependTo($(".popover-title"));
+
+        if (_this.currentTour.shownStep > 1) {
+          _prevBtn.appendTo($(".popover-content p"));
+        }
+        if (_this.currentTour.shownStep < _this.currentTour.steps.length && (_step.waitForAction == undefined || _step.waitForAction == false)) {
+          _nextBtn.appendTo($(".popover-content p"));
+        }
+
+        // last step, mark tour/tutorial as done
+        if ($.totalStorage !== undefined && _this.currentTour.shownStep == _this.currentTour.steps.length) {
+          var _key = location.pathname;
+          if (_this.currentTour.path !== undefined && _this.currentTour.path != "") {
+            _key = _this.currentTour.path;
+          }
+          _key += "_" + _this.currentTour.name;
+          var _history = $.totalStorage("jHueTourHistory");
+          if (_history == null) {
+            _history = {}
+          }
+          _history[_key] = true;
+          $.totalStorage("jHueTourHistory", _history);
+        }
+
+        var _exposedElement = $((_step.expose != undefined && _step.expose != "" ? _step.expose : _arrowOn));
+        if (_exposedElement.css("position") === undefined || _exposedElement.css("position") != "fixed") {
+          _exposedElement.css("position", "relative");
+        }
+        _exposedElement.addClass("jHueTourExposed");
       }
-      _exposedElement.addClass("jHueTourExposed");
     }
   };
 
