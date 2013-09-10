@@ -16,6 +16,7 @@ applications. It features:
       * JobBrowser for accessing MapReduce jobs (MR1/MR2-YARN)
       * Job Designer for creating MapReduce/Streaming/Java jobs
       * A Pig/HBase/Sqoop2 shell
+      * A Sqoop 2 editor and dashboard
 
 On top of that, a SDK is available for creating new apps integrated with Hadoop.
 
