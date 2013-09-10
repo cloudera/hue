@@ -352,15 +352,15 @@ def sync_ldap_users_groups(request):
   if request.method == 'POST':
     form = SyncLdapUsersGroupsForm(request.POST)
     if form.is_valid():
-      ensure_home_directory = form.cleaned_data['ensure_home_directory']
-      sync_ldap_users_and_groups(ensure_home_directory, request.fs)
+      is_ensuring_home_directory = form.cleaned_data['ensure_home_directory']
+      sync_ldap_users_and_groups(is_ensuring_home_directory, request.fs)
       return redirect(reverse(list_users))
   else:
     form = SyncLdapUsersGroupsForm()
 
   return render("sync_ldap_users_groups.mako", request, dict(path=request.path, form=form))
 
-def sync_ldap_users_and_groups(ensure_home_directory=False, fs=None):
+def sync_ldap_users_and_groups(is_ensuring_home_directory=False, fs=None):
   try:
     users = sync_ldap_users()
     groups = sync_ldap_groups()
@@ -369,7 +369,7 @@ def sync_ldap_users_and_groups(ensure_home_directory=False, fs=None):
     raise PopupException(_('There was an error when communicating with LDAP'), detail=str(e))
 
   # Create home dirs for every user sync'd
-  if ensure_home_directory:
+  if is_ensuring_home_directory:
     for user in users:
       try:
         ensure_home_directory(fs, user.username)
