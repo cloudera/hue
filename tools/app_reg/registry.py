@@ -107,9 +107,7 @@ class AppRegistry(object):
     """Save and write out the registry"""
     assert self._initialized, "Registry not yet initialized"
 
-    tmp_path = self._reg_path + '.new'
-    self._write(tmp_path)
-    os.rename(tmp_path, self._reg_path)
+    self._write(self._reg_path)
     LOG.info('=== Saved registry at %s' % (self._reg_path,))
 
 
