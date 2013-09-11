@@ -91,8 +91,8 @@ ADMIN_MEDIA_PREFIX = '/media/'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.load_template_source',
-    'desktop.lib.template_loader.load_template_source',
+  'django.template.loaders.filesystem.Loader',
+  'django.template.loaders.app_directories.Loader'
 )
 
 MIDDLEWARE_CLASSES = [
@@ -169,6 +169,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 AUTH_PROFILE_MODULE=None
 
 LOGIN_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "/" # For djangosaml2 bug.
 
 PYLINTRC = get_desktop_root('.pylintrc')
 

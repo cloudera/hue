@@ -18,7 +18,7 @@
 from djangosaml2.views import login, echo_attributes, metadata, assertion_consumer_service
 
 
-__all__ = ['login', 'echo_attributes']
+__all__ = ['login', 'echo_attributes', 'assertion_consumer_service', 'metadata']
 
 
 setattr(login, 'login_notrequired', True)
