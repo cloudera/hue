@@ -463,7 +463,7 @@ def expand_exception(exc, db, handle=None):
     # Always show something, even if server has died on the job.
     log = _("Could not retrieve logs: %s." % e)
 
-  if not exc.message:
+  if not hasattr(exc, 'message'):
     error_message = _("Unknown exception.")
   else:
     error_message = force_unicode(exc.message, strings_only=True, errors='replace')
