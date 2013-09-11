@@ -105,3 +105,15 @@ USER_ATTRIBUTE_MAPPING = Config(
   default={'uid': ('username', )},
   type=dict_list_map,
   help=_t("A mapping from attributes in the response from the IdP to django user attributes."))
+
+AUTHN_REQUESTS_SIGNED = Config(
+  key="authn_requests_signed",
+  default=False,
+  type=coerce_bool,
+  help=_t("Have Hue initiated authn requests be signed and provide a certificate."))
+
+LOGOUT_REQUESTS_SIGNED = Config(
+  key="logout_requests_signed",
+  default=False,
+  type=coerce_bool,
+  help=_t("Have Hue initiated logout requests be signed and provide a certificate."))

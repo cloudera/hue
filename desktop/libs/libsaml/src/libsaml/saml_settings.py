@@ -54,7 +54,7 @@ SAML_CONFIG = {
         # do not change the binding or service name
         'single_logout_service': [
           ("%s/saml2/ls/" % BASE_URL, saml2.BINDING_HTTP_REDIRECT),
-        ],
+        ]
       },
 
       'allow_unsolicited': libsaml.conf.ALLOW_UNSOLICITED.get(),
@@ -63,7 +63,7 @@ SAML_CONFIG = {
       'required_attributes': libsaml.conf.REQUIRED_ATTRIBUTES.get(),
 
       # attributes that may be useful to have but not required
-      'optional_attributes': libsaml.conf.OPTIONAL_ATTRIBUTES.get(),
+      'optional_attributes': libsaml.conf.OPTIONAL_ATTRIBUTES.get()
     },
   },
 
@@ -77,7 +77,10 @@ SAML_CONFIG = {
 
   # certificate
   'key_file': libsaml.conf.KEY_FILE.get(),
-  'cert_file': libsaml.conf.CERT_FILE.get()
+  'cert_file': libsaml.conf.CERT_FILE.get(),
+
+  'logout_requests_signed': str(libsaml.conf.LOGOUT_REQUESTS_SIGNED.get()).lower(),
+  'authn_requests_signed': str(libsaml.conf.AUTHN_REQUESTS_SIGNED.get()).lower()
 }
 
 SAML_ATTRIBUTE_MAPPING = libsaml.conf.USER_ATTRIBUTE_MAPPING.get()
