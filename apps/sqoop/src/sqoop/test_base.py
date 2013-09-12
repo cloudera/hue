@@ -45,8 +45,8 @@ class SqoopServerProvider(object):
   """
   Setup a Sqoop server.
   """
-  TEST_PORT = '18080'
-  TEST_SHUTDOWN_PORT = '18081'
+  TEST_PORT = '19080'
+  TEST_SHUTDOWN_PORT = '19081'
   HOME = get_run_root('ext/sqoop/sqoop')
 
   requires_hadoop = True
