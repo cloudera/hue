@@ -60,6 +60,7 @@ class PseudoHdfs4(object):
 
   def __init__(self):
     self._tmpdir = tempfile.mkdtemp(prefix='tmp_hue_')
+    os.chmod(self._tmpdir, 0755)
     self._superuser = getpass.getuser()
     self._fs = None
     self._jt = None
