@@ -300,6 +300,20 @@ ${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
         $("<option>").attr("value", item.label).text(item.label).data("field", item.field).data("asc", item.asc).appendTo($(".sort-by"));
       });
       var activeSorting = "${solr_query.get("sort", "")}";
+      if (activeSorting == ""){
+        // if the default sorting is just on one field, select that one
+        var _defaultSorting = "";
+        var _defaultSortingCnt = 0;
+        $.each(sortingData.fields, function (index, item) {
+          if (item.include) {
+            _defaultSorting = item.label;
+            _defaultSortingCnt++;
+          }
+        });
+        if (_defaultSortingCnt == 1){
+          $(".sort-by").val(_defaultSorting);
+        }
+      }
       if (activeSorting != "" && activeSorting.indexOf(" ") > -1) {
         $.each(sortingData.fields, function (index, item) {
           if (item.field == activeSorting.split(" ")[0] && item.asc == (activeSorting.split(" ")[1] == "asc")) {

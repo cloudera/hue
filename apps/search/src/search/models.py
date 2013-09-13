@@ -177,7 +177,10 @@ class Sorting(models.Model):
           ('sort', client_query.get('sort')),
         )
       elif data_dict.get('fields'):
-        fields = ['%s %s' % (field['field'], field['asc'] and 'asc' or 'desc') for field in data_dict.get('fields')]
+        fields = []
+        for field in data_dict.get('fields'):
+          if field['include']:
+            fields.append('%s %s' % (field['field'], field['asc'] and 'asc' or 'desc'))
         params += (
           ('sort', ','.join(fields)),
         )
