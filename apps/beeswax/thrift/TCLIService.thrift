@@ -38,7 +38,10 @@ namespace cpp apache.hive.service.cli.thrift
 // List of protocol versions. A new token should be
 // added to the end of this list every time a change is made.
 enum TProtocolVersion {
-  HIVE_CLI_SERVICE_PROTOCOL_V1
+  HIVE_CLI_SERVICE_PROTOCOL_V1,
+
+  // V2 adds support for asynchronous execution
+  HIVE_CLI_SERVICE_PROTOCOL_V2
 }
 
 enum TTypeId {
@@ -57,21 +60,25 @@ enum TTypeId {
   STRUCT_TYPE,
   UNION_TYPE,
   USER_DEFINED_TYPE,
-  DECIMAL_TYPE
+  DECIMAL_TYPE,
+  NULL_TYPE,
+  DATE_TYPE
 }
 
 const set<TTypeId> PRIMITIVE_TYPES = [
-  TTypeId.BOOLEAN_TYPE
-  TTypeId.TINYINT_TYPE
-  TTypeId.SMALLINT_TYPE
-  TTypeId.INT_TYPE
-  TTypeId.BIGINT_TYPE
-  TTypeId.FLOAT_TYPE
-  TTypeId.DOUBLE_TYPE
-  TTypeId.STRING_TYPE
-  TTypeId.TIMESTAMP_TYPE
+  TTypeId.BOOLEAN_TYPE,
+  TTypeId.TINYINT_TYPE,
+  TTypeId.SMALLINT_TYPE,
+  TTypeId.INT_TYPE,
+  TTypeId.BIGINT_TYPE,
+  TTypeId.FLOAT_TYPE,
+  TTypeId.DOUBLE_TYPE,
+  TTypeId.STRING_TYPE,
+  TTypeId.TIMESTAMP_TYPE,
   TTypeId.BINARY_TYPE,
-  TTypeId.DECIMAL_TYPE
+  TTypeId.DECIMAL_TYPE,
+  TTypeId.NULL_TYPE
+  TTypeId.DATE_TYPE
 ]
 
 const set<TTypeId> COMPLEX_TYPES = [
@@ -101,8 +108,10 @@ const map<TTypeId,string> TYPE_NAMES = {
   TTypeId.ARRAY_TYPE: "ARRAY",
   TTypeId.MAP_TYPE: "MAP",
   TTypeId.STRUCT_TYPE: "STRUCT",
-  TTypeId.UNION_TYPE: "UNIONTYPE"
-  TTypeId.DECIMAL_TYPE: "DECIMAL"
+  TTypeId.UNION_TYPE: "UNIONTYPE",
+  TTypeId.DECIMAL_TYPE: "DECIMAL",
+  TTypeId.NULL_TYPE: "NULL"
+  TTypeId.DATE_TYPE: "DATE"
 }
 
 // Thrift does not support recursively defined types or forward declarations,
@@ -285,7 +294,7 @@ union TColumnValue {
   4: TI32Value    i32Val       // INT
   5: TI64Value    i64Val       // BIGINT, TIMESTAMP
   6: TDoubleValue doubleVal    // FLOAT, DOUBLE
-  7: TStringValue stringVal    // STRING, LIST, MAP, STRUCT, UNIONTYPE, BINARY, DECIMAL
+  7: TStringValue stringVal    // STRING, LIST, MAP, STRUCT, UNIONTYPE, BINARY, DECIMAL, NULL
 }
 
 // Represents a row in a rowset.
@@ -350,6 +359,9 @@ enum TOperationState {
 
   // The operation is in an unrecognized state
   UKNOWN_STATE,
+
+  // The operation is in an pending state
+  PENDING_STATE,
 }
 
 
@@ -446,7 +458,7 @@ struct TOperationHandle {
 // which operations may be executed.
 struct TOpenSessionReq {
   // The version of the HiveServer2 protocol that the client is using.
-  1: required TProtocolVersion client_protocol = TProtocolVersion.HIVE_CLI_SERVICE_PROTOCOL_V1
+  1: required TProtocolVersion client_protocol = TProtocolVersion.HIVE_CLI_SERVICE_PROTOCOL_V2
 
   // Username and password for authentication.
   // Depending on the authentication scheme being used,
@@ -465,7 +477,7 @@ struct TOpenSessionResp {
   1: required TStatus status
 
   // The protocol version that the server is using.
-  2: required TProtocolVersion serverProtocolVersion = TProtocolVersion.HIVE_CLI_SERVICE_PROTOCOL_V1
+  2: required TProtocolVersion serverProtocolVersion = TProtocolVersion.HIVE_CLI_SERVICE_PROTOCOL_V2
 
   // Session Handle
   3: optional TSessionHandle sessionHandle
@@ -576,7 +588,7 @@ struct TGetInfoResp {
 // status of the statement, and to fetch results once the
 // statement has finished executing.
 struct TExecuteStatementReq {
-  // The session to exexcute the statement against
+  // The session to execute the statement against
   1: required TSessionHandle sessionHandle
 
   // The statement to be executed (DML, DDL, SET, etc)
@@ -587,13 +599,15 @@ struct TExecuteStatementReq {
   // is executed. These properties apply to this statement
   // only and will not affect the subsequent state of the Session.
   3: optional map<string, string> confOverlay
+
+  // Execute asynchronously when runAsync is true
+  4: optional bool runAsync = false
 }
 
 struct TExecuteStatementResp {
   1: required TStatus status
   2: optional TOperationHandle operationHandle
 }
-
 
 // GetTypeInfo()
 //
@@ -1013,4 +1027,3 @@ service TCLIService {
 
   TGetLogResp GetLog(1:TGetLogReq req);
 }
-

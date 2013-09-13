@@ -166,6 +166,7 @@ class HiveServerQueryHistory(QueryHistory):
     TOperationState.CLOSED_STATE         : QueryHistory.STATE.expired,
     TOperationState.ERROR_STATE        : QueryHistory.STATE.failed,
     TOperationState.UKNOWN_STATE        : QueryHistory.STATE.failed,
+    TOperationState.PENDING_STATE        : QueryHistory.STATE.submitted,
   }
 
   node_type = HIVE_SERVER2
