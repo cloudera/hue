@@ -113,6 +113,12 @@ class Dbms:
 
   def select_star_from(self, database, table):
     hql = "SELECT * FROM `%s.%s` %s" % (database, table.name, self._get_browse_limit_clause(table))
+    if table.partition_keys:
+      partitions = self.get_partitions(database, table, 10)
+      partition_query = ""
+      for idx, key in enumerate(partitions[0].values):
+        partition_query += (idx > 0 and " AND " or "") + table.partition_keys[idx].name + "='%s'" % key
+      hql = "SELECT * FROM `%s.%s` WHERE %s %s" % (database, table.name, partition_query, self._get_browse_limit_clause(table))
     return self.execute_statement(hql)
 
 
@@ -152,6 +158,12 @@ class Dbms:
     if not table.is_view:
       limit = min(100, BROWSE_PARTITIONED_TABLE_LIMIT.get())
       hql = "SELECT * FROM `%s.%s` LIMIT %s" % (database, table.name, limit)
+      if table.partition_keys:
+        partitions = self.get_partitions(database, table, 10)
+        partition_query = ""
+        for idx, key in enumerate(partitions[0].values):
+          partition_query += (idx > 0 and " AND " or "") + table.partition_keys[idx].name + "='%s'" % key
+        hql = "SELECT * FROM `%s.%s` WHERE %s %s" % (database, table.name, partition_query, self._get_browse_limit_clause(table))
       query = hql_query(hql)
       handle = self.execute_and_wait(query, timeout_sec=5.0)
 
