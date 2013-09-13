@@ -290,20 +290,30 @@ class LdapBackend(object):
       LOG.warn("Could not find LDAP URL required for authentication.")
       return None
 
-    # New Search/Bind Auth
-    base_dn = desktop.conf.LDAP.BASE_DN.get()
-    user_name_attr = desktop.conf.LDAP.USERS.USER_NAME_ATTR.get()
+    if desktop.conf.LDAP.SEARCH_BIND_AUTHENTICATION.get():
+      # New Search/Bind Auth
+      base_dn = desktop.conf.LDAP.BASE_DN.get()
+      user_name_attr = desktop.conf.LDAP.USERS.USER_NAME_ATTR.get()
 
-    if desktop.conf.LDAP.BIND_DN.get():
-      bind_dn = desktop.conf.LDAP.BIND_DN.get()
-      ldap_settings.AUTH_LDAP_BIND_DN = bind_dn
-      bind_password = desktop.conf.LDAP.BIND_PASSWORD.get()
-      ldap_settings.AUTH_LDAP_BIND_PASSWORD = bind_password
+      if desktop.conf.LDAP.BIND_DN.get():
+        bind_dn = desktop.conf.LDAP.BIND_DN.get()
+        ldap_settings.AUTH_LDAP_BIND_DN = bind_dn
+        bind_password = desktop.conf.LDAP.BIND_PASSWORD.get()
+        ldap_settings.AUTH_LDAP_BIND_PASSWORD = bind_password
 
-    search_bind_results = LDAPSearch(base_dn,
-        ldap.SCOPE_SUBTREE, "(" + user_name_attr + "=%(user)s)")
+      search_bind_results = LDAPSearch(base_dn,
+          ldap.SCOPE_SUBTREE, "(" + user_name_attr + "=%(user)s)")
 
-    ldap_settings.AUTH_LDAP_USER_SEARCH = search_bind_results
+      ldap_settings.AUTH_LDAP_USER_SEARCH = search_bind_results
+    else:
+      nt_domain = desktop.conf.LDAP.NT_DOMAIN.get()
+      if nt_domain is None:
+        pattern = desktop.conf.LDAP.LDAP_USERNAME_PATTERN.get()
+        pattern = pattern.replace('<username>', '%(user)s')
+        ldap_settings.AUTH_LDAP_USER_DN_TEMPLATE = pattern
+      else:
+        # %(user)s is a special string that will get replaced during the authentication process
+        ldap_settings.AUTH_LDAP_USER_DN_TEMPLATE = "%(user)s@" + nt_domain
 
     # Certificate-related config settings
     if desktop.conf.LDAP.LDAP_CERT.get():
