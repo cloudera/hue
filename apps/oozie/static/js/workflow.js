@@ -704,7 +704,12 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
 
       methodChooser(self.registry.get(self.start()), self.nodes, false, true);
       $(".tooltip").remove();
-      $("*[rel=tooltip]").tooltip();
+      $("[relz=tooltip]").tooltip({placement: "left", delay: 0});
+      $("[relz=tooltip]").hover(function () {
+        $(".tooltip").css("left", parseInt($(".tooltip").css("left")) - 10 + "px");
+      }, function () {
+        $(".tooltip").remove();
+      });
     },
 
     rebuild: function() {

@@ -618,6 +618,7 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
   ko.applyBindings(viewModel);
 
   var HIVE_AUTOCOMPLETE_BASE_URL = "${ autocomplete_base_url | n,unicode }";
+  var HIVE_AUTOCOMPLETE_FAILS_SILENTLY_ON = [503]; // error codes from beeswax/views.py - autocomplete
 
   var codeMirror;
 
@@ -866,15 +867,11 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
       $("#runScriptBtn").button("loading");
       $("#withoutLogs").removeClass("hide");
       $("#withLogs").addClass("hide").text("");
-      showAlert("${_('Running')} <b>" + viewModel.currentScript().name() + "</b>...", "info");
+      showAlert("${_('Running')} <b>" + viewModel.currentScript().name() + "</b>...");
     });
 
     $(document).on("saved", function () {
-      showAlert("<b>" + viewModel.currentScript().name() + "</b> ${_('has been saved correctly.')}", "success");
-    });
-
-    $(document).on("error", function () {
-      showAlert("<b>${_('There was an error with your request!')}</b>", "error");
+      showAlert("<b>" + viewModel.currentScript().name() + "</b> ${_('has been saved correctly.')}");
     });
 
     $(document).on("refreshDashboard", function () {
@@ -919,7 +916,7 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
     $(window).on("resize", function () {
       window.clearTimeout(_resizeTimeout);
       _resizeTimeout = window.setTimeout(function () {
-        codeMirror.setSize("100%", $(window).height() - 190);
+        codeMirror.setSize("100%", $(window).height() - 276);
       }, 100);
     });
 
@@ -1016,7 +1013,7 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
     function showMainSection(mainSection, includeGA) {
       window.setTimeout(function () {
         codeMirror.refresh();
-        codeMirror.setSize("100%", $(window).height() - 190);
+        codeMirror.setSize("100%", $(window).height() - 276);
       }, 100);
 
       if ($("#" + mainSection).is(":hidden")) {
@@ -1178,17 +1175,8 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
     }
   };
 
-  var _bottomAlertFade = -1;
-  function showAlert(msg, extraClass) {
-    var klass = "alert ";
-    if (extraClass != null && extraClass != undefined) {
-      klass += "alert-" + extraClass;
-    }
-    $(".bottomAlert").attr("class", "bottomAlert " + klass).html(msg).show();
-    window.clearTimeout(_bottomAlertFade);
-    _bottomAlertFade = window.setTimeout(function () {
-      $(".bottomAlert").fadeOut();
-    }, 3000);
+  function showAlert(msg) {
+    $(document).trigger("info", msg);
   }
 </script>
 

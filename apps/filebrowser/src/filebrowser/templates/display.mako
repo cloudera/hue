@@ -30,14 +30,6 @@
 
 ${ commonheader(_('%(filename)s - File Viewer') % dict(filename=truncate(filename)), 'filebrowser', user) | n,unicode }
 
-
-
-<div class="container-fluid">
-  % if breadcrumbs:
-        ${fb_components.breadcrumbs(path, breadcrumbs)}
-  %endif
-</div>
-
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="span2">
@@ -92,7 +84,13 @@ ${ commonheader(_('%(filename)s - File Viewer') % dict(filename=truncate(filenam
       </div>
     </div>
     <div class="span10">
-      % if not view['compression'] or view['compression'] in ("none", "avro"):
+      <div class="card" style="margin-top: 0">
+      % if breadcrumbs:
+        ${fb_components.breadcrumbs(path, breadcrumbs)}
+      %endif
+        <div class="card-body">
+          <p>
+            % if not view['compression'] or view['compression'] in ("none", "avro"):
         <div class="pagination">
           <ul>
               <li class="first-block prev disabled"><a href="javascript:void(0);" data-bind="click: firstBlock">${_('First Block')}</a></li>
@@ -160,6 +158,9 @@ ${ commonheader(_('%(filename)s - File Viewer') % dict(filename=truncate(filenam
           </ul>
         </div>
       % endif
+          </p>
+        </div>
+      </div>
     </div>
   </div>
 </div>

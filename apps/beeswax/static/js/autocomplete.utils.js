@@ -75,7 +75,9 @@ function hac_getTableColumns(databaseName, tableName, textScanned, callback) {
       table: tableName,
       onDataReceived: function (data) {
         if (data.error) {
-          $(document).trigger('error', data.error);
+          if (typeof HIVE_AUTOCOMPLETE_FAILS_SILENTLY_ON == undefined || data.code == null || HIVE_AUTOCOMPLETE_FAILS_SILENTLY_ON.indexOf(data.code) == -1){
+            $(document).trigger('error', data.error);
+          }
         }
         else {
           $.totalStorage('columns_' + databaseName + '_' + tableName, (data.columns ? data.columns.join(" ") : ""));
@@ -89,7 +91,9 @@ function hac_getTableColumns(databaseName, tableName, textScanned, callback) {
       table: tableName,
       onDataReceived: function (data) {
         if (data.error) {
-          $(document).trigger('error', data.error);
+          if (typeof HIVE_AUTOCOMPLETE_FAILS_SILENTLY_ON == undefined || data.code == null || HIVE_AUTOCOMPLETE_FAILS_SILENTLY_ON.indexOf(data.code) == -1){
+            $(document).trigger('error', data.error);
+          }
         }
         else {
           $.totalStorage('columns_' + databaseName + '_' + tableName, (data.columns ? data.columns.join(" ") : ""));
@@ -117,7 +121,9 @@ function hac_getTables(databaseName, callback) {
       database: databaseName,
       onDataReceived: function (data) {
         if (data.error) {
-          $(document).trigger('error', data.error);
+          if (typeof HIVE_AUTOCOMPLETE_FAILS_SILENTLY_ON == undefined || data.code == null || HIVE_AUTOCOMPLETE_FAILS_SILENTLY_ON.indexOf(data.code) == -1){
+            $(document).trigger('error', data.error);
+          }
         }
         else {
           $.totalStorage('tables_' + databaseName, data.tables.join(" "));
@@ -130,7 +136,9 @@ function hac_getTables(databaseName, callback) {
       database: databaseName,
       onDataReceived: function (data) {
         if (data.error) {
-          $(document).trigger('error', data.error);
+          if (typeof HIVE_AUTOCOMPLETE_FAILS_SILENTLY_ON == undefined || data.code == null || HIVE_AUTOCOMPLETE_FAILS_SILENTLY_ON.indexOf(data.code) == -1){
+            $(document).trigger('error', data.error);
+          }
         }
         else {
           $.totalStorage('tables_' + databaseName, data.tables.join(" "));
