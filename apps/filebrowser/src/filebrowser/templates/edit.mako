@@ -33,36 +33,35 @@ ${ commonheader(_('%(filename)s - File Viewer') % dict(filename=truncate(filenam
 
 
 <div class="container-fluid">
-    % if breadcrumbs:
-        ${fb_components.breadcrumbs(path, breadcrumbs)}
-    %endif
-</div>
-
-<div class="container-fluid">
-<div class="well" >
-    <form class="form-stacked" method="post" action="${url('filebrowser.views.save_file')}">
-    <div class="toolbar">
-        <a class="btn" href="${url('filebrowser.views.view', path=dirname_enc)}"><i class="icon-file-text"></i> ${_('Browse location')}</a>
+  <div class="row-fluid">
+    <div class="span12">
+      <div class="card">
+        % if breadcrumbs:
+          ${fb_components.breadcrumbs(path, breadcrumbs)}
+        %endif
+        <div class="card-body" style="margin-top: -20px">
+            <form class="form-stacked" method="post" action="${url('filebrowser.views.save_file')}">
+              % if form.errors:
+              <div class="alert-message">
+                % for field in form:
+                  % if len(field.errors):
+                    ${unicode(field.errors) | n}
+                  % endif
+                % endfor
+              </div>
+              % endif
+              ${edit.render_field(form["path"], hidden=True, notitle=True)}
+              ${edit.render_field(form["encoding"], hidden=True, notitle=True)}
+              <div style="width: 100%; height: 100%;">${edit.render_field(form["contents"], tag="textarea", nolabel=True, notitle=True, attrs=dict(
+                style="width:100%; height:400px;")) | n}</div>
+              <input class="btn btn-primary" type="submit" name="save" value="${_('Save')}">
+              <a id="saveAsBtn" class="btn">${_('Save as')}</a>
+            </form>
+          <br/>
+        </div>
+      </div>
     </div>
-    <br/>
-
-% if form.errors:
-  <div class="alert-message">
-    % for field in form:
-      % if len(field.errors):
-       ${unicode(field.errors) | n}
-      % endif
-    % endfor
   </div>
-% endif
-        ${edit.render_field(form["path"], hidden=True, notitle=True)}
-        ${edit.render_field(form["encoding"], hidden=True, notitle=True)}
-
-        <div style="width: 100%; height: 100%;">${edit.render_field(form["contents"], tag="textarea", notitle=True, attrs=dict(
-          style="width:100%; height:400px;")) | n}</div>
-        <input class="btn btn-primary" type="submit" name="save" value="${_('Save')}">
-        <a id="saveAsBtn" class="btn">${_('Save as')}</a>
-    </form>
 </div>
 
 

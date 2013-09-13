@@ -46,7 +46,7 @@ ${ commonheader(None, 'filebrowser', user) | n,unicode }
             <div id="ch-dropdown" class="btn-group" style="vertical-align: middle">
               <button href="#" class="btn dropdown-toggle" title="${_('Chown / Chmod')}" data-toggle="dropdown" data-bind="visible: !inTrash(), enable: selectedFiles().length > 0">
                 <i class="icon-user"></i> ${_('Chmod / Chown')}
-                <span class="caret"></span>
+                <span class="caret" style="line-height: 29px"></span>
               </button>
               <ul class="dropdown-menu" style="top: auto">
                 <li><a href="#" title="${_('Change owner/group')}" data-bind="visible: !inTrash(), click: changeOwner, enable: selectedFiles().length > 0"><i class="icon-user"></i> ${_('Change owner / group')}</a></li>
@@ -115,7 +115,9 @@ ${ commonheader(None, 'filebrowser', user) | n,unicode }
         ${fb_components.breadcrumbs(path, breadcrumbs, True)}
       %endif
 
+      <div style="padding-left: 6px">
         ${dir.list_table_browser(files, path_enc, current_request_path, cwd_set)}
+      </div>
     </div>
   </div>
 </div>

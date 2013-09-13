@@ -214,8 +214,11 @@ class OozieApi:
         get_copy = request.GET.copy() # Hacky, would need to refactor JobBrowser get logs
         get_copy['format'] = 'python'
         request.GET = get_copy
-        logs, workflow_action = self.get_log(request, job)
-        progress = workflow_action[0]['progress']
+        try:
+          logs, workflow_action = self.get_log(request, job)
+          progress = workflow_action[0]['progress']
+        except Exception:
+          progress = 0
       else:
         progress = 100
 

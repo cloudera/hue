@@ -66,8 +66,8 @@ ${ commonheader(_('Quick Start'), "quickstart", user, "100px") | n,unicode }
               <h2 class="card-heading simple">${ _('Checking current configuration') }</h2>
 
               <div class="card-body">
-                <div id="check-config-section">
-                  <!--[if !IE]><!--><i class="icon-spinner icon-spin" style="font-size: 60px;"></i><!--<![endif]-->
+                <div id="check-config-section" style="margin-bottom:20px">
+                  <!--[if !IE]><!--><i class="icon-spinner icon-spin" style="font-size: 60px; color: #DDD"></i><!--<![endif]-->
                   <!--[if IE]><img src="/hbase/static/art/loader.gif" /><![endif]-->
                 </div>
               </div>
@@ -207,12 +207,13 @@ ${ commonheader(_('Quick Start'), "quickstart", user, "100px") | n,unicode }
           </div>
           % endif
       </div>
-    </div>
-  </div>
 
-  <div class="form-actions" style="position:fixed;bottom:0;margin:0;margin-left:-20px;width:100%">
-    <a id="backBtn" class="btn disabled">${ _('Back') }</a>
-    <a id="nextBtn" class="btn btn-primary disable-feedback">${ _('Next') }</a>
+      <div class="form-actions">
+        <a id="backBtn" class="btn disabled">${ _('Back') }</a>
+        <a id="nextBtn" class="btn btn-primary disable-feedback">${ _('Next') }</a>
+      </div>
+
+    </div>
   </div>
 
 </div>
@@ -225,6 +226,16 @@ ${ commonheader(_('Quick Start'), "quickstart", user, "100px") | n,unicode }
 
   input[type=submit] {
     margin-left: 50px;
+  }
+
+  @media all and (max-height: 800px) {
+    .form-actions {
+      position:fixed;
+      bottom:0;
+      margin:0;
+      margin-left:-20px;
+      width:100%;
+    }
   }
 
 </style>

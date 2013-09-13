@@ -45,7 +45,7 @@
 
     Plugin.prototype.show = function () {
         var _this = this;
-        var MARGIN = 6;
+        var MARGIN = 20;
         var el = $("#jHueNotify").clone();
         el.removeAttr("id");
 
@@ -78,7 +78,7 @@
             el.find(".close").click(function(){
                 el.fadeOut();
                 el.nextAll(".jHueNotify").animate({
-                    top:'-=' + (el.outerHeight() + MARGIN)
+                    top:'-=' + (el.outerHeight() + MARGIN/3)
                 }, 200);
                 el.remove();
             }).show();
@@ -88,7 +88,7 @@
             var t = window.setTimeout(function(){
                 el.fadeOut();
                 el.nextAll(".jHueNotify").animate({
-                    top:'-=' + (el.outerHeight() + MARGIN)
+                    top:'-=' + (el.outerHeight() + MARGIN/3)
                 }, 200);
                 el.remove();
 
@@ -98,7 +98,7 @@
                 $(this).stop(true);
                 $(this).fadeOut();
                 $(this).nextAll(".jHueNotify").animate({
-                    top:'-=' + ($(this).outerHeight() + MARGIN)
+                    top:'-=' + ($(this).outerHeight() + MARGIN/3)
                 }, 200);
             });
             el.show();

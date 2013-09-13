@@ -38,7 +38,7 @@ from django.utils.translation import ugettext as _
         % else:
         <li><a href="${url('filebrowser.views.view', path=urlencode(path))}?default_to_home"><i class="icon-home"></i> ${_('Home')}</a></li>
         <li>
-            <ul class="hueBreadcrumb">
+            <ul class="hueBreadcrumb" style="padding-right:40px; padding-top: 12px">
                     % for breadcrumb_item in breadcrumbs:
                     <% label = breadcrumb_item['label'] %>
                     %if label == '/':

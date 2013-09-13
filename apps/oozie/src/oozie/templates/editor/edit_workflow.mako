@@ -473,9 +473,9 @@ ${ controls.decision_form(node_form, link_form, default_link_form, 'decision', T
 
       <div class="row-fluid node-action-bar">
         <div class="span12" style="text-align:right">
-          <a class="btn btn-mini edit-node-link" title="${ _('Edit') }" rel="tooltip" data-bind="attr: { 'data-node-type': node_type() }"><i class="icon-pencil"></i></a>
-          <a class="btn btn-mini clone-node-btn" title="${ _('Copy') }" rel="tooltip"><i class="icon-copy"></i></a>
-          <a class="btn btn-mini delete-node-btn" title="${ _('Delete') }" rel="tooltip"><i class="icon-trash"></i></a>
+          <a class="btn btn-mini edit-node-link" title="${ _('Edit') }" relz="tooltip" data-bind="attr: { 'data-node-type': node_type() }"><i class="icon-pencil"></i></a>
+          <a class="btn btn-mini clone-node-btn" title="${ _('Copy') }" relz="tooltip"><i class="icon-copy"></i></a>
+          <a class="btn btn-mini delete-node-btn" title="${ _('Delete') }" relz="tooltip"><i class="icon-trash"></i></a>
           &nbsp;
         </div>
       </div>
@@ -498,8 +498,8 @@ ${ controls.decision_form(node_form, link_form, default_link_form, 'decision', T
 
       <div class="row-fluid node-action-bar">
         <div class="span12" style="text-align:right">
-          <a class="btn btn-mini edit-node-link" title="${ _('Edit') }" rel="tooltip" data-bind="attr: { 'data-node-type': node_type() }"><i class="icon-pencil"></i></a>
-          <a class="btn btn-mini convert-node-link" title="${ _('Convert to Decision') }" data-bind="attr: { 'data-node-type': node_type() }" rel="tooltip"><i class="icon-wrench"></i></a>
+          <a class="btn btn-mini edit-node-link" title="${ _('Edit') }" relz="tooltip" data-bind="attr: { 'data-node-type': node_type() }"><i class="icon-pencil"></i></a>
+          <a class="btn btn-mini convert-node-link" title="${ _('Convert to Decision') }" data-bind="attr: { 'data-node-type': node_type() }" relz="tooltip"><i class="icon-wrench"></i></a>
           &nbsp;
         </div>
       </div>
@@ -533,7 +533,7 @@ ${ controls.decision_form(node_form, link_form, default_link_form, 'decision', T
 
       <div class="row-fluid node-action-bar">
         <div class="span12" style="text-align:right">
-          <a class="btn btn-mini edit-node-link" title="${ _('Edit') }" data-bind="attr: { 'data-node-type': node_type() }" rel="tooltip"><i class="icon-pencil"></i></a>
+          <a class="btn btn-mini edit-node-link" title="${ _('Edit') }" data-bind="attr: { 'data-node-type': node_type() }" relz="tooltip"><i class="icon-pencil"></i></a>
           &nbsp;
         </div>
       </div>

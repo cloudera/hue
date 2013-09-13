@@ -47,8 +47,9 @@ from beeswax.forms import QueryForm
 from beeswax.design import HQLdesign
 from beeswax.models import SavedQuery, make_query_context, QueryHistory
 from beeswax.server import dbms
-from beeswax.server.dbms import expand_exception, get_query_server_config,\
-  QueryServerException
+from beeswax.server.dbms import expand_exception, get_query_server_config, QueryServerException
+
+from thrift.transport.TTransport import TTransportException
 
 
 LOG = logging.getLogger(__name__)
@@ -888,8 +889,12 @@ def autocomplete(request, database=None, table=None):
     else:
       t = db.get_table(database, table)
       response['columns'] = [column.name for column in t.cols]
+  except TTransportException, tx:
+    response['code'] = 503
+    response['error'] = tx.message
   except Exception, e:
     LOG.warn('Autocomplete data fetching error %s.%s: %s' % (database, table, e))
+    response['code'] = 500
     response['error'] = e.message
 
 
