@@ -565,9 +565,9 @@ ${layout.menubar(section='query')}
 
       $("#saveQuery").click(function () {
         $("<input>").attr("type", "hidden").attr("name", "saveform-name")
-                .attr("value", $("#query-name").val()).appendTo($("#advancedSettingsForm"));
+                .attr("value", $("#query-name").data('value')).appendTo($("#advancedSettingsForm"));
         $("<input>").attr("type", "hidden").attr("name", "saveform-desc")
-                .attr("value", $("#query-description").val()).appendTo($("#advancedSettingsForm"));
+                .attr("value", $("#query-description").data('value')).appendTo($("#advancedSettingsForm"));
         $("<input>").attr("type", "hidden").attr("name", "saveform-save").attr("value", "Save").appendTo($("#advancedSettingsForm"));
         checkAndSubmit();
       });
@@ -579,9 +579,9 @@ ${layout.menubar(section='query')}
 
       $("#saveAsNameBtn").click(function () {
         $("<input>").attr("type", "hidden").attr("name", "saveform-name")
-                .attr("value", $("input[name=saveform-name]").val()).appendTo($("#advancedSettingsForm"));
+                .attr("value", $("input[name=saveform-name]").data('value')).appendTo($("#advancedSettingsForm"));
         $("<input>").attr("type", "hidden").attr("name", "saveform-desc")
-                .attr("value", $("input[name=saveform-desc]").val()).appendTo($("#advancedSettingsForm"));
+                .attr("value", $("input[name=saveform-desc]").data('value')).appendTo($("#advancedSettingsForm"));
         checkAndSubmit();
       });
 
