@@ -100,6 +100,7 @@ ${layout.menubar(section='query')}
     var logsAtEnd = true;
 
     function refreshView() {
+      $.ajaxSetup({ cache: false });
       $.getJSON("${url(app_name + ':watch_query_refresh_json', query.id)}", function (data) {
         if (data.isSuccess || data.isFailure) {
           location.href = fwdUrl;
