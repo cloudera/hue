@@ -1418,6 +1418,12 @@ a#advanced-btn:hover {
 
 .navbar-fixed-top.nokids .navbar-inner {
   height: 45px;
-}#jHueTourVideoPlayer .modal-body {
+}
+
+a, a:hover, a:active, a:focus {
+  outline: 0;
+}
+
+#jHueTourVideoPlayer .modal-body {
   max-height: 460px;
 }
