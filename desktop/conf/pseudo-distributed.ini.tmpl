@@ -125,6 +125,9 @@
     # The search base for finding users and groups
     ## base_dn="DC=mycompany,DC=com"
 
+    # The NT domain to connect to (only for use with Active Directory)
+    ## nt_domain=mycompany.com
+
     # URL of the LDAP server
     ## ldap_url=ldap://auth.mycompany.com
 
@@ -144,9 +147,16 @@
     # anonymous searches
     ## bind_password=
 
+    # Pattern for searching for usernames -- Use <username> for the parameter
+    # For use when using LdapBackend for Hue authentication
+    ## ldap_username_pattern="uid=<username>,ou=People,dc=mycompany,dc=com"
+
     # Create users in Hue when they try to login with their LDAP credentials
     # For use when using LdapBackend for Hue authentication
     ## create_users_on_login = true
+
+    # Use search bind authentication.
+    ## search_bind_authentication=true
 
     [[[users]]]
 
