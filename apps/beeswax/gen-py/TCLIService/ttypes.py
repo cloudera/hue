@@ -18,13 +18,16 @@ except:
 
 class TProtocolVersion(object):
   HIVE_CLI_SERVICE_PROTOCOL_V1 = 0
+  HIVE_CLI_SERVICE_PROTOCOL_V2 = 1
 
   _VALUES_TO_NAMES = {
     0: "HIVE_CLI_SERVICE_PROTOCOL_V1",
+    1: "HIVE_CLI_SERVICE_PROTOCOL_V2",
   }
 
   _NAMES_TO_VALUES = {
     "HIVE_CLI_SERVICE_PROTOCOL_V1": 0,
+    "HIVE_CLI_SERVICE_PROTOCOL_V2": 1,
   }
 
 class TTypeId(object):
@@ -44,6 +47,8 @@ class TTypeId(object):
   UNION_TYPE = 13
   USER_DEFINED_TYPE = 14
   DECIMAL_TYPE = 15
+  NULL_TYPE = 16
+  DATE_TYPE = 17
 
   _VALUES_TO_NAMES = {
     0: "BOOLEAN_TYPE",
@@ -62,6 +67,8 @@ class TTypeId(object):
     13: "UNION_TYPE",
     14: "USER_DEFINED_TYPE",
     15: "DECIMAL_TYPE",
+    16: "NULL_TYPE",
+    17: "DATE_TYPE",
   }
 
   _NAMES_TO_VALUES = {
@@ -81,6 +88,8 @@ class TTypeId(object):
     "UNION_TYPE": 13,
     "USER_DEFINED_TYPE": 14,
     "DECIMAL_TYPE": 15,
+    "NULL_TYPE": 16,
+    "DATE_TYPE": 17,
   }
 
 class TStatusCode(object):
@@ -114,6 +123,7 @@ class TOperationState(object):
   CLOSED_STATE = 4
   ERROR_STATE = 5
   UKNOWN_STATE = 6
+  PENDING_STATE = 7
 
   _VALUES_TO_NAMES = {
     0: "INITIALIZED_STATE",
@@ -123,6 +133,7 @@ class TOperationState(object):
     4: "CLOSED_STATE",
     5: "ERROR_STATE",
     6: "UKNOWN_STATE",
+    7: "PENDING_STATE",
   }
 
   _NAMES_TO_VALUES = {
@@ -133,6 +144,7 @@ class TOperationState(object):
     "CLOSED_STATE": 4,
     "ERROR_STATE": 5,
     "UKNOWN_STATE": 6,
+    "PENDING_STATE": 7,
   }
 
 class TOperationType(object):
@@ -2425,7 +2437,7 @@ class TOpenSessionReq(object):
 
   thrift_spec = (
     None, # 0
-    (1, TType.I32, 'client_protocol', None,     0, ), # 1
+    (1, TType.I32, 'client_protocol', None,     1, ), # 1
     (2, TType.STRING, 'username', None, None, ), # 2
     (3, TType.STRING, 'password', None, None, ), # 3
     (4, TType.MAP, 'configuration', (TType.STRING,None,TType.STRING,None), None, ), # 4
@@ -2534,7 +2546,7 @@ class TOpenSessionResp(object):
   thrift_spec = (
     None, # 0
     (1, TType.STRUCT, 'status', (TStatus, TStatus.thrift_spec), None, ), # 1
-    (2, TType.I32, 'serverProtocolVersion', None,     0, ), # 2
+    (2, TType.I32, 'serverProtocolVersion', None,     1, ), # 2
     (3, TType.STRUCT, 'sessionHandle', (TSessionHandle, TSessionHandle.thrift_spec), None, ), # 3
     (4, TType.MAP, 'configuration', (TType.STRING,None,TType.STRING,None), None, ), # 4
   )
@@ -3041,6 +3053,7 @@ class TExecuteStatementReq(object):
    - sessionHandle
    - statement
    - confOverlay
+   - runAsync
   """
 
   thrift_spec = (
@@ -3048,12 +3061,14 @@ class TExecuteStatementReq(object):
     (1, TType.STRUCT, 'sessionHandle', (TSessionHandle, TSessionHandle.thrift_spec), None, ), # 1
     (2, TType.STRING, 'statement', None, None, ), # 2
     (3, TType.MAP, 'confOverlay', (TType.STRING,None,TType.STRING,None), None, ), # 3
+    (4, TType.BOOL, 'runAsync', None, False, ), # 4
   )
 
-  def __init__(self, sessionHandle=None, statement=None, confOverlay=None,):
+  def __init__(self, sessionHandle=None, statement=None, confOverlay=None, runAsync=thrift_spec[4][4],):
     self.sessionHandle = sessionHandle
     self.statement = statement
     self.confOverlay = confOverlay
+    self.runAsync = runAsync
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -3086,6 +3101,11 @@ class TExecuteStatementReq(object):
           iprot.readMapEnd()
         else:
           iprot.skip(ftype)
+      elif fid == 4:
+        if ftype == TType.BOOL:
+          self.runAsync = iprot.readBool();
+        else:
+          iprot.skip(ftype)
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()
@@ -3111,6 +3131,10 @@ class TExecuteStatementReq(object):
         oprot.writeString(kiter134)
         oprot.writeString(viter135)
       oprot.writeMapEnd()
+      oprot.writeFieldEnd()
+    if self.runAsync is not None:
+      oprot.writeFieldBegin('runAsync', TType.BOOL, 4)
+      oprot.writeBool(self.runAsync)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()

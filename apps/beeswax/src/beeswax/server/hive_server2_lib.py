@@ -416,10 +416,8 @@ class HiveServerClient:
           self.execute_statement(resource.strip())
 
     configuration = self._get_query_configuration(query)
-    if self.query_server['server_name'] == 'beeswax':
-      configuration.update({'hive.server2.blocking.query': 'false'})
-
     query_statement =  query.get_query_statement(statement)
+
     return self.execute_async_statement(statement=query_statement, confOverlay=configuration)
 
 
@@ -431,7 +429,7 @@ class HiveServerClient:
 
 
   def execute_async_statement(self, statement, confOverlay):
-    req = TExecuteStatementReq(statement=statement.encode('utf-8'), confOverlay=confOverlay)
+    req = TExecuteStatementReq(statement=statement.encode('utf-8'), confOverlay=confOverlay, runAsync=True)
     res = self.call(self._client.ExecuteStatement, req)
 
     return HiveServerQueryHandle(secret=res.operationHandle.operationId.secret,
