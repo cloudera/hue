@@ -501,7 +501,9 @@ var PigViewModel = function (props) {
           $(document).trigger("showLogs");
           self.updateScripts();
           $("#submitModal").modal("hide");
-        }, "json");
+        }, "json").fail( function(xhr, textStatus, errorThrown) {
+          $(document).trigger("error", xhr.responseText);
+        });
   }
 
   function callStop(script) {

@@ -33,6 +33,7 @@ from django.utils.translation import ugettext as _, activate as activate_transla
 
 from desktop.lib.django_util import render, extract_field_data
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.lib.i18n import smart_str
 from desktop.lib.rest.http_client import RestException
 from hadoop.fs.exceptions import WebHdfsException
 from liboozie.submittion import Submission
@@ -335,6 +336,7 @@ def _submit_workflow(user, fs, workflow, mapping):
     detail = ex._headers.get('oozie-error-message', ex)
     if 'urlopen error' in str(detail):
       detail = '%s: %s' % (_('The Oozie server is not running'), detail)
+    LOG.error(smart_str(detail))
     raise PopupException(_("Error submitting workflow %s") % (workflow,), detail=detail)
 
   return redirect(reverse('oozie:list_oozie_workflow', kwargs={'job_id': job_id}))
