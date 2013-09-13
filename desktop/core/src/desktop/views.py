@@ -34,7 +34,7 @@ import django.views.debug
 
 from desktop.lib import django_mako
 from desktop.lib.conf import GLOBAL_CONFIG
-from desktop.lib.django_util import login_notrequired, render_json, render
+from desktop.lib.django_util import login_notrequired, render_json, render, encode_json_for_js
 from desktop.lib.i18n import smart_str, force_unicode
 from desktop.lib.paths import get_desktop_root
 from desktop.log.access import access_log_level, access_warn
@@ -43,16 +43,41 @@ from desktop import appmanager
 import desktop.conf
 import desktop.log.log_buffer
 
+try:
+  import json
+except ImportError:
+  import simplejson as json
+
 
 LOG = logging.getLogger(__name__)
 
 
 @access_log_level(logging.WARN)
 def home(request):
+  docs = Document.objects.get_docs(request.user).order_by('-last_modified')[:100]
   return render('home.mako', request, {
-    'documents': Document.objects.get_docs(request.user).order_by('-last_modified')[:100],
+    'documents': docs,
+    'json_documents': json.dumps(massaged_documents_for_json(docs)),
     'tags': DocumentTag.objects.filter(owner=request.user),
   })
+
+def massaged_documents_for_json(documents):
+  docs = []
+  for doc in documents:
+    massaged_doc = {
+      'id': doc.id,
+      'contentType': doc.content_type.name,
+      'name': doc.name,
+      'url': doc.content_object.get_absolute_url(),
+      'description': doc.description,
+      'tags': ['%s' % (tag.tag) for tag in doc.tags.all()],
+      'owner': doc.owner.username,
+      'lastModified': doc.last_modified.strftime("%x %X"),
+      'lastModifiedInMillis': time.mktime(doc.last_modified.timetuple())
+    }
+    docs.append(massaged_doc)
+
+  return docs
 
 
 def add_or_create_tag(request):
