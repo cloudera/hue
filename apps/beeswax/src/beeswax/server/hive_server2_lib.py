@@ -554,7 +554,6 @@ class PartitionValueCompatible:
       parts = part.split('/')
       for val in parts:
         self.values.append(val.split('=')[1])
-    self.where = partition[0].replace('=', '=\'').replace('/', '\' AND ') + '\''
     self.sd = type('Sd', (object,), {'location': '%s/%s' % (table.path_location, ','.join(partition)),})
 
 
