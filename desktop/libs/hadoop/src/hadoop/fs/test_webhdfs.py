@@ -171,7 +171,7 @@ class WebhdfsTests(unittest.TestCase):
     for stat in dest_stat:
       assert_equals('testcopy', stat.user)
       assert_equals('testcopy', stat.group)
-      assert_equals('100644', '%o' % stat.mode)
+      assert_equals('100755', '%o' % stat.mode)
 
   def test_two_files_open(self):
     """
@@ -291,19 +291,19 @@ class WebhdfsTests(unittest.TestCase):
       fs.chmod(dir1, 01000, recursive=True)
       assert_equals(041000, fs.stats(dir1).mode)
       assert_equals(041000, fs.stats(subdir1).mode)
-      assert_equals(0100000, fs.stats(file1).mode)
+      assert_equals(0101000, fs.stats(file1).mode)
 
       # Chmod non-recursive
       fs.chmod(dir1, 01222, recursive=False)
       assert_equals(041222, fs.stats(dir1).mode)
       assert_equals(041000, fs.stats(subdir1).mode)
-      assert_equals(0100000, fs.stats(file1).mode)
+      assert_equals(0101000, fs.stats(file1).mode)
 
       # Chmod recursive
       fs.chmod(dir1, 01444, recursive=True)
       assert_equals(041444, fs.stats(dir1).mode)
       assert_equals(041444, fs.stats(subdir1).mode)
-      assert_equals(0100444, fs.stats(file1).mode)
+      assert_equals(0101444, fs.stats(file1).mode)
     finally:
       try:
         fs.rmtree(dir1)
