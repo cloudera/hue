@@ -77,8 +77,9 @@ def get_query_server_config(name='beeswax'):
 class QueryServerException(Exception):
   # Ideally the query handle will be stored here too.
 
-  def __init__(self, e):
+  def __init__(self, e, message=''):
     super(QueryServerException, self).__init__(e)
+    self.message = message
 
 
 class NoSuchObjectException: pass
@@ -463,7 +464,7 @@ def expand_exception(exc, db, handle=None):
     # Always show something, even if server has died on the job.
     log = _("Could not retrieve logs: %s." % e)
 
-  if not exc.message:
+  if not hasattr(exc, 'message') or not exc.message:
     error_message = _("Unknown exception.")
   else:
     error_message = force_unicode(exc.message, strings_only=True, errors='replace')

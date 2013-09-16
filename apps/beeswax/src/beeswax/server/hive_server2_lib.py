@@ -352,7 +352,11 @@ class HiveServerClient:
 
     if status is not None and res.status.statusCode not in (
         TStatusCode.SUCCESS_STATUS, TStatusCode.SUCCESS_WITH_INFO_STATUS, TStatusCode.STILL_EXECUTING_STATUS):
-      raise QueryServerException(Exception('Bad status for request %s:\n%s' % (req, res)))
+      if hasattr(res.status, 'errorMessage') and res.status.errorMessage:
+        message = res.status.errorMessage
+      else:
+        message = ''
+      raise QueryServerException(Exception('Bad status for request %s:\n%s' % (req, res)), message=message)
     else:
       return res
 
