@@ -64,19 +64,24 @@ class DocumentTag(models.Model):
   def get_trash_tag(cls, user):
     tag, created = DocumentTag.objects.get_or_create(owner=user, tag=DocumentTag.TRASH)
     return tag
-  
+
+  @classmethod
+  def create_tag(cls, owner, tag_name):
+    tag = DocumentTag.objects.create(tag=tag_name, owner=owner)
+    return tag
+
   @classmethod
   def add_or_create_tag(cls, owner, doc_id, tag_name, tag_id=None):
-    tag = DocumentTag.objects.get(id=tag_id, owner=owner)
-    if tag.id == DocumentTag.get_trash_tag(owner):
-      raise Exception(_("Can't add trash tag. Please trash the document from instead."))
-        
-    if tag_id is not None:
-      tag = DocumentTag.objects.create(tag=tag_name, owner=owner)  
-      
-    doc = Document.objects.get_doc(doc_id, owner=owner)
-    doc.add(tag)
+    try:
+      tag = DocumentTag.objects.get(id=tag_id, owner=owner)
+      if tag.id == DocumentTag.get_trash_tag(owner):
+        raise Exception(_("Can't add trash tag. Please trash the document from instead."))
+    except:
+      tag = DocumentTag.objects.create(tag=tag_name, owner=owner)
 
+    doc = Document.objects.get_doc(doc_id, owner)
+    doc.add_tag(tag)
+    return tag
 
   @classmethod
   def remove_tag(cls, tag_id, owner, doc_id):
@@ -204,6 +209,9 @@ class Document(models.Model):
   def can_edit_or_exception(self, user, exception_class=PopupException):
     """Deprecated by can_write_or_exception"""
     return self.can_write_or_exception(user, exception_class)
+
+  def add_tag(self, tag):
+    self.tags.add(tag)
       
   def send_to_trash(self):
     tag = DocumentTag.get_trash_tag(user=self.owner)

@@ -39,7 +39,7 @@
     Plugin.prototype.init = function () {
         var _this = this;
         $(_this.element).closest("tr").click(function (e) {
-            if ($(e.target).data("row-selector-exclude")) {
+            if ($(e.target).data("row-selector-exclude") || $(e.target).closest("td").hasClass("row-selector-exclude")) {
                 return;
             }
             if (!$(e.target).is("a")) {
