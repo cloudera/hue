@@ -62,10 +62,26 @@ def home(request):
     'json_tags': json.dumps(massaged_tags_for_json(tags, request.user))
   })
 
+
+def list_docs(request):
+  docs = Document.objects.get_docs(request.user).order_by('-last_modified')[:100]
+  return HttpResponse(json.dumps(massaged_documents_for_json(docs)), mimetype="application/json")
+
+
+def list_tags(request):
+  tags = DocumentTag.objects.filter(owner=request.user)
+  return HttpResponse(json.dumps(massaged_tags_for_json(tags, request.user)), mimetype="application/json")
+
+
 def massaged_documents_for_json(documents):
   docs = []
   for doc in documents:
-    massaged_doc = {
+    docs.append(massage_doc_for_json(doc))
+
+  return docs
+
+def massage_doc_for_json(doc):
+  return {
       'id': doc.id,
       'contentType': doc.content_type.name,
       'name': doc.name,
@@ -76,10 +92,6 @@ def massaged_documents_for_json(documents):
       'lastModified': doc.last_modified.strftime("%x %X"),
       'lastModifiedInMillis': time.mktime(doc.last_modified.timetuple())
     }
-    docs.append(massaged_doc)
-
-  return docs
-
 
 def massaged_tags_for_json(tags, user):
   ts = []
@@ -108,10 +120,6 @@ def add_tag(request):
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
-def list_tags(request):
-  tags = DocumentTag.objects.objects.filter(owner=request.user)
-  return HttpResponse(json.dumps(massaged_tags_for_json(tags, request.user)), mimetype="application/json")
-
 
 def add_or_create_tag(request):
   response = {'status': -1, 'message': ''}
@@ -129,21 +137,40 @@ def add_or_create_tag(request):
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
-def remove_tag(request):
-  response = {'status': -1, 'message': _('Error')}
-  
+def update_tags(request):
+  response = {'status': -1, 'message': ''}
+
   if request.method == 'POST':
-    json = {'tag_id': 1, 'tag': 'hue project', 'doc_id': 1}  # instead ... json.load(request.POST)
+    request_json = json.loads(request.POST['data'])
     try:
-      DocumentTag.objects.remove_tag(id=json['tag_id'], owner=request.user, doc_id=json['doc_id'])
+      print request_json
+      #doc = DocumentTag.objects.update_tags(request.user, request_json['doc_id'], request_json['tag_ids'])
+      #response['doc'] = massage_doc_for_json(doc)
+    except Exception, e:
+      response['message'] = force_unicode(e)
+  else:
+    response['message'] = _('POST request only')
+
+  return HttpResponse(json.dumps(response), mimetype="application/json")
+
+
+def remove_tags(request):
+  response = {'status': -1, 'message': _('Error')}
+
+  if request.method == 'POST':
+    request_json = json.loads(request.POST['data'])
+    print request_json
+    try:
+      for tag_id in request_json['tag_ids']:
+        print tag_id
+        #DocumentTag.delete_tag(tag_id, request.user)
       response['message'] = _('Tag removed !')
     except Exception, e:
       response['message'] = force_unicode(e)
   else:
     response['message'] = _('POST request only')
-  
-  return HttpResponse(json.dumps(response), mimetype="application/json")
 
+  return HttpResponse(json.dumps(response), mimetype="application/json")
 
 def add_or_update_permission(request):
   pass

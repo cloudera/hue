@@ -77,21 +77,21 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
               <a href="#" data-toggle="dropdown"><i class="icon-plus-sign"></i> ${_('New document')}</a>
               <ul class="dropdown-menu" role="menu">
                 % if 'beeswax' in apps:
-                <li><a href="#"><img src="/beeswax/static/art/icon_beeswax_24.png"/> ${_('Hive Query')}</a></li>
+                <li><a href="${ url('beeswax:index') }"><img src="/beeswax/static/art/icon_beeswax_24.png"/> ${_('Hive Query')}</a></li>
                 % endif
                 % if 'impala' in apps:
-                <li><a href="#"><img src="/impala/static/art/icon_impala_24.png"/> ${_('Impala Query')}</a></li>
+                <li><a href="${ url('impala:index') }"><img src="/impala/static/art/icon_impala_24.png"/> ${_('Impala Query')}</a></li>
                 % endif
                 % if 'pig' in apps:
-                <li><a href="#"><img src="/pig/static/art/icon_pig_24.png"/> ${_('Pig Script')}</a></li>
+                <li><a href="${ url('pig:index') }"><img src="/pig/static/art/icon_pig_24.png"/> ${_('Pig Script')}</a></li>
                 % endif
                 % if 'oozie' in apps:
                 <li class="dropdown-submenu">
                   <a href="#"><img src="/oozie/static/art/icon_oozie_24.png"/> ${_('Oozie Scheduler')}</a>
                   <ul class="dropdown-menu">
-                    <li><a href="#"><img src="/oozie/static/art/icon_oozie_24_workflow.png"/> ${_('Workflow')}</a></li>
-                    <li><a href="#"><img src="/oozie/static/art/icon_oozie_24_coordinator.png"/> ${_('Coordinator')}</a></li>
-                    <li><a href="#"><img src="/oozie/static/art/icon_oozie_24_bundle.png"/> ${_('Bundle')}</a></li>
+                    <li><a href="${ url('oozie:create_workflow') }"><img src="/oozie/static/art/icon_oozie_24_workflow.png"/> ${_('Workflow')}</a></li>
+                    <li><a href="${ url('oozie:create_coordinator') }"><img src="/oozie/static/art/icon_oozie_24_coordinator.png"/> ${_('Coordinator')}</a></li>
+                    <li><a href="${ url('oozie:create_bundle') }"><img src="/oozie/static/art/icon_oozie_24_bundle.png"/> ${_('Bundle')}</a></li>
                   </ul>
                 </li>
                 % endif
@@ -156,7 +156,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
   </div>
   <div class="modal-footer">
     <a href="#" data-dismiss="modal" class="btn">${_('Cancel')}</a>
-    <a id="saveDocumentTags" href="#" class="btn btn-primary">${_('Save tags')}</a>
+    <a id="saveDocumentTags" href="#" class="btn btn-primary disable-feedback">${_('Save tags')}</a>
   </div>
 </div>
 
@@ -179,7 +179,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
   </div>
   <div class="modal-footer">
     <a href="#" data-dismiss="modal" class="btn">${_('Cancel')}</a>
-    <a id="removeTags" href="#" class="btn btn-danger">${_('Remove selected')}</a>
+    <a id="removeTags" href="#" class="btn btn-danger disable-feedback">${_('Remove selected')}</a>
   </div>
 </div>
 
@@ -389,26 +389,74 @@ $(document).ready(function () {
   });
 
   $("#saveDocumentTags").on("click", function () {
+    $(this).attr("data-loading-text", $(this).text() + " ...");
+    $(this).button("loading");
     var _tags = [];
     $(".documentTagsModalCheckbox.selected").each(function () {
       var _this = $(this);
       _tags.push(_this.data("value"));
     });
-    // TODO: $.post to remote to save the tags of a document
-    console.log("Post add tags to document " + _tags);
+    $.post("/doc/update_tags", {
+      data: JSON.stringify({
+        doc_id: $("#documentTagsModal").data("document-id"),
+        tag_ids: _tags
+      })
+    }, function (response) {
+      if (response.doc != null) {
+        var _doc = response.doc;
+        var _dtNodes = documentsTable.fnGetNodes();
+        $(_dtNodes).each(function (iNode, node) {
+          if ($(node).children("td").eq(3).find(".documentTags").data("document-id") == _doc.id) {
+            var _tags = "";
+            for (var i = 0; i < _doc.tags.length; i++) {
+              _tags += '<span class="badge">' + _doc.tags[i].name + '</span> ';
+            }
+            documentsTable.fnUpdate('<div class="documentTags" data-document-id="' + _doc.id + '">' + _tags + '</div>', node, 3, false);
+            updateDoc(_doc);
+            $("#saveDocumentTags").button("loading");
+          }
+        });
+      }
+      $("#documentTagsModal").modal("hide");
+    })
   });
 
   $("#removeTags").on("click", function () {
+    $(this).attr("data-loading-text", $(this).text() + " ...");
+    $(this).button("loading");
     var _tags = [];
     $(".tagsModalCheckbox.selected").each(function () {
       var _this = $(this);
       _tags.push(_this.data("value"));
     });
-    // TODO: $.post to remote to remove tags globally
-    console.log("Post remove tags " + _tags);
+    $.post("/tag/remove_tags", {
+      data: JSON.stringify({
+        tag_ids: _tags
+      })
+    }, function (response) {
+      $.getJSON("/tag/list_tags", function (data) {
+        JSON_TAGS = data;
+        renderTags();
+        renderTagsModal();
+        renderDocs(function () {
+          $("#removeTags").button("reset");
+          $("#tagsModal").modal("hide");
+        });
+      });
+    });
   });
 
 });
+
+function renderDocs(callback) {
+  $.getJSON("/doc/list_docs", function (data) {
+    JSON_DOCS = data;
+    populateTable();
+    if (callback != null) {
+      callback();
+    }
+  });
+}
 
 function isInTags(doc, tag) {
   if (doc.tags == null) {
@@ -479,6 +527,15 @@ function getDocById(id) {
   });
   return _doc;
 }
+
+function updateDoc(updatedDoc) {
+  $(JSON_DOCS).each(function (cnt, doc) {
+    if (doc.id == updatedDoc.id) {
+      JSON_DOCS[cnt] = updatedDoc;
+    }
+  });
+}
+
 
 function getIcon(contentType) {
   var _code = '<img src="';
