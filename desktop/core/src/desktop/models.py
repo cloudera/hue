@@ -66,7 +66,7 @@ class DocumentTagManager(models.Manager):
   def add_or_create_tag(self, owner, doc_id, tag_name, tag_id=None):
     try:
       tag = DocumentTag.objects.get(id=tag_id, owner=owner)
-      if tag.id == DocumentTag.get_trash_tag(owner):
+      if tag == DocumentTag.get_trash_tag(owner):
         raise Exception(_("Can't add trash tag. Please trash the document from instead."))
     except:
       tag = DocumentTag.objects.create(tag=tag_name, owner=owner)
@@ -77,13 +77,38 @@ class DocumentTagManager(models.Manager):
 
   def remove_tag(self, tag_id, owner, doc_id):
     tag = DocumentTag.objects.get(id=tag_id, owner=owner)
-    if tag.id == DocumentTag.get_trash_tag(owner):
+    if tag == DocumentTag.get_trash_tag(owner):
       raise Exception(_("Can't remove trash tag. Please restore the document from the trash instead."))
 
     doc = Document.objects.get_doc(doc_id, owner=owner)
     doc.remove(tag)
     if tag.tag != DocumentTag.TRASH and not tag.document_set.exists():
       tag.delete()
+
+  def delete_tag(self, tag_id, owner):
+    tag = DocumentTag.objects.get(id=tag_id, owner=owner)
+    if tag == DocumentTag.get_trash_tag(owner):
+      raise Exception(_("Can't remove trash tag. Please restore the document from the trash instead."))
+    
+    for doc in Document.objects.get_docs(owner):
+      doc.remove_tag(tag)
+    if tag.tag != DocumentTag.TRASH and not tag.document_set.exists():
+      tag.delete()
+
+  @classmethod
+  def update_tags(self, owner, doc_id, tag_ids):
+    doc = Document.objects.get_doc(doc_id, owner)
+    
+    for tag in doc.tags.all():
+      if tag.tag != DocumentTag.TRASH:
+        doc.remove_tag(tag)
+    
+    for tag_id in tag_ids:
+      tag = DocumentTag.objects.get(id=tag_id, owner=owner)
+      if tag.tag != DocumentTag.TRASH:
+        doc.add_tag(tag)
+    
+    return doc
 
 
 class DocumentTag(models.Model):
@@ -184,7 +209,7 @@ class DocumentManager(models.Manager):
           if job.is_shared:
             DocumentPermission.share_to_default(doc)
     except Exception, e:
-      print e
+      LOG.warn(force_unicode(e))
 
     try:
       for job in SavedQuery.objects.all():
@@ -195,7 +220,7 @@ class DocumentManager(models.Manager):
           if job.is_trashed:
             doc.send_to_trash()
     except Exception, e:
-      print e
+      LOG.warn(force_unicode(e))
 
     try:
       from pig.models import PigScript
@@ -206,7 +231,7 @@ class DocumentManager(models.Manager):
           tag, created = DocumentTag.objects.get_or_create(owner=job.owner, tag='default')
           doc.tags.add(tag)
     except Exception, e:
-      print e
+      LOG.warn(force_unicode(e))
 
 
 class Document(models.Model):
