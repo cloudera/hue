@@ -69,6 +69,8 @@ dynamic_patterns += patterns('desktop.views',
   (r'^log_frontend_event$', 'log_frontend_event'),
 
   # Doc model
+  (r'^tag/add_tag', 'add_tag'),
+  (r'^tag/list_tags', 'list_tags'),
   (r'^doc/add_or_create_tag$', 'add_or_create_tag'),
   (r'^doc/remove_tag$', 'remove_tag'),
   (r'^doc/add_or_update_permission$', 'add_or_update_permission'),

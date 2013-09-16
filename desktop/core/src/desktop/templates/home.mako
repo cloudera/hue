@@ -44,9 +44,10 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
     line-height: 15px !important;
   }
 
-  .toggleTag {
+  .toggleTag, .documentTagsModalCheckbox, .tagsModalCheckbox {
     cursor: pointer;
   }
+
 </style>
 
 <div class="navbar navbar-inverse navbar-fixed-top nokids">
@@ -89,7 +90,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
               </ul>
            </li>
            <li class="viewTrash"><a href="javascript:void(0)"><i class="icon-trash"></i> ${_('View Trash')} <span id="trashCounter" class="badge pull-right">0</span></a></li>
-          <li class="nav-header">${_('Tags')}</li>
+          <li class="nav-header tag-header">${_('Tags')} <div id="editTags" style="display: inline;cursor: pointer;margin-left: 6px"><i class="icon-edit"></i></div> </li>
           % for tag in tags:
             %if tag.tag != "trash":
             <li class="toggleTag white" data-tag="${ tag.tag }"><div class="hueCheckbox pull-left"></div>${ tag.tag }</li>
@@ -128,167 +129,372 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
   </div>
 </div>
 
+<div id="documentTagsModal" class="modal hide fade">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>${_('Tags for ')}<span id="documentTagsModalName"></span></h3>
+  </div>
+  <div class="modal-body">
+    <p>
+      <div id="documentTagsModalList"></div>
+      <div class="clearfix"></div>
+      <div style="margin-top: 20px">
+        <div class="input-append">
+          <input id="documentTagsNew" type="text">
+          <button id="documentTagsNewBtn" class="btn" type="button"><i class="icon-plus-sign"></i> ${_('Add')}</button>
+        </div>
+      </div>
+    </p>
+  </div>
+  <div class="modal-footer">
+    <a href="#" data-dismiss="modal" class="btn">${_('Cancel')}</a>
+    <a id="saveDocumentTags" href="#" class="btn btn-primary">${_('Save tags')}</a>
+  </div>
+</div>
+
+<div id="tagsModal" class="modal hide fade">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>${_('Manage tags')}</h3>
+  </div>
+  <div class="modal-body">
+    <p>
+      <div id="tagsModalList"></div>
+      <div class="clearfix"></div>
+      <div style="margin-top: 20px">
+        <div class="input-append">
+          <input id="tagsNew" type="text">
+          <button id="tagsNewBtn" class="btn" type="button"><i class="icon-plus-sign"></i> ${_('Add')}</button>
+        </div>
+      </div>
+    </p>
+  </div>
+  <div class="modal-footer">
+    <a href="#" data-dismiss="modal" class="btn">${_('Cancel')}</a>
+    <a id="removeTags" href="#" class="btn btn-danger">${_('Remove selected')}</a>
+  </div>
+</div>
+
+
 <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
 <script type="text/javascript" charset="utf-8">
 
-  var JSON_DOCS = ${json_documents|n};
-  var documentsTable;
+var JSON_DOCS = ${json_documents|n};
+var JSON_TAGS = ${json_tags|n};
+var documentsTable;
 
-  $(document).ready(function () {
-    documentsTable = $(".datatables").dataTable({
-      "sPaginationType": "bootstrap",
-      "iDisplayLength": 50,
-      "bLengthChange": false,
-      "sDom": "<'row'r>t<'row-fluid'<'dt-pages'p><'dt-records'i>>",
-      "aoColumns": [
-        { "bSortable": false, "sWidth": "26px" },
-        null,
-        null,
-        null,
-        null,
-        { "sSortDataType": "dom-sort-value", "sType": "numeric", "sWidth": "100px" }
-      ],
-      "aaSorting": [
-        [ 1, "desc" ]
-      ],
-      "oLanguage": {
-        "sEmptyTable": "${_('No data available')}",
-        "sInfo": "${_('Showing _START_ to _END_ of _TOTAL_ entries')}",
-        "sInfoEmpty": "${_('Showing 0 to 0 of 0 entries')}",
-        "sInfoFiltered": "${_('(filtered from _MAX_ total entries)')}",
-        "sZeroRecords": "${_('No matching records')}",
-        "oPaginate": {
-          "sFirst": "${_('First')}",
-          "sLast": "${_('Last')}",
-          "sNext": "${_('Next')}",
-          "sPrevious": "${_('Previous')}"
-        }
-      },
-      "fnDrawCallback": function (oSettings) {
-        $("a[data-row-selector='true']").jHueRowSelector();
+$(document).ready(function () {
+  documentsTable = $(".datatables").dataTable({
+    "sPaginationType": "bootstrap",
+    "iDisplayLength": 50,
+    "bLengthChange": false,
+    "sDom": "<'row'r>t<'row-fluid'<'dt-pages'p><'dt-records'i>>",
+    "aoColumns": [
+      { "bSortable": false, "sWidth": "26px" },
+      null,
+      null,
+      { "sClass": "row-selector-exclude"},
+      null,
+      { "sSortDataType": "dom-sort-value", "sType": "numeric", "sWidth": "100px" }
+    ],
+    "aaSorting": [
+      [ 1, "desc" ]
+    ],
+    "oLanguage": {
+      "sEmptyTable": "${_('No data available')}",
+      "sInfo": "${_('Showing _START_ to _END_ of _TOTAL_ entries')}",
+      "sInfoEmpty": "${_('Showing 0 to 0 of 0 entries')}",
+      "sInfoFiltered": "${_('(filtered from _MAX_ total entries)')}",
+      "sZeroRecords": "${_('No matching records')}",
+      "oPaginate": {
+        "sFirst": "${_('First')}",
+        "sLast": "${_('Last')}",
+        "sNext": "${_('Next')}",
+        "sPrevious": "${_('Previous')}"
       }
-    });
-
-    $("#filterInput").keydown(function (e) {
-      if (e.which == 13) {
-        e.preventDefault();
-        return false;
-      }
-    });
-
-    $("#filterInput").keyup(function () {
-      documentsTable.fnFilter($(this).val());
-      documentsTable.fnDraw();
-    });
-
-    populateTable();
-
-    $(".viewTrash").on("click", function () {
-      $(".hueCheckbox").removeClass("icon-ok");
-      var _this = $(this);
-      if (_this.hasClass("active")) {
-        populateTable();
-        _this.removeClass("active");
-      }
-      else {
-        populateTable("trash");
-        _this.addClass("active");
-      }
-    });
-
-    $(".toggleTag").on("click", function (e) {
-      $(".viewTrash").removeClass("active");
-      var _this = $(this);
-      _this.blur();
-      if (_this.find(".hueCheckbox").hasClass("icon-ok")) {
-        _this.find(".hueCheckbox").removeClass("icon-ok");
-      }
-      else {
-        _this.find(".hueCheckbox").addClass("icon-ok");
-      }
-      var _tags = [];
-      $(".hueCheckbox.icon-ok").each(function () {
-        _tags.push($(this).parent().data("tag"));
-      });
-      populateTable(_tags.join(","));
-    });
-
-    var _trashCounter = 0;
-    $(JSON_DOCS).each(function (cnt, doc) {
-      if (doc.tags.indexOf("trash") > -1) {
-        _trashCounter++;
-      }
-    });
-    $("#trashCounter").text(_trashCounter);
+    },
+    "fnDrawCallback": function (oSettings) {
+      $("a[data-row-selector='true']").jHueRowSelector();
+    }
   });
 
-  function populateTable(tags) {
-    documentsTable.fnClearTable();
+  $("#filterInput").keydown(function (e) {
+    if (e.which == 13) {
+      e.preventDefault();
+      return false;
+    }
+  });
+
+  $("#filterInput").keyup(function () {
+    documentsTable.fnFilter($(this).val());
     documentsTable.fnDraw();
-    if (tags == null || tags == "") {
-      $(JSON_DOCS).each(function (cnt, doc) {
-        if (doc.tags.indexOf("trash") == -1) {
-          addRow(doc);
-        }
-      });
+  });
+
+  populateTable();
+
+  $(".viewTrash").on("click", function () {
+    $(".hueCheckbox").removeClass("icon-ok");
+    var _this = $(this);
+    if (_this.hasClass("active")) {
+      populateTable();
+      _this.removeClass("active");
     }
     else {
-      var _tags = tags.split(",");
-      $(JSON_DOCS).each(function (cnt, doc) {
-        var _add = false;
-        $(_tags).each(function (cnt, tag) {
-          console.log(tag);
-          if (doc.tags.indexOf(tag) > -1) {
-            _add = true;
-          }
-        });
-        if (_add) {
-          addRow(doc);
+      populateTable("trash");
+      _this.addClass("active");
+    }
+  });
+
+  $(document).on("click", ".toggleTag", function (e) {
+    $(".viewTrash").removeClass("active");
+    var _this = $(this);
+    _this.blur();
+    if (_this.find(".hueCheckbox").hasClass("icon-ok")) {
+      _this.find(".hueCheckbox").removeClass("icon-ok");
+    }
+    else {
+      _this.find(".hueCheckbox").addClass("icon-ok");
+    }
+    var _tags = [];
+    $(".hueCheckbox.icon-ok").each(function () {
+      _tags.push($(this).parent().data("tag"));
+    });
+    populateTable(_tags.join(","));
+  });
+
+  var _trashCounter = 0;
+  $(JSON_DOCS).each(function (cnt, doc) {
+    if (isInTags(doc, "trash")) {
+      _trashCounter++;
+    }
+  });
+  $("#trashCounter").text(_trashCounter);
+
+  $(document).on("click", ".documentTags", function () {
+    $("#documentTagsModal").data("document-id", $(this).data("document-id"));
+    renderDocumentTagsModal();
+  });
+
+  function renderTags() {
+    $(".toggleTag").remove();
+    for (var i = JSON_TAGS.length - 1; i >= 0; i--) {
+      if (!JSON_TAGS[i].isTrash) {
+        var _t = $("<li>").addClass("toggleTag").addClass("white");
+        _t.data("tag", JSON_TAGS[i].name);
+        _t.html('<div class="hueCheckbox pull-left"></div>' + JSON_TAGS[i].name);
+        _t.insertAfter(".tag-header");
+      }
+    }
+  }
+
+  function renderTagsModal() {
+    var _tags = "";
+    for (var i = 0; i < JSON_TAGS.length; i++) {
+      if (!JSON_TAGS[i].isTrash) {
+        _tags += '<div style="margin-right:10px;margin-bottom: 6px;float:left;"><span class="tagsModalCheckbox badge" data-value="' + JSON_TAGS[i].id + '"><i class="icon-trash hide"></i> ' + JSON_TAGS[i].name + '</span></div>';
+      }
+    }
+    $("#tagsModalList").html(_tags);
+  }
+
+  function renderDocumentTagsModal() {
+    var _doc = getDocById($("#documentTagsModal").data("document-id"));
+    if (_doc != null) {
+      $("#documentTagsModalList").empty();
+      $("#documentTagsModalName").text(_doc.name);
+      var _tags = "";
+      for (var i = 0; i < JSON_TAGS.length; i++) {
+        if (!JSON_TAGS[i].isTrash) {
+          var _inTags = isInTags(_doc, JSON_TAGS[i].name);
+          _tags += '<div style="margin-right:10px;margin-bottom: 6px;float:left;"><span class="documentTagsModalCheckbox badge' + (_inTags ? ' badge-info selected' : '') + '" data-value="' + JSON_TAGS[i].id + '"><i class="icon-ok-sign' + (_inTags ? '' : ' hide') + '"></i> ' + JSON_TAGS[i].name + '</span></div>';
+        }
+      }
+      $("#documentTagsModalList").html(_tags);
+      $("#documentTagsModal").modal("show");
+    }
+  }
+
+  $("#documentTagsModal").modal({
+    show: false
+  });
+
+  $("#tagsModal").modal({
+    show: false
+  });
+
+  $("#documentTagsNewBtn").on("click", function () {
+    addTag($("#documentTagsNew").val(), function () {
+      $("#documentTagsNew").val("");
+      renderDocumentTagsModal();
+    });
+  });
+
+  $("#tagsNewBtn").on("click", function () {
+    addTag($("#tagsNew").val(), function () {
+      $("#tagsNew").val("");
+      renderTagsModal();
+    });
+  });
+
+
+  function addTag(value, callback) {
+    $.post("/tag/add_tag", {
+      name: value
+    }, function (data) {
+      $("#documentTagsNew").val("");
+      $.getJSON("/tag/list_tags", function (data) {
+        JSON_TAGS = data;
+        renderTags();
+        callback();
+      })
+    });
+  }
+
+  $(document).on("click", ".documentTagsModalCheckbox", function () {
+    var _this = $(this);
+    if (_this.hasClass("selected")) {
+      _this.removeClass("selected").removeClass("badge-info");
+      _this.find(".icon-ok-sign").addClass("hide");
+    }
+    else {
+      _this.addClass("selected").addClass("badge-info");
+      _this.find(".icon-ok-sign").removeClass("hide");
+    }
+  });
+
+
+  $("#editTags").on("click", function () {
+    renderTagsModal();
+    $("#tagsModal").modal("show");
+  });
+
+  $(document).on("click", ".tagsModalCheckbox", function () {
+    var _this = $(this);
+    if (_this.hasClass("selected")) {
+      _this.removeClass("selected").removeClass("badge-important");
+      _this.find(".icon-trash").addClass("hide");
+    }
+    else {
+      _this.addClass("selected").addClass("badge-important");
+      _this.find(".icon-trash").removeClass("hide");
+    }
+  });
+
+  $("#saveDocumentTags").on("click", function () {
+    var _tags = [];
+    $(".documentTagsModalCheckbox.selected").each(function () {
+      var _this = $(this);
+      _tags.push(_this.data("value"));
+    });
+    // TODO: $.post to remote to save the tags of a document
+    console.log("Post add tags to document " + _tags);
+  });
+
+  $("#removeTags").on("click", function () {
+    var _tags = [];
+    $(".tagsModalCheckbox.selected").each(function () {
+      var _this = $(this);
+      _tags.push(_this.data("value"));
+    });
+    // TODO: $.post to remote to remove tags globally
+    console.log("Post remove tags " + _tags);
+  });
+
+});
+
+function isInTags(doc, tag) {
+  if (doc.tags == null) {
+    return false;
+  }
+  var _inTags = false;
+  for (var i = 0; i < doc.tags.length; i++) {
+    if (doc.tags[i].name == tag) {
+      _inTags = true;
+    }
+  }
+  return _inTags;
+}
+
+function populateTable(tags) {
+  documentsTable.fnClearTable();
+  documentsTable.fnDraw();
+  if (tags == null || tags == "") {
+    $(JSON_DOCS).each(function (cnt, doc) {
+      if (!isInTags(doc, "trash")) {
+        addRow(doc);
+      }
+    });
+  }
+  else {
+    var _tags = tags.split(",");
+    $(JSON_DOCS).each(function (cnt, doc) {
+      var _add = false;
+      $(_tags).each(function (cnt, tag) {
+        if (isInTags(doc, tag)) {
+          _add = true;
         }
       });
-    }
-    documentsTable.fnDraw();
+      if (_add) {
+        addRow(doc);
+      }
+    });
   }
+  documentsTable.fnDraw();
+}
 
-  function addRow(doc) {
-    try {
-      documentsTable.fnAddData([
-        getIcon(doc.contentType),
-        '<a href="' + doc.url + '" data-row-selector="true">' + doc.name + '</a>',
-        emptyStringIfNull(doc.description),
-        emptyStringIfNull(doc.tags.join("-")),
-        emptyStringIfNull(doc.owner),
-        emptyStringIfNull(doc.lastModified)
-      ], false);
+function addRow(doc) {
+  try {
+    var _tags = "";
+    for (var i = 0; i < doc.tags.length; i++) {
+      _tags += '<span class="badge">' + doc.tags[i].name + '</span> ';
     }
-    catch (error) {
-      $(document).trigger("error", error);
-    }
+    documentsTable.fnAddData([
+      getIcon(doc.contentType),
+      '<a href="' + doc.url + '" data-row-selector="true">' + doc.name + '</a>',
+      emptyStringIfNull(doc.description),
+      '<div class="documentTags" data-document-id="' + doc.id + '">' + _tags + '</div>',
+      emptyStringIfNull(doc.owner),
+      emptyStringIfNull(doc.lastModified)
+    ], false);
   }
+  catch (error) {
+    $(document).trigger("error", error);
+  }
+}
 
-  function getIcon(contentType) {
-    var _code = '<img src="';
-    switch (contentType) {
-      case "workflow":
-        _code += '/oozie/static/art/icon_oozie_24_workflow.png';
-        break;
-      case "coordinator":
-        _code += '/oozie/static/art/icon_oozie_24_coordinator.png';
-        break;
-      case "bundle":
-        _code += '/oozie/static/art/icon_oozie_24_bundle.png';
-        break;
+function getDocById(id) {
+  var _doc = null;
+  $(JSON_DOCS).each(function (cnt, doc) {
+    if (doc.id == id) {
+      _doc = doc;
     }
-    _code += '" />';
-    return _code;
-  }
+  });
+  return _doc;
+}
 
-  function emptyStringIfNull(obj) {
-    if (obj != null && typeof obj != "undefined") {
-      return obj;
-    }
-    return "";
+function getIcon(contentType) {
+  var _code = '<img src="';
+  switch (contentType) {
+    case "workflow":
+      _code += '/oozie/static/art/icon_oozie_24_workflow.png';
+      break;
+    case "coordinator":
+      _code += '/oozie/static/art/icon_oozie_24_coordinator.png';
+      break;
+    case "bundle":
+      _code += '/oozie/static/art/icon_oozie_24_bundle.png';
+      break;
   }
+  _code += '" />';
+  return _code;
+}
+
+function emptyStringIfNull(obj) {
+  if (obj != null && typeof obj != "undefined") {
+    return obj;
+  }
+  return "";
+}
 </script>
 
 ${ commonfooter(messages) | n,unicode }

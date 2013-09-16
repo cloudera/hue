@@ -55,10 +55,12 @@ LOG = logging.getLogger(__name__)
 @access_log_level(logging.WARN)
 def home(request):
   docs = Document.objects.get_docs(request.user).order_by('-last_modified')[:100]
+  tags = DocumentTag.objects.filter(owner=request.user)
   return render('home.mako', request, {
     'documents': docs,
     'json_documents': json.dumps(massaged_documents_for_json(docs)),
-    'tags': DocumentTag.objects.filter(owner=request.user),
+    'tags': tags,
+    'json_tags': json.dumps(massaged_tags_for_json(tags, request.user))
   })
 
 def massaged_documents_for_json(documents):
@@ -70,7 +72,7 @@ def massaged_documents_for_json(documents):
       'name': doc.name,
       'url': doc.content_object.get_absolute_url(),
       'description': doc.description,
-      'tags': ['%s' % (tag.tag) for tag in doc.tags.all()],
+      'tags': [{'id': tag.id, 'name': tag.tag} for tag in doc.tags.all()],
       'owner': doc.owner.username,
       'lastModified': doc.last_modified.strftime("%x %X"),
       'lastModifiedInMillis': time.mktime(doc.last_modified.timetuple())
@@ -80,13 +82,46 @@ def massaged_documents_for_json(documents):
   return docs
 
 
+def massaged_tags_for_json(tags, user):
+  ts = []
+  trash = DocumentTag.get_trash_tag(user)
+  for tag in tags:
+    massaged_tag = {
+      'id': tag.id,
+      'name': tag.tag,
+      'isTrash': tag.id == trash.id
+    }
+    ts.append(massaged_tag)
+
+  return ts
+
+def add_tag(request):
+  response = {'status': -1, 'message': ''}
+
+  if request.method == 'POST':
+    try:
+      tag = DocumentTag.create_tag(request.user, request.POST['name'])
+      response['tag_id'] = tag.id
+    except Exception, e:
+      response['message'] = force_unicode(e)
+  else:
+    response['message'] = _('POST request only')
+
+  return HttpResponse(json.dumps(response), mimetype="application/json")
+
+def list_tags(request):
+  tags = DocumentTag.objects.filter(owner=request.user)
+  return HttpResponse(json.dumps(massaged_tags_for_json(tags, request.user)), mimetype="application/json")
+
+
 def add_or_create_tag(request):
   response = {'status': -1, 'message': ''}
   
-  if request.action == 'POST':
-    json = {'tag_id': 1, 'tag': 'hue project', 'doc_id': 1}   # instead ... json.load(request.POST) 
+  if request.method == 'POST':
+    request_json = json.loads(request.POST['data'])
     try:
-      DocumentTag.add_or_create_tag(request.user, json['doc_id'], json['tag'], json.get('tag_id'))
+      tag = DocumentTag.add_or_create_tag(request.user, request_json['doc_id'], request_json['tag'], request_json['tag_id'])
+      response['tag_id'] = tag.id
     except Exception, e:
       response['message'] = force_unicode(e)
   else:
@@ -98,7 +133,7 @@ def add_or_create_tag(request):
 def remove_tag(request):
   response = {'status': -1, 'message': _('Error')}
   
-  if request.action == 'POST':
+  if request.method == 'POST':
     json = {'tag_id': 1, 'tag': 'hue project', 'doc_id': 1}  # instead ... json.load(request.POST)
     try:
       DocumentTag.remove_tag(id=json['tag_id'], owner=request.user, doc_id=json['doc_id'])
