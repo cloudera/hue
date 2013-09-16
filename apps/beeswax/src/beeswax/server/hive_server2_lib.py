@@ -555,11 +555,7 @@ class PartitionValueCompatible:
 
   def __init__(self, partition, table):
     # Parses: ['datehour=2013022516'] or ['month=2011-07/dt=2011-07-01/hr=12']
-    self.values = []
-    for part in partition:
-      parts = part.split('/')
-      for val in parts:
-        self.values.append(val.split('=')[1])
+    self.values = [val.split('=')[1] for part in partition for val in part.split('/')]
     self.sd = type('Sd', (object,), {'location': '%s/%s' % (table.path_location, ','.join(partition)),})
 
 
