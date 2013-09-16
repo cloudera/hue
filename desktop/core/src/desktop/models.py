@@ -48,30 +48,17 @@ class Settings(models.Model):
     return settings
 
 
-class DocumentTag(models.Model):
-  owner = models.ForeignKey(auth_models.User, db_index=True)
-  tag = models.SlugField()
+class DocumentTagManager(models.Manager):
 
-  DEFAULT = 'default'
-  TRASH = 'trash'
-
-  unique_together = ('owner', 'tag')
-
-  def __unicode__(self):
-    return force_unicode('%s') % (self.tag,)
-
-  @classmethod
-  def get_trash_tag(cls, user):
+  def get_trash_tag(self, user):
     tag, created = DocumentTag.objects.get_or_create(owner=user, tag=DocumentTag.TRASH)
     return tag
 
-  @classmethod
-  def create_tag(cls, owner, tag_name):
+  def create_tag(self, owner, tag_name):
     tag = DocumentTag.objects.create(tag=tag_name, owner=owner)
     return tag
 
-  @classmethod
-  def add_or_create_tag(cls, owner, doc_id, tag_name, tag_id=None):
+  def add_or_create_tag(self, owner, doc_id, tag_name, tag_id=None):
     try:
       tag = DocumentTag.objects.get(id=tag_id, owner=owner)
       if tag.id == DocumentTag.get_trash_tag(owner):
@@ -83,8 +70,7 @@ class DocumentTag(models.Model):
     doc.add_tag(tag)
     return tag
 
-  @classmethod
-  def remove_tag(cls, tag_id, owner, doc_id):
+  def remove_tag(self, tag_id, owner, doc_id):
     tag = DocumentTag.objects.get(id=tag_id, owner=owner)
     if tag.id == DocumentTag.get_trash_tag(owner):
       raise Exception(_("Can't remove trash tag. Please restore the document from the trash instead."))
@@ -92,42 +78,57 @@ class DocumentTag(models.Model):
     doc = Document.objects.get_doc(doc_id, owner=owner)
     doc.remove(tag)
     if tag.tag != DocumentTag.TRASH and not tag.document_set.exists():
-      tag.delete()    
+      tag.delete()
+
+
+class DocumentTag(models.Model):
+  owner = models.ForeignKey(auth_models.User, db_index=True)
+  tag = models.SlugField()
+
+  DEFAULT = 'default'
+  TRASH = 'trash'
+
+  objects = DocumentTagManager()
+  unique_together = ('owner', 'tag')
+
+
+  def __unicode__(self):
+    return force_unicode('%s') % (self.tag,)
 
 
 class DocumentManager(models.Manager):
 
   def documents(self, user):
     return Document.objects.filter(Q(owner=user) | Q(documentpermission__users=user) | Q(documentpermission__groups__in=user.groups.all()))
-  
+
   def get_docs(self, user):
     return Document.objects.documents(user).exclude(name='pig-app-hue-script')
-    
+
   def get_doc(self, doc_id, user):
-    return Document.objects.documents(user).get(id=doc_id)  
-  
+    return Document.objects.documents(user).get(id=doc_id)
+
   def trashed_docs(self, model_class, user):
     ct = ContentType.objects.get_for_model(model_class)
-    tag = DocumentTag.get_trash_tag(user=user)
-    
+    tag = DocumentTag.objects.get_trash_tag(user=user)
+
     return Document.objects.get_docs(user).filter(content_type=ct).filter(tags__in=[tag]).order_by('-last_modified')
 
   def trashed(self, model_class, user):
     docs = self.trashed_docs(model_class, user)
-    
+
     return [job.content_object for job in docs if job.content_object]
-  
+
   def available_docs(self, model_class, user):
     ct = ContentType.objects.get_for_model(model_class)
-    tag = DocumentTag.get_trash_tag(user=user)
-    
+    tag = DocumentTag.objects.get_trash_tag(user=user)
+
     return Document.objects.get_docs(user).filter(content_type=ct).exclude(tags__in=[tag]).order_by('-last_modified')
-          
+
   def available(self, model_class, user):
     docs = self.available_docs(model_class, user)
-    
-    return [job.content_object for job in docs if job.content_object]
-  
+
+    return [doc.content_object for doc in docs if doc.content_object]
+
   def is_accessible_or_exception(self, user, doc_class, doc_id, exception_class=PopupException):
     if doc_id is None:
       return
@@ -145,11 +146,11 @@ class DocumentManager(models.Manager):
       raise exception_class(_('Document %(id)s does not exist') % {'id': doc_id})
 
   def is_accessible(self, user, doc_class, doc_id):
-    ct = ContentType.objects.get_for_model(doc_class)    
+    ct = ContentType.objects.get_for_model(doc_class)
     doc = Document.objects.get(object_id=doc_id, content_type=ct)
 
     return doc.is_accessible(user)
-  
+
   def link(self, content_object, owner, name='', description='', extra=''):
     doc = Document.objects.create(
               content_object=content_object,
@@ -179,19 +180,41 @@ class DocumentManager(models.Manager):
             DocumentPermission.share_to_default(doc)
     except Exception, e:
       print e
-       
-       
+
+    try:
+      for job in SavedQuery.objects.all():
+        if not job.doc.exists():
+          doc = Document.objects.link(job, owner=job.owner, name=job.name, description=job.desc, extra=job.type)
+          tag, created = DocumentTag.objects.get_or_create(owner=job.owner, tag='default')
+          doc.tags.add(tag)
+          if job.is_trashed:
+            doc.send_to_trash()
+    except Exception, e:
+      print e
+
+    try:
+      from pig.models import PigScript
+
+      for job in PigScript.objects.all():
+        if not job.doc.exists():
+          doc = Document.objects.link(job, owner=job.owner, name=job.dict['name'], description='')
+          tag, created = DocumentTag.objects.get_or_create(owner=job.owner, tag='default')
+          doc.tags.add(tag)
+    except Exception, e:
+      print e
+
+
 class Document(models.Model):
   owner = models.ForeignKey(auth_models.User, db_index=True, verbose_name=_t('Owner'), help_text=_t('User who can own the job.'), related_name='doc_owner')
   name = models.TextField(default='')
   description = models.TextField(default='')
 
-  last_modified = models.DateTimeField(auto_now=True, db_index=True, verbose_name=_t('Last modified'))  
+  last_modified = models.DateTimeField(auto_now=True, db_index=True, verbose_name=_t('Last modified'))
   version = models.SmallIntegerField(default=1, verbose_name=_t('Schema version'))
   extra = models.TextField(default='')
-  
+
   tags = models.ManyToManyField(DocumentTag, db_index=True)
-  
+
   content_type = models.ForeignKey(ContentType)
   object_id = models.PositiveIntegerField()
   content_object = generic.GenericForeignKey('content_type', 'object_id')
@@ -201,7 +224,7 @@ class Document(models.Model):
 
   def __unicode__(self):
     return force_unicode('%s %s %s') % (self.content_type, self.name, self.owner)
-      
+
   def is_editable(self, user):
     """Deprecated by can_read"""
     return self.can_write(user)
@@ -212,17 +235,17 @@ class Document(models.Model):
 
   def add_tag(self, tag):
     self.tags.add(tag)
-      
+
   def send_to_trash(self):
-    tag = DocumentTag.get_trash_tag(user=self.owner)
+    tag = DocumentTag.objects.get_trash_tag(user=self.owner)
     self.tags.add(tag)
 
   def restore_from_trash(self):
-    tag = DocumentTag.get_trash_tag(user=self.owner)
+    tag = DocumentTag.objects.get_trash_tag(user=self.owner)
     self.tags.remove(tag)
 
   def is_accessible(self, user):
-    return user.is_superuser or self.owner == user or Document.objects.get_doc(self.id, user) 
+    return user.is_superuser or self.owner == user or Document.objects.get_doc(self.id, user)
 
   def can_read(self, user):
     return user.is_superuser or self.owner == user or Document.objects.get_doc(self.id, user)
@@ -240,7 +263,7 @@ class Document(models.Model):
     if self.can_write(user):
       return True
     else:
-      raise exception_class(_('Only superusers and %s are allowed to modify this document.') % user) 
+      raise exception_class(_('Only superusers and %s are allowed to modify this document.') % user)
 
   def copy(self):
     copy_doc = self
@@ -250,20 +273,20 @@ class Document(models.Model):
     copy_doc.pk = None
     copy_doc.id = None
     copy_doc.save()
-    
+
     copy_doc.tags.add(*tags)
-    
-    return copy_doc 
+
+    return copy_doc
 
 
 
 class DocumentPermission(models.Model):
   doc = models.ForeignKey(Document)
-  
+
   users = models.ManyToManyField(auth_models.User, db_index=True)
-  groups = models.ManyToManyField(auth_models.Group, db_index=True) 
+  groups = models.ManyToManyField(auth_models.Group, db_index=True)
   perms = models.TextField(
-      default='read', choices=(('read', 'read'),),)    
+      default='read', choices=(('read', 'read'),),)
 
   @classmethod
   def share_to_default(cls, document):

@@ -76,17 +76,25 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
            <li class="dropdown">
               <a href="#" data-toggle="dropdown"><i class="icon-plus-sign"></i> ${_('New document')}</a>
               <ul class="dropdown-menu" role="menu">
+                % if 'beeswax' in apps:
                 <li><a href="#"><img src="/beeswax/static/art/icon_beeswax_24.png"/> ${_('Hive Query')}</a></li>
+                % endif
+                % if 'impala' in apps:
                 <li><a href="#"><img src="/impala/static/art/icon_impala_24.png"/> ${_('Impala Query')}</a></li>
+                % endif
+                % if 'pig' in apps:
                 <li><a href="#"><img src="/pig/static/art/icon_pig_24.png"/> ${_('Pig Script')}</a></li>
+                % endif
+                % if 'oozie' in apps:
                 <li class="dropdown-submenu">
-                  <a href="#"><img src="/oozie/static/art/icon_oozie_24.png"/> ${_('Oozie')}</a>
+                  <a href="#"><img src="/oozie/static/art/icon_oozie_24.png"/> ${_('Oozie Scheduler')}</a>
                   <ul class="dropdown-menu">
                     <li><a href="#"><img src="/oozie/static/art/icon_oozie_24_workflow.png"/> ${_('Workflow')}</a></li>
                     <li><a href="#"><img src="/oozie/static/art/icon_oozie_24_coordinator.png"/> ${_('Coordinator')}</a></li>
                     <li><a href="#"><img src="/oozie/static/art/icon_oozie_24_bundle.png"/> ${_('Bundle')}</a></li>
                   </ul>
                 </li>
+                % endif
               </ul>
            </li>
            <li class="viewTrash"><a href="javascript:void(0)"><i class="icon-trash"></i> ${_('View Trash')} <span id="trashCounter" class="badge pull-right">0</span></a></li>

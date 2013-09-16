@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import logging
+import json
 import os
 import sys
 import tempfile
@@ -34,7 +35,7 @@ import django.views.debug
 
 from desktop.lib import django_mako
 from desktop.lib.conf import GLOBAL_CONFIG
-from desktop.lib.django_util import login_notrequired, render_json, render, encode_json_for_js
+from desktop.lib.django_util import login_notrequired, render_json, render
 from desktop.lib.i18n import smart_str, force_unicode
 from desktop.lib.paths import get_desktop_root
 from desktop.log.access import access_log_level, access_warn
@@ -43,20 +44,18 @@ from desktop import appmanager
 import desktop.conf
 import desktop.log.log_buffer
 
-try:
-  import json
-except ImportError:
-  import simplejson as json
-
 
 LOG = logging.getLogger(__name__)
 
 
-@access_log_level(logging.WARN)
 def home(request):
   docs = Document.objects.get_docs(request.user).order_by('-last_modified')[:100]
   tags = DocumentTag.objects.filter(owner=request.user)
+  
+  apps = dict([(app.name, app) for app in appmanager.get_apps(request.user)])
+  
   return render('home.mako', request, {
+    'apps': apps,                                       
     'documents': docs,
     'json_documents': json.dumps(massaged_documents_for_json(docs)),
     'tags': tags,
@@ -84,7 +83,7 @@ def massaged_documents_for_json(documents):
 
 def massaged_tags_for_json(tags, user):
   ts = []
-  trash = DocumentTag.get_trash_tag(user)
+  trash = DocumentTag.objects.get_trash_tag(user)
   for tag in tags:
     massaged_tag = {
       'id': tag.id,
@@ -100,7 +99,7 @@ def add_tag(request):
 
   if request.method == 'POST':
     try:
-      tag = DocumentTag.create_tag(request.user, request.POST['name'])
+      tag = DocumentTag.objects.create_tag(request.user, request.POST['name'])
       response['tag_id'] = tag.id
     except Exception, e:
       response['message'] = force_unicode(e)
@@ -110,7 +109,7 @@ def add_tag(request):
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 def list_tags(request):
-  tags = DocumentTag.objects.filter(owner=request.user)
+  tags = DocumentTag.objects.objects.filter(owner=request.user)
   return HttpResponse(json.dumps(massaged_tags_for_json(tags, request.user)), mimetype="application/json")
 
 
@@ -120,7 +119,7 @@ def add_or_create_tag(request):
   if request.method == 'POST':
     request_json = json.loads(request.POST['data'])
     try:
-      tag = DocumentTag.add_or_create_tag(request.user, request_json['doc_id'], request_json['tag'], request_json['tag_id'])
+      tag = DocumentTag.objects.add_or_create_tag(request.user, request_json['doc_id'], request_json['tag'], request_json['tag_id'])
       response['tag_id'] = tag.id
     except Exception, e:
       response['message'] = force_unicode(e)
@@ -136,7 +135,7 @@ def remove_tag(request):
   if request.method == 'POST':
     json = {'tag_id': 1, 'tag': 'hue project', 'doc_id': 1}  # instead ... json.load(request.POST)
     try:
-      DocumentTag.remove_tag(id=json['tag_id'], owner=request.user, doc_id=json['doc_id'])
+      DocumentTag.objects.remove_tag(id=json['tag_id'], owner=request.user, doc_id=json['doc_id'])
       response['message'] = _('Tag removed !')
     except Exception, e:
       response['message'] = force_unicode(e)
