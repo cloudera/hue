@@ -77,17 +77,20 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
               <a href="#" data-toggle="dropdown"><i class="icon-plus-sign"></i> ${_('New document')}</a>
               <ul class="dropdown-menu" role="menu">
                 % if 'beeswax' in apps:
-                <li><a href="${ url('beeswax:index') }"><img src="/beeswax/static/art/icon_beeswax_24.png"/> ${_('Hive Query')}</a></li>
+                <li><a href="#"><img src="${ apps['beeswax'].icon_path }"/> ${_('Hive Query')}</a></li>
                 % endif
                 % if 'impala' in apps:
-                <li><a href="${ url('impala:index') }"><img src="/impala/static/art/icon_impala_24.png"/> ${_('Impala Query')}</a></li>
+                <li><a href="#"><img src="${ apps['impala'].icon_path }"/> ${_('Impala Query')}</a></li>
                 % endif
                 % if 'pig' in apps:
-                <li><a href="${ url('pig:index') }"><img src="/pig/static/art/icon_pig_24.png"/> ${_('Pig Script')}</a></li>
+                <li><a href="#"><img src="${ apps['pig'].icon_path }"/> ${_('Pig Script')}</a></li>
                 % endif
+                % if 'sqoop' in apps:
+                <li><a href="#"><img src="${ apps['sqoop'].icon_path }"/> ${_('Sqoop Transfer')}</a></li>
+                % endif                
                 % if 'oozie' in apps:
                 <li class="dropdown-submenu">
-                  <a href="#"><img src="/oozie/static/art/icon_oozie_24.png"/> ${_('Oozie Scheduler')}</a>
+                  <a href="#"><img src="${ apps['oozie'].icon_path }"/> ${_('Oozie Scheduler')}</a>
                   <ul class="dropdown-menu">
                     <li><a href="${ url('oozie:create_workflow') }"><img src="/oozie/static/art/icon_oozie_24_workflow.png"/> ${_('Workflow')}</a></li>
                     <li><a href="${ url('oozie:create_coordinator') }"><img src="/oozie/static/art/icon_oozie_24_coordinator.png"/> ${_('Coordinator')}</a></li>
@@ -505,7 +508,7 @@ function addRow(doc) {
       _tags += '<span class="badge">' + doc.tags[i].name + '</span> ';
     }
     documentsTable.fnAddData([
-      getIcon(doc.contentType),
+      '<img src="' + doc.icon + '" width="80%"/>',
       '<a href="' + doc.url + '" data-row-selector="true">' + doc.name + '</a>',
       emptyStringIfNull(doc.description),
       '<div class="documentTags" data-document-id="' + doc.id + '">' + _tags + '</div>',
@@ -534,24 +537,6 @@ function updateDoc(updatedDoc) {
       JSON_DOCS[cnt] = updatedDoc;
     }
   });
-}
-
-
-function getIcon(contentType) {
-  var _code = '<img src="';
-  switch (contentType) {
-    case "workflow":
-      _code += '/oozie/static/art/icon_oozie_24_workflow.png';
-      break;
-    case "coordinator":
-      _code += '/oozie/static/art/icon_oozie_24_coordinator.png';
-      break;
-    case "bundle":
-      _code += '/oozie/static/art/icon_oozie_24_bundle.png';
-      break;
-  }
-  _code += '" />';
-  return _code;
 }
 
 function emptyStringIfNull(obj) {
