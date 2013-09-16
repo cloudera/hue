@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 from itertools import chain
 
 from django.db import models
@@ -28,7 +29,11 @@ from desktop.lib.i18n import force_unicode
 from desktop.lib.exceptions_renderable import PopupException
 
 from useradmin.models import get_default_user_group
+from desktop import appmanager
 
+
+
+LOG = logging.getLogger(__name__)
 
 
 class UserPreferences(models.Model):
@@ -278,6 +283,25 @@ class Document(models.Model):
 
     return copy_doc
 
+  @property
+  def icon(self):
+    apps = appmanager.get_apps_dict()
+    
+    try:
+      if self.content_type.app_label == 'beeswax':
+        if self.extra == '0':      
+          return apps['beeswax'].icon_path
+        else:
+          return apps['impala'].icon_path
+      elif self.content_type.app_label == 'oozie':
+        return self.content_type.model_class().ICON
+      elif self.content_type.app_label in apps: 
+        return apps[self.content_type.app_label].icon_path
+      else:
+        return '/static/art/favicon.png'
+    except Exception, e:
+      LOG.warn(force_unicode(e))
+      return '/static/art/favicon.png' 
 
 
 class DocumentPermission(models.Model):

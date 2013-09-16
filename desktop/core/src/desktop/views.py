@@ -52,7 +52,7 @@ def home(request):
   docs = Document.objects.get_docs(request.user).order_by('-last_modified')[:100]
   tags = DocumentTag.objects.filter(owner=request.user)
   
-  apps = dict([(app.name, app) for app in appmanager.get_apps(request.user)])
+  apps = appmanager.get_apps_dict(request.user)
   
   return render('home.mako', request, {
     'apps': apps,                                       
@@ -84,6 +84,7 @@ def massage_doc_for_json(doc):
   return {
       'id': doc.id,
       'contentType': doc.content_type.name,
+      'icon': doc.icon,
       'name': doc.name,
       'url': doc.content_object.get_absolute_url(),
       'description': doc.description,
