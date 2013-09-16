@@ -55,7 +55,8 @@ from beeswax.data_export import download
 from beeswax.models import SavedQuery, QueryHistory, HQL
 from beeswax.server import dbms
 from beeswax.server.dbms import QueryServerException
-from beeswax.server.hive_server2_lib import HiveServerClient
+from beeswax.server.hive_server2_lib import HiveServerClient,\
+  PartitionValueCompatible
 from beeswax.test_base import BeeswaxSampleProvider
 
 
@@ -1435,6 +1436,20 @@ def test_split_statements():
   assert_equal(['select', "select * where id == '\\'10;' limit 100"], hql_query("select; select * where id == '\\'10;' limit 100;").statements)
   assert_equal(['select', "select * where id == '\"10;\"\"\"' limit 100"], hql_query("select; select * where id == '\"10;\"\"\"' limit 100;").statements)
 
+
+class MockHiveServerTable():
+
+  def __init__(self, data):
+    self.path_location = data.get('path_location')
+
+
+class TestHiveServer2API():
+
+  def test_partition_values(self):
+    table = MockHiveServerTable({'path_location': '/my/table'})
+
+    assert_equal(['2013022516'], PartitionValueCompatible(['datehour=2013022516'], table).values)
+    assert_equal(['2011-07', '2011-07-01', '12'], PartitionValueCompatible(['month=2011-07/dt=2011-07-01/hr=12'], table).values)
 
 
 class MockDbms:
