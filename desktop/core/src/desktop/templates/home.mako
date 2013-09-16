@@ -77,13 +77,13 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
               <a href="#" data-toggle="dropdown"><i class="icon-plus-sign"></i> ${_('New document')}</a>
               <ul class="dropdown-menu" role="menu">
                 % if 'beeswax' in apps:
-                <li><a href="#"><img src="${ apps['beeswax'].icon_path }"/> ${_('Hive Query')}</a></li>
+                <li><a href="${ url('beeswax:index') }"><img src="${ apps['beeswax'].icon_path }"/> ${_('Hive Query')}</a></li>
                 % endif
                 % if 'impala' in apps:
-                <li><a href="#"><img src="${ apps['impala'].icon_path }"/> ${_('Impala Query')}</a></li>
+                <li><a href="${ url('impala:index') }"><img src="${ apps['impala'].icon_path }"/> ${_('Impala Query')}</a></li>
                 % endif
                 % if 'pig' in apps:
-                <li><a href="#"><img src="${ apps['pig'].icon_path }"/> ${_('Pig Script')}</a></li>
+                <li><a href="${ url('beeswax:index') }"><img src="${ apps['pig'].icon_path }"/> ${_('Pig Script')}</a></li>
                 % endif
                 % if 'sqoop' in apps:
                 <li><a href="#"><img src="${ apps['sqoop'].icon_path }"/> ${_('Sqoop Transfer')}</a></li>

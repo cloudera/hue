@@ -144,9 +144,8 @@ def update_tags(request):
   if request.method == 'POST':
     request_json = json.loads(request.POST['data'])
     try:
-      print request_json
-      #doc = DocumentTag.objects.update_tags(request.user, request_json['doc_id'], request_json['tag_ids'])
-      #response['doc'] = massage_doc_for_json(doc)
+      doc = DocumentTag.objects.update_tags(request.user, request_json['doc_id'], request_json['tag_ids'])
+      response['doc'] = massage_doc_for_json(doc)
     except Exception, e:
       response['message'] = force_unicode(e)
   else:
@@ -160,11 +159,9 @@ def remove_tags(request):
 
   if request.method == 'POST':
     request_json = json.loads(request.POST['data'])
-    print request_json
     try:
       for tag_id in request_json['tag_ids']:
-        print tag_id
-        #DocumentTag.delete_tag(tag_id, request.user)
+        DocumentTag.objects.delete_tag(tag_id, request.user)
       response['message'] = _('Tag removed !')
     except Exception, e:
       response['message'] = force_unicode(e)

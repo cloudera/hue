@@ -20,6 +20,7 @@ import desktop
 import desktop.urls
 import desktop.conf
 import logging
+import json
 import os
 import time
 
@@ -29,6 +30,7 @@ import proxy.conf
 from nose.plugins.attrib import attr
 from nose.tools import assert_true, assert_equal, assert_not_equal, assert_raises
 from django.conf.urls.defaults import patterns, url
+from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.db.models import query, CharField, SmallIntegerField
@@ -485,3 +487,66 @@ def test_check_config_ajax():
   c = make_logged_in_client()
   response = c.get(reverse(check_config))
   assert_true("misconfiguration" in response.content, response.content)
+
+
+class TestDocModelTags():
+  def setUp(self):
+    self.client = make_logged_in_client(username="tag_user")
+    self.client_not_me = make_logged_in_client(username="not_tag_user")
+    
+    self.user = User.objects.get(username="tag_user")
+    self.user_not_me = User.objects.get(username="not_tag_user")
+
+    grant_access(self.user.username, self.user.username, "desktop")
+    grant_access(self.user_not_me.username, self.user_not_me.username, "desktop")        
+
+  def test_add_tag(self):
+    response = self.client.get("/desktop/add_tag")    
+    assert_equal(-1, json.loads(response.content).status)
+
+    response = self.client.post("/desktop/add_tag", {'name': 'my_tag'})    
+    assert_equal(0, json.loads(response.content).status)
+  
+  def test_remove_tags(self):
+    response = self.client.get("/desktop/remove_tags")    
+    assert_equal(-1, json.loads(response.content).status)
+
+    response = self.client.post("/desktop/remove_tags", {'data': json.dumps({'tag_ids': []})})    
+    assert_equal(0, json.loads(response.content).status)  
+  
+  def test_list_tags(self):
+    response = self.client.get("/desktop/list_tags")        
+    assert_equal({}, json.loads(response.content))    
+  
+  def test_list_docs(self):
+    response = self.client.get("/desktop/list_docs")        
+    assert_equal({}, json.loads(response.content))   
+  
+  def test_add_or_create_tag(self):
+    response = self.client.get("/desktop/add_or_create_tag$")        
+    assert_equal({}, json.loads(response.content))   
+
+  def test_update_tags(self):
+    response = self.client.get("/desktop/update_tags")        
+    assert_equal({}, json.loads(response.content))  
+
+
+
+class TestDocModelPermissions():
+  def setUp(self):
+    self.client = make_logged_in_client(username="perm_user")
+    self.client_not_me = make_logged_in_client(username="not_perm_user")
+    
+    self.user = User.objects.get(username="perm_user")
+    self.user_not_me = User.objects.get(username="not_perm_user")
+
+    grant_access(self.user.username, self.user.username, "desktop")
+    grant_access(self.user_not_me.username, self.user_not_me.username, "desktop")        
+
+  def test_add_or_update_permission(self):
+    response = self.client.get("/desktop/add_or_update_permission")    
+    assert_equal(-1, json.loads(response.content).status)
+
+  def test_remove_permission(self):
+    response = self.client.get("/desktop/remove_permission")    
+    assert_equal(-1, json.loads(response.content).status)
