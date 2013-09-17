@@ -22,7 +22,7 @@ from django.utils.translation import ugettext as _
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="util" file="util.mako" />
 
-${ commonheader(_('Waiting for query...'), app_name, user, '100px') | n,unicode }
+${ commonheader(_('Waiting for query...'), app_name, user) | n,unicode }
 ${layout.menubar(section='query')}
 
 ## Required for unit tests
@@ -63,7 +63,7 @@ ${layout.menubar(section='query')}
             </div>
         </div>
         <div class="span9">
-          <div class="card" style="margin-top: 0">
+          <div class="card card-small">
             <h1 class="card-heading simple">${_('Waiting for query...')} ${util.render_query_context(query_context)}</h1>
             <div class="card-body">
               <p>

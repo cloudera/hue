@@ -18,8 +18,24 @@
   from django.utils.translation import ugettext as _
 %>
 
-${ commonheader(_('Home'), "home", user) | n,unicode }
+${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
 
+  <div class="navbar navbar-inverse navbar-fixed-top nokids">
+      <div class="navbar-inner">
+        <div class="container-fluid">
+          <div class="nav-collapse">
+            <ul class="nav">
+              <li class="currentApp">
+                <a href="/home">
+                  <img src="/static/art/home.png" />
+                  ${ _('Home') }
+                </a>
+               </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+  </div>
 
 <%def name="app_link(app, label=None, extra_path = '')">
   % if app in apps:

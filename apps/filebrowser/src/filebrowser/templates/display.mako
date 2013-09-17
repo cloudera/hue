@@ -29,11 +29,12 @@
 <%namespace name="fb_components" file="fb_components.mako" />
 
 ${ commonheader(_('%(filename)s - File Viewer') % dict(filename=truncate(filename)), 'filebrowser', user) | n,unicode }
+${ fb_components.menubar() }
 
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="span2">
-      <div class="sidebar-nav">
+      <div class="sidebar-nav" style="padding-top: 0">
         <ul class="nav nav-list">
           <li class="nav-header">${_('Actions')}</li>
           % if view['mode'] == "binary":
@@ -84,7 +85,7 @@ ${ commonheader(_('%(filename)s - File Viewer') % dict(filename=truncate(filenam
       </div>
     </div>
     <div class="span10">
-      <div class="card" style="margin-top: 0">
+      <div class="card card-small">
       % if breadcrumbs:
         ${fb_components.breadcrumbs(path, breadcrumbs)}
       %endif

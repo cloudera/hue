@@ -70,7 +70,6 @@
       },
       tours: [],
       showRemote: false,
-      questionMarkPlacement: "right",
       hideIfNoneAvailable: true
     };
 
@@ -120,11 +119,8 @@
 
   Plugin.prototype.initQuestionMark = function () {
     var _this = this;
-    $("#jHueTourQuestion").remove();
-    var _questionMark = $("<div>").attr("id", "jHueTourQuestion").html('<i class="icon-flag-checkered" style=""></i>').addClass("jHueTourBadge");
-    if (_this.options.questionMarkPlacement == "left"){
-      _questionMark.addClass("jHueTourBadgeLeft");
-    }
+    $("#jHueTourFlag").remove();
+    var _questionMark = $("<a>").attr("id", "jHueTourFlag").html('<i class="icon-flag-checkered" style=""></i>');
     if ($.totalStorage("jHueTourExtras") != null) {
       var _newTours = [];
       $.each(_this.options.tours, function (cnt, tour) {
@@ -211,7 +207,7 @@
         content: _toursHtml,
         html: true,
         trigger: "manual",
-        placement: _this.options.questionMarkPlacement == "left"?"right":"left"
+        placement: "left"
       }).popover("show");
       if ($(".popover").position().top <= 0) {
         $(".popover").css("top", "10px");
@@ -219,7 +215,7 @@
       _closeBtn.prependTo($(".popover-title"));
 
     });
-    _questionMark.appendTo($("body"));
+    _questionMark.appendTo($("#jHueTourFlagPlaceholder"));
   };
 
   Plugin.prototype.addTours = function (options) {
@@ -282,9 +278,9 @@
             }
             $.totalStorage("jHueTourExtras", _newStoredArray);
           }
-          $("#jHueTourQuestion").popover("destroy");
+          $("#jHueTourFlag").popover("destroy");
           _this.initQuestionMark();
-          $("#jHueTourQuestion").click();
+          $("#jHueTourFlag").click();
         },
         error: function (e) {
           $(document).trigger("error", e.message);
@@ -304,9 +300,9 @@
           }
         });
         $.totalStorage("jHueTourExtras", _newStoredArray);
-        $("#jHueTourQuestion").popover("destroy");
+        $("#jHueTourFlag").popover("destroy");
         _this.initQuestionMark();
-        $("#jHueTourQuestion").click();
+        $("#jHueTourFlag").click();
       }
     }
 

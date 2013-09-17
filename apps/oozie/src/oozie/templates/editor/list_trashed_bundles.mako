@@ -24,12 +24,12 @@
 <%namespace name="layout" file="../navigation-bar.mako" />
 <%namespace name="utils" file="../utils.inc.mako" />
 
-${ commonheader(_("Trashed Bundles"), "oozie", user, "100px") | n,unicode }
+${ commonheader(_("Trashed Bundles"), "oozie", user) | n,unicode }
 ${ layout.menubar(section='bundles') }
 
 
 <div class="container-fluid">
-  <div class="card">
+  <div class="card card-small">
   <h1 class="card-heading simple">${ _('Bundle Trash') }</h1>
 
   <%actionbar:render>

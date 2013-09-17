@@ -24,19 +24,20 @@
 <%namespace name="layout" file="../navigation-bar.mako" />
 <%namespace name="utils" file="../utils.inc.mako" />
 
-${ commonheader(_("History"), "oozie", user, "100px") | n,unicode }
+${ commonheader(_("History"), "oozie", user) | n,unicode }
 ${ layout.menubar(section='history') }
 
 
 <div class="container-fluid">
-  <h1>${ _('Submission History') }</h1>
-  <div class="well hueWell">
-    <form class="form-search">
-      <input type="text" id="filterInput" class="input-xlarge search-query" placeholder="${ _('Search for username, name, etc...') }">
-    </form>
-  </div>
+  <div class="card card-small">
+  <h1 class="card-heading simple">${ _('Submission History') }</h1>
+    <div class="card-body">
+      <p>
+        <form class="form-search">
+          <input type="text" id="filterInput" class="input-xlarge search-query" placeholder="${ _('Search for username, name, etc...') }">
+        </form>
 
-  <table class="table table-condensed datatables" id="jobTable">
+        <table class="table table-condensed datatables" id="jobTable">
     <thead>
       <tr>
         <th width="10%">${ _('Submission Date') }</th>
@@ -61,6 +62,9 @@ ${ layout.menubar(section='history') }
     % endfor
     </tbody>
   </table>
+      </p>
+    </div>
+</div>
 </div>
 
 

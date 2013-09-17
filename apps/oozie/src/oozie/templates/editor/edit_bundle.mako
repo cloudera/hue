@@ -24,7 +24,7 @@
 <%namespace name="properties" file="coordinator_properties.mako" />
 <%namespace name="utils" file="../utils.inc.mako" />
 
-${ commonheader(_("Edit Bundle"), "oozie", user, "100px") | n,unicode }
+${ commonheader(_("Edit Bundle"), "oozie", user) | n,unicode }
 ${ layout.menubar(section='bundles') }
 
 <style type="text/css">
@@ -86,7 +86,7 @@ ${ layout.menubar(section='bundles') }
     </div>
 
     <div class="span10">
-      <div class="card" style="margin-top:0">
+      <div class="card card-small">
       <h1 class="card-heading simple">${ _('Bundle Editor : ') } ${ bundle.name }</h1>
       <form id="jobForm" class="form-horizontal" action="${ url('oozie:edit_bundle', bundle=bundle.id) }" method="POST">
 

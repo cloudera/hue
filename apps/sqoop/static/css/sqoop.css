@@ -72,6 +72,9 @@ h1.emptyMessage {
 }
 
 .top-bar {
+  position: fixed;
+  top:28px;
+  width: 100%;
   background-color: #FAFAFA;
   border-bottom: 1px solid #E3E3E3;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.067);
@@ -79,7 +82,6 @@ h1.emptyMessage {
   padding: 10px 20px;
   text-align: left;
   height: 30px;
-  margin-top: 10px;
 }
 
 .top-bar h4 {

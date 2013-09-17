@@ -20,10 +20,12 @@
 <%namespace name="comps" file="jobbrowser_components.mako" />
 
 ${ commonheader(_('Task Attempt: %(attemptId)s') % dict(attemptId=attempt.attemptId_short), "jobbrowser", user) | n,unicode }
+${ comps.menubar() }
+
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="span2">
-      <div class="sidebar-nav">
+      <div class="sidebar-nav" style="padding-top: 0">
         <ul class="nav nav-list">
           <li class="nav-header">${_('Attempt ID')}</li>
           <li class="white">${attempt.attemptId_short}</li>
@@ -50,8 +52,8 @@ ${ commonheader(_('Task Attempt: %(attemptId)s') % dict(attemptId=attempt.attemp
     </div>
 
     <div class="span10">
-      <div class="card" style="margin-top: 0">
-        <h1 class="card-heading simple">${_('Task Attempt: %(attemptId)s - Job Browser') % dict(attemptId=attempt.attemptId_short)}</h1>
+      <div class="card card-small">
+        <h1 class="card-heading simple">${_('Task Attempt: %(attemptId)s') % dict(attemptId=attempt.attemptId_short)}</h1>
         <div class="card-body">
           <p>
             <ul class="nav nav-tabs">

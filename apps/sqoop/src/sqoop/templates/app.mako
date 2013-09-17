@@ -21,10 +21,10 @@
 
 <%namespace name="actionbar" file="actionbar.mako" />
 
-${ commonheader(None, "sqoop", user, "40px") | n,unicode }
+${ commonheader(None, "sqoop", user) | n,unicode }
 <div data-bind="if: !isLoading(), css: {'hide': isLoading}" id="top-bar-container" class="hide">
   <div class="top-bar" data-bind="visible:shownSection() == 'jobs-list'">
-    <div style="margin-top: 4px; margin-right: 20px" class="pull-right">
+    <div style="margin-top: 4px; margin-right: 40px" class="pull-right">
       <a title="${_('Create a new job')}" href="#job/new" data-bind="visible: isReady"><i class="icon-plus-sign"></i> ${_('New job')}</a>
     </div>
     <h4>${_('Sqoop Jobs')}</h4>
@@ -33,7 +33,7 @@ ${ commonheader(None, "sqoop", user, "40px") | n,unicode }
 
   <!-- ko if: job -->
   <div class="top-bar" data-bind="visible:shownSection() == 'job-editor', with: job">
-    <div style="margin-top: 4px; margin-right: 20px" class="pull-right">
+    <div style="margin-top: 4px; margin-right: 40px" class="pull-right">
       <a title="${_('Create a new job')}" href="#job/new"><i class="icon-plus-sign"></i> ${_('New job')}</a>
     </div>
     <h4 data-bind="visible: !persisted()"><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> ${_('New Job')}</h4>

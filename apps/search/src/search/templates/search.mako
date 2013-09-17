@@ -22,7 +22,7 @@ import urllib
 
 <%namespace name="macros" file="macros.mako" />
 
-${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
+${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
 
 <link rel="stylesheet" href="/search/static/css/search.css">
 <script src="/static/ext/js/moment.min.js" type="text/javascript" charset="utf-8"></script>

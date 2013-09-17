@@ -20,14 +20,15 @@
   from django.utils.translation import ugettext as _
 %>
 <%namespace name="actionbar" file="actionbar.mako" />
+<%namespace name="components" file="jobbrowser_components.mako" />
 
 ${ commonheader(None, "jobbrowser", user) | n,unicode }
+${ components.menubar() }
 
 <link href="/jobbrowser/static/css/jobbrowser.css" rel="stylesheet">
 
 <div class="container-fluid">
-  <div class="card">
-  <h1 class="card-heading simple">${_('Job Browser')}</h1>
+  <div class="card card-small">
 
   <%actionbar:render>
     <%def name="search()">

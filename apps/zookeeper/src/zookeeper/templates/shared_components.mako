@@ -22,7 +22,7 @@
 <%def name="header(breadcrumbs, clusters, withBody=True)">
   <div class="container-fluid">
   <div class="row-fluid">
-    <div class="card">
+    <div class="card card-small">
       <h1 class="card-heading simple">
         <div class="btn-group pull-right">
           <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
@@ -67,5 +67,24 @@
 </div>
 <link rel="stylesheet" href="/zookeeper/static/css/zookeeper.css">
 <script src="/zookeeper/static/js/base64.js" type="text/javascript" charset="utf-8"></script>
+</%def>
+
+<%def name="menubar()">
+  <div class="navbar navbar-inverse navbar-fixed-top nokids">
+      <div class="navbar-inner">
+        <div class="container-fluid">
+          <div class="nav-collapse">
+            <ul class="nav">
+              <li class="currentApp">
+                <a href="/${app_name}">
+                  <img src="/zookeeper/static/art/icon_24.png" />
+                  ${ _('ZooKeeper Browser') }
+                </a>
+               </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+  </div>
 </%def>
 

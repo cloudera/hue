@@ -21,11 +21,12 @@
 <%namespace name="comps" file="jobbrowser_components.mako" />
 
 ${ commonheader(_('Job Attempt: %(attempt_index)s') % {'attempt_index': attempt_index}, "jobbrowser", user) | n,unicode }
+${ comps.menubar() }
 
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="span2">
-      <div class="sidebar-nav">
+      <div class="sidebar-nav" style="padding-top: 0">
         <ul class="nav nav-list">
           <li class="nav-header">${ _('Attempt ID') }</li>
           <li class="white">${ attempt_index }</li>
@@ -34,9 +35,8 @@ ${ commonheader(_('Job Attempt: %(attempt_index)s') % {'attempt_index': attempt_
     </div>
 
     <div class="span10">
-      <div class="card">
+      <div class="card card-small">
         <h1 class="card-heading simple">
-          ${ _('Job Browser') } -
           ${ _('Job') } <a href="${url('jobbrowser.views.single_job', job=job.jobId)}" title="${_('View this job')}">${ job.jobId_short }</a>
           ${ _('Attempt: %(attempt_index)s') % {'attempt_index': attempt_index} }
         </h1>

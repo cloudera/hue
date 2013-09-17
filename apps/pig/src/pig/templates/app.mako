@@ -20,22 +20,31 @@
 
 <%namespace name="actionbar" file="actionbar.mako" />
 
-${ commonheader(None, "pig", user, "100px") | n,unicode }
+${ commonheader(None, "pig", user) | n,unicode }
 
-<div class="subnav subnav-fixed">
-  <div class="container-fluid">
-    <ul class="nav nav nav-pills">
-      <li class="active"><a href="#editor" data-bind="css: { unsaved: isDirty }">${ _('Editor') }</a></li>
-      <li><a href="#scripts">${ _('Scripts') }</a></li>
-      <li><a href="#dashboard">${ _('Dashboard') }</a></li>
-    </ul>
-  </div>
+<div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container-fluid">
+        <div class="nav-collapse">
+          <ul class="nav">
+            <li class="currentApp">
+              <a href="/${app_name}">
+                <img src="/pig/static/art/icon_pig_24.png" />
+                ${ _('Pig Editor') }
+              </a>
+            </li>
+            <li class="active"><a href="#editor" data-bind="css: { unsaved: isDirty }">${ _('Editor') }</a></li>
+            <li><a href="#scripts">${ _('Scripts') }</a></li>
+            <li><a href="#dashboard">${ _('Dashboard') }</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
 </div>
-
 
 <div class="container-fluid">
   <div id="scripts" class="row-fluid mainSection hide">
-    <div class="card">
+    <div class="card card-small">
       <%actionbar:render>
         <%def name="search()">
             <input id="filter" type="text" class="input-xlarge search-query" placeholder="${_('Search for script name or content')}">
@@ -100,7 +109,7 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
 
   <div id="editor" class="row-fluid mainSection hide">
     <div class="span2">
-      <div class="sidebar-nav">
+      <div class="sidebar-nav" style="padding-top: 0">
           <ul class="nav nav-list">
             <li class="nav-header">${_('Editor')}</li>
             <li data-bind="click: editScript" class="active" data-section="edit">
@@ -114,9 +123,6 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
                 <i class="icon-save"></i> ${ _('Save') }
               </a>
             </li>
-            ##<li class="nav-header">${_('UDF')}</li>
-            ##<li><a href="#createDataset">${ _('Python') }</a></li>
-            ##<li><a href="#createDataset">${ _('Ruby') }</a></li>
             <li class="nav-header">${_('Run')}</li>
             <li data-bind="click: runOrShowSubmissionModal, visible: !currentScript().isRunning()">
               <a href="#" title="${ _('Run the script') }" rel="tooltip" data-placement="right">
@@ -169,7 +175,7 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
         <div class="ribbon">${ _('Unsaved') }</div>
       </div>
 
-      <div class="card">
+      <div class="card card-small">
 
       <div id="edit" class="section">
         <div class="alert alert-info">
@@ -382,7 +388,7 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
 
   <div id="dashboard" class="row-fluid mainSection hide">
 
-    <div class="card card-home">
+    <div class="card card-small">
       <h2 class="card-heading simple">${ _('Running') }</h2>
       <div class="card-body">
         <p>
@@ -406,7 +412,7 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
       </div>
     </div>
 
-    <div class="card card-home">
+    <div class="card card-small">
       <h2 class="card-heading simple">${ _('Completed') }</h2>
       <div class="card-body">
         <p>
@@ -916,7 +922,7 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
     $(window).on("resize", function () {
       window.clearTimeout(_resizeTimeout);
       _resizeTimeout = window.setTimeout(function () {
-        codeMirror.setSize("100%", $(window).height() - 276);
+        codeMirror.setSize("100%", $(window).height() - RESIZE_CORRECTION);
       }, 100);
     });
 
@@ -1010,10 +1016,12 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
       resizeLogs();
     });
 
+    var RESIZE_CORRECTION = 246;
+
     function showMainSection(mainSection, includeGA) {
       window.setTimeout(function () {
         codeMirror.refresh();
-        codeMirror.setSize("100%", $(window).height() - 276);
+        codeMirror.setSize("100%", $(window).height() - RESIZE_CORRECTION);
       }, 100);
 
       if ($("#" + mainSection).is(":hidden")) {
@@ -1040,7 +1048,7 @@ ${ commonheader(None, "pig", user, "100px") | n,unicode }
     }
 
     function highlightMainMenu(mainSection) {
-      $(".nav-pills li").removeClass("active");
+      $(".navbar-fixed-top .nav li").removeClass("active");
       $("a[href='#" + mainSection + "']").parent().addClass("active");
     }
 

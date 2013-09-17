@@ -25,7 +25,7 @@ from beeswax.views import collapse_whitespace
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="comps" file="beeswax_components.mako" />
 
-${ commonheader(_('History'), app_name, user, '100px') | n,unicode }
+${ commonheader(_('History'), app_name, user) | n,unicode }
 ${ layout.menubar(section='history') }
 
 <%def name="show_saved_query(design, history)">
@@ -96,7 +96,7 @@ ${ layout.menubar(section='history') }
             </div>
         </div>
         <div class="span10">
-          <div class="card" style="margin-top: 0">
+          <div class="card card-small">
             <h1 class="card-heading simple">${_('History')}</h1>
 
             <%actionbar:render>

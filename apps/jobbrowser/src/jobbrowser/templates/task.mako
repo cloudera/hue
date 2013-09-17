@@ -20,13 +20,14 @@
 <%namespace name="comps" file="jobbrowser_components.mako" />
 
 ${ commonheader(_('Job Task: %(taskId)s') % dict(taskId=task.taskId_short), "jobbrowser", user) | n,unicode }
+${ comps.menubar() }
 
 <link href="/jobbrowser/static/css/jobbrowser.css" rel="stylesheet">
 
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="span2">
-      <div class="sidebar-nav">
+      <div class="sidebar-nav" style="padding-top: 0">
         <ul class="nav nav-list">
           <li class="nav-header">${_('Task ID')}</li>
           <li class="white hellipsify">${task.taskId_short}</li>
@@ -46,8 +47,8 @@ ${ commonheader(_('Job Task: %(taskId)s') % dict(taskId=task.taskId_short), "job
     </div>
   </div>
     <div class="span10">
-      <div class="card" style="margin-top:0">
-        <h1 class="card-heading simple">${_('Job Task: %(taskId)s - Job Browser') % dict(taskId=task.taskId_short)}</h1>
+      <div class="card card-small">
+        <h1 class="card-heading simple">${_('Job Task: %(taskId)s') % dict(taskId=task.taskId_short)}</h1>
         <div class="card-body">
           <p>
             <ul class="nav nav-tabs">

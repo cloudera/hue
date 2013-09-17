@@ -18,6 +18,26 @@
   from django.utils.translation import ugettext as _
 %>
 
+<%def name="menubar()">
+  <div class="navbar navbar-inverse navbar-fixed-top nokids">
+      <div class="navbar-inner">
+        <div class="container-fluid">
+          <div class="nav-collapse">
+            <ul class="nav">
+              <li class="currentApp">
+                <a href="/${app_name}">
+                  <img src="/metastore/static/art/icon_metastore_24.png" />
+                  ${ _('Metastore Manager') }
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+  </div>
+</%def>
+
+
 <%def name="breadcrumbs(breadcrumbs)">
   <ul class="nav nav-pills hueBreadcrumbBar" id="breadcrumbs">
     <li>

@@ -23,12 +23,12 @@
 <%namespace name="layout" file="../navigation-bar.mako" />
 <%namespace name="utils" file="../utils.inc.mako" />
 
-${ commonheader(_("Trashed Coordinators"), "oozie", user, "100px") | n,unicode }
+${ commonheader(_("Trashed Coordinators"), "oozie", user) | n,unicode }
 ${ layout.menubar(section='coordinators') }
 
 
 <div class="container-fluid">
-  <div class="card">
+  <div class="card card-small">
   <h1 class="card-heading simple">${ _('Coordinator Trash') }</h1>
 
   <%actionbar:render>

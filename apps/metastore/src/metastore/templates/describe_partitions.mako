@@ -22,11 +22,12 @@
 <%namespace name="components" file="components.mako" />
 
 ${ commonheader(_('Table Partitions: %(tableName)s') % dict(tableName=table.name), app_name, user) | n,unicode }
+${ components.menubar() }
 
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="span3">
-      <div class="sidebar-nav">
+      <div class="sidebar-nav card-small">
         <ul class="nav nav-list">
           <li class="nav-header">${_('Actions')}</li>
           <li><a href="${ url('metastore:describe_table', database=database, table=table.name) }">${_('Show Table')}</a></li>
@@ -34,7 +35,7 @@ ${ commonheader(_('Table Partitions: %(tableName)s') % dict(tableName=table.name
       </div>
     </div>
     <div class="span9">
-      <div class="card">
+      <div class="card card-small">
         <h1 class="card-heading simple">${ components.breadcrumbs(breadcrumbs) }</h1>
           % if partitions:
           <table class="table table-striped table-condensed datatables">

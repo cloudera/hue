@@ -24,7 +24,7 @@
 <%namespace name="properties" file="coordinator_properties.mako" />
 <%namespace name="coordinator_data" file="create_coordinator_data.mako" />
 
-${ commonheader(_("Edit Coordinator"), "oozie", user, "100px") | n,unicode }
+${ commonheader(_("Edit Coordinator"), "oozie", user) | n,unicode }
 ${ layout.menubar(section='coordinators') }
 
 <style type="text/css">
@@ -81,7 +81,7 @@ ${ layout.menubar(section='coordinators') }
       </div>
     </div>
     <div class="span10">
-      <div class="card" style="margin-top: 0">
+      <div class="card card-small">
         <h1 class="card-heading simple">${ _('Coordinator Editor : ') } ${ coordinator.name }</h1>
       <form id="jobForm" class="form-horizontal" action="${ url('oozie:edit_coordinator', coordinator=coordinator.id) }" method="POST">
       <div id="properties" class="section">

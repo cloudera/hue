@@ -24,7 +24,7 @@ from django.utils.translation import ugettext as _
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="util" file="util.mako" />
 
-${ commonheader(_('Create table from file'), app_name, user, '100px') | n,unicode }
+${ commonheader(_('Create table from file'), app_name, user) | n,unicode }
 ${layout.menubar(section='query')}
 
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
@@ -33,7 +33,7 @@ ${layout.menubar(section='query')}
 % if error_msg:
   <h4>${error_msg}</h4>
 % endif
-  <div class="card">
+  <div class="card card-small">
     <h1 class="card-heading simple">${_('Save Query Results')}</h1>
     <div class="card-body">
       <p>

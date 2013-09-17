@@ -23,7 +23,7 @@
 <%namespace name="layout" file="../navigation-bar.mako" />
 <%namespace name="utils" file="../utils.inc.mako" />
 
-${ commonheader(_("Workflow Action"), "oozie", user, "100px") | n,unicode }
+${ commonheader(_("Workflow Action"), "oozie", user) | n,unicode }
 ${ layout.menubar(section='running') }
 
 

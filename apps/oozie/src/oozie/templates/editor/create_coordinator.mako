@@ -22,7 +22,7 @@
 <%namespace name="layout" file="../navigation-bar.mako" />
 <%namespace name="utils" file="../utils.inc.mako" />
 
-${ commonheader(_("Create Coordinator"), "oozie", user, "100px") | n,unicode }
+${ commonheader(_("Create Coordinator"), "oozie", user) | n,unicode }
 ${ layout.menubar(section='coordinators') }
 
 <style type="text/css">
@@ -52,7 +52,7 @@ ${ layout.menubar(section='coordinators') }
         </div>
     </div>
     <div class="span10">
-      <div class="card" style="margin-top:0">
+      <div class="card card-small">
         <h1 class="card-heading simple">${ _('Coordinator Editor') } ${ coordinator.name }</h1>
       <ul class="nav nav-pills">
         <li class="active"><a href="#step1" class="step">${ _('Step 1: Details') }</a></li>

@@ -22,7 +22,7 @@
 <%namespace name="layout" file="../navigation-bar.mako" />
 <%namespace name="utils" file="../utils.inc.mako" />
 
-${ commonheader(_("Create Workflow"), "oozie", user, "100px") | n,unicode }
+${ commonheader(_("Create Workflow"), "oozie", user) | n,unicode }
 ${ layout.menubar(section='workflows') }
 
 
@@ -39,7 +39,7 @@ ${ layout.menubar(section='workflows') }
       </div>
     </div>
     <div class="span10">
-      <div class="card" style="padding-top:0;margin-top: 0">
+      <div class="card card-small">
         <div class="alert alert-info"><h3>${ _('Properties') }</h3></div>
           <div class="card-body">
             <p>

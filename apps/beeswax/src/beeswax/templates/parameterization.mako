@@ -21,7 +21,7 @@ from django.utils.translation import ugettext as _
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="layout" file="layout.mako" />
 
-${ commonheader(_('Parameterize Query'), app_name, user, '100px') | n,unicode }
+${ commonheader(_('Parameterize Query'), app_name, user) | n,unicode }
 
 ${layout.menubar()}
 
@@ -35,7 +35,7 @@ ${layout.menubar()}
 </style>
 
 <div class="container-fluid">
-   <div class="card">
+   <div class="card card-small">
     <%
         if explain:
             action = url(app_name + ':explain_parameterized_query', design.id)

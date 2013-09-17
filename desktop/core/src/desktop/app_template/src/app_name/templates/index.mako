@@ -16,15 +16,19 @@
 ${'<'}%!from desktop.views import commonheader, commonfooter %>
 ${'<'}%namespace name="shared" file="shared_components.mako" />
 
-${'$'}{commonheader("${" ".join(word.capitalize() for word in app_name.split("_"))}", "${app_name}", user, "100px") | n,unicode}
+${'$'}{commonheader("${" ".join(word.capitalize() for word in app_name.split("_"))}", "${app_name}", user) | n,unicode}
 ${'$'}{shared.menubar(section='mytab')}
 
 ${'#'}# Use double hashes for a mako template comment
 ${'#'}# Main body
 
 <div class="container-fluid">
-  <h2>${" ".join(word.capitalize() for word in app_name.split("_"))} app is successfully setup!</h2>
-  ## Pass through literal $
-  <p>It's now ${'$'}{date}.</p>
+  <div class="card">
+    <h2 class="card-heading simple">${" ".join(word.capitalize() for word in app_name.split("_"))} app is successfully setup!</h2>
+    <div class="card-body">
+      ## Pass through literal $
+      <p>It's now ${'$'}{date}.</p>
+    </div>
+  </div>
 </div>
 ${'$'}{commonfooter(messages) | n,unicode}

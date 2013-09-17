@@ -22,11 +22,12 @@ from django.utils.translation import ugettext as _
 <%namespace name="components" file="components.mako" />
 
 ${ commonheader(_('Tables'), 'metastore', user) | n,unicode }
+${ components.menubar() }
 
 <div class="container-fluid" id="tables">
   <div class="row-fluid">
     <div class="span3">
-      <div class="sidebar-nav">
+      <div class="sidebar-nav card-small">
         <ul class="nav nav-list">
           <li class="nav-header">${_('database')}</li>
           <li class="white">
@@ -43,7 +44,7 @@ ${ commonheader(_('Tables'), 'metastore', user) | n,unicode }
       </div>
     </div>
     <div class="span9">
-      <div class="card">
+      <div class="card card-small">
         <h1 class="card-heading simple">${ components.breadcrumbs(breadcrumbs) }</h1>
         <%actionbar:render>
           <%def name="search()">

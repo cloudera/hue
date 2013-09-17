@@ -22,6 +22,7 @@
 <%namespace name="comps" file="jobbrowser_components.mako" />
 
 ${ commonheader(_('Task View: Job: %(jobId)s') % dict(jobId=job.jobId_short), "jobbrowser", user) | n,unicode }
+${ comps.menubar() }
 
 <%def name="selected(val, state)">
     %   if val is not None and state is not None and val in state:
@@ -30,7 +31,7 @@ ${ commonheader(_('Task View: Job: %(jobId)s') % dict(jobId=job.jobId_short), "j
 </%def>
 
 <div class="container-fluid">
-  <div class="card">
+  <div class="card card-small">
     <h1 class="card-heading simple">${_('Task View: Job: %(jobId)s') % dict(jobId=job.jobId_short)}</h1>
     <div class="card-body">
       <p>

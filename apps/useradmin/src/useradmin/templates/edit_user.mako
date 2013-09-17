@@ -20,14 +20,11 @@ from django.utils.translation import ugettext as _
 
 <%namespace name="layout" file="layout.mako" />
 
-${ commonheader(_('Hue Users'), "useradmin", user, "100px") | n,unicode }
-
-% if user.is_superuser:
-  ${ layout.menubar(section='users', _=_) }
-% endif
+${ commonheader(_('Hue Users'), "useradmin", user) | n,unicode }
+${ layout.menubar(section='users') }
 
 <div class="container-fluid">
-  <div class="card">
+  <div class="card card-small">
     % if username:
       <h1 class="card-heading simple">${_('Hue Users - Edit user: %(username)s') % dict(username=username)}</h1>
     % else:
@@ -37,7 +34,7 @@ ${ commonheader(_('Hue Users'), "useradmin", user, "100px") | n,unicode }
     <br/>
     <form id="editForm" method="POST" class="form form-horizontal" autocomplete="off">
     <div id="properties" class="section">
-      <ul class="nav nav-tabs">
+      <ul class="nav nav-tabs" style="margin-bottom: 0">
         <li class="active"><a href="#step1" class="step">${ _('Step 1: Credentials (required)') }</a></li>
         <li><a href="#step2" class="step">${ user.is_superuser and _('Step 2: Names and Groups') or _('Step 2: Names') }</a>
         </li>
