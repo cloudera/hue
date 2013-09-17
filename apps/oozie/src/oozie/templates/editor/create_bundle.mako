@@ -23,7 +23,7 @@
 <%namespace name="layout" file="../navigation-bar.mako" />
 <%namespace name="utils" file="../utils.inc.mako" />
 
-${ commonheader(_("Create Bundle"), "oozie", user, "100px") | n,unicode }
+${ commonheader(_("Create Bundle"), "oozie", user) | n,unicode }
 ${ layout.menubar(section='bundles') }
 
 
@@ -39,7 +39,7 @@ ${ layout.menubar(section='bundles') }
         </div>
       </div>
       <div class="span10">
-        <div class="card" style="margin-top: 0">
+        <div class="card card-small">
           <h1 class="card-heading simple">${ _('Create Bundle') }</h1>
           <div class="alert alert-info"><h3>${ _('Bundle data') }</h3></div>
           <fieldset>

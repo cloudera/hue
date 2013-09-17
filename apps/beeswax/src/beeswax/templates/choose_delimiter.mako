@@ -20,8 +20,10 @@ from django.utils.translation import ugettext as _
 
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="util" file="util.mako" />
+<%namespace name="layout" file="layout.mako" />
 
 ${ commonheader(_('Create table from file'), 'metastore', user) | n,unicode }
+${ layout.metastore_menubar() }
 
 <div class="container-fluid">
     <div class="row-fluid">

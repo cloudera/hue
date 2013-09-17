@@ -18,6 +18,8 @@
 ## no spaces in this method please; we're declaring a CSS class, and ART uses this value for stuff, and it splits on spaces, and
 ## multiple spaces and line breaks cause issues
 <%!
+from django.utils.translation import ugettext as _
+
 def is_selected(section, matcher):
   if section == matcher:
     return "active"
@@ -44,17 +46,32 @@ def is_selected(section, matcher):
   %endif
 </%def>
 
-<%def name="menubar(section='', _=None)">
-	<div class="subnav subnav-fixed">
-		<div class="container-fluid">
-			<ul class="nav nav-pills">
-				<li class="${is_selected(section, 'users')}"><a href="/useradmin/users">${_('Users')}</a></li>
-				<li class="${is_selected(section, 'groups')}"><a href="/useradmin/groups">${_('Groups')}</a></li>
-				<li class="${is_selected(section, 'permissions')}"><a href="/useradmin/permissions">${_('Permissions')}</a></li>
-			</ul>
-		</div>
-	</div>
+
+<%def name="menubar(section='')">
+  <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container-fluid">
+          <div class="nav-collapse">
+            <ul class="nav">
+              <li class="currentApp">
+                <a href="/${app_name}">
+                  <img src="/useradmin/static/art/icon_useradmin_24.png" />
+                  ${ _('User Admin') }
+                </a>
+              </li>
+              %if user.is_superuser:
+              <li class="${is_selected(section, 'users')}"><a href="/useradmin/users">${_('Users')}</a></li>
+				      <li class="${is_selected(section, 'groups')}"><a href="/useradmin/groups">${_('Groups')}</a></li>
+				      <li class="${is_selected(section, 'permissions')}"><a href="/useradmin/permissions">${_('Permissions')}</a></li>
+              %endif
+            </ul>
+          </div>
+        </div>
+      </div>
+  </div>
 </%def>
+
+
 
 <%def name="commons()">
 

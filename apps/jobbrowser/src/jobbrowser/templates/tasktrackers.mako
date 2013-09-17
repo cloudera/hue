@@ -20,10 +20,16 @@
 
 <%namespace name="comps" file="jobbrowser_components.mako" />
 ${ commonheader(_('Task Trackers'), "jobbrowser", user) | n,unicode }
-
+${ comps.menubar()}
 <div class="container-fluid">
+<div class="row-fluid">
+  <div class="span12">
+    <div class="card card-small">
+      <h2 class="card-heading simple">${_('Task Trackers')}</h2>
+      <div class="card-body">
+        <p>
 
-<table class="datatables">
+<table class="datatables" style="width: 100%">
     <thead>
         <tr>
             <th>${_('Name')}</th>
@@ -57,6 +63,12 @@ ${ commonheader(_('Task Trackers'), "jobbrowser", user) | n,unicode }
 </table>
 
 <div id="trackerDialog"></div>
+
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
 </div>
 
 <script type="text/javascript" charset="utf-8">

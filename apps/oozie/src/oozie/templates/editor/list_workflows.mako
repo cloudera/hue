@@ -23,7 +23,7 @@
 <%namespace name="layout" file="../navigation-bar.mako" />
 <%namespace name="utils" file="../utils.inc.mako" />
 
-${ commonheader(_("Workflows"), "oozie", user, "100px") | n,unicode }
+${ commonheader(_("Workflows"), "oozie", user) | n,unicode }
 ${ layout.menubar(section='workflows') }
 
 <style type="text/css">
@@ -33,7 +33,7 @@ ${ layout.menubar(section='workflows') }
 </style>
 
 <div class="container-fluid">
-  <div class="card">
+  <div class="card card-small">
   <h1 class="card-heading simple">${ _('Workflow Manager') }</h1>
 
   <%actionbar:render>

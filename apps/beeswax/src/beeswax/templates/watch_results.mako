@@ -24,7 +24,7 @@ from django.utils.translation import ugettext as _
 <%namespace name="util" file="util.mako" />
 <%namespace name="comps" file="beeswax_components.mako" />
 
-${ commonheader(_('Query Results'), app_name, user, '100px') | n,unicode }
+${ commonheader(_('Query Results'), app_name, user) | n,unicode }
 ${layout.menubar(section='query')}
 
 <style type="text/css">
@@ -119,7 +119,7 @@ ${layout.menubar(section='query')}
         </div>
 
         <div class="span9">
-          <div class="card" style="margin-top: 0">
+          <div class="card card-small">
             <h1 class="card-heading simple">${_('Query Results:')} ${ util.render_query_context(query_context) }</h1>
             <div class="card-body">
             <p>

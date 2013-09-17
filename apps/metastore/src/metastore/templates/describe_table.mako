@@ -28,6 +28,7 @@ from django.utils.translation import ugettext as _
     view_or_table_noun = _("Table")
 %>
 ${ commonheader(_("%s : %s") % (view_or_table_noun, table.name), app_name, user) | n,unicode }
+${ components.menubar() }
 
 <%def name="column_table(cols)">
   <table class="table table-striped table-condensed datatables">
@@ -53,7 +54,7 @@ ${ commonheader(_("%s : %s") % (view_or_table_noun, table.name), app_name, user)
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="span3">
-      <div class="sidebar-nav">
+      <div class="sidebar-nav card-small">
         <ul class="nav nav-list">
           <li class="nav-header">${_('Actions')}</li>
           % if has_write_access:
@@ -71,7 +72,7 @@ ${ commonheader(_("%s : %s") % (view_or_table_noun, table.name), app_name, user)
       </div>
     </div>
     <div class="span9">
-      <div class="card">
+      <div class="card card-small">
         <h1 class="card-heading simple">${ components.breadcrumbs(breadcrumbs) }</h1>
         <div class="card-body">
           <p>

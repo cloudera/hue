@@ -21,17 +21,30 @@
 
 <%namespace name="shared" file="shared_components.mako" />
 
-${ commonheader(_('View'), app_name, user, '60px') | n,unicode }
+${ commonheader(_('View'), app_name, user) | n,unicode }
+${ shared.menubar() }
 
 <%
   _breadcrumbs = [
-    ["ZooKeeper Browser", url('zookeeper:index')]
+    ["Home", url('zookeeper:index')]
   ]
 %>
 
-
+%if len(clusters)==0:
+  <div class="container-fluid">
+    <div class="card">
+      <h1 class="card-heading simple">${ _('There are currently no clusters to browse.') }</h1>
+    <div class="card-body">
+      <p>
+        ${ _('Please contact your administrator to solve this.') }
+        <br/>
+        <br/>
+      </p>
+    </div>
+    </div>
+  </div>
+%else:
 ${ shared.header(_breadcrumbs, clusters) }
-
 % for c in clusters:
   <h3 class="card-heading simple simpler">${ _('Cluster') } ${ c }</h3>
   <p>
@@ -61,9 +74,9 @@ ${ shared.header(_breadcrumbs, clusters) }
     </tbody>
   </table>
 % endfor
-
-
 ${ shared.footer() }
+%endif
+
 
 <script type="text/javascript" charset="utf-8">
   $(document).ready(function () {

@@ -24,7 +24,7 @@ import re
 <%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="layout" file="about_layout.mako" />
 
-${ commonheader(_('Server Logs'), "about", user, "100px") | n,unicode }
+${ commonheader(_('Server Logs'), "about", user) | n,unicode }
 ${layout.menubar(section='log_view')}
 
 <style type="text/css">
@@ -62,7 +62,7 @@ ${layout.menubar(section='log_view')}
 </style>
 
 <div class="container-fluid">
-  <div class="card">
+  <div class="card card-small">
     <%actionbar:render>
       <%def name="search()">
         <input type="text" class="input-xxlarge search-query" placeholder="${_('Search in the logs')}" value="${query}">

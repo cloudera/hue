@@ -24,12 +24,12 @@
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="layout" file="layout.mako" />
 
-${ commonheader(_('Saved Queries'), app_name, user, '100px') | n,unicode }
+${ commonheader(_('Saved Queries'), app_name, user) | n,unicode }
 
 ${layout.menubar(section='saved queries')}
 
 <div class="container-fluid">
-  <div class="card">
+  <div class="card card-small">
     <h1 class="card-heading simple">${_('Saved Queries')}</h1>
 
     <%actionbar:render>

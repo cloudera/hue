@@ -25,12 +25,11 @@ from django.utils.translation import ugettext as _
 <%namespace name="fb_components" file="fb_components.mako" />
 
 ${ commonheader(None, 'filebrowser', user) | n,unicode }
+${ fb_components.menubar() }
 
 <div class="container-fluid">
 
-  <div class="card">
-    <h1 class="card-heading simple">${_('File Browser')}</h1>
-
+  <div class="card card-small">
     <div class="actionbar">
     <%actionbar:render>
         <%def name="search()">

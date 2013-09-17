@@ -20,18 +20,16 @@ from desktop.lib.i18n import smart_unicode
 from django.utils.translation import ugettext as _
 %>
 
-<%def name="is_selected(section, matcher)">
-  %if section == matcher:
+<%def name="is_selected(selected)">
+  %if selected:
     class="active"
   %endif
 </%def>
 
-<%def name="get_nice_name(apps, section)">
-  % for app in apps:
-    % if section == app.display_name:
-      - ${app.nice_name}
-    % endif
-  % endfor
+<%def name="get_nice_name(app, section)">
+  % if app and section == app.display_name:
+    - ${app.nice_name}
+  % endif
 </%def>
 
 <%def name="get_title(title)">
@@ -44,7 +42,7 @@ from django.utils.translation import ugettext as _
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Hue ${get_nice_name(apps, section)} ${get_title(title)}</title>
+  <title>Hue ${get_nice_name(current_app, section)} ${get_title(title)}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
   <meta name="author" content="">
@@ -127,65 +125,155 @@ from django.utils.translation import ugettext as _
   <script src="/static/ext/js/fileuploader.js"></script>
 
   <script type="text/javascript" charset="utf-8">
-    $(document).ready(function(){
+    $(document).ready(function () {
       $("input, textarea").placeholder();
-      $(".submitter").keydown(function(e){
-        if (e.keyCode==13){
+      $(".submitter").keydown(function (e) {
+        if (e.keyCode == 13) {
           $(this).closest("form").submit();
         }
-      }).change(function(){
-        $(this).closest("form").submit();
+      }).change(function () {
+          $(this).closest("form").submit();
       });
 
       $(".navbar .nav-tooltip").tooltip({
-        delay:0,
-        placement:'bottom'});
+        delay: 0,
+        placement: "bottom"
+      });
+
+      $("[rel='tooltip']").tooltip({
+        delay: 0,
+        placement: "right"
+      });
+
+      var JB_CHECK_INTERVAL_IN_MILLIS = 30000;
+      window.setTimeout(checkJobBrowserStatus, JB_CHECK_INTERVAL_IN_MILLIS);
+
+      function checkJobBrowserStatus(){
+        $.getJSON("/${apps['jobbrowser'].display_name}/?format=json&state=running&user=${user.username}&rnd="+Math.random(), function(data){
+          if (data != null){
+            if (data.length > 0){
+              $("#jobBrowserCount").removeClass("hide").text(data.length);
+            }
+            else {
+              $("#jobBrowserCount").addClass("hide");
+            }
+          }
+          window.setTimeout(checkJobBrowserStatus, JB_CHECK_INTERVAL_IN_MILLIS);
+        });
+      }
+
+      var _skew = -1;
+      $("[data-hover]").on("mouseover", function(){
+        var _this = $(this);
+        _skew = window.setTimeout(function(){
+          _this.attr("src", _this.data("hover"));
+        }, 3000);
+      });
+
+      $("[data-hover]").on("mouseout", function(){
+        $(this).attr("src", $(this).data("orig"));
+        window.clearTimeout(_skew);
+      });
     });
   </script>
 </head>
 <body>
 
-<div class="navbar navbar-inverse navbar-fixed-top">
-    % if conf.CUSTOM.BANNER_TOP_HTML.get():
-    <div id="banner-top" class="banner">
-        ${conf.CUSTOM.BANNER_TOP_HTML.get()}
-    </div>
-    % endif
-    <div class="navbar-inner">
-      <div class="container-fluid">
-        <a class="brand nav-tooltip" title="${_('About Hue')}" href="/about"><img src="/static/art/hue-logo-mini.png" /></a>
-        % if user.is_authenticated():
-        <div id="usernameDropdown" class="btn-group pull-right">
-          <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-            <i class="icon-user"></i> ${user.username}
-            <span class="caret"></span>
-          </a>
-          <ul class="dropdown-menu">
-            <li><a class="userProfile" href="${ url('useradmin.views.edit_user', username=urllib.quote(user.username)) }">${_('Profile')}</a></li>
-            <li class="divider"></li>
-            <li><a href="/accounts/logout/">${_('Sign Out')}</a></li>
-          </ul>
-        </div>
-        % endif
+% if conf.CUSTOM.BANNER_TOP_HTML.get():
+  <div id="banner-top" class="banner">
+    ${conf.CUSTOM.BANNER_TOP_HTML.get()}
+  </div>
+% endif
 
-        <div class="nav-collapse">
-          <ul class="nav">
-            <li id="homeIcon" ${is_selected(section, "home")}>
-              <a class="nav-tooltip" title="${ _('Home') }" href="/home"><img src="/static/art/home.png" /></a>
-            </li>
-            %for app in apps:
-              %if app.icon_path:
-              <li id="${app.display_name}Icon" ${is_selected(section, app.display_name)}>
-                <a class="nav-tooltip" title="${app.nice_name}" href="/${app.display_name}"><img src="${app.icon_path}" /></a>
-              </li>
-              %endif
-            %endfor
-            <li class="divider-vertical"></li>
-            <li id="checkConfig"></li>
-          </ul>
-        </div>
-      </div>
-    </div>
+<div class="navigator">
+  <div class="pull-right">
+  % if user.is_authenticated():
+  <ul class="nav nav-pills">
+    <li class="divider-vertical"></li>
+    % if 'filebrowser' in apps:
+    <li><a href="/${apps['filebrowser'].display_name}"><i class="icon-file"></i>&nbsp;${_('File Browser')} &nbsp;</a></li>
+    % endif
+    % if 'jobbrowser' in apps:
+    <li><a href="/${apps['jobbrowser'].display_name}"><i class="icon-list-alt"></i>&nbsp;${_('Job Browser')} &nbsp;<span id="jobBrowserCount" class="badge badge-warning hide" style="padding-top:0;padding-bottom: 0"></span></a></li>
+    % endif
+    <li class="dropdown">
+      <a href="index.html#" data-toggle="dropdown" class="dropdown-toggle"><i class="icon-cogs"></i>&nbsp;&nbsp;<b class="caret"></b></a>
+      <ul class="dropdown-menu">
+        <li><a href="${ url('useradmin.views.edit_user', username=urllib.quote(user.username)) }"><i class="icon-key"></i>&nbsp;&nbsp;${_('Change Password')}</a></li>
+        %if user.is_superuser:
+        <li><a href="${ url('useradmin.views.list_users') }"><i class="icon-group"></i>&nbsp;&nbsp;${_('Manage users')}</a></li>
+        %endif
+      </ul>
+    </li>
+    <li><a title="${_('Sign out')}" rel="tooltip" data-placement="left" href="/accounts/logout/"><i class="icon-signout"></i>&nbsp;&nbsp;${user.username}</a></li>
+    <li><a href="/help"><i class="icon-question-sign"></i></a></li>
+    <li id="jHueTourFlagPlaceholder"></li>
+  </ul>
+  % endif
+  </div>
+    <a class="brand nav-tooltip pull-left" title="${_('About Hue')}" href="/about"><img src="/static/art/hue-logo-mini-white.png" data-orig="/static/art/hue-logo-mini-white.png" data-hover="/static/art/hue-logo-mini-white-hover.png"/></a>
+     <ul class="nav nav-pills pull-left">
+       <li><a href="/home"><i class="icon-home"></i></a></li>
+       <li class="dropdown">
+         <a href="#" data-toggle="dropdown" class="dropdown-toggle">${_('Query Editors')} <b class="caret"></b></a>
+         <ul role="menu" class="dropdown-menu">
+           % if 'beeswax' in apps:
+           <li><a href="/${apps['beeswax'].display_name}"><img src="${ apps['beeswax'].icon_path }"/> ${_('Hive')}</a></li>
+           % endif
+           % if 'impala' in apps:
+           <li><a href="/${apps['impala'].display_name}"><img src="${ apps['impala'].icon_path }"/> ${_('Impala')}</a></li>
+           % endif
+           % if 'pig' in apps:
+           <li><a href="/${apps['pig'].display_name}"><img src="${ apps['pig'].icon_path }"/> ${_('Pig')}</a></li>
+           % endif
+           % if 'jobsub' in apps:
+           <li><a href="/${apps['jobsub'].display_name}"><img src="${ apps['jobsub'].icon_path }"/> ${_('Job Designer')}</a></li>
+           % endif
+         </ul>
+       </li>
+       <li class="dropdown">
+         <a href="#" data-toggle="dropdown" class="dropdown-toggle">${_('Data Browsers')} <b class="caret"></b></a>
+         <ul role="menu" class="dropdown-menu">
+           % if 'metastore' in apps:
+           <li><a href="/${apps['metastore'].display_name}"><img src="${ apps['metastore'].icon_path }"/> ${_('Metastore Tables')}</a></li>
+           % endif
+           % if 'hbase' in apps:
+           <li><a href="/${apps['hbase'].display_name}"><img src="${ apps['hbase'].icon_path }"/> ${_('HBase')}</a></li>
+           % endif
+           % if 'sqoop' in apps:
+           <li><a href="/${apps['sqoop'].display_name}"><img src="${ apps['sqoop'].icon_path }"/> ${_('Sqoop Transfer')}</a></li>
+           % endif
+           % if 'zookeeper' in apps:
+           <li><a href="/${apps['zookeeper'].display_name}"><img src="${ apps['zookeeper'].icon_path }"/> ${_('Zookeeper')}</a></li>
+           % endif
+         </ul>
+       </li>
+       % if 'oozie' in apps:
+       <li class="dropdown">
+         <a title="${_('Oozie')}" rel="tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">${_('Workflows')} <b class="caret"></b></a>
+         <ul role="menu" class="dropdown-menu">
+           <li><a href="${ url('oozie:index') }"><img src="${ apps['oozie'].icon_path }"/> ${_('Dashboard')}</a></li>
+           <li><a href="${ url('oozie:create_workflow') }"><img src="${ apps['oozie'].icon_path }"/> ${_('Editor')}</a></li>
+         </ul>
+       </li>
+       % endif
+       % if 'search' in apps:
+       <li>
+         <a title="${_('Solr Search')}" rel="tooltip" href="${ url('search:index') }">${_('Search')}</a>
+       </li>
+       % endif
+       % if len(other_apps) > 0:
+       <li class="dropdown">
+         <a title="${_('Other apps')}" rel="tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">${_('Other apps')} <b class="caret"></b></a>
+         <ul role="menu" class="dropdown-menu">
+           % for other in other_apps:
+             <li><a href="/${ other.display_name }"><img src="${ other.icon_path }"/> ${ other.nice_name }</a></li>
+           % endfor
+         </ul>
+       </li>
+       % endif
+     </ul>
+
 </div>
 
 <div id="jHueNotify" class="alert hide">

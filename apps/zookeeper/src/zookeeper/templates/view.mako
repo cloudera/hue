@@ -21,11 +21,12 @@
 
 <%namespace name="shared" file="shared_components.mako" />
 
-${ commonheader(_('View'), app_name, user, '60px') | n,unicode }
+${ commonheader(_('View'), app_name, user) | n,unicode }
+${ shared.menubar() }
 
 <%
   _breadcrumbs = [
-    ["ZooKeeper Browser", url('zookeeper:index')],
+    [_("Home"), url('zookeeper:index')],
     [cluster['nice_name'].lower(), url('zookeeper:view', id=cluster['id'])]
   ]
 %>

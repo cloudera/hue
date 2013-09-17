@@ -22,21 +22,30 @@
 
 
 <%def name="menubar(section='')">
-  <div class="subnav subnav-fixed">
-    <div class="container-fluid">
-      <ul class="nav nav-pills">
-        <li class="${utils.is_selected(section, 'dashboard')}"><a href="${url('oozie:list_oozie_workflows')}">${ _('Dashboard') }</a></li>
-        <li class="${utils.is_selected(section, 'workflows')}"><a href="${url('oozie:list_workflows')}">${ _('Workflows') }</a></li>
-        <li class="${utils.is_selected(section, 'coordinators')}"><a href="${url('oozie:list_coordinators')}">${ _('Coordinators') }</a></li>
-        <li class="${utils.is_selected(section, 'bundles')}"><a href="${url('oozie:list_bundles')}">${ _('Bundles') }</a></li>
-      </ul>
-    </div>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container-fluid">
+          <div class="nav-collapse">
+            <ul class="nav">
+              <li class="currentApp">
+                <a href="/${app_name}">
+                  <img src="/oozie/static/art/icon_oozie_24.png" />
+                  ${ _('Oozie') }
+                </a>
+               </li>
+              <li class="${utils.is_selected(section, 'dashboard')}"><a href="${url('oozie:list_oozie_workflows')}">${ _('Dashboard') }</a></li>
+              <li class="${utils.is_selected(section, 'workflows')}"><a href="${url('oozie:list_workflows')}">${ _('Workflows') }</a></li>
+              <li class="${utils.is_selected(section, 'coordinators')}"><a href="${url('oozie:list_coordinators')}">${ _('Coordinators') }</a></li>
+              <li class="${utils.is_selected(section, 'bundles')}"><a href="${url('oozie:list_bundles')}">${ _('Bundles') }</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
   </div>
 </%def>
 
 <%def name="dashboard_sub_menubar(section='')">
-  <div class="card" style="padding-top:1px;margin-top:1px">
-##    <h1 class="card-heading simple">${ _('Dashboard') }</h1>
+  <div class="card card-small">
     <div class="card-body">
       <p>
         <ul class="nav nav-tabs">

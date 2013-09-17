@@ -22,27 +22,26 @@
 <%namespace name="layout" file="../navigation-bar.mako" />
 <%namespace name="utils" file="../utils.inc.mako" />
 
-${ commonheader(_("Import Workflow"), "oozie", user, "100px") | n,unicode }
+${ commonheader(_("Import Workflow"), "oozie", user) | n,unicode }
 ${ layout.menubar(section='workflows') }
 
 
 <div class="container-fluid">
-  <h1>${ _('Import Workflow') }</h1>
+  <div class="card card-small">
+  <h1 class="card-heading simple">${ _('Import Workflow') }</h1>
+  <div class="card-body">
+    <p>
 
-    <div class="well">
       <p>${_("You can import an external Oozie workflow by providing the workflow definition file.")}</p>
       <p>
         ${ _('Supported workflow versions are 0.4. Other versions might work depending on their complexity.') }
       </p>
-    </div>
 
     <div style="min-height:300px">
       <form class="form-horizontal" id="workflowForm" action="${ url('oozie:import_workflow') }" method="POST" enctype="multipart/form-data">
 
       <div class="row-fluid">
-        <div class="span2">
-        </div>
-        <div class="span8">
+        <div class="span12">
           <fieldset>
           ${ utils.render_field(workflow_form['name']) }
           ${ utils.render_field(workflow_form['description']) }
@@ -73,15 +72,18 @@ ${ layout.menubar(section='workflows') }
          </fieldset>
         </div>
 
-        <div class="span2"></div>
       </div>
 
-      <div class="form-actions center">
+      <div class="form-actions" style="padding-left: 20px !important;">
         <input class="btn btn-primary" type="submit" value="${ _('Import') }" />
         <a class="btn" onclick="history.back()">${ _('Back') }</a>
       </div>
       </form>
     </div>
+
+    </p>
+  </div>
+</div>
 </div>
 
 ${ utils.path_chooser_libs(False) }

@@ -21,8 +21,15 @@
 <%namespace name="comps" file="jobbrowser_components.mako" />
 
 ${ commonheader(_('Tracker: %(trackerId)s') % dict(trackerId=tracker.trackerId), "jobbrowser", user) | n,unicode }
+${ comps.menubar()}
 
 <div class="container-fluid">
+  <div class="row-fluid">
+    <div class="span12">
+      <div class="card card-home">
+        <div class="card-body">
+          <p>
+
     <h1>${_('Tracker at %(trackerHost)s on port %(trackerPort)s') % dict(trackerHost=tracker.host, trackerPort=tracker.httpPort)}</h1>
     <div>
         <dl>
@@ -80,6 +87,13 @@ ${ commonheader(_('Tracker: %(trackerId)s') % dict(trackerId=tracker.trackerId),
         </dl>
     </div>
     % endif
+
+          <a class="btn" href="javascript:history.back()">${_('Back')}</a>
+
+          </p>
+        </div>
+      </div>
+    </div>
 </div>
 
 ${ commonfooter(messages) | n,unicode }

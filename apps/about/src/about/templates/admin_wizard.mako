@@ -18,26 +18,14 @@ from desktop.views import commonheader, commonfooter
 from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext as _
 %>
+<%namespace name="header" file="header.mako" />
 
-${ commonheader(_('Quick Start'), "quickstart", user, "100px") | n,unicode }
-
-% if user.is_superuser:
-  <div class="row-fluid">
-    <div class="subnav subnav-fixed">
-      <div class="container-fluid">
-        <ul class="nav nav-pills">
-          <li class="active"><a href="${url("about:admin_wizard")}">${_('Quick Start')}</a></li>
-          <li><a href="${url("desktop.views.dump_config")}">${_('Configuration')}</a></li>
-          <li><a href="${url("desktop.views.log_view")}">${_('Server Logs')}</a></li>
-        </ul>
-      </div>
-    </div>
-  </div>
-% endif
+${ commonheader(_('Quick Start'), "quickstart", user) | n,unicode }
+${ header.menubar() }
 
 <div class="container-fluid">
   <div class="row-fluid">
-    <div class="card" style="margin-bottom: 100px;">
+    <div class="card card-small" style="margin-bottom: 100px;">
       <h2 class="card-heading simple">
         % if user.is_superuser:
           ${ _('Quick Start Wizard') } -

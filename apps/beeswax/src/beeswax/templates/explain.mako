@@ -22,11 +22,11 @@ from django.utils.translation import ugettext as _
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="util" file="util.mako" />
 
-${ commonheader(_('Query Explanation'), app_name, user, '100px') | n,unicode }
+${ commonheader(_('Query Explanation'), app_name, user) | n,unicode }
 ${layout.menubar(section='saved queries')}
 
 <div class="container-fluid" style="margin-bottom: 14px">
-  <div class="card">
+  <div class="card card-small">
     <h1 class="card-heading simple">${_('Query Explanation:')} ${util.render_query_context(query_context)}</h1>
     <div class="card-body">
       <p>

@@ -22,12 +22,13 @@ from django.utils.translation import ugettext as _
 
 <%namespace name="layout" file="layout.mako" />
 
-${ commonheader(_('Hue Users'), "useradmin", user, "100px") | n,unicode }
-${layout.menubar(section='users', _=_)}
+${ commonheader(_('Hue Users'), "useradmin", user) | n,unicode }
+${ layout.menubar(section='users') }
 
 
 <div class="container-fluid">
-    <h1>${_('Hue Users - Add/Sync LDAP user')}</h1>
+  <div class="card card-small">
+    <h1 class="card-heading simple">${_('Hue Users - Add/Sync LDAP user')}</h1>
     <br/>
 
   <form id="editForm" method="POST" class="form form-horizontal" autocomplete="off">
@@ -51,6 +52,7 @@ ${layout.menubar(section='users', _=_)}
     </div>
   </form>
 </div>
+  </div>
 
 <script type="text/javascript" charset="utf-8">
   $(document).ready(function(){

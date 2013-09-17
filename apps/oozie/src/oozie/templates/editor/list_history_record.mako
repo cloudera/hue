@@ -22,12 +22,18 @@
 <%namespace name="utils" file="../utils.inc.mako" />
 <%namespace name="layout" file="../navigation-bar.mako" />
 
-${ commonheader(_("History Record"), "oozie", user, "100px") | n,unicode }
+${ commonheader(_("History Record"), "oozie", user) | n,unicode }
 ${ layout.menubar(section='history') }
 
 
 <div class="container-fluid">
-  <h1>${ _('History') } ${ record.job.name }</h1>
+  <div class="card card-small">
+
+  <h1 class="card-heading simple">${ _('History') } ${ record.job.name }</h1>
+
+  <div class="card-body">
+    <p>
+
 
   <div>
     <h2>${ _('Details') }</h2>
@@ -79,6 +85,10 @@ ${ layout.menubar(section='history') }
   </div>
 
    <a href="${ url('oozie:list_history') }" class="btn">${ _('Back') }</a>
+
+    </p>
+  </div>
+</div>
 </div>
 
 ${ commonfooter(messages) | n,unicode }

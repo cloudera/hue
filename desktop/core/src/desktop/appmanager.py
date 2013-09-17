@@ -194,6 +194,14 @@ class DesktopModuleInfo(object):
 def get_apps(user):
   return filter(lambda app: user.has_hue_permission(action="access", app=app.display_name), DESKTOP_APPS)
 
+def get_apps_dict(user=None):
+  if user is not None:
+    apps = get_apps(user)
+  else:
+    apps = DESKTOP_APPS
+
+  return dict([(app.name, app) for app in apps])
+
 def load_libs():
   global DESKTOP_MODULES
   global DESKTOP_LIBS

@@ -24,7 +24,7 @@
 <%namespace name="utils" file="utils.inc.mako" />
 
 
-${ commonheader(_('Search'), "search", user, "40px") | n,unicode }
+${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
 
 <%def name="indexProperty(key)">
   %if key in solr_collection["status"][hue_collection.name]["index"]:

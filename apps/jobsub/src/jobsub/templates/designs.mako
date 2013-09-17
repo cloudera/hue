@@ -23,7 +23,7 @@ from django.utils.translation import ugettext as _
 
 <%namespace name="actionbar" file="actionbar.mako" />
 
-${ commonheader(None, "jobsub", user, "60px") | n,unicode }
+${ commonheader(None, "jobsub", user) | n,unicode }
 
 <link rel="stylesheet" href="/jobsub/static/css/jobsub.css">
 
@@ -39,8 +39,27 @@ ${ commonheader(None, "jobsub", user, "60px") | n,unicode }
 <script src="/jobsub/static/js/jobsub.ko.js" type="text/javascript" charset="utf-8"></script>
 <script src="/jobsub/static/js/jobsub.js" type="text/javascript" charset="utf-8"></script>
 
+
+<div class="navbar navbar-inverse navbar-fixed-top nokids">
+    <div class="navbar-inner">
+      <div class="container-fluid">
+        <div class="nav-collapse">
+          <ul class="nav">
+            <li class="currentApp">
+              <a href="/${app_name}">
+                <img src="/jobsub/static/art/icon_jobsub_24.png" />
+                ${ _('Job Designer') }
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+</div>
+
+
 <div class="container-fluid">
-  <div class="card">
+  <div class="card card-small">
   <h1 class="card-heading simple">${_('Job Designs')}</h1>
 
   <%actionbar:render>

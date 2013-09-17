@@ -26,7 +26,7 @@ from beeswax.views import collapse_whitespace
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="layout" file="layout.mako" />
 
-${ commonheader(_('My Queries'), app_name, user, '100px') | n,unicode }
+${ commonheader(_('My Queries'), app_name, user) | n,unicode }
 ${layout.menubar(section='my queries')}
 
 <style type="text/css">
@@ -36,7 +36,7 @@ ${layout.menubar(section='my queries')}
 </style>
 
 <div class="container-fluid">
-  <div class="card">
+  <div class="card card-small">
     <h1 class="card-heading simple">${_('My Queries')}</h1>
 
     <%actionbar:render>

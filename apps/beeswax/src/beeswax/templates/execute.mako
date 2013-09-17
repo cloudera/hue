@@ -56,7 +56,7 @@
 </%def>
 
 
-${ commonheader(_('Query'), app_name, user, '100px') | n,unicode }
+${ commonheader(_('Query'), app_name, user) | n,unicode }
 ${layout.menubar(section='query')}
 
 <div class="container-fluid">
@@ -256,7 +256,7 @@ ${layout.menubar(section='query')}
         </div>
 
         <div id="querySide" class="span9">
-          <div class="card" style="margin-top: 0">
+          <div class="card card-small">
             % if on_success_url:
               <input type="hidden" name="on_success_url" value="${on_success_url}"/>
             % endif

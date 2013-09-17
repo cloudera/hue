@@ -21,12 +21,13 @@ from django.utils.translation import ugettext as _
 <%namespace name="components" file="components.mako" />
 
 ${ commonheader(_('Databases'), 'metastore', user) | n,unicode }
+${ components.menubar() }
 
 <div class="container-fluid" id="databases">
   <div class="row-fluid">
   % if has_write_access:
     <div class="span3">
-      <div class="sidebar-nav">
+      <div class="sidebar-nav card-small">
         <ul class="nav nav-list">
           <li class="nav-header">${_('actions')}</li>
           <li><a href="${ url('beeswax:create_database') }">${_('Create a new database')}</a></li>
@@ -37,7 +38,7 @@ ${ commonheader(_('Databases'), 'metastore', user) | n,unicode }
   %else:
     <div class="span12">
   % endif
-      <div class="card">
+      <div class="card card-small">
         <h1 class="card-heading simple">${ components.breadcrumbs(breadcrumbs) }</h1>
         <%actionbar:render>
           <%def name="search()">

@@ -30,12 +30,12 @@
 <%namespace name="fb_components" file="fb_components.mako" />
 
 ${ commonheader(_('%(filename)s - File Viewer') % dict(filename=truncate(filename)), 'filebrowser', user) | n,unicode }
-
+${ fb_components.menubar() }
 
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="span12">
-      <div class="card">
+      <div class="card card-small">
         % if breadcrumbs:
           ${fb_components.breadcrumbs(path, breadcrumbs)}
         %endif

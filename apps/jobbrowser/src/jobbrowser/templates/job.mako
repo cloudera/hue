@@ -91,6 +91,7 @@
 </%def>
 
 ${ commonheader(_('Job: %(jobId)s') % dict(jobId=job.jobId_short), "jobbrowser", user) | n,unicode }
+${ comps.menubar() }
 
 <link href="/jobbrowser/static/css/jobbrowser.css" rel="stylesheet">
 
@@ -108,7 +109,7 @@ ${ commonheader(_('Job: %(jobId)s') % dict(jobId=job.jobId_short), "jobbrowser",
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="span2">
-      <div class="sidebar-nav">
+      <div class="sidebar-nav" style="padding-top: 0">
         <ul class="nav nav-list">
           <li class="nav-header">${_('Job ID')}</li>
           <li class="white hellipsify">${job.jobId_short}</li>
@@ -150,8 +151,8 @@ ${ commonheader(_('Job: %(jobId)s') % dict(jobId=job.jobId_short), "jobbrowser",
       </div>
     </div>
     <div class="span10">
-      <div class="card" style="margin-top:0">
-        <h1 class="card-heading simple">${_('Job: %(jobId)s - Job Browser') % dict(jobId=job.jobId_short)}</h1>
+      <div class="card card-small">
+        <h1 class="card-heading simple">${_('Job: %(jobId)s') % dict(jobId=job.jobId_short)}</h1>
           <div class="card-body">
             <p>
               <ul class="nav nav-tabs">

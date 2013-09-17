@@ -14,34 +14,27 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-from desktop.views import commonheader, commonfooter
-from desktop.lib.i18n import smart_unicode
 from django.utils.translation import ugettext as _
 %>
 
-${ commonheader(_('Error'), app_name, user, "40px") | n,unicode }
-
-  <div class="container-fluid">
-    <div class="row-fluid">
-      <div class="span12">
-        <div class="card card-small">
-          <h1 class="card-heading simple">${ _('Error!') }</h1>
-          <div class="card-body">
-            <p>
-              <pre>${ smart_unicode(error) }</pre>
-
-              %if traceback:
-                <textarea style="width: 100%;" rows=80 readonly="readonly">
-                ${ smart_unicode(traceback) }
-                </textarea>
-              %endif
-
-              <a class="btn" onclick="history.back()">${ _('Back') }</a>
-            </p>
+<%def name="menubar()">
+  <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container-fluid">
+          <div class="nav-collapse">
+            <ul class="nav">
+              <li class="currentApp">
+                <a href="/${app_name}"><img src="/static/art/icon_hue_24.png" />
+                ${ _('About Hue') }</a>
+               </li>
+              % if user.is_superuser:
+                <li class="active"><a href="${url("about:admin_wizard")}">${_('Quick Start')}</a></li>
+                <li><a href="${url("desktop.views.dump_config")}">${_('Configuration')}</a></li>
+                <li><a href="${url("desktop.views.log_view")}">${_('Server Logs')}</a></li>
+              % endif
+            </ul>
           </div>
         </div>
       </div>
-    </div>
   </div>
-
-${ commonfooter(messages) | n,unicode }
+</%def>

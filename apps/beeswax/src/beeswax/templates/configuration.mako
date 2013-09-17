@@ -21,11 +21,11 @@ from django.utils.translation import ugettext as _
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="util" file="util.mako" />
 
-${ commonheader(_('Settings'), app_name, user, '100px') | n,unicode }
+${ commonheader(_('Settings'), app_name, user) | n,unicode }
 ${layout.menubar(section='configuration')}
 
 <div class="container-fluid">
-  <div class="card">
+  <div class="card card-small">
 	  <h1 class="card-heading simple">${_('Settings')}</h1>
     <div class="card-body">
       <p>

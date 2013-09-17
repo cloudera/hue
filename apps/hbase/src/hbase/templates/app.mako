@@ -24,6 +24,23 @@ ${ commonheader(None, "hbase", user) | n,unicode }
 
 <link href="/hbase/static/css/hbase.css" rel="stylesheet" type="text/css" />
 
+<div class="navbar navbar-inverse navbar-fixed-top nokids">
+    <div class="navbar-inner">
+    <div class="container-fluid">
+      <div class="nav-collapse">
+        <ul class="nav">
+          <li class="currentApp">
+            <a href="/${app_name}">
+              <img src="/hbase/static/art/icon_24.png" />
+              ${ _('HBase Browser') }
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
 <%def name="datatable(datasource,rowTemplate = 'itemTemplate')">
   <table data-datasource="${datasource}" class="table table-striped table-condensed datatables tablescroller-disable">
       <thead>
@@ -117,10 +134,10 @@ ${ commonheader(None, "hbase", user) | n,unicode }
 </%def>
 
 <div class="container-fluid">
-  <div class="card">
+  <div class="card card-small">
   <!-- Page Header -->
   <h1 class="card-heading simple">
-    <a href="/hbase/">HBase Browser</a> - <a data-bind="text: app.cluster(), attr: { href: '#' + app.cluster() }"></a>
+    <a href="/hbase/">${_('Home')}</a> - <a data-bind="text: app.cluster(), attr: { href: '#' + app.cluster() }"></a>
     <span data-bind="visible: app.station() == 'table'">/ <a data-bind="text: app.views.tabledata.name(), attr: { href: '#' + app.cluster() + '/' + app.views.tabledata.name()}"></a></span>
     <span class="pull-right">
       <span class="dropdown">

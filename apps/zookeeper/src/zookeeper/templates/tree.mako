@@ -21,12 +21,13 @@
 
 <%namespace name="shared" file="shared_components.mako" />
 
-${ commonheader("ZooKeeper Browser > Tree > %s > %s" % (cluster['nice_name'], path), app_name, user, '60px') | n,unicode }
+${ commonheader("ZooKeeper Browser > Tree > %s > %s" % (cluster['nice_name'], path), app_name, user) | n,unicode }
+${ shared.menubar() }
 
 <%
   _split = path.split("/");
   _breadcrumbs = [
-    ["ZooKeeper Browser", url('zookeeper:index')],
+    [_("Home"), url('zookeeper:index')],
     [cluster['nice_name'].lower(), url('zookeeper:view', id=cluster['id'])],
   ]
   for idx, p in enumerate(_split):

@@ -23,11 +23,11 @@ from django.contrib.auth.models import Group
 
 <%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="layout" file="layout.mako" />
-${ commonheader(_('Hue Permissions'), "useradmin", user, "100px") | n,unicode }
-${layout.menubar(section='permissions', _=_)}
+${ commonheader(_('Hue Permissions'), "useradmin", user) | n,unicode }
+${layout.menubar(section='permissions')}
 
 <div class="container-fluid">
-  <div class="card">
+  <div class="card card-small">
     <h1 class="card-heading simple">${_('Hue Permissions')}</h1>
     <%actionbar:render>
       <%def name="search()">

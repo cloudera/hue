@@ -25,10 +25,6 @@
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
 }
 
-.pull-right {
-  margin: 4px;
-}
-
 .sortable {
   cursor: pointer;
 }
@@ -52,11 +48,6 @@ input[type=submit] {
   margin-left: 50px;
 }
 
-.nav {
-  margin-bottom: 0;
-  margin-top: 20px;
-}
-
 .nav-tabs .active {
   font-weight: bold;
 }
@@ -66,12 +57,12 @@ input[type=submit] {
 }
 
 @media all and (max-height: 800px) {
-    .form-actions {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      margin: 0;
-      padding-left: 20px !important;
-    }
+  .form-actions {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    margin: 0;
+    padding-left: 20px !important;
   }
+}
