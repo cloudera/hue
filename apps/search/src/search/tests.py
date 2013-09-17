@@ -15,6 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+try:
+  import json
+except ImportError:
+  import simplejson as json
 
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -23,6 +27,13 @@ from nose.tools import assert_true, assert_equal
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
+from desktop.lib.rest import resource
+
+
+class MockResource():
+
+  def __init__(self, client):
+    pass
 
 
 class TestSearchBase(object):
@@ -32,10 +43,21 @@ class TestSearchBase(object):
     grant_access('test_search', 'test_search', 'search')
     self.user = User.objects.get(username='test_search')
 
-    # To mock/monkey patch Resource
+    self.prev_resource = resource.Resource
+    resource.Resource = MockResource
+
+  def tearDown(self):
+    # Remove monkey patching
+    resource.Resource = self.prev_resource
 
 
 class TestWithMockedSolr(TestSearchBase):
 
   def test_index(self):
-    self.c.get(reverse('search:index'))
+    response = self.c.get(reverse('search:index'))
+    assert_true('search' in response.content, response.content)
+
+  def test_strip_nulls(self):
+    response = '{"uid":"1111111","method":"check_user"}\x00'
+    response = json.loads(response.replace('\x00', '')) # Does not call real API
+
