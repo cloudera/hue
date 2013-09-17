@@ -72,7 +72,12 @@ class SolrApi(object):
 
       if type(response) != dict:
         # Got 'plain/text' mimetype instead of 'application/json'
-        response = json.loads(response)
+        try:
+          response = json.loads(response)
+        except ValueError, e:
+          # Got some null bytes in the response
+          LOG.error('%s: %s' % (unicode(e), repr(response)))
+          response = json.loads(response.replace('\x00', ''))
       return response
     except RestException, e:
       raise PopupException('Error while accessing Solr: %s' % e)
@@ -118,7 +123,7 @@ class SolrApi(object):
     try:
       params = self._get_params() + (
           ('wt', 'json'),
-      )      
+      )
       return self._root.get('admin/cores', params=params)['status']
     except RestException, e:
       raise PopupException('Error while accessing Solr: %s' % e)
@@ -128,7 +133,7 @@ class SolrApi(object):
       params = self._get_params() + (
           ('wt', 'json'),
           ('core', core),
-      )         
+      )
       return self._root.get('admin/cores', params=params)
     except RestException, e:
       raise PopupException('Error while accessing Solr: %s' % e)
@@ -138,7 +143,7 @@ class SolrApi(object):
       params = self._get_params() + (
           ('wt', 'json'),
           ('file', 'schema.xml'),
-      )       
+      )
       return self._root.get('%(core)s/admin/file' % {'core': core}, params=params)
     except RestException, e:
       raise PopupException('Error while accessing Solr: %s' % e)
