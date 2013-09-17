@@ -174,10 +174,12 @@ def remove_tags(request):
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
-def add_or_update_permission(request):
-  pass
 
-def remove_permission(request):
+def update_permissions(request):
+  # doc_id or None if no perms yet for this doc
+  # some users [id1, id2...]
+  # some groups [id1, id2...]
+  # type: 'read' for now
   pass
 
 
