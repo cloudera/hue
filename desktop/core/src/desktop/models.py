@@ -105,7 +105,7 @@ class DocumentTagManager(models.Manager):
 
     for tag in doc.tags.all():
       if tag.tag not in (DocumentTag.TRASH, DocumentTag.DEFAULT):
-        doc.untag(tag)
+        doc.remove(tag)
 
     for tag_id in tag_ids:
       tag = DocumentTag.objects.get(id=tag_id, owner=owner)

@@ -48,6 +48,24 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
     cursor: pointer;
   }
 
+  .badge-left {
+    border-radius: 9px 0px 0px 9px;
+    padding-right: 5px;
+  }
+
+  .badge-right {
+    border-radius: 0px 9px 9px 0px;
+    padding-left: 5px;
+  }
+
+  .airy li {
+    margin-bottom: 6px;
+  }
+
+  .trashShare {
+    cursor: pointer;
+  }
+
 </style>
 
 <div class="navbar navbar-inverse navbar-fixed-top nokids">
@@ -129,6 +147,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
                 <th>${_('Tags')}</th>
                 <th>${_('Owner')}</th>
                 <th>${_('Last Modified')}</th>
+                <th>&nbsp;</th>
               </tr>
             </thead>
           </table>
@@ -152,7 +171,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
       <div style="margin-top: 20px">
         <div class="input-append">
           <input id="documentTagsNew" type="text">
-          <button id="documentTagsNewBtn" class="btn" type="button"><i class="icon-plus-sign"></i> ${_('Add')}</button>
+          <a id="documentTagsNewBtn" class="btn" type="button"><i class="icon-plus-sign"></i> ${_('Add')}</a>
         </div>
       </div>
     </p>
@@ -175,7 +194,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
       <div style="margin-top: 20px">
         <div class="input-append">
           <input id="tagsNew" type="text">
-          <button id="tagsNewBtn" class="btn" type="button"><i class="icon-plus-sign"></i> ${_('Add')}</button>
+          <a id="tagsNewBtn" class="btn" type="button"><i class="icon-plus-sign"></i> ${_('Add')}</a>
         </div>
       </div>
     </p>
@@ -186,15 +205,79 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
   </div>
 </div>
 
+<div id="documentShareModal" class="modal hide fade">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>${_('Share ')}<span id="documentShareModalName"></span></h3>
+  </div>
+  <div class="modal-body">
+    <p>
+      <h4 id="documentShareNoShare" class="muted" style="margin-top:0px">${_('No shares yet.')}</h4>
+      <ul id="documentShareList" class="unstyled inline airy hide">
+      </ul>
+      <div class="clearfix"></div>
+      <div style="margin-top: 20px">
+        <div class="input-append">
+          <input id="documentShareAdd" type="text" class="input-large" placeholder="${_('You can type a username or a group')}">
+          <a id="documentShareAddBtn" class="btn" type="button"><i class="icon-plus-sign"></i> ${_('Add')}</a>
+        </div>
+      </div>
+    </p>
+  </div>
+  <div class="modal-footer">
+    <a href="#" data-dismiss="modal" class="btn">${_('Cancel')}</a>
+    <a id="saveDocumentShare" href="#" class="btn btn-primary disable-feedback">${_('Share it')}</a>
+  </div>
+</div>
+
+
 
 <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
 <script type="text/javascript" charset="utf-8">
 
 var JSON_DOCS = ${json_documents|n};
 var JSON_TAGS = ${json_tags|n};
+var JSON_USERS_GROUPS;
 var documentsTable;
 
 $(document).ready(function () {
+  var selectedUserOrGroup = null;
+  $.getJSON("${ url('useradmin.views.list_for_autocomplete') }", function (data) {
+    JSON_USERS_GROUPS = data;
+    $("#documentShareAdd").typeahead({
+      source: function (query, process) {
+        dropdown = [];
+        map = {};
+        $.each(JSON_USERS_GROUPS.users, function (i, user) {
+          map[user.username] = user;
+          dropdown.push(user.username);
+        });
+        $.each(JSON_USERS_GROUPS.groups, function (i, group) {
+          map[group.name] = group;
+          dropdown.push(group.name);
+        });
+        process(dropdown);
+      },
+      matcher: function (item) {
+        if (item.toLowerCase().indexOf(this.query.trim().toLowerCase()) != -1) {
+          return true;
+        }
+      },
+      sorter: function (items) {
+        return items.sort();
+      },
+      highlighter: function (item) {
+        var _icon = map[item].username ? "icon-user" : "icon-group";
+        var regex = new RegExp('(' + this.query + ')', 'gi');
+        return "<i class='" + _icon + "'></i> " + item.replace(regex, "<strong>$1</strong>");
+      },
+      updater: function (item) {
+        selectedUserOrGroup = map[item];
+        return item;
+      }
+    });
+  });
+
   documentsTable = $(".datatables").dataTable({
     "sPaginationType": "bootstrap",
     "iDisplayLength": 50,
@@ -206,7 +289,8 @@ $(document).ready(function () {
       null,
       { "sClass": "row-selector-exclude"},
       null,
-      { "sSortDataType": "dom-sort-value", "sType": "numeric", "sWidth": "100px" }
+      { "sSortDataType": "dom-sort-value", "sType": "numeric", "sWidth": "100px" },
+      { "bSortable": false, "sClass": "row-selector-exclude", "sWidth": "20px"}
     ],
     "aaSorting": [
       [ 1, "desc" ]
@@ -333,6 +417,10 @@ $(document).ready(function () {
     show: false
   });
 
+  $("#documentShareModal").modal({
+    show: false
+  });
+
   $("#documentTagsNewBtn").on("click", function () {
     addTag($("#documentTagsNew").val(), function () {
       $("#documentTagsNew").val("");
@@ -449,6 +537,66 @@ $(document).ready(function () {
     });
   });
 
+  $(document).on("click", ".shareDocument", function () {
+    var _doc = getDocById($(this).data("document-id"));
+    if (_doc != null) {
+      $("#documentShareAdd").val("");
+      $("#documentShareModalName").text(_doc.name);
+      renderShareList();
+      $("#documentShareModal").modal("show");
+    }
+  });
+
+  $("#documentShareAddBtn").on("click", function () {
+    handleTypeaheadSelection();
+  });
+
+  function handleTypeaheadSelection() {
+    if (selectedUserOrGroup != null) {
+      addToShareList(selectedUserOrGroup);
+      renderShareList();
+    }
+    selectedUserOrGroup = null;
+    $("#documentShareAdd").val("");
+  }
+
+  var shareList = {};
+
+  function addToShareList(item) {
+    shareList[item.id] = item;
+  }
+
+  function renderShareList() {
+    var _html = "";
+    for (var id in shareList) {
+      if (shareList.hasOwnProperty(id)) {
+        var _obj = shareList[id];
+        var _icon = _obj.username != null ? "icon-user" : "icon-group";
+        var _label = _obj.username != null ? _obj.username : _obj.name;
+        _html += '<li data-object-id="' + _obj.id + '"><span class="badge badge-left"><i class="' + _icon + '"></i> ' + _label + '</span><span class="badge badge-important badge-right trashShare"><i class="icon-trash"></i></span></li>';
+      }
+    }
+    if (_html != "") {
+      $("#documentShareList").removeClass("hide").empty();
+      $("#documentShareList").html(_html);
+      $("#documentShareNoShare").addClass("hide");
+    }
+    else {
+      $("#documentShareList").addClass("hide");
+      $("#documentShareNoShare").removeClass("hide");
+    }
+  }
+
+  $(document).on("click", ".trashShare", function () {
+    delete shareList[$(this).parent().data("object-id")];
+    renderShareList();
+  });
+
+  $("#saveDocumentShare").on("click", function () {
+    // TODO: post to permissions stuff
+    console.log(shareList);
+  });
+
 });
 
 function renderDocs(callback) {
@@ -499,6 +647,7 @@ function populateTable(tags) {
     });
   }
   documentsTable.fnDraw();
+  $("a[rel='tooltip']").tooltip();
 }
 
 function addRow(doc) {
@@ -513,7 +662,8 @@ function addRow(doc) {
       emptyStringIfNull(doc.description),
       '<div class="documentTags" data-document-id="' + doc.id + '">' + _tags + '</div>',
       emptyStringIfNull(doc.owner),
-      emptyStringIfNull(doc.lastModified)
+      emptyStringIfNull(doc.lastModified),
+      '<a href="#" class="shareDocument" data-document-id="' + doc.id + '" rel="tooltip" title="${_('Share')} ' + doc.name + '" data-placement="left" style="padding-left:10px"><i class="icon-share-sign"></i></a>',
     ], false);
   }
   catch (error) {

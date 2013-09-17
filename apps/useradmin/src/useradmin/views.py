@@ -39,6 +39,7 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 from django.forms.util import ErrorList
 from django.shortcuts import redirect
+from django.http import HttpResponse
 
 import desktop.conf
 from hadoop.fs.exceptions import WebHdfsException
@@ -70,6 +71,40 @@ def list_groups(request):
 
 def list_permissions(request):
   return render("list_permissions.mako", request, dict(permissions=HuePermission.objects.all()))
+
+
+def list_for_autocomplete(request):
+  if request.ajax:
+    response = {
+      'users': massage_users_for_json(User.objects.all()),
+      'groups': massage_groups_for_json(Group.objects.all())
+    }
+    return HttpResponse(json.dumps(response), mimetype="application/json")
+
+  return HttpResponse("")
+
+
+def massage_users_for_json(users):
+  simple_users = []
+  for user in users:
+    simple_users.append({
+      'id': user.id,
+      'username': user.username,
+      'first_name': user.first_name,
+      'last_name': user.last_name,
+      'email': user.email
+    })
+  return simple_users
+
+
+def massage_groups_for_json(groups):
+  simple_groups = []
+  for group in groups:
+    simple_groups.append({
+      'id': group.id,
+      'name': group.name
+    })
+  return simple_groups
 
 
 def delete_user(request):
