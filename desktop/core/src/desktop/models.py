@@ -91,7 +91,7 @@ class DocumentTagManager(models.Manager):
   def delete_tag(self, tag_id, owner):
     tag = DocumentTag.objects.get(id=tag_id, owner=owner)
     default_tag = DocumentTag.objects.get_default_tag(user=owner)
-    
+
     if tag in (default_tag, DocumentTag.objects.get_trash_tag(owner)):
       raise Exception(_("Can't remove default or trash tag. Please restore the document from the trash instead."))
     else:
@@ -102,16 +102,16 @@ class DocumentTagManager(models.Manager):
 
   def update_tags(self, owner, doc_id, tag_ids):
     doc = Document.objects.get_doc(doc_id, owner)
-    
+
     for tag in doc.tags.all():
       if tag.tag not in (DocumentTag.TRASH, DocumentTag.DEFAULT):
         doc.untag(tag)
-    
+
     for tag_id in tag_ids:
       tag = DocumentTag.objects.get(id=tag_id, owner=owner)
       if tag.tag != DocumentTag.TRASH:
         doc.add_tag(tag)
-    
+
     return doc
 
 
@@ -211,7 +211,7 @@ class DocumentManager(models.Manager):
           if job.is_trashed:
             doc.send_to_trash()
           if job.is_shared:
-            DocumentPermission.share_to_default(doc)
+            DocumentPermission.objects.share_to_default(doc)
     except Exception, e:
       LOG.warn(force_unicode(e))
 
@@ -315,38 +315,69 @@ class Document(models.Model):
   @property
   def icon(self):
     apps = appmanager.get_apps_dict()
-    
+
     try:
       if self.content_type.app_label == 'beeswax':
-        if self.extra == '0':      
+        if self.extra == '0':
           return apps['beeswax'].icon_path
         else:
           return apps['impala'].icon_path
       elif self.content_type.app_label == 'oozie':
         return self.content_type.model_class().ICON
-      elif self.content_type.app_label in apps: 
+      elif self.content_type.app_label in apps:
         return apps[self.content_type.app_label].icon_path
       else:
         return '/static/art/favicon.png'
     except Exception, e:
       LOG.warn(force_unicode(e))
-      return '/static/art/favicon.png' 
+      return '/static/art/favicon.png'
 
 
 class DocumentPermission(models.Model):
+  READ_PERM = 'read'
+
   doc = models.ForeignKey(Document)
 
   users = models.ManyToManyField(auth_models.User, db_index=True)
   groups = models.ManyToManyField(auth_models.Group, db_index=True)
   perms = models.TextField(
-      default='read', choices=(('read', 'read'),),)
+      default='read', choices=((READ_PERM, 'read'),),)
 
-  @classmethod
-  def share_to_default(cls, document):
+  #unique_together = ('doc', 'perms')
+
+
+class DocumentPermissionManager(models.Manager):
+
+  def share_to_default(self, document):
     perm, created = DocumentPermission.objects.get_or_create(doc=document)
     default_group = get_default_user_group()
     if default_group:
       perm.groups.add(default_group)
+
+
+  def update(self, perm=None, perm_id=None, document=None, name=DocumentPermission.READ_PERM, user_ids=None, groups_ids=None):
+    if perm_id is not None:
+      perm = DocumentPermission.objects.get(id=perm_id)
+
+    if document is not None:
+      perm, created = DocumentPermission.objects.get_or_create(doc=document, perms=name)
+
+    if user_ids is not None:
+      users = auth_models.User.objects.in_bulk(user_ids)
+      perm.users = []
+      perm.users = users
+
+    if groups_ids is not None:
+      groups = auth_models.Group.objects.in_bulk(groups_ids)
+      perm.groups = []
+      perm.groups = groups
+
+    if not perm.users and not perm.groups:
+      perm.delete()
+
+# TODO: I think it is fine to load all the users and groups in the form
+# layout like gdoc?
+
 
 # HistoryTable
 # VersionTable
