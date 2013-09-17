@@ -51,11 +51,11 @@ LOG = logging.getLogger(__name__)
 def home(request):
   docs = Document.objects.get_docs(request.user).order_by('-last_modified')[:100]
   tags = DocumentTag.objects.filter(owner=request.user)
-  
+
   apps = appmanager.get_apps_dict(request.user)
-  
+
   return render('home.mako', request, {
-    'apps': apps,                                       
+    'apps': apps,
     'documents': docs,
     'json_documents': json.dumps(massaged_documents_for_json(docs)),
     'tags': tags,
@@ -125,7 +125,7 @@ def add_tag(request):
 
 def tag(request):
   response = {'status': -1, 'message': ''}
-  
+
   if request.method == 'POST':
     request_json = json.loads(request.POST['data'])
     try:
@@ -136,7 +136,7 @@ def tag(request):
       response['message'] = force_unicode(e)
   else:
     response['message'] = _('POST request only')
-  
+
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
@@ -176,11 +176,23 @@ def remove_tags(request):
 
 
 def update_permissions(request):
-  # doc_id or None if no perms yet for this doc
-  # some users [id1, id2...]
-  # some groups [id1, id2...]
-  # type: 'read' for now
-  pass
+  response = {'status': -1, 'message': _('Error')}
+
+  if request.method == 'POST':
+    data = json.loads(request.POST['data'])
+    doc_id = json.loads(request.POST['doc_id'])
+    try:
+      doc = Document.objects.get_doc(doc_id, request.user)
+      # doc.sync_permissions({'read': {'user_ids': [1, 2, 3], 'group_ids': [1, 2, 3]}})
+      doc.sync_permissions(data)
+      response['message'] = _('Permissions updated!')
+      response['status'] = 0
+    except Exception, e:
+      response['message'] = force_unicode(e)
+  else:
+    response['message'] = _('POST request only')
+
+  return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
 @access_log_level(logging.WARN)

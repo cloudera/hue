@@ -332,6 +332,75 @@ class Document(models.Model):
       LOG.warn(force_unicode(e))
       return '/static/art/favicon.png'
 
+  def share(self, users, groups, name='read'):
+    DocumentPermission.objects.update(document=self, name=name, users=users, groups=groups, add=True)
+
+  def unshare(self, users, groups, name='read'):
+    DocumentPermission.objects.update(document=self, name=name, users=users, groups=groups, add=False)
+
+  def sync_permissions(self, perms_dict):
+    """
+    Example of input: {'read': {'user_ids': [1, 2, 3], 'group_ids': [1, 2, 3]}}
+    """
+    for name, perm in perms_dict.iteritems():
+      users = groups = None
+
+      if perm.get('user_ids'):
+        users = auth_models.User.objects.in_bulk(perm.get('user_ids'))
+
+      if perm.get('group_ids'):
+        groups = auth_models.Group.objects.in_bulk(perm.get('group_ids'))
+
+      DocumentPermission.objects.sync(document=self, name=name, users=users, groups=groups)
+
+
+class DocumentPermissionManager(models.Manager):
+
+  def share_to_default(self, document):
+    perm, created = DocumentPermission.objects.get_or_create(doc=document)
+    default_group = get_default_user_group()
+
+    if default_group:
+      perm.groups.add(default_group)
+
+  def update(self, document, name='read', users=None, groups=None, add=True):
+    if name != DocumentPermission.READ_PERM:
+      raise PopupException(_('Only %s permissions is supported, not %s.') % (DocumentPermission.READ_PERM, name))
+
+    perm, created = DocumentPermission.objects.get_or_create(doc=document, perms=name)
+
+    if users is not None:
+      if add:
+        perm.users.add(*users)
+      else:
+        perm.users.remove(*users)
+
+    if groups is not None:
+      if add:
+        perm.groups.add(*groups)
+      else:
+        perm.groups.remove(*groups)
+
+    if not perm.users and not perm.groups:
+      perm.delete()
+
+  def sync(self, document, name='read', users=None, groups=None):
+    if name != DocumentPermission.READ_PERM:
+      raise PopupException(_('Only %s permissions is supported, not %s.') % (DocumentPermission.READ_PERM, name))
+
+    perm, created = DocumentPermission.objects.get_or_create(doc=document, perms=name)
+
+    if users is not None:
+      perm.users = []
+      perm.users = users
+
+    if groups is not None:
+      perm.groups = []
+      perm.groups = groups
+
+    if not perm.users and not perm.groups:
+      perm.delete()
+
 
 class DocumentPermission(models.Model):
   READ_PERM = 'read'
@@ -343,40 +412,9 @@ class DocumentPermission(models.Model):
   perms = models.TextField(
       default='read', choices=((READ_PERM, 'read'),),)
 
+
+  objects = DocumentPermissionManager()
   #unique_together = ('doc', 'perms')
-
-
-class DocumentPermissionManager(models.Manager):
-
-  def share_to_default(self, document):
-    perm, created = DocumentPermission.objects.get_or_create(doc=document)
-    default_group = get_default_user_group()
-    if default_group:
-      perm.groups.add(default_group)
-
-
-  def update(self, perm=None, perm_id=None, document=None, name=DocumentPermission.READ_PERM, user_ids=None, groups_ids=None):
-    if perm_id is not None:
-      perm = DocumentPermission.objects.get(id=perm_id)
-
-    if document is not None:
-      perm, created = DocumentPermission.objects.get_or_create(doc=document, perms=name)
-
-    if user_ids is not None:
-      users = auth_models.User.objects.in_bulk(user_ids)
-      perm.users = []
-      perm.users = users
-
-    if groups_ids is not None:
-      groups = auth_models.Group.objects.in_bulk(groups_ids)
-      perm.groups = []
-      perm.groups = groups
-
-    if not perm.users and not perm.groups:
-      perm.delete()
-
-# TODO: I think it is fine to load all the users and groups in the form
-# layout like gdoc?
 
 
 # HistoryTable
