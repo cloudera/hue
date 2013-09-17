@@ -715,6 +715,31 @@ class TestEditor(OozieMockBase):
     self.setup_simple_workflow()
 
 
+  def test_workflow_name(self):
+    try:
+      workflow_dict = WORKFLOW_DICT.copy()
+      workflow_count = Workflow.objects.available().count()
+
+      workflow_dict['name'][0] = 'bad workflow name'
+      response = self.c.post(reverse('oozie:create_workflow'), workflow_dict, follow=True)
+      assert_equal(200, response.status_code)
+      assert_equal(workflow_count, Workflow.objects.available().count(), response)
+
+      workflow_dict['name'][0] = 'good-workflow-name'
+      response = self.c.post(reverse('oozie:create_workflow'), workflow_dict, follow=True)
+      assert_equal(200, response.status_code)
+      assert_equal(workflow_count + 1, Workflow.objects.available().count(), response)
+    finally:
+      name = 'bad workflow name'
+      if Workflow.objects.filter(name=name).exists():
+        Node.objects.filter(workflow__name=name).delete()
+        Workflow.objects.filter(name=name).delete()
+      name = 'good-workflow-name'
+      if Workflow.objects.filter(name=name).exists():
+        Node.objects.filter(workflow__name=name).delete()
+        Workflow.objects.filter(name=name).delete()
+
+
   def test_find_parameters(self):
     jobs = [Job(name="$a"),
             Job(name="foo ${b} $$"),

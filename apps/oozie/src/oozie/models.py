@@ -53,7 +53,7 @@ LOG = logging.getLogger(__name__)
 
 
 PATH_MAX = 512
-name_validator = RegexValidator(regex='[a-zA-Z_][\-_a-zA-Z0-9]{1,39}',
+name_validator = RegexValidator(regex='^[a-zA-Z_][\-_a-zA-Z0-9]{1,39}$',
                                 message=_('Enter a valid value: combination of 2 - 40 letters and digits starting by a letter'))
 
 
