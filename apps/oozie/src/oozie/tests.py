@@ -16,10 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-try:
-  import json
-except ImportError:
-  import simplejson as json
+import json
 import logging
 import re
 import os
@@ -40,7 +37,6 @@ from liboozie.types import WorkflowList, Workflow as OozieWorkflow, Coordinator 
 
 from oozie.models import Workflow, Node, Kill, Link, Job, Coordinator, History,\
   find_parameters, NODE_TYPES, Bundle
-from oozie.conf import SHARE_JOBS
 from oozie.utils import workflow_to_dict, model_to_dict, smart_path
 from oozie.import_workflow import import_workflow
 from oozie.import_jobsub import convert_jobsub_design

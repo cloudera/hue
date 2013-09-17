@@ -570,6 +570,7 @@ class TestDocModelTags():
 
 
 class TestDocModelPermissions():
+  
   def setUp(self):
     self.client = make_logged_in_client(username="perm_user")
     self.client_not_me = make_logged_in_client(username="not_perm_user")
@@ -580,10 +581,17 @@ class TestDocModelPermissions():
     grant_access(self.user.username, self.user.username, "desktop")
     grant_access(self.user_not_me.username, self.user_not_me.username, "desktop")        
 
-  def test_add_or_update_permission(self):
-    response = self.client.get("/doc/add_or_update_permission")    
-    assert_equal(-1, json.loads(response.content).status)
+  def add_doc(self, name):
+    script = PigScript.objects.create(owner=self.user)
+    doc = Document.objects.link(script, owner=script.owner, name=name)
+    return script, doc
 
-  def test_remove_permission(self):
-    response = self.client.get("/doc/remove_permission")    
-    assert_equal(-1, json.loads(response.content).status)
+  def test_update_permissions(self):
+    script, doc = self.add_doc('test_update_permissions')
+    
+    response = self.client.post("/doc/update_permissions", {
+        'doc_id': doc.id,
+        'data': json.dumps({'read': {'user_ids': [1, 2], 'group_ids': [1]}})
+    })
+        
+    assert_equal(0, json.loads(response.content)['status'], response.content)

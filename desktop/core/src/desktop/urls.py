@@ -77,8 +77,6 @@ dynamic_patterns += patterns('desktop.views',
   (r'^doc/update_tags$', 'update_tags'),
 
   # Permissions
-  #(r'^doc/add_or_update_permission$', 'add_or_update_permission'),
-  #(r'^doc/remove_permission$', 'remove_permission'),
   (r'^doc/update_permissions', 'update_permissions'),
 
   # Jasmine
