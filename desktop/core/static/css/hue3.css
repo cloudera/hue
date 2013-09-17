@@ -1326,3 +1326,6 @@ a#advanced-btn:hover {
   margin-left: -320px!important;
   width: 640px;
 }
+#jHueTourVideoPlayer .modal-body {
+  max-height: 460px;
+}

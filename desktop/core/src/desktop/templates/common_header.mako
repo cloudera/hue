@@ -101,7 +101,7 @@ from django.utils.translation import ugettext as _
       labels: {
         AVAILABLE_TOURS: "${_('Available tours')}",
         NO_AVAILABLE_TOURS: "${_('None for this page.')}",
-        MORE_INFO: "${_('More info...')}"
+        MORE_INFO: "${_('Read more about it...')}"
       }
     };
 

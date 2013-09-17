@@ -43,7 +43,7 @@
               }, ...
             ],
             video: "http://player.vimeo.com/xxxxx", <-- instead of the steps you can specify a video and it will be displayed in a modal
-            blog: "http://gethue.tumblr.com/yyyyy" <-- if specified, a link to this with a "More info..." label will be placed under the video in the modal
+            blog: "http://gethue.tumblr.com/yyyyy" <-- if specified, a link to this with a "Read more about it..." label will be placed under the video in the modal. if video is empty, the link will be automagically opened
           }, ...
         ]
       });
@@ -66,7 +66,7 @@
       labels: {
         AVAILABLE_TOURS: "Available tours",
         NO_AVAILABLE_TOURS: "None for this page",
-        MORE_INFO: "More info..."
+        MORE_INFO: "Read more about it..."
       },
       tours: [],
       showRemote: false,
@@ -135,13 +135,13 @@
       _this.options.tours = _newTours.concat($.totalStorage("jHueTourExtras"));
     }
 
-    var _toursHtml = '<ul class="nav nav-pills nav-stacked">'
+    var _toursHtml = '<ul class="nav nav-pills nav-stacked" style="margin-bottom: 0">'
       var _added = 0;
       $.each(_this.options.tours, function (ctn, tour) {
         if (tour.path === undefined || RegExp(tour.path).test(location.pathname)) {
           var _tourDone = '';
           var _removeTour = '';
-          var _videoIcon = '';
+          var _extraIcon = '';
           if ($.totalStorage !== undefined) {
             var _key = location.pathname;
             if (tour.path !== undefined && tour.path != "") {
@@ -156,10 +156,16 @@
             _removeTour = '<div style="color:red;float:right;margin:4px;cursor: pointer" onclick="javascript:$.jHueTour(\'remove_' + tour.name + '\')"><i class="icon-remove-sign"></i></div>';
           }
 
+          var _link = '<a href="javascript:$.jHueTour(\'' + tour.name + '\', 1)" style="padding-left:0">';
+
           if (typeof tour.video != "undefined" && tour.video != null && tour.video != ""){
-            _videoIcon = '<i class="icon-youtube-play"></i> ';
+            _extraIcon = '<i class="icon-youtube-play"></i> ';
           }
-          _toursHtml += '<li>' + _removeTour + _tourDone + '<a href="javascript:$.jHueTour(\'' + tour.name + '\', 1)" style="padding-left:0">' + _videoIcon + tour.desc + '</a></li>';
+          else if (typeof tour.blog != "undefined" && tour.blog != null && tour.blog != ""){
+            _extraIcon = '<i class="icon-external-link"></i> ';
+            _link = '<a href="' + tour.blog + '" target="_blank" style="padding:0">';
+          }
+          _toursHtml += '<li>' + _removeTour + _tourDone + _link + _extraIcon + tour.desc + '</a></li>';
           _added++;
         }
       });
@@ -371,15 +377,15 @@
             '</div>' +
             '<div class="modal-body">' +
             '<iframe id="jHueTourVideoFrame" src="' + _this.currentTour.video + '?autoplay=1" width="700" height="350" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen="" style="height:360px;width:640px"></iframe><div class="moreInfo">' +
-            (typeof _this.currentTour.blog != "undefined" && _this.currentTour.blog != "" ? '<a href="' + _this.currentTour.blog + '" target="_blank"><i class="icon-link"></i> ' + _this.options.labels.MORE_INFO + '</a>' : '') +
+            (typeof _this.currentTour.blog != "undefined" && _this.currentTour.blog != "" ? '<br/><a href="' + _this.currentTour.blog + '" target="_blank"><i class="icon-external-link"></i> ' + _this.options.labels.MORE_INFO + '</a>' : '') +
             '</div></div>';
         var _player = $("<div>").attr("id", "jHueTourVideoPlayer").addClass("modal").addClass("hide").addClass("fade");
         _player.html(_playerHTML);
         _player.appendTo($("body"));
       }
       else {
-        $("#jHueTourVideoPlayer").find("h3").text(_this.currentTour.desc);
-        $("#jHueTourVideoPlayer").find(".moreInfo").html(typeof _this.currentTour.blog != "undefined" && _this.currentTour.blog != "" ? '<a href="' + _this.currentTour.blog + '" target="_blank"><i class="icon-link"></i> ' + _this.options.labels.MORE_INFO + '</a>' : '');
+        $("#jHueTourVideoPlayer").find("h3").html(_this.currentTour.desc);
+        $("#jHueTourVideoPlayer").find(".moreInfo").html(typeof _this.currentTour.blog != "undefined" && _this.currentTour.blog != "" ? '<a href="' + _this.currentTour.blog + '" target="_blank"><i class="icon-external-link"></i> ' + _this.options.labels.MORE_INFO + '</a>' : '');
         $("#jHueTourVideoFrame").attr("src", _this.currentTour.video + "?autoplay=1");
       }
       $("#jHueTourVideoPlayer").modal().modal("show");
