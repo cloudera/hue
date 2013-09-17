@@ -114,6 +114,7 @@ def add_tag(request):
     try:
       tag = DocumentTag.objects.create_tag(request.user, request.POST['name'])
       response['tag_id'] = tag.id
+      response['status'] = 0
     except Exception, e:
       response['message'] = force_unicode(e)
   else:
@@ -122,14 +123,15 @@ def add_tag(request):
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
-def add_or_create_tag(request):
+def tag(request):
   response = {'status': -1, 'message': ''}
   
   if request.method == 'POST':
     request_json = json.loads(request.POST['data'])
     try:
-      tag = DocumentTag.objects.add_or_create_tag(request.user, request_json['doc_id'], request_json['tag'], request_json['tag_id'])
+      tag = DocumentTag.objects.tag(request.user, request_json['doc_id'], request_json.get('tag'), request_json.get('tag_id'))
       response['tag_id'] = tag.id
+      response['status'] = 0
     except Exception, e:
       response['message'] = force_unicode(e)
   else:
@@ -146,6 +148,7 @@ def update_tags(request):
     try:
       doc = DocumentTag.objects.update_tags(request.user, request_json['doc_id'], request_json['tag_ids'])
       response['doc'] = massage_doc_for_json(doc)
+      response['status'] = 0
     except Exception, e:
       response['message'] = force_unicode(e)
   else:
@@ -162,7 +165,8 @@ def remove_tags(request):
     try:
       for tag_id in request_json['tag_ids']:
         DocumentTag.objects.delete_tag(tag_id, request.user)
-      response['message'] = _('Tag removed !')
+      response['message'] = _('Tag(s) removed!')
+      response['status'] = 0
     except Exception, e:
       response['message'] = force_unicode(e)
   else:

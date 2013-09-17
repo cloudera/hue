@@ -68,14 +68,15 @@ dynamic_patterns += patterns('desktop.views',
   (r'^debug/check_config_ajax$', 'check_config_ajax'),
   (r'^log_frontend_event$', 'log_frontend_event'),
 
-  # Doc model
+  # Tags
   (r'^tag/add_tag$', 'add_tag'),
   (r'^tag/remove_tags$', 'remove_tags'),
   (r'^tag/list_tags$', 'list_tags'),
   (r'^doc/list_docs$', 'list_docs'),
-  (r'^doc/add_or_create_tag$', 'add_or_create_tag'),
+  (r'^doc/tag$', 'tag'),
   (r'^doc/update_tags$', 'update_tags'),
 
+  # Permissions
   (r'^doc/add_or_update_permission$', 'add_or_update_permission'),
   (r'^doc/remove_permission$', 'remove_permission'),
 

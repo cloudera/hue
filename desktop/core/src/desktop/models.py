@@ -55,6 +55,10 @@ class Settings(models.Model):
 
 class DocumentTagManager(models.Manager):
 
+  def get_default_tag(self, user):
+    tag, created = DocumentTag.objects.get_or_create(owner=user, tag=DocumentTag.DEFAULT)
+    return tag
+
   def get_trash_tag(self, user):
     tag, created = DocumentTag.objects.get_or_create(owner=user, tag=DocumentTag.TRASH)
     return tag
@@ -63,45 +67,45 @@ class DocumentTagManager(models.Manager):
     tag = DocumentTag.objects.create(tag=tag_name, owner=owner)
     return tag
 
-  def add_or_create_tag(self, owner, doc_id, tag_name, tag_id=None):
+  def tag(self, owner, doc_id, tag_name='', tag_id=None):
     try:
       tag = DocumentTag.objects.get(id=tag_id, owner=owner)
-      if tag == DocumentTag.get_trash_tag(owner):
+      if tag == DocumentTag.objects.get_trash_tag(owner):
         raise Exception(_("Can't add trash tag. Please trash the document from instead."))
-    except:
+    except DocumentTag.DoesNotExist:
       tag = DocumentTag.objects.create(tag=tag_name, owner=owner)
 
     doc = Document.objects.get_doc(doc_id, owner)
     doc.add_tag(tag)
     return tag
 
-  def remove_tag(self, tag_id, owner, doc_id):
+  def untag(self, tag_id, owner, doc_id):
     tag = DocumentTag.objects.get(id=tag_id, owner=owner)
+
     if tag == DocumentTag.get_trash_tag(owner):
       raise Exception(_("Can't remove trash tag. Please restore the document from the trash instead."))
 
     doc = Document.objects.get_doc(doc_id, owner=owner)
     doc.remove(tag)
-    if tag.tag != DocumentTag.TRASH and not tag.document_set.exists():
-      tag.delete()
 
   def delete_tag(self, tag_id, owner):
     tag = DocumentTag.objects.get(id=tag_id, owner=owner)
-    if tag == DocumentTag.get_trash_tag(owner):
-      raise Exception(_("Can't remove trash tag. Please restore the document from the trash instead."))
+    default_tag = DocumentTag.objects.get_default_tag(user=owner)
     
-    for doc in Document.objects.get_docs(owner):
-      doc.remove_tag(tag)
-    if tag.tag != DocumentTag.TRASH and not tag.document_set.exists():
+    if tag in (default_tag, DocumentTag.objects.get_trash_tag(owner)):
+      raise Exception(_("Can't remove default or trash tag. Please restore the document from the trash instead."))
+    else:
       tag.delete()
 
-  @classmethod
+    for doc in Document.objects.get_docs(owner).filter(tags=None):
+      doc.add(default_tag)
+
   def update_tags(self, owner, doc_id, tag_ids):
     doc = Document.objects.get_doc(doc_id, owner)
     
     for tag in doc.tags.all():
-      if tag.tag != DocumentTag.TRASH:
-        doc.remove_tag(tag)
+      if tag.tag not in (DocumentTag.TRASH, DocumentTag.DEFAULT):
+        doc.untag(tag)
     
     for tag_id in tag_ids:
       tag = DocumentTag.objects.get(id=tag_id, owner=owner)
@@ -190,7 +194,7 @@ class DocumentManager(models.Manager):
               extra=extra
           )
 
-    tag, created = DocumentTag.objects.get_or_create(owner=owner, tag=DocumentTag.DEFAULT)
+    tag = DocumentTag.objects.get_default_tag(user=owner)
     doc.tags.add(tag)
 
     return doc
@@ -202,7 +206,7 @@ class DocumentManager(models.Manager):
       for job in list(chain(Workflow.objects.all(), Coordinator.objects.all(), Bundle.objects.all())):
         if not job.doc.exists():
           doc = Document.objects.link(job, owner=job.owner, name=job.name, description=job.description)
-          tag, created = DocumentTag.objects.get_or_create(owner=job.owner, tag='default')
+          tag = DocumentTag.objects.get_default_tag(owner=job.owner)
           doc.tags.add(tag)
           if job.is_trashed:
             doc.send_to_trash()
@@ -215,7 +219,7 @@ class DocumentManager(models.Manager):
       for job in SavedQuery.objects.all():
         if not job.doc.exists():
           doc = Document.objects.link(job, owner=job.owner, name=job.name, description=job.desc, extra=job.type)
-          tag, created = DocumentTag.objects.get_or_create(owner=job.owner, tag='default')
+          tag = DocumentTag.objects.get_default_tag(owner=job.owner)
           doc.tags.add(tag)
           if job.is_trashed:
             doc.send_to_trash()
@@ -228,7 +232,7 @@ class DocumentManager(models.Manager):
       for job in PigScript.objects.all():
         if not job.doc.exists():
           doc = Document.objects.link(job, owner=job.owner, name=job.dict['name'], description='')
-          tag, created = DocumentTag.objects.get_or_create(owner=job.owner, tag='default')
+          tag = DocumentTag.objects.get_default_tag(owner=job.owner)
           doc.tags.add(tag)
     except Exception, e:
       LOG.warn(force_unicode(e))
