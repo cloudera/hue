@@ -14,27 +14,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from urllib2 import HTTPError, URLError
+from requests.exceptions import HTTPError
+from requests import Response
 
 from nose.tools import assert_equal
 
 from desktop.lib.rest.http_client import RestException
 
 
-class MockFile:
-  def read(self):
-    return 'my data'
-  def readline(self):
-    return 'my data'
-
-
-def test_url_error_rest_exception():
-  exception = RestException(URLError('My error'))
-  assert_equal({}, exception._headers)
+def build_response(reason=None, status_code=200, headers={}):
+  response = Response()
+  response.status_code = status_code
+  response.headers = headers
+  response.reason = reason
+  return response
 
 
 def test_http_error_rest_exception():
-  headers = {'my header': 'one value'}
-
-  exception = RestException(HTTPError('url', 404, 'My error', headers, MockFile()))
+  headers ={'my header': 'one value'}
+  response = build_response('Not found', 404, headers)
+  exception = RestException(HTTPError(response=response))
   assert_equal(headers, exception._headers)

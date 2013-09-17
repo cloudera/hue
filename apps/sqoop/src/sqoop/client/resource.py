@@ -30,7 +30,7 @@ class SqoopResource(Resource):
   @see desktop.lib.rest.resource
   """
 
-  def invoke(self, method, relpath=None, params=None, data=None, headers=None):
+  def invoke(self, method, relpath=None, params=None, data=None, headers=None, allow_redirects=False):
     """
     Invoke an API method.
     Look for sqoop-error-code and sqoop-error-message.
@@ -41,21 +41,21 @@ class SqoopResource(Resource):
                                 path,
                                 params=params,
                                 data=data,
-                                headers=headers)
-    body = self._get_body(resp)
+                                headers=headers,
+                                allow_redirects=allow_redirects)
 
-    if resp.getcode() == 200:
+    if resp.status_code == 200:
       self._client.logger.debug(
           "%(method)s Got response:\n%(headers)s\n%(body)s" % {
             'method': method,
             'headers': resp.headers,
-            'body': body
+            'body': resp.content
       })
       # Sqoop always uses json
-      return self._format_body(resp, body)
+      return self._format_response(resp)
     else:
       # Body will probably be a JSON formatted stacktrace
-      body = self._format_body(resp, body)
+      body = self._format_response(resp)
       msg_format = "%(method)s Sqoop Error (%s): %s\n\t%s"
       args = (resp.headers['sqoop-error-code'], resp.headers['sqoop-error-message'], body)
       self._client.logger.error(msg_format % args)

@@ -326,7 +326,7 @@ def _submit_workflow(user, fs, workflow, mapping):
     return job_id
   except RestException, ex:
     detail = ex._headers.get('oozie-error-message', ex)
-    if 'urlopen error' in str(detail):
+    if 'Max retries exceeded with url' in str(detail):
       detail = '%s: %s' % (_('The Oozie server is not running'), detail)
     LOG.error(smart_str(detail))
     raise PopupException(_("Error submitting workflow %s") % (workflow,), detail=detail)

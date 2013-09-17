@@ -45,31 +45,21 @@ class Resource(object):
       return self._path
     return self._path + posixpath.normpath('/' + relpath)
 
-  def _get_body(self, resp):
-    try:
-      body = resp.read()
-    except Exception, ex:
-      raise Exception("Command '%s %s' failed: %s" %
-                      (method, path, ex))
-    return body
-
-  def _format_body(self, resp, body):
+  def _format_response(self, resp):
     """
     Decide whether the body should be a json dict or string
     """
-    if len(body) != 0 and \
-          resp.info().getmaintype() == "application" and \
-          resp.info().getsubtype() == "json":
+    if len(resp.content) != 0 and \
+          'application/json' in resp.headers['content-type']:
       try:
-        json_dict = json.loads(body)
-        return json_dict
+        return resp.json()
       except Exception, ex:
-        self._client.logger.exception('JSON decode error: %s' % (body,))
+        self._client.logger.exception('JSON decode error: %s' % resp.content)
         raise ex
     else:
-      return body
+      return resp.content
 
-  def invoke(self, method, relpath=None, params=None, data=None, headers=None):
+  def invoke(self, method, relpath=None, params=None, data=None, headers=None, allow_redirects=False):
     """
     Invoke an API method.
     @return: Raw body or JSON dictionary (if response content type is JSON).
@@ -79,14 +69,14 @@ class Resource(object):
                                 path,
                                 params=params,
                                 data=data,
-                                headers=headers)
-    body = self._get_body(resp)
+                                headers=headers,
+                                allow_redirects=allow_redirects)
 
     self._client.logger.debug(
         "%s Got response: %s%s" %
-        (method, body[:32], len(body) > 32 and "..." or ""))
+        (method, resp.content[:32], len(resp.content) > 32 and "..." or ""))
 
-    return self._format_body(resp, body)
+    return self._format_response(resp)
 
 
   def get(self, relpath=None, params=None, headers=None):
@@ -97,7 +87,7 @@ class Resource(object):
 
     @return: A dictionary of the JSON result.
     """
-    return self.invoke("GET", relpath, params, headers=headers)
+    return self.invoke("GET", relpath, params, headers=headers, allow_redirects=True)
 
 
   def delete(self, relpath=None, params=None):

@@ -1,0 +1,7 @@
+*.pyc
+*.swp
+env/
+build/
+dist/
+requests_kerberos.egg-info/
+

@@ -83,7 +83,7 @@ def show_oozie_error(view_func):
       return view_func(request, *args, **kwargs)
     except RestException, ex:
       detail = ex._headers.get('oozie-error-message', ex)
-      if 'urlopen error' in str(detail):
+      if 'Max retries exceeded with url' in str(detail):
         detail = '%s: %s' % (_('The Oozie server is not running'), detail)
       raise PopupException(_('An error occurred with Oozie.'), detail=detail)
   return wraps(view_func)(decorate)
