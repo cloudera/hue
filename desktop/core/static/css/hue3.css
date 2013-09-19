@@ -1306,6 +1306,7 @@ a#advanced-btn:hover {
   height: 20px;
   margin-bottom: 0;
   padding: 0;
+  border: none;
 }
 
 .nav-list > li.white {

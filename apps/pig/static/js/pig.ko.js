@@ -478,7 +478,10 @@ var PigViewModel = function (props) {
 
   function callRun(script) {
     self.currentScript(script);
+    $(document).trigger("showLogs");
     $(document).trigger("running");
+    $(document).trigger("startLogsRefresh");
+    $("#submitModal").modal("hide");
     $.post(self.RUN_URL,
         {
           id: script.id(),
@@ -496,11 +499,8 @@ var PigViewModel = function (props) {
           }
           script.isRunning(true);
           script.watchUrl(data.watchUrl);
-          $(document).trigger("startLogsRefresh");
           $(document).trigger("refreshDashboard");
-          $(document).trigger("showLogs");
           self.updateScripts();
-          $("#submitModal").modal("hide");
         }, "json").fail( function(xhr, textStatus, errorThrown) {
           $(document).trigger("error", xhr.responseText);
         });
