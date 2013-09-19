@@ -59,8 +59,8 @@ class Command(BaseCommand):
     We have to adapt a bit for South as well.
     """
     # South:
-    import south.management.commands.syncdb
-    south.management.commands.syncdb.patch_for_test_db_setup()
+    import south.management.commands
+    south.management.commands.patch_for_test_db_setup()
 
     # Create the test database
     from django.db import connection
