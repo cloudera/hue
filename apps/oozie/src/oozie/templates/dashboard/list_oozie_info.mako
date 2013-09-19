@@ -23,11 +23,10 @@
 <%namespace name="utils" file="../utils.inc.mako" />
 
 ${ commonheader(_("Oozie Information"), "oozie", user) | n,unicode }
-${ layout.menubar(section='dashboard') }
+${ layout.menubar(section='oozie', dashboard=True) }
 
 
 <div class="container-fluid">
-  ${ layout.dashboard_sub_menubar(section='oozie') }
 
   <h1 class="card-heading card-heading-noborder simple pull-right" style="margin-top: -4px;">
   ${ _('Oozie status') }
@@ -120,8 +119,6 @@ ${ layout.menubar(section='dashboard') }
     </div>
 
   </div>
-
-  ${ layout.dashboard_end_sub_menubar() }
 
 
 <script>
