@@ -93,7 +93,7 @@ class DocumentTagManager(models.Manager):
       raise Exception(_("Can't remove %s: it is a reserved tag.") % tag)
 
     doc = Document.objects.get_doc(doc_id, owner=owner)
-    doc.remove(tag)
+    doc.remove_tag(tag)
 
   def delete_tag(self, tag_id, owner):
     tag = DocumentTag.objects.get(id=tag_id, owner=owner)
@@ -111,7 +111,7 @@ class DocumentTagManager(models.Manager):
 
     for tag in doc.tags.all():
       if tag.tag not in DocumentTag.RESERVED:
-        doc.remove(tag)
+        doc.remove_tag(tag)
 
     for tag_id in tag_ids:
       tag = DocumentTag.objects.get(id=tag_id, owner=owner)
@@ -283,6 +283,9 @@ class Document(models.Model):
   def add_tag(self, tag):
     self.tags.add(tag)
 
+  def remove_tag(self, tag):
+    self.tags.remove(tag)
+
   def send_to_trash(self):
     tag = DocumentTag.objects.get_trash_tag(user=self.owner)
     self.tags.add(tag)
@@ -370,6 +373,9 @@ class Document(models.Model):
 
       DocumentPermission.objects.sync(document=self, name=name, users=users, groups=groups)
 
+  def list_permissions(self):
+    return DocumentPermission.objects.list(document=self)
+
 
 class DocumentPermissionManager(models.Manager):
 
@@ -417,6 +423,10 @@ class DocumentPermissionManager(models.Manager):
 
     if not perm.users and not perm.groups:
       perm.delete()
+
+  def list(self, document):
+    perm, created = DocumentPermission.objects.get_or_create(doc=document, perms=DocumentPermission.READ_PERM)
+    return perm
 
 
 class DocumentPermission(models.Model):
