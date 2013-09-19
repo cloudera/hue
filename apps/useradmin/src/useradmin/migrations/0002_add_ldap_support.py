@@ -1,10 +1,9 @@
 # encoding: utf-8
-import datetime
 from south.db import db
 from south.v2 import DataMigration
-from django.db import models
 
 from django.contrib.auth.models import User
+from django.db import connection
 from useradmin.models import create_profile_for_user
 from useradmin.models import UserProfile
 
@@ -15,13 +14,10 @@ class Migration(DataMigration):
         This migration has been customized to support upgrades from Cloudera
         Enterprise 3.5, as well as Hue 1.2
         """
-        try:
+        if 'userman_ldapgroup' in connection.introspection.table_names():
           db.rename_table('userman_ldapgroup', 'useradmin_ldapgroup')
           db.delete_column('useradmin_ldapgroup', 'hidden')
-        except Exception, e:
-          db.rollback_transaction()
-          db.start_transaction()
-
+        else:
           # Adding model 'LdapGroup'
           db.create_table('useradmin_ldapgroup', (
               ('group', self.gf('django.db.models.fields.related.ForeignKey')(related_name='group', to=orm['auth.Group'])),

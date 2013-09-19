@@ -46,8 +46,8 @@
     <slf4j.version>1.6.1</slf4j.version>
     <commons-logging.version>1.0.4</commons-logging.version>
     <thrift.version>0.9.0</thrift.version>
-    <javaVersion>1.6</javaVersion>
-    <targetJavaVersion>1.6</targetJavaVersion>
+    <javaVersion>1.7</javaVersion>
+    <targetJavaVersion>1.7</targetJavaVersion>
   </properties>
 
   <organization>

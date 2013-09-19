@@ -25,6 +25,7 @@ except ImportError:
 
 from south.db import db
 from south.v2 import SchemaMigration
+from django.db import connection
 from django.db import models
 
 from desktop.lib.django_db_util import remove_content_type
@@ -109,21 +110,18 @@ class Migration(SchemaMigration):
         db.commit_transaction()
 
         # Delete legacy tables. Note that this only applies to Hue 1.x installations
-        db.start_transaction()
-        try:
+        
+        if 'jobsub_submission' in connection.introspection.table_names():
+            db.start_transaction()
             db.delete_table('jobsub_submission')
             remove_content_type('jobsub', 'submission')
             db.commit_transaction()
-        except Exception, ex:
-            db.rollback_transaction()
 
-        db.start_transaction()
-        try:
+        if 'jobsub_serversubmissionstate' in connection.introspection.table_names():
+            db.start_transaction()
             db.delete_table('jobsub_serversubmissionstate')
             remove_content_type('jobsub', 'serversubmissionstate')
             db.commit_transaction()
-        except Exception, ex:
-            db.rollback_transaction()
 
         # South commits transaction at end of forward migration.
         db.start_transaction()

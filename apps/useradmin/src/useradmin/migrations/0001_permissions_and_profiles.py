@@ -1,6 +1,7 @@
 # encoding: utf-8
 from south.db import db
 from south.v2 import DataMigration
+from django.db import connection
 from django.db import models
 
 from useradmin.models import UserProfile
@@ -13,15 +14,14 @@ class Migration(DataMigration):
         This migration has been customized to support upgrades from Cloudera
         Enterprise 3.5, as well as Hue 1.2
         """
-        try:
-          # These will be removed if upgrading from a previous version of
-          # Cloudera Enterprise
+        # These will be removed if upgrading from a previous version of
+        # Cloudera Enterprise
+        if 'userman_groupadministrator' in connection.introspection.table_names():
           db.delete_table('userman_groupadministrator')
+        if 'userman_grouprelations' in connection.introspection.table_names():
           db.delete_table('userman_grouprelations')
-        except Exception:
-         pass
 
-        try:
+        if 'userman_userprofile' in connection.introspection.table_names():
           db.rename_table('userman_userprofile', 'useradmin_userprofile')
           db.delete_column('useradmin_userprofile', 'primary_group_id')
           db.create_index('useradmin_userprofile', ['user_id'])
@@ -36,10 +36,7 @@ class Migration(DataMigration):
             elif up.creation_method == '0':
               up.creation_method = UserProfile.CreationMethod.HUE
             up.save()
-        except Exception:
-          db.rollback_transaction()
-          db.start_transaction()
-
+        else:
           # Adding model 'UserProfile'
           db.create_table('useradmin_userprofile', (
               ('home_directory', self.gf('django.db.models.fields.CharField')(max_length=1024, null=True)),
@@ -50,15 +47,12 @@ class Migration(DataMigration):
           db.start_transaction()
           db.send_create_signal('useradmin', ['UserProfile'])
 
-        try:
+        if 'userman_grouppermission' in connection.introspection.table_names():
           db.rename_table('userman_grouppermission', 'useradmin_grouppermission')
           db.rename_column('useradmin_grouppermission', 'desktop_permission_id', 'hue_permission_id')
           db.create_index('useradmin_grouppermission', ['group_id'])
           db.create_index('useradmin_grouppermission', ['hue_permission_id'])
-        except Exception:
-          db.rollback_transaction()
-          db.start_transaction()
-
+        else:
           # Adding model 'GroupPermission'
           db.create_table('useradmin_grouppermission', (
               ('hue_permission', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['useradmin.HuePermission'])),
@@ -69,12 +63,9 @@ class Migration(DataMigration):
           db.start_transaction()
           db.send_create_signal('useradmin', ['GroupPermission'])
 
-        try:
+        if 'userman_desktoppermission' in connection.introspection.table_names():
           db.rename_table('userman_desktoppermission', 'useradmin_huepermission')
-        except Exception:
-          db.rollback_transaction()
-          db.start_transaction()
-
+        else:
           # Adding model 'HuePermission'
           db.create_table('useradmin_huepermission', (
               ('action', self.gf('django.db.models.fields.CharField')(max_length=100)),

@@ -30,7 +30,7 @@ from desktop.lib.paths import get_desktop_root
 def coerce_database(database):
   if database == 'mysql':
     return 'django.db.backends.mysql'
-  elif database == 'postgres':
+  elif database == 'postgres' or database == 'postgresql_psycopg2':
     return 'django.db.backends.postgresql_psycopg2'
   elif database == 'oracle':
     return 'django.db.backends.oracle'
