@@ -24,12 +24,10 @@
 <%namespace name="utils" file="../utils.inc.mako" />
 
 ${ commonheader(_("Bundle Dashboard"), "oozie", user) | n,unicode }
-${ layout.menubar(section='dashboard') }
+${ layout.menubar(section='bundles', dashboard=True) }
 
 
 <div class="container-fluid">
-  ${ layout.dashboard_sub_menubar(section='bundles') }
-
 <div class="row-fluid">
   <div class="span2">
     <div class="sidebar-nav">

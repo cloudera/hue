@@ -25,12 +25,10 @@
 <%namespace name="utils" file="../utils.inc.mako" />
 
 ${ commonheader(_("Workflow Dashboard"), "oozie", user) | n,unicode }
-${ layout.menubar(section='dashboard') }
+${ layout.menubar(section='dashboard', dashboard=True) }
 
 
 <div class="container-fluid" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
-
-  ${ layout.dashboard_sub_menubar(section='workflows') }
 
   <div class="row-fluid">
     <div class="span2">

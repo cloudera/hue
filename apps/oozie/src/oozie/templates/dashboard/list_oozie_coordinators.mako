@@ -24,12 +24,10 @@
 <%namespace name="utils" file="../utils.inc.mako" />
 
 ${ commonheader(_("Coordinators Dashboard"), "oozie", user) | n,unicode }
-${layout.menubar(section='dashboard')}
+${layout.menubar(section='coordinators', dashboard=True)}
 
 
 <div class="container-fluid">
-  ${ layout.dashboard_sub_menubar(section='coordinators') }
-
   <form>
     <input type="text" id="filterInput" class="input-xlarge search-query" placeholder="${ _('Search for username, name, etc...') }">
 
@@ -96,7 +94,7 @@ ${layout.menubar(section='dashboard')}
       </tbody>
      </table>
    </div>
-  ${ layout.dashboard_end_sub_menubar() }
+
 </div>
 
 
