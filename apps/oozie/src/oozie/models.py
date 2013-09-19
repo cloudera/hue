@@ -417,7 +417,10 @@ class Workflow(Job):
     return 'workflow.xml'
 
   def get_absolute_url(self):
-    return reverse('oozie:edit_workflow', kwargs={'workflow': self.id}) + '#editWorkflow'
+    if self.doc.get().extra == 'jobsub':
+      return '/jobsub/#edit-design/%s' % self.id
+    else:
+      return reverse('oozie:edit_workflow', kwargs={'workflow': self.id}) + '#editWorkflow'
 
   def get_hierarchy(self):
     node = Start.objects.get(workflow=self) # Uncached version of start.

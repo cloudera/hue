@@ -14,6 +14,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """
 Views for JobSubmission.
 
@@ -35,6 +36,7 @@ from desktop.lib.django_util import render, render_json
 from desktop.lib.exceptions import StructuredException
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.log.access import access_warn
+from desktop.models import Document
 
 from oozie.models import Workflow
 from oozie.forms import design_form_by_type
@@ -54,7 +56,8 @@ def _list_designs(request, owner, name, order_by='-last_modified'):
     order_by    - Order by string in django ORM format
     is_trashed  - Boolean filter for trash or available
   """
-  data = Workflow.objects.filter(managed=False)
+  data = Document.objects.get_docs(request.user, Workflow, extra='jobsub')
+
   if owner:
       data = data.filter(owner__username__icontains=owner)
   if name:
@@ -62,20 +65,22 @@ def _list_designs(request, owner, name, order_by='-last_modified'):
   data = data.order_by(order_by)
 
   designs = []
-  for design in data:
-      ko_design = {
-        'id': design.id,
-        'owner': design.owner.username,
-        # Design name is validated by workflow and node forms.
-        'name': design.name,
-        'description': design.description,
-        'node_type': design.start.get_child('to').node_type,
-        'last_modified': py_time.mktime(design.last_modified.timetuple()),
-        'editable': design.owner.id == request.user.id,
-        'is_shared': design.is_shared,
-        'is_trashed': design.is_trashed
-      }
-      designs.append(ko_design)
+  for doc in data:
+    design = doc.content_object
+
+    ko_design = {
+      'id': design.id,
+      'owner': design.owner.username,
+      # Design name is validated by workflow and node forms.
+      'name': design.name,
+      'description': design.description,
+      'node_type': design.start.get_child('to').node_type,
+      'last_modified': py_time.mktime(design.last_modified.timetuple()),
+      'editable': design.owner.id == request.user.id,
+      'is_shared': design.is_shared,
+      'is_trashed': doc.is_trashed()
+    }
+    designs.append(ko_design)
 
   return designs
 
@@ -87,7 +92,6 @@ def list_designs(request):
     owner       - Substring filter by owner field
     name        - Substring filter by design name field
   '''
-  data = Workflow.objects.filter(managed=False)
   owner = request.GET.get('owner', '')
   name = request.GET.get('name', '')
 
@@ -102,12 +106,14 @@ def list_designs(request):
       'name': name
     })
 
+
 def _get_design(design_id):
   """Raise PopupException if design doesn't exist"""
   try:
     return Workflow.objects.get(pk=design_id)
   except Workflow.DoesNotExist:
     raise PopupException(_("Workflow not found"))
+
 
 def _check_permission(request, owner_name, error_msg, allow_root=False):
   """Raise PopupException if user doesn't have permission to modify the design"""
@@ -116,6 +122,7 @@ def _check_permission(request, owner_name, error_msg, allow_root=False):
       return
     access_warn(request, error_msg)
     raise PopupException(_("Permission denied. You are not the owner."))
+
 
 def delete_design(request, design_id):
   if request.method != 'POST':
@@ -211,6 +218,9 @@ def _save_design(design_id, data):
 
   workflow.save()
 
+  if workflow.doc.exists():
+    workflow.doc.update(name=workflow.name, description=workflow.description)
+
 
 def new_design(request, node_type):
   """
@@ -244,6 +254,10 @@ def new_design(request, node_type):
   workflow.name = request.POST.get('name')
   workflow.description = request.POST.get('description')
   workflow.save()
+
+  doc = workflow.doc.get()
+  doc.extra='jobsub'
+  doc.save()
 
   # Save design again to update all fields.
   data = format_dict_field_values(request.POST.copy())

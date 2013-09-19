@@ -27,7 +27,7 @@ ${ shared.menubar() }
 <%
   _split = path.split("/");
   _breadcrumbs = [
-    [_("Home"), url('zookeeper:index')],
+    [_("Clusters"), url('zookeeper:index')],
     [cluster['nice_name'].lower(), url('zookeeper:view', id=cluster['id'])],
   ]
   for idx, p in enumerate(_split):

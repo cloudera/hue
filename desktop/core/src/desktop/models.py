@@ -59,7 +59,7 @@ class DocumentTagManager(models.Manager):
     if tag_name in DocumentTag.RESERVED:
       raise Exception(_("Can't add %s: it is a reserved tag.") % tag_name)
     else:
-      tag, created = DocumentTag.objects.create(tag=tag_name, owner=owner)
+      tag, created = DocumentTag.objects.get_or_create(tag=tag_name, owner=owner)
       return tag
 
   def get_default_tag(self, user):
@@ -147,17 +147,25 @@ class DocumentManager(models.Manager):
   def documents(self, user):
     return Document.objects.filter(Q(owner=user) | Q(documentpermission__users=user) | Q(documentpermission__groups__in=user.groups.all()))
 
-  def get_docs(self, user):
-    return Document.objects.documents(user).exclude(name='pig-app-hue-script')
+  def get_docs(self, user, model_class=None, extra=None):
+    docs = Document.objects.documents(user).exclude(name='pig-app-hue-script')
+    
+    if model_class is not None:
+      ct = ContentType.objects.get_for_model(model_class)
+      docs = docs.filter(content_type=ct)
+
+    if extra is not None:
+      docs = docs.filter(extra=extra)
+
+    return docs
 
   def get_doc(self, doc_id, user):
     return Document.objects.documents(user).get(id=doc_id)
 
   def trashed_docs(self, model_class, user):
-    ct = ContentType.objects.get_for_model(model_class)
     tag = DocumentTag.objects.get_trash_tag(user=user)
 
-    return Document.objects.get_docs(user).filter(content_type=ct).filter(tags__in=[tag]).order_by('-last_modified')
+    return Document.objects.get_docs(user, model_class).filter(tags__in=[tag]).order_by('-last_modified')
 
   def trashed(self, model_class, user):
     docs = self.trashed_docs(model_class, user)
@@ -165,11 +173,10 @@ class DocumentManager(models.Manager):
     return [job.content_object for job in docs if job.content_object]
 
   def available_docs(self, model_class, user):
-    ct = ContentType.objects.get_for_model(model_class)
     trash = DocumentTag.objects.get_trash_tag(user=user)
     history = DocumentTag.objects.get_history_tag(user=user)
 
-    return Document.objects.get_docs(user).filter(content_type=ct).exclude(tags__in=[trash, history]).order_by('-last_modified')
+    return Document.objects.get_docs(user, model_class).exclude(tags__in=[trash, history]).order_by('-last_modified')  
 
   def available(self, model_class, user):
     docs = self.available_docs(model_class, user)
@@ -199,24 +206,32 @@ class DocumentManager(models.Manager):
     return doc.is_accessible(user)
 
   def link(self, content_object, owner, name='', description='', extra=''):
-    doc = Document.objects.create(
-              content_object=content_object,
-              owner=owner,
-              name=name,
-              description=description,
-              extra=extra
-          )
-
-    tag = DocumentTag.objects.get_default_tag(user=owner)
-    doc.tags.add(tag)
-
-    return doc
+    if not content_object.doc.exists():
+      doc = Document.objects.create(
+                content_object=content_object,
+                owner=owner,
+                name=name,
+                description=description,
+                extra=extra
+            )
+  
+      tag = DocumentTag.objects.get_default_tag(user=owner)
+      doc.tags.add(tag)
+      return doc
+    else:
+      LOG.warn('Already a document %s for %s' % (content_object.doc.all(), content_object))
+      return content_object.doc.all()[0]
 
   def sync(self):
+
     try:
       from oozie.models import Workflow, Coordinator, Bundle
 
       for job in list(chain(Workflow.objects.all(), Coordinator.objects.all(), Bundle.objects.all())):
+        if job.doc.count() > 1:
+          LOG.warn('Deleting duplicate document %s for %s' % (job.doc.all(), job))
+          job.doc.all().delete()
+
         if not job.doc.exists():
           doc = Document.objects.link(job, owner=job.owner, name=job.name, description=job.description)
           tag = DocumentTag.objects.get_default_tag(owner=job.owner)
@@ -225,11 +240,19 @@ class DocumentManager(models.Manager):
             doc.send_to_trash()
           if job.is_shared:
             DocumentPermission.objects.share_to_default(doc)
+          if hasattr(job, 'managed'):
+            if not job.managed:
+              doc.extra = 'jobsub'
+              doc.save()              
     except Exception, e:
       LOG.warn(force_unicode(e))
 
     try:
       for job in SavedQuery.objects.all():
+        LOG.warn('Deleting duplicate document %s for %s' % (job.doc.all(), job))
+        if job.doc.count() > 1:
+          job.doc.all().delete()
+
         if not job.doc.exists():
           doc = Document.objects.link(job, owner=job.owner, name=job.name, description=job.desc, extra=job.type)
           tag = DocumentTag.objects.get_default_tag(owner=job.owner)
@@ -243,6 +266,10 @@ class DocumentManager(models.Manager):
       from pig.models import PigScript
 
       for job in PigScript.objects.all():
+        LOG.warn('Deleting duplicate document %s for %s' % (job.doc.all(), job))
+        if job.doc.count() > 1:
+          job.doc.all().delete()
+
         if not job.doc.exists():
           doc = Document.objects.link(job, owner=job.owner, name=job.dict['name'], description='')
           tag = DocumentTag.objects.get_default_tag(owner=job.owner)
@@ -285,6 +312,9 @@ class Document(models.Model):
 
   def remove_tag(self, tag):
     self.tags.remove(tag)
+
+  def is_trashed(self):
+    return DocumentTag.objects.get_trash_tag(user=self.owner) in self.tags.all()
 
   def send_to_trash(self):
     tag = DocumentTag.objects.get_trash_tag(user=self.owner)
@@ -343,7 +373,10 @@ class Document(models.Model):
         else:
           return apps['impala'].icon_path
       elif self.content_type.app_label == 'oozie':
-        return self.content_type.model_class().ICON
+        if self.extra == 'jobsub':
+          return apps['jobsub'].icon_path
+        else:
+          return self.content_type.model_class().ICON
       elif self.content_type.app_label in apps:
         return apps[self.content_type.app_label].icon_path
       else:

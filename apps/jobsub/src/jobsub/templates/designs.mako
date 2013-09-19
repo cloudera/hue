@@ -60,7 +60,7 @@ ${ commonheader(None, "jobsub", user) | n,unicode }
 
 <div class="container-fluid">
   <div class="card card-small">
-  <h1 class="card-heading simple">${_('Job Designs')}</h1>
+  <h1 class="card-heading simple">${_('Designs')}</h1>
 
   <%actionbar:render>
     <%def name="search()">
@@ -84,22 +84,20 @@ ${ commonheader(None, "jobsub", user) | n,unicode }
         </div>
       <!-- /ko -->
       <!-- ko if: inTrash -->
-        <button id="restore-designs" class="btn" title="${_('Restore')}" data-bind="enable: selectedDesignObjects().length > 0"><i class="icon-cloud-upload"></i> ${_('Restore')}</button>
-        <button id="destroy-designs" class="btn" title="${_('Delete forever')}" data-bind="enable: selectedDesignObjects().length > 0"><i class="icon-bolt"></i> ${_('Delete forever')}</button>
+        <button id="restore-designs" disabled="disabled" class="btn" title="${_('Restore')}" data-bind="enable: selectedDesignObjects().length > 0"><i class="icon-cloud-upload"></i> ${_('Restore')}</button>
+        <button id="destroy-designs" disabled="disabled" class="btn" title="${_('Delete forever')}" data-bind="enable: selectedDesignObjects().length > 0"><i class="icon-bolt"></i> ${_('Delete forever')}</button>
       <!-- /ko -->
       </div>
     </%def>
 
     <%def name="creation()">
       <div class="btn-toolbar" style="display: inline; vertical-align: middle">
-        <button id="home" class="btn" title="${_('Home')}" data-bind="visible: isEditing"><i class="icon-home"></i> ${_('View designs')}</button>
       <!-- ko if: inTrash -->
+        <button disabled="disabled" type="button" id="purge-trashed-designs" class="btn" title="${ _('Delete all the designs') }"><i class="icon-fire"></i> ${ _('Empty trash') }</button>
         &nbsp;&nbsp;
-        <button type="button" id="purge-trashed-designs" class="btn" title="${ _('Delete all the designs') }"><i class="icon-fire"></i> ${ _('Empty trash') }</button>
       <!-- /ko -->
+      <button id="home" class="btn" title="${_('Home')}" data-bind="visible: isEditing"><i class="icon-home"></i> ${_('View designs')}</button>
       <!-- ko ifnot: inTrash -->
-        <a href="#trashed-designs" class="btn"><i class="icon-trash"></i> ${ _('View trash') }</a>
-        &nbsp;&nbsp;
         <div id="new-action-dropdown" class="btn-group" style="vertical-align: middle">
           <a href="#" class="btn new-action-link dropdown-toggle" title="${_('New action')}" data-toggle="dropdown">
             <i class="icon-plus-sign"></i> ${_('New action')}
@@ -141,6 +139,8 @@ ${ commonheader(None, "jobsub", user) | n,unicode }
             </li>
           </ul>
         </div>
+        &nbsp;&nbsp;
+        <a href="#trashed-designs" class="btn"><i class="icon-trash"></i> ${ _('View trash') }</a>
       <!-- /ko -->
 
       </div>

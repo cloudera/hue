@@ -26,10 +26,11 @@ ${ shared.menubar() }
 
 <%
   _breadcrumbs = [
-    [_("Home"), url('zookeeper:index')],
+    [_("Clusters"), url('zookeeper:index')],
     [cluster['nice_name'].lower(), url('zookeeper:view', id=cluster['id'])]
   ]
 %>
+
 <%def name="show_stats(stats)">
   <thead>
   <tr>

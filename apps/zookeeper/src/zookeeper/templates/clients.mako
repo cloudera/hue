@@ -23,9 +23,10 @@
 
 ${ commonheader(_('Clients'), app_name, user) | n,unicode }
 ${ shared.menubar() }
+
 <%
   _breadcrumbs = [
-    [_("Home"), url('zookeeper:index')],
+    [_("Clusters"), url('zookeeper:index')],
     [cluster['nice_name'].lower(), url('zookeeper:view', id=cluster['id'])],
     [host + ":" + port, url('zookeeper:clients', id=cluster['id'], host=host + ":" + port)]
   ]

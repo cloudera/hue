@@ -26,11 +26,11 @@ ${ shared.menubar() }
 
 <%
   _breadcrumbs = [
-    ["Home", url('zookeeper:index')]
+    ["Clusters", url('zookeeper:index')]
   ]
 %>
 
-%if len(clusters)==0:
+% if not clusters:
   <div class="container-fluid">
     <div class="card">
       <h1 class="card-heading simple">${ _('There are currently no clusters to browse.') }</h1>
@@ -43,10 +43,10 @@ ${ shared.menubar() }
     </div>
     </div>
   </div>
-%else:
-${ shared.header(_breadcrumbs, clusters) }
+% else:
+  ${ shared.header(_breadcrumbs, clusters) }
 % for c in clusters:
-  <h3 class="card-heading simple simpler">${ _('Cluster') } ${ c }</h3>
+  <h3 class="card-heading simple simpler">${ c }</h3>
   <p>
     </br>
     &nbsp;&nbsp;<a href="${ url('zookeeper:view', id=c) }">${ _("Znode Hierarchy") }</a> 

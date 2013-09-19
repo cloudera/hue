@@ -118,9 +118,13 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
                 % endif
               </ul>
            </li>
-           <li class="viewTrash toggableSection"><a href="javascript:void(0)"><i class="icon-trash"></i> ${_('Trash')} <span id="trashCounter" class="badge pull-right">0</span></a></li>
-           <li class="viewHistory toggableSection"><a href="javascript:void(0)"><i class="icon-time"></i> ${_('History')} <span id="historyCounter" class="badge pull-right">0</span></a></li>
-          <li class="nav-header tag-header">${_('Tags')} <div id="editTags" style="display: inline;cursor: pointer;margin-left: 6px"><i class="icon-tags"></i></div> </li>
+           <li class="viewTrash toggableSection">
+             <a href="javascript:void(0)"><i class="icon-trash"></i> ${_('Trash')} <span id="trashCounter" class="badge pull-right">0</span></a>
+           </li>
+           <li class="viewHistory toggableSection">
+             <a href="javascript:void(0)"><i class="icon-time"></i> ${_('History')} <span id="historyCounter" class="badge pull-right">0</span></a>
+           </li>
+          <li class="nav-header tag-header">${_('Tags')} <div id="editTags" style="display: inline;cursor: pointer;margin-left: 6px" title="${ _('Edit tags') }"><i class="icon-tags"></i></div> </li>
           % for tag in tags:
             %if tag.tag != "trash" and tag.tag != "history":
             <li class="toggleTag white" data-tag="${ tag.tag }"><div class="hueCheckbox pull-left"></div>${ tag.tag }</li>
