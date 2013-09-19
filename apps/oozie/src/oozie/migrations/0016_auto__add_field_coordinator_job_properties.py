@@ -11,6 +11,13 @@ class Migration(SchemaMigration):
         # Adding field 'Coordinator.job_properties'
         db.add_column('oozie_coordinator', 'job_properties', self.gf('django.db.models.fields.TextField')(default='[]'), keep_default=False)
 
+        try:
+          from oozie.models import Coordinator
+          Coordinator.objects.all().update(job_properties='[]')
+        except Exception, e:
+          import logging
+          logging.warn(e)
+
 
     def backwards(self, orm):
 
