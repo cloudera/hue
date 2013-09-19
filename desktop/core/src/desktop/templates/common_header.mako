@@ -143,7 +143,7 @@ from django.utils.translation import ugettext as _
 
       $("[rel='tooltip']").tooltip({
         delay: 0,
-        placement: "right"
+        placement: "bottom"
       });
 
       var JB_CHECK_INTERVAL_IN_MILLIS = 30000;
@@ -182,7 +182,7 @@ from django.utils.translation import ugettext as _
 
 % if conf.CUSTOM.BANNER_TOP_HTML.get():
   <div id="banner-top" class="banner">
-    ${conf.CUSTOM.BANNER_TOP_HTML.get()}
+    ${ conf.CUSTOM.BANNER_TOP_HTML.get() }
   </div>
 % endif
 
@@ -192,13 +192,13 @@ from django.utils.translation import ugettext as _
   <ul class="nav nav-pills">
     <li class="divider-vertical"></li>
     % if 'filebrowser' in apps:
-    <li><a href="/${apps['filebrowser'].display_name}"><i class="icon-file"></i>&nbsp;${_('File Browser')} &nbsp;</a></li>
+    <li><a title="${_('Manage HDFS')}" href="/${apps['filebrowser'].display_name}"><i class="icon-file"></i>&nbsp;${_('File Browser')} &nbsp;</a></li>
     % endif
     % if 'jobbrowser' in apps:
-    <li><a href="/${apps['jobbrowser'].display_name}"><i class="icon-list-alt"></i>&nbsp;${_('Job Browser')} &nbsp;<span id="jobBrowserCount" class="badge badge-warning hide" style="padding-top:0;padding-bottom: 0"></span></a></li>
+    <li><a title="${_('Manage jobs')}" href="/${apps['jobbrowser'].display_name}"><i class="icon-list-alt"></i>&nbsp;${_('Job Browser')} &nbsp;<span id="jobBrowserCount" class="badge badge-warning hide" style="padding-top:0;padding-bottom: 0"></span></a></li>
     % endif
     <li class="dropdown">
-      <a href="index.html#" data-toggle="dropdown" class="dropdown-toggle"><i class="icon-cogs"></i>&nbsp;&nbsp;<b class="caret"></b></a>
+      <a title="${ _('Administration') }" href="index.html#" data-toggle="dropdown" class="dropdown-toggle"><i class="icon-cogs"></i>&nbsp;&nbsp;<b class="caret"></b></a>
       <ul class="dropdown-menu">
         <li><a href="${ url('useradmin.views.edit_user', username=urllib.quote(user.username)) }"><i class="icon-key"></i>&nbsp;&nbsp;${_('Change Password')}</a></li>
         %if user.is_superuser:
@@ -206,17 +206,17 @@ from django.utils.translation import ugettext as _
         %endif
       </ul>
     </li>
-    <li><a title="${_('Sign out')}" rel="tooltip" data-placement="left" href="/accounts/logout/"><i class="icon-signout"></i>&nbsp;&nbsp;${user.username}</a></li>
-    <li><a href="/help"><i class="icon-question-sign"></i></a></li>
+    <li><a title="${_('Sign out')}" data-placement="left" href="/accounts/logout/"><i class="icon-signout"></i>&nbsp;&nbsp;${user.username}</a></li>
+    <li><a title="${_('Documentation')}" data-placement="left" href="/help"><i class="icon-question-sign"></i></a></li>
     <li id="jHueTourFlagPlaceholder"></li>
   </ul>
   % endif
   </div>
     <a class="brand nav-tooltip pull-left" title="${_('About Hue')}" href="/about"><img src="/static/art/hue-logo-mini-white.png" data-orig="/static/art/hue-logo-mini-white.png" data-hover="/static/art/hue-logo-mini-white-hover.png"/></a>
      <ul class="nav nav-pills pull-left">
-       <li><a href="/home"><i class="icon-home"></i></a></li>
+       <li><a title="${_('My documents')}" href="/home"><i class="icon-home"></i></a></li>
        <li class="dropdown">
-         <a href="#" data-toggle="dropdown" class="dropdown-toggle">${_('Query Editors')} <b class="caret"></b></a>
+         <a title="${_('Query data')}" href="#" data-toggle="dropdown" class="dropdown-toggle">${_('Query Editors')} <b class="caret"></b></a>
          <ul role="menu" class="dropdown-menu">
            % if 'beeswax' in apps:
            <li><a href="/${apps['beeswax'].display_name}"><img src="${ apps['beeswax'].icon_path }"/> ${_('Hive')}</a></li>
@@ -233,7 +233,7 @@ from django.utils.translation import ugettext as _
          </ul>
        </li>
        <li class="dropdown">
-         <a href="#" data-toggle="dropdown" class="dropdown-toggle">${_('Data Browsers')} <b class="caret"></b></a>
+         <a title="${_('Manage data')}" href="#" data-toggle="dropdown" class="dropdown-toggle">${_('Data Browsers')} <b class="caret"></b></a>
          <ul role="menu" class="dropdown-menu">
            % if 'metastore' in apps:
            <li><a href="/${apps['metastore'].display_name}"><img src="${ apps['metastore'].icon_path }"/> ${_('Metastore Tables')}</a></li>
@@ -245,13 +245,13 @@ from django.utils.translation import ugettext as _
            <li><a href="/${apps['sqoop'].display_name}"><img src="${ apps['sqoop'].icon_path }"/> ${_('Sqoop Transfer')}</a></li>
            % endif
            % if 'zookeeper' in apps:
-           <li><a href="/${apps['zookeeper'].display_name}"><img src="${ apps['zookeeper'].icon_path }"/> ${_('Zookeeper')}</a></li>
+           <li><a href="/${apps['zookeeper'].display_name}"><img src="${ apps['zookeeper'].icon_path }"/> ${_('ZooKeeper')}</a></li>
            % endif
          </ul>
        </li>
        % if 'oozie' in apps:
        <li class="dropdown">
-         <a title="${_('Oozie')}" rel="tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">${_('Workflows')} <b class="caret"></b></a>
+         <a title="${_('Schedule with Oozie')}" href="#" data-toggle="dropdown" class="dropdown-toggle">${_('Workflows')} <b class="caret"></b></a>
          <ul role="menu" class="dropdown-menu">
            <li><a href="${ url('oozie:index') }"><img src="${ apps['oozie'].icon_path }"/> ${_('Dashboard')}</a></li>
            <li><a href="${ url('oozie:list_workflows') }"><img src="${ apps['oozie'].icon_path }"/> ${_('Editor')}</a></li>
@@ -260,12 +260,12 @@ from django.utils.translation import ugettext as _
        % endif
        % if 'search' in apps:
        <li>
-         <a title="${_('Solr Search')}" rel="tooltip" href="${ url('search:index') }">${_('Search')}</a>
+         <a title="${_('Solr Search')}" href="${ url('search:index') }">${_('Search')}</a>
        </li>
        % endif
-       % if len(other_apps) > 0:
+       % if other_apps:
        <li class="dropdown">
-         <a title="${_('Other apps')}" rel="tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">${_('Other apps')} <b class="caret"></b></a>
+         <a title="${_('Other apps')}" href="#" data-toggle="dropdown" class="dropdown-toggle">${_('Other apps')} <b class="caret"></b></a>
          <ul role="menu" class="dropdown-menu">
            % for other in other_apps:
              <li><a href="/${ other.display_name }"><img src="${ other.icon_path }"/> ${ other.nice_name }</a></li>
