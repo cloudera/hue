@@ -30,11 +30,12 @@ ${ header.menubar() }
         % if user.is_superuser:
           ${ _('Quick Start Wizard') } -
         % endif
-        Hue ${version}
+        Hue ${version} - The Hadoop UI
       </h2>
 
+     % if user.is_superuser:
+
       <div class="card-body">
-          % if user.is_superuser:
             <br/>
 
           <div class="row-fluid">
@@ -56,7 +57,7 @@ ${ header.menubar() }
               <div class="card-body">
                 <div id="check-config-section" style="margin-bottom:20px">
                   <!--[if !IE]><!--><i class="icon-spinner icon-spin" style="font-size: 60px; color: #DDD"></i><!--<![endif]-->
-                  <!--[if IE]><img src="/hbase/static/art/loader.gif" /><![endif]-->
+                  <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
                 </div>
               </div>
             </div>
@@ -193,13 +194,18 @@ ${ header.menubar() }
 
           </div>
           </div>
-          % endif
       </div>
 
       <div class="form-actions">
         <a id="backBtn" class="btn disabled">${ _('Back') }</a>
         <a id="nextBtn" class="btn btn-primary disable-feedback">${ _('Next') }</a>
       </div>
+      % else:
+        <p>
+        </br>
+        &nbsp;&nbsp;&nbsp;${ _('Learn more about Hue and Hadoop on') } <a href="http://gethue.com" target="_blank">http://gethue.com</a>
+        </p>
+      % endif
 
     </div>
   </div>
