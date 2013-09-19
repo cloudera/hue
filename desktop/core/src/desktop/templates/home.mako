@@ -118,8 +118,9 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
                 % endif
               </ul>
            </li>
-           <li class="viewTrash"><a href="javascript:void(0)"><i class="icon-trash"></i> ${_('View Trash')} <span id="trashCounter" class="badge pull-right">0</span></a></li>
-          <li class="nav-header tag-header">${_('Tags')} <div id="editTags" style="display: inline;cursor: pointer;margin-left: 6px"><i class="icon-edit"></i></div> </li>
+           <li class="viewTrash"><a href="javascript:void(0)"><i class="icon-trash"></i> ${_('Trash')} <span id="trashCounter" class="badge pull-right">0</span></a></li>
+           <li class="viewTrash"><a href="javascript:void(0)"><i class="icon-th-list"></i> ${_('History')} <span id="trashCounter" class="badge pull-right">0</span></a></li>
+          <li class="nav-header tag-header">${_('Tags')} <div id="editTags" style="display: inline;cursor: pointer;margin-left: 6px"><i class="icon-tags"></i></div> </li>
           % for tag in tags:
             %if tag.tag != "trash":
             <li class="toggleTag white" data-tag="${ tag.tag }"><div class="hueCheckbox pull-left"></div>${ tag.tag }</li>
@@ -147,7 +148,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
                 <th>${_('Tags')}</th>
                 <th>${_('Owner')}</th>
                 <th>${_('Last Modified')}</th>
-                <th>&nbsp;</th>
+                <th>${_('Sharing')}</th>
               </tr>
             </thead>
           </table>
@@ -212,7 +213,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
   </div>
   <div class="modal-body">
     <p>
-      <h4 id="documentShareNoShare" class="muted" style="margin-top:0px">${_('No shares yet.')}</h4>
+      <h4 id="documentShareNoShare" class="muted" style="margin-top:0px">${_('Not shared yet.')}</h4>
       <ul id="documentShareList" class="unstyled inline airy hide">
       </ul>
       <div class="clearfix"></div>
@@ -226,7 +227,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
   </div>
   <div class="modal-footer">
     <a href="#" data-dismiss="modal" class="btn">${_('Cancel')}</a>
-    <a id="saveDocumentShare" href="#" class="btn btn-primary disable-feedback">${_('Share it')}</a>
+    <a id="saveDocumentShare" href="#" class="btn btn-primary disable-feedback">${_('Update')}</a>
   </div>
 </div>
 

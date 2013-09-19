@@ -111,15 +111,17 @@ def save_design(request, form, type, design, explicit_save):
   design.data = new_data
 
   design.save()
-  design.doc.update(name=design.name, description=design.desc)
 
-  Document.objects.link(design, owner=design.owner, name=design.name, extra=design.type)
+  LOG.info('Saved %s design "%s" (id %s) for %s' % (explicit_save and '' or 'auto ', design.name, design.id, design.owner))
 
-  LOG.info('Saved %s design "%s" (id %s) for %s' %
-           (explicit_save and '' or 'auto ', design.name, design.id, design.owner))
-  if explicit_save:
-    messages.info(request, _('Saved design "%(name)s"') % {'name': design.name})
-  # Design may now have a new/different id
+  if design.doc.exists():
+    design.doc.update(name=design.name, description=design.desc)
+  else:
+    Document.objects.link(design, owner=design.owner, extra=design.type, name=design.name, description=design.desc)
+    
+  if design.is_auto:
+    design.doc.get().add_to_history()
+    
   return design
 
 
@@ -400,8 +402,10 @@ def execute_query(request, design_id=None):
 
       if to_submit or to_save or to_saveas or to_explain:
         explicit_save = to_save or to_saveas
+        if explicit_save:
+          request.info(_('Query saved!'))
         design = save_design(request, form, query_type, design, explicit_save)
-        action = reverse(app_name + ':execute_query', kwargs=dict(design_id=design.id))
+        action = reverse(app_name + ':execute_query', kwargs={'design_id': design.id})
 
       if to_explain or to_submit:
         query_str = form.query.cleaned_data["query"]
@@ -438,7 +442,7 @@ def execute_query(request, design_id=None):
     'log': log,
     'autocomplete_base_url': reverse(get_app_name(request) + ':autocomplete', kwargs={}),
     'on_success_url': on_success_url,
-    'can_edit_name': design and not design.is_auto,
+    'can_edit_name': design.id and not design.is_auto,
   })
 
 
@@ -935,7 +939,7 @@ def authorized_get_history(request, query_history_id, owner_only=False, must_exi
       return None
 
   query_history.design.doc.get().can_read_or_exception(request.user)
-  
+
   return query_history
 
 
@@ -951,7 +955,7 @@ def safe_get_design(request, design_type, design_id=None):
     design = authorized_get_design(request, design_id)
 
   if design is None:
-    design = models.SavedQuery(owner=request.user, type=design_type)
+    design = SavedQuery(owner=request.user, type=design_type)
 
   return design
 

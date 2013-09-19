@@ -24,10 +24,6 @@ to the cluster.  A parameterized, submitted job design
 is a "job submission".  Submissions can be "watched".
 """
 
-try:
-  import json
-except ImportError:
-  import simplejson as json
 import logging
 import time as py_time
 
@@ -195,20 +191,24 @@ def save_design(request, design_id):
 def _save_design(design_id, data):
   sanitize_node_dict(data)
   workflow = _get_design(design_id)
+
   workflow.name = data['name']
   workflow.description = data.setdefault('description', '')
   workflow.is_shared = str(data.setdefault('is_shared', 'true')).lower() == "true"
   workflow.parameters = data.setdefault('parameters', '[]')
   node = workflow.start.get_child('to').get_full_node()
   node_id = node.id
+
   for key in data:
     if key in ('is_shared', 'capture_output', 'propagate_configuration'):
       setattr(node, key, str(data[key]).lower() == 'true')
     else:
       setattr(node, key, data[key])
+
   node.id = node_id
   node.pk = node_id
   node.save()
+
   workflow.save()
 
 
