@@ -28,6 +28,10 @@ ${ layout.menubar(section='oozie', dashboard=True) }
 
 <div class="container-fluid">
 
+  <div class="card card-small">
+  <div class="card-body">
+  <p>
+
   <h1 class="card-heading card-heading-noborder simple pull-right" style="margin-top: -4px;">
   ${ _('Oozie status') }
   <div class="label ${ utils.get_status(oozie_status['systemMode']) }" style="line-height: 20px; vertical-align: middle">
@@ -118,6 +122,9 @@ ${ layout.menubar(section='oozie', dashboard=True) }
       <a href="${ url('oozie:list_oozie_bundles') }" class="btn">${ _('Back') }</a>
     </div>
 
+    </p>
+    </div>
+    </div>
   </div>
 
 

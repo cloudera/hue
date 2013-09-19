@@ -1271,6 +1271,7 @@ a#advanced-btn:hover {
 .card-tab {
   margin-top: 0;
   border-bottom: 1px solid #D8D8D8;
+  border-top: 0;
 }
 
 .card-tab-bordertop {
@@ -1386,6 +1387,10 @@ a#advanced-btn:hover {
   line-height: 14px !important;
 }
 
+.navigator .nav-pills .open .dropdown-toggle, .navigator .nav > li.dropdown.open.active > a:hover, .navigator .nav > li.dropdown.open.active > a:focus {
+  color: #FFFFFF;
+}
+
 .currentApp {
   font-size: 20px;
   padding-top: 13px;
@@ -1400,6 +1405,7 @@ a#advanced-btn:hover {
   padding: 0 !important;
   margin-top: -4px !important;
   border: none !important;
+  max-width: none!important;
 }
 
 .currentApp a:focus, .currentApp a:hover {
