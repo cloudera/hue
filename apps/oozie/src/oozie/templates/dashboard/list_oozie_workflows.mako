@@ -25,10 +25,13 @@
 
 
 ${ commonheader(_("Workflows Dashboard"), "oozie", user) | n,unicode }
-${ layout.menubar(section='dashboard', dashboard=True) }
+${ layout.menubar(section='workflows', dashboard=True) }
 
 
 <div class="container-fluid">
+  <div class="card card-small">
+  <div class="card-body">
+  <p>
   <form>
     <input type="text" id="filterInput" class="input-xlarge search-query" placeholder="${ _('Search for username, name, etc...') }">
 
@@ -96,9 +99,10 @@ ${ layout.menubar(section='dashboard', dashboard=True) }
       </tbody>
      </table>
    </div>
-
+    </p>
+  </div>
 </div>
-
+</div>
 
 <div id="confirmation" class="modal hide">
   <div class="modal-header">

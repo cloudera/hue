@@ -28,6 +28,9 @@ ${ layout.menubar(section='workflows', dashboard=True) }
 
 
 <div class="container-fluid">
+  <div class="card card-small">
+  <div class="card-body">
+  <p>
  <div class="row-fluid">
     <div class="span2">
       <div class="sidebar-nav">
@@ -176,8 +179,11 @@ ${ layout.menubar(section='workflows', dashboard=True) }
       </div>
     </div>
   </div>
-
+</p>
+    </div>
+    </div>
 </div>
+
 
 <script src="/static/ext/js/codemirror-3.11.js"></script>
 <link rel="stylesheet" href="/static/ext/css/codemirror.css">

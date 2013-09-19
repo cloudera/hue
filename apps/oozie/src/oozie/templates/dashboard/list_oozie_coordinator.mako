@@ -26,8 +26,11 @@
 ${ commonheader(_("Coordinator Dashboard"), "oozie", user) | n,unicode }
 ${ layout.menubar(section='coordinators', dashboard=True) }
 
-
 <div class="container-fluid">
+<div class="card card-small">
+  <div class="card-body">
+  <p>
+
 <div class="row-fluid">
   <div class="span2">
     <div class="sidebar-nav">
@@ -276,10 +279,9 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
 </div>
 
 
-
-
-
-
+  </p>
+  </div>
+</div>
 </div>
 
 <div id="confirmation" class="modal hide">

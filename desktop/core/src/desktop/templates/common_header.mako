@@ -146,6 +146,7 @@ from django.utils.translation import ugettext as _
         placement: "bottom"
       });
 
+      % if 'jobbrowser' in apps:
       var JB_CHECK_INTERVAL_IN_MILLIS = 30000;
       window.setTimeout(checkJobBrowserStatus, JB_CHECK_INTERVAL_IN_MILLIS);
 
@@ -162,6 +163,30 @@ from django.utils.translation import ugettext as _
           window.setTimeout(checkJobBrowserStatus, JB_CHECK_INTERVAL_IN_MILLIS);
         });
       }
+      % endif
+
+      var openTimeout, closeTimeout;
+      $(".navigator ul.nav li.dropdown").hover(function () {
+        var _this = $(this);
+        var _timeout = 500;
+        if ($(".navigator").find("ul.dropdown-menu:visible").length > 0) {
+          _timeout = 10;
+        }
+        window.clearTimeout(closeTimeout);
+        openTimeout = window.setTimeout(function () {
+          $(".navigator li.open").removeClass("open");
+          $(".navigator ul.dropdown-menu").hide();
+          _this.find("ul.dropdown-menu").show();
+        }, _timeout);
+      },
+      function () {
+        var _this = $(this);
+        window.clearTimeout(openTimeout);
+        closeTimeout = window.setTimeout(function () {
+          $(".navigator li.open").removeClass("open");
+          $(".navigator").find("ul.dropdown-menu").hide();
+        }, 500);
+      });
 
       var _skew = -1;
       $("[data-hover]").on("mouseover", function(){
@@ -214,7 +239,7 @@ from django.utils.translation import ugettext as _
   </div>
     <a class="brand nav-tooltip pull-left" title="${_('About Hue')}" href="/about"><img src="/static/art/hue-logo-mini-white.png" data-orig="/static/art/hue-logo-mini-white.png" data-hover="/static/art/hue-logo-mini-white-hover.png"/></a>
      <ul class="nav nav-pills pull-left">
-       <li><a title="${_('My documents')}" href="/home"><i class="icon-home"></i></a></li>
+       <li><a title="${_('My documents')}" href="/home"><i class="icon-home" style="font-size: 19px"></i></a></li>
        <li class="dropdown">
          <a title="${_('Query data')}" href="#" data-toggle="dropdown" class="dropdown-toggle">${_('Query Editors')} <b class="caret"></b></a>
          <ul role="menu" class="dropdown-menu">

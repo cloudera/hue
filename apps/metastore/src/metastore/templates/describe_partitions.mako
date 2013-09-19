@@ -37,6 +37,8 @@ ${ components.menubar() }
     <div class="span9">
       <div class="card card-small">
         <h1 class="card-heading simple">${ components.breadcrumbs(breadcrumbs) }</h1>
+          <div class="card-body">
+            <p>
           % if partitions:
           <table class="table table-striped table-condensed datatables">
           <tr>
@@ -64,12 +66,10 @@ ${ components.menubar() }
           % endfor
           </table>
           % else:
-            <div class="card-body">
-              <p>
-                <div class="alert">${_('The table %s has no partitions.' % table.name)}</div>
+              <div class="alert">${_('The table %s has no partitions.' % table.name)}</div>
+          % endif
               </p>
             </div>
-          % endif
         </div>
     </div>
   </div>

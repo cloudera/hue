@@ -60,7 +60,7 @@ ${ components.menubar() }
           </%def>
         </%actionbar:render>
 
-        <table class="table table-condensed datatables" data-tablescroller-disable="true">
+          <table class="table table-condensed datatables" data-tablescroller-disable="true">
           <thead>
             <tr>
               <th width="1%"><div class="hueCheckbox selectAll" data-selectables="tableCheck"></div></th>
@@ -119,7 +119,7 @@ ${ components.menubar() }
     ko.applyBindings(viewModel);
 
     var tables = $(".datatables").dataTable({
-      "sDom": "",
+      "sDom": "<'row'r>t<'row'<'span8'i><''p>>",
       "bPaginate": false,
       "bLengthChange": false,
       "bInfo": false,

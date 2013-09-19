@@ -52,7 +52,7 @@ ${ components.menubar() }
           </%def>
         </%actionbar:render>
 
-        <table class="table table-condensed table-striped datatables">
+        <table class="table table-condensed datatables">
           <thead>
             <tr>
               <th width="1%"><div class="hueCheckbox selectAll" data-selectables="databaseCheck"></div></th>

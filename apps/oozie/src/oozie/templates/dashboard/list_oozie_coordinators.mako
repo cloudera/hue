@@ -28,6 +28,9 @@ ${layout.menubar(section='coordinators', dashboard=True)}
 
 
 <div class="container-fluid">
+  <div class="card card-small">
+  <div class="card-body">
+  <p>
   <form>
     <input type="text" id="filterInput" class="input-xlarge search-query" placeholder="${ _('Search for username, name, etc...') }">
 
@@ -94,7 +97,9 @@ ${layout.menubar(section='coordinators', dashboard=True)}
       </tbody>
      </table>
    </div>
-
+  </p>
+  </div>
+  </div>
 </div>
 
 
