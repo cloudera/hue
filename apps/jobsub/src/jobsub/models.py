@@ -16,10 +16,6 @@
 # limitations under the License.
 
 import logging
-try:
-  import json
-except ImportError:
-  import simplejson
 
 from django.db import models
 from django.core import urlresolvers
