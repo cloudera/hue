@@ -19,18 +19,6 @@ from django.template.defaultfilters import escape, escapejs
 %>
 
 
-%if messages:
-  <script>
-    %for message in messages:
-      %if message.tags == 'error':
-        $(document).trigger('error', '${ escapejs(escape(message)) }');
-      %else:
-        $(document).trigger('info', '${ escapejs(escape(message)) }');
-      %endif
-    %endfor
-  </script>
-%endif
-
 <script type="text/javascript">
   $(document).ready(function () {
     $(document).on("info", function (e, msg) {
@@ -39,6 +27,16 @@ from django.template.defaultfilters import escape, escapejs
     $(document).on("error", function (e, msg) {
       $.jHueNotify.error(msg);
     });
+
+    %if messages:
+      %for message in messages:
+        %if message.tags == 'error':
+          $(document).trigger('error', '${ escapejs(escape(message)) }');
+        %else:
+          $(document).trigger('info', '${ escapejs(escape(message)) }');
+        %endif
+      %endfor
+    %endif
 
     $(".dataTables_wrapper").jHueTableScroller();
     var resetTimeout = -1;
