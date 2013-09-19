@@ -255,11 +255,11 @@ def config_validator(user):
   mr_down = []
   for name in MR_CLUSTERS.keys():
     cluster = MR_CLUSTERS[name]
-    res.extend(validate_path(cluster.HADOOP_MAPRED_HOME, is_dir=True))
-    res.extend(validate_path(cluster.HADOOP_CONF_DIR, is_dir=True))
-    res.extend(validate_path(cluster.HADOOP_BIN, is_dir=False))
-    mr_down.extend(job_tracker.test_jt_configuration(cluster))
     if cluster.SUBMIT_TO.get():
+      res.extend(validate_path(cluster.HADOOP_MAPRED_HOME, is_dir=True))
+      res.extend(validate_path(cluster.HADOOP_CONF_DIR, is_dir=True))
+      res.extend(validate_path(cluster.HADOOP_BIN, is_dir=False))
+      mr_down.extend(job_tracker.test_jt_configuration(cluster))
       submit_to.append('mapred_clusters.' + name)
   # If HA still failing
   if mr_down and len(mr_down) == len(MR_CLUSTERS.keys()):
@@ -268,10 +268,10 @@ def config_validator(user):
   # YARN_CLUSTERS
   for name in YARN_CLUSTERS.keys():
     cluster = YARN_CLUSTERS[name]
-    res.extend(validate_path(cluster.HADOOP_MAPRED_HOME, is_dir=True))
-    res.extend(validate_path(cluster.HADOOP_CONF_DIR, is_dir=True))
-    res.extend(validate_path(cluster.HADOOP_BIN, is_dir=False))
     if cluster.SUBMIT_TO.get():
+      res.extend(validate_path(cluster.HADOOP_MAPRED_HOME, is_dir=True))
+      res.extend(validate_path(cluster.HADOOP_CONF_DIR, is_dir=True))
+      res.extend(validate_path(cluster.HADOOP_BIN, is_dir=False))
       submit_to.append('yarn_clusters.' + name)
 
   if not submit_to:
