@@ -333,7 +333,7 @@ def dump_config(request):
   if request.GET.get("private"):
     show_private = True
 
-  apps = sorted(appmanager.DESKTOP_MODULES, key=lambda app: app.menu_index)
+  apps = sorted(appmanager.DESKTOP_MODULES, key=lambda app: app.name)
   apps_names = [app.name for app in apps]
   top_level = sorted(GLOBAL_CONFIG.get().values(), key=lambda obj: apps_names.index(obj.config.key))
 

@@ -55,6 +55,13 @@ class Settings(models.Model):
 
 class DocumentTagManager(models.Manager):
 
+  def create_tag(self, owner, tag_name):
+    if tag_name in DocumentTag.RESERVED:
+      raise Exception(_("Can't add %s: it is a reserved tag.") % tag_name)
+    else:
+      tag, created = DocumentTag.objects.create(tag=tag_name, owner=owner)
+      return tag
+
   def get_default_tag(self, user):
     tag, created = DocumentTag.objects.get_or_create(owner=user, tag=DocumentTag.DEFAULT)
     return tag
@@ -63,15 +70,15 @@ class DocumentTagManager(models.Manager):
     tag, created = DocumentTag.objects.get_or_create(owner=user, tag=DocumentTag.TRASH)
     return tag
 
-  def create_tag(self, owner, tag_name):
-    tag = DocumentTag.objects.create(tag=tag_name, owner=owner)
+  def get_history_tag(self, user):
+    tag, created = DocumentTag.objects.get_or_create(owner=user, tag=DocumentTag.HISTORY)
     return tag
 
   def tag(self, owner, doc_id, tag_name='', tag_id=None):
     try:
       tag = DocumentTag.objects.get(id=tag_id, owner=owner)
-      if tag == DocumentTag.objects.get_trash_tag(owner):
-        raise Exception(_("Can't add trash tag. Please trash the document from instead."))
+      if tag.tag in DocumentTag.RESERVED:
+        raise Exception(_("Can't add %s: it is a reserved tag.") % tag)
     except DocumentTag.DoesNotExist:
       tag = DocumentTag.objects.create(tag=tag_name, owner=owner)
 
@@ -82,18 +89,17 @@ class DocumentTagManager(models.Manager):
   def untag(self, tag_id, owner, doc_id):
     tag = DocumentTag.objects.get(id=tag_id, owner=owner)
 
-    if tag == DocumentTag.get_trash_tag(owner):
-      raise Exception(_("Can't remove trash tag. Please restore the document from the trash instead."))
+    if tag.tag in DocumentTag.RESERVED:
+      raise Exception(_("Can't remove %s: it is a reserved tag.") % tag)
 
     doc = Document.objects.get_doc(doc_id, owner=owner)
     doc.remove(tag)
 
   def delete_tag(self, tag_id, owner):
     tag = DocumentTag.objects.get(id=tag_id, owner=owner)
-    default_tag = DocumentTag.objects.get_default_tag(user=owner)
 
-    if tag in (default_tag, DocumentTag.objects.get_trash_tag(owner)):
-      raise Exception(_("Can't remove default or trash tag. Please restore the document from the trash instead."))
+    if tag.tag in DocumentTag.RESERVED:
+      raise Exception(_("Can't remove %s: it is a reserved tag.") % tag)
     else:
       tag.delete()
 
@@ -104,23 +110,29 @@ class DocumentTagManager(models.Manager):
     doc = Document.objects.get_doc(doc_id, owner)
 
     for tag in doc.tags.all():
-      if tag.tag not in (DocumentTag.TRASH, DocumentTag.DEFAULT):
+      if tag.tag not in DocumentTag.RESERVED:
         doc.remove(tag)
 
     for tag_id in tag_ids:
       tag = DocumentTag.objects.get(id=tag_id, owner=owner)
-      if tag.tag != DocumentTag.TRASH:
+      if tag.tag not in DocumentTag.RESERVED:
         doc.add_tag(tag)
 
     return doc
 
 
 class DocumentTag(models.Model):
+  """
+  Reserved tags can't be manually removed by the user.
+  """
   owner = models.ForeignKey(auth_models.User, db_index=True)
   tag = models.SlugField()
 
-  DEFAULT = 'default'
-  TRASH = 'trash'
+  DEFAULT = 'default' # Always there
+  TRASH = 'trash' # There when the document is trashed
+  HISTORY = 'history' # There when the document is a submission history
+  
+  RESERVED = (DEFAULT, TRASH, HISTORY)
 
   objects = DocumentTagManager()
   unique_together = ('owner', 'tag')
@@ -154,9 +166,10 @@ class DocumentManager(models.Manager):
 
   def available_docs(self, model_class, user):
     ct = ContentType.objects.get_for_model(model_class)
-    tag = DocumentTag.objects.get_trash_tag(user=user)
+    trash = DocumentTag.objects.get_trash_tag(user=user)
+    history = DocumentTag.objects.get_history_tag(user=user)
 
-    return Document.objects.get_docs(user).filter(content_type=ct).exclude(tags__in=[tag]).order_by('-last_modified')
+    return Document.objects.get_docs(user).filter(content_type=ct).exclude(tags__in=[trash, history]).order_by('-last_modified')
 
   def available(self, model_class, user):
     docs = self.available_docs(model_class, user)
@@ -277,6 +290,10 @@ class Document(models.Model):
   def restore_from_trash(self):
     tag = DocumentTag.objects.get_trash_tag(user=self.owner)
     self.tags.remove(tag)
+
+  def add_to_history(self):
+    tag = DocumentTag.objects.get_history_tag(user=self.owner)
+    self.tags.add(tag)
 
   def is_accessible(self, user):
     return user.is_superuser or self.owner == user or Document.objects.get_doc(self.id, user)

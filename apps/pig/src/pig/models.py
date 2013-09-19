@@ -86,9 +86,11 @@ def create_or_update_script(id, name, script, user, parameters, resources, hadoo
   try:
     pig_script = PigScript.objects.get(id=id)
     pig_script.doc.get().can_read_or_exception(user)
-  except:
+  except PigScript.DoesNotExist:
     pig_script = PigScript.objects.create(owner=user, is_design=is_design)
     Doc.objects.link(pig_script, owner=pig_script.owner, name=name)
+    if not is_design:
+      pig_script.doc.get().add_to_history()
 
   pig_script.update_from_dict({
       'name': name,
@@ -104,7 +106,6 @@ def create_or_update_script(id, name, script, user, parameters, resources, hadoo
 def get_scripts(user, is_design=None):
   scripts = []  
   data = Doc.objects.available(PigScript, user)
-  print data
 
   if is_design is not None:
     data = [job for job in data if job.is_design]

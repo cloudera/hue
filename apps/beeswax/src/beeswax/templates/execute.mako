@@ -579,9 +579,9 @@ ${layout.menubar(section='query')}
 
       $("#saveAsNameBtn").click(function () {
         $("<input>").attr("type", "hidden").attr("name", "saveform-name")
-                .attr("value", $("input[name=saveform-name]").data('value')).appendTo($("#advancedSettingsForm"));
+                .attr("value", $("input[name=saveform-name]").val()).appendTo($("#advancedSettingsForm"));
         $("<input>").attr("type", "hidden").attr("name", "saveform-desc")
-                .attr("value", $("input[name=saveform-desc]").data('value')).appendTo($("#advancedSettingsForm"));
+                .attr("value", $("input[name=saveform-desc]").val()).appendTo($("#advancedSettingsForm"));
         checkAndSubmit();
       });
 
