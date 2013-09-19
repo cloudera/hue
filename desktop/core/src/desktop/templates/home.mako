@@ -35,7 +35,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
     margin-bottom: 4px;
   }
 
-  #trashCounter {
+  #trashCounter, #historyCounter {
     margin-top: 3px;
   }
 
@@ -118,11 +118,11 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
                 % endif
               </ul>
            </li>
-           <li class="viewTrash"><a href="javascript:void(0)"><i class="icon-trash"></i> ${_('Trash')} <span id="trashCounter" class="badge pull-right">0</span></a></li>
-           <li class="viewTrash"><a href="javascript:void(0)"><i class="icon-th-list"></i> ${_('History')} <span id="trashCounter" class="badge pull-right">0</span></a></li>
+           <li class="viewTrash toggableSection"><a href="javascript:void(0)"><i class="icon-trash"></i> ${_('Trash')} <span id="trashCounter" class="badge pull-right">0</span></a></li>
+           <li class="viewHistory toggableSection"><a href="javascript:void(0)"><i class="icon-time"></i> ${_('History')} <span id="historyCounter" class="badge pull-right">0</span></a></li>
           <li class="nav-header tag-header">${_('Tags')} <div id="editTags" style="display: inline;cursor: pointer;margin-left: 6px"><i class="icon-tags"></i></div> </li>
           % for tag in tags:
-            %if tag.tag != "trash":
+            %if tag.tag != "trash" and tag.tag != "history":
             <li class="toggleTag white" data-tag="${ tag.tag }"><div class="hueCheckbox pull-left"></div>${ tag.tag }</li>
             %endif
           % endfor
@@ -242,21 +242,21 @@ var JSON_USERS_GROUPS;
 var documentsTable;
 
 $(document).ready(function () {
-  var selectedUserOrGroup = null;
+  var selectedUserOrGroup, map, dropdown = null;
   $.getJSON("${ url('useradmin.views.list_for_autocomplete') }", function (data) {
     JSON_USERS_GROUPS = data;
+    dropdown = [];
+    map = {};
+    $.each(JSON_USERS_GROUPS.users, function (i, user) {
+      map[user.username] = user;
+      dropdown.push(user.username);
+    });
+    $.each(JSON_USERS_GROUPS.groups, function (i, group) {
+      map[group.name] = group;
+      dropdown.push(group.name);
+    });
     $("#documentShareAdd").typeahead({
       source: function (query, process) {
-        dropdown = [];
-        map = {};
-        $.each(JSON_USERS_GROUPS.users, function (i, user) {
-          map[user.username] = user;
-          dropdown.push(user.username);
-        });
-        $.each(JSON_USERS_GROUPS.groups, function (i, group) {
-          map[group.name] = group;
-          dropdown.push(group.name);
-        });
         process(dropdown);
       },
       matcher: function (item) {
@@ -294,7 +294,7 @@ $(document).ready(function () {
       { "bSortable": false, "sClass": "row-selector-exclude", "sWidth": "20px"}
     ],
     "aaSorting": [
-      [ 1, "desc" ]
+      [ 5, "desc" ]
     ],
     "oLanguage": {
       "sEmptyTable": "${_('No data available')}",
@@ -329,20 +329,29 @@ $(document).ready(function () {
   populateTable();
 
   $(".viewTrash").on("click", function () {
-    $(".hueCheckbox").removeClass("icon-ok");
-    var _this = $(this);
-    if (_this.hasClass("active")) {
-      populateTable();
-      _this.removeClass("active");
-    }
-    else {
-      populateTable("trash");
-      _this.addClass("active");
-    }
+    $(".viewHistory").removeClass("active");
+    toggleSpecificSection($(this), "trash");
   });
 
-  $(document).on("click", ".toggleTag", function (e) {
+  $(".viewHistory").on("click", function () {
     $(".viewTrash").removeClass("active");
+    toggleSpecificSection($(this), "history");
+  });
+
+  function toggleSpecificSection(section, filter){
+    $(".hueCheckbox").removeClass("icon-ok");
+    if (section.hasClass("active")) {
+      populateTable();
+      section.removeClass("active");
+    }
+    else {
+      populateTable(filter);
+      section.addClass("active");
+    }
+  }
+
+  $(document).on("click", ".toggleTag", function (e) {
+    $(".toggableSection").removeClass("active");
     var _this = $(this);
     _this.blur();
     if (_this.find(".hueCheckbox").hasClass("icon-ok")) {
@@ -359,12 +368,17 @@ $(document).ready(function () {
   });
 
   var _trashCounter = 0;
+  var _historyCounter = 0;
   $(JSON_DOCS).each(function (cnt, doc) {
     if (isInTags(doc, "trash")) {
       _trashCounter++;
     }
+    if (isInTags(doc, "history")) {
+      _historyCounter++;
+    }
   });
   $("#trashCounter").text(_trashCounter);
+  $("#historyCounter").text(_historyCounter);
 
   $(document).on("click", ".documentTags", function () {
     $("#documentTagsModal").data("document-id", $(this).data("document-id"));
@@ -374,7 +388,7 @@ $(document).ready(function () {
   function renderTags() {
     $(".toggleTag").remove();
     for (var i = JSON_TAGS.length - 1; i >= 0; i--) {
-      if (!JSON_TAGS[i].isTrash) {
+      if (!JSON_TAGS[i].isTrash && !JSON_TAGS[i].isHistory) {
         var _t = $("<li>").addClass("toggleTag").addClass("white");
         _t.data("tag", JSON_TAGS[i].name);
         _t.html('<div class="hueCheckbox pull-left"></div>' + JSON_TAGS[i].name);
@@ -386,7 +400,7 @@ $(document).ready(function () {
   function renderTagsModal() {
     var _tags = "";
     for (var i = 0; i < JSON_TAGS.length; i++) {
-      if (!JSON_TAGS[i].isTrash) {
+      if (!JSON_TAGS[i].isTrash && !JSON_TAGS[i].isHistory) {
         _tags += '<div style="margin-right:10px;margin-bottom: 6px;float:left;"><span class="tagsModalCheckbox badge" data-value="' + JSON_TAGS[i].id + '"><i class="icon-trash hide"></i> ' + JSON_TAGS[i].name + '</span></div>';
       }
     }
@@ -400,7 +414,7 @@ $(document).ready(function () {
       $("#documentTagsModalName").text(_doc.name);
       var _tags = "";
       for (var i = 0; i < JSON_TAGS.length; i++) {
-        if (!JSON_TAGS[i].isTrash) {
+        if (!JSON_TAGS[i].isTrash && !JSON_TAGS[i].isHistory) {
           var _inTags = isInTags(_doc, JSON_TAGS[i].name);
           _tags += '<div style="margin-right:10px;margin-bottom: 6px;float:left;"><span class="documentTagsModalCheckbox badge' + (_inTags ? ' badge-info selected' : '') + '" data-value="' + JSON_TAGS[i].id + '"><i class="icon-ok-sign' + (_inTags ? '' : ' hide') + '"></i> ' + JSON_TAGS[i].name + '</span></div>';
         }
@@ -495,6 +509,7 @@ $(document).ready(function () {
       })
     }, function (response) {
       if (response.doc != null) {
+        $(document).trigger("info", "${ _("Tags updated successfully.") }");
         var _doc = response.doc;
         var _dtNodes = documentsTable.fnGetNodes();
         $(_dtNodes).each(function (iNode, node) {
@@ -526,21 +541,42 @@ $(document).ready(function () {
         tag_ids: _tags
       })
     }, function (response) {
-      $.getJSON("/tag/list_tags", function (data) {
-        JSON_TAGS = data;
-        renderTags();
-        renderTagsModal();
-        renderDocs(function () {
-          $("#removeTags").button("reset");
-          $("#tagsModal").modal("hide");
-        });
-      });
+        if (response!=null){
+          if (response.status == 0){
+            $(document).trigger("info", response.message);
+            $.getJSON("/tag/list_tags", function (data) {
+              JSON_TAGS = data;
+              renderTags();
+              renderTagsModal();
+              renderDocs(function () {
+                $("#removeTags").button("reset");
+                $("#tagsModal").modal("hide");
+              });
+            });
+          }
+          else {
+            $(document).trigger("error", "${_("There was an error processing your action: ")}"+response.message);
+          }
+        }
     });
   });
 
   $(document).on("click", ".shareDocument", function () {
     var _doc = getDocById($(this).data("document-id"));
     if (_doc != null) {
+      if (_doc.perms != null && _doc.perms.read != null){
+        if (_doc.perms.read.users != null){
+          for (var i=0; i<_doc.perms.read.users.length;i++){
+            addToShareList(map[_doc.perms.read.users[i].username]);
+          }
+        }
+        if (_doc.perms.read.groups != null){
+          for (var i=0; i<_doc.perms.read.groups.length;i++){
+            addToShareList(map[_doc.perms.read.groups[i].name]);
+          }
+        }
+      }
+      $("#documentShareModal").data("document-id", _doc.id);
       $("#documentShareAdd").val("");
       $("#documentShareModalName").text(_doc.name);
       renderShareList();
@@ -594,8 +630,40 @@ $(document).ready(function () {
   });
 
   $("#saveDocumentShare").on("click", function () {
-    // TODO: post to permissions stuff
-    console.log(shareList);
+    var _postPerms = {
+      read: {
+        user_ids: [],
+        group_ids: []
+      }
+    }
+
+    for (var id in shareList) {
+      if (shareList.hasOwnProperty(id)) {
+        var _obj = shareList[id];
+        if (_obj.username != null) {
+          _postPerms.read.user_ids.push(id);
+        }
+        else {
+          _postPerms.read.group_ids.push(id);
+        }
+      }
+    }
+
+    $.post("/doc/update_permissions", {
+      doc_id: $("#documentShareModal").data("document-id"),
+      data: JSON.stringify(_postPerms)
+    }, function (response) {
+      $("#documentShareModal").modal("hide");
+      if (response!=null){
+        if (response.status == 0){
+          $(document).trigger("info", response.message);
+          updateDoc(response.doc);
+        }
+        else {
+          $(document).trigger("error", "${_("There was an error processing your action: ")}"+response.message);
+        }
+      }
+    });
   });
 
 });
@@ -628,7 +696,7 @@ function populateTable(tags) {
   documentsTable.fnDraw();
   if (tags == null || tags == "") {
     $(JSON_DOCS).each(function (cnt, doc) {
-      if (!isInTags(doc, "trash")) {
+      if (!isInTags(doc, "trash") && !isInTags(doc, "history")) {
         addRow(doc);
       }
     });
@@ -657,7 +725,7 @@ function addRow(doc) {
     for (var i = 0; i < doc.tags.length; i++) {
       _tags += '<span class="badge">' + doc.tags[i].name + '</span> ';
     }
-    documentsTable.fnAddData([
+    var _addedRow = documentsTable.fnAddData([
       '<img src="' + doc.icon + '" width="80%"/>',
       '<a href="' + doc.url + '" data-row-selector="true">' + doc.name + '</a>',
       emptyStringIfNull(doc.description),
@@ -666,6 +734,7 @@ function addRow(doc) {
       emptyStringIfNull(doc.lastModified),
       '<a href="#" class="shareDocument" data-document-id="' + doc.id + '" rel="tooltip" title="${_('Share')} ' + doc.name + '" data-placement="left" style="padding-left:10px"><i class="icon-share-sign"></i></a>',
     ], false);
+    $("td", documentsTable.fnGetNodes(_addedRow[0]))[5].setAttribute("data-sort-value", doc.lastModifiedInMillis); // a bit of black magic.
   }
   catch (error) {
     $(document).trigger("error", error);

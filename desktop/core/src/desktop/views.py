@@ -81,6 +81,7 @@ def massaged_documents_for_json(documents):
   return docs
 
 def massage_doc_for_json(doc):
+  perms = doc.list_permissions()
   return {
       'id': doc.id,
       'contentType': doc.content_type.name,
@@ -89,6 +90,12 @@ def massage_doc_for_json(doc):
       'url': doc.content_object.get_absolute_url(),
       'description': doc.description,
       'tags': [{'id': tag.id, 'name': tag.tag} for tag in doc.tags.all()],
+      'perms': {
+        'read': {
+          'users': [{'id': user.id, 'username': user.username} for user in perms.users.all()],
+          'groups': [{'id': group.id, 'name': group.name} for group in perms.groups.all()]
+        }
+      },
       'owner': doc.owner.username,
       'lastModified': doc.last_modified.strftime("%x %X"),
       'lastModifiedInMillis': time.mktime(doc.last_modified.timetuple())
@@ -97,11 +104,13 @@ def massage_doc_for_json(doc):
 def massaged_tags_for_json(tags, user):
   ts = []
   trash = DocumentTag.objects.get_trash_tag(user)
+  history = DocumentTag.objects.get_history_tag(user)
   for tag in tags:
     massaged_tag = {
       'id': tag.id,
       'name': tag.tag,
-      'isTrash': tag.id == trash.id
+      'isTrash': tag.id == trash.id,
+      'isHistory': tag.id == history.id
     }
     ts.append(massaged_tag)
 
@@ -180,13 +189,14 @@ def update_permissions(request):
 
   if request.method == 'POST':
     data = json.loads(request.POST['data'])
-    doc_id = json.loads(request.POST['doc_id'])
+    doc_id = request.POST['doc_id']
     try:
       doc = Document.objects.get_doc(doc_id, request.user)
       # doc.sync_permissions({'read': {'user_ids': [1, 2, 3], 'group_ids': [1, 2, 3]}})
       doc.sync_permissions(data)
       response['message'] = _('Permissions updated!')
       response['status'] = 0
+      response['doc'] = massage_doc_for_json(doc)
     except Exception, e:
       response['message'] = force_unicode(e)
   else:
