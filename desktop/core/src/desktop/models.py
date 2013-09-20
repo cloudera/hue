@@ -130,7 +130,7 @@ class DocumentTag(models.Model):
   DEFAULT = 'default' # Always there
   TRASH = 'trash' # There when the document is trashed
   HISTORY = 'history' # There when the document is a submission history
-  
+
   RESERVED = (DEFAULT, TRASH, HISTORY)
 
   objects = DocumentTagManager()
@@ -148,7 +148,7 @@ class DocumentManager(models.Manager):
 
   def get_docs(self, user, model_class=None, extra=None):
     docs = Document.objects.documents(user).exclude(name='pig-app-hue-script')
-    
+
     if model_class is not None:
       ct = ContentType.objects.get_for_model(model_class)
       docs = docs.filter(content_type=ct)
@@ -175,7 +175,7 @@ class DocumentManager(models.Manager):
     trash = DocumentTag.objects.get_trash_tag(user=user)
     history = DocumentTag.objects.get_history_tag(user=user)
 
-    return Document.objects.get_docs(user, model_class).exclude(tags__in=[trash, history]).order_by('-last_modified')  
+    return Document.objects.get_docs(user, model_class).exclude(tags__in=[trash, history]).order_by('-last_modified')
 
   def available(self, model_class, user):
     docs = self.available_docs(model_class, user)
@@ -213,7 +213,7 @@ class DocumentManager(models.Manager):
                 description=description,
                 extra=extra
             )
-  
+
       tag = DocumentTag.objects.get_default_tag(user=owner)
       doc.tags.add(tag)
       return doc
@@ -233,47 +233,58 @@ class DocumentManager(models.Manager):
 
         if not job.doc.exists():
           doc = Document.objects.link(job, owner=job.owner, name=job.name, description=job.description)
-          tag = DocumentTag.objects.get_default_tag(owner=job.owner)
+          tag = DocumentTag.objects.get_default_tag(user=job.owner)
           doc.tags.add(tag)
           if job.is_trashed:
             doc.send_to_trash()
           if job.is_shared:
-            DocumentPermission.objects.share_to_default(doc)
+            doc.share_to_default()
           if hasattr(job, 'managed'):
             if not job.managed:
               doc.extra = 'jobsub'
-              doc.save()              
+              doc.save()
+        if job.owner.username == 'sample':
+          job.doc.get().share_to_default()
     except Exception, e:
+      print e
       LOG.warn(force_unicode(e))
 
     try:
+      from beeswax.models import SavedQuery
+
       for job in SavedQuery.objects.all():
-        LOG.warn('Deleting duplicate document %s for %s' % (job.doc.all(), job))
         if job.doc.count() > 1:
+          LOG.warn('Deleting duplicate document %s for %s' % (job.doc.all(), job))
           job.doc.all().delete()
 
         if not job.doc.exists():
           doc = Document.objects.link(job, owner=job.owner, name=job.name, description=job.desc, extra=job.type)
-          tag = DocumentTag.objects.get_default_tag(owner=job.owner)
+          tag = DocumentTag.objects.get_default_tag(user=job.owner)
           doc.tags.add(tag)
           if job.is_trashed:
             doc.send_to_trash()
+        if job.owner.username == 'sample':
+          job.doc.get().share_to_default()
     except Exception, e:
+      print e
       LOG.warn(force_unicode(e))
 
     try:
       from pig.models import PigScript
 
       for job in PigScript.objects.all():
-        LOG.warn('Deleting duplicate document %s for %s' % (job.doc.all(), job))
         if job.doc.count() > 1:
+          LOG.warn('Deleting duplicate document %s for %s' % (job.doc.all(), job))
           job.doc.all().delete()
 
         if not job.doc.exists():
           doc = Document.objects.link(job, owner=job.owner, name=job.dict['name'], description='')
-          tag = DocumentTag.objects.get_default_tag(owner=job.owner)
+          tag = DocumentTag.objects.get_default_tag(user=job.owner)
           doc.tags.add(tag)
+        if job.owner.username == 'sample':
+          job.doc.get().share_to_default()
     except Exception, e:
+      print e
       LOG.warn(force_unicode(e))
 
 
@@ -326,6 +337,9 @@ class Document(models.Model):
   def add_to_history(self):
     tag = DocumentTag.objects.get_history_tag(user=self.owner)
     self.tags.add(tag)
+
+  def share_to_default(self):
+    DocumentPermission.objects.share_to_default(self)
 
   def is_accessible(self, user):
     return user.is_superuser or self.owner == user or Document.objects.get_doc(self.id, user)

@@ -29,6 +29,7 @@ from hadoop import cluster
 from oozie.conf import LOCAL_SAMPLE_DATA_DIR, LOCAL_SAMPLE_DIR,\
   REMOTE_SAMPLE_DIR
 from liboozie.submittion import create_directories
+from desktop.models import Document
 
 
 LOG = logging.getLogger(__name__)
@@ -62,3 +63,4 @@ class Command(NoArgsCommand):
     except User.DoesNotExist:
       sample_user = User.objects.create(username=USERNAME, password='!', is_active=False, is_superuser=False, id=1100713, pk=1100713)
     management.call_command('loaddata', 'initial_oozie_examples.json', verbosity=2)
+    Document.objects.sync()
