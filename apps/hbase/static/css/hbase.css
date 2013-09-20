@@ -38,13 +38,13 @@ ul#hbase-breadcrumbs li a {
 }
 
 .smartview {
-	padding:0px;
+	padding:0;
 }
 
 .smartview .smartview-row {
-	padding:0px;
-    font-size:0px;
-    margin:0px;
+	padding:0;
+    font-size:0;
+    margin:0;
 	border: 1px solid #ccc;
 	margin-bottom: -1px;
 	position: relative;
@@ -58,10 +58,10 @@ ul#hbase-breadcrumbs li a {
 }
 
 .smartview .smartview-row h5 {
-	padding:0px 10px;
+	padding:0 10px;
 	line-height: 40px;
 	background:#ddd;
-	margin:0px;
+	margin:0;
 	border-bottom: solid 1px #ccc;
 	background-color: #f5f5f5;
 	background-image: -webkit-gradient(linear,0 0,0 100%,from(#fff),to(#e6e6e6));
@@ -112,7 +112,7 @@ ul#hbase-breadcrumbs li a {
     white-space: nowrap;
     list-style: none;
     margin: 0;
-    padding:0px;
+    padding:0;
     margin-right:-1px;
     display:block;
     background: #ddd;
@@ -126,13 +126,13 @@ ul#hbase-breadcrumbs li a {
     color:#000;
     font-size:12px;
     overflow: hidden;
-    padding:0px;
+    padding:0;
     height:100%;
     max-width:200px;
     max-height: 200px;
     display:table-cell;
     min-width: 140px;
-    border-top:0px;
+    border-top:0;
 }
 
 .smartview.gridView ul.smartview-cells > li {
@@ -168,7 +168,7 @@ ul#hbase-breadcrumbs li a {
 
 .smartview ul.smartview-cells > li h6 {
 	padding:6px;
-	margin:0px;
+	margin:0;
 	color:#3a3a3a;
 	background:#fafafa;
 	border-bottom: solid 1px #ccc;
@@ -194,7 +194,7 @@ ul#hbase-breadcrumbs li a {
 	color:#333;
 	text-decoration: none;
 	display: none;
-	padding:0px 6px;
+	padding:0 6px;
 }
 
 .smartview ul.smartview-cells > li pre {
@@ -257,7 +257,7 @@ ul#hbase-breadcrumbs li a {
 }
 
 .subnav select, .subnav input, .well input, .well select, .smartview select, .smartview .smartview-row-controls input {
-	margin:0px;
+	margin:0;
 }
 .ui-autocomplete {
 	z-index:10000 !important;
@@ -415,7 +415,7 @@ ul#hbase-breadcrumbs li a {
 	border: none;
 	border-radius: 0;
 	min-width: 1px;
-	padding:0px;
+	padding:0;
 }
 
 
@@ -460,7 +460,7 @@ ul#hbase-breadcrumbs li a {
 	box-shadow: none;
 	border:none;
     msargin-right:15%;
-    padding:0px;
+    padding:0;
     display: inline-block;
     border-radius: 0;
     overflow: hidden;
@@ -516,7 +516,7 @@ ul#hbase-breadcrumbs li a {
 	width: 80%;
 	left: 50%;
 	top: 10%;
-	margin-top:0px;
+	margin-top:0;
 	overflow: visible;
 }
 
