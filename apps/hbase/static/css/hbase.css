@@ -52,9 +52,9 @@ ul#hbase-breadcrumbs li a {
 
 .smartview .smartview-row input[type="checkbox"] {
 	border:solid 1px #ccc;
-	border-radius: 0px;
-	margin: 0px;
-	padding: 0px;
+	border-radius: 0;
+	margin: 0;
+	padding: 0;
 }
 
 .smartview .smartview-row h5 {
@@ -90,7 +90,7 @@ ul#hbase-breadcrumbs li a {
 
 .smartview .smartview-row-controls.controls-hover-bottom {
 	position: absolute;
-	bottom: 0px;
+	bottom: 0;
 	right:5px;
 	z-index: 10;
 }
@@ -111,7 +111,7 @@ ul#hbase-breadcrumbs li a {
 	height:auto;
     white-space: nowrap;
     list-style: none;
-    margin: 0px;
+    margin: 0;
     padding:0px;
     margin-right:-1px;
     display:block;
@@ -198,7 +198,7 @@ ul#hbase-breadcrumbs li a {
 }
 
 .smartview ul.smartview-cells > li pre {
-	border-radius: 0px;
+	border-radius: 0;
 	border:none;
 	background:transparent;
 	display:block;
@@ -213,7 +213,7 @@ ul#hbase-breadcrumbs li a {
 
 .smartview ul.smartview-cells > li > div > textarea {
 	display: block;
-	border-radius: 0px;
+	border-radius: 0;
     outline: none;
     width: 100%;
     min-width: 200px;
@@ -251,7 +251,7 @@ ul#hbase-breadcrumbs li a {
 }
 
 .subnav {
-	padding:5px 0px;
+	padding:5px 0;
 	line-height:30px;
 	border:none;
 }
@@ -283,7 +283,7 @@ ul#hbase-breadcrumbs li a {
 	line-height: 1em;
 	margin-right: 10px;
 	-webkit-appearance: none;
-	-webkit-box-shadow: rgba(0, 0, 0, 0.0745098) 0px 1px 1px 0px inset;
+	-webkit-box-shadow: rgba(0, 0, 0, 0.0745098) 0 1px 1px 0 inset;
 	-webkit-rtl-ordering: logical;
 	-webkit-transition-delay: 0s, 0s;
 	-webkit-transition-duration: 0.2s, 0.2s;
@@ -296,7 +296,7 @@ ul#hbase-breadcrumbs li a {
 	border-bottom-left-radius: 3px;
 	border-bottom-style: solid;
 	border-bottom-width: 1px;
-	border-image-outset: 0px;
+	border-image-outset: 0;
 	border-image-repeat: stretch;
 	border-image-slice: 100%;
 	border-image-source: none;
@@ -311,7 +311,7 @@ ul#hbase-breadcrumbs li a {
 	border-top-left-radius: 3px;
 	border-top-style: solid;
 	border-top-width: 1px;
-	box-shadow: rgba(0, 0, 0, 0.0745098) 0px 1px 1px 0px inset;
+	box-shadow: rgba(0, 0, 0, 0.0745098) 0 1px 1px 0 inset;
 	color: rgb(85, 85, 85);
 	cursor: auto;
 	display: inline-block;
@@ -321,17 +321,17 @@ ul#hbase-breadcrumbs li a {
 	height: 20px;
 	letter-spacing: normal;
 	line-height: 25px;
-	margin-bottom: 0px;
-	margin-left: 0px;
-	margin-right: 0px;
-	margin-top: 0px;
+	margin-bottom: 0;
+	margin-left: 0;
+	margin-right: 0;
+	margin-top: 0;
 	padding-bottom: 4px;
 	padding-left: 6px;
 	padding-right: 6px;
 	padding-top: 4px;
 	text-align: start;
-	text-indent: 0px;
-	text-shadow: rgba(0, 0, 0, 0) 0px 0px 1px;
+	text-indent: 0;
+	text-shadow: rgba(0, 0, 0, 0) 0 0 1px;
 	text-transform: none;
 	transition-delay: 0s, 0s;
 	transition-duration: 0.2s, 0.2s;
@@ -346,8 +346,8 @@ ul#hbase-breadcrumbs li a {
 }
 #search-tags {
 	display: block;
-	margin: 0px;
-	padding: 0px;
+	margin: 0;
+	padding: 0;
 	outline: none;
 	list-style: none;
 	width: 100%;
@@ -363,12 +363,12 @@ ul#hbase-breadcrumbs li a {
 	padding: 2px;
 }
 #search-tags span:hover {
-	margin: 0px;
+	margin: 0;
 	border: dashed 1px #5D6F8C;
 }
 
 #search-tags > span > span {
-	padding: 0px 3px;
+	padding: 0 3px;
 	border-radius: 3px;
 }
 
@@ -380,7 +380,7 @@ ul#hbase-breadcrumbs li a {
 #search-tags span.scan {
 	color: #fff;
 	background: #EDA11F;
-	padding: 0px 3px;
+	padding: 0 3px;
 	border-radius: 3px;
 }
 
@@ -413,7 +413,7 @@ ul#hbase-breadcrumbs li a {
 {
 	background: yellow;
 	border: none;
-	border-radius: 0px;
+	border-radius: 0;
 	min-width: 1px;
 	padding:0px;
 }
@@ -422,8 +422,8 @@ ul#hbase-breadcrumbs li a {
 #search-typeahead {
 	position: absolute;
 	z-index: 10000;
-	margin: 0px;
-	padding: 0px;
+	margin: 0;
+	padding: 0;
 	padding-top: 1px;
 	list-style: none;
 	margin-top: 40px;
@@ -455,14 +455,14 @@ ul#hbase-breadcrumbs li a {
 }
 
 #searchbar-main input[type=text].tag-searchbar {
-	border: 0px;
+	border: 0;
 	background: transparent;
 	box-shadow: none;
 	border:none;
     msargin-right:15%;
     padding:0px;
     display: inline-block;
-    border-radius: 0px;
+    border-radius: 0;
     overflow: hidden;
     width:100%;
 }
@@ -481,9 +481,9 @@ ul#hbase-breadcrumbs li a {
 
 #searchbar-main i.tagIndicator {
 	color: #000;
-	padding: 0px !important;
-	border: 0px;
-	margin: 0px;
+	padding: 0 !important;
+	border: 0;
+	margin: 0;
 	background: black !important;
 	display: inline-block;
 	width: 1px;
@@ -551,15 +551,15 @@ textarea {
 #new_table_modal ul, #new_row_field_list
 {
 	list-style-type: none;
-	padding: 0px;
-	margin: 0px;
+	padding: 0;
+	margin: 0;
 }
 
 .add-on
 {
 	border-radius: 1.5em;
-	border-bottom-left-radius: 0px;
-	border-top-left-radius: 0px;
+	border-bottom-left-radius: 0;
+	border-top-left-radius: 0;
 	height: auto;
 	display: inline-block;
 	padding: 3px 12px 3px 8px;
@@ -579,8 +579,8 @@ textarea {
 	cursor: pointer;
 	color: #ccc;
 	z-index: 100;
-	width: 0px;
-	height: 0px;
+	width: 0;
+	height: 0;
 	overflow: visible;
 	display: block;
 }
@@ -619,5 +619,5 @@ textarea {
 	background: linear-gradient(to bottom,  #292b2d 0%,#000000 100%); /* W3C */
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#292b2d', endColorstr='#000000',GradientType=0 ); /* IE6-9 */
 	border-color: #333;
-	box-shadow: 0px 3px 5px rgba(0,0,0,.3);
+	box-shadow: 0 3px 5px rgba(0,0,0,.3);
 }

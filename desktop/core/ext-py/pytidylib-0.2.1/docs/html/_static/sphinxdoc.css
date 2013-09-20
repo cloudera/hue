@@ -15,7 +15,7 @@ body {
     padding: 0;
     border: 1px solid #aaa;
 
-    margin: 0px 80px 0px 80px;
+    margin: 0 80px 0 80px;
     min-width: 740px;
 }
 
@@ -112,7 +112,7 @@ dl {
 }
 
 dd p {
-    margin-top: 0px;
+    margin-top: 0;
 }
 
 dd ul, dd table {

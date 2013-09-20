@@ -10,7 +10,7 @@
 /* Adapted for Pocoo API docs by Georg Brandl */
 
 /* Default Colors & Styles
- *   - Set the default foreground & background color with 'body'; and 
+ *   - Set the default foreground & background color with 'body'; and
  *     link colors with 'a:link' and 'a:visited'.
  *   - Use bold for decision list terms.
  *   - The heading styles defined here are used for headings *within*
@@ -40,7 +40,7 @@ hr                          { margin-top: 1.5em; margin-bottom: 1.5em;
 tt.literal                  { background: #F5FFD0; padding: 2px;
                               font-size: 110%; }
 table.rst-docutils          { border: 0; }
-table.rst-docutils td       { border: 0; padding: 5px 20px 5px 0px; }
+table.rst-docutils td       { border: 0; padding: 5px 20px 5px 0; }
 
 /* Page Header & Footer
  *   - The standard page header consists of a navigation bar (with
@@ -52,7 +52,7 @@ table.rst-docutils td       { border: 0; padding: 5px 20px 5px 0px; }
  *     corresponding source code (using 'span.codelink').
  *   - The footer consists of a navigation bar, a timestamp, and a
  *     pointer to epydoc's homepage.
- */ 
+ */
 h1.epydoc                   { margin-top: .4em; margin-bottom: .4em;
                               font-size: +180%; font-weight: bold;
                               font-style: normal; }
@@ -64,11 +64,11 @@ table.navbar                { background: #E6F8A0; color: #000000;
                               border-top: 1px solid #c0d0d0;
                               border-bottom: 1px solid #c0d0d0;
                               margin: -1px -1.2em 1em -1.2em; }
-table.navbar th             { padding: 2px 7px 2px 0px; }
+table.navbar th             { padding: 2px 7px 2px 0; }
 th.navbar-select            { background-color: transparent; }
 th.navbar-select:before     { content: ">" }
 th.navbar-select:after      { content: "<" }
-table.navbar a              { border: 0; }  
+table.navbar a              { border: 0; }
 span.breadcrumbs            { font-size: 95%; font-weight: bold; }
 span.options                { font-size: 80%; }
 span.codelink               { font-size: 85%; }
@@ -85,7 +85,7 @@ td.footer                   { font-size: 85%; }
 td.table-header             { background: #B6C870; color: #000000;
                               border-bottom: 1px solid #FFF; }
 span.table-header           { font-size: 110%; font-weight: bold; }
-th.group-header             { text-align: left; font-style: italic; 
+th.group-header             { text-align: left; font-style: italic;
                               font-size: 110%; }
 td.spacer { width: 5%; }
 
@@ -138,17 +138,17 @@ table.details dl            { margin-left: 5px; }
 table.link-index            { border-collapse: collapse;
                               background: #F6FFB0; color: #000000;
                               border: 1px solid #608090; }
-td.link-index               { border-width: 0px; }
+td.link-index               { border-width: 0; }
 span.index-where            { font-size: 70%; }
 table.metadata-index        { border-collapse: collapse;
                               background: #F6FFB0; color: #000000;
-                              border: 1px solid #608090; 
+                              border: 1px solid #608090;
                               margin: .2em 0 0 0; }
 td.metadata-index           { border-width: 1px; border-style: solid; }
 
 /* Function signatures
  *   - sig* is used for the signature in the details section.
- *   - .summary-sig* is used for the signature in the summary 
+ *   - .summary-sig* is used for the signature in the summary
  *     table, and when listing property accessor functions.
  * */
 .sig-name                   { color: #006080; }
@@ -198,7 +198,7 @@ pre.base-tree               { font-size: 90%; margin: 1em 0 2em 0;
 h1.toc                      { text-align: center; font-size: 105%;
                               margin: 0; font-weight: bold;
                               padding: 0; }
-h2.toc                      { font-size: 100%; font-weight: bold; 
+h2.toc                      { font-size: 100%; font-weight: bold;
                               margin: 0.5em 0 0 -0.3em; }
 
 /* Syntax Highlighting for Source Code
@@ -224,13 +224,13 @@ pre.rst-literal-block,
 pre.py-doctest              { margin-left: 1em; margin-right: 1.5em;
                               line-height: 150%;
                               background-color: #F5FFD0; padding: .5em;
-                              border: 1px solid #B6C870; 
+                              border: 1px solid #B6C870;
                               font-size: 110%; }
 pre.py-src                  { border: 1px solid #BBB; margin-top: 3em;
                               background: #f0f0f0; color: #000000;
                               line-height: 150%; }
 span.py-line                { margin-left: .2em; padding-left: .4em; }
-span.py-lineno              { border-right: 1px solid #BBB; 
+span.py-lineno              { border-right: 1px solid #BBB;
                               padding: .3em .5em .3em .5em;
                               font-style: italic; font-size: 90%; }
 a.py-toggle                 { text-decoration: none; }
@@ -274,7 +274,7 @@ span.graph-caption          { }
  *     top and bottom margin (but not the left or right margin --
  *     for lists, that would cause the bullets to disappear.)
  */
-p.indent-wrapped-lines      { padding: 0 0 0 7em; text-indent: -7em; 
+p.indent-wrapped-lines      { padding: 0 0 0 7em; text-indent: -7em;
                               margin: 0; }
 .nomargin-top               { margin-top: 0; }
 .nomargin                   { margin-top: 0; margin-bottom: 0; }

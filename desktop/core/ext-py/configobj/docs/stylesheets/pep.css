@@ -9,7 +9,7 @@ Default cascading style sheet for the PEP HTML output of Docutils.
 */
 
 /* "! important" is used here to override other ``margin-top`` and
-   ``margin-bottom`` styles that are later in the stylesheet or 
+   ``margin-bottom`` styles that are later in the stylesheet or
    more specific.  See http://www.w3.org/TR/CSS1#the-cascade */
 .first {
   margin-top: 0 ! important }
@@ -23,8 +23,8 @@ Default cascading style sheet for the PEP HTML output of Docutils.
 .navigation {
   width: 100% ;
   background: #99ccff ;
-  margin-top: 0px ;
-  margin-bottom: 0px }
+  margin-top: 0 ;
+  margin-bottom: 0 }
 
 .navigation .navicon {
   width: 150px ;
@@ -63,9 +63,9 @@ blockquote.epigraph {
   margin: 2em 5em ; }
 
 body {
-  margin: 0px ;
+  margin: 0 ;
   margin-bottom: 1em ;
-  padding: 0px }
+  padding: 0 }
 
 dl.docutils dd {
   margin-bottom: 0.5em }

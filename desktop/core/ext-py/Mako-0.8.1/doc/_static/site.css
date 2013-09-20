@@ -24,7 +24,7 @@ h1 {
 h2 {
     font-size:1.1em;
     font-weight:bold;
-    margin:10px 0px 10px 0px;
+    margin:10px 0 10px 0;
 }
 
 .clearfix{
@@ -43,7 +43,7 @@ h2 {
 }
 #gittip_nav {
     float:right;
-    margin:10px 0px 0px 0px;
+    margin:10px 0 0 0;
 }
 
 .toolbar {
@@ -63,7 +63,7 @@ h2 {
 }
 
 li {
-    margin:1px 0px 1px 0px;
+    margin:1px 0 1px 0;
 }
 
 .speedchart td {

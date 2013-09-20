@@ -31,13 +31,13 @@ th {
 }
 
 .addlink, .changelink {
-    padding-left: 0px;
+    padding-left: 0;
     padding-right: 12px;
     background-position: 100% 0.2em;
 }
 
 .deletelink {
-    padding-left: 0px;
+    padding-left: 0;
     padding-right: 12px;
     background-position: 100% 0.25em;
 }
@@ -99,24 +99,24 @@ table thead th.sorted .sortoptions {
 
 .change-list .filtered table {
     border-left: 1px solid #ddd;
-    border-right: 0px none;
+    border-right: 0 none;
 }
 
 #changelist-filter {
     right: auto;
     left: 0;
-    border-left: 0px none;
+    border-left: 0 none;
     border-right: 1px solid #ddd;
 }
 
 .change-list .filtered .results, .change-list .filtered .paginator, .filtered #toolbar, .filtered div.xfull {
-    margin-right: 0px !important;
+    margin-right: 0 !important;
     margin-left: 160px !important;
 }
 
 #changelist-filter li.selected {
-    border-left: 0px none;
-    padding-left: 0px;
+    border-left: 0 none;
+    padding-left: 0;
     margin-left: 0;
     border-right: 5px solid #ccc;
     padding-right: 5px;
