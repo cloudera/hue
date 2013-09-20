@@ -4,10 +4,10 @@ from distutils.sysconfig import get_python_lib
 from distutils.cmd import Command
 from distutils.command.build import build
 
-if (sys.version_info >= (2, 6, 0)):
+if (sys.version_info >= (2, 7, 0)):
     sys.stderr.write("Skipping building ssl-1.15 because" +
                      "it is a built-in module in Python" +
-                     "2.6 and later.\n")
+                     "2.7 and later.\n")
     sys.exit(0)
 elif (sys.version_info < (2, 3, 5)):
     sys.stderr.write("Warning:  This code has not been tested "
@@ -174,11 +174,11 @@ setup(name='ssl',
       long_description=
 """
 The old socket.ssl() support for TLS over sockets is being
-superseded in Python 2.6 by a new 'ssl' module.  This package
+superseded in Python 2.7 by a new 'ssl' module.  This package
 brings that module to older Python releases, 2.3.5 and up (it may
 also work on older versions of 2.3, but we haven't tried it).
 
-It's quite similar to the 2.6 ssl module.  There's no stand-alone
+It's quite similar to the 2.7 ssl module.  There's no stand-alone
 documentation for this package; instead, just use the development
 branch documentation for the SSL module at
 http://docs.python.org/dev/library/ssl.html.

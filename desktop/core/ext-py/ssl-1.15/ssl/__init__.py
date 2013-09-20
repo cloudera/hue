@@ -80,6 +80,8 @@ from socket import getnameinfo as _getnameinfo
 import base64        # for DER-to-PEM translation
 import select        # for handshake
 
+_DEFAULT_CIPHERS = 'DEFAULT:!aNULL:!eNULL:!LOW:!EXPORT:!SSLv2'
+
 class SSLSocket (socket):
 
     """This class implements a subtype of socket.socket that wraps
@@ -90,8 +92,12 @@ class SSLSocket (socket):
                  server_side=False, cert_reqs=CERT_NONE,
                  ssl_version=PROTOCOL_SSLv23, ca_certs=None,
                  do_handshake_on_connect=True,
-                 suppress_ragged_eofs=True):
+                 suppress_ragged_eofs=True,
+                 ciphers=None):
         socket.__init__(self, _sock=sock._sock)
+        if ciphers is None:
+            ciphers = _DEFAULT_CIPHERS
+
         # the initializer for socket trashes the methods (tsk, tsk), so...
         self.send = lambda x, flags=0: SSLSocket.send(self, x, flags)
         self.recv = lambda x, flags=0: SSLSocket.recv(self, x, flags)
@@ -110,7 +116,7 @@ class SSLSocket (socket):
             # yes, create the SSL object
             self._sslobj = _ssl2.sslwrap(self._sock, server_side,
                                          keyfile, certfile,
-                                         cert_reqs, ssl_version, ca_certs)
+                                         cert_reqs, ssl_version, ca_certs, ciphers)
             if do_handshake_on_connect:
                 timeout = self.gettimeout()
                 if timeout == 0.0:
@@ -122,6 +128,7 @@ class SSLSocket (socket):
         self.cert_reqs = cert_reqs
         self.ssl_version = ssl_version
         self.ca_certs = ca_certs
+        self.ciphers = ciphers
         self.do_handshake_on_connect = do_handshake_on_connect
         self.suppress_ragged_eofs = suppress_ragged_eofs
         self._makefile_refs = 0
@@ -278,7 +285,7 @@ class SSLSocket (socket):
         socket.connect(self, addr)
         self._sslobj = _ssl2.sslwrap(self._sock, False, self.keyfile, self.certfile,
                                      self.cert_reqs, self.ssl_version,
-                                     self.ca_certs)
+                                     self.ca_certs, self.ciphers)
         if self.do_handshake_on_connect:
             self.do_handshake()
 
@@ -296,7 +303,8 @@ class SSLSocket (socket):
                           cert_reqs=self.cert_reqs,
                           ssl_version=self.ssl_version,
                           ca_certs=self.ca_certs,
-                          do_handshake_on_connect=self.do_handshake_on_connect),
+                          do_handshake_on_connect=self.do_handshake_on_connect,
+                          ciphers=self.ciphers),
                 addr)
 
     def makefile(self, mode='r', bufsize=-1):
@@ -312,12 +320,13 @@ class SSLSocket (socket):
 def wrap_socket(sock, keyfile=None, certfile=None,
                 server_side=False, cert_reqs=CERT_NONE,
                 ssl_version=PROTOCOL_SSLv23, ca_certs=None,
-                do_handshake_on_connect=True):
+                do_handshake_on_connect=True, ciphers=None):
 
     return SSLSocket(sock, keyfile=keyfile, certfile=certfile,
                      server_side=server_side, cert_reqs=cert_reqs,
                      ssl_version=ssl_version, ca_certs=ca_certs,
-                     do_handshake_on_connect=do_handshake_on_connect)
+                     do_handshake_on_connect=do_handshake_on_connect,
+                     ciphers=ciphers)
 
 # some utility functions
 

@@ -8,11 +8,11 @@ Author-email: python.ssl.maintainer@gmail.com
 License: Python (MIT-like)
 Description: 
         The old socket.ssl() support for TLS over sockets is being
-        superseded in Python 2.6 by a new 'ssl' module.  This package
+        superseded in Python 2.7 by a new 'ssl' module.  This package
         brings that module to older Python releases, 2.3.5 and up (it may
         also work on older versions of 2.3, but we haven't tried it).
         
-        It's quite similar to the 2.6 ssl module.  There's no stand-alone
+        It's quite similar to the 2.7 ssl module.  There's no stand-alone
         documentation for this package; instead, just use the development
         branch documentation for the SSL module at
         http://docs.python.org/dev/library/ssl.html.

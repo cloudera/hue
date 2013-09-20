@@ -123,7 +123,7 @@ except ImportError:
         from eventlet.green.OpenSSL import SSL
         def wrap_ssl_impl(sock, keyfile=None, certfile=None, server_side=False,
                           cert_reqs=None, ssl_version=None, ca_certs=None,
-                          do_handshake_on_connect=True, 
+                          do_handshake_on_connect=True,
                           suppress_ragged_eofs=True, ciphers=None):
             # theoretically the ssl_version could be respected in this
             # next line

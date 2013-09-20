@@ -13,12 +13,8 @@ from eventlet.hubs import trampoline
 from eventlet.greenio import set_nonblocking, GreenSocket, SOCKET_CLOSED, CONNECT_ERR, CONNECT_SUCCESS
 orig_socket = __import__('socket')
 socket = orig_socket.socket
-if sys.version_info >= (2,7):
-    has_ciphers = True
-    timeout_exc = SSLError
-else:
-    has_ciphers = False
-    timeout_exc = orig_socket.timeout
+has_ciphers = True
+timeout_exc = SSLError
 
 __patched__ = ['SSLSocket', 'wrap_socket', 'sslwrap_simple']
 
@@ -44,6 +40,7 @@ class GreenSSLSocket(__ssl.SSLSocket):
 
         self.act_non_blocking = sock.act_non_blocking
         self._timeout = sock.gettimeout()
+
         super(GreenSSLSocket, self).__init__(sock.fd, *args, **kw)
        
         # the superclass initializer trashes the methods so we remove
@@ -298,7 +295,8 @@ class GreenSSLSocket(__ssl.SSLSocket):
                           ssl_version=self.ssl_version,
                           ca_certs=self.ca_certs,
                           do_handshake_on_connect=self.do_handshake_on_connect,
-                          suppress_ragged_eofs=self.suppress_ragged_eofs)
+                          suppress_ragged_eofs=self.suppress_ragged_eofs,
+                          ciphers=self.ciphers)
         return (new_ssl, addr)
 
     def dup(self):

@@ -137,11 +137,13 @@ class Controller(object):
                     json.dumps(self.args)]
                 if self.args['reload'] == 'dev':
                     command.append('--reload')
-		if self.args.get('ssl_private_key') and self.args.get('ssl_certificate'):
+                if self.args.get('ssl_private_key') and self.args.get('ssl_certificate'):
                     command.append('--ssl-private-key')
                     command.append(self.args.get('ssl_private_key'))
                     command.append('--ssl-certificate')
                     command.append(self.args.get('ssl_certificate'))
+                    command.append('--ssl-cipher-list')
+                    command.append(self.args.get('ssl_cipher_list'))
                 env = environ()
                 tpool_size = int(self.config.get('threadpool_workers', 0))
                 assert tpool_size >= 0, (tpool_size, 'Cannot have a negative --threads argument')
@@ -362,6 +364,8 @@ def main():
         help='Absolute path to SSL certificate file.')
     parser.add_option('--ssl-private-key', dest='ssl_private_key', type='string', default='',
         help='Absolute path to SSL private key.')
+    parser.add_option('--ssl-cipher-list', dest='ssl_cipher_list', type='string', default='DEFAULT:!aNULL:!eNULL:!LOW:!EXPORT:!SSLv2',
+        help='Absolute path to SSL private key.')
 
     options, positional_args = parser.parse_args()
 
@@ -501,8 +505,9 @@ def main():
         'args': positional_args,
         'status_port': options.status_port,
         'status_host': options.status_host or options.host,
-	'ssl_private_key': options.ssl_private_key,
-	'ssl_certificate': options.ssl_certificate
+        'ssl_private_key': options.ssl_private_key,
+        'ssl_certificate': options.ssl_certificate,
+        'ssl_cipher_list': options.ssl_cipher_list
     }
     start_controller(sock, factory, factory_args)
 

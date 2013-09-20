@@ -282,6 +282,8 @@ def main():
         help='Absolute path to SSL certificate file.')
     parser.add_option('--ssl-private-key', dest='ssl_private_key', type='string', default='',
         help='Absolute path to SSL private key.')
+    parser.add_option('--ssl-cipher-list', dest='ssl_cipher_list', type='string', default='DEFAULT:!aNULL:!eNULL:!LOW:!EXPORT:!SSLv2',
+        help='List of allowed and disallowed ciphers.')
 
     options, args = parser.parse_args()
 
@@ -333,7 +335,7 @@ def main():
         # of type "socket._socketobject", but it's actually of type "_socket.socket". Patching
         # up the object in this way solves this problem.
         sock.fd = socket._socketobject(_sock=sock.fd)
-        sock = eventlet.wrap_ssl(sock, certfile=options.ssl_certificate, keyfile=options.ssl_private_key, server_side=True)
+        sock = eventlet.wrap_ssl(sock, certfile=options.ssl_certificate, keyfile=options.ssl_private_key, server_side=True, ciphers=options.ssl_cipher_list)
 
     serve_from_child(sock, config, controller_pid)
 
