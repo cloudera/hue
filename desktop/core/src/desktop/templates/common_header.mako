@@ -60,7 +60,7 @@ from django.utils.translation import ugettext as _
       }
       .banner {
         height: 40px;
-        padding: 0px;
+        padding: 0;
       }
       .subnav-fixed {
         top: 80px;
