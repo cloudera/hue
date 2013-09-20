@@ -17,36 +17,25 @@
 
 import logging
 import os
-import pwd
 import simplejson
 
 from django.core.management.base import NoArgsCommand
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 
-import beeswax.conf
-from beeswax.models import SavedQuery
-from beeswax.server.dbms import get_query_server_config, QueryServerException
+from desktop.models import Document
 
-from beeswax import models
+import beeswax.conf
+
+from beeswax.models import SavedQuery, IMPALA
 from beeswax.design import hql_query
 from beeswax.server import dbms
+from beeswax.server.dbms import get_query_server_config, QueryServerException
 
 
 LOG = logging.getLogger(__name__)
-DEFAULT_INSTALL_USER = 'hue'
 
-
-def get_install_user():
-  """Use the DEFAULT_INSTALL_USER if it exists, else try the current user"""
-  try:
-    pwd.getpwnam(DEFAULT_INSTALL_USER)
-    return DEFAULT_INSTALL_USER
-  except KeyError:
-    pw_struct = pwd.getpwuid(os.geteuid())
-    LOG.info("Default sample installation user '%s' does not exist. Using '%s'"
-             % (DEFAULT_INSTALL_USER, pw_struct.pw_name))
-    return pw_struct.pw_name
+DEFAULT_INSTALL_USER = 'sample'
 
 
 class InstallException(Exception):
@@ -71,7 +60,7 @@ class Command(NoArgsCommand):
     """
     Setup the sample user
     """
-    USERNAME = 'sample'
+    USERNAME = DEFAULT_INSTALL_USER
     try:
       user = User.objects.get(username=USERNAME)
     except User.DoesNotExist:
@@ -100,7 +89,7 @@ class Command(NoArgsCommand):
 
     for design_dict in design_list:
       if app_name == 'impala':
-        design_dict['type'] = models.IMPALA
+        design_dict['type'] = IMPALA
       design = SampleDesign(design_dict)
       try:
         design.install(django_user)
@@ -130,6 +119,7 @@ class SampleTable(object):
   def install(self, django_user):
     self.create(django_user)
     self.load(django_user)
+    Document.objects.sync()
 
   def create(self, django_user):
     """
