@@ -194,13 +194,21 @@ def clone_design(request, design_id):
     return list_designs(request)
 
   copy = design.clone()
+  copy_doc = design.doc.get()
   copy.name = design.name + ' (copy)'
   copy.owner = request.user
   copy.save()
+  
+  copy_doc.pk = None
+  copy_doc.id = None
+  copy_doc.owner = copy.owner
+  copy_doc.name = copy.name
+  copy_doc.save()
+  copy.doc.add(copy_doc)  
+  
   messages.info(request, _('Copied design: %(name)s') % {'name': design.name})
 
-  return format_preserving_redirect(
-      request, reverse(get_app_name(request) + ':execute_query', kwargs={'design_id': copy.id}))
+  return format_preserving_redirect(request, reverse(get_app_name(request) + ':execute_query', kwargs={'design_id': copy.id}))
 
 
 def list_designs(request):

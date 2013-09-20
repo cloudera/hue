@@ -96,6 +96,7 @@ class DocumentTagManager(models.Manager):
 
   def delete_tag(self, tag_id, owner):
     tag = DocumentTag.objects.get(id=tag_id, owner=owner)
+    default_tag = DocumentTag.objects.get_default_tag(owner)
 
     if tag.tag in DocumentTag.RESERVED:
       raise Exception(_("Can't remove %s: it is a reserved tag.") % tag)
@@ -182,13 +183,13 @@ class DocumentManager(models.Manager):
 
     return [doc.content_object for doc in docs if doc.content_object]
 
-  def is_accessible_or_exception(self, user, doc_class, doc_id, exception_class=PopupException):
+  def can_read_or_exception(self, user, doc_class, doc_id, exception_class=PopupException):
     if doc_id is None:
       return
     try:
       ct = ContentType.objects.get_for_model(doc_class)
       doc = Document.objects.get(object_id=doc_id, content_type=ct)
-      if doc.is_accessible(user):
+      if doc.can_read(user):
         return doc
       else:
         message = _("Permission denied. %(username)s does not have the permissions required to access document %(id)s") % \
@@ -198,11 +199,11 @@ class DocumentManager(models.Manager):
     except Document.DoesNotExist:
       raise exception_class(_('Document %(id)s does not exist') % {'id': doc_id})
 
-  def is_accessible(self, user, doc_class, doc_id):
+  def can_read(self, user, doc_class, doc_id):
     ct = ContentType.objects.get_for_model(doc_class)
     doc = Document.objects.get(object_id=doc_id, content_type=ct)
 
-    return doc.is_accessible(user)
+    return doc.can_read(user)
 
   def link(self, content_object, owner, name='', description='', extra=''):
     if not content_object.doc.exists():
@@ -246,7 +247,6 @@ class DocumentManager(models.Manager):
         if job.owner.username == 'sample':
           job.doc.get().share_to_default()
     except Exception, e:
-      print e
       LOG.warn(force_unicode(e))
 
     try:
@@ -266,7 +266,6 @@ class DocumentManager(models.Manager):
         if job.owner.username == 'sample':
           job.doc.get().share_to_default()
     except Exception, e:
-      print e
       LOG.warn(force_unicode(e))
 
     try:
@@ -284,7 +283,13 @@ class DocumentManager(models.Manager):
         if job.owner.username == 'sample':
           job.doc.get().share_to_default()
     except Exception, e:
-      print e
+      LOG.warn(force_unicode(e))
+
+    try:
+      for doc in Document.objects.filter(tags=None):
+        default_tag = DocumentTag.objects.get_default_tag(doc.owner)
+        doc.tags.add(default_tag)      
+    except Exception, e:
       LOG.warn(force_unicode(e))
 
 
@@ -341,11 +346,8 @@ class Document(models.Model):
   def share_to_default(self):
     DocumentPermission.objects.share_to_default(self)
 
-  def is_accessible(self, user):
-    return user.is_superuser or self.owner == user or Document.objects.get_doc(self.id, user)
-
   def can_read(self, user):
-    return user.is_superuser or self.owner == user or Document.objects.get_doc(self.id, user)
+    return user.is_superuser or self.owner == user or Document.objects.get_docs(user).filter(id=self.id).exists()
 
   def can_write(self, user):
     return user.is_superuser or self.owner == user
@@ -362,13 +364,17 @@ class Document(models.Model):
     else:
       raise exception_class(_('Only superusers and %s are allowed to modify this document.') % user)
 
-  def copy(self):
+  def copy(self, name=None, owner=None):
     copy_doc = self
 
     tags = self.tags.all()
 
     copy_doc.pk = None
     copy_doc.id = None
+    if name is not None:
+      copy_doc.name = name
+    if owner is not None:
+      copy_doc.owner = owner
     copy_doc.save()
 
     copy_doc.tags.add(*tags)

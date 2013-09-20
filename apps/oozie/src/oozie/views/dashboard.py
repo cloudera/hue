@@ -181,8 +181,8 @@ def list_oozie_workflow(request, job_id, coordinator_job_id=None, bundle_job_id=
   hue_coord = history and history.get_coordinator() or History.get_coordinator_from_config(oozie_workflow.conf_dict)
   hue_workflow = (hue_coord and hue_coord.workflow) or (history and history.get_workflow()) or History.get_workflow_from_config(oozie_workflow.conf_dict)
 
-  if hue_coord: Job.objects.is_accessible_or_exception(request, hue_coord.workflow.id)
-  if hue_workflow: Job.objects.is_accessible_or_exception(request, hue_workflow.id)
+  if hue_coord: Job.objects.can_read_or_exception(request, hue_coord.workflow.id)
+  if hue_workflow: Job.objects.can_read_or_exception(request, hue_workflow.id)
 
   parameters = oozie_workflow.conf_dict.copy()
   for action in oozie_workflow.actions:

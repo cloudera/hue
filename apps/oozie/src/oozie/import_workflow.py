@@ -14,6 +14,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from desktop.models import Document
 """
 Import an external workflow by providing an XML definition.
 The workflow definition is imported via the method 'import_workflow'.
@@ -523,10 +524,8 @@ def _resolve_subworkflow_from_deployment_dir(fs, workflow, app_path):
   except Exception, e:
     raise RuntimeError(_("Could not find workflow at path %s") % app_path)
 
-  for subworkflow in Workflow.objects.available():
+  for subworkflow in Document.objects.available_docs(Workflow, workflow.owner):
     if subworkflow.deployment_dir == app_path:
-      if workflow.owner.id != subworkflow.owner.id:
-        raise RuntimeError(_("Subworkflow is not owned by %s") % workflow.owner)
       return subworkflow
 
   return None

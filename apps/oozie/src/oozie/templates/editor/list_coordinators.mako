@@ -82,7 +82,7 @@ ${ layout.menubar(section='coordinators') }
         <tr>
           <td data-row-selector-exclude="true">
             <div class="hueCheckbox coordinatorCheck" data-row-selector-exclude="true"
-              % if coordinator.is_accessible(user):
+              % if coordinator.can_read(user):
                   data-clone-url="${ url('oozie:clone_coordinator', coordinator=coordinator.id) }"
                   data-submit-url="${ url('oozie:submit_coordinator', coordinator=coordinator.id) }"
               % endif
@@ -91,7 +91,7 @@ ${ layout.menubar(section='coordinators') }
               % endif
               >
             </div>
-            % if coordinator.is_accessible(user):
+            % if coordinator.can_read(user):
               <a href="${ url('oozie:edit_coordinator', coordinator=coordinator.id) }" data-row-selector="true"/>
             % endif
           </td>

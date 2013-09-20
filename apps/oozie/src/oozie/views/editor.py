@@ -154,6 +154,9 @@ def import_workflow(request):
           shutil.rmtree(temp_path)
         else:
           raise PopupException(_('Archive should be a Zip.'))
+      else:
+        workflow.save()
+        Workflow.objects.initialize(workflow, request.fs)
 
       workflow.managed = True
       workflow.save()
@@ -164,7 +167,6 @@ def import_workflow(request):
         _import_workflow(fs=request.fs, workflow=workflow, workflow_definition=workflow_definition)
         request.info(_('Workflow imported'))
         return redirect(reverse('oozie:edit_workflow', kwargs={'workflow': workflow.id}))
-
       except Exception, e:
         request.error(_('Could not import workflow: %s' % e))
         Workflow.objects.destroy(workflow, request.fs)
@@ -185,7 +187,7 @@ def import_workflow(request):
 def edit_workflow(request, workflow):
   history = History.objects.filter(submitter=request.user, job=workflow).order_by('-submission_date')
   workflow_form = WorkflowForm(instance=workflow)
-  user_can_access_job = workflow.is_accessible(request.user)
+  user_can_access_job = workflow.can_read(request.user)
   user_can_edit_job = workflow.is_editable(request.user)
 
   return render('editor/edit_workflow.mako', request, {
@@ -212,7 +214,7 @@ def delete_workflow(request):
   job_ids = request.POST.getlist('job_selection')
 
   for job_id in job_ids:
-    job = Job.objects.is_accessible_or_exception(request, job_id)
+    job = Job.objects.can_read_or_exception(request, job_id)
     Job.objects.can_edit_or_exception(request, job)
     if skip_trash:
       Workflow.objects.destroy(job, request.fs)
@@ -234,7 +236,7 @@ def restore_workflow(request):
   job_ids = request.POST.getlist('job_selection')
 
   for job_id in job_ids:
-    job = Document.objects.is_accessible_or_exception(request.user, Job, job_id)
+    job = Document.objects.can_read_or_exception(request.user, Job, job_id)
     Job.objects.can_edit_or_exception(request, job)
     job.workflow.restore()
 
@@ -343,7 +345,7 @@ def delete_coordinator(request):
   job_ids = request.POST.getlist('job_selection')
 
   for job_id in job_ids:
-    job = Job.objects.is_accessible_or_exception(request, job_id)
+    job = Job.objects.can_read_or_exception(request, job_id)
     Job.objects.can_edit_or_exception(request, job)
     if skip_trash:
       Submission(request.user, job, request.fs, {}).remove_deployment_dir()
@@ -364,7 +366,7 @@ def restore_coordinator(request):
   job_ids = request.POST.getlist('job_selection')
 
   for job_id in job_ids:
-    job = Job.objects.is_accessible_or_exception(request, job_id)
+    job = Job.objects.can_read_or_exception(request, job_id)
     Job.objects.can_edit_or_exception(request, job)
     job.restore()
 
@@ -614,7 +616,7 @@ def delete_bundle(request):
   job_ids = request.POST.getlist('job_selection')
 
   for job_id in job_ids:
-    job = Job.objects.is_accessible_or_exception(request, job_id)
+    job = Job.objects.can_read_or_exception(request, job_id)
     Job.objects.can_edit_or_exception(request, job)
     if skip_trash:
       Submission(request.user, job, request.fs, {}).remove_deployment_dir()
@@ -632,7 +634,7 @@ def restore_bundle(request):
   job_ids = request.POST.getlist('job_selection')
 
   for job_id in job_ids:
-    job = Job.objects.is_accessible_or_exception(request, job_id)
+    job = Job.objects.can_read_or_exception(request, job_id)
     Job.objects.can_edit_or_exception(request, job)
     job.restore()
 

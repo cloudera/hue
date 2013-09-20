@@ -84,7 +84,7 @@ ${ layout.menubar(section='workflows') }
         <tr>
           <td data-row-selector-exclude="true">
              <div class="hueCheckbox workflowCheck" data-row-selector-exclude="true"
-              % if workflow.is_accessible(user):
+              % if workflow.can_read(user):
                   data-submit-url="${ url('oozie:submit_workflow', workflow=workflow.id) }"
                   data-schedule-url="${ url('oozie:schedule_workflow', workflow=workflow.id) }"
                   data-clone-url="${ url('oozie:clone_workflow', workflow=workflow.id) }"
@@ -93,7 +93,7 @@ ${ layout.menubar(section='workflows') }
                   data-delete-id="${ workflow.id }"
               % endif
             ></div>
-            % if workflow.is_accessible(user):
+            % if workflow.can_read(user):
               <a href="${ url('oozie:edit_workflow', workflow=workflow.id) }" data-row-selector="true"></a>
             % endif
           </td>

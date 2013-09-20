@@ -353,7 +353,7 @@ def workflows(request):
     raise StructuredException(code="METHOD_NOT_ALLOWED_ERROR", message=_('Must be GET request.'), error_code=405)
 
   workflows = request.GET.get('managed', 'false').lower() == 'true' and Workflow.objects.managed() or Workflow.objects.unmanaged()
-  workflows_accessible = filter(lambda x: Job.objects.is_accessible(request.user, x.id), workflows)
+  workflows_accessible = filter(lambda x: Job.objects.can_read(request.user, x.id), workflows)
   response = {
     'status': 0,
     'data': {
