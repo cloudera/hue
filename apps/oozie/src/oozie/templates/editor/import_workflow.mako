@@ -74,9 +74,9 @@ ${ layout.menubar(section='workflows') }
 
       </div>
 
-      <div class="form-actions" style="padding-left: 20px !important;">
-        <input class="btn btn-primary" type="submit" value="${ _('Import') }" />
+      <div class="form-actions" style="padding-left: 20px !important;">        
         <a class="btn" onclick="history.back()">${ _('Back') }</a>
+        <input class="btn btn-primary" type="submit" value="${ _('Import') }" />
       </div>
       </form>
     </div>

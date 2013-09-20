@@ -73,16 +73,16 @@ A Workflow/Coordinator can be modified only by its owner or a superuser.
 Permissions checking happens by adding the decorators.
 """
 class JobManager(models.Manager):
-  def is_accessible(self, user, job_id):
+  def can_read(self, user, job_id):
     job = Job.objects.select_related().get(pk=job_id).get_full_node()
-    return job.is_accessible(user)
+    return job.can_read(user)
 
-  def is_accessible_or_exception(self, request, job_id, exception_class=PopupException):
+  def can_read_or_exception(self, request, job_id, exception_class=PopupException):
     if job_id is None:
       return
     try:
       job = Job.objects.select_related().get(pk=job_id).get_full_node()
-      if job.is_accessible(request.user):
+      if job.can_read(request.user):
         return job
       else:
         message = _("Permission denied. %(username)s does not have the permissions required to access job %(id)s") % \
@@ -132,7 +132,8 @@ class Job(models.Model):
       self.doc.all().delete()
       return super(Job, self).delete(*args, **kwargs)
     else:
-      self.doc.get().send_to_trash()
+      for job in self.doc.all():
+        job.send_to_trash()
       return self
 
   def restore(self):
@@ -200,9 +201,8 @@ class Job(models.Model):
 
     return  [{'name': name, 'value': value} for name, value in params.iteritems()]
 
-  def is_accessible(self, user):
-    return self.doc.get().is_accessible(user)
-    #return user.is_superuser or self.owner == user or (SHARE_JOBS.get() and self.is_shared)
+  def can_read(self, user):
+    return self.doc.get().can_read(user)
 
   def is_editable(self, user):
     """Only owners or admins can modify a job."""
@@ -297,7 +297,7 @@ class Workflow(Job):
   def clone(self, fs, new_owner=None):
     source_deployment_dir = self.deployment_dir # Needed
     nodes = self.node_set.all()
-    copy_doc = self.doc.get().copy()    
+    copy_doc = self.doc.get().copy()
     links = Link.objects.filter(parent__workflow=self)
 
     copy = self
@@ -332,8 +332,9 @@ class Workflow(Job):
     copy.save()
 
     copy_doc.name = copy.name
+    copy_doc.owner = copy.owner
     copy_doc.save()
-    copy.doc.add(copy_doc)    
+    copy.doc.add(copy_doc)
 
     try:
       if copy.is_shared:
@@ -1323,6 +1324,7 @@ class Coordinator(Job):
 
     copy_doc.pk = None
     copy_doc.id = None
+    copy_doc.owner = copy.owner
     copy_doc.save()
     copy.doc.add(copy_doc)
 
@@ -1397,12 +1399,12 @@ def utc_datetime_format(utc_time):
 
 
 class DatasetManager(models.Manager):
-  def is_accessible_or_exception(self, request, dataset_id):
+  def can_read_or_exception(self, request, dataset_id):
     if dataset_id is None:
       return
     try:
       dataset = Dataset.objects.get(pk=dataset_id)
-      if dataset.coordinator.is_accessible(request.user):
+      if dataset.coordinator.can_read(request.user):
         return dataset
       else:
         message = _("Permission denied. %(username)s does not have the permissions to access dataset %(id)s.") % \
@@ -1574,6 +1576,7 @@ class Bundle(Job):
 
     copy_doc.pk = None
     copy_doc.id = None
+    copy_doc.owner = copy.owner
     copy_doc.save()
     copy.doc.add(copy_doc)
 

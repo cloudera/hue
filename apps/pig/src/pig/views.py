@@ -148,13 +148,15 @@ def copy(request):
   pig_script.doc.get.can_edit_or_exception(request.user)
 
   existing_script_data = pig_script.dict
+  
+  owner=request.user
   name = existing_script_data["name"] + _(' (Copy)')
   script = existing_script_data["script"]
   parameters = existing_script_data["parameters"]
   resources = existing_script_data["resources"]
   hadoopProperties = existing_script_data["hadoopProperties"]
 
-  script_copy = PigScript.objects.create(owner=request.user)
+  script_copy = PigScript.objects.create(owner=owner)
   script_copy.update_from_dict({
       'name': name,
       'script': script,
@@ -163,10 +165,8 @@ def copy(request):
       'hadoopProperties': hadoopProperties
   })  
   script_copy.save()
-  Document.objects.link(script_copy, owner=script_copy.owner, name=name)
-  copy_doc = pig_script.doc.get().copy()
-  copy_doc.name = name
-  copy_doc.save()
+
+  copy_doc = pig_script.doc.get(name=name, owner=owner).copy()
   script_copy.doc.add(copy_doc)   
 
   response = {

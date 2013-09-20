@@ -83,7 +83,7 @@ ${ layout.menubar(section='bundles') }
         <tr>
           <td data-row-selector-exclude="true">
             <div class="hueCheckbox bundleCheck" data-row-selector-exclude="true"
-              % if bundle.is_accessible(user):
+              % if bundle.can_read(user):
                   data-clone-url="${ url('oozie:clone_bundle', bundle=bundle.id) }"
                   data-submit-url="${ url('oozie:submit_bundle', bundle=bundle.id) }"
               % endif
@@ -92,7 +92,7 @@ ${ layout.menubar(section='bundles') }
               % endif
               >
             </div>
-            % if bundle.is_accessible(user):
+            % if bundle.can_read(user):
               <a href="${ url('oozie:edit_bundle', bundle=bundle.id) }" data-row-selector="true"/>
             % endif
           </td>

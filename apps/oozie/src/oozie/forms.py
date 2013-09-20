@@ -354,7 +354,7 @@ class CoordinatorForm(forms.ModelForm):
     qs = Document.objects.available(Workflow, user)
     workflows = []
     for workflow in qs:
-      if workflow.is_accessible(user):
+      if workflow.can_read(user):
         workflows.append(workflow.id)
     qs = Workflow.objects.filter(id__in=workflows)
     self.fields['workflow'].queryset = qs

@@ -46,7 +46,7 @@ def check_job_access_permission(exception_class=PopupException):
 
       job = kwargs.get(job_type)
       if job is not None:
-        job = Job.objects.is_accessible_or_exception(request, job, exception_class=exception_class)
+        job = Job.objects.can_read_or_exception(request, job, exception_class=exception_class)
       kwargs[job_type] = job
 
       return view_func(request, *args, **kwargs)
@@ -90,7 +90,7 @@ def check_action_access_permission(view_func):
   def decorate(request, *args, **kwargs):
     action_id = kwargs.get('action')
     action = Node.objects.get(id=action_id).get_full_node()
-    Job.objects.is_accessible_or_exception(request, action.workflow.id)
+    Job.objects.can_read_or_exception(request, action.workflow.id)
     kwargs['action'] = action
 
     return view_func(request, *args, **kwargs)
@@ -123,7 +123,7 @@ def check_dataset_access_permission(view_func):
   def decorate(request, *args, **kwargs):
     dataset = kwargs.get('dataset')
     if dataset is not None:
-      dataset = Dataset.objects.is_accessible_or_exception(request, dataset)
+      dataset = Dataset.objects.can_read_or_exception(request, dataset)
     kwargs['dataset'] = dataset
 
     return view_func(request, *args, **kwargs)
