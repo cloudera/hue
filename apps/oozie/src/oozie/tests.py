@@ -28,6 +28,8 @@ from django.core.urlresolvers import reverse
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_permission
+from desktop.models import Document
+
 from jobsub.models import OozieDesign, OozieMapreduceAction
 from liboozie import oozie_api
 from liboozie.conf import OOZIE_URL
@@ -40,6 +42,7 @@ from oozie.models import Workflow, Node, Kill, Link, Job, Coordinator, History,\
 from oozie.utils import workflow_to_dict, model_to_dict, smart_path
 from oozie.import_workflow import import_workflow
 from oozie.import_jobsub import convert_jobsub_design
+
 
 
 LOG = logging.getLogger(__name__)
@@ -186,13 +189,14 @@ class OozieMockBase(object):
     self.c = make_logged_in_client(is_superuser=False)
     grant_access("test", "test", "oozie")
     self.user = User.objects.get(username='test')
-    self.wf = create_workflow(self.c)
+    self.wf = create_workflow(self.c, self.user)
 
 
   def tearDown(self):
     oozie_api.OozieApi = oozie_api.OriginalOozieApi
     Workflow.objects.check_workspace = Workflow.objects.original_check_workspace
     oozie_api._api_cache = None
+
 
     History.objects.all().delete()
     Coordinator.objects.all().delete()
@@ -714,17 +718,17 @@ class TestEditor(OozieMockBase):
   def test_workflow_name(self):
     try:
       workflow_dict = WORKFLOW_DICT.copy()
-      workflow_count = Workflow.objects.available().count()
+      workflow_count = Document.objects.available_docs(Workflow, self.user).count()
 
       workflow_dict['name'][0] = 'bad workflow name'
       response = self.c.post(reverse('oozie:create_workflow'), workflow_dict, follow=True)
       assert_equal(200, response.status_code)
-      assert_equal(workflow_count, Workflow.objects.available().count(), response)
+      assert_equal(workflow_count, Document.objects.available_docs(Workflow, self.user).count(), response)
 
       workflow_dict['name'][0] = 'good-workflow-name'
       response = self.c.post(reverse('oozie:create_workflow'), workflow_dict, follow=True)
       assert_equal(200, response.status_code)
-      assert_equal(workflow_count + 1, Workflow.objects.available().count(), response)
+      assert_equal(workflow_count + 1, Document.objects.available_docs(Workflow, self.user).count(), response)
     finally:
       name = 'bad workflow name'
       if Workflow.objects.filter(name=name).exists():
@@ -1043,7 +1047,7 @@ class TestEditor(OozieMockBase):
 
     wf_dict = WORKFLOW_DICT.copy()
     wf_dict['name'] = [u'wf-name-2']
-    wf2 = create_workflow(self.c, wf_dict)
+    wf2 = create_workflow(self.c, self.user, wf_dict)
 
     action1 = add_node(self.wf, 'action-name-1', 'subworkflow', [self.wf.start], {
         u'name': 'MySubworkflow',
@@ -1114,18 +1118,18 @@ class TestEditor(OozieMockBase):
 
 
   def test_create_coordinator(self):
-    create_coordinator(self.wf, self.c)
+    create_coordinator(self.wf, self.c, self.user)
 
 
   def test_clone_coordinator(self):
-    coord = create_coordinator(self.wf, self.c)
-    coordinator_count = Coordinator.objects.available().count()
+    coord = create_coordinator(self.wf, self.c, self.user)
+    coordinator_count = Document.objects.available_docs(Coordinator, self.user).count()
 
     response = self.c.post(reverse('oozie:clone_coordinator', args=[coord.id]), {}, follow=True)
 
     coord2 = Coordinator.objects.latest('id')
     assert_not_equal(coord.id, coord2.id)
-    assert_equal(coordinator_count + 1, Coordinator.objects.available().count(), response)
+    assert_equal(coordinator_count + 1, Document.objects.available_docs(Coordinator, self.user).count(), response)
 
     assert_equal(coord.dataset_set.count(), coord2.dataset_set.count())
     assert_equal(coord.datainput_set.count(), coord2.datainput_set.count())
@@ -1148,7 +1152,7 @@ class TestEditor(OozieMockBase):
 
     # Bulk delete
     response = self.c.post(reverse('oozie:delete_coordinator'), {'job_selection': [coord.id, coord2.id]}, follow=True)
-    assert_equal(coordinator_count - 1, Coordinator.objects.available().count(), response)
+    assert_equal(coordinator_count - 1, Document.objects.available_docs(Coordinator, self.user).count(), response)
 
 
   def test_coordinator_workflow_access_permissions(self):
@@ -1160,7 +1164,7 @@ class TestEditor(OozieMockBase):
     # Login as someone else not superuser
     client_another_me = make_logged_in_client(username='another_me', is_superuser=False, groupname='test')
     grant_access("another_me", "test", "oozie")
-    coord = create_coordinator(self.wf, client_another_me)
+    coord = create_coordinator(self.wf, client_another_me, self.user)
 
     response = client_another_me.get(reverse('oozie:edit_coordinator', args=[coord.id]))
     assert_true('Editor' in response.content, response.content)
@@ -1200,7 +1204,7 @@ class TestEditor(OozieMockBase):
 
 
   def test_coordinator_gen_xml(self):
-    coord = create_coordinator(self.wf, self.c)
+    coord = create_coordinator(self.wf, self.c, self.user)
 
     assert_true(
 """<coordinator-app name="MyCoord"
@@ -1236,7 +1240,7 @@ class TestEditor(OozieMockBase):
 
 
   def test_coordinator_with_data_input_gen_xml(self):
-    coord = create_coordinator(self.wf, self.c)
+    coord = create_coordinator(self.wf, self.c, self.user)
     create_dataset(coord, self.c)
     create_coordinator_data(coord, self.c)
 
@@ -1323,12 +1327,12 @@ class TestEditor(OozieMockBase):
 
 
   def test_create_coordinator_dataset(self):
-    coord = create_coordinator(self.wf, self.c)
+    coord = create_coordinator(self.wf, self.c, self.user)
     create_dataset(coord, self.c)
 
 
   def test_edit_coordinator_dataset(self):
-    coord = create_coordinator(self.wf, self.c)
+    coord = create_coordinator(self.wf, self.c, self.user)
     create_dataset(coord, self.c)
 
     response = self.c.post(reverse('oozie:edit_coordinator_dataset', args=[1]), {
@@ -1345,7 +1349,7 @@ class TestEditor(OozieMockBase):
     assert_equal(0, data['status'], data['status'])
 
   def test_create_coordinator_input_data(self):
-    coord = create_coordinator(self.wf, self.c)
+    coord = create_coordinator(self.wf, self.c, self.user)
     create_dataset(coord, self.c)
 
     create_coordinator_data(coord, self.c)
@@ -1379,7 +1383,7 @@ class TestEditor(OozieMockBase):
 
 
   def test_get_coordinator_parameters(self):
-    coord = create_coordinator(self.wf, self.c)
+    coord = create_coordinator(self.wf, self.c, self.user)
 
     create_dataset(coord, self.c)
     create_coordinator_data(coord, self.c)
@@ -1410,7 +1414,7 @@ class TestEditor(OozieMockBase):
     data = WORKFLOW_DICT.copy()
     data['description'] = [u'"><script>alert(1);</script>']
 
-    self.wf = create_workflow(self.c, workflow_dict=data)
+    self.wf = create_workflow(self.c, self.user, workflow_dict=data)
 
     resp = self.c.get('/oozie/list_workflows/')
     assert_false('"><script>alert(1);</script>' in resp.content, resp.content)
@@ -1427,7 +1431,7 @@ class TestEditor(OozieMockBase):
                   response.context['params_form'].initial)
 
   def test_submit_coordinator(self):
-    coord = create_coordinator(self.wf, self.c)
+    coord = create_coordinator(self.wf, self.c, self.user)
 
     # Check param popup, SLEEP is set by coordinator so not shown in the popup
     response = self.c.get(reverse('oozie:submit_coordinator', args=[coord.id]))
@@ -1437,12 +1441,12 @@ class TestEditor(OozieMockBase):
                   response.context['params_form'].initial)
 
   def test_trash_workflow(self):
-    previous_trashed = len(Workflow.objects.trashed())
-    previous_available = len(Workflow.objects.available())
+    previous_trashed = Document.objects.trashed_docs(Workflow, self.user).count()
+    previous_available = Document.objects.available_docs(Workflow, self.user).count()
     response = self.c.post(reverse('oozie:delete_workflow'), {'job_selection': [self.wf.id]}, follow=True)
     assert_equal(200, response.status_code, response)
-    assert_equal(previous_trashed + 1, len(Workflow.objects.trashed()))
-    assert_equal(previous_available - 1, len(Workflow.objects.available()))
+    assert_equal(previous_trashed + 1, Document.objects.trashed_docs(Workflow, self.user).count())
+    assert_equal(previous_available - 1, Document.objects.available_docs(Workflow, self.user).count())
 
 
 class TestEditorBundle(OozieMockBase):
@@ -1453,20 +1457,18 @@ class TestEditorBundle(OozieMockBase):
 
 
   def test_create_bundle(self):
-    create_bundle(self.c)
+    create_bundle(self.c, self.user)
 
 
   def test_clone_bundle(self):
-    bundle = create_bundle(self.c)
-    bundle_count = Bundle.objects.available().count()
+    bundle = create_bundle(self.c, self.user)
+    bundle_count = Document.objects.available_docs(Bundle, self.user).count()
 
     response = self.c.post(reverse('oozie:clone_bundle', args=[bundle.id]), {}, follow=True)
 
     bundle2 = Bundle.objects.latest('id')
     assert_not_equal(bundle.id, bundle2.id)
-    assert_equal(bundle_count + 1, Bundle.objects.available().count(), response)
-
-    assert_equal(bundle.coordinators.count(), bundle.coordinators.all().count())
+    assert_equal(bundle_count + 1, Document.objects.available_docs(Bundle, self.user).count(), response)
 
     coord_ids = set(bundle.coordinators.values_list('id', flat=True))
     coord2_ids = set(bundle2.coordinators.values_list('id', flat=True))
@@ -1479,20 +1481,20 @@ class TestEditorBundle(OozieMockBase):
 
     # Bulk delete
     response = self.c.post(reverse('oozie:delete_bundle'), {'job_selection': [bundle.id, bundle2.id]}, follow=True)
-    assert_equal(bundle_count - 1, Bundle.objects.available().count(), response)
+    assert_equal(bundle_count - 1, Document.objects.available_docs(Bundle, self.user).count(), response)
 
 
   def test_delete_bundle(self):
-    bundle = create_bundle(self.c)
-    bundle_count = Bundle.objects.available().count()
+    bundle = create_bundle(self.c, self.user)
+    bundle_count = Document.objects.available_docs(Bundle, self.user).count()
 
     response = self.c.post(reverse('oozie:delete_bundle'), {'job_selection': [bundle.id]}, follow=True)
 
-    assert_equal(bundle_count - 1, Bundle.objects.available().count(), response)
+    assert_equal(bundle_count - 1, Document.objects.available_docs(Bundle, self.user).count(), response)
 
 
   def test_bundle_gen_xml(self):
-    bundle = create_bundle(self.c)
+    bundle = create_bundle(self.c, self.user)
 
     assert_true(
 """<bundle-app name="MyBundle"
@@ -1512,8 +1514,8 @@ class TestEditorBundle(OozieMockBase):
 
 
   def test_create_bundled_coordinator(self):
-    bundle = create_bundle(self.c)
-    coord = create_coordinator(self.wf, self.c)
+    bundle = create_bundle(self.c, self.user)
+    coord = create_coordinator(self.wf, self.c, self.user)
 
     post = {
         u'name': [u'test2'], u'kick_off_time_0': [u'02/12/2013'], u'kick_off_time_1': [u'05:05 PM'],
@@ -1900,7 +1902,7 @@ class TestPermissions(OozieBase):
 
   def setUp(self):
     self.c = make_logged_in_client()
-    self.wf = create_workflow(self.c)
+    self.wf = create_workflow(self.c, self.user)
     self.setup_simple_workflow()
 
   def tearDown(self):
@@ -2035,7 +2037,7 @@ class TestPermissions(OozieBase):
   def test_coordinator_permissions(self):
     raise SkipTest
 
-    coord = create_coordinator(self.wf, self.c)
+    coord = create_coordinator(self.wf, self.c, self.user)
 
     response = self.c.get(reverse('oozie:edit_coordinator', args=[coord.id]))
     assert_true('Editor' in response.content, response.content)
@@ -2182,7 +2184,7 @@ class TestPermissions(OozieBase):
     assert_equal(200, response.status_code)
 
   def test_bundle_permissions(self):
-    bundle = create_bundle(self.c)
+    bundle = create_bundle(self.c, self.user)
 
     response = self.c.get(reverse('oozie:edit_bundle', args=[bundle.id]))
     assert_true('Editor' in response.content, response.content)
@@ -2314,7 +2316,7 @@ class TestEditorWithOozie(OozieBase):
     OozieBase.setUp(self)
 
     self.c = make_logged_in_client()
-    self.wf = create_workflow(self.c)
+    self.wf = create_workflow(self.c, self.user)
     self.setup_simple_workflow()
 
 
@@ -2333,11 +2335,11 @@ class TestEditorWithOozie(OozieBase):
 
 
   def test_clone_workflow(self):
-    workflow_count = Workflow.objects.available().count()
+    workflow_count = Document.objects.available_docs(Workflow, self.user).count()
 
     response = self.c.post(reverse('oozie:clone_workflow', args=[self.wf.id]), {}, follow=True)
 
-    assert_equal(workflow_count + 1, Workflow.objects.available().count(), response)
+    assert_equal(workflow_count + 1, Document.objects.available_docs(Workflow, self.user).count(), response)
 
     wf2 = Workflow.objects.latest('id')
     assert_not_equal(self.wf.id, wf2.id)
@@ -2352,11 +2354,11 @@ class TestEditorWithOozie(OozieBase):
 
     # Bulk delete
     response = self.c.post(reverse('oozie:delete_workflow'), {'job_selection': [self.wf.id, wf2.id]}, follow=True)
-    assert_equal(workflow_count - 1, Workflow.objects.available().count(), response)
+    assert_equal(workflow_count - 1, Document.objects.available_docs(Workflow, self.user).count(), response)
 
 
   def test_import_workflow(self):
-    workflow_count = Workflow.objects.available().count()
+    workflow_count = Document.objects.available_docs(Workflow, self.user).count()
 
     # Create
     filename = os.path.abspath(os.path.dirname(__file__) + "/test_data/0.4/test-mapreduce.xml")
@@ -2372,14 +2374,14 @@ class TestEditorWithOozie(OozieBase):
       'description': ['']
     }, follow=True)
     fh.close()
-    assert_equal(workflow_count + 1, Workflow.objects.available().count(), response)
+    assert_equal(workflow_count + 1, Document.objects.available_docs(Workflow, self.user).count(), response)
 
   def test_delete_workflow(self):
-    previous_trashed = len(Workflow.objects.trashed())
+    previous_trashed = Document.objects.trashed_docs(Workflow, self.user).count()
     previous_available = len(Workflow.objects.all())
     response = self.c.post(reverse('oozie:delete_workflow') + "?skip_trash=true", {'job_selection': [self.wf.id]}, follow=True)
     assert_equal(200, response.status_code, response)
-    assert_equal(previous_trashed, len(Workflow.objects.trashed()))
+    assert_equal(previous_trashed, Document.objects.trashed_docs(Workflow, self.user).count())
     assert_equal(previous_available - 1, len(Workflow.objects.all()))
 
 
@@ -2389,7 +2391,7 @@ class TestImportWorkflow04WithOozie(OozieBase):
     OozieBase.setUp(self)
 
     self.c = make_logged_in_client()
-    self.wf = create_workflow(self.c)
+    self.wf = create_workflow(self.c, self.user)
     self.setup_simple_workflow()
 
     # in order to reference examples in Subworkflow, must be owned by current user.
@@ -2839,20 +2841,20 @@ class TestDashboard(OozieMockBase):
 
 
   def test_good_workflow_status_graph(self):
-    workflow_count = Workflow.objects.available().count()
+    workflow_count = Document.objects.available_docs(Workflow, self.user).count()
 
     response = self.c.get(reverse('oozie:list_oozie_workflow', args=[MockOozieApi.WORKFLOW_IDS[0]]), {})
 
     assert_true(response.context['workflow_graph'])
-    assert_equal(Workflow.objects.available().count(), workflow_count)
+    assert_equal(Document.objects.available_docs(Workflow, self.user).count(), workflow_count)
 
   def test_bad_workflow_status_graph(self):
-    workflow_count = Workflow.objects.available().count()
+    workflow_count = Document.objects.available_docs(Workflow, self.user).count()
 
     response = self.c.get(reverse('oozie:list_oozie_workflow', args=[MockOozieApi.WORKFLOW_IDS[1]]), {})
 
     assert_true(response.context['workflow_graph'] is None)
-    assert_equal(Workflow.objects.available().count(), workflow_count)
+    assert_equal(Document.objects.available_docs(Workflow, self.user).count(), workflow_count)
 
 
 class GeneralTestsWithOozie(OozieBase):
@@ -3001,19 +3003,28 @@ def add_node(workflow, name, node_type, parents, attrs={}):
   return node
 
 
-def create_workflow(client, workflow_dict=WORKFLOW_DICT):
+def create_workflow(client, user, workflow_dict=WORKFLOW_DICT):
   name = str(workflow_dict['name'][0])
 
   Node.objects.filter(workflow__name=name).delete()
   Workflow.objects.filter(name=name).delete()
 
-  workflow_count = Workflow.objects.available().count()
+  if Document.objects.get_docs(user, Workflow).filter(name=name).exists():
+    for doc in Document.objects.get_docs(user, Workflow).filter(name=name):
+      if doc.content_object:
+        client.post(reverse('oozie:delete_workflow') + '?skip_trash=true', {'job_selection': [doc.content_object.id]}, follow=True)
+      else:
+        doc.delete()
+
+  Document.objects.available_docs(Workflow, user).filter(name=name).delete()
+
+  workflow_count = Document.objects.available_docs(Workflow, user).count()
   response = client.get(reverse('oozie:create_workflow'))
-  assert_equal(workflow_count, Workflow.objects.available().count(), response)
+  assert_equal(workflow_count, Document.objects.available_docs(Workflow, user).count(), response)
 
   response = client.post(reverse('oozie:create_workflow'), workflow_dict, follow=True)
   assert_equal(200, response.status_code)
-  assert_equal(workflow_count + 1, Workflow.objects.available().count(), response)
+  assert_equal(workflow_count + 1, Document.objects.available_docs(Workflow, user).count())
 
   wf = Workflow.objects.get(name=name)
   assert_not_equal('', wf.deployment_dir)
@@ -3022,30 +3033,47 @@ def create_workflow(client, workflow_dict=WORKFLOW_DICT):
   return wf
 
 
-def create_coordinator(workflow, client):
-  coord_count = Coordinator.objects.available().count()
+def create_coordinator(workflow, client, user):
+  name = str(COORDINATOR_DICT['name'][0])
+
+  if Document.objects.get_docs(user, Coordinator).filter(name=name).exists():
+    for doc in Document.objects.get_docs(user, Coordinator).filter(name=name):
+      if doc.content_object:
+        client.post(reverse('oozie:delete_coordinator') + '?skip_trash=true', {'job_selection': [doc.content_object.id]}, follow=True)
+      else:
+        doc.delete()
+
+  coord_count = Document.objects.available_docs(Coordinator, user).count()
   response = client.get(reverse('oozie:create_coordinator'))
-  assert_equal(coord_count, Coordinator.objects.available().count(), response)
+  assert_equal(coord_count, Document.objects.available_docs(Coordinator, user).count(), response)
 
   post = COORDINATOR_DICT.copy()
   post['workflow'] = workflow.id
   response = client.post(reverse('oozie:create_coordinator'), post)
-  assert_equal(coord_count + 1, Coordinator.objects.available().count(), response)
+  assert_equal(coord_count + 1, Document.objects.available_docs(Coordinator, user).count(), response)
 
-  return Coordinator.objects.get(name='MyCoord')
+  return Coordinator.objects.get(name=name)
 
 
-def create_bundle(client):
-  if not Bundle.objects.available().filter(name='MyBundle').exists():
-    bundle_count = Bundle.objects.available().count()
-    response = client.get(reverse('oozie:create_bundle'))
-    assert_equal(bundle_count, Bundle.objects.available().count(), response)
+def create_bundle(client, user):
+  name = str(BUNDLE_DICT['name'][0])
 
-    post = BUNDLE_DICT.copy()
-    response = client.post(reverse('oozie:create_bundle'), post)
-    assert_equal(bundle_count + 1, Bundle.objects.available().count(), response)
+  if Document.objects.get_docs(user, Bundle).filter(name=name).exists():
+    for doc in Document.objects.get_docs(user, Bundle).filter(name=name):
+      if doc.content_object:
+        client.post(reverse('oozie:delete_bundle') + '?skip_trash=true', {'job_selection': [doc.content_object.id]}, follow=True)
+      else:
+        doc.delete()
 
-  return Bundle.objects.get(name='MyBundle')
+  bundle_count = Document.objects.available_docs(Bundle, user).count()
+  response = client.get(reverse('oozie:create_bundle'))
+  assert_equal(bundle_count, Document.objects.available_docs(Bundle, user).count(), response)
+
+  post = BUNDLE_DICT.copy()
+  response = client.post(reverse('oozie:create_bundle'), post)
+  assert_equal(bundle_count + 1, Document.objects.available_docs(Bundle, user).count(), response)
+
+  return Document.objects.available_docs(Bundle, user).get(name=name).content_object
 
 
 def create_dataset(coord, client):

@@ -18,11 +18,6 @@
 import logging
 import time
 
-try:
-  import json
-except ImportError:
-  import simplejson as json
-
 from nose.tools import assert_true, assert_false, assert_equal, assert_raises
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
