@@ -48,7 +48,7 @@ class TestMockedImpala:
 
   def test_basic_flow(self):
     response = self.client.get("/impala/")
-    assert_true(re.search('<li id="impalaIcon"\W+class="active', response.content), response.content)
+    assert_true(re.search('Cloudera Impala Query UI', response.content), response.content)
     assert_true('Query Editor' in response.content)
 
     response = self.client.get("/impala/execute/")
