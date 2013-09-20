@@ -28,7 +28,6 @@ from django.utils.translation import ugettext as _, ugettext_lazy as _t
 from desktop.lib.i18n import force_unicode
 from desktop.lib.exceptions_renderable import PopupException
 
-from useradmin.models import get_default_user_group
 from desktop import appmanager
 
 
@@ -413,6 +412,7 @@ class Document(models.Model):
 class DocumentPermissionManager(models.Manager):
 
   def share_to_default(self, document):
+    from useradmin.models import get_default_user_group # Remove build dependency
     perm, created = DocumentPermission.objects.get_or_create(doc=document)
     default_group = get_default_user_group()
 
