@@ -7,7 +7,7 @@ body {
 }
 
 a {
-    font-weight:normal; 
+    font-weight:normal;
     text-decoration:none;
 }
 
@@ -27,7 +27,7 @@ a:hover {
 
 /* paragraph links after sections.
    These aren't visible until hovering
-   over the <h> tag, then have a 
+   over the <h> tag, then have a
    "reverse video" effect over the actual
    link
  */
@@ -88,7 +88,7 @@ a.headerlink:hover {
 }
 
 #docs-top-navigation {
-  margin:10px 0px 10px 0px;
+  margin:10px 0 10px 0;
   line-height:1.2em;
 }
 
@@ -103,7 +103,7 @@ a.headerlink:hover {
 
 #docs-copyright {
     font-size:.85em;
-    padding:5px 0px;
+    padding:5px 0;
 }
 
 #docs-header h1,
@@ -190,7 +190,7 @@ a.headerlink:hover {
   color: #222222;
 }
 #docs-sidebar ul {
-  margin: 10px 10px 10px 0px;
+  margin: 10px 10px 10px 0;
   padding: 0;
   list-style: none outside none;
 }
@@ -249,11 +249,11 @@ a.headerlink:hover {
 }
 
 #docs-container pre {
-  background-color: #f0f0f0;  
+  background-color: #f0f0f0;
   border: solid 1px #ccc;
   box-shadow: 2px 2px 3px #DFDFDF;
   padding:10px;
-  margin: 5px 0px 5px 0px;
+  margin: 5px 0 5px 0;
   overflow:auto;
   line-height:1.3em;
 }
@@ -276,12 +276,12 @@ a.headerlink:hover {
   color:#990000;
   border:1px solid;
   padding:1px 2px 1px 2px;
-  margin:0px 10px 0px 15px;
+  margin:0px 10px 0 15px;
   float:right;
   line-height:1.2em;
 }
 
-#docs-container a.sql_link, 
+#docs-container a.sql_link,
 #docs-container .sql_link
 {
     text-decoration: none;
@@ -334,7 +334,7 @@ dl.exception > dt
 {
     background-color:#F0F0F0;
     margin:25px -10px 10px 10px;
-    padding: 0px 10px;
+    padding: 0 10px;
 }
 
 p.versionadded span.versionmodified,
@@ -395,7 +395,7 @@ tt {
 .go {color:#804049;}
 
 
-/* special "index page" sections 
+/* special "index page" sections
    with specific formatting
 */
 
@@ -412,7 +412,7 @@ div#sqlalchemy-documentation .rubric{
   border:1px solid #BFBFBF;
 }
 div#sqlalchemy-documentation a, div#sqlalchemy-documentation li {
-  padding:5px 0px;
+  padding:5px 0;
 }
 
 div#getting-started {

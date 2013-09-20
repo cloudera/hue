@@ -2,7 +2,7 @@
  * jQuery autocomplete
  ****************************************************************************/
 .ac_results {
-    padding: 0px;
+    padding: 0;
     border: 1px solid #ccc;
     background-color: #fff;
     overflow: hidden;
@@ -19,7 +19,7 @@
 }
 
 .ac_results li {
-    margin: 0px;
+    margin: 0;
     padding: 3px 5px;
     cursor: default;
     display: block;

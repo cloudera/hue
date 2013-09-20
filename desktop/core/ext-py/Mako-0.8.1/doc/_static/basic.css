@@ -297,7 +297,7 @@ div.admonition dl {
 }
 
 p.admonition-title {
-    margin: 0px 10px 5px 0px;
+    margin: 0 10px 5px 0;
     font-weight: bold;
 }
 
@@ -370,7 +370,7 @@ dl {
 }
 
 dd p {
-    margin-top: 0px;
+    margin-top: 0;
 }
 
 dd ul, dd table {
@@ -460,7 +460,7 @@ pre {
 }
 
 td.linenos pre {
-    padding: 5px 0px;
+    padding: 5px 0;
     border: 0;
     background-color: transparent;
     color: #aaa;

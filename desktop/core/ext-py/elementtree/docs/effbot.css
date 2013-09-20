@@ -3,7 +3,7 @@
 BODY {
     font: 100% Georgia, Times, serif;
     color: black;
-    margin: 0px 20px 0px 20px;
+    margin: 0 20px 0 20px;
 }
 
 #effbot-body {
@@ -18,17 +18,17 @@ BODY {
 
 .adsense {
     background: #f8fff8;
-    border: 1px solid #084; 
+    border: 1px solid #084;
     padding: 10px 4px 4px 4px;
 }
 
 .sidebar {
-    border: 1px solid #000; 
+    border: 1px solid #000;
     float: right; clear: right;
     width: 200px;
     background: white;
     padding: 10px;
-    margin: 0px -25px 10px 0px;
+    margin: 0 -25px 10px 0;
 }
 
 /* visual style */
@@ -39,7 +39,7 @@ P {
 
 CODE, PRE {
     font: 100% "Courier New", Courier, Monaco, monospace;
-    color: #042; margin-left: 20px; 
+    color: #042; margin-left: 20px;
 }
 
 H1, H2, H3 {
@@ -60,7 +60,7 @@ A:visited { color: #404040; }
 UL LI { list-style-type: square; }
 
 .title { margin-bottom: 2px; color: #084; }
-.info { font-size: 80%; color: #084; margin-top: 0px; }
+.info { font-size: 80%; color: #084; margin-top: 0; }
 
 .bluebox { color: #084; margin-top: 10px; }
 
@@ -69,7 +69,7 @@ UL LI { list-style-type: square; }
 .small { font-size: 80%; }
 .display { background: #eee; padding: 20px; }
 
-.note { 
+.note {
     background: #efe;
     border-top: 1px solid #084;
     border-bottom: 1px solid #084;
@@ -103,13 +103,13 @@ UL LI { list-style-type: square; }
     text-align: left;
     background: #cfc;
     border: 1px solid #084;
-    margin: 0px;
+    margin: 0;
     padding: 1px 5px;
 }
 
 .simpletable TD {
     border: 1px solid #084;
-    margin: 0px;
+    margin: 0;
     padding: 5px;
 }
 

@@ -17,7 +17,7 @@ body {
 @media print {
     div.document, div.footer {
         width: auto;
-        padding-left: 0px;
+        padding-left: 0;
     }
 
     div.sidemenu {
@@ -42,7 +42,7 @@ div.footer {
 /*** TOC ***/
 
 div.contents.topic ul {
-    margin-top: 0px;
+    margin-top: 0;
 }
 
 div.contents.topic ul > li {
@@ -58,8 +58,8 @@ div.contents.topic > p > a {
 
 div.sidemenu {
     position: absolute;
-    top: 0px;
-    left: 0px;
+    top: 0;
+    left: 0;
     width: 24em;
     font-size: 10px;
     text-align: left;
@@ -101,7 +101,7 @@ div.sidemenu ul.menu.foreign li.menu:hover ul.submenu {
     position: absolute;
     border: groove #990000;
     padding: 1ex 1ex 1ex 3ex;
-    margin-top: 0px;
+    margin-top: 0;
     margin-left: 4em;
     margin-right: -20em;
     color: #990000;
@@ -225,8 +225,8 @@ div.eyecatcher, p.eyecatcher {
 
 div.pagequote {
     position: absolute;
-    top: 0px;
-    right: 0px;
+    top: 0;
+    right: 0;
     padding: 10px 10px 0 0;
     text-align: right;
     font-size: 80%;
