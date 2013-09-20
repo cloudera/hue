@@ -1,14 +1,14 @@
-/* 
+/*
 	${app_name} styles
 	important: these should be namespaced
 	example:
 		let's say you are creating an app called "calculator"; you should prefix all your styles with your application's name like so
-		
+
 		.calculator img {
 			border: 1px solid #000;
 		}
 		.calculator p {
-			margin: 10px 0px;
+			margin: 10px 0;
 		}
 		etc...
 
