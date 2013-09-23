@@ -62,6 +62,11 @@ SSL_PRIVATE_KEY = Config(
   help=_("Filename of SSL RSA Private Key"),
   default=None)
 
+SSL_CIPHER_LIST = Config(
+  key="ssl_cipher_list",
+  help=_("List of allowed and disallowed ciphers"),
+  default="DEFAULT:!aNULL:!eNULL:!LOW:!EXPORT:!SSLv2")
+
 ENABLE_SERVER = Config(
   key="enable_server",
   help=_("If set to false, runcpserver will not actually start the web server.  Used if Apache is being used as a WSGI container."),
