@@ -54,6 +54,19 @@ class Settings(models.Model):
 
 class DocumentTagManager(models.Manager):
 
+  def get_tags(self, user):
+    # For now, the only shared tag is from 'sample' user and is named 'example'
+    # Tag permissions will come later.
+    tags = Document.objects.documents(user)
+
+    try:
+      sample_user = auth_models.User.objects.get(username='sample')
+      tags = tags.filter(Q(owner=user) | Q(owner=sample_user, tags__tag='example'))
+    except Exception, e:
+      tags = filter(owner=user)
+
+    return tags.values('tags__id', 'tags__tag').distinct()
+
   def create_tag(self, owner, tag_name):
     if tag_name in DocumentTag.RESERVED:
       raise Exception(_("Can't add %s: it is a reserved tag.") % tag_name)
@@ -71,6 +84,10 @@ class DocumentTagManager(models.Manager):
 
   def get_history_tag(self, user):
     tag, created = DocumentTag.objects.get_or_create(owner=user, tag=DocumentTag.HISTORY)
+    return tag
+
+  def get_example_tag(self, user):
+    tag, created = DocumentTag.objects.get_or_create(owner=user, tag=DocumentTag.EXAMPLE)
     return tag
 
   def tag(self, owner, doc_id, tag_name='', tag_id=None):
@@ -131,8 +148,9 @@ class DocumentTag(models.Model):
   DEFAULT = 'default' # Always there
   TRASH = 'trash' # There when the document is trashed
   HISTORY = 'history' # There when the document is a submission history
+  EXAMPLE = 'example' # Hue examples
 
-  RESERVED = (DEFAULT, TRASH, HISTORY)
+  RESERVED = (DEFAULT, TRASH, HISTORY, EXAMPLE)
 
   objects = DocumentTagManager()
   unique_together = ('owner', 'tag')
@@ -234,7 +252,7 @@ class DocumentManager(models.Manager):
 
         if not job.doc.exists():
           doc = Document.objects.link(job, owner=job.owner, name=job.name, description=job.description)
-          tag = DocumentTag.objects.get_default_tag(user=job.owner)
+          tag = DocumentTag.objects.get_example_tag(user=job.owner)
           doc.tags.add(tag)
           if job.is_trashed:
             doc.send_to_trash()
@@ -259,7 +277,7 @@ class DocumentManager(models.Manager):
 
         if not job.doc.exists():
           doc = Document.objects.link(job, owner=job.owner, name=job.name, description=job.desc, extra=job.type)
-          tag = DocumentTag.objects.get_default_tag(user=job.owner)
+          tag = DocumentTag.objects.get_example_tag(user=job.owner)
           doc.tags.add(tag)
           if job.is_trashed:
             doc.send_to_trash()
@@ -278,17 +296,27 @@ class DocumentManager(models.Manager):
 
         if not job.doc.exists():
           doc = Document.objects.link(job, owner=job.owner, name=job.dict['name'], description='')
-          tag = DocumentTag.objects.get_default_tag(user=job.owner)
+          tag = DocumentTag.objects.get_example_tag(user=job.owner)
           doc.tags.add(tag)
         if job.owner.username == 'sample':
           job.doc.get().share_to_default()
     except Exception, e:
       LOG.warn(force_unicode(e))
 
+    # Make sure doc have at least a tag
     try:
       for doc in Document.objects.filter(tags=None):
         default_tag = DocumentTag.objects.get_default_tag(doc.owner)
-        doc.tags.add(default_tag)      
+        doc.tags.add(default_tag)
+    except Exception, e:
+      LOG.warn(force_unicode(e))
+
+    # For now remove the default tag from the examples
+    try:
+      for doc in Document.objects.filter(tags__tag=DocumentTag.EXAMPLE):
+        print doc
+        default_tag = DocumentTag.objects.get_default_tag(doc.owner)
+        doc.tags.remove(default_tag)
     except Exception, e:
       LOG.warn(force_unicode(e))
 

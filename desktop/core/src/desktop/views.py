@@ -49,8 +49,8 @@ LOG = logging.getLogger(__name__)
 
 
 def home(request):
-  docs = Document.objects.get_docs(request.user).order_by('-last_modified')[:100]
-  tags = DocumentTag.objects.filter(owner=request.user)
+  docs = Document.objects.get_docs(request.user).order_by('-last_modified')[:1000]
+  tags = DocumentTag.objects.get_tags(user=request.user)
 
   apps = appmanager.get_apps_dict(request.user)
 
@@ -64,21 +64,18 @@ def home(request):
 
 
 def list_docs(request):
-  docs = Document.objects.get_docs(request.user).order_by('-last_modified')[:100]
+  docs = Document.objects.get_docs(request.user).order_by('-last_modified')[:1000]
   return HttpResponse(json.dumps(massaged_documents_for_json(docs)), mimetype="application/json")
 
 
 def list_tags(request):
-  tags = DocumentTag.objects.filter(owner=request.user)
+  tags = DocumentTag.objects.get_tags(user=request.user)
   return HttpResponse(json.dumps(massaged_tags_for_json(tags, request.user)), mimetype="application/json")
 
 
 def massaged_documents_for_json(documents):
-  docs = []
-  for doc in documents:
-    docs.append(massage_doc_for_json(doc))
+  return [massage_doc_for_json(doc) for doc in documents]
 
-  return docs
 
 def massage_doc_for_json(doc):
   perms = doc.list_permissions()
@@ -105,12 +102,14 @@ def massaged_tags_for_json(tags, user):
   ts = []
   trash = DocumentTag.objects.get_trash_tag(user)
   history = DocumentTag.objects.get_history_tag(user)
+
   for tag in tags:
     massaged_tag = {
-      'id': tag.id,
-      'name': tag.tag,
-      'isTrash': tag.id == trash.id,
-      'isHistory': tag.id == history.id
+      'id': tag['tags__id'],
+      'name': tag['tags__tag'],
+      'isTrash': tag['tags__id'] == trash.id,
+      'isHistory': tag['tags__id'] == history.id,
+      'isExample': tag['tags__tag'] == DocumentTag.EXAMPLE
     }
     ts.append(massaged_tag)
 
