@@ -1508,6 +1508,7 @@ class CherryPyWSGIServer(object):
     # Paths to certificate and private key files
     ssl_certificate = None
     ssl_private_key = None
+    ssl_cipher_list = "DEFAULT:!aNULL:!eNULL:!LOW:!EXPORT:!SSLv2"
     
     def __init__(self, bind_addr, wsgi_app, numthreads=10, server_name=None,
                  max=-1, request_queue_size=5, timeout=10, shutdown_timeout=5):
@@ -1663,6 +1664,7 @@ class CherryPyWSGIServer(object):
             
             # See http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/442473
             ctx = SSL.Context(SSL.SSLv23_METHOD)
+            ctx.set_cipher_list(self.ssl_cipher_list)
             ctx.use_privatekey_file(self.ssl_private_key)
             ctx.use_certificate_file(self.ssl_certificate)
             self.socket = SSLConnection(ctx, self.socket)

@@ -39,7 +39,8 @@ CPSERVER_OPTIONS = {
   'server_user': conf.SERVER_USER.get(),
   'server_group': conf.SERVER_GROUP.get(),
   'ssl_certificate': conf.SSL_CERTIFICATE.get(),
-  'ssl_private_key': conf.SSL_PRIVATE_KEY.get()
+  'ssl_private_key': conf.SSL_PRIVATE_KEY.get(),
+  'ssl_cipher_list': conf.SSL_CIPHER_LIST.get()
 }
 
 
@@ -80,7 +81,8 @@ def start_server(options):
     )
     if options['ssl_certificate'] and options['ssl_private_key']:
         server.ssl_certificate = options['ssl_certificate']
-        server.ssl_private_key = options['ssl_private_key']  
+        server.ssl_private_key = options['ssl_private_key']
+        server.ssl_cipher_list = options['ssl_cipher_list']
     try:
         server.bind_server()
         drop_privileges_if_necessary(options)
