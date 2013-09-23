@@ -24,6 +24,7 @@ from desktop.lib.django_test_util import make_logged_in_client
 from beeswax.models import SavedQuery, QueryHistory
 from beeswax.server import dbms
 from beeswax.design import hql_query
+from desktop.models import Document
 
 
 class MockDbms:
@@ -95,4 +96,7 @@ def create_saved_query(app_name, owner):
     design.data = hql_query('show $tables', database='db1').dumps()
     design.is_auto = False
     design.save()
+
+    Document.objects.link(design, owner=design.owner, extra=design.type, name=design.name, description=design.desc)
+
     return design
