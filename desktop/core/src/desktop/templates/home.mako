@@ -126,9 +126,9 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
            </li>
           <li class="nav-header tag-header">${_('Tags')} <div id="editTags" style="display: inline;cursor: pointer;margin-left: 6px" title="${ _('Edit tags') }"><i class="icon-tags"></i></div> </li>
           % for tag in tags:
-            %if tag.tag != "trash" and tag.tag != "history":
-            <li class="toggleTag white" data-tag="${ tag.tag }"><div class="hueCheckbox pull-left"></div>${ tag.tag }</li>
-            %endif
+            % if tag['tags__tag'] not in ('trash', 'history'):
+            <li class="toggleTag white" data-tag="${ tag['tags__tag'] }"><div class="hueCheckbox pull-left"></div>${ tag['tags__tag'] }</li>
+            % endif
           % endfor
 
         </ul>
@@ -392,7 +392,7 @@ $(document).ready(function () {
   function renderTags() {
     $(".toggleTag").remove();
     for (var i = JSON_TAGS.length - 1; i >= 0; i--) {
-      if (!JSON_TAGS[i].isTrash && !JSON_TAGS[i].isHistory) {
+      if (!JSON_TAGS[i].isTrash && !JSON_TAGS[i].isHistory && !JSON_TAGS[i].isExample) {
         var _t = $("<li>").addClass("toggleTag").addClass("white");
         _t.data("tag", JSON_TAGS[i].name);
         _t.html('<div class="hueCheckbox pull-left"></div>' + JSON_TAGS[i].name);
@@ -404,7 +404,7 @@ $(document).ready(function () {
   function renderTagsModal() {
     var _tags = "";
     for (var i = 0; i < JSON_TAGS.length; i++) {
-      if (!JSON_TAGS[i].isTrash && !JSON_TAGS[i].isHistory) {
+      if (!JSON_TAGS[i].isTrash && !JSON_TAGS[i].isHistory && !JSON_TAGS[i].isExample) {
         _tags += '<div style="margin-right:10px;margin-bottom: 6px;float:left;"><span class="tagsModalCheckbox badge" data-value="' + JSON_TAGS[i].id + '"><i class="icon-trash hide"></i> ' + JSON_TAGS[i].name + '</span></div>';
       }
     }
@@ -418,7 +418,7 @@ $(document).ready(function () {
       $("#documentTagsModalName").text(_doc.name);
       var _tags = "";
       for (var i = 0; i < JSON_TAGS.length; i++) {
-        if (!JSON_TAGS[i].isTrash && !JSON_TAGS[i].isHistory) {
+        if (!JSON_TAGS[i].isTrash && !JSON_TAGS[i].isHistory && !JSON_TAGS[i].isExample) {
           var _inTags = isInTags(_doc, JSON_TAGS[i].name);
           _tags += '<div style="margin-right:10px;margin-bottom: 6px;float:left;"><span class="documentTagsModalCheckbox badge' + (_inTags ? ' badge-info selected' : '') + '" data-value="' + JSON_TAGS[i].id + '"><i class="icon-ok-sign' + (_inTags ? '' : ' hide') + '"></i> ' + JSON_TAGS[i].name + '</span></div>';
         }
