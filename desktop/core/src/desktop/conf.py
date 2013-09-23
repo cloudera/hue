@@ -23,7 +23,8 @@ import stat
 from django.utils.translation import ugettext_lazy as _
 
 from desktop.lib.conf import Config, ConfigSection, UnspecifiedConfigSection
-from desktop.lib.conf import coerce_bool, validate_path
+from desktop.lib.conf import coerce_bool, coerce_csv, validate_path
+from desktop.lib.i18n import force_unicode
 from desktop.lib.paths import get_desktop_root
 
 
@@ -44,6 +45,13 @@ HTTP_PORT = Config(
   help=_("HTTP port to bind to."),
   type=int,
   default=8888)
+
+HTTP_ALLOWED_METHODS = Config(
+  key="http_allowed_methods",
+  help=_("HTTP methods the server will be allowed to service."),
+  type=coerce_csv,
+  private=True,
+  default=['OPTIONS', 'GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT'])
 
 SSL_CERTIFICATE = Config(
   key="ssl_certificate",

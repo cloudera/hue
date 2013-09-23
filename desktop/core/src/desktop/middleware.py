@@ -27,6 +27,7 @@ from django.contrib.auth import REDIRECT_FIELD_NAME, BACKEND_SESSION_KEY, authen
 from django.contrib.auth.middleware import RemoteUserMiddleware
 from django.core import exceptions, urlresolvers
 import django.db
+from django.http import HttpResponseNotAllowed
 from django.core.urlresolvers import resolve
 from django.http import HttpResponseRedirect, HttpResponse
 from django.utils.importlib import import_module
@@ -625,3 +626,11 @@ class HueRemoteUserMiddleware(RemoteUserMiddleware):
     if not 'RemoteUserDjangoBackend' in desktop.conf.AUTH.BACKEND.get():
       LOG.info('Unloading HueRemoteUserMiddleware')
       raise exceptions.MiddlewareNotUsed
+
+class EnsureSafeMethodMiddleware(object):
+  """
+  Middleware to white list configured HTTP request methods.
+  """
+  def process_request(self, request):
+    if request.method not in desktop.conf.HTTP_ALLOWED_METHODS.get():
+      return HttpResponseNotAllowed(desktop.conf.HTTP_ALLOWED_METHODS.get())
