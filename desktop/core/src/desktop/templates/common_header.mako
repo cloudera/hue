@@ -239,7 +239,7 @@ from django.utils.translation import ugettext as _
   </div>
     <a class="brand nav-tooltip pull-left" title="${_('About Hue')}" href="/about"><img src="/static/art/hue-logo-mini-white.png" data-orig="/static/art/hue-logo-mini-white.png" data-hover="/static/art/hue-logo-mini-white-hover.png"/></a>
      <ul class="nav nav-pills pull-left">
-       <li><a title="${_('My documents')}" href="/home"><i class="icon-home" style="font-size: 19px"></i></a></li>
+       <li><a title="${_('My documents')}" href="/home" style="padding-bottom:2px!important"><i class="icon-home" style="font-size: 19px"></i></a></li>
        <li class="dropdown">
          <a title="${_('Query data')}" href="#" data-toggle="dropdown" class="dropdown-toggle">${_('Query Editors')} <b class="caret"></b></a>
          <ul role="menu" class="dropdown-menu">
