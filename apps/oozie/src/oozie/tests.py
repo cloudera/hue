@@ -2890,7 +2890,7 @@ class TestUtils(OozieMockBase):
     OozieMockBase.setUp(self)
 
     # When updating wf, update wf_json as well!
-    self.wf = Workflow.objects.get(name='wf-name-1', managed=True)
+    self.wf = Document.objects.get_docs(self.user, Workflow).get(name='wf-name-1').content_object
 
 
   def test_workflow_to_dict(self):
@@ -3030,7 +3030,7 @@ def create_workflow(client, user, workflow_dict=WORKFLOW_DICT):
   assert_equal(200, response.status_code)
   assert_equal(workflow_count + 1, Document.objects.available_docs(Workflow, user).count())
 
-  wf = Workflow.objects.get(name=name)
+  wf = Document.objects.get_docs(user, Workflow).get(name=name).content_object
   assert_not_equal('', wf.deployment_dir)
   assert_true(wf.managed)
 
@@ -3056,7 +3056,7 @@ def create_coordinator(workflow, client, user):
   response = client.post(reverse('oozie:create_coordinator'), post)
   assert_equal(coord_count + 1, Document.objects.available_docs(Coordinator, user).count(), response)
 
-  return Coordinator.objects.get(name=name)
+  return Document.objects.available_docs(Coordinator, user).get(name=name).content_object
 
 
 def create_bundle(client, user):

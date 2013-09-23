@@ -15,10 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-try:
-    import json
-except ImportError:
-    import simplejson as json
+
+import json
 import logging
 import re
 import time
@@ -30,12 +28,13 @@ from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_false, assert_equal
 
 from desktop.lib.django_test_util import make_logged_in_client
-from desktop.lib.test_utils import grant_access
+from desktop.lib.test_utils import grant_access, add_to_group
 from hadoop import cluster
 from hadoop.conf import YARN_CLUSTERS
 from hadoop.yarn import resource_manager_api, mapreduce_api, history_server_api
 from liboozie.oozie_api_test import OozieServerProvider
 from oozie.models import Workflow
+from useradmin.models import get_default_user_group
 
 from jobbrowser import models, views
 from jobbrowser.conf import SHARE_JOBS
@@ -96,6 +95,7 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
     grant_access(self.username, 'test', 'jobsub')
     grant_access(self.username, 'test', 'jobbrowser')
     grant_access(self.username, 'test', 'oozie')
+    add_to_group(self.username, get_default_user_group().name)
 
     self.prev_user = self.cluster.fs.user
     self.cluster.fs.setuser(self.username)
