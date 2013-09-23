@@ -17,6 +17,7 @@
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_permission
+import desktop.conf
 
 from nose.tools import assert_equal
 
@@ -65,3 +66,22 @@ def test_view_perms():
 
   response = c.get("/useradmin/users/edit/user") # Can access his profile page
   assert_equal(200, response.status_code, response.content)
+
+
+def test_ensure_safe_method_middleware():
+  try:
+    # Super user
+    c = make_logged_in_client()
+
+    # GET works
+    response = c.get("/useradmin/")
+    assert_equal(200, response.status_code)
+
+    # Disallow GET
+    done = desktop.conf.HTTP_ALLOWED_METHODS.set_for_testing([])
+
+    # GET should not work because allowed methods is empty.
+    response = c.get("/useradmin/")
+    assert_equal(405, response.status_code)
+  finally:
+    done()

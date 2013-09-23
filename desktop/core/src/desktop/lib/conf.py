@@ -81,7 +81,7 @@ GLOBAL_CONFIG = None
 
 LOG = logging.getLogger(__name__)
 
-__all__ = ["UnspecifiedConfigSection", "ConfigSection", "Config", "load_confs", "coerce_bool"]
+__all__ = ["UnspecifiedConfigSection", "ConfigSection", "Config", "load_confs", "coerce_bool", "coerce_csv"]
 
 class BoundConfig(object):
   def __init__(self, config, bind_to, grab_key=_ANONYMOUS, prefix=''):
@@ -611,6 +611,13 @@ def coerce_bool(value):
   if upper in ("TRUE", "1", "YES", "ON", "YEA"):
     return True
   raise Exception("Could not coerce %r to boolean value" % (value,))
+
+def coerce_csv(value):
+  if isinstance(value, str):
+    return value.split(',')
+  elif isinstance(value, list):
+    return value
+  raise Exception("Could not coerce %r to csv array." % value)
 
 
 def validate_path(confvar, is_dir=None, fs=os.path, message='Path does not exist on the filesystem.'):
