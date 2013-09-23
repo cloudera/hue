@@ -1,0 +1,20 @@
+<link rel="stylesheet" href="docbook.css" type="text/css" media="screen" title="no title" charset="utf-8"></link>
+
+<h1>Hue 2 User Guide</h1>
+<ul>
+<li><a href="introducing.html">Introducing Hue</a></li>
+<li><a href="about.html">About Hue</a></li>
+<li><a href="beeswax.html">Beeswax</a></li>
+<li><a href="impala.html">Cloudera Impala Query UI</a></li>
+<li><a href="pig.html">Pig Editor</a></li>
+<li><a href="filebrowser.html">File Browser</a></li>
+<li><a href="metastore_manager.html">Metastore Manager</a></li>
+<li><a href="sqoop.html">Sqoop UI</a></li>
+<li><a href="jobbrowser.html">Job Browser</a></li>
+<li><a href="jobdesigner.html">Job Designer</a></li>
+<li><a href="oozie.html">Oozie Editor and Dashboard</a></li>
+<li><a href="search.html">Solr Search</a></li>
+<li><a href="shell.html">Hue Shell</a></li>
+<li><a href="hbase.html">HBase Browser</a></li>
+<li><a href="admin.html">User Admin</a></li>
+</ul>
