@@ -707,7 +707,10 @@ class Mapreduce(Action):
     return json.loads(self.job_properties)
 
   def get_files(self):
-    return json.loads(self.files)
+    files = json.loads(self.files)
+    if self.jar_path:
+      files.insert(0, self.jar_path)
+    return files
 
   def get_archives(self):
     return json.loads(self.archives)
@@ -780,7 +783,10 @@ class Java(Action):
     return json.loads(self.job_properties)
 
   def get_files(self):
-    return json.loads(self.files)
+    files = json.loads(self.files)
+    if self.jar_path:
+      files.insert(0, self.jar_path)
+    return files
 
   def get_archives(self):
     return json.loads(self.archives)
