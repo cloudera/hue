@@ -67,15 +67,44 @@ var PigScript = function (pigScript) {
   self.getParameters = function () {
     var params = {};
     var variables = this.script().match(/\$\D(\w*)/g);
+    var macro_defines = this.script().match(/define [^ ]+ \(([^\)]*)\)/gi); // no multiline
+    var macro_returns = this.script().match(/returns +([^\{]*)/gi); // no multiline
+
     if (variables) {
       $.each(variables, function(index, param) {
         var p = param.substring(1);
         params[p] = '';
       });
     }
+    if (macro_defines) {
+      $.each(macro_defines, function(index, params_line) {
+        var param_line = params_line.match(/(\w+)/g);
+        if (param_line && param_line.length > 2) {
+          $.each(param_line, function(index, param) {
+            if (index >= 2) { // Skips define NAME
+              delete params[param];
+            }
+          });
+        }
+      });
+    }
+    if (macro_returns) {
+      $.each(macro_returns, function(index, params_line) {
+        var param_line = params_line.match(/(\w+)/g);
+        if (param_line) {
+          $.each(param_line, function(index, param) {
+            if (index >= 1) { // Skip returns
+              delete params[param];
+            }
+          });
+        }
+      });
+    }
+
     $.each(self.parameters(), function(index, param) {
-        params[param.name()] = param.value();
+      params[param.name()] = param.value();
     });
+
     return params;
   };
 
