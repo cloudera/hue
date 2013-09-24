@@ -900,6 +900,7 @@ def autocomplete(request, database=None, table=None):
     else:
       t = db.get_table(database, table)
       response['columns'] = [column.name for column in t.cols]
+      response['extended_columns'] = massage_columns_for_json(t.cols)
   except TTransportException, tx:
     response['code'] = 503
     response['error'] = tx.message
@@ -915,6 +916,17 @@ def autocomplete(request, database=None, table=None):
 """
 Utils
 """
+
+def massage_columns_for_json(cols):
+  massaged_cols = []
+  for column in cols:
+    massaged_cols.append({
+      'name': column.name,
+      'type': column.type,
+      'comment': column.comment
+    })
+  return massaged_cols
+
 
 # owner_only is deprecated
 def authorized_get_design(request, design_id, owner_only=False, must_exist=False):

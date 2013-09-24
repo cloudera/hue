@@ -61,7 +61,7 @@ ${layout.menubar(section='query')}
 
 <div class="container-fluid">
   <div class="row-fluid">
-    <div class="span3">
+    <div class="span2">
       <form id="advancedSettingsForm" action="${action}" method="POST" class="form form-horizontal">
         <div class="sidebar-nav">
           <ul class="nav nav-list">
@@ -255,7 +255,7 @@ ${layout.menubar(section='query')}
                 </form>
         </div>
 
-        <div id="querySide" class="span9">
+        <div id="querySide" class="span8">
           <div class="card card-small">
             % if on_success_url:
               <input type="hidden" name="on_success_url" value="${on_success_url}"/>
@@ -331,6 +331,23 @@ ${layout.menubar(section='query')}
             </div>
         </div>
     </div>
+
+    <div class="span2" id="navigator">
+      <div class="card card-small">
+        <a href="#" title="${_('Double click on a table name or field to insert it in the editor')}" rel="tooltip" data-placement="left" class="pull-right" style="margin:10px"><i class="icon-question-sign"></i></a>
+        <h1 class="card-heading simple">${_('Navigator')}</h1>
+        <div class="card-body">
+          <p>
+            <input id="navigatorSearch" type="text" class="input-medium" placeholder="${ _('Table name...') }"/>
+            <ul id="navigatorTables" class="unstyled"></ul>
+            <div id="navigatorLoader">
+              <!--[if !IE]><!--><i class="icon-spinner icon-spin" style="font-size: 20px; color: #DDD"></i><!--<![endif]-->
+              <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+            </div>
+          </p>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -372,6 +389,24 @@ ${layout.menubar(section='query')}
     <div class="modal-footer">
         <button class="btn" data-dismiss="modal">${_('Cancel')}</button>
         <button id="saveAsNameBtn" class="btn btn-primary">${_('Save')}</button>
+    </div>
+</div>
+
+<div id="navigatorQuicklook" class="modal hide fade">
+    <div class="modal-header">
+        <a href="#" class="close" data-dismiss="modal">&times;</a>
+        <a class="tableLink pull-right" href="#" target="_blank" style="margin-right: 20px;margin-top:6px"><i class="icon-external-link"></i> ${ _('View in Metastore Browser') }</a>
+        <h3>${_('Data sample for')} <span class="tableName"></span></h3>
+    </div>
+    <div class="modal-body" style="min-height: 100px">
+      <div class="loader">
+        <!--[if !IE]><!--><i class="icon-spinner icon-spin" style="font-size: 30px; color: #DDD"></i><!--<![endif]-->
+        <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+      </div>
+      <div class="sample"></div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary disable-feedback" data-dismiss="modal">${_('Ok')}</button>
     </div>
 </div>
 
@@ -450,6 +485,18 @@ ${layout.menubar(section='query')}
     color: #666;
     font-style: normal;
   }
+
+  #navigatorTables li {
+    width: 95%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  #navigatorSearch {
+    display: none;
+  }
+
 </style>
 
 <script src="/static/ext/js/jquery/plugins/jquery-fieldselection.js" type="text/javascript"></script>
@@ -457,8 +504,82 @@ ${layout.menubar(section='query')}
 
 <script type="text/javascript" charset="utf-8">
     var HIVE_AUTOCOMPLETE_BASE_URL = "${ autocomplete_base_url | n,unicode }";
-
+    var codeMirror;
     $(document).ready(function(){
+
+      $("#navigatorQuicklook").modal({
+        show: false
+      });
+
+      var navigatorSearchTimeout = -1;
+      $("#navigatorSearch").on("keyup", function () {
+        window.clearTimeout(navigatorSearchTimeout);
+        navigatorSearchTimeout = window.setTimeout(function () {
+          $("#navigatorTables li").removeClass("hide");
+          $("#navigatorTables li").each(function () {
+            if ($(this).text().toLowerCase().indexOf($("#navigatorSearch").val().toLowerCase()) == -1) {
+              $(this).addClass("hide");
+            }
+          });
+        }, 300);
+      });
+
+      hac_getTables($("#id_query-database").val(), function (data) {  //preload tables for the default db
+        $(data.split(" ")).each(function (cnt, table) {
+          var _table = $("<li>");
+          _table.html("<a href='#' class='pull-right hide'><i class='icon-eye-open'></i></a><a href='#' title='" + table + "'><i class='icon-table'></i> " + table + "</a><ul class='unstyled'></ul>");
+          _table.data("table", table).attr("id", "navigatorTables_" + table);
+          _table.find("a:eq(1)").on("click", function () {
+            _table.find(".icon-table").removeClass("icon-table").addClass("icon-spin").addClass("icon-spinner");
+            hac_getTableColumns($("#id_query-database").val(), table, "", function (plain_columns, extended_columns) {
+              _table.find("a:eq(0)").removeClass("hide");
+              _table.find("ul").empty();
+              _table.find(".icon-spinner").removeClass("icon-spinner").removeClass("icon-spin").addClass("icon-table");
+              $(extended_columns).each(function (iCnt, col) {
+                var _column = $("<li>");
+                _column.html("<a href='#' style='padding-left:10px'" + (col.comment != null && col.comment != "" ? " title='" + col.comment + "'" : "") + "><i class='icon-columns'></i> " + col.name + " (" + col.type + ")</a>");
+                _column.appendTo(_table.find("ul"));
+                _column.on("dblclick", function () {
+                  codeMirror.replaceSelection(col.name);
+                  codeMirror.setSelection(codeMirror.getCursor());
+                  codeMirror.focus();
+                });
+              });
+            });
+          });
+          _table.find("a:eq(1)").on("dblclick", function () {
+            codeMirror.replaceSelection(table);
+            codeMirror.setSelection(codeMirror.getCursor());
+            codeMirror.focus();
+          });
+          _table.find("a:eq(0)").on("click", function () {
+            $("#navigatorQuicklook").find(".tableName").text(table);
+            $("#navigatorQuicklook").find(".tableLink").attr("href", "/metastore/table/" + $("#id_query-database").val() + "/" + _table.data("table"));
+            $("#navigatorQuicklook").find(".sample").empty("");
+            $("#navigatorQuicklook").attr("style", "width: " + ($(window).width() - 120) + "px;margin-left:-" + (($(window).width() - 80) / 2) + "px!important;");
+            $.ajax({
+              url: "/metastore/table/" + $("#id_query-database").val() + "/" + _table.data("table"),
+              data: {"sample": true},
+              beforeSend: function (xhr) {
+                xhr.setRequestHeader("X-Requested-With", "Hue");
+              },
+              dataType: "html",
+              success: function (data) {
+                $("#navigatorQuicklook").find(".loader").hide();
+                $("#navigatorQuicklook").find(".sample").html(data);
+              }
+            });
+            $("#navigatorQuicklook").modal("show");
+          });
+          _table.appendTo($("#navigatorTables"));
+        });
+        $("#navigatorLoader").hide();
+        $("#navigatorSearch").show();
+      });
+
+      $("#navigator .card").css("min-height", ($(window).height() - 130) + "px");
+      $("#navigatorTables").css("max-height", ($(window).height() - 260) + "px").css("overflow-y", "auto");
+
       var queryPlaceholder = "${_('Example: SELECT * FROM tablename, or press CTRL + space')}";
 
       var successfunction = function (response, newValue) {
@@ -603,6 +724,8 @@ ${layout.menubar(section='query')}
           // prevents endless loop in IE8
           if (winWidth != $(window).width() || winHeight != $(window).height()) {
             codeMirror.setSize("95%", $(window).height() - 270 - $("#queryPane .alert-error").outerHeight() - $(".nav-tabs").outerHeight());
+            $("#navigator .card").css("min-height", ($(window).height() - 130) + "px");
+            $("#navigatorTables").css("max-height", ($(window).height() - 260) + "px").css("overflow-y", "auto");
             winWidth = $(window).width();
             winHeight = $(window).height();
           }
@@ -616,8 +739,6 @@ ${layout.menubar(section='query')}
       }
 
       var queryEditor = $("#queryField")[0];
-
-      hac_getTables($("#id_query-database").val(), function(){}); //preload tables for the default db
 
       % if app_name == 'impala':
         var AUTOCOMPLETE_SET = CodeMirror.impalaSQLHint;
@@ -703,7 +824,7 @@ ${layout.menubar(section='query')}
 
       CodeMirror.fromDot = false;
 
-      var codeMirror = CodeMirror(function (elt) {
+      codeMirror = CodeMirror(function (elt) {
         queryEditor.parentNode.replaceChild(elt, queryEditor);
       }, {
         value: queryEditor.value,

@@ -68,8 +68,8 @@ function hac_getTableColumns(databaseName, tableName, textScanned, callback) {
     tableName = _aliases[tableName];
   }
 
-  if ($.totalStorage('columns_' + databaseName + '_' + tableName) != null) {
-    callback($.totalStorage('columns_' + databaseName + '_' + tableName));
+  if ($.totalStorage('columns_' + databaseName + '_' + tableName) != null && $.totalStorage('extended_columns_' + databaseName + '_' + tableName) != null) {
+    callback($.totalStorage('columns_' + databaseName + '_' + tableName), $.totalStorage('extended_columns_' + databaseName + '_' + tableName));
     hac_jsoncalls({
       database: databaseName,
       table: tableName,
@@ -81,6 +81,7 @@ function hac_getTableColumns(databaseName, tableName, textScanned, callback) {
         }
         else {
           $.totalStorage('columns_' + databaseName + '_' + tableName, (data.columns ? data.columns.join(" ") : ""));
+          $.totalStorage('extended_columns_' + databaseName + '_' + tableName, (data.extended_columns ? data.extended_columns : []));
         }
       }
     });
@@ -97,7 +98,8 @@ function hac_getTableColumns(databaseName, tableName, textScanned, callback) {
         }
         else {
           $.totalStorage('columns_' + databaseName + '_' + tableName, (data.columns ? data.columns.join(" ") : ""));
-          callback($.totalStorage('columns_' + databaseName + '_' + tableName));
+          $.totalStorage('extended_columns_' + databaseName + '_' + tableName, (data.extended_columns ? data.extended_columns : []));
+          callback($.totalStorage('columns_' + databaseName + '_' + tableName), $.totalStorage('extended_columns_' + databaseName + '_' + tableName));
         }
       }
     });
