@@ -39,6 +39,10 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
     margin-top: 3px;
   }
 
+  .tagCounter {
+    margin-top: 2px;
+  }
+
   .hueCheckbox {
     margin-right: 6px !important;
     line-height: 15px !important;
@@ -127,7 +131,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
           <li class="nav-header tag-header">${_('Tags')} <div id="editTags" style="display: inline;cursor: pointer;margin-left: 6px" title="${ _('Edit tags') }"><i class="icon-tags"></i></div> </li>
           % for tag in tags:
             % if tag['tags__tag'] not in ('trash', 'history'):
-            <li class="toggleTag white" data-tag="${ tag['tags__tag'] }"><div class="hueCheckbox pull-left"></div>${ tag['tags__tag'] }</li>
+            <li class="toggleTag white" data-tag="${ tag['tags__tag'] }"><div class="hueCheckbox pull-left"></div>${ tag['tags__tag'] } <span class="tagCounter badge pull-right">0</span></li>
             % endif
           % endfor
 
@@ -371,18 +375,27 @@ $(document).ready(function () {
     populateTable(_tags.join(","));
   });
 
-  var _trashCounter = 0;
-  var _historyCounter = 0;
+  // update tag counters
+  var _tagCounters = {};
   $(JSON_DOCS).each(function (cnt, doc) {
-    if (isInTags(doc, "trash")) {
-      _trashCounter++;
-    }
-    if (isInTags(doc, "history")) {
-      _historyCounter++;
+    if (doc.tags != null) {
+      for (var i = 0; i < doc.tags.length; i++) {
+        if (_tagCounters[doc.tags[i].name] == null) {
+          _tagCounters[doc.tags[i].name] = 1;
+        }
+        else {
+          _tagCounters[doc.tags[i].name]++;
+        }
+      }
     }
   });
-  $("#trashCounter").text(_trashCounter);
-  $("#historyCounter").text(_historyCounter);
+  $("#trashCounter").text(_tagCounters["trash"]);
+  $("#historyCounter").text(_tagCounters["history"]);
+  $("li[data-tag]").each(function () {
+    if (_tagCounters[$(this).data("tag")] != null) {
+      $(this).find(".badge").text(_tagCounters[$(this).data("tag")]);
+    }
+  });
 
   $(document).on("click", ".documentTags", function () {
     $("#documentTagsModal").data("document-id", $(this).data("document-id"));
