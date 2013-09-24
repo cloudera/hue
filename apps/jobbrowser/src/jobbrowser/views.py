@@ -15,17 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import re
 import time
 import logging
 import string
 from urllib import quote_plus
 from lxml import html
-
-try:
-  import json
-except ImportError:
-  import simplejson as json
 
 from django.http import HttpResponseRedirect, HttpResponse
 from django.utils.functional import wraps

@@ -16,7 +16,7 @@
 # limitations under the License.
 
 from django.contrib.auth.models import Group, User
-from useradmin.models import HuePermission, GroupPermission
+from useradmin.models import HuePermission, GroupPermission, get_default_user_group
 
 
 def grant_access(username, groupname, appname):
@@ -35,7 +35,7 @@ def add_permission(username, groupname, permname, appname):
         user.save()
 
 
-def add_to_group(username, groupname):
+def add_to_group(username, groupname=get_default_user_group().name):
     user = User.objects.get(username=username)
     group, created = Group.objects.get_or_create(name=groupname)
 

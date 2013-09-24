@@ -27,7 +27,7 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
 from desktop.lib.django_test_util import make_logged_in_client
-from desktop.lib.test_utils import grant_access, add_permission
+from desktop.lib.test_utils import grant_access, add_permission, add_to_group
 from desktop.models import Document
 
 from jobsub.models import OozieDesign, OozieMapreduceAction
@@ -271,6 +271,7 @@ class OozieBase(OozieServerProvider):
     self.c = make_logged_in_client(is_superuser=False)
     self.user = User.objects.get(username="test")
     grant_access("test", "test", "oozie")
+    add_to_group("test")
     self.cluster = OozieServerProvider.cluster
     self.install_examples()
 
@@ -286,11 +287,6 @@ class OozieBase(OozieServerProvider):
     self.c.post(reverse('oozie:install_examples'))
     self.cluster.fs.do_as_user('test', self.cluster.fs.create_home_dir, '/user/test')
     self.cluster.fs.do_as_superuser(self.cluster.fs.chmod, '/user/test', 0777, True)
-    try:
-      hue = User.objects.get(username='hue')
-    except User.DoesNotExist:
-      hue = User.objects.create_user('hue', 'hue' + '@localhost', 'hue')
-    Workflow.objects.update(owner=hue)
 
     _INITIALIZED = True
 
@@ -2378,15 +2374,18 @@ class TestEditorWithOozie(OozieBase):
       'description': ['']
     }, follow=True)
     fh.close()
+
     assert_equal(workflow_count + 1, Document.objects.available_docs(Workflow, self.user).count(), response)
 
   def test_delete_workflow(self):
     previous_trashed = Document.objects.trashed_docs(Workflow, self.user).count()
-    previous_available = len(Workflow.objects.all())
+    previous_available = Document.objects.available_docs(Workflow, self.user).count()
+
     response = self.c.post(reverse('oozie:delete_workflow') + "?skip_trash=true", {'job_selection': [self.wf.id]}, follow=True)
     assert_equal(200, response.status_code, response)
+
     assert_equal(previous_trashed, Document.objects.trashed_docs(Workflow, self.user).count())
-    assert_equal(previous_available - 1, len(Workflow.objects.all()))
+    assert_equal(previous_available - 1, Document.objects.available_docs(Workflow, self.user).count())
 
 
 class TestImportWorkflow04WithOozie(OozieBase):
@@ -2430,7 +2429,7 @@ class TestImportWorkflow04WithOozie(OozieBase):
 class TestOozieSubmissions(OozieBase):
 
   def test_submit_mapreduce_action(self):
-    wf = Workflow.objects.get(name='MapReduce', managed=True)
+    wf = Document.objects.get_docs(self.user, Workflow).filter(name='MapReduce')[0].content_object
     post_data = {u'form-MAX_NUM_FORMS': [u''], u'form-INITIAL_FORMS': [u'1'],
                  u'form-0-name': [u'REDUCER_SLEEP_TIME'], u'form-0-value': [u'1'],
                  u'form-TOTAL_FORMS': [u'1']}

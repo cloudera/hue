@@ -62,8 +62,8 @@ class DocumentTagManager(models.Manager):
     try:
       sample_user = auth_models.User.objects.get(username='sample')
       tags = tags.filter(Q(owner=user) | Q(owner=sample_user, tags__tag='example'))
-    except Exception, e:
-      tags = filter(owner=user)
+    except:
+      tags = tags.filter(owner=user)
 
     return tags.values('tags__id', 'tags__tag').distinct()
 
@@ -314,7 +314,6 @@ class DocumentManager(models.Manager):
     # For now remove the default tag from the examples
     try:
       for doc in Document.objects.filter(tags__tag=DocumentTag.EXAMPLE):
-        print doc
         default_tag = DocumentTag.objects.get_default_tag(doc.owner)
         doc.tags.remove(default_tag)
     except Exception, e:

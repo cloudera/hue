@@ -34,7 +34,6 @@ from hadoop.conf import YARN_CLUSTERS
 from hadoop.yarn import resource_manager_api, mapreduce_api, history_server_api
 from liboozie.oozie_api_test import OozieServerProvider
 from oozie.models import Workflow
-from useradmin.models import get_default_user_group
 
 from jobbrowser import models, views
 from jobbrowser.conf import SHARE_JOBS
@@ -42,6 +41,27 @@ from jobbrowser.conf import SHARE_JOBS
 
 LOG = logging.getLogger(__name__)
 _INITIALIZED = False
+
+
+from hadoop import pseudo_hdfs4
+
+
+class TestJobBrowserWithHadoop2(object):
+  requires_hadoop = True
+
+  @classmethod
+  def setup_class(cls):
+    cls.cluster = pseudo_hdfs4.shared_cluster()
+
+  def setUp(self):
+    self.client = make_logged_in_client(is_superuser=False)
+    self.user = User.objects.get(username="test")
+    grant_access("test", "test", "jobbrowser")
+
+  def test_list_jobs(self):
+    response = self.client.get("/jobbrowser/?format=json")
+    assert_equal('[]', response.content)
+
 
 def test_dots_to_camel_case():
   assert_equal("fooBar", models.dots_to_camel_case("foo.bar"))
@@ -95,7 +115,7 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
     grant_access(self.username, 'test', 'jobsub')
     grant_access(self.username, 'test', 'jobbrowser')
     grant_access(self.username, 'test', 'oozie')
-    add_to_group(self.username, get_default_user_group().name)
+    add_to_group(self.username)
 
     self.prev_user = self.cluster.fs.user
     self.cluster.fs.setuser(self.username)
@@ -227,89 +247,6 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
     response = self.client.get('/jobbrowser/jobs/%s/tasks?taskstate=failed' % (hadoop_job_id,))
     assert_true('r_000000' in response.content)
     assert_true('m_000000' not in response.content)
-
-  def test_kill_job(self):
-    """
-    Test job in kill state.
-    """
-    # Run the sleep example, since it doesn't require user home directory
-    design_id = self.design.id
-    response = self.client.post(reverse('oozie:submit_workflow',
-                                args=[self.design.id]),
-                                data={u'form-MAX_NUM_FORMS': [u''],
-                                      u'form-INITIAL_FORMS': [u'1'],
-                                      u'form-0-name': [u'REDUCER_SLEEP_TIME'],
-                                      u'form-0-value': [u'1'],
-                                      u'form-TOTAL_FORMS': [u'1']},
-                                follow=True)
-    oozie_jobid = response.context['oozie_workflow'].id
-
-    # Wait for a job to be created and fetch job ID
-    hadoop_job_id = get_hadoop_job_id(self.oozie, oozie_jobid, 1)
-
-    client2 = make_logged_in_client('test_non_superuser', is_superuser=False, groupname='test')
-    grant_access('test_non_superuser', 'test', 'jobbrowser')
-    response = client2.post('/jobbrowser/jobs/%s/kill' % (hadoop_job_id,))
-    assert_equal("Permission denied.  User test_non_superuser cannot delete user %s's job." % self.username, response.context["error"])
-
-    # Make sure that the first map task succeeds before moving on
-    # This will keep us from hitting timing-related failures
-    first_mapper = 'm_000000'
-    start = time.time()
-    timeout_sec = 60
-    while first_mapper not in \
-        self.client.get('/jobbrowser/jobs/%s/tasks?taskstate=succeeded' % (hadoop_job_id,)).content:
-      time.sleep(1)
-      # If this assert fails, something has probably really failed
-      assert_true(time.time() - start < timeout_sec,
-          "Timed out waiting for first mapper to complete")
-
-    # Kill task
-    self.client.post('/jobbrowser/jobs/%s/kill' % (hadoop_job_id,))
-
-    # It should say killed at some point
-    response = self.client.get('/jobbrowser/jobs/%s?format=json' % (hadoop_job_id,))
-    html = response.content.lower()
-    i = 0
-    while 'killed' not in html and i < 10:
-      time.sleep(5)
-      response = self.client.get('/jobbrowser/jobs/%s?format=json' % (hadoop_job_id,))
-      html = response.content.lower()
-      i += 1
-
-    assert_true(views.get_shorter_id(hadoop_job_id) in html)
-    assert_true('killed' in html, html)
-
-    # Exercise select by taskstate
-    self.client.get('/jobbrowser/jobs/%s/tasks?taskstate=failed' % (hadoop_job_id,))
-    self.client.get('/jobbrowser/jobs/%s/tasks?taskstate=succeeded' % (hadoop_job_id,))
-    self.client.get('/jobbrowser/jobs/%s/tasks?taskstate=running' % (hadoop_job_id,))
-    self.client.get('/jobbrowser/jobs/%s/tasks?taskstate=killed' % (hadoop_job_id,))
-
-    # Test single task page
-    late_task_id = hadoop_job_id.replace('job', 'task') + '_r_000000'
-    response = self.client.get('/jobbrowser/jobs/%s/tasks/%s' % (hadoop_job_id, late_task_id))
-    assert_false('succeed' in response.content)
-    assert_true('killed' in response.content)
-
-    # The first task should've succeeded
-    # We use a different method of checking success for this one
-    early_task_id = hadoop_job_id.replace('job', 'task') + '_m_000000'
-    response = self.client.get('/jobbrowser/jobs/%s/tasks/%s' % (hadoop_job_id, early_task_id))
-    assert_true('succeed' in response.content)
-    assert_false('failed' in response.content)
-
-    # Test single attempt page
-    early_task_id = hadoop_job_id.replace('job', 'task') + '_m_000000'
-    attempt_id = early_task_id.replace('task', 'attempt') + '_0'
-    response = self.client.get('/jobbrowser/jobs/%s/tasks/%s/attempts/%s/logs' %
-                          (hadoop_job_id, early_task_id, attempt_id))
-    assert_true('syslog' in response.content)
-
-    # Test dock jobs
-    response = self.client.get('/jobbrowser/dock_jobs/')
-    assert_false('completed' in response.content)
-    assert_false('failed' in response.content)
 
   def test_job(self):
     """
