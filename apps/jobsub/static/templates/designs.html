@@ -15,7 +15,7 @@
       <td data-row-selector-exclude="true">
         <div class="hueCheckbox savedCheck" data-row-selector-exclude="true"></div>
       </td>
-      <td><a href="javascript:void(0);" data-row-selector="true" data-bind="text: name, click: function(data, event) {$root.select.call($root, $index()); $root.showDesign.call($root, data, event);}"></a></td>
+      <td><a href="javascript:void(0);" data-row-selector="true" data-bind="text: name, click: function(data, event) {$root.selectByIndex.call($root, $index()); $root.showDesign.call($root, data, event);}"></a></td>
       <td data-bind="text: description"></td>
       <td data-bind="text: owner"></td>
       <td data-bind="text: type"></td>
