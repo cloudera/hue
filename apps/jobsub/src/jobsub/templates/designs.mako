@@ -180,11 +180,11 @@ ${ commonheader(None, "jobsub", user) | n,unicode }
     <td data-row-selector-exclude="true" data-bind="click: function(data, event) {$root.toggleSelect.call($root, $index());}" class="center" style="cursor: default">
       <div class="hueCheckbox savedCheck" data-row-selector-exclude="true" data-bind="css: {'hueCheckbox': name != '..', 'icon-ok': $parent.selected()}"></div>
     </td>
-    <td data-bind="click: function(data, event) { window.location = '#edit-design/' + $index() }, text: name"></td>
-    <td data-bind="click: function(data, event) { window.location = '#edit-design/' + $index() }, text: description"></td>
-    <td data-bind="click: function(data, event) { window.location = '#edit-design/' + $index() }, text: owner"></td>
-    <td data-bind="click: function(data, event) { window.location = '#edit-design/' + $index() }, text: node_type"></td>
-    <td data-bind="click: function(data, event) { window.location = '#edit-design/' + $index() }">
+    <td data-bind="click: function(data, event) { window.location = '#edit-design/' + id() }, text: name"></td>
+    <td data-bind="click: function(data, event) { window.location = '#edit-design/' + id() }, text: description"></td>
+    <td data-bind="click: function(data, event) { window.location = '#edit-design/' + id() }, text: owner"></td>
+    <td data-bind="click: function(data, event) { window.location = '#edit-design/' + id() }, text: node_type"></td>
+    <td data-bind="click: function(data, event) { window.location = '#edit-design/' + id() }">
       <!-- ko if: is_shared -->
         <span class="label label-info">shared</span>
       <!-- /ko -->
@@ -192,7 +192,7 @@ ${ commonheader(None, "jobsub", user) | n,unicode }
         <span class="label label-info">personal</span>
       <!-- /ko -->
     </td>
-    <td data-bind="click: function(data, event) { window.location = '#edit-design/' + $index() }, text: new Date(last_modified() * 1000).format('%B %d, %Y %I:%M %p'), attr: { 'data-sort-value': last_modified() }"></td>
+    <td data-bind="click: function(data, event) { window.location = '#edit-design/' + id() }, text: new Date(last_modified() * 1000).format('%B %d, %Y %I:%M %p'), attr: { 'data-sort-value': last_modified() }"></td>
     <td data-bind="text: is_trashed"></td>
   </tr>
 </script>
@@ -834,14 +834,14 @@ var setupRoutes = (function() {
           templates.getActionTemplate(node_type, context);
           designs.newDesign(node_type);
         },
-        'edit-design/:index': function(index) {
+        'edit-design/:design_id': function(design_id) {
           /**
            * Update context with correct title.
            * Design is selected through 'list-designs'.
            */
           designs.closeDesign();
 
-          var designObject = designs.designs()[index];
+          var designObject = designs.getDesignObjectById(design_id);
           if (!designObject) {
             routie('list-designs');
             return;
@@ -867,7 +867,7 @@ var setupRoutes = (function() {
           var context = $.extend(true, {}, global_action_context, contexts[node_type]);
           templates.getActionTemplate(node_type, context);
           designs.deselectAll();
-          designs.select(index);
+          designObject.selected(true);
           designs.editDesign();
         },
         'trashed-designs': function() {
@@ -905,7 +905,7 @@ $(document).ready(function(e) {
     );
   });
   $('body').on('click', '#edit-design', function() {
-    routie('edit-design/' + designs.selectedIndex());
+    routie('edit-design/' + designs.selectedDesign().id());
   });
   $('body').on('click', '#trash-designs', function() {
     $('#trashWf').modal('show');
