@@ -52,20 +52,22 @@ build_hadoop() {
   fi
 
   HADOOP_DIR=$HUE_ROOT/ext/hadoop
+  export YARN_HOME="$HADOOP_DIR/${CDH_VERSION}"
   export HADOOP_HDFS_HOME="$HADOOP_DIR/${CDH_VERSION}/share/hadoop/hdfs"
   export HADOOP_BIN="$HADOOP_DIR/${CDH_VERSION}/bin/hadoop"
-  export HADOOP_MR1_HOME="$HADOOP_DIR/${CDH_VERSION}/share/hadoop/mapreduce1"
-  export HADOOP_MR1_BIN="$HADOOP_DIR/${CDH_VERSION}/bin-mapreduce1/hadoop"
+  export HADOOP_MAPRED_HOME="$HADOOP_DIR/${CDH_VERSION}/share/hadoop/mapreduce2"
+  export HADOOP_MAPRED_BIN="$HADOOP_DIR/${CDH_VERSION}/bin/mapred"
 
   mkdir -p $HADOOP_DIR
   rm -rf "$HADOOP_DIR/${CDH_VERSION}"
   echo "Unpacking $CDH_CACHE to $HADOOP_DIR"
   tar -C $HADOOP_DIR -xzf $CDH_CACHE
   # For Hive
-  ln -s "$HADOOP_DIR/${CDH_VERSION}/bin-mapreduce1" $HADOOP_MR1_HOME/bin
-  # For MR1
-  rm -f "$HADOOP_DIR/${CDH_VERSION}/share/hadoop/mapreduce"
-  ln -sf "mapreduce1" "$HADOOP_DIR/${CDH_VERSION}/share/hadoop/mapreduce"
+  #ln -s "$HADOOP_DIR/${CDH_VERSION}/bin-mapreduce1" $HADOOP_MR1_HOME/bin
+  # For MR2
+  #rm -f "$HADOOP_DIR/${CDH_VERSION}/share/hadoop/mapreduce"
+  ln -sf "$HADOOP_DIR/${CDH_VERSION}/share/hadoop/mapreduce2" "$HADOOP_DIR/${CDH_VERSION}/share/hadoop/mapreduce"
+  #ln -sf "mapreduce" "$HADOOP_DIR/${CDH_VERSION}/share/hadoop/mapreduce"
   ln -s $HADOOP_DIR/${CDH_VERSION} $HADOOP_DIR/hadoop
 }
 
@@ -122,10 +124,11 @@ build_oozie() {
   ln -s $OOZIE_DIR/${OOZIE_VERSION} $OOZIE_DIR/oozie
 
   mkdir -p $OOZIE_HOME/libext
-  tar -C $OOZIE_HOME/libext -zxvf $OOZIE_HOME/oozie-hadooplibs-*-cdh*.tar.gz
-  cp $OOZIE_HOME/libext/oozie-*/hadooplibs/hadooplib-*-mr1-cdh*/*jar $OOZIE_HOME/libext/
+  tar -C $OOZIE_HOME/libext -zxvf $OOZIE_HOME/oozie-hadooplibs-*.tar.gz
+  HADOOP_LIB=`echo "${CDH_VERSION}" | sed -r 's/hadoop/hadooplib/g'`
+  cp $OOZIE_HOME/libext/oozie-*/hadooplibs/${HADOOP_LIB}*/*jar $OOZIE_HOME/libext/
   tar -C $OOZIE_HOME -zxvf $OOZIE_HOME/oozie-examples.tar.gz
-  tar -C $OOZIE_HOME -zxvf $OOZIE_HOME/oozie-sharelib-*SNAPSHOT.tar.gz
+  tar -C $OOZIE_HOME -zxvf $OOZIE_HOME/oozie-sharelib-*SNAPSHOT-yarn.tar.gz
 
   $OOZIE_HOME/bin/oozie-setup.sh prepare-war
   $OOZIE_HOME/bin/ooziedb.sh create -sqlfile oozie.sql -run
