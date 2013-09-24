@@ -150,7 +150,11 @@ def describe_table(request, database, table):
   except Exception, ex:
     error_message, logs = dbms.expand_exception(ex, db)
 
-  return render("describe_table.mako", request, {
+  renderable = "describe_table.mako"
+  if request.REQUEST.get("sample", "false") == "true":
+    renderable = "sample.mako"
+
+  return render(renderable, request, {
     'breadcrumbs': [{
         'name': database,
         'url': reverse('metastore:show_tables', kwargs={'database': database})
