@@ -762,6 +762,7 @@ var designTable = $('#designTable').dataTable( designTableOptions );
 /**
  * Redraw a table after the table has been dynamically updated.
  * This is necessary because KO and datatables don't play well together.
+ * This is useful when datatables doesn't automatically update and no extra rows have been added.
  */
 function redraw() {
   designTable.fnDestroy();
@@ -773,9 +774,11 @@ function redraw() {
  * Reload with datatables.
  * Remove datatables, reload, then reinitialize datatables.
  * Knockout doesn't work without this.
+ * Clearing the table is necessary so multiple rows will not be added.
  */
 function reload() {
   $(document).one('load.designs', function() {
+    designTable.fnClearTable();
     designTable.fnDestroy();
   });
   designs.load();
