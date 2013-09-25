@@ -100,7 +100,8 @@ from django.utils.translation import ugettext as _
       labels: {
         AVAILABLE_TOURS: "${_('Available tours')}",
         NO_AVAILABLE_TOURS: "${_('None for this page.')}",
-        MORE_INFO: "${_('Read more about it...')}"
+        MORE_INFO: "${_('Read more about it...')}",
+        TOOLTIP_TITLE: "${_('Demo tutorials')}"
       }
     };
 
@@ -146,6 +147,11 @@ from django.utils.translation import ugettext as _
         placement: "bottom"
       });
 
+      $("[rel='navigator-tooltip']").tooltip({
+        delay: 0,
+        placement: "bottom"
+      });
+
       % if 'jobbrowser' in apps:
       var JB_CHECK_INTERVAL_IN_MILLIS = 30000;
       window.setTimeout(checkJobBrowserStatus, JB_CHECK_INTERVAL_IN_MILLIS);
@@ -165,10 +171,9 @@ from django.utils.translation import ugettext as _
       }
       % endif
 
-      var openTimeout, closeTimeout;
-      $(".navigator ul.nav li.dropdown").hover(function () {
-        var _this = $(this);
-        var _timeout = 500;
+      function openDropdown(which, timeout){
+        var _this = which;
+        var _timeout = timeout!=null?timeout:800;
         if ($(".navigator").find("ul.dropdown-menu:visible").length > 0) {
           _timeout = 10;
         }
@@ -176,16 +181,26 @@ from django.utils.translation import ugettext as _
         openTimeout = window.setTimeout(function () {
           $(".navigator li.open").removeClass("open");
           $(".navigator ul.dropdown-menu").hide();
+          $("[rel='navigator-tooltip']").tooltip("hide");
           _this.find("ul.dropdown-menu").show();
         }, _timeout);
+      }
+
+      var openTimeout, closeTimeout;
+      $(".navigator ul.nav li.dropdown").on("click", function(){
+        openDropdown($(this), 10);
+      });
+      $(".navigator ul.nav li.dropdown").hover(function () {
+        openDropdown($(this));
       },
       function () {
         var _this = $(this);
         window.clearTimeout(openTimeout);
         closeTimeout = window.setTimeout(function () {
           $(".navigator li.open").removeClass("open");
+          $(".navigator li a:focus").blur();
           $(".navigator").find("ul.dropdown-menu").hide();
-        }, 500);
+        }, 1000);
       });
 
       var _skew = -1;
@@ -217,31 +232,31 @@ from django.utils.translation import ugettext as _
   <ul class="nav nav-pills">
     <li class="divider-vertical"></li>
     % if 'filebrowser' in apps:
-    <li><a title="${_('Manage HDFS')}" href="/${apps['filebrowser'].display_name}"><i class="icon-file"></i>&nbsp;${_('File Browser')} &nbsp;</a></li>
+    <li><a title="${_('Manage HDFS')}" rel="navigator-tooltip" href="/${apps['filebrowser'].display_name}"><i class="icon-file"></i>&nbsp;${_('File Browser')}&nbsp;</a></li>
     % endif
     % if 'jobbrowser' in apps:
-    <li><a title="${_('Manage jobs')}" href="/${apps['jobbrowser'].display_name}"><i class="icon-list-alt"></i>&nbsp;${_('Job Browser')} &nbsp;<span id="jobBrowserCount" class="badge badge-warning hide" style="padding-top:0;padding-bottom: 0"></span></a></li>
+    <li><a title="${_('Manage jobs')}" rel="navigator-tooltip" href="/${apps['jobbrowser'].display_name}"><i class="icon-list-alt"></i>&nbsp;${_('Job Browser')}&nbsp;<span id="jobBrowserCount" class="badge badge-warning hide" style="padding-top:0;padding-bottom: 0"></span></a></li>
     % endif
     <li class="dropdown">
-      <a title="${ _('Administration') }" href="index.html#" data-toggle="dropdown" class="dropdown-toggle"><i class="icon-cogs"></i>&nbsp;&nbsp;<b class="caret"></b></a>
+      <a title="${ _('Administration') }" rel="navigator-tooltip" href="index.html#" data-toggle="dropdown" class="dropdown-toggle"><i class="icon-cogs"></i>&nbsp;&nbsp;${user.username}<b class="caret"></b></a>
       <ul class="dropdown-menu">
-        <li><a href="${ url('useradmin.views.edit_user', username=urllib.quote(user.username)) }"><i class="icon-key"></i>&nbsp;&nbsp;${_('Change Password')}</a></li>
+        <li><a href="${ url('useradmin.views.edit_user', username=urllib.quote(user.username)) }"><i class="icon-key"></i>&nbsp;&nbsp;${_('Edit Profile')}</a></li>
         %if user.is_superuser:
         <li><a href="${ url('useradmin.views.list_users') }"><i class="icon-group"></i>&nbsp;&nbsp;${_('Manage users')}</a></li>
         %endif
       </ul>
     </li>
-    <li><a title="${_('Sign out')}" data-placement="left" href="/accounts/logout/"><i class="icon-signout"></i>&nbsp;&nbsp;${user.username}</a></li>
-    <li><a title="${_('Documentation')}" data-placement="left" href="/help"><i class="icon-question-sign"></i></a></li>
+    <li><a title="${_('Documentation')}" rel="navigator-tooltip" href="/help"><i class="icon-question-sign"></i></a></li>
     <li id="jHueTourFlagPlaceholder"></li>
+    <li><a title="${_('Sign out')}" rel="navigator-tooltip" href="/accounts/logout/"><i class="icon-signout"></i></a></li>
   </ul>
-  % endif
+      % endif
   </div>
-    <a class="brand nav-tooltip pull-left" title="${_('About Hue')}" href="/about"><img src="/static/art/hue-logo-mini-white.png" data-orig="/static/art/hue-logo-mini-white.png" data-hover="/static/art/hue-logo-mini-white-hover.png"/></a>
+    <a class="brand nav-tooltip pull-left" title="${_('About Hue')}" rel="navigator-tooltip" href="/about"><img src="/static/art/hue-logo-mini-white.png" data-orig="/static/art/hue-logo-mini-white.png" data-hover="/static/art/hue-logo-mini-white-hover.png"/></a>
      <ul class="nav nav-pills pull-left">
-       <li><a title="${_('My documents')}" href="/home" style="padding-bottom:2px!important"><i class="icon-home" style="font-size: 19px"></i></a></li>
+       <li><a title="${_('My documents')}" rel="navigator-tooltip" href="/home" style="padding-bottom:2px!important"><i class="icon-home" style="font-size: 19px"></i></a></li>
        <li class="dropdown">
-         <a title="${_('Query data')}" href="#" data-toggle="dropdown" class="dropdown-toggle">${_('Query Editors')} <b class="caret"></b></a>
+         <a title="${_('Query data')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">${_('Query Editors')} <b class="caret"></b></a>
          <ul role="menu" class="dropdown-menu">
            % if 'beeswax' in apps:
            <li><a href="/${apps['beeswax'].display_name}"><img src="${ apps['beeswax'].icon_path }"/> ${_('Hive')}</a></li>
@@ -258,7 +273,7 @@ from django.utils.translation import ugettext as _
          </ul>
        </li>
        <li class="dropdown">
-         <a title="${_('Manage data')}" href="#" data-toggle="dropdown" class="dropdown-toggle">${_('Data Browsers')} <b class="caret"></b></a>
+         <a title="${_('Manage data')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">${_('Data Browsers')} <b class="caret"></b></a>
          <ul role="menu" class="dropdown-menu">
            % if 'metastore' in apps:
            <li><a href="/${apps['metastore'].display_name}"><img src="${ apps['metastore'].icon_path }"/> ${_('Metastore Tables')}</a></li>
@@ -276,7 +291,7 @@ from django.utils.translation import ugettext as _
        </li>
        % if 'oozie' in apps:
        <li class="dropdown">
-         <a title="${_('Schedule with Oozie')}" href="#" data-toggle="dropdown" class="dropdown-toggle">${_('Workflows')} <b class="caret"></b></a>
+         <a title="${_('Schedule with Oozie')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">${_('Workflows')} <b class="caret"></b></a>
          <ul role="menu" class="dropdown-menu">
            <li><a href="${ url('oozie:index') }"><img src="${ apps['oozie'].icon_path }"/> ${_('Dashboard')}</a></li>
            <li><a href="${ url('oozie:list_workflows') }"><img src="${ apps['oozie'].icon_path }"/> ${_('Editor')}</a></li>
@@ -285,12 +300,12 @@ from django.utils.translation import ugettext as _
        % endif
        % if 'search' in apps:
        <li>
-         <a title="${_('Solr Search')}" href="${ url('search:index') }">${_('Search')}</a>
+         <a title="${_('Solr Search')}" rel="navigator-tooltip" href="${ url('search:index') }">${_('Search')}</a>
        </li>
        % endif
        % if other_apps:
        <li class="dropdown">
-         <a title="${_('Other apps')}" href="#" data-toggle="dropdown" class="dropdown-toggle">${_('Other apps')} <b class="caret"></b></a>
+         <a href="#" data-toggle="dropdown" class="dropdown-toggle">${_('Other apps')} <b class="caret"></b></a>
          <ul role="menu" class="dropdown-menu">
            % for other in other_apps:
              <li><a href="/${ other.display_name }"><img src="${ other.icon_path }"/> ${ other.nice_name }</a></li>
