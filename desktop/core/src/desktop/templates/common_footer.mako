@@ -188,13 +188,13 @@ from django.template.defaultfilters import escape, escapejs
         ${_('There is one or more tours available for this page. These tours were created to guide you around.')}
       </p>
       <p>
-        ${_('You can see the list of the tours by clicking on the checkered flag badge on the side of this page.')}
+        ${_('You can see the list of the tours by clicking on the checkered flag icon on top right of this page.')} <span class="badge badge-info"><i class="icon-flag-checkered"></i></span>
       </p>
         </div>
     </div>
     <div class="modal-footer">
       <label class="checkbox" style="float:left"><input id="jHueTourModalChk" type="checkbox" />${_('Do not show this dialog again')}</label>
-      <a href="#" class="btn btn-primary disable-feedback" data-dismiss="modal">${_('Got it, prof!')}</a>
+      <a id="jHueTourModalClose" href="#" class="btn btn-primary disable-feedback">${_('Got it, prof!')}</a>
     </div>
   </div>
 %endif
