@@ -186,6 +186,10 @@
           $("#jHueTourModalChk").on("change", function () {
             $.totalStorage("jHueTourHideModal", $(this).is(":checked"));
           });
+          $("#jHueTourModalClose").on("click", function () {
+            _questionMark.click();
+            $("#jHueTourModal").modal("hide");
+          });
         });
       }
       if (_this.options.showRemote){

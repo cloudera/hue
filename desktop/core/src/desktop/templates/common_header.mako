@@ -154,7 +154,7 @@ from django.utils.translation import ugettext as _
 
       % if 'jobbrowser' in apps:
       var JB_CHECK_INTERVAL_IN_MILLIS = 30000;
-      window.setTimeout(checkJobBrowserStatus, JB_CHECK_INTERVAL_IN_MILLIS);
+      window.setTimeout(checkJobBrowserStatus, 10);
 
       function checkJobBrowserStatus(){
         $.getJSON("/${apps['jobbrowser'].display_name}/?format=json&state=running&user=${user.username}&rnd="+Math.random(), function(data){
@@ -167,6 +167,8 @@ from django.utils.translation import ugettext as _
             }
           }
           window.setTimeout(checkJobBrowserStatus, JB_CHECK_INTERVAL_IN_MILLIS);
+        }).fail(function () {
+          window.clearTimeout(checkJobBrowserStatus);
         });
       }
       % endif
