@@ -541,7 +541,7 @@ ${layout.menubar(section='query')}
           $(data.split(" ")).each(function (cnt, table) {
             if ($.trim(table) != ""){
               var _table = $("<li>");
-              _table.html("<a href='#' class='pull-right hide'><i class='icon-eye-open'></i></a><a href='#' title='" + table + "'><i class='icon-table'></i> " + table + "</a><ul class='unstyled'></ul>");
+              _table.html("<a href='#' class='pull-right hide'><i class='icon-eye-open' title='" + "${ _('View data') }" + "'></i></a><a href='#' title='" + table + "'><i class='icon-table'></i> " + table + "</a><ul class='unstyled'></ul>");
               _table.data("table", table).attr("id", "navigatorTables_" + table);
               _table.find("a:eq(1)").on("click", function () {
                 _table.find(".icon-table").removeClass("icon-table").addClass("icon-spin").addClass("icon-spinner");
@@ -554,7 +554,7 @@ ${layout.menubar(section='query')}
                     _column.html("<a href='#' style='padding-left:10px'" + (col.comment != null && col.comment != "" ? " title='" + col.comment + "'" : "") + "><i class='icon-columns'></i> " + col.name + " (" + col.type + ")</a>");
                     _column.appendTo(_table.find("ul"));
                     _column.on("dblclick", function () {
-                      codeMirror.replaceSelection(col.name);
+                      codeMirror.replaceSelection($.trim(col.name) + ', ');
                       codeMirror.setSelection(codeMirror.getCursor());
                       codeMirror.focus();
                     });
@@ -562,7 +562,7 @@ ${layout.menubar(section='query')}
                 });
               });
               _table.find("a:eq(1)").on("dblclick", function () {
-                codeMirror.replaceSelection(table);
+                codeMirror.replaceSelection($.trim(table) + ' ');
                 codeMirror.setSelection(codeMirror.getCursor());
                 codeMirror.focus();
               });
