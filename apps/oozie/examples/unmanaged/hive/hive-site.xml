@@ -19,20 +19,14 @@
 
 <configuration>
 
-<!-- Hive Configuration can either be stored in this file or in the hadoop configuration files  -->
-<!-- that are implied by Hadoop setup variables.                                                -->
-<!-- Aside from Hadoop setup variables - this file is provided as a convenience so that Hive    -->
-<!-- users do not have to edit hadoop configuration files (that may be managed as a centralized -->
-<!-- resource).                                                                                 -->
+<!--
+  Note:
 
+  Configure Hive to use a remote Hive Metastore and update this hive-site.xml.
+  This example can work with a local metatastore but this is not recommended.
 
-<property>
-  <name>hive.server2.authentication</name>
-  <value>NOSASL</value>
-</property>
-
-
-<!-- Hive Execution Parameters -->
+  http://gethue.tumblr.com/post/60937985689/hadoop-tutorials-ii-2-execute-hive-queries-and
+-->
 
 <property>
   <name>javax.jdo.option.ConnectionURL</name>
