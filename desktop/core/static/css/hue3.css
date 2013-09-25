@@ -1341,7 +1341,7 @@ a#advanced-btn:hover {
   width: 100%;
   background-color: #338BB8;
   height: 28px;
-  z-index: 1031;
+  z-index: 1033;
 }
 
 .navigator .brand {
@@ -1355,6 +1355,9 @@ a#advanced-btn:hover {
 .navigator .dropdown-menu {
   z-index: 20000;
   box-shadow: none;
+  margin-top: -4px;
+  margin-left: -1px;
+  border-top: 2px solid #EEE;
 }
 
 .navigator .nav-pills > li > a {

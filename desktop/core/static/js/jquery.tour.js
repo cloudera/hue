@@ -66,7 +66,8 @@
       labels: {
         AVAILABLE_TOURS: "Available tours",
         NO_AVAILABLE_TOURS: "None for this page",
-        MORE_INFO: "Read more about it..."
+        MORE_INFO: "Read more about it...",
+        TOOLTIP_TITLE: "Demo tutorials"
       },
       tours: [],
       showRemote: false,
@@ -120,7 +121,11 @@
   Plugin.prototype.initQuestionMark = function () {
     var _this = this;
     $("#jHueTourFlag").remove();
-    var _questionMark = $("<a>").attr("id", "jHueTourFlag").html('<i title="Demo tutorials" class="icon-flag-checkered" style=""></i>');
+    var _questionMark = $("<a>").attr("id", "jHueTourFlag").html('<i class="icon-flag-checkered" style=""></i>');
+    _questionMark.tooltip({
+      placement: "bottom",
+      title: _this.options.labels.TOOLTIP_TITLE
+    });
     if ($.totalStorage("jHueTourExtras") != null) {
       var _newTours = [];
       $.each(_this.options.tours, function (cnt, tour) {
