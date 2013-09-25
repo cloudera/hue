@@ -339,6 +339,7 @@ ${layout.menubar(section='query')}
         <div class="card-body">
           <p>
             <input id="navigatorSearch" type="text" class="input-medium" placeholder="${ _('Table name...') }"/>
+            <span id="navigatorNoTables">${_('The selected database has no tables.')}</span>
             <ul id="navigatorTables" class="unstyled"></ul>
             <div id="navigatorLoader">
               <!--[if !IE]><!--><i class="icon-spinner icon-spin" style="font-size: 20px; color: #DDD"></i><!--<![endif]-->
@@ -493,7 +494,7 @@ ${layout.menubar(section='query')}
     text-overflow: ellipsis;
   }
 
-  #navigatorSearch {
+  #navigatorSearch, #navigatorNoTables {
     display: none;
   }
 
@@ -506,6 +507,13 @@ ${layout.menubar(section='query')}
     var HIVE_AUTOCOMPLETE_BASE_URL = "${ autocomplete_base_url | n,unicode }";
     var codeMirror;
     $(document).ready(function(){
+
+      ## If no particular query is loaded
+      % if design is None or design.id is None:
+        if ($.cookie("hueBeeswaxLastDatabase") != null) {
+          $("#id_query-database").val($.cookie("hueBeeswaxLastDatabase"));
+        }
+      % endif
 
       $("#navigatorQuicklook").modal({
         show: false
@@ -524,58 +532,73 @@ ${layout.menubar(section='query')}
         }, 300);
       });
 
-      hac_getTables($("#id_query-database").val(), function (data) {  //preload tables for the default db
-        $(data.split(" ")).each(function (cnt, table) {
-          var _table = $("<li>");
-          _table.html("<a href='#' class='pull-right hide'><i class='icon-eye-open'></i></a><a href='#' title='" + table + "'><i class='icon-table'></i> " + table + "</a><ul class='unstyled'></ul>");
-          _table.data("table", table).attr("id", "navigatorTables_" + table);
-          _table.find("a:eq(1)").on("click", function () {
-            _table.find(".icon-table").removeClass("icon-table").addClass("icon-spin").addClass("icon-spinner");
-            hac_getTableColumns($("#id_query-database").val(), table, "", function (plain_columns, extended_columns) {
-              _table.find("a:eq(0)").removeClass("hide");
-              _table.find("ul").empty();
-              _table.find(".icon-spinner").removeClass("icon-spinner").removeClass("icon-spin").addClass("icon-table");
-              $(extended_columns).each(function (iCnt, col) {
-                var _column = $("<li>");
-                _column.html("<a href='#' style='padding-left:10px'" + (col.comment != null && col.comment != "" ? " title='" + col.comment + "'" : "") + "><i class='icon-columns'></i> " + col.name + " (" + col.type + ")</a>");
-                _column.appendTo(_table.find("ul"));
-                _column.on("dblclick", function () {
-                  codeMirror.replaceSelection(col.name);
-                  codeMirror.setSelection(codeMirror.getCursor());
-                  codeMirror.focus();
+      renderNavigator();
+
+      function renderNavigator() {
+        $("#navigatorTables").empty();
+        $("#navigatorLoader").show();
+        hac_getTables($("#id_query-database").val(), function (data) {  //preload tables for the default db
+          $(data.split(" ")).each(function (cnt, table) {
+            if ($.trim(table) != ""){
+              var _table = $("<li>");
+              _table.html("<a href='#' class='pull-right hide'><i class='icon-eye-open'></i></a><a href='#' title='" + table + "'><i class='icon-table'></i> " + table + "</a><ul class='unstyled'></ul>");
+              _table.data("table", table).attr("id", "navigatorTables_" + table);
+              _table.find("a:eq(1)").on("click", function () {
+                _table.find(".icon-table").removeClass("icon-table").addClass("icon-spin").addClass("icon-spinner");
+                hac_getTableColumns($("#id_query-database").val(), table, "", function (plain_columns, extended_columns) {
+                  _table.find("a:eq(0)").removeClass("hide");
+                  _table.find("ul").empty();
+                  _table.find(".icon-spinner").removeClass("icon-spinner").removeClass("icon-spin").addClass("icon-table");
+                  $(extended_columns).each(function (iCnt, col) {
+                    var _column = $("<li>");
+                    _column.html("<a href='#' style='padding-left:10px'" + (col.comment != null && col.comment != "" ? " title='" + col.comment + "'" : "") + "><i class='icon-columns'></i> " + col.name + " (" + col.type + ")</a>");
+                    _column.appendTo(_table.find("ul"));
+                    _column.on("dblclick", function () {
+                      codeMirror.replaceSelection(col.name);
+                      codeMirror.setSelection(codeMirror.getCursor());
+                      codeMirror.focus();
+                    });
+                  });
                 });
               });
-            });
+              _table.find("a:eq(1)").on("dblclick", function () {
+                codeMirror.replaceSelection(table);
+                codeMirror.setSelection(codeMirror.getCursor());
+                codeMirror.focus();
+              });
+              _table.find("a:eq(0)").on("click", function () {
+                $("#navigatorQuicklook").find(".tableName").text(table);
+                $("#navigatorQuicklook").find(".tableLink").attr("href", "/metastore/table/" + $("#id_query-database").val() + "/" + _table.data("table"));
+                $("#navigatorQuicklook").find(".sample").empty("");
+                $("#navigatorQuicklook").attr("style", "width: " + ($(window).width() - 120) + "px;margin-left:-" + (($(window).width() - 80) / 2) + "px!important;");
+                $.ajax({
+                  url: "/metastore/table/" + $("#id_query-database").val() + "/" + _table.data("table"),
+                  data: {"sample": true},
+                  beforeSend: function (xhr) {
+                    xhr.setRequestHeader("X-Requested-With", "Hue");
+                  },
+                  dataType: "html",
+                  success: function (data) {
+                    $("#navigatorQuicklook").find(".loader").hide();
+                    $("#navigatorQuicklook").find(".sample").html(data);
+                  }
+                });
+                $("#navigatorQuicklook").modal("show");
+              });
+              _table.appendTo($("#navigatorTables"));
+            }
           });
-          _table.find("a:eq(1)").on("dblclick", function () {
-            codeMirror.replaceSelection(table);
-            codeMirror.setSelection(codeMirror.getCursor());
-            codeMirror.focus();
-          });
-          _table.find("a:eq(0)").on("click", function () {
-            $("#navigatorQuicklook").find(".tableName").text(table);
-            $("#navigatorQuicklook").find(".tableLink").attr("href", "/metastore/table/" + $("#id_query-database").val() + "/" + _table.data("table"));
-            $("#navigatorQuicklook").find(".sample").empty("");
-            $("#navigatorQuicklook").attr("style", "width: " + ($(window).width() - 120) + "px;margin-left:-" + (($(window).width() - 80) / 2) + "px!important;");
-            $.ajax({
-              url: "/metastore/table/" + $("#id_query-database").val() + "/" + _table.data("table"),
-              data: {"sample": true},
-              beforeSend: function (xhr) {
-                xhr.setRequestHeader("X-Requested-With", "Hue");
-              },
-              dataType: "html",
-              success: function (data) {
-                $("#navigatorQuicklook").find(".loader").hide();
-                $("#navigatorQuicklook").find(".sample").html(data);
-              }
-            });
-            $("#navigatorQuicklook").modal("show");
-          });
-          _table.appendTo($("#navigatorTables"));
+          $("#navigatorLoader").hide();
+          if ($("#navigatorTables li").length > 0) {
+            $("#navigatorSearch").show();
+            $("#navigatorNoTables").hide();
+          }
+          else {
+            $("#navigatorSearch").hide();
+            $("#navigatorNoTables").show();
+          }
         });
-        $("#navigatorLoader").hide();
-        $("#navigatorSearch").show();
-      });
+      }
 
       $("#navigator .card").css("min-height", ($(window).height() - 130) + "px");
       $("#navigatorTables").css("max-height", ($(window).height() - 260) + "px").css("overflow-y", "auto");
@@ -650,15 +673,8 @@ ${layout.menubar(section='query')}
 
       $("#id_query-database").change(function () {
         $.cookie("hueBeeswaxLastDatabase", $(this).val(), {expires: 90});
-        hac_getTables($("#id_query-database").val(), function(){}); //preload tables for the default db
+        renderNavigator();
       });
-
-      ## If no particular query is loaded
-      % if design is None or design.id is None:
-        if ($.cookie("hueBeeswaxLastDatabase") != null) {
-          $("#id_query-database").val($.cookie("hueBeeswaxLastDatabase"));
-        }
-      % endif
 
       var executeQuery = function () {
         $("input[name='button-explain']").remove();
