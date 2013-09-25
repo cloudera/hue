@@ -43,11 +43,6 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
     margin-top: 2px;
   }
 
-  .hueCheckbox {
-    margin-right: 6px !important;
-    line-height: 15px !important;
-  }
-
   .toggleTag, .documentTagsModalCheckbox, .tagsModalCheckbox {
     cursor: pointer;
   }
@@ -128,10 +123,10 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
            <li class="viewHistory toggableSection">
              <a href="javascript:void(0)"><i class="icon-time"></i> ${_('History')} <span id="historyCounter" class="badge pull-right">0</span></a>
            </li>
-          <li class="nav-header tag-header">${_('Tags')} <div id="editTags" style="display: inline;cursor: pointer;margin-left: 6px" title="${ _('Edit tags') }"><i class="icon-tags"></i></div> </li>
+          <li class="nav-header tag-header">${_('Projects')} <div id="editTags" style="display: inline;cursor: pointer;margin-left: 6px" title="${ _('Edit projects') }"><i class="icon-tags"></i></div> </li>
           % for tag in tags:
             % if tag['tags__tag'] not in ('trash', 'history'):
-            <li class="toggleTag white" data-tag="${ tag['tags__tag'] }"><div class="hueCheckbox pull-left"></div>${ tag['tags__tag'] } <span class="tagCounter badge pull-right">0</span></li>
+            <li class="toggleTag" data-tag="${ tag['tags__tag'] }"><a href="javascript:void(0)">${ tag['tags__tag'] } <span class="tagCounter badge pull-right">0</span></a></li>
             % endif
           % endfor
 
@@ -153,7 +148,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
                 <th>&nbsp;</th>
                 <th>${_('Name')}</th>
                 <th>${_('Description')}</th>
-                <th>${_('Tags')}</th>
+                <th>${_('Projects')}</th>
                 <th>${_('Owner')}</th>
                 <th>${_('Last Modified')}</th>
                 <th>${_('Sharing')}</th>
@@ -171,7 +166,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
 <div id="documentTagsModal" class="modal hide fade">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3>${_('Tags for ')}<span id="documentTagsModalName"></span></h3>
+    <h3>${_('Projects for ')}<span id="documentTagsModalName"></span></h3>
   </div>
   <div class="modal-body">
     <p>
@@ -187,14 +182,14 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
   </div>
   <div class="modal-footer">
     <a href="#" data-dismiss="modal" class="btn">${_('Cancel')}</a>
-    <a id="saveDocumentTags" href="#" class="btn btn-primary disable-feedback">${_('Save tags')}</a>
+    <a id="saveDocumentTags" href="#" class="btn btn-primary disable-feedback">${_('Save projects')}</a>
   </div>
 </div>
 
 <div id="tagsModal" class="modal hide fade">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3>${_('Manage tags')}</h3>
+    <h3>${_('Manage projects')}</h3>
   </div>
   <div class="modal-body">
     <p>
@@ -334,8 +329,6 @@ $(document).ready(function () {
     documentsTable.fnDraw();
   });
 
-  populateTable();
-
   $(".viewTrash").on("click", function () {
     $(".viewHistory").removeClass("active");
     toggleSpecificSection($(this), "trash");
@@ -347,10 +340,11 @@ $(document).ready(function () {
   });
 
   function toggleSpecificSection(section, filter){
-    $(".hueCheckbox").removeClass("icon-ok");
+    section.siblings().removeClass("active");
     if (section.hasClass("active")) {
       populateTable();
       section.removeClass("active");
+      section.find("a").blur();
     }
     else {
       populateTable(filter);
@@ -359,18 +353,19 @@ $(document).ready(function () {
   }
 
   $(document).on("click", ".toggleTag", function (e) {
-    $(".toggableSection").removeClass("active");
     var _this = $(this);
+    _this.siblings().removeClass("active");
     _this.blur();
-    if (_this.find(".hueCheckbox").hasClass("icon-ok")) {
-      _this.find(".hueCheckbox").removeClass("icon-ok");
+    if (_this.hasClass("active")) {
+      _this.removeClass("active");
+      _this.find("a").blur();
     }
     else {
-      _this.find(".hueCheckbox").addClass("icon-ok");
+      _this.addClass("active");
     }
     var _tags = [];
-    $(".hueCheckbox.icon-ok").each(function () {
-      _tags.push($(this).parent().data("tag"));
+    $(".toggleTag.active").each(function () {
+      _tags.push($(this).data("tag"));
     });
     populateTable(_tags.join(","));
   });
@@ -397,6 +392,21 @@ $(document).ready(function () {
     }
   });
 
+  if ($.totalStorage("hueHomeTags") != null && $.totalStorage("hueHomeTags") != "") {
+    if ($.totalStorage("hueHomeTags") == "history") {
+      $(".viewHistory").click();
+    }
+    else if ($.totalStorage("hueHomeTags") == "trash") {
+      $(".viewTrash").click();
+    }
+    else {
+      $("li[data-tag='" + $.totalStorage("hueHomeTags") + "']").click();
+    }
+  }
+  else {
+    populateTable();
+  }
+
   $(document).on("click", ".documentTags", function () {
     $("#documentTagsModal").data("document-id", $(this).data("document-id"));
     renderDocumentTagsModal();
@@ -406,12 +416,17 @@ $(document).ready(function () {
     $(".toggleTag").remove();
     for (var i = JSON_TAGS.length - 1; i >= 0; i--) {
       if (!JSON_TAGS[i].isTrash && !JSON_TAGS[i].isHistory && !JSON_TAGS[i].isExample) {
-        var _t = $("<li>").addClass("toggleTag").addClass("white");
-        _t.data("tag", JSON_TAGS[i].name);
-        _t.html('<div class="hueCheckbox pull-left"></div>' + JSON_TAGS[i].name);
+        var _t = $("<li>").addClass("toggleTag");
+        _t.attr("data-tag", JSON_TAGS[i].name);
+        _t.html('<a href="javascript:void(0)">' + JSON_TAGS[i].name + '<span class="tagCounter badge pull-right">0</span></a>');
         _t.insertAfter(".tag-header");
       }
     }
+    $("li[data-tag]").each(function () {
+      if (_tagCounters[$(this).data("tag")] != null) {
+        $(this).find(".badge").text(_tagCounters[$(this).data("tag")]);
+      }
+    });
   }
 
   function renderTagsModal() {
@@ -526,7 +541,7 @@ $(document).ready(function () {
       })
     }, function (response) {
       if (response.doc != null) {
-        $(document).trigger("info", "${ _("Tags updated successfully.") }");
+        $(document).trigger("info", "${ _("Projects updated successfully.") }");
         var _doc = response.doc;
         var _dtNodes = documentsTable.fnGetNodes();
         $(_dtNodes).each(function (iNode, node) {
@@ -709,6 +724,7 @@ function isInTags(doc, tag) {
 }
 
 function populateTable(tags) {
+  $.totalStorage("hueHomeTags", tags);
   documentsTable.fnClearTable();
   documentsTable.fnDraw();
   if (tags == null || tags == "") {
