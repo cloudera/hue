@@ -141,7 +141,7 @@ MR_CLUSTERS = UnspecifiedConfigSection(
       SECURITY_ENABLED=Config("security_enabled", help="Is running with Kerberos authentication",
                               default=False, type=coerce_bool),
       SUBMIT_TO=Config('submit_to', help="Whether Hue should use this cluster to run jobs",
-                       default=True, type=coerce_bool),
+                       default=True, type=coerce_bool), # Backward compatibility
 
       HADOOP_MAPRED_HOME = Config(
         key="hadoop_mapred_home",
@@ -185,7 +185,7 @@ YARN_CLUSTERS = UnspecifiedConfigSection(
       SECURITY_ENABLED=Config("security_enabled", help="Is running with Kerberos authentication",
                               default=False, type=coerce_bool),
       SUBMIT_TO=Config('submit_to', help="Whether Hue should use this cluster to run jobs",
-                       default=False, type=coerce_bool),
+                       default=False, type=coerce_bool), # Backward compatibility
 
       HADOOP_MAPRED_HOME = Config(
         key="hadoop_mapred_home",
