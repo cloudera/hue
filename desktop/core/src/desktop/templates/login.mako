@@ -44,7 +44,7 @@ from django.utils.translation import ugettext as _
       display: block;
       margin-left: auto;
       margin-right: auto;
-      margin-bottom: 40px
+      margin-bottom: 30px
     }
 
     .login-content {
@@ -62,6 +62,7 @@ from django.utils.translation import ugettext as _
     .login-content input[type='text'], .login-content input[type='password'] {
       width: 90%;
       margin-top: 10px;
+      font-size: 18px;
     }
 
     .login-content input {
@@ -85,77 +86,121 @@ from django.utils.translation import ugettext as _
       -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
       box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
     }
+
+    .well {
+      border: 1px solid #D8D8D8;
+      border-radius: 3px 3px 3px 3px;
+    }
+
+    .footer {
+      position: fixed;
+      bottom: 0;
+      background-color: #338BB8;
+      height: 4px;
+      width: 100%;
+    }
   </style>
 </head>
 
 <body>
 
-  <div class="container">
-    <div class="row">
-      <div class="login-content">
-        <form method="POST" action="${action}" class="well">
-        <img id="logo" src="/static/art/hue-login-logo.png" />
-          <label
+<div class="footer"></div>
+
+<div class="navigator">
+  <div class="pull-right">
+    <ul class="nav nav-pills">
+      <li id="jHueTourFlagPlaceholder"></li>
+    </ul>
+  </div>
+  <a class="brand nav-tooltip pull-left" href="#"><img src="/static/art/hue-logo-mini-white.png"
+                                                       data-orig="/static/art/hue-logo-mini-white.png"
+                                                       data-hover="/static/art/hue-logo-mini-white-hover.png"/></a>
+  <ul class="nav nav-pills pull-left hide" id="visit">
+    <li><a title="${_('Visit gethue.com')}" href="http://gethue.com">${_('Fell asleep? Visit us on gethue.com instead!')} <i class="icon-external-link-sign"></i></a></li>
+  </ul>
+</div>
+
+
+<div class="container">
+  <div class="row">
+    <div class="login-content">
+      <form method="POST" action="${action}" class="well">
+        <img id="logo" src="/static/art/hue-login-logo.png" data-orig="/static/art/hue-login-logo.png"
+             data-hover="/static/art/hue-login-logo-skew.png"/>
+        <label
           % if backend_name == 'OAuthBackend':
             class="hide"
           % endif
-          ><i class="icon-user"></i> ${_('Username')}
-              ${ form['username'] | n,unicode }
-              ${ form['username'].errors | n,unicode }
-          </label>
-          <label
+            ><i class="icon-user"></i> ${_('Username')}
+          ${ form['username'] | n,unicode }
+          ${ form['username'].errors | n,unicode }
+        </label>
+        <label
           % if backend_name in ('AllowAllBackend', 'OAuthBackend'):
             class="hide"
           % endif
-          ><i class="icon-lock"></i> ${_('Password')}
-              ${ form['password'] | n,unicode }
-              ${ form['password'].errors | n,unicode }
-          </label>
+            ><i class="icon-lock"></i> ${_('Password')}
+          ${ form['password'] | n,unicode }
+          ${ form['password'].errors | n,unicode }
+        </label>
 
-          %if login_errors:
+        %if login_errors:
             <div class="alert alert-error" style="text-align: center">
               <strong><i class="icon-warning-sign"></i> ${_('Error!')}</strong> ${_('Invalid username or password.')}
             </div>
-          %endif
+        %endif
 
-          %if first_login_ever:
+        %if first_login_ever:
             <div class="alert alert-block">
               <i class="icon-warning-sign"></i>
-              ${_('Since this is your first time logging in, pick any username and password. Be sure to remember these, as')}
+            ${_('Since this is your first time logging in, pick any username and password. Be sure to remember these, as')}
               <strong>${_('they will become your Hue superuser credentials.')}</strong>.
             </div>
             <hr/>
-            <input type="submit" class="btn btn-large btn-primary" value="${_('Sign up')}" />
-          %else:
+            <input type="submit" class="btn btn-large btn-primary" value="${_('Sign up')}"/>
+        %else:
             <hr/>
             <input type="submit" class="btn btn-large btn-primary" value="${_('Sign in')}"/>
-          %endif
-          <input type="hidden" name="next" value="${next}" />
-        </form>
-      </div>
+        %endif
+        <input type="hidden" name="next" value="${next}"/>
+      </form>
     </div>
   </div>
+</div>
 
-  <script src="/static/ext/js/jquery/jquery-2.0.2.min.js"></script>
-  <script>
-    $(document).ready(function(){
+<script src="/static/ext/js/jquery/jquery-2.0.2.min.js"></script>
+<script>
+  $(document).ready(function () {
+    var _skew = -1;
+    $("[data-hover]").on("mouseover", function () {
+      var _this = $(this);
+      _skew = window.setTimeout(function () {
+        _this.attr("src", _this.data("hover"));
+        $("#visit").removeClass("hide");
+      }, 3000);
+    });
+
+    $("[data-hover]").on("mouseout", function () {
+      $(this).attr("src", $(this).data("orig"));
+      window.clearTimeout(_skew);
+    });
 
     % if backend_name == 'AllowAllBackend':
-      $('#id_password').val('password');
+        $('#id_password').val('password');
     % endif
 
     % if backend_name == 'OAuthBackend':
-      $("input").css({"display": "block", "margin-left": "auto", "margin-right": "auto"});
-      $("input").bind('click', function() {
-        window.location.replace('/login/oauth/');
-       return false;
-      });
+        $("input").css({"display": "block", "margin-left": "auto", "margin-right": "auto"});
+        $("input").bind('click', function () {
+          window.location.replace('/login/oauth/');
+          return false;
+        });
     % endif
 
-      $("ul.errorlist").each(function(){
-        $(this).prev().addClass("error");
-      });
+    $("ul.errorlist").each(function () {
+      $(this).prev().addClass("error");
     });
-  </script>
+  });
+</script>
 </body>
 </html>
