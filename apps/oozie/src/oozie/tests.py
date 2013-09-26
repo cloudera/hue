@@ -240,13 +240,13 @@ class OozieMockBase(object):
   def setup_forking_workflow(self):
     Link.objects.filter(parent__workflow=self.wf).delete()
     Link(parent=self.wf.start, child=self.wf.end, name="related").save()
-    
+
     fork1 = add_node(self.wf, 'fork-name-1', 'fork', [self.wf.start])
     action1 = add_node(self.wf, 'action-name-1', 'mapreduce', [fork1])
     action2 = add_node(self.wf, 'action-name-2', 'mapreduce', [fork1])
-    join1 = add_node(self.wf, 'join-name-1', 'join', [action1, action2])    
+    join1 = add_node(self.wf, 'join-name-1', 'join', [action1, action2])
     Link(parent=fork1, child=join1, name="related").save()
-    
+
     action3 = add_node(self.wf, 'action-name-3', 'mapreduce', [join1])
     Link(parent=action3, child=self.wf.end, name="ok").save()
 
@@ -254,14 +254,14 @@ class OozieMockBase(object):
   def create_noop_workflow(self, name='noop-test'):
     Node.objects.filter(workflow__name=name).delete()
     Workflow.objects.filter(name=name).delete()
-  
+
     if Document.objects.get_docs(self.user, Workflow).filter(name=name).exists():
       for doc in Document.objects.get_docs(self.user, Workflow).filter(name=name):
         if doc.content_object:
           self.c.post(reverse('oozie:delete_workflow') + '?skip_trash=true', {'job_selection': [doc.content_object.id]}, follow=True)
         else:
-          doc.delete()    
-    
+          doc.delete()
+
     wf = Workflow.objects.new_workflow(self.user)
     wf.name = name
     wf.save()
@@ -269,9 +269,9 @@ class OozieMockBase(object):
     wf.end.workflow = wf
     wf.start.save()
     wf.end.save()
-    
+
     Document.objects.link(wf, owner=wf.owner, name=wf.name, description=wf.description)
-    
+
     Kill.objects.create(name='kill', workflow=wf, node_type=Kill.node_type)
     Link.objects.create(parent=wf.start, child=wf.end, name='related')
     Link.objects.create(parent=wf.start, child=wf.end, name="to")
@@ -2578,30 +2578,15 @@ class TestDashboard(OozieMockBase):
         u'form-INITIAL_FORMS': [u'0']
     }
 
-    finish = SHARE_JOBS.set_for_testing(False)
-    try:
-      response = self.c.post(reverse('oozie:rerun_oozie_coord', args=[MockOozieApi.COORDINATOR_IDS[0], '/path']), post_data)
-      assert_false('Permission denied' in response.content, response.content)
-    finally:
-      finish()
+    response = self.c.post(reverse('oozie:rerun_oozie_coord', args=[MockOozieApi.COORDINATOR_IDS[0], '/path']), post_data)
+    assert_false('Permission denied' in response.content, response.content)
 
     # Login as someone else
     client_not_me = make_logged_in_client(username='not_me', is_superuser=False, groupname='test')
     grant_access("not_me", "test", "oozie")
 
-    finish = SHARE_JOBS.set_for_testing(False)
-    try:
-      response = client_not_me.post(reverse('oozie:rerun_oozie_coord', args=[MockOozieApi.COORDINATOR_IDS[0], '/path']), post_data)
-      assert_true('Permission denied' in response.content, response.content)
-    finally:
-      finish()
-
-    finish = SHARE_JOBS.set_for_testing(True)
-    try:
-      response = client_not_me.post(reverse('oozie:rerun_oozie_coord', args=[MockOozieApi.COORDINATOR_IDS[0], '/path']), post_data)
-      assert_true('Permission denied' in response.content, response.content)
-    finally:
-      finish()
+    response = client_not_me.post(reverse('oozie:rerun_oozie_coord', args=[MockOozieApi.COORDINATOR_IDS[0], '/path']), post_data)
+    assert_true('Permission denied' in response.content, response.content)
 
 
   def test_rerun_bundle(self):
@@ -2610,7 +2595,7 @@ class TestDashboard(OozieMockBase):
 
 
   def test_rerun_bundle_permissions(self):
-    post_data =  {
+    post_data = {
         u'end_1': [u'01:55 PM'],
         u'end_0': [u'03/02/2013'],
         u'refresh': [u'on'],
@@ -2630,46 +2615,31 @@ class TestDashboard(OozieMockBase):
         u'form-2-value': [u'hdfs://localhost:8020/path'],
     }
 
-    finish = SHARE_JOBS.set_for_testing(False)
-    try:
-      response = self.c.post(reverse('oozie:rerun_oozie_bundle', args=[MockOozieApi.BUNDLE_IDS[0], '/path']), post_data)
-      assert_false('Permission denied' in response.content, response.content)
-    finally:
-      finish()
+    response = self.c.post(reverse('oozie:rerun_oozie_bundle', args=[MockOozieApi.BUNDLE_IDS[0], '/path']), post_data)
+    assert_false('Permission denied' in response.content, response.content)
 
     # Login as someone else
     client_not_me = make_logged_in_client(username='not_me', is_superuser=False, groupname='test')
     grant_access("not_me", "test", "oozie")
 
-    finish = SHARE_JOBS.set_for_testing(False)
-    try:
-      response = client_not_me.post(reverse('oozie:rerun_oozie_bundle', args=[MockOozieApi.BUNDLE_IDS[0], '/path']), post_data)
-      assert_true('Permission denied' in response.content, response.content)
-    finally:
-      finish()
-
-    finish = SHARE_JOBS.set_for_testing(True)
-    try:
-      response = client_not_me.post(reverse('oozie:rerun_oozie_bundle', args=[MockOozieApi.BUNDLE_IDS[0], '/path']), post_data)
-      assert_true('Permission denied' in response.content, response.content)
-    finally:
-      finish()
+    response = client_not_me.post(reverse('oozie:rerun_oozie_bundle', args=[MockOozieApi.BUNDLE_IDS[0], '/path']), post_data)
+    assert_true('Permission denied' in response.content, response.content)
 
 
   def test_list_workflows(self):
-    response = self.c.get(reverse('oozie:list_oozie_workflows')+"?format=json")
+    response = self.c.get(reverse('oozie:list_oozie_workflows') + "?format=json")
     for wf_id in MockOozieApi.WORKFLOW_IDS:
       assert_true(wf_id in response.content, response.content)
 
 
   def test_list_coordinators(self):
-    response = self.c.get(reverse('oozie:list_oozie_coordinators')+"?format=json")
+    response = self.c.get(reverse('oozie:list_oozie_coordinators') + "?format=json")
     for coord_id in MockOozieApi.COORDINATOR_IDS:
       assert_true(coord_id in response.content, response.content)
 
 
   def test_list_bundles(self):
-    response = self.c.get(reverse('oozie:list_oozie_bundles')+"?format=json")
+    response = self.c.get(reverse('oozie:list_oozie_bundles') + "?format=json")
     for coord_id in MockOozieApi.BUNDLE_IDS:
       assert_true(coord_id in response.content, response.content)
 
