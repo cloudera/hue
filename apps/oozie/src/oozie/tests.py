@@ -188,6 +188,7 @@ class OozieMockBase(object):
 
     self.c = make_logged_in_client(is_superuser=False)
     grant_access("test", "test", "oozie")
+    add_to_group("test")
     self.user = User.objects.get(username='test')
     self.wf = create_workflow(self.c, self.user)
 
@@ -237,19 +238,30 @@ class OozieMockBase(object):
 
 
   def setup_forking_workflow(self):
-    """ Creates a workflow with a fork """
     Link.objects.filter(parent__workflow=self.wf).delete()
     Link(parent=self.wf.start, child=self.wf.end, name="related").save()
+    
     fork1 = add_node(self.wf, 'fork-name-1', 'fork', [self.wf.start])
     action1 = add_node(self.wf, 'action-name-1', 'mapreduce', [fork1])
     action2 = add_node(self.wf, 'action-name-2', 'mapreduce', [fork1])
-    join1 = add_node(self.wf, 'join-name-1', 'join', [action1, action2])
+    join1 = add_node(self.wf, 'join-name-1', 'join', [action1, action2])    
     Link(parent=fork1, child=join1, name="related").save()
+    
     action3 = add_node(self.wf, 'action-name-3', 'mapreduce', [join1])
     Link(parent=action3, child=self.wf.end, name="ok").save()
 
 
   def create_noop_workflow(self, name='noop-test'):
+    Node.objects.filter(workflow__name=name).delete()
+    Workflow.objects.filter(name=name).delete()
+  
+    if Document.objects.get_docs(self.user, Workflow).filter(name=name).exists():
+      for doc in Document.objects.get_docs(self.user, Workflow).filter(name=name):
+        if doc.content_object:
+          self.c.post(reverse('oozie:delete_workflow') + '?skip_trash=true', {'job_selection': [doc.content_object.id]}, follow=True)
+        else:
+          doc.delete()    
+    
     wf = Workflow.objects.new_workflow(self.user)
     wf.name = name
     wf.save()
@@ -257,9 +269,13 @@ class OozieMockBase(object):
     wf.end.workflow = wf
     wf.start.save()
     wf.end.save()
+    
+    Document.objects.link(wf, owner=wf.owner, name=wf.name, description=wf.description)
+    
     Kill.objects.create(name='kill', workflow=wf, node_type=Kill.node_type)
     Link.objects.create(parent=wf.start, child=wf.end, name='related')
     Link.objects.create(parent=wf.start, child=wf.end, name="to")
+
     return wf
 
 
@@ -340,7 +356,6 @@ class TestAPI(OozieMockBase):
   def setUp(self):
     OozieMockBase.setUp(self)
 
-    # When updating wf, update wf_json as well!
     self.wf = Workflow.objects.get(name='wf-name-1', managed=True)
 
   def test_workflow_save(self):
@@ -462,6 +477,7 @@ class TestAPI(OozieMockBase):
 
   def test_workflow_add_mapreduce_node(self):
     wf = self.create_noop_workflow()
+
     try:
       node_name = "mr-1"
       node_id = "mapreduce:1"
@@ -505,6 +521,7 @@ class TestAPI(OozieMockBase):
       workflow_json = json.dumps(workflow_dict)
 
       response = self.c.post(reverse('oozie:workflow_save', kwargs={'workflow': wf.pk}), data={'workflow': workflow_json})
+
       test_response_json = response.content
       test_response_json_object = json.loads(test_response_json)
       assert_equal(0, test_response_json_object['status'], workflow_json)
@@ -2404,10 +2421,6 @@ class TestImportWorkflow04WithOozie(OozieBase):
   def tearDown(self):
     self.wf.delete(skip_trash=True)
 
-    # Make sure examples are owned by Hue.
-    # This user is created by OozieBase.
-    Workflow.objects.update(owner=User.objects.get(username='hue'))
-
 
   def test_import_workflow_subworkflow(self):
     """
@@ -2429,7 +2442,7 @@ class TestImportWorkflow04WithOozie(OozieBase):
 class TestOozieSubmissions(OozieBase):
 
   def test_submit_mapreduce_action(self):
-    wf = Document.objects.get_docs(self.user, Workflow).filter(name='MapReduce')[0].content_object
+    wf = Document.objects.get_docs(self.user, Workflow).get(name='MapReduce', owner__username='sample', extra='').content_object
     post_data = {u'form-MAX_NUM_FORMS': [u''], u'form-INITIAL_FORMS': [u'1'],
                  u'form-0-name': [u'REDUCER_SLEEP_TIME'], u'form-0-value': [u'1'],
                  u'form-TOTAL_FORMS': [u'1']}
@@ -2463,7 +2476,7 @@ class TestOozieSubmissions(OozieBase):
 
 
   def test_submit_java_action(self):
-    wf = Workflow.objects.get(name='Sequential Java', managed=True)
+    wf = Document.objects.get_docs(self.user, Workflow).get(name='Sequential Java', owner__username='sample', extra='').content_object
 
     response = self.c.post(reverse('oozie:submit_workflow', args=[wf.id]),
                            data={u'form-MAX_NUM_FORMS': [u''],
@@ -2476,14 +2489,15 @@ class TestOozieSubmissions(OozieBase):
 
 
   def test_submit_distcp_action(self):
-    wf = Workflow.objects.get(name='DistCp', managed=True)
+    wf = Document.objects.get_docs(self.user, Workflow).get(name='DistCp', owner__username='sample', extra='').content_object
 
     response = self.c.post(reverse('oozie:submit_workflow', args=[wf.id]),
-                           data= {u'form-MAX_NUM_FORMS': [u''], u'form-TOTAL_FORMS': [u'3'], u'form-INITIAL_FORMS': [u'3'],
-                                  u'form-0-name': [u'oozie.use.system.libpath'], u'form-0-value': [u'true'],
-                                  u'form-1-name': [u'OUTPUT'], u'form-1-value': [u'${nameNode}/user/test/out/distcp'],
-                                  u'form-2-name': [u'MAP_NUMBER'], u'form-2-value': [u'5'],
-                                  },
+                           data={
+                             u'form-MAX_NUM_FORMS': [u''], u'form-TOTAL_FORMS': [u'3'], u'form-INITIAL_FORMS': [u'3'],
+                             u'form-0-name': [u'oozie.use.system.libpath'], u'form-0-value': [u'true'],
+                             u'form-1-name': [u'OUTPUT'], u'form-1-value': [u'${nameNode}/user/test/out/distcp'],
+                             u'form-2-name': [u'MAP_NUMBER'], u'form-2-value': [u'5'],
+                           },
                            follow=True)
     job = OozieServerProvider.wait_until_completion(response.context['oozie_workflow'].id)
     assert_equal('SUCCEEDED', job.status)
