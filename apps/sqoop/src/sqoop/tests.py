@@ -82,6 +82,16 @@ class TestSqoopServerBase(SqoopServerProvider):
 
     return self.client.create_job(job)
 
+  def delete_sqoop_object(self, obj):
+    if isinstance(obj, Connection):
+      self.client.delete_connection(obj)
+    elif isinstance(obj, Job):
+      self.client.delete_job(obj)
+
+  def delete_sqoop_objects(self, objects):
+    for obj in objects:
+      self.delete_sqoop_object(obj)
+
 class TestSqoopClientConnections(TestSqoopServerBase):
   def test_connection(self):
     try:
@@ -110,10 +120,13 @@ class TestSqoopClientConnections(TestSqoopServerBase):
 
 class TestSqoopClientJobs(TestSqoopServerBase):
   def test_job(self):
+    removable = []
     try:
       # Create
       conn = self.create_connection(name='conn3')
+      removable.append(conn)
       job = self.create_job("IMPORT", "job1", connection_id=conn.id)
+      removable.insert(0, job)
       assert_true(job.id)
 
       job2 = self.client.get_job(job.id)
@@ -125,17 +138,18 @@ class TestSqoopClientJobs(TestSqoopServerBase):
       job3 = self.client.update_job(job)
       assert_equal(job.name, job3.name)
     finally:
-      self.client.delete_job(job)
-      self.client.delete_connection(conn)
+      self.delete_sqoop_objects(removable)
 
   def test_get_jobs(self):
+    removable = []
     try:
       conn = self.create_connection(name='conn4')
+      removable.append(conn)
       job = self.create_job("IMPORT", "job2", connection_id=conn.id)
+      removable.insert(0, job)
       assert_true(job.id)
 
       jobs = self.client.get_jobs()
       assert_true(len(jobs) > 0)
     finally:
-      self.client.delete_job(job)
-      self.client.delete_connection(conn)
+      self.delete_sqoop_objects(removable)
