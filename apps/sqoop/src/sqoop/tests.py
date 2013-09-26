@@ -14,11 +14,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
+
 from sqoop.client.connection import Connection
 from sqoop.client.job import Job
 from sqoop.test_base import SqoopServerProvider
 
 from nose.tools import assert_true, assert_equal
+
+
+LOG = logging.getLogger(__name__)
+
 
 CONNECTION_FORM_VALUES = {
   'connection.jdbcDriver': 'org.apache.derby.jdbc.EmbeddedDriver',
@@ -55,12 +61,16 @@ class TestSqoopServerBase(SqoopServerProvider):
 
     for _connector in conn.connector:
       for _input in _connector.inputs:
-        if CONNECTION_FORM_VALUES[_input.name]:
+        if _input.name not in CONNECTION_FORM_VALUES:
+          LOG.warning("Connection input mapping %s does not exist. Maybe it's new?" % _input.name)
+        elif CONNECTION_FORM_VALUES[_input.name]:
           _input.value = CONNECTION_FORM_VALUES[_input.name]
 
     for _framework in conn.framework:
       for _input in _framework.inputs:
-        if FRAMEWORK_FORM_VALUES[_input.name]:
+        if _input.name not in FRAMEWORK_FORM_VALUES:
+          LOG.warning("Framework input mapping %s does not exist. Maybe it's new?" % _input.name)
+        elif FRAMEWORK_FORM_VALUES[_input.name]:
           _input.value = FRAMEWORK_FORM_VALUES[_input.name]
 
     return self.client.create_connection(conn)
@@ -72,12 +82,16 @@ class TestSqoopServerBase(SqoopServerProvider):
 
     for _connector in job.connector:
       for _input in _connector.inputs:
-        if JOB_FORM_VALUES[_input.name]:
+        if _input.name not in JOB_FORM_VALUES:
+          LOG.warning("Job input mapping %s does not exist. Maybe it's new?" % _input.name)
+        elif JOB_FORM_VALUES[_input.name]:
           _input.value = JOB_FORM_VALUES[_input.name]
 
     for _framework in job.framework:
       for _input in _framework.inputs:
-        if FRAMEWORK_FORM_VALUES[_input.name]:
+        if _input.name not in FRAMEWORK_FORM_VALUES:
+          LOG.warning("Framework input mapping %s does not exist. Maybe it's new?" % _input.name)
+        elif FRAMEWORK_FORM_VALUES[_input.name]:
           _input.value = FRAMEWORK_FORM_VALUES[_input.name]
 
     return self.client.create_job(job)
