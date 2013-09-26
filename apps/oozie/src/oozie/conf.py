@@ -19,7 +19,7 @@ import os.path
 
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
-from desktop.lib.conf import Config, coerce_bool
+from desktop.lib.conf import Config
 from desktop.lib import paths
 from liboozie.conf import get_oozie_status
 
