@@ -519,9 +519,9 @@ def _resolve_subworkflow_from_deployment_dir(fs, workflow, app_path):
   except Workflow.DoesNotExist, e:
     raise RuntimeError(_("Could not find workflow with name %s extracted from subworkflow path %s") % (root.attrib['name'], app_path))
   except Exception, e:
-    raise RuntimeError(_("Could not find workflow at path %s") % app_path)
+    raise RuntimeError(_("Could not find workflow at path %s: %s") % (app_path, e))
 
-  for subworkflow in Document.objects.available_docs(Workflow, workflow.owner):
+  for subworkflow in Document.objects.available(Workflow, workflow.owner):
     if subworkflow.deployment_dir == app_path:
       return subworkflow
 
