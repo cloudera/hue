@@ -57,7 +57,8 @@ class DocumentTagManager(models.Manager):
   def get_tags(self, user):
     # For now, the only shared tag is from 'sample' user and is named 'example'
     # Tag permissions will come later.
-    tags = Document.objects.documents(user)
+    # Share Tag from shared document will come later.
+    tags = self
 
     try:
       sample_user = auth_models.User.objects.get(username='sample')
@@ -65,7 +66,7 @@ class DocumentTagManager(models.Manager):
     except:
       tags = tags.filter(owner=user)
 
-    return tags.values('tags__id', 'tags__tag').distinct()
+    return tags.distinct()
 
   def create_tag(self, owner, tag_name):
     if tag_name in DocumentTag.RESERVED:
@@ -121,7 +122,7 @@ class DocumentTagManager(models.Manager):
       tag.delete()
 
     for doc in Document.objects.get_docs(owner).filter(tags=None):
-      doc.add(default_tag)
+      doc.add_tag(default_tag)
 
   def update_tags(self, owner, doc_id, tag_ids):
     doc = Document.objects.get_doc(doc_id, owner)
