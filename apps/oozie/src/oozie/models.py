@@ -61,18 +61,8 @@ name_validator = RegexValidator(regex='^[a-zA-Z_][\-_a-zA-Z0-9]{1,39}$',
                                 message=_('Enter a valid value: combination of 2 - 40 letters and digits starting by a letter'))
 
 
-
-"""
-Permissions:
-
-A Workflow/Coordinator can be accessed/submitted by its owner, a superuser or by anyone if its 'is_shared'
-property and SHARE_JOBS are set to True.
-
-A Workflow/Coordinator can be modified only by its owner or a superuser.
-
-Permissions checking happens by adding the decorators.
-"""
 class JobManager(models.Manager):
+
   def can_read(self, user, job_id):
     job = Job.objects.select_related().get(pk=job_id).get_full_node()
     return job.can_read(user)

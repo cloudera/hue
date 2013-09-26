@@ -47,7 +47,7 @@ LOG = logging.getLogger(__name__)
 """
 Permissions:
 
-A Workflow/Coordinator can:
+A Workflow/Coordinator/Bundle can:
   * be accessed only by its owner or a superuser or by a user with 'dashboard_jobs_access' permissions
   * be submitted/modified only by its owner or a superuser
 
@@ -658,10 +658,10 @@ def split_oozie_jobs(oozie_jobs):
 
 def check_job_access_permission(request, job_id):
   """
-  Decorator ensuring that the user has access to the workflow or coordinator.
+  Decorator ensuring that the user has access to the job submitted to Oozie.
 
-  Arg: 'workflow' or 'coordinator' oozie id.
-  Return: the Oozie workflow of coordinator or raise an exception
+  Arg: Oozie 'workflow', 'coordinator' or 'bundle' ID.
+  Return: the Oozie workflow, coordinator or bundle or raise an exception
 
   Notice: its gets an id in input and returns the full object in output (not an id).
   """
