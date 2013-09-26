@@ -47,6 +47,7 @@
     <commons-logging.version>1.0.4</commons-logging.version>
     <thrift.version>0.9.0</thrift.version>
     <javaVersion>1.7</javaVersion>
+    <sourceJavaVersion>1.7</sourceJavaVersion>
     <targetJavaVersion>1.7</targetJavaVersion>
   </properties>
 
