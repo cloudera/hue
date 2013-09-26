@@ -118,10 +118,10 @@ def save_design(request, form, type, design, explicit_save):
     design.doc.update(name=design.name, description=design.desc)
   else:
     Document.objects.link(design, owner=design.owner, extra=design.type, name=design.name, description=design.desc)
-    
+
   if design.is_auto:
     design.doc.get().add_to_history()
-    
+
   return design
 
 
@@ -153,7 +153,7 @@ def delete_design(request):
   if request.method == 'POST':
     ids = request.POST.getlist('designs_selection')
     designs = dict([(design_id, authorized_get_design(request, design_id, owner_only=True)) for design_id in ids])
-    print designs
+
     if None in designs.values():
       LOG.error('Cannot delete non-existent design(s) %s' % ','.join([key for key, name in designs.items() if name is None]))
       return list_designs(request)
@@ -194,18 +194,16 @@ def clone_design(request, design_id):
     return list_designs(request)
 
   copy = design.clone()
-  copy_doc = design.doc.get()
+  copy_doc = design.doc.get().copy()
   copy.name = design.name + ' (copy)'
   copy.owner = request.user
   copy.save()
-  
-  copy_doc.pk = None
-  copy_doc.id = None
+
   copy_doc.owner = copy.owner
   copy_doc.name = copy.name
   copy_doc.save()
-  copy.doc.add(copy_doc)  
-  
+  copy.doc.add(copy_doc)
+
   messages.info(request, _('Copied design: %(name)s') % {'name': design.name})
 
   return format_preserving_redirect(request, reverse(get_app_name(request) + ':execute_query', kwargs={'design_id': copy.id}))

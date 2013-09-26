@@ -105,11 +105,11 @@ def massaged_tags_for_json(tags, user):
 
   for tag in tags:
     massaged_tag = {
-      'id': tag['tags__id'],
-      'name': tag['tags__tag'],
-      'isTrash': tag['tags__id'] == trash.id,
-      'isHistory': tag['tags__id'] == history.id,
-      'isExample': tag['tags__tag'] == DocumentTag.EXAMPLE
+      'id': tag.id,
+      'name': tag.tag,
+      'isTrash': tag.id == trash.id,
+      'isHistory': tag.id == history.id,
+      'isExample': tag.tag == DocumentTag.EXAMPLE
     }
     ts.append(massaged_tag)
 

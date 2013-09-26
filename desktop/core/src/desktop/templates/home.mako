@@ -125,8 +125,8 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
            </li>
           <li class="nav-header tag-header">${_('Projects')} <div id="editTags" style="display: inline;cursor: pointer;margin-left: 6px" title="${ _('Edit projects') }"><i class="icon-tags"></i></div> </li>
           % for tag in tags:
-            % if tag['tags__tag'] not in ('trash', 'history'):
-            <li class="toggleTag" data-tag="${ tag['tags__tag'] }"><a href="javascript:void(0)">${ tag['tags__tag'] } <span class="tagCounter badge pull-right">0</span></a></li>
+            % if tag.tag not in ('trash', 'history'):
+            <li class="toggleTag" data-tag="${ tag.tag }"><a href="javascript:void(0)">${ tag.tag } <span class="tagCounter badge pull-right">0</span></a></li>
             % endif
           % endfor
 
@@ -239,8 +239,8 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
 <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
 <script type="text/javascript" charset="utf-8">
 
-var JSON_DOCS = ${json_documents|n};
-var JSON_TAGS = ${json_tags|n};
+var JSON_DOCS = ${json_documents | n};
+var JSON_TAGS = ${json_tags | n};
 var JSON_USERS_GROUPS;
 var documentsTable;
 

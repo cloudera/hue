@@ -42,7 +42,7 @@ from desktop.lib.conf import validate_path
 from desktop.lib.django_util import TruncatingModel
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.test_utils import grant_access
-from desktop.views import check_config
+from desktop.views import check_config, home
 from desktop.models import DocumentTag , Document
 from pig.models import PigScript
 
@@ -79,6 +79,12 @@ def teardown_test_environment():
 
   django_mako.render_to_string = django_mako.render_to_string_normal
 teardown_test_environment.__test__ = False
+
+def test_home():
+  c = make_logged_in_client()
+  response = c.get(reverse(home))
+
+  assert_equal(200, response.status_code)
 
 def test_log_view():
   c = make_logged_in_client()
@@ -495,12 +501,12 @@ class TestDocModelTags():
   def setUp(self):
     self.client = make_logged_in_client(username="tag_user")
     self.client_not_me = make_logged_in_client(username="not_tag_user")
-    
+
     self.user = User.objects.get(username="tag_user")
     self.user_not_me = User.objects.get(username="not_tag_user")
 
     grant_access(self.user.username, self.user.username, "desktop")
-    grant_access(self.user_not_me.username, self.user_not_me.username, "desktop")        
+    grant_access(self.user_not_me.username, self.user_not_me.username, "desktop")
 
   def add_tag(self, name):
     response = self.client.post("/tag/add_tag", {'name': name})
@@ -513,73 +519,73 @@ class TestDocModelTags():
     return script, doc
 
   def test_add_tag(self):
-    response = self.client.get("/tag/add_tag")    
+    response = self.client.get("/tag/add_tag")
     assert_equal(-1, json.loads(response.content)['status'])
 
     tag_id = self.add_tag('my_tag')
 
-    assert_true(DocumentTag.objects.filter(id=tag_id).exists())
-  
+    assert_true(DocumentTag.objects.filter(id=tag_id, owner=self.user, tag='my_tag').exists())
+
   def test_remove_tags(self):
     response = self.client.post("/tag/add_tag", {'name': 'my_tag'})
     tag_id = json.loads(response.content)['tag_id']
-    
-    response = self.client.get("/tag/remove_tags")    
+
+    response = self.client.get("/tag/remove_tags")
     assert_equal(-1, json.loads(response.content)['status'])
 
-    response = self.client_not_me.post("/tag/remove_tags", {'data': json.dumps({'tag_ids': [tag_id]})})    
+    response = self.client_not_me.post("/tag/remove_tags", {'data': json.dumps({'tag_ids': [tag_id]})})
     assert_equal(-1, json.loads(response.content)['status'], response.content)
 
-    response = self.client.post("/tag/remove_tags", {'data': json.dumps({'tag_ids': [tag_id]})})    
+    response = self.client.post("/tag/remove_tags", {'data': json.dumps({'tag_ids': [tag_id]})})
     assert_equal(0, json.loads(response.content)['status'], response.content)
-    
+
     assert_false(DocumentTag.objects.filter(id=tag_id).exists())
-  
-  def test_list_tags(self):    
+
+  def test_list_tags(self):
     tag_id = self.add_tag('my_list_tags')
 
-    response = self.client.get("/tag/list_tags")        
+    response = self.client.get("/tag/list_tags")
     assert_true([tag for tag in json.loads(response.content) if tag['id'] == tag_id], response.content)
-  
+
   def test_list_docs(self):
     script, doc = self.add_doc('test-pig')
 
-    response = self.client.get("/doc/list_docs")        
+    response = self.client.get("/doc/list_docs")
     assert_true([doc for doc in json.loads(response.content) if doc['id'] == script.id], response.content)
-  
+
   def test_tag(self):
     script, doc = self.add_doc('tag_pig')
-    
-    response = self.client.post("/doc/tag", {'data': json.dumps({'doc_id': doc.id, 'tag': 'pig'})})        
+
+    response = self.client.post("/doc/tag", {'data': json.dumps({'doc_id': doc.id, 'tag': 'pig'})})
     assert_equal(0, json.loads(response.content)['status'], response.content)
-    
+
     tag2_id = self.add_tag('pig2')
-    
+
     response = self.client.post("/doc/tag", {'data': json.dumps({'doc_id': doc.id, 'tag_id': tag2_id})})
     assert_equal(0, json.loads(response.content)['status'], response.content)
 
   def test_update_tags(self):
     script, doc = self.add_doc('update_tags')
-    
+
     tag1_id = self.add_tag('update_tags_1')
     tag2_id = self.add_tag('update_tags_2')
-    
-    response = self.client.post("/doc/update_tags", {'data': json.dumps({'doc_id': doc.id, 'tag_ids': [tag1_id, tag2_id]})})        
-    assert_equal(0, json.loads(response.content)['status'], response.content)  
+
+    response = self.client.post("/doc/update_tags", {'data': json.dumps({'doc_id': doc.id, 'tag_ids': [tag1_id, tag2_id]})})
+    assert_equal(0, json.loads(response.content)['status'], response.content)
 
 
 
 class TestDocModelPermissions():
-  
+
   def setUp(self):
     self.client = make_logged_in_client(username="perm_user")
     self.client_not_me = make_logged_in_client(username="not_perm_user")
-    
+
     self.user = User.objects.get(username="perm_user")
     self.user_not_me = User.objects.get(username="not_perm_user")
 
     grant_access(self.user.username, self.user.username, "desktop")
-    grant_access(self.user_not_me.username, self.user_not_me.username, "desktop")        
+    grant_access(self.user_not_me.username, self.user_not_me.username, "desktop")
 
   def add_doc(self, name):
     script = PigScript.objects.create(owner=self.user)
@@ -588,10 +594,10 @@ class TestDocModelPermissions():
 
   def test_update_permissions(self):
     script, doc = self.add_doc('test_update_permissions')
-    
+
     response = self.client.post("/doc/update_permissions", {
         'doc_id': doc.id,
         'data': json.dumps({'read': {'user_ids': [1, 2], 'group_ids': [1]}})
     })
-        
+
     assert_equal(0, json.loads(response.content)['status'], response.content)
