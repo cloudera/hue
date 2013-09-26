@@ -83,8 +83,6 @@ def _save_links(workflow, root):
   Note: Nodes are looked up by workflow and name.
   Note: Skip global configuration explicitly. Unknown knows should throw an error.
   """
-  LOG.debug("Start resolving links for workflow %s" % smart_str(workflow.name))
-
   # Iterate over nodes
   for child_el in root:
     # Skip special nodes (like comments).
@@ -112,7 +110,7 @@ def _save_links(workflow, root):
     # Start node has attribute which points to first node
     try:
       parent = Node.objects.get(name=name, workflow=workflow).get_full_node()
-    except Node.DoesNotExist, e:
+    except Node.DoesNotExist:
       raise RuntimeError(_('Node with name %s for workflow %s does not exist.') % (name, workflow.name))
 
     if isinstance(parent, Start):
@@ -145,15 +143,18 @@ def _start_relationships(workflow, parent, child_el):
   if 'to' not in child_el.attrib:
     raise RuntimeError(_("Node %s has a link that is missing 'to' attribute.") % parent.name)
 
-  workflow.start = parent
   to = child_el.attrib['to']
 
   try:
     child = Node.objects.get(workflow=workflow, name=to)
-  except Node.DoesNotExist, e:
+  except Node.DoesNotExist:
     raise RuntimeError(_("Node %s has not been defined.") % to)
 
-  obj = Link.objects.create(name='to', parent=parent, child=child)
+  try:
+    obj = Link.objects.filter(parent=workflow.start).get(name='to')
+    obj.child = child
+  except Link.DoesNotExist:
+    obj = Link.objects.create(name='to', parent=parent.workflow.start, child=child)
   obj.save()
 
 
