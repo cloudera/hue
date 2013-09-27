@@ -14,14 +14,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""
-Tests for libs/hadoop
-"""
+
 import cStringIO
 import os
 
 from nose.tools import assert_true, assert_equal, assert_false
 from nose.plugins.attrib import attr
+from nose.plugins.skip import SkipTest
 
 from desktop.lib.django_test_util import make_logged_in_client
 from hadoop import cluster
@@ -29,12 +28,15 @@ from hadoop import conf
 from hadoop import confparse
 from hadoop import pseudo_hdfs4
 
+
 @attr('requires_hadoop')
 def test_live_jobtracker():
   """
   Checks that LiveJobTracker never raises
   exceptions for most of its calls.
   """
+  raise SkipTest
+
   minicluster = pseudo_hdfs4.shared_cluster()
 
   jt = minicluster.jt
@@ -56,7 +58,6 @@ def test_live_jobtracker():
 
 
 def test_confparse():
-  """Test configuration parsing"""
   data = """
     <configuration>
       <property>
@@ -120,8 +121,6 @@ def test_config_validator_basic():
     cli = make_logged_in_client()
     resp = cli.get('/debug/check_config')
     assert_true('hadoop.hdfs_clusters.default.webhdfs_url' in resp.content)
-    assert_true('hadoop.mapred_clusters.default.thrift_port' in resp.content)
-    assert_true('Port should be' in resp.content)
   finally:
     for old_conf in reset:
       old_conf()
@@ -149,7 +148,6 @@ def test_config_validator_more():
     assert_false('Failed to create' in resp.content)
     assert_false('Failed to chown' in resp.content)
     assert_false('Failed to delete' in resp.content)
-    assert_true('Failed to contact JobTracker plugin' in resp.content)
   finally:
     for old_conf in reset:
       old_conf()

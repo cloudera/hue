@@ -291,10 +291,6 @@ class OozieBase(OozieServerProvider):
     self.cluster = OozieServerProvider.cluster
     self.install_examples()
 
-    # Ensure access to MR folder
-    self.cluster.fs.do_as_superuser(self.cluster.fs.chmod, '/tmp', 0777, recursive=True)
-
-
   def install_examples(self):
     global _INITIALIZED
     if _INITIALIZED:
@@ -3006,17 +3002,15 @@ def add_node(workflow, name, node_type, parents, attrs={}):
 def create_workflow(client, user, workflow_dict=WORKFLOW_DICT):
   name = str(workflow_dict['name'][0])
 
-  Node.objects.filter(workflow__name=name).delete()
-  Workflow.objects.filter(name=name).delete()
+  # Leaking here for some reason 
+  Document.objects.filter(name='mapreduce1', owner__usernam='jobsub_test').delete()
 
-  if Document.objects.get_docs(user, Workflow).filter(name=name).exists():
-    for doc in Document.objects.get_docs(user, Workflow).filter(name=name):
+  if Document.objects.get_docs(user, Workflow).filter(name=name, extra='').exists():
+    for doc in Document.objects.get_docs(user, Workflow).filter(name=name, extra=''):
       if doc.content_object:
         client.post(reverse('oozie:delete_workflow') + '?skip_trash=true', {'job_selection': [doc.content_object.id]}, follow=True)
       else:
         doc.delete()
-
-  Document.objects.available_docs(Workflow, user).filter(name=name).delete()
 
   workflow_count = Document.objects.available_docs(Workflow, user).count()
   response = client.get(reverse('oozie:create_workflow'))
@@ -3024,9 +3018,10 @@ def create_workflow(client, user, workflow_dict=WORKFLOW_DICT):
 
   response = client.post(reverse('oozie:create_workflow'), workflow_dict, follow=True)
   assert_equal(200, response.status_code)
+  
   assert_equal(workflow_count + 1, Document.objects.available_docs(Workflow, user).count())
 
-  wf = Document.objects.get_docs(user, Workflow).get(name=name).content_object
+  wf = Document.objects.get_docs(user, Workflow).get(name=name, extra='').content_object
   assert_not_equal('', wf.deployment_dir)
   assert_true(wf.managed)
 

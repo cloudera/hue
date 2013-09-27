@@ -238,7 +238,7 @@ class DocumentManager(models.Manager):
       doc.tags.add(tag)
       return doc
     else:
-      LOG.warn('Already a document %s for %s' % (content_object.doc.all(), content_object))
+      LOG.warn('Object %s already has documents: %s' % (content_object, content_object.doc.all()))
       return content_object.doc.all()[0]
 
   def sync(self):
