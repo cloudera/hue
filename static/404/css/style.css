@@ -1,0 +1,67 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #FFFFFF;
+}
+
+html, body, #bell {
+    height: 100%;
+    width: 100%;
+}
+
+#bell {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    overflow: hidden;
+    z-index: 0;
+    cursor: pointer;
+}
+
+#bell img {
+    display: block;
+    height: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+img {
+    border: 0;
+    -ms-interpolation-mode: bicubic;
+    vertical-align: middle;
+}
+
+.hidden {
+    display: none !important;
+    visibility: hidden;
+}
+
+#donate {
+  position: absolute;
+  left: 20px;
+  top: 20px;
+  z-index: 5000;
+}
+
+#shop {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  z-index: 5000;
+}
+
+h1 {
+  margin: 20px;
+  font-family: sans-serif;
+}
+
+.flip-vertical {
+  -moz-transform: scaleY(-1);
+  -webkit-transform: scaleY(-1);
+  -o-transform: scaleY(-1);
+  transform: scaleY(-1);
+  -ms-filter: flipv; /*IE*/
+  filter: flipv; /*IE*/
+}
