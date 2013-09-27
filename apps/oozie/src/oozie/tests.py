@@ -3003,7 +3003,7 @@ def create_workflow(client, user, workflow_dict=WORKFLOW_DICT):
   name = str(workflow_dict['name'][0])
 
   # Leaking here for some reason 
-  Document.objects.filter(name='mapreduce1', owner__usernam='jobsub_test').delete()
+  Document.objects.filter(name='mapreduce1', owner__username='jobsub_test').delete()
 
   if Document.objects.get_docs(user, Workflow).filter(name=name, extra='').exists():
     for doc in Document.objects.get_docs(user, Workflow).filter(name=name, extra=''):
