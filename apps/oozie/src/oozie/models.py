@@ -200,6 +200,7 @@ class Job(models.Model):
 
 
 class WorkflowManager(models.Manager):
+
   def new_workflow(self, owner):
     workflow = Workflow(owner=owner, schema_version='uri:oozie:workflow:0.4')
 
