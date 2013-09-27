@@ -239,8 +239,8 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
 <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
 <script type="text/javascript" charset="utf-8">
 
-var JSON_DOCS = ${json_documents | n};
-var JSON_TAGS = ${json_tags | n};
+var JSON_DOCS = ${json_documents | n,unicode};
+var JSON_TAGS = ${json_tags | n,unicode};
 var JSON_USERS_GROUPS;
 var documentsTable;
 
