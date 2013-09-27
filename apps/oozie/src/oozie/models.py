@@ -192,7 +192,11 @@ class Job(models.Model):
     return  [{'name': name, 'value': value} for name, value in params.iteritems()]
 
   def can_read(self, user):
-    return self.doc.get().can_read(user)
+    try:
+      return self.doc.get().can_read(user)
+    except Exception, e:
+      LOG.error('can_read failed because the object has more than one document: %s' % self.doc.all())
+      raise e
 
   def is_editable(self, user):
     """Only owners or admins can modify a job."""

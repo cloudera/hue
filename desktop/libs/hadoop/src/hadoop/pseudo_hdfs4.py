@@ -252,6 +252,9 @@ class PseudoHdfs4(object):
     self.fs.do_as_superuser(self.fs.mkdir, '/var/log/hadoop-yarn/apps', 01777)
     self.fs.do_as_superuser(self.fs.chmod, '/var/log/hadoop-yarn/apps', 01777)
 
+    self.fs.create_home_dir('/user/test')
+    self.fs.create_home_dir('/user/hue')
+
 
   def _start_mr2(self, env):
     LOG.info("Starting MR2")
