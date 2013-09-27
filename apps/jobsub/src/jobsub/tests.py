@@ -35,8 +35,8 @@ class TestJobsubWithHadoop(OozieServerProvider):
 
   def setUp(self):
     OozieServerProvider.setup_class()
-    self.cluster.fs.do_as_user('test', self.cluster.fs.create_home_dir, '/user/jobsub_test')
-    self.cluster.fs.do_as_superuser(self.cluster.fs.chmod, '/user/jobsub_test', 0777, True)
+    self.cluster.fs.do_as_user('jobsub_test', self.cluster.fs.create_home_dir, '/user/jobsub_test')
+    self.cluster.fs.do_as_superuser(self.cluster.fs.chmod, '/user/jobsub_test', 0777, True) # Hum?
     self.client = make_logged_in_client(username='jobsub_test')
     self.user = User.objects.get(username='jobsub_test')
 

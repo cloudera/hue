@@ -21,6 +21,8 @@ import logging
 import re
 import os
 
+from itertools import chain
+
 from nose.plugins.skip import SkipTest
 from nose.tools import raises, assert_true, assert_false, assert_equal, assert_not_equal
 from django.contrib.auth.models import User
@@ -3002,15 +3004,17 @@ def add_node(workflow, name, node_type, parents, attrs={}):
 def create_workflow(client, user, workflow_dict=WORKFLOW_DICT):
   name = str(workflow_dict['name'][0])
 
-  # Leaking here for some reason 
-  Document.objects.filter(name='mapreduce1', owner__username='jobsub_test').delete()
+  # If not infinite looping
+  Node.objects.filter(workflow__name=name).delete()
 
-  if Document.objects.get_docs(user, Workflow).filter(name=name, extra='').exists():
-    for doc in Document.objects.get_docs(user, Workflow).filter(name=name, extra=''):
-      if doc.content_object:
-        client.post(reverse('oozie:delete_workflow') + '?skip_trash=true', {'job_selection': [doc.content_object.id]}, follow=True)
-      else:
-        doc.delete()
+  # Leaking here for some reason
+  for doc in list(chain(Document.objects.get_docs(user, Workflow).filter(name=name, extra=''),
+                        Document.objects.filter(name='mapreduce1', owner__username='jobsub_test').all(),
+                        Document.objects.filter(name='sleep_job-copy', owner__username='jobsub_test').all())):
+    if doc.content_object:
+      client.post(reverse('oozie:delete_workflow') + '?skip_trash=true', {'job_selection': [doc.content_object.id]}, follow=True)
+    else:
+      doc.delete()
 
   workflow_count = Document.objects.available_docs(Workflow, user).count()
   response = client.get(reverse('oozie:create_workflow'))
