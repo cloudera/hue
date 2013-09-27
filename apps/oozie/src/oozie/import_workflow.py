@@ -140,6 +140,7 @@ def _start_relationships(workflow, parent, child_el):
   if 'to' not in child_el.attrib:
     raise RuntimeError(_("Node %s has a link that is missing 'to' attribute.") % parent.name)
 
+  workflow.start = parent
   to = child_el.attrib['to']
 
   try:
@@ -148,10 +149,10 @@ def _start_relationships(workflow, parent, child_el):
     raise RuntimeError(_("Node %s has not been defined.") % to)
 
   try:
-    obj = Link.objects.filter(parent=workflow.start).get(name='to')
+    obj = Link.objects.filter(parent=parent).get(name='to')
     obj.child = child
   except Link.DoesNotExist:
-    obj = Link.objects.create(name='to', parent=parent.workflow.start, child=child)
+    obj = Link.objects.create(name='to', parent=parent, child=child)
   obj.save()
 
 
