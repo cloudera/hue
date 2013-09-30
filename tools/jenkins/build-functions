@@ -42,6 +42,7 @@ CDH_URL=${CDH_URL:-http://nightly.cloudera.com/cdh4/cdh/4/hadoop-2.0.0-cdh4.5.0-
 
 CDH_TGZ=$(basename $CDH_URL)
 CDH_VERSION=${CDH_TGZ/.tar.gz/}
+CDH_SHORT_VERSION=${CDH_VERSION/hadoop-/}
 CDH_CACHE="$HOME/.hue_cache/${CDH_TGZ}"
 CDH_MTIME_FILE="$HOME/.hue_cache/.cdh_mtime"
 
@@ -63,11 +64,12 @@ build_hadoop() {
   echo "Unpacking $CDH_CACHE to $HADOOP_DIR"
   tar -C $HADOOP_DIR -xzf $CDH_CACHE
   # For Hive
-  #ln -s "$HADOOP_DIR/${CDH_VERSION}/bin-mapreduce1" $HADOOP_MR1_HOME/bin
+  ln -sf $HADOOP_DIR/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-client-core-*.jar $HADOOP_DIR/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-client-core.jar
+  ln -sf $HADOOP_DIR/hadoop/share/hadoop/common/hadoop-common-*-SNAPSHOT.jar $HADOOP_DIR/hadoop/share/hadoop/common/hadoop-common.jar
+  ln -sf $HADOOP_DIR/hadoop/share/hadoop/common/lib/hadoop-auth-*-SNAPSHOT.jar $HADOOP_DIR/hadoop/share/hadoop/common/lib/hadoop-auth.jar
+  ln -sf $HADOOP_DIR/hadoop/share/hadoop/hdfs/hadoop-hdfs-${CDH_SHORT_VERSION}.jar  $HADOOP_DIR/hadoop/share/hadoop/hdfs/hadoop-hdfs.jar
   # For MR2
-  #rm -f "$HADOOP_DIR/${CDH_VERSION}/share/hadoop/mapreduce"
   ln -sf "$HADOOP_DIR/${CDH_VERSION}/share/hadoop/mapreduce2" "$HADOOP_DIR/${CDH_VERSION}/share/hadoop/mapreduce"
-  #ln -sf "mapreduce" "$HADOOP_DIR/${CDH_VERSION}/share/hadoop/mapreduce"
   ln -s $HADOOP_DIR/${CDH_VERSION} $HADOOP_DIR/hadoop
 }
 

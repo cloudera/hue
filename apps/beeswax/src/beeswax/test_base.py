@@ -30,12 +30,12 @@ from django.contrib.auth.models import User
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.paths import get_run_root
 from hadoop import pseudo_hdfs4
-from nose.plugins.skip import SkipTest
 
 import beeswax.conf
 
 from beeswax.server.dbms import get_query_server_config
 from beeswax.server import dbms
+
 
 HIVE_SERVER_TEST_PORT = 6969
 _INITIALIZED = False
@@ -50,12 +50,23 @@ LOG = logging.getLogger(__name__)
 def _start_server(cluster):
   args = [beeswax.conf.HIVE_SERVER_BIN.get()]
 
-  env = cluster.mr1_env.copy()
+  env = cluster._mr2_env.copy()
 
   env.update({
     'HIVE_CONF_DIR': beeswax.conf.HIVE_CONF_DIR.get(),
     'HIVE_SERVER2_THRIFT_PORT': str(HIVE_SERVER_TEST_PORT),
-    'AUX_CLASSPATH': '/usr/lib/hadoop-hdfs/hadoop-hdfs.jar:/usr/lib/hadoop/hadoop-auth.jar:/usr/lib/hadoop/hadoop-common.jar', # todo update
+    'HADOOP_MAPRED_HOME': get_run_root('ext/hadoop/hadoop') + '/share/hadoop/mapreduce',
+    # Links created in jenkins script.
+    # If missing classes when booting HS2, check here.
+    'AUX_CLASSPATH':
+       get_run_root('ext/hadoop/hadoop') + '/share/hadoop/hdfs/hadoop-hdfs.jar'
+       + ':' +
+       get_run_root('ext/hadoop/hadoop') + '/share/hadoop/common/lib/hadoop-auth.jar'
+       + ':' +
+       get_run_root('ext/hadoop/hadoop') + '/share/hadoop/common/hadoop-common.jar'
+       + ':' +
+       get_run_root('ext/hadoop/hadoop') + '/share/hadoop/mapreduce/hadoop-mapreduce-client-core.jar'
+       ,
     'HADOOP_CLASSPATH': '',
   })
 
@@ -63,7 +74,7 @@ def _start_server(cluster):
     env["JAVA_HOME"] = os.getenv("JAVA_HOME")
 
   LOG.info("Executing %s, env %s, cwd %s" % (repr(args), repr(env), cluster._tmpdir))
-  return subprocess.Popen(args=args, env=env, cwd=cluster._tmpdir)#, stdin=subprocess.PIPE)
+  return subprocess.Popen(args=args, env=env, cwd=cluster._tmpdir, stdin=subprocess.PIPE)
 
 
 def get_shared_beeswax_server():
@@ -73,7 +84,7 @@ def get_shared_beeswax_server():
 
     cluster = pseudo_hdfs4.shared_cluster()
 
-    HIVE_CONF = cluster._tmpdir + "/conf"
+    HIVE_CONF = cluster.hadoop_conf_dir
     finish = (
       beeswax.conf.HIVE_SERVER_HOST.set_for_testing("localhost"),
       beeswax.conf.HIVE_SERVER_PORT.set_for_testing(HIVE_SERVER_TEST_PORT),
@@ -92,8 +103,18 @@ def get_shared_beeswax_server():
   <description>JDBC connect string for a JDBC metastore</description>
 </property>
 
+ <property>
+   <name>hive.server2.enable.impersonation</name>
+   <value>false</value>
+ </property>
+
+<property>
+  <name>hive.querylog.location</name>
+  <value>%(querylog)s</value>
+</property>
+
 </configuration>
-""" % {'root': cluster._tmpdir}
+""" % {'root': cluster._tmpdir, 'querylog': cluster.log_dir + '/hive'}
 
     file(HIVE_CONF + '/hive-site.xml', 'w').write(default_xml)
 
@@ -125,22 +146,12 @@ def get_shared_beeswax_server():
           started = True
           break
         except Exception, e:
-          LOG.info('HiveServer2 server status not started yet: %s' % e)
+          LOG.info('HiveServer2 server status not started yet after: %s' % e)
           time.sleep(sleep)
           sleep *= 2
 
       if not started:
         raise Exception("Server took too long to come up.")
-
-      # Make sure /tmp is 0777
-      cluster.fs.setuser(cluster.superuser)
-      if not cluster.fs.isdir('/tmp'):
-        cluster.fs.mkdir('/tmp', 0777)
-      else:
-        cluster.fs.chmod('/tmp', 0777)
-
-      cluster.fs.chmod(cluster._tmpdir, 0777)
-      cluster.fs.chmod(cluster._tmpdir + '/hadoop_tmp_dir/mapred', 0777)
 
     def s():
       for f in finish:
@@ -156,7 +167,6 @@ REFRESH_RE = re.compile('<\s*meta\s+http-equiv="refresh"\s+content="\d*;([^"]*)"
 
 
 def wait_for_query_to_finish(client, response, max=30.0):
-  # logging.info(str(response.template.filename) + ": " + str(response.content))
   start = time.time()
   sleep_time = 0.05
   # We don't check response.template == "watch_wait.mako" here,
@@ -194,7 +204,7 @@ def make_query(client, query, submission_type="Execute",
     settings = []
   if local:
     # Tests run faster if not run against the real cluster.
-    settings.append(("mapred.job.tracker", "local"))
+    settings.append(('mapreduce.framework.name', 'local'))
 
   # Prepares arguments for the execute view.
   parameters = {
@@ -261,10 +271,6 @@ def verify_history(client, fragment, design=None, reverse=False):
     except KeyError:
       pass
 
-  # This could happen if we issue multiple requests in parallel.
-  # The capturing of Django response context is not thread safe.
-  # Also see:
-  #   http://docs.djangoproject.com/en/1.2/topics/testing/#testing-responses
   LOG.warn('Cannot find history size. Response context clobbered')
   return -1
 
@@ -275,7 +281,6 @@ class BeeswaxSampleProvider(object):
   """
   @classmethod
   def setup_class(cls):
-    raise SkipTest
     cls.cluster, shutdown = get_shared_beeswax_server()
     cls.client = make_logged_in_client()
     # Weird redirection to avoid binding nonsense.

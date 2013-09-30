@@ -130,9 +130,12 @@ class CSVformatter(Formatter):
 
   def format_row(self, row):
     # writerow will call our write() method
-    row = [smart_str(cell, self._encoding, strings_only=True, errors='replace') for cell in row]
+    row = [smart_str(self.nullify(cell), self._encoding, strings_only=True, errors='replace') for cell in row]
     self._csv_writer.writerow(row)
     return self._line
 
   def fini_doc(self):
     return ""
+
+  def nullify(self, cell):
+    return cell if cell is not None else 'NULL'

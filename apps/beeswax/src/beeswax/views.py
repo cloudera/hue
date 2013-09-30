@@ -15,10 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-try:
-  import json
-except ImportError:
-  import simplejson as json
+import json
 import logging
 import re
 
@@ -166,7 +163,7 @@ def delete_design(request):
         design.delete()
     return redirect(reverse(get_app_name(request) + ':list_designs'))
   else:
-    return render('confirm.html', request, dict(url=request.path, title=_('Delete design(s)?')))
+    return render('confirm.mako', request, {'url': request.path, 'title': _('Delete design(s)?')})
 
 
 def restore_design(request):
@@ -182,7 +179,7 @@ def restore_design(request):
       design.doc.get().restore_from_trash()
     return redirect(reverse(get_app_name(request) + ':list_designs'))
   else:
-    return render('confirm.html', request, dict(url=request.path, title=_('Restore design(s)?')))
+    return render('confirm.mako', request, {'url': request.path, 'title': _('Restore design(s)?')})
 
 
 def clone_design(request, design_id):
@@ -614,7 +611,8 @@ def view_results(request, id, first_row=0):
                 'rows': 0,
                 'columns': [],
                 'has_more': False,
-                'start_row': 0, })
+                'start_row': 0,
+            })
   data = []
   fetch_error = False
   error_message = ''
@@ -629,7 +627,7 @@ def view_results(request, id, first_row=0):
   context_param = request.GET.get('context', '')
   query_context = _parse_query_context(context_param)
 
-  # To remove in Hue 2.4
+  # To remove when Impala has start_over support
   download  = request.GET.get('download', '')
 
   # Update the status as expired should not be accessible
@@ -843,15 +841,12 @@ def query_done_cb(request, server_id):
   """
   A callback for query completion notification. When the query is done,
   BeeswaxServer notifies us by sending a GET request to this view.
-
-  This view should always return a 200 response, to reflect that the
-  notification is delivered to the right view.
   """
   message_template = '<html><head></head>%(message)s<body></body></html>'
   message = {'message': 'error'}
 
   try:
-    query_history = models.QueryHistory.objects.get(server_id=server_id)
+    query_history = QueryHistory.objects.get(server_id=server_id + '\n')
 
     # Update the query status
     query_history.set_to_available()
@@ -957,7 +952,7 @@ def authorized_get_history(request, query_history_id, owner_only=False, must_exi
       return None
 
   # Some queries don't have a design so are not linked to Document Model permission
-  if query_history.design is None:
+  if query_history.design is None or not query_history.design.doc.exists():
     if not request.user.is_superuser and request.user != query_history.owner:
       raise PopupException(_('Permission denied to read QueryHistory %(id)s') % {'id': query_history_id})
   else:

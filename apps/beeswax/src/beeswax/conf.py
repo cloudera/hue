@@ -20,7 +20,7 @@ import sys
 
 from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
-from desktop.lib.conf import Config, coerce_bool
+from desktop.lib.conf import Config
 
 from beeswax.settings import NICE_NAME
 
@@ -46,7 +46,8 @@ HIVE_CONF_DIR = Config(
 HIVE_SERVER_BIN = Config(
   key="hive_server_bin",
   help=_t("Path to HiveServer2 start script"),
-  default='/usr/lib/hive/bin/hiveserver2')
+  default='/usr/lib/hive/bin/hiveserver2',
+  private=True)
 
 LOCAL_EXAMPLES_DATA_DIR = Config(
   key='local_examples_data_dir',

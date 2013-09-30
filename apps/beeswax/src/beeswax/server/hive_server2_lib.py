@@ -456,7 +456,7 @@ class HiveServerClient:
 
   def close_operation(self, operation_handle):
     req = TCloseOperationReq(operationHandle=operation_handle)
-    return self.call(self._client.CancelOperation, req)
+    return self.call(self._client.CloseOperation, req)
 
 
   def get_columns(self, database, table):
@@ -519,7 +519,7 @@ class HiveServerTableCompatible(HiveServerTable):
 
   @property
   def cols(self):
-    return [type('Col', (object,), {'name': col.get('col_name', ''),
+    return [type('Col', (object,), {'name': col.get('col_name', '').strip(),
                                     'type': col.get('data_type', ''),
                                     'comment': col.get('comment', ''), }) for col in HiveServerTable.cols.fget(self)]
 
@@ -618,6 +618,10 @@ class HiveServerClientCompatible:
   def cancel_operation(self, handle):
     operationHandle = handle.get_rpc_handle()
     return self._client.cancel_operation(operationHandle)
+
+
+  def close(self, handle):
+    return self.close_operation(handle)
 
 
   def close_operation(self, handle):
