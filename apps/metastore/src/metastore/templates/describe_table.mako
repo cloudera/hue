@@ -121,7 +121,13 @@ ${ components.menubar() }
                   % for i, row in enumerate(sample):
                     <tr>
                     % for item in row:
-                      <td>${ smart_unicode(item, errors='ignore') }</td>
+                      <td>
+                        % if item is None:
+                          NULL
+                        % else:
+                          ${ smart_unicode(item, errors='ignore') }
+                        % endif
+                      </td>
                     % endfor
                     </tr>
                   % endfor

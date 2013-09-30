@@ -125,11 +125,11 @@ ${layout.menubar(section='query')}
             <p>
             <ul class="nav nav-tabs">
               <li class="active"><a href="#results" data-toggle="tab">
-                  %if error:
+                  % if error:
                         ${_('Error')}
-                  %else:
+                  % else:
                         ${_('Results')}
-                  %endif
+                  % endif
               </a></li>
               <li><a href="#query" data-toggle="tab">${_('Query')}</a></li>
               <li><a href="#log" data-toggle="tab">${_('Log')}</a></li>
@@ -169,7 +169,13 @@ ${layout.menubar(section='query')}
               <tr>
                 <td>${ start_row + i }</td>
                 % for item in row:
-                  <td>${ smart_unicode(item, errors='ignore') }</td>
+                  <td>
+                    % if item is None:
+                      NULL
+                    % else:
+                      ${ smart_unicode(item, errors='ignore') }
+                    % endif
+                  </td>
                 % endfor
               </tr>
               % endfor

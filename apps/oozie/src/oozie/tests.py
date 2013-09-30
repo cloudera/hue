@@ -1679,7 +1679,7 @@ class TestImportWorkflow04(OozieMockBase):
 
   def setUp(self):
     raise SkipTest
-    
+
     super(TestImportWorkflow04, self).setUp()
     self.setup_simple_workflow()
 
@@ -3111,7 +3111,7 @@ def create_workflow(client, user, workflow_dict=WORKFLOW_DICT):
 
   response = client.post(reverse('oozie:create_workflow'), workflow_dict, follow=True)
   assert_equal(200, response.status_code)
-  
+
   assert_equal(workflow_count + 1, Document.objects.available_docs(Workflow, user).count())
 
   wf = Document.objects.get_docs(user, Workflow).get(name=name, extra='').content_object
