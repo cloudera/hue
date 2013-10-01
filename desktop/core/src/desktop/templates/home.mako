@@ -109,9 +109,9 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
                 <li class="dropdown-submenu">
                   <a href="#"><img src="${ apps['oozie'].icon_path }"/> ${_('Oozie Scheduler')}</a>
                   <ul class="dropdown-menu">
-                    <li><a href="${ url('oozie:create_workflow') }"><img src="/oozie/static/art/icon_oozie_24_workflow.png"/> ${_('Workflow')}</a></li>
-                    <li><a href="${ url('oozie:create_coordinator') }"><img src="/oozie/static/art/icon_oozie_24_coordinator.png"/> ${_('Coordinator')}</a></li>
-                    <li><a href="${ url('oozie:create_bundle') }"><img src="/oozie/static/art/icon_oozie_24_bundle.png"/> ${_('Bundle')}</a></li>
+                    <li><a href="${ url('oozie:create_workflow') }"><img src="/oozie/static/art/icon_oozie_workflow_24.png"/> ${_('Workflow')}</a></li>
+                    <li><a href="${ url('oozie:create_coordinator') }"><img src="/oozie/static/art/icon_oozie_coordinator_24.png"/> ${_('Coordinator')}</a></li>
+                    <li><a href="${ url('oozie:create_bundle') }"><img src="/oozie/static/art/icon_oozie_bundle_24.png"/> ${_('Bundle')}</a></li>
                   </ul>
                 </li>
                 % endif

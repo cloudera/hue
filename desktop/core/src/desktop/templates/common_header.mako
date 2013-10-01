@@ -295,8 +295,8 @@ from django.utils.translation import ugettext as _
        <li class="dropdown">
          <a title="${_('Schedule with Oozie')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">${_('Workflows')} <b class="caret"></b></a>
          <ul role="menu" class="dropdown-menu">
-           <li><a href="${ url('oozie:index') }"><img src="${ apps['oozie'].icon_path }"/> ${_('Dashboard')}</a></li>
-           <li><a href="${ url('oozie:list_workflows') }"><img src="${ apps['oozie'].icon_path }"/> ${_('Editor')}</a></li>
+           <li><a href="${ url('oozie:index') }"><img src="/oozie/static/art/icon_oozie_dashboard_24.png" /> ${_('Dashboard')}</a></li>
+           <li><a href="${ url('oozie:list_workflows') }"><img src="/oozie/static/art/icon_oozie_editor_24.png" /> ${_('Editor')}</a></li>
          </ul>
        </li>
        % endif
