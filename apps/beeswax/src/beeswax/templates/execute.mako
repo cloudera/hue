@@ -421,8 +421,6 @@ ${layout.menubar(section='query')}
 % endif
 <script src="/static/js/codemirror-show-hint.js"></script>
 
-<link rel="stylesheet" href="/static/ext/css/codemirror-show-hint.css">
-
 <link href="/static/ext/css/bootstrap-editable.css" rel="stylesheet">
 <script src="/static/ext/js/bootstrap-editable.min.js"></script>
 
@@ -774,6 +772,10 @@ ${layout.menubar(section='query')}
         $(document.body).on("contextmenu", function (e) {
           e.preventDefault(); // prevents native menu on FF for Mac from being shown
         });
+
+        var pos = cm.cursorCoords();
+        $("<i class='icon-spinner icon-spin CodeMirror-spinner'></i>").css("top", pos.top + "px").css("left", (pos.left - 4) + "px").appendTo($("body"));
+
         if ($.totalStorage('tables_' + $("#id_query-database").val()) == null) {
           CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
           hac_getTables($("#id_query-database").val(), function () {}); // if preload didn't work, tries again

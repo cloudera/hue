@@ -37,6 +37,8 @@ CodeMirror.showHint = function(cm, getHints, options) {
     hints.style.top = top + "px";
     document.body.appendChild(hints);
 
+    $(".CodeMirror-spinner").remove();
+
     // If we're at the edge of the screen, then we want the menu to appear on the left of the cursor.
     var winW = window.innerWidth || Math.max(document.body.offsetWidth, document.documentElement.offsetWidth);
     var winH = window.innerHeight || Math.max(document.body.offsetHeight, document.documentElement.offsetHeight);
@@ -118,7 +120,7 @@ CodeMirror.showHint = function(cm, getHints, options) {
     });
     CodeMirror.on(hints, "click", function(e) {
       var t = e.target || e.srcElement;
-      if (t.hintId != null) changeActive(t.hintId);
+      if (t.hintId != null) {selectedHint = t.hintId; pick();}
       setTimeout(function(){cm.focus();}, 20);
     });
 

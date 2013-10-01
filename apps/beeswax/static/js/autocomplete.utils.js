@@ -37,6 +37,11 @@ function hac_jsoncalls(options) {
   }
 }
 
+function hac_hasExpired(timestamp){
+  var TIME_TO_LIVE_IN_MILLIS = 600000; // 10 minutes
+  return (new Date()).getTime() - timestamp > TIME_TO_LIVE_IN_MILLIS;
+}
+
 function hac_getTableAliases(textScanned) {
   var _aliases = {};
   var _val = textScanned; //codeMirror.getValue();
@@ -70,21 +75,24 @@ function hac_getTableColumns(databaseName, tableName, textScanned, callback) {
 
   if ($.totalStorage('columns_' + databaseName + '_' + tableName) != null && $.totalStorage('extended_columns_' + databaseName + '_' + tableName) != null) {
     callback($.totalStorage('columns_' + databaseName + '_' + tableName), $.totalStorage('extended_columns_' + databaseName + '_' + tableName));
-    hac_jsoncalls({
-      database: databaseName,
-      table: tableName,
-      onDataReceived: function (data) {
-        if (data.error) {
-          if (typeof HIVE_AUTOCOMPLETE_FAILS_SILENTLY_ON == undefined || data.code == null || HIVE_AUTOCOMPLETE_FAILS_SILENTLY_ON.indexOf(data.code) == -1){
-            $(document).trigger('error', data.error);
+    if ($.totalStorage('timestamp_columns_' + databaseName + '_' + tableName) == null || hac_hasExpired($.totalStorage('timestamp_columns_' + databaseName + '_' + tableName))){
+      hac_jsoncalls({
+        database: databaseName,
+        table: tableName,
+        onDataReceived: function (data) {
+          if (data.error) {
+            if (typeof HIVE_AUTOCOMPLETE_FAILS_SILENTLY_ON == "undefined" || data.code == null || HIVE_AUTOCOMPLETE_FAILS_SILENTLY_ON.indexOf(data.code) == -1){
+              $(document).trigger('error', data.error);
+            }
+          }
+          else {
+            $.totalStorage('columns_' + databaseName + '_' + tableName, (data.columns ? data.columns.join(" ") : ""));
+            $.totalStorage('extended_columns_' + databaseName + '_' + tableName, (data.extended_columns ? data.extended_columns : []));
+            $.totalStorage('timestamp_columns_' + databaseName + '_' + tableName, (new Date()).getTime());
           }
         }
-        else {
-          $.totalStorage('columns_' + databaseName + '_' + tableName, (data.columns ? data.columns.join(" ") : ""));
-          $.totalStorage('extended_columns_' + databaseName + '_' + tableName, (data.extended_columns ? data.extended_columns : []));
-        }
-      }
-    });
+      });
+    }
   }
   else {
     hac_jsoncalls({
@@ -92,13 +100,14 @@ function hac_getTableColumns(databaseName, tableName, textScanned, callback) {
       table: tableName,
       onDataReceived: function (data) {
         if (data.error) {
-          if (typeof HIVE_AUTOCOMPLETE_FAILS_SILENTLY_ON == undefined || data.code == null || HIVE_AUTOCOMPLETE_FAILS_SILENTLY_ON.indexOf(data.code) == -1){
+          if (typeof HIVE_AUTOCOMPLETE_FAILS_SILENTLY_ON == "undefined" || data.code == null || HIVE_AUTOCOMPLETE_FAILS_SILENTLY_ON.indexOf(data.code) == -1){
             $(document).trigger('error', data.error);
           }
         }
         else {
           $.totalStorage('columns_' + databaseName + '_' + tableName, (data.columns ? data.columns.join(" ") : ""));
           $.totalStorage('extended_columns_' + databaseName + '_' + tableName, (data.extended_columns ? data.extended_columns : []));
+          $.totalStorage('timestamp_columns_' + databaseName + '_' + tableName, (new Date()).getTime());
           callback($.totalStorage('columns_' + databaseName + '_' + tableName), $.totalStorage('extended_columns_' + databaseName + '_' + tableName));
         }
       }
@@ -119,31 +128,35 @@ function hac_tableHasAlias(tableName, textScanned) {
 function hac_getTables(databaseName, callback) {
   if ($.totalStorage('tables_' + databaseName) != null) {
     callback($.totalStorage('tables_' + databaseName));
-    hac_jsoncalls({
-      database: databaseName,
-      onDataReceived: function (data) {
-        if (data.error) {
-          if (typeof HIVE_AUTOCOMPLETE_FAILS_SILENTLY_ON == undefined || data.code == null || HIVE_AUTOCOMPLETE_FAILS_SILENTLY_ON.indexOf(data.code) == -1){
-            $(document).trigger('error', data.error);
+    if ($.totalStorage('timestamp_tables_' + databaseName) == null || hac_hasExpired($.totalStorage('timestamp_tables_' + databaseName))){
+      hac_jsoncalls({
+        database: databaseName,
+        onDataReceived: function (data) {
+          if (data.error) {
+            if (typeof HIVE_AUTOCOMPLETE_FAILS_SILENTLY_ON == "undefined" || data.code == null || HIVE_AUTOCOMPLETE_FAILS_SILENTLY_ON.indexOf(data.code) == -1){
+              $(document).trigger('error', data.error);
+            }
+          }
+          else {
+            $.totalStorage('tables_' + databaseName, data.tables.join(" "));
+            $.totalStorage('timestamp_tables_' + databaseName, (new Date()).getTime());
           }
         }
-        else {
-          $.totalStorage('tables_' + databaseName, data.tables.join(" "));
-        }
-      }
-    });
+      });
+    }
   }
   else {
     hac_jsoncalls({
       database: databaseName,
       onDataReceived: function (data) {
         if (data.error) {
-          if (typeof HIVE_AUTOCOMPLETE_FAILS_SILENTLY_ON == undefined || data.code == null || HIVE_AUTOCOMPLETE_FAILS_SILENTLY_ON.indexOf(data.code) == -1){
+          if (typeof HIVE_AUTOCOMPLETE_FAILS_SILENTLY_ON == "undefined" || data.code == null || HIVE_AUTOCOMPLETE_FAILS_SILENTLY_ON.indexOf(data.code) == -1){
             $(document).trigger('error', data.error);
           }
         }
         else {
           $.totalStorage('tables_' + databaseName, data.tables.join(" "));
+          $.totalStorage('timestamp_tables_' + databaseName, (new Date()).getTime());
           callback($.totalStorage('tables_' + databaseName));
         }
       }
