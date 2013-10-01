@@ -281,7 +281,7 @@ class Workflow(Job):
   objects = WorkflowManager()
 
   HUE_ID = 'hue-id-w'
-  ICON = '/oozie/static/art/icon_oozie_24_workflow.png'
+  ICON = '/oozie/static/art/icon_oozie_workflow_24.png'
 
   def get_type(self):
     return 'workflow'
@@ -1273,7 +1273,7 @@ class Coordinator(Job):
                                     help_text=_t('Additional properties to transmit to the workflow, e.g. limit=100, and EL functions, e.g. username=${coord:user()}'))
 
   HUE_ID = 'hue-id-c'
-  ICON = '/oozie/static/art/icon_oozie_24_coordinator.png'
+  ICON = '/oozie/static/art/icon_oozie_coordinator_24.png'
 
   def get_type(self):
     return 'coordinator'
@@ -1540,7 +1540,7 @@ class Bundle(Job):
   coordinators = models.ManyToManyField(Coordinator, through='BundledCoordinator')
 
   HUE_ID = 'hue-id-b'
-  ICON = '/oozie/static/art/icon_oozie_24_bundle.png'
+  ICON = '/oozie/static/art/icon_oozie_bundle_24.png'
 
   def get_type(self):
     return 'bundle'
