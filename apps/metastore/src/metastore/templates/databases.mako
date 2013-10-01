@@ -30,7 +30,7 @@ ${ components.menubar() }
       <div class="sidebar-nav card-small">
         <ul class="nav nav-list">
           <li class="nav-header">${_('actions')}</li>
-          <li><a href="${ url('beeswax:create_database') }">${_('Create a new database')}</a></li>
+          <li><a href="${ url('beeswax:create_database') }"><i class="icon-plus-sign"></i> ${_('Create a new database')}</a></li>
         </ul>
       </div>
     </div>

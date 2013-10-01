@@ -58,15 +58,15 @@ ${ components.menubar() }
         <ul class="nav nav-list">
           <li class="nav-header">${_('Actions')}</li>
           % if has_write_access:
-          <li><a href="#" id="import-data-btn">${_('Import Data')}</a></li>
+          <li><a href="#" id="import-data-btn"><i class="icon-download"></i> ${_('Import Data')}</a></li>
           % endif
-          <li><a href="${ url('metastore:read_table', database=database, table=table.name) }">${_('Browse Data')}</a></li>
+          <li><a href="${ url('metastore:read_table', database=database, table=table.name) }"><i class="icon-list"></i> ${_('Browse Data')}</a></li>
           % if has_write_access:
-          <li><a href="#dropTable" data-toggle="modal">${_('Drop')} ${view_or_table_noun}</a></li>
+          <li><a href="#dropTable" data-toggle="modal"><i class="icon-trash"></i> ${_('Drop')} ${view_or_table_noun}</a></li>
           % endif
-          <li><a href="${ table.hdfs_link }" rel="${ table.path_location }">${_('View File Location')}</a></li>
+          <li><a href="${ table.hdfs_link }" rel="${ table.path_location }"><i class="icon-share"></i> ${_('View File Location')}</a></li>
           % if table.partition_keys:
-          <li><a href="${ url('metastore:describe_partitions', database=database, table=table.name) }">${_('Show Partitions')} (${ len(partitions) })</a></li>
+          <li><a href="${ url('metastore:describe_partitions', database=database, table=table.name) }"><i class="icon-sitemap"></i> ${_('Show Partitions')} (${ len(partitions) })</a></li>
           % endif
         </ul>
       </div>

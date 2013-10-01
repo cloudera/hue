@@ -37,8 +37,8 @@ ${ components.menubar() }
           </li>
           % if has_write_access:
           <li class="nav-header">${_('Actions')}</li>
-          <li><a href="${ url('beeswax:import_wizard', database=database) }">${_('Create a new table from a file')}</a></li>
-          <li><a href="${ url('beeswax:create_table', database=database) }">${_('Create a new table manually')}</a></li>
+          <li><a href="${ url('beeswax:import_wizard', database=database) }"><i class="icon-copy"></i> ${_('Create a new table from a file')}</a></li>
+          <li><a href="${ url('beeswax:create_table', database=database) }"><i class="icon-wrench"></i> ${_('Create a new table manually')}</a></li>
           % endif
         </ul>
       </div>
