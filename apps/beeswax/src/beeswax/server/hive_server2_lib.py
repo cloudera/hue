@@ -262,6 +262,7 @@ class HiveServerClient:
     LOG.info('use_sasl=%s, mechanism=%s, kerberos_principal_short_name=%s, impersonation_enabled=%s' % (
              use_sasl, mechanism, kerberos_principal_short_name, impersonation_enabled))
 
+    self.use_sasl = use_sasl
     self.impersonation_enabled = impersonation_enabled
     self._client = thrift_util.get_client(TCLIService.Client,
                                           query_server['server_host'],
@@ -303,14 +304,17 @@ class HiveServerClient:
 
 
   def open_session(self, user):
-    if self.impersonation_enabled:
+    kwargs = {'username': user.username, 'configuration': {}}
+
+    if self.use_sasl:
       kerberos_principal_short_name = KERBEROS.HUE_PRINCIPAL.get().split('/', 1)[0]
+      kwargs.update({'username': kerberos_principal_short_name})
+
+    if self.impersonation_enabled:
       if self.query_server['server_name'] == 'impala':
-        kwargs = {'username': kerberos_principal_short_name, 'configuration': {'impala.proxy.user': user.username}}
+        kwargs.update({'configuration': {'impala.doas.user': user.username}})
       else:
-        kwargs = {'username': kerberos_principal_short_name, 'configuration': {'hive.server2.proxy.user': user.username}}
-    else:
-      kwargs = {'username': user.username, 'configuration': {}}
+        kwargs.update({'configuration': {'hive.server2.proxy.user': user.username}})
 
     req = TOpenSessionReq(**kwargs)
     res = self._client.OpenSession(req)
