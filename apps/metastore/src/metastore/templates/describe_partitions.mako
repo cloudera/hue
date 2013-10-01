@@ -30,7 +30,7 @@ ${ components.menubar() }
       <div class="sidebar-nav card-small">
         <ul class="nav nav-list">
           <li class="nav-header">${_('Actions')}</li>
-          <li><a href="${ url('metastore:describe_table', database=database, table=table.name) }">${_('Show Table')}</a></li>
+          <li><a href="${ url('metastore:describe_table', database=database, table=table.name) }"><i class="icon-reply"></i> ${_('Show Table')}</a></li>
         </ul>
       </div>
     </div>
