@@ -956,7 +956,12 @@ def authorized_get_history(request, query_history_id, owner_only=False, must_exi
     else:
       return None
 
-  query_history.design.doc.get().can_read_or_exception(request.user)
+  # Some queries don't have a design so are not linked to Document Model permission
+  if query_history.design is None:
+    if not request.user.is_superuser and request.user != query_history.owner:
+      raise PopupException(_('Permission denied to read QueryHistory %(id)s') % {'id': query_history_id})
+  else:
+    query_history.design.doc.get().can_read_or_exception(request.user)
 
   return query_history
 
