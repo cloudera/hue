@@ -133,7 +133,8 @@ def find_ssl():
                                  ['/usr/lib'],
                                  ['/usr/local/lib',
                                   '/usr/local/ssl/lib',
-                                  '/usr/contrib/ssl/lib/'
+                                  '/usr/contrib/ssl/lib/',
+                                  '/usr/lib64'
                                  ] )
 
     if (ssl_incs is not None and ssl_libs is not None):
