@@ -589,7 +589,6 @@ ${ commonheader(None, "pig", user) | n,unicode }
 
 <link rel="stylesheet" href="/pig/static/css/pig.css">
 <link rel="stylesheet" href="/static/ext/css/codemirror.css">
-<link rel="stylesheet" href="/static/ext/css/codemirror-show-hint.css">
 
 <style type="text/css">
   .fileChooserBtn {
