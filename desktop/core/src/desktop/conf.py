@@ -577,12 +577,11 @@ def config_validator(user):
     res.extend(validate_path(KERBEROS.CCACHE_PATH, is_dir=False))
 
   if LDAP.SEARCH_BIND_AUTHENTICATION.get():
-    if LDAP.LDAP_URL.get() is None:
-      res.append((LDAP.LDAP_URL,
-                  unicode(_("LDAP is only partially configured. An LDAP URL must be provided."))))
-
-    if LDAP.BIND_DN.get():
-      if LDAP.BIND_PASSWORD.get() is None:
+    if LDAP.LDAP_URL.get() is not None and bool(LDAP.BIND_DN.get()) != bool(LDAP.BIND_PASSWORD.get()):
+      if LDAP.BIND_DN.get() == None:
+        res.append((LDAP.BIND_DN,
+                  unicode(_("If you set bind_password, then you must set bind_dn."))))
+      else:
         res.append((LDAP.BIND_PASSWORD,
                     unicode(_("If you set bind_dn, then you must set bind_password."))))
   else:
