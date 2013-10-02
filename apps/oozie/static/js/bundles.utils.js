@@ -15,16 +15,6 @@
 // limitations under the License.
 
 function getStatusClass(status, prefix){
-  if(!Array.prototype.indexOf) {
-    Array.prototype.indexOf = function(needle) {
-      for(var i = 0; i < this.length; i++) {
-        if(this[i] === needle) {
-          return i;
-        }
-      }
-      return -1;
-    };
-  }
   if (prefix == null){
     prefix = "label-";
   }

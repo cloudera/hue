@@ -14,17 +14,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-if (!Array.prototype.indexOf) {
-  Array.prototype.indexOf = function (needle) {
-    for (var i = 0; i < this.length; i++) {
-      if (this[i] === needle) {
-        return i;
-      }
-    }
-    return -1;
-  };
-}
-
 function getStatusClass(status, prefix) {
   if (prefix == null) {
     prefix = "label-";
