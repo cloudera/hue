@@ -72,7 +72,7 @@ $(BLD_DIR_DOC)/user-guide: $(wildcard user-guide/*.md)
 	@for x in $? ; do PYTHONPATH=$(DESKTOP_DIR)/core/ext-py/markdown:$(DESKTOP_DIR)/core/ext-py/elementtree \
 	  $(DESKTOP_DIR)/core/ext-py/markdown/bin/markdown \
 	  $$x > $(BLD_DIR_DOC)/$$x ; done
-	@rename 's/\.md/\.html/' $@/*.md
+	@(cd $@; for file in *.md; do mv $${file} $${file/\.md/.html}; done)
 	@echo "--- Generated $@"
 
 
