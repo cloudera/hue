@@ -45,7 +45,7 @@ function hac_hasExpired(timestamp){
 function hac_getTableAliases(textScanned) {
   var _aliases = {};
   var _val = textScanned; //codeMirror.getValue();
-  var _from = _val.toUpperCase().indexOf("FROM");
+  var _from = _val.toUpperCase().indexOf("FROM ");
   if (_from > -1) {
     var _match = _val.toUpperCase().substring(_from).match(/ON|WHERE|GROUP|SORT/);
     var _to = _val.length;
@@ -86,7 +86,7 @@ function hac_getTableColumns(databaseName, tableName, textScanned, callback) {
             }
           }
           else {
-            $.totalStorage('columns_' + databaseName + '_' + tableName, (data.columns ? data.columns.join(" ") : ""));
+            $.totalStorage('columns_' + databaseName + '_' + tableName, (data.columns ? "* " + data.columns.join(" ") : "*"));
             $.totalStorage('extended_columns_' + databaseName + '_' + tableName, (data.extended_columns ? data.extended_columns : []));
             $.totalStorage('timestamp_columns_' + databaseName + '_' + tableName, (new Date()).getTime());
           }
@@ -105,7 +105,7 @@ function hac_getTableColumns(databaseName, tableName, textScanned, callback) {
           }
         }
         else {
-          $.totalStorage('columns_' + databaseName + '_' + tableName, (data.columns ? data.columns.join(" ") : ""));
+          $.totalStorage('columns_' + databaseName + '_' + tableName, (data.columns ? "* " + data.columns.join(" ") : "*"));
           $.totalStorage('extended_columns_' + databaseName + '_' + tableName, (data.extended_columns ? data.extended_columns : []));
           $.totalStorage('timestamp_columns_' + databaseName + '_' + tableName, (new Date()).getTime());
           callback($.totalStorage('columns_' + databaseName + '_' + tableName), $.totalStorage('extended_columns_' + databaseName + '_' + tableName));

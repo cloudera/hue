@@ -13,6 +13,8 @@ CodeMirror.showHint = function(cm, getHints, options) {
   }
 
   function showHints(data) {
+    data.list.clean("");
+    $(".CodeMirror-spinner").remove();
     if (!data || !data.list.length) return;
     var completions = data.list;
     // When there is only one completion, use it directly.
@@ -36,8 +38,6 @@ CodeMirror.showHint = function(cm, getHints, options) {
     hints.style.left = left + "px";
     hints.style.top = top + "px";
     document.body.appendChild(hints);
-
-    $(".CodeMirror-spinner").remove();
 
     // If we're at the edge of the screen, then we want the menu to appear on the left of the cursor.
     var winW = window.innerWidth || Math.max(document.body.offsetWidth, document.documentElement.offsetWidth);
