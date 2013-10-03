@@ -808,7 +808,6 @@ class TestEditor(OozieMockBase):
         '                    <value>${SLEEP}</value>\n'
         '                </property>\n'
         '            </configuration>\n'
-        '            <file>/user/hue/oozie/examples/lib/hadoop-examples.jar#hadoop-examples.jar</file>\n'
         '        </map-reduce>\n'
         '        <ok to="action-name-2"/>\n'
         '        <error to="kill"/>\n'
@@ -827,7 +826,6 @@ class TestEditor(OozieMockBase):
         '                    <value>${SLEEP}</value>\n'
         '                </property>\n'
         '            </configuration>\n'
-        '            <file>/user/hue/oozie/examples/lib/hadoop-examples.jar#hadoop-examples.jar</file>\n'
         '        </map-reduce>\n'
         '        <ok to="action-name-3"/>\n'
         '        <error to="kill"/>\n'
@@ -846,7 +844,6 @@ class TestEditor(OozieMockBase):
         '                    <value>${SLEEP}</value>\n'
         '                </property>\n'
         '            </configuration>\n'
-        '            <file>/user/hue/oozie/examples/lib/hadoop-examples.jar#hadoop-examples.jar</file>\n'
         '        </map-reduce>\n'
         '        <ok to="end"/>\n'
         '        <error to="kill"/>\n'
@@ -890,7 +887,6 @@ class TestEditor(OozieMockBase):
             <java-opts>-Dexample-property=natty</java-opts>
             <arg>1000</arg>
             <arg>${output_dir}/teragen</arg>
-            <file>/user/hue/oozie/workspaces/lib/hadoop-examples.jar#hadoop-examples.jar</file>
             <file>my_file#my_file</file>
             <file>my_file2#my_file2</file>
             <archive>my_archive#my_archive</archive>
