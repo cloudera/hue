@@ -124,20 +124,35 @@ def admin_collections(request, is_redirect=False):
 def admin_collections_import(request):
   if request.method == 'POST':
     searcher = SearchController(request.user)
-    status = 0
-    err_message = _('Error')
-    result = {
-      'status': status,
-      'message': err_message
-    }
+    imported = []
+    not_imported = []
+    status = -1
+    message = ""
     importables = json.loads(request.POST["selected"])
     for imp in importables:
       try:
         searcher.add_new_collection(imp)
-        status += 1
+        imported.append(imp['name'])
       except Exception, e:
-        err_message += unicode(str(e), "utf8") + "\n"
-      result['message'] = _('Imported successfully') if status == len(importables) else _('Imported with errors: ') + err_message
+        not_imported.append(imp['name'] + ": " + unicode(str(e), "utf8"))
+
+    if len(imported) == len(importables):
+      status = 0;
+      message = _('Collection(s) or core(s) imported successfully!')
+    elif len(not_imported) == len(importables):
+      status = 2;
+      message = _('There was an error importing the collection(s) or core(s)')
+    else:
+      status = 1;
+      message = _('Collection(s) or core(s) partially imported')
+
+    result = {
+      'status': status,
+      'message': message,
+      'imported': imported,
+      'notImported': not_imported
+    }
+
     return HttpResponse(json.dumps(result), mimetype="application/json")
   else:
     if request.GET.get('format') == 'json':

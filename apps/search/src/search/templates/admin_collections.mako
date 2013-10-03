@@ -206,10 +206,18 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
       _btn.button("loading");
     });
 
-    $(document).on("imported", function () {
+    $(document).on("imported", function (e, data) {
       $("#importModal").modal("hide");
       $("#importModalBtn").button("reset");
-      $(document).trigger("info", "${ _("Collections imported successfully.") }"); // Could fail actually
+      if (data.status == 0){
+        $(document).trigger("info", data.message + "<br/>${_('Imported:')}" +  + data.imported.join(", "));
+      }
+      else if (data.status == 1){
+        $(document).trigger("info", data.message + "<br/>${_('Imported:')}" + data.imported.join(", ") + "<br/>${_('Not imported:')}" + data.notImported.join(", "));
+      }
+      else {
+        $(document).trigger("error", data.message+ "<br/>${_('Not imported:')}" + data.notImported.join(", "));
+      }
     });
 
     $(document).on("deleting", function () {

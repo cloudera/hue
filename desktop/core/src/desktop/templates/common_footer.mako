@@ -24,6 +24,9 @@ from django.template.defaultfilters import escape, escapejs
     $(document).on("info", function (e, msg) {
       $.jHueNotify.info(msg);
     });
+    $(document).on("warn", function (e, msg) {
+      $.jHueNotify.warn(msg);
+    });
     $(document).on("error", function (e, msg) {
       $.jHueNotify.error(msg);
     });
@@ -32,6 +35,8 @@ from django.template.defaultfilters import escape, escapejs
       %for message in messages:
         %if message.tags == 'error':
           $(document).trigger('error', '${ escapejs(escape(message)) }');
+        %elif message.tags == 'warn':
+          $(document).trigger('warn', '${ escapejs(escape(message)) }');
         %else:
           $(document).trigger('info', '${ escapejs(escape(message)) }');
         %endif

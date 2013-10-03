@@ -180,7 +180,7 @@ var SearchCollectionsModel = function (props) {
         selected: ko.toJSON(selected)
       },
       function (data) {
-        $(document).trigger("imported");
+        $(document).trigger("imported", data);
         self.updateCollections();
       }, "json");
   };

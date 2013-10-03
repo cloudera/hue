@@ -113,6 +113,10 @@
         new Plugin({ level: TYPES.INFO, message: message});
     };
 
+    $[pluginName].warn = function (message) {
+        new Plugin({ level: TYPES.GENERAL, message: message, sticky: true});
+    };
+
     $[pluginName].error = function (message) {
         new Plugin({ level: TYPES.ERROR, message: message, sticky: true});
     };
