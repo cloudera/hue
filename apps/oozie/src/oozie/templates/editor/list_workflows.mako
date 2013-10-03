@@ -46,6 +46,7 @@ ${ layout.menubar(section='workflows') }
         <button class="btn toolbarBtn" id="submit-btn" disabled="disabled"><i class="icon-play"></i> ${ _('Submit') }</button>
         <button class="btn toolbarBtn" id="schedule-btn" disabled="disabled"><i class="icon-calendar"></i> ${ _('Schedule') }</button>
         <button class="btn toolbarBtn" id="clone-btn" disabled="disabled"><i class="icon-copy"></i> ${ _('Copy') }</button>
+        <button class="btn toolbarBtn" id="export-btn" disabled="disabled"><i class="icon-upload-alt"></i> ${ _('Export') }</button>
         <div id="delete-dropdown" class="btn-group" style="vertical-align: middle">
           <button id="trash-btn" class="btn toolbarBtn" disabled="disabled"><i class="icon-remove"></i> ${_('Move to trash')}</button>
           <button id="trash-btn-caret" class="btn toolbarBtn dropdown-toggle" data-toggle="dropdown" disabled="disabled">
@@ -88,6 +89,7 @@ ${ layout.menubar(section='workflows') }
                   data-submit-url="${ url('oozie:submit_workflow', workflow=workflow.id) }"
                   data-schedule-url="${ url('oozie:schedule_workflow', workflow=workflow.id) }"
                   data-clone-url="${ url('oozie:clone_workflow', workflow=workflow.id) }"
+                  data-export-url="${ url('oozie:export_workflow', workflow=workflow.id) }"
               % endif
               % if workflow.is_editable(user):
                   data-delete-id="${ workflow.id }"
@@ -194,7 +196,8 @@ ${ layout.menubar(section='workflows') }
         var action_buttons = [
           ['#submit-btn', 'data-submit-url'],
           ['#schedule-btn', 'data-schedule-url'],
-          ['#clone-btn', 'data-clone-url']
+          ['#clone-btn', 'data-clone-url'],
+          ['#export-btn', 'data-export-url']
         ];
         $.each(action_buttons, function (index) {
           if (selector.attr(this[1])) {
@@ -248,6 +251,12 @@ ${ layout.menubar(section='workflows') }
     $("#schedule-btn").click(function (e) {
       var _this = $(".hueCheckbox[checked='checked']");
       var _url = _this.attr("data-schedule-url");
+      window.location.replace(_url);
+    });
+
+    $("#export-btn").click(function (e) {
+      var _this = $(".hueCheckbox[checked='checked']");
+      var _url = _this.attr("data-export-url");
       window.location.replace(_url);
     });
 
