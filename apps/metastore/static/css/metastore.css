@@ -22,12 +22,16 @@
 
 .hueBreadcrumbBar {
   padding: 0;
-  margin: 0;
-  margin-bottom: 10px;
+  margin: 12px;
+}
+
+.hueBreadcrumbBar a {
+  color: #338BB8 !important;
+  display: inline !important;
 }
 
 .divider {
-  padding-left: 20px;
+  color: #CCC;
 }
 
 .sidebar-nav {
@@ -36,4 +40,5 @@
 
 .card-heading {
   padding-left: 6px !important;
+  border-bottom: none !important;
 }

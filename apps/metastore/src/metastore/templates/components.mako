@@ -41,15 +41,14 @@
 <%def name="breadcrumbs(breadcrumbs)">
   <ul class="nav nav-pills hueBreadcrumbBar" id="breadcrumbs">
     <li>
-      <a href="${url('metastore:databases')}">${_('Databases')} <span class="divider">&gt;</span></a>
+      <a href="${url('metastore:databases')}">${_('Databases')}</a><span class="divider">&gt;</span>
     </li>
     % for crumb in breadcrumbs:
     <li>
-      <a href="${ crumb['url'] }">${ crumb['name'] }
+      <a href="${ crumb['url'] }">${ crumb['name'] }</a>
       % if not loop.last:
         <span class="divider">&gt;</span>
       % endif
-      </a>
     </li>
     % endfor
   </ul>
