@@ -32,7 +32,10 @@ Action extensions are also versioned.
 Every action extension will have its own version via /xslt/<workflow version>/extensions/<name of extensions>.<version>.xslt
 """
 
-import json
+try:
+  import json
+except ImportError:
+  import simplejson as json
 
 import logging
 from lxml import etree
@@ -499,6 +502,7 @@ def _resolve_subworkflow_from_deployment_dir(fs, workflow, app_path):
   """
   Resolves subworkflow in a subworkflow node
   Looks at path and interrogates all workflows until the proper deployment path is found.
+  If the proper deployment path is never found, then
   """
   if not fs:
     raise RuntimeError(_("No hadoop file system to operate on."))
@@ -544,39 +548,7 @@ def _save_nodes(workflow, nodes):
       node.save()
 
 
-def _resolve_jar_paths(workflow):
-  """
-  Make first file in "files" field the "jar path".
-  """
-  for node in workflow.node_list:
-    if hasattr(node, 'jar_path') and hasattr(node, 'files'):
-      files = json.loads(node.files)
-      if files:
-        node.jar_path = files.pop(0)
-        node.files = json.dumps(files)
-        node.save()
-
-
-def _postprocess_workflow(workflow):
-  """
-  Post processing step.
-  """
-  _resolve_jar_paths(workflow)
-
-
 def import_workflow(workflow, workflow_definition, fs=None):
-  """
-  Import workflow takes 7 steps:
-  1. Perform XSLT.
-  2. Verify schema version.
-  3. Prepare nodes for importing.
-  4. Preprocess nodes before importing.
-  5. Save nodes after they've been processed.
-  6. Save links after the nodes have been added.
-  7. Post process the workflow.
-
-  Most logic is in steps 3, 4, and 6, 7.
-  """
   xslt_definition_fh = open("%(xslt_dir)s/workflow.xslt" % {
     'xslt_dir': DEFINITION_XSLT_DIR.get()
   })
@@ -610,7 +582,6 @@ def import_workflow(workflow, workflow_definition, fs=None):
   _preprocess_nodes(workflow, transformed_root, workflow_definition_root, nodes, fs)
   _save_nodes(workflow, nodes)
   _save_links(workflow, workflow_definition_root)
-  _postprocess_workflow(workflow)
 
   # Update schema_version
   workflow.schema_version = schema_version

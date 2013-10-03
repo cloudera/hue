@@ -149,7 +149,7 @@ class Submission(object):
       raise PopupException(message=msg, detail=str(ex))
 
     oozie_xml = self.job.to_xml(self.properties)
-    self._do_as(self.user.username, self._copy_files, deployment_dir, oozie_xml)
+    self._do_as(self.user.username , self._copy_files, deployment_dir, oozie_xml)
 
     if hasattr(self.job, 'actions'):
       for action in self.job.actions:
@@ -221,6 +221,25 @@ class Submission(object):
     xml_path = self.fs.join(deployment_dir, self.job.get_application_filename())
     self.fs.create(xml_path, overwrite=True, permission=0644, data=oozie_xml)
     LOG.debug("Created %s" % (xml_path,))
+
+    # Copy the files over
+    files = []
+    if hasattr(self.job, 'node_list'):
+      for node in self.job.node_list:
+        if hasattr(node, 'jar_path') and node.jar_path.startswith('/'):
+          files.append(node.jar_path)
+
+    if files:
+      lib_path = self.fs.join(deployment_dir, 'lib')
+      if self.fs.exists(lib_path):
+        LOG.debug("Cleaning up old %s" % (lib_path,))
+        self.fs.rmtree(lib_path)
+
+      self.fs.mkdir(lib_path, 0755)
+      LOG.debug("Created %s" % (lib_path,))
+
+      for file in files:
+        self.fs.copyfile(file, self.fs.join(lib_path, self.fs.basename(file)))
 
   def _do_as(self, username, fn, *args, **kwargs):
     prev_user = self.fs.user
