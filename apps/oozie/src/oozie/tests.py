@@ -20,6 +20,8 @@ import json
 import logging
 import re
 import os
+import StringIO
+import zipfile
 
 from itertools import chain
 
@@ -29,7 +31,7 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
 from desktop.lib.django_test_util import make_logged_in_client
-from desktop.lib.test_utils import grant_access, add_permission, add_to_group
+from desktop.lib.test_utils import grant_access, add_permission, add_to_group, reformat_json, reformat_xml
 from desktop.models import Document
 
 from jobsub.models import OozieDesign, OozieMapreduceAction
@@ -1464,6 +1466,97 @@ class TestEditor(OozieMockBase):
     assert_equal(previous_trashed + 1, Document.objects.trashed_docs(Workflow, self.user).count())
     assert_equal(previous_available - 1, Document.objects.available_docs(Workflow, self.user).count())
 
+
+  def test_workflow_export(self):
+    response = self.c.get(reverse('oozie:export_workflow', args=[self.wf.id]))
+    zfile = zipfile.ZipFile(StringIO.StringIO(response.content))
+    assert_true('workflow.xml' in zfile.namelist(), 'workflow.xml not in response')
+    assert_true('workflow-metadata.json' in zfile.namelist(), 'workflow-metadata.json not in response')
+    assert_equal(2, len(zfile.namelist()))
+
+    workflow_xml = reformat_xml("""<workflow-app name="wf-name-1" xmlns="uri:oozie:workflow:0.2">
+    <global>
+        <job-xml>jobconf.xml</job-xml>
+        <configuration>
+            <property>
+                <name>sleep-all</name>
+                <value>${SLEEP}</value>
+            </property>
+        </configuration>
+    </global>
+    <start to="action-name-1"/>
+    <action name="action-name-1">
+        <map-reduce>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <prepare>
+                <delete path="${nameNode}${output}"/>
+                <mkdir path="${nameNode}/test"/>
+            </prepare>
+            <configuration>
+                <property>
+                    <name>sleep</name>
+                    <value>${SLEEP}</value>
+                </property>
+            </configuration>
+        </map-reduce>
+        <ok to="action-name-2"/>
+        <error to="kill"/>
+    </action>
+    <action name="action-name-2">
+        <map-reduce>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <prepare>
+                <delete path="${nameNode}${output}"/>
+                <mkdir path="${nameNode}/test"/>
+            </prepare>
+            <configuration>
+                <property>
+                    <name>sleep</name>
+                    <value>${SLEEP}</value>
+                </property>
+            </configuration>
+        </map-reduce>
+        <ok to="action-name-3"/>
+        <error to="kill"/>
+    </action>
+    <action name="action-name-3">
+        <map-reduce>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <prepare>
+                <delete path="${nameNode}${output}"/>
+                <mkdir path="${nameNode}/test"/>
+            </prepare>
+            <configuration>
+                <property>
+                    <name>sleep</name>
+                    <value>${SLEEP}</value>
+                </property>
+            </configuration>
+        </map-reduce>
+        <ok to="end"/>
+        <error to="kill"/>
+    </action>
+    <kill name="kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+    <end name="end"/>
+</workflow-app>""")
+    workflow_metadata_json = reformat_json("""{
+  "action-name-1": {
+    "jar_path": "/user/hue/oozie/examples/lib/hadoop-examples.jar"
+  },
+  "action-name-2": {
+    "jar_path": "/user/hue/oozie/examples/lib/hadoop-examples.jar"
+  },
+  "action-name-3": {
+    "jar_path": "/user/hue/oozie/examples/lib/hadoop-examples.jar"
+  }
+}""")
+    assert_equal(workflow_xml, reformat_xml(zfile.read('workflow.xml')))
+    assert_equal(workflow_metadata_json, reformat_json(zfile.read('workflow-metadata.json')))
 
 class TestEditorBundle(OozieMockBase):
 

@@ -15,6 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
+from lxml import objectify, etree
+
 from django.contrib.auth.models import Group, User
 from useradmin.models import HuePermission, GroupPermission, get_default_user_group
 
@@ -42,3 +45,17 @@ def add_to_group(username, groupname=get_default_user_group().name):
     if not user.groups.filter(name=group.name).exists():
         user.groups.add(group)
         user.save()
+
+
+def reformat_json(json_obj):
+    if isinstance(json_obj, basestring):
+        return json.dumps(json.loads(json_obj))
+    else:
+        return json.dumps(json_obj)
+
+
+def reformat_xml(xml_obj):
+    if isinstance(xml_obj, basestring):
+        return etree.tostring(objectify.fromstring(xml_obj))
+    else:
+        return etree.tostring(xml_obj)

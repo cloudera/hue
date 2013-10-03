@@ -71,6 +71,9 @@ ${ layout.menubar(section='workflows') }
           <li>
             <a id="clone-btn" href="#" data-clone-url="${ url('oozie:clone_workflow', workflow=workflow.id) }" title="${ _('Copy this workflow') }" rel="tooltip" data-placement="right"><i class="icon-copy"></i> ${ _('Copy') }</a>
           </li>
+          <li>
+            <a id="export-btn" href="${ url('oozie:export_workflow', workflow=workflow.id) }" title="${ _('Export this workflow') }" rel="tooltip" data-placement="right"><i class="icon-upload-alt"></i> ${ _('Export') }</a>
+          </li>
         % endif
       </ul>
     </div>
