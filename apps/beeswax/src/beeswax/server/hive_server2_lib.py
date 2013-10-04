@@ -304,7 +304,11 @@ class HiveServerClient:
 
 
   def open_session(self, user):
-    kwargs = {'username': user.username, 'configuration': {}}
+    kwargs = {
+        'username': user.username,
+        'configuration': {},
+        'client_protocol': TOpenSessionReq.thrift_spec[1][4], # Thrift default not automatic
+    }
 
     if self.use_sasl:
       kerberos_principal_short_name = KERBEROS.HUE_PRINCIPAL.get().split('/', 1)[0]
