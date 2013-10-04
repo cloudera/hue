@@ -186,7 +186,7 @@ ${ comps.menubar() }
                           </a>
                         </td>
                         <td>${ attempt['id'] }</td>
-                        <td>${ comps.get_container_link(job.status, attempt['containerId']) }</td>
+                        <td>${ comps.get_container_link(job.status, attempt['nodeHttpAddress'], attempt['containerId']) }</td>
                       </tr>
                       % endfor
                     </tbody>

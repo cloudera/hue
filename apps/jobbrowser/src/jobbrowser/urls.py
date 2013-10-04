@@ -32,6 +32,7 @@ urlpatterns = patterns('jobbrowser.views',
   url(r'^jobs/(?P<job>\w+)/tasks/(?P<taskid>\w+)/attempts/(?P<attemptid>\w+)/logs$', 'single_task_attempt_logs', name='single_task_attempt_logs'),
   url(r'^jobs/(\w+)/tasks/(\w+)/attempts/(?P<attemptid>\w+)/kill$', 'kill_task_attempt', name='kill_task_attempt'),
   url(r'^trackers/(?P<trackerid>.+)$', 'single_tracker', name='single_tracker'),
+  url(r'^container/(?P<node_manager_http_address>.+)/(?P<containerid>.+)$', 'container', name='container'),
 
   # MR2 specific
   url(r'^jobs/(?P<job>\w+)/job_attempt_logs/(?P<attempt_index>\d+)$', 'job_attempt_logs', name='job_attempt_logs'),

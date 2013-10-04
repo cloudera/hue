@@ -17,11 +17,9 @@
 
 import logging
 import posixpath
-import threading
 
 from desktop.lib.rest.http_client import HttpClient
 from desktop.lib.rest.resource import Resource
-from hadoop import cluster
 
 
 LOG = logging.getLogger(__name__)
@@ -30,21 +28,10 @@ DEFAULT_USER = 'hue'
 _API_VERSION = 'v1'
 _JSON_CONTENT_TYPE = 'application/json'
 
-_api_cache = None
-_api_cache_lock = threading.Lock()
 
 
-def get_resource_manager_api():
-  global _api_cache
-  if _api_cache is None:
-    _api_cache_lock.acquire()
-    try:
-      if _api_cache is None:
-        yarn_cluster = cluster.get_cluster_conf_for_job_submission()
-        _api_cache = ResourceManagerApi(yarn_cluster.NODE_MANAGER_API_URL.get())
-    finally:
-      _api_cache_lock.release()
-  return _api_cache
+def get_resource_manager_api(api_url):
+  return ResourceManagerApi(api_url)
 
 
 class ResourceManagerApi(object):

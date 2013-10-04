@@ -85,7 +85,7 @@ ${ comps.menubar() }
                       <td><span class="status_link ${attempt.state}">${attempt.state}</span></td>
                       <td>
                         % if task.is_mr2:
-                          ${ comps.get_container_link(task.state, attempt.taskTrackerId) }
+                          ${ comps.get_container_link(task.state, attempt.nodeHttpAddress, attempt.taskTrackerId) }
                         % else:
                           <a href="/jobbrowser/trackers/${attempt.taskTrackerId}" class="task_tracker_link">${attempt.taskTrackerId}</a>
                         % endif

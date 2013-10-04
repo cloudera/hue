@@ -20,7 +20,7 @@
 
 <%namespace name="comps" file="jobbrowser_components.mako" />
 
-${ commonheader(_('Tracker: %(trackerId)s') % dict(trackerId=tracker.trackerId), "jobbrowser", user) | n,unicode }
+${ commonheader(_('Container: %(trackerId)s') % dict(trackerId=tracker.trackerId), "jobbrowser", user) | n,unicode }
 ${ comps.menubar()}
 
 <div class="container-fluid">
@@ -30,39 +30,29 @@ ${ comps.menubar()}
         <div class="card-body">
           <p>
 
-    <h1>${_('Tracker at %(trackerHost)s on port %(trackerPort)s') % dict(trackerHost=tracker.host, trackerPort=tracker.httpPort)}</h1>
+    <h1>${_('Container at %(trackerHost)s on port %(trackerPort)s') % dict(trackerHost=tracker.host, trackerPort=tracker.httpPort)}</h1>
     <div>
         <dl>
             <dt>${_('ID')}</dt>
             <dd>${ tracker.trackerId }</dd>
-            <dt>${_('Last heard from at')}</dt>
-            <dd>${ tracker.lastSeenFormatted }.</dd>
         </dl>
     </div>
 
     <h2>${_('Memory Metrics')}</h2>
     <div>
         <dl>
-            <dt>${_('Total virtual memory:')}</dt>
-            <dd>${tracker.totalVirtualMemory }</dd>
-            <dt>${_('Total physical memory:')}</dt>
-            <dd>${tracker.totalPhysicalMemory }</dd>
-            <dt>${_('Available space:')}</dt>
-            <dd>${tracker.availableSpace}</dd>
-        </dl>
-    </div>
-
-    <h2>${_('Map and Reduce')}</h2>
-    <div>
-        <dl>
-            <dt>${_('Map count:')}</dt>
-            <dd>${tracker.mapCount}</dd>
-            <dt>${_('Reduce count:')}</dt>
-            <dd>${tracker.reduceCount}</dd>
-            <dt>${_('Max map tasks:')}</dt>
-            <dd>${tracker.maxMapTasks}</dd>
-            <dt>${_('Max reduce tasks:')}</dt>
-            <dd>${tracker.maxReduceTasks}</dd>
+            <dt>${_('Node Id')}</dt>
+            <dd>${tracker.nodeId }</dd>
+            <dt>${_('State')}</dt>
+            <dd>${tracker.state }</dd>
+            <dt>${_('User')}</dt>
+            <dd>${tracker.user}</dd>
+            <dt>${_('Diagnostics')}</dt>
+            <dd>${tracker.diagnostics}</dd>
+            <dt>${_('Total Memory Needed in MB')}</dt>
+            <dd>${tracker.totalMemoryNeededMB}</dd>
+            <dt>${_('Exit Code')}</dt>
+            <dd>${tracker.exitCode}</dd>
         </dl>
     </div>
 
