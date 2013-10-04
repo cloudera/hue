@@ -4936,7 +4936,7 @@ input[type="submit"].btn.btn-mini {
   left: 50%;
   margin-left: -6px;
   border-top-color: #999;
-  border-top-color: #ffffff;
+  border-top-color: rgba(0, 0, 0, 0.2);
   border-bottom-width: 0;
 }
 
@@ -4952,7 +4952,7 @@ input[type="submit"].btn.btn-mini {
   left: -6px;
   margin-top: -6px;
   border-right-color: #999;
-  border-right-color: #ffffff;
+  border-right-color: rgba(0, 0, 0, 0.2);
   border-left-width: 0;
 }
 
@@ -4968,7 +4968,7 @@ input[type="submit"].btn.btn-mini {
   left: 50%;
   margin-left: -6px;
   border-bottom-color: #999;
-  border-bottom-color: #ffffff;
+  border-bottom-color: rgba(0, 0, 0, 0.2);
   border-top-width: 0;
 }
 
@@ -4984,7 +4984,7 @@ input[type="submit"].btn.btn-mini {
   right: -6px;
   margin-top: -6px;
   border-left-color: #999;
-  border-left-color: #ffffff;
+  border-left-color: rgba(0, 0, 0, 0.2);
   border-right-width: 0;
 }
 

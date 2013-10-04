@@ -75,7 +75,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
           <li class="currentApp">
             <a href="/home">
               <img src="/static/art/home.png" />
-              ${ _('Home') }
+              ${ _('My documents') }
             </a>
            </li>
         </ul>

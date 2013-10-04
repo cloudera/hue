@@ -180,7 +180,7 @@ from django.template.defaultfilters import escape, escapejs
 
 </script>
 %if tours_and_tutorials:
-  <script src="/static/js/available.tours.js"></script>
+  <%include file="tours.mako"/>
   <div id="jHueTourModal" class="modal hide fade">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>

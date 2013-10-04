@@ -142,7 +142,7 @@
         if (tour.path === undefined || RegExp(tour.path).test(location.pathname)) {
           var _tourDone = '';
           var _removeTour = '';
-          var _extraIcon = '';
+          var _extraIcon = '<i class="icon-flag"></i> ';
           if ($.totalStorage !== undefined) {
             var _key = location.pathname;
             if (tour.path !== undefined && tour.path != "") {
