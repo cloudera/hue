@@ -162,33 +162,36 @@ ${ components.menubar() }
     }
 
     var isUpdating = false;
-    var newRows = [];
+    var updateableRows = {};
 
     function updateRunning(data) {
       if (data != null && data.length > 0) {
-        for (var i = 0; i < newRows.length; i++) {
-          var isDone = true;
-          $(data).each(function (cnt, job) {
-            if (job.id == newRows[i].id) {
-              isDone = false;
-            }
-          });
-          if (isDone) {
-            callJobDetails(newRows[i]);
-            newRows.splice(i, 1);
+        // Update finished jobs from updateableRows.
+        // jobs missing from response are finished.
+        $.each(updateableRows, function(job_id, job) {
+          if ($.grep(data, function(new_job) {
+            return new_job.shortId == job_id;
+          }).length == 0 ) {
+            callJobDetails(job, true);
+            delete updateableRows[job_id];
           }
-        }
-        $(data).each(function (cnt, job) {
-          var nNodes = jobTable.fnGetNodes();
-          var foundRow = null;
-          $(nNodes).each(function (iNode, node) {
-            if ($(node).children("td").eq(1).text().trim() == job.shortId) {
-              foundRow = node;
-            }
-          });
-          if (foundRow == null) {
-            if (['RUNNING', 'PREP', 'WAITING', 'SUSPENDED', 'PREPSUSPENDED', 'PREPPAUSED', 'PAUSED'].indexOf(job.status.toUpperCase()) > -1) {
-              newRows.push(job);
+        });
+
+        // Find new jobs and running jobs.
+        // Update updateableRows.
+        for(var i = 0; i < data.length; ++i) {
+          var job = data[i];
+          if (['RUNNING', 'PREP', 'WAITING', 'SUSPENDED', 'PREPSUSPENDED', 'PREPPAUSED', 'PAUSED'].indexOf(job.status.toUpperCase()) > -1) {
+            updateableRows[job.shortId] = job;
+
+            var nNodes = jobTable.fnGetNodes();
+            var foundRow = null;
+            $.each(nNodes, function (iNode, node) {
+              if ($(node).children("td").eq(1).text().trim() == job.shortId) {
+                foundRow = node;
+              }
+            });
+            if (foundRow == null) {
               try {
                 jobTable.fnAddData(getJobRow(job));
                 if ($("#noJobs").is(":visible")) {
@@ -196,22 +199,21 @@ ${ components.menubar() }
                   $(".datatables").show();
                 }
                 $("a[data-row-selector='true']").jHueRowSelector();
-              }
-              catch (error) {
+              } catch (error) {
                 $(document).trigger("error", error);
               }
+            } else {
+              updateJobRow(job, foundRow);
             }
           }
-          else {
-            updateJobRow(job, foundRow);
-          }
-        });
-      }
-      else {
-        for (var i = 0; i < newRows.length; i++) {
-          callJobDetails(newRows[i]);
-          newRows.splice(i, 1);
         }
+      } else {
+        // Update finished jobs from updateableRows.
+        // all jobs have finished if hit this clause.
+        $.each(updateableRows, function(job_id, job) {
+          callJobDetails(job, true);
+          delete updateableRows[job_id];
+        });
       }
       isUpdating = false;
     }
@@ -243,10 +245,12 @@ ${ components.menubar() }
       ]
     }
 
-    function updateJobRow(job, row) {
+    function updateJobRow(job, row, finish) {
+      var mapsPercentComplete = (finish) ? 100 : job.mapsPercentComplete;
+      var reducesPercentComplete = (finish) ? 100 : job.reducesPercentComplete;
       jobTable.fnUpdate('<span class="label ' + getStatusClass(job.status) + '">' + job.status + '</span>', row, 3, false);
-      jobTable.fnUpdate('<span title="' + emptyStringIfNull(job.mapsPercentComplete) + '"><div class="progress" title="' + (job.isMR2 ? job.mapsPercentComplete : job.finishedMaps + '/' + job.desiredMaps) + '"><div class="bar-label">' + job.mapsPercentComplete + '%</div><div class="' + 'bar ' + getStatusClass(job.status, "bar-") + '" style="margin-top:-20px;width:' + job.mapsPercentComplete + '%"></div></div></span>', row, 5, false);
-      jobTable.fnUpdate('<span title="' + emptyStringIfNull(job.reducesPercentComplete) + '"><div class="progress" title="' + (job.isMR2 ? job.reducesPercentComplete : job.finishedReduces + '/' + job.desiredReduces) + '"><div class="bar-label">' + job.reducesPercentComplete + '%</div><div class="' + 'bar ' + getStatusClass(job.status, "bar-") + '" style="margin-top:-20px;width:' + job.reducesPercentComplete + '%"></div></div></span>', row, 6, false);
+      jobTable.fnUpdate('<span title="' + emptyStringIfNull(mapsPercentComplete) + '"><div class="progress" title="' + (job.isMR2 ? mapsPercentComplete : job.finishedMaps + '/' + job.desiredMaps) + '"><div class="bar-label">' + mapsPercentComplete + '%</div><div class="' + 'bar ' + getStatusClass(job.status, "bar-") + '" style="margin-top:-20px;width:' + mapsPercentComplete + '%"></div></div></span>', row, 5, false);
+      jobTable.fnUpdate('<span title="' + emptyStringIfNull(reducesPercentComplete) + '"><div class="progress" title="' + (job.isMR2 ? reducesPercentComplete : job.finishedReduces + '/' + job.desiredReduces) + '"><div class="bar-label">' + reducesPercentComplete + '%</div><div class="' + 'bar ' + getStatusClass(job.status, "bar-") + '" style="margin-top:-20px;width:' + reducesPercentComplete + '%"></div></div></span>', row, 6, false);
       jobTable.fnUpdate('<span title="' + emptyStringIfNull(job.durationMs) + '">' + emptyStringIfNull(job.durationFormatted) + '</span>', row, 9, false);
       var _killCell = "";
       if (job.canKill) {
@@ -261,7 +265,7 @@ ${ components.menubar() }
       jobTable.fnUpdate(_killCell, row, 11, false);
     }
 
-    function callJobDetails(job) {
+    function callJobDetails(job, finish) {
       $.getJSON(job.url + "?format=json&rnd=" + Math.random(), function (data) {
         if (data != null && data.job) {
           var jobTableNodes = jobTable.fnGetNodes();
@@ -272,7 +276,7 @@ ${ components.menubar() }
             }
           });
           if (_foundRow != null) {
-            updateJobRow(data.job, _foundRow);
+            updateJobRow(data.job, _foundRow, finish);
           }
         }
       });
