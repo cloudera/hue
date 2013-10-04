@@ -330,6 +330,8 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
 
 <script type="text/html" id="job-editor-begin">
 <fieldset>
+  <div data-bind="template: {'name': 'job-editor-form-error', 'data': {'name': ko.observable('connection')}}" class=""></div>
+
   <div class="control-group">
     <label class="control-label">${ _('Name') }</label>
     <div class="controls">
@@ -714,6 +716,19 @@ function handle_form_errors(e, node, options, data) {
   }
 }
 
+function connection_missing_error(e, node) {
+  // Resets save and run btns
+  reset_save_buttons();
+  viewModel.errors({
+    'connection': [{
+      'status': 'UNACCEPTABLE',
+      'message': '${_("Please specify a connection.")}'
+    }]
+  });
+  viewModel.warnings({});
+  routie('job/edit/wizard/job-editor-begin');
+}
+
 $(document).on('connection_error.jobs', function(e, name, options, jqXHR) {
   $('#sqoop-error .message').text("${ _('Cannot connect to sqoop server.') }");
   routie('error');
@@ -744,6 +759,7 @@ $(document).one('load_fail.job', function() {
 });
 
 $(document).on('save_fail.job', handle_form_errors);
+$(document).on('connection_missing.job', connection_missing_error);
 $(document).on('save_fail.connection', handle_form_errors);
 $(document).on('delete_fail.job', handle_form_errors);
 

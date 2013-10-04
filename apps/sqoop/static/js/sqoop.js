@@ -306,8 +306,12 @@ var viewModel = new (function() {
   self.saveJob = function() {
     var job = self.job();
     if (job) {
-      job.connector_id(self.connector().id());
-      job.connection_id(self.connection().id());
+      if (!self.connection()) {
+        $(document).trigger('connection_missing.job', [self, null, {}]);
+        return;
+      }
+      job.connector_id((self.connector()) ? self.connector().id() : null);
+      job.connection_id((self.connection()) ? self.connection().id() : null);
       job.save();
     }
   };
