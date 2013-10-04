@@ -54,7 +54,7 @@ $("<style type='text/css'> .tooltip {z-index: 30000} .tourBuilder td { vertical-
              "<h3>Available tours</h3>" +
              "</div>" +
              "<div class='modal-body'>" +
-             "<p><span id='tbTourList'></span><br/><h4>Content for available.tours.js</h4><textarea id='tbAvailableContent' style='width:90%'></textarea><br/><a href='javascript:void(0)' id='tbLoadToursJson' class='btn btn-mini'>Load from JSON</a></p>" +
+             "<p><span id='tbTourList'></span><br/><h4>Content for tours.mako</h4><textarea id='tbAvailableContent' style='width:90%'></textarea><br/><a href='javascript:void(0)' id='tbLoadToursJson' class='btn btn-mini'>Load from JSON</a></p>" +
              "</div>" +
              "<div class='modal-footer'><a href='javascript:void(0)' data-dismiss='modal' class='btn'>Close</a></div></div>";
 
