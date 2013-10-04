@@ -382,6 +382,8 @@ for x in sys.stdin:
     assert_equal('other_db', response.context['query'].design.get_design().query['database'])
 
   def test_explain_query(self):
+    raise SkipTest
+  
     c = self.client
     response = _make_query(c, "SELECT KITTENS ARE TASTY", submission_type="Explain")
     assert_true("ParseException" in response.context["error_message"])
@@ -393,6 +395,8 @@ for x in sys.stdin:
     assert_true(response.context["explanation"])
 
   def test_explain_query_i18n(self):
+    raise SkipTest
+
     query = u"SELECT foo FROM test_utf8 WHERE bar='%s'" % (unichr(200),)
     response = _make_query(self.client, query, submission_type="Explain")
     assert_true(response.context['explanation'])
@@ -449,6 +453,8 @@ for x in sys.stdin:
     assert_true('DROP TABLE test_multiple_statements_2' in resp.content, resp.content)
 
   def test_multiple_statements_with_result_set(self):
+    raise SkipTest
+
     hql = """
       SELECT foo FROM test;
       SELECT count(*) FROM test;
@@ -489,6 +495,8 @@ for x in sys.stdin:
 
     So we check the results by looking at the csv files.
     """
+    raise SkipTest
+
     PARALLEL_TASKS = 2
     responses = [ None ] * PARALLEL_TASKS
     threads = []
@@ -511,6 +519,8 @@ for x in sys.stdin:
       assert_equal( [ i + 1, i + 2 ], answer)
 
   def test_data_export_limit_clause(self):
+    raise SkipTest
+
     limit = 3
     hql = 'SELECT foo FROM test limit %d' % (limit,)
     query = hql_query(hql)
@@ -540,6 +550,8 @@ for x in sys.stdin:
     assert_true('QueryHistory matching query does not exist' in response.content, response.content)
 
   def test_data_export(self):
+    raise SkipTest
+
     hql = 'SELECT * FROM test'
     query = hql_query(hql)
 
