@@ -29,6 +29,7 @@ from django.contrib.auth.models import User
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.paths import get_run_root
+from desktop.lib.security_util import get_localhost_name
 from hadoop import pseudo_hdfs4
 
 import beeswax.conf
@@ -86,7 +87,7 @@ def get_shared_beeswax_server():
 
     HIVE_CONF = cluster.hadoop_conf_dir
     finish = (
-      beeswax.conf.HIVE_SERVER_HOST.set_for_testing("localhost"),
+      beeswax.conf.HIVE_SERVER_HOST.set_for_testing(get_localhost_name()),
       beeswax.conf.HIVE_SERVER_PORT.set_for_testing(HIVE_SERVER_TEST_PORT),
       beeswax.conf.HIVE_SERVER_BIN.set_for_testing(get_run_root('ext/hive/hive') + '/bin/hiveserver2'),
       beeswax.conf.HIVE_CONF_DIR.set_for_testing(HIVE_CONF)
