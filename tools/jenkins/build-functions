@@ -63,6 +63,7 @@ build_hadoop() {
   rm -rf "$HADOOP_DIR/${CDH_VERSION}"
   echo "Unpacking $CDH_CACHE to $HADOOP_DIR"
   tar -C $HADOOP_DIR -xzf $CDH_CACHE
+  ln -s $HADOOP_DIR/${CDH_VERSION} $HADOOP_DIR/hadoop
   # For Hive
   ln -sf $HADOOP_DIR/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-client-core-*.jar $HADOOP_DIR/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-client-core.jar
   ln -sf $HADOOP_DIR/hadoop/share/hadoop/common/hadoop-common-*-SNAPSHOT.jar $HADOOP_DIR/hadoop/share/hadoop/common/hadoop-common.jar
@@ -70,7 +71,6 @@ build_hadoop() {
   ln -sf $HADOOP_DIR/hadoop/share/hadoop/hdfs/hadoop-hdfs-${CDH_SHORT_VERSION}.jar  $HADOOP_DIR/hadoop/share/hadoop/hdfs/hadoop-hdfs.jar
   # For MR2
   ln -sf "$HADOOP_DIR/${CDH_VERSION}/share/hadoop/mapreduce2" "$HADOOP_DIR/${CDH_VERSION}/share/hadoop/mapreduce"
-  ln -s $HADOOP_DIR/${CDH_VERSION} $HADOOP_DIR/hadoop
 }
 
 ##########
