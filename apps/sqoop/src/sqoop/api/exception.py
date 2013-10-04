@@ -40,5 +40,6 @@ def handle_rest_exception(e, msg):
     LOG.error(smart_str(e.message))
     return {
       'status': 1,
-      'errors': [msg]
+      'errors': [msg],
+      'exception': str(e)
     }
