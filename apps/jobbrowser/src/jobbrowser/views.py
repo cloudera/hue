@@ -415,8 +415,19 @@ def single_tracker(request, trackerid):
   try:
     tracker = jt.get_tracker(trackerid)
   except Exception, e:
-    raise PopupException(_('The container disappears as soon as the job finishes.'), detail=e)
+    raise PopupException(_('The tracker could not be contacted.'), detail=e)
   return render("tasktracker.mako", request, {'tracker':tracker})
+
+def container(request, node_manager_http_address, containerid):
+  jt = get_api(request.user, request.jt)
+
+  try:
+    tracker = jt.get_tracker(node_manager_http_address, containerid)
+  except Exception, e:
+    # TODO: add a redirect of some kind
+    raise PopupException(_('The container disappears as soon as the job finishes.'), detail=e)
+  return render("container.mako", request, {'tracker':tracker})
+
 
 def clusterstatus(request):
   """

@@ -522,7 +522,6 @@ def shared_cluster():
       hadoop.conf.YARN_CLUSTERS['default'].PORT.set_for_testing(cluster._rm_port),
 
       hadoop.conf.YARN_CLUSTERS['default'].RESOURCE_MANAGER_API_URL.set_for_testing('http://%s:%s' % (cluster._fqdn, cluster._rm_webapp_port,)),
-      hadoop.conf.YARN_CLUSTERS['default'].NODE_MANAGER_API_URL.set_for_testing('http://%s:%s' % (cluster._fqdn, cluster._nm_webapp_port,)),
       hadoop.conf.YARN_CLUSTERS['default'].PROXY_API_URL.set_for_testing('http://%s:%s' % (cluster._fqdn, cluster._rm_webapp_port,)),
       hadoop.conf.YARN_CLUSTERS['default'].HISTORY_SERVER_API_URL.set_for_testing('%s:%s' % (cluster._fqdn, cluster._jh_web_port,)),
     ]

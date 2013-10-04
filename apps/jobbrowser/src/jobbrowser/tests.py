@@ -30,7 +30,6 @@ from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_to_group
 from desktop.models import Document
 from hadoop import cluster
-from hadoop import pseudo_hdfs4
 from hadoop.conf import YARN_CLUSTERS
 from hadoop.yarn import resource_manager_api, mapreduce_api, history_server_api
 from liboozie.oozie_api_test import OozieServerProvider
