@@ -18,6 +18,7 @@
 
 <%!
   import os
+  from hadoop.fs.exceptions import WebHdfsException
   from jobbrowser.views import format_counter_name
   from filebrowser.views import location_to_url
   from desktop.views import commonheader, commonfooter
@@ -72,10 +73,14 @@
             %>
             % if is_hdfs_uri:
                 <%
+                  try:
                     if request.fs.isfile(url_splitted[2]):
                       target = "FileViewer"
                     else:
                       target = "FileBrowser"
+                  except WebHdfsException, e:
+                    # Permissions error... see HUE-1593
+                    target = "FileBrowser"
                 %>
                     <a href="${location_to_url(val)}" title="${val}" target="${target}">${val}</a>
                 % if i != len(splitArray) - 1:
