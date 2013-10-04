@@ -63,7 +63,7 @@ build_hadoop() {
   rm -rf "$HADOOP_DIR/${CDH_VERSION}"
   echo "Unpacking $CDH_CACHE to $HADOOP_DIR"
   tar -C $HADOOP_DIR -xzf $CDH_CACHE
-  ln -s $HADOOP_DIR/${CDH_VERSION} $HADOOP_DIR/hadoop
+  ln -sf $HADOOP_DIR/${CDH_VERSION} $HADOOP_DIR/hadoop
   # For Hive
   ln -sf $HADOOP_DIR/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-client-core-*.jar $HADOOP_DIR/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-client-core.jar
   ln -sf $HADOOP_DIR/hadoop/share/hadoop/common/hadoop-common-*-SNAPSHOT.jar $HADOOP_DIR/hadoop/share/hadoop/common/hadoop-common.jar
@@ -95,8 +95,11 @@ build_hive() {
   rm -rf $HIVE_HOME
   echo "Unpacking $HIVE_CACHE to $HIVE_DIR"
   tar -C $HIVE_DIR -xzf $HIVE_CACHE
-  ln -s $HIVE_DIR/${HIVE_VERSION} $HIVE_DIR/hive
+  ln -sf $HIVE_DIR/${HIVE_VERSION} $HIVE_DIR/hive
   export HIVE_CONF_DIR=$HIVE_HOME/conf
+
+  # Weird HADOOP_HOME, creating a HADOOP_HIVE_HOME
+  #sed -i'.bk' "s|HADOOP=\$HADOOP_HOME/bin/hadoop|HADOOP=\$HADOOP_HIVE_HOME/bin/hadoop|g" $HIVE_HOME/bin/hive
 }
 
 ##########
@@ -123,7 +126,7 @@ build_oozie() {
   export OOZIE_CONF_DIR=$OOZIE_HOME/conf
 
   rm -rf $OOZIE_DIR/oozie
-  ln -s $OOZIE_DIR/${OOZIE_VERSION} $OOZIE_DIR/oozie
+  ln -sf $OOZIE_DIR/${OOZIE_VERSION} $OOZIE_DIR/oozie
 
   mkdir -p $OOZIE_HOME/libext
   tar -C $OOZIE_HOME/libext -zxvf $OOZIE_HOME/oozie-hadooplibs-*.tar.gz
@@ -161,7 +164,7 @@ build_sqoop() {
   export SQOOP_CONF_DIR=$SQOOP_HOME/server/conf
 
   rm -rf $SQOOP_DIR/sqoop
-  ln -s $SQOOP_DIR/${SQOOP_VERSION} $SQOOP_DIR/sqoop
+  ln -sf $SQOOP_DIR/${SQOOP_VERSION} $SQOOP_DIR/sqoop
 
   # Change ports and hostnames to be configurable or replaceable
   sed -i'.bk' 's/12000/${test.port.http}/g' $SQOOP_CONF_DIR/server.xml

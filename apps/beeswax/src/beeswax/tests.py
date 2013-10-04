@@ -520,8 +520,6 @@ for x in sys.stdin:
       assert_equal( [ i + 1, i + 2 ], answer)
 
   def test_data_export_limit_clause(self):
-    raise SkipTest
-
     limit = 3
     hql = 'SELECT foo FROM test limit %d' % (limit,)
     query = hql_query(hql)
