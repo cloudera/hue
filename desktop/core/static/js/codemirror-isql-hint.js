@@ -95,7 +95,11 @@
     }
 
     function maybeAddToExtra(str) {
-      if (str.indexOf(start) == 0 && !arrayContains(found, str)) extraFound.push(str);
+      var _match = str;
+      if (_match.indexOf("icon-magic") > -1) {
+        _match = _match.substring(32);
+      }
+      if (_match.indexOf(start) == 0 && !arrayContains(found, str)) extraFound.push(str);
     }
 
     function gatherCompletions(obj) {
