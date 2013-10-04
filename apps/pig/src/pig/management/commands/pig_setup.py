@@ -26,10 +26,11 @@ from django.utils.translation import ugettext as _
 
 from hadoop import cluster
 
-from pig.conf import LOCAL_SAMPLE_DIR, REMOTE_SAMPLE_DIR
-from liboozie.submittion import create_directories
 from desktop.lib import paths
 from desktop.models import Document
+from liboozie.submittion import create_directories
+from pig.conf import LOCAL_SAMPLE_DIR, REMOTE_SAMPLE_DIR
+from useradmin.models import install_sample_user
 
 LOG = logging.getLogger(__name__)
 
@@ -56,10 +57,6 @@ class Command(NoArgsCommand):
     fs.do_as_user(fs.DEFAULT_USER, fs.copyFromLocal, local_dir, remote_data_dir)
 
     # Load jobs
-    USERNAME = 'sample'
-    try:
-      sample_user = User.objects.get(username=USERNAME)
-    except User.DoesNotExist:
-      sample_user = User.objects.create(username=USERNAME, password='!', is_active=False, is_superuser=False, id=1100713, pk=1100713)
+    install_sample_user()
     management.call_command('loaddata', 'initial_pig_examples.json', verbosity=2)
     Document.objects.sync()

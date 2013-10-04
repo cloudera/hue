@@ -31,11 +31,10 @@ from beeswax.models import SavedQuery, IMPALA
 from beeswax.design import hql_query
 from beeswax.server import dbms
 from beeswax.server.dbms import get_query_server_config, QueryServerException
+from useradmin.models import install_sample_user
 
 
 LOG = logging.getLogger(__name__)
-
-DEFAULT_INSTALL_USER = 'sample'
 
 
 class InstallException(Exception):
@@ -49,24 +48,14 @@ class Command(NoArgsCommand):
   def handle_noargs(self, **options):
     """Main entry point to install or re-install examples. May raise InstallException"""
     try:
-      user = self._install_user()
+      user = install_sample_user()
       self._install_tables(user, options['app_name'])
       self._install_queries(user, options['app_name'])
     except Exception, ex:
       LOG.exception(ex)
       raise InstallException(ex)
 
-  def _install_user(self):
-    """
-    Setup the sample user
-    """
-    USERNAME = DEFAULT_INSTALL_USER
-    try:
-      user = User.objects.get(username=USERNAME)
-    except User.DoesNotExist:
-      user = User.objects.create(username=USERNAME, password='!', is_active=False, is_superuser=False, id=1100713, pk=1100713)
-      LOG.info('Installed a user called "%s"' % (USERNAME,))
-    return user
+    Document.objects.sync()
 
   def _install_tables(self, django_user, app_name):
     data_dir = beeswax.conf.LOCAL_EXAMPLES_DATA_DIR.get()
@@ -119,7 +108,6 @@ class SampleTable(object):
   def install(self, django_user):
     self.create(django_user)
     self.load(django_user)
-    Document.objects.sync()
 
   def create(self, django_user):
     """
