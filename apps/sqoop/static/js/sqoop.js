@@ -83,6 +83,7 @@ var viewModel = new (function() {
   var self = this;
 
   self.jobWizard = new wizard.Wizard();
+  self.sqoop_errors = ko.observableArray([]);
   self.errors = ko.observable({});
   self.warnings = ko.observable({});
   self.framework = ko.observable();

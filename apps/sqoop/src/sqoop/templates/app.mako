@@ -48,8 +48,12 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
 </div>
 
 <div class="container-fluid">
-  <div id="sqoop-error" class="row-fluid mainSection hide" style="margin-top: 30px">
-    <div class="alert alert-error"><i class="icon-warning-sign"></i> <strong>${_('Sqoop error')}:</strong> <span class="message"></span></div>
+  <div data-bind="foreach: sqoop_errors" id="sqoop-error" class="row-fluid mainSection hide" style="margin-top: 30px">
+    <div class="alert alert-error">
+      <i class="icon-warning-sign"></i>
+      <strong>${_('Sqoop error')}:</strong>
+      <span data-bind="text: $data" class="message"></span>
+    </div>
   </div>
 
   <div class="row-fluid" data-bind="if: isLoading">
@@ -730,7 +734,8 @@ function connection_missing_error(e, node) {
 }
 
 $(document).on('connection_error.jobs', function(e, name, options, jqXHR) {
-  $('#sqoop-error .message').text("${ _('Cannot connect to sqoop server.') }");
+  viewModel.sqoop_errors.removeAll();
+  viewModel.sqoop_errors.push("${ _('Cannot connect to sqoop server.') }");
   routie('error');
 });
 
@@ -779,9 +784,18 @@ $("#jobs-list tbody").on('click', 'tr', function() {
 //// Load all the data
 var framework = new framework.Framework();
 (function() {
-  function fail() {
+  function fail(e, options, data) {
     viewModel.isLoading(false);
     viewModel.isReady(false);
+    viewModel.sqoop_errors.removeAll();
+    if (data.errors) {
+      $.each(data.errors, function(i, error_msg) {
+        viewModel.sqoop_errors.push(error_msg);
+      });
+    } else {
+      viewModel.sqoop_errors.push('${_("Unknown error.")}');
+    }
+    window.location.hash = 'error';
   }
   $(document).one('load_error.jobs', fail);
   $(document).one('load_error.framework', fail);
