@@ -100,11 +100,11 @@ class Dbms:
     return self.client.get_table(database, table_name)
 
 
-  def get_tables(self, database='default', table_names='.*'):
+  def get_tables(self, database='default', table_names='.*'):    
     return self.client.get_tables(database, table_names)
 
 
-  def get_databases(self):
+  def get_databases(self):    
     return self.client.get_databases()
 
 

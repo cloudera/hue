@@ -19,6 +19,8 @@ import logging
 import re
 import thrift
 
+from operator import itemgetter
+
 from desktop.conf import KERBEROS
 from desktop.lib import thrift_util
 from hadoop import cluster
@@ -42,15 +44,15 @@ LOG = logging.getLogger(__name__)
 
 class HiveServerTable(Table):
   """
-  We are parsing DESCRIBE EXTENDED text sometimes and might need to implement the metastore API instead at some point.
+  We are parsing DESCRIBE EXTENDED text as the metastore API like GetColumns() misses most of the information.
   """
   def __init__(self, table_results, table_schema, desc_results, desc_schema):
     if not table_results.rows:
       raise NoSuchObjectException()
     self.table = table_results.rows and table_results.rows[0] or ''
     self.table_schema = table_schema
-    self.results = desc_results
-    self.schema = desc_schema
+    self.desc_results = desc_results
+    self.desc_schema = desc_schema
 
   @property
   def name(self):
@@ -61,10 +63,9 @@ class HiveServerTable(Table):
     return HiveServerTRow(self.table, self.table_schema).col('TABLE_TYPE') == 'VIRTUAL_VIEW'
 
   @property
-  def partition_keys(self):    
+  def partition_keys(self):
     describe = self.extended_describe
-    print describe
-    #  partitionKeys:[FieldSchema(name:datehour, type:int, comment:null)],
+    # Parses a list of: partitionKeys:[FieldSchema(name:baz, type:string, comment:null), FieldSchema(name:boom, type:string, comment:null)]
     match = re.search('partitionKeys:\[([^\]]+)\]', describe)
     if match is not None:
       match = match.group(1)
@@ -94,11 +95,9 @@ class HiveServerTable(Table):
 
   @property
   def cols(self):
-    cols = HiveServerTTableSchema(self.results, self.schema).cols()
-    if sum([bool(col['col_name']) for col in cols]) == len(cols):
-      return cols
-    else:
-      return cols[:-2] # Drop last 2 lines of extended describe
+    cols = HiveServerTTableSchema(self.desc_results, self.desc_schema).cols()
+    end_cols_index = map(itemgetter('col_name'), cols).index('') # Truncate below extended describe
+    return cols[0:end_cols_index]
 
   @property
   def comment(self):
@@ -106,9 +105,17 @@ class HiveServerTable(Table):
 
   @property
   def extended_describe(self):
-    # Just keep the content and skip the last new line
-    return HiveServerTTableSchema(self.results, self.schema).cols()[-1]['data_type']
-
+    # Just keep rows after 'Detailed Table Information'
+    rows = HiveServerTTableSchema(self.desc_results, self.desc_schema).cols()
+    detailed_row_index = map(itemgetter('col_name'), rows).index('Detailed Table Information')
+    # Hack because of bad delimiter escaping in LazySimpleSerDe in HS2: parameters:{serialization.format=})
+    describe_text = rows[detailed_row_index]['data_type']
+    try:
+      # LazySimpleSerDe case
+      return describe_text+  rows[detailed_row_index + 1]['col_name']
+    except:
+      return describe_text
+      
 
 class HiveServerTRowSet:
   def __init__(self, row_set, schema):
@@ -402,8 +409,8 @@ class HiveServerClient:
     res = self.call(self._client.GetTables, req)
 
     table_results, table_schema = self.fetch_result(res.operationHandle)
-
     desc_results, desc_schema = self.execute_statement('DESCRIBE EXTENDED %s' % table_name)
+
     return HiveServerTable(table_results.results, table_schema.schema, desc_results.results, desc_schema.schema)
 
 
@@ -504,7 +511,7 @@ class HiveServerClient:
 
   def get_partitions(self, database, table_name, max_parts):
     table = self.get_table(database, table_name)
-
+    # todo use DB
     partitionTable = self.execute_query_statement('SHOW PARTITIONS %s' % table_name) # DB prefix not supported
     return [PartitionValueCompatible(partition, table) for partition in partitionTable.rows()][-max_parts:]
 
@@ -519,8 +526,8 @@ class HiveServerTableCompatible(HiveServerTable):
   def __init__(self, hive_table):
     self.table = hive_table.table
     self.table_schema = hive_table.table_schema
-    self.results = hive_table.results
-    self.schema = hive_table.schema
+    self.desc_results = hive_table.desc_results
+    self.desc_schema = hive_table.desc_schema
 
   @property
   def cols(self):
@@ -655,6 +662,10 @@ class HiveServerClientCompatible:
   def get_table(self, database, table_name):
     table = self._client.get_table(database, table_name)
     return HiveServerTableCompatible(table)
+
+
+  def get_columns(self, database, table):
+    return self._client.get_columns(database, table)
 
 
   def get_default_configuration(self, *args, **kwargs):

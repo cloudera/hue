@@ -142,7 +142,8 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
   def test_browse_partitions(self):
     response = self.client.get("/metastore/table/default/test_partitions/partitions/0", follow=True)
     response = wait_for_query_to_finish(self.client, response, max=30.0)
-    assert_true(len(response.context['results']) > 10)
+    page_context = [context for context in response.context if 'results' in context][0]
+    assert_true(len(page_context['results']) > 10)
 
   def test_drop_multi_tables(self):
     hql = """
