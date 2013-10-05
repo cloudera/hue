@@ -61,8 +61,9 @@ class HiveServerTable(Table):
     return HiveServerTRow(self.table, self.table_schema).col('TABLE_TYPE') == 'VIRTUAL_VIEW'
 
   @property
-  def partition_keys(self):
+  def partition_keys(self):    
     describe = self.extended_describe
+    print describe
     #  partitionKeys:[FieldSchema(name:datehour, type:int, comment:null)],
     match = re.search('partitionKeys:\[([^\]]+)\]', describe)
     if match is not None:

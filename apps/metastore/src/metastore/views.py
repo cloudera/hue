@@ -91,7 +91,7 @@ def drop_database(request):
       raise PopupException(error, title=_("Hive Error"), detail=log)
   else:
     title = _("Do you really want to delete the database(s)?")
-    return render('confirm.html', request, dict(url=request.path, title=title))
+    return render('confirm.mako', request, {'url': request.path, 'title': title})
 
 
 """
@@ -191,7 +191,7 @@ def drop_table(request, database):
       raise PopupException(error, title=_("Hive Error"), detail=log)
   else:
     title = _("Do you really want to delete the table(s)?")
-    return render('confirm.html', request, dict(url=request.path, title=title))
+    return render('confirm.mako', request, {'url': request.path, 'title': title})
 
 
 def read_table(request, database, table):
