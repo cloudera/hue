@@ -95,8 +95,8 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     # Note that it may not return all rows at once. But we expect at least 10.
     assert_true(len(response.context['results']) > 10)
     # Column names
-    assert_true("<td>foo</td>" in response.content)
-    assert_true("<td>bar</td>" in response.content)
+    assert_true("foo" in response.content)
+    assert_true("bar" in response.content)
     # This should NOT go into the query history.
     assert_equal(verify_history(self.client, fragment='test'), history_cnt,
                  'Implicit queries should not be saved in the history')
@@ -115,7 +115,7 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
 
   def test_describe_partitions(self):
     response = self.client.get("/metastore/table/default/test_partitions")
-    assert_true("Show Partitions (1)" in response.content)
+    assert_true("Show Partitions (1)" in response.content, response.content)
 
     response = self.client.get("/metastore/table/default/test_partitions/partitions", follow=True)
     assert_true("baz_one" in response.content)
@@ -199,7 +199,7 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     # Try it with partitions
     resp = self.client.post("/metastore/table/default/test_partitions/load", dict(path="/tmp/foo", partition_0="alpha", partition_1="beta"), follow=True)
     query = QueryHistory.objects.latest('id')
-    assert_equal_mod_whitespace("LOAD DATA INPATH '/tmp/foo' INTO TABLE `default.test_partitions` PARTITION (baz='alpha', boom='beta')", query.query)
+    assert_equal_mod_whitespace(query.query, "LOAD DATA INPATH '/tmp/foo' INTO TABLE `default.test_partitions` PARTITION (baz='alpha', boom='beta')")
 
 
   def test_has_write_access_frontend(self):
