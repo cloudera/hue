@@ -70,7 +70,7 @@ ${layout.menubar(section='query')}
                 <ul class="nav nav-list">
                     <li><a id="collapse" class="btn btn-small"><i class="icon-chevron-left" rel="tooltip" title="${_('Collapse this panel')}"></i></a></li>
                     % if download_urls:
-                    <li class="nav-header">${_('Downloads')}</li>
+                    <li class="nav-header">${_('Results')}</li>
                     <li><a target="_blank" href="${download_urls["csv"]}"><i class="icon-download"></i> ${_('Download as CSV')}</a></li>
                     <li><a target="_blank" href="${download_urls["xls"]}"><i class="icon-download"></i> ${_('Download as XLS')}</a></li>
                     % endif
@@ -80,7 +80,7 @@ ${layout.menubar(section='query')}
                     % if app_name != 'impala':
                     <%
                       n_jobs = hadoop_jobs and len(hadoop_jobs) or 0
-                      mr_jobs = (n_jobs == 1) and _('MR Job') or _('MR Jobs')
+                      mr_jobs = (n_jobs == 1) and _('MapReduce Job') or _('MapReduce Jobs')
                     %>
                      % if n_jobs > 0:
                         <li class="nav-header">${mr_jobs} (${n_jobs})</li>

@@ -129,7 +129,7 @@ $.jHueTour({
      },
      {
        "name": "huesqoop",
-       "desc": "${_("The Sqoop 2 app")}",
+       "desc": "${_("Transfering data with Sqoop")}",
        "path": "/sqoop",
        "video": "http://player.vimeo.com/video/76063637",
        "blog": "http://gethue.tumblr.com/post/63064228790/move-data-in-out-your-hadoop-cluster-with-the-sqoop"
