@@ -115,7 +115,7 @@ class HiveServerTable(Table):
       return describe_text+  rows[detailed_row_index + 1]['col_name']
     except:
       return describe_text
-      
+  
 
 class HiveServerTRowSet:
   def __init__(self, row_set, schema):
@@ -511,7 +511,7 @@ class HiveServerClient:
 
   def get_partitions(self, database, table_name, max_parts):
     table = self.get_table(database, table_name)
-    # todo use DB
+    # TODO: do a 'use DB' ?
     partitionTable = self.execute_query_statement('SHOW PARTITIONS %s' % table_name) # DB prefix not supported
     return [PartitionValueCompatible(partition, table) for partition in partitionTable.rows()][-max_parts:]
 
