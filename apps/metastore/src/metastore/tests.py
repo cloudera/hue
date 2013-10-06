@@ -204,6 +204,9 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
 
 
   def test_has_write_access_frontend(self):
+    # HS2 bug: Proxy user substitution is not supported for unsecure hadoop
+    raise SkipTest
+
     client = make_logged_in_client(username='write_access_frontend', groupname='write_access_frontend', is_superuser=False)
     grant_access("write_access_frontend", "write_access_frontend", "metastore")
     user = User.objects.get(username='write_access_frontend')
@@ -228,6 +231,9 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
 
 
   def test_has_write_access_backend(self):
+    # HS2 bug: Proxy user substitution is not supported for unsecure hadoop
+    raise SkipTest
+
     client = make_logged_in_client(username='write_access_backend', groupname='write_access_backend', is_superuser=False)
     grant_access("write_access_backend", "write_access_backend", "metastore")
     grant_access("write_access_backend", "write_access_backend", "beeswax")

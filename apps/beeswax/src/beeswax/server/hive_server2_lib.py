@@ -115,7 +115,7 @@ class HiveServerTable(Table):
       return describe_text+  rows[detailed_row_index + 1]['col_name']
     except:
       return describe_text
-  
+
 
 class HiveServerTRowSet:
   def __init__(self, row_set, schema):

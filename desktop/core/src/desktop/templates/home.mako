@@ -102,9 +102,6 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
                 % if 'pig' in apps:
                 <li><a href="${ url('beeswax:index') }"><img src="${ apps['pig'].icon_path }"/> ${_('Pig Script')}</a></li>
                 % endif
-                % if 'sqoop' in apps:
-                <li><a href="#"><img src="${ apps['sqoop'].icon_path }"/> ${_('Sqoop Transfer')}</a></li>
-                % endif                
                 % if 'oozie' in apps:
                 <li class="dropdown-submenu">
                   <a href="#"><img src="${ apps['oozie'].icon_path }"/> ${_('Oozie Scheduler')}</a>

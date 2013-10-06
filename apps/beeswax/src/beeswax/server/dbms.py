@@ -100,11 +100,11 @@ class Dbms:
     return self.client.get_table(database, table_name)
 
 
-  def get_tables(self, database='default', table_names='.*'):    
+  def get_tables(self, database='default', table_names='.*'):
     return self.client.get_tables(database, table_names)
 
 
-  def get_databases(self):    
+  def get_databases(self):
     return self.client.get_databases()
 
 
@@ -362,7 +362,7 @@ class Dbms:
       LOG.exception(ex)
       # Kind of expected (hql compile/syntax error, etc.)
       if hasattr(ex, 'handle') and ex.handle:
-        query_history.server_id = ex.handle.id
+        query_history.server_id, query_history.server_guid = ex.handle.id, ex.handle.id
         query_history.log_context = ex.handle.log_context
       query_history.save_state(QueryHistory.STATE.failed)
       raise ex
