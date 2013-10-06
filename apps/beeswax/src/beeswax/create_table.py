@@ -51,7 +51,8 @@ def create_table(request, database='default'):
   form = MultiForm(
       table=CreateTableForm,
       columns=ColumnTypeFormSet,
-      partitions=PartitionTypeFormSet)
+      partitions=PartitionTypeFormSet
+  )
 
   if request.method == "POST":
     form.bind(request.POST)
