@@ -902,7 +902,6 @@ def autocomplete(request, database=None, table=None):
     response['code'] = 500
     response['error'] = e.message
 
-
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 

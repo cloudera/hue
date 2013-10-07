@@ -266,11 +266,12 @@ class HiveServerClient:
     self.query_server = query_server
     self.user = user
 
-    use_sasl, mechanism, kerberos_principal_short_name, impersonation_enabled = HiveServerClient.get_security(query_server)
+    use_sasl, mechanism, kerberos_principal_short_name, impersonation_enabled = self.get_security()
     LOG.info('use_sasl=%s, mechanism=%s, kerberos_principal_short_name=%s, impersonation_enabled=%s' % (
              use_sasl, mechanism, kerberos_principal_short_name, impersonation_enabled))
 
     self.use_sasl = use_sasl
+    self.kerberos_principal_short_name = kerberos_principal_short_name
     self.impersonation_enabled = impersonation_enabled
     self._client = thrift_util.get_client(TCLIService.Client,
                                           query_server['server_host'],
@@ -283,30 +284,27 @@ class HiveServerClient:
                                           timeout_seconds=conf.SERVER_CONN_TIMEOUT.get())
 
 
-  @classmethod
-  def get_security(cls, query_server):
-    principal = query_server['principal']
+  def get_security(self):
+    principal = self.query_server['principal']
     impersonation_enabled = False
-
-    if query_server['server_name'] == 'impala':
-      cluster_conf = cluster.get_cluster_conf_for_job_submission()
-      use_sasl = cluster_conf is not None and cluster_conf.SECURITY_ENABLED.get()
-      mechanism = HiveServerClient.HS2_MECHANISMS['KERBEROS']
-      impersonation_enabled = query_server['impersonation_enabled']
-    else:
-      hive_mechanism = hive_site.get_hiveserver2_authentication()
-      if hive_mechanism not in HiveServerClient.HS2_MECHANISMS:
-        raise Exception(_('%s server authentication not supported. Valid are %s.' % (hive_mechanism, HiveServerClient.HS2_MECHANISMS.keys())))
-      use_sasl = hive_mechanism in ('KERBEROS', 'NONE')
-      mechanism = 'NOSASL'
-      if use_sasl:
-        mechanism = HiveServerClient.HS2_MECHANISMS[hive_mechanism]
-      impersonation_enabled = hive_site.hiveserver2_impersonation_enabled()
 
     if principal:
       kerberos_principal_short_name = principal.split('/', 1)[0]
     else:
       kerberos_principal_short_name = None
+
+    if self.query_server['server_name'] == 'impala':
+      cluster_conf = cluster.get_cluster_conf_for_job_submission()
+      use_sasl = cluster_conf is not None and cluster_conf.SECURITY_ENABLED.get()
+      mechanism = HiveServerClient.HS2_MECHANISMS['KERBEROS']
+      impersonation_enabled = self.query_server['impersonation_enabled']
+    else:
+      hive_mechanism = hive_site.get_hiveserver2_authentication()
+      if hive_mechanism not in HiveServerClient.HS2_MECHANISMS:
+        raise Exception(_('%s server authentication not supported. Valid are %s.' % (hive_mechanism, HiveServerClient.HS2_MECHANISMS.keys())))
+      use_sasl = hive_mechanism in ('KERBEROS', 'NONE')
+      mechanism = HiveServerClient.HS2_MECHANISMS[hive_mechanism]
+      impersonation_enabled = hive_site.hiveserver2_impersonation_enabled()
 
     return use_sasl, mechanism, kerberos_principal_short_name, impersonation_enabled
 
@@ -315,12 +313,11 @@ class HiveServerClient:
     kwargs = {
         'username': user.username,
         'configuration': {},
-        'client_protocol': TOpenSessionReq.thrift_spec[1][4], # Thrift default not automatic
     }
 
     if self.use_sasl:
-      kerberos_principal_short_name = KERBEROS.HUE_PRINCIPAL.get().split('/', 1)[0]
-      kwargs.update({'username': kerberos_principal_short_name})
+      # HS2 PLAIN still requires a non null username but None works
+      kwargs.update({'username': self.kerberos_principal_short_name})
 
     if self.impersonation_enabled:
       if self.query_server['server_name'] == 'impala':
@@ -358,7 +355,7 @@ class HiveServerClient:
     # Not supported currently in HS2 and Impala: TStatusCode.INVALID_HANDLE_STATUS
     if res.status.statusCode == TStatusCode.ERROR_STATUS and \
         re.search('Invalid SessionHandle|Invalid session', res.status.errorMessage or '', re.I):
-      LOG.info('Retrying with a new session because of %s' % res)
+      LOG.info('Retrying with a new session because for %s of %s' % (self.user, res))
 
       session = self.open_session(self.user)
       req.sessionHandle = session.get_handle()

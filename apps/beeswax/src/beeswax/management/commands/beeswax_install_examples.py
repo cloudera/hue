@@ -54,8 +54,8 @@ class Command(NoArgsCommand):
     except Exception, ex:
       LOG.exception(ex)
       raise InstallException(ex)
-
-    Document.objects.sync()
+    finally:
+      Document.objects.sync()
 
   def _install_tables(self, django_user, app_name):
     data_dir = beeswax.conf.LOCAL_EXAMPLES_DATA_DIR.get()

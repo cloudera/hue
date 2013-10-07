@@ -33,7 +33,8 @@ class QueryForm(MultiForm):
       settings=SettingFormSet,
       file_resources=FileResourceFormSet,
       functions=FunctionFormSet,
-      saveform=SaveForm)
+      saveform=SaveForm
+    )
 
 
 class SaveForm(forms.Form):

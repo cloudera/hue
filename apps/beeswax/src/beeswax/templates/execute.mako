@@ -299,9 +299,9 @@ ${layout.menubar(section='query')}
                       <li>
                         <a href="#errorPane" data-toggle="tab">
                         % if log:
-                            ${_('Error Log')}
+                            ${ _('Error Log') }
                         % else:
-                            &nbsp;
+                            ${ _('No server logs for this query.') }
                         % endif
                         </a>
                     </li>

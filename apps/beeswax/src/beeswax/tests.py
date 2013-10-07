@@ -29,7 +29,7 @@ import threading
 
 import hadoop
 
-from nose.tools import assert_true, assert_equal, assert_false, assert_not_equal
+from nose.tools import assert_true, assert_equal, assert_false, assert_not_equal, assert_raises
 from nose.plugins.skip import SkipTest
 
 from django.utils.encoding import smart_str
@@ -87,7 +87,7 @@ def _make_query(client, query, submission_type="Execute",
 def get_csv(client, result_response):
   """Get the csv for a query result"""
   csv_link = CSV_LINK_PAT.search(result_response.content)
-  assert_true(csv_link, "Query result should have a csv download link")
+  assert_true(csv_link, result_response.content)
   return client.get(csv_link.group()).content
 
 
@@ -257,23 +257,14 @@ for x in sys.stdin:
     hql = "SELECT KITTENS ARE TASTY"
     resp = _make_query(self.client, hql, name='tasty kittens', wait=True, local=False)
     assert_true("ParseException" in resp.content, resp.content)
-    # Check for query logs only on watch page below
-
-    id = self._verify_query_state(beeswax.models.QueryHistory.STATE.failed)
-
-    # Operation handle is operationHandle for some reason as statusCode=3
-    # ExecuteStatement returned in 39ms: TExecuteStatementResp(status=TStatus(errorCode=40000,
-    # errorMessage="Error while compiling statement: FAILED: ParseException line 1:19 missing FROM at
-    # 'TASTY' near '<EOF>'\n", sqlState='42000', infoMessages=None, statusCode=3), operationHandle=None)
-    raise SkipTest
-
-    # Test that we can view the error again
-    resp = self.client.get('/beeswax/watch/%s' % (id,), follow=True)
-    assert_true("ParseException" in resp.content, resp.content)
     page_context = [context for context in resp.context if 'log' in context][0]
     log = page_context['log']
-    assert_true('ParseException: line' in log, log)
+    # No logs as operationHandle=None
+    assert_equal('', log, log)
 
+    # Watch page will fail as operationHandle=None
+    query_id = self._verify_query_state(beeswax.models.QueryHistory.STATE.failed)
+    assert_raises(TypeError, self.client.get, '/beeswax/watch/%s' % (query_id,), follow=True)
 
   def test_sync_query_exec(self):
     # Execute Query Synchronously, set fetch size and fetch results
@@ -439,7 +430,7 @@ for x in sys.stdin:
     try:
       q = "SELECT foo+" + str(i + 1) + " FROM test WHERE foo < 2"
       LOG.info("Starting " + str(i) + ": " + q)
-      response = _make_query(client, q)
+      response = _make_query(client, q, local=False)
       response = wait_for_query_to_finish(client, response, max=(240.0 * num_tasks))
       lock.acquire()
       result_holder[i] = response
@@ -462,8 +453,6 @@ for x in sys.stdin:
     assert_true('DROP TABLE test_multiple_statements_2' in resp.content, resp.content)
 
   def test_multiple_statements_with_result_set(self):
-    raise SkipTest
-
     hql = """
       SELECT foo FROM test;
       SELECT count(*) FROM test;
@@ -504,8 +493,6 @@ for x in sys.stdin:
 
     So we check the results by looking at the csv files.
     """
-    raise SkipTest
-
     PARALLEL_TASKS = 2
     responses = [ None ] * PARALLEL_TASKS
     threads = []
@@ -528,8 +515,6 @@ for x in sys.stdin:
       assert_equal( [ i + 1, i + 2 ], answer)
 
   def test_data_export_limit_clause(self):
-    raise SkipTest
-
     limit = 3
     hql = 'SELECT foo FROM test limit %d' % (limit,)
     query = hql_query(hql)
@@ -559,8 +544,6 @@ for x in sys.stdin:
     assert_true('QueryHistory matching query does not exist' in response.content, response.content)
 
   def test_data_export(self):
-    raise SkipTest
-
     hql = 'SELECT * FROM test'
     query = hql_query(hql)
 
@@ -838,8 +821,6 @@ for x in sys.stdin:
 
 
   def test_install_examples(self):
-    raise SkipTest
-
     assert_true(not beeswax.models.MetaInstall.get().installed_example)
 
     # Check popup
@@ -1569,6 +1550,8 @@ def search_log_line(component, expected_log, all_logs):
 
 
 def test_hiveserver2_get_security():
+  make_logged_in_client()
+  user = User.objects.get(username='test')
   # Bad but easy mocking
   hive_site.get_conf()
 
@@ -1582,27 +1565,32 @@ def test_hiveserver2_get_security():
     principal = get_query_server_config('impala')['principal']
     assert_true(principal.startswith('impala/'), principal)
 
+    default_query_server = {'server_host': 'my_host', 'server_port': 12345}
+
     # Beeswax
     beeswax_query_server = {'server_name': 'beeswax', 'principal': 'hive'}
-    assert_equal((True, 'PLAIN', 'hive', False), HiveServerClient.get_security(beeswax_query_server))
+    beeswax_query_server.update(default_query_server)
+    assert_equal((True, 'PLAIN', 'hive', False), HiveServerClient(beeswax_query_server, user).get_security())
 
     hive_site._HIVE_SITE_DICT[hive_site._CNF_HIVESERVER2_AUTHENTICATION] = 'NOSASL'
     hive_site._HIVE_SITE_DICT[hive_site._CNF_HIVESERVER2_IMPERSONATION] = 'true'
-    assert_equal((False, 'NOSASL', 'hive', True), HiveServerClient.get_security(beeswax_query_server))
+    assert_equal((False, 'NOSASL', 'hive', True), HiveServerClient(beeswax_query_server, user).get_security())
     hive_site._HIVE_SITE_DICT[hive_site._CNF_HIVESERVER2_AUTHENTICATION] = 'KERBEROS'
-    assert_equal((True, 'GSSAPI', 'hive', True), HiveServerClient.get_security(beeswax_query_server))
+    assert_equal((True, 'GSSAPI', 'hive', True), HiveServerClient(beeswax_query_server, user).get_security())
 
     # Impala
     impala_query_server = {'server_name': 'impala', 'principal': 'impala', 'impersonation_enabled': False}
-    assert_equal((False, 'GSSAPI', 'impala', False), HiveServerClient.get_security(impala_query_server))
+    impala_query_server.update(default_query_server)
+    assert_equal((False, 'GSSAPI', 'impala', False), HiveServerClient(impala_query_server, user).get_security())
 
     impala_query_server = {'server_name': 'impala', 'principal': 'impala', 'impersonation_enabled': True}
-    assert_equal((False, 'GSSAPI', 'impala', True), HiveServerClient.get_security(impala_query_server))
+    impala_query_server.update(default_query_server)
+    assert_equal((False, 'GSSAPI', 'impala', True), HiveServerClient(impala_query_server, user).get_security())
 
     cluster_conf = hadoop.cluster.get_cluster_conf_for_job_submission()
     finish = cluster_conf.SECURITY_ENABLED.set_for_testing(True)
     try:
-      assert_equal((True, 'GSSAPI', 'impala', True), HiveServerClient.get_security(impala_query_server))
+      assert_equal((True, 'GSSAPI', 'impala', True), HiveServerClient(impala_query_server, user).get_security())
     finally:
       finish()
   finally:
