@@ -491,8 +491,14 @@ ${ layout.menubar(section='coordinators') }
       $('#add-dataset-btn').click(function () {
         $("#add-dataset-form").empty();
         window.viewModel.updateInstance();
-        $("#add-dataset-body").find("input, select").each(function () {
+        $("#add-dataset-body").find("input").each(function () {
           $(this).clone().appendTo($("#add-dataset-form"));
+        });
+        // select clone does not set a value! http://bugs.jquery.com/ticket/1294
+        $("#add-dataset-body").find("select").each(function () {
+          var _clone = $(this).clone();
+          _clone.val($(this).val());
+          _clone.appendTo($("#add-dataset-form"));
         });
         $.post("${ url('oozie:create_coordinator_dataset', coordinator=coordinator.id) }",
                 $("#add-dataset-form").serialize(),
