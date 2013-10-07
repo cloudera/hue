@@ -459,7 +459,7 @@ def expand_exception(exc, db, handle=None):
     elif hasattr(exc, 'get_rpc_handle') or hasattr(exc, 'log_context'):
       log = db.get_log(exc)
     else:
-      log = _("No server logs for this query.")
+      log = ''
   except Exception, e:
     # Always show something, even if server has died on the job.
     log = _("Could not retrieve logs: %s." % e)
