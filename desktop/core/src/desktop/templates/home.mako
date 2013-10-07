@@ -39,11 +39,11 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
     margin-top: 3px;
   }
 
-  .tagCounter {
+  .tag-counter {
     margin-top: 2px;
   }
 
-  .toggleTag, .documentTagsModalCheckbox, .tagsModalCheckbox {
+  .toggle-tag, .document-tags-modal-checkbox, .tags-modal-checkbox {
     cursor: pointer;
   }
 
@@ -61,7 +61,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
     margin-bottom: 6px;
   }
 
-  .trashShare {
+  .trash-share {
     cursor: pointer;
   }
 
@@ -114,19 +114,22 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
                 % endif
               </ul>
            </li>
-           <li class="viewTrash toggableSection">
+           <li class="view-trash toggable-section">
              <a href="javascript:void(0)"><i class="icon-trash"></i> ${_('Trash')} <span id="trashCounter" class="badge pull-right">0</span></a>
            </li>
-           <li class="viewHistory toggableSection">
+           <li class="viewHistory toggable-section">
              <a href="javascript:void(0)"><i class="icon-time"></i> ${_('History')} <span id="historyCounter" class="badge pull-right">0</span></a>
            </li>
-          <li class="nav-header tag-header">${_('Projects')} <div id="editTags" style="display: inline;cursor: pointer;margin-left: 6px" title="${ _('Edit projects') }"><i class="icon-tags"></i></div> </li>
-          % for tag in tags:
-            % if tag.tag not in ('trash', 'history'):
-            <li class="toggleTag" data-tag="${ tag.tag }"><a href="javascript:void(0)">${ tag.tag } <span class="tagCounter badge pull-right">0</span></a></li>
-            % endif
-          % endfor
-
+          <li class="nav-header tag-header">${_('Projects')} <div class="edit-tags" style="display: inline;cursor: pointer;margin-left: 6px" title="${ _('Edit projects') }"><i class="icon-tags"></i></div> </li>
+          % if len(tags) > 2:
+            % for tag in tags:
+              % if tag.tag not in ('trash', 'history'):
+              <li class="toggle-tag" data-tag="${ tag.tag }"><a href="javascript:void(0)">${ tag.tag } <span class="tag-counter badge pull-right">0</span></a></li>
+              % endif
+            % endfor
+          % else:
+            <li><a href="javascript:void(0)" class="edit-tags" style="line-height:24px"><i class="icon-plus-sign"></i> ${_('There are currently no projects. Click here to add one now!')}</a></li>
+          % endif
         </ul>
       </div>
 
@@ -326,13 +329,13 @@ $(document).ready(function () {
     documentsTable.fnDraw();
   });
 
-  $(".viewTrash").on("click", function () {
+  $(".view-trash").on("click", function () {
     $(".viewHistory").removeClass("active");
     toggleSpecificSection($(this), "trash");
   });
 
   $(".viewHistory").on("click", function () {
-    $(".viewTrash").removeClass("active");
+    $(".view-trash").removeClass("active");
     toggleSpecificSection($(this), "history");
   });
 
@@ -349,7 +352,7 @@ $(document).ready(function () {
     }
   }
 
-  $(document).on("click", ".toggleTag", function (e) {
+  $(document).on("click", ".toggle-tag", function (e) {
     var _this = $(this);
     _this.siblings().removeClass("active");
     _this.blur();
@@ -361,7 +364,7 @@ $(document).ready(function () {
       _this.addClass("active");
     }
     var _tags = [];
-    $(".toggleTag.active").each(function () {
+    $(".toggle-tag.active").each(function () {
       _tags.push($(this).data("tag"));
     });
     populateTable(_tags.join(","));
@@ -394,7 +397,7 @@ $(document).ready(function () {
       $(".viewHistory").click();
     }
     else if ($.totalStorage("hueHomeTags") == "trash") {
-      $(".viewTrash").click();
+      $(".view-trash").click();
     }
     else {
       $("li[data-tag='" + $.totalStorage("hueHomeTags") + "']").click();
@@ -410,12 +413,12 @@ $(document).ready(function () {
   });
 
   function renderTags() {
-    $(".toggleTag").remove();
+    $(".toggle-tag").remove();
     for (var i = JSON_TAGS.length - 1; i >= 0; i--) {
       if (!JSON_TAGS[i].isTrash && !JSON_TAGS[i].isHistory && !JSON_TAGS[i].isExample) {
-        var _t = $("<li>").addClass("toggleTag");
+        var _t = $("<li>").addClass("toggle-tag");
         _t.attr("data-tag", JSON_TAGS[i].name);
-        _t.html('<a href="javascript:void(0)">' + JSON_TAGS[i].name + '<span class="tagCounter badge pull-right">0</span></a>');
+        _t.html('<a href="javascript:void(0)">' + JSON_TAGS[i].name + '<span class="tag-counter badge pull-right">0</span></a>');
         _t.insertAfter(".tag-header");
       }
     }
@@ -430,7 +433,7 @@ $(document).ready(function () {
     var _tags = "";
     for (var i = 0; i < JSON_TAGS.length; i++) {
       if (!JSON_TAGS[i].isTrash && !JSON_TAGS[i].isHistory && !JSON_TAGS[i].isExample) {
-        _tags += '<div style="margin-right:10px;margin-bottom: 6px;float:left;"><span class="tagsModalCheckbox badge" data-value="' + JSON_TAGS[i].id + '"><i class="icon-trash hide"></i> ' + JSON_TAGS[i].name + '</span></div>';
+        _tags += '<div style="margin-right:10px;margin-bottom: 6px;float:left;"><span class="tags-modal-checkbox badge" data-value="' + JSON_TAGS[i].id + '"><i class="icon-trash hide"></i> ' + JSON_TAGS[i].name + '</span></div>';
       }
     }
     $("#tagsModalList").html(_tags);
@@ -445,7 +448,7 @@ $(document).ready(function () {
       for (var i = 0; i < JSON_TAGS.length; i++) {
         if (!JSON_TAGS[i].isTrash && !JSON_TAGS[i].isHistory && !JSON_TAGS[i].isExample) {
           var _inTags = isInTags(_doc, JSON_TAGS[i].name);
-          _tags += '<div style="margin-right:10px;margin-bottom: 6px;float:left;"><span class="documentTagsModalCheckbox badge' + (_inTags ? ' badge-info selected' : '') + '" data-value="' + JSON_TAGS[i].id + '"><i class="icon-ok-sign' + (_inTags ? '' : ' hide') + '"></i> ' + JSON_TAGS[i].name + '</span></div>';
+          _tags += '<div style="margin-right:10px;margin-bottom: 6px;float:left;"><span class="document-tags-modal-checkbox badge' + (_inTags ? ' badge-info selected' : '') + '" data-value="' + JSON_TAGS[i].id + '"><i class="icon-ok-sign' + (_inTags ? '' : ' hide') + '"></i> ' + JSON_TAGS[i].name + '</span></div>';
         }
       }
       $("#documentTagsModalList").html(_tags);
@@ -493,7 +496,7 @@ $(document).ready(function () {
     });
   }
 
-  $(document).on("click", ".documentTagsModalCheckbox", function () {
+  $(document).on("click", ".document-tags-modal-checkbox", function () {
     var _this = $(this);
     if (_this.hasClass("selected")) {
       _this.removeClass("selected").removeClass("badge-info");
@@ -506,12 +509,12 @@ $(document).ready(function () {
   });
 
 
-  $("#editTags").on("click", function () {
+  $(".edit-tags").on("click", function () {
     renderTagsModal();
     $("#tagsModal").modal("show");
   });
 
-  $(document).on("click", ".tagsModalCheckbox", function () {
+  $(document).on("click", ".tags-modal-checkbox", function () {
     var _this = $(this);
     if (_this.hasClass("selected")) {
       _this.removeClass("selected").removeClass("badge-important");
@@ -527,7 +530,7 @@ $(document).ready(function () {
     $(this).attr("data-loading-text", $(this).text() + " ...");
     $(this).button("loading");
     var _tags = [];
-    $(".documentTagsModalCheckbox.selected").each(function () {
+    $(".document-tags-modal-checkbox.selected").each(function () {
       var _this = $(this);
       _tags.push(_this.data("value"));
     });
@@ -561,7 +564,7 @@ $(document).ready(function () {
     $(this).attr("data-loading-text", $(this).text() + " ...");
     $(this).button("loading");
     var _tags = [];
-    $(".tagsModalCheckbox.selected").each(function () {
+    $(".tags-modal-checkbox.selected").each(function () {
       var _this = $(this);
       _tags.push(_this.data("value"));
     });
@@ -639,7 +642,7 @@ $(document).ready(function () {
         var _obj = shareList[id];
         var _icon = _obj.username != null ? "icon-user" : "icon-group";
         var _label = _obj.username != null ? _obj.username : _obj.name;
-        _html += '<li data-object-id="' + _obj.id + '"><span class="badge badge-left"><i class="' + _icon + '"></i> ' + _label + '</span><span class="badge badge-important badge-right trashShare"><i class="icon-trash"></i></span></li>';
+        _html += '<li data-object-id="' + _obj.id + '"><span class="badge badge-left"><i class="' + _icon + '"></i> ' + _label + '</span><span class="badge badge-important badge-right trash-share"><i class="icon-trash"></i></span></li>';
       }
     }
     if (_html != "") {
@@ -653,7 +656,7 @@ $(document).ready(function () {
     }
   }
 
-  $(document).on("click", ".trashShare", function () {
+  $(document).on("click", ".trash-share", function () {
     delete shareList[$(this).parent().data("object-id")];
     renderShareList();
   });
