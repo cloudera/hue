@@ -913,7 +913,7 @@ for x in sys.stdin:
       # Create was fast
       templates = [_template.filename for _template in resp.template]
       assert_true(any(['describe_table.mako' in template for template in templates]), templates)
-      assert_true('Table my_table' in resp.content, resp.content)
+      assert_true('Table : my_table' in resp.content, resp.content)
 
 
   def test_create_table_timestamp(self):
