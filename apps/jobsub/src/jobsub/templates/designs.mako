@@ -886,7 +886,6 @@ var setupRoutes = (function() {
         }
       });
     }
-    routie('list-designs');
   }
 })();
 

@@ -256,4 +256,3 @@ $.each(events, function(index, event) {
 });
 
 $(document).bind('error.design', addFileBrowseButton);
-$(document).bind('loaded.designs', function() { routie('list-designs'); });
