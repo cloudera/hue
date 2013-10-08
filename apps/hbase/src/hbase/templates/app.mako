@@ -42,7 +42,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
 </div>
 
 <%def name="datatable(datasource,rowTemplate = 'itemTemplate')">
-  <table data-datasource="${datasource}" class="table table-striped table-condensed datatables tablescroller-disable">
+  <table data-datasource="${datasource}" class="table table-striped table-condensed datatables tablescroller-disable" style="padding-left: 0;padding-right: 0">
       <thead>
         <tr>
           <th width="1%"><div data-bind="click: ${datasource}.toggleSelectAll, css: {hueCheckbox: true,'icon-ok':${datasource}.selected().length == ${datasource}.items().length && ${datasource}.items().length>0}"></div></th>
@@ -276,9 +276,9 @@ ${ commonheader(None, "hbase", user) | n,unicode }
           </div>
           <span class="pull-right">
             % if user.is_superuser:
-              <button class="btn" data-bind="enable: views.tabledata.selected().length > 0, click: views.tabledata.dropSelected"><i class="icon-trash"></i> ${_('Drop Rows')}</button>
+              <a class="btn" data-bind="enable: views.tabledata.selected().length > 0, click: views.tabledata.dropSelected"><i class="icon-trash"></i> ${_('Drop Rows')}</a>
             % endif
-            <button id="bulk-upload-btn" class="btn fileChooserBtn" data-toggle="tooltip" title="${_('.CSV, .TSV, etc...')}" aria-hidden="true"><i class="icon-upload"></i> ${_('Bulk Upload')}</button>
+            <a id="bulk-upload-btn" class="btn fileChooserBtn" data-toggle="tooltip" title="${_('.CSV, .TSV, etc...')}" aria-hidden="true"><i class="icon-upload"></i> ${_('Bulk Upload')}</a>
             <a href="#new_row_modal" data-bind="click:function(){app.focusModel(app.views.tabledata);launchModal('new_row_modal')}" role="button" class="btn btn-primary" data-callback=""><i class='icon-plus-sign'></i> ${_('New Row')}</a>
           </span>
         </div>
