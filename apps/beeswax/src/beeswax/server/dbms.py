@@ -129,6 +129,7 @@ class Dbms:
     if no_start_over_support:
       start_over = False
 
+
     return self.client.fetch(query_handle, start_over, rows)
 
 
@@ -159,6 +160,15 @@ class Dbms:
       if handle:
         return self.fetch(handle)
 
+  def analyze_table_table(self, database, table):
+    hql = 'analyze table `%(database)s.%(table_name)` compute statistics' % {'database': database, 'table_name': table.name}
+    query = hql_query(hql, database)
+
+    return self.execute_query(query)
+
+  def analyze_table_column(self):
+    # analyze table <table_name> partition <part_name> compute statistics for columns <col_name1>, <col_name2>...
+    pass
 
   def drop_table(self, database, table):
     if table.is_view:

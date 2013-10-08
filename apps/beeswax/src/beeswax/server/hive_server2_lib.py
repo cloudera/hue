@@ -21,7 +21,6 @@ import thrift
 
 from operator import itemgetter
 
-from desktop.conf import KERBEROS
 from desktop.lib import thrift_util
 from hadoop import cluster
 
@@ -112,9 +111,25 @@ class HiveServerTable(Table):
     describe_text = rows[detailed_row_index]['data_type']
     try:
       # LazySimpleSerDe case
-      return describe_text+  rows[detailed_row_index + 1]['col_name']
+      return describe_text + rows[detailed_row_index + 1]['col_name']
     except:
       return describe_text
+
+  @property
+  def properties(self):
+    # Ugly but would need a recursive parsing to be clean
+    no_table = re.sub('\)$', '', re.sub('^Table\(', '', self.extended_describe))
+    properties = re.sub(', sd:StorageDescriptor\(cols.+?\]', '', no_table).split(', ')
+    props = []
+
+    for prop in properties:
+      key_val = prop.rsplit(':', 1)
+      if len(key_val) == 1:
+        key_val = key_val[0].rsplit('=', 1)
+      if len(key_val) == 2:
+        props.append(key_val)
+
+    return props
 
 
 class HiveServerTRowSet:

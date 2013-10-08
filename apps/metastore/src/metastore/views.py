@@ -15,10 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-try:
-  import json
-except ImportError:
-  import simplejson as json
+import json
 import logging
 
 from django.http import HttpResponse
@@ -277,6 +274,28 @@ def describe_partitions(request, database, table):
         },
       ],
       'database': database, 'table': table_obj, 'partitions': partitions, 'request': request})
+
+
+def analyze_table(request, database, table, column=None):
+  app_name = get_app_name(request)
+  query_server = get_query_server_config(app_name)
+  db = dbms.get(request.user, query_server)
+
+  response = {'status': -1, 'message': '', 'redirect': ''}
+
+  if request.POST:
+    if column is None:
+      query_history = db.analyze_table(database, table)
+      response['redirect'] = reverse('beeswax:watch_query', args=[query_history.id]) + \
+                                     '?on_success_url=' + reverse('metastore:describe_table',
+                                                                  kwargs={'database': database, 'table': table.name})
+      response['status'] = 0
+    else:
+      response['message'] = _('Column analysis not supportet yet')
+  else:
+    response['message'] = _('A POST request is required')
+
+  return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
 def has_write_access(user):

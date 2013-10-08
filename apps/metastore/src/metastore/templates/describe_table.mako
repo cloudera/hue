@@ -88,6 +88,7 @@ ${ components.menubar() }
               % if sample is not None:
               <li><a href="#sample" data-toggle="tab">${_('Sample')}</a></li>
               % endif
+              <li><a href="#properties" data-toggle="tab">${ _('Properties') }</a></li>
             </ul>
 
             <div class="tab-content">
@@ -136,6 +137,24 @@ ${ components.menubar() }
               % endif
               </div>
               % endif
+
+              <div class="tab-pane" id="properties">
+                <table class="table table-striped table-condensed">
+                  <thead>
+                    <tr>
+                      <th>${ _('Name') }</th>
+                      <th>${ _('Value') }</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    % for name, value in table.properties:
+                      <tr>
+                        <td>${ name }</td>
+                        <td>${ value }</td>
+                      </tr>
+                     % endfor
+                  </tbody>
+              </div>
             </div>
           </p>
         </div>
