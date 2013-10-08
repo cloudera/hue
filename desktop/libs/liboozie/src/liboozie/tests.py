@@ -20,7 +20,10 @@ import logging
 from nose.tools import assert_equal
 from oozie.tests import MockOozieApi
 
+from desktop.lib.test_utils import reformat_xml
+
 from liboozie.types import WorkflowAction, Coordinator
+from liboozie.utils import config_gen
 
 
 LOG = logging.getLogger(__name__)
@@ -36,3 +39,20 @@ def test_valid_external_id():
 def aggregate_coordinator_instances():
   dates = ['1', '2', '3', '6', '7', '8', '10', '12', '15', '16', '20', '23', '30', '40']
   assert_equal(['1-3', '6-8', '10-10', '12-12', '15-16', '20-20', '23-23', '30-30', '40-40'], Coordinator.aggreate(dates))
+
+
+def test_config_gen():
+  properties = {
+    'user.name': 'hue',
+    'test.1': 'http://localhost/test?test1=test&test2=test'
+  }
+  assert_equal(reformat_xml("""<configuration>
+<property>
+  <name>test.1</name>
+  <value><![CDATA[http://localhost/test?test1=test&test2=test]]></value>
+</property>
+<property>
+  <name>user.name</name>
+  <value><![CDATA[hue]]></value>
+</property>
+</configuration>"""), reformat_xml(config_gen(properties)))

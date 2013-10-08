@@ -56,6 +56,6 @@ def reformat_json(json_obj):
 
 def reformat_xml(xml_obj):
     if isinstance(xml_obj, basestring):
-        return etree.tostring(objectify.fromstring(xml_obj))
+        return etree.tostring(objectify.fromstring(xml_obj, etree.XMLParser(strip_cdata=False, remove_blank_text=True)))
     else:
         return etree.tostring(xml_obj)
