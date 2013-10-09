@@ -52,7 +52,7 @@ def _read_footer(fo):
     object. This method assumes that the fo references a valid parquet file"""
     footer_size = _get_footer_size(fo)
     logger.debug("Footer size in bytes: %s", footer_size)
-    fo.seek(-(8+footer_size), 2)  # seek to beginning of footer
+    fo.seek(-(8 + footer_size), 2)  # seek to beginning of footer
     tin = TTransport.TFileObjectTransport(fo)
     pin = TCompactProtocol.TCompactProtocol(tin)
     fmd = FileMetaData()
@@ -83,7 +83,7 @@ def read_footer(filename):
 def _get_name(type_, value):
     """Returns the name for the given value of the given type_ unless value is
     None, in which case it returns empty string"""
-    return type_._VALUES_TO_NAMES[value] if value else "None"
+    return type_._VALUES_TO_NAMES[value] if value is not None else "None"
 
 
 def _get_offset(cmd):
@@ -127,8 +127,9 @@ def dump_metadata(filename, show_row_group_metadata, out=sys.stdout):
         for rg in footer.row_groups:
             num_rows = rg.num_rows
             bytes = rg.total_byte_size
-            println("  rows={num_rows}, bytes={bytes}".format(num_rows=num_rows,
-                                                              bytes=bytes))
+            println(
+                "  rows={num_rows}, bytes={bytes}".format(num_rows=num_rows,
+                                                          bytes=bytes))
             println("    chunks:")
             for cg in rg.columns:
                 cmd = cg.meta_data
@@ -139,11 +140,12 @@ def dump_metadata(filename, show_row_group_metadata, out=sys.stdout):
                         "compressed_bytes={compressed_bytes} "
                         "data_page_offset={data_page_offset} "
                         "dictionary_page_offset={dictionary_page_offset}".format(
-                            type=cmd.type,
+                            type=_get_name(Type, cmd.type),
                             offset=cg.file_offset,
                             codec=_get_name(CompressionCodec, cmd.codec),
                             encodings=",".join(
-                                [_get_name(Encoding, s) for s in cmd.encodings]),
+                                [_get_name(
+                                    Encoding, s) for s in cmd.encodings]),
                             path_in_schema=cmd.path_in_schema,
                             num_values=cmd.num_values,
                             raw_bytes=cmd.total_uncompressed_size,
@@ -175,8 +177,10 @@ def dump_metadata(filename, show_row_group_metadata, out=sys.stdout):
                         rep_level_encoding = None
                         if daph:
                             encoding_type = _get_name(Encoding, daph.encoding)
-                            def_level_encoding = _get_name(Encoding, daph.definition_level_encoding)
-                            rep_level_encoding = _get_name(Encoding, daph.repetition_level_encoding)
+                            def_level_encoding = _get_name(
+                                Encoding, daph.definition_level_encoding)
+                            rep_level_encoding = _get_name(
+                                Encoding, daph.repetition_level_encoding)
 
                         println("        page header: type={type} "
                                 "uncompressed_size={raw_bytes} "
@@ -208,6 +212,15 @@ def _read_page(fo, page_header, column_metadata):
                 "Unsupported Codec: {0}".format(codec))
     else:
         raw_bytes = bytes_from_file
+    logger.debug(
+        "Read page with compression type {0}. Bytes {1} -> {2}".format(
+        _get_name(CompressionCodec, codec),
+        page_header.compressed_page_size,
+        page_header.uncompressed_page_size))
+    assert len(raw_bytes) == page_header.uncompressed_page_size, \
+        "found {0} raw bytes (expected {1})".format(
+            len(raw_bytes),
+            page_header.uncompressed_page_size)
     return raw_bytes
 
 
@@ -310,8 +323,6 @@ def read_dictionary_page(fo, page_header, column_metadata):
         dict_items.append(
             encoding.read_plain(io_obj, column_metadata.type, None))
     return dict_items
-
-## max_records=10
 
 
 def dump(filename, options, out=sys.stdout):
