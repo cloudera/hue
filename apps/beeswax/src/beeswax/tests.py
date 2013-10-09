@@ -382,8 +382,6 @@ for x in sys.stdin:
     assert_equal('other_db', response.context['query'].design.get_design().query['database'])
 
   def test_explain_query(self):
-    raise SkipTest
-
     c = self.client
     response = _make_query(c, "SELECT KITTENS ARE TASTY", submission_type="Explain")
     assert_true("ParseException" in response.context["error_message"])
@@ -395,8 +393,6 @@ for x in sys.stdin:
     assert_true(response.context["explanation"])
 
   def test_explain_query_i18n(self):
-    raise SkipTest
-
     query = u"SELECT foo FROM test_utf8 WHERE bar='%s'" % (unichr(200),)
     response = _make_query(self.client, query, submission_type="Explain")
     assert_true(response.context['explanation'])
