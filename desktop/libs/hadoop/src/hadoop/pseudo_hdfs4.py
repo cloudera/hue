@@ -451,7 +451,7 @@ class PseudoHdfs4(object):
       'yarn.nodemanager.log-dirs': self._logpath('yarn-logs'),
       'yarn.nodemanager.remote-app-log-dir': '/var/log/hadoop-yarn/apps',
       'yarn.nodemanager.localizer.address' : '%s:%s' % (self._fqdn, self._nm_port,),
-      'yarn.nodemanager.aux-services': 'mapreduce.shuffle',
+      'yarn.nodemanager.aux-services': 'mapreduce_shuffle',
       'yarn.nodemanager.aux-services.mapreduce.shuffle.class': 'org.apache.hadoop.mapred.ShuffleHandler',
       'yarn.nodemanager.webapp.address': self._nm_webapp_port,
 
