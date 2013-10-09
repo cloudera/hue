@@ -111,7 +111,7 @@ ${layout.menubar(section='my queries')}
         </tbody>
       </table>
       % if q_page.number != q_page.num_pages():
-        <a href="${ url(app_name + ':list_designs') }?user=${request.user.username|u}" >${_('View all my queries')} &raquo;</a>
+        <a href="${ url(app_name + ':list_designs') }?q-user=${request.user.username|u}" >${_('View all my queries')} &raquo;</a>
       % endif
     </div>
 

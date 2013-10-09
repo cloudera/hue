@@ -21,6 +21,7 @@ import re
 
 from django import forms
 from django.contrib import messages
+from django.contrib.auth.models import User
 from django.db.models import Q
 from django.http import HttpResponse, QueryDict
 from django.shortcuts import redirect
@@ -231,9 +232,8 @@ def list_designs(request):
   prefix = 'q-'
   querydict_query = _copy_prefix(prefix, request.GET)
   # Manually limit up the user filter.
-  querydict_query[ prefix + 'user' ] = request.user
   querydict_query[ prefix + 'type' ] = app_name
-  page, filter_params = _list_designs(querydict_query, DEFAULT_PAGE_SIZE, prefix)
+  page, filter_params = _list_designs(request.user, querydict_query, DEFAULT_PAGE_SIZE, prefix)
 
   return render('list_designs.mako', request, {
     'page': page,
@@ -253,9 +253,8 @@ def list_trashed_designs(request):
   prefix = 'q-'
   querydict_query = _copy_prefix(prefix, request.GET)
   # Manually limit up the user filter.
-  querydict_query[ prefix + 'user' ] = user
   querydict_query[ prefix + 'type' ] = app_name
-  page, filter_params = _list_designs(querydict_query, DEFAULT_PAGE_SIZE, prefix, is_trashed=True)
+  page, filter_params = _list_designs(user, querydict_query, DEFAULT_PAGE_SIZE, prefix, is_trashed=True)
 
   return render('list_trashed_designs.mako', request, {
     'page': page,
@@ -291,10 +290,9 @@ def my_queries(request):
   prefix = 'q-'
   querydict_query = _copy_prefix(prefix, request.GET)
   # Manually limit up the user filter.
-  querydict_query[ prefix + 'user' ] = request.user
   querydict_query[ prefix + 'type' ] = app_name
 
-  query_page, query_filter = _list_designs(querydict_query, DEFAULT_PAGE_SIZE, prefix)
+  query_page, query_filter = _list_designs(request.user, querydict_query, DEFAULT_PAGE_SIZE, prefix)
 
   filter_params = hist_filter
   filter_params.update(query_filter)
@@ -1131,14 +1129,12 @@ def execute_directly(request, query, query_server=None, design=None, tablename=N
   return format_preserving_redirect(request, watch_url, get_dict)
 
 
-def _list_designs(querydict, page_size, prefix="", is_trashed=False):
+def _list_designs(user, querydict, page_size, prefix="", is_trashed=False):
   """
-  _list_designs(querydict, page_size, prefix, user) -> (page, filter_param)
+  _list_designs(user, querydict, page_size, prefix, is_trashed) -> (page, filter_param)
 
   A helper to gather the designs page. It understands all the GET params in
   ``list_designs``, by reading keys from the ``querydict`` with the given ``prefix``.
-  If a ``user`` is specified, only the saved queries of this user will be returned.
-  This has priority over the ``user`` in the ``querydict`` parameter.
   """
   DEFAULT_SORT = ('-', 'date')                  # Descending date
 
@@ -1149,14 +1145,21 @@ def _list_designs(querydict, page_size, prefix="", is_trashed=False):
     type='extra',
   )
 
-  user = querydict.get(prefix + 'user')
-
   # Trash and security
   # Discarding is_auto for now
   if is_trashed:
     db_queryset = Document.objects.trashed_docs(SavedQuery, user)
   else:
     db_queryset = Document.objects.available_docs(SavedQuery, user)
+
+  # Filter by user
+  filter_username = querydict.get(prefix + 'user')
+  if filter_username:
+    try:
+      db_queryset = db_queryset.filter(owner=User.objects.get(username=filter_username))
+    except User.DoesNotExist:
+      # Don't care if a bad filter term is provided
+      pass
 
   # Design type
   d_type = querydict.get(prefix + 'type')
