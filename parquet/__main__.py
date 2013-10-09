@@ -16,7 +16,8 @@ def setup_logging(options=None):
 def main(argv=None):
     argv = argv or sys.argv[1:]
 
-    parser = argparse.ArgumentParser(description='Read parquet files')
+    parser = argparse.ArgumentParser('parquet',
+                                     description='Read parquet files')
     parser.add_argument('--metadata', action='store_true',
                         help='show metadata on file')
     parser.add_argument('--row-group-metadata', action='store_true',
