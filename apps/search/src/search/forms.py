@@ -59,12 +59,16 @@ class HighlightingForm(forms.Form):
 
 
 class CollectionForm(forms.ModelForm):
+  def __init__(self, *args, **kwargs):
+    self.user = kwargs.pop('user', None)
+    super(CollectionForm, self).__init__(*args, **kwargs)
+
   class Meta:
     model = Collection
     exclude = ('facets', 'result', 'sorting', 'properties', 'cores')
 
   def clean_name(self):
-    searcher = SearchController()
+    searcher = SearchController(self.user)
     name = self.cleaned_data['name']
     if not searcher.is_collection(name) and not searcher.is_core(name):
       raise forms.ValidationError(_('No live Solr collection or core by the name %s.') % name)
