@@ -539,12 +539,12 @@ ${layout.menubar(section='query')}
           $(data.split(" ")).each(function (cnt, table) {
             if ($.trim(table) != ""){
               var _table = $("<li>");
-              _table.html("<a href='#' class='pull-right hide'><i class='icon-eye-open' title='" + "${ _('View data') }" + "'></i></a><a href='#' title='" + table + "'><i class='icon-table'></i> " + table + "</a><ul class='unstyled'></ul>");
+              _table.html("<a href='/metastore/table/" + $("#id_query-database").val() + "/" + table + "' target='_blank' class='pull-right'><i class='icon-eye-open' title='" + "${ _('View in Metastore Browser') }" + "' style='margin-left:5px'></i></a><a href='#' class='pull-right hide'><i class='icon-list' title='" + "${ _('Preview Sample data') }" + "'></i></a><a href='#' title='" + table + "'><i class='icon-table'></i> " + table + "</a><ul class='unstyled'></ul>");
               _table.data("table", table).attr("id", "navigatorTables_" + table);
-              _table.find("a:eq(1)").on("click", function () {
+              _table.find("a:eq(2)").on("click", function () {
                 _table.find(".icon-table").removeClass("icon-table").addClass("icon-spin").addClass("icon-spinner");
                 hac_getTableColumns($("#id_query-database").val(), table, "", function (plain_columns, extended_columns) {
-                  _table.find("a:eq(0)").removeClass("hide");
+                  _table.find("a:eq(1)").removeClass("hide");
                   _table.find("ul").empty();
                   _table.find(".icon-spinner").removeClass("icon-spinner").removeClass("icon-spin").addClass("icon-table");
                   $(extended_columns).each(function (iCnt, col) {
@@ -559,12 +559,12 @@ ${layout.menubar(section='query')}
                   });
                 });
               });
-              _table.find("a:eq(1)").on("dblclick", function () {
+              _table.find("a:eq(2)").on("dblclick", function () {
                 codeMirror.replaceSelection($.trim(table) + ' ');
                 codeMirror.setSelection(codeMirror.getCursor());
                 codeMirror.focus();
               });
-              _table.find("a:eq(0)").on("click", function () {
+              _table.find("a:eq(1)").on("click", function () {
                 $("#navigatorQuicklook").find(".tableName").text(table);
                 $("#navigatorQuicklook").find(".tableLink").attr("href", "/metastore/table/" + $("#id_query-database").val() + "/" + _table.data("table"));
                 $("#navigatorQuicklook").find(".sample").empty("");
