@@ -55,7 +55,6 @@ OOZIE_JOBS_COUNT = Config(
   type=int,
   help=_t('Maximum number of Oozie workflows or coodinators or bundles to retrieve in one API call.'))
 
-
 def config_validator(user):
   res = []
 

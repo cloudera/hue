@@ -64,7 +64,9 @@ class LiveJobTracker(object):
   In particular, if Thrift returns None for anything, this will throw.
   """
 
-  def __init__(self, host, thrift_port,
+  def __init__(self, host,
+               thrift_port,
+               logical_name=None,
                security_enabled=False,
                kerberos_principal="mapred"):
     self.client = thrift_util.get_client(
@@ -75,6 +77,7 @@ class LiveJobTracker(object):
       timeout_seconds=JT_THRIFT_TIMEOUT)
     self.host = host
     self.thrift_port = thrift_port
+    self.logical_name = logical_name
     self.security_enabled = security_enabled
     # We allow a single LiveJobTracker to be used across multiple
     # threads by restricting the stateful components to a thread
@@ -87,6 +90,7 @@ class LiveJobTracker(object):
     return cls(
       conf.HOST.get(),
       conf.JT_THRIFT_PORT.get(),
+      conf.LOGICAL_NAME.get(),
       security_enabled=conf.SECURITY_ENABLED.get(),
       kerberos_principal=conf.JT_KERBEROS_PRINCIPAL.get())
 
