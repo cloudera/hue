@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from django.utils.translation import ugettext_lazy as _t
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, validate_path, coerce_bool
 import fnmatch
 import logging
@@ -82,6 +83,8 @@ HDFS_CLUSTERS = UnspecifiedConfigSection(
       # End deprecation
       FS_DEFAULTFS=Config("fs_defaultfs", help="The equivalent of fs.defaultFS (aka fs.default.name)",
                           default="hdfs://localhost:8020"),
+      LOGICAL_NAME = Config("logical_name", default="",
+                            type=str, help=_t('NameNode logical name.')),
       WEBHDFS_URL=Config("webhdfs_url",
                          help="The URL to WebHDFS/HttpFS service. Defaults to " +
                          "the WebHDFS URL on the NameNode.",
@@ -134,6 +137,10 @@ MR_CLUSTERS = UnspecifiedConfigSection(
                   default=8021,
                   help="Service port for the JobTracker",
                   type=int),
+      LOGICAL_NAME = Config('logical_name',
+                            default="",
+                            type=str,
+                            help=_t('JobTracker logical name.')),
       JT_THRIFT_PORT=Config("thrift_port", help="Thrift port for JobTracker", default=9290,
                             type=int),
       JT_KERBEROS_PRINCIPAL=Config("jt_kerberos_principal", help="Kerberos principal for JobTracker",

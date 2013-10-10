@@ -368,7 +368,7 @@ def rerun_oozie_job(request, job_id, app_path):
 
 def _rerun_workflow(request, oozie_id, run_args, mapping):
   try:
-    submission = Submission(user=request.user, fs=request.fs, properties=mapping, oozie_id=oozie_id)
+    submission = Submission(user=request.user, fs=request.fs, jt=request.jt, properties=mapping, oozie_id=oozie_id)
     job_id = submission.rerun(**run_args)
     return job_id
   except RestException, ex:
@@ -422,7 +422,7 @@ def rerun_oozie_coordinator(request, job_id, app_path):
 
 def _rerun_coordinator(request, oozie_id, args, params, properties):
   try:
-    submission = Submission(user=request.user, fs=request.fs, oozie_id=oozie_id, properties=properties)
+    submission = Submission(user=request.user, fs=request.fs, jt=request.jt, oozie_id=oozie_id, properties=properties)
     job_id = submission.rerun_coord(params=params, **args)
     return job_id
   except RestException, ex:
@@ -485,7 +485,7 @@ def rerun_oozie_bundle(request, job_id, app_path):
 
 def _rerun_bundle(request, oozie_id, args, params, properties):
   try:
-    submission = Submission(user=request.user, fs=request.fs, oozie_id=oozie_id, properties=properties)
+    submission = Submission(user=request.user, fs=request.fs, jt=request.jt, oozie_id=oozie_id, properties=properties)
     job_id = submission.rerun_bundle(params=params, **args)
     return job_id
   except RestException, ex:

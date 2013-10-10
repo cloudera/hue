@@ -333,6 +333,12 @@
       # Use WebHdfs/HttpFs as the communication mechanism. To fallback to
       # using the Thrift plugin (used in Hue 1.x), this must be uncommented
       # and explicitly set to the empty value.
+      # NameNode logical name.
+      ## logical_name=
+
+      # Use WebHdfs/HttpFs as the communication mechanism.
+      # This should be the web service root URL, such as
+      # http://namenode:50070/webhdfs/v1
       ## webhdfs_url=
 
       ## security_enabled=false
@@ -362,6 +368,9 @@
       ## thrift_port=9290
       # Whether to submit jobs to this cluster
       ## submit_to=True
+
+      # NameNode logical name.
+      ## logical_name=
 
       # Change this if your MapReduce cluster is Kerberos-secured
       ## security_enabled=false

@@ -22,7 +22,10 @@ from oozie.tests import MockOozieApi
 
 from desktop.lib.test_utils import reformat_xml
 
+from hadoop import cluster
+from hadoop.conf import HDFS_CLUSTERS, MR_CLUSTERS, YARN_CLUSTERS
 from liboozie.types import WorkflowAction, Coordinator
+from liboozie.submittion import Submission
 from liboozie.utils import config_gen
 
 
@@ -56,3 +59,51 @@ def test_config_gen():
   <value><![CDATA[hue]]></value>
 </property>
 </configuration>"""), reformat_xml(config_gen(properties)))
+
+
+def test_update_properties():
+  finish = []
+  finish.append(MR_CLUSTERS['default'].SUBMIT_TO.set_for_testing(True))
+  finish.append(YARN_CLUSTERS['default'].SUBMIT_TO.set_for_testing(True))
+  try:
+    properties = {
+      'user.name': 'hue',
+      'test.1': 'http://localhost/test?test1=test&test2=test'
+    }
+
+    final_properties = properties.copy()
+    submission = Submission(None, properties=properties, oozie_id='test')
+    assert_equal(properties, submission.properties)
+    submission._update_properties('jtaddress', 'deployment-directory')
+    assert_equal(final_properties, submission.properties)
+
+    cluster.clear_caches()
+    fs = cluster.get_hdfs()
+    jt = cluster.get_next_ha_mrcluster()[1]
+    final_properties = properties.copy()
+    final_properties.update({
+      'jobTracker': 'jtaddress',
+      'nameNode': fs.fs_defaultfs
+    })
+    submission = Submission(None, properties=properties, oozie_id='test', fs=fs, jt=jt)
+    assert_equal(properties, submission.properties)
+    submission._update_properties('jtaddress', 'deployment-directory')
+    assert_equal(final_properties, submission.properties)
+
+    finish.append(HDFS_CLUSTERS['default'].LOGICAL_NAME.set_for_testing('namenode'))
+    finish.append(MR_CLUSTERS['default'].LOGICAL_NAME.set_for_testing('jobtracker'))
+    cluster.clear_caches()
+    fs = cluster.get_hdfs()
+    jt = cluster.get_next_ha_mrcluster()[1]
+    final_properties = properties.copy()
+    final_properties.update({
+      'jobTracker': 'jobtracker',
+      'nameNode': 'namenode'
+    })
+    submission = Submission(None, properties=properties, oozie_id='test', fs=fs, jt=jt)
+    assert_equal(properties, submission.properties)
+    submission._update_properties('jtaddress', 'deployment-directory')
+    assert_equal(final_properties, submission.properties)
+  finally:
+    for reset in finish:
+      reset()

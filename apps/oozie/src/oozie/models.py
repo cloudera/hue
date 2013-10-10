@@ -253,10 +253,10 @@ class WorkflowManager(TrashManager):
     else:
       perms = 0711
 
-    Submission(workflow.owner, workflow, fs, {})._create_dir(workflow.deployment_dir, perms=perms)
+    Submission(workflow.owner, workflow, fs, None, {})._create_dir(workflow.deployment_dir, perms=perms)
 
   def destroy(self, workflow, fs):
-    Submission(workflow.owner, workflow, fs, {}).remove_deployment_dir()
+    Submission(workflow.owner, workflow, fs, None, {}).remove_deployment_dir()
     try:
       workflow.coordinator_set.update(workflow=None) # In Django 1.3 could do ON DELETE set NULL
     except:

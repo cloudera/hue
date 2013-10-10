@@ -39,10 +39,11 @@ class Submission(object):
   - submit
   - rerun
   """
-  def __init__(self, user, job=None, fs=None, properties=None, oozie_id=None):
+  def __init__(self, user, job=None, fs=None, jt=None, properties=None, oozie_id=None):
     self.job = job
     self.user = user
     self.fs = fs
+    self.jt = jt
     self.oozie_id = oozie_id
 
     if properties is not None:
@@ -157,7 +158,7 @@ class Submission(object):
         # Don't support shared sub-worfklow
         if action.node_type == 'subworkflow':
           node = action.get_full_node()
-          sub_deploy = Submission(self.user, node.sub_workflow, self.fs, self.properties)
+          sub_deploy = Submission(self.user, node.sub_workflow, self.fs, self.jt, self.properties)
           sub_deploy.deploy()
 
     return deployment_dir
@@ -167,6 +168,11 @@ class Submission(object):
       'jobTracker': jobtracker_addr,
       'nameNode': self.fs.fs_defaultfs,
     }
+    if self.fs and self.jt:
+      self.properties.update({
+        'jobTracker': self.jt.logical_name or jobtracker_addr,
+        'nameNode': self.fs.logical_name or self.fs.fs_defaultfs,
+      })
 
     if self.job:
       properties.update({

@@ -39,7 +39,6 @@ REMOTE_DEPLOYMENT_DIR = Config(
   default="/user/hue/oozie/deployments",
   help=_t("Location on HDFS where the workflows/coordinators are deployed when submitted by a non-owner."))
 
-
 def get_oozie_status():
   from liboozie.oozie_api import get_oozie
 

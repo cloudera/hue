@@ -307,7 +307,7 @@ def submit_workflow(request, workflow):
     if params_form.is_valid():
       mapping = dict([(param['name'], param['value']) for param in params_form.cleaned_data])
 
-      job_id = _submit_workflow(request.user, request.fs, workflow, mapping)
+      job_id = _submit_workflow(request.user, request.fs, request.jt, workflow, mapping)
 
       request.info(_('Workflow submitted'))
       return redirect(reverse('oozie:list_oozie_workflow', kwargs={'job_id': job_id}))
@@ -325,9 +325,9 @@ def submit_workflow(request, workflow):
   return HttpResponse(json.dumps(popup), mimetype="application/json")
 
 
-def _submit_workflow(user, fs, workflow, mapping):
+def _submit_workflow(user, fs, jt, workflow, mapping):
   try:
-    submission = Submission(user, workflow, fs, mapping)
+    submission = Submission(user, workflow, fs, jt, mapping)
     job_id = submission.run()
     History.objects.create_from_submission(submission)
     return job_id
@@ -606,12 +606,12 @@ def submit_coordinator(request, coordinator):
 
 def _submit_coordinator(request, coordinator, mapping):
   try:
-    wf_dir = Submission(request.user, coordinator.workflow, request.fs, mapping).deploy()
+    wf_dir = Submission(request.user, coordinator.workflow, request.fs, request.jt, mapping).deploy()
 
     properties = {'wf_application_path': request.fs.get_hdfs_path(wf_dir)}
     properties.update(mapping)
 
-    submission = Submission(request.user, coordinator, request.fs, properties=properties)
+    submission = Submission(request.user, coordinator, request.fs, request.jt, properties=properties)
     job_id = submission.run()
 
     History.objects.create_from_submission(submission)
@@ -817,13 +817,13 @@ def _submit_bundle(request, bundle, properties):
     deployment_dirs = {}
 
     for bundled in bundle.coordinators.all():
-      wf_dir = Submission(request.user, bundled.coordinator.workflow, request.fs, properties).deploy()
+      wf_dir = Submission(request.user, bundled.coordinator.workflow, request.fs, request.jt, properties).deploy()
       deployment_dirs['wf_%s_dir' % bundled.coordinator.workflow.id] = request.fs.get_hdfs_path(wf_dir)
-      coord_dir = Submission(request.user, bundled.coordinator, request.fs, properties).deploy()
+      coord_dir = Submission(request.user, bundled.coordinator, request.fs, request.jt, properties).deploy()
       deployment_dirs['coord_%s_dir' % bundled.coordinator.id] = coord_dir
 
     properties.update(deployment_dirs)
-    submission = Submission(request.user, bundle, request.fs, properties=properties)
+    submission = Submission(request.user, bundle, request.fs, request.jt, properties=properties)
     job_id = submission.run()
 
     History.objects.create_from_submission(submission)

@@ -55,6 +55,7 @@ class WebHdfs(Hdfs):
 
   def __init__(self, url,
                fs_defaultfs,
+               logical_name=None,
                hdfs_superuser=None,
                security_enabled=False,
                temp_dir="/tmp"):
@@ -63,6 +64,7 @@ class WebHdfs(Hdfs):
     self._security_enabled = security_enabled
     self._temp_dir = temp_dir
     self._fs_defaultfs = fs_defaultfs
+    self._logical_name = logical_name
 
     self._client = self._make_client(url, security_enabled)
     self._root = resource.Resource(self._client)
@@ -78,6 +80,7 @@ class WebHdfs(Hdfs):
     fs_defaultfs = hdfs_config.FS_DEFAULTFS.get()
     return cls(url=_get_service_url(hdfs_config),
                fs_defaultfs=fs_defaultfs,
+               logical_name=hdfs_config.LOGICAL_NAME.get(),
                security_enabled=hdfs_config.SECURITY_ENABLED.get(),
                temp_dir=hdfs_config.TEMP_DIR.get())
 
@@ -94,6 +97,10 @@ class WebHdfs(Hdfs):
   @property
   def uri(self):
     return self._url
+
+  @property
+  def logical_name(self):
+    return self._logical_name
 
   @property
   def fs_defaultfs(self):
