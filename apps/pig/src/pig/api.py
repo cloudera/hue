@@ -14,12 +14,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from filebrowser.views import location_to_url
 
-try:
-  import json
-except ImportError:
-  import simplejson as json
+import json
 import logging
 import re
 import time
@@ -28,11 +24,12 @@ from django.core.urlresolvers import reverse
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
 
-from jobbrowser.views import job_single_logs
 from desktop.lib.view_util import format_duration_in_millis
+from filebrowser.views import location_to_url
+from jobbrowser.views import job_single_logs
+from liboozie.oozie_api import get_oozie
 from oozie.models import Workflow, Pig
 from oozie.views.editor import _submit_workflow
-from liboozie.oozie_api import get_oozie
 
 LOG = logging.getLogger(__name__)
 
