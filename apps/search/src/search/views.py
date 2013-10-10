@@ -201,7 +201,7 @@ def admin_collection_properties(request, collection_id):
   solr_collection = SolrApi(SOLR_URL.get(), request.user).collection_or_core(hue_collection)
 
   if request.method == 'POST':
-    collection_form = CollectionForm(request.POST, instance=hue_collection)
+    collection_form = CollectionForm(request.POST, instance=hue_collection, user=request.user)
     if collection_form.is_valid():
       searcher = SearchController(request.user)
       hue_collection = collection_form.save(commit=False)
