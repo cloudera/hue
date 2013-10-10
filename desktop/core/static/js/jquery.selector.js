@@ -60,7 +60,9 @@
     });
     var sortedKeys = [];
     for (var key in addressBook) {
-      sortedKeys.push(key);
+      if (addressBook.hasOwnProperty(key)) {
+        sortedKeys.push(key);
+      }
     }
     sortedKeys.sort();
 
