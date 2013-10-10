@@ -37,7 +37,7 @@ from desktop.views import register_status_bar_view
 from hadoop.api.jobtracker.ttypes import ThriftJobPriority, TaskTrackerNotFoundException, ThriftJobState
 
 from jobbrowser import conf
-from jobbrowser.api import get_api
+from jobbrowser.api import get_api, ApplicationNotRunning
 from jobbrowser.models import Job, JobLinkage, Tracker, Cluster
 
 import urllib2
@@ -46,20 +46,40 @@ import urllib2
 def check_job_permission(view_func):
   """
   Ensure that the user has access to the job.
-  Assumes that the wrapped function takes a 'jobid' param.
+  Assumes that the wrapped function takes a 'jobid' param named 'job'.
   """
   def decorate(request, *args, **kwargs):
     jobid = kwargs['job']
     try:
       job = get_api(request.user, request.jt).get_job(jobid=jobid)
+    except ApplicationNotRunning, e:
+      # reverse() seems broken, using request.path but beware, it discards GET and POST info
+      return job_not_assigned(request, jobid, request.path)
     except Exception, e:
-      raise PopupException(_('Could not find job %s. The job might not be running yet.') % jobid, detail=e)
+      raise PopupException(_('Could not find job %s.') % jobid, detail=e)
     if not conf.SHARE_JOBS.get() and not request.user.is_superuser \
       and job.user != request.user.username:
       raise PopupException(_("You don't have permission to access job %(id)s.") % {'id': jobid})
     kwargs['job'] = job
     return view_func(request, *args, **kwargs)
   return wraps(view_func)(decorate)
+
+
+def job_not_assigned(request, jobid, path):
+  if request.GET.get('format') == 'json':
+    result = {'status': -1, 'message': ''}
+
+    try:
+      get_api(request.user, request.jt).get_job(jobid=jobid)
+      result['status'] = 0
+    except ApplicationNotRunning, e:
+      result['status'] = 1
+    except Exception, e:
+      result['message'] = _('Error polling job %s: e') % (jobid, e)
+
+    return HttpResponse(encode_json_for_js(result), mimetype="application/json")
+  else:
+    return render('job_not_assigned.mako', request, {'jobid': jobid, 'path': path})
 
 
 def jobs(request):
@@ -242,7 +262,7 @@ def job_single_logs(request, job):
   if failed_tasks:
     task = failed_tasks[0]
   else:
-    recent_tasks = job.filter_tasks(task_states=('running', 'succeeded',), task_types=('map', 'reduce',))
+    recent_tasks = job.filter_tasks(task_states=('running', 'succeeded', 'scheduled'), task_types=('map', 'reduce',))
     recent_tasks.sort(cmp_exec_time, reverse=True)
     if recent_tasks:
       task = recent_tasks[0]

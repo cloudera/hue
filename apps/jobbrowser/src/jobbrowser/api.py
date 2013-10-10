@@ -234,14 +234,20 @@ class YarnApi(JobBrowserApi):
       jobid = jobid.replace('job', 'application')
       job = self.resource_manager_api.app(jobid)['app']
 
-      # MR id
+      if job['state'] == 'ACCEPTED':
+        raise ApplicationNotRunning(jobid, job)
+
+      # MR id, assume 'applicationType': 'MAPREDUCE'
       jobid = jobid.replace('application', 'job')
+
       if job['state'] in ('NEW', 'SUBMITTED', 'ACCEPTED', 'RUNNING'):
         json = self.mapreduce_api.job(self.user, jobid)
         job = YarnJob(self.mapreduce_api, json['job'])
       else:
         json = self.history_server_api.job(self.user, jobid)
         job = YarnJob(self.history_server_api, json['job'])
+    except ApplicationNotRunning, e:
+      raise e
     except Exception, e:
       raise PopupException('Job %s could not be found: %s' % (jobid, e), detail=e)
 
@@ -257,3 +263,10 @@ class YarnApi(JobBrowserApi):
   def get_tracker(self, node_manager_http_address, container_id):
     api = node_manager_api.get_resource_manager_api('http://' + node_manager_http_address)
     return Container(api.container(container_id))
+
+
+class ApplicationNotRunning(Exception):
+
+  def __init__(self, application_id, job):
+    self.application_id = application_id
+    self.job = job

@@ -400,6 +400,15 @@ class TestMapReduce2NoHadoop:
     response = self.c.get('/jobbrowser/jobs/job_1356251510842_0009')
     assert_equal(response.context['job'].jobId, 'job_1356251510842_0009')
 
+  def job_not_assigned(self):
+    response = self.c.get('/jobbrowser/jobs/job_1356251510842_0009/job_not_assigned//my_url')
+    assert_equal(response.context['jobid'], 'job_1356251510842_0009')
+    assert_equal(response.context['path'], '/my_url')
+
+    response = self.c.get('/jobbrowser/jobs/job_1356251510842_0009/job_not_assigned//my_url?format=json')
+    result = json.loads(response.content)
+    assert_equal(result['status'], 0)
+
 
 class MockResourceManagerApi:
   APPS = {

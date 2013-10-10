@@ -193,6 +193,8 @@ class Attempt:
     setattr(self, 'mapFinishTimeFormatted', None)
     if not hasattr(self, 'diagnostics'):
       self.diagnostics = ''
+    if not hasattr(self, 'assignedContainerId'):
+      setattr(self, 'assignedContainerId', '')
 
   @property
   def counters(self):
