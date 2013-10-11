@@ -45,6 +45,7 @@ LOG = logging.getLogger(__name__)
 class HiveServerTable(Table):
   """
   We are parsing DESCRIBE EXTENDED text as the metastore API like GetColumns() misses most of the information.
+  Impala only supports a simple DESCRIBE.
   """
   def __init__(self, table_results, table_schema, desc_results, desc_schema):
     if not table_results.rows:
@@ -96,8 +97,12 @@ class HiveServerTable(Table):
   @property
   def cols(self):
     cols = HiveServerTTableSchema(self.desc_results, self.desc_schema).cols()
-    end_cols_index = map(itemgetter('col_name'), cols).index('') # Truncate below extended describe
-    return cols[0:end_cols_index]
+    try:
+      end_cols_index = map(itemgetter('col_name'), cols).index('') # Truncate below extended describe
+      return cols[0:end_cols_index]
+    except:
+      # Impala use non extended describe and 'col' instead of 'col_name'
+      return cols
 
   @property
   def comment(self):
@@ -177,7 +182,15 @@ class HiveServerTTableSchema:
     self.schema = schema
 
   def cols(self):
-    return HiveServerTRowSet(self.columns, self.schema).cols(('col_name', 'data_type', 'comment'))
+    try:
+      return HiveServerTRowSet(self.columns, self.schema).cols(('col_name', 'data_type', 'comment'))
+    except:
+      # Impala API is different
+      cols = HiveServerTRowSet(self.columns, self.schema).cols(('name', 'type', 'comment'))
+      for col in cols: 
+        col['col_name'] = col.pop('name')
+        col['col_type'] = col.pop('type')
+      return cols
 
   def col(self, colName):
     pos = self._get_col_position(colName)
@@ -406,7 +419,12 @@ class HiveServerClient:
     res = self.call(self._client.GetTables, req)
 
     table_results, table_schema = self.fetch_result(res.operationHandle)
-    desc_results, desc_schema = self.execute_statement('DESCRIBE EXTENDED %s' % table_name)
+    if self.query_server['server_name'] == 'impala':
+      # Impala does not supported extended
+      query = 'DESCRIBE %s' % table_name
+    else:
+      query = 'DESCRIBE EXTENDED %s' % table_name
+    desc_results, desc_schema = self.execute_statement(query)
 
     return HiveServerTable(table_results.results, table_schema.schema, desc_results.results, desc_schema.schema)
 
