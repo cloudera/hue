@@ -19,6 +19,7 @@ import atexit
 import getpass
 import logging
 import os
+import shutil
 import socket
 import subprocess
 import threading
@@ -28,6 +29,7 @@ from nose.tools import assert_equal, assert_true
 
 from desktop.lib.paths import get_run_root
 from hadoop import pseudo_hdfs4
+from hadoop.mini_cluster import write_config
 
 from liboozie.oozie_api import get_oozie
 from liboozie.conf import OOZIE_URL
@@ -77,26 +79,64 @@ class OozieServerProvider(object):
     return job
 
   @classmethod
+  def _setup_conf_dir(cls, cluster):
+    original_oozie_conf_dir = '%s/conf' % OozieServerProvider.OOZIE_HOME
+    shutil.copytree(original_oozie_conf_dir, cluster._tmppath('conf/oozie'))
+    cls._write_oozie_site(cluster)
+
+  @classmethod
+  def _write_oozie_site(cls, cluster):
+    oozie_configs = {
+      'oozie.service.ProxyUserService.proxyuser.hue.hosts': '*',
+      'oozie.service.ProxyUserService.proxyuser.hue.groups': '*',
+      'oozie.service.HadoopAccessorService.hadoop.configurations': '*=%s' % cluster._tmppath('conf'),
+      'oozie.db.schema.name': 'oozie',
+      'oozie.data.dir': cluster._tmppath('oozie_tmp_dir'),
+      'oozie.service.JPAService.create.db.schema': 'false',
+      'oozie.service.JPAService.jdbc.driver': 'org.apache.derby.jdbc.EmbeddedDriver',
+      'oozie.service.JPAService.jdbc.url': 'jdbc:derby:${oozie.data.dir}/${oozie.db.schema.name}-db;create=true',
+      'oozie.service.JPAService.jdbc.username': 'sa',
+      'oozie.service.JPAService.jdbc.password': '',
+      'oozie.service.SchemaService.wf.ext.schemas': '''shell-action-0.1.xsd,shell-action-0.2.xsd,shell-action-0.3.xsd,email-action-0.1.xsd,hive-action-0.2.xsd,
+            hive-action-0.3.xsd,hive-action-0.4.xsd,hive-action-0.5.xsd,sqoop-action-0.2.xsd,sqoop-action-0.3.xsd,
+            sqoop-action-0.4.xsd,ssh-action-0.1.xsd,ssh-action-0.2.xsd,distcp-action-0.1.xsd,distcp-action-0.2.xsd,
+            oozie-sla-0.1.xsd,oozie-sla-0.2.xsd''',
+      'oozie.service.ActionService.executor.ext.classes': '''org.apache.oozie.action.email.EmailActionExecutor,
+            org.apache.oozie.action.hadoop.HiveActionExecutor,
+            org.apache.oozie.action.hadoop.ShellActionExecutor,
+            org.apache.oozie.action.hadoop.SqoopActionExecutor,
+            org.apache.oozie.action.hadoop.DistcpActionExecutor''',
+      'oozie.service.coord.normal.default.timeout': 120
+    }
+    write_config(oozie_configs, cluster._tmppath('conf/oozie/oozie-site.xml'))
+
+  @classmethod
   def _start_oozie(cls, cluster):
     """
     Start oozie process.
     """
+    OozieServerProvider._setup_conf_dir(cluster)
+
     args = [OozieServerProvider.OOZIE_HOME + '/bin/oozied.sh', 'run']
     env = os.environ
+    env['OOZIE_DATA'] = cluster._tmppath('oozie_tmp_dir')
     env['OOZIE_HTTP_PORT'] = OozieServerProvider.OOZIE_TEST_PORT
     conf_dir = os.path.join(cluster.log_dir, 'oozie')
     os.mkdir(conf_dir)
     env['OOZIE_LOG'] = conf_dir
+    env['OOZIE_CONFIG'] = cluster._tmppath('conf/oozie')
 
     LOG.info("Executing %s, env %s, cwd %s" % (repr(args), repr(env), cluster._tmpdir))
     process = subprocess.Popen(args=args, env=env, cwd=cluster._tmpdir, stdin=subprocess.PIPE)
     return process
 
   @classmethod
-  def _reset_oozie(cls):
+  def _reset_oozie(cls, cluster):
     env = os.environ
 
-    args = ['rm', '-r', OozieServerProvider.OOZIE_HOME + '/data/oozie-db']
+    env['OOZIE_DATA'] = cluster._tmppath('oozie_tmp_dir')
+
+    args = ['rm', '-r', '%s/data/oozie-db' % cluster._tmppath('oozie_tmp_dir')]
     LOG.info("Executing %s, env %s" % (args, env))
     subprocess.call(args, env=env)
 
@@ -132,7 +172,7 @@ class OozieServerProvider(object):
       # Setup
       cluster = pseudo_hdfs4.shared_cluster()
       cls._setup_sharelib()
-      cls._reset_oozie()
+      cls._reset_oozie(cluster)
 
       p = cls._start_oozie(cluster)
 
