@@ -44,6 +44,20 @@ $.jHueTour({
       "blog": "http://gethue.tumblr.com/post/60376973455/hadoop-tutorials-ii-1-prepare-the-data-for-analysis"
     },
     {
+      "name": "saml",
+      "desc": "${_("SSO with SAML")}",
+      "path": "/(useradmin|about)",
+      "video": "http://player.vimeo.com/video/76063637",
+      "blog": "http://gethue.tumblr.com/post/62273866476/sso-with-hue-new-saml-backend"
+    },
+    {
+      "name": "impalavshive",
+      "desc": "${_("Fast SQL qith Impala")}",
+      "path": "/impala",
+      "video": "http://player.vimeo.com/video/75493693",
+      "blog": "http://gethue.tumblr.com/post/62452792255/fast-sql-with-the-impala-query-editor"
+    },
+    {
       "name": "pigeditor",
       "desc": "${_("The Pig Editor")}",
       "path": "/pig",
