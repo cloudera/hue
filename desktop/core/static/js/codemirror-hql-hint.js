@@ -72,7 +72,7 @@
   var hiveQLKeywordsU = hiveQLKeywords.split(" ");
   var hiveQLKeywordsL = hiveQLKeywords.toLowerCase().split(" ");
 
-  var hiveQLKeywordsAfterTables = "JOIN ON WHERE";
+  var hiveQLKeywordsAfterTables = "JOIN ON WHERE ORDER BY ASC DESC LIMIT";
   var hiveQLKeywordsAfterTablesU = hiveQLKeywordsAfterTables.split(" ");
   var hiveQLKeywordsAfterTablesL = hiveQLKeywordsAfterTables.toLowerCase().split(" ");
 

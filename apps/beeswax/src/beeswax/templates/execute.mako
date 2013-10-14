@@ -815,7 +815,7 @@ ${layout.menubar(section='query')}
       function fieldsAutocomplete(cm) {
         CodeMirror.possibleSoloField = true;
         try {
-          var _possibleTables = $.trim(codeMirror.getValue().substr(codeMirror.getValue().toUpperCase().indexOf("FROM ") + 4)).split(" ");
+          var _possibleTables = $.trim(codeMirror.getValue(" ").substr(codeMirror.getValue().toUpperCase().indexOf("FROM ") + 4)).split(" ");
           var _foundTable = "";
           for (var i = 0; i < _possibleTables.length; i++) {
             if ($.trim(_possibleTables[i]) != "" && _foundTable == "") {
