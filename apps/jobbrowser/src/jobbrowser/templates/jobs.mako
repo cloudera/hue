@@ -103,13 +103,15 @@ ${ components.menubar() }
 
     var jobTable = $(".datatables").dataTable({
       "sPaginationType": "bootstrap",
-      "iDisplayLength": 30,
+      "iDisplayLength": 50,
       "bLengthChange": false,
       "bAutoWidth": false,
       "sDom": "<'row'r>t<'row-fluid'<'dt-pages'p><'dt-records'i>>",
       "aaSorting": [
         [1, "desc"]
       ],
+      "bProcessing": true,
+      "bDeferRender": true,
       "aoColumns": [
         {"bSortable": false, "sWidth": "20px"},
         {"sWidth": "10%"},
@@ -148,15 +150,12 @@ ${ components.menubar() }
           $(".datatables").hide();
         }
         else {
+          var rows = [];
           $(data).each(function (cnt, job) {
-            try {
-              jobTable.fnAddData(getJobRow(job));
-              $("a[data-row-selector='true']").jHueRowSelector();
-            }
-            catch (error) {
-              $(document).trigger("error", error);
-            }
+            rows.push(getJobRow(job));
           });
+          jobTable.fnAddData(rows);
+          $("a[data-row-selector='true']").jHueRowSelector();
         }
       }
     }
