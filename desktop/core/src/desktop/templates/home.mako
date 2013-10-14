@@ -342,7 +342,7 @@ $(document).ready(function () {
   function toggleSpecificSection(section, filter){
     section.siblings().removeClass("active");
     if (section.hasClass("active")) {
-      populateTable();
+      populateTable("");
       section.removeClass("active");
       section.find("a").blur();
     }
@@ -392,20 +392,26 @@ $(document).ready(function () {
     }
   });
 
-  if ($.totalStorage("hueHomeTags") != null && $.totalStorage("hueHomeTags") != "") {
-    if ($.totalStorage("hueHomeTags") == "history") {
-      $(".viewHistory").click();
-    }
-    else if ($.totalStorage("hueHomeTags") == "trash") {
-      $(".view-trash").click();
-    }
-    else {
-      $("li[data-tag='" + $.totalStorage("hueHomeTags") + "']").click();
-    }
+  if ($.totalStorage("hueHomeTags") == null){
+    $("li[data-tag='default']").click(); // for new users show default tag
   }
   else {
-    populateTable();
+    if ($.totalStorage("hueHomeTags") != "") {
+      if ($.totalStorage("hueHomeTags") == "history") {
+        $(".viewHistory").click();
+      }
+      else if ($.totalStorage("hueHomeTags") == "trash") {
+        $(".view-trash").click();
+      }
+      else {
+        $("li[data-tag='" + $.totalStorage("hueHomeTags") + "']").click();
+      }
+    }
+    else {
+      populateTable();
+    }
   }
+
 
   $(document).on("click", ".documentTags", function () {
     $("#documentTagsModal").data("document-id", $(this).data("document-id"));
