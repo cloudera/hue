@@ -175,6 +175,15 @@ ${ commonheader(None, "jobsub", user) | n,unicode }
 
 </div>
 
+<div class="hueOverlay" data-bind="visible: isLoading">
+  <!--[if lte IE 9]>
+    <img src="/static/art/spinner-big.gif" />
+  <![endif]-->
+  <!--[if !IE]> -->
+    <i class="icon-spinner icon-spin"></i>
+  <!-- <![endif]-->
+</div>
+
 <script id="designTemplate" type="text/html">
   <tr style="cursor: pointer" data-bind="with: design">
     <td data-row-selector-exclude="true" data-bind="click: function(data, event) {$root.toggleSelect.call($root, $index());}" class="center" style="cursor: default">
@@ -765,9 +774,11 @@ var designTable = $('#designTable').dataTable( designTableOptions );
  * This is useful when datatables doesn't automatically update and no extra rows have been added.
  */
 function redraw() {
+  designs.isLoading(true);
   designTable.fnDestroy();
   designTable = $('#designTable').dataTable( designTableOptions );
   designTable.fnFilter(designs.inTrash().toString(), 7);
+  designs.isLoading(false);
 }
 
 /**
@@ -777,6 +788,7 @@ function redraw() {
  * Clearing the table is necessary so multiple rows will not be added.
  */
 function reload() {
+  designs.isLoading(true);
   $(document).one('load.designs', function() {
     designTable.fnClearTable();
     designTable.fnDestroy();
@@ -785,6 +797,7 @@ function reload() {
   $(document).one('initialized.designs', function() {
     designTable = $('#designTable').dataTable( designTableOptions );
     designTable.fnFilter(designs.inTrash().toString(), 7);
+    designs.isLoading(false);
   });
 }
 
@@ -919,6 +932,7 @@ $(document).ready(function(e) {
     $('#restoreWf').modal('show');
   });
   $('body').on('click', '#copy-designs', function() {
+    designs.isLoading(true);
     designs.cloneDesigns();
   });
   $('#home').click(function() {

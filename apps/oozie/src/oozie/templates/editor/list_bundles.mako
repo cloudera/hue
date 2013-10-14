@@ -119,6 +119,14 @@ ${ layout.menubar(section='bundles') }
 </div>
 </div>
 
+<div class="hueOverlay" data-bind="visible: isLoading">
+  <!--[if lte IE 9]>
+    <img src="/static/art/spinner-big.gif" />
+  <![endif]-->
+  <!--[if !IE]> -->
+    <i class="icon-spinner icon-spin"></i>
+  <!-- <![endif]-->
+</div>
 
 <div id="submit-job-modal" class="modal hide"></div>
 
@@ -160,8 +168,9 @@ ${ layout.menubar(section='bundles') }
 <script type="text/javascript" charset="utf-8">
   $(document).ready(function () {
     var viewModel = {
-        availableJobs : ko.observableArray(${ json_jobs | n }),
-        chosenJobs : ko.observableArray([])
+      availableJobs : ko.observableArray(${ json_jobs | n }),
+      chosenJobs : ko.observableArray([]),
+      isLoading: ko.observable(false)
     };
 
     ko.applyBindings(viewModel);
@@ -240,6 +249,7 @@ ${ layout.menubar(section='bundles') }
     });
 
     $("#clone-btn").click(function (e) {
+      viewModel.isLoading(true);
       var _this = $(".hueCheckbox[checked='checked']");
       var _url = _this.attr("data-clone-url");
       $.post(_url, function (data) {

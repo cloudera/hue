@@ -1471,3 +1471,19 @@ a, a:hover, a:active, a:focus {
 #jHueTourVideoPlayer .modal-body {
   max-height: 460px;
 }
+
+.hueOverlay {
+  top: 28px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  position: fixed;
+  z-index: 100500;
+  background-color: #FFF;
+  color: #333;
+  font-size: 60px;
+  opacity: 0.7;
+  text-align: center;
+  vertical-align: middle;
+  padding-top: 70px;
+}
