@@ -592,6 +592,7 @@ def test_view_snappy_compressed_avro():
   import snappy
 
   cluster = pseudo_hdfs4.shared_cluster()
+  finish = []
   try:
     c = make_logged_in_client()
     cluster.fs.setuser(cluster.superuser)
@@ -647,16 +648,74 @@ def test_view_snappy_compressed_avro():
     assert_equal(eval(response.context['view']['contents']), dummy_datum, response)
 
     # Largest snappy compressed file
-    finish = MAX_SNAPPY_DECOMPRESSION_SIZE.set_for_testing(1)
+    finish.append( MAX_SNAPPY_DECOMPRESSION_SIZE.set_for_testing(1) )
     response = c.get('/filebrowser/view/test-snappy-avro-filebrowser/test-view.avro?compression=snappy_avro')
-    assert_true('File size is greater than allowed max snappy decompression size' in response.context['message'], response)
+    assert_true('File size is greater than allowed max snappy decompression size of 1' in response.context['message'], response)
 
   finally:
-    finish()
+    for done in finish:
+      done()
     try:
       cluster.fs.rmtree('/test-snappy-avro-filebrowser/')
     except:
       pass      # Don't let cleanup errors mask earlier failures
+
+
+@attr('requires_hadoop')
+def test_view_snappy_compressed():
+  if not snappy_installed():
+    raise SkipTest
+  import snappy
+
+  cluster = pseudo_hdfs4.shared_cluster()
+  finish = []
+  try:
+    c = make_logged_in_client()
+    cluster.fs.setuser(cluster.superuser)
+    if cluster.fs.isdir('/tmp/test-snappy-filebrowser'):
+      cluster.fs.rmtree('/tmp/test-snappy-filebrowser')
+
+    cluster.fs.mkdir('/tmp/test-snappy-avro-filebrowser/')
+
+    f = cluster.fs.open('/tmp/test-snappy-filebrowser/test-view.snappy', "w")
+    f.write(snappy.compress('This is a test of the emergency broadcasting system.'))
+    f.close()
+
+    f = cluster.fs.open('/tmp/test-snappy-filebrowser/test-view.stillsnappy', "w")
+    f.write(snappy.compress('The broadcasters of your area in voluntary cooperation with the FCC and other authorities.'))
+    f.close()
+
+    f = cluster.fs.open('/tmp/test-snappy-filebrowser/test-view.notsnappy', "w")
+    f.write('foobar')
+    f.close()
+
+    # Snappy compressed fail
+    response = c.get('/filebrowser/view/tmp/test-snappy-filebrowser/test-view.notsnappy?compression=snappy')
+    assert_true('Failed to decompress' in response.context['message'], response)
+
+    # Snappy compressed succeed
+    response = c.get('/filebrowser/view/tmp/test-snappy-filebrowser/test-view.snappy')
+    assert_equal('snappy', response.context['view']['compression'])
+    assert_equal(response.context['view']['contents'], 'This is a test of the emergency broadcasting system.', response)
+
+    # Snappy compressed succeed
+    response = c.get('/filebrowser/view/tmp/test-snappy-filebrowser/test-view.stillsnappy')
+    assert_equal('snappy', response.context['view']['compression'])
+    assert_equal(response.context['view']['contents'], 'The broadcasters of your area in voluntary cooperation with the FCC and other authorities.', response)
+
+    # Largest snappy compressed file
+    finish.append( MAX_SNAPPY_DECOMPRESSION_SIZE.set_for_testing(1) )
+    response = c.get('/filebrowser/view/tmp/test-snappy-filebrowser/test-view.stillsnappy?compression=snappy')
+    assert_true('File size is greater than allowed max snappy decompression size of 1' in response.context['message'], response)
+
+  finally:
+    for done in finish:
+      done()
+    try:
+      cluster.fs.rmtree('/test-snappy-avro-filebrowser/')
+    except:
+      pass      # Don't let cleanup errors mask earlier failures
+
 
 @attr('requires_hadoop')
 def test_view_avro():
