@@ -339,19 +339,17 @@ class HiveServerClient:
 
   def open_session(self, user):
     kwargs = {
-        'username': user.username,
+        'username': user.username, # If SASL, it gets the username from the authentication mechanism" since it dependents on it.
         'configuration': {},
     }
 
-    if self.use_sasl:
-      # HS2 PLAIN still requires a non null username but None works
-      kwargs.update({'username': self.kerberos_principal_short_name})
-
     if self.impersonation_enabled:
+      kwargs.update({'username': 'hue'})
+
       if self.query_server['server_name'] == 'impala':
-        kwargs.update({'configuration': {'impala.doas.user': user.username}})
+        kwargs['configuration'].update({'impala.doas.user': user.username})
       else:
-        kwargs.update({'configuration': {'hive.server2.proxy.user': user.username}})
+        kwargs['configuration'].update({'hive.server2.proxy.user': user.username})
 
     req = TOpenSessionReq(**kwargs)
     res = self._client.OpenSession(req)
