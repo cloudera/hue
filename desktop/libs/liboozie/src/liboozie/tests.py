@@ -105,5 +105,6 @@ def test_update_properties():
     submission._update_properties('jtaddress', 'deployment-directory')
     assert_equal(final_properties, submission.properties)
   finally:
+    cluster.clear_caches()
     for reset in finish:
       reset()

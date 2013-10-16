@@ -134,7 +134,7 @@ class PseudoHdfs4(object):
   @property
   def jt(self):
     if self._jt is None:
-      self._jt = LiveJobTracker(self._fqdn, self.jt_thrift_port)
+      self._jt = LiveJobTracker(self._fqdn, 0)
     return self._jt
 
   def stop(self):

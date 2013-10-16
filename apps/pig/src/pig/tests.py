@@ -144,7 +144,7 @@ class TestMock(TestPigBase):
     self.c.post(reverse('pig:save'), data=attrs, follow=True)
 
   def parse_oozie_logs(self):
-    api = get(None, self.user)
+    api = get(None, None, self.user)
 
     assert_equal(
 '''Run pig script using PigRunner.run() for Pig version 0.8+
@@ -178,7 +178,7 @@ class TestWithHadoop(OozieBase):
 
   def test_create_workflow(self):
     cluster = pseudo_hdfs4.shared_cluster()
-    api = OozieApi(cluster.fs, self.user)
+    api = OozieApi(cluster.fs, cluster.jt, self.user)
 
     xattrs = {
       'parameters': [
@@ -246,7 +246,7 @@ class TestWithHadoop(OozieBase):
     return pig_script_id
 
   def test_submit(self):
-    script = PigScript.objects.get(id=1)
+    script = PigScript.objects.get(id=1100713)
     script_dict = script.dict
 
     post_data = {
@@ -266,7 +266,7 @@ class TestWithHadoop(OozieBase):
     self.wait_until_completion(job_id)
 
   def test_stop(self):
-    script = PigScript.objects.get(id=1)
+    script = PigScript.objects.get(id=1100713)
     script_dict = script.dict
 
     post_data = {
