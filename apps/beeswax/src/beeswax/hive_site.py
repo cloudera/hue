@@ -37,7 +37,7 @@ _METASTORE_LOC_CACHE = None
 
 _CNF_HIVESERVER2_KERBEROS_PRINCIPAL = 'hive.server2.authentication.kerberos.principal'
 _CNF_HIVESERVER2_AUTHENTICATION = 'hive.server2.authentication'
-_CNF_HIVESERVER2_IMPERSONATION = 'hive.server2.enable.impersonation'
+_CNF_HIVESERVER2_IMPERSONATION = 'hive.server2.enable.doAs'
 
 # Host is whatever up to the colon. Allow and ignore a trailing slash.
 _THRIFT_URI_RE = re.compile("^thrift://([^:]+):(\d+)[/]?$")
