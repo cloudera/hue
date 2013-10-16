@@ -54,7 +54,7 @@ def scripts(request):
 
 @show_oozie_error
 def dashboard(request):
-  pig_api = api.get(request.fs, request.user)
+  pig_api = api.get(request.fs, request.jt, request.user)
 
   jobs = pig_api.get_jobs()
   hue_jobs = PigScript.objects.filter(owner=request.user)
@@ -99,7 +99,7 @@ def stop(request):
   check_job_edition_permission(job, request.user)
 
   try:
-    api.get(request, request.user).stop(job_id)
+    api.get(request.fs, request.jt, request.user).stop(job_id)
   except RestException, e:
     raise PopupException(_("Error stopping Pig script.") % e.message)
 
@@ -125,7 +125,7 @@ def run(request):
   pig_script = create_or_update_script(**attrs)
 
   params = request.POST.get('submissionVariables')
-  oozie_id = api.get(request.fs, request.user).submit(pig_script, params)
+  oozie_id = api.get(request.fs, request.jt, request.user).submit(pig_script, params)
 
   pig_script.update_from_dict({'job_id': oozie_id})
   pig_script.save()
@@ -198,7 +198,7 @@ def delete(request):
 @show_oozie_error
 def watch(request, job_id):
   oozie_workflow = check_job_access_permission(request, job_id)
-  logs, workflow_actions = api.get(request, job_id).get_log(request, oozie_workflow)
+  logs, workflow_actions = api.get(request.jt, request.jt, request.user).get_log(request, oozie_workflow)
   output = get_workflow_output(oozie_workflow, request.fs)
 
   workflow = {

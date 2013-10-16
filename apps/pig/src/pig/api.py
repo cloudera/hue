@@ -37,8 +37,8 @@ from liboozie.oozie_api import get_oozie
 LOG = logging.getLogger(__name__)
 
 
-def get(fs, user):
-  return OozieApi(fs, user)
+def get(fs, jt, user):
+  return OozieApi(fs, jt, user)
 
 
 class OozieApi:
@@ -51,8 +51,9 @@ class OozieApi:
   RE_LOG_START_FINISHED = re.compile('(>>> Invoking Pig command line now >>>)', re.M | re.DOTALL)
   MAX_DASHBOARD_JOBS = 100
 
-  def __init__(self, fs, user):
+  def __init__(self, fs, jt, user):
     self.fs = fs
+    self.jt = jt
     self.user = user
 
   def submit(self, pig_script, params):
@@ -64,7 +65,7 @@ class OozieApi:
 
     try:
       workflow = self._create_workflow(pig_script, params)
-      oozie_wf = _submit_workflow(self.user, self.fs, workflow, mapping)
+      oozie_wf = _submit_workflow(self.user, self.fs, self.jt, workflow, mapping)
     finally:
       if workflow:
         workflow.delete()
