@@ -66,7 +66,7 @@ ${ header.menubar() }
             <h2 class="card-heading simple">${ _('HDFS Trash Configuration') }</h2>
           <div class="card-body">
           <p>
-            % if not trash_enabled:
+            % if trash_enabled:
             <h5>${ _('Trash is active.')}</h5>
             % else:
             ${ _('You can activate trash collection by setting fs.trash.interval in core-site.xml:')}<br/><br/>

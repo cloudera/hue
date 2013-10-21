@@ -15,10 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-try:
-  import json
-except ImportError:
-  import simplejson as json
+
+import json
 
 from django.conf import settings
 from django.http import HttpResponse
@@ -36,13 +34,14 @@ def admin_wizard(request):
   app_names = [app.name for app in sorted(apps, key=lambda app: app.menu_index)]
 
   tours_and_tutorials = Settings.get_settings().tours_and_tutorials
+  trash_enabled = get_trash_interval() > 0
 
   return render('admin_wizard.mako', request, {
       'version': settings.HUE_DESKTOP_VERSION,
       'apps': dict([(app.name, app) for app in apps]),
       'app_names': app_names,
       'tours_and_tutorials': tours_and_tutorials,
-      'trash_enabled': get_trash_interval()
+      'trash_enabled': trash_enabled
   })
 
 
