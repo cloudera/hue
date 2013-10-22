@@ -44,7 +44,7 @@ ${ components.menubar() }
         <tr>
           <td>${ column.name }</td>
           <td>${ column.type }</td>
-          <td>${ column.comment or "" }</td>
+          <td>${ column.comment != 'None' and column.comment or "" }</td>
         </tr>
       % endfor
     </tbody>

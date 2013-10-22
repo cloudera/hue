@@ -202,7 +202,7 @@ class HiveServerTTableSchema:
     except:
       # Impala API is different
       cols = HiveServerTRowSet(self.columns, self.schema).cols(('name', 'type', 'comment'))
-      for col in cols: 
+      for col in cols:
         col['col_name'] = col.pop('name')
         col['col_type'] = col.pop('type')
       return cols
@@ -562,7 +562,7 @@ class HiveServerTableCompatible(HiveServerTable):
   def cols(self):
     return [type('Col', (object,), {'name': col.get('col_name', '').strip(),
                                     'type': col.get('data_type', ''),
-                                    'comment': col.get('comment', ''), }) for col in HiveServerTable.cols.fget(self)]
+                                    'comment': col.get('comment', '').strip(), }) for col in HiveServerTable.cols.fget(self)]
 
 
 class ResultCompatible:

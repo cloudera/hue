@@ -45,9 +45,11 @@
     </li>
     % for crumb in breadcrumbs:
     <li>
-      <a href="${ crumb['url'] }">${ crumb['name'] }</a>
       % if not loop.last:
+        <a href="${ crumb['url'] }">${ crumb['name'] }</a>
         <span class="divider">&gt;</span>
+      % else:
+        <span style="padding-left:12px">${ crumb['name'] }</span>
       % endif
     </li>
     % endfor
