@@ -56,14 +56,22 @@ from django.utils.translation import ugettext as _
   <style type="text/css">
     % if conf.CUSTOM.BANNER_TOP_HTML.get():
       body {
-        padding-top: ${str(int(padding[:-2]) + 40) + 'px'};
+        padding-top: ${str(int(padding[:-2]) + 30) + 'px'};
       }
       .banner {
         height: 40px;
+        width: 100%;
         padding: 0;
+        position: fixed;
+        top: 0;
+        background-color: #F9F9F9;
+        z-index: 1033;
       }
-      .subnav-fixed {
-        top: 80px;
+      .navigator {
+        top: 30px!important;
+      }
+      .navbar-fixed-top {
+        top: 58px!important;
       }
     % else:
       body {
