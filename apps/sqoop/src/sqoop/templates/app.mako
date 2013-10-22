@@ -97,7 +97,7 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
         </ul>
         <div class="card" data-bind="visible: filteredJobs().length == 0">
           <div class="span10 offset1 center nojobs">
-            <i class="icon-plus-sign waiting"></i>
+            <a href="#job/new" class="nounderline"><i class="icon-plus-sign waiting"></i></a>
             <h1 class="emptyMessage">${ _('There are currently no jobs.') }<br/><a href="#job/new">${ _('Click here to add one.') }</a></h1>
           </div>
           <div class="clearfix"></div>
