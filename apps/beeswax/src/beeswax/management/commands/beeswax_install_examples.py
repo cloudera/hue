@@ -46,16 +46,23 @@ class Command(NoArgsCommand):
   Install examples but do not overwrite them.
   """
   def handle_noargs(self, **options):
-    """Main entry point to install or re-install examples. May raise InstallException"""
+    exception = None
+
     try:
       user = install_sample_user()
       self._install_tables(user, options['app_name'])
+    except Exception, ex:
+      exception = ex
+
+    try:
       self._install_queries(user, options['app_name'])
     except Exception, ex:
-      LOG.exception(ex)
-      raise InstallException(ex)
-    finally:
-      Document.objects.sync()
+      exception = ex
+
+    Document.objects.sync()
+
+    if exception is not None:
+      raise exception
 
   def _install_tables(self, django_user, app_name):
     data_dir = beeswax.conf.LOCAL_EXAMPLES_DATA_DIR.get()
@@ -68,8 +75,7 @@ class Command(NoArgsCommand):
       try:
         table.install(django_user)
       except Exception, ex:
-        LOG.exception(ex)
-        LOG.error('Could not install table: %s' % (ex,))
+        raise InstallException(_('Could not install table: %s') % ex)
 
   def _install_queries(self, django_user, app_name):
     design_file = file(os.path.join(beeswax.conf.LOCAL_EXAMPLES_DATA_DIR.get(), 'designs.json'))
@@ -83,8 +89,7 @@ class Command(NoArgsCommand):
       try:
         design.install(django_user)
       except Exception, ex:
-        LOG.exception(ex)
-        LOG.error('Could not install query: %s' % (ex,))
+        raise InstallException(_('Could not install query: %s') % ex)
 
 
 class SampleTable(object):
@@ -175,9 +180,6 @@ class SampleDesign(object):
     try:
       # Don't overwrite
       model = SavedQuery.objects.get(owner=django_user, name=self.name, type=self.type)
-      msg = _('Sample design %(name)s already exists.') % {'name': self.name}
-      LOG.error(msg)
-      raise InstallException(msg)
     except SavedQuery.DoesNotExist:
       model = SavedQuery(owner=django_user, name=self.name)
       model.type = self.type
