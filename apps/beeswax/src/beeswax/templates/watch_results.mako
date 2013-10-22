@@ -208,7 +208,7 @@ ${layout.menubar(section='query')}
             </thead>
             <tbody>
               % for col in columns:
-                <tr><td>${col}</td></tr>
+                <tr><td><a href="javascript:void(0)" class="column-selector" data-column="${col}">${col}</a></td></tr>
               % endfor
             </tbody>
           </table>
@@ -357,6 +357,26 @@ $(document).ready(function () {
     $(this).hide();
     $(".sidebar-nav").parent().next().removeClass("span12").addClass("span9").removeClass("noLeftMargin");
     $(".sidebar-nav").parent().css("margin-left", "0");
+  });
+
+  $(document).on("click", ".column-selector", function () {
+    var _t = $(".resultTable");
+    var _col = _t.find("th:econtains(" + $(this).data("column") + ")");
+    _t.find(".columnSelected").removeClass("columnSelected");
+    _t.find("tr td:nth-child(" + (_col.index() + 1) + ")").addClass("columnSelected");
+    $("a[href='#results']").click();
+  });
+
+  $("a[data-toggle='tab']").on("shown", function (e) {
+    if ($(e.target).attr("href") == "#results" && $(e.relatedTarget).attr("href") == "#columns") {
+      if ($(".resultTable .columnSelected").length > 0) {
+        var _t = $(".resultTable");
+        var _col = _t.find("th:nth-child(" + ($(".resultTable .columnSelected").index() + 1) + ")");
+        _t.parent().animate({
+          scrollLeft: _col.position().left + _t.parent().scrollLeft() - _t.parent().offset().left - 30
+        }, 300);
+      }
+    }
   });
 
   resizeLogs();
