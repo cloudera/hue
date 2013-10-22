@@ -66,7 +66,7 @@ ${ fb_components.menubar() }
            <li><a id="refreshBtn"><i class="icon-refresh"></i> ${_('Refresh')}</a></li>
 
           <li class="nav-header">${_('Info')}</li>
-          <li>
+          <li class="white">
             <dl>
               <dt>${_('Last modified')}</dt>
               <dd>${date(datetime.datetime.fromtimestamp(stats['mtime']))} ${time(datetime.datetime.fromtimestamp(stats['mtime']))}</dd>
