@@ -15,10 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-try:
-  import json
-except ImportError:
-  import simplejson as json
+import json
 import logging
 import re
 import csv
@@ -36,11 +33,13 @@ from hbase import conf
 
 LOG = logging.getLogger(__name__)
 
-#format methods similar to Thrift API, for similarity with catch-all
+
+# Format methods similar to Thrift API, for similarity with catch-all
 class HbaseApi(object):
+
   def query(self, action, *args):
     try:
-      if hasattr(self,action):
+      if hasattr(self, action):
         return getattr(self, action)(*args)
       cluster = args[0]
       return self.queryCluster(action, cluster, *args[1:])
@@ -73,7 +72,7 @@ class HbaseApi(object):
       for cluster in clusters:
         if cluster["name"] == name:
           return cluster
-    except Exception, e:
+    except:
       pass
     raise PopupException(_("Cluster by the name of %s does not exist in configuration.") % name)
 
@@ -87,6 +86,14 @@ class HbaseApi(object):
                                   use_sasl=False,
                                   timeout_seconds=None)
 
+  def get(self, cluster, tableName, row, column, attributes):
+    client = self.connectCluster(cluster)
+    return client.get(tableName, smart_str(row), smart_str(column), attributes)
+
+  def getVerTs(self, cluster, tableName, row, column, timestamp, numVersions, attributesargs):
+    client = self.connectCluster(cluster)
+    return client.getVerTs(tableName, smart_str(row), smart_str(column), timestamp, numVersions, attributesargs)
+
   def createTable(self, cluster, tableName, *columns):
     client = self.connectCluster(cluster)
     client.createTable(tableName, [get_thrift_type('ColumnDescriptor')(name=column) for column in columns])
@@ -96,10 +103,10 @@ class HbaseApi(object):
     client = self.connectCluster(cluster)
     return [{'name': name,'enabled': client.isTableEnabled(name)} for name in client.getTableNames()]
 
-  def getRows(self, cluster, tableName, columns, startRowKey, numRows, prefix = False):
+  def getRows(self, cluster, tableName, columns, startRowKey, numRows, prefix=False):
     client = self.connectCluster(cluster)
     if prefix == False:
-      scanner = client.scannerOpen(tableName, startRowKey, columns, None)
+      scanner = client.scannerOpen(tableName, smart_str(startRowKey), columns, None)
     else:
       scanner = client.scannerOpenWithPrefix(tableName, smart_str(startRowKey), columns, None)
     data = client.scannerGetList(scanner, numRows)
@@ -107,12 +114,14 @@ class HbaseApi(object):
     return data
 
   def getAutocompleteRows(self, cluster, tableName, numRows, query):
+    query = smart_str(query)
     try:
       client = self.connectCluster(cluster)
       scan = get_thrift_type('TScan')(startRow=query, stopRow=None, timestamp=None, columns=[], caching=None, filterString="PrefixFilter('" + query + "') AND ColumnPaginationFilter(1,0)", batchSize=None)
       scanner = client.scannerOpenWithScan(tableName, scan, None)
       return [result.row for result in client.scannerGetList(scanner, numRows)]
-    except:
+    except Exception, e:
+      LOG.error('Autocomplete error: %s' % smart_str(e))
       return []
 
   def getRow(self, cluster, tableName, columns, startRowKey):
@@ -123,7 +132,7 @@ class HbaseApi(object):
 
   def getRowsFull(self, cluster, tableName, startRowKey, numRows):
     client = self.connectCluster(cluster)
-    return self.getRows(cluster, tableName, [column for column in client.getColumnDescriptors(tableName)], startRowKey, numRows)
+    return self.getRows(cluster, tableName, [smart_str(column) for column in client.getColumnDescriptors(tableName)], smart_str(startRowKey), numRows)
 
   def getRowFull(self, cluster, tableName, startRowKey, numRows):
     row = self.getRowsFull(cluster, tableName, smart_str(startRowKey), 1)
@@ -144,7 +153,7 @@ class HbaseApi(object):
     return client.mutateRow(tableName, smart_str(row), mutations, None)
 
   def deleteColumn(self, cluster, tableName, row, column):
-    return self.deleteColumns(cluster, tableName, smart_str(row), [column])
+    return self.deleteColumns(cluster, tableName, smart_str(row), [smart_str(column)])
 
   def putRow(self, cluster, tableName, row, data):
     client = self.connectCluster(cluster)
@@ -200,4 +209,3 @@ class HbaseApi(object):
       batches += [BatchMutation(row=row_key, mutations=mutations)]
     client.mutateRows(tableName, batches, None)
     return True
-
