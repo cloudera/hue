@@ -334,7 +334,8 @@ ${layout.menubar(section='query')}
 
     <div class="span2" id="navigator">
       <div class="card card-small">
-        <a href="#" title="${_('Double click on a table name or field to insert it in the editor')}" rel="tooltip" data-placement="left" class="pull-right" style="margin:10px"><i class="icon-question-sign"></i></a>
+        <a href="#" title="${_('Double click on a table name or field to insert it in the editor')}" rel="tooltip" data-placement="left" class="pull-right" style="margin:10px;margin-left: 0"><i class="icon-question-sign"></i></a>
+        <a id="refreshNavigator" href="#" title="${_('Manually refresh the table list')}" rel="tooltip" data-placement="left" class="pull-right" style="margin:10px"><i class="icon-refresh"></i></a>
         <h1 class="card-heading simple">${_('Navigator')}</h1>
         <div class="card-body">
           <p>
@@ -496,14 +497,27 @@ ${layout.menubar(section='query')}
     display: none;
   }
 
+  .tooltip.left {
+    margin-left: -13px;
+  }
+
 </style>
 
 <script src="/static/ext/js/jquery/plugins/jquery-fieldselection.js" type="text/javascript"></script>
 <script src="/beeswax/static/js/autocomplete.utils.js" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript" charset="utf-8">
+    var codeMirror, renderNavigator, resetNavigator;
+
     var HIVE_AUTOCOMPLETE_BASE_URL = "${ autocomplete_base_url | n,unicode }";
-    var codeMirror;
+    var HIVE_AUTOCOMPLETE_FAILS_SILENTLY_ON = [500]; // error codes from beeswax/views.py - autocomplete
+
+    var HIVE_AUTOCOMPLETE_GLOBAL_CALLBACK = function (data) {
+      if (data != null && data.error) {
+        resetNavigator();
+      }
+    };
+
     $(document).ready(function(){
 
       ## If no particular query is loaded
@@ -530,9 +544,14 @@ ${layout.menubar(section='query')}
         }, 300);
       });
 
-      renderNavigator();
+      resetNavigator = function () {
+        var _db = $("#id_query-database").val();
+        $.totalStorage('tables_' + _db, null);
+        $.totalStorage('timestamp_tables_' + _db, null);
+        renderNavigator();
+      }
 
-      function renderNavigator() {
+      renderNavigator = function () {
         $("#navigatorTables").empty();
         $("#navigatorLoader").show();
         hac_getTables($("#id_query-database").val(), function (data) {  //preload tables for the default db
@@ -579,6 +598,13 @@ ${layout.menubar(section='query')}
                   success: function (data) {
                     $("#navigatorQuicklook").find(".loader").hide();
                     $("#navigatorQuicklook").find(".sample").html(data);
+                  },
+                  error: function (e) {
+                    if (e.status == 500){
+                      resetNavigator();
+                      $(document).trigger("error", "${ _('There was a problem loading the table preview.') }");
+                      $("#navigatorQuicklook").modal("hide");
+                    }
                   }
                 });
                 $("#navigatorQuicklook").modal("show");
@@ -597,6 +623,13 @@ ${layout.menubar(section='query')}
           }
         });
       }
+
+      renderNavigator();
+
+      $("#refreshNavigator").on("click", function(){
+        resetNavigator();
+      });
+
 
       $("#navigator .card").css("min-height", ($(window).height() - 130) + "px");
       $("#navigatorTables").css("max-height", ($(window).height() - 260) + "px").css("overflow-y", "auto");

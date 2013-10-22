@@ -80,6 +80,9 @@ function hac_getTableColumns(databaseName, tableName, textScanned, callback) {
         database: databaseName,
         table: tableName,
         onDataReceived: function (data) {
+          if (typeof HIVE_AUTOCOMPLETE_GLOBAL_CALLBACK == "function") {
+            HIVE_AUTOCOMPLETE_GLOBAL_CALLBACK(data);
+          }
           if (data.error) {
             if (typeof HIVE_AUTOCOMPLETE_FAILS_SILENTLY_ON == "undefined" || data.code == null || HIVE_AUTOCOMPLETE_FAILS_SILENTLY_ON.indexOf(data.code) == -1){
               $(document).trigger('error', data.error);
@@ -99,6 +102,9 @@ function hac_getTableColumns(databaseName, tableName, textScanned, callback) {
       database: databaseName,
       table: tableName,
       onDataReceived: function (data) {
+        if (typeof HIVE_AUTOCOMPLETE_GLOBAL_CALLBACK == "function") {
+          HIVE_AUTOCOMPLETE_GLOBAL_CALLBACK(data);
+        }
         if (data.error) {
           if (typeof HIVE_AUTOCOMPLETE_FAILS_SILENTLY_ON == "undefined" || data.code == null || HIVE_AUTOCOMPLETE_FAILS_SILENTLY_ON.indexOf(data.code) == -1){
             $(document).trigger('error', data.error);
@@ -132,6 +138,9 @@ function hac_getTables(databaseName, callback) {
       hac_jsoncalls({
         database: databaseName,
         onDataReceived: function (data) {
+          if (typeof HIVE_AUTOCOMPLETE_GLOBAL_CALLBACK == "function") {
+            HIVE_AUTOCOMPLETE_GLOBAL_CALLBACK(data);
+          }
           if (data.error) {
             if (typeof HIVE_AUTOCOMPLETE_FAILS_SILENTLY_ON == "undefined" || data.code == null || HIVE_AUTOCOMPLETE_FAILS_SILENTLY_ON.indexOf(data.code) == -1){
               $(document).trigger('error', data.error);
@@ -149,6 +158,9 @@ function hac_getTables(databaseName, callback) {
     hac_jsoncalls({
       database: databaseName,
       onDataReceived: function (data) {
+        if (typeof HIVE_AUTOCOMPLETE_GLOBAL_CALLBACK == "function") {
+          HIVE_AUTOCOMPLETE_GLOBAL_CALLBACK(data);
+        }
         if (data.error) {
           if (typeof HIVE_AUTOCOMPLETE_FAILS_SILENTLY_ON == "undefined" || data.code == null || HIVE_AUTOCOMPLETE_FAILS_SILENTLY_ON.indexOf(data.code) == -1){
             $(document).trigger('error', data.error);
