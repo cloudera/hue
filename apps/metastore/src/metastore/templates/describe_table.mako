@@ -154,6 +154,7 @@ ${ components.menubar() }
                       </tr>
                      % endfor
                   </tbody>
+                </table>
               </div>
             </div>
           </p>
@@ -234,13 +235,13 @@ ${ components.menubar() }
           "sZeroRecords": "${_('No matching records')}",
         }
       });
-    })
+    });
 
     $("#import-data-btn").click(function () {
       $.get("${ url('metastore:load_table', database=database, table=table.name) }", function (response) {
-            $("#import-data-modal").html(response['data']);
-            $("#import-data-modal").modal("show");
-          }
+          $("#import-data-modal").html(response['data']);
+          $("#import-data-modal").modal("show");
+        }
       );
     });
   });
