@@ -214,7 +214,7 @@ ${ layout.metastore_menubar() }
 
     $(".dataSample").each(function () {
       var _val = $.trim($(this).text());
-      var _field = $(this).siblings().find("select#id_cols-0-column_type");
+      var _field = $(this).siblings().find("select[id^=id_cols-]");
       var _foundType = "string";
       if ($.isNumeric(_val)) {
         _val = _val * 1;
@@ -245,7 +245,7 @@ ${ layout.metastore_menubar() }
       }
     });
 
-    $("select#id_cols-0-column_type").each(function () {
+    $("select[id^=id_cols-]").each(function () {
       $(this).val($(this).data("possibleType"));
     });
 
