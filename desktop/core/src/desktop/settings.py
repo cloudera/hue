@@ -252,6 +252,7 @@ else:
     "PASSWORD" : desktop.conf.DATABASE.PASSWORD.get(),
     "HOST" : desktop.conf.DATABASE.HOST.get(),
     "PORT" : str(desktop.conf.DATABASE.PORT.get()),
+    "OPTIONS": desktop.conf.DATABASE.OPTIONS.get(),
     # DB used for tests
     "TEST_NAME" : get_desktop_root('desktop-test.db')
   }

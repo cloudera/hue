@@ -68,6 +68,7 @@ pytype = type
 from desktop.lib.paths import get_desktop_root, get_build_dir
 
 import configobj
+import json
 import logging
 import os
 import textwrap
@@ -81,7 +82,7 @@ GLOBAL_CONFIG = None
 
 LOG = logging.getLogger(__name__)
 
-__all__ = ["UnspecifiedConfigSection", "ConfigSection", "Config", "load_confs", "coerce_bool", "coerce_csv"]
+__all__ = ["UnspecifiedConfigSection", "ConfigSection", "Config", "load_confs", "coerce_bool", "coerce_csv", "coerce_json_dict"]
 
 class BoundConfig(object):
   def __init__(self, config, bind_to, grab_key=_ANONYMOUS, prefix=''):
@@ -619,6 +620,12 @@ def coerce_csv(value):
     return value
   raise Exception("Could not coerce %r to csv array." % value)
 
+def coerce_json_dict(value):
+  if isinstance(value, basestring):
+    return json.loads(value)
+  elif isinstance(value, dict):
+    return value
+  raise Exception("Could not coerce %r to json dictionary." % value)
 
 def validate_path(confvar, is_dir=None, fs=os.path, message='Path does not exist on the filesystem.'):
   """
