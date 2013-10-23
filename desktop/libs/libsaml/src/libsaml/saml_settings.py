@@ -30,12 +30,15 @@ BASE_URL = "%(protocol)s%(host)s:%(port)d" % {
   'port':  desktop.conf.HTTP_PORT.get()
 }
 
+ENTITY_ID = libsaml.conf.ENTITY_ID.get().replace('<base_url>', BASE_URL)
+
+
 SAML_CONFIG = {
   # full path to the xmlsec1 binary programm
   'xmlsec_binary': libsaml.conf.XMLSEC_BINARY.get(),
 
   # your entity id, usually your subdomain plus the url to the metadata view
-  'entityid': "%s/saml2/metadata/" % BASE_URL,
+  'entityid': ENTITY_ID,
 
   # directory with attribute mapping
   'attribute_map_dir': libsaml.conf.ATTRIBUTE_MAP_DIR.get(),
