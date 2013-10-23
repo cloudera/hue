@@ -188,18 +188,23 @@ ${field.label_tag() | n}
     href="?q-page=${num}&${filter_params}"
   % endif
 </%def>
+
 <%def name="prevpage(page)">
   ${pageref(page.previous_page_number())}
 </%def>
+
 <%def name="nextpage(page)">
   ${pageref(page.next_page_number())}
 </%def>
+
 <%def name="toppage(page)">
   ${pageref(1)}
 </%def>
+
 <%def name="bottompage(page)">
   ${pageref(page.num_pages())}
 </%def>
+
 <%def name="pagination(page)">
     <div class="pagination">
         <ul class="pull-right">

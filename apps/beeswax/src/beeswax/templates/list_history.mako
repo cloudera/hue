@@ -13,6 +13,7 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
+
 <%!
 import time
 from desktop.views import commonheader, commonfooter
@@ -150,7 +151,7 @@ ${ layout.menubar(section='history') }
             </tbody>
           </table>
 
-                ${comps.pagination(page)}
+                ${ comps.pagination(page) }
               </p>
             </div>
           </div>

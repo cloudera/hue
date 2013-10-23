@@ -1358,7 +1358,7 @@ def _list_query_history(user, querydict, page_size, prefix=""):
     _update_query_state(history.get_full_object())
 
   # We need to pass the parameters back to the template to generate links
-  keys_to_copy = [ prefix + key for key in ('user', 'type', 'sort', 'design_id', 'auto_query') ]
+  keys_to_copy = [ prefix + key for key in ('user', 'type', 'sort', 'design_id', 'auto_query', 'search') ]
   filter_params = copy_query_dict(querydict, keys_to_copy)
 
   return page, filter_params
