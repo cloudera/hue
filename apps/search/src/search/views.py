@@ -49,7 +49,12 @@ def index(request):
     else:
       return no_collections(request)
 
-  initial_collection = request.COOKIES.get('hueSearchLastCollection', 0)
+  initial_collection = request.COOKIES.get('hueSearchLastCollection', hue_collections[0].id)
+  try:
+    Collection.objects.get(id=initial_collection)
+  except Exception, e:
+    initial_collection = hue_collections[0].id
+
   search_form = QueryForm(request.GET, initial_collection=initial_collection)
   response = {}
   error = {}

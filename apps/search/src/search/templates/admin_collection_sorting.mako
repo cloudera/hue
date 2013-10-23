@@ -159,7 +159,13 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
       return new SortingField(obj.field, obj.label, obj.asc, obj.include);
     }));
 
-    self.sortingFieldsList = ko.observableArray(${ hue_collection.fields(user) | n,unicode });
+    var _cleanedFields = ko.utils.arrayFilter(${ hue_collection.fields_data(user) | n,unicode }, function (fieldObj) {
+      return fieldObj.type != "multiValued";
+    });
+
+    self.sortingFieldsList = ko.observableArray(ko.utils.arrayMap(_cleanedFields, function (fieldObj) {
+      return fieldObj.name;
+    }));
 
     self.newFieldSelect = ko.observable();
     self.newFieldSelect.subscribe(function (newValue) {

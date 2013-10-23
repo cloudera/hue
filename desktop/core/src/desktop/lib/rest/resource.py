@@ -49,8 +49,9 @@ class Resource(object):
     """
     Decide whether the body should be a json dict or string
     """
-    if len(resp.content) != 0 and \
-          'application/json' in resp.headers['content-type']:
+
+    if len(resp.content) != 0 and resp.headers.get('content-type') and \
+          'application/json' in resp.headers.get('content-type'):
       try:
         return resp.json()
       except Exception, ex:
