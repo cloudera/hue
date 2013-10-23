@@ -18,12 +18,14 @@
 import json
 import os
 
-from django.utils.translation import ugettext_lazy as _t
+from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
 from desktop.lib.conf import Config, coerce_bool, coerce_csv
 
 
 BASEDIR = os.path.dirname(os.path.abspath(__file__))
+
+USERNAME_SOURCES = ('attributes', 'nameid')
 
 
 def dict_list_map(value):
@@ -116,3 +118,16 @@ LOGOUT_REQUESTS_SIGNED = Config(
   default=False,
   type=coerce_bool,
   help=_t("Have Hue initiated logout requests be signed and provide a certificate."))
+
+USERNAME_SOURCE = Config(
+  key="username_source",
+  default="attributes",
+  type=str,
+  help=_t("Username can be sourced from 'attributes' or 'nameid'"))
+
+
+def config_validator(user):
+  res = []
+  if USERNAME_SOURCE.get() not in USERNAME_SOURCES:
+    res.append(("libsaml.username_source", _("username_source not configured properly. SAML integration may not work.")))
+  return res
