@@ -43,6 +43,12 @@ XMLSEC_BINARY = Config(
   type=str,
   help=_t("Xmlsec1 binary path. This program should be executable by the user running Hue."))
 
+ENTITY_ID = Config(
+  key="entity_id",
+  default="<base_url>/saml2/metadata/",
+  type=str,
+  help=_t("Entity ID for Hue acting as service provider. Can also accept a pattern where '<base_url>' will be replaced with server URL base."))
+
 CREATE_USERS_ON_LOGIN = Config(
   key="create_users_on_login",
   default=True,
