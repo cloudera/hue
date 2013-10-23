@@ -40,14 +40,18 @@ ${ comps.menubar() }
     </div>
     <div class="span10">
       <div class="card card-small">
-        <h1 class="card-heading simple"></h1>
+        <h1 class="card-heading simple">${_('Loading...')}</h1>
           <div class="card-body">
             <p>
 
-             ${ _('The application might not be running yet or there is no Node Manager or Container available.') }
+              ${ _('The application might not be running yet or there is no Node Manager or Container available.') }
+              <strong>${ _('This page will be automatically refreshed.') }</strong>
 
-             <!--[if !IE]><!--><i class="icon-spinner icon-spin loader-main"></i><!--<![endif]-->
-             <!--[if IE]><img src="/hbase/static/art/loader.gif" /><![endif]-->
+              <br/>
+              <br/>
+
+              <!--[if !IE]><!--><i class="icon-spinner icon-spin" style="font-size: 60px; color: #DDD"></i><!--<![endif]-->
+              <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
             </p>
       </div>
     </div>

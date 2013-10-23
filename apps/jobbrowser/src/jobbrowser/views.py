@@ -262,7 +262,10 @@ def job_single_logs(request, job):
   if failed_tasks:
     task = failed_tasks[0]
   else:
-    recent_tasks = job.filter_tasks(task_states=('running', 'succeeded', 'scheduled'), task_types=('map', 'reduce',))
+    task_states = ['running', 'succeeded']
+    if job.is_mr2:
+      task_states.append('scheduled')
+    recent_tasks = job.filter_tasks(task_states=task_states, task_types=('map', 'reduce',))
     recent_tasks.sort(cmp_exec_time, reverse=True)
     if recent_tasks:
       task = recent_tasks[0]
