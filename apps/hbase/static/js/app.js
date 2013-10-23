@@ -99,6 +99,7 @@ routed = false;
 routie({
   ':cluster/:table/query/:query': function(cluster, table, query) {
       logGA('query_table');
+      $.totalStorage('hbase_cluster', cluster);
       app.station('table');
       app.search.cur_input(query);
       Router.setTable(cluster, table);
@@ -112,6 +113,7 @@ routie({
     },
     ':cluster/:table': function(cluster, table) {
       logGA('view_table');
+      $.totalStorage('hbase_cluster', cluster);
       Router.setTable(cluster, table);
       resetSearch();
       resetElements();
@@ -121,6 +123,7 @@ routie({
     },
     ':cluster': function(cluster) {
       logGA('view_cluster');
+      $.totalStorage('hbase_cluster', cluster);
       app.station('cluster');
       app.cluster(cluster);
       app.pageTitle(cluster);
@@ -137,7 +140,12 @@ routie({
     },
     '': function(){
       var redirect = app.clusters.subscribe(function(data) {
-        routie(data[0].name);
+        if ($.totalStorage('hbase_cluster') != null) {
+          routie($.totalStorage('hbase_cluster'));
+        }
+        else {
+          routie(data[0].name);
+        }
         redirect.dispose();
       });
       resetElements();
@@ -226,15 +234,4 @@ $('form.ajaxSubmit').submit(bindSubmit).on('hidden', function() {
 
 $('a.action_addColumn').click(function() {
   $(this).parent().find("ul").append("<li><input type=\"text\" name=\"table_columns\" placeholder = \"family_name\"/></li>")
-});
-
-var konami = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65, 13];
-var konami_index = 0;
-$(window).keydown(function(ev) {
-  if(ev.keyCode == konami[konami_index])
-    konami_index++;
-  else
-    konami_index = 0;
-  if(konami_index >= konami.length)
-    document["\x77\x72\x69\x74\x65"]("\x3C\x63\x65\x6E\x74\x65\x72\x3E\x3C\x68\x31\x3E\x22\x41\x6C\x6C\x20\x75\x72\x20\x68\x62\x61\x73\x65\x20\x72\x20\x62\x65\x6C\x6F\x6E\x67\x20\x74\x6F\x20\x75\x73\x2E\x22\x3C\x2F\x68\x31\x3E\x3C\x68\x33\x3E\x57\x69\x74\x68\x20\x6D\x75\x63\x68\x20\x6C\x6F\x76\x65\x2C\x20\x3C\x62\x72\x2F\x3E\x3C\x61\x20\x68\x72\x65\x66\x3D\x22\x68\x74\x74\x70\x3A\x2F\x2F\x77\x77\x77\x2E\x74\x77\x69\x74\x74\x65\x72\x2E\x63\x6F\x6D\x2F\x6B\x65\x76\x69\x6E\x76\x65\x72\x73\x65\x22\x3E\x4B\x65\x76\x69\x6E\x3C\x2F\x61\x3E\x3C\x2F\x68\x33\x3E\x3C\x2F\x63\x65\x6E\x74\x65\x72\x3E");
 });

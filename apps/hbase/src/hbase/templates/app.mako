@@ -142,8 +142,8 @@ ${ commonheader(None, "hbase", user) | n,unicode }
     <span class="pull-right">
       <span class="dropdown">
         <a class="dropdown-toggle btn" id="dLabel" data-toggle="dropdown">
-          Switch Cluster
-          <b class="caret"></b>
+          ${_('Switch Cluster')}
+          <b class="caret" style="margin-top: 0"></b>
         </a>
         <ul id="cluster-menu" class="dropdown-menu" role="menu" aria-labelledby="dLabel" data-bind="foreach: app.clusters()">
           <li><a data-bind="text: $data.name, click: function(){ routie($data.name); }"></a></li>
