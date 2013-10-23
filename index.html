@@ -24,7 +24,17 @@
           <li><a href="#home">Home</a></li>
           <li><a href="#tour">Applications</a></li>
           <li><a href="http://gethue.tumblr.com/tagged/release">Releases</a></li>
-          <li><a href="http://gethue.tumblr.com">Tutorials</a></li>
+          <li><a href="http://gethue.tumblr.com" style="padding-right: 0">Tutorials</a></li>
+          <li class="dropdown" style="margin-left: 0">
+              <a class="dropdown-toggle" role="button" data-toggle="dropdown" data-target="#" href="http://gethue.tumblr.com" style="padding-left: 6px">
+                <b class="caret"></b>
+              </a>
+              <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                <li><a href="http://gethue-fr.tumblr.com"><img src="static/images/flags/fr.gif" /> Tutoriels en Français</a></li>
+                <li><a href="http://gethue-it.tumblr.com"><img src="static/images/flags/it.gif" /> Guide in Italiano</a></li>
+                <li><a href="http://gethue-jp.tumblr.com"><img src="static/images/flags/jp.gif" /> 日本語チュートリアル</a></li>
+              </ul>
+          </li>
           <li><a href="http://twitter.com/gethue/" target="_blank"><i class="icon-twitter icon-large"></i></a></li>
         </ul>
       </div>
@@ -41,10 +51,8 @@
         <img id="feature-screenshot" src="static/images/shot.png" alt="screenshot">
       </div>
       <p>
-        <a id="downloadBtn" href="javascript:void(0)" class="big-btn big-btn-blue"><i
-                class="icon-download"></i> Download Hue</a>
-        <a href="https://github.com/cloudera/hue" target="_blank" class="big-btn big-btn-black"><i
-                class="icon-github"></i> View on Github</a>
+        <a id="downloadBtn" href="javascript:void(0)" class="big-btn big-btn-blue"><i class="icon-download"></i> Download Hue</a>
+        <a href="https://github.com/cloudera/hue" target="_blank" class="big-btn big-btn-black"><i class="icon-github"></i> View on Github</a>
       </p>
 
       <p><strong>Hue</strong> features a File Browser for HDFS, a Job Browser for MapReduce/YARN, an HBase Browser, query editors for
@@ -383,8 +391,7 @@
     <a id="subscribeBtn" class="btn btn-mini" value="Subscribe"><i class="icon-envelope-alt icon-large"></i> Subscribe</a>
       </form>
   </nav>
-  <p><strong>Hue</strong> is open source and released under the <a class="normal" href="http://www.apache.org/licenses/LICENSE-2.0"
-                                                        target="_blank">Apache License, version 2.0</a>.</p>
+  <p><strong>Hue</strong> is open source and released under the <a class="normal" href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank">Apache License, version 2.0</a>.</p>
   <p>Hue and the Hue logo are trademarks of Cloudera, Inc.</p>
 
 </footer>
@@ -396,15 +403,17 @@
   </div>
   <div class="modal-body">
     <div style="float: left; width: 705px">
-      <iframe id="videoFrame" src="http://player.vimeo.com/video/76063637" width="700" height="350" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
-      <a id="videoBlogLink" href="http://gethue.tumblr.com/post/63064228790/move-data-in-out-your-hadoop-cluster-with-the-sqoop" target="_blank"><i class="icon-external-link"></i> Read more about it...</a>
+      <iframe id="videoFrame" src="http://player.vimeo.com/video/76700456" width="700" height="350" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
+      <a id="videoBlogLink" href="http://gethue.tumblr.com/post/64707633719/hadoop-tutorial-use-pig-and-hive-with-hbase" target="_blank"><i class="icon-external-link"></i> Read more about it...</a>
     </div>
     <div style="float: left; width: 187px;">
       <div class="videoNavigator" data-direction="up">
         <i class="icon-caret-up"></i>
       </div>
       <ul class="videoList unstyled" style="height: 300px; overflow-y: scroll">
-        <li class="active" data-video="http://player.vimeo.com/video/76063637">The new Sqoop 2 app</li>
+        <li class="active" data-video="http://player.vimeo.com/video/76700456" data-blog="http://gethue.tumblr.com/post/64707633719/hadoop-tutorial-use-pig-and-hive-with-hbase">Use Pig and Hive with HBase</li>
+        <li data-video="http://player.vimeo.com/video/76519513" data-blog="http://gethue.tumblr.com/post/63988110361/hadoop-tutorial-bundle-oozie-coordinators-with-hue">Bundle Oozie coordinators with Hue</li>
+        <li data-video="http://player.vimeo.com/video/76063637" data-blog="http://gethue.tumblr.com/post/63064228790/move-data-in-out-your-hadoop-cluster-with-the-sqoop">The new Sqoop 2 app</li>
         <li data-video="http://player.vimeo.com/video/75493693" data-blog="http://gethue.tumblr.com/post/62452792255/fast-sql-with-the-impala-query-editor">The Impala web UI</li>
         <li data-video="http://player.vimeo.com/video/75212274" data-blog="http://gethue.tumblr.com/post/62273866476/sso-with-hue-new-saml-backend">SSO via SAML in Hue</li>
         <li data-video="http://player.vimeo.com/video/74378529" data-blog="http://gethue.tumblr.com/post/61597968730/hadoop-tutorials-ii-3-schedule-hive-queries-with">Schedule Hive queries with Oozie coordinators</li>

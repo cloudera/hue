@@ -131,6 +131,19 @@ h4 {
   text-shadow: 0 1px 0 #ffffff;
 }
 
+.dropdown-menu li a {
+  text-align: left!important;
+}
+.dropdown-menu li a:hover {
+  color: #FFFFFF!important;
+  text-shadow: none!important;
+}
+
+.dropdown-menu li {
+  margin-left: 0!important;
+  text-align: left;
+}
+
 .navbar .nav .active a:hover,
 .footer-box .active a:hover {
   color: #4fb6e9;
