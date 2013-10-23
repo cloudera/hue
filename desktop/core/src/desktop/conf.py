@@ -22,8 +22,9 @@ import stat
 
 from django.utils.translation import ugettext_lazy as _
 
-from desktop.lib.conf import Config, ConfigSection, UnspecifiedConfigSection
-from desktop.lib.conf import coerce_bool, coerce_csv, validate_path
+from desktop.lib.conf import Config, ConfigSection, UnspecifiedConfigSection,\
+                             coerce_bool, coerce_csv, coerce_json_dict,\
+                             validate_path
 from desktop.lib.i18n import force_unicode
 from desktop.lib.paths import get_desktop_root
 
@@ -207,6 +208,12 @@ DATABASE = ConfigSection(
       type=int,
       default=0,
     ),
+    OPTIONS=Config(
+      key='options',
+      help=_('Database options to send to the server when connecting.'),
+      type=coerce_json_dict,
+      default='{}'
+    )
   )
 )
 
