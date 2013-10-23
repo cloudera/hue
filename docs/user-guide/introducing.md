@@ -4,10 +4,11 @@
 Introducing Hue
 ===============
 
-Hue is a set of web applications that enable you to interact with a CDH
-cluster. Hue applications let you browse HDFS, manage a Hive metastore,
-and run Hive and Cloudera Impala queries, HBase and Sqoop commands, Pig
-scripts, MapReduce jobs, and Oozie workflows.
+Hue is a set of web applications that enable you to interact with a Hadoop
+cluster. Hue applications let you browse HDFS and jobs, manage a Hive metastore,
+run Hive, Cloudera Impala queries and Pig scripts, browse HBase,
+export data with Sqoop, submit MapReduce programs, build custom search engines
+with Solr, and schedule repetitive workflows with Oozie.
 
 Hue Architecture
 ----------------
