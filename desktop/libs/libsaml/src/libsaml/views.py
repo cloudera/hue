@@ -17,11 +17,18 @@
 
 from djangosaml2.views import login, echo_attributes, metadata, assertion_consumer_service
 
+import libsaml.conf
+
 
 __all__ = ['login', 'echo_attributes', 'assertion_consumer_service', 'metadata']
 
 
+def acs(request, config_loader_path=None, attribute_mapping=None, create_unknown_user=None):
+  username_source = libsaml.conf.USERNAME_SOURCE.get().lower()
+  return assertion_consumer_service(request, config_loader_path, attribute_mapping, create_unknown_user, username_source)
+
+
 setattr(login, 'login_notrequired', True)
 setattr(echo_attributes, 'login_notrequired', True)
-setattr(assertion_consumer_service, 'login_notrequired', True)
+setattr(acs, 'login_notrequired', True)
 setattr(metadata, 'login_notrequired', True)
