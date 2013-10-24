@@ -81,12 +81,13 @@ class LdapTestConnection(object):
     self._instance.groups[group]['posix_members'].remove(user)
 
   def find_users(self, username_pattern, search_attr=None, user_name_attr=None, find_by_dn=False, scope=ldap.SCOPE_SUBTREE):
-    """ Returns info for a particular user """
+    """ Returns info for a particular user via a case insensitive search """
     if find_by_dn:
       data = filter(lambda attrs: attrs['dn'] == username_pattern, self._instance.users.values())
     else:
       username_pattern = "^%s$" % username_pattern.replace('.','\\.').replace('*', '.*')
-      usernames = filter(lambda username: re.match(username_pattern, username), self._instance.users.keys())
+      username_fsm = re.compile(username_pattern, flags=re.I)
+      usernames = filter(lambda username: username_fsm.match(username), self._instance.users.keys())
       data = [self._instance.users.get(username) for username in usernames]
     return data
 
@@ -658,6 +659,16 @@ def test_useradmin_ldap_user_integration():
   assert_equal(get_profile(curly).creation_method, str(UserProfile.CreationMethod.EXTERNAL))
   assert_equal(2, curly.groups.all().count(), curly.groups.all())
 
+  reset_all_users()
+  reset_all_groups()
+
+  # Test import case sensitivity
+  reset = desktop.conf.LDAP.IGNORE_USERNAME_CASE.set_for_testing(True)
+  import_ldap_users('Lårry', sync_groups=False, import_by_dn=False)
+  assert_false(User.objects.filter(username='Lårry').exists())
+  assert_true(User.objects.filter(username='lårry').exists())
+  reset()
+
 
 def test_add_ldap_users():
   URL = reverse(add_ldap_users)
@@ -682,6 +693,19 @@ def test_add_ldap_users():
   # Test wild card
   response = c.post(URL, dict(username_pattern='*r*', password1='test', password2='test'))
   assert_true('/useradmin/users' in response['Location'], response)
+
+  # Test ignore case
+  reset = desktop.conf.LDAP.IGNORE_USERNAME_CASE.set_for_testing(True)
+  User.objects.filter(username='moe').delete()
+  assert_false(User.objects.filter(username='Moe').exists())
+  assert_false(User.objects.filter(username='moe').exists())
+  response = c.post(URL, dict(username_pattern='Moe', password1='test', password2='test'))
+  assert_true('Location' in response, response)
+  assert_true('/useradmin/users' in response['Location'], response)
+  assert_false(User.objects.filter(username='Moe').exists())
+  assert_true(User.objects.filter(username='moe').exists())
+  reset()
+
 
 def test_add_ldap_groups():
   URL = reverse(add_ldap_groups)

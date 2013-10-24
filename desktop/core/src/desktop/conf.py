@@ -380,6 +380,10 @@ LDAP = ConfigSection(
       help=_("Create users when they login with their LDAP credentials."),
       type=coerce_bool,
       default=True),
+    IGNORE_USERNAME_CASE = Config("ignore_username_case",
+      help=_("Ignore the case of usernames when searching for existing users in Hue."),
+      type=coerce_bool,
+      default=False),
 
     USERS = ConfigSection(
       key="users",
