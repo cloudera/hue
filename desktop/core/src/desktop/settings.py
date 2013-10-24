@@ -169,6 +169,11 @@ TEMPLATE_CONTEXT_PROCESSORS = (
   'desktop.context_processors.app_name',
 )
 
+# Activate l10n
+LOCALE_PATHS = (
+  get_desktop_root('../apps/beeswax/src/beeswax/locale'),
+)
+
 
 # Desktop doesn't use an auth profile module, because
 # because it doesn't mesh very well with the notion
