@@ -184,7 +184,7 @@ class Submission(object):
     # Automatic setup of the required directories if needed
     create_directories(self.fs)
 
-    if self.user != self.job.owner:      
+    if self.user != self.job.owner:
       path = Hdfs.join(REMOTE_DEPLOYMENT_DIR.get(), '_%s_-oozie-%s-%s' % (self.user.username, self.job.id, time.time()))
       self.fs.copy_remote_dir(self.job.deployment_dir, path, owner=self.user, dir_mode=0711)
     else:
@@ -217,31 +217,29 @@ class Submission(object):
 
   def _copy_files(self, deployment_dir, oozie_xml):
     """
-    Copy the files over to the deployment directory. This should run as the
-    design owner.
+    Copy XML and the jar_path files from Java or MR actions to the deployment directory.
+    This should run as the workflow user.
     """
     xml_path = self.fs.join(deployment_dir, self.job.get_application_filename())
     self.fs.create(xml_path, overwrite=True, permission=0644, data=oozie_xml)
     LOG.debug("Created %s" % (xml_path,))
 
-    # Copy the files over
+    # List jar files
     files = []
+    lib_path = self.fs.join(deployment_dir, 'lib')
     if hasattr(self.job, 'node_list'):
       for node in self.job.node_list:
-        if hasattr(node, 'jar_path') and node.jar_path.startswith('/'):
+        if hasattr(node, 'jar_path') and not node.jar_path.startswith(lib_path):
           files.append(node.jar_path)
 
+    # Copy the jar files to the workspace lib
     if files:
-      lib_path = self.fs.join(deployment_dir, 'lib')
-      if self.fs.exists(lib_path):
-        LOG.debug("Cleaning up old %s" % (lib_path,))
-        self.fs.rmtree(lib_path)
-
-      self.fs.mkdir(lib_path, 0755)
-      LOG.debug("Created %s" % (lib_path,))
-
-      for file in files:
-        self.fs.copyfile(file, self.fs.join(lib_path, self.fs.basename(file)))
+      for jar_file in files:
+        LOG.debug("Updating %s" % jar_file)
+        jar_lib_path = self.fs.join(lib_path, self.fs.basename(jar_file))
+        if self.fs.exists(jar_lib_path):
+          self.fs.remove(jar_lib_path, skip_trash=True)
+        self.fs.copyfile(jar_file, jar_lib_path)
 
   def _do_as(self, username, fn, *args, **kwargs):
     prev_user = self.fs.user
