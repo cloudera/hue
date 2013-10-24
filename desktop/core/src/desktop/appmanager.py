@@ -185,6 +185,10 @@ class DesktopModuleInfo(object):
   def settings(self):
     return self._submodule("settings")
 
+  @property
+  def locale_path(self):
+    return os.path.join(os.path.dirname(self.module.__file__), 'locale')
+
   def _submodule(self, name):
     return _import_module_or_none(self.module.__name__ + "." + name)
 

@@ -157,6 +157,10 @@ INSTALLED_APPS = [
     'desktop'
 ]
 
+LOCALE_PATHS = [
+  'desktop'
+]
+
 # Keep default values up to date
 TEMPLATE_CONTEXT_PROCESSORS = (
   'django.contrib.auth.context_processors.auth',
@@ -167,11 +171,6 @@ TEMPLATE_CONTEXT_PROCESSORS = (
   'django.contrib.messages.context_processors.messages',
    # Not default
   'desktop.context_processors.app_name',
-)
-
-# Activate l10n
-LOCALE_PATHS = (
-  get_desktop_root('../apps/beeswax/src/beeswax/locale'),
 )
 
 
@@ -205,9 +204,13 @@ _config_dir = os.getenv("HUE_CONF_DIR", get_desktop_root("conf"))
 appmanager.load_libs()
 _lib_conf_modules = [dict(module=app.conf, config_key=None) for app in appmanager.DESKTOP_LIBS if app.conf is not None]
 
+# Activate l10n
+# Install apps
 appmanager.load_apps()
 for app in appmanager.DESKTOP_APPS:
   INSTALLED_APPS.extend(app.django_apps)
+  LOCALE_PATHS.append(app.locale_path)
+
 
 logging.debug("Installed Django modules: %s" % ",".join(map(str, appmanager.DESKTOP_MODULES)))
 
