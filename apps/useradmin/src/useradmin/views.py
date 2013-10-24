@@ -516,7 +516,7 @@ def _import_ldap_users_info(user_info, sync_groups=False, import_by_dn=False):
   """
   imported_users = []
   for ldap_info in user_info:
-    user, created = User.objects.get_or_create(username=ldap_info['username'])
+    user, created = ldap_access.get_or_create_ldap_user(username=ldap_info['username'])
     profile = get_profile(user)
     if not created and profile.creation_method == str(UserProfile.CreationMethod.HUE):
       # This is a Hue user, and shouldn't be overwritten
@@ -622,7 +622,7 @@ def _import_ldap_groups(groupname_pattern, import_members=False, recursive_impor
         else:
           for ldap_info in user_info:
             try:
-              user = User.objects.get(username=ldap_info['username'])
+              user = ldap_access.get_ldap_user(username=ldap_info['username'])
               users.append(user)
             except User.DoesNotExist:
               pass
@@ -650,7 +650,7 @@ def _import_ldap_groups(groupname_pattern, import_members=False, recursive_impor
         else:
           for ldap_info in user_info:
             try:
-              user = User.objects.get(username=ldap_info['username'])
+              user = ldap_access.get_ldap_user(username=ldap_info['username'])
               users.append(user)
             except User.DoesNotExist:
               pass

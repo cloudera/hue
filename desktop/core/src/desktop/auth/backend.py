@@ -37,6 +37,7 @@ from django.utils.importlib import import_module
 from django.core.exceptions import ImproperlyConfigured
 from useradmin.models import get_profile, get_default_user_group, UserProfile
 from useradmin.views import import_ldap_users
+from useradmin import ldap_access
 
 import pam
 from django_auth_ldap.backend import LDAPBackend, ldap_settings
@@ -283,7 +284,17 @@ class LdapBackend(object):
   """
   def __init__(self):
     # Delegate to django_auth_ldap.LDAPBackend
-    self._backend = LDAPBackend()
+    class _LDAPBackend(LDAPBackend):
+      def get_or_create_user(self, username, ldap_user):
+        if desktop.conf.LDAP.IGNORE_USERNAME_CASE.get():
+          try:
+            return User.objects.get(username__iexact=username), False
+          except User.DoesNotExist:
+            return User.objects.get_or_create(username=username)
+        else:
+          return User.objects.get_or_create(username=username)
+
+    self._backend = _LDAPBackend()
 
     ldap_settings.AUTH_LDAP_SERVER_URI = desktop.conf.LDAP.LDAP_URL.get()
     if ldap_settings.AUTH_LDAP_SERVER_URI is None:
@@ -325,20 +336,22 @@ class LdapBackend(object):
       ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_NEVER)
 
   def authenticate(self, username=None, password=None):
+    username_filter_kwargs = ldap_access.get_ldap_user_kwargs(username)
+
     # Do this check up here, because the auth call creates a django user upon first login per user
     is_super = False
     if not UserProfile.objects.filter(creation_method=str(UserProfile.CreationMethod.EXTERNAL)).exists():
       # If there are no LDAP users already in the system, the first one will
       # become a superuser
       is_super = True
-    elif User.objects.filter(username=username).exists():
+    elif User.objects.filter(**username_filter_kwargs).exists():
       # If the user already exists, we shouldn't change its superuser
       # privileges. However, if there's a naming conflict with a non-external
       # user, we should do the safe thing and turn off superuser privs.
-      existing_user = User.objects.get(username=username)
+      existing_user = User.objects.get(**username_filter_kwargs)
       existing_profile = get_profile(existing_user)
       if existing_profile.creation_method == str(UserProfile.CreationMethod.EXTERNAL):
-        is_super = User.objects.get(username=username).is_superuser
+        is_super = User.objects.get(**username_filter_kwargs).is_superuser
     elif not desktop.conf.LDAP.CREATE_USERS_ON_LOGIN.get():
       return None
 

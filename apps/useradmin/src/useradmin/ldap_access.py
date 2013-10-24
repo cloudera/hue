@@ -23,6 +23,8 @@ import ldap.filter
 import logging
 import re
 
+from django.contrib.auth.models import User
+
 import desktop.conf
 from desktop.lib.python_util import CaseInsensitiveDict
 
@@ -56,6 +58,32 @@ def get_ldap_username(username, nt_domain):
     return '%s@%s' % (username, nt_domain)
   else:
     return username
+
+
+def get_ldap_user_kwargs(username):
+  if desktop.conf.LDAP.IGNORE_USERNAME_CASE.get():
+    return {
+      'username__iexact': username
+    }
+  else:
+    return {
+      'username': username
+    }
+
+
+def get_ldap_user(username):
+  username_kwargs = get_ldap_user_kwargs(username)
+  return User.objects.get(**username_kwargs)
+
+
+def get_or_create_ldap_user(username):
+  username_kwargs = get_ldap_user_kwargs(username)
+  users = User.objects.filter(**username_kwargs)
+  if users.exists():
+    return User.objects.get(**username_kwargs), False
+  else:
+    return User.objects.create(username=username), True
+
 
 class LdapConnection(object):
   """
@@ -137,7 +165,7 @@ class LdapConnection(object):
 
           ldap_info = {
             'dn': dn,
-            'name': data[user_name_attr][0]
+            'username': data[user_name_attr][0]
           }
 
           if 'givenName' in data:
