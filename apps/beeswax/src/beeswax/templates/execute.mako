@@ -733,9 +733,9 @@ ${layout.menubar(section='query')}
 
       $("#saveQuery").click(function () {
         $("<input>").attr("type", "hidden").attr("name", "saveform-name")
-                .attr("value", $("#query-name").data('value')).appendTo($("#advancedSettingsForm"));
+                .attr("value", $("#query-name").text()).appendTo($("#advancedSettingsForm"));
         $("<input>").attr("type", "hidden").attr("name", "saveform-desc")
-                .attr("value", $("#query-description").data('value')).appendTo($("#advancedSettingsForm"));
+                .attr("value", $("#query-description").text()).appendTo($("#advancedSettingsForm"));
         $("<input>").attr("type", "hidden").attr("name", "saveform-save").attr("value", "Save").appendTo($("#advancedSettingsForm"));
         checkAndSubmit();
       });
