@@ -644,7 +644,7 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
     // Only ranges
     self.rangeFacetsList = ko.observableArray([]);
     $.each(self.fields(), function(index, field) {
-      if (self.fullFields[field] && ['tdate', 'date', 'tint', 'long'].indexOf(self.fullFields[field].type) >= 0) {
+      if (self.fullFields[field] && ['tdate', 'date', 'tint', 'int', 'tlong', 'long'].indexOf(self.fullFields[field].type) >= 0) {
         self.rangeFacetsList.push(field);
       }
     });
