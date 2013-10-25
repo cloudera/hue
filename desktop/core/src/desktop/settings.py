@@ -158,7 +158,7 @@ INSTALLED_APPS = [
 ]
 
 LOCALE_PATHS = [
-  'desktop'
+  get_desktop_root('core/src/desktop/locale')
 ]
 
 # Keep default values up to date
@@ -203,6 +203,7 @@ _config_dir = os.getenv("HUE_CONF_DIR", get_desktop_root("conf"))
 # Libraries are loaded and configured before the apps
 appmanager.load_libs()
 _lib_conf_modules = [dict(module=app.conf, config_key=None) for app in appmanager.DESKTOP_LIBS if app.conf is not None]
+LOCALE_PATHS.extend([app.locale_path for app in appmanager.DESKTOP_LIBS])
 
 # Activate l10n
 # Install apps
