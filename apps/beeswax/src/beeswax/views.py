@@ -436,6 +436,9 @@ def execute_query(request, design_id=None):
       form.bind()
     form.query.fields['database'].choices = databases # Could not do it in the form
 
+  if not databases:
+    request.error(_('No databases are available. Permissions could be missing.'))
+
   return render('execute.mako', request, {
     'action': action,
     'design': design,
@@ -1389,7 +1392,7 @@ def _get_db_choices(request):
   query_server = get_query_server_config(app_name)
   db = dbms.get(request.user, query_server)
   dbs = db.get_databases()
-  return ((db, db) for db in dbs)
+  return [(db, db) for db in dbs]
 
 WHITESPACE = re.compile("\s+", re.MULTILINE)
 def collapse_whitespace(s):
