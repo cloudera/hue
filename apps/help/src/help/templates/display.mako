@@ -22,7 +22,32 @@ def is_selected(section, matcher):
   else:
     return ""
 %>
-${ commonheader("Hue Help", "help", user, "70px") | n,unicode }
+${ commonheader("Hue Help", "help", user, "40px") | n,unicode }
+
+<style type="text/css">
+  .card h1, .card h2, .card h3, .card h4 {
+    color: #777777;
+  }
+
+  .card h1 {
+    font-size: 28px;
+    font-weight: 500;
+  }
+
+  .card h2 {
+    border-bottom: 1px solid #E5E5E5;
+    font-size: 24px;
+    font-weight: 300;
+    margin-top: 30px;
+  }
+
+  .card h3 {
+    font-size: 20px;
+    font-weight: 300;
+    margin-top: 20px;
+  }
+
+</style>
 
 <div class="container-fluid">
   <div class="row-fluid">
@@ -35,8 +60,12 @@ ${ commonheader("Hue Help", "help", user, "70px") | n,unicode }
         </ul>
       </div>
     </div>
-    <div class="span10 well">
-      ${content|n}
+    <div class="span10 card card-small">
+      <div class="card-body">
+        <p>
+          ${content|n}
+        </p>
+      </div>
     </div>
   </div>
 </div>
