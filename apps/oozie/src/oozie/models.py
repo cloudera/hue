@@ -1239,7 +1239,7 @@ class Coordinator(Job):
   frequency_unit = models.CharField(max_length=20, choices=FREQUENCY_UNITS, default='days', verbose_name=_t('Frequency unit'),
                                     help_text=_t('The unit of the rate at which data is periodically created.'))
   timezone = models.CharField(max_length=24, choices=TIMEZONES, default='America/Los_Angeles', verbose_name=_t('Timezone'),
-                              help_text=_t('The timezone of the coordinator.'))
+                              help_text=_t('The timezone of the coordinator. Only used for managing the daylight saving time changes when combining several coordinators.'))
   start = models.DateTimeField(default=datetime.today(), verbose_name=_t('Start'),
                                help_text=_t('When to start the first workflow.'))
   end = models.DateTimeField(default=datetime.today() + timedelta(days=3), verbose_name=_t('End'),
@@ -1433,7 +1433,7 @@ class Dataset(models.Model):
                                       'dataset instance. The URI consist of constants (e.g. ${YEAR}/${MONTH}) and '
                                       'configuration properties (e.g. /home/${USER}/projects/${PROJECT})'))
   timezone = models.CharField(max_length=24, choices=TIMEZONES, default='America/Los_Angeles', verbose_name=_t('Timezone'),
-                              help_text=_t('The timezone of the dataset.'))
+                              help_text=_t('The timezone of the dataset. Only used for managing the daylight saving time changes when combining several datasets.'))
   done_flag = models.CharField(max_length=64, blank=True, default='', verbose_name=_t('Done flag'),
                                help_text=_t('The done file for the data set. If the Done flag is not specified, then Oozie '
                                             'configures Hadoop to create a _SUCCESS file in the output directory. If Done '
