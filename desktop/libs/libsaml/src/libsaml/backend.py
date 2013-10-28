@@ -18,9 +18,10 @@
 See desktop/auth/backend.py
 """
 import logging
+from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.models import User
 from djangosaml2.backends import Saml2Backend as _Saml2Backend
-from djangosaml2.views import logout
+from djangosaml2.views import logout as saml_logout
 from desktop.auth.backend import rewrite_user
 from useradmin.models import get_profile, get_default_user_group, UserProfile
 
@@ -76,4 +77,6 @@ class SAML2Backend(_Saml2Backend):
     return True
 
   def logout(self, request, next_page=None):
-    return logout(request)
+    response = saml_logout(request)
+    auth_logout(request)
+    return response

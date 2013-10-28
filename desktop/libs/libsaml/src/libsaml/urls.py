@@ -15,15 +15,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django.conf.urls.defaults import patterns, handler500, url
+from django.conf.urls.defaults import patterns, url
 
 urlpatterns = patterns(
     'djangosaml2.views',
-    url(r'^logout/$', 'logout', name='saml2_logout'),
-    url(r'^ls/$', 'logout_service', name='saml2_ls')
+    url(r'^logout/$', 'logout', name='saml2_logout')
 )
 
 urlpatterns += patterns('libsaml.views',
+                        url(r'^ls/$', 'logout_service', name='saml2_ls'),
                         url(r'^acs/$', 'acs', name='saml2_acs'),
                         url(r'^login/$', 'login', name='saml2_login'),
                         url(r'^metadata/$', 'metadata', name='saml2_metadata'),
