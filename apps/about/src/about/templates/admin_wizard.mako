@@ -24,13 +24,13 @@ ${ commonheader(_('Quick Start'), "quickstart", user) | n,unicode }
 ${ header.menubar() }
 
 <div class="container-fluid">
-  <div class="row-fluid">
-    <div class="card card-small" style="margin-bottom: 100px;">
+  <div class="row-fluid" style="margin-bottom: 100px;">
+    <div class="card card-small">
       <h2 class="card-heading simple">
         % if user.is_superuser:
           ${ _('Quick Start Wizard') } -
         % endif
-        Hue ${version} - The Hadoop UI
+        Hue&trade; ${version} - The Hadoop UI
       </h2>
 
      % if user.is_superuser:
@@ -199,6 +199,7 @@ ${ header.menubar() }
       <div class="form-actions">
         <a id="backBtn" class="btn disabled">${ _('Back') }</a>
         <a id="nextBtn" class="btn btn-primary disable-feedback">${ _('Next') }</a>
+        <div class="pull-right muted">Hue and the Hue logo are trademarks of Cloudera, Inc.</div>
       </div>
       % else:
         <p>
@@ -227,9 +228,13 @@ ${ header.menubar() }
       position:fixed;
       bottom:0;
       margin:0;
-      margin-left:-20px;
-      width:100%;
+      left:0;
+      right:0;
     }
+  }
+
+  .footer {
+    text-align: center;
   }
 
 </style>
