@@ -44,8 +44,8 @@ from liboozie.types import WorkflowList, Workflow as OozieWorkflow, Coordinator 
 from oozie.models import Workflow, Node, Kill, Link, Job, Coordinator, History,\
   find_parameters, NODE_TYPES, Bundle
 from oozie.utils import workflow_to_dict, model_to_dict, smart_path
-from oozie.import_workflow import import_workflow
-from oozie.import_jobsub import convert_jobsub_design
+from oozie.importlib.workflows import import_workflow
+from oozie.importlib.jobdesigner import convert_jobsub_design
 
 
 
@@ -1541,18 +1541,33 @@ class TestEditor(OozieMockBase):
     <end name="end"/>
 </workflow-app>""")
     workflow_metadata_json = reformat_json("""{
-  "action-name-1": {
-    "jar_path": "/user/hue/oozie/examples/lib/hadoop-examples.jar"
+  "attributes": {
+    "deployment_dir": "/user/hue/oozie/workspaces/_test_-oozie-13-1383539302.62",
+    "description": ""
   },
-  "action-name-2": {
-    "jar_path": "/user/hue/oozie/examples/lib/hadoop-examples.jar"
+  "nodes": {
+    "action-name-1": {
+      "attributes": {
+        "jar_path": "/user/hue/oozie/examples/lib/hadoop-examples.jar"
+      }
+    },
+    "action-name-2": {
+      "attributes": {
+        "jar_path": "/user/hue/oozie/examples/lib/hadoop-examples.jar"
+      }
+    },
+    "action-name-3": {
+      "attributes": {
+        "jar_path": "/user/hue/oozie/examples/lib/hadoop-examples.jar"
+      }
+    }
   },
-  "action-name-3": {
-    "jar_path": "/user/hue/oozie/examples/lib/hadoop-examples.jar"
-  }
+  "version": "0.0.1"
 }""")
+    result_workflow_metadata_json = reformat_json(zfile.read('workflow-metadata.json'))
+    workflow_metadata_json = synchronize_workflow_attributes(workflow_metadata_json, result_workflow_metadata_json)
     assert_equal(workflow_xml, reformat_xml(zfile.read('workflow.xml')))
-    assert_equal(workflow_metadata_json, reformat_json(zfile.read('workflow-metadata.json')))
+    assert_equal(workflow_metadata_json, result_workflow_metadata_json)
 
 class TestEditorBundle(OozieMockBase):
 
@@ -2522,7 +2537,7 @@ class TestImportWorkflow04WithOozie(OozieBase):
     workflow = Workflow.objects.new_workflow(self.user)
     workflow.save()
     f = open('apps/oozie/src/oozie/test_data/0.4/test-subworkflow.xml')
-    import_workflow(workflow, f.read(), self.cluster.fs)
+    import_workflow(workflow, f.read(), None, self.cluster.fs)
     f.close()
     workflow.save()
     assert_equal(4, len(Node.objects.filter(workflow=workflow)))
@@ -3183,3 +3198,20 @@ def create_coordinator_data(coord, client):
                          {u'input-name': [u'input_dir'], u'input-dataset': [u'1']})
   data = json.loads(response.content)
   assert_equal(0, data['status'], data['data'])
+
+
+def synchronize_workflow_attributes(workflow_json, correct_workflow_json):
+  if isinstance(workflow_json, basestring):
+    workflow_dict = json.loads(workflow_json)
+  else:
+    workflow_dict = workflow_json
+
+  if isinstance(correct_workflow_json, basestring):
+    correct_workflow_dict = json.loads(correct_workflow_json)
+  else:
+    correct_workflow_dict = correct_workflow_json
+
+  if 'attributes' in workflow_dict and 'attributes' in correct_workflow_dict:
+    workflow_dict['attributes']['deployment_dir'] = correct_workflow_dict['attributes']['deployment_dir']
+
+  return reformat_json(workflow_dict)

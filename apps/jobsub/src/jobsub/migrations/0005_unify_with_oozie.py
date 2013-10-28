@@ -5,7 +5,7 @@ from django.utils.translation import ugettext as _
 from south.db import db
 from south.v2 import DataMigration
 from django.db import models
-from oozie.import_jobsub import convert_jobsub_design
+from oozie.importlib.jobdesigner import convert_jobsub_design
 from oozie.models import Workflow, Kill, Start, End
 
 

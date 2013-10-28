@@ -22,9 +22,7 @@ except ImportError:
   import simplejson as json
 import logging
 import shutil
-import StringIO
 import time
-import zipfile
 
 from django.core.urlresolvers import reverse
 from django.db.models import Q
@@ -32,7 +30,6 @@ from django.forms.formsets import formset_factory
 from django.forms.models import inlineformset_factory
 from django.http import HttpResponse
 from django.shortcuts import redirect
-from django.utils.encoding import smart_str
 from django.utils.functional import curry
 from django.utils.http import http_date
 from django.utils.translation import ugettext as _, activate as activate_translation
@@ -46,7 +43,7 @@ from liboozie.submittion import Submission
 from filebrowser.lib.archives import archive_factory
 from oozie.decorators import check_job_access_permission, check_job_edition_permission,\
                              check_dataset_access_permission, check_dataset_edition_permission
-from oozie.import_workflow import import_workflow as _import_workflow
+from oozie.importlib.workflows import import_workflow as _import_workflow
 from oozie.management.commands import oozie_setup
 from oozie.models import Workflow, History, Coordinator,\
                          Dataset, DataInput, DataOutput,\
@@ -190,23 +187,7 @@ def import_workflow(request):
 
 @check_job_access_permission()
 def export_workflow(request, workflow):
-  parameters = workflow.find_all_parameters()
-  mapping = dict([(param['name'], param['value']) for param in parameters])
-  workflow_xml = workflow.to_xml(mapping)
-
-  zip_file = StringIO.StringIO()
-
-  metadata = {}
-  for node in workflow.node_list:
-    if hasattr(node, 'jar_path'):
-      metadata[node.name] = {}
-      metadata[node.name]['jar_path'] = node.jar_path
-  metadata_json = json.dumps(metadata)
-
-  zfile = zipfile.ZipFile(zip_file, 'w')
-  zfile.writestr("workflow.xml", smart_str(workflow_xml))
-  zfile.writestr("workflow-metadata.json", smart_str(metadata_json))
-  zfile.close()
+  zip_file = workflow.compress(mapping=dict([(param['name'], param['value']) for param in workflow.find_all_parameters()]))
 
   response = HttpResponse(mimetype="application/zip")
   response["Last-Modified"] = http_date(time.time())

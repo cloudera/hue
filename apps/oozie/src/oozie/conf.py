@@ -28,7 +28,7 @@ from oozie.settings import NICE_NAME
 
 DEFINITION_XSLT_DIR = Config(
   key="definition_xslt_dir",
-  default=os.path.join(os.path.dirname(__file__), "xslt"),
+  default=os.path.join(os.path.dirname(__file__), "importlib", "xslt"),
   help=_t("Location on local FS where the xslt files are stored for workflow import."),
   private=True)
 

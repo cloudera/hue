@@ -18,7 +18,9 @@
 import json
 import logging
 import re
+import StringIO
 import time
+import zipfile
 
 from datetime import datetime,  timedelta
 from string import Template
@@ -32,7 +34,7 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.forms.models import inlineformset_factory
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_unicode, smart_str
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
 from desktop.log.access import access_warn
@@ -47,7 +49,8 @@ from liboozie.submittion import Submission
 from liboozie.submittion import create_directories
 
 from oozie.conf import REMOTE_SAMPLE_DIR
-from timezones import TIMEZONES
+from oozie.utils import utc_datetime_format
+from oozie.timezones import TIMEZONES
 
 
 LOG = logging.getLogger(__name__)
@@ -217,7 +220,7 @@ class WorkflowManager(models.Manager):
 
     return workflow
 
-  def initialize(self, workflow, fs):
+  def initialize(self, workflow, fs=None):
     Kill.objects.create(name='kill', workflow=workflow, node_type=Kill.node_type)
     end = End.objects.create(name='end', workflow=workflow, node_type=End.node_type)
     start = Start.objects.create(name='start', workflow=workflow, node_type=Start.node_type)
@@ -233,7 +236,8 @@ class WorkflowManager(models.Manager):
 
     Document.objects.link(workflow, owner=workflow.owner, name=workflow.name, description=workflow.description)
 
-    self.check_workspace(workflow, fs)
+    if fs:
+      self.check_workspace(workflow, fs)
 
   def check_workspace(self, workflow, fs):
     create_directories(fs, [REMOTE_SAMPLE_DIR.get()])
@@ -279,6 +283,7 @@ class Workflow(Job):
 
   HUE_ID = 'hue-id-w'
   ICON = '/oozie/static/art/icon_oozie_workflow_24.png'
+  METADATA_FORMAT_VERSION = "0.0.1"
 
   def get_type(self):
     return 'workflow'
@@ -469,7 +474,7 @@ class Workflow(Job):
 
   @classmethod
   def gen_status_graph_from_xml(cls, user, oozie_workflow):
-    from oozie.import_workflow import import_workflow # Circular dependency
+    from oozie.importlib.workflows import import_workflow # Circular dependency
     try:
       workflow = Workflow.objects.new_workflow(user)
       workflow.save()
@@ -489,6 +494,40 @@ class Workflow(Job):
     tmpl = 'editor/gen/workflow.xml.mako'
     xml = re.sub(re.compile('\s*\n+', re.MULTILINE), '\n', django_mako.render_to_string(tmpl, {'workflow': self, 'mapping': mapping}))
     return force_unicode(xml)
+
+  def compress(self, mapping=None, fp=StringIO.StringIO()):
+    metadata = {
+      'version': Workflow.METADATA_FORMAT_VERSION,
+      'nodes': {},
+      'attributes': {
+        'description': self.description,
+        'deployment_dir': self.deployment_dir
+      }
+    }
+    for node in self.node_list:
+      if hasattr(node, 'jar_path'):
+        metadata['nodes'][node.name] = {
+          'attributes': {
+            'jar_path': node.jar_path
+          }
+        }
+    
+    xml = self.to_xml(mapping=mapping)
+
+    zfile = zipfile.ZipFile(fp, 'w')
+    zfile.writestr("workflow.xml", smart_str(xml))
+    zfile.writestr("workflow-metadata.json", smart_str(json.dumps(metadata)))
+    zfile.close()
+
+    return fp
+
+  @classmethod
+  def decompress(cls, fp):
+    zfile = zipfile.ZipFile(fp, 'r')
+    metadata_json = zfile.read('workflow-metadata.json')
+    metadata = json.loads(metadata_json)
+    workflow_xml = zfile.read('workflow.xml')
+    return workflow_xml, metadata
 
 
 class Link(models.Model):
@@ -1265,6 +1304,7 @@ class Coordinator(Job):
 
   HUE_ID = 'hue-id-c'
   ICON = '/oozie/static/art/icon_oozie_coordinator_24.png'
+  METADATA_FORMAT_VERSION = "0.0.1"
 
   def get_type(self):
     return 'coordinator'
@@ -1337,6 +1377,13 @@ class Coordinator(Job):
     for prop in self.workflow.get_parameters():
       if not prop['name'] in index:
         props.append(prop)
+        index.append(prop['name'])
+
+    # Remove DataInputs and DataOutputs
+    datainput_names = [_input.name for _input in self.datainput_set.all()]
+    dataoutput_names = [_output.name for _output in self.dataoutput_set.all()]
+    removable_names = datainput_names + dataoutput_names
+    props = filter(lambda prop: prop['name'] not in removable_names, props)
 
     return props
 
@@ -1385,9 +1432,32 @@ class Coordinator(Job):
 
     return params
 
+  def compress(self, mapping=None, fp=StringIO.StringIO()):
+    metadata = {
+      'version': Coordinator.METADATA_FORMAT_VERSION,
+      'workflow': self.workflow.name,
+      'attributes': {
+        'description': self.description,
+        'deployment_dir': self.deployment_dir
+      }
+    }
 
-def utc_datetime_format(utc_time):
-  return utc_time.strftime("%Y-%m-%dT%H:%MZ")
+    xml = self.to_xml(mapping=mapping)
+
+    zfile = zipfile.ZipFile(fp, 'w')
+    zfile.writestr("coordinator.xml", smart_str(xml))
+    zfile.writestr("coordinator-metadata.json", smart_str(json.dumps(metadata)))
+    zfile.close()
+
+    return fp
+
+  @classmethod
+  def decompress(cls, fp):
+    zfile = zipfile.ZipFile(fp, 'r')
+    metadata_json = zfile.read('coordinator-metadata.json')
+    metadata = json.loads(metadata_json)
+    xml = zfile.read('coordinator.xml')
+    return xml, metadata
 
 
 class DatasetManager(models.Manager):
@@ -1532,6 +1602,7 @@ class Bundle(Job):
 
   HUE_ID = 'hue-id-b'
   ICON = '/oozie/static/art/icon_oozie_bundle_24.png'
+  METADATA_FORMAT_VERSION = '0.0.1'
 
   def get_type(self):
     return 'bundle'
@@ -1600,6 +1671,32 @@ class Bundle(Job):
   @property
   def kick_off_time_utc(self):
     return utc_datetime_format(self.kick_off_time)
+
+  def compress(self, mapping=None, fp=StringIO.StringIO()):
+    metadata = {
+      'version': Bundle.METADATA_FORMAT_VERSION,
+      'attributes': {
+        'description': self.description,
+        'deployment_dir': self.deployment_dir
+      }
+    }
+    
+    xml = self.to_xml(mapping=mapping)
+
+    zfile = zipfile.ZipFile(fp, 'w')
+    zfile.writestr("bundle.xml", smart_str(xml))
+    zfile.writestr("bundle-metadata.json", smart_str(json.dumps(metadata)))
+    zfile.close()
+
+    return fp
+
+  @classmethod
+  def decompress(cls, fp):
+    zfile = zipfile.ZipFile(fp, 'r')
+    metadata_json = zfile.read('bundle-metadata.json')
+    metadata = json.loads(metadata_json)
+    xml = zfile.read('bundle.xml')
+    return xml, metadata
 
 
 class HistoryManager(models.Manager):
