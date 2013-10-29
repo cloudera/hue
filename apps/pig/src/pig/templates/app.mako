@@ -183,9 +183,153 @@ ${ commonheader(None, "pig", user) | n,unicode }
           <a class="mainAction" href="#" title="${ _('Stop this script') }" data-bind="click: showStopModal, visible: currentScript().isRunning()"><i class="icon-stop"></i></a>
           <h3><span data-bind="text: currentScript().name"></span></h3>
         </div>
-        <form id="queryForm">
-          <textarea id="scriptEditor" data-bind="text:currentScript().script"></textarea>
-        </form>
+        <div class="row-fluid">
+          <div class="span9">
+            <form id="queryForm">
+              <textarea id="scriptEditor" data-bind="text:currentScript().script"></textarea>
+            </form>
+          </div>
+          <div class="span3">
+            <a href="#" title="${_('Double click on function to insert it in the editor')}" rel="tooltip" data-placement="left" class="pull-right" style="margin:10px;margin-left: 0"><i class="icon-question-sign"></i></a>
+            <h1 class="card-heading simple">${_('Navigator')}</h1>
+            <div class="card-body">
+              <p>
+                <input id="navigatorSearch" type="text" class="input-medium" placeholder="${ _('Function name...') }"/>
+                <ul id="navigatorFunctions" class="unstyled">
+                  <li>
+                    <a class="navigatorFunctionCategory" href="javascript:void(0)">Eval Functions</a>
+                    <ul class="navigatorFunctionCategoryContent unstyled hide">
+                      <li><a href="#">AVG(%VAR%)</a></li>
+                      <li><a href="#">CONCAT(%VAR1%, %VAR2%)</a></li>
+                      <li><a href="#">COUNT(%VAR%)</a></li>
+                      <li><a href="#">COUNT_START(%VAR%)</a></li>
+                      <li><a href="#">IsEmpty(%VAR%)</a></li>
+                      <li><a href="#">DIFF(%VAR1%, %VAR2%)</a></li>
+                      <li><a href="#">MAX(%VAR%)</a></li>
+                      <li><a href="#">MIN(%VAR%)</a></li>
+                      <li><a href="#">SIZE(%VAR%)</a></li>
+                      <li><a href="#">SUM(%VAR%)</a></li>
+                      <li><a href="#">TOKENIZE(%VAR%, %DELIM%)</a></li>
+                    </ul>
+                  </li>
+                  <li>
+                      <a class="navigatorFunctionCategory" href="javascript:void(0)">Relational Operators</a>
+                      <ul class="navigatorFunctionCategoryContent unstyled hide">
+                        <li><a href="#">COGROUP %VAR% BY %VAR%</a></li>
+                        <li><a href="#">CROSS %VAR1%, %VAR2%;</a></li>
+                        <li><a href="#">DISTINCT %VAR%;</a></li>
+                        <li><a href="#">FILTER %VAR% BY %COND%</a></li>
+                        <li><a href="#">FLATTEN(%VAR%)</a></li>
+                        <li><a href="#">FOREACH %DATA% GENERATE %NEW_DATA%</a></li>
+                        <li><a href="#">FOREACH %DATA% {%NESTED_BLOCK%}</a></li>
+                        <li><a href="#">GROUP %VAR% BY %VAR%</a></li>
+                        <li><a href="#">GROUP %VAR% ALL</a></li>
+                        <li><a href="#">JOIN %VAR% BY </a></li>
+                        <li><a href="#">LIMIT %VAR% %N%</a></li>
+                        <li><a href="#">ORDER %VAR% BY %FIELD%</a></li>
+                        <li><a href="#">SAMPLE %VAR% %SIZE%</a></li>
+                        <li><a href="#">SPLIT %VAR1% INTO %VAR2% IF %EXPRESSIONS%</a></li>
+                        <li><a href="#">UNION %VAR1%, %VAR2%</a></li>
+                      </ul>
+                    </li>
+
+                    <li>
+                      <a class="navigatorFunctionCategory" href="javascript:void(0)">Input/Output</a>
+                      <ul class="navigatorFunctionCategoryContent unstyled hide">
+                        <li><a href="#">LOAD '%FILE%';</a></li>
+                        <li><a href="#">DUMP %VAR%;</a></li>
+                        <li><a href="#">STORE %VAR% INTO %PATH%;</a></li>
+                      </ul>
+                    </li>
+                    <li>
+                      <a class="navigatorFunctionCategory" href="javascript:void(0)">Debug</a>
+                      <ul class="navigatorFunctionCategoryContent unstyled hide">
+                        <li><a href="#">EXPLAIN %VAR%;</a></li>
+                        <li><a href="#">ILLUSTRATE %VAR%;</a></li>
+                        <li><a href="#">DESCRIBE %VAR%;</a></li>
+                      </ul>
+                    </li>
+                    <li>
+                      <a class="navigatorFunctionCategory" href="javascript:void(0)">HCatalog</a>
+                      <ul class="navigatorFunctionCategoryContent unstyled hide">
+                        <li><a href="#">LOAD '%TABLE%' USING org.apache.hcatalog.pig.HCatLoader();</a></li>
+                      </ul>
+                    </li>
+                    <li>
+                      <a class="navigatorFunctionCategory" href="javascript:void(0)">Math</a>
+                      <ul class="navigatorFunctionCategoryContent unstyled hide">
+                        <li><a href="#">ABS(%VAR%)</a></li>
+                        <li><a href="#">ACOS(%VAR%)</a></li>
+                        <li><a href="#">ASIN(%VAR%)</a></li>
+                        <li><a href="#">ATAN(%VAR%)</a></li>
+                        <li><a href="#">CBRT(%VAR%)</a></li>
+                        <li><a href="#">CEIL(%VAR%)</a></li>
+                        <li><a href="#">COS(%VAR%)</a></li>
+                        <li><a href="#">COSH(%VAR%)</a></li>
+                        <li><a href="#">EXP(%VAR%)</a></li>
+                        <li><a href="#">FLOOR(%VAR%)</a></li>
+                        <li><a href="#">LOG(%VAR%)</a></li>
+                        <li><a href="#">LOG10(%VAR%)</a></li>
+                        <li><a href="#">RANDOM(%VAR%)</a></li>
+                        <li><a href="#">ROUND(%VAR%)</a></li>
+                        <li><a href="#">SIN(%VAR%)</a></li>
+                        <li><a href="#">SINH(%VAR%)</a></li>
+                        <li><a href="#">SQRT(%VAR%)</a></li>
+                        <li><a href="#">TAN(%VAR%)</a></li>
+                        <li><a href="#">TANH(%VAR%)</a></li>
+                      </ul>
+                    </li>
+                    <li>
+                      <a class="navigatorFunctionCategory" href="javascript:void(0)">Tuple, Bag, Map Functions</a>
+                      <ul class="navigatorFunctionCategoryContent unstyled hide">
+                        <li><a href="#">TOTUPLE(%VAR%)</a></li>
+                        <li><a href="#">TOBAG(%VAR%)</a></li>
+                        <li><a href="#">TOMAP(%KEY%, %VALUE%)</a></li>
+                        <li><a href="#">TOP(%topN%, %COLUMN%, %RELATION%)</a></li>
+                      </ul>
+                    </li>
+                    <li>
+                      <a class="navigatorFunctionCategory" href="javascript:void(0)">String Functions</a>
+                      <ul class="navigatorFunctionCategoryContent unstyled hide">
+                        <li><a href="#">INDEXOF(%STRING%, '%CHARACTER%', %STARTINDEX%)</a></li>
+                        <li><a href="#">LAST_INDEX_OF(%STRING%, '%CHARACTER%', %STARTINDEX%)</a></li>
+                        <li><a href="#">LOWER(%STRING%)</a></li>
+                        <li><a href="#">REGEX_EXTRACT(%STRING%, %REGEX%, %INDEX%)</a></li>
+                        <li><a href="#">REGEX_EXTRACT_ALL(%STRING%, %REGEX%)</a></li>
+                        <li><a href="#">REPLACE(%STRING%, '%oldChar%', '%newChar%')</a></li>
+                        <li><a href="#">STRSPLIT(%STRING%, %REGEX%, %LIMIT%)</a></li>
+                        <li><a href="#">SUBSTRING(%STRING%, %STARTINDEX%, %STOPINDEX%)</a></li>
+                        <li><a href="#">TRIM(%STRING%)</a></li>
+                        <li><a href="#">UCFIRST(%STRING%)</a></li>
+                        <li><a href="#">UPPER(%STRING%)</a></li>
+                      </ul>
+                    </li>
+                    <li>
+                      <a class="navigatorFunctionCategory" href="javascript:void(0)">Macros</a>
+                      <ul class="navigatorFunctionCategoryContent unstyled hide">
+                        <li><a href="#">IMPORT '%PATH_TO_MACRO%';</a></li>
+                      </ul>
+                    </li>
+                    <li>
+                      <a class="navigatorFunctionCategory" href="javascript:void(0)">HBase</a>
+                      <ul class="navigatorFunctionCategoryContent unstyled hide">
+                        <li><a href="#">LOAD 'hbase://%TABLE%' USING org.apache.pig.backend.hadoop.hbase.HBaseStorage('%columnList%')</a></li>
+                        <li><a href="#">STORE %VAR% INTO 'hbase://%TABLE%' USING org.apache.pig.backend.hadoop.hbase.HBaseStorage('%columnList%')</a></li>
+                      </ul>
+                    </li>
+                    <li>
+                      <a class="navigatorFunctionCategory" href="javascript:void(0)">Python UDF</a>
+                      <ul class="navigatorFunctionCategoryContent unstyled hide">
+                        <li>
+                          <a data-python="true" href="#">REGISTER 'python_udf.py' USING jython AS myfuncs;</a>
+                        </li>
+                      </ul>
+                    </li>
+                </ul>
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div id="properties" class="section hide">
@@ -628,6 +772,46 @@ ${ commonheader(None, "pig", user) | n,unicode }
   var codeMirror;
 
   $(document).ready(function () {
+    // initialize navigator
+    $(".navigatorFunctionCategory").on("click", function () {
+      var _submenu = $(this).next(".navigatorFunctionCategoryContent");
+      _submenu.find("li").removeClass("hide");
+      $("#navigatorSearch").val("");
+      _submenu.removeClass("hide");
+    });
+
+    $(".navigatorFunctionCategoryContent li a").on("click", function (e) {
+      e.preventDefault();
+      var _toInsert = $.trim($(this).text());
+      var _startChar = codeMirror.getCursor().ch;
+      codeMirror.replaceSelection(_toInsert);
+      codeMirror.setSelection({
+          line: codeMirror.getCursor().line,
+          ch: _startChar + _toInsert.indexOf("%")
+        }, {
+          line: codeMirror.getCursor().line,
+          ch: _startChar + _toInsert.indexOf("%") + _toInsert.substr(_toInsert.indexOf("%") + 1).indexOf("%") + 2
+        }
+      );
+      codeMirror.focus();
+    });
+
+    var navigatorSearchTimeout = -1;
+    $("#navigatorSearch").on("keyup", function () {
+      window.clearTimeout(navigatorSearchTimeout);
+      navigatorSearchTimeout = window.setTimeout(function () {
+        $(".navigatorFunctionCategoryContent").removeClass("hide");
+        $(".navigatorFunctionCategoryContent li").removeClass("hide");
+        $(".navigatorFunctionCategoryContent li").each(function () {
+          if ($(this).text().toLowerCase().indexOf($("#navigatorSearch").val().toLowerCase()) == -1) {
+            $(this).addClass("hide");
+          }
+        });
+      }, 300);
+    });
+
+    $("#navigatorFunctions").css("max-height", ($(window).height() - 370) + "px").css("overflow-y", "auto");
+
     viewModel.updateScripts();
 
     var USER_HOME = "/user/${ user }/";
@@ -922,6 +1106,7 @@ ${ commonheader(None, "pig", user) | n,unicode }
       window.clearTimeout(_resizeTimeout);
       _resizeTimeout = window.setTimeout(function () {
         codeMirror.setSize("100%", $(window).height() - RESIZE_CORRECTION);
+        $("#navigatorFunctions").css("max-height", ($(window).height() - 370) + "px").css("overflow-y", "auto");
       }, 100);
     });
 

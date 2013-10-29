@@ -128,3 +128,21 @@
   padding: 4px;
   font-size: 11px;
 }
+
+#navigatorFunctions li {
+  width: 95%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.navigatorFunctionCategoryContent li {
+  padding-left: 8px;
+}
+
+.navigatorFunctionCategory {
+  font-weight: bold;
+}
+.tooltip.left {
+  margin-left: -13px;
+}
