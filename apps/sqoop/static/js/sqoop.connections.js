@@ -86,7 +86,8 @@ var connections = (function($) {
       url: '/sqoop/api/connections/',
       dataType: 'json',
       type: 'GET',
-      success: fetcher_success('connections', Connection, options)
+      success: fetcher_success('connections', Connection, options),
+      error: fetcher_error('connections', Connection, options)
     }, options || {});
     $.ajax(request);
   }

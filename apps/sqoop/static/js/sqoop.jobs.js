@@ -238,7 +238,8 @@ var jobs = (function($) {
       url: '/sqoop/api/jobs/',
       dataType: 'json',
       type: 'GET',
-      success: fetcher_success('jobs', Job, options)
+      success: fetcher_success('jobs', Job, options),
+      error: fetcher_error('jobs', Job, options)
     }, options || {});
     $.ajax(request);
   }

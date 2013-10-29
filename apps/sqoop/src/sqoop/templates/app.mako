@@ -48,7 +48,7 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
 </div>
 
 <div class="container-fluid">
-  <div data-bind="foreach: sqoop_errors" id="sqoop-error" class="row-fluid mainSection hide" style="margin-top: 30px">
+  <div data-bind="foreach: sqoop_errors" id="sqoop-error" class="row-fluid mainSection hide" style="margin-top: 10px">
     <div class="alert alert-error">
       <i class="icon-warning-sign"></i>
       <strong>${_('Sqoop error')}:</strong>
@@ -793,7 +793,12 @@ var framework = new framework.Framework();
         viewModel.sqoop_errors.push(error_msg);
       });
     } else {
-      viewModel.sqoop_errors.push('${_("Unknown error.")}');
+      if (data.status == 500){
+        viewModel.sqoop_errors.push('${_("There was a problem with the server. Look at the Sqoop2 server logs for more details.")}');
+      }
+      else {
+        viewModel.sqoop_errors.push('${_("Unknown error.")}');
+      }
     }
     window.location.hash = 'error';
   }

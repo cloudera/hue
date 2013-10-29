@@ -38,6 +38,13 @@ function fetcher_success(name, Node, options) {
   };
 }
 
+function fetcher_error(name, Node, options) {
+  return function(data) {
+    $(document).trigger('connection_error.' + name, [options, data])
+  };
+}
+
+
 //// KO utils
 ko.bindingHandlers.routie = {
   init: function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
