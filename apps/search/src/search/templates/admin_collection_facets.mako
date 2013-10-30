@@ -94,7 +94,7 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
             <div class="bubble">
               <strong><span data-bind="editable: label"></span></strong>
               <span style="color:#666;font-size: 12px">(<span data-bind="text: field"></span>)</span>
-              <a class="btn btn-small" data-bind="click: $root.removeFieldFacet"><i class="icon-trash"></i></a>
+              <a class="btn btn-small" data-bind="click: $root.removeFieldFacet"><i class="fa fa-trash-o"></i></a>
             </div>
           </div>
           <div class="clearfix"></div>
@@ -105,7 +105,7 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
             <input id="selectedFieldLabel" type="text" data-bind="value: selectedFieldLabel" class="input" />
             <br/>
             <br/>
-            <a class="btn" data-bind="click: $root.addFieldFacet"><i class="icon-plus-sign"></i> ${_('Add to Field Facets')}</a>
+            <a class="btn" data-bind="click: $root.addFieldFacet"><i class="fa fa-plus-circle"></i> ${_('Add to Field Facets')}</a>
             &nbsp;<span id="field-facet-error" class="label label-important hide">${_('The field you are trying to add is already in the list.')}</span>
           </div>
         </div>
@@ -118,10 +118,10 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
           <div class="bubble">
             <strong><span data-bind="editable: label"></span></strong>
             <span style="color:#666;font-size: 12px">
-              (<span data-bind="text: field"></span>, <span data-bind="editable: start"></span> <i class="icon-double-angle-right"></i> <span data-bind="editable: end"></span>,
-              <i class="icon-resize-horizontal"></i> <span data-bind="editable: gap"></span>)
+              (<span data-bind="text: field"></span>, <span data-bind="editable: start"></span> <i class="fa fa-double-angle-right"></i> <span data-bind="editable: end"></span>,
+              <i class="fa fa-resize-horizontal"></i> <span data-bind="editable: gap"></span>)
             </span>
-            <a class="btn btn-small" data-bind="click: $root.removeRangeFacet"><i class="icon-trash"></i></a>
+            <a class="btn btn-small" data-bind="click: $root.removeRangeFacet"><i class="fa fa-trash-o"></i></a>
           </div>
         </div>
         <div class="clearfix"></div>
@@ -140,7 +140,7 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
           <input type="number" data-bind="value: selectedRangeGapFacet" class="input-mini" />
           <br/>
           <br/>
-          <a class="btn" data-bind="click: $root.addRangeFacet"><i class="icon-plus-sign"></i> ${_('Add to Range Facets')}</a>
+          <a class="btn" data-bind="click: $root.addRangeFacet"><i class="fa fa-plus-circle"></i> ${_('Add to Range Facets')}</a>
         </div>
       </div>
 
@@ -152,10 +152,10 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
           <div class="bubble">
             <strong><span data-bind="editable: label"></span></strong>
             <span style="color:#666;font-size: 12px">
-              (<span data-bind="text: field"></span>, <span data-bind="editable: start"></span> <i class="icon-double-angle-right"></i> <span data-bind="editable: end"></span>,
-              <i class="icon-resize-horizontal"></i> <span data-bind="editable: gap"></span>, <i class="icon-calendar"></i> <span data-bind="editable: format"></span>)
+              (<span data-bind="text: field"></span>, <span data-bind="editable: start"></span> <i class="fa fa-double-angle-right"></i> <span data-bind="editable: end"></span>,
+              <i class="fa fa-resize-horizontal"></i> <span data-bind="editable: gap"></span>, <i class="fa fa-calendar"></i> <span data-bind="editable: format"></span>)
             </span>
-            <a class="btn btn-small" data-bind="click: $root.removeDateFacet"><i class="icon-trash"></i></a>
+            <a class="btn btn-small" data-bind="click: $root.removeDateFacet"><i class="fa fa-trash-o"></i></a>
           </div>
         </div>
         <div class="clearfix"></div>
@@ -181,10 +181,10 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
           <br/>
           <br/>
           ${_('Date format')}
-          <input id="dateFormatInput" type="text" data-bind="value: selectedDateFormat" class="input" /> <a href="#formatHelpModal" class="btn btn-mini" data-toggle="modal"><i class="icon-question-sign"></i></a>
+          <input id="dateFormatInput" type="text" data-bind="value: selectedDateFormat" class="input" /> <a href="#formatHelpModal" class="btn btn-mini" data-toggle="modal"><i class="fa fa-question-circle"></i></a>
           <br/>
           <br/>
-          <a class="btn" data-bind="click: $root.addDateFacet"><i class="icon-plus-sign"></i> ${_('Add to Date Facets')}</a>
+          <a class="btn" data-bind="click: $root.addDateFacet"><i class="fa fa-plus-circle"></i> ${_('Add to Date Facets')}</a>
         </div>
       </div>
 
@@ -194,7 +194,7 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
         </div>
         <div data-bind="sortable: sortableFacets, afterMove: isSaveBtnVisible(true)">
           <div class="bubble" style="float: none;cursor: move">
-            <i class="icon-move"></i>
+            <i class="fa fa-move"></i>
             <strong><span data-bind="text: label"></span></strong>
             <span style="color:#666;font-size: 12px">(<span data-bind="text: field"></span>)</span>
           </div>

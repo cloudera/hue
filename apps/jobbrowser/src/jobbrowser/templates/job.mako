@@ -42,7 +42,7 @@
                 <td data-row-selector-exclude="true">
                 %if task.taskAttemptIds:
                     <a href="${ url('jobbrowser.views.single_task_attempt_logs', job=task.jobId, taskid=task.taskId, attemptid=task.taskAttemptIds[-1]) }"
-                        data-row-selector="true"><i class="icon-tasks"></i>
+                        data-row-selector="true"><i class="fa fa-tasks"></i>
                     </a>
                 %endif
                 </td>
@@ -123,7 +123,7 @@ ${ comps.menubar() }
           <li class="nav-header">${_('Status')}</li>
           <li class="white" id="jobStatus">&nbsp;</li>
           <li class="nav-header">${_('Logs')}</li>
-          <li><a href="${ url('jobbrowser.views.job_single_logs', job=job.jobId) }"><i class="icon-tasks"></i> ${_('Logs')}</a></li>
+          <li><a href="${ url('jobbrowser.views.job_single_logs', job=job.jobId) }"><i class="fa fa-tasks"></i> ${_('Logs')}</a></li>
           % if not job.is_retired:
           <li class="nav-header">${_('Maps:')}</li>
           <li class="white" id="jobMaps">&nbsp;</li>
@@ -144,7 +144,7 @@ ${ comps.menubar() }
             % if location_url != None:
             <a href="${location_url}" title="${output_dir}">
             % endif
-            <i class="icon-folder-open"></i> ${dir_name}
+            <i class="fa fa-folder-open"></i> ${dir_name}
             % if location_url != None:
             </a>
             % endif
@@ -187,7 +187,7 @@ ${ comps.menubar() }
                       <tr>
                         <td>
                           <a href="${ url('jobbrowser.views.job_attempt_logs', job=job.jobId, attempt_index=loop.index) }" data-row-selector="true">
-                            <i class="icon-tasks"></i>
+                            <i class="fa fa-tasks"></i>
                           </a>
                         </td>
                         <td>${ attempt['id'] }</td>
@@ -449,7 +449,7 @@ $(document).ready(function () {
       $(".killJob").hide();
     }
     $("#killJobContainer").html(killCell);
-    $("#jobStatus").html('<span class="label ' + getStatusClass(job.status) + '">' + (job.isRetired && !job.isMR2 ? '<i class="icon-briefcase icon-white" title="${ _('Retired') }"></i> ' : '') + job.status + '</span>');
+    $("#jobStatus").html('<span class="label ' + getStatusClass(job.status) + '">' + (job.isRetired && !job.isMR2 ? '<i class="fa fa-briefcase fa fa-white" title="${ _('Retired') }"></i> ' : '') + job.status + '</span>');
     if (job.desiredMaps > 0) {
       $("#jobMaps").html((job.isRetired ? '${_('N/A')}' : '<div class="progress" style="width:100px" title="' + (job.isMR2 ? job.mapsPercentComplete : job.finishedMaps + '/' + job.desiredMaps) + '"><div class="bar-label">' + job.mapsPercentComplete + '%</div><div class="' + 'bar ' + getStatusClass(job.status, "bar-") + '" style="margin-top:-20px;width:' + job.mapsPercentComplete + '%"></div></div>'));
     }
@@ -519,7 +519,7 @@ $(document).ready(function () {
 
   function getTaskRow(task) {
     return [
-      '<a href="' + emptyStringIfNull(task.logs) + '" data-row-selector-exclude="true"><i class="icon-tasks"></i></a>',
+      '<a href="' + emptyStringIfNull(task.logs) + '" data-row-selector-exclude="true"><i class="fa fa-tasks"></i></a>',
       '<a href="' + emptyStringIfNull(task.url) + '" title="${_('View this task')}" data-row-selector="true">' + emptyStringIfNull(task.shortId) + '</a>',
       emptyStringIfNull(task.type)
     ]

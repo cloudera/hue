@@ -60,11 +60,11 @@
 
         if (_this.options.level == TYPES.ERROR){
             el.addClass("alert-error");
-            el.find(".message").html("<i class='icon-warning-sign'></i> <strong>" + _this.options.message + "</strong>");
+            el.find(".message").html("<i class='fa fa-exclamation-triangle'></i> <strong>" + _this.options.message + "</strong>");
         }
         else if (_this.options.level == TYPES.INFO){
             el.addClass("alert-info");
-            el.find(".message").html("<i class='icon-info-sign'></i> <strong>" + _this.options.message + "</strong>");
+            el.find(".message").html("<i class='fa fa-info-circle'></i> <strong>" + _this.options.message + "</strong>");
         }
         else {
             el.find(".message").html(_this.options.message);

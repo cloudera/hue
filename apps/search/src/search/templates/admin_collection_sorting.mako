@@ -61,12 +61,12 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
         </div>
         <div data-bind="sortable: sortingFields">
           <div class="bubble" style="cursor: move">
-            <i class="icon-move"></i>
+            <i class="fa fa-move"></i>
             <strong><span data-bind="editable: label"></span></strong>
             <span style="color:#666;font-size: 12px">
-              (<span data-bind="text: field"></span> <i class="icon-arrow-up" data-bind="visible: asc() == true"></i><i class="icon-arrow-down" data-bind="visible: asc() == false"></i> <span data-bind="editable: order"></span>, <input type="checkbox" data-bind="checked: include" style="margin-top:0" /> ${_('Default sorting')} )
+              (<span data-bind="text: field"></span> <i class="fa fa-arrow-up" data-bind="visible: asc() == true"></i><i class="fa fa-arrow-down" data-bind="visible: asc() == false"></i> <span data-bind="editable: order"></span>, <input type="checkbox" data-bind="checked: include" style="margin-top:0" /> ${_('Default sorting')} )
             </span>
-            <a class="btn btn-small" data-bind="click: $root.removeSortingField"><i class="icon-trash"></i></a>
+            <a class="btn btn-small" data-bind="click: $root.removeSortingField"><i class="fa fa-trash-o"></i></a>
           </div>
         </div>
         <div class="clearfix"></div>
@@ -77,15 +77,15 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
           <input id="newFieldLabel" type="text" data-bind="value: newFieldLabel" class="input" />
           &nbsp;${_('Sorting')}
           <div class="btn-group" style="display: inline">
-            <button id="newFieldAsc" type="button" data-bind="css: {'active': newFieldAscDesc() == 'asc', 'btn': true}"><i class="icon-arrow-up"></i></button>
-            <button id="newFieldDesc" type="button" data-bind="css: {'active': newFieldAscDesc() == 'desc', 'btn': true}"><i class="icon-arrow-down"></i></button>
+            <button id="newFieldAsc" type="button" data-bind="css: {'active': newFieldAscDesc() == 'asc', 'btn': true}"><i class="fa fa-arrow-up"></i></button>
+            <button id="newFieldDesc" type="button" data-bind="css: {'active': newFieldAscDesc() == 'desc', 'btn': true}"><i class="fa fa-arrow-down"></i></button>
           </div>
           <label class="checkbox" style="display: inline">
             <input id="newFieldInclude" type="checkbox" style="float:none;margin-left:0;margin-top: -2px;margin-right: 4px"  data-bind="checked: newFieldIncludeInSorting" /> ${_('Include in default sorting')}
           </label>
           <br/>
           <br/>
-          <a class="btn" data-bind="click: $root.addSortingField"><i class="icon-plus-sign"></i> ${_('Add to Sorting')}</a>
+          <a class="btn" data-bind="click: $root.addSortingField"><i class="fa fa-plus-circle"></i> ${_('Add to Sorting')}</a>
         </div>
       </div>
 

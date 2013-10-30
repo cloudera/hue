@@ -50,7 +50,7 @@
       return;
     }
 
-    var link = $("<a/>").attr("id", "jHueScrollUpAnchor").attr("href", "javascript:void(0)").html("<i class='icon-chevron-up'></i>").appendTo("body");
+    var link = $("<a/>").attr("id", "jHueScrollUpAnchor").attr("href", "javascript:void(0)").html("<i class='fa fa-chevron-up'></i>").appendTo("body");
 
     if ($(_this.element).is("body")) {
       $(window).scroll(function () {

@@ -51,13 +51,13 @@ ${ commonheader(None, "pig", user) | n,unicode }
         </%def>
 
         <%def name="actions()">
-            <button class="btn fileToolbarBtn" title="${_('Run this script')}" data-bind="enable: selectedScripts().length == 1, click: listRunScript, visible: scripts().length > 0"><i class="icon-play"></i> ${_('Run')}</button>
-            <button class="btn fileToolbarBtn" title="${_('Copy this script')}" data-bind="enable: selectedScripts().length == 1, click: listCopyScript, visible: scripts().length > 0"><i class="icon-copy"></i> ${_('Copy')}</button>
-            <button class="btn fileToolbarBtn" title="${_('Delete this script')}" data-bind="enable: selectedScripts().length > 0, click: listConfirmDeleteScripts, visible: scripts().length > 0"><i class="icon-trash"></i> ${_('Delete')}</button>
+            <button class="btn fileToolbarBtn" title="${_('Run this script')}" data-bind="enable: selectedScripts().length == 1, click: listRunScript, visible: scripts().length > 0"><i class="fa fa-play"></i> ${_('Run')}</button>
+            <button class="btn fileToolbarBtn" title="${_('Copy this script')}" data-bind="enable: selectedScripts().length == 1, click: listCopyScript, visible: scripts().length > 0"><i class="fa fa-files-o"></i> ${_('Copy')}</button>
+            <button class="btn fileToolbarBtn" title="${_('Delete this script')}" data-bind="enable: selectedScripts().length > 0, click: listConfirmDeleteScripts, visible: scripts().length > 0"><i class="fa fa-trash-o"></i> ${_('Delete')}</button>
         </%def>
 
         <%def name="creation()">
-            <button class="btn fileToolbarBtn" title="${_('Create a new script')}" data-bind="click: confirmNewScript"><i class="icon-plus-sign"></i> ${_('New Script')}</button>
+            <button class="btn fileToolbarBtn" title="${_('Create a new script')}" data-bind="click: confirmNewScript"><i class="fa fa-plus-circle"></i> ${_('New Script')}</button>
         </%def>
       </%actionbar:render>
       <div class="alert alert-info" data-bind="visible: scripts().length == 0">
@@ -67,7 +67,7 @@ ${ commonheader(None, "pig", user) | n,unicode }
       <table class="table table-striped table-condensed tablescroller-disable" data-bind="visible: scripts().length > 0">
         <thead>
         <tr>
-          <th width="1%"><div data-bind="click: selectAll, css: {hueCheckbox: true, 'icon-ok': allSelected}"></div></th>
+          <th width="1%"><div data-bind="click: selectAll, css: {hueCheckbox: true, 'fa': true, 'fa-check': allSelected}"></div></th>
           <th width="20%">${_('Name')}</th>
           <th width="79%">${_('Script')}</th>
         </tr>
@@ -94,7 +94,7 @@ ${ commonheader(None, "pig", user) | n,unicode }
       <script id="scriptTemplate" type="text/html">
         <tr style="cursor: pointer" data-bind="event: { mouseover: toggleHover, mouseout: toggleHover}">
           <td class="center" data-bind="click: handleSelect" style="cursor: default">
-            <div data-bind="css: {hueCheckbox: true, 'icon-ok': selected}"></div>
+            <div data-bind="css: {hueCheckbox: true, 'fa': true, 'fa-check': selected}"></div>
           </td>
           <td data-bind="click: $root.confirmViewScript">
             <strong><a href="#" data-bind="click: $root.confirmViewScript, text: name"></a></strong>
@@ -113,51 +113,51 @@ ${ commonheader(None, "pig", user) | n,unicode }
           <ul class="nav nav-list">
             <li class="nav-header">${_('Editor')}</li>
             <li data-bind="click: editScript" class="active" data-section="edit">
-              <a href="#"><i class="icon-edit"></i> ${ _('Pig') }</a>
+              <a href="#"><i class="fa fa-edit"></i> ${ _('Pig') }</a>
             </li>
             <li data-bind="click: editScriptProperties" data-section="properties">
-              <a href="#"><i class="icon-reorder"></i> ${ _('Properties') }</a>
+              <a href="#"><i class="fa fa-reorder"></i> ${ _('Properties') }</a>
             </li>
             <li data-bind="click: saveScript">
               <a href="#" title="${ _('Save the script') }" rel="tooltip" data-placement="right">
-                <i class="icon-save"></i> ${ _('Save') }
+                <i class="fa fa-floppy-o"></i> ${ _('Save') }
               </a>
             </li>
             <li class="nav-header">${_('Run')}</li>
             <li data-bind="click: runOrShowSubmissionModal, visible: !currentScript().isRunning()">
               <a href="#" title="${ _('Run the script') }" rel="tooltip" data-placement="right">
-                <i class="icon-play"></i> ${ _('Submit') }
+                <i class="fa fa-play"></i> ${ _('Submit') }
               </a>
             </li>
             <li data-bind="click: showStopModal, visible: currentScript().isRunning()">
               <a href="#" title="${ _('Stop the script') }" rel="tooltip" data-placement="right" class="disabled">
-                <i class="icon-ban-circle"></i> ${ _('Stop') }
+                <i class="fa fa-ban"></i> ${ _('Stop') }
               </a>
             </li>
             <li data-bind="click: showScriptLogs" data-section="logs">
               <a href="#" title="${ _('Show Logs') }" rel="tooltip" data-placement="right">
-                <i class="icon-tasks"></i> ${ _('Logs') }
+                <i class="fa fa-tasks"></i> ${ _('Logs') }
               </a>
             </li>
             <li class="nav-header">${_('File')}</li>
             <li data-bind="visible: currentScript().id() != -1, click: copyScript">
               <a href="#" title="${ _('Copy the script') }" rel="tooltip" data-placement="right">
-                <i class="icon-copy"></i> ${ _('Copy') }
+                <i class="fa fa-files-o"></i> ${ _('Copy') }
               </a>
             </li>
             <li data-bind="visible: currentScript().id() != -1, click: confirmDeleteScript">
               <a href="#" title="${ _('Delete the script') }" rel="tooltip" data-placement="right">
-                <i class="icon-trash"></i> ${ _('Delete') }
+                <i class="fa fa-trash-o"></i> ${ _('Delete') }
               </a>
             </li>
             <li data-bind="click: confirmNewScript">
               <a href="#" title="${ _('New script') }" rel="tooltip" data-placement="right">
-                <i class="icon-plus-sign"></i> ${ _('Script') }
+                <i class="fa fa-plus-circle"></i> ${ _('Script') }
               </a>
             </li>
             <li>
             <a href="#" id="help">
-              <i class="icon-question-sign"></i>
+              <i class="fa fa-question-circle"></i>
             </a>
             <div id="help-content" class="hide">
               <ul style="text-align: left;">
@@ -179,8 +179,8 @@ ${ commonheader(None, "pig", user) | n,unicode }
 
       <div id="edit" class="section">
         <div class="alert alert-info">
-          <a class="mainAction" href="#" title="${ _('Run this script') }" data-bind="click: runOrShowSubmissionModal, visible: !currentScript().isRunning()"><i class="icon-play"></i></a>
-          <a class="mainAction" href="#" title="${ _('Stop this script') }" data-bind="click: showStopModal, visible: currentScript().isRunning()"><i class="icon-stop"></i></a>
+          <a class="mainAction" href="#" title="${ _('Run this script') }" data-bind="click: runOrShowSubmissionModal, visible: !currentScript().isRunning()"><i class="fa fa-play"></i></a>
+          <a class="mainAction" href="#" title="${ _('Stop this script') }" data-bind="click: showStopModal, visible: currentScript().isRunning()"><i class="fa fa-stop"></i></a>
           <h3><span data-bind="text: currentScript().name"></span></h3>
         </div>
         <div class="row-fluid">
@@ -190,7 +190,7 @@ ${ commonheader(None, "pig", user) | n,unicode }
             </form>
           </div>
           <div class="span3">
-            <a href="#" title="${_('Double click on function to insert it in the editor')}" rel="tooltip" data-placement="left" class="pull-right" style="margin:10px;margin-left: 0"><i class="icon-question-sign"></i></a>
+            <a href="#" title="${_('Double click on function to insert it in the editor')}" rel="tooltip" data-placement="left" class="pull-right" style="margin:10px;margin-left: 0"><i class="fa fa-question-circle"></i></a>
             <h1 class="card-heading simple">${_('Navigator')}</h1>
             <div class="card-body">
               <p>
@@ -334,8 +334,8 @@ ${ commonheader(None, "pig", user) | n,unicode }
 
       <div id="properties" class="section hide">
         <div class="alert alert-info">
-          <a class="mainAction" href="#" title="${ _('Run this script') }" data-bind="click: runOrShowSubmissionModal, visible: !currentScript().isRunning()"><i class="icon-play"></i></a>
-          <a class="mainAction" href="#" title="${ _('Stop this script') }" data-bind="click: showStopModal, visible: currentScript().isRunning()"><i class="icon-stop"></i></a>
+          <a class="mainAction" href="#" title="${ _('Run this script') }" data-bind="click: runOrShowSubmissionModal, visible: !currentScript().isRunning()"><i class="fa fa-play"></i></a>
+          <a class="mainAction" href="#" title="${ _('Stop this script') }" data-bind="click: showStopModal, visible: currentScript().isRunning()"><i class="fa fa-stop"></i></a>
           <h3><span data-bind="text: currentScript().name"></span></h3>
         </div>
         <form class="form-inline" style="padding-left: 10px">
@@ -347,7 +347,7 @@ ${ commonheader(None, "pig", user) | n,unicode }
           <br/>
           <br/>
 
-          <h4>${ _('Parameters') } &nbsp; <i id="parameters-dyk" class="icon-question-sign"></i></h4>
+          <h4>${ _('Parameters') } &nbsp; <i id="parameters-dyk" class="fa fa-question-circle"></i></h4>
           <div id="parameters-dyk-content" class="hide">
             <ul style="text-align: left;">
               <li>input /user/data</li>
@@ -362,7 +362,7 @@ ${ commonheader(None, "pig", user) | n,unicode }
                 <td>
                   ${ _('There are currently no defined parameters.') }
                   <button class="btn" data-bind="click: currentScript().addParameter" style="margin-left: 4px">
-                    <i class="icon-plus"></i> ${ _('Add') }
+                    <i class="fa fa-plus"></i> ${ _('Add') }
                   </button>
                 </td>
               </tr>
@@ -384,13 +384,13 @@ ${ commonheader(None, "pig", user) | n,unicode }
                       <button class="btn fileChooserBtn" data-bind="click: $root.showFileChooser">..</button>
                     </div>
                   </td>
-                  <td><button data-bind="click: viewModel.currentScript().removeParameter" class="btn"><i class="icon-trash"></i> ${ _('Remove') }</button></td>
+                  <td><button data-bind="click: viewModel.currentScript().removeParameter" class="btn"><i class="fa fa-trash-o"></i> ${ _('Remove') }</button></td>
                 </tr>
               </tbody>
               <tfoot data-bind="visible: currentScript().parameters().length > 0">
                 <tr>
                   <td colspan="3">
-                    <button class="btn" data-bind="click: currentScript().addParameter"><i class="icon-plus"></i> ${ _('Add') }</button>
+                    <button class="btn" data-bind="click: currentScript().addParameter"><i class="fa fa-plus"></i> ${ _('Add') }</button>
                   </td>
                 </tr>
               </tfoot>
@@ -398,7 +398,7 @@ ${ commonheader(None, "pig", user) | n,unicode }
           </div>
 
           <br/>
-          <h4>${ _('Hadoop properties') } &nbsp; <i id="properties-dyk" class="icon-question-sign"></i></h4>
+          <h4>${ _('Hadoop properties') } &nbsp; <i id="properties-dyk" class="fa fa-question-circle"></i></h4>
           <div id="properties-dyk-content" class="hide">
             <ul style="text-align: left; word-wrap:break-word">
               <li>mapred.job.queue.name production</li>
@@ -411,7 +411,7 @@ ${ commonheader(None, "pig", user) | n,unicode }
                 <td>
                   ${ _('There are currently no defined Hadoop properties.') }
                   <button class="btn" data-bind="click: currentScript().addHadoopProperties" style="margin-left: 4px">
-                    <i class="icon-plus"></i> ${ _('Add') }
+                    <i class="fa fa-plus"></i> ${ _('Add') }
                   </button>
                 </td>
               </tr>
@@ -433,13 +433,13 @@ ${ commonheader(None, "pig", user) | n,unicode }
                       <button class="btn fileChooserBtn" data-bind="click: $root.showFileChooser">..</button>
                     </div>
                   </td>
-                  <td><button data-bind="click: viewModel.currentScript().removeHadoopProperties" class="btn"><i class="icon-trash"></i> ${ _('Remove') }</button></td>
+                  <td><button data-bind="click: viewModel.currentScript().removeHadoopProperties" class="btn"><i class="fa fa-trash-o"></i> ${ _('Remove') }</button></td>
                 </tr>
               </tbody>
               <tfoot data-bind="visible: currentScript().hadoopProperties().length > 0">
                 <tr>
                   <td colspan="3">
-                    <button class="btn" data-bind="click: currentScript().addHadoopProperties"><i class="icon-plus"></i> ${ _('Add') }</button>
+                    <button class="btn" data-bind="click: currentScript().addHadoopProperties"><i class="fa fa-plus"></i> ${ _('Add') }</button>
                   </td>
                 </tr>
               </tfoot>
@@ -448,7 +448,7 @@ ${ commonheader(None, "pig", user) | n,unicode }
 
           <br/>
 
-          <h4>${ _('Resources') } &nbsp; <i id="resources-dyk" class="icon-question-sign"></i></h4>
+          <h4>${ _('Resources') } &nbsp; <i id="resources-dyk" class="fa fa-question-circle"></i></h4>
           <div id="resources-dyk-content" class="hide">
             <ul style="text-align: left;">
               <li>${ _("Path to a HDFS file or zip file to add to the workspace of the running script") }</li>
@@ -460,7 +460,7 @@ ${ commonheader(None, "pig", user) | n,unicode }
                 <td>
                   ${ _('There are currently no defined resources.') }
                   <button class="btn" data-bind="click: currentScript().addResource" style="margin-left: 4px">
-                    <i class="icon-plus"></i> ${ _('Add') }
+                    <i class="fa fa-plus"></i> ${ _('Add') }
                   </button>
                 </td>
               </tr>
@@ -490,14 +490,14 @@ ${ commonheader(None, "pig", user) | n,unicode }
                   </td>
                   <td>
                     <button data-bind="click: viewModel.currentScript().removeResource" class="btn">
-                    <i class="icon-trash"></i> ${ _('Remove') }</button>
+                    <i class="fa fa-trash-o"></i> ${ _('Remove') }</button>
                   </td>
                 </tr>
               </tbody>
               <tfoot data-bind="visible: currentScript().resources().length > 0">
                 <tr>
                   <td colspan="3">
-                    <button class="btn" data-bind="click: currentScript().addResource"><i class="icon-plus"></i> ${ _('Add') }</button>
+                    <button class="btn" data-bind="click: currentScript().addResource"><i class="fa fa-plus"></i> ${ _('Add') }</button>
                   </td>
                 </tr>
               </tfoot>
@@ -508,14 +508,14 @@ ${ commonheader(None, "pig", user) | n,unicode }
 
       <div id="logs" class="section hide">
           <div class="alert alert-info">
-            <a class="mainAction" href="#" title="${ _('Stop this script') }" data-bind="click: showStopModal, visible: currentScript().isRunning()"><i class="icon-stop"></i></a>
+            <a class="mainAction" href="#" title="${ _('Stop this script') }" data-bind="click: showStopModal, visible: currentScript().isRunning()"><i class="fa fa-stop"></i></a>
             <h3><span data-bind="text: currentScript().name"></span></h3>
           </div>
           <div data-bind="template: {name: 'logTemplate', foreach: currentScript().actions}"></div>
           <script id="logTemplate" type="text/html">
             <div data-bind="css:{'alert-modified': name != '', 'alert': name != '', 'alert-success': status == 'SUCCEEDED' || status == 'OK', 'alert-error': status != 'RUNNING' && status != 'SUCCEEDED' && status != 'OK' && status != 'PREP' && status != 'SUSPENDED'}">
               <div class="pull-right">
-                  ${ _('Status:') } <a data-bind="text: status, visible: absoluteUrl != '', attr: {'href': absoluteUrl}" target="_blank"/> <i class="icon-share-alt"></i>
+                  ${ _('Status:') } <a data-bind="text: status, visible: absoluteUrl != '', attr: {'href': absoluteUrl}" target="_blank"/> <i class="fa fa-share"></i>
               </div>
               <h4>${ _('Progress:') } <span data-bind="text: progress"></span>${ _('%') }</h4>
               <div data-bind="css: {'progress': name != '', 'progress-striped': name != '', 'active': status == 'RUNNING'}" style="margin-top:10px">
@@ -590,7 +590,7 @@ ${ commonheader(None, "pig", user) | n,unicode }
           </div>
         </td>
         <td data-bind="text: created"></td>
-        <td data-bind="click: $root.showLogs"><i class="icon-tasks"></i></td>
+        <td data-bind="click: $root.showLogs"><i class="fa fa-tasks"></i></td>
       </tr>
     </script>
 
@@ -959,11 +959,11 @@ ${ commonheader(None, "pig", user) | n,unicode }
         if (data.error == null) {
           $(data.files).each(function (cnt, item) {
             if (item.name != ".") {
-              var _ico = "icon-file-alt";
+              var _ico = "fa-file-o";
               if (item.type == "dir") {
-                _ico = "icon-folder-close";
+                _ico = "fa-folder";
               }
-              CodeMirror.currentFiles.push('<i class="' + _ico + '"></i> ' + item.name);
+              CodeMirror.currentFiles.push('<i class="fa ' + _ico + '"></i> ' + item.name);
             }
           });
           CodeMirror.isPath = true;
@@ -1142,7 +1142,7 @@ ${ commonheader(None, "pig", user) | n,unicode }
           var _lineNo = line.match(/[Ll]ine \d*/) != null ? line.match(/[Ll]ine \d*/)[0].split(" ")[1] * 1 : -1;
           var _colNo = line.match(/[Cc]olumn \d*/) != null ? line.match(/[Cc]olumn \d*/)[0].split(" ")[1] * 1 : -1;
           if (_lineNo != -1 && _colNo != -1 && errorWidget == null) {
-            errorWidget = codeMirror.addLineWidget(_lineNo - 1, $("<div>").addClass("editorError").html("<i class='icon-exclamation-sign'></i> " + line)[0], {coverGutter: true, noHScroll: true});
+            errorWidget = codeMirror.addLineWidget(_lineNo - 1, $("<div>").addClass("editorError").html("<i class='fa fa-exclamation-circle'></i> " + line)[0], {coverGutter: true, noHScroll: true});
             codeMirror.setSelection({line: _lineNo - 1, ch: _colNo}, {line: _lineNo - 1, ch: _colNo + codeMirror.getLine(_lineNo - 1).substring(_colNo).split(" ")[0].length});
             $(document).trigger("showEditor");
           }

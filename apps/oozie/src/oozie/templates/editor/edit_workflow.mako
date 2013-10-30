@@ -40,39 +40,39 @@ ${ layout.menubar(section='workflows') }
     <div id="workflowControls" class="sidebar-nav">
       <ul class="nav nav-list">
         <li class="nav-header">${ _('Editor') }</li>
-        <li><a href="#editWorkflow"><i class="icon-code-fork"></i> ${ _('Workflow') }</a></li>
-        <li><a href="#properties"><i class="icon-reorder"></i> ${ _('Properties') }</a></li>
+        <li><a href="#editWorkflow"><i class="fa fa-code-fork"></i> ${ _('Workflow') }</a></li>
+        <li><a href="#properties"><i class="fa fa-reorder"></i> ${ _('Properties') }</a></li>
         % if user_can_edit_job:
           <li>
-            <a data-bind="attr: {href: '/filebrowser/view' + deployment_dir() }" target="_blank" title="${ _('Go upload additional files and libraries to the deployment directory on HDFS') }" rel="tooltip" data-placement="right"><i class="icon-folder-open"></i> ${ _('Workspace') }</a>
+            <a data-bind="attr: {href: '/filebrowser/view' + deployment_dir() }" target="_blank" title="${ _('Go upload additional files and libraries to the deployment directory on HDFS') }" rel="tooltip" data-placement="right"><i class="fa fa-folder-open"></i> ${ _('Workspace') }</a>
           </li>
         % endif
 
         <li class="nav-header">${ _('Advanced') }</li>
-        <li><a href="#importAction" title="${ _('Click to import an Oozie workflow action or Job Designer action') }" rel="tooltip" data-placement="right"><i class="icon-download-alt"></i> ${ _('Import action') }</a></li>
+        <li><a href="#importAction" title="${ _('Click to import an Oozie workflow action or Job Designer action') }" rel="tooltip" data-placement="right"><i class="fa fa-arrow-circle-o-down"></i> ${ _('Import action') }</a></li>
         % if user_can_edit_job:
           <li>
-            <a title="${ _('Edit kill node') }" rel="tooltip" data-placement="right" href="#kill"><i class="icon-off"></i> ${ _('Kill node') }</a>
+            <a title="${ _('Edit kill node') }" rel="tooltip" data-placement="right" href="#kill"><i class="fa fa-power-off"></i> ${ _('Kill node') }</a>
           </li>
         % endif
 
         % if user_can_edit_job:
-          <li><a href="#listHistory"><i class="icon-archive"></i> ${ _('History') }</a></li>
+          <li><a href="#listHistory"><i class="fa fa-archive"></i> ${ _('History') }</a></li>
         % endif
 
         <li class="nav-header">${ _('Actions') }</li>
         % if user_can_access_job:
           <li>
-            <a id="submit-btn" href="javascript:void(0)" data-submit-url="${ url('oozie:submit_workflow', workflow=workflow.id) }" title="${ _('Submit this workflow') }" rel="tooltip" data-placement="right"><i class="icon-play"></i> ${ _('Submit') }</a>
+            <a id="submit-btn" href="javascript:void(0)" data-submit-url="${ url('oozie:submit_workflow', workflow=workflow.id) }" title="${ _('Submit this workflow') }" rel="tooltip" data-placement="right"><i class="fa fa-play"></i> ${ _('Submit') }</a>
           </li>
           <li>
-            <a href="${ url('oozie:schedule_workflow', workflow=workflow.id) }" title="${ _('Schedule this workflow') }" rel="tooltip" data-placement="right"><i class="icon-calendar"></i> ${ _('Schedule') }</a>
+            <a href="${ url('oozie:schedule_workflow', workflow=workflow.id) }" title="${ _('Schedule this workflow') }" rel="tooltip" data-placement="right"><i class="fa fa-calendar"></i> ${ _('Schedule') }</a>
           </li>
           <li>
-            <a id="clone-btn" href="#" data-clone-url="${ url('oozie:clone_workflow', workflow=workflow.id) }" title="${ _('Copy this workflow') }" rel="tooltip" data-placement="right"><i class="icon-copy"></i> ${ _('Copy') }</a>
+            <a id="clone-btn" href="#" data-clone-url="${ url('oozie:clone_workflow', workflow=workflow.id) }" title="${ _('Copy this workflow') }" rel="tooltip" data-placement="right"><i class="fa fa-files-o"></i> ${ _('Copy') }</a>
           </li>
           <li>
-            <a id="export-btn" href="${ url('oozie:export_workflow', workflow=workflow.id) }" title="${ _('Export this workflow') }" rel="tooltip" data-placement="right"><i class="icon-upload-alt"></i> ${ _('Export') }</a>
+            <a id="export-btn" href="${ url('oozie:export_workflow', workflow=workflow.id) }" title="${ _('Export this workflow') }" rel="tooltip" data-placement="right"><i class="fa fa-upload"></i> ${ _('Export') }</a>
           </li>
         % endif
       </ul>
@@ -110,7 +110,7 @@ ${ layout.menubar(section='workflows') }
         <div class="control-group ">
           <label class="control-label">
             <a href="#" id="advanced-btn" onclick="$('#advanced-container').toggle('hide')">
-              <i class="icon-share-alt"></i> ${ _('advanced') }</a>
+              <i class="fa fa-share"></i> ${ _('advanced') }</a>
           </label>
           <div class="controls"></div>
         </div>
@@ -138,7 +138,7 @@ ${ layout.menubar(section='workflows') }
       <div class="card-body">
         <p>
           <fieldset data-bind="with: context().node">
-            <p>&nbsp;${_('Action enabled: ')} <i class="icon-check" data-bind="visible: to().length > 0"></i><i class="icon-check-empty" data-bind="visible: to().length == 0"></i></p>
+            <p>&nbsp;${_('Action enabled: ')} <i class="fa fa-check-square-o" data-bind="visible: to().length > 0"></i><i class="fa fa-square-o" data-bind="visible: to().length == 0"></i></p>
 
             % for form_info in action_forms:
               % if form_info[0] == 'email':
@@ -251,79 +251,79 @@ ${ layout.menubar(section='workflows') }
         <div class="draggable-button">
           <a data-node-type="mapreduce"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
-            <i class="icon-move"></i> MapReduce
+            <i class="fa fa-move"></i> MapReduce
           </a>
         </div>
         <div class="draggable-button">
           <a data-node-type="streaming"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
-            <i class="icon-move"></i> Streaming
+            <i class="fa fa-move"></i> Streaming
           </a>
         </div>
         <div class="draggable-button">
           <a data-node-type="java"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
-            <i class="icon-move"></i> Java
+            <i class="fa fa-move"></i> Java
           </a>
          </div>
         <div class="draggable-button">
           <a data-node-type="pig"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
-            <i class="icon-move"></i> Pig
+            <i class="fa fa-move"></i> Pig
           </a>
         </div>
         <div class="draggable-button">
           <a data-node-type="hive"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
-            <i class="icon-move"></i> Hive
+            <i class="fa fa-move"></i> Hive
           </a>
         </div>
         <div class="draggable-button">
           <a data-node-type="sqoop"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
-            <i class="icon-move"></i> Sqoop
+            <i class="fa fa-move"></i> Sqoop
           </a>
         </div>
         <div class="draggable-button">
           <a data-node-type="shell"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
-            <i class="icon-move"></i> Shell
+            <i class="fa fa-move"></i> Shell
           </a>
         </div>
         <div class="draggable-button">
           <a data-node-type="ssh"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
-            <i class="icon-move"></i> Ssh
+            <i class="fa fa-move"></i> Ssh
           </a>
         </div>
         <div class="draggable-button">
           <a data-node-type="distcp"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
-            <i class="icon-move"></i> DistCp
+            <i class="fa fa-move"></i> DistCp
           </a>
         </div>
         <div class="draggable-button">
           <a data-node-type="fs"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
-            <i class="icon-move"></i> Fs
+            <i class="fa fa-move"></i> Fs
           </a>
         </div>
         <div class="draggable-button">
           <a data-node-type="email"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
-            <i class="icon-move"></i> Email
+            <i class="fa fa-move"></i> Email
           </a>
         </div>
         <div class="draggable-button">
           <a data-node-type="subworkflow"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
-            <i class="icon-move"></i> Sub-workflow
+            <i class="fa fa-move"></i> Sub-workflow
           </a>
         </div>
         <div class="draggable-button">
           <a data-node-type="generic"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
-            <i class="icon-move"></i> Generic
+            <i class="fa fa-move"></i> Generic
           </a>
         </div>
       </div>
@@ -478,9 +478,9 @@ ${ controls.decision_form(node_form, link_form, default_link_form, 'decision', T
 
       <div class="row-fluid node-action-bar">
         <div class="span12" style="text-align:right">
-          <a class="btn btn-mini edit-node-link" title="${ _('Edit') }" relz="tooltip" data-bind="attr: { 'data-node-type': node_type() }"><i class="icon-pencil"></i></a>
-          <a class="btn btn-mini clone-node-btn" title="${ _('Copy') }" relz="tooltip"><i class="icon-copy"></i></a>
-          <a class="btn btn-mini delete-node-btn" title="${ _('Delete') }" relz="tooltip"><i class="icon-trash"></i></a>
+          <a class="btn btn-mini edit-node-link" title="${ _('Edit') }" relz="tooltip" data-bind="attr: { 'data-node-type': node_type() }"><i class="fa fa-pencil"></i></a>
+          <a class="btn btn-mini clone-node-btn" title="${ _('Copy') }" relz="tooltip"><i class="fa fa-files-o"></i></a>
+          <a class="btn btn-mini delete-node-btn" title="${ _('Delete') }" relz="tooltip"><i class="fa fa-trash-o"></i></a>
           &nbsp;
         </div>
       </div>
@@ -503,8 +503,8 @@ ${ controls.decision_form(node_form, link_form, default_link_form, 'decision', T
 
       <div class="row-fluid node-action-bar">
         <div class="span12" style="text-align:right">
-          <a class="btn btn-mini edit-node-link" title="${ _('Edit') }" relz="tooltip" data-bind="attr: { 'data-node-type': node_type() }"><i class="icon-pencil"></i></a>
-          <a class="btn btn-mini convert-node-link" title="${ _('Convert to Decision') }" data-bind="attr: { 'data-node-type': node_type() }" relz="tooltip"><i class="icon-wrench"></i></a>
+          <a class="btn btn-mini edit-node-link" title="${ _('Edit') }" relz="tooltip" data-bind="attr: { 'data-node-type': node_type() }"><i class="fa fa-pencil"></i></a>
+          <a class="btn btn-mini convert-node-link" title="${ _('Convert to Decision') }" data-bind="attr: { 'data-node-type': node_type() }" relz="tooltip"><i class="fa fa-wrench"></i></a>
           &nbsp;
         </div>
       </div>
@@ -538,7 +538,7 @@ ${ controls.decision_form(node_form, link_form, default_link_form, 'decision', T
 
       <div class="row-fluid node-action-bar">
         <div class="span12" style="text-align:right">
-          <a class="btn btn-mini edit-node-link" title="${ _('Edit') }" data-bind="attr: { 'data-node-type': node_type() }" relz="tooltip"><i class="icon-pencil"></i></a>
+          <a class="btn btn-mini edit-node-link" title="${ _('Edit') }" data-bind="attr: { 'data-node-type': node_type() }" relz="tooltip"><i class="fa fa-pencil"></i></a>
           &nbsp;
         </div>
       </div>

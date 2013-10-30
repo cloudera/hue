@@ -96,7 +96,7 @@
 
     function maybeAddToExtra(str) {
       var _match = str;
-      if (_match.indexOf("icon-magic") > -1) {
+      if (_match.indexOf("fa-magic") > -1) {
         _match = _match.substring(32);
       }
       if (_match.indexOf(start) == 0 && !arrayContains(found, str)) extraFound.push(str);
@@ -111,7 +111,7 @@
           if (CodeMirror.tableFieldMagic) {
             var _specialCatalogTablesL = CodeMirror.catalogTables.toLowerCase().split(" ");
             for (var i = 0; i < _specialCatalogTablesL.length; i++) {
-              _specialCatalogTablesL[i] = "<i class='icon-magic'></i> FROM " + _specialCatalogTablesL[i];
+              _specialCatalogTablesL[i] = "<i class='fa fa-magic'></i> FROM " + _specialCatalogTablesL[i];
             }
             forEach(_specialCatalogTablesL, maybeAddToExtra);
           }

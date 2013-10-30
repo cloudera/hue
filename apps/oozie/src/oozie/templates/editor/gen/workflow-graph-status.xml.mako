@@ -66,9 +66,9 @@
           </div>
           <div class="span10" style="text-align:right">
             % if action:
-              <a href="${ action.get_absolute_url() }" class="btn btn-mini" title="${ _('View workflow action') }" rel="tooltip"><i class="icon-eye-open"></i></a>
+              <a href="${ action.get_absolute_url() }" class="btn btn-mini" title="${ _('View workflow action') }" rel="tooltip"><i class="fa fa-eye"></i></a>
             % endif
-            <a href="${ url('jobbrowser.views.job_single_logs', job=action.externalId) }" class="btn btn-mini" title="${ _('View the logs') }" rel="tooltip" data-row-selector-exclude="true" id="advanced-btn"><i class="icon-tasks"></i></a>
+            <a href="${ url('jobbrowser.views.job_single_logs', job=action.externalId) }" class="btn btn-mini" title="${ _('View the logs') }" rel="tooltip" data-row-selector-exclude="true" id="advanced-btn"><i class="fa fa-tasks"></i></a>
             &nbsp;
           </div>
         </div>

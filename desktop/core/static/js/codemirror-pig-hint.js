@@ -126,7 +126,7 @@
         forEach(CodeMirror.availableVariables, maybeAddToExtra);
       }
       if (CodeMirror.isHCatHint){
-        maybeAdd("<i class='icon-magic'></i> USING org.apache.hcatalog.pig.HCatLoader();");
+        maybeAdd("<i class='fa fa-magic'></i> USING org.apache.hcatalog.pig.HCatLoader();");
       }
     }
 

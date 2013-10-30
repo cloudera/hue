@@ -386,7 +386,7 @@
       $(".date:not('.input-append')").each(function () {
         $(this).removeClass("date").addClass("dateInput").wrap($("<div>").addClass("input-append").addClass("date").css("marginRight", "8px"));
         $(this).parent().data("date", $(this).val());
-        $("<span>").addClass("add-on").html('<i class="icon-th"></i>').appendTo($(this).parent());
+        $("<span>").addClass("add-on").html('<i class="fa fa-th"></i>').appendTo($(this).parent());
       });
 
       $("input[name='end_0']").data("original-val", $("input[name='end_0']").val());
@@ -414,7 +414,7 @@
 
       $(".time:not('.input-append')").each(function () {
         $(this).attr("class", "input-mini timepicker-default").wrap($("<div>").addClass("input-append").addClass("date").addClass("bootstrap-timepicker-component"));
-        $("<span>").addClass("add-on").html('<i class="icon-time"></i>').appendTo($(this).parent());
+        $("<span>").addClass("add-on").html('<i class="fa fa-clock-o"></i>').appendTo($(this).parent());
       });
 
       $(".timepicker-default").timepicker({

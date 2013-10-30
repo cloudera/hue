@@ -44,13 +44,13 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
 <div class="search-bar">
   % if user.is_superuser:
     <div class="pull-right" style="margin-top: 4px">
-      <a class="change-settings" href="#"><i class="icon-edit"></i> ${ _('Customize this collection') }</a> &nbsp;&nbsp;
-      <a href="${ url('search:admin_collections') }"><i class="icon-sitemap"></i> ${ _('Collection manager') }</a>
+      <a class="change-settings" href="#"><i class="fa fa-edit"></i> ${ _('Customize this collection') }</a> &nbsp;&nbsp;
+      <a href="${ url('search:admin_collections') }"><i class="fa fa-sitemap"></i> ${ _('Collection manager') }</a>
     </div>
   % endif
   <form class="form-search" style="margin: 0">
     <div class="dropdown" style="display: inline">
-      ${ _('Search in')} <a href="#" data-toggle="dropdown"><strong class="current-collection"></strong> <i class="icon-caret-down"></i></a>
+      ${ _('Search in')} <a href="#" data-toggle="dropdown"><strong class="current-collection"></strong> <i class="fa fa-caret-down"></i></a>
       <ul class="dropdown-menu">
         % if user.is_superuser:
           % for collection in hue_collections:
@@ -65,7 +65,7 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
     </div>
     <div class="input-append">
       ${ search_form | n,unicode }
-      <button type="submit" class="btn"><i class="icon-search"></i></button>
+      <button type="submit" class="btn"><i class="fa fa-search"></i></button>
     </div>
   </form>
 </div>
@@ -114,13 +114,13 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
             % endif
             % if found_value != "":
               % if fld['type'] == 'field' and '"' + group + '"' == found_value:
-                <li><strong>${ group }</strong> <a href="?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}"><i class="icon-remove"></i></a></li>
+                <li><strong>${ group }</strong> <a href="?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}"><i class="fa fa-times"></i></a></li>
               % endif
               % if fld['type'] == 'range' and '["' + group + '" TO "' + str(int(group) + int(fld['gap']) - 1) + '"]' == found_value:
-                <li><strong>${ group } - ${ str(int(group) + int(fld['gap']) - 1) }</strong> <a href="?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}"><i class="icon-remove"></i></a></li>
+                <li><strong>${ group } - ${ str(int(group) + int(fld['gap']) - 1) }</strong> <a href="?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}"><i class="fa fa-times"></i></a></li>
               % endif
               % if fld['type'] == 'date' and found_value.startswith('[' + group + ' TO'):
-                <li><strong><span class="dateFacet" data-format="${fld['format']}">${ group }<span class="dateFacetGap hide">${ fld['gap'] }</span></span></strong> <a href="?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}"><i class="icon-remove"></i></a></li>
+                <li><strong><span class="dateFacet" data-format="${fld['format']}">${ group }<span class="dateFacetGap hide">${ fld['gap'] }</span></span></strong> <a href="?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}"><i class="fa fa-times"></i></a></li>
               % endif
             % endif
           % endfor

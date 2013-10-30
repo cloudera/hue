@@ -16,9 +16,9 @@
 
 <%namespace name="dir" file="listdir_components.mako" />
 
-<div class="fb-actions" data-filters="ArtButtonBar">
-  <a class="fb-upload" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height' : 16}" href="${url('filebrowser.views.upload_file')}?dest=${path|u}&next=${current_request_path|u}">Upload Files</a>
-  <a class="fb-mkdir" data-filters="ArtButton" data-icon-styles="{'width': 16, 'height': 16}" href="${url('filebrowser.views.mkdir')}?path=${path|u}&next=${current_request_path|u}">New Directory</a>
+<div class="fb-actions">
+  <a class="fb-upload" data-icon-styles="{'width': 16, 'height' : 16}" href="${url('filebrowser.views.upload_file')}?dest=${path|u}&next=${current_request_path|u}">Upload Files</a>
+  <a class="fb-mkdir" data-icon-styles="{'width': 16, 'height': 16}" href="${url('filebrowser.views.mkdir')}?path=${path|u}&next=${current_request_path|u}">New Directory</a>
 </div>
 
 ${dir.list_table_chooser(files, path_enc, current_request_path)}

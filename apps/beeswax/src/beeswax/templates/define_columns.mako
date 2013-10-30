@@ -31,8 +31,8 @@ ${ layout.metastore_menubar() }
             <div class="sidebar-nav">
                 <ul class="nav nav-list">
                     <li class="nav-header">${_('Actions')}</li>
-                    <li><a href="${ url(app_name + ':import_wizard', database=database)}"><i class="icon-copy"></i> ${_('Create a new table from a file')}</a></li>
-                    <li><a href="${ url(app_name + ':create_table', database=database)}"><i class="icon-wrench"></i> ${_('Create a new table manually')}</a></li>
+                    <li><a href="${ url(app_name + ':import_wizard', database=database)}"><i class="fa fa-files-o"></i> ${_('Create a new table from a file')}</a></li>
+                    <li><a href="${ url(app_name + ':create_table', database=database)}"><i class="fa fa-wrench"></i> ${_('Create a new table manually')}</a></li>
                 </ul>
             </div>
         </div>
@@ -63,7 +63,7 @@ ${ layout.metastore_menubar() }
                             <div class="scrollable">
                                 <table class="table table-striped">
                                     <thead>
-                                      <th id="editColumns">${ _('Column name') } &nbsp;<i class="icon-edit" rel="tooltip" data-placement="right" title="${ _('Bulk edit names') }"></i></th>
+                                      <th id="editColumns">${ _('Column name') } &nbsp;<i class="fa fa-edit" rel="tooltip" data-placement="right" title="${ _('Bulk edit names') }"></i></th>
                                       <th>${ _('Column Type') }</th>
                                       % for i in range(0, n_rows):
                                         <th><em>${_('Sample Row')} #${i + 1}</em></th>
@@ -122,8 +122,8 @@ ${ layout.metastore_menubar() }
                   <input type="text" class="span8" style="padding-right: 24px;" placeholder="${ _('e.g. id, name, salary') }">
                 </div>
                 <div class="editable-buttons">
-                  <button type="button" class="btn btn-primary editable-submit"><i class="icon-ok"></i></button>
-                  <button type="button" class="btn editable-cancel"><i class="icon-remove"></i></button>
+                  <button type="button" class="btn btn-primary editable-submit"><i class="fa fa-check"></i></button>
+                  <button type="button" class="btn editable-cancel"><i class="fa fa-times"></i></button>
                 </div>
               </div>
             </div>

@@ -38,18 +38,18 @@ ${ layout.menubar(section='coordinators') }
 
     <%def name="actions()">
         <button class="btn toolbarBtn" id="restore-btn" disabled="disabled" title="${_('Restore the selected coordinators')}">
-          <i class="icon-cloud-upload"></i> ${ _('Restore') }
+          <i class="fa fa-cloud-upload"></i> ${ _('Restore') }
         </button>
         <button class="btn toolbarBtn" id="destroy-btn" disabled="disabled" title="${_('Delete the selected coordinators')}">
-          <i class="icon-bolt"></i> ${ _('Delete forever') }
+          <i class="fa fa-bolt"></i> ${ _('Delete forever') }
         </button>
     </%def>
 
     <%def name="creation()">
-       <button class="btn" id="purge-btn"><i class="icon-fire"></i> ${ _('Empty trash') }</button>
+       <button class="btn" id="purge-btn"><i class="fa fa-fire"></i> ${ _('Empty trash') }</button>
        &nbsp;&nbsp;
        <a href="${ url('oozie:list_coordinators') }" id="home-btn" class="btn" title="${ _('Got to coordinator manager') }">
-         <i class="icon-home"></i> ${ _('Back') }
+         <i class="fa fa-home"></i> ${ _('Back') }
        </a>        
     </%def>
   </%actionbar:render>
@@ -57,7 +57,7 @@ ${ layout.menubar(section='coordinators') }
   <table id="coordinatorTable" class="table datatables">
     <thead>
       <tr>
-        <th width="1%"><div class="hueCheckbox selectAll" data-selectables="coordinatorCheck"></div></th>
+        <th width="1%"><div class="hueCheckbox selectAll fa" data-selectables="coordinatorCheck"></div></th>
         <th>${ _('Name') }</th>
         <th>${ _('Description') }</th>
         <th>${ _('Workflow') }</th>
@@ -71,7 +71,7 @@ ${ layout.menubar(section='coordinators') }
       %for coordinator in jobs:
         <tr>
           <td data-row-selector-exclude="true">
-            <div class="hueCheckbox coordinatorCheck" data-row-selector-exclude="true" data-coordinator-id="${ coordinator.id }"></div>
+            <div class="hueCheckbox coordinatorCheck fa" data-row-selector-exclude="true" data-coordinator-id="${ coordinator.id }"></div>
           </td>
           <td>${ coordinator.name }</td>
           <td>${ coordinator.description }</td>
@@ -158,24 +158,24 @@ ${ layout.menubar(section='coordinators') }
 
     $(".selectAll").click(function () {
       if ($(this).attr("checked")) {
-        $(this).removeAttr("checked").removeClass("icon-ok");
-        $("." + $(this).data("selectables")).removeClass("icon-ok").removeAttr("checked");
+        $(this).removeAttr("checked").removeClass("fa-check");
+        $("." + $(this).data("selectables")).removeClass("fa-check").removeAttr("checked");
       }
       else {
-        $(this).attr("checked", "checked").addClass("icon-ok");
-        $("." + $(this).data("selectables")).addClass("icon-ok").attr("checked", "checked");
+        $(this).attr("checked", "checked").addClass("fa-check");
+        $("." + $(this).data("selectables")).addClass("fa-check").attr("checked", "checked");
       }
       toggleActions();
     });
 
     $(".coordinatorCheck").click(function () {
       if ($(this).attr("checked")) {
-        $(this).removeClass("icon-ok").removeAttr("checked");
+        $(this).removeClass("fa-check").removeAttr("checked");
       }
       else {
-        $(this).addClass("icon-ok").attr("checked", "checked");
+        $(this).addClass("fa-check").attr("checked", "checked");
       }
-      $(".selectAll").removeAttr("checked").removeClass("icon-ok");
+      $(".selectAll").removeAttr("checked").removeClass("fa-check");
       toggleActions();
     });
 

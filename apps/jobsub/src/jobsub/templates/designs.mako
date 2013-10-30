@@ -70,22 +70,22 @@ ${ commonheader(None, "jobsub", user) | n,unicode }
     <%def name="actions()">
       <div class="btn-toolbar" style="display: inline; vertical-align: middle">
       <!-- ko ifnot: inTrash -->
-        <button id="submit-design" class="btn" title="${_('Submit')}" data-bind="enable: selectedDesignObjects().length == 1"><i class="icon-play"></i> ${_('Submit')}</button>
-        <button id="edit-design" class="btn" title="${_('Edit')}" data-bind="enable: selectedDesignObjects().length == 1"><i class="icon-pencil"></i> ${_('Edit')}</button>
-        <button id="copy-designs" class="btn" title="${_('Copy')}" data-bind="enable: selectedDesignObjects().length > 0"><i class="icon-copy"></i> ${_('Copy')}</button>
+        <button id="submit-design" class="btn" title="${_('Submit')}" data-bind="enable: selectedDesignObjects().length == 1"><i class="fa fa-play"></i> ${_('Submit')}</button>
+        <button id="edit-design" class="btn" title="${_('Edit')}" data-bind="enable: selectedDesignObjects().length == 1"><i class="fa fa-pencil"></i> ${_('Edit')}</button>
+        <button id="copy-designs" class="btn" title="${_('Copy')}" data-bind="enable: selectedDesignObjects().length > 0"><i class="fa fa-files-o"></i> ${_('Copy')}</button>
         <div id="delete-dropdown" class="btn-group" style="vertical-align: middle">
-          <button id="trash-designs" class="btn" data-bind="enable: selectedDesignObjects().length > 0"><i class="icon-remove"></i> ${_('Move to trash')}</button>
+          <button id="trash-designs" class="btn" data-bind="enable: selectedDesignObjects().length > 0"><i class="fa fa-times"></i> ${_('Move to trash')}</button>
           <button class="btn dropdown-toggle" data-toggle="dropdown" data-bind="enable: selectedDesignObjects().length > 0">
             <span class="caret"></span>
           </button>
           <ul class="dropdown-menu">
-            <li><a href="javascript:void(0);" id="destroy-designs" title="${_('Delete forever')}"><i class="icon-bolt"></i> ${_('Delete forever')}</a></li>
+            <li><a href="javascript:void(0);" id="destroy-designs" title="${_('Delete forever')}"><i class="fa fa-bolt"></i> ${_('Delete forever')}</a></li>
           </ul>
         </div>
       <!-- /ko -->
       <!-- ko if: inTrash -->
-        <button id="restore-designs" disabled="disabled" class="btn" title="${_('Restore')}" data-bind="enable: selectedDesignObjects().length > 0"><i class="icon-cloud-upload"></i> ${_('Restore')}</button>
-        <button id="destroy-designs" disabled="disabled" class="btn" title="${_('Delete forever')}" data-bind="enable: selectedDesignObjects().length > 0"><i class="icon-bolt"></i> ${_('Delete forever')}</button>
+        <button id="restore-designs" disabled="disabled" class="btn" title="${_('Restore')}" data-bind="enable: selectedDesignObjects().length > 0"><i class="fa fa-cloud-upload"></i> ${_('Restore')}</button>
+        <button id="destroy-designs" disabled="disabled" class="btn" title="${_('Delete forever')}" data-bind="enable: selectedDesignObjects().length > 0"><i class="fa fa-bolt"></i> ${_('Delete forever')}</button>
       <!-- /ko -->
       </div>
     </%def>
@@ -93,54 +93,54 @@ ${ commonheader(None, "jobsub", user) | n,unicode }
     <%def name="creation()">
       <div class="btn-toolbar" style="display: inline; vertical-align: middle">
       <!-- ko if: inTrash -->
-        <button disabled="disabled" type="button" id="purge-trashed-designs" class="btn" title="${ _('Delete all the designs') }"><i class="icon-fire"></i> ${ _('Empty trash') }</button>
+        <button disabled="disabled" type="button" id="purge-trashed-designs" class="btn" title="${ _('Delete all the designs') }"><i class="fa fa-fire"></i> ${ _('Empty trash') }</button>
         &nbsp;&nbsp;
       <!-- /ko -->
-      <button id="home" class="btn" title="${_('Home')}" data-bind="visible: isEditing"><i class="icon-home"></i> ${_('View designs')}</button>
+      <button id="home" class="btn" title="${_('Home')}" data-bind="visible: isEditing"><i class="fa fa-home"></i> ${_('View designs')}</button>
       <!-- ko ifnot: inTrash -->
         <div id="new-action-dropdown" class="btn-group" style="vertical-align: middle">
           <a href="#" class="btn new-action-link dropdown-toggle" title="${_('New action')}" data-toggle="dropdown">
-            <i class="icon-plus-sign"></i> ${_('New action')}
+            <i class="fa fa-plus-circle"></i> ${_('New action')}
             <span class="caret"></span>
           </a>
           <ul class="dropdown-menu" style="top: auto">
             <li>
-              <a href="#new-design/mapreduce" class="new-node-link" title="${_('Create MapReduce design')}" rel="tooltip"><i class="icon-plus-sign"></i> MapReduce</a>
+              <a href="#new-design/mapreduce" class="new-node-link" title="${_('Create MapReduce design')}" rel="tooltip"><i class="fa fa-plus-circle"></i> MapReduce</a>
             </li>
             <li>
-              <a href="#new-design/java" class="new-node-link" title="${_('Create Java design')}" rel="tooltip"><i class="icon-plus-sign"></i> Java</a>
+              <a href="#new-design/java" class="new-node-link" title="${_('Create Java design')}" rel="tooltip"><i class="fa fa-plus-circle"></i> Java</a>
             </li>
             <li>
-              <a href="#new-design/streaming" class="new-node-link" title="${_('Create Streaming design')}" rel="tooltip"><i class="icon-plus-sign"></i> Streaming</a>
+              <a href="#new-design/streaming" class="new-node-link" title="${_('Create Streaming design')}" rel="tooltip"><i class="fa fa-plus-circle"></i> Streaming</a>
             </li>
             <li>
-              <a href="#new-design/hive" class="new-node-link" title="${_('Create Hive design')}" rel="tooltip"><i class="icon-plus-sign"></i> Hive</a>
+              <a href="#new-design/hive" class="new-node-link" title="${_('Create Hive design')}" rel="tooltip"><i class="fa fa-plus-circle"></i> Hive</a>
             </li>
             <li>
-              <a href="#new-design/pig" class="new-node-link" title="${_('Create Pig design')}" rel="tooltip"><i class="icon-plus-sign"></i> Pig</a>
+              <a href="#new-design/pig" class="new-node-link" title="${_('Create Pig design')}" rel="tooltip"><i class="fa fa-plus-circle"></i> Pig</a>
             </li>
             <li>
-              <a href="#new-design/sqoop" class="new-node-link" title="${_('Create Sqoop design')}" rel="tooltip"><i class="icon-plus-sign"></i> Sqoop</a>
+              <a href="#new-design/sqoop" class="new-node-link" title="${_('Create Sqoop design')}" rel="tooltip"><i class="fa fa-plus-circle"></i> Sqoop</a>
             </li>
             <li>
-              <a href="#new-design/fs" class="new-node-link" title="${_('Create Fs design')}" rel="tooltip"><i class="icon-plus-sign"></i> Fs</a>
+              <a href="#new-design/fs" class="new-node-link" title="${_('Create Fs design')}" rel="tooltip"><i class="fa fa-plus-circle"></i> Fs</a>
             </li>
             <li>
-              <a href="#new-design/ssh" class="new-node-link" title="${_('Create SSH design')}" rel="tooltip"><i class="icon-plus-sign"></i> Ssh</a>
+              <a href="#new-design/ssh" class="new-node-link" title="${_('Create SSH design')}" rel="tooltip"><i class="fa fa-plus-circle"></i> Ssh</a>
             </li>
             <li>
-              <a href="#new-design/shell" class="new-node-link" title="${_('Create Shell design')}" rel="tooltip"><i class="icon-plus-sign"></i> Shell</a>
+              <a href="#new-design/shell" class="new-node-link" title="${_('Create Shell design')}" rel="tooltip"><i class="fa fa-plus-circle"></i> Shell</a>
             </li>
             <li>
-              <a href="#new-design/email" class="new-node-link" title="${_('Create Email design')}" rel="tooltip"><i class="icon-plus-sign"></i> Email</a>
+              <a href="#new-design/email" class="new-node-link" title="${_('Create Email design')}" rel="tooltip"><i class="fa fa-plus-circle"></i> Email</a>
             </li>
             <li>
-              <a href="#new-design/distcp" class="new-node-link" title="${_('Create DistCp design')}" rel="tooltip"><i class="icon-plus-sign"></i> DistCp</a>
+              <a href="#new-design/distcp" class="new-node-link" title="${_('Create DistCp design')}" rel="tooltip"><i class="fa fa-plus-circle"></i> DistCp</a>
             </li>
           </ul>
         </div>
         &nbsp;&nbsp;
-        <a href="#trashed-designs" class="btn"><i class="icon-trash"></i> ${ _('View trash') }</a>
+        <a href="#trashed-designs" class="btn"><i class="fa fa-trash-o"></i> ${ _('View trash') }</a>
       <!-- /ko -->
 
       </div>
@@ -154,7 +154,7 @@ ${ commonheader(None, "jobsub", user) | n,unicode }
       <thead>
         <tr>
           <th width="1%">
-            <div id="selectAll" data-bind="click: toggleSelectAll, css: {'hueCheckbox': true, 'icon-ok': allSelected}"></div>
+            <div id="selectAll" data-bind="click: toggleSelectAll, css: {'hueCheckbox': true, 'fa': true, 'fa-check': allSelected}"></div>
           </th>
           <th>${_('Name')}</th>
           <th>${_('Description')}</th>
@@ -180,14 +180,14 @@ ${ commonheader(None, "jobsub", user) | n,unicode }
     <img src="/static/art/spinner-big.gif" />
   <![endif]-->
   <!--[if !IE]> -->
-    <i class="icon-spinner icon-spin"></i>
+    <i class="fa fa-spinner fa-spin"></i>
   <!-- <![endif]-->
 </div>
 
 <script id="designTemplate" type="text/html">
   <tr style="cursor: pointer" data-bind="with: design">
     <td data-row-selector-exclude="true" data-bind="click: function(data, event) {$root.toggleSelect.call($root, $index());}" class="center" style="cursor: default">
-      <div class="hueCheckbox savedCheck" data-row-selector-exclude="true" data-bind="css: {'hueCheckbox': name != '..', 'icon-ok': $parent.selected()}"></div>
+      <div class="hueCheckbox savedCheck" data-row-selector-exclude="true" data-bind="css: {'hueCheckbox': name != '..', 'fa': name != '..', 'fa-check': $parent.selected()}"></div>
     </td>
     <td data-bind="click: function(data, event) { window.location = '#edit-design/' + id() }, text: name"></td>
     <td data-bind="click: function(data, event) { window.location = '#edit-design/' + id() }, text: description"></td>

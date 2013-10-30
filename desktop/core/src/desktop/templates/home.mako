@@ -91,7 +91,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
          <ul class="nav nav-list">
           <li class="nav-header">${_('Actions')}</li>
            <li class="dropdown">
-              <a href="#" data-toggle="dropdown"><i class="icon-plus-sign"></i> ${_('New document')}</a>
+              <a href="#" data-toggle="dropdown"><i class="fa fa-plus-circle"></i> ${_('New document')}</a>
               <ul class="dropdown-menu" role="menu">
                 % if 'beeswax' in apps:
                 <li><a href="${ url('beeswax:index') }"><img src="${ apps['beeswax'].icon_path }"/> ${_('Hive Query')}</a></li>
@@ -115,12 +115,12 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
               </ul>
            </li>
            <li class="view-trash toggable-section">
-             <a href="javascript:void(0)"><i class="icon-trash"></i> ${_('Trash')} <span id="trashCounter" class="badge pull-right">0</span></a>
+             <a href="javascript:void(0)"><i class="fa fa-trash-o"></i> ${_('Trash')} <span id="trashCounter" class="badge pull-right">0</span></a>
            </li>
            <li class="viewHistory toggable-section">
-             <a href="javascript:void(0)"><i class="icon-time"></i> ${_('History')} <span id="historyCounter" class="badge pull-right">0</span></a>
+             <a href="javascript:void(0)"><i class="fa fa-clock-o"></i> ${_('History')} <span id="historyCounter" class="badge pull-right">0</span></a>
            </li>
-          <li class="nav-header tag-header">${_('Projects')} <div class="edit-tags" style="display: inline;cursor: pointer;margin-left: 6px" title="${ _('Edit projects') }"><i class="icon-tags"></i></div> </li>
+          <li class="nav-header tag-header">${_('Projects')} <div class="edit-tags" style="display: inline;cursor: pointer;margin-left: 6px" title="${ _('Edit projects') }"><i class="fa fa-tags"></i></div> </li>
           % if len(tags) > 2:
             % for tag in tags:
               % if tag.tag not in ('trash', 'history'):
@@ -128,7 +128,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
               % endif
             % endfor
           % else:
-            <li><a href="javascript:void(0)" class="edit-tags" style="line-height:24px"><i class="icon-plus-sign"></i> ${_('There are currently no projects. Click here to add one now!')}</a></li>
+            <li><a href="javascript:void(0)" class="edit-tags" style="line-height:24px"><i class="fa fa-plus-circle"></i> ${_('There are currently no projects. Click here to add one now!')}</a></li>
           % endif
         </ul>
       </div>
@@ -175,7 +175,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
       <div style="margin-top: 20px">
         <div class="input-append">
           <input id="documentTagsNew" type="text">
-          <a id="documentTagsNewBtn" class="btn" type="button"><i class="icon-plus-sign"></i> ${_('Add')}</a>
+          <a id="documentTagsNewBtn" class="btn" type="button"><i class="fa fa-plus-circle"></i> ${_('Add')}</a>
         </div>
       </div>
     </p>
@@ -198,7 +198,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
       <div style="margin-top: 20px">
         <div class="input-append">
           <input id="tagsNew" type="text">
-          <a id="tagsNewBtn" class="btn" type="button"><i class="icon-plus-sign"></i> ${_('Add')}</a>
+          <a id="tagsNewBtn" class="btn" type="button"><i class="fa fa-plus-circle"></i> ${_('Add')}</a>
         </div>
       </div>
     </p>
@@ -223,7 +223,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
       <div style="margin-top: 20px">
         <div class="input-append">
           <input id="documentShareAdd" type="text" class="input-large" placeholder="${_('You can type a username or a group')}">
-          <a id="documentShareAddBtn" class="btn" type="button"><i class="icon-plus-sign"></i> ${_('Add')}</a>
+          <a id="documentShareAddBtn" class="btn" type="button"><i class="fa fa-plus-circle"></i> ${_('Add')}</a>
         </div>
       </div>
     </p>
@@ -271,7 +271,7 @@ $(document).ready(function () {
         return items.sort();
       },
       highlighter: function (item) {
-        var _icon = map[item].username ? "icon-user" : "icon-group";
+        var _icon = map[item].username ? "fa fa-user" : "fa fa-group";
         var regex = new RegExp('(' + this.query + ')', 'gi');
         return "<i class='" + _icon + "'></i> " + item.replace(regex, "<strong>$1</strong>");
       },
@@ -439,7 +439,7 @@ $(document).ready(function () {
     var _tags = "";
     for (var i = 0; i < JSON_TAGS.length; i++) {
       if (!JSON_TAGS[i].isTrash && !JSON_TAGS[i].isHistory && !JSON_TAGS[i].isExample) {
-        _tags += '<div style="margin-right:10px;margin-bottom: 6px;float:left;"><span class="tags-modal-checkbox badge" data-value="' + JSON_TAGS[i].id + '"><i class="icon-trash hide"></i> ' + JSON_TAGS[i].name + '</span></div>';
+        _tags += '<div style="margin-right:10px;margin-bottom: 6px;float:left;"><span class="tags-modal-checkbox badge" data-value="' + JSON_TAGS[i].id + '"><i class="fa fa-trash-o hide"></i> ' + JSON_TAGS[i].name + '</span></div>';
       }
     }
     $("#tagsModalList").html(_tags);
@@ -454,7 +454,7 @@ $(document).ready(function () {
       for (var i = 0; i < JSON_TAGS.length; i++) {
         if (!JSON_TAGS[i].isTrash && !JSON_TAGS[i].isHistory && !JSON_TAGS[i].isExample) {
           var _inTags = isInTags(_doc, JSON_TAGS[i].name);
-          _tags += '<div style="margin-right:10px;margin-bottom: 6px;float:left;"><span class="document-tags-modal-checkbox badge' + (_inTags ? ' badge-info selected' : '') + '" data-value="' + JSON_TAGS[i].id + '"><i class="icon-ok-sign' + (_inTags ? '' : ' hide') + '"></i> ' + JSON_TAGS[i].name + '</span></div>';
+          _tags += '<div style="margin-right:10px;margin-bottom: 6px;float:left;"><span class="document-tags-modal-checkbox badge' + (_inTags ? ' badge-info selected' : '') + '" data-value="' + JSON_TAGS[i].id + '"><i class="fa fa-check-circle' + (_inTags ? '' : ' hide') + '"></i> ' + JSON_TAGS[i].name + '</span></div>';
         }
       }
       $("#documentTagsModalList").html(_tags);
@@ -506,11 +506,11 @@ $(document).ready(function () {
     var _this = $(this);
     if (_this.hasClass("selected")) {
       _this.removeClass("selected").removeClass("badge-info");
-      _this.find(".icon-ok-sign").addClass("hide");
+      _this.find(".fa-check-circle").addClass("hide");
     }
     else {
       _this.addClass("selected").addClass("badge-info");
-      _this.find(".icon-ok-sign").removeClass("hide");
+      _this.find(".fa-check-circle").removeClass("hide");
     }
   });
 
@@ -524,11 +524,11 @@ $(document).ready(function () {
     var _this = $(this);
     if (_this.hasClass("selected")) {
       _this.removeClass("selected").removeClass("badge-important");
-      _this.find(".icon-trash").addClass("hide");
+      _this.find(".fa-trash-o").addClass("hide");
     }
     else {
       _this.addClass("selected").addClass("badge-important");
-      _this.find(".icon-trash").removeClass("hide");
+      _this.find(".fa-trash-o").removeClass("hide");
     }
   });
 
@@ -646,9 +646,9 @@ $(document).ready(function () {
     for (var id in shareList) {
       if (shareList.hasOwnProperty(id)) {
         var _obj = shareList[id];
-        var _icon = _obj.username != null ? "icon-user" : "icon-group";
+        var _icon = _obj.username != null ? "fa fa-user" : "fa fa-group";
         var _label = _obj.username != null ? _obj.username : _obj.name;
-        _html += '<li data-object-id="' + _obj.id + '"><span class="badge badge-left"><i class="' + _icon + '"></i> ' + _label + '</span><span class="badge badge-important badge-right trash-share"><i class="icon-trash"></i></span></li>';
+        _html += '<li data-object-id="' + _obj.id + '"><span class="badge badge-left"><i class="' + _icon + '"></i> ' + _label + '</span><span class="badge badge-important badge-right trash-share"><i class="fa fa-trash-o"></i></span></li>';
       }
     }
     if (_html != "") {
@@ -771,7 +771,7 @@ function addRow(doc) {
       '<div class="documentTags" data-document-id="' + doc.id + '">' + _tags + '</div>',
       emptyStringIfNull(doc.owner),
       emptyStringIfNull(doc.lastModified),
-      '<a href="#" class="shareDocument" data-document-id="' + doc.id + '" rel="tooltip" title="${_('Share')} ' + doc.name + '" data-placement="left" style="padding-left:10px"><i class="icon-share-sign"></i></a>',
+      '<a href="#" class="shareDocument" data-document-id="' + doc.id + '" rel="tooltip" title="${_('Share')} ' + doc.name + '" data-placement="left" style="padding-left:10px"><i class="fa fa-share-square-o"></i></a>',
     ], false);
     $("td", documentsTable.fnGetNodes(_addedRow[0]))[5].setAttribute("data-sort-value", doc.lastModifiedInMillis); // a bit of black magic.
   }

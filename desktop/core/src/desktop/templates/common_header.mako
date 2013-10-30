@@ -243,29 +243,29 @@ from django.utils.translation import ugettext as _
   <ul class="nav nav-pills">
     <li class="divider-vertical"></li>
     % if 'filebrowser' in apps:
-    <li><a title="${_('Manage HDFS')}" rel="navigator-tooltip" href="/${apps['filebrowser'].display_name}"><i class="icon-file"></i>&nbsp;${_('File Browser')}&nbsp;</a></li>
+    <li><a title="${_('Manage HDFS')}" rel="navigator-tooltip" href="/${apps['filebrowser'].display_name}"><i class="fa fa-file"></i>&nbsp;${_('File Browser')}&nbsp;</a></li>
     % endif
     % if 'jobbrowser' in apps:
-    <li><a title="${_('Manage jobs')}" rel="navigator-tooltip" href="/${apps['jobbrowser'].display_name}"><i class="icon-list-alt"></i>&nbsp;${_('Job Browser')}&nbsp;<span id="jobBrowserCount" class="badge badge-warning hide" style="padding-top:0;padding-bottom: 0"></span></a></li>
+    <li><a title="${_('Manage jobs')}" rel="navigator-tooltip" href="/${apps['jobbrowser'].display_name}"><i class="fa fa-list-alt"></i>&nbsp;${_('Job Browser')}&nbsp;<span id="jobBrowserCount" class="badge badge-warning hide" style="padding-top:0;padding-bottom: 0"></span></a></li>
     % endif
     <li class="dropdown">
-      <a title="${ _('Administration') }" rel="navigator-tooltip" href="index.html#" data-toggle="dropdown" class="dropdown-toggle"><i class="icon-cogs"></i>&nbsp;&nbsp;${user.username}<b class="caret"></b></a>
+      <a title="${ _('Administration') }" rel="navigator-tooltip" href="index.html#" data-toggle="dropdown" class="dropdown-toggle"><i class="fa fa-cogs"></i>&nbsp;&nbsp;${user.username}<b class="caret"></b></a>
       <ul class="dropdown-menu">
-        <li><a href="${ url('useradmin.views.edit_user', username=urllib.quote(user.username)) }"><i class="icon-key"></i>&nbsp;&nbsp;${_('Edit Profile')}</a></li>
+        <li><a href="${ url('useradmin.views.edit_user', username=urllib.quote(user.username)) }"><i class="fa fa-key"></i>&nbsp;&nbsp;${_('Edit Profile')}</a></li>
         %if user.is_superuser:
-        <li><a href="${ url('useradmin.views.list_users') }"><i class="icon-group"></i>&nbsp;&nbsp;${_('Manage users')}</a></li>
+        <li><a href="${ url('useradmin.views.list_users') }"><i class="fa fa-group"></i>&nbsp;&nbsp;${_('Manage users')}</a></li>
         %endif
       </ul>
     </li>
-    <li><a title="${_('Documentation')}" rel="navigator-tooltip" href="/help"><i class="icon-question-sign"></i></a></li>
+    <li><a title="${_('Documentation')}" rel="navigator-tooltip" href="/help"><i class="fa fa-question-circle"></i></a></li>
     <li id="jHueTourFlagPlaceholder"></li>
-    <li><a title="${_('Sign out')}" rel="navigator-tooltip" href="/accounts/logout/"><i class="icon-signout"></i></a></li>
+    <li><a title="${_('Sign out')}" rel="navigator-tooltip" href="/accounts/logout/"><i class="fa fa-sign-out"></i></a></li>
   </ul>
       % endif
   </div>
     <a class="brand nav-tooltip pull-left" title="${_('About Hue')}" rel="navigator-tooltip" href="/about"><img src="/static/art/hue-logo-mini-white.png" data-orig="/static/art/hue-logo-mini-white.png" data-hover="/static/art/hue-logo-mini-white-hover.png"/></a>
      <ul class="nav nav-pills pull-left">
-       <li><a title="${_('My documents')}" rel="navigator-tooltip" href="/home" style="padding-bottom:2px!important"><i class="icon-home" style="font-size: 19px"></i></a></li>
+       <li><a title="${_('My documents')}" rel="navigator-tooltip" href="/home" style="padding-bottom:2px!important"><i class="fa fa-home" style="font-size: 19px"></i></a></li>
        <li class="dropdown">
          <a title="${_('Query data')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">${_('Query Editors')} <b class="caret"></b></a>
          <ul role="menu" class="dropdown-menu">

@@ -203,13 +203,13 @@ def escape(text)  :
         <ul class="tweet-actions">
           <li class="action">
             <a href="https://twitter.com/intent/tweet?in_reply_to=${ result.get('id', '') }" target="_blank">
-              <i class="icon icon-reply"></i>
+              <i class="icon fa fa-reply"></i>
               <b>${_('Reply')}</b>
             </a>
           </li>
           <li class="action">
             <a href="https://twitter.com/intent/retweet?tweet_id=${ result.get('id', '') }" target="_blank">
-              <i class="icon icon-retweet"></i>
+              <i class="icon fa fa-retweet"></i>
               <b>${_('Retweet')}</b>
             </a>
           </li>

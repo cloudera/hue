@@ -53,7 +53,7 @@ ${ layout.menubar(section='workflows') }
           <div class="control-group ">
             <label class="control-label">
               <a href="#" id="advanced-btn" onclick="$('#advanced-container').toggle('hide')">
-                <i class="icon-share-alt"></i> ${ _('advanced') }
+                <i class="fa fa-share"></i> ${ _('advanced') }
               </a>
             </label>
             <div class="controls"></div>

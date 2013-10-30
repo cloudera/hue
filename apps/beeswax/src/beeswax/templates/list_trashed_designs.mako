@@ -40,10 +40,10 @@ ${layout.menubar(section='saved queries')}
       <%def name="actions()">
         <div class="btn-toolbar" style="display: inline; vertical-align: middle">
           <button id="deleteQueryBtn" class="btn toolbarBtn" title="${_('Delete forever')}" disabled="disabled">
-            <i class="icon-bolt"></i> ${_('Delete forever')}
+            <i class="fa fa-bolt"></i> ${_('Delete forever')}
           </button>
           <button id="restoreQueryBtn" class="btn toolbarBtn" title="${_('Restore from trash')}" disabled="disabled">
-            <i class="icon-cloud-upload"></i> ${_('Restore')}
+            <i class="fa fa-cloud-upload"></i> ${_('Restore')}
           </button>
         </div>
       </%def>
@@ -51,10 +51,10 @@ ${layout.menubar(section='saved queries')}
       <%def name="creation()">
         <div class="btn-toolbar" style="display: inline; vertical-align: middle">
           <button id="emptyTrashBtn" class="btn" title="${_('Empty trash')}" data-bind="enabled: availableSavedQueries().length > 0">
-            <i class="icon-fire"></i> ${_('Empty trash')}
+            <i class="fa fa-fire"></i> ${_('Empty trash')}
           </button>        
           <button id="viewQueriesBtn" class="btn" title="${_('View queries')}">
-            <i class="icon-home"></i> ${_('Back')}
+            <i class="fa fa-home"></i> ${_('Back')}
           </button>
         </div>
       </%def>
@@ -63,7 +63,7 @@ ${layout.menubar(section='saved queries')}
     <table class="table table-condensed datatables">
     <thead>
       <tr>
-        <th width="1%"><div class="hueCheckbox selectAll" data-selectables="savedCheck"></div></th>
+        <th width="1%"><div class="hueCheckbox selectAll fa" data-selectables="savedCheck"></div></th>
         <th>${_('Name')}</th>
         <th>${_('Description')}</th>
         <th>${_('Owner')}</th>
@@ -77,7 +77,7 @@ ${layout.menubar(section='saved queries')}
         %>
       <tr>
         <td data-row-selector-exclude="true">
-          <div class="hueCheckbox savedCheck"
+          <div class="hueCheckbox savedCheck fa"
             % if may_edit:
               data-delete-id="${ design.id }"
             % endif
@@ -162,24 +162,24 @@ ${layout.menubar(section='saved queries')}
 
     $(".selectAll").click(function () {
       if ($(this).attr("checked")) {
-        $(this).removeAttr("checked").removeClass("icon-ok");
-        $("." + $(this).data("selectables")).removeClass("icon-ok").removeAttr("checked");
+        $(this).removeAttr("checked").removeClass("fa-check");
+        $("." + $(this).data("selectables")).removeClass("fa-check").removeAttr("checked");
       }
       else {
-        $(this).attr("checked", "checked").addClass("icon-ok");
-        $("." + $(this).data("selectables")).addClass("icon-ok").attr("checked", "checked");
+        $(this).attr("checked", "checked").addClass("fa-check");
+        $("." + $(this).data("selectables")).addClass("fa-check").attr("checked", "checked");
       }
       toggleActions();
     });
 
     $(".savedCheck").click(function () {
       if ($(this).attr("checked")) {
-        $(this).removeClass("icon-ok").removeAttr("checked");
+        $(this).removeClass("fa-check").removeAttr("checked");
       }
       else {
-        $(this).addClass("icon-ok").attr("checked", "checked");
+        $(this).addClass("fa-check").attr("checked", "checked");
       }
-      $(".selectAll").removeAttr("checked").removeClass("icon-ok");
+      $(".selectAll").removeAttr("checked").removeClass("fa-check");
       toggleActions();
     });
 

@@ -37,17 +37,17 @@ ${layout.menubar(section='users')}
       <%def name="actions()">
         %if user.is_superuser:
             <button id="deleteUserBtn" class="btn" title="${_('Delete')}" disabled="disabled"><i
-                class="icon-trash"></i> ${_('Delete')}</button>
+                class="fa fa-trash-o"></i> ${_('Delete')}</button>
         %endif
       </%def>
       <%def name="creation()">
         %if user.is_superuser:
-            <a href="${ url('useradmin.views.edit_user') }" class="btn"><i class="icon-user"></i> ${_('Add user')}</a>
+            <a href="${ url('useradmin.views.edit_user') }" class="btn"><i class="fa fa-user"></i> ${_('Add user')}</a>
             <a href="${ url('useradmin.views.add_ldap_users') }" class="btn"><i
-                class="icon-briefcase"></i> ${_('Add/Sync LDAP user')}</a>
+                class="fa fa-briefcase"></i> ${_('Add/Sync LDAP user')}</a>
             <a href="javascript:void(0)" class="btn confirmationModal"
                data-confirmation-url="${ url('useradmin.views.sync_ldap_users_groups') }"><i
-                class="icon-refresh"></i> ${_('Sync LDAP users/groups')}</a>
+                class="fa fa-refresh"></i> ${_('Sync LDAP users/groups')}</a>
         %endif
       </%def>
     </%actionbar:render>
@@ -57,7 +57,7 @@ ${layout.menubar(section='users')}
       <tr>
         %if user.is_superuser:
             <th width="1%">
-              <div id="selectAll" class="hueCheckbox"></div>
+              <div id="selectAll" class="hueCheckbox fa"></div>
             </th>
         %endif
         <th>${_('Username')}</th>
@@ -74,7 +74,7 @@ ${layout.menubar(section='users')}
               data-search="${listed_user.username}${listed_user.first_name}${listed_user.last_name}${listed_user.email}${', '.join([group.name for group in listed_user.groups.all()])}">
           %if user.is_superuser:
               <td data-row-selector-exclude="true">
-                <div class="hueCheckbox userCheck" data-row-selector-exclude="true" data-id="${ listed_user.id }"></div>
+                <div class="hueCheckbox userCheck fa" data-row-selector-exclude="true" data-id="${ listed_user.id }"></div>
               </td>
           %endif
           <td>
@@ -182,21 +182,21 @@ ${layout.menubar(section='users')}
     $("#selectAll").click(function () {
       if ($(this).attr("checked")) {
         $(this).removeAttr("checked");
-        $(".userCheck").removeClass("icon-ok").removeAttr("checked");
+        $(".userCheck").removeClass("fa-check").removeAttr("checked");
       }
       else {
         $(this).attr("checked", "checked");
-        $(".userCheck").addClass("icon-ok").attr("checked", "checked");
+        $(".userCheck").addClass("fa-check").attr("checked", "checked");
       }
       toggleActions();
     });
 
     $(".userCheck").click(function () {
       if ($(this).attr("checked")) {
-        $(this).removeClass("icon-ok").removeAttr("checked");
+        $(this).removeClass("fa-check").removeAttr("checked");
       }
       else {
-        $(this).addClass("icon-ok").attr("checked", "checked");
+        $(this).addClass("fa-check").attr("checked", "checked");
       }
       toggleActions();
     });

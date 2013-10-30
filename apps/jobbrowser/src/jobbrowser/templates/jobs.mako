@@ -55,7 +55,7 @@ ${ components.menubar() }
     </%def>
   </%actionbar:render>
 
-  <div id="noJobs" class="alert"><i class="icon-warning-sign"></i>&nbsp; ${_('There are no jobs that match your search criteria.')}</div>
+  <div id="noJobs" class="alert"><i class="fa fa-exclamation-triangle"></i>&nbsp; ${_('There are no jobs that match your search criteria.')}</div>
 
   <table id="jobsTable" class="datatables table table-condensed">
     <thead>
@@ -229,10 +229,10 @@ ${ components.menubar() }
                 '>${ _('Kill') }</a>';
       }
       return [
-        '<a href="' + emptyStringIfNull(job.logs) + '" data-row-selector-exclude="true"><i class="icon-tasks"></i></a>',
+        '<a href="' + emptyStringIfNull(job.logs) + '" data-row-selector-exclude="true"><i class="fa fa-tasks"></i></a>',
         '<a href="' + emptyStringIfNull(job.url) + '" title="${_('View this job')}" data-row-selector="true">' + emptyStringIfNull(job.shortId) + '</a>',
         emptyStringIfNull(job.name),
-        '<span class="label ' + getStatusClass(job.status) + '">' + (job.isRetired && !job.isMR2 ? '<i class="icon-briefcase icon-white" title="${ _('Retired') }"></i> ' : '') + job.status + '</span>',
+        '<span class="label ' + getStatusClass(job.status) + '">' + (job.isRetired && !job.isMR2 ? '<i class="fa fa-briefcase fa fa-white" title="${ _('Retired') }"></i> ' : '') + job.status + '</span>',
         emptyStringIfNull(job.user),
         '<span title="' + emptyStringIfNull(job.mapsPercentComplete) + '">' + (job.isRetired ? '${_('N/A')}' : '<div class="progress" title="' + (job.isMR2 ? job.mapsPercentComplete : job.finishedMaps + '/' + job.desiredMaps) + '"><div class="bar-label">' + job.mapsPercentComplete + '%</div><div class="' + 'bar ' + getStatusClass(job.status, "bar-") + '" style="margin-top:-20px;width:' + job.mapsPercentComplete + '%"></div></div>') + '</span>',
         '<span title="' + emptyStringIfNull(job.reducesPercentComplete) + '">' + (job.isRetired ? '${_('N/A')}' : '<div class="progress" title="' + (job.isMR2 ? job.reducesPercentComplete : job.finishedReduces + '/' + job.desiredReduces) + '"><div class="bar-label">' + job.reducesPercentComplete + '%</div><div class="' + 'bar ' + getStatusClass(job.status, "bar-") + '" style="margin-top:-20px;width:' + job.reducesPercentComplete + '%"></div></div>') + '</span>',

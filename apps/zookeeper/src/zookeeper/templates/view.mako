@@ -121,7 +121,7 @@ ${ shared.header(_breadcrumbs, clusters, False) }
 
     % if leader:
       <h2 class="card-heading simple simpler">
-        <div class="pull-right"><a href="${url('zookeeper:clients', id=cluster['id'], host=leader['host'])}"><i class="icon-eye-open"></i> ${_('Client Connections')}</a></div>
+        <div class="pull-right"><a href="${url('zookeeper:clients', id=cluster['id'], host=leader['host'])}"><i class="fa fa-eye"></i> ${_('Client Connections')}</a></div>
         ${ _('Node') } ${leader['host']} (${ _('leader') })
       </h2>
 
@@ -145,7 +145,7 @@ ${ shared.header(_breadcrumbs, clusters, False) }
 
     % for stats in followers:
       <h2 class="card-heading simple simpler">
-        <div class="pull-right"><a href="${url('zookeeper:clients', id=cluster['id'], host=stats['host'])}"><i class="icon-eye-open"></i> ${ _('Client Connections') }</a></div>
+        <div class="pull-right"><a href="${url('zookeeper:clients', id=cluster['id'], host=stats['host'])}"><i class="fa fa-eye"></i> ${ _('Client Connections') }</a></div>
       ${ _('Node') } ${stats['host']} (${ _('follower') })
       </h2>
       <table class="table">

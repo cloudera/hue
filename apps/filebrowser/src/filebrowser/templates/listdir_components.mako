@@ -113,8 +113,8 @@ from django.utils.translation import ugettext as _
     <table class="table table-condensed datatables tablescroller-disable">
         <thead>
             <tr>
-                <th width="1%"><div data-bind="click: selectAll, css: {hueCheckbox: true, 'icon-ok': allSelected}"></div></th>
-                <th class="sortable sorting" data-sort="type" width="4%" data-bind="click: sort">Type</th>
+                <th width="1%"><div data-bind="click: selectAll, css: {hueCheckbox: true, 'fa': true, 'fa-check': allSelected}"></div></th>
+                <th class="sortable sorting" data-sort="type" width="1%" data-bind="click: sort">&nbsp;</th>
                 <th class="sortable sorting" data-sort="name" data-bind="click: sort">${_('Name')}</th>
                 <th class="sortable sorting" data-sort="size" width="10%" data-bind="click: sort">${_('Size')}</th>
                 <th class="sortable sorting" data-sort="user" width="10%" data-bind="click: sort">${_('User')}</th>
@@ -145,9 +145,9 @@ from django.utils.translation import ugettext as _
     <script id="fileTemplate" type="text/html">
         <tr style="cursor: pointer" data-bind="event: { mouseover: toggleHover, mouseout: toggleHover}">
             <td class="center" data-bind="click: handleSelect" style="cursor: default">
-                <div data-bind="visible: name != '.' && name != '..', css: {hueCheckbox: name != '.' && name != '..', 'icon-ok': selected}"></div>
+                <div data-bind="visible: name != '.' && name != '..', css: {hueCheckbox: name != '.' && name != '..', 'fa': name != '.' && name != '..', 'fa-check': selected}"></div>
             </td>
-            <td data-bind="click: $root.viewFile" class="left"><i data-bind="css: {'icon-file-alt': type == 'file', 'icon-folder-close': type != 'file', 'icon-folder-open': type != 'file' && hovered}"></i></td>
+            <td data-bind="click: $root.viewFile" class="left"><i data-bind="css: {'fa': true, 'fa-file-o': type == 'file', 'fa-folder': type != 'file', 'fa-folder-open': type != 'file' && hovered}"></i></td>
             <td data-bind="click: $root.viewFile, attr: {'title': tooltip}" rel="tooltip">
                 <strong><a href="#" data-bind="click: $root.viewFile, text: name"></a></strong>
             </td>

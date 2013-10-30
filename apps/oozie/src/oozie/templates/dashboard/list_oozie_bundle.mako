@@ -67,7 +67,7 @@ ${ layout.menubar(section='bundles', dashboard=True) }
           % for bundled in bundle.coordinators.distinct():
             <li rel="tooltip" title="${ bundled.coordinator.name }" class="white">
               <a href="${ bundled.coordinator.get_absolute_url() }">
-                <i class="icon-eye-open"></i> <span class="dataset">${ bundled.coordinator.name }</span>
+                <i class="fa fa-eye"></i> <span class="dataset">${ bundled.coordinator.name }</span>
               </a>
             </li>
           % endfor

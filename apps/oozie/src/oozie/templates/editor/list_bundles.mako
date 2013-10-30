@@ -44,31 +44,31 @@ ${ layout.menubar(section='bundles') }
 
     <%def name="actions()">
       <div class="btn-toolbar" style="display: inline; vertical-align: middle">
-        <button class="btn toolbarBtn" id="submit-btn" disabled="disabled"><i class="icon-play"></i> ${ _('Submit') }</button>
-        <button class="btn toolbarBtn" id="clone-btn" disabled="disabled"><i class="icon-copy"></i> ${ _('Copy') }</button>
+        <button class="btn toolbarBtn" id="submit-btn" disabled="disabled"><i class="fa fa-play"></i> ${ _('Submit') }</button>
+        <button class="btn toolbarBtn" id="clone-btn" disabled="disabled"><i class="fa fa-files-o"></i> ${ _('Copy') }</button>
         <div id="delete-dropdown" class="btn-group" style="vertical-align: middle">
-          <button id="trash-btn" class="btn toolbarBtn" disabled="disabled"><i class="icon-remove"></i> ${_('Move to trash')}</button>
+          <button id="trash-btn" class="btn toolbarBtn" disabled="disabled"><i class="fa fa-times"></i> ${_('Move to trash')}</button>
           <button id="trash-btn-caret" class="btn toolbarBtn dropdown-toggle" data-toggle="dropdown" disabled="disabled">
             <span class="caret"></span>
           </button>
           <ul class="dropdown-menu">
-            <li><a href="javascript:void(0);" id="destroy-btn" title="${_('Delete forever')}"><i class="icon-bolt"></i> ${_('Delete forever')}</a></li>
+            <li><a href="javascript:void(0);" id="destroy-btn" title="${_('Delete forever')}"><i class="fa fa-bolt"></i> ${_('Delete forever')}</a></li>
           </ul>
         </div>
       </div>
     </%def>
 
     <%def name="creation()">
-      <a href="${ url('oozie:create_bundle') }" class="btn"><i class="icon-plus-sign"></i> ${ _('Create') }</a>
+      <a href="${ url('oozie:create_bundle') }" class="btn"><i class="fa fa-plus-circle"></i> ${ _('Create') }</a>
       &nbsp;&nbsp;
-      <a href="${ url('oozie:list_trashed_bundles') }" class="btn"><i class="icon-trash"></i> ${ _('View trash') }</a>
+      <a href="${ url('oozie:list_trashed_bundles') }" class="btn"><i class="fa fa-trash-o"></i> ${ _('View trash') }</a>
     </%def>
   </%actionbar:render>
 
   <table id="bundleTable" class="table datatables">
     <thead>
       <tr>
-        <th width="1%"><div class="hueCheckbox selectAll" data-selectables="bundleCheck"></div></th>
+        <th width="1%"><div class="hueCheckbox selectAll fa" data-selectables="bundleCheck"></div></th>
         <th width="10%">${ _('Name') }</th>
         <th width="20%">${ _('Description') }</th>
         <th width="35%">${ _('Coordinators') }</th>
@@ -82,7 +82,7 @@ ${ layout.menubar(section='bundles') }
       % for bundle in jobs:
         <tr>
           <td data-row-selector-exclude="true">
-            <div class="hueCheckbox bundleCheck" data-row-selector-exclude="true"
+            <div class="hueCheckbox bundleCheck fa" data-row-selector-exclude="true"
               % if bundle.can_read(user):
                   data-clone-url="${ url('oozie:clone_bundle', bundle=bundle.id) }"
                   data-submit-url="${ url('oozie:submit_bundle', bundle=bundle.id) }"
@@ -124,7 +124,7 @@ ${ layout.menubar(section='bundles') }
     <img src="/static/art/spinner-big.gif" />
   <![endif]-->
   <!--[if !IE]> -->
-    <i class="icon-spinner icon-spin"></i>
+    <i class="fa fa-spinner fa-spin"></i>
   <!-- <![endif]-->
 </div>
 
@@ -177,24 +177,24 @@ ${ layout.menubar(section='bundles') }
 
     $(".selectAll").click(function () {
       if ($(this).attr("checked")) {
-        $(this).removeAttr("checked").removeClass("icon-ok");
-        $("." + $(this).data("selectables")).removeClass("icon-ok").removeAttr("checked");
+        $(this).removeAttr("checked").removeClass("fa-check");
+        $("." + $(this).data("selectables")).removeClass("fa-check").removeAttr("checked");
       }
       else {
-        $(this).attr("checked", "checked").addClass("icon-ok");
-        $("." + $(this).data("selectables")).addClass("icon-ok").attr("checked", "checked");
+        $(this).attr("checked", "checked").addClass("fa-check");
+        $("." + $(this).data("selectables")).addClass("fa-check").attr("checked", "checked");
       }
       toggleActions();
     });
 
     $(".bundleCheck").click(function () {
       if ($(this).attr("checked")) {
-        $(this).removeClass("icon-ok").removeAttr("checked");
+        $(this).removeClass("fa-check").removeAttr("checked");
       }
       else {
-        $(this).addClass("icon-ok").attr("checked", "checked");
+        $(this).addClass("fa-check").attr("checked", "checked");
       }
-      $(".selectAll").removeAttr("checked").removeClass("icon-ok");
+      $(".selectAll").removeAttr("checked").removeClass("fa-check");
       toggleActions();
     });
 

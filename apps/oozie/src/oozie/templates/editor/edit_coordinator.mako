@@ -53,28 +53,28 @@ ${ layout.menubar(section='coordinators') }
       <div class="sidebar-nav">
         <ul class="nav nav-list">
           <li class="nav-header">${ _('Properties') }</li>
-          <li class="active"><a href="#properties"><i class="icon-reorder"></i> ${ _('Edit properties') }</a></li>
+          <li class="active"><a href="#properties"><i class="fa fa-reorder"></i> ${ _('Edit properties') }</a></li>
 
           % if coordinator.workflow:
             <li class="nav-header">${ _('Workflow') }</li>
-            <li id="workflowName"><a href="${ coordinator.workflow.get_absolute_url() }" target="_blank"><i class="icon-code-fork"></i> ${ coordinator.workflow }</a></li>
+            <li id="workflowName"><a href="${ coordinator.workflow.get_absolute_url() }" target="_blank"><i class="fa fa-code-fork"></i> ${ coordinator.workflow }</a></li>
           % endif
 
           <li class="nav-header">${ _('Datasets') }</li>
           % if coordinator.is_editable(user):
-          <li><a href="#createDataset"><i class="icon-plus"></i> ${ _('Create new') }</a></li>
+          <li><a href="#createDataset"><i class="fa fa-plus"></i> ${ _('Create new') }</a></li>
           % endif
-          <li><a href="#listDataset"><i class="icon-cloud"></i> ${ _('Show existing') }</a></li>
+          <li><a href="#listDataset"><i class="fa fa-cloud"></i> ${ _('Show existing') }</a></li>
 
           % if coordinator.is_editable(user):
               <li class="nav-header">${ _('History') }</li>
-              <li><a href="#listHistory"><i class="icon-archive"></i> ${ _('Show history') }</a></li>
+              <li><a href="#listHistory"><i class="fa fa-archive"></i> ${ _('Show history') }</a></li>
           % endif
 
           % if coordinator:
               <li class="nav-header">${ _('Actions') }</li>
-              <li><a id="submit-btn" href="javascript:void(0)" data-submit-url="${ url('oozie:submit_coordinator', coordinator=coordinator.id) }" title="${ _('Submit this coordinator') }" rel="tooltip" data-placement="right"><i class="icon-play"></i> ${ _('Submit') }</a></li>
-              <li><a id="clone-btn" href="javascript:void(0)" data-clone-url="${ url('oozie:clone_coordinator', coordinator=coordinator.id) }" title="${ _('Copy this coordinator') }" rel="tooltip" data-placement="right"><i class="icon-copy"></i> ${ _('Copy') }</a></li>
+              <li><a id="submit-btn" href="javascript:void(0)" data-submit-url="${ url('oozie:submit_coordinator', coordinator=coordinator.id) }" title="${ _('Submit this coordinator') }" rel="tooltip" data-placement="right"><i class="fa fa-play"></i> ${ _('Submit') }</a></li>
+              <li><a id="clone-btn" href="javascript:void(0)" data-clone-url="${ url('oozie:clone_coordinator', coordinator=coordinator.id) }" title="${ _('Copy this coordinator') }" rel="tooltip" data-placement="right"><i class="fa fa-files-o"></i> ${ _('Copy') }</a></li>
           % endif
 
         </ul>

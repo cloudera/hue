@@ -14,7 +14,7 @@ $("<style type='text/css'> .tooltip {z-index: 30000} .tourBuilder td { vertical-
      _tb.height($(window).height());
      _tb.appendTo($("body"));
 
-     var _tbCog = $("<div>").attr("id", "tbCog").html('<i class="icon-cogs"></i>').addClass("jHueTourBadge").css("top", "64px");
+     var _tbCog = $("<div>").attr("id", "tbCog").html('<i class="fa fa-cogs"></i>').addClass("jHueTourBadge").css("top", "64px");
      _tbCog.on("click", function () {
        _tb.show();
      });
@@ -22,27 +22,27 @@ $("<style type='text/css'> .tooltip {z-index: 30000} .tourBuilder td { vertical-
      _tbCog.appendTo($("body"));
 
      var _html = "<h4>General</h4>" +
-             "<table><tr><td>ID:</td><td><input class='input' type='text' id='tbName' /> <span rel='tooltip' title='unique tour name (location.pathname scope)'><i class='icon-question-sign'></i></span></td></tr>" +
-             "<tr><td>Name:</td><td><input class='input' type='text' id='tbDesc' /> <span rel='tooltip' title='the label shown on the question mark'><i class='icon-question-sign'></i></span></td></tr>" +
-             "<tr><td>Path:</td><td><input class='input' type='text' id='tbPath' value='" + _tbTour.path + "'/> <span rel='tooltip' title='string for the path to show this tour on, regex allowed'><i class='icon-question-sign'></i></span></td></tr></table>" +
+             "<table><tr><td>ID:</td><td><input class='input' type='text' id='tbName' /> <span rel='tooltip' title='unique tour name (location.pathname scope)'><i class='fa fa-question-circle'></i></span></td></tr>" +
+             "<tr><td>Name:</td><td><input class='input' type='text' id='tbDesc' /> <span rel='tooltip' title='the label shown on the question mark'><i class='fa fa-question-circle'></i></span></td></tr>" +
+             "<tr><td>Path:</td><td><input class='input' type='text' id='tbPath' value='" + _tbTour.path + "'/> <span rel='tooltip' title='string for the path to show this tour on, regex allowed'><i class='fa fa-question-circle'></i></span></td></tr></table>" +
              "<h4>New step</h4><table>" +
-             "<tr><td>Visit URL:</td><td><input class='input' type='text' id='tbNewURL' /> <span rel='tooltip' title='overrides everything, redirects to specific url'><i class='icon-question-sign'></i></span></td></tr>" +
+             "<tr><td>Visit URL:</td><td><input class='input' type='text' id='tbNewURL' /> <span rel='tooltip' title='overrides everything, redirects to specific url'><i class='fa fa-question-circle'></i></span></td></tr>" +
              "<tr><td colspan='2'>&nbsp;</td></tr>" +
-             "<tr><td>Arrow on:</td><td><input class='input' type='text' id='tbNewArrow' /> <span rel='tooltip' title='the element relative to the popover is positioned'><i class='icon-question-sign'></i></span></td></tr>" +
-             "<tr><td>Expose:</td><td><input class='input' type='text' id='tbNewExpose' /> <span rel='tooltip' title='optional, the exposed object. if not present, arrowOn will be exposed'><i class='icon-question-sign'></i></span></td></tr>" +
-             "<tr><td>Title:</td><td><input class='input' type='text' id='tbNewTitle'/> <span rel='tooltip' title='popover title'><i class='icon-question-sign'></i></span></td></tr>" +
-             "<tr><td>Content:</td><td><textarea id='tbNewContent'></textarea> <span rel='tooltip' title='popover content, html enabled'><i class='icon-question-sign'></i></span></td></tr>" +
-             "<tr><td>Placement:</td><td><select class='input' id='tbNewPlacement'><option value='top' selected='selected'>Top</option><option value='bottom'>Bottom</option><option value='left'>Left</option><option value='right'>Right</option> </select> <span rel='tooltip' title='popover placement'><i class='icon-question-sign'></i></span></td></tr>" +
+             "<tr><td>Arrow on:</td><td><input class='input' type='text' id='tbNewArrow' /> <span rel='tooltip' title='the element relative to the popover is positioned'><i class='fa fa-question-circle'></i></span></td></tr>" +
+             "<tr><td>Expose:</td><td><input class='input' type='text' id='tbNewExpose' /> <span rel='tooltip' title='optional, the exposed object. if not present, arrowOn will be exposed'><i class='fa fa-question-circle'></i></span></td></tr>" +
+             "<tr><td>Title:</td><td><input class='input' type='text' id='tbNewTitle'/> <span rel='tooltip' title='popover title'><i class='fa fa-question-circle'></i></span></td></tr>" +
+             "<tr><td>Content:</td><td><textarea id='tbNewContent'></textarea> <span rel='tooltip' title='popover content, html enabled'><i class='fa fa-question-circle'></i></span></td></tr>" +
+             "<tr><td>Placement:</td><td><select class='input' id='tbNewPlacement'><option value='top' selected='selected'>Top</option><option value='bottom'>Bottom</option><option value='left'>Left</option><option value='right'>Right</option> </select> <span rel='tooltip' title='popover placement'><i class='fa fa-question-circle'></i></span></td></tr>" +
              "<tr><td>Left:</td><td>Offset <input type='text' class='input-mini' id='tbNewOffsetLeft'/> Abs <input type='text' class='input-mini' id='tbNewAbsLeft'/></td></tr>" +
              "<tr><td>Top:</td><td>Offset <input type='text' class='input-mini' id='tbNewOffsetTop'/> Abs <input type='text' class='input-mini' id='tbNewAbsTop'/></td></tr>" +
-             "<tr><td>On shown:</td><td><textarea id='tbNewShown'></textarea> <span rel='tooltip' title='javascript run on popover step shown. DANGER!'><i class='icon-question-sign'></i></span></td></tr>" +
-             "<tr><td>Wait:</td><td><input type='checkbox' id='tbNewWait'/> <span rel='tooltip' title='does not show the next button and waits for an action to go on with the tour'><i class='icon-question-sign'></i></span></td></tr>" +
+             "<tr><td>On shown:</td><td><textarea id='tbNewShown'></textarea> <span rel='tooltip' title='javascript run on popover step shown. DANGER!'><i class='fa fa-question-circle'></i></span></td></tr>" +
+             "<tr><td>Wait:</td><td><input type='checkbox' id='tbNewWait'/> <span rel='tooltip' title='does not show the next button and waits for an action to go on with the tour'><i class='fa fa-question-circle'></i></span></td></tr>" +
              "<tr><td>&nbsp;</td><td style='text-align: right'><a href='javascript:void(0)' id='tbNewShow' class='btn btn-mini'>Show</a> <a id='tbNewAdd' href='javascript:void(0)' class='btn btn-mini'>Add to tour</a> </td></tr>" +
              "</table><h4>Steps</h4>" +
              "<div id='tbSteps'></div>" +
              "<h4>JSON</h4>" +
              "<textarea id='tbPreview' style='width: 90%'>" + JSON.stringify(_tbTour) + "</textarea><br/><a href='javascript:void(0)' id='tbLoadJson' class='btn btn-mini'>Load from JSON</a><br/><br/>" +
-             "<div style='text-align: right'><a id='tbManageTours' class='btn' href='javascript:void(0)' style='float:left'><i class='icon-sitemap'></i></a> <a id='tbAddTour' class='btn' href='javascript:void(0)'><i class='icon-plus-sign-alt'></i></a> <a id='tbClearCache' class='btn' href='javascript:void(0)'><i class='icon-trash'></i></a> <a id='tbTryTour' title='Try tour' class='btn' href='javascript:void(0)'><i class='icon-eye-open'></i></a></div><br/><br/>";
+             "<div style='text-align: right'><a id='tbManageTours' class='btn' href='javascript:void(0)' style='float:left'><i class='fa fa-sitemap'></i></a> <a id='tbAddTour' class='btn' href='javascript:void(0)'><i class='fa fa-plus-circle-alt'></i></a> <a id='tbClearCache' class='btn' href='javascript:void(0)'><i class='fa fa-trash-o'></i></a> <a id='tbTryTour' title='Try tour' class='btn' href='javascript:void(0)'><i class='fa fa-eye'></i></a></div><br/><br/>";
 
 
      _tb.html(_html);
@@ -134,20 +134,20 @@ $("<style type='text/css'> .tooltip {z-index: 30000} .tourBuilder td { vertical-
          var _trow = $("<div>").html("&nbsp;" + (item.visitUrl!="" && item.visitUrl!=undefined?"URL: " + item.visitUrl:"Title: "+item.title));
 
          var _trowdelete = $("<a>");
-         _trowdelete.addClass("btn").addClass("btn-mini").html("<i class='icon-trash'></i>").css("margin", "3px").on("click", function () {
+         _trowdelete.addClass("btn").addClass("btn-mini").html("<i class='fa fa-trash-o'></i>").css("margin", "3px").on("click", function () {
            _tbTour.steps.splice(cnt, 1);
            updateTour();
          });
          _trowdelete.prependTo(_trow);
 
          var _trowcopy = $("<a>");
-         _trowcopy.addClass("btn").addClass("btn-mini").html("<i class='icon-copy'></i>").css("margin", "3px").on("click", function () {
+         _trowcopy.addClass("btn").addClass("btn-mini").html("<i class='fa fa-files-o'></i>").css("margin", "3px").on("click", function () {
            fillItem(item);
          });
          _trowcopy.prependTo(_trow);
 
          var _trowedit = $("<a>");
-         _trowedit.addClass("btn").addClass("btn-mini").html("<i class='icon-edit'></i>").css("margin", "3px").on("click", function () {
+         _trowedit.addClass("btn").addClass("btn-mini").html("<i class='fa fa-edit'></i>").css("margin", "3px").on("click", function () {
            fillItem(item);
            _tbTourIsStepEditing = cnt;
            $("#tbNewAdd").text("Update step");
@@ -155,7 +155,7 @@ $("<style type='text/css'> .tooltip {z-index: 30000} .tourBuilder td { vertical-
          _trowedit.prependTo(_trow);
 
          var _trowup = $("<a>");
-         _trowup.addClass("btn").addClass("btn-mini").html("<i class='icon-arrow-up'></i>").css("margin", "3px").on("click", function () {
+         _trowup.addClass("btn").addClass("btn-mini").html("<i class='fa fa-arrow-up'></i>").css("margin", "3px").on("click", function () {
            var _newPos = cnt - 1;
            if (cnt == 0) {
              _newPos = _tbTour.steps.length - 1;
@@ -166,7 +166,7 @@ $("<style type='text/css'> .tooltip {z-index: 30000} .tourBuilder td { vertical-
          _trowup.prependTo(_trow);
 
          var _trowdown = $("<a>");
-         _trowdown.addClass("btn").addClass("btn-mini").html("<i class='icon-arrow-down'></i>").css("margin", "3px").on("click", function () {
+         _trowdown.addClass("btn").addClass("btn-mini").html("<i class='fa fa-arrow-down'></i>").css("margin", "3px").on("click", function () {
            var _newPos = cnt + 1;
            if (cnt == _tbTour.steps.length - 1) {
              _newPos = 0;
@@ -225,7 +225,7 @@ $("<style type='text/css'> .tooltip {z-index: 30000} .tourBuilder td { vertical-
        $(".jHueTourExposed").removeClass("jHueTourExposed").css("position", "");
        $("#jHueTourMask").width($(document).width()).height($(document).height()).show();
        var _closeBtn = $("<a>");
-       _closeBtn.addClass("btn").addClass("btn-mini").html('<i class="icon-remove"></i>').css("float", "right").css("margin-top", "-4px").css("margin-right", "-6px");
+       _closeBtn.addClass("btn").addClass("btn-mini").html('<i class="fa fa-times"></i>').css("float", "right").css("margin-top", "-4px").css("margin-right", "-6px");
        _closeBtn.click(function () {
          $(".popover").remove();
          $(".jHueTourExposed").removeClass("jHueTourExposed");
@@ -254,7 +254,7 @@ $("<style type='text/css'> .tooltip {z-index: 30000} .tourBuilder td { vertical-
          }
          $(".popover-title").html($("#tbNewTitle").val());
          _closeBtn.prependTo($(".popover-title"));
-         $("<a class='btn btn-mini' style='margin-top:10px' onclick='alert(\"Nothing else to do? :)\")'><i class='icon-smile'></i></a>").appendTo($(".popover-content p"));
+         $("<a class='btn btn-mini' style='margin-top:10px' onclick='alert(\"Nothing else to do? :)\")'><i class='fa fa-smile'></i></a>").appendTo($(".popover-content p"));
        }
 
        var _exposedElement = $($("#tbNewExpose").val());
@@ -361,7 +361,7 @@ $("<style type='text/css'> .tooltip {z-index: 30000} .tourBuilder td { vertical-
        if (_tbTourIsEditing > -1) {
          _tbStoredTours[_tbTourIsEditing] = _tbTour;
          _tbTourIsEditing = -1;
-         $("#tbAddTour").html("<i class='icon-plus-sign-alt'></i>");
+         $("#tbAddTour").html("<i class='fa fa-plus-circle-alt'></i>");
        }
        else {
          _tbStoredTours.push(_tbTour);
@@ -377,7 +377,7 @@ $("<style type='text/css'> .tooltip {z-index: 30000} .tourBuilder td { vertical-
          var _trow = $("<div>").html("&nbsp;Name: " + item.name + ", Desc: "+ item.desc + ", Path: "+ item.path);
 
          var _trowdelete = $("<a>");
-         _trowdelete.addClass("btn").addClass("btn-mini").html("<i class='icon-trash'></i>").css("margin", "3px").on("click", function () {
+         _trowdelete.addClass("btn").addClass("btn-mini").html("<i class='fa fa-trash-o'></i>").css("margin", "3px").on("click", function () {
            var _tmpTrz = $.totalStorage("jHueTourBuilderTours");
            _tmpTrz.splice(cnt, 1);
            $.totalStorage("jHueTourBuilderTours", _tmpTrz);
@@ -386,7 +386,7 @@ $("<style type='text/css'> .tooltip {z-index: 30000} .tourBuilder td { vertical-
          _trowdelete.prependTo(_trow);
 
          var _trowcopy = $("<a>");
-         _trowcopy.addClass("btn").addClass("btn-mini").html("<i class='icon-copy'></i>").css("margin", "3px").on("click", function () {
+         _trowcopy.addClass("btn").addClass("btn-mini").html("<i class='fa-files-oopy'></i>").css("margin", "3px").on("click", function () {
            $.totalStorage("jHueTourBuilderTemp", null);
            _tbTour = item;
            $("#tbName").val(_tbTour.name);
@@ -398,7 +398,7 @@ $("<style type='text/css'> .tooltip {z-index: 30000} .tourBuilder td { vertical-
          _trowcopy.prependTo(_trow);
 
          var _trowedit = $("<a>");
-         _trowedit.addClass("btn").addClass("btn-mini").html("<i class='icon-edit'></i>").css("margin", "3px").on("click", function () {
+         _trowedit.addClass("btn").addClass("btn-mini").html("<i class='fa fa-edit'></i>").css("margin", "3px").on("click", function () {
            $.totalStorage("jHueTourBuilderTemp", null);
            _tbTour = item;
            $("#tbName").val(_tbTour.name);
@@ -406,7 +406,7 @@ $("<style type='text/css'> .tooltip {z-index: 30000} .tourBuilder td { vertical-
            $("#tbPath").val(_tbTour.path);
            updateTour();
            _tbTourIsEditing = cnt;
-           $("#tbAddTour").html("<i class='icon-save'></i>");
+           $("#tbAddTour").html("<i class='fa fa-floppy-o'></i>");
            $("#tbToursModal").modal("hide");
          });
          _trowedit.prependTo(_trow);
@@ -429,15 +429,15 @@ $("<style type='text/css'> .tooltip {z-index: 30000} .tourBuilder td { vertical-
        if (_tb.css("left") != "0px") {
          _tb.css("left", "0");
          _tb.css("right", "auto");
-         $(this).html("<i class='icon-arrow-right'></i>");
+         $(this).html("<i class='fa fa-arrow-right'></i>");
        }
        else {
          _tb.css("right", "0");
          _tb.css("left", "auto");
-         $(this).html("<i class='icon-arrow-left'></i>");
+         $(this).html("<i class='fa fa-arrow-left'></i>");
        }
      });
-     _changeSide.html("<i class='icon-arrow-left'></i>");
+     _changeSide.html("<i class='fa fa-arrow-left'></i>");
      _changeSide.prependTo(_tb);
 
      var _hideTb = $("<a>");
@@ -447,7 +447,7 @@ $("<style type='text/css'> .tooltip {z-index: 30000} .tourBuilder td { vertical-
        e.stopImmediatePropagation();
        _tb.hide();
      });
-     _hideTb.html("<i class='icon-remove'></i>");
+     _hideTb.html("<i class='fa fa-times'></i>");
      _hideTb.prependTo(_tb);
 
       // preload
@@ -465,7 +465,7 @@ $("<style type='text/css'> .tooltip {z-index: 30000} .tourBuilder td { vertical-
        $($.totalStorage("jHueTourBuilderTours")).each(function (cnt, item) {
          if (item.name == _tbTour.name && item.path == _tbTour.path){
             _tbTourIsEditing = cnt;
-           $("#tbAddTour").html("<i class='icon-save'></i>");
+           $("#tbAddTour").html("<i class='fa fa-floppy-o'></i>");
          }
        });
      }

@@ -116,7 +116,7 @@ from django.utils.translation import ugettext as _
                                                        data-orig="/static/art/hue-logo-mini-white.png"
                                                        data-hover="/static/art/hue-logo-mini-white-hover.png"/></a>
   <ul class="nav nav-pills pull-left hide" id="visit">
-    <li><a title="${_('Visit gethue.com')}" href="http://gethue.com">${_('Fell asleep? Visit us on gethue.com instead!')} <i class="icon-external-link-sign"></i></a></li>
+    <li><a title="${_('Visit gethue.com')}" href="http://gethue.com">${_('Fell asleep? Visit us on gethue.com instead!')} <i class="fa fa-external-link-circle"></i></a></li>
   </ul>
 </div>
 
@@ -131,7 +131,7 @@ from django.utils.translation import ugettext as _
           % if backend_name == 'OAuthBackend':
             class="hide"
           % endif
-            ><i class="icon-user"></i> ${_('Username')}
+            ><i class="fa fa-user"></i> ${_('Username')}
           ${ form['username'] | n,unicode }
           ${ form['username'].errors | n,unicode }
         </label>
@@ -139,20 +139,20 @@ from django.utils.translation import ugettext as _
           % if backend_name in ('AllowAllBackend', 'OAuthBackend'):
             class="hide"
           % endif
-            ><i class="icon-lock"></i> ${_('Password')}
+            ><i class="fa fa-lock"></i> ${_('Password')}
           ${ form['password'] | n,unicode }
           ${ form['password'].errors | n,unicode }
         </label>
 
         %if login_errors:
             <div class="alert alert-error" style="text-align: center">
-              <strong><i class="icon-warning-sign"></i> ${_('Error!')}</strong> ${_('Invalid username or password.')}
+              <strong><i class="fa fa-exclamation-triangle"></i> ${_('Error!')}</strong> ${_('Invalid username or password.')}
             </div>
         %endif
 
         %if first_login_ever:
             <div class="alert alert-block">
-              <i class="icon-warning-sign"></i>
+              <i class="fa fa-exclamation-triangle"></i>
             ${_('Since this is your first time logging in, pick any username and password. Be sure to remember these, as')}
               <strong>${_('they will become your Hue superuser credentials.')}</strong>.
             </div>

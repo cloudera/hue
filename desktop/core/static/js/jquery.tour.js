@@ -121,7 +121,7 @@
   Plugin.prototype.initQuestionMark = function () {
     var _this = this;
     $("#jHueTourFlag").remove();
-    var _questionMark = $("<a>").attr("id", "jHueTourFlag").html('<i class="icon-flag-checkered" style=""></i>');
+    var _questionMark = $("<a>").attr("id", "jHueTourFlag").html('<i class="fa fa-flag-checkered" style=""></i>');
     _questionMark.tooltip({
       placement: "bottom",
       title: _this.options.labels.TOOLTIP_TITLE
@@ -142,7 +142,7 @@
         if (tour.path === undefined || RegExp(tour.path).test(location.pathname)) {
           var _tourDone = '';
           var _removeTour = '';
-          var _extraIcon = '<i class="icon-flag"></i> ';
+          var _extraIcon = '<i class="fa fa-flag"></i> ';
           if ($.totalStorage !== undefined) {
             var _key = location.pathname;
             if (tour.path !== undefined && tour.path != "") {
@@ -150,20 +150,20 @@
             }
             _key += "_" + tour.name;
             if ($.totalStorage("jHueTourHistory") != null && $.totalStorage("jHueTourHistory")[_key] == true) {
-              _tourDone = '<div style="color:green;float:right;margin:4px"><i class="icon-check-sign"></i></div>';
+              _tourDone = '<div style="color:green;float:right;margin:4px"><i class="fa fa-check-circle"></i></div>';
             }
           }
           if (tour.remote) {
-            _removeTour = '<div style="color:red;float:right;margin:4px;cursor: pointer" onclick="javascript:$.jHueTour(\'remove_' + tour.name + '\')"><i class="icon-remove-sign"></i></div>';
+            _removeTour = '<div style="color:red;float:right;margin:4px;cursor: pointer" onclick="javascript:$.jHueTour(\'remove_' + tour.name + '\')"><i class="fa fa-times-circle"></i></div>';
           }
 
           var _link = '<a href="javascript:$.jHueTour(\'' + tour.name + '\', 1)" style="padding-left:0">';
 
           if (typeof tour.video != "undefined" && tour.video != null && tour.video != ""){
-            _extraIcon = '<i class="icon-youtube-play"></i> ';
+            _extraIcon = '<i class="fa fa-youtube-play"></i> ';
           }
           else if (typeof tour.blog != "undefined" && tour.blog != null && tour.blog != ""){
-            _extraIcon = '<i class="icon-external-link"></i> ';
+            _extraIcon = '<i class="fa fa-external-link"></i> ';
             _link = '<a href="' + tour.blog + '" target="_blank" style="padding:0">';
           }
           _toursHtml += '<li>' + _removeTour + _tourDone + _link + _extraIcon + tour.desc + '</a></li>';
@@ -197,7 +197,7 @@
           ' <div class="input-append" style="margin-top: 10px">' +
           '  <input id="jHueTourRemoteTutorial" style="width:70%" type="text" placeholder="URL">' +
           '  <button id="jHueTourRemoteTutorialBtn" class="btn" type="button" onclick="javascript:$.jHueTour($(\'#jHueTourRemoteTutorial\').val())">' +
-          '  <i class="icon-cloud-download"></i></button>' +
+          '  <i class="fa fa-cloud-download"></i></button>' +
           ' </div>' +
           '</li>';
       }
@@ -206,7 +206,7 @@
     _questionMark.click(function () {
 
       var _closeBtn = $("<a>");
-      _closeBtn.html('<i class="icon-remove"></i>').addClass("btn-mini").css("cursor", "pointer").css("margin-left", "7px").css("float", "right").css("margin-top", "-4px").css("margin-right", "-6px");
+      _closeBtn.html('<i class="fa fa-times"></i>').addClass("btn-mini").css("cursor", "pointer").css("margin-left", "7px").css("float", "right").css("margin-top", "-4px").css("margin-right", "-6px");
       _closeBtn.click(function () {
         $(".popover").remove();
       });
@@ -382,7 +382,7 @@
             '</div>' +
             '<div class="modal-body">' +
             '<iframe id="jHueTourVideoFrame" src="' + _this.currentTour.video + '?autoplay=1" width="700" height="350" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen="" style="height:360px;width:640px"></iframe><div class="moreInfo">' +
-            (typeof _this.currentTour.blog != "undefined" && _this.currentTour.blog != "" ? '<br/><a href="' + _this.currentTour.blog + '" target="_blank"><i class="icon-external-link"></i> ' + _this.options.labels.MORE_INFO + '</a>' : '') +
+            (typeof _this.currentTour.blog != "undefined" && _this.currentTour.blog != "" ? '<br/><a href="' + _this.currentTour.blog + '" target="_blank"><i class="fa fa-external-link"></i> ' + _this.options.labels.MORE_INFO + '</a>' : '') +
             '</div></div>';
         var _player = $("<div>").attr("id", "jHueTourVideoPlayer").addClass("modal").addClass("hide").addClass("fade");
         _player.html(_playerHTML);
@@ -390,7 +390,7 @@
       }
       else {
         $("#jHueTourVideoPlayer").find("h3").html(_this.currentTour.desc);
-        $("#jHueTourVideoPlayer").find(".moreInfo").html(typeof _this.currentTour.blog != "undefined" && _this.currentTour.blog != "" ? '<a href="' + _this.currentTour.blog + '" target="_blank"><i class="icon-external-link"></i> ' + _this.options.labels.MORE_INFO + '</a>' : '');
+        $("#jHueTourVideoPlayer").find(".moreInfo").html(typeof _this.currentTour.blog != "undefined" && _this.currentTour.blog != "" ? '<a href="' + _this.currentTour.blog + '" target="_blank"><i class="fa fa-external-link"></i> ' + _this.options.labels.MORE_INFO + '</a>' : '');
         $("#jHueTourVideoFrame").attr("src", _this.currentTour.video + "?autoplay=1");
       }
       $("#jHueTourVideoPlayer").modal().modal("show");
@@ -420,19 +420,19 @@
         $("#jHueTourMask").width($(document).width()).height($(document).height()).show();
 
         var _closeBtn = $("<a>");
-        _closeBtn.addClass("btn").addClass("btn-mini").html('<i class="icon-remove"></i>').css("float", "right").css("margin-top", "-4px").css("margin-right", "-6px");
+        _closeBtn.addClass("btn").addClass("btn-mini").html('<i class="fa fa-times"></i>').css("float", "right").css("margin-top", "-4px").css("margin-right", "-6px");
         _closeBtn.click(function () {
           _this.performOperation("close");
         });
 
         var _nextBtn = $("<a>");
-        _nextBtn.addClass("btn").addClass("btn-mini").html('<i class="icon-chevron-sign-right"></i>').css("margin-top", "10px");
+        _nextBtn.addClass("btn").addClass("btn-mini").html('<i class="fa fa-chevron-circle-right"></i>').css("margin-top", "10px");
         _nextBtn.click(function () {
           _this.showStep(_this.currentTour.shownStep + 1);
         });
 
         var _prevBtn = $("<a>");
-        _prevBtn.addClass("btn").addClass("btn-mini").html('<i class="icon-chevron-sign-left"></i>').css("margin-top", "10px").css("margin-right", "10px");
+        _prevBtn.addClass("btn").addClass("btn-mini").html('<i class="fa fa-chevron-circle-left"></i>').css("margin-top", "10px").css("margin-right", "10px");
         _prevBtn.click(function () {
           _this.showStep(_this.currentTour.shownStep - 1);
         });

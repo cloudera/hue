@@ -28,7 +28,7 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
 
 <div class="search-bar" style="height: 30px">
     <div class="pull-right" style="margin-top: 4px; margin-right: 20px">
-      <a href="${ url('search:index') }"><i class="icon-share-alt"></i> ${ _('Search page') }</a>
+      <a href="${ url('search:index') }"><i class="fa fa-share"></i> ${ _('Search page') }</a>
     </div>
   <h4>${_('Collection Manager')}</h4>
 </div>
@@ -42,19 +42,19 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
     </%def>
 
     <%def name="creation()">
-      <button type="button" class="btn importBtn" data-bind="visible: collections().length > 0 && !isLoading()"><i class="icon-plus-sign"></i> ${ _('Import') }</button>
+      <button type="button" class="btn importBtn" data-bind="visible: collections().length > 0 && !isLoading()"><i class="fa fa-plus-circle"></i> ${ _('Import') }</button>
     </%def>
   </%actionbar:render>
 
   <div class="row-fluid" data-bind="visible: collections().length == 0 && !isLoading()">
     <div class="span10 offset1 center importBtn" style="cursor: pointer">
-      <i class="icon-plus-sign waiting"></i>
+      <i class="fa fa-plus-circle waiting"></i>
       <h1 class="emptyMessage">${ _('There are currently no collections defined.') }<br/><a href="javascript:void(0)" class="importBtn">${ _('Click here to add') }</a> ${ _('one or more.') }</h1>
     </div>
   </div>
   <div class="row-fluid" data-bind="visible: isLoading()">
     <div class="span10 offset1 center">
-      <i class="icon-spinner icon-spin" style="font-size: 60px; color: #DDD"></i>
+      <i class="fa fa-spinner fa-spin" style="font-size: 60px; color: #DDD"></i>
     </div>
   </div>
   <div class="row-fluid">
@@ -69,10 +69,10 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
   <script id="collectionTemplate" type="text/html">
     <li class="collectionRow" data-bind="click: $root.editCollection" title="${ _('Click to edit') }">
       <div class="pull-right" style="margin-top: 10px;margin-right: 10px; cursor: pointer">
-        <a data-bind="click: $root.copyCollection, clickBubble: false"><i class="icon-copy"></i> ${_('Copy')}</a> &nbsp;
-        <a data-bind="click: $root.markForDeletion, clickBubble: false"><i class="icon-remove"></i> ${_('Delete')}</a>
+        <a data-bind="click: $root.copyCollection, clickBubble: false"><i class="fa fa-files-o"></i> ${_('Copy')}</a> &nbsp;
+        <a data-bind="click: $root.markForDeletion, clickBubble: false"><i class="fa fa-times"></i> ${_('Delete')}</a>
       </div>
-      <h4><i class="icon-list"></i> <span data-bind="text: label"></span></h4>
+      <h4><i class="fa fa-list"></i> <span data-bind="text: label"></span></h4>
     </li>
   </script>
   </div>
@@ -105,7 +105,7 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
 <script id="importableTemplate" type="text/html">
   <tr>
     <td width="24">
-      <div data-bind="click: handleSelect, css: {hueCheckbox: true, 'icon-ok': selected}"></div>
+      <div data-bind="click: handleSelect, css: {hueCheckbox: true, 'fa': true, 'fa-check': selected}"></div>
     </td>
     <td data-bind="text: name"></td>
   </tr>

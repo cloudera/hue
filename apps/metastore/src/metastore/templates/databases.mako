@@ -30,7 +30,7 @@ ${ components.menubar() }
       <div class="sidebar-nav card-small">
         <ul class="nav nav-list">
           <li class="nav-header">${_('actions')}</li>
-          <li><a href="${ url('beeswax:create_database') }"><i class="icon-plus-sign"></i> ${_('Create a new database')}</a></li>
+          <li><a href="${ url('beeswax:create_database') }"><i class="fa fa-plus-circle"></i> ${_('Create a new database')}</a></li>
         </ul>
       </div>
     </div>
@@ -47,7 +47,7 @@ ${ components.menubar() }
 
           <%def name="actions()">
             % if has_write_access:
-              <button id="dropBtn" class="btn toolbarBtn" title="${_('Drop the selected databases')}" disabled="disabled"><i class="icon-trash"></i>  ${_('Drop')}</button>
+              <button id="dropBtn" class="btn toolbarBtn" title="${_('Drop the selected databases')}" disabled="disabled"><i class="fa fa-trash-o"></i>  ${_('Drop')}</button>
             % endif
           </%def>
         </%actionbar:render>
@@ -55,7 +55,7 @@ ${ components.menubar() }
         <table class="table table-condensed datatables">
           <thead>
             <tr>
-              <th width="1%"><div class="hueCheckbox selectAll" data-selectables="databaseCheck"></div></th>
+              <th width="1%"><div class="hueCheckbox selectAll fa" data-selectables="databaseCheck"></div></th>
               <th>${_('Database Name')}</th>
             </tr>
           </thead>
@@ -63,7 +63,7 @@ ${ components.menubar() }
           % for database in databases:
             <tr>
               <td data-row-selector-exclude="true" width="1%">
-                <div class="hueCheckbox databaseCheck"
+                <div class="hueCheckbox databaseCheck fa"
                    data-view-url="${ url('metastore:show_tables', database=database) }"
                    data-drop-name="${ database }"
                    data-row-selector-exclude="true"></div>
@@ -133,24 +133,24 @@ ${ components.menubar() }
 
     $(".selectAll").click(function () {
       if ($(this).attr("checked")) {
-        $(this).removeAttr("checked").removeClass("icon-ok");
-        $("." + $(this).data("selectables")).removeClass("icon-ok").removeAttr("checked");
+        $(this).removeAttr("checked").removeClass("fa-check");
+        $("." + $(this).data("selectables")).removeClass("fa-check").removeAttr("checked");
       }
       else {
-        $(this).attr("checked", "checked").addClass("icon-ok");
-        $("." + $(this).data("selectables")).addClass("icon-ok").attr("checked", "checked");
+        $(this).attr("checked", "checked").addClass("fa-check");
+        $("." + $(this).data("selectables")).addClass("fa-check").attr("checked", "checked");
       }
       toggleActions();
     });
 
     $(".databaseCheck").click(function () {
       if ($(this).attr("checked")) {
-        $(this).removeClass("icon-ok").removeAttr("checked");
+        $(this).removeClass("fa-check").removeAttr("checked");
       }
       else {
-        $(this).addClass("icon-ok").attr("checked", "checked");
+        $(this).addClass("fa-check").attr("checked", "checked");
       }
-      $(".selectAll").removeAttr("checked").removeClass("icon-ok");
+      $(".selectAll").removeAttr("checked").removeClass("fa-check");
       toggleActions();
     });
 

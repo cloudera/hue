@@ -50,7 +50,7 @@ ${ comps.menubar() }
               <br/>
               <br/>
 
-              <!--[if !IE]><!--><i class="icon-spinner icon-spin" style="font-size: 60px; color: #DDD"></i><!--<![endif]-->
+              <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 60px; color: #DDD"></i><!--<![endif]-->
               <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
             </p>
       </div>

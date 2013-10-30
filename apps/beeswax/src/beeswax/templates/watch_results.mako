@@ -63,19 +63,19 @@ ${layout.menubar(section='query')}
 </style>
 
 <div class="container-fluid">
-  <div id="expand"><i class="icon-chevron-right" style="color: #FFFFFF"></i></div>
+  <div id="expand"><i class="fa fa-chevron-right" style="color: #FFFFFF"></i></div>
     <div class="row-fluid">
         <div class="span3">
             <div class="sidebar-nav">
                 <ul class="nav nav-list">
-                    <li><a id="collapse" class="btn btn-small"><i class="icon-chevron-left" rel="tooltip" title="${_('Collapse this panel')}"></i></a></li>
+                    <li><a id="collapse" class="btn btn-small"><i class="fa fa-chevron-left" rel="tooltip" title="${_('Collapse this panel')}"></i></a></li>
                     % if download_urls:
                     <li class="nav-header">${_('Results')}</li>
-                    <li><a target="_blank" href="${download_urls["csv"]}"><i class="icon-download"></i> ${_('Download as CSV')}</a></li>
-                    <li><a target="_blank" href="${download_urls["xls"]}"><i class="icon-download"></i> ${_('Download as XLS')}</a></li>
+                    <li><a target="_blank" href="${download_urls["csv"]}"><i class="fa fa-arrow-circle-o-down"></i> ${_('Download as CSV')}</a></li>
+                    <li><a target="_blank" href="${download_urls["xls"]}"><i class="fa fa-arrow-circle-o-down"></i> ${_('Download as XLS')}</a></li>
                     % endif
                     %if can_save:
-                    <li><a data-toggle="modal" href="#saveAs"><i class="icon-save"></i> ${_('Save')}</a></li>
+                    <li><a data-toggle="modal" href="#saveAs"><i class="fa fa-floppy-o"></i> ${_('Save')}</a></li>
                     % endif
                     % if app_name != 'impala':
                     <%

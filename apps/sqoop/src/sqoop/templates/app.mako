@@ -25,7 +25,7 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
 <div data-bind="if: !isLoading(), css: {'hide': isLoading}" id="top-bar-container" class="hide">
   <div class="top-bar" data-bind="visible:shownSection() == 'jobs-list'">
     <div style="margin-top: 4px; margin-right: 40px" class="pull-right">
-      <a title="${_('Create a new job')}" href="#job/new" data-bind="visible: isReady"><i class="icon-plus-sign"></i> ${_('New job')}</a>
+      <a title="${_('Create a new job')}" href="#job/new" data-bind="visible: isReady"><i class="fa fa-plus-circle"></i> ${_('New job')}</a>
     </div>
     <h4>${_('Sqoop Jobs')}</h4>
     <input id="filter" type="text" class="input-xlarge search-query" placeholder="${_('Search for job name or content')}"  data-bind="visible: isReady">
@@ -34,15 +34,15 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
   <!-- ko if: job -->
   <div class="top-bar" data-bind="visible:shownSection() == 'job-editor', with: job">
     <div style="margin-top: 4px; margin-right: 40px" class="pull-right">
-      <a title="${_('Create a new job')}" href="#job/new"><i class="icon-plus-sign"></i> ${_('New job')}</a>
+      <a title="${_('Create a new job')}" href="#job/new"><i class="fa fa-plus-circle"></i> ${_('New job')}</a>
     </div>
     <h4 data-bind="visible: !persisted()"><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> ${_('New Job')}</h4>
-    <h4 data-bind="visible: persisted"><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> <i data-bind="css:{'icon-download-alt': type() == 'IMPORT', 'icon-upload-alt': type() == 'EXPORT'}"></i> &nbsp;<span data-bind="text: type"></span> <span class="muted" data-bind="editable: name, editableOptions: {'placement': 'right'}"></span></h4>
+    <h4 data-bind="visible: persisted"><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> <i data-bind="css:{'fa fa-arrow-circle-o-down': type() == 'IMPORT', 'fa fa-upload': type() == 'EXPORT'}"></i> &nbsp;<span data-bind="text: type"></span> <span class="muted" data-bind="editable: name, editableOptions: {'placement': 'right'}"></span></h4>
   </div>
 
   <div class="top-bar" data-bind="visible:shownSection() == 'connection-editor', with: editConnection">
     <h4 data-bind="visible: !persisted()"><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> <a href="#connection/edit-cancel" data-bind="text: name"></a> <span class="muted">/</span> ${_('New Connection')}</h4>
-    <h4 data-bind="visible: persisted()"><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> <a href="#connection/edit-cancel"><i data-bind="css:{'icon-download-alt': $root.job().type() == 'IMPORT', 'icon-upload-alt': $root.job().type() == 'EXPORT'}"></i> &nbsp;<span data-bind="text: $root.job().type"></span> <span data-bind="text: $root.job().name"></span></a> <span class="muted">/</span> <span data-bind="text: $root.job().name"></span></h4>
+    <h4 data-bind="visible: persisted()"><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> <a href="#connection/edit-cancel"><i data-bind="css:{'fa fa-arrow-circle-o-down': $root.job().type() == 'IMPORT', 'fa fa-upload': $root.job().type() == 'EXPORT'}"></i> &nbsp;<span data-bind="text: $root.job().type"></span> <span data-bind="text: $root.job().name"></span></a> <span class="muted">/</span> <span data-bind="text: $root.job().name"></span></h4>
   </div>
   <!-- /ko -->
 </div>
@@ -50,7 +50,7 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
 <div class="container-fluid">
   <div data-bind="foreach: sqoop_errors" id="sqoop-error" class="row-fluid mainSection hide" style="margin-top: 10px">
     <div class="alert alert-error">
-      <i class="icon-warning-sign"></i>
+      <i class="fa fa-exclamation-triangle"></i>
       <strong>${_('Sqoop error')}:</strong>
       <span data-bind="text: $data" class="message"></span>
     </div>
@@ -62,7 +62,7 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
         <img src="/static/art/spinner-big.gif" />
       <![endif]-->
       <!--[if !IE]> -->
-        <i class="icon-spinner icon-spin" style="font-size: 60px; color: #DDD"></i>
+        <i class="fa fa-spinner fa-spin" style="font-size: 60px; color: #DDD"></i>
       <!-- <![endif]-->
     </div>
   </div>
@@ -97,7 +97,7 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
         </ul>
         <div class="card" data-bind="visible: filteredJobs().length == 0">
           <div class="span10 offset1 center nojobs">
-            <a href="#job/new" class="nounderline"><i class="icon-plus-sign waiting"></i></a>
+            <a href="#job/new" class="nounderline"><i class="fa fa-plus-circle waiting"></i></a>
             <h1 class="emptyMessage">${ _('There are currently no jobs.') }<br/><a href="#job/new">${ _('Click here to add one.') }</a></h1>
           </div>
           <div class="clearfix"></div>
@@ -112,38 +112,38 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
             <li class="nav-header" data-bind="visible: $root.job().persisted">${_('Actions')}</li>
             <li data-bind="visible: $root.job().persisted() && !$root.job().isRunning()">
               <a id="save-run-link" data-placement="right" rel="tooltip" title="${_('Run the job')}" href="#job/save-and-run">
-                <i class="icon-play"></i> ${_('Run')}
+                <i class="fa fa-play"></i> ${_('Run')}
               </a>
             </li>
             <li data-bind="visible: $root.job().isRunning()">
               <a data-placement="right" rel="tooltip" title="${_('Stop the job')}" href="#job/stop">
-                <i class="icon-stop"></i> ${_('Stop')}
+                <i class="fa fa-stop"></i> ${_('Stop')}
               </a>
             </li>
             <li data-bind="visible: $root.job().persisted">
               <a data-placement="right" rel="tooltip" title="${_('Copy the job')}" href="#job/copy">
-                <i class="icon-copy"></i> ${_('Copy')}
+                <i class="fa fa-files-o"></i> ${_('Copy')}
               </a>
             </li>
             <li data-bind="visible: $root.job().persisted">
               <a data-bind="click: $root.showDeleteJobModal.bind($root)" data-placement="right" rel="tooltip" title="${_('Delete the job')}" href="javascript:void(0);">
-                <i class="icon-remove"></i> ${_('Delete')}
+                <i class="fa fa-times"></i> ${_('Delete')}
               </a>
             </li>
             <li class="nav-header" data-bind="visible: $root.job().persisted">${_('Submissions')}</li>
             <li data-bind="visible: $root.job().persisted() && $root.job().outputDirectoryFilebrowserURL">
               <a data-bind="attr: { 'href': $root.job().outputDirectoryFilebrowserURL }" data-placement="right" rel="tooltip" title="${_('Browse output directory')}" href="javascript:void(0);" target="_new">
-                <i class="icon-folder-open"></i> ${_('Output directory')}
+                <i class="fa fa-folder-open"></i> ${_('Output directory')}
               </a>
             </li>
             <li data-bind="visible: $root.job().persisted() && $root.job().inputDirectoryFilebrowserURL">
               <a data-bind="attr: { 'href': $root.job().inputDirectoryFilebrowserURL }" data-placement="right" rel="tooltip" title="${_('Browse input directory')}" href="javascript:void(0);" target="_new">
-                <i class="icon-folder-open"></i> ${_('Input directory')}
+                <i class="fa fa-folder-open"></i> ${_('Input directory')}
               </a>
             </li>
             <li data-bind="visible: $root.job().submission().external_id()">
               <a rel="tooltip" title="${_('Logs')}" href="javascript:void(0);" target="_new" data-bind="attr: {href: '/jobbrowser/jobs/' + $root.job().submission().external_id() + '/single_logs'}">
-                <i class="icon-list"></i>
+                <i class="fa fa-list"></i>
                 ${_('Logs')}
               </a>
             </li>
@@ -282,7 +282,7 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
 <script type="text/html" id="job-list-item">
 <h4 style="display: inline-block">
   <!-- ko if: type() == 'IMPORT' -->
-  <i class="icon-download-alt"></i>&nbsp;
+  <i class="fa fa-download"></i>&nbsp;
   <span data-bind="text: type"></span>
   <span>${_('from ')}</span>
   <span data-bind="text: $root.getDatabaseByConnectionId(connection_id())"></span>
@@ -291,7 +291,7 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
   <span data-bind="text: name" class="muted"></span>
   <!-- /ko -->
   <!-- ko if: type() == 'EXPORT' -->
-  <i class="icon-upload-alt"></i>&nbsp;
+  <i class="fa fa-upload"></i>&nbsp;
   <span data-bind="text: type"></span>
   <span>${_('from ')}</span>
   <span data-bind="text: storageType"></span>
@@ -347,11 +347,11 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
     <label class="control-label">${ _('Job type') }</label>
     <div class="controls">
       <div title="${ _('Import from a Database to Hadoop') }" data-bind="css:{ 'big-btn': type() != '', 'selected': type() == 'IMPORT' }, click: setImport">
-        <i class="icon-download-alt"></i><br/>
+        <i class="fa fa-download"></i><br/>
         ${ _('Import') }
       </div>
       <div title="${ _('Import from Hadoop to a Database') }"data-bind="css:{ 'big-btn': type() != '', 'selected': type() == 'EXPORT' }, click: setExport">
-        <i class="icon-upload-alt"></i><br/>
+        <i class="fa fa-upload"></i><br/>
         ${ _('Export') }
       </div>
       <input name="type" type="hidden" data-bind="value: type" />
@@ -366,16 +366,16 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
       <!-- ko if: $root.connection() -->
       <div style="display:inline">
         <a data-bind="routie: 'connection/edit/' + $root.connection().id()" href="javascript:void(0);" class="subbtn" style="margin-left: 5px">
-          <i class="icon-edit"></i> ${_('Edit')}
+          <i class="fa fa-edit"></i> ${_('Edit')}
         </a>
         <a data-bind="click: $root.showDeleteConnectionModal.bind($root)" href="javascript:void(0);" class="subbtn" style="margin-left: 5px">
-          <i class="icon-remove"></i> ${_('Delete')}
+          <i class="fa fa-times"></i> ${_('Delete')}
         </a>
       </div>
       <!-- /ko -->
       <div class="clearfix"></div>
       <a data-bind="routie: 'connection/new'" href="javascript:void(0);" style="margin: 5px; display: block">
-        <i class="icon-plus"></i> ${_('Add a new connection')}
+        <i class="fa fa-plus"></i> ${_('Add a new connection')}
       </a>
     </div>
   </div>

@@ -67,7 +67,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
         % if coordinator:
             <li class="nav-header">${ _('Datasets') }</li>
           % for dataset in coordinator.dataset_set.all():
-            <li rel="tooltip" title="${ dataset.name } : ${ dataset.uri }" class="white"><i class="icon-eye-open"></i> <span class="dataset">${ dataset.name }</span></li>
+            <li rel="tooltip" title="${ dataset.name } : ${ dataset.uri }" class="white"><i class="fa fa-eye"></i> <span class="dataset">${ dataset.name }</span></li>
           % endfor
         % endif
 

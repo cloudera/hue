@@ -49,7 +49,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
 
             <li class="nav-header">${ _('Logs') }</li>
             <li>
-              <a href="${ url('jobbrowser.views.job_single_logs', job=action.externalId) }" title="${ _('View the logs') }" rel="tooltip"><i class="icon-tasks"></i></a>
+              <a href="${ url('jobbrowser.views.job_single_logs', job=action.externalId) }" title="${ _('View the logs') }" rel="tooltip"><i class="fa fa-tasks"></i></a>
             </li>
           % endif
 
@@ -158,7 +158,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
               <tr>
                 <td>
                   <a href="${ url('jobbrowser.views.job_single_logs', job=child_id) }" title="${ _('View the logs') }" rel="tooltip">
-                    <i class="icon-tasks"></i>
+                    <i class="fa fa-tasks"></i>
                   </a>
                 </td>
                 <td>

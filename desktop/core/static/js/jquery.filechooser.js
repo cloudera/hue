@@ -99,7 +99,7 @@
           $(_parent.element).html("<img src='/static/art/spinner.gif' />");
         }
         else {
-          $(_parent.element).html("<i style=\"font-size: 24px; color: #DDD\" class=\"icon-spinner icon-spin\"></i>");
+          $(_parent.element).html("<i style=\"font-size: 24px; color: #DDD\" class=\"fa fa-spinner fa-spin\"></i>");
         }
         $.getJSON("/filebrowser/chooser" + path, function (data) {
             $(_parent.element).empty();
@@ -123,7 +123,7 @@
                 _parent.previousPath = path;
                 var _breadcrumbs = $("<ul>").addClass("hueBreadcrumb").css("padding", "0").css("marginLeft", "0");
                 var _home = $("<li>");
-                var _homelink = $("<a>").addClass("nounderline").html('<i class="icon-home"></i> Home').css("cursor", "pointer").click(function () {
+                var _homelink = $("<a>").addClass("nounderline").html('<i class="fa fa-home"></i> Home').css("cursor", "pointer").click(function () {
                     _parent.navigateTo("/?default_to_home");
                 });
                 _homelink.appendTo(_home);
@@ -159,14 +159,14 @@
                     var _flink = $("<a>");
                     _flink.attr("href", "javascript:void(0)").text(" " + (file.name != "" ? file.name : "..")).appendTo(_f);
                     if (file.type == "dir") {
-                        $("<i class='icon-folder-close'></i>").prependTo(_flink);
+                        $("<i class='fa fa-folder'></i>").prependTo(_flink);
                         _f.click(function () {
                             _parent.options.onFolderChange(file.path);
                             _parent.navigateTo(file.path);
                         });
                     }
                     if (file.type == "file") {
-                        $("<i class='icon-file-alt'></i>").prependTo(_flink);
+                        $("<i class='fa fa-file-o'></i>").prependTo(_flink);
                         _f.click(function () {
                             _parent.options.onFileChoose(file.path);
                         });

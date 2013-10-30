@@ -34,7 +34,7 @@ ${ layout.menubar(section='workflows') }
       <div id="workflowControls" class="sidebar-nav">
         <ul class="nav nav-list">
           <li class="nav-header">${ _('New workflow') }</li>
-          <li class="active"><a href="#properties"><i class="icon-reorder"></i> ${ _('Properties') }</a></li>
+          <li class="active"><a href="#properties"><i class="fa fa-reorder"></i> ${ _('Properties') }</a></li>
         </ul>
       </div>
     </div>
@@ -51,7 +51,7 @@ ${ layout.menubar(section='workflows') }
               <div class="control-group ">
                 <label class="control-label">
                   <a href="#" id="advanced-btn" onclick="$('#advanced-container').toggle('hide')">
-                    <i class="icon-share-alt"></i> ${ _('advanced') }
+                    <i class="fa fa-share"></i> ${ _('advanced') }
                   </a>
                 </label>
                 <div class="controls"></div>

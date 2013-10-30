@@ -124,7 +124,7 @@ function hellipsify() {
       })
       $(this).html(_oText.substr(0, MAX_LENGTH - 1) + "&hellip;&nbsp;");
       var _eye = $("<button class='nochrome btn-small'></button>");
-      _eye.html("<i class='icon-eye-open'></i>");
+      _eye.html("<i class='fa fa-eye'></i>");
       _eye.css("cursor", "pointer");
       _eye.on("click", function (e) {
         e.stopImmediatePropagation();

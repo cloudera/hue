@@ -21,9 +21,9 @@ from django.utils.translation import ugettext as _
 <%def name="breadcrumbs(path, breadcrumbs, from_listdir=False)">
     <ul class="nav nav-pills hueBreadcrumbBar">
         % if from_listdir:
-        <li><a href="${url('filebrowser.views.view', path=urlencode(path))}?default_to_home" style="line-height:18px"><i class="icon-home"></i> ${_('Home')}</a></li>
+        <li><a href="${url('filebrowser.views.view', path=urlencode(path))}?default_to_home" style="line-height:18px"><i class="fa fa-home"></i> ${_('Home')}</a></li>
         <li>
-            <span style="float:right; margin-top:10px;"><i id="editBreadcrumb" class="icon-pencil hand" rel="tooltip" title="${_('Edit path')}"></i></span>
+            <span style="float:right; margin-top:10px;"><i id="editBreadcrumb" class="fa fa-pencil hand" rel="tooltip" title="${_('Edit path')}"></i></span>
             <ul class="hueBreadcrumb" data-bind="foreach: breadcrumbs" style="padding-right:40px; padding-top: 12px">
                 <li data-bind="visible: label == '/'"><a href="#" data-bind="click: show"><span class="divider" data-bind="text: label"></span></a></li>
                 <li data-bind="visible: label != '/'"><a href="#" data-bind="text: label, click: show"></a><span class="divider">/</span></li>
@@ -32,11 +32,11 @@ from django.utils.translation import ugettext as _
         </li>
         <li class="pull-right">
           <a href="${url('filebrowser.views.view', path=urlencode(path))}?default_to_trash" style="line-height:18px" data-bind="visible: trashEnabled" title="${_('View trash')}">
-            <i class="icon-trash"></i> ${_('View trash')}
+            <i class="fa fa-trash-o"></i> ${_('View trash')}
           </a>
         </li>
         % else:
-        <li><a href="${url('filebrowser.views.view', path=urlencode(path))}?default_to_home"><i class="icon-home"></i> ${_('Home')}</a></li>
+        <li><a href="${url('filebrowser.views.view', path=urlencode(path))}?default_to_home"><i class="fa fa-home"></i> ${_('Home')}</a></li>
         <li>
             <ul class="hueBreadcrumb" style="padding-right:40px; padding-top: 12px">
                     % for breadcrumb_item in breadcrumbs:
@@ -53,7 +53,7 @@ from django.utils.translation import ugettext as _
         % endif
         % if not trash_enabled and is_superuser:
         <li id="trash-help" class="pull-right" style="width:30px;text-align:right;line-height:35px;">
-            <i class='icon-question-sign'></i>
+            <i class='fa fa-question-circle'></i>
         </li>
         % endif
     </ul>

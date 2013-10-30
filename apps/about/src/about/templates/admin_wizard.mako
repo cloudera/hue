@@ -42,10 +42,10 @@ ${ header.menubar() }
           <div id="properties" class="section">
             <ul class="nav nav-tabs" style="margin-bottom: 0">
               <li class="active"><a href="#step1" class="step">${ _('Step 1:') } <i
-                  class="icon-cogs"></i> ${ _('Check Configuration') }</a></li>
-              <li><a href="#step2" class="step">${ _('Step 2:') } <i class="icon-book"></i> ${ _('Examples') }</a></li>
-              <li><a href="#step3" class="step">${ _('Step 3:') } <i class="icon-group"></i> ${ _('Users') }</a></li>
-              <li><a id="lastStep" href="#step4" class="step">${ _('Step 4:') } <i class="icon-flag"></i> ${_('Go!') }
+                  class="fa fa-cogs"></i> ${ _('Check Configuration') }</a></li>
+              <li><a href="#step2" class="step">${ _('Step 2:') } <i class="fa fa-book"></i> ${ _('Examples') }</a></li>
+              <li><a href="#step3" class="step">${ _('Step 3:') } <i class="fa fa-group"></i> ${ _('Users') }</a></li>
+              <li><a id="lastStep" href="#step4" class="step">${ _('Step 4:') } <i class="fa fa-flag"></i> ${_('Go!') }
               </a></li>
             </ul>
 
@@ -56,7 +56,7 @@ ${ header.menubar() }
 
               <div class="card-body">
                 <div id="check-config-section" style="margin-bottom:20px">
-                  <!--[if !IE]><!--><i class="icon-spinner icon-spin" style="font-size: 60px; color: #DDD"></i><!--<![endif]-->
+                  <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 60px; color: #DDD"></i><!--<![endif]-->
                   <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
                 </div>
               </div>
@@ -90,7 +90,7 @@ ${ header.menubar() }
                 <ul>
                   <li>
                     <a href="#" class="installAllBtn" data-loading-text="${ _('Installing...') }">
-                      <i class="icon-download-alt"></i> ${ _('All') }
+                      <i class="fa fa-download"></i> ${ _('All') }
                     </a>
                   </li>
                 </ul>
@@ -107,7 +107,7 @@ ${ header.menubar() }
               <li>
                 <a href="#" class="installBtn" data-loading-text="${ _('Installing...') }"
                    data-sample-url="${ url('beeswax:install_examples') }">
-                  <i class="icon-download-alt"></i> ${ apps['beeswax'].nice_name }
+                  <i class="fa fa-download"></i> ${ apps['beeswax'].nice_name }
                 </a>
               </li>
           % endif
@@ -115,7 +115,7 @@ ${ header.menubar() }
               <li>
                 <a href="#" class="installBtn" data-loading-text="${ _('Installing...') }"
                    data-sample-url="${ url('impala:install_examples') }">
-                  <i class="icon-download-alt"></i> ${ apps['impala'].nice_name }
+                  <i class="fa fa-download"></i> ${ apps['impala'].nice_name }
                 </a>
               </li>
           % endif
@@ -123,7 +123,7 @@ ${ header.menubar() }
               <li>
                 <a href="#" class="installBtn" data-loading-text="${ _('Installing...') }"
                    data-sample-url="${ url('oozie:install_examples') }">
-                  <i class="icon-download-alt"></i> ${ apps['jobsub'].nice_name }
+                  <i class="fa fa-download"></i> ${ apps['jobsub'].nice_name }
                 </a>
               </li>
           % endif
@@ -131,7 +131,7 @@ ${ header.menubar() }
               <li>
                 <a href="#" class="installBtn" data-loading-text="${ _('Installing...') }"
                    data-sample-url="${ url('oozie:install_examples') }">
-                  <i class="icon-download-alt"></i> ${ apps['oozie'].nice_name }
+                  <i class="fa fa-download"></i> ${ apps['oozie'].nice_name }
                 </a>
               </li>
           % endif
@@ -139,7 +139,7 @@ ${ header.menubar() }
               <li>
                 <a href="#" class="installBtn" data-loading-text="${ _('Installing...') }"
                    data-sample-url="${ url('pig:install_examples') }">
-                  <i class="icon-download-alt"></i> ${ apps['pig'].nice_name }
+                  <i class="fa fa-download"></i> ${ apps['pig'].nice_name }
                 </a>
               </li>
           % endif
@@ -184,7 +184,7 @@ ${ header.menubar() }
 
                 <div class="card-body">
                   <p>
-                    <a href="${ url('desktop.views.home') }" class="step"><i class="icon-home"></i> ${_('Hue Home') }
+                    <a href="${ url('desktop.views.home') }" class="step"><i class="fa fa-home"></i> ${_('Hue Home') }
                     </a>
                   </p>
                 </div>

@@ -70,10 +70,10 @@ ${ layout.menubar(section='workflows', dashboard=True) }
                 % if var not in ParameterForm.NON_PARAMETERS and var != 'oozie.use.system.libpath':
                   % if utils.is_linkable(var, str(value)):
                   <li rel="tooltip" title="${ var } : ${ str(value) }">
-                    <a href="${ utils.hdfs_link_js(str(value)) }"><i class="icon-eye-open"></i> <span class="variable hide">${ var }</span></a>
+                    <a href="${ utils.hdfs_link_js(str(value)) }"><i class="fa fa-eye"></i> <span class="variable hide">${ var }</span></a>
                   % else:
                   <li rel="tooltip" title="${ var } : ${ str(value) }" class="white">
-                    <i class="icon-eye-open"></i> <span class="variable">${ var }</span>
+                    <i class="fa fa-eye"></i> <span class="variable">${ var }</span>
                   % endif
                   </li>
                 % endif
@@ -206,7 +206,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         <script id="actionTemplate" type="text/html">
           <tr>
             <td>
-              <a data-bind="visible:externalId !='', attr: { href: log}" data-row-selector-exclude="true"><i class="icon-tasks"></i></a>
+              <a data-bind="visible:externalId !='', attr: { href: log}" data-row-selector-exclude="true"><i class="fa fa-tasks"></i></a>
             </td>
             <td>
               <a data-bind="text: id, attr: { href: url}" data-row-selector="true"></a>

@@ -41,7 +41,7 @@ ${ commonheader(title, "", user, "40px") | n,unicode }
 
               <div class="details">
       % if traceback:
-        <a href="javascript:toggleDisplay('#traceback');"><i class="icon-share-alt"></i> ${_('More Info')}</a>
+        <a href="javascript:toggleDisplay('#traceback');"><i class="fa fa-share"></i> ${_('More Info')}</a>
         &nbsp;
         <a href="/logs" target="_new">${_('View Logs')}</a>
         <br />

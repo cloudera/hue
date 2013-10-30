@@ -185,7 +185,7 @@
     additional_class = get_bootstrap_class(job, 'label')
     %>
     % if job.is_retired and not job.is_mr2:
-        <span class="label ${additional_class}"><i class="icon-briefcase icon-white" title="${ _('Retired') }"></i> ${job.status.lower()}</span>
+        <span class="label ${additional_class}"><i class="fa fa-briefcase" style="color: #FFFFFF" title="${ _('Retired') }"></i> ${job.status.lower()}</span>
     % else:
         <span class="label ${additional_class}">${job.status.lower()}</span>
     % endif

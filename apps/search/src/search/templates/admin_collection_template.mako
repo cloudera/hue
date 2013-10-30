@@ -160,12 +160,12 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
             <div id="content-editor" class="clear">${ hue_collection.result.get_template() | n,unicode }</div>
             <div id="cloud-template" class="btn-group">
               <a title="${_('Cloud Template')}" class="btn toolbar-btn toolbar-cmd">
-                <i class="icon-cloud-download" style="margin-top:2px;"></i>
+                <i class="fa fa-cloud-download" style="margin-top:2px;"></i>
               </a>
             </div>
             <div id="load-template" class="btn-group">
               <a title="${_('Layout')}" class="btn toolbar-btn toolbar-cmd">
-                <i class="icon-th-large" style="margin-top:2px;"></i>
+                <i class="fa fa-th-large" style="margin-top:2px;"></i>
               </a>
             </div>
           </div>
@@ -176,7 +176,7 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
                 <p>
                   <select data-bind="options: availableFields, value: selectedVisualField" class="input-large chosen-select"></select>
                   <button title="${ _('Click on this button to add the field') }" class="btn plus-btn" data-bind="click: $root.addFieldToVisual">
-                    <i class="icon-plus"></i>
+                    <i class="fa fa-plus"></i>
                   </button>
                   <div class="clearfix"></div>
                 </p>
@@ -200,7 +200,7 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
                   <option title="${ _('Truncate a value after 500 characters') }" value="{{#truncate500}} {{/truncate500}}">{{#truncate500}}</option>
                 </select>
                 <button title="${ _('Click on this button to add the field') }" class="btn plus-btn" data-bind="click: $root.addFunctionToVisual">
-                  <i class="icon-plus"></i>
+                  <i class="fa fa-plus"></i>
                 </button>
                 <div class="clearfix"></div>
                 <p class="muted" style="margin-top: 10px"></p>
@@ -222,7 +222,7 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
                 <p>
                   <select data-bind="options: availableFields, value: selectedSourceField" class="input-medium chosen-select"></select>
                   <button title="${ _('Click on this button to add the field') }" class="btn plus-btn" data-bind="click: $root.addFieldToSource">
-                    <i class="icon-plus"></i>
+                    <i class="fa fa-plus"></i>
                   </button>
                   <div class="clearfix"></div>
                 </p>
@@ -246,7 +246,7 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
                   <option title="${ _('Truncate a value after 500 characters') }" value="{{#truncate500}} {{/truncate500}}">{{#truncate500}}</option>
                 </select>
                 <button title="${ _('Click on this button to add the field') }" class="btn plus-btn" data-bind="click: $root.addFunctionToSource">
-                  <i class="icon-plus"></i>
+                  <i class="fa fa-plus"></i>
                 </button>
                 <div class="clearfix"></div>
                 <p class="muted" style="margin-top: 10px"></p>

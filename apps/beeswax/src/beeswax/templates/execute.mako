@@ -223,7 +223,7 @@ ${layout.menubar(section='query')}
               <li class="white">
                 <div class="control-group">
                   <span id="refresh-dyk">
-                    <i class="icon-refresh"></i>
+                    <i class="fa fa-refresh"></i>
                     ${ _('Sync tables tips') }
                   </span>
                   <div id="refresh-content" class="hide">
@@ -239,7 +239,7 @@ ${layout.menubar(section='query')}
               <li class="nav-header"></li>
               <li class="white">
                 <div class="control-group">
-                  <i class="icon-question-sign" id="help"></i>
+                  <i class="fa fa-question-circle" id="help"></i>
                   <div id="help-content" class="hide">
                     <ul style="text-align: left;">
                       <li>${ _('Press CTRL + Space to autocomplete') }</li>
@@ -334,8 +334,8 @@ ${layout.menubar(section='query')}
 
     <div class="span2" id="navigator">
       <div class="card card-small">
-        <a href="#" title="${_('Double click on a table name or field to insert it in the editor')}" rel="tooltip" data-placement="left" class="pull-right" style="margin:10px;margin-left: 0"><i class="icon-question-sign"></i></a>
-        <a id="refreshNavigator" href="#" title="${_('Manually refresh the table list')}" rel="tooltip" data-placement="left" class="pull-right" style="margin:10px"><i class="icon-refresh"></i></a>
+        <a href="#" title="${_('Double click on a table name or field to insert it in the editor')}" rel="tooltip" data-placement="left" class="pull-right" style="margin:10px;margin-left: 0"><i class="fa fa-question-circle"></i></a>
+        <a id="refreshNavigator" href="#" title="${_('Manually refresh the table list')}" rel="tooltip" data-placement="left" class="pull-right" style="margin:10px"><i class="fa fa-refresh"></i></a>
         <h1 class="card-heading simple">${_('Navigator')}</h1>
         <div class="card-body">
           <p>
@@ -343,7 +343,7 @@ ${layout.menubar(section='query')}
             <span id="navigatorNoTables">${_('The selected database has no tables.')}</span>
             <ul id="navigatorTables" class="unstyled"></ul>
             <div id="navigatorLoader">
-              <!--[if !IE]><!--><i class="icon-spinner icon-spin" style="font-size: 20px; color: #DDD"></i><!--<![endif]-->
+              <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #DDD"></i><!--<![endif]-->
               <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
             </div>
           </p>
@@ -397,12 +397,12 @@ ${layout.menubar(section='query')}
 <div id="navigatorQuicklook" class="modal hide fade">
     <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <a class="tableLink pull-right" href="#" target="_blank" style="margin-right: 20px;margin-top:6px"><i class="icon-external-link"></i> ${ _('View in Metastore Browser') }</a>
+        <a class="tableLink pull-right" href="#" target="_blank" style="margin-right: 20px;margin-top:6px"><i class="fa fa-external-link"></i> ${ _('View in Metastore Browser') }</a>
         <h3>${_('Data sample for')} <span class="tableName"></span></h3>
     </div>
     <div class="modal-body" style="min-height: 100px">
       <div class="loader">
-        <!--[if !IE]><!--><i class="icon-spinner icon-spin" style="font-size: 30px; color: #DDD"></i><!--<![endif]-->
+        <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 30px; color: #DDD"></i><!--<![endif]-->
         <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
       </div>
       <div class="sample"></div>
@@ -558,17 +558,17 @@ ${layout.menubar(section='query')}
           $(data.split(" ")).each(function (cnt, table) {
             if ($.trim(table) != ""){
               var _table = $("<li>");
-              _table.html("<a href='/metastore/table/" + $("#id_query-database").val() + "/" + table + "' target='_blank' class='pull-right'><i class='icon-eye-open' title='" + "${ _('View in Metastore Browser') }" + "' style='margin-left:5px'></i></a><a href='#' class='pull-right hide'><i class='icon-list' title='" + "${ _('Preview Sample data') }" + "'></i></a><a href='#' title='" + table + "'><i class='icon-table'></i> " + table + "</a><ul class='unstyled'></ul>");
+              _table.html("<a href='/metastore/table/" + $("#id_query-database").val() + "/" + table + "' target='_blank' class='pull-right'><i class='fa fa-eye' title='" + "${ _('View in Metastore Browser') }" + "' style='margin-left:5px'></i></a><a href='#' class='pull-right hide'><i class='fa fa-list' title='" + "${ _('Preview Sample data') }" + "'></i></a><a href='#' title='" + table + "'><i class='fa fa-table'></i> " + table + "</a><ul class='unstyled'></ul>");
               _table.data("table", table).attr("id", "navigatorTables_" + table);
               _table.find("a:eq(2)").on("click", function () {
-                _table.find(".icon-table").removeClass("icon-table").addClass("icon-spin").addClass("icon-spinner");
+                _table.find(".fa-table").removeClass("fa-table").addClass("fa-spin").addClass("fa-spinner");
                 hac_getTableColumns($("#id_query-database").val(), table, "", function (plain_columns, extended_columns) {
                   _table.find("a:eq(1)").removeClass("hide");
                   _table.find("ul").empty();
-                  _table.find(".icon-spinner").removeClass("icon-spinner").removeClass("icon-spin").addClass("icon-table");
+                  _table.find(".fa-spinner").removeClass("fa-spinner").removeClass("fa-spin").addClass("fa-table");
                   $(extended_columns).each(function (iCnt, col) {
                     var _column = $("<li>");
-                    _column.html("<a href='#' style='padding-left:10px'" + (col.comment != null && col.comment != "" ? " title='" + col.comment + "'" : "") + "><i class='icon-columns'></i> " + col.name + " (" + col.type + ")</a>");
+                    _column.html("<a href='#' style='padding-left:10px'" + (col.comment != null && col.comment != "" ? " title='" + col.comment + "'" : "") + "><i class='fa fa-columns'></i> " + col.name + " (" + col.type + ")</a>");
                     _column.appendTo(_table.find("ul"));
                     _column.on("dblclick", function () {
                       codeMirror.replaceSelection($.trim(col.name) + ', ');
@@ -808,7 +808,7 @@ ${layout.menubar(section='query')}
         });
 
         var pos = cm.cursorCoords();
-        $("<i class='icon-spinner icon-spin CodeMirror-spinner'></i>").css("top", pos.top + "px").css("left", (pos.left - 4) + "px").appendTo($("body"));
+        $("<i class='fa fa-spinner fa-spin CodeMirror-spinner'></i>").css("top", pos.top + "px").css("left", (pos.left - 4) + "px").appendTo($("body"));
 
         if ($.totalStorage('tables_' + $("#id_query-database").val()) == null) {
           CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
@@ -922,7 +922,7 @@ ${layout.menubar(section='query')}
         var err = $(".queryErrorMessage").text().toLowerCase();
         var firstPos = err.indexOf("line");
         selectedLine = $.trim(err.substring(err.indexOf(" ", firstPos), err.indexOf(":", firstPos))) * 1;
-        errorWidget = codeMirror.addLineWidget(selectedLine - 1, $("<div>").addClass("editorError").html("<i class='icon-exclamation-sign'></i> " + err)[0], {coverGutter: true, noHScroll: true})
+        errorWidget = codeMirror.addLineWidget(selectedLine - 1, $("<div>").addClass("editorError").html("<i class='fa fa-exclamation-circle'></i> " + err)[0], {coverGutter: true, noHScroll: true})
       }
 
       codeMirror.setSize("95%", $(window).height() - 270 - $("#queryPane .alert-error").outerHeight() - $(".nav-tabs").outerHeight());

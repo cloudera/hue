@@ -65,7 +65,7 @@
   <div class="control-group ">
     <label class="control-label">
       <a href="javascript:void(0);" id="advanced-btn" onclick="$('#node-advanced-container').toggle('hide')">
-        <i class="icon-share-alt"></i> ${ _('Advanced') }</a>
+        <i class="fa fa-share"></i> ${ _('Advanced') }</a>
     </label>
     <div class="controls"></div>
   </div>

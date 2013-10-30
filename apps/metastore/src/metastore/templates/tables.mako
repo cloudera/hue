@@ -37,8 +37,8 @@ ${ components.menubar() }
           </li>
           % if has_write_access:
           <li class="nav-header">${_('Actions')}</li>
-          <li><a href="${ url('beeswax:import_wizard', database=database) }"><i class="icon-copy"></i> ${_('Create a new table from a file')}</a></li>
-          <li><a href="${ url('beeswax:create_table', database=database) }"><i class="icon-wrench"></i> ${_('Create a new table manually')}</a></li>
+          <li><a href="${ url('beeswax:import_wizard', database=database) }"><i class="fa fa-files-o"></i> ${_('Create a new table from a file')}</a></li>
+          <li><a href="${ url('beeswax:create_table', database=database) }"><i class="fa fa-wrench"></i> ${_('Create a new table manually')}</a></li>
           % endif
         </ul>
       </div>
@@ -52,10 +52,10 @@ ${ components.menubar() }
           </%def>
 
           <%def name="actions()">
-            <button id="viewBtn" class="btn toolbarBtn" title="${_('Browse the selected table')}" disabled="disabled"><i class="icon-eye-open"></i> ${_('View')}</button>
-            <button id="browseBtn" class="btn toolbarBtn" title="${_('Browse the selected table')}" disabled="disabled"><i class="icon-list"></i> ${_('Browse Data')}</button>
+            <button id="viewBtn" class="btn toolbarBtn" title="${_('Browse the selected table')}" disabled="disabled"><i class="fa fa-eye"></i> ${_('View')}</button>
+            <button id="browseBtn" class="btn toolbarBtn" title="${_('Browse the selected table')}" disabled="disabled"><i class="fa fa-list"></i> ${_('Browse Data')}</button>
             % if has_write_access:
-            <button id="dropBtn" class="btn toolbarBtn" title="${_('Delete the selected tables')}" disabled="disabled"><i class="icon-trash"></i>  ${_('Drop')}</button>
+            <button id="dropBtn" class="btn toolbarBtn" title="${_('Delete the selected tables')}" disabled="disabled"><i class="fa fa-trash-o"></i>  ${_('Drop')}</button>
             % endif
           </%def>
         </%actionbar:render>
@@ -63,7 +63,7 @@ ${ components.menubar() }
           <table class="table table-condensed datatables" data-tablescroller-disable="true">
           <thead>
             <tr>
-              <th width="1%"><div class="hueCheckbox selectAll" data-selectables="tableCheck"></div></th>
+              <th width="1%"><div class="hueCheckbox selectAll fa" data-selectables="tableCheck"></div></th>
               <th>${_('Table Name')}</th>
             </tr>
           </thead>
@@ -71,7 +71,7 @@ ${ components.menubar() }
           % for table in tables:
             <tr>
               <td data-row-selector-exclude="true" width="1%">
-                <div class="hueCheckbox tableCheck"
+                <div class="hueCheckbox tableCheck fa"
                      data-view-url="${ url('metastore:describe_table', database=database, table=table) }"
                      data-browse-url="${ url('metastore:read_table', database=database, table=table) }"
                      data-drop-name="${ table }"
@@ -147,24 +147,24 @@ ${ components.menubar() }
 
     $(".selectAll").click(function () {
       if ($(this).attr("checked")) {
-        $(this).removeAttr("checked").removeClass("icon-ok");
-        $("." + $(this).data("selectables")).removeClass("icon-ok").removeAttr("checked");
+        $(this).removeAttr("checked").removeClass("fa-check");
+        $("." + $(this).data("selectables")).removeClass("fa-check").removeAttr("checked");
       }
       else {
-        $(this).attr("checked", "checked").addClass("icon-ok");
-        $("." + $(this).data("selectables")).addClass("icon-ok").attr("checked", "checked");
+        $(this).attr("checked", "checked").addClass("fa-check");
+        $("." + $(this).data("selectables")).addClass("fa-check").attr("checked", "checked");
       }
       toggleActions();
     });
 
     $(".tableCheck").click(function () {
       if ($(this).attr("checked")) {
-        $(this).removeClass("icon-ok").removeAttr("checked");
+        $(this).removeClass("fa-check").removeAttr("checked");
       }
       else {
-        $(this).addClass("icon-ok").attr("checked", "checked");
+        $(this).addClass("fa-check").attr("checked", "checked");
       }
-      $(".selectAll").removeAttr("checked").removeClass("icon-ok");
+      $(".selectAll").removeAttr("checked").removeClass("fa-check");
       toggleActions();
     });
 

@@ -37,15 +37,15 @@ ${layout.menubar(section='groups')}
       <%def name="actions()">
         %if user.is_superuser:
             <button id="deleteGroupBtn" class="btn confirmationModal" title="${_('Delete')}" disabled="disabled"><i
-                class="icon-trash"></i> ${_('Delete')}</button>
+                class="fa fa-trash-o"></i> ${_('Delete')}</button>
         %endif
       </%def>
       <%def name="creation()">
         %if user.is_superuser:
             <a id="addGroupBtn" href="${url('useradmin.views.edit_group')}" class="btn"><i
-                class="icon-plus-sign"></i> ${_('Add group')}</a>
+                class="fa fa-plus-circle"></i> ${_('Add group')}</a>
             <a id="addLdapGroupBtn" href="${url('useradmin.views.add_ldap_groups')}" class="btn"><i
-                class="icon-refresh"></i> ${_('Add/Sync LDAP group')}</a>
+                class="fa fa-refresh"></i> ${_('Add/Sync LDAP group')}</a>
         %endif
       </%def>
     </%actionbar:render>
@@ -55,7 +55,7 @@ ${layout.menubar(section='groups')}
       <tr>
         %if user.is_superuser:
             <th width="1%">
-              <div id="selectAll" class="hueCheckbox"></div>
+              <div id="selectAll" class="hueCheckbox fa"></div>
             </th>
         %endif
         <th>${_('Group Name')}</th>
@@ -69,7 +69,7 @@ ${layout.menubar(section='groups')}
               data-search="${group.name}${', '.join([group_user.username for group_user in group.user_set.all()])}">
           %if user.is_superuser:
               <td data-row-selector-exclude="true">
-                <div class="hueCheckbox groupCheck" data-group="${group.name}"
+                <div class="hueCheckbox groupCheck fa" data-group="${group.name}"
                      data-confirmation-url="${ url('useradmin.views.delete_group', name=urllib.quote(group.name))}"
                      data-row-selector-exclude="true"></div>
               </td>
@@ -146,21 +146,21 @@ ${layout.menubar(section='groups')}
     $("#selectAll").click(function () {
       if ($(this).attr("checked")) {
         $(this).removeAttr("checked");
-        $(".groupCheck").removeClass("icon-ok").removeAttr("checked");
+        $(".groupCheck").removeClass("fa-check").removeAttr("checked");
       }
       else {
         $(this).attr("checked", "checked");
-        $(".groupCheck").addClass("icon-ok").attr("checked", "checked");
+        $(".groupCheck").addClass("fa-check").attr("checked", "checked");
       }
       toggleActions();
     });
 
     $(".groupCheck").click(function () {
       if ($(this).attr("checked")) {
-        $(this).removeClass("icon-ok").removeAttr("checked");
+        $(this).removeClass("fa-check").removeAttr("checked");
       }
       else {
-        $(this).addClass("icon-ok").attr("checked", "checked");
+        $(this).addClass("fa-check").attr("checked", "checked");
       }
       toggleActions();
     });

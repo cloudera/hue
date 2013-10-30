@@ -43,27 +43,27 @@ ${ layout.menubar(section='workflows') }
 
     <%def name="actions()">
       <div class="btn-toolbar" style="display: inline; vertical-align: middle">
-        <button class="btn toolbarBtn" id="submit-btn" disabled="disabled"><i class="icon-play"></i> ${ _('Submit') }</button>
-        <button class="btn toolbarBtn" id="schedule-btn" disabled="disabled"><i class="icon-calendar"></i> ${ _('Schedule') }</button>
-        <button class="btn toolbarBtn" id="clone-btn" disabled="disabled"><i class="icon-copy"></i> ${ _('Copy') }</button>
-        <button class="btn toolbarBtn" id="export-btn" disabled="disabled"><i class="icon-upload-alt"></i> ${ _('Export') }</button>
+        <button class="btn toolbarBtn" id="submit-btn" disabled="disabled"><i class="fa fa-play"></i> ${ _('Submit') }</button>
+        <button class="btn toolbarBtn" id="schedule-btn" disabled="disabled"><i class="fa fa-calendar"></i> ${ _('Schedule') }</button>
+        <button class="btn toolbarBtn" id="clone-btn" disabled="disabled"><i class="fa fa-files-o"></i> ${ _('Copy') }</button>
+        <button class="btn toolbarBtn" id="export-btn" disabled="disabled"><i class="fa fa-upload"></i> ${ _('Export') }</button>
         <div id="delete-dropdown" class="btn-group" style="vertical-align: middle">
-          <button id="trash-btn" class="btn toolbarBtn" disabled="disabled"><i class="icon-remove"></i> ${_('Move to trash')}</button>
+          <button id="trash-btn" class="btn toolbarBtn" disabled="disabled"><i class="fa fa-times"></i> ${_('Move to trash')}</button>
           <button id="trash-btn-caret" class="btn toolbarBtn dropdown-toggle" data-toggle="dropdown" disabled="disabled">
             <span class="caret"></span>
           </button>
           <ul class="dropdown-menu">
-            <li><a href="javascript:void(0);" id="destroy-btn" title="${_('Delete forever')}"><i class="icon-bolt"></i> ${_('Delete forever')}</a></li>
+            <li><a href="javascript:void(0);" id="destroy-btn" title="${_('Delete forever')}"><i class="fa fa-bolt"></i> ${_('Delete forever')}</a></li>
           </ul>
         </div>
       </div>
     </%def>
 
     <%def name="creation()">
-      <a href="${ url('oozie:create_workflow') }" class="btn"><i class="icon-plus-sign"></i> ${ _('Create') }</a>
-      <a href="${ url('oozie:import_workflow') }" class="btn"><i class="icon-download-alt"></i> ${ _('Import') }</a>      
+      <a href="${ url('oozie:create_workflow') }" class="btn"><i class="fa fa-plus-circle"></i> ${ _('Create') }</a>
+      <a href="${ url('oozie:import_workflow') }" class="btn"><i class="fa fa-download"></i> ${ _('Import') }</a>
       &nbsp;&nbsp;
-      <a href="${ url('oozie:list_trashed_workflows') }" class="btn"><i class="icon-trash"></i> ${ _('Trash') }</a>
+      <a href="${ url('oozie:list_trashed_workflows') }" class="btn"><i class="fa fa-trash-o"></i> ${ _('Trash') }</a>
     </%def>
   </%actionbar:render>
 
@@ -71,7 +71,7 @@ ${ layout.menubar(section='workflows') }
   <table id="workflowTable" class="table datatables">
     <thead>
       <tr>
-        <th width="1%"><div class="hueCheckbox selectAll" data-selectables="workflowCheck"></div></th>
+        <th width="1%"><div class="hueCheckbox selectAll fa" data-selectables="workflowCheck"></div></th>
         <th>${ _('Name') }</th>
         <th>${ _('Description') }</th>
         <th>${ _('Last Modified') }</th>
@@ -84,7 +84,7 @@ ${ layout.menubar(section='workflows') }
       % for workflow in jobs:
         <tr>
           <td data-row-selector-exclude="true">
-             <div class="hueCheckbox workflowCheck" data-row-selector-exclude="true"
+             <div class="hueCheckbox workflowCheck fa" data-row-selector-exclude="true"
               % if workflow.can_read(user):
                   data-submit-url="${ url('oozie:submit_workflow', workflow=workflow.id) }"
                   data-schedule-url="${ url('oozie:schedule_workflow', workflow=workflow.id) }"
@@ -123,7 +123,7 @@ ${ layout.menubar(section='workflows') }
     <img src="/static/art/spinner-big.gif" />
   <![endif]-->
   <!--[if !IE]> -->
-    <i class="icon-spinner icon-spin"></i>
+    <i class="fa fa-spinner fa-spin"></i>
   <!-- <![endif]-->
 </div>
 
@@ -177,24 +177,24 @@ ${ layout.menubar(section='workflows') }
 
     $(".selectAll").click(function () {
       if ($(this).attr("checked")) {
-        $(this).removeAttr("checked").removeClass("icon-ok");
-        $("." + $(this).data("selectables")).removeClass("icon-ok").removeAttr("checked");
+        $(this).removeAttr("checked").removeClass("fa-check");
+        $("." + $(this).data("selectables")).removeClass("fa-check").removeAttr("checked");
       }
       else {
-        $(this).attr("checked", "checked").addClass("icon-ok");
-        $("." + $(this).data("selectables")).addClass("icon-ok").attr("checked", "checked");
+        $(this).attr("checked", "checked").addClass("fa-check");
+        $("." + $(this).data("selectables")).addClass("fa-check").attr("checked", "checked");
       }
       toggleActions();
     });
 
     $(".workflowCheck").click(function () {
       if ($(this).attr("checked")) {
-        $(this).removeClass("icon-ok").removeAttr("checked");
+        $(this).removeClass("fa-check").removeAttr("checked");
       }
       else {
-        $(this).addClass("icon-ok").attr("checked", "checked");
+        $(this).addClass("fa-check").attr("checked", "checked");
       }
-      $(".selectAll").removeAttr("checked").removeClass("icon-ok");
+      $(".selectAll").removeAttr("checked").removeClass("fa-check");
       toggleActions();
     });
 
