@@ -284,6 +284,9 @@ from django.utils.translation import ugettext as _
            % if 'jobsub' in apps:
            <li><a href="/${apps['jobsub'].display_name}"><img src="${ apps['jobsub'].icon_path }"/> ${_('Job Designer')}</a></li>
            % endif
+           % if 'spark' in apps:
+           <li><a href="/${apps['spark'].display_name}"><img src="${ apps['spark'].icon_path }"/> ${_('Spark')}</a></li>
+           % endif
          </ul>
        </li>
        <li class="dropdown">

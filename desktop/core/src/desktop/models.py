@@ -167,7 +167,7 @@ class DocumentManager(models.Manager):
     return Document.objects.filter(Q(owner=user) | Q(documentpermission__users=user) | Q(documentpermission__groups__in=user.groups.all()))
 
   def get_docs(self, user, model_class=None, extra=None):
-    docs = Document.objects.documents(user).exclude(name='pig-app-hue-script')
+    docs = Document.objects.documents(user).exclude(name='pig-app-hue-script').exclude(name='spark-app-hue-script')
 
     if model_class is not None:
       ct = ContentType.objects.get_for_model(model_class)
@@ -358,6 +358,9 @@ class Document(models.Model):
 
   def is_trashed(self):
     return DocumentTag.objects.get_trash_tag(user=self.owner) in self.tags.all()
+
+  def is_historic(self):
+    return DocumentTag.objects.get_history_tag(user=self.owner) in self.tags.all()
 
   def send_to_trash(self):
     tag = DocumentTag.objects.get_trash_tag(user=self.owner)
