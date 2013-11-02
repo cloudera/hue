@@ -803,7 +803,7 @@ from django.utils.translation import ugettext as _
       $(window).scroll(function () {
         if ($(window).scrollTop() > 95) {
           $(".actionbar").width($(".actionbar").data("originalWidth"));
-          $(".actionbar").css("position", "fixed").css("top", "40px");
+          $(".actionbar").css("position", "fixed").css("top", "73px");
           $(".actionbarGhost").removeClass("hide");
         }
         else {
