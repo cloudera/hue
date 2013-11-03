@@ -39,7 +39,7 @@ def static_pattern(urlprefix, root):
   directory to serve.
   """
   return (r'^%s/(?P<path>.*)$' % urlprefix, 'django.views.static.serve',
-   { 'document_root': root, 'show_indexes': True })
+   { 'document_root': root, 'show_indexes': False })
 
 
 admin.autodiscover()
