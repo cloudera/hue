@@ -18,10 +18,7 @@
 """
 The HQLdesign class can (de)serialize a design to/from a QueryDict.
 """
-try:
-  import json
-except ImportError:
-  import simplejson as json
+import json
 
 import logging
 import re
@@ -44,13 +41,12 @@ def hql_query(hql, database='default'):
   if not (isinstance(hql, str) or isinstance(hql, unicode)):
     raise Exception('Requires a SQL text query of type <str>, <unicode> and not %s' % type(hql))
 
-  data_dict['query']['query'] = _strip_trailing_semicolon(hql)
+  data_dict['query']['query'] = strip_trailing_semicolon(hql)
   data_dict['query']['database'] = database
   hql_design = HQLdesign()
   hql_design._data_dict = data_dict
 
   return hql_design
-
 
 
 class HQLdesign(object):
@@ -163,8 +159,8 @@ class HQLdesign(object):
 
   @property
   def statements(self):
-    hql_query = _strip_trailing_semicolon(self.hql_query)
-    return [_strip_trailing_semicolon(statement.strip()) for statement in split_statements(hql_query)]
+    hql_query = strip_trailing_semicolon(self.hql_query)
+    return [strip_trailing_semicolon(statement.strip()) for statement in split_statements(hql_query)]
 
 
 def split_statements(hql):
@@ -255,7 +251,7 @@ def denormalize_formset_dict(data_dict_list, formset, attr_list):
 
 _SEMICOLON_WHITESPACE = re.compile(";\s*$")
 
-def _strip_trailing_semicolon(query):
+def strip_trailing_semicolon(query):
   """As a convenience, we remove trailing semicolons from queries."""
   s = _SEMICOLON_WHITESPACE.split(query, 2)
   if len(s) > 1:

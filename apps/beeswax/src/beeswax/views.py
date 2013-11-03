@@ -48,6 +48,8 @@ from beeswax.models import SavedQuery, make_query_context, QueryHistory
 from beeswax.server import dbms
 from beeswax.server.dbms import expand_exception, get_query_server_config, QueryServerException
 
+import rdbms.design
+
 from thrift.transport.TTransport import TTransportException
 
 
@@ -61,9 +63,9 @@ def index(request):
 Design views
 """
 
-def save_design(request, form, type, design, explicit_save):
+def save_design(request, form, type_, design, explicit_save):
   """
-  save_design(request, form, type, design, explicit_save) -> SavedQuery
+  save_design(request, form, type_, design, explicit_save) -> SavedQuery
 
   A helper method to save the design:
     * If ``explicit_save``, then we save the data in the current design.
@@ -77,12 +79,12 @@ def save_design(request, form, type, design, explicit_save):
   """
   assert form.saveform.is_valid()
 
-  if type == models.HQL:
+  if type_ == models.HQL:
     design_cls = beeswax.design.HQLdesign
-  elif type == models.IMPALA:
+  elif type_ == models.IMPALA:
     design_cls = beeswax.design.HQLdesign
   else:
-    raise ValueError(_('Invalid design type %(type)s') % {'type': type})
+    raise ValueError(_('Invalid design type %(type)s') % {'type': type_})
 
   old_design = design
   design_obj = design_cls(form)
@@ -105,7 +107,7 @@ def save_design(request, form, type, design, explicit_save):
       design.name = models.SavedQuery.DEFAULT_NEW_DESIGN_NAME
     design.is_auto = True
 
-  design.type = type
+  design.type = type_
   design.data = new_data
 
   design.save()
@@ -384,7 +386,7 @@ def execute_query(request, design_id=None):
 
   query_server = get_query_server_config(app_name)
   db = dbms.get(request.user, query_server)
-  databases = _get_db_choices(request)
+  databases = get_db_choices(request)
 
   if request.method == 'POST':
     form.bind(request.POST)
@@ -514,7 +516,7 @@ def watch_query(request, id):
 
   # Keep waiting
   # - Translate context into something more meaningful (type, data)
-  query_context = _parse_query_context(context_param)
+  query_context = parse_query_context(context_param)
 
   return render('watch_wait.mako', request, {
                 'query': query_history,
@@ -627,7 +629,7 @@ def view_results(request, id, first_row=0):
 
   handle, state = _get_query_handle_and_state(query_history)
   context_param = request.GET.get('context', '')
-  query_context = _parse_query_context(context_param)
+  query_context = parse_query_context(context_param)
 
   # To remove when Impala has start_over support
   download  = request.GET.get('download', '')
@@ -1024,7 +1026,7 @@ def _run_parameterized_query(request, design_id, explain):
   params = design_obj.get_query_dict()
   params.update(request.POST)
 
-  databases = _get_db_choices(request)
+  databases = get_db_choices(request)
   query_form.bind(params)
   query_form.query.fields['database'].choices = databases # Could not do it in the form
 
@@ -1067,7 +1069,7 @@ def _run_parameterized_query(request, design_id, explain):
 
 
 def execute_directly(request, query, query_server=None, design=None, tablename=None,
-                     on_success_url=None, on_success_params=None, **kwargs):
+                           on_success_url=None, on_success_params=None, **kwargs):
   """
   execute_directly(request, query_msg, tablename, design) -> HTTP response for execution
 
@@ -1227,9 +1229,9 @@ def _get_query_handle_and_state(query_history):
   return (handle, state)
 
 
-def _parse_query_context(context):
+def parse_query_context(context):
   """
-  _parse_query_context(context) -> ('table', <table_name>) -or- ('design', <design_obj>)
+  parse_query_context(context) -> ('table', <table_name>) -or- ('design', <design_obj>)
   """
   if not context:
     return None
@@ -1351,7 +1353,6 @@ def _list_query_history(user, querydict, page_size, prefix=""):
   if pagenum < 1:
     pagenum = 1
   db_queryset = db_queryset[ page_size * (pagenum - 1) : page_size * pagenum ]
-
   paginator = Paginator(db_queryset, page_size, total=total_count)
   page = paginator.page(pagenum)
 
@@ -1387,7 +1388,7 @@ def _update_query_state(query_history):
     query_history.save_state(state_enum)
   return True
 
-def _get_db_choices(request):
+def get_db_choices(request):
   app_name = get_app_name(request)
   query_server = get_query_server_config(app_name)
   db = dbms.get(request.user, query_server)

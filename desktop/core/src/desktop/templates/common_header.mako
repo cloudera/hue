@@ -275,6 +275,9 @@ from django.utils.translation import ugettext as _
            % if 'impala' in apps:
            <li><a href="/${apps['impala'].display_name}"><img src="${ apps['impala'].icon_path }"/> ${_('Impala')}</a></li>
            % endif
+           % if 'rdbms' in apps:
+           <li><a href="/${apps['rdbms'].display_name}"><img src="${ apps['rdbms'].icon_path }"/> ${_('DB Query')}</a></li>
+           % endif
            % if 'pig' in apps:
            <li><a href="/${apps['pig'].display_name}"><img src="${ apps['pig'].icon_path }"/> ${_('Pig')}</a></li>
            % endif

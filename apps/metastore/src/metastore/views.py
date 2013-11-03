@@ -78,7 +78,7 @@ def drop_database(request):
 
     try:
       # Can't be simpler without an important refactoring
-      design = SavedQuery.create_empty(app_name='beeswax', owner=request.user)
+      design = SavedQuery.create_empty(app_name='beeswax', owner=request.user, data=hql_query('').dumps())
       query_history = db.drop_databases(databases, design)
       url = reverse('beeswax:watch_query', args=[query_history.id]) + '?on_success_url=' + reverse('metastore:databases')
       return redirect(url)
@@ -178,7 +178,7 @@ def drop_table(request, database):
     tables_objects = [db.get_table(database, table) for table in tables]
     try:
       # Can't be simpler without an important refactoring
-      design = SavedQuery.create_empty(app_name='beeswax', owner=request.user)
+      design = SavedQuery.create_empty(app_name='beeswax', owner=request.user, data=hql_query('').dumps())
       query_history = db.drop_tables(database, tables_objects, design)
       url = reverse('beeswax:watch_query', args=[query_history.id]) + '?on_success_url=' + reverse('metastore:show_tables')
       return redirect(url)
@@ -226,7 +226,7 @@ def load_table(request, database, table):
     if load_form.is_valid():
       on_success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': table.name})
       try:
-        design = SavedQuery.create_empty(app_name='beeswax', owner=request.user)
+        design = SavedQuery.create_empty(app_name='beeswax', owner=request.user, data=hql_query('').dumps())
         query_history = db.load_data(database, table, load_form, design)
         url = reverse('beeswax:watch_query', args=[query_history.id]) + '?on_success_url=' + on_success_url
         response['status'] = 0

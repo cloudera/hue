@@ -38,6 +38,9 @@ def is_selected(section, matcher):
                 % if app_name == 'impala':
                   <img src="/impala/static/art/icon_impala_24.png" />
                   ${ _('Impala') }
+                % elif app_name == 'rdbms':
+                  <img src="/rdbms/static/art/icon_rdbms_24.png" />
+                  ${ _('DB Query') }
                 % else:
                   <img src="/beeswax/static/art/icon_beeswax_24.png" />
                   ${ _('Beeswax') }

@@ -1,0 +1,44 @@
+# Spanish translations for Hue.
+# Copyright (C) 2012 Cloudera
+# This file is distributed under the same license as the Hue project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2013-08-02 20:43-0700\n"
+"PO-Revision-Date: 2012-07-30 18:50-0700\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.6\n"
+
+#: src/impala/conf.py:29
+msgid "Host of the Impala Server."
+msgstr "Host del servidor Impala."
+
+#: src/impala/conf.py:34
+msgid "Port of the Impala Server."
+msgstr "Puerto del servidor Impala."
+
+#: src/impala/conf.py:40
+#, fuzzy
+msgid "Beeswax or Hive Server 2 Thrift API used. Choices are: 'beeswax' or 'hiveserver2'."
+msgstr "Se utiliza la API Thrift de Beeswax o de Hive Server 2. Las opciones son: 'beeswax' o 'hiveserver2'."
+
+#: src/impala/conf.py:45
+msgid "Kerberos principal name for Impala. Typically 'impala/hostname.foo.com'."
+msgstr "Nombre de la entidad de seguridad de Kerberos para Hue. Normalmente 'hue/hostname.foo.com'."
+
+#: src/impala/conf.py:63
+msgid "No available Impalad to send queries to."
+msgstr "No hay ningún Impalad disponible al que enviar las consultas."
+
+#: src/impala/views.py:35
+msgid "A POST request is required."
+msgstr "Se necesita una solicitud POST."
+

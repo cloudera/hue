@@ -251,8 +251,8 @@ def _submit_create_and_load(request, create_hql, table_name, path, do_load, data
 
   query = hql_query(create_hql, database=database)
   return execute_directly(request, query,
-                          on_success_url=on_success_url,
-                          on_success_params=on_success_params)
+                                on_success_url=on_success_url,
+                                on_success_params=on_success_params)
 
 
 def _delim_preview(fs, file_form, encoding, file_types, delimiters):

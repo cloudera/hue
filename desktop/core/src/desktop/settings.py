@@ -23,10 +23,12 @@
 import logging
 import os
 import sys
+import pkg_resources
+
 import desktop.conf
 import desktop.log
 from desktop.lib.paths import get_desktop_root
-import pkg_resources
+
 
 HUE_DESKTOP_VERSION = pkg_resources.get_distribution("desktop").version or "Unknown"
 NICE_NAME = "Hue"
@@ -269,6 +271,7 @@ else:
 DATABASES = {
   'default': default_db
 }
+
 
 # Configure sessions
 SESSION_COOKIE_AGE = desktop.conf.SESSION.TTL.get()

@@ -45,7 +45,8 @@ APPS := about \
   search \
   hbase \
   sqoop \
-  zookeeper
+  zookeeper \
+  rdbms
 
 ################################################
 # Install all applications into the Desktop environment
@@ -119,7 +120,8 @@ I18N_APPS := about \
   search \
   hbase \
   sqoop \
-  zookeeper
+  zookeeper \
+  rdbms
 
 COMPILE_LOCALE_TARGETS := $(I18N_APPS:%=.recursive-compile-locales/%)
 compile-locales: $(COMPILE_LOCALE_TARGETS)

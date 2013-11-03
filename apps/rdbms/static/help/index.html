@@ -1,0 +1,663 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<link rel="stylesheet" type="text/css" href="commonltr.css"/>
+<title>Beeswax</title>
+</head>
+<body id="topic_4"><a name="topic_4"><!-- --></a>
+
+
+
+  <h1 class="title topictitle1">Beeswax </h1>
+
+
+  <div class="body conbody">
+    <p class="p">The Beeswax application enables you to perform queries on Apache Hive, a
+      data warehousing system designed to work with Hadoop. For information about Hive, see <a class="xref" href="http://archive.cloudera.com/cdh4/cdh/4/hive/" target="_blank">Hive Documentation</a>. You can create Hive databases, tables and
+      partitions, load data, create, run, and manage queries, and download the results in a
+      Microsoft Office Excel worksheet file or a comma-separated values file. </p>
+
+  </div>
+
+
+  <div class="topic concept nested1" xml:lang="en-US" lang="en-US" id="topic_4_1"><a name="topic_4_1"><!-- --></a>
+
+    <h2 class="title topictitle2">Beeswax and Hive Installation and
+      Configuration </h2>
+
+
+    <div class="body conbody">
+
+      <p class="p">Beeswax is installed and configured as part of Hue. <span class="ph">For information about installing and configuring Hue,
+        see Hue Installation in <a class="xref" href="http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/CDH4-Installation-Guide.html" target="_blank">http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/CDH4-Installation-Guide.html</a>.</span>
+      </p>
+
+
+      <p class="p">Beeswax assumes an existing Hive installation. The Hue installation
+        instructions include the configuration necessary for Beeswax to access Hive. You can view
+        the current Hive configuration from the <strong class="ph b">Settings</strong> tab in
+        the Beeswax application. </p>
+
+
+      <p class="p">By default, a Beeswax user can see the saved queries for all users –
+        both his/her own queries and those of other Beeswax users. To restrict viewing saved queries
+        to the query owner and Hue administrators, set the <samp class="ph codeph">share_saved_queries</samp> property under the <samp class="ph codeph">[beeswax]</samp> section in the Hue configuration file to <samp class="ph codeph">false</samp>. </p>
+
+
+    </div>
+
+
+  </div>
+
+
+  <div class="topic concept nested1" xml:lang="en-US" lang="en-US" id="topic_4_2"><a name="topic_4_2"><!-- --></a>
+
+    <h2 class="title topictitle2">Starting Beeswax </h2>
+
+
+    <div class="body conbody">
+
+      <p class="p">Click the <strong class="ph b">Beeswax</strong> icon (<img class="image" src="/beeswax/static/art/icon_beeswax_24.png"/>)
+        in the navigation bar at the top of the Hue browser page. </p>
+
+
+    </div>
+
+
+  </div>
+
+  <div class="topic concept nested1" id="concept_xvg_nzh_dk"><a name="concept_xvg_nzh_dk"><!-- --></a>
+    <h2 class="title topictitle2">Managing Databases, Tables, and Partitions</h2>
+
+    <div class="body conbody">
+      <p class="p" id="concept_xvg_nzh_dk__p_ygl_m13_dk"><a name="concept_xvg_nzh_dk__p_ygl_m13_dk"><!-- --></a>You can create databases, tables, partitions, and load data by executing
+          <a class="xref" href="http://archive.cloudera.com/cdh4/cdh/4/hive/language_manual/data-manipulation-statements.html" target="_blank">Hive data manipulation
+          statements</a> in the Beeswax application.</p>
+
+      <p class="p" id="concept_xvg_nzh_dk__p_pdp_m13_dk"><a name="concept_xvg_nzh_dk__p_pdp_m13_dk"><!-- --></a>You can also use the <a class="xref" href="metastoremanager.html#xd_583c10bfdbd326ba-3ca24a24-13d80143249--7f9b">Metastore Manager</a> application to manage the
+        databases, tables, and partitions and load data.</p>
+
+    </div>
+
+  </div>
+
+  <div class="topic concept nested1" xml:lang="en-US" lang="en-US" id="topic_4_2_1"><a name="topic_4_2_1"><!-- --></a>
+    <h2 class="title topictitle2">Installing Example Queries and
+      Tables</h2>
+
+    <div class="body conbody">
+      <div class="note note" id="topic_4_2_1__note_sb1_dlk_2k"><a name="topic_4_2_1__note_sb1_dlk_2k"><!-- --></a><span class="notetitle"><img src="/static/art/help/note.jpg"/> 
+      <b>Note</b>:</span> You must be a superuser to perform this task.</div>
+
+      <a name="topic_4_2_1__ol_kss_btp_wj"><!-- --></a><ol class="ol" id="topic_4_2_1__ol_kss_btp_wj">
+        <li class="li" id="topic_4_2_1__li_src_z3t_yj"><a name="topic_4_2_1__li_src_z3t_yj"><!-- --></a>Click <a name="topic_4_2_1__image_vv5_hnv_wj"><!-- --></a><img class="image" id="topic_4_2_1__image_vv5_hnv_wj" src="/static/art/hue-logo-mini.png"/>. The Quick Start Wizard opens.</li>
+
+        <li class="li" id="topic_4_2_1__li_zgj_z3t_yj"><a name="topic_4_2_1__li_zgj_z3t_yj"><!-- --></a>Click <strong class="ph b">Step 2:
+            Examples</strong>.</li>
+
+        <li class="li">Click <strong class="ph b">Beeswax (Hive UI)</strong>.</li>
+
+      </ol>
+
+    </div>
+
+  </div>
+
+
+  <div class="topic concept nested1" xml:lang="en-US" lang="en-US" id="topic_4_3"><a name="topic_4_3"><!-- --></a>
+
+    <h2 class="title topictitle2">Query Editor</h2>
+
+
+    <div class="body conbody">
+
+      <p class="p">The Query Editor view lets you create, save, and submit queries in the
+          <a class="xref" href="http://wiki.apache.org/hadoop/Hive/LanguageManual" target="_blank">Hive Query Language (HQL)</a>,
+        which is similar to Structured Query Language (SQL).  When you submit a query, the Beeswax
+        Server uses Hive to run the queries. You can either wait for the query to complete, or
+        return later to find the queries in the History view. You can also request to receive an
+        email message after the query is completed.</p>
+
+      <p class="p">In the box to the left of the Query field, you can select a database,
+        override the default Hive and Hadoop settings, specify file resources and user-defined
+        functions, enable users to enter parameters at run-time, and request email notification when
+        the job is complete. See <a class="xref" href="#topic_4_3_2">Advanced Query Settings</a> for details on using these settings. </p>
+
+
+    </div>
+
+
+    <div class="topic concept nested2" xml:lang="en-US" lang="en-US" id="topic_4_3_1"><a name="topic_4_3_1"><!-- --></a>
+
+      <h3 class="title topictitle3">Creating Queries </h3>
+
+
+      <div class="body conbody">
+
+        <ol class="ol">
+          <li class="li" id="topic_4_3_1__li_v2d_p5k_xj"><a name="topic_4_3_1__li_v2d_p5k_xj"><!-- --></a>In the Query Editor window, type a query or
+            multiple queries separated by a semicolon ";".  To be presented with a drop-down of
+            autocomplete options, type <span class="ph uicontrol">CTRL+spacebar</span> when entering a query.  </li>
+
+          <li class="li" id="topic_4_3_1__li_ilk_p5k_xj"><a name="topic_4_3_1__li_ilk_p5k_xj"><!-- --></a>To save your query and advanced settings to use
+            again later, click <strong class="ph b">Save As</strong>, enter a name and
+            description, and then click <strong class="ph b">OK</strong>. To save changes to an
+            existing query, click <strong class="ph b">Save.</strong>
+          </li>
+
+          <li class="li">If you want to view the execution plan for the query, click <strong class="ph b">Explain</strong>. For more information, see <a class="xref" href="http://wiki.apache.org/hadoop/Hive/LanguageManual/Explain" target="_blank">http://wiki.apache.org/hadoop/Hive/LanguageManual/Explain</a>.</li>
+
+        </ol>
+
+
+      </div>
+
+
+    </div>
+
+    <div class="topic concept nested2" id="concept_ch1_5gb_zj"><a name="concept_ch1_5gb_zj"><!-- --></a>
+      <h3 class="title topictitle3">Loading Queries into the Query Editor</h3>
+
+      <div class="body conbody">
+        <a name="concept_ch1_5gb_zj__ol_kkg_vgb_zj"><!-- --></a><ol class="ol" id="concept_ch1_5gb_zj__ol_kkg_vgb_zj">
+          <li class="li">Do one of the following:<a name="concept_ch1_5gb_zj__ul_xlq_jqb_zj"><!-- --></a><ul class="ul" id="concept_ch1_5gb_zj__ul_xlq_jqb_zj">
+              <li class="li">Click the <span class="ph uicontrol">My Queries</span>  tab.<a name="concept_ch1_5gb_zj__ol_qhz_lqb_zj"><!-- --></a><ol class="ol" type="a" id="concept_ch1_5gb_zj__ol_qhz_lqb_zj">
+                  <li class="li">Click the <span class="ph uicontrol">Recent Saved Queries</span> or <span class="ph uicontrol">Recent Run
+                      Queries</span> tab to display the respective queries. </li>
+
+                </ol>
+</li>
+
+              <li class="li">Click the <span class="ph uicontrol">Saved Queries</span> tab.</li>
+
+            </ul>
+</li>
+
+          <li class="li">Click a query name. The query is loaded into the Query Editor.</li>
+
+        </ol>
+
+      </div>
+
+    </div>
+
+    <div class="topic concept nested2" id="concept_xsr_yx1_zj"><a name="concept_xsr_yx1_zj"><!-- --></a>
+      <h3 class="title topictitle3">Running Queries </h3>
+
+      <div class="body conbody">
+        <div class="note note" id="concept_xsr_yx1_zj__note_vbn_4xk_xj"><a name="concept_xsr_yx1_zj__note_vbn_4xk_xj"><!-- --></a><span class="notetitle"><img src="/static/art/help/note.jpg"/> 
+      <b>Note</b>:</span> To run a query, you must be logged in to
+          Hue as a user that also has a Unix user account on the remote server. </div>
+
+        <a name="concept_xsr_yx1_zj__ol_rnw_yx1_zj"><!-- --></a><ol class="ol" id="concept_xsr_yx1_zj__ol_rnw_yx1_zj">
+          <li class="li">To execute a portion of the query, highlight one or more query
+            statements.</li>
+
+          <li class="li">Click <strong class="ph b">Execute</strong>. The Query Results
+            window appears with the results of your query. <a name="concept_xsr_yx1_zj__ul_f4w_yx1_zj"><!-- --></a><ul class="ul" id="concept_xsr_yx1_zj__ul_f4w_yx1_zj">
+              <li class="li">To view a log of the query execution, click <strong class="ph b">Log</strong> at the top of the results display. You can use
+                the information in this tab to debug your query.</li>
+
+              <li class="li">To view the query that generated these results, click <strong class="ph b">Query</strong> at the top of the results display.</li>
+
+              <li class="li">To view the columns of the query, click <strong class="ph b">Columns</strong>.</li>
+
+              <li class="li">To return to the query in the Query Editor, click <strong class="ph b">Unsaved Query</strong>.</li>
+
+            </ul>
+</li>
+
+          <li class="li">If there are multiple statements in the query, click <span class="ph uicontrol">Next</span> in
+            the Multi-statement query pane to execute the remaining statements.</li>
+
+        </ol>
+
+        <div class="note note"><span class="notetitle"><img src="/static/art/help/note.jpg"/> 
+      <b>Note</b>:</span> Under <strong class="ph b">MR JOBS</strong>, you can view any MapReduce jobs that
+          the query generated.</div>
+
+      </div>
+
+    </div>
+
+    <div class="topic concept nested2" id="concept_axp_mgb_zj"><a name="concept_axp_mgb_zj"><!-- --></a>
+      <h3 class="title topictitle3">Downloading and Saving Query Results</h3>
+
+      <div class="body conbody">
+        <div class="note important"><span class="importanttitle"><img src="/static/art/help/important.jpg"/> 
+      <b>Important</b>:</span> 
+          <a name="concept_axp_mgb_zj__ul_p4w_yx1_zj"><!-- --></a><ul class="ul" id="concept_axp_mgb_zj__ul_p4w_yx1_zj">
+            <li class="li">You can only save results to a file when the results were
+              generated by a MapReduce job.</li>
+
+            <li class="li">This is the preferred way to save when the result is large (for
+              example &gt; 1M rows).</li>
+
+          </ul>
+
+        </div>
+
+        <a name="concept_axp_mgb_zj__ol_agb_4gb_zj"><!-- --></a><ol class="ol" id="concept_axp_mgb_zj__ol_agb_4gb_zj">
+          <li class="li">Do any of the following to download or save the query results: <a name="concept_axp_mgb_zj__ul_i4w_yx1_zj"><!-- --></a><ul class="ul" id="concept_axp_mgb_zj__ul_i4w_yx1_zj">
+              <li class="li">Click <strong class="ph b">Download as CSV</strong> to
+                download the results in a comma-separated values file suitable for use in other
+                applications.</li>
+
+              <li class="li">Click <strong class="ph b">Download as XLS</strong> to
+                download the results in a Microsoft Office Excel worksheet file.</li>
+
+              <li class="li">Click <strong class="ph b">Save</strong> to save the
+                results in a table or HDFS file.<a name="concept_axp_mgb_zj__ul_m4w_yx1_zj"><!-- --></a><ul class="ul" id="concept_axp_mgb_zj__ul_m4w_yx1_zj">
+                  <li class="li">To save the results in a new table, select <strong class="ph b">In a new table</strong>, enter a table name, and then
+                    click <strong class="ph b">Save</strong>.</li>
+
+                  <li class="li">To save the results in an HDFS file, select <strong class="ph b">In an HDFS directory</strong>, enter a path and then
+                    click <strong class="ph b">Save</strong>. You can then download the file
+                    with <a class="xref" href="filebrowser.html#topic_6">File Browser</a>.  </li>
+
+                </ul>
+</li>
+
+            </ul>
+</li>
+
+        </ol>
+
+      </div>
+
+    </div>
+
+
+    <div class="topic concept nested2" xml:lang="en-US" lang="en-US" id="topic_4_3_2"><a name="topic_4_3_2"><!-- --></a>
+
+      <h3 class="title topictitle3">Advanced Query Settings </h3>
+
+
+      <div class="body conbody">
+
+        <p class="p">The pane to the left of the Query Editor lets you specify the
+          following options: </p>
+
+
+        
+<div class="tablenoborder"><table cellpadding="4" cellspacing="0" summary="" class="table" frame="hsides" border="1" rules="all">
+            
+            
+            <thead class="thead" align="left">
+              <tr class="row">
+                <th class="entry" valign="top" width="16.666666666666664%" id="d5062e390">
+                  <p class="p">
+                    <strong class="ph b">Option</strong>
+                  </p>
+
+                </th>
+
+                <th class="entry" valign="top" width="83.33333333333334%" id="d5062e399">
+                  <p class="p">
+                    <strong class="ph b">Description</strong>
+                  </p>
+
+                </th>
+
+              </tr>
+
+            </thead>
+
+            <tbody class="tbody">
+              <tr class="row">
+                <td class="entry" valign="top" width="16.666666666666664%" headers="d5062e390 ">
+                  <p class="p"><strong class="ph b">DATABASE</strong>
+                  </p>
+
+                </td>
+
+                <td class="entry" valign="top" width="83.33333333333334%" headers="d5062e399 ">
+                  <p class="p">The database containing the table definitions. </p>
+
+                </td>
+
+              </tr>
+
+              <tr class="row">
+                <td class="entry" valign="top" width="16.666666666666664%" headers="d5062e390 ">
+                  <p class="p"><strong class="ph b">SETTINGS</strong>
+                  </p>
+
+                </td>
+
+                <td class="entry" valign="top" width="83.33333333333334%" headers="d5062e399 ">
+                  <div class="p">Override the Hive and Hadoop default settings.  To configure
+                    a new setting: <a name="topic_4_3_2__ol_k5v_hcc_zj"><!-- --></a><ol class="ol" id="topic_4_3_2__ol_k5v_hcc_zj">
+                      <li class="li">Click <strong class="ph b">Add</strong>.</li>
+
+                      <li class="li">For <strong class="ph b">Key</strong>, enter a Hive or Hadoop
+                        configuration variable name. </li>
+
+                      <li class="li">For <strong class="ph b">Value</strong>, enter the value you want to
+                        use for the variable. </li>
+
+                    </ol>
+</div>
+
+                  <p class="p">For example, to override the directory where structured
+                    Hive query logs are created, you would enter <samp class="ph codeph">hive.querylog.location</samp> for <strong class="ph b">Key</strong>, and a path for <strong class="ph b">Value.</strong>
+                  </p>
+
+                  <p class="p">To view the default settings, click the <strong class="ph b">Settings</strong> tab at the top of the page. For
+                    information about Hive configuration variables, see: <a class="xref" href="http://wiki.apache.org/hadoop/Hive/AdminManual/Configuration" target="_blank">http://wiki.apache.org/hadoop/Hive/AdminManual/Configuration</a>. For
+                    information about Hadoop configuration variables, see: <a class="xref" href="http://hadoop.apache.org/docs/current/hadoop-mapreduce-client/hadoop-mapreduce-client-core/mapred-default.xml" target="_blank">http://hadoop.apache.org/docs/current/hadoop-mapreduce-client/hadoop-mapreduce-client-core/mapred-default.xml</a>.</p>
+
+                </td>
+
+              </tr>
+
+              <tr class="row">
+                <td class="entry" valign="top" width="16.666666666666664%" headers="d5062e390 ">
+                  <p class="p"><strong class="ph b">FILE RESOURCES</strong>
+                  </p>
+
+                </td>
+
+                <td class="entry" valign="top" width="83.33333333333334%" headers="d5062e399 ">
+                  <div class="p">Make files locally accessible at query execution time
+                    available on the Hadoop cluster. Hive uses the Hadoop Distributed Cache to
+                    distribute the added files to all machines in the cluster at query execution
+                      time.<a name="topic_4_3_2__ol_flf_vfc_zj"><!-- --></a><ol class="ol" id="topic_4_3_2__ol_flf_vfc_zj">
+                      <li class="li">Click <strong class="ph b">Add</strong> to
+                        configure a new setting.</li>
+
+                      <li class="li">From the <strong class="ph b">Type</strong>
+                        drop-down menu, choose one of the following:<a name="topic_4_3_2__ul_bkb_wfc_zj"><!-- --></a><ul class="ul" id="topic_4_3_2__ul_bkb_wfc_zj">
+                          <li class="li">
+                            <strong class="ph b">jar</strong> — Adds the specified resources to
+                            the Java classpath.</li>
+
+                          <li class="li"><strong class="ph b">archive</strong> —
+                            Unarchives the specified resources when distributing them. </li>
+
+                          <li class="li"><strong class="ph b">file</strong> — Adds the
+                            specified resources to the distributed cache. Typically, this might be a
+                            transform script (or similar) to be executed. </li>
+
+                        </ul>
+</li>
+
+                      <li class="li">For <strong class="ph b">Path</strong>, enter the
+                        path to the file or click <a name="topic_4_3_2__image_sdp_cgc_zj"><!-- --></a><img class="image" id="topic_4_3_2__image_sdp_cgc_zj" src="/static/art/help/browse.png"/> to browse and select the file.  </li>
+
+                    </ol>
+</div>
+
+
+                  <div class="note note"><span class="notetitle"><img src="/static/art/help/note.jpg"/> 
+      <b>Note</b>:</span> It is not necessary to specify files used in a
+										transform script if the files are available in the same path
+										on all machines in the Hadoop cluster.</div>
+
+                </td>
+
+              </tr>
+
+              <tr class="row">
+                <td class="entry" valign="top" width="16.666666666666664%" headers="d5062e390 ">
+                  <p class="p"><strong class="ph b">USER-DEFINED FUNCTIONS</strong>
+                  </p>
+
+                </td>
+
+                <td class="entry" valign="top" width="83.33333333333334%" headers="d5062e399 ">
+                  <p class="p">Specify user-defined functions. Click <strong class="ph b">Add</strong> to configure a new setting. Specify the
+                    function name in the <strong class="ph b">Name</strong> field, and specify
+                    the class name for <strong class="ph b">Class</strong>
+                    <strong class="ph b">name</strong>. </p>
+
+                  <p class="p">You <em class="ph i">must</em> specify a JAR file for the user-defined
+                    functions in <strong class="ph b"><strong class="ph b">FILE
+                        RESOURCES</strong></strong>. </p>
+
+                  <p class="p">To include a user-defined function in a query, add a $
+                    (dollar sign) before the function name in the query. For example, if <var class="keyword varname">MyTable</var> is a user-defined
+                    function name in the query, you would type: <samp class="ph codeph">SELECT * $</samp><samp class="ph codeph"><var class="keyword varname">MyTable</var></samp>
+                  </p>
+
+                </td>
+
+              </tr>
+
+              <tr class="row">
+                <td class="entry" valign="top" width="16.666666666666664%" headers="d5062e390 ">
+                  <p class="p"><strong class="ph b">PARAMETERIZATION</strong>
+                  </p>
+
+                </td>
+
+                <td class="entry" valign="top" width="83.33333333333334%" headers="d5062e399 ">
+                  <p class="p">Indicate that a dialog box should display to enter parameter
+                    values when a query containing the string $<var class="keyword varname">parametername</var> is
+                    executed. Enabled by default. </p>
+
+                </td>
+
+              </tr>
+
+              <tr class="row">
+                <td class="entry" valign="top" width="16.666666666666664%" headers="d5062e390 ">
+                  <p class="p"><strong class="ph b">EMAIL NOTIFICATION</strong>
+                  </p>
+
+                </td>
+
+                <td class="entry" valign="top" width="83.33333333333334%" headers="d5062e399 ">
+                  <p class="p">Indicate that an email message should be sent after a query
+                    completes. The email is sent to the email address specified in the logged-in
+                    user's profile. </p>
+
+                </td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+</div>
+
+
+      </div>
+
+
+    </div>
+
+
+    <div class="topic concept nested2" xml:lang="en-US" lang="en-US" id="topic_4_3_3"><a name="topic_4_3_3"><!-- --></a>
+
+      <h3 class="title topictitle3">Viewing Query History </h3>
+
+
+      <div class="body conbody">
+
+        <p class="p">You can view the history of queries that you have run previously.
+          Results for these queries are available for one week or until Hue is restarted. </p>
+
+
+        <ol class="ol">
+
+          <li class="li">Click <strong class="ph b">History</strong>. A list of your
+            saved and unsaved queries displays in the Query History window.</li>
+
+
+          <li class="li">To display the queries for all users, click <strong class="ph b">Show everyone's queries</strong>.
+						To display your queries only, click <strong class="ph b">Show my queries</strong>.</li>
+
+
+          <li class="li">To display the automatically generated actions performed on a
+            user's behalf, click <strong class="ph b">Show auto actions</strong>. To display
+            user queries again, click <strong class="ph b">Show user queries</strong>.</li>
+
+
+        </ol>
+
+
+      </div>
+
+
+    </div>
+
+
+    <div class="topic concept nested2" xml:lang="en-US" lang="en-US" id="topic_4_3_4"><a name="topic_4_3_4"><!-- --></a>
+
+      <h3 class="title topictitle3">Viewing, Editing, Copying, and Deleting
+        Saved Queries </h3>
+
+
+      <div class="body conbody">
+
+        <p class="p">You can view a list of saved queries of all users by clicking <strong class="ph b">My
+            Queries</strong> and then selecting either  <span class="ph uicontrol">Recent Saved Queries</span> or
+            <span class="ph uicontrol">Recent Run Queries</span> tab to display the respective queries or
+          clicking <strong class="ph b">Saved Queries</strong>. You can copy any query, but you
+          can edit, delete, and view the history of only your own queries. </p>
+
+        
+<div class="tablenoborder"><a name="topic_4_3_4__table_rxy_gdh_b3"><!-- --></a><table cellpadding="4" cellspacing="0" summary="" id="topic_4_3_4__table_rxy_gdh_b3" class="table" frame="hsides" border="1" rules="all">
+            
+            
+            <thead class="thead" align="left">
+              <tr class="row">
+                <th class="entry" valign="top" width="25%" id="d5062e719">Saved Query</th>
+
+                <th class="entry" valign="top" width="75%" id="d5062e722">Procedure</th>
+
+              </tr>
+
+            </thead>
+
+            <tbody class="tbody">
+              <tr class="row">
+                <td class="entry" valign="top" width="25%" headers="d5062e719 ">
+                  <p class="p">
+                    <strong class="ph b">Edit</strong>
+                  </p>
+
+                </td>
+
+                <td class="entry" valign="top" width="75%" headers="d5062e722 ">
+                  <div class="p">
+                    <a name="topic_4_3_4__ol_hbl_xbh_dk"><!-- --></a><ol class="ol" id="topic_4_3_4__ol_hbl_xbh_dk">
+                      <li class="li">Click <strong class="ph b">Saved Queries</strong>.
+                        The Queries window displays.</li>
+
+                      <li class="li">Check the checkbox next to the query and click <strong class="ph b">Edit</strong>. The query displays in the Query
+                        Editor window.</li>
+
+                      <li class="li">Change the query and then click <strong class="ph b">Save.</strong> You can also click <strong class="ph b">Save As</strong>, enter a new name, and click <strong class="ph b">OK</strong> to save a copy of the query.</li>
+
+                    </ol>
+
+                  </div>
+
+                </td>
+
+              </tr>
+
+              <tr class="row">
+                <td class="entry" valign="top" width="25%" headers="d5062e719 ">
+                  <p class="p">
+                    <strong class="ph b">Copy</strong>
+                  </p>
+
+                </td>
+
+                <td class="entry" valign="top" width="75%" headers="d5062e722 ">
+                  <div class="p">
+                    <a name="topic_4_3_4__ol_dqp_xbh_dk"><!-- --></a><ol class="ol" id="topic_4_3_4__ol_dqp_xbh_dk">
+                      <li class="li">Click <strong class="ph b">Saved Queries</strong>.
+                        The Queries window displays.</li>
+
+                      <li class="li">Check the checkbox next to the query and click <strong class="ph b">Copy</strong>. The query displays in the Query
+                        Editor window.</li>
+
+                      <li class="li">Change the query as necessary and then click <strong class="ph b">Save.</strong> You can also click <strong class="ph b">Save As</strong>, enter a new name, and click <strong class="ph b">OK</strong> to save a copy of the query.</li>
+
+                    </ol>
+
+                  </div>
+
+                </td>
+
+              </tr>
+
+              <tr class="row">
+                <td class="entry" valign="top" width="25%" headers="d5062e719 ">
+                  <p class="p">
+                    <strong class="ph b">Copy in Query History</strong>
+                  </p>
+
+                </td>
+
+                <td class="entry" valign="top" width="75%" headers="d5062e722 ">
+                  <div class="p">
+                    <a name="topic_4_3_4__ol_ut5_xbh_dk"><!-- --></a><ol class="ol" id="topic_4_3_4__ol_ut5_xbh_dk">
+                      <li class="li">Click <strong class="ph b">History</strong>. The
+                        Query History window displays.</li>
+
+                      <li class="li">To display the queries for all users, click <strong class="ph b">Show everyone's queries</strong>. The queries for
+                        all users display in the History window.</li>
+
+                      <li class="li">Click the query you want to copy. A copy of the query
+                        displays in the Query Editor window.</li>
+
+                      <li class="li">Change the query, if necessary, and then click <strong class="ph b">Save As</strong>, enter a new name, and click <strong class="ph b">OK</strong> to save the query.</li>
+
+                    </ol>
+
+                  </div>
+
+                </td>
+
+              </tr>
+
+              <tr class="row">
+                <td class="entry" valign="top" width="25%" headers="d5062e719 ">
+                  <p class="p">
+                    <strong class="ph b">Delete</strong>
+                  </p>
+
+                </td>
+
+                <td class="entry" valign="top" width="75%" headers="d5062e722 ">
+                  <a name="topic_4_3_4__ol_fgh_1vc_zj"><!-- --></a><ol class="ol" id="topic_4_3_4__ol_fgh_1vc_zj">
+                    <li class="li">Click <strong class="ph b">Saved Queries</strong>.
+                      The Queries window displays.</li>
+
+                    <li class="li">Check the checkbox next to the query and click <strong class="ph b">Delete</strong>.</li>
+
+                    <li class="li">Click <strong class="ph b">Yes</strong> to confirm
+                      the deletion.</li>
+
+                  </ol>
+
+                </td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+</div>
+
+
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+
+</body>
+</html>

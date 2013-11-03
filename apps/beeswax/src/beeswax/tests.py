@@ -52,7 +52,7 @@ from beeswax.conf import HIVE_SERVER_HOST
 from beeswax.views import collapse_whitespace
 from beeswax.test_base import make_query, wait_for_query_to_finish, verify_history, get_query_server_config,\
   HIVE_SERVER_TEST_PORT
-from beeswax.design import hql_query, _strip_trailing_semicolon
+from beeswax.design import hql_query, strip_trailing_semicolon
 from beeswax.data_export import download
 from beeswax.models import SavedQuery, QueryHistory, HQL
 from beeswax.server import dbms
@@ -1269,17 +1269,17 @@ def test_history_page():
   do_view('q-user=test_who', 0)
   do_view('q-user=:all')
 
-def test_strip_trailing_semicolon():
+def teststrip_trailing_semicolon():
   # Note that there are two queries (both an execute and an explain) scattered
   # in this file that use semicolons all the way through.
 
   # Single semicolon
-  assert_equal("foo", _strip_trailing_semicolon("foo;\n"))
-  assert_equal("foo\n", _strip_trailing_semicolon("foo\n;\n\n\n"))
+  assert_equal("foo", strip_trailing_semicolon("foo;\n"))
+  assert_equal("foo\n", strip_trailing_semicolon("foo\n;\n\n\n"))
   # Multiple semicolons: strip only last one
-  assert_equal("fo;o;", _strip_trailing_semicolon("fo;o;;     "))
+  assert_equal("fo;o;", strip_trailing_semicolon("fo;o;;     "))
   # No semicolons
-  assert_equal("foo", _strip_trailing_semicolon("foo"))
+  assert_equal("foo", strip_trailing_semicolon("foo"))
 
 def test_hadoop_extraction():
   sample_log = """

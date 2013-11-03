@@ -464,7 +464,7 @@ def commonheader(title, section, user, padding="90px"):
     apps = appmanager.get_apps(user)
     apps_list = appmanager.get_apps_dict(user)
     for app in apps:
-      if app.display_name not in ['beeswax', 'impala', 'pig', 'jobsub', 'jobbrowser', 'metastore', 'hbase', 'sqoop', 'oozie', 'filebrowser', 'useradmin', 'search', 'help', 'about', 'zookeeper', 'proxy']:
+      if app.display_name not in ['beeswax', 'impala', 'pig', 'jobsub', 'jobbrowser', 'metastore', 'hbase', 'sqoop', 'oozie', 'filebrowser', 'useradmin', 'search', 'help', 'about', 'zookeeper', 'proxy', 'rdbms']:
         other_apps.append(app)
       if section == app.display_name:
         current_app = app

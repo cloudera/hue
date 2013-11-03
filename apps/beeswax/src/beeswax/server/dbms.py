@@ -39,16 +39,25 @@ LOG = logging.getLogger(__name__)
 
 
 def get(user, query_server=None):
-  # Avoid circular dependency
-  from beeswax.server.hive_server2_lib import HiveServerClientCompatible, HiveServerClient
-
   if query_server is None:
     query_server = get_query_server_config()
 
-  return Dbms(HiveServerClientCompatible(HiveServerClient(query_server, user)), QueryHistory.SERVER_TYPE[1][0])
+  if query_server['server_name'] in ('impala', 'beeswax'):
+    # Avoid circular dependency
+    from beeswax.server.hive_server2_lib import HiveServerClientCompatible, HiveServerClient
+
+    return HS2Dbms(HiveServerClientCompatible(HiveServerClient(query_server, user)), QueryHistory.SERVER_TYPE[1][0])
+  elif query_server['server_name'] == 'mysql':
+    from beeswax.server.mysql_lib import MySQLClient
+
+    return Rdbms(MySQLClient(query_server, user), QueryHistory.SERVER_TYPE[2][0])
+  elif query_server['server_name'] in ('postgresql', 'postgresql_psycopg2'):
+    from beeswax.server.postgresql_lib import PostgreSQLClient
+
+    return Rdbms(PostgreSQLClient(query_server, user), QueryHistory.SERVER_TYPE[2][0])
 
 
-def get_query_server_config(name='beeswax'):
+def get_query_server_config(name='beeswax', server=None):
   if name == 'impala':
     from impala.conf import SERVER_HOST as IMPALA_SERVER_HOST, SERVER_PORT as IMPALA_SERVER_PORT, \
         IMPALA_PRINCIPAL, IMPERSONATION_ENABLED
@@ -60,6 +69,28 @@ def get_query_server_config(name='beeswax'):
         'principal': IMPALA_PRINCIPAL.get(),
         'impersonation_enabled': IMPERSONATION_ENABLED.get()
     }
+  elif name == 'rdbms':
+    from rdbms.conf import RDBMS
+
+    if not server or server not in RDBMS:
+      keys = RDBMS.keys()
+      name = keys and keys[0] or None
+    else:
+      name = server
+
+    if name:
+      query_server = {
+        'server_name': RDBMS[name].ENGINE.get().split('.')[-1],
+        'server_host': RDBMS[name].HOST.get(),
+        'server_port': RDBMS[name].PORT.get(),
+        'username': RDBMS[name].USER.get(),
+        'password': RDBMS[name].PASSWORD.get(),
+        'password': RDBMS[name].PASSWORD.get(),
+        'alias': name
+      }
+    else:
+      query_server = {}
+
   else:
     kerberos_principal = hive_site.get_hiveserver2_kerberos_principal(HIVE_SERVER_HOST.get())
 
@@ -69,7 +100,8 @@ def get_query_server_config(name='beeswax'):
         'server_port': HIVE_SERVER_PORT.get(),
         'principal': kerberos_principal
     }
-    LOG.debug("Query Server: %s" % query_server)
+
+  LOG.debug("Query Server: %s" % query_server)
 
   return query_server
 
@@ -86,12 +118,13 @@ class NoSuchObjectException: pass
 
 
 class Dbms:
-  """SQL"""
-
   def __init__(self, client, server_type):
     self.client = client
     self.server_type = server_type
 
+
+class HS2Dbms(Dbms):
+  """SQL"""
 
   def get_table(self, database, table_name):
     # DB name not supported in SHOW PARTITIONS required in Table
@@ -315,13 +348,14 @@ class Dbms:
   def execute_and_wait(self, query, timeout_sec=30.0):
     """
     Run query and check status until it finishes or timeouts.
+
+    Check status until it finishes or timeouts.
     """
     SLEEP_INTERVAL = 0.5
 
     handle = self.client.query(query)
     curr = time.time()
     end = curr + timeout_sec
-
     while curr <= end:
       state = self.client.get_state(handle)
       if state not in (QueryHistory.STATE.running, QueryHistory.STATE.submitted):
@@ -441,6 +475,51 @@ class Dbms:
       if limit > 0:
         return "LIMIT %d" % (limit,)
     return ""
+
+
+class Rdbms(Dbms):
+  def get_table(self, database, table_name):
+    return self.client.get_table(database, table_name)
+
+  def get_databases(self):
+    return self.client.get_databases()
+
+  def execute_query(self, query, design):
+    sql_query = query.sql_query
+    query_history = QueryHistory.build(
+      owner=self.client.user,
+      query=sql_query,
+      server_host='%(server_host)s' % self.client.query_server,
+      server_port='%(server_port)d' % self.client.query_server,
+      server_name='%(server_name)s' % self.client.query_server,
+      server_type=self.server_type,
+      last_state=QueryHistory.STATE.available.index,
+      design=design,
+      notify=False,
+      query_type=query.query['type'],
+      statement_number=0
+    )
+    query_history.save()
+
+    LOG.debug("Updated QueryHistory id %s user %s statement_number: %s" % (query_history.id, self.client.user, query_history.statement_number))
+
+    return query_history
+
+  def explain(self, statement):
+    return self.client.explain(statement)
+
+  def use(self, database):
+    self.client.use(database)
+
+  def execute_and_wait(self, query, timeout_sec=30.0):
+    """
+    Run query
+
+    Simply run query irrespective of timeout.
+    Timeout exists to comply with interface.
+    """
+
+    return self.client.query(query)
 
 
 class Table:
