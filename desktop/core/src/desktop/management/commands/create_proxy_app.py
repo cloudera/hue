@@ -28,20 +28,25 @@ from django.utils.translation import ugettext as _
 LOG = logging.getLogger(__name__)
 
 class Command(BaseCommand):
-  help = _("Creates a Hue application directory structure.")
+  help = _("Creates a Hue proxy application directory structure.")
   args = "[appname]"
   label = _('application name')
 
   def handle(self, *args, **options):
-    if len(args) > 2 or len(args) == 0:
-      raise CommandError(_("Expected arguments: app_name [app_dir]"))
+    if len(args) > 3 or len(args) == 0:
+      raise CommandError(_("Expected arguments: app_name [app_url] [app_dir]"))
     app_name = args[0]
     if len(args) == 2:
-      app_dir = args[1]
+      app_url = args[1]
+      app_dir = os.getcwd()
+    elif len(args) == 3:
+      app_url = args[1]
+      app_dir = args[2]
     else:
+      app_url = "http://gethue.com"
       app_dir = os.getcwd()
 
-    app_template = os.path.abspath(os.path.join(os.path.dirname(__file__),'..','..','app_template'))
+    app_template = os.path.abspath(os.path.join(os.path.dirname(__file__),'..','..','app_template_proxy'))
     assert os.path.isdir(app_template), _("App template dir missing: %(template)s.") % {'template': app_template}
     app_dir = os.path.join(app_dir, app_name)
 
@@ -55,9 +60,9 @@ class Command(BaseCommand):
     except OSError, e:
       raise CommandError(e)
 
-    copy_template(app_template, app_dir, app_name)
+    copy_template(app_template, app_dir, app_name, app_url)
 
-def copy_template(app_template, copy_to, app_name):
+def copy_template(app_template, copy_to, app_name, app_url):
   """copies the specified template directory to the copy_to location"""
 
   app_name_spaces = " ".join(word.capitalize() for word in app_name.split("_"))
@@ -80,7 +85,7 @@ def copy_template(app_template, copy_to, app_name):
       if path_old.endswith(".png"):
         shutil.copyfileobj(file(path_old), fp_new)
       else:
-        fp_new.write( Template(filename=path_old).render(app_name=app_name, app_name_camel=app_name_camel, app_name_spaces=app_name_spaces) )
+        fp_new.write( Template(filename=path_old).render(app_name=app_name, app_name_camel=app_name_camel, app_name_spaces=app_name_spaces, app_url=app_url) )
       fp_new.close()
         
       shutil.copymode(path_old, path_new)
