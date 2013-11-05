@@ -72,6 +72,7 @@ import json
 import logging
 import os
 import textwrap
+import re
 import sys
 
 # Magical object for use as a "symbol"
@@ -626,6 +627,11 @@ def coerce_json_dict(value):
   elif isinstance(value, dict):
     return value
   raise Exception("Could not coerce %r to json dictionary." % value)
+
+def list_of_compiled_res(list_of_strings):
+  if isinstance(list_of_strings, str):
+    list_of_strings = [ list_of_strings ]
+  return list(re.compile(x) for x in list_of_strings)
 
 def validate_path(confvar, is_dir=None, fs=os.path, message='Path does not exist on the filesystem.'):
   """

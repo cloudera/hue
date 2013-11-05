@@ -24,7 +24,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from desktop.lib.conf import Config, ConfigSection, UnspecifiedConfigSection,\
                              coerce_bool, coerce_csv, coerce_json_dict,\
-                             validate_path
+                             validate_path, list_of_compiled_res
 from desktop.lib.i18n import force_unicode
 from desktop.lib.paths import get_desktop_root
 
@@ -99,6 +99,13 @@ COLLECT_USAGE = Config(
   type=coerce_bool,
   default=True)
 
+REDIRECT_WHITELIST = Config(
+  key="redirect_whitelist",
+  help=_("Comma-separated list of regular expressions, which match the redirect URL."
+         "For example, to restrict to your local domain and FQDN, the following value can be used:"
+         "  ^\/.*$,^http:\/\/www.mydomain.com\/.*$"),
+  type=list_of_compiled_res,
+  default='')
 
 def is_https_enabled():
   return bool(SSL_CERTIFICATE.get() and SSL_PRIVATE_KEY.get())

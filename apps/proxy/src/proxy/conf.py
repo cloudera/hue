@@ -17,14 +17,7 @@
 """
 Configuration options for the reverse proxy application.
 """
-import re
-
-from desktop.lib.conf import Config
-
-def list_of_compiled_res(list_of_strings):
-  if isinstance(list_of_strings, str):
-    list_of_strings = [ list_of_strings ]
-  return list(re.compile(x) for x in list_of_strings)
+from desktop.lib.conf import Config, list_of_compiled_res
     
 WHITELIST = Config(
   key="whitelist",
