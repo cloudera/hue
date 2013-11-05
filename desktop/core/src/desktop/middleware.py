@@ -27,7 +27,7 @@ from django.contrib.auth import REDIRECT_FIELD_NAME, BACKEND_SESSION_KEY, authen
 from django.contrib.auth.middleware import RemoteUserMiddleware
 from django.core import exceptions, urlresolvers
 import django.db
-from django.http import HttpResponseNotAllowed
+from django.http import HttpResponseNotAllowed, HttpResponseForbidden
 from django.core.urlresolvers import resolve
 from django.http import HttpResponseRedirect, HttpResponse
 from django.utils.importlib import import_module
@@ -634,3 +634,19 @@ class EnsureSafeMethodMiddleware(object):
   def process_request(self, request):
     if request.method not in desktop.conf.HTTP_ALLOWED_METHODS.get():
       return HttpResponseNotAllowed(desktop.conf.HTTP_ALLOWED_METHODS.get())
+
+
+class EnsureSafeRedirectURLMiddleware(object):
+  """
+  Middleware to white list configured redirect URLs.
+  """
+  def process_response(self, request, response):
+    if response.status_code == 302:
+      if any([regexp.match(response['Location']) for regexp in desktop.conf.REDIRECT_WHITELIST.get()]):
+        return response
+
+      response = render("error.mako", request, dict(error=_('Redirect to %s is not allowed.') % response['Location']))
+      response.status_code = 403
+      return response
+    else:
+      return response

@@ -304,6 +304,10 @@ if SAML_AUTHENTICATION:
   LOGIN_URL = '/saml2/login/'
   SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
+# URL Redirection white list.
+if desktop.conf.REDIRECT_WHITELIST.get():
+  MIDDLEWARE_CLASSES.append('desktop.middleware.EnsureSafeRedirectURLMiddleware')
+
 ############################################################
 
 # Necessary for South to not fuzz with tests.  Fixed in South 0.7.1

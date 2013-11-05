@@ -85,3 +85,33 @@ def test_ensure_safe_method_middleware():
     assert_equal(405, response.status_code)
   finally:
     done()
+
+
+def test_ensure_safe_redirect_middleware():
+  done = []
+  try:
+    # Super user
+    c = make_logged_in_client()
+
+    # GET works
+    response = c.get("/useradmin/")
+    assert_equal(200, response.status_code)
+
+    # Disallow most redirects
+    done.append(desktop.conf.REDIRECT_WHITELIST.set_for_testing('\d+'))
+    response = c.get("")
+    assert_equal(403, response.status_code)
+
+    # Allow all redirects
+    done.append(desktop.conf.REDIRECT_WHITELIST.set_for_testing('.*'))
+    response = c.get("")
+    assert_equal(302, response.status_code)
+
+    # Allow all redirects and disallow most at the same time.
+    # should have a logic OR functionality.
+    done.append(desktop.conf.REDIRECT_WHITELIST.set_for_testing('\d+,.*'))
+    response = c.get("")
+    assert_equal(403, response.status_code)
+  finally:
+    for finish in done:
+      finish()
