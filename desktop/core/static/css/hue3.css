@@ -1487,3 +1487,12 @@ a, a:hover, a:active, a:focus {
   vertical-align: middle;
   padding-top: 70px;
 }
+
+#jHueBlueprintTooltip {
+  position: absolute;
+  display: none;
+  border: 1px solid #61AE36;
+  padding: 2px;
+  background-color: #C2E0B0;
+  opacity: 0.80;
+}

@@ -60,7 +60,14 @@ var FLOT_LOADED, FLOT_PIE_LOADED = false;
         type: TYPES.LINECHART,
         fill: false,
         width: "100%",
-        height: 200
+        height: 200,
+        borderWidth: 0,
+        tooltips: true,
+        enableSelection: false,
+        onSelect: function () {
+        },
+        onItemClick: function () {
+        }
       };
 
   function Plugin(element, options) {
@@ -82,7 +89,14 @@ var FLOT_LOADED, FLOT_PIE_LOADED = false;
         });
       }
       else {
-        flot(_this);
+        if (_this.options.enableSelection) {
+          $.cacheScript("/static/ext/js/jquery/plugins/jquery.flot.selection.min.js", function (script, textStatus) {
+            flot(_this);
+          });
+        }
+        else {
+          flot(_this);
+        }
       }
     });
   };
@@ -106,19 +120,69 @@ var FLOT_LOADED, FLOT_PIE_LOADED = false;
       }
       else {
         _series.push(getSerie(serie));
-        var _plot = $.plot(element, _series);
+        var _plot = $.plot(element, _series, { grid: { borderWidth: element.data('plugin_' + pluginName).options.borderWidth } });
         $(element).data("plotObj", _plot);
         $(element).data("plotSeries", _series);
       }
     }
   };
 
+  function showTooltip(x, y, contents) {
+    $("<div id='jHueBlueprintTooltip'>" + contents + "</div>").css({
+      top: y + 5,
+      left: x + 5
+    }).appendTo("body").fadeIn(200);
+  }
+
 
   function flot(plugin) {
     var _this = plugin;
     $(_this.element).width(_this.options.width).height(_this.options.height);
     var _serie = getSerie(_this.options);
-    var _plot = $.plot(_this.element, [_serie]);
+    var _options = {
+      grid: {
+        borderWidth: _this.options.borderWidth,
+        clickable: true
+      }
+    }
+    if (_this.options.tooltips) {
+      _options.grid.hoverable = true;
+    }
+    if (_this.options.enableSelection) {
+      _options.selection = {
+        mode: "x",
+        color: COLORS.GREEN
+      }
+    }
+    var _plot = $.plot(_this.element, [_serie], _options);
+    $(_this.element).bind("plotselected", function (event, ranges) {
+      _this.options.onSelect(ranges);
+    });
+
+    if (_this.options.tooltips) {
+      var previousPoint = null;
+      $(_this.element).bind("plothover", function (event, pos, item) {
+
+        if (item) {
+          if (previousPoint != item.dataIndex) {
+
+            previousPoint = item.dataIndex;
+
+            $("#jHueBlueprintTooltip").remove();
+            var x = item.datapoint[0].toFixed(2),
+                y = item.datapoint[1].toFixed(2);
+
+            showTooltip(item.pageX, item.pageY, x);
+          }
+        } else {
+          $("#jHueBlueprintTooltip").remove();
+          previousPoint = null;
+        }
+      });
+    }
+    $(_this.element).bind("plotclick", function (event, pos, item) {
+      _this.options.onItemClick(pos, item);
+    });
     $(_this.element).data("plotObj", _plot);
     $(_this.element).data("plotSeries", [_serie]);
   }
@@ -126,27 +190,38 @@ var FLOT_LOADED, FLOT_PIE_LOADED = false;
   function flot_pie(plugin) {
     var _this = plugin;
     $(_this.element).width(_this.options.width).height(_this.options.height);
-    var _plot = $.plot(_this.element, _this.options.data, {
+    var _options = {
+      grid: {
+        borderWidth: _this.options.borderWidth,
+        clickable: true
+      },
       series: {
         pie: {
           show: true
         }
       }
-    });
+    };
+    if (_this.options.tooltips) {
+      _options.grid.hoverable = true;
+    }
+    var _plot = $.plot(_this.element, _this.options.data, _options);
     $(_this.element).data("plotObj", _plot);
   }
 
 
   function getSerie(options) {
     var _flotSerie = {
-      data: options.data
+      data: options.data,
+      label: options.label
     }
 
     if (options.type == TYPES.LINECHART) {
       _flotSerie.lines = {show: true, fill: options.fill }
+      _flotSerie.points = {show: true}
     }
     if (options.type == TYPES.BARCHART) {
       _flotSerie.bars = {show: true, fill: options.fill }
+      _flotSerie.points = {show: true}
     }
     if (options.type == TYPES.POINTCHART) {
       _flotSerie.points = {show: true}

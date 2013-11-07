@@ -18,15 +18,17 @@
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 import urllib
+import math
 %>
 
 <%namespace name="macros" file="macros.mako" />
 
-${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
+${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
 
 <link rel="stylesheet" href="/search/static/css/search.css">
 <script src="/static/ext/js/moment.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/search/static/js/search.utils.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/jquery.blueprint.js" type="text/javascript" charset="utf-8"></script>
 
 <%
   if "q" not in solr_query:
@@ -43,7 +45,7 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
 
 <div class="search-bar">
   % if user.is_superuser:
-    <div class="pull-right" style="margin-top: 4px">
+    <div class="pull-right" style="margin-top: 6px; margin-right: 40px">
       <a class="change-settings" href="#"><i class="fa fa-edit"></i> ${ _('Customize this collection') }</a> &nbsp;&nbsp;
       <a href="${ url('search:admin_collections') }"><i class="fa fa-sitemap"></i> ${ _('Collection manager') }</a>
     </div>
@@ -69,11 +71,18 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
     </div>
   </form>
 </div>
-<div class="well">
+
+<div id="loader" class="row" style="text-align: center;margin-top: 20px">
+  <!--[if lte IE 9]>
+      <img src="/static/art/spinner-big.gif" />
+  <![endif]-->
+  <!--[if !IE]> -->
+    <i class="fa fa-spinner fa-spin" style="font-size: 60px; color: #DDD"></i>
+  <!-- <![endif]-->
+</div>
+
+
 <div class="container results">
-  <div id="loader" class="row" style="text-align: center">
-    <img src="/static/art/spinner.gif" />
-  </div>
   <div id="mainContent" class="row hide">
     % if error:
     <div class="span12 results">
@@ -85,45 +94,64 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
     % if response and 'response' in response and 'docs' in response['response'] and len(response['response']['docs']) > 0 and 'normalized_facets' in response:
     <div class="span2 results">
       <ul class="facet-list">
+        ## Force chart facets first
         % for fld in response['normalized_facets']:
-          % if fld['type'] == 'date':
-            <li class="nav-header dateFacetHeader">${fld['label']}</li>
-          % else:
-            <li class="nav-header">${fld['label']}</li>
+          % if fld['type'] == 'chart':
+            <%
+            found_value = ""
+            for fq in solr_query['fq'].split('|'):
+              if fq and fq.split(':')[0] == fld['field']:
+                found_value = fq[fq.find(":") + 1:]
+                remove_list = solr_query['fq'].split('|')
+                remove_list.remove(fq)
+            %>
+            %if found_value != "":
+              <li class="nav-header">${fld['label']}</li>
+              <li><strong>${ found_value }</strong> <a href="?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}"><i class="fa fa-times"></i></a></li>
+            %endif
           % endif
+        % endfor
+        % for fld in response['normalized_facets']:
+          % if fld['type'] != 'chart':
+            % if fld['type'] == 'date':
+              <li class="nav-header facetHeader dateFacetHeader">${fld['label']}</li>
+            % else:
+              <li class="nav-header facetHeader">${fld['label']}</li>
+            % endif
 
-          <%
-          found_value = ""
-          for fq in solr_query['fq'].split('|'):
-            if fq and fq.split(':')[0] == fld['field']:
-              found_value = fq[fq.find(":") + 1:]
-              remove_list = solr_query['fq'].split('|')
-              remove_list.remove(fq)
-          %>
-          % for group, count in macros.pairwise(fld['counts']):
-            % if count > 0 and group != "" and found_value == "":
-              % if fld['type'] == 'field':
-                <li><a href='?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ fld['field'] }:"${ urllib.quote_plus(group.encode('ascii', 'xmlcharrefreplace')) }"${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}'>${group}</a> <span class="counter">(${ count })</span></li>
+            <%
+            found_value = ""
+            for fq in solr_query['fq'].split('|'):
+              if fq and fq.split(':')[0] == fld['field']:
+                found_value = fq[fq.find(":") + 1:]
+                remove_list = solr_query['fq'].split('|')
+                remove_list.remove(fq)
+            %>
+            % for group, count in macros.pairwise(fld['counts']):
+              % if count > 0 and group != "" and found_value == "":
+                % if fld['type'] == 'field':
+                  <li class="facetItem"><a href='?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ fld['field'] }:"${ urllib.quote_plus(group.encode('ascii', 'xmlcharrefreplace')) }"${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}'>${group}</a> <span class="counter">(${ count })</span></li>
+                % endif
+                % if fld['type'] == 'range':
+                  <li class="facetItem"><a href='?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ fld['field'] }:["${ group }" TO "${ str(int(group) + int(fld['gap']) - 1) }"]${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}'>${ group } - ${ str(int(group) + int(fld['gap']) - 1) }</a> <span class="counter">(${ count })</span></li>
+                % endif
+                % if fld['type'] == 'date':
+                  <li class="facetItem dateFacetItem"><a href='?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ fld['field'] }:[${ group } TO ${ group }${ urllib.quote_plus(fld['gap']) }]${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}'><span class="dateFacet" data-format="${fld['format']}">${ group }<span class="dateFacetGap hide">${ fld['gap'] }</span></span></a> <span class="counter">(${ count })</span></li>
+                % endif
               % endif
-              % if fld['type'] == 'range':
-                <li><a href='?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ fld['field'] }:["${ group }" TO "${ str(int(group) + int(fld['gap']) - 1) }"]${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}'>${ group } - ${ str(int(group) + int(fld['gap']) - 1) }</a> <span class="counter">(${ count })</span></li>
+              % if found_value != "":
+                % if fld['type'] == 'field' and '"' + group + '"' == found_value:
+                  <li class="facetItem"><strong>${ group }</strong> <a href="?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}"><i class="fa fa-times"></i></a></li>
+                % endif
+                % if fld['type'] == 'range' and '["' + group + '" TO "' + str(int(group) + int(fld['gap']) - 1) + '"]' == found_value:
+                  <li class="facetItem"><strong>${ group } - ${ str(int(group) + int(fld['gap']) - 1) }</strong> <a href="?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}"><i class="fa fa-times"></i></a></li>
+                % endif
+                % if fld['type'] == 'date' and found_value.startswith('[' + group + ' TO'):
+                  <li class="facetItem"><strong><span class="dateFacet" data-format="${fld['format']}">${ group }<span class="dateFacetGap hide">${ fld['gap'] }</span></span></strong> <a href="?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}"><i class="fa fa-times"></i></a></li>
+                % endif
               % endif
-              % if fld['type'] == 'date':
-                <li class="dateFacetItem"><a href='?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ fld['field'] }:[${ group } TO ${ group }${ urllib.quote_plus(fld['gap']) }]${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}'><span class="dateFacet" data-format="${fld['format']}">${ group }<span class="dateFacetGap hide">${ fld['gap'] }</span></span></a> <span class="counter">(${ count })</span></li>
-              % endif
-            % endif
-            % if found_value != "":
-              % if fld['type'] == 'field' and '"' + group + '"' == found_value:
-                <li><strong>${ group }</strong> <a href="?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}"><i class="fa fa-times"></i></a></li>
-              % endif
-              % if fld['type'] == 'range' and '["' + group + '" TO "' + str(int(group) + int(fld['gap']) - 1) + '"]' == found_value:
-                <li><strong>${ group } - ${ str(int(group) + int(fld['gap']) - 1) }</strong> <a href="?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}"><i class="fa fa-times"></i></a></li>
-              % endif
-              % if fld['type'] == 'date' and found_value.startswith('[' + group + ' TO'):
-                <li><strong><span class="dateFacet" data-format="${fld['format']}">${ group }<span class="dateFacetGap hide">${ fld['gap'] }</span></span></strong> <a href="?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}"><i class="fa fa-times"></i></a></li>
-              % endif
-            % endif
-          % endfor
+            % endfor
+          % endif
         % endfor
       </ul>
     </div>
@@ -137,9 +165,11 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
       % endif
       <ul class="breadcrumb">
         <li class="pull-right">
-          <select class="sort-by">
-            <option value="">${ _('Sort by') }</option>
-          </select>
+          <div id="sortBy" style="display: inline" class="dropdown">
+            Sort by <a data-toggle="dropdown" href="#"><strong></strong> <i class="fa fa-caret-down"></i></a>
+            <ul class="dropdown-menu">
+            </ul>
+          </div>
         </li>
         <li class="active">
         <%
@@ -147,9 +177,20 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
           if end_record > int(response['response']['numFound']):
             end_record = response['response']['numFound'];
         %>
-        ${_('Showing %s - %s of %s results') % (int(solr_query["start"]) + 1, end_record, response['response']['numFound'])}
+          ${_('Page %s of %s. Showing %s results (%s seconds)') % (solr_query["current_page"], solr_query["total_pages"], response['response']['numFound'], float(solr_query["search_time"])/1000)}
         </li>
       </ul>
+
+      % for fld in response['normalized_facets']:
+        %if fld['type'] == 'chart':
+          <%
+            values = ""
+            for group, count in macros.pairwise(fld['counts']):
+              values += "['" + group + "'," + str(count) + "],"
+          %>
+          <div class="chartComponent" data-values="[${values[:-1]}]" data-label="${fld['label']}" data-field="${fld['field']}"></div>
+        %endif
+      % endfor
 
       <script src="/static/ext/js/mustache.js"></script>
 
@@ -178,18 +219,37 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
       <div class="pagination">
         <ul>
           <%
+            pages_to_show = 5 # always use an odd number since we do it symmetrically
+
             beginning = 0
             previous = int(solr_query["start"]) - int(solr_query["rows"])
             next = int(solr_query["start"]) + int(solr_query["rows"])
+
+            pages_after = (pages_to_show - 1) / 2
+            pages_total = solr_query['total_pages']+1
+            real_pages_after =  pages_total - solr_query["current_page"]
+            symmetric_start = solr_query["current_page"] < pages_total - pages_after
+            symmetric_end = solr_query["current_page"] > pages_after
+
+            pagination_start = solr_query["current_page"] > (pages_to_show - 1)/2 and (symmetric_start and solr_query["current_page"] - (pages_to_show - 1)/2 or solr_query["current_page"] - pages_to_show + real_pages_after ) or 1
+            pagination_end = solr_query["current_page"] < solr_query['total_pages']+1-(pages_to_show - 1)/2 and (symmetric_end and solr_query["current_page"] + (pages_to_show - 1)/2 + 1 or solr_query["current_page"] + (pages_to_show - solr_query["current_page"]) + 1) or solr_query['total_pages']+1
           %>
           % if int(solr_query["start"]) > 0:
             <li>
-              <a title="${_('Beginning of List')}" href="?collection=${ current_collection }&query=${solr_query["q"]}&fq=${urllib.quote_plus(solr_query["fq"])}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}&rows=${solr_query["rows"]}&start=${beginning}">&larr; ${_('Beginning of List')}</a>
-            </li>
-            <li>
-              <a title="Previous Page" href="?collection=${ current_collection }&query=${solr_query["q"]}&fq=${urllib.quote_plus(solr_query["fq"])}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}&rows=${solr_query["rows"]}&start=${previous}">${_('Previous Page')}</a>
+              <a title="${_('Previous Page')}" href="?collection=${ current_collection }&query=${solr_query["q"]}&fq=${urllib.quote_plus(solr_query["fq"])}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}&rows=${solr_query["rows"]}&start=${previous}">${_('Previous Page')}</a>
             </li>
           % endif
+          % for page in range(pagination_start, pagination_end):
+            %if page > 0 and page < pages_total:
+            <li
+             %if solr_query["current_page"] == page:
+               class="active"
+             %endif
+                >
+              <a href="?collection=${ current_collection }&query=${solr_query["q"]}&fq=${urllib.quote_plus(solr_query["fq"])}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}&rows=${solr_query["rows"]}&start=${(int(page)-1)*int(solr_query["rows"])}">${page}</a>
+            </li>
+            %endif
+          % endfor
           % if end_record < int(response["response"]["numFound"]):
             <li>
               <a title="Next page" href="?collection=${ current_collection }&query=${solr_query["q"]}&fq=${urllib.quote_plus(solr_query["fq"])}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}&rows=${solr_query["rows"]}&start=${next}">${_('Next Page')}</a>
@@ -207,7 +267,6 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
     % endif
   </div>
   % endif
-</div>
 </div>
 
 % if hue_collection:
@@ -228,6 +287,36 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
       $("#loader").show();
       $("#mainContent").addClass("hide");
     };
+
+    var collectionProperties = ${ hue_collection.facets.data | n,unicode }.properties;
+    $(".facetHeader").each(function(cnt, section){
+      var _added = 0;
+      var _showMore = false;
+      var _lastSection = null;
+      $(section).nextUntil(".facetHeader").each(function(cnt, item){
+        if (cnt < collectionProperties.limit*1){ // it's a string, *1 -> number
+          $(item).show();
+          _added++;
+          if (cnt == (collectionProperties.limit*1) - 1){
+            _lastSection = $(item);
+          }
+        }
+        else {
+          _showMore = true;
+        }
+      });
+      if (_added == 0){
+        $(section).hide();
+      }
+      if (_showMore){
+        $("<li>").addClass("facetShowMore").html('<a href="javascript:void(0)">${_('More...')}</a>').insertAfter(_lastSection);
+      }
+    });
+
+    $(document).on("click", ".facetShowMore", function(){
+      $(this).hide();
+      $(this).nextUntil(".facetHeader").show();
+    });
 
     $(".dateFacet").each(function () {
       var _m = moment($(this).text());
@@ -297,7 +386,9 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
     var sortingData = ${ hue_collection and hue_collection.sorting.data or '[]' | n,unicode };
     if (sortingData && sortingData.fields && sortingData.fields.length > 0) {
       $.each(sortingData.fields, function (index, item) {
-        $("<option>").attr("value", item.label).text(item.label).data("field", item.field).data("asc", item.asc).appendTo($(".sort-by"));
+        var _dropDownOption= $("<li>");
+        _dropDownOption.html('<a href="#" class="dropdown-sort" data-field="'+ item.field +'" data-asc="'+ item.asc +'">'+ item.label +'</a>');
+        _dropDownOption.appendTo($("#sortBy .dropdown-menu"));
       });
       var activeSorting = "${solr_query.get("sort", "")}";
       if (activeSorting == ""){
@@ -311,24 +402,25 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
           }
         });
         if (_defaultSortingCnt == 1){
-          $(".sort-by").val(_defaultSorting);
+          $("#sortBy strong").text(_defaultSorting);
         }
       }
       if (activeSorting != "" && activeSorting.indexOf(" ") > -1) {
         $.each(sortingData.fields, function (index, item) {
           if (item.field == activeSorting.split(" ")[0] && item.asc == (activeSorting.split(" ")[1] == "asc")) {
-            $(".sort-by").val(item.label);
+            $("#sortBy strong").text(item.label);
           }
         });
       }
     }
     else {
-      $(".sort-by").hide();
+      $("#sortBy").hide();
     }
 
-    $(".sort-by").change(function () {
-      var _sort = $(".sort-by option:selected").data("field") + "+" + ($(".sort-by option:selected").data("asc") ? "asc" : "desc");
-      if ($(".sort-by").val() == "") {
+    $(document).on("click", "#sortBy li a", function () {
+      var _this = $(this);
+      var _sort = _this.data("field") + "+" + (_this.data("asc") ? "asc" : "desc");
+      if (typeof _this.data("field") == "undefined") {
         _sort = "";
       }
       location.href = "?query=${solr_query["q"]}&fq=${solr_query["fq"]}&rows=${solr_query["rows"]}&start=${solr_query["start"]}" + (_sort != "" ? "&sort=" + _sort : "");
@@ -376,6 +468,63 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
       }
     });
     % endif
+
+    function getFq(existing, currentField, currentValue) {
+      if (existing.indexOf(currentField) > -1) {
+        var _pieces = existing.split("|");
+        var _newPieces = [];
+        $(_pieces).each(function (cnt, item) {
+          if (item.indexOf(currentField) > -1) {
+            _newPieces.push(currentField + currentValue);
+          }
+          else {
+            // !!! High trickery. Uses jquery to reconvert all html entities to text
+            _newPieces.push($("<span>").html(item).text());
+          }
+        });
+        return _newPieces.join("|");
+      }
+      else {
+        return decodeURIComponent(existing) + "|" + currentField + currentValue;
+      }
+    }
+
+    var _chartData = eval($(".chartComponent").data("values"));
+
+    // test the content of _chartData to see if it can be rendered as chart
+    if (_chartData.length > 0) {
+      if ($.isArray(_chartData[0])) {
+        if ($.isNumeric(_chartData[0][0])) {
+          $(".chartComponent").jHueBlueprint({
+            data: _chartData,
+            label: $(".chartComponent").data("label"),
+            type: $.jHueBlueprint.TYPES.BARCHART,
+            color: $.jHueBlueprint.COLORS.BLUE,
+            fill: true,
+            enableSelection: true,
+            height: 100,
+            onSelect: function (range) {
+              location.href = '?collection=${ current_collection }&query=${ solr_query['q'] }&fq=' + getFq("${ solr_query['fq'] }", $(".chartComponent").data("field"), ':["' + Math.floor(range.xaxis.from) + '" TO "' + Math.ceil(range.xaxis.to) + '"]') + '${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}';
+            },
+            onItemClick: function (pos, item) {
+              if (item) {
+                $(".chartComponent").data("plotObj").highlight(item.series, item.datapoint);
+                location.href = '?collection=${ current_collection }&query=${ solr_query['q'] }&fq=' + getFq("${ solr_query['fq'] }", $(".chartComponent").data("field"), ':' + item.datapoint[0]) + '${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}';
+              }
+            }
+          });
+        }
+        else {
+          $(".chartComponent").addClass("alert").text("${_('The graphical facets works just with numbers. Please choose another field.')}")
+        }
+      }
+      else {
+        $(".chartComponent").addClass("alert").text("${_('There was an error initializing the graphical facet component.')}")
+      }
+    }
+    else {
+      $(".chartComponent").hide();
+    }
 
   });
 </script>

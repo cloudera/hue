@@ -38,7 +38,7 @@ LOG = logging.getLogger(__name__)
 
 
 class Facet(models.Model):
-  _ATTRIBUTES = ['properties', 'fields', 'ranges', 'dates', 'order']
+  _ATTRIBUTES = ['properties', 'fields', 'ranges', 'dates', 'charts', 'order']
 
   enabled = models.BooleanField(default=True)
   data = models.TextField()
@@ -63,13 +63,17 @@ class Facet(models.Model):
 
     params = (
         ('facet', properties.get('isEnabled') and 'true' or 'false'),
-        ('facet.limit', properties.get('limit')),
         ('facet.mincount', properties.get('mincount')),
+        ('facet.limit', -1),
         ('facet.sort', properties.get('sort')),
     )
 
     if data_dict.get('fields'):
       field_facets = tuple([('facet.field', field_facet['field']) for field_facet in data_dict['fields']])
+      params += field_facets
+
+    if data_dict.get('charts'):
+      field_facets = tuple([('facet.field', field_facet['field']) for field_facet in data_dict['charts']])
       params += field_facets
 
     if data_dict.get('ranges'):
@@ -310,6 +314,10 @@ def get_facet_field_label(field, type, facets):
     for fld in facets['dates']:
       if fld['field'] == field:
         label = fld['label']
+  elif type == 'chart':
+    for fld in facets['charts']:
+      if fld['field'] == field:
+        label = fld['label']
   return label
 
 def get_facet_field_uuid(field, type, facets):
@@ -328,6 +336,13 @@ def get_facet_field_uuid(field, type, facets):
         uuid = fld['uuid']
   return uuid
 
+def is_chart_field(field, charts):
+  found = False
+  for fld in charts:
+    if field == fld['field']:
+      found = True
+  return found
+
 
 def augment_solr_response(response, facets):
   augmented = response
@@ -336,13 +351,15 @@ def augment_solr_response(response, facets):
   normalized_facets = {}
   default_facets = []
 
+  chart_facets = facets.get('charts', [])
+
   if response and response.get('facet_counts'):
     if response['facet_counts']['facet_fields']:
       for cat in response['facet_counts']['facet_fields']:
         facet = {
           'field': cat,
-          'type': 'field',
-          'label': get_facet_field_label(cat, 'field', facets),
+          'type': is_chart_field(cat, chart_facets) and 'chart' or 'field',
+          'label': get_facet_field_label(cat, is_chart_field(cat, chart_facets) and 'chart' or 'field', facets),
           'counts': response['facet_counts']['facet_fields'][cat],
         }
         uuid = get_facet_field_uuid(cat, 'field', facets)

@@ -59,7 +59,8 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
           <li><a href="#step2" class="step">${ _('Step 2: Field Facets') }</a></li>
           <li><a href="#step3" class="step">${ _('Step 3: Range Facets') }</a></li>
           <li><a href="#step4" class="step">${ _('Step 4: Date Facets') }</a></li>
-          <li><a href="#step5" class="step">${ _('Step 5: Facets Order') }</a></li>
+          <li><a href="#step5" class="step">${ _('Step 5: Graphical Facet') }</a></li>
+          <li><a href="#step6" class="step">${ _('Step 6: Facets Order') }</a></li>
         </ul>
 
         <div id="step1" class="stepDetails">
@@ -88,7 +89,7 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
 
         <div id="step2" class="stepDetails hide">
           <div data-bind="visible: fieldFacets().length == 0" style="padding-left: 10px;margin-bottom: 20px">
-            <em>${_('There are currently no field Facets defined.')}</em>
+            <em>${_('There are currently no field facets defined.')}</em>
           </div>
           <div data-bind="foreach: fieldFacets">
             <div class="bubble">
@@ -112,7 +113,7 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
 
       <div id="step3" class="stepDetails hide">
         <div data-bind="visible: rangeFacets().length == 0" style="padding-left: 10px;margin-bottom: 20px">
-          <em>${_('There are currently no Range Facets defined.')}</em>
+          <em>${_('There are currently no range facets defined.')}</em>
         </div>
         <div data-bind="foreach: rangeFacets">
           <div class="bubble">
@@ -146,7 +147,7 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
 
       <div id="step4" class="stepDetails hide">
         <div data-bind="visible: dateFacets().length == 0" style="padding-left: 10px;margin-bottom: 20px">
-          <em>${_('There are currently no Date Facets defined.')}</em>
+          <em>${_('There are currently no date facets defined.')}</em>
         </div>
         <div data-bind="foreach: dateFacets">
           <div class="bubble">
@@ -188,7 +189,32 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
         </div>
       </div>
 
-      <div id="step5" class="stepDetails hide">
+        <div id="step5" class="stepDetails hide">
+          <div data-bind="visible: chartFacets().length == 0" style="padding-left: 10px;margin-bottom: 20px">
+            <em>${_('There is currently no graphical facet defined. Remember, you can add just one field as graphical facet.')}</em>
+          </div>
+          <div data-bind="foreach: chartFacets">
+            <div class="bubble">
+              <strong><span data-bind="editable: label"></span></strong>
+              <span style="color:#666;font-size: 12px">(<span data-bind="text: field"></span>)</span>
+              <a class="btn btn-small" data-bind="click: $root.removeChartFacet"><i class="fa fa-trash-o"></i></a>
+            </div>
+          </div>
+          <div class="clearfix"></div>
+          <div class="miniform">
+            ${_('Field')}
+            <select id="select-chart-facet" data-bind="options: chartFacetsList, value: selectedChartFacet"></select>
+            &nbsp;${_('Label')}
+            <input id="selectedChartLabel" type="text" data-bind="value: selectedChartLabel" class="input" />
+            <br/>
+            <br/>
+            <a class="btn" data-bind="click: $root.addChartFacet, css:{disabled: $root.chartFacets().length == 1}"><i class="fa fa-plus-circle"></i> ${_('Set as Graphical Facet')}</a>
+            &nbsp;<span id="chart-facet-error" class="label label-important hide">${_('You can add just one field as graphical facet')}</span>
+            <span id="chart-facet-error-wrong-field-type" class="label label-important hide">${_('You can add just one field as graphical facet')}</span>
+          </div>
+        </div>
+
+      <div id="step6" class="stepDetails hide">
         <div data-bind="visible: sortableFacets().length == 0" style="padding-left: 10px;margin-bottom: 20px">
           <em>${_('There are currently no Facets defined.')}</em>
         </div>
@@ -566,6 +592,10 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
     return new Facet({type: "field", field: obj.field, label: obj.label, uuid: obj.uuid});
   }
 
+  var ChartFacet = function (obj) {
+    return new Facet({type: "chart", field: obj.field, label: obj.label, uuid: obj.uuid});
+  }
+
   var RangeFacet = function (obj) {
     return new Facet({type: "range", field: obj.field, label: obj.label, start: obj.start, end: obj.end, gap: obj.gap, uuid: obj.uuid});
   }
@@ -668,6 +698,16 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
       }
     });
 
+    self.chartFacets = ko.observableArray(ko.utils.arrayMap(${ hue_collection.facets.data | n,unicode }.charts, function (obj) {
+      return new ChartFacet(obj);
+    }));
+
+    // Remove already selected fields
+    self.chartFacetsList = ko.observableArray(${ hue_collection.fields(user) | n,unicode });
+    $.each(self.chartFacets(), function(index, field) {
+      self.chartFacetsList.remove(field.field);
+    });
+
     // List of all facets sorted by UUID
     self.sortableFacets = ko.observableArray(self.fieldFacets().concat(self.rangeFacets()).concat(self.dateFacets()));
     self.sortableFacets.sort(function(left, right) {
@@ -704,6 +744,12 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
         new DateMath({frequency: 1, unit: 'DAYS'})
     ]);
 
+    self.selectedChartFacet = ko.observable();
+    self.selectedChartFacet.subscribe(function (newValue) {
+      $("#selectedChartLabel").prop("placeholder", newValue);
+    });
+    self.selectedChartLabel = ko.observable("");
+
 
     self.removeFieldFacet = function (facet) {
       self.fieldFacets.remove(facet);
@@ -724,6 +770,15 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
     self.removeDateFacet = function (facet) {
       self.dateFacets.remove(facet);
       self.sortableFacets.remove(facet);
+      self.updateSortableFacets();
+      self.isSaveBtnVisible(true);
+    };
+
+    self.removeChartFacet = function (facet) {
+      self.chartFacets.remove(facet);
+      self.sortableFacets.remove(facet);
+      self.chartFacetsList.push(facet.field);
+      self.chartFacetsList.sort();
       self.updateSortableFacets();
       self.isSaveBtnVisible(true);
     };
@@ -805,6 +860,32 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
       self.isSaveBtnVisible(true);
     };
 
+
+    self.addChartFacet = function () {
+      if (self.chartFacets().length == 0){
+        var found = false;
+        ko.utils.arrayForEach(self.chartFacets(), function(facet) {
+          if (facet.field == self.selectedChartFacet()){
+            found = true;
+          }
+        });
+        if (!found){
+          if (self.selectedChartLabel() == ""){
+            self.selectedChartLabel(self.selectedChartFacet());
+          }
+          var newFacet = new ChartFacet({field: self.selectedChartFacet(), label: self.selectedChartLabel()});
+          self.chartFacets.push(newFacet);
+          self.selectedChartLabel("");
+          self.chartFacetsList.remove(self.selectedChartFacet());
+          self.properties().isEnabled(true);
+          self.isSaveBtnVisible(true);
+        }
+      }
+      else {
+        $("#chart-facet-error").show();
+      }
+    };
+
     self.submit = function () {
       $.ajax("${ url('search:admin_collection_facets', collection_id=hue_collection.id) }", {
         data: {
@@ -812,8 +893,9 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
           'fields': ko.toJSON(self.fieldFacets),
           'ranges': ko.toJSON(self.rangeFacets),
           'dates': ko.toJSON(self.dateFacets),
+          'charts': ko.toJSON(self.chartFacets),
           'order': ko.toJSON(ko.utils.arrayMap(self.sortableFacets(), function (obj) {
-                      return obj.uuid;
+              return obj.uuid;
            }))
         },
         contentType: 'application/json',
@@ -843,6 +925,10 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
       $("#field-facet-error").hide();
     });
 
+    $("#select-chart-facet").click(function(){
+      $("#chart-facet-error").hide();
+    });
+
     var currentStep = "step1";
 
     routie({
@@ -867,6 +953,11 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
       "step5":function () {
         if (validateStep("step1") && validateStep("step2")) {
           showStep("step5");
+        }
+      },
+      "step6":function () {
+        if (validateStep("step1") && validateStep("step2")) {
+          showStep("step6");
         }
       }
     });
