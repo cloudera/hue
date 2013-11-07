@@ -286,6 +286,7 @@ class LdapBackend(object):
     # Delegate to django_auth_ldap.LDAPBackend
     class _LDAPBackend(LDAPBackend):
       def get_or_create_user(self, username, ldap_user):
+        username = desktop.conf.LDAP.FORCE_USERNAME_LOWERCASE.get() and username.lower() or username
         if desktop.conf.LDAP.IGNORE_USERNAME_CASE.get():
           try:
             return User.objects.get(username__iexact=username), False

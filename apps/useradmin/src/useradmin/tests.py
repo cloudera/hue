@@ -110,7 +110,7 @@ class LdapTestConnection(object):
       self.users = {'moe': {'dn': 'uid=moe,ou=People,dc=example,dc=com', 'username':'moe', 'first':'Moe', 'email':'moe@stooges.com', 'groups': ['cn=TestUsers,ou=Groups,dc=example,dc=com']},
                     'lårry': {'dn': 'uid=lårry,ou=People,dc=example,dc=com', 'username':'lårry', 'first':'Larry', 'last':'Stooge', 'email':'larry@stooges.com', 'groups': ['cn=TestUsers,ou=Groups,dc=example,dc=com', 'cn=Test Administrators,cn=TestUsers,ou=Groups,dc=example,dc=com']},
                     'curly': {'dn': 'uid=curly,ou=People,dc=example,dc=com', 'username':'curly', 'first':'Curly', 'last':'Stooge', 'email':'curly@stooges.com', 'groups': ['cn=TestUsers,ou=Groups,dc=example,dc=com', 'cn=Test Administrators,cn=TestUsers,ou=Groups,dc=example,dc=com']},
-                    'rock': {'dn': 'uid=rock,ou=People,dc=example,dc=com', 'username':'rock', 'first':'rock', 'last':'man', 'email':'rockman@stooges.com', 'groups': ['cn=Test Administrators,cn=TestUsers,ou=Groups,dc=example,dc=com']},
+                    'Rock': {'dn': 'uid=Rock,ou=People,dc=example,dc=com', 'username':'Rock', 'first':'rock', 'last':'man', 'email':'rockman@stooges.com', 'groups': ['cn=Test Administrators,cn=TestUsers,ou=Groups,dc=example,dc=com']},
                     'otherguy': {'dn': 'uid=otherguy,ou=People,dc=example,dc=com', 'username':'otherguy', 'first':'Other', 'last':'Guy', 'email':'other@guy.com'},
                     'posix_person': {'dn': 'uid=posix_person,ou=People,dc=example,dc=com', 'username': 'posix_person', 'first': 'pos', 'last': 'ix', 'email': 'pos@ix.com'},
                     'posix_person2': {'dn': 'uid=posix_person2,ou=People,dc=example,dc=com', 'username': 'posix_person2', 'first': 'pos', 'last': 'ix', 'email': 'pos@ix.com'}}
@@ -123,7 +123,7 @@ class LdapTestConnection(object):
                      'Test Administrators': {
                         'dn': 'cn=Test Administrators,cn=TestUsers,ou=Groups,dc=example,dc=com',
                         'name':'Test Administrators',
-                        'members':['uid=rock,ou=People,dc=example,dc=com','uid=lårry,ou=People,dc=example,dc=com','uid=curly,ou=People,dc=example,dc=com'],
+                        'members':['uid=Rock,ou=People,dc=example,dc=com','uid=lårry,ou=People,dc=example,dc=com','uid=curly,ou=People,dc=example,dc=com'],
                         'posix_members':[]},
                      'OtherGroup': {
                         'dn': 'cn=OtherGroup,cn=TestUsers,ou=Groups,dc=example,dc=com',
@@ -622,89 +622,126 @@ def test_useradmin_ldap_posix_group_integration():
 
 
 def test_useradmin_ldap_user_integration():
-  reset_all_users()
-  reset_all_groups()
+  done = []
+  try:
+    reset_all_users()
+    reset_all_groups()
 
-  # Set up LDAP tests to use a LdapTestConnection instead of an actual LDAP connection
-  ldap_access.CACHED_LDAP_CONN = LdapTestConnection()
+    # Set up LDAP tests to use a LdapTestConnection instead of an actual LDAP connection
+    ldap_access.CACHED_LDAP_CONN = LdapTestConnection()
 
-  # Try importing a user
-  import_ldap_users('lårry', sync_groups=False, import_by_dn=False)
-  larry = User.objects.get(username='lårry')
-  assert_true(larry.first_name == 'Larry')
-  assert_true(larry.last_name == 'Stooge')
-  assert_true(larry.email == 'larry@stooges.com')
-  assert_true(get_profile(larry).creation_method == str(UserProfile.CreationMethod.EXTERNAL))
+    # Try importing a user
+    import_ldap_users('lårry', sync_groups=False, import_by_dn=False)
+    larry = User.objects.get(username='lårry')
+    assert_true(larry.first_name == 'Larry')
+    assert_true(larry.last_name == 'Stooge')
+    assert_true(larry.email == 'larry@stooges.com')
+    assert_true(get_profile(larry).creation_method == str(UserProfile.CreationMethod.EXTERNAL))
 
-  # Should be a noop
-  sync_ldap_users()
-  sync_ldap_groups()
-  assert_equal(User.objects.all().count(), 1)
-  assert_equal(Group.objects.all().count(), 0)
+    # Should be a noop
+    sync_ldap_users()
+    sync_ldap_groups()
+    assert_equal(User.objects.all().count(), 1)
+    assert_equal(Group.objects.all().count(), 0)
 
-  # Make sure that if a Hue user already exists with a naming collision, we
-  # won't overwrite any of that user's information.
-  hue_user = User.objects.create(username='otherguy', first_name='Different', last_name='Guy')
-  import_ldap_users('otherguy', sync_groups=False, import_by_dn=False)
-  hue_user = User.objects.get(username='otherguy')
-  assert_equal(get_profile(hue_user).creation_method, str(UserProfile.CreationMethod.HUE))
-  assert_equal(hue_user.first_name, 'Different')
+    # Make sure that if a Hue user already exists with a naming collision, we
+    # won't overwrite any of that user's information.
+    hue_user = User.objects.create(username='otherguy', first_name='Different', last_name='Guy')
+    import_ldap_users('otherguy', sync_groups=False, import_by_dn=False)
+    hue_user = User.objects.get(username='otherguy')
+    assert_equal(get_profile(hue_user).creation_method, str(UserProfile.CreationMethod.HUE))
+    assert_equal(hue_user.first_name, 'Different')
 
-  # Try importing a user and sync groups
-  import_ldap_users('curly', sync_groups=True, import_by_dn=False)
-  curly = User.objects.get(username='curly')
-  assert_equal(curly.first_name, 'Curly')
-  assert_equal(curly.last_name, 'Stooge')
-  assert_equal(curly.email, 'curly@stooges.com')
-  assert_equal(get_profile(curly).creation_method, str(UserProfile.CreationMethod.EXTERNAL))
-  assert_equal(2, curly.groups.all().count(), curly.groups.all())
+    # Try importing a user and sync groups
+    import_ldap_users('curly', sync_groups=True, import_by_dn=False)
+    curly = User.objects.get(username='curly')
+    assert_equal(curly.first_name, 'Curly')
+    assert_equal(curly.last_name, 'Stooge')
+    assert_equal(curly.email, 'curly@stooges.com')
+    assert_equal(get_profile(curly).creation_method, str(UserProfile.CreationMethod.EXTERNAL))
+    assert_equal(2, curly.groups.all().count(), curly.groups.all())
 
-  reset_all_users()
-  reset_all_groups()
+    reset_all_users()
+    reset_all_groups()
 
-  # Test import case sensitivity
-  reset = desktop.conf.LDAP.IGNORE_USERNAME_CASE.set_for_testing(True)
-  import_ldap_users('Lårry', sync_groups=False, import_by_dn=False)
-  assert_false(User.objects.filter(username='Lårry').exists())
-  assert_true(User.objects.filter(username='lårry').exists())
-  reset()
+    # Test import case sensitivity
+    done.append(desktop.conf.LDAP.IGNORE_USERNAME_CASE.set_for_testing(True))
+    import_ldap_users('Lårry', sync_groups=False, import_by_dn=False)
+    assert_false(User.objects.filter(username='Lårry').exists())
+    assert_true(User.objects.filter(username='lårry').exists())
+
+    # Test lower case
+    User.objects.filter(username__iexact='Rock').delete()
+    import_ldap_users('Rock', sync_groups=False, import_by_dn=False)
+    assert_true(User.objects.filter(username='Rock').exists())
+    assert_false(User.objects.filter(username='rock').exists())
+
+    done.append(desktop.conf.LDAP.FORCE_USERNAME_LOWERCASE.set_for_testing(True))
+
+    import_ldap_users('Rock', sync_groups=False, import_by_dn=False)
+    assert_true(User.objects.filter(username='Rock').exists())
+    assert_false(User.objects.filter(username='rock').exists())
+
+    User.objects.filter(username='Rock').delete()
+    import_ldap_users('Rock', sync_groups=False, import_by_dn=False)
+    assert_false(User.objects.filter(username='Rock').exists())
+    assert_true(User.objects.filter(username='rock').exists())
+  finally:
+    for finish in done:
+      finish()
 
 
 def test_add_ldap_users():
-  URL = reverse(add_ldap_users)
+  done = []
+  try:
+    URL = reverse(add_ldap_users)
 
-  reset_all_users()
-  reset_all_groups()
+    reset_all_users()
+    reset_all_groups()
 
-  # Set up LDAP tests to use a LdapTestConnection instead of an actual LDAP connection
-  ldap_access.CACHED_LDAP_CONN = LdapTestConnection()
+    # Set up LDAP tests to use a LdapTestConnection instead of an actual LDAP connection
+    ldap_access.CACHED_LDAP_CONN = LdapTestConnection()
 
-  c = make_logged_in_client('test', is_superuser=True)
+    c = make_logged_in_client('test', is_superuser=True)
 
-  assert_true(c.get(URL))
+    assert_true(c.get(URL))
 
-  response = c.post(URL, dict(username_pattern='moe', password1='test', password2='test'))
-  assert_true('Location' in response, response)
-  assert_true('/useradmin/users' in response['Location'], response)
+    response = c.post(URL, dict(username_pattern='moe', password1='test', password2='test'))
+    assert_true('Location' in response, response)
+    assert_true('/useradmin/users' in response['Location'], response)
 
-  response = c.post(URL, dict(username_pattern='bad_name', password1='test', password2='test'))
-  assert_true('Could not' in response.context['form'].errors['username_pattern'][0], response)
+    response = c.post(URL, dict(username_pattern='bad_name', password1='test', password2='test'))
+    assert_true('Could not' in response.context['form'].errors['username_pattern'][0], response)
 
-  # Test wild card
-  response = c.post(URL, dict(username_pattern='*r*', password1='test', password2='test'))
-  assert_true('/useradmin/users' in response['Location'], response)
+    # Test wild card
+    response = c.post(URL, dict(username_pattern='*r*', password1='test', password2='test'))
+    assert_true('/useradmin/users' in response['Location'], response)
 
-  # Test ignore case
-  reset = desktop.conf.LDAP.IGNORE_USERNAME_CASE.set_for_testing(True)
-  User.objects.filter(username='moe').delete()
-  assert_false(User.objects.filter(username='Moe').exists())
-  assert_false(User.objects.filter(username='moe').exists())
-  response = c.post(URL, dict(username_pattern='Moe', password1='test', password2='test'))
-  assert_true('Location' in response, response)
-  assert_true('/useradmin/users' in response['Location'], response)
-  assert_false(User.objects.filter(username='Moe').exists())
-  assert_true(User.objects.filter(username='moe').exists())
-  reset()
+    # Test ignore case
+    done.append(desktop.conf.LDAP.IGNORE_USERNAME_CASE.set_for_testing(True))
+    User.objects.filter(username='moe').delete()
+    assert_false(User.objects.filter(username='Moe').exists())
+    assert_false(User.objects.filter(username='moe').exists())
+    response = c.post(URL, dict(username_pattern='Moe', password1='test', password2='test'))
+    assert_true('Location' in response, response)
+    assert_true('/useradmin/users' in response['Location'], response)
+    assert_false(User.objects.filter(username='Moe').exists())
+    assert_true(User.objects.filter(username='moe').exists())
+
+    # Test lower case
+    done.append(desktop.conf.LDAP.FORCE_USERNAME_LOWERCASE.set_for_testing(True))
+    User.objects.filter(username__iexact='Rock').delete()
+    assert_false(User.objects.filter(username='Rock').exists())
+    assert_false(User.objects.filter(username='rock').exists())
+    response = c.post(URL, dict(username_pattern='rock', password1='test', password2='test'))
+    assert_true('Location' in response, response)
+    assert_true('/useradmin/users' in response['Location'], response)
+    assert_false(User.objects.filter(username='Rock').exists())
+    assert_true(User.objects.filter(username='rock').exists())
+
+  finally:
+    for finish in done:
+      finish()
 
 
 def test_add_ldap_groups():
