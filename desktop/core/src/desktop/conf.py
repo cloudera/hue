@@ -391,6 +391,10 @@ LDAP = ConfigSection(
       help=_("Ignore the case of usernames when searching for existing users in Hue."),
       type=coerce_bool,
       default=False),
+    FORCE_USERNAME_LOWERCASE = Config("force_username_lowercase",
+      help=_("Force usernames to lowercase when creating new users from LDAP."),
+      type=coerce_bool,
+      default=False),
 
     USERS = ConfigSection(
       key="users",
