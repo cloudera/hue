@@ -339,7 +339,7 @@ ${layout.menubar(section='query')}
         <h1 class="card-heading simple">${_('Navigator')}</h1>
         <div class="card-body">
           <p>
-            <input id="navigatorSearch" type="text" class="input-medium" placeholder="${ _('Table name...') }"/>
+            <input id="navigatorSearch" type="text" placeholder="${ _('Table name...') }" style="width:90%"/>
             <span id="navigatorNoTables">${_('The selected database has no tables.')}</span>
             <ul id="navigatorTables" class="unstyled"></ul>
             <div id="navigatorLoader">
@@ -937,14 +937,20 @@ ${layout.menubar(section='query')}
         $("#validationResults").empty();
       });
 
+      % if design and not design.id:
+      if ($.totalStorage("${app_name}_temp_query") != null && $.totalStorage("${app_name}_temp_query") != "") {
+        codeMirror.setValue($.totalStorage("${app_name}_temp_query"));
+      }
+      % endif
+
       codeMirror.on("blur", function () {
         $(document.body).off("contextmenu");
       });
 
       codeMirror.on("change", function () {
         $(".query").val(codeMirror.getValue());
+        $.totalStorage("${app_name}_temp_query", codeMirror.getValue());
       });
-
 
       function getHighlightedQuery() {
         var selection = codeMirror.getSelection();
@@ -957,6 +963,7 @@ ${layout.menubar(section='query')}
       function checkAndSubmit() {
         var query = getHighlightedQuery() || codeMirror.getValue();
         $(".query").val(query);
+        $.totalStorage("${app_name}_temp_query", null);
         $("#advancedSettingsForm").submit();
       }
 
