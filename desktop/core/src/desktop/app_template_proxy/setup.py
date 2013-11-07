@@ -28,9 +28,9 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 setup(
   name = "${app_name}",
   version = "0.1",
-  url = 'TODO',
-  description = 'TODO',
-  author = 'TODO',
+  url = 'gethue.com',
+  description = 'A new Hue App',
+  author = 'Elephant',
   packages = find_packages('src'),
   package_dir = {'': 'src'},
   install_requires = ['setuptools', 'desktop'],

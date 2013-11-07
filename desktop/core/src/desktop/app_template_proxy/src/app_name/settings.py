@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 DJANGO_APPS = [ "${app_name}" ]
+NICE_NAME = "${app_name}"
 REQUIRES_HADOOP = False
 MENU_INDEX = 100
 ICON = "/${app_name}/static/art/icon_${app_name}_24.png"
