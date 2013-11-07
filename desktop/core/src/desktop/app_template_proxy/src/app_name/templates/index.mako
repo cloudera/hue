@@ -13,7 +13,10 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
+
 ${'<'}%!from desktop.views import commonheader, commonfooter %>
+${'<'}%!from ${app_name}.conf import URL %>
+
 ${'<'}%namespace name="shared" file="shared_components.mako" />
 
 ${'$'}{commonheader("${" ".join(word.capitalize() for word in app_name.split("_"))}", "${app_name}", user, "28px") | n,unicode}
@@ -28,13 +31,12 @@ ${'#'}# Main body
   }
 </style>
 
-<iframe id="appframe" src="${app_url}"></iframe>
+<iframe id="appframe" src="${'${'} URL.get() if URL.get() else '${ app_url }' }"></iframe>
 
 <script type="text/javascript">
   $(document).ready(function () {
     var _resizeTimeout = -1;
     $(window).on("resize", function () {
-      console.log("resize")
       window.clearTimeout(_resizeTimeout);
       _resizeTimeout = window.setTimeout(resizeAppframe, 300);
     });

@@ -29,12 +29,12 @@ LOG = logging.getLogger(__name__)
 
 class Command(BaseCommand):
   help = _("Creates a Hue proxy application directory structure.")
-  args = "[appname]"
+  args = "app_name app_web_url [app_dir]"
   label = _('application name')
 
   def handle(self, *args, **options):
     if len(args) > 3 or len(args) == 0:
-      raise CommandError(_("Expected arguments: app_name [app_url] [app_dir]"))
+      raise CommandError(_("Expected arguments: app_name app_web_url [app_dir]"))
     app_name = args[0]
     if len(args) == 2:
       app_url = args[1]
@@ -46,7 +46,7 @@ class Command(BaseCommand):
       app_url = "http://gethue.com"
       app_dir = os.getcwd()
 
-    app_template = os.path.abspath(os.path.join(os.path.dirname(__file__),'..','..','app_template_proxy'))
+    app_template = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'app_template_proxy'))
     assert os.path.isdir(app_template), _("App template dir missing: %(template)s.") % {'template': app_template}
     app_dir = os.path.join(app_dir, app_name)
 

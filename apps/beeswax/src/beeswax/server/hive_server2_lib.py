@@ -525,7 +525,7 @@ class HiveServerClient:
 
 
   def explain(self, query):
-    query_statement =  query.get_query_statement(0)
+    query_statement = query.get_query_statement(0)
     return self.execute_query_statement('EXPLAIN %s' % query_statement)
 
 
