@@ -168,9 +168,10 @@ class HiveServerTRowSet:
 
 
 class HiveServerDataTable(DataTable):
-  def __init__(self, results, schema):
+  def __init__(self, results, schema, operation_handle):
     self.schema = schema and schema.schema
     self.row_set = HiveServerTRowSet(results.results, schema)
+    self.operation_handle = operation_handle
     self.has_more = not self.row_set.is_empty()    # Should be results.hasMoreRows but always True in HS2
     self.startRowOffset = self.row_set.startRowOffset    # Always 0 in HS2
 
@@ -354,6 +355,13 @@ class HiveServerClient:
     req = TOpenSessionReq(**kwargs)
     res = self._client.OpenSession(req)
 
+    if res.status is not None and res.status.statusCode not in (TStatusCode.SUCCESS_STATUS,):
+      if hasattr(res.status, 'errorMessage') and res.status.errorMessage:
+        message = res.status.errorMessage
+      else:
+        message = ''
+      raise QueryServerException(Exception('Bad status for request %s:\n%s' % (req, res)), message=message)
+
     sessionId = res.sessionHandle.sessionId
     LOG.info('Opening session %s' % sessionId)
 
@@ -413,6 +421,7 @@ class HiveServerClient:
     res = self.call(self._client.GetSchemas, req)
 
     results, schema = self.fetch_result(res.operationHandle)
+    self.close_operation(res.operationHandle)
 
     col = 'TABLE_SCHEM'
     return HiveServerTRowSet(results.results, schema.schema).cols((col,))
@@ -423,6 +432,7 @@ class HiveServerClient:
     res = self.call(self._client.GetTables, req)
 
     results, schema = self.fetch_result(res.operationHandle)
+    self.close_operation(res.operationHandle)
 
     return HiveServerTRowSet(results.results, schema.schema).cols(('TABLE_NAME',))
 
@@ -432,24 +442,27 @@ class HiveServerClient:
     res = self.call(self._client.GetTables, req)
 
     table_results, table_schema = self.fetch_result(res.operationHandle)
+    self.close_operation(res.operationHandle)
+
     if self.query_server['server_name'] == 'impala':
       # Impala does not supported extended
       query = 'DESCRIBE %s' % table_name
     else:
       query = 'DESCRIBE EXTENDED %s' % table_name
-    desc_results, desc_schema = self.execute_statement(query)
+    (desc_results, desc_schema), operation_handle = self.execute_statement(query)
+    self.close_operation(operation_handle)
 
     return HiveServerTable(table_results.results, table_schema.schema, desc_results.results, desc_schema.schema)
 
 
-  def execute_query(self, query, max_rows=100):
+  def execute_query(self, query, max_rows=1000):
     configuration = self._get_query_configuration(query)
     return self.execute_query_statement(statement=query.query['query'], max_rows=max_rows, configuration=configuration)
 
 
-  def execute_query_statement(self, statement, max_rows=100, configuration={}):
-    results, schema = self.execute_statement(statement=statement, max_rows=max_rows, configuration=configuration)
-    return HiveServerDataTable(results, schema)
+  def execute_query_statement(self, statement, max_rows=1000, configuration={}):
+    (results, schema), operation_handle = self.execute_statement(statement=statement, max_rows=max_rows, configuration=configuration)
+    return HiveServerDataTable(results, schema, operation_handle)
 
 
   def execute_async_query(self, query, statement=0):
@@ -465,11 +478,11 @@ class HiveServerClient:
     return self.execute_async_statement(statement=query_statement, confOverlay=configuration)
 
 
-  def execute_statement(self, statement, max_rows=100, configuration={}):
+  def execute_statement(self, statement, max_rows=1000, configuration={}):
     req = TExecuteStatementReq(statement=statement.encode('utf-8'), confOverlay=configuration)
     res = self.call(self._client.ExecuteStatement, req)
 
-    return self.fetch_result(res.operationHandle, max_rows=max_rows)
+    return self.fetch_result(res.operationHandle, max_rows=max_rows), res.operationHandle
 
 
   def execute_async_statement(self, statement, confOverlay):
@@ -483,10 +496,10 @@ class HiveServerClient:
                                  modified_row_count=res.operationHandle.modifiedRowCount)
 
 
-  def fetch_data(self, operation_handle, orientation=TFetchOrientation.FETCH_NEXT, max_rows=100):
+  def fetch_data(self, operation_handle, orientation=TFetchOrientation.FETCH_NEXT, max_rows=1000):
     # The client should check for hasMoreRows and fetch until the result is empty dues to a HS2 bug
     results, schema = self.fetch_result(operation_handle, orientation, max_rows)
-    return HiveServerDataTable(results, schema)
+    return HiveServerDataTable(results, schema, operation_handle)
 
 
   def cancel_operation(self, operation_handle):
@@ -503,10 +516,13 @@ class HiveServerClient:
     req = TGetColumnsReq(schemaName=database, tableName=table)
     res = self.call(self._client.GetColumns, req)
 
-    return self.fetch_result(res.operationHandle)
+    res, schema = self.fetch_result(res.operationHandle)
+    self.close_operation(res.operationHandle)
+
+    return res, schema
 
 
-  def fetch_result(self, operation_handle, orientation=TFetchOrientation.FETCH_NEXT, max_rows=100):
+  def fetch_result(self, operation_handle, orientation=TFetchOrientation.FETCH_NEXT, max_rows=1000):
     fetch_req = TFetchResultsReq(operationHandle=operation_handle, orientation=orientation, maxRows=max_rows)
     res = self.call(self._client.FetchResults, fetch_req)
 
@@ -632,15 +648,23 @@ class HiveServerClientCompatible(object):
     return HiveServerQueryHistory.STATE_MAP[res.operationState]
 
 
+  def use(self, query):
+    data = self._client.execute_query(query)
+    self._client.close_operation(data.operation_handle)
+    return data
+
+
   def explain(self, query):
     data_table = self._client.explain(query)
-    return ExplainCompatible(data_table)
+    data = ExplainCompatible(data_table)
+    self._client.close_operation(data_table.operation_handle)
+    return data
 
 
   def fetch(self, handle, start_over=False, max_rows=None):
     operationHandle = handle.get_rpc_handle()
     if max_rows is None:
-      max_rows = 10000
+      max_rows = 1000
 
     # Impala does not support FETCH_FIRST
     if self.query_server['server_name'] == 'impala':

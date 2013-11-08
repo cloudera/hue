@@ -383,10 +383,13 @@ def execute_query(request, design_id=None):
   query_type = SavedQuery.TYPES_MAPPING[app_name]
   design = safe_get_design(request, query_type, design_id)
   on_success_url = request.REQUEST.get('on_success_url')
-
+  databases = []
   query_server = get_query_server_config(app_name)
   db = dbms.get(request.user, query_server)
-  databases = get_db_choices(request)
+  try:
+    databases = get_db_choices(request)
+  except Exception, ex:
+    error_message, log = expand_exception(ex, db)
 
   if request.method == 'POST':
     form.bind(request.POST)
