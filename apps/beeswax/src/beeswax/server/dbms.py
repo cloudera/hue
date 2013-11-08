@@ -172,7 +172,9 @@ class Dbms:
       handle = self.execute_and_wait(query, timeout_sec=5.0)
 
       if handle:
-        return self.fetch(handle)
+        result = self.fetch(handle)
+        self.close(handle)
+        return result
 
 
   def drop_table(self, database, table):
@@ -308,8 +310,8 @@ class Dbms:
     """Beeswax interface does not support use directly."""
     if self.server_type == HIVE_SERVER2:
       query = hql_query('USE %s' % database)
-      self.client.query(query)
-      # TODO sync + close query
+      return self.client.use(query)
+
 
   def get_log(self, query_handle):
     return self.client.get_log(query_handle)
@@ -319,12 +321,10 @@ class Dbms:
     return self.client.get_state(handle)
 
 
-  def execute_and_wait(self, query, timeout_sec=30.0):
+  def execute_and_wait(self, query, timeout_sec=30.0, sleep_interval=0.5):
     """
     Run query and check status until it finishes or timeouts.
     """
-    SLEEP_INTERVAL = 0.5
-
     handle = self.client.query(query)
     curr = time.time()
     end = curr + timeout_sec
@@ -333,7 +333,7 @@ class Dbms:
       state = self.client.get_state(handle)
       if state not in (QueryHistory.STATE.running, QueryHistory.STATE.submitted):
         return handle
-      time.sleep(SLEEP_INTERVAL)
+      time.sleep(sleep_interval)
       curr = time.time()
     return None
 
