@@ -27,6 +27,7 @@ from django.core.urlresolvers import reverse
 from desktop.lib.django_util import render
 from desktop.lib.exceptions_renderable import PopupException
 
+from beeswax.design import hql_query
 from beeswax.models import SavedQuery, MetaInstall
 from beeswax.server import dbms
 
