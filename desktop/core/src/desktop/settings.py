@@ -28,6 +28,11 @@ import desktop.log
 from desktop.lib.paths import get_desktop_root
 import pkg_resources
 
+try:
+  import json
+except ImportError:
+  import simplejson as json
+
 HUE_DESKTOP_VERSION = pkg_resources.get_distribution("desktop").version or "Unknown"
 NICE_NAME = "Hue"
 

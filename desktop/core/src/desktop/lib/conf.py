@@ -68,7 +68,10 @@ pytype = type
 from desktop.lib.paths import get_desktop_root, get_build_dir
 
 import configobj
-import json
+try:
+  import json
+except ImportError:
+  import simplejson as json
 import logging
 import os
 import textwrap
