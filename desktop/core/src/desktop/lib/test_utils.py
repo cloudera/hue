@@ -15,7 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
+try:
+  import json
+except ImportError:
+  import simplejson as json
+
 from lxml import etree, objectify
 
 from django.contrib.auth.models import Group, User
