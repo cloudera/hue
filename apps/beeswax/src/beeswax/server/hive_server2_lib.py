@@ -345,10 +345,11 @@ class HiveServerClient:
     if self.impersonation_enabled:
       kwargs.update({'username': 'hue'})
 
-      if self.query_server['server_name'] == 'impala':
+      if self.query_server['server_name'] == 'impala': # Only when Impala accepts it
         kwargs['configuration'].update({'impala.doas.user': user.username})
-      else:
-        kwargs['configuration'].update({'hive.server2.proxy.user': user.username})
+
+    if self.query_server['server_name'] == 'beeswax': # All the time
+      kwargs['configuration'].update({'hive.server2.proxy.user': user.username})
 
     req = TOpenSessionReq(**kwargs)
     res = self._client.OpenSession(req)
