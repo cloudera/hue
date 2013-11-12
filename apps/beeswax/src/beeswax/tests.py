@@ -1506,7 +1506,7 @@ class TestWithMockedServer(object):
     grant_access("test", "test", "beeswax")
 
   def tearDown(self):
-    dbms.Dbms = dbms.OriginalBeeswaxApi
+    dbms.HS2Dbms = dbms.OriginalBeeswaxApi
 
   def test_save_design_properties(self):
     resp = self.client.get('/beeswax/save_design_properties')
