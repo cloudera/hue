@@ -1736,7 +1736,7 @@ def test_hiveserver2_get_security():
   assert_true(principal.startswith('impala/'), principal)
 
   beeswax_query_server = {'server_name': 'beeswax', 'principal': 'hue'}
-  impala_query_server = {'server_name': 'impala', 'principal': 'impala'}
+  impala_query_server = {'server_name': 'impala', 'principal': 'impala', 'impersonation_enabled': False}
 
   assert_equal((True, 'PLAIN', 'hue', False), HiveServerClient.get_security(beeswax_query_server))
   assert_equal((False, 'GSSAPI', 'impala', False), HiveServerClient.get_security(impala_query_server))
