@@ -21,6 +21,13 @@ from django.utils.translation import ugettext as _, ugettext_lazy as _t
 from desktop.lib.conf import Config, validate_path
 
 
+SPARK_MASTER = Config(
+  key="spark_master",
+  help=_t("Address of the Spark master, e.g spark://localhost:7077. If empty use the current configuration. "
+          "Can be overriden in the script too."),
+  default=""
+)
+
 SPARK_HOME = Config(
   key="spark_home",
   help=_t("Local path to Spark Home on all the nodes of the cluster."),

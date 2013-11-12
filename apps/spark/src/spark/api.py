@@ -24,7 +24,7 @@ from django.core.urlresolvers import reverse
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
 
-from spark.conf import SPARK_HOME
+from spark.conf import SPARK_HOME, SPARK_MASTER
 from desktop.lib.view_util import format_duration_in_millis
 from filebrowser.views import location_to_url
 from jobbrowser.views import job_single_logs
@@ -56,7 +56,7 @@ class OozieSparkApi:
 
   def submit(self, spark_script, params):
     mapping = {
-      'oozie.use.system.libpath':  'false',
+      'oozie.use.system.libpath': 'false',
     }
 
     workflow = None
@@ -77,7 +77,7 @@ class OozieSparkApi:
     workflow.save()
     Workflow.objects.initialize(workflow, self.fs)
 
-    spark_script_path = workflow.deployment_dir + '/spark.py'
+    spark_script_path = workflow.deployment_dir + '/spark.script'
     spark_launcher_path = workflow.deployment_dir + '/spark.sh'
     self.fs.do_as_user(self.user.username, self.fs.create, spark_script_path, data=spark_script.dict['script'])
     self.fs.do_as_user(self.user.username, self.fs.create, spark_launcher_path, data="""
@@ -85,11 +85,14 @@ class OozieSparkApi:
 
 WORKSPACE=`pwd`
 cd %(spark_home)s
-MASTER=spark://runreal:7077 pyspark $WORKSPACE/spark.py
-    """ % {'spark_home': SPARK_HOME.get()})
-# MASTER=spark://kostas-1.ent.cloudera.com:7077 pyspark $WORKSPACE/spark.py
+%(spark_master)s %(spark_shell)s $WORKSPACE/spark.script
+    """ % {
+        'spark_home': SPARK_HOME.get(),
+        'spark_master': 'MASTER=%s' % SPARK_MASTER.get() if SPARK_MASTER.get() != '' else '',
+        'spark_shell': 'pyspark' if spark_script.dict['language'] == 'python' else 'spark-shell <'
+    })
 
-    files = ['spark.py', 'spark.sh']
+    files = ['spark.script', 'spark.sh']
     archives = []
 
     popup_params = json.loads(params)

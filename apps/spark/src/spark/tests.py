@@ -38,7 +38,8 @@ class TestSparkBase(object):
       'script': 'print "spark"',
       'parameters': [],
       'resources': [],
-      'hadoopProperties': []
+      'hadoopProperties': [],
+      'language': 'python'
   }
 
   def setUp(self):
@@ -67,7 +68,7 @@ class TestMock(TestSparkBase):
   def test_save(self):
     attrs = {'user': self.user,}
     attrs.update(TestSparkBase.SCRIPT_ATTRS)
-    #attrs['type'] = json.dumps(TestSparkBase.SCRIPT_ATTRS['type']) # TODO: when support of Scala + Java
+    attrs['language'] = json.dumps(TestSparkBase.SCRIPT_ATTRS['language'])
     attrs['parameters'] = json.dumps(TestSparkBase.SCRIPT_ATTRS['parameters'])
     attrs['resources'] = json.dumps(TestSparkBase.SCRIPT_ATTRS['resources'])
     attrs['hadoopProperties'] = json.dumps(TestSparkBase.SCRIPT_ATTRS['hadoopProperties'])

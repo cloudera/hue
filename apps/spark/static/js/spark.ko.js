@@ -31,15 +31,15 @@ var HadoopProperty = function (property) {
 var PigParameter = HadoopProperty;
 
 
-var PigScript = function (pigScript) {
+var SparkScript = function (sparkScript) {
   var self = this;
 
-  self.id = ko.observable(pigScript.id);
-  self.isDesign = ko.observable(pigScript.isDesign);
-  self.name = ko.observable(pigScript.name);
-  self.type = ko.observable(pigScript.type);
-  self.script = ko.observable(pigScript.script);
-  self.scriptSumup = ko.observable(pigScript.script.replace(/\W+/g, ' ').substring(0, 100));
+  self.id = ko.observable(sparkScript.id);
+  self.isDesign = ko.observable(sparkScript.isDesign);
+  self.name = ko.observable(sparkScript.name);
+  self.language = ko.observable(sparkScript.language);
+  self.script = ko.observable(sparkScript.script);
+  self.scriptSumup = ko.observable(sparkScript.script.replace(/\W+/g, ' ').substring(0, 100));
   self.isRunning = ko.observable(false);
   self.selected = ko.observable(false);
   self.watchUrl = ko.observable("");
@@ -54,7 +54,7 @@ var PigScript = function (pigScript) {
   };
 
   self.parameters = ko.observableArray([]);
-  ko.utils.arrayForEach(pigScript.parameters, function (parameter) {
+  ko.utils.arrayForEach(sparkScript.parameters, function (parameter) {
     self.parameters.push(new PigParameter({name: parameter.name, value: parameter.value}));
   });
   self.addParameter = function () {
@@ -71,7 +71,7 @@ var PigScript = function (pigScript) {
   };
 
   self.hadoopProperties = ko.observableArray([]);
-  ko.utils.arrayForEach(pigScript.hadoopProperties, function (property) {
+  ko.utils.arrayForEach(sparkScript.hadoopProperties, function (property) {
     self.hadoopProperties.push(new HadoopProperty({name: property.name, value: property.value}));
   });
   self.addHadoopProperties = function () {
@@ -84,7 +84,7 @@ var PigScript = function (pigScript) {
   };
 
   self.resources = ko.observableArray([]);
-  ko.utils.arrayForEach(pigScript.resources, function (resource) {
+  ko.utils.arrayForEach(sparkScript.resources, function (resource) {
     self.resources.push(new Resource({type: resource.type, value: resource.value}));
   });
   self.addResource = function () {
@@ -96,7 +96,7 @@ var PigScript = function (pigScript) {
     self.updateParentModel();
   };
 
-  self.parentModel = pigScript.parentModel;
+  self.parentModel = sparkScript.parentModel;
   self.updateParentModel = function () {
     if (typeof self.parentModel != "undefined" && self.parentModel != null) {
       self.parentModel.isDirty(true);
@@ -163,15 +163,15 @@ var SparkViewModel = function (props) {
   var _defaultScript = {
     id: -1,
     name: self.LABELS.NEW_SCRIPT_NAME,
-    type: 'python',
-    script: self.LABELS.NEW_SCRIPT_CONTENT,
+    language: 'python',
+    script: self.LABELS.NEW_SCRIPT_CONTENT['python'],
     parameters: self.LABELS.NEW_SCRIPT_PARAMETERS,
     resources: self.LABELS.NEW_SCRIPT_RESOURCES,
     hadoopProperties: self.LABELS.NEW_SCRIPT_HADOOP_PROPERTIES,
     parentModel: self
   };
 
-  self.currentScript = ko.observable(new PigScript(_defaultScript));
+  self.currentScript = ko.observable(new SparkScript(_defaultScript));
   self.loadingScript = null;
   self.currentDeleteType = ko.observable("");
 
@@ -215,7 +215,7 @@ var SparkViewModel = function (props) {
       self.currentScript(_s);
     }
     else {
-      self.currentScript(new PigScript(_defaultScript));
+      self.currentScript(new SparkScript(_defaultScript));
     }
   }
 
@@ -239,12 +239,20 @@ var SparkViewModel = function (props) {
 
   self.newScript = function () {
     self.loadingScript = null;
-    self.currentScript(new PigScript(_defaultScript));
+    self.currentScript(new SparkScript(_defaultScript));
     self.isDirty(false);
     $("#confirmModal").modal("hide");
+    $("#newScriptModal").modal("show");
     $(document).trigger("loadEditor");
     $(document).trigger("showEditor");
     $(document).trigger("clearLogs");
+  };
+
+  self.createAndEditScript = function () {
+	self.currentScript().script(LABELS.NEW_SCRIPT_CONTENT[self.currentScript().language()]);
+	$(document).trigger("loadEditor");
+	$("#newScriptModal").modal("hide");
+	$(document).trigger("showEditor");
   };
 
   self.editScript = function (script) {
@@ -338,7 +346,7 @@ var SparkViewModel = function (props) {
     $.getJSON(self.LIST_SCRIPTS, function (data) {
       self.scripts(ko.utils.arrayMap(data, function (script) {
         script.parentModel = self;
-        return new PigScript(script);
+        return new SparkScript(script);
       }));
       self.filteredScripts(self.scripts());
       $(document).trigger("scriptsRefreshed");
@@ -460,6 +468,7 @@ var SparkViewModel = function (props) {
           parameters: ko.toJSON(script.parameters()),
           resources: ko.toJSON(script.resources()),
           hadoopProperties: ko.toJSON(script.hadoopProperties()),
+          language: ko.toJSON(script.language())
         },
         function (data) {
           self.currentScript().id(data.id);
@@ -481,7 +490,8 @@ var SparkViewModel = function (props) {
           parameters: ko.toJSON(script.parameters()),
           submissionVariables: ko.utils.stringifyJson(self.submissionVariables()),
           resources: ko.toJSON(script.resources()),
-          hadoopProperties: ko.toJSON(script.hadoopProperties())
+          hadoopProperties: ko.toJSON(script.hadoopProperties()),
+          language: ko.toJSON(script.language())
         },
         function (data) {
           if (data.id && self.currentScript().id() != data.id){
@@ -516,7 +526,7 @@ var SparkViewModel = function (props) {
         },
         function (data) {
           data.parentModel = self;
-          self.currentScript(new PigScript(data));
+          self.currentScript(new SparkScript(data));
           $(document).trigger("loadEditor");
           self.updateScripts();
         }, "json");
@@ -524,7 +534,7 @@ var SparkViewModel = function (props) {
 
   function callDelete(ids) {
     if (ids.indexOf(self.currentScript().id()) > -1) {
-      self.currentScript(new PigScript(_defaultScript));
+      self.currentScript(new SparkScript(_defaultScript));
       $(document).trigger("loadEditor");
     }
     $.post(self.DELETE_URL, {

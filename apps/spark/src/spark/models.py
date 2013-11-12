@@ -31,7 +31,7 @@ from hadoop.fs.hadoopfs import Hdfs
 
 
 class SparkScript(models.Model):
-  _ATTRIBUTES = ['script', 'name', 'properties', 'job_id', 'parameters', 'resources', 'hadoopProperties', 'type']
+  _ATTRIBUTES = ['script', 'name', 'properties', 'job_id', 'parameters', 'resources', 'hadoopProperties', 'language']
 
   data = models.TextField(default=json.dumps({
       'script': '',
@@ -41,7 +41,7 @@ class SparkScript(models.Model):
       'parameters': [],
       'resources': [],
       'hadoopProperties': [],
-      'type': 'python',
+      'language': 'python',
   }))
 
   doc = generic.GenericRelation(Doc, related_name='spark_doc')
@@ -66,7 +66,7 @@ class SparkScript(models.Model):
     return reverse('spark:index') + '#edit/%s' % self.id
 
 
-def create_or_update_script(id, name, script, user, parameters, resources, hadoopProperties, is_design=True):
+def create_or_update_script(id, name, script, user, parameters, resources, hadoopProperties, language, is_design=True):
   try:
     spark_script = SparkScript.objects.get(id=id)
     spark_script.doc.get().can_read_or_exception(user)
@@ -81,7 +81,8 @@ def create_or_update_script(id, name, script, user, parameters, resources, hadoo
       'script': script,
       'parameters': parameters,
       'resources': resources,
-      'hadoopProperties': hadoopProperties
+      'hadoopProperties': hadoopProperties,
+      'language': language,
   })
 
   return spark_script
@@ -103,6 +104,7 @@ def get_scripts(user, is_design=None):
       'parameters': data['parameters'],
       'resources': data['resources'],
       'hadoopProperties': data.get('hadoopProperties', []),
+      'language': data['language'],
       'isDesign': not script.doc.get().is_historic(),
     }
     scripts.append(massaged_script)

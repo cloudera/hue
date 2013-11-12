@@ -113,7 +113,7 @@ ${ commonheader(None, "spark", user) | n,unicode }
           <ul class="nav nav-list">
             <li class="nav-header">${_('Editor')}</li>
             <li data-bind="click: editScript" class="active" data-section="edit">
-              <a href="#"><i class="fa fa-edit"></i><span data-bind="value: currentScript().type"> ${ _('Python') }</span></a>
+              <a href="#"><i class="fa fa-edit"></i> <span data-bind="text: viewModel.currentScript().language" style="text-transform:capitalize"></span></a>
             </li>
             <li data-bind="click: editScriptProperties" data-section="properties">
               <a href="#"><i class="fa fa-reorder"></i> ${ _('Properties') }</a>
@@ -140,6 +140,11 @@ ${ commonheader(None, "spark", user) | n,unicode }
               </a>
             </li>
             <li class="nav-header">${_('File')}</li>
+            <li data-bind="click: confirmNewScript">
+              <a href="#" title="${ _('New script') }" rel="tooltip" data-placement="right">
+                <i class="fa fa-plus-circle"></i> ${ _('New') }
+              </a>
+            </li>
             <li data-bind="visible: currentScript().id() != -1, click: copyScript">
               <a href="#" title="${ _('Copy the script') }" rel="tooltip" data-placement="right">
                 <i class="fa fa-files-o"></i> ${ _('Copy') }
@@ -148,11 +153,6 @@ ${ commonheader(None, "spark", user) | n,unicode }
             <li data-bind="visible: currentScript().id() != -1, click: confirmDeleteScript">
               <a href="#" title="${ _('Delete the script') }" rel="tooltip" data-placement="right">
                 <i class="fa fa-trash-o"></i> ${ _('Delete') }
-              </a>
-            </li>
-            <li data-bind="click: confirmNewScript">
-              <a href="#" title="${ _('New script') }" rel="tooltip" data-placement="right">
-                <i class="fa fa-plus-circle"></i> ${ _('Script') }
               </a>
             </li>
             <li>
@@ -476,6 +476,33 @@ ${ commonheader(None, "spark", user) | n,unicode }
   </div>
 </div>
 
+<div id="newScriptModal" class="modal hide fade">
+  <div class="modal-header">
+    <a href="#" class="close" data-dismiss="modal">&times;</a>
+    <h3>${_('New script')}</h3>
+  </div>
+  <div class="modal-body">
+    <p>
+      ${_('Please select the language of your script:')}<br/><br/>
+      <label>
+        ${ _('Java') } &nbsp;
+        <input type="radio" checked name="languages" value="java" data-bind="checked: currentScript().language" />
+      </label>
+      <label>
+        ${ _('Scala') } &nbsp;
+        <input type="radio" name="languages" value="scala" data-bind="checked: currentScript().language" />
+      </label>
+      <label>
+        ${ _('Python') } &nbsp;
+        <input type="radio" name="languages" value="python" data-bind="checked: currentScript().language" />
+      </label>
+    </p>
+  </div>
+  <div class="modal-footer">
+    <a class="btn" data-dismiss="modal">${_('Cancel')}</a>
+    <button class="btn btn-primary disable-feedback" data-bind="click: createAndEditScript">${_('Create')}</button>
+  </div>
+</div>
 
 <div class="bottomAlert alert"></div>
 
@@ -484,6 +511,7 @@ ${ commonheader(None, "spark", user) | n,unicode }
 <script src="/spark/static/js/spark.ko.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/routie-0.3.0.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/codemirror-3.11.js"></script>
+<script src="/static/js/clike.js"></script>
 <script src="/static/js/codemirror-python.js"></script>
 <script src="/static/js/codemirror-show-hint.js"></script>
 <script src="/static/js/codemirror-pig-hint.js"></script>
@@ -505,7 +533,11 @@ ${ commonheader(None, "spark", user) | n,unicode }
     TOOLTIP_STOP: "${ _('Stop execution.') }",
     SAVED: "${ _('Saved') }",
     NEW_SCRIPT_NAME: "${ _('Unsaved script') }",
-    NEW_SCRIPT_CONTENT: "Example:\nfrom pyspark import SparkContext\n\nsc = SparkContext('local', 'App Name')\n\n\nwords = sc.textFile('/usr/share/dict/words')\nprint words.filter(lambda w: w.startswith('spar')).take(5)",
+    NEW_SCRIPT_CONTENT: {
+      'python': "Example:\nfrom pyspark import SparkContext\n\nsc = SparkContext('local', 'App Name')\n\n\nwords = sc.textFile('/usr/share/dict/words')\nprint words.filter(lambda w: w.startswith('spar')).take(5)",
+      'java': 'Example:\npublic class JavaWordCount {\n  ...\n}',
+      'scala': 'Example:\nval distFile = sc.textFile("data.txt")\nval linesWithSpark = distFile.filter(line => line.contains("Spark"))\nprintln(linesWithSpark)'
+    },
     NEW_SCRIPT_PARAMETERS: [],
     NEW_SCRIPT_RESOURCES: [],
     NEW_SCRIPT_HADOOP_PROPERTIES: []
@@ -628,7 +660,7 @@ ${ commonheader(None, "spark", user) | n,unicode }
       value: scriptEditor.value,
       readOnly: false,
       lineNumbers: true,
-      mode: "text/x-python",
+      mode: "text/x-" + viewModel.currentScript().language(), // TODO update to language dynamically
       extraKeys: {
         "Ctrl-Space": "autocomplete",
         "Ctrl-Enter": function () {
@@ -706,7 +738,7 @@ ${ commonheader(None, "spark", user) | n,unicode }
     }
 
     codeMirror.on("focus", function () {
-      if (codeMirror.getValue() == LABELS.NEW_SCRIPT_CONTENT) {
+      if (codeMirror.getValue() == LABELS.NEW_SCRIPT_CONTENT[viewModel.currentScript().language()]) {
         codeMirror.setValue("");
       }
       if (errorWidget != null) {

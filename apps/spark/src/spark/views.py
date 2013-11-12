@@ -72,6 +72,7 @@ def save(request):
     'parameters': json.loads(request.POST.get('parameters')),
     'resources': json.loads(request.POST.get('resources')),
     'hadoopProperties': json.loads(request.POST.get('hadoopProperties')),
+    'language': json.loads(request.POST.get('language')),
   }
   spark_script = create_or_update_script(**attrs)
   spark_script.is_design = True
@@ -116,6 +117,7 @@ def run(request):
     'parameters': json.loads(request.POST.get('parameters')),
     'resources': json.loads(request.POST.get('resources')),
     'hadoopProperties': json.loads(request.POST.get('hadoopProperties')),
+    'language': json.loads(request.POST.get('language')),
     'is_design': False
   }
 
@@ -150,6 +152,7 @@ def copy(request):
   parameters = existing_script_data["parameters"]
   resources = existing_script_data["resources"]
   hadoopProperties = existing_script_data["hadoopProperties"]
+  language = existing_script_data["language"]
 
   script_copy = SparkScript.objects.create()
   script_copy.update_from_dict({
@@ -157,7 +160,8 @@ def copy(request):
       'script': script,
       'parameters': parameters,
       'resources': resources,
-      'hadoopProperties': hadoopProperties
+      'hadoopProperties': hadoopProperties,
+      'language': language
   })
   script_copy.save()
 
@@ -170,7 +174,8 @@ def copy(request):
     'script': script,
     'parameters': parameters,
     'resources': resources,
-    'hadoopProperties': hadoopProperties
+    'hadoopProperties': hadoopProperties,
+    'language': language
   }
 
   return HttpResponse(json.dumps(response), content_type="text/plain")
