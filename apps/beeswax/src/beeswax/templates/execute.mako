@@ -546,9 +546,11 @@ ${layout.menubar(section='query')}
 
       resetNavigator = function () {
         var _db = $("#id_query-database").val();
-        $.totalStorage('tables_' + _db, null);
-        $.totalStorage('timestamp_tables_' + _db, null);
-        renderNavigator();
+        if (_db != null) {
+          $.totalStorage('tables_' + _db, null);
+          $.totalStorage('timestamp_tables_' + _db, null);
+          renderNavigator();
+        }
       }
 
       renderNavigator = function () {
