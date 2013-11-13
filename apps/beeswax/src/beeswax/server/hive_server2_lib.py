@@ -311,6 +311,8 @@ class HiveServerClient:
       kwargs.update({'username': kerberos_principal_short_name})
 
     if self.impersonation_enabled:
+      kwargs.update({'username': 'hue'})
+
       if self.query_server['server_name'] == 'impala': # Only when Impala accepts it
         kwargs['configuration'].update({'impala.doas.user': user.username})
 
