@@ -69,28 +69,28 @@ ${layout.menubar(section='query')}
             <div class="sidebar-nav">
                 <ul class="nav nav-list">
                     <li><a id="collapse" class="btn btn-small"><i class="fa fa-chevron-left" rel="tooltip" title="${_('Collapse this panel')}"></i></a></li>
-                    % if download_urls:
-                    <li class="nav-header">${_('Results')}</li>
-                    <li><a target="_blank" href="${download_urls["csv"]}"><i class="fa fa-arrow-circle-o-down"></i> ${_('Download as CSV')}</a></li>
-                    <li><a target="_blank" href="${download_urls["xls"]}"><i class="fa fa-arrow-circle-o-down"></i> ${_('Download as XLS')}</a></li>
+                    % if download_urls and download:
+                      <li class="nav-header">${_('Results')}</li>
+                      <li><a target="_blank" href="${download_urls["csv"]}"><i class="fa fa-arrow-circle-o-down"></i> ${_('Download as CSV')}</a></li>
+                      <li><a target="_blank" href="${download_urls["xls"]}"><i class="fa fa-arrow-circle-o-down"></i> ${_('Download as XLS')}</a></li>
                     % endif
-                    %if can_save:
-                    <li><a data-toggle="modal" href="#saveAs"><i class="fa fa-floppy-o"></i> ${_('Save')}</a></li>
+                    % if can_save and download:
+                      <li><a data-toggle="modal" href="#saveAs"><i class="fa fa-floppy-o"></i> ${_('Save')}</a></li>
                     % endif
                     % if app_name != 'impala':
-                    <%
-                      n_jobs = hadoop_jobs and len(hadoop_jobs) or 0
-                      mr_jobs = (n_jobs == 1) and _('MapReduce Job') or _('MapReduce Jobs')
-                    %>
-                     % if n_jobs > 0:
+                      <%
+                        n_jobs = hadoop_jobs and len(hadoop_jobs) or 0
+                        mr_jobs = (n_jobs == 1) and _('MapReduce Job') or _('MapReduce Jobs')
+                      %>
+                      % if n_jobs > 0:
                         <li class="nav-header">${mr_jobs} (${n_jobs})</li>
                         % for jobid in hadoop_jobs:
-                            <li><a href="${url("jobbrowser.views.single_job", job=jobid.replace('application', 'job'))}">${ jobid.replace("application_", "") }</a></li>
+                          <li><a href="${url("jobbrowser.views.single_job", job=jobid.replace('application', 'job'))}">${ jobid.replace("application_", "") }</a></li>
                         % endfor
-                    % else:
+                      % else:
                         <li class="nav-header">${mr_jobs}</li>
                         <li class="white">${_('No Hadoop jobs were launched in running this query.')}</li>
-                    % endif
+                      % endif
                     % endif
                 </ul>
             </div>
@@ -222,7 +222,7 @@ ${layout.menubar(section='query')}
     </div>
 </div>
 
-%if can_save:
+% if can_save:
 ## duplication from save_results.mako
 <div id="saveAs" class="modal hide fade">
   <form id="saveForm" action="${url(app_name + ':save_results', query.id) }" method="POST"
@@ -265,7 +265,7 @@ ${layout.menubar(section='query')}
     </div>
   </form>
 </div>
-%endif.resultTable
+% endif.resultTable
 
 
 <script type="text/javascript" charset="utf-8">
@@ -393,7 +393,7 @@ $(document).ready(function () {
     $("#log pre").css("overflow", "auto").height($(window).height() - $("#log pre").position().top - 40);
   }
 
-  % if app_name == 'impala':
+  % if app_name == 'impala' and query.is_finished():
     % if not download:
       $("#collapse").click();
       $(".sidebar-nav, #expand").hide();

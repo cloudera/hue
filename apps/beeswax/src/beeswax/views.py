@@ -87,7 +87,7 @@ def save_design(request, form, type_, design, explicit_save):
     raise ValueError(_('Invalid design type %(type)s') % {'type': type_})
 
   old_design = design
-  design_obj = design_cls(form)
+  design_obj = design_cls(form, query_type=type_)
   new_data = design_obj.dumps()
 
   # Auto save if (1) the user didn't click "save", and (2) the data is different.
@@ -481,7 +481,7 @@ def watch_query(request, id):
 
   All other GET params will be passed to on_success_url (if present).
   """
-  # Coerce types; manage arguments
+  # Coerce types: manage arguments
   query_history = authorized_get_history(request, id, must_exist=True)
   db = dbms.get(request.user, query_history.get_query_server_config())
 
@@ -635,7 +635,7 @@ def view_results(request, id, first_row=0):
   query_context = parse_query_context(context_param)
 
   # To remove when Impala has start_over support
-  download  = request.GET.get('download', '')
+  download = request.GET.get('download', '') or app_name != 'impala'
 
   # Update the status as expired should not be accessible
   # Impala does not support startover for now
@@ -648,15 +648,13 @@ def view_results(request, id, first_row=0):
   try:
     if query_server['server_name'] == 'impala' and not handle.has_result_set:
       downloadable = False
-    elif not download:
+    else:
       results = db.fetch(handle, start_over, 100)
       data = list(results.rows()) # Materialize results
 
       # We display the "Download" button only when we know that there are results:
       downloadable = first_row > 0 or data
       log = db.get_log(handle)
-    else:
-      downloadable = True
 
   except Exception, ex:
     fetch_error = True
@@ -700,7 +698,7 @@ def view_results(request, id, first_row=0):
       'columns': results.columns,
       'download_urls': download_urls,
       'save_form': save_form,
-      'can_save': query_history.owner == request.user and not download,
+      'can_save': query_history.owner == request.user,
       'next_json_set': reverse(get_app_name(request) + ':view_results', kwargs={
         'id': str(id),
         'first_row': results.start_row + len(data)
