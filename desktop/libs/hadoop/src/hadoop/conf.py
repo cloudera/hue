@@ -73,14 +73,6 @@ HDFS_CLUSTERS = UnspecifiedConfigSection(
   each=ConfigSection(
     help="Information about a single HDFS cluster",
     members=dict(
-      # Deprecated
-      NN_HOST=Config("namenode_host", help="Host/IP for name node"),
-
-      NN_THRIFT_PORT=Config("thrift_port", help="Thrift port for name node", default=10090,
-                            type=int),
-      NN_HDFS_PORT=Config("hdfs_port", help="Hadoop IPC port for the name node", default=8020,
-                            type=int),
-      # End deprecation
       FS_DEFAULTFS=Config("fs_defaultfs", help="The equivalent of fs.defaultFS (aka fs.default.name)",
                           default="hdfs://localhost:8020"),
       LOGICAL_NAME = Config("logical_name", default="",
@@ -88,7 +80,7 @@ HDFS_CLUSTERS = UnspecifiedConfigSection(
       WEBHDFS_URL=Config("webhdfs_url",
                          help="The URL to WebHDFS/HttpFS service. Defaults to " +
                          "the WebHDFS URL on the NameNode.",
-                         type=str, default=None),
+                         type=str, default="http://localhost:50070/webhdfs/v1"),
       NN_KERBEROS_PRINCIPAL=Config("nn_kerberos_principal", help="Kerberos principal for NameNode",
                                    default="hdfs", type=str),
       DN_KERBEROS_PRINCIPAL=Config("dn_kerberos_principal", help="Kerberos principal for DataNode",
