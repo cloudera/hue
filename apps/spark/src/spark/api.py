@@ -135,14 +135,14 @@ cd %(spark_home)s
     return spark_params
 
   def stop(self, job_id):
-    return get_oozie().job_control(job_id, 'kill')
+    return get_oozie(self.user).job_control(job_id, 'kill')
 
   def get_jobs(self):
     kwargs = {'cnt': OozieSparkApi.MAX_DASHBOARD_JOBS,}
     kwargs['user'] = self.user.username
     kwargs['name'] = OozieSparkApi.WORKFLOW_NAME
 
-    return get_oozie().get_workflows(**kwargs).jobs
+    return get_oozie(self.user).get_workflows(**kwargs).jobs
 
   def get_log(self, request, oozie_workflow):
     logs = {}
@@ -211,7 +211,7 @@ cd %(spark_home)s
 
     for job in oozie_jobs:
       if job.is_running():
-        job = get_oozie().get_job(job.id)
+        job = get_oozie(self.user).get_job(job.id)
         get_copy = request.GET.copy() # Hacky, would need to refactor JobBrowser get logs
         get_copy['format'] = 'python'
         request.GET = get_copy

@@ -190,7 +190,7 @@ class OozieServerProvider(object):
         status = None
         try:
           LOG.info('Check Oozie status...')
-          status = get_oozie().get_oozie_status()
+          status = get_oozie(cluster.superuser).get_oozie_status()
           if status['systemMode'] == 'NORMAL':
             started = True
             break
@@ -214,12 +214,15 @@ class OozieServerProvider(object):
 
     _oozie_lock.release()
 
-    return get_oozie(), callback
+    cluster = pseudo_hdfs4.shared_cluster()
+    return get_oozie(cluster.superuser), callback
 
 
 class TestMiniOozie(OozieServerProvider):
 
   def test_oozie_status(self):
-    assert_equal(get_oozie().get_oozie_status()['systemMode'], 'NORMAL')
+    user = getpass.getuser()
 
-    assert_true(self.cluster.fs.exists('/user/%(user)s/share/lib' % {'user': getpass.getuser()}))
+    assert_equal(get_oozie(user).get_oozie_status()['systemMode'], 'NORMAL')
+
+    assert_true(self.cluster.fs.exists('/user/%(user)s/share/lib' % {'user': user}))

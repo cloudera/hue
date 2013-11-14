@@ -110,7 +110,7 @@
     </p>
   % endif
   % if node_type == 'java':
-    % if get_oozie().security_enabled:
+    % if get_oozie(user).security_enabled:
     <br style="clear: both" />
       <p class="alert alert-warn span5">
         ${ _('The delegation token needs to be propagated from the launcher job to the MR job') }.

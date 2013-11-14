@@ -45,6 +45,7 @@ class Submission(object):
     self.fs = fs
     self.jt = jt
     self.oozie_id = oozie_id
+    self.api = get_oozie(self.user)
 
     if properties is not None:
       self.properties = properties
@@ -72,40 +73,32 @@ class Submission(object):
 
     deployment_dir = self.deploy()
 
-    try:
-      prev = get_oozie().setuser(self.user.username)
-      self._update_properties(jobtracker, deployment_dir)
-      self.oozie_id = get_oozie().submit_job(self.properties)
-      LOG.info("Submitted: %s" % (self,))
+    self._update_properties(jobtracker, deployment_dir)
+    self.oozie_id = self.api.submit_job(self.properties)
+    LOG.info("Submitted: %s" % (self,))
 
-      if self.job.get_type() == 'workflow':
-        get_oozie().job_control(self.oozie_id, 'start')
-        LOG.info("Started: %s" % (self,))
-    finally:
-      get_oozie().setuser(prev)
+    if self.job.get_type() == 'workflow':
+      self.api.job_control(self.oozie_id, 'start')
+      LOG.info("Started: %s" % (self,))
 
     return self.oozie_id
 
   def rerun(self, deployment_dir, fail_nodes=None, skip_nodes=None):
     jobtracker = cluster.get_cluster_addr_for_job_submission()
 
-    try:
-      prev = get_oozie().setuser(self.user.username)
-      self._update_properties(jobtracker, deployment_dir)
-      self.properties.update({'oozie.wf.application.path': deployment_dir})
+    self._update_properties(jobtracker, deployment_dir)
+    self.properties.update({'oozie.wf.application.path': deployment_dir})
 
-      if fail_nodes:
-        self.properties.update({'oozie.wf.rerun.failnodes': fail_nodes})
-      elif not skip_nodes:
-        self.properties.update({'oozie.wf.rerun.failnodes': 'false'}) # Case empty 'skip_nodes' list
-      else:
-        self.properties.update({'oozie.wf.rerun.skip.nodes': skip_nodes})
+    if fail_nodes:
+      self.properties.update({'oozie.wf.rerun.failnodes': fail_nodes})
+    elif not skip_nodes:
+      self.properties.update({'oozie.wf.rerun.failnodes': 'false'}) # Case empty 'skip_nodes' list
+    else:
+      self.properties.update({'oozie.wf.rerun.skip.nodes': skip_nodes})
 
-      get_oozie().rerun(self.oozie_id, properties=self.properties)
+    self.api.rerun(self.oozie_id, properties=self.properties)
 
-      LOG.info("Rerun: %s" % (self,))
-    finally:
-      get_oozie().setuser(prev)
+    LOG.info("Rerun: %s" % (self,))
 
     return self.oozie_id
 
@@ -113,15 +106,11 @@ class Submission(object):
   def rerun_coord(self, deployment_dir, params):
     jobtracker = cluster.get_cluster_addr_for_job_submission()
 
-    try:
-      prev = get_oozie().setuser(self.user.username)
-      self._update_properties(jobtracker, deployment_dir)
-      self.properties.update({'oozie.coord.application.path': deployment_dir})
+    self._update_properties(jobtracker, deployment_dir)
+    self.properties.update({'oozie.coord.application.path': deployment_dir})
 
-      get_oozie().job_control(self.oozie_id, action='coord-rerun', properties=self.properties, parameters=params)
-      LOG.info("Rerun: %s" % (self,))
-    finally:
-      get_oozie().setuser(prev)
+    self.api.job_control(self.oozie_id, action='coord-rerun', properties=self.properties, parameters=params)
+    LOG.info("Rerun: %s" % (self,))
 
     return self.oozie_id
 
@@ -129,14 +118,10 @@ class Submission(object):
   def rerun_bundle(self, deployment_dir, params):
     jobtracker = cluster.get_cluster_addr_for_job_submission()
 
-    try:
-      prev = get_oozie().setuser(self.user.username)
-      self._update_properties(jobtracker, deployment_dir)
-      self.properties.update({'oozie.bundle.application.path': deployment_dir})
-      get_oozie().job_control(self.oozie_id, action='bundle-rerun', properties=self.properties, parameters=params)
-      LOG.info("Rerun: %s" % (self,))
-    finally:
-      get_oozie().setuser(prev)
+    self._update_properties(jobtracker, deployment_dir)
+    self.properties.update({'oozie.bundle.application.path': deployment_dir})
+    self.api.job_control(self.oozie_id, action='bundle-rerun', properties=self.properties, parameters=params)
+    LOG.info("Rerun: %s" % (self,))
 
     return self.oozie_id
 

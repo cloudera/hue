@@ -39,14 +39,15 @@ REMOTE_DEPLOYMENT_DIR = Config(
   default="/user/hue/oozie/deployments",
   help=_t("Location on HDFS where the workflows/coordinators are deployed when submitted by a non-owner."))
 
-def get_oozie_status():
+
+def get_oozie_status(user):
   from liboozie.oozie_api import get_oozie
 
   status = 'down'
 
   try:
     if not 'test' in sys.argv: # Avoid tests hanging
-      status = str(get_oozie().get_oozie_status())
+      status = str(get_oozie(user).get_oozie_status())
   except:
     pass
 
@@ -62,7 +63,7 @@ def config_validator(user):
 
   res = []
 
-  status = get_oozie_status()
+  status = get_oozie_status(user)
   if 'NORMAL' not in status:
     res.append((status, _('The Oozie server is not available')))
 

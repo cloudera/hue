@@ -58,7 +58,7 @@ OOZIE_JOBS_COUNT = Config(
 def config_validator(user):
   res = []
 
-  status = get_oozie_status()
+  status = get_oozie_status(user)
 
   if 'NORMAL' not in status:
     res.append((NICE_NAME, _("The app won't work without a running Oozie server")))
