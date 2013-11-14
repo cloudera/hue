@@ -22,6 +22,7 @@
 
 import errno
 import logging
+import json
 import mimetypes
 import operator
 import posixpath
@@ -29,11 +30,6 @@ import re
 import shutil
 import stat as stat_module
 import os
-
-try:
-  import json
-except ImportError:
-  import simplejson as json
 
 from datetime import datetime
 
@@ -65,7 +61,6 @@ from filebrowser.lib import xxd
 from filebrowser.forms import RenameForm, UploadFileForm, UploadArchiveForm, MkDirForm, EditorForm, TouchForm,\
                               RenameFormSet, RmTreeFormSet, ChmodFormSet, ChownFormSet, CopyFormSet, RestoreFormSet,\
                               TrashPurgeForm
-from hadoop.core_site import get_trash_interval
 from hadoop.fs.hadoopfs import Hdfs
 from hadoop.fs.exceptions import WebHdfsException
 
@@ -425,8 +420,6 @@ def listdir_paged(request, path):
     if not request.fs.isdir(path):
         raise PopupException("Not a directory: %s" % (path,))
 
-    trash_enabled = get_trash_interval()
-
     pagenum = int(request.GET.get('pagenum', 1))
     pagesize = int(request.GET.get('pagesize', 30))
 
@@ -488,7 +481,6 @@ def listdir_paged(request, path):
         'page': _massage_page(page),
         'pagesize': pagesize,
         'home_directory': request.fs.isdir(home_dir_path) and home_dir_path or None,
-        'trash_enabled': trash_enabled,
         'sortby': sortby,
         'descending': descending_param,
         # The following should probably be deprecated

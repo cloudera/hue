@@ -439,7 +439,7 @@ class PseudoHdfs4(object):
     yarn_configs = {
       'yarn.resourcemanager.resource-tracker.address': '%s:%s' % (self._fqdn, self._rm_resource_port,),
       'yarn.resourcemanager.address': '%s:%s' % (self._fqdn, self._rm_port,),
-      'yarn.resourcemanager.scheduler.address': '%s:%s' % (self._fqdn, 8030,), #self._rm_scheduler_port # /!\ Hardcoded for now
+      'yarn.resourcemanager.scheduler.address': '%s:%s' % (self._fqdn, self._rm_scheduler_port,),
       'yarn.resourcemanager.scheduler.class': 'org.apache.hadoop.yarn.server.resourcemanager.scheduler.fair.FairScheduler',
       'yarn.resourcemanager.admin.address': '%s:%s' % (self._fqdn, self._rm_admin_port,),
       'yarn.resourcemanager.webapp.address': '%s:%s' % (self._fqdn, self._rm_webapp_port,),
@@ -515,9 +515,7 @@ def shared_cluster():
     closers = [
       hadoop.conf.HDFS_CLUSTERS['default'].FS_DEFAULTFS.set_for_testing(cluster.fs_default_name),
       hadoop.conf.HDFS_CLUSTERS['default'].WEBHDFS_URL.set_for_testing(webhdfs_url),
-      hadoop.conf.HDFS_CLUSTERS['default'].HADOOP_CONF_DIR.set_for_testing(cluster.hadoop_conf_dir),
 
-      hadoop.conf.YARN_CLUSTERS['default'].HADOOP_CONF_DIR.set_for_testing(cluster.hadoop_conf_dir),
       hadoop.conf.YARN_CLUSTERS['default'].HOST.set_for_testing(fqdn),
       hadoop.conf.YARN_CLUSTERS['default'].PORT.set_for_testing(cluster._rm_port),
 

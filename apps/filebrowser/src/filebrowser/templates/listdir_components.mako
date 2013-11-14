@@ -771,15 +771,6 @@ from django.utils.translation import ugettext as _
         $("#editBreadcrumb").show();
       });
 
-      % if not trash_enabled and is_superuser:
-        $("#trash-help").popover({
-            'title': "${_('Did you know?')}",
-            'content': '${_('You can activate HDFS trash by setting fs.trash.interval in core-site.xml.')}',
-            'trigger': 'hover',
-            'html': true,
-            'placement': 'left'
-        });
-      % endif
       $.ajaxSetup({
         error:function (x, e) {
           if (x.status == 500) {
@@ -916,7 +907,6 @@ from django.utils.translation import ugettext as _
       self.recordsPerPage = ko.observable($.cookie("hueFilebrowserRecordsPerPage"));
       self.targetPageNum = ko.observable(1);
       self.targetPath = ko.observable("${current_request_path}");
-      self.trashEnabled = ko.observable(${ trash_enabled and "true" or "false" });
 
       self.sortBy = ko.observable("name");
       self.sortDescending = ko.observable(false);
@@ -969,11 +959,11 @@ from django.utils.translation import ugettext as _
       self.currentPath = ko.observable(currentDirPath);
 
       self.inTrash = ko.computed(function() {
-        return self.currentPath().match(/^\/user\/.+?\/\.Trash/) && self.trashEnabled();
+        return self.currentPath().match(/^\/user\/.+?\/\.Trash/);
       });
 
       self.inRestorableTrash = ko.computed(function() {
-        return self.currentPath().match(/^\/user\/.+?\/\.Trash\/.+?/) && self.trashEnabled();
+        return self.currentPath().match(/^\/user\/.+?\/\.Trash\/.+?/);
       });
 
       self.getStats = function (callback) {

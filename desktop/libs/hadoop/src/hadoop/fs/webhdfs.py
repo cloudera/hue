@@ -282,7 +282,7 @@ class WebHdfs(Hdfs):
 
   def remove(self, path, skip_trash=False):
     """Delete a file."""
-    if hadoop.core_site.get_trash_interval() is None or skip_trash:
+    if skip_trash:
       self._delete(path, recursive=False)
     else:
       self._trash(path, recursive=False)
@@ -293,7 +293,7 @@ class WebHdfs(Hdfs):
 
   def rmtree(self, path, skip_trash=False):
     """Delete a tree recursively."""
-    if hadoop.core_site.get_trash_interval() is None or skip_trash:
+    if skip_trash:
       self._delete(path, recursive=True)
     else:
       self._trash(path, recursive=True)
@@ -306,9 +306,6 @@ class WebHdfs(Hdfs):
     Removing the root from ``path`` will provide the original path.
     Ensure parent directories exist and rename path.
     """
-    if hadoop.core_site.get_trash_interval() is None:
-      raise IOError(errno.EPERM, _("Trash is not enabled."))
-
     if not path.startswith(self.trash_path):
       raise IOError(errno.EPERM, _("File %s is not in trash") % path)
 
@@ -333,9 +330,6 @@ class WebHdfs(Hdfs):
 
     Purge all trash in users ``trash_path``
     """
-    if hadoop.core_site.get_trash_interval() is None:
-      raise IOError(errno.EPERM, _("Trash is not enabled."))
-
     for timestamped_directory in self.listdir(self.trash_path):
       self.rmtree(self.join(self.trash_path, timestamped_directory), True)
 
@@ -782,7 +776,7 @@ def test_fs_configuration(fs_config):
             _('Failed to create temporary file "%s"') % tmpname)]
 
   # Check superuser has super power
-  try:  # Finally: delete tmpname
+  try:
     try:
       fs.chown(tmpname, fs.superuser)
     except Exception, ex:

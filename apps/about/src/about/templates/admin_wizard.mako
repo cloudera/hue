@@ -30,15 +30,15 @@ ${ header.menubar() }
         % if user.is_superuser:
           ${ _('Quick Start Wizard') } -
         % endif
-        Hue&trade; ${version} - The Hadoop UI
+        Hue&trade; ${version} - <a href="http://gethue.com" target="_blank" style="color:#777" title="${ _('Visit the project website!') }">The Hadoop UI</a>
       </h2>
 
      % if user.is_superuser:
 
       <div class="card-body">
-            <br/>
+        <br/>
 
-          <div class="row-fluid">
+         <div class="row-fluid">
           <div id="properties" class="section">
             <ul class="nav nav-tabs" style="margin-bottom: 0">
               <li class="active"><a href="#step1" class="step">${ _('Step 1:') } <i
@@ -62,23 +62,6 @@ ${ header.menubar() }
               </div>
             </div>
 
-          <div class="card card-home card-tab card-tab-bordertop">
-            <h2 class="card-heading simple">${ _('HDFS Trash Configuration') }</h2>
-          <div class="card-body">
-          <p>
-            % if trash_enabled:
-            <h5>${ _('Trash is active.')}</h5>
-            % else:
-            ${ _('You can activate trash collection by setting fs.trash.interval in core-site.xml:')}<br/><br/>
-            <pre>
-  &#60;property&#62;
-    &#60;name&#62;fs.trash.interval&#60;/name&#62;
-    &#60;value&#62;10060&#60;/value&#62;
-  &#60;/property&#62;</pre>
-            % endif
-          </p>
-          </div>
-          </div>
           </div>
 
           <div id="step2" class="stepDetails hide">

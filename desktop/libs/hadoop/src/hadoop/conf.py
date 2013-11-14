@@ -16,7 +16,7 @@
 # limitations under the License.
 
 from django.utils.translation import ugettext_lazy as _t
-from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, validate_path, coerce_bool
+from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_bool
 import fnmatch
 import logging
 import os
@@ -39,26 +39,6 @@ def find_file_recursive(desired_glob, root):
   f.__doc__ = "Finds %s/%s" % (root, desired_glob)
   return f
 
-HADOOP_PLUGIN_CLASSPATH = Config("hadoop_plugin_classpath",
-  help="[Used only in testing code.] Path to the Hadoop plugin jar.",
-  type=str,
-  dynamic_default=find_file_recursive("hue-plugins-*.jar",
-                root=os.path.join(os.path.dirname(__file__), '..', '..', 'java-lib')),
-  private=True)
-
-SUDO_SHELL_JAR = Config("hadoop_sudo_shell_jar",
-  help="Tool that allows a proxy user UGI to be used to upload files.",
-  type=str,
-  dynamic_default=find_file_recursive("sudo-shell-*.jar",
-                root=os.path.join(os.path.dirname(__file__), '..', '..', 'sudo-shell', 'java-lib')),
-  private=True)
-
-CREDENTIALS_MERGER_JAR = Config("hadoop_credentials_merger_jar",
-  help="Tool that is capable of merging multiple files containing delegation tokens into one.",
-  type=str,
-  dynamic_default=find_file_recursive("credentials-merger-*.jar",
-                root=os.path.join(os.path.dirname(__file__), '..', '..', 'credentials-merger', 'java-lib')),
-  private=True)
 
 UPLOAD_CHUNK_SIZE = Config(
   key="upload_chunk_size",
@@ -89,31 +69,6 @@ HDFS_CLUSTERS = UnspecifiedConfigSection(
                               default=False, type=coerce_bool),
       TEMP_DIR=Config("temp_dir", help="HDFS directory for temporary files",
                       default='/tmp', type=str),
-
-      HADOOP_HDFS_HOME = Config(
-        key="hadoop_hdfs_home",
-        default=os.environ.get("HADOOP_HDFS_HOME", "/usr/lib/hadoop-hdfs"),
-        help=("Path to Hadoop HDFS home - HADOOP_HOME or HADOOP_HDFS_HOME in " +
-              "hadoop parlance. For tarball installations, it is the root of " +
-              "the untarred directory. For packages, " +
-              "it is /usr/lib/hadoop-hdfs." +
-              "Defaults to the environment varible HADOOP_BIN when set, " +
-              "or '/usr/bin/hadoop'."),
-      ),
-      HADOOP_BIN = Config(
-        key="hadoop_bin",
-        default=os.environ.get("HADOOP_BIN", "/usr/bin/hadoop"),
-        help=("Path to your Hadoop launcher script. E.g. /usr/bin/hadoop. " +
-              "Defaults to the environment varible HADOOP_BIN when set, " +
-              "or '/usr/bin/hadoop'.")
-      ),
-      HADOOP_CONF_DIR = Config(
-        key="hadoop_conf_dir",
-        default=os.environ.get("HADOOP_CONF_DIR", "/etc/hadoop/conf"),
-        help=("Directory to pass to hadoop_bin (from Hadoop configuration) " +
-              "as the --config flag. Defaults to the environment variable " +
-              "HADOOP_CONF_DIR when set, or '/etc/hadoop/conf'.")
-      ),
     )
   )
 )
@@ -140,29 +95,7 @@ MR_CLUSTERS = UnspecifiedConfigSection(
       SECURITY_ENABLED=Config("security_enabled", help="Is running with Kerberos authentication",
                               default=False, type=coerce_bool),
       SUBMIT_TO=Config('submit_to', help="Whether Hue should use this cluster to run jobs",
-                       default=True, type=coerce_bool), # Backward compatibility
-
-      HADOOP_MAPRED_HOME = Config(
-        key="hadoop_mapred_home",
-        default=os.environ.get("HADOOP_MR1_HOME", "/usr/lib/hadoop-0.20-mapreduce"),
-        help=("Path to directory holding Hadoop MR1 libs. " +
-              "E.g. /usr/lib/hadoop. Defaults to the environment variable " +
-              "HADOOP_MR1_HOME when set, or '/usr/lib/hadoop'.")
-      ),
-      HADOOP_BIN = Config(
-        key="hadoop_bin",
-        default=os.environ.get("HADOOP_MR1_BIN", "/usr/bin/hadoop"),
-        help=("Path to your Hadoop launcher script. E.g. /usr/bin/hadoop. " +
-              "Defaults to the environment varible HADOOP_MR1_BIN when set, " +
-              "or '/usr/bin/hadoop'.")
-      ),
-      HADOOP_CONF_DIR = Config(
-        key="hadoop_conf_dir",
-        default=os.environ.get("HADOOP_CONF_DIR", "/etc/hadoop/conf"),
-        help=("Directory to pass to hadoop_bin (from Hadoop configuration) " +
-              "as the --config flag. Defaults to the environment variable " +
-              "HADOOP_CONF_DIR when set, or '/etc/hadoop/conf'.")
-      ),
+                       default=True, type=coerce_bool), # True here for backward compatibility
     )
   )
 )
@@ -184,29 +117,7 @@ YARN_CLUSTERS = UnspecifiedConfigSection(
       SECURITY_ENABLED=Config("security_enabled", help="Is running with Kerberos authentication",
                               default=False, type=coerce_bool),
       SUBMIT_TO=Config('submit_to', help="Whether Hue should use this cluster to run jobs",
-                       default=False, type=coerce_bool), # Backward compatibility
-
-      HADOOP_MAPRED_HOME = Config(
-        key="hadoop_mapred_home",
-        default=os.environ.get("HADOOP_MR2_HOME", "/usr/lib/hadoop-mapreduce"),
-        help=("Path to directory holding Hadoop MR2 libs. " +
-              "E.g. /usr/lib/hadoop. Defaults to the environment " +
-              "variable HADOOP_MR2_HOME when set, or '/usr/lib/hadoop'.")
-      ),
-      HADOOP_BIN = Config(
-        key="hadoop_bin",
-        default=os.environ.get("HADOOP_MR2_BIN", "/usr/bin/hadoop"),
-        help=("Path to your Hadoop launcher script. E.g. /usr/bin/hadoop. " +
-              "Defaults to the environment varible HADOOP_MR2_BIN when set, " +
-              "or '/usr/bin/hadoop'.")
-      ),
-      HADOOP_CONF_DIR = Config(
-        key="hadoop_conf_dir",
-        default=os.environ.get("HADOOP_CONF_DIR", "/etc/hadoop/conf"),
-        help=("Directory to pass to hadoop_bin (from Hadoop configuration) " +
-              "as the --config flag. Defaults to the environment variable " +
-              "HADOOP_CONF_DIR when set, or '/etc/hadoop/conf'.")
-      ),
+                       default=False, type=coerce_bool), # False here for backward compatibility
       IS_YARN=Config("is_yarn", help="Attribute set only on YARN clusters and not MR1 ones.",
                      default=True, type=coerce_bool),
       RESOURCE_MANAGER_API_URL=Config("resourcemanager_api_url",
@@ -231,6 +142,8 @@ def config_validator(user):
   """
   from hadoop.fs import webhdfs
   from hadoop import job_tracker
+  from hadoop.yarn import tests
+
   res = []
   submit_to = []
 
@@ -238,9 +151,6 @@ def config_validator(user):
   has_default = False
   for name in HDFS_CLUSTERS.keys():
     cluster = HDFS_CLUSTERS[name]
-    res.extend(validate_path(cluster.HADOOP_HDFS_HOME, is_dir=True))
-    res.extend(validate_path(cluster.HADOOP_CONF_DIR, is_dir=True))
-    res.extend(validate_path(cluster.HADOOP_BIN, is_dir=False))
     res.extend(webhdfs.test_fs_configuration(cluster))
     if name == 'default':
       has_default = True
@@ -252,9 +162,6 @@ def config_validator(user):
   for name in MR_CLUSTERS.keys():
     cluster = MR_CLUSTERS[name]
     if cluster.SUBMIT_TO.get():
-      res.extend(validate_path(cluster.HADOOP_MAPRED_HOME, is_dir=True))
-      res.extend(validate_path(cluster.HADOOP_CONF_DIR, is_dir=True))
-      res.extend(validate_path(cluster.HADOOP_BIN, is_dir=False))
       mr_down.extend(job_tracker.test_jt_configuration(cluster))
       submit_to.append('mapred_clusters.' + name)
   # If HA still failing
@@ -265,9 +172,7 @@ def config_validator(user):
   for name in YARN_CLUSTERS.keys():
     cluster = YARN_CLUSTERS[name]
     if cluster.SUBMIT_TO.get():
-      res.extend(validate_path(cluster.HADOOP_MAPRED_HOME, is_dir=True))
-      res.extend(validate_path(cluster.HADOOP_CONF_DIR, is_dir=True))
-      res.extend(validate_path(cluster.HADOOP_BIN, is_dir=False))
+      res.extend(tests.test_yarn_configurations())
       submit_to.append('yarn_clusters.' + name)
 
   if not submit_to:

@@ -58,7 +58,6 @@ ${ fb_components.menubar() }
             <button class="btn fileToolbarBtn" title="${_('Download')}" data-bind="visible: !inTrash(), click: downloadFile, enable: selectedFiles().length == 1 && selectedFile().type == 'file'"><i class="fa fa-arrow-circle-o-down"></i> ${_('Download')}</button>
             <button class="btn fileToolbarBtn" title="${_('Restore from trash')}" data-bind="visible: inRestorableTrash(), click: restoreTrashSelected, enable: selectedFiles().length > 0"><i class="fa fa-cloud-upload"></i> ${_('Restore')}</button>
             <!-- ko ifnot: inTrash -->
-              <!-- ko if: trashEnabled -->
                 <div id="delete-dropdown" class="btn-group" style="vertical-align: middle">
                   <button id="trash-btn" class="btn toolbarBtn" data-bind="enable: selectedFiles().length > 0, click: trashSelected"><i class="fa fa-times"></i> ${_('Move to trash')}</button>
                   <button id="trash-btn-caret" class="btn toolbarBtn dropdown-toggle" data-toggle="dropdown" data-bind="enable: selectedFiles().length > 0">
@@ -68,10 +67,6 @@ ${ fb_components.menubar() }
                     <li><a href="#" class="delete-link" title="${_('Delete forever')}" data-bind="enable: selectedFiles().length > 0, click: deleteSelected"><i class="fa fa-bolt"></i> ${_('Delete forever')}</a></li>
                   </ul>
                 </div>
-              <!-- /ko -->
-            <!-- /ko -->
-            <!-- ko ifnot: trashEnabled -->
-              <button class="btn fileToolbarBtn delete-link" title="${_('Delete forever')}" data-bind="enable: selectedFiles().length > 0, click: deleteSelected"><i class="fa fa-bolt"></i> ${_('Delete forever')}</button>
             <!-- /ko -->
             <button class="btn fileToolbarBtn" title="${_('Submit')}"
               data-bind="visible: selectedFiles().length == 1 && $.inArray(selectedFile().name, ['workflow.xml', 'coordinator.xml', 'bundle.xml']) > -1, click: submitSelected">
