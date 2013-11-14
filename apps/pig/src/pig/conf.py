@@ -42,7 +42,7 @@ def config_validator(user):
   res = []
 
   if not 'test' in sys.argv: # Avoid tests hanging
-    status = get_oozie_status()
+    status = get_oozie_status(user)
 
     if 'NORMAL' not in status:
       res.append((NICE_NAME, _("The app won't work without a running Oozie server")))

@@ -73,6 +73,10 @@ ${ fb_components.menubar() }
             <!-- ko ifnot: trashEnabled -->
               <button class="btn fileToolbarBtn delete-link" title="${_('Delete forever')}" data-bind="enable: selectedFiles().length > 0, click: deleteSelected"><i class="fa fa-bolt"></i> ${_('Delete forever')}</button>
             <!-- /ko -->
+            <button class="btn fileToolbarBtn" title="${_('Submit')}"
+              data-bind="visible: selectedFiles().length == 1 && $.inArray(selectedFile().name, ['workflow.xml', 'coordinator.xml', 'bundle.xml']) > -1, click: submitSelected">
+              <i class="fa fa-play"></i> ${_('Submit')}
+            </button>
           </div>
         </%def>
 

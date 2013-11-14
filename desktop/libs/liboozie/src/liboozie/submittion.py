@@ -17,6 +17,7 @@
 
 import errno
 import logging
+import os
 import time
 
 from django.utils.translation import ugettext as _
@@ -27,6 +28,7 @@ from hadoop.fs.hadoopfs import Hdfs
 
 from liboozie.oozie_api import get_oozie
 from liboozie.conf import REMOTE_DEPLOYMENT_DIR
+from jobsub.parameterization import find_variables
 
 LOG = logging.getLogger(__name__)
 
@@ -61,7 +63,7 @@ class Submission(object):
       res += " -- " + self.oozie_id
     return res
 
-  def run(self):
+  def run(self, deployment_dir=None):
     """
     Take care of all the actions of submitting a Oozie workflow.
     Returns the oozie job id if all goes well.
@@ -71,13 +73,14 @@ class Submission(object):
 
     jobtracker = cluster.get_cluster_addr_for_job_submission()
 
-    deployment_dir = self.deploy()
+    if deployment_dir is None:
+      deployment_dir = self.deploy()
 
     self._update_properties(jobtracker, deployment_dir)
     self.oozie_id = self.api.submit_job(self.properties)
     LOG.info("Submitted: %s" % (self,))
 
-    if self.job.get_type() == 'workflow':
+    if self._is_workflow():
       self.api.job_control(self.oozie_id, 'start')
       LOG.info("Started: %s" % (self,))
 
@@ -147,6 +150,28 @@ class Submission(object):
           sub_deploy.deploy()
 
     return deployment_dir
+
+  def get_external_parameters(self, application_path):
+    """From XML and job.properties HDFS files"""
+    deployment_dir = os.path.dirname(application_path)
+    xml = self.fs.do_as_user(self.user, self.fs.read, application_path, 0, 1 * 1024**2)
+
+    properties_file = deployment_dir + '/job.properties'
+    if self.fs.do_as_user(self.user, self.fs.exists, properties_file):
+      properties = self.fs.do_as_user(self.user, self.fs.read, properties_file, 0, 1 * 1024**2)
+    else:
+      properties = None
+
+    return self._get_external_parameters(xml, properties)
+
+  def _get_external_parameters(self, xml, properties=None):
+    from oozie.models import DATASET_FREQUENCY
+    parameters = dict([(var, '') for var in find_variables(xml) if not self._is_coordinator() or var not in DATASET_FREQUENCY])
+
+    if properties:
+      parameters.update(dict([line.strip().split('=')
+                              for line in properties.split('\n') if not line.startswith('#') and len(line.strip().split('=')) == 2]))
+    return parameters
 
   def _update_properties(self, jobtracker_addr, deployment_dir):
     if self.fs and self.jt:
@@ -244,6 +269,14 @@ class Submission(object):
       LOG.warn("Failed to clean up workflow deployment directory for "
                "%s (owner %s). Caused by: %s",
                self.job.name, self.user, ex)
+
+  def _is_workflow(self):
+    from oozie.models import Workflow
+    return Workflow.get_application_path_key() in self.properties
+
+  def _is_coordinator(self):
+    from oozie.models import Coordinator
+    return Coordinator.get_application_path_key() in self.properties
 
 
 def create_directories(fs, directory_list=[]):

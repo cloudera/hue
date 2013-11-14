@@ -17,6 +17,7 @@
 
 import json
 import logging
+import os
 import time
 
 from django.forms.formsets import formset_factory
@@ -28,16 +29,19 @@ from django.shortcuts import redirect
 
 from desktop.lib.django_util import render, encode_json_for_js
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.lib.i18n import smart_str
 from desktop.lib.rest.http_client import RestException
 from desktop.lib.view_util import format_duration_in_millis
 from desktop.log.access import access_warn
+
 from liboozie.oozie_api import get_oozie
 from liboozie.submittion import Submission
 
 from oozie.conf import OOZIE_JOBS_COUNT
 from oozie.forms import RerunForm, ParameterForm, RerunCoordForm,\
   RerunBundleForm
-from oozie.models import History, Job, Workflow, utc_datetime_format
+from oozie.models import History, Job, Workflow, utc_datetime_format, Bundle,\
+  Coordinator
 from oozie.settings import DJANGO_APPS
 
 
@@ -489,6 +493,45 @@ def _rerun_bundle(request, oozie_id, args, params, properties):
   except RestException, ex:
     raise PopupException(_("Error re-running bundle %s.") % (oozie_id,),
                          detail=ex._headers.get('oozie-error-message', ex))
+
+
+def submit_external_job(request, application_path):
+  ParametersFormSet = formset_factory(ParameterForm, extra=0)
+
+  if request.method == 'POST':
+    params_form = ParametersFormSet(request.POST)
+
+    if params_form.is_valid():
+      mapping = dict([(param['name'], param['value']) for param in params_form.cleaned_data])
+      application_name = os.path.basename(application_path)
+      application_class = Bundle if application_name == 'bundle.xml' else Coordinator if application_name == 'coordinator.xml' else Workflow
+      mapping[application_class.get_application_path_key()] = application_path
+
+      try:
+        submission = Submission(request.user, fs=request.fs, jt=request.jt, properties=mapping)
+        job_id = submission.run(application_path)
+      except RestException, ex:
+        detail = ex._headers.get('oozie-error-message', ex)
+        if 'Max retries exceeded with url' in str(detail):
+          detail = '%s: %s' % (_('The Oozie server is not running'), detail)
+        LOG.error(smart_str(detail))
+        raise PopupException(_("Error submitting job %s") % (application_path,), detail=detail)
+
+      request.info(_('Oozie job submitted'))
+      view = 'list_oozie_bundle' if application_name == 'bundle.xml' else 'list_oozie_coordinator' if application_name == 'coordinator.xml' else 'list_oozie_workflow'
+      return redirect(reverse('oozie:%s' % view, kwargs={'job_id': job_id}))
+    else:
+      request.error(_('Invalid submission form: %s' % params_form.errors))
+  else:
+    parameters = Submission(request.user, fs=request.fs, jt=request.jt).get_external_parameters(application_path)
+    initial_params = ParameterForm.get_initial_params(parameters)
+    params_form = ParametersFormSet(initial=initial_params)
+
+  popup = render('editor/submit_job_popup.mako', request, {
+                   'params_form': params_form,
+                   'action': reverse('oozie:submit_external_job', kwargs={'application_path': application_path})
+                 }, force_template=True).content
+  return HttpResponse(json.dumps(popup), mimetype="application/json")
 
 
 def massaged_workflow_actions_for_json(workflow_actions, oozie_coordinator, oozie_bundle):

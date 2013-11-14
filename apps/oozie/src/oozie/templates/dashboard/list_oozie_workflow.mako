@@ -67,7 +67,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
           % if parameters and len(parameters) < 10:
               <li class="nav-header">${ _('Variables') }</li>
               % for var, value in parameters.iteritems():
-                % if var not in ParameterForm.NON_PARAMETERS and var != 'oozie.use.system.libpath':
+                % if var not in ParameterForm.NON_PARAMETERS and var != 'oozie.use.system.libpath' or var == 'oozie.wf.application.path':
                   % if utils.is_linkable(var, str(value)):
                   <li rel="tooltip" title="${ var } : ${ str(value) }">
                     <a href="${ utils.hdfs_link_js(str(value)) }"><i class="fa fa-eye"></i> <span class="variable hide">${ var }</span></a>
@@ -362,8 +362,8 @@ ${ layout.menubar(section='workflows', dashboard=True) }
     $("*[rel=tooltip]").tooltip();
 
     $(".variable").each(function () {
-      if ($(this).text().length > 15) {
-        $(this).html($(this).text().substr(0, 14) + "&hellip;");
+      if ($(this).text().length > 25) {
+        $(this).html($(this).text().substr(0, 24) + "&hellip;");
       }
       $(this).removeClass("hide");
     });

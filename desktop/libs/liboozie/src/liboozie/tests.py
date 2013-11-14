@@ -17,9 +17,10 @@
 
 import logging
 
+from django.contrib.auth.models import User
 from nose.tools import assert_equal
-from oozie.tests import MockOozieApi
 
+from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import reformat_xml
 
 from hadoop import cluster
@@ -27,6 +28,7 @@ from hadoop.conf import HDFS_CLUSTERS, MR_CLUSTERS, YARN_CLUSTERS
 from liboozie.types import WorkflowAction, Coordinator
 from liboozie.submittion import Submission
 from liboozie.utils import config_gen
+from oozie.tests import MockOozieApi
 
 
 LOG = logging.getLogger(__name__)
@@ -108,3 +110,66 @@ def test_update_properties():
     cluster.clear_caches()
     for reset in finish:
       reset()
+
+
+class TestSubmission():
+
+  def setUp(self):
+    self.c = make_logged_in_client(is_superuser=False)
+#    grant_access("test", "test", "oozie")
+#    add_to_group("test")
+    self.user = User.objects.get(username='test')
+
+  def test_get_external_parameters(self):
+    xml = """
+<workflow-app name="Pig" xmlns="uri:oozie:workflow:0.4">
+    <start to="Pig"/>
+    <action name="Pig">
+        <pig>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <prepare>
+                  <delete path="${output}"/>
+            </prepare>
+            <script>aggregate.pig</script>
+              <argument>-param</argument>
+              <argument>INPUT=${input}</argument>
+              <argument>-param</argument>
+              <argument>OUTPUT=${output}</argument>
+        </pig>
+        <ok to="end"/>
+        <error to="kill"/>
+    </action>
+    <kill name="kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+    <end name="end"/>
+</workflow-app>
+    """
+
+    properties = """
+#
+# Licensed to the Hue
+#
+
+nameNode=hdfs://localhost:8020
+jobTracker=localhost:8021
+queueName=default
+examplesRoot=examples
+
+oozie.use.system.libpath=true
+
+oozie.wf.application.path=${nameNode}/user/${user.name}/${examplesRoot}/apps/pig
+    """
+    parameters = Submission(self.user)._get_external_parameters(xml, properties)
+
+    assert_equal({'oozie.use.system.libpath': 'true',
+                   'input': '',
+                   'jobTracker': 'localhost:8021',
+                   'oozie.wf.application.path': '${nameNode}/user/${user.name}/${examplesRoot}/apps/pig',
+                   'examplesRoot': 'examples',
+                   'output': '',
+                   'nameNode': 'hdfs://localhost:8020',
+                   'queueName': 'default'
+                  },
+                 parameters)

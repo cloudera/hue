@@ -147,7 +147,7 @@ from django.utils.translation import ugettext as _
             <td class="center" data-bind="click: handleSelect" style="cursor: default">
                 <div data-bind="visible: name != '.' && name != '..', css: {hueCheckbox: name != '.' && name != '..', 'fa': name != '.' && name != '..', 'fa-check': selected}"></div>
             </td>
-            <td data-bind="click: $root.viewFile" class="left"><i data-bind="css: {'fa': true, 'fa-file-o': type == 'file', 'fa-folder': type != 'file', 'fa-folder-open': type != 'file' && hovered}"></i></td>
+            <td data-bind="click: $root.viewFile" class="left"><i data-bind="css: {'fa': true, 'fa-play': $.inArray(name, ['workflow.xml', 'coordinator.xml', 'bundle.xml']) > -1, 'fa-file-o': type == 'file', 'fa-folder': type != 'file', 'fa-folder-open': type != 'file' && hovered}"></i></td>
             <td data-bind="click: $root.viewFile, attr: {'title': tooltip}" rel="tooltip">
                 <strong><a href="#" data-bind="click: $root.viewFile, text: name"></a></strong>
             </td>
@@ -485,6 +485,8 @@ from django.utils.translation import ugettext as _
         </div>
         </form>
     </div>
+
+    <div id="submit-wf-modal" class="modal hide"></div>
 
     <script type="text/javascript" charset="utf-8">
     // ajax modal windows
@@ -1190,6 +1192,14 @@ from django.utils.translation import ugettext as _
       self.trashSelected = function () {
         deleteSelected();
       };
+
+      self.submitSelected = function() {
+        $.get("${ url('oozie:submit_external_job', application_path='/') }../" + self.selectedFile().path, function (response) {
+            $('#submit-wf-modal').html(response);
+            $('#submit-wf-modal').modal('show');
+          }
+        );
+      }
 
       self.createDirectory = function (formElement) {
         $(formElement).attr("action", "/filebrowser/mkdir?next=${url('filebrowser.views.view', path=urlencode('/'))}" + "." + self.currentPath());

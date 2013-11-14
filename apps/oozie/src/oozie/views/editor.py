@@ -14,12 +14,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from desktop.models import Document
 
-try:
-  import json
-except ImportError:
-  import simplejson as json
+import json
 import logging
 import shutil
 import time
@@ -38,6 +34,7 @@ from desktop.lib.django_util import render, extract_field_data
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_str
 from desktop.lib.rest.http_client import RestException
+from desktop.models import Document
 from liboozie.submittion import Submission
 
 from filebrowser.lib.archives import archive_factory

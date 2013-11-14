@@ -79,7 +79,7 @@ class MockOozieApi:
   BUNDLE_IDS = [bundle['bundleJobId'] for bundle in JSON_BUNDLE_LIST]
   BUNDLE_DICT = dict([(bundle['bundleJobId'], bundle) for bundle in JSON_BUNDLE_LIST])
 
-  WORKFLOW_ACTION = {u'status': u'OK', u'retries': 0, u'transition': u'end', u'stats': None, u'startTime': u'Fri, 10 Aug 2012 05:24:21 GMT', u'toString': u'Action name[WordCount] status[OK]', u'cred': u'null', u'errorMessage': None, u'errorCode': None, u'consoleUrl': u'http://localhost:50030/jobdetails.jsp?jobid=job_201208072118_0044', u'externalId': u'job_201208072118_0044', u'externalStatus': u'SUCCEEDED', u'conf': u'<map-reduce xmlns="uri:oozie:workflow:0.2">\r\n  <job-tracker>localhost:8021</job-tracker>\r\n  <name-node>hdfs://localhost:8020</name-node>\r\n  <configuration>\r\n    <property>\r\n      <name>mapred.mapper.regex</name>\r\n      <value>dream</value>\r\n    </property>\r\n    <property>\r\n      <name>mapred.input.dir</name>\r\n      <value>/user/test/words/20120702</value>\r\n    </property>\r\n    <property>\r\n      <name>mapred.output.dir</name>\r\n      <value>/user/test/out/rrwords/20120702</value>\r\n    </property>\r\n    <property>\r\n      <name>mapred.mapper.class</name>\r\n      <value>org.apache.hadoop.mapred.lib.RegexMapper</value>\r\n    </property>\r\n    <property>\r\n      <name>mapred.combiner.class</name>\r\n      <value>org.apache.hadoop.mapred.lib.LongSumReducer</value>\r\n    </property>\r\n    <property>\r\n      <name>mapred.reducer.class</name>\r\n      <value>org.apache.hadoop.mapred.lib.LongSumReducer</value>\r\n    </property>\r\n    <property>\r\n      <name>mapred.output.key.class</name>\r\n      <value>org.apache.hadoop.io.Text</value>\r\n    </property>\r\n    <property>\r\n      <name>mapred.output.value.class</name>\r\n      <value>org.apache.hadoop.io.LongWritable</value>\r\n    </property>\r\n  </configuration>\r\n</map-reduce>', u'type': u'map-reduce', u'trackerUri': u'localhost:8021', u'externalChildIDs': None, u'endTime': u'Fri, 10 Aug 2012 05:24:38 GMT', u'data': None, u'id': u'0000012-120725142744176-oozie-oozi-W@WordCount', u'name': u'WordCount', u'externalChildIDs': u'job_201302280955_0018,job_201302280955_0019,job_201302280955_0020'}
+  WORKFLOW_ACTION = {u'status': u'OK', u'retries': 0, u'transition': u'end', u'stats': None, u'startTime': u'Fri, 10 Aug 2012 05:24:21 GMT', u'toString': u'Action name[WordCount] status[OK]', u'cred': u'null', u'errorMessage': None, u'errorCode': None, u'consoleUrl': u'http://localhost:50030/jobdetails.jsp?jobid=job_201208072118_0044', u'externalId': u'job_201208072118_0044', u'externalStatus': u'SUCCEEDED', u'conf': u'<map-reduce xmlns="uri:oozie:workflow:0.4">\r\n  <job-tracker>localhost:8021</job-tracker>\r\n  <name-node>hdfs://localhost:8020</name-node>\r\n  <configuration>\r\n    <property>\r\n      <name>mapred.mapper.regex</name>\r\n      <value>dream</value>\r\n    </property>\r\n    <property>\r\n      <name>mapred.input.dir</name>\r\n      <value>/user/test/words/20120702</value>\r\n    </property>\r\n    <property>\r\n      <name>mapred.output.dir</name>\r\n      <value>/user/test/out/rrwords/20120702</value>\r\n    </property>\r\n    <property>\r\n      <name>mapred.mapper.class</name>\r\n      <value>org.apache.hadoop.mapred.lib.RegexMapper</value>\r\n    </property>\r\n    <property>\r\n      <name>mapred.combiner.class</name>\r\n      <value>org.apache.hadoop.mapred.lib.LongSumReducer</value>\r\n    </property>\r\n    <property>\r\n      <name>mapred.reducer.class</name>\r\n      <value>org.apache.hadoop.mapred.lib.LongSumReducer</value>\r\n    </property>\r\n    <property>\r\n      <name>mapred.output.key.class</name>\r\n      <value>org.apache.hadoop.io.Text</value>\r\n    </property>\r\n    <property>\r\n      <name>mapred.output.value.class</name>\r\n      <value>org.apache.hadoop.io.LongWritable</value>\r\n    </property>\r\n  </configuration>\r\n</map-reduce>', u'type': u'map-reduce', u'trackerUri': u'localhost:8021', u'externalChildIDs': None, u'endTime': u'Fri, 10 Aug 2012 05:24:38 GMT', u'data': None, u'id': u'0000012-120725142744176-oozie-oozi-W@WordCount', u'name': u'WordCount', u'externalChildIDs': u'job_201302280955_0018,job_201302280955_0019,job_201302280955_0020'}
 
   JSON_ACTION_BUNDLE_LIST = [
       {u'status': u'SUCCEEDED', u'toString': u'WorkflowAction name[0000000-130117135211239-oozie-oozi-C@1] status[SUCCEEDED]', u'runConf': None, u'errorMessage': None, u'missingDependencies': u'', u'coordJobId': u'0000000-130117135211239-oozie-oozi-C', u'errorCode': None, u'actionNumber': 1, u'consoleUrl': None, u'nominalTime': u'Mon, 31 Dec 2012 16:00:00 PST', u'externalStatus': u'', u'createdConf': None, u'createdTime': u'Fri, 25 Jan 2013 10:53:39 PST', u'externalId': u'0000035-130124125317829-oozie-oozi-W', u'lastModifiedTime': u'Fri, 25 Jan 2013 10:53:51 PST', u'type': None, u'id': u'0000000-130117135211239-oozie-oozi-C@1', u'trackerUri': None},
@@ -201,7 +201,6 @@ class OozieMockBase(object):
     oozie_api.OozieApi = oozie_api.OriginalOozieApi
     Workflow.objects.check_workspace = Workflow.objects.original_check_workspace
     oozie_api._api_cache = None
-
 
     History.objects.all().delete()
     Coordinator.objects.all().delete()
@@ -783,7 +782,7 @@ class TestEditor(OozieMockBase):
 
   def test_workflow_gen_xml(self):
     assert_equal(
-        '<workflow-app name="wf-name-1" xmlns="uri:oozie:workflow:0.2">\n'
+        '<workflow-app name="wf-name-1" xmlns="uri:oozie:workflow:0.4">\n'
         '    <global>\n'
         '        <job-xml>jobconf.xml</job-xml>\n'
         '        <configuration>\n'
@@ -1470,7 +1469,7 @@ class TestEditor(OozieMockBase):
     assert_true('workflow-metadata.json' in zfile.namelist(), 'workflow-metadata.json not in response')
     assert_equal(2, len(zfile.namelist()))
 
-    workflow_xml = reformat_xml("""<workflow-app name="wf-name-1" xmlns="uri:oozie:workflow:0.2">
+    workflow_xml = reformat_xml("""<workflow-app name="wf-name-1" xmlns="uri:oozie:workflow:0.4">
     <global>
         <job-xml>jobconf.xml</job-xml>
         <configuration>
@@ -1540,6 +1539,7 @@ class TestEditor(OozieMockBase):
     </kill>
     <end name="end"/>
 </workflow-app>""")
+
     workflow_metadata_json = reformat_json("""{
   "attributes": {
     "deployment_dir": "/user/hue/oozie/workspaces/_test_-oozie-13-1383539302.62",
@@ -1568,6 +1568,7 @@ class TestEditor(OozieMockBase):
     workflow_metadata_json = synchronize_workflow_attributes(workflow_metadata_json, result_workflow_metadata_json)
     assert_equal(workflow_xml, reformat_xml(zfile.read('workflow.xml')))
     assert_equal(workflow_metadata_json, result_workflow_metadata_json)
+
 
 class TestEditorBundle(OozieMockBase):
 
@@ -2631,15 +2632,68 @@ class TestOozieSubmissions(OozieBase):
     assert_true('oozie.base.url' in response.content, response.content)
 
 
-class TestDashboardNoMocking:
+class TestDashboardWithOozie(OozieBase):
+
+  def setUp(self):
+    super(TestDashboardWithOozie, self).setUp()
+
+    self.c = make_logged_in_client()
+    self.wf = create_workflow(self.c, self.user)
+    self.setup_simple_workflow()
+
+  def tearDown(self):
+    try:
+      self.wf.delete(skip_trash=True)
+    except:
+      pass
+
+  def test_submit_external_workflow(self):
+    # Check popup and reading workflow.xml and job.properties
+    oozie_xml = self.wf.to_xml({'output': '/path'})
+    deployment_dir = self.cluster.fs.mktemp(prefix='test_submit_external_workflow')
+    application_path = deployment_dir + '/workflow.xml'
+
+    self.cluster.fs.create(application_path, data=oozie_xml)
+
+    response = self.c.get(reverse('oozie:submit_external_job', kwargs={'application_path': application_path}))
+    assert_equal([{'name': 'SLEEP', 'value': ''}, {'name': 'output', 'value': ''}],
+                  response.context['params_form'].initial)
+
+    oozie_properties = """
+#
+# Licensed to the Hue
+#
+nameNode=hdfs://localhost:8020
+jobTracker=localhost:8021
+my_prop_not_filtered=10
+    """
+    self.cluster.fs.create(deployment_dir + '/job.properties', data=oozie_properties)
+
+    response = self.c.get(reverse('oozie:submit_external_job', kwargs={'application_path': application_path}))
+    assert_equal([{'name': 'SLEEP', 'value': ''}, {'name': 'my_prop_not_filtered', 'value': '10'}, {'name': 'output', 'value': ''}],
+                  response.context['params_form'].initial)
+
+    # Submit, just check if submittion worked
+    response = self.c.post(reverse('oozie:submit_external_job', kwargs={'application_path': application_path}), {
+        u'form-MAX_NUM_FORMS': [u''],
+        u'form-TOTAL_FORMS': [u'3'],
+        u'form-INITIAL_FORMS': [u'3'],
+        u'form-0-name': [u'SLEEP'],
+        u'form-0-value': [u'ilovesleep'],
+        u'form-1-name': [u'my_prop_not_filtered'],
+        u'form-1-value': [u'10'],
+        u'form-2-name': [u'output'],
+        u'form-2-value': [u'/path/output'],
+    }, follow=True)
+    assert_true(response.context['oozie_workflow'], response.content)
+
 
   def test_oozie_not_running_message(self):
-    c = make_logged_in_client(is_superuser=False)
-    grant_access("test", "test", "oozie")
+    raise SkipTest # Not reseting the oozie url for some reason
 
     finish = OOZIE_URL.set_for_testing('http://not_localhost:11000/bad')
     try:
-      response = c.get(reverse('oozie:list_oozie_workflows'))
+      response = self.c.get(reverse('oozie:list_oozie_workflows'))
       assert_true('The Oozie server is not running' in response.content, response.content)
     finally:
       finish()
@@ -3047,7 +3101,7 @@ class TestUtils(OozieMockBase):
 # Utils
 WORKFLOW_DICT = {
     u'deployment_dir': [u''], u'name': [u'wf-name-1'], u'description': [u''],
-    u'schema_version': [u'uri:oozie:workflow:0.2'],
+    u'schema_version': [u'uri:oozie:workflow:0.4'],
     u'parameters': [u'[{"name":"market","value":"US"}]'],
     u'job_xml': [u'jobconf.xml'],
     u'job_properties': [u'[{"name":"sleep-all","value":"${SLEEP}"}]']
