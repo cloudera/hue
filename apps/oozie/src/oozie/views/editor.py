@@ -491,7 +491,7 @@ def edit_coordinator_dataset(request, dataset):
       response['data'] = reverse('oozie:edit_coordinator', kwargs={'coordinator': dataset.coordinator.id}) + "#listDataset"
       request.info(_('Dataset modified'))
       if dataset.start > dataset.coordinator.start:
-        request.error(_('Beware: dataset start date was after the coordinator start date.'))
+        request.warn(_('Beware: dataset start date was after the coordinator start date.'))
     else:
       response['data'] = dataset_form.errors
   else:

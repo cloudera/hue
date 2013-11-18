@@ -379,7 +379,7 @@ def jasmine(request):
   return render('jasmine.mako', request, None)
 
 def index(request):
-  if request.user.is_superuser:
+  if request.user.is_superuser and request.COOKIES.get('hueLandingPage') != 'home':
     return redirect(reverse('about:index'))
   else:
     return home(request)

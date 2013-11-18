@@ -189,6 +189,22 @@ ${ header.menubar() }
                   </p>
                 </div>
               </div>
+
+              <div class="card card-home card-tab card-tab-bordertop card-listcontent">
+                <h2 class="card-heading simple">${ _('Skip wizard next time') }</h2>
+
+                <div class="card-body">
+                  <p>
+                    <label class="checkbox">
+                      <input id="updateSkipWizard" type="checkbox"
+                             style="margin-right: 10px"
+                             title="${ ('Check to skip this wizard next time.') }"/>
+                    ${ ('Skip the Quick Start Wizard at next login and land directly on the home page.') }
+                    </label>
+                  </p>
+                </div>
+              </div>
+
             </div>
           </div>
 
@@ -343,6 +359,12 @@ $(document).ready(function(){
         $(document).trigger('error', data.data);
       }
     });
+  });
+
+  $("#updateSkipWizard").prop('checked', $.cookie("hueLandingPage", {path: "/"}) == "home");
+
+  $("#updateSkipWizard").change(function () {
+    $.cookie("hueLandingPage", this.checked ? "home" : "wizard", {path: "/"});
   });
 
 });

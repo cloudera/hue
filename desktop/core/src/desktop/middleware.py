@@ -191,8 +191,12 @@ class NotificationMiddleware(object):
     def error(title, detail=None):
       messages.error(request, message(title, detail))
 
+    def warn(title, detail=None):
+      messages.warning(request, message(title, detail))
+
     request.info = info
     request.error = error
+    request.warn = warn
 
 
 class AppSpecificMiddleware(object):

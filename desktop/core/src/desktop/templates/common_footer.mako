@@ -35,7 +35,7 @@ from django.template.defaultfilters import escape, escapejs
       %for message in messages:
         %if message.tags == 'error':
           $(document).trigger('error', '${ escapejs(escape(message)) }');
-        %elif message.tags == 'warn':
+        %elif message.tags == 'warning':
           $(document).trigger('warn', '${ escapejs(escape(message)) }');
         %else:
           $(document).trigger('info', '${ escapejs(escape(message)) }');

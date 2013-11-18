@@ -87,6 +87,34 @@ def test_home():
 
   assert_equal(200, response.status_code)
 
+def test_skip_wizard():
+  c = make_logged_in_client() # is_superuser
+
+  response = c.get('/', follow=True)
+  assert_true(['admin_wizard.mako' in _template.filename for _template in response.template], [_template.filename for _template in response.template])
+
+  c.cookies['hueLandingPage'] = 'home'
+  response = c.get('/', follow=True)
+  assert_true(['home.mako' in _template.filename for _template in response.template], [_template.filename for _template in response.template])
+
+  c.cookies['hueLandingPage'] = ''
+  response = c.get('/', follow=True)
+  assert_true(['admin_wizard.mako' in _template.filename for _template in response.template], [_template.filename for _template in response.template])
+
+
+  c = make_logged_in_client(username="test_skip_wizard", password="test_skip_wizard", is_superuser=False)
+
+  response = c.get('/', follow=True)
+  assert_true(['home.mako' in _template.filename for _template in response.template], [_template.filename for _template in response.template])
+
+  c.cookies['hueLandingPage'] = 'home'
+  response = c.get('/', follow=True)
+  assert_true(['home.mako' in _template.filename for _template in response.template], [_template.filename for _template in response.template])
+
+  c.cookies['hueLandingPage'] = ''
+  response = c.get('/', follow=True)
+  assert_true(['home.mako' in _template.filename for _template in response.template], [_template.filename for _template in response.template])
+
 def test_log_view():
   c = make_logged_in_client()
 
