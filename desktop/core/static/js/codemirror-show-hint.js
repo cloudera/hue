@@ -1,3 +1,8 @@
+CodeMirror.registerHelper = function(what, language, hinter) {
+  // avoids JS errors for the unsupported method
+  console.error("Hello Hue dev, we are currently using a version of CodeMirror 3 that does not support .registerHelper. Please use the CodeMirror.languageHint = languageHint syntax instead");
+}
+
 CodeMirror.showHint = function(cm, getHints, options) {
   if (!options) options = {};
   var startCh = cm.getCursor().ch, continued = false;

@@ -106,6 +106,12 @@ var SparkScript = function (sparkScript) {
   self.name.subscribe(function (name) {
     self.updateParentModel();
   });
+
+  self.language.subscribe(function (lang) {
+    if (typeof codeMirror != "undefined"){
+      codeMirror.setOption("mode", "text/x-" + lang);
+    }
+  });
 }
 
 var Workflow = function (wf) {

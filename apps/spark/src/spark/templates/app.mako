@@ -511,10 +511,11 @@ ${ commonheader(None, "spark", user) | n,unicode }
 <script src="/spark/static/js/spark.ko.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/routie-0.3.0.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/codemirror-3.11.js"></script>
-<script src="/static/js/clike.js"></script>
+<script src="/static/js/codemirror-clike.js"></script>
 <script src="/static/js/codemirror-python.js"></script>
 <script src="/static/js/codemirror-show-hint.js"></script>
-<script src="/static/js/codemirror-pig-hint.js"></script>
+<script src="/static/js/codemirror-python-hint.js"></script>
+<script src="/static/js/codemirror-clike-hint.js"></script>
 <script src="/beeswax/static/js/autocomplete.utils.js" type="text/javascript" charset="utf-8"></script>
 
 <link rel="stylesheet" href="/spark/static/css/spark.css">
@@ -556,9 +557,6 @@ ${ commonheader(None, "spark", user) | n,unicode }
   var viewModel = new SparkViewModel(appProperties);
   ko.applyBindings(viewModel);
 
-  var HIVE_AUTOCOMPLETE_BASE_URL = "${ autocomplete_base_url | n,unicode }";
-  var HIVE_AUTOCOMPLETE_FAILS_SILENTLY_ON = [503]; // error codes from beeswax/views.py - autocomplete
-
   var codeMirror;
 
   $(document).ready(function () {
@@ -571,88 +569,27 @@ ${ commonheader(None, "spark", user) | n,unicode }
     var logsAtEnd = true;
     var forceLogsAtEnd = false;
 
-    function storeVariables() {
-      CodeMirror.availableVariables = [];
-      var _val = codeMirror.getValue();
-      var _groups = _val.replace(/==/gi, "").split("=");
-      $.each(_groups, function (cnt, item) {
-        if (cnt < _groups.length - 1) {
-          var _blocks = $.trim(item).replace(/\n/gi, " ").split(" ");
-          CodeMirror.availableVariables.push(_blocks[_blocks.length - 1]);
-        }
-        if (item.toLowerCase().indexOf("split") > -1 && item.toLowerCase().indexOf("into") > -1) {
-          try {
-            var _split = item.substring(item.toLowerCase().indexOf("into"));
-            var _possibleVariables = $.trim(_split.substring(4, _split.indexOf(";"))).split(",");
-            $.each(_possibleVariables, function (icnt, iitem) {
-              if (iitem.toLowerCase().indexOf("if") > -1) {
-                CodeMirror.availableVariables.push($.trim(iitem).split(" ")[0]);
-              }
-            });
-          }
-          catch (e) {
-          }
-        }
-      });
-    }
-
-    var KLASS = "org.apache.hcatalog.pig.HCatLoader";
-
-    CodeMirror.onAutocomplete = function (data, from, to) {
-      if (CodeMirror.isHCatHint && data.indexOf(KLASS) > -1) {
-        codeMirror.replaceRange(" ", to, to);
-        codeMirror.setCursor(to);
-        CodeMirror.isHCatHint = false;
-        showHiveAutocomplete("default");
+    function getLanguageHint() {
+      var _hint = null;
+      switch (viewModel.currentScript().language()) {
+        case "java":
+          _hint = CodeMirror.javaHint;
+          break;
+        case "scala":
+          _hint = CodeMirror.scalaHint;
+          break;
+        case "python":
+          _hint = CodeMirror.pythonHint;
+          break;
       }
-    };
+      return _hint;
+    }
 
     CodeMirror.commands.autocomplete = function (cm) {
       $(document.body).on("contextmenu", function (e) {
         e.preventDefault(); // prevents native menu on FF for Mac from being shown
       });
-      storeVariables();
-      var _line = codeMirror.getLine(codeMirror.getCursor().line);
-      var _partial = _line.substring(0, codeMirror.getCursor().ch);
-      if (_partial.indexOf("'") > -1 && _partial.indexOf("'") == _partial.lastIndexOf("'")) {
-        CodeMirror.isHCatHint = false;
-        CodeMirror.isTable = false;
-        if (_partial.toLowerCase().indexOf("load") > -1 || _partial.toLowerCase().indexOf("into") > -1) {
-          var _path = _partial.substring(_partial.lastIndexOf("'") + 1);
-          var _autocompleteUrl = "/filebrowser/view";
-          if (_path.indexOf("/") == 0) {
-            _autocompleteUrl += _path.substr(0, _path.lastIndexOf("/"));
-          }
-          else if (_path.indexOf("/") > 0) {
-            _autocompleteUrl += USER_HOME + _path.substr(0, _path.lastIndexOf("/"));
-          }
-          else {
-            _autocompleteUrl += USER_HOME;
-          }
-          var _showHCatHint = false;
-          if (_line.indexOf(KLASS) == -1) {
-            if (_partial.indexOf("'") == _partial.length - 1) {
-              _showHCatHint = true;
-            }
-            showHdfsAutocomplete(_autocompleteUrl + "?format=json", _showHCatHint);
-          }
-          else {
-            var _db = _partial.substring(_partial.lastIndexOf("'") + 1);
-            if (_db.indexOf(".") > -1) {
-              showHiveAutocomplete(_db.substring(0, _db.length - 1));
-            }
-            else {
-              showHiveAutocomplete("default");
-            }
-          }
-        }
-      }
-      else {
-        CodeMirror.isPath = false;
-        CodeMirror.isTable = false;
-        CodeMirror.isHCatHint = false;
-        CodeMirror.showHint(cm, CodeMirror.pigHint);
-      }
+      CodeMirror.showHint(cm, getLanguageHint());
     }
     codeMirror = CodeMirror(function (elt) {
       scriptEditor.parentNode.replaceChild(elt, scriptEditor);
@@ -660,7 +597,7 @@ ${ commonheader(None, "spark", user) | n,unicode }
       value: scriptEditor.value,
       readOnly: false,
       lineNumbers: true,
-      mode: "text/x-" + viewModel.currentScript().language(), // TODO update to language dynamically
+      mode: "text/x-" + viewModel.currentScript().language(),
       extraKeys: {
         "Ctrl-Space": "autocomplete",
         "Ctrl-Enter": function () {
@@ -676,16 +613,6 @@ ${ commonheader(None, "spark", user) | n,unicode }
       },
       onKeyEvent: function (e, s) {
         if (s.type == "keyup") {
-          if (s.keyCode == 190) {
-            if (codeMirror.getValue().indexOf(KLASS) > -1) {
-              var _line = codeMirror.getLine(codeMirror.getCursor().line);
-              var _partial = _line.substring(0, codeMirror.getCursor().ch);
-              var _db = _partial.substring(_partial.lastIndexOf("'") + 1);
-              if (_partial.replace(/ /g, '').toUpperCase().indexOf("LOAD") == _partial.replace(/ /g, '').lastIndexOf("'") - 4) {
-                showHiveAutocomplete(_db.substring(0, _db.length - 1));
-              }
-            }
-          }
           if (s.keyCode == 191) {
             var _line = codeMirror.getLine(codeMirror.getCursor().line);
             var _partial = _line.substring(0, codeMirror.getCursor().ch);
@@ -719,21 +646,9 @@ ${ commonheader(None, "spark", user) | n,unicode }
           CodeMirror.isPath = true;
           CodeMirror.isHCatHint = showHCatHint;
           window.setTimeout(function () {
-            CodeMirror.showHint(codeMirror, CodeMirror.pigHint);
+            CodeMirror.showHint(codeMirror,  getLanguageHint());
           }, 100);  // timeout for IE8
         }
-      });
-    }
-
-    hac_getTables("default", function(){}); //preload tables for the default db
-
-    function showHiveAutocomplete(databaseName) {
-      CodeMirror.isPath = false;
-      CodeMirror.isTable = true;
-      CodeMirror.isHCatHint = false;
-      hac_getTables(databaseName, function (tables) {
-        CodeMirror.catalogTables = tables;
-        CodeMirror.showHint(codeMirror, CodeMirror.pigHint);
       });
     }
 
