@@ -90,7 +90,7 @@ from django.utils.translation import ugettext as _
       }
 
       .pagination ul {
-        margin-bottom: 10px;
+        margin-top: 14px;
         margin-right: 20px;
       }
 
@@ -724,7 +724,13 @@ from django.utils.translation import ugettext as _
 
       $("*[rel='tooltip']").tooltip({ placement:"bottom" });
       if (window.location.hash != null && window.location.hash.length > 1) {
-        viewModel.targetPath("${url('filebrowser.views.view', path=urlencode('/'))}" + stripHashes(window.location.hash.substring(2)));
+        var targetPath = "${url('filebrowser.views.view', path=urlencode('/'))}" + stripHashes(window.location.hash.substring(2));
+        viewModel.targetPath(targetPath);
+        if (targetPath.indexOf("!!") > -1){
+          viewModel.targetPageNum(targetPath.substring(targetPath.indexOf("!!")+2)*1)
+          targetPath = targetPath.substring(0, targetPath.indexOf("!!"));
+          viewModel.targetPath(targetPath);
+        }
       }
       viewModel.retrieveData();
 
@@ -784,16 +790,24 @@ from django.utils.translation import ugettext as _
       });
 
       $(window).bind("hashchange", function () {
-        var target = "";
+        var targetPath = "";
         var hash = window.location.hash.substring(1);
         if (hash != null && hash != "") {
-          target = "${url('filebrowser.views.view', path=urlencode('/'))}" + stripHashes(hash.substring(1));
+          targetPath = "${url('filebrowser.views.view', path=urlencode('/'))}" + stripHashes(hash.substring(1));
+          if (targetPath.indexOf("!!") > -1){
+            viewModel.targetPageNum(targetPath.substring(targetPath.indexOf("!!")+2)*1)
+            targetPath = targetPath.substring(0, targetPath.indexOf("!!"));
+          }
+          else {
+            viewModel.targetPageNum(1)
+          }
         }
         if (window.location.href.indexOf("#") == -1) {
-          target = "${current_request_path}";
+          viewModel.targetPageNum(1)
+          targetPath = "${current_request_path}";
         }
-        if (target != "") {
-          viewModel.targetPath(target);
+        if (targetPath != "") {
+          viewModel.targetPath(targetPath);
           viewModel.retrieveData();
         }
       });
@@ -883,6 +897,7 @@ from django.utils.translation import ugettext as _
             // forcing root on empty breadcrumb url
             this.url = "/";
           }
+          viewModel.targetPageNum(1);
           viewModel.targetPath("${url('filebrowser.views.view', path=urlencode('/'))}" + stripHashes(this.url));
           window.location.hash = this.url;
         }
@@ -1013,7 +1028,12 @@ from django.utils.translation import ugettext as _
 
       self.goToPage = function (pageNumber) {
         self.targetPageNum(pageNumber);
-        self.retrieveData();
+        if (window.location.hash.indexOf("!!") > -1){
+          window.location.hash =  window.location.hash.substring(0, window.location.hash.indexOf("!!")) + "!!" + pageNumber;
+        }
+        else {
+          window.location.hash += "!!" + pageNumber;
+        }
       };
 
       self.firstPage = function () {
