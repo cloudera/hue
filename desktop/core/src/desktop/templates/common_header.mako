@@ -237,6 +237,17 @@ from django.utils.translation import ugettext as _
   </div>
 % endif
 
+<%
+  def count_apps(apps, app_list):
+    count = 0
+    found_app = ""
+    for app in app_list:
+      if app in apps:
+       found_app = app
+       count += 1
+    return found_app, count
+%>
+
 <div class="navigator">
   <div class="pull-right">
   % if user.is_authenticated():
@@ -266,6 +277,10 @@ from django.utils.translation import ugettext as _
     <a class="brand nav-tooltip pull-left" title="${_('About Hue')}" rel="navigator-tooltip" href="/about"><img src="/static/art/hue-logo-mini-white.png" data-orig="/static/art/hue-logo-mini-white.png" data-hover="/static/art/hue-logo-mini-white-hover.png"/></a>
      <ul class="nav nav-pills pull-left">
        <li><a title="${_('My documents')}" rel="navigator-tooltip" href="/home" style="padding-bottom:2px!important"><i class="fa fa-home" style="font-size: 19px"></i></a></li>
+       <%
+         query_apps = count_apps(apps, ['beeswax', 'impala', 'rdbms', 'pig', 'jobsub', 'spark']);
+       %>
+       % if query_apps[1] > 1:
        <li class="dropdown">
          <a title="${_('Query data')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">${_('Query Editors')} <b class="caret"></b></a>
          <ul role="menu" class="dropdown-menu">
@@ -289,6 +304,13 @@ from django.utils.translation import ugettext as _
            % endif
          </ul>
        </li>
+       % elif query_apps[1] == 1:
+          <li><a href="/${apps[query_apps[0]].display_name}">${apps[query_apps[0]].nice_name}</a></li>
+       % endif
+       <%
+         data_apps = count_apps(apps, ['metastore', 'hbase', 'sqoop', 'zookeeper']);
+       %>
+       % if data_apps[1] > 1:
        <li class="dropdown">
          <a title="${_('Manage data')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">${_('Data Browsers')} <b class="caret"></b></a>
          <ul role="menu" class="dropdown-menu">
@@ -306,6 +328,9 @@ from django.utils.translation import ugettext as _
            % endif
          </ul>
        </li>
+       % elif data_apps[1] == 1:
+         <li><a href="/${apps[data_apps[0]].display_name}">${apps[data_apps[0]].nice_name}</a></li>
+       % endif
        % if 'oozie' in apps:
        <li class="dropdown">
          <a title="${_('Schedule with Oozie')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">${_('Workflows')} <b class="caret"></b></a>
