@@ -55,6 +55,10 @@ def get(user, query_server=None):
     from beeswax.server.postgresql_lib import PostgreSQLClient
 
     return Rdbms(PostgreSQLClient(query_server, user), QueryHistory.SERVER_TYPE[2][0])
+  elif query_server['server_name'] in ('sqlite', 'sqlite3'):
+    from beeswax.server.sqlite_lib import SQLiteClient
+
+    return Rdbms(SQLiteClient(query_server, user), QueryHistory.SERVER_TYPE[2][0])
 
 
 def get_query_server_config(name='beeswax', server=None):
@@ -88,6 +92,9 @@ def get_query_server_config(name='beeswax', server=None):
         'password': RDBMS[name].PASSWORD.get(),
         'alias': name
       }
+
+      if RDBMS[name].NAME.get():
+        query_server['name'] = RDBMS[name].NAME.get()
     else:
       query_server = {}
 

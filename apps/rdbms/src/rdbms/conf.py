@@ -15,10 +15,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django.utils.translation import ugettext_lazy as _t
+from django.utils.translation import ugettext_lazy as _t, ugettext as _
 from desktop.lib.conf import Config, UnspecifiedConfigSection,\
                              ConfigSection, coerce_json_dict
 from desktop.conf import coerce_database
+
+from rdbms.settings import NICE_NAME
 
 
 RDBMS = UnspecifiedConfigSection(
@@ -32,6 +34,12 @@ RDBMS = UnspecifiedConfigSection(
         help=_t('Nice name of server.'),
         type=str,
         default=None,
+      ),
+      NAME=Config(
+        key='name',
+        help=_t('Database name or path to database file. If provided, then choosing other databases will not be permitted.'),
+        type=str,
+        default='',
       ),
       ENGINE=Config(
         key='engine',
@@ -76,6 +84,11 @@ RDBMS = UnspecifiedConfigSection(
 
 def config_validator(user):
   res = []
+
+  for server in RDBMS:
+    if RDBMS[server].ENGINE.get().split('.')[-1] in ('sqlite', 'sqlite3') and not RDBMS[server].NAME.get():
+      res.append((RDBMS[server].NAME, _("Database name should not be empty for SQLite backends. The %s may not work correctly.") % NICE_NAME))
+
   return res
 
 

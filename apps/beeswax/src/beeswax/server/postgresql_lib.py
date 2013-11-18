@@ -48,18 +48,25 @@ class PostgreSQLClient(BaseRDMSClient):
 
   @property
   def _conn_params(self):
-    return {
+    params = {
       'user': self.query_server['username'],
       'password': self.query_server['password'],
       'host': self.query_server['server_host'],
       'port': self.query_server['server_port'] == 0 and 5432 or self.query_server['server_port']
     }
+    if 'name' in self.query_server:
+      params['database'] = self.query_server['name']
+    return params
 
 
   def use(self, database):
-    conn_params = self._conn_params
-    conn_params['database'] = database
-    self.connection = Database.connect(**conn_params)
+    # No op if a database has been specified.
+    if 'database' in self._conn_params and self._conn_params['database'] != database:
+      raise RuntimeError("Tried to use database %s when %s was specified." % (database, self._conn_params['db']))
+    else:
+      conn_params = self._conn_params
+      conn_params['database'] = database
+      self.connection = Database.connect(**conn_params)
 
 
   def execute_statement(self, statement):

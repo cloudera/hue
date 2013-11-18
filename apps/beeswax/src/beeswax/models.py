@@ -46,6 +46,7 @@ BEESWAX = 'beeswax'
 HIVE_SERVER2 = 'hiveserver2'
 MYSQL = 'mysql'
 POSTGRESQL = 'postgresql'
+SQLITE = 'sqlite'
 QUERY_TYPES = (HQL, IMPALA, RDBMS) = range(3)
 
 
@@ -54,7 +55,9 @@ class QueryHistory(models.Model):
   Holds metadata about all queries that have been executed.
   """
   STATE = Enum('submitted', 'running', 'available', 'failed', 'expired')
-  SERVER_TYPE = ((BEESWAX, 'Beeswax'), (HIVE_SERVER2, 'Hive Server 2'), (MYSQL, 'MySQL'), (POSTGRESQL, 'PostgreSQL'))
+  SERVER_TYPE = ((BEESWAX, 'Beeswax'), (HIVE_SERVER2, 'Hive Server 2'),
+                 (MYSQL, 'MySQL'), (POSTGRESQL, 'PostgreSQL'),
+                 (SQLITE, 'sqlite'))
 
   owner = models.ForeignKey(User, db_index=True)
   query = models.TextField()
