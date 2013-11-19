@@ -92,6 +92,8 @@ def config_validator(user):
         res.append((RDBMS[server].NAME, _("Database name should not be empty for the SQLite backend. The %s may not work correctly.") % NICE_NAME))
       if engine == 'oracle':
         res.append((RDBMS[server].NAME, _("Database name should not be empty for the Oracle backend. It should be the SID of your database. The %s may not work correctly.") % NICE_NAME))
+      if engine in ('postgresql_psycopg2', 'postgresql'):
+        res.append((RDBMS[server].NAME, _("Database name should not be empty for the PostgreSQL backend. The %s may not work correctly.") % NICE_NAME))
 
   return res
 

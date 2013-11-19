@@ -18,12 +18,12 @@
 import logging
 
 try:
-    import psycopg2 as Database
+  import cx_Oracle as Database
 except ImportError, e:
-    from django.core.exceptions import ImproperlyConfigured
-    raise ImproperlyConfigured("Error loading psycopg2 module: %s" % e)
+  from django.core.exceptions import ImproperlyConfigured
+  raise ImproperlyConfigured("Error loading cx_Oracle module: %s" % e)
 
-from beeswax.server.rdbms_base_lib import BaseRDBMSDataTable, BaseRDBMSResult, BaseRDMSClient
+from rdbms.server.rdbms_base_lib import BaseRDBMSDataTable, BaseRDBMSResult, BaseRDMSClient
 
 
 LOG = logging.getLogger(__name__)
@@ -35,38 +35,32 @@ class DataTable(BaseRDBMSDataTable): pass
 class Result(BaseRDBMSResult): pass
 
 
-class PostgreSQLClient(BaseRDMSClient):
+class OracleClient(BaseRDMSClient):
   """Same API as Beeswax"""
 
   data_table_cls = DataTable
   result_cls = Result
 
   def __init__(self, *args, **kwargs):
-    super(PostgreSQLClient, self).__init__(*args, **kwargs)
-    self.connection = Database.connect(**self._conn_params)
+    super(OracleClient, self).__init__(*args, **kwargs)
+    self.connection = Database.connect(self._conn_string, **{})
 
 
   @property
-  def _conn_params(self):
-    params = {
-      'user': self.query_server['username'],
-      'password': self.query_server['password'],
-      'host': self.query_server['server_host'],
-      'port': self.query_server['server_port'] == 0 and 5432 or self.query_server['server_port']
-    }
-    if 'name' in self.query_server:
-      params['database'] = self.query_server['name']
-    return params
+  def _conn_string(self):
+    if self.query_server['server_host']:
+      dsn = Database.makedsn(self.query_server['server_host'],
+                             int(self.query_server['server_port']),
+                             self.query_server['name'])
+    else:
+      dsn = self.query_server['name']
+    return "%s/%s@%s" % (self.query_server['username'],
+                         self.query_server['password'], dsn)
 
 
   def use(self, database):
-    # No op if a database has been specified.
-    if 'database' in self._conn_params and self._conn_params['database'] != database:
-      raise RuntimeError("Tried to use database %s when %s was specified." % (database, self._conn_params['db']))
-    else:
-      conn_params = self._conn_params
-      conn_params['database'] = database
-      self.connection = Database.connect(**conn_params)
+    # Oracle credentials are on a per database basis.
+    pass
 
 
   def execute_statement(self, statement):
@@ -81,22 +75,18 @@ class PostgreSQLClient(BaseRDMSClient):
 
 
   def get_databases(self):
-    cursor = self.connection.cursor()
-    cursor.execute("SELECT datname FROM pg_database")
-    self.connection.commit()
-    return [row[0] for row in cursor.fetchall()]
+    return [self.query_server['name']]
 
 
   def get_tables(self, database, table_names):
-    # Doesn't use database and only retrieves tables for database currently in use.
     cursor = self.connection.cursor()
-    cursor.execute("SELECT table_schema,table_name FROM information_schema.tables")
+    cursor.execute("SELECT table_name FROM all_tables")
     self.connection.commit()
     return [row[0] for row in cursor.fetchall()]
 
 
   def get_columns(self, database, table):
     cursor = self.connection.cursor()
-    cursor.execute("SHOW COLUMNS %s.%s" % (database, table))
+    cursor.execute("SELECT column_name FROM user_tab_cols WHERE table_name = '%s'" % table)
     self.connection.commit()
     return [row[0] for row in cursor.fetchall()]

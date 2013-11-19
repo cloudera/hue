@@ -25,12 +25,12 @@ from desktop.context_processors import get_app_name
 
 from beeswax import models as beeswax_models
 from beeswax.forms import SaveForm
-from beeswax.server import dbms
 from beeswax.views import authorized_get_history, safe_get_design
 
 from rdbms import conf
 from rdbms.forms import SQLForm
 from rdbms.design import SQLdesign
+from rdbms.server import dbms
 from rdbms.views import save_design
 
 
@@ -48,8 +48,7 @@ def servers(request):
 
 
 def databases(request, server):
-  app_name = get_app_name(request)
-  query_server = dbms.get_query_server_config(app_name, server)
+  query_server = dbms.get_query_server_config(server)
 
   if not query_server:
     raise Http404
@@ -80,7 +79,7 @@ def execute_query(request, design_id=None):
       design = save_design(request, SaveForm(), form, query_type, design)
 
       query = SQLdesign(form, query_type=query_type)
-      query_server = dbms.get_query_server_config(app_name)
+      query_server = dbms.get_query_server_config(request.POST.get('server'))
       db = dbms.get(request.user, query_server)
       query_history = db.execute_query(query, design)
       query_history.last_state = beeswax_models.QueryHistory.STATE.expired.index
@@ -253,12 +252,10 @@ def design_to_dict(design):
 
 
 def get_query_form(request, design_id=None):
-  app_name = get_app_name(request)
   servers = conf.get_server_choices()
 
   # Get database choices
-  app_name = get_app_name(request)
-  query_server = dbms.get_query_server_config(app_name, request.POST.get('server', None))
+  query_server = dbms.get_query_server_config(request.POST.get('server'))
 
   if not query_server:
     raise RuntimeError(_("Server specified doesn't exist."))

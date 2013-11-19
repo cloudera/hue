@@ -47,9 +47,13 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
       <ul class="nav nav-pills hueBreadcrumbBar" id="breadcrumbs">
         <li>
           <div style="display: inline" class="dropdown">
-            ${_('Server')}&nbsp;<a data-toggle="dropdown" href="#"><strong data-bind="text: $root.server"></strong> <i class="fa fa-caret-down"></i></a>
-            <ul data-bind="foreach: Object.keys($root.servers())" class="dropdown-menu">
-              <li data-bind="click: $root.chooseServer, text: $root.servers()[$data]" class="selectable"></li>
+            ${_('Server')}&nbsp;
+            <a data-bind="if: $root.server" data-toggle="dropdown" href="javascript:void(0);">
+              <strong data-bind="text: $root.server().nice_name"></strong>
+              <i class="fa fa-caret-down"></i>
+            </a>
+            <ul data-bind="foreach: $root.servers" class="dropdown-menu">
+              <li data-bind="click: $root.chooseServer, text: nice_name" class="selectable"></li>
             </ul>
           </div>
         </li>
@@ -454,6 +458,18 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
     }
   }
 
+  function checkLastDatabase(server, database) {
+    var key = "hueRdbmsLastDatabase-" + server;
+    if (database != $.totalStorage(key)) {
+      $.totalStorage(key, database);
+    }
+  }
+
+  function getLastDatabase(server) {
+    var key = "hueRdbmsLastDatabase-" + server;
+    return $.totalStorage(key);
+  }
+
 
   // Knockout
   viewModel = new RdbmsViewModel();
@@ -468,18 +484,8 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
           viewModel.fetchQuery(${design.id});
         }
       % endif
-
-      if (counter++ > 0) {
-        if (value != $.totalStorage("hueRdbmsLastDatabase")) {
-          $.totalStorage("hueRdbmsLastDatabase", value);
-        }
-      }
     }
   })());
-  viewModel.databases.subscribe(function() {
-    viewModel.database($.totalStorage("hueRdbmsLastDatabase"));
-  });
-
   viewModel.query.query.subscribe((function() {
     // First call skipped to avoid reset of hueRdbmsLastDatabase
     var counter = 0;
@@ -489,7 +495,6 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
       }
     }
   })());
-
   ko.applyBindings(viewModel);
 
 

@@ -18,15 +18,21 @@
 import logging
 
 try:
-  try:
-    from pysqlite2 import dbapi2 as Database
-  except ImportError, e1:
-    from sqlite3 import dbapi2 as Database
-except ImportError, exc:
-  from django.core.exceptions import ImproperlyConfigured
-  raise ImproperlyConfigured("Error loading either pysqlite2 or sqlite3 modules (tried in that order): %s" % exc)
+    import MySQLdb as Database
+except ImportError, e:
+    from django.core.exceptions import ImproperlyConfigured
+    raise ImproperlyConfigured("Error loading MySQLdb module: %s" % e)
 
-from beeswax.server.rdbms_base_lib import BaseRDBMSDataTable, BaseRDBMSResult, BaseRDMSClient
+# We want version (1, 2, 1, 'final', 2) or later. We can't just use
+# lexicographic ordering in this check because then (1, 2, 1, 'gamma')
+# inadvertently passes the version test.
+version = Database.version_info
+if (version < (1,2,1) or (version[:3] == (1, 2, 1) and
+        (len(version) < 5 or version[3] != 'final' or version[4] < 2))):
+    from django.core.exceptions import ImproperlyConfigured
+    raise ImproperlyConfigured("MySQLdb-1.2.1p2 or newer is required; you have %s" % Database.__version__)
+
+from rdbms.server.rdbms_base_lib import BaseRDBMSDataTable, BaseRDBMSResult, BaseRDMSClient
 
 
 LOG = logging.getLogger(__name__)
@@ -38,28 +44,39 @@ class DataTable(BaseRDBMSDataTable): pass
 class Result(BaseRDBMSResult): pass
 
 
-class SQLiteClient(BaseRDMSClient):
+class MySQLClient(BaseRDMSClient):
   """Same API as Beeswax"""
 
   data_table_cls = DataTable
   result_cls = Result
 
   def __init__(self, *args, **kwargs):
-    super(SQLiteClient, self).__init__(*args, **kwargs)
+    super(MySQLClient, self).__init__(*args, **kwargs)
     self.connection = Database.connect(**self._conn_params)
 
 
   @property
   def _conn_params(self):
-    return {
-      'database': self.query_server['name'],
-      'detect_types': Database.PARSE_DECLTYPES | Database.PARSE_COLNAMES,
+    params = {
+      'user': self.query_server['username'],
+      'passwd': self.query_server['password'],
+      'host': self.query_server['server_host'],
+      'port': self.query_server['server_port']
     }
+
+    if 'name' in self.query_server:
+      params['db'] = self.query_server['name']
+
+    return params
 
 
   def use(self, database):
-    # Do nothing because SQLite has one database per path.
-    pass
+    if 'db' in self._conn_params and self._conn_params['db'] != database:
+      raise RuntimeError("Tried to use database %s when %s was specified." % (database, self._conn_params['db']))
+    else:
+      cursor = self.connection.cursor()
+      cursor.execute("USE %s" % database)
+      self.connection.commit()
 
 
   def execute_statement(self, statement):
@@ -74,19 +91,21 @@ class SQLiteClient(BaseRDMSClient):
 
 
   def get_databases(self):
-    return [self._conn_params['database']]
+    cursor = self.connection.cursor()
+    cursor.execute("SHOW DATABASES")
+    self.connection.commit()
+    return [row[0] for row in cursor.fetchall()]
 
 
   def get_tables(self, database, table_names):
-    # Doesn't use database and only retrieves tables for database currently in use.
     cursor = self.connection.cursor()
-    cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
+    cursor.execute("SHOW TABLES")
     self.connection.commit()
     return [row[0] for row in cursor.fetchall()]
 
 
   def get_columns(self, database, table):
     cursor = self.connection.cursor()
-    cursor.execute("PRAGMA table_info(%s)" % table)
+    cursor.execute("SHOW COLUMNS %s.%s" % (database, table))
     self.connection.commit()
-    return [row[1] for row in cursor.fetchall()]
+    return [row[0] for row in cursor.fetchall()]

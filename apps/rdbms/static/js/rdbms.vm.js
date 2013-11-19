@@ -18,10 +18,10 @@
 function RdbmsViewModel() {
   var self = this;
 
-  self.selectedServer = ko.observable();
-  self.servers = ko.observable({});
+  self.servers = ko.observableArray();
+  self.selectedServer = ko.observable(0);
+  self.databases = ko.observableArray();
   self.selectedDatabase = ko.observable(0);
-  self.databases = ko.observableArray([]);
   self.query = ko.mapping.fromJS({
     'id': -1,
     'query': '',
@@ -38,20 +38,24 @@ function RdbmsViewModel() {
 
   self.server = ko.computed({
     'read': function() {
-      if (self.servers() && self.selectedServer()) {
+      if (self.servers().length > 0) {
         return self.servers()[self.selectedServer()];
       } else{
-        return "";
+        return null;
       }
     },
     'write': function(value) {
-      self.selectedServer(value);
+      var filtered = $.each(self.servers(), function(index, server) {
+        if (server.name() == value) {
+          self.selectedServer(index);
+        }
+      });
     }
   });
 
   self.database = ko.computed({
     'read': function() {
-      if (self.databases) {
+      if (self.databases()) {
         return self.databases()[self.selectedDatabase()];
       } else{
         return "";
@@ -62,9 +66,17 @@ function RdbmsViewModel() {
     }
   });
 
-  self.selectedServer.subscribe(function(value) {
-    self.fetchDatabases();
-  });
+  self.getFirstDatabase = function() {
+    if (self.databases()) {
+      return self.databases()[0];
+    } else {
+      return null;
+    }
+  };
+
+  self.getServerNiceName = function(value) {
+    return self.servers[value];
+  };
 
   self.updateResults = function(results) {
     var rows = [];
@@ -80,15 +92,29 @@ function RdbmsViewModel() {
   };
 
   self.updateServers = function(servers) {
-    self.servers(servers);
-    if (servers) {
-      self.selectedServer(Object.keys(servers)[0]);
+    var newServers = [];
+    $.each(servers, function(name, nice_name) {
+      newServers.push({
+        'name': ko.observable(name),
+        'nice_name': ko.observable(nice_name)
+      });
+    });
+    self.servers(newServers);
+
+    var last = $.totalStorage('hueRdbmsLastServer') || ((newServers[0].length > 0) ? newServers[0].name() : null);
+    if (last) {
+      self.server(last);
     }
   };
 
   self.updateDatabases = function(databases) {
     self.databases(databases);
-    self.selectedDatabase.valueHasMutated();
+
+    var key = 'hueRdbmsLastDatabase-' + self.server().name();
+    var last = $.totalStorage(key) || ((databases.length > 0) ? databases[0] : null);
+    if (last) {
+      self.database(last);
+    }
   };
 
   self.updateQuery = function(design) {
@@ -101,29 +127,37 @@ function RdbmsViewModel() {
   };
 
   self.chooseServer = function(value, e) {
-    self.selectedServer(value);
+    $.each(self.servers(), function(index, server) {
+      if (server.name() == value.name()) {
+        self.selectedServer(index);
+      }
+    });
+    $.totalStorage('hueRdbmsLastServer', self.server().name());
+    self.fetchDatabases();
   };
 
   self.chooseDatabase = function(value, e) {
+    var key = 'hueRdbmsLastDatabase-' + self.server().name();
     self.selectedDatabase(self.databases.indexOf(value));
+    $.totalStorage(key, value);
   };
 
   self.explainQuery = function() {
     var data = ko.mapping.toJS(self.query);
     data.database = self.database();
-    data.server = self.selectedServer();
+    data.server = self.server().name();
     var request = {
       url: '/rdbms/api/explain/',
       dataType: 'json',
       type: 'POST',
       success: function(data) {
+        self.query.errors.removeAll();
         if (data.status === 0) {
           $(document).trigger('explain.query', data);
           self.updateResults(data.results);
           self.query.id(data.design);
           $(document).trigger('explained.query', data);
         } else {
-          self.query.errors.removeAll();
           self.query.errors.push(data.message);
         }
       },
@@ -154,7 +188,7 @@ function RdbmsViewModel() {
     if (self.query.query() && self.query.name()) {
       var data = ko.mapping.toJS(self.query);
       data['desc'] = data['description'];
-      data['server'] = self.selectedServer();
+      data['server'] = self.server().name();
       data['database'] = self.database();
       var url = '/rdbms/api/query/';
       if (self.query.id() && self.query.id() != -1) {
@@ -179,19 +213,19 @@ function RdbmsViewModel() {
   self.executeQuery = function() {
     var data = ko.mapping.toJS(self.query);
     data.database = self.database();
-    data.server = self.selectedServer();
+    data.server = self.server().name();
     var request = {
       url: '/rdbms/api/execute/',
       dataType: 'json',
       type: 'POST',
       success: function(data) {
+        self.query.errors.removeAll();
         if (data.status === 0) {
           $(document).trigger('execute.query', data);
           self.updateResults(data.results);
           self.query.id(data.design);
           $(document).trigger('executed.query', data);
         } else {
-          self.query.errors.removeAll();
           self.query.errors.push(data.message);
         }
       },
@@ -216,9 +250,9 @@ function RdbmsViewModel() {
   };
 
   self.fetchDatabases = function() {
-    if (self.selectedServer()) {
+    if (self.server()) {
       var request = {
-        url: '/rdbms/api/servers/' + self.selectedServer() + '/databases/',
+        url: '/rdbms/api/servers/' + self.server().name() + '/databases/',
         dataType: 'json',
         type: 'GET',
         success: function(data) {
