@@ -56,6 +56,7 @@ from django.utils.translation import ugettext as _
   <style type="text/css">
     % if conf.CUSTOM.BANNER_TOP_HTML.get():
       body {
+        display: none;
         padding-top: ${str(int(padding[:-2]) + 30) + 'px'};
       }
       .banner {
@@ -75,6 +76,7 @@ from django.utils.translation import ugettext as _
       }
     % else:
       body {
+        display: none;
         padding-top: ${padding};
       }
     % endif
@@ -137,6 +139,14 @@ from django.utils.translation import ugettext as _
 
   <script type="text/javascript" charset="utf-8">
     $(document).ready(function () {
+      // prevents framebusting and clickjacking
+      if (self == top){
+        $("body").show();
+      }
+      else {
+        top.location = self.location;
+      }
+
       $("input, textarea").placeholder();
       $(".submitter").keydown(function (e) {
         if (e.keyCode == 13) {
