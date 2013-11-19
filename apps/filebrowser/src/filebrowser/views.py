@@ -14,11 +14,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
-# Implements simple file system browsing operations.
-#
-# Useful resources:
-#   django/views/static.py manages django's internal directory index
 
 import errno
 import logging
@@ -46,6 +41,7 @@ from django.template.defaultfilters import urlencode
 from django.utils.functional import curry
 from django.utils.http import http_date, urlquote
 from django.utils.html import escape
+from django.utils.translation import ugettext as _
 from cStringIO import StringIO
 from gzip import GzipFile
 from avro import datafile, io
@@ -54,6 +50,9 @@ from desktop.lib import i18n, paginator
 from desktop.lib.conf import coerce_bool
 from desktop.lib.django_util import make_absolute, render, render_json, format_preserving_redirect
 from desktop.lib.exceptions_renderable import PopupException
+from hadoop.fs.hadoopfs import Hdfs
+from hadoop.fs.exceptions import WebHdfsException
+
 from filebrowser.conf import MAX_SNAPPY_DECOMPRESSION_SIZE
 from filebrowser.lib.archives import archive_factory
 from filebrowser.lib.rwx import filetype, rwx
@@ -61,10 +60,6 @@ from filebrowser.lib import xxd
 from filebrowser.forms import RenameForm, UploadFileForm, UploadArchiveForm, MkDirForm, EditorForm, TouchForm,\
                               RenameFormSet, RmTreeFormSet, ChmodFormSet, ChownFormSet, CopyFormSet, RestoreFormSet,\
                               TrashPurgeForm
-from hadoop.fs.hadoopfs import Hdfs
-from hadoop.fs.exceptions import WebHdfsException
-
-from django.utils.translation import ugettext as _
 
 
 DEFAULT_CHUNK_SIZE_BYTES = 1024 * 4 # 4KB
@@ -144,6 +139,9 @@ def view(request, path):
 
     # default_to_home is set in bootstrap.js
     if 'default_to_trash' in request.GET:
+        home_trash = request.fs.join(request.fs.trash_path, 'Current', request.user.get_home_directory()[1:])
+        if request.fs.isdir(home_trash):
+            return format_preserving_redirect(request, reverse(view, kwargs=dict(path=home_trash)))
         if request.fs.isdir(request.fs.trash_path):
             return format_preserving_redirect(request, reverse(view, kwargs=dict(path=request.fs.trash_path)))
 

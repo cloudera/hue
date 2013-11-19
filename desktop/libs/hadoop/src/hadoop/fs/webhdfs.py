@@ -69,8 +69,7 @@ class WebHdfs(Hdfs):
     self._client = self._make_client(url, security_enabled)
     self._root = resource.Resource(self._client)
 
-    # To store user info
-    self._thread_local = threading.local()
+    self._user = None
 
     LOG.debug("Initializing Hadoop WebHdfs: %s (security: %s, superuser: %s)" %
               (self._url, self._security_enabled, self._superuser))
@@ -126,20 +125,13 @@ class WebHdfs(Hdfs):
   @property
   def user(self):
     try:
-      return self._thread_local.user
+      return self._user
     except AttributeError:
       return WebHdfs.DEFAULT_USER
 
   @property
   def trash_path(self):
-    try:
-      return self._thread_local.trash_path[self.user]
-    except AttributeError:
-      self._thread_local.trash_paths = {}
-      self._thread_local.trash_paths[self.user] = self.join(self.get_home_dir(), '.Trash')
-    except KeyError:
-      self._thread_local.trash_paths[self.user] = self.join(self.get_home_dir(), '.Trash')
-    return self._thread_local.trash_paths[self.user]
+    return self.join(self.get_home_dir(), '.Trash')
 
   @property
   def current_trash_path(self):
@@ -154,7 +146,7 @@ class WebHdfs(Hdfs):
   def setuser(self, user):
     """Set a new user. Return the current user."""
     curr = self.user
-    self._thread_local.user = user
+    self._user = user
     return curr
 
   def listdir_stats(self, path, glob=None):

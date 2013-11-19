@@ -1130,3 +1130,44 @@ def test_location_to_url():
   assert_equal('/filebrowser/view/var/lib/hadoop-hdfs', location_to_url('hdfs://localhost:8020/var/lib/hadoop-hdfs'))
   assert_equal('/filebrowser/view/', location_to_url('hdfs://localhost:8020'))
   assert_equal(None, location_to_url('thrift://10.0.0.1:9083'))
+
+@attr('requires_hadoop')
+def test_trash():
+  cluster = pseudo_hdfs4.shared_cluster()
+
+  try:
+    c = make_logged_in_client()
+    USERNAME = 'test'
+    cluster.fs.setuser(USERNAME)
+
+    cluster.fs.do_as_superuser(cluster.fs.chown, '/user/%s' % USERNAME, USERNAME, USERNAME)
+
+    HOME_TRASH_DIR = '/user/%s/.Trash/Current/user/%s' % (USERNAME, USERNAME)
+    prefix = '/tmp/test_trash'
+    PATH_1 = '/%s/1' % prefix
+    cluster.fs.mkdir(prefix)
+    cluster.fs.mkdir(PATH_1)
+
+    c.post('/filebrowser/rmtree?skip_trash=true', dict(path=[HOME_TRASH_DIR]))
+
+    # No trash folder
+    response = c.get('/filebrowser/view/user/test?default_to_trash', follow=True)
+    assert_equal([], response.redirect_chain)
+
+    c.post('/filebrowser/rmtree', dict(path=[PATH_1]))
+
+    # We have a trash folder so a redirect (Current not always there)
+    response = c.get('/filebrowser/view/user/test?default_to_trash', follow=True)
+    assert_true(any(['.Trash' in page for page, code in response.redirect_chain]), response.redirect_chain)
+
+    c.post('/filebrowser/rmtree?skip_trash=true', dict(path=[HOME_TRASH_DIR]))
+
+    # No home trash, just regular root trash
+    response = c.get('/filebrowser/view/user/test?default_to_trash', follow=True)
+    assert_true(any(['.Trash' in page for page, code in response.redirect_chain]), response.redirect_chain)
+  finally:
+    try:
+      cluster.fs.rmtree(prefix)     # Clean up
+    except:
+      pass      # Don't let cleanup errors mask earlier failures
+

@@ -32,7 +32,7 @@ from django.utils.translation import ugettext as _
         </li>
         <li class="pull-right">
           <a href="${url('filebrowser.views.view', path=urlencode(path))}?default_to_trash" style="line-height:18px" title="${_('View trash')}">
-            <i class="fa fa-trash-o"></i> ${_('View trash')}
+            <i class="fa fa-trash-o"></i> ${_('Trash')}
           </a>
         </li>
         % else:
