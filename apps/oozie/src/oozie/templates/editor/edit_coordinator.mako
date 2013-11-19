@@ -430,8 +430,6 @@ ${ layout.menubar(section='coordinators') }
     }
   </style>
 
-  <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
-
   <script type="text/javascript" charset="utf-8">
 
     /**
@@ -507,6 +505,7 @@ ${ layout.menubar(section='coordinators') }
                     $("#add-dataset-form").empty();
                     $('#add-dataset-body').html(response['data']);
                     decorateDateTime();
+                    ko.cleanNode(window.document.body);
                     ko.applyBindings(window.viewModel);
                   } else {
                     window.location.replace(response['data']);
@@ -528,6 +527,7 @@ ${ layout.menubar(section='coordinators') }
           success:function (response) {
             $("#edit-dataset-body").html(response['data']);
             decorateDateTime();
+            ko.cleanNode(window.document.body);
             ko.applyBindings(window.viewModel);
             routie("editDataset");
           }
