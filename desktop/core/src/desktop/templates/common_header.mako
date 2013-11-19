@@ -58,6 +58,7 @@ from django.utils.translation import ugettext as _
     % if conf.CUSTOM.BANNER_TOP_HTML.get():
       body {
         padding-top: ${str(int(padding[:-2]) + 40) + 'px'};
+        display: none;
       }
       .banner {
         height: 40px;
@@ -68,6 +69,7 @@ from django.utils.translation import ugettext as _
       }
     % else:
       body {
+        display: none;
         padding-top: ${padding};
       }
     % endif
@@ -126,7 +128,15 @@ from django.utils.translation import ugettext as _
   <script src="/static/ext/js/fileuploader.js"></script>
 
   <script type="text/javascript" charset="utf-8">
-    $(document).ready(function(){
+    $(document).ready(function() {
+      // prevents framebusting and clickjacking
+      if (self == top){
+        $("body").show();
+      }
+      else {
+        top.location = self.location;
+      }
+
       $("input, textarea").placeholder();
       $(".submitter").keydown(function(e){
         if (e.keyCode==13){
