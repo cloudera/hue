@@ -1259,7 +1259,7 @@ class TestEditor(OozieMockBase):
 
     self.c.post(reverse('oozie:create_coordinator_dataset', args=[coord.id]), {
                           u'create-name': [u'MyDataset2'], u'create-frequency_number': [u'1'], u'create-frequency_unit': [u'days'],
-                          u'create-uri': [u'/data/out/${YEAR}${MONTH}${DAY}'],
+                          u'create-uri': [u's3n://a-server/data/out/${YEAR}${MONTH}${DAY}'],
                           u'create-instance_choice': [u'single'],
                           u'instance_start': [u'-1'],
                           u'create-advanced_start_instance': [u'0'],
@@ -1290,7 +1290,7 @@ class TestEditor(OozieMockBase):
     </dataset>
     <dataset name="MyDataset2" frequency="${coord:days(1)}"
              initial-instance="2012-07-01T00:00Z" timezone="America/Los_Angeles">
-      <uri-template>${nameNode}/data/out/${YEAR}${MONTH}${DAY}</uri-template>
+      <uri-template>s3n://a-server/data/out/${YEAR}${MONTH}${DAY}</uri-template>
       <done-flag></done-flag>
     </dataset>
   </datasets>

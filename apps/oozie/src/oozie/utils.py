@@ -18,6 +18,7 @@
 import json
 import logging
 import re
+import urlparse
 from datetime import datetime
 
 from django.utils.formats import localize_input
@@ -97,7 +98,7 @@ def smart_path(path, mapping):
   # This dynamic checking enable the use of <prepares> statements in a workflow scheduled manually of by a coordinator.
   # The logic is a bit complicated but Oozie is not consistent with data paths, prepare, coordinator paths and Fs action.
 
-  if not path.startswith('$') and not path.startswith('/') and not path.startswith('hdfs://'):
+  if not path.startswith('$') and not path.startswith('/') and not urlparse.urlsplit(path).scheme:
     path = '/user/%(username)s/%(path)s' % {'username': '${wf:user()}', 'path': path}
 
   if path.startswith('$'):
@@ -106,10 +107,10 @@ def smart_path(path, mapping):
       prefix = '${%s}' % var
       if path.startswith(prefix):
         if var in mapping:
-          if not mapping[var].startswith('hdfs://') and not mapping[var].startswith('$'):
+          if not urlparse.urlsplit(mapping[var]).scheme and not mapping[var].startswith('$'):
             path = '%(nameNode)s%(path)s' % {'nameNode': '${nameNode}', 'path': path}
   else:
-    if not path.startswith('hdfs://'):
+    if not urlparse.urlsplit(path).scheme:
       path = '%(nameNode)s%(path)s' % {'nameNode': '${nameNode}', 'path': path}
 
   return path
