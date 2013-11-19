@@ -59,6 +59,10 @@ def get(user, query_server=None):
     from beeswax.server.sqlite_lib import SQLiteClient
 
     return Rdbms(SQLiteClient(query_server, user), QueryHistory.SERVER_TYPE[2][0])
+  elif query_server['server_name'] == 'oracle':
+    from beeswax.server.oracle_lib import OracleClient
+
+    return Rdbms(OracleClient(query_server, user), QueryHistory.SERVER_TYPE[2][0])
 
 
 def get_query_server_config(name='beeswax', server=None):

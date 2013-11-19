@@ -47,6 +47,7 @@ HIVE_SERVER2 = 'hiveserver2'
 MYSQL = 'mysql'
 POSTGRESQL = 'postgresql'
 SQLITE = 'sqlite'
+ORACLE = 'oracle'
 QUERY_TYPES = (HQL, IMPALA, RDBMS) = range(3)
 
 
@@ -57,7 +58,7 @@ class QueryHistory(models.Model):
   STATE = Enum('submitted', 'running', 'available', 'failed', 'expired')
   SERVER_TYPE = ((BEESWAX, 'Beeswax'), (HIVE_SERVER2, 'Hive Server 2'),
                  (MYSQL, 'MySQL'), (POSTGRESQL, 'PostgreSQL'),
-                 (SQLITE, 'sqlite'))
+                 (SQLITE, 'sqlite'), (ORACLE, 'oracle'))
 
   owner = models.ForeignKey(User, db_index=True)
   query = models.TextField()

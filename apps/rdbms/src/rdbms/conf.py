@@ -86,8 +86,12 @@ def config_validator(user):
   res = []
 
   for server in RDBMS:
-    if RDBMS[server].ENGINE.get().split('.')[-1] in ('sqlite', 'sqlite3') and not RDBMS[server].NAME.get():
-      res.append((RDBMS[server].NAME, _("Database name should not be empty for SQLite backends. The %s may not work correctly.") % NICE_NAME))
+    if not RDBMS[server].NAME.get():
+      engine = RDBMS[server].ENGINE.get().split('.')[-1]
+      if engine in ('sqlite', 'sqlite3'):
+        res.append((RDBMS[server].NAME, _("Database name should not be empty for the SQLite backend. The %s may not work correctly.") % NICE_NAME))
+      if engine == 'oracle':
+        res.append((RDBMS[server].NAME, _("Database name should not be empty for the Oracle backend. It should be the SID of your database. The %s may not work correctly.") % NICE_NAME))
 
   return res
 
