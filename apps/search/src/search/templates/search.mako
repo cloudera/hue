@@ -17,8 +17,10 @@
 <%!
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
+from django.utils.dateparse import parse_datetime
 import urllib
 import math
+import time
 %>
 
 <%namespace name="macros" file="macros.mako" />
@@ -28,6 +30,9 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
 <link rel="stylesheet" href="/search/static/css/search.css">
 <script src="/static/ext/js/moment.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/search/static/js/search.utils.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/jquery/plugins/jquery.flot.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/jquery/plugins/jquery.flot.selection.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/jquery/plugins/jquery.flot.time.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/js/jquery.blueprint.js" type="text/javascript" charset="utf-8"></script>
 
 <%
@@ -92,6 +97,7 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
     </div>
     %else:
     % if response and 'response' in response and 'docs' in response['response'] and len(response['response']['docs']) > 0 and 'normalized_facets' in response:
+      <% shown_facets = 0 %>
     <div class="span2 results">
       <ul class="facet-list">
         ## Force chart facets first
@@ -106,6 +112,7 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
                 remove_list.remove(fq)
             %>
             %if found_value != "":
+              <% shown_facets += 1 %>
               <li class="nav-header">${fld['label']}</li>
               <li><strong>${ found_value }</strong> <a href="?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}"><i class="fa fa-times"></i></a></li>
             %endif
@@ -113,6 +120,7 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
         % endfor
         % for fld in response['normalized_facets']:
           % if fld['type'] != 'chart':
+            <% shown_facets += 1 %>
             % if fld['type'] == 'date':
               <li class="nav-header facetHeader dateFacetHeader">${fld['label']}</li>
             % else:
@@ -158,7 +166,7 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
     % endif
 
     % if response and 'response' in response and 'docs' in response['response'] and len(response['response']['docs']) > 0:
-      % if response['normalized_facets']:
+      % if response['normalized_facets'] and shown_facets > 0:
       <div class="span10 results">
       % else:
       <div class="span12 results">
@@ -188,7 +196,14 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
             for group, count in macros.pairwise(fld['counts']):
               values += "['" + group + "'," + str(count) + "],"
           %>
-          <div class="chartComponent" data-values="[${values[:-1]}]" data-label="${fld['label']}" data-field="${fld['field']}"></div>
+          <div class="chartComponent" data-values="[${values[:-1]}]" data-label="${fld['label']}" data-field="${fld['field']}">
+            <!--[if lte IE 9]>
+              <img src="/static/art/spinner-big.gif" />
+            <![endif]-->
+            <!--[if !IE]> -->
+              <i class="fa fa-spinner fa-spin" style="font-size: 24px; color: #DDD"></i>
+            <!-- <![endif]-->
+          </div>
         %endif
       % endfor
 
@@ -489,33 +504,52 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
       }
     }
 
-    var _chartData = eval($(".chartComponent").data("values"));
+    var _chartData = null;
+
+    if ($(".chartComponent").length > 0){
+      _chartData = eval($(".chartComponent").data("values"));
+    }
 
     // test the content of _chartData to see if it can be rendered as chart
-    if (_chartData.length > 0) {
+    if (_chartData != null && _chartData.length > 0) {
       if ($.isArray(_chartData[0])) {
-        if ($.isNumeric(_chartData[0][0])) {
+        if ($.isNumeric(_chartData[0][0]) || _chartData[0][0].match(/[0-9][0-9][0-9][0-9]\-[0-9][0-9]\-[0-9][0-9]T/)) {
+          var _isDate = false;
+          if (_chartData[0][0].match(/[0-9][0-9][0-9][0-9]\-[0-9][0-9]\-[0-9][0-9]T/) != null){
+            _isDate = true;
+          }
           $(".chartComponent").jHueBlueprint({
             data: _chartData,
             label: $(".chartComponent").data("label"),
             type: $.jHueBlueprint.TYPES.BARCHART,
             color: $.jHueBlueprint.COLORS.BLUE,
+            isDateTime: _isDate,
             fill: true,
             enableSelection: true,
             height: 100,
             onSelect: function (range) {
-              location.href = '?collection=${ current_collection }&query=${ solr_query['q'] }&fq=' + getFq("${ solr_query['fq'] }", $(".chartComponent").data("field"), ':["' + Math.floor(range.xaxis.from) + '" TO "' + Math.ceil(range.xaxis.to) + '"]') + '${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}';
+              var _start = Math.floor(range.xaxis.from)
+              var _end = Math.ceil(range.xaxis.to);
+              if (_isDate){
+                _start = moment(range.xaxis.from).utc().format("YYYY-MM-DD[T]HH:mm:ss[Z]");
+                _end = moment(range.xaxis.to).utc().format("YYYY-MM-DD[T]HH:mm:ss[Z]");
+              }
+              location.href = '?collection=${ current_collection }&query=${ solr_query['q'] }&fq=' + getFq("${ solr_query['fq'] }", $(".chartComponent").data("field"), ':["' + _start + '" TO "' + _end + '"]') + '${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}';
             },
             onItemClick: function (pos, item) {
               if (item) {
                 $(".chartComponent").data("plotObj").highlight(item.series, item.datapoint);
-                location.href = '?collection=${ current_collection }&query=${ solr_query['q'] }&fq=' + getFq("${ solr_query['fq'] }", $(".chartComponent").data("field"), ':' + item.datapoint[0]) + '${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}';
+                var _point = item.datapoint[0];
+                if (_isDate){
+                  _point = '"' + moment(item.datapoint[0]).utc().format("YYYY-MM-DD[T]HH:mm:ss[Z]") + '"';
+                }
+                location.href = '?collection=${ current_collection }&query=${ solr_query['q'] }&fq=' + getFq("${ solr_query['fq'] }", $(".chartComponent").data("field"), ':' + _point) + '${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}';
               }
             }
           });
         }
         else {
-          $(".chartComponent").addClass("alert").text("${_('The graphical facets works just with numbers. Please choose another field.')}")
+          $(".chartComponent").addClass("alert").text("${_('The graphical facets works just with numbers or dates. Please choose another field.')}")
         }
       }
       else {

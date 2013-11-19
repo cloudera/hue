@@ -18,29 +18,6 @@
  * it's a layer of abstraction on top of other chart/drawing/mapping plugins
  */
 
-jQuery.cachedScripts = {};
-
-jQuery.cacheScript = function (url, callback) {
-  if (jQuery.cachedScripts != null && jQuery.cachedScripts[url] != null) {
-    callback(jQuery.cachedScripts[url]);
-  }
-  else {
-    var options = $.extend({}, {
-      dataType: "script",
-      cache: true,
-      url: url,
-      async: false,
-      complete: function (script) {
-        jQuery.cachedScripts[url] = script;
-        callback(script);
-      }
-    });
-    return jQuery.ajax(options);
-  }
-};
-
-var FLOT_LOADED, FLOT_PIE_LOADED = false;
-
 (function ($, window, document, undefined) {
   var pluginName = "jHueBlueprint",
       COLORS = {
@@ -64,6 +41,7 @@ var FLOT_LOADED, FLOT_PIE_LOADED = false;
         borderWidth: 0,
         tooltips: true,
         enableSelection: false,
+        isDateTime: false,
         onSelect: function () {
         },
         onItemClick: function () {
@@ -80,25 +58,12 @@ var FLOT_LOADED, FLOT_PIE_LOADED = false;
 
   Plugin.prototype.init = function () {
     var _this = this;
-    $.cacheScript("/static/ext/js/jquery/plugins/jquery.flot.min.js", function (script, textStatus) {
-      FLOT_LOADED = true;
-      if (_this.options.type == TYPES.PIECHART) {
-        $.cacheScript("/static/ext/js/jquery/plugins/jquery.flot.pie.min.js", function (script, textStatus) {
-          FLOT_PIE_LOADED = true;
-          flot_pie(_this);
-        });
-      }
-      else {
-        if (_this.options.enableSelection) {
-          $.cacheScript("/static/ext/js/jquery/plugins/jquery.flot.selection.min.js", function (script, textStatus) {
-            flot(_this);
-          });
-        }
-        else {
-          flot(_this);
-        }
-      }
-    });
+    if (_this.options.type == TYPES.PIECHART) {
+      flot_pie(_this);
+    }
+    else {
+      flot(_this);
+    }
   };
 
   Plugin.prototype.setOptions = function (options) {
@@ -106,24 +71,17 @@ var FLOT_LOADED, FLOT_PIE_LOADED = false;
   };
 
   function addSerie(element, serie) {
-    if (!FLOT_LOADED) {
-      window.setTimeout(function () {
-        addSerie(element, serie);
-      }, 500)
+    var _series = $(element).data("plotSeries");
+    if (_series == null) {
+      if (typeof console != "undefined") {
+        console.warn("$(elem).jHueBlueprint('add', options) requires an existing data serie to work. Use $(elem).jHueBlueprint(options) instead.");
+      }
     }
     else {
-      var _series = $(element).data("plotSeries");
-      if (_series == null) {
-        if (typeof console != "undefined") {
-          console.warn("$(elem).jHueBlueprint('add', options) requires an existing data serie to work. Use $(elem).jHueBlueprint(options) instead.");
-        }
-      }
-      else {
-        _series.push(getSerie(serie));
-        var _plot = $.plot(element, _series, { grid: { borderWidth: element.data('plugin_' + pluginName).options.borderWidth } });
-        $(element).data("plotObj", _plot);
-        $(element).data("plotSeries", _series);
-      }
+      _series.push(getSerie(serie));
+      var _plot = $.plot(element, _series, { grid: { borderWidth: element.data('plugin_' + pluginName).options.borderWidth } });
+      $(element).data("plotObj", _plot);
+      $(element).data("plotSeries", _series);
     }
   };
 
@@ -154,6 +112,11 @@ var FLOT_LOADED, FLOT_PIE_LOADED = false;
         color: COLORS.GREEN
       }
     }
+    if (_this.options.isDateTime) {
+      _options.xaxis = {
+        mode: "time"
+      }
+    }
     var _plot = $.plot(_this.element, [_serie], _options);
     $(_this.element).bind("plotselected", function (event, ranges) {
       _this.options.onSelect(ranges);
@@ -169,10 +132,14 @@ var FLOT_LOADED, FLOT_PIE_LOADED = false;
             previousPoint = item.dataIndex;
 
             $("#jHueBlueprintTooltip").remove();
-            var x = item.datapoint[0].toFixed(2),
-                y = item.datapoint[1].toFixed(2);
+            var x = item.datapoint[0],
+                y = item.datapoint[1];
 
-            showTooltip(item.pageX, item.pageY, x);
+            if (_this.options.isDateTime && typeof moment != "undefined"){
+              x = moment(x).utc().format("YYYY-MM-DD[T]HH:mm:ss[Z]");
+            }
+
+            showTooltip(item.pageX, item.pageY, "X: "+x+", Y: "+y);
           }
         } else {
           $("#jHueBlueprintTooltip").remove();
@@ -210,8 +177,18 @@ var FLOT_LOADED, FLOT_PIE_LOADED = false;
 
 
   function getSerie(options) {
+    var _chartData = options.data;
+    if (options.isDateTime){
+      var _newChartData = [];
+      for (var i=0;i<_chartData.length;i++){
+        var _tuple = _chartData[i];
+        _tuple[0] = moment(_tuple[0]).unix()*1000;
+        _newChartData.push(_tuple)
+        }
+      _chartData = _newChartData;
+    }
     var _flotSerie = {
-      data: options.data,
+      data: _chartData,
       label: options.label
     }
 
