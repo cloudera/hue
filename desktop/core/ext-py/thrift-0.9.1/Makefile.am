@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 #
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements. See the NOTICE file
@@ -18,27 +16,21 @@
 # specific language governing permissions and limitations
 # under the License.
 #
+.NOTPARALLEL:
+DESTDIR ?= /
+EXTRA_DIST = setup.py setup.cfg src compat
 
-from distutils.core import setup, Extension
+all-local:
+	$(PYTHON) setup.py build
 
-fastbinarymod = Extension('thrift.protocol.fastbinary',
-                          sources = ['src/protocol/fastbinary.c'],
-                          )
+# We're ignoring prefix here because site-packages seems to be
+# the equivalent of /usr/local/lib in Python land.
+# Old version (can't put inline because it's not portable).
+#$(PYTHON) setup.py install --prefix=$(prefix) --root=$(DESTDIR) $(PYTHON_SETUPUTIL_ARGS)
+install-exec-hook:
+	$(PYTHON) setup.py install --root=$(DESTDIR) --prefix=$(PY_PREFIX) $(PYTHON_SETUPUTIL_ARGS)
 
-setup(name = 'Thrift',
-      version = '0.1',
-      description = 'Thrift Python Libraries',
-      author = ['Thrift Developers'],
-      author_email = ['thrift-dev@incubator.apache.org'],
-      url = 'http://incubator.apache.org/thrift/',
-      license = 'Apache License 2.0',
-      packages = [
-        'thrift',
-        'thrift.protocol',
-        'thrift.transport',
-        'thrift.server',
-      ],
-      package_dir = {'thrift' : 'src'},
-      ext_modules = [fastbinarymod],
-      )
+clean-local:
+	$(RM) -r build
 
+check-local: all

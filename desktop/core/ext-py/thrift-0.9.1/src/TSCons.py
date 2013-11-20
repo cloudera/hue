@@ -17,20 +17,19 @@
 # under the License.
 #
 
-DESTDIR ?= /
-EXTRA_DIST = setup.py src
+from os import path
+from SCons.Builder import Builder
 
-all-local:
-	$(PYTHON) setup.py build
 
-# We're ignoring prefix here because site-packages seems to be
-# the equivalent of /usr/local/lib in Python land.
-# Old version (can't put inline because it's not portable).
-#$(PYTHON) setup.py install --prefix=$(prefix) --root=$(DESTDIR) $(PYTHON_SETUPUTIL_ARGS)
-install-exec-hook:
-	$(PYTHON) setup.py install --root=$(DESTDIR) --prefix=$(PY_PREFIX) $(PYTHON_SETUPUTIL_ARGS)
+def scons_env(env, add=''):
+  opath = path.dirname(path.abspath('$TARGET'))
+  lstr = 'thrift --gen cpp -o ' + opath + ' ' + add + ' $SOURCE'
+  cppbuild = Builder(action=lstr)
+  env.Append(BUILDERS={'ThriftCpp': cppbuild})
 
-clean-local:
-	$(RM) -r build
 
-check-local: all
+def gen_cpp(env, dir, file):
+  scons_env(env)
+  suffixes = ['_types.h', '_types.cpp']
+  targets = map(lambda s: 'gen-cpp/' + file + s, suffixes)
+  return env.ThriftCpp(targets, dir + file + '.thrift')

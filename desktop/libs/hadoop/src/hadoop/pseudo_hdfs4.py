@@ -28,8 +28,10 @@ import tempfile
 import textwrap
 import time
 
+from desktop.lib.python_util import find_unused_port
+
 import hadoop
-from hadoop.mini_cluster import find_unused_port, write_config
+from hadoop.mini_cluster import write_config
 from hadoop.job_tracker import LiveJobTracker
 from desktop.lib.paths import get_run_root
 

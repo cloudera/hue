@@ -18,6 +18,7 @@
 # Extra python utils
 
 import select
+import socket
 from django.utils.translation import ugettext as _
 from desktop import conf
 
@@ -80,3 +81,17 @@ def create_synchronous_io_multiplexer(timeout=0):
     except ImportError:
       pass
   return SelectSynchronousIOMultiplexer(timeout)
+
+
+def find_unused_port():
+  """
+  Finds a port that's available.
+  Unfortunately, this port may not be available by the time
+  the subprocess uses it, but this generally works.
+  """
+  sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0)
+  sock.bind(('127.0.0.1', 0))
+  sock.listen(socket.SOMAXCONN)
+  _, port = sock.getsockname()
+  sock.close()
+  return port

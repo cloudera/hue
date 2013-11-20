@@ -16,16 +16,18 @@
 # specific language governing permissions and limitations
 # under the License.
 #
+
+from cStringIO import StringIO
+
 from zope.interface import implements, Interface, Attribute
 from twisted.internet.protocol import Protocol, ServerFactory, ClientFactory, \
     connectionDone
 from twisted.internet import defer
 from twisted.protocols import basic
 from twisted.python import log
-
+from twisted.web import server, resource, http
 
 from thrift.transport import TTransport
-from cStringIO import StringIO
 
 
 class TMessageSenderTransport(TTransport.TTransportBase):
@@ -79,7 +81,7 @@ class ThriftClientProtocol(basic.Int32StringReceiver):
         self.started.callback(self.client)
 
     def connectionLost(self, reason=connectionDone):
-        for k,v in self.client._reqs.iteritems():
+        for k, v in self.client._reqs.iteritems():
             tex = TTransport.TTransportException(
                 type=TTransport.TTransportException.END_OF_FILE,
                 message='Connection closed')
@@ -179,3 +181,41 @@ class ThriftClientFactory(ClientFactory):
             self.oprot_factory)
         p.factory = self
         return p
+
+
+class ThriftResource(resource.Resource):
+
+    allowedMethods = ('POST',)
+
+    def __init__(self, processor, inputProtocolFactory,
+        outputProtocolFactory=None):
+        resource.Resource.__init__(self)
+        self.inputProtocolFactory = inputProtocolFactory
+        if outputProtocolFactory is None:
+            self.outputProtocolFactory = inputProtocolFactory
+        else:
+            self.outputProtocolFactory = outputProtocolFactory
+        self.processor = processor
+
+    def getChild(self, path, request):
+        return self
+
+    def _cbProcess(self, _, request, tmo):
+        msg = tmo.getvalue()
+        request.setResponseCode(http.OK)
+        request.setHeader("content-type", "application/x-thrift")
+        request.write(msg)
+        request.finish()
+
+    def render_POST(self, request):
+        request.content.seek(0, 0)
+        data = request.content.read()
+        tmi = TTransport.TMemoryBuffer(data)
+        tmo = TTransport.TMemoryBuffer()
+
+        iprot = self.inputProtocolFactory.getProtocol(tmi)
+        oprot = self.outputProtocolFactory.getProtocol(tmo)
+
+        d = self.processor.process(iprot, oprot)
+        d.addCallback(self._cbProcess, request, tmo)
+        return server.NOT_DONE_YET
