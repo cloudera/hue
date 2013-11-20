@@ -44,7 +44,7 @@ def get(user, query_server=None):
   if query_server is None:
     query_server = get_query_server_config()
 
-  return HS2Dbms(HiveServerClientCompatible(HiveServerClient(query_server, user)), QueryHistory.SERVER_TYPE[1][0])
+  return HiveServer2Dbms(HiveServerClientCompatible(HiveServerClient(query_server, user)), QueryHistory.SERVER_TYPE[1][0])
 
 
 def get_query_server_config(name='beeswax', server=None):
@@ -85,8 +85,8 @@ class QueryServerException(Exception):
 class NoSuchObjectException: pass
 
 
-class HS2Dbms(object):
-  """SQL"""
+class HiveServer2Dbms(object):
+
   def __init__(self, client, server_type):
     self.client = client
     self.server_type = server_type
@@ -232,6 +232,8 @@ class HS2Dbms(object):
 
   def insert_query_into_directory(self, query_history, target_dir):
     design = query_history.design.get_design()
+    database = design.query['database']
+    self.use(database)
 
     hql = "INSERT OVERWRITE DIRECTORY '%s' %s" % (target_dir, design.query['query'])
     return self.execute_statement(hql)
@@ -243,8 +245,9 @@ class HS2Dbms(object):
 
     # Case 1: Hive Server 2 backend or results straight from an existing table
     if result_meta.in_tablename:
+      self.use(database)
+
       hql = 'CREATE TABLE `%s.%s` AS %s' % (database, target_table, design.query['query'])
-      #query = hql_query(hql, database=database)
       query_history = self.execute_statement(hql)
       url = redirect(reverse('beeswax:watch_query', args=[query_history.id]) + '?on_success_url=' + reverse('metastore:describe_table', args=[database, target_table]))
     else:

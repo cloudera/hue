@@ -1499,14 +1499,14 @@ class TestWithMockedServer(object):
   def setUp(self):
     # Beware: Monkey patch Beeswax/Hive server with Mock API
     if not hasattr(dbms, 'OriginalBeeswaxApi'):
-      dbms.OriginalBeeswaxApi = dbms.HS2Dbms
-    dbms.HS2Dbms = MockDbms
+      dbms.OriginalBeeswaxApi = dbms.HiveServer2Dbms
+    dbms.HiveServer2Dbms = MockDbms
 
     self.client = make_logged_in_client(is_superuser=False)
     grant_access("test", "test", "beeswax")
 
   def tearDown(self):
-    dbms.HS2Dbms = dbms.OriginalBeeswaxApi
+    dbms.HiveServer2Dbms = dbms.OriginalBeeswaxApi
 
   def test_save_design_properties(self):
     resp = self.client.get('/beeswax/save_design_properties')
