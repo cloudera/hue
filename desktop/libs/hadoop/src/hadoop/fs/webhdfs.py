@@ -36,7 +36,6 @@ from hadoop.fs.webhdfs_types import WebHdfsStat, WebHdfsContentSummary
 from hadoop.conf import UPLOAD_CHUNK_SIZE
 
 import hadoop.conf
-import hadoop.core_site
 
 
 DEFAULT_HDFS_SUPERUSER = 'hdfs'

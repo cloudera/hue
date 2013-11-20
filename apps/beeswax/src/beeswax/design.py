@@ -18,16 +18,18 @@
 """
 The HQLdesign class can (de)serialize a design to/from a QueryDict.
 """
-import json
 
+import json
 import logging
 import re
+import urlparse
 
 import django.http
 from django import forms
 
 from desktop.lib.django_forms import BaseSimpleFormSet, MultiForm
 from desktop.lib.django_mako import render_to_string
+from hadoop.cluster import get_hdfs
 
 
 LOG = logging.getLogger(__name__)
@@ -104,7 +106,11 @@ class HQLdesign(object):
     configuration = []
 
     for f in self.file_resources:
-      configuration.append(render_to_string("hql_resource.mako", dict(type=f['type'], path=f['path'])))
+      if not urlparse.urlsplit(f['path']).scheme:
+        scheme = get_hdfs().fs_defaultfs
+      else:
+        scheme = ''
+      configuration.append(render_to_string("hql_resource.mako", dict(type=f['type'], path=f['path'], scheme=scheme)))
 
     for f in self.functions:
       configuration.append(render_to_string("hql_function.mako", f))

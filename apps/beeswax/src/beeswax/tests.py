@@ -1585,6 +1585,22 @@ class TestWithMockedServer(object):
     assert_equal(0, sum([query_id in ids_page_1 for query_id in ids]))
 
 
+class TestDesign():
+
+  def test_hql_resource(self):
+    design = hql_query('SELECT')
+    design._data_dict['file_resources'] = [
+        {'type': 'FILE', 'path': 'my_file'},
+        {'type': 'FILE', 'path': '/my_path/my_file'},
+        {'type': 'FILE', 'path': 's3://host/my_s3_file'}
+    ]
+
+    assert_equal([
+        u'\nADD FILE hdfs://localhost:8020my_file\n', # Expected
+        u'\nADD FILE hdfs://localhost:8020/my_path/my_file\n',
+        u'\nADD FILE s3://host/my_s3_file\n'
+    ], design.get_configuration_statements())
+
 def search_log_line(component, expected_log, all_logs):
   """Checks if 'expected_log' can be found in one line of 'all_logs' outputed by the logging component 'component'."""
   return re.compile('.+?%(component)s(.+?)%(expected_log)s' % {'component': component, 'expected_log': expected_log}).search(all_logs)
