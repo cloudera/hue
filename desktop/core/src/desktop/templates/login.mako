@@ -37,6 +37,7 @@ from django.utils.translation import ugettext as _
 
   <style type="text/css">
     body {
+      display: none;
       padding-top: 80px;
     }
 
@@ -171,6 +172,14 @@ from django.utils.translation import ugettext as _
 <script src="/static/ext/js/jquery/jquery-2.0.2.min.js"></script>
 <script>
   $(document).ready(function () {
+    // prevents framebusting and clickjacking
+    if (self == top){
+      $("body").show();
+    }
+    else {
+      top.location = self.location;
+    }
+
     var _skew = -1;
     $("[data-hover]").on("mouseover", function () {
       var _this = $(this);
