@@ -59,11 +59,23 @@ ${ layout.metastore_menubar() }
                 <fieldset>
                     <div class="alert alert-info"><h3>${_('Define your columns')}</h3></div>
                     <div class="control-group">
+
+                    <div class="control-group" id="use-header">
+                        <div class="controls">
+                            ${_('Use first line as column names')}
+                            <input id="use_header" type="checkbox" name="use_header"/>
+                        </div>
+                        <div class="controls">
+                            ${_('Bulk edit column names')}
+                            <i id="editColumns" class="fa fa-edit" rel="tooltip" data-placement="right" title="${ _('Bulk edit names') }"></i>
+                        </div>
+                    </div>
+
                         <div class="controls">
                             <div class="scrollable">
                                 <table class="table table-striped">
                                     <thead>
-                                      <th id="editColumns">${ _('Column name') } &nbsp;<i class="fa fa-edit" rel="tooltip" data-placement="right" title="${ _('Bulk edit names') }"></i></th>
+                                      <th id="column_names">${ _('Column name') }</th>
                                       <th>${ _('Column Type') }</th>
                                       % for i in range(0, n_rows):
                                         <th><em>${_('Sample Row')} #${i + 1}</em></th>
@@ -73,19 +85,14 @@ ${ layout.metastore_menubar() }
                                       % for col, form in zip(range(len(column_formset.forms)), column_formset.forms):
                                       <tr>
                                         <td class="cols">
-                                          ${comps.field(form["column_name"],
-                                              render_default=False,
-                                              placeholder=_("Column name")
-                                            )}
+                                          ${ comps.field(form["column_name"], render_default=False, placeholder=_("Column name")) }
                                         </td>
                                         <td>
-                                          ${comps.field(form["column_type"],
-                                              render_default=True
-                                            )}
+                                          ${ comps.field(form["column_type"], render_default=True) }
                                           ${unicode(form["_exists"]) | n}
                                         </td>
                                         % for row in fields_list[:n_rows]:
-                                          ${ comps.getEllipsifiedCell(row[col], "bottom", "dataSample") }
+                                          ${ comps.getEllipsifiedCell(row[col], "bottom", "dataSample cols-%s" % (loop.index + 1)) }
                                         % endfor
                                       </tr>
                                       %endfor
@@ -187,7 +194,7 @@ ${ layout.metastore_menubar() }
       $(".cols input[type='text']").each(function (cnt, item) {
         _newVal += $(item).val() + (cnt < $(".cols input[type='text']").length - 1 ? ", " : "");
       });
-      $("#columnNamesPopover").show().css("left", $("#editColumns i").position().left + 16).css("top", $("#editColumns i").position().top - ($("#columnNamesPopover").height() / 2));
+      $("#columnNamesPopover").show().css("left", $("#column_names").position().left + 16).css("top", $("#column_names").position().top - ($("#columnNamesPopover").height() / 2));
       $(".editable-input input").val(_newVal).focus();
     });
 
@@ -212,42 +219,91 @@ ${ layout.metastore_menubar() }
       $("#columnNamesPopover").hide();
     });
 
-    $(".dataSample").each(function () {
-      var _val = $.trim($(this).text());
-      var _field = $(this).siblings().find("select[id^=id_cols-]");
-      var _foundType = "string";
-      if ($.isNumeric(_val)) {
-        _val = _val * 1;
-        if (isInt(_val)) {
-          // it's an int
-          _foundType = "int";
+    function guessColumnTypes() {
+      // Pick from 2nd column only
+      $(".dataSample").each(function () {
+        var _val = $.trim($(this).text());
+        var _field = $(this).siblings().find("select[id^=id_cols-]");
+        var _foundType = "string";
+
+        if ($.isNumeric(_val)) {
+          if (isInt(_val)) {
+            // it's an int
+            _foundType = "int";
+          }
+          else {
+            // it's possibly a float
+            _foundType = "float";
+          }
         }
         else {
-          // it's possibly a float
-          _foundType = "float";
+          if (_val.toLowerCase().indexOf("true") > -1 || _val.toLowerCase().indexOf("false") > -1) {
+            // it's a boolean
+            _foundType = "boolean";
+          }
+          else {
+            // it's most probably a string
+            _foundType = "string";
+          }
         }
-      }
-      else {
-        if (_val.toLowerCase().indexOf("true") > -1 || _val.toLowerCase().indexOf("false") > -1) {
-          // it's a boolean
-          _foundType = "boolean";
-        }
-        else {
-          // it's most probably a string
-          _foundType = "string";
-        }
-      }
-      if (_field.data("possibleType") != null && _field.data("possibleType") != _foundType) {
-        _field.data("possibleType", "string");
-      }
-      else {
+
         _field.data("possibleType", _foundType);
+        $(this).data("possibleType", _foundType);
+      });
+
+      $("select[id^=id_cols-]").each(function () {
+        $(this).val($(this).data("possibleType"));
+      });
+    }
+
+    guessColumnTypes();
+
+    $("#use_header").change(function (e) {
+      var input = this;
+
+      $(".cols input[type='text']").each(function (cnt, item) {
+        if (input.checked) {
+          $(item).data('previous', $(item).val());
+          $(item).val($.trim(${ fields_list_json | n,unicode }[0][cnt]));
+        } else {
+          $(item).val($(item).data('previous'));
+        }
+      });
+
+      $(".cols-1").each(function (cnt, item) {
+        if (input.checked) {
+          $(item).data('previous', $(item).text());
+          $(item).text($.trim(${ fields_list_json | n,unicode }[1][cnt]));
+        } else {
+          $(item).text($(item).data('previous'));
+        }
+      });
+
+      $(".cols-2").each(function (cnt, item) {
+        if (input.checked) {
+          $(item).data('previous', $(item).text());
+          $(item).text($.trim(${ fields_list_json | n,unicode }[2][cnt]));
+        } else {
+          $(item).text($(item).data('previous'));
+        }
+      });
+
+      guessColumnTypes();
+    });
+
+    // Really basic heuristic to detect if first row is a header.
+    var isString = 0;
+    $(".cols-1").each(function (cnt, item) {
+      if ($(".cols-1").data("possibleType") == 'string') {
+        isString += 1;
       }
     });
 
-    $("select[id^=id_cols-]").each(function () {
-      $(this).val($(this).data("possibleType"));
-    });
+    if (isString > $(".cols-1").length - 1) {
+      $("#use_header").prop('checked', true);
+      $("#use_header").change();
+    }
+
 
     function parseJSON(val) {
       try {

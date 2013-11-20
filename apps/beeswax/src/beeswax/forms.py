@@ -343,7 +343,7 @@ PartitionTypeFormSet = simple_formset_factory(PartitionTypeForm, add_label=_t("A
 
 def _clean_databasename(name):
   try:
-    if name in db.get_databases():
+    if name in db.get_databases(): # Will always fail
       raise forms.ValidationError(_('Database "%(name)s" already exists.') % {'name': name})
   except Exception:
     return name

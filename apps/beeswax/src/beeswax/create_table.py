@@ -21,6 +21,7 @@ Views & controls for creating tables
 
 import logging
 import gzip
+import json
 
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
@@ -87,7 +88,7 @@ def create_table(request, database='default'):
   })
 
 
-IMPORT_PEEK_SIZE = 8192
+IMPORT_PEEK_SIZE = 5 * 1024**2
 IMPORT_PEEK_NLINES = 10
 DELIMITERS = [ hive_val for hive_val, desc, ascii in TERMINATORS ]
 DELIMITER_READABLE = {'\\001' : _('ctrl-As'),
@@ -190,17 +191,19 @@ def import_wizard(request, database='default'):
         if s3_col_formset is None:
           columns = []
           for i in range(n_cols):
-            columns.append(dict(
-                column_name='col_%s' % (i,),
-                column_type='string',
-            ))
+            columns.append({
+                'column_name': 'col_%s' % (i,),
+                'column_type': 'string',
+            })
           s3_col_formset = ColumnTypeFormSet(prefix='cols', initial=columns)
+
         return render('define_columns.mako', request, {
           'action': reverse(app_name + ':import_wizard', kwargs={'database': database}),
           'file_form': s1_file_form,
           'delim_form': s2_delim_form,
           'column_formset': s3_col_formset,
           'fields_list': fields_list,
+          'fields_list_json': json.dumps(fields_list),
           'n_cols': n_cols,
           'database': database,
         })
@@ -212,10 +215,12 @@ def import_wizard(request, database='default'):
         delim = s2_delim_form.cleaned_data['delimiter']
         table_name = s1_file_form.cleaned_data['name']
         proposed_query = django_mako.render_to_string("create_table_statement.mako", {
-            'table': dict(name=table_name,
-                          comment=s1_file_form.cleaned_data['comment'],
-                          row_format='Delimited',
-                          field_terminator=delim),
+            'table': {
+                'name': table_name,
+                'comment': s1_file_form.cleaned_data['comment'],
+                'row_format': 'Delimited',
+                'field_terminator': delim
+             },
             'columns': [ f.cleaned_data for f in s3_col_formset.forms ],
             'partition_columns': [],
             'database': database,
