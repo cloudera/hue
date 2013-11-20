@@ -37,7 +37,7 @@
   </licenses>
 
   <properties>
-    <hadoop.version>2.2.0-mr1-cdh5.0.0-SNAPSHOT</hadoop.version>
+    <hadoop.version>${cdh.mr1.version}</hadoop.version>
     <slf4j.version>1.6.1</slf4j.version>
     <commons-logging.version>1.0.4</commons-logging.version>
     <thrift.version>0.9.0</thrift.version>
