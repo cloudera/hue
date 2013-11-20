@@ -642,8 +642,9 @@ class EnsureSafeRedirectURLMiddleware(object):
   """
   def process_response(self, request, response):
     if response.status_code == 302:
-      if any([regexp.match(response['Location']) for regexp in desktop.conf.REDIRECT_WHITELIST.get()]):
-        return response
+      for regexp in desktop.conf.REDIRECT_WHITELIST.get():
+        if regexp.match(response['Location']):
+          return response
 
       response = render("error.mako", request, dict(error=_('Redirect to %s is not allowed.') % response['Location']))
       response.status_code = 403
