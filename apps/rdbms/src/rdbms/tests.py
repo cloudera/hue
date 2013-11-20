@@ -15,12 +15,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# import re
+import json
+import os
+import uuid
 
-from nose.tools import assert_true
+from django.core.urlresolvers import reverse
+from nose.tools import assert_true, assert_equal
 
 from desktop.lib.django_test_util import make_logged_in_client
-from beeswax.server import dbms
+
+from rdbms import conf as rdbms_conf
+from rdbms.server import dbms
 
 
 class MockRdbms:
@@ -46,3 +51,57 @@ class TestMockedRdbms:
   def test_basic_flow(self):
     response = self.client.get("/rdbms/")
     assert_true('DB Query' in response.content, response.content)
+
+
+class TestSQLiteRdbmsBase(object):
+  @classmethod
+  def setup_class(cls):
+    cls.database = '/tmp/%s.db' % uuid.uuid4()
+    cls.prefillDatabase()
+
+  @classmethod
+  def teardown_class(cls):
+    os.remove(cls.database)
+
+  def setUp(self):
+    self.client = make_logged_in_client()
+    self.finish = rdbms_conf.RDBMS.set_for_testing({
+      'sqlitee': {
+        'name': self.database,
+        'engine': 'sqlite'
+      }
+    })
+
+  def tearDown(self):
+    self.finish()
+
+  @classmethod
+  def prefillDatabase(cls):
+    import sqlite3
+    connection = sqlite3.connect(cls.database)
+    connection.execute("CREATE TABLE test1 (date text, trans text, symbol text, qty real, price real)")
+    connection.execute("INSERT INTO test1 VALUES ('2006-01-05','BUY','RHAT',100,35.14)")
+    connection.commit()
+    connection.close()
+
+
+class TestAPI(TestSQLiteRdbmsBase):
+  def test_get_servers(self):
+    response = self.client.get(reverse('rdbms:api_servers'))
+    response_dict = json.loads(response.content)
+    assert_true('sqlitee' in response_dict['servers'], response_dict)
+
+  def test_get_databases(self):
+    response = self.client.get(reverse('rdbms:api_databases', args=['sqlitee']))
+    response_dict = json.loads(response.content)
+    assert_true(self.database in response_dict['databases'], response_dict)
+
+  def test_execute_query(self):
+    data = {
+      'server': 'sqlitee',
+      'database': self.database,
+      'query': 'SELECT * FROM test1'
+    }
+    response = self.client.post(reverse('rdbms:api_execute_query'), data, follow=True)
+    response_dict = json.loads(response.content)
+    assert_equal(1, len(response_dict['results']['rows']), response_dict)
