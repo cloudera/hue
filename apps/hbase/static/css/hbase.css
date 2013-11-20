@@ -506,15 +506,7 @@ ul#hbase-breadcrumbs li a {
 	font-size:14px;
 }
 
-#cell_edit_modal {
-	width: 80%;
-	left: 25%;
-	margin-left: 0px;
-	max-height:100%;
-	top: 10%;
-	margin-top:0px;
-	overflow: visible;
-}
+#cell_edit_modal { width: 80%; margin-left: -40%; max-height: 100%; }
 
 #cell_edit_modal iframe {
 	min-height: 600px;
