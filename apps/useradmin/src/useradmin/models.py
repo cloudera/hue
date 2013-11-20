@@ -287,8 +287,12 @@ def install_sample_user():
   try:
     user = auth_models.User.objects.get(username=SAMPLE_USERNAME)
   except auth_models.User.DoesNotExist:
-    user = auth_models.User.objects.create(username=SAMPLE_USERNAME, password='!', is_active=False, is_superuser=False, id=1100713, pk=1100713)
-    LOG.info('Installed a user called "%s"' % (SAMPLE_USERNAME,))
+    try:
+      user = auth_models.User.objects.create(username=SAMPLE_USERNAME, password='!', is_active=False, is_superuser=False, id=1100713, pk=1100713)
+      LOG.info('Installed a user called "%s"' % (SAMPLE_USERNAME,))
+    except Exception, e:
+      LOG.info('Sample user race condition: %s' % e)
+      user = auth_models.User.objects.get(username=SAMPLE_USERNAME)
 
   fs = cluster.get_hdfs()
   fs.do_as_user(SAMPLE_USERNAME, fs.create_home_dir)

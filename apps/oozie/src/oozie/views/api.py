@@ -15,23 +15,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-try:
-  import json
-except ImportError:
-  import simplejson as json
+import json
 import logging
 
 from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions import StructuredException
+from desktop.models import Document
 
 from oozie.forms import WorkflowForm, NodeForm, design_form_by_type
-from oozie.models import Job, Workflow, Node, Start, End, Kill,\
+from oozie.models import Workflow, Node, Start, End, Kill,\
                          Link, Decision, Fork, DecisionEnd, Join,\
                          NODE_TYPES, ACTION_TYPES, _STD_PROPERTIES_JSON
 from oozie.decorators import check_job_access_permission, check_job_edition_permission
 from oozie.utils import model_to_dict, format_dict_field_values, format_field_value
+
 
 
 LOG = logging.getLogger(__name__)
@@ -352,14 +351,20 @@ def workflows(request):
   if request.method not in ['GET']:
     raise StructuredException(code="METHOD_NOT_ALLOWED_ERROR", message=_('Must be GET request.'), error_code=405)
 
-  workflows = request.GET.get('managed', 'false').lower() == 'true' and Workflow.objects.managed() or Workflow.objects.unmanaged()
-  workflows_accessible = filter(lambda x: Job.objects.can_read(request.user, x.id), workflows)
+  if request.GET.get('managed', 'false').lower() == 'false':
+    extra='jobsub'
+  else:
+    extra=''
+
+  workflow_docs = Document.objects.get_docs(request.user, Workflow, extra=extra)
+
   response = {
     'status': 0,
     'data': {
-      'workflows': [model_to_dict(workflow) for workflow in workflows_accessible]
+      'workflows': [model_to_dict(workflow.content_object) for workflow in workflow_docs]
     }
   }
+
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
