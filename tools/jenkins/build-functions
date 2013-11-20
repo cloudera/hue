@@ -123,7 +123,7 @@ build_oozie() {
   tar -C $OOZIE_HOME/libext -zxvf $OOZIE_HOME/oozie-hadooplibs-*-cdh*.tar.gz
   cp $OOZIE_HOME/libext/oozie-*/hadooplibs/hadooplib-*-mr1-cdh*/*jar $OOZIE_HOME/libext/
   tar -C $OOZIE_HOME -zxvf $OOZIE_HOME/oozie-examples.tar.gz
-  tar -C $OOZIE_HOME -zxvf $OOZIE_HOME/oozie-sharelib-*SNAPSHOT.tar.gz
+  tar -C $OOZIE_HOME -zxvf $OOZIE_HOME/oozie-sharelib-*4.5.0.tar.gz
 
   $OOZIE_HOME/bin/oozie-setup.sh prepare-war
   $OOZIE_HOME/bin/ooziedb.sh create -sqlfile oozie.sql -run
