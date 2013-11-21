@@ -97,7 +97,7 @@
     function maybeAddToExtra(str) {
       var _match = str;
       if (_match.indexOf("fa-magic") > -1) {
-        _match = _match.substring(32);
+        _match = _match.substring(_match.indexOf("FROM ") + 5);
       }
       if (_match.indexOf(start) == 0 && !arrayContains(found, str)) extraFound.push(str);
     }
