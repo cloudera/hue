@@ -24,20 +24,46 @@ from django.utils.translation import ugettext as _
 ${ commonheader(_('Create table from file'), 'metastore', user) | n,unicode }
 ${ layout.metastore_menubar() }
 
+<link rel="stylesheet" href="/metastore/static/css/metastore.css">
+
 <div class="container-fluid">
     <div class="row-fluid">
         <div class="span3">
             <div class="sidebar-nav">
                 <ul class="nav nav-list">
-                    <li class="nav-header">${_('Actions')}</li>
-                    <li><a href="${ url(app_name + ':import_wizard', database=database)}"><i class="fa fa-files-o"></i> ${_('Create a new table from a file')}</a></li>
-                    <li><a href="${ url(app_name + ':create_table', database=database)}"><i class="fa fa-wrench"></i> ${_('Create a new table manually')}</a></li>
+                  <li class="nav-header">${_('database')}</li>
+                  <li class="white">
+                      <select id="chooseDatabase" class="input-medium">
+                    % for db in databases:
+                      <option value="${db["url"]}"
+                              %if database==db["name"]:
+                                selected="selected"
+                              %endif
+                          >${db["name"]}</option>
+                    % endfor
+                      </select>
+                  </li>
+                  <li class="nav-header">${_('Actions')}</li>
+                  <li><a href="${ url(app_name + ':import_wizard', database=database)}"><i class="fa fa-files-o"></i> ${_('Create a new table from a file')}</a></li>
+                  <li><a href="${ url(app_name + ':create_table', database=database)}"><i class="fa fa-wrench"></i> ${_('Create a new table manually')}</a></li>
                 </ul>
             </div>
         </div>
         <div class="span9">
-          <div class="card" style="margin-top: 0">
-            <h1 class="card-heading simple">${_('Create a new table from a file')}</h1>
+          <div class="card card-small" style="margin-top: 0">
+            <h1 class="card-heading simple">
+              <ul id="breadcrumbs" class="nav nav-pills hueBreadcrumbBar">
+                <li>
+                  <a href="${url('metastore:databases')}">${_('Databases')}</a><span class="divider">&gt;</span>
+                </li>
+                <li>
+                  <a href="${ url('metastore:show_tables', database=database) }">${database}</a><span class="divider">&gt;</span>
+                </li>
+                <li>
+                    <span style="padding-left:12px">${_('Create a new table from a file')}</span>
+                </li>
+              </ul>
+            </h1>
             <div class="card-body">
               <p>
                 <ul class="nav nav-pills">
@@ -127,52 +153,56 @@ ${ layout.metastore_menubar() }
 
 
 <style type="text/css">
-    #filechooser {
-        min-height: 100px;
-        overflow-y: auto;
-        margin-top: 10px;
-    }
+  #filechooser {
+    min-height: 100px;
+    overflow-y: auto;
+    margin-top: 10px;
+  }
 
-    #fileWillBeMoved {
-        margin-top: 10px;
-    }
+  #fileWillBeMoved {
+    margin-top: 10px;
+  }
 </style>
 
 
 <script type="text/javascript" charset="utf-8">
-    $(document).ready(function(){
-        $(".fileChooserBtn").click(function(e){
-            e.preventDefault();
-            var _destination = $(this).attr("data-filechooser-destination");
-            $("#filechooser").jHueFileChooser({
-                initialPath: $("input[name='"+_destination+"']").val(),
-                onFileChoose: function(filePath){
-                    $("input[name='"+_destination+"']").val(filePath);
-                    $("#chooseFile").modal("hide");
-                },
-                createFolder: false
-            });
-            $("#chooseFile").modal("show");
-        });
-        $("#id_do_import").change(function(){
-            if ($(this).is(":checked")){
-                $("#fileWillBeMoved").show();
-            }
-            else {
-                $("#fileWillBeMoved").hide();
-            }
-        });
-        $("#step2").click(function(e){
-            e.preventDefault();
-            $("input[name='submit_file']").click();
-        });
-        $("body").keypress(function(e){
-            if(e.which == 13){
-                e.preventDefault();
-                $("input[name='submit_file']").click();
-            }
-        });
+  $(document).ready(function () {
+    $("#chooseDatabase").on("change", function () {
+      window.location.href = $(this).val();
     });
+
+    $(".fileChooserBtn").click(function (e) {
+      e.preventDefault();
+      var _destination = $(this).attr("data-filechooser-destination");
+      $("#filechooser").jHueFileChooser({
+        initialPath: $("input[name='" + _destination + "']").val(),
+        onFileChoose: function (filePath) {
+          $("input[name='" + _destination + "']").val(filePath);
+          $("#chooseFile").modal("hide");
+        },
+        createFolder: false
+      });
+      $("#chooseFile").modal("show");
+    });
+    $("#id_do_import").change(function () {
+      if ($(this).is(":checked")) {
+        $("#fileWillBeMoved").show();
+      }
+      else {
+        $("#fileWillBeMoved").hide();
+      }
+    });
+    $("#step2").click(function (e) {
+      e.preventDefault();
+      $("input[name='submit_file']").click();
+    });
+    $("body").keypress(function (e) {
+      if (e.which == 13) {
+        e.preventDefault();
+        $("input[name='submit_file']").click();
+      }
+    });
+  });
 </script>
 
 ${ commonfooter(messages) | n,unicode }

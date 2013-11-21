@@ -42,10 +42,11 @@ from beeswax.views import execute_directly
 
 LOG = logging.getLogger(__name__)
 
-
 def create_table(request, database='default'):
   """Create a table by specifying its attributes manually"""
   db = dbms.get(request.user)
+  dbs = db.get_databases()
+  databases = [{'name':db, 'url':reverse('beeswax:create_table', kwargs={'database': db})} for db in dbs]
 
   form = MultiForm(
       table=CreateTableForm,
@@ -63,6 +64,7 @@ def create_table(request, database='default'):
         columns = [ f.cleaned_data for f in form.columns.forms ]
         partition_columns = [ f.cleaned_data for f in form.partitions.forms ]
         proposed_query = django_mako.render_to_string("create_table_statement.mako", {
+            'databases': databases,
             'database': database,
             'table': form.table.cleaned_data,
             'columns': columns,
@@ -78,6 +80,7 @@ def create_table(request, database='default'):
 
   return render("create_table_manually.mako", request, {
     'action': "#",
+    'databases': databases,
     'table_form': form.table,
     'columns_form': form.columns,
     'partitions_form': form.partitions,
@@ -110,6 +113,10 @@ def import_wizard(request, database='default'):
   encoding = i18n.get_site_encoding()
   app_name = get_app_name(request)
 
+  db = dbms.get(request.user)
+  dbs = db.get_databases()
+  databases = [{'name':db, 'url':reverse('beeswax:import_wizard', kwargs={'database': db})} for db in dbs]
+
   if request.method == 'POST':
     #
     # General processing logic:
@@ -127,8 +134,6 @@ def import_wizard(request, database='default'):
     delim_is_auto = False
     fields_list, n_cols = [[]], 0
     s3_col_formset = None
-
-    db = dbms.get(request.user)
     s1_file_form = CreateByImportFileForm(request.POST, db=db)
 
     if s1_file_form.is_valid():
@@ -180,6 +185,7 @@ def import_wizard(request, database='default'):
           'delimiter_choices': TERMINATOR_CHOICES,
           'n_cols': n_cols,
           'database': database,
+          'databases': databases
         })
 
       #
@@ -204,6 +210,7 @@ def import_wizard(request, database='default'):
             'fields_list_json': json.dumps(fields_list),
             'n_cols': n_cols,
             'database': database,
+            'databases': databases
           })
         except Exception, e:
           raise PopupException(_("The selected delimiter is creating an un-even number of columns. Please make sure you don't have empty columns."), detail=e)
@@ -224,6 +231,7 @@ def import_wizard(request, database='default'):
             'columns': [ f.cleaned_data for f in s3_col_formset.forms ],
             'partition_columns': [],
             'database': database,
+            'databases': databases
           }
         )
 
@@ -237,6 +245,7 @@ def import_wizard(request, database='default'):
     'action': reverse(app_name + ':import_wizard', kwargs={'database': database}),
     'file_form': s1_file_form,
     'database': database,
+    'databases': databases
   })
 
 

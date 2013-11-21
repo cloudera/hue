@@ -24,11 +24,25 @@ from django.utils.translation import ugettext as _
 ${ commonheader(_("Create table manually"), 'metastore', user) | n,unicode }
 ${ layout.metastore_menubar() }
 
+<link rel="stylesheet" href="/metastore/static/css/metastore.css">
+
 <div class="container-fluid">
 <div class="row-fluid">
 <div class="span3">
     <div class="sidebar-nav">
         <ul class="nav nav-list">
+            <li class="nav-header">${_('database')}</li>
+            <li class="white">
+                <select id="chooseDatabase" class="input-medium">
+              % for db in databases:
+                <option value="${db["url"]}"
+                        %if database==db["name"]:
+                          selected="selected"
+                        %endif
+                    >${db["name"]}</option>
+              % endfor
+                </select>
+            </li>
             <li class="nav-header">${_('Actions')}</li>
             <li><a href="${ url(app_name + ':import_wizard', database=database)}"><i class="fa fa-files-o"></i> ${_('Create a new table from a file')}</a></li>
             <li><a href="${ url(app_name + ':create_table', database=database)}"><i class="fa fa-wrench"></i> ${_('Create a new table manually')}</a></li>
@@ -37,8 +51,20 @@ ${ layout.metastore_menubar() }
 </div>
 
 <div class="span9">
-  <div class="card" style="margin-top: 0">
-    <h1 class="card-heading simple">${_('Create a new table manually')}</h1>
+  <div class="card card-small" style="margin-top: 0">
+    <h1 class="card-heading simple">
+      <ul id="breadcrumbs" class="nav nav-pills hueBreadcrumbBar">
+        <li>
+          <a href="${url('metastore:databases')}">${_('Databases')}</a><span class="divider">&gt;</span>
+        </li>
+        <li>
+          <a href="${ url('metastore:show_tables', database=database) }">${database}</a><span class="divider">&gt;</span>
+        </li>
+        <li>
+            <span style="padding-left:12px">${_('Create a new table manually')}</span>
+        </li>
+      </ul>
+    </h1>
     <div class="card-body">
       <p>
         <ul class="nav nav-pills">
@@ -444,6 +470,10 @@ ${ layout.metastore_menubar() }
 
 <script type="text/javascript" charset="utf-8">
 $(document).ready(function () {
+  $("#chooseDatabase").on("change", function () {
+    window.location.href = $(this).val();
+  });
+
   if ($(".removeBtn").length == 1) {
     $(".removeBtn").first().hide();
   }
