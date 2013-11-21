@@ -29,7 +29,6 @@ if not gen_py_path in sys.path:
 from djangothrift_test_gen.ttypes import TestStruct, TestNesting, TestEnum, TestManyTypes
 from djangothrift_test_gen import TestService
 
-import hadoop
 import python_util
 import thrift_util
 from thrift_util import jsonable2thrift, thrift2json
@@ -43,6 +42,8 @@ from nose.tools import assert_equal
 
 
 class SimpleThriftServer(object):
+  socket_family = socket.AF_INET
+
   """A simple thrift server impl"""
   def __init__(self):
     self.port = python_util.find_unused_port()
@@ -70,7 +71,7 @@ class SimpleThriftServer(object):
     # Child process runs the thrift server loop
     try:
       processor = TestService.Processor(self)
-      transport = TSocket.TServerSocket('localhost', self.port)
+      transport = TSocket.TServerSocket('localhost', self.port, socket_family=self.socket_family)
       server = TServer.TThreadedServer(processor,
                                        transport,
                                        TBufferedTransportFactory(),
@@ -82,11 +83,12 @@ class SimpleThriftServer(object):
   def _ensure_online(self):
     """Ensure that the child server is online"""
     deadline = time.time() + 60
+    logging.debug("Socket Info: " + str(socket.getaddrinfo('localhost', self.port, socket.AF_UNSPEC, socket.SOCK_STREAM)))
     while time.time() < deadline:
       logging.info("Waiting for service to come online")
       try:
-        ping_s = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
-        ping_s.connect(('localhost', self.port, 0, 0))
+        ping_s = socket.socket(self.socket_family, socket.SOCK_STREAM)
+        ping_s.connect(('localhost', self.port))
         ping_s.close()
         return
       except:
