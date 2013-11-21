@@ -184,14 +184,16 @@ ${ commonheader(None, "pig", user) | n,unicode }
           <h3><span data-bind="text: currentScript().name"></span></h3>
         </div>
         <div class="row-fluid">
-          <div class="span9">
+          <div id="queryColumn" class="span9">
+            <a id="navigatorShow" href="#" title="${_('Show the function navigator')}" style="position:absolute;z-index: 10000; margin-top:10px;display:none;right:30px" rel="tooltip" data-placement="left"><i class="fa fa-compass"></i></a>
             <form id="queryForm">
               <textarea id="scriptEditor" data-bind="text:currentScript().script"></textarea>
             </form>
           </div>
-          <div class="span3">
+          <div id="navigatorColumn" class="span3">
+            <a id="navigatorHide" href="#" title="${_('Hide the function navigator')}" rel="tooltip" data-placement="left" class="pull-right" style="margin:10px;margin-left: 0"><i class="fa fa-chevron-right"></i></a>
             <a href="#" title="${_('Double click on function to insert it in the editor')}" rel="tooltip" data-placement="left" class="pull-right" style="margin:10px;margin-left: 0"><i class="fa fa-question-circle"></i></a>
-            <h1 class="card-heading simple">${_('Navigator')}</h1>
+            <h1 class="card-heading simple"><i class="fa fa-compass"></i> ${_('Navigator')}</h1>
             <div class="card-body">
               <p>
                 <input id="navigatorSearch" type="text" class="input-medium" placeholder="${ _('Function name...') }"/>
@@ -773,6 +775,32 @@ ${ commonheader(None, "pig", user) | n,unicode }
 
   $(document).ready(function () {
     // initialize navigator
+    function showNavigator() {
+      $("#queryColumn").removeClass("span12").addClass("span9");
+      $("#navigatorColumn").show();
+      $("#navigatorShow").hide();
+    }
+
+    function hideNavigator() {
+      $("#queryColumn").removeClass("span9").addClass("span12");
+      $("#navigatorColumn").hide();
+      $("#navigatorShow").show();
+    }
+
+    $("#navigatorHide").on("click", function () {
+      hideNavigator();
+      $.totalStorage("huePigNavigatorHidden", true);
+    });
+
+    $("#navigatorShow").on("click", function () {
+      showNavigator();
+      $.totalStorage("huePigNavigatorHidden", null);
+    });
+
+    if ($.totalStorage("huePigNavigatorHidden") != null && $.totalStorage("huePigNavigatorHidden")) {
+      hideNavigator();
+    }
+
     $(".navigatorFunctionCategory").on("click", function () {
       var _submenu = $(this).next(".navigatorFunctionCategoryContent");
       _submenu.find("li").removeClass("hide");

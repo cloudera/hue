@@ -336,7 +336,7 @@ ${layout.menubar(section='query')}
       <div class="card card-small">
         <a href="#" title="${_('Double click on a table name or field to insert it in the editor')}" rel="tooltip" data-placement="left" class="pull-right" style="margin:10px;margin-left: 0"><i class="fa fa-question-circle"></i></a>
         <a id="refreshNavigator" href="#" title="${_('Manually refresh the table list')}" rel="tooltip" data-placement="left" class="pull-right" style="margin:10px"><i class="fa fa-refresh"></i></a>
-        <h1 class="card-heading simple">${_('Navigator')}</h1>
+        <h1 class="card-heading simple"><i class="fa fa-compass"></i> ${_('Navigator')}</h1>
         <div class="card-body">
           <p>
             <input id="navigatorSearch" type="text" placeholder="${ _('Table name...') }" style="width:90%"/>
