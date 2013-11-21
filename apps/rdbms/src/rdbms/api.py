@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import datetime
 import json
 import logging
 
@@ -35,6 +36,13 @@ from rdbms.views import save_design
 
 
 LOG = logging.getLogger(__name__)
+
+
+class ResultEncoder(json.JSONEncoder):
+  def default(self, obj):
+    if isinstance(obj, datetime.datetime):
+      return obj.strftime('%Y-%m-%d %H:%M:%S %Z')
+    return super(ResultEncoder, self).default(obj)
 
 
 def servers(request):
@@ -103,7 +111,7 @@ def execute_query(request, design_id=None):
   except RuntimeError, e:
     response['message']= str(e)
 
-  return HttpResponse(json.dumps(response), mimetype="application/json")
+  return HttpResponse(json.dumps(response, cls=ResultEncoder), mimetype="application/json")
 
 
 def explain_query(request):
