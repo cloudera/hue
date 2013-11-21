@@ -86,16 +86,22 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
   <!-- <![endif]-->
 </div>
 
-
-<div class="container results">
-  <div id="mainContent" class="row hide">
-    % if error:
-    <div class="span12 results">
-      <div class="alert">
-        ${ error['message'] }
+% if error:
+<div class="container-fluid">
+  <div class="row-fluid">
+    <div class="span12">
+      <div class="alert alert-error">
+        % if error['title']:
+        <h4>${ error['title'] }</h4><br/>
+        % endif
+        <span class="decodeError" data-message="${ error['message'] }"></span>
       </div>
     </div>
-    %else:
+  </div>
+</div>
+% else:
+<div class="container results">
+  <div id="mainContent" class="row hide">
     % if response and 'response' in response and 'docs' in response['response'] and len(response['response']['docs']) > 0 and 'normalized_facets' in response:
       <% shown_facets = 0 %>
     <div class="span2 results">
@@ -275,14 +281,22 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
     </div>
     % else:
     <div class="span12">
-      <div class="alert">
-        ${_('Your search - %s - did not match any documents.') % (solr_query["q"])}
-      </div>
+      <h4>
+        ${_('Your search')} - <strong>${solr_query["q"]}</strong> - ${_('did not match any documents.')}
+      </h4>
+      ${_('Suggestions:')}
+      <ul>
+        <li>${_('Make sure all words are spelled correctly.')}</li>
+        <li>${_('Try different keywords.')}</li>
+        <li>${_('Try more general keywords.')}</li>
+        <li>${_('Try fewer keywords.')}</li>
+      </ul>
     </div>
     % endif
   </div>
-  % endif
 </div>
+
+% endif
 
 % if hue_collection:
   ${ hue_collection.result.get_extracode() | n,unicode }
@@ -295,6 +309,8 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
         $(document).trigger("error", $(this).text());
       });
     }
+
+    $(".decodeError").text($("<span>").html($(".decodeError").data("message")).text());
 
     $("#loader").hide();
     $("#mainContent").removeClass("hide");

@@ -38,6 +38,7 @@ from search.forms import QueryForm, CollectionForm, HighlightingForm
 from search.models import Collection, augment_solr_response
 from search.search_controller import SearchController
 
+from django.utils.encoding import force_unicode
 
 LOG = logging.getLogger(__name__)
 
@@ -83,7 +84,8 @@ def index(request):
       solr_query['total_pages'] = int(math.ceil((float(response['response']['numFound'])/float(solr_query['rows']))))
       solr_query['search_time'] = response['responseHeader']['QTime']
     except Exception, e:
-      error['message'] = unicode(str(e), "utf8")
+      error['title'] = force_unicode(e.title)
+      error['message'] = force_unicode(str(e))
   else:
     error['message'] = _('There is no collection to search.')
 

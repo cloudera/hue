@@ -27,6 +27,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.rest.http_client import HttpClient, RestException
 from desktop.lib.rest.resource import Resource
 from search.conf import EMPTY_QUERY, SECURITY_ENABLED
+from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger(__name__)
@@ -80,7 +81,7 @@ class SolrApi(object):
           response = json.loads(response.replace('\x00', ''))
       return response
     except RestException, e:
-      raise PopupException('Error while accessing Solr: %s' % e)
+      raise PopupException(e, title=_('Error while accessing Solr'))
 
   def suggest(self, solr_query, hue_core):
     try:
@@ -93,7 +94,7 @@ class SolrApi(object):
         response = json.loads(response)
       return response
     except RestException, e:
-      raise PopupException('Error while accessing Solr: %s' % e)
+      raise PopupException(e, title=_('Error while accessing Solr'))
 
   def collections(self):
     try:
@@ -104,7 +105,7 @@ class SolrApi(object):
       response = self._root.get('zookeeper', params=params)
       return json.loads(response['znode']['data'])
     except RestException, e:
-      raise PopupException('Error while accessing Solr: %s' % e)
+      raise PopupException(e, title=_('Error while accessing Solr'))
 
   def collection_or_core(self, hue_collection):
     if hue_collection.is_core_only:
@@ -117,7 +118,7 @@ class SolrApi(object):
       collections = self.collections()
       return collections[name]
     except Exception, e:
-      raise PopupException('Error while accessing Solr: %s' % e)
+      raise PopupException(e, title=_('Error while accessing Solr'))
 
   def cores(self):
     try:
@@ -126,7 +127,7 @@ class SolrApi(object):
       )
       return self._root.get('admin/cores', params=params)['status']
     except RestException, e:
-      raise PopupException('Error while accessing Solr: %s' % e)
+      raise PopupException(e, title=_('Error while accessing Solr'))
 
   def core(self, core):
     try:
@@ -136,7 +137,7 @@ class SolrApi(object):
       )
       return self._root.get('admin/cores', params=params)
     except RestException, e:
-      raise PopupException('Error while accessing Solr: %s' % e)
+      raise PopupException(e, title=_('Error while accessing Solr'))
 
   def schema(self, core):
     try:
@@ -146,4 +147,4 @@ class SolrApi(object):
       )
       return self._root.get('%(core)s/admin/file' % {'core': core}, params=params)
     except RestException, e:
-      raise PopupException('Error while accessing Solr: %s' % e)
+      raise PopupException(e, title=_('Error while accessing Solr'))
