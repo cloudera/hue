@@ -57,26 +57,20 @@ ${ layout.metastore_menubar() }
                     if n_rows > 2: n_rows = 2
                 %>
                 <fieldset>
-                    <div class="alert alert-info"><h3>${_('Define your columns')}</h3></div>
-                    <div class="control-group">
-
-                    <div class="control-group" id="use-header">
-                        <div class="controls">
-                            ${_('Use first line as column names')}
-                            <input id="use_header" type="checkbox" name="use_header"/>
-                        </div>
-                        <div class="controls">
-                            ${_('Bulk edit column names')}
-                            <i id="editColumns" class="fa fa-edit" rel="tooltip" data-placement="right" title="${ _('Bulk edit names') }"></i>
-                        </div>
+                    <div class="alert alert-info">
+                      <h3>${_('Define your columns')}</h3>
                     </div>
-
+                    <div class="row" style="margin-left: 8px">
+                      <div class="span3">${_('Use first row as column names')} &nbsp;<a id="useHeader" class="btn disable-feedback"><i class="fa fa-outdent"></i></a></div>
+                      <div class="span3">${ _('Bulk edit column names') } &nbsp;<a id="editColumns" class="btn"><i class="fa fa-edit"></i></a></div>
+                    </div>
+                    <div class="control-group" style="margin-top: 10px">
                         <div class="controls">
                             <div class="scrollable">
                                 <table class="table table-striped">
                                     <thead>
-                                      <th id="column_names">${ _('Column name') }</th>
-                                      <th>${ _('Column Type') }</th>
+                                      <th id="column_names" style="width:210px">${ _('Column name') }</th>
+                                      <th style="width:210px">${ _('Column Type') }</th>
                                       % for i in range(0, n_rows):
                                         <th><em>${_('Sample Row')} #${i + 1}</em></th>
                                       % endfor
@@ -157,6 +151,60 @@ ${ layout.metastore_menubar() }
 <script type="text/javascript" charset="utf-8">
   $(document).ready(function () {
     $("[rel='tooltip']").tooltip();
+
+    $("#useHeader").on("click", function(){
+      var _isChecked = false;
+      var _klass = "btn-info";
+      if ($(this).hasClass(_klass)){
+        $(this).removeClass(_klass);
+      }
+      else {
+        $(this).addClass(_klass);
+        _isChecked = true;
+      }
+
+      $(".cols input[type='text']").each(function (cnt, item) {
+        if (_isChecked) {
+          $(item).data('previous', $(item).val());
+          $(item).val($.trim(${ fields_list_json | n,unicode }[0][cnt]));
+        } else {
+          $(item).val($(item).data('previous'));
+        }
+      });
+
+      $(".cols-1").each(function (cnt, item) {
+        if (_isChecked) {
+          $(item).data('previous', $(item).text());
+          $(item).text($.trim(${ fields_list_json | n,unicode }[1][cnt]));
+        } else {
+          $(item).text($(item).data('previous'));
+        }
+      });
+
+      $(".cols-2").each(function (cnt, item) {
+        if (_isChecked) {
+          $(item).data('previous', $(item).text());
+          $(item).text($.trim(${ fields_list_json | n,unicode }[2][cnt]));
+        } else {
+          $(item).text($(item).data('previous'));
+        }
+      });
+      guessColumnTypes();
+    });
+
+    guessColumnTypes();
+
+    // Really basic heuristic to detect if first row is a header.
+    var isString = 0;
+    $(".cols-1").each(function (cnt, item) {
+      if ($(".cols-1").data("possibleType") == 'string') {
+        isString += 1;
+      }
+    });
+    // Most of its columns are strings
+    if (isString > $(".cols-1").length - 1) {
+      $("#useHeader").click();
+    }
 
     $(".scrollable").width($(".form-actions").width() - 10);
 
@@ -255,55 +303,6 @@ ${ layout.metastore_menubar() }
         $(this).val($(this).data("possibleType"));
       });
     }
-
-    guessColumnTypes();
-
-    $("#use_header").change(function (e) {
-      var input = this;
-
-      $(".cols input[type='text']").each(function (cnt, item) {
-        if (input.checked) {
-          $(item).data('previous', $(item).val());
-          $(item).val($.trim(${ fields_list_json | n,unicode }[0][cnt]));
-        } else {
-          $(item).val($(item).data('previous'));
-        }
-      });
-
-      $(".cols-1").each(function (cnt, item) {
-        if (input.checked) {
-          $(item).data('previous', $(item).text());
-          $(item).text($.trim(${ fields_list_json | n,unicode }[1][cnt]));
-        } else {
-          $(item).text($(item).data('previous'));
-        }
-      });
-
-      $(".cols-2").each(function (cnt, item) {
-        if (input.checked) {
-          $(item).data('previous', $(item).text());
-          $(item).text($.trim(${ fields_list_json | n,unicode }[2][cnt]));
-        } else {
-          $(item).text($(item).data('previous'));
-        }
-      });
-
-      guessColumnTypes();
-    });
-
-    // Really basic heuristic to detect if first row is a header.
-    var isString = 0;
-    $(".cols-1").each(function (cnt, item) {
-      if ($(".cols-1").data("possibleType") == 'string') {
-        isString += 1;
-      }
-    });
-
-    if (isString > $(".cols-1").length - 1) {
-      $("#use_header").prop('checked', true);
-      $("#use_header").change();
-    }
-
 
     function parseJSON(val) {
       try {
