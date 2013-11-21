@@ -20,7 +20,7 @@ import sys
 
 from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
-from desktop.lib.conf import Config
+from desktop.lib.conf import ConfigSection, Config, coerce_bool
 
 from beeswax.settings import NICE_NAME
 
@@ -66,6 +66,46 @@ BROWSE_PARTITIONED_TABLE_LIMIT = Config(
   type=int,
   help=_t('Set a LIMIT clause when browsing a partitioned table. A positive value will be set as the LIMIT. If 0 or negative, do not set any limit.'))
 
+SSL = ConfigSection(
+  key='ssl',
+  help=_t('SSL configuration for the server.'),
+  members=dict(
+    ENABLED = Config(
+      key="enabled",
+      help=_t("SSL communication enabled for this server."),
+      type=coerce_bool,
+      default=False
+    ),
+
+    CACERTS = Config(
+      key="cacerts",
+      help=_t("Path to Certificate Authority certificates."),
+      type=str,
+      default=""
+    ),
+
+    KEY = Config(
+      key="key",
+      help=_t("Path to the private key file."),
+      type=str,
+      default=""
+    ),
+
+    CERT = Config(
+      key="cert",
+      help=_t("Path to the public certificate file."),
+      type=str,
+      default=""
+    ),
+
+    VALIDATE = Config(
+      key="validate",
+      help=_t("Choose whether Hue should validate certificates received from the server."),
+      type=coerce_bool,
+      default=True
+    )
+  )
+)
 
 def config_validator(user):
   # dbms is dependent on beeswax.conf (this file)

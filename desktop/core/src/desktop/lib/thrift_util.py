@@ -19,7 +19,6 @@
 
 import Queue
 import logging
-import select
 import socket
 import threading
 import time
@@ -28,6 +27,7 @@ import sys
 
 from thrift.Thrift import TType, TApplicationException
 from thrift.transport.TSocket import TSocket
+from thrift.transport.TSSLSocket import TSSLSocket
 from thrift.transport.TTransport import TBufferedTransport, TMemoryBuffer,\
                                         TTransportException
 from thrift.protocol.TBinaryProtocol import TBinaryProtocol
@@ -70,9 +70,14 @@ class ConnectionConfig(object):
   """ Struct-like class encapsulating the configuration of a Thrift client. """
   def __init__(self, klass, host, port, service_name,
                use_sasl=False,
+               use_ssl=False,
                kerberos_principal="thrift",
                mechanism='GSSAPI',
                username='hue',
+               ca_certs=None,
+               keyfile=None,
+               certfile=None,
+               validate=False,
                timeout_seconds=45):
     """
     @param klass The thrift client class
@@ -80,11 +85,16 @@ class ConnectionConfig(object):
     @param port Port to connect to
     @param service_name A human-readable name to describe the service
     @param use_sasl If true, will use KERBEROS or PLAIN over SASL to authenticate
+    @param use_ssl If true, will use ca_certs, keyfile, and certfile to create TLS connection
     @param mechanism: GSSAPI or PLAIN if SASL
     @param username: username if PLAIN SASL only
     @param kerberos_principal The Kerberos service name to connect to.
               NOTE: for a service like fooservice/foo.blah.com@REALM only
               specify "fooservice", NOT the full principal name.
+    @param ca_certs certificate authority certificates
+    @param keyfile private key file
+    @param certfile certificate file
+    @param validate Validate the certificate received from server
     @param timeout_seconds Timeout for thrift calls
     """
     self.klass = klass
@@ -92,14 +102,19 @@ class ConnectionConfig(object):
     self.port = port
     self.service_name = service_name
     self.use_sasl = use_sasl
+    self.use_ssl = use_ssl
     self.mechanism = mechanism
     self.username = username
     self.kerberos_principal = kerberos_principal
+    self.ca_certs = ca_certs
+    self.keyfile = keyfile
+    self.certfile = certfile
+    self.validate = validate
     self.timeout_seconds = timeout_seconds
 
   def __str__(self):
     return ', '.join(map(str, [self.klass, self.host, self.port, self.service_name, self.use_sasl, self.kerberos_principal, self.timeout_seconds,
-                               self.mechanism, self.username]))
+                               self.mechanism, self.username, self.use_ssl, self.ca_certs, self.keyfile, self.certfile, self.validate]))
 
 class ConnectionPooler(object):
   """
@@ -213,7 +228,10 @@ def connect_to_thrift(conf):
 
   Returns a tuple of (service, protocol, transport)
   """
-  sock = TSocket(conf.host, conf.port)
+  if conf.use_ssl:
+    sock = TSSLSocket(conf.host, conf.port, validate=conf.validate, ca_certs=conf.ca_certs, keyfile=conf.keyfile, certfile=conf.certfile)
+  else:
+    sock = TSocket(conf.host, conf.port)
   if conf.timeout_seconds:
     # Thrift trivia: You can do this after the fact with
     # _grab_transport_from_wrapper(self.wrapped.transport).setTimeout(seconds*1000)

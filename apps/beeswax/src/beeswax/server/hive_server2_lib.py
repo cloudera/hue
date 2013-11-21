@@ -309,7 +309,12 @@ class HiveServerClient:
                                           use_sasl=use_sasl,
                                           mechanism=mechanism,
                                           username=user.username,
-                                          timeout_seconds=conf.SERVER_CONN_TIMEOUT.get())
+                                          timeout_seconds=conf.SERVER_CONN_TIMEOUT.get(),
+                                          use_ssl=conf.SSL.ENABLED.get(),
+                                          ca_certs=conf.SSL.CACERTS.get(),
+                                          keyfile=conf.SSL.KEY.get(),
+                                          certfile=conf.SSL.CERT.get(),
+                                          validate=conf.SSL.VALIDATE.get())
 
 
   def get_security(self):
