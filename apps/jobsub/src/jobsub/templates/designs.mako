@@ -736,6 +736,7 @@ ko.applyBindings(designs);
 
 // Design table and other variables.
 var designTableOptions = {
+  "bAutoWidth": false,
   "sPaginationType": "bootstrap",
   "bLengthChange": false,
   "sDom": "<'row'r>t<'row-fluid'<'dt-pages'p><'dt-records'i>>",
