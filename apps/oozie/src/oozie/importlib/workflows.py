@@ -342,7 +342,7 @@ def _resolve_decision_relationships(workflow):
       link = Link(name='to', parent=decision_end, child=node)
       link.save()
 
-  def decision_helper(decision):
+  def decision_helper(decision, subgraphs):
     """
     Iterates through children, waits for ends.
     When an end is found, finish the decision.
@@ -359,7 +359,7 @@ def _resolve_decision_relationships(workflow):
 
     ends = set()
     for child in children:
-      end = helper(child)
+      end = helper(child, subgraphs)
       if end:
         ends.add(end)
 
@@ -387,12 +387,12 @@ def _resolve_decision_relationships(workflow):
         # If both decision nodes are within a single decision path,
         # then the end may need to be returned, if found.
         if isinstance(end, Decision):
-          end = decision_helper(end)
+          end = decision_helper(end, subgraphs)
           if end:
             return end
 
         # Can do this because we've replace all its parents with a single DecisionEnd node.
-        return helper(end)
+        return helper(end, subgraphs)
       else:
         raise RuntimeError(_('Cannot import workflows that have decisions paths with multiple terminal nodes that converge on a single terminal node.'))
     else:
@@ -400,8 +400,11 @@ def _resolve_decision_relationships(workflow):
 
     return None
 
-  def helper(node):
+  def helper(node, subgraphs={}):
     """Iterates through nodes, returning ends."""
+    if node.name in subgraphs:
+      return subgraphs[node.name]
+
     # Assume receive full node.
     children = [link.child.get_full_node() for link in node.get_children_links().exclude(name__in=['error','default'])]
 
@@ -411,25 +414,32 @@ def _resolve_decision_relationships(workflow):
     if fan_in_count > 1 and not isinstance(node, Join) and not isinstance(node, DecisionEnd):
       return node
     elif isinstance(node, Decision):
-      end = decision_helper(node)
+      end = decision_helper(node, subgraphs)
       if end:
+        # Remember end so we don't have go through checking this path again.
+        subgraphs[node.name] = end
         return end
-    # I case of fork, should not find different ends.
+    # In case of fork, should not find different ends.
     elif len(children) > 1:
       end = None
       for child in children:
-        temp = helper(child)
+        temp = helper(child, subgraphs)
         end = end or temp
         if end != temp:
           raise RuntimeError(_('Different ends found in fork.'))
+      # Remember end so we don't have go through checking this path again.
+      subgraphs[node.name] = end
       return end
     elif children:
-      return helper(children.pop())
+      return helper(children.pop(), subgraphs)
 
     # Likely reached end.
     return None
 
   helper(workflow.start.get_full_node())
+
+  if Node.objects.filter(workflow=workflow).filter(node_type=Decision.node_type).exists():
+    helper(workflow.start.get_full_node())
 
 
 def _prepare_nodes(workflow, root):
