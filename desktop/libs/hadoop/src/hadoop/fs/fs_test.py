@@ -117,13 +117,15 @@ def test_hdfs_copy():
     assert_equal(0646, stat.S_IMODE(sb.mode))
 
   finally:
-    minifs.rmtree('/copy_test_src')
-    minifs.rmtree('/copy_test_dst')
+    minifs.do_as_superuser(minifs.rmtree, '/copy_test_src')
+    minifs.do_as_superuser(minifs.rmtree, '/copy_test_dst')
+
 
 @attr('requires_hadoop')
 def test_hdfs_full_copy():
   minicluster = pseudo_hdfs4.shared_cluster()
   minifs = minicluster.fs
+  minifs.setuser('test')
 
   try:
     minifs.do_as_superuser(minifs.chmod, '/', 0777)
@@ -146,22 +148,21 @@ def test_hdfs_full_copy():
     # Copy directory to file should fail.
     try:
       minifs.copy('/copy_test/src', '/copy_test/dest/file.txt', True)
-    except IOError, e:
+    except IOError:
       pass
-    except Exception, e:
+    except Exception:
       raise
 
   finally:
-    minifs.rmtree('/copy_test')
+    minifs.do_as_superuser(minifs.rmtree, '/copy_test')
 
 @attr('requires_hadoop')
 def test_hdfs_copy_from_local():
   minicluster = pseudo_hdfs4.shared_cluster()
   minifs = minicluster.fs
+  minifs.setuser('test')
 
-  olduser = minifs.setuser(minifs.superuser)
-  minifs.chmod('/', 0777)
-  minifs.setuser(olduser)
+  minifs.do_as_superuser(minifs.chmod, '/', 0777)
 
   path = os.path.join(tempfile.gettempdir(), 'copy_test_src')
   logging.info(path)

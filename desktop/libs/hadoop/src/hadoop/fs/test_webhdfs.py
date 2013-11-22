@@ -258,22 +258,6 @@ class WebhdfsTests(unittest.TestCase):
       reload(sys)
       sys.setdefaultencoding('ascii')
 
-  def test_threadedness(self):
-    # Start a second thread to change the user, and
-    # make sure that isn't reflected.
-    fs = self.cluster.fs
-    fs.setuser("alpha")
-    class T(threading.Thread):
-      def run(self):
-        fs.setuser("beta")
-        assert_equals("beta", fs.user)
-    t = T()
-    t.start()
-    t.join()
-    assert_equals("alpha", fs.user)
-    fs.setuser("gamma")
-    assert_equals("gamma", fs.user)
-
   def test_chmod(self):
     # Create a test directory with
     # a subdirectory and a few files.

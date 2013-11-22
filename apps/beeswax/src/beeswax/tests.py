@@ -1618,8 +1618,8 @@ class TestDesign():
     ]
 
     statements = design.get_configuration_statements()
-    assert_true(re.match('\nADD FILE hdfs://localhost:(\d+)my_file\n', statements[0]), statements[0])
-    assert_true(re.match('\nADD FILE hdfs://localhost:(\d+)/my_path/my_file\n', statements[1]), statements[1])
+    assert_true(re.match('\nADD FILE hdfs://([^:]+):(\d+)my_file\n', statements[0]), statements[0])
+    assert_true(re.match('\nADD FILE hdfs://([^:]+):(\d+)/my_path/my_file\n', statements[1]), statements[1])
     assert_equal('\nADD FILE s3://host/my_s3_file\n', statements[2])
 
 
