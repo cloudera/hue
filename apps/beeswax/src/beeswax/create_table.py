@@ -15,13 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-Views & controls for creating tables
-"""
 
-import logging
+import csv
 import gzip
 import json
+import logging
 
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
@@ -196,17 +194,19 @@ def import_wizard(request, database='default'):
                 'column_type': 'string',
             })
           s3_col_formset = ColumnTypeFormSet(prefix='cols', initial=columns)
-
-        return render('define_columns.mako', request, {
-          'action': reverse(app_name + ':import_wizard', kwargs={'database': database}),
-          'file_form': s1_file_form,
-          'delim_form': s2_delim_form,
-          'column_formset': s3_col_formset,
-          'fields_list': fields_list,
-          'fields_list_json': json.dumps(fields_list),
-          'n_cols': n_cols,
-          'database': database,
-        })
+        try:
+          return render('define_columns.mako', request, {
+            'action': reverse(app_name + ':import_wizard', kwargs={'database': database}),
+            'file_form': s1_file_form,
+            'delim_form': s2_delim_form,
+            'column_formset': s3_col_formset,
+            'fields_list': fields_list,
+            'fields_list_json': json.dumps(fields_list),
+            'n_cols': n_cols,
+            'database': database,
+          })
+        except Exception, e:
+          raise PopupException(_("The selected delimiter is creating an un-even number of columns. Please make sure you don't have empty columns."), detail=e)
 
       #
       # Final: Execute
@@ -364,17 +364,24 @@ def _readfields(lines, delimiters):
   res = (None, None)
 
   for delim in delimiters:
-    fields_list = [ ]
-    for line in lines:
-      if line:
-        # Unescape the delimiter back to its character value
-        fields_list.append(line.split(delim.decode('string_escape')))
+    # Unescape the delimiter back to its character value
+    delimiter = delim.decode('string_escape')
+    try:
+      fields_list = _get_rows(lines, delimiter)
+    except:
+      fields_list = [line.split(delimiter) for line in lines if line]
+
     score = score_delim(fields_list)
     LOG.debug("'%s' gives score of %s" % (delim, score))
     if score > max_score:
       max_score = score
       res = (delim, fields_list)
   return res
+
+
+def _get_rows(lines, delimiter):
+  column_reader = csv.reader(lines, delimiter=delimiter)
+  return [row for row in column_reader if row]
 
 
 def _peek_file(fs, file_form):
@@ -445,7 +452,7 @@ def load_after_create(request, database):
   LOG.debug("Auto loading data from %s into table %s" % (path, tablename))
   hql = "LOAD DATA INPATH '%s' INTO TABLE `%s.%s`" % (path, database, tablename)
   query = hql_query(hql)
-  app_name = get_app_name(request)
+
   on_success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': tablename})
 
   return execute_directly(request, query, on_success_url=on_success_url)

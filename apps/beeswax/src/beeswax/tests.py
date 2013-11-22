@@ -998,7 +998,13 @@ for x in sys.stdin:
     RAW_FIELDS = [
       ['ta\tb', 'nada', 'sp ace'],
       ['f\too', 'bar', 'fred'],
-      ['a\ta', 'bb', 'cc'] ]
+      ['a\ta', 'bb', 'cc'],
+    ]
+    CSV_FIELDS = [
+      ['a', 'b', 'c'],
+      ['"a,a"', '"b,b"', '"c,c"'],
+      ['"a,\"\"a"', '"b,\"\"b"', '"c,\"\"c"'],
+    ]
 
     def write_file(filename, raw_fields, delim, do_gzip=False):
       lines = [ delim.join(row) for row in raw_fields ]
@@ -1018,6 +1024,7 @@ for x in sys.stdin:
     write_file('/tmp/comma.dat', RAW_FIELDS, ',')
     write_file('/tmp/pipes.dat', RAW_FIELDS, '|')
     write_file('/tmp/comma.dat.gz', RAW_FIELDS, ',', do_gzip=True)
+    write_file('/tmp/comma.csv', CSV_FIELDS, ',')
 
     # Test auto delim selection
     resp = self.client.post('/beeswax/create/import_wizard/default', {
@@ -1056,6 +1063,21 @@ for x in sys.stdin:
       'file_type': 'text',
     })
     assert_equal(len(resp.context['fields_list'][0]), 3)
+
+    # Make sure quoted CSV works
+    resp = self.client.post('/beeswax/create/import_wizard/default', {
+      'submit_preview': 'on',
+      'path': '/tmp/comma.csv',
+      'name': 'test_create_import_csv',
+      'delimiter_0': '__other__',
+      'delimiter_1': ',',
+      'file_type': 'text',
+    })
+    assert_equal(resp.context['fields_list'], [
+      ['a', 'b', 'c'],
+      ['a,a', 'b,b', 'c,c'],
+      ['a,"a', 'b,"b', 'c,"c'],
+    ] )
 
     # Test column definition
     resp = self.client.post('/beeswax/create/import_wizard/default', {
@@ -1595,11 +1617,11 @@ class TestDesign():
         {'type': 'FILE', 'path': 's3://host/my_s3_file'}
     ]
 
-    assert_equal([
-        u'\nADD FILE hdfs://localhost:8020my_file\n', # Expected
-        u'\nADD FILE hdfs://localhost:8020/my_path/my_file\n',
-        u'\nADD FILE s3://host/my_s3_file\n'
-    ], design.get_configuration_statements())
+    statements = design.get_configuration_statements()
+    assert_true(re.match('\nADD FILE hdfs://localhost:(\d+)my_file\n', statements[0]), statements[0])
+    assert_true(re.match('\nADD FILE hdfs://localhost:(\d+)/my_path/my_file\n', statements[1]), statements[1])
+    assert_equal('\nADD FILE s3://host/my_s3_file\n', statements[2])
+
 
 def search_log_line(component, expected_log, all_logs):
   """Checks if 'expected_log' can be found in one line of 'all_logs' outputed by the logging component 'component'."""
