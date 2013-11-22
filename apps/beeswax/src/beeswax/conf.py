@@ -81,21 +81,21 @@ SSL = ConfigSection(
       key="cacerts",
       help=_t("Path to Certificate Authority certificates."),
       type=str,
-      default=""
+      default="/etc/hue/cacerts.pem"
     ),
 
     KEY = Config(
       key="key",
       help=_t("Path to the private key file."),
       type=str,
-      default=""
+      default="/etc/hue/key.pem"
     ),
 
     CERT = Config(
       key="cert",
       help=_t("Path to the public certificate file."),
       type=str,
-      default=""
+      default="/etc/hue/cert.pem"
     ),
 
     VALIDATE = Config(
