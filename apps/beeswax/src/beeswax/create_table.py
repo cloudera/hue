@@ -38,6 +38,7 @@ from beeswax.forms import CreateTableForm, ColumnTypeFormSet,\
   TERMINATOR_CHOICES
 from beeswax.server import dbms
 from beeswax.views import execute_directly
+import re
 
 
 LOG = logging.getLogger(__name__)
@@ -201,13 +202,17 @@ def import_wizard(request, database='default'):
             })
           s3_col_formset = ColumnTypeFormSet(prefix='cols', initial=columns)
         try:
+          fields_list_for_json = list(fields_list)
+          if fields_list_for_json:
+            fields_list_for_json[0] = map(lambda a: re.sub('[^\w]', '', a), fields_list_for_json[0]) # Cleaning headers
+
           return render('define_columns.mako', request, {
             'action': reverse(app_name + ':import_wizard', kwargs={'database': database}),
             'file_form': s1_file_form,
             'delim_form': s2_delim_form,
             'column_formset': s3_col_formset,
             'fields_list': fields_list,
-            'fields_list_json': json.dumps(fields_list),
+            'fields_list_json': json.dumps(fields_list_for_json),
             'n_cols': n_cols,
             'database': database,
             'databases': databases

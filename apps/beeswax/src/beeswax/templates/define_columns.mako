@@ -219,6 +219,7 @@ ${ layout.metastore_menubar() }
           $(item).text($(item).data('previous'));
         }
       });
+
       guessColumnTypes();
     });
 
@@ -227,12 +228,12 @@ ${ layout.metastore_menubar() }
     // Really basic heuristic to detect if first row is a header.
     var isString = 0;
     $(".cols-1").each(function (cnt, item) {
-      if ($(".cols-1").data("possibleType") == 'string') {
+      if ($(item).data("possibleType") == 'string') {
         isString += 1;
       }
     });
-
-    if (isString > $(".cols-1").length - 1) {
+    // First row is just strings
+    if (isString == $(".cols-1").length) {
       $("#useHeader").click();
     }
 
@@ -356,7 +357,7 @@ ${ layout.metastore_menubar() }
     }
 
     function isInt(n) {
-      return typeof n === 'number' && parseFloat(n) == parseInt(n, 10) && !isNaN(n);
+      return Math.floor(n) == n && n.toString().indexOf(".") == -1;
     }
   });
 </script>
