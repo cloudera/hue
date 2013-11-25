@@ -31,10 +31,7 @@ function RdbmsViewModel() {
   });
   self.rows = ko.observableArray();
   self.columns = ko.observableArray();
-
-  self.filter = ko.observable("");
-  self.isLoading = ko.observable(false);
-  self.isReady = ko.observable(false);
+  self.resultsEmpty = ko.observable(false);
 
   self.server = ko.computed({
     'read': function() {
@@ -156,6 +153,7 @@ function RdbmsViewModel() {
           $(document).trigger('explain.query', data);
           self.updateResults(data.results);
           self.query.id(data.design);
+          self.resultsEmpty(data.results.rows.length === 0);
           $(document).trigger('explained.query', data);
         } else {
           self.query.errors.push(data.message);
@@ -224,6 +222,7 @@ function RdbmsViewModel() {
           $(document).trigger('execute.query', data);
           self.updateResults(data.results);
           self.query.id(data.design);
+          self.resultsEmpty(data.results.rows.length === 0);
           $(document).trigger('executed.query', data);
         } else {
           self.query.errors.push(data.message);

@@ -145,6 +145,18 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
         </table>
       </div>
     </div>
+
+    <div data-bind="css: {'hide': !resultsEmpty()}" class="row-fluid hide">
+      <div class="card card-small scrollable">
+        <div class="row-fluid">
+          <div class="span10 offset1 center empty-wrapper">
+            <i class="fa fa-frown-o"></i>
+            <h1>${_('The server returned no results.')}</h1>
+            <br />
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
 </div>
@@ -266,6 +278,16 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
 
   .resultTable td, .resultTable th {
     white-space: nowrap;
+  }
+
+  .empty-wrapper {
+    margin-top: 50px;
+    color: #BBB;
+    line-height: 60px;
+  }
+
+  .empty-wrapper i {
+    font-size: 148px;
   }
 </style>
 
