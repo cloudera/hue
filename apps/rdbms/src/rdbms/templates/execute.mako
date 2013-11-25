@@ -18,28 +18,11 @@
   from django.utils.translation import ugettext as _
 %>
 
+<%namespace name="common" file="common.mako" />
+
 ${ commonheader(_('Query'), app_name, user) | n,unicode }
 
-<div class="navbar navbar-inverse navbar-fixed-top">
-  <div class="navbar-inner">
-    <div class="container-fluid">
-      <div class="nav-collapse">
-        <ul class="nav">
-          <li class="currentApp">
-            <a href="/rdbms">
-              <img src="/rdbms/static/art/icon_rdbms_24.png" />
-              ${ _('DB Query') }
-            </a>
-          </li>
-          <li class="active"><a href="${ url('rdbms:execute_query') }">${_('Query Editor')}</a></li>
-          <li><a href="${ url('rdbms:my_queries') }">${_('My Queries')}</a></li>
-          <li><a href="${ url('rdbms:list_designs') }">${_('Saved Queries')}</a></li>
-          <li><a href="${ url('rdbms:list_query_history') }">${_('History')}</a></li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</div>
+<%common:navbar></%common:navbar>
 
 <div class="container-fluid">
   <div class="row-fluid">

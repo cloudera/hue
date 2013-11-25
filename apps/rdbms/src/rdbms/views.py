@@ -35,17 +35,6 @@ from rdbms.design import SQLdesign
 LOG = logging.getLogger(__name__)
 
 
-def ensure_configuration(error_view_func):
-  def _temporary_decorator(view_func):
-    def _decorator(*args, **kwargs):
-      if len(conf.RDBMS.get()) > 0:
-        return view_func(*args, **kwargs)
-      else:
-        return error_view_func(*args, **kwargs)
-    return wraps(view_func)(_decorator)
-  return _temporary_decorator
-
-
 def index(request):
   return execute_query(request)
 
@@ -55,9 +44,21 @@ def configuration_error(request, *args, **kwargs):
 
 
 """
+Decorators
+"""
+def ensure_configuration(view_func):
+  def _decorator(*args, **kwargs):
+    if conf.RDBMS.get():
+      return view_func(*args, **kwargs)
+    else:
+      return configuration_error(*args, **kwargs)
+  return wraps(view_func)(_decorator)
+
+
+"""
 Queries Views
 """
-@ensure_configuration(error_view_func=configuration_error)
+@ensure_configuration
 def execute_query(request, design_id=None):
   """
   View function for executing an arbitrary synchronously query.
@@ -75,7 +76,7 @@ def execute_query(request, design_id=None):
   })
 
 
-@ensure_configuration(error_view_func=configuration_error)
+@ensure_configuration
 def save_design(request, save_form, query_form, type_, design, explicit_save=False):
   """
   save_design(request, save_form, query_form, type_, design, explicit_save) -> SavedQuery
