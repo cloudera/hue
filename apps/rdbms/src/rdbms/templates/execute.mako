@@ -288,10 +288,14 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
 <script src="/static/ext/js/bootstrap-editable.min.js"></script>
 
 <script src="/static/ext/js/jquery/plugins/jquery-fieldselection.js" type="text/javascript"></script>
-<script src="/beeswax/static/js/autocomplete.utils.js" type="text/javascript" charset="utf-8"></script>
+<script src="/rdbms/static/js/autocomplete.utils.js" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript" charset="utf-8">
   var codeMirror, viewModel;
+
+  var RDBMS_AUTOCOMPLETE_BASE_URL = '/rdbms/api';
+  var RDBMS_AUTOCOMPLETE_FAILS_SILENTLY_ON = [500, 404]; // error codes from rdbms/views.py - autocomplete
+  var RDBMS_AUTOCOMPLETE_GLOBAL_CALLBACK = $.noop;
 
   $(document).ready(function(){
 
@@ -321,13 +325,73 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
 
     var AUTOCOMPLETE_SET = CodeMirror.sqlHint;
 
-    CodeMirror.onAutocomplete = function (data, from, to) {
-      if (CodeMirror.tableFieldMagic) {
-        codeMirror.replaceRange(" ", from, from);
-        codeMirror.setCursor(from);
+    CodeMirror.commands.autocomplete = function (cm) {
+      $(document.body).on("contextmenu", function (e) {
+        e.preventDefault(); // prevents native menu on FF for Mac from being shown
+      });
+
+      var options = {
+        'tables': {}
+      };
+
+      var pos = cm.cursorCoords();
+      $("<i class='fa fa-spinner fa-spin CodeMirror-spinner'></i>").css("top", pos.top + "px").css("left", (pos.left - 4) + "px").appendTo($("body"));
+
+      if ($.totalStorage('rdbms_tables_' + viewModel.server().name() + "_" + viewModel.database()) == null) {
         CodeMirror.showHint(codeMirror, AUTOCOMPLETE_SET);
+        rdbms_getTables(viewModel.server().name(), viewModel.database(), function () {}); // if preload didn't work, tries again
       }
-    };
+      else {
+        rdbms_getTables(viewModel.server().name(), viewModel.database(), function (tables) {
+          $.each(tables.split(' '), function(index, table) {
+            if (!(table in options['tables'])) {
+              options['tables'][table] = [];
+            }
+          });
+          var _before = codeMirror.getRange({line: 0, ch: 0}, {line: codeMirror.getCursor().line, ch: codeMirror.getCursor().ch}).replace(/(\r\n|\n|\r)/gm, " ");
+          if (_before.toUpperCase().indexOf("SELECT ") > -1 && _before.toUpperCase().indexOf(" FROM ") == -1 && !CodeMirror.fromDot) {
+            if (codeMirror.getValue().toUpperCase().indexOf("FROM ") > -1) {
+              fieldsAutocomplete(codeMirror, options);
+            } else {
+              CodeMirror.showHint(codeMirror, AUTOCOMPLETE_SET);
+            }
+          }
+          else {
+            if (_before.toUpperCase().indexOf("WHERE ") > -1 && !CodeMirror.fromDot && _before.match(/ON|GROUP|SORT/) == null) {
+              fieldsAutocomplete(codeMirror);
+            }
+            else {
+              CodeMirror.showHint(codeMirror, AUTOCOMPLETE_SET, options);
+            }
+          }
+        });
+      }
+    }
+
+    function fieldsAutocomplete(cm, options) {
+      try {
+        var _possibleTables = $.trim(codeMirror.getValue(" ").substr(codeMirror.getValue().toUpperCase().indexOf("FROM ") + 4)).split(" ");
+        var _foundTable = "";
+        for (var i = 0; i < _possibleTables.length; i++) {
+          if ($.trim(_possibleTables[i]) != "" && _foundTable == "") {
+            _foundTable = _possibleTables[i];
+          }
+        }
+        if (_foundTable != "" && _foundTable in options['tables']) {
+          if (rdbms_tableHasAlias(viewModel.server().name(), _foundTable, codeMirror.getValue())) {
+            CodeMirror.showHint(cm, AUTOCOMPLETE_SET, options);
+          } else {
+            rdbms_getTableColumns(viewModel.server().name(), viewModel.database(), _foundTable, codeMirror.getValue(),
+                function (columns) {
+                  options['tables'][_foundTable] = columns.split(' ');
+                  CodeMirror.showHint(cm, AUTOCOMPLETE_SET, options);
+                });
+          }
+        }
+      }
+      catch (e) {
+      }
+    }
 
     CodeMirror.fromDot = false;
 
@@ -341,7 +405,7 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
       extraKeys: {
         "Ctrl-Space": function () {
           CodeMirror.fromDot = false;
-          CodeMirror.showHint(codeMirror, AUTOCOMPLETE_SET);
+          codeMirror.execCommand("autocomplete");
         },
         Tab: function (cm) {
           $("#executeQuery").focus();
@@ -350,21 +414,10 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
       onKeyEvent: function (e, s) {
         if (s.type == "keyup") {
           if (s.keyCode == 190) {
-            var _line = codeMirror.getLine(codeMirror.getCursor().line);
-            var _partial = _line.substring(0, codeMirror.getCursor().ch);
-            var _table = _partial.substring(_partial.lastIndexOf(" ") + 1, _partial.length - 1);
             if (codeMirror.getValue().toUpperCase().indexOf("FROM") > -1) {
-              hac_getTableColumns($("#id_query-database").val(), _table, codeMirror.getValue(), function (columns) {
-                var _cols = columns.split(" ");
-                for (var col in _cols){
-                  _cols[col] = "." + _cols[col];
-                }
-                CodeMirror.catalogFields = _cols.join(" ");
-                CodeMirror.fromDot = true;
-                window.setTimeout(function () {
-                  codeMirror.execCommand("autocomplete");
-                }, 100);  // timeout for IE8
-              });
+              window.setTimeout(function () {
+                codeMirror.execCommand("autocomplete");
+              }, 100);  // timeout for IE8
             }
           }
         }

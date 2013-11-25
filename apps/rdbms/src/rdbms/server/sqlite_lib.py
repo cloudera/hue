@@ -77,7 +77,7 @@ class SQLiteClient(BaseRDMSClient):
     return [self._conn_params['database']]
 
 
-  def get_tables(self, database, table_names):
+  def get_tables(self, database, table_names=[]):
     # Doesn't use database and only retrieves tables for database currently in use.
     cursor = self.connection.cursor()
     cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")

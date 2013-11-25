@@ -97,7 +97,7 @@ class MySQLClient(BaseRDMSClient):
     return [row[0] for row in cursor.fetchall()]
 
 
-  def get_tables(self, database, table_names):
+  def get_tables(self, database, table_names=[]):
     cursor = self.connection.cursor()
     cursor.execute("SHOW TABLES")
     self.connection.commit()

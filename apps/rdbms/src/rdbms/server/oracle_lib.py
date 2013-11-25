@@ -78,7 +78,7 @@ class OracleClient(BaseRDMSClient):
     return [self.query_server['name']]
 
 
-  def get_tables(self, database, table_names):
+  def get_tables(self, database, table_names=[]):
     cursor = self.connection.cursor()
     cursor.execute("SELECT table_name FROM all_tables")
     self.connection.commit()

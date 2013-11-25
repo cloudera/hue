@@ -107,6 +107,20 @@ class TestAPI(TestSQLiteRdbmsBase):
     response_dict = json.loads(response.content)
     assert_true(self.database in response_dict['databases'], response_dict)
 
+  def test_get_tables(self):
+    response = self.client.get(reverse('rdbms:api_tables', args=['sqlitee', self.database]))
+    response_dict = json.loads(response.content)
+    assert_true('test1' in response_dict['tables'], response_dict)
+
+  def test_get_columns(self):
+    response = self.client.get(reverse('rdbms:api_columns', args=['sqlitee', self.database, 'test1']))
+    response_dict = json.loads(response.content)
+    assert_true('date' in response_dict['columns'], response_dict)
+    assert_true('trans' in response_dict['columns'], response_dict)
+    assert_true('symbol' in response_dict['columns'], response_dict)
+    assert_true('qty' in response_dict['columns'], response_dict)
+    assert_true('price' in response_dict['columns'], response_dict)
+
   def test_execute_query(self):
     data = {
       'server': 'sqlitee',

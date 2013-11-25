@@ -80,11 +80,17 @@ class Rdbms(object):
     self.client = client
     self.server_type = server_type
 
+  def get_databases(self):
+    return self.client.get_databases()
+
+  def get_tables(self, database):
+    return self.client.get_tables(database)
+
   def get_table(self, database, table_name):
     return self.client.get_table(database, table_name)
 
-  def get_databases(self):
-    return self.client.get_databases()
+  def get_columns(self, database, table_name):
+    return self.client.get_columns(database, table_name)
 
   def execute_query(self, query, design):
     sql_query = query.sql_query

@@ -70,6 +70,36 @@ def databases(request, server):
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
+def tables(request, server, database):
+  query_server = dbms.get_query_server_config(server)
+
+  if not query_server:
+    raise Http404
+
+  db = dbms.get(request.user, query_server)
+
+  response = {
+    'tables': db.get_tables(database)
+  }
+
+  return HttpResponse(json.dumps(response), mimetype="application/json")
+
+
+def columns(request, server, database, table):
+  query_server = dbms.get_query_server_config(server)
+
+  if not query_server:
+    raise Http404
+
+  db = dbms.get(request.user, query_server)
+
+  response = {
+    'columns': db.get_columns(database, table)
+  }
+
+  return HttpResponse(json.dumps(response), mimetype="application/json")
+
+
 def execute_query(request, design_id=None):
   response = {'status': -1, 'message': ''}
 
