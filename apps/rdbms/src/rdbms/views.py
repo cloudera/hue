@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from functools import wraps
 import logging
 
 from django.utils.translation import ugettext as _
@@ -27,20 +28,36 @@ from desktop.lib.django_util import render
 from beeswax import models as beeswax_models
 from beeswax.views import safe_get_design
 
+from rdbms import conf
 from rdbms.design import SQLdesign
 
 
 LOG = logging.getLogger(__name__)
 
 
+def ensure_configuration(error_view_func):
+  def _temporary_decorator(view_func):
+    def _decorator(*args, **kwargs):
+      if len(conf.RDBMS.get()) > 0:
+        return view_func(*args, **kwargs)
+      else:
+        return error_view_func(*args, **kwargs)
+    return wraps(view_func)(_decorator)
+  return _temporary_decorator
+
+
 def index(request):
   return execute_query(request)
+
+
+def configuration_error(request, *args, **kwargs):
+  return render('error.mako', request, {})
 
 
 """
 Queries Views
 """
-
+@ensure_configuration(error_view_func=configuration_error)
 def execute_query(request, design_id=None):
   """
   View function for executing an arbitrary synchronously query.
@@ -58,6 +75,7 @@ def execute_query(request, design_id=None):
   })
 
 
+@ensure_configuration(error_view_func=configuration_error)
 def save_design(request, save_form, query_form, type_, design, explicit_save=False):
   """
   save_design(request, save_form, query_form, type_, design, explicit_save) -> SavedQuery

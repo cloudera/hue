@@ -52,6 +52,17 @@ class TestMockedRdbms:
     response = self.client.get("/rdbms/")
     assert_true('DB Query' in response.content, response.content)
 
+  def test_config_error(self):
+    self.finish = rdbms_conf.RDBMS.set_for_testing({})
+
+    response = self.client.get("/rdbms/")
+    assert_true('There are currently no databases configured.' in response.content)
+
+    response = self.client.get("/rdbms/execute/")
+    assert_true('There are currently no databases configured.' in response.content)
+
+    self.finish()
+
 
 class TestSQLiteRdbmsBase(object):
   @classmethod
