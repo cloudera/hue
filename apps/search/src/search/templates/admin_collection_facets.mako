@@ -212,13 +212,12 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
           <br/>
           <br/>
           ${_('Start')}
-          <input type="number" data-bind="value: selectedChartStartFacet" class="input-medium" />
+          <input id="selectedChartStartFacet" type="text" data-bind="value: selectedChartStartFacet" class="input-mini" data-placeholder-general="${_('ie. 0')}" data-placeholder-date="${_('ie. NOW-12HOURS/MINUTES')}" />
           &nbsp;${_('End')}
-          <input type="number" data-bind="value: selectedChartEndFacet" class="input-medium" />
+          <input id="selectedChartEndFacet" type="text" data-bind="value: selectedChartEndFacet" class="input-mini" data-placeholder-general="${_('ie. 100')}" data-placeholder-date="${_('ie. NOW')}" />
           &nbsp;${_('Gap')}
-          <input type="number" data-bind="value: selectedChartGapFacet" class="input-mini" />
-          <span id="chart-facet-help-general"  class="muted">&nbsp;${_('If empty this will be treated as a simple Field Facet.')}</span>
-          <span id="chart-facet-help-date" class="muted hide">&nbsp;${_('You can use fixed dates or functions. ie. Start: NOW-12HOURS/MINUTES, End: NOW, Gap: +30MINUTES')}</span>
+          <input id="selectedChartGapFacet" type="text" data-bind="value: selectedChartGapFacet" class="input-mini" data-placeholder-general="${_('ie. 10')}" data-placeholder-date="${_('ie. +30MINUTES')}" />
+          <span class="muted">&nbsp;${_('If empty this will be treated as a simple Field Facet.')} &nbsp;<a href="http://wiki.apache.org/solr/SimpleFacetParameters#rangefaceting" target="_blank"><i class="fa fa-external-link"></i> ${_('Read more about facets...')}</a></span>
           <br/>
           <br/>
           <a class="btn" data-bind="click: $root.addChartFacet, css:{disabled: $root.chartFacets().length == 1}"><i class="fa fa-plus-circle"></i> ${_('Set as Graphical Facet')}</a>
@@ -763,12 +762,14 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
     self.selectedChartFacet.subscribe(function (newValue) {
       var _field = self.fullFields[newValue];
       if (_field.type == "tdate"){
-        $("#chart-facet-help-date").removeClass("hide");
-        $("#chart-facet-help-general").addClass("hide");
+        $("#selectedChartStartFacet").attr("placeholder", $("#selectedChartStartFacet").data("placeholder-date")).removeClass("input-mini");
+        $("#selectedChartEndFacet").attr("placeholder", $("#selectedChartEndFacet").data("placeholder-date")).removeClass("input-mini");
+        $("#selectedChartGapFacet").attr("placeholder", $("#selectedChartGapFacet").data("placeholder-date")).removeClass("input-mini");
       }
       else {
-        $("#chart-facet-help-date").addClass("hide");
-        $("#chart-facet-help-general").removeClass("hide");
+        $("#selectedChartStartFacet").attr("placeholder", $("#selectedChartStartFacet").data("placeholder-general")).addClass("input-mini");
+        $("#selectedChartEndFacet").attr("placeholder", $("#selectedChartEndFacet").data("placeholder-general")).addClass("input-mini");
+        $("#selectedChartGapFacet").attr("placeholder", $("#selectedChartGapFacet").data("placeholder-general")).addClass("input-mini");
       }
       $("#selectedChartLabel").prop("placeholder", newValue);
     });
