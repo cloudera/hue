@@ -496,6 +496,12 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
       if ('read_only' in options) {
         self.read_only(options['read_only']);
       }
+
+      if (self.errors) {
+        ko.mapping.fromJS(format_errors_mapping(self.model), self.errors);
+      } else {
+        self.errors = ko.mapping.fromJS(format_errors_mapping(self.model));
+      }
     },
 
     toString: function() {

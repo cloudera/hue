@@ -124,8 +124,6 @@ def create_workflow(request):
       wf.managed = True
       Workflow.objects.initialize(wf, request.fs)
       return redirect(reverse('oozie:edit_workflow', kwargs={'workflow': workflow.id}))
-    else:
-      request.error(_('Errors on the form: %s') % workflow_form.errors)
   else:
     workflow_form = WorkflowForm(instance=workflow)
 

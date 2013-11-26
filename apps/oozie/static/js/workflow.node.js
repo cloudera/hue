@@ -14,6 +14,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+function format_errors_mapping(model) {
+  var errors = {};
+  for(var key in model) {
+    switch(key) {
+      case 'child_links':
+      case 'node_ptr':
+      case 'initialize':
+      case 'toString':
+      break;
+      default:
+        errors[key] = [];
+      break;
+    }
+  }
+  return errors;
+}
+
 /**
  * Node
  * Displays node in a graph and handles graph manipulation.
@@ -74,20 +91,7 @@ var NodeModule = function($, IdGeneratorTable, NodeFields) {
     self.children = ko.observableArray([]);
     self.model = model;
 
-    var errors = {};
-    for(var key in model) {
-      switch(key) {
-        case 'child_links':
-        case 'node_ptr':
-        case 'initialize':
-        case 'toString':
-        break;
-        default:
-          errors[key] = [];
-        break;
-      }
-    }
-    self.errors = ko.mapping.fromJS(errors);
+    self.errors = ko.mapping.fromJS(format_errors_mapping(model));
 
     self.edit_template = model.node_type + 'EditTemplate';
     switch(model.node_type) {

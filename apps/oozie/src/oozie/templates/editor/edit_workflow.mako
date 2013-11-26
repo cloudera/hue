@@ -85,10 +85,10 @@ ${ layout.menubar(section='workflows') }
       <div class="card-body">
         <p>
             <fieldset>
-        ${ utils.render_field(workflow_form['name'], extra_attrs={'data-bind': 'value: %s' % workflow_form['name'].name}) }
-        ${ utils.render_field(workflow_form['description'], extra_attrs={'data-bind': 'value: %s' % workflow_form['description'].name}) }
+        ${ utils.render_field_with_error_js(workflow_form['name'], workflow_form['name'].name, extra_attrs={'data-bind': 'value: %s' % workflow_form['name'].name}) }
+        ${ utils.render_field_with_error_js(workflow_form['description'], workflow_form['description'].name, extra_attrs={'data-bind': 'value: %s' % workflow_form['description'].name}) }
         <div class="hide">
-          ${ utils.render_field(workflow_form['is_shared'], extra_attrs={'data-bind': 'checked: %s' % workflow_form['is_shared'].name}) }
+          ${ utils.render_field_with_error_js(workflow_form['is_shared'], workflow_form['is_shared'].name, extra_attrs={'data-bind': 'checked: %s' % workflow_form['is_shared'].name}) }
         </div>
 
       <%
@@ -117,10 +117,10 @@ ${ layout.menubar(section='workflows') }
 
       <div id="advanced-container" class="hide">
         % if user_can_edit_job:
-          ${ utils.render_field(workflow_form['deployment_dir'], extra_attrs={'data-bind': 'value: %s' % workflow_form['deployment_dir'].name}) }
+          ${ utils.render_field_with_error_js(workflow_form['deployment_dir'], workflow_form['deployment_dir'].name, extra_attrs={'data-bind': 'value: %s' % workflow_form['deployment_dir'].name}) }
         % endif
 
-        ${ utils.render_field(workflow_form['job_xml'], extra_attrs={'data-bind': 'value: %s' % workflow_form['job_xml'].name}) }
+        ${ utils.render_field_with_error_js(workflow_form['job_xml'], workflow_form['job_xml'].name, extra_attrs={'data-bind': 'value: %s' % workflow_form['job_xml'].name}) }
       </div>
 
       </fieldset>
@@ -594,6 +594,13 @@ function workflow_save_success(data) {
 }
 
 function workflow_save_error(data) {
+  try {
+    if (data.status !== 400) {
+      throw Exception();
+    }
+    var response = $.parseJSON(data.responseText);
+    ko.mapping.fromJS(response.data.errors, workflow.errors);
+  } catch(err) {}
   $(document).trigger("error", "${ _('Could not save workflow') }");
   workflow.loading(false);
   $("#btn-save-wf").button('reset');
