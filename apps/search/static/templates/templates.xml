@@ -13,7 +13,7 @@
       </div>
       <div class="span11">
         <a href="https://twitter.com/{{user_screen_name}}/status/{{id}}" class="btn openTweet">
-          <i class="icon-twitter"></i>
+          <i class="fa fa-twitter"></i>
         </a>
         <b>{{user_name}}</b>
         <br/>
@@ -107,10 +107,10 @@ em {
     $(".stars").each(function(){
   	  var _h = "";
   	  for (var i=0;i<$(this).data("stars")*1;i++){
-        _h += '<i class="icon-star"></i>';
+        _h += '<i class="fa fa-star"></i>';
   	  }
   	  for (var i=$(this).data("stars")*1;i<5;i++){
-        _h += '<i class="icon-star-empty"></i>';
+        _h += '<i class="fa fa-star-o"></i>';
   	  }
   	  $(this).html(_h);
     });

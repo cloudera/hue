@@ -189,30 +189,43 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
         </div>
       </div>
 
-        <div id="step5" class="stepDetails hide">
-          <div data-bind="visible: chartFacets().length == 0" style="padding-left: 10px;margin-bottom: 20px">
-            <em>${_('There is currently no graphical facet defined. Remember, you can add just one field as graphical facet.')}</em>
-          </div>
-          <div data-bind="foreach: chartFacets">
-            <div class="bubble">
-              <strong><span data-bind="editable: label"></span></strong>
-              <span style="color:#666;font-size: 12px">(<span data-bind="text: field"></span>)</span>
-              <a class="btn btn-small" data-bind="click: $root.removeChartFacet"><i class="fa fa-trash-o"></i></a>
-            </div>
-          </div>
-          <div class="clearfix"></div>
-          <div class="miniform">
-            ${_('Field')}
-            <select id="select-chart-facet" data-bind="options: chartFacetsList, value: selectedChartFacet"></select>
-            &nbsp;${_('Label')}
-            <input id="selectedChartLabel" type="text" data-bind="value: selectedChartLabel" class="input" />
-            <br/>
-            <br/>
-            <a class="btn" data-bind="click: $root.addChartFacet, css:{disabled: $root.chartFacets().length == 1}"><i class="fa fa-plus-circle"></i> ${_('Set as Graphical Facet')}</a>
-            &nbsp;<span id="chart-facet-error" class="label label-important hide">${_('You can add just one field as graphical facet')}</span>
-            <span id="chart-facet-error-wrong-field-type" class="label label-important hide">${_('You can add just one field as graphical facet')}</span>
+      <div id="step5" class="stepDetails hide">
+        <div data-bind="visible: chartFacets().length == 0" style="padding-left: 10px;margin-bottom: 20px">
+          <em>${_('There is currently no graphical facet defined. Remember, you can add just one field as graphical facet.')}</em>
+        </div>
+        <div data-bind="foreach: chartFacets">
+          <div class="bubble">
+            <strong><span data-bind="editable: label"></span></strong>
+            <span style="color:#666;font-size: 12px">
+              (<span data-bind="text: field"></span>, <span data-bind="editable: start"></span> <i class="fa fa-double-angle-right"></i> <span data-bind="editable: end"></span>,
+              <i class="fa fa-resize-horizontal"></i> <span data-bind="editable: gap"></span>)
+            </span>
+            <a class="btn btn-small" data-bind="click: $root.removeChartFacet"><i class="fa fa-trash-o"></i></a>
           </div>
         </div>
+        <div class="clearfix"></div>
+        <div class="miniform">
+          ${_('Field')}
+          <select id="select-chart-facet" data-bind="options: chartFacetsList, value: selectedChartFacet"></select>
+          &nbsp;${_('Label')}
+          <input id="selectedChartLabel" type="text" data-bind="value: selectedChartLabel" class="input" />
+          <br/>
+          <br/>
+          ${_('Start')}
+          <input type="number" data-bind="value: selectedChartStartFacet" class="input-medium" />
+          &nbsp;${_('End')}
+          <input type="number" data-bind="value: selectedChartEndFacet" class="input-medium" />
+          &nbsp;${_('Gap')}
+          <input type="number" data-bind="value: selectedChartGapFacet" class="input-mini" />
+          <span id="chart-facet-help-general"  class="muted">&nbsp;${_('If empty this will be treated as a simple Field Facet.')}</span>
+          <span id="chart-facet-help-date" class="muted hide">&nbsp;${_('You can use fixed dates or functions. ie. Start: NOW-12HOURS/MINUTES, End: NOW, Gap: +30MINUTES')}</span>
+          <br/>
+          <br/>
+          <a class="btn" data-bind="click: $root.addChartFacet, css:{disabled: $root.chartFacets().length == 1}"><i class="fa fa-plus-circle"></i> ${_('Set as Graphical Facet')}</a>
+          &nbsp;<span id="chart-facet-error" class="label label-important hide">${_('You can add just one field as graphical facet')}</span>
+          <span id="chart-facet-error-wrong-field-type" class="label label-important hide">${_('You can add just one field as graphical facet')}</span>
+        </div>
+      </div>
 
       <div id="step6" class="stepDetails hide">
         <div data-bind="visible: sortableFacets().length == 0" style="padding-left: 10px;margin-bottom: 20px">
@@ -593,7 +606,7 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
   }
 
   var ChartFacet = function (obj) {
-    return new Facet({type: "chart", field: obj.field, label: obj.label, uuid: obj.uuid});
+    return new Facet({type: "chart", field: obj.field, label: obj.label, start: obj.start, end: obj.end, gap: obj.gap, uuid: obj.uuid});
   }
 
   var RangeFacet = function (obj) {
@@ -702,10 +715,12 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
       return new ChartFacet(obj);
     }));
 
-    // Remove already selected fields
-    self.chartFacetsList = ko.observableArray(${ hue_collection.fields(user) | n,unicode });
-    $.each(self.chartFacets(), function(index, field) {
-      self.chartFacetsList.remove(field.field);
+    // Only dates and numbers
+    self.chartFacetsList = ko.observableArray([]);
+    $.each(self.fields(), function(index, field) {
+      if (self.fullFields[field] && ['tdate', 'date', 'tint', 'int', 'tlong', 'long'].indexOf(self.fullFields[field].type) >= 0) {
+        self.chartFacetsList.push(field);
+      }
     });
 
     // List of all facets sorted by UUID
@@ -746,9 +761,21 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
 
     self.selectedChartFacet = ko.observable();
     self.selectedChartFacet.subscribe(function (newValue) {
+      var _field = self.fullFields[newValue];
+      if (_field.type == "tdate"){
+        $("#chart-facet-help-date").removeClass("hide");
+        $("#chart-facet-help-general").addClass("hide");
+      }
+      else {
+        $("#chart-facet-help-date").addClass("hide");
+        $("#chart-facet-help-general").removeClass("hide");
+      }
       $("#selectedChartLabel").prop("placeholder", newValue);
     });
     self.selectedChartLabel = ko.observable("");
+    self.selectedChartStartFacet = ko.observable("");
+    self.selectedChartEndFacet = ko.observable("");
+    self.selectedChartGapFacet = ko.observable("");
 
 
     self.removeFieldFacet = function (facet) {
@@ -874,8 +901,18 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
             self.selectedChartLabel(self.selectedChartFacet());
           }
           var newFacet = new ChartFacet({field: self.selectedChartFacet(), label: self.selectedChartLabel()});
+          var newFacet = new ChartFacet({
+            field: self.selectedChartFacet(),
+            label: self.selectedChartLabel(),
+            start: self.selectedChartStartFacet(),
+            end: self.selectedChartEndFacet(),
+            gap: self.selectedChartGapFacet()
+         });
           self.chartFacets.push(newFacet);
           self.selectedChartLabel("");
+          self.selectedChartStartFacet("");
+          self.selectedChartEndFacet("");
+          self.selectedChartGapFacet("");
           self.chartFacetsList.remove(self.selectedChartFacet());
           self.properties().isEnabled(true);
           self.isSaveBtnVisible(true);

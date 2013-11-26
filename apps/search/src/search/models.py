@@ -62,10 +62,10 @@ class Facet(models.Model):
     properties = data_dict.get('properties')
 
     params = (
-        ('facet', properties.get('isEnabled') and 'true' or 'false'),
-        ('facet.mincount', properties.get('mincount')),
-        ('facet.limit', -1),
-        ('facet.sort', properties.get('sort')),
+      ('facet', properties.get('isEnabled') and 'true' or 'false'),
+      ('facet.mincount', properties.get('mincount')),
+      ('facet.limit', 100),
+      ('facet.sort', properties.get('sort')),
     )
 
     if data_dict.get('fields'):
@@ -73,17 +73,31 @@ class Facet(models.Model):
       params += field_facets
 
     if data_dict.get('charts'):
-      field_facets = tuple([('facet.field', field_facet['field']) for field_facet in data_dict['charts']])
-      params += field_facets
+      for field_facet in data_dict['charts']:
+        if field_facet['start'] and field_facet['end'] and field_facet['gap']:
+          range_facets = tuple([
+             ('facet.range', field_facet['field']),
+             ('f.%s.facet.limit' % field_facet['field'], -1),
+             ('f.%s.facet.range.start' % field_facet['field'], field_facet['start']),
+             ('f.%s.facet.range.end' % field_facet['field'], field_facet['end']),
+             ('f.%s.facet.range.gap' % field_facet['field'], field_facet['gap']),]
+          )
+          params += range_facets
+        else:
+          field_facets = tuple([
+            ('facet.field', field_facet['field']),
+            ('f.%s.facet.limit' % field_facet['field'], -1),
+          ])
+          params += field_facets
 
     if data_dict.get('ranges'):
       for field_facet in data_dict['ranges']:
         range_facets = tuple([
-                           ('facet.range', field_facet['field']),
-                           ('f.%s.facet.range.start' % field_facet['field'], field_facet['start']),
-                           ('f.%s.facet.range.end' % field_facet['field'], field_facet['end']),
-                           ('f.%s.facet.range.gap' % field_facet['field'], field_facet['gap']),]
-                        )
+           ('facet.range', field_facet['field']),
+           ('f.%s.facet.range.start' % field_facet['field'], field_facet['start']),
+           ('f.%s.facet.range.end' % field_facet['field'], field_facet['end']),
+           ('f.%s.facet.range.gap' % field_facet['field'], field_facet['gap']),]
+        )
         params += range_facets
 
     if data_dict.get('dates'):
@@ -93,12 +107,11 @@ class Facet(models.Model):
         gap = field_facet['gap']
 
         date_facets = tuple([
-                           ('facet.date', field_facet['field']),
-                           ('f.%s.facet.date.start' % field_facet['field'], 'NOW-%(frequency)s%(unit)s/%(rounder)s' % {"frequency": start["frequency"], "unit": start["unit"], "rounder": gap["unit"]}),
-                           ('f.%s.facet.date.end' % field_facet['field'], 'NOW-%(frequency)s%(unit)s' % end),
-                           ('f.%s.facet.date.gap' % field_facet['field'], '+%(frequency)s%(unit)s' % gap),]
-                        )
-
+           ('facet.date', field_facet['field']),
+           ('f.%s.facet.date.start' % field_facet['field'], 'NOW-%(frequency)s%(unit)s/%(rounder)s' % {"frequency": start["frequency"], "unit": start["unit"], "rounder": gap["unit"]}),
+           ('f.%s.facet.date.end' % field_facet['field'], 'NOW-%(frequency)s%(unit)s' % end),
+           ('f.%s.facet.date.gap' % field_facet['field'], '+%(frequency)s%(unit)s' % gap),]
+        )
         params += date_facets
 
     return params
@@ -358,7 +371,7 @@ def augment_solr_response(response, facets):
       for cat in response['facet_counts']['facet_fields']:
         facet = {
           'field': cat,
-          'type': is_chart_field(cat, chart_facets) and 'chart' or 'field',
+          'type': 'chart' if is_chart_field(cat, chart_facets) else 'field',
           'label': get_facet_field_label(cat, is_chart_field(cat, chart_facets) and 'chart' or 'field', facets),
           'counts': response['facet_counts']['facet_fields'][cat],
         }
@@ -372,7 +385,7 @@ def augment_solr_response(response, facets):
       for cat in response['facet_counts']['facet_ranges']:
         facet = {
           'field': cat,
-          'type': 'range',
+          'type': 'chart' if is_chart_field(cat, chart_facets) else 'range',
           'label': get_facet_field_label(cat, 'range', facets),
           'counts': response['facet_counts']['facet_ranges'][cat]['counts'],
           'start': response['facet_counts']['facet_ranges'][cat]['start'],

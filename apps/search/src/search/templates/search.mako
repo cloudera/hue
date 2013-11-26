@@ -142,7 +142,7 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
                 remove_list.remove(fq)
             %>
             % for group, count in macros.pairwise(fld['counts']):
-              % if count > 0 and group != "" and found_value == "":
+              % if count > 0 and group != "" and found_value == "" and loop.index < 100:
                 % if fld['type'] == 'field':
                   <li class="facetItem"><a href='?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ fld['field'] }:"${ urllib.quote_plus(group.encode('ascii', 'xmlcharrefreplace')) }"${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}'>${group}</a> <span class="counter">(${ count })</span></li>
                 % endif
@@ -153,7 +153,7 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
                   <li class="facetItem dateFacetItem"><a href='?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${ solr_query['fq'] }|${ fld['field'] }:[${ group } TO ${ group }${ urllib.quote_plus(fld['gap']) }]${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}'><span class="dateFacet" data-format="${fld['format']}">${ group }<span class="dateFacetGap hide">${ fld['gap'] }</span></span></a> <span class="counter">(${ count })</span></li>
                 % endif
               % endif
-              % if found_value != "":
+              % if found_value != "" and loop.index < 100:
                 % if fld['type'] == 'field' and '"' + group + '"' == found_value:
                   <li class="facetItem"><strong>${ group }</strong> <a href="?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${'|'.join(remove_list)}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}"><i class="fa fa-times"></i></a></li>
                 % endif
@@ -202,7 +202,7 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
             for group, count in macros.pairwise(fld['counts']):
               values += "['" + group + "'," + str(count) + "],"
           %>
-          <div class="chartComponent" data-values="[${values[:-1]}]" data-label="${fld['label']}" data-field="${fld['field']}">
+          <div class="chartComponent" data-values="[${values[:-1]}]" data-label="${fld['label']}" data-field="${fld['field']}" data-gap="${'gap' in fld and fld['gap'] or ''}">
             <!--[if lte IE 9]>
               <img src="/static/art/spinner-big.gif" />
             <![endif]-->
@@ -340,7 +340,7 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
         $(section).hide();
       }
       if (_showMore){
-        $("<li>").addClass("facetShowMore").html('<a href="javascript:void(0)">${_('More...')}</a>').insertAfter(_lastSection);
+        $("<li>").addClass("facetShowMore").html('<a href="javascript:void(0)">${_('Show')} ' + ($(section).nextUntil(".facetHeader").length-(collectionProperties.limit*1)) + ' ${_('more...')}</a>').insertAfter(_lastSection);
       }
     });
 
@@ -557,9 +557,25 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
                 $(".chartComponent").data("plotObj").highlight(item.series, item.datapoint);
                 var _point = item.datapoint[0];
                 if (_isDate){
-                  _point = '"' + moment(item.datapoint[0]).utc().format("YYYY-MM-DD[T]HH:mm:ss[Z]") + '"';
+                  var _momentDate = moment(item.datapoint[0]);
+                  var _gap = $(".chartComponent").data("gap");
+                  if (_gap != null && _gap != ""){
+                    var _futureMomentDate = moment(item.datapoint[0]);
+                    var _how = _gap.match(/\d+/)[0];
+                    var _what = _gap.substring(_how.length + 1).toLowerCase();
+                    _futureMomentDate.add(_what, _how * 1);
+                    var _start = _momentDate.utc().format("YYYY-MM-DD[T]HH:mm:ss[Z]");
+                    var _end = _futureMomentDate.utc().format("YYYY-MM-DD[T]HH:mm:ss[Z]");
+                    location.href = '?collection=${ current_collection }&query=${ solr_query['q'] }&fq=' + getFq("${ solr_query['fq'] }", $(".chartComponent").data("field"), ':["' + _start + '" TO "' + _end + '"]') + '${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}';
+                  }
+                  else {
+                    _point = '"' + _momentDate.utc().format("YYYY-MM-DD[T]HH:mm:ss[Z]") + '"';
+                    location.href = '?collection=${ current_collection }&query=${ solr_query['q'] }&fq=' + getFq("${ solr_query['fq'] }", $(".chartComponent").data("field"), ':' + _point) + '${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}';
+                  }
                 }
-                location.href = '?collection=${ current_collection }&query=${ solr_query['q'] }&fq=' + getFq("${ solr_query['fq'] }", $(".chartComponent").data("field"), ':' + _point) + '${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}';
+                else {
+                  location.href = '?collection=${ current_collection }&query=${ solr_query['q'] }&fq=' + getFq("${ solr_query['fq'] }", $(".chartComponent").data("field"), ':' + _point) + '${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}';
+                }
               }
             }
           });
