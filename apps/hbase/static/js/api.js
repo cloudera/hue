@@ -64,7 +64,7 @@ var API = {
     return API.queryCluster.apply(this, args);
   },
   //functions to abstract away API structure, in case API changes:
-  //only have funciton name, data, and callbacks. no URL or api-facing.
+  //only have function name, data, and callbacks. no URL or api-facing.
   createTable: function(cluster, tableName, columns, callback) {
      return API.query('createTable', cluster, tableName, columns).done(callback);
   },

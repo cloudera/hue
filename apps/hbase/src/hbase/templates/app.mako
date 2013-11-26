@@ -202,7 +202,21 @@ ${ commonheader(None, "hbase", user) | n,unicode }
         <label>${_('Table Name')}:</label> <input name="tableName" placeholder="MyTable" type="text"/>
         <label>${_('Column Families')}:</label>
         <ul>
-          <li><input type="text" name="table_columns" placeholder="family_name"></li>
+          <li>
+            <input type="text" name="table_columns" placeholder="family_name">
+            <select name="table_columns_propery" style="width:100px">
+			    <option data-default="3" selected>maxVersions</option>
+			    <option data-default="NONE">compression</option>
+			    <option data-default="true">inMemory</option>
+			    <option data-default="NONE">bloomFilterType</option>
+			    <option data-default="0">bloomFilterVectorSize</option>
+			    <option data-default="0">bloomFilterNbHashes</option>
+			    <option data-default="true">blockCacheEnabled</option>
+			    <option data-default="-1">timeToLive</option>
+			 </select>
+			  <input type="text" name="table_columns" placeholder="3" style="width:50px">
+			  <i class="fa fa-plus-circle"></i>
+          </li>
         </ul>
         <a class="btn action_addColumn"><i class="fa fa-plus-circle"></i> ${_('Additional Column Family')}</a>
       </div>
