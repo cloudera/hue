@@ -253,6 +253,12 @@ SESSION = ConfigSection(
       help=_("The cookie containing the users' session ID will be secure. This should only be enabled with HTTPS."),
       type=coerce_bool,
       default=False,
+    ),
+    HTTP_ONLY=Config(
+      key='http_only',
+      help=_("The cookie containing the users' session ID will use the HTTP only flag."),
+      type=coerce_bool,
+      default=False
     )
   )
 )

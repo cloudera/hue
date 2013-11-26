@@ -277,6 +277,9 @@ DATABASES = {
 SESSION_COOKIE_AGE = desktop.conf.SESSION.TTL.get()
 SESSION_COOKIE_SECURE = desktop.conf.SESSION.SECURE.get()
 
+# HTTP only
+SESSION_COOKIE_HTTPONLY = desktop.conf.SESSION.HTTP_ONLY.get()
+
 # django-nose test specifics
 TEST_RUNNER = 'desktop.lib.test_runners.HueTestRunner'
 # Turn off cache middleware
