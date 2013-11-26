@@ -62,7 +62,8 @@ class OozieApi(object):
       self._client.set_kerberos_auth()
     self._root = Resource(self._client)
     self._security_enabled = security_enabled
-    self.user = None # username actually
+    # To store username info
+    self._thread_local = threading.local()
 
   def __str__(self):
     return "OozieApi at %s" % (self._url,)
@@ -75,11 +76,15 @@ class OozieApi(object):
   def security_enabled(self):
     return self._security_enabled
 
+  @property
+  def user(self):
+    return self._thread_local.user
+
   def setuser(self, user):
     if hasattr(user, 'username'):
-      self.user = user.username
+      self._thread_local.user = user.username
     else:
-      self.user = user
+      self._thread_local.user = user
 
   def _get_params(self):
     if self.security_enabled:
