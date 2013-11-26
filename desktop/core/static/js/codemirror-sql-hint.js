@@ -85,20 +85,39 @@
 
     var search = token.string.trim();
 
-    addMatches(result, search, keywords,
-        function(w) {return w.toUpperCase();});
+    var from = CodeMirror.Pos(cur.line, token.start);
+    var to = CodeMirror.Pos(cur.line, token.end);
 
-    addMatches(result, search, tables,
-        function(w) {return w;});
+    if (CodeMirror.possibleSoloField && CodeMirror.table && CodeMirror.table in tables) {
+      var columns = tables[CodeMirror.table];
+      addMatches(result, search, columns, function(w) {return w;});
 
-    if(search.lastIndexOf('.') === 0) {
+      // Token search/replace replaces "SELECT  FROM test" with "SELECTtestFROM test".
+      // Changing the start position and end position fixes that.
+      if (!search) {
+        from = cur;
+        to = cur;
+      }
+    } else if(search.lastIndexOf('.') === 0) {
       columnCompletion(result, editor);
+    } else if (CodeMirror.possibleTable) {
+      addMatches(result, search, tables,
+        function(w) {return w;});
+    } else {
+      if (CodeMirror.tableFieldMagic) {
+        addMatches(result, search, tables, function(w) {
+          return "<i class='fa fa-magic'></i> FROM " + w.trim();
+        });
+      } else {
+        addMatches(result, search, keywords,
+          function(w) {return w.toUpperCase();});
+      }
     }
 
     return {
       list: result,
-        from: CodeMirror.Pos(cur.line, token.start),
-        to: CodeMirror.Pos(cur.line, token.end)
+      from: from,
+      to: to
     };
   }
   CodeMirror.sqlHint = sqlHint;

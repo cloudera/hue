@@ -325,6 +325,15 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
 
     var AUTOCOMPLETE_SET = CodeMirror.sqlHint;
 
+    CodeMirror.onAutocomplete = function (data, from, to) {
+      if (CodeMirror.tableFieldMagic) {
+        codeMirror.replaceRange("  ", from, from);
+        from.ch = from.ch + 1;
+        codeMirror.setCursor(from);
+        codeMirror.execCommand("autocomplete");
+      }
+    };
+
     CodeMirror.commands.autocomplete = function (cm) {
       $(document.body).on("contextmenu", function (e) {
         e.preventDefault(); // prevents native menu on FF for Mac from being shown
@@ -348,12 +357,19 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
               options['tables'][table] = [];
             }
           });
+          CodeMirror.possibleTable = false;
+          CodeMirror.tableFieldMagic = false;
+          CodeMirror.possibleSoloField = false;
           var _before = codeMirror.getRange({line: 0, ch: 0}, {line: codeMirror.getCursor().line, ch: codeMirror.getCursor().ch}).replace(/(\r\n|\n|\r)/gm, " ");
+          if (_before.toUpperCase().indexOf(" FROM ") > -1 && _before.toUpperCase().indexOf(" ON ") == -1 && _before.toUpperCase().indexOf(" WHERE ") == -1) {
+            CodeMirror.possibleTable = true;
+          }
           if (_before.toUpperCase().indexOf("SELECT ") > -1 && _before.toUpperCase().indexOf(" FROM ") == -1 && !CodeMirror.fromDot) {
             if (codeMirror.getValue().toUpperCase().indexOf("FROM ") > -1) {
               fieldsAutocomplete(codeMirror, options);
             } else {
-              CodeMirror.showHint(codeMirror, AUTOCOMPLETE_SET);
+              CodeMirror.tableFieldMagic = true;
+              CodeMirror.showHint(codeMirror, AUTOCOMPLETE_SET, options);
             }
           }
           else {
@@ -369,6 +385,7 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
     }
 
     function fieldsAutocomplete(cm, options) {
+      CodeMirror.possibleSoloField = true;
       try {
         var _possibleTables = $.trim(codeMirror.getValue(" ").substr(codeMirror.getValue().toUpperCase().indexOf("FROM ") + 4)).split(" ");
         var _foundTable = "";
@@ -379,10 +396,12 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
         }
         if (_foundTable != "" && _foundTable in options['tables']) {
           if (rdbms_tableHasAlias(viewModel.server().name(), _foundTable, codeMirror.getValue())) {
+            CodeMirror.possibleSoloField = false;
             CodeMirror.showHint(cm, AUTOCOMPLETE_SET, options);
           } else {
             rdbms_getTableColumns(viewModel.server().name(), viewModel.database(), _foundTable, codeMirror.getValue(),
                 function (columns) {
+                  CodeMirror.table = _foundTable;
                   options['tables'][_foundTable] = columns.split(' ');
                   CodeMirror.showHint(cm, AUTOCOMPLETE_SET, options);
                 });
