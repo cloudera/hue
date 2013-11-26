@@ -60,6 +60,7 @@ from beeswax.server.dbms import QueryServerException
 from beeswax.server.hive_server2_lib import HiveServerClient,\
   PartitionValueCompatible, HiveServerTable
 from beeswax.test_base import BeeswaxSampleProvider
+from beeswax.hive_site import get_metastore
 
 
 
@@ -1334,7 +1335,7 @@ def test_hive_site():
 
     assert_equal(beeswax.hive_site.get_conf()['hive.metastore.warehouse.dir'], u'/abc')
     assert_equal(beeswax.hive_site.get_hiveserver2_kerberos_principal('localhost'), 'hs2test/test.com@TEST.COM')
-    assert_equal(beeswax.hive_site.get_hiveserver2_authentication(), 'NONE')
+    assert_equal(beeswax.hive_site.get_hiveserver2_authentication(), 'NOSASL')
   finally:
     beeswax.hive_site.reset()
     if saved is not None:
@@ -1393,7 +1394,7 @@ def test_hive_site_null_hs2krb():
 
     assert_equal(beeswax.hive_site.get_conf()['hive.metastore.warehouse.dir'], u'/abc')
     assert_equal(beeswax.hive_site.get_hiveserver2_kerberos_principal('localhost'), None)
-    assert_equal(beeswax.hive_site.get_hiveserver2_authentication(), 'NONE')
+    assert_equal(beeswax.hive_site.get_hiveserver2_authentication(), 'NOSASL')
   finally:
     beeswax.hive_site.reset()
     if saved is not None:
@@ -1679,6 +1680,34 @@ def test_hiveserver2_get_security():
       hive_site._HIVE_SITE_DICT.pop(hive_site._CNF_HIVESERVER2_AUTHENTICATION, None)
 
 
+def test_metastore_security():
+  tmpdir = tempfile.mkdtemp()
+  saved = None
+  try:
+    # We just replace the Beeswax conf variable
+    class Getter(object):
+      def get(self):
+        return tmpdir
+
+    xml = hive_site_xml(is_local=False, use_sasl=True, kerberos_principal='hive/_HOST@test.com')
+    file(os.path.join(tmpdir, 'hive-site.xml'), 'w').write(xml)
+
+    beeswax.hive_site.reset()
+    saved = beeswax.conf.HIVE_CONF_DIR
+    beeswax.conf.HIVE_CONF_DIR = Getter()
+
+    metastore = get_metastore()
+
+    assert_true(metastore['use_sasl'])
+    assert_equal('thrift://darkside-1234:9999', metastore['thrift_uri'])
+    assert_equal('hive/darkside-1234@test.com', metastore['kerberos_principal'])
+  finally:
+    beeswax.hive_site.reset()
+    if saved is not None:
+      beeswax.conf.HIVE_CONF_DIR = saved
+    shutil.rmtree(tmpdir)
+
+
 def hive_site_xml(is_local=False, use_sasl=False, thrift_uris='thrift://darkside-1234:9999',
                   warehouse_dir='/abc', kerberos_principal='test/test.com@TEST.COM',
                   hs2_kerberos_principal='hs2test/test.com@TEST.COM',
@@ -1724,7 +1753,7 @@ def hive_site_xml(is_local=False, use_sasl=False, thrift_uris='thrift://darkside
       </property>
 
       <property>
-        <name>hive.metastore.sasl.enabled</name>
+        <name>hive.server2.authentication</name>
         <value>%(hs2_authentication)s</value>
       </property>
 

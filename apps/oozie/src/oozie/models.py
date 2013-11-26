@@ -45,8 +45,10 @@ from desktop.models import Document
 from hadoop.fs.exceptions import WebHdfsException
 
 from hadoop.fs.hadoopfs import Hdfs
+from liboozie.conf import SECURITY_ENABLED
 from liboozie.submittion import Submission
 from liboozie.submittion import create_directories
+
 
 from oozie.conf import REMOTE_SAMPLE_DIR
 from oozie.utils import utc_datetime_format
@@ -464,7 +466,7 @@ class Workflow(Job):
     controls = oozie_workflow.get_control_flow_actions()
     WorkflowFormSet = inlineformset_factory(Workflow, Node, form=NodeMetaForm, max_num=0, can_order=False, can_delete=False)
     forms = WorkflowFormSet(instance=self).forms
-    template='editor/gen/workflow-graph-status.xml.mako'
+    template = 'editor/gen/workflow-graph-status.xml.mako'
 
     index = dict([(form.instance.id, form) for form in forms])
     actions_index = dict([(action.name, action) for action in actions])

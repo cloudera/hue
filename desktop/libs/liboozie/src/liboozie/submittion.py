@@ -186,6 +186,18 @@ class Submission(object):
         self.job.HUE_ID: self.job.id
       })
 
+    # Even if no Hive action for now
+    from beeswax.hive_site import get_metastore
+    metastore = get_metastore()
+
+    if metastore and metastore.get('use_sasl'):
+      self.properties.update({
+         'is_kerberized_hive': True,
+         'credential_type': 'hcat',
+         'thrift_server': metastore.get('thrift_uri'),
+         'hive_principal': metastore.get('kerberos_principal')
+      })
+
   def _create_deployment_dir(self):
     """
     Return the job deployment directory in HDFS, creating it if necessary.

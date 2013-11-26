@@ -21,6 +21,8 @@ import logging
 import re
 import os
 import StringIO
+import shutil
+import tempfile
 import zipfile
 
 from itertools import chain
@@ -46,7 +48,6 @@ from oozie.models import Workflow, Node, Kill, Link, Job, Coordinator, History,\
 from oozie.utils import workflow_to_dict, model_to_dict, smart_path
 from oozie.importlib.workflows import import_workflow
 from oozie.importlib.jobdesigner import convert_jobsub_design
-
 
 
 LOG = logging.getLogger(__name__)
@@ -1128,6 +1129,132 @@ class TestEditor(OozieMockBase):
         <ok to="end"/>
         <error to="kill"/>
     </action>""" in xml, xml)
+
+
+  def test_workflow_hive_gen_xml(self):
+    self.wf.node_set.filter(name='action-name-1').delete()
+
+    action1 = add_node(self.wf, 'action-name-1', 'hive', [self.wf.start], {
+        u'job_xml': 'my-job.xml',
+        u'files': '["hello.py"]',
+        u'name': 'MyHive',
+        u'job_properties': '[]',
+        u'script_path': 'hello.sql',
+        u'archives': '[]',
+        u'prepares': '[]',
+        u'params': '[{"value":"World!","type":"argument"}]',
+        u'description': ''
+    })
+    Link(parent=action1, child=self.wf.end, name="ok").save()
+
+    xml = self.wf.to_xml()
+
+    assert_true("""
+<workflow-app name="wf-name-1" xmlns="uri:oozie:workflow:0.4">
+  <global>
+      <job-xml>jobconf.xml</job-xml>
+            <configuration>
+                <property>
+                    <name>sleep-all</name>
+                    <value>${SLEEP}</value>
+                </property>
+            </configuration>
+  </global>
+    <start to="MyHive"/>
+    <action name="MyHive">
+        <hive xmlns="uri:oozie:hive-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+              <job-xml>my-job.xml</job-xml>
+            <script>hello.sql</script>
+              <argument>World!</argument>
+            <file>hello.py#hello.py</file>
+        </hive>
+        <ok to="end"/>
+        <error to="kill"/>
+    </action>
+    <kill name="kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+    <end name="end"/>
+</workflow-app>""" in xml, xml)
+
+    import beeswax
+    from beeswax.tests import hive_site_xml
+
+    tmpdir = tempfile.mkdtemp()
+    saved = None
+    try:
+      # We just replace the Beeswax conf variable
+      class Getter(object):
+        def get(self):
+          return tmpdir
+
+      xml = hive_site_xml(is_local=False, use_sasl=True, kerberos_principal='hive/_HOST@test.com')
+      file(os.path.join(tmpdir, 'hive-site.xml'), 'w').write(xml)
+
+      beeswax.hive_site.reset()
+      saved = beeswax.conf.HIVE_CONF_DIR
+      beeswax.conf.HIVE_CONF_DIR = Getter()
+
+      xml = self.wf.to_xml(mapping={
+         'is_kerberized_hive': True,
+         'credential_type': 'hcat',
+         'thrift_server': 'thrift://darkside-1234:9999',
+         'hive_principal': 'hive/darkside-1234@test.com'
+      })
+
+      assert_true("""
+<workflow-app name="wf-name-1" xmlns="uri:oozie:workflow:0.4">
+  <global>
+      <job-xml>jobconf.xml</job-xml>
+            <configuration>
+                <property>
+                    <name>sleep-all</name>
+                    <value>${SLEEP}</value>
+                </property>
+            </configuration>
+  </global>
+  <credentials>
+    <credential name='hive_credentials' type='hcat'>
+      <property>
+        <name>hcat.metastore.uri</name>
+        <value>thrift://darkside-1234:9999</value>
+      </property>
+      <property>
+        <name>hcat.metastore.principal</name>
+        <value>hive/darkside-1234@test.com</value>
+      </property>
+    </credential>
+   </credentials>
+    <start to="MyHive"/>
+    <action name="MyHive" cred='hive_credentials'>
+        <hive xmlns="uri:oozie:hive-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+              <job-xml>my-job.xml</job-xml>
+            <script>hello.sql</script>
+              <argument>World!</argument>
+            <file>hello.py#hello.py</file>
+        </hive>
+        <ok to="end"/>
+        <error to="kill"/>
+    </action>
+    <kill name="kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+    <end name="end"/>
+</workflow-app>""" in xml, xml)
+
+    finally:
+      beeswax.hive_site.reset()
+      if saved is not None:
+        beeswax.conf.HIVE_CONF_DIR = saved
+      shutil.rmtree(tmpdir)
+
+
+    self.wf.node_set.filter(name='action-name-1').delete()
+
 
 
   def test_create_coordinator(self):

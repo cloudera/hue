@@ -29,6 +29,20 @@
     % endif
   </global>
   % endif
+  % if mapping.get('is_kerberized_hive'):
+  <credentials>
+    <credential name='hive_credentials' type='${ mapping['credential_type'] }'>
+      <property>
+        <name>hcat.metastore.uri</name>
+        <value>${ mapping['thrift_server'] }</value>
+      </property>
+      <property>
+        <name>hcat.metastore.principal</name>
+        <value>${ mapping['hive_principal'] }</value>
+      </property>
+    </credential>
+   </credentials>
+  % endif
   % for node in workflow.node_list:
       ${ node.to_xml(mapping) | n }
   % endfor

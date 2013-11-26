@@ -14,6 +14,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """
 Helper for reading hive-site.xml
 """
@@ -22,6 +23,7 @@ import errno
 import logging
 import os.path
 import re
+import socket
 
 from desktop.lib import security_util
 
@@ -34,6 +36,10 @@ LOG = logging.getLogger(__name__)
 _HIVE_SITE_PATH = None                  # Path to hive-site.xml
 _HIVE_SITE_DICT = None                  # A dictionary of name/value config options
 _METASTORE_LOC_CACHE = None
+
+_CNF_METASTORE_SASL = 'hive.metastore.sasl.enabled'
+_CNF_METASTORE_URIS = 'hive.metastore.uris'
+_CNF_METASTORE_KERBEROS_PRINCIPAL = 'hive.metastore.kerberos.principal'
 
 _CNF_HIVESERVER2_KERBEROS_PRINCIPAL = 'hive.server2.authentication.kerberos.principal'
 _CNF_HIVESERVER2_AUTHENTICATION = 'hive.server2.authentication'
@@ -60,6 +66,37 @@ def get_conf():
   if _HIVE_SITE_DICT is None:
     _parse_hive_site()
   return _HIVE_SITE_DICT
+
+
+def get_metastore():
+  """
+  Get first metastore information from local hive-site.xml.
+  """
+  global _METASTORE_LOC_CACHE
+  if not _METASTORE_LOC_CACHE:
+    thrift_uris = get_conf().get(_CNF_METASTORE_URIS)
+    is_local = thrift_uris is None or thrift_uris == ''
+
+    if not is_local:
+      use_sasl = str(get_conf().get(_CNF_METASTORE_SASL, 'false')).lower() == 'true'
+      thrift_uri = thrift_uris.split(",")[0] # First URI
+      host = socket.getfqdn()
+      match = _THRIFT_URI_RE.match(thrift_uri)
+      if not match:
+        LOG.error('Cannot understand remote metastore uri "%s"' % thrift_uri)
+      else:
+        host, port = match.groups()
+      kerberos_principal = security_util.get_kerberos_principal(get_conf().get(_CNF_METASTORE_KERBEROS_PRINCIPAL, None), host)
+
+      _METASTORE_LOC_CACHE = {
+          'use_sasl': use_sasl,
+          'thrift_uri': thrift_uri,
+          'kerberos_principal': kerberos_principal
+      }
+    else:
+      LOG.error('Hue requires a remote metastore configuration')
+  return _METASTORE_LOC_CACHE
+
 
 def get_hiveserver2_kerberos_principal(hostname_or_ip):
   """
