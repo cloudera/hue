@@ -138,7 +138,9 @@ def dt_logout(request, next_page=None):
   if backends:
     for backend in backends:
       if hasattr(backend, 'logout'):
-        return backend.logout(request, next_page)
+        response = backend.logout(request, next_page)
+        if response:
+          return response
 
   return django.contrib.auth.views.logout(request, next_page)
 

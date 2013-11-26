@@ -125,6 +125,12 @@ USERNAME_SOURCE = Config(
   type=str,
   help=_t("Username can be sourced from 'attributes' or 'nameid'"))
 
+LOGOUT_ENABLED = Config(
+  key="logout_enabled",
+  default=True,
+  type=coerce_bool,
+  help=_t("Performs the logout or not."))
+
 
 def config_validator(user):
   res = []
