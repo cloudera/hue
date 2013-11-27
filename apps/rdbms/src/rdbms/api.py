@@ -77,6 +77,7 @@ def tables(request, server, database):
     raise Http404
 
   db = dbms.get(request.user, query_server)
+  db.use(database)
 
   response = {
     'tables': db.get_tables(database)
@@ -92,6 +93,7 @@ def columns(request, server, database, table):
     raise Http404
 
   db = dbms.get(request.user, query_server)
+  db.use(database)
 
   response = {
     'columns': db.get_columns(database, table)

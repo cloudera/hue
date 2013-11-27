@@ -106,6 +106,6 @@ class MySQLClient(BaseRDMSClient):
 
   def get_columns(self, database, table):
     cursor = self.connection.cursor()
-    cursor.execute("SHOW COLUMNS %s.%s" % (database, table))
+    cursor.execute("SHOW COLUMNS FROM %s.%s" % (database, table))
     self.connection.commit()
     return [row[0] for row in cursor.fetchall()]
