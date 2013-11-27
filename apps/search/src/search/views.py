@@ -15,11 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-try:
-  import json
-except ImportError:
-  import simplejson as json
-
+import json
 import logging
 import math
 
@@ -73,7 +69,7 @@ def index(request):
     solr_query['rows'] = search_form.cleaned_data['rows'] or 15
     solr_query['start'] = search_form.cleaned_data['start'] or 0
     solr_query['facets'] = search_form.cleaned_data['facets'] or 1
-    solr_query['current_page'] = int(math.ceil((float(solr_query['start'])+1)/float(solr_query['rows'])))
+    solr_query['current_page'] = int(math.ceil((float(solr_query['start']) + 1) / float(solr_query['rows'])))
     solr_query['total_pages'] = 0
     solr_query['search_time'] = 0
 
@@ -81,10 +77,10 @@ def index(request):
       hue_collection = Collection.objects.get(id=collection_id)
       solr_query['collection'] = hue_collection.name
       response = SolrApi(SOLR_URL.get(), request.user).query(solr_query, hue_collection)
-      solr_query['total_pages'] = int(math.ceil((float(response['response']['numFound'])/float(solr_query['rows']))))
+      solr_query['total_pages'] = int(math.ceil((float(response['response']['numFound']) / float(solr_query['rows']))))
       solr_query['search_time'] = response['responseHeader']['QTime']
     except Exception, e:
-      error['title'] = force_unicode(e.title)
+      error['title'] = force_unicode(e.title) if hasattr(e, 'title') else ''
       error['message'] = force_unicode(str(e))
   else:
     error['message'] = _('There is no collection to search.')

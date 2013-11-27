@@ -16,16 +16,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-try:
-  import json
-except ImportError:
-  import simplejson as json
+import json
 
 import logging
 
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.rest.http_client import HttpClient, RestException
-from desktop.lib.rest.resource import Resource
+from desktop.lib.rest import resource
 from search.conf import EMPTY_QUERY, SECURITY_ENABLED
 from django.utils.translation import ugettext as _
 
@@ -46,7 +43,7 @@ class SolrApi(object):
     self.security_enabled = SECURITY_ENABLED.get()
     if self.security_enabled:
       self._client.set_kerberos_auth()
-    self._root = Resource(self._client)
+    self._root = resource.Resource(self._client)
 
   def _get_params(self):
     if self.security_enabled:
