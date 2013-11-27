@@ -602,7 +602,6 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
   });
 
   var dataTable = null;
-  var dataTableWidth = 0;
   function cleanResultsTable() {
     if (dataTable) {
       dataTable.fnDestroy();
@@ -613,7 +612,7 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
   }
 
   function resultsTable() {
-    if (!dataTable) {
+    if (dataTable) {
       dataTable = $(".resultTable").dataTable({
         "bPaginate": false,
         "bLengthChange": false,
@@ -633,11 +632,7 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
       $(".dataTables_filter").hide();
       $(".dataTables_wrapper").jHueTableScroller();
 
-      if (dataTableWidth > 0) {
-        $(".resultTable").width(dataTableWidth);
-      } else {
-        dataTableWidth = $(".resultTable").outerWidth();
-      }
+      $(".resultTable").width($(".resultTable").parent().width());
     }
   }
   $(document).on('execute.query', cleanResultsTable);

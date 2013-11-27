@@ -77,6 +77,7 @@ function RdbmsViewModel() {
 
   self.updateResults = function(results) {
     var rows = [];
+    self.columns.removeAll();  // Needed for datatables to refresh properly.
     self.columns(results.columns);
     $.each(results.rows, function(i, result_row) {
       var row = [];
