@@ -51,10 +51,18 @@ class SQLiteClient(BaseRDMSClient):
 
   @property
   def _conn_params(self):
-    return {
+    params = {
       'database': self.query_server['name'],
       'detect_types': Database.PARSE_DECLTYPES | Database.PARSE_COLNAMES,
     }
+
+    if self.query_server['options']:
+      params.update(self.query_server['options'])
+
+    # Make sure connection is shareable.
+    params['check_same_thread'] = False
+
+    return params
 
 
   def use(self, database):

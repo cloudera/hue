@@ -17,12 +17,32 @@
 
 import logging
 
+from desktop.lib.i18n import smart_str
 from beeswax.models import QueryHistory
-
 from rdbms.conf import RDBMS
 
 
 LOG = logging.getLogger(__name__)
+
+
+def force_dict_to_strings(dictionary):
+  if not dictionary:
+    return dictionary
+
+  new_dict = {}
+  for k in dictionary:
+    new_key = smart_str(k)
+    if isinstance(dictionary[k], basestring):
+      # Strings should not be unicode.
+      new_dict[new_key] = smart_str(dictionary[k])
+    elif isinstance(dictionary[k], dict):
+      # Recursively force dicts to strings.
+      new_dict[new_key] = force_dict_to_strings(dictionary[k])
+    else:
+      # Normal objects, or other literals, should not be converted.
+      new_dict[new_key] = dictionary[k]
+
+  return new_dict
 
 
 def get(user, query_server=None):
@@ -61,7 +81,7 @@ def get_query_server_config(server=None):
       'server_port': RDBMS[name].PORT.get(),
       'username': RDBMS[name].USER.get(),
       'password': RDBMS[name].PASSWORD.get(),
-      'password': RDBMS[name].PASSWORD.get(),
+      'options': force_dict_to_strings(RDBMS[name].OPTIONS.get()),
       'alias': name
     }
 

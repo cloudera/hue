@@ -130,3 +130,11 @@ class TestAPI(TestSQLiteRdbmsBase):
     response = self.client.post(reverse('rdbms:api_execute_query'), data, follow=True)
     response_dict = json.loads(response.content)
     assert_equal(1, len(response_dict['results']['rows']), response_dict)
+
+  def test_options(self):
+    finish = rdbms_conf.RDBMS['sqlitee'].OPTIONS.set_for_testing({'nonsensical': None})
+    try:
+      self.client.get(reverse('rdbms:api_tables', args=['sqlitee', self.database]))
+    except TypeError, e:
+      assert_true('nonsensical' in str(e), e)
+    finish()

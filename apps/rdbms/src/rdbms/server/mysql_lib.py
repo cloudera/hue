@@ -64,6 +64,9 @@ class MySQLClient(BaseRDMSClient):
       'port': self.query_server['server_port']
     }
 
+    if self.query_server['options']:
+      params.update(self.query_server['options'])
+
     if 'name' in self.query_server:
       params['db'] = self.query_server['name']
 

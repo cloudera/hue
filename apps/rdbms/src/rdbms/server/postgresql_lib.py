@@ -55,6 +55,13 @@ class PostgreSQLClient(BaseRDMSClient):
       'port': self.query_server['server_port'] == 0 and 5432 or self.query_server['server_port'],
       'database': self.query_server['name']
     }
+
+    if self.query_server['options']:
+      params.update(self.query_server['options'])
+      # handle transaction commits manually.
+      if 'autocommit' in params:
+        del params['autocommit']
+
     return params
 
 
