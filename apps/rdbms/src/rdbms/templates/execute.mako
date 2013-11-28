@@ -52,9 +52,9 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
       </ul>
     </div>
   </div>
-
-  <div id="query" class="row-fluid">
-    <div class="row-fluid">
+  <div class="row-fluid">
+    <div class="span10">
+    <div id="query">
       <div class="card card-small">
         <div style="margin-bottom: 30px">
           <h1 class="card-heading simple">
@@ -111,8 +111,7 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
         </div>
       </div>
     </div>
-
-    <div data-bind="css: {'hide': rows().length == 0}" class="row-fluid hide">
+    <div data-bind="css: {'hide': rows().length == 0}" class="hide">
       <div class="card card-small scrollable">
         <table class="table table-striped table-condensed resultTable" cellpadding="0" cellspacing="0" data-tablescroller-min-height-disable="true" data-tablescroller-enforce-height="true">
           <thead>
@@ -129,7 +128,7 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
       </div>
     </div>
 
-    <div data-bind="css: {'hide': !resultsEmpty()}" class="row-fluid hide">
+    <div data-bind="css: {'hide': !resultsEmpty()}" class="hide">
       <div class="card card-small scrollable">
         <div class="row-fluid">
           <div class="span10 offset1 center empty-wrapper">
@@ -141,7 +140,26 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
       </div>
     </div>
   </div>
+  <div class="span2" id="navigator">
+      <div class="card card-small">
+        <a href="#" title="${_('Double click on a table name or field to insert it in the editor')}" rel="tooltip" data-placement="left" class="pull-right" style="margin:10px;margin-left: 0"><i class="fa fa-question-circle"></i></a>
+        <a id="refreshNavigator" href="#" title="${_('Manually refresh the table list')}" rel="tooltip" data-placement="left" class="pull-right" style="margin:10px"><i class="fa fa-refresh"></i></a>
+        <h1 class="card-heading simple"><i class="fa fa-compass"></i> ${_('Navigator')}</h1>
+        <div class="card-body">
+          <p>
+            <input id="navigatorSearch" type="text" placeholder="${ _('Table name...') }" style="width:90%"/>
+            <span id="navigatorNoTables">${_('The selected database has no tables.')}</span>
+            <ul id="navigatorTables" class="unstyled"></ul>
+            <div id="navigatorLoader">
+              <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #DDD"></i><!--<![endif]-->
+              <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+            </div>
+          </p>
+        </div>
+      </div>
+  </div>
 
+  </div>
 </div>
 
 
@@ -272,6 +290,22 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
   .empty-wrapper i {
     font-size: 148px;
   }
+
+  #navigatorTables li {
+    width: 95%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  #navigatorSearch, #navigatorNoTables {
+    display: none;
+  }
+
+  #navigator .card {
+    padding-bottom: 30px;
+  }
+
 </style>
 
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
@@ -305,6 +339,21 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
       placement: 'bottom'
     });
 
+    var navigatorSearchTimeout = -1;
+    $("#navigatorSearch").on("keyup", function () {
+      window.clearTimeout(navigatorSearchTimeout);
+      navigatorSearchTimeout = window.setTimeout(function () {
+        $("#navigatorTables li").removeClass("hide");
+        $("#navigatorTables li").each(function () {
+          if ($(this).text().toLowerCase().indexOf($("#navigatorSearch").val().toLowerCase()) == -1) {
+            $(this).addClass("hide");
+          }
+        });
+      }, 300);
+    });
+
+    $("#navigatorTables").css("max-height", ($(window).height() - 340) + "px").css("overflow-y", "auto");
+
     var resizeTimeout = -1;
     var winWidth = $(window).width();
     var winHeight = $(window).height();
@@ -317,6 +366,7 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
           codeMirror.setSize("95%", 100);
           winWidth = $(window).width();
           winHeight = $(window).height();
+          $("#navigatorTables").css("max-height", ($(window).height() - 340) + "px").css("overflow-y", "auto");
         }
       }, 200);
     });
@@ -478,6 +528,7 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
       'trigger': 'hover',
       'html': true
     });
+
   });
 
   function modal(el) {
@@ -555,12 +606,12 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
     // First call skipped to avoid reset of hueRdbmsLastDatabase
     var counter = 0;
     return function(value) {
-
       % if design.id:
         if (counter++ == 0) {
           viewModel.fetchQuery(${design.id});
         }
       % endif
+      renderNavigator();
     }
   })());
   viewModel.query.query.subscribe((function() {
@@ -574,6 +625,66 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
   })());
   ko.applyBindings(viewModel);
 
+  function resetNavigator() {
+    renderNavigator();
+  }
+
+  function renderNavigator() {
+    $("#navigatorTables").empty();
+    $("#navigatorLoader").show();
+    rdbms_getTables(viewModel.server().name(), viewModel.database(), function (data) {  //preload tables for the default db
+      $(data.split(" ")).each(function (cnt, table) {
+        if ($.trim(table) != "") {
+          var _table = $("<li>");
+          _table.html("<a href='#' title='" + table + "'><i class='fa fa-table'></i> " + table + "</a><ul class='unstyled'></ul>");
+          _table.data("table", table).attr("id", "navigatorTables_" + table);
+          _table.find("a").on("dblclick", function () {
+            codeMirror.replaceSelection($.trim($(this).text()) + ' ');
+            codeMirror.setSelection(codeMirror.getCursor());
+            codeMirror.focus();
+          });
+          _table.find("a").on("click", function () {
+            _table.find(".fa-table").removeClass("fa-table").addClass("fa-spin").addClass("fa-spinner");
+            rdbms_getTableColumns(viewModel.server().name(), viewModel.database(), table, "", function (columns) {
+              _table.find("ul").empty();
+              _table.find(".fa-spinner").removeClass("fa-spinner").removeClass("fa-spin").addClass("fa-table");
+              $(columns.split(" ")).each(function (iCnt, col) {
+                if ($.trim(col) != "" && $.trim(col) != "*") {
+                  var _column = $("<li>");
+                  _column.html("<a href='#' style='padding-left:10px'><i class='fa fa-columns'></i> " + col + "</a>");
+                  _column.appendTo(_table.find("ul"));
+                  _column.on("dblclick", function () {
+                    codeMirror.replaceSelection($.trim(col) + ', ');
+                    codeMirror.setSelection(codeMirror.getCursor());
+                    codeMirror.focus();
+                  });
+                }
+              });
+            });
+          });
+          _table.find("a:eq(2)").on("dblclick", function () {
+            codeMirror.replaceSelection($.trim(table) + ' ');
+            codeMirror.setSelection(codeMirror.getCursor());
+            codeMirror.focus();
+          });
+          _table.appendTo($("#navigatorTables"));
+        }
+      });
+      $("#navigatorLoader").hide();
+      if ($("#navigatorTables li").length > 0) {
+        $("#navigatorSearch").show();
+        $("#navigatorNoTables").hide();
+      }
+      else {
+        $("#navigatorSearch").hide();
+        $("#navigatorNoTables").show();
+      }
+    });
+  }
+
+  $("#refreshNavigator").on("click", function () {
+    resetNavigator();
+  });
 
   // Editables
   $("#query-name").editable({
