@@ -377,8 +377,7 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
 
     CodeMirror.onAutocomplete = function (data, from, to) {
       if (CodeMirror.tableFieldMagic) {
-        codeMirror.replaceRange("  ", from, from);
-        from.ch = from.ch + 1;
+        codeMirror.replaceRange(" ", from, from);
         codeMirror.setCursor(from);
         codeMirror.execCommand("autocomplete");
       }
@@ -389,52 +388,47 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
         e.preventDefault(); // prevents native menu on FF for Mac from being shown
       });
 
-      var options = {
-        'tables': {}
-      };
-
       var pos = cm.cursorCoords();
+      $(".CodeMirror-spinner").remove();
       $("<i class='fa fa-spinner fa-spin CodeMirror-spinner'></i>").css("top", pos.top + "px").css("left", (pos.left - 4) + "px").appendTo($("body"));
 
       if ($.totalStorage('rdbms_tables_' + viewModel.server().name() + "_" + viewModel.database()) == null) {
-        CodeMirror.showHint(codeMirror, AUTOCOMPLETE_SET);
-        rdbms_getTables(viewModel.server().name(), viewModel.database(), function () {}); // if preload didn't work, tries again
+        CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
+        rdbms_getTables(viewModel.server().name(), viewModel.database(), function () {
+        }); // if preload didn't work, tries again
       }
       else {
         rdbms_getTables(viewModel.server().name(), viewModel.database(), function (tables) {
-          $.each(tables.split(' '), function(index, table) {
-            if (!(table in options['tables'])) {
-              options['tables'][table] = [];
-            }
-          });
+          CodeMirror.catalogTables = tables;
+          var _before = codeMirror.getRange({line: 0, ch: 0}, {line: codeMirror.getCursor().line, ch: codeMirror.getCursor().ch}).replace(/(\r\n|\n|\r)/gm, " ");
           CodeMirror.possibleTable = false;
           CodeMirror.tableFieldMagic = false;
-          CodeMirror.possibleSoloField = false;
-          var _before = codeMirror.getRange({line: 0, ch: 0}, {line: codeMirror.getCursor().line, ch: codeMirror.getCursor().ch}).replace(/(\r\n|\n|\r)/gm, " ");
           if (_before.toUpperCase().indexOf(" FROM ") > -1 && _before.toUpperCase().indexOf(" ON ") == -1 && _before.toUpperCase().indexOf(" WHERE ") == -1) {
             CodeMirror.possibleTable = true;
           }
+          CodeMirror.possibleSoloField = false;
           if (_before.toUpperCase().indexOf("SELECT ") > -1 && _before.toUpperCase().indexOf(" FROM ") == -1 && !CodeMirror.fromDot) {
             if (codeMirror.getValue().toUpperCase().indexOf("FROM ") > -1) {
-              fieldsAutocomplete(codeMirror, options);
-            } else {
+              fieldsAutocomplete(cm);
+            }
+            else {
               CodeMirror.tableFieldMagic = true;
-              CodeMirror.showHint(codeMirror, AUTOCOMPLETE_SET, options);
+              CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
             }
           }
           else {
             if (_before.toUpperCase().indexOf("WHERE ") > -1 && !CodeMirror.fromDot && _before.match(/ON|GROUP|SORT/) == null) {
-              fieldsAutocomplete(codeMirror);
+              fieldsAutocomplete(cm);
             }
             else {
-              CodeMirror.showHint(codeMirror, AUTOCOMPLETE_SET, options);
+              CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
             }
           }
         });
       }
     }
 
-    function fieldsAutocomplete(cm, options) {
+    function fieldsAutocomplete(cm) {
       CodeMirror.possibleSoloField = true;
       try {
         var _possibleTables = $.trim(codeMirror.getValue(" ").substr(codeMirror.getValue().toUpperCase().indexOf("FROM ") + 4)).split(" ");
@@ -444,17 +438,17 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
             _foundTable = _possibleTables[i];
           }
         }
-        if (_foundTable != "" && _foundTable in options['tables']) {
+        if (_foundTable != "") {
           if (rdbms_tableHasAlias(viewModel.server().name(), _foundTable, codeMirror.getValue())) {
             CodeMirror.possibleSoloField = false;
-            CodeMirror.showHint(cm, AUTOCOMPLETE_SET, options);
-          } else {
+            CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
+          }
+          else {
             rdbms_getTableColumns(viewModel.server().name(), viewModel.database(), _foundTable, codeMirror.getValue(),
-                function (columns) {
-                  CodeMirror.table = _foundTable;
-                  options['tables'][_foundTable] = columns.split(' ');
-                  CodeMirror.showHint(cm, AUTOCOMPLETE_SET, options);
-                });
+                    function (columns) {
+                      CodeMirror.catalogFields = columns;
+                      CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
+                    });
           }
         }
       }
@@ -483,10 +477,22 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
       onKeyEvent: function (e, s) {
         if (s.type == "keyup") {
           if (s.keyCode == 190) {
+            var _line = codeMirror.getLine(codeMirror.getCursor().line);
+            var _partial = _line.substring(0, codeMirror.getCursor().ch);
+            var _table = _partial.substring(_partial.lastIndexOf(" ") + 1, _partial.length - 1);
             if (codeMirror.getValue().toUpperCase().indexOf("FROM") > -1) {
-              window.setTimeout(function () {
-                codeMirror.execCommand("autocomplete");
-              }, 100);  // timeout for IE8
+              rdbms_getTableColumns(viewModel.server().name(), viewModel.database(), _table, codeMirror.getValue(),
+                      function (columns) {
+                        var _cols = columns.split(" ");
+                        for (var col in _cols) {
+                          _cols[col] = "." + _cols[col];
+                        }
+                        CodeMirror.catalogFields = _cols.join(" ");
+                        CodeMirror.fromDot = true;
+                        window.setTimeout(function () {
+                          codeMirror.execCommand("autocomplete");
+                        }, 100);  // timeout for IE8
+                      });
             }
           }
         }
@@ -501,6 +507,7 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
       selectedLine = $.trim(err.substring(err.indexOf(" ", firstPos), err.indexOf(":", firstPos))) * 1;
       errorWidget = codeMirror.addLineWidget(selectedLine - 1, $("<div>").addClass("editorError").html("<i class='fa fa-exclamation-circle'></i> " + err)[0], {coverGutter: true, noHScroll: true})
     }
+
 
     codeMirror.setSize("95%", 100);
 

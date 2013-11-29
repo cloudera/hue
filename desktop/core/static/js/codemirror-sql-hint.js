@@ -1,124 +1,146 @@
-(function () {
-  "use strict";
+// Licensed to Cloudera, Inc. under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  Cloudera, Inc. licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-  var tables;
-  var keywords;
+(function () {
+
+  var keywords, keywordsU, keywordsL;
 
   function getKeywords(editor) {
     var mode = editor.doc.modeOption;
-    if(mode === "sql") mode = "text/x-sql";
-    return CodeMirror.resolveMode(mode).keywords;
-  }
-
-  function match(string, word) {
-    var len = string.length;
-    var sub = word.substr(0, len);
-    return string.toUpperCase() === sub.toUpperCase();
-  }
-
-  function addMatches(result, search, wordlist, formatter) {
-    for(var word in wordlist) {
-      if(!wordlist.hasOwnProperty(word)) continue;
-      if(Array.isArray(wordlist)) {
-        word = wordlist[word];
-      }
-      if(match(search, word)) {
-        result.push(formatter(word));
-      }
+    if (mode === "sql") mode = "text/x-sql";
+    var _keywordsObj = CodeMirror.resolveMode(mode).keywords;
+    var _keywords = "";
+    for (var keyword in _keywordsObj) {
+      _keywords += keyword.toUpperCase() + " ";
     }
+    return _keywords;
   }
 
-  function columnCompletion(result, editor) {
-    var cur = editor.getCursor();
-    var token = editor.getTokenAt(cur);
-    var string = token.string.substr(1);
-    var prevCur = CodeMirror.Pos(cur.line, token.start);
-    var table = editor.getTokenAt(prevCur).string;
-    var columns = tables[table];
-    if(!columns) {
-      table = findTableByAlias(table, editor);
-    }
-    columns = tables[table];
-    if(!columns) {
-      return;
-    }
-    addMatches(result, string, columns,
-        function(w) {return "." + w;});
+  function forEach(arr, f) {
+    for (var i = 0, e = arr.length; i < e; ++i) f(arr[i]);
   }
 
-  function eachWord(line, f) {
-    var words = line.text.split(" ");
-    for(var i = 0; i < words.length; i++) {
-      f(words[i]);
-    }
-  }
-
-  // Tries to find possible table name from alias.
-  function findTableByAlias(alias, editor) {
-    var aliasUpperCase = alias.toUpperCase();
-    var previousWord = "";
-    var table = "";
-
-    editor.eachLine(function(line) {
-      eachWord(line, function(word) {
-        var wordUpperCase = word.toUpperCase();
-        if(wordUpperCase === aliasUpperCase) {
-          if(tables.hasOwnProperty(previousWord)) {
-            table = previousWord;
-          }
+  function arrayContains(arr, item) {
+    if (!Array.prototype.indexOf) {
+      var i = arr.length;
+      while (i--) {
+        if (arr[i] === item) {
+          return true;
         }
-        if(wordUpperCase !== "AS") {
-          previousWord = word;
-        }
-      });
+      }
+      return false;
+    }
+    return arr.indexOf(item) != -1;
+  }
+
+  function scriptHint(editor, _keywords, getToken) {
+    // Find the token at the cursor
+    var cur = editor.getCursor(), token = getToken(editor, cur), tprop = token;
+
+    // If it's not a 'word-style' or dot token, ignore the token.
+    if (!/^[\.\w$_]*$/.test(token.string)) {
+      token = tprop = {start: cur.ch, end: cur.ch, string: "", state: token.state,
+        className: token.string == "." ? "hiveql-type" : null};
+    }
+
+    if (!context) var context = [];
+    context.push(tprop);
+
+    var completionList = getCompletions(token, context);
+    //prevent autocomplete for last word, instead show dropdown with one word
+    if (completionList.length == 1) {
+      completionList.push(" ");
+    }
+
+    return {list: completionList,
+      from: CodeMirror.Pos(cur.line, token.start),
+      to: CodeMirror.Pos(cur.line, token.end)};
+  }
+
+  CodeMirror.catalogTables = "";
+  CodeMirror.catalogFields = "";
+  CodeMirror.possibleTable = false;
+  CodeMirror.possibleSoloField = false;
+  CodeMirror.tableFieldMagic = false;
+
+  CodeMirror.sqlHint = function (editor) {
+    keywords = getKeywords(editor);
+    keywordsU = keywords.split(" ");
+    keywordsL = keywords.toLowerCase().split(" ");
+    return scriptHint(editor, keywords, function (e, cur) {
+      return e.getTokenAt(cur);
     });
-    return table;
-  }
+  };
 
-  function sqlHint(editor, options) {
-    tables = (options && options.tables) || {};
-    keywords = keywords || getKeywords(editor);
-    var cur = editor.getCursor();
-    var token = editor.getTokenAt(cur);
+  function getCompletions(token, context) {
+    var catalogTablesL = CodeMirror.catalogTables.toLowerCase().split(" ");
+    var catalogFieldsL = CodeMirror.catalogFields.toLowerCase().split(" ");
 
-    var result = [];
+    var found = [], start = token.string, extraFound = [];
 
-    var search = token.string.trim();
+    function maybeAdd(str) {
+      if (str.indexOf(start) == 0 && !arrayContains(found, str)) found.push(str);
+    }
 
-    var from = CodeMirror.Pos(cur.line, token.start);
-    var to = CodeMirror.Pos(cur.line, token.end);
-
-    if (CodeMirror.possibleSoloField && CodeMirror.table && CodeMirror.table in tables) {
-      var columns = tables[CodeMirror.table];
-      addMatches(result, search, columns, function(w) {return w;});
-
-      // Token search/replace replaces "SELECT  FROM test" with "SELECTtestFROM test".
-      // Changing the start position and end position fixes that.
-      if (!search) {
-        from = cur;
-        to = cur;
+    function maybeAddToExtra(str) {
+      var _match = str;
+      if (_match.indexOf("fa-magic") > -1) {
+        _match = _match.substring(_match.indexOf("FROM ") + 5);
       }
-    } else if(search.lastIndexOf('.') === 0) {
-      columnCompletion(result, editor);
-    } else if (CodeMirror.possibleTable) {
-      addMatches(result, search, tables,
-        function(w) {return w;});
-    } else {
-      if (CodeMirror.tableFieldMagic) {
-        addMatches(result, search, tables, function(w) {
-          return "<i class='fa fa-magic'></i> FROM " + w.trim();
-        });
-      } else {
-        addMatches(result, search, keywords,
-          function(w) {return w.toUpperCase();});
+      if (_match.indexOf(start) == 0 && !arrayContains(found, str)) extraFound.push(str);
+    }
+
+    function gatherCompletions(obj) {
+      if (obj.indexOf(".") == 0) {
+        forEach(catalogFieldsL, maybeAdd);
+      }
+      else {
+        if (!CodeMirror.possibleTable) {
+          if (CodeMirror.tableFieldMagic) {
+            var _specialCatalogTablesL = CodeMirror.catalogTables.toLowerCase().split(" ");
+            for (var i = 0; i < _specialCatalogTablesL.length; i++) {
+              _specialCatalogTablesL[i] = "<i class='fa fa-magic'></i> FROM " + _specialCatalogTablesL[i];
+            }
+            forEach(_specialCatalogTablesL, maybeAddToExtra);
+          }
+          if (CodeMirror.possibleSoloField) {
+            forEach(catalogFieldsL, maybeAddToExtra);
+          }
+          forEach(keywordsU, maybeAdd);
+          forEach(keywordsL, maybeAdd);
+
+        }
+        else {
+          forEach(catalogTablesL, maybeAddToExtra);
+          forEach(keywordsU, maybeAdd);
+          forEach(keywordsL, maybeAdd);
+        }
       }
     }
 
-    return {
-      list: result,
-      from: from,
-      to: to
-    };
+    if (context) {
+      // If this is a property, see if it belongs to some object we can
+      // find in the current environment.
+      var obj = context.pop(), base;
+      base = obj.string;
+
+      while (base != null && context.length)
+        base = base[context.pop().string];
+      if (base != null) gatherCompletions(base);
+    }
+    return extraFound.sort().concat(found.sort());
   }
-  CodeMirror.sqlHint = sqlHint;
 })();
