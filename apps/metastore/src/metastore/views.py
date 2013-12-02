@@ -163,7 +163,7 @@ def describe_table(request, database, table):
     ],
     'table': table,
     'partitions': partitions,
-    'sample': table_data and table_data.rows(),
+    'sample': table_data and list(table_data.rows()),
     'error_message': error_message,
     'database': database,
     'has_write_access': has_write_access(request.user),

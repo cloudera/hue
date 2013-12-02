@@ -303,7 +303,6 @@ class OozieBase(OozieServerProvider):
 
     self.c.post(reverse('oozie:install_examples'))
     self.cluster.fs.do_as_user('test', self.cluster.fs.create_home_dir, '/user/test')
-    self.cluster.fs.do_as_superuser(self.cluster.fs.chmod, '/user/test', 0777, True)
 
     _INITIALIZED = True
 

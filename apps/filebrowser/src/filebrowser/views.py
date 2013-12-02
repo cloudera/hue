@@ -52,6 +52,7 @@ from desktop.lib.django_util import make_absolute, render, render_json, format_p
 from desktop.lib.exceptions_renderable import PopupException
 from hadoop.fs.hadoopfs import Hdfs
 from hadoop.fs.exceptions import WebHdfsException
+from hadoop.fs.fsutils import do_newfile_save, do_overwrite_save
 
 from filebrowser.conf import MAX_SNAPPY_DECOMPRESSION_SIZE
 from filebrowser.lib.archives import archive_factory
@@ -240,87 +241,17 @@ def save_file(request):
         return edit(request, path, form=form)
 
     if request.fs.exists(path):
-        _do_overwrite_save(request.fs, path,
+        do_overwrite_save(request.fs, path,
                            form.cleaned_data['contents'],
                            form.cleaned_data['encoding'])
     else:
-        _do_newfile_save(request.fs, path,
+        do_newfile_save(request.fs, path,
                          form.cleaned_data['contents'],
                          form.cleaned_data['encoding'])
 
     messages.info(request, _('Saved %(path)s.') % {'path': os.path.basename(path)})
     request.path = reverse("filebrowser.views.edit", kwargs=dict(path=path))
     return edit(request, path, form)
-
-
-def _do_overwrite_save(fs, path, data, encoding):
-    """
-    Atomically (best-effort) save the specified data to the given path
-    on the filesystem.
-
-    TODO(todd) should this be in some fsutil.py?
-    """
-    # TODO(todd) Should probably do an advisory permissions check here to
-    # see if we're likely to fail (eg make sure we own the file
-    # and can write to the dir)
-
-    # First write somewhat-kinda-atomically to a staging file
-    # so that if we fail, we don't clobber the old one
-    path_dest = path + "._hue_new"
-
-    new_file = fs.open(path_dest, "w")
-    try:
-        try:
-            new_file.write(data.encode(encoding))
-            logging.info("Wrote to " + path_dest)
-        finally:
-            new_file.close()
-    except Exception, e:
-        # An error occurred in writing, we should clean up
-        # the tmp file if it exists, before re-raising
-        try:
-            fs.remove(path_dest)
-        except:
-            pass
-        raise e
-
-    # Try to match the permissions and ownership of the old file
-    cur_stats = fs.stats(path)
-    try:
-        fs.chmod(path_dest, stat_module.S_IMODE(cur_stats['mode']))
-    except:
-        logging.warn("Could not chmod new file %s to match old file %s" % (
-            path_dest, path), exc_info=True)
-        # but not the end of the world - keep going
-
-    try:
-        fs.chown(path_dest, cur_stats['user'], cur_stats['group'])
-    except:
-        logging.warn("Could not chown new file %s to match old file %s" % (
-            path_dest, path), exc_info=True)
-        # but not the end of the world - keep going
-
-    # Now delete the old - nothing we can do here to recover
-    fs.remove(path)
-
-    # Now move the new one into place
-    # If this fails, then we have no reason to assume
-    # we can do anything to recover, since we know the
-    # destination shouldn't already exist (we just deleted it above)
-    fs.rename(path_dest, path)
-
-
-def _do_newfile_save(fs, path, data, encoding):
-    """
-    Save data to the path 'path' on the filesystem 'fs'.
-
-    There must not be a pre-existing file at that path.
-    """
-    new_file = fs.open(path, "w")
-    try:
-        new_file.write(data.encode(encoding))
-    finally:
-        new_file.close()
 
 
 def parse_breadcrumbs(path):

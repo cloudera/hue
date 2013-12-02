@@ -130,6 +130,7 @@ def get_shared_beeswax_server():
     if _SHARED_HIVE_SERVER_PROCESS is None:
       p = _start_server(cluster)
       LOG.info("started")
+      cluster.fs.do_as_superuser(cluster.fs.chmod, '/tmp', 01777)
 
       _SHARED_HIVE_SERVER_PROCESS = p
       def kill():

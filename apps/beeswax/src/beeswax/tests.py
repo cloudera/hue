@@ -1016,9 +1016,13 @@ for x in sys.stdin:
         gzdat.write(data)
         gzdat.close()
         data = sio.getvalue()
+
       f = self.cluster.fs.open(filename, "w")
       f.write(data)
       f.close()
+      self.cluster.fs.do_as_superuser(self.cluster.fs.chown, filename, 'test', 'test')
+
+    self.cluster.fs.do_as_user('test', self.cluster.fs.create_home_dir, '/user/test')
 
     write_file('/tmp/spacé.dat'.decode('utf-8'), RAW_FIELDS, ' ')
     write_file('/tmp/tab.dat', RAW_FIELDS, '\t')
@@ -1122,6 +1126,41 @@ for x in sys.stdin:
     assert_equal([ col.name for col in cols ], [ 'col_a', 'col_b', 'col_c' ])
     assert_true("nada" in resp.content, resp.content)
     assert_true("sp ace" in resp.content, resp.content)
+
+    # Test table creation and data loading
+    resp = self.client.post('/beeswax/create/import_wizard/default', {
+      'submit_create': 'on',
+      'path': '/tmp/comma.csv',
+      'name': 'test_create_import_with_header',
+      'delimiter_0': ',',
+      'delimiter_1': '',
+      'file_type': 'text',
+      'do_import': 'True',
+      'cols-0-_exists': 'True',
+      'cols-0-column_name': 'col_a',
+      'cols-0-column_type': 'string',
+      'cols-1-_exists': 'True',
+      'cols-1-column_name': 'col_b',
+      'cols-1-column_type': 'string',
+      'cols-2-_exists': 'True',
+      'cols-2-column_name': 'col_c',
+      'cols-2-column_type': 'string',
+      'cols-next_form_id': '3',
+      'removeHeader': 'on'
+    }, follow=True)
+
+    resp = wait_for_query_to_finish(self.client, resp, max=180.0)
+
+    # Check data is in the table (by describing it)
+    resp = self.client.get('/metastore/table/default/test_create_import_with_header')
+    cols = resp.context['table'].cols
+    assert_equal(len(cols), 3)
+    assert_equal([ col.name for col in cols ], [ 'col_a', 'col_b', 'col_c' ])
+    assert_equal(resp.context['sample'], [
+      #['a', 'b', 'c'], # Gone as told to be header
+      ['"a', 'a"', '"b'], # Hive does not support natively quoted CSV
+      ['"a', '""a"', '"b']
+    ] )
 
 
   def test_create_database(self):

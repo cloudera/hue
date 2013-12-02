@@ -849,14 +849,11 @@ def test_view_i18n():
     c = make_logged_in_client()
     response = c.get('/filebrowser/view/')
     assert_equal(response.context['path'], '/')
-    cluster.fs.mkdir('/user/test')
-    cluster.fs.chown("/user/test", "test", "test")
     response = c.get('/filebrowser/view/?default_to_home=1')
     assert_equal("http://testserver/filebrowser/view/user/test", response["location"])
   finally:
     try:
       cluster.fs.rmtree('/test-filebrowser/')
-      cluster.fs.rmtree('/user/test')
     except Exception, ex:
       LOG.error('Failed to cleanup test directory: %s' % (ex,))
 

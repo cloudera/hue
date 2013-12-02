@@ -474,7 +474,7 @@ class WebHdfs(Hdfs):
     self._invoke_with_redirect('POST', path, params, data)
 
 
-  def copyfile(self, src, dst):
+  def copyfile(self, src, dst, skip_header=False):
     sb = self._stats(src)
     if sb is None:
       raise IOError(errno.ENOENT, _("Copy src '%s' does not exist") % src)
@@ -488,6 +488,10 @@ class WebHdfs(Hdfs):
     while True:
       data = self.read(src, offset, UPLOAD_CHUNK_SIZE.get())
       if offset == 0:
+        if skip_header:
+          n = data.index('\n')
+          if n > 0:
+            data = data[n + 1:]
         self.create(dst,
                     overwrite=True,
                     blocksize=sb.blockSize,

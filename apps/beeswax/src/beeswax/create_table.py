@@ -30,6 +30,7 @@ from desktop.lib.django_util import render
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.django_forms import MultiForm
 from hadoop.fs import hadoopfs
+from hadoop.fs.fsutils import remove_header
 
 from beeswax.common import TERMINATORS
 from beeswax.design import hql_query
@@ -264,6 +265,7 @@ def _submit_create_and_load(request, create_hql, table_name, path, do_load, data
   if do_load:
     on_success_params['table'] = table_name
     on_success_params['path'] = path
+    on_success_params['removeHeader'] = request.POST.get('removeHeader')
     on_success_url = reverse(app_name + ':load_after_create', kwargs={'database': database})
   else:
     on_success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': table_name})
@@ -457,11 +459,15 @@ def load_after_create(request, database):
   """
   tablename = request.REQUEST.get('table')
   path = request.REQUEST.get('path')
+  is_remove_header = request.REQUEST.get('removeHeader').lower() == 'on'
 
   if not tablename or not path:
     msg = _('Internal error: Missing needed parameter to load data into table.')
     LOG.error(msg)
     raise PopupException(msg)
+
+  if is_remove_header:
+    remove_header(request.fs, path)
 
   LOG.debug("Auto loading data from %s into table %s" % (path, tablename))
   hql = "LOAD DATA INPATH '%s' INTO TABLE `%s.%s`" % (path, database, tablename)

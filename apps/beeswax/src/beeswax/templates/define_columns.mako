@@ -87,8 +87,13 @@ ${ layout.metastore_menubar() }
                       <h3>${_('Define your columns')}</h3>
                     </div>
                     <div class="row" style="margin-left: 8px">
-                      <div class="span3">${_('Use first row as column names')} &nbsp;<a id="useHeader" class="btn disable-feedback"><i class="fa fa-outdent"></i></a></div>
-                      <div class="span3">${ _('Bulk edit column names') } &nbsp;<a id="editColumns" class="btn"><i class="fa fa-edit"></i></a></div>
+                      <div class="span3">
+                        <input id="removeHeader" type="checkbox" class="hide" name="removeHeader">
+                        ${_('Use first row as column names')} &nbsp;<a id="useHeader" class="btn disable-feedback"><i class="fa fa-outdent"></i></a>
+                      </div>
+                      <div class="span3">
+                        ${ _('Bulk edit column names') } &nbsp;<a id="editColumns" class="btn"><i class="fa fa-edit"></i></a>
+                      </div>
                     </div>
                     <div class="control-group" style="margin-top: 10px">
                         <div class="controls">
@@ -192,6 +197,7 @@ ${ layout.metastore_menubar() }
         $(this).addClass(_klass);
         _isChecked = true;
       }
+      $("#removeHeader").prop('checked', _isChecked);
 
       $(".cols input[type='text']").each(function (cnt, item) {
         if (_isChecked) {
