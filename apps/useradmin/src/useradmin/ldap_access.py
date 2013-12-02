@@ -199,7 +199,7 @@ class LdapConnection(object):
           }
 
           member_attr = desktop.conf.LDAP.GROUPS.GROUP_MEMBER_ATTR.get()
-          if member_attr in data:
+          if member_attr in data and 'posixGroup' not in data['objectClass']:
             ldap_info['members'] = data[member_attr]
           else:
             ldap_info['members'] = []
