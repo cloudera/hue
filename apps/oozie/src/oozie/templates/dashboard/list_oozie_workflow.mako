@@ -358,6 +358,28 @@ ${ layout.menubar(section='workflows', dashboard=True) }
   ko.applyBindings(viewModel);
 
   $(document).ready(function() {
+    var CURRENT_ZOOM = 1;
+    $(document).keydown(function(e) {
+      if (e.ctrlKey){
+        if (e.which == 173 || e.which == 189) {
+          CURRENT_ZOOM -= 0.1;
+          zoom();
+        }
+        if (e.which == 61 || e.which == 187) {
+          CURRENT_ZOOM += 0.1;
+          zoom();
+        }
+        if (e.which == 48) {
+          CURRENT_ZOOM = 1;
+          zoom();
+        }
+      }
+    });
+
+    function zoom(){
+      $("#graph").css("zoom", CURRENT_ZOOM);
+      $("#graph").css("-moz-transform", "scale("+CURRENT_ZOOM+")");
+    }
 
     $("*[rel=tooltip]").tooltip();
 
