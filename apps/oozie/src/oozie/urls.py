@@ -34,6 +34,7 @@ urlpatterns = patterns(
   url(r'^submit_workflow/(?P<workflow>\d+)$', 'submit_workflow', name='submit_workflow'),
   url(r'^schedule_workflow/(?P<workflow>\d+)$', 'schedule_workflow', name='schedule_workflow'),
   url(r'^import_workflow/$', 'import_workflow', name='import_workflow'),
+  url(r'^import_coordinator/$', 'import_coordinator', name='import_coordinator'),
   url(r'^export_workflow/(?P<workflow>\d+)$', 'export_workflow', name='export_workflow'),
 
   url(r'^list_coordinators/(?P<workflow_id>[-\w]+)?$', 'list_coordinators', name='list_coordinators'),

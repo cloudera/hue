@@ -41,14 +41,16 @@ from filebrowser.lib.archives import archive_factory
 from oozie.decorators import check_job_access_permission, check_job_edition_permission,\
                              check_dataset_access_permission, check_dataset_edition_permission
 from oozie.importlib.workflows import import_workflow as _import_workflow
+from oozie.importlib.coordinators import import_coordinator as _import_coordinator
 from oozie.management.commands import oozie_setup
 from oozie.models import Workflow, History, Coordinator,\
                          Dataset, DataInput, DataOutput,\
                          ACTION_TYPES, Bundle, BundledCoordinator, Job
 from oozie.forms import WorkflowForm, CoordinatorForm, DatasetForm,\
                         DataInputForm, DataOutputForm, LinkForm,\
-                        DefaultLinkForm, ParameterForm, ImportWorkflowForm,\
-                        NodeForm, BundleForm, BundledCoordinatorForm, design_form_by_type
+                        DefaultLinkForm, ParameterForm, NodeForm,\
+                        BundleForm, BundledCoordinatorForm, design_form_by_type,\
+                        ImportWorkflowForm, ImportCoordinatorForm
 
 
 LOG = logging.getLogger(__name__)
@@ -179,6 +181,52 @@ def import_workflow(request):
     'workflow_form': workflow_form,
     'workflow': workflow,
   })
+
+
+def import_coordinator(request):
+  coordinator = Coordinator(owner=request.user, schema_version="uri:oozie:coordinator:0.2")
+
+  if request.method == 'POST':
+    coordinator_form = ImportCoordinatorForm(request.POST, request.FILES, instance=coordinator, user=request.user)
+
+    if coordinator_form.is_valid():
+      coordinator_definition = coordinator_form.cleaned_data['definition_file'].read()
+
+      try:
+        _import_coordinator(coordinator=coordinator, coordinator_definition=coordinator_definition)
+        coordinator.managed = True
+        coordinator.name = coordinator_form.cleaned_data.get('name')
+        coordinator.save()
+      except Exception, e:
+        request.error(_('Could not import coordinator: %s' % e))
+        raise PopupException(_('Could not import coordinator.'), detail=e)
+
+      if coordinator_form.cleaned_data.get('resource_archive'):
+        # Upload resources to workspace
+        source = coordinator_form.cleaned_data.get('resource_archive')
+        if source.name.endswith('.zip'):
+          temp_path = archive_factory(source).extract()
+          request.fs.copyFromLocal(temp_path, coordinator.deployment_dir)
+          shutil.rmtree(temp_path)
+        else:
+          Coordinator.objects.filter(id=coordinator.id).delete()
+          raise PopupException(_('Archive should be a Zip.'))
+      
+      Document.objects.link(coordinator, owner=request.user, name=coordinator.name, description=coordinator.description)
+      request.info(_('Coordinator imported'))
+      return redirect(reverse('oozie:edit_coordinator', kwargs={'coordinator': coordinator.id}))
+
+    else:
+      request.error(_('Errors on the form'))
+
+  else:
+    coordinator_form = ImportCoordinatorForm(instance=coordinator, user=request.user)
+
+  return render('editor/import_coordinator.mako', request, {
+    'coordinator_form': coordinator_form,
+    'coordinator': coordinator,
+  })
+
 
 @check_job_access_permission()
 def export_workflow(request, workflow):

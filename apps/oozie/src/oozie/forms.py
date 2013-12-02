@@ -360,6 +360,22 @@ class CoordinatorForm(forms.ModelForm):
     self.fields['workflow'].queryset = qs
 
 
+class ImportCoordinatorForm(CoordinatorForm):
+  definition_file = forms.FileField(label=_t("Local coordinator.xml file"))
+  resource_archive = forms.FileField(label=_t("Coordinator resource archive (zip)"), required=False)
+  start = forms.SplitDateTimeField(input_time_formats=[TIME_FORMAT],
+                                   widget=SplitDateTimeWidget(attrs={'class': 'input-small', 'id': 'coordinator_start'},
+                                                              date_format=DATE_FORMAT, time_format=TIME_FORMAT),
+                                   required=False)
+  end = forms.SplitDateTimeField(input_time_formats=[TIME_FORMAT],
+                                 widget=SplitDateTimeWidget(attrs={'class': 'input-small', 'id': 'coordinator_end'},
+                                                            date_format=DATE_FORMAT, time_format=TIME_FORMAT),
+                                 required=False)
+
+  class Meta(CoordinatorForm.Meta):
+    exclude = ('owner', 'deployment_dir', 'timezone', 'frequency_number', 'frequency_unit', 'schema_version', 'job_properties', 'parameters')
+
+
 class DatasetForm(forms.ModelForm):
   start = forms.SplitDateTimeField(input_time_formats=[TIME_FORMAT],
                                    widget=SplitDateTimeWidget(attrs={'class': 'short'},

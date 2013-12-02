@@ -24,6 +24,7 @@ import StringIO
 import shutil
 import tempfile
 import zipfile
+from datetime import datetime
 
 from itertools import chain
 
@@ -1833,7 +1834,7 @@ class TestImportWorkflow04(OozieMockBase):
     """
     workflow = Workflow.objects.new_workflow(self.user)
     workflow.save()
-    f = open('apps/oozie/src/oozie/test_data/0.4/test-basic-namespace-missing.xml')
+    f = open('apps/oozie/src/oozie/test_data/workflows/0.4/test-basic-namespace-missing.xml')
     contents = f.read()
     f.close()
 
@@ -1847,7 +1848,7 @@ class TestImportWorkflow04(OozieMockBase):
     """
     workflow = Workflow.objects.new_workflow(self.user)
     workflow.save()
-    f = open('apps/oozie/src/oozie/test_data/0.4/test-basic.xml')
+    f = open('apps/oozie/src/oozie/test_data/workflows/0.4/test-basic.xml')
     import_workflow(workflow, f.read())
     f.close()
     workflow.save()
@@ -1864,7 +1865,7 @@ class TestImportWorkflow04(OozieMockBase):
     """
     workflow = Workflow.objects.new_workflow(self.user)
     workflow.save()
-    f = open('apps/oozie/src/oozie/test_data/0.4/test-basic-global-config.xml')
+    f = open('apps/oozie/src/oozie/test_data/workflows/0.4/test-basic-global-config.xml')
     import_workflow(workflow, f.read())
     f.close()
     workflow.save()
@@ -1881,7 +1882,7 @@ class TestImportWorkflow04(OozieMockBase):
     """
     workflow = Workflow.objects.new_workflow(self.user)
     workflow.save()
-    f = open('apps/oozie/src/oozie/test_data/0.4/test-decision.xml')
+    f = open('apps/oozie/src/oozie/test_data/workflows/0.4/test-decision.xml')
     import_workflow(workflow, f.read())
     f.close()
     workflow.save()
@@ -1897,7 +1898,7 @@ class TestImportWorkflow04(OozieMockBase):
   def test_import_workflow_decision_complex(self):
     workflow = Workflow.objects.new_workflow(self.user)
     workflow.save()
-    f = open('apps/oozie/src/oozie/test_data/0.4/test-decision-complex.xml')
+    f = open('apps/oozie/src/oozie/test_data/workflows/0.4/test-decision-complex.xml')
     import_workflow(workflow, f.read())
     f.close()
     workflow.save()
@@ -1916,7 +1917,7 @@ class TestImportWorkflow04(OozieMockBase):
     """
     workflow = Workflow.objects.new_workflow(self.user)
     workflow.save()
-    f = open('apps/oozie/src/oozie/test_data/0.4/test-distcp.0.1.xml')
+    f = open('apps/oozie/src/oozie/test_data/workflows/0.4/test-distcp.0.1.xml')
     import_workflow(workflow, f.read())
     f.close()
     workflow.save()
@@ -1929,7 +1930,7 @@ class TestImportWorkflow04(OozieMockBase):
   def test_import_workflow_forks(self):
     workflow = Workflow.objects.new_workflow(self.user)
     workflow.save()
-    f = open('apps/oozie/src/oozie/test_data/0.4/test-forks.xml')
+    f = open('apps/oozie/src/oozie/test_data/workflows/0.4/test-forks.xml')
     import_workflow(workflow, f.read())
     f.close()
     workflow.save()
@@ -1947,7 +1948,7 @@ class TestImportWorkflow04(OozieMockBase):
     """
     workflow = Workflow.objects.new_workflow(self.user)
     workflow.save()
-    f = open('apps/oozie/src/oozie/test_data/0.4/test-mapreduce.xml')
+    f = open('apps/oozie/src/oozie/test_data/workflows/0.4/test-mapreduce.xml')
     import_workflow(workflow, f.read())
     f.close()
     workflow.save()
@@ -1963,7 +1964,7 @@ class TestImportWorkflow04(OozieMockBase):
     """
     workflow = Workflow.objects.new_workflow(self.user)
     workflow.save()
-    f = open('apps/oozie/src/oozie/test_data/0.4/test-pig.xml')
+    f = open('apps/oozie/src/oozie/test_data/workflows/0.4/test-pig.xml')
     import_workflow(workflow, f.read())
     f.close()
     workflow.save()
@@ -1981,7 +1982,7 @@ class TestImportWorkflow04(OozieMockBase):
     """
     workflow = Workflow.objects.new_workflow(self.user)
     workflow.save()
-    f = open('apps/oozie/src/oozie/test_data/0.4/test-sqoop.0.2.xml')
+    f = open('apps/oozie/src/oozie/test_data/workflows/0.4/test-sqoop.0.2.xml')
     import_workflow(workflow, f.read())
     f.close()
     workflow.save()
@@ -2000,7 +2001,7 @@ class TestImportWorkflow04(OozieMockBase):
     """
     workflow = Workflow.objects.new_workflow(self.user)
     workflow.save()
-    f = open('apps/oozie/src/oozie/test_data/0.4/test-java.xml')
+    f = open('apps/oozie/src/oozie/test_data/workflows/0.4/test-java.xml')
     import_workflow(workflow, f.read())
     f.close()
     workflow.save()
@@ -2020,7 +2021,7 @@ class TestImportWorkflow04(OozieMockBase):
   def test_import_workflow_shell(self):
     workflow = Workflow.objects.new_workflow(self.user)
     workflow.save()
-    f = open('apps/oozie/src/oozie/test_data/0.4/test-shell.xml')
+    f = open('apps/oozie/src/oozie/test_data/workflows/0.4/test-shell.xml')
     import_workflow(workflow, f.read())
     f.close()
     workflow.save()
@@ -2044,7 +2045,7 @@ class TestImportWorkflow04(OozieMockBase):
     """
     workflow = Workflow.objects.new_workflow(self.user)
     workflow.save()
-    f = open('apps/oozie/src/oozie/test_data/0.4/test-fs.xml')
+    f = open('apps/oozie/src/oozie/test_data/workflows/0.4/test-fs.xml')
     import_workflow(workflow, f.read())
     f.close()
     workflow.save()
@@ -2065,7 +2066,7 @@ class TestImportWorkflow04(OozieMockBase):
     """
     workflow = Workflow.objects.new_workflow(self.user)
     workflow.save()
-    f = open('apps/oozie/src/oozie/test_data/0.4/test-email.0.1.xml')
+    f = open('apps/oozie/src/oozie/test_data/workflows/0.4/test-email.0.1.xml')
     import_workflow(workflow, f.read())
     f.close()
     workflow.save()
@@ -2085,7 +2086,7 @@ class TestImportWorkflow04(OozieMockBase):
     """
     workflow = Workflow.objects.new_workflow(self.user)
     workflow.save()
-    f = open('apps/oozie/src/oozie/test_data/0.4/test-generic.xml')
+    f = open('apps/oozie/src/oozie/test_data/workflows/0.4/test-generic.xml')
     import_workflow(workflow, f.read())
     f.close()
     workflow.save()
@@ -2104,7 +2105,7 @@ class TestImportWorkflow04(OozieMockBase):
     """
     workflow = Workflow.objects.new_workflow(self.user)
     workflow.save()
-    f = open('apps/oozie/src/oozie/test_data/0.4/test-java-multiple-kill.xml')
+    f = open('apps/oozie/src/oozie/test_data/workflows/0.4/test-java-multiple-kill.xml')
     import_workflow(workflow, f.read())
     f.close()
     workflow.save()
@@ -2129,7 +2130,7 @@ class TestImportWorkflow04(OozieMockBase):
     """
     workflow = Workflow.objects.new_workflow(self.user)
     workflow.save()
-    f = open('apps/oozie/src/oozie/test_data/0.4/test-java-different-error-links.xml')
+    f = open('apps/oozie/src/oozie/test_data/workflows/0.4/test-java-different-error-links.xml')
     import_workflow(workflow, f.read())
     f.close()
     workflow.save()
@@ -2146,6 +2147,43 @@ class TestImportWorkflow04(OozieMockBase):
     assert_equal(1, len(Link.objects.filter(parent__workflow=workflow).filter(parent__name='TeraGenWorkflow').filter(name='error').filter(child__node_type='java')))
     assert_equal(1, len(Link.objects.filter(parent__workflow=workflow).filter(parent__name='TeraSort').filter(name='error').filter(child__node_type='kill')))
     workflow.delete(skip_trash=True)
+
+
+class TestImportCoordinator02(OozieMockBase):
+
+  def setUp(self):
+    super(TestImportCoordinator02, self).setUp()
+    self.setup_simple_workflow()
+
+  def test_import_coordinator_simple(self):
+    coordinator_count = Document.objects.available_docs(Coordinator, self.user).count()
+
+    # Create
+    filename = os.path.abspath(os.path.dirname(__file__) + "/test_data/coordinators/0.2/test-basic.xml")
+    fh = open(filename)
+    response = self.c.post(reverse('oozie:import_coordinator'), {
+      'name': ['test_coordinator'],
+      'workflow': Workflow.objects.get(name='wf-name-1').pk,
+      'definition_file': [fh],
+      'description': ['test description']
+    }, follow=True)
+    fh.close()
+
+    assert_equal(coordinator_count + 1, Document.objects.available_docs(Coordinator, self.user).count(), response)
+    coordinator = Coordinator.objects.get(name='test_coordinator')
+    assert_equal('[{"name":"oozie.use.system.libpath","value":"true"}]', coordinator.parameters)
+    assert_equal('uri:oozie:coordinator:0.2', coordinator.schema_version)
+    assert_equal('test description', coordinator.description)
+    assert_equal(datetime.strptime('2013-06-03T00:00Z', '%Y-%m-%dT%H:%MZ'), coordinator.start)
+    assert_equal(datetime.strptime('2013-06-05T00:00Z', '%Y-%m-%dT%H:%MZ'), coordinator.end)
+    assert_equal('America/Los_Angeles', coordinator.timezone)
+    assert_equal('days', coordinator.frequency_unit)
+    assert_equal(1, coordinator.frequency_number)
+    assert_equal(None, coordinator.timeout)
+    assert_equal(None, coordinator.concurrency)
+    assert_equal(None, coordinator.execution)
+    assert_equal(None, coordinator.throttle)
+    assert_not_equal(None, coordinator.deployment_dir)
 
 
 class TestPermissions(OozieBase):
@@ -2614,7 +2652,7 @@ class TestEditorWithOozie(OozieBase):
     workflow_count = Document.objects.available_docs(Workflow, self.user).count()
 
     # Create
-    filename = os.path.abspath(os.path.dirname(__file__) + "/test_data/0.4/test-mapreduce.xml")
+    filename = os.path.abspath(os.path.dirname(__file__) + "/test_data/workflows/0.4/test-mapreduce.xml")
     fh = open(filename)
     response = self.c.post(reverse('oozie:import_workflow'), {
       'job_xml': [''],
@@ -2664,7 +2702,7 @@ class TestImportWorkflow04WithOozie(OozieBase):
     """
     workflow = Workflow.objects.new_workflow(self.user)
     workflow.save()
-    f = open('apps/oozie/src/oozie/test_data/0.4/test-subworkflow.xml')
+    f = open('apps/oozie/src/oozie/test_data/workflows/0.4/test-subworkflow.xml')
     import_workflow(workflow, f.read(), None, self.cluster.fs)
     f.close()
     workflow.save()

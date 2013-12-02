@@ -59,6 +59,7 @@ ${ layout.menubar(section='coordinators') }
 
     <%def name="creation()">
       <a href="${ url('oozie:create_coordinator') }" class="btn"><i class="fa fa-plus-circle"></i> ${ _('Create') }</a>
+      <a href="${ url('oozie:import_coordinator') }" class="btn"><i class="fa fa-download"></i> ${ _('Import') }</a>
       &nbsp;&nbsp;
       <a href="${ url('oozie:list_trashed_coordinators') }" class="btn"><i class="fa fa-trash-o"></i> ${ _('View trash') }</a>
     </%def>
