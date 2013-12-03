@@ -37,17 +37,10 @@ from useradmin.models import install_sample_user
 
 LOG = logging.getLogger(__name__)
 
+
 class Command(NoArgsCommand):
-  def _handle_docs(self, objects, extra=None):
-    for obj in objects:
-      if obj.doc.exists():
-        doc = obj.doc.get()
-        if extra:
-          doc.extra = extra
-        doc.save()
 
   def _import_workflows(self, directory, managed=True):
-    imported = []
     for example_directory_name in os.listdir(directory):
       if os.path.isdir(os.path.join(directory, example_directory_name)):
         with open(os.path.join(directory, example_directory_name, 'workflow.zip')) as fp:
@@ -65,11 +58,9 @@ class Command(NoArgsCommand):
           workflow.save()
           Workflow.objects.initialize(workflow)
           import_workflow_root(workflow=workflow, workflow_definition_root=workflow_root, metadata=metadata, fs=self.fs)
-          imported.append(workflow)
-    return imported
+          workflow.doc.all().delete() # Delete doc as it messes up the example sharing
 
   def _import_coordinators(self, directory):
-    imported = []
     for example_directory_name in os.listdir(directory):
       if os.path.isdir(os.path.join(directory, example_directory_name)):
         with open(os.path.join(directory, example_directory_name, 'coordinator.zip')) as fp:
@@ -84,11 +75,8 @@ class Command(NoArgsCommand):
           coordinator.name = coordinator_root.get('name')
           coordinator.save()
           import_coordinator_root(coordinator=coordinator, coordinator_definition_root=coordinator_root, metadata=metadata)
-          imported.append(coordinator)
-    return imported
 
   def _import_bundles(self, directory):
-    imported = []
     for example_directory_name in os.listdir(directory):
       if os.path.isdir(os.path.join(directory, example_directory_name)):
         with open(os.path.join(directory, example_directory_name, 'bundle.zip')) as fp:
@@ -103,29 +91,21 @@ class Command(NoArgsCommand):
           bundle.name = bundle_root.get('name')
           bundle.save()
           import_bundle_root(bundle=bundle, bundle_definition_root=bundle_root, metadata=metadata)
-          imported.append(bundle)
-    return imported
 
   def install_examples(self):
     data_dir = LOCAL_SAMPLE_DIR.get()
 
     managed_dir = os.path.join(data_dir, 'managed')
-    managed_workflows = self._import_workflows(managed_dir, managed=True)
-    self._handle_docs(managed_workflows)
+    self._import_workflows(managed_dir, managed=True)
 
     unmanaged_dir = os.path.join(data_dir, 'unmanaged')
-    unmanaged_workflows = self._import_workflows(unmanaged_dir, managed=False)
-    self._handle_docs(unmanaged_workflows, "jobsub")
+    self._import_workflows(unmanaged_dir, managed=False)
 
     coordinators_dir = os.path.join(data_dir, 'coordinators')
-    coordinators = self._import_coordinators(coordinators_dir)
-    self._handle_docs(coordinators)
+    self._import_coordinators(coordinators_dir)
 
     bundles_dir = os.path.join(data_dir, 'bundles')
-    bundles = self._import_bundles(bundles_dir)
-    self._handle_docs(bundles)
-
-    Document.objects.sync()
+    self._import_bundles(bundles_dir)
 
   def handle_noargs(self, **options):
     self.user = install_sample_user()
@@ -153,4 +133,5 @@ class Command(NoArgsCommand):
     # Load jobs
     LOG.info(_("Installing examples..."))
     self.install_examples()
+
     Document.objects.sync()

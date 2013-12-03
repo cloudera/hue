@@ -15,12 +15,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import re
 
-from jobsub.models import OozieDesign, OozieMapreduceAction, OozieStreamingAction,\
-                          OozieJavaAction
+from jobsub.models import OozieMapreduceAction, OozieStreamingAction, OozieJavaAction
 
 from oozie.models import Mapreduce, Java, Streaming
+
+
+LOG = logging.getLogger(__name__)
 
 
 def get_root_action(design):
@@ -34,8 +37,7 @@ def get_root_action(design):
   elif root.action_type == OozieJavaAction.ACTION_TYPE:
     return root.ooziejavaaction
 
-  LOG.error("Oozie action type '%s' is not valid (jobsub_oozieaction.id %s)"
-            % (root.action_type, root.id))
+  LOG.error("Oozie action type '%s' is not valid (jobsub_oozieaction.id %s)" % (root.action_type, root.id))
   return None
 
 

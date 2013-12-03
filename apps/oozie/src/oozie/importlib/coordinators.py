@@ -188,7 +188,7 @@ def import_coordinator_root(coordinator, coordinator_definition_root, metadata=N
     coordinator.save()
   except:
     # There was an error importing the coordinator so delete every thing associated with it.
-    coordinator.delete()
+    coordinator.delete(skip_trash=True)
     raise
 
 

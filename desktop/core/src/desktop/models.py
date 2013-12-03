@@ -31,8 +31,10 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop import appmanager
 
 
-
 LOG = logging.getLogger(__name__)
+
+
+SAMPLE_USERNAME = 'sample'
 
 
 class UserPreferences(models.Model):
@@ -61,8 +63,8 @@ class DocumentTagManager(models.Manager):
     tags = self
 
     try:
-      sample_user = auth_models.User.objects.get(username='sample')
-      tags = tags.filter(Q(owner=user) | Q(owner=sample_user, tags__tag='example'))
+      sample_user = auth_models.User.objects.get(username=SAMPLE_USERNAME)
+      tags = tags.filter(Q(owner=user) | Q(owner=sample_user, tag=DocumentTag.EXAMPLE))
     except:
       tags = tags.filter(owner=user)
 
@@ -263,7 +265,7 @@ class DocumentManager(models.Manager):
             if not job.managed:
               doc.extra = 'jobsub'
               doc.save()
-        if job.owner.username == 'sample':
+        if job.owner.username == SAMPLE_USERNAME:
           job.doc.get().share_to_default()
     except Exception, e:
       LOG.warn(force_unicode(e))
@@ -282,7 +284,7 @@ class DocumentManager(models.Manager):
           doc.tags.add(tag)
           if job.is_trashed:
             doc.send_to_trash()
-        if job.owner.username == 'sample':
+        if job.owner.username == SAMPLE_USERNAME:
           job.doc.get().share_to_default()
     except Exception, e:
       LOG.warn(force_unicode(e))
@@ -299,7 +301,7 @@ class DocumentManager(models.Manager):
           doc = Document.objects.link(job, owner=job.owner, name=job.dict['name'], description='')
           tag = DocumentTag.objects.get_example_tag(user=job.owner)
           doc.tags.add(tag)
-        if job.owner.username == 'sample':
+        if job.owner.username == SAMPLE_USERNAME:
           job.doc.get().share_to_default()
     except Exception, e:
       LOG.warn(force_unicode(e))

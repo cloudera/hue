@@ -616,7 +616,7 @@ def import_workflow_root(workflow, workflow_definition_root, metadata=None, fs=N
     workflow.name = workflow_definition_root.get('name')
     workflow.save()
   except:
-    workflow.delete()
+    workflow.delete(skip_trash=True)
     raise
 
 

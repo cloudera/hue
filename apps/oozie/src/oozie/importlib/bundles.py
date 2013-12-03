@@ -114,7 +114,7 @@ def import_bundle_root(bundle, bundle_definition_root, metadata=None):
     bundle.save()
   except:
     # There was an error importing the bundle so delete every thing associated with it.
-    bundle.delete()
+    bundle.delete(skip_trash=True)
     raise
 
 
