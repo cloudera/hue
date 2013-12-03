@@ -56,6 +56,7 @@ def _set_controls(coordinator, root, namespace):
     'n': namespace
   }
   controls_list = root.xpath('n:controls', namespaces=namespaces)
+
   if controls_list:
     controls = controls_list[0]
     concurrency = controls.xpath('n:concurrency', namespaces=namespaces)
@@ -90,27 +91,34 @@ def _reconcile_datasets(coordinator, objects, root, namespace):
   datainputs = []
   dataoutputs = []
   coordinator.save()
+
   for obj in objects:
     obj.object.coordinator = coordinator
     if isinstance(obj.object, Dataset):
+      obj.object.pk = None
+      obj.object.save()
       dataset_elements = root.xpath('//n:dataset[@name="%s"]' % obj.object.name, namespaces=namespaces)
       for dataset_element in dataset_elements:
         obj.object.start = oozie_to_django_datetime(dataset_element.get('initial-instance'))
-      obj.object.save()
       datasets[obj.object.name] = obj.object
+      obj.object.save()
     elif isinstance(obj.object, DataInput):
       datainputs.append(obj.object)
     elif isinstance(obj.object, DataOutput):
       dataoutputs.append(obj.object)
+
   for datainput in datainputs:
     datainput_elements = root.xpath('//n:data-in[@name="%s"]' % datainput.name, namespaces=namespaces)
     for datainput_element in datainput_elements:
       datainput.dataset = datasets[datainput_element.get('dataset')]
+    datainput.pk = None
     datainput.save()
+
   for dataoutput in dataoutputs:
     dataoutput_elements = root.xpath('//n:data-out[@name="%s"]' % dataoutput.name, namespaces=namespaces)
     for dataoutput_element in dataoutput_elements:
       dataoutput.dataset = datasets[dataoutput_element.get('dataset')]
+    dataoutput.pk = None
     dataoutput.save()
   # @TODO(abe): reconcile instance times
 
@@ -167,7 +175,6 @@ def import_coordinator_root(coordinator, coordinator_definition_root, metadata=N
 
     # Deserialize XML
     objects = serializers.deserialize('xml', etree.tostring(transformed_root))
-
     # Resolve coordinator dependencies and node types and link dependencies
     _set_coordinator_properties(coordinator, coordinator_definition_root, schema_version)
     _set_controls(coordinator, coordinator_definition_root, schema_version)

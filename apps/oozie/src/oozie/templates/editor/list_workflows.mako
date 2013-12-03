@@ -217,7 +217,8 @@ ${ layout.menubar(section='workflows') }
         });
       }
       var can_delete = $(".hueCheckbox[checked='checked'][data-delete-id]");
-      if (can_delete.length >= 1 && can_delete.length == selector.length) {
+      var can_delete_box_count = $(".hueCheckbox[data-delete-id]").length;
+      if (can_delete.length >= 1 && can_delete.length == can_delete_box_count) {
         $("#trash-btn").removeAttr("disabled");
         $("#trash-btn-caret").removeAttr("disabled");
       }

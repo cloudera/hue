@@ -487,7 +487,7 @@ class Workflow(Job):
       except Exception, e:
         LOG.warn('Workflow %s could not be converted to a graph: %s' % (oozie_workflow.id, e))
     finally:
-      workflow.delete()
+      workflow.delete(skip_trash=True)
     return None, []
 
   def to_xml(self, mapping=None):
