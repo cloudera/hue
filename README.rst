@@ -17,6 +17,7 @@ applications. It features:
       * Job Designer for creating MapReduce/Streaming/Java jobs
       * A Sqoop 2 editor and dashboard
       * A ZooKeeper browser and editor
+      * A DB Query editor for querying MySql, PostGres, Sqlite and Oracle
 
 On top of that, a SDK is available for creating new apps integrated with Hadoop.
 
@@ -138,7 +139,7 @@ Main Stack
 ==========
 
    * Python 2.6 - 2.7
-   * Django 1.4.5 https://docs.djangoproject.com/en/1.4/
+   * Django 1.4 https://docs.djangoproject.com/en/1.4/
    * Mako
    * jQuery
    * Bootstrap

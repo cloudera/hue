@@ -42,16 +42,16 @@ Compatibility
 Runs on CentOS versions 5 to 6, Red Hat Enterprise Linux (RHEL), and Ubuntu 10.04 to 12.10.
 CentOS 5 requires EPEL python package.
 
-Tested with CDH4.4. Specifically:
+Tested with CDH5beta1. Specifically:
 
-- Hadoop 0.20 / 2.0.0
-- Hive 0.10.0
-- Oozie 3.3
+- Hadoop 0.20 / 2.2.0
+- Hive 0.11.0
+- Oozie 4.0
 - HBase 0.94
-- Pig 0.11
+- Pig 0.12
 - Impala 1.0 / 1.1
 - Solr 4.0
-- Sqoop2 1.99.2
+- Sqoop2 1.99.3 
 
 Supported Browsers:
 
