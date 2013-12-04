@@ -341,28 +341,15 @@ $(document).ready(function () {
 
   function toggleSpecificSection(section, filter){
     section.siblings().removeClass("active");
-    if (section.hasClass("active")) {
-      populateTable("");
-      section.removeClass("active");
-      section.find("a").blur();
-    }
-    else {
-      populateTable(filter);
-      section.addClass("active");
-    }
+    populateTable(filter);
+    section.addClass("active");
   }
 
   $(document).on("click", ".toggle-tag", function (e) {
     var _this = $(this);
     _this.siblings().removeClass("active");
     _this.blur();
-    if (_this.hasClass("active")) {
-      _this.removeClass("active");
-      _this.find("a").blur();
-    }
-    else {
-      _this.addClass("active");
-    }
+    _this.addClass("active");
     var _tags = [];
     $(".toggle-tag.active").each(function () {
       _tags.push($(this).data("tag"));
