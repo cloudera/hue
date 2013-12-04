@@ -49,13 +49,13 @@ class Command(NoArgsCommand):
     exception = None
 
     try:
-      user = install_sample_user()
-      self._install_tables(user, options['app_name'])
+      install_sample_user() # Documents will belong to this user but we run the install as the current user
+      self._install_tables(options['user'], options['app_name'])
     except Exception, ex:
       exception = ex
 
     try:
-      self._install_queries(user, options['app_name'])
+      self._install_queries(options['user'], options['app_name'])
     except Exception, ex:
       exception = ex
 

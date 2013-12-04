@@ -828,7 +828,7 @@ def install_examples(request):
   if request.method == 'POST':
     try:
       app_name = get_app_name(request)
-      beeswax.management.commands.beeswax_install_examples.Command().handle_noargs(app_name=app_name)
+      beeswax.management.commands.beeswax_install_examples.Command().handle_noargs(app_name=app_name, user=request.user)
       response['status'] = 0
     except Exception, err:
       LOG.exception(err)
