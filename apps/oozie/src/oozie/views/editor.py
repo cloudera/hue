@@ -360,7 +360,9 @@ def _submit_workflow(user, fs, jt, workflow, mapping):
 
 @check_job_access_permission()
 def schedule_workflow(request, workflow):
-  if Coordinator.objects.available().filter(workflow=workflow).exists():
+  data = Document.objects.available(Coordinator, request.user)
+  data = [coordinator for coordinator in data if coordinator.workflow == workflow]
+  if data:
     request.info(_('You already have some coordinators for this workflow. Submit one or create a new one.'))
     return list_coordinators(request, workflow_id=workflow.id)
   else:
