@@ -45,6 +45,20 @@ class ResultEncoder(json.JSONEncoder):
     return super(ResultEncoder, self).default(obj)
 
 
+def error_handler(view_fn):
+  def decorator(*args, **kwargs):
+    try:
+      return view_fn(*args, **kwargs)
+    except Http404, e:
+      raise e
+    except Exception, e:
+      response = {
+        'error': str(e)
+      }
+      return HttpResponse(json.dumps(response), mimetype="application/json", status=500)
+  return decorator
+
+
 def servers(request):
   servers = conf.get_server_choices()
   servers_dict = dict(servers)
@@ -55,21 +69,24 @@ def servers(request):
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
+@error_handler
 def databases(request, server):
   query_server = dbms.get_query_server_config(server)
 
   if not query_server:
     raise Http404
-  
+
   db = dbms.get(request.user, query_server)
 
   response = {
+    'status': 0,
     'databases': db.get_databases()
   }
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
+@error_handler
 def tables(request, server, database):
   query_server = dbms.get_query_server_config(server)
 
@@ -86,6 +103,7 @@ def tables(request, server, database):
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
+@error_handler
 def columns(request, server, database, table):
   query_server = dbms.get_query_server_config(server)
 
@@ -102,6 +120,7 @@ def columns(request, server, database, table):
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
+@error_handler
 def execute_query(request, design_id=None):
   response = {'status': -1, 'message': ''}
 
@@ -146,6 +165,7 @@ def execute_query(request, design_id=None):
   return HttpResponse(json.dumps(response, cls=ResultEncoder), mimetype="application/json")
 
 
+@error_handler
 def explain_query(request):
   response = {'status': -1, 'message': ''}
 
@@ -183,6 +203,7 @@ def explain_query(request):
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
+@error_handler
 def fetch_results(request, id, first_row=0):
   """
   Returns the results of the QueryHistory with the given id.
@@ -227,6 +248,7 @@ def fetch_results(request, id, first_row=0):
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
+@error_handler
 def save_query(request, design_id=None):
   response = {'status': -1, 'message': ''}
 
@@ -253,6 +275,7 @@ def save_query(request, design_id=None):
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
+@error_handler
 def fetch_saved_query(request, design_id):
   response = {'status': -1, 'message': ''}
 

@@ -140,6 +140,14 @@ function RdbmsViewModel() {
     $.totalStorage(key, value);
   };
 
+  var error_fn = function(jqXHR, status, errorThrown) {
+    try {
+      $(document).trigger('server.error', $.parseJSON(jqXHR.responseText));
+    } catch(e) {
+      $(document).trigger('server.unmanageable_error', jqXHR.responseText);
+    }
+  };
+
   self.explainQuery = function() {
     var data = ko.mapping.toJS(self.query);
     data.database = self.database();
@@ -160,7 +168,7 @@ function RdbmsViewModel() {
           self.query.errors.push(data.message);
         }
       },
-      error: $.noop,
+      error: error_fn,
       data: data
     };
     $.ajax(request);
@@ -176,7 +184,7 @@ function RdbmsViewModel() {
         success: function(data) {
           self.updateQuery(data.design);
         },
-        error: $.noop
+        error: error_fn
       };
       $.ajax(request);
     }
@@ -229,7 +237,7 @@ function RdbmsViewModel() {
           self.query.errors.push(data.message);
         }
       },
-      error: $.noop,
+      error: error_fn,
       data: data
     };
     $.ajax(request);
@@ -244,7 +252,7 @@ function RdbmsViewModel() {
         self.updateServers(data.servers);
         self.fetchDatabases();
       },
-      error: $.noop
+      error: error_fn
     };
     $.ajax(request);
   };
@@ -258,7 +266,7 @@ function RdbmsViewModel() {
         success: function(data) {
           self.updateDatabases(data.databases);
         },
-        error: $.noop
+        error: error_fn
       };
       $.ajax(request);
     }

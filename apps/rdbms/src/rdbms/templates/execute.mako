@@ -758,6 +758,14 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
   $(document).on('executed.query', resultsTable);
   $(document).on('explained.query', resultsTable);
 
+  // Server error handling.
+  $(document).on('server.error', function(e, data) {
+    $(document).trigger('error', "${_('Server error occured: ')}" + data.error);
+  });
+  $(document).on('server.unmanageable_error', function(e, responseText) {
+    $(document).trigger('error', "${_('Unmanageable server error occured: ')}" + responseText);
+  });
+
 </script>
 
 ${ commonfooter(messages) | n,unicode }
