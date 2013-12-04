@@ -190,7 +190,7 @@ class Submission(object):
     from beeswax.hive_site import get_metastore
     metastore = get_metastore()
 
-    if metastore and metastore.get('use_sasl'):
+    if metastore and metastore.get('use_sasl') and False: # Disabled for now
       self.properties.update({
          'is_kerberized_hive': True,
          'credential_type': 'hcat',

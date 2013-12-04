@@ -316,8 +316,14 @@ page. You can click on any stack frame to get a debugging console:
 Great! Now that we've added a single application, we're going to
 delve further into the back-end.
 
+
+Integrate external Web applications in any language
+===================================================
+Use the [create_proxy_app command](http://gethue.tumblr.com/post/66367939672/integrate-external-web-applications-in-any-language)
+
+
 A Look at Three Existing Apps
-===========================
+=============================
 
 ![Arch](arch_examples.png)
 

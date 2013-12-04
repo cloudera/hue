@@ -16,8 +16,8 @@ link:sdk/sdk.html[SDK Documentation] to get started.
 
 Release Notes
 -------------
-Note that prior to version 0.9, Hue was "Cloudera Desktop".
 
+* December 4, 2013 --- link:release-notes/release-notes-3.5.0.html[Version 3.5.0]
 * September 20, 2013 --- link:release-notes/release-notes-3.0.0.html[Version 3.0.0]
 * July 15, 2013 --- link:release-notes/release-notes-2.5.0.html[Version 2.5.0]
 * June 12, 2013 --- link:release-notes/release-notes-2.4.0.html[Version 2.4.0]
