@@ -222,8 +222,8 @@ ${ commonheader(None, "pig", user) | n,unicode }
                         <li><a href="#">DISTINCT %VAR%;</a></li>
                         <li><a href="#">FILTER %VAR% BY %COND%</a></li>
                         <li><a href="#">FLATTEN(%VAR%)</a></li>
-                        <li><a href="#">FOREACH %DATA% GENERATE %NEW_DATA%</a></li>
-                        <li><a href="#">FOREACH %DATA% {%NESTED_BLOCK%}</a></li>
+                        <li><a href="#">FOREACH %DATA% GENERATE %NEW_DATA%;</a></li>
+                        <li><a href="#">FOREACH %DATA% {%NESTED_BLOCK%};</a></li>
                         <li><a href="#">GROUP %VAR% BY %VAR%</a></li>
                         <li><a href="#">GROUP %VAR% ALL</a></li>
                         <li><a href="#">JOIN %VAR% BY </a></li>
@@ -929,7 +929,7 @@ ${ commonheader(None, "pig", user) | n,unicode }
         CodeMirror.isPath = false;
         CodeMirror.isTable = false;
         CodeMirror.isHCatHint = false;
-        CodeMirror.showHint(cm, CodeMirror.pigHint);
+        CodeMirror.showHint(codeMirror, CodeMirror.pigHint);
       }
     }
     codeMirror = CodeMirror(function (elt) {

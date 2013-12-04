@@ -39,7 +39,19 @@
 
     if (token.string.indexOf("'") == 0){
       CodeMirror.isPath = !CodeMirror.isTable;
-      token.string = token.string.substring(1, token.string.length);
+      if (CodeMirror.isTable) {
+        var line = editor.getLine(cur.line);
+        var USING_CLAUSE = "USING org.apache.hcatalog.pig.HCatLoader();";
+        if (token.string.indexOf(USING_CLAUSE) > -1) {
+          token.end = token.end - USING_CLAUSE.length;
+        }
+        token.string = token.string.substring(1, cur.ch - line.indexOf(token.string));
+        token.start = token.start + 1;
+        token.end = token.end - 1;
+      }
+      else {
+        token.string = token.string.substring(1, token.string.length);
+      }
     }
     if (token.string.indexOf("/") > -1){
       token.string = token.string.substring(token.string.lastIndexOf("/") + 1);
