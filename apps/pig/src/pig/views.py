@@ -15,12 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-try:
-  import json
-except ImportError:
-  import simplejson as json
+import json
 import logging
-
 
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
@@ -145,11 +141,11 @@ def copy(request):
     raise PopupException(_('POST request required.'))
 
   pig_script = PigScript.objects.get(id=request.POST.get('id'))
-  pig_script.doc.get.can_edit_or_exception(request.user)
+  pig_script.doc.get().can_edit_or_exception(request.user)
 
   existing_script_data = pig_script.dict
   
-  owner=request.user
+  owner = request.user
   name = existing_script_data["name"] + _(' (Copy)')
   script = existing_script_data["script"]
   parameters = existing_script_data["parameters"]
@@ -166,7 +162,7 @@ def copy(request):
   })  
   script_copy.save()
 
-  copy_doc = pig_script.doc.get(name=name, owner=owner).copy()
+  copy_doc = pig_script.doc.get().copy(name=name, owner=owner)
   script_copy.doc.add(copy_doc)   
 
   response = {
