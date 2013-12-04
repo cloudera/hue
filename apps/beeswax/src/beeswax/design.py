@@ -68,11 +68,12 @@ class HQLdesign(object):
     """Initialize the design from a valid form data."""
     if form is not None:
       assert isinstance(form, MultiForm)
-      self._data_dict = dict(
-          query = normalize_form_dict(form.query, HQLdesign._QUERY_ATTRS),
-          settings = normalize_formset_dict(form.settings, HQLdesign._SETTINGS_ATTRS),
-          file_resources = normalize_formset_dict(form.file_resources, HQLdesign._FILE_RES_ATTRS),
-          functions = normalize_formset_dict(form.functions, HQLdesign._FUNCTIONS_ATTRS))
+      self._data_dict = {
+          'query': normalize_form_dict(form.query, HQLdesign._QUERY_ATTRS),
+          'settings': normalize_formset_dict(form.settings, HQLdesign._SETTINGS_ATTRS),
+          'file_resources': normalize_formset_dict(form.file_resources, HQLdesign._FILE_RES_ATTRS),
+          'functions': normalize_formset_dict(form.functions, HQLdesign._FUNCTIONS_ATTRS)
+      }
       if query_type is not None:
         self._data_dict['query']['type'] = query_type
 
@@ -167,6 +168,12 @@ class HQLdesign(object):
   def statements(self):
     hql_query = strip_trailing_semicolon(self.hql_query)
     return [strip_trailing_semicolon(statement.strip()) for statement in split_statements(hql_query)]
+
+  def __eq__(self, other):
+    return (isinstance(other, self.__class__) and self.__dict__ == other.__dict__)
+
+  def __ne__(self, other):
+    return not self.__eq__(other)
 
 
 def split_statements(hql):

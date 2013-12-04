@@ -233,7 +233,11 @@ class SavedQuery(models.Model):
     ordering = ['-mtime']
 
   def get_design(self):
-    return HQLdesign.loads(self.data)
+    try:
+      return HQLdesign.loads(self.data)
+    except ValueError:
+      # data is empty
+      pass
 
   def clone(self):
     """clone() -> A new SavedQuery with a deep copy of the same data"""

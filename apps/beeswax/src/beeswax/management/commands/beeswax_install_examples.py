@@ -48,14 +48,15 @@ class Command(NoArgsCommand):
   def handle_noargs(self, **options):
     exception = None
 
+    # Documents will belong to this user but we run the install as the current user
     try:
-      install_sample_user() # Documents will belong to this user but we run the install as the current user
+      sample_user = install_sample_user()
       self._install_tables(options['user'], options['app_name'])
     except Exception, ex:
       exception = ex
 
     try:
-      self._install_queries(options['user'], options['app_name'])
+      self._install_queries(sample_user, options['app_name'])
     except Exception, ex:
       exception = ex
 

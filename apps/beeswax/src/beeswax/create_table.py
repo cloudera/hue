@@ -459,7 +459,7 @@ def load_after_create(request, database):
   """
   tablename = request.REQUEST.get('table')
   path = request.REQUEST.get('path')
-  is_remove_header = request.REQUEST.get('removeHeader').lower() == 'on'
+  is_remove_header = request.REQUEST.get('removeHeader').lower() == 'on' and not path.endswith('gz')
 
   if not tablename or not path:
     msg = _('Internal error: Missing needed parameter to load data into table.')

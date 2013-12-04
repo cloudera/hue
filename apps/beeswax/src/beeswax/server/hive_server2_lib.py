@@ -436,7 +436,7 @@ class HiveServerClient:
     req = TGetTablesReq(schemaName=database, tableName=table_names)
     res = self.call(self._client.GetTables, req)
 
-    results, schema = self.fetch_result(res.operationHandle)
+    results, schema = self.fetch_result(res.operationHandle, max_rows=5000)
     self.close_operation(res.operationHandle)
 
     return HiveServerTRowSet(results.results, schema.schema).cols(('TABLE_NAME',))

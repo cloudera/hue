@@ -86,6 +86,7 @@ def save_design(request, form, type_, design, explicit_save):
   else:
     raise ValueError(_('Invalid design type %(type)s') % {'type': type_})
 
+  # design here means SavedQuery
   old_design = design
   design_obj = design_cls(form, query_type=type_)
   new_data = design_obj.dumps()
@@ -96,7 +97,7 @@ def save_design(request, form, type_, design, explicit_save):
     design.name = form.saveform.cleaned_data['name']
     design.desc = form.saveform.cleaned_data['desc']
     design.is_auto = False
-  elif new_data != old_design.data:
+  elif design_obj != old_design.get_design():
     # Auto save iff the data is different
     if old_design.id is not None:
       # Clone iff the parent design isn't a new unsaved model
@@ -222,10 +223,6 @@ def list_designs(request):
                   Accepts the form "-date", which sort in descending order.
                   Default to "-date".
     text=<frag> - Search for fragment "frag" in names and descriptions.
-
-  Depending on Beeswax configuration parameter ``SHOW_ONLY_PERSONAL_SAVED_QUERIES``,
-  only the personal queries of the user will be returned (even if another user is
-  specified in ``filterargs``).
   """
   DEFAULT_PAGE_SIZE = 20
   app_name= get_app_name(request)
@@ -322,7 +319,7 @@ def list_query_history(request):
                             "date", "state", "name" (design name), and "type" (design type)
                           Accepts the form "-date", which sort in descending order.
                           Default to "-date".
-    auto_query=<bool>   - Show auto generated actions (drop table, read data, etc). Default False
+    auto_query=<bool>   - Show auto generated actions (drop table, read data, etc). Default True
   """
   DEFAULT_PAGE_SIZE = 30
   prefix = 'q-'
@@ -386,6 +383,7 @@ def execute_query(request, design_id=None):
   databases = []
   query_server = get_query_server_config(app_name)
   db = dbms.get(request.user, query_server)
+
   try:
     databases = get_db_choices(request)
   except Exception, ex:
@@ -1153,7 +1151,6 @@ def _list_designs(user, querydict, page_size, prefix="", is_trashed=False):
   )
 
   # Trash and security
-  # Discarding is_auto for now
   if is_trashed:
     db_queryset = Document.objects.trashed_docs(SavedQuery, user)
   else:
@@ -1193,7 +1190,7 @@ def _list_designs(user, querydict, page_size, prefix="", is_trashed=False):
     sort_dir, sort_attr = DEFAULT_SORT
   db_queryset = db_queryset.order_by(sort_dir + SORT_ATTR_TRANSLATION[sort_attr])
 
-  designs = [job.content_object for job in db_queryset.all() if job.content_object]
+  designs = [job.content_object for job in db_queryset.all() if job.content_object and job.content_object.is_auto == False]
 
   pagenum = int(querydict.get(prefix + 'page', 1))
   paginator = Paginator(designs, page_size)
@@ -1307,8 +1304,8 @@ def _list_query_history(user, querydict, page_size, prefix=""):
   #
   # Queries without designs are the ones we submitted on behalf of the user,
   # (e.g. view table data). Exclude those when returning query history.
-  if not querydict.get(prefix + 'auto_query', False):
-    db_queryset = db_queryset.filter(design__isnull=False)
+  if querydict.get(prefix + 'auto_query', 'on') != 'on':
+    db_queryset = db_queryset.exclude(design__isnull=False, design__is_auto=True)
 
   user_filter = querydict.get(prefix + 'user', user.username)
   if user_filter != ':all':

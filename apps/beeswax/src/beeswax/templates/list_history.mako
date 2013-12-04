@@ -76,22 +76,22 @@ ${ layout.menubar(section='history') }
                         % endif
                     % endif
 
-                     % if filter_params.get(prefix + 'auto_query', None):
-                      <%
-                        my_querydict = filter_params.copy()
-                        my_querydict[prefix + 'auto_query'] = ''
-                        if filter:
-                          my_querydict[prefix + 'search'] = filter
-                      %>
-                      <li><a href="?${my_querydict.urlencode()}">${_('Show user queries')}</a></li>
-                    % else:
+                     % if filter_params.get(prefix + 'auto_query', 'on') == 'off':
                       <%
                         my_querydict = filter_params.copy()
                         my_querydict[prefix + 'auto_query'] = 'on'
                         if filter:
                           my_querydict[prefix + 'search'] = filter
                       %>
-                      <li><a href="?${my_querydict.urlencode()}">${_('Show auto actions')}</a></li>
+                      <li><a href="?${my_querydict.urlencode()}">${_('Show auto queries')}</a></li>
+                    % else:
+                      <%
+                        my_querydict = filter_params.copy()
+                        my_querydict[prefix + 'auto_query'] = 'off'
+                        if filter:
+                          my_querydict[prefix + 'search'] = filter
+                      %>
+                      <li><a href="?${my_querydict.urlencode()}">${_('Show only saved queries')}</a></li>
                     % endif
                 </ul>
             </div>
