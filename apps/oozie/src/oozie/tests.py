@@ -205,8 +205,10 @@ class OozieMockBase(object):
     oozie_api._api_cache = None
 
     History.objects.all().delete()
-    Coordinator.objects.all().delete()
-    Bundle.objects.all().delete()
+    for coordinator in Coordinator.objects.all():
+      coordinator.delete(skip_trash=True)
+    for bundle in Bundle.objects.all():
+      bundle.delete(skip_trash=True)
 
 
   def setup_simple_workflow(self):
@@ -3124,7 +3126,7 @@ class TestDashboard(OozieMockBase):
 
 
   def test_bundles_permissions(self):
-    response = self.c.get(reverse('oozie:list_oozie_bundles')+"?format=json")
+    response = self.c.get(reverse('oozie:list_oozie_bundles') + "?format=json")
     assert_true('MyBundle1' in response.content, response.content)
 
     # Login as someone else

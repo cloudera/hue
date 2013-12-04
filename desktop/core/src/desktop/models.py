@@ -321,6 +321,14 @@ class DocumentManager(models.Manager):
         doc.tags.remove(default_tag)
     except Exception, e:
       LOG.warn(force_unicode(e))
+      
+    # Delete documents with no object
+    try:
+      for doc in Document.objects.all():
+        if doc.content_type is None:
+          doc.delete()
+    except Exception, e:
+      LOG.warn(force_unicode(e))
 
 
 class Document(models.Model):
@@ -412,8 +420,12 @@ class Document(models.Model):
       copy_doc.owner = owner
     copy_doc.save()
 
+    tags = filter(lambda tag: tag.tag != DocumentTag.EXAMPLE, tags)
+    if not tags:
+      default_tag = DocumentTag.objects.get_default_tag(copy_doc.owner)
+      tags = [default_tag]
     copy_doc.tags.add(*tags)
-
+    
     return copy_doc
 
   @property

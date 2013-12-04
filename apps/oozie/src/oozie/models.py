@@ -296,17 +296,26 @@ class Workflow(Job):
   def clone(self, fs, new_owner=None):
     source_deployment_dir = self.deployment_dir # Needed
     nodes = self.node_set.all()
-    copy_doc = self.doc.get().copy()
     links = Link.objects.filter(parent__workflow=self)
+
+    name = self.name + '-copy'
+    if new_owner is not None:
+      owner = new_owner
+    else:
+      owner = self.owner
+
+    copy_doc = self.doc.get().copy(name=name, owner=owner)
 
     copy = self
     copy.pk = None
     copy.id = None
-    copy.name += '-copy'
+    copy.name = name
     copy.deployment_dir = ''
-    if new_owner is not None:
-      copy.owner = new_owner
+    copy.owner = owner
     copy.save()
+
+    copy.doc.all().delete()
+    copy.doc.add(copy_doc)
 
     old_nodes_mapping = {}
 
@@ -329,11 +338,6 @@ class Workflow(Job):
     copy.start = old_nodes_mapping[self.start.id]
     copy.end = old_nodes_mapping[self.end.id]
     copy.save()
-
-    copy_doc.name = copy.name
-    copy_doc.owner = copy.owner
-    copy_doc.save()
-    copy.doc.add(copy_doc)
 
     try:
       if copy.is_shared:
@@ -487,7 +491,8 @@ class Workflow(Job):
       except Exception, e:
         LOG.warn('Workflow %s could not be converted to a graph: %s' % (oozie_workflow.id, e))
     finally:
-      workflow.delete(skip_trash=True)
+      if workflow.pk is not None:
+        workflow.delete(skip_trash=True)
     return None, []
 
   def to_xml(self, mapping=None):
@@ -513,7 +518,7 @@ class Workflow(Job):
             'jar_path': node.jar_path
           }
         }
-    
+
     xml = self.to_xml(mapping=mapping)
 
     zfile = zipfile.ZipFile(fp, 'w')
@@ -1318,19 +1323,28 @@ class Coordinator(Job):
     return re.sub(re.compile('\s*\n+', re.MULTILINE), '\n', django_mako.render_to_string(tmpl, {'coord': self, 'mapping': mapping})).encode('utf-8', 'xmlcharrefreplace')
 
   def clone(self, new_owner=None):
-    copy_doc = self.doc.get()
     datasets = Dataset.objects.filter(coordinator=self)
     data_inputs = DataInput.objects.filter(coordinator=self)
     data_outputs = DataOutput.objects.filter(coordinator=self)
 
+    name = self.name + '-copy'
+    if new_owner is not None:
+      owner = new_owner
+    else:
+      owner = self.owner
+
+    copy_doc = self.doc.get().copy(name=name, owner=owner)
+
     copy = self
     copy.pk = None
     copy.id = None
-    copy.name += '-copy'
+    copy.name = name
     copy.deployment_dir = ''
-    if new_owner is not None:
-      copy.owner = new_owner
+    copy.owner = owner
     copy.save()
+
+    copy.doc.all().delete()
+    copy.doc.add(copy_doc)
 
     old_dataset_mapping = {}
 
@@ -1355,12 +1369,6 @@ class Coordinator(Job):
       data_output.coordinator = copy
       data_output.dataset = old_dataset_mapping[data_output.dataset.id]
       data_output.save()
-
-    copy_doc.pk = None
-    copy_doc.id = None
-    copy_doc.owner = copy.owner
-    copy_doc.save()
-    copy.doc.add(copy_doc)
 
     return copy
 
@@ -1622,28 +1630,31 @@ class Bundle(Job):
 
   def clone(self, new_owner=None):
     bundleds = BundledCoordinator.objects.filter(bundle=self)
-    copy_doc = self.doc.get()
+
+    name = self.name + '-copy'
+    if new_owner is not None:
+      owner = new_owner
+    else:
+      owner = self.owner
+
+    copy_doc = self.doc.get().copy(name=name, owner=owner)
 
     copy = self
     copy.pk = None
     copy.id = None
-    copy.name += '-copy'
+    copy.name = name
     copy.deployment_dir = ''
-    if new_owner is not None:
-      copy.owner = new_owner
+    copy.owner = owner
     copy.save()
+
+    copy.doc.all().delete()
+    copy.doc.add(copy_doc)
 
     for bundled in bundleds:
       bundled.pk = None
       bundled.id = None
       bundled.bundle = copy
       bundled.save()
-
-    copy_doc.pk = None
-    copy_doc.id = None
-    copy_doc.owner = copy.owner
-    copy_doc.save()
-    copy.doc.add(copy_doc)
 
     return copy
 
@@ -1682,7 +1693,7 @@ class Bundle(Job):
         'deployment_dir': self.deployment_dir
       }
     }
-    
+
     xml = self.to_xml(mapping=mapping)
 
     zfile = zipfile.ZipFile(fp, 'w')

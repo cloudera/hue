@@ -217,8 +217,9 @@ ${ layout.menubar(section='bundles') }
       }
       var can_delete = $(".hueCheckbox[checked='checked'][data-delete-id]");
       var can_delete_box_count = $(".hueCheckbox[data-delete-id]").length;
-      if (can_delete.length >= 1 && can_delete.length == can_delete_box_count) {
+      if (can_delete.length >= 1 || can_delete.length == can_delete_box_count) {
         $("#trash-btn").removeAttr("disabled");
+        $("#trash-btn-caret").removeAttr("disabled");
       }
     }
 
