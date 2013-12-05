@@ -48,7 +48,7 @@ MYSQL = 'mysql'
 POSTGRESQL = 'postgresql'
 SQLITE = 'sqlite'
 ORACLE = 'oracle'
-QUERY_TYPES = (HQL, IMPALA, RDBMS) = range(3)
+QUERY_TYPES = (HQL, IMPALA, RDBMS, SPARK) = range(4)
 
 
 class QueryHistory(models.Model):
@@ -212,7 +212,7 @@ class SavedQuery(models.Model):
   DEFAULT_NEW_DESIGN_NAME = _('My saved query')
   AUTO_DESIGN_SUFFIX = _(' (new)')
   TYPES = QUERY_TYPES
-  TYPES_MAPPING = {'beeswax': HQL, 'hql': HQL, 'impala': IMPALA, 'rdbms': RDBMS}
+  TYPES_MAPPING = {'beeswax': HQL, 'hql': HQL, 'impala': IMPALA, 'rdbms': RDBMS, 'spark': SPARK}
 
   type = models.IntegerField(null=False)
   owner = models.ForeignKey(User, db_index=True)
