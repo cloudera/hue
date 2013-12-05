@@ -170,18 +170,42 @@ var MAPPING_OPTIONS = {
   },
   deletes: {
     create: function(options) {
-      return map_params(options, function() {});
+      var parent = options.parent;
+      var subscribe = function(mapping) {
+        mapping.name.subscribe(function(value) {
+          parent.deletes.valueHasMutated();
+        });
+      };
+      return map_params(options, subscribe);
     },
     update: function(options) {
-      return map_params(options, function() {});
+      var parent = options.parent;
+      var subscribe = function(mapping) {
+        mapping.name.subscribe(function(value) {
+          parent.deletes.valueHasMutated();
+        });
+      };
+      return map_params(options, subscribe);
     },
   },
   mkdirs: {
     create: function(options) {
-      return map_params(options, function() {});
+      var parent = options.parent;
+      var subscribe = function(mapping) {
+        mapping.name.subscribe(function(value) {
+          parent.mkdirs.valueHasMutated();
+        });
+      };
+      return map_params(options, subscribe);
     },
     update: function(options) {
-      return map_params(options, function() {});
+      var parent = options.parent;
+      var subscribe = function(mapping) {
+        mapping.name.subscribe(function(value) {
+          parent.mkdirs.valueHasMutated();
+        });
+      };
+      return map_params(options, subscribe);
     },
   },
   moves: {
@@ -248,10 +272,22 @@ var MAPPING_OPTIONS = {
    },
    touchzs: {
      create: function(options) {
-       return map_params(options, function() {});
+       var parent = options.parent;
+        var subscribe = function(mapping) {
+          mapping.name.subscribe(function(value) {
+            parent.touchzs.valueHasMutated();
+          });
+        };
+        return map_params(options, subscribe);
      },
      update: function(options) {
-       return map_params(options, function() {});
+       var parent = options.parent;
+        var subscribe = function(mapping) {
+          mapping.name.subscribe(function(value) {
+            parent.touchzs.valueHasMutated();
+          });
+        };
+        return map_params(options, subscribe);
      }
    }
 };
