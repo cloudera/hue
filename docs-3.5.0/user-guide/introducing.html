@@ -1,0 +1,48 @@
+<link rel="stylesheet" href="docbook.css" type="text/css" media="screen" title="no title" charset="utf-8"></link>
+
+<h1>Introducing Hue</h1>
+<p>Hue is a set of web applications that enable you to interact with a Hadoop
+cluster. Hue applications let you browse HDFS and jobs, manage a Hive metastore,
+run Hive, Cloudera Impala queries and Pig scripts, browse HBase,
+export data with Sqoop, submit MapReduce programs, build custom search engines
+with Solr, and schedule repetitive workflows with Oozie.</p>
+<h2>Hue Architecture</h2>
+<p>Hue applications run in a Web browser and require no client
+installation.</p>
+<p>The following figure illustrates how Hue works. Hue Server is a
+"container" web application that sits in between CDH and the browser. It
+hosts all the Hue web applications and communicates with CDH components.</p>
+<p><img alt="image" src="images/huearch.jpg" /></p>
+<h2>Starting Applications</h2>
+<p>To open a Hue application, click the appropriate icon in the navigation
+bar at the top of the Hue web browser window. To open a second application concurrently (or a second instance of the
+same application), right-click the icon and select <strong>Open link in new
+tab</strong>.</p>
+<h2>Displaying Help for the Hue Applications</h2>
+<p>To display the help text for a Hue application, click the <strong>Help</strong> (
+<img alt="image" src="images/icon_help_24.png" /> ) tab in the Hue navigation bar, then
+click the appropriate link in the Help navigation bar at the top of the
+Help window.</p>
+<h2>Logging In and Out</h2>
+<p>To log out of Hue, click <strong>Sign Out</strong> from the pull-down list under the
+logged-in user name (at the right of the Hue navigation bar).</p>
+<h2>Notice of Misconfiguration</h2>
+<p>If Hue detects a misconfiguration, an indicator
+<img alt="image" src="images/misconfiguration.png" /> appears in the navigation bar at
+the top of the page. Clicking this indicator takes you to the <a href="../about.html">Check
+Configuration</a> screen
+which will indicate the potential misconfiguration(s) with hints about
+fixing them.</p>
+<h2>Changing Your Password</h2>
+<p>You can go directly to your own information by selecting username &gt;
+Profile at the right of the Hue navigation bar.</p>
+<p>If authentication is managed by Hue (that is, authentication is not
+managed via some external mechanism), and you are a superuser, you can
+use the <a href="../useradmin.html">User Admin</a> application to
+change password and personal details.</p>
+<h2>Seeking Help, Reporting Bugs, and Providing Feedback</h2>
+<p>The Hue team strongly values your feedback. The best way to contact us
+is to send email to
+<a href="mailto:hue-user@cloudera.org">hue-user@cloudera.org</a>.</p>
+<p>If you're experiencing transient errors (typically an error message
+saying a service is down), contact your system administrator first.</p>
