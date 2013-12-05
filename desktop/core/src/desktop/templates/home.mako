@@ -353,27 +353,40 @@ $(document).ready(function () {
     populateTable($(".toggle-tag.active").data("tag"));
   });
 
-  // update tag counters
-  var _tagCounters = {};
-  $(JSON_DOCS).each(function (cnt, doc) {
-    if (doc.tags != null) {
-      for (var i = 0; i < doc.tags.length; i++) {
-        if (doc.tags[i].name == "trash" || doc.tags[i].name == "history" || (!isInTags(doc, "trash") && !isInTags(doc, "history"))) {
-          _tagCounters[doc.tags[i].name] = (_tagCounters[doc.tags[i].name] == null) ? 1 : _tagCounters[doc.tags[i].name] + 1;
+  function updateTagCounters(){
+    // update tag counters
+    var _tagCounters = {};
+    $(JSON_DOCS).each(function (cnt, doc) {
+      if (doc.tags != null) {
+        for (var i = 0; i < doc.tags.length; i++) {
+          if (doc.tags[i].name == "trash" || doc.tags[i].name == "history" || (!isInTags(doc, "trash") && !isInTags(doc, "history"))) {
+            _tagCounters[doc.tags[i].name] = (_tagCounters[doc.tags[i].name] == null) ? 1 : _tagCounters[doc.tags[i].name] + 1;
+          }
         }
       }
-    }
-  });
-  $("#trashCounter").text(_tagCounters["trash"]);
-  $("#historyCounter").text(_tagCounters["history"]);
-  $("li[data-tag]").each(function () {
-    if (_tagCounters[$(this).data("tag")] != null) {
-      $(this).find(".badge").text(_tagCounters[$(this).data("tag")]);
-    }
-  });
+    });
+    $("#trashCounter").text(_tagCounters["trash"]);
+    $("#historyCounter").text(_tagCounters["history"]);
+    $("li[data-tag]").each(function () {
+      if (_tagCounters[$(this).data("tag")] != null) {
+        $(this).find(".badge").text(_tagCounters[$(this).data("tag")]);
+      }
+    });
+    _tagCounters = null;
+  }
+
+  updateTagCounters();
 
   if ($.totalStorage("hueHomeTags") == null){
-    $("li[data-tag='default']").click(); // for new users show default tag
+    if ($("li[data-tag='default']").length > 0){
+      $("li[data-tag='default']").click(); // for new users show default tag
+    }
+    else if ($("li[data-tag='example']").length > 0){
+      $("li[data-tag='example']").click(); // for new users show example tag if default is not available
+    }
+    else {
+      $(".viewHistory").click();
+    }
   }
   else {
     if ($.totalStorage("hueHomeTags") == "history") {
@@ -394,20 +407,23 @@ $(document).ready(function () {
   });
 
   function renderTags() {
+    var _selected = "";
+    if ($(".toggle-tag.active").length > 0){
+      _selected = $(".toggle-tag.active").data("tag");
+    }
     $(".toggle-tag").remove();
     for (var i = JSON_TAGS.length - 1; i >= 0; i--) {
-      if (!JSON_TAGS[i].isTrash && !JSON_TAGS[i].isHistory && !JSON_TAGS[i].isExample) {
+      if (!JSON_TAGS[i].isTrash && !JSON_TAGS[i].isHistory) {
         var _t = $("<li>").addClass("toggle-tag");
         _t.attr("data-tag", JSON_TAGS[i].name);
         _t.html('<a href="javascript:void(0)">' + JSON_TAGS[i].name + '<span class="tag-counter badge pull-right">0</span></a>');
         _t.insertAfter(".tag-header");
       }
     }
-    $("li[data-tag]").each(function () {
-      if (_tagCounters[$(this).data("tag")] != null) {
-        $(this).find(".badge").text(_tagCounters[$(this).data("tag")]);
-      }
-    });
+    if (_selected != ""){
+      $(".toggle-tag[data-tag='"+_selected+"']").click();
+    }
+    updateTagCounters();
   }
 
   function renderTagsModal() {
@@ -533,7 +549,8 @@ $(document).ready(function () {
             }
             documentsTable.fnUpdate('<div class="documentTags" data-document-id="' + _doc.id + '">' + _tags + '</div>', node, 3, false);
             updateDoc(_doc);
-            $("#saveDocumentTags").button("loading");
+            $("#saveDocumentTags").button("reset");
+            renderTags();
           }
         });
       }
