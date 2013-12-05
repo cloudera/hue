@@ -730,7 +730,7 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
   }
 
   function resultsTable() {
-    if (dataTable) {
+    if (!dataTable) {
       dataTable = $(".resultTable").dataTable({
         "bPaginate": false,
         "bLengthChange": false,
