@@ -350,11 +350,7 @@ $(document).ready(function () {
     _this.siblings().removeClass("active");
     _this.blur();
     _this.addClass("active");
-    var _tags = [];
-    $(".toggle-tag.active").each(function () {
-      _tags.push($(this).data("tag"));
-    });
-    populateTable(_tags.join(","));
+    populateTable($(".toggle-tag.active").data("tag"));
   });
 
   // update tag counters
@@ -362,11 +358,8 @@ $(document).ready(function () {
   $(JSON_DOCS).each(function (cnt, doc) {
     if (doc.tags != null) {
       for (var i = 0; i < doc.tags.length; i++) {
-        if (_tagCounters[doc.tags[i].name] == null) {
-          _tagCounters[doc.tags[i].name] = 1;
-        }
-        else {
-          _tagCounters[doc.tags[i].name]++;
+        if (doc.tags[i].name == "trash" || doc.tags[i].name == "history" || (!isInTags(doc, "trash") && !isInTags(doc, "history"))) {
+          _tagCounters[doc.tags[i].name] = (_tagCounters[doc.tags[i].name] == null) ? 1 : _tagCounters[doc.tags[i].name] + 1;
         }
       }
     }
@@ -383,19 +376,14 @@ $(document).ready(function () {
     $("li[data-tag='default']").click(); // for new users show default tag
   }
   else {
-    if ($.totalStorage("hueHomeTags") != "") {
-      if ($.totalStorage("hueHomeTags") == "history") {
-        $(".viewHistory").click();
-      }
-      else if ($.totalStorage("hueHomeTags") == "trash") {
-        $(".view-trash").click();
-      }
-      else {
-        $("li[data-tag='" + $.totalStorage("hueHomeTags") + "']").click();
-      }
+    if ($.totalStorage("hueHomeTags") == "history") {
+      $(".viewHistory").click();
+    }
+    else if ($.totalStorage("hueHomeTags") == "trash") {
+      $(".view-trash").click();
     }
     else {
-      populateTable();
+      $("li[data-tag='" + $.totalStorage("hueHomeTags") + "']").click();
     }
   }
 
@@ -716,31 +704,18 @@ function isInTags(doc, tag) {
   return _inTags;
 }
 
-function populateTable(tags) {
-  $.totalStorage("hueHomeTags", tags);
+function populateTable(tag) {
+  if (tag == null || tag == "") {
+    tag = "default"; //force default tag in case of empty
+  }
+  $.totalStorage("hueHomeTags", tag);
   documentsTable.fnClearTable();
   documentsTable.fnDraw();
-  if (tags == null || tags == "") {
-    $(JSON_DOCS).each(function (cnt, doc) {
-      if (!isInTags(doc, "trash") && !isInTags(doc, "history")) {
-        addRow(doc);
-      }
-    });
-  }
-  else {
-    var _tags = tags.split(",");
-    $(JSON_DOCS).each(function (cnt, doc) {
-      var _add = false;
-      $(_tags).each(function (cnt, tag) {
-        if (isInTags(doc, tag)) {
-          _add = true;
-        }
-      });
-      if (_add) {
-        addRow(doc);
-      }
-    });
-  }
+  $(JSON_DOCS).each(function (cnt, doc) {
+    if (((tag == ("trash") || tag == "history") || (tag != "trash" && tag != "history" && !isInTags(doc, "trash") && !isInTags(doc, "history"))) && isInTags(doc, tag)) {
+      addRow(doc);
+    }
+  });
   documentsTable.fnDraw();
   $("a[rel='tooltip']").tooltip();
 }
