@@ -13,9 +13,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 DJANGO_APPS = ['spark']
 NICE_NAME = 'Spark Editor'
-MENU_INDEX = 12
+MENU_INDEX = 11
 ICON = '/spark/static/art/icon_spark_24.png'
 
 REQUIRES_HADOOP = False

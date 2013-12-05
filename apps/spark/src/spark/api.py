@@ -15,263 +15,292 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import datetime
 import json
 import logging
-import re
-import time
 
-from django.core.urlresolvers import reverse
-from django.utils.html import escape
+from django.http import HttpResponse, Http404
 from django.utils.translation import ugettext as _
 
-from spark.conf import SPARK_HOME, SPARK_MASTER
-from desktop.lib.view_util import format_duration_in_millis
-from filebrowser.views import location_to_url
-from jobbrowser.views import job_single_logs
-from liboozie.oozie_api import get_oozie
-from oozie.models import Workflow, Shell
-from oozie.views.editor import _submit_workflow
+from desktop.context_processors import get_app_name
+from desktop.lib.exceptions import StructuredException
+
+from beeswax import models as beeswax_models
+from beeswax.forms import SaveForm
+from beeswax.views import authorized_get_history, safe_get_design
+
+from spark import conf
+from spark.design import SparkDesign
+from spark.views import save_design
+from spark.job_server_api import get_api
+from spark.forms import SparkForm, UploadApp
+import urllib
+
 
 LOG = logging.getLogger(__name__)
 
 
-def get(fs, jt, user):
-  return OozieSparkApi(fs, jt, user)
+class ResultEncoder(json.JSONEncoder):
+  def default(self, obj):
+    if isinstance(obj, datetime.datetime):
+      return obj.strftime('%Y-%m-%d %H:%M:%S %Z')
+    return super(ResultEncoder, self).default(obj)
 
 
-class OozieSparkApi:
-  """
-  Oozie submission.
-  """
-  WORKFLOW_NAME = 'spark-app-hue-script'
-  RE_LOG_END = re.compile('(<<< Invocation of Shell command completed <<<|<<< Invocation of Main class completed <<<)')
-  RE_LOG_START_RUNNING = re.compile('>>> Invoking Shell command line now >>(.+?)(Exit code of the Shell|<<< Invocation of Shell command completed <<<|<<< Invocation of Main class completed)', re.M | re.DOTALL)
-  RE_LOG_START_FINISHED = re.compile('(>>> Invoking Shell command line now >>)', re.M | re.DOTALL)
-  MAX_DASHBOARD_JOBS = 100
-
-  def __init__(self, fs, jt, user):
-    self.fs = fs
-    self.jt = jt
-    self.user = user
-
-  def submit(self, spark_script, params):
-    mapping = {
-      'oozie.use.system.libpath': 'false',
-    }
-
-    workflow = None
-
+def error_handler(view_fn):
+  def decorator(*args, **kwargs):
     try:
-      workflow = self._create_workflow(spark_script, params)
-      oozie_wf = _submit_workflow(self.user, self.fs, self.jt, workflow, mapping)
-    finally:
-      if workflow:
-        workflow.delete()
-
-    return oozie_wf
-
-  def _create_workflow(self, spark_script, params):
-    workflow = Workflow.objects.new_workflow(self.user)
-    workflow.name = OozieSparkApi.WORKFLOW_NAME
-    workflow.is_history = True
-    workflow.save()
-    Workflow.objects.initialize(workflow, self.fs)
-
-    spark_script_path = workflow.deployment_dir + '/spark.script'
-    spark_launcher_path = workflow.deployment_dir + '/spark.sh'
-    self.fs.do_as_user(self.user.username, self.fs.create, spark_script_path, data=spark_script.dict['script'])
-    self.fs.do_as_user(self.user.username, self.fs.create, spark_launcher_path, data="""
-#!/usr/bin/env bash
-
-WORKSPACE=`pwd`
-cd %(spark_home)s
-%(spark_master)s %(spark_shell)s $WORKSPACE/spark.script
-    """ % {
-        'spark_home': SPARK_HOME.get(),
-        'spark_master': 'MASTER=%s' % SPARK_MASTER.get() if SPARK_MASTER.get() != '' else '',
-        'spark_shell': 'pyspark' if spark_script.dict['language'] == 'python' else 'spark-shell <'
-    })
-
-    files = ['spark.script', 'spark.sh']
-    archives = []
-
-    popup_params = json.loads(params)
-    popup_params_names = [param['name'] for param in popup_params]
-    spark_params = self._build_parameters(popup_params)
-    script_params = [param for param in spark_script.dict['parameters'] if param['name'] not in popup_params_names]
-
-    spark_params += self._build_parameters(script_params)
-
-    job_properties = [{"name": prop['name'], "value": prop['value']} for prop in spark_script.dict['hadoopProperties']]
-
-    for resource in spark_script.dict['resources']:
-      if resource['type'] == 'file':
-        files.append(resource['value'])
-      if resource['type'] == 'archive':
-        archives.append({"dummy": "", "name": resource['value']})
-
-    action = Shell.objects.create(
-        name='spark',
-        command='spark.sh',
-        workflow=workflow,
-        node_type='shell',
-        params=json.dumps(spark_params),
-        files=json.dumps(files),
-        archives=json.dumps(archives),
-        job_properties=json.dumps(job_properties),
-    )
-
-    action.add_node(workflow.end)
-
-    start_link = workflow.start.get_link()
-    start_link.child = action
-    start_link.save()
-
-    return workflow
-
-  def _build_parameters(self, params):
-    spark_params = []
-
-    return spark_params
-
-  def stop(self, job_id):
-    return get_oozie(self.user).job_control(job_id, 'kill')
-
-  def get_jobs(self):
-    kwargs = {'cnt': OozieSparkApi.MAX_DASHBOARD_JOBS,}
-    kwargs['user'] = self.user.username
-    kwargs['name'] = OozieSparkApi.WORKFLOW_NAME
-
-    return get_oozie(self.user).get_workflows(**kwargs).jobs
-
-  def get_log(self, request, oozie_workflow):
-    logs = {}
-
-    for action in oozie_workflow.get_working_actions():
-      try:
-        if action.externalId:
-          data = job_single_logs(request, **{'job': action.externalId})
-          if data:
-            matched_logs = self._match_logs(data)
-            logs[action.name] = self._make_links(matched_logs)
-      except Exception, e:
-        LOG.error('An error happen while watching the demo running: %(error)s' % {'error': e})
-
-    workflow_actions = []
-
-    # Only one Shell action
-    for action in oozie_workflow.get_working_actions():
-      progress = get_progress(oozie_workflow, logs.get(action.name, ''))
-      appendable = {
-        'name': action.name,
-        'status': action.status,
-        'logs': logs.get(action.name, ''),
-        'progress': progress,
-        'progressPercent': '%d%%' % progress,
-        'absoluteUrl': oozie_workflow.get_absolute_url(),
+      return view_fn(*args, **kwargs)
+    except Http404, e:
+      raise e
+    except Exception, e:
+      response = {
+        'error': str(e)
       }
-      workflow_actions.append(appendable)
+      return HttpResponse(json.dumps(response), mimetype="application/json", status=500)
+  return decorator
 
-    return logs, workflow_actions
 
-  def _match_logs(self, data):
-    """Difficult to match multi lines of text"""
-    logs = data['logs'][1]
+def jars(request):
+  api = get_api(request.user)
+  response = {
+    'jars': api.jars()
+  }
 
-    if OozieSparkApi.RE_LOG_END.search(logs):
-      return re.search(OozieSparkApi.RE_LOG_START_RUNNING, logs).group(1).strip()
+  return HttpResponse(json.dumps(response), mimetype="application/json")
+
+
+def contexts(request):
+  api = get_api(request.user)
+  response = {
+    'contexts': api.contexts()
+  }
+
+  return HttpResponse(json.dumps(response), mimetype="application/json")
+
+
+def create_context(request):
+  if request.method != 'POST':
+    raise StructuredException(code="INVALID_REQUEST_ERROR", message=_('Requires a POST'))
+  response = {}
+
+  name = request.POST.get('name', '')
+  memPerNode = request.POST.get('memPerNode', '512m')
+  numCores = request.POST.get('numCores', '1')
+
+  api = get_api(request.user)
+  try:
+    response = api.create_context(name, memPerNode=memPerNode, numCores=numCores)
+  except Exception, e:
+    if e.message != 'No JSON object could be decoded':
+      response = json.loads(e.message)
     else:
-      group = re.search(OozieSparkApi.RE_LOG_START_FINISHED, logs)
-      i = logs.index(group.group(1)) + len(group.group(1))
-      return logs[i:].strip()
+      response = {'status': 'OK'}
+  response['name'] = name
 
-  @classmethod
-  def _make_links(cls, log):
-    escaped_logs = escape(log)
-    hdfs_links = re.sub('((?<= |;)/|hdfs://)[^ <&\t;,\n]+', OozieSparkApi._make_hdfs_link, escaped_logs)
-    return re.sub('(job_[0-9_]+(/|\.)?)', OozieSparkApi._make_mr_link, hdfs_links)
-
-  @classmethod
-  def _make_hdfs_link(self, match):
-    try:
-      return '<a href="%s" target="_blank">%s</a>' % (location_to_url(match.group(0), strict=False), match.group(0))
-    except:
-      return match.group(0)
-
-  @classmethod
-  def _make_mr_link(self, match):
-    try:
-      return '<a href="%s" target="_blank">%s</a>' % (reverse('jobbrowser.views.single_job', kwargs={'job': match.group(0)}), match.group(0))
-    except:
-      return match.group(0)
-
-  def massaged_jobs_for_json(self, request, oozie_jobs, hue_jobs):
-    jobs = []
-    hue_jobs = dict([(script.dict.get('job_id'), script) for script in hue_jobs if script.dict.get('job_id')])
-
-    for job in oozie_jobs:
-      if job.is_running():
-        job = get_oozie(self.user).get_job(job.id)
-        get_copy = request.GET.copy() # Hacky, would need to refactor JobBrowser get logs
-        get_copy['format'] = 'python'
-        request.GET = get_copy
-        try:
-          logs, workflow_action = self.get_log(request, job)
-          progress = workflow_action[0]['progress']
-        except Exception:
-          progress = 0
-      else:
-        progress = 100
-
-      hue_pig = hue_jobs.get(job.id) and hue_jobs.get(job.id) or None
-
-      massaged_job = {
-        'id': job.id,
-        'lastModTime': hasattr(job, 'lastModTime') and job.lastModTime and format_time(job.lastModTime) or None,
-        'kickoffTime': hasattr(job, 'kickoffTime') and job.kickoffTime or None,
-        'timeOut': hasattr(job, 'timeOut') and job.timeOut or None,
-        'endTime': job.endTime and format_time(job.endTime) or None,
-        'status': job.status,
-        'isRunning': job.is_running(),
-        'duration': job.endTime and job.startTime and format_duration_in_millis(( time.mktime(job.endTime) - time.mktime(job.startTime) ) * 1000) or None,
-        'appName': hue_pig and hue_pig.dict['name'] or _('Unsaved script'),
-        'scriptId': hue_pig and hue_pig.id or -1,
-        'scriptContent': hue_pig and hue_pig.dict['script'] or '',
-        'type': hue_pig and hue_pig.dict['type'] or '',
-        'progress': progress,
-        'progressPercent': '%d%%' % progress,
-        'user': job.user,
-        'absoluteUrl': job.get_absolute_url(),
-        'canEdit': has_job_edition_permission(job, self.user),
-        'killUrl': reverse('oozie:manage_oozie_jobs', kwargs={'job_id':job.id, 'action':'kill'}),
-        'watchUrl': reverse('spark:watch', kwargs={'job_id': job.id}) + '?format=python',
-        'created': hasattr(job, 'createdTime') and job.createdTime and job.createdTime and ((job.type == 'Bundle' and job.createdTime) or format_time(job.createdTime)),
-        'startTime': hasattr(job, 'startTime') and format_time(job.startTime) or None,
-        'run': hasattr(job, 'run') and job.run or 0,
-        'frequency': hasattr(job, 'frequency') and job.frequency or None,
-        'timeUnit': hasattr(job, 'timeUnit') and job.timeUnit or None,
-        }
-      jobs.append(massaged_job)
-
-    return jobs
-
-def get_progress(job, log):
-  if job.status in ('SUCCEEDED', 'KILLED', 'FAILED'):
-    return 100
-  else:
-    try:
-      return int(re.findall("MapReduceLauncher  - (1?\d?\d)% complete", log)[-1])
-    except:
-      return 0
+  return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
-def format_time(st_time):
-  if st_time is None:
-    return '-'
-  else:
-    return time.strftime("%a, %d %b %Y %H:%M:%S", st_time)
+def delete_context(request):
+  if request.method != 'DELETE':
+    raise StructuredException(code="INVALID_REQUEST_ERROR", message=_('Requires a DELETE'))
+  response = {}
+
+  name = request.POST.get('name', '')
+
+  api = get_api(request.user)
+  try:
+    response = api.delete_context(name)
+  except Exception, e:
+    if e.message != 'No JSON object could be decoded':
+      response = json.loads(e.message)
+    else:
+      response = {'status': 'OK'}
+  response['name'] = name
+
+  return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
-def has_job_edition_permission(oozie_job, user):
-  return user.is_superuser or oozie_job.user == user.username
+def job(request, job_id):
+  api = get_api(request.user)
 
+  response = {
+    'results': api.job(job_id)
+  }
+
+  return HttpResponse(json.dumps(response), mimetype="application/json")
+
+
+
+@error_handler
+def execute(request, design_id=None):
+  response = {'status': -1, 'message': ''}
+
+  if request.method != 'POST':
+    response['message'] = _('A POST request is required.')
+
+  app_name = get_app_name(request)
+  query_type = beeswax_models.SavedQuery.TYPES_MAPPING[app_name]
+  design = safe_get_design(request, query_type, design_id)
+
+  try:
+    form = get_query_form(request)
+
+    if form.is_valid():
+      #design = save_design(request, SaveForm(), form, query_type, design)
+
+#      query = SQLdesign(form, query_type=query_type)
+#      query_server = dbms.get_query_server_config(request.POST.get('server'))
+#      db = dbms.get(request.user, query_server)
+#      query_history = db.execute_query(query, design)
+#      query_history.last_state = beeswax_models.QueryHistory.STATE.expired.index
+#      query_history.save()
+
+      try:
+        api = get_api(request.user)
+
+        results = api.submit_job(
+            form.cleaned_data['appName'],
+            form.cleaned_data['classPath'],
+            data=form.cleaned_data['query'],
+            context=None if form.cleaned_data['autoContext'] else form.cleaned_data['context'],
+            sync=False
+        )
+        response['status'] = 0
+        response['results'] = results
+        #response['design'] = design.id
+      except Exception, e:
+        response['status'] = -1
+        response['message'] = str(e)
+
+    else:
+      response['message'] = _('There was an error with your query: %s' % form.errors)
+      response['errors'] = form.errors
+  except RuntimeError, e:
+    response['message']= str(e)
+
+  return HttpResponse(json.dumps(response, cls=ResultEncoder), mimetype="application/json")
+
+
+@error_handler
+def fetch_results(request, id, first_row=0):
+  """
+  Returns the results of the QueryHistory with the given id.
+
+  The query results MUST be ready.
+
+  If ``first_row`` is 0, restarts (if necessary) the query read.  Otherwise, just
+  spits out a warning if first_row doesn't match the servers conception.
+  Multiple readers will produce a confusing interaction here, and that's known.
+  """
+  first_row = long(first_row)
+  results = type('Result', (object,), {
+                'rows': 0,
+                'columns': [],
+                'has_more': False,
+                'start_row': 0,
+            })
+  fetch_error = False
+  error_message = ''
+
+  query_history = authorized_get_history(request, id, must_exist=True)
+  query_server = query_history.get_query_server_config()
+  design = SQLdesign.loads(query_history.design.data)
+  db = dbms.get(request.user, query_server)
+
+  try:
+    database = design.query.get('database', 'default')
+    db.use(database)
+    datatable = db.execute_and_wait(design)
+    results = db.client.create_result(datatable)
+    status = 0
+  except Exception, e:
+    fetch_error = True
+    error_message = str(e)
+    status = -1
+
+  response = {
+    'status': status,
+    'message': fetch_error and error_message or '',
+    'results': results_to_dict(results)
+  }
+  return HttpResponse(json.dumps(response), mimetype="application/json")
+
+
+@error_handler
+def save_query(request, design_id=None):
+  response = {'status': -1, 'message': ''}
+
+  if request.method != 'POST':
+    response['message'] = _('A POST request is required.')
+
+  app_name = get_app_name(request)
+  query_type = beeswax_models.SavedQuery.TYPES_MAPPING[app_name]
+  design = safe_get_design(request, query_type, design_id)
+
+  try:
+    save_form = SaveForm(request.POST.copy())
+    query_form = get_query_form(request, design_id)
+
+    if query_form.is_valid() and save_form.is_valid():
+      design = save_design(request, save_form, query_form, query_type, design, True)
+      response['design_id'] = design.id
+      response['status'] = 0
+    else:
+      response['errors'] = query_form.errors
+  except RuntimeError, e:
+    response['message'] = str(e)
+
+  return HttpResponse(json.dumps(response), mimetype="application/json")
+
+
+@error_handler
+def fetch_saved_query(request, design_id):
+  response = {'status': -1, 'message': ''}
+
+  if request.method != 'GET':
+    response['message'] = _('A GET request is required.')
+
+  app_name = get_app_name(request)
+  query_type = beeswax_models.SavedQuery.TYPES_MAPPING[app_name]
+  design = safe_get_design(request, query_type, design_id)
+
+  response['design'] = design_to_dict(design)
+  return HttpResponse(json.dumps(response), mimetype="application/json")
+
+
+def results_to_dict(results):
+  data = {}
+  rows = []
+  for row in results.rows():
+    rows.append(dict(zip(results.columns, row)))
+  data['rows'] = rows
+  data['start_row'] = results.start_row
+  data['has_more'] = results.has_more
+  data['columns'] = results.columns
+  return data
+
+
+def design_to_dict(design):
+  sql_design = SQLdesign.loads(design.data)
+  return {
+    'id': design.id,
+    'query': sql_design.sql_query,
+    'name': design.name,
+    'desc': design.desc,
+    'server': sql_design.server,
+    'database': sql_design.database
+  }
+
+
+def get_query_form(request):
+  api = get_api(request.user)
+
+  app_names = api.jars()
+
+  if not app_names:
+    raise RuntimeError(_("Server specified a jar name."))
+
+  form = SparkForm(request.POST, app_names=app_names)
+
+  return form

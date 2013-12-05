@@ -15,29 +15,41 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
 
-from django.utils.translation import ugettext as _, ugettext_lazy as _t
+from django.utils.translation import ugettext_lazy as _t
 
-from desktop.lib.conf import Config, validate_path
+from desktop.lib.conf import Config
+from spark.settings import NICE_NAME
 
 
-SPARK_MASTER = Config(
-  key="spark_master",
-  help=_t("Address of the Spark master, e.g spark://localhost:7077. If empty use the current configuration. "
-          "Can be overriden in the script too."),
-  default=""
+JOB_SERVER_URL = Config(
+  key="server_url",
+  help=_t("URL of the Spark Job Server."),
+  default="http://localhost:8090/"
 )
 
-SPARK_HOME = Config(
-  key="spark_home",
-  help=_t("Local path to Spark Home on all the nodes of the cluster."),
-  default="/usr/lib/spark"
-)
+
+
+def get_spark_status(user):
+  from spark.job_server_api import get_api
+  status = None
+
+  try:
+    if not 'test' in sys.argv: # Avoid tests hanging
+      status = str(get_api(user).get_status())
+  except:
+    pass
+
+  return status
 
 
 def config_validator(user):
   res = []
 
-  res.extend(validate_path(SPARK_HOME, is_dir=True))
+  status = get_spark_status(user)
+
+  if status:
+    res.append((NICE_NAME, _("The app won't work without a running Job Server")))
 
   return res
