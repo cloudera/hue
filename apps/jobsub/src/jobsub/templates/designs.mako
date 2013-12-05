@@ -794,12 +794,13 @@ function reload() {
     designTable.fnClearTable();
     designTable.fnDestroy();
   });
-  designs.load();
   $(document).one('initialized.designs', function() {
     designTable = $('#designTable').dataTable( designTableOptions );
     designTable.fnFilter(designs.inTrash().toString(), 7);
     designs.isLoading(false);
+    routie('list-designs');
   });
+  designs.load();
 }
 
 $(document).bind('loaded.designs', function() {
