@@ -119,11 +119,6 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
               <th data-bind="text: $data"></th>
             </tr>
           </thead>
-          <tbody data-bind="foreach: rows">
-            <tr data-bind="foreach: $data">
-              <td data-bind="text: $data"></td>
-            </tr>
-          </tbody>
         </table>
       </div>
     </div>
@@ -722,11 +717,22 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
   var dataTable = null;
   function cleanResultsTable() {
     if (dataTable) {
+      dataTable.fnClearTable();
       dataTable.fnDestroy();
       viewModel.columns.valueHasMutated();
       viewModel.rows.valueHasMutated();
       dataTable = null;
     }
+  }
+
+  function addResults(viewModel, dataTable, index, pageSize) {
+    $.each(viewModel.rows.slice(index, index+pageSize), function(row_index, row) {
+      var ordered_row = [];
+      $.each(viewModel.columns(), function(col_index, col) {
+        ordered_row.push(row[col]);
+      });
+      dataTable.fnAddData(ordered_row);
+    });
   }
 
   function resultsTable() {
@@ -749,6 +755,19 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
       });
       $(".dataTables_filter").hide();
       $(".dataTables_wrapper").jHueTableScroller();
+
+      // Automatic results grower
+      var dataTableEl = $(".dataTables_wrapper");
+      var index = 0;
+      var pageSize = 100;
+      dataTableEl.on("scroll", function (e) {
+        if (dataTableEl.scrollTop() + dataTableEl.outerHeight() + 20 > dataTableEl[0].scrollHeight && dataTable) {
+          addResults(viewModel, dataTable, index, pageSize);
+          index += pageSize;
+        }
+      });
+      addResults(viewModel, dataTable, index, pageSize);
+      index += pageSize;
 
       $(".resultTable").width($(".resultTable").parent().width());
     }

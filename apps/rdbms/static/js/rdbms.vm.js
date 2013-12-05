@@ -79,14 +79,8 @@ function RdbmsViewModel() {
     var rows = [];
     self.columns.removeAll();  // Needed for datatables to refresh properly.
     self.columns(results.columns);
-    $.each(results.rows, function(i, result_row) {
-      var row = [];
-      $.each(self.columns(), function(j, column) {
-        row.push(result_row[column]);
-      });
-      rows.push(row);
-    });
-    self.rows(rows);
+    self.rows.removeAll();
+    self.rows(results.rows);
   };
 
   self.updateServers = function(servers) {
