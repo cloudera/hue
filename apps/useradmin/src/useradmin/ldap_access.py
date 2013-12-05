@@ -184,9 +184,10 @@ class LdapConnection(object):
     group_info = []
     if result_data:
       for dn, data in result_data:
-
         # Skip Active Directory # refldap entries.
         if dn is not None:
+          # Case insensitivity
+          data = CaseInsensitiveDict.from_dict(data)
 
           # Skip unnamed entries.
           if group_name_attr not in data:
