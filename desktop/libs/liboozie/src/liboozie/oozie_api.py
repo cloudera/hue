@@ -40,14 +40,14 @@ _api_cache = None
 _api_cache_lock = threading.Lock()
 
 
-def get_oozie(user):
+def get_oozie(user, api_version=API_VERSION):
   global _api_cache
   if _api_cache is None:
     _api_cache_lock.acquire()
     try:
       if _api_cache is None:
         secure = SECURITY_ENABLED.get()
-        _api_cache = OozieApi(OOZIE_URL.get(), secure)
+        _api_cache = OozieApi(OOZIE_URL.get(), secure, api_version)
     finally:
       _api_cache_lock.release()
   _api_cache.setuser(user)
@@ -55,8 +55,8 @@ def get_oozie(user):
 
 
 class OozieApi(object):
-  def __init__(self, oozie_url, security_enabled=False):
-    self._url = posixpath.join(oozie_url, API_VERSION)
+  def __init__(self, oozie_url, security_enabled=False, api_version=API_VERSION):
+    self._url = posixpath.join(oozie_url, api_version)
     self._client = HttpClient(self._url, logger=LOG)
     if security_enabled:
       self._client.set_kerberos_auth()
@@ -287,3 +287,20 @@ class OozieApi(object):
     params = self._get_params()
     resp = self._root.get('admin/status', params)
     return resp
+
+  def get_oozie_slas(self, **kwargs):
+    """
+    filter=
+      app_name=my-sla-app
+      id=0000002-131206135002457-oozie-oozi-W
+      nominal_start=2013-06-18T00:01Z
+      nominal_end=2013-06-23T00:01Z
+    timezone=GMT
+    """
+    params = self._get_params()
+    if 'timezone' in kwargs:
+      params['timezone'] = kwargs.pop('timezone')
+    params['filter'] = ';'.join(['%s=%s' % (key, val) for key, val in kwargs.iteritems()])    
+    resp = self._root.get('sla', params)
+    # resp = {u'slaSummaryList': [{u'actualDuration': 68406, u'appType': u'WORKFLOW_JOB', u'appName': u'Forks', u'actualStart': u'Fri, 06 Dec 2013 14:01:53 PST', u'jobStatus': u'SUCCEEDED', u'id': u'0000002-131206135002457-oozie-oozi-W', u'expectedDuration': 1800000, u'nominalTime': u'Mon, 17 Jun 2013 17:01:00 PDT', u'slaStatus': u'MISS', u'lastModified': u'Fri, 06 Dec 2013 14:03:05 PST', u'actualEnd': u'Fri, 06 Dec 2013 14:03:01 PST', u'expectedEnd': u'Mon, 17 Jun 2013 17:31:00 PDT', u'expectedStart': u'Mon, 17 Jun 2013 17:11:00 PDT', u'user': u'romain'}]}
+    return resp['slaSummaryList'] 
