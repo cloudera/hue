@@ -328,6 +328,37 @@ def list_oozie_info(request):
 
 
 @show_oozie_error
+def list_oozie_sla(request):
+  api = get_oozie(request.user, api_version="v2")
+
+  # filter=nominal_start=2013-06-18T00:01Z;nominal_end=2013-06-23T00:01Z;app_name=my-sla-app
+  params = {}
+  
+  # query matches Oozie id
+  # if parent checkbox:
+  #  parent_id = query
+  # else:
+  #   id = query
+  # else if query:
+  # app_name = query
+  
+  # if start
+  #   nominal_start=2013-06-18T00:01Z
+  # if end
+  #   nominal_end=2013-06-23T00:01Z
+
+  params['app_name'] = 'Forks'
+
+  oozie_slas = api.get_oozie_slas(**params)  
+  configuration = api.get_configuration()
+
+  return render('dashboard/list_oozie_sla.mako', request, {
+    'configuration': configuration,
+    'oozie_slas': oozie_slas,
+  })
+
+
+@show_oozie_error
 def rerun_oozie_job(request, job_id, app_path):
   ParametersFormSet = formset_factory(ParameterForm, extra=0)
   oozie_workflow = check_job_access_permission(request, job_id)
