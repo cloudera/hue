@@ -15,7 +15,8 @@
 ## limitations under the License.
 
 <%!
-  from django.template.defaultfilters import urlencode
+  import datetime
+  from django.template.defaultfilters import urlencode, stringformat, date, filesizeformat, time
   from filebrowser.views import truncate
   from desktop.views import commonheader, commonfooter
   from django.utils.translation import ugettext as _
@@ -34,12 +35,16 @@ ${ fb_components.menubar() }
 
 <div class="container-fluid">
   <div class="row-fluid">
-    <div class="span12">
+    <div class="span2">
+      ${ fb_components.file_sidebar(path_enc, dirname_enc, stats) }
+    </div>
+    <div class="span10">
       <div class="card card-small">
-        % if breadcrumbs:
-          ${fb_components.breadcrumbs(path, breadcrumbs)}
-        %endif
-        <div class="card-body" style="margin-top: -20px">
+      % if breadcrumbs:
+        ${fb_components.breadcrumbs(path, breadcrumbs)}
+      %endif
+        <div class="card-body">
+          <p>
             <form class="form-stacked" method="post" action="${url('filebrowser.views.save_file')}">
               % if form.errors:
               <div class="alert-message">
@@ -52,12 +57,12 @@ ${ fb_components.menubar() }
               % endif
               ${edit.render_field(form["path"], hidden=True, notitle=True)}
               ${edit.render_field(form["encoding"], hidden=True, notitle=True)}
-              <div style="width: 100%; height: 100%;">${edit.render_field(form["contents"], tag="textarea", nolabel=True, notitle=True, attrs=dict(
-                style="width:100%; height:400px;")) | n}</div>
+              <div style="width: 98%; height: 100%;">${edit.render_field(form["contents"], tag="textarea", nolabel=True, notitle=True, attrs=dict(
+                style="width:100%; height:400px; resize:none")) | n}</div>
               <input class="btn btn-primary" type="submit" name="save" value="${_('Save')}">
               <a id="saveAsBtn" class="btn">${_('Save as')}</a>
             </form>
-          <br/>
+          </p>
         </div>
       </div>
     </div>
@@ -133,6 +138,26 @@ ${ fb_components.menubar() }
         });
         $("#fileChooserSaveModal").slideDown();
       });
+
+      $("#refreshBtn").click(function(){
+        window.location.reload();
+      });
+
+      function resizeTextarea() {
+        var RESIZE_CORRECTION = 246;
+        $("textarea[name='contents']").height( $(window).height() - RESIZE_CORRECTION);
+      }
+
+      var _resizeTimeout = -1;
+      $(window).on("resize", function () {
+        window.clearTimeout(_resizeTimeout);
+        _resizeTimeout = window.setTimeout(function () {
+          resizeTextarea();
+        }, 100);
+      });
+
+      resizeTextarea();
+
     });
   </script>
 

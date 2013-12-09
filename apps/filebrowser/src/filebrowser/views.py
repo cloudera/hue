@@ -211,6 +211,7 @@ def edit(request, path, form=None):
 
     data = dict(
         exists=(stats is not None),
+        stats=stats,
         form=form,
         path=path,
         filename=os.path.basename(path),
