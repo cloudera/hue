@@ -31,58 +31,22 @@
 ${ commonheader(_('%(filename)s - File Viewer') % dict(filename=truncate(filename)), 'filebrowser', user) | n,unicode }
 ${ fb_components.menubar() }
 
+<style type="text/css">
+  .empty-wrapper {
+    margin-top: 50px;
+    color: #BBB;
+    line-height: 60px;
+  }
+
+  .empty-wrapper i {
+    font-size: 148px;
+  }
+</style>
+
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="span2">
-      <div class="sidebar-nav" style="padding-top: 0">
-        <ul class="nav nav-list">
-          <li class="nav-header">${_('Actions')}</li>
-          % if view['mode'] == "binary":
-            <li><a href="${base_url}?offset=${view['offset']}&length=${view['length']}&mode=text&compression=${view['compression']}"><i class="fa fa-font"></i> ${_('View as text')}</a></li>
-          % endif
-
-          % if view['mode'] == "text":
-            <li><a href="${base_url}?offset=${view['offset']}&length=${view['length']}&mode=binary&compression=${view['compression']}"><i class="fa fa-barcode"></i> ${_('View as binary')}</a></li>
-          % endif
-
-          % if view['compression'] != "gzip" and path.endswith('.gz'):
-            <li><a href="${base_url}?offset=0&length=2000&mode=${view['mode']}&compression=gzip"><i class="fa fa-youtube-play"></i> ${_('Preview as Gzip')}</a></li>
-          % endif
-
-          % if view['compression'] != "avro" and view['compression'] != "snappy_avro" and path.endswith('.avro'):
-            <li><a href="${base_url}?offset=0&length=2000&mode=${view['mode']}&compression=avro"><i class="fa fa-youtube-play"></i> ${_('Preview as Avro')}</a></li>
-          % endif
-
-          % if view['compression'] and view['compression'] != "none":
-            <li><a href="${base_url}?offset=0&length=2000&mode=${view['mode']}&compression=none"><i class="fa fa-times-circle"></i> ${_('Stop preview')}</a></li>
-          % endif
-
-          % if editable and view['compression'] == "none":
-            <li><a href="${url('filebrowser.views.edit', path=path_enc)}"><i class="fa fa-pencil"></i> ${_('Edit file')}</a></li>
-          % endif
-
-           <li><a href="${url('filebrowser.views.download', path=path_enc)}"><i class="fa fa-download"></i> ${_('Download')}</a></li>
-           <li><a href="${url('filebrowser.views.view', path=dirname_enc)}"><i class="fa fa-file-text"></i> ${_('View file location')}</a></li>
-           <li><a id="refreshBtn"><i class="fa fa-refresh"></i> ${_('Refresh')}</a></li>
-
-          <li class="nav-header">${_('Info')}</li>
-          <li class="white">
-            <dl>
-              <dt>${_('Last modified')}</dt>
-              <dd>${date(datetime.datetime.fromtimestamp(stats['mtime']))} ${time(datetime.datetime.fromtimestamp(stats['mtime']))}</dd>
-              <dt>${_('User')}</dt>
-              <dd>${stats['user']}</dd>
-              <dt>${_('Group')}</dt>
-              <dd>${stats['group']}</dd>
-              <dt>${_('Size')}</dt>
-              <dd>${stats['size']|filesizeformat}</dd>
-              <dt>${_('Mode')}</dt>
-              <dd>${stringformat(stats['mode'], "o")}</dd>
-            </dl>
-          </li>
-        </ul>
-
-      </div>
+      ${ fb_components.file_sidebar(path_enc, dirname_enc, stats, view) }
     </div>
     <div class="span10">
       <div class="card card-small">
@@ -91,74 +55,77 @@ ${ fb_components.menubar() }
       %endif
         <div class="card-body">
           <p>
-            % if not view['compression'] or view['compression'] in ("none", "avro"):
-        <div class="pagination">
-          <ul>
+        % if stats['size'] == 0:
+          <div class="center empty-wrapper">
+            <i class="fa fa-frown-o"></i>
+            <h1>${_('The current file is empty.')}</h1>
+            <br />
+          </div>
+        % else:
+          % if not view['compression'] or view['compression'] in ("none", "avro"):
+          <div class="pagination">
+            <ul>
               <li class="first-block prev disabled"><a href="javascript:void(0);" data-bind="click: firstBlock">${_('First Block')}</a></li>
               <li class="previous-block disabled"><a href="javascript:void(0);" data-bind="click: previousBlock">${_('Previous Block')}</a></li>
               <li class="next-block"><a href="javascript:void(0);" data-bind="click: nextBlock">${_('Next Block')}</a></li>
               <li class="last-block next"><a href="javascript:void(0);" data-bind="click: lastBlock">${_('Last Block')}</a></li>
-          </ul>
+            </ul>
 
-          <form action="${url('filebrowser.views.view', path=path_enc)}" method="GET" class="form-inline pull-right">
-            <span>${_('Viewing Bytes:')}</span>
-            <input type="text" name="begin" value="${view['offset'] + 1}" data-bind="value: begin" class="input-mini" />
-            -
-            <input type="text" name="end" value="${view['end']}" data-bind="value: end" class="input-mini" /> of
-            <span>${stats['size']}</span>
-            <span>${_('(%(length)s B block size)' % dict(length=view['length']))}</span>
-            % if view['mode']:
-              <input type="hidden" name="mode" value="${view['mode']}"/>
+            <form action="${url('filebrowser.views.view', path=path_enc)}" method="GET" class="form-inline pull-right">
+              <span>${_('Viewing Bytes:')}</span>
+              <input type="text" name="begin" value="${view['offset'] + 1}" data-bind="value: begin" class="input-mini" />
+              -
+              <input type="text" name="end" value="${view['end']}" data-bind="value: end" class="input-mini" /> of
+              <span>${stats['size']}</span>
+              <span>${_('(%(length)s B block size)' % dict(length=view['length']))}</span>
+              % if view['mode']:
+                <input type="hidden" name="mode" value="${view['mode']}"/>
+              % endif
+            </form>
+          </div>
+          % endif
+
+          %if 'contents' in view:
+            % if view['masked_binary_data']:
+              <div class="alert-message warning">${_("Warning: some binary data has been masked out with '&#xfffd'.")}</div>
             % endif
-          </form>
+          % endif
 
-        </div>
-      % endif
-
-      %if 'contents' in view:
-        % if view['masked_binary_data']:
-        <div class="alert-message warning">${_("Warning: some binary data has been masked out with '&#xfffd'.")}</div>
-        % endif
-      % endif
-
-      <div>
-      % if 'contents' in view:
-        <div id="file-contents"><pre>${view['contents']}</pre></div>
-      % else:
-        <table>
-          % for offset, words, masked in view['xxd']:
-          <tr>
-            <td><tt>${stringformat(offset, "07x")}:&nbsp;</tt></td>
-            <td>
-              <tt>
-                % for word in words:
-                  % for byte in word:
-                    ${stringformat(byte, "02x")}
+          <div>
+          % if 'contents' in view:
+            <div id="file-contents"><pre>${view['contents']}</pre></div>
+          % else:
+            <table>
+              % for offset, words, masked in view['xxd']:
+              <tr>
+                <td>${stringformat(offset, "07x")}:&nbsp;</td>
+                <td>
+                  % for word in words:
+                    % for byte in word:
+                      ${stringformat(byte, "02x")}
+                    % endfor
                   % endfor
-                % endfor
-              </tt>
-            </td>
-            <td>
-              <tt>
-                &nbsp;&nbsp;${masked}
-              </tt>
-            </td>
-          </tr>
-          % endfor
-        </table>
-      % endif
-      </div>
+                </td>
+                <td>
+                  &nbsp;&nbsp;${masked}
+                </td>
+              </tr>
+              % endfor
+            </table>
+          % endif
+          </div>
 
-      % if not view['compression'] or view['compression'] in ("none", "avro"):
-        <div class="pagination">
-          <ul>
-              <li class="first-block prev disabled"><a href="javascript:void(0);" data-bind="click: firstBlock">${_('First Block')}</a></li>
-              <li class="previous-block disabled"><a href="javascript:void(0);" data-bind="click: previousBlock">${_('Previous Block')}</a></li>
-              <li class="next-block"><a href="javascript:void(0);" data-bind="click: nextBlock">${_('Next Block')}</a></li>
-              <li class="last-block next"><a href="javascript:void(0);" data-bind="click: lastBlock">${_('Last Block')}</a></li>
-          </ul>
-        </div>
-      % endif
+          % if not view['compression'] or view['compression'] in ("none", "avro"):
+            <div class="pagination">
+              <ul>
+                <li class="first-block prev disabled"><a href="javascript:void(0);" data-bind="click: firstBlock">${_('First Block')}</a></li>
+                <li class="previous-block disabled"><a href="javascript:void(0);" data-bind="click: previousBlock">${_('Previous Block')}</a></li>
+                <li class="next-block"><a href="javascript:void(0);" data-bind="click: nextBlock">${_('Next Block')}</a></li>
+                <li class="last-block next"><a href="javascript:void(0);" data-bind="click: lastBlock">${_('Last Block')}</a></li>
+              </ul>
+            </div>
+          % endif
+        % endif
           </p>
         </div>
       </div>
