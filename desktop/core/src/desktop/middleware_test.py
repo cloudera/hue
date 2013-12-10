@@ -17,6 +17,7 @@
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_permission
+from django.conf import settings
 import desktop.conf
 
 from nose.tools import assert_equal
@@ -89,6 +90,7 @@ def test_ensure_safe_method_middleware():
 
 def test_ensure_safe_redirect_middleware():
   done = []
+  settings.MIDDLEWARE_CLASSES.append('desktop.middleware.EnsureSafeRedirectURLMiddleware')
   try:
     # Super user
     c = make_logged_in_client()
@@ -98,7 +100,7 @@ def test_ensure_safe_redirect_middleware():
     assert_equal(200, response.status_code)
 
     # Disallow most redirects
-    done.append(desktop.conf.REDIRECT_WHITELIST.set_for_testing('\d+'))
+    done.append(desktop.conf.REDIRECT_WHITELIST.set_for_testing('^\d+$'))
     response = c.get("")
     assert_equal(403, response.status_code)
 
@@ -111,7 +113,8 @@ def test_ensure_safe_redirect_middleware():
     # should have a logic OR functionality.
     done.append(desktop.conf.REDIRECT_WHITELIST.set_for_testing('\d+,.*'))
     response = c.get("")
-    assert_equal(403, response.status_code)
+    assert_equal(302, response.status_code)
   finally:
+    settings.MIDDLEWARE_CLASSES.pop()
     for finish in done:
       finish()
