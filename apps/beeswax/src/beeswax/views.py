@@ -1107,6 +1107,12 @@ def execute_directly(request, query, query_server=None, design=None, tablename=N
   database = query.query.get('database', 'default')
   db.use(database)
 
+  #filter hql
+  SUPER_HQL_RE = re.compile('SHOW|GRANT|REVOKE', re.IGNORECASE)
+  if not request.user.is_superuser:
+    if SUPER_HQL_RE.match(query.hql_query) is not None:
+      raise PopupException('Not allowed')
+
   history_obj = db.execute_query(query, design)
 
   watch_url = reverse(get_app_name(request) + ':watch_query', kwargs={'id': history_obj.id})
