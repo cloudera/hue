@@ -117,7 +117,7 @@ REDIRECT_WHITELIST = Config(
   help=_("Comma-separated list of regular expressions, which match the redirect URL."
          "For example, to restrict to your local domain and FQDN, the following value can be used:"
          "  ^\/.*$,^http:\/\/www.mydomain.com\/.*$"),
-  type=list_of_compiled_res,
+  type=list_of_compiled_res(skip_empty=True),
   default='')
 
 def is_https_enabled():
