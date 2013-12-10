@@ -24,6 +24,12 @@ from django.utils.translation import ugettext as _
 from desktop.lib.rest.resource import Resource
 
 
+def get_code(resp):
+  try:
+    return resp.getcode()
+  except AttributeError:
+    return resp.code
+
 class SqoopResource(Resource):
   """
   Sqoop resources provide extra response headers.
@@ -44,7 +50,7 @@ class SqoopResource(Resource):
                                 headers=headers)
     body = self._get_body(resp)
 
-    if resp.getcode() == 200:
+    if get_code(resp) == 200:
       self._client.logger.debug(
           "%(method)s Got response:\n%(headers)s\n%(body)s" % {
             'method': method,

@@ -21,15 +21,13 @@ import socket
 from django.utils.translation import ugettext as _
 from django.utils.encoding import smart_str
 
-from desktop.lib.exceptions import StructuredException
-from desktop.lib.rest.http_client import RestException
-from django.views.decorators.cache import never_cache
-
 LOG = logging.getLogger(__name__)
 
-@never_cache
 def handle_rest_exception(e, msg):
-  reason = e.get_parent_ex().reason
+  if 'reason' in e.get_parent_ex():
+    reason = e.get_parent_ex().reason
+  else:
+    reason = None
   if isinstance(reason, socket.error):
     LOG.error(smart_str('Could not connect to sqoop server: %s (%s)' % (reason[0], reason[1])))
     return {
