@@ -81,6 +81,11 @@ ${ layout.menubar(section='workflows') }
   <div class="span10">
     <div id="properties" class="section hide">
     <div class="card card-small">
+    
+            
+    
+
+    
       <div class="alert alert-info"><h3 data-bind="text: name()"></h3></div>
       <div class="card-body">
         <p>
@@ -106,6 +111,30 @@ ${ layout.menubar(section='workflows') }
       'add': '$root.addJobProperty',
       })
       %>
+
+
+        <div id="slaEditord" class="control-group">
+          <label class="control-label">
+              ${ _('SLA') }
+          </label>
+          
+          <div data-bind="foreach: sla">
+            <div class="controls">          
+              <div class="span3">
+                <span data-bind="text: getSLAText(key)['niceName']"></span>
+              </div>
+              <div class="span9">
+                <!-- ko if:  key == 'enabled' -->
+                <input type="checkbox" data-bind="checked: value"/>
+                <!-- /ko -->
+                <!-- ko if:  key != 'enabled' -->
+                <input type="text" data-bind="value: value, attr: {placeholder: getSLAText(key)['placeHolder']}" class="span7">
+                <!-- /ko -->
+              </div>
+            </div>
+          </div>      
+  
+        </div>
 
         <div class="control-group ">
           <label class="control-label">
@@ -648,7 +677,8 @@ var workflow_model = new WorkflowModel({
   deployment_dir: "${ workflow.deployment_dir }",
   is_shared: "${ workflow.is_shared }" == "True",
   parameters: ${ workflow.parameters_escapejs | n,unicode },
-  job_properties: ${ workflow.job_properties_escapejs | n,unicode }
+  job_properties: ${ workflow.job_properties_escapejs | n,unicode },
+  sla: ${ workflow.sla_jsescaped | n,unicode }
 });
 var registry = new Registry();
 var workflow = new Workflow({
@@ -899,6 +929,7 @@ ko.applyBindings(workflow, $('#workflowControls')[0]);
 ko.applyBindings(import_view_model, $('#importAction')[0]);
 ko.applyBindings(import_view_model.oozie(), $('#importOozieAction')[0]);
 
+
 window.onbeforeunload = function (e) {
   if (workflow.is_dirty()) {
     var message = "${ _('You have unsaved changes in this workflow.') }";
@@ -913,6 +944,18 @@ window.onbeforeunload = function (e) {
     }
     return message;
   }
+};
+
+function getSLAText(key) {
+  return {
+     'enabled': {'niceName': '${ _("Enabled") }', 'placeHolder': ''},
+     'nominal-time': {'niceName': '${ _("Nominal time") } *', 'placeHolder': '${"$"}{nominal_time}'},
+     'should-start': {'niceName': '${ _("Should start") }', 'placeHolder': '${"$"}{10 * MINUTES}'},
+     'should-end': {'niceName': '${ _("Should end") } *', 'placeHolder': '${"$"}{30 * MINUTES}'},
+     'max-duration': {'niceName': '${ _("Max duration") }', 'placeHolder': '${"$"}{30 * MINUTES}'},
+     'alert-events': {'niceName': '${ _("Alert events") }', 'placeHolder': 'start_miss,end_miss,duration_miss'},
+     'alert-contact': {'niceName': '${ _("Alert contact") }', 'placeHolder': 'joe@example.com,bob@example.com'} 
+  }[key]
 };
 
 window.onresize = function () {

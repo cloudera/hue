@@ -64,7 +64,7 @@ class ParameterForm(forms.Form):
 class WorkflowForm(forms.ModelForm):
   class Meta:
     model = Workflow
-    exclude = ('owner', 'start', 'end')
+    exclude = ('owner', 'start', 'end', 'data')
     widgets = {
       'description': forms.TextInput(attrs={'class': 'span5'}),
       'deployment_dir': forms.TextInput(attrs={'class': 'pathChooser span7'}),

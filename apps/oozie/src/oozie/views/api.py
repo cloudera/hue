@@ -228,12 +228,13 @@ def _update_workflow_json(json_workflow):
   workflow = Workflow.objects.get(id=json_workflow['id'])
 
   for key in json_workflow:
-    if key not in ('nodes', 'start', 'end', 'job_ptr', 'owner'):
+    if key == 'sla':
+      workflow.set_sla(json_workflow['sla'])
+    elif key not in ('nodes', 'start', 'end', 'job_ptr', 'owner', 'data'):
       setattr(workflow, key, json_workflow[key])
 
   workflow.save()
   workflow.doc.update(name=workflow.name, description=workflow.description)
-
   return workflow
 
 
@@ -276,7 +277,7 @@ def workflow_validate_node(request, workflow, node_type):
 def workflow_save(request, workflow):
   if request.method != 'POST':
     raise StructuredException(code="METHOD_NOT_ALLOWED_ERROR", message=_('Must be POST request.'), error_code=405)
-
+  print request.POST
   json_workflow = format_dict_field_values(json.loads(str(request.POST.get('workflow'))))
   json_workflow.setdefault('schema_version', workflow.schema_version)
 

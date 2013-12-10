@@ -354,10 +354,12 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
     $.extend(self, mapping);
     $.each(mapping['__ko_mapping__'].mappedProperties, function(key, value) {
       var key = key;
+      if (self[key]) { //ugly? // allow custom sub bindings in foreach
       self[key].subscribe(function(value) {
-        self.is_dirty( true );
+        self.is_dirty(true);
         self.model[key] = ko.mapping.toJS(value);
       });
+      }
     });
 
     self.model = options.model;
@@ -393,6 +395,8 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
     self.el.trigger('workflow:events:loaded');
 
     module.prototype.initialize.apply(self, arguments);
+
+    self.sla = self.model['sla']; // Need to persists here for some reason
 
     return self;
   };
@@ -530,7 +534,9 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
         nodes.push(model);
       });
       data['nodes'] = nodes;
-
+      
+      data['sla'] = self.sla;
+      
       return JSON.stringify(data);
     },
 

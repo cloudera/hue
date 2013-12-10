@@ -337,7 +337,8 @@ $.extend(WorkflowModel.prototype, {
   deployment_dir: '',
   is_shared: true,
   parameters: '[]',
-  job_xml: ''
+  job_xml: '',
+  sla: []
 });
 
 var NodeModel = ModelModule($);

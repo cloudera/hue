@@ -331,8 +331,15 @@ def list_oozie_info(request):
 def list_oozie_sla(request):
   api = get_oozie(request.user, api_version="v2")
 
+  if request.method == 'POST':
   # filter=nominal_start=2013-06-18T00:01Z;nominal_end=2013-06-23T00:01Z;app_name=my-sla-app
-  params = {}
+    print request.POST
+    job_name = request.POST
+    params = {}
+    params['app_name'] = 'tt'
+    oozie_slas = api.get_oozie_slas(**params)  
+  else:
+    oozie_slas = []
   
   # query matches Oozie id
   # if parent checkbox:
@@ -347,13 +354,9 @@ def list_oozie_sla(request):
   # if end
   #   nominal_end=2013-06-23T00:01Z
 
-  params['app_name'] = 'Forks'
 
-  oozie_slas = api.get_oozie_slas(**params)  
-  configuration = api.get_configuration()
 
   return render('dashboard/list_oozie_sla.mako', request, {
-    'configuration': configuration,
     'oozie_slas': oozie_slas,
   })
 

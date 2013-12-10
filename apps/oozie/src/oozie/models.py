@@ -111,9 +111,10 @@ class Job(models.Model):
                                   help_text=_t('Enable other users to have access to this job.'))
   parameters = models.TextField(default='[{"name":"oozie.use.system.libpath","value":"true"}]', verbose_name=_t('Oozie parameters'),
                                 help_text=_t('Parameters used at the submission time (e.g. market=US, oozie.use.system.libpath=true).'))
-  is_trashed = models.BooleanField(default=False, db_index=True, verbose_name=_t('Is trashed'),  blank=True,# Deprecated
+  is_trashed = models.BooleanField(default=False, db_index=True, verbose_name=_t('Is trashed'), blank=True,# Deprecated
                                    help_text=_t('If this job is trashed.'))
   doc = generic.GenericRelation(Document, related_name='oozie_doc')
+  data = models.TextField(blank=True, default=json.dumps({}))
 
   objects = JobManager()
   unique_together = ('owner', 'name')
@@ -203,11 +204,41 @@ class Job(models.Model):
     """Only owners or admins can modify a job."""
     return user.is_superuser or self.owner == user
 
+  @property
+  def sla(self):
+    return json.loads(self.data).get('sla', [
+        {'key': 'enabled', 'value': False},
+        {'key': 'nominal-time', 'value': ''},
+        {'key': 'should-start', 'value': ''},
+        {'key': 'should-end', 'value': ''},
+        {'key': 'max-duration', 'value': ''},
+        {'key': 'alert-events', 'value': ''},
+        {'key': 'alert-contact', 'value': ''},        
+    ])
+  
+  @property
+  def sla_jsescaped(self):
+    return json.dumps(self.sla, cls=JSONEncoderForHTML)
+  
+  def set_sla(self, sla):
+    data_json = json.loads(self.data)
+    data_json['sla'] = sla  
+    self.data = json.dumps(data_json)
+    
+    if self.get_type() == 'workflow':
+      self.schema_version = WorkflowManager.SCHEMA_VERSION_V5 if self.sla_enabled else WorkflowManager.SCHEMA_VERSION_V4
+
+  @property
+  def sla_enabled(self):
+    return self.sla[0]['value'] # #1 is enabled
+
 
 class WorkflowManager(models.Manager):
+  SCHEMA_VERSION_V4 = 'uri:oozie:workflow:0.4'
+  SCHEMA_VERSION_V5 = 'uri:oozie:workflow:0.5'
 
   def new_workflow(self, owner):
-    workflow = Workflow(owner=owner, schema_version='uri:oozie:workflow:0.4')
+    workflow = Workflow(owner=owner, schema_version=WorkflowManager.SCHEMA_VERSION_V4)
 
     kill = Kill(name='kill', workflow=workflow, node_type=Kill.node_type)
     end = End(name='end', workflow=workflow, node_type=End.node_type)
@@ -571,6 +602,7 @@ class Node(models.Model):
                                help_text=_t('The type of action (e.g. MapReduce, Pig...)'))
   workflow = models.ForeignKey(Workflow)
   children = models.ManyToManyField('self', related_name='parents', symmetrical=False, through=Link)
+  #data = models.TextField(default=json.dumps({}))
 
   unique_together = ('workflow', 'name')
 
