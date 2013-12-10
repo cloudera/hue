@@ -18,7 +18,7 @@
 <%namespace name="common" file="workflow-common.xml.mako" />
 
 
-<workflow-app name="${ workflow.name | x }" xmlns="${ workflow.schema_version }">
+<workflow-app name="${ workflow.name | x }" xmlns="${ workflow.schema_version }"${ ' xmlns:sla="uri:oozie:sla:0.2"' if workflow.sla_enabled else '' | n,unicode}>
   % if workflow.job_xml or workflow.get_properties():
   <global>
     % if workflow.job_xml:
@@ -46,4 +46,13 @@
   % for node in workflow.node_list:
       ${ node.to_xml(mapping) | n }
   % endfor
+  % if workflow.sla_enabled:
+    <sla:info>
+    % for sla in workflow.sla:
+      % if sla['value'] and sla['key'] != 'enabled':
+        <sla:${ sla['key'] }>${ sla['value'] }</sla:${ sla['key'] }>
+      % endif
+    % endfor
+    </sla:info>
+  % endif
 </workflow-app>

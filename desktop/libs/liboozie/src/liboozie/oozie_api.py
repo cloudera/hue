@@ -295,11 +295,8 @@ class OozieApi(object):
       id=0000002-131206135002457-oozie-oozi-W
       nominal_start=2013-06-18T00:01Z
       nominal_end=2013-06-23T00:01Z
-    timezone=GMT
     """
     params = self._get_params()
-    if 'timezone' in kwargs:
-      params['timezone'] = kwargs.pop('timezone')
     params['filter'] = ';'.join(['%s=%s' % (key, val) for key, val in kwargs.iteritems()])    
     resp = self._root.get('sla', params)
     # resp = {u'slaSummaryList': [{u'actualDuration': 68406, u'appType': u'WORKFLOW_JOB', u'appName': u'Forks', u'actualStart': u'Fri, 06 Dec 2013 14:01:53 PST', u'jobStatus': u'SUCCEEDED', u'id': u'0000002-131206135002457-oozie-oozi-W', u'expectedDuration': 1800000, u'nominalTime': u'Mon, 17 Jun 2013 17:01:00 PDT', u'slaStatus': u'MISS', u'lastModified': u'Fri, 06 Dec 2013 14:03:05 PST', u'actualEnd': u'Fri, 06 Dec 2013 14:03:01 PST', u'expectedEnd': u'Mon, 17 Jun 2013 17:31:00 PDT', u'expectedStart': u'Mon, 17 Jun 2013 17:11:00 PDT', u'user': u'romain'}]}

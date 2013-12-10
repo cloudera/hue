@@ -1254,9 +1254,29 @@ class TestEditor(OozieMockBase):
         beeswax.conf.HIVE_CONF_DIR = saved
       shutil.rmtree(tmpdir)
 
-
     self.wf.node_set.filter(name='action-name-1').delete()
 
+
+  def test_workflow_gen_sla(self):    
+    xml = self.wf.to_xml({'output': '/path'})
+    assert_false('<sla' in xml, xml)
+    assert_false('xmlns="uri:oozie:workflow:0.5"' in xml, xml)
+    assert_false('xmlns:sla="uri:oozie:sla:0.2"' in xml, xml)
+        
+    sla = self.wf.sla
+    sla[0]['value'] = True
+    sla[1]['value'] = 'now' # nominal-time
+    sla[3]['value'] = '${ 10 * MINUTES}' # should-end
+    self.wf.set_sla(sla)
+    self.wf.save()
+
+    xml = self.wf.to_xml({'output': '/path'})
+    assert_true('xmlns="uri:oozie:workflow:0.5"' in xml, xml)
+    assert_true('xmlns:sla="uri:oozie:sla:0.2"' in xml, xml)
+    assert_true("""<sla:info>
+        <sla:nominal-time>now</sla:nominal-time>
+        <sla:should-end>${ 10 * MINUTES}</sla:should-end>
+    </sla:info>""" in xml, xml)
 
 
   def test_create_coordinator(self):
