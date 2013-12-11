@@ -16,11 +16,7 @@
 # limitations under the License.
 #!/usr/bin/env python
 
-try:
-  import json
-except ImportError:
-  import simplejson as json
-
+import json
 import logging
 import os
 import re
