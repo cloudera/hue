@@ -285,6 +285,15 @@ $(document).ready(function () {
         fixedHeader: true,
         firstColumnTooltip: true
       });
+    },
+    "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+      // Make sure null values are seen as NULL.
+      for(var j = 0; j < aData.length; ++j) {
+        if (aData[j] == null) {
+          $(nRow).find('td:eq('+j+')').html("NULL");
+        }
+      }
+      return nRow;
     }
   });
 
