@@ -23,6 +23,7 @@ import logging
 import socket
 
 from django.http import HttpResponse
+from django.utils.encoding import smart_str
 from django.utils.translation import ugettext as _
 
 from sqoop import client, conf
@@ -64,7 +65,7 @@ def create_connection(request):
   if 'connection' not in request.POST:
     raise StructuredException(code="INVALID_REQUEST_ERROR", message=_('Error saving connection'), data={'errors': 'Connection is missing.'}, error_code=400)
 
-  d = json.loads(request.POST['connection'])
+  d = json.loads(smart_str(request.POST['connection']))
   conn = client.Connection.from_dict(d)
 
   try:
@@ -88,7 +89,7 @@ def update_connection(request, connection):
   if 'connection' not in request.POST:
     raise StructuredException(code="INVALID_REQUEST_ERROR", message=_('Error saving connection'), data={'errors': 'Connection is missing.'}, error_code=400)
 
-  connection.update_from_dict(json.loads(request.POST['connection']))
+  connection.update_from_dict(json.loads(smart_str(request.POST['connection'])))
 
   try:
     c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE)
