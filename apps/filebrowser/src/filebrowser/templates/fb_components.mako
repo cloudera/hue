@@ -114,6 +114,7 @@ from django.utils.translation import ugettext as _
        <li><a href="${url('filebrowser.views.view', path=dirname_enc)}"><i class="fa fa-file-text"></i> ${_('View file location')}</a></li>
        <li><a id="refreshBtn" href="#"><i class="fa fa-refresh"></i> ${_('Refresh')}</a></li>
 
+       % if stats is not None: # Case new file
        <li class="nav-header">${_('Info')}</li>
        <li class="white">
         <dl>
@@ -129,6 +130,7 @@ from django.utils.translation import ugettext as _
           <dd>${stringformat(stats['mode'], "o")}</dd>
         </dl>
        </li>
+       % endif
     </ul>
   </div>
 </%def>
