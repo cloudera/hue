@@ -173,14 +173,14 @@ ul {
   cursor: pointer;
 }
 
-#graph .nav-tabs > li, .nav-pills > li {
+.action > .nav-tabs > li, .action > .nav-pills > li, .action > .tabs-below > .nav-tabs > li, .action > .tabs-below > .nav-pills > li {
     float:none;
     display:inline-block;
     *display:inline; /* ie7 fix */
      zoom:1; /* hasLayout ie7 trigger */
 }
 
-#graph .nav-tabs, .nav-pills {
+.action > .nav-tabs, .action > .nav-pills, .action > .tabs-below > .nav-tabs, .action > .tabs-below > .nav-pills {
     text-align:center;
 }
 
