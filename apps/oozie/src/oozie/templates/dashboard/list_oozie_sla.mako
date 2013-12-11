@@ -37,9 +37,9 @@ ${ layout.menubar(section='sla', dashboard=True) }
   </h1>
 
   <ul class="nav nav-tabs">
-      <form class="form-search" id="search" method="GET" action=".">
-        <input type="text" name="job" class="searchFilter input-xlarge search-query" placeholder="${_('Job Name or Id (required)')}">
-        <input type="checkbox" name="isParent" placeholder="${_('Text Filter')}">
+      <form class="form-search" id="searchForm" method="GET" action=".">
+        <input type="text" name="job_name" class="searchFilter input-xlarge search-query" placeholder="${_('Job Name or Id (required)')}">
+        <input type="checkbox" name="isParent" class="searchFilter" placeholder="${_('Text Filter')}">
         ${ _('Parent ID') }
         Start
         <input type="text" name="start" class="searchFilter input-xlarge search-query" placeholder="${_('Start in GMT')}">
@@ -115,22 +115,6 @@ ${ layout.menubar(section='sla', dashboard=True) }
 
     $("*[rel=tooltip]").tooltip();
 
-/**
-        var _metadataTable = $("#graphTable").dataTable({
-            "bPaginate": false,
-            "bLengthChange": false,
-            "bInfo": false,
-            "bAutoWidth": false,
-            "aoColumns": [
-                { "sWidth": "30%" },
-                { "sWidth": "70%" }
-            ],
-            "oLanguage": {
-                "sEmptyTable": "${_('No data available')}",
-                "sZeroRecords": "${_('No matching records')}",
-            }
-        });
-*/
         var slaList = $("#intrumentationTable").dataTable({
             "bPaginate": false,
             "bLengthChange": false,
@@ -144,9 +128,9 @@ ${ layout.menubar(section='sla', dashboard=True) }
         });
 
     $(".searchFilter").keyup(function(){
-      ("form#search").submit();
-       // _metadataTable.fnFilter($(this).val());
-       // slaList.fnFilter($(".searchFilter").val());
+      $.post("${ url('oozie:list_oozie_sla') }", $("#searchForm").serialize(), function(data) {
+        $( ".result" ).html( data );
+      });
     });
 
     $(".dataTables_wrapper").css("min-height","0");

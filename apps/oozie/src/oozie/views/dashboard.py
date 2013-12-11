@@ -332,29 +332,31 @@ def list_oozie_sla(request):
   api = get_oozie(request.user, api_version="v2")
 
   if request.method == 'POST':
-  # filter=nominal_start=2013-06-18T00:01Z;nominal_end=2013-06-23T00:01Z;app_name=my-sla-app
-    print request.POST
-    job_name = request.POST
+    # filter=nominal_start=2013-06-18T00:01Z;nominal_end=2013-06-23T00:01Z;app_name=my-sla-app
     params = {}
-    params['app_name'] = 'tt'
+    print request.POST
+    
+    job_name = request.POST.get('job_name')
+    if job_name.endswith('-oozie-oozi-W'):
+      if 'isParent' in request.POST:
+        params['parent_id'] = job_name
+      else:    
+        params['id'] = job_name
+    else:
+      params['app_name'] = job_name
+      
+    if request.POST.get('start'):
+      params['nominal_start'] = request.POST.get('start')
+    if request.POST.get('end'):
+      params['nominal_end'] = request.POST.get('end')
+      
     oozie_slas = api.get_oozie_slas(**params)  
+    
   else:
-    oozie_slas = []
+    oozie_slas = [] # or get latest?
   
-  # query matches Oozie id
-  # if parent checkbox:
-  #  parent_id = query
-  # else:
-  #   id = query
-  # else if query:
-  # app_name = query
-  
-  # if start
-  #   nominal_start=2013-06-18T00:01Z
-  # if end
-  #   nominal_end=2013-06-23T00:01Z
-
-
+  if request.REQUEST.get('format') == 'json':
+    return HttpResponse(json.dumps({'oozie_slas': oozie_slas}), content_type="text/plain")
 
   return render('dashboard/list_oozie_sla.mako', request, {
     'oozie_slas': oozie_slas,
