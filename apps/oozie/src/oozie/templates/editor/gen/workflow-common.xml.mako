@@ -65,3 +65,16 @@
         % endif
     % endfor
 </%def>
+
+
+<%def name="sla(element)">
+        % if element.sla_enabled:
+          <sla:info>
+          % for sla in element.sla:
+            % if sla['value'] and sla['key'] != 'enabled':
+            <sla:${ sla['key'] }>${ sla['value'] }</sla:${ sla['key'] }>
+            % endif
+          % endfor
+          </sla:info>
+        % endif
+</%def>

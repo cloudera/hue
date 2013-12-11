@@ -259,6 +259,24 @@
 </%def>
 
 
+<%def name="slaForm()">
+  <div data-bind="foreach: sla">
+    <div class="controls">          
+      <div class="span3">
+        <span data-bind="text: getSLAText(key)['niceName']"></span>
+      </div>
+      <div class="span9">
+        <!-- ko if:  key == 'enabled' -->
+        <input type="checkbox" data-bind="checked: value"/>
+        <!-- /ko -->
+        <!-- ko if:  key != 'enabled' -->
+        <input type="text" data-bind="value: value, attr: {placeholder: getSLAText(key)['placeHolder']}" class="span7">
+        <!-- /ko -->
+      </div>
+    </div>
+  </div>           
+</%def>
+
 <%def name="render_constant(label, value)">
   <div class="control-group">
     <label class="control-label">${ label }</label>

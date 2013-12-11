@@ -57,11 +57,15 @@ def format_dict_field_values(dictionary):
 
 def model_to_dict(model):
   from django.db import models
+  from oozie.models import Node
   dictionary = {}
   for field in model._meta.fields:
     try:
       attr = getattr(model, field.name, None)
-      if isinstance(attr, models.Model):
+      if field.name == 'data' and issubclass(type(model), Node):
+        if hasattr(model, 'sla'):
+          dictionary['sla'] = model.sla
+      elif isinstance(attr, models.Model):
         dictionary[field.name] = attr.id
       elif isinstance(attr, datetime):
         dictionary[field.name] = str(attr)

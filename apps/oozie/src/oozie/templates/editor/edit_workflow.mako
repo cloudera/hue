@@ -112,31 +112,7 @@ ${ layout.menubar(section='workflows') }
       })
       %>
 
-
-        <div id="slaEditord" class="control-group">
-          <label class="control-label">
-              ${ _('SLA') }
-          </label>
-          
-          <div data-bind="foreach: sla">
-            <div class="controls">          
-              <div class="span3">
-                <span data-bind="text: getSLAText(key)['niceName']"></span>
-              </div>
-              <div class="span9">
-                <!-- ko if:  key == 'enabled' -->
-                <input type="checkbox" data-bind="checked: value"/>
-                <!-- /ko -->
-                <!-- ko if:  key != 'enabled' -->
-                <input type="text" data-bind="value: value, attr: {placeholder: getSLAText(key)['placeHolder']}" class="span7">
-                <!-- /ko -->
-              </div>
-            </div>
-          </div>      
-  
-        </div>
-
-        <div class="control-group ">
+        <div class="control-group">
           <label class="control-label">
             <a href="#" id="advanced-btn" onclick="$('#advanced-container').toggle('hide')">
               <i class="fa fa-share"></i> ${ _('advanced') }</a>
@@ -145,6 +121,15 @@ ${ layout.menubar(section='workflows') }
         </div>
 
       <div id="advanced-container" class="hide">
+      
+        <div id="slaEditord" class="control-group">
+          <label class="control-label">
+              ${ _('SLA') }
+          </label>
+          
+          ${ utils.slaForm() }  
+        </div>      
+      
         % if user_can_edit_job:
           ${ utils.render_field_with_error_js(workflow_form['deployment_dir'], workflow_form['deployment_dir'].name, extra_attrs={'data-bind': 'value: %s' % workflow_form['deployment_dir'].name}) }
         % endif
@@ -946,18 +931,6 @@ window.onbeforeunload = function (e) {
   }
 };
 
-function getSLAText(key) {
-  return {
-     'enabled': {'niceName': '${ _("Enabled") }', 'placeHolder': ''},
-     'nominal-time': {'niceName': '${ _("Nominal time") } *', 'placeHolder': '${"$"}{nominal_time}'},
-     'should-start': {'niceName': '${ _("Should start") }', 'placeHolder': '${"$"}{10 * MINUTES}'},
-     'should-end': {'niceName': '${ _("Should end") } *', 'placeHolder': '${"$"}{30 * MINUTES}'},
-     'max-duration': {'niceName': '${ _("Max duration") }', 'placeHolder': '${"$"}{30 * MINUTES}'},
-     'alert-events': {'niceName': '${ _("Alert events") }', 'placeHolder': 'start_miss,end_miss,duration_miss'},
-     'alert-contact': {'niceName': '${ _("Alert contact") }', 'placeHolder': 'joe@example.com,bob@example.com'} 
-  }[key]
-};
-
 window.onresize = function () {
   if (modal) {
     modal.recenter(280, 0);
@@ -1075,6 +1048,18 @@ function checkModelDirtiness() {
     $('.ribbon-wrapper').hide();
   }
 }
+
+function getSLAText(key) {
+  return {
+     'enabled': {'niceName': '${ _("Enabled") }', 'placeHolder': ''},
+     'nominal-time': {'niceName': '${ _("Nominal time") } *', 'placeHolder': '${"$"}{nominal_time}'},
+     'should-start': {'niceName': '${ _("Should start") }', 'placeHolder': '${"$"}{10 * MINUTES}'},
+     'should-end': {'niceName': '${ _("Should end") } *', 'placeHolder': '${"$"}{30 * MINUTES}'},
+     'max-duration': {'niceName': '${ _("Max duration") }', 'placeHolder': '${"$"}{30 * MINUTES}'},
+     'alert-events': {'niceName': '${ _("Alert events") }', 'placeHolder': 'start_miss,end_miss,duration_miss'},
+     'alert-contact': {'niceName': '${ _("Alert contact") }', 'placeHolder': 'joe@example.com,bob@example.com'} 
+  }[key]
+};
 
 </script>
 

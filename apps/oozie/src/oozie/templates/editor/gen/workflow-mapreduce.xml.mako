@@ -32,4 +32,5 @@
         </map-reduce>
         <ok to="${ node.get_oozie_child('ok') }"/>
         <error to="${ node.get_oozie_child('error') }"/>
+        ${ common.sla(node) }
     </action>

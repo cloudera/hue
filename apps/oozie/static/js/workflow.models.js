@@ -382,7 +382,8 @@ $.extend(DistCPModel.prototype, {
   prepares: '[]',
   job_xml: '',
   params: '[]',
-  child_links: []
+  child_links: [],
+  sla: []
 });
 
 var MapReduceModel = ModelModule($);
@@ -398,7 +399,8 @@ $.extend(MapReduceModel.prototype, {
   jar_path: '',
   prepares: '[]',
   job_xml: '',
-  child_links: []
+  child_links: [],
+  sla: []
 });
 
 var StreamingModel = ModelModule($);
@@ -413,7 +415,8 @@ $.extend(StreamingModel.prototype, {
   job_properties: '[]',
   mapper: '',
   reducer: '',
-  child_links: []
+  child_links: [],
+  sla: []
 });
 
 var JavaModel = ModelModule($);
@@ -433,7 +436,8 @@ $.extend(JavaModel.prototype, {
   args: '',
   java_opts: '',
   capture_output: false,
-  child_links: []
+  child_links: [],
+  sla: []
 });
 
 var PigModel = ModelModule($);
@@ -450,7 +454,8 @@ $.extend(PigModel.prototype, {
   job_xml: '',
   params: '[]',
   script_path: '',
-  child_links: []
+  child_links: [],
+  sla: []
 });
 
 var HiveModel = ModelModule($);
@@ -467,7 +472,8 @@ $.extend(HiveModel.prototype, {
   job_xml: '',
   params: '[]',
   script_path: '',
-  child_links: []
+  child_links: [],
+  sla: []
 });
 
 var SqoopModel = ModelModule($);
@@ -484,7 +490,8 @@ $.extend(SqoopModel.prototype, {
   job_xml: '',
   params: '[]',
   script_path: '',
-  child_links: []
+  child_links: [],
+  sla: []
 });
 
 var ShellModel = ModelModule($);
@@ -502,7 +509,8 @@ $.extend(ShellModel.prototype, {
   params: '[]',
   command: '',
   capture_output: false,
-  child_links: []
+  child_links: [],
+  sla: []
 });
 
 var SshModel = ModelModule($);
@@ -517,7 +525,8 @@ $.extend(SshModel.prototype, {
   params: '[]',
   command: '',
   capture_output: false,
-  child_links: []
+  child_links: [],
+  sla: []
 });
 
 var FsModel = ModelModule($);
@@ -532,7 +541,8 @@ $.extend(FsModel.prototype, {
   moves: '[]',
   chmods: '[]',
   touchzs: '[]',
-  child_links: []
+  child_links: [],
+  sla: []
 });
 
 var EmailModel = ModelModule($);
@@ -546,7 +556,8 @@ $.extend(EmailModel.prototype, {
   cc: '',
   subject: '',
   body: '',
-  child_links: []
+  child_links: [],
+  sla: []
 });
 
 var SubWorkflowModel = ModelModule($);
@@ -559,7 +570,8 @@ $.extend(SubWorkflowModel.prototype, {
   sub_workflow: 0,
   propagate_configuration: true,
   job_properties: '[]',
-  child_links: []
+  child_links: [],
+  sla: []
 });
 
 var GenericModel = ModelModule($);

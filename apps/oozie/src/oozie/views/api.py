@@ -205,7 +205,9 @@ def _update_workflow_nodes_json(workflow, json_nodes, id_map, user):
     id_map[str(json_node['id'])] = node.id
 
     for key in json_node:
-      if key not in ('node_ptr', 'child_nodes', 'workflow', 'id', 'sub_workflow'):
+      if key == 'sla':
+        node.set_sla(json_node[key])
+      elif key not in ('node_ptr', 'child_nodes', 'workflow', 'id', 'sub_workflow'):
         setattr(node, key, format_field_value(key, json_node[key]))
 
     node.workflow = workflow
@@ -277,7 +279,7 @@ def workflow_validate_node(request, workflow, node_type):
 def workflow_save(request, workflow):
   if request.method != 'POST':
     raise StructuredException(code="METHOD_NOT_ALLOWED_ERROR", message=_('Must be POST request.'), error_code=405)
-  print request.POST
+
   json_workflow = format_dict_field_values(json.loads(str(request.POST.get('workflow'))))
   json_workflow.setdefault('schema_version', workflow.schema_version)
 
