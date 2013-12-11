@@ -40,7 +40,7 @@ _api_cache = None
 _api_cache_lock = threading.Lock()
 
 
-def get_oozie(user, api_version=API_VERSION):
+def get_oozie(user, api_version=API_VERSION): # cf. cache version pb
   global _api_cache
   if _api_cache is None:
     _api_cache_lock.acquire()
