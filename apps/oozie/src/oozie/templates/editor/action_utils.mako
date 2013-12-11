@@ -61,7 +61,7 @@
 
   ${ utils.render_constant(_('Action type'), node_type) }
 
-  <!-- ko if: $root.context().nodes && $root.context().error_node -->
+  
   <div class="control-group ">
     <label class="control-label">
       <a href="javascript:void(0);" id="advanced-btn" onclick="$('#node-advanced-container').toggle('hide')">
@@ -71,6 +71,16 @@
   </div>
 
   <div id="node-advanced-container" class="hide">
+
+        <div class="control-group">
+          <label class="control-label">
+              ${ _('SLA') }
+          </label>      
+      
+          ${ utils.slaForm() }  
+    </div>
+
+    <!-- ko if: $root.context().nodes && $root.context().error_node -->
     <div class="control-group">
       <label class="control-label">${_('Error link to')}</label>
       <div class="controls">
@@ -82,12 +92,15 @@
                              optionsValue: function(item) {
                                return item.id();
                              },
-                             value: $root.context().error_node"></select>
+                             value: $root.context().error_node">
+           </select>
         </div>
       </div>
     </div>
+    <!-- /ko -->
+
   </div>
-  <!-- /ko -->
+  
 
   <hr/>
 % endif

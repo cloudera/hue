@@ -1257,7 +1257,7 @@ class TestEditor(OozieMockBase):
     self.wf.node_set.filter(name='action-name-1').delete()
 
 
-  def test_workflow_gen_sla(self):    
+  def test_workflow_gen_workflow_sla(self):    
     xml = self.wf.to_xml({'output': '/path'})
     assert_false('<sla' in xml, xml)
     assert_false('xmlns="uri:oozie:workflow:0.5"' in xml, xml)
@@ -1273,10 +1273,53 @@ class TestEditor(OozieMockBase):
     xml = self.wf.to_xml({'output': '/path'})
     assert_true('xmlns="uri:oozie:workflow:0.5"' in xml, xml)
     assert_true('xmlns:sla="uri:oozie:sla:0.2"' in xml, xml)
-    assert_true("""<sla:info>
-        <sla:nominal-time>now</sla:nominal-time>
-        <sla:should-end>${ 10 * MINUTES}</sla:should-end>
-    </sla:info>""" in xml, xml)
+    assert_true("""<end name="end"/>
+          <sla:info>
+            <sla:nominal-time>now</sla:nominal-time>
+            <sla:should-end>${ 10 * MINUTES}</sla:should-end>
+          </sla:info>
+</workflow-app>""" in xml, xml)
+
+
+  def test_workflow_gen_action_sla(self):    
+    xml = self.wf.to_xml({'output': '/path'})
+    assert_false('<sla' in xml, xml)
+    assert_false('xmlns="uri:oozie:workflow:0.5"' in xml, xml)
+    assert_false('xmlns:sla="uri:oozie:sla:0.2"' in xml, xml)
+
+    self.wf.node_set.filter(name='action-name-1').delete()
+
+    action1 = add_node(self.wf, 'action-name-1', 'hive', [self.wf.start], {
+        u'job_xml': 'my-job.xml',
+        u'files': '["hello.py"]',
+        u'name': 'MyHive',
+        u'job_properties': '[]',
+        u'script_path': 'hello.sql',
+        u'archives': '[]',
+        u'prepares': '[]',
+        u'params': '[{"value":"World!","type":"argument"}]',
+        u'description': ''
+    })
+    Link(parent=action1, child=self.wf.end, name="ok").save()
+
+    xml = self.wf.to_xml()
+
+    sla = action1.sla
+    sla[0]['value'] = True
+    sla[1]['value'] = 'now' # nominal-time
+    sla[3]['value'] = '${ 10 * MINUTES}' # should-end
+    action1.set_sla(sla)
+    action1.save()
+
+    xml = self.wf.to_xml({'output': '/path'})
+    assert_true('xmlns="uri:oozie:workflow:0.5"' in xml, xml)
+    assert_true('xmlns:sla="uri:oozie:sla:0.2"' in xml, xml)
+    assert_true("""<error to="kill"/>
+          <sla:info>
+            <sla:nominal-time>now</sla:nominal-time>
+            <sla:should-end>${ 10 * MINUTES}</sla:should-end>
+          </sla:info>
+    </action>""" in xml, xml)
 
 
   def test_create_coordinator(self):

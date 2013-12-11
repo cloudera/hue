@@ -95,34 +95,34 @@ var NodeModule = function($, IdGeneratorTable, NodeFields) {
 
     self.edit_template = model.node_type + 'EditTemplate';
     switch(model.node_type) {
-    case 'start':
-    case 'end':
-      self.view_template = ko.observable('disabledNodeTemplate');
-    break;
+      case 'start':
+      case 'end':
+        self.view_template = ko.observable('disabledNodeTemplate');
+      break;
 
-    case 'kill':
-      self.view_template = ko.observable('emptyTemplate');
-    break;
+      case 'kill':
+        self.view_template = ko.observable('emptyTemplate');
+      break;
 
-    case 'fork':
-      self.view_template = ko.observable('forkTemplate');
-    break;
+      case 'fork':
+        self.view_template = ko.observable('forkTemplate');
+      break;
 
-    case 'join':
-      self.view_template = ko.observable('joinTemplate');
-    break;
+      case 'join':
+        self.view_template = ko.observable('joinTemplate');
+      break;
 
-    case 'decision':
-      self.view_template = ko.observable('decisionTemplate');
-    break;
+      case 'decision':
+        self.view_template = ko.observable('decisionTemplate');
+      break;
 
-    case 'decisionend':
-      self.view_template = ko.observable('decisionEndTemplate');
-    break;
+      case 'decisionend':
+        self.view_template = ko.observable('decisionEndTemplate');
+      break;
 
-    default:
-      self.view_template = ko.observable('nodeTemplate');
-    break;
+      default:
+        self.view_template = ko.observable('nodeTemplate');
+      break;
     }
 
     // Data manipulation
@@ -168,6 +168,14 @@ var NodeModule = function($, IdGeneratorTable, NodeFields) {
       self.removeFile = function(val) {
         self.files.remove(val);
       };
+    }
+    
+    if ('sla' in self.model) {
+      var data = self.model['sla'];
+      //alert(data);
+      self.sla = ko.observableArray(self.model['sla']);
+      ///self.sla = ko.observable('aaa');
+      //delete self.model['data'];
     }
 
     self.initialize.apply(self, arguments);

@@ -94,7 +94,7 @@ class ImportJobsubDesignForm(forms.Form):
 
 class NodeForm(forms.ModelForm):
   class Meta:
-    ALWAYS_HIDE = ('workflow', 'children', 'node_type')
+    ALWAYS_HIDE = ('workflow', 'children', 'node_type', 'data')
     model = Node
     exclude = ALWAYS_HIDE
 

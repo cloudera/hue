@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import json
+import copy
 import logging
 import re
 import StringIO
@@ -48,7 +49,6 @@ from hadoop.fs.hadoopfs import Hdfs
 from liboozie.submittion import Submission
 from liboozie.submittion import create_directories
 
-
 from oozie.conf import REMOTE_SAMPLE_DIR
 from oozie.utils import utc_datetime_format
 from oozie.timezones import TIMEZONES
@@ -60,7 +60,15 @@ LOG = logging.getLogger(__name__)
 PATH_MAX = 512
 name_validator = RegexValidator(regex='^[a-zA-Z_][\-_a-zA-Z0-9]{1,39}$',
                                 message=_('Enter a valid value: combination of 2 - 40 letters and digits starting by a letter'))
-
+DEFAULT_SLA = [
+    {'key': 'enabled', 'value': False},
+    {'key': 'nominal-time', 'value': ''},
+    {'key': 'should-start', 'value': ''},
+    {'key': 'should-end', 'value': ''},
+    {'key': 'max-duration', 'value': ''},
+    {'key': 'alert-events', 'value': ''},
+    {'key': 'alert-contact', 'value': ''},        
+]
 
 class JobManager(models.Manager):
 
@@ -206,15 +214,7 @@ class Job(models.Model):
 
   @property
   def sla(self):
-    return json.loads(self.data).get('sla', [
-        {'key': 'enabled', 'value': False},
-        {'key': 'nominal-time', 'value': ''},
-        {'key': 'should-start', 'value': ''},
-        {'key': 'should-end', 'value': ''},
-        {'key': 'max-duration', 'value': ''},
-        {'key': 'alert-events', 'value': ''},
-        {'key': 'alert-contact', 'value': ''},        
-    ])
+    return json.loads(self.data).get('sla', copy.deepcopy(DEFAULT_SLA))
   
   @property
   def sla_jsescaped(self):
@@ -224,9 +224,6 @@ class Job(models.Model):
     data_json = json.loads(self.data)
     data_json['sla'] = sla  
     self.data = json.dumps(data_json)
-    
-    if self.get_type() == 'workflow':
-      self.schema_version = WorkflowManager.SCHEMA_VERSION_V5 if self.sla_enabled else WorkflowManager.SCHEMA_VERSION_V4
 
   @property
   def sla_enabled(self):
@@ -566,6 +563,10 @@ class Workflow(Job):
     workflow_xml = zfile.read('workflow.xml')
     return workflow_xml, metadata
 
+  @property
+  def sla_workflow_enabled(self):
+    return self.sla_enabled or any([node.sla_enabled for node in self.node_list if hasattr(node, 'sla_enabled')])
+
 
 class Link(models.Model):
   # Links to exclude when using get_children_link(), get_parent_links() in the API
@@ -602,7 +603,7 @@ class Node(models.Model):
                                help_text=_t('The type of action (e.g. MapReduce, Pig...)'))
   workflow = models.ForeignKey(Workflow)
   children = models.ManyToManyField('self', related_name='parents', symmetrical=False, through=Link)
-  #data = models.TextField(default=json.dumps({}))
+  data = models.TextField(blank=True, default=json.dumps({}))
 
   unique_together = ('workflow', 'name')
 
@@ -738,6 +739,19 @@ class Node(models.Model):
     raise NotImplementedError(_("%(node_type)s has not implemented the 'add_node' method.") % {
       'node_type': self.node_type
     })
+
+  @property
+  def sla(self):
+    return json.loads(self.data).get('sla', copy.deepcopy(DEFAULT_SLA))
+  
+  def set_sla(self, sla):
+    data_json = json.loads(self.data)
+    data_json['sla'] = sla  
+    self.data = json.dumps(data_json)
+
+  @property
+  def sla_enabled(self):
+    return self.sla[0]['value'] # #1 is enabled
 
 
 class Action(Node):
