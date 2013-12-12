@@ -556,7 +556,6 @@ ${ layout.menubar(section='workflows', dashboard=True) }
 
     function resizeLogs() {
       $("#log pre").css("overflow", "auto").height($(window).height() - $("#log pre").position().top - 80);
-      $("#log pre").css("overflow", "auto").height($(window).height() - $("#log pre").position().top - 80);
     }
 
   });

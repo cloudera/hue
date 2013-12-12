@@ -45,7 +45,7 @@ def get_oozie(user, api_version=API_VERSION):
   if _api_cache is None or _api_cache.api_version != api_version:
     _api_cache_lock.acquire()
     try:
-      if _api_cache is None:
+      if _api_cache is None or _api_cache.api_version != api_version:
         secure = SECURITY_ENABLED.get()
         _api_cache = OozieApi(OOZIE_URL.get(), secure, api_version)
     finally:

@@ -82,10 +82,6 @@ ${ layout.menubar(section='workflows') }
     <div id="properties" class="section hide">
     <div class="card card-small">
     
-            
-    
-
-    
       <div class="alert alert-info"><h3 data-bind="text: name()"></h3></div>
       <div class="card-body">
         <p>
