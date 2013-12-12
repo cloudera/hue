@@ -338,7 +338,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
     <script id="cell_edit_modal_template" type="text/html">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h3>Edit Cell - <span data-bind="text: content.name || formatTimestamp(content.timestamp)"></span> <code data-bind="text: mime"></code> <small><i class="fa fa-clock-o"></i> <span data-bind="text: $data.content.timestamp"></span></small></h3>
+        <h3>${_('Edit Cell')} - <span data-bind="text: content.name || formatTimestamp(content.timestamp)"></span> <code data-bind="text: mime"></code> <small><i class="fa fa-clock-o"></i> <span data-bind="text: $data.content.timestamp"></span></small></h3>
       </div>
       <div class="modal-body container-fluid">
           <div class="row-fluid">
@@ -367,7 +367,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
       <div class="modal-footer" data-bind="if: !$data.readonly">
         % if user.is_superuser:
           <button class="btn" data-dismiss="modal" aria-hidden="true">${_('Cancel')}</button>
-          <button id="file-upload-btn" class="btn fileChooserBtn" aria-hidden="true"><i class="fa fa-upload"></i> ${_('Upload')}</button>
+          <a id="file-upload-btn" class="btn fileChooserBtn" aria-hidden="true"><i class="fa fa-upload"></i> ${_('Upload')}</a>
           <input type="submit" class="btn btn-primary" value="${_('Save')}">
         % else:
           <button class="btn" data-dismiss="modal" aria-hidden="true">${_('OK')}</button>
