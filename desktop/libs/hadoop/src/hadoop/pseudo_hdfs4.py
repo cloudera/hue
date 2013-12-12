@@ -31,6 +31,7 @@ import time
 from desktop.lib.python_util import find_unused_port
 
 import hadoop
+from hadoop import cluster
 from hadoop.mini_cluster import write_config
 from hadoop.job_tracker import LiveJobTracker
 from desktop.lib.paths import get_run_root
@@ -43,6 +44,7 @@ LOG = logging.getLogger(__name__)
 
 STARTUP_DEADLINE = 60.0
 CLEANUP_TMP_DIR = os.environ.get('MINI_CLUSTER_CLEANUP', 'true')
+BOOT_MINI_CLUSTER = os.environ.get('BOOT_MINI_CLUSTER', 'true')
 
 
 class PseudoHdfs4(object):
@@ -126,12 +128,15 @@ class PseudoHdfs4(object):
 
   @property
   def fs(self):
-    if self._fs is None:
-      if self._dfs_http_address is None:
-        LOG.warn("Attempt to access uninitialized filesystem")
-        return None
-      self._fs = hadoop.fs.webhdfs.WebHdfs("http://%s/webhdfs/v1" % (self._dfs_http_address,), self.fs_default_name)
-    return self._fs
+    if BOOT_MINI_CLUSTER == 'true':
+      if self._fs is None:
+        if self._dfs_http_address is None:
+          LOG.warn("Attempt to access uninitialized filesystem")
+          return None
+        self._fs = hadoop.fs.webhdfs.WebHdfs("http://%s/webhdfs/v1" % (self._dfs_http_address,), self.fs_default_name)
+      return self._fs
+    else:
+      return cluster.get_hdfs()
 
   @property
   def jt(self):
@@ -504,36 +509,37 @@ def shared_cluster():
 
   if _shared_cluster is None:
     cluster = PseudoHdfs4()
-    atexit.register(cluster.stop)
+    if BOOT_MINI_CLUSTER == 'true':
+      atexit.register(cluster.stop)
 
-    try:
-      cluster.start()
-    except Exception, ex:
-      LOG.exception("Failed to fully bring up test cluster: %s" % (ex,))
+      try:
+        cluster.start()
+      except Exception, ex:
+        LOG.exception("Failed to fully bring up test cluster: %s" % (ex,))
 
-    fqdn = socket.getfqdn()
-    webhdfs_url = "http://%s:%s/webhdfs/v1" % (fqdn, cluster.dfs_http_port,)
+      fqdn = socket.getfqdn()
+      webhdfs_url = "http://%s:%s/webhdfs/v1" % (fqdn, cluster.dfs_http_port,)
 
-    closers = [
-      hadoop.conf.HDFS_CLUSTERS['default'].FS_DEFAULTFS.set_for_testing(cluster.fs_default_name),
-      hadoop.conf.HDFS_CLUSTERS['default'].WEBHDFS_URL.set_for_testing(webhdfs_url),
+      closers = [
+        hadoop.conf.HDFS_CLUSTERS['default'].FS_DEFAULTFS.set_for_testing(cluster.fs_default_name),
+        hadoop.conf.HDFS_CLUSTERS['default'].WEBHDFS_URL.set_for_testing(webhdfs_url),
 
-      hadoop.conf.YARN_CLUSTERS['default'].HOST.set_for_testing(fqdn),
-      hadoop.conf.YARN_CLUSTERS['default'].PORT.set_for_testing(cluster._rm_port),
+        hadoop.conf.YARN_CLUSTERS['default'].HOST.set_for_testing(fqdn),
+        hadoop.conf.YARN_CLUSTERS['default'].PORT.set_for_testing(cluster._rm_port),
 
-      hadoop.conf.YARN_CLUSTERS['default'].RESOURCE_MANAGER_API_URL.set_for_testing('http://%s:%s' % (cluster._fqdn, cluster._rm_webapp_port,)),
-      hadoop.conf.YARN_CLUSTERS['default'].PROXY_API_URL.set_for_testing('http://%s:%s' % (cluster._fqdn, cluster._rm_webapp_port,)),
-      hadoop.conf.YARN_CLUSTERS['default'].HISTORY_SERVER_API_URL.set_for_testing('%s:%s' % (cluster._fqdn, cluster._jh_web_port,)),
-    ]
+        hadoop.conf.YARN_CLUSTERS['default'].RESOURCE_MANAGER_API_URL.set_for_testing('http://%s:%s' % (cluster._fqdn, cluster._rm_webapp_port,)),
+        hadoop.conf.YARN_CLUSTERS['default'].PROXY_API_URL.set_for_testing('http://%s:%s' % (cluster._fqdn, cluster._rm_webapp_port,)),
+        hadoop.conf.YARN_CLUSTERS['default'].HISTORY_SERVER_API_URL.set_for_testing('%s:%s' % (cluster._fqdn, cluster._jh_web_port,)),
+      ]
 
-    old = hadoop.cluster.clear_caches()
+      old = hadoop.cluster.clear_caches()
 
-    def restore_config():
-      hadoop.cluster.restore_caches(old)
-      for x in closers:
-        x()
+      def restore_config():
+        hadoop.cluster.restore_caches(old)
+        for x in closers:
+          x()
 
-    cluster.shutdown_hook = restore_config
+      cluster.shutdown_hook = restore_config
     _shared_cluster = cluster
 
   return _shared_cluster
