@@ -139,6 +139,9 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
       <li><a href="#configuration" data-toggle="tab">${ _('Configuration') }</a></li>
       <li><a href="#log" data-toggle="tab">${ _('Log') }</a></li>
       <li><a href="#definition" data-toggle="tab">${ _('Definition') }</a></li>
+      % if oozie_coordinator.has_sla:
+      <li><a href="#sla" data-toggle="tab">${ _('SLA') }</a></li>
+      % endif
     </ul>
 
     <div class="tab-content" style="padding-bottom:200px">
@@ -269,6 +272,11 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
       <div class="tab-pane" id="definition">
         <textarea id="definitionEditor">${ oozie_coordinator.definition.decode('utf-8', 'replace') }</textarea>
       </div>
+      
+      % if oozie_coordinator.has_sla:
+      <div class="tab-pane" id="sla">          
+      </div>
+      % endif
     </div>
 
     <div style="margin-bottom: 16px">

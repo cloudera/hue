@@ -68,6 +68,8 @@ DEFAULT_SLA = [
     {'key': 'max-duration', 'value': ''},
     {'key': 'alert-events', 'value': ''},
     {'key': 'alert-contact', 'value': ''},
+    #{'key': 'notification-msg', 'value': ''},
+    #{'key': 'alert-contact', 'value': ''},
 ]
 
 class JobManager(models.Manager):
@@ -214,6 +216,8 @@ class Job(models.Model):
 
   @property
   def sla(self):
+    if not self.data: # backward compatible
+      self.data = json.dumps({})
     return json.loads(self.data).get('sla', copy.deepcopy(DEFAULT_SLA))
 
   @property
@@ -221,6 +225,8 @@ class Job(models.Model):
     return json.dumps(self.sla, cls=JSONEncoderForHTML)
 
   def set_sla(self, sla):
+    if not self.data: # backward compatible
+      self.data = json.dumps({})    
     data_json = json.loads(self.data)
     data_json['sla'] = sla
     self.data = json.dumps(data_json)

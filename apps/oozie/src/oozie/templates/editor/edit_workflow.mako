@@ -1045,21 +1045,10 @@ function checkModelDirtiness() {
   }
 }
 
-function getSLAText(key) {
-  return {
-     'enabled': {'niceName': '${ _("Enabled") }', 'placeHolder': ''},
-     'nominal-time': {'niceName': '${ _("Nominal time") } *', 'placeHolder': '${"$"}{nominal_time}'},
-     'should-start': {'niceName': '${ _("Should start") }', 'placeHolder': '${"$"}{10 * MINUTES}'},
-     'should-end': {'niceName': '${ _("Should end") } *', 'placeHolder': '${"$"}{30 * MINUTES}'},
-     'max-duration': {'niceName': '${ _("Max duration") }', 'placeHolder': '${"$"}{30 * MINUTES}'},
-     'alert-events': {'niceName': '${ _("Alert events") }', 'placeHolder': 'start_miss,end_miss,duration_miss'},
-     'alert-contact': {'niceName': '${ _("Alert contact") }', 'placeHolder': 'joe@example.com,bob@example.com'} 
-  }[key]
-};
-
 </script>
 
 ${ utils.path_chooser_libs(True) }
+${ utils.slaGlobal() }
 
 <script>
   $(document).ready(function(){

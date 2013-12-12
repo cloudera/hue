@@ -459,7 +459,7 @@ def edit_coordinator(request, coordinator):
     data_output_formset = DataOutputFormSet(request.POST, request.FILES, instance=coordinator)
     new_data_input_formset = NewDataInputFormSet(request.POST, request.FILES, instance=coordinator, prefix='input')
     new_data_output_formset = NewDataOutputFormSet(request.POST, request.FILES, instance=coordinator, prefix='output')
-
+    print request.POST
     if coordinator_form.is_valid() and dataset_formset.is_valid() and data_input_formset.is_valid() and data_output_formset.is_valid() \
         and new_data_input_formset.is_valid() and new_data_output_formset.is_valid():
       coordinator = coordinator_form.save()
@@ -468,6 +468,9 @@ def edit_coordinator(request, coordinator):
       data_output_formset.save()
       new_data_input_formset.save()
       new_data_output_formset.save()
+      
+      coordinator.set_sla(json.loads(request.POST.get('sla')))
+      coordinator.save()
 
       request.info(_('Coordinator saved.'))
       return redirect(reverse('oozie:edit_coordinator', kwargs={'coordinator': coordinator.id}))

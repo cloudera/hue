@@ -51,7 +51,6 @@ $(document).ready(function () {
     };
   };
 
-
   window.viewModel = new ViewModel();
   ko.applyBindings(window.viewModel, document.getElementById('editBundledCoordinator'));
 

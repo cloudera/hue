@@ -104,7 +104,7 @@ ${ layout.menubar(section='coordinators') }
             <div class="fieldWrapper">
               ${ utils.render_field_no_popover(coordinator_form['name'], extra_attrs = {'validate':'true'}) }
               ${ utils.render_field_no_popover(coordinator_form['description']) }
-              ${ utils.render_field_no_popover(coordinator_form['workflow'], extra_attrs = {'validate':'true'}) }              
+              ${ utils.render_field_no_popover(coordinator_form['workflow'], extra_attrs = {'validate':'true'}) }
               ${ coordinator_form['parameters'] | n,unicode }
               <div class="hide">
                 ${ utils.render_field_no_popover(coordinator_form['is_shared']) }
@@ -251,9 +251,11 @@ ${ layout.menubar(section='coordinators') }
 
           <div id="step5" class="stepDetails hide">
             <div class="alert alert-info"><h3>${ _('Advanced settings') }</h3></div>
-            ${ properties.print_key_value(coordinator_form['parameters'], 'parameters') }
-            ${ properties.print_key_value(coordinator_form['job_properties'], 'job_properties') }
-            ${ utils.render_field(coordinator_form['timeout']) }
+            <div id="properties-settings">
+              ${ properties.print_key_value(coordinator_form['parameters'], 'parameters') }
+              ${ properties.print_key_value(coordinator_form['job_properties'], 'job_properties') }
+            </div>
+              ${ utils.render_field(coordinator_form['timeout']) }
             <div class="row-fluid">
               <div class="span6">
                 ${ utils.render_field(coordinator_form['concurrency']) }
@@ -262,13 +264,31 @@ ${ layout.menubar(section='coordinators') }
                 ${ utils.render_field(coordinator_form['throttle']) }
               </div>
             </div>
+
             ${ utils.render_field(coordinator_form['execution']) }
             ${ coordinator_form['schema_version'] | n,unicode }
+
+            <div class="control-group">
+              <label class="control-label">
+                <a href="#" id="advanced-btn" onclick="$('#advanced-container').toggle('hide')">
+                <i class="fa fa-share"></i> ${ _('Advanced') }</a>
+              </label>
+              <div class="controls"></div>
+            </div>
+
+            <div id="advanced-container" class="hide">
+              <div id="slaEditord" class="control-group">
+                <label class="control-label">
+                  ${ _('SLA') }
+                </label>
+                ${ utils.slaForm() }
+              </div>
+            </div>
           </div>
 
         </div>
 
-        <div class="form-actions">
+        <div class="form-actions" id="bottom-nav">
           <a id="backBtn" class="btn disabled">${ _('Back') }</a>
           <a id="nextBtn" class="btn btn-primary disable-feedback">${ _('Next') }</a>
           % if coordinator.is_editable(user):
@@ -394,7 +414,7 @@ ${ layout.menubar(section='coordinators') }
               <tr>
                 <td>
                   <a href="${ url('oozie:list_history_record', record_id=record.id) }" data-row-selector="true"></a>
-                ${ utils.format_date(record.submission_date) }
+                  ${ utils.format_date(record.submission_date) }
                 </td>
                 <td>${ record.oozie_job_id }</td>
               </tr>
@@ -499,19 +519,19 @@ ${ layout.menubar(section='coordinators') }
           _clone.appendTo($("#add-dataset-form"));
         });
         $.post("${ url('oozie:create_coordinator_dataset', coordinator=coordinator.id) }",
-                $("#add-dataset-form").serialize(),
-                function (response) {
-                  if (response['status'] != 0) {
-                    $("#add-dataset-form").empty();
-                    $('#add-dataset-body').html(response['data']);
-                    decorateDateTime();
-                    ko.cleanNode(window.document.body);
-                    ko.applyBindings(window.viewModel);
-                  } else {
-                    window.location.replace(response['data']);
-                    window.location.reload();
-                  }
-                }
+            $("#add-dataset-form").serialize(),
+            function (response) {
+              if (response['status'] != 0) {
+                $("#add-dataset-form").empty();
+                $('#add-dataset-body').html(response['data']);
+                decorateDateTime();
+                ko.cleanNode($('#add-dataset-body')[0]);
+                ko.applyBindings(window.viewModel, $('#add-dataset-body')[0]);
+              } else {
+                window.location.replace(response['data']);
+                window.location.reload();
+              }
+            }
         );
       });
 
@@ -527,8 +547,8 @@ ${ layout.menubar(section='coordinators') }
           success:function (response) {
             $("#edit-dataset-body").html(response['data']);
             decorateDateTime();
-            ko.cleanNode(window.document.body);
-            ko.applyBindings(window.viewModel);
+            ko.cleanNode($('#edit-dataset-body')[0]);
+            ko.applyBindings(window.viewModel, $('#edit-dataset-body')[0]);
             routie("editDataset");
           }
         });
@@ -579,8 +599,20 @@ ${ layout.menubar(section='coordinators') }
 
       $("a[data-row-selector='true']").jHueRowSelector();
 
+      var slaModel = function() {
+        var self = this;
+        self.sla = ko.observableArray(${ coordinator.sla_jsescaped | n,unicode });
+      };
+
+      window.slaModel = new slaModel();
+      ko.applyBindings(window.slaModel, document.getElementById('slaEditord'));
+
       window.viewModel.isSaveVisible = ko.observable(false);
-      ko.applyBindings(window.viewModel);
+      ko.applyBindings(window.viewModel, $('#bottom-nav')[0]);
+      ko.applyBindings(window.viewModel, $('#properties-settings')[0]);
+      ko.applyBindings(window.viewModel, $('#step3')[0]);
+      ko.applyBindings(window.viewModel, $('#step4')[0]);
+      ko.applyBindings(window.viewModel, $('#createDataset')[0]);
 
       $("*[rel=popover]").popover({
         placement:'top',
@@ -735,7 +767,7 @@ ${ layout.menubar(section='coordinators') }
   </script>
 % endif
 
-
 ${ utils.decorate_datetime_fields() }
+${ utils.slaGlobal() }
 
 ${ commonfooter(messages) | n,unicode }
