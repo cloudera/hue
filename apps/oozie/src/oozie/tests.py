@@ -185,7 +185,7 @@ class MockOozieApi:
 
   def get_oozie_slas(self, **kwargs):
     return MockOozieApi.WORKFLOWS_SLAS
-    
+
 
 class OozieMockBase(object):
 
@@ -1449,6 +1449,32 @@ class TestEditor(OozieMockBase):
    </workflow>
   </action>
 </coordinator-app>""" in coord.to_xml(), coord.to_xml())
+
+
+  def test_coordinator_gen_sla(self):
+    coord = create_coordinator(self.wf, self.c, self.user)
+    xml = coord.to_xml()
+
+    assert_false('<sla' in xml, xml)
+    assert_false('xmlns="uri:oozie:coordinator:0.4"' in xml, xml)
+    assert_false('xmlns:sla="uri:oozie:sla:0.2"' in xml, xml)
+
+    sla = coord.sla
+    sla[0]['value'] = True
+    sla[1]['value'] = 'now' # nominal-time
+    sla[3]['value'] = '${ 10 * MINUTES}' # should-end
+    coord.set_sla(sla)
+    coord.save()
+
+    xml = coord.to_xml()
+    assert_true('xmlns="uri:oozie:coordinator:0.4"' in xml, xml)
+    assert_true('xmlns:sla="uri:oozie:sla:0.2"' in xml, xml)
+    assert_true("""</workflow>
+          <sla:info>
+            <sla:nominal-time>now</sla:nominal-time>
+            <sla:should-end>${ 10 * MINUTES}</sla:should-end>
+          </sla:info>
+  </action>""" in xml, xml)
 
 
   def test_coordinator_with_data_input_gen_xml(self):

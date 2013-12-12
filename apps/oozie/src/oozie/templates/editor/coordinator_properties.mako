@@ -98,6 +98,10 @@
                   .attr("name", "job_properties")
                   .attr("value", ko.utils.stringifyJson(self.job_properties))
                   .appendTo(form);
+          $("<input>").attr("type", "hidden")
+                  .attr("name", "sla")
+                  .attr("value", ko.utils.stringifyJson(window.slaModel.sla))
+                  .appendTo(form);
 
           form.submit();
         };

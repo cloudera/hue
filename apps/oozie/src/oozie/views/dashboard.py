@@ -350,7 +350,8 @@ def list_oozie_sla(request):
     if request.POST.get('end'):
       params['nominal_end'] = request.POST.get('end')
       
-    oozie_slas = api.get_oozie_slas(**params)  
+    oozie_slas = api.get_oozie_slas(**params)
+    print oozie_slas  
     
   else:
     oozie_slas = [] # or get latest?
