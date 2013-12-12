@@ -25,7 +25,7 @@ from hadoop import cluster
 
 from TCLIService import TCLIService
 from TCLIService.ttypes import TOpenSessionReq, TGetTablesReq, TFetchResultsReq,\
-  TStatusCode, TGetResultSetMetadataReq, TGetColumnsReq, TType,\
+  TStatusCode, TGetResultSetMetadataReq, TGetColumnsReq, TTypeId,\
   TExecuteStatementReq, TGetOperationStatusReq, TFetchOrientation,\
   TCloseSessionReq, TGetSchemasReq, TGetLogReq, TCancelOperationReq,\
   TCloseOperationReq
@@ -274,7 +274,7 @@ class HiveServerTColumnDesc:
   def get_type(self, typeDesc):
     for ttype in typeDesc.types:
       if ttype.primitiveEntry is not None:
-        return TType._VALUES_TO_NAMES[ttype.primitiveEntry.type]
+        return TTypeId._VALUES_TO_NAMES[ttype.primitiveEntry.type]
       elif ttype.mapEntry is not None:
         return ttype.mapEntry
       elif ttype.unionEntry is not None:

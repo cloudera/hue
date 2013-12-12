@@ -622,6 +622,7 @@ def view_results(request, id, first_row=0):
   fetch_error = False
   error_message = ''
   log = ''
+  columns = []
   app_name = get_app_name(request)
 
   query_history = authorized_get_history(request, id, must_exist=True)
@@ -653,6 +654,7 @@ def view_results(request, id, first_row=0):
       # We display the "Download" button only when we know that there are results:
       downloadable = first_row > 0 or data
       log = db.get_log(handle)
+      columns = results.data_table.cols()
 
   except Exception, ex:
     fetch_error = True
@@ -693,7 +695,7 @@ def view_results(request, id, first_row=0):
       'next_row': results.start_row + len(data),
       'start_row': results.start_row,
       'expected_first_row': first_row,
-      'columns': results.columns,
+      'columns': columns,
       'download_urls': download_urls,
       'save_form': save_form,
       'can_save': query_history.owner == request.user,
