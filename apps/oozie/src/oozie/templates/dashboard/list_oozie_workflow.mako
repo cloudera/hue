@@ -155,6 +155,9 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         <li><a href="#configuration" data-toggle="tab">${ _('Configuration') }</a></li>
         <li><a href="#log" data-toggle="tab">${ _('Log') }</a></li>
         <li><a href="#definition" data-toggle="tab">${ _('Definition') }</a></li>
+        % if oozie_workflow.has_sla:
+        <li><a href="#sla" data-toggle="tab">${ _('SLA') }</a></li>
+        % endif
       </ul>
 
       <div id="workflow-tab-content" class="tab-content" style="min-height:200px">
@@ -279,9 +282,14 @@ ${ layout.menubar(section='workflows', dashboard=True) }
           <pre>${ oozie_workflow.log.decode('utf-8', 'replace') }</pre>
         </div>
 
-        <div class="tab-pane" id="definition" style="min-height:400px">
+        <div class="tab-pane" id="definition">
           <textarea id="definitionEditor">${ oozie_workflow.definition.decode('utf-8', 'replace') }</textarea>
         </div>
+        
+        % if oozie_workflow.has_sla:
+        <div class="tab-pane" id="sla">          
+        </div>
+        % endif
       </div>
 
       <div style="margin-bottom: 16px">
@@ -318,7 +326,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
 
 <style type="text/css">
 .CodeMirror.cm-s-default {
-   height:500px;
+   height:700px;
 }
 </style>
 
@@ -547,6 +555,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
     });
 
     function resizeLogs() {
+      $("#log pre").css("overflow", "auto").height($(window).height() - $("#log pre").position().top - 80);
       $("#log pre").css("overflow", "auto").height($(window).height() - $("#log pre").position().top - 80);
     }
 

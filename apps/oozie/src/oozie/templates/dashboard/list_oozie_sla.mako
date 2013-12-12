@@ -59,26 +59,8 @@ ${ layout.menubar(section='sla', dashboard=True) }
 
         <div class="tab-content">
 
-            <table id="intrumentationTable" class="table table-striped table-condensed">
+            <table id="slaTable" class="table table-striped table-condensed">
               <thead>
-                <%
-                columns = [
-                  'slaStatus',
-                  'id',
-                  'appType',
-                  'appName',
-                  'user',
-                  'nominalTime',
-                  'expectedStart',
-                  'actualStart',
-                  'expectedEnd',
-                  'actualEnd',                  
-                  'jobStatus',
-                  #'expectedDuration',
-                  #'actualDuration',
-                  'lastModified'
-                ]
-                %>
                 % for col in columns:
                   <th>${ col }</th>
                 % endfor
@@ -115,22 +97,28 @@ ${ layout.menubar(section='sla', dashboard=True) }
 
     $("*[rel=tooltip]").tooltip();
 
-        var slaList = $("#intrumentationTable").dataTable({
-            "bPaginate": false,
-            "bLengthChange": false,
-            "bInfo": false,
-            "bAutoWidth": false,
+    var slaTable = $("#slaTable").dataTable({
+        "bPaginate": false,
+        "bLengthChange": false,
+        "bInfo": false,
+        "bAutoWidth": false,
+        "oLanguage": {
+            "sEmptyTable": "${_('No data available')}",
+            "sZeroRecords": "${_('No matching records')}"
+        }
+    });
 
-            "oLanguage": {
-                "sEmptyTable": "${_('No data available')}",
-                "sZeroRecords": "${_('No matching records')}"
-            }
+    var _filterTimeout = -1;
+    $(".searchFilter").keyup(function() {
+      window.clearTimeout(_filterTimeout);
+      _filterTimeout = window.setTimeout(function () {
+        $.post("${ url('oozie:list_oozie_sla') }?format=json", $("#searchForm").serialize(), function(data) {
+          slaTable.fnClearTable();
+          if (data['oozie_slas']) {
+            slaTable.fnAddData(data['oozie_slas']);
+          } 
         });
-
-    $(".searchFilter").keyup(function(){
-      $.post("${ url('oozie:list_oozie_sla') }", $("#searchForm").serialize(), function(data) {
-        $( ".result" ).html( data );
-      });
+      }, 300);
     });
 
     $(".dataTables_wrapper").css("min-height","0");

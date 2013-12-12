@@ -169,13 +169,11 @@ var NodeModule = function($, IdGeneratorTable, NodeFields) {
         self.files.remove(val);
       };
     }
-    
+
+    // Manage custom 'data' here
     if ('sla' in self.model) {
       var data = self.model['sla'];
-      //alert(data);
       self.sla = ko.observableArray(self.model['sla']);
-      ///self.sla = ko.observable('aaa');
-      //delete self.model['data'];
     }
 
     self.initialize.apply(self, arguments);

@@ -261,7 +261,7 @@
 
 <%def name="slaForm()">
   <div data-bind="foreach: sla">
-    <div class="controls">          
+    <div class="controls">
       <div class="span3">
         <span data-bind="text: getSLAText(key)['niceName']"></span>
       </div>
@@ -274,7 +274,7 @@
         <!-- /ko -->
       </div>
     </div>
-  </div>           
+  </div>
 </%def>
 
 <%def name="render_constant(label, value)">
