@@ -32,7 +32,7 @@ from liboozie.utils import config_gen
 
 LOG = logging.getLogger(__name__)
 DEFAULT_USER = 'hue'
-API_VERSION = 'v1'
+API_VERSION = 'v1' # Overridden to v2 for SLA
 
 _XML_CONTENT_TYPE = 'application/xml;charset=UTF-8'
 
@@ -40,9 +40,9 @@ _api_cache = None
 _api_cache_lock = threading.Lock()
 
 
-def get_oozie(user, api_version=API_VERSION): # cf. cache version pb
+def get_oozie(user, api_version=API_VERSION):
   global _api_cache
-  if _api_cache is None:
+  if _api_cache is None or _api_cache.api_version != api_version:
     _api_cache_lock.acquire()
     try:
       if _api_cache is None:
@@ -64,6 +64,7 @@ class OozieApi(object):
     self._security_enabled = security_enabled
     # To store username info
     self._thread_local = threading.local()
+    self.api_version = api_version
 
   def __str__(self):
     return "OozieApi at %s" % (self._url,)
@@ -299,5 +300,4 @@ class OozieApi(object):
     params = self._get_params()
     params['filter'] = ';'.join(['%s=%s' % (key, val) for key, val in kwargs.iteritems()])    
     resp = self._root.get('sla', params)
-    # resp = {u'slaSummaryList': [{u'actualDuration': 68406, u'appType': u'WORKFLOW_JOB', u'appName': u'Forks', u'actualStart': u'Fri, 06 Dec 2013 14:01:53 PST', u'jobStatus': u'SUCCEEDED', u'id': u'0000002-131206135002457-oozie-oozi-W', u'expectedDuration': 1800000, u'nominalTime': u'Mon, 17 Jun 2013 17:01:00 PDT', u'slaStatus': u'MISS', u'lastModified': u'Fri, 06 Dec 2013 14:03:05 PST', u'actualEnd': u'Fri, 06 Dec 2013 14:03:01 PST', u'expectedEnd': u'Mon, 17 Jun 2013 17:31:00 PDT', u'expectedStart': u'Mon, 17 Jun 2013 17:11:00 PDT', u'user': u'romain'}]}
     return resp['slaSummaryList'] 

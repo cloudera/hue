@@ -369,6 +369,10 @@ class Job(object):
   def __str__(self):
     return '%s - %s' % (self.id, self.status)
 
+  @property
+  def has_sla(self):
+    return '<sla:info>' in self.definition
+
 
 class Workflow(Job):
   _ATTRS = [

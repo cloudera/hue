@@ -355,11 +355,33 @@ def list_oozie_sla(request):
   else:
     oozie_slas = [] # or get latest?
   
+  columns = [
+    'slaStatus',
+    'id',
+    'appType',
+    'appName',
+    'user',
+    'nominalTime',
+    'expectedStart',
+    'actualStart',
+    'expectedEnd',
+    'actualEnd',                  
+    'jobStatus',
+    #'expectedDuration',
+    #'actualDuration',
+    'lastModified'
+  ]  
+  
   if request.REQUEST.get('format') == 'json':
-    return HttpResponse(json.dumps({'oozie_slas': oozie_slas}), content_type="text/plain")
+    massaged_slas = []
+    for sla in oozie_slas:
+      massaged_slas.append([sla[key] for key in columns])
+
+    return HttpResponse(json.dumps({'oozie_slas': massaged_slas}), content_type="text/json")
 
   return render('dashboard/list_oozie_sla.mako', request, {
     'oozie_slas': oozie_slas,
+    'columns': columns,
   })
 
 

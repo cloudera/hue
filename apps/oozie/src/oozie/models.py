@@ -67,7 +67,7 @@ DEFAULT_SLA = [
     {'key': 'should-end', 'value': ''},
     {'key': 'max-duration', 'value': ''},
     {'key': 'alert-events', 'value': ''},
-    {'key': 'alert-contact', 'value': ''},        
+    {'key': 'alert-contact', 'value': ''},
 ]
 
 class JobManager(models.Manager):
@@ -215,14 +215,14 @@ class Job(models.Model):
   @property
   def sla(self):
     return json.loads(self.data).get('sla', copy.deepcopy(DEFAULT_SLA))
-  
+
   @property
   def sla_jsescaped(self):
     return json.dumps(self.sla, cls=JSONEncoderForHTML)
-  
+
   def set_sla(self, sla):
     data_json = json.loads(self.data)
-    data_json['sla'] = sla  
+    data_json['sla'] = sla
     self.data = json.dumps(data_json)
 
   @property
@@ -743,10 +743,10 @@ class Node(models.Model):
   @property
   def sla(self):
     return json.loads(self.data).get('sla', copy.deepcopy(DEFAULT_SLA))
-  
+
   def set_sla(self, sla):
     data_json = json.loads(self.data)
-    data_json['sla'] = sla  
+    data_json['sla'] = sla
     self.data = json.dumps(data_json)
 
   @property
