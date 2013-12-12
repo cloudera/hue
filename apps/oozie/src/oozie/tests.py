@@ -3254,9 +3254,11 @@ class TestDashboard(OozieMockBase):
 
     response = self.c.get(reverse('oozie:list_oozie_sla') + "?format=json")
     for sla in MockOozieApi.WORKFLOWS_SLAS:
-      assert_true(sla[u'slaStatus'] in response.content, response.content) #{"oozie_slas": []}
-      
-    # TODO, POST
+      assert_equal({"oozie_slas": []}, json.loads(response.content), response.content)
+
+    response = self.c.post(reverse('oozie:list_oozie_sla') + "?format=json", {'job_name': 'kochang'})
+    for sla in MockOozieApi.WORKFLOWS_SLAS:
+      assert_true('MISS' in response.content, response.content)
 
 
 class GeneralTestsWithOozie(OozieBase):

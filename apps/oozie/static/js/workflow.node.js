@@ -211,7 +211,7 @@ var NodeModule = function($, IdGeneratorTable, NodeFields) {
       var self = this;
 
       // @see http://knockoutjs.com/documentation/plugins-mapping.html
-      // MAPPING_OPTIONS comes from /oozie/static/js/models.js
+      // MAPPING_OPTIONS comes from /oozie/static/js/workflow.models.js
       var mapping = ko.mapping.fromJS(model, MAPPING_OPTIONS);
 
       $.extend(self, mapping);

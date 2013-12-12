@@ -115,7 +115,7 @@ ${ layout.menubar(section='sla', dashboard=True) }
         $.post("${ url('oozie:list_oozie_sla') }?format=json", $("#searchForm").serialize(), function(data) {
           slaTable.fnClearTable();
           if (data['oozie_slas']) {
-            slaTable.fnAddData(data['oozie_slas']);
+            slaTable.fnAddData(data['oozie_slas']); ## Should put a class on status, links to oozie job ids...
           } 
         });
       }, 300);

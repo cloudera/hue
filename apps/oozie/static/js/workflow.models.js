@@ -19,6 +19,20 @@
 // These serialized values are also stored in the backend.
 var MODEL_FIELDS_JSON = ['parameters', 'job_properties', 'files', 'archives', 'prepares', 'params',
                    'deletes', 'mkdirs', 'moves', 'chmods', 'touchzs'];
+var DEFAULT_SLA = [
+    {'key': 'enabled', 'value': false},
+    {'key': 'nominal-time', 'value': ''},
+    {'key': 'should-start', 'value': ''},
+    {'key': 'should-end', 'value': ''},
+    {'key': 'max-duration', 'value': ''},
+    {'key': 'alert-events', 'value': ''},
+    {'key': 'alert-contact', 'value': ''}
+];
+
+function getDefaultSla() {
+ return jQuery.extend(true, [], DEFAULT_SLA);
+}
+
 function normalize_model_fields(node_model) {
   $.each(MODEL_FIELDS_JSON, function(index, field) {
     if (field in node_model && $.isArray(node_model[field])) {
@@ -47,7 +61,7 @@ var map_params = function(options, subscribe) {
 
 // Maps JSON strings to fields in the view model.
 var MAPPING_OPTIONS = {
-  ignore: ['initialize', 'toString', 'copy'],
+  ignore: ['initialize', 'toString', 'copy', 'sla'], // Do not support cancel edit on SLA
   job_properties: {
     create: function(options) {
       var parent = options.parent;
@@ -273,21 +287,21 @@ var MAPPING_OPTIONS = {
    touchzs: {
      create: function(options) {
        var parent = options.parent;
-        var subscribe = function(mapping) {
-          mapping.name.subscribe(function(value) {
-            parent.touchzs.valueHasMutated();
-          });
-        };
-        return map_params(options, subscribe);
+       var subscribe = function(mapping) {
+         mapping.name.subscribe(function(value) {
+           parent.touchzs.valueHasMutated();
+         });
+       };
+       return map_params(options, subscribe);
      },
      update: function(options) {
        var parent = options.parent;
-        var subscribe = function(mapping) {
-          mapping.name.subscribe(function(value) {
-            parent.touchzs.valueHasMutated();
-          });
-        };
-        return map_params(options, subscribe);
+       var subscribe = function(mapping) {
+         mapping.name.subscribe(function(value) {
+           parent.touchzs.valueHasMutated();
+         });
+       };
+       return map_params(options, subscribe);
      }
    }
 };
@@ -338,7 +352,7 @@ $.extend(WorkflowModel.prototype, {
   is_shared: true,
   parameters: '[]',
   job_xml: '',
-  sla: []
+  sla: getDefaultSla()
 });
 
 var NodeModel = ModelModule($);
@@ -383,7 +397,7 @@ $.extend(DistCPModel.prototype, {
   job_xml: '',
   params: '[]',
   child_links: [],
-  sla: []
+  sla: getDefaultSla()
 });
 
 var MapReduceModel = ModelModule($);
@@ -400,7 +414,7 @@ $.extend(MapReduceModel.prototype, {
   prepares: '[]',
   job_xml: '',
   child_links: [],
-  sla: []
+  sla: getDefaultSla()
 });
 
 var StreamingModel = ModelModule($);
@@ -416,7 +430,7 @@ $.extend(StreamingModel.prototype, {
   mapper: '',
   reducer: '',
   child_links: [],
-  sla: []
+  sla: getDefaultSla()
 });
 
 var JavaModel = ModelModule($);
@@ -437,7 +451,7 @@ $.extend(JavaModel.prototype, {
   java_opts: '',
   capture_output: false,
   child_links: [],
-  sla: []
+  sla: getDefaultSla()
 });
 
 var PigModel = ModelModule($);
@@ -455,7 +469,7 @@ $.extend(PigModel.prototype, {
   params: '[]',
   script_path: '',
   child_links: [],
-  sla: []
+  sla: getDefaultSla()
 });
 
 var HiveModel = ModelModule($);
@@ -473,7 +487,7 @@ $.extend(HiveModel.prototype, {
   params: '[]',
   script_path: '',
   child_links: [],
-  sla: []
+  sla: getDefaultSla()
 });
 
 var SqoopModel = ModelModule($);
@@ -491,7 +505,7 @@ $.extend(SqoopModel.prototype, {
   params: '[]',
   script_path: '',
   child_links: [],
-  sla: []
+  sla: getDefaultSla()
 });
 
 var ShellModel = ModelModule($);
@@ -510,7 +524,7 @@ $.extend(ShellModel.prototype, {
   command: '',
   capture_output: false,
   child_links: [],
-  sla: []
+  sla: getDefaultSla()
 });
 
 var SshModel = ModelModule($);
@@ -526,7 +540,7 @@ $.extend(SshModel.prototype, {
   command: '',
   capture_output: false,
   child_links: [],
-  sla: []
+  sla: getDefaultSla()
 });
 
 var FsModel = ModelModule($);
@@ -542,7 +556,7 @@ $.extend(FsModel.prototype, {
   chmods: '[]',
   touchzs: '[]',
   child_links: [],
-  sla: []
+  sla: getDefaultSla()
 });
 
 var EmailModel = ModelModule($);
@@ -557,7 +571,7 @@ $.extend(EmailModel.prototype, {
   subject: '',
   body: '',
   child_links: [],
-  sla: []
+  sla: getDefaultSla()
 });
 
 var SubWorkflowModel = ModelModule($);
@@ -571,7 +585,7 @@ $.extend(SubWorkflowModel.prototype, {
   propagate_configuration: true,
   job_properties: '[]',
   child_links: [],
-  sla: []
+  sla: getDefaultSla()
 });
 
 var GenericModel = ModelModule($);
