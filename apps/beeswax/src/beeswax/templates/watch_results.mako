@@ -279,6 +279,19 @@ $(document).ready(function () {
         "sEmptyTable": "${_('No data available')}",
         "sZeroRecords": "${_('No matching records')}",
     },
+    "aoColumns":[
+        {"sSortDataType":"dom-text", "sType":"numeric", "sWidth":"1%" },
+        % for col in columns:
+          <%
+          sType = "string"
+          if col.type in ["TINYINT_TYPE", "SMALLINT_TYPE", "INT_TYPE", "BIGINT_TYPE", "FLOAT_TYPE", "DOUBLE_TYPE", "DECIMAL_TYPE"]:
+            sType = "numeric"
+          elif col.type in ["TIMESTAMP_TYPE", "DATE_TYPE"]:
+            sType = "date"
+          %>
+        { "sSortDataType":"dom-text", "sType":"${ sType }"},
+        % endfor
+    ],
     "fnDrawCallback": function( oSettings ) {
       $(".resultTable").jHueTableExtender({
         hintElement: "#jumpToColumnAlert",
