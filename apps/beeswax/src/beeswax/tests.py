@@ -193,6 +193,7 @@ for x in sys.stdin:
 
     response = wait_for_query_to_finish(self.client, response, max=180.0)
     assert_equal([0, 255, 32640], response.context["results"][0], response.content)
+    assert_equal(['INT_TYPE', 'INT_TYPE', 'BIGINT_TYPE'], [col.type for col in response.context["columns"]])
     # Because it happens that we're running this with local mode,
     # we won't see any hadoop jobs.
     assert_equal(1, len(response.context["hadoop_jobs"]), response.context["hadoop_jobs"])
