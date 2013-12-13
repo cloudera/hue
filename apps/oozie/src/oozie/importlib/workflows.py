@@ -48,7 +48,7 @@ from oozie.models import Workflow, Node, Link, Start, End,\
 
 LOG = logging.getLogger(__name__)
 
-OOZIE_NAMESPACES = ['uri:oozie:workflow:0.1', 'uri:oozie:workflow:0.2', 'uri:oozie:workflow:0.3', 'uri:oozie:workflow:0.4']
+OOZIE_NAMESPACES = ['uri:oozie:workflow:0.1', 'uri:oozie:workflow:0.2', 'uri:oozie:workflow:0.3', 'uri:oozie:workflow:0.4', 'uri:oozie:workflow:0.5']
 
 LINKS = ('ok', 'error', 'path')
 
