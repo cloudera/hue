@@ -280,7 +280,7 @@
 
 ## Would be nice include it in slaForm() somehow
 <%def name="slaGlobal()">
-<script type="text/javascript" charset="utf-8">
+
   function getSLAText(key) {
     return {
        'enabled': {'niceName': '${ _("Enabled") }', 'placeHolder': ''},
@@ -289,10 +289,12 @@
        'should-end': {'niceName': '${ _("Should end") } *', 'placeHolder': '${"$"}{30 * MINUTES}'},
        'max-duration': {'niceName': '${ _("Max duration") }', 'placeHolder': '${"$"}{30 * MINUTES}'},
        'alert-events': {'niceName': '${ _("Alert events") }', 'placeHolder': 'start_miss,end_miss,duration_miss'},
-       'alert-contact': {'niceName': '${ _("Alert contact") }', 'placeHolder': 'joe@example.com,bob@example.com'} 
-    }[key]
+       'alert-contact': {'niceName': '${ _("Alert contact") }', 'placeHolder': 'joe@example.com,bob@example.com'},
+       'notification-msg': {'niceName': '${ _("Notification message") }', 'placeHolder': 'My Job has encountered an SLA event!'},
+       'upstream-apps': {'niceName': '${ _("Upstream apps") }', 'placeHolder': 'dependent-app-1, dependent-app-2'}
+    }[key];
   };
-</script>
+
 </%def>
 
 

@@ -68,8 +68,8 @@ DEFAULT_SLA = [
     {'key': 'max-duration', 'value': ''},
     {'key': 'alert-events', 'value': ''},
     {'key': 'alert-contact', 'value': ''},
-    #{'key': 'notification-msg', 'value': ''},
-    #{'key': 'alert-contact', 'value': ''},
+    {'key': 'notification-msg', 'value': ''},
+    {'key': 'upstream-apps', 'value': ''},
 ]
 
 class JobManager(models.Manager):
