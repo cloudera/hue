@@ -45,7 +45,7 @@ ${ fb_components.menubar() }
             <div id="ch-dropdown" class="btn-group" style="vertical-align: middle">
               <button href="#" class="btn dropdown-toggle" title="${_('Chown / Chmod')}" data-toggle="dropdown" data-bind="visible: !inTrash(), enable: selectedFiles().length > 0">
                 <i class="fa fa-user"></i> ${_('Chmod / Chown')}
-                <span class="caret" style="line-height: 29px"></span>
+                <span class="caret" style="line-height: 15px"></span>
               </button>
               <ul class="dropdown-menu" style="top: auto">
                 <li><a href="#" title="${_('Change owner/group')}" data-bind="visible: !inTrash(), click: changeOwner, enable: selectedFiles().length > 0"><i class="fa fa-user"></i> ${_('Change owner / group')}</a></li>
