@@ -48,8 +48,6 @@ from beeswax.models import SavedQuery, make_query_context, QueryHistory
 from beeswax.server import dbms
 from beeswax.server.dbms import expand_exception, get_query_server_config, QueryServerException
 
-import rdbms.design
-
 from thrift.transport.TTransport import TTransportException
 
 
@@ -668,6 +666,7 @@ def view_results(request, id, first_row=0):
     'error_message': error_message,
     'query': query_history,
     'results': data,
+    'columns': columns,
     'expected_first_row': first_row,
     'log': log,
     'hadoop_jobs': app_name != 'impala' and _parse_out_hadoop_jobs(log),
