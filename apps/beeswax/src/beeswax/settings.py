@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 DJANGO_APPS = [ "beeswax" ]
-NICE_NAME = "Beeswax (Hive UI)"
+NICE_NAME = "Hive Editor"
 REQUIRES_HADOOP = True
 ICON = "/beeswax/static/art/icon_beeswax_24.png"
 MENU_INDEX = 10

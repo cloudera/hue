@@ -37,13 +37,13 @@ def is_selected(section, matcher):
                 <a href="/${app_name}">
                 % if app_name == 'impala':
                   <img src="/impala/static/art/icon_impala_24.png" />
-                  ${ _('Impala') }
+                  Impala Editor
                 % elif app_name == 'rdbms':
                   <img src="/rdbms/static/art/icon_rdbms_24.png" />
-                  ${ _('DB Query') }
+                  DB Query
                 % else:
                   <img src="/beeswax/static/art/icon_beeswax_24.png" />
-                  ${ _('Beeswax') }
+                  Hive Editor
                 % endif
                 </a>
               </li>
