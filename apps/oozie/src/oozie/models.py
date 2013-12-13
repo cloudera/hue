@@ -198,6 +198,11 @@ class Job(models.Model):
   def find_all_parameters(self):
     params = self.find_parameters()
 
+    if hasattr(self, 'sla'):
+      for param in find_json_parameters(self.sla):
+        if param not in params:
+          params[param] = ''
+
     for param in self.get_parameters():
       params[param['name'].strip()] = param['value']
 
@@ -659,7 +664,7 @@ class Node(models.Model):
 
     return node
 
-  def find_parameters(self):
+  def find_parameters(self):    
     return find_parameters(self, self.PARAM_FIELDS)
 
   def __unicode__(self):
@@ -783,7 +788,7 @@ class Action(Node):
 #  - maybe actions_utils.mako
 
 class Mapreduce(Action):
-  PARAM_FIELDS = ('files', 'archives', 'job_properties', 'jar_path', 'prepares')
+  PARAM_FIELDS = ('files', 'archives', 'job_properties', 'jar_path', 'prepares', 'sla')
   node_type = 'mapreduce'
 
   files = models.TextField(default="[]", verbose_name=_t('Files'),
@@ -816,7 +821,7 @@ class Mapreduce(Action):
 
 
 class Streaming(Action):
-  PARAM_FIELDS = ('files', 'archives', 'job_properties', 'mapper', 'reducer')
+  PARAM_FIELDS = ('files', 'archives', 'job_properties', 'mapper', 'reducer', 'sla')
   node_type = "streaming"
 
   files = models.TextField(default="[]", verbose_name=_t('Files'),
@@ -842,7 +847,7 @@ class Streaming(Action):
 
 class Java(Action):
   PARAM_FIELDS = ('files', 'archives', 'jar_path', 'main_class', 'args',
-                  'java_opts', 'job_properties', 'prepares')
+                  'java_opts', 'job_properties', 'prepares', 'sla')
   node_type = "java"
 
   files = models.TextField(default="[]", verbose_name=_t('Files'),
@@ -889,7 +894,7 @@ class Java(Action):
 
 
 class Pig(Action):
-  PARAM_FIELDS = ('files', 'archives', 'job_properties', 'params', 'prepares')
+  PARAM_FIELDS = ('files', 'archives', 'job_properties', 'params', 'prepares', 'sla')
   node_type = 'pig'
 
   script_path = models.CharField(max_length=256, blank=False, verbose_name=_t('Script name'),
@@ -927,7 +932,7 @@ class Pig(Action):
 
 
 class Hive(Action):
-  PARAM_FIELDS = ('files', 'archives', 'job_properties', 'params', 'prepares')
+  PARAM_FIELDS = ('files', 'archives', 'job_properties', 'params', 'prepares', 'sla')
   node_type = 'hive'
 
   script_path = models.CharField(max_length=256, blank=False, verbose_name=_t('Script name'),
@@ -964,7 +969,7 @@ class Hive(Action):
 
 
 class Sqoop(Action):
-  PARAM_FIELDS = ('files', 'archives', 'job_properties', 'params', 'prepares')
+  PARAM_FIELDS = ('files', 'archives', 'job_properties', 'params', 'prepares', 'sla')
   node_type = 'sqoop'
 
   script_path = models.TextField(blank=True, verbose_name=_t('Command'), default='',
@@ -1005,7 +1010,7 @@ class Sqoop(Action):
 
 
 class Ssh(Action):
-  PARAM_FIELDS = ('user', 'host', 'command', 'params')
+  PARAM_FIELDS = ('user', 'host', 'command', 'params', 'sla')
   node_type = 'ssh'
 
   user = models.CharField(max_length=64, verbose_name=_t('User'),
@@ -1027,7 +1032,7 @@ class Ssh(Action):
 
 
 class Shell(Action):
-  PARAM_FIELDS = ('files', 'archives', 'job_properties', 'params', 'prepares')
+  PARAM_FIELDS = ('files', 'archives', 'job_properties', 'params', 'prepares', 'sla')
   node_type = 'shell'
 
   command = models.CharField(max_length=256, blank=False, verbose_name=_t('%(type)s command') % {'type': node_type.title()},
@@ -1070,7 +1075,7 @@ class Shell(Action):
 
 
 class DistCp(Action):
-  PARAM_FIELDS = ('job_properties', 'params', 'prepares')
+  PARAM_FIELDS = ('job_properties', 'params', 'prepares', 'sla')
   node_type = 'distcp'
 
   params = models.TextField(default="[]", verbose_name=_t('Arguments'),
@@ -1098,7 +1103,7 @@ class DistCp(Action):
 
 
 class Fs(Action):
-  PARAM_FIELDS = ('deletes', 'mkdirs', 'moves', 'chmods', 'touchzs')
+  PARAM_FIELDS = ('deletes', 'mkdirs', 'moves', 'chmods', 'touchzs', 'sla')
   node_type = 'fs'
 
   deletes = models.TextField(default="[]", verbose_name=_t('Delete path'), blank=True,
@@ -1133,7 +1138,7 @@ class Fs(Action):
 
 
 class Email(Action):
-  PARAM_FIELDS = ('to', 'cc', 'subject', 'body')
+  PARAM_FIELDS = ('to', 'cc', 'subject', 'body', 'sla')
   node_type = 'email'
 
   to = models.TextField(default='', verbose_name=_t('TO addresses'), help_text=_t('Comma-separated values.'))
@@ -1143,7 +1148,7 @@ class Email(Action):
 
 
 class SubWorkflow(Action):
-  PARAM_FIELDS = ('subworkflow', 'propagate_configuration', 'job_properties')
+  PARAM_FIELDS = ('subworkflow', 'propagate_configuration', 'job_properties', 'sla')
   node_type = 'subworkflow'
 
   sub_workflow = models.ForeignKey(Workflow, db_index=True, verbose_name=_t('Sub-workflow'),
@@ -1840,11 +1845,29 @@ def find_parameters(instance, fields=None):
   params = []
   for field in fields:
     data = getattr(instance, field)
-    if isinstance(data, basestring):
+    if isinstance(data, list):
+      params.extend(find_json_parameters(data))
+    elif isinstance(data, basestring):
       for match in Template.pattern.finditer(data):
         name = match.group('braced')
         if name is not None:
           params.append(name)
+
+  return params
+
+def find_json_parameters(fields):
+  # To make smarter
+  # Input is list of json dict
+  params = []
+
+  for field in fields:
+    for data in field.values():      
+      if isinstance(data, basestring):
+        for match in Template.pattern.finditer(data):
+          name = match.group('braced')
+          if name is not None:
+            params.append(name)
+
   return params
 
 
