@@ -1045,10 +1045,12 @@ function checkModelDirtiness() {
   }
 }
 
+${ utils.slaGlobal() }
+
 </script>
 
 ${ utils.path_chooser_libs(True) }
-${ utils.slaGlobal() }
+
 
 <script>
   $(document).ready(function(){

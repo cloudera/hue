@@ -26,7 +26,9 @@ var DEFAULT_SLA = [
     {'key': 'should-end', 'value': ''},
     {'key': 'max-duration', 'value': ''},
     {'key': 'alert-events', 'value': ''},
-    {'key': 'alert-contact', 'value': ''}
+    {'key': 'alert-contact', 'value': ''},
+    {'key': 'notification-msg', 'value': ''},
+    {'key': 'upstream-apps', 'value': ''}
 ];
 
 function getDefaultSla() {

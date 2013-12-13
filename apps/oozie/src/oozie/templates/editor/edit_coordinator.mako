@@ -764,10 +764,12 @@ ${ layout.menubar(section='coordinators') }
 
       $("a[rel='tooltip']").tooltip();
     });
+    
+    ${ utils.slaGlobal() } 
+   
   </script>
 % endif
 
 ${ utils.decorate_datetime_fields() }
-${ utils.slaGlobal() }
 
 ${ commonfooter(messages) | n,unicode }
