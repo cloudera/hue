@@ -208,7 +208,7 @@ ${layout.menubar(section='query')}
             </thead>
             <tbody>
               % for col in columns:
-                <tr><td><a href="javascript:void(0)" class="column-selector" data-column="${col}">${ col.name }</a></td></tr>
+                <tr><td><a href="javascript:void(0)" class="column-selector" data-column="${ col.name }">${ col.name }</a></td></tr>
               % endfor
             </tbody>
           </table>
