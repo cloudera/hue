@@ -1274,7 +1274,7 @@ class TestEditor(OozieMockBase):
     sla[0]['value'] = True
     sla[1]['value'] = 'now' # nominal-time
     sla[3]['value'] = '${ 10 * MINUTES}' # should-end
-    self.wf.set_sla(sla)
+    self.wf.sla = sla
     self.wf.save()
 
     xml = self.wf.to_xml({'output': '/path'})
@@ -1315,7 +1315,7 @@ class TestEditor(OozieMockBase):
     sla[0]['value'] = True
     sla[1]['value'] = 'now' # nominal-time
     sla[3]['value'] = '${ 10 * MINUTES}' # should-end
-    action1.set_sla(sla)
+    action1.sla = sla
     action1.save()
 
     xml = self.wf.to_xml({'output': '/path'})
@@ -1463,7 +1463,7 @@ class TestEditor(OozieMockBase):
     sla[0]['value'] = True
     sla[1]['value'] = 'now' # nominal-time
     sla[3]['value'] = '${ 10 * MINUTES}' # should-end
-    coord.set_sla(sla)
+    coord.sla = sla
     coord.save()
 
     xml = coord.to_xml()

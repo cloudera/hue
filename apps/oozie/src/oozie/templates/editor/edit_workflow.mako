@@ -659,7 +659,7 @@ var workflow_model = new WorkflowModel({
   is_shared: "${ workflow.is_shared }" == "True",
   parameters: ${ workflow.parameters_escapejs | n,unicode },
   job_properties: ${ workflow.job_properties_escapejs | n,unicode },
-  sla: ${ workflow.sla_jsescaped | n,unicode }
+  data: ${ workflow.data_js_escaped | n,unicode }
 });
 var registry = new Registry();
 var workflow = new Workflow({

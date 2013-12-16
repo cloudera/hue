@@ -220,21 +220,26 @@ class Job(models.Model):
     return user.is_superuser or self.owner == user
 
   @property
+  def data_dict(self):
+    return json.loads(self.data)
+
+  @property
   def sla(self):
     if not self.data: # backward compatible
       self.data = json.dumps({})
     return json.loads(self.data).get('sla', copy.deepcopy(DEFAULT_SLA))
 
   @property
-  def sla_jsescaped(self):
-    return json.dumps(self.sla, cls=JSONEncoderForHTML)
+  def data_js_escaped(self):
+    return json.dumps(self.data_dict, cls=JSONEncoderForHTML)
 
-  def set_sla(self, sla):
+  @sla.setter
+  def sla(self, sla):
     if not self.data: # backward compatible
       self.data = json.dumps({})    
     data_json = json.loads(self.data)
     data_json['sla'] = sla
-    self.data = json.dumps(data_json)
+    self.data = json.dumps(data_json) #data=json.dump({'sla': [python data], 'global': [python data], 'credentials': [python data]})
 
   @property
   def sla_enabled(self):
@@ -242,11 +247,13 @@ class Job(models.Model):
 
 
 class WorkflowManager(models.Manager):
-  SCHEMA_VERSION_V4 = 'uri:oozie:workflow:0.4'
-  SCHEMA_VERSION_V5 = 'uri:oozie:workflow:0.5'
+  SCHEMA_VERSION = {
+    '0.4': 'url:oozie:workflow:0.4',
+    '0.5': 'url:oozie:workflow:0.5'
+  }
 
   def new_workflow(self, owner):
-    workflow = Workflow(owner=owner, schema_version=WorkflowManager.SCHEMA_VERSION_V4)
+    workflow = Workflow(owner=owner, schema_version=WorkflowManager.SCHEMA_VERSION['0.4'])
 
     kill = Kill(name='kill', workflow=workflow, node_type=Kill.node_type)
     end = End(name='end', workflow=workflow, node_type=End.node_type)
@@ -755,7 +762,8 @@ class Node(models.Model):
   def sla(self):
     return json.loads(self.data).get('sla', copy.deepcopy(DEFAULT_SLA))
 
-  def set_sla(self, sla):
+  @sla.setter
+  def sla(self, sla):
     data_json = json.loads(self.data)
     data_json['sla'] = sla
     self.data = json.dumps(data_json)
