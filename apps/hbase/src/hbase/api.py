@@ -59,11 +59,14 @@ class HbaseApi(object):
       full_config = [conf.HBASE_CLUSTERS.get()]
     for config in full_config: #hack cause get() is weird
       match = re.match('\((?P<name>[^\(\)\|]+)\|(?P<host>.+):(?P<port>[0-9]+)\)', config)
-      clusters += [{
-        'name': match.group('name'),
-        'host': match.group('host'),
-        'port': int(match.group('port'))
-      }]
+      if match:
+        clusters += [{
+          'name': match.group('name'),
+          'host': match.group('host'),
+          'port': int(match.group('port'))
+        }]
+      else:
+        raise Exception(_("Cluster configuration %s isn't formatted correctly.") % config)
     return clusters
 
   def getCluster(self, name):
