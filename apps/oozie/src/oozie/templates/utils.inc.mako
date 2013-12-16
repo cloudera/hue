@@ -290,7 +290,7 @@
        'max-duration': {'niceName': '${ _("Max duration") }', 'placeHolder': '${"$"}{30 * MINUTES}'},
        'alert-events': {'niceName': '${ _("Alert events") }', 'placeHolder': 'start_miss,end_miss,duration_miss'},
        'alert-contact': {'niceName': '${ _("Alert contact") }', 'placeHolder': 'joe@example.com,bob@example.com'},
-       'notification-msg': {'niceName': '${ _("Notification message") }', 'placeHolder': 'My Job has encountered an SLA event!'},
+       'notification-msg': {'niceName': '${ _("Notification message") }', 'placeHolder': '${ _("My Job has encountered an SLA event!") }'},
        'upstream-apps': {'niceName': '${ _("Upstream apps") }', 'placeHolder': 'dependent-app-1, dependent-app-2'}
     }[key];
   };

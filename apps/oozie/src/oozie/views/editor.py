@@ -469,7 +469,7 @@ def edit_coordinator(request, coordinator):
       new_data_input_formset.save()
       new_data_output_formset.save()
       
-      coordinator.set_sla(json.loads(request.POST.get('sla')))
+      coordinator.sla = json.loads(request.POST.get('sla'))
       coordinator.save()
 
       request.info(_('Coordinator saved.'))

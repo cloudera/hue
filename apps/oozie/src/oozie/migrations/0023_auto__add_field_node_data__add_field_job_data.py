@@ -13,10 +13,18 @@ class Migration(SchemaMigration):
                       self.gf('django.db.models.fields.TextField')(default='{}', blank=True),
                       keep_default=False)
 
+        # Adding field 'Job.data'
+        db.add_column('oozie_job', 'data',
+                      self.gf('django.db.models.fields.TextField')(default='{}', blank=True),
+                      keep_default=False)
+
 
     def backwards(self, orm):
         # Deleting field 'Node.data'
         db.delete_column('oozie_node', 'data')
+
+        # Deleting field 'Job.data'
+        db.delete_column('oozie_job', 'data')
 
 
     models = {
@@ -79,7 +87,7 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'Bundle', '_ormbases': ['oozie.Job']},
             'coordinators': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['oozie.Coordinator']", 'through': "orm['oozie.BundledCoordinator']", 'symmetrical': 'False'}),
             'job_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['oozie.Job']", 'unique': 'True', 'primary_key': 'True'}),
-            'kick_off_time': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2013, 12, 11, 0, 0)'})
+            'kick_off_time': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2013, 12, 17, 0, 0)'})
         },
         'oozie.bundledcoordinator': {
             'Meta': {'object_name': 'BundledCoordinator'},
@@ -91,13 +99,13 @@ class Migration(SchemaMigration):
         'oozie.coordinator': {
             'Meta': {'object_name': 'Coordinator', '_ormbases': ['oozie.Job']},
             'concurrency': ('django.db.models.fields.PositiveSmallIntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'end': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2013, 12, 14, 0, 0)'}),
+            'end': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2013, 12, 20, 0, 0)'}),
             'execution': ('django.db.models.fields.CharField', [], {'max_length': '10', 'null': 'True', 'blank': 'True'}),
             'frequency_number': ('django.db.models.fields.SmallIntegerField', [], {'default': '1'}),
             'frequency_unit': ('django.db.models.fields.CharField', [], {'default': "'days'", 'max_length': '20'}),
             'job_properties': ('django.db.models.fields.TextField', [], {'default': "'[]'"}),
             'job_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['oozie.Job']", 'unique': 'True', 'primary_key': 'True'}),
-            'start': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2013, 12, 11, 0, 0)'}),
+            'start': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2013, 12, 17, 0, 0)'}),
             'throttle': ('django.db.models.fields.PositiveSmallIntegerField', [], {'null': 'True', 'blank': 'True'}),
             'timeout': ('django.db.models.fields.SmallIntegerField', [], {'null': 'True', 'blank': 'True'}),
             'timezone': ('django.db.models.fields.CharField', [], {'default': "'America/Los_Angeles'", 'max_length': '24'}),
@@ -129,7 +137,7 @@ class Migration(SchemaMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'instance_choice': ('django.db.models.fields.CharField', [], {'default': "'default'", 'max_length': '10'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '40'}),
-            'start': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2013, 12, 11, 0, 0)'}),
+            'start': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2013, 12, 17, 0, 0)'}),
             'timezone': ('django.db.models.fields.CharField', [], {'default': "'America/Los_Angeles'", 'max_length': '24'}),
             'uri': ('django.db.models.fields.CharField', [], {'default': "'/data/${YEAR}${MONTH}${DAY}'", 'max_length': '1024'})
         },

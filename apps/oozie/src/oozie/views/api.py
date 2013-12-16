@@ -206,7 +206,7 @@ def _update_workflow_nodes_json(workflow, json_nodes, id_map, user):
 
     for key in json_node:
       if key == 'sla':
-        node.set_sla(json_node[key])
+        node.sla = json_node[key]
       elif key not in ('node_ptr', 'child_nodes', 'workflow', 'id', 'sub_workflow'):
         setattr(node, key, format_field_value(key, json_node[key]))
 
@@ -231,7 +231,7 @@ def _update_workflow_json(json_workflow):
 
   for key in json_workflow:
     if key == 'sla':
-      workflow.set_sla(json_workflow['sla'])
+      workflow.sla = json_workflow['sla']
     elif key not in ('nodes', 'start', 'end', 'job_ptr', 'owner', 'data'):
       setattr(workflow, key, json_workflow[key])
 
