@@ -58,6 +58,17 @@
     drawHeader(this);
   };
 
+  Plugin.prototype.resetSource = function() {
+    var _this = this;
+
+    var source = [];
+    $(this.element).find("th").each(function () {
+      source.push($(this).text());
+    });
+
+    $("#jHueTableExtenderNavigator").find("input").data('typeahead').source = source;
+  };
+
   Plugin.prototype.init = function () {
 
     $.expr[":"].econtains = function (obj, index, meta, stack) {
@@ -207,6 +218,7 @@
         $.data(this, 'plugin_' + pluginName, new Plugin(this, options));
       }
       else {
+        $.data(this, 'plugin_' + pluginName).resetSource();
         $.data(this, 'plugin_' + pluginName).setOptions(options);
       }
     });

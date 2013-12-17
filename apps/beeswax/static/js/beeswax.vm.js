@@ -1,0 +1,491 @@
+// Licensed to Cloudera, Inc. under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  Cloudera, Inc. licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+
+function BeeswaxViewModel(server, query_id) {
+  var self = this;
+
+  self.server = ko.observable(server);
+  self.databases = ko.observableArray();
+  self.selectedDatabase = ko.observable(0);
+  self.query = ko.mapping.fromJS({
+    'id': query_id,
+    'query': '',
+    'name': null,
+    'description': null,
+    'settings': [],
+    'fileResources': [],
+    'functions': [],
+    'parameters': [],
+    'isParameterized': true,
+    'email': false,
+    'errors': [],
+    'explain': false
+  });
+  self.logs = ko.observableArray();
+  self.explanation = ko.observable();
+  self.watchURL = ko.observable();
+  self.resultsURL = ko.observable(null);
+  self.columns = ko.observableArray();
+  self.rows = ko.observableArray();
+  self.resultsEmpty = ko.observable(true);
+
+  self.hasMoreResults = ko.computed(function() {
+    return self.resultsURL() != null;
+  });
+
+  self.database = ko.computed({
+    'read': function() {
+      if (self.databases()) {
+        return self.databases()[self.selectedDatabase()];
+      } else{
+        return "";
+      }
+    },
+    'write': function(value) {
+      self.selectedDatabase(self.databases.indexOf(value));
+    },
+    'deferEvaluation': true
+  });
+
+  self.updateDatabases = function(databases) {
+    self.databases(databases);
+
+    var key = 'hueBeeswaxLastDatabase-' + self.server();
+    var last = $.totalStorage(key) || ((databases.length > 0) ? databases[0] : null);
+    if (last) {
+      self.database(last);
+    }
+  };
+
+  self.updateQuery = function(design) {
+    self.query.query(design.query);
+    self.query.id(design.id);
+    self.query.name(design.name);
+    self.query.description(design.desc);
+    self.database(design.database);
+    self.query.isParameterized(design.is_parameterized);
+    self.query.email(design.email_notify);
+    
+    self.query.settings.removeAll();
+    self.query.fileResources.removeAll();
+    self.query.functions.removeAll();
+
+    $.each(design.settings, function(index, setting) {
+      self.addSetting(setting.key, setting.value);
+    });
+    $.each(design.file_resources, function(index, file_resource) {
+      self.addFileResources(file_resource.type, file_resource.path);
+    });
+    $.each(design.functions, function(index, _function) {
+      self.addFunction(_function.name, _function.class_name);
+    });
+  };
+
+  self.updateParameters = function(parameters) {
+    self.query.parameters.removeAll();
+    $.each(parameters, function(index, parameter) {
+      self.addParameter(parameter.parameter, parameter.name, '');
+    });
+  };
+
+  self.addParameter = function(parameter, name, value) {
+    var obj = {
+      'parameter': ko.observable(parameter),
+      'name': ko.observable(name),
+      'value': ko.observable(value)
+    };
+    obj.parameter.subscribe(function() {
+      self.query.parameters.valueHasMutated();
+    });
+    obj.name.subscribe(function() {
+      self.query.parameters.valueHasMutated();
+    });
+    obj.value.subscribe(function() {
+      self.query.parameters.valueHasMutated();
+    });
+    self.query.parameters.push(obj);
+  };
+
+  self.addSetting = function(key, value) {
+    var obj = {
+      'key': ko.observable(key),
+      'value': ko.observable(value)
+    };
+    obj.key.subscribe(function() {
+      self.query.settings.valueHasMutated();
+    });
+    obj.value.subscribe(function() {
+      self.query.settings.valueHasMutated();
+    });
+    self.query.settings.push(obj);
+  };
+
+  self.removeSetting = function(index) {
+    self.query.settings.splice(index, 1);
+  };
+
+  self.addFileResources = function(type, path) {
+    var obj = {
+      'type': ko.observable(type),
+      'path': ko.observable(path)
+    };
+    obj.type.subscribe(function() {
+      self.query.fileResources.valueHasMutated();
+    });
+    obj.path.subscribe(function() {
+      self.query.fileResources.valueHasMutated();
+    });
+    self.query.fileResources.push(obj);
+  };
+
+  self.removeFileResources = function(index) {
+    self.query.fileResources.splice(index, 1);
+  };
+
+  self.addFunction = function(name, class_name) {
+    var obj = {
+      'name': ko.observable(name),
+      'class_name': ko.observable(class_name)
+    };
+    obj.name.subscribe(function() {
+      self.query.functions.valueHasMutated();
+    });
+    obj.class_name.subscribe(function() {
+      self.query.functions.valueHasMutated();
+    });
+    self.query.functions.push(obj);
+  };
+
+  self.removeFunction = function(index) {
+    self.query.functions.splice(index, 1);
+  };
+
+  function getMultiFormData(prefix, arr, members) {
+    var data = {};
+    var index = 0;
+    data[prefix + '-next_form_id'] = arr.length;
+    ko.utils.arrayForEach(arr, function(obj) {
+      $.each(members, function(index, member) {
+        data[prefix + '-' + index + '-' + member] = obj[member]();
+      });
+      data[prefix + '-' + index + '-_exists'] = true;
+      data[prefix + '-' + index + '-_deleted'] = false;
+    });
+    return data;
+  }
+
+  self.getSettingsFormData = function() {
+    return getMultiFormData('settings', self.query.settings(), ['key', 'value']);
+  };
+
+  self.getFileResourcesFormData = function() {
+    return getMultiFormData('file_resources', self.query.fileResources(), ['type', 'path']);
+  };
+
+  self.getFunctionsFormData = function() {
+    return getMultiFormData('functions', self.query.functions(), ['name', 'class_name']);
+  };
+
+  self.getParametersFormData = function() {
+    var data = {};
+    $.each(self.query.parameters(), function(index, parameter) {
+      data[parameter.parameter()] = parameter.value();
+    });
+    return data;
+  };
+
+  self.getOtherData = function() {
+    var data = {
+      'query-email_notify': self.query.email(),
+      'query-is_parameterized': self.query.isParameterized()
+    };
+    return data;
+  };
+
+  var error_fn = function(jqXHR, status, errorThrown) {
+    try {
+      $(document).trigger('server.error', $.parseJSON(jqXHR.responseText));
+    } catch(e) {
+      $(document).trigger('server.unmanageable_error', jqXHR.responseText);
+    }
+  };
+
+  self.fetchDatabases = function() {
+    var request = {
+      url: '/' + self.server() + '/api/autocomplete',
+      dataType: 'json',
+      type: 'GET',
+      success: function(data) {
+        self.updateDatabases(data.databases);
+      },
+      error: error_fn
+    };
+    $.ajax(request);
+  };
+
+  self.fetchQuery = function() {
+    $(document).trigger('fetch.query');
+
+    var request = {
+      url: '/' + self.server() + '/api/query/' + self.query.id() + '/get',
+      dataType: 'json',
+      type: 'GET',
+      success: function(data) {
+        self.updateQuery(data.design);
+        $(document).trigger('fetched.query', data);
+      },
+      error: error_fn
+    };
+    $.ajax(request);
+  };
+
+  self.fetchParameters = function() {
+    $(document).trigger('fetch.parameters');
+
+    var data = {
+      'query-query': self.query.query(),
+      'query-database': self.database()
+    };
+    $.extend(data, self.getSettingsFormData());
+    $.extend(data, self.getFileResourcesFormData());
+    $.extend(data, self.getFunctionsFormData());
+    $.extend(data, self.getParametersFormData());
+    $.extend(data, self.getOtherData());
+    var request = {
+      url: '/' + self.server() + '/api/query/parameters',
+      dataType: 'json',
+      type: 'POST',
+      success: function(data) {
+        self.updateParameters(data.parameters);
+        $(document).trigger('fetched.parameters');
+      },
+      error: error_fn,
+      data: data
+    };
+    $.ajax(request);
+  };
+
+  self.explainQuery = function() {
+    $(document).trigger('explain.query', data);
+    self.query.explain(true);
+
+    var data = {
+      'query-query': self.query.query(),
+      'query-database': self.database()
+    };
+    $.extend(data, self.getSettingsFormData());
+    $.extend(data, self.getFileResourcesFormData());
+    $.extend(data, self.getFunctionsFormData());
+    $.extend(data, self.getParametersFormData());
+    $.extend(data, self.getOtherData());
+    var request = {
+      url: '/' + self.server() + '/api/query/execute/?explain=true',
+      dataType: 'json',
+      type: 'POST',
+      success: function(data) {
+        self.query.errors.removeAll();
+        if (data.status == 0) {
+          self.logs.removeAll();
+          self.rows.removeAll();
+          self.columns.removeAll();
+          self.explanation(data.explanation);
+        } else {
+          self.query.errors.push(data.message);
+        }
+        $(document).trigger('explained.query', data);
+      },
+      error: error_fn,
+      data: data
+    };
+    $.ajax(request);
+  };
+
+  self.executeQuery = function() {
+    $(document).trigger('execute.query', data);
+    self.query.explain(false);
+
+    var data = {
+      'query-query': self.query.query(),
+      'query-database': self.database()
+    };
+    $.extend(data, self.getSettingsFormData());
+    $.extend(data, self.getFileResourcesFormData());
+    $.extend(data, self.getFunctionsFormData());
+    $.extend(data, self.getParametersFormData());
+    $.extend(data, self.getOtherData());
+    var request = {
+      url: '/' + self.server() + '/api/query/execute/',
+      dataType: 'json',
+      type: 'POST',
+      success: function(data) {
+        self.query.errors.removeAll();
+        if (data.status == 0) {
+          self.query.id(data.id);
+          self.logs.removeAll();
+          self.rows.removeAll();
+          self.columns.removeAll();
+          self.resultsURL('/' + self.server() + '/results/' + self.query.id() + '/0?format=json');
+          self.watchURL(data.watch_url);
+          self.watchQueryLoop();
+        } else {
+          self.query.errors.push(data.message);
+        }
+        $(document).trigger('executed.query', data);
+      },
+      error: error_fn,
+      data: data
+    };
+    $.ajax(request);
+  };
+
+  self.watchQuery = function() {
+    $(document).trigger('watch.query');
+
+    var data = {
+      'query-query': self.query.query(),
+      'query-database': self.database()
+    };
+    $.extend(data, self.getSettingsFormData());
+    $.extend(data, self.getFileResourcesFormData());
+    $.extend(data, self.getFunctionsFormData());
+    $.extend(data, self.getParametersFormData());
+    $.extend(data, self.getOtherData());
+    var request = {
+      url: self.watchURL(),
+      dataType: 'json',
+      type: 'POST',
+      success: function(data) {
+        $(document).trigger('watched.query', data);
+      },
+      error: error_fn,
+      data: data
+    };
+    $.ajax(request);
+  };
+
+  self.watchQueryLoop = function() {
+    var TIMEOUT = 1000;
+    var timer = null;
+    var executed_once = false;
+    var fn = function() {
+      $(document).one('watched.query', function(e, data) {
+        if (executed_once && (data.isSuccess || data.isFailure)) {
+          clearTimeout(timer);
+          $(document).trigger('stop_watch.query');
+          self.fetchResults();
+        } else {
+          executed_once = true;
+          if (data.log) {
+            self.logs.push(data.log);
+          }
+          timer = setTimeout(fn, TIMEOUT);
+        }
+      });
+      self.watchQuery();
+    };
+    $(document).trigger('start_watch.query');
+    timer = setTimeout(fn, TIMEOUT);
+  };
+
+  self.fetchResults = function() {
+    $(document).trigger('fetch.results');
+    var request = {
+      url: self.resultsURL(),
+      dataType: 'json',
+      type: 'GET',
+      success: function(data) {
+        self.columns(data.columns);
+        self.rows.push.apply(self.rows, data.results);
+        self.resultsEmpty(self.rows().length == 0);
+        if (data.has_more) {
+          self.resultsURL(data.next_json_set);
+        } else {
+          self.resultsURL(null);
+        }
+        $(document).trigger('fetched.results', data);
+      },
+      error: error_fn
+    };
+    $.ajax(request);
+  };
+
+  self.saveQuery = function() {
+    var self = this;
+    if (self.query.query() && self.query.name()) {
+      var data = {
+        'query-query': self.query.query(),
+        'query-database': self.database()
+      };
+      $.extend(data, self.getSettingsFormData());
+      $.extend(data, self.getFileResourcesFormData());
+      $.extend(data, self.getFunctionsFormData());
+      $.extend(data, self.getParametersFormData());
+      $.extend(data, self.getOtherData());
+      data['saveform-name'] = self.query.name();
+      data['saveform-desc'] = self.query.description();
+      if (self.query.id() > 0) {
+        data['query-id'] = self.query.id();
+      }
+      var url = '/' + self.server() + '/api/query/';
+      if (self.query.id() && self.query.id() != -1) {
+        url += self.query.id();
+      }
+      var request = {
+        url: url,
+        dataType: 'json',
+        type: 'POST',
+        success: function(data) {
+          self.query.id(data.design_id);
+          $(document).trigger('saved.query', data);
+        },
+        error: function() {
+          $(document).trigger('error.query');
+        },
+        data: data
+      };
+      $.ajax(request);
+    }
+  };
+
+  self.cancelQuery = function() {
+    $(document).trigger('cancel.query');
+    var url = '/' + self.server() + '/api/query/' + self.query.id() + '/cancel';
+    $.post(url,
+      function(response) {
+        if (response['status'] != 0) {
+          $(document).trigger('error_cancel.query', response['message']);
+        } else {
+          $(document).trigger('cancelled.query');
+        }
+      }
+    );
+  };
+
+  // Events
+  // Remove watched query event that watchQueryLoop may be bound to.
+  $(document).on('server.unmanageable_error', function() {
+    $(document).off('watched.query');
+  });
+}
+
+
+// For routie
+function showSection(section) {
+  $('.section').hide();
+  $('#' + section).show();
+  $(window).scrollTop(0);
+}
