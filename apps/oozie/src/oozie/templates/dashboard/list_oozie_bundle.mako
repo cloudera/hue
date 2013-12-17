@@ -437,6 +437,8 @@ ${ layout.menubar(section='bundles', dashboard=True) }
 
         $("#status span").attr("class", "label").addClass(getStatusClass(data.status)).text(data.status);
 
+        $.jHueTitleUpdater.set(data.progress + "%");
+
         if (data.id && (data.status == "KILLED" || data.status == "SUCCEEDED" ||  data.status == "DONEWITHERROR" || data.status == "FAILED")) {
           $("#kill-btn").hide();
           if (data.status != "KILLED" ) {
@@ -449,6 +451,7 @@ ${ layout.menubar(section='bundles', dashboard=True) }
 
         if (data.id && (data.status == "RUNNING" || data.status == "RUNNINGWITHERROR")){
           $("#suspend-btn").show();
+          $.jHueTitleUpdater.reset();
         } else {
           $("#suspend-btn").hide();
         }
@@ -460,7 +463,7 @@ ${ layout.menubar(section='bundles', dashboard=True) }
           $("#resume-btn").hide();
         }
 
-        $("#progress .bar").text(data.progress+"%").css("width", data.progress+"%").attr("class", "bar "+getStatusClass(data.status, "bar-"));
+        $("#progress .bar").text(data.progress + "%").css("width", data.progress + "%").attr("class", "bar " + getStatusClass(data.status, "bar-"));
 
         var _logsEl = $("#log pre");
         var newLines = data.log.split("\n").slice(_logsEl.text().split("\n").length);

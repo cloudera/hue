@@ -492,6 +492,8 @@ ${ layout.menubar(section='workflows', dashboard=True) }
 
         $("#status span").attr("class", "label").addClass(getStatusClass(data.status)).text(data.status);
 
+        $.jHueTitleUpdater.set(data.progress + "%");
+
         if (data.id && data.status == "SUSPENDED"){
           $("#resume-btn").show();
         } else {
@@ -507,9 +509,11 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         if (data.id && data.status != "RUNNING" && data.status != "SUSPENDED"){
           $("#kill-btn").hide();
           $("#rerun-btn").show();
+          $.jHueTitleUpdater.reset();
         }
 
-        $("#progress .bar").text(data.progress+"%").css("width", data.progress+"%").attr("class", "bar " + getStatusClass(data.status, "bar-"));
+        $("#progress .bar").text(data.progress + "%").css("width", data.progress + "%").attr("class", "bar " + getStatusClass(data.status, "bar-"));
+
         $("#graph").html(data.graph);
 
         var _logsEl = $("#log pre");

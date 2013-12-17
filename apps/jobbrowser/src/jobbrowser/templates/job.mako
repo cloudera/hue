@@ -450,23 +450,30 @@ $(document).ready(function () {
     }
     $("#killJobContainer").html(killCell);
     $("#jobStatus").html('<span class="label ' + getStatusClass(job.status) + '">' + (job.isRetired && !job.isMR2 ? '<i class="fa fa-briefcase fa fa-white" title="${ _('Retired') }"></i> ' : '') + job.status + '</span>');
+    var _title = "";
     if (job.desiredMaps > 0) {
       $("#jobMaps").html((job.isRetired ? '${_('N/A')}' : '<div class="progress" style="width:100px" title="' + (job.isMR2 ? job.mapsPercentComplete : job.finishedMaps + '/' + job.desiredMaps) + '"><div class="bar-label">' + job.mapsPercentComplete + '%</div><div class="' + 'bar ' + getStatusClass(job.status, "bar-") + '" style="margin-top:-20px;width:' + job.mapsPercentComplete + '%"></div></div>'));
+      _title += "M " + job.mapsPercentComplete + "%";
     }
     else {
       $("#jobMaps").html('${_('N/A')}');
     }
     if (job.desiredReduces > 0) {
       $("#jobReduces").html((job.isRetired ? '${_('N/A')}' : '<div class="progress" style="width:100px" title="' + (job.isMR2 ? job.reducesPercentComplete : job.finishedReduces + '/' + job.desiredReduces) + '"><div class="bar-label">' + job.reducesPercentComplete + '%</div><div class="' + 'bar ' + getStatusClass(job.status, "bar-") + '" style="margin-top:-20px;width:' + job.reducesPercentComplete + '%"></div></div>'));
+      _title += " R " + job.reducesPercentComplete + "%";;
     }
     else {
       $("#jobReduces").html('${_('N/A')}');
+    }
+    if (_title != ""){
+      $.jHueTitleUpdater.set(_title);
     }
     $("#jobDuration").html('<span title="' + emptyStringIfNull(job.durationMs) + '">' + (job.isRetired ? '${_('N/A')}' : emptyStringIfNull(job.durationFormatted)) + '</span>');
 
     if (['RUNNING', 'PREP', 'WAITING', 'SUSPENDED', 'PREPSUSPENDED', 'PREPPAUSED', 'PAUSED'].indexOf(job.status.toUpperCase()) == -1) {
       window.clearInterval(_runningInterval);
       removeFailedTasksFromRecent();
+      $.jHueTitleUpdater.reset();
     }
   }
 

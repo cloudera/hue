@@ -125,6 +125,7 @@ from django.utils.translation import ugettext as _
   <script src="/static/js/jquery.alert.js"></script>
   <script src="/static/js/jquery.rowselector.js"></script>
   <script src="/static/js/jquery.notify.js"></script>
+  <script src="/static/js/jquery.titleupdater.js"></script>
   <script src="/static/js/jquery.tablescroller.js"></script>
   <script src="/static/js/jquery.tableextender.js"></script>
   <script src="/static/js/jquery.scrollup.js"></script>
