@@ -56,23 +56,28 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
     </div>
   % endif
   <form class="form-search" style="margin: 0">
-    <div class="dropdown" style="display: inline">
-      ${ _('Search in')} <a href="#" data-toggle="dropdown"><strong class="current-collection"></strong> <i class="fa fa-caret-down"></i></a>
-      <ul class="dropdown-menu">
-        % if user.is_superuser:
-          % for collection in hue_collections:
-            <li><a class="dropdown-collection" href="#" data-value="${ collection.id }" data-settings-url="${ collection.get_absolute_url() }">${ collection.label }</a></li>
-          % endfor
-        % else:
-          % for collection in hue_collections:
-            <li><a class="dropdown-collection" href="#" data-value="${ collection.id }">${ collection.label }</a></li>
-          % endfor
-        % endif
-      </ul>
-    </div>
+    <strong>${_("Search")}</strong>
     <div class="input-append">
+      <div class="selectMask">
+        <i class="fa fa-caret-down" style="float:right;margin-top: 8px; margin-left: 5px"></i>
+        <span class="current-collection"></span>
+        <div id="collectionPopover" class="hide">
+        <ul class="unstyled">
+          % if user.is_superuser:
+            % for collection in hue_collections:
+              <li><a class="dropdown-collection" href="#" data-value="${ collection.id }" data-settings-url="${ collection.get_absolute_url() }">${ collection.label }</a></li>
+            % endfor
+          % else:
+            % for collection in hue_collections:
+              <li><a class="dropdown-collection" href="#" data-value="${ collection.id }">${ collection.label }</a></li>
+            % endfor
+          % endif
+        </ul>
+        </div>
+      </div>
+
       ${ search_form | n,unicode }
-      <button type="submit" class="btn"><i class="fa fa-search"></i></button>
+      <button type="submit" class="btn btn-inverse"><i class="fa fa-search"></i></button>
     </div>
   </form>
 </div>
@@ -304,6 +309,7 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
 
 <script>
   $(document).ready(function () {
+
     if ($(".errorlist").length > 0) {
       $(".errorlist li").each(function () {
         $(document).trigger("error", $(this).text());
@@ -396,7 +402,7 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
       % endif
     % endif
 
-    $(".dropdown-collection").click(function (e) {
+    $(document).on("click", ".dropdown-collection", function (e) {
       e.preventDefault();
       var collectionId = $(this).data("value");
       $("select[name='collection']").val(collectionId);
@@ -406,6 +412,24 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
       $.cookie("hueSearchLastCollection", collectionId, {expires: 90});
       $("form").find("input[type='hidden']").val("");
       $("form").submit();
+      $(".selectMask").popover("hide");
+    });
+
+    function getCollectionPopoverContent() {
+      var _html = "<ul class='unstyled'>";
+      $("#collectionPopover ul li").each(function () {
+        if ($(this).find("a").data("value") != $("#id_collection").val()) {
+          _html += $(this).clone().wrap('<p>').parent().html();
+        }
+      });
+      _html += "</ul>";
+      return _html;
+    }
+
+    $(".selectMask").popover({
+      html: true,
+      content: getCollectionPopoverContent(),
+      placement: "bottom"
     });
 
     $("#recordsPerPage").change(function () {
