@@ -136,3 +136,37 @@ body {
 .facetItem {
   display: none;
 }
+
+.selectMask {
+  background-color: #F9F9F9;
+  background-image: linear-gradient(to bottom, #FFFFFF, #F1F1F1);
+  background-repeat: repeat-x;
+  border: 1px solid #C0C0C0;
+  border-right-color: rgba(0, 0, 0, 0.1);
+  border-radius: 2px;
+  border-bottom-right-radius: 0;
+  border-top-right-radius: 0;
+  box-shadow: none;
+  color: #444444;
+  cursor: pointer;
+  display: inline-block;
+  font-size: 13px;
+  height: 29px;
+  line-height: 29px;
+  margin: 0;
+  margin-left: 5px;
+  min-height: 29px;
+  min-width: 120px;
+  padding: 0 8px;
+  text-shadow: none;
+  vertical-align: middle;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.search-query {
+  border-bottom-left-radius: 0 !important;
+  border-top-left-radius: 0 !important;
+  margin-left: 0 !important;
+  border-left: 0 !important;
+}

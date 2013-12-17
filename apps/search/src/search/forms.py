@@ -26,7 +26,7 @@ class QueryForm(forms.Form):
   collection = forms.ChoiceField() # Aka collection_id
 
   query = forms.CharField(label='', max_length=256, required=False, initial='',
-                          widget=forms.TextInput(attrs={'class': 'search-query input-xxlarge', 'placeholder': 'Search...'}))
+                          widget=forms.TextInput(attrs={'class': 'search-query input-xxlarge'}))
   fq = forms.CharField(label='', max_length=256, required=False, initial='', widget=forms.HiddenInput(), help_text='Solr Filter query')
   sort = forms.CharField(label='', max_length=256, required=False, initial='', widget=forms.HiddenInput(), help_text='Solr sort')
   rows = forms.CharField(label='', required=False, initial='', widget=forms.HiddenInput(), help_text='Solr records per page')
