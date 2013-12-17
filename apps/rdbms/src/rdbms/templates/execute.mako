@@ -56,8 +56,9 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
     <div class="span10">
     <div id="query">
       <div class="card card-small">
-        <div style="margin-bottom: 30px">
+        <div style="margin-bottom: 10px">
           <h1 class="card-heading simple">
+            <a id="collapse-editor" href="javascript:void(0)" class="pull-right"><i class="fa fa-caret-up"></i></a>
             ${ _('Query Editor') }
             % if can_edit_name:
               :
@@ -98,7 +99,7 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
               <textarea class="hide" tabindex="1" name="query" id="queryField"></textarea>
 
               <div class="actions">
-                <button data-bind="click: tryExecuteQuery" type="button" id="executeQuery" class="btn btn-primary" tabindex="2">${_('Execute')}</button>
+                <button data-bind="click: tryExecuteQuery" type="button" id="executeQuery" class="btn btn-primary disable-feedback" tabindex="2">${_('Execute')}</button>
                 <button data-bind="click: trySaveQuery, css: {'hide': !$root.query.id() || $root.query.id() == -1}" type="button" class="btn hide">${_('Save')}</button>
                 <button data-bind="click: trySaveAsQuery" type="button" class="btn">${_('Save as...')}</button>
                 <button data-bind="click: tryExplainQuery" type="button" id="explainQuery" class="btn">${_('Explain')}</button>
@@ -130,6 +131,17 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
             <i class="fa fa-frown-o"></i>
             <h1>${_('The server returned no results.')}</h1>
             <br />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div data-bind="css: {'hide': !isExecuting()}" class="hide">
+      <div class="card card-small scrollable">
+        <div class="row-fluid">
+          <div class="span10 offset1 center" style="padding: 30px">
+            <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 60px; color: #DDD"></i><!--<![endif]-->
+            <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
           </div>
         </div>
       </div>
@@ -531,6 +543,31 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
       'html': true
     });
 
+    $("#collapse-editor").on("click", function () {
+      if ($("#query .card-body").is(":visible")) {
+        $("#query .card-body").slideUp(100, function () {
+          $(".dataTables_wrapper").jHueTableScroller();
+          $(".resultTable").jHueTableExtender({
+            hintElement: "#jumpToColumnAlert",
+            fixedHeader: true,
+            firstColumnTooltip: true
+          });
+        });
+        $("#collapse-editor i").removeClass("fa-caret-up").addClass("fa-caret-down");
+      }
+      else {
+        $("#query .card-body").slideDown(100, function () {
+          $(".dataTables_wrapper").jHueTableScroller();
+          $(".resultTable").jHueTableExtender({
+            hintElement: "#jumpToColumnAlert",
+            fixedHeader: true,
+            firstColumnTooltip: true
+          });
+        });
+        $("#collapse-editor i").removeClass("fa-caret-down").addClass("fa-caret-up");
+      }
+    });
+
   });
 
   function modal(el) {
@@ -725,6 +762,11 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
     }
   }
 
+  function waitingResultsTable() {
+    $("#executeQuery").attr("data-loading-text", $("#executeQuery").text() + " ...");
+    $("#executeQuery").button("loading");
+  }
+
   function addResults(viewModel, dataTable, index, pageSize) {
     $.each(viewModel.rows.slice(index, index+pageSize), function(row_index, row) {
       var ordered_row = [];
@@ -770,8 +812,10 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
       index += pageSize;
 
       $(".resultTable").width($(".resultTable").parent().width());
+      $("#executeQuery").button("reset");
     }
   }
+  $(document).on('start_execution.query', waitingResultsTable);
   $(document).on('execute.query', cleanResultsTable);
   $(document).on('explain.query', cleanResultsTable);
   $(document).on('executed.query', resultsTable);

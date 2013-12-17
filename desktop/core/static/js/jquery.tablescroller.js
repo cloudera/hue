@@ -42,6 +42,7 @@
 
   Plugin.prototype.setOptions = function (options) {
     this.options = $.extend({}, defaults, options);
+    resizeScrollingTable(this);
   };
 
   Plugin.prototype.init = function () {
@@ -51,7 +52,7 @@
 
     var disableScrollingTable = $(_this.element).find("table").eq(0).data("tablescroller-disable");
     if (disableScrollingTable == null || disableScrollingTable != true) {
-      resizeScrollingTable(_this.element);
+      resizeScrollingTable(_this);
       var _resizeTimeout = -1;
       var winWidth = $(window).width();
       var winHeight = $(window).height();
@@ -60,7 +61,7 @@
         _resizeTimeout = window.setTimeout(function(){
           // prevents endless loop in IE8
           if (winWidth != $(window).width() || winHeight != $(window).height()) {
-            resizeScrollingTable(_this.element);
+            resizeScrollingTable(_this);
             winWidth = $(window).width();
             winHeight = $(window).height();
           }
@@ -68,44 +69,45 @@
       });
     }
 
-    function resizeScrollingTable(el) {
-      $(el).css("overflow-y", "").css("height", "");
-      var heightAfter = _this.options.heightAfterCorrection;
-      $(el).nextAll(":visible").each(function () {
-        heightAfter += $(this).outerHeight(true);
-      });
+  };
+  function resizeScrollingTable(_this) {
+    var el = _this.element;
+    $(el).css("overflow-y", "").css("height", "");
+    var heightAfter = _this.options.heightAfterCorrection;
+    $(el).nextAll(":visible").each(function () {
+      heightAfter += $(this).outerHeight(true);
+    });
 
-      var heightCondition = $(el).height() > ($(window).height() - $(el).offset().top - heightAfter);
-      var enforceHeight = $(_this.element).find("table").eq(0).data("tablescroller-enforce-height");
-      if (enforceHeight !== undefined && enforceHeight == true) {
-        heightCondition = true;
+    var heightCondition = $(el).height() > ($(window).height() - $(el).offset().top - heightAfter);
+    var enforceHeight = $(_this.element).find("table").eq(0).data("tablescroller-enforce-height");
+    if (enforceHeight !== undefined && enforceHeight == true) {
+      heightCondition = true;
+    }
+
+    if (heightCondition) {
+      var specificMinHeight = $(el).find("table").eq(0).data("tablescroller-min-height");
+      var minHeightVal = _this.options.minHeight;
+      if (!isNaN(parseFloat(specificMinHeight)) && isFinite(specificMinHeight)) {
+        minHeightVal = parseFloat(specificMinHeight);
       }
-
-      if (heightCondition) {
-        var specificMinHeight = $(el).find("table").eq(0).data("tablescroller-min-height");
-        var minHeightVal = _this.options.minHeight;
-        if (!isNaN(parseFloat(specificMinHeight)) && isFinite(specificMinHeight)) {
-          minHeightVal = parseFloat(specificMinHeight);
+      var disableMinHeight = $(_this.element).find("table").eq(0).data("tablescroller-min-height-disable");
+      if (disableMinHeight != null && disableMinHeight == true) {
+        if (heightCondition) {
+          $(el).css("overflow-y", "auto").height($(window).height() - $(el).offset().top - heightAfter);
         }
-        var disableMinHeight = $(_this.element).find("table").eq(0).data("tablescroller-min-height-disable");
-        if (disableMinHeight != null && disableMinHeight == true) {
-          if (heightCondition) {
-            $(el).css("overflow-y", "auto").height($(window).height() - $(el).offset().top - heightAfter);
-          }
+      }
+      else {
+        if (($(window).height() - $(el).offset().top - heightAfter) > minHeightVal){
+          $(el).css("overflow-y", "auto").height($(window).height() - $(el).offset().top - heightAfter);
         }
         else {
-          if (($(window).height() - $(el).offset().top - heightAfter) > minHeightVal){
-            $(el).css("overflow-y", "auto").height($(window).height() - $(el).offset().top - heightAfter);
-          }
-          else {
-            if ($(el).data("original-height") > minHeightVal){
-              $(el).css("overflow-y", "auto").height(minHeightVal);
-            }
+          if ($(el).data("original-height") > minHeightVal){
+            $(el).css("overflow-y", "auto").height(minHeightVal);
           }
         }
       }
     }
-  };
+  }
 
   $.fn[pluginName] = function (options) {
     return this.each(function () {

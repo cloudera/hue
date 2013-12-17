@@ -32,6 +32,7 @@ function RdbmsViewModel() {
   self.rows = ko.observableArray();
   self.columns = ko.observableArray();
   self.resultsEmpty = ko.observable(false);
+  self.isExecuting = ko.observable(false);
 
   self.server = ko.computed({
     'read': function() {
@@ -212,6 +213,8 @@ function RdbmsViewModel() {
   };
 
   self.executeQuery = function() {
+    $(document).trigger('start_execution.query');
+    self.isExecuting(true);
     var data = ko.mapping.toJS(self.query);
     data.database = self.database();
     data.server = self.server().name();
@@ -226,6 +229,7 @@ function RdbmsViewModel() {
           self.updateResults(data.results);
           self.query.id(data.design);
           self.resultsEmpty(data.results.rows.length === 0);
+          self.isExecuting(false);
           $(document).trigger('executed.query', data);
         } else {
           self.query.errors.push(data.message);
