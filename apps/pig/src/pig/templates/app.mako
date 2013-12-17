@@ -1097,10 +1097,12 @@ ${ commonheader(None, "pig", user) | n,unicode }
 
     $(document).on("showDashboard", function () {
       routie("dashboard");
+      $.jHueTitleUpdater.reset();
     });
 
     $(document).on("showScripts", function () {
       routie("scripts");
+      $.jHueTitleUpdater.reset();
     });
 
     $(document).on("scriptsRefreshed", function () {
@@ -1120,6 +1122,7 @@ ${ commonheader(None, "pig", user) | n,unicode }
 
     $(document).on("stopLogsRefresh", function () {
       window.clearInterval(logsRefreshInterval);
+      $.jHueTitleUpdater.reset();
     });
 
     $(document).on("clearLogs", function () {
@@ -1203,16 +1206,21 @@ ${ commonheader(None, "pig", user) | n,unicode }
           }
           if (data.workflow && data.workflow.isRunning) {
             viewModel.currentScript().actions(data.workflow.actions);
+            if (data.workflow.actions != null && data.workflow.actions.length > 0) {
+              $.jHueTitleUpdater.set(data.workflow.actions[data.workflow.actions.length-1].progress + "%");
+            }
           }
           else {
             viewModel.currentScript().actions(data.workflow.actions);
             viewModel.currentScript().isRunning(false);
             $(document).trigger("stopLogsRefresh");
+            $.jHueTitleUpdater.reset();
           }
         });
       }
       else {
         $(document).trigger("stopLogsRefresh");
+        $.jHueTitleUpdater.reset();
       }
     }
 

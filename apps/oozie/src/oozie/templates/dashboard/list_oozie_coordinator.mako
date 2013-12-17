@@ -434,6 +434,8 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
 
         $("#status span").attr("class", "label").addClass(getStatusClass(data.status)).text(data.status);
 
+        $.jHueTitleUpdater.set(data.progress + "%");
+
         if (data.id && data.status != "RUNNING" && data.status != "SUSPENDED" && data.status != "KILLED" && data.status != "FAILED"){
           $("#kill-btn").hide();
           $("#rerun-btn").show();
@@ -448,11 +450,12 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
         if (data.id && (data.status == "SUSPENDED" || data.status == "SUSPENDEDWITHERROR" || data.status == "SUSPENDEDWITHERROR"
             || data.status == "PREPSUSPENDED")){
           $("#resume-btn").show();
+          $.jHueTitleUpdater.reset();
         } else {
           $("#resume-btn").hide();
         }
 
-        $("#progress .bar").text(data.progress+"%").css("width", data.progress+"%").attr("class", "bar "+getStatusClass(data.status, "bar-"));
+        $("#progress .bar").text(data.progress + "%").css("width", data.progress + "%").attr("class", "bar " + getStatusClass(data.status, "bar-"));
 
         var _logsEl = $("#log pre");
         var newLines = data.log.split("\n").slice(_logsEl.text().split("\n").length);
