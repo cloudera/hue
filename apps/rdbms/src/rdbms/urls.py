@@ -38,12 +38,6 @@ urlpatterns += patterns('rdbms.api',
 )
 
 urlpatterns += patterns('beeswax.views',
-  url(r'^autocomplete/$', 'autocomplete', name='autocomplete'),
-  url(r'^autocomplete/(?P<database>\w+)/$', 'autocomplete', name='autocomplete'),
-  url(r'^autocomplete/(?P<database>\w+)/(?P<table>\w+)$', 'autocomplete', name='autocomplete'),
-
-  url(r'^save_design_properties$', 'save_design_properties', name='save_design_properties'), # Ajax
-
   url(r'^my_queries$', 'my_queries', name='my_queries'),
   url(r'^list_designs$', 'list_designs', name='list_designs'),
   url(r'^list_trashed_designs$', 'list_trashed_designs', name='list_trashed_designs'),
@@ -51,4 +45,10 @@ urlpatterns += patterns('beeswax.views',
   url(r'^restore_designs$', 'restore_design', name='restore_design'),
   url(r'^clone_design/(?P<design_id>\d+)$', 'clone_design', name='clone_design'),
   url(r'^query_history$', 'list_query_history', name='list_query_history')
+)
+
+urlpatterns += patterns('beeswax.api',
+  url(r'^autocomplete/$', 'autocomplete', name='api_autocomplete_databases'),
+  url(r'^autocomplete/(?P<database>\w+)/$', 'autocomplete', name='api_autocomplete_tables'),
+  url(r'^autocomplete/(?P<database>\w+)/(?P<table>\w+)$', 'autocomplete', name='api_autocomplete_columns')
 )

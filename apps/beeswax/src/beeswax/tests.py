@@ -1571,37 +1571,6 @@ class TestWithMockedServer(object):
   def tearDown(self):
     dbms.HiveServer2Dbms = dbms.OriginalBeeswaxApi
 
-  def test_save_design_properties(self):
-    resp = self.client.get('/beeswax/save_design_properties')
-    content = json.loads(resp.content)
-    assert_equal(-1, content['status'])
-
-    response = _make_query(self.client, 'SELECT', submission_type='Save', name='My Name', desc='My Description')
-    design = response.context['design']
-
-    try:
-      resp = self.client.post('/beeswax/save_design_properties', {'name': 'name', 'value': 'New Name', 'pk': design.id})
-      design = SavedQuery.objects.get(id=design.id)
-      content = json.loads(resp.content)
-      assert_equal(0, content['status'])
-      assert_equal('New Name', design.name)
-      assert_equal('My Description', design.desc)
-    finally:
-      design.delete()
-
-    response = _make_query(self.client, 'SELECT', submission_type='Save', name='My Name', desc='My Description')
-    design = response.context['design']
-
-    try:
-      resp = self.client.post('/beeswax/save_design_properties', {'name': 'description', 'value': 'New Description', 'pk': design.id})
-      design = SavedQuery.objects.get(id=design.id)
-      content = json.loads(resp.content)
-      assert_equal(0, content['status'])
-      assert_equal('My Name', design.name)
-      assert_equal('New Description', design.desc)
-    finally:
-      design.delete()
-
   def test_bulk_query_trash(self):
     response = _make_query(self.client, 'SELECT', submission_type='Save', name='My Name 1', desc='My Description')
     query = response.context['design']

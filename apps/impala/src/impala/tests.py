@@ -71,9 +71,6 @@ class TestMockedImpala:
       response = self.client.get("/impala/list_designs")
       assert_equal(len(response.context['page'].object_list), 1)
 
-      response = self.client.get("/impala/execute_parameterized/%s" % impala_query.id)
-      assert_true('specify parameters' in response.content)
-
       # Test my query page
       QueryHistory.objects.create(owner=user, design=impala_query, query='', last_state=QueryHistory.STATE.available.index)
 

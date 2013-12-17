@@ -21,21 +21,12 @@ urlpatterns = patterns('beeswax.views',
   url(r'^$', 'index', name='index'),
 
   url(r'^execute/(?P<design_id>\d+)?$', 'execute_query', name='execute_query'),
-  url(r'^explain_parameterized/(?P<design_id>\d+)$', 'explain_parameterized_query', name='explain_parameterized_query'),
-  url(r'^execute_parameterized/(?P<design_id>\d+)$', 'execute_parameterized_query', name='execute_parameterized_query'),
   url(r'^watch/(?P<id>\d+)$', 'watch_query', name='watch_query'),
   url(r'^watch/json/(?P<id>\d+)$', 'watch_query_refresh_json', name='watch_query_refresh_json'),
-  url(r'^cancel_operation/(?P<query_id>\d+)?$', 'cancel_operation', name='cancel_operation'),
   url(r'^close_operation/(?P<query_id>\d+)?$', 'close_operation', name='close_operation'),
   url(r'^results/(?P<id>\d+)/(?P<first_row>\d+)$', 'view_results', name='view_results'),
   url(r'^download/(?P<id>\d+)/(?P<format>\w+)$', 'download', name='download'),
   url(r'^save_results/(?P<id>\d+)$', 'save_results', name='save_results'),
-  url(r'^save_design_properties$', 'save_design_properties', name='save_design_properties'), # Ajax
-
-  url(r'^autocomplete/$', 'autocomplete', name='autocomplete'),
-  url(r'^autocomplete/(?P<database>\w+)/$', 'autocomplete', name='autocomplete'),
-  url(r'^autocomplete/(?P<database>\w+)/(?P<table>\w+)$', 'autocomplete', name='autocomplete'),
-
 
   url(r'^my_queries$', 'my_queries', name='my_queries'),
   url(r'^list_designs$', 'list_designs', name='list_designs'),
@@ -62,4 +53,17 @@ urlpatterns += patterns(
   url(r'^create/create_table/(?P<database>\w+)$', 'create_table', name='create_table'),
   url(r'^create/import_wizard/(?P<database>\w+)$', 'import_wizard', name='import_wizard'),
   url(r'^create/auto_load/(?P<database>\w+)$', 'load_after_create', name='load_after_create'),
+)
+
+urlpatterns += patterns(
+  'beeswax.api',
+
+  url(r'^api/autocomplete/$', 'autocomplete', name='api_autocomplete'),
+  url(r'^api/autocomplete/(?P<database>\w+)/$', 'autocomplete', name='api_autocomplete'),
+  url(r'^api/autocomplete/(?P<database>\w+)/(?P<table>\w+)$', 'autocomplete', name='api_autocomplete'),
+  url(r'^api/query/parameters$', 'parameters', name='api_parameters'),
+  url(r'^api/query/execute/(?P<query_id>\d+)?$', 'execute', name='api_execute'),
+  url(r'^api/query/(?P<query_id>\d+)?$', 'save_query', name='api_save_query'),
+  url(r'^api/query/(?P<query_id>\d+)/get$', 'fetch_saved_query', name='api_fetch_saved_query'),
+  url(r'^api/query/(?P<query_id>\d+)/cancel$', 'cancel_query', name='api_cancel_query'),
 )
