@@ -60,7 +60,18 @@ ${layout.menubar(section='query')}
   .noLeftMargin {
     margin-left: 0!important;
   }
+
+  .empty {
+    text-align: center;
+    color: #CCCCCC;
+    font-size: 24px;
+    padding: 40px;
+  }
+  .map {
+    height: 400px;
+  }
 </style>
+<link href="/static/ext/css/leaflet.css" rel="stylesheet">
 
 <div class="container-fluid">
   <div id="expand"><i class="fa fa-chevron-right" style="color: #FFFFFF"></i></div>
@@ -135,6 +146,7 @@ ${layout.menubar(section='query')}
               <li><a href="#log" data-toggle="tab">${_('Log')}</a></li>
               % if not error:
               <li><a href="#columns" data-toggle="tab">${_('Columns')}</a></li>
+              <li><a href="#chart" data-toggle="tab">${_('Chart')}</a></li>
               % endif
             </ul>
 
@@ -213,6 +225,64 @@ ${layout.menubar(section='query')}
             </tbody>
           </table>
         </div>
+        <div class="tab-pane" id="chart">
+          <div style="text-align: center">
+          <form class="form-inline">
+            ${_('Chart type')}&nbsp;
+            <div class="btn-group" data-toggle="buttons-radio">
+              <a rel="tooltip" data-placement="top" title="${_('Bars')}" id="blueprintBars" href="javascript:void(0)" class="btn"><i class="fa fa-bar-chart-o"></i></a>
+              <a rel="tooltip" data-placement="top" title="${_('Lines')}" id="blueprintLines" href="javascript:void(0)" class="btn"><i class="fa fa-signal"></i></a>
+              <a rel="tooltip" data-placement="top" title="${_('Map')}" id="blueprintMap" href="javascript:void(0)" class="btn"><i class="fa fa-map-marker"></i></a>
+            </div>&nbsp;&nbsp;
+            <span id="blueprintAxis" class="hide">
+              <label>${_('X-Axis')}
+                <select id="blueprintX" class="blueprintSelect">
+                  <option value="-1">${ _("Please select a column")}</option>
+                  % for col in columns:
+                    <option value="${loop.index+2}">${ col.name }</option>
+                  % endfor
+                </select>
+              </label>&nbsp;&nbsp;
+              <label>${_('Y-Axis')}
+              <select id="blueprintY" class="blueprintSelect">
+                  <option value="-1">${ _("Please select a column")}</option>
+                  % for col in columns:
+                    <option value="${loop.index+2}">${ col.name }</option>
+                  % endfor
+                </select>
+              </label>&nbsp;&nbsp;
+              <a rel="tooltip" data-placement="top" title="${_('Download image')}" id="blueprintDownload" href="javascript:void(0)" class="btn hide"><i class="fa fa-download"></i></a>
+            </span>
+            <span id="blueprintLatLng" class="hide">
+              <label>${_('Latitude')}
+                <select id="blueprintLat" class="blueprintSelect">
+                  <option value="-1">${ _("Please select a column")}</option>
+                  % for col in columns:
+                    <option value="${loop.index+2}">${ col.name }</option>
+                  % endfor
+                </select>
+              </label>&nbsp;&nbsp;
+              <label>${_('Longitude')}
+              <select id="blueprintLng" class="blueprintSelect">
+                  <option value="-1">${ _("Please select a column")}</option>
+                  % for col in columns:
+                    <option value="${loop.index+2}">${ col.name }</option>
+                  % endfor
+                </select>
+              </label>&nbsp;&nbsp;
+              <label>${_('Label')}
+              <select id="blueprintDesc" class="blueprintSelect">
+                  <option value="-1">${ _("Please select a column")}</option>
+                  % for col in columns:
+                    <option value="${loop.index+2}">${ col.name }</option>
+                  % endfor
+                </select>
+              </label>
+            </span>
+          </form>
+          </div>
+          <div id="blueprint" class="empty">${_("Please select a chart type.")}</div>
+        </div>
         % endif
       </div>
             </p>
@@ -267,6 +337,10 @@ ${layout.menubar(section='query')}
 </div>
 % endif.resultTable
 
+<script src="/static/ext/js/jquery/plugins/jquery.flot.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/jquery/plugins/jquery.flot.categories.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/leaflet/leaflet.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/jquery.blueprint.js" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript" charset="utf-8">
 $(document).ready(function () {
@@ -374,11 +448,13 @@ $(document).ready(function () {
     $(".sidebar-nav").parent().css("margin-left", "-31%");
     $("#expand").show().css("top", $(".sidebar-nav i").position().top + "px");
     $(".sidebar-nav").parent().next().removeClass("span9").addClass("span12").addClass("noLeftMargin");
+    generateGraph(getGraphType());
   });
   $("#expand").click(function () {
     $(this).hide();
     $(".sidebar-nav").parent().next().removeClass("span12").addClass("span9").removeClass("noLeftMargin");
     $(".sidebar-nav").parent().css("margin-left", "0");
+    generateGraph(getGraphType());
   });
 
   $(document).on("click", ".column-selector", function () {
@@ -454,6 +530,167 @@ $(document).ready(function () {
   });
 
   _dt.jHueScrollUp();
+
+  function getMapBounds(lats, lngs) {
+    lats = lats.sort();
+    lngs = lngs.sort();
+    return [
+      [lats[lats.length - 1], lngs[lngs.length - 1]], // north-east
+      [lats[0], lngs[0]] // south-west
+    ]
+  }
+  var map;
+  function generateGraph(graphType) {
+    if (graphType != "") {
+      if (map != null) {
+        try {
+          map.remove();
+        }
+        catch (err) { // do nothing
+        }
+      }
+      $("#blueprintDownload").addClass("hide");
+      $("#blueprint").attr("class", "").attr("style", "").empty();
+      $("#blueprint").data("plugin_jHueBlueprint", null);
+      if (graphType == $.jHueBlueprint.TYPES.MAP) {
+        if ($("#blueprintLat").val() != "-1" && $("#blueprintLng").val() != "-1") {
+          var _latCol = $("#blueprintLat").val() * 1;
+          var _lngCol = $("#blueprintLng").val() * 1;
+          var _descCol = $("#blueprintDesc").val() * 1;
+          var _lats = [];
+          var _lngs = [];
+          $(".resultTable>tbody>tr>td:nth-child(" + _latCol + ")").each(function (cnt) {
+            _lats.push($.trim($(this).text()) * 1);
+          });
+          $(".resultTable>tbody>tr>td:nth-child(" + _lngCol + ")").each(function (cnt) {
+            _lngs.push($.trim($(this).text()) * 1);
+          });
+          $("#blueprint").addClass("map");
+          map = L.map("blueprint").fitBounds(getMapBounds(_lats, _lngs));
+
+          L.tileLayer("http://{s}.tile.osm.org/{z}/{x}/{y}.png", {
+            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+          }).addTo(map);
+
+          $(".resultTable>tbody>tr>td:nth-child(" + _latCol + ")").each(function (cnt) {
+            if (_descCol != "-1") {
+              L.marker([$.trim($(this).text()) * 1, $.trim($(".resultTable>tbody>tr:nth-child(" + (cnt + 1) + ")>td:nth-child(" + _lngCol + ")").text()) * 1]).addTo(map).bindPopup($.trim($(".resultTable>tbody>tr:nth-child(" + (cnt + 1) + ")>td:nth-child(" + _descCol + ")").text()));
+            }
+            else {
+              L.marker([$.trim($(this).text()) * 1, $.trim($(".resultTable>tbody>tr:nth-child(" + (cnt + 1) + ")>td:nth-child(" + _lngCol + ")").text()) * 1]).addTo(map);
+            }
+          });
+
+        }
+        else {
+          $("#blueprint").addClass("empty").text("${_("Please select the latitude and longitude columns.")}");
+        }
+      }
+      else {
+        if ($("#blueprintX").val() != "-1" && $("#blueprintY").val() != "-1") {
+          var _x = $("#blueprintX").val() * 1;
+          var _y = $("#blueprintY").val() * 1;
+          var _data = [];
+          $(".resultTable>tbody>tr>td:nth-child(" + _x + ")").each(function (cnt) {
+            _data.push([$.trim($(this).text()), $.trim($(".resultTable>tbody>tr:nth-child(" + (cnt + 1) + ")>td:nth-child(" + _y + ")").text()) * 1]);
+          });
+
+          $("#blueprint").jHueBlueprint({
+            data: _data,
+            label: $(".resultTable>thead>tr>th:nth-child(" + _y + ")").text(),
+            type: graphType,
+            color: $.jHueBlueprint.COLORS.BLUE,
+            isCategories: true,
+            fill: true,
+            enableSelection: false,
+            height: 250
+          });
+          if (_data.length > 30){
+            $(".flot-x-axis .flot-tick-label").hide();
+          }
+          $("#blueprintDownload").removeClass("hide");
+        }
+        else {
+          $("#blueprint").addClass("empty").text("${_("Please select the columns you would like to see in this chart.")}");
+        }
+      }
+    }
+  }
+
+  $("#blueprintDownload").on("click", function(){
+    window.open($(".flot-base")[0].toDataURL());
+  });
+
+  function getGraphType() {
+    var _type = "";
+    if ($("#blueprintBars").hasClass("active")) {
+      _type = $.jHueBlueprint.TYPES.BARCHART;
+    }
+    if ($("#blueprintLines").hasClass("active")) {
+      _type = $.jHueBlueprint.TYPES.LINECHART;
+    }
+    if ($("#blueprintMap").hasClass("active")) {
+      _type = $.jHueBlueprint.TYPES.MAP;
+    }
+    return _type;
+  }
+
+  var hasBeenPredicted = false;
+  function predictGraph() {
+    if (!hasBeenPredicted) {
+      hasBeenPredicted = true;
+      var _firstAllString, _firstAllNumeric;
+      for (var i = 1; i < $(".resultTable>thead>tr>th").length; i++) {
+        var _isNumeric = true;
+        $(".resultTable>tbody>tr>td:nth-child(" + (i + 1) + ")").each(function (cnt) {
+          if (!$.isNumeric($.trim($(this).text()))) {
+            _isNumeric = false;
+          }
+        });
+        if (_firstAllString == null && !_isNumeric) {
+          _firstAllString = i + 1;
+        }
+        if (_firstAllNumeric == null && _isNumeric) {
+          _firstAllNumeric = i + 1;
+        }
+      }
+      if (_firstAllString != null && _firstAllNumeric != null) {
+        $("#blueprintBars").addClass("active");
+        $("#blueprintAxis").removeClass("hide");
+        $("#blueprintLatLng").addClass("hide");
+        $("#blueprintX").val(_firstAllString);
+        $("#blueprintY").val(_firstAllNumeric);
+      }
+    }
+    generateGraph(getGraphType());
+  }
+
+
+  $("a[data-toggle='tab']").on("shown", function (e) {
+    if ($(e.target).attr("href") == "#chart") {
+      predictGraph();
+    }
+  });
+
+  $(".blueprintSelect").on("change", function () {
+    generateGraph(getGraphType())
+  });
+
+  $("#blueprintBars").on("click", function () {
+    $("#blueprintAxis").removeClass("hide");
+    $("#blueprintLatLng").addClass("hide");
+    generateGraph($.jHueBlueprint.TYPES.BARCHART)
+  });
+  $("#blueprintLines").on("click", function () {
+    $("#blueprintAxis").removeClass("hide");
+    $("#blueprintLatLng").addClass("hide");
+    generateGraph($.jHueBlueprint.TYPES.LINECHART)
+  });
+  $("#blueprintMap").on("click", function () {
+    $("#blueprintAxis").addClass("hide");
+    $("#blueprintLatLng").removeClass("hide");
+    generateGraph($.jHueBlueprint.TYPES.MAP)
+  });
 
   % if app_name == 'impala':
     window.onbeforeunload = function(e) {
