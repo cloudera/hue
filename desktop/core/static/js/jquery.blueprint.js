@@ -42,6 +42,8 @@
         tooltips: true,
         enableSelection: false,
         isDateTime: false,
+        isCategories: false,
+        useCanvas: false,
         onSelect: function () {
         },
         onItemClick: function () {
@@ -96,7 +98,6 @@
   function flot(plugin) {
     var _this = plugin;
     $(_this.element).width(_this.options.width).height(_this.options.height);
-    var _serie = getSerie(_this.options);
     var _options = {
       grid: {
         borderWidth: _this.options.borderWidth,
@@ -117,7 +118,17 @@
         mode: "time"
       }
     }
-    var _plot = $.plot(_this.element, [_serie], _options);
+    if (_this.options.isCategories) {
+      _options.xaxis = {
+        mode: "categories"
+      }
+    }
+    if (_this.options.useCanvas) {
+      _options.canvas = true;
+    }
+    var _serie = getSerie(_this.options);
+    var _plot = $.plot($(_this.element), [_serie], _options);
+
     $(_this.element).bind("plotselected", function (event, ranges) {
       _this.options.onSelect(ranges);
     });
@@ -137,6 +148,10 @@
 
             if (_this.options.isDateTime && typeof moment != "undefined"){
               x = moment(x).utc().format("YYYY-MM-DD[T]HH:mm:ss[Z]");
+            }
+
+            if (_this.options.isCategories){
+              x = item.series.data[item.dataIndex][0];
             }
 
             showTooltip(item.pageX, item.pageY, "X: "+x+", Y: "+y);
@@ -197,7 +212,7 @@
       _flotSerie.points = {show: true}
     }
     if (options.type == TYPES.BARCHART) {
-      _flotSerie.bars = {show: true, fill: options.fill }
+      _flotSerie.bars = {show: true, fill: options.fill, barWidth: 0.6, align: "center" }
       _flotSerie.points = {show: true}
     }
     if (options.type == TYPES.POINTCHART) {
