@@ -195,6 +195,15 @@ var NodeModule = function($, IdGeneratorTable, NodeFields) {
       return '';
     },
 
+    toJS: function() {
+      var self = this;
+      var data = ko.mapping.toJS(self);
+      if ('files' in data) {
+        self['files'] = ko.toJS(self._files);
+      }
+      return data;
+    },
+
     /**
      * Fetches registry
      */
@@ -214,26 +223,6 @@ var NodeModule = function($, IdGeneratorTable, NodeFields) {
       var mapping = ko.mapping.fromJS(model, MAPPING_OPTIONS);
 
       $.extend(self, mapping);
-      $.each(mapping, function(key, value) {
-        var key = key;
-        if (ko.isObservable(self[key])) {
-          self[key].subscribe(function(value) {
-            model[key] = ko.mapping.toJS(value);
-          });
-        }
-      });
-
-      $.each(self.child_links(), function(index, link) {
-        var $index = index;
-        link.comment.subscribe(function(value) {
-          self.model.child_links[$index].comment = value;
-        });
-
-        link.child.subscribe(function(value) {
-          self.model.child_links[$index].child = value;
-        });
-      });
-
     },
 
     validate: function( ) {
@@ -241,13 +230,13 @@ var NodeModule = function($, IdGeneratorTable, NodeFields) {
 
       var options = {};
 
-      data = $.extend(true, {}, self.model);
+      // data = $.extend(true, {}, self.model);
 
       var success = false;
       var request = $.extend({
         url: '/oozie/workflows/' + self._workflow.id() + '/nodes/' + self.node_type() + '/validate',
         type: 'POST',
-        data: { node: JSON.stringify(data) },
+        data: { node: JSON.stringify(self.toJS()) },
         success: function(data) {
           ko.mapping.fromJS(data.data, self.errors);
           success = data.status == 0;

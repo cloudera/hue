@@ -285,10 +285,9 @@ $.extend(DecisionNode.prototype, ForkNode.prototype, {
  */
 var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode, IdGeneratorTable) {
 
-  function addModelModificationHandlers(workflow, mapping, model, key) {
+  function addHooks(workflow, mapping, model, key) {
     mapping.subscribe(function(value) {
       workflow.is_dirty(true);
-      model[key] = ko.mapping.toJS(value);
     });
   }
 
@@ -409,13 +408,13 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
 
     $.each(self['__ko_mapping__'].mappedProperties, function(key, value) {
       if (ko.isObservable(self[key])) {
-        addModelModificationHandlers(self, self[key], options.model, key);
+        addHooks(self, self[key], options.model, key);
       } else {
         // Unstructured data object.
         $.each(self[key], function(_key, _value) {
           // @TODO: Don't assume all children are observable
           if (ko.isObservable(self[key][_key])) {
-            addModelModificationHandlers(self, self[key][_key], options.model[key], _key);
+            addHooks(self, self[key][_key], options.model[key], _key);
           }
         });
       }
@@ -547,7 +546,6 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
                 } catch (error){
                   data = value;
                 }
-                alert(JSON.stringify(data));
                 updateData(self[key], data);
               break;
 
@@ -600,20 +598,15 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
     toJSON: function() {
       var self = this;
 
-      data = $.extend(true, {}, self.model);
+      data = $.extend(true, {}, ko.mapping.toJS(self));
 
-      var nodes = [];
+      data['nodes'] = [];
       $.each(self.registry.nodes, function(key, node) {
         // Create object with members from the actual model to address JSON.stringify bug
         // JSON.stringify does not pick up members specified in prototype prior to object creation.
-        var model = {};
-        for (var key in node.model) {  //if (key =='data') {alert(node.model[key])};
-          model[key] = node.model[key];
-        }
-        nodes.push(model);
+        data['nodes'].push(node.toJS());
       });
-      data['nodes'] = nodes;
-            
+
       return JSON.stringify(data);
     },
 

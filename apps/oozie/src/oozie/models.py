@@ -228,7 +228,7 @@ class Job(models.Model):
     if 'sla' not in data_python:
       data_python['sla'] = copy.deepcopy(DEFAULT_SLA)
     if 'global_properties' not in data_python:
-      data_python['global_properties'] = DEFAULT_GLOBAL_PROPERTIES       
+      data_python['global_properties'] = DEFAULT_GLOBAL_PROPERTIES
     if 'global_config' not in data_python:
       data_python['global_config'] = DEFAULT_GLOBAL_CONFIG     
     return data_python 
