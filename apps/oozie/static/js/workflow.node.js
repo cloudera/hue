@@ -126,6 +126,12 @@ var NodeModule = function($, IdGeneratorTable, NodeFields) {
     }
 
     // Data manipulation
+    if (self.data && self.data.sla) {
+      self.sla = ko.computed(function() {
+        return self.data.sla();
+      });
+    }
+
     if ('files' in model) {
       //// WARNING: The following order should be preserved!
 
@@ -170,19 +176,12 @@ var NodeModule = function($, IdGeneratorTable, NodeFields) {
       };
     }
 
-    // Manage custom 'data' here
-    if ('sla' in self.model) {
-      var data = self.model['sla'];
-      self.sla = ko.observableArray(self.model['sla']);
-    }
-
     self.initialize.apply(self, arguments);
 
     return self;
   };
 
   $.extend(true, module.prototype, NodeFields, {
-    // Data.
     children: null,
     model: null,
 
