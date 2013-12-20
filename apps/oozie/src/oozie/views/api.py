@@ -205,8 +205,8 @@ def _update_workflow_nodes_json(workflow, json_nodes, id_map, user):
     id_map[str(json_node['id'])] = node.id
 
     for key in json_node:
-      if key == 'sla':
-        node.sla = json_node[key]
+      if key == 'data':
+        node.data = json.dumps(json_node[key])
       elif key not in ('node_ptr', 'child_nodes', 'workflow', 'id', 'sub_workflow'):
         setattr(node, key, format_field_value(key, json_node[key]))
 
@@ -228,11 +228,11 @@ def _update_workflow_nodes_json(workflow, json_nodes, id_map, user):
 
 def _update_workflow_json(json_workflow):
   workflow = Workflow.objects.get(id=json_workflow['id'])
-
+  print json_workflow
   for key in json_workflow:
-    if key == 'sla':
-      workflow.sla = json_workflow['sla']
-    elif key not in ('nodes', 'start', 'end', 'job_ptr', 'owner', 'data'):
+    if key == 'data':
+      workflow.data = json.dumps(json_workflow['data'])
+    elif key not in ('nodes', 'start', 'end', 'job_ptr', 'owner'):
       setattr(workflow, key, json_workflow[key])
 
   workflow.save()

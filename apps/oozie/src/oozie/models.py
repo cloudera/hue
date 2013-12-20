@@ -124,7 +124,7 @@ class Job(models.Model):
   is_trashed = models.BooleanField(default=False, db_index=True, verbose_name=_t('Is trashed'), blank=True,# Deprecated
                                    help_text=_t('If this job is trashed.'))
   doc = generic.GenericRelation(Document, related_name='oozie_doc')
-  data = models.TextField(blank=True, default=json.dumps({}))
+  data = models.TextField(blank=True, default=json.dumps({}))  # e.g. data=json.dump({'sla': [python data], 'global': [python data], 'credentials': [python data]})
 
   objects = JobManager()
   unique_together = ('owner', 'name')
@@ -220,26 +220,25 @@ class Job(models.Model):
     return user.is_superuser or self.owner == user
 
   @property
-  def data_dict(self):
-    return json.loads(self.data)
-
-  @property
-  def sla(self):
-    if not self.data: # backward compatible
-      self.data = json.dumps({})
-    return json.loads(self.data).get('sla', copy.deepcopy(DEFAULT_SLA))
+  def data_dict(self): 
+    data_python = json.loads(self.data)
+    if 'sla' not in data_python: # backward compatibility
+      data_python['sla'] = copy.deepcopy(DEFAULT_SLA)
+    return data_python 
 
   @property
   def data_js_escaped(self):
     return json.dumps(self.data_dict, cls=JSONEncoderForHTML)
 
+  @property
+  def sla(self):
+    return self.data_dict['sla']
+
   @sla.setter
-  def sla(self, sla):
-    if not self.data: # backward compatible
-      self.data = json.dumps({})    
-    data_json = json.loads(self.data)
-    data_json['sla'] = sla
-    self.data = json.dumps(data_json) #data=json.dump({'sla': [python data], 'global': [python data], 'credentials': [python data]})
+  def sla(self, sla): 
+    data_ = self.data_dict
+    data_['sla'] = sla
+    self.data = json.dumps(data_)
 
   @property
   def sla_enabled(self):

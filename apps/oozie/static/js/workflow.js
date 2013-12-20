@@ -540,6 +540,7 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
                 } catch (error){
                   data = value;
                 }
+                alert(JSON.stringify(data));
                 updateData(self[key], data);
               break;
 
@@ -599,7 +600,7 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
         // Create object with members from the actual model to address JSON.stringify bug
         // JSON.stringify does not pick up members specified in prototype prior to object creation.
         var model = {};
-        for (var key in node.model) {
+        for (var key in node.model) {  //if (key =='data') {alert(node.model[key])};
           model[key] = node.model[key];
         }
         nodes.push(model);
