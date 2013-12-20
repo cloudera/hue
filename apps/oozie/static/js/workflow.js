@@ -432,9 +432,16 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
     self.read_only = ko.observable( options.read_only || false );
     self.new_node = ko.observable();
 
+    // Create fields from the generic data field
     self.sla = ko.computed(function() {
       return self.data.sla();
     });
+//    self.globalProperties = ko.computed(function() {
+//        return self.data.globalProperties();
+//      });     
+//    self.globalConfig = ko.computed(function() {
+//      return self.data.globalConfig();
+//    });
 
     self.url = ko.computed(function() {
       return '/oozie/workflows/' + self.id();
@@ -606,9 +613,7 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
         nodes.push(model);
       });
       data['nodes'] = nodes;
-      
-      //data['sla'] = self.sla;
-      
+            
       return JSON.stringify(data);
     },
 

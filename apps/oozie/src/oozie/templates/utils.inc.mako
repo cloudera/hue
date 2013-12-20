@@ -278,6 +278,36 @@
 </%def>
 
 
+<%def name="globalPropertiesForm()">
+  <div data-bind="foreach: { 'data': globalProperties }">
+    <div class="controls">
+      <div class="span3">
+        <span></span>
+      </div>
+      <div class="span9">
+        <input type="text" data-bind="value: key" class="span6">
+        <input type="text" data-bind="value: value" class="span6">
+      </div>
+    </div>
+  </div>
+</%def>
+
+
+<%def name="globalConfigForm()">
+  <div data-bind="foreach: { 'data': globalConfig }">
+    <div class="controls">
+      <div class="span3">
+        <span></span>
+      </div>
+      <div class="span9">
+        <input type="text" data-bind="value: key" class="span6">
+        <input type="text" data-bind="value: value" class="span6">
+      </div>
+    </div>
+  </div>
+</%def>
+
+
 ## Would be nice include it in slaForm() somehow
 <%def name="slaGlobal()">
   var SLA_TEXT = {
