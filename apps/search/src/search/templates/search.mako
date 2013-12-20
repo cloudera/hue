@@ -540,7 +540,7 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
         return _newPieces.join("|");
       }
       else {
-        return decodeURIComponent(existing) + "|" + currentField + currentValue;
+        return $("<span>").html(existing).text() + "|" + currentField + currentValue;
       }
     }
 
