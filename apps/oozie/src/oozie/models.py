@@ -71,6 +71,8 @@ DEFAULT_SLA = [
     {'key': 'notification-msg', 'value': ''},
     {'key': 'upstream-apps', 'value': ''},
 ]
+DEFAULT_GLOBAL_PROPERTIES = [{}]
+DEFAULT_GLOBAL_CONFIG = [{}]
 
 class JobManager(models.Manager):
 
@@ -222,8 +224,13 @@ class Job(models.Model):
   @property
   def data_dict(self): 
     data_python = json.loads(self.data)
-    if 'sla' not in data_python: # backward compatibility
+    # Backward compatibility
+    if 'sla' not in data_python:
       data_python['sla'] = copy.deepcopy(DEFAULT_SLA)
+    if 'global_properties' not in data_python:
+      data_python['global_properties'] = DEFAULT_GLOBAL_PROPERTIES       
+    if 'global_config' not in data_python:
+      data_python['global_config'] = DEFAULT_GLOBAL_CONFIG     
     return data_python 
 
   @property
@@ -243,6 +250,26 @@ class Job(models.Model):
   @property
   def sla_enabled(self):
     return self.sla[0]['value'] # #1 is enabled
+
+  @property
+  def global_properties(self):
+    return self.data_dict['global_properties']
+
+  @global_properties.setter
+  def global_properties(self, global_properties): 
+    data_ = self.data_dict
+    data_['global_properties'] = global_properties
+    self.data = json.dumps(data_)
+
+  @property
+  def global_config(self):
+    return self.data_dict['global_config']
+
+  @global_config.setter
+  def global_config(self, global_config): 
+    data_ = self.data_dict
+    data_['global_config'] = global_config
+    self.data = json.dumps(data_)
 
 
 class WorkflowManager(models.Manager):
