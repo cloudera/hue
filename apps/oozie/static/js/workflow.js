@@ -285,6 +285,52 @@ $.extend(DecisionNode.prototype, ForkNode.prototype, {
  */
 var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode, IdGeneratorTable) {
 
+  function addModelModificationHandlers(workflow, mapping, model, key) {
+    mapping.subscribe(function(value) {
+      workflow.is_dirty(true);
+      model[key] = ko.mapping.toJS(value);
+    });
+  }
+
+  function updateData(mapping, model) {
+    // Unstructured data section.
+    // Assumes ko.mapping was used to create children.
+    // Assumes one of three structures:
+    //   - members are literals
+    //   - members are arrays of literals
+    //   - members are arrays of objects with literal members
+    // The point is to keep any parent containers and replace child observables.
+    // Templates will likely be tied to parent containers... so if we bubble changes
+    // to the parent container... the UI will reflect that.
+    $.each(mapping, function(member, value) {
+      if (member in model) {
+        if ($.isArray(value()) && $.isArray(model[member])) {
+          mapping[member].removeAll();
+          $.each(model[member], function(key, object_or_literal) {
+            if ($.isPlainObject(object_or_literal)) {
+              var obj = {};
+              $.each(object_or_literal, function(key, literal) {
+                obj[key] = ko.mapping.fromJS(literal);
+                obj[key].subscribe(function() {
+                  mapping[member].valueHasMutated();
+                });
+              });
+              mapping[member].push(obj);
+            } else {
+              var literal = ko.mapping.fromJS(object_or_literal);
+              mapping[member].push(literal);
+              literal.subscribe(function() {
+                mapping[member].valueHasMutated();
+              });
+            }
+          });
+        } else {
+          mapping[member](model[member]);
+        }
+      }
+    });
+  }
+
   var module = function(options) {
     var self = this;
 
@@ -348,16 +394,29 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
 
           return map_params(options, subscribe);
         }
+      },
+      data: {
+        create: function(options) {
+          return map_data(options);
+        },
+        update: function(options) {
+          return map_data(options);
+        }
       }
     });
 
     $.extend(self, mapping);
-    $.each(mapping['__ko_mapping__'].mappedProperties, function(key, value) {
-      var key = key;
-      if (self[key]) { //ugly? // allow custom sub bindings in foreach
-        self[key].subscribe(function(value) {
-          self.is_dirty(true);
-          self.model[key] = ko.mapping.toJS(value);
+
+    $.each(self['__ko_mapping__'].mappedProperties, function(key, value) {
+      if (ko.isObservable(self[key])) {
+        addModelModificationHandlers(self, self[key], options.model, key);
+      } else {
+        // Unstructured data object.
+        $.each(self[key], function(_key, _value) {
+          // @TODO: Don't assume all children are observable
+          if (ko.isObservable(self[key][_key])) {
+            addModelModificationHandlers(self, self[key][_key], options.model[key], _key);
+          }
         });
       }
     });
@@ -373,8 +432,12 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
     self.read_only = ko.observable( options.read_only || false );
     self.new_node = ko.observable();
 
+    self.sla = ko.computed(function() {
+      return self.data.sla();
+    });
+
     self.url = ko.computed(function() {
-      return '/oozie/workflows/' + self.id()
+      return '/oozie/workflows/' + self.id();
     });
 
     // Events
@@ -395,9 +458,6 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
     self.el.trigger('workflow:events:loaded');
 
     module.prototype.initialize.apply(self, arguments);
-
-    //self.sla = self.model['sla']; // Need to persists here for some reason
-    self.data = self.model['data']; // Need to persists here for some reason
 
     return self;
   };
@@ -471,6 +531,16 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
               break;
 
               case 'nodes':
+              break;
+
+              case 'data':
+                var data = {};
+                try {
+                  data = $.parseJSON(value);
+                } catch (error){
+                  data = value;
+                }
+                updateData(self[key], data);
               break;
 
               default:
@@ -606,10 +676,10 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
       var prop = { name: ko.observable(""), value: ko.observable("") };
       // force bubble up to containing observable array.
       prop.name.subscribe(function(){
-        self.parameters.valueHasMutated();
+        self.job_properties.valueHasMutated();
       });
       prop.value.subscribe(function(){
-        self.parameters.valueHasMutated();
+        self.job_properties.valueHasMutated();
       });
       self.job_properties.push(prop);
     },

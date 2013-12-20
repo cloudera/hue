@@ -624,7 +624,8 @@ function workflow_read_only_handler() {
 var kill_view_model = null;
 function workflow_load_success(data) {
   if (data.status == 0) {
-    workflow.reload(data.data);
+    var workflow_model = new WorkflowModel(data.data);
+    workflow.reload(workflow_model);
 
     //// Kill node
     kill_view_model = ManageKillModule($, workflow, nodeModelChooser, Node, NodeModel);

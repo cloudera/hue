@@ -32,7 +32,7 @@ var DEFAULT_SLA = [
 ];
 
 function getDefaultData() {
- return {'sla': jQuery.extend(true, [], DEFAULT_SLA)};
+ return {'sla': DEFAULT_SLA.slice(0)};
 }
 
 function normalize_model_fields(node_model) {
@@ -55,15 +55,54 @@ var map_params = function(options, subscribe) {
     });
     return mapping;
   } else {
-    var mapping =  ko.mapping.fromJS(options.data, {});
+    var mapping = ko.mapping.fromJS(options.data, {});
     subscribe(mapping);
     return mapping;
   }
 };
 
+// Find all members of the data and apply appropriate mapping.
+// Arrays might contain literals or plain objects.
+// Plain objects should have their members mapped and literals should
+// be replaced with observables.
+// Plain object members will notify their containing arrays when they update.
+// Literals will notify their containing arrays when they've changed.
+var map_data = function(options) {
+  var data = {};
+  options.data = ($.type(options.data) == "string") ? $.parseJSON(options.data) : options.data;
+  $.each(options.data, function(member, value) {
+    // @TODO: Should we support unstructureed data as children?
+    if ($.isArray(value)) {
+      // @TODO: Support more than {'member': 'value',...} and 'value'.
+      data[member] = ko.observableArray();
+      $.each(value, function(index, object_or_literal) {
+        if ($.isPlainObject(object_or_literal)) {
+          var obj = {};
+          $.each(object_or_literal, function(key, literal) {
+            obj[key] = ko.mapping.fromJS(literal);
+            obj[key].subscribe(function() {
+              data[member].valueHasMutated();
+            });
+          });
+          data[member].push(obj);
+        } else {
+          var literal = ko.mapping.fromJS(object_or_literal);
+          data[member].push(literal);
+          literal.subscribe(function() {
+            data[member].valueHasMutated();
+          });
+        }
+      });
+    } else {
+      data[member] = ko.mapping.fromJS(value);
+    }
+  });
+  return data;
+};
+
 // Maps JSON strings to fields in the view model.
 var MAPPING_OPTIONS = {
-  ignore: ['initialize', 'toString', 'copy', 'data'], // Do not support cancel edit on data
+  ignore: ['initialize', 'toString', 'copy'], // Do not support cancel edit on data
   job_properties: {
     create: function(options) {
       var parent = options.parent;
@@ -235,7 +274,6 @@ var MAPPING_OPTIONS = {
           parent.moves.valueHasMutated();
         });
       };
-
       return map_params(options, subscribe);
     },
     update: function(options) {
@@ -248,64 +286,69 @@ var MAPPING_OPTIONS = {
           parent.moves.valueHasMutated();
         });
       };
-
       return map_params(options, subscribe);
     }
-   },
-   chmods: {
-     create: function(options) {
-       var parent = options.parent;
-       var subscribe = function(mapping) {
-         mapping.path.subscribe(function(value) {
-           parent.chmods.valueHasMutated();
-         });
-         mapping.permissions.subscribe(function(value) {
-           parent.chmods.valueHasMutated();
-         });
-         mapping.recursive.subscribe(function(value) {
-           parent.chmods.valueHasMutated();
-         });
-       };
-
-       return map_params(options, subscribe);
-     },
-     update: function(options) {
-       var parent = options.parent;
-       var subscribe = function(mapping) {
-         mapping.path.subscribe(function(value) {
-           parent.chmods.valueHasMutated();
-         });
-         mapping.permissions.subscribe(function(value) {
-           parent.chmods.valueHasMutated();
-         });
-         mapping.recursive.subscribe(function(value) {
-           parent.chmods.valueHasMutated();
-         });
-       };
-
-       return map_params(options, subscribe);
-     },
-   },
-   touchzs: {
-     create: function(options) {
-       var parent = options.parent;
-       var subscribe = function(mapping) {
-         mapping.name.subscribe(function(value) {
-           parent.touchzs.valueHasMutated();
-         });
-       };
-       return map_params(options, subscribe);
-     },
-     update: function(options) {
-       var parent = options.parent;
-       var subscribe = function(mapping) {
-         mapping.name.subscribe(function(value) {
-           parent.touchzs.valueHasMutated();
-         });
-       };
-       return map_params(options, subscribe);
-     }
-   }
+  },
+  chmods: {
+    create: function(options) {
+      var parent = options.parent;
+      var subscribe = function(mapping) {
+        mapping.path.subscribe(function(value) {
+          parent.chmods.valueHasMutated();
+        });
+        mapping.permissions.subscribe(function(value) {
+          parent.chmods.valueHasMutated();
+        });
+        mapping.recursive.subscribe(function(value) {
+          parent.chmods.valueHasMutated();
+        });
+      };
+      return map_params(options, subscribe);
+    },
+    update: function(options) {
+      var parent = options.parent;
+      var subscribe = function(mapping) {
+        mapping.path.subscribe(function(value) {
+          parent.chmods.valueHasMutated();
+        });
+        mapping.permissions.subscribe(function(value) {
+          parent.chmods.valueHasMutated();
+        });
+        mapping.recursive.subscribe(function(value) {
+          parent.chmods.valueHasMutated();
+        });
+      };
+      return map_params(options, subscribe);
+    },
+  },
+  touchzs: {
+    create: function(options) {
+      var parent = options.parent;
+      var subscribe = function(mapping) {
+        mapping.name.subscribe(function(value) {
+          parent.touchzs.valueHasMutated();
+        });
+      };
+      return map_params(options, subscribe);
+    },
+    update: function(options) {
+      var parent = options.parent;
+      var subscribe = function(mapping) {
+        mapping.name.subscribe(function(value) {
+          parent.touchzs.valueHasMutated();
+        });
+      };
+      return map_params(options, subscribe);
+    }
+  },
+  data: {
+    create: function(options) {
+      return map_data(options);
+    },
+    update: function(options) {
+      return map_data(options);
+    }
+  }
 };
 
 var ModelModule = function($) {
@@ -342,6 +385,16 @@ var ModelModule = function($) {
   return module;
 };
 
+function initializeData() {
+  var self = this;
+
+  self.data = ($.type(self.data) == "string") ? $.parseJSON(self.data) : self.data;
+
+  if (!('sla' in self.data)) {
+    self.data['sla'] = DEFAULT_SLA.slice(0);
+  }
+}
+
 var WorkflowModel = ModelModule($);
 $.extend(WorkflowModel.prototype, {
   id: 0,
@@ -354,7 +407,8 @@ $.extend(WorkflowModel.prototype, {
   is_shared: true,
   parameters: '[]',
   job_xml: '',
-  data: getDefaultData()
+  data: getDefaultData(),
+  initialize: initializeData
 });
 
 var NodeModel = ModelModule($);
@@ -399,7 +453,8 @@ $.extend(DistCPModel.prototype, {
   job_xml: '',
   params: '[]',
   child_links: [],
-  data: getDefaultData()
+  data: getDefaultData(),
+  initialize: initializeData
 });
 
 var MapReduceModel = ModelModule($);
@@ -416,7 +471,8 @@ $.extend(MapReduceModel.prototype, {
   prepares: '[]',
   job_xml: '',
   child_links: [],
-  data: getDefaultData()
+  data: getDefaultData(),
+  initialize: initializeData
 });
 
 var StreamingModel = ModelModule($);
@@ -432,7 +488,8 @@ $.extend(StreamingModel.prototype, {
   mapper: '',
   reducer: '',
   child_links: [],
-  data: getDefaultData()
+  data: getDefaultData(),
+  initialize: initializeData
 });
 
 var JavaModel = ModelModule($);
@@ -453,7 +510,8 @@ $.extend(JavaModel.prototype, {
   java_opts: '',
   capture_output: false,
   child_links: [],
-  data: getDefaultData()
+  data: getDefaultData(),
+  initialize: initializeData
 });
 
 var PigModel = ModelModule($);
@@ -471,7 +529,8 @@ $.extend(PigModel.prototype, {
   params: '[]',
   script_path: '',
   child_links: [],
-  data: getDefaultData()
+  data: getDefaultData(),
+  initialize: initializeData
 });
 
 var HiveModel = ModelModule($);
@@ -489,7 +548,8 @@ $.extend(HiveModel.prototype, {
   params: '[]',
   script_path: '',
   child_links: [],
-  data: getDefaultData()
+  data: getDefaultData(),
+  initialize: initializeData
 });
 
 var SqoopModel = ModelModule($);
@@ -507,7 +567,8 @@ $.extend(SqoopModel.prototype, {
   params: '[]',
   script_path: '',
   child_links: [],
-  data: getDefaultData()
+  data: getDefaultData(),
+  initialize: initializeData
 });
 
 var ShellModel = ModelModule($);
@@ -526,7 +587,8 @@ $.extend(ShellModel.prototype, {
   command: '',
   capture_output: false,
   child_links: [],
-  data: getDefaultData()
+  data: getDefaultData(),
+  initialize: initializeData
 });
 
 var SshModel = ModelModule($);
@@ -542,7 +604,8 @@ $.extend(SshModel.prototype, {
   command: '',
   capture_output: false,
   child_links: [],
-  data: getDefaultData()
+  data: getDefaultData(),
+  initialize: initializeData
 });
 
 var FsModel = ModelModule($);
@@ -558,7 +621,8 @@ $.extend(FsModel.prototype, {
   chmods: '[]',
   touchzs: '[]',
   child_links: [],
-  data: getDefaultData()
+  data: getDefaultData(),
+  initialize: initializeData
 });
 
 var EmailModel = ModelModule($);
@@ -573,7 +637,8 @@ $.extend(EmailModel.prototype, {
   subject: '',
   body: '',
   child_links: [],
-  data: getDefaultData()
+  data: getDefaultData(),
+  initialize: initializeData
 });
 
 var SubWorkflowModel = ModelModule($);
@@ -587,7 +652,8 @@ $.extend(SubWorkflowModel.prototype, {
   propagate_configuration: true,
   job_properties: '[]',
   child_links: [],
-  data: getDefaultData()
+  data: getDefaultData(),
+  initialize: initializeData
 });
 
 var GenericModel = ModelModule($);
