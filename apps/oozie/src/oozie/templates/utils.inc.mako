@@ -310,22 +310,22 @@
 
 ## Would be nice include it in slaForm() somehow
 <%def name="slaGlobal()">
-  var SLA_TEXT = {
-    'enabled': {'niceName': '${ _("Enabled") }', 'placeHolder': ''},
-    'nominal-time': {'niceName': '${ _("Nominal time") } *', 'placeHolder': '${"$"}{nominal_time}'},
-    'should-start': {'niceName': '${ _("Should start") }', 'placeHolder': '${"$"}{10 * MINUTES}'},
-    'should-end': {'niceName': '${ _("Should end") } *', 'placeHolder': '${"$"}{30 * MINUTES}'},
-    'max-duration': {'niceName': '${ _("Max duration") }', 'placeHolder': '${"$"}{30 * MINUTES}'},
-    'alert-events': {'niceName': '${ _("Alert events") }', 'placeHolder': 'start_miss,end_miss,duration_miss'},
-    'alert-contact': {'niceName': '${ _("Alert contact") }', 'placeHolder': 'joe@example.com,bob@example.com'},
-    'notification-msg': {'niceName': '${ _("Notification message") }', 'placeHolder': '${ _("My Job has encountered an SLA event!") }'},
-    'upstream-apps': {'niceName': '${ _("Upstream apps") }', 'placeHolder': 'dependent-app-1, dependent-app-2'}
-  };
-
   function addSLATextAndPlaceholder(elements, $data) {
-    if (SLA_TEXT[$data.key()]) {
-      $(elements).find('input').attr('placeholder', SLA_TEXT[$data.key()].placeHolder);
-      $(elements).find('span').text(SLA_TEXT[$data.key()].niceName);
+    var SLA_TEXT = {
+      'enabled': {'niceName': '${ _("Enabled") }', 'placeHolder': ''},
+      'nominal-time': {'niceName': '${ _("Nominal time") } *', 'placeHolder': '${"$"}{nominal_time}'},
+      'should-start': {'niceName': '${ _("Should start") }', 'placeHolder': '${"$"}{10 * MINUTES}'},
+      'should-end': {'niceName': '${ _("Should end") } *', 'placeHolder': '${"$"}{30 * MINUTES}'},
+      'max-duration': {'niceName': '${ _("Max duration") }', 'placeHolder': '${"$"}{30 * MINUTES}'},
+      'alert-events': {'niceName': '${ _("Alert events") }', 'placeHolder': 'start_miss,end_miss,duration_miss'},
+      'alert-contact': {'niceName': '${ _("Alert contact") }', 'placeHolder': 'joe@example.com,bob@example.com'},
+      'notification-msg': {'niceName': '${ _("Notification message") }', 'placeHolder': '${ _("My Job has encountered an SLA event!") }'},
+      'upstream-apps': {'niceName': '${ _("Upstream apps") }', 'placeHolder': 'dependent-app-1, dependent-app-2'}
+    };
+    var text = SLA_TEXT[$data.key()];
+    if (text) {
+      $(elements).find('input').attr('placeholder', text.placeHolder);
+      $(elements).find('span').text(text.niceName);
     } else {
       $(elements).find('input').attr('placeholder', '');
       $(elements).find('span').text('');
