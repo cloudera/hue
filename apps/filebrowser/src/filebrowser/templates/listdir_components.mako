@@ -33,6 +33,7 @@ from django.utils.translation import ugettext as _
 </%def>
 
 <%def name="_table(files, path, current_request_path, view)">
+    <script src="/static/js/jquery.hdfsautocomplete.js" type="text/javascript" charset="utf-8"></script>
     <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
     <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
     <style type="text/css">
@@ -108,6 +109,21 @@ from django.utils.translation import ugettext as _
       .scrollable {
         margin-bottom: 80px;
       }
+
+      #jHueHdfsAutocomplete ul li {
+        cursor: pointer;
+      }
+
+      #jHueHdfsAutocomplete ul li:hover,  #jHueHdfsAutocomplete ul li.active {
+        color: #FFFFFF;
+        background: #338BB8;
+      }
+
+      #jHueHdfsAutocomplete .popover-content {
+        max-height: 200px;
+        overflow-y: auto;
+      }
+
     </style>
 
     <table class="table table-condensed datatables tablescroller-disable">
@@ -488,6 +504,18 @@ from django.utils.translation import ugettext as _
 
     <div id="submit-wf-modal" class="modal hide"></div>
 
+    <div id="jHueHdfsAutocomplete" class="popover bottom" style="position:absolute;display:none;max-width:1000px;z-index:33000">
+      <div class="arrow"></div>
+      <div class="popover-inner">
+        <h3 class="popover-title"></h3>
+        <div class="popover-content">
+          <p>
+            <ul class="unstyled"></ul>
+          </p>
+        </div>
+      </div>
+    </div>
+
     <script type="text/javascript" charset="utf-8">
     // ajax modal windows
     function openChownWindow(path, user, group, next) {
@@ -749,26 +777,25 @@ from django.utils.translation import ugettext as _
         $("#hueBreadcrumbText").show().focus();
       });
 
-      $("#hueBreadcrumbText").keyup(function (e) {
-        if (e.keyCode == 13) {
-          var _el = $(this);
-          viewModel.targetPath("${url('filebrowser.views.view', path=urlencode('/'))}" + stripHashes(_el.val().substring(1)));
+      $("#hueBreadcrumbText").jHueHdfsAutocomplete({
+        home: "/user/${ user }/",
+        onEnter: function (el) {
+          viewModel.targetPath("${url('filebrowser.views.view', path=urlencode('/'))}" + stripHashes(el.val().substring(1)));
           viewModel.getStats(function (data) {
             if (data.type != null && data.type == "file") {
               location.href = data.url;
               return false;
             }
             else {
-              window.location.hash = stripHashes(_el.val());
+              window.location.hash = stripHashes(el.val());
             }
           });
+        },
+        onBlur: function() {
+          $("#hueBreadcrumbText").hide();
+          $(".hueBreadcrumb").show();
+          $("#editBreadcrumb").show();
         }
-      });
-
-      $("#hueBreadcrumbText").blur(function () {
-        $(this).hide();
-        $(".hueBreadcrumb").show();
-        $("#editBreadcrumb").show();
       });
 
       $.ajaxSetup({
