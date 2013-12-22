@@ -117,6 +117,22 @@ ${ layout.menubar(section='workflows') }
         </div>
 
       <div id="advanced-container" class="hide">
+
+        <div id="globalPropertiesEditord" class="control-group">
+          <label class="control-label">
+              ${ _('Global properties') }
+          </label>
+          
+	      <%
+	      workflows.key_value_field(type('globalProperties', (object,), {'label': 'l', 'help_text': 'h'}), {
+	        'name': 'globalProperties',
+	        'remove': '$root.removeGlobalProperties',
+	        'add': '$root.addGlobalProperties',
+	      })
+	      %>
+
+          ${ utils.globalConfigForm() }
+        </div>   
       
         <div id="slaEditord" class="control-group">
           <label class="control-label">
