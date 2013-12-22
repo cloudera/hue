@@ -150,22 +150,6 @@ function sparkViewModel() {
     }
   };
 
-  self.fetchQuery = function(id) {
-    var _id = id || self.query.id();
-    if (_id && _id != -1) {
-      var request = {
-        url: '/spark/api/query/' + _id + '/get',
-        dataType: 'json',
-        type: 'GET',
-        success: function(data) {
-          self.updateQuery(data.design);
-        },
-        error: error_fn
-      };
-      $.ajax(request);
-    }
-  };
-
   self.saveQuery = function() {
     var self = this;
     if (self.query.query() && self.query.name()) {
@@ -204,6 +188,7 @@ function sparkViewModel() {
       type: 'POST',
       success: function(data) {
         self.query.errors.removeAll();
+        self.rows.removeAll();
         if (data.status == 0) {
           $(document).trigger('execute.query', data);
           self.query.id(data.design);
@@ -221,8 +206,8 @@ function sparkViewModel() {
   };
 
   self.checkQueryStatus = function() {
-	var timerId = 0;
-	
+  var timerId = 0;
+
     var request = {
       url: '/spark/api/job/' + self.query.jobId(),
       dataType: 'json',
@@ -230,8 +215,8 @@ function sparkViewModel() {
       success: function(data) {
         // Script finished
         if (data.results.status == 'OK' || data.results.status == 'ERROR') {
-    	  clearInterval(timerId);
-    	  self.updateResults(data.results.result);
+        clearInterval(timerId);
+        self.updateResults(data.results.result);
 
           self.resultsEmpty($.isEmptyObject(data.results.result));
           $(document).trigger('executed.query', data);
@@ -243,6 +228,12 @@ function sparkViewModel() {
     timerId = setInterval(function(){
       $.ajax(request);
     }, 1000);
+  };
+
+  self.openQuery = function(jobId) {
+    self.query.jobId(jobId);
+    $(document).trigger('execute.query');
+    self.checkQueryStatus();
   };
 
   self.fetchAppNames = function() {
@@ -280,10 +271,10 @@ function sparkViewModel() {
       success: function(result) {
         self.query.errors.removeAll();
         if (result.status == 'OK') {
-      	  self.contexts().push(createDropdownItem(result.name));
-      	  self.context(result.name);
-      	  self.autoContext(false);
-      	  $(document).trigger('created.context', data);
+          self.contexts().push(createDropdownItem(result.name));
+          self.context(result.name);
+          self.autoContext(false);
+          $(document).trigger('created.context', data);
         } else {
           $(document).trigger('error', result.result);
         }

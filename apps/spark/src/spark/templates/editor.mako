@@ -35,7 +35,7 @@ ${ common.navbar('editor') }
             <a class="uploadAppModalBtn" href="javascript:void(0);">
               ${ _("None, create one?") }
             </a>
-            <!-- /ko -->​
+            <!-- /ko -->
             <a data-bind="if: $root.appName" data-toggle="dropdown" href="javascript:void(0);">
               <strong data-bind="text: $root.appName().nice_name"></strong>
               <i class="fa fa-caret-down"></i>
@@ -76,8 +76,8 @@ ${ common.navbar('editor') }
           </div>
         </li>
         <span class="pull-right">
-		  <button type="button" class="btn btn-primary uploadAppModalBtn">${ _('Upload app') }</button>
-		  <button type="button" class="btn btn-primary createContextModalBtn">${ _('Create context') }</button>
+      <button type="button" class="btn btn-primary uploadAppModalBtn">${ _('Upload app') }</button>
+      <button type="button" class="btn btn-primary createContextModalBtn">${ _('Create context') }</button>
         </span>
       </ul>
     </div>
@@ -88,7 +88,7 @@ ${ common.navbar('editor') }
       <div class="card card-small">
         <div style="margin-bottom: 30px">
           <h1 class="card-heading simple">
-            ${ _('Script Editor') }
+            ${ _('Parameters') }
             % if can_edit_name:
               :
               <a href="javascript:void(0);"
@@ -131,7 +131,6 @@ ${ common.navbar('editor') }
                 <button data-bind="click: tryExecuteQuery" type="button" id="executeQuery" class="btn btn-primary" tabindex="2">${_('Execute')}</button>
                 <button data-bind="click: trySaveQuery, css: {'hide': !$root.query.id() || $root.query.id() == -1}" type="button" class="btn hide">${_('Save')}</button>
                 <button data-bind="click: trySaveAsQuery" type="button" class="btn">${_('Save as...')}</button>
-                <button data-bind="click: tryExplainQuery" type="button" id="explainQuery" class="btn">${_('Explain')}</button>
                 &nbsp; ${_('or create a')} &nbsp;<a type="button" class="btn" href="${ url('spark:editor') }">${_('New query')}</a>
                 <br /><br />
             </div>
@@ -141,6 +140,7 @@ ${ common.navbar('editor') }
         </div>
       </div>
     </div>
+
     <div data-bind="css: {'hide': rows().length == 0}" class="hide">
       <div class="card card-small scrollable">
         <table class="table table-striped table-condensed resultTable" cellpadding="0" cellspacing="0" data-tablescroller-min-height-disable="true" data-tablescroller-enforce-height="true">
@@ -160,16 +160,27 @@ ${ common.navbar('editor') }
           <div class="span10 offset1 center empty-wrapper">
             <i class="fa fa-frown-o"></i>
             <h1>${_('The server returned no results.')}</h1>
-            <br />
+            <br/>
           </div>
         </div>
       </div>
     </div>
+
+    <div id="wait-info" class="hide">
+      <div class="card card-small scrollable">
+        <div class="row-fluid">
+          <div class="span10 offset1 center" style="padding: 30px">
+            <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 60px; color: #DDD"></i><!--<![endif]-->
+            <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
+
   <div class="span2" id="navigator">
       <div class="card card-small">
-        <a href="#" title="${_('Double click on a table name or field to insert it in the editor')}" rel="tooltip" data-placement="left" class="pull-right" style="margin:10px;margin-left: 0"><i class="fa fa-question-circle"></i></a>
-        <a id="refreshNavigator" href="#" title="${_('Manually refresh the table list')}" rel="tooltip" data-placement="left" class="pull-right" style="margin:10px"><i class="fa fa-refresh"></i></a>
         <h1 class="card-heading simple"><i class="fa fa-compass"></i> ${_('History')}</h1>
         <div class="card-body">
           <p>
@@ -219,19 +230,19 @@ ${ common.navbar('editor') }
     <h3>${_('Upload application')}</h3>
   </div>
   <div class="modal-body">
-	    ${ _('One class of the jar should implement SparkJob.') }
-	    <div class="control-group">
-	      <label class="control-label">${ _("Local jar file") }</label>
-	      <div class="controls">
-	        <input type="file" name="jar_file" id="jar_file">
-	      </div>
-	    </div>
-        <div class="control-group">
-          <label class="control-label">${ _("App name") }</label>
-          <div class="controls">
-            <input type="text" name="app_name" id="app_name">
-          </div>
-        </div>
+    ${ _('One class of the jar should implement SparkJob.') }
+    <div class="control-group">
+      <label class="control-label">${ _("Local jar file") }</label>
+      <div class="controls">
+        <input type="file" name="jar_file" id="jar_file">
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label">${ _("App name") }</label>
+      <div class="controls">
+        <input type="text" name="app_name" id="app_name">
+      </div>
+    </div>
   </div>
   <div class="modal-footer">
     <button class="btn" data-dismiss="modal">${_('Cancel')}</button>
@@ -247,26 +258,26 @@ ${ common.navbar('editor') }
     <h3>${_('Create context')}</h3>
   </div>
   <div class="modal-body">
-      <form class="form-horizontal" id="createContextForm">
-        <div class="control-group">
-          <label class="control-label">${ _("Name") }</label>
-          <div class="controls">
-            <input type="text" name="name">
-          </div>
+    <form class="form-horizontal" id="createContextForm">
+      <div class="control-group">
+        <label class="control-label">${ _("Name") }</label>
+        <div class="controls">
+          <input type="text" name="name">
         </div>
-        <div class="control-group">
-          <label class="control-label">${ _("Num cpu cores") }</label>
-          <div class="controls">
-            <input type="text" name="numCores"value="1">
-          </div>
+      </div>
+      <div class="control-group">
+        <label class="control-label">${ _("Num cpu cores") }</label>
+        <div class="controls">
+          <input type="text" name="numCores"value="1">
         </div>
-        <div class="control-group">
-          <label class="control-label">${ _("Memory per node") }</label>
-          <div class="controls">
-            <input type="text" name="memPerNode" value="512m">
-          </div>
+      </div>
+      <div class="control-group">
+        <label class="control-label">${ _("Memory per node") }</label>
+        <div class="controls">
+          <input type="text" name="memPerNode" value="512m">
         </div>
-      </form>
+      </div>
+    </form>
   </div>
   <div class="modal-footer">
     <button class="btn" data-dismiss="modal">${_('Cancel')}</button>
@@ -341,9 +352,9 @@ ${ common.navbar('editor') }
     margin-bottom: 20px;
   }
 
-.CodeMirror.cm-s-default {
-   height:150px;
-}
+  .CodeMirror.cm-s-default {
+    height:100px;
+  }
 
   .editorError {
     color: #B94A48;
@@ -420,17 +431,9 @@ ${ common.navbar('editor') }
   var spark_AUTOCOMPLETE_GLOBAL_CALLBACK = $.noop;
 
   $(document).ready(function(){
-
-    var queryPlaceholder = "${_('Example: SELECT * FROM tablename, or press CTRL + space')}";
-
     $("*[rel=tooltip]").tooltip({
       placement: 'bottom'
     });
-
-    var queryEditor = $("#queryField")[0];
-
-    var selectedLine = -1;
-    var errorWidget = null;
 
     $("#help").popover({
       'title': "${_('Did you know?')}",
@@ -439,7 +442,16 @@ ${ common.navbar('editor') }
       'html': true
     });
 
+    // Knockout
+    viewModel = new sparkViewModel();
+    viewModel.fetchAppNames();
+    viewModel.fetchContexts();
+    % if job_id:
+      viewModel.openQuery("${ job_id }");
+    % endif
+    ko.applyBindings(viewModel);
   });
+
 
   function modal(el) {
     var el = $(el);
@@ -460,12 +472,6 @@ ${ common.navbar('editor') }
     var query = getHighlightedQuery() || codeMirror.getValue();
     viewModel.query.query(query);
     viewModel.executeQuery();
-  }
-
-  function tryExplainQuery() {
-    var query = getHighlightedQuery() || codeMirror.getValue();
-    viewModel.query.query(query);
-    viewModel.explainQuery();
   }
 
   function trySaveQuery() {
@@ -503,21 +509,8 @@ ${ common.navbar('editor') }
     }
   }
 
-  function checkLastDatabase(server, database) {
-    var key = "huesparkLastDatabase-" + server;
-    if (database != $.totalStorage(key)) {
-      $.totalStorage(key, database);
-    }
-  }
-
-  function getLastDatabase(server) {
-    var key = "huesparkLastDatabase-" + server;
-    return $.totalStorage(key);
-  }
-
-    var queryEditor = $("#queryField")[0];
-
-    var AUTOCOMPLETE_SET = CodeMirror.sqlHint;
+  var queryEditor = $("#queryField")[0];
+  var AUTOCOMPLETE_SET = CodeMirror.sqlHint;
 
   codeMirror = CodeMirror(function (elt) {
       queryEditor.parentNode.replaceChild(elt, queryEditor);
@@ -543,29 +536,22 @@ ${ common.navbar('editor') }
             var _table = _partial.substring(_partial.lastIndexOf(" ") + 1, _partial.length - 1);
             if (codeMirror.getValue().toUpperCase().indexOf("FROM") > -1) {
               rdbms_getTableColumns(viewModel.server().name(), viewModel.database(), _table, codeMirror.getValue(),
-	              function (columns) {
-	                var _cols = columns.split(" ");
-	                for (var col in _cols) {
-	                  _cols[col] = "." + _cols[col];
-	                }
-	                CodeMirror.catalogFields = _cols.join(" ");
-	                CodeMirror.fromDot = true;
-	                window.setTimeout(function () {
-	                  codeMirror.execCommand("autocomplete");
-	                }, 100);  // timeout for IE8
-	              });
+                function (columns) {
+                  var _cols = columns.split(" ");
+                  for (var col in _cols) {
+                    _cols[col] = "." + _cols[col];
+                  }
+                  CodeMirror.catalogFields = _cols.join(" ");
+                  CodeMirror.fromDot = true;
+                  window.setTimeout(function () {
+                    codeMirror.execCommand("autocomplete");
+                  }, 100);  // timeout for IE8
+                });
             }
           }
         }
       }
     });
-
-
-  // Knockout
-  viewModel = new sparkViewModel();
-  viewModel.fetchAppNames();
-  viewModel.fetchContexts();
-  ko.applyBindings(viewModel);
 
 
   // Editables
@@ -587,6 +573,7 @@ ${ common.navbar('editor') }
   });
 
   var dataTable = null;
+
   function cleanResultsTable() {
     if (dataTable) {
       dataTable.fnClearTable();
@@ -608,6 +595,7 @@ ${ common.navbar('editor') }
         "bPaginate": false,
         "bLengthChange": false,
         "bInfo": false,
+        "aaSorting":[],
         "oLanguage": {
           "sEmptyTable": "${_('No data available')}",
           "sZeroRecords": "${_('No matching records')}"
@@ -639,9 +627,15 @@ ${ common.navbar('editor') }
       $(".resultTable").width($(".resultTable").parent().width());
     }
   }
-  $(document).on('execute.query', cleanResultsTable);
-  $(document).on('executed.query', resultsTable);
 
+  $(document).on('execute.query', function() {
+    $('#wait-info').show();
+    cleanResultsTable();
+  });
+  $(document).on('executed.query', function() {
+    $('#wait-info').hide();
+    resultsTable();
+  });
   $(document).on('created.context', function() {
     $('#createContextModal').modal('hide');
   });

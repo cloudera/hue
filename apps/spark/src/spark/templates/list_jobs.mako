@@ -29,30 +29,40 @@ ${ common.navbar('jobs') }
     <h1 class="card-heading simple">${_('Jobs')}</h1>
 
     <table class="table table-condensed datatables">
-    <thead>
-      <tr>
-        <th>${_('Status')}</th>
-        <th>${_('Job id')}</th>
-        <th>${_('Class path')}</th>
-        <th>${_('Context')}</th>
-        <th>${_('Start time')}</th>
-        <th>${_('Duration')}</th>
-      </tr>
-    </thead>
-    <tbody>
-      % for job in jobs:
-      <tr>
-        <td>${ job.get('status') }</td>
-        <td>${ job.get('jobId') }</td>
-        <td>${ job.get('classPath') }</td>
-        <td>${ job.get('context') }</td>
-        <td>${ job.get('startTime') }</td>
-        <td>${ job.get('duration') }</td>
-      </tr>
-      % endfor
-
-    </tbody>
-  </table>
+     <thead>
+        <tr>
+          <th>${_('Status')}</th>
+          <th>${_('Job id')}</th>
+          <th>${_('Class path')}</th>
+          <th>${_('Context')}</th>
+          <th>${_('Start time')}</th>
+          <th>${_('Duration')}</th>
+        </tr>
+      </thead>
+      <tbody>
+        % for job in jobs:
+        <tr>
+          <td>${ job.get('status') }</td>
+          <td>
+            <%
+              can_view = job.get('status') == 'FINISHED'
+            %>
+            % if can_view:
+              <a href="${ url('spark:view_job', job.get('jobId')) }" data-row-selector="true">
+            % endif
+            ${ job.get('jobId') }
+            % if can_view:
+              </a>
+            % endif
+          </td>
+          <td>${ job.get('classPath') }</td>
+          <td>${ job.get('context') }</td>
+          <td>${ job.get('startTime') }</td>
+          <td>${ job.get('duration') }</td>
+        </tr>
+        % endfor
+      </tbody>
+    </table>
     <div class="card-body">
       <p>
         ## ${ comps.pagination(page) }
@@ -83,8 +93,8 @@ ${ common.navbar('jobs') }
 <script type="text/javascript" charset="utf-8">
   $(document).ready(function () {
     var viewModel = {
-        availableSavedQueries : ko.observableArray(${ jobs_json | n,unicode }),
-        chosenSavedQueries : ko.observableArray([])
+      availableSavedQueries : ko.observableArray(${ jobs_json | n,unicode }),
+      chosenSavedQueries : ko.observableArray([])
     };
 
     ko.applyBindings(viewModel);
