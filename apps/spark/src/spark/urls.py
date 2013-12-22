@@ -39,6 +39,7 @@ urlpatterns += patterns('spark.api',
   url(r'^api/job/(?P<job_id>.+)$', 'job', name='job'),
   url(r'^api/create_context$', 'create_context', name='create_context'),
   url(r'^api/delete_context', 'delete_context', name='delete_context'),
+  url(r'^api/save_query/((?P<design_id>\d+)/?)?$', 'save_query', name='save_query'),
 )
 
 urlpatterns += patterns('beeswax.views',

@@ -43,7 +43,7 @@ def is_selected(section, matcher):
             </li>
             <li class="${is_selected(section, 'query')}"><a href="${ url('spark:editor') }">${_('Query Editor')}</a></li>
             ##<li class="${is_selected(section, 'my queries')}"><a href="${ url(app_name + ':my_queries') }">${_('My Queries')}</a></li>
-            <li class="${is_selected(section, 'queries')}"><a href="${ url('spark:list_designs') }">${_('Queries')}</a></li>
+            <li class="${is_selected(section, 'saved queries')}"><a href="${ url('spark:list_designs') }">${_('Queries')}</a></li>
             <li class="${is_selected(section, 'history')}"><a href="${ url('spark:list_query_history') }">${_('History')}</a></li>
             <li class="currentApp">
               <a href="/spark">
@@ -58,7 +58,7 @@ def is_selected(section, matcher):
       </div>
     </div>
   </div>
-  % else:  
+  % else:
   <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container-fluid">
@@ -78,7 +78,7 @@ def is_selected(section, matcher):
                 % endif
                 </a>
               </li>
-              <li class="${is_selected(section, 'query')}"><a href="${ url(app_name + ':execute_query') }">${_('Query Editor')}</a></li>            
+              <li class="${is_selected(section, 'query')}"><a href="${ url(app_name + ':execute_query') }">${_('Query Editor')}</a></li>
               <li class="${is_selected(section, 'my queries')}"><a href="${ url(app_name + ':my_queries') }">${_('My Queries')}</a></li>
               <li class="${is_selected(section, 'saved queries')}"><a href="${ url(app_name + ':list_designs') }">${_('Saved Queries')}</a></li>
               <li class="${is_selected(section, 'history')}"><a href="${ url(app_name + ':list_query_history') }">${_('History')}</a></li>

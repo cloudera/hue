@@ -88,18 +88,18 @@ ${ common.navbar('editor') }
       <div class="card card-small">
         <div style="margin-bottom: 30px">
           <h1 class="card-heading simple">
-            ${ _('Parameters') }
             % if can_edit_name:
-              :
               <a href="javascript:void(0);"
                  id="query-name"
                  data-type="text"
                  data-name="name"
                  data-value="${design.name}"
-                 data-original-title="${ _('Query name') }"
+                 data-original-title="${ _('Script name') }"
                  data-placement="right">
               </a>
+              :
             %endif
+            ${ _('Parameters') }
           </h1>
           % if can_edit_name:
             <p style="margin-left: 20px">
@@ -446,6 +446,9 @@ ${ common.navbar('editor') }
     viewModel = new sparkViewModel();
     viewModel.fetchAppNames();
     viewModel.fetchContexts();
+    % if design_json:
+      viewModel.loadDesign(${ design_json | n,unicode });
+    % endif
     % if job_id:
       viewModel.openQuery("${ job_id }");
     % endif
@@ -483,8 +486,8 @@ ${ common.navbar('editor') }
   }
 
   function trySaveAsQuery() {
-    var query = getHighlightedQuery() || codeMirror.getValue();
-    viewModel.query.query(query);
+    var params = getHighlightedQuery() || codeMirror.getValue();
+    viewModel.query.params(params);
     $('#saveAsQueryModal').modal('show');
   }
 
@@ -496,13 +499,13 @@ ${ common.navbar('editor') }
   });
 
   function modalSaveAsQuery() {
-    if (viewModel.query.query() && viewModel.query.name()) {
+    if (viewModel.appName() && viewModel.query.name()) {
       viewModel.query.id(-1);
       viewModel.saveQuery();
       $('#saveas-query-name').removeClass('error');
       $('#saveAsQueryModal').modal('hide');
     } else if (viewModel.query.name()) {
-      $.jHueNotify.error("${_('No query provided to save.')}");
+      $.jHueNotify.error("${_('No application name provided.')}");
       $('#saveAsQueryModal').modal('hide');
     } else {
       $('#saveas-query-name').addClass('error');

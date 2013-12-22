@@ -17,14 +17,15 @@
 
 from django import forms
 from django.utils.translation import ugettext_lazy as _t
+from desktop.lib.django_forms import MultiForm
+from beeswax.forms import SaveForm
 
 
 class SparkForm(forms.Form):
   query = forms.CharField(label=_t("Script parameters"),
                           required=False)
   classPath = forms.CharField(label=_t("Class path"),
-                          required=True,
-                          widget=forms.Textarea(attrs={'class': 'beeswax_query'}))
+                          required=True)
   appName = forms.ChoiceField(required=True,
                              label='',
                              choices=(('default', 'default'),),
@@ -36,9 +37,17 @@ class SparkForm(forms.Form):
 
 
   def __init__(self, *args, **kwargs):
-    app_names = kwargs.pop('app_names')
+    app_names = kwargs.pop('app_names', [])
     super(SparkForm, self).__init__(*args, **kwargs)
     self.fields['appName'].choices = ((key, key) for key in app_names)
+
+
+class QueryForm(MultiForm):
+  def __init__(self):
+    super(QueryForm, self).__init__(
+      query=SparkForm,
+      saveform=SaveForm
+    )
 
 
 class UploadApp(forms.Form):

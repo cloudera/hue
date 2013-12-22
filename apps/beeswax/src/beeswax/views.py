@@ -74,17 +74,22 @@ def save_design(request, form, type_, design, explicit_save):
   Assumes that form.saveform is the SaveForm, and that it is valid.
   """
   assert form.saveform.is_valid()
+  sub_design_form = None # Beeswax/Impala case
 
   if type_ == models.HQL:
     design_cls = beeswax.design.HQLdesign
   elif type_ == models.IMPALA:
     design_cls = beeswax.design.HQLdesign
+  elif type_ == models.SPARK:
+    from spark.design import SparkDesign
+    design_cls = SparkDesign
+    sub_design_form = form.query
   else:
     raise ValueError(_('Invalid design type %(type)s') % {'type': type_})
 
-  # design here means SavedQuery
+  # Design here means SavedQuery
   old_design = design
-  design_obj = design_cls(form, query_type=type_)
+  design_obj = design_cls(sub_design_form, query_type=type_)
   new_data = design_obj.dumps()
 
   # Auto save if (1) the user didn't click "save", and (2) the data is different.
@@ -197,7 +202,7 @@ def list_designs(request):
     text=<frag> - Search for fragment "frag" in names and descriptions.
   """
   DEFAULT_PAGE_SIZE = 20
-  app_name= get_app_name(request)
+  app_name = get_app_name(request)
 
   # Extract the saved query list.
   prefix = 'q-'

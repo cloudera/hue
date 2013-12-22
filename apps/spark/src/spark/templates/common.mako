@@ -36,7 +36,7 @@ def is_selected(section, matcher):
                 ${ _('Spark Editor') }
               </a>
             </li>
-            <li class="${is_selected(section, 'query')}"><a href="${ url('spark:editor') }">${_('Query Editor')}</a></li>
+            <li class="${is_selected(section, 'editor')}"><a href="${ url('spark:editor') }">${_('Query Editor')}</a></li>
             ##<li class="${is_selected(section, 'my queries')}"><a href="${ url(app_name + ':my_queries') }">${_('My Queries')}</a></li>
             <li class="${is_selected(section, 'queries')}"><a href="${ url('spark:list_designs') }">${_('Queries')}</a></li>
             <li class="${is_selected(section, 'history')}"><a href="${ url('spark:list_query_history') }">${_('History')}</a></li>

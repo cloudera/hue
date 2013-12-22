@@ -169,7 +169,7 @@ class DocumentManager(models.Manager):
     return Document.objects.filter(Q(owner=user) | Q(documentpermission__users=user) | Q(documentpermission__groups__in=user.groups.all()))
 
   def get_docs(self, user, model_class=None, extra=None):
-    docs = Document.objects.documents(user).exclude(name='pig-app-hue-script').exclude(name='spark-app-hue-script')
+    docs = Document.objects.documents(user).exclude(name='pig-app-hue-script')
 
     if model_class is not None:
       ct = ContentType.objects.get_for_model(model_class)
@@ -436,6 +436,8 @@ class Document(models.Model):
       if self.content_type.app_label == 'beeswax':
         if self.extra == '0':
           return apps['beeswax'].icon_path
+        elif self.extra == '3':
+          return apps['spark'].icon_path        
         else:
           return apps['impala'].icon_path
       elif self.content_type.app_label == 'oozie':
