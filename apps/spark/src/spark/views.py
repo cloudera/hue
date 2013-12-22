@@ -40,6 +40,10 @@ LOG = logging.getLogger(__name__)
 
 
 def editor(request, design_id=None):
+  if design_id is not None and not design_id.isdigit():
+    job_id, design_id = design_id, None
+  else:
+    job_id = None
   action = request.path
   app_name = get_app_name(request)
   query_type = beeswax_models.SavedQuery.TYPES_MAPPING[app_name]
@@ -49,6 +53,7 @@ def editor(request, design_id=None):
     'action': action,
     'design': design,
     'can_edit_name': design.id and not design.is_auto,
+    'job_id': job_id,
   })
 
 

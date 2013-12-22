@@ -28,6 +28,37 @@ def is_selected(section, matcher):
 %>
 
 <%def name="menubar(section='')">
+  % if app_name == 'spark':
+  ## Duplication from spark common.mako!
+  <div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container-fluid">
+        <div class="nav-collapse">
+          <ul class="nav">
+            <li class="currentApp">
+              <a href="/spark">
+                <img src="/spark/static/art/icon_spark_24.png" />
+                ${ _('Spark Editor') }
+              </a>
+            </li>
+            <li class="${is_selected(section, 'query')}"><a href="${ url('spark:editor') }">${_('Query Editor')}</a></li>
+            ##<li class="${is_selected(section, 'my queries')}"><a href="${ url(app_name + ':my_queries') }">${_('My Queries')}</a></li>
+            <li class="${is_selected(section, 'queries')}"><a href="${ url('spark:list_designs') }">${_('Queries')}</a></li>
+            <li class="${is_selected(section, 'history')}"><a href="${ url('spark:list_query_history') }">${_('History')}</a></li>
+            <li class="currentApp">
+              <a href="/spark">
+                ${ _('Browser') }
+              </a>
+            </li>
+            <li class="${is_selected(section, 'jobs')}"><a href="${ url('spark:list_jobs') }">${_('Jobs')}</a></li>
+            <li class="${is_selected(section, 'contexts')}"><a href="${ url('spark:list_contexts') }">${_('Contexts')}</a></li>
+            <li class="${is_selected(section, 'jars')}"><a href="${ url('spark:list_jars') }">${_('Jars')}</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  % else:  
   <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container-fluid">
@@ -37,25 +68,17 @@ def is_selected(section, matcher):
                 <a href="/${app_name}">
                 % if app_name == 'impala':
                   <img src="/impala/static/art/icon_impala_24.png" />
-                  ${ current_app.nice_name }
+                  Impala
                 % elif app_name == 'rdbms':
                   <img src="/rdbms/static/art/icon_rdbms_24.png" />
                   DB Query
-                % elif app_name == 'spark':
-                  <img src="/spark/static/art/icon_spark_24.png" />
-                  Spark Editor                  
                 % else:
                   <img src="/beeswax/static/art/icon_beeswax_24.png" />
                   Hive Editor
                 % endif
                 </a>
               </li>
-              <li class="${is_selected(section, 'query')}"><a href="${ url(app_name + ':execute_query') }">${_('Query Editor')}</a></li>
-              % if app_name == 'spark':
-                <li class="class=${is_selected(section, 'jobs')}"><a href="${ url('spark:list_jobs') }">${_('Jobs')}</a></li>
-                <li class="class=${is_selected(section, 'contexts')}"><a href="${ url('spark:list_contexts') }">${_('Contexts')}</a></li>
-                <li class="class=${is_selected(section, 'jars')}"><a href="${ url('spark:list_jars') }">${_('Jars')}</a></li>
-              % endif              
+              <li class="${is_selected(section, 'query')}"><a href="${ url(app_name + ':execute_query') }">${_('Query Editor')}</a></li>            
               <li class="${is_selected(section, 'my queries')}"><a href="${ url(app_name + ':my_queries') }">${_('My Queries')}</a></li>
               <li class="${is_selected(section, 'saved queries')}"><a href="${ url(app_name + ':list_designs') }">${_('Saved Queries')}</a></li>
               <li class="${is_selected(section, 'history')}"><a href="${ url(app_name + ':list_query_history') }">${_('History')}</a></li>
@@ -64,6 +87,7 @@ def is_selected(section, matcher):
         </div>
       </div>
   </div>
+  % endif
 </%def>
 
 <%def name="metastore_menubar()">

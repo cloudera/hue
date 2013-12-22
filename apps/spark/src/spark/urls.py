@@ -21,8 +21,9 @@ from django.conf.urls.defaults import patterns, url
 # Views
 urlpatterns = patterns('spark.views',
   url(r'^$', 'editor', name='index'),
-  url(r'^editor/(?P<design_id>\d+)?$', 'editor', name='editor'),
-  url(r'^editor/(?P<design_id>\d+)?$', 'editor', name='execute_query'),
+  url(r'^editor/(?P<design_id>.+)?$', 'editor', name='editor'),
+  url(r'^editor/(?P<design_id>.+)?$', 'editor', name='execute_query'), # For Beeswax
+  url(r'^editor/(?P<design_id>.+)?$', 'editor', name='view_job'), # For browser
   url(r'^list_jobs', 'list_jobs', name='list_jobs'),
   url(r'^list_contexts', 'list_contexts', name='list_contexts'),
   url(r'^delete_contexts', 'delete_contexts', name='delete_contexts'),
