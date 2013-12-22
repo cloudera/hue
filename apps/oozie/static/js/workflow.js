@@ -426,21 +426,21 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
     self.el = (options.el) ? $(options.el) : $('#workflow');
     self.nodes = ko.observableArray([]);
     self.kill = null;
-    self.is_dirty = ko.observable( false );
-    self.loading = ko.observable( false );
-    self.read_only = ko.observable( options.read_only || false );
+    self.is_dirty = ko.observable(false);
+    self.loading = ko.observable(false);
+    self.read_only = ko.observable(options.read_only || false);
     self.new_node = ko.observable();
 
     // Create fields from the generic data field
     self.sla = ko.computed(function() {
       return self.data.sla();
     });
-//    self.globalProperties = ko.computed(function() {
-//        return self.data.globalProperties();
-//      });     
-//    self.globalConfig = ko.computed(function() {
-//      return self.data.globalConfig();
-//    });
+    self.globalProperties = ko.computed(function() {
+        return self.data.globalProperties();
+      });     
+    self.globalConfig = ko.computed(function() {
+      return self.data.globalConfig();
+    });
 
     self.url = ko.computed(function() {
       return '/oozie/workflows/' + self.id();
@@ -688,6 +688,23 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
       self.job_properties.remove(data);
     },
 
+    addGlobalProperties: function(data, event) {
+      var self = this;
+      var prop = { name: ko.observable(""), value: ko.observable("") };
+      // force bubble up to containing observable array.
+//      prop.name.subscribe(function(){
+//        self.globalProperties.valueHasMutated();
+//      });
+//      prop.value.subscribe(function(){
+//        self.globalProperties.valueHasMutated();
+//      });
+      self.globalProperties.push(prop);
+    },
+	removeGlobalProperties: function(data, event) {
+	  var self = this;
+      self.globalProperties.remove(data);
+    },    
+    
     // Workflow UI
     // Function to build nodes... recursively.
     build: function() {
