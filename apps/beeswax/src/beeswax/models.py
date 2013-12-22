@@ -104,6 +104,8 @@ class QueryHistory(models.Model):
       return 'impala'
     elif query_type == RDBMS:
       return 'rdbms'
+    elif query_type == SPARK:
+      return 'spark'
     else:
       return 'beeswax'
 

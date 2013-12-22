@@ -23,17 +23,16 @@ from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 
 from desktop.context_processors import get_app_name
-from desktop.models import Document
 from desktop.lib.django_util import render
 from django.shortcuts import redirect
 
 from beeswax import models as beeswax_models
 from beeswax.views import safe_get_design
 
-from spark.design import SparkDesign
 from spark.job_server_api import get_api
 from spark.forms import UploadApp
 from desktop.lib.exceptions import StructuredException
+from spark.api import design_to_dict
 
 
 LOG = logging.getLogger(__name__)
@@ -52,6 +51,7 @@ def editor(request, design_id=None):
   return render('editor.mako', request, {
     'action': action,
     'design': design,
+    'design_json': json.dumps(design_to_dict(design)),
     'can_edit_name': design.id and not design.is_auto,
     'job_id': job_id,
   })
@@ -119,62 +119,3 @@ def upload_app(request):
     response['results'] = form.errors
 
   return redirect(reverse('spark:index'))
-
-
-def save_design(request, save_form, query_form, type_, design, explicit_save=False):
-  """
-  save_design(request, save_form, query_form, type_, design, explicit_save) -> SavedQuery
-
-  A helper method to save the design:
-    * If ``explicit_save``, then we save the data in the current design.
-    * If the user clicked the submit button, we do NOT overwrite the current
-      design. Instead, we create a new "auto" design (iff the user modified
-      the data). This new design is named after the current design, with the
-      AUTO_DESIGN_SUFFIX to signify that it's different.
-
-  Need to return a SavedQuery because we may end up with a different one.
-  Assumes that form.saveform is the SaveForm, and that it is valid.
-  """
-
-  if type_ == beeswax_models.SPARK:
-    design_cls = SparkDesign
-  else:
-    raise ValueError(_('Invalid design type %(type)s') % {'type': type_})
-
-  old_design = design
-  design_obj = design_cls(query_form)
-  new_data = design_obj.dumps()
-
-  # Auto save if (1) the user didn't click "save", and (2) the data is different.
-  # Don't generate an auto-saved design if the user didn't change anything
-  if explicit_save:
-    design.name = save_form.cleaned_data['name']
-    design.desc = save_form.cleaned_data['desc']
-    design.is_auto = False
-  elif new_data != old_design.data:
-    # Auto save iff the data is different
-    if old_design.id is not None:
-      # Clone iff the parent design isn't a new unsaved model
-      design = old_design.clone()
-      if not old_design.is_auto:
-        design.name = old_design.name + beeswax_models.SavedQuery.AUTO_DESIGN_SUFFIX
-    else:
-      design.name = beeswax_models.SavedQuery.DEFAULT_NEW_DESIGN_NAME
-    design.is_auto = True
-
-  design.type = type_
-  design.data = new_data
-
-  design.save()
-
-  LOG.info('Saved %s design "%s" (id %s) for %s' % (design.name and '' or 'auto ', design.name, design.id, design.owner))
-
-  if design.doc.exists():
-    design.doc.update(name=design.name, description=design.desc)
-  else:
-    Document.objects.link(design, owner=design.owner, extra=design.type, name=design.name, description=design.desc)
-
-  if design.is_auto:
-    design.doc.get().add_to_history()
-
-  return design

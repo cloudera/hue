@@ -21,25 +21,20 @@ import logging
 import django.http
 from django.utils.translation import ugettext as _
 
-from beeswax.design import normalize_form_dict, denormalize_form_dict, strip_trailing_semicolon,\
-                           split_statements
+from beeswax.design import normalize_form_dict, denormalize_form_dict
 
 
 LOG = logging.getLogger(__name__)
 
-SERIALIZATION_VERSION = "0.0.1"
+SERIALIZATION_VERSION = "1.0"
 
 
 class SparkDesign(object):
-  """
-  Represents an SQL design, with methods to perform (de)serialization.
-  """
-  _QUERY_ATTRS = [ 'query', 'type', 'database', 'server' ]
+  _QUERY_ATTRS = ['type', 'appName', 'classPath', 'autoContext', 'context', 'params']
 
   def __init__(self, form=None, query_type=None):
-    """Initialize the design from a valid form data."""
     if form is not None:
-      self._data_dict = dict(query = normalize_form_dict(form, SparkDesign._QUERY_ATTRS))
+      self._data_dict = {'query': normalize_form_dict(form, SparkDesign._QUERY_ATTRS)}
       if query_type is not None:
         self._data_dict['query']['type'] = query_type
 
@@ -50,52 +45,47 @@ class SparkDesign(object):
     return json.dumps(dic)
 
   @property
-  def sql_query(self):
-    return self._data_dict['query']['query']
-
-  @property
   def query(self):
     return self._data_dict['query'].copy()
 
   @property
-  def server(self):
-    return self._data_dict['query']['server']
+  def appName(self):
+    return self._data_dict['query']['appName']
 
   @property
-  def database(self):
-    return self._data_dict['query']['database']
+  def classPath(self):
+    return self._data_dict['query']['classPath']
+
+  @property
+  def autoContext(self):
+    return self._data_dict['query']['autoContext']
+
+  @property
+  def context(self):
+    return self._data_dict['query']['context']
+
+  @property
+  def params(self):
+    return self._data_dict['query']['params']
 
   def get_query_dict(self):
-    # We construct the mform to use its structure and prefix. We don't actually bind data to the forms.
+    # We construct the form to use its structure and prefix. We don't actually bind data to the forms.
     from beeswax.forms import QueryForm
     mform = QueryForm()
     mform.bind()
 
     res = django.http.QueryDict('', mutable=True)
-    res.update(denormalize_form_dict(
-                self._data_dict['query'], mform.query, SparkDesign._QUERY_ATTRS))
+    res.update(denormalize_form_dict(self._data_dict['query'], mform.query, SparkDesign._QUERY_ATTRS))
     return res
-
-  def get_query(self):
-    return self._data_dict["query"]
-
-  @property
-  def statement_count(self):
-    return len(self.statements)
-
-  def get_query_statement(self, n=0):
-    return self.statements[n]
-
-  @property
-  def statements(self):
-    sql_query = strip_trailing_semicolon(self.sql_query)
-    return [strip_trailing_semicolon(statement.strip()) for statement in split_statements(sql_query)]
 
   @staticmethod
   def loads(data):
-    """Returns SQLdesign from the serialized form"""
-    dic = json.loads(data)
-    dic = dict(map(lambda k: (str(k), dic.get(k)), dic.keys()))
+    if data:
+      dic = json.loads(data)
+      dic = dict(map(lambda k: (str(k), dic.get(k)), dic.keys()))
+    else:
+      dic = {'VERSION': SERIALIZATION_VERSION, 'query': {'type': 3, 'appName': '', 'classPath': 'spark.jobserver.WordCountExample', 'autoContext': True, 'context': '', 'params': ''}}
+
     if dic['VERSION'] != SERIALIZATION_VERSION:
       LOG.error('Design version mismatch. Found %s; expect %s' % (dic['VERSION'], SERIALIZATION_VERSION))
 
@@ -103,10 +93,16 @@ class SparkDesign(object):
     del dic['VERSION']
     if 'type' not in dic['query'] or dic['query']['type'] is None:
       dic['query']['type'] = 0
-    if 'server' not in dic['query']:
-      raise RuntimeError(_('No server!'))
-    if 'database' not in dic['query']:
-      raise RuntimeError(_('No database!'))
+    if 'appName' not in dic['query']:
+      dic['query']['appName'] = ''
+    if 'classPath' not in dic['query']:
+      dic['query']['classPath'] = ''
+    if 'autoContext' not in dic['query']:
+      dic['query']['autoContext'] = True
+    if 'context' not in dic['query']:
+      dic['query']['context'] = ''
+    if 'params' not in dic['query']:
+      dic['query']['params'] = ''
 
     design = SparkDesign()
     design._data_dict = dic

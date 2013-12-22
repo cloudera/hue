@@ -682,7 +682,7 @@ def split_oozie_jobs(user, oozie_jobs):
   jobs_completed = []
 
   for job in oozie_jobs:
-    if job.appName not in ('pig-app-hue-script', 'spark-app-hue-script'):
+    if job.appName != 'pig-app-hue-script':
       if job.is_running():
         if job.type == 'Workflow':
           job = get_oozie(user).get_job(job.id)

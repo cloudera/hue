@@ -45,7 +45,6 @@ from desktop.models import Document
 from hadoop.fs.exceptions import WebHdfsException
 
 from hadoop.fs.hadoopfs import Hdfs
-from liboozie.conf import SECURITY_ENABLED
 from liboozie.submittion import Submission
 from liboozie.submittion import create_directories
 
