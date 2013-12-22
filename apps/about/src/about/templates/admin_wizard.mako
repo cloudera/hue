@@ -159,6 +159,23 @@ ${ header.menubar() }
                   </p>
                 </div>
               </div>
+
+          <div class="card card-home card-tab card-tab-bordertop card-listcontent">
+            <h2 class="card-heading simple">${ _('Anonymous usage analytics') }</h2>
+
+            <div class="card-body">
+              <label class="checkbox">
+                <input class="updatePreferences" type="checkbox" name="collect_usage" style="margin-right: 10px" title="${ ('Check to enable usage analytics') }" ${ collect_usage and "checked" }/>
+                ${ ('Help improve Hue with anonymous usage analytics.') }
+                <a href="javascript:void(0)" style="display: inline" data-trigger="hover" data-toggle="popover" data-placement="right" rel="popover"
+                   title="${_('How does it work?') }"
+                   data-content="${ ('We are using Google Analytics to see how many times an application or specific section of an application is used, nothing more.') }">
+                   <i class="fa fa-question-circle"></i>
+                </a>
+              </label>
+            </div>
+          </div>
+
             </div>
 
             <div id="step4" class="stepDetails hide">

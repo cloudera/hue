@@ -495,9 +495,13 @@ def commonfooter(messages=None):
   return django_mako.render_to_string("common_footer.mako", {
     'messages': messages,
     'version': settings.HUE_DESKTOP_VERSION,
-    'collect_usage': desktop.conf.COLLECT_USAGE.get(),
+    'collect_usage': collect_usage(),
     'tours_and_tutorials': hue_settings.tours_and_tutorials
   })
+
+
+def collect_usage():
+  return desktop.conf.COLLECT_USAGE.get() and Settings.get_settings().collect_usage
 
 
 # If the app's conf.py has a config_validator() method, call it.
