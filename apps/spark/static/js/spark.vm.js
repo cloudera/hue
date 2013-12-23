@@ -35,7 +35,7 @@ function sparkViewModel() {
     'classPath': '',
     'context': '',
     'autoContext': true,
-    'params': '',
+    'params': [],
   });
 
   self.rows = ko.observableArray();
@@ -113,6 +113,14 @@ function sparkViewModel() {
     }
   };
 
+  self.addParam = function() {
+    self.query.params.push({name: "", value: ""});
+  };
+
+  self.removeParam = function() {
+    self.query.params.remove(this);
+  };
+
   function createDropdownItem(item) {
     return {
       'name': ko.observable(item),
@@ -172,7 +180,7 @@ function sparkViewModel() {
       data['query-classPath'] = self.classPath();
       data['query-autoContext'] = self.autoContext();
       data['query-context'] = self.context().name;
-      data['query-params'] = '';
+      data['query-params'] = JSON.stringify(self.query.params());
       var url = '/spark/api/save_query/';
       if (self.query.id() && self.query.id() != -1) {
         url += self.query.id() + '/';
@@ -203,6 +211,7 @@ function sparkViewModel() {
     data.classPath = self.classPath();
     data.autoContext = self.autoContext();
     data.context = self.context().name;
+    data.params = JSON.stringify(self.query.params());
     var request = {
       url: '/spark/api/execute',
       dataType: 'json',

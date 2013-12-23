@@ -43,6 +43,7 @@ def editor(request, design_id=None):
     job_id, design_id = design_id, None
   else:
     job_id = None
+
   action = request.path
   app_name = get_app_name(request)
   query_type = beeswax_models.SavedQuery.TYPES_MAPPING[app_name]

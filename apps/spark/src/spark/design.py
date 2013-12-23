@@ -84,7 +84,13 @@ class SparkDesign(object):
       dic = json.loads(data)
       dic = dict(map(lambda k: (str(k), dic.get(k)), dic.keys()))
     else:
-      dic = {'VERSION': SERIALIZATION_VERSION, 'query': {'type': 3, 'appName': '', 'classPath': 'spark.jobserver.WordCountExample', 'autoContext': True, 'context': '', 'params': ''}}
+      dic = {
+          'VERSION': SERIALIZATION_VERSION,
+          'query': {
+              'type': 3, 'appName': '', 'classPath': 'spark.jobserver.WordCountExample', 'autoContext': True, 'context': '',
+              'params': json.dumps([{'name': 'aa', 'value': 'rr'}])
+          }
+      }
 
     if dic['VERSION'] != SERIALIZATION_VERSION:
       LOG.error('Design version mismatch. Found %s; expect %s' % (dic['VERSION'], SERIALIZATION_VERSION))
