@@ -22,7 +22,7 @@ from beeswax.forms import SaveForm
 
 
 class SparkForm(forms.Form):
-  query = forms.CharField(label=_t("Script parameters"),
+  params = forms.CharField(label=_t("Script parameters"),
                           required=False)
   classPath = forms.CharField(label=_t("Class path"),
                           required=True)
