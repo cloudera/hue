@@ -26,8 +26,7 @@ from desktop.context_processors import get_app_name
 from desktop.lib.exceptions import StructuredException
 
 from beeswax import models as beeswax_models
-from beeswax.forms import SaveForm
-from beeswax.views import authorized_get_history, safe_get_design, save_design
+from beeswax.views import safe_get_design, save_design
 
 from spark.job_server_api import get_api
 from spark.forms import SparkForm, QueryForm
@@ -36,13 +35,6 @@ from spark.design import SparkDesign
 
 
 LOG = logging.getLogger(__name__)
-
-
-class ResultEncoder(json.JSONEncoder):
-  def default(self, obj):
-    if isinstance(obj, datetime.datetime):
-      return obj.strftime('%Y-%m-%d %H:%M:%S %Z')
-    return super(ResultEncoder, self).default(obj)
 
 
 def error_handler(view_fn):
@@ -155,13 +147,15 @@ def execute(request, design_id=None):
 #      query_history.last_state = beeswax_models.QueryHistory.STATE.expired.index
 #      query_history.save()
 
+      params = '\n'.join(['%(name)s=%(value)s' % param for param in json.loads(form.cleaned_data['params'])])
+
       try:
         api = get_api(request.user)
 
         results = api.submit_job(
             form.cleaned_data['appName'],
             form.cleaned_data['classPath'],
-            data=form.cleaned_data['params'],
+            data=params,
             context=None if form.cleaned_data['autoContext'] else form.cleaned_data['context'],
             sync=False
         )
@@ -178,7 +172,7 @@ def execute(request, design_id=None):
   except RuntimeError, e:
     response['message']= str(e)
 
-  return HttpResponse(json.dumps(response, cls=ResultEncoder), mimetype="application/json")
+  return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
 @error_handler
@@ -194,7 +188,7 @@ def save_query(request, design_id=None):
   form = QueryForm()
   api = get_api(request.user)
   app_names = api.jars()
-
+  print request.POST
   try:
     form.bind(request.POST)
     form.query.fields['appName'].choices = ((key, key) for key in app_names)
@@ -236,7 +230,7 @@ def design_to_dict(design):
     'classPath': spark_design.classPath,
     'autoContext': spark_design.autoContext,
     'context': spark_design.context,
-    'params': spark_design.params,
+    'params': json.loads(spark_design.params),
   }
 
 def get_query_form(request):

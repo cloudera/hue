@@ -125,7 +125,29 @@ ${ common.navbar('editor') }
                 </div>
               </div>
 
-              <textarea class="hide" tabindex="2" name="query" id="queryField"></textarea>
+				<div class="control-group">
+				  <div class="controls">
+				      <table class="table-condensed designTable">
+				        <thead>
+				          <tr>
+				            <th>${ _('Name') }</th>
+				            <th>${ _('Value') }</th>
+				            <th/>
+				          </tr>
+				        </thead>
+				        <tbody data-bind="foreach: query.params">
+				          <tr>
+				            <td><input type="text" class="span6 required propKey" data-bind="value: name" /></td>
+				            <td><input type="text" class="span6 required pathChooserKo" data-bind="fileChooser: $data, value: value" /></td>
+				            <td>
+				              <a class="btn" href="#" data-bind="click: $root.removeParam">${ _('Delete') }</a>
+				            </td>
+				          </tr>
+				        </tbody>
+				      </table>
+				      <button class="btn" data-bind="click: $root.addParam">${ _('Add') }</button>
+				  </div>
+				</div>
 
               <div class="actions">
                 <button data-bind="click: tryExecuteQuery" type="button" id="executeQuery" class="btn btn-primary" tabindex="2">${_('Execute')}</button>
@@ -347,15 +369,6 @@ ${ common.navbar('editor') }
     background: #DDDDDD;
   }
 
-  .CodeMirror {
-    border: 1px solid #eee;
-    margin-bottom: 20px;
-  }
-
-  .CodeMirror.cm-s-default {
-    height:100px;
-  }
-
   .editorError {
     color: #B94A48;
     background-color: #F2DEDE;
@@ -410,25 +423,15 @@ ${ common.navbar('editor') }
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
 <script src="/spark/static/js/spark.vm.js"></script>
-<script src="/static/ext/js/codemirror-3.11.js"></script>
-<link rel="stylesheet" href="/static/ext/css/codemirror.css">
-<script src="/static/ext/js/codemirror-sql.js"></script>
-<script src="/static/js/codemirror-sql-hint.js"></script>
-<script src="/static/js/codemirror-show-hint.js"></script>
 
 <link href="/static/ext/css/bootstrap-editable.css" rel="stylesheet">
 <script src="/static/ext/js/bootstrap-editable.min.js"></script>
 <script src="/static/ext/js/bootstrap-editable.min.js"></script>
 
 <script src="/static/ext/js/jquery/plugins/jquery-fieldselection.js" type="text/javascript"></script>
-<script src="/spark/static/js/autocomplete.utils.js" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript" charset="utf-8">
-  var codeMirror, viewModel;
-
-  var spark_AUTOCOMPLETE_BASE_URL = '/spark/api';
-  var spark_AUTOCOMPLETE_FAILS_SILENTLY_ON = [500, 404]; // error codes from spark/views.py - autocomplete
-  var spark_AUTOCOMPLETE_GLOBAL_CALLBACK = $.noop;
+  var viewModel;
 
   $(document).ready(function(){
     $("*[rel=tooltip]").tooltip({
@@ -463,31 +466,17 @@ ${ common.navbar('editor') }
     };
   }
 
-  function getHighlightedQuery() {
-    var selection = codeMirror.getSelection();
-    if (selection != "") {
-      return selection;
-    }
-    return null;
-  }
-
   function tryExecuteQuery() {
-    var query = getHighlightedQuery() || codeMirror.getValue();
-    viewModel.query.params(query);
     viewModel.executeQuery();
   }
 
   function trySaveQuery() {
-    var query = getHighlightedQuery() || codeMirror.getValue();
-    viewModel.query.params(query);
     if (viewModel.query.id() && viewModel.query.id() != -1) {
       viewModel.saveQuery();
     }
   }
 
   function trySaveAsQuery() {
-    var params = getHighlightedQuery() || codeMirror.getValue();
-    viewModel.query.params(params);
     $('#saveAsQueryModal').modal('show');
   }
 
@@ -511,51 +500,6 @@ ${ common.navbar('editor') }
       $('#saveas-query-name').addClass('error');
     }
   }
-
-  var queryEditor = $("#queryField")[0];
-  var AUTOCOMPLETE_SET = CodeMirror.sqlHint;
-
-  codeMirror = CodeMirror(function (elt) {
-      queryEditor.parentNode.replaceChild(elt, queryEditor);
-    }, {
-      value: queryEditor.value,
-      readOnly: false,
-      lineNumbers: true,
-      mode: "text/x-sql",
-      extraKeys: {
-        "Ctrl-Space": function () {
-          CodeMirror.fromDot = false;
-          codeMirror.execCommand("autocomplete");
-        },
-        Tab: function (cm) {
-          $("#executeQuery").focus();
-        }
-      },
-      onKeyEvent: function (e, s) {
-        if (s.type == "keyup") {
-          if (s.keyCode == 190) {
-            var _line = codeMirror.getLine(codeMirror.getCursor().line);
-            var _partial = _line.substring(0, codeMirror.getCursor().ch);
-            var _table = _partial.substring(_partial.lastIndexOf(" ") + 1, _partial.length - 1);
-            if (codeMirror.getValue().toUpperCase().indexOf("FROM") > -1) {
-              rdbms_getTableColumns(viewModel.server().name(), viewModel.database(), _table, codeMirror.getValue(),
-                function (columns) {
-                  var _cols = columns.split(" ");
-                  for (var col in _cols) {
-                    _cols[col] = "." + _cols[col];
-                  }
-                  CodeMirror.catalogFields = _cols.join(" ");
-                  CodeMirror.fromDot = true;
-                  window.setTimeout(function () {
-                    codeMirror.execCommand("autocomplete");
-                  }, 100);  // timeout for IE8
-                });
-            }
-          }
-        }
-      }
-    });
-
 
   // Editables
   $("#query-name").editable({
