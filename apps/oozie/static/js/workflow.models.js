@@ -32,7 +32,11 @@ var DEFAULT_SLA = [
 ];
 
 function getDefaultData() {
- return {'sla': DEFAULT_SLA.slice(0)};
+ return {
+  'sla': DEFAULT_SLA.slice(0),
+  'global_properties': [],
+  'global_config': []
+  };
 }
 
 function normalize_model_fields(node_model) {
@@ -392,6 +396,14 @@ function initializeData() {
 
   if (!('sla' in self.data)) {
     self.data['sla'] = DEFAULT_SLA.slice(0);
+  }
+
+  if (!('global_properties' in self.data)) {
+    self.data['global_properties'] = [];
+  }
+
+  if (!('global_config' in self.data)) {
+    self.data['global_config'] = [];
   }
 }
 

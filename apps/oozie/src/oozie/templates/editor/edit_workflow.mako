@@ -93,7 +93,7 @@ ${ layout.menubar(section='workflows') }
         </div>
 
       <%
-      workflows.key_value_field(workflow_form['parameters'], {
+      workflows.key_value_field(workflow_form['parameters'].label, workflow_form['parameters'].help_text, {
       'name': 'parameters',
       'remove': '$root.removeParameter',
       'add': '$root.addParameter',
@@ -101,7 +101,7 @@ ${ layout.menubar(section='workflows') }
       %>
 
       <%
-      workflows.key_value_field(workflow_form['job_properties'], {
+      workflows.key_value_field(workflow_form['job_properties'].label, workflow_form['job_properties'].help_text, {
       'name': 'job_properties',
       'remove': '$root.removeJobProperty',
       'add': '$root.addJobProperty',
@@ -120,26 +120,36 @@ ${ layout.menubar(section='workflows') }
 
         <div id="globalPropertiesEditord" class="control-group">
           <label class="control-label">
-              ${ _('Global properties') }
+            ${ _('Global properites') }
           </label>
-          
-	      <%
-	      workflows.key_value_field(type('globalProperties', (object,), {'label': 'l', 'help_text': 'h'}), {
-	        'name': 'globalProperties',
-	        'remove': '$root.removeGlobalProperties',
-	        'add': '$root.addGlobalProperties',
-	      })
-	      %>
+          <%
+          workflows.key_value_field(_("Global properties"), _("Global properties"), {
+          'name': 'data.global_properties',
+          'remove': '$root.removeGlobalProperty',
+          'add': '$root.addGlobalProperty',
+          })
+          %>
+        </div>
 
-          ${ utils.globalConfigForm() }
-        </div>   
+        <div id="globalConfigEditord" class="control-group">
+          <label class="control-label">
+            ${ _('Global config') }
+          </label>
+          <%
+          workflows.key_value_field(_("Global config"), _("Global config"), {
+          'name': 'data.global_config',
+          'remove': '$root.removeGlobalConfig',
+          'add': '$root.addGlobalConfig',
+          })
+          %>
+        </div>
       
         <div id="slaEditord" class="control-group">
           <label class="control-label">
-              ${ _('SLA') }
+            ${ _('SLA') }
           </label>
           
-          ${ utils.slaForm() }  
+          ${ utils.slaForm() }
         </div>      
       
         % if user_can_edit_job:
