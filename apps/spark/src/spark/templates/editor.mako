@@ -473,13 +473,13 @@ ${ common.navbar('editor') }
 
   function tryExecuteQuery() {
     var query = getHighlightedQuery() || codeMirror.getValue();
-    viewModel.query.query(query);
+    viewModel.query.params(query);
     viewModel.executeQuery();
   }
 
   function trySaveQuery() {
     var query = getHighlightedQuery() || codeMirror.getValue();
-    viewModel.query.query(query);
+    viewModel.query.params(query);
     if (viewModel.query.id() && viewModel.query.id() != -1) {
       viewModel.saveQuery();
     }

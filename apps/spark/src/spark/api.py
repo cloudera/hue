@@ -161,7 +161,7 @@ def execute(request, design_id=None):
         results = api.submit_job(
             form.cleaned_data['appName'],
             form.cleaned_data['classPath'],
-            data=form.cleaned_data['query'],
+            data=form.cleaned_data['params'],
             context=None if form.cleaned_data['autoContext'] else form.cleaned_data['context'],
             sync=False
         )
