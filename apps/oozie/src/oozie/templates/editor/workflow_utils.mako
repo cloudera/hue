@@ -19,10 +19,10 @@
 %>
 
 
-<%def name="key_value_field(field, javascript_attrs={})">
+<%def name="key_value_field(label, help_text, javascript_attrs={})">
   <div id="${ javascript_attrs['name'] }" class="control-group ko-${ javascript_attrs['name'] }" rel="popover"
-      data-original-title="${ field.label }" data-content="${ field.help_text }">
-    <label class="control-label">${ field.label }</label>
+      data-original-title="${ label }" data-content="${ help_text }">
+    <label class="control-label">${ label }</label>
 
     <div class="controls">
       <table class="table-condensed designTable" data-bind="visible: ${ javascript_attrs['name'] }().length > 0" style="text-align: left;">

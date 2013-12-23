@@ -436,8 +436,8 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
       return self.data.sla();
     });
     self.globalProperties = ko.computed(function() {
-        return self.data.globalProperties();
-      });     
+      return self.data.globalProperties();
+    });
     self.globalConfig = ko.computed(function() {
       return self.data.globalConfig();
     });
@@ -688,22 +688,40 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
       self.job_properties.remove(data);
     },
 
-    addGlobalProperties: function(data, event) {
+    addGlobalProperty: function(data, event) {
       var self = this;
       var prop = { name: ko.observable(""), value: ko.observable("") };
       // force bubble up to containing observable array.
-//      prop.name.subscribe(function(){
-//        self.globalProperties.valueHasMutated();
-//      });
-//      prop.value.subscribe(function(){
-//        self.globalProperties.valueHasMutated();
-//      });
-      self.globalProperties.push(prop);
+      prop.name.subscribe(function(){
+        self.data.global_properties.valueHasMutated();
+      });
+      prop.value.subscribe(function(){
+        self.data.global_properties.valueHasMutated();
+      });
+      self.data.global_properties.push(prop);
     },
-	removeGlobalProperties: function(data, event) {
-	  var self = this;
-      self.globalProperties.remove(data);
-    },    
+
+    removeGlobalProperty: function(data, event) {
+      var self = this;
+      self.data.global_properties.remove(data);
+    },
+
+    addGlobalConfig: function(data, event) {
+      var self = this;
+      var prop = { name: ko.observable(""), value: ko.observable("") };
+      // force bubble up to containing observable array.
+      prop.name.subscribe(function(){
+        self.data.global_config.valueHasMutated();
+      });
+      prop.value.subscribe(function(){
+        self.data.global_config.valueHasMutated();
+      });
+      self.data.global_config.push(prop);
+    },
+    removeGlobalConfig: function(data, event) {
+      var self = this;
+      self.data.global_config.remove(data);
+    },
     
     // Workflow UI
     // Function to build nodes... recursively.
