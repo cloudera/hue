@@ -89,11 +89,13 @@ def delete_contexts(request):
     return render('confirm.mako', request, {'url': request.path, 'title': _('Delete context(s)?')})
 
 
-def list_jars(request):
+def list_applications(request):
   api = get_api(request.user)
+  applications = api.jars()
 
-  return render('list_jars.mako', request, {
-    'jars': api.jars()
+  return render('list_applications.mako', request, {
+    'applications': applications,
+    'applications_json': json.dumps([applications])
   })
 
 
@@ -119,4 +121,17 @@ def upload_app(request):
   else:
     response['results'] = form.errors
 
-  return redirect(reverse('spark:index'))
+  return redirect(request.META['HTTP_REFERER'])
+
+
+def download_result(request, job_id):
+  api = get_api(request.user)
+  result = api.job(job_id)
+
+  mimetype = 'application/json'
+  gen = json.dumps(result['result'])
+
+  resp = HttpResponse(gen, mimetype=mimetype)
+  resp['Content-Disposition'] = 'attachment; filename=query_result.%s' % format
+
+  return resp

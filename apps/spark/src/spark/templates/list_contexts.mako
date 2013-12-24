@@ -28,9 +28,14 @@ ${ common.navbar('contexts') }
   <div class="card card-small">
     <h1 class="card-heading simple">${_('Contexts')}</h1>
 
-    <a href="#" id="deleteContextBtn" title="${_('Delete forever')}" class="btn"><i class="fa fa-bolt"></i> ${_('Delete')}</a>
+    <button type="button" class="btn createContextModalBtn">
+      <i class="fa fa-plus-circle"> ${ _('Create context') }</i>
+    </button>
+    <a href="#" id="deleteContextBtn" title="${_('Delete forever')}" class="btn">
+      <i class="fa fa-bolt"></i> ${ _('Delete') }
+    </a>
 
-    <table class="table table-condensed datatables">
+    <table class="table table-condensed datatables" id="contextTable">
     <thead>
       <th width="1%"><div class="hueCheckbox selectAll fa" data-selectables="savedCheck"></div></th>
       <th>${ _('Name') }</th>
@@ -72,16 +77,27 @@ ${ common.navbar('contexts') }
   </form>
 </div>
 
+
+${ common.createContextModal() }
+
+
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
+
+<script src="/spark/static/js/spark.vm.js"></script>
 
 <script type="text/javascript" charset="utf-8">
-  $(document).ready(function () {
+
+  $(document).ready(function() {
     var viewModel = {
         availableSavedQueries : ko.observableArray(${ contexts_json | n,unicode }),
         chosenSavedQueries : ko.observableArray([])
     };
 
-    ko.applyBindings(viewModel);
+    ko.applyBindings(viewModel, $('#deleteContext')[0]);
+
+    //var sparkViewModel = new sparkViewModel();
+    //ko.applyBindings(sparkViewModel, $('#createContextModal')[0]);
 
     var savedQueries = $(".datatables").dataTable({
       "sDom":"<'row'r>t<'row'<'span8'i><''p>>",
@@ -173,6 +189,9 @@ ${ common.navbar('contexts') }
       deleteQueries();
     });
 
+    $('.createContextModalBtn').click(function(){
+      $('#createContextModal').modal('show');
+    });
 
     $("a[data-row-selector='true']").jHueRowSelector();
   });

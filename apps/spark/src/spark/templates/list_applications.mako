@@ -20,13 +20,17 @@
 
 <%namespace name="common" file="common.mako" />
 
-${ commonheader(_('Query'), app_name, user) | n,unicode }
+${ commonheader(_('Applications'), app_name, user) | n,unicode }
 
-${ common.navbar('jars') }
+${ common.navbar('applications') }
 
 <div class="container-fluid">
   <div class="card card-small">
-    <h1 class="card-heading simple">${_('Jars')}</h1>
+    <h1 class="card-heading simple">${_('Applications')}</h1>
+
+    <button type="button" class="btn uploadAppModalBtn">
+      <i class="fa fa-plus-circle"> ${ _('Upload app') }</i>
+    </button>
 
     <table class="table table-condensed datatables">
     <thead>
@@ -36,7 +40,7 @@ ${ common.navbar('jars') }
       </tr>
     </thead>
     <tbody>
-      % for name, ts in jars.iteritems():
+      % for name, ts in applications.iteritems():
       <tr>
         <td>${ name }</td>
         <td>${ ts }</td>
@@ -70,12 +74,16 @@ ${ common.navbar('jars') }
   </form>
 </div>
 
+
+${ common.uploadAppModal() }
+
+
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript" charset="utf-8">
   $(document).ready(function () {
     var viewModel = {
-        availableSavedQueries : ko.observableArray(${ jars | n,unicode }),
+        availableSavedQueries : ko.observableArray(${ applications_json | n,unicode }),
         chosenSavedQueries : ko.observableArray([])
     };
 
@@ -83,18 +91,15 @@ ${ common.navbar('jars') }
 
     var savedQueries = $(".datatables").dataTable({
       "sDom":"<'row'r>t<'row'<'span8'i><''p>>",
-      "bPaginate":false,
-      "bLengthChange":false,
-      "bInfo":false,
+      "bPaginate": false,
+      "bLengthChange": false,
+      "bInfo": false,
       "aaSorting":[
-        [4, 'desc']
+        [1, 'desc']
       ],
       "aoColumns":[
         null,
-        null,
-        null,
-        null,
-        { "sSortDataType":"dom-sort-value", "sType":"numeric" }
+        null
       ],
       "oLanguage":{
         "sEmptyTable":"${_('No data available')}",
@@ -105,6 +110,10 @@ ${ common.navbar('jars') }
 
     $("#filterInput").keyup(function () {
       savedQueries.fnFilter($(this).val());
+    });
+
+    $('.uploadAppModalBtn').click(function(){
+      $('#uploadAppModal').modal('show');
     });
 
     $("a[data-row-selector='true']").jHueRowSelector();

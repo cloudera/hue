@@ -33,7 +33,7 @@ ${ common.navbar('editor') }
             ${_('App name')}&nbsp;
             <!-- ko if: $root.appNames().length == 0 -->
             <a class="uploadAppModalBtn" href="javascript:void(0);">
-              ${ _("None, create one?") }
+              ${ _("Missing, add one?") }
             </a>
             <!-- /ko -->
             <a data-bind="if: $root.appName" data-toggle="dropdown" href="javascript:void(0);">
@@ -48,21 +48,21 @@ ${ common.navbar('editor') }
         <li>&nbsp;&nbsp;&nbsp;&nbsp;</li>
         <li>
             ${_('Class path')}&nbsp;
-            <input type="text" data-bind="value: $root.classPath" class="input-xlarge"></input>
+            <input type="text" data-bind="value: $root.classPath" class="input-xlarge" placeholder="spark.jobserver.WordCountExample"></input>
         </li>
         <li>&nbsp;&nbsp;&nbsp;&nbsp;</li>
         <li>
           <div style="display: inline" class="dropdown">
             ${_('Context')}&nbsp;
             <input type="checkbox" data-bind="checked: $root.autoContext" />
-            <span data-bind="visible: $root.autoContext()">
+            <span data-bind="visible: $root.autoContext">
               ${ _('auto') }
             </span>
 
             <span data-bind="visible: ! $root.autoContext()">
               <!-- ko if: $root.contexts().length == 0 -->
               <a class="createContextModalBtn" href="javascript:void(0);">
-                ${ _("None, create one?") }
+                ${ _("Create one?") }
               </a>
               <!-- /ko -->
               <a data-bind="if: $root.context" data-toggle="dropdown" href="javascript:void(0);">
@@ -75,45 +75,42 @@ ${ common.navbar('editor') }
             </span>
           </div>
         </li>
+        % if can_edit_name:
+        <li style="padding-left:50px">
+          ${ _("Script") }
+          <a href="javascript:void(0);"
+             id="query-name"
+             data-type="text"
+             data-name="name"
+             data-value="${design.name}"
+             data-original-title="${ _('Script name') }"
+             data-placement="right">
+          </a>
+          <a href="javascript:void(0);"
+             id="query-description"
+             data-type="textarea"
+             data-name="description"
+             data-value="${design.desc}"
+             data-original-title="${ _('Script description') }"
+             data-placement="right">
+          </a>
+         </p>
+        </li>
+        %endif
+
         <span class="pull-right">
-      <button type="button" class="btn btn-primary uploadAppModalBtn">${ _('Upload app') }</button>
-      <button type="button" class="btn btn-primary createContextModalBtn">${ _('Create context') }</button>
+          <button type="button" class="btn btn-primary uploadAppModalBtn">${ _('Upload app') }</button>
+          <button type="button" class="btn btn-primary createContextModalBtn">${ _('Create context') }</button>
         </span>
       </ul>
     </div>
   </div>
+
   <div class="row-fluid">
-    <div class="span10">
+    <div class="span12">
     <div id="query">
       <div class="card card-small">
-        <div style="margin-bottom: 30px">
-          <h1 class="card-heading simple">
-            % if can_edit_name:
-              <a href="javascript:void(0);"
-                 id="query-name"
-                 data-type="text"
-                 data-name="name"
-                 data-value="${design.name}"
-                 data-original-title="${ _('Script name') }"
-                 data-placement="right">
-              </a>
-              :
-            %endif
-            ${ _('Parameters') }
-          </h1>
-          % if can_edit_name:
-            <p style="margin-left: 20px">
-              <a href="javascript:void(0);"
-                 id="query-description"
-                 data-type="textarea"
-                 data-name="description"
-                 data-value="${design.desc}"
-                 data-original-title="${ _('Query description') }"
-                 data-placement="right">
-              </a>
-            </p>
-          % endif
-        </div>
+
         <div class="card-body">
           <div class="tab-content">
             <div id="queryPane">
@@ -125,38 +122,51 @@ ${ common.navbar('editor') }
                 </div>
               </div>
 
-				<div class="control-group">
-				  <div class="controls">
-				      <table class="table-condensed designTable">
-				        <thead>
-				          <tr>
-				            <th>${ _('Name') }</th>
-				            <th>${ _('Value') }</th>
-				            <th/>
-				          </tr>
-				        </thead>
-				        <tbody data-bind="foreach: query.params">
-				          <tr>
-				            <td><input type="text" class="span6 required propKey" data-bind="value: name" /></td>
-				            <td><input type="text" class="span6 required pathChooserKo" data-bind="fileChooser: $data, value: value" /></td>
-				            <td>
-				              <a class="btn" href="#" data-bind="click: $root.removeParam">${ _('Delete') }</a>
-				            </td>
-				          </tr>
-				        </tbody>
-				      </table>
-				      <button class="btn" data-bind="click: $root.addParam">${ _('Add') }</button>
-				  </div>
-				</div>
-
+      <div class="control-group">
+        <label class="control-label" style="padding-right:50px">${ _('Parameters') }</label>
+        <div class="controls">
+            <table class="table-condensed">
+              <thead data-bind="visible: query.params().length > 0">
+                <tr>
+                  <th>${ _('Name') }</th>
+                  <th>${ _('Value') }</th>
+                  <th/>
+                </tr>
+              </thead>
+              <tbody data-bind="foreach: query.params">
+                <tr>
+                  <td><input type="text" class="span6 required propKey" data-bind="value: name" /></td>
+                  <td><input type="text" class="span6 required pathChooserKo" data-bind="fileChooser: $data, value: value" /></td>
+                  <td>
+                    <a class="btn" href="#" data-bind="click: $root.removeParam">${ _('Delete') }</a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <button class="btn" data-bind="click: $root.addParam">${ _('Add') }</button>
+          </div>
+         </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row-fluid">
+    <div class="span12">
+    <div class="card card-small">
               <div class="actions">
-                <button data-bind="click: tryExecuteQuery" type="button" id="executeQuery" class="btn btn-primary" tabindex="2">${_('Execute')}</button>
+                <button data-bind="click: tryExecuteQuery, enable: $root.appNames().length > 0 && $root.classPath()"
+                    type="button" id="executeQuery" class="btn btn-primary disable-feedback"
+                    tabindex="2" data-loading-text="${ _("Executing...") }">
+                  ${_('Execute')}
+                </button>
                 <button data-bind="click: trySaveQuery, css: {'hide': !$root.query.id() || $root.query.id() == -1}" type="button" class="btn hide">${_('Save')}</button>
                 <button data-bind="click: trySaveAsQuery" type="button" class="btn">${_('Save as...')}</button>
                 &nbsp; ${_('or create a')} &nbsp;<a type="button" class="btn" href="${ url('spark:editor') }">${_('New query')}</a>
-                <br /><br />
-            </div>
-
+                <span class="pull-right">
+                  <a type="button" class="btn" data-bind="visible: rows().length != 0, attr: {'href': '${ url('spark:download_result') }' + $root.query.jobId()}">${_('Download')}</a>
+                </span>
+              </div>
+             </div>
             </div>
           </div>
         </div>
@@ -201,19 +211,6 @@ ${ common.navbar('editor') }
 
   </div>
 
-  <div class="span2" id="navigator">
-      <div class="card card-small">
-        <h1 class="card-heading simple"><i class="fa fa-compass"></i> ${_('History')}</h1>
-        <div class="card-body">
-          <p>
-            <input id="navigatorSearch" type="text" placeholder="${ _('Table name...') }" style="width:90%"/>
-            <span id="navigatorNoTables">${_('The selected database has no tables.')}</span>
-            <ul id="navigatorTables" class="unstyled"></ul>
-          </p>
-        </div>
-      </div>
-  </div>
-
   </div>
 </div>
 
@@ -245,67 +242,8 @@ ${ common.navbar('editor') }
   </div>
 </div>
 
-<div id="uploadAppModal" class="modal hide fade">
-  <form class="form-horizontal" id="uploadAppForm" action="${ url('spark:upload_app') }" method="POST" enctype="multipart/form-data">
-  <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${_('Upload application')}</h3>
-  </div>
-  <div class="modal-body">
-    ${ _('One class of the jar should implement SparkJob.') }
-    <div class="control-group">
-      <label class="control-label">${ _("Local jar file") }</label>
-      <div class="controls">
-        <input type="file" name="jar_file" id="jar_file">
-      </div>
-    </div>
-    <div class="control-group">
-      <label class="control-label">${ _("App name") }</label>
-      <div class="controls">
-        <input type="text" name="app_name" id="app_name">
-      </div>
-    </div>
-  </div>
-  <div class="modal-footer">
-    <button class="btn" data-dismiss="modal">${_('Cancel')}</button>
-    <input type="submit" class="btn btn-primary" value="${_('Upload')}"/>
-    ##<button data-bind="click: $('#uploadAppForm').submit()" class="btn btn-primary">${_('Upload')}</button>
-  </div>
-  </form>
-</div>
-
-<div id="createContextModal" class="modal hide fade">
-  <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${_('Create context')}</h3>
-  </div>
-  <div class="modal-body">
-    <form class="form-horizontal" id="createContextForm">
-      <div class="control-group">
-        <label class="control-label">${ _("Name") }</label>
-        <div class="controls">
-          <input type="text" name="name">
-        </div>
-      </div>
-      <div class="control-group">
-        <label class="control-label">${ _("Num cpu cores") }</label>
-        <div class="controls">
-          <input type="text" name="numCores"value="1">
-        </div>
-      </div>
-      <div class="control-group">
-        <label class="control-label">${ _("Memory per node") }</label>
-        <div class="controls">
-          <input type="text" name="memPerNode" value="512m">
-        </div>
-      </div>
-    </form>
-  </div>
-  <div class="modal-footer">
-    <button class="btn" data-dismiss="modal">${_('Cancel')}</button>
-    <button data-bind="click: createContext" class="btn btn-primary">${_('Create')}</button>
-  </div>
-</div>
+${ common.uploadAppModal() }
+${ common.createContextModal() }
 
 
 <style type="text/css">
@@ -483,18 +421,16 @@ ${ common.navbar('editor') }
   $('.uploadAppModalBtn').click(function(){
     $('#uploadAppModal').modal('show');
   });
+
   $('.createContextModalBtn').click(function(){
     $('#createContextModal').modal('show');
   });
 
   function modalSaveAsQuery() {
-    if (viewModel.appName() && viewModel.query.name()) {
+    if (viewModel.query.name()) {
       viewModel.query.id(-1);
       viewModel.saveQuery();
       $('#saveas-query-name').removeClass('error');
-      $('#saveAsQueryModal').modal('hide');
-    } else if (viewModel.query.name()) {
-      $.jHueNotify.error("${_('No application name provided.')}");
       $('#saveAsQueryModal').modal('hide');
     } else {
       $('#saveas-query-name').addClass('error');
@@ -513,6 +449,14 @@ ${ common.navbar('editor') }
     },
     emptytext: "${ _('Query name') }"
   });
+
+  $("#query-description").editable({
+    success: function(response, newValue) {
+      viewModel.query.description(newValue);
+    },
+    emptytext: "${ _('Empty description') }"
+  });
+
 
   // Events and datatables
   $(document).on('saved.query', function() {
@@ -542,7 +486,7 @@ ${ common.navbar('editor') }
         "bPaginate": false,
         "bLengthChange": false,
         "bInfo": false,
-        "aaSorting":[],
+        "aaSorting": [],
         "oLanguage": {
           "sEmptyTable": "${_('No data available')}",
           "sZeroRecords": "${_('No matching records')}"
@@ -577,10 +521,12 @@ ${ common.navbar('editor') }
 
   $(document).on('execute.query', function() {
     $('#wait-info').show();
+    $("#executeQuery").button("loading");
     cleanResultsTable();
   });
   $(document).on('executed.query', function() {
     $('#wait-info').hide();
+    $("#executeQuery").button("reset");
     resultsTable();
   });
   $(document).on('created.context', function() {

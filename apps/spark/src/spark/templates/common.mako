@@ -24,6 +24,8 @@ def is_selected(section, matcher):
     return ""
 %>
 
+## Nav bar is also duplicated in beeswax layout.mako.
+
 <%def name="navbar(section='editor')">
   <div class="navbar navbar-inverse navbar-fixed-top">
     <div class="navbar-inner">
@@ -42,15 +44,81 @@ def is_selected(section, matcher):
             ##<li class="${is_selected(section, 'history')}"><a href="${ url('spark:list_query_history') }">${_('History')}</a></li>
             <li class="currentApp">
               <a href="/spark">
-                ${ _('Browser') }
+                ${ _('Dashboard') }
               </a>
             </li>
             <li class="${is_selected(section, 'jobs')}"><a href="${ url('spark:list_jobs') }">${_('Jobs')}</a></li>
             <li class="${is_selected(section, 'contexts')}"><a href="${ url('spark:list_contexts') }">${_('Contexts')}</a></li>
-            <li class="${is_selected(section, 'jars')}"><a href="${ url('spark:list_jars') }">${_('Jars')}</a></li>
+            <li class="${is_selected(section, 'applications')}"><a href="${ url('spark:list_applications') }">${_('Applications')}</a></li>
           </ul>
         </div>
       </div>
     </div>
   </div>
+</%def>
+
+<%def name="createContextModal()">
+<div id="createContextModal" class="modal hide fade">
+  <div class="modal-header">
+    <a href="#" class="close" data-dismiss="modal">&times;</a>
+    <h3>${_('Create context')}</h3>
+  </div>
+  <div class="modal-body">
+    <form class="form-horizontal" id="createContextForm">
+      <div class="control-group">
+        <label class="control-label">${ _("Name") }</label>
+        <div class="controls">
+          <input type="text" name="name">
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="control-label">${ _("Num cpu cores") }</label>
+        <div class="controls">
+          <input type="text" name="numCores"value="1">
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="control-label">${ _("Memory per node") }</label>
+        <div class="controls">
+          <input type="text" name="memPerNode" value="512m">
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal">${_('Cancel')}</button>
+    <button data-bind="click: createContext" class="btn btn-primary">${_('Create')}</button>
+  </div>
+</div>
+</%def>
+
+
+<%def name="uploadAppModal()">
+<div id="uploadAppModal" class="modal hide fade">
+  <form class="form-horizontal" id="uploadAppForm" action="${ url('spark:upload_app') }" method="POST" enctype="multipart/form-data">
+  <div class="modal-header">
+    <a href="#" class="close" data-dismiss="modal">&times;</a>
+    <h3>${_('Upload application')}</h3>
+  </div>
+  <div class="modal-body">
+    ${ _('One class of the jar should implement SparkJob.') }
+    <div class="control-group">
+      <label class="control-label">${ _("Local jar file") }</label>
+      <div class="controls">
+        <input type="file" name="jar_file" id="jar_file">
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label">${ _("App name") }</label>
+      <div class="controls">
+        <input type="text" name="app_name" id="app_name">
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal">${_('Cancel')}</button>
+    <input type="submit" class="btn btn-primary" value="${_('Upload')}"/>
+  </div>
+  </form>
+</div>
 </%def>

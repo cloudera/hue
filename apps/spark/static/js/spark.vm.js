@@ -77,6 +77,7 @@ function sparkViewModel() {
 
   self.updateResults = function(results) {
     self.rows.removeAll();
+    // todo if results is not a list or map
     var newRows = [];
     $.each(results, function(key, value) {
       newRows.push([key, value]);
@@ -210,7 +211,7 @@ function sparkViewModel() {
     data.appName = self.appName().name;
     data.classPath = self.classPath();
     data.autoContext = self.autoContext();
-    data.context = self.context().name;
+    data.context = self.context() ? self.context().name : '';
     data.params = JSON.stringify(self.query.params());
     var request = {
       url: '/spark/api/execute',
@@ -245,9 +246,8 @@ function sparkViewModel() {
       success: function(data) {
         // Script finished
         if (data.results.status == 'OK' || data.results.status == 'ERROR') {
-        clearInterval(timerId);
-        self.updateResults(data.results.result);
-
+          clearInterval(timerId);
+          self.updateResults(data.results.result);
           self.resultsEmpty($.isEmptyObject(data.results.result));
           $(document).trigger('executed.query', data);
         }
@@ -301,7 +301,7 @@ function sparkViewModel() {
       success: function(result) {
         self.query.errors.removeAll();
         if (result.status == 'OK') {
-          self.contexts().push(createDropdownItem(result.name));
+          self.contexts.push(createDropdownItem(result.name));
           self.context(result.name);
           self.autoContext(false);
           $(document).trigger('created.context', data);

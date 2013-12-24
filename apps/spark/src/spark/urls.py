@@ -27,8 +27,9 @@ urlpatterns = patterns('spark.views',
   url(r'^list_jobs', 'list_jobs', name='list_jobs'),
   url(r'^list_contexts', 'list_contexts', name='list_contexts'),
   url(r'^delete_contexts', 'delete_contexts', name='delete_contexts'),
-  url(r'^list_jars', 'list_jars', name='list_jars'),
+  url(r'^list_applications', 'list_applications', name='list_applications'),
   url(r'^upload_app$', 'upload_app', name='upload_app'),
+  url(r'^download_result/(?P<job_id>.+)?$', 'download_result', name='download_result'),
 )
 
 # APIs
