@@ -44,8 +44,6 @@ urlpatterns += patterns('spark.api',
 )
 
 urlpatterns += patterns('beeswax.views',
-  url(r'^save_design_properties$', 'save_design_properties', name='save_design_properties'), # Ajax
-
   url(r'^my_queries$', 'my_queries', name='my_queries'),
   url(r'^list_designs$', 'list_designs', name='list_designs'),
   url(r'^list_trashed_designs$', 'list_trashed_designs', name='list_trashed_designs'),
