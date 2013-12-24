@@ -77,11 +77,15 @@ function sparkViewModel() {
 
   self.updateResults = function(results) {
     self.rows.removeAll();
-    // todo if results is not a list or map
     var newRows = [];
-    $.each(results, function(key, value) {
-      newRows.push([key, value]);
-    });
+    // Is a list of map
+    if ($.inArray($.type(results), ['array', 'object']) != -1) {
+      $.each(results, function(key, value) {
+        newRows.push([key, value]);
+      });
+    } else {
+      newRows.push([0, results]);
+    }
     self.rows(newRows);
   };
 
