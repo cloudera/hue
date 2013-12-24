@@ -15,7 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import datetime
 import json
 import logging
 
@@ -159,11 +158,14 @@ def execute(request, design_id=None):
             context=None if form.cleaned_data['autoContext'] else form.cleaned_data['context'],
             sync=False
         )
-        response['status'] = 0
-        response['results'] = results
-        #response['design'] = design.id
+
+        if results['status'] == 'STARTED':
+          response['status'] = 0
+          response['results'] = results
+        else:
+          response['message'] = str(results[1]['result'])
+        response['design'] = design.id
       except Exception, e:
-        response['status'] = -1
         response['message'] = str(e)
 
     else:

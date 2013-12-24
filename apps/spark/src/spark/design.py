@@ -88,7 +88,7 @@ class SparkDesign(object):
           'VERSION': SERIALIZATION_VERSION,
           'query': {
               'type': 3, 'appName': '', 'classPath': 'spark.jobserver.WordCountExample', 'autoContext': True, 'context': '',
-              'params': json.dumps([{'name': 'aa', 'value': 'rr'}])
+              'params': json.dumps([])
           }
       }
 
