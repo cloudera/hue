@@ -74,8 +74,8 @@ def create_context(request):
   response = {}
 
   name = request.POST.get('name', '')
-  memPerNode = request.POST.get('memPerNode', '512m')
-  numCores = request.POST.get('numCores', '1')
+  memPerNode = request.POST.get('mem-per-node', '512m')
+  numCores = request.POST.get('num-cpu-cores', '1')
 
   api = get_api(request.user)
   try:
@@ -190,7 +190,7 @@ def save_query(request, design_id=None):
   form = QueryForm()
   api = get_api(request.user)
   app_names = api.jars()
-  print request.POST
+
   try:
     form.bind(request.POST)
     form.query.fields['appName'].choices = ((key, key) for key in app_names)

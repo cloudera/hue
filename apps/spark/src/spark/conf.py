@@ -17,7 +17,7 @@
 
 import sys
 
-from django.utils.translation import ugettext_lazy as _t
+from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
 from desktop.lib.conf import Config
 from spark.settings import NICE_NAME
@@ -38,6 +38,9 @@ def get_spark_status(user):
   try:
     if not 'test' in sys.argv: # Avoid tests hanging
       status = str(get_api(user).get_status())
+  except ValueError:
+    # No json returned
+    status = 'OK'
   except:
     pass
 
@@ -49,7 +52,7 @@ def config_validator(user):
 
   status = get_spark_status(user)
 
-  if status:
+  if status != 'OK':
     res.append((NICE_NAME, _("The app won't work without a running Job Server")))
 
   return res

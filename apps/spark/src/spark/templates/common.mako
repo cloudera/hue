@@ -74,13 +74,13 @@ def is_selected(section, matcher):
       <div class="control-group">
         <label class="control-label">${ _("Num cpu cores") }</label>
         <div class="controls">
-          <input type="text" name="numCores"value="1">
+          <input type="text" name="num-cpu-cores"value="1">
         </div>
       </div>
       <div class="control-group">
         <label class="control-label">${ _("Memory per node") }</label>
         <div class="controls">
-          <input type="text" name="memPerNode" value="512m">
+          <input type="text" name="mem-per-node" value="512m">
         </div>
       </div>
     </form>
