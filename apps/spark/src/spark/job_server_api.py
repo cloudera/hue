@@ -30,6 +30,8 @@ DEFAULT_USER = 'hue'
 
 _API_VERSION = 'v1'
 _JSON_CONTENT_TYPE = 'application/json'
+_BINARY_CONTENT_TYPE = 'application/octet-stream'
+_TEXT_CONTENT_TYPE = 'text/plain'
 
 _api_cache = None
 _api_cache_lock = threading.Lock()
@@ -79,13 +81,13 @@ class JobServerApi(object):
       self._thread_local.user = user
 
   def get_status(self, **kwargs):
-    return self._root.get('', params=kwargs, headers={'Accept': _JSON_CONTENT_TYPE})
+    return self._root.get('healthz', params=kwargs, headers={'Accept': _TEXT_CONTENT_TYPE})
 
   def submit_job(self, appName, classPath, data, context=None, sync=False):
     params = {'appName': appName, 'classPath': classPath, 'sync': sync}
     if context:
       params['context'] = context
-    return self._root.post('jobs' % params, params=params, data=data, contenttype='application/octet-stream')
+    return self._root.post('jobs' % params, params=params, data=data, contenttype=_BINARY_CONTENT_TYPE)
 
   def job(self, job_id):
     return self._root.get('jobs/%s' % job_id, headers={'Accept': _JSON_CONTENT_TYPE})
@@ -94,7 +96,7 @@ class JobServerApi(object):
     return self._root.get('jobs', params=kwargs, headers={'Accept': _JSON_CONTENT_TYPE})
 
   def create_context(self, name, **kwargs):
-    return self._root.post('contexts/%s' % name, params=kwargs, contenttype='application/octet-stream')
+    return self._root.post('contexts/%s' % name, params=kwargs, contenttype=_BINARY_CONTENT_TYPE)
 
   def contexts(self, **kwargs):
     return self._root.get('contexts', params=kwargs, headers={'Accept': _JSON_CONTENT_TYPE})
@@ -103,7 +105,7 @@ class JobServerApi(object):
     return self._root.delete('contexts/%s' % name)
 
   def upload_jar(self, app_name, data):
-    return self._root.post('jars/%s' % app_name, data=data, contenttype='application/octet-stream')
+    return self._root.post('jars/%s' % app_name, data=data, contenttype=_BINARY_CONTENT_TYPE)
 
   def jars(self, **kwargs):
     return self._root.get('jars', params=kwargs, headers={'Accept': _JSON_CONTENT_TYPE})

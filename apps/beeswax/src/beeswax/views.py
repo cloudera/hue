@@ -74,7 +74,7 @@ def save_design(request, form, type_, design, explicit_save):
   Assumes that form.saveform is the SaveForm, and that it is valid.
   """
   assert form.saveform.is_valid()
-  sub_design_form = None # Beeswax/Impala case
+  sub_design_form = form # Beeswax/Impala case
 
   if type_ == models.HQL:
     design_cls = beeswax.design.HQLdesign
