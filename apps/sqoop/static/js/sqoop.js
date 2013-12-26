@@ -41,6 +41,7 @@ function showSection(mainSection, section) {
     $(".section").hide();
     $("#" + section).show();
     highlightMenu(section);
+    $(document).trigger('shown_section', section);
   }
 }
 
