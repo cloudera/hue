@@ -167,9 +167,11 @@ function hac_getTables(databaseName, callback) {
           }
         }
         else {
-          $.totalStorage('tables_' + databaseName, data.tables.join(" "));
-          $.totalStorage('timestamp_tables_' + databaseName, (new Date()).getTime());
-          callback($.totalStorage('tables_' + databaseName));
+          if (data.tables) {
+            $.totalStorage('tables_' + databaseName, data.tables.join(" "));
+            $.totalStorage('timestamp_tables_' + databaseName, (new Date()).getTime());
+            callback($.totalStorage('tables_' + databaseName));
+          }
         }
       }
     });

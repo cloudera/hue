@@ -173,7 +173,7 @@
     var clonedTableContainer = $("<div>").width($(_this.element).outerWidth());
     clonedTable.appendTo(clonedTableContainer);
 
-    var clonedTableVisibleContainer = $("<div>").addClass("jHueTableExtenderClonedContainer").width($(_this.element).parent().width()).css("overflow-x", "hidden");
+    var clonedTableVisibleContainer = $("<div>").addClass("jHueTableExtenderClonedContainer").width($(_this.element).parent().width()).css("overflow-x", "hidden").css("top", ($(_this.element).parent().offset().top - $(window).scrollTop()) + "px");
     clonedTableVisibleContainer.css("position", "fixed");
 
     clonedTableContainer.appendTo(clonedTableVisibleContainer);
@@ -197,6 +197,10 @@
 
     $(_this.element).parent().resize(function () {
       clonedTableVisibleContainer.width($(this).width());
+    });
+
+    $(window).scroll(function () {
+      clonedTableVisibleContainer.css("top", ($(_this.element).parent().offset().top - $(window).scrollTop()) + "px");
     });
   }
 
