@@ -218,7 +218,7 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
             <div class="controls">
               <select class="input-xlarge" name="connector" data-bind="'options': $root.connectors, 'optionsText': function(item) { return item.name(); }, 'optionsValue': function(item) { return item.id(); }, 'value': connector_id">
               </select>
-              </div>
+            </div>
           </div>
           <fieldset data-bind="foreach: connector">
             <div data-bind="foreach: inputs">
@@ -600,6 +600,7 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
 <script src="/static/ext/js/knockout.x-editable.js"></script>
 <script src="/sqoop/static/js/cclass.js" type="text/javascript" charset="utf-8"></script>
 <script src="/sqoop/static/js/koify.js" type="text/javascript" charset="utf-8"></script>
+<script src="/sqoop/static/js/sqoop.autocomplete.js" type="text/javascript" charset="utf-8"></script>
 <script src="/sqoop/static/js/sqoop.utils.js" type="text/javascript" charset="utf-8"></script>
 <script src="/sqoop/static/js/sqoop.wizard.js" type="text/javascript" charset="utf-8"></script>
 <script src="/sqoop/static/js/sqoop.forms.js" type="text/javascript" charset="utf-8"></script>
@@ -770,6 +771,47 @@ $(document).on('delete_fail.job', handle_form_errors);
 
 $(document).on('show_section', function(e, section){
   viewModel.shownSection(section);
+});
+$(document).on('changed.page', function(e, jobWizard) {
+  $('input[name="table.tableName').typeahead({
+    'source': function(query, process) {
+      var database = viewModel.connection().database();
+      switch (viewModel.connection().jdbcDriver()) {
+        case 'com.mysql.jdbc.Driver':
+        return autocomplete.tables('mysql', database);
+        break;
+        case 'org.postgresql.Driver':
+        return autocomplete.tables('postgresql', database);
+        break;
+        case 'oracle.jdbc.OracleDriver':
+        return autocomplete.tables('oracle', database);
+      }
+      return [];
+    }
+  });
+  function columnsAutocomplete(query, process) {
+    var database = viewModel.connection().database();
+    if (viewModel.job()) {
+      var table = viewModel.job().table();
+      switch (viewModel.connection().jdbcDriver()) {
+        case 'com.mysql.jdbc.Driver':
+        return autocomplete.columns('mysql', database, table);
+        break;
+        case 'org.postgresql.Driver':
+        return autocomplete.columns('postgresql', database, table);
+        break;
+        case 'oracle.jdbc.OracleDriver':
+        return autocomplete.columns('oracle', database, table);
+      }
+      return [];
+    }
+  }
+  $('input[name="table.columns"]').typeahead({
+    'source': columnsAutocomplete
+  });
+  $('input[name="table.partitionColumn"]').typeahead({
+    'source': columnsAutocomplete
+  });
 });
 
 $(document).on('keyup', 'input#filter', function() {
@@ -962,6 +1004,7 @@ $(document).ready(function () {
       } else {
         viewModel.jobWizard.index(viewModel.jobWizard.getIndex(page));
       }
+      $(document).trigger('changed.page', [viewModel.jobWizard]);
       $("*[rel=tooltip]").tooltip({
         placement: 'right'
       });
@@ -973,6 +1016,7 @@ $(document).ready(function () {
         $("*[rel=tooltip]").tooltip({
           placement: 'right'
         });
+        routie('job/edit/wizard/' + 0);
       });
     },
     "job/new": function () {

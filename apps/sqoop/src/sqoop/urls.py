@@ -22,6 +22,9 @@ urlpatterns = patterns('sqoop.views',
 )
 
 urlpatterns += patterns('sqoop.api',
+  url(r'^api/autocomplete/databases/?$', 'autocomplete', name='autocomplete_databases'),
+  url(r'^api/autocomplete/databases/(?P<database>.+)/tables/?$', 'autocomplete', name='autocomplete_tables'),
+  url(r'^api/autocomplete/databases/(?P<database>.+)/tables/(?P<table>.+)/columns/?$', 'autocomplete', name='autocomplete_fields'),
   url(r'^api/framework/?$', 'framework', name='framework'),
   url(r'^api/connectors/?$', 'connectors', name='connectors'),
   url(r'^api/connectors/resources/?$', 'connectors_resources', name='connectors_resources'),

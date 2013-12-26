@@ -127,24 +127,24 @@ var jobs = (function($) {
         return (output_directory) ? '/filebrowser/view' + output_directory : null;
       });
       self.inputDirectoryFilebrowserURL = ko.computed(function() {
-          var input_directory = null;
-          $.each(self.framework(), function(index, form) {
-            if (form.name() == 'input') {
-              $.each(form.inputs(), function(index, input) {
-                if (input.name() == 'input.inputDirectory') {
-                  input_directory = input.value();
-                }
-              });
-            }
-          });
-          return (input_directory) ? '/filebrowser/view' + input_directory : null;
+        var input_directory = null;
+        $.each(self.framework(), function(index, form) {
+          if (form.name() == 'input') {
+            $.each(form.inputs(), function(index, input) {
+              if (input.name() == 'input.inputDirectory') {
+                input_directory = input.value();
+              }
+            });
+          }
         });
+        return (input_directory) ? '/filebrowser/view' + input_directory : null;
+      });
       self.storageType = ko.computed(function() {
         var storage_type = null;
         $.each(self.framework(), function(index, form) {
-    	  if (form.name() == 'input') {
+          if (form.name() == 'input') {
             storage_type = 'HDFS'; // Hardcoded for now
-    	  } else if (form.name() == 'output') {
+          } else if (form.name() == 'output') {
             $.each(form.inputs(), function(index, input) {
               if (input.name() == 'output.storageType') {
                 storage_type = input.value();
@@ -153,6 +153,20 @@ var jobs = (function($) {
           }
         });
         return storage_type;
+      });
+      self.table = ko.computed(function() {
+        var table = null;
+        $.each(self.connector(), function(index, form) {
+          if (form.name() == 'table') {
+            console.log(form.name());
+            $.each(form.inputs(), function(index, input) {
+              if (input.name() == 'table.tableName') {
+                table = input.value();
+              }
+            });
+          }
+        });
+        return table;
       });
 
       self.runningInterval = 0;
