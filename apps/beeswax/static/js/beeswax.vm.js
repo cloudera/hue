@@ -42,6 +42,7 @@ function BeeswaxViewModel(server, query_id) {
   self.columns = ko.observableArray();
   self.rows = ko.observableArray();
   self.resultsEmpty = ko.observable(true);
+  self.isRunning = ko.observable(false);
 
   self.hasMoreResults = ko.computed(function() {
     return self.resultsURL() != null;
@@ -217,6 +218,7 @@ function BeeswaxViewModel(server, query_id) {
   };
 
   var error_fn = function(jqXHR, status, errorThrown) {
+    self.isRunning(false);
     try {
       $(document).trigger('server.error', $.parseJSON(jqXHR.responseText));
     } catch(e) {
@@ -282,6 +284,7 @@ function BeeswaxViewModel(server, query_id) {
   self.explainQuery = function() {
     $(document).trigger('explain.query', data);
     self.query.explain(true);
+    self.isRunning(true);
 
     var data = {
       'query-query': self.query.query(),
@@ -305,8 +308,10 @@ function BeeswaxViewModel(server, query_id) {
           self.explanation(data.explanation);
         } else {
           self.query.errors.push(data.message);
+          $(document).trigger('error.query');
         }
         $(document).trigger('explained.query', data);
+        self.isRunning(false);
       },
       error: error_fn,
       data: data
@@ -317,6 +322,7 @@ function BeeswaxViewModel(server, query_id) {
   self.executeQuery = function() {
     $(document).trigger('execute.query', data);
     self.query.explain(false);
+    self.isRunning(true);
 
     var data = {
       'query-query': self.query.query(),
@@ -343,6 +349,7 @@ function BeeswaxViewModel(server, query_id) {
           self.watchQueryLoop();
         } else {
           self.query.errors.push(data.message);
+          $(document).trigger('error.query');
         }
         $(document).trigger('executed.query', data);
       },
@@ -353,8 +360,6 @@ function BeeswaxViewModel(server, query_id) {
   };
 
   self.watchQuery = function() {
-    $(document).trigger('watch.query');
-
     var data = {
       'query-query': self.query.query(),
       'query-database': self.database()
@@ -391,6 +396,7 @@ function BeeswaxViewModel(server, query_id) {
           executed_once = true;
           if (data.log) {
             self.logs.push(data.log);
+            // scroll logs
           }
           timer = setTimeout(fn, TIMEOUT);
         }
@@ -408,6 +414,7 @@ function BeeswaxViewModel(server, query_id) {
       dataType: 'json',
       type: 'GET',
       success: function(data) {
+        self.isRunning(false);
         self.columns(data.columns);
         self.rows.push.apply(self.rows, data.results);
         self.resultsEmpty(self.rows().length == 0);
@@ -453,7 +460,7 @@ function BeeswaxViewModel(server, query_id) {
           $(document).trigger('saved.query', data);
         },
         error: function() {
-          $(document).trigger('error.query');
+          $(document).trigger('error_save.query');
         },
         data: data
       };
