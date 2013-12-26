@@ -795,7 +795,8 @@ from django.utils.translation import ugettext as _
           $("#hueBreadcrumbText").hide();
           $(".hueBreadcrumb").show();
           $("#editBreadcrumb").show();
-        }
+        },
+        smartTooltip: "${_('Did you know? You can use the tab key or CTRL + Space to autocomplete file and folder names')}"
       });
 
       $.ajaxSetup({
