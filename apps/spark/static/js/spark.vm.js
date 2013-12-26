@@ -228,6 +228,7 @@ function sparkViewModel() {
           $(document).trigger('execute.query', data);
           self.query.id(data.design);
           self.query.jobId(data.results.result.jobId);
+          window.location.hash = 'jobId=' + data.results.result.jobId;
           self.query.context(data.results.result.context);
           self.checkQueryStatus();
         } else {
