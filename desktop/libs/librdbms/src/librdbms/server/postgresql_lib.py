@@ -18,15 +18,12 @@
 import logging
 
 try:
-  try:
-    from pysqlite2 import dbapi2 as Database
-  except ImportError, e1:
-    from sqlite3 import dbapi2 as Database
-except ImportError, exc:
-  from django.core.exceptions import ImproperlyConfigured
-  raise ImproperlyConfigured("Error loading either pysqlite2 or sqlite3 modules (tried in that order): %s" % exc)
+    import psycopg2 as Database
+except ImportError, e:
+    from django.core.exceptions import ImproperlyConfigured
+    raise ImproperlyConfigured("Error loading psycopg2 module: %s" % e)
 
-from rdbms.server.rdbms_base_lib import BaseRDBMSDataTable, BaseRDBMSResult, BaseRDMSClient
+from librdbms.server.rdbms_base_lib import BaseRDBMSDataTable, BaseRDBMSResult, BaseRDMSClient
 
 
 LOG = logging.getLogger(__name__)
@@ -38,35 +35,38 @@ class DataTable(BaseRDBMSDataTable): pass
 class Result(BaseRDBMSResult): pass
 
 
-class SQLiteClient(BaseRDMSClient):
+class PostgreSQLClient(BaseRDMSClient):
   """Same API as Beeswax"""
 
   data_table_cls = DataTable
   result_cls = Result
 
   def __init__(self, *args, **kwargs):
-    super(SQLiteClient, self).__init__(*args, **kwargs)
+    super(PostgreSQLClient, self).__init__(*args, **kwargs)
     self.connection = Database.connect(**self._conn_params)
 
 
   @property
   def _conn_params(self):
     params = {
-      'database': self.query_server['name'],
-      'detect_types': Database.PARSE_DECLTYPES | Database.PARSE_COLNAMES,
+      'user': self.query_server['username'],
+      'password': self.query_server['password'],
+      'host': self.query_server['server_host'],
+      'port': self.query_server['server_port'] == 0 and 5432 or self.query_server['server_port'],
+      'database': self.query_server['name']
     }
 
     if self.query_server['options']:
       params.update(self.query_server['options'])
-
-    # Make sure connection is shareable.
-    params['check_same_thread'] = False
+      # handle transaction commits manually.
+      if 'autocommit' in params:
+        del params['autocommit']
 
     return params
 
 
   def use(self, database):
-    # Do nothing because SQLite has one database per path.
+    # No op since postgresql requires a new connection per database
     pass
 
 
@@ -88,13 +88,13 @@ class SQLiteClient(BaseRDMSClient):
   def get_tables(self, database, table_names=[]):
     # Doesn't use database and only retrieves tables for database currently in use.
     cursor = self.connection.cursor()
-    cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
+    cursor.execute("SELECT table_schema,table_name FROM information_schema.tables")
     self.connection.commit()
     return [row[0] for row in cursor.fetchall()]
 
 
   def get_columns(self, database, table):
     cursor = self.connection.cursor()
-    cursor.execute("PRAGMA table_info(%s)" % table)
+    cursor.execute("SHOW COLUMNS %s.%s" % (database, table))
     self.connection.commit()
-    return [row[1] for row in cursor.fetchall()]
+    return [row[0] for row in cursor.fetchall()]

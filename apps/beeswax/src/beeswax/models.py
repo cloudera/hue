@@ -28,6 +28,8 @@ from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
 from enum import Enum
 
+from librdbms.server import dbms as librdbms_dbms
+
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import Document
 
@@ -44,10 +46,6 @@ QUERY_SUBMISSION_TIMEOUT = datetime.timedelta(0, 60 * 60)               # 1 hour
 # Constants for DB fields, hue ini
 BEESWAX = 'beeswax'
 HIVE_SERVER2 = 'hiveserver2'
-MYSQL = 'mysql'
-POSTGRESQL = 'postgresql'
-SQLITE = 'sqlite'
-ORACLE = 'oracle'
 QUERY_TYPES = (HQL, IMPALA, RDBMS, SPARK) = range(4)
 
 
@@ -57,8 +55,8 @@ class QueryHistory(models.Model):
   """
   STATE = Enum('submitted', 'running', 'available', 'failed', 'expired')
   SERVER_TYPE = ((BEESWAX, 'Beeswax'), (HIVE_SERVER2, 'Hive Server 2'),
-                 (MYSQL, 'MySQL'), (POSTGRESQL, 'PostgreSQL'),
-                 (SQLITE, 'sqlite'), (ORACLE, 'oracle'))
+                 (librdbms_dbms.MYSQL, 'MySQL'), (librdbms_dbms.POSTGRESQL, 'PostgreSQL'),
+                 (librdbms_dbms.SQLITE, 'sqlite'), (librdbms_dbms.ORACLE, 'oracle'))
 
   owner = models.ForeignKey(User, db_index=True)
   query = models.TextField()

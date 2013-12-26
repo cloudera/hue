@@ -18,11 +18,16 @@
 import logging
 
 from desktop.lib.i18n import smart_str
-from beeswax.models import QueryHistory
-from rdbms.conf import RDBMS
+
+from librdbms.conf import DATABASES
 
 
 LOG = logging.getLogger(__name__)
+
+MYSQL = 'mysql'
+POSTGRESQL = 'postgresql'
+SQLITE = 'sqlite'
+ORACLE = 'oracle'
 
 
 def force_dict_to_strings(dictionary):
@@ -50,43 +55,43 @@ def get(user, query_server=None):
     query_server = get_query_server_config()
 
   if query_server['server_name'] == 'mysql':
-    from rdbms.server.mysql_lib import MySQLClient
+    from librdbms.server.mysql_lib import MySQLClient
 
-    return Rdbms(MySQLClient(query_server, user), QueryHistory.SERVER_TYPE[2][0])
+    return Rdbms(MySQLClient(query_server, user), MYSQL)
   elif query_server['server_name'] in ('postgresql', 'postgresql_psycopg2'):
-    from rdbms.server.postgresql_lib import PostgreSQLClient
+    from librdbms.server.postgresql_lib import PostgreSQLClient
 
-    return Rdbms(PostgreSQLClient(query_server, user), QueryHistory.SERVER_TYPE[2][0])
+    return Rdbms(PostgreSQLClient(query_server, user), POSTGRESQL)
   elif query_server['server_name'] in ('sqlite', 'sqlite3'):
-    from rdbms.server.sqlite_lib import SQLiteClient
+    from librdbms.server.sqlite_lib import SQLiteClient
 
-    return Rdbms(SQLiteClient(query_server, user), QueryHistory.SERVER_TYPE[2][0])
+    return Rdbms(SQLiteClient(query_server, user), SQLITE)
   elif query_server['server_name'] == 'oracle':
-    from rdbms.server.oracle_lib import OracleClient
+    from librdbms.server.oracle_lib import OracleClient
 
-    return Rdbms(OracleClient(query_server, user), QueryHistory.SERVER_TYPE[2][0])
+    return Rdbms(OracleClient(query_server, user), ORACLE)
 
 
 def get_query_server_config(server=None):
-  if not server or server not in RDBMS:
-    keys = RDBMS.keys()
+  if not server or server not in DATABASES:
+    keys = DATABASES.keys()
     name = keys and keys[0] or None
   else:
     name = server
 
   if name:
     query_server = {
-      'server_name': RDBMS[name].ENGINE.get().split('.')[-1],
-      'server_host': RDBMS[name].HOST.get(),
-      'server_port': RDBMS[name].PORT.get(),
-      'username': RDBMS[name].USER.get(),
-      'password': RDBMS[name].PASSWORD.get(),
-      'options': force_dict_to_strings(RDBMS[name].OPTIONS.get()),
+      'server_name': DATABASES[name].ENGINE.get().split('.')[-1],
+      'server_host': DATABASES[name].HOST.get(),
+      'server_port': DATABASES[name].PORT.get(),
+      'username': DATABASES[name].USER.get(),
+      'password': DATABASES[name].PASSWORD.get(),
+      'options': force_dict_to_strings(DATABASES[name].OPTIONS.get()),
       'alias': name
     }
 
-    if RDBMS[name].NAME.get():
-      query_server['name'] = RDBMS[name].NAME.get()
+    if DATABASES[name].NAME.get():
+      query_server['name'] = DATABASES[name].NAME.get()
   else:
     query_server = {}
 
@@ -113,6 +118,8 @@ class Rdbms(object):
     return self.client.get_columns(database, table_name)
 
   def execute_query(self, query, design):
+    from beeswax.models import QueryHistory
+
     sql_query = query.sql_query
     query_history = QueryHistory.build(
       owner=self.client.user,

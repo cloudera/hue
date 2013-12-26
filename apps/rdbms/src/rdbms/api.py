@@ -24,14 +24,15 @@ from django.utils.translation import ugettext as _
 
 from desktop.context_processors import get_app_name
 
+from librdbms import conf
+from librdbms.server import dbms
+from librdbms.design import SQLdesign
+
 from beeswax import models as beeswax_models
 from beeswax.forms import SaveForm
 from beeswax.views import authorized_get_history, safe_get_design
 
-from rdbms import conf
 from rdbms.forms import SQLForm
-from rdbms.design import SQLdesign
-from rdbms.server import dbms
 from rdbms.views import save_design
 
 
