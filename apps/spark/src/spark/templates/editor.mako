@@ -393,6 +393,10 @@ ${ common.createContextModal() }
     % if job_id:
       viewModel.openQuery("${ job_id }");
     % endif
+    var hash = window.location.hash;
+    if (hash != "" && hash.indexOf("=") > -1 && hash.split("=")[0] == '#jobId') {
+      viewModel.openQuery(hash.split("=")[1]);
+    }
     ko.applyBindings(viewModel);
   });
 
