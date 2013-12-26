@@ -25,11 +25,11 @@ from desktop.context_processors import get_app_name
 from desktop.models import Document
 from desktop.lib.django_util import render
 
+from librdbms import conf
+from librdbms.design import SQLdesign
+
 from beeswax import models as beeswax_models
 from beeswax.views import safe_get_design
-
-from rdbms import conf
-from rdbms.design import SQLdesign
 
 
 LOG = logging.getLogger(__name__)
@@ -48,7 +48,7 @@ Decorators
 """
 def ensure_configuration(view_func):
   def _decorator(*args, **kwargs):
-    if conf.RDBMS.get():
+    if conf.DATABASES.get():
       return view_func(*args, **kwargs)
     else:
       return configuration_error(*args, **kwargs)

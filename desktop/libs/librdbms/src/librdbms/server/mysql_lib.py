@@ -18,12 +18,21 @@
 import logging
 
 try:
-  import cx_Oracle as Database
+    import MySQLdb as Database
 except ImportError, e:
-  from django.core.exceptions import ImproperlyConfigured
-  raise ImproperlyConfigured("Error loading cx_Oracle module: %s" % e)
+    from django.core.exceptions import ImproperlyConfigured
+    raise ImproperlyConfigured("Error loading MySQLdb module: %s" % e)
 
-from rdbms.server.rdbms_base_lib import BaseRDBMSDataTable, BaseRDBMSResult, BaseRDMSClient
+# We want version (1, 2, 1, 'final', 2) or later. We can't just use
+# lexicographic ordering in this check because then (1, 2, 1, 'gamma')
+# inadvertently passes the version test.
+version = Database.version_info
+if (version < (1,2,1) or (version[:3] == (1, 2, 1) and
+        (len(version) < 5 or version[3] != 'final' or version[4] < 2))):
+    from django.core.exceptions import ImproperlyConfigured
+    raise ImproperlyConfigured("MySQLdb-1.2.1p2 or newer is required; you have %s" % Database.__version__)
+
+from librdbms.server.rdbms_base_lib import BaseRDBMSDataTable, BaseRDBMSResult, BaseRDMSClient
 
 
 LOG = logging.getLogger(__name__)
@@ -35,41 +44,42 @@ class DataTable(BaseRDBMSDataTable): pass
 class Result(BaseRDBMSResult): pass
 
 
-class OracleClient(BaseRDMSClient):
+class MySQLClient(BaseRDMSClient):
   """Same API as Beeswax"""
 
   data_table_cls = DataTable
   result_cls = Result
 
   def __init__(self, *args, **kwargs):
-    super(OracleClient, self).__init__(*args, **kwargs)
-    if self.__conn_params:
-      self.connection = Database.connect(self._conn_string, **self.__conn_params)
-    else:
-      self.connection = Database.connect(self._conn_string)
+    super(MySQLClient, self).__init__(*args, **kwargs)
+    self.connection = Database.connect(**self._conn_params)
+
 
   @property
   def _conn_params(self):
-    if self.query_server['options']:
-      return self.query_server['options'].copy()
-    else:
-      return None
+    params = {
+      'user': self.query_server['username'],
+      'passwd': self.query_server['password'],
+      'host': self.query_server['server_host'],
+      'port': self.query_server['server_port']
+    }
 
-  @property
-  def _conn_string(self):
-    if self.query_server['server_host']:
-      dsn = Database.makedsn(self.query_server['server_host'],
-                             int(self.query_server['server_port']),
-                             self.query_server['name'])
-    else:
-      dsn = self.query_server['name']
-    return "%s/%s@%s" % (self.query_server['username'],
-                         self.query_server['password'], dsn)
+    if self.query_server['options']:
+      params.update(self.query_server['options'])
+
+    if 'name' in self.query_server:
+      params['db'] = self.query_server['name']
+
+    return params
 
 
   def use(self, database):
-    # Oracle credentials are on a per database basis.
-    pass
+    if 'db' in self._conn_params and self._conn_params['db'] != database:
+      raise RuntimeError("Tried to use database %s when %s was specified." % (database, self._conn_params['db']))
+    else:
+      cursor = self.connection.cursor()
+      cursor.execute("USE %s" % database)
+      self.connection.commit()
 
 
   def execute_statement(self, statement):
@@ -84,18 +94,21 @@ class OracleClient(BaseRDMSClient):
 
 
   def get_databases(self):
-    return [self.query_server['name']]
+    cursor = self.connection.cursor()
+    cursor.execute("SHOW DATABASES")
+    self.connection.commit()
+    return [row[0] for row in cursor.fetchall()]
 
 
   def get_tables(self, database, table_names=[]):
     cursor = self.connection.cursor()
-    cursor.execute("SELECT table_name FROM all_tables")
+    cursor.execute("SHOW TABLES")
     self.connection.commit()
     return [row[0] for row in cursor.fetchall()]
 
 
   def get_columns(self, database, table):
     cursor = self.connection.cursor()
-    cursor.execute("SELECT column_name FROM user_tab_cols WHERE table_name = '%s'" % table)
+    cursor.execute("SHOW COLUMNS FROM %s.%s" % (database, table))
     self.connection.commit()
     return [row[0] for row in cursor.fetchall()]

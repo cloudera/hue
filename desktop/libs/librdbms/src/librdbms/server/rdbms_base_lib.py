@@ -17,13 +17,11 @@
 
 import logging
 
-from beeswax.server.dbms import DataTable
-
 
 LOG = logging.getLogger(__name__)
 
 
-class BaseRDBMSDataTable(DataTable):
+class BaseRDBMSDataTable(object):
   def __init__(self, cursor, columns, fetch_size=1000):
     self.cursor = cursor
     self.columns = columns

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -14,13 +14,23 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
 
-from autocomplete import autocomplete
-from connection import get_connections, create_connection, update_connection,\
-                       connection, connections, connection_clone, connection_delete
-from connector import get_connectors, connectors, connector
-from framework import framework
-from job import get_jobs, create_job, update_job,\
-                job, jobs, job_clone, job_delete,\
-                job_start, job_stop, job_status
-from submission import get_submissions, submissions
+
+ifeq ($(ROOT),)
+  $(error "Error: Expect the environment variable $$ROOT to point to the Desktop installation")
+endif
+
+include $(ROOT)/Makefile.sdk
+
+default::
+	@echo '  env-install    : Install into virtual-env'
+
+#
+# env-install
+#   Install app into the virtual environment.
+#
+.PHONY: env-install
+env-install: compile ext-env-install
+	@echo '--- Installing $(APP_NAME) into virtual-env'
+	@$(ENV_PYTHON) setup.py develop -N -q

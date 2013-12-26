@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -14,13 +13,3 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-from autocomplete import autocomplete
-from connection import get_connections, create_connection, update_connection,\
-                       connection, connections, connection_clone, connection_delete
-from connector import get_connectors, connectors, connector
-from framework import framework
-from job import get_jobs, create_job, update_job,\
-                job, jobs, job_clone, job_delete,\
-                job_start, job_stop, job_status
-from submission import get_submissions, submissions

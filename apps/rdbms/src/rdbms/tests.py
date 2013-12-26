@@ -24,8 +24,7 @@ from nose.tools import assert_true, assert_equal
 
 from desktop.lib.django_test_util import make_logged_in_client
 
-from rdbms import conf as rdbms_conf
-from rdbms.server import dbms
+from librdbms import conf as rdbms_conf, dbms
 
 
 class MockRdbms:
@@ -53,7 +52,7 @@ class TestMockedRdbms:
     assert_true('DB Query' in response.content, response.content)
 
   def test_config_error(self):
-    self.finish = rdbms_conf.RDBMS.set_for_testing({})
+    self.finish = rdbms_conf.DATABASES.set_for_testing({})
 
     response = self.client.get("/rdbms/")
     assert_true('There are currently no databases configured.' in response.content)
@@ -76,7 +75,7 @@ class TestSQLiteRdbmsBase(object):
 
   def setUp(self):
     self.client = make_logged_in_client()
-    self.finish = rdbms_conf.RDBMS.set_for_testing({
+    self.finish = rdbms_conf.DATABASES.set_for_testing({
       'sqlitee': {
         'name': self.database,
         'engine': 'sqlite'
@@ -132,7 +131,7 @@ class TestAPI(TestSQLiteRdbmsBase):
     assert_equal(1, len(response_dict['results']['rows']), response_dict)
 
   def test_options(self):
-    finish = rdbms_conf.RDBMS['sqlitee'].OPTIONS.set_for_testing({'nonsensical': None})
+    finish = rdbms_conf.DATABASES['sqlitee'].OPTIONS.set_for_testing({'nonsensical': None})
     try:
       self.client.get(reverse('rdbms:api_tables', args=['sqlitee', self.database]))
     except TypeError, e:
