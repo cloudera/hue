@@ -272,9 +272,9 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
       <div class="tab-pane" id="definition">
         <textarea id="definitionEditor">${ oozie_coordinator.definition.decode('utf-8', 'replace') }</textarea>
       </div>
-      
+
       % if oozie_coordinator.has_sla:
-      <div class="tab-pane" id="sla">          
+      <div class="tab-pane" id="sla">
       </div>
       % endif
     </div>

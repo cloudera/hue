@@ -32,7 +32,6 @@ from oozie.decorators import check_job_access_permission, check_job_edition_perm
 from oozie.utils import model_to_dict, format_dict_field_values, format_field_value
 
 
-
 LOG = logging.getLogger(__name__)
 
 

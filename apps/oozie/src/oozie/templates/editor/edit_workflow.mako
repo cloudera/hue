@@ -81,7 +81,7 @@ ${ layout.menubar(section='workflows') }
   <div class="span10">
     <div id="properties" class="section hide">
     <div class="card card-small">
-    
+
       <div class="alert alert-info"><h3 data-bind="text: name()"></h3></div>
       <div class="card-body">
         <p>
@@ -117,41 +117,14 @@ ${ layout.menubar(section='workflows') }
         </div>
 
       <div id="advanced-container" class="hide">
-
-        <div id="globalPropertiesEditord" class="control-group">
-          <label class="control-label">
-            ${ _('Global properites') }
-          </label>
-          <%
-          workflows.key_value_field(_("Global properties"), _("Global properties"), {
-          'name': 'data.global_properties',
-          'remove': '$root.removeGlobalProperty',
-          'add': '$root.addGlobalProperty',
-          })
-          %>
-        </div>
-
-        <div id="globalConfigEditord" class="control-group">
-          <label class="control-label">
-            ${ _('Global config') }
-          </label>
-          <%
-          workflows.key_value_field(_("Global config"), _("Global config"), {
-          'name': 'data.global_config',
-          'remove': '$root.removeGlobalConfig',
-          'add': '$root.addGlobalConfig',
-          })
-          %>
-        </div>
-      
         <div id="slaEditord" class="control-group">
           <label class="control-label">
             ${ _('SLA') }
           </label>
-          
+
           ${ utils.slaForm() }
-        </div>      
-      
+        </div>
+
         % if user_can_edit_job:
           ${ utils.render_field_with_error_js(workflow_form['deployment_dir'], workflow_form['deployment_dir'].name, extra_attrs={'data-bind': 'value: %s' % workflow_form['deployment_dir'].name}) }
         % endif
@@ -674,7 +647,9 @@ function save_workflow() {
   }
 }
 
-// Fetch all nodes from server.
+var OOZIE_CREDENTIALS = ${ credentials | n,unicode };
+
+// Fetch workflow properties from server.
 var workflow_model = new WorkflowModel({
   id: ${ workflow.id },
   name: "${ workflow.name }",
@@ -700,7 +675,7 @@ var import_jobsub_action = new ImportJobsubAction({workflow: workflow});
 var import_workflow_action = new ImportWorkflowAction({workflow: workflow});
 var modal = new Modal($('#node-modal'));
 
-// Load data.
+// Fetch nodes
 import_jobsub_action.fetchWorkflows({ success: import_jobsub_load_success });
 import_workflow_action.fetchWorkflows({ success: import_workflow_load_success });
 {

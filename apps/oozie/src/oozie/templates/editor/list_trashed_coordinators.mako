@@ -50,7 +50,7 @@ ${ layout.menubar(section='coordinators') }
        &nbsp;&nbsp;
        <a href="${ url('oozie:list_coordinators') }" id="home-btn" class="btn" title="${ _('Got to coordinator manager') }">
          <i class="fa fa-home"></i> ${ _('Back') }
-       </a>        
+       </a>
     </%def>
   </%actionbar:render>
 

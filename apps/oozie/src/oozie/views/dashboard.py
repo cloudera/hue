@@ -335,27 +335,27 @@ def list_oozie_sla(request):
     # filter=nominal_start=2013-06-18T00:01Z;nominal_end=2013-06-23T00:01Z;app_name=my-sla-app
     params = {}
     print request.POST
-    
+
     job_name = request.POST.get('job_name')
     if job_name.endswith('-oozie-oozi-W'):
       if 'isParent' in request.POST:
         params['parent_id'] = job_name
-      else:    
+      else:
         params['id'] = job_name
     else:
       params['app_name'] = job_name
-      
+
     if request.POST.get('start'):
       params['nominal_start'] = request.POST.get('start')
     if request.POST.get('end'):
       params['nominal_end'] = request.POST.get('end')
-      
+
     oozie_slas = api.get_oozie_slas(**params)
-    print oozie_slas  
-    
+    print oozie_slas
+
   else:
     oozie_slas = [] # or get latest?
-  
+
   columns = [
     'slaStatus',
     'id',
@@ -366,13 +366,13 @@ def list_oozie_sla(request):
     'expectedStart',
     'actualStart',
     'expectedEnd',
-    'actualEnd',                  
+    'actualEnd',
     'jobStatus',
     #'expectedDuration',
     #'actualDuration',
     'lastModified'
-  ]  
-  
+  ]
+
   if request.REQUEST.get('format') == 'json':
     massaged_slas = []
     for sla in oozie_slas:

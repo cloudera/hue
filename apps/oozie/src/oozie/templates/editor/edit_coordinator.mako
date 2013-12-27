@@ -764,9 +764,9 @@ ${ layout.menubar(section='coordinators') }
 
       $("a[rel='tooltip']").tooltip();
     });
-    
-    ${ utils.slaGlobal() } 
-   
+
+    ${ utils.slaGlobal() }
+
   </script>
 % endif
 

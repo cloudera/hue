@@ -46,7 +46,7 @@ ${ layout.menubar(section='workflows') }
               <form class="form-horizontal" id="workflowForm" action="${ url('oozie:create_workflow') }" method="POST">
               <fieldset>
               ${ utils.render_field(workflow_form['name']) }
-              ${ utils.render_field(workflow_form['description']) }              
+              ${ utils.render_field(workflow_form['description']) }
 
               <div class="control-group ">
                 <label class="control-label">

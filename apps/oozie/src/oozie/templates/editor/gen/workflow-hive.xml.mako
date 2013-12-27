@@ -17,7 +17,7 @@
 
 <%namespace name="common" file="workflow-common.xml.mako" />
 
-    <action name="${ node }"${ " cred='hive_credentials'" if mapping.get('is_kerberized_hive') else '' | n,unicode}>
+    <action name="${ node }"${ common.credentials(node.credentials) }>
         <hive xmlns="uri:oozie:hive-action:0.2">
             <job-tracker>${'${'}jobTracker}</job-tracker>
             <name-node>${'${'}nameNode}</name-node>

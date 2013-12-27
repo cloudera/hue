@@ -82,7 +82,7 @@ ${ layout.menubar(section='sla', dashboard=True) }
     </div>
 
     <div class="tab-pane" id="graphTab">
-      MY GRAPH      
+      MY GRAPH
     </div>
 
     </p>
@@ -116,7 +116,7 @@ ${ layout.menubar(section='sla', dashboard=True) }
           slaTable.fnClearTable();
           if (data['oozie_slas']) {
             slaTable.fnAddData(data['oozie_slas']); ## Should put a class on status, links to oozie job ids...
-          } 
+          }
         });
       }, 300);
     });

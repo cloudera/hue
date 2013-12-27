@@ -32,10 +32,9 @@ var DEFAULT_SLA = [
 ];
 
 function getDefaultData() {
- return {
-  'sla': DEFAULT_SLA.slice(0),
-  'global_properties': [],
-  'global_config': []
+  return {
+    'sla': DEFAULT_SLA.slice(0),
+    'credentials': []
   };
 }
 
@@ -389,22 +388,28 @@ var ModelModule = function($) {
   return module;
 };
 
-function initializeData() {
+function initializeWorkflowData() {
   var self = this;
 
   self.data = ($.type(self.data) == "string") ? $.parseJSON(self.data) : self.data;
 
-  if (!('sla' in self.data)) {
+  if (! ('sla' in self.data)) {
     self.data['sla'] = DEFAULT_SLA.slice(0);
   }
+}
 
-  if (!('global_properties' in self.data)) {
-    self.data['global_properties'] = [];
-  }
+function initializeNodeData() {
+  var self = this;
 
-  if (!('global_config' in self.data)) {
-    self.data['global_config'] = [];
+  self.data = ($.type(self.data) == "string") ? $.parseJSON(self.data) : self.data;
+
+  if (! ('sla' in self.data)) {
+    self.data['sla'] = DEFAULT_SLA.slice(0);
   }
+  
+  if (! ('credentials' in self.data)) {
+	self.data['credentials'] = getDefaultData()['credentials'].slice(0);
+  }  
 }
 
 var WorkflowModel = ModelModule($);
@@ -420,7 +425,7 @@ $.extend(WorkflowModel.prototype, {
   parameters: '[]',
   job_xml: '',
   data: getDefaultData(),
-  initialize: initializeData
+  initialize: initializeWorkflowData
 });
 
 var NodeModel = ModelModule($);
@@ -466,7 +471,7 @@ $.extend(DistCPModel.prototype, {
   params: '[]',
   child_links: [],
   data: getDefaultData(),
-  initialize: initializeData
+  initialize: initializeNodeData
 });
 
 var MapReduceModel = ModelModule($);
@@ -484,7 +489,7 @@ $.extend(MapReduceModel.prototype, {
   job_xml: '',
   child_links: [],
   data: getDefaultData(),
-  initialize: initializeData
+  initialize: initializeNodeData
 });
 
 var StreamingModel = ModelModule($);
@@ -501,7 +506,7 @@ $.extend(StreamingModel.prototype, {
   reducer: '',
   child_links: [],
   data: getDefaultData(),
-  initialize: initializeData
+  initialize: initializeNodeData
 });
 
 var JavaModel = ModelModule($);
@@ -523,7 +528,7 @@ $.extend(JavaModel.prototype, {
   capture_output: false,
   child_links: [],
   data: getDefaultData(),
-  initialize: initializeData
+  initialize: initializeNodeData
 });
 
 var PigModel = ModelModule($);
@@ -542,7 +547,7 @@ $.extend(PigModel.prototype, {
   script_path: '',
   child_links: [],
   data: getDefaultData(),
-  initialize: initializeData
+  initialize: initializeNodeData
 });
 
 var HiveModel = ModelModule($);
@@ -561,7 +566,7 @@ $.extend(HiveModel.prototype, {
   script_path: '',
   child_links: [],
   data: getDefaultData(),
-  initialize: initializeData
+  initialize: initializeNodeData
 });
 
 var SqoopModel = ModelModule($);
@@ -580,7 +585,7 @@ $.extend(SqoopModel.prototype, {
   script_path: '',
   child_links: [],
   data: getDefaultData(),
-  initialize: initializeData
+  initialize: initializeNodeData
 });
 
 var ShellModel = ModelModule($);
@@ -600,7 +605,7 @@ $.extend(ShellModel.prototype, {
   capture_output: false,
   child_links: [],
   data: getDefaultData(),
-  initialize: initializeData
+  initialize: initializeNodeData
 });
 
 var SshModel = ModelModule($);
@@ -617,7 +622,7 @@ $.extend(SshModel.prototype, {
   capture_output: false,
   child_links: [],
   data: getDefaultData(),
-  initialize: initializeData
+  initialize: initializeNodeData
 });
 
 var FsModel = ModelModule($);
@@ -634,7 +639,7 @@ $.extend(FsModel.prototype, {
   touchzs: '[]',
   child_links: [],
   data: getDefaultData(),
-  initialize: initializeData
+  initialize: initializeNodeData
 });
 
 var EmailModel = ModelModule($);
@@ -650,7 +655,7 @@ $.extend(EmailModel.prototype, {
   body: '',
   child_links: [],
   data: getDefaultData(),
-  initialize: initializeData
+  initialize: initializeNodeData
 });
 
 var SubWorkflowModel = ModelModule($);
@@ -665,7 +670,7 @@ $.extend(SubWorkflowModel.prototype, {
   job_properties: '[]',
   child_links: [],
   data: getDefaultData(),
-  initialize: initializeData
+  initialize: initializeNodeData
 });
 
 var GenericModel = ModelModule($);

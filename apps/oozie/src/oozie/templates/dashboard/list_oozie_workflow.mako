@@ -285,9 +285,9 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         <div class="tab-pane" id="definition">
           <textarea id="definitionEditor">${ oozie_workflow.definition.decode('utf-8', 'replace') }</textarea>
         </div>
-        
+
         % if oozie_workflow.has_sla:
-        <div class="tab-pane" id="sla">          
+        <div class="tab-pane" id="sla">
         </div>
         % endif
       </div>

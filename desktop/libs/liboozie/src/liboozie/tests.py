@@ -116,8 +116,6 @@ class TestSubmission():
 
   def setUp(self):
     self.c = make_logged_in_client(is_superuser=False)
-#    grant_access("test", "test", "oozie")
-#    add_to_group("test")
     self.user = User.objects.get(username='test')
 
   def test_get_external_parameters(self):

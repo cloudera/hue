@@ -35,6 +35,9 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_str
 from desktop.lib.rest.http_client import RestException
 from desktop.models import Document
+
+from liboozie.credentials import Credentials
+from liboozie.oozie_api import get_oozie
 from liboozie.submittion import Submission
 
 from filebrowser.lib.archives import archive_factory
@@ -78,7 +81,7 @@ def list_trashed_workflows(request):
 
 def list_coordinators(request, workflow_id=None):
   data = Document.objects.available(Coordinator, request.user)
-    
+
   if workflow_id is not None:
     data = [job for job in data if job.workflow.id == workflow_id]
 
@@ -211,7 +214,7 @@ def import_coordinator(request):
         else:
           Coordinator.objects.filter(id=coordinator.id).delete()
           raise PopupException(_('Archive should be a Zip.'))
-      
+
       Document.objects.link(coordinator, owner=request.user, name=coordinator.name, description=coordinator.description)
       request.info(_('Coordinator imported'))
       return redirect(reverse('oozie:edit_coordinator', kwargs={'coordinator': coordinator.id}))
@@ -245,6 +248,9 @@ def edit_workflow(request, workflow):
   workflow_form = WorkflowForm(instance=workflow)
   user_can_access_job = workflow.can_read(request.user)
   user_can_edit_job = workflow.is_editable(request.user)
+  api = get_oozie(request.user)
+  credentials = Credentials()
+  credentials.fetch(api)
 
   return render('editor/edit_workflow.mako', request, {
     'workflow_form': workflow_form,
@@ -257,7 +263,8 @@ def edit_workflow(request, workflow):
     'default_link_form': DefaultLinkForm(action=workflow.start),
     'node_form': NodeForm(),
     'action_forms': [(node_type, design_form_by_type(node_type, request.user, workflow)())
-                     for node_type in ACTION_TYPES.iterkeys()]
+                     for node_type in ACTION_TYPES.iterkeys()],
+    'credentials': json.dumps(credentials.credentials.keys())
   })
 
 
@@ -459,7 +466,7 @@ def edit_coordinator(request, coordinator):
     data_output_formset = DataOutputFormSet(request.POST, request.FILES, instance=coordinator)
     new_data_input_formset = NewDataInputFormSet(request.POST, request.FILES, instance=coordinator, prefix='input')
     new_data_output_formset = NewDataOutputFormSet(request.POST, request.FILES, instance=coordinator, prefix='output')
-    print request.POST
+
     if coordinator_form.is_valid() and dataset_formset.is_valid() and data_input_formset.is_valid() and data_output_formset.is_valid() \
         and new_data_input_formset.is_valid() and new_data_output_formset.is_valid():
       coordinator = coordinator_form.save()
@@ -468,7 +475,7 @@ def edit_coordinator(request, coordinator):
       data_output_formset.save()
       new_data_input_formset.save()
       new_data_output_formset.save()
-      
+
       coordinator.sla = json.loads(request.POST.get('sla'))
       coordinator.save()
 
