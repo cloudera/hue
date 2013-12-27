@@ -62,9 +62,6 @@ def model_to_dict(model):
   for field in model._meta.fields:
     try:
       attr = getattr(model, field.name, None)
-#      if field.name == 'data' and issubclass(type(model), Node):
-#        if hasattr(model, 'sla'):
-#          dictionary['sla'] = model.sla
       if isinstance(attr, models.Model):
         dictionary[field.name] = attr.id
       elif isinstance(attr, datetime):

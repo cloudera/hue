@@ -17,7 +17,7 @@
 
 <%namespace name="common" file="workflow-common.xml.mako" />
 
-    <action name="${ node }">
+    <action name="${ node }"${ common.credentials(node.credentials) }>
         <email xmlns="uri:oozie:email-action:0.1">
             <to>${ node.to }</to>
             % if node.cc:

@@ -132,6 +132,46 @@ var NodeModule = function($, IdGeneratorTable, NodeFields) {
       });
     }
 
+    if (self.data && self.data.credentials) {
+      self.credentials = ko.computed(function() {
+        return self.data.credentials();
+      });
+
+      // A bit complicated but just update the available credentials
+      var new_creds = OOZIE_CREDENTIALS.slice(0);
+      var old_creds = [];
+      var to_remove = [];
+
+      $.each(self.credentials(), function(index, credential) {
+        if (credential != null) {
+          if ($.inArray(credential.name(), OOZIE_CREDENTIALS) != -1) {
+            // A new credential was added to the Oozie server
+            new_creds = jQuery.grep(new_creds, function(value) {
+              return value != credential.name();
+            });
+          } else {
+           // A credential was removed from the Oozie server
+           to_remove.push(credential);
+          }
+        }
+      });
+
+      $.each(new_creds, function(index, name) {
+        var prop = { name: ko.observable(name), value: ko.observable(false) };
+        prop.name.subscribe(function(){
+          self.data.credentials.valueHasMutated();
+        });
+        prop.value.subscribe(function(){
+          self.data.credentials.valueHasMutated();
+        });
+        self.data.credentials.push(prop);
+      });
+
+      $.each(to_remove, function(index, name) {
+        self.data.credentials.remove(name);
+      });
+    }
+
     if ('files' in model) {
       //// WARNING: The following order should be preserved!
 
@@ -229,8 +269,6 @@ var NodeModule = function($, IdGeneratorTable, NodeFields) {
       var self = this;
 
       var options = {};
-
-      // data = $.extend(true, {}, self.model);
 
       var success = false;
       var request = $.extend({

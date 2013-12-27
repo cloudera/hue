@@ -186,6 +186,16 @@ class MockOozieApi:
   def get_oozie_slas(self, **kwargs):
     return MockOozieApi.WORKFLOWS_SLAS
 
+  def get_configuration(self):
+    oozie_credentialclasses = """
+           hbase=org.apache.oozie.action.hadoop.HbaseCredentials,
+           hcat=org.apache.oozie.action.hadoop.HCatCredentials,
+           hive2=org.apache.oozie.action.hadoop.Hive2Credentials
+    """
+    return {
+        'oozie.credentials.credentialclasses': oozie_credentialclasses
+    }
+
 
 class OozieMockBase(object):
 
@@ -1206,12 +1216,22 @@ class TestEditor(OozieMockBase):
       saved = beeswax.conf.HIVE_CONF_DIR
       beeswax.conf.HIVE_CONF_DIR = Getter()
 
+      action1 = Node.objects.get(workflow=self.wf, name='MyHive')
+      action1.credentials = [{'name': 'hcat', 'value': True}, {'name': 'hbase', 'value': False}]
+      action1.save()
+
       xml = self.wf.to_xml(mapping={
-         'is_kerberized_hive': True,
-         'credential_type': 'hcat',
-         'thrift_server': 'thrift://darkside-1234:9999',
-         'hive_principal': 'hive/darkside-1234@test.com'
-      })
+          'credentials': {
+              'hcat': {
+                  'xml_name': 'hcat',
+                  'properties': [
+                      ('hcat.metastore.uri', 'thrift://hue-koh-chang:9999'),
+                      ('hcat.metastore.principal', 'hive')
+                  ]
+              }
+          }
+        }
+      )
 
       assert_true("""
 <workflow-app name="wf-name-1" xmlns="uri:oozie:workflow:0.4">
@@ -1225,19 +1245,19 @@ class TestEditor(OozieMockBase):
             </configuration>
   </global>
   <credentials>
-    <credential name='hive_credentials' type='hcat'>
+    <credential name="hcat" type="hcat">
       <property>
         <name>hcat.metastore.uri</name>
-        <value>thrift://darkside-1234:9999</value>
+        <value>thrift://hue-koh-chang:9999</value>
       </property>
       <property>
         <name>hcat.metastore.principal</name>
-        <value>hive/darkside-1234@test.com</value>
+        <value>hive</value>
       </property>
     </credential>
-   </credentials>
+  </credentials>
     <start to="MyHive"/>
-    <action name="MyHive" cred='hive_credentials'>
+    <action name="MyHive" cred="hcat">
         <hive xmlns="uri:oozie:hive-action:0.2">
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
@@ -1422,7 +1442,8 @@ class TestEditor(OozieMockBase):
 """<coordinator-app name="MyCoord"
   frequency="${coord:days(1)}"
   start="2012-07-01T00:00Z" end="2012-07-04T00:00Z" timezone="America/Los_Angeles"
-  xmlns="uri:oozie:coordinator:0.2">
+  xmlns="uri:oozie:coordinator:0.2"
+  >
   <controls>
     <timeout>100</timeout>
     <concurrency>3</concurrency>
@@ -1500,7 +1521,8 @@ class TestEditor(OozieMockBase):
 """<coordinator-app name="MyCoord"
   frequency="${coord:days(1)}"
   start="2012-07-01T00:00Z" end="2012-07-04T00:00Z" timezone="America/Los_Angeles"
-  xmlns="uri:oozie:coordinator:0.2">
+  xmlns="uri:oozie:coordinator:0.2"
+  >
   <controls>
     <timeout>100</timeout>
     <concurrency>3</concurrency>

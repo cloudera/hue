@@ -15,7 +15,9 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 
-    <action name="${ node }">
+<%namespace name="common" file="workflow-common.xml.mako" />
+
+    <action name="${ node }"${ common.credentials(node.credentials) }>
         ${ node.xml | n,unicode }
         <ok to="${ node.get_oozie_child('ok') }"/>
         <error to="${ node.get_oozie_child('error') }"/>

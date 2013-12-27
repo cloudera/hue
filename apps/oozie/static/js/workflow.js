@@ -435,12 +435,7 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
     self.sla = ko.computed(function() {
       return self.data.sla();
     });
-    self.globalProperties = ko.computed(function() {
-      return self.data.globalProperties();
-    });
-    self.globalConfig = ko.computed(function() {
-      return self.data.globalConfig();
-    });
+
 
     self.url = ko.computed(function() {
       return '/oozie/workflows/' + self.id();
@@ -686,41 +681,6 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
     removeJobProperty: function(data, event) {
       var self = this;
       self.job_properties.remove(data);
-    },
-
-    addGlobalProperty: function(data, event) {
-      var self = this;
-      var prop = { name: ko.observable(""), value: ko.observable("") };
-      // force bubble up to containing observable array.
-      prop.name.subscribe(function(){
-        self.data.global_properties.valueHasMutated();
-      });
-      prop.value.subscribe(function(){
-        self.data.global_properties.valueHasMutated();
-      });
-      self.data.global_properties.push(prop);
-    },
-
-    removeGlobalProperty: function(data, event) {
-      var self = this;
-      self.data.global_properties.remove(data);
-    },
-
-    addGlobalConfig: function(data, event) {
-      var self = this;
-      var prop = { name: ko.observable(""), value: ko.observable("") };
-      // force bubble up to containing observable array.
-      prop.name.subscribe(function(){
-        self.data.global_config.valueHasMutated();
-      });
-      prop.value.subscribe(function(){
-        self.data.global_config.valueHasMutated();
-      });
-      self.data.global_config.push(prop);
-    },
-    removeGlobalConfig: function(data, event) {
-      var self = this;
-      self.data.global_config.remove(data);
     },
     
     // Workflow UI

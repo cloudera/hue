@@ -26,9 +26,9 @@ import re
 import socket
 
 from desktop.lib import security_util
+from hadoop import confparse
 
 import beeswax.conf
-from hadoop import confparse
 
 
 LOG = logging.getLogger(__name__)
@@ -44,6 +44,7 @@ _CNF_METASTORE_KERBEROS_PRINCIPAL = 'hive.metastore.kerberos.principal'
 _CNF_HIVESERVER2_KERBEROS_PRINCIPAL = 'hive.server2.authentication.kerberos.principal'
 _CNF_HIVESERVER2_AUTHENTICATION = 'hive.server2.authentication'
 _CNF_HIVESERVER2_IMPERSONATION = 'hive.server2.enable.doAs'
+
 
 # Host is whatever up to the colon. Allow and ignore a trailing slash.
 _THRIFT_URI_RE = re.compile("^thrift://([^:]+):(\d+)[/]?$")
@@ -117,6 +118,10 @@ def get_hiveserver2_authentication():
 
 def hiveserver2_impersonation_enabled():
   return get_conf().get(_CNF_HIVESERVER2_IMPERSONATION, 'FALSE').upper() == 'TRUE'
+
+def hiveserver2_jdbc_url():
+  return 'jdbc:hive2://%s:%s' % (beeswax.conf.HIVE_SERVER_HOST.get(), beeswax.conf.HIVE_SERVER_PORT.get())
+
 
 def _parse_hive_site():
   """

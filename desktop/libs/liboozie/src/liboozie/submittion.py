@@ -29,6 +29,7 @@ from hadoop.fs.hadoopfs import Hdfs
 from liboozie.oozie_api import get_oozie
 from liboozie.conf import REMOTE_DEPLOYMENT_DIR
 from jobsub.parameterization import find_variables
+from liboozie.credentials import Credentials
 
 LOG = logging.getLogger(__name__)
 
@@ -186,17 +187,11 @@ class Submission(object):
         self.job.HUE_ID: self.job.id
       })
 
-    # Even if no Hive action for now
-    from beeswax.hive_site import get_metastore
-    metastore = get_metastore()
-
-    if metastore and metastore.get('use_sasl') and False: # Disabled for now
-      self.properties.update({
-         'is_kerberized_hive': True,
-         'credential_type': 'hcat',
-         'thrift_server': metastore.get('thrift_uri'),
-         'hive_principal': metastore.get('kerberos_principal')
-      })
+    # Generate credentials when using security
+    if self.api.security_enabled:
+      credentials = Credentials()
+      credentials.fetch(self.api)
+      self.properties['credentials'] = credentials.get_properties()
 
   def _create_deployment_dir(self):
     """

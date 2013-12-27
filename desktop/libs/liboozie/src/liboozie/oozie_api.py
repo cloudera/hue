@@ -298,6 +298,6 @@ class OozieApi(object):
       nominal_end=2013-06-23T00:01Z
     """
     params = self._get_params()
-    params['filter'] = ';'.join(['%s=%s' % (key, val) for key, val in kwargs.iteritems()])    
+    params['filter'] = ';'.join(['%s=%s' % (key, val) for key, val in kwargs.iteritems()])
     resp = self._root.get('sla', params)
-    return resp['slaSummaryList'] 
+    return resp['slaSummaryList']

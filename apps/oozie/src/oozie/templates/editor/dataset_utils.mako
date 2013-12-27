@@ -14,6 +14,9 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 
+<%!
+  from django.utils.translation import ugettext as _
+%>
 
 ## How to use:
 ## <%include file="dataset_utils.mako"/>
@@ -23,33 +26,33 @@
 
 
 <div class="control-group">
-  <label class="control-label">Instance</label>
+  <label class="control-label">${ _('Instance') }</label>
   <div class="controls">
       <div class="btn-group" data-toggle="buttons-radio">
-          <button id="default-btn" type="button" class="btn" data-bind="click: setDefault, css: { active: instance_choice() == 'default' }">Default</button>
-          <button id="single-btn" type="button" class="btn" data-bind="click: setSingle, css: { active: instance_choice() == 'single' }">Single</button>
-          <button id="range-btn" type="button" class="btn" data-bind="click: setRange, css: { active: instance_choice() == 'range' }">Range</button>
+          <button id="default-btn" type="button" class="btn" data-bind="click: setDefault, css: { active: instance_choice() == 'default' }">${ _('Default') }</button>
+          <button id="single-btn" type="button" class="btn" data-bind="click: setSingle, css: { active: instance_choice() == 'single' }">${ _('Single') }</button>
+          <button id="range-btn" type="button" class="btn" data-bind="click: setRange, css: { active: instance_choice() == 'range' }">${ _('Range') }</button>
       </div>
       <span class="help-block">${ dataset_form['instance_choice'].help_text }</span>
 
       <div data-bind="visible: $.inArray(instance_choice(), ['single', 'range']) != -1">
-          <span class="span1">Start</span>
+          <span class="span1">${ _('Start') }</span>
           <input name="instance_start" type="number" data-bind="value: start_instance, enable: ! is_advanced_start_instance()"/>
           <label style="display: inline">
               &nbsp;
               <input type="checkbox" data-bind="checked: is_advanced_start_instance">
-              (advanced)
+              ${ _('(advanced)') }
           </label>
           <input type="text" data-bind="value: advanced_start_instance, visible: is_advanced_start_instance()" class="span4"/>
           <span class="help-block">${ dataset_form['advanced_start_instance'].help_text }</span>
       </div>
       <div data-bind="visible: instance_choice() == 'range'">
-          <span class="span1">End</span>
+          <span class="span1">${ _('End') }</span>
           <input name="instance_end" type="number" data-bind="value: end_instance, enable: ! is_advanced_end_instance()" />
           <label style="display: inline">
               &nbsp;
               <input type="checkbox" data-bind="checked: is_advanced_end_instance">
-              (advanced)
+              ${ _('(advanced)') }
           </label>
           <input type="text" data-bind="value: advanced_end_instance, visible: is_advanced_end_instance()" class="span4"/>
           <span class="help-block">${ dataset_form['advanced_end_instance'].help_text }</span>

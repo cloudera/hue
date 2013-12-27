@@ -5,25 +5,25 @@ from south.v2 import SchemaMigration
 from django.db import models
 
 class Migration(SchemaMigration):
-    
+
     def forwards(self, orm):
-        
+
         # Changing field 'Mapreduce.node_ptr'
         db.alter_column('oozie_mapreduce', 'node_ptr_id', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['oozie.Node'], unique=True, primary_key=True))
 
         # Changing field 'Start.node_ptr'
         db.alter_column('oozie_start', 'node_ptr_id', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['oozie.Node'], unique=True, primary_key=True))
-    
-    
+
+
     def backwards(self, orm):
-        
+
         # Changing field 'Mapreduce.node_ptr'
         db.alter_column('oozie_mapreduce', 'node_ptr_id', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['oozie.Node'], unique=True))
 
         # Changing field 'Start.node_ptr'
         db.alter_column('oozie_start', 'node_ptr_id', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['oozie.Node'], unique=True))
-    
-    
+
+
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},
@@ -322,5 +322,5 @@ class Migration(SchemaMigration):
             'start': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'start_workflow'", 'null': 'True', 'to': "orm['oozie.Start']"})
         }
     }
-    
+
     complete_apps = ['oozie']

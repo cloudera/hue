@@ -113,7 +113,7 @@ ${ layout.menubar(section='bundles') }
                       ${ _('UTC time only. (e.g. if you want 10pm PST (UTC+8) set it 8 hours later to 6am the next day.') }
                     </div>
                   </div>
-                </div>                
+                </div>
                 ${ bundle_form['parameters'] | n,unicode }
                 <div class="hide">
                   ${ utils.render_field_no_popover(bundle_form['is_shared']) }

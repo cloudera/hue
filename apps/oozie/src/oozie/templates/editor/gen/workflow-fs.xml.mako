@@ -21,7 +21,7 @@
 
 <%namespace name="common" file="workflow-common.xml.mako" />
 
-    <action name="${ node }">
+    <action name="${ node }"${ common.credentials(node.credentials) }>
         <fs>
             % for param in node.get_deletes():
               <delete path='${ smart_path(param['name'], mapping) }'/>

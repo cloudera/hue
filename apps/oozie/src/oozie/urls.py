@@ -100,6 +100,6 @@ urlpatterns += patterns(
   url(r'^submit_external_job/(?P<application_path>.+?)$', 'submit_external_job', name='submit_external_job'),
 
   url(r'^list_oozie_info/$', 'list_oozie_info', name='list_oozie_info'),
-  
+
   url(r'^list_oozie_sla/$', 'list_oozie_sla', name='list_oozie_sla'),
 )

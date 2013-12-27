@@ -5,25 +5,25 @@ from south.v2 import SchemaMigration
 from django.db import models
 
 class Migration(SchemaMigration):
-    
+
     def forwards(self, orm):
-        
+
         # Changing field 'Java.args'
         db.alter_column('oozie_java', 'args', self.gf('django.db.models.fields.TextField')(blank=True))
 
         # Adding field 'Job.is_trashed'
         db.add_column('oozie_job', 'is_trashed', self.gf('django.db.models.fields.BooleanField')(default=False, db_index=True, blank=True), keep_default=False)
-    
-    
+
+
     def backwards(self, orm):
-        
+
         # Changing field 'Java.args'
         db.alter_column('oozie_java', 'args', self.gf('django.db.models.fields.CharField')(max_length=4096, blank=True))
 
         # Deleting field 'Job.is_trashed'
         db.delete_column('oozie_job', 'is_trashed')
-    
-    
+
+
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},
@@ -322,5 +322,5 @@ class Migration(SchemaMigration):
             'start': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'start_workflow'", 'null': 'True', 'to': "orm['oozie.Start']"})
         }
     }
-    
+
     complete_apps = ['oozie']

@@ -17,7 +17,7 @@
 
 <%namespace name="common" file="workflow-common.xml.mako" />
 
-    <action name="${ node }">
+    <action name="${ node }"${ common.credentials(node.credentials) }>
         <shell xmlns="uri:oozie:shell-action:0.1">
             <job-tracker>${'${'}jobTracker}</job-tracker>
             <name-node>${'${'}nameNode}</name-node>
