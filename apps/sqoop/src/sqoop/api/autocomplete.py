@@ -35,12 +35,8 @@ def get_query_server_config_from_request(request):
     check_params['username'] = request.GET.get('username')
 
   for alias in librdbms_conf.DATABASES:
-    valid = True
     config = dbms.get_query_server_config(alias)
-    for param in check_params:
-      if config[param] != check_params[param]:
-        valid = False
-    if valid:
+    if all([check_params[param] == config[param] for param in check_params]):
       return config
 
   return None

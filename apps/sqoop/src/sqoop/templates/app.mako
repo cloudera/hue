@@ -779,10 +779,8 @@ $(document).on('changed.page', function(e, jobWizard) {
       switch (viewModel.connection().jdbcDriver()) {
         case 'com.mysql.jdbc.Driver':
         return autocomplete.tables('mysql', database);
-        break;
         case 'org.postgresql.Driver':
         return autocomplete.tables('postgresql', database);
-        break;
         case 'oracle.jdbc.OracleDriver':
         return autocomplete.tables('oracle', database);
       }
@@ -813,6 +811,47 @@ $(document).on('changed.page', function(e, jobWizard) {
     'source': columnsAutocomplete
   });
 });
+$(document).on('shown_section', (function(){
+  var connectionEditorShown = false;
+  return function(e, section) {
+    if (section == 'connection-editor' && !connectionEditorShown) {
+      connectionEditorShown = true;
+      $('input[name="connection.jdbcDriver"]').typeahead({
+        'source': [
+          'com.mysql.jdbc.Driver',
+          'org.postgresql.Driver',
+          'oracle.jdbc.OracleDriver'
+        ]
+      });
+      $('input[name="connection.connectionString"]').typeahead({
+        'source': function(query, process) {
+          var arr = [];
+          switch (viewModel.connection().jdbcDriver()) {
+            case 'com.mysql.jdbc.Driver':
+            arr = $.map(autocomplete.databases('mysql'), function(value, index) {
+              return 'jdbc:mysql://' + host + ':' + port + '/' + value;
+            });
+            arr.push('jdbc:mysql://[host]:[port]/[database]');
+            break;
+            case 'org.postgresql.Driver':
+            arr = $.map(autocomplete.databases('postgresql'), function(value, index) {
+              return 'jdbc:postgresql://' + host + ':' + port + '/' + value;
+            });
+            arr.push('jdbc:postgresql://[host]:[port]/[database]');
+            break;
+            case 'oracle.jdbc.OracleDriver':
+            arr = $.map(autocomplete.databases('oracle'), function(value, index) {
+              return 'jdbc:oracle:thin:' + host + '@:' + port + ':' + value;
+            });
+            arr.push('jdbc:oracle:thin:@[host]:[port]:[sid]');
+            break;
+          }
+          return arr;
+        }
+      });
+    }
+  };
+})());
 
 $(document).on('keyup', 'input#filter', function() {
   viewModel.filter($('#filter').val());
