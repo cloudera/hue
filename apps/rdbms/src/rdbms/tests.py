@@ -24,7 +24,8 @@ from nose.tools import assert_true, assert_equal
 
 from desktop.lib.django_test_util import make_logged_in_client
 
-from librdbms import conf as rdbms_conf, dbms
+from librdbms import conf as rdbms_conf
+from librdbms.server import dbms
 
 
 class MockRdbms:

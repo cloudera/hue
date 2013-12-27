@@ -15,6 +15,7 @@
 ## limitations under the License.
 <%!
   from desktop.views import commonheader, commonfooter
+  from django.template.defaultfilters import urlencode
   from django.utils.translation import ugettext as _
   from django.core.urlresolvers import reverse
 %>
@@ -243,16 +244,26 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
 <div data-bind="template: {'name': modal.name(), 'if': modal.name()}" id="modal-container" class="modal hide fade"></div>
 
 <div id="chooseFile" class="modal hide fade">
-    <div class="modal-header">
-        <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3>${_('Choose a folder')}</h3>
+  <div class="modal-header">
+    <a href="#" class="close" data-dismiss="modal">&times;</a>
+    <h3>${_('Choose a folder')}</h3>
+  </div>
+  <div class="modal-body">
+    <div id="filechooser"></div>
+  </div>
+  <div class="modal-footer"></div>
+</div>
+
+<div id="jHueHdfsAutocomplete" class="popover bottom" style="position:absolute;display:none;max-width:1000px;z-index:33000">
+  <div class="arrow"></div>
+  <div class="popover-inner">
+    <h3 class="popover-title"></h3>
+    <div class="popover-content">
+      <p>
+        <ul class="unstyled"></ul>
+      </p>
     </div>
-    <div class="modal-body">
-        <div id="filechooser">
-        </div>
-    </div>
-    <div class="modal-footer">
-    </div>
+  </div>
 </div>
 
 <script type="text/html" id="delete-job-modal">
@@ -598,6 +609,7 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
 <script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/bootstrap-editable.min.js"></script>
 <script src="/static/ext/js/knockout.x-editable.js"></script>
+<script src="/static/js/jquery.hdfsautocomplete.js" type="text/javascript" charset="utf-8"></script>
 <script src="/sqoop/static/js/cclass.js" type="text/javascript" charset="utf-8"></script>
 <script src="/sqoop/static/js/koify.js" type="text/javascript" charset="utf-8"></script>
 <script src="/sqoop/static/js/sqoop.autocomplete.js" type="text/javascript" charset="utf-8"></script>
@@ -773,7 +785,8 @@ $(document).on('show_section', function(e, section){
   viewModel.shownSection(section);
 });
 $(document).on('changed.page', function(e, jobWizard) {
-  $('input[name="table.tableName').typeahead({
+  // Autocomplete fields and table name
+  $('input[name="table.tableName"]').typeahead({
     'source': function(query, process) {
       var database = viewModel.connection().database();
       switch (viewModel.connection().jdbcDriver()) {
@@ -787,28 +800,29 @@ $(document).on('changed.page', function(e, jobWizard) {
       return [];
     }
   });
-  function columnsAutocomplete(query, process) {
-    var database = viewModel.connection().database();
-    if (viewModel.job()) {
-      var table = viewModel.job().table();
-      switch (viewModel.connection().jdbcDriver()) {
-        case 'com.mysql.jdbc.Driver':
-        return autocomplete.columns('mysql', database, table);
-        break;
-        case 'org.postgresql.Driver':
-        return autocomplete.columns('postgresql', database, table);
-        break;
-        case 'oracle.jdbc.OracleDriver':
-        return autocomplete.columns('oracle', database, table);
+  $('input[name="table.partitionColumn"],input[name="table.columns"]').typeahead({
+    'source': function(query, process) {
+      var database = viewModel.connection().database();
+      if (viewModel.job()) {
+        var table = viewModel.job().table();
+        switch (viewModel.connection().jdbcDriver()) {
+          case 'com.mysql.jdbc.Driver':
+          return autocomplete.columns('mysql', database, table);
+          break;
+          case 'org.postgresql.Driver':
+          return autocomplete.columns('postgresql', database, table);
+          break;
+          case 'oracle.jdbc.OracleDriver':
+          return autocomplete.columns('oracle', database, table);
+        }
+        return [];
       }
-      return [];
     }
-  }
-  $('input[name="table.columns"]').typeahead({
-    'source': columnsAutocomplete
   });
-  $('input[name="table.partitionColumn"]').typeahead({
-    'source': columnsAutocomplete
+  // Autocomplete HDFS paths
+  $('input[name="output.outputDirectory"],input[name="input.inputDirectory"]').jHueHdfsAutocomplete({
+    home: "/user/${ user }/",
+    smartTooltip: "${_('Did you know? You can use the tab key or CTRL + Space to autocomplete file and folder names')}"
   });
 });
 $(document).on('shown_section', (function(){
@@ -1213,6 +1227,7 @@ $(document).ready(function () {
     placement: 'right'
   });
 });
+
 </script>
 
 ${ commonfooter(messages) | n,unicode }
