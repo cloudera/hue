@@ -25,6 +25,16 @@ function sparkViewModel() {
   self.selectedContext = ko.observable(0);
   self.classPath = ko.observable('');
 
+  self.autoContext.forEditing = ko.computed({
+    read: function() {
+        return this.autoContext().toString();
+    },
+    write: function(newValue) {
+         this.autoContext(newValue === "true");
+    },
+    owner: this
+  });
+
   self.query = ko.mapping.fromJS({
     'id': -1,
     'jobId': null,
@@ -299,6 +309,8 @@ function sparkViewModel() {
 
   self.createContext = function() {
     var data = $("#createContextForm").serialize(); // Not koified
+    $("#createContextBtn").attr("data-loading-text", $("#createContextBtn").text() + " ...");
+    $("#createContextBtn").button("loading");
     var request = {
       url: '/spark/api/create_context',
       dataType: 'json',

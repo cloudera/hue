@@ -35,21 +35,17 @@ def is_selected(section, matcher):
             <li class="currentApp">
               <a href="/spark">
                 <img src="/spark/static/art/icon_spark_24.png" />
-                ${ _('Spark Editor') }
+                ${ _('Spark Igniter') }
               </a>
             </li>
-            <li class="${is_selected(section, 'editor')}"><a href="${ url('spark:editor') }">${_('Query Editor')}</a></li>
+            <li class="${is_selected(section, 'editor')}"><a href="${ url('spark:editor') }">${_('App Runner')}</a></li>
             ##<li class="${is_selected(section, 'my queries')}"><a href="${ url(app_name + ':my_queries') }">${_('My Queries')}</a></li>
-            <li class="${is_selected(section, 'queries')}"><a href="${ url('spark:list_designs') }">${_('Queries')}</a></li>
+            <li class="${is_selected(section, 'queries')}"><a href="${ url('spark:list_designs') }">${_('App Configurations')}</a></li>
             ##<li class="${is_selected(section, 'history')}"><a href="${ url('spark:list_query_history') }">${_('History')}</a></li>
-            <li class="currentApp">
-              <a href="/spark">
-                ${ _('Dashboard') }
-              </a>
-            </li>
-            <li class="${is_selected(section, 'jobs')}"><a href="${ url('spark:list_jobs') }">${_('Jobs')}</a></li>
+
+            <li class="${is_selected(section, 'jobs')}"><a href="${ url('spark:list_jobs') }">${_('Dashboard')}</a></li>
             <li class="${is_selected(section, 'contexts')}"><a href="${ url('spark:list_contexts') }">${_('Contexts')}</a></li>
-            <li class="${is_selected(section, 'applications')}"><a href="${ url('spark:list_applications') }">${_('Applications')}</a></li>
+            <li class="${is_selected(section, 'applications')}"><a href="${ url('spark:list_applications') }">${_('Uploaded Apps')}</a></li>
           </ul>
         </div>
       </div>
@@ -68,26 +64,26 @@ def is_selected(section, matcher):
       <div class="control-group">
         <label class="control-label">${ _("Name") }</label>
         <div class="controls">
-          <input type="text" name="name">
+          <input type="text" name="name" data-default="">
         </div>
       </div>
       <div class="control-group">
         <label class="control-label">${ _("Num cpu cores") }</label>
         <div class="controls">
-          <input type="text" name="num-cpu-cores"value="1">
+          <input type="text" name="num-cpu-cores" value="1" data-default="1">
         </div>
       </div>
       <div class="control-group">
         <label class="control-label">${ _("Memory per node") }</label>
         <div class="controls">
-          <input type="text" name="mem-per-node" value="512m">
+          <input type="text" name="mem-per-node" value="512m" data-default="512m">
         </div>
       </div>
     </form>
   </div>
   <div class="modal-footer">
     <button class="btn" data-dismiss="modal">${_('Cancel')}</button>
-    <button data-bind="click: createContext" class="btn btn-primary">${_('Create')}</button>
+    <button id="createContextBtn" data-bind="click: createContext" class="btn btn-primary disable-feedback">${_('Create')}</button>
   </div>
 </div>
 </%def>

@@ -71,41 +71,18 @@ ${ common.navbar('jobs') }
   </div>
 </div>
 
-<div id="deleteQuery" class="modal hide fade">
-  <form id="deleteQueryForm" action="${ url(app_name + ':delete_design') }" method="POST">
-    <input type="hidden" name="skipTrash" id="skipTrash" value="false"/>
-    <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3 id="deleteQueryMessage">${_('Confirm action')}</h3>
-    </div>
-    <div class="modal-footer">
-      <input type="button" class="btn" data-dismiss="modal" value="${_('Cancel')}" />
-      <input type="submit" class="btn btn-danger" value="${_('Yes')}"/>
-    </div>
-    <div class="hide">
-      <select name="designs_selection" data-bind="options: availableSavedQueries, selectedOptions: chosenSavedQueries" multiple="true"></select>
-    </div>
-  </form>
-</div>
-
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript" charset="utf-8">
   $(document).ready(function () {
-    var viewModel = {
-      availableSavedQueries : ko.observableArray(${ jobs_json | n,unicode }),
-      chosenSavedQueries : ko.observableArray([])
-    };
 
-    ko.applyBindings(viewModel);
-
-    var savedQueries = $(".datatables").dataTable({
+    var jobs = $(".datatables").dataTable({
       "sDom":"<'row'r>t<'row'<'span8'i><''p>>",
       "bPaginate":false,
       "bLengthChange":false,
       "bInfo":false,
       "aaSorting":[
-        [4, 'desc']
+        [4, "desc"]
       ],
       "aoColumns":[
         null,
@@ -123,7 +100,7 @@ ${ common.navbar('jobs') }
     });
 
     $("#filterInput").keyup(function () {
-      savedQueries.fnFilter($(this).val());
+      jobs.fnFilter($(this).val());
     });
 
     $("a[data-row-selector='true']").jHueRowSelector();

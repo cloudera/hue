@@ -219,7 +219,7 @@ ${layout.menubar(section='saved queries')}
       $("#deleteQueryMessage").text("${ _('Empty the trash?') }");
 
       viewModel.chosenSavedQueries.removeAll();
-      $.each(viewModel.availableSavedQueries(), function(index, query) {
+      $.each(viewModel.availableSavedContexts(), function(index, query) {
         viewModel.chosenSavedQueries.push(query);
       });
 

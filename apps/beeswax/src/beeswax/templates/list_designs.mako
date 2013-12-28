@@ -30,18 +30,29 @@ ${layout.menubar(section='saved queries')}
 
 <div class="container-fluid">
   <div class="card card-small">
-    <h1 class="card-heading simple">${_('Saved Queries')}</h1>
+    % if app_name == 'spark':
+      <h1 class="card-heading simple">${_('App Configurations')}</h1>
+    % else:
+      <h1 class="card-heading simple">${_('Saved Queries')}</h1>
+    % endif
 
+    <%
+      noun = "query"
+      pluralnoun = "queries"
+      if app_name == 'spark':
+        noun = "app"
+        pluralnoun = "apps"
+    %>
     <%actionbar:render>
       <%def name="search()">
-        <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for query')}">
+        <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for %s') % noun }">
       </%def>
 
       <%def name="actions()">
         <div class="btn-toolbar" style="display: inline; vertical-align: middle">
-          <button id="editBtn" class="btn toolbarBtn" title="${_('Edit the selected query')}" disabled="disabled"><i class="fa fa-edit"></i> ${_('Edit')}</button>
-          <button id="cloneBtn" class="btn toolbarBtn" title="${_('Copy the selected query')}" disabled="disabled"><i class="fa fa-files-o"></i> ${_('Copy')}</button>
-          <button id="historyBtn" class="btn toolbarBtn" title="${_('View the usage history of the selected query')}" disabled="disabled"><i class="fa fa-tasks"></i> ${_('Usage history')}</button>
+          <button id="editBtn" class="btn toolbarBtn" title="${_('Edit the selected %s' % noun)}" disabled="disabled"><i class="fa fa-edit"></i> ${_('Edit')}</button>
+          <button id="cloneBtn" class="btn toolbarBtn" title="${_('Copy the selected %s' % noun)}" disabled="disabled"><i class="fa fa-files-o"></i> ${_('Copy')}</button>
+          <button id="historyBtn" class="btn toolbarBtn" title="${_('View the usage history of the selected %s' % noun)}" disabled="disabled"><i class="fa fa-tasks"></i> ${_('Usage history')}</button>
 
           <div id="delete-dropdown" class="btn-group" style="vertical-align: middle">
             <button id="trashQueryBtn" class="btn toolbarBtn" disabled="disabled"><i class="fa fa-times"></i> ${_('Move to trash')}</button>
@@ -57,7 +68,7 @@ ${layout.menubar(section='saved queries')}
 
       <%def name="creation()">
         <div class="btn-toolbar" style="display: inline; vertical-align: middle">          
-          <a class="btn" href="${ url(app_name + ':execute_query') }" title="${_('Create new query')}"><i class="fa fa-plus-circle"></i> ${_('New query')}</a>
+          <a class="btn" href="${ url(app_name + ':execute_query') }" title="${_('Create new %s' % noun)}"><i class="fa fa-plus-circle"></i> ${_('New %s' % noun)}</a>
           <a class="btn" href="${ url(app_name + ':list_trashed_designs') }" title="${_('Go to the trash')}"><i class="fa fa-trash-o"></i> ${_('View trash')}</a>
         </div>
       </%def>
@@ -229,13 +240,13 @@ ${layout.menubar(section='saved queries')}
 
     $("#trashQueryBtn").click(function () {
       $("#skipTrash").val(false);
-      $("#deleteQueryMessage").text("${ _('Move the selected queries to the trash?') }");
+      $("#deleteQueryMessage").text("${ _('Move the selected %s to the trash?' % pluralnoun) }");
       deleteQueries();
     });
 
     $("#deleteQueryBtn").click(function () {
       $("#skipTrash").val(true);
-      $("#deleteQueryMessage").text("${ _('Delete the selected queries?') }");
+      $("#deleteQueryMessage").text("${ _('Delete the selected %s?' % pluralnoun) }");
       deleteQueries();
     });
 
