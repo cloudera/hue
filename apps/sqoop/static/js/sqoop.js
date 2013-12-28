@@ -139,6 +139,16 @@ var viewModel = new (function() {
       }
     });
   });
+  self.filteredConnections = ko.computed(function() {
+    var filter = self.filter().toLowerCase();
+    return ko.utils.arrayFilter(self.persistedConnections(), function (connection) {
+      if (connection.name()) {
+        return connection.name().toLowerCase().indexOf(filter) > -1 || connection.type().toLowerCase().indexOf(filter) > -1;
+      } else {
+        return false;
+      }
+    });
+  });
   self.selectedJobs = ko.computed(function() {
     return ko.utils.arrayFilter(self.jobs(), function (job) {
       return job.selected();
