@@ -409,12 +409,12 @@ class HiveServerClient:
     return HiveServerTable(table_results.results, table_schema.schema, desc_results.results, desc_schema.schema)
 
 
-  def execute_query(self, query, max_rows=100):
+  def execute_query(self, query, max_rows=5000):
     configuration = self._get_query_configuration(query)
     return self.execute_query_statement(statement=query.query['query'], max_rows=max_rows, configuration=configuration)
 
 
-  def execute_query_statement(self, statement, max_rows=100, configuration={}):
+  def execute_query_statement(self, statement, max_rows=5000, configuration={}):
     # Only execute_async_query() supports configuration
     if self.query_server['server_name'] == 'beeswax':
       self.execute_statement(statement='SET hive.server2.blocking.query=true')
@@ -441,7 +441,7 @@ class HiveServerClient:
     return self.execute_async_statement(statement=query_statement, confOverlay=configuration)
 
 
-  def execute_statement(self, statement, max_rows=100, configuration={}):
+  def execute_statement(self, statement, max_rows=5000, configuration={}):
     req = TExecuteStatementReq(statement=statement, confOverlay=configuration)
     res = self.call(self._client.ExecuteStatement, req)
 
@@ -459,7 +459,7 @@ class HiveServerClient:
                                  modified_row_count=res.operationHandle.modifiedRowCount)
 
 
-  def fetch_data(self, operation_handle, orientation=TFetchOrientation.FETCH_NEXT, max_rows=100):
+  def fetch_data(self, operation_handle, orientation=TFetchOrientation.FETCH_NEXT, max_rows=5000):
     # The client should check for hasMoreRows and fetch until the result is empty dues to a HS2 bug
     results, schema = self.fetch_result(operation_handle, orientation, max_rows)
     return HiveServerDataTable(results, schema)
@@ -482,7 +482,7 @@ class HiveServerClient:
     return self.fetch_result(res.operationHandle)
 
 
-  def fetch_result(self, operation_handle, orientation=TFetchOrientation.FETCH_NEXT, max_rows=100):
+  def fetch_result(self, operation_handle, orientation=TFetchOrientation.FETCH_NEXT, max_rows=5000):
     fetch_req = TFetchResultsReq(operationHandle=operation_handle, orientation=orientation, maxRows=max_rows)
     res = self.call(self._client.FetchResults, fetch_req)
 
@@ -617,7 +617,7 @@ class HiveServerClientCompatible:
   def fetch(self, handle, start_over=False, max_rows=None):
     operationHandle = handle.get_rpc_handle()
     if max_rows is None:
-      max_rows = 10000
+      max_rows = 5000
 
     # Impala does not support FETCH_FIRST
     if self.query_server['server_name'] == 'impala':
