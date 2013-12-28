@@ -17,7 +17,7 @@
   from desktop.views import commonheader, commonfooter
   from django.utils.translation import ugettext as _
 %>
-
+<%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="common" file="common.mako" />
 
 ${ commonheader(_('Applications'), app_name, user) | n,unicode }
@@ -28,9 +28,16 @@ ${ common.navbar('applications') }
   <div class="card card-small">
     <h1 class="card-heading simple">${_('Applications')}</h1>
 
-    <button type="button" class="btn uploadAppModalBtn">
-      <i class="fa fa-plus-circle"> ${ _('Upload app') }</i>
-    </button>
+    <%actionbar:render>
+      <%def name="search()">
+          <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for name')}">
+      </%def>
+      <%def name="creation()">
+         <button type="button" class="btn uploadAppModalBtn"><i class="fa fa-plus-circle"></i> ${ _('Upload app') }</button>
+      </%def>
+    </%actionbar:render>
+
+
 
     <table class="table table-condensed datatables">
     <thead>
@@ -57,23 +64,6 @@ ${ common.navbar('applications') }
   </div>
 </div>
 
-<div id="deleteQuery" class="modal hide fade">
-  <form id="deleteQueryForm" action="${ url(app_name + ':delete_design') }" method="POST">
-    <input type="hidden" name="skipTrash" id="skipTrash" value="false"/>
-    <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3 id="deleteQueryMessage">${_('Confirm action')}</h3>
-    </div>
-    <div class="modal-footer">
-      <input type="button" class="btn" data-dismiss="modal" value="${_('Cancel')}" />
-      <input type="submit" class="btn btn-danger" value="${_('Yes')}"/>
-    </div>
-    <div class="hide">
-      <select name="designs_selection" data-bind="options: availableSavedQueries, selectedOptions: chosenSavedQueries" multiple="true"></select>
-    </div>
-  </form>
-</div>
-
 
 ${ common.uploadAppModal() }
 
@@ -82,14 +72,8 @@ ${ common.uploadAppModal() }
 
 <script type="text/javascript" charset="utf-8">
   $(document).ready(function () {
-    var viewModel = {
-        availableSavedQueries : ko.observableArray(${ applications_json | n,unicode }),
-        chosenSavedQueries : ko.observableArray([])
-    };
 
-    ko.applyBindings(viewModel);
-
-    var savedQueries = $(".datatables").dataTable({
+    var apps = $(".datatables").dataTable({
       "sDom":"<'row'r>t<'row'<'span8'i><''p>>",
       "bPaginate": false,
       "bLengthChange": false,
@@ -109,14 +93,13 @@ ${ common.uploadAppModal() }
     });
 
     $("#filterInput").keyup(function () {
-      savedQueries.fnFilter($(this).val());
+      apps.fnFilter($(this).val());
     });
 
-    $('.uploadAppModalBtn').click(function(){
-      $('#uploadAppModal').modal('show');
+    $(".uploadAppModalBtn").on("click", function(){
+      $("#uploadAppModal").modal("show");
     });
 
-    $("a[data-row-selector='true']").jHueRowSelector();
   });
 </script>
 

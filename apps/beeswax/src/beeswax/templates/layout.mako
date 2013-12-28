@@ -38,21 +38,16 @@ def is_selected(section, matcher):
             <li class="currentApp">
               <a href="/spark">
                 <img src="/spark/static/art/icon_spark_24.png" />
-                ${ _('Spark Editor') }
+                ${ _('Spark Igniter') }
               </a>
             </li>
-            <li class="${is_selected(section, 'query')}"><a href="${ url('spark:editor') }">${_('Query Editor')}</a></li>
+            <li class="${is_selected(section, 'query')}"><a href="${ url('spark:editor') }">${_('App Runner')}</a></li>
             ##<li class="${is_selected(section, 'my queries')}"><a href="${ url(app_name + ':my_queries') }">${_('My Queries')}</a></li>
-            <li class="${is_selected(section, 'saved queries')}"><a href="${ url('spark:list_designs') }">${_('Queries')}</a></li>
+            <li class="${is_selected(section, 'saved queries')}"><a href="${ url('spark:list_designs') }">${_('App Configurations')}</a></li>
             ##<li class="${is_selected(section, 'history')}"><a href="${ url('spark:list_query_history') }">${_('History')}</a></li>
-            <li class="currentApp">
-              <a href="/spark">
-                ${ _('Dashboard') }
-              </a>
-            </li>
-            <li class="${is_selected(section, 'jobs')}"><a href="${ url('spark:list_jobs') }">${_('Jobs')}</a></li>
+            <li class="${is_selected(section, 'jobs')}"><a href="${ url('spark:list_jobs') }">${_('Dashboard')}</a></li>
             <li class="${is_selected(section, 'contexts')}"><a href="${ url('spark:list_contexts') }">${_('Contexts')}</a></li>
-            <li class="${is_selected(section, 'applications')}"><a href="${ url('spark:list_applications') }">${_('Applications')}</a></li>
+            <li class="${is_selected(section, 'applications')}"><a href="${ url('spark:list_applications') }">${_('Uploaded Apps')}</a></li>
           </ul>
         </div>
       </div>

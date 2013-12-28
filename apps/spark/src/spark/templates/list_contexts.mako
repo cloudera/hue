@@ -17,7 +17,7 @@
   from desktop.views import commonheader, commonfooter
   from django.utils.translation import ugettext as _
 %>
-
+<%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="common" file="common.mako" />
 
 ${ commonheader(_('Context'), app_name, user) | n,unicode }
@@ -28,12 +28,19 @@ ${ common.navbar('contexts') }
   <div class="card card-small">
     <h1 class="card-heading simple">${_('Contexts')}</h1>
 
-    <button type="button" class="btn createContextModalBtn">
-      <i class="fa fa-plus-circle"> ${ _('Create context') }</i>
-    </button>
-    <a href="#" id="deleteContextBtn" title="${_('Delete forever')}" class="btn">
-      <i class="fa fa-bolt"></i> ${ _('Delete') }
-    </a>
+    <%actionbar:render>
+      <%def name="search()">
+          <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for name')}">
+      </%def>
+      <%def name="actions()">
+        <button type="button" id="deleteContextBtn" title="${_('Delete forever')}" class="btn" disabled="disabled">
+          <i class="fa fa-bolt"></i> ${ _('Delete selected') }
+        </button>
+      </%def>
+      <%def name="creation()">
+         <button type="button" class="btn createContextModalBtn"><i class="fa fa-plus-circle"></i> ${ _('Create context') }</button>
+      </%def>
+    </%actionbar:render>
 
     <table class="table table-condensed datatables" id="contextTable">
     <thead>
@@ -49,8 +56,15 @@ ${ common.navbar('contexts') }
         <td data-name="${ contextz }">${ contextz }</td>
       </tr>
       % endfor
-
     </tbody>
+    <tfoot>
+      <tr class="hide">
+        <td colspan="2" style="text-align: center">
+          <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #DDD"></i><!--<![endif]-->
+          <!--[if IE]><img src="/static/art/spinner.gif"/><![endif]-->
+        </td>
+      </tr>
+    </tfoot>
   </table>
     <div class="card-body">
       <p>
@@ -72,7 +86,7 @@ ${ common.navbar('contexts') }
       <input type="submit" class="btn btn-danger" value="${_('Yes')}"/>
     </div>
     <div class="hide">
-      <select name="contexts_selection" data-bind="options: availableSavedQueries, selectedOptions: chosenSavedQueries" multiple="true"></select>
+      <select name="contexts_selection" data-bind="options: availableSavedContexts, selectedOptions: chosenSavedContexts" multiple="true"></select>
     </div>
   </form>
 </div>
@@ -90,41 +104,46 @@ ${ common.createContextModal() }
 
   $(document).ready(function() {
     var viewModel = {
-        availableSavedQueries : ko.observableArray(${ contexts_json | n,unicode }),
-        chosenSavedQueries : ko.observableArray([])
+        availableSavedContexts : ko.observableArray(${ contexts_json | n,unicode }),
+        chosenSavedContexts : ko.observableArray([])
     };
 
     ko.applyBindings(viewModel, $('#deleteContext')[0]);
 
-    //var sparkViewModel = new sparkViewModel();
-    //ko.applyBindings(sparkViewModel, $('#createContextModal')[0]);
+    var sViewModel = new sparkViewModel();
+    ko.applyBindings(sViewModel, $('#createContextModal')[0]);
 
-    var savedQueries = $(".datatables").dataTable({
-      "sDom":"<'row'r>t<'row'<'span8'i><''p>>",
-      "bPaginate":false,
-      "bLengthChange":false,
-      "bInfo":false,
-      "aaSorting":[
-        [2, 'desc']
-      ],
-      "aoColumns":[
-        null,
-        null
-      ],
-      "oLanguage":{
-        "sEmptyTable":"${_('No data available')}",
-        "sZeroRecords":"${_('No matching records')}",
-      },
-      "bStateSave": true
-    });
+    var savedContexts;
+    function createDataTable () {
+      savedContexts = $(".datatables").dataTable({
+        "sDom":"<'row'r>t<'row'<'span8'i><''p>>",
+        "bPaginate":false,
+        "bLengthChange":false,
+        "bInfo":false,
+        "aaSorting":[
+          [1, "desc"]
+        ],
+        "aoColumns":[
+          {"bSortable": false},
+          null
+        ],
+        "oLanguage":{
+          "sEmptyTable":"${_('No data available')}",
+          "sZeroRecords":"${_('No matching records')}",
+        },
+        "bDestroy": true
+      });
+    }
 
-    $("#filterInput").keyup(function () {
-      savedQueries.fnFilter($(this).val());
+    createDataTable();
+
+    $("#filterInput").on("keyup", function () {
+      savedContexts.fnFilter($(this).val());
     });
 
     $("a[data-row-selector='true']").jHueRowSelector();
 
-    $(".selectAll").click(function () {
+    $(".selectAll").on("click", function () {
       if ($(this).attr("checked")) {
         $(this).removeAttr("checked").removeClass("fa-check");
         $("." + $(this).data("selectables")).removeClass("fa-check").removeAttr("checked");
@@ -136,7 +155,7 @@ ${ common.createContextModal() }
       toggleActions();
     });
 
-    $(".savedCheck").click(function () {
+    $(document).on("click", ".savedCheck", function () {
       if ($(this).attr("checked")) {
         $(this).removeClass("fa-check").removeAttr("checked");
       }
@@ -171,29 +190,61 @@ ${ common.createContextModal() }
       if (selector.length >= 1) {
         $("#trashContextBtn").removeAttr("disabled");
         $("#trashContextCaretBtn").removeAttr("disabled");
+        $("#deleteContextBtn").removeAttr("disabled");
       }
     }
 
-    function deleteQueries() {
-      viewModel.chosenSavedQueries.removeAll();
+    function deleteContexts() {
+      viewModel.chosenSavedContexts.removeAll();
       $(".hueCheckbox[checked='checked']").each(function( index ) {
-        viewModel.chosenSavedQueries.push($(this).data("delete-name"));
+        viewModel.chosenSavedContexts.push($(this).data("delete-name"));
       });
 
       $("#deleteContext").modal("show");
     }
 
-    $("#deleteContextBtn").click(function () {
+    $("#deleteContextBtn").on("click", function () {
       $("#skipTrash").val(true);
-      $("#deleteContextMessage").text("${ _('Delete the selected queries?') }");
-      deleteQueries();
+      $("#deleteContextMessage").text("${ _('Delete the selected contexts?') }");
+      deleteContexts();
     });
 
-    $('.createContextModalBtn').click(function(){
-      $('#createContextModal').modal('show');
+    $(".createContextModalBtn").on("click", function(){
+      $("#createContextModal").modal("show");
     });
 
     $("a[data-row-selector='true']").jHueRowSelector();
+
+    $(document).on("created.context", function() {
+      $(".datatables tfoot tr").removeClass("hide");
+      $(".datatables tbody").empty();
+      savedContexts.fnClearTable();
+      $.getJSON("${ url('spark:list_contexts')}", function(data){
+        viewModel.availableSavedContexts(data.contexts);
+        var _h  = "";
+        $(data.contexts).each(function(cnt, ctx){
+          _h += getContextRow(ctx);
+        });
+        $(".datatables").find("tbody").html(_h);
+        createDataTable();
+      });
+      $("#createContextModal").modal("hide");
+      $("#createContextBtn").button("reset");
+      $("input[data-default]").each(function(){
+        $(this).val($(this).data("default"));
+      });
+      $(".datatables tfoot tr").addClass("hide");
+    });
+
+    function getContextRow(context) {
+      return '<tr>' +
+        '<td data-row-selector-exclude="true">' +
+        '<div class="hueCheckbox savedCheck fa" data-delete-name="'+context+'" data-row-selector-exclude="true"></div>' +
+        '</td>' +
+        '<td data-name="'+context+'">'+context+'</td>' +
+      '</tr>';
+    }
+
   });
 </script>
 
