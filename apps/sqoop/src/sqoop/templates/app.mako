@@ -15,7 +15,6 @@
 ## limitations under the License.
 <%!
   from desktop.views import commonheader, commonfooter
-  from django.template.defaultfilters import urlencode
   from django.utils.translation import ugettext as _
   from django.core.urlresolvers import reverse
 %>
@@ -28,8 +27,22 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
     <div style="margin-top: 4px; margin-right: 40px" class="pull-right">
       <a title="${_('Create a new job')}" href="#job/new" data-bind="visible: isReady"><i class="fa fa-plus-circle"></i> ${_('New job')}</a>
     </div>
+    <div style="margin-top: 4px; margin-right: 40px" class="pull-right">
+      <a title="${_('Manage connections')}" href="#connections" data-bind="visible: isReady"><i class="fa fa-list"></i> ${_('Manage connections')}</a>
+    </div>
     <h4>${_('Sqoop Jobs')}</h4>
     <input id="filter" type="text" class="input-xlarge search-query" placeholder="${_('Search for job name or content')}"  data-bind="visible: isReady">
+  </div>
+
+  <div class="top-bar" data-bind="visible:shownSection() == 'connections-list'">
+    <div style="margin-top: 4px; margin-right: 40px" class="pull-right">
+      <a title="${_('Create a new connection')}" href="#connection/new" data-bind="visible: isReady"><i class="fa fa-plus-circle"></i> ${_('New connection')}</a>
+    </div>
+    <div style="margin-top: 4px; margin-right: 40px" class="pull-right">
+      <a title="${_('Manage jobs')}" href="#jobs" data-bind="visible: isReady"><i class="fa fa-list"></i> ${_('Manage jobs')}</a>
+    </div>
+    <h4>${_('Sqoop Connections')}</h4>
+    <input id="filter" type="text" class="input-xlarge search-query" placeholder="${_('Search for connection name or content')}"  data-bind="visible: isReady">
   </div>
 
   <!-- ko if: job -->
@@ -71,7 +84,7 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
   <div id="jobs" class="row-fluid mainSection hide">
     <div id="jobs-list" class="row-fluid section hide">
       <div class="row-fluid" data-bind="if: isReady">
-        <ul class="major-list" data-bind="foreach: filteredJobs() ? filteredJobs() : []">
+        <ul class="major-list" data-bind="foreach: filteredJobs">
           <!-- ko if: submission -->
           <li data-bind="routie: 'job/edit/' + id()" title="${ _('Click to edit') }">
             <div class="pull-right">
@@ -204,6 +217,25 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
           </div>
       </div>
     </div>
+  </div>
+
+  <div id="connections" class="row-fluid mainSection hide">
+    <div id="connections-list" class="row-fluid section hide">
+      <div class="row-fluid" data-bind="if: isReady">
+        <ul class="major-list" data-bind="foreach: filteredConnections">
+          <li data-bind="routie: 'connection/edit/' + id()" title="${ _('Click to edit') }">
+            <div class="main" data-bind="template: {name: 'connection-list-item'}"></div>
+          </li>
+        </ul>
+        <div class="card" data-bind="visible: filteredConnections().length == 0">
+          <div class="span10 offset1 center nojobs">
+            <a href="#connection/new" class="nounderline"><i class="fa fa-plus-circle waiting"></i></a>
+            <h1 class="emptyMessage">${ _('There are currently no connections.') }<br/><a href="#connection/new">${ _('Click here to add one.') }</a></h1>
+          </div>
+          <div class="clearfix"></div>
+        </div>
+      </div>
+    </div>
 
     <div id="connection-editor" class="row-fluid section hide" data-bind="with: editConnection">
       <div id="connection-forms" class="span12">
@@ -232,7 +264,7 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
             </div>
           </fieldset>
           <div class="form-actions">
-            <a href="#connection/edit-cancel" class="btn">${_('Cancel and return to job')}</a>
+            <a href="#connection/edit-cancel" class="btn">${_('Cancel')}</a>
             <a href="#connection/save" class="btn btn-primary">${_('Save')}</a>
           </div>
         </form>
@@ -276,6 +308,17 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
   <a class="btn" href="javascript:void(0);" data-dismiss="modal">${_('No')}</a>
   <a data-bind="routie: {'url': 'connection/delete/' + $root.connection().id(), 'bubble': true}" data-dismiss="modal" class="btn btn-danger" href="javascript:void(0);">${_('Yes, delete it')}</a>
 </div>
+</script>
+
+<script type="text/html" id="connection-list-item">
+<h4 style="display: inline-block">
+  <i class="fa fa-cog"></i>&nbsp;
+  <span data-bind="text: name" class="muted"></span>
+  &nbsp;&nbsp;
+  <span data-bind="text: type"></span>
+  <span>${_("server at ")}</span>
+  <span data-bind="text: hostAndPort"></span>
+</h4>
 </script>
 
 <script type="text/html" id="job-list-item">
@@ -1147,18 +1190,21 @@ $(document).ready(function () {
       viewModel.chooseJobById(id);
       routie('job/delete');
     },
+    "connections": function() {
+      showSection("connections", "connections-list");
+    },
     "connection/edit": function() {
-      if (viewModel.connection()) {
-        routie('')
-      }
-      showSection("jobs", "connection-editor");
+      // if (viewModel.connection()) {
+      //   routie('')
+      // }
+      showSection("connections", "connection-editor");
       $("*[rel=tooltip]").tooltip({
         placement: 'right'
       });
     },
     "connection/edit/:id": function(id) {
       viewModel.chooseConnectionById(id);
-      showSection("jobs", "connection-editor");
+      showSection("connections", "connection-editor");
       $("*[rel=tooltip]").tooltip({
         placement: 'right'
       });
@@ -1167,10 +1213,12 @@ $(document).ready(function () {
       if (!viewModel.connection().persisted()) {
         viewModel.connections.pop();
       }
-      routie('job/edit');
+      // routie('job/edit');
+      window.history.go(-2);
     },
     "connection/new": function() {
       viewModel.newConnection();
+      window.history.back();
       routie('connection/edit');
     },
     "connection/save": function() {

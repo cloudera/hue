@@ -82,13 +82,13 @@ var connections = (function($) {
         var pattern = null;
         switch (self.jdbcDriver()) {
           case 'com.mysql.jdbc.Driver':
-          pattern = /jdbc:mysql:\/\/([^\:\/]+?).*/;
+          pattern = /jdbc:mysql:\/\/([^\:\/]+).*/;
           break;
           case 'org.postgresql.Driver':
-          pattern = /jdbc:postgresql:\/\/([^\:\/]+?).*/;
+          pattern = /jdbc:postgresql:\/\/([^\:\/]+).*/;
           break;
           case 'oracle.jdbc.OracleDriver':
-          pattern = /jdbc:oracle:thin:@([^\:\/]+?).*/;
+          pattern = /jdbc:oracle:thin:@([^\:\/]+).*/;
           break;
         }
         if (pattern) {
@@ -104,22 +104,33 @@ var connections = (function($) {
         var pattern = null;
         switch (self.jdbcDriver()) {
           case 'com.mysql.jdbc.Driver':
-          pattern = /jdbc:mysql:\/\/([^\:\/]+?):(\d+)\/.*/;
+          pattern = /jdbc:mysql:\/\/[^\:\/]+:(\d+)\/.*/;
           break;
           case 'org.postgresql.Driver':
-          pattern = /jdbc:postgresql:\/\/([^\:\/]+?):(\d+)\/.*/;
+          pattern = /jdbc:postgresql:\/\/[^\:\/]+:(\d+)\/.*/;
           break;
           case 'oracle.jdbc.OracleDriver':
-          pattern = /jdbc:oracle:thin:@([^\:\/]+?):(\d+):.*/;
+          pattern = /jdbc:oracle:thin:@[^\:\/]+:(\d+):.*/;
           break;
         }
         if (pattern) {
           var res = self.connectionString().match(pattern);
           if (res) {
-            return res[2];
+            return res[1];
           } else {
             return null;
           }
+        }
+      });
+      self.hostAndPort = ko.computed(function() {
+        if (self.host()) {
+          if (self.port()) {
+            return self.host() + ":" + self.port();
+          } else {
+            return self.host();
+          }
+        } else {
+          return null;
         }
       });
       self.database = ko.computed(function() {
@@ -169,6 +180,19 @@ var connections = (function($) {
           }
         });
         return password;
+      });
+      self.type = ko.computed(function() {
+        var conn_string = self.connectionString();
+        if (!conn_string) {
+          return "unknown";
+        }
+
+        var parts = conn_string.split(':');
+        if (parts.length < 2) {
+          return "unknown";
+        }
+
+        return parts[1];
       });
     },
     'map': function() {
