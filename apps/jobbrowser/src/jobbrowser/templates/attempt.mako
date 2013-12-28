@@ -111,7 +111,7 @@ ${ comps.menubar() }
                 </tr>
                 <tr>
                   <td>${_('Progress')}</td>
-                  <td>${"%d" % (attempt.progress * 100)}%</td>
+                  <td>${"%d" % (attempt.progress)}%</td>
                 </tr>
                 <tr>
                   <td>${_('Task Tracker')}</td>
