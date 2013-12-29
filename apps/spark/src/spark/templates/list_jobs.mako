@@ -48,7 +48,7 @@ ${ common.navbar('jobs') }
               can_view = job.get('status') == 'FINISHED'
             %>
             % if can_view:
-              <a href="${ url('spark:view_job', job.get('jobId')) }" data-row-selector="true">
+              <a href="${ url('spark:view_job', job.get('jobId')) }" data-row-selector="true" title="${ _('Click to open') }">
             % endif
             ${ job.get('jobId') }
             % if can_view:

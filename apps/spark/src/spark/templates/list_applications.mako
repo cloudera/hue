@@ -47,12 +47,16 @@ ${ common.navbar('applications') }
       </tr>
     </thead>
     <tbody>
-      % for name, ts in applications.iteritems():
+    % for name, ts in applications.iteritems():
       <tr>
-        <td>${ name }</td>
+        <td>
+          <a href="${ url('spark:editor') }#applicationId=${ name }" data-row-selector="true" title="${ _('Click to open and execute') }">
+            ${ name }
+          </a>
+        </td>
         <td>${ ts }</td>
       </tr>
-      % endfor
+    % endfor
 
     </tbody>
   </table>
@@ -100,6 +104,7 @@ ${ common.uploadAppModal() }
       $("#uploadAppModal").modal("show");
     });
 
+    $("a[data-row-selector='true']").jHueRowSelector();
   });
 </script>
 

@@ -108,7 +108,7 @@ class SparkDesign(object):
     if 'context' not in dic['query']:
       dic['query']['context'] = ''
     if 'params' not in dic['query']:
-      dic['query']['params'] = ''
+      dic['query']['params'] = json.dumps([])
 
     design = SparkDesign()
     design._data_dict = dic
