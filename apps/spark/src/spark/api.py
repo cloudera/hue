@@ -31,6 +31,7 @@ from spark.job_server_api import get_api
 from spark.forms import SparkForm, QueryForm
 from desktop.lib.i18n import smart_str
 from spark.design import SparkDesign
+from desktop.lib.rest.http_client import RestException
 
 
 LOG = logging.getLogger(__name__)
@@ -80,11 +81,12 @@ def create_context(request):
   api = get_api(request.user)
   try:
     response = api.create_context(name, memPerNode=memPerNode, numCores=numCores)
+  except ValueError:
+    # No json is returned
+    response = {'status': 'OK'}
   except Exception, e:
-    if e.message != 'No JSON object could be decoded':
-      response = json.loads(e.message)
-    else:
-      response = {'status': 'OK'}
+    response = json.loads(e.message)
+
   response['name'] = name
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
@@ -113,10 +115,11 @@ def delete_context(request):
 
 def job(request, job_id):
   api = get_api(request.user)
-
-  response = {
-    'results': api.job(job_id)
-  }
+  response = {}
+  try:
+    response['results'] = api.job(job_id)
+  except RestException, e:
+    response['results'] = json.loads(e.message)
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
