@@ -254,18 +254,6 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
   <div class="modal-footer"></div>
 </div>
 
-<div id="jHueHdfsAutocomplete" class="popover bottom" style="position:absolute;display:none;max-width:1000px;z-index:33000">
-  <div class="arrow"></div>
-  <div class="popover-inner">
-    <h3 class="popover-title"></h3>
-    <div class="popover-content">
-      <p>
-        <ul class="unstyled"></ul>
-      </p>
-    </div>
-  </div>
-</div>
-
 <script type="text/html" id="delete-job-modal">
 <div class="modal-header">
   <a href="javascript:void(0);" class="close" data-dismiss="modal">&times;</a>

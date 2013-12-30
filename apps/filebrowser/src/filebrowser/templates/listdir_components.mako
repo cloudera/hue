@@ -504,18 +504,6 @@ from django.utils.translation import ugettext as _
 
     <div id="submit-wf-modal" class="modal hide"></div>
 
-    <div id="jHueHdfsAutocomplete" class="popover bottom" style="position:absolute;display:none;max-width:1000px;z-index:33000">
-      <div class="arrow"></div>
-      <div class="popover-inner">
-        <h3 class="popover-title"></h3>
-        <div class="popover-content">
-          <p>
-            <ul class="unstyled"></ul>
-          </p>
-        </div>
-      </div>
-    </div>
-
     <script type="text/javascript" charset="utf-8">
     // ajax modal windows
     function openChownWindow(path, user, group, next) {
