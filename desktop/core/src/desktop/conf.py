@@ -259,6 +259,12 @@ SESSION = ConfigSection(
       help=_("The cookie containing the users' session ID will use the HTTP only flag."),
       type=coerce_bool,
       default=False
+    ),
+    EXPIRE_AT_BROWSER_CLOSE=Config(
+      key='expire_at_browser_close',
+      help=_("Use session-length cookies. Logs out the user when she closes the browser window."),
+      type=coerce_bool,
+      default=False
     )
   )
 )
