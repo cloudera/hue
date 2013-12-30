@@ -32,6 +32,8 @@ if (version < (1,2,1) or (version[:3] == (1, 2, 1) and
     from django.core.exceptions import ImproperlyConfigured
     raise ImproperlyConfigured("MySQLdb-1.2.1p2 or newer is required; you have %s" % Database.__version__)
 
+from django.utils.translation import ugettext as _
+
 from librdbms.server.rdbms_base_lib import BaseRDBMSDataTable, BaseRDBMSResult, BaseRDMSClient
 
 
@@ -75,7 +77,7 @@ class MySQLClient(BaseRDMSClient):
 
   def use(self, database):
     if 'db' in self._conn_params and self._conn_params['db'] != database:
-      raise RuntimeError("Tried to use database %s when %s was specified." % (database, self._conn_params['db']))
+      raise RuntimeError(_("Database '%s' is not allowed. Please use database '%s'.") % (database, self._conn_params['db']))
     else:
       cursor = self.connection.cursor()
       cursor.execute("USE %s" % database)
@@ -97,7 +99,14 @@ class MySQLClient(BaseRDMSClient):
     cursor = self.connection.cursor()
     cursor.execute("SHOW DATABASES")
     self.connection.commit()
-    return [row[0] for row in cursor.fetchall()]
+    databases = [row[0] for row in cursor.fetchall()]
+    if 'db' in self._conn_params:
+      if self._conn_params['db'] in databases:
+        return [self._conn_params['db']]
+      else:
+        raise RuntimeError(_("Cannot locate the %s database. Are you sure your configuration is correct?") % self._conn_params['db'])
+    else:
+      return databases
 
 
   def get_tables(self, database, table_names=[]):
