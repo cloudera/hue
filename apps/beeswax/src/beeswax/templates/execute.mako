@@ -627,7 +627,7 @@ $(document).ready(function () {
       $(data.split(" ")).each(function (cnt, table) {
         if ($.trim(table) != "") {
           var _table = $("<li>");
-          _table.html("<a href='/metastore/table/" + viewModel.database() + "/" + table + "' target='_blank' class='pull-right'><i class='fa fa-eye' title='" + "${ _('View in Metastore Browser') }" + "' style='margin-left:5px'></i></a><a href='#' class='pull-right hide'><i class='fa fa-list' title='" + "${ _('Preview Sample data') }" + "'></i></a><a href='#' title='" + table + "'><i class='fa fa-table'></i> " + table + "</a><ul class='unstyled'></ul>");
+          _table.html("<a href='#' class='pull-right'><i class='fa fa-list' title='" + "${ _('Preview Sample data') }" + "' style='margin-left:5px'></i></a><a href='/metastore/table/" + viewModel.database() + "/" + table + "' target='_blank' class='pull-right hide'><i class='fa fa-eye' title='" + "${ _('View in Metastore Browser') }" + "'></i></a><a href='#' title='" + table + "'><i class='fa fa-table'></i> " + table + "</a><ul class='unstyled'></ul>");
           _table.data("table", table).attr("id", "navigatorTables_" + table);
           _table.find("a:eq(2)").on("click", function () {
             _table.find(".fa-table").removeClass("fa-table").addClass("fa-spin").addClass("fa-spinner");
@@ -652,7 +652,7 @@ $(document).ready(function () {
             codeMirror.setSelection(codeMirror.getCursor());
             codeMirror.focus();
           });
-          _table.find("a:eq(1)").on("click", function () {
+          _table.find("a:eq(0)").on("click", function () {
             $("#navigatorQuicklook").find(".tableName").text(table);
             $("#navigatorQuicklook").find(".tableLink").attr("href", "/metastore/table/" + viewModel.database() + "/" + _table.data("table"));
             $("#navigatorQuicklook").find(".sample").empty("");
