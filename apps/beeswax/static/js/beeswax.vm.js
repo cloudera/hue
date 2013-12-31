@@ -64,12 +64,6 @@ function BeeswaxViewModel(server, query_id) {
 
   self.updateDatabases = function(databases) {
     self.databases(databases);
-
-    var key = 'hueBeeswaxLastDatabase-' + self.server();
-    var last = $.totalStorage(key) || ((databases.length > 0) ? databases[0] : null);
-    if (last) {
-      self.database(last);
-    }
   };
 
   self.updateQuery = function(design) {
