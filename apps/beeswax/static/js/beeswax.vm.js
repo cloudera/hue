@@ -174,11 +174,11 @@ function BeeswaxViewModel(server, query_id) {
     var index = 0;
     data[prefix + '-next_form_id'] = arr.length;
     ko.utils.arrayForEach(arr, function(obj) {
-      $.each(members, function(index, member) {
+      $.each(members, function(i, member) {
         data[prefix + '-' + index + '-' + member] = obj[member]();
       });
       data[prefix + '-' + index + '-_exists'] = true;
-      data[prefix + '-' + index + '-_deleted'] = false;
+      data[prefix + '-' + index++ + '-_deleted'] = false;
     });
     return data;
   }
