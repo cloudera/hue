@@ -340,6 +340,8 @@ Queries Views
 
 def execute_query(request, design_id=None):
   """
+  Deprecated except for testing I guess.
+
   View function for executing an arbitrary query.
   It understands the optional GET/POST params:
 
