@@ -1204,6 +1204,7 @@ function clickHard(el) {
 viewModel = new BeeswaxViewModel("${app_name}", ${design.id and design.id or -1});
 viewModel.fetchDatabases();
 if (viewModel.query.id() > 0) {
+  // Code mirror and ko.
   viewModel.query.query.subscribe((function () {
     // First call skipped to avoid reset of hueBeeswaxLastDatabase
     var counter = 0;
@@ -1215,6 +1216,10 @@ if (viewModel.query.id() > 0) {
   })());
   viewModel.fetchQuery();
 }
+viewModel.query.fileResources.subscribe(function() {
+  // File chooser button for file resources.
+  $(".pathChooser:not(:has(~ button))").after(getFileBrowseButton($(".pathChooser:not(:has(~ button))")));
+});
 ko.applyBindings(viewModel);
 
 // Server error handling.
@@ -1243,21 +1248,6 @@ $(document).ready(function () {
 
   // hack for select default rendered fields
   $("select").addClass("input-medium");
-
-  function getFileBrowseButton(inputElement) {
-    return $("<button>").addClass("btn").addClass("fileChooserBtn").text("..").click(function (e) {
-      e.preventDefault();
-      $("#filechooser").jHueFileChooser({
-        initialPath: inputElement.val(),
-        onFileChoose: function (filePath) {
-          inputElement.val(filePath);
-          $("#chooseFile").modal("hide");
-        },
-        createFolder: false
-      });
-      $("#chooseFile").modal("show");
-    })
-  }
 
   // Type ahead for settings.
   $.getJSON("${ url(app_name + ':configuration') }", function (data) {
