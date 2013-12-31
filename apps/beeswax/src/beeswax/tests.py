@@ -392,12 +392,14 @@ for x in sys.stdin:
     wait_for_query_to_finish(c, response)
 
     response = _make_query(c, "SELECT SUM(foo) FROM test_explain", submission_type="Explain")
-    assert_true(response.context["explanation"])
+    explanation = json.loads(response.content)['explanation']
+    assert_true('ABSTRACT SYNTAX TREE' in explanation, explanation)
 
   def test_explain_query_i18n(self):
     query = u"SELECT foo FROM test_utf8 WHERE bar='%s'" % (unichr(200),)
     response = _make_query(self.client, query, submission_type="Explain")
-    assert_true(response.context['explanation'])
+    explanation = json.loads(response.content)['explanation']
+    assert_true('ABSTRACT SYNTAX TREE' in explanation, explanation)
 
   def test_query_i18n(self):
     # Test fails because HIVE_PLAN cannot be found and raises FileNotFoundException

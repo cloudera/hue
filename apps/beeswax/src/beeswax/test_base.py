@@ -25,7 +25,9 @@ import subprocess
 import time
 
 from nose.tools import assert_true, assert_false
+from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
+
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.paths import get_run_root
@@ -254,7 +256,11 @@ def make_query(client, query, submission_type="Execute",
     parameters["file_resources-%d-_exists" % i] = 'True'
 
   kwargs.setdefault('follow', True)
-  response = client.post("/beeswax/execute/", parameters, **kwargs)
+
+  if submission_type == 'Explain':
+    response = client.post(reverse("beeswax:api_execute") + "?explain=true", parameters, **kwargs)
+  else:
+    response = client.post(reverse("beeswax:execute_query"), parameters, **kwargs)
 
   if wait:
     return wait_for_query_to_finish(client, response, max)
