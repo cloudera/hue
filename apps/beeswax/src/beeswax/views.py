@@ -427,7 +427,7 @@ def execute_query(request, design_id=None):
     'error_message': error_message,
     'form': form,
     'log': log,
-    'autocomplete_base_url': reverse(get_app_name(request) + ':api_autocomplete', kwargs={}),
+    'autocomplete_base_url': reverse(get_app_name(request) + ':api_autocomplete_databases', kwargs={}),
     'on_success_url': on_success_url,
     'can_edit_name': design.id and not design.is_auto,
   })
@@ -630,6 +630,8 @@ def view_results(request, id, first_row=0):
 
 def save_results(request, id):
   """
+  DEPRECATED. Need to get rid of watch_wait dependency first.
+
   Save the results of a query to an HDFS directory or Hive table.
   """
   query_history = authorized_get_history(request, id, must_exist=True)
@@ -714,8 +716,6 @@ def install_examples(request):
     response['message'] = _('A POST request is required.')
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
-
-
 
 
 @login_notrequired

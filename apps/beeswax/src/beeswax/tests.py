@@ -736,11 +736,10 @@ for x in sys.stdin:
     def save_and_verify(select_resp, target_dir, verify=True):
       qid = select_resp.context['query'].id
       save_data = {
-        'save_target': beeswax.forms.SaveResultsForm.SAVE_TYPE_DIR,
-        'target_dir': target_dir,
-        'save': True
+        'type': 'hdfs',
+        'path': target_dir
       }
-      resp = self.client.post('/beeswax/save_results/%s' % (qid,), save_data, follow=True)
+      resp = self.client.post('/beeswax/api/query/%s/results/save' % qid, save_data, follow=True)
       resp = wait_for_query_to_finish(self.client, resp, max=60)
 
       # Check that data is right
@@ -795,11 +794,10 @@ for x in sys.stdin:
       """Check that saving to table works"""
       qid = select_resp.context['query'].id
       save_data = {
-        'save_target': beeswax.forms.SaveResultsForm.SAVE_TYPE_TBL,
-        'target_table': target_tbl,
-        'save': True
+        'type': 'hive-table',
+        'path': target_tbl
       }
-      resp = self.client.post('/beeswax/save_results/%s' % (qid,), save_data, follow=True)
+      resp = self.client.post('/beeswax/api/query/%s/results/save' % (qid,), save_data, follow=True)
       wait_for_query_to_finish(self.client, resp, max=120)
 
       # Check that data is right. The SELECT may not give us the whole table.

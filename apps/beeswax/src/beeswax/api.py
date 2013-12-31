@@ -327,6 +327,75 @@ def cancel_query(request, query_id):
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
+@error_handler
+def save_results(request, query_id):
+  """
+  Save the results of a query to an HDFS directory or Hive table.
+  """
+  response = {'status': 0, 'message': ''}
+
+  query_history = authorized_get_history(request, query_id, must_exist=True)
+  server_id, state = _get_query_handle_and_state(query_history)
+  query_history.save_state(state)
+  error_msg, log = None, None
+
+  if request.method != 'POST':
+    response['message'] = _('A POST request is required.')
+  else:
+    if not query_history.is_success():
+      response['message'] = _('This query is %(state)s. Results unavailable.') % {'state': state}
+      response['status'] = -1
+      return HttpResponse(json.dumps(response), mimetype="application/json")
+
+    # massage data to work with old forms
+    data = {}
+    if request.POST.get('type') == 'hive-table':
+      data['save_target'] = 'to a new table'
+      data['target_table'] = request.POST.get('path', None)
+    elif request.POST.get('type') == 'hdfs':
+      data['save_target'] = 'to HDFS directory'
+      data['target_dir'] = request.POST.get('path', None)
+    else:
+      data['save_target'] = None
+      data['target_table'] = request.POST.get('path', None)
+      data['target_dir'] = request.POST.get('path', None)
+
+    db = dbms.get(request.user, query_history.get_query_server_config())
+    form = beeswax.forms.SaveResultsForm(data, db=db, fs=request.fs)
+
+    if form.is_valid():
+      try:
+        handle, state = _get_query_handle_and_state(query_history)
+        result_meta = db.get_results_metadata(handle)
+      except Exception, ex:
+        response['message'] = _('Cannot find query: %s') % {'state': state}
+        response['status'] = -2
+        return HttpResponse(json.dumps(response), mimetype="application/json")
+
+      try:
+        if form.cleaned_data['save_target'] == form.SAVE_TYPE_DIR:
+          target_dir = form.cleaned_data['target_dir']
+          query_history = db.insert_query_into_directory(query_history, target_dir)
+          response['type'] = 'hdfs'
+          response['id'] = query_history.id
+          response['query'] = query_history.query
+          response['path'] = target_dir
+          response['watch_url'] = reverse(get_app_name(request) + ':watch_query_refresh_json', kwargs={'id': query_history.id})
+        elif form.cleaned_data['save_target'] == form.SAVE_TYPE_TBL:
+          db.create_table_as_a_select(request, query_history, form.cleaned_data['target_table'], result_meta)
+          response['type'] = 'hive-table'
+          response['path'] = form.cleaned_data['target_table']
+      except Exception, ex:
+        error_msg, log = expand_exception(ex, db)
+        response['message'] = _('The result could not be saved: %s.') % error_msg
+        response['status'] = -3
+    else:
+      response['status'] = 1
+      response['errors'] = form.errors
+
+  return HttpResponse(json.dumps(response), mimetype="application/json")
+
+
 def design_to_dict(design):
   hql_design = HQLdesign.loads(design.data)
   return {

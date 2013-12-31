@@ -105,22 +105,25 @@ class SaveResultsForm(DependencyAwareForm):
   def clean(self):
     cleaned_data = super(SaveResultsForm, self).clean()
 
-    if cleaned_data.get('save_target') == SaveResultsForm.SAVE_TYPE_TBL:
-      tbl = cleaned_data.get('target_table')
-      if tbl:
-        try:
-          if self.db is not None:
-            self.db.get_table('default', tbl) # Assumes 'default' DB
-          self._errors['target_table'] = self.error_class([_('Table already exists')])
-          del cleaned_data['target_table']
-        except Exception:
-          pass
-    elif cleaned_data['save_target'] == SaveResultsForm.SAVE_TYPE_DIR:
-      target_dir = cleaned_data['target_dir']
-      if not target_dir.startswith('/'):
-        self._errors['target_dir'] = self.error_class([_('Directory should start with /')])
-      elif self.fs.exists(target_dir):
-        self._errors['target_dir'] = self.error_class([_('Directory already exists.')]) # Overwrite destination directory content
+    if cleaned_data:
+      if cleaned_data.get('save_target') == SaveResultsForm.SAVE_TYPE_TBL:
+        tbl = cleaned_data.get('target_table')
+        if tbl:
+          try:
+            if self.db is not None:
+              self.db.get_table('default', tbl) # Assumes 'default' DB
+            self._errors['target_table'] = self.error_class([_('Table already exists')])
+            del cleaned_data['target_table']
+          except Exception:
+            pass
+      elif cleaned_data['save_target'] == SaveResultsForm.SAVE_TYPE_DIR:
+        target_dir = cleaned_data['target_dir']
+        if not target_dir.startswith('/'):
+          self._errors['target_dir'] = self.error_class([_('Directory should start with /')])
+        elif self.fs.exists(target_dir):
+          self._errors['target_dir'] = self.error_class([_('Directory already exists.')]) # Overwrite destination directory content
+    else:
+      self._errors['save_target'] = self.error_class([_('Please select a save target.')])
 
     return cleaned_data
 

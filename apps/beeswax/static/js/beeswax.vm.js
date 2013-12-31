@@ -33,19 +33,40 @@ function BeeswaxViewModel(server, query_id) {
     'isParameterized': true,
     'email': false,
     'errors': [],
-    'explain': false
+    'explain': false,
+    'results': {
+      'rows': [],
+      'columns': [],
+      'empty': true,
+      'explanation': null,
+      'url': null,
+      'save': {
+        'errors': null,
+        'type': 'table',
+        'path': null
+      }
+    },
+    'watch': {
+      'logs': [],
+      'url': null,
+    },
+    'isRunning': false
   });
-  self.logs = ko.observableArray();
-  self.explanation = ko.observable();
-  self.watchURL = ko.observable();
-  self.resultsURL = ko.observable(null);
-  self.columns = ko.observableArray();
-  self.rows = ko.observableArray();
-  self.resultsEmpty = ko.observable(true);
-  self.isRunning = ko.observable(false);
 
   self.hasMoreResults = ko.computed(function() {
-    return self.resultsURL() != null;
+    return self.query.results.url() != null;
+  });
+
+  self.query.results.save.saveTargetError = ko.computed(function() {
+    return (self.query.results.save.errors() && 'save_target' in self.query.results.save.errors()) ? self.query.results.save.errors()['save_target'] : null;
+  });
+
+  self.query.results.save.targetTableError = ko.computed(function() {
+    return (self.query.results.save.errors() && 'target_table' in self.query.results.save.errors()) ? self.query.results.save.errors()['target_table'] : null;
+  });
+
+  self.query.results.save.targetDirectoryError = ko.computed(function() {
+    return (self.query.results.save.errors() && 'target_dir' in self.query.results.save.errors()) ? self.query.results.save.errors()['target_dir'] : null;
   });
 
   self.database = ko.computed({
@@ -212,7 +233,7 @@ function BeeswaxViewModel(server, query_id) {
   };
 
   var error_fn = function(jqXHR, status, errorThrown) {
-    self.isRunning(false);
+    self.query.isRunning(false);
     try {
       $(document).trigger('server.error', $.parseJSON(jqXHR.responseText));
     } catch(e) {
@@ -278,7 +299,7 @@ function BeeswaxViewModel(server, query_id) {
   self.explainQuery = function() {
     $(document).trigger('explain.query', data);
     self.query.explain(true);
-    self.isRunning(true);
+    self.query.isRunning(true);
 
     var data = {
       'query-query': self.query.query(),
@@ -296,16 +317,16 @@ function BeeswaxViewModel(server, query_id) {
       success: function(data) {
         self.query.errors.removeAll();
         if (data.status == 0) {
-          self.logs.removeAll();
-          self.rows.removeAll();
-          self.columns.removeAll();
-          self.explanation(data.explanation);
+          self.query.watch.logs.removeAll();
+          self.query.results.rows.removeAll();
+          self.query.results.columns.removeAll();
+          self.query.results.explanation(data.explanation);
         } else {
           self.query.errors.push(data.message);
           $(document).trigger('error.query');
         }
         $(document).trigger('explained.query', data);
-        self.isRunning(false);
+        self.query.isRunning(false);
       },
       error: error_fn,
       data: data
@@ -316,7 +337,7 @@ function BeeswaxViewModel(server, query_id) {
   self.executeQuery = function() {
     $(document).trigger('execute.query', data);
     self.query.explain(false);
-    self.isRunning(true);
+    self.query.isRunning(true);
 
     var data = {
       'query-query': self.query.query(),
@@ -335,11 +356,8 @@ function BeeswaxViewModel(server, query_id) {
         self.query.errors.removeAll();
         if (data.status == 0) {
           self.query.id(data.id);
-          self.logs.removeAll();
-          self.rows.removeAll();
-          self.columns.removeAll();
-          self.resultsURL('/' + self.server() + '/results/' + self.query.id() + '/0?format=json');
-          self.watchURL(data.watch_url);
+          self.query.results.url('/' + self.server() + '/results/' + self.query.id() + '/0?format=json');
+          self.query.watch.url(data.watch_url);
           self.watchQueryLoop();
         } else {
           self.query.errors.push(data.message);
@@ -364,7 +382,7 @@ function BeeswaxViewModel(server, query_id) {
     $.extend(data, self.getParametersFormData());
     $.extend(data, self.getOtherData());
     var request = {
-      url: self.watchURL(),
+      url: self.query.watch.url(),
       dataType: 'json',
       type: 'POST',
       success: function(data) {
@@ -376,46 +394,55 @@ function BeeswaxViewModel(server, query_id) {
     $.ajax(request);
   };
 
-  self.watchQueryLoop = function() {
+  self.watchQueryLoop = function(fn) {
     var TIMEOUT = 1000;
     var timer = null;
     var executed_once = false;
-    var fn = function() {
+
+    self.query.watch.logs.removeAll();
+    self.query.results.rows.removeAll();
+    self.query.results.columns.removeAll();
+
+    var _fn = function() {
       $(document).one('watched.query', function(e, data) {
         if (executed_once && (data.isSuccess || data.isFailure)) {
           clearTimeout(timer);
           $(document).trigger('stop_watch.query');
-          self.fetchResults();
+          if (fn) {
+            fn(data);
+          } else {
+            self.fetchResults();
+          }
         } else {
           executed_once = true;
           if (data.log) {
-            self.logs.push(data.log);
+            self.query.watch.logs.push(data.log);
             // scroll logs
           }
-          timer = setTimeout(fn, TIMEOUT);
+          timer = setTimeout(_fn, TIMEOUT);
         }
       });
       self.watchQuery();
     };
     $(document).trigger('start_watch.query');
-    timer = setTimeout(fn, TIMEOUT);
+    timer = setTimeout(_fn, TIMEOUT);
   };
 
   self.fetchResults = function() {
     $(document).trigger('fetch.results');
     var request = {
-      url: self.resultsURL(),
+      url: self.query.results.url(),
       dataType: 'json',
       type: 'GET',
       success: function(data) {
-        self.isRunning(false);
-        self.columns(data.columns);
-        self.rows.push.apply(self.rows, data.results);
-        self.resultsEmpty(self.rows().length == 0);
+        self.query.isRunning(false);
+        self.query.results.columns(data.columns);
+        self.query.results.rows.push.apply(self.query.results.rows, data.results);
+        self.query.results.empty(self.query.results.rows().length == 0);
         if (data.has_more) {
-          self.resultsURL(data.next_json_set);
+          self.query.results.url(data.next_json_set);
         } else {
-          self.resultsURL(null);
+          self.query.results.url(null);
         }
         $(document).trigger('fetched.results', data);
       },
@@ -474,6 +501,48 @@ function BeeswaxViewModel(server, query_id) {
         }
       }
     );
+  };
+
+  self.saveResults = function() {
+    var self = this;
+    if (self.query.id()) {
+      var data = {
+        'type': self.query.results.save.type(),
+        'path': self.query.results.save.path()
+      };
+      var url = '/' + self.server() + '/api/query/' + self.query.id() + '/results/save';
+      var request = {
+        url: url,
+        dataType: 'json',
+        type: 'POST',
+        success: function(data) {
+          if (data.status == 0) {
+            self.query.results.save.errors(null);
+            if (data.id) {
+              // watch this ID.
+              self.query.watch.url(data.watch_url);
+              self.query.watch.logs.removeAll();
+              self.watchQueryLoop(function() {
+                window.location.href = "/filebrowser/view" + data.path;
+              });
+            } else {
+              // redirect to metastore app.
+              window.location.href = "/metastore";
+            }
+            $(document).trigger('saved.results', data);
+          } else {
+            self.query.results.save.errors(data.errors);
+            $(document).trigger('error_save.results');
+          }
+        },
+        error: function(data) {
+          self.query.results.save.errors(data);
+          $(document).trigger('error_save.results');
+        },
+        data: data
+      };
+      $.ajax(request);
+    }
   };
 
   // Events
