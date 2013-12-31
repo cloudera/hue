@@ -32,22 +32,20 @@ ${layout.menubar(section='query')}
     <div class="sidebar-nav">
       <ul class="nav nav-list">
         <li class="nav-header">${_('database')}</li>
-        <li class="white">
-          <select data-bind="options: databases, value: database" class="input-medium" name="query-database"></select>
+        <li class="white" style="padding-top:0px">
+          <select data-bind="options: databases, value: database" class="input-medium chosen-select" name="query-database" data-placeholder="${_('Choose a database...')}"></select>
         </li>
         <li class="nav-header">${_('settings')}</li>
-        <li class="white">
+        <li class="white paramContainer">
           <!-- ko foreach: query.settings -->
           <div class="param">
             <div class="remove">
-              <button data-bind="click: $root.removeSetting.bind(this, $index())" type="button"
-                      class="btn btn-mini settingsDelete" title="${_('Delete this setting')}">x
+              <button data-bind="click: $root.removeSetting.bind(this, $index())" type="button" class="btn btn-mini settingsDelete" title="${_('Delete this setting')}">x
               </button>
             </div>
             <div class="control-group">
               <label>${_('Key')}</label>
-              <input data-bind="value: key" type="text" class="settingsField span8" autocomplete="off"
-                     placeholder="mapred.reduce.tasks"/>
+              <input data-bind="value: key" type="text" class="settingsField span8" autocomplete="off" placeholder="mapred.reduce.tasks"/>
             </div>
 
             <div class="control-group">
@@ -58,31 +56,29 @@ ${layout.menubar(section='query')}
           <!-- /ko -->
 
           <div class="control-group">
-            <a data-bind="click: function() { $root.addSetting('','') }" class="btn btn-small">${_('Add')}</a>
+            <a data-bind="click: function() { $root.addSetting('','') }" class="btn btn-mini paramAdd">${_('Add')}</a>
           </div>
         </li>
         <li class="nav-header
-              % if app_name == 'impala':
-                                   hide
-                                                 % endif
-              ">
+          % if app_name == 'impala':
+             hide
+          % endif
+          ">
           ${_('File Resources')}
         </li>
-        <li class="white
-              % if app_name == 'impala':
-                                   hide
-                                                 % endif
-              ">
+        <li class="white paramContainer
+          % if app_name == 'impala':
+             hide
+          % endif
+          ">
           <!-- ko foreach: query.fileResources -->
           <div class="param">
             <div class="remove">
-              <button data-bind="click: $root.removeFileResources.bind(this, $index())" type="button"
-                      class="btn btn-mini file_resourcesDelete" title="${_('Delete this setting')}">x
-              </button>
+              <button data-bind="click: $root.removeFileResources.bind(this, $index())" type="button" class="btn btn-mini" title="${_('Delete this setting')}">&times;</button>
             </div>
             <div class="control-group">
               <label>${_('Type')}</label>
-              <select data-bind="value: type" class="input-medium">
+              <select data-bind="value: type" class="input-small">
                 <option value="JAR">${_('jar')}</option>
                 <option value="ARCHIVE">${_('archive')}</option>
                 <option value="FILE">${_('file')}</option>
@@ -91,39 +87,35 @@ ${layout.menubar(section='query')}
 
             <div class="control-group">
               <label>${_('Path')}</label>
-              <input data-bind="value: path" type="text" class="input-medium file_resourcesField pathChooser"
-                     placeholder="/user/foo/udf.jar"/>
+              <input data-bind="value: path" type="text" class="span8 pathChooser" placeholder="/user/foo/udf.jar"/>
             </div>
           </div>
           <!-- /ko -->
 
           <div class="control-group">
-            <a data-bind="click: function() { $root.addFileResources('','') }" class="btn btn-small">${_('Add')}</a>
+            <a data-bind="click: function() { $root.addFileResources('','') }" class="btn btn-mini paramAdd">${_('Add')}</a>
           </div>
         </li>
-        <li class="nav-header
-            % if app_name == 'impala':
-                                 hide
-                                             % endif
-            ">
-          ${_('User-defined Functions')}
+        <li class="nav-header" title="${_("User-Defined Functions")}"
+          % if app_name == 'impala':
+            hide
+          % endif
+          ">
+          ${_('UDFs')}
         </li>
-        <li class="white
-            % if app_name == 'impala':
-                                 hide
-                                             % endif
-            ">
+        <li class="white paramContainer
+          % if app_name == 'impala':
+            hide
+          % endif
+          ">
           <!-- ko foreach: query.functions -->
           <div class="param">
             <div class="remove">
-              <button data-bind="click: $root.removeFunction.bind(this, $index())" type="button"
-                      class="btn btn-mini settingsDelete" title="${_('Delete this setting')}">x
-              </button>
+              <button data-bind="click: $root.removeFunction.bind(this, $index())" type="button" class="btn btn-mini settingsDelete" title="${_('Delete this setting')}">&times;</button>
             </div>
             <div class="control-group">
               <label>${_('Name')}</label>
-              <input data-bind="value: name" type="text" class="functionsField span8" autocomplete="off"
-                     placeholder="myFunction"/>
+              <input data-bind="value: name" type="text" class="functionsField span8" autocomplete="off" placeholder="myFunction"/>
             </div>
 
             <div class="control-group">
@@ -134,29 +126,20 @@ ${layout.menubar(section='query')}
           <!-- /ko -->
 
           <div class="control-group">
-            <a data-bind="click: function() { $root.addFunction('','') }" class="btn btn-small">${_('Add')}</a>
+            <a data-bind="click: function() { $root.addFunction('','') }" class="btn btn-mini paramAdd">${_('Add')}</a>
           </div>
         </li>
-        <li class="nav-header">${_('Parameterization')}</li>
-        <li class="white">
-          <label class="checkbox" rel="tooltip"
-                 data-original-title="${_("If checked (the default), you can include parameters like $parameter_name in your query, and users will be prompted for a value when the query is run.")}">
+        <li class="nav-header">${_('Options')}</li>
+        <li class="white" style="padding-top:0px">
+          <label class="checkbox" rel="tooltip" data-original-title="${_("If checked (the default), you can include parameters like $parameter_name in your query, and users will be prompted for a value when the query is run.")}">
             <input data-bind="checked: query.isParameterized" type="checkbox"/>
-            ${_("Enable Parameterization")}
+            ${_("Enable parameterization")}
           </label>
-        </li>
-        <li class="nav-header
-                % if app_name == 'impala':
-                                     hide
-                                                     % endif
-              ">${_('Email Notification')}</li>
-        <li class="white
-                % if app_name == 'impala':
-                                     hide
-                                                     % endif
-              ">
-          <label class="checkbox" rel="tooltip"
-                 data-original-title="${_("If checked, you will receive an email notification when the query completes.")}">
+          <label class="checkbox
+          % if app_name == 'impala':
+            hide
+          % endif
+          " rel="tooltip" data-original-title="${_("If checked, you will receive an email notification when the query completes.")}">
             <input data-bind="checked: query.email" type="checkbox"/>
             ${_("Email me on completion.")}
           </label>
@@ -167,10 +150,10 @@ ${layout.menubar(section='query')}
           </li>
           <li class="white">
             <div class="control-group">
-                  <span id="refresh-dyk">
-                    <i class="fa fa-refresh"></i>
-                    ${ _('Sync tables tips') }
-                  </span>
+              <span id="refresh-dyk">
+                <i class="fa fa-refresh"></i>
+                ${ _('Sync tables tips') }
+              </span>
 
               <div id="refresh-content" class="hide">
                 <ul style="text-align: left;">
@@ -253,18 +236,13 @@ ${layout.menubar(section='query')}
           <textarea class="hide" tabindex="1" name="query" id="queryField"></textarea>
 
           <div class="actions">
-            <button data-bind="click: tryExecuteQuery, visible: !$root.isRunning()" type="button" id="executeQuery"
-                    class="btn btn-primary" tabindex="2">${_('Execute')}</button>
-            <button data-bind="click: tryCancelQuery, visible: $root.isRunning()" class="btn btn-danger"
-                    data-loading-text="${ _('Canceling...') }" rel="tooltip"
-                    data-original-title="${ _('Cancel the query') }">${ _('Cancel') }</button>
-            <button data-bind="click: trySaveQuery, css: {'hide': !$root.query.id() || $root.query.id() == -1}"
-                    type="button" class="btn hide">${_('Save')}</button>
+            <button data-bind="click: tryExecuteQuery, visible: !$root.isRunning()" type="button" id="executeQuery" class="btn btn-primary" tabindex="2">${_('Execute')}</button>
+            <button data-bind="click: tryCancelQuery, visible: $root.isRunning()" class="btn btn-danger" data-loading-text="${ _('Canceling...') }" rel="tooltip" data-original-title="${ _('Cancel the query') }">${ _('Cancel') }</button>
+            <button data-bind="click: trySaveQuery, css: {'hide': !$root.query.id() || $root.query.id() == -1}" type="button" class="btn hide">${_('Save')}</button>
             <button data-bind="click: saveAsModal" type="button" class="btn">${_('Save as...')}</button>
-            <button data-bind="click: tryExplainQuery" type="button" id="explainQuery"
-                    class="btn">${_('Explain')}</button>
-            &nbsp; ${_('or create a')} &nbsp;<a type="button" class="btn"
-                                                href="${ url('beeswax:execute_query') }">${_('New query')}</a>
+            <button data-bind="click: tryExplainQuery" type="button" id="explainQuery" class="btn">${_('Explain')}</button>
+            &nbsp; ${_('or create a')} &nbsp;
+            <a type="button" class="btn" href="${ url('beeswax:execute_query') }">${_('New query')}</a>
             <br/><br/>
           </div>
 
@@ -304,8 +282,7 @@ ${layout.menubar(section='query')}
         </div>
         <div class="tab-pane" id="results">
           <div data-bind="css: {'hide': rows().length == 0}" class="hide">
-            <table class="table table-striped table-condensed resultTable" cellpadding="0" cellspacing="0"
-                   data-tablescroller-min-height-disable="true" data-tablescroller-enforce-height="true">
+            <table class="table table-striped table-condensed resultTable" cellpadding="0" cellspacing="0" data-tablescroller-min-height-disable="true" data-tablescroller-enforce-height="true">
               <thead>
               <tr data-bind="foreach: columns">
                 <th data-bind="text: $data"></th>
@@ -319,7 +296,6 @@ ${layout.menubar(section='query')}
               <div class="row-fluid">
                 <div class="span10 offset1 center empty-wrapper">
                   <i class="fa fa-frown-o"></i>
-
                   <h1>${_('The server returned no results.')}</h1>
                   <br/>
                 </div>
@@ -335,10 +311,8 @@ ${layout.menubar(section='query')}
 
 <div class="span2" id="navigator">
   <div class="card card-small">
-    <a href="#" title="${_('Double click on a table name or field to insert it in the editor')}" rel="tooltip"
-       data-placement="left" class="pull-right" style="margin:10px;margin-left: 0"><i class="fa fa-question-circle"></i></a>
-    <a id="refreshNavigator" href="#" title="${_('Manually refresh the table list')}" rel="tooltip"
-       data-placement="left" class="pull-right" style="margin:10px"><i class="fa fa-refresh"></i></a>
+    <a href="#" title="${_('Double click on a table name or field to insert it in the editor')}" rel="tooltip" data-placement="left" class="pull-right" style="margin:10px;margin-left: 0"><i class="fa fa-question-circle"></i></a>
+    <a id="refreshNavigator" href="#" title="${_('Manually refresh the table list')}" rel="tooltip" data-placement="left" class="pull-right" style="margin:10px"><i class="fa fa-refresh"></i></a>
 
     <h1 class="card-heading simple"><i class="fa fa-compass"></i> ${_('Navigator')}</h1>
 
@@ -346,11 +320,11 @@ ${layout.menubar(section='query')}
       <p>
         <input id="navigatorSearch" type="text" placeholder="${ _('Table name...') }" style="width:90%"/>
         <span id="navigatorNoTables">${_('The selected database has no tables.')}</span>
-      <ul id="navigatorTables" class="unstyled"></ul>
-      <div id="navigatorLoader">
-        <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #DDD"></i><!--<![endif]-->
-        <!--[if IE]><img src="/static/art/spinner.gif"/><![endif]-->
-      </div>
+        <ul id="navigatorTables" class="unstyled"></ul>
+        <div id="navigatorLoader">
+          <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #DDD"></i><!--<![endif]-->
+          <!--[if IE]><img src="/static/art/spinner.gif"/><![endif]-->
+        </div>
       </p>
     </div>
   </div>
@@ -380,8 +354,7 @@ ${layout.menubar(section='query')}
             <!-- /ko -->
             <div class="form-actions" style="padding-left: 10px">
               <a class="btn" href="javascript:history.go(-1);">${_('Cancel')}</a>
-              <button data-bind="click: tryExecuteParameterizedQuery" type="button"
-                      class="btn btn-primary">${_('Execute query')}</button>
+              <button data-bind="click: tryExecuteParameterizedQuery" type="button" class="btn btn-primary">${_('Execute query')}</button>
             </div>
           </fieldset>
         </form>
@@ -413,8 +386,7 @@ ${layout.menubar(section='query')}
             <!-- /ko -->
             <div class="form-actions" style="padding-left: 10px">
               <a class="btn" href="javascript:history.go(-1);">${_('Cancel')}</a>
-              <button data-bind="click: tryExplainParameterizedQuery" type="button"
-                      class="btn btn-primary">${_('Explain query')}</button>
+              <button data-bind="click: tryExplainParameterizedQuery" type="button" class="btn btn-primary">${_('Explain query')}</button>
             </div>
           </fieldset>
         </form>
@@ -529,20 +501,29 @@ ${layout.menubar(section='query')}
     margin-bottom: 90px !important;
   }
 
+  .paramContainer {
+    padding-top: 3px!important;
+    padding-left: 0px!important;
+    padding-right: 0px!important;
+  }
+
   .param {
-    padding: 8px 8px 1px 8px;
     margin-bottom: 5px;
-    border-bottom: 1px solid #EEE;
+    padding:4px;
+    padding-left:8px;
+    border-bottom: 1px solid #F6F6F6;
+  }
+
+  .param:nth-child(even) {
+    background-color: #F0F0F0;
+  }
+
+  .paramAdd {
+    margin-left: 18px;
   }
 
   .remove {
     float: right;
-  }
-
-  .file_resourcesField {
-    border-radius: 3px 0 0 3px;
-    border-right: 0 !important;
-    min-height: 27px !important;
   }
 
   .fileChooserBtn {
@@ -594,6 +575,9 @@ ${layout.menubar(section='query')}
 
 <script src="/static/ext/js/jquery/plugins/jquery-fieldselection.js" type="text/javascript"></script>
 <script src="/beeswax/static/js/autocomplete.utils.js" type="text/javascript" charset="utf-8"></script>
+
+<link rel="stylesheet" href="/static/ext/chosen/chosen.min.css">
+<script src="/static/ext/chosen/chosen.jquery.min.js" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript" charset="utf-8">
 var codeMirror, renderNavigator, resetNavigator, dataTable;
@@ -727,13 +711,30 @@ $(document).ready(function () {
     resetNavigator();
   });
 
-
   $("#navigator .card").css("min-height", ($(window).height() - 130) + "px");
   $("#navigatorTables").css("max-height", ($(window).height() - 260) + "px").css("overflow-y", "auto");
 
-  viewModel.database.subscribe(function () {
+  viewModel.databases.subscribe(function () {
+    if ($.totalStorage("${app_name}_last_database") != null && $.inArray($.totalStorage("${app_name}_last_database"), viewModel.databases())) {
+      viewModel.database($.totalStorage("${app_name}_last_database"));
+    }
+  });
+
+  viewModel.database.subscribe(function (value) {
+    $(".chosen-select").trigger("chosen:updated");
     renderNavigator();
   });
+
+  $(".chosen-select").chosen({
+    disable_search_threshold: 5,
+    width: "100%",
+    no_results_text: "${_('Oops, no database found!')}"
+  });
+
+  $(".chosen-select").chosen().change(function () {
+    $.totalStorage("${app_name}_last_database", viewModel.database());
+  });
+
 });
 
 
