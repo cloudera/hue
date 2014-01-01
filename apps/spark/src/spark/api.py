@@ -33,24 +33,11 @@ from desktop.lib.i18n import smart_str
 from spark.design import SparkDesign
 from desktop.lib.rest.http_client import RestException
 
+from spark.decorators import json_error_handler
 
 LOG = logging.getLogger(__name__)
 
-
-def error_handler(view_fn):
-  def decorator(*args, **kwargs):
-    try:
-      return view_fn(*args, **kwargs)
-    except Http404, e:
-      raise e
-    except Exception, e:
-      response = {
-        'error': str(e)
-      }
-      return HttpResponse(json.dumps(response), mimetype="application/json", status=500)
-  return decorator
-
-
+@json_error_handler
 def jars(request):
   api = get_api(request.user)
   response = {
@@ -59,7 +46,7 @@ def jars(request):
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
-
+@json_error_handler
 def contexts(request):
   api = get_api(request.user)
   response = {
@@ -125,7 +112,7 @@ def job(request, job_id):
 
 
 
-@error_handler
+@json_error_handler
 def execute(request, design_id=None):
   response = {'status': -1, 'message': ''}
 
@@ -180,7 +167,7 @@ def execute(request, design_id=None):
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
-@error_handler
+@json_error_handler
 def save_query(request, design_id=None):
   response = {'status': -1, 'message': ''}
 
@@ -210,7 +197,7 @@ def save_query(request, design_id=None):
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
-@error_handler
+@json_error_handler
 def fetch_saved_query(request, design_id):
   response = {'status': -1, 'message': ''}
 

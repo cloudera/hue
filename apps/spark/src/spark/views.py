@@ -32,13 +32,18 @@ from beeswax.views import safe_get_design
 from spark.job_server_api import get_api
 from spark.forms import UploadApp
 from desktop.lib.exceptions import StructuredException
+from desktop.lib.rest.http_client import RestException
 from spark.api import design_to_dict
+
+from spark.decorators import view_error_handler
 
 
 LOG = logging.getLogger(__name__)
 
-
+@view_error_handler
 def editor(request, design_id=None):
+  api = get_api(request.user)
+  jobs = api.jobs()
   if design_id is not None and not design_id.isdigit():
     job_id, design_id = design_id, None
   else:
@@ -57,7 +62,7 @@ def editor(request, design_id=None):
     'job_id': job_id,
   })
 
-
+@view_error_handler
 def list_jobs(request):
   api = get_api(request.user)
   jobs = api.jobs()
@@ -67,7 +72,7 @@ def list_jobs(request):
     'jobs_json': json.dumps(jobs)
   })
 
-
+@view_error_handler
 def list_contexts(request):
   api = get_api(request.user)
   contexts = api.contexts()
@@ -77,7 +82,7 @@ def list_contexts(request):
     'contexts_json': json.dumps(contexts)
   })
 
-
+@view_error_handler
 def delete_contexts(request):
   if request.method == 'POST':
     api = get_api(request.user)
@@ -88,7 +93,7 @@ def delete_contexts(request):
   else:
     return render('confirm.mako', request, {'url': request.path, 'title': _('Delete context(s)?')})
 
-
+@view_error_handler
 def list_applications(request):
   api = get_api(request.user)
   applications = api.jars()
@@ -123,7 +128,7 @@ def upload_app(request):
 
   return redirect(request.META['HTTP_REFERER'])
 
-
+@view_error_handler
 def download_result(request, job_id):
   api = get_api(request.user)
   result = api.job(job_id)
