@@ -303,7 +303,12 @@ function sparkViewModel() {
       dataType: 'json',
       type: 'GET',
       success: function(data) {
-        self.updateAppNames(data.jars);
+        if (data.error != null) {
+          $.jHueNotify.error(data.error);
+        }
+        else {
+          self.updateAppNames(data.jars);
+        }
       },
       error: error_fn
     };
@@ -316,7 +321,12 @@ function sparkViewModel() {
       dataType: 'json',
       type: 'GET',
       success: function(data) {
-        self.updateContexts(data.contexts);
+        if (data.error != null) {
+          $.jHueNotify.error(data.error);
+        }
+        else {
+          self.updateContexts(data.contexts);
+        }
       },
       error: error_fn
     };
