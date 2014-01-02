@@ -665,7 +665,7 @@ def view_results(request, id, first_row=0):
 
   if request.GET.get('format') == 'json':
     context = {
-      'columns': [column.name for column in columns],
+      'columns': massage_columns_for_json(columns),
       'results': data,
       'has_more': results.has_more,
       'next_row': results.start_row + len(data),
