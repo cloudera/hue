@@ -1,7 +1,6 @@
 Welcome to the repository for Hue
 =================================
 
-
 Hue is both a Web UI for Hadoop and a framework to create interactive Web
 applications. It features:
 
@@ -18,6 +17,7 @@ applications. It features:
       * A Sqoop 2 editor and dashboard
       * A ZooKeeper browser and editor
       * A DB Query editor for querying MySql, PostGres, Sqlite and Oracle
+      * Spark editor and dashboard
 
 On top of that, a SDK is available for creating new apps integrated with Hadoop.
 
@@ -157,4 +157,4 @@ License
 Apache License, Version 2.0
 http://www.apache.org/licenses/LICENSE-2.0
 
-
+.. image:: https://ga-beacon.appspot.com/UA-37637545-2/hue/index?pixel
