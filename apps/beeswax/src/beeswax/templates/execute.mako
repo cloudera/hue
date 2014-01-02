@@ -260,6 +260,7 @@ ${layout.menubar(section='query')}
         <!-- /ko -->
         <li><a href="#query" data-toggle="tab">${_('Query')}</a></li>
         <!-- ko if: !query.explain() -->
+        <li><a href="#columns" data-toggle="tab">${_('Columns')}</a></li>
         <li><a href="#results" data-toggle="tab">${_('Results')}</a></li>
         <!-- /ko -->
         <!-- ko if: query.explain() -->
@@ -280,12 +281,24 @@ ${layout.menubar(section='query')}
         <div class="active tab-pane" id="log">
           <pre data-bind="text: viewModel.logs().join('\n')"></pre>
         </div>
+        <div class="tab-pane" id="columns">
+          <table class="table table-striped table-condensed" cellpadding="0" cellspacing="0">
+            <thead>
+              <tr><th>${_('Name')}</th></tr>
+            </thead>
+            <tbody data-bind="foreach: columns">
+              <tr>
+                <td><a href="javascript:void(0)" class="column-selector" data-bind="text: $data.name"></a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
         <div class="tab-pane" id="results">
           <div data-bind="css: {'hide': rows().length == 0}" class="hide">
             <table class="table table-striped table-condensed resultTable" cellpadding="0" cellspacing="0" data-tablescroller-min-height-disable="true" data-tablescroller-enforce-height="true">
               <thead>
               <tr data-bind="foreach: columns">
-                <th data-bind="text: $data"></th>
+                <th data-bind="text: $data.name, css: { 'sort-numeric': $.inArray($data.type, ['TINYINT_TYPE', 'SMALLINT_TYPE', 'INT_TYPE', 'BIGINT_TYPE', 'FLOAT_TYPE', 'DOUBLE_TYPE', 'DECIMAL_TYPE']) > -1, 'sort-date': $.inArray($data.type, ['TIMESTAMP_TYPE', 'DATE_TYPE']) > -1, 'sort-string': $.inArray($data.type, ['TINYINT_TYPE', 'SMALLINT_TYPE', 'INT_TYPE', 'BIGINT_TYPE', 'FLOAT_TYPE', 'DOUBLE_TYPE', 'DECIMAL_TYPE', 'TIMESTAMP_TYPE', 'DATE_TYPE']) == -1 }"></th>
               </tr>
               </thead>
             </table>
@@ -735,6 +748,27 @@ $(document).ready(function () {
     $.totalStorage("${app_name}_last_database", viewModel.database());
   });
 
+  $(document).on("click", ".column-selector", function () {
+    var _t = $(".resultTable");
+    var _col = _t.find("th:econtains(" + $(this).text() + ")");
+    _t.find(".columnSelected").removeClass("columnSelected");
+    _t.find("tr td:nth-child(" + (_col.index() + 1) + ")").addClass("columnSelected");
+    $("a[href='#results']").click();
+  });
+
+  $("a[data-toggle='tab']").on("shown", function (e) {
+    if ($(e.target).attr("href") == "#results" && $(e.relatedTarget).attr("href") == "#columns") {
+      if ($(".resultTable .columnSelected").length > 0) {
+        var _t = $(".resultTable");
+        var _col = _t.find("th:nth-child(" + ($(".resultTable .columnSelected").index() + 1) + ")");
+        _t.parent().animate({
+          scrollLeft: _col.position().left + _t.parent().scrollLeft() - _t.parent().offset().left - 30
+        }, 300);
+      }
+    }
+  });
+
+
 });
 
 
@@ -1068,7 +1102,21 @@ function resultsTable() {
           }
         }
         return nRow;
-      }
+      },
+      "aoColumnDefs": [
+        {
+          "sType": "numeric",
+          "aTargets": [ "sort-numeric" ]
+        },
+        {
+          "sType": "string",
+          "aTargets": [ "sort-string" ]
+        },
+        {
+          "sType": "date",
+          "aTargets": [ "sort-date" ]
+        }
+      ]
     });
     $(".dataTables_filter").hide();
     reinitializeTable();
