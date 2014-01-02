@@ -1462,6 +1462,12 @@ function clickHard(el) {
 
 viewModel = new BeeswaxViewModel("${app_name}", ${design.id and design.id or -1});
 viewModel.fetchDatabases();
+var subscription = viewModel.databases.subscribe(function() {
+  if (viewModel.query.id() > 0) {
+    viewModel.fetchQuery();
+  }
+  subscription.dispose();
+});
 if (viewModel.query.id() > 0) {
   // Code mirror and ko.
   viewModel.query.query.subscribe((function () {
@@ -1490,8 +1496,9 @@ $(document).on('server.unmanageable_error', function (e, responseText) {
 });
 
 // Other
-$(document).on('saved.query', function (e) {
+$(document).on('saved.query', function (e, id) {
   $(document).trigger('info', "${'Query saved.'}");
+  window.location.href = "/beeswax/execute/" + id;
 });
 $(document).on('error_cancel.query', function (e, message) {
   $(document).trigger("error", "${ _('Problem: ') }" + message);

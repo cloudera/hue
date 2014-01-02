@@ -451,7 +451,7 @@ function BeeswaxViewModel(server, query_id) {
         type: 'POST',
         success: function(data) {
           self.query.id(data.design_id);
-          $(document).trigger('saved.query', data);
+          $(document).trigger('saved.query', [data.design_id]);
         },
         error: function() {
           $(document).trigger('error_save.query');
