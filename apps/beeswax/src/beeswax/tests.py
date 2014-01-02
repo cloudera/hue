@@ -386,7 +386,7 @@ for x in sys.stdin:
   def test_explain_query(self):
     c = self.client
     response = _make_query(c, "SELECT KITTENS ARE TASTY", submission_type="Explain")
-    assert_true("ParseException" in response.context["error_message"])
+    assert_true("ParseException line" in json.loads(response.content)["message"])
     CREATE_TABLE = "CREATE TABLE test_explain (foo INT, bar STRING);"
     response = _make_query(c, CREATE_TABLE)
     wait_for_query_to_finish(c, response)

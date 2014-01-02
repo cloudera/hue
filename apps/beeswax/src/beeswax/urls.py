@@ -21,9 +21,7 @@ urlpatterns = patterns('beeswax.views',
   url(r'^$', 'index', name='index'),
 
   url(r'^execute/(?P<design_id>\d+)?$', 'execute_query', name='execute_query'),
-  url(r'^watch/(?P<id>\d+)$', 'watch_query', name='watch_query'),
-  url(r'^watch/json/(?P<id>\d+)$', 'watch_query_refresh_json', name='watch_query_refresh_json'),
-  url(r'^close_operation/(?P<query_id>\d+)?$', 'close_operation', name='close_operation'),
+  url(r'^watch/(?P<id>\d+)$', 'watch_query', name='watch_query'),  
   url(r'^results/(?P<id>\d+)/(?P<first_row>\d+)$', 'view_results', name='view_results'),
   url(r'^download/(?P<id>\d+)/(?P<format>\w+)$', 'download', name='download'),
   url(r'^save_results/(?P<id>\d+)$', 'save_results', name='save_results'),
@@ -66,4 +64,6 @@ urlpatterns += patterns(
   url(r'^api/query/(?P<query_id>\d+)?$', 'save_query', name='api_save_query'),
   url(r'^api/query/(?P<query_id>\d+)/get$', 'fetch_saved_query', name='api_fetch_saved_query'),
   url(r'^api/query/(?P<query_id>\d+)/cancel$', 'cancel_query', name='api_cancel_query'),
+  url(r'^watch/json/(?P<id>\d+)$', 'watch_query_refresh_json', name='watch_query_refresh_json'),
+  url(r'^close_operation/(?P<query_id>\d+)?$', 'close_operation', name='close_operation'),
 )

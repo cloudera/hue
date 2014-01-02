@@ -141,7 +141,7 @@ ${layout.menubar(section='query')}
           % endif
           " rel="tooltip" data-original-title="${_("If checked, you will receive an email notification when the query completes.")}">
             <input data-bind="checked: query.email" type="checkbox"/>
-            ${_("Email me on completion.")}
+            ${_("Email me on completion")}
           </label>
         </li>
         % if app_name == 'impala':
@@ -1489,7 +1489,7 @@ ko.applyBindings(viewModel);
 
 // Server error handling.
 $(document).on('server.error', function (e, data) {
-  $(document).trigger('error', "${_('Server error occured: ')}" + data.error);
+  $(document).trigger('error', "${_('Server error occured: ')}" + data.message ? data.message : data.error);
 });
 $(document).on('server.unmanageable_error', function (e, responseText) {
   $(document).trigger('error', "${_('Unmanageable server error occured: ')}" + responseText);
