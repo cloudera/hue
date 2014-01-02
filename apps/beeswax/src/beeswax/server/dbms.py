@@ -314,6 +314,10 @@ class HiveServer2Dbms(object):
     return self.client.get_state(handle)
 
 
+  def get_operation_status(self, handle):
+    return self.client.get_operation_status(handle)
+
+
   def execute_and_wait(self, query, timeout_sec=30.0, sleep_interval=0.5):
     """
     Run query and check status until it finishes or timeouts.

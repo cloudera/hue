@@ -33,9 +33,12 @@ import beeswax.models
 from beeswax.forms import QueryForm
 from beeswax.design import HQLdesign
 from beeswax.server import dbms
-from beeswax.server.dbms import expand_exception, get_query_server_config
+from beeswax.server.dbms import expand_exception, get_query_server_config,\
+  QueryServerException
 from beeswax.views import authorized_get_design, authorized_get_history, make_parameterization_form,\
-                          safe_get_design, save_design, massage_columns_for_json, _get_query_handle_and_state
+                          safe_get_design, save_design, massage_columns_for_json, _get_query_handle_and_state,\
+  _parse_out_hadoop_jobs
+from desktop.lib.i18n import force_unicode
 
 
 LOG = logging.getLogger(__name__)
@@ -48,8 +51,13 @@ def error_handler(view_fn):
     except Http404, e:
       raise e
     except Exception, e:
+      if not hasattr(e, 'message') or not e.message:
+        message = _("Unknown exception.")
+      else:
+        message = force_unicode(e.message, strings_only=True, errors='replace')
       response = {
-        'error': str(e)
+        'error': str(e),
+        'message': message,
       }
       return HttpResponse(json.dumps(response), mimetype="application/json", status=500)
   return decorator
@@ -103,6 +111,7 @@ def parameters(request, design_id=None):
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
+@error_handler
 def execute_directly(request, query, design, query_server, tablename=None, **kwargs):
   if design is not None:
     design = authorized_get_design(request, design.id)
@@ -123,9 +132,72 @@ def execute_directly(request, query, design, query_server, tablename=None, **kwa
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
+@error_handler
+def watch_query_refresh_json(request, id):
+  query_history = authorized_get_history(request, id, must_exist=True)
+  db = dbms.get(request.user, query_history.get_query_server_config())
+  handle, state = _get_query_handle_and_state(query_history)
+  query_history.save_state(state)
+
+  # Show popup message if error, might be better in error tab instead
+  if query_history.is_failure():
+    res = db.get_operation_status(handle)
+    if hasattr(res, 'errorMessage') and res.errorMessage:
+      message = res.errorMessage
+    else:
+      message = ''
+    raise QueryServerException(Exception('Bad status for request %s:\n%s' % (id, res)), message=message)
+
+  # Multi query if more statements
+  try:
+    if not query_history.is_finished() and query_history.is_success() and not query_history.has_results:
+      db.execute_next_statement(query_history)
+      handle, state = _get_query_handle_and_state(query_history)
+  except Exception, ex:
+    LOG.exception(ex)
+    handle, state = _get_query_handle_and_state(query_history)
+
+  try:
+    log = db.get_log(handle)
+  except Exception, ex:
+    log = str(ex)
+
+  jobs = _parse_out_hadoop_jobs(log)
+  job_urls = dict([(job, reverse('jobbrowser.views.single_job', kwargs=dict(job=job))) for job in jobs])
+
+  result = {
+    'log': log,
+    'jobs': jobs,
+    'jobUrls': job_urls,
+    'isSuccess': query_history.is_finished() or (query_history.is_success() and query_history.has_results),
+    'isFailure': query_history.is_failure()
+  }
+
+  return HttpResponse(json.dumps(result), mimetype="application/json")
+
+
+def close_operation(request, query_id):
+  response = {'status': -1, 'message': ''}
+
+  if request.method != 'POST':
+    response['message'] = _('A POST request is required.')
+  else:
+    try:
+      query_history = authorized_get_history(request, query_id, must_exist=True)
+      db = dbms.get(request.user, query_history.get_query_server_config())
+      db.close_operation(query_history.get_handle())
+      _get_query_handle_and_state(query_history)
+      response = {'status': 0}
+    except Exception, e:
+      response = {'message': unicode(e)}
+
+  return HttpResponse(json.dumps(response), mimetype="application/json")
+
+
+@error_handler
 def explain_directly(request, query, design, query_server):
   explanation = dbms.get(request.user, query_server).explain(query)
-  
+
   response = {
     'status': 0,
     'explanation': explanation.textual
@@ -140,7 +212,7 @@ def execute(request, query_id=None):
 
   if request.method != 'POST':
     response['message'] = _('A POST request is required.')
-  
+
   app_name = get_app_name(request)
   query_server = get_query_server_config(app_name)
   query_type = beeswax.models.SavedQuery.TYPES_MAPPING[app_name]

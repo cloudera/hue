@@ -13,11 +13,13 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
+
 <%!
 from desktop.views import commonheader, commonfooter
 from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext as _
 %>
+
 <%namespace name="header" file="header.mako" />
 
 ${ commonheader(_('Quick Start'), "quickstart", user) | n,unicode }
@@ -153,8 +155,8 @@ ${ header.menubar() }
                     <label class="checkbox">
                       <input class="updatePreferences" type="checkbox" name="tours_and_tutorials"
                              style="margin-right: 10px"
-                             title="${ ('Check to enable the tours and tutorials') }" ${ tours_and_tutorials and "checked" }/>
-                    ${ ('Display the "Available Tours" question mark when tours are available for a specific page.') }
+                             title="${ _('Check to enable the tours and tutorials') }" ${ tours_and_tutorials and 'checked' or '' }/>
+                      ${ _('Display the "Available Tours" question mark when tours are available for a specific page.') }
                     </label>
                   </p>
                 </div>
@@ -165,11 +167,11 @@ ${ header.menubar() }
 
             <div class="card-body">
               <label class="checkbox">
-                <input class="updatePreferences" type="checkbox" name="collect_usage" style="margin-right: 10px" title="${ ('Check to enable usage analytics') }" ${ collect_usage and "checked" }/>
-                ${ ('Help improve Hue with anonymous usage analytics.') }
+                <input class="updatePreferences" type="checkbox" name="collect_usage" style="margin-right: 10px" title="${ _('Check to enable usage analytics') }" ${ collect_usage and 'checked' or '' }/>
+                ${ _('Help improve Hue with anonymous usage analytics.') }
                 <a href="javascript:void(0)" style="display: inline" data-trigger="hover" data-toggle="popover" data-placement="right" rel="popover"
-                   title="${_('How does it work?') }"
-                   data-content="${ ('We are using Google Analytics to see how many times an application or specific section of an application is used, nothing more.') }">
+                   title="${ _('How does it work?') }"
+                   data-content="${ _('We are using Google Analytics to see how many times an application or specific section of an application is used, nothing more.') }">
                    <i class="fa fa-question-circle"></i>
                 </a>
               </label>
@@ -184,7 +186,7 @@ ${ header.menubar() }
 
                 <div class="card-body">
                   <p>
-                    <a href="${ url('desktop.views.home') }" class="step"><i class="fa fa-home"></i> ${_('Hue Home') }
+                    <a href="${ url('desktop.views.home') }" class="step"><i class="fa fa-home"></i> ${ _('Hue Home') }
                     </a>
                   </p>
                 </div>
@@ -198,8 +200,8 @@ ${ header.menubar() }
                     <label class="checkbox">
                       <input id="updateSkipWizard" type="checkbox"
                              style="margin-right: 10px"
-                             title="${ ('Check to skip this wizard next time.') }"/>
-                    ${ ('Skip the Quick Start Wizard at next login and land directly on the home page.') }
+                             title="${ _('Check to skip this wizard next time.') }"/>
+                      ${ _('Skip the Quick Start Wizard at next login and land directly on the home page.') }
                     </label>
                   </p>
                 </div>
@@ -215,7 +217,7 @@ ${ header.menubar() }
       <div class="form-actions">
         <a id="backBtn" class="btn disabled">${ _('Back') }</a>
         <a id="nextBtn" class="btn btn-primary disable-feedback">${ _('Next') }</a>
-        <div class="pull-right muted">Hue and the Hue logo are trademarks of Cloudera, Inc.</div>
+        <div class="pull-right muted">${ _('Hue and the Hue logo are trademarks of Cloudera, Inc.') }</div>
       </div>
       % else:
         <p>

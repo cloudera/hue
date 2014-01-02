@@ -501,58 +501,6 @@ def watch_query(request, id):
               })
 
 
-
-def watch_query_refresh_json(request, id):
-  query_history = authorized_get_history(request, id, must_exist=True)
-  db = dbms.get(request.user, query_history.get_query_server_config())
-  handle, state = _get_query_handle_and_state(query_history)
-  query_history.save_state(state)
-
-  try:
-    if not query_history.is_finished() and query_history.is_success() and not query_history.has_results:
-      db.execute_next_statement(query_history)
-      handle, state = _get_query_handle_and_state(query_history)
-  except Exception, ex:
-    LOG.exception(ex)
-    handle, state = _get_query_handle_and_state(query_history)
-
-  try:
-    log = db.get_log(handle)
-  except Exception, ex:
-    log = str(ex)
-
-  jobs = _parse_out_hadoop_jobs(log)
-  job_urls = dict([(job, reverse('jobbrowser.views.single_job', kwargs=dict(job=job))) for job in jobs])
-
-  result = {
-    'log': log,
-    'jobs': jobs,
-    'jobUrls': job_urls,
-    'isSuccess': query_history.is_finished() or (query_history.is_success() and query_history.has_results),
-    'isFailure': query_history.is_failure()
-  }
-
-  return HttpResponse(json.dumps(result), mimetype="application/json")
-
-
-def close_operation(request, query_id):
-  response = {'status': -1, 'message': ''}
-
-  if request.method != 'POST':
-    response['message'] = _('A POST request is required.')
-  else:
-    try:
-      query_history = authorized_get_history(request, query_id, must_exist=True)
-      db = dbms.get(request.user, query_history.get_query_server_config())
-      db.close_operation(query_history.get_handle())
-      _get_query_handle_and_state(query_history)
-      response = {'status': 0}
-    except Exception, e:
-      response = {'message': unicode(e)}
-
-  return HttpResponse(json.dumps(response), mimetype="application/json")
-
-
 def view_results(request, id, first_row=0):
   """
   Returns the view for the results of the QueryHistory with the given id.
@@ -1124,10 +1072,7 @@ def _get_query_handle_and_state(query_history):
   if query_server['server_name'] == 'impala' and not handle.has_result_set:
     state = QueryHistory.STATE.available
   else:
-    try:
-      state = dbms.get(query_history.owner, query_history.get_query_server_config()).get_state(handle)
-    except QueryServerException, e:
-      raise PopupException(_("Failed to contact Server to check query status."), detail=e)
+    state = dbms.get(query_history.owner, query_history.get_query_server_config()).get_state(handle)
 
   if state is None:
     raise PopupException(_("Failed to contact Server to check query status."))

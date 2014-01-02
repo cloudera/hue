@@ -653,6 +653,11 @@ class HiveServerClientCompatible(object):
     return HiveServerQueryHistory.STATE_MAP[res.operationState]
 
 
+  def get_operation_status(self, handle):
+    operationHandle = handle.get_rpc_handle()
+    return self._client.get_operation_status(operationHandle)
+
+
   def use(self, query):
     data = self._client.execute_query(query)
     self._client.close_operation(data.operation_handle)
