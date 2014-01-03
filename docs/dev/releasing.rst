@@ -1,10 +1,8 @@
 The version used in the Maven projects needs to be set by hand in the
 following files:
 - maven/pom.xml
-- apps/beeswax/java/pom.xml
 - desktop/libs/hadoop/java/pom.xml
-- desktop/libs/hadoop/static-group-mapping/pom.xml
-- desktop/libs/hadoop/sudo-shell/pom.xml
+- desktop/libs/*/setup.py
 
 In the case of maven/pom.xml, change the first <version> tag. In the
 other cases, change the <version> tag within the <parent> tag.
