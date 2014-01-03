@@ -596,6 +596,7 @@ def view_results(request, id, first_row=0):
     results.start_row = first_row
 
     context.update({
+      'id': id,
       'results': data,
       'has_more': results.has_more,
       'next_row': results.start_row + len(data),
@@ -605,27 +606,22 @@ def view_results(request, id, first_row=0):
       'download_urls': download_urls,
       'save_form': save_form,
       'can_save': query_history.owner == request.user,
-      'next_json_set': reverse(get_app_name(request) + ':view_results', kwargs={
-        'id': str(id),
-        'first_row': results.start_row + len(data)
-      }) + ('?context=' + context_param or '') + '&format=json'
+      'next_json_set':
+        reverse(get_app_name(request) + ':view_results', kwargs={
+            'id': str(id),
+            'first_row': results.start_row + len(data)
+          }
+        )
+        + ('?context=' + context_param or '') + '&format=json'
     })
 
   if request.GET.get('format') == 'json':
-    context = {
-      'columns': massage_columns_for_json(columns),
-      'results': data,
-      'has_more': results.has_more,
-      'next_row': results.start_row + len(data),
-      'start_row': results.start_row,
-      'next_json_set': reverse(get_app_name(request) + ':view_results', kwargs={
-        'id': str(id),
-        'first_row': results.start_row + len(data)
-      }) + ('?context=' + context_param or '') + '&format=json'
-    }
+    context['columns'] = massage_columns_for_json(columns)
+    del context['save_form']
+    del context['query']
     return HttpResponse(json.dumps(context), mimetype="application/json")
-
-  return render('watch_results.mako', request, context)
+  else:
+    return render('watch_results.mako', request, context)
 
 
 def save_results(request, id):

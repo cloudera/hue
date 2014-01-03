@@ -51,7 +51,7 @@ from beeswax import conf, hive_site
 from beeswax.conf import HIVE_SERVER_HOST
 from beeswax.views import collapse_whitespace
 from beeswax.test_base import make_query, wait_for_query_to_finish, verify_history, get_query_server_config,\
-  HIVE_SERVER_TEST_PORT
+  HIVE_SERVER_TEST_PORT, fetch_query_result_data
 from beeswax.design import hql_query, strip_trailing_semicolon
 from beeswax.data_export import download
 from beeswax.models import SavedQuery, QueryHistory, HQL
@@ -65,8 +65,6 @@ from beeswax.hive_site import get_metastore
 
 
 LOG = logging.getLogger(__name__)
-CSV_LINK_PAT = re.compile('/beeswax/download/\d+/csv')
-
 
 def _make_query(client, query, submission_type="Execute",
                 udfs=None, settings=None, resources=[],
@@ -87,9 +85,10 @@ def _make_query(client, query, submission_type="Execute",
 
 def get_csv(client, result_response):
   """Get the csv for a query result"""
-  csv_link = CSV_LINK_PAT.search(result_response.content)
-  assert_true(csv_link, result_response.content)
-  return client.get(csv_link.group()).content
+  content = json.loads(result_response.content)
+  assert_true(content['isSuccess'])
+  csv_link = '/beeswax/download/%s/csv' % content['id']
+  return client.get(csv_link).content
 
 
 class TestBeeswaxWithHadoop(BeeswaxSampleProvider):
@@ -112,12 +111,11 @@ class TestBeeswaxWithHadoop(BeeswaxSampleProvider):
     return history.id
 
   def test_query_with_error(self):
-    """
-    Creating a table "again" should not work; error should be displayed.
-    """
+    # Creating a table "again" should not work; error should be displayed.
     response = _make_query(self.client, "CREATE TABLE test (foo INT)", wait=True)
-    assert_true("Table test already exists" in response.content)
-    assert_true("Table test already exists" in response.context["error_message"])
+    content = json.loads(response.content)
+    assert_true("AlreadyExistsException" in content.get('error'), content)
+    assert_true("Table test already exists" in content.get('message'), content)
 
   def test_configuration(self):
     # No HS2 API
@@ -153,7 +151,8 @@ for x in sys.stdin:
       "SELECT TRANSFORM (foo) USING 'python square.py' AS b FROM test",
       resources=[("FILE", "/square.py")], local=False)
     response = wait_for_query_to_finish(self.client, response, max=180.0)
-    assert_equal([['0'], ['1'], ['4'], ['9']], response.context["results"][0:4])
+    content = fetch_query_result_data(self.client, response)
+    assert_equal([['0'], ['1'], ['4'], ['9']], content["results"][0:4])
 
   def test_query_with_setting(self):
     response = _make_query(self.client, "CREATE TABLE test2 AS SELECT foo+1 FROM test WHERE foo=4",
@@ -187,18 +186,18 @@ for x in sys.stdin:
       SELECT MIN(foo), MAX(foo), SUM(foo) FROM test;
     """
     response = _make_query(self.client, QUERY, local=False)
-    assert_true(response.redirect_chain[0][0].startswith("http://testserver/beeswax/watch/"))
+    content = json.loads(response.content)
+    assert_true('watch_url' in content)
     # Check that we report this query as "running". (This query takes a while.)
     self._verify_query_state(beeswax.models.QueryHistory.STATE.running)
 
     response = wait_for_query_to_finish(self.client, response, max=180.0)
-    assert_equal([0, 255, 32640], response.context["results"][0], response.content)
-    assert_equal(['INT_TYPE', 'INT_TYPE', 'BIGINT_TYPE'], [col.type for col in response.context["columns"]])
-    # Because it happens that we're running this with local mode,
-    # we won't see any hadoop jobs.
-    assert_equal(1, len(response.context["hadoop_jobs"]), response.context["hadoop_jobs"])
-    self._verify_query_state(beeswax.models.QueryHistory.STATE.available)
+    content = fetch_query_result_data(self.client, response)
 
+    assert_equal([0, 255, 32640], content["results"][0], content)
+    assert_equal(['INT_TYPE', 'INT_TYPE', 'BIGINT_TYPE'], [col['type'] for col in content["columns"]])
+    assert_equal(0, len(content["hadoop_jobs"]), content) # Should be 1 after HS2 bug is fixed
+    self._verify_query_state(beeswax.models.QueryHistory.STATE.available)
 
     # Query multi-page request
     QUERY = """
@@ -206,17 +205,20 @@ for x in sys.stdin:
     """
     response = _make_query(self.client, QUERY, name='select star', local=False)
     response = wait_for_query_to_finish(self.client, response)
-    assert_equal(str(response.context['query_context'][0]), 'design')
-    assert_true("99" in response.content)
-    assert_true(response.context["has_more"])
-    response = self.client.get("/beeswax/results/%d/%d" % (response.context["query"].id, response.context["next_row"]))
-    assert_true("199" in response.content)
-    response = self.client.get("/beeswax/results/%d/0" % (response.context["query"].id))
-    assert_true("99" in response.content)
-    assert_equal(0, len(response.context["hadoop_jobs"]), "SELECT * shouldn't have started jobs.")
+    content = fetch_query_result_data(self.client, response)
+
+    assert_true([99, u'0x63'] in content['results'], content['results'])
+    assert_true(content["has_more"])
+    response = self.client.get("/beeswax/results/%s/%s?format=json" % (content["id"], content["next_row"]))
+    content = json.loads(response.content)
+    assert_true([199, u'0xc7'] in content['results'], content['results'])
+    response = self.client.get("/beeswax/results/%s/0?format=json" % (content["id"]))
+    content = json.loads(response.content)
+    assert_true([99, u'0x63'] in content['results'])
+    assert_equal(0, len(content["hadoop_jobs"]), "SELECT * shouldn't have started jobs.")
 
     # Download the data
-    response = self.client.get(response.context["download_urls"]["csv"])
+    response = self.client.get(content["download_urls"]["csv"])
     # Header line plus data lines...
     assert_equal(257, response.content.count("\n"))
 
@@ -228,12 +230,14 @@ for x in sys.stdin:
       udfs=[('my_sqrt', 'org.apache.hadoop.hive.ql.udf.UDFSqrt'),
             ('my_power', 'org.apache.hadoop.hive.ql.udf.UDFPower')], local=False)
     response = wait_for_query_to_finish(self.client, response, max=60.0)
-    assert_equal([2.0, 256.0], response.context["results"][0])
-    log = response.context['log']
+    content = fetch_query_result_data(self.client, response)
+
+    assert_equal([2.0, 256.0], content["results"][0])
+    log = content['log']
     assert_true(search_log_line('ql.Driver', 'Total MapReduce jobs', log), 'Captured log from Driver in %s' % log)
     assert_true(search_log_line('exec.Task', 'Starting Job = job_', log), 'Captured log from MapRedTask in %s' % log)
     # Test job extraction while we're at it
-    assert_equal(1, len(response.context["hadoop_jobs"]), "Should have started 1 job and extracted it.")
+    assert_equal(1, len(content["hadoop_jobs"]), "Should have started 1 job and extracted it.")
 
   def test_query_with_remote_udf(self):
     """
@@ -258,11 +262,8 @@ for x in sys.stdin:
   def test_query_with_simple_errors(self):
     hql = "SELECT KITTENS ARE TASTY"
     resp = _make_query(self.client, hql, name='tasty kittens', wait=True, local=False)
-    assert_true("ParseException" in resp.content, resp.content)
-    page_context = [context for context in resp.context if 'log' in context][0]
-    log = page_context['log']
-    # No logs as operationHandle=None
-    assert_equal('', log, log)
+    assert_true("ParseException line" in json.loads(resp.content)["error"])
+    assert_true("ParseException line" in json.loads(resp.content)["message"])
 
     # Watch page will fail as operationHandle=None
     query_id = self._verify_query_state(beeswax.models.QueryHistory.STATE.failed)
@@ -342,17 +343,23 @@ for x in sys.stdin:
 
 
   def test_parameterization(self):
-    """
-    Test parameterization
-    """
     response = _make_query(self.client, "SELECT foo FROM test WHERE foo='$x' and bar='$y'", is_parameterized=False)
+    content = json.loads(response.content)
     # Assert no parameterization was offered
-    assert_true(any(["watch_wait.mako" in _template.filename for _template in response.template]), "we should have seen the template for a query executing")
+    assert_true('watch_url' in content, content)
 
-    response = _make_query(self.client, "SELECT foo FROM test WHERE foo='$x' and bar='$y'")
-    assert_true("parameterization.mako", response.template)
-    assert_true(["x", "y"], response.context["form"].fields.keys())
-    design_id = response.context["design"].id
+    data = {
+      'query-query': "SELECT foo FROM test WHERE foo='$x' and bar='$y'",
+      'query-database': "default"
+    }
+    response = self.client.post(reverse('beeswax:api_parameters'), data)
+    assert_equal([], content['parameters'], content)
+
+    response = _make_query(self.client, "SELECT foo FROM test WHERE foo='$x' and bar='$y'") # Save?
+    content = json.loads(response.content)
+    design_id = content['id']
+
+    # todo below
 
     # Don't fill out the form
     response = self.client.post("/beeswax/execute_parameterized/%d" % design_id)
@@ -450,7 +457,12 @@ for x in sys.stdin:
     resp = _make_query(self.client, hql)
     resp = wait_for_query_to_finish(self.client, resp, max=30.0)
 
-    assert_true('DROP TABLE test_multiple_statements_2' in resp.content, resp.content)
+    content = json.loads(resp.content)
+    design_id = content['id']
+
+    resp = self.client.get("/beeswax/results/%s/0?format=json" % design_id)
+    content = json.loads(resp.content)
+    assert_true('DROP TABLE test_multiple_statements_2' in content, content) # HUE-1843
 
   def test_multiple_statements_with_result_set(self):
     hql = """
@@ -464,7 +476,7 @@ for x in sys.stdin:
     handle = self.db.execute_and_wait(query)
     resp = wait_for_query_to_finish(self.client, resp, max=30.0)
 
-    assert_true('multiStatementsQuery' in resp.content, resp.content)
+    assert_true('multiStatementsQuery' in resp.content, resp.content) # HUE-1843
 
     resp = self.client.post(reverse('beeswax:watch_query', args=[resp.context['query'].id]))
     assert_true('Waiting for query' in resp.content, resp.content)
@@ -483,7 +495,7 @@ for x in sys.stdin:
     handle = self.db.execute_and_wait(query)
     resp = wait_for_query_to_finish(self.client, resp, max=30.0)
 
-    assert_true('SELECT foo FROM test' in resp.content, resp.content)
+    assert_true('SELECT foo FROM test' in resp.content, resp.content) # HUE-1843
 
   def test_parallel_queries(self):
     """
@@ -711,13 +723,12 @@ for x in sys.stdin:
 
 
   def test_my_queries(self):
-    """Test the "My Queries" page"""
     # Explicit save a design
     _make_query(self.client, "select noHQL", name='my rubbish kuery', submission_type='Save')
     # Run something
     _make_query(self.client, "Even More Bogus Junk")
     resp = self.client.get('/beeswax/my_queries')
-    assert_true('my rubbish kuery' in resp.content)
+    assert_true('my rubbish kuery' in resp.content, resp.content)
     assert_true('Even More Bogus Junk' in resp.content)
 
     # Login as someone else
@@ -1204,15 +1215,17 @@ for x in sys.stdin:
   def test_select_multi_db(self):
     response = _make_query(self.client, 'SELECT * FROM test LIMIT 5', local=False, database='default')
     response = wait_for_query_to_finish(self.client, response)
-    assert_true('Query Results' in response.content, response.content)
+    content = fetch_query_result_data(self.client, response)
+    assert_true([0, u'0x0'] in content['results'], content)
 
     response = _make_query(self.client, 'SHOW TABLES', local=False, database='other_db')
     response = wait_for_query_to_finish(self.client, response)
-    assert_true('Query Results' in response.content, response.content)
+    content = fetch_query_result_data(self.client, response)
+    assert_true('tab_name' in content['columns'][0]['name'], content)
 
     response = _make_query(self.client, 'SELECT * FROM test LIMIT 5', local=False, database='not_there')
-    response = wait_for_query_to_finish(self.client, response)
-    assert_true('Error' in response.content, response.content)
+    content = json.loads(response.content)
+    assert_equal(-1, content.get('status'), content)
 
 
   def test_xss_html_escaping(self):

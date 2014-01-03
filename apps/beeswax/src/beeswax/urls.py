@@ -17,11 +17,12 @@
 
 from django.conf.urls.defaults import patterns, url
 
+
 urlpatterns = patterns('beeswax.views',
   url(r'^$', 'index', name='index'),
 
   url(r'^execute/(?P<design_id>\d+)?$', 'execute_query', name='execute_query'),
-  url(r'^watch/(?P<id>\d+)$', 'watch_query', name='watch_query'),  
+  url(r'^watch/(?P<id>\d+)$', 'watch_query', name='watch_query'),
   url(r'^results/(?P<id>\d+)/(?P<first_row>\d+)$', 'view_results', name='view_results'),
   url(r'^download/(?P<id>\d+)/(?P<format>\w+)$', 'download', name='download'),
   url(r'^save_results/(?P<id>\d+)$', 'save_results', name='save_results'),
