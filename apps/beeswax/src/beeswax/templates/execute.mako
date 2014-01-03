@@ -1250,10 +1250,15 @@ $(document).ready(function () {
 
   function resizeLogs() {
     // Use fixed subtraction since logs aren't always visible.
-    //$("#log pre").css("overflow", "auto").height($("#log").height() - 20);
-    $("#log").css("overflow", "auto").height($(window).height() - $("#log").offset().top - 60);
     $("#log pre").css("overflow", "auto").height($(window).height() - $("#log pre").offset().top - 40);
   }
+
+  viewModel.logs.subscribe(function(val){
+    if (logsAtEnd) {
+      var _logsEl = $("#log pre");
+      _logsEl.scrollTop(_logsEl[0].scrollHeight - _logsEl.height());
+    }
+  });
 });
 
 
