@@ -768,7 +768,7 @@ workflow.el.on('click', '.convert-node-link', function(e) {
 // Modal for cloning a node
 workflow.el.on('click', '.clone-node-btn', function(e) {
   var node = ko.contextFor(this).$data;
-  var model = node.model.copy();
+  var model = node.toJS();
   model.id = IdGeneratorTable[model.node_type].nextId();
   model.name += '-copy';
   model.child_links = [];
