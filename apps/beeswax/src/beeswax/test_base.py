@@ -18,9 +18,9 @@
 #
 
 import atexit
+import json
 import logging
 import os
-import re
 import subprocess
 import time
 
@@ -39,7 +39,7 @@ import beeswax.conf
 
 from beeswax.server.dbms import get_query_server_config
 from beeswax.server import dbms
- 
+
 
 HIVE_SERVER_TEST_PORT = find_unused_port()
 _INITIALIZED = False
@@ -76,7 +76,7 @@ def _start_server(cluster):
        + ':' +
        get_run_root('ext/hadoop/hadoop') + '/share/hadoop/mapreduce/hadoop-mapreduce-client-core.jar'
        ,
-      'HADOOP_CLASSPATH': hadoop_cp,     
+      'HADOOP_CLASSPATH': hadoop_cp,
   })
 
   if os.getenv("JAVA_HOME"):
@@ -173,15 +173,21 @@ def get_shared_beeswax_server():
   return _SHARED_HIVE_SERVER, _SHARED_HIVE_SERVER_CLOSER
 
 
-REFRESH_RE = re.compile('<\s*meta\s+http-equiv="refresh"\s+content="\d*;([^"]*)"\s*/>', re.I)
-
-
 def wait_for_query_to_finish(client, response, max=30.0):
+  # Take a async API execute_query() response in input
   start = time.time()
   sleep_time = 0.05
-  # We don't check response.template == "watch_wait.mako" here,
-  # because Django's response.template stuff is not thread-safe.
-  while "Waiting for query..." in response.content:
+
+  if is_finished(response): # aka Has error at submission
+    return response
+
+  content = json.loads(response.content)
+  watch_url = content['watch_url']
+
+  response = client.get(watch_url, follow=True)
+
+  # Loop and check status
+  while not is_finished(response):
     time.sleep(sleep_time)
     sleep_time = min(1.0, sleep_time * 2) # Capped exponential
     if (time.time() - start) > max:
@@ -189,16 +195,23 @@ def wait_for_query_to_finish(client, response, max=30.0):
       LOG.warning(message)
       raise Exception(message)
 
-    # Find out url to retry
-    match = REFRESH_RE.search(response.content)
-    if match is not None:
-      url = match.group(1)
-      url = url.lstrip('url=')
-    else:
-      url = response.request['PATH_INFO']
-    response = client.get(url, follow=True)
+    response = client.get(watch_url, follow=True)
   return response
 
+
+def is_finished(response):
+  status = json.loads(response.content)
+  return 'error' in status or status.get('isSuccess') or status.get('isFailure')
+
+
+def fetch_query_result_data(client, status_response):
+  # Take a wait_for_query_to_finish() response in input
+  status = json.loads(status_response.content)
+
+  response = client.get("/beeswax/results/%s/0?format=json" % status.get('id'))
+  content = json.loads(response.content)
+
+  return content
 
 def make_query(client, query, submission_type="Execute",
                udfs=None, settings=None, resources=None,
@@ -256,14 +269,16 @@ def make_query(client, query, submission_type="Execute",
     parameters["file_resources-%d-_exists" % i] = 'True'
 
   kwargs.setdefault('follow', True)
+  execute_url = reverse("beeswax:api_execute")
 
   if submission_type == 'Explain':
-    response = client.post(reverse("beeswax:api_execute") + "?explain=true", parameters, **kwargs)
-  else:
-    response = client.post(reverse("beeswax:execute_query"), parameters, **kwargs)
+    execute_url += "?explain=true"
+
+  response = client.post(execute_url, parameters, **kwargs)
 
   if wait:
     return wait_for_query_to_finish(client, response, max)
+
   return response
 
 
