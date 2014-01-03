@@ -388,7 +388,15 @@ function BeeswaxViewModel(server, query_id) {
       success: function(data) {
         $(document).trigger('watched.query', data);
       },
-      error: error_fn,
+      error: function(jqXHR, status, errorThrown) {
+        self.query.isRunning(false);
+        try {
+          var data = $.parseJSON(jqXHR.responseText);
+          self.query.errors.push(data.error);
+        } catch(e) {
+          $(document).trigger('server.unmanageable_error', jqXHR.responseText);
+        }
+      },
       data: data
     };
     $.ajax(request);
@@ -444,7 +452,7 @@ function BeeswaxViewModel(server, query_id) {
         } else {
           self.query.results.url(null);
         }
-        $(document).trigger('fetched.results', data);
+        $(document).trigger('fetched.results', [data]);
       },
       error: error_fn
     };
