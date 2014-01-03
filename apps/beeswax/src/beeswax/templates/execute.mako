@@ -1323,7 +1323,7 @@ $(document).ready(function () {
     $("#log pre").css("overflow", "auto").height($(window).height() - $("#log pre").offset().top - 40);
   }
 
-  viewModel.logs.subscribe(function(val){
+  viewModel.query.watch.logs.subscribe(function(val){
     if (logsAtEnd) {
       var _logsEl = $("#log pre");
       _logsEl.scrollTop(_logsEl[0].scrollHeight - _logsEl.height());
@@ -1355,8 +1355,8 @@ function addResults(viewModel, dataTable, index, pageSize) {
   }
 }
 
-function resultsTable() {
-  if (!dataTable) {
+function resultsTable(e, data) {
+  if (!dataTable && viewModel.query.results.columns().length > 0) {
     dataTable = $(".resultTable").dataTable({
       "bPaginate": false,
       "bLengthChange": false,
