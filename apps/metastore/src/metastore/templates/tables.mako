@@ -24,6 +24,9 @@ from django.utils.translation import ugettext as _
 ${ commonheader(_('Tables'), 'metastore', user) | n,unicode }
 ${ components.menubar() }
 
+<link rel="stylesheet" href="/static/ext/chosen/chosen.min.css">
+<script src="/static/ext/chosen/chosen.jquery.min.js" type="text/javascript" charset="utf-8"></script>
+
 <div class="container-fluid" id="tables">
   <div class="row-fluid">
     <div class="span3">
@@ -140,7 +143,13 @@ ${ components.menubar() }
 
     $("a[data-row-selector='true']").jHueRowSelector();
 
-    $("#id_database").change(function () {
+    $("#id_database").chosen({
+      disable_search_threshold: 5,
+      width: "100%",
+      no_results_text: "${_('Oops, no database found!')}"
+    });
+
+    $("#id_database").chosen().change(function () {
       $.cookie("hueBeeswaxLastDatabase", $(this).val(), {expires: 90});
       $('#db_form').submit();
     });

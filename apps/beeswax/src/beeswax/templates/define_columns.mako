@@ -179,10 +179,19 @@ ${ layout.metastore_menubar() }
   }
 </style>
 
+<link rel="stylesheet" href="/static/ext/chosen/chosen.min.css">
+<script src="/static/ext/chosen/chosen.jquery.min.js" type="text/javascript" charset="utf-8"></script>
+
 <script type="text/javascript" charset="utf-8">
   $(document).ready(function () {
-    $("#chooseDatabase").on("change", function () {
-      window.location.href = $(this).val();
+    $("#chooseDatabase").chosen({
+      disable_search_threshold: 5,
+      width: "100%",
+      no_results_text: "${_('Oops, no database found!')}"
+    });
+
+    $("#chooseDatabase").chosen().change(function () {
+      window.location.href = $("#chooseDatabase").val();
     });
 
     $("[rel='tooltip']").tooltip();
