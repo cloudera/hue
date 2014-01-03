@@ -1,14 +1,21 @@
+.. image:: docs/images/hue_logo.png
+
 Welcome to the repository for Hue
 =================================
 
-Hue is both a Web UI for Hadoop and a framework to create interactive Web
-applications. It features:
+`Hue
+<http://gethue.com>`_ is a Web UI and framework for making Hadoop easy to use.
+
+.. image:: docs/images/hue-screen.png
+
+It features:
 
       * File Browser for accessing HDFS
       * Beeswax application for executing Hive queries
       * Impala App for executing Cloudera Impala queries
-      * Oozie App for submitting and monitoring workflows, coordinators and bundles
+      * Spark editor and dashboard
       * Pig Editor for submitting Pig scripts
+      * Oozie App for submitting and monitoring workflows, coordinators and bundles
       * HBase Browser for exploring and modifying HBase tables and data
       * Table Browser for accessing Hive metadata and HCatalog
       * Search app for querying Solr and Solr Cloud
@@ -17,7 +24,6 @@ applications. It features:
       * A Sqoop 2 editor and dashboard
       * A ZooKeeper browser and editor
       * A DB Query editor for querying MySql, PostGres, Sqlite and Oracle
-      * Spark editor and dashboard
 
 On top of that, a SDK is available for creating new apps integrated with Hadoop.
 
