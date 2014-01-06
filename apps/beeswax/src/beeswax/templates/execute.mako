@@ -1679,6 +1679,18 @@ $(document).ready(function () {
       'trigger': 'hover',
       'html': true
     });
+
+    window.onbeforeunload = function(e) {
+      viewModel.closeQuery();
+    };
+
+    $(document).on('explain.query', function() {
+      viewModel.closeQuery();
+    });
+
+    $(document).on('execute.query', function() {
+      viewModel.closeQuery();
+    });
   % endif
 });
 
