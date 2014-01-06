@@ -470,7 +470,7 @@ $(document).ready(function () {
     }
     $("#jobDuration").html('<span title="' + emptyStringIfNull(job.durationMs) + '">' + (job.isRetired ? '${_('N/A')}' : emptyStringIfNull(job.durationFormatted)) + '</span>');
 
-    if (['RUNNING', 'PREP', 'WAITING', 'SUSPENDED', 'PREPSUSPENDED', 'PREPPAUSED', 'PAUSED'].indexOf(job.status.toUpperCase()) == -1) {
+    if (['RUNNING', 'PREP', 'WAITING', 'SUSPENDED', 'PREPSUSPENDED', 'PREPPAUSED', 'PAUSED', 'STARTED', 'FINISHING'].indexOf(job.status.toUpperCase()) == -1) {
       window.clearInterval(_runningInterval);
       removeFailedTasksFromRecent();
       $.jHueTitleUpdater.reset();
