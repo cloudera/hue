@@ -742,10 +742,10 @@ for x in sys.stdin:
 
 
   def test_save_results_to_dir(self):
-    """Check that saving to directory works"""
 
     def save_and_verify(select_resp, target_dir, verify=True):
-      qid = select_resp.context['query'].id
+      content = json.loads(select_resp.content)
+      qid = content['id']
       save_data = {
         'type': 'hdfs',
         'path': target_dir
@@ -799,11 +799,11 @@ for x in sys.stdin:
 
 
   def test_save_results_to_tbl(self):
-    """Check that saving to new table works"""
 
     def save_and_verify(select_resp, target_tbl):
       """Check that saving to table works"""
-      qid = select_resp.context['query'].id
+      content = json.loads(select_resp.content)
+      qid = content['id']
       save_data = {
         'type': 'hive-table',
         'path': target_tbl
@@ -1586,10 +1586,12 @@ class TestWithMockedServer(object):
 
   def test_bulk_query_trash(self):
     response = _make_query(self.client, 'SELECT', submission_type='Save', name='My Name 1', desc='My Description')
-    query = response.context['design']
+    content = json.loads(response.content)
+    query = content['design_id']
     response = _make_query(self.client, 'SELECT', submission_type='Save', name='My Name 2', desc='My Description')
-    query2 = response.context['design']
-    ids = [query.id, query2.id]
+    content = json.loads(response.content)
+    query2 = content['design_id']
+    ids = [query, query2]
 
     resp = self.client.get('/beeswax/list_designs')
     ids_page_1 = set([query.id for query in resp.context['page'].object_list])

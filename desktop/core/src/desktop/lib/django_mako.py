@@ -64,7 +64,7 @@ class DesktopLookup(TemplateCollection):
                             output_encoding=i18n.get_site_encoding(),
                             input_encoding=i18n.get_site_encoding(),
                             encoding_errors=ENCODING_ERRORS,
-                            default_filters=['decode.utf8', 'unicode', 'escape'],
+                            default_filters=['unicode', 'escape'],
                             imports=IMPORTS)
     # TODO(philip): Make a django_aware default filter, that understands
     # django safe strings.  See http://www.makotemplates.org/docs/filtering.html.

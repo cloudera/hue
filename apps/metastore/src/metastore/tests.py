@@ -98,8 +98,7 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     assert_true("foo" in response.content)
     assert_true("bar" in response.content)
     # This should NOT go into the query history.
-    assert_equal(verify_history(self.client, fragment='test'), history_cnt,
-                 'Implicit queries should not be saved in the history')
+    assert_equal(verify_history(self.client, fragment='test'), history_cnt, 'Implicit queries should not be saved in the history')
     assert_equal(str(response.context['query_context'][0]), 'table')
     assert_equal(str(response.context['query_context'][1]), 'test:default')
 
