@@ -46,6 +46,7 @@ function BeeswaxViewModel(server, query_id) {
     'watch': {
       'logs': [],
       'url': null,
+      'errors': []
     },
     'isRunning': false
   };
@@ -80,7 +81,9 @@ function BeeswaxViewModel(server, query_id) {
       }
     },
     'write': function(value) {
-      self.selectedDatabase(self.databases.indexOf(value));
+      if (value) {
+        self.selectedDatabase(self.databases.indexOf(value));
+      }
     },
     'deferEvaluation': true
   });
@@ -344,6 +347,7 @@ function BeeswaxViewModel(server, query_id) {
     $(document).trigger('execute.query', data);
     self.query.explain(false);
     self.query.isRunning(true);
+    self.query.errors.removeAll();
 
     var data = {
       'query-query': self.query.query(),
@@ -367,6 +371,7 @@ function BeeswaxViewModel(server, query_id) {
           self.watchQueryLoop();
         } else {
           self.query.errors.push(data.message);
+          self.query.isRunning(false);
           $(document).trigger('error.query');
         }
         $(document).trigger('executed.query', data);
@@ -411,28 +416,37 @@ function BeeswaxViewModel(server, query_id) {
   self.watchQueryLoop = function(fn) {
     var TIMEOUT = 1000;
     var timer = null;
-    var executed_once = false;
 
     self.query.watch.logs.removeAll();
+    self.query.watch.errors.removeAll();
     self.query.results.rows.removeAll();
     self.query.results.columns.removeAll();
 
     var _fn = function() {
       $(document).one('watched.query', function(e, data) {
-        if (executed_once && (data.isSuccess || data.isFailure)) {
+        if (data.isSuccess || data.isFailure) {
           clearTimeout(timer);
-          $(document).trigger('stop_watch.query');
-          if (fn) {
-            fn(data);
-          } else {
-            self.fetchResults();
-          }
-        } else {
-          executed_once = true;
+          self.query.isRunning(false);
+
           if (data.log) {
             self.query.watch.logs.push(data.log);
             // scroll logs
           }
+          if (!data.isFailure) {
+            $(document).trigger('stop_watch.query');
+
+            if (fn) {
+              fn(data);
+            } else {
+              self.fetchResults();
+            }
+          }
+        } else {
+          if (data.log) {
+            self.query.watch.logs.push(data.log);
+            // scroll logs
+          }
+          
           timer = setTimeout(_fn, TIMEOUT);
         }
       });
