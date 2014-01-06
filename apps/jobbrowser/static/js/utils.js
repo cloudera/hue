@@ -72,7 +72,7 @@ function getStatusClass(status, prefix) {
   else if (['RUNNING', 'ACCEPTED', 'READY',
     'PREP', 'WAITING', 'SUSPENDED',
     'PREPSUSPENDED', 'PREPPAUSED', 'PAUSED',
-    'SUBMITTED', 'SUSPENDEDWITHERROR', 'PAUSEDWITHERROR'].indexOf(status) > -1) {
+    'SUBMITTED', 'SUSPENDEDWITHERROR', 'PAUSEDWITHERROR', 'FINISHING', 'STARTED'].indexOf(status) > -1) {
     klass = prefix + "warning";
   }
   else {

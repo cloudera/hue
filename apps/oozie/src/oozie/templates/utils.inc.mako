@@ -190,7 +190,7 @@
 <%def name="get_status(status)">
    % if status in ('SUCCEEDED', 'OK', 'NORMAL', 'DONE'):
      label-success
-   % elif status in ('RUNNING', 'PREP', 'WAITING', 'SUSPENDED', 'PREPSUSPENDED', 'PREPPAUSED', 'PAUSED'):
+   % elif status in ('RUNNING', 'PREP', 'WAITING', 'SUSPENDED', 'PREPSUSPENDED', 'PREPPAUSED', 'PAUSED', 'STARTED', 'FINISHING'):
       label-warning
    % elif status == 'READY':
       label-success

@@ -364,7 +364,7 @@ ${layout.menubar(section='bundles', dashboard=True)}
                       '>${ _('Resume') }</a>';
             }
             if (foundRow == null) {
-              if (['RUNNING', 'PREP', 'WAITING', 'SUSPENDED', 'PREPSUSPENDED', 'PREPPAUSED', 'PAUSED'].indexOf(bundle.status) > -1) {
+              if (['RUNNING', 'PREP', 'WAITING', 'SUSPENDED', 'PREPSUSPENDED', 'PREPPAUSED', 'PAUSED', 'STARTED', 'FINISHING'].indexOf(bundle.status) > -1) {
                 try {
                   runningTable.fnAddData([
                     emptyStringIfNull(bundle.kickoffTime),
