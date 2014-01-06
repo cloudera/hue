@@ -121,7 +121,7 @@ def execute_directly(request, query, design, query_server, tablename=None, **kwa
   db.use(database)
 
   history_obj = db.execute_query(query, design)
-  watch_url = reverse(get_app_name(request) + ':watch_query_refresh_json', kwargs={'id': history_obj.id})
+  watch_url = reverse(get_app_name(request) + ':api_watch_query_refresh_json', kwargs={'id': history_obj.id})
 
   response = {
     'status': 0,
@@ -178,19 +178,24 @@ def watch_query_refresh_json(request, id):
 
 
 def close_operation(request, query_id):
-  response = {'status': -1, 'message': ''}
+  response = {
+    'status': -1,
+    'message': ''
+  }
 
   if request.method != 'POST':
     response['message'] = _('A POST request is required.')
   else:
     try:
       query_history = authorized_get_history(request, query_id, must_exist=True)
-      db = dbms.get(request.user, query_history.get_query_server_config())
-      db.close_operation(query_history.get_handle())
-      _get_query_handle_and_state(query_history)
-      response = {'status': 0}
+      db = dbms.get(query_history.owner, query_history.get_query_server_config())
+      handle = query_history.get_handle()
+      db.close_operation(handle)
+      query_history.set_to_expired()
+      query_history.save()
+      response['status'] = 0
     except Exception, e:
-      response = {'message': unicode(e)}
+      response['message'] = unicode(e)
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
@@ -381,7 +386,7 @@ def save_results(request, query_id):
           response['id'] = query_history.id
           response['query'] = query_history.query
           response['path'] = target_dir
-          response['watch_url'] = reverse(get_app_name(request) + ':watch_query_refresh_json', kwargs={'id': query_history.id})
+          response['watch_url'] = reverse(get_app_name(request) + ':api_watch_query_refresh_json', kwargs={'id': query_history.id})
         elif form.cleaned_data['save_target'] == form.SAVE_TYPE_TBL:
           db.create_table_as_a_select(request, query_history, form.cleaned_data['target_table'], result_meta)
           response['type'] = 'hive-table'

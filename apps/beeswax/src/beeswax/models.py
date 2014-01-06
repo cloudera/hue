@@ -155,6 +155,9 @@ class QueryHistory(models.Model):
   def set_to_available(self):
     self.last_state = QueryHistory.STATE.available.index
 
+  def set_to_expired(self):
+    self.last_state = QueryHistory.STATE.expired.index
+
 
 def make_query_context(type, info):
   """

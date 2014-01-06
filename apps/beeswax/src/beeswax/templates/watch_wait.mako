@@ -101,7 +101,7 @@ ${layout.menubar(section='query')}
 
     function refreshView() {
       $.ajaxSetup({ cache: false });
-      $.getJSON("${url(app_name + ':watch_query_refresh_json', query.id)}", function (data) {
+      $.getJSON("${url(app_name + ':api_watch_query_refresh_json', query.id)}", function (data) {
         if (data.isSuccess || data.isFailure) {
           location.href = fwdUrl;
         }

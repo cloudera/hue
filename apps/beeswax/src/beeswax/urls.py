@@ -65,7 +65,7 @@ urlpatterns += patterns(
   url(r'^api/query/(?P<query_id>\d+)?$', 'save_query', name='api_save_query'),
   url(r'^api/query/(?P<query_id>\d+)/get$', 'fetch_saved_query', name='api_fetch_saved_query'),
   url(r'^api/query/(?P<query_id>\d+)/cancel$', 'cancel_query', name='api_cancel_query'),
+  url(r'^api/query/(?P<query_id>\d+)/close/?$', 'close_operation', name='api_close_operation'),
   url(r'^api/query/(?P<query_id>\d+)/results/save$', 'save_results', name='api_save_results'),
-  url(r'^watch/json/(?P<id>\d+)$', 'watch_query_refresh_json', name='watch_query_refresh_json'),
-  url(r'^close_operation/(?P<query_id>\d+)?$', 'close_operation', name='close_operation'),
+  url(r'^api/watch/json/(?P<id>\d+)$', 'watch_query_refresh_json', name='api_watch_query_refresh_json'),
 )
