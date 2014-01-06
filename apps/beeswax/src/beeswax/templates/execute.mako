@@ -50,7 +50,7 @@ ${layout.menubar(section='query')}
 
             <div class="control-group">
               <label>${_('Value')}</label>
-              <input data-bind="value: value" type="text" class="span8" placeholder="1"/>
+              <input data-bind="value: value" type="text" class="settingValuesField span8" placeholder="1"/>
             </div>
           </div>
           <!-- /ko -->
@@ -87,7 +87,7 @@ ${layout.menubar(section='query')}
 
             <div class="control-group">
               <label>${_('Path')}</label>
-              <input data-bind="value: path" type="text" class="span8 pathChooser" placeholder="/user/foo/udf.jar"/>
+              <input data-bind="value: path" type="text" class="filesField span7 pathChooser" placeholder="/user/foo/udf.jar"/>
             </div>
           </div>
           <!-- /ko -->
@@ -120,7 +120,7 @@ ${layout.menubar(section='query')}
 
             <div class="control-group">
               <label>${_('Class name')}</label>
-              <input data-bind="value: class_name" type="text" class="span8" placeholder="com.acme.example"/>
+              <input data-bind="value: class_name" type="text" class="classNamesField span8" placeholder="com.acme.example"/>
             </div>
           </div>
           <!-- /ko -->
@@ -1594,6 +1594,15 @@ $(document).on('cancelled.query', function (e) {
   $(document).trigger("info", "${ _('Query canceled!') }")
 });
 
+function updateSidebarTooltips(selector) {
+  $(selector).each(function(){
+    $(this).tooltip({
+      placement: "right",
+      title: $(this).val()
+    }).attr('data-original-title', $(this).val()).tooltip('fixTitle');
+  });
+}
+
 $(document).ready(function () {
   $(".pathChooser:not(:has(~ button))").after(getFileBrowseButton($(".pathChooser:not(:has(~ button))")));
 
@@ -1620,6 +1629,33 @@ $(document).ready(function () {
     'trigger': 'hover',
     'html': true
   });
+
+  $(document).on("change", ".settingsField", function(){
+    updateSidebarTooltips(".settingsField");
+  });
+
+  $(document).on("change", ".settingValuesField", function(){
+    updateSidebarTooltips(".settingValuesField");
+  });
+
+  $(document).on("change", ".filesField", function(){
+    updateSidebarTooltips(".filesField");
+  });
+
+  $(document).on("change", ".functionsField", function(){
+    updateSidebarTooltips(".functionsField");
+  });
+
+  $(document).on("change", ".classNamesField", function(){
+    updateSidebarTooltips(".classNamesField");
+  });
+
+  // loads default
+  updateSidebarTooltips(".settingsField");
+  updateSidebarTooltips(".settingValuesField");
+  updateSidebarTooltips(".filesField");
+  updateSidebarTooltips(".functionsField");
+  updateSidebarTooltips(".classNamesField");
 
   % if app_name == 'impala':
     $("#downloadQuery").click(function () {

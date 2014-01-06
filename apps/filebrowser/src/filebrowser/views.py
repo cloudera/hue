@@ -496,11 +496,13 @@ def display(request, path):
     if not request.fs.isfile(path):
         raise PopupException(_("Not a file: '%(path)s'") % {'path': path})
 
-    mimetype = mimetypes.guess_type(path)[0]
+    # display inline files just if it's not an ajax request
+    if not request.is_ajax():
+      mimetype = mimetypes.guess_type(path)[0]
 
-    if mimetype is not None and INLINE_DISPLAY_MIMETYPE.search(mimetype):
-      path_enc = urlencode(path)
-      return redirect(reverse('filebrowser.views.download', args=[path_enc]) + '?disposition=inline')
+      if mimetype is not None and INLINE_DISPLAY_MIMETYPE.search(mimetype):
+        path_enc = urlencode(path)
+        return redirect(reverse('filebrowser.views.download', args=[path_enc]) + '?disposition=inline')
 
     stats = request.fs.stats(path)
     encoding = request.GET.get('encoding') or i18n.get_site_encoding()
