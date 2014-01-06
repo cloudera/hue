@@ -100,7 +100,7 @@
                   .appendTo(form);
           $("<input>").attr("type", "hidden")
                   .attr("name", "sla")
-                  .attr("value", ko.utils.stringifyJson(window.slaModel.sla))
+                  .attr("value", ko.toJSON(window.slaModel.sla))
                   .appendTo(form);
 
           form.submit();
