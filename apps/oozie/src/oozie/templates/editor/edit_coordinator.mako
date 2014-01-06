@@ -44,6 +44,7 @@ ${ layout.menubar(section='coordinators') }
 </style>
 
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/routie-0.3.0.min.js" type="text/javascript" charset="utf-8"></script>
 
 
@@ -440,7 +441,6 @@ ${ layout.menubar(section='coordinators') }
 <form class="form-horizontal" id="edit-dataset-form"></form>
 
 
-
 % if coordinator.id:
   <div class="modal hide" id="edit-dataset-modal" style="z-index:1500;width:850px"></div>
 
@@ -601,7 +601,7 @@ ${ layout.menubar(section='coordinators') }
 
       var slaModel = function() {
         var self = this;
-        self.sla = ko.observableArray(${ coordinator.sla_jsescaped | n,unicode });
+        self.sla = ko.mapping.fromJS(${ coordinator.sla_jsescaped | n,unicode });
       };
 
       window.slaModel = new slaModel();
