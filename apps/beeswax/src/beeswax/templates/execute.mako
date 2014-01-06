@@ -96,11 +96,10 @@ ${layout.menubar(section='query')}
             <a data-bind="click: function() { $root.addFileResources('','') }" class="btn btn-mini paramAdd">${_('Add')}</a>
           </div>
         </li>
-        <li class="nav-header" title="${_("User-Defined Functions")}"
+        <li class="nav-header 
           % if app_name == 'impala':
             hide
-          % endif
-          ">
+          % endif" title="${_("User-Defined Functions")}">
           ${_('UDFs')}
         </li>
         <li class="white paramContainer
@@ -223,6 +222,14 @@ ${layout.menubar(section='query')}
             </div>
           </div>
 
+          <div data-bind="css: {'hide': query.watch.errors().length == 0}" class="alert alert-error">
+            <p><strong>${_('Your query has the following error(s):')}</strong></p>
+
+            <div data-bind="foreach: query.watch.errors">
+              <p data-bind="text: $data" class="queryErrorMessage"></p>
+            </div>
+          </div>
+
           <textarea class="hide" tabindex="1" name="query" id="queryField"></textarea>
 
           <div class="actions">
@@ -296,6 +303,7 @@ ${layout.menubar(section='query')}
           </table>
         </div>
         <div class="tab-pane" id="results">
+
           <div data-bind="css: {'hide': $root.query.results.rows().length == 0}" class="hide">
             <table class="table table-striped table-condensed resultTable" cellpadding="0" cellspacing="0" data-tablescroller-enforce-height="true">
               <thead>
@@ -318,6 +326,7 @@ ${layout.menubar(section='query')}
             </div>
           </div>
         </div>
+
          <div class="tab-pane" id="chart">
           <div style="text-align: center">
           <form class="form-inline">
@@ -1079,8 +1088,11 @@ $(document).ready(function () {
     if (codeMirror.getValue() == queryPlaceholder) {
       codeMirror.setValue("");
     }
-    if (errorWidget) {
-      errorWidget.clear();
+    if (errorWidgets) {
+      $.each(errorWidgets, function(index, errorWidget) {
+        errorWidget.clear();
+      });
+      errorWidgets = [];
     }
     $("#validationResults").empty();
   });
@@ -1432,15 +1444,25 @@ $(document).on('explain.query', cleanResultsTable);
 $(document).on('fetched.results', resultsTable);
 
 var selectedLine = -1;
-var errorWidget = null;
+var errorWidgets = [];
 $(document).on('error.query', function () {
-  if ($(".queryErrorMessage").length > 0) {
-    var err = $(".queryErrorMessage").text().toLowerCase();
+  $.each(errorWidgets, function(index, el) {
+    $(el).remove();
+    errorWidgets = [];
+  });
+
+  $.each($(".queryErrorMessage"), function(index, el) {
+    var err = $(el).text().toLowerCase();
     var firstPos = err.indexOf("line");
     if (firstPos > -1) {
       selectedLine = $.trim(err.substring(err.indexOf(" ", firstPos), err.indexOf(":", firstPos))) * 1;
-      errorWidget = codeMirror.addLineWidget(selectedLine - 1, $("<div>").addClass("editorError").html("<i class='fa fa-exclamation-circle'></i> " + err)[0], {coverGutter: true, noHScroll: true})
+      errorWidgets.push(codeMirror.addLineWidget(selectedLine - 1, $("<div>").addClass("editorError").html("<i class='fa fa-exclamation-circle'></i> " + err)[0], {coverGutter: true, noHScroll: true}));
     }
+    $(el).hide();
+  });
+
+  if ($(".queryErrorMessage:hidden").length == $(".queryErrorMessage").length) {
+    $(".queryErrorMessage").parent().parent().hide();
   }
 });
 
@@ -1725,7 +1747,7 @@ $(document).ready(function () {
       showSection('explain-parameter-selection');
     },
     'query/logs': function () {
-      if (viewModel.query.watch.logs().length == 0) {
+      if (viewModel.query.watch.logs().length == 0 && viewModel.query.watch.errors().length == 0) {
         routie('query');
       }
       codeMirror.setSize("99%", 100);
@@ -1735,7 +1757,7 @@ $(document).ready(function () {
       clickHard('.resultsContainer .nav-tabs a[href="#log"]');
     },
     'query/results': function () {
-      if (viewModel.query.results.empty()) {
+      if (viewModel.query.id() == -1 && viewModel.query.results.empty()) {
         routie('query');
       } else {
         codeMirror.setSize("99%", 100);
@@ -1770,11 +1792,20 @@ $(document).ready(function () {
   $(document).on('explained.query', function () {
     routie('query/explanation');
   });
-  $(document).on('watched.query', function () {
+  $(document).on('watched.query', function (e, data) {
+    if (data.status && data.status && data.status != 0) {
+      viewModel.query.watch.errors.push(data.error || data.message);
+    }
+    routie('query/logs');
+  });
+  $(document).on('error_watch.query', function () {
     routie('query/logs');
   });
   $(document).on('fetched.results', function () {
     routie('query/results');
+  });
+  $(document).on('execute.query', function() {
+    routie('query');
   });
 });
 
