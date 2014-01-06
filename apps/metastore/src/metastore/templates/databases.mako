@@ -166,10 +166,12 @@ ${ components.menubar() }
       $.getJSON("${ url('metastore:drop_database') }", function (data) {
         $("#dropDatabaseMessage").text(data.title);
       });
-      viewModel.chosenDatabases.removeAll();
+      var _tempList = [];
       $(".hueCheckbox[checked='checked']").each(function (index) {
-        viewModel.chosenDatabases.push($(this).data("drop-name"));
+        _tempList.push($(this).data("drop-name"));
       });
+      viewModel.chosenDatabases.removeAll();
+      viewModel.chosenDatabases(_tempList);
       $("#dropDatabase").modal("show");
     });
   });

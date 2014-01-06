@@ -201,10 +201,12 @@ ${ components.menubar() }
       $.getJSON("${ url('metastore:drop_table', database=database) }", function (data) {
         $("#dropTableMessage").text(data.title);
       });
-      viewModel.chosenTables.removeAll();
+      var _tempList = [];
       $(".hueCheckbox[checked='checked']").each(function (index) {
-        viewModel.chosenTables.push($(this).data("drop-name"));
+        _tempList.push($(this).data("drop-name"));
       });
+      viewModel.chosenTables.removeAll();
+      viewModel.chosenTables(_tempList);
       $("#dropTable").modal("show");
     });
   });
