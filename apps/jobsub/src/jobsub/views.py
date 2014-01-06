@@ -45,6 +45,7 @@ from oozie.utils import model_to_dict, format_dict_field_values,\
 
 
 LOG = logging.getLogger(__name__)
+MAX_DESIGNS = 250
 
 
 def _list_designs(request, owner, name, order_by='-last_modified'):
@@ -65,7 +66,7 @@ def _list_designs(request, owner, name, order_by='-last_modified'):
   data = data.order_by(order_by)
 
   designs = []
-  for doc in data:
+  for doc in data[:MAX_DESIGNS]:
     design = doc.content_object
 
     ko_design = {
