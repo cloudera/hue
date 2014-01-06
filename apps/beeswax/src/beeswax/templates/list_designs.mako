@@ -16,8 +16,10 @@
 <%!
     import time
     from django.template.defaultfilters import timesince
-    from desktop.views import commonheader, commonfooter
+    from django.utils.encoding import force_unicode    
     from django.utils.translation import ugettext as _
+
+    from desktop.views import commonheader, commonfooter
 %>
 
 <%namespace name="actionbar" file="actionbar.mako" />
@@ -26,7 +28,7 @@
 
 ${ commonheader(_('Saved Queries'), app_name, user) | n,unicode }
 
-${layout.menubar(section='saved queries')}
+${ layout.menubar(section='saved queries') }
 
 <div class="container-fluid">
   <div class="card card-small">
@@ -101,25 +103,25 @@ ${layout.menubar(section='saved queries')}
         </td>
         <td>
         % if may_edit:
-          <a href="${ url(app_name + ':execute_query', design_id=design.id) }" data-row-selector="true">${design.name}</a>
+          <a href="${ url(app_name + ':execute_query', design_id=design.id) }" data-row-selector="true">${ force_unicode(design.name) }</a>
         % else:
-          ${ design.name }
+          ${ force_unicode(design.name) }
         % endif
         </td>
         <td>
         % if design.desc:
-          ${ design.desc }
+          ${ force_unicode(design.desc) }
         % endif
         </td>
         <td>${ design.owner.username }</td>
-        <td data-sort-value="${time.mktime(design.mtime.timetuple())}">${ timesince(design.mtime) } ${_('ago')}</td>
+        <td data-sort-value="${time.mktime(design.mtime.timetuple())}">${ timesince(design.mtime) } ${ _('ago') }</td>
       </tr>
       % endfor
     </tbody>
   </table>
     <div class="card-body">
       <p>
-        ${comps.pagination(page)}
+        ${ comps.pagination(page) }
       </p>
     </div>
   </div>
