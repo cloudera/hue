@@ -78,6 +78,7 @@ class Submission(object):
       deployment_dir = self.deploy()
 
     self._update_properties(jobtracker, deployment_dir)
+
     self.oozie_id = self.api.submit_job(self.properties)
     LOG.info("Submitted: %s" % (self,))
 
@@ -134,7 +135,7 @@ class Submission(object):
     try:
       deployment_dir = self._create_deployment_dir()
     except Exception, ex:
-      msg = _("Failed to access deployment directory.")
+      msg = _("Failed to create deployment directory: %s" % ex)
       LOG.exception(msg)
       raise PopupException(message=msg, detail=str(ex))
 
@@ -201,9 +202,14 @@ class Submission(object):
     # Automatic setup of the required directories if needed
     create_directories(self.fs)
 
+    # Case of a shared job
     if self.user != self.job.owner:
       path = Hdfs.join(REMOTE_DEPLOYMENT_DIR.get(), '_%s_-oozie-%s-%s' % (self.user.username, self.job.id, time.time()))
-      self.fs.copy_remote_dir(self.job.deployment_dir, path, owner=self.user, dir_mode=0711)
+      # Shared coords or bundles might not have any existing workspaces
+      if self.fs.exists(self.job.deployment_dir):
+        self.fs.copy_remote_dir(self.job.deployment_dir, path, owner=self.user, dir_mode=0711)
+      else:
+        self._create_dir(path)
     else:
       path = self.job.deployment_dir
       self._create_dir(path)
