@@ -216,7 +216,7 @@ def fetch_query_result_data(client, status_response):
 def make_query(client, query, submission_type="Execute",
                udfs=None, settings=None, resources=None,
                wait=False, name=None, desc=None, local=True,
-               is_parameterized=True, max=30.0, database='default', email_notify=False, **kwargs):
+               is_parameterized=True, max=30.0, database='default', email_notify=False, params=None, **kwargs):
   """
   Prepares arguments for the execute view.
 
@@ -225,6 +225,8 @@ def make_query(client, query, submission_type="Execute",
 
   if settings is None:
     settings = []
+  if params is None:
+    params = []
   if local:
     # Tests run faster if not run against the real cluster.
     settings.append(('mapreduce.framework.name', 'local'))
@@ -269,6 +271,8 @@ def make_query(client, query, submission_type="Execute",
     parameters["file_resources-%d-type" % i] = str(type)
     parameters["file_resources-%d-path" % i] = str(path)
     parameters["file_resources-%d-_exists" % i] = 'True'
+  for name, value in params:
+    parameters["parameterization-%s" % name] = value
 
   kwargs.setdefault('follow', True)
   execute_url = reverse("beeswax:api_execute")
