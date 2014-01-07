@@ -12,18 +12,18 @@ It features:
 
       * File Browser for accessing HDFS
       * Beeswax application for executing Hive queries
-      * Impala App for executing Cloudera Impala queries
-      * Spark editor and dashboard
+      * Impala App for executing Impala queries
+      * Spark Editor and Dashboard
       * Pig Editor for submitting Pig scripts
       * Oozie App for submitting and monitoring workflows, coordinators and bundles
       * HBase Browser for exploring and modifying HBase tables and data
       * Table Browser for accessing Hive metadata and HCatalog
-      * Search app for querying Solr and Solr Cloud
+      * Search App for querying Solr and Solr Cloud
       * Job Browser for accessing MapReduce jobs (MR1/MR2-YARN)
       * Job Designer for creating MapReduce/Streaming/Java jobs
-      * A Sqoop 2 editor and dashboard
-      * A ZooKeeper browser and editor
-      * A DB Query editor for querying MySql, PostGres, Sqlite and Oracle
+      * A Sqoop 2 Editor and Dashboard
+      * A ZooKeeper Browser and Editor
+      * A DB Query Editor for MySql, PostGres, Sqlite and Oracle
 
 On top of that, a SDK is available for creating new apps integrated with Hadoop.
 
@@ -32,7 +32,7 @@ More user and developer documentation is available at http://gethue.com.
 
 Getting Started
 ===============
-To build and get the core server running::
+To build and get the development server running::
 
     $ git clone http://github.com/cloudera/hue.git
     $ cd hue
@@ -50,9 +50,16 @@ Note: to start the production server (but lose the automatic reloading after sou
 
 To run the tests::
 
+   Install the mini cluster (only once):
+   $ ./tools/jenkins/jenkins.sh slow
+
+   Run all the tests:
    $ build/env/bin/hue test all
-   $ build/env/bin/hue test specific filebrowser
-   $ build/env/bin/hue test specific jobbrowser.tests:test_get_path
+
+   Or just some parts of the tests, e.g.:
+   $ build/env/bin/hue test specific impala
+   $ build/env/bin/hue test specific impala.tests:TestMockedImpala
+   $ build/env/bin/hue test specific impala.tests:TestMockedImpala.test_basic_flow
 
 
 Development Prerequisites
