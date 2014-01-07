@@ -95,8 +95,8 @@
           $(event.target.parentNode).addClass("rowSelected");
           $(event.target.parentNode).find("td").addClass("rowSelected");
           jHueTableExtenderNavigator
-              .css("left", (event.clientX + jHueTableExtenderNavigator.width() > $(window).width() - 10 ? event.clientX - jHueTableExtenderNavigator.width() - 10 : event.clientX) + "px")
-              .css("top", (event.clientY + 10) + "px").show();
+              .css("left", (event.pageX + jHueTableExtenderNavigator.width() > $(window).width() - 10 ? event.pageX - jHueTableExtenderNavigator.width() - 10 : event.pageX) + "px")
+              .css("top", (event.pageY + 10) + "px").show();
           jHueTableExtenderNavigator.find("input").focus();
         }, 100);
       }

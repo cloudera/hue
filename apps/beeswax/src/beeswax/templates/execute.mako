@@ -297,7 +297,7 @@ ${layout.menubar(section='query')}
         </div>
         <div class="tab-pane" id="results">
           <div data-bind="css: {'hide': $root.query.results.rows().length == 0}" class="hide">
-            <table class="table table-striped table-condensed resultTable" cellpadding="0" cellspacing="0" data-tablescroller-min-height-disable="true" data-tablescroller-enforce-height="true">
+            <table class="table table-striped table-condensed resultTable" cellpadding="0" cellspacing="0" data-tablescroller-enforce-height="true">
               <thead>
               <tr data-bind="foreach: $root.query.results.columns">
                 <th data-bind="text: $data.name, css: { 'sort-numeric': $.inArray($data.type, ['TINYINT_TYPE', 'SMALLINT_TYPE', 'INT_TYPE', 'BIGINT_TYPE', 'FLOAT_TYPE', 'DOUBLE_TYPE', 'DECIMAL_TYPE']) > -1, 'sort-date': $.inArray($data.type, ['TIMESTAMP_TYPE', 'DATE_TYPE']) > -1, 'sort-string': $.inArray($data.type, ['TINYINT_TYPE', 'SMALLINT_TYPE', 'INT_TYPE', 'BIGINT_TYPE', 'FLOAT_TYPE', 'DOUBLE_TYPE', 'DECIMAL_TYPE', 'TIMESTAMP_TYPE', 'DATE_TYPE']) == -1 }"></th>
@@ -688,6 +688,10 @@ ${layout.menubar(section='query')}
     height: 200px;
   }
 
+  .resultTable td, .resultTable th {
+    white-space: nowrap;
+  }
+
 </style>
 
 <link href="/static/ext/css/leaflet.css" rel="stylesheet">
@@ -890,6 +894,7 @@ function getHighlightedQuery() {
 function reinitializeTable () {
   window.setTimeout(function(){
     $(".dataTables_wrapper").jHueTableScroller({
+      minHeight: $(window).height() - 190,
       heightAfterCorrection: 0
     });
     $(".resultTable").jHueTableExtender({
@@ -1418,6 +1423,7 @@ function resultsTable(e, data) {
     });
     addResults(viewModel, dataTable, index, pageSize);
     index += pageSize;
+    dataTableEl.jHueScrollUp();
   }
 }
 
@@ -1486,6 +1492,9 @@ function tryExecuteQuery() {
   $(".tooltip").remove();
   var query = getHighlightedQuery() || codeMirror.getValue();
   viewModel.query.query(query);
+  if ($(".dataTables_wrapper").length > 0) { // forces results to be up
+    $(".dataTables_wrapper").scrollTop(0);
+  }
   if (viewModel.query.isParameterized()) {
     viewModel.fetchParameters();
   } else {
@@ -1734,6 +1743,7 @@ $(document).ready(function () {
         $('.resultsContainer .watch-query').hide();
         $('.resultsContainer .view-query-results').show();
         clickHard('.resultsContainer .nav-tabs a[href="#results"]');
+        $("html, body").animate({ scrollTop: ($(".resultsContainer").position().top - 80) + "px" });
       }
     },
     'query/explanation': function () {

@@ -450,7 +450,9 @@ function BeeswaxViewModel(server, query_id) {
       type: 'GET',
       success: function(data) {
         self.query.isRunning(false);
-        self.query.results.columns(data.columns);
+        if (self.query.results.columns().length == 0){
+          self.query.results.columns(data.columns);
+        }
         self.query.results.rows.push.apply(self.query.results.rows, data.results);
         self.query.results.empty(self.query.results.rows().length == 0);
         if (data.has_more) {
