@@ -163,7 +163,7 @@ def watch_query_refresh_json(request, id):
     log = str(ex)
 
   jobs = _parse_out_hadoop_jobs(log)
-  job_urls = dict([(job, reverse('jobbrowser.views.single_job', kwargs=dict(job=job))) for job in jobs])
+  job_urls = dict([(job, reverse('jobbrowser.views.single_job', kwargs={'job': job})) for job in jobs])
 
   result = {
     'log': log,
