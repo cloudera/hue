@@ -232,6 +232,8 @@ def make_query(client, query, submission_type="Execute",
   # Prepares arguments for the execute view.
   parameters = {
     'query-query': query,
+    'query-name': name if name else '',
+    'query-desc': desc if desc else '',
     'query-is_parameterized': is_parameterized and "on",
     'query-database': database,
     'query-email_notify': email_notify and "on",
