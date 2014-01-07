@@ -90,6 +90,16 @@ function BeeswaxViewModel(server, query_id) {
     'deferEvaluation': true
   });
 
+  self.hasParametersFilled = ko.computed(function() {
+    var hasBlank = false;
+    $.each(self.query.parameters(), function(index, element) {
+      if (element.value() == '') {
+        hasBlank = true;
+      }
+    });
+    return ! hasBlank;
+  });
+
   self.resetQuery = function() {
     ko.mapping.fromJS(QUERY_DEFAULTS, self.query);
   };

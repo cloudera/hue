@@ -409,13 +409,13 @@ ${layout.menubar(section='query')}
             <div class="control-group">
               <label data-bind="text: name" class="control-label"></label>
               <div class="controls">
-                <input data-bind="value: value" type="text"/>
+                <input data-bind="value: value, valueUpdate:'afterkeydown'" type="text"/>
               </div>
             </div>
             <!-- /ko -->
             <div class="form-actions" style="padding-left: 10px">
               <a class="btn" href="javascript:history.go(-1);">${_('Cancel')}</a>
-              <button data-bind="click: tryExecuteParameterizedQuery" type="button" class="btn btn-primary">${_('Execute query')}</button>
+              <button data-bind="enable: $root.hasParametersFilled, click: tryExecuteParameterizedQuery" type="button" class="btn btn-primary">${_('Execute query')}</button>
             </div>
           </fieldset>
         </form>
@@ -441,13 +441,13 @@ ${layout.menubar(section='query')}
               <label data-bind="text: name" class="control-label"></label>
 
               <div class="controls">
-                <input data-bind="value: value" type="text"/>
+                <input data-bind="value: value, valueUpdate:'afterkeydown'" type="text"/>
               </div>
             </div>
             <!-- /ko -->
             <div class="form-actions" style="padding-left: 10px">
               <a class="btn" href="javascript:history.go(-1);">${_('Cancel')}</a>
-              <button data-bind="click: tryExplainParameterizedQuery" type="button" class="btn btn-primary">${_('Explain query')}</button>
+              <button data-bind="enable: $root.hasParametersFilled, click: tryExplainParameterizedQuery" type="button" class="btn btn-primary">${_('Explain query')}</button>
             </div>
           </fieldset>
         </form>
@@ -729,6 +729,7 @@ var HIVE_AUTOCOMPLETE_GLOBAL_CALLBACK = function (data) {
     resetNavigator();
   }
 };
+
 
 // Navigator.
 $(document).ready(function () {

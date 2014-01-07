@@ -42,7 +42,6 @@ from desktop.lib.test_utils import grant_access, add_to_group
 from desktop.lib.security_util import get_localhost_name
 
 import beeswax.create_table
-import beeswax.forms
 import beeswax.hive_site
 import beeswax.models
 import beeswax.views
@@ -69,11 +68,11 @@ LOG = logging.getLogger(__name__)
 def _make_query(client, query, submission_type="Execute",
                 udfs=None, settings=None, resources=[],
                 wait=False, name=None, desc=None, local=True,
-                is_parameterized=True, max=30.0, database='default', email_notify=False, **kwargs):
-  """Wrapper around the real make_query"""
+                is_parameterized=True, max=30.0, database='default', email_notify=False, params=None, **kwargs):
+
   res = make_query(client, query, submission_type,
                    udfs, settings, resources,
-                   wait, name, desc, local, is_parameterized, max, database, email_notify, **kwargs)
+                   wait, name, desc, local, is_parameterized, max, database, email_notify, params, **kwargs)
 
   # Should be in the history if it's submitted.
   if submission_type == 'Execute':
@@ -353,42 +352,37 @@ for x in sys.stdin:
       'query-database': "default"
     }
     response = self.client.post(reverse('beeswax:api_parameters'), data)
-    assert_equal([], content['parameters'], content)
-
-    response = _make_query(self.client, "SELECT foo FROM test WHERE foo='$x' and bar='$y'") # Save?
     content = json.loads(response.content)
-    design_id = content['id']
-
-    # todo below
-
-    # Don't fill out the form
-    response = self.client.post("/beeswax/execute_parameterized/%d" % design_id)
-    assert_true("parameterization.mako", response.template)
+    assert_equal([
+        {'parameter': 'parameterization-x', 'name': 'x'},
+        {'parameter': 'parameterization-y', 'name': 'y'}
+      ], content['parameters'], content)
 
     # Now fill it out
-    response = self.client.post("/beeswax/execute_parameterized/%d" % design_id, {
-                                "parameterization-x": str(1), "parameterization-y": str(2)}, follow=True)
-    assert_true(any(["watch_wait.mako" in _template.filename for _template in response.template]))
+    response = _make_query(self.client, "SELECT foo FROM test WHERE foo='$x' and bar='$y'", params=[('x', '1'), ('y', '2')])
+    content = json.loads(response.content)
+    assert_true('watch_url' in content, content)
+    query_history = QueryHistory.get(content['id'])
 
     # Check that substitution happened!
-    assert_equal("SELECT foo FROM test WHERE foo='1' and bar='2'", response.context["query"].query)
+    assert_equal("SELECT foo FROM test WHERE foo='1' and bar='2'", query_history.query)
 
     # Check that error handling is reasonable
-    response = self.client.post("/beeswax/execute_parameterized/%d" % design_id,
-                                {"parameterization-x": "'_this_is_not SQL ", "parameterization-y": str(2)},
-                                follow=True)
-    response = wait_for_query_to_finish(self.client, response)
-    assert_true("FAILED: ParseException" in response.content, response.content)
+    response = _make_query(self.client, "SELECT foo FROM test WHERE foo='$x' and bar='$y'", params=[('x', "'_this_is_not SQL "), ('y', '2')])
+    content = json.loads(response.content)
+    assert_true("FAILED: ParseException" in content.get('message'), content)
 
     # Check multi DB with a non default DB
     response = _make_query(self.client, "CREATE TABLE test (foo INT, bar STRING)", database='other_db')
     response = wait_for_query_to_finish(self.client, response)
     response = _make_query(self.client, "SELECT foo FROM test WHERE foo='$x' and bar='$y'", database='other_db')
-    assert_true("parameterization.mako", response.template)
-    design_id = response.context["design"].id
-    response = self.client.post("/beeswax/execute_parameterized/%d" % design_id, {
-                                "parameterization-x": str(1), "parameterization-y": str(2)}, follow=True)
-    assert_equal('other_db', response.context['query'].design.get_design().query['database'])
+
+    response = _make_query(self.client, "SELECT foo FROM test WHERE foo='$x' and bar='$y'", database='other_db',
+                           params=[('x', '1'), ('y', '2')])
+    content = json.loads(response.content)
+    assert_true('watch_url' in content, content)
+    query_history = QueryHistory.get(content['id'])
+    assert_equal('other_db', query_history.design.get_design().query['database'])
 
   def test_explain_query(self):
     c = self.client
@@ -416,8 +410,7 @@ for x in sys.stdin:
     # Selecting from utf-8 table should get correct result
     query = u"SELECT * FROM test_utf8 WHERE bar='%s'" % (unichr(200),)
     response = _make_query(self.client, query, wait=True)
-    assert_equal(["200", unichr(200)], response.context["results"][0],
-                 "selecting from utf-8 table should get correct result")
+    assert_equal(["200", unichr(200)], response.context["results"][0], "selecting from utf-8 table should get correct result")
 
     csv = get_csv(self.client, response)
     assert_equal('"200","%s"' % (unichr(200).encode('utf-8'),), csv.split()[1])
@@ -425,8 +418,7 @@ for x in sys.stdin:
     # Selecting from latin1 table should not blow up
     query = u"SELECT * FROM test_latin1 WHERE bar='%s'" % (unichr(200),)
     response = _make_query(self.client, query, wait=True)
-    assert_true(response.context.has_key("results"),
-                "selecting from latin1 table should not blow up")
+    assert_true(response.context.has_key("results"), "selecting from latin1 table should not blow up")
 
     # Describe table should be fine with non-ascii comment
     response = self.client.get('/beeswax/table/default/test_utf8')
