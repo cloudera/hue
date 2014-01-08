@@ -260,79 +260,79 @@ ${ layout.menubar(section='workflows') }
         <div class="draggable-button">
           <a data-node-type="mapreduce"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
-            <i class="fa fa-move"></i> MapReduce
+            <i class="fa fa-arrows"></i> MapReduce
           </a>
         </div>
         <div class="draggable-button">
           <a data-node-type="streaming"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
-            <i class="fa fa-move"></i> Streaming
+            <i class="fa fa-arrows"></i> Streaming
           </a>
         </div>
         <div class="draggable-button">
           <a data-node-type="java"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
-            <i class="fa fa-move"></i> Java
+            <i class="fa fa-arrows"></i> Java
           </a>
          </div>
         <div class="draggable-button">
           <a data-node-type="pig"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
-            <i class="fa fa-move"></i> Pig
+            <i class="fa fa-arrows"></i> Pig
           </a>
         </div>
         <div class="draggable-button">
           <a data-node-type="hive"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
-            <i class="fa fa-move"></i> Hive
+            <i class="fa fa-arrows"></i> Hive
           </a>
         </div>
         <div class="draggable-button">
           <a data-node-type="sqoop"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
-            <i class="fa fa-move"></i> Sqoop
+            <i class="fa fa-arrows"></i> Sqoop
           </a>
         </div>
         <div class="draggable-button">
           <a data-node-type="shell"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
-            <i class="fa fa-move"></i> Shell
+            <i class="fa fa-arrows"></i> Shell
           </a>
         </div>
         <div class="draggable-button">
           <a data-node-type="ssh"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
-            <i class="fa fa-move"></i> Ssh
+            <i class="fa fa-arrows"></i> Ssh
           </a>
         </div>
         <div class="draggable-button">
           <a data-node-type="distcp"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
-            <i class="fa fa-move"></i> DistCp
+            <i class="fa fa-arrows"></i> DistCp
           </a>
         </div>
         <div class="draggable-button">
           <a data-node-type="fs"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
-            <i class="fa fa-move"></i> Fs
+            <i class="fa fa-arrows"></i> Fs
           </a>
         </div>
         <div class="draggable-button">
           <a data-node-type="email"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
-            <i class="fa fa-move"></i> Email
+            <i class="fa fa-arrows"></i> Email
           </a>
         </div>
         <div class="draggable-button">
           <a data-node-type="subworkflow"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
-            <i class="fa fa-move"></i> Sub-workflow
+            <i class="fa fa-arrows"></i> Sub-workflow
           </a>
         </div>
         <div class="draggable-button">
           <a data-node-type="generic"
              title="${ _('Drag and drop this action on the workflow') }" class="btn new-node-link">
-            <i class="fa fa-move"></i> Generic
+            <i class="fa fa-arrows"></i> Generic
           </a>
         </div>
       </div>
@@ -451,47 +451,51 @@ ${ controls.decision_form(node_form, link_form, default_link_form, 'decision', T
 <script type="text/html" id="emptyTemplate"></script>
 
 <script type="text/html" id="disabledNodeTemplate">
-  <div class="node node-control row-fluid">
-    <div class="action span12">
+  <div class="node node-control action row-fluid">
+    <!-- ko if: node_type() == 'start' -->
+      <ul class="nav nav-tabs" style="margin-bottom:0">
+        <li class="active"><a data-toggle="tab" style="line-height:10px;background-color: #F9F9F9;"><i style="color:#DDD" class="fa fa-thumbs-up"></i> &nbsp;
+          <strong style="color:#999" data-bind="text: node_type"></strong></a>
+        </li>
+      </ul>
       <div class="row-fluid">
-        <div class="span12">
-          <h4 data-bind="text: (name()) ? name() : node_type() + '-' + id()"></h4>
-          <span data-bind="text: node_type" class="muted"></span>
-          <div class="node-description" data-bind="text: description"></div>
-        </div>
+        <div class="span12 gradient" style="border:0"></div>
       </div>
-
-      <div class="row-fluid node-action-bar">
-        <div class="span12" style="text-align:right">
-          &nbsp;
-        </div>
+    <!-- /ko -->
+    <!-- ko if: node_type() == 'end' -->
+      <div class="row-fluid">
+        <div class="span12 inverse_gradient" style="border:0"></div>
       </div>
-    </div>
+      <div class="tabbable tabs-below">
+        <ul class="nav nav-tabs" style="margin-bottom:0">
+          <li class="active"><a data-toggle="tab" style="line-height:10px;background-color: #F9F9F9;"><i style="color:#DDD" class="fa fa-dot-circle-o"></i> &nbsp;
+            <strong style="color:#999" data-bind="text: node_type"></strong></a>
+          </li>
+        </ul>
+      </div>
+    <!-- /ko -->
+    <!-- ko if: links -->
+      <div class="row-fluid" data-bind="template: { name: 'linkTemplate', foreach: links }"></div>
+    <!-- /ko -->
   </div>
-
-  <!-- ko if: links -->
-    <div class="row-fluid" data-bind="template: { name: 'linkTemplate', foreach: links }"></div>
-  <!-- /ko -->
 </script>
 
 <script type="text/html" id="nodeTemplate">
-  <div class="node node-action row-fluid">
-    <div class="action span12">
-      <div class="row-fluid">
-        <div class="span12">
-          <h4 data-bind="text: (name()) ? name() : node_type() + '-' + id()"></h4>
-          <span data-bind="text: node_type" class="muted"></span>
-          <div class="node-description" data-bind="text: description"></div>
-        </div>
-      </div>
-
-      <div class="row-fluid node-action-bar">
-        <div class="span12" style="text-align:right">
-          <a class="btn btn-mini edit-node-link" title="${ _('Edit') }" relz="tooltip" data-bind="attr: { 'data-node-type': node_type() }"><i class="fa fa-pencil"></i></a>
-          <a class="btn btn-mini clone-node-btn" title="${ _('Copy') }" relz="tooltip"><i class="fa fa-files-o"></i></a>
-          <a class="btn btn-mini delete-node-btn" title="${ _('Delete') }" relz="tooltip"><i class="fa fa-trash-o"></i></a>
-          &nbsp;
-        </div>
+  <div class="node node-action row-fluid action">
+    <ul class="nav nav-tabs" style="margin-bottom:0">
+      <li class="active"><a data-toggle="tab" style="line-height:10px;background-color: #F9F9F9;"><i style="color:#DDD" class="fa fa-cogs"></i> &nbsp;
+        <strong style="color:#999" data-bind="text: node_type"></strong>
+        &nbsp;&nbsp;
+        <button type="button" class="btn btn-mini clone-node-btn" title="${ _('Copy') }" relz="tooltip"><i class="fa fa-files-o"></i></button>
+        <button type="button" class="btn btn-mini delete-node-btn" title="${ _('Delete') }" relz="tooltip"><i class="fa fa-trash-o"></i></button>
+      </a>
+      </li>
+    </ul>
+    <div class="row-fluid">
+      <div class="span12" style="text-align:left; padding:10px;border:1px solid #DDD; border-top:0">
+        <div class="pull-right" style="font-size: 30px; margin-top:14px; cursor:pointer"><a class="edit-node-link" title="${ _('Edit') }" relz="tooltip" data-bind="attr: { 'data-node-type': node_type() }"><i class="fa fa-pencil"></i></a></div>
+        <h4 data-bind="text: (name()) ? name() : node_type() + '-' + id()"></h4>
+        <div class="node-description muted" data-bind="text: description()"></div>
       </div>
     </div>
   </div>
@@ -502,19 +506,20 @@ ${ controls.decision_form(node_form, link_form, default_link_form, 'decision', T
 <script type="text/html" id="forkTemplate">
   <div class="node node-fork row-fluid">
     <div class="action span12">
+      <ul class="nav nav-tabs" style="margin-bottom:0">
+        <li class="active">
+          <a class="action-link" data-toggle="tab" style="line-height:10px;background-color: #F9F9F9;">
+            <i style="color:#DDD" class="fa fa-sitemap"></i> &nbsp; <strong style="color:#999" data-bind="text: node_type"></strong>
+            &nbsp;&nbsp;
+            <button type="button" class="btn btn-mini edit-node-link" title="${ _('Edit') }" relz="tooltip" data-bind="attr: { 'data-node-type': node_type() }"><i class="fa fa-pencil"></i></button>
+            <button type="button" class="btn btn-mini convert-node-link" title="${ _('Convert to Decision') }" data-bind="attr: { 'data-node-type': node_type() }" relz="tooltip"><i class="fa fa-magic"></i></button>
+          </a>
+        </li>
+      </ul>
       <div class="row-fluid">
-        <div class="span12 action-link" title="Edit">
+        <div class="span12 action-link" style="text-align:left; padding:10px;border:1px solid #DDD; border-top:0">
           <h4 data-bind="text: (name()) ? name() : node_type() + '-' + id()"></h4>
-          <span data-bind="text: node_type" class="muted"></span>
-          <div class="node-description" data-bind="text: description()"></div>
-        </div>
-      </div>
-
-      <div class="row-fluid node-action-bar">
-        <div class="span12" style="text-align:right">
-          <a class="btn btn-mini edit-node-link" title="${ _('Edit') }" relz="tooltip" data-bind="attr: { 'data-node-type': node_type() }"><i class="fa fa-pencil"></i></a>
-          <a class="btn btn-mini convert-node-link" title="${ _('Convert to Decision') }" data-bind="attr: { 'data-node-type': node_type() }" relz="tooltip"><i class="fa fa-wrench"></i></a>
-          &nbsp;
+          <div class="node-description muted" data-bind="text: description()"></div>
         </div>
       </div>
     </div>
@@ -537,18 +542,19 @@ ${ controls.decision_form(node_form, link_form, default_link_form, 'decision', T
 <script type="text/html" id="decisionTemplate">
   <div class="node node-decision row-fluid">
     <div class="action span12">
+      <ul class="nav nav-tabs" style="margin-bottom:0">
+        <li class="active">
+          <a class="action-link" data-toggle="tab" style="line-height:10px;background-color: #F9F9F9;">
+            <i style="color:#DDD" class="fa fa-magic"></i> &nbsp; <strong style="color:#999" data-bind="text: node_type"></strong>
+            &nbsp;&nbsp;
+            <button type="button" class="btn btn-mini edit-node-link" title="${ _('Edit') }" data-bind="attr: { 'data-node-type': node_type() }" relz="tooltip"><i class="fa fa-pencil"></i></button>
+          </a>
+        </li>
+      </ul>
       <div class="row-fluid">
-        <div class="span12 action-link">
+        <div class="span12 action-link" style="text-align:left; padding:10px;border:1px solid #DDD; border-top:0">
           <h4 data-bind="text: (name()) ? name() : node_type() + '-' + id()"></h4>
-          <span data-bind="text: node_type" class="muted"></span>
-          <div class="node-description" data-bind="text: description()"></div>
-        </div>
-      </div>
-
-      <div class="row-fluid node-action-bar">
-        <div class="span12" style="text-align:right">
-          <a class="btn btn-mini edit-node-link" title="${ _('Edit') }" data-bind="attr: { 'data-node-type': node_type() }" relz="tooltip"><i class="fa fa-pencil"></i></a>
-          &nbsp;
+          <div class="node-description muted" data-bind="text: description()"></div>
         </div>
       </div>
     </div>
