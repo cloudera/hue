@@ -96,10 +96,11 @@ ${layout.menubar(section='query')}
             <a data-bind="click: function() { $root.addFileResources('','') }" class="btn btn-mini paramAdd">${_('Add')}</a>
           </div>
         </li>
-        <li class="nav-header 
+        <li title="${ _('User-Defined Functions') }" class="nav-header
           % if app_name == 'impala':
             hide
-          % endif" title="${_("User-Defined Functions")}">
+          % endif
+          ">
           ${_('UDFs')}
         </li>
         <li class="white paramContainer
@@ -233,8 +234,14 @@ ${layout.menubar(section='query')}
           <textarea class="hide" tabindex="1" name="query" id="queryField"></textarea>
 
           <div class="actions">
-            <button data-bind="click: tryExecuteQuery, visible: !$root.query.isRunning()" type="button" id="executeQuery" class="btn btn-primary disable-feedback" tabindex="2">${_('Execute')}</button>
+            % if app_name == 'impala':
+            <button data-bind="click: tryExecuteQuery, visible: !$root.query.isRunning() && $root.query.isFinished()" type="button" id="executeQuery" class="btn btn-primary disable-feedback" tabindex="2">${_('Execute')}</button>
             <button data-bind="click: tryCancelQuery, visible: $root.query.isRunning()" class="btn btn-danger" data-loading-text="${ _('Canceling...') }" rel="tooltip" data-original-title="${ _('Cancel the query') }">${ _('Cancel') }</button>
+            % else:
+            <button data-bind="click: tryExecuteQuery, enable: !$root.query.isRunning(), visible: $root.query.isFinished()" type="button" id="executeQuery" class="btn btn-primary disable-feedback" tabindex="2">${_('Execute')}</button>
+            % endif
+            <button data-bind="click: executeNextStatement, visible: !$root.query.isFinished()" type="button" class="btn btn-primary disable-feedback" tabindex="2">${_('Next')}</button>
+
             <button data-bind="click: trySaveQuery, css: {'hide': !$root.query.id() || $root.query.id() == -1}" type="button" class="btn hide">${_('Save')}</button>
             <button data-bind="click: saveAsModal" type="button" class="btn">${_('Save as...')}</button>
             <button data-bind="click: tryExplainQuery" type="button" id="explainQuery" class="btn">${_('Explain')}</button>
@@ -263,10 +270,10 @@ ${layout.menubar(section='query')}
 
     <div class="card-body">
       <ul class="nav nav-tabs">
+        <li><a href="#query" data-toggle="tab">${_('Query')}</a></li>
         <!-- ko if: !query.explain() -->
         <li><a href="#log" data-toggle="tab">${_('Log')}</a></li>
         <!-- /ko -->
-        <li><a href="#query" data-toggle="tab">${_('Query')}</a></li>
         <!-- ko if: !query.explain() -->
         <li><a href="#columns" data-toggle="tab">${_('Columns')}</a></li>
         <li><a href="#results" data-toggle="tab">${_('Results')}</a></li>
@@ -279,7 +286,7 @@ ${layout.menubar(section='query')}
 
       <div class="tab-content">
         <div class="tab-pane" id="query">
-          <pre data-bind="text: viewModel.query.query()"></pre>
+          <pre data-bind="text: viewModel.query.statement()"></pre>
         </div>
         <!-- ko if: query.explain() -->
         <div class="tab-pane" id="explanation">
@@ -1809,12 +1816,8 @@ $(document).ready(function () {
   });
 });
 
-// @TODO: Make file resources list automatically generated.
 // @TODO: Improve resize logs to be more relative. See FF versus Chrome.
-// @TODO: Close
 // @TODO: Stop operation
-// @TODO: Re-add filebrowser to file resources.
-// @TODO: Re-add tooltips for execute query button
 // @TODO: Re-add download query for impala
 // @TODO: Re-enable type ahead for settings
 </script>

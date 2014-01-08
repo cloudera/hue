@@ -33,11 +33,10 @@ import beeswax.models
 from beeswax.forms import QueryForm
 from beeswax.design import HQLdesign
 from beeswax.server import dbms
-from beeswax.server.dbms import expand_exception, get_query_server_config,\
-  QueryServerException
+from beeswax.server.dbms import expand_exception, get_query_server_config
 from beeswax.views import authorized_get_design, authorized_get_history, make_parameterization_form,\
                           safe_get_design, save_design, massage_columns_for_json, _get_query_handle_and_state,\
-  _parse_out_hadoop_jobs
+                          _parse_out_hadoop_jobs
 from desktop.lib.i18n import force_unicode
 
 
@@ -132,7 +131,8 @@ def execute_directly(request, query, design, query_server, tablename=None, **kwa
   response = {
     'status': 0,
     'id': history_obj.id,
-    'watch_url': watch_url
+    'watch_url': watch_url,
+    'statement': history_obj.get_current_statement()
   }
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
@@ -142,13 +142,15 @@ def execute_directly(request, query, design, query_server, tablename=None, **kwa
 def watch_query_refresh_json(request, id):
   query_history = authorized_get_history(request, id, must_exist=True)
   db = dbms.get(request.user, query_history.get_query_server_config())
-  handle, state = _get_query_handle_and_state(query_history)
-  query_history.save_state(state)
 
-  # Multi query if more statements
+  if not request.POST.get('next'): # We need this as multi query would fail as current query is closed
+    handle, state = _get_query_handle_and_state(query_history)
+    query_history.save_state(state)
+
+  # Go to next statement if asked to continue or when a statement with no dataset finished.
   try:
-    if not query_history.is_finished() and query_history.is_success() and not query_history.has_results:
-      db.execute_next_statement(query_history)
+    if request.POST.get('next') or (not query_history.is_finished() and query_history.is_success() and not query_history.has_results):
+      query_history = db.execute_next_statement(query_history)
       handle, state = _get_query_handle_and_state(query_history)
   except Exception, ex:
     LOG.exception(ex)
@@ -166,9 +168,11 @@ def watch_query_refresh_json(request, id):
     'log': log,
     'jobs': jobs,
     'jobUrls': job_urls,
-    'isSuccess': query_history.is_finished() or (query_history.is_success() and query_history.has_results and query_history.is_failure()),
+    'isSuccess': query_history.is_success(),
     'isFailure': query_history.is_failure(),
-    'id': id
+    'id': id,
+    'statement': query_history.get_current_statement(),
+    'watch_url': reverse(get_app_name(request) + ':api_watch_query_refresh_json', kwargs={'id': query_history.id})
   }
 
   # Show popup message if error, should be better in error tab instead and merged into the result response below
@@ -178,7 +182,7 @@ def watch_query_refresh_json(request, id):
       result['message'] = res.errorMessage
     else:
       result['message'] = ''
-    
+
     result['error'] = 'Bad status for request %s:\n%s' % (id, res)
     result['status'] = 1
 

@@ -48,7 +48,9 @@ function BeeswaxViewModel(server, query_id) {
       'url': null,
       'errors': []
     },
-    'isRunning': false
+    'isRunning': false,
+    'statement': '',
+    'isFinished': true
   };
 
   self.server = ko.observable(server);
@@ -104,7 +106,7 @@ function BeeswaxViewModel(server, query_id) {
     self.database(design.database);
     self.query.isParameterized(design.is_parameterized);
     self.query.email(design.email_notify);
-    
+
     self.query.settings.removeAll();
     self.query.fileResources.removeAll();
     self.query.functions.removeAll();
@@ -347,6 +349,7 @@ function BeeswaxViewModel(server, query_id) {
     $(document).trigger('execute.query', data);
     self.query.explain(false);
     self.query.isRunning(true);
+    self.query.isFinished(true);
     self.query.errors.removeAll();
 
     var data = {
@@ -368,12 +371,41 @@ function BeeswaxViewModel(server, query_id) {
           self.query.id(data.id);
           self.query.results.url('/' + self.server() + '/results/' + self.query.id() + '/0?format=json');
           self.query.watch.url(data.watch_url);
+          self.query.statement(data.statement);
           self.watchQueryLoop();
         } else {
           self.query.errors.push(data.message);
           self.query.isRunning(false);
           $(document).trigger('error.query');
         }
+        $(document).trigger('executed.query', data);
+      },
+      error: error_fn,
+      data: data
+    };
+    $.ajax(request);
+  };
+
+  self.executeNextStatement = function() {
+    $(document).trigger('execute.query', data);
+    self.query.explain(false);
+    self.query.isRunning(true);
+    self.query.isFinished(true);
+    self.query.errors.removeAll();
+
+    var data = {
+      'next': true
+    };
+    var request = {
+      url: self.query.watch.url(),
+      dataType: 'json',
+      type: 'POST',
+      success: function(data) {
+        self.query.errors.removeAll();
+        self.query.statement(data.statement);
+        self.query.watch.url(data.watch_url);
+        self.query.results.url('/' + self.server() + '/results/' + self.query.id() + '/0?format=json');
+        self.watchQueryLoop();
         $(document).trigger('executed.query', data);
       },
       error: error_fn,
@@ -442,11 +474,12 @@ function BeeswaxViewModel(server, query_id) {
             }
           }
         } else {
+          self.query.statement(data.statement); // In case new no result statement executed
           if (data.log) {
             self.query.watch.logs.push(data.log);
             // scroll logs
           }
-          
+
           timer = setTimeout(_fn, TIMEOUT);
         }
       });
@@ -464,6 +497,7 @@ function BeeswaxViewModel(server, query_id) {
       type: 'GET',
       success: function(data) {
         self.query.isRunning(false);
+        self.query.isFinished(data.is_finished);
         if (self.query.results.columns().length == 0){
           self.query.results.columns(data.columns);
         }
@@ -545,7 +579,7 @@ function BeeswaxViewModel(server, query_id) {
         success: function(data) {
           if (data.status == 0) {
             $(document).trigger('closed.query', data);
-            self.resetQuery();
+            //self.resetQuery(); // Would fail multiqueries
           } else {
             $(document).trigger('error_close.query');
           }
@@ -553,7 +587,8 @@ function BeeswaxViewModel(server, query_id) {
         error: function(data) {
           $(document).trigger('error_close.results');
         },
-        data: data
+        data: data,
+        async: false // for multi query
       };
       $.ajax(request);
     }
