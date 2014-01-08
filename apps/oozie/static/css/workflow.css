@@ -53,26 +53,6 @@ ul {
   margin-bottom: 1px;
 }
 
-.node-action {
-  background: #FFF url(/oozie/static/art/action.png) no-repeat 10px 10px;
-}
-
-.node-fork {
-  background: #FFF url(/oozie/static/art/fork.png) no-repeat 10px 10px;
-}
-
-.node-join {
-  background: #FFF url(/oozie/static/art/join.png) no-repeat 10px 10px;
-}
-
-.node-decision {
-  background: #FFF url(/oozie/static/art/decision.png) no-repeat 10px 10px;
-}
-
-.node-decisionend {
-  background: #FFF url(/oozie/static/art/decision_end.png) no-repeat 10px 10px;
-}
-
 .node-link {
   border: 1px dashed #DDD;
   margin: 10px;
@@ -89,6 +69,10 @@ ul {
   margin-top: 10px;
   -webkit-box-shadow: inset 0 3px 5px 0 #DDD;
   box-shadow: inset 0 3px 5px 0 #DDD;
+}
+
+#graph {
+  margin-top: 20px;
 }
 
 #graph, #new-node {
@@ -129,6 +113,8 @@ ul {
   z-index: 1000;
   padding: 4px;
   padding-bottom: 8px;
+  background-color: #FFF;
+  text-align: center;
 }
 
 #actionToolbar.shadowed {
@@ -182,6 +168,10 @@ ul {
 
 .action > .nav-tabs, .action > .nav-pills, .action > .tabs-below > .nav-tabs, .action > .tabs-below > .nav-pills {
     text-align:center;
+}
+
+.action .btn-mini i {
+  line-height: 18px!important;
 }
 
 .gradient {

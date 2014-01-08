@@ -232,7 +232,7 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
         </div>
         <div data-bind="sortable: sortableFacets, afterMove: isSaveBtnVisible(true)">
           <div class="bubble" style="float: none;cursor: move">
-            <i class="fa fa-move"></i>
+            <i class="fa fa-arrows"></i>
             <strong><span data-bind="text: label"></span></strong>
             <span style="color:#666;font-size: 12px">(<span data-bind="text: field"></span>)</span>
           </div>

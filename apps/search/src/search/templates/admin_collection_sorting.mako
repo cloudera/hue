@@ -61,7 +61,7 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
         </div>
         <div data-bind="sortable: sortingFields">
           <div class="bubble" style="cursor: move">
-            <i class="fa fa-move"></i>
+            <i class="fa fa-arrows"></i>
             <strong><span data-bind="editable: label"></span></strong>
             <span style="color:#666;font-size: 12px">
               (<span data-bind="text: field"></span> <i class="fa fa-arrow-up" data-bind="visible: asc() == true"></i><i class="fa fa-arrow-down" data-bind="visible: asc() == false"></i> <span data-bind="editable: order"></span>, <input type="checkbox" data-bind="checked: include" style="margin-top:0" /> ${_('Default sorting')} )

@@ -811,6 +811,7 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
 
       self.el.find('.node-action').each(function(index, el) {
         if (!$(el).hasClass('ui-draggable')) {
+          $(el).find('ul li a').eq(0).css('cursor', 'move');
           $(el).find('.row-fluid').eq(0).css('cursor', 'move');
           $(el).draggable({
             containment: [ self.el.offset().left - 10, self.el.offset().top - 10,
