@@ -52,7 +52,7 @@ ${layout.menubar(section='saved queries')}
         <div class="btn-toolbar" style="display: inline; vertical-align: middle">
           <button id="emptyTrashBtn" class="btn" title="${_('Empty trash')}" data-bind="enabled: availableSavedQueries().length > 0">
             <i class="fa fa-fire"></i> ${_('Empty trash')}
-          </button>        
+          </button>
           <button id="viewQueriesBtn" class="btn" title="${_('View queries')}">
             <i class="fa fa-home"></i> ${_('Back')}
           </button>

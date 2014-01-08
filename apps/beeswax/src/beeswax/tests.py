@@ -458,11 +458,12 @@ for x in sys.stdin:
     resp = wait_for_query_to_finish(self.client, resp, max=30.0)
 
     content = json.loads(resp.content)
-    design_id = content['id']
+    history_id = content['id']
+    query_history = QueryHistory.get(id=history_id)
 
-    resp = self.client.get("/beeswax/results/%s/0?format=json" % design_id)
+    resp = self.client.get("/beeswax/results/%s/0?format=json" % history_id)
     content = json.loads(resp.content)
-    assert_true('DROP TABLE test_multiple_statements_2' in content, content) # HUE-1843
+    assert_equal('DROP TABLE test_multiple_statements_2', query_history.get_current_statement(), content)
 
   def test_multiple_statements_with_result_set(self):
     hql = """
@@ -471,16 +472,20 @@ for x in sys.stdin:
     """
 
     resp = _make_query(self.client, hql)
-    query = hql_query(hql)
 
-    handle = self.db.execute_and_wait(query)
+    content = json.loads(resp.content)
+    assert_true('watch_url' in content, content)
+    watch_url = content['watch_url']
+    assert_equal('SELECT foo FROM test', content.get('statement'), content)
+
     resp = wait_for_query_to_finish(self.client, resp, max=30.0)
+    content = fetch_query_result_data(self.client, resp)
 
-    assert_true('multiStatementsQuery' in resp.content, resp.content) # HUE-1843
+    assert_false(content.get('is_finished'), content)
 
-    resp = self.client.post(reverse('beeswax:watch_query', args=[resp.context['query'].id]))
-    assert_true('Waiting for query' in resp.content, resp.content)
-    assert_true('SELECT count(*) FROM test' in resp.content, resp.content)
+    resp = self.client.post(watch_url, {'next': True})
+    content = json.loads(resp.content)
+    assert_equal('SELECT count(*) FROM test', content.get('statement'), content)
 
   def test_multiple_statements_various_queries(self):
     hql = """
@@ -490,12 +495,16 @@ for x in sys.stdin:
     """
 
     resp = _make_query(self.client, hql)
-    query = hql_query(hql)
 
-    handle = self.db.execute_and_wait(query)
+    content = json.loads(resp.content)
+    assert_equal('CREATE TABLE test_multiple_statements_2 (a int)', content.get('statement'), content)
+
     resp = wait_for_query_to_finish(self.client, resp, max=30.0)
+    content = json.loads(resp.content)
+    assert_equal('SELECT foo FROM test', content.get('statement'), content)
 
-    assert_true('SELECT foo FROM test' in resp.content, resp.content) # HUE-1843
+    content = fetch_query_result_data(self.client, resp)
+    assert_true(content.get('is_finished'), content)
 
   def test_parallel_queries(self):
     """
@@ -751,6 +760,7 @@ for x in sys.stdin:
         'path': target_dir
       }
       resp = self.client.post('/beeswax/api/query/%s/results/save' % qid, save_data, follow=True)
+
       resp = wait_for_query_to_finish(self.client, resp, max=60)
 
       # Check that data is right

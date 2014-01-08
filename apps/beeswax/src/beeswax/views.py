@@ -583,7 +583,8 @@ def view_results(request, id, first_row=0):
     'expired': expired,
     'app_name': app_name,
     'download': download,
-    'next_json_set': None
+    'next_json_set': None,
+    'is_finished': query_history.is_finished()
   }
 
   if not error:
