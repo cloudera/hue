@@ -176,11 +176,19 @@ class Submission(object):
     return parameters
 
   def _update_properties(self, jobtracker_addr, deployment_dir):
-    if self.fs and self.jt:
-      self.properties.update({
-        'jobTracker': self.jt.logical_name or jobtracker_addr,
-        'nameNode': self.fs.logical_name or self.fs.fs_defaultfs,
-      })
+    LOG.info('Using FS %s and JT %s' % (self.fs, self.jt))
+    if self.jt and self.jt.logical_name:
+      jobtracker_addr = self.jt.logical_name
+
+    if self.fs and self.fs.logical_name:
+      fs_defaultfs = self.fs.logical_name
+    else:
+      fs_defaultfs = self.fs.fs_defaultfs
+
+    self.properties.update({
+      'jobTracker': jobtracker_addr,
+      'nameNode': fs_defaultfs,
+    })
 
     if self.job:
       self.properties.update({
