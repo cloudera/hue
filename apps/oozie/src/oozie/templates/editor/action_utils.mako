@@ -72,32 +72,27 @@
 
   <div id="node-advanced-container" class="hide">
 
-        <div class="control-group">
-          <label class="control-label">
-              ${ _('SLA') }
-          </label>
-
+    <div class="control-group">
+      <label class="control-label">${ _('SLA Configuration') }</label>
+      <div class="controls">
           ${ utils.slaForm() }
-        </div>
+      </div>
+    </div>
 
-        <div class="control-group" data-bind="visible: credentials().length > 0">
-          <label class="control-label">
-              ${ _('Credentials') }
-          </label>
-
+    <div class="control-group" data-bind="visible: credentials().length > 0">
+      <label class="control-label">${ _('Credentials') }</label>
+      <div class="controls">
           <div data-bind="foreach: credentials">
-            <div class="controls">
-              <div class="span3">
-                <span></span>
-              </div>
-              <div class="span9">
-                <span data-bind="text: name" class="span2"/>
+            <div class="control-group control-row" style="margin-bottom: 2px">
+              <label class="control-label" data-bind="text: name"></label>
+              <div class="controls">
                 <input type="checkbox" data-bind="checked: value"/>
                 <span data-bind="visible: name() == 'hbase'">${ _('Requires hbase-site.xml in job-xml field') }</span>
               </div>
             </div>
           </div>
-        </div>
+      </div>
+    </div>
 
     <!-- ko if: $root.context().nodes && $root.context().error_node -->
     <div class="control-group">

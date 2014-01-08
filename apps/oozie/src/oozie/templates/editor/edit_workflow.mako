@@ -117,12 +117,13 @@ ${ layout.menubar(section='workflows') }
         </div>
 
       <div id="advanced-container" class="hide">
-        <div id="slaEditord" class="control-group">
-          <label class="control-label">
-            ${ _('SLA') }
-          </label>
-
-          ${ utils.slaForm() }
+        <div id="slaEditord">
+          <div class="control-group">
+            <label class="control-label">${ _('SLA Configuration') }</label>
+            <div class="controls">
+                ${ utils.slaForm() }
+            </div>
+          </div>
         </div>
 
         % if user_can_edit_job:
