@@ -261,11 +261,9 @@
 
 <%def name="slaForm()">
   <div data-bind="foreach: { 'data': sla, 'afterRender': addSLATextAndPlaceholder }">
-    <div class="controls">
-      <div class="span3">
-        <span></span>
-      </div>
-      <div class="span9">
+    <div class="control-group control-row" style="margin-bottom: 2px">
+      <label class="control-label" style="text-align: left"></label>
+      <div class="controls">
         <!-- ko if:  key() == 'enabled' -->
         <input type="checkbox" data-bind="checked: value"/>
         <!-- /ko -->
@@ -282,7 +280,7 @@
 <%def name="slaGlobal()">
   function addSLATextAndPlaceholder(elements, $data) {
     var SLA_TEXT = {
-      'enabled': {'niceName': '${ _("Enabled") }', 'placeHolder': ''},
+      'enabled': {'niceName': '${ _("Enable") }', 'placeHolder': ''},
       'nominal-time': {'niceName': '${ _("Nominal time") } *', 'placeHolder': '${"$"}{nominal_time}'},
       'should-start': {'niceName': '${ _("Should start") }', 'placeHolder': '${"$"}{10 * MINUTES}'},
       'should-end': {'niceName': '${ _("Should end") } *', 'placeHolder': '${"$"}{30 * MINUTES}'},
@@ -295,10 +293,10 @@
     var text = SLA_TEXT[$data.key()];
     if (text) {
       $(elements).find('input').attr('placeholder', text.placeHolder);
-      $(elements).find('span').text(text.niceName);
+      $(elements).find('.control-label').text(text.niceName);
     } else {
       $(elements).find('input').attr('placeholder', '');
-      $(elements).find('span').text('');
+      $(elements).find('.control-label').text('');
     }
   }
 </%def>
