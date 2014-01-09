@@ -460,8 +460,7 @@ def test_user_admin():
 
 
 def test_useradmin_ldap_user_group_membership_sync():
-  reset = [desktop.conf.AUTH.USER_GROUP_MEMBERSHIP_SYNCHRONIZATION_BACKEND.set_for_testing('desktop.auth.backend.LdapSynchronizationBackend')]
-  settings.MIDDLEWARE_CLASSES.append('desktop.middleware.UserGroupSynchronizationMiddleware')
+  settings.MIDDLEWARE_CLASSES.append('useradmin.middleware.LdapSynchronizationMiddleware')
 
   reset_all_users()
   reset_all_groups()
@@ -504,9 +503,7 @@ def test_useradmin_ldap_user_group_membership_sync():
     # Should have 2 groups now. 1 from LDAP and 1 from 'grant_access' call.
     assert_equal(3, user.groups.all().count(), user.groups.all())
   finally:
-    for finish in reset:
-      finish()
-    settings.MIDDLEWARE_CLASSES.remove('desktop.middleware.UserGroupSynchronizationMiddleware')
+    settings.MIDDLEWARE_CLASSES.remove('useradmin.middleware.LdapSynchronizationMiddleware')
 
 
 def test_useradmin_ldap_group_integration():
