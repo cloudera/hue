@@ -180,7 +180,7 @@ class Submission(object):
     if self.jt and self.jt.logical_name:
       jobtracker_addr = self.jt.logical_name
 
-    if self.fs and self.fs.logical_name:
+    if self.fs.logical_name:
       fs_defaultfs = self.fs.logical_name
     else:
       fs_defaultfs = self.fs.fs_defaultfs
