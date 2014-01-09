@@ -22,13 +22,15 @@
  *
  *   options:
  *    - threshold: (default 100) value in pixels, scroll amount before the link appears
+ *    - secondClickScrollToTop: (default false) if specified, the anchor stays for longer and you can re-click on it to scroll to this element
  */
 
 (function ($, window, document, undefined) {
 
   var pluginName = "jHueScrollUp",
       defaults = {
-        threshold: 100 // it displays it after 100 px of scroll
+        threshold: 100, // it displays it after 100 px of scroll
+        secondClickScrollToTop: false
       };
 
   function Plugin(element, options) {
@@ -46,11 +48,11 @@
   Plugin.prototype.init = function () {
     var _this = this;
 
-    if ($("#jHueScrollUpAnchor").length > 0) { // just one scroll up per page
-      return;
-    }
-
     var link = $("<a/>").attr("id", "jHueScrollUpAnchor").attr("href", "javascript:void(0)").html("<i class='fa fa-chevron-up'></i>").appendTo("body");
+    if ($("#jHueScrollUpAnchor").length > 0) { // just one scroll up per page
+      link = $("#jHueScrollUpAnchor");
+      link.off("click");
+    }
 
     if ($(_this.element).is("body")) {
       $(window).scroll(function () {
@@ -63,24 +65,36 @@
     }
     else {
       $(_this.element).scroll(function () {
-        $(($(_this.element).scrollTop() > _this.options.threshold) ? link.fadeIn(200) : link.fadeOut(200));
+        var _fadeOutMs = 200;
+        if (_this.options.secondClickScrollToTop) {
+          _fadeOutMs = 1000;
+        }
+        $(($(_this.element).scrollTop() > _this.options.threshold) ? link.fadeIn(200) : link.fadeOut(_fadeOutMs));
       });
-      link.click(function (event) {
-        $(_this.element).animate({scrollTop: 0}, 300);
+      link.on("click", function (event) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        if (_this.options.secondClickScrollToTop) {
+          if ($(_this.element).data("lastClick") == null || (new Date()).getTime() - $(_this.element).data("lastClick") > 1500) {
+            $(_this.element).animate({scrollTop: 0}, 300);
+          }
+          else {
+            $("body, html").animate({scrollTop: 0}, 300);
+            link.fadeOut(200);
+          }
+          $(_this.element).data("lastClick", (new Date()).getTime());
+        }
+        else {
+          $(_this.element).animate({scrollTop: 0}, 300);
+        }
         return false;
       });
     }
-
   };
 
   $.fn[pluginName] = function (options) {
     return this.each(function () {
-      if (!$.data(this, 'plugin_' + pluginName)) {
-        $.data(this, 'plugin_' + pluginName, new Plugin(this, options));
-      }
-      else {
-        $.data(this, 'plugin_' + pluginName).setOptions(options);
-      }
+      $.data(this, 'plugin_' + pluginName, new Plugin(this, options));
     });
   }
 

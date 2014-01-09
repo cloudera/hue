@@ -412,6 +412,7 @@ function BeeswaxViewModel(server, query_id) {
       type: 'POST',
       success: function(data) {
         self.query.errors.removeAll();
+        self.query.watch.logs.removeAll();
         self.query.statement(data.statement);
         self.query.watch.url(data.watch_url);
         self.query.results.url('/' + self.server() + '/results/' + self.query.id() + '/0?format=json');
@@ -658,7 +659,6 @@ function BeeswaxViewModel(server, query_id) {
 function showSection(section) {
   $('.section').hide();
   $('#' + section).show();
-  $(window).scrollTop(0);
 }
 
 

@@ -274,12 +274,12 @@ ${layout.menubar(section='query')}
         <!-- ko if: !query.explain() -->
         <li><a href="#log" data-toggle="tab">${_('Log')}</a></li>
         <!-- /ko -->
-        <!-- ko if: !query.explain() -->
+        <!-- ko if: !query.explain() && !query.isRunning() -->
         <li><a href="#columns" data-toggle="tab">${_('Columns')}</a></li>
         <li><a href="#results" data-toggle="tab">${_('Results')}</a></li>
         <li><a href="#chart" data-toggle="tab">${_('Chart')}</a></li>
         <!-- /ko -->
-        <!-- ko if: query.explain() -->
+        <!-- ko if: query.explain() && !query.isRunning() -->
         <li><a href="#explanation" data-toggle="tab">${_('Explanation')}</a></li>
         <!-- /ko -->
       </ul>
@@ -708,6 +708,10 @@ ${layout.menubar(section='query')}
     white-space: nowrap;
   }
 
+  .tab-content {
+    min-height: 100px;
+  }
+
 </style>
 
 <link href="/static/ext/css/leaflet.css" rel="stylesheet">
@@ -884,6 +888,10 @@ $(document).ready(function () {
   });
 
   $("a[data-toggle='tab']").on("shown", function (e) {
+    if ($(e.target).attr("href") == "#log") {
+      logsAtEnd = true;
+      window.setTimeout(resizeLogs, 150);
+    }
     if ($(e.target).attr("href") == "#results" && $(e.relatedTarget).attr("href") == "#columns") {
       if ($(".resultTable .columnSelected").length > 0) {
         var _t = $(".resultTable");
@@ -920,6 +928,9 @@ function reinitializeTable () {
       firstColumnTooltip: true
     });
     $($("a[data-toggle='tab']").parent(".active").find("a").attr("href")).height($(".dataTables_wrapper").height());
+    $(".dataTables_wrapper").jHueScrollUp({
+      secondClickScrollToTop: true
+    });
   }, 400)
 }
 
@@ -1146,13 +1157,12 @@ $(document).one('fetched.query', function () {
 
 
 // Logs
+var logsAtEnd = true;
 $(document).ready(function () {
   var labels = {
     MRJOB: "${_('MR Job')}",
     MRJOBS: "${_('MR Jobs')}"
   };
-
-  var logsAtEnd = true;
 
   $(window).resize(function () {
     resizeLogs();
@@ -1343,11 +1353,6 @@ $(document).ready(function () {
     }
   });
 
-  function resizeLogs() {
-    // Use fixed subtraction since logs aren't always visible.
-    $("#log pre").css("overflow", "auto").height($(window).height() - $("#log pre").offset().top - 40);
-  }
-
   viewModel.query.watch.logs.subscribe(function(val){
     if (logsAtEnd) {
       var _logsEl = $("#log pre");
@@ -1356,6 +1361,11 @@ $(document).ready(function () {
   });
 });
 
+function resizeLogs() {
+  // Use fixed subtraction since logs aren't always visible.
+  $("#log").height($(window).height() - $("#log pre").offset().top - 10);
+  $("#log pre").css("overflow", "auto").height($(window).height() - $("#log pre").offset().top - 50);
+}
 
 // Result Datatable
 function cleanResultsTable() {
@@ -1443,7 +1453,9 @@ function resultsTable(e, data) {
     });
     addResults(viewModel, dataTable, index, pageSize);
     index += pageSize;
-    dataTableEl.jHueScrollUp();
+    dataTableEl.jHueScrollUp({
+      secondClickScrollToTop: true
+    });
   }
 }
 
