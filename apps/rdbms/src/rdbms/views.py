@@ -59,7 +59,7 @@ def ensure_configuration(view_func):
 Queries Views
 """
 @ensure_configuration
-def execute_query(request, design_id=None):
+def execute_query(request, design_id=None, query_history_id=None):
   """
   View function for executing an arbitrary synchronously query.
   """

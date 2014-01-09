@@ -34,7 +34,7 @@ from beeswax.forms import QueryForm
 from beeswax.design import HQLdesign
 from beeswax.server import dbms
 from beeswax.server.dbms import expand_exception, get_query_server_config
-from beeswax.views import authorized_get_design, authorized_get_history, make_parameterization_form,\
+from beeswax.views import authorized_get_design, authorized_get_query_history, make_parameterization_form,\
                           safe_get_design, save_design, massage_columns_for_json, _get_query_handle_and_state,\
                           _parse_out_hadoop_jobs
 from desktop.lib.i18n import force_unicode
@@ -134,7 +134,7 @@ def execute_directly(request, query, design, query_server, tablename=None, **kwa
 
 @error_handler
 def watch_query_refresh_json(request, id):
-  query_history = authorized_get_history(request, id, must_exist=True)
+  query_history = authorized_get_query_history(request, id, must_exist=True)
   db = dbms.get(request.user, query_history.get_query_server_config())
 
   if not request.POST.get('next'): # We need this as multi query would fail as current query is closed
@@ -181,7 +181,7 @@ def watch_query_refresh_json(request, id):
   return HttpResponse(json.dumps(result), mimetype="application/json")
 
 
-def close_operation(request, query_id):
+def close_operation(request, query_history_id):
   response = {
     'status': -1,
     'message': ''
@@ -191,7 +191,7 @@ def close_operation(request, query_id):
     response['message'] = _('A POST request is required.')
   else:
     try:
-      query_history = authorized_get_history(request, query_id, must_exist=True)
+      query_history = authorized_get_query_history(request, query_history_id, must_exist=True)
       db = dbms.get(query_history.owner, query_history.get_query_server_config())
       handle = query_history.get_handle()
       db.close_operation(handle)
@@ -217,7 +217,7 @@ def explain_directly(request, query, design, query_server):
 
 
 @error_handler
-def execute(request, query_id=None):
+def execute(request, design_id=None):
   response = {'status': -1, 'message': ''}
 
   if request.method != 'POST':
@@ -226,7 +226,7 @@ def execute(request, query_id=None):
   app_name = get_app_name(request)
   query_server = get_query_server_config(app_name)
   query_type = beeswax.models.SavedQuery.TYPES_MAPPING[app_name]
-  design = safe_get_design(request, query_type, query_id)
+  design = safe_get_design(request, query_type, design_id)
 
   try:
     query_form = get_query_form(request)
@@ -278,7 +278,7 @@ def execute(request, query_id=None):
 
 
 @error_handler
-def save_query(request, query_id=None):
+def save_query_design(request, design_id=None):
   response = {'status': -1, 'message': ''}
 
   if request.method != 'POST':
@@ -286,7 +286,7 @@ def save_query(request, query_id=None):
 
   app_name = get_app_name(request)
   query_type = beeswax.models.SavedQuery.TYPES_MAPPING[app_name]
-  design = safe_get_design(request, query_type, query_id)
+  design = safe_get_design(request, query_type, design_id)
 
   try:
     query_form = get_query_form(request)
@@ -304,7 +304,7 @@ def save_query(request, query_id=None):
 
 
 @error_handler
-def fetch_saved_query(request, query_id):
+def fetch_saved_design(request, design_id):
   response = {'status': 0, 'message': ''}
 
   if request.method != 'GET':
@@ -312,21 +312,32 @@ def fetch_saved_query(request, query_id):
 
   app_name = get_app_name(request)
   query_type = beeswax.models.SavedQuery.TYPES_MAPPING[app_name]
-  design = safe_get_design(request, query_type, query_id)
+  design = safe_get_design(request, query_type, design_id)
 
   response['design'] = design_to_dict(design)
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
+@error_handler
+def fetch_query_history(request, query_history_id):
+  response = {'status': 0, 'message': ''}
+
+  if request.method != 'GET':
+    response['message'] = _('A GET request is required.')
+
+  query = authorized_get_query_history(request, query_history_id, must_exist=True)
+
+  response['query_history'] = query_history_to_dict(request, query)
+  return HttpResponse(json.dumps(response), mimetype="application/json")
 
 @error_handler
-def cancel_query(request, query_id):
+def cancel_query(request, query_history_id):
   response = {'status': -1, 'message': ''}
 
   if request.method != 'POST':
     response['message'] = _('A POST request is required.')
   else:
     try:
-      query_history = authorized_get_history(request, query_id, must_exist=True)
+      query_history = authorized_get_query_history(request, query_history_id, must_exist=True)
       db = dbms.get(request.user, query_history.get_query_server_config())
       db.cancel_operation(query_history.get_handle())
       _get_query_handle_and_state(query_history)
@@ -338,13 +349,13 @@ def cancel_query(request, query_id):
 
 
 @error_handler
-def save_results(request, query_id):
+def save_results(request, query_history_id):
   """
   Save the results of a query to an HDFS directory or Hive table.
   """
   response = {'status': 0, 'message': ''}
 
-  query_history = authorized_get_history(request, query_id, must_exist=True)
+  query_history = authorized_get_query_history(request, query_history_id, must_exist=True)
   server_id, state = _get_query_handle_and_state(query_history)
   query_history.save_state(state)
   error_msg, log = None, None
@@ -419,6 +430,19 @@ def design_to_dict(design):
     'functions': hql_design.functions,
     'is_parameterized': hql_design.query.get('is_parameterized', True),
     'email_notify': hql_design.query.get('email_notify', True)
+  }
+
+
+def query_history_to_dict(request, query_history):
+  return {
+    'id': query_history.id,
+    'state': query_history.last_state,
+    'query': query_history.query,
+    'has_results': query_history.has_results,
+    'statement_number': query_history.statement_number,
+    'design': design_to_dict(query_history.design),
+    'watch_url': reverse(get_app_name(request) + ':api_watch_query_refresh_json', kwargs={'id': query_history.id}),
+    'results_url': reverse(get_app_name(request) + ':view_results', kwargs={'id': query_history.id, 'first_row': 0})
   }
 
 

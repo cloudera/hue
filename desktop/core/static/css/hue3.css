@@ -1004,6 +1004,16 @@ div.box {
   right: -27px;
 }
 
+.empty-wrapper {
+  margin-top: 50px;
+  color: #BBB;
+  line-height: 60px;
+}
+
+.empty-wrapper i {
+  font-size: 148px;
+}
+
 /*
  * Advanced options
  */

@@ -28,7 +28,7 @@ ${layout.menubar(section='query')}
 <div id="query-editor" class="container-fluid hide section">
 <div class="row-fluid">
 <div class="span2">
-  <form id="advancedSettingsForm" action="${action}" method="POST" class="form form-horizontal">
+  <form id="advancedSettingsForm" action="" method="POST" class="form form-horizontal">
     <div class="sidebar-nav">
       <ul class="nav nav-list">
         <li class="nav-header">${_('database')}</li>
@@ -37,7 +37,7 @@ ${layout.menubar(section='query')}
         </li>
         <li class="nav-header">${_('settings')}</li>
         <li class="white paramContainer">
-          <!-- ko foreach: query.settings -->
+          <!-- ko foreach: design.settings -->
           <div class="param">
             <div class="remove">
               <button data-bind="click: $root.removeSetting.bind(this, $index())" type="button" class="btn btn-mini settingsDelete" title="${_('Delete this setting')}">x
@@ -71,7 +71,7 @@ ${layout.menubar(section='query')}
              hide
           % endif
           ">
-          <!-- ko foreach: query.fileResources -->
+          <!-- ko foreach: design.fileResources -->
           <div class="param">
             <div class="remove">
               <button data-bind="click: $root.removeFileResources.bind(this, $index())" type="button" class="btn btn-mini" title="${_('Delete this setting')}">&times;</button>
@@ -108,7 +108,7 @@ ${layout.menubar(section='query')}
             hide
           % endif
           ">
-          <!-- ko foreach: query.functions -->
+          <!-- ko foreach: design.functions -->
           <div class="param">
             <div class="remove">
               <button data-bind="click: $root.removeFunction.bind(this, $index())" type="button" class="btn btn-mini settingsDelete" title="${_('Delete this setting')}">&times;</button>
@@ -132,7 +132,7 @@ ${layout.menubar(section='query')}
         <li class="nav-header">${_('Options')}</li>
         <li class="white" style="padding-top:0px">
           <label class="checkbox" rel="tooltip" data-original-title="${_("If checked (the default), you can include parameters like $parameter_name in your query, and users will be prompted for a value when the query is run.")}">
-            <input data-bind="checked: query.isParameterized" type="checkbox"/>
+            <input data-bind="checked: design.isParameterized" type="checkbox"/>
             ${_("Enable parameterization")}
           </label>
           <label class="checkbox
@@ -140,7 +140,7 @@ ${layout.menubar(section='query')}
             hide
           % endif
           " rel="tooltip" data-original-title="${_("If checked, you will receive an email notification when the query completes.")}">
-            <input data-bind="checked: query.email" type="checkbox"/>
+            <input data-bind="checked: design.email" type="checkbox"/>
             ${_("Email me on completion")}
           </label>
         </li>
@@ -215,18 +215,18 @@ ${layout.menubar(section='query')}
       <div class="tab-content">
         <div id="queryPane">
 
-          <div data-bind="css: {'hide': query.errors().length == 0}" class="hide alert alert-error">
+          <div data-bind="css: {'hide': design.errors().length == 0}" class="hide alert alert-error">
             <p><strong>${_('Your query has the following error(s):')}</strong></p>
 
-            <div data-bind="foreach: query.errors">
+            <div data-bind="foreach: design.errors">
               <p data-bind="text: $data" class="queryErrorMessage"></p>
             </div>
           </div>
 
-          <div data-bind="css: {'hide': query.watch.errors().length == 0}" class="alert alert-error">
+          <div data-bind="css: {'hide': design.watch.errors().length == 0}" class="alert alert-error">
             <p><strong>${_('Your query has the following error(s):')}</strong></p>
 
-            <div data-bind="foreach: query.watch.errors">
+            <div data-bind="foreach: design.watch.errors">
               <p data-bind="text: $data" class="queryErrorMessage"></p>
             </div>
           </div>
@@ -235,14 +235,14 @@ ${layout.menubar(section='query')}
 
           <div class="actions">
             % if app_name == 'impala':
-            <button data-bind="click: tryExecuteQuery, visible: !$root.query.isRunning() && $root.query.isFinished()" type="button" id="executeQuery" class="btn btn-primary disable-feedback" tabindex="2">${_('Execute')}</button>
-            <button data-bind="click: tryCancelQuery, visible: $root.query.isRunning()" class="btn btn-danger" data-loading-text="${ _('Canceling...') }" rel="tooltip" data-original-title="${ _('Cancel the query') }">${ _('Cancel') }</button>
+            <button data-bind="click: tryExecuteQuery, visible: !$root.design.isRunning() && $root.design.isFinished()" type="button" id="executeQuery" class="btn btn-primary disable-feedback" tabindex="2">${_('Execute')}</button>
+            <button data-bind="click: tryCancelQuery, visible: $root.design.isRunning()" class="btn btn-danger" data-loading-text="${ _('Canceling...') }" rel="tooltip" data-original-title="${ _('Cancel the query') }">${ _('Cancel') }</button>
             % else:
-            <button data-bind="click: tryExecuteQuery, enable: !$root.query.isRunning(), visible: $root.query.isFinished()" type="button" id="executeQuery" class="btn btn-primary disable-feedback" tabindex="2">${_('Execute')}</button>
+            <button data-bind="click: tryExecuteQuery, enable: !$root.design.isRunning(), visible: $root.design.isFinished()" type="button" id="executeQuery" class="btn btn-primary disable-feedback" tabindex="2">${_('Execute')}</button>
             % endif
-            <button data-bind="click: executeNextStatement, visible: !$root.query.isFinished()" type="button" class="btn btn-primary disable-feedback" tabindex="2">${_('Next')}</button>
+            <button data-bind="click: executeNextStatement, visible: !$root.design.isFinished()" type="button" class="btn btn-primary disable-feedback" tabindex="2">${_('Next')}</button>
 
-            <button data-bind="click: trySaveQuery, css: {'hide': !$root.query.id() || $root.query.id() == -1}" type="button" class="btn hide">${_('Save')}</button>
+            <button data-bind="click: trySaveDesign, css: {'hide': !$root.design.id() || $root.design.id() == -1}" type="button" class="btn hide">${_('Save')}</button>
             <button data-bind="click: saveAsModal" type="button" class="btn">${_('Save as...')}</button>
             <button data-bind="click: tryExplainQuery" type="button" id="explainQuery" class="btn">${_('Explain')}</button>
             &nbsp; ${_('or create a')} &nbsp;
@@ -262,47 +262,47 @@ ${layout.menubar(section='query')}
     <a id="save-results" data-bind="click: saveResultsModal" href="javascript:void(0)" title="${_('Save the results to HDFS or a new Hive table')}" rel="tooltip"
       class="view-query-results hide pull-right"><h4 style="margin-right: 20px"><i class="fa fa-save"></i></h4></a>
 
-    <a id="download-csv" data-bind="attr: {'href': '/beeswax/download/' + $root.query.id() + '/csv'}" href="javascript:void(0)" title="${_('Download the results in CSV format')}" rel="tooltip"
+    <a id="download-csv" data-bind="attr: {'href': '/beeswax/download/' + $root.design.id() + '/csv'}" href="javascript:void(0)" title="${_('Download the results in CSV format')}" rel="tooltip"
       class="view-query-results hide pull-right"><h4 style="margin-right: 20px"><i class="fa fa-arrow-circle-o-down"></i></h4></a>
 
-    <a id="download-excel" data-bind="attr: {'href': '/beeswax/download/' + $root.query.id() + '/xls'}" href="javascript:void(0)" title="${_('Download the results for excel')}" rel="tooltip"
+    <a id="download-excel" data-bind="attr: {'href': '/beeswax/download/' + $root.design.id() + '/xls'}" href="javascript:void(0)" title="${_('Download the results for excel')}" rel="tooltip"
       class="view-query-results hide pull-right"><h4 style="margin-right: 20px"><i class="fa fa-arrow-circle-o-down"></i></h4></a>
 
     <div class="card-body">
       <ul class="nav nav-tabs">
         <li><a href="#query" data-toggle="tab">${_('Query')}</a></li>
-        <!-- ko if: !query.explain() -->
+        <!-- ko if: !design.explain() -->
         <li><a href="#log" data-toggle="tab">${_('Log')}</a></li>
         <!-- /ko -->
-        <!-- ko if: !query.explain() && !query.isRunning() -->
+        <!-- ko if: !design.explain() && !design.isRunning() -->
         <li><a href="#columns" data-toggle="tab">${_('Columns')}</a></li>
         <li><a href="#results" data-toggle="tab">${_('Results')}</a></li>
         <li><a href="#chart" data-toggle="tab">${_('Chart')}</a></li>
         <!-- /ko -->
-        <!-- ko if: query.explain() && !query.isRunning() -->
+        <!-- ko if: design.explain() && !design.isRunning() -->
         <li><a href="#explanation" data-toggle="tab">${_('Explanation')}</a></li>
         <!-- /ko -->
       </ul>
 
       <div class="tab-content">
         <div class="tab-pane" id="query">
-          <pre data-bind="text: viewModel.query.statement()"></pre>
+          <pre data-bind="text: viewModel.design.statement()"></pre>
         </div>
-        <!-- ko if: query.explain() -->
+        <!-- ko if: design.explain() -->
         <div class="tab-pane" id="explanation">
-          <pre data-bind="text: $root.query.results.explanation()"></pre>
+          <pre data-bind="text: $root.design.results.explanation()"></pre>
         </div>
         <!-- /ko -->
-        <!-- ko if: !query.explain() -->
+        <!-- ko if: !design.explain() -->
         <div class="active tab-pane" id="log">
-          <pre data-bind="text: $root.query.watch.logs().join('\n')"></pre>
+          <pre data-bind="text: $root.design.watch.logs().join('\n')"></pre>
         </div>
         <div class="tab-pane" id="columns">
           <table class="table table-striped table-condensed" cellpadding="0" cellspacing="0">
             <thead>
               <tr><th>${_('Name')}</th></tr>
             </thead>
-            <tbody data-bind="foreach: $root.query.results.columns">
+            <tbody data-bind="foreach: $root.design.results.columns">
               <tr>
                 <td><a href="javascript:void(0)" class="column-selector" data-bind="text: $data.name"></a></td>
               </tr>
@@ -311,17 +311,25 @@ ${layout.menubar(section='query')}
         </div>
         <div class="tab-pane" id="results">
 
-          <div data-bind="css: {'hide': $root.query.results.rows().length == 0}" class="hide">
+          <div data-bind="css: {'hide': design.results.errors().length == 0}" class="alert alert-error">
+            <p><strong>${_('Fetching results ran into the following error(s):')}</strong></p>
+
+            <div data-bind="foreach: design.results.errors">
+              <p data-bind="text: $data" class="queryErrorMessage"></p>
+            </div>
+          </div>
+
+          <div data-bind="css: {'hide': $root.design.results.empty()}" class="hide">
             <table class="table table-striped table-condensed resultTable" cellpadding="0" cellspacing="0" data-tablescroller-enforce-height="true">
               <thead>
-              <tr data-bind="foreach: $root.query.results.columns">
+              <tr data-bind="foreach: $root.design.results.columns">
                 <th data-bind="text: $data.name, css: { 'sort-numeric': $.inArray($data.type, ['TINYINT_TYPE', 'SMALLINT_TYPE', 'INT_TYPE', 'BIGINT_TYPE', 'FLOAT_TYPE', 'DOUBLE_TYPE', 'DECIMAL_TYPE']) > -1, 'sort-date': $.inArray($data.type, ['TIMESTAMP_TYPE', 'DATE_TYPE']) > -1, 'sort-string': $.inArray($data.type, ['TINYINT_TYPE', 'SMALLINT_TYPE', 'INT_TYPE', 'BIGINT_TYPE', 'FLOAT_TYPE', 'DOUBLE_TYPE', 'DECIMAL_TYPE', 'TIMESTAMP_TYPE', 'DATE_TYPE']) == -1 }"></th>
               </tr>
               </thead>
             </table>
           </div>
 
-          <div data-bind="css: {'hide': !$root.query.results.empty()}" class="hide">
+          <div data-bind="css: {'hide': !$root.design.results.empty()}" class="hide">
             <div class="card card-small scrollable">
               <div class="row-fluid">
                 <div class="span10 offset1 center empty-wrapper">
@@ -405,7 +413,7 @@ ${layout.menubar(section='query')}
         <p>
         <form method="POST" action="" class="form-horizontal">
           <fieldset>
-            <!-- ko foreach: $root.query.parameters -->
+            <!-- ko foreach: $root.design.parameters -->
             <div class="control-group">
               <label data-bind="text: name" class="control-label"></label>
               <div class="controls">
@@ -436,7 +444,7 @@ ${layout.menubar(section='query')}
 
         <form method="POST" action="" class="form-horizontal">
           <fieldset>
-            <!-- ko foreach: $root.query.parameters -->
+            <!-- ko foreach: $root.design.parameters -->
             <div class="control-group">
               <label data-bind="text: name" class="control-label"></label>
 
@@ -484,20 +492,20 @@ ${layout.menubar(section='query')}
       <label class="control-label">${_('Name')}</label>
 
       <div class="controls">
-        <input data-bind="value: $root.query.name" type="text" class="input-xlarge">
+        <input data-bind="value: $root.design.name" type="text" class="input-xlarge">
       </div>
     </div>
     <div class="control-group">
       <label class="control-label">${_('Description')}</label>
 
       <div class="controls">
-        <input data-bind="value: $root.query.description" type="text" class="input-xlarge">
+        <input data-bind="value: $root.design.description" type="text" class="input-xlarge">
       </div>
     </div>
   </form>
   <div class="modal-footer">
     <button class="btn" data-dismiss="modal">${_('Cancel')}</button>
-    <button data-bind="click: trySaveAsQuery" class="btn btn-primary">${_('Save')}</button>
+    <button data-bind="click: trySaveAsDesign" class="btn btn-primary">${_('Save')}</button>
   </div>
 </div>
 
@@ -508,36 +516,36 @@ ${layout.menubar(section='query')}
     <h3>${_('Save Query Results')}</h3>
   </div>
   <div class="modal-body">
-    <!-- ko if: $root.query.results.save.saveTargetError() -->
-      <h4 data-bind="text: $root.query.results.save.saveTargetError()"></h4>
+    <!-- ko if: $root.design.results.save.saveTargetError() -->
+      <h4 data-bind="text: $root.design.results.save.saveTargetError()"></h4>
     <!-- /ko -->
-    <!-- ko if: $root.query.results.save.targetTableError() -->
-      <h4 data-bind="text: $root.query.results.save.targetTableError()"></h4>
+    <!-- ko if: $root.design.results.save.targetTableError() -->
+      <h4 data-bind="text: $root.design.results.save.targetTableError()"></h4>
     <!-- /ko -->
-    <!-- ko if: $root.query.results.save.targetDirectoryError() -->
-      <h4 data-bind="text: $root.query.results.save.targetDirectoryError()"></h4>
+    <!-- ko if: $root.design.results.save.targetDirectoryError() -->
+      <h4 data-bind="text: $root.design.results.save.targetDirectoryError()"></h4>
     <!-- /ko -->
     <form id="saveResultsForm" method="POST" class="form form-inline">
       <fieldset>
-        <div data-bind="css: {'error': $root.query.results.save.targetTableError()}" class="control-group">
+        <div data-bind="css: {'error': $root.design.results.save.targetTableError()}" class="control-group">
           <div class="controls">
             <label class="radio">
-              <input data-bind="checked: $root.query.results.save.type" type="radio" name="save-results-type" value="hive-table">
+              <input data-bind="checked: $root.design.results.save.type" type="radio" name="save-results-type" value="hive-table">
               &nbsp;${ _('In a new table') }
             </label>
-            <span data-bind="visible: $root.query.results.save.type() == 'hive-table'">
-              <input data-bind="value: $root.query.results.save.path" type="text" name="target_table" placeholder="${_('Table name')}">
+            <span data-bind="visible: $root.design.results.save.type() == 'hive-table'">
+              <input data-bind="value: $root.design.results.save.path" type="text" name="target_table" placeholder="${_('Table name')}">
             </span>
           </div>
         </div>
-        <div data-bind="css: {'error': $root.query.results.save.targetDirectoryError()}" class="control-group">
+        <div data-bind="css: {'error': $root.design.results.save.targetDirectoryError()}" class="control-group">
           <div class="controls">
             <label class="radio">
-              <input data-bind="checked: $root.query.results.save.type" type="radio" name="save-results-type" value="hdfs">
+              <input data-bind="checked: $root.design.results.save.type" type="radio" name="save-results-type" value="hdfs">
               &nbsp;${ _('In an HDFS directory') }
             </label>
-            <span data-bind="visible: $root.query.results.save.type() == 'hdfs'">
-              <input data-bind="value: $root.query.results.save.path" type="text" name="target_dir" placeholder="${_('Results location')}" class="pathChooser">
+            <span data-bind="visible: $root.design.results.save.type() == 'hdfs'">
+              <input data-bind="value: $root.design.results.save.path" type="text" name="target_dir" placeholder="${_('Results location')}" class="pathChooser">
             </span>
           </div>
         </div>
@@ -1133,7 +1141,7 @@ $(document).ready(function () {
 });
 
 
-$(document).one('fetched.query', function () {
+$(document).one('fetched.design', function () {
   // Edit query name and description.
   $("#query-name").editable({
     validate: function (value) {
@@ -1142,14 +1150,14 @@ $(document).one('fetched.query', function () {
       }
     },
     success: function (response, newValue) {
-      viewModel.query.name(newValue);
+      viewModel.design.name(newValue);
     },
     emptytext: "${ _('Query name') }"
   });
 
   $("#query-description").editable({
     success: function (response, newValue) {
-      viewModel.query.description(newValue);
+      viewModel.design.description(newValue);
     },
     emptytext: "${ _('Empty description') }"
   });
@@ -1174,12 +1182,11 @@ $(document).ready(function () {
 
   $("a[data-toggle='tab']").on("shown", function (e) {
     if ($(e.target).attr("href") != "#results"){
-      $($(e.target).attr("href")).height($(".dataTables_wrapper").height());
+      $($(e.target).attr("href")).css('height', 'auto');
       if ($(e.target).attr("href") == "#chart") {
         predictGraph();
       }
-    }
-    else {
+    } else {
       reinitializeTable();
     }
   });
@@ -1353,7 +1360,7 @@ $(document).ready(function () {
     }
   });
 
-  viewModel.query.watch.logs.subscribe(function(val){
+  viewModel.design.watch.logs.subscribe(function(val){
     if (logsAtEnd) {
       var _logsEl = $("#log pre");
       _logsEl.scrollTop(_logsEl[0].scrollHeight - _logsEl.height());
@@ -1372,26 +1379,26 @@ function cleanResultsTable() {
   if (dataTable) {
     dataTable.fnClearTable();
     dataTable.fnDestroy();
-    viewModel.query.results.columns.valueHasMutated();
-    viewModel.query.results.rows.valueHasMutated();
+    viewModel.design.results.columns.valueHasMutated();
+    viewModel.design.results.rows.valueHasMutated();
     dataTable = null;
   }
 }
 
 function addResults(viewModel, dataTable, index, pageSize) {
-  if (viewModel.hasMoreResults() && index + pageSize > viewModel.query.results.rows().length) {
+  if (viewModel.hasMoreResults() && index + pageSize > viewModel.design.results.rows().length) {
     $(document).one('fetched.results', function () {
       $.totalStorage("${app_name}_temp_query", null);
-      dataTable.fnAddData(viewModel.query.results.rows.slice(index, index + pageSize));
+      dataTable.fnAddData(viewModel.design.results.rows.slice(index, index + pageSize));
     });
     viewModel.fetchResults();
   } else {
-    dataTable.fnAddData(viewModel.query.results.rows.slice(index, index + pageSize));
+    dataTable.fnAddData(viewModel.design.results.rows.slice(index, index + pageSize));
   }
 }
 
 function resultsTable(e, data) {
-  if (!dataTable && viewModel.query.results.columns().length > 0) {
+  if (!dataTable && viewModel.design.results.columns().length > 0) {
     dataTable = $(".resultTable").dataTable({
       "bPaginate": false,
       "bLengthChange": false,
@@ -1432,7 +1439,7 @@ function resultsTable(e, data) {
     $(".dataTables_filter").hide();
     reinitializeTable();
     var _options = '<option value="-1">${ _("Please select a column")}</option>';
-    $(viewModel.query.results.columns()).each(function(cnt, item){
+    $(viewModel.design.results.columns()).each(function(cnt, item){
       _options += '<option value="'+(cnt + 1)+'">'+ item.name +'</option>';
     });
     $(".blueprintSelect").html(_options);
@@ -1498,27 +1505,27 @@ $(document).on('error.query', function () {
 
 
 // Save
-function trySaveQuery() {
+function trySaveDesign() {
   var query = getHighlightedQuery() || codeMirror.getValue();
-  viewModel.query.query(query);
-  if (viewModel.query.id() && viewModel.query.id() != -1) {
-    viewModel.saveQuery();
+  viewModel.design.query(query);
+  if (viewModel.design.id() && viewModel.design.id() != -1) {
+    viewModel.saveDesign();
   }
 }
 
 function saveAsModal() {
   var query = getHighlightedQuery() || codeMirror.getValue();
-  viewModel.query.query(query);
+  viewModel.design.query(query);
   $('#saveAs').modal('show');
 }
 
-function trySaveAsQuery() {
-  if (viewModel.query.query() && viewModel.query.name()) {
-    viewModel.query.id(-1);
-    viewModel.saveQuery();
+function trySaveAsDesign() {
+  if (viewModel.design.query() && viewModel.design.name()) {
+    viewModel.design.id(-1);
+    viewModel.saveDesign();
     $('#saveas-query-name').removeClass('error');
     $('#saveAs').modal('hide');
-  } else if (viewModel.query.name()) {
+  } else if (viewModel.design.name()) {
     $.jHueNotify.error("${_('No query provided to save.')}");
     $('#saveAs').modal('hide');
   } else {
@@ -1543,11 +1550,11 @@ $(document).on('saved.results', function() {
 function tryExecuteQuery() {
   $(".tooltip").remove();
   var query = getHighlightedQuery() || codeMirror.getValue();
-  viewModel.query.query(query);
+  viewModel.design.query(query);
   if ($(".dataTables_wrapper").length > 0) { // forces results to be up
     $(".dataTables_wrapper").scrollTop(0);
   }
-  if (viewModel.query.isParameterized()) {
+  if (viewModel.design.isParameterized()) {
     viewModel.fetchParameters();
   } else {
     viewModel.executeQuery();
@@ -1564,7 +1571,7 @@ function tryExecuteParameterizedQuery() {
 function tryExplainQuery() {
   $(".tooltip").remove();
   var query = getHighlightedQuery() || codeMirror.getValue();
-  viewModel.query.query(query);
+  viewModel.design.query(query);
   viewModel.explainQuery();
 }
 
@@ -1608,31 +1615,29 @@ function clickHard(el) {
   }, 100);
 }
 
-viewModel = new BeeswaxViewModel("${app_name}", ${design.id and design.id or -1});
-viewModel.fetchDatabases();
-var subscription = viewModel.databases.subscribe(function() {
-  if (viewModel.query.id() > 0) {
-    viewModel.fetchQuery();
-  }
-  subscription.dispose();
-});
-if (viewModel.query.id() > 0) {
+viewModel = new BeeswaxViewModel("${app_name}");
+% if query:
+  viewModel.design.history.id(${query.id});
+  viewModel.fetchQueryHistory();
+  $(document).on('fetched.query', function(e) {
+    viewModel.watchQueryLoop();
+  });
+% elif design.id:
+  viewModel.design.id(${design.id});
+  viewModel.fetchDesign();
+% endif
+if (viewModel.design.id() > 0 || viewModel.design.history.id() > 0) {
   // Code mirror and ko.
-  viewModel.query.query.subscribe((function () {
-    // First call skipped to avoid reset of hueBeeswaxLastDatabase
-    var counter = 0;
-    return function (value) {
-      if (counter++ == 0) {
-        codeMirror.setValue(value);
-      }
-    }
-  })());
-  viewModel.fetchQuery();
+  var codeMirrorSubscription = viewModel.design.query.subscribe(function(value) {
+    codeMirror.setValue(value);
+    codeMirrorSubscription.dispose();
+  });
 }
-viewModel.query.fileResources.subscribe(function() {
+viewModel.design.fileResources.subscribe(function() {
   // File chooser button for file resources.
   $(".pathChooser:not(:has(~ button))").after(getFileBrowseButton($(".pathChooser:not(:has(~ button))")));
 });
+viewModel.fetchDatabases();
 ko.applyBindings(viewModel);
 
 // Server error handling.
@@ -1644,9 +1649,9 @@ $(document).on('server.unmanageable_error', function (e, responseText) {
 });
 
 // Other
-$(document).on('saved.query', function (e, id) {
+$(document).on('saved.design', function (e, id) {
   $(document).trigger('info', "${'Query saved.'}");
-  window.location.href = "/beeswax/execute/" + id;
+  window.location.href = "/beeswax/execute/design/" + id;
 });
 $(document).on('error_cancel.query', function (e, message) {
   $(document).trigger("error", "${ _('Problem: ') }" + message);
@@ -1765,19 +1770,19 @@ $(document).ready(function () {
       codeMirror.setSize("99%", $(window).height() - 270 - $("#queryPane .alert-error").outerHeight() - $(".nav-tabs").outerHeight());
     },
     'query/execute/params': function () {
-      if (viewModel.query.parameters().length == 0) {
+      if (viewModel.design.parameters().length == 0) {
         routie('query');
       }
       showSection('execute-parameter-selection');
     },
     'query/explain/params': function () {
-      if (viewModel.query.parameters().length == 0) {
+      if (viewModel.design.parameters().length == 0) {
         routie('query');
       }
       showSection('explain-parameter-selection');
     },
     'query/logs': function () {
-      if (viewModel.query.watch.logs().length == 0 && viewModel.query.watch.errors().length == 0) {
+      if (viewModel.design.watch.logs().length == 0 && viewModel.design.watch.errors().length == 0) {
         routie('query');
       }
       codeMirror.setSize("99%", 100);
@@ -1787,19 +1792,15 @@ $(document).ready(function () {
       clickHard('.resultsContainer .nav-tabs a[href="#log"]');
     },
     'query/results': function () {
-      if (viewModel.query.id() == -1 && viewModel.query.results.empty()) {
-        routie('query');
-      } else {
-        codeMirror.setSize("99%", 100);
-        $('.resultsContainer').show();
-        $('.resultsContainer .watch-query').hide();
-        $('.resultsContainer .view-query-results').show();
-        clickHard('.resultsContainer .nav-tabs a[href="#results"]');
-        $("html, body").animate({ scrollTop: ($(".resultsContainer").position().top - 80) + "px" });
-      }
+      codeMirror.setSize("99%", 100);
+      $('.resultsContainer').show();
+      $('.resultsContainer .watch-query').hide();
+      $('.resultsContainer .view-query-results').show();
+      clickHard('.resultsContainer .nav-tabs a[href="#results"]');
+      $("html, body").animate({ scrollTop: ($(".resultsContainer").position().top - 80) + "px" });
     },
     'query/explanation': function () {
-      if (!viewModel.query.results.explanation()) {
+      if (!viewModel.design.results.explanation()) {
         routie('query');
       }
       codeMirror.setSize("99%", 100);
@@ -1812,8 +1813,11 @@ $(document).ready(function () {
       routie('query');
     }
   });
+
+  routie('query');
+
   $(document).on('fetched.parameters', function () {
-    if (viewModel.query.parameters().length > 0) {
+    if (viewModel.design.parameters().length > 0) {
       routie('query/execute/params');
     } else {
       viewModel.executeQuery();
@@ -1824,7 +1828,7 @@ $(document).ready(function () {
   });
   $(document).on('watched.query', function (e, data) {
     if (data.status && data.status && data.status != 0) {
-      viewModel.query.watch.errors.push(data.error || data.message);
+      viewModel.design.watch.errors.push(data.error || data.message);
     }
     routie('query/logs');
   });
@@ -1839,10 +1843,6 @@ $(document).ready(function () {
   });
 });
 
-// @TODO: Improve resize logs to be more relative. See FF versus Chrome.
-// @TODO: Stop operation
-// @TODO: Re-add download query for impala
-// @TODO: Re-enable type ahead for settings
 </script>
 
 ${ commonfooter(messages) | n,unicode }

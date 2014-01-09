@@ -339,16 +339,6 @@ ${ common.createContextModal() }
     white-space: nowrap;
   }
 
-  .empty-wrapper {
-    margin-top: 50px;
-    color: #BBB;
-    line-height: 60px;
-  }
-
-  .empty-wrapper i {
-    font-size: 148px;
-  }
-
   #navigatorTables li {
     width: 95%;
     white-space: nowrap;
