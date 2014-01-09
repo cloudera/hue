@@ -184,7 +184,7 @@ def clone_design(request, design_id):
 
   messages.info(request, _('Copied design: %(name)s') % {'name': design.name})
 
-  return format_preserving_redirect(request, reverse(get_app_name(request) + ':execute_query', kwargs={'design_id': copy.id}))
+  return format_preserving_redirect(request, reverse(get_app_name(request) + ':execute_design', kwargs={'design_id': copy.id}))
 
 
 def list_designs(request):
@@ -327,7 +327,7 @@ def list_query_history(request):
 def download(request, id, format):
   assert format in common.DL_FORMATS
 
-  query_history = authorized_get_history(request, id, must_exist=True)
+  query_history = authorized_get_query_history(request, id, must_exist=True)
   db = dbms.get(request.user, query_history.get_query_server_config())
   LOG.debug('Download results for query %s: [ %s ]' % (query_history.server_id, query_history.query))
 
@@ -338,99 +338,30 @@ def download(request, id, format):
 Queries Views
 """
 
-def execute_query(request, design_id=None):
+def execute_query(request, design_id=None, query_history_id=None):
   """
-  Deprecated except for testing I guess.
-
   View function for executing an arbitrary query.
-  It understands the optional GET/POST params:
-
-    on_success_url
-      If given, it will be displayed when the query is successfully finished.
-      Otherwise, it will display the view query results page by default.
   """
-  authorized_get_design(request, design_id)
-
-  error_message = None
-  form = QueryForm()
-  action = request.path
-  log = None
-  app_name = get_app_name(request)
-  query_type = SavedQuery.TYPES_MAPPING[app_name]
-  design = safe_get_design(request, query_type, design_id)
-  on_success_url = request.REQUEST.get('on_success_url')
-  databases = []
-  query_server = get_query_server_config(app_name)
-  db = dbms.get(request.user, query_server)
-
-  try:
-    databases = get_db_choices(request)
-  except Exception, ex:
-    error_message, log = expand_exception(ex, db)
-
-  if request.method == 'POST':
-    form.bind(request.POST)
-    form.query.fields['database'].choices =  databases # Could not do it in the form
-
-    to_explain = request.POST.has_key('button-explain')
-    to_submit = request.POST.has_key('button-submit')
-
-    # Always validate the saveform, which will tell us whether it needs explicit saving
-    if form.is_valid():
-      to_save = form.saveform.cleaned_data['save']
-      to_saveas = form.saveform.cleaned_data['saveas']
-
-      if to_saveas and not design.is_auto:
-        # Save As only affects a previously saved query
-        design = design.clone()
-
-      if to_submit or to_save or to_saveas or to_explain:
-        explicit_save = to_save or to_saveas
-        if explicit_save:
-          request.info(_('Query saved!'))
-        design = save_design(request, form, query_type, design, explicit_save)
-        action = reverse(app_name + ':execute_query', kwargs={'design_id': design.id})
-
-      if to_explain or to_submit:
-        query_str = form.query.cleaned_data["query"]
-
-        # (Optional) Parameterization.
-        parameterization = get_parameterization(request, query_str, form, design, to_explain)
-        if parameterization:
-          return parameterization
-
-        try:
-          query = HQLdesign(form, query_type=query_type)
-          if to_explain:
-            return explain_directly(request, query, design, query_server)
-          else:
-            download = request.POST.has_key('download')
-            return execute_directly(request, query, query_server, design, on_success_url=on_success_url, download=download)
-        except Exception, ex:
-          error_message, log = expand_exception(ex, db)
+  if query_history_id:
+    query = authorized_get_query_history(request, query_history_id, must_exist=True)
+    design = query.design
   else:
-    if design.id is not None:
-      data = HQLdesign.loads(design.data).get_query_dict()
-      form.bind(data)
-      form.saveform.set_data(design.name, design.desc)
-    else:
-      # New design
-      form.bind()
-    form.query.fields['database'].choices = databases # Could not do it in the form
+    # Check perms.
+    authorized_get_design(request, design_id)
 
-  if not databases:
-    request.error(_('No databases are available. Permissions could be missing.'))
+    app_name = get_app_name(request)
+    query_type = SavedQuery.TYPES_MAPPING[app_name]
+    design = safe_get_design(request, query_type, design_id)
+    query = None
 
-  return render('execute.mako', request, {
-    'action': action,
+  context = {
     'design': design,
-    'error_message': error_message,
-    'form': form,
-    'log': log,
+    'query': query,
     'autocomplete_base_url': reverse(get_app_name(request) + ':api_autocomplete_databases', kwargs={}),
-    'on_success_url': on_success_url,
-    'can_edit_name': design.id and not design.is_auto,
-  })
+    'can_edit_name': design.id and not design.is_auto
+  }
+
+  return render('execute.mako', request, context)
 
 
 def watch_query(request, id):
@@ -453,7 +384,7 @@ def watch_query(request, id):
   All other GET params will be passed to on_success_url (if present).
   """
   # Coerce types: manage arguments
-  query_history = authorized_get_history(request, id, must_exist=True)
+  query_history = authorized_get_query_history(request, id, must_exist=True)
   db = dbms.get(request.user, query_history.get_query_server_config())
 
   # GET param: context.
@@ -530,7 +461,7 @@ def view_results(request, id, first_row=0):
   columns = []
   app_name = get_app_name(request)
 
-  query_history = authorized_get_history(request, id, must_exist=True)
+  query_history = authorized_get_query_history(request, id, must_exist=True)
   query_server = query_history.get_query_server_config()
   db = dbms.get(request.user, query_server)
 
@@ -618,8 +549,10 @@ def view_results(request, id, first_row=0):
 
   if request.GET.get('format') == 'json':
     context['columns'] = massage_columns_for_json(columns)
-    del context['save_form']
-    del context['query']
+    if 'save_form' in context:
+      del context['save_form']
+    if 'query' in context:
+      del context['query']
     return HttpResponse(json.dumps(context), mimetype="application/json")
   else:
     return render('watch_results.mako', request, context)
@@ -631,7 +564,7 @@ def save_results(request, id):
 
   Save the results of a query to an HDFS directory or Hive table.
   """
-  query_history = authorized_get_history(request, id, must_exist=True)
+  query_history = authorized_get_query_history(request, id, must_exist=True)
 
   app_name = get_app_name(request)
   server_id, state = _get_query_handle_and_state(query_history)
@@ -792,7 +725,7 @@ def authorized_get_design(request, design_id, owner_only=False, must_exist=False
 
   return design
 
-def authorized_get_history(request, query_history_id, owner_only=False, must_exist=False):
+def authorized_get_query_history(request, query_history_id, owner_only=False, must_exist=False):
   if query_history_id is None and not must_exist:
     return None
   try:
@@ -908,7 +841,7 @@ def _run_parameterized_query(request, design_id, explain):
       db = dbms.get(request.user, query_server)
       error_message, log = expand_exception(ex, db)
       return render('execute.mako', request, {
-        'action': reverse(get_app_name(request) + ':execute_query'),
+        'action': reverse(get_app_name(request) + ':execute_design'),
         'design': design,
         'error_message': error_message,
         'form': query_form,

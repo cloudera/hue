@@ -91,14 +91,14 @@ ${layout.menubar(section='my queries')}
           <tr>
             <td data-row-selector-exclude="true">
               <div class="hueCheckbox savedCheck fa canDelete"
-                   data-edit-url="${ url(app_name + ':execute_query', design_id=design.id) }"
+                   data-edit-url="${ url(app_name + ':execute_design', design_id=design.id) }"
                    data-delete-name="${ design.id }"
                    data-history-url="${ url(app_name + ':list_query_history') }?q-design_id=${design.id}"
                    data-clone-url="${ url(app_name + ':clone_design', design_id=design.id) }"
                    data-row-selector-exclude="true"></div>
             </td>
             <td>
-              <a href="${ url(app_name + ':execute_query', design_id=design.id) }" data-row-selector="true">${design.name}</a>
+              <a href="${ url(app_name + ':execute_design', design_id=design.id) }" data-row-selector="true">${design.name}</a>
             </td>
             <td>
               % if design.desc:
@@ -134,14 +134,14 @@ ${layout.menubar(section='my queries')}
           <tr>
             <td width="1%" data-row-selector-exclude="true">
               <div class="hueCheckbox runCheck fa"
-                data-edit-url="${ url(app_name + ':execute_query', design_id=query.design.id) }"
+                data-edit-url="${ url(app_name + ':execute_design', design_id=query.design.id) }"
                 % if qcontext and query.last_state != models.QueryHistory.STATE.expired.index:
                   data-view-url="${ url(app_name + ':watch_query', id=query.id) }?context=${qcontext|u}"
                 % endif
                 data-row-selector-exclude="true"></div>
             </td>
             <td width="10%" data-sort-value="${time.mktime(query.submission_date.timetuple())}">${ query.submission_date.strftime("%x %X") }</td>
-            <td width="20%"><a href="${ url(app_name + ':execute_query', design_id=query.design.id) }" data-row-selector="true">${ query.design.name }</a></td>
+            <td width="20%"><a href="${ url(app_name + ':execute_design', design_id=query.design.id) }" data-row-selector="true">${ query.design.name }</a></td>
             <td width="60%">
               % if len(query.query) > 100:
               <code>${collapse_whitespace(query.query[:100])}...</code>

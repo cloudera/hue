@@ -589,7 +589,7 @@ for x in sys.stdin:
     resp = cli.get('/beeswax/execute/%s' % (design.id,))
     assert_equal(design, resp.context['design'], resp.context)
 
-    resp = cli.get(reverse('beeswax:api_fetch_saved_query', kwargs={'query_id': design.id}))
+    resp = cli.get(reverse('beeswax:api_fetch_saved_design', kwargs={'design_id': design.id}))
     content = json.loads(resp.content)
     assert_true('SELECT bogus FROM test' in content['design']['query'], content)
 
@@ -615,7 +615,7 @@ for x in sys.stdin:
 
     # Retrieve that design and check correct DB is selected
     design = beeswax.models.SavedQuery.objects.filter(name='rubbish')[0]
-    resp = cli.get(reverse('beeswax:api_fetch_saved_query', kwargs={'query_id': design.id}))
+    resp = cli.get(reverse('beeswax:api_fetch_saved_design', kwargs={'design_id': design.id}))
     content = json.loads(resp.content)
     assert_true(query in content['design']['query'], content)
     assert_equal('', content['design']['desc'], content)

@@ -31,18 +31,6 @@
 ${ commonheader(_('%(filename)s - File Viewer') % dict(filename=truncate(filename)), 'filebrowser', user) | n,unicode }
 ${ fb_components.menubar() }
 
-<style type="text/css">
-  .empty-wrapper {
-    margin-top: 50px;
-    color: #BBB;
-    line-height: 60px;
-  }
-
-  .empty-wrapper i {
-    font-size: 148px;
-  }
-</style>
-
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="span2">

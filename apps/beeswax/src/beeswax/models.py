@@ -300,7 +300,7 @@ class SavedQuery(models.Model):
       return ""
 
   def get_absolute_url(self):
-    return reverse(QueryHistory.get_type_name(self.type) + ':execute_query', kwargs={'design_id': self.id})
+    return reverse(QueryHistory.get_type_name(self.type) + ':execute_design', kwargs={'design_id': self.id})
 
 
 class SessionManager(models.Manager):

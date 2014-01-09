@@ -280,7 +280,7 @@ def make_query(client, query, submission_type="Execute",
   if submission_type == 'Explain':
     execute_url += "?explain=true"
   if submission_type == 'Save':
-    execute_url = reverse("beeswax:api_save_query")
+    execute_url = reverse("beeswax:api_save_design")
 
   response = client.post(execute_url, parameters, **kwargs)
 

@@ -95,7 +95,7 @@ ${ layout.menubar(section='saved queries') }
         <td data-row-selector-exclude="true">
           <div class="hueCheckbox savedCheck fa"
             % if may_edit:
-              data-edit-url="${ url(app_name + ':execute_query', design_id=design.id) }"
+              data-edit-url="${ url(app_name + ':execute_design', design_id=design.id) }"
               data-delete-name="${ design.id }"
               data-history-url="${ url(app_name + ':list_query_history') }?q-design_id=${design.id}"
             % endif
@@ -103,7 +103,7 @@ ${ layout.menubar(section='saved queries') }
         </td>
         <td>
         % if may_edit:
-          <a href="${ url(app_name + ':execute_query', design_id=design.id) }" data-row-selector="true">${ force_unicode(design.name) }</a>
+          <a href="${ url(app_name + ':execute_design', design_id=design.id) }" data-row-selector="true">${ force_unicode(design.name) }</a>
         % else:
           ${ force_unicode(design.name) }
         % endif

@@ -41,7 +41,7 @@ from spark.decorators import view_error_handler
 LOG = logging.getLogger(__name__)
 
 @view_error_handler
-def editor(request, design_id=None):
+def editor(request, design_id=None, query_history_id=None):
   api = get_api(request.user)
   jobs = api.jobs()
   if design_id is not None and not design_id.isdigit():

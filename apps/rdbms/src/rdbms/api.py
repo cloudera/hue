@@ -30,7 +30,7 @@ from librdbms.design import SQLdesign
 
 from beeswax import models as beeswax_models
 from beeswax.forms import SaveForm
-from beeswax.views import authorized_get_history, safe_get_design
+from beeswax.views import authorized_get_query_history, safe_get_design
 
 from rdbms.forms import SQLForm
 from rdbms.views import save_design
@@ -225,7 +225,7 @@ def fetch_results(request, id, first_row=0):
   fetch_error = False
   error_message = ''
 
-  query_history = authorized_get_history(request, id, must_exist=True)
+  query_history = authorized_get_query_history(request, id, must_exist=True)
   query_server = query_history.get_query_server_config()
   design = SQLdesign.loads(query_history.design.data)
   db = dbms.get(request.user, query_server)
