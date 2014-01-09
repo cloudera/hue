@@ -86,7 +86,7 @@ class SolrApi(object):
           ('q', solr_query['q']),
           ('wt', 'json'),
       )
-      response = self._root.get('%(core)s/suggest' % solr_query, params)
+      response = self._root.get('%(collection)s/suggest' % solr_query, params)
       if type(response) != dict:
         response = json.loads(response)
       return response

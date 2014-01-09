@@ -224,10 +224,11 @@ def admin_collection_properties(request, collection_id):
 
   if request.method == 'POST':
     collection_form = CollectionForm(request.POST, instance=hue_collection, user=request.user)
-    if collection_form.is_valid():
+    if collection_form.is_valid(): # Check for autocomplete in data?
       searcher = SearchController(request.user)
       hue_collection = collection_form.save(commit=False)
       hue_collection.is_core_only = not searcher.is_collection(hue_collection.name)
+      hue_collection.autocomplete = json.loads(request.POST.get('autocomplete'))
       hue_collection.save()
       return redirect(reverse('search:admin_collection_properties', kwargs={'collection_id': hue_collection.id}))
     else:
@@ -239,6 +240,7 @@ def admin_collection_properties(request, collection_id):
     'solr_collection': solr_collection,
     'hue_collection': hue_collection,
     'collection_form': collection_form,
+    'collection_properties': json.dumps(hue_collection.properties_dict)
   })
 
 
@@ -349,7 +351,7 @@ def query_suggest(request, collection_id, query=""):
   result = {'status': -1, 'message': 'Error'}
 
   solr_query = {}
-  solr_query['collection'] = collection
+  solr_query['collection'] = hue_collection.name
   solr_query['q'] = query
 
   try:

@@ -252,7 +252,7 @@ em {
   <div class="row-fluid">
     <div class="span12">%s</div>
   </div>
-  <br/>  
+  <br/>
 </div>""" % ' '.join(['{{%s}}' % field for field in collection.fields(user)])
 
       result.update_from_post({'template': json.dumps(template)})
@@ -270,7 +270,8 @@ class Collection(models.Model):
   cores = models.TextField(default=json.dumps({}), verbose_name=_t('Collection with cores data'), help_text=_t('Solr json'))
   properties = models.TextField(
       default=json.dumps({}), verbose_name=_t('Properties'),
-      help_text=_t('Hue properties (e.g. results by pages number)'))
+      help_text=_t('Hue properties (e.g. results by pages number)')
+  )
 
   facets = models.ForeignKey(Facet)
   result = models.ForeignKey(Result)
@@ -293,6 +294,27 @@ class Collection(models.Model):
 
     return sorted([{'name': field.get('name'), 'type': field.get('type')}
                    for fields in schema.iter('fields') for field in fields.iter('field')])
+
+  @property
+  def properties_dict(self):
+    if not self.properties:
+      self.data = json.dumps({})
+    properties_python = json.loads(self.properties)
+    # Backward compatibility
+    if 'autocomplete' not in properties_python:
+      properties_python['autocomplete'] = False
+    return properties_python
+
+  @property
+  def autocomplete(self):
+    return self.properties_dict['autocomplete']
+
+  @autocomplete.setter
+  def autocomplete(self, autocomplete):
+    properties_ = self.properties_dict
+    properties_['autocomplete'] = autocomplete
+    self.properties = json.dumps(properties_)
+
 
 def get_facet_field_format(field, type, facets):
   format = ""
