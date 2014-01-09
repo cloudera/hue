@@ -311,6 +311,10 @@ if SAML_AUTHENTICATION:
   LOGIN_URL = '/saml2/login/'
   SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
+# Middleware classes.
+for middleware in desktop.conf.MIDDLEWARE.get():
+  MIDDLEWARE_CLASSES.append(middleware)
+
 # URL Redirection white list.
 if desktop.conf.REDIRECT_WHITELIST.get():
   MIDDLEWARE_CLASSES.append('desktop.middleware.EnsureSafeRedirectURLMiddleware')
@@ -323,7 +327,3 @@ SKIP_SOUTH_TESTS = True
 # Set up environment variable so Kerberos libraries look at our private
 # ticket cache
 os.environ['KRB5CCNAME'] = desktop.conf.KERBEROS.CCACHE_PATH.get()
-
-#######
-if desktop.conf.AUTH.USER_GROUP_MEMBERSHIP_SYNCHRONIZATION_BACKEND.get():
-  MIDDLEWARE_CLASSES.append('desktop.middleware.UserGroupSynchronizationMiddleware')

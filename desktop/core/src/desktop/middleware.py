@@ -27,10 +27,9 @@ from django.contrib.auth import REDIRECT_FIELD_NAME, BACKEND_SESSION_KEY, authen
 from django.contrib.auth.middleware import RemoteUserMiddleware
 from django.core import exceptions, urlresolvers
 import django.db
-from django.http import HttpResponseNotAllowed, HttpResponseForbidden
+from django.http import HttpResponseNotAllowed
 from django.core.urlresolvers import resolve
 from django.http import HttpResponseRedirect, HttpResponse
-from django.utils.importlib import import_module
 from django.utils.translation import ugettext as _
 from django.utils.http import urlquote
 from django.utils.encoding import iri_to_uri
@@ -58,30 +57,6 @@ DJANGO_VIEW_AUTH_WHITELIST = [
   django.views.static.serve,
   django.views.generic.simple.redirect_to,
 ]
-
-class UserGroupSynchronizationMiddleware(object):
-  """
-  Middleware that synchronizes users and groups
-  """
-  def load_backend(self, path):
-    i = path.rfind('.')
-    module, attr = path[:i], path[i+1:]
-    try:
-      mod = import_module(module)
-    except ImportError, e:
-      raise ImproperlyConfigured('Error importing synchronization backend %s: "%s"' % (module, e))
-    try:
-        cls = getattr(mod, attr)
-    except AttributeError:
-      raise ImproperlyConfigured('Module "%s" does not define a "%s" synchronization backend' % (module, attr))
-    return cls()
-
-  def get_backend(self):
-    return self.load_backend(desktop.conf.AUTH.USER_GROUP_MEMBERSHIP_SYNCHRONIZATION_BACKEND.get())
-
-  def process_request(self, request):
-    backend = self.get_backend()
-    backend.sync(request)
 
 class AjaxMiddleware(object):
   """

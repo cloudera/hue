@@ -112,6 +112,14 @@ POLL_ENABLED = Config(
   private=True,
   default=True)
 
+MIDDLEWARE = Config(
+  key="middleware",
+  help=_("Comma-separated list of Django middleware classes to use. " +
+         "See https://docs.djangoproject.com/en/1.4/ref/middleware/ for " +
+         "more details on middlewares in Django."),
+  type=coerce_csv,
+  default=[])
+
 REDIRECT_WHITELIST = Config(
   key="redirect_whitelist",
   help=_("Comma-separated list of regular expressions, which match the redirect URL."
@@ -352,12 +360,6 @@ AUTH = ConfigSection(
                         "django.contrib.auth.backends.ModelBackend (fully Django backend), " +
                         "desktop.auth.backend.AllowAllBackend (allows everyone), " +
                         "desktop.auth.backend.AllowFirstUserDjangoBackend (relies on Django and user manager, after the first login). ")),
-    USER_GROUP_MEMBERSHIP_SYNCHRONIZATION_BACKEND = Config(
-      key="user_group_membership_synchronization_backend",
-      help=_("Backend to synchronize user-group membership with."),
-      type=str,
-      default='',
-    ),
     USER_AUGMENTOR=Config("user_augmentor",
                    default="desktop.auth.backend.DefaultUserAugmentor",
                    help=_("Class which defines extra accessor methods for User objects.")),
