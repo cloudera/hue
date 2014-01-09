@@ -51,19 +51,13 @@ def error_handler(view_fn):
       raise e
     except Exception, e:
       if not hasattr(e, 'message') or not e.message:
-        message = _("Unknown exception.")
-        response = {
-          'status': -1,
-          'error': str(e),
-          'message': message,
-        }
+        message = str(e)
       else:
         message = force_unicode(e.message, strings_only=True, errors='replace')
-        response = {
-          'status': 1,
-          'error': str(e),
-          'message': message,
-        }
+      response = {
+        'status': -1,
+        'message': message,
+      }
       return HttpResponse(json.dumps(response), mimetype="application/json", status=200)
   return decorator
 
@@ -175,15 +169,13 @@ def watch_query_refresh_json(request, id):
     'watch_url': reverse(get_app_name(request) + ':api_watch_query_refresh_json', kwargs={'id': query_history.id})
   }
 
-  # Show popup message if error, should be better in error tab instead and merged into the result response below
+  # Run time error
   if query_history.is_failure():
     res = db.get_operation_status(handle)
     if hasattr(res, 'errorMessage') and res.errorMessage:
       result['message'] = res.errorMessage
     else:
-      result['message'] = ''
-
-    result['error'] = 'Bad status for request %s:\n%s' % (id, res)
+      result['message'] = _('Bad status for request %s:\n%s') % (id, res)
     result['status'] = 1
 
   return HttpResponse(json.dumps(result), mimetype="application/json")
@@ -270,7 +262,7 @@ def execute(request, query_id=None):
             response['errors'] = parameterization_form.errors
             return HttpResponse(json.dumps(response), mimetype="application/json")
 
-      # non-parameterized query
+      # Non-parameterized query
       query = HQLdesign(query_form, query_type=query_type)
       if request.GET.get('explain', 'false').lower() == 'true':
         return explain_directly(request, query, design, query_server)

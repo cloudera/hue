@@ -1465,20 +1465,30 @@ $(document).on('fetched.results', resultsTable);
 
 var selectedLine = -1;
 var errorWidgets = [];
+
 $(document).on('error.query', function () {
   $.each(errorWidgets, function(index, el) {
     $(el).remove();
     errorWidgets = [];
   });
 
+  // Move error to codeMirror if we konw the line number
   $.each($(".queryErrorMessage"), function(index, el) {
     var err = $(el).text().toLowerCase();
     var firstPos = err.indexOf("line");
     if (firstPos > -1) {
       selectedLine = $.trim(err.substring(err.indexOf(" ", firstPos), err.indexOf(":", firstPos))) * 1;
-      errorWidgets.push(codeMirror.addLineWidget(selectedLine - 1, $("<div>").addClass("editorError").html("<i class='fa fa-exclamation-circle'></i> " + err)[0], {coverGutter: true, noHScroll: true}));
+      errorWidgets.push(
+         codeMirror.addLineWidget(
+             selectedLine - 1,
+             $("<div>").addClass("editorError").html("<i class='fa fa-exclamation-circle'></i> " + err)[0], {
+                 coverGutter: true,
+                 noHScroll: true
+             }
+         )
+      );
+      $(el).hide();
     }
-    $(el).hide();
   });
 
   if ($(".queryErrorMessage:hidden").length == $(".queryErrorMessage").length) {
