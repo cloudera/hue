@@ -41,15 +41,12 @@ ul {
     margin-left: 0;
 }
 
-.action {
+.action, .editor-action {
   border: 0!important;
   padding: 0;
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  border-radius: 4px;
 }
 
-.action h4 {
+.action h4, .editor-action h4 {
   margin-bottom: 1px;
 }
 
@@ -159,18 +156,32 @@ ul {
   cursor: pointer;
 }
 
-.action > .nav-tabs > li, .action > .nav-pills > li, .action > .tabs-below > .nav-tabs > li, .action > .tabs-below > .nav-pills > li {
+.action > .nav-tabs > li,
+.action > .nav-pills > li,
+.action > .tabs-below > .nav-tabs > li,
+.action > .tabs-below > .nav-pills > li,
+.editor-action > .nav-tabs > li,
+.editor-action > .nav-pills > li,
+.editor-action > .tabs-below > .nav-tabs > li,
+.editor-action > .tabs-below > .nav-pills > li {
     float:none;
     display:inline-block;
     *display:inline; /* ie7 fix */
      zoom:1; /* hasLayout ie7 trigger */
 }
 
-.action > .nav-tabs, .action > .nav-pills, .action > .tabs-below > .nav-tabs, .action > .tabs-below > .nav-pills {
+.action > .nav-tabs,
+.action > .nav-pills,
+.action > .tabs-below > .nav-tabs,
+.action > .tabs-below > .nav-pills,
+.editor-action > .nav-tabs,
+.editor-action > .nav-pills,
+.editor-action > .tabs-below > .nav-tabs,
+.editor-action > .tabs-below > .nav-pills {
     text-align:center;
 }
 
-.action .btn-mini i {
+.action .btn-mini i, .editor-action .btn-mini i {
   line-height: 18px!important;
 }
 
@@ -198,4 +209,11 @@ ul {
   background: -ms-linear-gradient(top,  #ffffff 0%,#f9f9f9 100%); /* IE10+ */
   background: linear-gradient(to bottom,  #ffffff 0%,#f9f9f9 100%); /* W3C */
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#f9f9f9',GradientType=0 ); /* IE6-8 */
+}
+
+.editor-action-body {
+  text-align:left;
+  padding:10px;
+  border:1px solid #DDD!important;
+  border-top:0!important;
 }
