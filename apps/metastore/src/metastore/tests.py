@@ -17,6 +17,7 @@
 # limitations under the License.
 
 import logging
+import json
 
 from nose.tools import assert_true, assert_equal, assert_false
 
@@ -32,7 +33,7 @@ from useradmin.models import HuePermission, GroupPermission,\
 
 from beeswax.conf import BROWSE_PARTITIONED_TABLE_LIMIT
 from beeswax.views import collapse_whitespace
-from beeswax.test_base import make_query, wait_for_query_to_finish, verify_history, get_query_server_config
+from beeswax.test_base import make_query, wait_for_query_to_finish, verify_history, get_query_server_config, fetch_query_result_data
 from beeswax.models import QueryHistory
 from beeswax.server import dbms
 from beeswax.test_base import BeeswaxSampleProvider
@@ -56,7 +57,6 @@ def _make_query(client, query, submission_type="Execute",
     verify_history(client, fragment=fragment)
 
   return res
-
 
 class TestMetastoreWithHadoop(BeeswaxSampleProvider):
   requires_hadoop = True
@@ -91,16 +91,13 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
 
     # Show table data.
     response = self.client.get("/metastore/table/default/test/read", follow=True)
+    response = self.client.get(reverse("beeswax:api_watch_query_refresh_json", kwargs={'id': response.context['query'].id}), follow=True)
     response = wait_for_query_to_finish(self.client, response, max=30.0)
     # Note that it may not return all rows at once. But we expect at least 10.
-    assert_true(len(response.context['results']) > 10)
-    # Column names
-    assert_true("foo" in response.content)
-    assert_true("bar" in response.content)
+    results = fetch_query_result_data(self.client, response)
+    assert_true(len(results['results']) > 0)
     # This should NOT go into the query history.
     assert_equal(verify_history(self.client, fragment='test'), history_cnt, 'Implicit queries should not be saved in the history')
-    assert_equal(str(response.context['query_context'][0]), 'table')
-    assert_equal(str(response.context['query_context'][1]), 'test:default')
 
   def test_describe_view(self):
     resp = self.client.get('/metastore/table/default/myview')
@@ -140,9 +137,10 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
 
   def test_browse_partitions(self):
     response = self.client.get("/metastore/table/default/test_partitions/partitions/0", follow=True)
+    response = self.client.get(reverse("beeswax:api_watch_query_refresh_json", kwargs={'id': response.context['query'].id}), follow=True)
     response = wait_for_query_to_finish(self.client, response, max=30.0)
-    page_context = [context for context in response.context if 'results' in context][0]
-    assert_true(len(page_context['results']) > 10)
+    results = fetch_query_result_data(self.client, response)
+    assert_true(len(results['results']) > 0, results)
 
   def test_drop_multi_tables(self):
     hql = """

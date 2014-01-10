@@ -403,9 +403,12 @@ def save_results(request, query_history_id):
           response['path'] = target_dir
           response['watch_url'] = reverse(get_app_name(request) + ':api_watch_query_refresh_json', kwargs={'id': query_history.id})
         elif form.cleaned_data['save_target'] == form.SAVE_TYPE_TBL:
-          db.create_table_as_a_select(request, query_history, form.cleaned_data['target_table'], result_meta)
+          query_history = db.create_table_as_a_select(request, query_history, form.cleaned_data['target_table'], result_meta)
+          response['id'] = query_history.id
+          response['query'] = query_history.query
           response['type'] = 'hive-table'
           response['path'] = form.cleaned_data['target_table']
+          response['watch_url'] = reverse(get_app_name(request) + ':api_watch_query_refresh_json', kwargs={'id': query_history.id})
       except Exception, ex:
         error_msg, log = expand_exception(ex, db)
         response['message'] = _('The result could not be saved: %s.') % error_msg
@@ -434,16 +437,20 @@ def design_to_dict(design):
 
 
 def query_history_to_dict(request, query_history):
-  return {
+  query_history_dict = {
     'id': query_history.id,
     'state': query_history.last_state,
     'query': query_history.query,
     'has_results': query_history.has_results,
     'statement_number': query_history.statement_number,
-    'design': design_to_dict(query_history.design),
     'watch_url': reverse(get_app_name(request) + ':api_watch_query_refresh_json', kwargs={'id': query_history.id}),
     'results_url': reverse(get_app_name(request) + ':view_results', kwargs={'id': query_history.id, 'first_row': 0})
   }
+
+  if query_history.design:
+    query_history_dict['design'] = design_to_dict(query_history.design)
+
+  return query_history_dict
 
 
 def get_query_form(request):

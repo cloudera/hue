@@ -35,18 +35,16 @@ from desktop.lib.django_util import login_notrequired, get_desktop_uri_prefix
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import Document
 
-from jobsub.parameterization import find_variables, substitute_variables
+from jobsub.parameterization import find_variables
 
 import beeswax.forms
 import beeswax.design
 import beeswax.management.commands.beeswax_install_examples
 
 from beeswax import common, data_export, models
-from beeswax.forms import QueryForm
-from beeswax.design import HQLdesign
 from beeswax.models import SavedQuery, make_query_context, QueryHistory
 from beeswax.server import dbms
-from beeswax.server.dbms import expand_exception, get_query_server_config, QueryServerException
+from beeswax.server.dbms import expand_exception, get_query_server_config
 
 
 LOG = logging.getLogger(__name__)
@@ -342,9 +340,19 @@ def execute_query(request, design_id=None, query_history_id=None):
   """
   View function for executing an arbitrary query.
   """
+  action = 'query'
+
   if query_history_id:
     query = authorized_get_query_history(request, query_history_id, must_exist=True)
     design = query.design
+
+    if 'on_success_url' in request.GET:
+      if request.GET.get('on_success_url'):
+        action = 'watch-redirect'
+      else:
+        action = 'watch-results'
+    else:
+      action = 'editor-results'
   else:
     # Check perms.
     authorized_get_design(request, design_id)
@@ -358,78 +366,11 @@ def execute_query(request, design_id=None, query_history_id=None):
     'design': design,
     'query': query,
     'autocomplete_base_url': reverse(get_app_name(request) + ':api_autocomplete_databases', kwargs={}),
-    'can_edit_name': design.id and not design.is_auto
+    'can_edit_name': design and design.id and not design.is_auto,
+    'action': action
   }
 
   return render('execute.mako', request, context)
-
-
-def watch_query(request, id):
-  """
-  DEPRECATED!!!
-
-  Wait for the query to finish and (by default) displays the results of query id.
-  It understands the optional GET params:
-
-    on_success_url
-      If given, it will be displayed when the query is successfully finished.
-      Otherwise, it will display the view query results page by default.
-
-    context
-      A string of "name:data" that describes the context
-      that generated this query result. It may be:
-        - "table":"<table_name>"
-        - "design":<design_id>
-
-  All other GET params will be passed to on_success_url (if present).
-  """
-  # Coerce types: manage arguments
-  query_history = authorized_get_query_history(request, id, must_exist=True)
-  db = dbms.get(request.user, query_history.get_query_server_config())
-
-  # GET param: context.
-  context_param = request.GET.get('context', '')
-
-  # GET param: on_success_url. Default to view_results
-  results_url = reverse(get_app_name(request) + ':view_results', kwargs={'id': id, 'first_row': 0})
-  if request.GET.get('download', ''):
-    results_url += '?download=true'
-  on_success_url = request.GET.get('on_success_url')
-  if not on_success_url:
-    on_success_url = results_url
-
-  # Go to next statement if asked to continue or when a statement with no dataset finished.
-  if request.method == 'POST' or (not query_history.is_finished() and query_history.is_success() and not query_history.has_results):
-    try:
-      query_history = db.execute_next_statement(query_history)
-    except Exception, ex:
-      pass
-
-  # Check query state
-  handle, state = _get_query_handle_and_state(query_history)
-  query_history.save_state(state)
-
-  if query_history.is_failure():
-    # When we fetch, Beeswax server will throw us a Exception, which has the
-    # log we want to display.
-    return format_preserving_redirect(request, results_url, request.GET)
-  elif query_history.is_finished() or (query_history.is_success() and query_history.has_results):
-    return format_preserving_redirect(request, on_success_url, request.GET)
-
-  # Still running
-  log = db.get_log(handle)
-
-  # Keep waiting
-  # - Translate context into something more meaningful (type, data)
-  query_context = parse_query_context(context_param)
-
-  return render('watch_wait.mako', request, {
-                'query': query_history,
-                'fwd_params': request.GET.urlencode(),
-                'log': log,
-                'hadoop_jobs': _parse_out_hadoop_jobs(log),
-                'query_context': query_context,
-              })
 
 
 def view_results(request, id, first_row=0):
@@ -437,14 +378,14 @@ def view_results(request, id, first_row=0):
   Returns the view for the results of the QueryHistory with the given id.
 
   The query results MUST be ready.
-  To display query results, one should always go through the watch_query view.
+  To display query results, one should always go through the execute_query view.
   If the result set has has_result_set=False, display an empty result.
 
   If ``first_row`` is 0, restarts (if necessary) the query read.  Otherwise, just
   spits out a warning if first_row doesn't match the servers conception.
   Multiple readers will produce a confusing interaction here, and that's known.
 
-  It understands the ``context`` GET parameter. (See watch_query().)
+  It understands the ``context`` GET parameter. (See execute_query().)
   """
   first_row = long(first_row)
   start_over = (first_row == 0)
@@ -558,64 +499,6 @@ def view_results(request, id, first_row=0):
     return render('watch_results.mako', request, context)
 
 
-def save_results(request, id):
-  """
-  DEPRECATED. Need to get rid of watch_wait dependency first.
-
-  Save the results of a query to an HDFS directory or Hive table.
-  """
-  query_history = authorized_get_query_history(request, id, must_exist=True)
-
-  app_name = get_app_name(request)
-  server_id, state = _get_query_handle_and_state(query_history)
-  query_history.save_state(state)
-  error_msg, log = None, None
-
-  if request.method == 'POST':
-    if not query_history.is_success():
-      msg = _('This query is %(state)s. Results unavailable.') % {'state': state}
-      raise PopupException(msg)
-
-    db = dbms.get(request.user, query_history.get_query_server_config())
-    form = beeswax.forms.SaveResultsForm(request.POST, db=db, fs=request.fs)
-
-    if request.POST.get('cancel'):
-      return format_preserving_redirect(request, '/%s/watch/%s' % (app_name, id))
-
-    if form.is_valid():
-      try:
-        handle, state = _get_query_handle_and_state(query_history)
-        result_meta = db.get_results_metadata(handle)
-      except Exception, ex:
-        raise PopupException(_('Cannot find query: %s') % ex)
-
-      try:
-        if form.cleaned_data['save_target'] == form.SAVE_TYPE_DIR:
-          target_dir = form.cleaned_data['target_dir']
-          query_history = db.insert_query_into_directory(query_history, target_dir)
-          redirected = redirect(reverse('beeswax:watch_query', args=[query_history.id]) \
-                                + '?on_success_url=' + reverse('filebrowser.views.view', kwargs={'path': target_dir}))
-        elif form.cleaned_data['save_target'] == form.SAVE_TYPE_TBL:
-          redirected = db.create_table_as_a_select(request, query_history, form.cleaned_data['target_table'], result_meta)
-      except Exception, ex:
-        error_msg, log = expand_exception(ex, db)
-        raise PopupException(_('The result could not be saved: %s.') % log, detail=ex)
-
-      return redirected
-  else:
-    form = beeswax.forms.SaveResultsForm()
-
-  if error_msg:
-    error_msg = _('Failed to save results from query: %(error)s.') % {'error': error_msg}
-
-  return render('save_results.mako', request, {
-    'action': reverse(get_app_name(request) + ':save_results', kwargs={'id': str(id)}),
-    'form': form,
-    'error_msg': error_msg,
-    'log': log,
-  })
-
-
 def configuration(request):
   app_name = get_app_name(request)
   query_server = get_query_server_config(app_name)
@@ -677,7 +560,7 @@ def query_done_cb(request, server_id):
 
     link = "%s%s" % \
               (get_desktop_uri_prefix(),
-               reverse(get_app_name(request) + ':watch_query', kwargs={'id': query_history.id}))
+               reverse(get_app_name(request) + ':watch_query_history', kwargs={'query_history_id': query_history.id}))
     body = _("%(subject)s. See the results here: %(link)s\n\nQuery:\n%(query)s") % {
                'subject': subject, 'link': link, 'query': query_history.query
              }
@@ -762,21 +645,6 @@ def safe_get_design(request, design_type, design_id=None):
 
   return design
 
-def get_parameterization(request, query_str, form, design, is_explain):
-  """
-  DEPRECATED!!!
-  Figures out whether a design is parameterizable, and, if so,
-  returns a form to fill out.  Returns None if there's no parameterization
-  to do.
-  """
-  if form.query.cleaned_data["is_parameterized"]:
-    parameters_form = make_parameterization_form(query_str)
-    if parameters_form:
-      return render("parameterization.mako", request, dict(
-        form=parameters_form(prefix="parameterization"),
-        design=design,
-        explain=is_explain))
-  return None
 
 def make_parameterization_form(query_str):
   """
@@ -793,67 +661,9 @@ def make_parameterization_form(query_str):
     return None
 
 
-def _run_parameterized_query(request, design_id, explain):
-  """
-  DEPRECATED!!!
-  Given a design and arguments to parameterize that design, runs the query.
-  - explain is a boolean to determine whether to run as an explain or as an
-  execute.
-
-  This is an extra "step" in the flow from execute_query.
-  """
-  design = authorized_get_design(request, design_id, must_exist=True)
-
-  # Reconstitute the form
-  design_obj = beeswax.design.HQLdesign.loads(design.data)
-  query_form = QueryForm()
-  params = design_obj.get_query_dict()
-  params.update(request.POST)
-
-  databases = get_db_choices(request)
-  query_form.bind(params)
-  query_form.query.fields['database'].choices = databases # Could not do it in the form
-
-  if not query_form.is_valid():
-    raise PopupException(_("Query form is invalid: %s") % query_form.errors)
-
-  query_str = query_form.query.cleaned_data["query"]
-  app_name = get_app_name(request)
-  query_server = get_query_server_config(app_name)
-  query_type = SavedQuery.TYPES_MAPPING[app_name]
-
-  parameterization_form_cls = make_parameterization_form(query_str)
-  if not parameterization_form_cls:
-    raise PopupException(_("Query is not parameterizable."))
-
-  parameterization_form = parameterization_form_cls(request.REQUEST, prefix="parameterization")
-
-  if parameterization_form.is_valid():
-    real_query = substitute_variables(query_str, parameterization_form.cleaned_data)
-    query = HQLdesign(query_form, query_type=query_type)
-    query._data_dict['query']['query'] = real_query
-    try:
-      if explain:
-        return explain_directly(request, query, design, query_server)
-      else:
-        return execute_directly(request, query, query_server, design)
-    except Exception, ex:
-      db = dbms.get(request.user, query_server)
-      error_message, log = expand_exception(ex, db)
-      return render('execute.mako', request, {
-        'action': reverse(get_app_name(request) + ':execute_design'),
-        'design': design,
-        'error_message': error_message,
-        'form': query_form,
-        'log': log,
-        'autocomplete_base_url': reverse(get_app_name(request) + ':api_autocomplete', kwargs={}),
-      })
-  else:
-    return render("parameterization.mako", request, dict(form=parameterization_form, design=design, explain=explain))
-
-
-def execute_directly(request, query, query_server=None, design=None, tablename=None,
-                           on_success_url=None, on_success_params=None, **kwargs):
+def execute_directly(request, query, query_server=None,
+                     design=None, on_success_url=None, on_success_params=None,
+                     **kwargs):
   """
   execute_directly(request, query_msg, tablename, design) -> HTTP response for execution
 
@@ -869,9 +679,6 @@ def execute_directly(request, query, query_server=None, design=None, tablename=N
 
     design
       The design associated with the query.
-
-    tablename
-      The associated table name for the context.
 
     on_success_url
       Where to go after the query is done. The URL handler may expect an option "context" GET
@@ -892,27 +699,20 @@ def execute_directly(request, query, query_server=None, design=None, tablename=N
   database = query.query.get('database', 'default')
   db.use(database)
 
-  history_obj = db.execute_query(query, design)
+  query_history = db.execute_query(query, design)
 
-  watch_url = reverse(get_app_name(request) + ':watch_query', kwargs={'id': history_obj.id})
-  if 'download' in kwargs and kwargs['download']:
-    watch_url += '?download=true'
+  watch_url = reverse(get_app_name(request) + ':watch_query_history', kwargs={'query_history_id': query_history.id})
 
   # Prepare the GET params for the watch_url
   get_dict = QueryDict(None, mutable=True)
-  # (1) context
-  if design:
-    get_dict['context'] = make_query_context('design', design.id)
-  elif tablename:
-    get_dict['context'] = make_query_context('table', '%s:%s' % (tablename, database))
 
-  # (2) on_success_url
+  # (1) on_success_url
   if on_success_url:
     if callable(on_success_url):
-      on_success_url = on_success_url(history_obj)
+      on_success_url = on_success_url(query_history)
     get_dict['on_success_url'] = on_success_url
 
-  # (3) misc
+  # (2) misc
   if on_success_params:
     get_dict.update(on_success_params)
 

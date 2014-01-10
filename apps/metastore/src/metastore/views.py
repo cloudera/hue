@@ -81,7 +81,7 @@ def drop_database(request):
       # Can't be simpler without an important refactoring
       design = SavedQuery.create_empty(app_name='beeswax', owner=request.user, data=hql_query('').dumps())
       query_history = db.drop_databases(databases, design)
-      url = reverse('beeswax:watch_query', args=[query_history.id]) + '?on_success_url=' + reverse('metastore:databases')
+      url = reverse('beeswax:watch_query_history', kwargs={'query_history_id': query_history.id}) + '?on_success_url=' + reverse('metastore:databases')
       return redirect(url)
     except Exception, ex:
       error_message, log = dbms.expand_exception(ex, db)
@@ -181,7 +181,7 @@ def drop_table(request, database):
       # Can't be simpler without an important refactoring
       design = SavedQuery.create_empty(app_name='beeswax', owner=request.user, data=hql_query('').dumps())
       query_history = db.drop_tables(database, tables_objects, design)
-      url = reverse('beeswax:watch_query', args=[query_history.id]) + '?on_success_url=' + reverse('metastore:show_tables')
+      url = reverse('beeswax:watch_query_history', kwargs={'query_history_id': query_history.id}) + '?on_success_url=' + reverse('metastore:show_tables')
       return redirect(url)
     except Exception, ex:
       error_message, log = dbms.expand_exception(ex, db)
@@ -198,8 +198,8 @@ def read_table(request, database, table):
   table = db.get_table(database, table)
 
   try:
-    history = db.select_star_from(database, table)
-    url = reverse('beeswax:watch_query', args=[history.id]) + '?context=table:%s:%s' % (table.name, database)
+    query_history = db.select_star_from(database, table)
+    url = reverse('beeswax:watch_query_history', kwargs={'query_history_id': query_history.id}) + '?on_success_url=&context=table:%s:%s' % (table.name, database)
     return redirect(url)
   except Exception, e:
     raise PopupException(_('Cannot read table'), detail=e)
@@ -209,7 +209,7 @@ def read_partition(request, database, table, partition_id):
   db = dbms.get(request.user)
   try:
     partition = db.get_partition(database, table, int(partition_id))
-    url = reverse('beeswax:watch_query', args=[partition.id]) + '?context=table:%s:%s' % (table, database)
+    url = reverse('beeswax:watch_query_history', kwargs={'query_history_id': partition.id}) + '?on_success_url=&context=table:%s:%s' % (table, database)
     return redirect(url)
   except Exception, e:
     raise PopupException(_('Cannot read table'), detail=e)
@@ -229,7 +229,7 @@ def load_table(request, database, table):
       try:
         design = SavedQuery.create_empty(app_name='beeswax', owner=request.user, data=hql_query('').dumps())
         query_history = db.load_data(database, table, load_form, design)
-        url = reverse('beeswax:watch_query', args=[query_history.id]) + '?on_success_url=' + on_success_url
+        url = reverse('beeswax:watch_query_history', kwargs={'query_history_id': query_history.id}) + '?on_success_url=' + on_success_url
         response['status'] = 0
         response['data'] = url
       except Exception, e:
@@ -287,7 +287,7 @@ def analyze_table(request, database, table, column=None):
   if request.POST:
     if column is None:
       query_history = db.analyze_table(database, table)
-      response['redirect'] = reverse('beeswax:watch_query', args=[query_history.id]) + \
+      response['redirect'] = reverse('beeswax:watch_query_history', kwargs={'query_history_id': query_history.id}) + \
                                      '?on_success_url=' + reverse('metastore:describe_table',
                                                                   kwargs={'database': database, 'table': table.name})
       response['status'] = 0
