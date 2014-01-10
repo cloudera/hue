@@ -249,7 +249,6 @@ class HiveServer2Dbms(object):
 
       hql = 'CREATE TABLE `%s.%s` AS %s' % (database, target_table, design.query['query'])
       query_history = self.execute_statement(hql)
-      url = redirect(reverse('beeswax:watch_query', args=[query_history.id]) + '?on_success_url=' + reverse('metastore:describe_table', args=[database, target_table]))
     else:
       # Case 2: The results are in some temporary location
       # Beeswax backward compatibility and optimization
@@ -298,7 +297,7 @@ class HiveServer2Dbms(object):
         raise ex
       url = format_preserving_redirect(request, reverse('metastore:index'))
 
-    return url
+    return query_history
 
 
   def use(self, database):

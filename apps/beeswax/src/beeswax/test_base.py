@@ -175,6 +175,7 @@ def get_shared_beeswax_server():
 
 def wait_for_query_to_finish(client, response, max=30.0):
   # Take a async API execute_query() response in input
+
   start = time.time()
   sleep_time = 0.05
 
@@ -191,11 +192,12 @@ def wait_for_query_to_finish(client, response, max=30.0):
     time.sleep(sleep_time)
     sleep_time = min(1.0, sleep_time * 2) # Capped exponential
     if (time.time() - start) > max:
-      message = "Query took too long! %d seconds" % (time.time() - start,)
+      message = "Query took too long! %d seconds" % (time.time() - start)
       LOG.warning(message)
       raise Exception(message)
 
     response = client.get(watch_url, follow=True)
+
   return response
 
 

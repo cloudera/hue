@@ -27,7 +27,7 @@ ${layout.menubar(section='query')}
 
 <div id="query-editor" class="container-fluid hide section">
 <div class="row-fluid">
-<div class="span2">
+<div class="span2" id="advanced-settings">
   <form id="advancedSettingsForm" action="" method="POST" class="form form-horizontal">
     <div class="sidebar-nav">
       <ul class="nav nav-list">
@@ -188,7 +188,7 @@ ${layout.menubar(section='query')}
 </div>
 
 <div id="querySide" class="span8">
-  <div class="card card-small">
+  <div id="queryContainer" class="card card-small">
     <div style="margin-bottom: 30px">
         % if can_edit_name:
         <h1 class="card-heading simple">
@@ -1619,41 +1619,6 @@ function getLastDatabase(server) {
 }
 
 
-// Knockout
-function clickHard(el) {
-  var timer = setInterval(function () {
-    if ($(el).length > 0) {
-      $(el).click();
-      clearInterval(timer);
-    }
-  }, 100);
-}
-
-viewModel = new BeeswaxViewModel("${app_name}");
-% if query:
-  viewModel.design.history.id(${query.id});
-  viewModel.fetchQueryHistory();
-  $(document).on('fetched.query', function(e) {
-    viewModel.watchQueryLoop();
-  });
-% elif design.id:
-  viewModel.design.id(${design.id});
-  viewModel.fetchDesign();
-% endif
-if (viewModel.design.id() > 0 || viewModel.design.history.id() > 0) {
-  // Code mirror and ko.
-  var codeMirrorSubscription = viewModel.design.query.subscribe(function(value) {
-    codeMirror.setValue(value);
-    codeMirrorSubscription.dispose();
-  });
-}
-viewModel.design.fileResources.subscribe(function() {
-  // File chooser button for file resources.
-  $(".pathChooser:not(:has(~ button))").after(getFileBrowseButton($(".pathChooser:not(:has(~ button))")));
-});
-viewModel.fetchDatabases();
-ko.applyBindings(viewModel);
-
 // Server error handling.
 $(document).on('server.error', function (e, data) {
   $(document).trigger('error', "${_('Server error occured: ')}" + data.message ? data.message : data.error);
@@ -1777,57 +1742,146 @@ $(document).ready(function () {
 
 // Routie
 $(document).ready(function () {
+  function queryPageComponents() {
+    $('#advanced-settings').show();
+    $('#navigator').show();
+    $('#queryContainer').show();
+    $('a[href="#query"]').parent().show();
+    if (!$('#querySide').hasClass('span8')) {
+      $('#querySide').addClass('span8');
+    }
+  }
+
+  function watchPageComponents() {
+    $('#advanced-settings').hide();
+    $('#navigator').hide();
+    $('#queryContainer').hide();
+    $('a[href="#query"]').parent().hide();
+    if ($('#querySide').hasClass('span8')) {
+      $('#querySide').removeClass('span8');
+    }
+  }
+
+  function queryPage() {
+    queryPageComponents();
+    $('.resultsContainer').hide();
+    $('.resultsContainer .watch-query').hide();
+    $('.resultsContainer .view-query-results').hide();
+  }
+
+  function queryLogPage() {
+    queryPageComponents();
+    $('.resultsContainer').show();
+    $('.resultsContainer .watch-query').show();
+    $('.resultsContainer .view-query-results').hide();
+  }
+
+  function queryResultsPage() {
+    queryPageComponents();
+    $('.resultsContainer').show();
+    $('.resultsContainer .watch-query').hide();
+    $('.resultsContainer .view-query-results').show();
+  }
+
+  function parametersPage() {
+    queryPageComponents();
+    $('.resultsContainer').hide();
+    $('.resultsContainer .watch-query').hide();
+    $('.resultsContainer .view-query-results').hide();
+  }
+
+  function watchLogsPage() {
+    watchPageComponents();
+    $('.resultsContainer').show();
+    $('.resultsContainer .watch-query').show();
+    $('.resultsContainer .view-query-results').hide();
+  }
+
+  function watchResultsPage() {
+    watchPageComponents();
+    $('.resultsContainer').show();
+    $('.resultsContainer .watch-query').hide();
+    $('.resultsContainer .view-query-results').show();
+  }
+
   routie({
     'query': function () {
       showSection('query-editor');
-      $('.resultsContainer').hide();
+      queryPage();
+
       codeMirror.setSize("99%", $(window).height() - 270 - $("#queryPane .alert-error").outerHeight() - $(".nav-tabs").outerHeight());
     },
     'query/execute/params': function () {
       if (viewModel.design.parameters().length == 0) {
         routie('query');
       }
+
       showSection('execute-parameter-selection');
+      parametersPage();
     },
     'query/explain/params': function () {
       if (viewModel.design.parameters().length == 0) {
         routie('query');
       }
+
       showSection('explain-parameter-selection');
+      parametersPage();
     },
     'query/logs': function () {
       if (viewModel.design.watch.logs().length == 0 && viewModel.design.watch.errors().length == 0) {
         routie('query');
       }
-      codeMirror.setSize("99%", 100);
-      $('.resultsContainer').show();
-      $('.resultsContainer .watch-query').show();
-      $('.resultsContainer .view-query-results').hide();
+
+      showSection('query-editor');
+      queryLogPage();
+
       clickHard('.resultsContainer .nav-tabs a[href="#log"]');
+
+      codeMirror.setSize("99%", 100);
     },
     'query/results': function () {
-      codeMirror.setSize("99%", 100);
-      $('.resultsContainer').show();
-      $('.resultsContainer .watch-query').hide();
-      $('.resultsContainer .view-query-results').show();
-      clickHard('.resultsContainer .nav-tabs a[href="#results"]');
+      showSection('query-editor');
+      queryResultsPage();
+
       $("html, body").animate({ scrollTop: ($(".resultsContainer").position().top - 80) + "px" });
+
+      codeMirror.setSize("99%", 100);
+
+      clickHard('.resultsContainer .nav-tabs a[href="#results"]');
     },
     'query/explanation': function () {
       if (! viewModel.design.results.explanation()) {
         routie('query');
       }
-      codeMirror.setSize("99%", 100);
-      $('.resultsContainer').show();
-      $('.resultsContainer .watch-query').hide();
-      $('.resultsContainer .view-query-results').show();
+
+      showSection('query-editor');
+      queryResultsPage();
+
       clickHard('.resultsContainer .nav-tabs a[href="#explanation"]');
+
+      codeMirror.setSize("99%", 100);
     },
-    '': function () {
+    'watch/logs': function() {
+      showSection('query-editor');
+      watchLogsPage();
+
+      clickHard('.resultsContainer .nav-tabs a[href="#log"]');
+    },
+    'watch/results': function() {
+      showSection('query-editor');
+      watchResultsPage();
+
+      clickHard('.resultsContainer .nav-tabs a[href="#results"]');
+    },
+    '*': function () {
       routie('query');
     }
   });
+});
 
+
+// Event setup
+function queryEvents() {
   $(document).on('fetched.parameters', function () {
     if (viewModel.design.parameters().length > 0) {
       routie('query/execute/params');
@@ -1853,7 +1907,74 @@ $(document).ready(function () {
   $(document).on('execute.query', function() {
     routie('query');
   });
+  $(document).ready(function() {
+    routie('query');
+  });
+}
+
+function watchEvents() {
+  $(document).ready(function() {
+    routie('watch/logs');
+  });
+  $(document).on('error_watch.query', function () {
+    routie('watch/logs');
+  });
+  $(document).on('fetched.results', function () {
+    routie('watch/results');
+  });
+}
+
+
+// Knockout
+viewModel = new BeeswaxViewModel("${app_name}");
+% if query:
+  viewModel.design.history.id(${query.id});
+  viewModel.fetchQueryHistory();
+  $(document).on('fetched.query', function(e) {
+    viewModel.watchQueryLoop();
+  });
+% elif design.id:
+  viewModel.design.id(${design.id});
+  viewModel.fetchDesign();
+% endif
+if (viewModel.design.id() > 0 || viewModel.design.history.id() > 0) {
+  // Code mirror and ko.
+  var codeMirrorSubscription = viewModel.design.query.subscribe(function(value) {
+    codeMirror.setValue(value);
+    codeMirrorSubscription.dispose();
+  });
+}
+viewModel.design.fileResources.subscribe(function() {
+  // File chooser button for file resources.
+  $(".pathChooser:not(:has(~ button))").after(getFileBrowseButton($(".pathChooser:not(:has(~ button))")));
 });
+viewModel.fetchDatabases();
+ko.applyBindings(viewModel);
+
+
+% if action == 'watch-results':
+  watchEvents();
+  $(document).one('fetched.query', function(e) {
+    viewModel.watchQueryLoop();
+  });
+% elif action == 'watch-redirect':
+  watchEvents();
+  $(document).one('fetched.query', function(e) {
+    viewModel.watchQueryLoop();
+  });
+  $(document).on('stop_watch.query', function(e) {
+    if (viewModel.design.results.errors().length == 0) {
+      window.location.href = "${request.GET['on_success_url']}";
+    }
+  });
+% elif action == 'editor-results':
+  queryEvents();
+  $(document).one('fetched.query', function(e) {
+    viewModel.watchQueryLoop();
+  });
+% else:
+  queryEvents();
+% endif
 
 // @TODO: Stop operation
 // @TODO: Re-add download query for impala

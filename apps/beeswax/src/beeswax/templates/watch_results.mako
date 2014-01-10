@@ -112,7 +112,7 @@ ${layout.menubar(section='query')}
               <strong>${_('Multi-statement query')}</strong></br>
               ${_('Hue stopped as one of your query contains some results.') }
               ${_('Click on') }
-              <form action="${ url(app_name + ':watch_query', query.id) }?context=${ query.design.get_query_context() }" method="POST">
+              <form action="${ url(app_name + ':watch_query_history', query.id) }?context=${ query.design.get_query_context() }" method="POST">
                 <input type="submit" value="${ _("next") }"/ class="btn btn-primary">
               </form>
               ${_('to continue execution of the remaining statements.') }

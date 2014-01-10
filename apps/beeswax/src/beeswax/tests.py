@@ -114,7 +114,6 @@ class TestBeeswaxWithHadoop(BeeswaxSampleProvider):
     response = _make_query(self.client, "CREATE TABLE test (foo INT)", wait=True)
     content = json.loads(response.content)
     assert_true("AlreadyExistsException" in content.get('message'), content)
-    assert_true("Table test already exists" in content.get('message'), content)
 
   def test_configuration(self):
     # No HS2 API
@@ -262,13 +261,11 @@ for x in sys.stdin:
 
   def test_query_with_simple_errors(self):
     hql = "SELECT KITTENS ARE TASTY"
-    resp = _make_query(self.client, hql, name='tasty kittens', wait=True, local=False)
-    assert_true("ParseException line" in json.loads(resp.content)["error"])
+    resp = _make_query(self.client, hql, name='tasty kittens', wait=False, local=False)
     assert_true("ParseException line" in json.loads(resp.content)["message"])
 
     # Watch page will fail as operationHandle=None
     query_id = self._verify_query_state(beeswax.models.QueryHistory.STATE.failed)
-    assert_raises(TypeError, self.client.get, '/beeswax/watch/%s' % (query_id,), follow=True)
 
   def test_sync_query_exec(self):
     # Execute Query Synchronously, set fetch size and fetch results
@@ -420,7 +417,7 @@ for x in sys.stdin:
     # Selecting from latin1 table should not blow up
     query = u"SELECT * FROM test_latin1 WHERE bar='%s'" % (unichr(200),)
     response = _make_query(self.client, query, wait=True)
-    assert_true(response.context.has_key("results"), "selecting from latin1 table should not blow up")
+    assert_true('results' in response.context, "selecting from latin1 table should not blow up")
 
     # Describe table should be fine with non-ascii comment
     response = self.client.get('/beeswax/table/default/test_utf8')
@@ -586,8 +583,18 @@ for x in sys.stdin:
 
     # Retrieve that design. It's the first one since it's most recent
     design = beeswax.models.SavedQuery.objects.all()[0]
-    resp = cli.get('/beeswax/execute/%s' % (design.id,))
+    resp = cli.get('/beeswax/execute/design/%s' % design.id)
+    assert_true('query' in resp.context, resp.context)
+    assert_true(resp.context['query'] is None, resp.context)
     assert_equal(design, resp.context['design'], resp.context)
+
+    # Retrieve that query history. It's the first one since it's most recent
+    query_history = beeswax.models.QueryHistory.objects.all()[0]
+    resp = cli.get('/beeswax/execute/query/%s' % query_history.id)
+    assert_true('query' in resp.context, resp.context)
+    assert_true(resp.context['query'] is not None, resp.context)
+    assert_true('design' in resp.context, resp.context)
+    assert_true(resp.context['design'] is not None, resp.context)
 
     resp = cli.get(reverse('beeswax:api_fetch_saved_design', kwargs={'design_id': design.id}))
     content = json.loads(resp.content)
@@ -762,7 +769,8 @@ for x in sys.stdin:
         'path': target_dir
       }
       resp = self.client.post('/beeswax/api/query/%s/results/save' % qid, save_data, follow=True)
-
+      context = json.loads(resp.content)
+      resp = self.client.get(context['watch_url'], follow=True)
       resp = wait_for_query_to_finish(self.client, resp, max=60)
 
       # Check that data is right
@@ -820,13 +828,16 @@ for x in sys.stdin:
         'type': 'hive-table',
         'path': target_tbl
       }
-      resp = self.client.post('/beeswax/api/query/%s/results/save' % (qid,), save_data, follow=True)
+      resp = self.client.post('/beeswax/api/query/%s/results/save' % qid, save_data, follow=True)
+      context = json.loads(resp.content)
+      resp = self.client.get(context['watch_url'], follow=True)
       wait_for_query_to_finish(self.client, resp, max=120)
 
       # Check that data is right. The SELECT may not give us the whole table.
-      resp = _make_query(self.client, 'SELECT * FROM %s' % (target_tbl,), wait=True, local=False)
+      resp = _make_query(self.client, 'SELECT * FROM %s' % target_tbl, wait=True, local=False)
+      resp = fetch_query_result_data(self.client, resp)
       for i in xrange(90):
-        assert_equal([i, '0x%x' % (i,)], resp.context['results'][i])
+        assert_equal([i, '0x%x' % (i,)], context['results'][i])
 
     TARGET_TBL_ROOT = 'test_copy'
 
@@ -895,27 +906,9 @@ for x in sys.stdin:
       'create': 'Create table',
     }, follow=True)
 
-    templates = [_template.filename for _template in resp.template]
-
-    if any(['watch_wait.mako' in template for template in templates]):
-      assert_equal_mod_whitespace("""
-          CREATE EXTERNAL TABLE `default.my_table`
-          (
-           `my_col` string
-          )
-          COMMENT "Yo>>>>dude"
-          ROW FORMAT DELIMITED
-            FIELDS TERMINATED BY ','
-            COLLECTION ITEMS TERMINATED BY '\\002'
-            MAP KEYS TERMINATED BY '\\003'
-            STORED AS TextFile LOCATION "/tmp/foo"
-      """, resp.context['query'].query)
-      assert_true('on_success_url=%2Fmetastore%2Ftable%2Fdefault%2Fmy_table' in resp.context['fwd_params'], resp.context['fwd_params'])
-    else:
-      # Create was fast
-      templates = [_template.filename for _template in resp.template]
-      assert_true(any(['describe_table.mako' in template for template in templates]), templates)
-      assert_true('Table : my_table' in resp.content, resp.content)
+    # Ensure we can see table.
+    response = self.client.get("/metastore/table/default/my_table")
+    assert_true("my_col" in response.content)
 
 
   def test_create_table_timestamp(self):
@@ -1140,7 +1133,7 @@ for x in sys.stdin:
       'cols-2-column_type': 'string',
       'cols-next_form_id': '3',
     }, follow=True)
-
+    resp = self.client.get(reverse("beeswax:api_watch_query_refresh_json", kwargs={'id': resp.context['query'].id}), follow=True)
     resp = wait_for_query_to_finish(self.client, resp, max=180.0)
 
     # Check data is in the table (by describing it)
@@ -1172,7 +1165,7 @@ for x in sys.stdin:
       'cols-next_form_id': '3',
       'removeHeader': 'on'
     }, follow=True)
-
+    resp = self.client.get(reverse("beeswax:api_watch_query_refresh_json", kwargs={'id': resp.context['query'].id}), follow=True)
     resp = wait_for_query_to_finish(self.client, resp, max=180.0)
 
     # Check data is in the table (by describing it)
@@ -1194,16 +1187,9 @@ for x in sys.stdin:
       'create': 'Create database',
       'use_default_location': True,
     }, follow=True)
-
-    templates = [_template.filename for _template in resp.template]
-
-    if [template for template in templates if "watch_wait.mako" in template]:
-      assert_equal_mod_whitespace("CREATE DATABASE my_db COMMENT \"foo\"", resp.context['query'].query, resp.content)
-    else:
-      # Create was fast
-      assert_true([template for template in templates if 'databases.mako' in template], templates)
-
+    resp = self.client.get(reverse("beeswax:api_watch_query_refresh_json", kwargs={'id': resp.context['query'].id}), follow=True)
     resp = wait_for_query_to_finish(self.client, resp, max=180.0)
+    resp = self.client.get("/metastore/databases/")
     assert_true('my_db' in resp.context['databases'], resp)
 
 

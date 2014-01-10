@@ -141,7 +141,9 @@ function BeeswaxViewModel(server) {
     self.design.history.id(history.id);
     viewModel.design.results.url('/' + viewModel.server() + '/results/' + history.id + '/0?format=json');
     viewModel.design.watch.url('/' + viewModel.server() + '/api/watch/json/' + history.id);
-    self.updateDesign(history.design);
+    if (history.design) {
+      self.updateDesign(history.design);
+    }
   };
 
   self.updateParameters = function(parameters) {
@@ -714,4 +716,15 @@ function getFileBrowseButton(inputElement) {
     });
     $("#chooseFile").modal("show");
   });
+}
+
+
+// utils
+function clickHard(el) {
+  var timer = setInterval(function () {
+    if ($(el).length > 0) {
+      $(el).click();
+      clearInterval(timer);
+    }
+  }, 100);
 }
