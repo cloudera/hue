@@ -1,0 +1,47 @@
+#!/usr/bin/env python
+"""Make an OpenID Assocition request against an endpoint
+and print the results."""
+
+import sys
+
+from openid.store.memstore import MemoryStore
+from openid.consumer import consumer
+from openid.consumer.discover import OpenIDServiceEndpoint
+
+from datetime import datetime
+
+def verboseAssociation(assoc):
+    """A more verbose representation of an Association.
+    """
+    d = assoc.__dict__
+    issued_date = datetime.fromtimestamp(assoc.issued)
+    d['issued_iso'] = issued_date.isoformat()
+    fmt = """  Type: %(assoc_type)s
+  Handle: %(handle)s
+  Issued: %(issued)s [%(issued_iso)s]
+  Lifetime: %(lifetime)s
+  Secret: %(secret)r
+"""
+    return fmt % d
+
+def main():
+    if not sys.argv[1:]:
+        print "Usage: %s ENDPOINT_URL..." % (sys.argv[0],)
+    for endpoint_url in sys.argv[1:]:
+        print "Associating with", endpoint_url
+
+        # This makes it clear why j3h made AssociationManager when we
+        # did the ruby port.  We can't invoke requestAssociation
+        # without these other trappings.
+        store = MemoryStore()
+        endpoint = OpenIDServiceEndpoint()
+        endpoint.server_url = endpoint_url
+        c = consumer.GenericConsumer(store)
+        auth_req = c.begin(endpoint)
+        if auth_req.assoc:
+            print verboseAssociation(auth_req.assoc)
+        else:
+            print "  ...no association."
+
+if __name__ == '__main__':
+    main()

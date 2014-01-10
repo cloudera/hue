@@ -1,0 +1,21 @@
+{% if pape_request %}
+  {% if pape_request.preferred_auth_policies %}
+    The relying party requested the following PAPE policies be in effect:
+
+    <ul>
+    {% for uri in pape_request.preferred_auth_policies %}
+    <li>{{ uri }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+
+  {% if pape_request.preferred_auth_level_types %}
+    The relying party requested the following authentication level types:
+
+    <ul>
+    {% for uri in pape_request.preferred_auth_level_types %}
+    <li>{{ uri }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endif %}

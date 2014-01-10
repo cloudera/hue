@@ -318,6 +318,25 @@
 
 
 ###########################################################################
+# Settings to configure OPENID
+###########################################################################
+
+[libopenid]
+  # (Required) OpenId SSO endpoint url. 
+  ## server_endpoint_url=https://www.google.com/accounts/o8/id
+
+  # OpenId 1.1 identity url prefix to be used instead of SSO endpoint url
+  # This is only supported if you are using an OpenId 1.1 endpoint
+  ## identity_url_prefix=https://app.onelogin.com/openid/your_company.com/
+
+  # Create users from OPENID on login.
+  ## create_users_on_login=true
+
+  # Use email for username
+  ## use_email_for_username=true
+
+
+###########################################################################
 # Settings for the RDBMS application
 ###########################################################################
 

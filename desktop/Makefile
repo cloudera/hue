@@ -43,7 +43,8 @@ APPS := core \
 	libs/hadoop \
 	libs/liboozie \
 	libs/libsaml \
-	libs/librdbms
+	libs/librdbms \
+        libs/libopenid
 
 .PHONY: default
 default:: hue syncdb
