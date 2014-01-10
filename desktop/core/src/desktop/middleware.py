@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import logging
+import json
 import os.path
 import re
 import tempfile
@@ -37,6 +38,7 @@ import django.views.static
 import django.views.generic.simple
 
 import desktop.conf
+from desktop.context_processors import get_app_name
 from desktop.lib import apputil, i18n
 from desktop.lib.django_util import render, render_json, is_jframe_request
 from desktop.lib.exceptions import StructuredException
@@ -44,7 +46,6 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.log.access import access_log, log_page_hit
 from desktop import appmanager
 from hadoop import cluster
-import simplejson
 
 
 LOG = logging.getLogger(__name__)
@@ -57,6 +58,7 @@ DJANGO_VIEW_AUTH_WHITELIST = [
   django.views.static.serve,
   django.views.generic.simple.redirect_to,
 ]
+
 
 class AjaxMiddleware(object):
   """
@@ -114,7 +116,7 @@ class JFrameMiddleware(object):
         if hasattr(request, "flash"):
           flashes = request.flash.get()
           if flashes:
-            response['X-Hue-Flash-Messages'] = simplejson.dumps(flashes)
+            response['X-Hue-Flash-Messages'] = json.dumps(flashes)
 
     return response
 
@@ -309,13 +311,21 @@ class LoginAndPermissionMiddleware(object):
         access_log(request, 'error checking view perm: %s', e, level=access_log_level)
         access_view =''
 
-      if request._desktop_app and \
-          request._desktop_app != "desktop" and \
-          not (request.user.has_hue_permission(action="access", app=request._desktop_app) or
-               request.user.has_hue_permission(action=access_view, app=request._desktop_app)):
+      # Accessing an app can access an underlying other app.
+      # e.g. impala or spark uses code from beeswax and so accessing impala shows up as beeswax here.
+      # Here we trust the URL to be the real app we need to check the perms.
+      app_accessed = request._desktop_app
+      ui_app_accessed = get_app_name(request)
+      if app_accessed != ui_app_accessed:
+        app_accessed = ui_app_accessed
+
+      if app_accessed and \
+          app_accessed not in ("desktop", "home") and \
+          not (request.user.has_hue_permission(action="access", app=app_accessed) or
+               request.user.has_hue_permission(action=access_view, app=app_accessed)):
         access_log(request, 'permission denied', level=access_log_level)
-        return PopupException(_("You do not have permission to access the %(app_name)s application.") %
-                              {'app_name': request._desktop_app.capitalize()}, error_code=401).response(request)
+        return PopupException(
+            _("You do not have permission to access the %(app_name)s application.") % {'app_name': app_accessed.capitalize()}, error_code=401).response(request)
       else:
         log_page_hit(request, view_func, level=access_log_level)
         return None

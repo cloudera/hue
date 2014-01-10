@@ -46,6 +46,7 @@ from desktop.lib.test_utils import grant_access
 from desktop.views import check_config, home
 from desktop.models import DocumentTag , Document
 from pig.models import PigScript
+from useradmin.models import GroupPermission
 
 
 def setup_test_environment():
@@ -370,6 +371,46 @@ def test_error_handling():
       desktop.urls.urlpatterns.remove(i)
     restore_django_debug()
     restore_500_debug()
+
+
+def test_app_permissions():
+  USERNAME = 'test_app_permissions'
+  GROUPNAME = 'impala_only'
+
+  c = make_logged_in_client(USERNAME, groupname=GROUPNAME, recreate=True, is_superuser=False)
+
+  # Reset all perms
+  GroupPermission.objects.filter(group__name=GROUPNAME).delete()
+
+  # Access to nothing
+  assert_equal(401, c.get('/beeswax', follow=True).status_code)
+  assert_equal(401, c.get('/impala', follow=True).status_code)
+  assert_equal(401, c.get('/filebrowser', follow=True).status_code)
+
+  # Add access to beeswax
+  grant_access(USERNAME, GROUPNAME, "beeswax")
+  assert_equal(200, c.get('/beeswax', follow=True).status_code)
+  assert_equal(401, c.get('/impala', follow=True).status_code)
+  assert_equal(401, c.get('/filebrowser', follow=True).status_code)
+
+  # Add access to filebrowser
+  grant_access(USERNAME, GROUPNAME, "filebrowser")
+  assert_equal(200, c.get('/beeswax', follow=True).status_code)
+  assert_equal(401, c.get('/impala', follow=True).status_code)
+  assert_equal(200, c.get('/filebrowser', follow=True).status_code)
+
+  # Reset all perms
+  GroupPermission.objects.filter(group__name=GROUPNAME).delete()
+
+  assert_equal(401, c.get('/beeswax', follow=True).status_code)
+  assert_equal(401, c.get('/impala', follow=True).status_code)
+  assert_equal(401, c.get('/filebrowser', follow=True).status_code)
+
+  # Test only impala perm
+  grant_access(USERNAME, GROUPNAME, "impala")
+  assert_equal(401, c.get('/beeswax', follow=True).status_code)
+  assert_equal(200, c.get('/impala', follow=True).status_code)
+  assert_equal(401, c.get('/filebrowser', follow=True).status_code)
 
 
 def test_error_handling_failure():
