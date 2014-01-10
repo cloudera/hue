@@ -23,7 +23,11 @@
       COLORS = {
         ORANGE: "#FB950D",
         GREEN: "#419E08",
-        BLUE: "#338BB8"
+        BLUE: "#338BB8",
+        RED: "#CE151D",
+        PURPLE: "#572B91",
+        TURQUOISE: "#049D84",
+        FALAFEL: "#774400"
       },
       TYPES = {
         LINECHART: "lines",
@@ -42,8 +46,13 @@
         tooltips: true,
         enableSelection: false,
         isDateTime: false,
+        timeFormat: null,
         isCategories: false,
         useCanvas: false,
+        xAxisFormatter: null,
+        yAxisFormatter: null,
+        xTooltipFormatter: null,
+        yTooltipFormatter: null,
         onSelect: function () {
         },
         onItemClick: function () {
@@ -81,7 +90,7 @@
     }
     else {
       _series.push(getSerie(serie));
-      var _plot = $.plot(element, _series, { grid: { borderWidth: element.data('plugin_' + pluginName).options.borderWidth } });
+      var _plot = $.plot(element, _series, $(element).data("plotOptions"));
       $(element).data("plotObj", _plot);
       $(element).data("plotSeries", _series);
     }
@@ -117,10 +126,28 @@
       _options.xaxis = {
         mode: "time"
       }
+      if (_this.options.timeFormat) {
+         _options.xaxis.timeformat = _this.options.timeFormat;
+      }
     }
     if (_this.options.isCategories) {
       _options.xaxis = {
         mode: "categories"
+      }
+    }
+    if (_this.options.xAxisFormatter != null) {
+      if (_options.xaxis == null){
+        _options.xaxis = {
+          tickFormatter: _this.options.yAxisFormatter
+        }
+      }
+      else {
+        _options.xaxis.tickFormatter = _this.options.xAxisFormatter;
+      }
+    }
+    if (_this.options.yAxisFormatter != null) {
+      _options.yaxis = {
+        tickFormatter: _this.options.yAxisFormatter
       }
     }
     if (_this.options.useCanvas) {
@@ -154,7 +181,7 @@
               x = item.series.data[item.dataIndex][0];
             }
 
-            showTooltip(item.pageX, item.pageY, "X: "+x+", Y: "+y);
+            showTooltip(item.pageX, item.pageY, "X: "+(_this.options.xTooltipFormatter?_this.options.xTooltipFormatter(x):x)+", Y: "+(_this.options.yTooltipFormatter?_this.options.yTooltipFormatter(y):y));
           }
         } else {
           $("#jHueBlueprintTooltip").remove();
@@ -166,6 +193,7 @@
       _this.options.onItemClick(pos, item);
     });
     $(_this.element).data("plotObj", _plot);
+    $(_this.element).data("plotOptions", _options);
     $(_this.element).data("plotSeries", [_serie]);
   }
 
@@ -230,11 +258,24 @@
   $.fn[pluginName] = function (options) {
     var _args = Array.prototype.slice.call(arguments);
     if (_args.length == 1) {
-      return this.each(function () {
-        if (!$.data(this, 'plugin_' + pluginName)) {
-          $.data(this, 'plugin_' + pluginName, new Plugin(this, options));
+      if (_args[0] == "reset") { // resets the graph
+        if (this.data("plotObj")){
+          this.data("plotObj").setData([]);
+          this.data("plotObj").setupGrid();
+          this.data("plotObj").draw();
+          this.data("plotObj", null);
+          this.data("plotSeries", null);
+          this.data("plotOptions", null);
+          this.data('plugin_' + pluginName, null);
         }
-      });
+      }
+      else {
+        return this.each(function () {
+          if (!$.data(this, 'plugin_' + pluginName)) {
+            $.data(this, 'plugin_' + pluginName, new Plugin(this, options));
+          }
+        });
+      }
     }
     else {
       if (_args[0] == "add") { // add a serie to the graph
