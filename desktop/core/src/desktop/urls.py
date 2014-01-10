@@ -97,6 +97,10 @@ static_patterns = []
 if settings.SAML_AUTHENTICATION:
   static_patterns.append((r'^saml2/', include('libsaml.urls')))
 
+# OpenId specific
+if settings.OPENID_AUTHENTICATION:
+    static_patterns.append((r'^openid/', include('libopenid.urls')))
+
 # Root each app at /appname if they have a "urls" module
 for app in appmanager.DESKTOP_APPS:
   if app.urls:

@@ -1,0 +1,151 @@
+#!/usr/bin/env python
+"""Grab URLs from the clipboard, interpret the queries as OpenID, and print.
+
+In addition to URLs, I also scan for queries as they appear in httpd log files,
+with a pattern like 'GET /foo?bar=baz HTTP'.
+
+Requires the 'xsel' program to get the contents of the clipboard.
+"""
+
+from pprint import pformat
+from urlparse import urlsplit, urlunsplit
+import cgi, re, subprocess, sys
+
+from openid import message
+
+OPENID_SORT_ORDER = ['mode', 'identity', 'claimed_id']
+
+class NoQuery(Exception):
+    def __init__(self, url):
+        self.url = url
+
+    def __str__(self):
+        return "No query in url %s" % (self.url,)
+
+
+def getClipboard():
+    xsel = subprocess.Popen(["xsel", "-o", "-b"], stdout=subprocess.PIPE)
+    output = xsel.communicate()[0]
+    return output
+
+
+def main():
+    source = getClipboard()
+    urls = find_urls(source)
+
+    errors = []
+    output = []
+    queries = []
+
+    queries.extend(queriesFromPostdata(source))
+
+    for url in urls:
+        try:
+            queries.append(queryFromURL(url))
+        except NoQuery, err:
+            errors.append(err)
+
+    queries.extend(queriesFromLogs(source))
+
+    for where, query in queries:
+        output.append('at %s:\n%s' % (where, openidFromQuery(query)))
+
+    if output:
+        print '\n\n'.join(output)
+    elif errors:
+        for err in errors:
+            print err
+
+
+def queryFromURL(url):
+    split_url = urlsplit(url)
+    query = cgi.parse_qs(split_url[3])
+
+    if not query:
+        raise NoQuery(url)
+
+    url_without_query = urlunsplit(split_url[:3] + (None, None))
+
+    return (url_without_query, query)
+
+
+def openidFromQuery(query):
+    try:
+        msg = message.Message.fromPostArgs(unlistify(query))
+        s = formatOpenIDMessage(msg)
+    except Exception, err:
+        # XXX - side effect.
+        sys.stderr.write(str(err))
+        s = pformat(query)
+
+    return s
+
+
+def formatOpenIDMessage(msg):
+    value_lists = {}
+    for (ns_uri, ns_key), value in msg.args.items():
+        l = value_lists.setdefault(ns_uri, {})
+        l[ns_key] = value
+
+    output = []
+
+    for ns_uri, values in value_lists.items():
+        ns_output = []
+
+        alias = msg.namespaces.getAlias(ns_uri)
+        if alias is message.NULL_NAMESPACE:
+            alias = 'openid'
+        ns_output.append("  %s <%s>" % (alias, ns_uri))
+
+        for key in OPENID_SORT_ORDER:
+            try:
+                ns_output.append("    %s = %s" % (key, values.pop(key)))
+            except KeyError:
+                pass
+
+        values = values.items()
+        values.sort()
+
+        for k, v in values:
+            ns_output.append("    %s = %s" % (k, v))
+
+        output.append('\n'.join(ns_output))
+
+    return '\n\n'.join(output)
+
+
+def unlistify(d):
+    return dict((i[0], i[1][0]) for i in d.items())
+
+
+def queriesFromLogs(s):
+    qre = re.compile(r'GET (/.*)?\?(.+) HTTP')
+
+    return [(match.group(1), cgi.parse_qs(match.group(2)))
+            for match in qre.finditer(s)]
+
+def queriesFromPostdata(s):
+    # This looks for query data in a line that starts POSTDATA=.
+    # Tamperdata outputs such lines.  If there's a 'Host=' in that block,
+    # use that too, but don't require it.
+    qre = re.compile(r'(?:^Host=(?P<host>.+?)$.*?)?^POSTDATA=(?P<query>.*)$',
+                     re.DOTALL | re.MULTILINE)
+    return [(match.group('host') or 'POSTDATA',
+             cgi.parse_qs(match.group('query'))) for match in qre.finditer(s)]
+
+def find_urls(s):
+    # Regular expression borrowed from urlscan
+    # by Daniel Burrows <dburrows@debian.org>, GPL.
+    urlinternalpattern=r'[{}a-zA-Z/\-_0-9%?&.=:;+,#~]'
+    urltrailingpattern=r'[{}a-zA-Z/\-_0-9%&=+#]'
+    httpurlpattern = r'(?:https?://' + urlinternalpattern + r'*' + urltrailingpattern + r')'
+    # Used to guess that blah.blah.blah.TLD is a URL.
+    tlds=['biz', 'com', 'edu', 'info', 'org']
+    guessedurlpattern=r'(?:[a-zA-Z0-9_\-%]+(?:\.[a-zA-Z0-9_\-%]+)*\.(?:' + '|'.join(tlds) + '))'
+    urlre = re.compile(r'(?:<(?:URL:)?)?(' + httpurlpattern + '|' + guessedurlpattern + '|(?:mailto:[a-zA-Z0-9\-_]*@[0-9a-zA-Z_\-.]*[0-9a-zA-Z_\-]))>?')
+
+    return [match.group(1) for match in urlre.finditer(s)]
+
+
+if __name__ == '__main__':
+    main()

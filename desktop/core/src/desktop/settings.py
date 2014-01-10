@@ -142,6 +142,7 @@ TEMPLATE_DIRS = (
 
 INSTALLED_APPS = [
     'django.contrib.auth',
+    'django_openid_auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
@@ -314,6 +315,14 @@ if SAML_AUTHENTICATION:
 # Middleware classes.
 for middleware in desktop.conf.MIDDLEWARE.get():
   MIDDLEWARE_CLASSES.append(middleware)
+
+# OpenId
+OPENID_AUTHENTICATION = 'libopenid.backend.OpenIDBackend' in AUTHENTICATION_BACKENDS
+if OPENID_AUTHENTICATION:
+  from libopenid.openid_settings import *
+  INSTALLED_APPS.append('libopenid')
+  LOGIN_URL = '/openid/login'
+  SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 # URL Redirection white list.
 if desktop.conf.REDIRECT_WHITELIST.get():
