@@ -103,11 +103,12 @@ def list_oozie_workflows(request):
 
   if request.GET.get('format') == 'json':
     json_jobs = workflows.jobs
+    just_sla = request.GET.get('justsla') == 'true'
     if request.GET.get('type') == 'running':
       json_jobs = split_oozie_jobs(request.user, workflows.jobs)['running_jobs']
     if request.GET.get('type') == 'completed':
       json_jobs = split_oozie_jobs(request.user, workflows.jobs)['completed_jobs']
-    return HttpResponse(encode_json_for_js(massaged_oozie_jobs_for_json(json_jobs, request.user)), mimetype="application/json")
+    return HttpResponse(encode_json_for_js(massaged_oozie_jobs_for_json(json_jobs, request.user, just_sla)), mimetype="application/json")
 
   return render('dashboard/list_oozie_workflows.mako', request, {
     'user': request.user,
@@ -334,7 +335,6 @@ def list_oozie_sla(request):
   if request.method == 'POST':
     # filter=nominal_start=2013-06-18T00:01Z;nominal_end=2013-06-23T00:01Z;app_name=my-sla-app
     params = {}
-    print request.POST
 
     job_name = request.POST.get('job_name')
     if job_name.endswith('-oozie-oozi-W'):
@@ -351,39 +351,41 @@ def list_oozie_sla(request):
       params['nominal_end'] = request.POST.get('end')
 
     oozie_slas = api.get_oozie_slas(**params)
-    print oozie_slas
 
   else:
     oozie_slas = [] # or get latest?
 
-  columns = [
-    'slaStatus',
-    'id',
-    'appType',
-    'appName',
-    'user',
-    'nominalTime',
-    'expectedStart',
-    'actualStart',
-    'expectedEnd',
-    'actualEnd',
-    'jobStatus',
-    #'expectedDuration',
-    #'actualDuration',
-    'lastModified'
-  ]
-
   if request.REQUEST.get('format') == 'json':
     massaged_slas = []
     for sla in oozie_slas:
-      massaged_slas.append([sla[key] for key in columns])
+      massaged_slas.append(massaged_sla_for_json(sla))
 
     return HttpResponse(json.dumps({'oozie_slas': massaged_slas}), content_type="text/json")
 
   return render('dashboard/list_oozie_sla.mako', request, {
-    'oozie_slas': oozie_slas,
-    'columns': columns,
+    'oozie_slas': oozie_slas
   })
+
+def massaged_sla_for_json(sla):
+  massaged_sla = {
+    'slaStatus': sla['slaStatus'],
+    'id': sla['id'],
+    'appType': sla['appType'],
+    'appName': sla['appName'],
+    'appUrl': reverse(sla['appType'] == 'WORKFLOW_JOB' and 'oozie:list_oozie_workflow' or 'oozie:list_oozie_coordinator', kwargs={'job_id': sla['id']}),
+    'user': sla['user'],
+    'nominalTime': sla['nominalTime'],
+    'expectedStart': sla['expectedStart'],
+    'actualStart': sla['actualStart'],
+    'expectedEnd': sla['expectedEnd'],
+    'actualEnd': sla['actualEnd'],
+    'jobStatus': sla['jobStatus'],
+    'expectedDuration': sla['expectedDuration'],
+    'actualDuration': sla['actualDuration'],
+    'lastModified': sla['lastModified']
+  }
+
+  return massaged_sla
 
 
 @show_oozie_error
@@ -695,7 +697,7 @@ def format_time(st_time):
     return time.strftime("%a, %d %b %Y %H:%M:%S", st_time)
 
 
-def massaged_oozie_jobs_for_json(oozie_jobs, user):
+def massaged_oozie_jobs_for_json(oozie_jobs, user, just_sla=False):
   jobs = []
 
   for job in oozie_jobs:
@@ -706,31 +708,31 @@ def massaged_oozie_jobs_for_json(oozie_jobs, user):
         job = get_oozie(user).get_coordinator(job.id)
       else:
         job = get_oozie(user).get_bundle(job.id)
-
-    massaged_job = {
-      'id': job.id,
-      'lastModTime': hasattr(job, 'lastModTime') and job.lastModTime and format_time(job.lastModTime) or None,
-      'kickoffTime': hasattr(job, 'kickoffTime') and job.kickoffTime or '',
-      'timeOut': hasattr(job, 'timeOut') and job.timeOut or None,
-      'endTime': job.endTime and format_time(job.endTime) or None,
-      'status': job.status,
-      'isRunning': job.is_running(),
-      'duration': job.endTime and job.startTime and format_duration_in_millis(( time.mktime(job.endTime) - time.mktime(job.startTime) ) * 1000) or None,
-      'appName': job.appName,
-      'progress': job.get_progress(),
-      'user': job.user,
-      'absoluteUrl': job.get_absolute_url(),
-      'canEdit': has_job_edition_permission(job, user),
-      'killUrl': reverse('oozie:manage_oozie_jobs', kwargs={'job_id':job.id, 'action':'kill'}),
-      'suspendUrl': reverse('oozie:manage_oozie_jobs', kwargs={'job_id':job.id, 'action':'suspend'}),
-      'resumeUrl': reverse('oozie:manage_oozie_jobs', kwargs={'job_id':job.id, 'action':'resume'}),
-      'created': hasattr(job, 'createdTime') and job.createdTime and job.createdTime and ((job.type == 'Bundle' and job.createdTime) or format_time(job.createdTime)),
-      'startTime': hasattr(job, 'startTime') and format_time(job.startTime) or None,
-      'run': hasattr(job, 'run') and job.run or 0,
-      'frequency': hasattr(job, 'frequency') and job.frequency or None,
-      'timeUnit': hasattr(job, 'timeUnit') and job.timeUnit or None,
-    }
-    jobs.append(massaged_job)
+    if not just_sla or (just_sla and job.has_sla):
+      massaged_job = {
+        'id': job.id,
+        'lastModTime': hasattr(job, 'lastModTime') and job.lastModTime and format_time(job.lastModTime) or None,
+        'kickoffTime': hasattr(job, 'kickoffTime') and job.kickoffTime or '',
+        'timeOut': hasattr(job, 'timeOut') and job.timeOut or None,
+        'endTime': job.endTime and format_time(job.endTime) or None,
+        'status': job.status,
+        'isRunning': job.is_running(),
+        'duration': job.endTime and job.startTime and format_duration_in_millis(( time.mktime(job.endTime) - time.mktime(job.startTime) ) * 1000) or None,
+        'appName': job.appName,
+        'progress': job.get_progress(),
+        'user': job.user,
+        'absoluteUrl': job.get_absolute_url(),
+        'canEdit': has_job_edition_permission(job, user),
+        'killUrl': reverse('oozie:manage_oozie_jobs', kwargs={'job_id':job.id, 'action':'kill'}),
+        'suspendUrl': reverse('oozie:manage_oozie_jobs', kwargs={'job_id':job.id, 'action':'suspend'}),
+        'resumeUrl': reverse('oozie:manage_oozie_jobs', kwargs={'job_id':job.id, 'action':'resume'}),
+        'created': hasattr(job, 'createdTime') and job.createdTime and job.createdTime and ((job.type == 'Bundle' and job.createdTime) or format_time(job.createdTime)),
+        'startTime': hasattr(job, 'startTime') and format_time(job.startTime) or None,
+        'run': hasattr(job, 'run') and job.run or 0,
+        'frequency': hasattr(job, 'frequency') and job.frequency or None,
+        'timeUnit': hasattr(job, 'timeUnit') and job.timeUnit or None,
+      }
+      jobs.append(massaged_job)
 
   return jobs
 
