@@ -256,17 +256,20 @@ ${layout.menubar(section='query')}
   </div>
 
   <div class="card card-small scrollable resultsContainer">
-    <a id="expandResults" href="javascript:void(0)" title="${_('See results in full screen')}" rel="tooltip"
-      class="view-query-results hide pull-right"><h4 style="margin-right: 20px"><i class="fa fa-expand"></i></h4></a>
 
-    <a id="save-results" data-bind="click: saveResultsModal" href="javascript:void(0)" title="${_('Save the results to HDFS or a new Hive table')}" rel="tooltip"
-      class="view-query-results hide pull-right"><h4 style="margin-right: 20px"><i class="fa fa-save"></i></h4></a>
+    <div data-bind="visible: !$root.design.results.empty()">
+      <a id="expandResults" href="javascript:void(0)" title="${_('See results in full screen')}" rel="tooltip"
+        class="view-query-results hide pull-right"><h4 style="margin-right: 20px"><i class="fa fa-expand"></i></h4></a>
 
-    <a id="download-csv" data-bind="attr: {'href': '/beeswax/download/' + $root.design.id() + '/csv'}" href="javascript:void(0)" title="${_('Download the results in CSV format')}" rel="tooltip"
-      class="view-query-results hide pull-right"><h4 style="margin-right: 20px"><i class="fa fa-arrow-circle-o-down"></i></h4></a>
+      <a id="save-results" data-bind="click: saveResultsModal" href="javascript:void(0)" title="${_('Save the results to HDFS or a new Hive table')}" rel="tooltip"
+        class="view-query-results hide pull-right"><h4 style="margin-right: 20px"><i class="fa fa-save"></i></h4></a>
 
-    <a id="download-excel" data-bind="attr: {'href': '/beeswax/download/' + $root.design.id() + '/xls'}" href="javascript:void(0)" title="${_('Download the results for excel')}" rel="tooltip"
-      class="view-query-results hide pull-right"><h4 style="margin-right: 20px"><i class="fa fa-arrow-circle-o-down"></i></h4></a>
+      <a id="download-csv" data-bind="attr: {'href': '/beeswax/download/' + $root.design.id() + '/csv'}" href="javascript:void(0)" title="${_('Download the results in CSV format')}" rel="tooltip"
+        class="view-query-results hide pull-right"><h4 style="margin-right: 20px"><i class="fa fa-arrow-circle-o-down"></i></h4></a>
+
+      <a id="download-excel" data-bind="attr: {'href': '/beeswax/download/' + $root.design.id() + '/xls'}" href="javascript:void(0)" title="${_('Download the results for excel')}" rel="tooltip"
+        class="view-query-results hide pull-right"><h4 style="margin-right: 20px"><i class="fa fa-arrow-circle-o-down"></i></h4></a>
+   </div>
 
     <div class="card-body">
       <ul class="nav nav-tabs">
@@ -1361,8 +1364,9 @@ $(document).ready(function () {
   });
 
   viewModel.design.watch.logs.subscribe(function(val){
-    if (logsAtEnd) {
-      var _logsEl = $("#log pre");
+    var _logsEl = $("#log pre");
+
+    if (logsAtEnd && _logsEl[0]) {
       _logsEl.scrollTop(_logsEl[0].scrollHeight - _logsEl.height());
     }
   });
@@ -1800,7 +1804,7 @@ $(document).ready(function () {
       $("html, body").animate({ scrollTop: ($(".resultsContainer").position().top - 80) + "px" });
     },
     'query/explanation': function () {
-      if (!viewModel.design.results.explanation()) {
+      if (! viewModel.design.results.explanation()) {
         routie('query');
       }
       codeMirror.setSize("99%", 100);
@@ -1813,8 +1817,6 @@ $(document).ready(function () {
       routie('query');
     }
   });
-
-  routie('query');
 
   $(document).on('fetched.parameters', function () {
     if (viewModel.design.parameters().length > 0) {
@@ -1843,6 +1845,8 @@ $(document).ready(function () {
   });
 });
 
+// @TODO: Stop operation
+// @TODO: Re-add download query for impala
 </script>
 
 ${ commonfooter(messages) | n,unicode }

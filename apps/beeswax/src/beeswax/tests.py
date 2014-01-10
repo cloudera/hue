@@ -113,7 +113,7 @@ class TestBeeswaxWithHadoop(BeeswaxSampleProvider):
     # Creating a table "again" should not work; error should be displayed.
     response = _make_query(self.client, "CREATE TABLE test (foo INT)", wait=True)
     content = json.loads(response.content)
-    assert_true("AlreadyExistsException" in content.get('error'), content)
+    assert_true("AlreadyExistsException" in content.get('message'), content)
     assert_true("Table test already exists" in content.get('message'), content)
 
   def test_configuration(self):

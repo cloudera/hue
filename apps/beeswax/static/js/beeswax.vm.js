@@ -350,6 +350,8 @@ function BeeswaxViewModel(server) {
     $(document).trigger('explain.query', data);
     self.design.explain(true);
     self.design.isRunning(true);
+    self.design.isFinished(true);
+    self.design.errors.removeAll();
 
     var data = {
       'query-query': self.design.query(),
