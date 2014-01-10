@@ -452,7 +452,7 @@ ${ controls.decision_form(node_form, link_form, default_link_form, 'decision', T
 <script type="text/html" id="emptyTemplate"></script>
 
 <script type="text/html" id="disabledNodeTemplate">
-  <div class="node node-control action row-fluid">
+  <div class="node node-control row-fluid editor-action">
     <!-- ko if: node_type() == 'start' -->
       <ul class="nav nav-tabs" style="margin-bottom:0">
         <li class="active"><a data-toggle="tab" style="line-height:10px;background-color: #F9F9F9;"><i style="color:#DDD" class="fa fa-thumbs-up"></i> &nbsp;
@@ -460,12 +460,12 @@ ${ controls.decision_form(node_form, link_form, default_link_form, 'decision', T
         </li>
       </ul>
       <div class="row-fluid">
-        <div class="span12 gradient" style="border:0"></div>
+        <div class="span12 action gradient" style="border:0"></div>
       </div>
     <!-- /ko -->
     <!-- ko if: node_type() == 'end' -->
       <div class="row-fluid">
-        <div class="span12 inverse_gradient" style="border:0"></div>
+        <div class="span12 action inverse_gradient" style="border:0"></div>
       </div>
       <div class="tabbable tabs-below">
         <ul class="nav nav-tabs" style="margin-bottom:0">
@@ -482,7 +482,7 @@ ${ controls.decision_form(node_form, link_form, default_link_form, 'decision', T
 </script>
 
 <script type="text/html" id="nodeTemplate">
-  <div class="node node-action row-fluid action">
+  <div class="node node-action row-fluid editor-action">
     <ul class="nav nav-tabs" style="margin-bottom:0">
       <li class="active"><a data-toggle="tab" style="line-height:10px;background-color: #F9F9F9;"><i style="color:#DDD" class="fa fa-cogs"></i> &nbsp;
         <strong style="color:#999" data-bind="text: node_type"></strong>
@@ -493,7 +493,7 @@ ${ controls.decision_form(node_form, link_form, default_link_form, 'decision', T
       </li>
     </ul>
     <div class="row-fluid">
-      <div class="span12" style="text-align:left; padding:10px;border:1px solid #DDD; border-top:0">
+      <div class="span12 action editor-action-body">
         <div class="pull-right" style="font-size: 30px; margin-top:14px; cursor:pointer"><a class="edit-node-link" title="${ _('Edit') }" relz="tooltip" data-bind="attr: { 'data-node-type': node_type() }"><i class="fa fa-pencil"></i></a></div>
         <h4 data-bind="text: (name()) ? name() : node_type() + '-' + id()"></h4>
         <div class="node-description muted" data-bind="text: description()"></div>
@@ -725,7 +725,7 @@ workflow.el.on('mousedown', '.new-node-link', function(e) {
 
   // Trigger fake mousedown event to start dragging node.
   var is_dirty = workflow.is_dirty();
-  el.offset({ top: e.pageY - el.height()/10, left: e.pageX - el.width()/10 });
+  el.offset({ top: e.pageY - el.height()/2, left: e.pageX - el.width()/10 });
   el.trigger($.Event("mousedown", {pageX: e.pageX, pageY: e.pageY, target: el[0], which: 1}));
 
   var cancel_edit = function(e) {
