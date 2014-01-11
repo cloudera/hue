@@ -346,6 +346,9 @@ ${layout.menubar(section='query')}
         </div>
 
          <div class="tab-pane" id="chart">
+           <div class="alert hide">
+            <strong>${_('Warning:')}</strong> ${_('the results on the chart have been limited to 1000 rows.')}
+          </div>
           <div style="text-align: center">
           <form class="form-inline">
             ${_('Chart type')}&nbsp;
@@ -898,7 +901,7 @@ $(document).ready(function () {
     $("a[href='#results']").click();
   });
 
-  $("a[data-toggle='tab']").on("shown", function (e) {
+  $(document).on("shown", "a[data-toggle='tab']", function (e) {
     if ($(e.target).attr("href") == "#log") {
       logsAtEnd = true;
       window.setTimeout(resizeLogs, 150);
@@ -913,8 +916,6 @@ $(document).ready(function () {
       }
     }
   });
-
-
 });
 
 
@@ -1167,6 +1168,7 @@ $(document).one('fetched.design', function () {
 });
 
 
+var graphHasBeenPredicted = false;
 // Logs
 var logsAtEnd = true;
 $(document).ready(function () {
@@ -1183,7 +1185,7 @@ $(document).ready(function () {
     resizeLogs();
   });
 
-  $("a[data-toggle='tab']").on("shown", function (e) {
+  $(document).on("shown", "a[data-toggle='tab']", function (e) {
     if ($(e.target).attr("href") != "#results"){
       $($(e.target).attr("href")).css('height', 'auto');
       if ($(e.target).attr("href") == "#chart") {
@@ -1192,6 +1194,7 @@ $(document).ready(function () {
     } else {
       reinitializeTable();
     }
+    return e;
   });
 
 
@@ -1205,6 +1208,7 @@ $(document).ready(function () {
   }
   var map;
   function generateGraph(graphType) {
+    $("#chart .alert").addClass("hide");
     if (graphType != "") {
       if (map != null) {
         try {
@@ -1247,6 +1251,9 @@ $(document).ready(function () {
               }
             }
           });
+          if ($(".resultTable>tbody>tr>td:nth-child(" + _latCol + ")").length > 1000){
+            $("#chart .alert").removeClass("hide");
+          }
 
         }
         else {
@@ -1263,7 +1270,9 @@ $(document).ready(function () {
               _data.push([$.trim($(this).text()), $.trim($(".resultTable>tbody>tr:nth-child(" + (cnt + 1) + ")>td:nth-child(" + _y + ")").text()) * 1]);
             }
           });
-
+          if ($(".resultTable>tbody>tr>td:nth-child(" + _x + ")").length > 1000){
+            $("#chart .alert").removeClass("hide");
+          }
           $("#blueprint").jHueBlueprint({
             data: _data,
             label: $(".resultTable>thead>tr>th:nth-child(" + _y + ")").text(),
@@ -1304,10 +1313,10 @@ $(document).ready(function () {
     return _type;
   }
 
-  var hasBeenPredicted = false;
+
   function predictGraph() {
-    if (!hasBeenPredicted) {
-      hasBeenPredicted = true;
+    if (!graphHasBeenPredicted) {
+      graphHasBeenPredicted = true;
       var _firstAllString, _firstAllNumeric;
       for (var i = 1; i < $(".resultTable>thead>tr>th").length; i++) {
         var _isNumeric = true;
@@ -1558,6 +1567,7 @@ function tryExecuteQuery() {
   if ($(".dataTables_wrapper").length > 0) { // forces results to be up
     $(".dataTables_wrapper").scrollTop(0);
   }
+  graphHasBeenPredicted = false;
   if (viewModel.design.isParameterized()) {
     viewModel.fetchParameters();
   } else {
