@@ -59,7 +59,9 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
     <strong>${_("Search")}</strong>
     <div class="input-append">
       <div class="selectMask">
+        % if len(hue_collections) > 1:
         <i class="fa fa-caret-down" style="float:right;margin-top: 8px; margin-left: 5px"></i>
+        % endif
         <span class="current-collection"></span>
         <div id="collectionPopover" class="hide">
         <ul class="unstyled">
@@ -426,11 +428,13 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
       return _html;
     }
 
+    % if len(hue_collections) > 1:
     $(".selectMask").popover({
       html: true,
       content: getCollectionPopoverContent(),
       placement: "bottom"
     });
+    % endif
 
     $("#recordsPerPage").change(function () {
       $("input[name='rows']").val($(this).val());

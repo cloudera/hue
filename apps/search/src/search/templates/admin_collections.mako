@@ -210,7 +210,7 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
       $("#importModal").modal("hide");
       $("#importModalBtn").button("reset");
       if (data.status == 0){
-        $(document).trigger("info", data.message + "<br/>${_('Imported:')}" +  + data.imported.join(", "));
+        $(document).trigger("info", data.message + "<br/>${_('Imported:')}" + data.imported.join(", "));
       }
       else if (data.status == 1){
         $(document).trigger("info", data.message + "<br/>${_('Imported:')}" + data.imported.join(", ") + "<br/>${_('Not imported:')}" + data.notImported.join(", "));
