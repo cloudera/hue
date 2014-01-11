@@ -198,7 +198,7 @@ def test_dump_config():
   grant_access("not_me", "test", "desktop")
 
   response = client_not_me.get('/dump_config')
-  assert_equal("You must be a superuser.", response.content)
+  assert_true("You do not have permission" in response.content, response.content)
 
   os.environ["HUE_CONF_DIR"] = "/tmp/test_hue_conf_dir"
   resp = c.get('/dump_config')
@@ -385,32 +385,32 @@ def test_app_permissions():
   # Access to nothing
   assert_equal(401, c.get('/beeswax', follow=True).status_code)
   assert_equal(401, c.get('/impala', follow=True).status_code)
-  assert_equal(401, c.get('/filebrowser', follow=True).status_code)
+  assert_equal(401, c.get('/hbase', follow=True).status_code)
 
   # Add access to beeswax
   grant_access(USERNAME, GROUPNAME, "beeswax")
   assert_equal(200, c.get('/beeswax', follow=True).status_code)
   assert_equal(401, c.get('/impala', follow=True).status_code)
-  assert_equal(401, c.get('/filebrowser', follow=True).status_code)
+  assert_equal(401, c.get('/hbase', follow=True).status_code)
 
-  # Add access to filebrowser
-  grant_access(USERNAME, GROUPNAME, "filebrowser")
+  # Add access to hbase
+  grant_access(USERNAME, GROUPNAME, "hbase")
   assert_equal(200, c.get('/beeswax', follow=True).status_code)
   assert_equal(401, c.get('/impala', follow=True).status_code)
-  assert_equal(200, c.get('/filebrowser', follow=True).status_code)
+  assert_equal(200, c.get('/hbase', follow=True).status_code)
 
   # Reset all perms
   GroupPermission.objects.filter(group__name=GROUPNAME).delete()
 
   assert_equal(401, c.get('/beeswax', follow=True).status_code)
   assert_equal(401, c.get('/impala', follow=True).status_code)
-  assert_equal(401, c.get('/filebrowser', follow=True).status_code)
+  assert_equal(401, c.get('/hbase', follow=True).status_code)
 
   # Test only impala perm
   grant_access(USERNAME, GROUPNAME, "impala")
   assert_equal(401, c.get('/beeswax', follow=True).status_code)
   assert_equal(200, c.get('/impala', follow=True).status_code)
-  assert_equal(401, c.get('/filebrowser', follow=True).status_code)
+  assert_equal(401, c.get('/hbase', follow=True).status_code)
 
 
 def test_error_handling_failure():
