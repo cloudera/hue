@@ -275,6 +275,36 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
 
       % if oozie_coordinator.has_sla:
       <div class="tab-pane" id="sla">
+        <div id="yAxisLabel" class="hide">${_('Time since Nominal Time')}</div>
+        <div id="slaChart"></div>
+        <table id="slaTable" class="table table-striped table-condensed hide">
+          <thead>
+            <th>${_('Status')}</th>
+            <th>${_('Nominal Time')}</th>
+            <th>${_('Expected Start')}</th>
+            <th>${_('Actual Start')}</th>
+            <th>${_('Expected End')}</th>
+            <th>${_('Actual End')}</th>
+            <th>${_('Expected Duration')}</th>
+            <th>${_('Actual Duration')}</th>
+            <th>${_('SLA')}</th>
+          </thead>
+          <tbody>
+          %for sla in oozie_slas:
+            <tr>
+              <td class="slaStatus">${sla['slaStatus']}</td>
+              <td><span class="nominalTime">${sla['nominalTime']}</span></td>
+              <td><span class="expectedStart">${sla['expectedStart']}</span></td>
+              <td><span class="actualStart">${sla['actualStart']}</span></td>
+              <td><span class="expectedEnd">${sla['expectedEnd']}</span></td>
+              <td><span class="actualEnd">${sla['actualEnd']}</span></td>
+              <td>${sla['expectedDuration']}</td>
+              <td>${sla['actualDuration']}</td>
+              <td><a href="${ url('oozie:list_oozie_sla') }#${ sla['id'] }"></a></td>
+            </tr>
+          %endfor
+          </tbody>
+        </table>
       </div>
       % endif
     </div>
@@ -309,9 +339,37 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
 <link rel="stylesheet" href="/static/ext/css/codemirror.css">
 <script src="/static/ext/js/codemirror-xml.js"></script>
 
+% if oozie_coordinator.has_sla:
+<script src="/static/ext/js/moment.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/oozie/static/js/sla.utils.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/jquery/plugins/jquery.flot.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/jquery/plugins/jquery.flot.selection.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/ext/js/jquery/plugins/jquery.flot.time.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/js/jquery.blueprint.js"></script>
+% endif
+
+
 <style type="text/css">
   .CodeMirror.cm-s-default {
     height:500px;
+  }
+
+  #sla th {
+    vertical-align: middle !important;
+  }
+
+  #yAxisLabel {
+    -webkit-transform: rotate(270deg);
+    -moz-transform: rotate(270deg);
+    -o-transform: rotate(270deg);
+    writing-mode: lr-tb;
+    margin-left: -82px;
+    margin-top: 120px;
+    position: absolute;
+  }
+
+  #slaTable {
+    margin-top: 20px;
   }
 </style>
 
@@ -348,6 +406,16 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
   var viewModel = new RunningCoordinatorActionsModel([]);
   ko.applyBindings(viewModel);
 
+  var CHART_LABELS = {
+    NOMINAL_TIME: "${_('Nominal Time')}",
+    EXPECTED_START: "${_('Expected Start')}",
+    ACTUAL_START: "${_('Actual Start')}",
+    EXPECTED_END: "${_('Expected End')}",
+    ACTUAL_END: "${_('Actual End')}",
+    TOOLTIP_ADDON: "${_('click for the SLA dashboard')}"
+  }
+  var slaTable;
+
   $(document).ready(function(){
     $("a[data-row-selector='true']").jHueRowSelector();
 
@@ -360,6 +428,25 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
       $(this).removeClass("hide");
     });
 
+    % if oozie_coordinator.has_sla:
+    slaTable = $("#slaTable").dataTable({
+      "bPaginate": false,
+      "bLengthChange": false,
+      "bInfo": false,
+      "bAutoWidth": false,
+      "oLanguage": {
+        "sEmptyTable": "${_('No data available')}",
+        "sZeroRecords": "${_('No matching records')}"
+      }
+    });
+
+    $(".slaStatus").each(function () {
+      $(this).html(getSLAStatusLabel($(this).text()));
+    });
+
+    $(".dataTables_wrapper").css("min-height", "0");
+    $(".dataTables_filter").hide();
+    % endif
 
     var definitionEditor = $("#definitionEditor")[0];
 
@@ -376,6 +463,13 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
       if ($(e.target).attr("href") == "#definition") {
         codeMirror.refresh();
       }
+      % if oozie_coordinator.has_sla:
+      if ($(e.target).attr("href") == "#sla") {
+        window.setTimeout(function () {
+          updateSLAChart(slaTable, CHART_LABELS, 30); // limits to 30 results
+        }, 100)
+      }
+      % endif
     });
 
     $(".confirmationModal").click(function(){
@@ -497,6 +591,10 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
 
     function resizeLogs() {
       $("#log pre").css("overflow", "auto").height($(window).height() - $("#log pre").position().top - 80);
+    }
+
+    if (window.location.hash == "#showSla") {
+      $("a[href='#sla']").click();
     }
   });
 </script>

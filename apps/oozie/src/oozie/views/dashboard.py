@@ -208,11 +208,20 @@ def list_oozie_workflow(request, job_id, coordinator_job_id=None, bundle_job_id=
     }
     return HttpResponse(encode_json_for_js(return_obj), mimetype="application/json")
 
+  oozie_slas = []
+  if oozie_workflow.has_sla:
+    api = get_oozie(request.user, api_version="v2")
+    params = {
+      'id': oozie_workflow.id
+    }
+    oozie_slas = api.get_oozie_slas(**params)
+
   return render('dashboard/list_oozie_workflow.mako', request, {
     'history': history,
     'oozie_workflow': oozie_workflow,
     'oozie_coordinator': oozie_coordinator,
     'oozie_bundle': oozie_bundle,
+    'oozie_slas': oozie_slas,
     'hue_workflow': hue_workflow,
     'hue_coord': hue_coord,
     'parameters': parameters,
@@ -248,8 +257,17 @@ def list_oozie_coordinator(request, job_id, bundle_job_id=None):
     }
     return HttpResponse(encode_json_for_js(return_obj), mimetype="application/json")
 
+  oozie_slas = []
+  if oozie_coordinator.has_sla:
+    api = get_oozie(request.user, api_version="v2")
+    params = {
+      'id': oozie_coordinator.id
+    }
+    oozie_slas = api.get_oozie_slas(**params)
+
   return render('dashboard/list_oozie_coordinator.mako', request, {
     'oozie_coordinator': oozie_coordinator,
+    'oozie_slas': oozie_slas,
     'coordinator': coordinator,
     'oozie_bundle': oozie_bundle,
     'has_job_edition_permission': has_job_edition_permission,

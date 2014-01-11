@@ -146,16 +146,17 @@ ${ layout.menubar(section='sla', dashboard=True) }
     </div>
   </div>
 </div>
-
+<script src="/oozie/static/js/bundles.utils.js" type="text/javascript" charset="utf-8"></script>
+<script src="/oozie/static/js/sla.utils.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/jquery/plugins/jquery.flot.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/jquery/plugins/jquery.flot.selection.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/jquery/plugins/jquery.flot.time.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/js/jquery.blueprint.js"></script>
 
 <script type="text/javascript" charset="utf-8">
-  var slaTable;
   function performSearch(id) {
     if ((id != null || $("input[name='job_name']").val().trim()) != "" && slaTable) {
+      window.location.hash = (id != null ? id : $("input[name='job_name']").val().trim());
       $(".results").addClass("hide");
       $(".loader").removeClass("hide");
       $(".search-something").addClass("hide");
@@ -193,46 +194,16 @@ ${ layout.menubar(section='sla', dashboard=True) }
     }
   }
 
-  function getSLArow(row) {
-    return [
-      getStatusClass(row.slaStatus),
-      emptyStringIfNull(row.appName),
-      emptyStringIfNull(row.appType),
-      '<a href="' + row.appUrl + '" data-row-selector="true">' + row.id + '</a>',
-      emptyStringIfNull(row.nominalTime),
-      emptyStringIfNull(row.expectedStart),
-      emptyStringIfNull(row.actualStart),
-      emptyStringIfNull(row.expectedEnd),
-      emptyStringIfNull(row.actualEnd),
-      emptyStringIfNull(row.expectedDuration),
-      emptyStringIfNull(row.actualDuration),
-      emptyStringIfNull(row.jobStatus),
-      emptyStringIfNull(row.user),
-      emptyStringIfNull(row.lastModified)
-    ];
+  var CHART_LABELS = {
+    NOMINAL_TIME: "${_('Nominal Time')}",
+    EXPECTED_START: "${_('Expected Start')}",
+    ACTUAL_START: "${_('Actual Start')}",
+    EXPECTED_END: "${_('Expected End')}",
+    ACTUAL_END: "${_('Actual End')}",
+    TOOLTIP_ADDON: "${_('click for more details')}"
   }
 
-  function getStatusClass(status) {
-    var klass = "";
-    if (['MET'].indexOf(status.toUpperCase()) > -1) {
-      klass = "label-success";
-    }
-    else if (['NOT_STARTED', 'IN_PROCESS'].indexOf(status.toUpperCase()) > -1) {
-      klass = "label-warning";
-    }
-    else {
-      klass = "label-important";
-    }
-    return '<span class="label ' + klass + '">' + status + '</span>'
-  }
-
-  function emptyStringIfNull(obj) {
-    if (obj != null && obj != undefined) {
-      return obj;
-    }
-    return "";
-  }
-
+  var slaTable;
   $(document).ready(function () {
     $("a[data-row-selector='true']").jHueRowSelector();
 
@@ -281,72 +252,18 @@ ${ layout.menubar(section='sla', dashboard=True) }
     $(".dataTables_wrapper").css("min-height", "0");
     $(".dataTables_filter").hide();
 
-    function msToTime(millis) {
-      var s = Math.abs(millis);
-      var ms = s % 1000;
-      s = (s - ms) / 1000;
-      var secs = s % 60;
-      s = (s - secs) / 60;
-      var mins = s % 60;
-      var hrs = (s - mins) / 60;
-      return (millis < 0 ? "-" : "") + (hrs < 10 ? "0" : "") + hrs + ":" + (mins < 10 ? "0" : "") + mins + ":" + (secs < 10 ? "0" : "") + secs;
-    }
-
     $("a[data-toggle='tab']").on("shown", function (e) {
       if ($(e.target).attr("href") == "#chartTab") {
         window.setTimeout(function () {
-          $("#slaChart").jHueBlueprint("reset");
-          var rows = slaTable.fnGetNodes();
-          for (var i = 0; i < rows.length; i++) {
-            function getOptions(differenceCellValue, label, color) {
-              return {
-                data: [
-                  [moment($(rows[i]).find("td:eq(4)").html()).valueOf(), (moment(differenceCellValue).valueOf() - moment($(rows[i]).find("td:eq(4)").html()).valueOf())]
-                ],
-                label: label,
-                yAxisFormatter: function (val, axis) {
-                  return msToTime(val);
-                },
-                type: $.jHueBlueprint.TYPES.POINTCHART,
-                color: color,
-                isDateTime: true,
-                timeFormat: "<span style='color:" + ($(rows[i]).find("td:eq(4)").text().toUpperCase() == "MET" ? $.jHueBlueprint.COLORS.GREEN : $.jHueBlueprint.COLORS.RED) + "'>%Y-%m-%d %H:%M:%S</span>",
-                fill: false,
-                height: 300,
-                yTooltipFormatter: function (val) {
-                  return msToTime(val);
-                },
-                onItemClick: function (pos, item) {
-                  if (item) {
-                    location.href = $(slaTable.fnGetNodes()[item.dataIndex]).find("a").attr("href");
-                  }
-                }
-              }
-            }
-
-            if ($("#slaChart").data('plugin_jHueBlueprint') == null) {
-              $("#slaChart").jHueBlueprint(getOptions($(rows[i]).find("td:eq(4)").html(), (i == 0 ? "${_('Nominal Time')}" : null), $.jHueBlueprint.COLORS.ORANGE));
-            }
-            else {
-              $("#slaChart").jHueBlueprint("add", getOptions($(rows[i]).find("td:eq(4)").html(), (i == 0 ? "${_('Nominal Time')}" : null), $.jHueBlueprint.COLORS.ORANGE));
-            }
-            if ($(rows[i]).find("td:eq(5)").html().trim() != "") {
-              $("#slaChart").jHueBlueprint("add", getOptions($(rows[i]).find("td:eq(5)").html(), (i == 0 ? "${_('Expected Start')}" : null), $.jHueBlueprint.COLORS.BLUE));
-            }
-            if ($(rows[i]).find("td:eq(6)").html().trim() != "") {
-              $("#slaChart").jHueBlueprint("add", getOptions($(rows[i]).find("td:eq(6)").html(), (i == 0 ? "${_('Actual Start')}" : null), $.jHueBlueprint.COLORS.GREEN));
-            }
-            if ($(rows[i]).find("td:eq(7)").html().trim() != "") {
-              $("#slaChart").jHueBlueprint("add", getOptions($(rows[i]).find("td:eq(7)").html(), (i == 0 ? "${_('Expected End')}" : null), $.jHueBlueprint.COLORS.FALAFEL));
-            }
-            if ($(rows[i]).find("td:eq(8)").html().trim() != "") {
-              $("#slaChart").jHueBlueprint("add", getOptions($(rows[i]).find("td:eq(8)").html(), (i == 0 ? "${_('Actual End')}" : null), $.jHueBlueprint.COLORS.TURQUOISE));
-            }
-            $("#yAxisLabel").removeClass("hide");
-          }
+          updateSLAChart(slaTable, CHART_LABELS);
         }, 300)
       }
     });
+
+    if (window.location.hash != "") {
+      $("input[name='job_name']").val(window.location.hash.substr(1));
+      performSearch(window.location.hash.substr(1));
+    }
   });
 </script>
 
