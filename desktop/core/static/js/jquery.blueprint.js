@@ -44,6 +44,7 @@
         height: 200,
         borderWidth: 0,
         tooltips: true,
+        tooltipAddon: "",
         enableSelection: false,
         isDateTime: false,
         timeFormat: null,
@@ -181,7 +182,7 @@
               x = item.series.data[item.dataIndex][0];
             }
 
-            showTooltip(item.pageX, item.pageY, "X: "+(_this.options.xTooltipFormatter?_this.options.xTooltipFormatter(x):x)+", Y: "+(_this.options.yTooltipFormatter?_this.options.yTooltipFormatter(y):y));
+            showTooltip(item.pageX, item.pageY, "X: " + (_this.options.xTooltipFormatter ? _this.options.xTooltipFormatter(x) : x) + ", Y: " + (_this.options.yTooltipFormatter ? _this.options.yTooltipFormatter(y) : y) + (_this.options.tooltipAddon != "" ? ", " + _this.options.tooltipAddon : ""));
           }
         } else {
           $("#jHueBlueprintTooltip").remove();
