@@ -43,7 +43,7 @@ function BeeswaxViewModel(server) {
       'errors': [],
       'save': {
         'errors': null,
-        'type': 'table',
+        'type': 'hive-table',
         'path': null
       }
     },
@@ -649,6 +649,8 @@ function BeeswaxViewModel(server) {
     var self = this;
     if (self.design.id()) {
       var data = {
+        'database': self.database(),
+        'server': self.server(),
         'type': self.design.results.save.type(),
         'path': self.design.results.save.path()
       };
@@ -665,11 +667,11 @@ function BeeswaxViewModel(server) {
               self.design.watch.url(data.watch_url);
               self.design.watch.logs.removeAll();
               self.watchQueryLoop(function() {
-                window.location.href = "/filebrowser/view" + data.path;
+                window.location.href = data.success_url;
               });
             } else {
               // redirect to metastore app.
-              window.location.href = "/metastore";
+              window.location.href = data.success_url;
             }
             $(document).trigger('saved.results', data);
           } else {
