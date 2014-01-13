@@ -181,7 +181,7 @@ def explain_query(request):
 
     if form.is_valid():
       query = SQLdesign(form, query_type=query_type)
-      query_server = dbms.get_query_server_config(app_name)
+      query_server = dbms.get_query_server_config(request.POST.get('server'))
       db = dbms.get(request.user, query_server)
 
       try:
