@@ -652,6 +652,14 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
       }
     }
   })());
+  viewModel.query.errors.subscribe(function() {
+    // Ensure table headers are in right place when query errors exist.
+    $(".resultTable").jHueTableExtender({
+      hintElement: "#jumpToColumnAlert",
+      fixedHeader: true,
+      firstColumnTooltip: true
+    });
+  });
   ko.applyBindings(viewModel);
 
   function resetNavigator() {
