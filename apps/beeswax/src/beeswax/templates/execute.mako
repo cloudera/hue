@@ -1165,6 +1165,8 @@ $(document).one('fetched.design', function () {
     },
     emptytext: "${ _('Empty description') }"
   });
+
+  $(".pathChooser:not(:has(~ button))").after(getFileBrowseButton($(".pathChooser:not(:has(~ button))")));
 });
 
 
@@ -1649,7 +1651,6 @@ function updateSidebarTooltips(selector) {
 }
 
 $(document).ready(function () {
-  $(".pathChooser:not(:has(~ button))").after(getFileBrowseButton($(".pathChooser:not(:has(~ button))")));
 
   $("*[rel=tooltip]").tooltip({
     placement: 'bottom'
