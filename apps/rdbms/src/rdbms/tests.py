@@ -131,6 +131,16 @@ class TestAPI(TestSQLiteRdbmsBase):
     response_dict = json.loads(response.content)
     assert_equal(1, len(response_dict['results']['rows']), response_dict)
 
+  def test_explain_query(self):
+    data = {
+      'server': 'sqlitee',
+      'database': self.database,
+      'query': 'SELECT * FROM test1'
+    }
+    response = self.client.post(reverse('rdbms:api_explain_query'), data, follow=True)
+    response_dict = json.loads(response.content)
+    assert_true(len(response_dict['results']['rows']) > 0, response_dict)
+
   def test_options(self):
     finish = rdbms_conf.DATABASES['sqlitee'].OPTIONS.set_for_testing({'nonsensical': None})
     try:

@@ -76,7 +76,7 @@ class BaseRDMSClient(object):
 
   def explain(self, query):
     q = query.get_query_statement(0)
-    if q[:8].upper().startswith('EXPLAIN'):
+    if q.upper().startswith('EXPLAIN'):
       return self.execute_statement(q)
     else:
       return self.execute_statement('EXPLAIN ' + q)
