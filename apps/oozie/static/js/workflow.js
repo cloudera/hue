@@ -153,12 +153,12 @@ $.extend(ForkNode.prototype, Node.prototype, {
       id: IdGeneratorTable['decisionend'].nextId(),
       node_type: 'decisionend',
       workflow: self.workflow(),
-      child_links: join.model.child_links
+      child_links: ko.mapping.toJS(join.child_links())
     });
-    var decision_end_node = new Node(self._workflow, decision_end_model, self.registry);
     $.each(decision_end_model.child_links, function(index, link) {
       link.parent = decision_end_model.id;
     });
+    var decision_end_node = new Node(self._workflow, decision_end_model, self.registry);
     var parents = join.findParents();
     $.each(parents, function(index, parent) {
       parent.replaceChild(join, decision_end_node);
