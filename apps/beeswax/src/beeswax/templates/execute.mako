@@ -264,10 +264,10 @@ ${layout.menubar(section='query')}
       <a id="save-results" data-bind="click: saveResultsModal" href="javascript:void(0)" title="${_('Save the results to HDFS or a new Hive table')}" rel="tooltip"
         class="view-query-results hide pull-right"><h4 style="margin-right: 20px"><i class="fa fa-save"></i></h4></a>
 
-      <a id="download-csv" data-bind="attr: {'href': '/beeswax/download/' + $root.design.id() + '/csv'}" href="javascript:void(0)" title="${_('Download the results in CSV format')}" rel="tooltip"
+      <a id="download-csv" data-bind="attr: {'href': '/beeswax/download/' + $root.design.history.id() + '/csv'}" href="javascript:void(0)" title="${_('Download the results in CSV format')}" rel="tooltip"
         class="view-query-results hide pull-right"><h4 style="margin-right: 20px"><i class="fa fa-arrow-circle-o-down"></i></h4></a>
 
-      <a id="download-excel" data-bind="attr: {'href': '/beeswax/download/' + $root.design.id() + '/xls'}" href="javascript:void(0)" title="${_('Download the results for excel')}" rel="tooltip"
+      <a id="download-excel" data-bind="attr: {'href': '/beeswax/download/' + $root.design.history.id() + '/xls'}" href="javascript:void(0)" title="${_('Download the results for excel')}" rel="tooltip"
         class="view-query-results hide pull-right"><h4 style="margin-right: 20px"><i class="fa fa-arrow-circle-o-down"></i></h4></a>
    </div>
 

@@ -414,6 +414,7 @@ function BeeswaxViewModel(server) {
           self.design.results.url('/' + self.server() + '/results/' + data.id + '/0?format=json');
           self.design.watch.url(data.watch_url);
           self.design.statement(data.statement);
+          self.design.history.id(data.id);
           self.watchQueryLoop();
         } else {
           self.design.errors.push(data.message);
@@ -651,7 +652,7 @@ function BeeswaxViewModel(server) {
         'type': self.design.results.save.type(),
         'path': self.design.results.save.path()
       };
-      var url = '/' + self.server() + '/api/query/' + self.design.id() + '/results/save';
+      var url = '/' + self.server() + '/api/query/' + self.design.history.id() + '/results/save';
       var request = {
         url: url,
         dataType: 'json',
