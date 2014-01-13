@@ -404,8 +404,12 @@ function BeeswaxViewModel(server) {
     $.extend(data, self.getFunctionsFormData());
     $.extend(data, self.getParametersFormData());
     $.extend(data, self.getOtherData());
+    var url = '/' + self.server() + '/api/query/execute/';
+    if (self.design.id() > -1) {
+      url += self.design.id();
+    }
     var request = {
-      url: '/' + self.server() + '/api/query/execute/',
+      url: url,
       dataType: 'json',
       type: 'POST',
       success: function(data) {
