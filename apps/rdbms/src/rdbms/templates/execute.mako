@@ -659,6 +659,8 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
       fixedHeader: true,
       firstColumnTooltip: true
     });
+
+    $("#executeQuery").button("reset");
   });
   ko.applyBindings(viewModel);
 
