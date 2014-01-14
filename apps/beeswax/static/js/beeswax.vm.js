@@ -276,7 +276,7 @@ function BeeswaxViewModel(server) {
     }
   };
 
-  var advancedParameterErrorHandling = function(advanced_parameter, key) {
+  var advancedErrorHandling = function(advanced_parameter, key) {
     return function(index) {
       var errors = self.design[advanced_parameter].errors();
       if (errors && errors[index]) {
@@ -291,14 +291,16 @@ function BeeswaxViewModel(server) {
     };
   };
 
-  self.getSettingKeyErrors = advancedParameterErrorHandling('settings', 'key');
-  self.getSettingValueErrors = advancedParameterErrorHandling('settings', 'value');
+  self.getQueryErrors = advancedErrorHandling('query', 'query');
 
-  self.getFileResourceTypeErrors = advancedParameterErrorHandling('fileResources', 'type');
-  self.getFileResourcePathErrors = advancedParameterErrorHandling('fileResources', 'path');
+  self.getSettingKeyErrors = advancedErrorHandling('settings', 'key');
+  self.getSettingValueErrors = advancedErrorHandling('settings', 'value');
 
-  self.getFunctionNameErrors = advancedParameterErrorHandling('functions', 'name');
-  self.getFunctionClassNameErrors = advancedParameterErrorHandling('functions', 'class_name');
+  self.getFileResourceTypeErrors = advancedErrorHandling('fileResources', 'type');
+  self.getFileResourcePathErrors = advancedErrorHandling('fileResources', 'path');
+
+  self.getFunctionNameErrors = advancedErrorHandling('functions', 'name');
+  self.getFunctionClassNameErrors = advancedErrorHandling('functions', 'class_name');
 
   function getMultiFormData(prefix, arr, members) {
     var data = {};
@@ -793,9 +795,28 @@ function getFileBrowseButton(inputElement) {
         inputElement.trigger("change");
         $("#chooseFile").modal("hide");
       },
+      selectFolder: false,
       createFolder: false
     });
     $("#chooseFile").modal("show");
+  });
+}
+
+function getFileAndFolderBrowseButton(inputElement) {
+  return $("<button>").addClass("btn").addClass("fileChooserBtn").text("..").click(function (e) {
+    e.preventDefault();
+    $("#folderchooser").jHueFileChooser({
+      initialPath: inputElement.val(),
+      onFolderChoose:function (folderPath) {
+        inputElement.val(folderPath);
+        inputElement.trigger("change");
+        $("#chooseFolder").modal("hide");
+      },
+      selectFolder: true,
+      createFolder: false,
+      uploadFile:false
+    });
+    $("#chooseFolder").modal("show");
   });
 }
 

@@ -87,7 +87,7 @@ ${layout.menubar(section='query')}
 
             <div data-bind="css: {'error': $root.getFileResourcePathErrors($index()).length > 0}" class="control-group">
               <label>${_('Path')}</label>
-              <input data-bind="value: path" type="text" class="filesField span7 pathChooser" placeholder="/user/foo/udf.jar"/>
+              <input data-bind="value: path" type="text" class="filesField span7 fileChooser" placeholder="/user/foo/udf.jar"/>
             </div>
           </div>
           <!-- /ko -->
@@ -216,10 +216,10 @@ ${layout.menubar(section='query')}
         <div id="queryPane">
 
           <div data-bind="css: {'hide': design.query.errors().length == 0}" class="hide alert alert-error">
-            <!-- ko if: design.query.errors().length > 0 -->
+            <!-- ko if: $root.getQueryErrors().length > 0 -->
             <p><strong>${_('Please provide a query')}</strong></p>
             <!-- /ko -->
-            <!-- ko if: design.query.errors().length == 0 -->
+            <!-- ko if: $root.getQueryErrors().length == 0 -->
             <p><strong>${_('Your query has the following error(s):')}</strong></p>
 
             <div>
@@ -493,6 +493,20 @@ ${layout.menubar(section='query')}
   </div>
 </div>
 
+<div id="chooseFolder" class="modal hide fade">
+  <div class="modal-header">
+    <a href="#" class="close" data-dismiss="modal">&times;</a>
+
+    <h3>${_('Choose an empty folder')}</h3>
+  </div>
+  <div class="modal-body">
+    <div id="folderchooser">
+    </div>
+  </div>
+  <div class="modal-footer">
+  </div>
+</div>
+
 
 <div id="saveAs" class="modal hide fade">
   <div class="modal-header">
@@ -619,7 +633,11 @@ ${layout.menubar(section='query')}
     margin-bottom: 5px;
   }
 
-  #filechooser {
+  #chooseFile, #chooseFolder {
+    z-index: 1100;
+  }
+
+  #filechooser, #folderchooser {
     min-height: 100px;
     overflow-y: auto;
   }
@@ -1168,7 +1186,7 @@ $(document).one('fetched.design', function () {
     emptytext: "${ _('Empty description') }"
   });
 
-  $(".pathChooser:not(:has(~ button))").after(getFileBrowseButton($(".pathChooser:not(:has(~ button))")));
+  $(".fileChooser:not(:has(~ button))").after(getFileBrowseButton($(".fileChooser:not(:has(~ button))")));
 });
 
 
@@ -1746,6 +1764,8 @@ $(document).ready(function () {
   % endif
 });
 
+$(".pathChooser:not(:has(~ button))").after(getFileAndFolderBrowseButton($(".pathChooser:not(:has(~ button))"), true));
+
 
 // Routie
 $(document).ready(function () {
@@ -1959,7 +1979,7 @@ if (viewModel.design.id() > 0 || viewModel.design.history.id() > 0) {
 }
 viewModel.design.fileResources.values.subscribe(function() {
   // File chooser button for file resources.
-  $(".pathChooser:not(:has(~ button))").after(getFileBrowseButton($(".pathChooser:not(:has(~ button))")));
+  $(".fileChooser:not(:has(~ button))").after(getFileBrowseButton($(".fileChooser:not(:has(~ button))")));
 });
 viewModel.fetchDatabases();
 ko.applyBindings(viewModel);
