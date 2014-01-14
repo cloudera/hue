@@ -57,7 +57,7 @@ def format_dict_field_values(dictionary):
 
 def model_to_dict(model):
   from django.db import models
-  from oozie.models import Node
+
   dictionary = {}
   for field in model._meta.fields:
     try:
