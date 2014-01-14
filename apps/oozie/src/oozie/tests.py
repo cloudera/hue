@@ -390,7 +390,7 @@ class TestAPI(OozieMockBase):
 
     # Change property and save
     workflow_dict = workflow_to_dict(self.wf)
-    workflow_dict['description'] = 'test'
+    workflow_dict['description'] = 'Le workflow est testé. 한국어/조선말'
     workflow_json = json.dumps(workflow_dict)
 
     response = self.c.post(reverse('oozie:workflow_save', kwargs={'workflow': self.wf.pk}), data={'workflow': workflow_json})
@@ -399,7 +399,7 @@ class TestAPI(OozieMockBase):
     assert_equal(0, test_response_json_object['status'])
 
     wf = Workflow.objects.get(id=self.wf.id)
-    assert_equal('test', wf.description)
+    assert_equal(u'Le workflow est testé. 한국어/조선말', wf.description)
     assert_equal(self.wf.name, wf.name)
 
     # Change node and save
