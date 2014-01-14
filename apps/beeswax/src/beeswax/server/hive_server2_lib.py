@@ -59,7 +59,7 @@ class HiveServerTable(Table):
 
   @property
   def is_view(self):
-    return HiveServerTRow(self.table, self.table_schema).col('TABLE_TYPE') == 'VIRTUAL_VIEW'
+    return HiveServerTRow(self.table, self.table_schema).col('TABLE_TYPE') == 'VIEW' # Used to be VIRTUAL_VIEW
 
   @property
   def partition_keys(self):

@@ -37,7 +37,6 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
 from desktop.lib.django_test_util import make_logged_in_client, assert_equal_mod_whitespace
-from desktop.lib.django_test_util import assert_similar_pages
 from desktop.lib.test_utils import grant_access, add_to_group
 from desktop.lib.security_util import get_localhost_name
 
@@ -769,9 +768,13 @@ for x in sys.stdin:
         'path': target_dir
       }
       resp = self.client.post('/beeswax/api/query/%s/results/save' % qid, save_data, follow=True)
-      context = json.loads(resp.content)
-      resp = self.client.get(context['watch_url'], follow=True)
-      resp = wait_for_query_to_finish(self.client, resp, max=60)
+      content = json.loads(resp.content)
+
+      if content['status'] == 0:
+        success_url = content['success_url']
+        resp = self.client.get(content['watch_url'], follow=True)
+        resp = wait_for_query_to_finish(self.client, resp, max=60)
+        resp.success_url = success_url # Hack until better API
 
       # Check that data is right
       if verify:
@@ -785,6 +788,7 @@ for x in sys.stdin:
 
         assert_equal(256, len(data_buf.strip().split('\n')))
         assert_true('255' in data_buf)
+
       return resp
 
     TARGET_DIR_ROOT = '/tmp/beeswax.test_save_results'
@@ -802,6 +806,7 @@ for x in sys.stdin:
     hql = "SELECT * FROM test"
     resp = _make_query(self.client, hql, wait=True, local=False, max=180.0)
     resp = save_and_verify(resp, TARGET_DIR_ROOT + '/1', verify=False)
+    resp = self.client.get(resp.success_url)
     # Success and went to FB
     assert_true('File Browser' in resp.content, resp.content)
 
@@ -809,12 +814,14 @@ for x in sys.stdin:
     hql = "SELECT foo, bar FROM test"
     resp = _make_query(self.client, hql, wait=True, local=False, max=180.0)
     resp = save_and_verify(resp, TARGET_DIR_ROOT + '/2')
+    resp = self.client.get(resp.success_url)
     assert_true('File Browser' in resp.content, resp.content)
 
     # Partition tables
     hql = "SELECT * FROM test_partitions"
     resp = _make_query(self.client, hql, wait=True, local=False, max=180.0)
     resp = save_and_verify(resp, TARGET_DIR_ROOT + '/3', verify=False)
+    resp = self.client.get(resp.success_url)
     assert_true('File Browser' in resp.content, resp.content)
 
 
@@ -829,15 +836,15 @@ for x in sys.stdin:
         'path': target_tbl
       }
       resp = self.client.post('/beeswax/api/query/%s/results/save' % qid, save_data, follow=True)
-      context = json.loads(resp.content)
-      resp = self.client.get(context['watch_url'], follow=True)
+      content = json.loads(resp.content)
+      resp = self.client.get(content['watch_url'], follow=True)
       wait_for_query_to_finish(self.client, resp, max=120)
 
       # Check that data is right. The SELECT may not give us the whole table.
       resp = _make_query(self.client, 'SELECT * FROM %s' % target_tbl, wait=True, local=False)
-      resp = fetch_query_result_data(self.client, resp)
+      content = fetch_query_result_data(self.client, resp)
       for i in xrange(90):
-        assert_equal([i, '0x%x' % (i,)], context['results'][i])
+        assert_equal([i, '0x%x' % (i,)], content['results'][i])
 
     TARGET_TBL_ROOT = 'test_copy'
 
@@ -1133,18 +1140,47 @@ for x in sys.stdin:
       'cols-2-column_type': 'string',
       'cols-next_form_id': '3',
     }, follow=True)
-    resp = self.client.get(reverse("beeswax:api_watch_query_refresh_json", kwargs={'id': resp.context['query'].id}), follow=True)
-    resp = wait_for_query_to_finish(self.client, resp, max=180.0)
+
+    #
+    # Little nightmare here:
+    # We have a POST (create table) with a redirect (load data) of redirect (show table)
+    #
+    assert_equal(resp.context['action'], 'watch-redirect')
+    on_success_url_load_data = resp.context['on_success_url']
+    assert_true('auto_load' in on_success_url_load_data, on_success_url_load_data)
+    query_history = resp.context['query_history']
+
+    resp = self.client.get(reverse('beeswax:api_fetch_query_history', kwargs={'query_history_id': query_history.id}), follow=True)
+    content = json.loads(resp.content)
+    watch_url = content['query_history']['watch_url']
+
+    class MockResponse():
+      def __init__(self, content):
+        self.content = json.dumps(content)
+
+    # Wait for CREATE TABLE to finis
+    resp = wait_for_query_to_finish(self.client, MockResponse({'status': 'ok', 'watch_url': watch_url}), max=180.0)
+
+    # Get URL that will load the data into the table. Also get the URL that will show the table in metastore app.
+    resp = self.client.get(on_success_url_load_data, follow=True)
+    assert_equal(resp.context['action'], 'watch-redirect')
+    on_success_url_show_table = resp.context['on_success_url']
+    assert_true('/metastore/table/' in on_success_url_show_table, on_success_url_show_table)
+    query_history = resp.context['query_history']
+
+    # Wait for load data to finish
+    resp = wait_for_query_to_finish(self.client, MockResponse({'status': 'ok', 'watch_url': watch_url}), max=180.0)
 
     # Check data is in the table (by describing it)
-    resp = self.client.get('/metastore/table/default/test_create_import')
+    resp = self.client.get(on_success_url_show_table)
     cols = resp.context['table'].cols
     assert_equal(len(cols), 3)
     assert_equal([ col.name for col in cols ], [ 'col_a', 'col_b', 'col_c' ])
+    assert_equal([['ta\tb', 'nada', 'sp ace'], ['f\too', 'bar', 'fred'], ['a\ta', 'bb', 'cc']], resp.context['sample'])
     assert_true("nada" in resp.content, resp.content)
     assert_true("sp ace" in resp.content, resp.content)
 
-    # Test table creation and data loading
+    # Test table creation and data loading and removing header
     resp = self.client.post('/beeswax/create/import_wizard/default', {
       'submit_create': 'on',
       'path': '/tmp/comma.csv',
@@ -1165,11 +1201,34 @@ for x in sys.stdin:
       'cols-next_form_id': '3',
       'removeHeader': 'on'
     }, follow=True)
-    resp = self.client.get(reverse("beeswax:api_watch_query_refresh_json", kwargs={'id': resp.context['query'].id}), follow=True)
-    resp = wait_for_query_to_finish(self.client, resp, max=180.0)
+
+    # We have a POST (create table) with a redirect (load data) of redirect (show table)
+    assert_equal(resp.context['action'], 'watch-redirect')
+    on_success_url_load_data = resp.context['on_success_url']
+    assert_true('auto_load' in on_success_url_load_data, on_success_url_load_data)
+    query_history = resp.context['query_history']
+
+    resp = self.client.get(reverse('beeswax:api_fetch_query_history', kwargs={'query_history_id': query_history.id}), follow=True)
+    content = json.loads(resp.content)
+    watch_url = content['query_history']['watch_url']
+
+    # Wait for CREATE TABLE to finis
+    resp = wait_for_query_to_finish(self.client, MockResponse({'status': 'ok', 'watch_url': watch_url}), max=180.0)
+
+    # Get URL that will load the data into the table. Also get the URL that will show the table in metastore app.
+    resp = self.client.get(on_success_url_load_data, follow=True)
+    assert_equal(resp.context['action'], 'watch-redirect')
+    on_success_url_show_table = resp.context['on_success_url']
+    assert_true('/metastore/table/' in on_success_url_show_table, on_success_url_show_table)
+    query_history = resp.context['query_history']
+
+    # Wait for load data to finish
+    resp = wait_for_query_to_finish(self.client, MockResponse({'status': 'ok', 'watch_url': watch_url}), max=180.0)
 
     # Check data is in the table (by describing it)
-    resp = self.client.get('/metastore/table/default/test_create_import_with_header')
+    resp = self.client.get(on_success_url_show_table)
+
+    # Check data is in the table (by describing it)
     cols = resp.context['table'].cols
     assert_equal(len(cols), 3)
     assert_equal([ col.name for col in cols ], [ 'col_a', 'col_b', 'col_c' ])
