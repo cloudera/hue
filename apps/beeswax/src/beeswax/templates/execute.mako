@@ -1137,11 +1137,6 @@ $(document).ready(function () {
   codeMirror.on("blur", function () {
     $(document.body).off("contextmenu");
   });
-
-  codeMirror.on("change", function () {
-    $(".query").val(codeMirror.getValue());
-    $.totalStorage("${app_name}_temp_query", codeMirror.getValue());
-  });
 });
 
 
@@ -1929,6 +1924,12 @@ function watchEvents() {
   });
 }
 
+function cacheQueryTextEvents() {
+  codeMirror.on("change", function () {
+    $(".query").val(codeMirror.getValue());
+    $.totalStorage("${app_name}_temp_query", codeMirror.getValue());
+  });
+}
 
 // Knockout
 viewModel = new BeeswaxViewModel("${app_name}");
@@ -1958,14 +1959,16 @@ ko.applyBindings(viewModel);
 
 
 % if action == 'watch-results':
-  watchEvents();
+  $(document).ready(watchEvents);
   $(document).one('fetched.query', function(e) {
     viewModel.watchQueryLoop();
+    cacheQueryTextEvents();
   });
 % elif action == 'watch-redirect':
-  watchEvents();
+  $(document).ready(watchEvents);
   $(document).one('fetched.query', function(e) {
     viewModel.watchQueryLoop();
+    cacheQueryTextEvents();
   });
   $(document).on('stop_watch.query', function(e) {
     if (viewModel.design.results.errors().length == 0) {
@@ -1973,12 +1976,14 @@ ko.applyBindings(viewModel);
     }
   });
 % elif action == 'editor-results':
-  queryEvents();
+  $(document).ready(queryEvents);
   $(document).one('fetched.query', function(e) {
     viewModel.watchQueryLoop();
+    cacheQueryTextEvents();
   });
 % else:
-  queryEvents();
+  $(document).ready(queryEvents);
+  $(document).ready(cacheQueryTextEvents);
 % endif
 
 // @TODO: Stop operation
