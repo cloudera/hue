@@ -20,12 +20,24 @@ function BeeswaxViewModel(server) {
 
   var DESIGN_DEFAULTS = {
     'id': -1,
-    'query': '',
+    'query': {
+      'value': '',
+      'errors': []
+    },
     'name': null,
     'description': null,
-    'settings': [],
-    'fileResources': [],
-    'functions': [],
+    'settings': {
+      'values': [],
+      'errors': []
+    },
+    'fileResources': {
+      'values': [],
+      'errors': []
+    },
+    'functions': {
+      'values': [],
+      'errors': []
+    },
     'parameters': [],
     'isParameterized': true,
     'email': false,
@@ -109,12 +121,31 @@ function BeeswaxViewModel(server) {
     ko.mapping.fromJS(QUERY_DEFAULTS, self.design);
   };
 
+  self.resetErrors = function() {
+    self.design.errors.removeAll();
+    self.design.query.errors.removeAll();
+    self.design.settings.errors.removeAll();
+    self.design.fileResources.errors.removeAll();
+    self.design.functions.errors.removeAll();
+  };
+
+  self.setErrors = function(message, errors) {
+    self.resetErrors();
+    self.design.errors.push(message);
+    if (errors) {
+      self.design.query.errors.push.apply(self.design.query.errors, errors.query);
+      self.design.settings.errors.push.apply(self.design.settings.errors, errors.settings);
+      self.design.fileResources.errors.push.apply(self.design.fileResources.errors, errors.file_resources);
+      self.design.functions.errors.push.apply(self.design.functions.errors, errors.functions);
+    }
+  };
+
   self.updateDatabases = function(databases) {
     self.databases(databases);
   };
 
   self.updateDesign = function(design) {
-    self.design.query(design.query);
+    self.design.query.value(design.query);
     self.design.id(design.id);
     self.design.name(design.name);
     self.design.description(design.desc);
@@ -122,9 +153,9 @@ function BeeswaxViewModel(server) {
     self.design.isParameterized(design.is_parameterized);
     self.design.email(design.email_notify);
 
-    self.design.settings.removeAll();
-    self.design.fileResources.removeAll();
-    self.design.functions.removeAll();
+    self.design.settings.values.removeAll();
+    self.design.fileResources.values.removeAll();
+    self.design.functions.values.removeAll();
 
     $.each(design.settings, function(index, setting) {
       self.addSetting(setting.key, setting.value);
@@ -177,34 +208,46 @@ function BeeswaxViewModel(server) {
       'value': ko.observable(value)
     };
     obj.key.subscribe(function() {
-      self.design.settings.valueHasMutated();
+      self.design.settings.values.valueHasMutated();
     });
     obj.value.subscribe(function() {
-      self.design.settings.valueHasMutated();
+      self.design.settings.values.valueHasMutated();
     });
-    self.design.settings.push(obj);
+    self.design.settings.values.push(obj);
   };
 
   self.removeSetting = function(index) {
-    self.design.settings.splice(index, 1);
+    self.design.settings.values.splice(index, 1);
   };
 
-  self.addFileResources = function(type, path) {
+  self.addFileResource = function(type, path) {
     var obj = {
       'type': ko.observable(type),
       'path': ko.observable(path)
     };
     obj.type.subscribe(function() {
-      self.design.fileResources.valueHasMutated();
+      self.design.fileResources.values.valueHasMutated();
     });
     obj.path.subscribe(function() {
-      self.design.fileResources.valueHasMutated();
+      self.design.fileResources.values.valueHasMutated();
     });
-    self.design.fileResources.push(obj);
+    self.design.fileResources.values.push(obj);
   };
 
-  self.removeFileResources = function(index) {
-    self.design.fileResources.splice(index, 1);
+  self.removeFileResource = function(index) {
+    self.design.fileResources.values.splice(index, 1);
+  };
+
+  self.getFileResourceTypeErrors = function(index) {
+    if (self.design.settings.errors() && self.design.settings.errors()[index]) {
+      return self.design.settings.errors()[index];
+    } else {
+      return {};
+    }
+  };
+
+  self.getFileResourcePathErrors = function(index) {
+    
   };
 
   self.addFunction = function(name, class_name) {
@@ -213,17 +256,49 @@ function BeeswaxViewModel(server) {
       'class_name': ko.observable(class_name)
     };
     obj.name.subscribe(function() {
-      self.design.functions.valueHasMutated();
+      self.design.functions.values.valueHasMutated();
     });
     obj.class_name.subscribe(function() {
-      self.design.functions.valueHasMutated();
+      self.design.functions.values.valueHasMutated();
     });
-    self.design.functions.push(obj);
+    self.design.functions.values.push(obj);
   };
 
   self.removeFunction = function(index) {
-    self.design.functions.splice(index, 1);
+    self.design.functions.values.splice(index, 1);
   };
+
+  self.getFunctionErrors = function(index) {
+    if (self.design.settings.errors() && self.design.settings.errors()[index]) {
+      return self.design.settings.errors()[index];
+    } else {
+      return {};
+    }
+  };
+
+  var advancedParameterErrorHandling = function(advanced_parameter, key) {
+    return function(index) {
+      var errors = self.design[advanced_parameter].errors();
+      if (errors && errors[index]) {
+        if (key in errors[index]) {
+          return errors[index][key];
+        } else {
+          return [];
+        }
+      } else {
+        return [];
+      }
+    };
+  };
+
+  self.getSettingKeyErrors = advancedParameterErrorHandling('settings', 'key');
+  self.getSettingValueErrors = advancedParameterErrorHandling('settings', 'value');
+
+  self.getFileResourceTypeErrors = advancedParameterErrorHandling('fileResources', 'type');
+  self.getFileResourcePathErrors = advancedParameterErrorHandling('fileResources', 'path');
+
+  self.getFunctionNameErrors = advancedParameterErrorHandling('functions', 'name');
+  self.getFunctionClassNameErrors = advancedParameterErrorHandling('functions', 'class_name');
 
   function getMultiFormData(prefix, arr, members) {
     var data = {};
@@ -240,15 +315,15 @@ function BeeswaxViewModel(server) {
   }
 
   self.getSettingsFormData = function() {
-    return getMultiFormData('settings', self.design.settings(), ['key', 'value']);
+    return getMultiFormData('settings', self.design.settings.values(), ['key', 'value']);
   };
 
   self.getFileResourcesFormData = function() {
-    return getMultiFormData('file_resources', self.design.fileResources(), ['type', 'path']);
+    return getMultiFormData('file_resources', self.design.fileResources.values(), ['type', 'path']);
   };
 
   self.getFunctionsFormData = function() {
-    return getMultiFormData('functions', self.design.functions(), ['name', 'class_name']);
+    return getMultiFormData('functions', self.design.functions.values(), ['name', 'class_name']);
   };
 
   self.getParametersFormData = function() {
@@ -326,7 +401,7 @@ function BeeswaxViewModel(server) {
     $(document).trigger('fetch.parameters');
 
     var data = {
-      'query-query': self.design.query(),
+      'query-query': self.design.query.value(),
       'query-database': self.database()
     };
     $.extend(data, self.getSettingsFormData());
@@ -353,10 +428,10 @@ function BeeswaxViewModel(server) {
     self.design.explain(true);
     self.design.isRunning(true);
     self.design.isFinished(true);
-    self.design.errors.removeAll();
+    self.resetErrors();
 
     var data = {
-      'query-query': self.design.query(),
+      'query-query': self.design.query.value(),
       'query-database': self.database()
     };
     $.extend(data, self.getSettingsFormData());
@@ -369,14 +444,13 @@ function BeeswaxViewModel(server) {
       dataType: 'json',
       type: 'POST',
       success: function(data) {
-        self.design.errors.removeAll();
         if (data.status == 0) {
           self.design.watch.logs.removeAll();
           self.design.results.rows.removeAll();
           self.design.results.columns.removeAll();
           self.design.results.explanation(data.explanation);
         } else {
-          self.design.errors.push(data.message);
+          self.setErrors(data.message);
           $(document).trigger('error.query');
         }
         $(document).trigger('explained.query', data);
@@ -393,10 +467,10 @@ function BeeswaxViewModel(server) {
     self.design.explain(false);
     self.design.isRunning(true);
     self.design.isFinished(true);
-    self.design.errors.removeAll();
+    self.resetErrors();
 
     var data = {
-      'query-query': self.design.query(),
+      'query-query': self.design.query.value(),
       'query-database': self.database()
     };
     $.extend(data, self.getSettingsFormData());
@@ -421,7 +495,7 @@ function BeeswaxViewModel(server) {
           self.design.history.id(data.id);
           self.watchQueryLoop();
         } else {
-          self.design.errors.push(data.message);
+          self.setErrors(data.message, data.errors);
           self.design.isRunning(false);
           $(document).trigger('error.query');
         }
@@ -464,7 +538,7 @@ function BeeswaxViewModel(server) {
 
   self.watchQuery = function() {
     var data = {
-      'query-query': self.design.query(),
+      'query-query': self.design.query.value(),
       'query-database': self.database()
     };
     $.extend(data, self.getSettingsFormData());
@@ -572,9 +646,9 @@ function BeeswaxViewModel(server) {
 
   self.saveDesign = function() {
     var self = this;
-    if (self.design.query() && self.design.name()) {
+    if (self.design.query.value() && self.design.name()) {
       var data = {
-        'query-query': self.design.query(),
+        'query-query': self.design.query.value(),
         'query-database': self.database()
       };
       $.extend(data, self.getSettingsFormData());
