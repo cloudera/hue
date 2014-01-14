@@ -401,7 +401,7 @@ def save_results(request, query_history_id):
           response['id'] = query_history.id
           response['query'] = query_history.query
           response['path'] = target_dir
-          response['success_url'] = reverse('view', kwargs={'path': target_dir})
+          response['success_url'] = '/filebrowser/view%s' % target_dir
           response['watch_url'] = reverse(get_app_name(request) + ':api_watch_query_refresh_json', kwargs={'id': query_history.id})
         elif form.cleaned_data['save_target'] == form.SAVE_TYPE_TBL:
           query_history = db.create_table_as_a_select(request, query_history, form.cleaned_data['target_table'], result_meta)

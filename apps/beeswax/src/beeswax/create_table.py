@@ -22,6 +22,7 @@ import json
 import logging
 
 from django.core.urlresolvers import reverse
+from django.http import QueryDict
 from django.utils.translation import ugettext as _
 
 from desktop.context_processors import get_app_name
@@ -259,14 +260,14 @@ def _submit_create_and_load(request, create_hql, table_name, path, do_load, data
   """
   Submit the table creation, and setup the load to happen (if ``do_load``).
   """
-  on_success_params = {}
+  on_success_params = QueryDict('', mutable=True)
   app_name = get_app_name(request)
 
   if do_load:
     on_success_params['table'] = table_name
     on_success_params['path'] = path
     on_success_params['removeHeader'] = request.POST.get('removeHeader')
-    on_success_url = reverse(app_name + ':load_after_create', kwargs={'database': database})
+    on_success_url = reverse(app_name + ':load_after_create', kwargs={'database': database}) + '?' + on_success_params.urlencode()
   else:
     on_success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': table_name})
 

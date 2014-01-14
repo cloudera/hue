@@ -1927,8 +1927,8 @@ function watchEvents() {
 
 // Knockout
 viewModel = new BeeswaxViewModel("${app_name}");
-% if query:
-  viewModel.design.history.id(${query.id});
+% if query_history:
+  viewModel.design.history.id(${query_history.id});
   viewModel.fetchQueryHistory();
   $(document).on('fetched.query', function(e) {
     viewModel.watchQueryLoop();

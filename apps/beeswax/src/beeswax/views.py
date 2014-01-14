@@ -343,8 +343,8 @@ def execute_query(request, design_id=None, query_history_id=None):
   action = 'query'
 
   if query_history_id:
-    query = authorized_get_query_history(request, query_history_id, must_exist=True)
-    design = query.design
+    query_history = authorized_get_query_history(request, query_history_id, must_exist=True)
+    design = query_history.design
 
     if 'on_success_url' in request.GET:
       if request.GET.get('on_success_url'):
@@ -360,14 +360,16 @@ def execute_query(request, design_id=None, query_history_id=None):
     app_name = get_app_name(request)
     query_type = SavedQuery.TYPES_MAPPING[app_name]
     design = safe_get_design(request, query_type, design_id)
-    query = None
+    query_history = None
 
   context = {
     'design': design,
-    'query': query,
+    'query': query_history, # Backward
+    'query_history': query_history,
     'autocomplete_base_url': reverse(get_app_name(request) + ':api_autocomplete_databases', kwargs={}),
     'can_edit_name': design and design.id and not design.is_auto,
-    'action': action
+    'action': action,
+    'on_success_url': request.GET.get('on_success_url')
   }
 
   return render('execute.mako', request, context)
