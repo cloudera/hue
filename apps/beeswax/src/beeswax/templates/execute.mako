@@ -37,18 +37,18 @@ ${layout.menubar(section='query')}
         </li>
         <li class="nav-header">${_('settings')}</li>
         <li class="white paramContainer">
-          <!-- ko foreach: design.settings -->
+          <!-- ko foreach: design.settings.values -->
           <div class="param">
             <div class="remove">
               <button data-bind="click: $root.removeSetting.bind(this, $index())" type="button" class="btn btn-mini settingsDelete" title="${_('Delete this setting')}">x
               </button>
             </div>
-            <div class="control-group">
+            <div data-bind="css: {'error': $root.getSettingKeyErrors($index()).length > 0}" class="control-group">
               <label>${_('Key')}</label>
               <input data-bind="value: key" type="text" class="settingsField span8" autocomplete="off" placeholder="mapred.reduce.tasks"/>
             </div>
 
-            <div class="control-group">
+            <div data-bind="css: {'error': $root.getSettingValueErrors($index()).length > 0}" class="control-group">
               <label>${_('Value')}</label>
               <input data-bind="value: value" type="text" class="settingValuesField span8" placeholder="1"/>
             </div>
@@ -71,12 +71,12 @@ ${layout.menubar(section='query')}
              hide
           % endif
           ">
-          <!-- ko foreach: design.fileResources -->
+          <!-- ko foreach: design.fileResources.values -->
           <div class="param">
             <div class="remove">
-              <button data-bind="click: $root.removeFileResources.bind(this, $index())" type="button" class="btn btn-mini" title="${_('Delete this setting')}">&times;</button>
+              <button data-bind="click: $root.removeFileResource.bind(this, $index())" type="button" class="btn btn-mini" title="${_('Delete this setting')}">&times;</button>
             </div>
-            <div class="control-group">
+            <div data-bind="css: {'error': $root.getFileResourceTypeErrors($index()).length > 0}" class="control-group">
               <label>${_('Type')}</label>
               <select data-bind="value: type" class="input-small">
                 <option value="JAR">${_('jar')}</option>
@@ -85,7 +85,7 @@ ${layout.menubar(section='query')}
               </select>
             </div>
 
-            <div class="control-group">
+            <div data-bind="css: {'error': $root.getFileResourcePathErrors($index()).length > 0}" class="control-group">
               <label>${_('Path')}</label>
               <input data-bind="value: path" type="text" class="filesField span7 pathChooser" placeholder="/user/foo/udf.jar"/>
             </div>
@@ -93,7 +93,7 @@ ${layout.menubar(section='query')}
           <!-- /ko -->
 
           <div class="control-group">
-            <a data-bind="click: function() { $root.addFileResources('','') }" class="btn btn-mini paramAdd">${_('Add')}</a>
+            <a data-bind="click: function() { $root.addFileResource('','') }" class="btn btn-mini paramAdd">${_('Add')}</a>
           </div>
         </li>
         <li title="${ _('User-Defined Functions') }" class="nav-header
@@ -108,17 +108,17 @@ ${layout.menubar(section='query')}
             hide
           % endif
           ">
-          <!-- ko foreach: design.functions -->
+          <!-- ko foreach: design.functions.values -->
           <div class="param">
             <div class="remove">
               <button data-bind="click: $root.removeFunction.bind(this, $index())" type="button" class="btn btn-mini settingsDelete" title="${_('Delete this setting')}">&times;</button>
             </div>
-            <div class="control-group">
+            <div data-bind="css: {'error': $root.getFunctionNameErrors($index()).length > 0}" class="control-group">
               <label>${_('Name')}</label>
               <input data-bind="value: name" type="text" class="functionsField span8" autocomplete="off" placeholder="myFunction"/>
             </div>
 
-            <div class="control-group">
+            <div data-bind="css: {'error': $root.getFunctionClassNameErrors($index()).length > 0}" class="control-group">
               <label>${_('Class name')}</label>
               <input data-bind="value: class_name" type="text" class="classNamesField span8" placeholder="com.acme.example"/>
             </div>
@@ -215,12 +215,19 @@ ${layout.menubar(section='query')}
       <div class="tab-content">
         <div id="queryPane">
 
-          <div data-bind="css: {'hide': design.errors().length == 0}" class="hide alert alert-error">
+          <div data-bind="css: {'hide': design.query.errors().length == 0}" class="hide alert alert-error">
+            <!-- ko if: design.query.errors().length > 0 -->
+            <p><strong>${_('Please provide a query')}</strong></p>
+            <!-- /ko -->
+            <!-- ko if: design.query.errors().length == 0 -->
             <p><strong>${_('Your query has the following error(s):')}</strong></p>
 
-            <div data-bind="foreach: design.errors">
-              <p data-bind="text: $data" class="queryErrorMessage"></p>
+            <div>
+              <div data-bind="foreach: design.errors">
+                <p data-bind="text: $data" class="queryErrorMessage"></p>
+              </div>
             </div>
+            <!-- /ko -->
           </div>
 
           <div data-bind="css: {'hide': design.watch.errors().length == 0}" class="alert alert-error">
@@ -1521,7 +1528,7 @@ $(document).on('error.query', function () {
 // Save
 function trySaveDesign() {
   var query = getHighlightedQuery() || codeMirror.getValue();
-  viewModel.design.query(query);
+  viewModel.design.query.value(query);
   if (viewModel.design.id() && viewModel.design.id() != -1) {
     viewModel.saveDesign();
   }
@@ -1529,12 +1536,12 @@ function trySaveDesign() {
 
 function saveAsModal() {
   var query = getHighlightedQuery() || codeMirror.getValue();
-  viewModel.design.query(query);
+  viewModel.design.query.value(query);
   $('#saveAs').modal('show');
 }
 
 function trySaveAsDesign() {
-  if (viewModel.design.query() && viewModel.design.name()) {
+  if (viewModel.design.query.value() && viewModel.design.name()) {
     viewModel.design.id(-1);
     viewModel.saveDesign();
     $('#saveas-query-name').removeClass('error');
@@ -1564,7 +1571,7 @@ $(document).on('saved.results', function() {
 function tryExecuteQuery() {
   $(".tooltip").remove();
   var query = getHighlightedQuery() || codeMirror.getValue();
-  viewModel.design.query(query);
+  viewModel.design.query.value(query);
   if ($(".dataTables_wrapper").length > 0) { // forces results to be up
     $(".dataTables_wrapper").scrollTop(0);
   }
@@ -1586,7 +1593,7 @@ function tryExecuteParameterizedQuery() {
 function tryExplainQuery() {
   $(".tooltip").remove();
   var query = getHighlightedQuery() || codeMirror.getValue();
-  viewModel.design.query(query);
+  viewModel.design.query.value(query);
   viewModel.explainQuery();
 }
 
@@ -1945,12 +1952,12 @@ viewModel = new BeeswaxViewModel("${app_name}");
 % endif
 if (viewModel.design.id() > 0 || viewModel.design.history.id() > 0) {
   // Code mirror and ko.
-  var codeMirrorSubscription = viewModel.design.query.subscribe(function(value) {
+  var codeMirrorSubscription = viewModel.design.query.value.subscribe(function(value) {
     codeMirror.setValue(value);
     codeMirrorSubscription.dispose();
   });
 }
-viewModel.design.fileResources.subscribe(function() {
+viewModel.design.fileResources.values.subscribe(function() {
   // File chooser button for file resources.
   $(".pathChooser:not(:has(~ button))").after(getFileBrowseButton($(".pathChooser:not(:has(~ button))")));
 });

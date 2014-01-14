@@ -270,7 +270,12 @@ def execute(request, design_id=None):
         return execute_directly(request, query, design, query_server)
     else:
       response['message'] = _('There was an error with your query.')
-      response['errors'] = query_form.query.errors
+      response['errors'] = {
+        'query': [query_form.query.errors],
+        'settings': query_form.settings.errors,
+        'file_resources': query_form.file_resources.errors,
+        'functions': query_form.functions.errors,
+      }
   except RuntimeError, e:
     response['message']= str(e)
 
