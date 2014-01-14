@@ -261,8 +261,8 @@ def _clean_tablename(db, name, database='default'):
 
 
 def _clean_terminator(val):
-  if val is not None and len(val.decode('string_escape')) != 1:
-    raise forms.ValidationError(_('Terminator must be exactly one character.'))
+  if val is not None and val == '':
+    raise forms.ValidationError(_('Terminator must not be empty.'))
   return val
 
 
@@ -297,10 +297,10 @@ class CreateByImportDelimForm(forms.Form):
     delimiter = self.cleaned_data.get('delimiter')
     if delimiter.isdigit():
       try:
-        chr(int(delimiter))
+        unichr(int(delimiter))
         return int(delimiter)
       except ValueError:
-        raise forms.ValidationError(_('Delimiter value must be smaller than 256.'))
+        raise forms.ValidationError(_('Delimiter value must be smaller than 65533.'))
     if not delimiter:
       raise forms.ValidationError(_('Delimiter value is required.'))
     _clean_terminator(delimiter)
