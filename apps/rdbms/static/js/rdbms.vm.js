@@ -136,6 +136,7 @@ function RdbmsViewModel() {
   };
 
   var error_fn = function(jqXHR, status, errorThrown) {
+    self.isExecuting(false);
     try {
       $(document).trigger('server.error', $.parseJSON(jqXHR.responseText));
     } catch(e) {
@@ -232,6 +233,7 @@ function RdbmsViewModel() {
           self.isExecuting(false);
           $(document).trigger('executed.query', data);
         } else {
+          self.isExecuting(false);
           self.query.errors.push(data.message);
         }
       },
