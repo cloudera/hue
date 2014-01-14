@@ -198,7 +198,7 @@ def test_dump_config():
   grant_access("not_me", "test", "desktop")
 
   response = client_not_me.get('/dump_config')
-  assert_true("You do not have permission" in response.content, response.content)
+  assert_true("You must be a superuser" in response.content, response.content)
 
   os.environ["HUE_CONF_DIR"] = "/tmp/test_hue_conf_dir"
   resp = c.get('/dump_config')

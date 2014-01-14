@@ -316,11 +316,11 @@ class LoginAndPermissionMiddleware(object):
       # Here we trust the URL to be the real app we need to check the perms.
       app_accessed = request._desktop_app
       ui_app_accessed = get_app_name(request)
-      if app_accessed != ui_app_accessed:
+      if app_accessed != ui_app_accessed and ui_app_accessed not in ('logs', 'dump_config', 'debug'):
         app_accessed = ui_app_accessed
 
       if app_accessed and \
-          app_accessed not in ("desktop", "home") and \
+          app_accessed not in ("desktop", "home", "about") and \
           not (request.user.has_hue_permission(action="access", app=app_accessed) or
                request.user.has_hue_permission(action=access_view, app=app_accessed)):
         access_log(request, 'permission denied', level=access_log_level)

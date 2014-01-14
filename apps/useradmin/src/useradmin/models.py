@@ -104,7 +104,7 @@ class UserProfile(models.Model):
       try:
         perm = self._lookup_permission(app, action)
       except HuePermission.DoesNotExist:
-        LOG.exception("Permission object not available. Was syncdb run after installation?")
+        LOG.exception("Permission object %s - %s not available. Was syncdb run after installation?" % (app, action))
         return self.user.is_superuser
     if self.user.is_superuser:
       return True
