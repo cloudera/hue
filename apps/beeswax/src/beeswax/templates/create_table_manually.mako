@@ -158,7 +158,7 @@ ${ layout.metastore_menubar() }
                         ${comps.bootstrapLabel(table_form["field_terminator"])}
                         <div class="controls">
                             ${comps.field(table_form["field_terminator"], render_default=True)}
-                            <span  class="help-inline error-inline hide">${_('This field is required. Spaces are not allowed. Terminator must be exactly one character.')}</span>
+                            <span  class="help-inline error-inline hide">${_('This field is required. Spaces are not allowed.')}</span>
                             <span class="help-block">
                                 ${_('Enter the column delimiter. Must be a single character. Use syntax like "\\001" or "\\t" for special characters.')}
                             </span>
@@ -168,7 +168,7 @@ ${ layout.metastore_menubar() }
                         ${comps.bootstrapLabel(table_form["collection_terminator"])}
                         <div class="controls">
                             ${comps.field(table_form["collection_terminator"], render_default=True)}
-                            <span  class="help-inline error-inline hide">${_('This field is required. Spaces are not allowed. Terminator must be exactly one character.')}</span>
+                            <span  class="help-inline error-inline hide">${_('This field is required. Spaces are not allowed.')}</span>
                             <span class="help-block">
                                 ${_('Use for array types.')}
                             </span>
@@ -178,7 +178,7 @@ ${ layout.metastore_menubar() }
                         ${comps.bootstrapLabel(table_form["map_key_terminator"])}
                         <div class="controls">
                             ${comps.field(table_form["map_key_terminator"], render_default=True)}
-                            <span  class="help-inline error-inline hide">${_('This field is required. Spaces are not allowed. Terminator must be exactly one character.')}</span>
+                            <span  class="help-inline error-inline hide">${_('This field is required. Spaces are not allowed.')}</span>
                             <span class="help-block">
                                 ${_('Use for map types.')}
                             </span>
@@ -683,7 +683,7 @@ $(document).ready(function () {
     // step 3
     var step3Valid = true;
     var fieldTerminatorFld = $("#id_table-field_terminator_1");
-    if ($("#id_table-field_terminator_0").val() == "__other__" && (!isValid($.trim(fieldTerminatorFld.val())) || $.trim(fieldTerminatorFld.val()).length != 1)) {
+    if ($("#id_table-field_terminator_0").val() == "__other__" && ! isValid($.trim(fieldTerminatorFld.val()))) {
       showFieldError(fieldTerminatorFld);
       step3Valid = false;
     }
@@ -692,7 +692,7 @@ $(document).ready(function () {
     }
 
     var collectionTerminatorFld = $("#id_table-collection_terminator_1");
-    if ($("#id_table-collection_terminator_0").val() == "__other__" && (!isValid($.trim(collectionTerminatorFld.val())) || $.trim(collectionTerminatorFld.val()).length != 1)) {
+    if ($("#id_table-collection_terminator_0").val() == "__other__" && ! isValid($.trim(collectionTerminatorFld.val()))) {
       showFieldError(collectionTerminatorFld);
       step3Valid = false;
     }
@@ -701,7 +701,7 @@ $(document).ready(function () {
     }
 
     var mapKeyTerminatorFld = $("#id_table-map_key_terminator_1");
-    if ($("#id_table-map_key_terminator_0").val() == "__other__" && (!isValid($.trim(mapKeyTerminatorFld.val())) || $.trim(mapKeyTerminatorFld.val()).length != 1)) {
+    if ($("#id_table-map_key_terminator_0").val() == "__other__" && ! isValid($.trim(mapKeyTerminatorFld.val()))) {
       showFieldError(mapKeyTerminatorFld);
       step3Valid = false;
     }
