@@ -1428,10 +1428,14 @@ function resultsTable(e, data) {
         reinitializeTable();
       },
       "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-        // Make sure null values are seen as NULL.
+        // Make sure null values are seen as NULL and are escaped.
+        var tmpDiv = $('<div />');
         for (var j = 0; j < aData.length; ++j) {
+          var cell = $(nRow).find('td:eq(' + j + ')');
           if (aData[j] == null) {
-            $(nRow).find('td:eq(' + j + ')').html("NULL");
+            cell.html("NULL");
+          } else {
+            cell.html(tmpDiv.text(cell.html()).html());
           }
         }
         return nRow;
