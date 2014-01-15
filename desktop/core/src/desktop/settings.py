@@ -286,7 +286,7 @@ SESSION_COOKIE_HTTPONLY = desktop.conf.SESSION.HTTP_ONLY.get()
 TEST_RUNNER = 'desktop.lib.test_runners.HueTestRunner'
 # Turn off cache middleware
 if 'test' in sys.argv:
-   CACHE_MIDDLEWARE_SECONDS = 0
+  CACHE_MIDDLEWARE_SECONDS = 0
 
 TIME_ZONE = desktop.conf.TIME_ZONE.get()
 # Desktop supports only one authentication backend.

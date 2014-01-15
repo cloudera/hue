@@ -52,6 +52,7 @@ def _read_log_conf(proc_name, log_dir):
       return proc_name
 
   log_conf = get_desktop_root('conf', 'log.conf')
+
   if not os.path.isfile(log_conf):
     return None
 
@@ -159,7 +160,7 @@ def basic_logging(proc_name, log_dir=None):
 def fancy_logging():
   """Configure logging into a buffer for /logs endpoint."""
   from log_buffer import FixedBufferHandler
-  BUFFER_SIZE = 10*1024*1024 # This is the size in characters, not bytes
+  BUFFER_SIZE = 10 * 1024 * 1024 # This is the size in characters, not bytes
   buffer_handler = FixedBufferHandler(BUFFER_SIZE)
   formatter = logging.Formatter(LOG_FORMAT, DATE_FORMAT)
   # We always want to catch all messages in our error report buffer
