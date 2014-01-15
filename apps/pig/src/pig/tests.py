@@ -130,6 +130,10 @@ class TestMock(TestPigBase):
     pig_script = self.create_script()
     assert_equal('Test', pig_script.dict['name'])
 
+  def test_editor_view(self):
+    response = self.c.get(reverse('pig:app'))
+    assert_true('Unsaved script' in response.content)
+
   def test_save(self):
     attrs = {'user': self.user,}
     attrs.update(TestPigBase.SCRIPT_ATTRS)

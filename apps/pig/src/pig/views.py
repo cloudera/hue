@@ -42,7 +42,7 @@ LOG = logging.getLogger(__name__)
 
 def app(request):
   return render('app.mako', request, {
-    'autocomplete_base_url': reverse('beeswax:api_autocomplete', kwargs={}),
+    'autocomplete_base_url': reverse('beeswax:api_autocomplete_databases', kwargs={}),
   })
 
 
