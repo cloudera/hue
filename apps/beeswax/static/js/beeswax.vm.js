@@ -702,7 +702,7 @@ function BeeswaxViewModel(server) {
     var self = this;
     if (self.design.id()) {
       var data = {};
-      var url = '/' + self.server() + '/api/query/' + self.design.id() + '/close';
+      var url = '/' + self.server() + '/api/query/' + self.design.history.id() + '/close';
       var request = {
         url: url,
         dataType: 'json',
