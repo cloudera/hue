@@ -270,9 +270,13 @@ class BundleAction(Action):
 
 
 class Job(object):
-  RUNNING_STATUSES = set(['PREP', 'RUNNING', 'SUSPENDED', # Workflow
-                          'RUNNING', 'PREPSUSPENDED', 'SUSPENDED', 'PREPPAUSED', 'PAUSED' # Coordinator
-                          ])
+  RUNNING_STATUSES = set([
+     'PREP', 'RUNNING', 'SUSPENDED', # Workflow
+     'RUNNING', 'PREPSUSPENDED', 'SUSPENDED', 'PREPPAUSED', 'PAUSED' # Coordinator
+    ]
+  )
+  MAX_LOG_SIZE = 3500 * 20 # 20 pages
+
   """
   Accessing log and definition will trigger Oozie API calls.
   """
@@ -311,7 +315,7 @@ class Job(object):
     """Get the log lazily, trigger Oozie API call at the first access."""
     if self._log is None:
       self._log = self._api.get_job_log(self.id)
-    return self._log
+    return self._log[-Job.MAX_LOG_SIZE:]
   log = property(_get_log)
 
   def _get_definition(self):

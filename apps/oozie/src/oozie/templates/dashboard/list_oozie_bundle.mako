@@ -137,7 +137,7 @@ ${ layout.menubar(section='bundles', dashboard=True) }
       <li><a href="#definition" data-toggle="tab">${ _('Definition') }</a></li>
     </ul>
 
-    <div class="tab-content" style="padding-bottom:200px">
+    <div class="tab-content" style="min-height:200px">
       <div class="tab-pane active" id="calendar">
         <table class="table table-striped table-condensed">
           <thead>
@@ -466,8 +466,8 @@ ${ layout.menubar(section='bundles', dashboard=True) }
         $("#progress .bar").text(data.progress + "%").css("width", data.progress + "%").attr("class", "bar " + getStatusClass(data.status, "bar-"));
 
         var _logsEl = $("#log pre");
-        var newLines = data.log.split("\n").slice(_logsEl.text().split("\n").length);
-        _logsEl.text(_logsEl.text() + newLines.join("\n"));
+        _logsEl.text(data.log);
+
         if (logsAtEnd) {
           _logsEl.scrollTop(_logsEl[0].scrollHeight - _logsEl.height());
         }
@@ -475,7 +475,7 @@ ${ layout.menubar(section='bundles', dashboard=True) }
         if (data.status != "RUNNING" && data.status != "PREP"){
           return;
         }
-        window.setTimeout(refreshView, 1000);
+        window.setTimeout(refreshView, 20000);
       });
     }
 
