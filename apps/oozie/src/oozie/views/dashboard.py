@@ -46,7 +46,7 @@ from oozie.settings import DJANGO_APPS
 
 
 LOG = logging.getLogger(__name__)
-
+MAX_COORD_ACTIONS = 250
 
 """
 Permissions:
@@ -245,7 +245,13 @@ def list_oozie_coordinator(request, job_id, bundle_job_id=None):
   if bundle_job_id is not None:
     oozie_bundle = check_job_access_permission(request, bundle_job_id)
 
+  show_all_actions =request.GET.get('show_all_actions') == 'true'
+
   if request.GET.get('format') == 'json':
+    actions = massaged_coordinator_actions_for_json(oozie_coordinator, oozie_bundle)
+    if not show_all_actions:
+      actions = actions[:MAX_COORD_ACTIONS]
+
     return_obj = {
       'id': oozie_coordinator.id,
       'status':  oozie_coordinator.status,
@@ -253,7 +259,8 @@ def list_oozie_coordinator(request, job_id, bundle_job_id=None):
       'nextTime': format_time(oozie_coordinator.nextMaterializedTime),
       'endTime': format_time(oozie_coordinator.endTime),
       'log': oozie_coordinator.log,
-      'actions': massaged_coordinator_actions_for_json(oozie_coordinator, oozie_bundle)
+      'actions': actions,
+      'show_all_actions': show_all_actions
     }
     return HttpResponse(encode_json_for_js(return_obj), mimetype="application/json")
 
@@ -271,6 +278,8 @@ def list_oozie_coordinator(request, job_id, bundle_job_id=None):
     'coordinator': coordinator,
     'oozie_bundle': oozie_bundle,
     'has_job_edition_permission': has_job_edition_permission,
+    'show_all_actions': show_all_actions,
+    'MAX_COORD_ACTIONS': MAX_COORD_ACTIONS
   })
 
 

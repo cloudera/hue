@@ -144,7 +144,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
       % endif
     </ul>
 
-    <div class="tab-content" style="padding-bottom:200px">
+    <div class="tab-content" style="min-height:200px">
       <div class="tab-pane active" id="calendar">
         <table class="table table-striped table-condensed">
           <thead>
@@ -156,6 +156,15 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
           <tbody data-bind="template: {name: 'calendarTemplate', foreach: actions}">
           </tbody>
           <tfoot>
+            <tr>
+              <td data-bind="visible: !isLoading() && paginate()" colspan="10">
+                </br>
+                <div class="alert">
+                  ${ _('There are older actions to be shown:') }
+                  <a class="btn" href="${ oozie_coordinator.get_absolute_url() }?show_all_actions=true">${ _('Expand') }</a>
+                </div>
+              </td>
+            </tr>
             <tr data-bind="visible: isLoading()">
               <td colspan="2" class="left">
                 <img src="/static/art/spinner.gif" />
@@ -401,6 +410,9 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
     self.actions = ko.observableArray(ko.utils.arrayMap(actions), function (action) {
       return new Action(action);
     });
+    self.paginate = ko.computed(function(){
+      return self.actions().length >= ${ MAX_COORD_ACTIONS } && ${ "false" if show_all_actions else 'true' | n,unicode };
+    });
   };
 
   var viewModel = new RunningCoordinatorActionsModel([]);
@@ -526,7 +538,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
     var logsAtEnd = true;
 
     function refreshView() {
-      $.getJSON("${ oozie_coordinator.get_absolute_url(oozie_bundle) }" + "?format=json", function (data) {
+      $.getJSON("${ oozie_coordinator.get_absolute_url(oozie_bundle) }" + "?format=json" + "${ "&show_all_actions=true" if show_all_actions else '' | n,unicode }", function (data) {
         viewModel.isLoading(false);
         if (data.actions){
           viewModel.actions(ko.utils.arrayMap(data.actions, function (action) {
@@ -560,15 +572,15 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
         $("#progress .bar").text(data.progress + "%").css("width", data.progress + "%").attr("class", "bar " + getStatusClass(data.status, "bar-"));
 
         var _logsEl = $("#log pre");
-        var newLines = data.log.split("\n").slice(_logsEl.text().split("\n").length);
-        _logsEl.text(_logsEl.text() + newLines.join("\n"));
+        _logsEl.text(data.log);
+
         if (logsAtEnd) {
           _logsEl.scrollTop(_logsEl[0].scrollHeight - _logsEl.height());
         }
         if (data.status != "RUNNING" && data.status != "PREP"){
           return;
         }
-        window.setTimeout(refreshView, 1000);
+        window.setTimeout(refreshView, 20000);
       });
     }
 

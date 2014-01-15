@@ -412,7 +412,7 @@ ${layout.menubar(section='coordinators', dashboard=True)}
         }
         numRunning = data.length;
 
-        window.setTimeout(refreshRunning, 1000);
+        window.setTimeout(refreshRunning, 20000);
       });
     }
 

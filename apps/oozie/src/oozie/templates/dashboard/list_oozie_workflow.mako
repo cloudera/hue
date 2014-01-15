@@ -619,8 +619,9 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         $("#graph").html(data.graph);
 
         var _logsEl = $("#log pre");
-        var newLines = data.log.split("\n").slice(_logsEl.text().split("\n").length);
-        _logsEl.text(_logsEl.text() + newLines.join("\n"));
+
+        _logsEl.text(data.log);
+
         if (logsAtEnd) {
           _logsEl.scrollTop(_logsEl[0].scrollHeight - _logsEl.height());
         }
