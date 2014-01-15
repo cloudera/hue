@@ -1963,9 +1963,6 @@ viewModel = new BeeswaxViewModel("${app_name}");
 % if query_history:
   viewModel.design.history.id(${query_history.id});
   viewModel.fetchQueryHistory();
-  $(document).on('fetched.query', function(e) {
-    viewModel.watchQueryLoop();
-  });
 % elif design.id:
   viewModel.design.id(${design.id});
   viewModel.fetchDesign();
