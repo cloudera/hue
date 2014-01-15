@@ -239,7 +239,7 @@ var NodeModule = function($, IdGeneratorTable, NodeFields) {
       var self = this;
       var data = ko.mapping.toJS(self);
       if ('files' in data) {
-        self['files'] = ko.toJS(self._files);
+        data['files'] = ko.toJS(self._files);
       }
       return data;
     },
