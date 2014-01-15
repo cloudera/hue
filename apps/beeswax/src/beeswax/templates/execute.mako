@@ -1726,43 +1726,43 @@ $(document).ready(function () {
   updateSidebarTooltips(".filesField");
   updateSidebarTooltips(".functionsField");
   updateSidebarTooltips(".classNamesField");
-
-  % if app_name == 'impala':
-    $("#downloadQuery").click(function () {
-      $("<input>").attr("type", "hidden").attr("name", "button-submit").attr("value", "Execute").appendTo($("#advancedSettingsForm"));
-      $("<input>").attr("type", "hidden").attr("name", "download").attr("value", "true").appendTo($("#advancedSettingsForm"));
-      tryExecuteQuery();
-    });
-  % endif
-
-  % if app_name == 'impala':
-    $("#refresh-dyk").popover({
-      'title': "${_('Missing some tables? In order to update the list of tables/metadata seen by Impala, execute one of these queries:')}",
-      'content': $("#refresh-content").html(),
-      'trigger': 'hover',
-      'html': true
-    });
-
-    $("#refresh-tip").popover({
-      'title': "${_('Missing some tables? In order to update the list of tables/metadata seen by Impala, execute one of these queries:')}",
-      'content': $("#refresh-content").html(),
-      'trigger': 'hover',
-      'html': true
-    });
-
-    window.onbeforeunload = function(e) {
-      viewModel.closeQuery();
-    };
-
-    $(document).on('explain.query', function() {
-      viewModel.closeQuery();
-    });
-
-    $(document).on('execute.query', function() {
-      viewModel.closeQuery();
-    });
-  % endif
 });
+
+% if app_name == 'impala':
+$(document).ready(function () {
+  $("#downloadQuery").click(function () {
+    $("<input>").attr("type", "hidden").attr("name", "button-submit").attr("value", "Execute").appendTo($("#advancedSettingsForm"));
+    $("<input>").attr("type", "hidden").attr("name", "download").attr("value", "true").appendTo($("#advancedSettingsForm"));
+    tryExecuteQuery();
+  });
+
+  $("#refresh-dyk").popover({
+    'title': "${_('Missing some tables? In order to update the list of tables/metadata seen by Impala, execute one of these queries:')}",
+    'content': $("#refresh-content").html(),
+    'trigger': 'hover',
+    'html': true
+  });
+
+  $("#refresh-tip").popover({
+    'title': "${_('Missing some tables? In order to update the list of tables/metadata seen by Impala, execute one of these queries:')}",
+    'content': $("#refresh-content").html(),
+    'trigger': 'hover',
+    'html': true
+  });
+
+  $(document).on('explain.query', function() {
+    viewModel.closeQuery();
+  });
+
+  $(document).on('execute.query', function() {
+    viewModel.closeQuery();
+  });
+});
+
+window.onbeforeunload = function(e) {
+  viewModel.closeQuery();
+};
+% endif
 
 $(".pathChooser:not(:has(~ button))").after(getFileAndFolderBrowseButton($(".pathChooser:not(:has(~ button))"), true));
 
