@@ -36,13 +36,14 @@ import django.views.debug
 from desktop.lib import django_mako
 from desktop.lib.conf import GLOBAL_CONFIG
 from desktop.lib.django_util import login_notrequired, render_json, render
-from desktop.lib.i18n import smart_str, force_unicode
+from desktop.lib.i18n import smart_str
 from desktop.lib.paths import get_desktop_root
 from desktop.log.access import access_log_level, access_warn
 from desktop.models import UserPreferences, Settings, Document, DocumentTag
 from desktop import appmanager
 import desktop.conf
 import desktop.log.log_buffer
+from desktop.api import massaged_tags_for_json, massaged_documents_for_json
 
 
 LOG = logging.getLogger(__name__)
@@ -61,147 +62,6 @@ def home(request):
     'tags': tags,
     'json_tags': json.dumps(massaged_tags_for_json(tags, request.user))
   })
-
-
-def list_docs(request):
-  docs = Document.objects.get_docs(request.user).order_by('-last_modified')[:1000]
-  return HttpResponse(json.dumps(massaged_documents_for_json(docs)), mimetype="application/json")
-
-
-def list_tags(request):
-  tags = DocumentTag.objects.get_tags(user=request.user)
-  return HttpResponse(json.dumps(massaged_tags_for_json(tags, request.user)), mimetype="application/json")
-
-
-def massaged_documents_for_json(documents):
-  return [massage_doc_for_json(doc) for doc in documents]
-
-
-def massage_doc_for_json(doc):
-  perms = doc.list_permissions()
-  return {
-      'id': doc.id,
-      'contentType': doc.content_type.name,
-      'icon': doc.icon,
-      'name': doc.name,
-      'url': doc.content_object.get_absolute_url(),
-      'description': doc.description,
-      'tags': [{'id': tag.id, 'name': tag.tag} for tag in doc.tags.all()],
-      'perms': {
-        'read': {
-          'users': [{'id': user.id, 'username': user.username} for user in perms.users.all()],
-          'groups': [{'id': group.id, 'name': group.name} for group in perms.groups.all()]
-        }
-      },
-      'owner': doc.owner.username,
-      'lastModified': doc.last_modified.strftime("%x %X"),
-      'lastModifiedInMillis': time.mktime(doc.last_modified.timetuple())
-    }
-
-def massaged_tags_for_json(tags, user):
-  ts = []
-  trash = DocumentTag.objects.get_trash_tag(user)
-  history = DocumentTag.objects.get_history_tag(user)
-
-  for tag in tags:
-    massaged_tag = {
-      'id': tag.id,
-      'name': tag.tag,
-      'isTrash': tag.id == trash.id,
-      'isHistory': tag.id == history.id,
-      'isExample': tag.tag == DocumentTag.EXAMPLE
-    }
-    ts.append(massaged_tag)
-
-  return ts
-
-def add_tag(request):
-  response = {'status': -1, 'message': ''}
-
-  if request.method == 'POST':
-    try:
-      tag = DocumentTag.objects.create_tag(request.user, request.POST['name'])
-      response['tag_id'] = tag.id
-      response['status'] = 0
-    except Exception, e:
-      response['message'] = force_unicode(e)
-  else:
-    response['message'] = _('POST request only')
-
-  return HttpResponse(json.dumps(response), mimetype="application/json")
-
-
-def tag(request):
-  response = {'status': -1, 'message': ''}
-
-  if request.method == 'POST':
-    request_json = json.loads(request.POST['data'])
-    try:
-      tag = DocumentTag.objects.tag(request.user, request_json['doc_id'], request_json.get('tag'), request_json.get('tag_id'))
-      response['tag_id'] = tag.id
-      response['status'] = 0
-    except Exception, e:
-      response['message'] = force_unicode(e)
-  else:
-    response['message'] = _('POST request only')
-
-  return HttpResponse(json.dumps(response), mimetype="application/json")
-
-
-def update_tags(request):
-  response = {'status': -1, 'message': ''}
-
-  if request.method == 'POST':
-    request_json = json.loads(request.POST['data'])
-    try:
-      doc = DocumentTag.objects.update_tags(request.user, request_json['doc_id'], request_json['tag_ids'])
-      response['doc'] = massage_doc_for_json(doc)
-      response['status'] = 0
-    except Exception, e:
-      response['message'] = force_unicode(e)
-  else:
-    response['message'] = _('POST request only')
-
-  return HttpResponse(json.dumps(response), mimetype="application/json")
-
-
-def remove_tags(request):
-  response = {'status': -1, 'message': _('Error')}
-
-  if request.method == 'POST':
-    request_json = json.loads(request.POST['data'])
-    try:
-      for tag_id in request_json['tag_ids']:
-        DocumentTag.objects.delete_tag(tag_id, request.user)
-      response['message'] = _('Tag(s) removed!')
-      response['status'] = 0
-    except Exception, e:
-      response['message'] = force_unicode(e)
-  else:
-    response['message'] = _('POST request only')
-
-  return HttpResponse(json.dumps(response), mimetype="application/json")
-
-
-def update_permissions(request):
-  response = {'status': -1, 'message': _('Error')}
-
-  if request.method == 'POST':
-    data = json.loads(request.POST['data'])
-    doc_id = request.POST['doc_id']
-    try:
-      doc = Document.objects.get_doc(doc_id, request.user)
-      # doc.sync_permissions({'read': {'user_ids': [1, 2, 3], 'group_ids': [1, 2, 3]}})
-      doc.sync_permissions(data)
-      response['message'] = _('Permissions updated!')
-      response['status'] = 0
-      response['doc'] = massage_doc_for_json(doc)
-    except Exception, e:
-      response['message'] = force_unicode(e)
-  else:
-    response['message'] = _('POST request only')
-
-  return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
 @access_log_level(logging.WARN)
@@ -257,7 +117,7 @@ def download_log_view(request):
         response['Content-Length'] = length
         return response
       except Exception, e:
-        logging.exception("Couldn't construct zip file to write logs to.")
+        logging.exception("Couldn't construct zip file to write logs to: %s") % e
         return log_view(request)
 
   return render_to_response("logs.mako", dict(log=[_("No logs found.")]))

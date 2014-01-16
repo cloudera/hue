@@ -21,12 +21,12 @@ from desktop.lib.django_util import get_username_re_rule, get_groupname_re_rule
 username_re = get_username_re_rule()
 groupname_re = get_groupname_re_rule()
 
+
 urlpatterns = patterns('useradmin.views',
   url(r'^$', 'list_users'),
   url(r'^users$', 'list_users'),
   url(r'^groups$', 'list_groups'),
   url(r'^permissions$', 'list_permissions'),
-  url(r'^autocomplete', 'list_for_autocomplete'),
   url(r'^users/edit/(?P<username>%s)$' % (username_re,), 'edit_user'),
   url(r'^users/add_ldap_users$', 'add_ldap_users'),
   url(r'^users/add_ldap_groups$', 'add_ldap_groups'),

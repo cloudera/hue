@@ -20,7 +20,6 @@ import desktop
 import desktop.urls
 import desktop.conf
 import logging
-import json
 import os
 import time
 
@@ -36,6 +35,8 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.db.models import query, CharField, SmallIntegerField
 
+from useradmin.models import GroupPermission
+
 from desktop.lib import django_mako
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.paginator import Paginator
@@ -44,9 +45,6 @@ from desktop.lib.django_util import TruncatingModel
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.test_utils import grant_access
 from desktop.views import check_config, home
-from desktop.models import DocumentTag , Document
-from pig.models import PigScript
-from useradmin.models import GroupPermission
 
 
 def setup_test_environment():
@@ -157,10 +155,10 @@ def test_dump_config():
   CANARY = "abracadabra"
   clear = desktop.conf.HTTP_HOST.set_for_testing(CANARY)
 
-  response1 = c.get('/dump_config')
+  response1 = c.get(reverse('desktop.views.dump_config'))
   assert_true(CANARY in response1.content)
 
-  response2 = c.get('/dump_config', dict(private="true"))
+  response2 = c.get(reverse('desktop.views.dump_config'), dict(private="true"))
   assert_true(CANARY in response2.content)
 
   # There are more private variables...
@@ -171,7 +169,7 @@ def test_dump_config():
   CANARY = "(localhost|127\.0\.0\.1):(50030|50070|50060|50075)"
   clear = proxy.conf.WHITELIST.set_for_testing(CANARY)
 
-  response1 = c.get('/dump_config')
+  response1 = c.get(reverse('desktop.views.dump_config'))
   assert_true(CANARY in response1.content)
 
   clear()
@@ -180,7 +178,7 @@ def test_dump_config():
   CANARY = "asdfoijaoidfjaosdjffjfjaoojosjfiojdosjoidjfoa"
   clear = desktop.conf.HTTP_PORT.set_for_testing(CANARY)
 
-  response1 = c.get('/dump_config')
+  response1 = c.get(reverse('desktop.views.dump_config'))
   assert_true(CANARY in response1.content, response1.content)
 
   clear()
@@ -188,7 +186,7 @@ def test_dump_config():
   CANARY = '/tmp/spacé.dat'
   finish = proxy.conf.WHITELIST.set_for_testing(CANARY)
   try:
-    response = c.get('/dump_config')
+    response = c.get(reverse('desktop.views.dump_config'))
     assert_true(CANARY in response.content, response.content)
   finally:
     finish()
@@ -197,11 +195,11 @@ def test_dump_config():
   client_not_me = make_logged_in_client(username='not_me', is_superuser=False, groupname='test')
   grant_access("not_me", "test", "desktop")
 
-  response = client_not_me.get('/dump_config')
+  response = client_not_me.get(reverse('desktop.views.dump_config'))
   assert_true("You must be a superuser" in response.content, response.content)
 
   os.environ["HUE_CONF_DIR"] = "/tmp/test_hue_conf_dir"
-  resp = c.get('/dump_config')
+  resp = c.get(reverse('desktop.views.dump_config'))
   del os.environ["HUE_CONF_DIR"]
   assert_true('/tmp/test_hue_conf_dir' in resp.content, resp)
 
@@ -210,34 +208,34 @@ def test_prefs():
   c = make_logged_in_client()
 
   # Get everything
-  response = c.get('/prefs/')
+  response = c.get('/desktop/prefs/')
   assert_equal('{}', response.content)
 
   # Set and get
-  response = c.get('/prefs/foo', dict(set="bar"))
+  response = c.get('/desktop/prefs/foo', dict(set="bar"))
   assert_equal('true', response.content)
-  response = c.get('/prefs/foo')
+  response = c.get('/desktop/prefs/foo')
   assert_equal('"bar"', response.content)
 
   # Reset (use post this time)
-  c.post('/prefs/foo', dict(set="baz"))
-  response = c.get('/prefs/foo')
+  c.post('/desktop/prefs/foo', dict(set="baz"))
+  response = c.get('/desktop/prefs/foo')
   assert_equal('"baz"', response.content)
 
   # Check multiple values
-  c.post('/prefs/elephant', dict(set="room"))
-  response = c.get('/prefs/')
+  c.post('/desktop/prefs/elephant', dict(set="room"))
+  response = c.get('/desktop/prefs/')
   assert_true("baz" in response.content)
   assert_true("room" in response.content)
 
   # Delete everything
-  c.get('/prefs/elephant', dict(delete=""))
-  c.get('/prefs/foo', dict(delete=""))
-  response = c.get('/prefs/')
+  c.get('/desktop/prefs/elephant', dict(delete=""))
+  c.get('/desktop/prefs/foo', dict(delete=""))
+  response = c.get('/desktop/prefs/')
   assert_equal('{}', response.content)
 
   # Check non-existent value
-  response = c.get('/prefs/doesNotExist')
+  response = c.get('/desktop/prefs/doesNotExist')
   assert_equal('null', response.content)
 
 def test_status_bar():
@@ -256,7 +254,7 @@ def test_status_bar():
     raise Exception()
   views.register_status_bar_view(f)
 
-  response = c.get("/status_bar")
+  response = c.get("/desktop/status_bar")
   assert_equal("foobar", response.content)
 
   views._status_bar_views = backup
@@ -305,7 +303,7 @@ def test_paginator():
 
 def test_thread_dump():
   c = make_logged_in_client()
-  response = c.get("/debug/threads")
+  response = c.get("/desktop/debug/threads")
   assert_true("test_thread_dump" in response.content)
 
 def test_truncating_model():
@@ -373,6 +371,18 @@ def test_error_handling():
     restore_500_debug()
 
 
+def test_desktop_permissions():
+  USERNAME = 'test_core_permissions'
+  GROUPNAME = 'default'
+
+  c = make_logged_in_client(USERNAME, groupname=GROUPNAME, recreate=True, is_superuser=False)
+
+  # Access to the basic works
+  assert_equal(200, c.get('/accounts/login/', follow=True).status_code)
+  assert_equal(200, c.get('/accounts/logout', follow=True).status_code)
+  assert_equal(200, c.get('/home', follow=True).status_code)
+
+
 def test_app_permissions():
   USERNAME = 'test_app_permissions'
   GROUPNAME = 'impala_only'
@@ -438,7 +448,7 @@ def test_error_handling_failure():
   try:
     # Make sure we are showing default 500.html page.
     # See django.test.client#L246
-    assert_raises(AttributeError, c.get, '/dump_config')
+    assert_raises(AttributeError, c.get, reverse('desktop.views.dump_config'))
   finally:
     # Restore the world
     restore_django_debug()
@@ -468,20 +478,20 @@ def test_log_event():
   handler = RecordingHandler()
   root.addHandler(handler)
 
-  c.get("/log_frontend_event?level=info&message=foo")
+  c.get("/desktop/log_frontend_event?level=info&message=foo")
   assert_equal("INFO", handler.records[-1].levelname)
   assert_equal("Untrusted log event from user test: foo", handler.records[-1].message)
   assert_equal("desktop.views.log_frontend_event", handler.records[-1].name)
 
-  c.get("/log_frontend_event?level=error&message=foo2")
+  c.get("/desktop/log_frontend_event?level=error&message=foo2")
   assert_equal("ERROR", handler.records[-1].levelname)
   assert_equal("Untrusted log event from user test: foo2", handler.records[-1].message)
 
-  c.get("/log_frontend_event?message=foo3")
+  c.get("/desktop/log_frontend_event?message=foo3")
   assert_equal("INFO", handler.records[-1].levelname)
   assert_equal("Untrusted log event from user test: foo3", handler.records[-1].message)
 
-  c.post("/log_frontend_event", {
+  c.post("/desktop/log_frontend_event", {
     "message": "01234567" * 1024})
   assert_equal("INFO", handler.records[-1].levelname)
   assert_equal("Untrusted log event from user test: " + "01234567"*(1024/8),
@@ -509,7 +519,7 @@ def test_config_check():
 
   try:
     cli = make_logged_in_client()
-    resp = cli.get('/debug/check_config')
+    resp = cli.get('/desktop/debug/check_config')
     assert_true('Secret key should be configured' in resp.content, resp)
     assert_true('desktop.ssl_certificate' in resp.content, resp)
     assert_true('Path does not exist' in resp.content, resp)
@@ -519,7 +529,7 @@ def test_config_check():
 
     # Set HUE_CONF_DIR and make sure check_config returns appropriate conf
     os.environ["HUE_CONF_DIR"] = "/tmp/test_hue_conf_dir"
-    resp = cli.get('/debug/check_config')
+    resp = cli.get('/desktop/debug/check_config')
     del os.environ["HUE_CONF_DIR"]
     assert_true('/tmp/test_hue_conf_dir' in resp.content, resp)
   finally:
@@ -567,109 +577,3 @@ def test_check_config_ajax():
   c = make_logged_in_client()
   response = c.get(reverse(check_config))
   assert_true("misconfiguration" in response.content, response.content)
-
-
-class TestDocModelTags():
-  def setUp(self):
-    self.client = make_logged_in_client(username="tag_user")
-    self.client_not_me = make_logged_in_client(username="not_tag_user")
-
-    self.user = User.objects.get(username="tag_user")
-    self.user_not_me = User.objects.get(username="not_tag_user")
-
-    grant_access(self.user.username, self.user.username, "desktop")
-    grant_access(self.user_not_me.username, self.user_not_me.username, "desktop")
-
-  def add_tag(self, name):
-    response = self.client.post("/tag/add_tag", {'name': name})
-    assert_equal(0, json.loads(response.content)['status'], response.content)
-    return json.loads(response.content)['tag_id']
-
-  def add_doc(self, name):
-    script = PigScript.objects.create(owner=self.user)
-    doc = Document.objects.link(script, owner=script.owner, name=name)
-    return script, doc
-
-  def test_add_tag(self):
-    response = self.client.get("/tag/add_tag")
-    assert_equal(-1, json.loads(response.content)['status'])
-
-    tag_id = self.add_tag('my_tag')
-
-    assert_true(DocumentTag.objects.filter(id=tag_id, owner=self.user, tag='my_tag').exists())
-
-  def test_remove_tags(self):
-    response = self.client.post("/tag/add_tag", {'name': 'my_tag'})
-    tag_id = json.loads(response.content)['tag_id']
-
-    response = self.client.get("/tag/remove_tags")
-    assert_equal(-1, json.loads(response.content)['status'])
-
-    response = self.client_not_me.post("/tag/remove_tags", {'data': json.dumps({'tag_ids': [tag_id]})})
-    assert_equal(-1, json.loads(response.content)['status'], response.content)
-
-    response = self.client.post("/tag/remove_tags", {'data': json.dumps({'tag_ids': [tag_id]})})
-    assert_equal(0, json.loads(response.content)['status'], response.content)
-
-    assert_false(DocumentTag.objects.filter(id=tag_id).exists())
-
-  def test_list_tags(self):
-    tag_id = self.add_tag('my_list_tags')
-
-    response = self.client.get("/tag/list_tags")
-    assert_true([tag for tag in json.loads(response.content) if tag['id'] == tag_id], response.content)
-
-  def test_list_docs(self):
-    script, doc = self.add_doc('test-pig')
-
-    response = self.client.get("/doc/list_docs")
-    assert_true([doc for doc in json.loads(response.content) if doc['id'] == script.id], response.content)
-
-  def test_tag(self):
-    script, doc = self.add_doc('tag_pig')
-
-    response = self.client.post("/doc/tag", {'data': json.dumps({'doc_id': doc.id, 'tag': 'pig'})})
-    assert_equal(0, json.loads(response.content)['status'], response.content)
-
-    tag2_id = self.add_tag('pig2')
-
-    response = self.client.post("/doc/tag", {'data': json.dumps({'doc_id': doc.id, 'tag_id': tag2_id})})
-    assert_equal(0, json.loads(response.content)['status'], response.content)
-
-  def test_update_tags(self):
-    script, doc = self.add_doc('update_tags')
-
-    tag1_id = self.add_tag('update_tags_1')
-    tag2_id = self.add_tag('update_tags_2')
-
-    response = self.client.post("/doc/update_tags", {'data': json.dumps({'doc_id': doc.id, 'tag_ids': [tag1_id, tag2_id]})})
-    assert_equal(0, json.loads(response.content)['status'], response.content)
-
-
-
-class TestDocModelPermissions():
-
-  def setUp(self):
-    self.client = make_logged_in_client(username="perm_user")
-    self.client_not_me = make_logged_in_client(username="not_perm_user")
-
-    self.user = User.objects.get(username="perm_user")
-    self.user_not_me = User.objects.get(username="not_perm_user")
-
-    grant_access(self.user.username, self.user.username, "desktop")
-    grant_access(self.user_not_me.username, self.user_not_me.username, "desktop")
-
-  def add_doc(self, name):
-    script = PigScript.objects.create(owner=self.user)
-    doc = Document.objects.link(script, owner=script.owner, name=name)
-    return script, doc
-
-  def test_update_permissions(self):
-    script, doc = self.add_doc('test_update_permissions')
-
-    response = self.client.post("/doc/update_permissions", {
-        'doc_id': doc.id,
-        'data': json.dumps({'read': {'user_ids': [1, 2], 'group_ids': [1]}})
-    })
-
-    assert_equal(0, json.loads(response.content)['status'], response.content)
