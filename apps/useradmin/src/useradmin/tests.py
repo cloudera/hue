@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -17,10 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-Tests for "user admin"
-"""
-
+import json
 import re
 import urllib
 import ldap
@@ -43,7 +39,9 @@ import useradmin.conf
 from hadoop import pseudo_hdfs4
 from views import sync_ldap_users, sync_ldap_groups, import_ldap_users, import_ldap_groups, \
                   add_ldap_users, add_ldap_groups, sync_ldap_users_groups
+
 import ldap_access
+
 
 def reset_all_users():
   """Reset to a clean state by deleting all users"""
@@ -892,3 +890,38 @@ def test_ensure_home_directory():
   assert_equal('test2', dir_stat.user)
   assert_equal('test2', dir_stat.group)
   assert_equal('40755', '%o' % dir_stat.mode)
+
+def test_list_for_autocomplete():
+  c1 = make_logged_in_client('test_list_for_autocomplete', is_superuser=False, groupname='test_list_for_autocomplete')
+  c2_same_group = make_logged_in_client('test_list_for_autocomplete2', is_superuser=False, groupname='test_list_for_autocomplete')
+  c3_other_group = make_logged_in_client('test_list_for_autocomplete3', is_superuser=False, groupname='test_list_for_autocomplete_other_group')
+
+  # c1 is in the same group as c2
+  response = c1.get(reverse('useradmin.views.list_for_autocomplete'), HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+  content = json.loads(response.content)
+
+  users = [user['username'] for user in content['users']]
+  groups = [user['name'] for user in content['groups']]
+
+  assert_equal(['test_list_for_autocomplete2'], users)
+  assert_equal(['test_list_for_autocomplete'], groups)
+
+  # c2 is in the same group as c1
+  response = c2_same_group.get(reverse('useradmin.views.list_for_autocomplete'), HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+  content = json.loads(response.content)
+
+  users = [user['username'] for user in content['users']]
+  groups = [user['name'] for user in content['groups']]
+
+  assert_equal(['test_list_for_autocomplete'], users)
+  assert_equal(['test_list_for_autocomplete'], groups)
+
+  # c3 is alone
+  response = c3_other_group.get(reverse('useradmin.views.list_for_autocomplete'), HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+  content = json.loads(response.content)
+
+  users = [user['username'] for user in content['users']]
+  groups = [user['name'] for user in content['groups']]
+
+  assert_equal([], users)
+  assert_equal(['test_list_for_autocomplete_other_group'], groups)

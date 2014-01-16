@@ -53,7 +53,6 @@ __users_lock = threading.Lock()
 __groups_lock = threading.Lock()
 
 
-
 def list_users(request):
   return render("list_users.mako", request, {
       'users': User.objects.all(),
@@ -71,10 +70,12 @@ def list_permissions(request):
 
 
 def list_for_autocomplete(request):
+  # Restrict to what the current user can interact withreverse('desktop.views.home')
   if request.ajax:
+    user_groups = request.user.groups.all()
     response = {
-      'users': massage_users_for_json(User.objects.all()),
-      'groups': massage_groups_for_json(Group.objects.all())
+      'users': massage_users_for_json(User.objects.filter(groups__in=user_groups).exclude(pk=request.user.pk)),
+      'groups': massage_groups_for_json(user_groups)
     }
     return HttpResponse(json.dumps(response), mimetype="application/json")
 
