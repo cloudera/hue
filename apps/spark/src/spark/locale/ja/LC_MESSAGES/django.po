@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-08-02 20:43-0700\n"
+"POT-Creation-Date: 2014-01-16 13:47-0800\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -17,445 +17,344 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/pig/api.py:233 src/pig/templates/app.mako:601
-msgid "Unsaved script"
-msgstr "未保存のスクリプト"
+#: src/spark/api.py:61 src/spark/views.py:109
+msgid "Requires a POST"
+msgstr ""
 
-#: src/pig/conf.py:32
-msgid "Location on local filesystem where the examples are stored."
-msgstr "例が保存されているローカルファイルシステム上の場所です。"
+#: src/spark/api.py:84
+msgid "Requires a DELETE"
+msgstr ""
 
-#: src/pig/conf.py:38
-msgid "Location on HDFS where the Pig examples are stored."
-msgstr "Pig の例が保存されている HDFS 上の場所です。"
-
-#: src/pig/conf.py:48
-msgid "The app won't work without a running Oozie server"
-msgstr "実行中の Oozie Server が存在しない場合、アプリが機能しません"
-
-#: src/pig/models.py:33
-msgid "Owner"
-msgstr "所有者"
-
-#: src/pig/models.py:33
-msgid "User who can modify the job."
-msgstr "ジョブを変更できるユーザーです。"
-
-#: src/pig/models.py:34
-msgid "Is a user document, not a document submission."
-msgstr "ユーザードキュメントです。ドキュメントサブミッションではありません。"
-
-#: src/pig/models.py:35
-msgid "If the document is not a submitted job but a real query, script, workflow."
-msgstr "ドキュメントがサブミットしたジョブではなく実際のクエリ、、スクリプト、Workflow である場合。"
-
-#: src/pig/models.py:44
-#, python-format
-msgid "Only superusers and %s are allowed to modify this document."
-msgstr "スーパーユーザーと %s のみが、このドキュメントを変更できます。"
-
-#: src/pig/views.py:68 src/pig/views.py:93 src/pig/views.py:112
-#: src/pig/views.py:143 src/pig/views.py:179
-msgid "POST request required."
-msgstr "POST 要求が必要です。"
-
-#: src/pig/views.py:104
-msgid "Error stopping Pig script."
-msgstr "Pig スクリプトの停止中にエラーが発生しました。"
-
-#: src/pig/views.py:149
-msgid " (Copy)"
-msgstr " （コピー）"
-
-#: src/pig/views.py:227
+#: src/spark/api.py:120 src/spark/api.py:175
 msgid "A POST request is required."
 msgstr "POST 要求が必要です。"
 
-#: src/pig/management/commands/pig_setup.py:46
-#, python-format
-msgid "Copying examples %(local_dir)s to %(remote_data_dir)s\n"
-msgstr "例を %(local_dir)s から %(remote_data_dir)s にコピーしています\n"
+#: src/spark/api.py:162
+#, fuzzy, python-format
+msgid "There was an error with your query: %s"
+msgstr "要求に関するエラーがあります: %s。"
 
-#: src/pig/management/commands/pig_setup.py:53
-#, python-format
-msgid "Copying data %(local_dir)s to %(remote_data_dir)s\n"
-msgstr "データを %(local_dir)s から %(remote_data_dir)s にコピーしています\n"
+#: src/spark/api.py:205
+#, fuzzy
+msgid "A GET request is required."
+msgstr "POST 要求が必要です。"
 
-#: src/pig/templates/app.mako:28 src/pig/templates/app.mako:103
+#: src/spark/api.py:234
+msgid "Missing application jar list."
+msgstr ""
+
+#: src/spark/conf.py:28
+msgid "URL of the Spark Job Server."
+msgstr ""
+
+#: src/spark/conf.py:56
+#, fuzzy
+msgid "The app won't work without a running Job Server"
+msgstr "実行中の Oozie Server が存在しない場合、アプリが機能しません"
+
+#: src/spark/decorators.py:34
+msgid "An error happened with the Spark Server"
+msgstr ""
+
+#: src/spark/forms.py:25
+#, fuzzy
+msgid "Script parameters"
+msgstr "スクリプト変数"
+
+#: src/spark/forms.py:27 src/spark/templates/editor.mako:79
+#: src/spark/templates/list_jobs.mako:36
+msgid "Class path"
+msgstr ""
+
+#: src/spark/views.py:94
+msgid "Delete context(s)?"
+msgstr ""
+
+#: src/spark/templates/common.mako:38
+msgid "Spark Igniter"
+msgstr ""
+
+#: src/spark/templates/common.mako:41
 msgid "Editor"
 msgstr "エディタ"
 
-#: src/pig/templates/app.mako:29
-msgid "Scripts"
-msgstr "スクリプト"
+#: src/spark/templates/common.mako:43
+#: src/spark/templates/list_applications.mako:23
+#: src/spark/templates/list_applications.mako:29
+msgid "Applications"
+msgstr ""
 
-#: src/pig/templates/app.mako:30
+#: src/spark/templates/common.mako:45
 msgid "Dashboard"
 msgstr "ダッシュボード"
 
-#: src/pig/templates/app.mako:40
-msgid "Search for script name or content"
-msgstr "スクリプト名または内容の検索"
+#: src/spark/templates/common.mako:46 src/spark/templates/list_contexts.mako:29
+msgid "Contexts"
+msgstr ""
 
-#: src/pig/templates/app.mako:44 src/pig/templates/app.mako:171
-#: src/pig/templates/app.mako:182
-msgid "Run this script"
-msgstr "このスクリプトを実行"
+#: src/spark/templates/common.mako:47
+msgid "Uploads"
+msgstr ""
 
-#: src/pig/templates/app.mako:44 src/pig/templates/app.mako:118
-msgid "Run"
-msgstr "実行"
-
-#: src/pig/templates/app.mako:45
-msgid "Copy this script"
-msgstr "このスクリプトをコピー"
-
-#: src/pig/templates/app.mako:45 src/pig/templates/app.mako:137
-msgid "Copy"
-msgstr "コピー"
-
-#: src/pig/templates/app.mako:46
-msgid "Delete this script"
-msgstr "このスクリプトを削除"
-
-#: src/pig/templates/app.mako:46 src/pig/templates/app.mako:142
-msgid "Delete"
-msgstr "削除"
-
-#: src/pig/templates/app.mako:50
-msgid "Create a new script"
-msgstr "新しいスクリプトを作成"
-
-#: src/pig/templates/app.mako:50
+#: src/spark/templates/common.mako:59 src/spark/templates/editor.mako:59
+#: src/spark/templates/list_contexts.mako:41
 #, fuzzy
-msgid "New Script"
-msgstr "新しいスクリプト"
+msgid "Create context"
+msgstr "作成日"
 
-#: src/pig/templates/app.mako:54
-msgid "There are currently no scripts defined. Please add a new script clicking on \"New script\""
-msgstr "現在、スクリプトは定義されていません。［新しいスクリプト］をクリックして、新しいスクリプトを追加してください。"
-
-#: src/pig/templates/app.mako:61 src/pig/templates/app.mako:218
-#: src/pig/templates/app.mako:267 src/pig/templates/app.mako:394
-#: src/pig/templates/app.mako:421
+#: src/spark/templates/common.mako:64 src/spark/templates/editor.mako:132
+#: src/spark/templates/editor.mako:220
+#: src/spark/templates/list_applications.mako:45
+#: src/spark/templates/list_contexts.mako:48
 msgid "Name"
 msgstr "名前"
 
-#: src/pig/templates/app.mako:62 src/pig/templates/app.mako:147
-msgid "Script"
-msgstr "スクリプト"
+#: src/spark/templates/common.mako:70
+msgid "Num cpu cores"
+msgstr ""
 
-#: src/pig/templates/app.mako:77
-msgid "There are no scripts matching the search criteria."
-msgstr "検索条件に一致するスクリプトが存在しません。"
+#: src/spark/templates/common.mako:76
+msgid "Memory per node"
+msgstr ""
 
-#: src/pig/templates/app.mako:105
-msgid "Pig"
-msgstr "Pig"
-
-#: src/pig/templates/app.mako:108
-msgid "Properties"
-msgstr "プロパティ"
-
-#: src/pig/templates/app.mako:111
-msgid "Save the script"
-msgstr "スクリプトを保存"
-
-#: src/pig/templates/app.mako:112 src/pig/templates/app.mako:568
-msgid "Save"
-msgstr "保存"
-
-#: src/pig/templates/app.mako:120
-msgid "Run the script"
-msgstr "スクリプトを実行"
-
-#: src/pig/templates/app.mako:121
-msgid "Submit"
-msgstr "サブミット"
-
-#: src/pig/templates/app.mako:125
-#, fuzzy
-msgid "Stop the script"
-msgstr "スクリプトを停止"
-
-#: src/pig/templates/app.mako:126
-msgid "Stop"
-msgstr "停止"
-
-#: src/pig/templates/app.mako:130
-msgid "Show Logs"
-msgstr "ログを表示"
-
-#: src/pig/templates/app.mako:131 src/pig/templates/app.mako:481
-msgid "Logs"
-msgstr "ログ"
-
-#: src/pig/templates/app.mako:134 src/pig/templates/app.mako:326
-msgid "File"
-msgstr "ファイル"
-
-#: src/pig/templates/app.mako:136
-msgid "Copy the script"
-msgstr "スクリプトをコピー"
-
-#: src/pig/templates/app.mako:141
-msgid "Delete the script"
-msgstr "スクリプトを削除"
-
-#: src/pig/templates/app.mako:146
-msgid "New script"
-msgstr "新しいスクリプト"
-
-#: src/pig/templates/app.mako:155
-msgid "Press CTRL + Space to autocomplete"
-msgstr "Ctrl キーを押したまま Space キーを押すと、オートコンプリート"
-
-#: src/pig/templates/app.mako:156
-msgid "You can execute the current script by pressing CTRL + ENTER or CTRL + . in the editor"
-msgstr "エディタで Ctrl キーを押したまま ENTER キーを押すか、Ctrl キーを押したまま .（ピリオド）を押すと、現在のスクリプトを実行できます"
-
-#: src/pig/templates/app.mako:166
-#, fuzzy
-msgid "Unsaved"
-msgstr "未保存"
-
-#: src/pig/templates/app.mako:172 src/pig/templates/app.mako:183
-#: src/pig/templates/app.mako:356
-#, fuzzy
-msgid "Stop this script"
-msgstr "このスクリプトを停止"
-
-#: src/pig/templates/app.mako:188 src/pig/templates/app.mako:561
-msgid "Script name"
-msgstr "スクリプト名"
-
-#: src/pig/templates/app.mako:195
-msgid "Parameters"
-msgstr "パラメータ"
-
-#: src/pig/templates/app.mako:208
-#, fuzzy
-msgid "There are currently no defined parameters."
-msgstr "現在、定義されているパラメータはありません。"
-
-#: src/pig/templates/app.mako:210 src/pig/templates/app.mako:238
-#: src/pig/templates/app.mako:259 src/pig/templates/app.mako:287
-#: src/pig/templates/app.mako:308 src/pig/templates/app.mako:345
-msgid "Add"
-msgstr "追加"
-
-#: src/pig/templates/app.mako:219 src/pig/templates/app.mako:268
-#: src/pig/templates/app.mako:317
-msgid "Value"
-msgstr "値"
-
-#: src/pig/templates/app.mako:232 src/pig/templates/app.mako:281
-#: src/pig/templates/app.mako:338
-msgid "Remove"
-msgstr "削除"
-
-#: src/pig/templates/app.mako:246
-#, fuzzy
-msgid "Hadoop properties"
-msgstr "Hadoop プロパティ"
-
-#: src/pig/templates/app.mako:257
-#, fuzzy
-msgid "There are currently no defined Hadoop properties."
-msgstr "現在、定義された Hadoop プロパティはありません。"
-
-#: src/pig/templates/app.mako:296
-msgid "Resources"
-msgstr "リソース"
-
-#: src/pig/templates/app.mako:299
-msgid "Path to a HDFS file or zip file to add to the workspace of the running script"
-msgstr "実行中のスクリプトの Workspace に追加する HDFS ファイルまたは zip ファイルへのパス"
-
-#: src/pig/templates/app.mako:306
-#, fuzzy
-msgid "There are currently no defined resources."
-msgstr "現在、定義されているリソースはありません。"
-
-#: src/pig/templates/app.mako:316
-msgid "Type"
-msgstr "タイプ"
-
-#: src/pig/templates/app.mako:327
-msgid "Archive"
-msgstr "アーカイブ"
-
-#: src/pig/templates/app.mako:363
-msgid "Status:"
-msgstr "ステータス："
-
-#: src/pig/templates/app.mako:365
-msgid "Progress:"
-msgstr "進行状況："
-
-#: src/pig/templates/app.mako:365
-msgid "%"
-msgstr "%"
-
-#: src/pig/templates/app.mako:371
-msgid "No available logs."
-msgstr "利用可能なログがありません。"
-
-#: src/pig/templates/app.mako:385 src/pig/templates/app.mako:873
-msgid "Running"
-msgstr "実行中"
-
-#: src/pig/templates/app.mako:389
-msgid "There are currently no running scripts."
-msgstr "現在実行中のスクリプトはありません。"
-
-#: src/pig/templates/app.mako:395
-msgid "Progress"
-msgstr "進行状況"
-
-#: src/pig/templates/app.mako:396 src/pig/templates/app.mako:423
-msgid "Created on"
-msgstr "作成日"
-
-#: src/pig/templates/app.mako:412
-msgid "Completed"
-msgstr "完了"
-
-#: src/pig/templates/app.mako:416
-msgid "There are currently no completed scripts."
-msgstr "現在完了したスクリプトはありません。"
-
-#: src/pig/templates/app.mako:422
-msgid "Status"
-msgstr "ステータス"
-
-#: src/pig/templates/app.mako:435
-msgid "Click to edit"
-msgstr "クリックして編集"
-
-#: src/pig/templates/app.mako:449
-msgid "Click to view"
-msgstr "クリックして表示"
-
-#: src/pig/templates/app.mako:466
-msgid "Confirm Delete"
-msgstr "削除を確認"
-
-#: src/pig/templates/app.mako:469
-msgid "Are you sure you want to delete this script?"
-msgstr "このスクリプトを削除してもよろしいですか?"
-
-#: src/pig/templates/app.mako:470
-msgid "Are you sure you want to delete these scripts?"
-msgstr "これらのスクリプトを削除してもよろしいですか?"
-
-#: src/pig/templates/app.mako:473 src/pig/templates/app.mako:507
-#: src/pig/templates/app.mako:518 src/pig/templates/app.mako:547
-msgid "No"
-msgstr "いいえ"
-
-#: src/pig/templates/app.mako:474 src/pig/templates/app.mako:508
-#: src/pig/templates/app.mako:519 src/pig/templates/app.mako:548
-msgid "Yes"
-msgstr "はい"
-
-#: src/pig/templates/app.mako:488
-msgid "Close"
-msgstr "閉じる"
-
-#: src/pig/templates/app.mako:495
-msgid "Run Script"
-msgstr "スクリプトを実行"
-
-#: src/pig/templates/app.mako:495 src/pig/templates/app.mako:515
-msgid "?"
-msgstr "?"
-
-#: src/pig/templates/app.mako:498
-msgid "Script variables"
-msgstr "スクリプト変数"
-
-#: src/pig/templates/app.mako:515
-msgid "Stop Script"
-msgstr "スクリプトを停止"
-
-#: src/pig/templates/app.mako:526
-msgid "Choose a file"
-msgstr "ファイルを選択"
-
-#: src/pig/templates/app.mako:539
-msgid "Are you sure?"
-msgstr "よろしいですか？"
-
-#: src/pig/templates/app.mako:543
-msgid "The current script has unsaved changes. Are you sure you want to discard the changes?"
-msgstr "現在のスクリプトには、未保存の変更があります。変更を破棄してもよろしいですか？"
-
-#: src/pig/templates/app.mako:555
-#, fuzzy
-msgid "Save script"
-msgstr "スクリプトの保存"
-
-#: src/pig/templates/app.mako:559
-msgid "Give a meaningful name to this script."
-msgstr "このスクリプトに意味のある名前を付けます。"
-
-#: src/pig/templates/app.mako:567
+#: src/spark/templates/common.mako:84 src/spark/templates/common.mako:114
+#: src/spark/templates/editor.mako:234
+#: src/spark/templates/list_contexts.mako:85
 msgid "Cancel"
 msgstr "キャンセル"
 
-#: src/pig/templates/app.mako:597
+#: src/spark/templates/common.mako:85
 #, fuzzy
-msgid "The Pig job could not be killed."
-msgstr "Pig ジョブを強制終了できませんでした。"
+msgid "Create"
+msgstr "作成日"
 
-#: src/pig/templates/app.mako:598
-#, fuzzy
-msgid "Run this Pig script."
-msgstr "この Pig スクリプトを実行します。"
+#: src/spark/templates/common.mako:96
+msgid "Upload application"
+msgstr ""
 
-#: src/pig/templates/app.mako:599
+#: src/spark/templates/common.mako:99
+msgid "One class of the jar should implement SparkJob."
+msgstr ""
+
+#: src/spark/templates/common.mako:101
+msgid "Local jar file"
+msgstr ""
+
+#: src/spark/templates/common.mako:107 src/spark/templates/editor.mako:63
 #, fuzzy
-msgid "Stop execution."
+msgid "App name"
+msgstr "スクリプト名"
+
+#: src/spark/templates/common.mako:115
+msgid "Upload"
+msgstr ""
+
+#: src/spark/templates/editor.mako:23
+msgid "Query"
+msgstr ""
+
+#: src/spark/templates/editor.mako:39 src/spark/templates/editor.mako:486
+msgid "Application name"
+msgstr ""
+
+#: src/spark/templates/editor.mako:48
+msgid "Application description"
+msgstr ""
+
+#: src/spark/templates/editor.mako:58
+#: src/spark/templates/list_applications.mako:36
+msgid "Upload app"
+msgstr ""
+
+#: src/spark/templates/editor.mako:66
+msgid "Missing, add one?"
+msgstr ""
+
+#: src/spark/templates/editor.mako:83 src/spark/templates/list_contexts.mako:23
+#: src/spark/templates/list_jobs.mako:37
+msgid "Context"
+msgstr ""
+
+#: src/spark/templates/editor.mako:86
+msgid "Automatic"
+msgstr ""
+
+#: src/spark/templates/editor.mako:92
+#, fuzzy
+msgid "Create one?"
+msgstr "作成日"
+
+#: src/spark/templates/editor.mako:115
+msgid "Parameters"
+msgstr "パラメータ"
+
+#: src/spark/templates/editor.mako:121
+msgid "Your application has the following error(s):"
+msgstr ""
+
+#: src/spark/templates/editor.mako:127
+msgid "No parameters defined yet."
+msgstr ""
+
+#: src/spark/templates/editor.mako:133 src/spark/templates/editor.mako:176
+msgid "Value"
+msgstr "値"
+
+#: src/spark/templates/editor.mako:147
+msgid "Delete"
+msgstr "削除"
+
+#: src/spark/templates/editor.mako:153
+msgid "Add"
+msgstr "追加"
+
+#: src/spark/templates/editor.mako:159
+#, fuzzy
+msgid "Executing..."
 msgstr "実行を停止します。"
 
-#: src/pig/templates/app.mako:600
-msgid "Saved"
-msgstr "保存済み"
+#: src/spark/templates/editor.mako:160
+#, fuzzy
+msgid "Execute"
+msgstr "削除"
 
-#: src/pig/templates/app.mako:866
-msgid "Saving"
-msgstr "保存中"
+#: src/spark/templates/editor.mako:162 src/spark/templates/editor.mako:235
+msgid "Save"
+msgstr "保存"
 
-#: src/pig/templates/app.mako:877
-msgid "has been saved correctly."
-msgstr "が正しく保存されました。"
+#: src/spark/templates/editor.mako:163
+msgid "Save as..."
+msgstr ""
 
-#: src/pig/templates/app.mako:881
-msgid "There was an error with your request!"
-msgstr "要求に関するエラーがあります。"
+#: src/spark/templates/editor.mako:164
+msgid "or create a"
+msgstr ""
 
-#: src/pig/templates/app.mako:1141
+#: src/spark/templates/editor.mako:164
+msgid "New application"
+msgstr ""
+
+#: src/spark/templates/editor.mako:166
+msgid "Download"
+msgstr ""
+
+#: src/spark/templates/editor.mako:175
+msgid "Key"
+msgstr ""
+
+#: src/spark/templates/editor.mako:188
+msgid "The server returned no results."
+msgstr ""
+
+#: src/spark/templates/editor.mako:215
+msgid "Save your query"
+msgstr ""
+
+#: src/spark/templates/editor.mako:226
+#, fuzzy
+msgid "Description"
+msgstr "新しいスクリプト"
+
+#: src/spark/templates/editor.mako:242
+msgid "Choose a file"
+msgstr "ファイルを選択"
+
+#: src/spark/templates/editor.mako:378
 msgid "Did you know?"
 msgstr "便利な使い方"
 
-#: src/pig/templates/app.mako:1148
-msgid "Names and values of Pig parameters and options, e.g."
-msgstr "Pig パラメータとオプションの名前と値、例"
+#: src/spark/templates/editor.mako:480
+#, fuzzy
+msgid "This field is required."
+msgstr "POST 要求が必要です。"
 
-#: src/pig/templates/app.mako:1155
-msgid "Names and values of Hadoop properties, e.g."
-msgstr "Hadoop プロパティの名前と値、例"
+#: src/spark/templates/editor.mako:493
+#, fuzzy
+msgid "Empty description"
+msgstr "スクリプトをコピー"
 
-#: src/pig/templates/app.mako:1162
-msgid "Include files or compressed files"
-msgstr "ファイルまたは圧縮ファイルを含む"
+#: src/spark/templates/editor.mako:499
+msgid "Application saved successfully!"
+msgstr ""
 
-#: src/pig/templates/app.mako:1171
-msgid "You have unsaved changes in this pig script."
-msgstr "この Pig スクリプトには、未保存の変更があります。"
+#: src/spark/templates/editor.mako:527
+#: src/spark/templates/list_applications.mako:93
+#: src/spark/templates/list_contexts.mako:131
+#: src/spark/templates/list_jobs.mako:96
+#, fuzzy
+msgid "No data available"
+msgstr "利用可能なログがありません。"
 
-#~ msgid "Actions"
-#~ msgstr "アクション"
-#~ msgid "Current Logs"
-#~ msgstr "現在のログ"
+#: src/spark/templates/editor.mako:528
+#: src/spark/templates/list_applications.mako:94
+#: src/spark/templates/list_contexts.mako:132
+#: src/spark/templates/list_jobs.mako:97
+msgid "No matching records"
+msgstr ""
+
+#: src/spark/templates/editor.mako:579
+msgid "Server error occured: "
+msgstr ""
+
+#: src/spark/templates/editor.mako:582
+msgid "Unmanageable server error occured: "
+msgstr ""
+
+#: src/spark/templates/list_applications.mako:33
+#: src/spark/templates/list_contexts.mako:33
+msgid "Search for name"
+msgstr ""
+
+#: src/spark/templates/list_applications.mako:46
+msgid "Upload time"
+msgstr ""
+
+#: src/spark/templates/list_applications.mako:53
+msgid "Click to open and execute"
+msgstr ""
+
+#: src/spark/templates/list_contexts.mako:36
+msgid "Delete forever"
+msgstr ""
+
+#: src/spark/templates/list_contexts.mako:37
+msgid "Delete selected"
+msgstr ""
+
+#: src/spark/templates/list_contexts.mako:82
+msgid "Confirm action"
+msgstr ""
+
+#: src/spark/templates/list_contexts.mako:86
+msgid "Yes"
+msgstr "はい"
+
+#: src/spark/templates/list_contexts.mako:208
+msgid "Delete the selected contexts?"
+msgstr ""
+
+#: src/spark/templates/list_jobs.mako:23 src/spark/templates/list_jobs.mako:29
+msgid "Jobs"
+msgstr ""
+
+#: src/spark/templates/list_jobs.mako:34
+msgid "Status"
+msgstr "ステータス"
+
+#: src/spark/templates/list_jobs.mako:35
+msgid "Job id"
+msgstr ""
+
+#: src/spark/templates/list_jobs.mako:38
+msgid "Start time"
+msgstr ""
+
+#: src/spark/templates/list_jobs.mako:39
+msgid "Duration"
+msgstr ""
+
+#: src/spark/templates/list_jobs.mako:51
+#, fuzzy
+msgid "Click to open"
+msgstr "クリックして表示"
+
