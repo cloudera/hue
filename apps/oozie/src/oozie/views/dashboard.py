@@ -18,6 +18,7 @@
 import json
 import logging
 import os
+import re
 import time
 
 from django.forms.formsets import formset_factory
@@ -41,7 +42,7 @@ from oozie.conf import OOZIE_JOBS_COUNT
 from oozie.forms import RerunForm, ParameterForm, RerunCoordForm,\
   RerunBundleForm
 from oozie.models import History, Job, Workflow, utc_datetime_format, Bundle,\
-  Coordinator
+  Coordinator, get_link
 from oozie.settings import DJANGO_APPS
 
 
@@ -212,7 +213,8 @@ def list_oozie_workflow(request, job_id, coordinator_job_id=None, bundle_job_id=
   if oozie_workflow.has_sla:
     api = get_oozie(request.user, api_version="v2")
     params = {
-      'id': oozie_workflow.id
+      'id': oozie_workflow.id,
+      'parent_id': oozie_workflow.id
     }
     oozie_slas = api.get_oozie_slas(**params)
 
@@ -268,7 +270,8 @@ def list_oozie_coordinator(request, job_id, bundle_job_id=None):
   if oozie_coordinator.has_sla:
     api = get_oozie(request.user, api_version="v2")
     params = {
-      'id': oozie_coordinator.id
+      'id': oozie_coordinator.id,
+      'parent_id': oozie_coordinator.id
     }
     oozie_slas = api.get_oozie_slas(**params)
 
@@ -318,8 +321,7 @@ def list_oozie_workflow_action(request, action, coordinator_job_id=None, bundle_
     action = get_oozie(request.user).get_action(action)
     workflow = check_job_access_permission(request, action.id.split('@')[0])
   except RestException, ex:
-    raise PopupException(_("Error accessing Oozie action %s.") % (action,),
-                         detail=ex.message)
+    raise PopupException(_("Error accessing Oozie action %s.") % (action,), detail=ex.message)
 
   oozie_coordinator = None
   if coordinator_job_id is not None:
@@ -360,22 +362,21 @@ def list_oozie_sla(request):
   api = get_oozie(request.user, api_version="v2")
 
   if request.method == 'POST':
-    # filter=nominal_start=2013-06-18T00:01Z;nominal_end=2013-06-23T00:01Z;app_name=my-sla-app
     params = {}
 
     job_name = request.POST.get('job_name')
-    if job_name.endswith('-oozie-oozi-W'):
-      if 'isParent' in request.POST:
-        params['parent_id'] = job_name
-      else:
-        params['id'] = job_name
+
+    if re.match('.*-oozie-oozi-[WCB]', job_name):
+      params['id'] = job_name
+      params['parent_id'] = job_name
     else:
       params['app_name'] = job_name
 
-    if request.POST.get('start'):
-      params['nominal_start'] = request.POST.get('start')
-    if request.POST.get('end'):
-      params['nominal_end'] = request.POST.get('end')
+    if 'useDates' in request.POST:
+      if request.POST.get('start'):
+        params['nominal_start'] = request.POST.get('start')
+      if request.POST.get('end'):
+        params['nominal_end'] = request.POST.get('end')
 
     oozie_slas = api.get_oozie_slas(**params)
 
@@ -385,7 +386,7 @@ def list_oozie_sla(request):
   if request.REQUEST.get('format') == 'json':
     massaged_slas = []
     for sla in oozie_slas:
-      massaged_slas.append(massaged_sla_for_json(sla))
+      massaged_slas.append(massaged_sla_for_json(sla, request))
 
     return HttpResponse(json.dumps({'oozie_slas': massaged_slas}), content_type="text/json")
 
@@ -393,13 +394,14 @@ def list_oozie_sla(request):
     'oozie_slas': oozie_slas
   })
 
-def massaged_sla_for_json(sla):
+
+def massaged_sla_for_json(sla, request):
   massaged_sla = {
     'slaStatus': sla['slaStatus'],
     'id': sla['id'],
     'appType': sla['appType'],
     'appName': sla['appName'],
-    'appUrl': reverse(sla['appType'] == 'WORKFLOW_JOB' and 'oozie:list_oozie_workflow' or 'oozie:list_oozie_coordinator', kwargs={'job_id': sla['id']}),
+    'appUrl': get_link(sla['id']),
     'user': sla['user'],
     'nominalTime': sla['nominalTime'],
     'expectedStart': sla['expectedStart'],

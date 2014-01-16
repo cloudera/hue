@@ -774,16 +774,31 @@ class TestEditor(OozieMockBase):
 
 
   def test_find_parameters(self):
+    data = json.dumps({'sla': [
+        {'key': 'enabled', 'value': True},
+        {'key': 'nominal-time', 'value': '${time}'},]}
+    )
     jobs = [Job(name="$a"),
             Job(name="foo ${b} $$"),
-            Job(name="${foo}", description="xxx ${foo}")]
+            Job(name="${foo}", description="xxx ${food}", data=data)]
 
-    result = [find_parameters(job, ['name', 'description']) for job in jobs]
-    assert_equal(set(["b", "foo"]), reduce(lambda x, y: x | set(y), result, set()))
+    result = [find_parameters(job, ['name', 'description', 'sla']) for job in jobs]
+    assert_equal(set(["b", "foo", "food", "time"]), reduce(lambda x, y: x | set(y), result, set()))
 
 
   def test_find_all_parameters(self):
+    self.wf.data = json.dumps({'sla': [
+        {'key': 'enabled', 'value': False},
+        {'key': 'nominal-time', 'value': '${time}'},]}
+    )
     assert_equal([{'name': u'output', 'value': u''}, {'name': u'SLEEP', 'value': ''}, {'name': u'market', 'value': u'US'}],
+                 self.wf.find_all_parameters())
+
+    self.wf.data = json.dumps({'sla': [
+        {'key': 'enabled', 'value': True},
+        {'key': 'nominal-time', 'value': '${time}'},]}
+    )
+    assert_equal([{'name': u'time', 'value': u''}, {'name': u'output', 'value': u''}, {'name': u'SLEEP', 'value': ''}, {'name': u'market', 'value': u'US'}],
                  self.wf.find_all_parameters())
 
 
