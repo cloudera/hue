@@ -58,23 +58,27 @@ ${ layout.menubar(section='sla', dashboard=True) }
 <div class="container-fluid">
   <div class="card card-small">
     <h1 class="card-heading simple">
-    <div class="pull-left" style="margin-right: 20px;margin-top: 2px">${_('Search SLA')}</div>
+    <div class="pull-left" style="margin-right: 20px;margin-top: 2px">${_('Search')}</div>
     <form class="form-inline" id="searchForm" method="GET" action="." style="margin-bottom: 4px">
       <label>
         ${_('Name or Id')}
         <input type="text" name="job_name" class="searchFilter input-xlarge search-query" placeholder="${_('Job Name or Id (required)')}">
       </label>
+      <span style="padding-left:25px">
+        <label class="label-with-margin">
+          ${ _('Start') }
+          <input type="text" name="start_0" class="input-small date" value="" placeholder="${_('Date in GMT')}"  data-bind="enable: useDates">
+          <input type="text" name="start_1" class="input-small time" value="" data-bind="enable: useDates">
+        </label>
+        <label>
+          ${ _('End') }
+          <input type="text" name="end_0" class="input-small date" value="" placeholder="${_('Date in GMT')}" data-bind="enable: useDates">
+          <input type="text" name="end_1" class="input-small time" value="" data-bind="enable: useDates">
+        </label>
+      </span>
       <label class="checkbox label-with-margin">
-        <input type="checkbox" name="isParent" class="searchFilter">
-        ${ _('This is the parent ID') }
-      </label>
-      <label class="label-with-margin">
-        ${ _('Start') }
-        <input type="text" name="start_0" class="input-small date" value="" placeholder="${_('Date in GMT')}"><input type="text" name="start_1" class="input-small time" value="">
-      </label>
-      <label>
-        ${ _('End') }
-        <input type="text" name="end_0" class="input-small date" value="" placeholder="${_('Date in GMT')}"><input type="text" name="end_1" class="input-small time" value="">
+        <input type="checkbox" name="useDates" class="searchFilter" data-bind="checked: useDates, click: performSearch()">
+        ${ _('Date filter') }
       </label>
     </form>
     </h1>
@@ -146,14 +150,19 @@ ${ layout.menubar(section='sla', dashboard=True) }
     </div>
   </div>
 </div>
+
 <script src="/oozie/static/js/bundles.utils.js" type="text/javascript" charset="utf-8"></script>
 <script src="/oozie/static/js/sla.utils.js" type="text/javascript" charset="utf-8"></script>
+
+<script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
+
 <script src="/static/ext/js/jquery/plugins/jquery.flot.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/jquery/plugins/jquery.flot.selection.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/jquery/plugins/jquery.flot.time.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/js/jquery.blueprint.js"></script>
 
 <script type="text/javascript" charset="utf-8">
+
   function performSearch(id) {
     if ((id != null || $("input[name='job_name']").val().trim()) != "" && slaTable) {
       window.location.hash = (id != null ? id : $("input[name='job_name']").val().trim());
@@ -166,8 +175,8 @@ ${ layout.menubar(section='sla', dashboard=True) }
         "job_name": id != null ? id : $("input[name='job_name']").val()
       };
 
-      if ($("input[name='isParent']").is("checked")) {
-        _postObj.isParent = true;
+      if (window.viewModel.useDates()) {
+        _postObj.useDates = true;
       }
       if ($("input[name='start_0']").val() != "" && $("input[name='start_1']").val() != "") {
         _postObj.start = moment($("input[name='start_0']").val() + " " + $("input[name='start_1']").val(), IN_DATETIME_FORMAT).format(OUT_DATETIME_FORMAT);
@@ -204,15 +213,26 @@ ${ layout.menubar(section='sla', dashboard=True) }
   }
 
   var slaTable;
+
   $(document).ready(function () {
+    var ViewModel = function () {
+      var self = this;
+
+      self.useDates = ko.observable(false);
+    };
+
+    window.viewModel = new ViewModel([]);
+    ko.applyBindings(window.viewModel);
+
+
     $("a[data-row-selector='true']").jHueRowSelector();
 
     $("*[rel=tooltip]").tooltip();
 
     $("input[name='start_0']").val(moment().subtract('days', 7).format("MM/DD/YYYY"));
     $("input[name='start_1']").val(moment().subtract('days', 7).format("hh:mm A"));
-    $("input[name='end_0']").val(moment().format("MM/DD/YYYY"));
-    $("input[name='end_1']").val(moment().format("hh:mm A"));
+    $("input[name='end_0']").val(moment().add('days', 1).format("MM/DD/YYYY"));
+    $("input[name='end_1']").val(moment().add('days', 1).format("hh:mm A"));
 
 
     $.getJSON("${url('oozie:list_oozie_workflows')}?format=json&justsla=true", function (data) {
@@ -244,6 +264,9 @@ ${ layout.menubar(section='sla', dashboard=True) }
         "sEmptyTable": "${_('No data available')}",
         "sZeroRecords": "${_('No matching records')}"
       },
+      "aaSorting":[
+        [4, "desc"]
+      ],
       "fnDrawCallback": function (oSettings) {
         $("a[data-row-selector='true']").jHueRowSelector();
       }

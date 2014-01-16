@@ -126,7 +126,7 @@ class Job(models.Model):
   is_trashed = models.BooleanField(default=False, db_index=True, verbose_name=_t('Is trashed'), blank=True, # Deprecated
                                    help_text=_t('If this job is trashed.'))
   doc = generic.GenericRelation(Document, related_name='oozie_doc')
-  data = models.TextField(blank=True, default=json.dumps({}))  # e.g. data=json.dump({'sla': [python data], ...})
+  data = models.TextField(blank=True, default=json.dumps({}))  # e.g. data=json.dumps({'sla': [python data], ...})
 
   objects = JobManager()
   unique_together = ('owner', 'name')
@@ -432,6 +432,10 @@ class Workflow(Job):
 
   def find_parameters(self):
     params = set()
+
+    if self.sla_enabled:
+      for param in find_json_parameters(self.sla):
+        params.add(param)
 
     for node in self.node_list:
       if hasattr(node, 'find_parameters'):
@@ -1523,6 +1527,10 @@ class Coordinator(Job):
     for param in find_parameters(self, ['job_properties']):
       params[param] = ''
 
+    if self.sla_enabled:
+      for param in find_json_parameters(self.sla):
+        params.add(param)
+
     for dataset in self.dataset_set.all():
       for param in find_parameters(dataset, ['uri']):
         if param not in set(DATASET_FREQUENCY):
@@ -1882,6 +1890,20 @@ class History(models.Model):
 
     return history
 
+
+def get_link(oozie_id):
+  link = ''
+
+  if 'W@' in oozie_id:
+    link = reverse('oozie:list_oozie_workflow_action', kwargs={'action': oozie_id})
+  elif oozie_id.endswith('W'):
+    link = reverse('oozie:list_oozie_workflow', kwargs={'job_id': oozie_id})
+  elif oozie_id.endswith('C'):
+    link = reverse('oozie:list_oozie_coordinator', kwargs={'job_id': oozie_id})
+
+  return link
+
+
 def find_parameters(instance, fields=None):
   """Find parameters in the given fields"""
   if fields is None:
@@ -1890,6 +1912,8 @@ def find_parameters(instance, fields=None):
   params = []
   for field in fields:
     data = getattr(instance, field)
+    if field == 'sla' and not instance.sla_enabled:
+      continue
     if isinstance(data, list):
       params.extend(find_json_parameters(data))
     elif isinstance(data, basestring):
