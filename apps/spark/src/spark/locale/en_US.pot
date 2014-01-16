@@ -1,14 +1,14 @@
 # Translations template for Hue.
-# Copyright (C) 2013 Cloudera, Inc
+# Copyright (C) 2014 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2014.
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-05-10 11:59-0700\n"
+"POT-Creation-Date: 2014-01-16 13:47-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,366 +17,330 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/pig/api.py:182 src/pig/templates/app.mako:455
-msgid "Unsaved script"
+#: src/spark/api.py:61 src/spark/views.py:109
+msgid "Requires a POST"
 msgstr ""
 
-#: src/pig/conf.py:32
-msgid "Location on local filesystem where the examples are stored."
+#: src/spark/api.py:84
+msgid "Requires a DELETE"
 msgstr ""
 
-#: src/pig/conf.py:38
-msgid "Location on HDFS where the Pig examples are stored."
-msgstr ""
-
-#: src/pig/conf.py:48
-msgid "The app won't work without a running Oozie server"
-msgstr ""
-
-#: src/pig/models.py:33
-msgid "Owner"
-msgstr ""
-
-#: src/pig/models.py:33
-msgid "User who can modify the job."
-msgstr ""
-
-#: src/pig/models.py:34
-msgid "Is a user document, not a document submission."
-msgstr ""
-
-#: src/pig/models.py:35
-msgid "If the document is not a submitted job but a real query, script, workflow."
-msgstr ""
-
-#: src/pig/models.py:44
-#, python-format
-msgid "Only superusers and %s are allowed to modify this document."
-msgstr ""
-
-#: src/pig/views.py:66 src/pig/views.py:90 src/pig/views.py:109
-#: src/pig/views.py:139 src/pig/views.py:163
-msgid "POST request required."
-msgstr ""
-
-#: src/pig/views.py:101
-msgid "Error stopping Pig script."
-msgstr ""
-
-#: src/pig/views.py:145
-msgid " (Copy)"
-msgstr ""
-
-#: src/pig/views.py:211
+#: src/spark/api.py:120 src/spark/api.py:175
 msgid "A POST request is required."
 msgstr ""
 
-#: src/pig/management/commands/pig_setup.py:46
+#: src/spark/api.py:162
 #, python-format
-msgid "Copying examples %(local_dir)s to %(remote_data_dir)s\n"
+msgid "There was an error with your query: %s"
 msgstr ""
 
-#: src/pig/management/commands/pig_setup.py:53
-#, python-format
-msgid "Copying data %(local_dir)s to %(remote_data_dir)s\n"
+#: src/spark/api.py:205
+msgid "A GET request is required."
 msgstr ""
 
-#: src/pig/templates/app.mako:23
-msgid "Pig"
+#: src/spark/api.py:234
+msgid "Missing application jar list."
 msgstr ""
 
-#: src/pig/templates/app.mako:28 src/pig/templates/app.mako:104
+#: src/spark/conf.py:28
+msgid "URL of the Spark Job Server."
+msgstr ""
+
+#: src/spark/conf.py:56
+msgid "The app won't work without a running Job Server"
+msgstr ""
+
+#: src/spark/decorators.py:34
+msgid "An error happened with the Spark Server"
+msgstr ""
+
+#: src/spark/forms.py:25
+msgid "Script parameters"
+msgstr ""
+
+#: src/spark/forms.py:27 src/spark/templates/editor.mako:79
+#: src/spark/templates/list_jobs.mako:36
+msgid "Class path"
+msgstr ""
+
+#: src/spark/views.py:94
+msgid "Delete context(s)?"
+msgstr ""
+
+#: src/spark/templates/common.mako:38
+msgid "Spark Igniter"
+msgstr ""
+
+#: src/spark/templates/common.mako:41
 msgid "Editor"
 msgstr ""
 
-#: src/pig/templates/app.mako:29
-msgid "Scripts"
+#: src/spark/templates/common.mako:43
+#: src/spark/templates/list_applications.mako:23
+#: src/spark/templates/list_applications.mako:29
+msgid "Applications"
 msgstr ""
 
-#: src/pig/templates/app.mako:30
+#: src/spark/templates/common.mako:45
 msgid "Dashboard"
 msgstr ""
 
-#: src/pig/templates/app.mako:40
-msgid "Search for script name or content"
+#: src/spark/templates/common.mako:46 src/spark/templates/list_contexts.mako:29
+msgid "Contexts"
 msgstr ""
 
-#: src/pig/templates/app.mako:44
-msgid "Run this script"
+#: src/spark/templates/common.mako:47
+msgid "Uploads"
 msgstr ""
 
-#: src/pig/templates/app.mako:44 src/pig/templates/app.mako:123
-msgid "Run"
+#: src/spark/templates/common.mako:59 src/spark/templates/editor.mako:59
+#: src/spark/templates/list_contexts.mako:41
+msgid "Create context"
 msgstr ""
 
-#: src/pig/templates/app.mako:45
-msgid "Copy this script"
-msgstr ""
-
-#: src/pig/templates/app.mako:45 src/pig/templates/app.mako:138
-msgid "Copy"
-msgstr ""
-
-#: src/pig/templates/app.mako:46
-msgid "Delete this script"
-msgstr ""
-
-#: src/pig/templates/app.mako:46 src/pig/templates/app.mako:143
-msgid "Delete"
-msgstr ""
-
-#: src/pig/templates/app.mako:50
-msgid "Create a new script"
-msgstr ""
-
-#: src/pig/templates/app.mako:50 src/pig/templates/app.mako:109
-#: src/pig/templates/app.mako:110
-msgid "New script"
-msgstr ""
-
-#: src/pig/templates/app.mako:54
-msgid ""
-"There are currently no scripts defined. Please add a new script clicking "
-"on \"New script\""
-msgstr ""
-
-#: src/pig/templates/app.mako:61 src/pig/templates/app.mako:181
-#: src/pig/templates/app.mako:287 src/pig/templates/app.mako:314
+#: src/spark/templates/common.mako:64 src/spark/templates/editor.mako:132
+#: src/spark/templates/editor.mako:220
+#: src/spark/templates/list_applications.mako:45
+#: src/spark/templates/list_contexts.mako:48
 msgid "Name"
 msgstr ""
 
-#: src/pig/templates/app.mako:62
-msgid "Script"
+#: src/spark/templates/common.mako:70
+msgid "Num cpu cores"
 msgstr ""
 
-#: src/pig/templates/app.mako:77
-msgid "There are no scripts matching the search criteria."
+#: src/spark/templates/common.mako:76
+msgid "Memory per node"
 msgstr ""
 
-#: src/pig/templates/app.mako:106
-msgid "Edit script"
+#: src/spark/templates/common.mako:84 src/spark/templates/common.mako:114
+#: src/spark/templates/editor.mako:234
+#: src/spark/templates/list_contexts.mako:85
+msgid "Cancel"
 msgstr ""
 
-#: src/pig/templates/app.mako:113
-msgid "Properties"
+#: src/spark/templates/common.mako:85
+msgid "Create"
 msgstr ""
 
-#: src/pig/templates/app.mako:115
-msgid "Edit properties"
+#: src/spark/templates/common.mako:96
+msgid "Upload application"
 msgstr ""
 
-#: src/pig/templates/app.mako:120
-msgid "Actions"
+#: src/spark/templates/common.mako:99
+msgid "One class of the jar should implement SparkJob."
 msgstr ""
 
-#: src/pig/templates/app.mako:122 src/pig/templates/app.mako:127
-msgid "Run the script"
+#: src/spark/templates/common.mako:101
+msgid "Local jar file"
 msgstr ""
 
-#: src/pig/templates/app.mako:128
-msgid "Stop"
+#: src/spark/templates/common.mako:107 src/spark/templates/editor.mako:63
+msgid "App name"
 msgstr ""
 
-#: src/pig/templates/app.mako:132
-msgid "Save the script"
+#: src/spark/templates/common.mako:115
+msgid "Upload"
 msgstr ""
 
-#: src/pig/templates/app.mako:133
-msgid "Save"
+#: src/spark/templates/editor.mako:23
+msgid "Query"
 msgstr ""
 
-#: src/pig/templates/app.mako:137
-msgid "Copy the script"
+#: src/spark/templates/editor.mako:39 src/spark/templates/editor.mako:486
+msgid "Application name"
 msgstr ""
 
-#: src/pig/templates/app.mako:142
-msgid "Delete the script"
+#: src/spark/templates/editor.mako:48
+msgid "Application description"
 msgstr ""
 
-#: src/pig/templates/app.mako:146 src/pig/templates/app.mako:374
-msgid "Logs"
+#: src/spark/templates/editor.mako:58
+#: src/spark/templates/list_applications.mako:36
+msgid "Upload app"
 msgstr ""
 
-#: src/pig/templates/app.mako:148
-msgid "Show Logs"
+#: src/spark/templates/editor.mako:66
+msgid "Missing, add one?"
 msgstr ""
 
-#: src/pig/templates/app.mako:148
-msgid "Current Logs"
+#: src/spark/templates/editor.mako:83 src/spark/templates/list_contexts.mako:23
+#: src/spark/templates/list_jobs.mako:37
+msgid "Context"
 msgstr ""
 
-#: src/pig/templates/app.mako:157
-msgid "Edit"
+#: src/spark/templates/editor.mako:86
+msgid "Automatic"
 msgstr ""
 
-#: src/pig/templates/app.mako:164
-msgid "Edit properties for"
+#: src/spark/templates/editor.mako:92
+msgid "Create one?"
 msgstr ""
 
-#: src/pig/templates/app.mako:167
-msgid "Script name"
-msgstr ""
-
-#: src/pig/templates/app.mako:172
+#: src/spark/templates/editor.mako:115
 msgid "Parameters"
 msgstr ""
 
-#: src/pig/templates/app.mako:174 src/pig/templates/app.mako:196
-#: src/pig/templates/app.mako:205 src/pig/templates/app.mako:241
-msgid "Add"
+#: src/spark/templates/editor.mako:121
+msgid "Your application has the following error(s):"
 msgstr ""
 
-#: src/pig/templates/app.mako:182 src/pig/templates/app.mako:213
+#: src/spark/templates/editor.mako:127
+msgid "No parameters defined yet."
+msgstr ""
+
+#: src/spark/templates/editor.mako:133 src/spark/templates/editor.mako:176
 msgid "Value"
 msgstr ""
 
-#: src/pig/templates/app.mako:190 src/pig/templates/app.mako:234
-msgid "Remove"
+#: src/spark/templates/editor.mako:147
+msgid "Delete"
 msgstr ""
 
-#: src/pig/templates/app.mako:203
-msgid "Resources"
+#: src/spark/templates/editor.mako:153
+msgid "Add"
 msgstr ""
 
-#: src/pig/templates/app.mako:212
-msgid "Type"
+#: src/spark/templates/editor.mako:159
+msgid "Executing..."
 msgstr ""
 
-#: src/pig/templates/app.mako:222
-msgid "File"
+#: src/spark/templates/editor.mako:160
+msgid "Execute"
 msgstr ""
 
-#: src/pig/templates/app.mako:223
-msgid "Archive"
+#: src/spark/templates/editor.mako:162 src/spark/templates/editor.mako:235
+msgid "Save"
 msgstr ""
 
-#: src/pig/templates/app.mako:251
-msgid "Logs for"
+#: src/spark/templates/editor.mako:163
+msgid "Save as..."
 msgstr ""
 
-#: src/pig/templates/app.mako:256
-msgid "Status:"
+#: src/spark/templates/editor.mako:164
+msgid "or create a"
 msgstr ""
 
-#: src/pig/templates/app.mako:258
-msgid "Progress:"
+#: src/spark/templates/editor.mako:164
+msgid "New application"
 msgstr ""
 
-#: src/pig/templates/app.mako:258
-msgid "%"
+#: src/spark/templates/editor.mako:166
+msgid "Download"
 msgstr ""
 
-#: src/pig/templates/app.mako:264
-msgid "No available logs."
+#: src/spark/templates/editor.mako:175
+msgid "Key"
 msgstr ""
 
-#: src/pig/templates/app.mako:278 src/pig/templates/app.mako:640
-msgid "Running"
+#: src/spark/templates/editor.mako:188
+msgid "The server returned no results."
 msgstr ""
 
-#: src/pig/templates/app.mako:282
-msgid "There are currently no running scripts."
+#: src/spark/templates/editor.mako:215
+msgid "Save your query"
 msgstr ""
 
-#: src/pig/templates/app.mako:288
-msgid "Progress"
+#: src/spark/templates/editor.mako:226
+msgid "Description"
 msgstr ""
 
-#: src/pig/templates/app.mako:289 src/pig/templates/app.mako:316
-msgid "Created on"
-msgstr ""
-
-#: src/pig/templates/app.mako:305
-msgid "Completed"
-msgstr ""
-
-#: src/pig/templates/app.mako:309
-msgid "There are currently no completed scripts."
-msgstr ""
-
-#: src/pig/templates/app.mako:315
-msgid "Status"
-msgstr ""
-
-#: src/pig/templates/app.mako:328
-msgid "Click to edit"
-msgstr ""
-
-#: src/pig/templates/app.mako:342
-msgid "Click to view"
-msgstr ""
-
-#: src/pig/templates/app.mako:359
-msgid "Confirm Delete"
-msgstr ""
-
-#: src/pig/templates/app.mako:362
-msgid "Are you sure you want to delete this script?"
-msgstr ""
-
-#: src/pig/templates/app.mako:363
-msgid "Are you sure you want to delete these scripts?"
-msgstr ""
-
-#: src/pig/templates/app.mako:366 src/pig/templates/app.mako:400
-#: src/pig/templates/app.mako:411
-msgid "No"
-msgstr ""
-
-#: src/pig/templates/app.mako:367 src/pig/templates/app.mako:401
-#: src/pig/templates/app.mako:412
-msgid "Yes"
-msgstr ""
-
-#: src/pig/templates/app.mako:381
-msgid "Close"
-msgstr ""
-
-#: src/pig/templates/app.mako:388
-msgid "Run Script"
-msgstr ""
-
-#: src/pig/templates/app.mako:388 src/pig/templates/app.mako:408
-msgid "?"
-msgstr ""
-
-#: src/pig/templates/app.mako:391
-msgid "Script variables"
-msgstr ""
-
-#: src/pig/templates/app.mako:408
-msgid "Stop Script"
-msgstr ""
-
-#: src/pig/templates/app.mako:419
+#: src/spark/templates/editor.mako:242
 msgid "Choose a file"
 msgstr ""
 
-#: src/pig/templates/app.mako:451
-msgid "The pig job could not be killed."
+#: src/spark/templates/editor.mako:378
+msgid "Did you know?"
 msgstr ""
 
-#: src/pig/templates/app.mako:452
-msgid "Run this pig script"
+#: src/spark/templates/editor.mako:480
+msgid "This field is required."
 msgstr ""
 
-#: src/pig/templates/app.mako:453
-msgid "Stop the execution"
+#: src/spark/templates/editor.mako:493
+msgid "Empty description"
 msgstr ""
 
-#: src/pig/templates/app.mako:454
-msgid "Saved"
+#: src/spark/templates/editor.mako:499
+msgid "Application saved successfully!"
 msgstr ""
 
-#: src/pig/templates/app.mako:633
-msgid "Saving"
+#: src/spark/templates/editor.mako:527
+#: src/spark/templates/list_applications.mako:93
+#: src/spark/templates/list_contexts.mako:131
+#: src/spark/templates/list_jobs.mako:96
+msgid "No data available"
 msgstr ""
 
-#: src/pig/templates/app.mako:644
-msgid "has been saved correctly."
+#: src/spark/templates/editor.mako:528
+#: src/spark/templates/list_applications.mako:94
+#: src/spark/templates/list_contexts.mako:132
+#: src/spark/templates/list_jobs.mako:97
+msgid "No matching records"
 msgstr ""
 
-#: src/pig/templates/app.mako:648
-msgid "There was an error with your request!"
+#: src/spark/templates/editor.mako:579
+msgid "Server error occured: "
+msgstr ""
+
+#: src/spark/templates/editor.mako:582
+msgid "Unmanageable server error occured: "
+msgstr ""
+
+#: src/spark/templates/list_applications.mako:33
+#: src/spark/templates/list_contexts.mako:33
+msgid "Search for name"
+msgstr ""
+
+#: src/spark/templates/list_applications.mako:46
+msgid "Upload time"
+msgstr ""
+
+#: src/spark/templates/list_applications.mako:53
+msgid "Click to open and execute"
+msgstr ""
+
+#: src/spark/templates/list_contexts.mako:36
+msgid "Delete forever"
+msgstr ""
+
+#: src/spark/templates/list_contexts.mako:37
+msgid "Delete selected"
+msgstr ""
+
+#: src/spark/templates/list_contexts.mako:82
+msgid "Confirm action"
+msgstr ""
+
+#: src/spark/templates/list_contexts.mako:86
+msgid "Yes"
+msgstr ""
+
+#: src/spark/templates/list_contexts.mako:208
+msgid "Delete the selected contexts?"
+msgstr ""
+
+#: src/spark/templates/list_jobs.mako:23 src/spark/templates/list_jobs.mako:29
+msgid "Jobs"
+msgstr ""
+
+#: src/spark/templates/list_jobs.mako:34
+msgid "Status"
+msgstr ""
+
+#: src/spark/templates/list_jobs.mako:35
+msgid "Job id"
+msgstr ""
+
+#: src/spark/templates/list_jobs.mako:38
+msgid "Start time"
+msgstr ""
+
+#: src/spark/templates/list_jobs.mako:39
+msgid "Duration"
+msgstr ""
+
+#: src/spark/templates/list_jobs.mako:51
+msgid "Click to open"
 msgstr ""
 
