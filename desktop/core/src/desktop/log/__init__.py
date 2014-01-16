@@ -33,7 +33,7 @@ from desktop.lib.paths import get_desktop_root
 
 DEFAULT_LOG_DIR = 'logs'
 LOG_FORMAT = '[%(asctime)s] %(module)-12s %(levelname)-8s %(message)s'
-DATE_FORMAT = '%d/%b/%Y %H:%M:%S %z'
+DATE_FORMAT = '%d/%b/%Y %H:%M:%S'
 
 CONF_RE = re.compile('%LOG_DIR%|%PROC_NAME%')
 
