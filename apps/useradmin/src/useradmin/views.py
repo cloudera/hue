@@ -24,10 +24,7 @@ import grp
 import logging
 import threading
 import subprocess
-try:
-  import json
-except ImportError:
-  import simplejson as json
+import json
 
 import ldap
 import ldap_access

@@ -1045,7 +1045,7 @@ $(document).ready(function () {
         CodeMirror.possibleTable = false;
         CodeMirror.tableFieldMagic = false;
         if (_before.toUpperCase().indexOf(" FROM ") > -1 && _before.toUpperCase().indexOf(" ON ") == -1 && _before.toUpperCase().indexOf(" WHERE ") == -1 ||
-            _before.toUpperCase().indexOf("REFRESH") > -1 || _before.toUpperCase().indexOf("METADATA") > -1) {
+            _before.toUpperCase().indexOf("REFRESH") > -1 || _before.toUpperCase().indexOf("METADATA") > -1 || _before.toUpperCase().indexOf("DESCRIBE") > -1) {
           CodeMirror.possibleTable = true;
         }
         CodeMirror.possibleSoloField = false;

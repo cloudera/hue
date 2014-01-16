@@ -73,7 +73,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
       <div class="nav-collapse">
         <ul class="nav">
           <li class="currentApp">
-            <a href="/home">
+            <a href="${ url('desktop.views.home') }">
               <img src="/static/art/home.png" />
               ${ _('My documents') }
             </a>
@@ -249,7 +249,7 @@ var documentsTable;
 
 $(document).ready(function () {
   var selectedUserOrGroup, map, dropdown = null;
-  $.getJSON("${ url('useradmin.views.list_for_autocomplete') }", function (data) {
+  $.getJSON('/desktop/api/users/autocomplete', function (data) {
     JSON_USERS_GROUPS = data;
     dropdown = [];
     map = {};
@@ -484,11 +484,11 @@ $(document).ready(function () {
 
 
   function addTag(value, callback) {
-    $.post("/tag/add_tag", {
+    $.post("/desktop/api/tag/add_tag", {
       name: value
     }, function (data) {
       $("#documentTagsNew").val("");
-      $.getJSON("/tag/list_tags", function (data) {
+      $.getJSON("/desktop/api/tag/list_tags", function (data) {
         JSON_TAGS = data;
         renderTags();
         callback();
@@ -534,7 +534,7 @@ $(document).ready(function () {
       var _this = $(this);
       _tags.push(_this.data("value"));
     });
-    $.post("/doc/update_tags", {
+    $.post("/desktop/api/doc/update_tags", {
       data: JSON.stringify({
         doc_id: $("#documentTagsModal").data("document-id"),
         tag_ids: _tags
@@ -569,7 +569,7 @@ $(document).ready(function () {
       var _this = $(this);
       _tags.push(_this.data("value"));
     });
-    $.post("/tag/remove_tags", {
+    $.post("/desktop/api/tag/remove_tags", {
       data: JSON.stringify({
         tag_ids: _tags
       })
@@ -577,7 +577,7 @@ $(document).ready(function () {
         if (response!=null){
           if (response.status == 0){
             $(document).trigger("info", response.message);
-            $.getJSON("/tag/list_tags", function (data) {
+            $.getJSON("/desktop/api/tag/list_tags", function (data) {
               JSON_TAGS = data;
               renderTags();
               renderTagsModal();
@@ -682,7 +682,7 @@ $(document).ready(function () {
       }
     }
 
-    $.post("/doc/update_permissions", {
+    $.post("/desktop/api/doc/update_permissions", {
       doc_id: $("#documentShareModal").data("document-id"),
       data: JSON.stringify(_postPerms)
     }, function (response) {
@@ -693,7 +693,7 @@ $(document).ready(function () {
           updateDoc(response.doc);
         }
         else {
-          $(document).trigger("error", "${_("There was an error processing your action: ")}"+response.message);
+          $(document).trigger("error", "${_("There was an error processing your action: ")}" + response.message);
         }
       }
     });
@@ -702,7 +702,7 @@ $(document).ready(function () {
 });
 
 function renderDocs(callback) {
-  $.getJSON("/doc/list_docs", function (data) {
+  $.getJSON("/desktop/api/doc/list_docs", function (data) {
     JSON_DOCS = data;
     populateTable();
     if (callback != null) {

@@ -119,7 +119,7 @@ def test_config_validator_basic():
   old = cluster.clear_caches()
   try:
     cli = make_logged_in_client()
-    resp = cli.get('/debug/check_config')
+    resp = cli.get('/desktop/debug/check_config')
     assert_true('hadoop.hdfs_clusters.default.webhdfs_url' in resp.content)
   finally:
     for old_conf in reset:

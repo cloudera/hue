@@ -316,7 +316,7 @@ class LoginAndPermissionMiddleware(object):
       # Here we trust the URL to be the real app we need to check the perms.
       app_accessed = request._desktop_app
       ui_app_accessed = get_app_name(request)
-      if app_accessed != ui_app_accessed and ui_app_accessed not in ('logs', 'dump_config', 'debug'):
+      if app_accessed != ui_app_accessed and ui_app_accessed not in ('logs', 'accounts', 'login'):
         app_accessed = ui_app_accessed
 
       if app_accessed and \

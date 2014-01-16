@@ -127,6 +127,7 @@ class DocumentTagManager(models.Manager):
       doc.add_tag(default_tag)
 
   def update_tags(self, owner, doc_id, tag_ids):
+    # TODO secu
     doc = Document.objects.get_doc(doc_id, owner)
 
     for tag in doc.tags.all():
@@ -166,7 +167,7 @@ class DocumentTag(models.Model):
 class DocumentManager(models.Manager):
 
   def documents(self, user):
-    return Document.objects.filter(Q(owner=user) | Q(documentpermission__users=user) | Q(documentpermission__groups__in=user.groups.all()))
+    return Document.objects.filter(Q(owner=user) | Q(documentpermission__users=user) | Q(documentpermission__groups__in=user.groups.all())).distinct()
 
   def get_docs(self, user, model_class=None, extra=None):
     docs = Document.objects.documents(user).exclude(name='pig-app-hue-script')
@@ -321,7 +322,7 @@ class DocumentManager(models.Manager):
         doc.tags.remove(default_tag)
     except Exception, e:
       LOG.warn(force_unicode(e))
-      
+
     # Delete documents with no object
     try:
       for doc in Document.objects.all():
@@ -425,7 +426,7 @@ class Document(models.Model):
       default_tag = DocumentTag.objects.get_default_tag(copy_doc.owner)
       tags = [default_tag]
     copy_doc.tags.add(*tags)
-    
+
     return copy_doc
 
   @property
@@ -437,7 +438,7 @@ class Document(models.Model):
         if self.extra == '0':
           return apps['beeswax'].icon_path
         elif self.extra == '3':
-          return apps['spark'].icon_path        
+          return apps['spark'].icon_path
         else:
           return apps['impala'].icon_path
       elif self.content_type.app_label == 'oozie':
@@ -454,13 +455,15 @@ class Document(models.Model):
       return '/static/art/favicon.png'
 
   def share(self, users, groups, name='read'):
-    DocumentPermission.objects.update(document=self, name=name, users=users, groups=groups, add=True)
+    DocumentPermission.objects.filter(document=self, name=name).update(users=users, groups=groups, add=True)
 
   def unshare(self, users, groups, name='read'):
-    DocumentPermission.objects.update(document=self, name=name, users=users, groups=groups, add=False)
+    DocumentPermission.objects.filter(document=self, name=name).update(users=users, groups=groups, add=False)
 
   def sync_permissions(self, perms_dict):
     """
+    Set who else or which other group can interact with the document.
+
     Example of input: {'read': {'user_ids': [1, 2, 3], 'group_ids': [1, 2, 3]}}
     """
     for name, perm in perms_dict.iteritems():
@@ -518,12 +521,14 @@ class DocumentPermissionManager(models.Manager):
     if users is not None:
       perm.users = []
       perm.users = users
+      perm.save()
 
     if groups is not None:
       perm.groups = []
       perm.groups = groups
+      perm.save()
 
-    if not perm.users and not perm.groups:
+    if not users and not groups:
       perm.delete()
 
   def list(self, document):
@@ -538,8 +543,7 @@ class DocumentPermission(models.Model):
 
   users = models.ManyToManyField(auth_models.User, db_index=True)
   groups = models.ManyToManyField(auth_models.Group, db_index=True)
-  perms = models.TextField(
-      default='read', choices=((READ_PERM, 'read'),),)
+  perms = models.TextField(default=READ_PERM, choices=((READ_PERM, 'read'),))
 
 
   objects = DocumentPermissionManager()

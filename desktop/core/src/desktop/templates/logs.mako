@@ -69,7 +69,7 @@ ${layout.menubar(section='log_view')}
       </%def>
       <%def name="creation()">
         <label class="checkbox" style="display: inline-block; margin-right: 10px"><input id="wrapLogs" type="checkbox" checked="checked">${_('Wrap logs')}</label>
-        <a href="/download_logs" class="btn"><i class="fa fa-download"></i> ${_('Download entire log as zip')}</a>
+        <a href="/desktop/download_logs" class="btn"><i class="fa fa-download"></i> ${_('Download entire log as zip')}</a>
       </%def>
     </%actionbar:render>
 
