@@ -514,7 +514,7 @@ function BeeswaxViewModel(server) {
     self.design.explain(false);
     self.design.isRunning(true);
     self.design.isFinished(true);
-    self.design.errors.removeAll();
+    self.resetErrors();
 
     var data = {
       'next': true
@@ -559,7 +559,7 @@ function BeeswaxViewModel(server) {
         self.design.isRunning(false);
         try {
           var data = $.parseJSON(jqXHR.responseText);
-          self.design.errors.push(data.error);
+          self.design.watch.errors.push(data.error);
         } catch(e) {
           $(document).trigger('server.unmanageable_error', jqXHR.responseText);
         }
@@ -574,13 +574,14 @@ function BeeswaxViewModel(server) {
     var timer = null;
 
     self.design.watch.logs.removeAll();
-    self.design.watch.errors.removeAll();
     self.design.results.rows.removeAll();
     self.design.results.columns.removeAll();
+    self.resetErrors();
 
     var _fn = function() {
       $(document).one('watched.query', function(e, data) {
-        if (data.isSuccess || data.isFailure) {
+        var failed = data.isFailure  || data.status != 0;
+        if (data.isSuccess || failed) {
           clearTimeout(timer);
           self.design.isRunning(false);
 
@@ -588,7 +589,7 @@ function BeeswaxViewModel(server) {
             self.design.watch.logs.push(data.log);
             // scroll logs
           }
-          if (!data.isFailure) {
+          if (!failed) {
             $(document).trigger('stop_watch.query');
 
             if (fn) {

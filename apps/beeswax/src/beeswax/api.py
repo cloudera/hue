@@ -44,9 +44,9 @@ LOG = logging.getLogger(__name__)
 
 
 def error_handler(view_fn):
-  def decorator(*args, **kwargs):
+  def decorator(request, *args, **kwargs):
     try:
-      return view_fn(*args, **kwargs)
+      return view_fn(request, *args, **kwargs)
     except Http404, e:
       raise e
     except Exception, e:
@@ -54,6 +54,14 @@ def error_handler(view_fn):
         message = str(e)
       else:
         message = force_unicode(e.message, strings_only=True, errors='replace')
+        
+        if 'Invalid OperationHandle' in message and 'id' in kwargs:
+          # Expired state.
+          query_history = authorized_get_query_history(request, kwargs['id'], must_exist=False)
+          if query_history:
+            query_history.set_to_expired()
+            query_history.save()
+
       response = {
         'status': -1,
         'message': message,
