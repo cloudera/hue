@@ -85,12 +85,12 @@ ${ layout.menubar(section='workflows') }
       <div class="alert alert-info"><h3 data-bind="text: name()"></h3></div>
       <div class="card-body">
         <p>
-            <fieldset>
-        ${ utils.render_field_with_error_js(workflow_form['name'], workflow_form['name'].name, extra_attrs={'data-bind': 'value: %s' % workflow_form['name'].name}) }
-        ${ utils.render_field_with_error_js(workflow_form['description'], workflow_form['description'].name, extra_attrs={'data-bind': 'value: %s' % workflow_form['description'].name}) }
-        <div class="hide">
-          ${ utils.render_field_with_error_js(workflow_form['is_shared'], workflow_form['is_shared'].name, extra_attrs={'data-bind': 'checked: %s' % workflow_form['is_shared'].name}) }
-        </div>
+          <fieldset>
+            ${ utils.render_field_with_error_js(workflow_form['name'], workflow_form['name'].name, extra_attrs={'data-bind': 'value: %s' % workflow_form['name'].name}) }
+            ${ utils.render_field_with_error_js(workflow_form['description'], workflow_form['description'].name, extra_attrs={'data-bind': 'value: %s' % workflow_form['description'].name}) }
+            <div class="hide">
+              ${ utils.render_field_with_error_js(workflow_form['is_shared'], workflow_form['is_shared'].name, extra_attrs={'data-bind': 'checked: %s' % workflow_form['is_shared'].name}) }
+            </div>
 
       <%
       workflows.key_value_field(workflow_form['parameters'].label, workflow_form['parameters'].help_text, {
@@ -369,10 +369,13 @@ ${ layout.menubar(section='workflows') }
                 % for record in history:
                 <tr>
                   <td>
-                    <a href="${ url('oozie:list_history_record', record_id=record.id) }" data-row-selector="true"></a>
                     ${ utils.format_date(record.submission_date) }
                   </td>
-                  <td>${ record.oozie_job_id }</td>
+                  <td>
+                    <a href="${ record.get_absolute_oozie_url() }" data-row-selector="true">
+                      ${ record.oozie_job_id }
+                    </a>
+                  </td>
                 </tr>
                 % endfor
                 </tbody>
@@ -947,6 +950,8 @@ var AUTOCOMPLETE_PROPERTIES;
 $(document).ready(function () {
 
   routie('editWorkflow');
+
+  $("a[data-row-selector='true']").jHueRowSelector();
 
   var actionToolbarProperties = {
     docked: false,
