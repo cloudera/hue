@@ -416,10 +416,13 @@ ${ layout.menubar(section='coordinators') }
               % for record in history:
               <tr>
                 <td>
-                  <a href="${ url('oozie:list_history_record', record_id=record.id) }" data-row-selector="true"></a>
                   ${ utils.format_date(record.submission_date) }
                 </td>
-                <td>${ record.oozie_job_id }</td>
+                <td>
+                  <a href="${ record.get_absolute_oozie_url() }" data-row-selector="true">
+                    ${ record.oozie_job_id }
+                  </a>
+                </td>
               </tr>
               % endfor
               </tbody>

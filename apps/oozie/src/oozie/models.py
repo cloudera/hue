@@ -984,14 +984,14 @@ class Hive(Action):
       help_text=_t('List of names or paths of files to be added to the distributed cache and the task running directory.'))
   archives = models.TextField(default="[]", verbose_name=_t('Archives'),
       help_text=_t('List of names or paths of the archives to be added to the distributed cache.'))
-  job_properties = models.TextField(default='[{"name":"oozie.hive.defaults","value":"hive-site.xml"}]',
+  job_properties = models.TextField(default='[]',
                                     verbose_name=_t('Hadoop job properties'),
                                     help_text=_t('For the job configuration (e.g. mapred.job.queue.name=production)'))
   prepares = models.TextField(default="[]", verbose_name=_t('Prepares'),
                               help_text=_t('List of absolute paths to delete, then create, before starting the application. '
                                            'This should be used exclusively for directory cleanup.'))
-  job_xml = models.CharField(max_length=PATH_MAX, default='', blank=True, verbose_name=_t('Job XML'),
-                             help_text=_t('Refer to a Hive hive-site.xml file bundled in the workflow deployment directory. '))
+  job_xml = models.CharField(max_length=PATH_MAX, default='hive-config.xml', blank=True, verbose_name=_t('Job XML'),
+                             help_text=_t('Refer to a Hive hive-config.xml file bundled in the workflow deployment directory. Pick a name different than hive-site.xml.'))
 
   def get_properties(self):
     return json.loads(self.job_properties)

@@ -22,7 +22,7 @@
 <!--
   Note:
 
-  Configure Hive to use a remote Hive Metastore and update this hive-site.xml.
+  Configure Hive to use a remote Hive Metastore and update this from /etc/hive/conf/hive-site.xml values.
   This example can work with a local metatastore but this is not recommended.
 
   http://gethue.tumblr.com/post/60937985689/hadoop-tutorials-ii-2-execute-hive-queries-and
