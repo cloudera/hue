@@ -61,18 +61,27 @@ def test_config_gen():
 </configuration>"""), reformat_xml(config_gen(properties)))
 
 
+class MockFs():
+  def __init__(self, logical_name=None):
+
+    self.fs_defaultfs = 'hdfs://curacao:8020'
+    self.logical_name = logical_name if logical_name else ''
+
+
 def test_update_properties():
   finish = []
   finish.append(MR_CLUSTERS['default'].SUBMIT_TO.set_for_testing(True))
   finish.append(YARN_CLUSTERS['default'].SUBMIT_TO.set_for_testing(True))
   try:
     properties = {
-      'user.name': 'hue',
-      'test.1': 'http://localhost/test?test1=test&test2=test'
+        'user.name': 'hue',
+        'test.1': 'http://localhost/test?test1=test&test2=test',
+        'nameNode': 'hdfs://curacao:8020',
+        'jobTracker': 'jtaddress'
     }
 
     final_properties = properties.copy()
-    submission = Submission(None, properties=properties, oozie_id='test')
+    submission = Submission(None, properties=properties, oozie_id='test', fs=MockFs())
     assert_equal(properties, submission.properties)
     submission._update_properties('jtaddress', 'deployment-directory')
     assert_equal(final_properties, submission.properties)

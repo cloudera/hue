@@ -156,7 +156,7 @@ class PseudoHdfs4(object):
   def jt(self):
     """Returns a LiveJobTracker object configured for this cluster."""
     if self._jt is None:
-      self._jt = LiveJobTracker(self._fqdn, 0)
+      self._jt = LiveJobTracker(self._fqdn, self.jt_thrift_port)
     return self._jt
 
   def stop(self):
