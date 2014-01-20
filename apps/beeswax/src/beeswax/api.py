@@ -167,6 +167,7 @@ def watch_query_refresh_json(request, id):
   job_urls = dict([(job, reverse('jobbrowser.views.single_job', kwargs={'job': job})) for job in jobs])
 
   result = {
+    'status': 0,
     'log': log,
     'jobs': jobs,
     'jobUrls': job_urls,

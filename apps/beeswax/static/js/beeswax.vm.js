@@ -489,7 +489,7 @@ function BeeswaxViewModel(server) {
       dataType: 'json',
       type: 'POST',
       success: function(data) {
-        self.design.errors.removeAll();
+        self.resetErrors();
         if (data.status == 0) {
           self.design.results.url('/' + self.server() + '/results/' + data.id + '/0?format=json');
           self.design.watch.url(data.watch_url);
@@ -524,7 +524,7 @@ function BeeswaxViewModel(server) {
       dataType: 'json',
       type: 'POST',
       success: function(data) {
-        self.design.errors.removeAll();
+        self.resetErrors();
         self.design.watch.logs.removeAll();
         self.design.statement(data.statement);
         self.design.watch.url(data.watch_url);
@@ -616,7 +616,7 @@ function BeeswaxViewModel(server) {
 
   self.fetchResults = function() {
     $(document).trigger('fetch.results');
-    self.design.results.errors.removeAll();
+    self.resetErrors();
     var request = {
       url: self.design.results.url(),
       dataType: 'json',
