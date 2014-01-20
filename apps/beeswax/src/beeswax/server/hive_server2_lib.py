@@ -493,7 +493,7 @@ class HiveServerClient:
 
   def close_operation(self, operation_handle):
     req = TCloseOperationReq(operationHandle=operation_handle)
-    return self.call(self._client.CancelOperation, req)
+    return self.call(self._client.CloseOperation, req)
 
 
   def get_columns(self, database, table):
