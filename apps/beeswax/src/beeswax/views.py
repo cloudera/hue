@@ -42,7 +42,7 @@ import beeswax.design
 import beeswax.management.commands.beeswax_install_examples
 
 from beeswax import common, data_export, models
-from beeswax.models import SavedQuery, make_query_context, QueryHistory
+from beeswax.models import SavedQuery, QueryHistory
 from beeswax.server import dbms
 from beeswax.server.dbms import expand_exception, get_query_server_config
 
@@ -444,7 +444,7 @@ def view_results(request, id, first_row=0):
 
   context = {
     'error': error,
-    'error_message': error_message,
+    'message': error_message,
     'query': query_history,
     'results': data,
     'columns': columns,
