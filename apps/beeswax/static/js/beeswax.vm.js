@@ -586,7 +586,7 @@ function BeeswaxViewModel(server) {
           self.design.isRunning(false);
 
           if (data.log) {
-            self.design.watch.logs.push(data.log);
+            self.design.watch.logs(data.log.split("\n"));
             // scroll logs
           }
           if (!failed) {
@@ -601,7 +601,7 @@ function BeeswaxViewModel(server) {
         } else {
           self.design.statement(data.statement); // In case new no result statement executed
           if (data.log) {
-            self.design.watch.logs.push(data.log);
+            self.design.watch.logs(data.log.split("\n"));
             // scroll logs
           }
 
