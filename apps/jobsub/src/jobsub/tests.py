@@ -25,7 +25,7 @@ from django.core.urlresolvers import reverse
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.models import Document
 
-from liboozie.oozie_api_test import OozieServerProvider
+from liboozie.oozie_api_tests import OozieServerProvider
 from oozie.models import Workflow, Node, Action, Start, Kill, End, Link
 
 

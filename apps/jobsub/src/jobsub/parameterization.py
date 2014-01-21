@@ -62,7 +62,7 @@ def recursive_walk(function, data):
 
   return function(data)
 
-def find_variables(data):
+def find_variables(data, include_named=True):
   """
   Finds all substitutable variables.
 
@@ -74,7 +74,7 @@ def find_variables(data):
     if not isinstance(val, basestring):
       return
     for match in Template.pattern.finditer(val):
-      name = match.group('named') or match.group('braced')
+      name = (include_named and match.group('named')) or match.group('braced')
       if name is not None:
         found.add(name)
 

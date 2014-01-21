@@ -32,7 +32,7 @@ from desktop.models import Document
 from hadoop import cluster
 from hadoop.conf import YARN_CLUSTERS
 from hadoop.yarn import resource_manager_api, mapreduce_api, history_server_api
-from liboozie.oozie_api_test import OozieServerProvider
+from liboozie.oozie_api_tests import OozieServerProvider
 from oozie.models import Workflow
 
 from jobbrowser import models, views

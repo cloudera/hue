@@ -15,10 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-try:
-  import json
-except ImportError:
-  import simplejson as json
+
+import json
 import time
 
 from django.contrib.auth.models import User
@@ -29,7 +27,7 @@ from nose.tools import assert_true, assert_equal
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
 from hadoop import pseudo_hdfs4
-from liboozie.oozie_api_test import OozieServerProvider
+from liboozie.oozie_api_tests import OozieServerProvider
 from oozie.tests import OozieBase
 
 from pig.models import create_or_update_script, PigScript
