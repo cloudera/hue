@@ -14,12 +14,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from liboozie.oozie_api_test import OozieServerProvider
 
-try:
-  import json
-except ImportError:
-  import simplejson as json
+
+import json
 import time
 
 from django.contrib.auth.models import User

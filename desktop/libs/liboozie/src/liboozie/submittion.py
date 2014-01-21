@@ -170,7 +170,7 @@ class Submission(object):
 
   def _get_external_parameters(self, xml, properties=None):
     from oozie.models import DATASET_FREQUENCY
-    parameters = dict([(var, '') for var in find_variables(xml) if not self._is_coordinator() or var not in DATASET_FREQUENCY])
+    parameters = dict([(var, '') for var in find_variables(xml, include_named=False) if not self._is_coordinator() or var not in DATASET_FREQUENCY])
 
     if properties:
       parameters.update(dict([line.strip().split('=')

@@ -136,6 +136,12 @@ class TestSubmission(OozieMockBase):
               <argument>INPUT=${input}</argument>
               <argument>-param</argument>
               <argument>OUTPUT=${output}</argument>
+            <configuration>
+              <property>
+                <name>mapred.input.format.class</name>
+                <value>org.apache.hadoop.examples.SleepJob$SleepInputFormat</value>
+              </property>
+            </configuration>
         </pig>
         <ok to="end"/>
         <error to="kill"/>
