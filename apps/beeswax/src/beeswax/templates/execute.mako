@@ -1144,12 +1144,7 @@ $(document).ready(function () {
     if (codeMirror.getValue() == queryPlaceholder) {
       codeMirror.setValue("");
     }
-    if (errorWidgets) {
-      $.each(errorWidgets, function(index, errorWidget) {
-        errorWidget.clear();
-      });
-      errorWidgets = [];
-    }
+    clearErrorWidgets();
     $("#validationResults").empty();
   });
 
@@ -1511,6 +1506,15 @@ $(document).on('fetched.results', resultsTable);
 
 var selectedLine = -1;
 var errorWidgets = [];
+
+function clearErrorWidgets() {
+  $.each(errorWidgets, function(index, errorWidget) {
+    errorWidget.clear();
+  });
+  errorWidgets = [];
+}
+
+$(document).on('execute.query', clearErrorWidgets);
 
 $(document).on('error.query', function () {
   $.each(errorWidgets, function(index, el) {
