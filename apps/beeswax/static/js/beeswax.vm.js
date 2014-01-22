@@ -708,7 +708,7 @@ function BeeswaxViewModel(server) {
 
   self.closeQuery = function() {
     var self = this;
-    if (self.design.history.id()) {
+    if (self.design.history.id() && !self.design.isRunning()) {
       var data = {};
       var url = '/' + self.server() + '/api/query/' + self.design.history.id() + '/close';
       var request = {
