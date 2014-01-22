@@ -1232,7 +1232,7 @@ class TestEditor(OozieMockBase):
       beeswax.conf.HIVE_CONF_DIR = Getter()
 
       action1 = Node.objects.get(workflow=self.wf, name='MyHive')
-      action1.credentials = [{'name': 'hcat', 'value': True}, {'name': 'hbase', 'value': False}]
+      action1.credentials = [{'name': 'hcat', 'value': True}, {'name': 'hbase', 'value': False}, {'name': 'hive2', 'value': True}]
       action1.save()
 
       xml = self.wf.to_xml(mapping={
@@ -1242,6 +1242,13 @@ class TestEditor(OozieMockBase):
                   'properties': [
                       ('hcat.metastore.uri', 'thrift://hue-koh-chang:9999'),
                       ('hcat.metastore.principal', 'hive')
+                  ]
+              },
+              'hive2': {
+                  'xml_name': 'hive2',
+                  'properties': [
+                      ('hive2.jdbc.url', 'jdbc:hive2://hue-koh-chang:8888'),
+                      ('hive2.server.principal', 'hive')
                   ]
               }
           }
@@ -1270,9 +1277,19 @@ class TestEditor(OozieMockBase):
         <value>hive</value>
       </property>
     </credential>
+    <credential name="hive2" type="hive2">
+      <property>
+        <name>hive2.jdbc.url</name>
+        <value>jdbc:hive2://hue-koh-chang:8888</value>
+      </property>
+      <property>
+        <name>hive2.server.principal</name>
+        <value>hive</value>
+      </property>
+    </credential>
   </credentials>
     <start to="MyHive"/>
-    <action name="MyHive" cred="hcat">
+    <action name="MyHive" cred="hcat,hive2">
         <hive xmlns="uri:oozie:hive-action:0.2">
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
