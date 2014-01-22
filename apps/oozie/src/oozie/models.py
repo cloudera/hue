@@ -200,7 +200,7 @@ class Job(models.Model):
   def find_all_parameters(self):
     params = self.find_parameters()
 
-    if hasattr(self, 'sla'):
+    if hasattr(self, 'sla') and self.sla_enabled:
       for param in find_json_parameters(self.sla):
         if param not in params:
           params[param] = ''

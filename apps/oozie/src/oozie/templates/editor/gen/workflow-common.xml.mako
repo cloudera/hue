@@ -24,7 +24,7 @@
 <%def name="filelink(path)">${ '#' in path and path or path + '#' + posixpath.basename(path) }</%def>
 
 
-<%def name="credentials(credentials)">${ ' cred="%s"' % ' '.join([cred['name'] for cred in credentials if cred['value']]) if credentials else '' | n,unicode }</%def>
+<%def name="credentials(credentials)">${ ' cred="%s"' % ','.join([cred['name'] for cred in credentials if cred['value']]) if credentials else '' | n,unicode }</%def>
 
 
 <%def name="prepares(prepares)">

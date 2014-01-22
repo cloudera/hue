@@ -75,7 +75,7 @@ class TestCredentials():
          'hive2': {
             'xml_name': 'hive2',
             'properties': [
-                ('hive2.jdbc.url', 'jdbc:hive2://hue-koh-chang:12345'),
+                ('hive2.jdbc.url', 'jdbc:hive2://hue-koh-chang:12345/default'),
                 ('hive2.server.principal', 'hive')
           ]},
          'hbase': {

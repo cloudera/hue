@@ -75,6 +75,7 @@ class Submission(object):
     jobtracker = cluster.get_cluster_addr_for_job_submission()
 
     if deployment_dir is None:
+      self._update_properties(jobtracker) # Needed as we need to set some properties like Credentials before
       deployment_dir = self.deploy()
 
     self._update_properties(jobtracker, deployment_dir)
@@ -153,6 +154,7 @@ class Submission(object):
 
     return deployment_dir
 
+
   def get_external_parameters(self, application_path):
     """From XML and job.properties HDFS files"""
     deployment_dir = os.path.dirname(application_path)
@@ -175,7 +177,7 @@ class Submission(object):
                               for line in properties.split('\n') if not line.startswith('#') and len(line.strip().split('=')) == 2]))
     return parameters
 
-  def _update_properties(self, jobtracker_addr, deployment_dir):
+  def _update_properties(self, jobtracker_addr, deployment_dir=None):
     LOG.info('Using FS %s and JT %s' % (self.fs, self.jt))
     if self.jt and self.jt.logical_name:
       jobtracker_addr = self.jt.logical_name
@@ -190,7 +192,7 @@ class Submission(object):
       'nameNode': fs_defaultfs,
     })
 
-    if self.job:
+    if self.job and deployment_dir:
       self.properties.update({
         self.job.get_application_path_key(): self.fs.get_hdfs_path(deployment_dir),
         self.job.HUE_ID: self.job.id
