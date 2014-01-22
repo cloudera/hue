@@ -242,10 +242,10 @@ ${layout.menubar(section='query')}
 
           <div class="actions">
             % if app_name == 'impala':
-            <button data-bind="click: tryExecuteQuery, visible: !$root.design.isRunning() && $root.design.isFinished()" type="button" id="executeQuery" class="btn btn-primary disable-feedback" tabindex="2">${_('Execute')}</button>
+            <button data-bind="click: tryExecuteQuery, visible: $root.canExecute, enable: $root.queryEditorBlank" type="button" id="executeQuery" class="btn btn-primary disable-feedback" tabindex="2">${_('Execute')}</button>
             <button data-bind="click: tryCancelQuery, visible: $root.design.isRunning()" class="btn btn-danger" data-loading-text="${ _('Canceling...') }" rel="tooltip" data-original-title="${ _('Cancel the query') }">${ _('Cancel') }</button>
             % else:
-            <button data-bind="click: tryExecuteQuery, enable: !$root.design.isRunning(), visible: $root.design.isFinished()" type="button" id="executeQuery" class="btn btn-primary disable-feedback" tabindex="2">${_('Execute')}</button>
+            <button data-bind="click: tryExecuteQuery, enable: $root.canExecute() && $root.queryEditorBlank()" type="button" id="executeQuery" class="btn btn-primary disable-feedback" tabindex="2">${_('Execute')}</button>
             % endif
             <button data-bind="click: executeNextStatement, visible: !$root.design.isFinished()" type="button" class="btn btn-primary disable-feedback" tabindex="2">${_('Next')}</button>
 
@@ -1143,6 +1143,9 @@ $(document).ready(function () {
   codeMirror.on("focus", function () {
     if (codeMirror.getValue() == queryPlaceholder) {
       codeMirror.setValue("");
+      // Use a view model attribute so that we don't have to override KO.
+      // This allows Hue to disable the execute button until the query placeholder dies.
+      viewModel.queryEditorBlank(true);
     }
     clearErrorWidgets();
     $("#validationResults").empty();
