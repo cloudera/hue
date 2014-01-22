@@ -19,7 +19,6 @@ import logging
 from datetime import datetime,  timedelta
 
 from django import forms
-from django.db.models import Q
 from django.core.exceptions import ValidationError
 from django.forms.widgets import TextInput
 from django.utils.functional import curry
@@ -275,7 +274,7 @@ class SubWorkflowForm(forms.ModelForm):
     workflow = kwargs.pop('workflow')
     super(SubWorkflowForm, self).__init__(*args, **kwargs)
     choices=((wf.id, wf) for wf in Document.objects.available(Workflow, user) if workflow.id != id)
-    self.fields['sub_workflow'] = forms.ChoiceField(choices=choices, widget=forms.RadioSelect(attrs={'class':'radio'}))
+    self.fields['sub_workflow'] = forms.ChoiceField(choices=choices, required=False, widget=forms.RadioSelect(attrs={'class':'radio'}))
 
   class Meta:
     model = SubWorkflow
@@ -287,8 +286,9 @@ class SubWorkflowForm(forms.ModelForm):
   def clean_sub_workflow(self):
     try:
       return Workflow.objects.get(id=int(self.cleaned_data.get('sub_workflow')))
-    except Exception, e:
-      raise ValidationError(_('The sub-workflow could not be found: %s.' % e))
+    except:
+      LOG.debug('The sub-workflow could not be found.', exc_info=True)
+      return None
 
 
 class GenericForm(forms.ModelForm):
