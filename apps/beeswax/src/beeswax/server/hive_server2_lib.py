@@ -484,6 +484,9 @@ class HiveServerClient:
     configuration = self._get_query_configuration(query)
     query_statement =  query.get_query_statement(statement)
 
+    if self.query_server['server_name'] == 'impala' and self.query_server['querycache_rows'] > 0:
+      configuration['impala.resultset.cache.size'] = str(self.query_server['querycache_rows'])
+
     return self.execute_async_statement(statement=query_statement, confOverlay=configuration)
 
 
@@ -679,10 +682,6 @@ class HiveServerClientCompatible(object):
     operationHandle = handle.get_rpc_handle()
     if max_rows is None:
       max_rows = 1000
-
-    # Impala does not support FETCH_FIRST
-    if self.query_server['server_name'] == 'impala':
-      start_over = False
 
     if start_over:
       orientation = TFetchOrientation.FETCH_FIRST

@@ -707,6 +707,11 @@
   # Turn on/off impersonation mechanism when talking to Impala
   ## impersonation_enabled=False
 
+  # Number of initial rows of a result set to ask Impala to cache in order
+  # to support re-fetching them for downloading them.
+  # Set to 0 for disabling the option and backward compatibility.
+  ## querycache_rows=50000
+
 
 ###########################################################################
 # Settings to configure Hbase

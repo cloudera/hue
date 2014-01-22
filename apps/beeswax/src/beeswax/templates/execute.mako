@@ -265,14 +265,16 @@ ${layout.menubar(section='query')}
 
       % if app_name != 'impala':
       <a id="save-results" data-bind="click: saveResultsModal" href="javascript:void(0)" title="${_('Save the results to HDFS or a new Hive table')}" rel="tooltip"
-        class="view-query-results hide pull-right"><h4 style="margin-right: 20px"><i class="fa fa-save"></i></h4></a>
+        class="view-query-results hide pull-right"><h4 style="margin-right: 20px"><i class="fa fa-save"></i></h4>
+      </a>
+      % endif
 
       <a id="download-csv" data-bind="attr: {'href': '/beeswax/download/' + $root.design.history.id() + '/csv'}" href="javascript:void(0)" title="${_('Download the results in CSV format')}" rel="tooltip"
-        class="view-query-results hide pull-right"><h4 style="margin-right: 20px"><i class="fa fa-arrow-circle-o-down"></i></h4></a>
+        class="view-query-results download hide pull-right"><h4 style="margin-right: 20px"><i class="fa fa-arrow-circle-o-down"></i></h4>
+      </a>
 
       <a id="download-excel" data-bind="attr: {'href': '/beeswax/download/' + $root.design.history.id() + '/xls'}" href="javascript:void(0)" title="${_('Download the results for excel')}" rel="tooltip"
-        class="view-query-results hide pull-right"><h4 style="margin-right: 20px"><i class="fa fa-arrow-circle-o-down"></i></h4></a>
-      % endif
+        class="view-query-results download hide pull-right"><h4 style="margin-right: 20px"><i class="fa fa-arrow-circle-o-down"></i></h4></a>
    </div>
 
     <div class="card-body">
@@ -1762,6 +1764,7 @@ $(document).ready(function () {
 
 % if app_name == 'impala':
 $(document).ready(function () {
+
   $("#downloadQuery").click(function () {
     $("<input>").attr("type", "hidden").attr("name", "button-submit").attr("value", "Execute").appendTo($("#advancedSettingsForm"));
     $("<input>").attr("type", "hidden").attr("name", "download").attr("value", "true").appendTo($("#advancedSettingsForm"));
@@ -1775,13 +1778,6 @@ $(document).ready(function () {
     'html': true
   });
 
-  $("#refresh-tip").popover({
-    'title': "${_('Missing some tables? In order to update the list of tables/metadata seen by Impala, execute one of these queries:')}",
-    'content': $("#refresh-content").html(),
-    'trigger': 'hover',
-    'html': true
-  });
-
   $(document).on('explain.query', function() {
     viewModel.closeQuery();
   });
@@ -1789,11 +1785,22 @@ $(document).ready(function () {
   $(document).on('execute.query', function() {
     viewModel.closeQuery();
   });
+
+  // Tricks for not triggering the closing of the query on download
+  $("a.download").hover(function(){
+      window.onbeforeunload = null;
+    },function() {
+      window.onbeforeunload = $(window).data('beforeunload');
+    }
+  );
 });
 
+// Close the query when leaving the page, backup for later when disabling the close before downloading results.
 window.onbeforeunload = function(e) {
   viewModel.closeQuery();
 };
+$(window).data('beforeunload', window.onbeforeunload);
+
 % endif
 
 $(".pathChooser:not(:has(~ button))").after(getFileAndFolderBrowseButton($(".pathChooser:not(:has(~ button))"), true));
@@ -1996,7 +2003,7 @@ function cacheQueryTextEvents() {
 
 function databaseCacheWriter() {
   $(".chosen-select").chosen().change(function () {
-    $.totalStorage("${app_name}_last_database", viewModel.database()); 
+    $.totalStorage("${app_name}_last_database", viewModel.database());
   });
 }
 
