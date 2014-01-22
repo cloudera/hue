@@ -20,6 +20,17 @@ var Modal = ModalModule($, ko);
 
 var Node = NodeModule($, IdGeneratorTable, NodeFields);
 
+var SubworkflowNode = NodeModule($, IdGeneratorTable, NodeFields);
+$.extend(SubworkflowNode.prototype, Node.prototype, {
+  'initialize': function(workflow, model, registry) {
+    var self = this;
+
+    if (self.sub_workflow()) {
+      self.sub_workflow(self.sub_workflow().toString());
+    }
+  }
+});
+
 var StartNode = NodeModule($, IdGeneratorTable, NodeFields);
 $.extend(StartNode.prototype, Node.prototype, {
   /**
@@ -493,6 +504,9 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
               break;
               case 'kill':
                 temp = self.kill = new Node(self, model, self.registry);
+              break;
+              case 'subworkflow':
+                temp = new SubworkflowNode(self, model, self.registry);
               break;
               default:
                 temp = new Node(self, model, self.registry);

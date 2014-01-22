@@ -1196,7 +1196,7 @@ class SubWorkflow(Action):
   PARAM_FIELDS = ('subworkflow', 'propagate_configuration', 'job_properties', 'sla', 'credentials')
   node_type = 'subworkflow'
 
-  sub_workflow = models.ForeignKey(Workflow, db_index=True, verbose_name=_t('Sub-workflow'),
+  sub_workflow = models.ForeignKey(Workflow, default=None, db_index=True, blank=True, null=True, verbose_name=_t('Sub-workflow'),
                             help_text=_t('The sub-workflow application to include. You must own all the sub-workflows.'))
   propagate_configuration = models.BooleanField(default=True, verbose_name=_t('Propagate configuration'), blank=True,
                             help_text=_t('If the workflow job configuration should be propagated to the child workflow.'))

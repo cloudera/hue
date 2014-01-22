@@ -31,7 +31,7 @@ LOG = logging.getLogger(__name__)
 JSON_FIELDS = ('parameters', 'job_properties', 'files', 'archives', 'prepares', 'params',
                'deletes', 'mkdirs', 'moves', 'chmods', 'touchzs')
 BOOLEAN_FIELDS = ('propagate_configuration','capture_output')
-NUMBER_FIELDS = ('sub_workflow',)
+NUMBER_FIELDS_OR_NULL = ('sub_workflow',)
 GMT_TIME_FORMAT = "%Y-%m-%dT%H:%MGMT%z"
 UTC_TIME_FORMAT = "%Y-%m-%dT%H:%MZ"
 FREQUENCY_REGEX = r'^\$\{coord:(?P<frequency_unit>\w+)\((?P<frequency_number>\d+)\)\}$'
@@ -41,8 +41,8 @@ def format_field_value(field, value):
   if field in JSON_FIELDS:
     if not isinstance(value, basestring):
       return json.dumps(value)
-  if field in NUMBER_FIELDS:
-    if not isinstance(value, int):
+  if field in NUMBER_FIELDS_OR_NULL:
+    if not isinstance(value, int) and value is not None:
       return int(value)
   if field in BOOLEAN_FIELDS:
     return str(value).lower() == 'true'

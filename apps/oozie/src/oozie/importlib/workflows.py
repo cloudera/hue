@@ -495,13 +495,15 @@ def _preprocess_nodes(workflow, transformed_root, workflow_definition_root, node
                   app_path = property_el.text
 
       if app_path is None:
-        raise RuntimeError(_("Could not find app-path for subworkflow %s") % full_node.name)
-
-      subworkflow = _resolve_subworkflow_from_deployment_dir(fs, workflow, app_path)
-      if subworkflow:
-        full_node.sub_workflow = subworkflow
+        LOG.debug("Could not find deployment directory for subworkflow action %s" % full_node.name)
       else:
-        raise RuntimeError(_("Could not find subworkflow with deployment directory: %s") % app_path)
+        LOG.debug("Found deployment directory for subworkflow action %s" % full_node.name)
+        subworkflow = _resolve_subworkflow_from_deployment_dir(fs, workflow, app_path)
+        if subworkflow:
+          LOG.debug("Found workflow %s in deployment directory %s" % (workflow, app_path))
+          full_node.sub_workflow = subworkflow
+        else:
+          LOG.debug("Could not find workflow with deployment directory: %s" % app_path)
 
 
 def _resolve_subworkflow_from_deployment_dir(fs, workflow, app_path):
