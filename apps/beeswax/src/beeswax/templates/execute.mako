@@ -1143,16 +1143,15 @@ $(document).ready(function () {
   codeMirror.on("focus", function () {
     if (codeMirror.getValue() == queryPlaceholder) {
       codeMirror.setValue("");
-      // Use a view model attribute so that we don't have to override KO.
-      // This allows Hue to disable the execute button until the query placeholder dies.
-      viewModel.queryEditorBlank(true);
     }
+    viewModel.queryEditorBlank(true);
     clearErrorWidgets();
     $("#validationResults").empty();
   });
 
   % if design and not design.id:
     if ($.totalStorage("${app_name}_temp_query") != null && $.totalStorage("${app_name}_temp_query") != "") {
+      viewModel.queryEditorBlank(true);
       codeMirror.setValue($.totalStorage("${app_name}_temp_query"));
     }
   % endif
@@ -1977,6 +1976,7 @@ viewModel = new BeeswaxViewModel("${app_name}");
 if (viewModel.design.id() > 0 || viewModel.design.history.id() > 0) {
   // Code mirror and ko.
   var codeMirrorSubscription = viewModel.design.query.value.subscribe(function(value) {
+    viewModel.queryEditorBlank(true);
     codeMirror.setValue(value);
     codeMirrorSubscription.dispose();
   });

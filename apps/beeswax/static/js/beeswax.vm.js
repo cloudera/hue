@@ -73,6 +73,8 @@ function BeeswaxViewModel(server) {
   self.databases = ko.observableArray();
   self.selectedDatabase = ko.observable(0);
   self.isReady = ko.observable(false);
+  // Use a view model attribute so that we don't have to override KO.
+  // This allows Hue to disable the execute button until the query placeholder dies.
   self.queryEditorBlank = ko.observable(false);
   self.design = ko.mapping.fromJS(DESIGN_DEFAULTS);
 
