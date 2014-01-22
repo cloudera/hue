@@ -73,7 +73,12 @@ function BeeswaxViewModel(server) {
   self.databases = ko.observableArray();
   self.selectedDatabase = ko.observable(0);
   self.isReady = ko.observable(false);
+  self.queryEditorBlank = ko.observable(false);
   self.design = ko.mapping.fromJS(DESIGN_DEFAULTS);
+
+  self.canExecute = ko.computed(function() {
+    return !self.design.isRunning() && self.design.isFinished();
+  });
 
   self.hasMoreResults = ko.computed(function() {
     return self.design.results.url() != null;
