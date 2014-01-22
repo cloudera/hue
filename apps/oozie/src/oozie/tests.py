@@ -798,7 +798,7 @@ class TestEditor(OozieMockBase):
         {'key': 'enabled', 'value': True},
         {'key': 'nominal-time', 'value': '${time}'},]}
     )
-    assert_equal([{'name': u'time', 'value': u''}, {'name': u'output', 'value': u''}, {'name': u'SLEEP', 'value': ''}, {'name': u'market', 'value': u'US'}],
+    assert_equal([{'name': u'output', 'value': u''}, {'name': u'SLEEP', 'value': ''}, {'name': u'market', 'value': u'US'}, {'name': u'time', 'value': u''}],
                  self.wf.find_all_parameters())
 
 
