@@ -50,14 +50,15 @@ def get(user, query_server=None):
 def get_query_server_config(name='beeswax', server=None):
   if name == 'impala':
     from impala.conf import SERVER_HOST as IMPALA_SERVER_HOST, SERVER_PORT as IMPALA_SERVER_PORT, \
-        IMPALA_PRINCIPAL, IMPERSONATION_ENABLED
+        IMPALA_PRINCIPAL, IMPERSONATION_ENABLED, QUERYCACHE_ROWS
 
     query_server = {
         'server_name': 'impala',
         'server_host': IMPALA_SERVER_HOST.get(),
         'server_port': IMPALA_SERVER_PORT.get(),
         'principal': IMPALA_PRINCIPAL.get(),
-        'impersonation_enabled': IMPERSONATION_ENABLED.get()
+        'impersonation_enabled': IMPERSONATION_ENABLED.get(),
+        'querycache_rows': QUERYCACHE_ROWS.get()
     }
   else:
     kerberos_principal = hive_site.get_hiveserver2_kerberos_principal(HIVE_SERVER_HOST.get())
@@ -159,11 +160,13 @@ class HiveServer2Dbms(object):
         self.close(handle)
         return result
 
+
   def analyze_table_table(self, database, table):
     hql = 'analyze table `%(database)s.%(table_name)` compute statistics' % {'database': database, 'table_name': table.name}
     query = hql_query(hql, database)
 
     return self.execute_query(query)
+
 
   def analyze_table_column(self):
     # analyze table <table_name> partition <part_name> compute statistics for columns <col_name1>, <col_name2>...
@@ -369,8 +372,7 @@ class HiveServer2Dbms(object):
     try:
       handle = self.client.query(query, query_history.statement_number)
       if not handle.is_valid():
-        msg = _("Server returning invalid handle for query id %(id)d [%(query)s]...") % \
-              {'id': query_history.id, 'query': query[:40]}
+        msg = _("Server returning invalid handle for query id %(id)d [%(query)s]...") % {'id': query_history.id, 'query': query[:40]}
         raise QueryServerException(msg)
     except QueryServerException, ex:
       LOG.exception(ex)

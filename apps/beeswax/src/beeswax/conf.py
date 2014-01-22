@@ -25,7 +25,6 @@ from desktop.lib.conf import ConfigSection, Config, coerce_bool
 from beeswax.settings import NICE_NAME
 
 
-
 HIVE_SERVER_HOST = Config(
   key="hive_server_host",
   help=_t("Host where HiveServer2 server is running. If Kerberos security is enabled, "

@@ -30,6 +30,7 @@ LOG = logging.getLogger(__name__)
 _DATA_WAIT_SLEEP = 0.1                  # Sleep 0.1 sec before checking for data availability
 FETCH_ROWS = 100000
 
+
 def download(handle, format, db):
   """
   download(query_model, format) -> HttpResponse

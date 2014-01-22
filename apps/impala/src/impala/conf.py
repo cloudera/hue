@@ -47,6 +47,14 @@ IMPERSONATION_ENABLED=Config(
   type=coerce_bool,
   default=False)
 
+QUERYCACHE_ROWS=Config(
+  key='querycache_rows',
+  help=_t("Number of initial rows of a resultset to ask Impala to cache in order to"
+          " support re-fetching them for downloading them."
+          " Set to 0 for disabling the option and backward compatibility."),
+  type=int,
+  default=50000)
+
 
 def config_validator(user):
   # dbms is dependent on beeswax.conf (this file)

@@ -412,9 +412,6 @@ def view_results(request, id, first_row=0):
   context_param = request.GET.get('context', '')
   query_context = parse_query_context(context_param)
 
-  # To remove when Impala has start_over support
-  download = request.GET.get('download', '') or app_name != 'impala'
-
   # Update the status as expired should not be accessible
   # Impala does not support startover for now
   expired = state == models.QueryHistory.STATE.expired
@@ -456,7 +453,6 @@ def view_results(request, id, first_row=0):
     'context_param': context_param,
     'expired': expired,
     'app_name': app_name,
-    'download': download,
     'next_json_set': None,
     'is_finished': query_history.is_finished()
   }
