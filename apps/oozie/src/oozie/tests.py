@@ -1472,7 +1472,7 @@ class TestEditor(OozieMockBase):
 
     assert_true(
 """<coordinator-app name="MyCoord"
-  frequency="${coord:days(1)}"
+  frequency="0 0 * * *"
   start="2012-07-01T00:00Z" end="2012-07-04T00:00Z" timezone="America/Los_Angeles"
   xmlns="uri:oozie:coordinator:0.2"
   >
@@ -1551,7 +1551,7 @@ class TestEditor(OozieMockBase):
 
     assert_true(
 """<coordinator-app name="MyCoord"
-  frequency="${coord:days(1)}"
+  frequency="0 0 * * *"
   start="2012-07-01T00:00Z" end="2012-07-04T00:00Z" timezone="America/Los_Angeles"
   xmlns="uri:oozie:coordinator:0.2"
   >

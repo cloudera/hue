@@ -406,10 +406,10 @@ function initializeNodeData() {
   if (! ('sla' in self.data)) {
     self.data['sla'] = DEFAULT_SLA.slice(0);
   }
-  
+
   if (! ('credentials' in self.data)) {
 	self.data['credentials'] = getDefaultData()['credentials'].slice(0);
-  }  
+  }
 }
 
 var WorkflowModel = ModelModule($);

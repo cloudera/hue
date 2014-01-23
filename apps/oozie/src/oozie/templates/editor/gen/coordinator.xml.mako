@@ -51,7 +51,7 @@
 
 
 <coordinator-app name="${ coord.name }"
-  frequency="${ coord.frequency }"
+  frequency="${ coord.cron_frequency['frequency'] }"
   start="${ coord.start_utc }" end="${ coord.end_utc }" timezone="${ coord.timezone }"
   xmlns="${ 'uri:oozie:coordinator:0.4' if coord.sla_enabled else coord.schema_version | n,unicode }"
   ${ 'xmlns:sla="uri:oozie:sla:0.2"' if coord.sla_enabled else '' | n,unicode }>

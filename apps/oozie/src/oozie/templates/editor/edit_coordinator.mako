@@ -23,6 +23,8 @@
 <%namespace name="utils" file="../utils.inc.mako" />
 <%namespace name="properties" file="coordinator_properties.mako" />
 <%namespace name="coordinator_data" file="create_coordinator_data.mako" />
+<%namespace name="coordinator_utils" file="coordinator_utils.mako" />
+
 
 ${ commonheader(_("Edit Coordinator"), "oozie", user) | n,unicode }
 ${ layout.menubar(section='coordinators') }
@@ -68,14 +70,14 @@ ${ layout.menubar(section='coordinators') }
           <li><a href="#listDataset"><i class="fa fa-cloud"></i> ${ _('Show existing') }</a></li>
 
           % if coordinator.is_editable(user):
-              <li class="nav-header">${ _('History') }</li>
-              <li><a href="#listHistory"><i class="fa fa-archive"></i> ${ _('Show history') }</a></li>
+            <li class="nav-header">${ _('History') }</li>
+            <li><a href="#listHistory"><i class="fa fa-archive"></i> ${ _('Show history') }</a></li>
           % endif
 
           % if coordinator:
-              <li class="nav-header">${ _('Actions') }</li>
-              <li><a id="submit-btn" href="javascript:void(0)" data-submit-url="${ url('oozie:submit_coordinator', coordinator=coordinator.id) }" title="${ _('Submit this coordinator') }" rel="tooltip" data-placement="right"><i class="fa fa-play"></i> ${ _('Submit') }</a></li>
-              <li><a id="clone-btn" href="javascript:void(0)" data-clone-url="${ url('oozie:clone_coordinator', coordinator=coordinator.id) }" title="${ _('Copy this coordinator') }" rel="tooltip" data-placement="right"><i class="fa fa-files-o"></i> ${ _('Copy') }</a></li>
+            <li class="nav-header">${ _('Actions') }</li>
+            <li><a id="submit-btn" href="javascript:void(0)" data-submit-url="${ url('oozie:submit_coordinator', coordinator=coordinator.id) }" title="${ _('Submit this coordinator') }" rel="tooltip" data-placement="right"><i class="fa fa-play"></i> ${ _('Submit') }</a></li>
+            <li><a id="clone-btn" href="javascript:void(0)" data-clone-url="${ url('oozie:clone_coordinator', coordinator=coordinator.id) }" title="${ _('Copy this coordinator') }" rel="tooltip" data-placement="right"><i class="fa fa-files-o"></i> ${ _('Copy') }</a></li>
           % endif
 
         </ul>
@@ -101,7 +103,7 @@ ${ layout.menubar(section='coordinators') }
 
         <div class="steps">
           <div id="step1" class="stepDetails">
-            <div class="alert alert-info"><h3>${ _('Coordinator data') }</h3></div>
+            <div class="alert alert-info"><h3>${ _('What to schedule') }</h3></div>
             <div class="fieldWrapper">
               ${ utils.render_field_no_popover(coordinator_form['name'], extra_attrs = {'validate':'true'}) }
               ${ utils.render_field_no_popover(coordinator_form['description']) }
@@ -119,20 +121,15 @@ ${ layout.menubar(section='coordinators') }
             <div class="alert alert-info"><h3>${ _('Frequency') }</h3></div>
             <div class="fieldWrapper">
               <div class="row-fluid">
-                <div class="span6">
-                ${ utils.render_field_no_popover(coordinator_form['frequency_number']) }
-                </div>
-                <div class="span6">
-                ${ utils.render_field_no_popover(coordinator_form['frequency_unit']) }
+                <div class="alert alert-warning">
+                  ${ _('UTC time only. (e.g. if you want 10pm PST (UTC+8) set it 8 hours later to 6am the next day.') }
                 </div>
               </div>
             </div>
             <div class="fieldWrapper">
-              <div class="row-fluid">
-                  <div class="alert alert-warning">
-                    ${ _('UTC time only. (e.g. if you want 10pm PST (UTC+8) set it 8 hours later to 6am the next day.') }
-                  </div>
-              </div>
+              ${ coordinator_utils.frequency_fields() }
+            </div>
+            <div class="fieldWrapper">
               <div class="row-fluid">
                 <div class="span6">
                 ${ utils.render_field_no_popover(coordinator_form['start']) }
@@ -141,7 +138,7 @@ ${ layout.menubar(section='coordinators') }
                 ${ utils.render_field_no_popover(coordinator_form['end']) }
                 </div>
               </div>
-            ${ utils.render_field_no_popover(coordinator_form['timezone']) }
+              ${ utils.render_field_no_popover(coordinator_form['timezone']) }
             </div>
           </div>
 
@@ -445,6 +442,11 @@ ${ layout.menubar(section='coordinators') }
 <form class="form-horizontal" id="add-dataset-form"></form>
 <form class="form-horizontal" id="edit-dataset-form"></form>
 
+<link rel="stylesheet" type="text/css" href="/static/ext/jqCron/jqCron.css" />
+<script type="text/javascript" src="/static/ext/jqCron/jqCron.min.js"></script>
+
+<script type="text/javascript" src="/oozie/static/js/coordinator.js"></script>
+
 
 % if coordinator.id:
   <div class="modal hide" id="edit-dataset-modal" style="z-index:1500;width:850px"></div>
@@ -609,10 +611,14 @@ ${ layout.menubar(section='coordinators') }
         self.sla = ko.mapping.fromJS(${ coordinator.sla_jsescaped | n,unicode });
       };
 
+    initCoordinator(${ coordinator_frequency | n,unicode });
+
       window.slaModel = new slaModel();
       ko.applyBindings(window.slaModel, document.getElementById('slaEditord'));
 
       window.viewModel.isSaveVisible = ko.observable(false);
+
+
       ko.applyBindings(window.viewModel, $('#bottom-nav')[0]);
       ko.applyBindings(window.viewModel, $('#properties-settings')[0]);
       ko.applyBindings(window.viewModel, $('#step3')[0]);
