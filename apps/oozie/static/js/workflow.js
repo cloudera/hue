@@ -696,7 +696,7 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
       var self = this;
       self.job_properties.remove(data);
     },
-    
+
     // Workflow UI
     // Function to build nodes... recursively.
     build: function() {

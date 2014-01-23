@@ -388,6 +388,8 @@ def create_coordinator(request, workflow=None):
 
     if coordinator_form.is_valid():
       coordinator = coordinator_form.save()
+      coordinator.cron_frequency = {'frequency': request.POST.get('cron_frequency'), 'isAdvancedCron': request.POST.get('isAdvancedCron') == 'on'}
+      coordinator.save()
       Document.objects.link(coordinator, owner=coordinator.owner, name=coordinator.name, description=coordinator.description)
       return redirect(reverse('oozie:edit_coordinator', kwargs={'coordinator': coordinator.id}) + "#step3")
     else:
@@ -398,6 +400,7 @@ def create_coordinator(request, workflow=None):
   return render('editor/create_coordinator.mako', request, {
     'coordinator': coordinator,
     'coordinator_form': coordinator_form,
+    'coordinator_frequency': json.dumps(coordinator.cron_frequency),
   })
 
 
@@ -475,8 +478,8 @@ def edit_coordinator(request, coordinator):
       data_output_formset.save()
       new_data_input_formset.save()
       new_data_output_formset.save()
-
       coordinator.sla = json.loads(request.POST.get('sla'))
+      coordinator.cron_frequency = {'frequency': request.POST.get('cron_frequency'), 'isAdvancedCron': request.POST.get('isAdvancedCron') == 'on'}
       coordinator.save()
 
       request.info(_('Coordinator saved.'))
@@ -499,7 +502,8 @@ def edit_coordinator(request, coordinator):
     'dataset_form': dataset_form,
     'new_data_input_formset': new_data_input_formset,
     'new_data_output_formset': new_data_output_formset,
-    'history': history
+    'history': history,
+    'coordinator_frequency': json.dumps(coordinator.cron_frequency)
   })
 
 
