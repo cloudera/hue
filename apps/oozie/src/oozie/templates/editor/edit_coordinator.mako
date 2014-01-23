@@ -542,7 +542,6 @@ ${ layout.menubar(section='coordinators') }
 
       $(".editDataset").click(function () {
         var el = $(this);
-        $("#edit-dataset-body").data("url", el.data("url"));
         $.ajax({
           url:el.data("url"),
           beforeSend:function (xhr) {
@@ -553,6 +552,7 @@ ${ layout.menubar(section='coordinators') }
             $("#edit-dataset-body").html(response['data']);
             decorateDateTime();
             ko.cleanNode($('#edit-dataset-body')[0]);
+            $("#edit-dataset-body").data("url", el.data("url"));
             ko.applyBindings(window.viewModel, $('#edit-dataset-body')[0]);
             routie("editDataset");
           }
