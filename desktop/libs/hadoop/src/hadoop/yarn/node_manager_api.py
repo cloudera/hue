@@ -21,6 +21,8 @@ import posixpath
 from desktop.lib.rest.http_client import HttpClient
 from desktop.lib.rest.resource import Resource
 
+from hadoop import cluster
+
 
 LOG = logging.getLogger(__name__)
 DEFAULT_USER = 'hue'
@@ -31,15 +33,18 @@ _JSON_CONTENT_TYPE = 'application/json'
 
 
 def get_resource_manager_api(api_url):
-  return ResourceManagerApi(api_url)
+  return ResourceManagerApi(api_url, cluster.get_cluster_conf_for_job_submission().SECURITY_ENABLED.get())
 
 
 class ResourceManagerApi(object):
-  def __init__(self, oozie_url):
+  def __init__(self, oozie_url, security_enabled=False):
     self._url = posixpath.join(oozie_url, 'ws', _API_VERSION)
     self._client = HttpClient(self._url, logger=LOG)
     self._root = Resource(self._client)
-    self._security_enabled = False
+    self._security_enabled = security_enabled
+
+    if self._security_enabled:
+      self._client.set_kerberos_auth()
 
   def __str__(self):
     return "NodeManagerApi at %s" % (self._url,)
