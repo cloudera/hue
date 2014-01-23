@@ -21,6 +21,8 @@
 
 <%namespace name="layout" file="../navigation-bar.mako" />
 <%namespace name="utils" file="../utils.inc.mako" />
+<%namespace name="coordinator_utils" file="coordinator_utils.mako" />
+
 
 ${ commonheader(_("Create Coordinator"), "oozie", user) | n,unicode }
 ${ layout.menubar(section='coordinators') }
@@ -66,7 +68,7 @@ ${ layout.menubar(section='coordinators') }
         <div class="steps">
 
           <div id="step1" class="stepDetails">
-            <div class="alert alert-info"><h3>${ _('Coordinator data') }</h3></div>
+            <div class="alert alert-info"><h3>${ _('What to schedule') }</h3></div>
             <div class="fieldWrapper">
               ${ utils.render_field_no_popover(coordinator_form['name'], extra_attrs = {'validate':'true'}) }
               ${ utils.render_field_no_popover(coordinator_form['description']) }
@@ -84,14 +86,7 @@ ${ layout.menubar(section='coordinators') }
           <div id="step2" class="stepDetails hide">
             <div class="alert alert-info"><h3>${ _('Frequency') }</h3></div>
             <div class="fieldWrapper">
-              <div class="row-fluid">
-                <div class="span6">
-                  ${ utils.render_field_no_popover(coordinator_form['frequency_number']) }
-                </div>
-                <div class="span6">
-                  ${ utils.render_field_no_popover(coordinator_form['frequency_unit']) }
-                </div>
-              </div>
+              ${ coordinator_utils.frequency_fields() }
             </div>
             <div class="fieldWrapper">
               <div class="row-fluid">
@@ -120,8 +115,16 @@ ${ layout.menubar(section='coordinators') }
   </div>
 </div>
 
+<link rel="stylesheet" type="text/css" href="/static/ext/jqCron/jqCron.css" />
+<script type="text/javascript" src="/static/ext/jqCron/jqCron.min.js"></script>
+
+<script type="text/javascript" src="/oozie/static/js/coordinator.js"></script>
+
+
 <script type="text/javascript" charset="utf-8">
   $(document).ready(function () {
+
+    initCoordinator(${ coordinator_frequency | n,unicode });
 
     var currentStep = "step1";
 

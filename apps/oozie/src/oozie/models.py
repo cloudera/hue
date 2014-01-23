@@ -1379,9 +1379,9 @@ DATASET_FREQUENCY = ['MINUTE', 'HOUR', 'DAY', 'MONTH', 'YEAR']
 class Coordinator(Job):
   frequency_number = models.SmallIntegerField(default=1, choices=FREQUENCY_NUMBERS, verbose_name=_t('Frequency number'),
                                               help_text=_t('The number of units of the rate at which '
-                                                           'data is periodically created.'))
+                                                           'data is periodically created.')) # unused
   frequency_unit = models.CharField(max_length=20, choices=FREQUENCY_UNITS, default='days', verbose_name=_t('Frequency unit'),
-                                    help_text=_t('The unit of the rate at which data is periodically created.'))
+                                    help_text=_t('The unit of the rate at which data is periodically created.')) # unused
   timezone = models.CharField(max_length=24, choices=TIMEZONES, default='America/Los_Angeles', verbose_name=_t('Timezone'),
                               help_text=_t('The timezone of the coordinator. Only used for managing the daylight saving time changes when combining several coordinators.'))
   start = models.DateTimeField(default=datetime.today(), verbose_name=_t('Start'),
@@ -1577,6 +1577,31 @@ class Coordinator(Job):
   @property
   def sla_jsescaped(self):
     return json.dumps(self.sla, cls=JSONEncoderForHTML)
+
+  @property
+  def cron_frequency(self):
+    if 'cron_frequency' in self.data_dict:
+      return self.data_dict['cron_frequency']
+    else:
+      # Backward compatibility
+      freq = '0 0 * * *'
+      if self.frequency_number == 1:
+        if self.frequency_unit == 'MINUTES':
+          freq = '* * * * *'
+        elif self.frequency_unit == 'HOURS':
+          freq = '0 * * * *'
+        elif self.frequency_unit == 'DAYS':
+          freq = '0 0 * * *'
+        elif self.frequency_unit == 'MONTH':
+          freq = '0 0 * * *'
+      return {'frequency': freq, 'isAdvancedCron': False}
+
+
+  @cron_frequency.setter
+  def cron_frequency(self, cron_frequency):
+    data_ = self.data_dict
+    data_['cron_frequency'] = cron_frequency
+    self.data = json.dumps(data_)
 
 
 class DatasetManager(models.Manager):
