@@ -18,10 +18,16 @@
 import logging
 import re
 import time
+import urlparse
 
 from lxml import html
 
+from django.utils.translation import ugettext as _
+
+from desktop.lib.rest.resource import Resource
 from desktop.lib.view_util import format_duration_in_millis
+
+from hadoop.yarn.clients import get_log_client
 
 from jobbrowser.models import format_unixtime_ms
 
@@ -211,12 +217,15 @@ class Attempt:
 
     for name in ('stdout', 'stderr', 'syslog'):
       link = '/%s/' % name
+      params = {}
       if int(offset) >= 0:
-        link += '?start=%s' % offset
+        params['start'] = offset
 
       try:
         log_link = re.sub('job_[^/]+', self.id, log_link)
-        log = html.parse(log_link + link).xpath('/html/body/table/tbody/tr/td[2]')[0].text_content()
+        root = Resource(get_log_client(log_link), urlparse.urlsplit(log_link)[2])
+        response = root.get(link, params=params)
+        log = html.fromstring(response).xpath('/html/body/table/tbody/tr/td[2]')[0].text_content()
       except Exception, e:
         log = _('Failed to retrieve log: %s') % e
 
