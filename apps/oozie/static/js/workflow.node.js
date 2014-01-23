@@ -241,7 +241,7 @@ var NodeModule = function($, IdGeneratorTable, NodeFields) {
       if ('files' in data) {
         data['files'] = ko.toJS(self._files);
       }
-      if ('sub_workflow' in data) {
+      if ('sub_workflow' in data && data['sub_workflow']) {
         data['sub_workflow'] = Number(data['sub_workflow']);
       }
       return data;
