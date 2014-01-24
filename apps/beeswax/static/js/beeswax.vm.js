@@ -694,7 +694,7 @@ function BeeswaxViewModel(server) {
 
   self.cancelQuery = function() {
     $(document).trigger('cancel.query');
-    var url = '/' + self.server() + '/api/query/' + self.design.id() + '/cancel';
+    var url = '/' + self.server() + '/api/query/' + self.design.history.id() + '/cancel';
     $.post(url,
       function(response) {
         if (response['status'] != 0) {

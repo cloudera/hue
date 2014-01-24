@@ -241,12 +241,9 @@ ${layout.menubar(section='query')}
           <textarea class="hide" tabindex="1" name="query" id="queryField"></textarea>
 
           <div class="actions">
-            % if app_name == 'impala':
             <button data-bind="click: tryExecuteQuery, visible: $root.canExecute, enable: $root.queryEditorBlank" type="button" id="executeQuery" class="btn btn-primary disable-feedback" tabindex="2">${_('Execute')}</button>
             <button data-bind="click: tryCancelQuery, visible: $root.design.isRunning()" class="btn btn-danger" data-loading-text="${ _('Canceling...') }" rel="tooltip" data-original-title="${ _('Cancel the query') }">${ _('Cancel') }</button>
-            % else:
-            <button data-bind="click: tryExecuteQuery, enable: $root.canExecute() && $root.queryEditorBlank()" type="button" id="executeQuery" class="btn btn-primary disable-feedback" tabindex="2">${_('Execute')}</button>
-            % endif
+
             <button data-bind="click: executeNextStatement, visible: !$root.design.isFinished()" type="button" class="btn btn-primary disable-feedback" tabindex="2">${_('Next')}</button>
 
             <button data-bind="click: trySaveDesign, css: {'hide': !$root.design.id() || $root.design.id() == -1}" type="button" class="btn hide">${_('Save')}</button>
