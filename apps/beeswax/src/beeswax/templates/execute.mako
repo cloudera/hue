@@ -1208,6 +1208,7 @@ $(document).ready(function () {
     if ($(e.target).attr("href") != "#results"){
       $($(e.target).attr("href")).css('height', 'auto');
       if ($(e.target).attr("href") == "#chart") {
+        logGA('results/chart');
         predictGraph();
       }
     } else {
@@ -1555,6 +1556,7 @@ function trySaveDesign() {
   viewModel.design.query.value(query);
   if (viewModel.design.id() && viewModel.design.id() != -1) {
     viewModel.saveDesign();
+    logGA('design/save');
   }
 }
 
@@ -1570,6 +1572,7 @@ function trySaveAsDesign() {
     viewModel.saveDesign();
     $('#saveas-query-name').removeClass('error');
     $('#saveAs').modal('hide');
+    logGA('design/save-as');
   } else if (viewModel.design.name()) {
     $.jHueNotify.error("${_('No query provided to save.')}");
     $('#saveAs').modal('hide');
@@ -1584,6 +1587,7 @@ function saveResultsModal() {
 
 function trySaveResults() {
   viewModel.saveResults();
+  logGA('results/save');
 }
 
 $(document).on('saved.results', function() {
@@ -1605,6 +1609,8 @@ function tryExecuteQuery() {
   } else {
     viewModel.executeQuery();
   }
+
+  logGA('query/execute');
 }
 
 function tryExecuteParameterizedQuery() {
@@ -1612,13 +1618,14 @@ function tryExecuteParameterizedQuery() {
   viewModel.executeQuery();
   routie('query');
 }
-;
 
 function tryExplainQuery() {
   $(".tooltip").remove();
   var query = getHighlightedQuery() || codeMirror.getValue();
   viewModel.design.query.value(query);
   viewModel.explainQuery();
+
+  logGA('query/explain');
 }
 
 function tryExplainParameterizedQuery() {
@@ -1626,7 +1633,6 @@ function tryExplainParameterizedQuery() {
   viewModel.explainQuery();
   routie('query');
 }
-;
 
 function tryCancelQuery() {
   $(".tooltip").remove();
@@ -1881,6 +1887,8 @@ $(document).ready(function () {
       codeMirror.setSize("99%", 100);
 
       clickHard('.resultsContainer .nav-tabs a[href="#results"]');
+
+      logGA('query/results');
     },
     'query/explanation': function () {
       if (! viewModel.design.results.explanation()) {
@@ -1899,12 +1907,16 @@ $(document).ready(function () {
       watchLogsPage();
 
       clickHard('.resultsContainer .nav-tabs a[href="#log"]');
+
+      logGA('watch/logs');
     },
     'watch/results': function() {
       showSection('query-editor');
       watchResultsPage();
 
       clickHard('.resultsContainer .nav-tabs a[href="#results"]');
+
+      logGA('watch/results');
     },
     '*': function () {
       routie('query');
