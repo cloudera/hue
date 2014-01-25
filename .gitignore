@@ -7,7 +7,9 @@
 *.pyo
 
 # Language compiled files
-*.mo
+apps/*/src/*/locale/*/LC_MESSAGES/*.mo
+desktop/core/src/desktop/locale/*/LC_MESSAGES/*.mo
+desktop/libs/*/src/*/locale/*/LC_MESSAGES/*.mo
 
 # vim tmp files
 .*.swp
