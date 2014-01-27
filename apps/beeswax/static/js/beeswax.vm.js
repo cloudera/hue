@@ -347,6 +347,7 @@ function BeeswaxViewModel(server) {
       type: 'GET',
       success: function(data) {
         self.updateDatabases(data.databases);
+        $(document).trigger('fetched.databases', [data]);
       },
       error: error_fn
     };
@@ -362,7 +363,8 @@ function BeeswaxViewModel(server) {
       type: 'GET',
       success: function(data) {
         self.updateDesign(data.design);
-        $(document).trigger('fetched.design', data);
+        self.database(data.design.database);
+        $(document).trigger('fetched.design', [data]);
       },
       error: error_fn
     };
@@ -378,7 +380,8 @@ function BeeswaxViewModel(server) {
       type: 'GET',
       success: function(data) {
         self.updateHistory(data.query_history);
-        $(document).trigger('fetched.query', data);
+        self.database(data.query_history.database);
+        $(document).trigger('fetched.query', [data]);
       },
       error: error_fn
     };
