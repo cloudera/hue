@@ -245,18 +245,6 @@ function BeeswaxViewModel(server) {
     self.design.fileResources.values.splice(index, 1);
   };
 
-  self.getFileResourceTypeErrors = function(index) {
-    if (self.design.settings.errors() && self.design.settings.errors()[index]) {
-      return self.design.settings.errors()[index];
-    } else {
-      return {};
-    }
-  };
-
-  self.getFileResourcePathErrors = function(index) {
-    
-  };
-
   self.addFunction = function(name, class_name) {
     var obj = {
       'name': ko.observable(name),
@@ -273,14 +261,6 @@ function BeeswaxViewModel(server) {
 
   self.removeFunction = function(index) {
     self.design.functions.values.splice(index, 1);
-  };
-
-  self.getFunctionErrors = function(index) {
-    if (self.design.settings.errors() && self.design.settings.errors()[index]) {
-      return self.design.settings.errors()[index];
-    } else {
-      return {};
-    }
   };
 
   var advancedErrorHandling = function(advanced_parameter, key) {
@@ -496,19 +476,20 @@ function BeeswaxViewModel(server) {
       dataType: 'json',
       type: 'POST',
       success: function(data) {
-        self.resetErrors();
+        self.design.errors.removeAll();
+        self.design.watch.errors.removeAll();
         if (data.status == 0) {
           self.design.results.url('/' + self.server() + '/results/' + data.id + '/0?format=json');
           self.design.watch.url(data.watch_url);
           self.design.statement(data.statement);
           self.design.history.id(data.id);
           self.watchQueryLoop();
+          $(document).trigger('executed.query', data);
         } else {
           self.setErrors(data.message, data.errors);
           self.design.isRunning(false);
           $(document).trigger('error.query');
         }
-        $(document).trigger('executed.query', data);
       },
       error: error_fn,
       data: data
@@ -531,13 +512,19 @@ function BeeswaxViewModel(server) {
       dataType: 'json',
       type: 'POST',
       success: function(data) {
-        self.resetErrors();
-        self.design.watch.logs.removeAll();
-        self.design.statement(data.statement);
-        self.design.watch.url(data.watch_url);
-        self.design.results.url('/' + self.server() + '/results/' + data.id + '/0?format=json');
-        self.watchQueryLoop();
-        $(document).trigger('executed.query', data);
+        if (data.status == 0) {
+          self.design.watch.logs.removeAll();
+          self.design.statement(data.statement);
+          self.design.watch.url(data.watch_url);
+          self.design.results.url('/' + self.server() + '/results/' + data.id + '/0?format=json');
+          self.watchQueryLoop();
+          $(document).trigger('executed.query', data);
+        } else {
+          self.setErrors(data.message, data.errors);
+          self.design.isRunning(false);
+          self.design.isFinished(false); // We propose to skip the failed statement
+          $(document).trigger('error.query');
+        }
       },
       error: error_fn,
       data: data
@@ -623,7 +610,7 @@ function BeeswaxViewModel(server) {
 
   self.fetchResults = function() {
     $(document).trigger('fetch.results');
-    self.resetErrors();
+    self.design.errors.removeAll();
     var request = {
       url: self.design.results.url(),
       dataType: 'json',
