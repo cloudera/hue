@@ -909,10 +909,6 @@ $(document).ready(function () {
     no_results_text: "${_('Oops, no database found!')}"
   });
 
-  $(".chosen-select").chosen().change(function () {
-    $.totalStorage("${app_name}_last_database", viewModel.database());
-  });
-
   $(document).on("click", ".column-selector", function () {
     var _t = $(".resultTable");
     var _col = _t.find("th:econtains(" + $(this).text() + ")");
@@ -1979,28 +1975,64 @@ function cacheQueryTextEvents() {
   });
 }
 
-// Knockout
-viewModel = new BeeswaxViewModel("${app_name}");
-% if query_history:
-  viewModel.design.history.id(${query_history.id});
-  viewModel.fetchQueryHistory();
-% elif design.id:
-  viewModel.design.id(${design.id});
-  viewModel.fetchDesign();
-% endif
-if (viewModel.design.id() > 0 || viewModel.design.history.id() > 0) {
-  // Code mirror and ko.
+function databaseCacheWriter() {
+  $(".chosen-select").chosen().change(function () {
+    $.totalStorage("${app_name}_last_database", viewModel.database()); 
+  });
+}
+
+function loadEditor() {
+  $(document).one('fetched.databases', databaseCacheWriter);
+  viewModel.fetchDatabases();
+}
+
+function loadDesign(design_id) {
+  $(document).one('fetched.databases', function() {
+    viewModel.design.id(design_id);
+    viewModel.fetchDesign();
+  });
+
+  $(document).one('fetched.design', databaseCacheWriter);
+
   var codeMirrorSubscription = viewModel.design.query.value.subscribe(function(value) {
     viewModel.queryEditorBlank(true);
     codeMirror.setValue(value);
     codeMirrorSubscription.dispose();
   });
+
+  loadEditor();
 }
+
+function loadQueryHistory(query_history_id) {
+  $(document).one('fetched.databases', function() {
+    viewModel.design.history.id(query_history_id);
+    viewModel.fetchQueryHistory();
+  });
+
+  $(document).one('fetched.query', databaseCacheWriter);
+
+  var codeMirrorSubscription = viewModel.design.query.value.subscribe(function(value) {
+    viewModel.queryEditorBlank(true);
+    codeMirror.setValue(value);
+    codeMirrorSubscription.dispose();
+  });
+
+  loadEditor();
+}
+
+// Knockout
+viewModel = new BeeswaxViewModel("${app_name}");
+% if query_history:
+  loadQueryHistory(${query_history.id});
+% elif design.id:
+  loadDesign(${design.id});
+% else:
+  loadEditor();
+% endif
 viewModel.design.fileResources.values.subscribe(function() {
   // File chooser button for file resources.
   $(".fileChooser:not(:has(~ button))").after(getFileBrowseButton($(".fileChooser:not(:has(~ button))")));
 });
-viewModel.fetchDatabases();
 ko.applyBindings(viewModel);
 
 
