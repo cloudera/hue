@@ -33,7 +33,8 @@ import beeswax.models
 from beeswax.forms import QueryForm
 from beeswax.design import HQLdesign
 from beeswax.server import dbms
-from beeswax.server.dbms import expand_exception, get_query_server_config
+from beeswax.server.dbms import expand_exception, get_query_server_config,\
+  QueryServerException
 from beeswax.views import authorized_get_design, authorized_get_query_history, make_parameterization_form,\
                           safe_get_design, save_design, massage_columns_for_json, _get_query_handle_and_state,\
                           _parse_out_hadoop_jobs
@@ -54,7 +55,7 @@ def error_handler(view_fn):
         message = str(e)
       else:
         message = force_unicode(e.message, strings_only=True, errors='replace')
-        
+
         if 'Invalid OperationHandle' in message and 'id' in kwargs:
           # Expired state.
           query_history = authorized_get_query_history(request, kwargs['id'], must_exist=False)
@@ -154,6 +155,8 @@ def watch_query_refresh_json(request, id):
     if request.POST.get('next') or (not query_history.is_finished() and query_history.is_success() and not query_history.has_results):
       query_history = db.execute_next_statement(query_history)
       handle, state = _get_query_handle_and_state(query_history)
+  except QueryServerException, ex:
+    raise ex
   except Exception, ex:
     LOG.exception(ex)
     handle, state = _get_query_handle_and_state(query_history)

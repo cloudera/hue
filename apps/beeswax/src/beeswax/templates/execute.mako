@@ -215,17 +215,15 @@ ${layout.menubar(section='query')}
       <div class="tab-content">
         <div id="queryPane">
 
-          <div data-bind="css: {'hide': design.query.errors().length == 0}" class="hide alert alert-error">
+          <div data-bind="css: {'hide': design.errors().length == 0}" class="alert alert-error">
             <!-- ko if: $root.getQueryErrors().length > 0 -->
             <p><strong>${_('Please provide a query')}</strong></p>
             <!-- /ko -->
             <!-- ko if: $root.getQueryErrors().length == 0 -->
             <p><strong>${_('Your query has the following error(s):')}</strong></p>
 
-            <div>
-              <div data-bind="foreach: design.errors">
-                <p data-bind="text: $data" class="queryErrorMessage"></p>
-              </div>
+            <div data-bind="foreach: design.errors">
+              <p data-bind="text: $data" class="queryErrorMessage"></p>
             </div>
             <!-- /ko -->
           </div>
@@ -316,8 +314,8 @@ ${layout.menubar(section='query')}
             </tbody>
           </table>
         </div>
-        <div class="tab-pane" id="results">
 
+        <div class="tab-pane" id="results">
           <div data-bind="css: {'hide': design.results.errors().length == 0}" class="alert alert-error">
             <p><strong>${_('Fetching results ran into the following error(s):')}</strong></p>
 
@@ -1522,7 +1520,7 @@ $(document).on('error.query', function () {
     errorWidgets = [];
   });
 
-  // Move error to codeMirror if we konw the line number
+  // Move error to codeMirror if we know the line number
   $.each($(".queryErrorMessage"), function(index, el) {
     var err = $(el).text().toLowerCase();
     var firstPos = err.indexOf("line");
