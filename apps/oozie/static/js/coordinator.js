@@ -20,22 +20,22 @@ function initCoordinator(coordinator_json) {
 
   var coordCron =
     $('#coord-frequency')
-    .jqCron({
-      enabled_minute: true,
-      multiple_dom: true,
-      multiple_month: true,
-      multiple_mins: true,
-      multiple_dow: true,
-      multiple_time_hours: true,
-      multiple_time_minutes: true,
-      default_period: 'day',
-      default_value: coordinator_json.frequency,
-      no_reset_button: false,
-      lang: 'en'
-    })
-    .jqCronGetInstance();
+      .jqCron({
+        enabled_minute: false,
+        multiple_dom: true,
+        multiple_month: true,
+        multiple_mins: true,
+        multiple_dow: true,
+        multiple_time_hours: true,
+        multiple_time_minutes: false,
+        default_period: 'day',
+        default_value: coordinator_json.frequency,
+        no_reset_button: true,
+        lang: 'en'
+      })
+      .jqCronGetInstance();
 
-  var coordModel = function() {
+  var coordViewModel = function() {
     var self = this;
 
     self.isSaveVisible = ko.observable(false);
@@ -49,10 +49,9 @@ function initCoordinator(coordinator_json) {
     });
   };
 
-  window.coordModel = new coordModel();
-  window.coordModel.isAdvancedCron(coordinator_json.isAdvancedCron);
+  window.coordViewModel = new coordViewModel();
+  window.coordViewModel.isAdvancedCron(coordinator_json.isAdvancedCron);
   $('#coord-frequency').val(coordinator_json.frequency),
 
-  ko.applyBindings(window.coordModel, document.getElementById('step2'));
+  ko.applyBindings(window.coordViewModel, document.getElementById('step2'));
 }
-
