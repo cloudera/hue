@@ -103,7 +103,7 @@ ${ layout.menubar(section='coordinators') }
 
         <div class="steps">
           <div id="step1" class="stepDetails">
-            <div class="alert alert-info"><h3>${ _('What to schedule') }</h3></div>
+            <div class="alert alert-info"><h3>${ _('Schedule') }</h3></div>
             <div class="fieldWrapper">
               ${ utils.render_field_no_popover(coordinator_form['name'], extra_attrs = {'validate':'true'}) }
               ${ utils.render_field_no_popover(coordinator_form['description']) }
