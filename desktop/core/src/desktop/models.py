@@ -77,21 +77,29 @@ class DocumentTagManager(models.Manager):
       tag, created = DocumentTag.objects.get_or_create(tag=tag_name, owner=owner)
       return tag
 
-  def get_default_tag(self, user):
-    tag, created = DocumentTag.objects.get_or_create(owner=user, tag=DocumentTag.DEFAULT)
+  def _get_tag(self, user, name):
+    try:
+      tag, created = DocumentTag.objects.get_or_create(owner=user, tag=name)
+    except DocumentTag.MultipleObjectsReturned, ex:
+      # We can delete duplicate tags of a user
+      dups = DocumentTag.objects.filter(owner=user, tag=name)
+      tag = dups[0]
+      for dup in dups[1:]:
+        LOG.warn('Deleting duplicate %s' % dup)
+        dup.delete()
     return tag
+
+  def get_default_tag(self, user):
+    return self._get_tag(user, DocumentTag.DEFAULT)
 
   def get_trash_tag(self, user):
-    tag, created = DocumentTag.objects.get_or_create(owner=user, tag=DocumentTag.TRASH)
-    return tag
+    return self._get_tag(user, DocumentTag.TRASH)
 
   def get_history_tag(self, user):
-    tag, created = DocumentTag.objects.get_or_create(owner=user, tag=DocumentTag.HISTORY)
-    return tag
+    return self._get_tag(user, DocumentTag.HISTORY)
 
   def get_example_tag(self, user):
-    tag, created = DocumentTag.objects.get_or_create(owner=user, tag=DocumentTag.EXAMPLE)
-    return tag
+    return self._get_tag(user, DocumentTag.EXAMPLE)
 
   def tag(self, owner, doc_id, tag_name='', tag_id=None):
     try:
@@ -99,7 +107,7 @@ class DocumentTagManager(models.Manager):
       if tag.tag in DocumentTag.RESERVED:
         raise Exception(_("Can't add %s: it is a reserved tag.") % tag)
     except DocumentTag.DoesNotExist:
-      tag = DocumentTag.objects.create(tag=tag_name, owner=owner)
+      tag = self._get_tag(user=owner, name=tag_name)
 
     doc = Document.objects.get_doc(doc_id, owner)
     doc.add_tag(tag)
@@ -532,7 +540,15 @@ class DocumentPermissionManager(models.Manager):
       perm.delete()
 
   def list(self, document):
-    perm, created = DocumentPermission.objects.get_or_create(doc=document, perms=DocumentPermission.READ_PERM)
+    try:
+      perm, created = DocumentPermission.objects.get_or_create(doc=document, perms=DocumentPermission.READ_PERM)
+    except DocumentPermission.MultipleObjectsReturned, ex:
+      # We can delete duplicate perms of a document
+      dups = DocumentPermission.objects.filter(doc=document, perms=DocumentPermission.READ_PERM)
+      perm = dups[0]
+      for dup in dups[1:]:
+        LOG.warn('Deleting duplicate %s' % dup)
+        dup.delete()
     return perm
 
 
@@ -547,7 +563,7 @@ class DocumentPermission(models.Model):
 
 
   objects = DocumentPermissionManager()
-  #unique_together = ('doc', 'perms')
+  unique_together = ('doc', 'perms')
 
 
 # HistoryTable

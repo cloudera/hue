@@ -63,6 +63,30 @@ class TestDocModelTags():
 
     assert_true(DocumentTag.objects.filter(id=tag_id, owner=self.user, tag='my_tag').exists())
 
+  def test_add_duplicate_tag(self):
+    tag_name = 'test_add_duplicate_tag'
+    n = DocumentTag.objects.filter(owner=self.user, tag=tag_name).count()
+
+    tag_id = self.add_tag(tag_name)
+    assert_equal(n + 1, DocumentTag.objects.filter(owner=self.user, tag=tag_name).count())
+
+    tag_id = self.add_tag(tag_name)
+    assert_equal(n + 1, DocumentTag.objects.filter(owner=self.user, tag=tag_name).count())
+
+  def test_add_and_clean_duplicate_tag(self):
+    tag_name = 'test_add_and_clean_duplicate_tag'
+    script, doc = self.add_doc('test-pig')
+    n = DocumentTag.objects.filter(owner=self.user, tag=tag_name).count()
+
+    tag_id = self.add_tag(tag_name)
+    assert_equal(n + 1, DocumentTag.objects.filter(owner=self.user, tag=tag_name).count())
+
+    DocumentTag.objects.create(owner=self.user, tag=tag_name)
+    assert_equal(n + 2, DocumentTag.objects.filter(owner=self.user, tag=tag_name).count())
+
+    tag_id = DocumentTag.objects.tag(self.user, doc.id, tag_name=tag_name)
+    assert_equal(n + 1, DocumentTag.objects.filter(owner=self.user, tag=tag_name).count())
+
   def test_remove_tags(self):
     response = self.client.post("/desktop/api/tag/add_tag", {'name': 'my_tag'})
     tag_id = json.loads(response.content)['tag_id']
