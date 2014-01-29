@@ -19,6 +19,8 @@ import logging
 import re
 import thrift
 
+from operator import itemgetter
+
 from desktop.conf import KERBEROS
 from desktop.lib import thrift_util
 from hadoop import cluster
@@ -49,8 +51,8 @@ class HiveServerTable(Table):
       raise NoSuchObjectException()
     self.table = table_results.rows and table_results.rows[0] or ''
     self.table_schema = table_schema
-    self.results = desc_results
-    self.schema = desc_schema
+    self.desc_results = desc_results
+    self.desc_schema = desc_schema
 
   @property
   def name(self):
@@ -93,20 +95,30 @@ class HiveServerTable(Table):
 
   @property
   def cols(self):
-    cols = HiveServerTTableSchema(self.results, self.schema).cols()
-    if sum([bool(col['col_name']) for col in cols]) == len(cols):
+    cols = HiveServerTTableSchema(self.desc_results, self.desc_schema).cols()
+    try:
+      end_cols_index = map(itemgetter('col_name'), cols).index('') # Truncate below extended describe
+      return cols[0:end_cols_index]
+    except:
+      # Impala use non extended describe and 'col' instead of 'col_name'
       return cols
-    else:
-      return cols[:-2] # Drop last 2 lines of extended describe
-
+ 
   @property
   def comment(self):
     return HiveServerTRow(self.table, self.table_schema).col('REMARKS')
 
   @property
   def extended_describe(self):
-    # Just keep the content and skip the last new line
-    return HiveServerTTableSchema(self.results, self.schema).cols()[-1]['data_type']
+    # Just keep rows after 'Detailed Table Information'
+    rows = HiveServerTTableSchema(self.desc_results, self.desc_schema).cols()
+    detailed_row_index = map(itemgetter('col_name'), rows).index('Detailed Table Information')
+    # Hack because of bad delimiter escaping in LazySimpleSerDe in HS2: parameters:{serialization.format=})
+    describe_text = rows[detailed_row_index]['data_type']
+    try:
+      # LazySimpleSerDe case
+      return describe_text + rows[detailed_row_index + 1]['col_name']
+    except:
+      return describe_text
 
 
 class HiveServerTRowSet:
@@ -170,7 +182,15 @@ class HiveServerTTableSchema:
     self.schema = schema
 
   def cols(self):
-    return HiveServerTRowSet(self.columns, self.schema).cols(('col_name', 'data_type', 'comment'))
+    try:
+      return HiveServerTRowSet(self.columns, self.schema).cols(('col_name', 'data_type', 'comment'))
+    except:
+      # Impala API is different
+      cols = HiveServerTRowSet(self.columns, self.schema).cols(('name', 'type', 'comment'))
+      for col in cols:
+        col['col_name'] = col.pop('name')
+        col['col_type'] = col.pop('type')
+      return cols
 
   def col(self, colName):
     pos = self._get_col_position(colName)
@@ -424,7 +444,6 @@ class HiveServerClient:
     if self.query_server['server_name'] == 'beeswax':
       self.execute_statement(statement='SET hive.server2.blocking.query=true')
 
-    desc_results, desc_schema = self.execute_statement('DESCRIBE EXTENDED %s' % table_name)
     return HiveServerTable(table_results.results, table_schema.schema, desc_results.results, desc_schema.schema)
 
 
@@ -557,15 +576,14 @@ class HiveServerTableCompatible(HiveServerTable):
   def __init__(self, hive_table):
     self.table = hive_table.table
     self.table_schema = hive_table.table_schema
-    self.results = hive_table.results
-    self.schema = hive_table.schema
+    self.desc_results = hive_table.desc_results
+    self.desc_schema = hive_table.desc_schema
 
   @property
   def cols(self):
-    return [type('Col', (object,), {'name': col.get('col_name', ''),
+    return [type('Col', (object,), {'name': col.get('col_name', '').strip(),
                                     'type': col.get('data_type', ''),
-                                    'comment': col.get('comment', ''), }) for col in HiveServerTable.cols.fget(self)]
-
+                                    'comment': col.get('comment', '').strip(), }) for col in HiveServerTable.cols.fget(self)]
 
 class ResultCompatible:
 
