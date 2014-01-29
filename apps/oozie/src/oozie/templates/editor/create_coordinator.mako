@@ -86,7 +86,18 @@ ${ layout.menubar(section='coordinators') }
           <div id="step2" class="stepDetails hide">
             <div class="alert alert-info"><h3>${ _('Frequency') }</h3></div>
             <div class="fieldWrapper">
-              ${ coordinator_utils.frequency_fields() }
+              % if enable_cron_scheduling:
+                ${ coordinator_utils.frequency_fields() }
+              % else:
+                <div class="row-fluid">
+                  <div class="span6">
+                    ${ utils.render_field_no_popover(coordinator_form['frequency_number']) }
+                  </div>
+                  <div class="span6">
+                    ${ utils.render_field_no_popover(coordinator_form['frequency_unit']) }
+                  </div>
+                </div>
+              % endif
             </div>
             <div class="fieldWrapper">
               <div class="row-fluid">
@@ -124,7 +135,9 @@ ${ layout.menubar(section='coordinators') }
 <script type="text/javascript" charset="utf-8">
   $(document).ready(function () {
 
-    initCoordinator(${ coordinator_frequency | n,unicode });
+    % if enable_cron_scheduling:
+      initCoordinator(${ coordinator_frequency | n,unicode });
+    % endif
 
     var currentStep = "step1";
 

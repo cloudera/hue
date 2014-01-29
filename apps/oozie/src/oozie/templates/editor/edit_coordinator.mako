@@ -127,7 +127,18 @@ ${ layout.menubar(section='coordinators') }
               </div>
             </div>
             <div class="fieldWrapper">
-              ${ coordinator_utils.frequency_fields() }
+              % if enable_cron_scheduling:
+                ${ coordinator_utils.frequency_fields() }
+              % else:
+                <div class="row-fluid">
+                  <div class="span6">
+                    ${ utils.render_field_no_popover(coordinator_form['frequency_number']) }
+                  </div>
+                  <div class="span6">
+                    ${ utils.render_field_no_popover(coordinator_form['frequency_unit']) }
+                  </div>
+                </div>
+              % endif
             </div>
             <div class="fieldWrapper">
               <div class="row-fluid">
@@ -611,7 +622,9 @@ ${ layout.menubar(section='coordinators') }
         self.sla = ko.mapping.fromJS(${ coordinator.sla_jsescaped | n,unicode });
       };
 
-    initCoordinator(${ coordinator_frequency | n,unicode });
+      % if enable_cron_scheduling:
+        initCoordinator(${ coordinator_frequency | n,unicode });
+      % endif
 
       window.slaModel = new slaModel();
       ko.applyBindings(window.slaModel, document.getElementById('slaEditord'));

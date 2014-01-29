@@ -25,10 +25,13 @@ from django.utils.functional import curry
 from django.utils.translation import ugettext_lazy as _t
 
 from desktop.lib.django_forms import MultiForm, SplitDateTimeWidget
+from desktop.models import Document
+
+from oozie.conf import ENABLE_CRON_SCHEDULING
 from oozie.models import Workflow, Node, Java, Mapreduce, Streaming, Coordinator,\
   Dataset, DataInput, DataOutput, Pig, Link, Hive, Sqoop, Ssh, Shell, DistCp, Fs,\
   Email, SubWorkflow, Generic, Bundle, BundledCoordinator
-from desktop.models import Document
+
 
 
 LOG = logging.getLogger(__name__)
@@ -338,7 +341,9 @@ class CoordinatorForm(forms.ModelForm):
 
   class Meta:
     model = Coordinator
-    exclude = ('owner', 'deployment_dir', 'frequency_number', 'frequency_unit')
+    exclude = ('owner', 'deployment_dir')
+    if ENABLE_CRON_SCHEDULING.get():
+        exclude += ('frequency_number', 'frequency_unit')
     widgets = {
       'description': forms.TextInput(attrs={'class': 'span5'}),
       'parameters': forms.widgets.HiddenInput(),

@@ -17,6 +17,7 @@
 
 <%!
   from oozie.utils import smart_path
+  from oozie.conf import ENABLE_CRON_SCHEDULING
 %>
 
 <%namespace name="common" file="workflow-common.xml.mako" />
@@ -51,7 +52,11 @@
 
 
 <coordinator-app name="${ coord.name }"
+  % if ENABLE_CRON_SCHEDULING.get():
   frequency="${ coord.cron_frequency['frequency'] }"
+  % else:
+  frequency="${ coord.frequency }"
+  % endif
   start="${ coord.start_utc }" end="${ coord.end_utc }" timezone="${ coord.timezone }"
   xmlns="${ 'uri:oozie:coordinator:0.4' if coord.sla_enabled else coord.schema_version | n,unicode }"
   ${ 'xmlns:sla="uri:oozie:sla:0.2"' if coord.sla_enabled else '' | n,unicode }>
