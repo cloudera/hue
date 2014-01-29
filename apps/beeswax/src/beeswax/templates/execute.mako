@@ -876,11 +876,11 @@ $(document).ready(function () {
   $("#expandResults").on("click", function(){
     if ($(this).find("i").hasClass("fa-expand")){
       $(this).find("i").removeClass("fa-expand").addClass("fa-compress");
-      $(this).parent().addClass("fullscreen");
+      $(this).parent().parent().addClass("fullscreen");
     }
     else {
       $(this).find("i").addClass("fa-expand").removeClass("fa-compress");
-      $(this).parent().removeClass("fullscreen");
+      $(this).parent().parent().removeClass("fullscreen");
     }
     reinitializeTable();
   });
