@@ -44,6 +44,7 @@ from liboozie.oozie_api_test import OozieServerProvider
 from liboozie.types import WorkflowList, Workflow as OozieWorkflow, Coordinator as OozieCoordinator,\
   Bundle as OozieBundle, CoordinatorList, WorkflowAction, BundleList
 
+from oozie.conf import ENABLE_CRON_SCHEDULING
 from oozie.models import Workflow, Node, Kill, Link, Job, Coordinator, History,\
   find_parameters, NODE_TYPES, Bundle
 from oozie.utils import workflow_to_dict, model_to_dict, smart_path
@@ -1469,6 +1470,45 @@ class TestEditor(OozieMockBase):
 
   def test_coordinator_gen_xml(self):
     coord = create_coordinator(self.wf, self.c, self.user)
+
+    finish = ENABLE_CRON_SCHEDULING.set_for_testing(False)
+
+    try:
+      assert_true(
+  """
+<coordinator-app name="MyCoord"
+  frequency="${coord:days(1)}"
+  start="2012-07-01T00:00Z" end="2012-07-04T00:00Z" timezone="America/Los_Angeles"
+  xmlns="uri:oozie:coordinator:0.2"
+  >
+  <controls>
+    <timeout>100</timeout>
+    <concurrency>3</concurrency>
+    <execution>FIFO</execution>
+    <throttle>10</throttle>
+  </controls>
+  <action>
+    <workflow>
+      <app-path>${wf_application_path}</app-path>
+      <configuration>
+        <property>
+          <name>username</name>
+          <value>${coord:user()}</value>
+        </property>
+        <property>
+          <name>SLEEP</name>
+          <value>1000</value>
+        </property>
+        <property>
+          <name>market</name>
+          <value>US</value>
+        </property>
+      </configuration>
+   </workflow>
+  </action>
+</coordinator-app>""" in coord.to_xml(), coord.to_xml())
+    finally:
+      finish()
 
     assert_true(
 """<coordinator-app name="MyCoord"
@@ -3447,7 +3487,9 @@ COORDINATOR_DICT = {
     u'concurrency': [u'3'],
     u'execution': [u'FIFO'],
     u'throttle': [u'10'],
-    u'schema_version': [u'uri:oozie:coordinator:0.2']
+    u'schema_version': [u'uri:oozie:coordinator:0.2'],
+    u'cron_frequency': [u'0 0 * * *'],
+    u'isAdvancedCron': [u'on'],
 }
 BUNDLE_DICT = {
     u'name': [u'MyBundle'], u'description': [u'Description of my bundle'],
