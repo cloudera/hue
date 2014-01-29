@@ -19,7 +19,7 @@ import os.path
 
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
-from desktop.lib.conf import Config
+from desktop.lib.conf import Config, coerce_bool
 from desktop.lib import paths
 from liboozie.conf import get_oozie_status
 
@@ -30,30 +30,43 @@ DEFINITION_XSLT_DIR = Config(
   key="definition_xslt_dir",
   default=os.path.join(os.path.dirname(__file__), "importlib", "xslt"),
   help=_t("Location on local FS where the xslt files are stored for workflow import."),
-  private=True)
+  private=True
+)
 
 LOCAL_SAMPLE_DIR = Config(
   key="local_data_dir",
   default=os.path.join(os.path.dirname(__file__), "..", "..", "examples"),
   help=_t("Location on local filesystem where the examples are stored."),
-  private=True)
+  private=True
+)
 
 LOCAL_SAMPLE_DATA_DIR = Config(
   key="sample_data_dir",
   default=paths.get_thirdparty_root("sample_data"),
   help=_t("Location on local filesystem where the data for the examples is stored."),
-  private=True)
+  private=True
+)
 
 REMOTE_SAMPLE_DIR = Config(
   key="remote_data_dir",
   default="/user/hue/oozie/workspaces",
-  help=_t("Location on HDFS where the Oozie workflows are stored."))
+  help=_t("Location on HDFS where the Oozie workflows are stored.")
+)
 
 OOZIE_JOBS_COUNT = Config(
   key='oozie_jobs_count',
   default=100,
   type=int,
-  help=_t('Maximum number of Oozie workflows or coodinators or bundles to retrieve in one API call.'))
+  help=_t('Maximum number of Oozie workflows or coodinators or bundles to retrieve in one API call.')
+)
+
+ENABLE_CRON_SCHEDULING = Config( # Until Hue 4
+  key='enable_cron_scheduling',
+  default=True,
+  type=coerce_bool,
+  help=_t('Use Cron format for defining the frequency of a Coordinator instead of the old frequency number/unit.')
+)
+
 
 def config_validator(user):
   res = []
