@@ -263,6 +263,7 @@ ${layout.menubar(section='query')}
       <a id="expandResults" href="javascript:void(0)" title="${_('See results in full screen')}" rel="tooltip"
         class="view-query-results hide pull-right"><h4 style="margin-right: 20px"><i class="fa fa-expand"></i></h4></a>
 
+      % if app_name != 'impala':
       <a id="save-results" data-bind="click: saveResultsModal" href="javascript:void(0)" title="${_('Save the results to HDFS or a new Hive table')}" rel="tooltip"
         class="view-query-results hide pull-right"><h4 style="margin-right: 20px"><i class="fa fa-save"></i></h4></a>
 
@@ -271,6 +272,7 @@ ${layout.menubar(section='query')}
 
       <a id="download-excel" data-bind="attr: {'href': '/beeswax/download/' + $root.design.history.id() + '/xls'}" href="javascript:void(0)" title="${_('Download the results for excel')}" rel="tooltip"
         class="view-query-results hide pull-right"><h4 style="margin-right: 20px"><i class="fa fa-arrow-circle-o-down"></i></h4></a>
+      % endif
    </div>
 
     <div class="card-body">
@@ -324,7 +326,7 @@ ${layout.menubar(section='query')}
             </div>
           </div>
 
-          <div data-bind="css: {'hide': $root.design.results.empty()}" class="hide">
+          <div data-bind="css: {'hide': $root.design.results.empty()}">
             <table class="table table-striped table-condensed resultTable" cellpadding="0" cellspacing="0" data-tablescroller-enforce-height="true">
               <thead>
               <tr data-bind="foreach: $root.design.results.columns">
@@ -334,12 +336,12 @@ ${layout.menubar(section='query')}
             </table>
           </div>
 
-          <div data-bind="css: {'hide': !$root.design.results.empty()}" class="hide">
+          <div data-bind="css: {'hide': !$root.design.results.empty()}" id="resultEmpty">
             <div class="card card-small scrollable">
               <div class="row-fluid">
                 <div class="span10 offset1 center empty-wrapper">
                   <i class="fa fa-frown-o"></i>
-                  <h1>${_('The server returned no results.')}</h1>
+                  <h1>${_('The operation has no results.')}</h1>
                   <br/>
                 </div>
               </div>
@@ -948,19 +950,24 @@ function reinitializeTable(max) {
   var _max = max || 10;
 
   function fn(){
-    $(".dataTables_wrapper").jHueTableScroller({
-      minHeight: $(window).height() - 190,
-      heightAfterCorrection: 0
-    });
-    $(".resultTable").jHueTableExtender({
-      hintElement: "#jumpToColumnAlert",
-      fixedHeader: true,
-      firstColumnTooltip: true
-    });
-    $($("a[data-toggle='tab']").parent(".active").find("a").attr("href")).height($(".dataTables_wrapper").height());
-    $(".dataTables_wrapper").jHueScrollUp({
-      secondClickScrollToTop: true
-    });
+    var container = $($("a[data-toggle='tab']").parent(".active").find("a").attr("href"));
+    if ($(".dataTables_wrapper").height() > 0) {
+      $(".dataTables_wrapper").jHueTableScroller({
+        minHeight: $(window).height() - 190,
+        heightAfterCorrection: 0
+      });
+      $(".resultTable").jHueTableExtender({
+        hintElement: "#jumpToColumnAlert",
+        fixedHeader: true,
+        firstColumnTooltip: true
+      });
+      container.height($(".dataTables_wrapper").height());
+      $(".dataTables_wrapper").jHueScrollUp({
+        secondClickScrollToTop: true
+      });
+    } else if ($('#resultEmpty').height() > 0) {
+      container.height($('#resultEmpty').height());
+    }
 
     if ($(".dataTables_wrapper").data('original-height') == 0 && --_max != 0) {
       $(".dataTables_wrapper").data('original-height', $(".dataTables_wrapper").height());
@@ -1880,8 +1887,6 @@ $(document).ready(function () {
     'query/results': function () {
       showSection('query-editor');
       queryResultsPage();
-
-      $("html, body").animate({ scrollTop: ($(".resultsContainer").position().top - 80) + "px" });
 
       codeMirror.setSize("99%", 100);
 
