@@ -30,6 +30,7 @@ import sys
 from cStringIO import StringIO
 
 from desktop.lib.paths import get_desktop_root
+from desktop.log import formatter
 
 DEFAULT_LOG_DIR = 'logs'
 LOG_FORMAT = '[%(asctime)s] %(module)-12s %(levelname)-8s %(message)s'
@@ -162,9 +163,9 @@ def fancy_logging():
   from log_buffer import FixedBufferHandler
   BUFFER_SIZE = 10 * 1024 * 1024 # This is the size in characters, not bytes
   buffer_handler = FixedBufferHandler(BUFFER_SIZE)
-  formatter = logging.Formatter(LOG_FORMAT, DATE_FORMAT)
+  _formatter = formatter.Formatter(LOG_FORMAT, DATE_FORMAT)
   # We always want to catch all messages in our error report buffer
   buffer_handler.setLevel(logging.DEBUG)
-  buffer_handler.setFormatter(formatter)
+  buffer_handler.setFormatter(_formatter)
   root_logger = logging.getLogger()
   root_logger.addHandler(buffer_handler)
