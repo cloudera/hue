@@ -44,7 +44,8 @@ APPS := core \
 	libs/liboozie \
 	libs/libsaml \
 	libs/librdbms \
-        libs/libopenid
+	libs/libopenid \
+	libs/liboauth
 
 .PHONY: default
 default:: hue syncdb

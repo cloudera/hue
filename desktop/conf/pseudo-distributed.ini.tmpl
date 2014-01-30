@@ -108,10 +108,13 @@
     # - desktop.auth.backend.PamBackend
     # - desktop.auth.backend.SpnegoDjangoBackend
     # - desktop.auth.backend.RemoteUserDjangoBackend
-    # - desktop.auth.backend.OAuthBackend
     # - libsaml.backend.SAML2Backend
+    # - libopenid.backend.OpenIDBackend
+    # - liboauth.backend.OAuthBackend
+    #     (New oauth, support Twitter, Facebook, Google+ and Linkedin
     ## backend=desktop.auth.backend.AllowFirstUserDjangoBackend
 
+    # The service to use when querying PAM.
     ## pam_service=login
 
     # When using the desktop.auth.backend.RemoteUserDjangoBackend, this sets
@@ -250,7 +253,7 @@
     ## kinit_path=/path/to/kinit
 
 
-  # Configuration options for using OAuthBackend login
+  # Configuration options for using OAuthBackend (Core) login
   # ------------------------------------------------------------------------
   [[oauth]]
     # The Consumer key of the application
@@ -334,6 +337,59 @@
 
   # Use email for username
   ## use_email_for_username=true
+
+
+###########################################################################
+# Settings to configure OAuth
+###########################################################################
+
+[liboauth]
+  # NOTE:
+  # To work, each of the active (i.e. uncommented) service must have
+  # applications created on the social network.
+  # Then the "consumer key" and "consumer secret" must be provided here.
+  #
+  # The addresses where to do so are:
+  # Twitter:  https://dev.twitter.com/apps
+  # Google+ : https://cloud.google.com/
+  # Facebook: https://developers.facebook.com/apps
+  # Linkedin: https://www.linkedin.com/secure/developer
+  #
+  # Additionnaly, the following must be set in the application settings:
+  # Twitter:  Callback URL (aka Redirect URL) must be set to http://YOUR_HUE_IP_OR_DOMAIN_NAME/oauth/social_login/oauth_authenticated
+  # Google+ : CONSENT SCREEN must have email address
+  # Facebook: Sandbox Mode must be DISABLED
+  # Linkedin: "In OAuth User Agreement", r_emailaddress is REQUIRED
+
+  # The Consumer key of the application
+  ## consumer_key_twitter=
+  ## consumer_key_google=
+  ## consumer_key_facebook=
+  ## consumer_key_linkedin=
+
+  # The Consumer secret of the application
+  ## consumer_secret_twitter=
+  ## consumer_secret_google=
+  ## consumer_secret_facebook=
+  ## consumer_secret_linkedin=
+
+  # The Request token URL
+  ## request_token_url_twitter=https://api.twitter.com/oauth/request_token
+  ## request_token_url_google=https://accounts.google.com/o/oauth2/auth
+  ## request_token_url_linkedin=https://www.linkedin.com/uas/oauth2/authorization
+  ## request_token_url_facebook=https://graph.facebook.com/oauth/authorize
+
+  # The Access token URL
+  ## access_token_url_twitter=https://api.twitter.com/oauth/access_token?oauth_verifier=
+  ## access_token_url_google=https://accounts.google.com/o/oauth2/token
+  ## access_token_url_facebook=https://graph.facebook.com/oauth/access_token
+  ## access_token_url_linkedin=https://api.linkedin.com/uas/oauth2/accessToken
+
+  # The Authenticate URL
+  ## authenticate_url_twitter=https://api.twitter.com/oauth/authenticate
+  ## authenticate_url_google=https://www.googleapis.com/oauth2/v1/userinfo?access_token=
+  ## authenticate_url_facebook=https://graph.facebook.com/me?access_token=
+  ## authenticate_url_linkedin=https://api.linkedin.com/v1/people/~:(email-address)?format=json&oauth2_access_token=
 
 
 ###########################################################################

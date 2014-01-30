@@ -181,6 +181,8 @@ class AllowFirstUserDjangoBackend(django.contrib.auth.backends.ModelBackend):
 
 class OAuthBackend(DesktopBackendBase):
   """
+  Deprecated, use liboauth.backend.OAuthBackend instead
+
   Heavily based on Twitter Oauth: https://github.com/simplegeo/python-oauth2#logging-into-django-w-twitter
   Requires: python-oauth2 and httplib2
 
