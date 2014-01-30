@@ -271,7 +271,7 @@ function sparkViewModel() {
   var timerId = 0;
 
     var request = {
-      url: '/spark/api/job/' + self.query.jobId(),
+      url: '/spark/api/job/' + self.query.jobId() + '?' + Math.random(),
       dataType: 'json',
       type: 'GET',
       success: function(data) {
@@ -299,7 +299,7 @@ function sparkViewModel() {
 
   self.fetchAppNames = function() {
     var request = {
-      url: '/spark/api/jars',
+      url: '/spark/api/jars?' + Math.random(),
       dataType: 'json',
       type: 'GET',
       success: function(data) {
@@ -317,7 +317,7 @@ function sparkViewModel() {
 
   self.fetchContexts = function() {
     var request = {
-      url: '/spark/api/contexts',
+      url: '/spark/api/contexts?' + Math.random(),
       dataType: 'json',
       type: 'GET',
       success: function(data) {

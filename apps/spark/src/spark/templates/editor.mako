@@ -58,6 +58,7 @@ ${ common.navbar('editor') }
             <button type="button" class="btn btn-primary uploadAppModalBtn">${ _('Upload app') }</button>
             <button type="button" class="btn btn-primary createContextModalBtn">${ _('Create context') }</button>
           </span>
+          <div></div><!-- this is to fix IE's quirkiness /-->
           <form class="form-inline">
             <span class="dropdown">
               ${_('App name')}&nbsp;

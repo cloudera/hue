@@ -250,8 +250,7 @@ ${layout.menubar(section='query')}
                     <option value="${loop.index+2}">${ col.name }</option>
                   % endfor
                 </select>
-              </label>&nbsp;&nbsp;
-              <a rel="tooltip" data-placement="top" title="${_('Download image')}" id="blueprintDownload" href="javascript:void(0)" class="btn hide"><i class="fa fa-download"></i></a>
+              </label>
             </span>
             <span id="blueprintLatLng" class="hide">
               <label>${_('Latitude')}
@@ -549,7 +548,6 @@ $(document).ready(function () {
         catch (err) { // do nothing
         }
       }
-      $("#blueprintDownload").addClass("hide");
       $("#blueprint").attr("class", "").attr("style", "").empty();
       $("#blueprint").data("plugin_jHueBlueprint", null);
       if (graphType == $.jHueBlueprint.TYPES.MAP) {
@@ -608,7 +606,6 @@ $(document).ready(function () {
           if (_data.length > 30){
             $(".flot-x-axis .flot-tick-label").hide();
           }
-          $("#blueprintDownload").removeClass("hide");
         }
         else {
           $("#blueprint").addClass("empty").text("${_("Please select the columns you would like to see in this chart.")}");
@@ -616,10 +613,6 @@ $(document).ready(function () {
       }
     }
   }
-
-  $("#blueprintDownload").on("click", function(){
-    window.open($(".flot-base")[0].toDataURL());
-  });
 
   function getGraphType() {
     var _type = "";
