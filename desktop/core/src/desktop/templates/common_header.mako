@@ -279,7 +279,9 @@ from django.utils.translation import ugettext as _
         %endif
       </ul>
     </li>
+    % if 'help' in apps:
     <li><a title="${_('Documentation')}" rel="navigator-tooltip" href="/help"><i class="fa fa-question-circle"></i></a></li>
+    % endif
     <li id="jHueTourFlagPlaceholder"></li>
     <li><a title="${_('Sign out')}" rel="navigator-tooltip" href="/accounts/logout/"><i class="fa fa-sign-out"></i></a></li>
   </ul>
