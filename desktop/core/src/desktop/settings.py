@@ -324,6 +324,13 @@ if OPENID_AUTHENTICATION:
   LOGIN_URL = '/openid/login'
   SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
+# OAuth
+OAUTH_AUTHENTICATION='liboauth.backend.OAuthBackend' in AUTHENTICATION_BACKENDS
+if OAUTH_AUTHENTICATION:
+    INSTALLED_APPS.append('liboauth')
+    LOGIN_URL = '/oauth/accounts/login'
+    SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
 # URL Redirection white list.
 if desktop.conf.REDIRECT_WHITELIST.get():
   MIDDLEWARE_CLASSES.append('desktop.middleware.EnsureSafeRedirectURLMiddleware')

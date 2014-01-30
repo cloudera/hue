@@ -86,6 +86,13 @@ ${ layout.menubar(section='coordinators') }
           <div id="step2" class="stepDetails hide">
             <div class="alert alert-info"><h3>${ _('Frequency') }</h3></div>
             <div class="fieldWrapper">
+              <div class="row-fluid">
+                <div class="alert alert-warning">
+                  ${ _('UTC time only. (e.g. if you want 10pm PST (UTC+8) set it 8 hours later to 6am the next day.') }
+                </div>
+              </div>
+            </div>
+            <div class="fieldWrapper">
               % if enable_cron_scheduling:
                 ${ coordinator_utils.frequency_fields() }
               % else:
