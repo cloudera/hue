@@ -36,11 +36,32 @@ from django.utils.translation import ugettext as _
   <link href="/static/css/hue3.css" rel="stylesheet">
 
   <style type="text/css">
-    body {
-      display: none;
-      padding-top: 80px;
-    }
+    % if conf.CUSTOM.BANNER_TOP_HTML.get():
+      body {
+        display: none;
+        padding-top: 120px;
+      }
+      .banner {
+        height: 40px;
+        width: 100%;
+        padding: 0;
+        position: fixed;
+        top: 0;
+        background-color: #F9F9F9;
+        z-index: 1033;
+      }
+      .navigator {
+        top: 30px!important;
+      }
+    % else:
+      body {
+        display: none;
+        padding-top: 80px;
+      }
+    % endif
+  </style>
 
+  <style type="text/css">
     #logo {
       display: block;
       margin-left: auto;
@@ -104,6 +125,13 @@ from django.utils.translation import ugettext as _
 </head>
 
 <body>
+
+% if conf.CUSTOM.BANNER_TOP_HTML.get():
+  <div id="banner-top" class="banner">
+    ${ conf.CUSTOM.BANNER_TOP_HTML.get() | n,unicode }
+  </div>
+% endif
+
 
 <div class="footer"></div>
 
