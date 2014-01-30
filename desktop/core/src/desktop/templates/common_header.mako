@@ -244,7 +244,7 @@ from django.utils.translation import ugettext as _
 
 % if conf.CUSTOM.BANNER_TOP_HTML.get():
   <div id="banner-top" class="banner">
-    ${ conf.CUSTOM.BANNER_TOP_HTML.get() }
+    ${ conf.CUSTOM.BANNER_TOP_HTML.get() | n,unicode }
   </div>
 % endif
 
