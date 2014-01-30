@@ -136,7 +136,7 @@ class Result(models.Model):
     data_dict = json.loads(self.data)
 
     template = data_dict.get('template')
-    if with_highlighting:
+    if with_highlighting and data_dict.get('highlighting'):
       for field in data_dict.get('highlighting', []):
         template = re.sub('\{\{%s\}\}' % field, '{{{%s}}}' % field, template)
 

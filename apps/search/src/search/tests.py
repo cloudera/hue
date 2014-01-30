@@ -92,6 +92,14 @@ class TestWithMockedSolr(TestSearchBase):
 
     assert_true('Showing 4 results' in response.content, response.content)
 
+  def test_empty_highlighting(self):
+    collection, created = Collection.objects.get_or_create(name='collection_1', solr_properties={})
+
+    assert_equal('[]', collection.result.get_highlighting())
+
+    assert_true('{{_version_}} {{affiliation}}' in collection.result.get_template(True), collection.result.get_template(True))
+
+
 
 SOLR_SCHEMA = """<?xml version="1.0" encoding="UTF-8" ?>
 <!--
