@@ -298,6 +298,9 @@ class LdapBackend(object):
       # New Search/Bind Auth
       base_dn = desktop.conf.LDAP.BASE_DN.get()
       user_name_attr = desktop.conf.LDAP.USERS.USER_NAME_ATTR.get()
+      user_filter = desktop.conf.LDAP.USERS.USER_FILTER.get()
+      if not user_filter.startswith('('):
+        user_filter = '(' + user_filter + ')'
 
       if desktop.conf.LDAP.BIND_DN.get():
         bind_dn = desktop.conf.LDAP.BIND_DN.get()
@@ -305,8 +308,13 @@ class LdapBackend(object):
         bind_password = desktop.conf.LDAP.BIND_PASSWORD.get()
         ldap_settings.AUTH_LDAP_BIND_PASSWORD = bind_password
 
-      search_bind_results = LDAPSearch(base_dn,
-          ldap.SCOPE_SUBTREE, "(" + user_name_attr + "=%(user)s)")
+      if user_filter is None:
+        search_bind_results = LDAPSearch(base_dn,
+            ldap.SCOPE_SUBTREE, "(" + user_name_attr + "=%(user)s)")
+
+      else:
+        search_bind_results = LDAPSearch(base_dn,
+            ldap.SCOPE_SUBTREE, "(&(" + user_name_attr + "=%(user)s)" + user_filter + ")")
 
       ldap_settings.AUTH_LDAP_USER_SEARCH = search_bind_results
     else:
