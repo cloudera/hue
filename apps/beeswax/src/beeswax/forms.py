@@ -111,7 +111,16 @@ class SaveResultsForm(DependencyAwareForm):
         if tbl:
           try:
             if self.db is not None:
-              self.db.get_table('default', tbl) # Assumes 'default' DB
+              db_name = 'default'
+              name_parts = tbl.split(".")
+              if len(name_parts) == 1:
+                tbl_name = tbl
+              elif len(name_parts) == 2:
+                db_name, tbl_name = name_parts
+              else:
+                self._errors['target_table'] = self.error_class([_('Invalid table name')])
+
+              self.db.get_table(db_name, tbl_name)
             self._errors['target_table'] = self.error_class([_('Table already exists')])
             del cleaned_data['target_table']
           except Exception:
