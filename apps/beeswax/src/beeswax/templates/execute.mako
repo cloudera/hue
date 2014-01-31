@@ -961,9 +961,7 @@ function reinitializeTable(max) {
         firstColumnTooltip: true
       });
       container.height($(".dataTables_wrapper").height());
-      $(".dataTables_wrapper").jHueScrollUp({
-        secondClickScrollToTop: true
-      });
+      $(".dataTables_wrapper").jHueScrollUp();
     } else if ($('#resultEmpty').height() > 0) {
       container.height($('#resultEmpty').height());
     }
@@ -977,6 +975,8 @@ function reinitializeTable(max) {
 }
 
 $(document).ready(function () {
+  $.jHueScrollUp();
+
   var queryPlaceholder = "${_('Example: SELECT * FROM tablename, or press CTRL + space')}";
 
   $("#executeQuery").tooltip({
@@ -1496,9 +1496,7 @@ function resultsTable(e, data) {
     });
     addResults(viewModel, dataTable, index, pageSize);
     index += pageSize;
-    dataTableEl.jHueScrollUp({
-      secondClickScrollToTop: true
-    });
+    dataTableEl.jHueScrollUp();
   }
 }
 

@@ -22,15 +22,13 @@
  *
  *   options:
  *    - threshold: (default 100) value in pixels, scroll amount before the link appears
- *    - secondClickScrollToTop: (default false) if specified, the anchor stays for longer and you can re-click on it to scroll to this element
  */
 
 (function ($, window, document, undefined) {
 
   var pluginName = "jHueScrollUp",
       defaults = {
-        threshold: 100, // it displays it after 100 px of scroll
-        secondClickScrollToTop: false
+        threshold: 100 // it displays it after 100 px of scroll
       };
 
   function Plugin(element, options) {
@@ -51,45 +49,70 @@
     var link = $("<a/>").attr("id", "jHueScrollUpAnchor").attr("href", "javascript:void(0)").html("<i class='fa fa-chevron-up'></i>").appendTo("body");
     if ($("#jHueScrollUpAnchor").length > 0) { // just one scroll up per page
       link = $("#jHueScrollUpAnchor");
-      link.off("click");
+      $(document).off("click", "#jHueScrollUpAnchor");
     }
 
+    $(_this.element).attr("jHueScrollified", "true");
+
     if ($(_this.element).is("body")) {
-      $(window).scroll(function () {
-        $(($(window).scrollTop() > _this.options.threshold) ? link.fadeIn(200) : link.fadeOut(200));
-      });
-      link.click(function (event) {
-        $("body, html").animate({scrollTop: $(_this.element).position().top}, 300);
-        return false;
-      });
+      setScrollBehavior($(window), $("body, html"));
     }
     else {
-      $(_this.element).scroll(function () {
-        var _fadeOutMs = 200;
-        if (_this.options.secondClickScrollToTop) {
-          _fadeOutMs = 1000;
-        }
-        $(($(_this.element).scrollTop() > _this.options.threshold) ? link.fadeIn(200) : link.fadeOut(_fadeOutMs));
-      });
-      link.on("click", function (event) {
-        event.preventDefault();
-        event.stopImmediatePropagation();
-        if (_this.options.secondClickScrollToTop) {
-          if ($(_this.element).data("lastClick") == null || (new Date()).getTime() - $(_this.element).data("lastClick") > 1500) {
-            $(_this.element).animate({scrollTop: 0}, 300);
+      setScrollBehavior($(_this.element), $(_this.element));
+    }
+
+    function setScrollBehavior(scrolled, scrollable) {
+      scrolled.scroll(function () {
+        if (scrolled.scrollTop() > _this.options.threshold) {
+          if (link.is(":hidden")) {
+            link.fadeIn(200);
           }
-          else {
-            $("body, html").animate({scrollTop: 0}, 300);
-            link.fadeOut(200);
+          if ($(_this.element).data("lastScrollTop") == null || $(_this.element).data("lastScrollTop") < scrolled.scrollTop()) {
+            $("#jHueScrollUpAnchor").data("caller", scrollable);
           }
-          $(_this.element).data("lastClick", (new Date()).getTime());
+          $(_this.element).data("lastScrollTop", scrolled.scrollTop());
         }
         else {
-          $(_this.element).animate({scrollTop: 0}, 300);
+          checkForAllScrolls();
         }
-        return false;
       });
     }
+
+    function checkForAllScrolls() {
+      var _allOk = true;
+      $(document).find("[jHueScrollified='true']").each(function (cnt, item) {
+        if ($(item).is("body")) {
+          if ($(window).scrollTop() > _this.options.threshold) {
+            _allOk = false;
+            $("#jHueScrollUpAnchor").data("caller", $("body, html"));
+          }
+        }
+        else {
+          if ($(item).scrollTop() > _this.options.threshold) {
+            _allOk = false;
+            $("#jHueScrollUpAnchor").data("caller", $(item));
+          }
+        }
+      });
+      if (_allOk) {
+        link.fadeOut(200);
+        $("#jHueScrollUpAnchor").data("caller", null);
+      }
+    }
+
+    $(document).on("click", "#jHueScrollUpAnchor", function (event) {
+      if ($("#jHueScrollUpAnchor").data("caller") != null) {
+        $("#jHueScrollUpAnchor").data("caller").animate({scrollTop: 0}, 300, function () {
+          if ($(document).find("[jHueScrollified='true']").not($("#jHueScrollUpAnchor").data("caller")).is("body") && $(window).scrollTop() > _this.options.threshold) {
+            $("#jHueScrollUpAnchor").data("caller", $("body, html"));
+          }
+          else {
+            checkForAllScrolls();
+          }
+        });
+      }
+      return false;
+    });
   };
 
   $.fn[pluginName] = function (options) {
