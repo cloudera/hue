@@ -243,6 +243,10 @@ class HiveServer2Dbms(object):
     design = query_history.design.get_design()
     database = design.query['database']
 
+    name_parts = target_table.split(".")
+    if len(name_parts) == 2:
+      database, target_table = name_parts
+
     # Case 1: Hive Server 2 backend or results straight from an existing table
     if result_meta.in_tablename:
       self.use(database)
