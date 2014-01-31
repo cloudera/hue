@@ -1935,7 +1935,7 @@ function queryEvents() {
     routie('query/explanation');
   });
   $(document).on('watched.query', function (e, data) {
-    if (data.status && data.status && data.status != 0) {
+    if (data.status && data.status && data.status != 0 && data.status != 2) {
       viewModel.design.watch.errors.push(data.error || data.message);
     }
     routie('query/logs');

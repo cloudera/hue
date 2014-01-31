@@ -67,6 +67,10 @@ def error_handler(view_fn):
         'status': -1,
         'message': message,
       }
+
+      if 'database is locked' in message or 'Invalid query handle' in message:
+        response['status'] = 2 # Frontend will not display this type of error
+
       return HttpResponse(json.dumps(response), mimetype="application/json", status=200)
   return decorator
 
