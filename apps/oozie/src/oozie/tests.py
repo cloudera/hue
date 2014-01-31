@@ -2013,8 +2013,6 @@ class TestEditorBundle(OozieMockBase):
 class TestImportWorkflow04(OozieMockBase):
 
   def setUp(self):
-    raise SkipTest
-
     super(TestImportWorkflow04, self).setUp()
     self.setup_simple_workflow()
 
