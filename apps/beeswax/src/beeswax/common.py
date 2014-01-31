@@ -24,7 +24,7 @@ import re
 from django import forms
 
 
-HIVE_IDENTIFER_REGEX = re.compile("^[a-zA-Z0-9]\w*$")
+HIVE_IDENTIFER_REGEX = re.compile("(^[a-zA-Z0-9]\w*\.)?[a-zA-Z0-9]\w*$")
 
 DL_FORMATS = [ 'csv', 'xls' ]
 
