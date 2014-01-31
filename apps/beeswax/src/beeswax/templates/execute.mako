@@ -311,7 +311,7 @@ ${layout.menubar(section='query')}
             </thead>
             <tbody data-bind="foreach: $root.design.results.columns">
               <tr>
-                <td><a href="javascript:void(0)" class="column-selector" data-bind="text: $data.name"></a></td>
+                <td><a href="javascript:void(0)" class="column-selector" data-bind="text: $data.name + ($.trim($data.type) != '' ? ' (' + $.trim($data.type) + ')' : '')"></a></td>
               </tr>
             </tbody>
           </table>
@@ -330,7 +330,7 @@ ${layout.menubar(section='query')}
             <table class="table table-striped table-condensed resultTable" cellpadding="0" cellspacing="0" data-tablescroller-enforce-height="true">
               <thead>
               <tr data-bind="foreach: $root.design.results.columns">
-                <th data-bind="text: $data.name, css: { 'sort-numeric': $.inArray($data.type, ['TINYINT_TYPE', 'SMALLINT_TYPE', 'INT_TYPE', 'BIGINT_TYPE', 'FLOAT_TYPE', 'DOUBLE_TYPE', 'DECIMAL_TYPE']) > -1, 'sort-date': $.inArray($data.type, ['TIMESTAMP_TYPE', 'DATE_TYPE']) > -1, 'sort-string': $.inArray($data.type, ['TINYINT_TYPE', 'SMALLINT_TYPE', 'INT_TYPE', 'BIGINT_TYPE', 'FLOAT_TYPE', 'DOUBLE_TYPE', 'DECIMAL_TYPE', 'TIMESTAMP_TYPE', 'DATE_TYPE']) == -1 }"></th>
+                <th data-bind="text: $data.name, css: { 'sort-numeric': isNumericColumn($data.type), 'sort-date': isDateTimeColumn($data.type), 'sort-string': isStringColumn($data.type)}"></th>
               </tr>
               </thead>
             </table>
@@ -816,7 +816,7 @@ $(document).ready(function () {
               _table.find(".fa-spinner").removeClass("fa-spinner").removeClass("fa-spin").addClass("fa-table");
               $(extended_columns).each(function (iCnt, col) {
                 var _column = $("<li>");
-                _column.html("<a href='#' style='padding-left:10px'" + (col.comment != null && col.comment != "" ? " title='" + col.comment + "'" : "") + "><i class='fa fa-columns'></i> " + col.name + " (" + col.type + ")</a>");
+                _column.html("<a href='#' style='padding-left:10px'" + (col.comment != null && col.comment != "" ? " title='" + col.comment + "'" : "") + "><i class='fa fa-columns'></i> " + col.name + ($.trim(col.type) != "" ? " (" + $.trim(col.type) + ")" : "") + "</a>");
                 _column.appendTo(_table.find("ul"));
                 _column.on("dblclick", function () {
                   codeMirror.replaceSelection($.trim(col.name) + ', ');
@@ -1191,6 +1191,17 @@ $(document).one('fetched.design', function () {
   $(".fileChooser:not(:has(~ button))").after(getFileBrowseButton($(".fileChooser:not(:has(~ button))")));
 });
 
+function isNumericColumn(type) {
+  return $.inArray(type, ['TINYINT_TYPE', 'SMALLINT_TYPE', 'INT_TYPE', 'BIGINT_TYPE', 'FLOAT_TYPE', 'DOUBLE_TYPE', 'DECIMAL_TYPE', 'TIMESTAMP_TYPE', 'DATE_TYPE']) > -1;
+}
+
+function isDateTimeColumn(type) {
+  return $.inArray(type, ['TIMESTAMP_TYPE', 'DATE_TYPE']) > -1;
+}
+
+function isStringColumn(type) {
+  return !isNumericColumn(type) && !isDateTimeColumn(type);
+}
 
 var graphHasBeenPredicted = false;
 // Logs
@@ -1337,20 +1348,16 @@ $(document).ready(function () {
     if (!graphHasBeenPredicted) {
       graphHasBeenPredicted = true;
       var _firstAllString, _firstAllNumeric;
-      for (var i = 1; i < $(".resultTable>thead>tr>th").length; i++) {
-        var _isNumeric = true;
-        $(".resultTable>tbody>tr>td:nth-child(" + (i + 1) + ")").each(function (cnt) {
-          if (!$.isNumeric($.trim($(this).text()))) {
-            _isNumeric = false;
-          }
-        });
-        if (_firstAllString == null && !_isNumeric) {
-          _firstAllString = i + 1;
+      var _cols = viewModel.design.results.columns();
+      $(_cols).each(function (cnt, col) {
+        if (_firstAllString == null && !isNumericColumn(col.type)) {
+          _firstAllString = cnt + 1;
         }
-        if (_firstAllNumeric == null && _isNumeric) {
-          _firstAllNumeric = i + 1;
+        if (_firstAllNumeric == null && isNumericColumn(col.type)) {
+          _firstAllNumeric = cnt + 1;
         }
-      }
+      });
+
       if (_firstAllString != null && _firstAllNumeric != null) {
         $("#blueprintBars").addClass("active");
         $("#blueprintAxis").removeClass("hide");
