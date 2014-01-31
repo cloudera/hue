@@ -1,4 +1,4 @@
-<workflow-app name="Forks-copy" xmlns="uri:oozie:workflow:0.4">
+<workflow-app name="test-decision" xmlns="uri:oozie:workflow:0.4">
     <start to="decision-85"/>
     <decision name="decision-85">
         <switch>

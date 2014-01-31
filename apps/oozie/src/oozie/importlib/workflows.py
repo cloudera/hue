@@ -355,7 +355,7 @@ def _resolve_decision_relationships(workflow):
       link = Link(name='related', parent=decision, child=end)
       link.save()
 
-    children = [link.child.get_full_node() for link in decision.get_children_links().exclude(name__in=['error','default'])]
+    children = [_link.child.get_full_node() for _link in decision.get_children_links().exclude(name__in=['error','default'])]
 
     ends = set()
     for child in children:
@@ -408,7 +408,7 @@ def _resolve_decision_relationships(workflow):
     # Assume receive full node.
     children = [link.child.get_full_node() for link in node.get_children_links().exclude(name__in=['error','default'])]
 
-    # Multiple parents means that we've found an end.
+    # Multiple parents means that we've potentially found an end.
     # Joins will always have more than one parent.
     fan_in_count = len(node.get_parent_links().exclude(name__in=['error','default']))
     if fan_in_count > 1 and not isinstance(node, Join) and not isinstance(node, DecisionEnd):
@@ -435,8 +435,6 @@ def _resolve_decision_relationships(workflow):
 
     # Likely reached end.
     return None
-
-  helper(workflow.start.get_full_node())
 
   if Node.objects.filter(workflow=workflow).filter(node_type=Decision.node_type).exists():
     helper(workflow.start.get_full_node())
