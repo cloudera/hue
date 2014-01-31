@@ -683,22 +683,24 @@ function BeeswaxViewModel(server) {
   };
 
   self.cancelQuery = function() {
-    $(document).trigger('cancel.query');
-    var url = '/' + self.server() + '/api/query/' + self.design.history.id() + '/cancel';
-    $.post(url,
-      function(response) {
-        if (response['status'] != 0) {
-          $(document).trigger('error_cancel.query', response['message']);
-        } else {
-          $(document).trigger('cancelled.query');
+    if (self.design.history.id() > 0) {
+      $(document).trigger('cancel.query');
+      var url = '/' + self.server() + '/api/query/' + self.design.history.id() + '/cancel';
+      $.post(url,
+        function(response) {
+          if (response['status'] != 0) {
+            $(document).trigger('error_cancel.query', response['message']);
+          } else {
+            $(document).trigger('cancelled.query');
+          }
         }
-      }
-    );
+      );
+    }
   };
 
   self.closeQuery = function() {
     var self = this;
-    if (self.design.history.id() && !self.design.isRunning()) {
+    if (self.design.history.id() > 0 && !self.design.isRunning()) {
       var data = {};
       var url = '/' + self.server() + '/api/query/' + self.design.history.id() + '/close';
       var request = {
