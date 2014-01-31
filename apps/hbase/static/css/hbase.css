@@ -191,13 +191,14 @@ ul#hbase-breadcrumbs li a {
 
 .smartview ul.smartview-cells > li .corner-btn {
   position: absolute;
-  top: 5px;
-  right: 5px;
+  top: 1px;
+  right: 3px;
   font-size: 12px;
   color: #333;
   text-decoration: none;
   display: none;
   padding: 0 6px;
+  min-height: 27px;
 }
 
 .smartview ul.smartview-cells > li pre {
