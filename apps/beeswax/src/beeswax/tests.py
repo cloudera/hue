@@ -171,9 +171,6 @@ for x in sys.stdin:
         if x.profile.name == "test_query_with_setting" ][0].user)
 
   def test_basic_flow(self):
-    """
-    Test basic query submission
-    """
     # Minimal server operation
     assert_equal(['default', 'other_db'], self.db.get_databases())
 
@@ -193,7 +190,7 @@ for x in sys.stdin:
 
     assert_equal([0, 255, 32640], content["results"][0], content)
     assert_equal(['INT_TYPE', 'INT_TYPE', 'BIGINT_TYPE'], [col['type'] for col in content["columns"]])
-    assert_equal(0, len(content["hadoop_jobs"]), content) # Should be 1 after HS2 bug is fixed
+    assert_equal(1, len(content["hadoop_jobs"]), content) # Should be 1 after HS2 bug is fixed
     self._verify_query_state(beeswax.models.QueryHistory.STATE.available)
 
     # Query multi-page request
@@ -231,12 +228,12 @@ for x in sys.stdin:
 
     assert_equal([2.0, 4.0], content["results"][0])
     log = content['log']
-    assert_true(search_log_line('parse.ParseDriver', 'Parse Completed', log), log)
-    assert_true(search_log_line('cli.CLIService', 'getOperationStatus()', log), log)
-    assert_true(search_log_line('cli.CLIService', 'fetchResults()', log), log)
-    assert_true(search_log_line('cli.CLIService', 'getResultSetMetadata()', log), log)
+    assert_true(search_log_line('parse.SemanticAnalyzer', 'Completed plan generation', log), log)
+    assert_true(search_log_line('ql.Driver', 'Semantic Analysis Completed', log), log)
+    assert_true(search_log_line('exec.Task', '100%', log), log)
+    assert_true(search_log_line('ql.Driver', 'OK', log), log)
     # Test job extraction while we're at it
-    # assert_equal(1, len(content["hadoop_jobs"]), "Should have started 1 job and extracted it.") # Should be 1 after HS2 bug is fixed
+    assert_equal(1, len(content["hadoop_jobs"]), "Should have started 1 job and extracted it.")
 
   def test_query_with_remote_udf(self):
     """
