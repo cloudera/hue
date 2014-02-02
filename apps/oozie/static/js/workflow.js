@@ -835,7 +835,7 @@ var WorkflowModule = function($, NodeModelChooser, Node, ForkNode, DecisionNode,
             zIndex: 1000,
             opacity: 0.45,
             revertDuration: 0,
-            cancel: '.node-action-bar'
+            cancel: '.edit-node-link'
           });
         }
       });
