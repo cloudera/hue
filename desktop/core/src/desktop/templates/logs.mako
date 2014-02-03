@@ -98,13 +98,9 @@ ${layout.menubar(section='log_view')}
       }, 200);
     });
 
-    var filterTimeout = -1;
-    $(".search-query").keyup(function () {
-      window.clearTimeout(filterTimeout);
-      filterTimeout = window.setTimeout(function () {
-        filterLogs($(".search-query").val());
-      }, 500);
-    });
+    $(".search-query").jHueDelayedInput(function(){
+      filterLogs($(".search-query").val());
+    }, 500);
 
     if ("${query}" != "") {
       filterLogs("${query}");

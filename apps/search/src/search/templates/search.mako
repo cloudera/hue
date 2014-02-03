@@ -531,22 +531,18 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
     % if hue_collection.autocomplete:
     $("#id_query").attr("autocomplete", "off");
 
-    var autocompleteTimeout = -1;
-    $("#id_query").on("keyup", function () {
-      window.clearTimeout(autocompleteTimeout);
-      autocompleteTimeout = window.setTimeout(function() {
-        var query = $("#id_query").val();
-        if (query) {
-          $.ajax("${ url('search:query_suggest', collection_id=hue_collection.id) }" + query, {
-            type: 'GET',
-            success: function (data) {
-              if (data.message.spellcheck && ! jQuery.isEmptyObject(data.message.spellcheck.suggestions)) {
-                $('#id_query').typeahead({source: data.message.spellcheck.suggestions[1].suggestion});
-              }
+    $("#id_query").jHueDelayedInput(function(){
+      var query = $("#id_query").val();
+      if (query) {
+        $.ajax("${ url('search:query_suggest', collection_id=hue_collection.id) }" + query, {
+          type: 'GET',
+          success: function (data) {
+            if (data.message.spellcheck && ! jQuery.isEmptyObject(data.message.spellcheck.suggestions)) {
+              $('#id_query').typeahead({source: data.message.spellcheck.suggestions[1].suggestion});
             }
-          });
-        }
-      }, 300);
+          }
+        });
+      }
     });
     % endif
 

@@ -750,14 +750,10 @@ from django.utils.translation import ugettext as _
       }
       viewModel.retrieveData();
 
-      var filterTimeout = -1;
-      $(".search-query").keyup(function () {
-        window.clearTimeout(filterTimeout);
-        filterTimeout = window.setTimeout(function () {
-          viewModel.searchQuery($(".search-query").val());
-          viewModel.filter();
-        }, 500);
-      });
+      $(".search-query").jHueDelayedInput(function(){
+        viewModel.searchQuery($(".search-query").val());
+        viewModel.filter();
+      }, 500);
 
       $("#editBreadcrumb").click(function () {
         $(this).hide();
