@@ -27,6 +27,92 @@ __docformat__ = "epytext"
 
 LOG = logging.getLogger(__name__)
 
+
+class HueCookieJar(cookielib.CookieJar):
+  def _process_rfc2109_cookies(self, cookies):
+    rfc2109_as_ns = getattr(self._policy, 'rfc2109_as_netscape', None)
+    if rfc2109_as_ns is None:
+      rfc2109_as_ns = not self._policy.rfc2965
+    for cookie in cookies:
+      if cookie.version == 1:
+        cookie.rfc2109 = True
+        if rfc2109_as_ns:
+          # treat 2109 cookies as Netscape cookies rather than
+          # as RFC2965 cookies
+          cookie.version = 0
+
+
+  def make_cookies(self, response, request):
+    """Return sequence of Cookie objects extracted from response object."""
+    # get cookie-attributes for RFC 2965 and Netscape protocols
+    headers = response.info()
+    rfc2965_hdrs = headers.getheaders("Set-Cookie2")
+    ns_hdrs = headers.getheaders("Set-Cookie")
+
+    rfc2965 = self._policy.rfc2965
+    netscape = self._policy.netscape
+
+    if ((not rfc2965_hdrs and not ns_hdrs) or
+        (not ns_hdrs and not rfc2965) or
+        (not rfc2965_hdrs and not netscape) or
+        (not netscape and not rfc2965)):
+        return []  # no relevant cookie headers: quick exit
+
+    try:
+      cookies = self._cookies_from_attrs_set(cookielib.split_header_words(rfc2965_hdrs), request)
+    except:
+      cookielib.reraise_unmasked_exceptions()
+      cookies = []
+
+    if ns_hdrs and netscape:
+      try:
+        ns_cookies = self._cookies_from_attrs_set(cookielib.parse_ns_headers(ns_hdrs), request)
+      except:
+        cookielib.reraise_unmasked_exceptions()
+        ns_cookies = []
+      self._process_rfc2109_cookies(ns_cookies)
+
+      # Written by Abe
+      if rfc2965:
+        lookup = {}
+        for cookie in cookies:
+          lookup[(cookie.domain, cookie.path, cookie.name)] = None
+
+        def no_matching_rfc2965(ns_cookie, lookup=lookup):
+          key = ns_cookie.domain, ns_cookie.path, ns_cookie.name
+          return key not in lookup
+        ns_cookies = filter(no_matching_rfc2965, ns_cookies)
+
+      if ns_cookies:
+        cookies.extend(ns_cookies)
+
+    return cookies
+
+
+class HueCookiePolicy(cookielib.DefaultCookiePolicy):
+  def __init__(self,
+               blocked_domains=None, allowed_domains=None,
+               netscape=True, rfc2965=False,
+               rfc2109_as_netscape=None,
+               hide_cookie2=False,
+               strict_domain=False,
+               strict_rfc2965_unverifiable=True,
+               strict_ns_unverifiable=False,
+               strict_ns_domain=0,
+               strict_ns_set_initial_dollar=False,
+               strict_ns_set_path=False):
+    self.rfc2109_as_netscape = rfc2109_as_netscape
+    return cookielib.DefaultCookiePolicy.__init__(self, blocked_domains=blocked_domains, allowed_domains=allowed_domains,
+                                                  netscape=netscape, rfc2965=rfc2965,
+                                                  hide_cookie2=hide_cookie2,
+                                                  strict_domain=strict_domain,
+                                                  strict_rfc2965_unverifiable=strict_rfc2965_unverifiable,
+                                                  strict_ns_unverifiable=strict_ns_unverifiable,
+                                                  strict_ns_domain=strict_ns_domain,
+                                                  strict_ns_set_initial_dollar=strict_ns_set_initial_dollar,
+                                                  strict_ns_set_path=strict_ns_set_path)
+
+
 class RestException(Exception):
   """
   Any error result from the Rest API is converted into this exception type.
@@ -83,11 +169,11 @@ class HttpClient(object):
     self._headers = { }
 
     # Make a cookie processor
-    cookiejar = cookielib.CookieJar()
+    self._cookiejar = HueCookieJar(HueCookiePolicy())
 
     self._opener = urllib2.build_opener(
         HTTPErrorProcessor(),
-        urllib2.HTTPCookieProcessor(cookiejar))
+        urllib2.HTTPCookieProcessor(self._cookiejar))
 
 
   def set_basic_auth(self, username, password, realm):
@@ -170,6 +256,7 @@ class HttpClient(object):
 
     # Call it
     self.logger.debug("%s %s" % (http_method, url))
+    self.logger.debug("Cookies %s" % self._cookiejar)
     try:
       return self._opener.open(request)
     except (urllib2.HTTPError, urllib2.URLError), ex:
