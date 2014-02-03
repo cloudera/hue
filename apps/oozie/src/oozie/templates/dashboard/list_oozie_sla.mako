@@ -48,8 +48,8 @@ ${ layout.menubar(section='sla', dashboard=True) }
     -moz-transform: rotate(270deg);
     -o-transform: rotate(270deg);
     writing-mode: lr-tb;
-    margin-left: -82px;
-    margin-top: 120px;
+    margin-left: -110px;
+    margin-top: 130px;
     position: absolute;
   }
 
@@ -140,8 +140,8 @@ ${ layout.menubar(section='sla', dashboard=True) }
 
             </div>
 
-            <div class="tab-pane" id="chartTab">
-              <div id="yAxisLabel" class="hide">${_('Time since Nominal Time')}</div>
+            <div class="tab-pane" id="chartTab" style="padding-left: 20px">
+              <div id="yAxisLabel" class="hide">${_('Time since Nominal Time in min')}</div>
               <div id="slaChart"></div>
             </div>
           </div>

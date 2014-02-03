@@ -283,8 +283,8 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
       </div>
 
       % if oozie_coordinator.has_sla:
-      <div class="tab-pane" id="sla">
-        <div id="yAxisLabel" class="hide">${_('Time since Nominal Time')}</div>
+      <div class="tab-pane" id="sla" style="padding-left: 20px">
+        <div id="yAxisLabel" class="hide">${_('Time since Nominal Time in min')}</div>
         <div id="slaChart"></div>
         <table id="slaTable" class="table table-striped table-condensed hide">
           <thead>
@@ -372,8 +372,8 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
     -moz-transform: rotate(270deg);
     -o-transform: rotate(270deg);
     writing-mode: lr-tb;
-    margin-left: -82px;
-    margin-top: 120px;
+    margin-left: -110px;
+    margin-top: 130px;
     position: absolute;
   }
 
@@ -450,10 +450,6 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
         "sEmptyTable": "${_('No data available')}",
         "sZeroRecords": "${_('No matching records')}"
       }
-    });
-
-    $(".slaStatus").each(function () {
-      $(this).html(getSLAStatusLabel($(this).text()));
     });
 
     $(".dataTables_wrapper").css("min-height", "0");
