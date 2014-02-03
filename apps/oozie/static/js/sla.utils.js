@@ -25,7 +25,19 @@ function getSLAStatusLabel(status) {
   else {
     klass = "label-important";
   }
-  return '<span class="label ' + klass + '">' + status + '</span>'
+  return '<span class="slaStatus label ' + klass + '">' + status + '</span>'
+}
+
+function getXAxisColor(status) {
+  if (['MET'].indexOf(status.toUpperCase()) > -1) {
+    return $.jHueBlueprint.COLORS.GREEN;
+  }
+  else if (['NOT_STARTED', 'IN_PROCESS'].indexOf(status.toUpperCase()) > -1) {
+    return $.jHueBlueprint.COLORS.ORANGE;
+  }
+  else {
+    return $.jHueBlueprint.COLORS.RED;
+  }
 }
 
 function getSLArow(row) {
@@ -75,7 +87,7 @@ function updateSLAChart(slaTable, labels, limit) {
         type: $.jHueBlueprint.TYPES.POINTCHART,
         color: color,
         isDateTime: true,
-        timeFormat: "<span style='color:" + ($(rows[i]).find("td:eq(4)").text().toUpperCase() == "MET" ? $.jHueBlueprint.COLORS.GREEN : $.jHueBlueprint.COLORS.RED) + "'>%Y-%m-%d %H:%M:%S</span>",
+        timeFormat: "<span data-link='"+ $(rows[i]).find("a").attr("href") +"' style='color:" + getXAxisColor($(rows[i]).find(".slaStatus").text()) + "'>%Y-%m-%d %H:%M:%S</span>",
         fill: false,
         height: 300,
         tooltipAddon: labels.TOOLTIP_ADDON,
@@ -83,6 +95,13 @@ function updateSLAChart(slaTable, labels, limit) {
           return msToTime(val);
         },
         onItemClick: function (pos, item) {
+          if (!item) { // detect if it's a label click
+            $(".flot-x-axis .tickLabel").each(function(cnt, label){
+              if (pos.pageX >= $(label).offset().left && pos.pageX <= $(label).offset().left + $(label).width() && pos.pageY >= $(label).offset().top && pos.pageY <= $(label).offset().top + $(label).height()){
+                location.href = $(label).find("span").data("link");
+              }
+            });
+          }
           if (item && $(slaTable.fnGetNodes()[item.dataIndex]).find("a").length > 0) {
             location.href = $(slaTable.fnGetNodes()[item.dataIndex]).find("a").attr("href");
           }
@@ -109,5 +128,6 @@ function updateSLAChart(slaTable, labels, limit) {
       $("#slaChart").jHueBlueprint("add", getOptions($(rows[i]).find("span.actualEnd").html(), (i == 0 ? labels.ACTUAL_END : null), $.jHueBlueprint.COLORS.TURQUOISE));
     }
     $("#yAxisLabel").removeClass("hide");
+
   }
 }
