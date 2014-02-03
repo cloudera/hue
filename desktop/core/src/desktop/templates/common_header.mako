@@ -122,7 +122,7 @@ from django.utils.translation import ugettext as _
   <script src="/static/js/jquery.migration.js"></script>
   <script src="/static/js/jquery.filechooser.js"></script>
   <script src="/static/js/jquery.selector.js"></script>
-  <script src="/static/js/jquery.alert.js"></script>
+  <script src="/static/js/jquery.delayedinput.js"></script>
   <script src="/static/js/jquery.rowselector.js"></script>
   <script src="/static/js/jquery.notify.js"></script>
   <script src="/static/js/jquery.titleupdater.js"></script>

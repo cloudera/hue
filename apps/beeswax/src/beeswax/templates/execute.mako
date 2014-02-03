@@ -777,17 +777,13 @@ $(document).ready(function () {
     show: false
   });
 
-  var navigatorSearchTimeout = -1;
-  $("#navigatorSearch").on("keyup", function () {
-    window.clearTimeout(navigatorSearchTimeout);
-    navigatorSearchTimeout = window.setTimeout(function () {
-      $("#navigatorTables li").removeClass("hide");
-      $("#navigatorTables li").each(function () {
-        if ($(this).text().toLowerCase().indexOf($("#navigatorSearch").val().toLowerCase()) == -1) {
-          $(this).addClass("hide");
-        }
-      });
-    }, 300);
+  $("#navigatorSearch").jHueDelayedInput(function(){
+    $("#navigatorTables li").removeClass("hide");
+    $("#navigatorTables li").each(function () {
+      if ($(this).text().toLowerCase().indexOf($("#navigatorSearch").val().toLowerCase()) == -1) {
+        $(this).addClass("hide");
+      }
+    });
   });
 
   resetNavigator = function () {

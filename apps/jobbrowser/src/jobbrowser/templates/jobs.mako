@@ -306,13 +306,9 @@ ${ components.menubar() }
       $.getJSON(_url, callback);
     }
 
-    var _filterTimeout = -1;
-    $(".search-query").on("keyup", function () {
-      window.clearTimeout(_filterTimeout);
-      _filterTimeout = window.setTimeout(function () {
-        $("#loading").removeClass("hide");
-        callJsonData(populateTable);
-      }, 300);
+    $(".search-query").jHueDelayedInput(function(){
+      $("#loading").removeClass("hide");
+      callJsonData(populateTable);
     });
 
     $("#showRetired").change(function () {

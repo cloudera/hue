@@ -190,16 +190,12 @@ ${ layout.menubar(section='history') }
       "bStateSave": true
     });
 
-    var filterTimeout = -1;
-    $(".search-query").keyup(function () {
-      window.clearTimeout(filterTimeout);
-      filterTimeout = window.setTimeout(function () {
-        $("#spinner").show();
-        $(".datatables").hide();
-        $(".pagination").hide();
-        location.href = '?${ filter_params.get(prefix + 'user') and (prefix + 'user=' + filter_params.get(prefix + 'user') + '&') or '' }${ prefix }search='+$(".search-query").val();
-      }, 500);
-    });
+    $(".search-query").jHueDelayedInput(function(){
+      $("#spinner").show();
+      $(".datatables").hide();
+      $(".pagination").hide();
+      location.href = '?${ filter_params.get(prefix + 'user') and (prefix + 'user=' + filter_params.get(prefix + 'user') + '&') or '' }${ prefix }search='+$(".search-query").val();
+    }, 500);
 
     var _val = $(".search-query").val();
     $(".search-query").focus().val("").val(_val);
