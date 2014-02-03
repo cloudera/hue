@@ -57,6 +57,7 @@ from django.utils.translation import ugettext as _
     % if conf.CUSTOM.BANNER_TOP_HTML.get():
       body {
         display: none;
+        visibility: hidden;
         padding-top: ${str(int(padding[:-2]) + 30) + 'px'};
       }
       .banner {
@@ -77,6 +78,7 @@ from django.utils.translation import ugettext as _
     % else:
       body {
         display: none;
+        visibility: hidden;
         padding-top: ${padding};
       }
     % endif
@@ -142,7 +144,10 @@ from django.utils.translation import ugettext as _
     $(document).ready(function () {
       // prevents framebusting and clickjacking
       if (self == top){
-        $("body").show();
+        $("body").css({
+          'display': 'block',
+          'visibility': 'visible'
+        });
       }
       else {
         top.location = self.location;
