@@ -40,6 +40,8 @@ from desktop.lib.django_test_util import make_logged_in_client, assert_equal_mod
 from desktop.lib.test_utils import grant_access, add_to_group
 from desktop.lib.security_util import get_localhost_name
 
+import desktop.conf as desktop_conf
+
 import beeswax.create_table
 import beeswax.hive_site
 import beeswax.models
@@ -1748,6 +1750,48 @@ def test_hiveserver2_get_security():
       hive_site._HIVE_SITE_DICT[hive_site._CNF_HIVESERVER2_AUTHENTICATION] = prev
     else:
       hive_site._HIVE_SITE_DICT.pop(hive_site._CNF_HIVESERVER2_AUTHENTICATION, None)
+
+
+class MockClient():
+
+  def __init__(self):
+    self.open_session_args= None
+
+  def OpenSession(self, args):
+    self.open_session_args = args
+
+
+def test_hive_server2_open_session():
+  make_logged_in_client()
+  user = User.objects.get(username='test')
+
+  query_server = get_query_server_config()
+
+  db_client = HiveServerClient(query_server, user)
+  mock_hs2_client = MockClient()
+  setattr(db_client, '_client', mock_hs2_client)
+
+  # Regular session
+  try:
+    db_client.open_session(user)
+  except:
+    pass
+  finally:
+    req = mock_hs2_client.open_session_args
+    assert_equal('hue', req.username)
+    assert_equal(None, req.password)
+
+  # LDAP credentials
+  finish = desktop_conf.LDAP_PASSWORD.set_for_testing('I_love_Hue')
+  try:
+    db_client.open_session(user)
+  except:
+    pass
+  finally:
+    finish()
+    req = mock_hs2_client.open_session_args
+    assert_equal('hue', req.username)
+    assert_equal('I_love_Hue', req.password)
 
 
 def test_metastore_security():

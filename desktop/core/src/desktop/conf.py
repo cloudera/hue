@@ -75,6 +75,12 @@ SSL_CIPHER_LIST = Config(
   help=_("List of allowed and disallowed ciphers"),
   default="DEFAULT:!aNULL:!eNULL:!LOW:!EXPORT:!SSLv2")
 
+LDAP_PASSWORD = Config(
+  key="ldap_password",
+  help=_("LDAP password of the hue user used for LDAP authentications. For example for LDAP Authentication with HiveServer2."),
+  private=True,
+  default=None)
+
 ENABLE_SERVER = Config(
   key="enable_server",
   help=_("If set to false, runcpserver will not actually start the web server.  Used if Apache is being used as a WSGI container."),
@@ -333,6 +339,7 @@ SERVER_USER = Config(
   help=_("Username to run servers as."),
   type=str,
   default="hue")
+
 SERVER_GROUP = Config(
   key="server_group",
   help=_("Group to run servers as."),
@@ -508,6 +515,7 @@ LOCAL_FILESYSTEMS = UnspecifiedConfigSection(
       PATH=Config("path",
                   required=True,
                   help=_("The path on the local filesystem.")))))
+
 
 def default_feedback_url():
   """A version-specific URL."""

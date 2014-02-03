@@ -21,6 +21,7 @@ import re
 from operator import itemgetter
 
 from desktop.lib import thrift_util
+from desktop.conf import LDAP_PASSWORD
 from hadoop import cluster
 
 from TCLIService import TCLIService
@@ -356,6 +357,9 @@ class HiveServerClient:
 
     if self.query_server['server_name'] == 'beeswax': # All the time
       kwargs['configuration'].update({'hive.server2.proxy.user': user.username})
+      if LDAP_PASSWORD.get(): # HiveServer2 supports pass-through LDAP authentication.
+        kwargs['username'] = 'hue'
+        kwargs['password'] = LDAP_PASSWORD.get()
 
     req = TOpenSessionReq(**kwargs)
     res = self._client.OpenSession(req)
