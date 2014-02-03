@@ -58,8 +58,11 @@ ${ header.menubar() }
 
               <div class="card-body">
                 <div id="check-config-section" style="margin-bottom:20px">
-                  <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 60px; color: #DDD"></i><!--<![endif]-->
-                  <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+                  <div class="spinner">
+                    <!--[if !IE]> --><i class="fa fa-spinner fa-spin" style="font-size: 60px; color: #DDD"></i><!-- <![endif]-->
+                    <!--[if IE]><img src="/static/art/spinner.gif" /><![endif]-->
+                  </div>
+                  <div class="info hide"></div>
                 </div>
               </div>
             </div>
@@ -260,10 +263,16 @@ ${ header.menubar() }
 <script src="/static/ext/js/routie-0.3.0.min.js" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript" charset="utf-8">
+
 $(document).ready(function(){
 
   $.get("${ url('desktop.views.check_config') }", function(response) {
-    $("#check-config-section").html(response);
+    $("#check-config-section .spinner").css({
+      'position': 'absolute',
+      'top': '-100px'
+    });
+    $("#check-config-section .info").html(response);
+    $("#check-config-section .info").removeClass('hide');
   })
   .fail(function() { $(document).trigger('error', '${ _("Check config failed: ")}'); });
 
