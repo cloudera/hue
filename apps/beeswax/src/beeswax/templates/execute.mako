@@ -305,13 +305,14 @@ ${layout.menubar(section='query')}
           <pre data-bind="text: $root.design.watch.logs().join('\n')"></pre>
         </div>
         <div class="tab-pane" id="columns">
+          <div data-bind="visible: $root.design.results.columns().length > 10">
+            <input id="columnFilter" class="input-xlarge" type="text" placeholder="${_('Filter for column name or type...')}" />
+          </div>
           <table class="table table-striped table-condensed" cellpadding="0" cellspacing="0">
-            <thead>
-              <tr><th>${_('Name')}</th></tr>
-            </thead>
             <tbody data-bind="foreach: $root.design.results.columns">
-              <tr>
-                <td><a href="javascript:void(0)" class="column-selector" data-bind="text: $data.name + ($.trim($data.type) != '' ? ' (' + $.trim($data.type) + ')' : '')"></a></td>
+              <tr class="columnRow">
+                <td rel="columntooltip" data-placement="left" data-bind="attr: {title: 'Scroll the column \'' + $data.name + '\''}"><a href="javascript:void(0)" data-row-selector="true" class="column-selector" data-bind="text: $data.name"></a></td>
+                <td class="columnType" data-bind="text: $.trim($data.type)"></td>
               </tr>
             </tbody>
           </table>
@@ -747,6 +748,11 @@ ${layout.menubar(section='query')}
     min-height: 100px;
   }
 
+  .columnType {
+    text-align: right!important;
+    color: #999;
+  }
+
 </style>
 
 <link href="/static/ext/css/leaflet.css" rel="stylesheet">
@@ -781,6 +787,15 @@ $(document).ready(function () {
     $("#navigatorTables li").removeClass("hide");
     $("#navigatorTables li").each(function () {
       if ($(this).text().toLowerCase().indexOf($("#navigatorSearch").val().toLowerCase()) == -1) {
+        $(this).addClass("hide");
+      }
+    });
+  });
+
+  $("#columnFilter").jHueDelayedInput(function(){
+    $(".columnRow").removeClass("hide");
+    $(".columnRow").each(function () {
+      if ($(this).text().toLowerCase().indexOf($("#columnFilter").val().toLowerCase()) == -1) {
         $(this).addClass("hide");
       }
     });
@@ -908,7 +923,7 @@ $(document).ready(function () {
 
   $(document).on("click", ".column-selector", function () {
     var _t = $(".resultTable");
-    var _col = _t.find("th:econtains(" + $(this).text() + ")");
+    var _col = _t.find("th:contains(" + $.trim($(this).text().split("(")[0]) + ")");
     _t.find(".columnSelected").removeClass("columnSelected");
     _t.find("tr td:nth-child(" + (_col.index() + 1) + ")").addClass("columnSelected");
     $("a[href='#results']").click();
@@ -950,11 +965,6 @@ function reinitializeTable(max) {
       $(".dataTables_wrapper").jHueTableScroller({
         minHeight: $(window).height() - 190,
         heightAfterCorrection: 0
-      });
-      $(".resultTable").jHueTableExtender({
-        hintElement: "#jumpToColumnAlert",
-        fixedHeader: true,
-        firstColumnTooltip: true
       });
       container.height($(".dataTables_wrapper").height());
       $(".dataTables_wrapper").jHueScrollUp();
@@ -1400,6 +1410,13 @@ $(document).ready(function () {
     if (logsAtEnd && _logsEl[0]) {
       _logsEl.scrollTop(_logsEl[0].scrollHeight - _logsEl.height());
     }
+  });
+
+  viewModel.design.results.columns.subscribe(function(val){
+    $("*[rel=columntooltip]").tooltip({
+      delay: {show: 500}
+    });
+    $("a[data-row-selector='true']").jHueRowSelector();
   });
 });
 
