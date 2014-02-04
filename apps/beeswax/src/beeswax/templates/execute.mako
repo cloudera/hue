@@ -1177,8 +1177,7 @@ $(document).ready(function () {
   });
 });
 
-
-$(document).one('fetched.design', function () {
+var editables = function() {
   // Edit query name and description.
   $("#query-name").editable({
     validate: function (value) {
@@ -1200,7 +1199,11 @@ $(document).one('fetched.design', function () {
   });
 
   $(".fileChooser:not(:has(~ button))").after(getFileBrowseButton($(".fileChooser:not(:has(~ button))")));
-});
+};
+
+$(document).one('fetched.design', editables);
+
+$(document).one('fetched.query', editables);
 
 function isNumericColumn(type) {
   return $.inArray(type, ['TINYINT_TYPE', 'SMALLINT_TYPE', 'INT_TYPE', 'BIGINT_TYPE', 'FLOAT_TYPE', 'DOUBLE_TYPE', 'DECIMAL_TYPE', 'TIMESTAMP_TYPE', 'DATE_TYPE']) > -1;
