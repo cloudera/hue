@@ -282,9 +282,9 @@ ${layout.menubar(section='query')}
         <li><a href="#log" data-toggle="tab">${_('Log')}</a></li>
         <!-- /ko -->
         <!-- ko if: !design.explain() && !design.isRunning() -->
-        <li><a href="#columns" data-toggle="tab">${_('Columns')}</a></li>
+        <li data-bind="css: {'hide': $root.design.results.empty()}"><a href="#columns" data-toggle="tab">${_('Columns')}</a></li>
         <li><a href="#results" data-toggle="tab">${_('Results')}</a></li>
-        <li><a href="#chart" data-toggle="tab">${_('Chart')}</a></li>
+        <li data-bind="css: {'hide': $root.design.results.empty()}"><a href="#chart" data-toggle="tab">${_('Chart')}</a></li>
         <!-- /ko -->
         <!-- ko if: design.explain() && !design.isRunning() -->
         <li><a href="#explanation" data-toggle="tab">${_('Explanation')}</a></li>
@@ -295,16 +295,19 @@ ${layout.menubar(section='query')}
         <div class="tab-pane" id="query">
           <pre data-bind="text: viewModel.design.statement()"></pre>
         </div>
+
         <!-- ko if: design.explain() -->
         <div class="tab-pane" id="explanation">
           <pre data-bind="text: $root.design.results.explanation()"></pre>
         </div>
         <!-- /ko -->
+
         <!-- ko if: !design.explain() -->
         <div class="active tab-pane" id="log">
           <pre data-bind="text: $root.design.watch.logs().join('\n')"></pre>
         </div>
-        <div class="tab-pane" id="columns">
+
+        <div class="tab-pane" id="columns" data-bind="css: {'hide': $root.design.results.empty()}">
           <div data-bind="visible: $root.design.results.columns().length > 10">
             <input id="columnFilter" class="input-xlarge" type="text" placeholder="${_('Filter for column name or type...')}" />
           </div>
