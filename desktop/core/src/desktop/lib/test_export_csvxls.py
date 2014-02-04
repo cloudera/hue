@@ -15,23 +15,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import cStringIO
-from desktop.lib.export_csvxls import make_response
-from nose.tools import assert_true, assert_equal, assert_false
+import tablib
 
-def test_export_csvxls():
+from desktop.lib.export_csvxls import make_response
+from nose.tools import assert_equal
+
+def test_export_csv():
   header = ["x", "y"]
-  data = [ ["1", "2"], ["3", "4"] ]
+  data = [ ["1", "2"], ["3", "4"], ["5,6", "7"], [None, None] ]
 
   # Check CSV
   response = make_response(header, data, "csv", "foo")
   assert_equal("application/csv", response["content-type"])
-  assert_equal('"x","y"\r\n"1","2"\r\n"3","4"\r\n', response.content)
+  assert_equal('x,y\r\n1,2\r\n3,4\r\n"5,6",7\r\nNULL,NULL\r\n', response.content)
   assert_equal("attachment; filename=foo.csv", response["content-disposition"])
 
+def test_export_xls():
+  header = ["x", "y"]
+  data = [ ["1", "2"], ["3", "4"], ["5,6", "7"], [None, None] ]
+
+  dataset = tablib.Dataset(headers=header)
+  for row in data:
+    dataset.append([cell is not None and cell or "NULL" for cell in row])
+
   # Check XLS
-  # Should be same as CSV
-  response = make_response(header, data, "xls", "bar")
+  response = make_response(header, data, "xls", "foo")
   assert_equal("application/xls", response["content-type"])
-  assert_equal("attachment; filename=bar.xls", response["content-disposition"])
-  assert_equal('"x","y"\r\n"1","2"\r\n"3","4"\r\n', response.content)
+  assert_equal(dataset.xls, response.content)
+  assert_equal("attachment; filename=foo.xls", response["content-disposition"])

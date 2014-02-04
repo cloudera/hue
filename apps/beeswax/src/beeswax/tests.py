@@ -24,6 +24,7 @@ import os
 import re
 import shutil
 import socket
+import tablib
 import tempfile
 import threading
 
@@ -556,20 +557,22 @@ for x in sys.stdin:
   def test_data_export(self):
     hql = 'SELECT * FROM test'
     query = hql_query(hql)
+    dataset = tablib.Dataset()
 
     # Get the result in xls.
+
     handle = self.db.execute_and_wait(query)
     xls_resp = download(handle, 'xls', self.db)
-    # Should be CSV since we simply change the file extension and MIME type from CSV to XLS.
-    translated_csv = xls_resp.content
+
+    dataset.xls = xls_resp.content
     # It should have 257 lines (256 + header)
-    assert_equal(len(translated_csv.strip('\r\n').split('\r\n')), 257, translated_csv)
+    assert_equal(len(dataset.csv.strip('\r\n').split('\r\n')), 257, dataset.csv)
 
     # Get the result in csv.
     query = hql_query(hql)
     handle = self.db.execute_and_wait(query)
     csv_resp = download(handle, 'csv', self.db)
-    assert_equal(csv_resp.content, translated_csv)
+    assert_equal(csv_resp.content, dataset.csv)
 
   def test_designs(self):
     cli = self.client
