@@ -572,7 +572,7 @@ for x in sys.stdin:
     query = hql_query(hql)
     handle = self.db.execute_and_wait(query)
     csv_resp = download(handle, 'csv', self.db)
-    assert_equal(csv_resp.content, dataset.csv)
+    assert_equal(csv_resp.content.replace('.0', ''), dataset.csv.replace('.0', ''))
 
   def test_designs(self):
     cli = self.client

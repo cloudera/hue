@@ -69,7 +69,7 @@ DOWNLOAD_ROW_LIMIT = Config(
   key='download_row_limit',
   default=1000000,
   type=int,
-  help=_t('A limit to the number of rows that can be downloaded from a query. A value of -1 means there will be no limit.'))
+  help=_t('A limit to the number of rows that can be downloaded from a query. A value of -1 means there will be no limit. A maximum of 65,000 is applied to XLS downloads.'))
 
 SSL = ConfigSection(
   key='ssl',
