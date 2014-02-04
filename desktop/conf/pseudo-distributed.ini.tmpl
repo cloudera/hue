@@ -631,6 +631,10 @@
   # A positive value will be set as the LIMIT. If 0 or negative, do not set any limit.
   ## browse_partitioned_table_limit=250
 
+  # A limit to the number of rows that can be downloaded from a query.
+  # A value of -1 means there will be no limit.
+  ## download_row_limit=1000000
+
   [[ssl]]
     # SSL communication enabled for this server.
     ## enabled=false

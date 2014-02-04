@@ -66,6 +66,12 @@ BROWSE_PARTITIONED_TABLE_LIMIT = Config(
   type=int,
   help=_t('Set a LIMIT clause when browsing a partitioned table. A positive value will be set as the LIMIT. If 0 or negative, do not set any limit.'))
 
+DOWNLOAD_ROW_LIMIT = Config(
+  key='download_row_limit',
+  default=1000000,
+  type=int,
+  help=_t('A limit to the number of rows that can be downloaded from a query. A value of -1 means there will be no limit.'))
+
 SSL = ConfigSection(
   key='ssl',
   help=_t('SSL configuration for the server.'),

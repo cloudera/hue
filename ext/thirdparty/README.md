@@ -40,6 +40,7 @@ Checked-in third party dependencies
 |Y|simplejson|2.0.9|MIT|http://pypi.python.org/packages/source/s/simplejson/simplejson-2.0.9.tar.gz|
 |Y|South|0.7|Apache|http://south.aeracode.org/|
 |Y|ssl|1.15|Python|http://pypi.python.org/pypi/ssl/1.15|
+|Y|tablib|0.9.11|MIT|http://docs.python-tablib.org/en/latest/|
 |Y|threadframe|0.2|Python|http://www.majid.info/mylos/stories/2004/06/10/threadframe.html|
 |Y|Thrift|?|Apache|http://incubator.apache.org/thrift/download/|
 |Y|urllib2_kerberos|0.1.6|ASL2|http://pypi.python.org/pypi/urllib2_kerberos|
