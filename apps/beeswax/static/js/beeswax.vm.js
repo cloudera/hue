@@ -627,7 +627,7 @@ function BeeswaxViewModel(server) {
           self.design.isRunning(false);
           self.design.isFinished(data.is_finished);
           if (self.design.results.columns().length == 0){
-            self.design.results.columns(data.columns);
+            self.design.results.columns(data.columns ? data.columns : []); // Some querysets have empty or null for columns
           }
           self.design.results.rows.push.apply(self.design.results.rows, data.results);
           self.design.results.empty(self.design.results.rows().length == 0);
