@@ -1167,7 +1167,7 @@ $(document).ready(function () {
     $("#validationResults").empty();
   });
 
-  % if design and not design.id:
+  % if not design.id and not ( query_history and query_history.id ):
     if ($.totalStorage("${app_name}_temp_query") != null && $.totalStorage("${app_name}_temp_query") != "") {
       viewModel.queryEditorBlank(true);
       codeMirror.setValue($.totalStorage("${app_name}_temp_query"));
@@ -2077,6 +2077,7 @@ viewModel = new BeeswaxViewModel("${app_name}");
 % elif design.id:
   loadDesign(${design.id});
 % else:
+  $(document).ready(cacheQueryTextEvents);
   loadEditor();
 % endif
 viewModel.design.fileResources.values.subscribe(function() {
@@ -2111,11 +2112,8 @@ ko.applyBindings(viewModel);
   });
 % else:
   $(document).ready(queryEvents);
-  $(document).ready(cacheQueryTextEvents);
 % endif
 
-// @TODO: Stop operation
-// @TODO: Re-add download query for impala
 </script>
 
 ${ commonfooter(messages) | n,unicode }
