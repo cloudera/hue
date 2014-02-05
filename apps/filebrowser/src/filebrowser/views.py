@@ -1195,18 +1195,26 @@ def _upload_archive(request):
         dest = request.fs.join(form.cleaned_data['dest'], uploaded_file.name)
         try:
             # Extract if necessary
-            # Make sure dest path is without '.zip' extension
+            # Make sure dest path is without the extension
             if dest.endswith('.zip'):
-                temp_path = archive_factory(uploaded_file).extract()
+                temp_path = archive_factory(uploaded_file, 'zip').extract()
                 if not temp_path:
                     raise PopupException(_('Could not extract contents of file.'))
                 # Move the file to where it belongs
                 dest = dest[:-4]
-                request.fs.copyFromLocal(temp_path, dest)
-                shutil.rmtree(temp_path)
-                response['status'] = 0
+            elif dest.endswith('.tar.gz'):
+                print uploaded_file
+                temp_path = archive_factory(uploaded_file, 'tgz').extract()
+                if not temp_path:
+                    raise PopupException(_('Could not extract contents of file.'))
+                # Move the file to where it belongs
+                dest = dest[:-7]
             else:
                 raise PopupException(_('Could not interpret archive type.'))
+
+            request.fs.copyFromLocal(temp_path, dest)
+            shutil.rmtree(temp_path)
+            response['status'] = 0
 
         except IOError, ex:
             already_exists = False
