@@ -338,11 +338,18 @@ class HiveServer2Dbms(object):
     return None
 
 
-  def execute_next_statement(self, query_history):
-    query_history.statement_number += 1
+  def execute_next_statement(self, query_history, hql_query):
+    if query_history.is_success():
+      # We need to go to the next statement only if the previous one passed
+      query_history.statement_number += 1
+    else:
+      # We need to update the query in case it was fixed
+      query_history.refresh_design(hql_query)
+
     query_history.last_state = QueryHistory.STATE.submitted.index
     query_history.save()
     query = query_history.design.get_design()
+
     return self.execute_and_watch(query, query_history=query_history)
 
 

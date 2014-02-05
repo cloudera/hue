@@ -87,6 +87,10 @@ class HQLdesign(object):
   def hql_query(self):
     return self._data_dict['query']['query']
 
+  @hql_query.setter
+  def hql_query(self, query):
+    self._data_dict['query']['query'] = query
+
   @property
   def query(self):
     return self._data_dict['query'].copy()
