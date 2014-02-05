@@ -1079,7 +1079,7 @@ def test_upload_file():
       pass
 
 @attr('requires_hadoop')
-def test_upload_archive():
+def test_upload_zip():
   """Test archive upload"""
   cluster = pseudo_hdfs4.shared_cluster()
 
@@ -1115,7 +1115,48 @@ def test_upload_archive():
   finally:
     try:
       cluster.fs.remove(HDFS_DEST_DIR)
-    except Exception, ex:
+    except:
+      pass
+
+@attr('requires_hadoop')
+def test_upload_tgz():
+  """Test archive upload"""
+  cluster = pseudo_hdfs4.shared_cluster()
+
+  try:
+    USER_NAME = 'test'
+    HDFS_DEST_DIR = "/tmp/fb-upload-test"
+    TGZ_FILE = os.path.realpath('apps/filebrowser/src/filebrowser/test_data/test.tar.gz')
+    HDFS_TGZ_FILE = HDFS_DEST_DIR + '/test.tar.gz'
+    HDFS_DECOMPRESSED_FILE = HDFS_DEST_DIR + '/test'
+
+    cluster.fs.setuser(USER_NAME)
+    client = make_logged_in_client(USER_NAME)
+
+    cluster.fs.mkdir(HDFS_DEST_DIR)
+    cluster.fs.chown(HDFS_DEST_DIR, USER_NAME)
+    cluster.fs.chmod(HDFS_DEST_DIR, 0700)
+
+    # Upload and decompress archive
+    resp = client.post('/filebrowser/upload/archive?dest=%s' % HDFS_DEST_DIR,
+                       dict(dest=HDFS_DEST_DIR, archive=file(TGZ_FILE)))
+    response = json.loads(resp.content)
+    assert_equal(0, response['status'], response)
+    assert_false(cluster.fs.exists(HDFS_TGZ_FILE))
+    assert_true(cluster.fs.isdir(HDFS_DECOMPRESSED_FILE))
+    assert_true(cluster.fs.isfile(HDFS_DECOMPRESSED_FILE + '/test.txt'))
+    assert_equal(cluster.fs.read(HDFS_DECOMPRESSED_FILE + '/test.txt', 0, 4), "test")
+
+    # Upload archive
+    resp = client.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR,
+                       dict(dest=HDFS_DEST_DIR, hdfs_file=file(TGZ_FILE)))
+    response = json.loads(resp.content)
+    assert_equal(0, response['status'], response)
+    assert_true(cluster.fs.exists(HDFS_TGZ_FILE))
+  finally:
+    try:
+      cluster.fs.remove(HDFS_DEST_DIR)
+    except:
       pass
 
 def test_location_to_url():

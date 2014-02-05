@@ -19,6 +19,7 @@
 
 import os
 import posixpath
+import tarfile
 import tempfile
 from zipfile import ZipFile
 
@@ -38,6 +39,17 @@ class Archive(object):
     Should return a directory where the extracted contents live.
     """
     raise NotImplemented(_("Must implement 'extract' method."))
+
+  def _create_dirs(self, basepath, dirs=[]):
+    """
+    Creates all directories passed at the given basepath.
+    """
+    for directory in dirs:
+      directory = os.path.join(basepath, directory)
+      try:
+        os.makedirs(directory)
+      except OSError:
+        pass
 
 class ZipArchive(Archive):
   """
@@ -76,17 +88,6 @@ class ZipArchive(Archive):
         files.append(name)
     return (dirs, files)
 
-  def _create_dirs(self, basepath, dirs=[]):
-    """
-    Creates all directories passed at the given basepath.
-    """
-    for directory in dirs:
-      directory = os.path.join(basepath, directory)
-      try:
-        os.makedirs(directory)
-      except OSError:
-        pass
-
   def _create_files(self, basepath, files=[]):
     """
     Extract files to their rightful place.
@@ -99,5 +100,63 @@ class ZipArchive(Archive):
       new_file.close()
 
 
+class TarballArchive(Archive):
+  """
+  Acts on a tarball (tar.gz) file in memory or in a temporary location.
+  Python's ZipFile class inherently buffers all reading.
+  """
+  def __init__(self, file):
+    if isinstance(file, basestring):
+      self.path = file
+    else:
+      f = tempfile.NamedTemporaryFile(delete=False)
+      f.write(file.read())
+      self.path = f.name
+      f.close()
+    self.fh = tarfile.open(self.path)
+
+  def extract(self):
+    """
+    Extracts a zip file.
+    If a 'file' ends with '/', then it is a directory and we must create it.
+    Else, open a file for writing and meta pipe the contents zipfile to the new file.
+    """
+    # Store all extracted files in a temporary directory.
+    directory = tempfile.mkdtemp()
+
+    dirs, files = self._filenames()
+    self._create_dirs(directory, dirs)
+    self._create_files(directory, files)
+
+    return directory
+
+  def _filenames(self):
+    """
+    List all dirs and files by reading the table of contents of the Zipfile.
+    """
+    dirs = []
+    files = []
+    for tarinfo in self.fh.getmembers():
+      if tarinfo.isdir():
+        dirs.append(tarinfo.name)
+      else:
+        files.append(tarinfo.name)
+    return (dirs, files)
+
+  def _create_files(self, basepath, files=[]):
+    """
+    Extract files to their rightful place.
+    Files are written to a temporary directory immediately after being decompressed.
+    """
+    for f in files:
+      new_path = os.path.join(basepath, f)
+      new_file = open(new_path, 'w')
+      new_file.write(self.fh.extractfile(f).read())
+      new_file.close()
+
+
 def archive_factory(path, archive_type='zip'):
-  return ZipArchive(path)
+  if archive_type == 'zip':
+    return ZipArchive(path)
+  elif archive_type == 'tarball' or archive_type == 'tar.gz' or archive_type == 'tgz':
+    return TarballArchive(path)
