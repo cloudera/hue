@@ -453,7 +453,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
 
     function zoom(){
       $("#graph").css("zoom", CURRENT_ZOOM);
-      $("#graph").css("-moz-transform", "scale("+CURRENT_ZOOM+")");
+      $("#graph").css("-moz-transform", "scale(" + CURRENT_ZOOM + ")");
     }
 
     $("*[rel=tooltip]").tooltip();
@@ -604,7 +604,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
           $("#suspend-btn").hide();
         }
 
-        if (data.id && data.status != "RUNNING" && data.status != "SUSPENDED"){
+        if (data.id && data.status != "RUNNING" && data.status != "SUSPENDED" && data.status != "PREP"){
           $("#kill-btn").hide();
           $("#rerun-btn").show();
           $.jHueTitleUpdater.reset();

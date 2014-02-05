@@ -508,7 +508,8 @@ function BeeswaxViewModel(server) {
     self.resetErrors();
 
     var data = {
-      'next': true
+      'next': true,
+      'query-query': self.design.query.value(),
     };
     var request = {
       url: self.design.watch.url(),

@@ -128,6 +128,13 @@ class QueryHistory(models.Model):
     else:
       return self.query
 
+  def refresh_design(self, hql_query):
+    # Refresh only HQL query part
+    query = self.design.get_design()
+    query.hql_query = hql_query
+    self.design.data = query.dumps()
+    self.query = hql_query
+ 
   def is_finished(self):
     is_statement_finished = not self.is_running()
 

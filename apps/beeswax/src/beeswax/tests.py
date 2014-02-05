@@ -496,6 +496,62 @@ for x in sys.stdin:
     content = fetch_query_result_data(self.client, resp)
     assert_true(content.get('is_finished'), content)
 
+
+  def test_multiple_statements_with_next_button(self):
+    hql = """
+      show tables;
+      select * from test
+    """
+
+    resp = _make_query(self.client, hql)
+
+    # First statement
+    content = json.loads(resp.content)
+    watch_url = content['watch_url']
+    assert_equal('show tables', content.get('statement'), content)
+
+    resp = wait_for_query_to_finish(self.client, resp, max=30.0)
+    content = fetch_query_result_data(self.client, resp)
+    assert_true([u'test'] in content.get('results'), content)
+
+    # Next statement
+    resp = self.client.post(watch_url, {'next': True, 'query-query': hql})
+    content = json.loads(resp.content)
+    assert_equal('select * from test', content.get('statement'), content)
+
+    resp = wait_for_query_to_finish(self.client, resp, max=30.0)
+    content = fetch_query_result_data(self.client, resp)
+    assert_true([0, u'0x0'] in content.get('results'), content)
+
+  def test_multiple_statements_with_error(self):
+    hql = """
+      show tables;
+      select * from
+    """
+
+    resp = _make_query(self.client, hql)
+
+    content = json.loads(resp.content)
+    watch_url = content['watch_url']
+    assert_equal('show tables', content.get('statement'), content)
+
+    resp = wait_for_query_to_finish(self.client, resp, max=30.0)
+
+    resp = self.client.post(watch_url, {'next': True, 'query-query': hql})
+    content = json.loads(resp.content)
+    assert_true('Error while compiling statement' in content.get('message'), content)
+
+    hql = """
+      show tables;
+      select * from test
+    """
+
+    # Retry where we were with the statement fixed
+    resp = self.client.post(watch_url, {'next': True, 'query-query': hql})
+    content = json.loads(resp.content)
+    assert_equal('select * from test', content.get('statement'), content)
+
+
   def test_parallel_queries(self):
     """
     Test that we can issue two queries to the BeeswaxServer in parallel.

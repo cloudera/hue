@@ -76,7 +76,7 @@ CLOSE_QUERIES = Config(
   help=_t("Hue will try to close the Hive query when the user leaves the editor page. "
           "This will free all the query resources in HiveServer2, but also make its results inaccessible."),
   type=coerce_bool,
-  default=True
+  default=False
 )
 
 SSL = ConfigSection(
