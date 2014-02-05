@@ -1825,6 +1825,24 @@ def test_metastore_security():
     shutil.rmtree(tmpdir)
 
 
+def test_close_queries_flag():
+  c = make_logged_in_client()
+
+  finish = conf.CLOSE_QUERIES.set_for_testing(False)
+  try:
+    resp = c.get('/beeswax/execute')
+    assert_false('closeQuery()' in resp.content, resp.content)
+  finally:
+    finish()
+
+  finish = conf.CLOSE_QUERIES.set_for_testing(True)
+  try:
+    resp = c.get('/beeswax/execute')
+    assert_true('closeQuery()' in resp.content, resp.content)
+  finally:
+    finish()
+
+
 def hive_site_xml(is_local=False, use_sasl=False, thrift_uris='thrift://darkside-1234:9999',
                   warehouse_dir='/abc', kerberos_principal='test/test.com@TEST.COM',
                   hs2_kerberos_principal='hs2test/test.com@TEST.COM',

@@ -71,6 +71,14 @@ DOWNLOAD_ROW_LIMIT = Config(
   type=int,
   help=_t('A limit to the number of rows that can be downloaded from a query. A value of -1 means there will be no limit. A maximum of 65,000 is applied to XLS downloads.'))
 
+CLOSE_QUERIES = Config(
+  key="close_queries",
+  help=_t("Hue will try to close the Hive query when the user leaves the editor page. "
+          "This will free all the query resources in HiveServer2, but also make its results inaccessible."),
+  type=coerce_bool,
+  default=True
+)
+
 SSL = ConfigSection(
   key='ssl',
   help=_t('SSL configuration for the server.'),
