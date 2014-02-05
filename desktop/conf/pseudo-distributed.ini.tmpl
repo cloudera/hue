@@ -636,6 +636,10 @@
   # A maximum of 65,000 is applied to XLS downloads.
   ## download_row_limit=1000000
 
+  # Hue will try to close the Hive query when the user leaves the editor page.
+  # This will free all the query resources in HiveServer2, but also make its results inaccessible.
+  ## close_queries=false
+
   [[ssl]]
     # SSL communication enabled for this server.
     ## enabled=false

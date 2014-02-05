@@ -16,6 +16,7 @@
 <%!
   from desktop.lib.django_util import extract_field_data
   from desktop.views import commonheader, commonfooter
+  from beeswax.conf import CLOSE_QUERIES
   from django.utils.translation import ugettext as _
 %>
 
@@ -24,6 +25,7 @@
 
 ${ commonheader(_('Query'), app_name, user) | n,unicode }
 ${layout.menubar(section='query')}
+
 
 <div id="query-editor" class="container-fluid hide section">
 <div class="row-fluid">
@@ -1767,7 +1769,6 @@ $(document).ready(function () {
 
 % if app_name == 'impala':
 $(document).ready(function () {
-
   $("#downloadQuery").click(function () {
     $("<input>").attr("type", "hidden").attr("name", "button-submit").attr("value", "Execute").appendTo($("#advancedSettingsForm"));
     $("<input>").attr("type", "hidden").attr("name", "download").attr("value", "true").appendTo($("#advancedSettingsForm"));
@@ -1781,6 +1782,17 @@ $(document).ready(function () {
     'html': true
   });
 
+  $("#refresh-tip").popover({
+    'title': "${_('Missing some tables? In order to update the list of tables/metadata seen by Impala, execute one of these queries:')}",
+    'content': $("#refresh-content").html(),
+    'trigger': 'hover',
+    'html': true
+  });
+});
+% endif
+
+% if CLOSE_QUERIES.get() or app_name == 'impala':
+$(document).ready(function () {
   $(document).on('explain.query', function() {
     viewModel.closeQuery();
   });
