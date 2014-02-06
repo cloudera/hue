@@ -170,3 +170,11 @@ body {
   margin-left: 0 !important;
   border-left: 0 !important;
 }
+
+.download-btn-group {
+  min-width: auto;
+}
+
+.download-btn-group > ul > li {
+  text-align: left;
+}

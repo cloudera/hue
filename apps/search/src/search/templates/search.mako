@@ -79,7 +79,17 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
       </div>
 
       ${ search_form | n,unicode }
-      <button type="submit" class="btn btn-inverse"><i class="fa fa-search"></i></button>
+      <button type="submit" id="search-btn" class="btn btn-inverse"><i class="fa fa-search"></i></button>
+
+      % if response and 'response' in response and 'docs' in response['response'] and len(response['response']['docs']) > 0:
+      <div class="btn-group download-btn-group" style="margin-left: 15px">
+        <button type="button" id="download-btn" class="btn btn-inverse dropdown-toggle" data-toggle="dropdown"><i class="fa fa-download"></i></button>
+        <ul class="dropdown-menu" role="menu">
+          <li><a href="javascript:void(0)" id="download-csv"><i class="fa fa-list"></i>&nbsp; CSV</a></li>
+          <li><a href="javascript:void(0)" id="download-xls"><i class="fa fa-th"></i>&nbsp; XLS</a></li>
+        </ul>
+      </div>
+      % endif
     </div>
   </form>
 </div>
@@ -415,6 +425,21 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
       $("form").find("input[type='hidden']").val("");
       $("form").submit();
       $(".selectMask").popover("hide");
+    });
+
+    $("#download-csv").on("click", function(e) {
+      $("form").attr('action', "${ url('search:download', format='csv') }");
+      $("form").attr('target', "_new");
+      $("form").submit();
+      $("form").removeAttr('action');
+      $("form").removeAttr('target');
+    });
+    $("#download-xls").on("click", function(e) {
+      $("form").attr('action', "${ url('search:download', format='xls') }");
+      $("form").attr('target', "_new");
+      $("form").submit();
+      $("form").removeAttr('action');
+      $("form").removeAttr('target');
     });
 
     function getCollectionPopoverContent() {

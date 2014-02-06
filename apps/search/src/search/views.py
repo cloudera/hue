@@ -21,6 +21,7 @@ import math
 
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
+from django.utils.encoding import smart_str
 from django.utils.translation import ugettext as _
 from django.shortcuts import redirect
 
@@ -29,14 +30,25 @@ from desktop.lib.exceptions_renderable import PopupException
 
 from search.api import SolrApi
 from search.conf import SOLR_URL
+from search.data_export import download as export_download
 from search.decorators import allow_admin_only
-from search.forms import QueryForm, CollectionForm, HighlightingForm
+from search.forms import QueryForm, CollectionForm
 from search.models import Collection, augment_solr_response
 from search.search_controller import SearchController
 
 from django.utils.encoding import force_unicode
 
 LOG = logging.getLogger(__name__)
+
+
+def initial_collection(request, hue_collections):
+  initial_collection = request.COOKIES.get('hueSearchLastCollection', hue_collections[0].id)
+  try:
+    Collection.objects.get(id=initial_collection)
+  except:
+    initial_collection = hue_collections[0].id
+
+  return initial_collection
 
 
 def index(request):
@@ -48,35 +60,21 @@ def index(request):
     else:
       return no_collections(request)
 
-  initial_collection = request.COOKIES.get('hueSearchLastCollection', hue_collections[0].id)
-  try:
-    Collection.objects.get(id=initial_collection)
-  except Exception, e:
-    initial_collection = hue_collections[0].id
+  init_collection = initial_collection(request, hue_collections)
 
-  search_form = QueryForm(request.GET, initial_collection=initial_collection)
+  search_form = QueryForm(request.GET, initial_collection=init_collection)
   response = {}
   error = {}
   solr_query = {}
-  hue_collection = None
 
   if search_form.is_valid():
-    collection_id = search_form.cleaned_data['collection']
-    solr_query['q'] = search_form.cleaned_data['query'].encode('utf8')
-    solr_query['fq'] = search_form.cleaned_data['fq']
-    if search_form.cleaned_data['sort']:
-      solr_query['sort'] = search_form.cleaned_data['sort']
-    solr_query['rows'] = search_form.cleaned_data['rows'] or 15
-    solr_query['start'] = search_form.cleaned_data['start'] or 0
-    solr_query['facets'] = search_form.cleaned_data['facets'] or 1
-    solr_query['current_page'] = int(math.ceil((float(solr_query['start']) + 1) / float(solr_query['rows'])))
-    solr_query['total_pages'] = 0
-    solr_query['search_time'] = 0
-
     try:
+      collection_id = search_form.cleaned_data['collection']
       hue_collection = Collection.objects.get(id=collection_id)
-      solr_query['collection'] = hue_collection.name
+
+      solr_query = search_form.solr_query_dict
       response = SolrApi(SOLR_URL.get(), request.user).query(solr_query, hue_collection)
+
       solr_query['total_pages'] = int(math.ceil((float(response['response']['numFound']) / float(solr_query['rows']))))
       solr_query['search_time'] = response['responseHeader']['QTime']
     except Exception, e:
@@ -101,6 +99,33 @@ def index(request):
     'current_collection': collection_id,
     'json': json,
   })
+
+
+def download(request, format):
+  hue_collections = Collection.objects.filter(enabled=True)
+
+  if not hue_collections:
+    raise PopupException(_("No collection to download."))
+
+  init_collection = initial_collection(request, hue_collections)
+
+  search_form = QueryForm(request.GET, initial_collection=init_collection)
+
+  if search_form.is_valid():
+    try:
+      collection_id = search_form.cleaned_data['collection']
+      hue_collection = Collection.objects.get(id=collection_id)
+
+      solr_query = search_form.solr_query_dict
+      response = SolrApi(SOLR_URL.get(), request.user).query(solr_query, hue_collection)
+
+      LOG.debug('Download results for query %s' % smart_str(solr_query))
+
+      return export_download(response, format)
+    except Exception, e:
+      raise PopupException(_("Could not download search results: %s") % e)
+  else:
+    raise PopupException(_("Could not download search results: %s") % search_form.errors)
 
 
 def no_collections(request):

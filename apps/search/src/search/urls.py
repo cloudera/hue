@@ -20,6 +20,7 @@ from django.conf.urls.defaults import patterns, url
 urlpatterns = patterns('search.views',
   url(r'^$', 'index', name='index'),
   url(r'^query$', 'index', name='query'),
+  url(r'^download/(?P<format>(csv|xls))$', 'download', name='download'),
 
   url(r'^admin/collections$', 'admin_collections', name='admin_collections'),
   url(r'^admin/collections_import$', 'admin_collections_import', name='admin_collections_import'),
