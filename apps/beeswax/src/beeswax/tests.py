@@ -935,6 +935,10 @@ for x in sys.stdin:
     resp = _make_query(self.client, hql, wait=True, local=False, max=180.0)
     save_and_verify(resp, TARGET_TBL_ROOT + '_2')
 
+    # Save to another DB
+    hql = "SELECT * FROM test"
+    resp = _make_query(self.client, hql, wait=True, local=False, max=180.0)
+    save_and_verify(resp, 'other_db.' + TARGET_TBL_ROOT)
 
   def test_install_examples(self):
     assert_true(not beeswax.models.MetaInstall.get().installed_example)

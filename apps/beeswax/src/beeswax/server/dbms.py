@@ -242,19 +242,15 @@ class HiveServer2Dbms(object):
     return self.execute_statement(hql)
 
 
-  def create_table_as_a_select(self, request, query_history, target_table, result_meta):
+  def create_table_as_a_select(self, request, query_history, target_database, target_table, result_meta):
     design = query_history.design.get_design()
     database = design.query['database']
-
-    name_parts = target_table.split(".")
-    if len(name_parts) == 2:
-      database, target_table = name_parts
 
     # Case 1: Hive Server 2 backend or results straight from an existing table
     if result_meta.in_tablename:
       self.use(database)
 
-      hql = 'CREATE TABLE `%s.%s` AS %s' % (database, target_table, design.query['query'])
+      hql = 'CREATE TABLE `%s.%s` AS %s' % (target_database, target_table, design.query['query'])
       query_history = self.execute_statement(hql)
     else:
       # Case 2: The results are in some temporary location

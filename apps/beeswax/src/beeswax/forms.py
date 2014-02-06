@@ -88,7 +88,7 @@ class SaveResultsForm(DependencyAwareForm):
   target_table = common.HiveIdentifierField(
                                   label=_t("Table Name"),
                                   required=False,
-                                  help_text=_t("Name of the new table"))
+                                  help_text=_t("Name of the new table")) # Can also contain a DB prefixed table name, e.g. DB_NAME.TABLE_NAME
   target_dir = PathField(label=_t("Results Location"),
                          required=False,
                          help_text=_t("Empty directory in HDFS to store results."))
@@ -100,6 +100,7 @@ class SaveResultsForm(DependencyAwareForm):
   def __init__(self, *args, **kwargs):
     self.db = kwargs.pop('db', None)
     self.fs = kwargs.pop('fs', None)
+    self.target_database = kwargs.pop('database', 'default')
     super(SaveResultsForm, self).__init__(*args, **kwargs)
 
   def clean(self):
@@ -107,20 +108,19 @@ class SaveResultsForm(DependencyAwareForm):
 
     if cleaned_data:
       if cleaned_data.get('save_target') == SaveResultsForm.SAVE_TYPE_TBL:
-        tbl = cleaned_data.get('target_table')
-        if tbl:
+        target_table = cleaned_data.get('target_table')
+        if target_table:
           try:
             if self.db is not None:
-              db_name = 'default'
-              name_parts = tbl.split(".")
+              name_parts = target_table.split(".")
               if len(name_parts) == 1:
-                tbl_name = tbl
+                pass
               elif len(name_parts) == 2:
-                db_name, tbl_name = name_parts
+                self.target_database, target_table = name_parts
               else:
-                self._errors['target_table'] = self.error_class([_('Invalid table name')])
-
-              self.db.get_table(db_name, tbl_name)
+                self._errors['target_table'] = self.error_class([_('Invalid table prefix name')])
+              cleaned_data['target_table'] = target_table # Update table name without the DB prefix
+              self.db.get_table(self.target_database, target_table)
             self._errors['target_table'] = self.error_class([_('Table already exists')])
             del cleaned_data['target_table']
           except Exception:
