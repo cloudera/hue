@@ -403,7 +403,8 @@ def save_results(request, query_history_id):
       data['target_dir'] = request.POST.get('path', None)
 
     db = dbms.get(request.user, query_history.get_query_server_config())
-    form = beeswax.forms.SaveResultsForm(data, db=db, fs=request.fs)
+    database = query_history.design.get_design().query.get('database', 'default')
+    form = beeswax.forms.SaveResultsForm(data, db=db, fs=request.fs, database=database)
 
     if form.is_valid():
       try:
@@ -425,12 +426,12 @@ def save_results(request, query_history_id):
           response['success_url'] = '/filebrowser/view%s' % target_dir
           response['watch_url'] = reverse(get_app_name(request) + ':api_watch_query_refresh_json', kwargs={'id': query_history.id})
         elif form.cleaned_data['save_target'] == form.SAVE_TYPE_TBL:
-          query_history = db.create_table_as_a_select(request, query_history, form.cleaned_data['target_table'], result_meta)
+          query_history = db.create_table_as_a_select(request, query_history, form.target_database, form.cleaned_data['target_table'], result_meta)
           response['id'] = query_history.id
           response['query'] = query_history.query
           response['type'] = 'hive-table'
           response['path'] = form.cleaned_data['target_table']
-          response['success_url'] = reverse('metastore:describe_table', kwargs={'database': 'default', 'table': form.cleaned_data['target_table']})
+          response['success_url'] = reverse('metastore:describe_table', kwargs={'database': form.target_database, 'table': form.cleaned_data['target_table']})
           response['watch_url'] = reverse(get_app_name(request) + ':api_watch_query_refresh_json', kwargs={'id': query_history.id})
       except Exception, ex:
         error_msg, log = expand_exception(ex, db)

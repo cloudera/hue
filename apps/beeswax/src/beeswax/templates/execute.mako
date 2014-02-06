@@ -601,7 +601,7 @@ ${layout.menubar(section='query')}
               &nbsp;${ _('In a new table') }
             </label>
             <span data-bind="visible: $root.design.results.save.type() == 'hive-table'">
-              <input data-bind="value: $root.design.results.save.path" type="text" name="target_table" placeholder="${_('Table name')}">
+              <input data-bind="value: $root.design.results.save.path" type="text" name="target_table" class="span4" placeholder="${_('Table name or <database name>.<table name>')}">
             </span>
           </div>
         </div>
