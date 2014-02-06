@@ -34,6 +34,7 @@ from nose.tools import assert_true, assert_equal, assert_false, assert_not_equal
 from nose.plugins.skip import SkipTest
 
 from django.utils.encoding import smart_str
+from django.utils.html import escape
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
@@ -78,7 +79,7 @@ def _make_query(client, query, submission_type="Execute",
 
   # Should be in the history if it's submitted.
   if submission_type == 'Execute':
-    fragment = collapse_whitespace(smart_str(query[:20]))
+    fragment = collapse_whitespace(smart_str(escape(query[:20])))
     verify_history(client, fragment=fragment)
 
   return res
@@ -218,6 +219,24 @@ for x in sys.stdin:
     response = self.client.get(content["download_urls"]["csv"])
     # Header line plus data lines...
     assert_equal(257, response.content.count("\n"))
+
+  def test_result_escaping(self):
+    # Check for XSS and NULL display
+    QUERY = """
+      SELECT 'abc', 1.0, 1=1, 1, 1/0, '<a>lala</a>lulu' from test LIMIT 3;
+    """
+    response = _make_query(self.client, QUERY, local=False)
+    content = json.loads(response.content)
+    assert_true('watch_url' in content)
+
+    response = wait_for_query_to_finish(self.client, response, max=180.0)
+    content = fetch_query_result_data(self.client, response)
+
+    assert_equal([
+        [u'abc', 1.0, True, 1, u'NULL', u'&lt;a&gt;lala&lt;/a&gt;lulu'],
+        [u'abc', 1.0, True, 1, u'NULL', u'&lt;a&gt;lala&lt;/a&gt;lulu'],
+        [u'abc', 1.0, True, 1, u'NULL', u'&lt;a&gt;lala&lt;/a&gt;lulu'],
+      ], content["results"], content)
 
   def test_query_with_udf(self):
     """

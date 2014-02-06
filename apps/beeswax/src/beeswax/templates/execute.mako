@@ -1474,19 +1474,7 @@ function resultsTable(e, data) {
       "fnDrawCallback": function (oSettings) {
         reinitializeTable();
       },
-      "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-        // Make sure null values are seen as NULL and are escaped.
-        var tmpDiv = $('<div />');
-        for (var j = 0; j < aData.length; ++j) {
-          var cell = $(nRow).find('td:eq(' + j + ')');
-          if (aData[j] == null) {
-            cell.html("NULL");
-          } else {
-            cell.html(tmpDiv.text(cell.html()).html());
-          }
-        }
-        return nRow;
-      },
+
       "aoColumnDefs": [
         {
           "sType": "numeric",
