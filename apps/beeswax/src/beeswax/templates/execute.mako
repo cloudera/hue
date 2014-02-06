@@ -1167,7 +1167,7 @@ $(document).ready(function () {
     $("#validationResults").empty();
   });
 
-  % if not design.id and not ( query_history and query_history.id ):
+  % if not (design and design.id) and not ( query_history and query_history.id ):
     if ($.totalStorage("${app_name}_temp_query") != null && $.totalStorage("${app_name}_temp_query") != "") {
       viewModel.queryEditorBlank(true);
       codeMirror.setValue($.totalStorage("${app_name}_temp_query"));
