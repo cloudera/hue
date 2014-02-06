@@ -26,171 +26,196 @@
 ${ commonheader(_('Query'), app_name, user) | n,unicode }
 ${layout.menubar(section='query')}
 
+<div id="temporaryPlaceholder"></div>
 
 <div id="query-editor" class="container-fluid hide section">
 <div class="row-fluid">
-<div class="span2" id="advanced-settings">
-  <form id="advancedSettingsForm" action="" method="POST" class="form form-horizontal">
-    <div class="sidebar-nav">
-      <ul class="nav nav-list">
-        <li class="nav-header">${_('database')}</li>
-        <li class="white" style="padding-top:0px">
+
+<div class="span2" id="navigator">
+  <ul class="nav nav-tabs" style="margin-bottom: 0">
+    <li class="active"><a href="#navigatorTab" data-toggle="tab" class="sidetab">${_('Navigator')}</a></li>
+    <li><a href="#settingsTab" data-toggle="tab" class="sidetab">${_('Settings')} <span data-bind="visible:design.settings.values().length + design.fileResources.values().length + design.functions.values().length > 0, text: design.settings.values().length + design.fileResources.values().length + design.functions.values().length" class="badge badge-info">12</span></a></li>
+  </ul>
+  <div class="tab-content">
+    <div class="tab-pane active" id="navigatorTab">
+      <div class="card card-small card-tab">
+        <div class="card-body" style="margin-top: 0">
+          <a href="#" title="${_('Double click on a table name or field to insert it in the editor')}" rel="tooltip" data-placement="top" class="pull-right" style="margin:3px; margin-top:7px"><i class="fa fa-question-circle"></i></a>
+          <a id="refreshNavigator" href="#" title="${_('Manually refresh the table list')}" rel="tooltip" data-placement="top" class="pull-right" style="margin:3px; margin-top:7px"><i class="fa fa-refresh"></i></a>
+          <ul class="nav nav-list" style="border: none; padding: 0; background-color: #FFF">
+            <li class="nav-header">${_('database')}</li>
+          </ul>
           <select data-bind="options: databases, value: database" class="input-medium chosen-select" name="query-database" data-placeholder="${_('Choose a database...')}"></select>
-        </li>
-        <li class="nav-header">${_('settings')}</li>
-        <li class="white paramContainer">
-          <!-- ko foreach: design.settings.values -->
-          <div class="param">
-            <div class="remove">
-              <button data-bind="click: $root.removeSetting.bind(this, $index())" type="button" class="btn btn-mini settingsDelete" title="${_('Delete this setting')}">x
-              </button>
-            </div>
-            <div data-bind="css: {'error': $root.getSettingKeyErrors($index()).length > 0}" class="control-group">
-              <label>${_('Key')}</label>
-              <input data-bind="value: key" type="text" class="settingsField span8" autocomplete="off" placeholder="mapred.reduce.tasks"/>
-            </div>
-
-            <div data-bind="css: {'error': $root.getSettingValueErrors($index()).length > 0}" class="control-group">
-              <label>${_('Value')}</label>
-              <input data-bind="value: value" type="text" class="settingValuesField span8" placeholder="1"/>
-            </div>
+          <input id="navigatorSearch" type="text" placeholder="${ _('Table name...') }" style="width:90%; margin-top: 20px"/>
+          <span id="navigatorNoTables">${_('The selected database has no tables.')}</span>
+          <ul id="navigatorTables" class="unstyled"></ul>
+          <div id="navigatorLoader">
+            <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #DDD"></i><!--<![endif]-->
+            <!--[if IE]><img src="/static/art/spinner.gif"/><![endif]-->
           </div>
-          <!-- /ko -->
-
-          <div class="control-group">
-            <a data-bind="click: function() { $root.addSetting('','') }" class="btn btn-mini paramAdd">${_('Add')}</a>
-          </div>
-        </li>
-        <li class="nav-header
-          % if app_name == 'impala':
-             hide
-          % endif
-          ">
-          ${_('File Resources')}
-        </li>
-        <li class="white paramContainer
-          % if app_name == 'impala':
-             hide
-          % endif
-          ">
-          <!-- ko foreach: design.fileResources.values -->
-          <div class="param">
-            <div class="remove">
-              <button data-bind="click: $root.removeFileResource.bind(this, $index())" type="button" class="btn btn-mini" title="${_('Delete this setting')}">&times;</button>
-            </div>
-            <div data-bind="css: {'error': $root.getFileResourceTypeErrors($index()).length > 0}" class="control-group">
-              <label>${_('Type')}</label>
-              <select data-bind="value: type" class="input-small">
-                <option value="JAR">${_('jar')}</option>
-                <option value="ARCHIVE">${_('archive')}</option>
-                <option value="FILE">${_('file')}</option>
-              </select>
-            </div>
-
-            <div data-bind="css: {'error': $root.getFileResourcePathErrors($index()).length > 0}" class="control-group">
-              <label>${_('Path')}</label>
-              <input data-bind="value: path" type="text" class="filesField span7 fileChooser" placeholder="/user/foo/udf.jar"/>
-            </div>
-          </div>
-          <!-- /ko -->
-
-          <div class="control-group">
-            <a data-bind="click: function() { $root.addFileResource('','') }" class="btn btn-mini paramAdd">${_('Add')}</a>
-          </div>
-        </li>
-        <li title="${ _('User-Defined Functions') }" class="nav-header
-          % if app_name == 'impala':
-            hide
-          % endif
-          ">
-          ${_('UDFs')}
-        </li>
-        <li class="white paramContainer
-          % if app_name == 'impala':
-            hide
-          % endif
-          ">
-          <!-- ko foreach: design.functions.values -->
-          <div class="param">
-            <div class="remove">
-              <button data-bind="click: $root.removeFunction.bind(this, $index())" type="button" class="btn btn-mini settingsDelete" title="${_('Delete this setting')}">&times;</button>
-            </div>
-            <div data-bind="css: {'error': $root.getFunctionNameErrors($index()).length > 0}" class="control-group">
-              <label>${_('Name')}</label>
-              <input data-bind="value: name" type="text" class="functionsField span8" autocomplete="off" placeholder="myFunction"/>
-            </div>
-
-            <div data-bind="css: {'error': $root.getFunctionClassNameErrors($index()).length > 0}" class="control-group">
-              <label>${_('Class name')}</label>
-              <input data-bind="value: class_name" type="text" class="classNamesField span8" placeholder="com.acme.example"/>
-            </div>
-          </div>
-          <!-- /ko -->
-
-          <div class="control-group">
-            <a data-bind="click: function() { $root.addFunction('','') }" class="btn btn-mini paramAdd">${_('Add')}</a>
-          </div>
-        </li>
-        <li class="nav-header">${_('Options')}</li>
-        <li class="white" style="padding-top:0px">
-          <label class="checkbox" rel="tooltip" data-original-title="${_("If checked (the default), you can include parameters like $parameter_name in your query, and users will be prompted for a value when the query is run.")}">
-            <input data-bind="checked: design.isParameterized" type="checkbox"/>
-            ${_("Enable parameterization")}
-          </label>
-          <label class="checkbox
-          % if app_name == 'impala':
-            hide
-          % endif
-          " rel="tooltip" data-original-title="${_("If checked, you will receive an email notification when the query completes.")}">
-            <input data-bind="checked: design.email" type="checkbox"/>
-            ${_("Email me on completion")}
-          </label>
-        </li>
-        % if app_name == 'impala':
-          <li class="nav-header">
-            ${_('Metastore Catalog')}
-          </li>
-          <li class="white">
-            <div class="control-group">
-              <span id="refresh-dyk">
-                <i class="fa fa-refresh"></i>
-                ${ _('Sync tables tips') }
-              </span>
-
-              <div id="refresh-content" class="hide">
-                <ul style="text-align: left;">
-                  <li>"invalidate
-                    metadata" ${ _("invalidates the entire catalog metadata. All table metadata will be reloaded on the next access.") }</li>
-                  <li>"invalidate metadata
-                    &lt;table&gt;" ${ _("invalidates the metadata, load on the next access") }</li>
-                  <li>"refresh
-                    &lt;table&gt;" ${ _("refreshes the metadata immediately. It is a faster, incremental refresh.") }</li>
-                </ul>
-              </div>
-            </div>
-          </li>
-        % endif
-        <li class="nav-header"></li>
-        <li class="white">
-          <div class="control-group">
-            <i class="fa fa-question-circle" id="help"></i>
-
-            <div id="help-content" class="hide">
-              <ul style="text-align: left;">
-                <li>${ _('Press CTRL + Space to autocomplete') }</li>
-                <li>${ _("You can execute queries with multiple SQL statements delimited by a semicolon ';'") }</li>
-                <li>${ _('You can highlight and run a fragment of a query') }</li>
-              </ul>
-            </div>
-          </div>
-        </li>
-      </ul>
+        </div>
+      </div>
     </div>
-  </form>
+    <div class="tab-pane" id="settingsTab">
+      <div class="card card-small card-tab">
+        <div class="card-body">
+          <div id="advanced-settings">
+          <form id="advancedSettingsForm" action="" method="POST" class="form form-horizontal">
+              <ul class="nav nav-list" style="border: none; padding: 0;">
+                <li class="nav-header">${_('settings')}</li>
+                <li class="white paramContainer">
+                  <!-- ko foreach: design.settings.values -->
+                  <div class="param">
+                    <div class="remove">
+                      <button data-bind="click: $root.removeSetting.bind(this, $index())" type="button" class="btn btn-mini settingsDelete" title="${_('Delete this setting')}">x
+                      </button>
+                    </div>
+                    <div data-bind="css: {'error': $root.getSettingKeyErrors($index()).length > 0}" class="control-group">
+                      <label>${_('Key')}</label>
+                      <input data-bind="value: key" type="text" class="settingsField span8" autocomplete="off" placeholder="mapred.reduce.tasks"/>
+                    </div>
+
+                    <div data-bind="css: {'error': $root.getSettingValueErrors($index()).length > 0}" class="control-group">
+                      <label>${_('Value')}</label>
+                      <input data-bind="value: value" type="text" class="settingValuesField span8" placeholder="1"/>
+                    </div>
+                  </div>
+                  <!-- /ko -->
+
+                  <div class="control-group">
+                    <a data-bind="click: function() { $root.addSetting('','') }" class="btn btn-mini paramAdd">${_('Add')}</a>
+                  </div>
+                </li>
+                <li class="nav-header
+                  % if app_name == 'impala':
+                     hide
+                  % endif
+                  ">
+                  ${_('File Resources')}
+                </li>
+                <li class="white paramContainer
+                  % if app_name == 'impala':
+                     hide
+                  % endif
+                  ">
+                  <!-- ko foreach: design.fileResources.values -->
+                  <div class="param">
+                    <div class="remove">
+                      <button data-bind="click: $root.removeFileResource.bind(this, $index())" type="button" class="btn btn-mini" title="${_('Delete this setting')}">&times;</button>
+                    </div>
+                    <div data-bind="css: {'error': $root.getFileResourceTypeErrors($index()).length > 0}" class="control-group">
+                      <label>${_('Type')}</label>
+                      <select data-bind="value: type" class="input-small">
+                        <option value="JAR">${_('jar')}</option>
+                        <option value="ARCHIVE">${_('archive')}</option>
+                        <option value="FILE">${_('file')}</option>
+                      </select>
+                    </div>
+
+                    <div data-bind="css: {'error': $root.getFileResourcePathErrors($index()).length > 0}" class="control-group">
+                      <label>${_('Path')}</label>
+                      <input data-bind="value: path" type="text" class="filesField span7 fileChooser" placeholder="/user/foo/udf.jar"/>
+                    </div>
+                  </div>
+                  <!-- /ko -->
+
+                  <div class="control-group">
+                    <a data-bind="click: function() { $root.addFileResource('','') }" class="btn btn-mini paramAdd">${_('Add')}</a>
+                  </div>
+                </li>
+                <li title="${ _('User-Defined Functions') }" class="nav-header
+                  % if app_name == 'impala':
+                    hide
+                  % endif
+                  ">
+                  ${_('UDFs')}
+                </li>
+                <li class="white paramContainer
+                  % if app_name == 'impala':
+                    hide
+                  % endif
+                  ">
+                  <!-- ko foreach: design.functions.values -->
+                  <div class="param">
+                    <div class="remove">
+                      <button data-bind="click: $root.removeFunction.bind(this, $index())" type="button" class="btn btn-mini settingsDelete" title="${_('Delete this setting')}">&times;</button>
+                    </div>
+                    <div data-bind="css: {'error': $root.getFunctionNameErrors($index()).length > 0}" class="control-group">
+                      <label>${_('Name')}</label>
+                      <input data-bind="value: name" type="text" class="functionsField span8" autocomplete="off" placeholder="myFunction"/>
+                    </div>
+
+                    <div data-bind="css: {'error': $root.getFunctionClassNameErrors($index()).length > 0}" class="control-group">
+                      <label>${_('Class name')}</label>
+                      <input data-bind="value: class_name" type="text" class="classNamesField span8" placeholder="com.acme.example"/>
+                    </div>
+                  </div>
+                  <!-- /ko -->
+
+                  <div class="control-group">
+                    <a data-bind="click: function() { $root.addFunction('','') }" class="btn btn-mini paramAdd">${_('Add')}</a>
+                  </div>
+                </li>
+                <li class="nav-header">${_('Options')}</li>
+                <li class="white" style="padding-top:0; padding-left:0">
+                  <label class="checkbox" rel="tooltip" data-original-title="${_("If checked (the default), you can include parameters like $parameter_name in your query, and users will be prompted for a value when the query is run.")}">
+                    <input data-bind="checked: design.isParameterized" type="checkbox"/>
+                    ${_("Enable parameterization")}
+                  </label>
+                  <label class="checkbox
+                  % if app_name == 'impala':
+                    hide
+                  % endif
+                  " rel="tooltip" data-original-title="${_("If checked, you will receive an email notification when the query completes.")}">
+                    <input data-bind="checked: design.email" type="checkbox"/>
+                    ${_("Email me on completion")}
+                  </label>
+                </li>
+                % if app_name == 'impala':
+                  <li class="nav-header">
+                    ${_('Metastore Catalog')}
+                  </li>
+                  <li class="white">
+                    <div class="control-group">
+                      <span id="refresh-dyk">
+                        <i class="fa fa-refresh"></i>
+                        ${ _('Sync tables tips') }
+                      </span>
+
+                      <div id="refresh-content" class="hide">
+                        <ul style="text-align: left;">
+                          <li>"invalidate
+                            metadata" ${ _("invalidates the entire catalog metadata. All table metadata will be reloaded on the next access.") }</li>
+                          <li>"invalidate metadata
+                            &lt;table&gt;" ${ _("invalidates the metadata, load on the next access") }</li>
+                          <li>"refresh
+                            &lt;table&gt;" ${ _("refreshes the metadata immediately. It is a faster, incremental refresh.") }</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </li>
+                % endif
+              </ul>
+          </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
-<div id="querySide" class="span8">
+<div id="querySide" class="span10">
   <div id="queryContainer" class="card card-small">
+    <div class="pull-right" style="margin: 10px">
+      <i class="fa fa-question-circle" id="help"></i>
+      <div id="help-content" class="hide">
+        <ul style="text-align: left;">
+          <li>${ _('Press CTRL + Space to autocomplete') }</li>
+          <li>${ _("You can execute queries with multiple SQL statements delimited by a semicolon ';'") }</li>
+          <li>${ _('You can highlight and run a fragment of a query') }</li>
+        </ul>
+      </div>
+    </div>
     <div style="margin-bottom: 30px">
         % if can_edit_name:
         <h1 class="card-heading simple">
@@ -259,8 +284,38 @@ ${layout.menubar(section='query')}
     </div>
   </div>
 
-  <div class="card card-small scrollable resultsContainer">
+  <div id="resizePanel"><a href="javascript:void(0)"><i class="fa fa-ellipsis-h"></i></a></div>
 
+  <div id="recentSection">
+    <ul class="nav nav-tabs" style="margin-bottom: 0">
+      <li class="active"><a href="#recentTab" data-toggle="tab" class="sidetab">${_('Recent queries')}</a></li>
+    </ul>
+    <div class="tab-content">
+      <div class="tab-pane active" id="recentTab">
+        <div class="card card-tab" style="padding-top: 1px;">
+          <div class="card-body">
+            <div id="recentLoader">
+              <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #DDD"></i><!--<![endif]-->
+              <!--[if IE]><img src="/static/art/spinner.gif"/><![endif]-->
+            </div>
+            <table id="recentQueries" class="table table-striped table-condensed datatables" style="padding-left: 0;">
+              <thead>
+                <tr>
+                  <th>${_('Time')}</th>
+                  <th>${_('Query')}</th>
+                  <th>${_('Result')}</th>
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card card-small scrollable resultsContainer">
     <div data-bind="visible: !$root.design.results.empty()">
       <a id="expandResults" href="javascript:void(0)" title="${_('See results in full screen')}" rel="tooltip"
         class="view-query-results hide pull-right"><h4 style="margin-right: 20px"><i class="fa fa-expand"></i></h4></a>
@@ -398,26 +453,7 @@ ${layout.menubar(section='query')}
   </div>
 </div>
 
-<div class="span2" id="navigator">
-  <div class="card card-small">
-    <a href="#" title="${_('Double click on a table name or field to insert it in the editor')}" rel="tooltip" data-placement="left" class="pull-right" style="margin:10px;margin-left: 0"><i class="fa fa-question-circle"></i></a>
-    <a id="refreshNavigator" href="#" title="${_('Manually refresh the table list')}" rel="tooltip" data-placement="left" class="pull-right" style="margin:10px"><i class="fa fa-refresh"></i></a>
 
-    <h1 class="card-heading simple"><i class="fa fa-compass"></i> ${_('Navigator')}</h1>
-
-    <div class="card-body">
-      <p>
-        <input id="navigatorSearch" type="text" placeholder="${ _('Table name...') }" style="width:90%"/>
-        <span id="navigatorNoTables">${_('The selected database has no tables.')}</span>
-        <ul id="navigatorTables" class="unstyled"></ul>
-        <div id="navigatorLoader">
-          <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #DDD"></i><!--<![endif]-->
-          <!--[if IE]><img src="/static/art/spinner.gif"/><![endif]-->
-        </div>
-      </p>
-    </div>
-  </div>
-</div>
 </div>
 </div>
 
@@ -609,6 +645,7 @@ ${layout.menubar(section='query')}
   </div>
 </div>
 
+<script src="/static/ext/js/jquery/plugins/jquery-ui-draggable-droppable-sortable-1.8.23.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/routie-0.3.0.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout.mapping-2.3.2.js" type="text/javascript" charset="utf-8"></script>
@@ -681,10 +718,6 @@ ${layout.menubar(section='query')}
 
   .param:nth-child(even) {
     background-color: #F0F0F0;
-  }
-
-  .paramAdd {
-    margin-left: 18px;
   }
 
   .remove {
@@ -760,6 +793,52 @@ ${layout.menubar(section='query')}
     color: #999;
   }
 
+  #queryContainer {
+    margin-bottom: 0;
+  }
+
+  #resizePanel a {
+    position: absolute;
+    cursor: ns-resize;
+    color: #666;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .resultsContainer {
+    margin-top: 20px;
+  }
+
+  #recentSection {
+    margin-top: 20px;
+  }
+
+  #recentSection code {
+    cursor: pointer;
+    white-space: normal;
+  }
+
+  #recentQueries {
+    width: 100%;
+  }
+
+  #navigator .card-body {
+    margin-top: 1px !important;
+    padding: 6px !important;
+  }
+
+  #navigator .nav-header {
+    padding-left: 0;
+  }
+
+  #navigator .control-group {
+    padding-left: 0;
+  }
+
+  #navigator .nav-list > li.white, #navigator .nav-list .nav-header {
+    margin: 0;
+  }
+
 </style>
 
 <link href="/static/ext/css/leaflet.css" rel="stylesheet">
@@ -771,7 +850,7 @@ ${layout.menubar(section='query')}
 <script src="/static/ext/chosen/chosen.jquery.min.js" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript" charset="utf-8">
-var codeMirror, renderNavigator, resetNavigator, dataTable;
+var codeMirror, renderNavigator, resetNavigator, resizeNavigator, dataTable, renderRecent;
 
 var HIVE_AUTOCOMPLETE_BASE_URL = "${ autocomplete_base_url | n,unicode }";
 var HIVE_AUTOCOMPLETE_FAILS_SILENTLY_ON = [500]; // error codes from beeswax/views.py - autocomplete
@@ -782,9 +861,89 @@ var HIVE_AUTOCOMPLETE_GLOBAL_CALLBACK = function (data) {
   }
 };
 
+function placeResizePanelHandle() {
+  // dynamically positioning the resize panel handle since IE doesn't play well with styles.
+  $("#resizePanel a").css("left", $("#resizePanel").position().left + $("#resizePanel").width()/2 - 8);
+}
 
-// Navigator.
+var CURRENT_CODEMIRROR_SIZE = 100;
+
+// Navigator, recent queries
 $(document).ready(function () {
+
+  var INITIAL_RESIZE_POSITION = 299;
+  $("#resizePanel a").draggable({
+    axis: "y",
+    drag: function(e, ui) {
+      draggableHelper($(this), e, ui);
+    },
+    stop: function(e, ui) {
+      draggableHelper($(this), e, ui);
+    }
+  });
+
+  function draggableHelper(el, e, ui) {
+    if (el.offset().top > INITIAL_RESIZE_POSITION){
+      CURRENT_CODEMIRROR_SIZE = 100 + (el.offset().top - INITIAL_RESIZE_POSITION);
+      codeMirror.setSize("99%", CURRENT_CODEMIRROR_SIZE);
+    }
+    if (ui.position.top < INITIAL_RESIZE_POSITION) {
+      ui.position.top = INITIAL_RESIZE_POSITION;
+    }
+  }
+
+
+  var recentQueries = $("#recentQueries").dataTable({
+      "bPaginate": false,
+      "bLengthChange": false,
+      "bInfo": false,
+      "bFilter": false,
+      "aoColumns": [
+        { "sWidth" : "20%"},
+        { "sWidth" : "75%"},
+        { "sWidth" : "5%", "bSortable": false }
+      ],
+      "aaSorting": [
+        [0, 'desc']
+      ],
+      "oLanguage": {
+        "sEmptyTable": "${_('No data available')}",
+        "sInfo": "${_('Showing _START_ to _END_ of _TOTAL_ entries')}",
+        "sInfoEmpty": "${_('Showing 0 to 0 of 0 entries')}",
+        "sInfoFiltered": "${_('(filtered from _MAX_ total entries)')}",
+        "sZeroRecords": "${_('No matching records')}",
+        "oPaginate": {
+          "sFirst": "${_('First')}",
+          "sLast": "${_('Last')}",
+          "sNext": "${_('Next')}",
+          "sPrevious": "${_('Previous')}"
+        }
+      }
+    });
+
+  renderRecent = function() {
+    $("#recentLoader").show();
+    recentQueries.fnClearTable();
+    $.getJSON("${ url(app_name + ':list_query_history') }?format=json", function(data) {
+      if (data && data.queries) {
+        $(data.queries).each(function(cnt, item){
+          recentQueries.fnAddData([
+            '<span data-time="' + item.timeInMs + '">' + item.timeFormatted + '</span>',
+            '<code style="cursor:pointer">' + item.query + '</code>',
+            (item.resultsUrl != "" ? '<a href="' + item.resultsUrl + '">${_('See results...')}</a>': '')
+          ]);
+        });
+      }
+      $("#recentLoader").hide();
+      $("#recentQueries").css("width", "100%");
+    });
+  }
+
+  $(document).on("click", "#recentQueries code", function(){
+    codeMirror.setValue($(this).text());
+  });
+
+  renderRecent();
 
   $("#navigatorQuicklook").modal({
     show: false
@@ -807,6 +966,12 @@ $(document).ready(function () {
       }
     });
   });
+
+  resizeNavigator = function () {
+    $("#navigator .card").css("min-height", ($(window).height() - 150) + "px");
+    $("#navigatorTables").css("max-height", ($(window).height() - 280) + "px").css("overflow-y", "auto");
+    ##$("#recentQueries").css("max-height", ($(window).height() - 200) + "px").css("overflow-y", "auto");
+  }
 
   resetNavigator = function () {
     var _db = viewModel.database();
@@ -908,8 +1073,7 @@ $(document).ready(function () {
     resetNavigator();
   });
 
-  $("#navigator .card").css("min-height", ($(window).height() - 130) + "px");
-  $("#navigatorTables").css("max-height", ($(window).height() - 260) + "px").css("overflow-y", "auto");
+  resizeNavigator();
 
   viewModel.databases.subscribe(function () {
     if ($.totalStorage("${app_name}_last_database") != null && $.inArray($.totalStorage("${app_name}_last_database"), viewModel.databases())) {
@@ -936,7 +1100,7 @@ $(document).ready(function () {
     $("a[href='#results']").click();
   });
 
-  $(document).on("shown", "a[data-toggle='tab']", function (e) {
+  $(document).on("shown", "a[data-toggle='tab']:not(.sidetab)", function (e) {
     if ($(e.target).attr("href") == "#log") {
       logsAtEnd = true;
       window.setTimeout(resizeLogs, 150);
@@ -967,7 +1131,7 @@ function reinitializeTable(max) {
   var _max = max || 10;
 
   function fn(){
-    var container = $($("a[data-toggle='tab']").parent(".active").find("a").attr("href"));
+    var container = $($("a[data-toggle='tab']:not(.sidetab)").parent(".active").find("a").attr("href"));
     if ($(".dataTables_wrapper").height() > 0) {
       $(".dataTables_wrapper").jHueTableScroller({
         minHeight: $(window).height() - 190,
@@ -1013,8 +1177,7 @@ $(document).ready(function () {
     resizeTimeout = window.setTimeout(function () {
       // prevents endless loop in IE8
       if (winWidth != $(window).width() || winHeight != $(window).height()) {
-        $("#navigator .card").css("min-height", ($(window).height() - 130) + "px");
-        $("#navigatorTables").css("max-height", ($(window).height() - 260) + "px").css("overflow-y", "auto");
+        resizeNavigator();
         winWidth = $(window).width();
         winHeight = $(window).height();
       }
@@ -1177,6 +1340,7 @@ $(document).ready(function () {
   codeMirror.on("blur", function () {
     $(document.body).off("contextmenu");
   });
+
 });
 
 var editables = function() {
@@ -1236,7 +1400,7 @@ $(document).ready(function () {
     resizeLogs();
   });
 
-  $(document).on("shown", "a[data-toggle='tab']", function (e) {
+  $(document).on("shown", "a[data-toggle='tab']:not(.sidetab)", function (e) {
     if ($(e.target).attr("href") != "#results"){
       $($(e.target).attr("href")).css('height', 'auto');
       if ($(e.target).attr("href") == "#chart") {
@@ -1733,6 +1897,7 @@ $(document).ready(function () {
     'title': "${_('Did you know?')}",
     'content': $("#help-content").html(),
     'trigger': 'hover',
+    'placement': 'left',
     'html': true
   });
 
@@ -1825,8 +1990,8 @@ $(document).ready(function () {
     $('#navigator').show();
     $('#queryContainer').show();
     $('a[href="#query"]').parent().show();
-    if (!$('#querySide').hasClass('span8')) {
-      $('#querySide').addClass('span8');
+    if (!$('#querySide').hasClass('span10')) {
+      $('#querySide').addClass('span10');
     }
   }
 
@@ -1835,13 +2000,14 @@ $(document).ready(function () {
     $('#navigator').hide();
     $('#queryContainer').hide();
     $('a[href="#query"]').parent().hide();
-    if ($('#querySide').hasClass('span8')) {
-      $('#querySide').removeClass('span8');
+    if ($('#querySide').hasClass('span10')) {
+      $('#querySide').removeClass('span10');
     }
   }
 
   function queryPage() {
     queryPageComponents();
+    $('#recentSection').show();
     $('.resultsContainer').hide();
     $('.resultsContainer .watch-query').hide();
     $('.resultsContainer .view-query-results').hide();
@@ -1849,6 +2015,7 @@ $(document).ready(function () {
 
   function queryLogPage() {
     queryPageComponents();
+    $('#recentSection').hide();
     $('.resultsContainer').show();
     $('.resultsContainer .watch-query').show();
     $('.resultsContainer .view-query-results').hide();
@@ -1856,6 +2023,7 @@ $(document).ready(function () {
 
   function queryResultsPage() {
     queryPageComponents();
+    $('#recentSection').hide();
     $('.resultsContainer').show();
     $('.resultsContainer .watch-query').hide();
     $('.resultsContainer .view-query-results').show();
@@ -1863,6 +2031,7 @@ $(document).ready(function () {
 
   function parametersPage() {
     queryPageComponents();
+    $('#recentSection').hide();
     $('.resultsContainer').hide();
     $('.resultsContainer .watch-query').hide();
     $('.resultsContainer .view-query-results').hide();
@@ -1870,6 +2039,7 @@ $(document).ready(function () {
 
   function watchLogsPage() {
     watchPageComponents();
+    $('#recentSection').hide();
     $('.resultsContainer').show();
     $('.resultsContainer .watch-query').show();
     $('.resultsContainer .view-query-results').hide();
@@ -1877,6 +2047,7 @@ $(document).ready(function () {
 
   function watchResultsPage() {
     watchPageComponents();
+    $('#recentSection').hide();
     $('.resultsContainer').show();
     $('.resultsContainer .watch-query').hide();
     $('.resultsContainer .view-query-results').show();
@@ -1886,8 +2057,8 @@ $(document).ready(function () {
     'query': function () {
       showSection('query-editor');
       queryPage();
-
-      codeMirror.setSize("99%", $(window).height() - 270 - $("#queryPane .alert-error").outerHeight() - $(".nav-tabs").outerHeight());
+      codeMirror.setSize("99%", CURRENT_CODEMIRROR_SIZE);
+      placeResizePanelHandle();
     },
     'query/execute/params': function () {
       if (viewModel.design.parameters().length == 0) {
@@ -1914,16 +2085,15 @@ $(document).ready(function () {
       queryLogPage();
 
       clickHard('.resultsContainer .nav-tabs a[href="#log"]');
-
-      codeMirror.setSize("99%", 100);
     },
     'query/results': function () {
       showSection('query-editor');
       queryResultsPage();
 
-      codeMirror.setSize("99%", 100);
-
       clickHard('.resultsContainer .nav-tabs a[href="#results"]');
+
+      renderRecent();
+      placeResizePanelHandle();
 
       logGA('query/results');
     },
@@ -1936,8 +2106,6 @@ $(document).ready(function () {
       queryResultsPage();
 
       clickHard('.resultsContainer .nav-tabs a[href="#explanation"]');
-
-      codeMirror.setSize("99%", 100);
     },
     'watch/logs': function() {
       showSection('query-editor');

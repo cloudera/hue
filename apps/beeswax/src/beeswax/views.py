@@ -47,6 +47,8 @@ from beeswax.models import SavedQuery, QueryHistory
 from beeswax.server import dbms
 from beeswax.server.dbms import expand_exception, get_query_server_config
 
+import time
+
 
 LOG = logging.getLogger(__name__)
 
@@ -313,6 +315,13 @@ def list_query_history(request):
 
   filter = request.GET.get(prefix + 'search') and request.GET.get(prefix + 'search') or ''
 
+  if request.GET.get('format') == 'json':
+    resp = {
+      'queries': [massage_query_history_for_json(app_name, query_history) for query_history in page.object_list]
+    }
+    return HttpResponse(json.dumps(resp), mimetype="application/json")
+
+
   return render('list_history.mako', request, {
     'request': request,
     'page': page,
@@ -322,6 +331,13 @@ def list_query_history(request):
     'filter': filter,
   })
 
+def massage_query_history_for_json(app_name, query_history):
+  return {
+    'query': query_history.query,
+    'timeInMs': time.mktime(query_history.submission_date.timetuple()),
+    'timeFormatted': query_history.submission_date.strftime("%x %X"),
+    'resultsUrl': not query_history.is_failure() and reverse(app_name + ':watch_query_history', kwargs={'query_history_id': query_history.id}) or ""
+  }
 
 def download(request, id, format):
   assert format in common.DL_FORMATS
