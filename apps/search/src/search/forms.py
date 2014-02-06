@@ -16,6 +16,8 @@
 # limitations under the License.
 
 
+import math
+
 from django import forms
 from django.utils.translation import ugettext as _
 from search.models import Collection
@@ -45,6 +47,25 @@ class QueryForm(forms.Form):
       return self.cleaned_data['collection']
     else:
       return self.initial_collection
+
+  @property
+  def solr_query_dict(self):
+    solr_query = {}
+
+    if self.is_valid():
+      solr_query['q'] = self.cleaned_data['query'].encode('utf8')
+      solr_query['fq'] = self.cleaned_data['fq']
+      if self.cleaned_data['sort']:
+        solr_query['sort'] = self.cleaned_data['sort']
+      solr_query['rows'] = self.cleaned_data['rows'] or 15
+      solr_query['start'] = self.cleaned_data['start'] or 0
+      solr_query['facets'] = self.cleaned_data['facets'] or 1
+      solr_query['current_page'] = int(math.ceil((float(solr_query['start']) + 1) / float(solr_query['rows'])))
+      solr_query['total_pages'] = 0
+      solr_query['search_time'] = 0
+      solr_query['collection'] = Collection.objects.get(id=self.cleaned_data['collection']).name
+    
+    return solr_query
 
 
 class HighlightingForm(forms.Form):
