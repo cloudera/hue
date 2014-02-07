@@ -683,10 +683,13 @@ class HiveServerClientCompatible:
 
     return ResultCompatible(data_table)
 
-
   def cancel_operation(self, handle):
     operationHandle = handle.get_rpc_handle()
     return self._client.cancel_operation(operationHandle)
+
+
+  def close(self, handle):
+    return self.close_operation(handle)
 
 
   def close_operation(self, handle):

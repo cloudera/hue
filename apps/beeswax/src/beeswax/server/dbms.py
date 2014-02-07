@@ -150,10 +150,11 @@ class Dbms:
 
 
   def close_operation(self, query_handle):
+    # Beeswax does not support close_operation
     if self.server_type == BEESWAX:
-      raise PopupException(_('%s interface does not support close_operation. %s interface does.') % (BEESWAX, HIVE_SERVER2))
-
-    return self.client.close_operation(query_handle)
+      pass
+    else:
+      return self.client.close_operation(query_handle)
 
 
   def cancel_operation(self, query_handle):
