@@ -33,7 +33,7 @@ class Command(BaseCommand):
   0 queries closed.
   """
   args = '<age_in_days> <all> (default is 7)'
-  help = 'Closes the non running queries older than 7 days. If <all> is specified, close the ones of any types.'
+  help = 'Closes the non running Hive queries older than 7 days. If <all> is specified, close the Hive and Impala ones.'
 
   def handle(self, *args, **options):
     days = int(args[0]) if len(args) >= 1 else 7
