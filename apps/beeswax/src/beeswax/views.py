@@ -27,6 +27,7 @@ from django.contrib import messages
 from django.db.models import Q
 from django.http import HttpResponse, QueryDict
 from django.shortcuts import redirect
+from django.utils.html import escape
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 
@@ -639,7 +640,21 @@ def view_results(request, id, first_row=0):
       downloadable = False
     elif not download:
       results = db.fetch(handle, start_over, 100)
-      data = list(results.rows()) # Materialize results
+      data = []
+
+      # Materialize and HTML escape results
+      # TODO: use Number + list comprehension
+      for row in results.rows():
+        escaped_row = []
+        for field in row:
+          if isinstance(field, (int, long, float, complex, bool)):
+            escaped_field = field
+          elif field is None:
+            escaped_field = 'NULL'
+          else:
+            escaped_field = escape(field)
+          escaped_row.append(escaped_field)
+        data.append(escaped_row)
 
       # We display the "Download" button only when we know that there are results:
       downloadable = first_row > 0 or data

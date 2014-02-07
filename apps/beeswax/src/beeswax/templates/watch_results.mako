@@ -166,7 +166,7 @@ ${layout.menubar(section='query')}
               <tr>
                 <td>${ start_row + i }</td>
                 % for item in row:
-                  <td>${ smart_unicode(item, errors='ignore') }</td>
+                  <td>${ smart_unicode(item, errors='ignore') | n,unicode }</td>
                 % endfor
               </tr>
               % endfor
