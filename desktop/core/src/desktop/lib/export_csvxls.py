@@ -43,7 +43,9 @@ def dataset(headers, data, encoding=None):
   Return a dataset object for a csv or excel document.
   """
   dataset = tablib.Dataset()
-  dataset.headers = format(headers, encoding)
+
+  if headers:
+    dataset.headers = format(headers, encoding)
 
   for row in data:
     dataset.append(format(row, encoding))

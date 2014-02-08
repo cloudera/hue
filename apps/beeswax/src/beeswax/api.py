@@ -17,6 +17,7 @@
 
 import json
 import logging
+import os
 
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, Http404
@@ -31,6 +32,7 @@ from jobsub.parameterization import substitute_variables
 import beeswax.models
 
 from beeswax.forms import QueryForm
+from beeswax.data_export import upload
 from beeswax.design import HQLdesign
 from beeswax.server import dbms
 from beeswax.server.dbms import expand_exception, get_query_server_config,\
@@ -418,13 +420,19 @@ def save_results(request, query_history_id):
       try:
         if form.cleaned_data['save_target'] == form.SAVE_TYPE_DIR:
           target_dir = form.cleaned_data['target_dir']
-          query_history = db.insert_query_into_directory(query_history, target_dir)
           response['type'] = 'hdfs'
           response['id'] = query_history.id
           response['query'] = query_history.query
           response['path'] = target_dir
           response['success_url'] = '/filebrowser/view%s' % target_dir
-          response['watch_url'] = reverse(get_app_name(request) + ':api_watch_query_refresh_json', kwargs={'id': query_history.id})
+          if form.cleaned_data['rerun']:
+            query_history = db.insert_query_into_directory(query_history, target_dir)
+            response['watch_url'] = reverse(get_app_name(request) + ':api_watch_query_refresh_json', kwargs={'id': query_history.id})
+          else:
+            request.fs.do_as_user(request.user.username, request.fs.mkdir, form.cleaned_data['target_dir'])
+            path = os.path.join(form.cleaned_data['target_dir'], 'results')
+            upload(path, handle, request.user, db, request.fs)
+            response['watch_url'] = reverse(get_app_name(request) + ':api_watch_query_refresh_json', kwargs={'id': query_history.id})
         elif form.cleaned_data['save_target'] == form.SAVE_TYPE_TBL:
           query_history = db.create_table_as_a_select(request, query_history, form.target_database, form.cleaned_data['target_table'], result_meta)
           response['id'] = query_history.id

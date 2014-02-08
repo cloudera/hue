@@ -92,6 +92,9 @@ class SaveResultsForm(DependencyAwareForm):
   target_dir = PathField(label=_t("Results Location"),
                          required=False,
                          help_text=_t("Empty directory in HDFS to store results."))
+  rerun = forms.BooleanField(label=_t("Run an export query"),
+                             initial=False,
+                             required=False)
   dependencies = [
     ('save_target', SAVE_TYPE_TBL, 'target_table'),
     ('save_target', SAVE_TYPE_DIR, 'target_dir'),

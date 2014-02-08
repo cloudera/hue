@@ -28,7 +28,7 @@ from beeswax import common, conf
 LOG = logging.getLogger(__name__)
 
 _DATA_WAIT_SLEEP = 0.1                  # Sleep 0.1 sec before checking for data availability
-FETCH_ROWS = 100000
+FETCH_ROWS = 10
 
 
 def download(handle, format, db):
@@ -41,20 +41,42 @@ def download(handle, format, db):
     LOG.error('Unknown download format "%s"' % (format,))
     return
 
-  data = HS2DataAdapter(handle, format, db, conf.DOWNLOAD_ROW_LIMIT.get())
+  data, has_more = HS2DataAdapter(handle, db, conf.DOWNLOAD_ROW_LIMIT.get())
   return export_csvxls.make_response(data[0], data[1:], format, 'query_result')
 
 
-def HS2DataAdapter(handle, format, db, max_rows=0):
+def upload(path, handle, user, db, fs):
   """
-  HS2DataAdapter(query_model, format, db) -> 2D array of data.
+  upload(query_model, path, user, db, fs) -> None
+
+  Retrieve the query result in the format specified and upload to hdfs.
+  """
+  has_more = True
+  start_over = True
+
+  fs.do_as_user(user.username, fs.create, path, overwrite=True)
+
+  while has_more:
+    data, has_more = HS2DataAdapter(handle, db, conf.DOWNLOAD_ROW_LIMIT.get(), start_over=start_over)
+    dataset = export_csvxls.dataset(None, data[1:])
+    fs.do_as_user(user.username, fs.append, path, dataset.csv)
+
+    if start_over:
+      start_over = False
+
+
+def HS2DataAdapter(handle, db, max_rows=0, start_over=True):
+  """
+  HS2DataAdapter(query_model, db) -> 2D array of data.
 
   First line should be the headers.
   """
-  results = db.fetch(handle, start_over=True, rows=FETCH_ROWS)
-  while not results.ready:   # For Beeswax
+  fetch_rows = max_rows if max_rows > -1 else FETCH_ROWS
+
+  results = db.fetch(handle, start_over=start_over, rows=fetch_rows)
+  while not results.ready:
     time.sleep(_DATA_WAIT_SLEEP)
-    results = db.fetch(handle, start_over=True, rows=FETCH_ROWS)
+    results = db.fetch(handle, start_over=start_over, rows=fetch_rows)
 
   data = [results.cols()]
 
@@ -68,8 +90,8 @@ def HS2DataAdapter(handle, format, db, max_rows=0):
       break
 
     if results.has_more:
-      results = db.fetch(handle, start_over=False, rows=FETCH_ROWS)
+      results = db.fetch(handle, start_over=False, rows=fetch_rows)
     else:
       results = None
 
-  return data
+  return data, results.has_more if results else False

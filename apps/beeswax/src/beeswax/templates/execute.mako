@@ -614,6 +614,12 @@ ${layout.menubar(section='query')}
             <span data-bind="visible: $root.design.results.save.type() == 'hdfs'">
               <input data-bind="value: $root.design.results.save.path" type="text" name="target_dir" placeholder="${_('Results location')}" class="pathChooser">
             </span>
+            % if app_name != 'impala':
+            <label class="radio" data-bind="visible: $root.design.results.save.type() == 'hdfs'">
+              <input data-bind="checked: $root.design.results.save.rerun" type="checkbox" name="rerun">
+              ${ _('Run an export query') }
+            </label>
+            % endif
           </div>
         </div>
       </fieldset>
@@ -1711,13 +1717,13 @@ $(document).on('error.query', function () {
     if (firstPos > -1) {
       selectedLine = $.trim(err.substring(err.indexOf(" ", firstPos), err.indexOf(":", firstPos))) * 1;
       errorWidgets.push(
-         codeMirror.addLineWidget(
-             selectedLine - 1,
-             $("<div>").addClass("editorError").html("<i class='fa fa-exclamation-circle'></i> " + err)[0], {
-                 coverGutter: true,
-                 noHScroll: true
-             }
-         )
+        codeMirror.addLineWidget(
+          selectedLine - 1,
+          $("<div>").addClass("editorError").html("<i class='fa fa-exclamation-circle'></i> " + err)[0], {
+            coverGutter: true,
+            noHScroll: true
+          }
+        )
       );
       $(el).hide();
     }
