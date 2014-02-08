@@ -55,7 +55,7 @@ from beeswax.views import collapse_whitespace
 from beeswax.test_base import make_query, wait_for_query_to_finish, verify_history, get_query_server_config,\
   HIVE_SERVER_TEST_PORT, fetch_query_result_data
 from beeswax.design import hql_query, strip_trailing_semicolon
-from beeswax.data_export import download
+from beeswax.data_export import upload
 from beeswax.models import SavedQuery, QueryHistory, HQL
 from beeswax.server import dbms
 from beeswax.server.dbms import QueryServerException
@@ -649,6 +649,15 @@ for x in sys.stdin:
     csv_resp = download(handle, 'csv', self.db)
     assert_equal(csv_resp.content.replace('.0', ''), dataset.csv.replace('.0', ''))
 
+  def test_data_upload(self):
+    hql = 'SELECT * FROM test'
+    query = hql_query(hql)
+
+    handle = self.db.execute_and_wait(query)
+    upload('/tmp/test_data_upload.csv', handle, self.db, self.cluster.fs)
+
+    assert_true(self.cluster.fs.exists('/tmp/test_data_upload.csv'))
+
   def test_designs(self):
     cli = self.client
 
@@ -837,12 +846,13 @@ for x in sys.stdin:
 
   def test_save_results_to_dir(self):
 
-    def save_and_verify(select_resp, target_dir, verify=True):
+    def save_and_verify(select_resp, target_dir, rerun=True, verify=True):
       content = json.loads(select_resp.content)
       qid = content['id']
       save_data = {
         'type': 'hdfs',
-        'path': target_dir
+        'path': target_dir,
+        'rerun': rerun
       }
       resp = self.client.post('/beeswax/api/query/%s/results/save' % qid, save_data, follow=True)
       content = json.loads(resp.content)
@@ -858,6 +868,12 @@ for x in sys.stdin:
         target_ls = self.cluster.fs.listdir(target_dir)
         assert_true(len(target_ls) >= 1)
         data_buf = ""
+
+        if not rerun:
+          assert_equal(len(target_ls), 1)
+          # filename is 'results'
+          assert_equal(target_ls[0], 'results')
+
         for target in target_ls:
           target_file = self.cluster.fs.open(target_dir + '/' + target)
           data_buf += target_file.read()
@@ -898,6 +914,14 @@ for x in sys.stdin:
     hql = "SELECT * FROM test_partitions"
     resp = _make_query(self.client, hql, wait=True, local=False, max=180.0)
     resp = save_and_verify(resp, TARGET_DIR_ROOT + '/3', verify=False)
+    resp = self.client.get(resp.success_url)
+    assert_true('File Browser' in resp.content, resp.content)
+
+    # SELECT columns. (Result dir is in /tmp.)
+    # Do not rerun
+    hql = "SELECT foo, bar FROM test"
+    resp = _make_query(self.client, hql, wait=True, local=False, max=180.0)
+    resp = save_and_verify(resp, TARGET_DIR_ROOT + '/4', rerun=False, verify=True)
     resp = self.client.get(resp.success_url)
     assert_true('File Browser' in resp.content, resp.content)
 

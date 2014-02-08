@@ -56,7 +56,8 @@ function BeeswaxViewModel(server) {
       'save': {
         'errors': null,
         'type': 'hive-table',
-        'path': null
+        'path': null,
+        'rerun': true
       }
     },
     'watch': {
@@ -733,7 +734,8 @@ function BeeswaxViewModel(server) {
         'database': self.database(),
         'server': self.server(),
         'type': self.design.results.save.type(),
-        'path': self.design.results.save.path()
+        'path': self.design.results.save.path(),
+        'rerun': self.design.results.save.rerun()
       };
       var url = '/' + self.server() + '/api/query/' + self.design.history.id() + '/results/save';
       var request = {
