@@ -588,11 +588,21 @@ ${ controls.decision_form(node_form, link_form, default_link_form, 'decision', T
  * Initialize the workflow, registry, modal, and import objects.
  */
  // Custom handlers for saving, loading, error checking, etc.
+function interpret_server_error(data, premessage) {
+  var message = premessage;
+  if (data) {
+    if (data.message) {
+      message += ": " + data.message;
+    }
+  }
+  return message;
+}
+
 function import_jobsub_load_success(data) {
   if (data.status == 0) {
     import_jobsub_action.initialize(data.data);
   } else {
-    $(document).trigger("error", "${ _('Received invalid response from server: ') } " + JSON.stringify(data));
+    $(document).trigger("error", interpret_server_error(data, "${ _('Received invalid response from server') } "));
   }
 }
 
@@ -600,29 +610,30 @@ function import_workflow_load_success(data) {
   if (data.status == 0) {
     import_workflow_action.initialize(data.data);
   } else {
-    $(document).trigger("error", "${ _('Received invalid response from server: ') } " + JSON.stringify(data));
+    $(document).trigger("error", interpret_server_error(data, "${ _('Received invalid response from server') } "));
   }
 }
 
 function workflow_save_success(data) {
-  $(document).trigger("info", "${ _('Workflow saved') }");
-  workflow.reload(data.data);
-  workflow.is_dirty( false );
-  workflow.loading(false);
-  $("#btn-save-wf").button('reset');
+  if (data.status != 0) {
+    $(document).trigger("error", interpret_server_error(data, "${ _('Could not save workflow') }"));
+  } else {
+    $(document).trigger("info", "${ _('Workflow saved') }");
+    workflow.reload(data.data);
+    workflow.is_dirty( false );
+    workflow.loading(false);
+    $("#btn-save-wf").button('reset');
+  }
 }
 
-function workflow_save_error(data) {
-  try {
-    if (data.status !== 400) {
-      throw Exception();
-    }
-    var response = $.parseJSON(data.responseText);
-    ko.mapping.fromJS(response.data.errors, workflow.errors);
-  } catch(err) {}
-  $(document).trigger("error", "${ _('Could not save workflow') }");
-  workflow.loading(false);
-  $("#btn-save-wf").button('reset');
+function workflow_save_error(jqXHR) {
+  if (jqXHR.status !== 400) {
+    $(document).trigger("error", interpret_server_error(jqXHR.responseJSON, "${ _('Could not save workflow') }"));
+  } else {
+    ko.mapping.fromJS(jqXHR.responseJSON.details.errors, workflow.errors);
+    workflow.loading(false);
+    $("#btn-save-wf").button('reset');
+  }
 }
 
 function workflow_read_only_handler() {
@@ -641,8 +652,14 @@ function workflow_load_success(data) {
     ko.applyBindings(kill_view_model, $('#editKill')[0]);
 
   } else {
-    $(document).trigger("error", "${ _('Received invalid response from server: ') }" + JSON.stringify(data));
+    $(document).trigger("error", interpret_server_error(data, "${ _('Error loading workflow') }"));
   }
+  workflow.loading(false);
+}
+
+function workflow_load_error(jqXHR) {
+  var data = jqXHR.responseJSON;
+  $(document).trigger("error", interpret_server_error(jqXHR.responseJSON, "${ _('Error loading workflow') }"));
   workflow.loading(false);
 }
 
@@ -698,7 +715,7 @@ import_workflow_action.fetchWorkflows({ success: import_workflow_load_success })
     }
   });
   workflow.loading(true);
-  workflow.load({ success: workflow_load_success });
+  workflow.load({ success: workflow_load_success, error: workflow_load_error });
 }
 
 /**
@@ -864,7 +881,7 @@ $('#importJobsub').on('click', '.action-row', function(e) {
           routie('editWorkflow');
           $(document).trigger("info", "${ _('Action imported at the top of the workflow.') } ");
         } else {
-          $(document).trigger("error", "${ _('Received invalid response from server: ') } " + JSON.stringify(data));
+          $(document).trigger("error", interpret_server_error(data, "${ _('Received invalid response from server') }"));
         }
       }
     });
@@ -886,7 +903,7 @@ $('#importOozie').on('click', '.action-row', function(e) {
           import_view_model.oozie().initialize({nodes: data.data.actions});
           routie('importAction/oozie');
         } else {
-          $(document).trigger("error", "${ _('Received invalid response from server: ') } " + JSON.stringify(data));
+          $(document).trigger("error", interpret_server_error(data, "${ _('Received invalid response from server') }"));
         }
       }
     });
@@ -903,7 +920,7 @@ $('#importOozieAction').on('click', '.action-row', function(e) {
 
     workflow.el.trigger('workflow:rebuild');
     routie('editWorkflow');
-    $(document).trigger("error", "${ _('Action imported at the top of the workflow.') } ");
+    $(document).trigger("info", "${ _('Action imported at the top of the workflow.') }");
   }
 });
 

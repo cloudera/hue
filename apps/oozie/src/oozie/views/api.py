@@ -17,11 +17,13 @@
 
 import json
 import logging
+import sys
 
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions import StructuredException
+from desktop.lib.i18n import force_unicode
 from desktop.models import Document
 
 from oozie.forms import WorkflowForm, NodeForm, design_form_by_type
@@ -33,6 +35,35 @@ from oozie.utils import model_to_dict, format_dict_field_values, format_field_va
 
 
 LOG = logging.getLogger(__name__)
+
+
+def error_handler(view_fn):
+  def decorator(request, *args, **kwargs):
+    try:
+      return view_fn(request, *args, **kwargs)
+    except Http404, e:
+      raise e
+    except StructuredException, e:
+      error_code = e.error_code
+      message = e.message
+      details = e.data or {}
+    except Exception, e:
+      error_code = 500
+      details = {}
+      (type, value, tb) = sys.exc_info()
+      if not hasattr(e, 'message') or not e.message:
+        message = str(e)
+      else:
+        message = force_unicode(e.message, strings_only=True, errors='replace')
+
+    response = {
+      'status': 1,
+      'message': message,
+      'details': details
+    }
+
+    return HttpResponse(json.dumps(response), mimetype="application/json", status=error_code)
+  return decorator
 
 
 def get_or_create_node(workflow, node_data, save=True):
@@ -265,6 +296,7 @@ def _workflow(request, workflow):
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
+@error_handler
 @check_job_access_permission(exception_class=(lambda x: StructuredException(code="UNAUTHORIZED_REQUEST_ERROR", message=x, data=None, error_code=401)))
 @check_job_edition_permission(exception_class=(lambda x: StructuredException(code="UNAUTHORIZED_REQUEST_ERROR", message=x, data=None, error_code=401)))
 def workflow_validate_node(request, workflow, node_type):
@@ -281,6 +313,7 @@ def workflow_validate_node(request, workflow, node_type):
 
 
 # Workflow and child links are SPECIAL.
+@error_handler
 @check_job_access_permission(exception_class=(lambda x: StructuredException(code="UNAUTHORIZED_REQUEST_ERROR", message=x, data=None, error_code=401)))
 @check_job_edition_permission(exception_class=(lambda x: StructuredException(code="UNAUTHORIZED_REQUEST_ERROR", message=x, data=None, error_code=401)))
 def workflow_save(request, workflow):
@@ -334,6 +367,7 @@ def workflow_save(request, workflow):
   return _workflow(request, workflow=workflow)
 
 
+@error_handler
 @check_job_access_permission(exception_class=(lambda x: StructuredException(code="UNAUTHORIZED_REQUEST_ERROR", message=x, data=None, error_code=401)))
 def workflow(request, workflow):
   if request.method != 'GET':
@@ -342,6 +376,7 @@ def workflow(request, workflow):
   return _workflow(request, workflow)
 
 
+@error_handler
 @check_job_access_permission(exception_class=(lambda x: StructuredException(code="UNAUTHORIZED_REQUEST_ERROR", message=x, data=None, error_code=401)))
 def workflow_actions(request, workflow):
   if request.method != 'GET':
@@ -357,6 +392,7 @@ def workflow_actions(request, workflow):
   return HttpResponse(json.dumps(response), mimetype="application/json")
 
 
+@error_handler
 def workflows(request):
   if request.method not in ['GET']:
     raise StructuredException(code="METHOD_NOT_ALLOWED_ERROR", message=_('Must be GET request.'), error_code=405)

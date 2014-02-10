@@ -131,7 +131,10 @@ $.extend(ForkNode.prototype, Node.prototype, {
     }
 
     var links = self.links().filter(function(element, index, arr) {
-      return self.registry.get(element.child()).node_type() != 'join';
+      var node = self.registry.get(element.child());
+      // If no node is found, it means that it's a temporary node that may be added to the graph.
+      // This will not be a join. It will most likely be a decision node.
+      return !node || node.node_type() != 'join';
     });
 
     if (links.length < 2) {
