@@ -326,11 +326,11 @@ ${layout.menubar(section='query')}
       </a>
       % endif
 
-      <a id="download-csv" data-bind="attr: {'href': '/beeswax/download/' + $root.design.history.id() + '/csv'}" href="javascript:void(0)" title="${_('Download the results in CSV format')}" rel="tooltip"
+      <a id="download-csv" data-bind="attr: {'href': '/${ app_name }/download/' + $root.design.history.id() + '/csv'}" href="javascript:void(0)" title="${_('Download the results in CSV format')}" rel="tooltip"
         class="view-query-results download hide pull-right"><h4 style="margin-right: 20px"><i class="fa fa-arrow-circle-o-down"></i></h4>
       </a>
 
-      <a id="download-excel" data-bind="attr: {'href': '/beeswax/download/' + $root.design.history.id() + '/xls'}" href="javascript:void(0)" title="${_('Download the results for excel')}" rel="tooltip"
+      <a id="download-excel" data-bind="attr: {'href': '/${ app_name }/download/' + $root.design.history.id() + '/xls'}" href="javascript:void(0)" title="${_('Download the results for excel')}" rel="tooltip"
         class="view-query-results download hide pull-right"><h4 style="margin-right: 20px"><i class="fa fa-arrow-circle-o-down"></i></h4></a>
    </div>
 
@@ -1900,7 +1900,7 @@ $(document).on('server.unmanageable_error', function (e, responseText) {
 // Other
 $(document).on('saved.design', function (e, id) {
   $(document).trigger('info', "${'Query saved.'}");
-  window.location.href = "/beeswax/execute/design/" + id;
+  window.location.href = "/${ app_name }/execute/design/" + id;
 });
 $(document).on('error_cancel.query', function (e, message) {
   $(document).trigger("error", "${ _('Problem: ') }" + message);
