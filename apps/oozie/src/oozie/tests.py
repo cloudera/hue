@@ -555,6 +555,25 @@ class TestAPI(OozieMockBase):
 
     assert_equal(0, test_response_json_object['status'])
 
+  def test_workflow_fail(self):
+    import oozie.views.api
+    old_method = oozie.views.api._workflow
+    def exception_method(*args, **kwargs):
+      logging.error( 'here' )
+      raise Exception("arg")
+    oozie.views.api._workflow = exception_method
+
+    try:
+      response = self.c.get(reverse('oozie:workflow', kwargs={'workflow': self.wf.pk}))
+      test_response_json = response.content
+      test_response_json_object = json.loads(test_response_json)
+
+      assert_equal(1, test_response_json_object['status'], test_response_json_object)
+      assert_equal('arg', test_response_json_object['message'], test_response_json_object)
+      assert_equal({}, test_response_json_object['details'], test_response_json_object)
+    finally:
+      oozie.views.api._workflow = old_method
+
   def test_workflow_validate_node(self):
     data = {"files":"[\"hive-site.xml\"]","job_xml":"hive-site.xml","description":"Show databases","workflow":17,"child_links":[{"comment":"","name":"ok","id":106,"parent":76,"child":74},{"comment":"","name":"error","id":107,"parent":76,"child":73}],"job_properties":"[{\"name\":\"oozie.hive.defaults\",\"value\":\"hive-site.xml\"}]","node_type":"hive","params":"[{\"value\":\"INPUT=/user/hue/oozie/workspaces/data\",\"type\":\"param\"}]","archives":"[]","node_ptr":76,"prepares":"[]","script_path":"hive.sql","id":76,"name":"Hive"}
     response = self.c.post(reverse('oozie:workflow_validate_node', kwargs={'workflow': self.wf.pk, 'node_type': 'hive'}), data={'node': json.dumps(data)}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
@@ -645,6 +664,25 @@ class TestAPI(OozieMockBase):
     assert_equal(0, response_json_dict['status'])
     assert_equal(0, len(response_json_dict['data']['workflows']))
 
+  def test_workflows_fail(self):
+    # Insert an exception
+    import oozie.utils
+    old_method = oozie.utils.model_to_dict
+    def exception_method(*args, **kwargs):
+      raise Exception("arg")
+    oozie.utils.model_to_dict = exception_method
+
+    try:
+      response = self.c.post(reverse('oozie:workflows') + "?managed=true", HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+      test_response_json = response.content
+      test_response_json_object = json.loads(test_response_json)
+
+      assert_equal(1, test_response_json_object['status'], test_response_json_object)
+      assert_equal("Must be GET request.", test_response_json_object['message'], test_response_json_object)
+      assert_equal({}, test_response_json_object['details'], test_response_json_object)
+    finally:
+      oozie.utils.model_to_dict = old_method
+
   def test_workflow_actions(self):
     response = self.c.get(reverse('oozie:workflow_actions', kwargs={'workflow': self.wf.pk}), HTTP_X_REQUESTED_WITH='XMLHttpRequest')
     response_json_dict = json.loads(response.content)
@@ -656,6 +694,25 @@ class TestAPI(OozieMockBase):
     response_json_dict = json.loads(response.content)
     assert_equal(0, response_json_dict['status'])
     assert_equal(3, len(response_json_dict['data']['actions']))
+
+  def test_workflow_actions_fail(self):
+    # Insert an exception
+    import oozie.utils
+    old_method = oozie.utils.model_to_dict
+    def exception_method(*args, **kwargs):
+      raise Exception("arg")
+    oozie.utils.model_to_dict = exception_method
+
+    try:
+      response = self.c.post(reverse('oozie:workflow_actions', kwargs={'workflow': self.wf.pk}), HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+      test_response_json = response.content
+      test_response_json_object = json.loads(test_response_json)
+
+      assert_equal(1, test_response_json_object['status'], test_response_json_object)
+      assert_equal("Must be GET request.", test_response_json_object['message'], test_response_json_object)
+      assert_equal({}, test_response_json_object['details'], test_response_json_object)
+    finally:
+      oozie.utils.model_to_dict = old_method
 
   def test_autocomplete(self):
     response = self.c.get(reverse('oozie:autocomplete_properties'))
