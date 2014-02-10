@@ -340,14 +340,18 @@ def massage_query_history_for_json(app_name, query_history):
   }
 
 def download(request, id, format):
-  assert format in common.DL_FORMATS
+  try:
+    query_history = authorized_get_query_history(request, id, must_exist=True)
+    db = dbms.get(request.user, query_history.get_query_server_config())
+    LOG.debug('Download results for query %s: [ %s ]' % (query_history.server_id, query_history.query))
 
-  query_history = authorized_get_query_history(request, id, must_exist=True)
-  db = dbms.get(request.user, query_history.get_query_server_config())
-  LOG.debug('Download results for query %s: [ %s ]' % (query_history.server_id, query_history.query))
-
-  return data_export.download(query_history.get_handle(), format, db)
-
+    return data_export.download(query_history.get_handle(), format, db)
+  except Exception, e:
+    if not hasattr(e, 'message') or not e.message:
+      message = e
+    else:
+      message = e.message
+    raise PopupException(message, detail='')
 
 """
 Queries Views
