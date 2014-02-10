@@ -72,12 +72,12 @@ ${layout.menubar(section='query')}
                     </div>
                     <div data-bind="css: {'error': $root.getSettingKeyErrors($index()).length > 0}" class="control-group">
                       <label>${_('Key')}</label>
-                      <input data-bind="value: key" type="text" class="settingsField span8" autocomplete="off" placeholder="mapred.reduce.tasks"/>
+                      <input data-bind="value: key" type="text" class="settingsField span8" autocomplete="off" placeholder="${ 'impala.resultset.cache.size' if app_name == 'impala' else 'mapred.reduce.tasks' }"/>
                     </div>
 
                     <div data-bind="css: {'error': $root.getSettingValueErrors($index()).length > 0}" class="control-group">
                       <label>${_('Value')}</label>
-                      <input data-bind="value: value" type="text" class="settingValuesField span8" placeholder="1"/>
+                      <input data-bind="value: value" type="text" class="settingValuesField span8" placeholder="${ '5000' if app_name == 'impala' else '1' }"/>
                     </div>
                   </div>
                   <!-- /ko -->

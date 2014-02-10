@@ -40,6 +40,8 @@ from beeswax.server.dbms import Table, NoSuchObjectException, DataTable,\
 
 LOG = logging.getLogger(__name__)
 
+IMPALA_RESULTSET_CACHE_SIZE = 'impala.resultset.cache.size'
+
 
 class HiveServerTable(Table):
   """
@@ -481,11 +483,14 @@ class HiveServerClient:
         for resource in query.get_configuration_statements():
           self.execute_statement(resource.strip())
 
-    configuration = self._get_query_configuration(query)
-    query_statement =  query.get_query_statement(statement)
+    configuration = {}
 
     if self.query_server['server_name'] == 'impala' and self.query_server['querycache_rows'] > 0:
-      configuration['impala.resultset.cache.size'] = str(self.query_server['querycache_rows'])
+      configuration[IMPALA_RESULTSET_CACHE_SIZE] = str(self.query_server['querycache_rows'])
+
+    # The query can override the default configuration
+    configuration.update(self._get_query_configuration(query))
+    query_statement = query.get_query_statement(statement)
 
     return self.execute_async_statement(statement=query_statement, confOverlay=configuration)
 
