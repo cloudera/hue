@@ -436,9 +436,6 @@ def view_results(request, id, first_row=0):
   # Update the status as expired should not be accessible
   # Impala does not support startover for now
   expired = state == models.QueryHistory.STATE.expired
-  if expired or app_name == 'impala':
-    state = models.QueryHistory.STATE.expired
-    query_history.save_state(state)
 
   # Retrieve query results or use empty result if no result set
   try:
@@ -832,7 +829,7 @@ def _get_query_handle_and_state(query_history):
 
   query_server = query_history.get_query_server_config()
 
-  if query_server['server_name'] == 'impala' and not handle.has_result_set:
+  if query_server['server_name'] == 'impala' and handle.has_result_set:
     state = QueryHistory.STATE.available
   else:
     state = dbms.get(query_history.owner, query_history.get_query_server_config()).get_state(handle)

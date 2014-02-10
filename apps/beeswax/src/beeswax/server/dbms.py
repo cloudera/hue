@@ -339,7 +339,7 @@ class HiveServer2Dbms(object):
 
 
   def execute_next_statement(self, query_history, hql_query):
-    if query_history.is_success():
+    if query_history.is_success() or query_history.is_expired():
       # We need to go to the next statement only if the previous one passed
       query_history.statement_number += 1
     else:

@@ -153,6 +153,9 @@ class QueryHistory(models.Model):
   def is_failure(self):
     return self.last_state in (QueryHistory.STATE.expired.index, QueryHistory.STATE.failed.index)
 
+  def is_expired(self):
+    return self.last_state in (QueryHistory.STATE.expired.index,)
+
   def set_to_running(self):
     self.last_state = QueryHistory.STATE.running.index
 

@@ -31,10 +31,10 @@ ${ commonheader(title, "", user, "40px") | n,unicode }
             <p>
 
               <div class="alert">
-      <p><strong>${message}</strong></p>
+      <p><strong>${ smart_unicode(message) }</strong></p>
 
       % if detail:
-        <p>${ detail }</p>
+        <p>${ smart_unicode(detail) }</p>
       % endif
 
     </div>
