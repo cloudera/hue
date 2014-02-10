@@ -336,6 +336,7 @@ def massage_query_history_for_json(app_name, query_history):
     'query': query_history.query,
     'timeInMs': time.mktime(query_history.submission_date.timetuple()),
     'timeFormatted': query_history.submission_date.strftime("%x %X"),
+    'designUrl': reverse(app_name + ':execute_design', kwargs={'design_id': query_history.design.id}),
     'resultsUrl': not query_history.is_failure() and reverse(app_name + ':watch_query_history', kwargs={'query_history_id': query_history.id}) or ""
   }
 

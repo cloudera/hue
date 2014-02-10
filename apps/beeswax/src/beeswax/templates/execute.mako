@@ -301,6 +301,7 @@ ${layout.menubar(section='query')}
             <table id="recentQueries" class="table table-striped table-condensed datatables" style="padding-left: 0;">
               <thead>
                 <tr>
+                  <th>&nbsp;</th>
                   <th>${_('Time')}</th>
                   <th>${_('Query')}</th>
                   <th>${_('Result')}</th>
@@ -911,8 +912,9 @@ $(document).ready(function () {
       "bInfo": false,
       "bFilter": false,
       "aoColumns": [
+        { "bSortable": false, "sWidth" : "1px" },
         { "sWidth" : "10%"},
-        { "sWidth" : "75%"},
+        { "sWidth" : "85%"},
         { "sWidth" : "5%", "bSortable": false }
       ],
       "aaSorting": [
@@ -940,9 +942,10 @@ $(document).ready(function () {
       if (data && data.queries) {
         $(data.queries).each(function(cnt, item){
           recentQueries.fnAddData([
+            (item.designUrl != "" ? '<a href="' + item.designUrl + '" data-row-selector="true">&nbsp;</a>': ''),
             '<span data-time="' + item.timeInMs + '">' + item.timeFormatted + '</span>',
             '<code style="cursor:pointer">' + item.query + '</code>',
-            (item.resultsUrl != "" ? '<a href="' + item.resultsUrl + '" data-row-selector="true">${_('See results...')}</a>': '')
+            (item.resultsUrl != "" ? '<a href="' + item.resultsUrl + '" data-row-selector-exclude="true">${_('See results...')}</a>': '')
           ]);
         });
       }
@@ -1228,7 +1231,10 @@ $(document).ready(function () {
     });
 
     var pos = cm.cursorCoords();
-    $("<i class='fa fa-spinner fa-spin CodeMirror-spinner'></i>").css("top", pos.top + "px").css("left", (pos.left - 4) + "px").appendTo($("body"));
+    if ($(".CodeMirror-spinner").length == 0){
+      $("<i class='fa fa-spinner fa-spin CodeMirror-spinner'></i>").appendTo($("body"));
+    }
+    $(".CodeMirror-spinner").css("top", pos.top + "px").css("left", (pos.left - 4) + "px").show();
 
     if ($.totalStorage('tables_' + viewModel.database()) == null) {
       CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
@@ -2051,7 +2057,6 @@ $(document).ready(function () {
 
   function queryPage() {
     queryPageComponents();
-    $('#recentSection').show();
     $('.resultsContainer').hide();
     $('.resultsContainer .watch-query').hide();
     $('.resultsContainer .view-query-results').hide();
