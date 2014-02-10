@@ -1392,11 +1392,30 @@ a#advanced-btn:hover {
   background-color: #338BB8;
   height: 28px;
   z-index: 1033;
-  min-width: 1100px;
+  min-width: 740px;
 }
 
 .navigator .brand {
   padding-top: 0 !important;
+}
+
+@media (max-width: 1180px) {
+  .navigator .nav-tabs > li > a, .navigator .nav-pills > li > a {
+    padding-right: 6px;
+    padding-left: 6px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .navigator .hideable {
+    display: none;
+  }
+}
+
+@media (max-width: 830px) {
+  .brand {
+    display: none;
+  }
 }
 
 .navbar-fixed-top {
