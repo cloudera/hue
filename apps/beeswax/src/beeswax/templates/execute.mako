@@ -882,9 +882,15 @@ $(document).ready(function () {
     axis: "y",
     drag: function(e, ui) {
       draggableHelper($(this), e, ui);
+      $(".jHueTableExtenderClonedContainer").hide();
     },
     stop: function(e, ui) {
+      $(".jHueTableExtenderClonedContainer").show();
       draggableHelper($(this), e, ui);
+      $(".resultTable").jHueTableExtender({
+         fixedHeader: true,
+         includeNavigator: false
+      });
     }
   });
 
@@ -977,7 +983,6 @@ $(document).ready(function () {
   resizeNavigator = function () {
     $("#navigator .card").css("min-height", ($(window).height() - 150) + "px");
     $("#navigatorTables").css("max-height", ($(window).height() - 280) + "px").css("overflow-y", "auto");
-    ##$("#recentQueries").css("max-height", ($(window).height() - 200) + "px").css("overflow-y", "auto");
   }
 
   resetNavigator = function () {
@@ -996,7 +1001,7 @@ $(document).ready(function () {
       $(data.split(" ")).each(function (cnt, table) {
         if ($.trim(table) != "") {
           var _table = $("<li>");
-          _table.html("<a href='#' class='pull-right'><i class='fa fa-list' title='" + "${ _('Preview Sample data') }" + "' style='margin-left:5px'></i></a><a href='/metastore/table/" + viewModel.database() + "/" + table + "' target='_blank' class='pull-right hide'><i class='fa fa-eye' title='" + "${ _('View in Metastore Browser') }" + "'></i></a><a href='#' title='" + table + "'><i class='fa fa-table'></i> " + table + "</a><ul class='unstyled'></ul>");
+          _table.html("<a href='javascript:void(0)' class='pull-right'><i class='fa fa-list' title='" + "${ _('Preview Sample data') }" + "' style='margin-left:5px'></i></a><a href='/metastore/table/" + viewModel.database() + "/" + table + "' target='_blank' class='pull-right hide'><i class='fa fa-eye' title='" + "${ _('View in Metastore Browser') }" + "'></i></a><a href='javascript:void(0)' title='" + table + "'><i class='fa fa-table'></i> " + table + "</a><ul class='unstyled'></ul>");
           _table.data("table", table).attr("id", "navigatorTables_" + table);
           _table.find("a:eq(2)").on("click", function () {
             _table.find(".fa-table").removeClass("fa-table").addClass("fa-spin").addClass("fa-spinner");
@@ -1006,7 +1011,7 @@ $(document).ready(function () {
               _table.find(".fa-spinner").removeClass("fa-spinner").removeClass("fa-spin").addClass("fa-table");
               $(extended_columns).each(function (iCnt, col) {
                 var _column = $("<li>");
-                _column.html("<a href='#' style='padding-left:10px'" + (col.comment != null && col.comment != "" ? " title='" + col.comment + "'" : "") + "><i class='fa fa-columns'></i> " + col.name + ($.trim(col.type) != "" ? " (" + $.trim(col.type) + ")" : "") + "</a>");
+                _column.html("<a href='javascript:void(0)' style='padding-left:10px'" + (col.comment != null && col.comment != "" ? " title='" + col.comment + "'" : "") + "><i class='fa fa-columns'></i> " + col.name + ($.trim(col.type) != "" ? " (" + $.trim(col.type) + ")" : "") + "</a>");
                 _column.appendTo(_table.find("ul"));
                 _column.on("dblclick", function () {
                   codeMirror.replaceSelection($.trim(col.name) + ', ');
@@ -1356,6 +1361,10 @@ $(document).ready(function () {
     if (CURRENT_CODEMIRROR_SIZE == 100 && codeMirror.lineCount() > 7){
       CURRENT_CODEMIRROR_SIZE = 270;
       codeMirror.setSize("99%", CURRENT_CODEMIRROR_SIZE);
+      $(".resultTable").jHueTableExtender({
+         fixedHeader: true,
+         includeNavigator: false
+      });
     }
   });
 
