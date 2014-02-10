@@ -25,6 +25,7 @@
         fixedHeader:false,
         firstColumnTooltip:false,
         hintElement:null,
+        includeNavigator: true,
         labels:{
           GO_TO_COLUMN:"Go to column:",
           PLACEHOLDER:"column name..."
@@ -60,13 +61,14 @@
 
   Plugin.prototype.resetSource = function() {
     var _this = this;
+    if (_this.options.includeNavigator){
+      var source = [];
+      $(this.element).find("th").each(function () {
+        source.push($(this).text());
+      });
 
-    var source = [];
-    $(this.element).find("th").each(function () {
-      source.push($(this).text());
-    });
-
-    $("#jHueTableExtenderNavigator").find("input").data('typeahead').source = source;
+      $("#jHueTableExtenderNavigator").find("input").data('typeahead').source = source;
+    }
   };
 
   Plugin.prototype.init = function () {
@@ -76,63 +78,64 @@
     }
 
     var _this = this;
+    if (_this.options.includeNavigator){
+      var jHueTableExtenderNavigator = $("<div>").attr("id", "jHueTableExtenderNavigator");
+      $("<a>").attr("href", "#").addClass("pull-right").html("&times;").click(function (e) {
+        e.preventDefault();
+        $(this).parent().hide();
+      }).appendTo(jHueTableExtenderNavigator);
+      $("<label>").html(_this.options.labels.GO_TO_COLUMN + " <input type=\"text\" placeholder=\"" + _this.options.labels.PLACEHOLDER + "\" />").appendTo(jHueTableExtenderNavigator);
 
-    var jHueTableExtenderNavigator = $("<div>").attr("id", "jHueTableExtenderNavigator");
-    $("<a>").attr("href", "#").addClass("pull-right").html("&times;").click(function (e) {
-      e.preventDefault();
-      $(this).parent().hide();
-    }).appendTo(jHueTableExtenderNavigator);
-    $("<label>").html(_this.options.labels.GO_TO_COLUMN + " <input type=\"text\" placeholder=\"" + _this.options.labels.PLACEHOLDER + "\" />").appendTo(jHueTableExtenderNavigator);
+      jHueTableExtenderNavigator.appendTo($("body"));
 
-    jHueTableExtenderNavigator.appendTo($("body"));
-
-    $(_this.element).find("tbody").click(function (event) {
-      if ($.trim(getSelection()) == "") {
-        window.setTimeout(function () {
-          $(".rowSelected").removeClass("rowSelected");
-          $(".columnSelected").removeClass("columnSelected");
-          $(".cellSelected").removeClass("cellSelected");
-          $(event.target.parentNode).addClass("rowSelected");
-          $(event.target.parentNode).find("td").addClass("rowSelected");
-          jHueTableExtenderNavigator
-              .css("left", (event.pageX + jHueTableExtenderNavigator.width() > $(window).width() - 10 ? event.pageX - jHueTableExtenderNavigator.width() - 10 : event.pageX) + "px")
-              .css("top", (event.pageY + 10) + "px").show();
-          jHueTableExtenderNavigator.find("input").focus();
-        }, 100);
-      }
-    });
-
-    var source = [];
-    $(_this.element).find("th").each(function () {
-      source.push($(this).text());
-    });
-
-    jHueTableExtenderNavigator.find("input").typeahead({
-      source:source,
-      updater:function (item) {
-        jHueTableExtenderNavigator.hide();
-        $(_this.element).find("tr td:nth-child(" + ($(_this.element).find("th:econtains(" + item + ")").index() + 1) + ")").addClass("columnSelected");
-        if (_this.options.firstColumnTooltip) {
-          $(_this.element).find("tr td:nth-child(" + ($(_this.element).find("th:econtains(" + item + ")").index() + 1) + ")").each(function () {
-            $(this).attr("rel", "tooltip").attr("title", "#" + $(this).parent().find("td:first-child").text()).tooltip({
-              placement:'left'
-            });
-          });
+      $(_this.element).find("tbody").click(function (event) {
+        if ($.trim(getSelection()) == "") {
+          window.setTimeout(function () {
+            $(".rowSelected").removeClass("rowSelected");
+            $(".columnSelected").removeClass("columnSelected");
+            $(".cellSelected").removeClass("cellSelected");
+            $(event.target.parentNode).addClass("rowSelected");
+            $(event.target.parentNode).find("td").addClass("rowSelected");
+            jHueTableExtenderNavigator
+                .css("left", (event.pageX + jHueTableExtenderNavigator.width() > $(window).width() - 10 ? event.pageX - jHueTableExtenderNavigator.width() - 10 : event.pageX) + "px")
+                .css("top", (event.pageY + 10) + "px").show();
+            jHueTableExtenderNavigator.find("input").focus();
+          }, 100);
         }
-        $(_this.element).parent().animate({
-          scrollLeft:$(_this.element).find("th:econtains(" + item + ")").position().left + $(_this.element).parent().scrollLeft() - $(_this.element).parent().offset().left - 30
-        }, 300);
-        $(_this.element).find("tr.rowSelected td:nth-child(" + ($(_this.element).find("th:econtains(" + item + ")").index() + 1) + ")").addClass("cellSelected");
-      }
-    });
+      });
 
-    $(_this.element).parent().bind("mouseleave", function () {
-      jHueTableExtenderNavigator.hide();
-    });
+      var source = [];
+      $(_this.element).find("th").each(function () {
+        source.push($(this).text());
+      });
 
-    jHueTableExtenderNavigator.bind("mouseenter", function (e) {
-      jHueTableExtenderNavigator.show();
-    });
+      jHueTableExtenderNavigator.find("input").typeahead({
+        source:source,
+        updater:function (item) {
+          jHueTableExtenderNavigator.hide();
+          $(_this.element).find("tr td:nth-child(" + ($(_this.element).find("th:econtains(" + item + ")").index() + 1) + ")").addClass("columnSelected");
+          if (_this.options.firstColumnTooltip) {
+            $(_this.element).find("tr td:nth-child(" + ($(_this.element).find("th:econtains(" + item + ")").index() + 1) + ")").each(function () {
+              $(this).attr("rel", "tooltip").attr("title", "#" + $(this).parent().find("td:first-child").text()).tooltip({
+                placement:'left'
+              });
+            });
+          }
+          $(_this.element).parent().animate({
+            scrollLeft:$(_this.element).find("th:econtains(" + item + ")").position().left + $(_this.element).parent().scrollLeft() - $(_this.element).parent().offset().left - 30
+          }, 300);
+          $(_this.element).find("tr.rowSelected td:nth-child(" + ($(_this.element).find("th:econtains(" + item + ")").index() + 1) + ")").addClass("cellSelected");
+        }
+      });
+
+      $(_this.element).parent().bind("mouseleave", function () {
+        jHueTableExtenderNavigator.hide();
+      });
+
+      jHueTableExtenderNavigator.bind("mouseenter", function (e) {
+        jHueTableExtenderNavigator.show();
+      });
+    }
 
     if (_this.options.hintElement != null) {
       var showAlertTimeout = -1;
