@@ -55,7 +55,7 @@ from beeswax.views import collapse_whitespace
 from beeswax.test_base import make_query, wait_for_query_to_finish, verify_history, get_query_server_config,\
   HIVE_SERVER_TEST_PORT, fetch_query_result_data
 from beeswax.design import hql_query, strip_trailing_semicolon
-from beeswax.data_export import upload
+from beeswax.data_export import upload, download
 from beeswax.models import SavedQuery, QueryHistory, HQL
 from beeswax.server import dbms
 from beeswax.server.dbms import QueryServerException
@@ -97,9 +97,9 @@ class TestBeeswaxWithHadoop(BeeswaxSampleProvider):
   requires_hadoop = True
 
   def setUp(self):
-    user = User.objects.get(username='test')
+    self.user = User.objects.get(username='test')
     add_to_group('test')
-    self.db = dbms.get(user, get_query_server_config())
+    self.db = dbms.get(self.user, get_query_server_config())
 
   def _verify_query_state(self, state):
     """
@@ -654,7 +654,7 @@ for x in sys.stdin:
     query = hql_query(hql)
 
     handle = self.db.execute_and_wait(query)
-    upload('/tmp/test_data_upload.csv', handle, self.db, self.cluster.fs)
+    upload('/tmp/test_data_upload.csv', handle, self.user, self.db, self.cluster.fs)
 
     assert_true(self.cluster.fs.exists('/tmp/test_data_upload.csv'))
 
