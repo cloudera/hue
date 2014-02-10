@@ -1208,7 +1208,7 @@ class SubWorkflow(Action):
 
 
 class Generic(Action):
-  PARAM_FIELDS = ('xml', 'credentials')
+  PARAM_FIELDS = ('xml', 'credentials', 'sla', 'credentials')
   node_type = 'generic'
 
   xml = models.TextField(default='', verbose_name=_t('XML of the custom action'),

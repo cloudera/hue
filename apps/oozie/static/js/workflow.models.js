@@ -681,7 +681,9 @@ $.extend(GenericModel.prototype, {
   node_type: 'generic',
   workflow: 0,
   xml: '',
-  child_links: []
+  child_links: [],
+  data: getDefaultData(),
+  initialize: initializeNodeData
 });
 
 function nodeModelChooser(node_type) {
