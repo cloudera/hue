@@ -182,7 +182,7 @@ $.extend(ForkNode.prototype, Node.prototype, {
       description: self.description(),
       node_type: 'decision',
       workflow: self.workflow(),
-      child_links: self.model.child_links
+      child_links: ko.mapping.toJS(self.child_links())
     });
     var default_link = {
       parent: decision_model.id,
