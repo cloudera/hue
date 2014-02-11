@@ -32,14 +32,14 @@ $.jHueTour({
     },
     {
       "name": "hiveheaders",
-      "desc": "${_("Create Hive tables and load quoted CSV data")}",
-      "path": "/hive",
+      "desc": "${_("Create Hive tables and load quoted")}<br/>${_("CSV data")}",
+      "path": "/beeswax",
       "video": "http://player.vimeo.com/video/80460405",
       "blog": "http://gethue.tumblr.com/post/68282571607/hadoop-tutorial-create-hive-tables-and-load-quoted-csv"
     },
     {
       "name": "fbooziesubmit",
-      "desc": "${_("Submit any Oozie jobs directly from HDFS")}",
+      "desc": "${_("Submit any Oozie jobs directly")}<br/>${_("from HDFS")}",
       "path": "/(oozie|filebrowser)",
       "video": "http://player.vimeo.com/video/80749790",
       "blog": "http://gethue.tumblr.com/post/68781982681/hadoop-tutorial-submit-any-oozie-jobs-directly-from"
@@ -67,14 +67,14 @@ $.jHueTour({
     },
     {
       "name": "sentry",
-      "desc": "${_("Hive Query editor with HiveServer2 and Sentry")}",
-      "path": "/(hive|impala)",
+      "desc": "${_("Hive Query editor with HiveServer2")}<br/>${_("and Sentry")}",
+      "path": "/(beeswax|impala)",
       "video": "http://player.vimeo.com/video/79883574",
       "blog": "http://gethue.tumblr.com/post/64916325309/hadoop-tutorial-hive-query-editor-with-hiveserver2-and"
     },
     {
       "name": "superproxy",
-      "desc": "${_("Integrate external Web applications in any language")}",
+      "desc": "${_("Integrate external Web applications in")}<br/>${_("any language")}",
       "path": "/about",
       "video": "http://player.vimeo.com/video/79178858",
       "blog": "http://gethue.tumblr.com/post/66367939672/integrate-external-web-applications-in-any-language"
