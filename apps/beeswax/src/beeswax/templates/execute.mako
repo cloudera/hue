@@ -1646,7 +1646,6 @@ function cleanResultsTable() {
 }
 
 function addResults(viewModel, dataTable, index, pageSize) {
-  var _scrollPos = $("#results .dataTables_wrapper").data("scrollPosition");
   if (viewModel.hasMoreResults() && index + pageSize > viewModel.design.results.rows().length) {
     $(document).one('fetched.results', function () {
       $.totalStorage("${app_name}_temp_query", null);
@@ -1655,15 +1654,6 @@ function addResults(viewModel, dataTable, index, pageSize) {
     viewModel.fetchResults();
   } else {
     dataTable.fnAddData(viewModel.design.results.rows.slice(index, index + pageSize));
-  }
-  if ($.browser.msie){
-    if (_scrollPos != null && typeof _scrollPos != "undefined"){
-      window.setTimeout(function(){
-        $("#results .dataTables_wrapper").scrollTop(_scrollPos);
-        $(".spinner").hide();
-        $("#results .dataTables_wrapper").animate({opacity: '1'}, 50);
-      }, 1000)
-    }
   }
 }
 
@@ -1712,18 +1702,17 @@ function resultsTable(e, data) {
     var pageSize = 100;
     var _scrollTimeout = -1;
     dataTableEl.on("scroll", function (e) {
+      var _lastScrollPosition = dataTableEl.data("scrollPosition") != null ? dataTableEl.data("scrollPosition") : 0;
       window.clearTimeout(_scrollTimeout);
       _scrollTimeout = window.setTimeout(function(){
         dataTableEl.data("scrollPosition", dataTableEl.scrollTop());
-        if (dataTableEl.scrollTop() + dataTableEl.outerHeight() + 20 > dataTableEl[0].scrollHeight && dataTable) {
+        if (_lastScrollPosition !=  dataTableEl.scrollTop() && dataTableEl.scrollTop() + dataTableEl.outerHeight() + 20 > dataTableEl[0].scrollHeight && dataTable) {
           dataTableEl.animate({opacity: '0.55'}, 200);
           $(".spinner").show();
           addResults(viewModel, dataTable, index, pageSize);
           index += pageSize;
-          if (typeof $.browser.msie == "undefined"){
-            $(".spinner").hide();
-            dataTableEl.animate({opacity: '1'}, 50);
-          }
+          $(".spinner").hide();
+          dataTableEl.animate({opacity: '1'}, 50);
         }
       }, 100);
     });

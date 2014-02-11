@@ -73,6 +73,7 @@
   function resizeScrollingTable(_this) {
     var el = _this.element;
     $(el).css("overflow-y", "").css("height", "");
+    $(el).css("overflow-x", "auto");
     var heightAfter = _this.options.heightAfterCorrection;
     $(el).nextAll(":visible").each(function () {
       heightAfter += $(this).outerHeight(true);
