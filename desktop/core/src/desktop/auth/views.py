@@ -103,7 +103,7 @@ def dt_login(request):
         if request.session.test_cookie_worked():
           request.session.delete_test_cookie()
 
-        if is_first_login_ever or backend_name == 'AllowAllBackend':
+        if is_first_login_ever or backend_name in ('AllowAllBackend', 'LdapBackend'):
           # Create home directory for first user.
           try:
             ensure_home_directory(request.fs, user.username)
