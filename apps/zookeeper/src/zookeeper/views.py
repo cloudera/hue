@@ -15,11 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-try:
-  import json
-except ImportError:
-  import simplejson as json
 
+import json
 import logging
 
 from django.http import Http404, HttpResponse
@@ -123,7 +120,10 @@ def tree(request, id, path):
 
 
 def delete(request, id, path):
+  if not request.user.is_superuser:
+    raise PopupException(_('You are not a superuser'))
   cluster = get_cluster_or_404(id)
+
   redir = {}
   if request.method == 'POST':
     zk = ZooKeeper(cluster['rest_url'])
@@ -134,10 +134,13 @@ def delete(request, id, path):
     redir = {
       'redirect': reverse('zookeeper:tree', kwargs={'id':id, 'path': path[:path.rindex('/')] or '/'})
     }
+
   return HttpResponse(json.dumps(redir), mimetype="application/json")
 
 
 def create(request, id, path):
+  if not request.user.is_superuser:
+    raise PopupException(_('You are not a superuser'))
   cluster = get_cluster_or_404(id)
 
   if request.method == 'POST':
@@ -161,6 +164,8 @@ def edit_as_base64(request, id, path):
   node = zk.get(path)
 
   if request.method == 'POST':
+    if not request.user.is_superuser:
+      raise PopupException(_('You are not a superuser'))
     form = EditZNodeForm(request.POST)
     if form.is_valid():
       # TODO is valid base64 string?
@@ -182,6 +187,8 @@ def edit_as_text(request, id, path):
   node = zk.get(path)
 
   if request.method == 'POST':
+    if not request.user.is_superuser:
+      raise PopupException(_('You are not a superuser'))
     form = EditZNodeForm(request.POST)
     if form.is_valid():
       zk.set(path, form.cleaned_data['data'])
