@@ -1409,6 +1409,16 @@ for x in sys.stdin:
     SavedQuery.objects.filter(name='my query history').delete()
 
 
+  def test_get_table_sample(self):
+    client = make_logged_in_client()
+
+    resp = client.get(reverse('beeswax:describe_table', kwargs={'database': 'default', 'table': 'test'}) + '?sample=true')
+
+    assert_equal(resp.status_code, 200)
+    assert_true('<th>foo</th>' in resp.content, resp.content)
+    assert_true([0, '0x0'] in resp.context['sample'], resp.context['sample'])
+
+
 def test_import_gzip_reader():
   """Test the gzip reader in create table"""
   # Make gzipped data

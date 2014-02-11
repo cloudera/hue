@@ -15,22 +15,21 @@
 ## limitations under the License.
 <%!
 from desktop.lib.i18n import smart_unicode
-from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
 
 % if sample is not None:
   % if error_message:
     <div class="alert alert-error">
-      <h3>${_('Error!')}</h3>
-      <pre>${error_message | h}</pre>
+      <h3>${ _('Error!') }</h3>
+      <pre>${ error_message | h }</pre>
     </div>
   % else:
   <table class="table table-striped table-condensed sampleTable">
     <thead>
       <tr>
         % for col in table.cols:
-          <th>${col.name}</th>
+          <th>${ col.name }</th>
         % endfor
       </tr>
     </thead>

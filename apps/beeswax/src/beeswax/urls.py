@@ -69,4 +69,6 @@ urlpatterns += patterns(
   url(r'^api/query/(?P<query_history_id>\d+)/close/?$', 'close_operation', name='api_close_operation'),
   url(r'^api/query/(?P<query_history_id>\d+)/results/save$', 'save_results', name='api_save_results'),
   url(r'^api/watch/json/(?P<id>\d+)$', 'watch_query_refresh_json', name='api_watch_query_refresh_json'),
+
+  url(r'^api/table/(?P<database>\w+)/(?P<table>\w+)$', 'describe_table', name='describe_table'),
 )

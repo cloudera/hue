@@ -1004,7 +1004,7 @@ $(document).ready(function () {
       $(data.split(" ")).each(function (cnt, table) {
         if ($.trim(table) != "") {
           var _table = $("<li>");
-          _table.html("<a href='javascript:void(0)' class='pull-right'><i class='fa fa-list' title='" + "${ _('Preview Sample data') }" + "' style='margin-left:5px'></i></a><a href='/metastore/table/" + viewModel.database() + "/" + table + "' target='_blank' class='pull-right hide'><i class='fa fa-eye' title='" + "${ _('View in Metastore Browser') }" + "'></i></a><a href='javascript:void(0)' title='" + table + "'><i class='fa fa-table'></i> " + table + "</a><ul class='unstyled'></ul>");
+          _table.html("<a href='javascript:void(0)' class='pull-right'><i class='fa fa-list' title='" + "${ _('Preview Sample data') }" + "' style='margin-left:5px'></i></a><a href='/${ app_name }/api/table/" + viewModel.database() + "/" + table + "' target='_blank' class='pull-right hide'><i class='fa fa-eye' title='" + "${ _('View in Metastore Browser') }" + "'></i></a><a href='javascript:void(0)' title='" + table + "'><i class='fa fa-table'></i> " + table + "</a><ul class='unstyled'></ul>");
           _table.data("table", table).attr("id", "navigatorTables_" + table);
           _table.find("a:eq(2)").on("click", function () {
             _table.find(".fa-table").removeClass("fa-table").addClass("fa-spin").addClass("fa-spinner");
@@ -1030,12 +1030,13 @@ $(document).ready(function () {
             codeMirror.focus();
           });
           _table.find("a:eq(0)").on("click", function () {
+            var tableUrl = "/${ app_name }/api/table/" + viewModel.database() + "/" + _table.data("table");
             $("#navigatorQuicklook").find(".tableName").text(table);
-            $("#navigatorQuicklook").find(".tableLink").attr("href", "/metastore/table/" + viewModel.database() + "/" + _table.data("table"));
+            $("#navigatorQuicklook").find(".tableLink").attr("href", tableUrl);
             $("#navigatorQuicklook").find(".sample").empty("");
             $("#navigatorQuicklook").attr("style", "width: " + ($(window).width() - 120) + "px;margin-left:-" + (($(window).width() - 80) / 2) + "px!important;");
             $.ajax({
-              url: "/metastore/table/" + viewModel.database() + "/" + _table.data("table"),
+              url: tableUrl,
               data: {"sample": true},
               beforeSend: function (xhr) {
                 xhr.setRequestHeader("X-Requested-With", "Hue");
@@ -1879,7 +1880,7 @@ function tryCancelQuery() {
 
 function createNewQuery() {
   $.totalStorage("${app_name}_temp_query", null);
-  location.href="${ url('beeswax:execute_query') }";
+  location.href="${ url(app_name + ':execute_query') }";
 }
 
 function checkLastDatabase(server, database) {

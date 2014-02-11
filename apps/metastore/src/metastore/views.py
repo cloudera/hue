@@ -24,17 +24,20 @@ from django.utils.functional import wraps
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 
+from desktop.context_processors import get_app_name
 from desktop.lib.django_util import render
 from desktop.lib.exceptions_renderable import PopupException
 
 from beeswax.design import hql_query
 from beeswax.models import SavedQuery, MetaInstall
 from beeswax.server import dbms
-
+from beeswax.server.dbms import get_query_server_config
 from metastore.forms import LoadDataForm, DbForm
 from metastore.settings import DJANGO_APPS
 
+
 LOG = logging.getLogger(__name__)
+
 SAVE_RESULTS_CTAS_TIMEOUT = 300         # seconds
 
 
@@ -131,7 +134,10 @@ def show_tables(request, database=None):
 
 
 def describe_table(request, database, table):
-  db = dbms.get(request.user)
+  app_name = get_app_name(request)
+  query_server = get_query_server_config(app_name)
+  db = dbms.get(request.user, query_server)
+
   error_message = ''
   table_data = ''
 
@@ -139,8 +145,9 @@ def describe_table(request, database, table):
     table = db.get_table(database, table)
   except Exception, e:
     raise PopupException(_("Hive Error"), detail=e)
+
   partitions = None
-  if table.partition_keys:
+  if app_name != 'impala' and table.partition_keys:
     partitions = db.get_partitions(database, table, max_parts=None)
 
   try:
