@@ -301,10 +301,10 @@ ${layout.menubar(section='query')}
             <table id="recentQueries" class="table table-striped table-condensed datatables" style="padding-left: 0;">
               <thead>
                 <tr>
-                  <th>&nbsp;</th>
                   <th>${_('Time')}</th>
                   <th>${_('Query')}</th>
                   <th>${_('Result')}</th>
+                  <th>&nbsp;</th>
                 </tr>
               </thead>
               <tbody>
@@ -373,7 +373,7 @@ ${layout.menubar(section='query')}
           </div>
           <table class="table table-striped table-condensed" cellpadding="0" cellspacing="0">
             <tbody data-bind="foreach: $root.design.results.columns">
-              <tr class="columnRow">
+              <tr class="columnRow" data-bind="visible: $index() > 0">
                 <td rel="columntooltip" data-placement="left" data-bind="attr: {title: 'Scroll the column \'' + $data.name + '\''}"><a href="javascript:void(0)" data-row-selector="true" class="column-selector" data-bind="text: $data.name"></a></td>
                 <td class="columnType" data-bind="text: $.trim($data.type)"></td>
               </tr>
@@ -394,7 +394,7 @@ ${layout.menubar(section='query')}
             <table class="table table-striped table-condensed resultTable" cellpadding="0" cellspacing="0" data-tablescroller-enforce-height="true">
               <thead>
               <tr data-bind="foreach: $root.design.results.columns">
-                <th data-bind="text: $data.name, css: { 'sort-numeric': isNumericColumn($data.type), 'sort-date': isDateTimeColumn($data.type), 'sort-string': isStringColumn($data.type)}"></th>
+                <th data-bind="html: ($index() == 0 ? '&nbsp;' : $data.name), css: { 'sort-numeric': isNumericColumn($data.type), 'sort-date': isDateTimeColumn($data.type), 'sort-string': isStringColumn($data.type)}"></th>
               </tr>
               </thead>
             </table>
@@ -912,10 +912,10 @@ $(document).ready(function () {
       "bInfo": false,
       "bFilter": false,
       "aoColumns": [
-        { "bSortable": false, "sWidth" : "1px" },
         { "sWidth" : "10%"},
         { "sWidth" : "85%"},
-        { "sWidth" : "5%", "bSortable": false }
+        { "sWidth" : "5%", "bSortable": false },
+        { "bSortable": false, "sWidth" : "4px" }
       ],
       "aaSorting": [
         [0, 'desc']
@@ -942,10 +942,10 @@ $(document).ready(function () {
       if (data && data.queries) {
         $(data.queries).each(function(cnt, item){
           recentQueries.fnAddData([
-            (item.designUrl != "" ? '<a href="' + item.designUrl + '" data-row-selector="true">&nbsp;</a>': ''),
             '<span data-time="' + item.timeInMs + '">' + item.timeFormatted + '</span>',
             '<code style="cursor:pointer">' + item.query + '</code>',
-            (item.resultsUrl != "" ? '<a href="' + item.resultsUrl + '" data-row-selector-exclude="true">${_('See results...')}</a>': '')
+            (item.resultsUrl != "" ? '<a href="' + item.resultsUrl + '" data-row-selector-exclude="true">${_('See results...')}</a>': ''),
+            (item.designUrl != "" ? '<a href="' + item.designUrl + '" data-row-selector="true">&nbsp;</a>': '')
           ]);
         });
       }
@@ -1564,11 +1564,13 @@ $(document).ready(function () {
       var _firstAllString, _firstAllNumeric;
       var _cols = viewModel.design.results.columns();
       $(_cols).each(function (cnt, col) {
-        if (_firstAllString == null && !isNumericColumn(col.type)) {
-          _firstAllString = cnt + 1;
-        }
-        if (_firstAllNumeric == null && isNumericColumn(col.type)) {
-          _firstAllNumeric = cnt + 1;
+        if (cnt > 0){
+          if (_firstAllString == null && !isNumericColumn(col.type)) {
+            _firstAllString = cnt + 1;
+          }
+          if (_firstAllNumeric == null && isNumericColumn(col.type)) {
+            _firstAllNumeric = cnt + 1;
+          }
         }
       });
 
@@ -1645,15 +1647,24 @@ function cleanResultsTable() {
   }
 }
 
+function addRowNumberToResults(data, startIndex) {
+  var _tmpdata = [];
+  $(data).each(function(cnt, item){
+    item.unshift(cnt + startIndex);
+    _tmpdata.push(item);
+  });
+  return _tmpdata;
+}
+
 function addResults(viewModel, dataTable, index, pageSize) {
   if (viewModel.hasMoreResults() && index + pageSize > viewModel.design.results.rows().length) {
     $(document).one('fetched.results', function () {
       $.totalStorage("${app_name}_temp_query", null);
-      dataTable.fnAddData(viewModel.design.results.rows.slice(index, index + pageSize));
+      dataTable.fnAddData(addRowNumberToResults(viewModel.design.results.rows.slice(index, index + pageSize), index));
     });
     viewModel.fetchResults();
   } else {
-    dataTable.fnAddData(viewModel.design.results.rows.slice(index, index + pageSize));
+    dataTable.fnAddData(addRowNumberToResults(viewModel.design.results.rows.slice(index, index + pageSize), index));
   }
 }
 
@@ -1670,9 +1681,11 @@ function resultsTable(e, data) {
         "sZeroRecords": "${_('No matching records')}"
       },
       "fnDrawCallback": function (oSettings) {
-        reinitializeTable();
+        $(".resultTable").jHueTableExtender({
+          fixedHeader: true,
+          includeNavigator: false
+        });
       },
-
       "aoColumnDefs": [
         {
           "sType": "numeric",
@@ -1692,7 +1705,9 @@ function resultsTable(e, data) {
     reinitializeTable();
     var _options = '<option value="-1">${ _("Please select a column")}</option>';
     $(viewModel.design.results.columns()).each(function(cnt, item){
-      _options += '<option value="'+(cnt + 1)+'">'+ item.name +'</option>';
+      if (cnt > 0){
+        _options += '<option value="'+(cnt + 1)+'">'+ item.name +'</option>';
+      }
     });
     $(".blueprintSelect").html(_options);
 
@@ -1708,10 +1723,8 @@ function resultsTable(e, data) {
         dataTableEl.data("scrollPosition", dataTableEl.scrollTop());
         if (_lastScrollPosition !=  dataTableEl.scrollTop() && dataTableEl.scrollTop() + dataTableEl.outerHeight() + 20 > dataTableEl[0].scrollHeight && dataTable) {
           dataTableEl.animate({opacity: '0.55'}, 200);
-          $(".spinner").show();
           addResults(viewModel, dataTable, index, pageSize);
           index += pageSize;
-          $(".spinner").hide();
           dataTableEl.animate({opacity: '1'}, 50);
         }
       }, 100);
