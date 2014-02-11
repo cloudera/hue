@@ -350,7 +350,8 @@ function BeeswaxViewModel(server) {
         self.updateDatabases(data.databases);
         $(document).trigger('fetched.databases', [data]);
       },
-      error: error_fn
+      error: error_fn,
+      cache: false
     };
     $.ajax(request);
   };
@@ -367,7 +368,8 @@ function BeeswaxViewModel(server) {
         self.database(data.design.database);
         $(document).trigger('fetched.design', [data]);
       },
-      error: error_fn
+      error: error_fn,
+      cache: false
     };
     $.ajax(request);
   };
@@ -384,7 +386,8 @@ function BeeswaxViewModel(server) {
         self.database(data.query_history.database);
         $(document).trigger('fetched.query', [data]);
       },
-      error: error_fn
+      error: error_fn,
+      cache: false
     };
     $.ajax(request);
   };
@@ -411,7 +414,8 @@ function BeeswaxViewModel(server) {
         $(document).trigger('fetched.parameters');
       },
       error: error_fn,
-      data: data
+      data: data,
+      cache: false
     };
     $.ajax(request);
   };
@@ -451,7 +455,8 @@ function BeeswaxViewModel(server) {
         self.design.isRunning(false);
       },
       error: error_fn,
-      data: data
+      data: data,
+      cache: false
     };
     $.ajax(request);
   };
@@ -497,7 +502,8 @@ function BeeswaxViewModel(server) {
         }
       },
       error: error_fn,
-      data: data
+      data: data,
+      cache: false
     };
     $.ajax(request);
   };
@@ -533,7 +539,8 @@ function BeeswaxViewModel(server) {
         }
       },
       error: error_fn,
-      data: data
+      data: data,
+      cache: false
     };
     $.ajax(request);
   };
@@ -564,7 +571,8 @@ function BeeswaxViewModel(server) {
           $(document).trigger('server.unmanageable_error', jqXHR.responseText);
         }
       },
-      data: data
+      data: data,
+      cache: false
     };
     $.ajax(request);
   };
@@ -645,7 +653,8 @@ function BeeswaxViewModel(server) {
         }
         $(document).trigger('fetched.results', [data]);
       },
-      error: error_fn
+      error: error_fn,
+      cache: false
     };
     $.ajax(request);
   };
@@ -682,7 +691,8 @@ function BeeswaxViewModel(server) {
         error: function() {
           $(document).trigger('error_save.design');
         },
-        data: data
+        data: data,
+        cache: false
       };
       $.ajax(request);
     }
@@ -725,7 +735,8 @@ function BeeswaxViewModel(server) {
           $(document).trigger('error_close.results');
         },
         data: data,
-        async: false // for multi query
+        async: false, // for multi query
+        cache: false
       };
       $.ajax(request);
     }
@@ -770,7 +781,8 @@ function BeeswaxViewModel(server) {
           self.design.results.save.errors(data);
           $(document).trigger('error_save.results');
         },
-        data: data
+        data: data,
+        cache: false
       };
       $.ajax(request);
     }
