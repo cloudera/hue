@@ -250,7 +250,7 @@ class HiveServer2Dbms(object):
     if result_meta.in_tablename:
       self.use(database)
 
-      hql = 'CREATE TABLE `%s.%s` AS %s' % (target_database, target_table, design.query['query'])
+      hql = 'CREATE TABLE %s.%s AS %s' % (target_database, target_table, design.query['query'])
       query_history = self.execute_statement(hql)
     else:
       # Case 2: The results are in some temporary location

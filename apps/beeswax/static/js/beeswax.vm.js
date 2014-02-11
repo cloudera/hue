@@ -57,7 +57,7 @@ function BeeswaxViewModel(server) {
         'errors': null,
         'type': 'hive-table',
         'path': null,
-        'rerun': true
+        'rerun': false
       }
     },
     'watch': {
