@@ -41,6 +41,7 @@ from beeswax.views import authorized_get_design, authorized_get_query_history, m
                           safe_get_design, save_design, massage_columns_for_json, _get_query_handle_and_state,\
                           _parse_out_hadoop_jobs
 from desktop.lib.i18n import force_unicode
+from desktop.lib.exceptions_renderable import PopupException
 
 
 LOG = logging.getLogger(__name__)
@@ -483,6 +484,15 @@ def query_history_to_dict(request, query_history):
     query_history_dict['design'] = design_to_dict(query_history.design)
 
   return query_history_dict
+
+
+# Proxy API for Metastore App
+def describe_table(request, database, table):
+  try:
+    from metastore.views import describe_table
+    return describe_table(request, database, table)
+  except Exception, e:
+    raise PopupException(_('Problem accessing table metadata'), detail=e)
 
 
 def get_query_form(request):
