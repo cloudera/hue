@@ -17,9 +17,9 @@
 # limitations under the License.
 
 import json
+import ldap
 import re
 import urllib
-import ldap
 
 from nose.plugins.attrib import attr
 from nose.tools import assert_true, assert_equal, assert_false
@@ -54,6 +54,7 @@ def reset_all_groups():
   useradmin.conf.DEFAULT_USER_GROUP.set_for_testing(None)
   for grp in Group.objects.all():
     grp.delete()
+
 
 class LdapTestConnection(object):
   """
