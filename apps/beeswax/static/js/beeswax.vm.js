@@ -439,6 +439,7 @@ function BeeswaxViewModel(server) {
       success: function(data) {
         if (data.status == 0) {
           self.design.watch.logs.removeAll();
+          self.design.statement(data.statement);
           self.design.results.rows.removeAll();
           self.design.results.columns.removeAll();
           self.design.results.explanation(data.explanation);
