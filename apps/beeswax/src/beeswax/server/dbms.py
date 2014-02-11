@@ -435,8 +435,8 @@ class HiveServer2Dbms(object):
     return self.execute_statement(hql)
 
 
-  def explain(self, statement):
-    return self.client.explain(statement)
+  def explain(self, query):
+    return self.client.explain(query)
 
 
   def getStatus(self):

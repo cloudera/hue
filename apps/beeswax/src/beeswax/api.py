@@ -229,7 +229,8 @@ def explain_directly(request, query, design, query_server):
 
   response = {
     'status': 0,
-    'explanation': explanation.textual
+    'explanation': explanation.textual,
+    'statement': query.get_query_statement(0),
   }
 
   return HttpResponse(json.dumps(response), mimetype="application/json")
