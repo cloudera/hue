@@ -169,7 +169,7 @@ function BeeswaxViewModel(server) {
       self.addSetting(setting.key, setting.value);
     });
     $.each(design.file_resources, function(index, file_resource) {
-      self.addFileResources(file_resource.type, file_resource.path);
+      self.addFileResource(file_resource.type, file_resource.path);
     });
     $.each(design.functions, function(index, _function) {
       self.addFunction(_function.name, _function.class_name);
