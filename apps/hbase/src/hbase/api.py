@@ -44,7 +44,10 @@ class HbaseApi(object):
       cluster = args[0]
       return self.queryCluster(action, cluster, *args[1:])
     except Exception, e:
-      raise PopupException(_("Api Error: %s") % e.message)
+      if 'Could not connect to' in e.message:
+        raise PopupException(_("HBase Thrift 1 server cannot be contacted: %s") % e.message)
+      else:
+        raise PopupException(_("Api Error: %s") % e.message)
 
   def queryCluster(self, action, cluster, *args):
     client = self.connectCluster(cluster)
