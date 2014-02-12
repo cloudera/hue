@@ -635,8 +635,11 @@ ${layout.menubar(section='query')}
 <div id="navigatorQuicklook" class="modal hide fade">
   <div class="modal-header">
     <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <a class="tableLink pull-right" href="#" target="_blank" style="margin-right: 20px;margin-top:6px"><i
-        class="fa fa-external-link"></i> ${ _('View in Metastore Browser') }</a>
+    % if has_metastore:
+    <a class="tableLink pull-right" href="#" target="_blank" style="margin-right: 20px;margin-top:6px">
+      <iclass="fa fa-external-link"></i> ${ _('View in Metastore Browser') }
+    </a>
+    % endif
 
     <h3>${_('Data sample for')} <span class="tableName"></span></h3>
   </div>
@@ -1004,7 +1007,12 @@ $(document).ready(function () {
       $(data.split(" ")).each(function (cnt, table) {
         if ($.trim(table) != "") {
           var _table = $("<li>");
-          _table.html("<a href='javascript:void(0)' class='pull-right'><i class='fa fa-list' title='" + "${ _('Preview Sample data') }" + "' style='margin-left:5px'></i></a><a href='/${ app_name }/api/table/" + viewModel.database() + "/" + table + "' target='_blank' class='pull-right hide'><i class='fa fa-eye' title='" + "${ _('View in Metastore Browser') }" + "'></i></a><a href='javascript:void(0)' title='" + table + "'><i class='fa fa-table'></i> " + table + "</a><ul class='unstyled'></ul>");
+          var metastore_link = "";
+          % if has_metastore:
+            metastore_link = "<i class='fa fa-eye' title='" + "${ _('View in Metastore Browser') }" + "'></i></a>";
+          % endif
+          _table.html("<a href='javascript:void(0)' class='pull-right'><i class='fa fa-list' title='" + "${ _('Preview Sample data') }" + "' style='margin-left:5px'></i></a><a href='/metastore/table/" + viewModel.database() + "/" + table + "' target='_blank' class='pull-right hide'>" + metastore_link + "<a href='javascript:void(0)' title='" + table + "'><i class='fa fa-table'></i> " + table + "</a><ul class='unstyled'></ul>");
+
           _table.data("table", table).attr("id", "navigatorTables_" + table);
           _table.find("a:eq(2)").on("click", function () {
             _table.find(".fa-table").removeClass("fa-table").addClass("fa-spin").addClass("fa-spinner");
