@@ -26,14 +26,14 @@ from oozie.tests import OozieMockBase
 LOG = logging.getLogger(__name__)
 
 
-class MockFs():
+class MockFs(object):
   def __init__(self, logical_name=None):
 
     self.fs_defaultfs = 'hdfs://curacao:8020'
     self.logical_name = logical_name if logical_name else ''
 
 
-class MockJt():
+class MockJt(object):
   def __init__(self, logical_name=None):
 
     self.logical_name = logical_name if logical_name else ''
