@@ -1234,6 +1234,37 @@ $(document).ready(function () {
     }
   };
 
+  function split_statements(hql) {
+    var statements = [];
+    var current = "";
+    var prev = "";
+    var between_quotes = null;
+    for (var i = 0, len = hql.length; i < len; i++) {
+      var c = hql[i];
+      current += c;
+      if ($.inArray(c, ['"', "'"]) > -1 && prev != "\\") {
+        if (between_quotes == c) {
+          between_quotes = null;
+        }
+        else if (between_quotes == null) {
+          between_quotes = c;
+        }
+      }
+      else if (c == ";") {
+        if (between_quotes == null) {
+          statements.push(current);
+          current = "";
+        }
+      }
+      prev = c;
+    }
+
+    if (current != "" && current != ";") {
+      statements.push(current);
+    }
+    return statements;
+  }
+
   CodeMirror.commands.autocomplete = function (cm) {
     $(document.body).on("contextmenu", function (e) {
       e.preventDefault(); // prevents native menu on FF for Mac from being shown
@@ -1253,7 +1284,10 @@ $(document).ready(function () {
     else {
       hac_getTables(viewModel.database(), function (tables) {
         CodeMirror.catalogTables = tables;
-        var _before = codeMirror.getRange({line: 0, ch: 0}, {line: codeMirror.getCursor().line, ch: codeMirror.getCursor().ch}).replace(/(\r\n|\n|\r)/gm, " ");
+        var _beforeArr = split_statements(codeMirror.getRange({line: 0, ch: 0}, {line: codeMirror.getCursor().line, ch: codeMirror.getCursor().ch}).replace(/(\r\n|\n|\r)/gm, " "));
+        var _before = (_beforeArr.length > 0)?_beforeArr[_beforeArr.length - 1].replace(/;+$/, ""):"";
+        var _afterArr = split_statements(codeMirror.getRange({line: codeMirror.getCursor().line, ch: codeMirror.getCursor().ch}, {line: 10000, ch: 10000}).replace(/(\r\n|\n|\r)/gm, " "));
+        var _after = (_afterArr.length > 0)?_afterArr[0].replace(/;+$/, ""):"";
         CodeMirror.possibleTable = false;
         CodeMirror.tableFieldMagic = false;
         if (_before.toUpperCase().indexOf(" FROM ") > -1 && _before.toUpperCase().indexOf(" ON ") == -1 && _before.toUpperCase().indexOf(" WHERE ") == -1 ||
@@ -1262,8 +1296,9 @@ $(document).ready(function () {
         }
         CodeMirror.possibleSoloField = false;
         if (_before.toUpperCase().indexOf("SELECT ") > -1 && _before.toUpperCase().indexOf(" FROM ") == -1 && !CodeMirror.fromDot) {
-          if (codeMirror.getValue().toUpperCase().indexOf("FROM ") > -1) {
-            fieldsAutocomplete(cm);
+
+          if (_after.toUpperCase().indexOf("FROM ") > -1) {
+            fieldsAutocomplete(cm, _after);
           }
           else {
             CodeMirror.tableFieldMagic = true;
@@ -1271,8 +1306,8 @@ $(document).ready(function () {
           }
         }
         else {
-          if (_before.toUpperCase().indexOf("WHERE ") > -1 && !CodeMirror.fromDot && _before.match(/ON|GROUP|SORT/) == null) {
-            fieldsAutocomplete(cm);
+          if (_before.toUpperCase().indexOf("WHERE ") > -1 && !CodeMirror.fromDot && _before.toUpperCase().match(/ ON| GROUP| SORT/) == null) {
+            fieldsAutocomplete(cm, _before);
           }
           else {
             CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
@@ -1282,10 +1317,10 @@ $(document).ready(function () {
     }
   }
 
-  function fieldsAutocomplete(cm) {
+  function fieldsAutocomplete(cm, value) {
     CodeMirror.possibleSoloField = true;
     try {
-      var _possibleTables = $.trim(codeMirror.getValue(" ").substr(codeMirror.getValue().toUpperCase().indexOf("FROM ") + 4)).split(" ");
+      var _possibleTables = $.trim(value.substr(value.toUpperCase().indexOf("FROM ") + 4)).split(" ");
       var _foundTable = "";
       for (var i = 0; i < _possibleTables.length; i++) {
         if ($.trim(_possibleTables[i]) != "" && _foundTable == "") {
@@ -1293,12 +1328,12 @@ $(document).ready(function () {
         }
       }
       if (_foundTable != "") {
-        if (hac_tableHasAlias(_foundTable, codeMirror.getValue())) {
+        if (hac_tableHasAlias(_foundTable, value)) {
           CodeMirror.possibleSoloField = false;
           CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
         }
         else {
-          hac_getTableColumns(viewModel.database(), _foundTable, codeMirror.getValue(),
+          hac_getTableColumns(viewModel.database(), _foundTable, value,
               function (columns) {
                 CodeMirror.catalogFields = columns;
                 CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
@@ -1335,7 +1370,7 @@ $(document).ready(function () {
           var _partial = _line.substring(0, codeMirror.getCursor().ch);
           var _table = _partial.substring(_partial.lastIndexOf(" ") + 1, _partial.length - 1);
           if (codeMirror.getValue().toUpperCase().indexOf("FROM") > -1) {
-            hac_getTableColumns(viewModel.database(), _table, codeMirror.getValue(), function (columns) {
+            hac_getTableColumns(viewModel.database(), _table, codeMirror.getRange({line: codeMirror.getCursor().line, ch: codeMirror.getCursor().ch}, {line: 10000, ch: 10000}), function (columns) {
               var _cols = columns.split(" ");
               for (var col in _cols) {
                 _cols[col] = "." + _cols[col];

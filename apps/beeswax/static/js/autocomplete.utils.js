@@ -47,7 +47,7 @@ function hac_getTableAliases(textScanned) {
   var _val = textScanned; //codeMirror.getValue();
   var _from = _val.toUpperCase().indexOf("FROM ");
   if (_from > -1) {
-    var _match = _val.toUpperCase().substring(_from).match(/ON|WHERE|GROUP|SORT/);
+    var _match = _val.toUpperCase().substring(_from).match(/ ON| WHERE| GROUP| SORT|;/);
     var _to = _val.length;
     if (_match) {
       _to = _match.index;
