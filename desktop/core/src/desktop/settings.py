@@ -208,9 +208,13 @@ appmanager.load_libs()
 _lib_conf_modules = [dict(module=app.conf, config_key=None) for app in appmanager.DESKTOP_LIBS if app.conf is not None]
 LOCALE_PATHS.extend([app.locale_path for app in appmanager.DESKTOP_LIBS])
 
+# Load desktop config
+_desktop_conf_modules = [dict(module=desktop.conf, config_key=None)]
+conf.initialize(_desktop_conf_modules, _config_dir)
+
 # Activate l10n
 # Install apps
-appmanager.load_apps()
+appmanager.load_apps(desktop.conf.APP_BLACKLIST.get())
 for app in appmanager.DESKTOP_APPS:
   INSTALLED_APPS.extend(app.django_apps)
   LOCALE_PATHS.append(app.locale_path)
@@ -220,7 +224,6 @@ logging.debug("Installed Django modules: %s" % ",".join(map(str, appmanager.DESK
 
 # Load app configuration
 _app_conf_modules = [dict(module=app.conf, config_key=app.config_key) for app in appmanager.DESKTOP_APPS if app.conf is not None]
-_app_conf_modules.append(dict(module=desktop.conf, config_key=None))
 
 conf.initialize(_lib_conf_modules, _config_dir)
 conf.initialize(_app_conf_modules, _config_dir)

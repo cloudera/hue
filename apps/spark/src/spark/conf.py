@@ -50,9 +50,9 @@ def get_spark_status(user):
 def config_validator(user):
   res = []
 
-#  status = get_spark_status(user)
-#
-#  if status != 'OK':
-#    res.append((NICE_NAME, _("The app won't work without a running Job Server")))
+  status = get_spark_status(user)
+
+  if status != 'OK':
+    res.append((NICE_NAME, _("The app won't work without a running Job Server")))
 
   return res

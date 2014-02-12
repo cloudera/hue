@@ -134,6 +134,13 @@ REDIRECT_WHITELIST = Config(
   type=list_of_compiled_res(skip_empty=True),
   default='')
 
+APP_BLACKLIST = Config(
+  key='app_blacklist',
+  default='',
+  type=coerce_csv,
+  help=_('Comma separated list of apps to not load at server startup.')
+)
+
 def is_https_enabled():
   return bool(SSL_CERTIFICATE.get() and SSL_PRIVATE_KEY.get())
 
