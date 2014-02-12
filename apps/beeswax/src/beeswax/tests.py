@@ -846,15 +846,14 @@ for x in sys.stdin:
 
   def test_save_results_to_dir(self):
 
-    def save_and_verify(select_resp, target_dir, rerun=True, verify=True):
+    def save_and_verify(select_resp, target_dir, verify=True):
       content = json.loads(select_resp.content)
       qid = content['id']
       save_data = {
-        'type': 'hdfs',
-        'path': target_dir,
-        'rerun': rerun
+        'type': 'hdfs-directory',
+        'path': target_dir
       }
-      resp = self.client.post('/beeswax/api/query/%s/results/save' % qid, save_data, follow=True)
+      resp = self.client.post('/beeswax/api/query/%s/results/save/hdfs/directory' % qid, save_data, follow=True)
       content = json.loads(resp.content)
 
       if content['status'] == 0:
@@ -869,10 +868,8 @@ for x in sys.stdin:
         assert_true(len(target_ls) >= 1)
         data_buf = ""
 
-        if not rerun:
-          assert_equal(len(target_ls), 1)
-          # filename is 'results'
-          assert_equal(target_ls[0], 'results')
+
+        assert_equal(len(target_ls), 1)
 
         for target in target_ls:
           target_file = self.cluster.fs.open(target_dir + '/' + target)
@@ -884,12 +881,12 @@ for x in sys.stdin:
 
       return resp
 
-    TARGET_DIR_ROOT = '/tmp/beeswax.test_save_results'
+    TARGET_DIR_ROOT = '/tmp/beeswax.test_save_directory_results'
+
+    # Already existing dir
     if not self.cluster.fs.exists(TARGET_DIR_ROOT):
       self.cluster.fs.mkdir(TARGET_DIR_ROOT)
       self.cluster.fs.chown(TARGET_DIR_ROOT, user='test')
-
-    # Already existing dir
     hql = "SELECT * FROM test"
     resp = _make_query(self.client, hql, wait=True, local=False, max=180.0)
     resp = save_and_verify(resp, TARGET_DIR_ROOT, verify=False)
@@ -917,11 +914,63 @@ for x in sys.stdin:
     resp = self.client.get(resp.success_url)
     assert_true('File Browser' in resp.content, resp.content)
 
+
+  def test_save_results_to_file(self):
+
+    def save_and_verify(select_resp, target_file, overwrite=True, verify=True):
+      content = json.loads(select_resp.content)
+      qid = content['id']
+      save_data = {
+        'type': 'hdfs',
+        'path': target_file,
+        'overwrite': overwrite
+      }
+      resp = self.client.post('/beeswax/api/query/%s/results/save/hdfs/file' % qid, save_data, follow=True)
+      content = json.loads(resp.content)
+
+      if content['status'] == 0:
+        success_url = content['success_url']
+        resp = self.client.get(content['watch_url'], follow=True)
+        resp = wait_for_query_to_finish(self.client, resp, max=60)
+        resp.success_url = success_url # Hack until better API
+
+      # Check that data is right
+      if verify:
+        assert_true(self.cluster.fs.exists(target_file))
+        assert_true(self.cluster.fs.isfile(target_file))
+        data_buf = ""
+
+        _file = self.cluster.fs.open(target_file)
+        data_buf += _file.read()
+        _file.close()
+
+        assert_equal(256, len(data_buf.strip().split('\n')))
+        assert_true('255' in data_buf)
+
+      return resp
+
+    TARGET_FILE = '/tmp/beeswax.test_save_file_results'
+    if self.cluster.fs.exists(TARGET_FILE):
+      self.cluster.fs.rmtree(TARGET_FILE)
+
     # SELECT columns. (Result dir is in /tmp.)
-    # Do not rerun
     hql = "SELECT foo, bar FROM test"
     resp = _make_query(self.client, hql, wait=True, local=False, max=180.0)
-    resp = save_and_verify(resp, TARGET_DIR_ROOT + '/4', rerun=False, verify=True)
+    resp = save_and_verify(resp, TARGET_FILE)
+    resp = self.client.get(resp.success_url)
+    assert_true('File Browser' in resp.content, resp.content)
+
+    # overwrite = false
+    hql = "SELECT foo, bar FROM test"
+    resp = _make_query(self.client, hql, wait=True, local=False, max=180.0)
+    resp = save_and_verify(resp, TARGET_FILE, overwrite=False, verify=False)
+    assert_true('-3' in resp.content)
+    assert_true('already exists' in resp.content)
+
+    # Partition tables
+    hql = "SELECT * FROM test_partitions"
+    resp = _make_query(self.client, hql, wait=True, local=False, max=180.0)
+    resp = save_and_verify(resp, TARGET_FILE, verify=False)
     resp = self.client.get(resp.success_url)
     assert_true('File Browser' in resp.content, resp.content)
 
@@ -934,9 +983,9 @@ for x in sys.stdin:
       qid = content['id']
       save_data = {
         'type': 'hive-table',
-        'path': target_tbl
+        'table': target_tbl
       }
-      resp = self.client.post('/beeswax/api/query/%s/results/save' % qid, save_data, follow=True)
+      resp = self.client.post('/beeswax/api/query/%s/results/save/hive/table' % qid, save_data, follow=True)
       content = json.loads(resp.content)
       resp = self.client.get(content['watch_url'], follow=True)
       wait_for_query_to_finish(self.client, resp, max=120)

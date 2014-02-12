@@ -536,7 +536,7 @@ ${layout.menubar(section='query')}
   <div class="modal-header">
     <a href="#" class="close" data-dismiss="modal">&times;</a>
 
-    <h3>${_('Choose an empty folder')}</h3>
+    <h3>${_('Choose a folder')}</h3>
   </div>
   <div class="modal-body">
     <div id="folderchooser">
@@ -593,6 +593,33 @@ ${layout.menubar(section='query')}
     <!-- /ko -->
     <form id="saveResultsForm" method="POST" class="form form-inline">
       <fieldset>
+        <div data-bind="css: {'error': $root.design.results.save.targetFileError()}" class="control-group">
+          <div class="controls">
+            <label class="radio">
+              <input data-bind="checked: $root.design.results.save.type" type="radio" name="save-results-type" value="hdfs-file">
+              &nbsp;${ _('In an HDFS file') }
+            </label>
+            <span data-bind="visible: $root.design.results.save.type() == 'hdfs-file'">
+              <input data-bind="value: $root.design.results.save.path" type="text" name="target_file" placeholder="${_('Results location')}" class="fileChooser">
+            </span>
+            <label class="radio" data-bind="visible: $root.design.results.save.type() == 'hdfs-file'">
+              <input data-bind="checked: $root.design.results.save.overwrite" type="checkbox" name="overwrite">
+              ${ _('Overwrite') }
+            </label>
+          </div>
+        </div>
+        <div data-bind="css: {'error': $root.design.results.save.targetDirectoryError()}" class="control-group hide advanced">
+          <div class="controls">
+            <label class="radio">
+              <input data-bind="checked: $root.design.results.save.type" type="radio" name="save-results-type" value="hdfs-directory">
+              &nbsp;${ _('In an HDFS directory') }
+            </label>
+            <span data-bind="visible: $root.design.results.save.type() == 'hdfs-directory'">
+              <input data-bind="value: $root.design.results.save.path" type="text" name="target_dir" placeholder="${_('Results location')}" class="folderChooser">
+              <i class="fa fa-question-circle" id="hdfs-directory-help"></i>
+            </span>
+          </div>
+        </div>
         <div data-bind="css: {'error': $root.design.results.save.targetTableError()}" class="control-group">
           <div class="controls">
             <label class="radio">
@@ -604,27 +631,15 @@ ${layout.menubar(section='query')}
             </span>
           </div>
         </div>
-        <div data-bind="css: {'error': $root.design.results.save.targetDirectoryError()}" class="control-group">
-          <div class="controls">
-            <label class="radio">
-              <input data-bind="checked: $root.design.results.save.type" type="radio" name="save-results-type" value="hdfs">
-              &nbsp;${ _('In an HDFS directory') }
-            </label>
-            <span data-bind="visible: $root.design.results.save.type() == 'hdfs'">
-              <input data-bind="value: $root.design.results.save.path" type="text" name="target_dir" placeholder="${_('Results location')}" class="pathChooser">
-            </span>
-            <label class="radio" data-bind="visible: $root.design.results.save.type() == 'hdfs'">
-              % if app_name != 'impala':
-                <input data-bind="checked: $root.design.results.save.rerun" type="checkbox" name="rerun">
-                ${ _('Run an export query') }
-              % endif
-            </label>
-          </div>
-        </div>
       </fieldset>
     </form>
+    <div id="hdfs-directory-help-content" class="hide">
+      <p>${ _("Using this option will rerun the query. Use the 'save as file' option to skip rerunning the query.") }</p>
+    </div>
   </div>
   <div class="modal-footer">
+    <a id="save-results-advanced" href="javascript:void(0)" class="pull-left">${ _('Show advanced fields') }</a>
+    <a id="save-results-simple" href="javascript:void(0)" class="pull-left hide">${ _('Hide advanced fields') }</a>
     <button class="btn" data-dismiss="modal">${_('Cancel')}</button>
     <button data-bind="click: trySaveResults" class="btn btn-primary">${_('Save')}</button>
   </div>
@@ -2013,6 +2028,25 @@ $(document).ready(function () {
     'html': true
   });
 
+  $("#hdfs-directory-help").popover({
+    'title': "${_('Did you know?')}",
+    'content': $("#hdfs-directory-help-content").html(),
+    'trigger': 'hover',
+    'placement': 'right',
+    'html': true
+  });
+
+  $(document).on('click', '#save-results-simple', function() {
+    $('#save-results-advanced').removeClass('hide');
+    $('#save-results-simple').addClass('hide');
+    $('#saveResultsForm .advanced').addClass('hide');
+  });
+  $(document).on('click', '#save-results-advanced', function() {
+    $('#save-results-advanced').addClass('hide');
+    $('#save-results-simple').removeClass('hide');
+    $('#saveResultsForm .advanced').removeClass('hide');
+  });
+
   $(document).on("change", ".settingsField", function(){
     updateSidebarTooltips(".settingsField");
   });
@@ -2092,7 +2126,7 @@ $(window).data('beforeunload', window.onbeforeunload);
 
 % endif
 
-$(".pathChooser:not(:has(~ button))").after(getFileAndFolderBrowseButton($(".pathChooser:not(:has(~ button))"), true));
+$(".folderChooser:not(:has(~ button))").after(getFolderBrowseButton($(".folderChooser:not(:has(~ button))"), true));
 
 
 // Routie
@@ -2384,3 +2418,4 @@ ko.applyBindings(viewModel);
 </script>
 
 ${ commonfooter(messages) | n,unicode }
+

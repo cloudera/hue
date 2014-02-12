@@ -56,8 +56,7 @@ function BeeswaxViewModel(server) {
       'save': {
         'errors': null,
         'type': 'hive-table',
-        'path': null,
-        'rerun': false
+        'path': null
       }
     },
     'watch': {
@@ -97,6 +96,10 @@ function BeeswaxViewModel(server) {
 
   self.design.results.save.targetDirectoryError = ko.computed(function() {
     return (self.design.results.save.errors() && 'target_dir' in self.design.results.save.errors()) ? self.design.results.save.errors()['target_dir'] : null;
+  });
+
+  self.design.results.save.targetFileError = ko.computed(function() {
+    return (self.design.results.save.errors() && 'target_file' in self.design.results.save.errors()) ? self.design.results.save.errors()['target_file'] : null;
   });
 
   self.database = ko.computed({
@@ -756,14 +759,35 @@ function BeeswaxViewModel(server) {
     self.design.isRunning(true);
     self.resetErrors();
     if (self.design.id()) {
-      var data = {
-        'database': self.database(),
-        'server': self.server(),
-        'type': self.design.results.save.type(),
-        'path': self.design.results.save.path(),
-        'rerun': self.design.results.save.rerun()
-      };
-      var url = '/' + self.server() + '/api/query/' + self.design.history.id() + '/results/save';
+      var data, url;
+
+      switch(self.design.results.save.type()) {
+        case 'hdfs-directory':
+        data = {
+          'server': self.server(),
+          'path': self.design.results.save.path()
+        };
+        url = '/' + self.server() + '/api/query/' + self.design.history.id() + '/results/save/hdfs/directory';
+        break;
+
+        case 'hdfs-file':
+        data = {
+          'server': self.server(),
+          'path': self.design.results.save.path()
+        };
+        url = '/' + self.server() + '/api/query/' + self.design.history.id() + '/results/save/hdfs/file';
+        break;
+
+        // case 'hive-table':
+        default:
+        data = {
+          'database': self.database(),
+          'server': self.server(),
+          'table': self.design.results.save.path()
+        };
+        url = '/' + self.server() + '/api/query/' + self.design.history.id() + '/results/save/hive/table';
+        break;
+      }
       var request = {
         url: url,
         dataType: 'json',
@@ -771,17 +795,19 @@ function BeeswaxViewModel(server) {
         success: function(data) {
           if (data.status == 0) {
             self.design.results.save.errors(null);
+
+            var redirect_fn = function() {
+              window.location.href = data.success_url;
+              self.design.isRunning(false);
+            };
             if (data.id) {
               // watch this ID.
               self.design.watch.url(data.watch_url);
               self.design.watch.logs.removeAll();
-              self.watchQueryLoop(function() {
-                window.location.href = data.success_url;
-              });
+              self.watchQueryLoop(redirect_fn);
             } else {
               // redirect to metastore app.
-              window.location.href = data.success_url;
-              self.design.isRunning(false);
+              redirect_fn();
             }
             $(document).trigger('saved.results', data);
           } else {
@@ -793,7 +819,7 @@ function BeeswaxViewModel(server) {
         error: function(data) {
           self.design.isRunning(false);
           self.design.results.save.errors(data);
-          $(document).trigger('error_save.results');
+          $(document).trigger('error_save.results', [data]);
         },
         data: data,
         cache: false
@@ -835,21 +861,26 @@ function getFileBrowseButton(inputElement) {
   });
 }
 
-function getFileAndFolderBrowseButton(inputElement) {
+function folderChooser(inputElement) {
+  $("#folderchooser").jHueFileChooser({
+    initialPath: inputElement.val(),
+    onFolderChoose:function (folderPath) {
+      inputElement.val(folderPath);
+      inputElement.trigger("change");
+      $("#chooseFolder").modal("hide");
+    },
+    selectFolder: true,
+    createFolder: true,
+    selectFile: false,
+    uploadFile: false
+  });
+  $("#chooseFolder").modal("show");
+}
+
+function getFolderBrowseButton(inputElement) {
   return $("<button>").addClass("btn").addClass("fileChooserBtn").text("..").click(function (e) {
     e.preventDefault();
-    $("#folderchooser").jHueFileChooser({
-      initialPath: inputElement.val(),
-      onFolderChoose:function (folderPath) {
-        inputElement.val(folderPath);
-        inputElement.trigger("change");
-        $("#chooseFolder").modal("hide");
-      },
-      selectFolder: true,
-      createFolder: false,
-      uploadFile:false
-    });
-    $("#chooseFolder").modal("show");
+    folderChooser(inputElement);
   });
 }
 

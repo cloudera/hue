@@ -497,7 +497,6 @@ def view_results(request, id, first_row=0):
       for format in common.DL_FORMATS:
         download_urls[format] = reverse(app_name + ':download', kwargs=dict(id=str(id), format=format))
 
-    save_form = beeswax.forms.SaveResultsForm()
     results.start_row = first_row
 
     context.update({
@@ -509,7 +508,6 @@ def view_results(request, id, first_row=0):
       'expected_first_row': first_row,
       'columns': columns,
       'download_urls': download_urls,
-      'save_form': save_form,
       'can_save': query_history.owner == request.user,
       'next_json_set':
         reverse(get_app_name(request) + ':view_results', kwargs={
@@ -520,15 +518,12 @@ def view_results(request, id, first_row=0):
         + ('?context=' + context_param or '') + '&format=json'
     })
 
-  if request.GET.get('format') == 'json':
-    context['columns'] = massage_columns_for_json(columns)
-    if 'save_form' in context:
-      del context['save_form']
-    if 'query' in context:
-      del context['query']
-    return HttpResponse(json.dumps(context), mimetype="application/json")
-  else:
-    return render('watch_results.mako', request, context)
+  context['columns'] = massage_columns_for_json(columns)
+  if 'save_form' in context:
+    del context['save_form']
+  if 'query' in context:
+    del context['query']
+  return HttpResponse(json.dumps(context), mimetype="application/json")
 
 
 def configuration(request):
