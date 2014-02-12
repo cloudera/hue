@@ -18,6 +18,7 @@
 import json
 import logging
 import re
+import time
 
 from django import forms
 from django.contrib import messages
@@ -29,6 +30,7 @@ from django.utils.html import escape
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 
+from desktop.appmanager import get_apps_dict
 from desktop.context_processors import get_app_name
 from desktop.lib.paginator import Paginator
 from desktop.lib.django_util import copy_query_dict, format_preserving_redirect, render
@@ -46,8 +48,6 @@ from beeswax import common, data_export, models
 from beeswax.models import SavedQuery, QueryHistory
 from beeswax.server import dbms
 from beeswax.server.dbms import expand_exception, get_query_server_config
-
-import time
 
 
 LOG = logging.getLogger(__name__)
@@ -391,7 +391,8 @@ def execute_query(request, design_id=None, query_history_id=None):
     'autocomplete_base_url': reverse(get_app_name(request) + ':api_autocomplete_databases', kwargs={}),
     'can_edit_name': design and design.id and not design.is_auto,
     'action': action,
-    'on_success_url': request.GET.get('on_success_url')
+    'on_success_url': request.GET.get('on_success_url'),
+    'has_metastore': 'metastore' in get_apps_dict(request.user)
   }
 
   return render('execute.mako', request, context)

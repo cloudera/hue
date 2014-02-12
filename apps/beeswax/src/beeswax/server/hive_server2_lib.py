@@ -594,7 +594,7 @@ class HiveServerTableCompatible(HiveServerTable):
   @property
   def cols(self):
     return [type('Col', (object,), {'name': col.get('col_name', '').strip(),
-                                    'type': col.get('data_type', ''),
+                                    'type': col.get('data_type', col.get('col_type', '')).strip(), # Impala is col_type
                                     'comment': col.get('comment', '').strip(), }) for col in HiveServerTable.cols.fget(self)]
 
 
