@@ -61,11 +61,14 @@ def test_config_gen():
 </configuration>"""), reformat_xml(config_gen(properties)))
 
 
-class MockFs():
+class MockFs(object):
   def __init__(self, logical_name=None):
 
     self.fs_defaultfs = 'hdfs://curacao:8020'
-    self.logical_name = logical_name if logical_name else ''
+    if logical_name:
+      self.logical_name = logical_name
+    else:
+      self.logical_name = ''
 
 
 def test_update_properties():
