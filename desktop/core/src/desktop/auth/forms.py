@@ -26,7 +26,7 @@ class AuthenticationForm(AuthAuthenticationForm):
   Adds appropriate classes to authentication form
   """
   username = CharField(label=_t("Username"), max_length=30, widget=TextInput(attrs={'class': 'input-large', 'maxlength': 30}))
-  password = CharField(label=_t("Password"), widget=PasswordInput(attrs={'class': 'input-large', 'maxlength': 30}))
+  password = CharField(label=_t("Password"), widget=PasswordInput(attrs={'class': 'input-large'}))
 
 
 class UserCreationForm(AuthUserCreationForm):
@@ -35,7 +35,7 @@ class UserCreationForm(AuthUserCreationForm):
   password fields with the value of that password field
   Adds appropriate classes to authentication form.
   """
-  password = CharField(label=_t("Password"), widget=PasswordInput(attrs={'class': 'input-large', 'maxlength': 30}))
+  password = CharField(label=_t("Password"), widget=PasswordInput(attrs={'class': 'input-large'}))
 
   def __init__(self, data=None, *args, **kwargs):
     if data and 'password' in data:
