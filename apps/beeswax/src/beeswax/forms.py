@@ -77,65 +77,75 @@ class SaveForm(forms.Form):
     self.data = data2
 
 
-class SaveResultsForm(DependencyAwareForm):
-  """Used for saving the query result data"""
+class SaveResultsDirectoryForm(forms.Form):
+  """Used for saving the query result data to hdfs directory"""
 
-  SAVE_TYPES = (SAVE_TYPE_TBL, SAVE_TYPE_DIR) = ('to a new table', 'to HDFS directory')
-  save_target = forms.ChoiceField(required=True,
-                                  choices=common.to_choices(SAVE_TYPES),
-                                  widget=forms.RadioSelect,
-                                  initial=SAVE_TYPE_TBL)
+  target_dir = forms.CharField(label=_t("Directory"),
+                               required=True,
+                               help_text=_t("Path to directory"))
+
+  def __init__(self, *args, **kwargs):
+    self.fs = kwargs.pop('fs', None)
+    super(SaveResultsDirectoryForm, self).__init__(*args, **kwargs)
+
+  def clean_target_dir(self):
+    if not self.cleaned_data['target_dir'].startswith('/'):
+      raise forms.ValidationError(_("Target directory should begin with a /"))
+    elif self.fs.exists(self.cleaned_data['target_dir']):
+      raise forms.ValidationError(_('Directory already exists.'))
+    return self.cleaned_data['target_dir']
+
+
+class SaveResultsFileForm(forms.Form):
+  """Used for saving the query result data to hdfs file"""
+
+  target_file = forms.CharField(label=_t("File path"),
+                                required=True,
+                                help_text=_t("Path to file"))
+  overwrite = forms.BooleanField(label=_t('Overwrite'),
+                                 required=False,
+                                 help_text=_t("Overwrite the selected filed"))
+
+  def clean_target_file(self):
+    if not self.cleaned_data['target_file'].startswith('/'):
+      raise forms.ValidationError("Target file should begin with a /")
+
+    return self.cleaned_data['target_file']
+
+
+class SaveResultsTableForm(forms.Form):
+  """Used for saving the query result data to hive table"""
+
   target_table = common.HiveIdentifierField(
                                   label=_t("Table Name"),
-                                  required=False,
+                                  required=True,
                                   help_text=_t("Name of the new table")) # Can also contain a DB prefixed table name, e.g. DB_NAME.TABLE_NAME
-  target_dir = PathField(label=_t("Results Location"),
-                         required=False,
-                         help_text=_t("Empty directory in HDFS to store results."))
-  rerun = forms.BooleanField(label=_t("Run an export query"),
-                             initial=False,
-                             required=False)
-  dependencies = [
-    ('save_target', SAVE_TYPE_TBL, 'target_table'),
-    ('save_target', SAVE_TYPE_DIR, 'target_dir'),
-  ]
 
   def __init__(self, *args, **kwargs):
     self.db = kwargs.pop('db', None)
-    self.fs = kwargs.pop('fs', None)
     self.target_database = kwargs.pop('database', 'default')
-    super(SaveResultsForm, self).__init__(*args, **kwargs)
+    super(SaveResultsTableForm, self).__init__(*args, **kwargs)
 
   def clean(self):
-    cleaned_data = super(SaveResultsForm, self).clean()
+    cleaned_data = super(SaveResultsTableForm, self).clean()
 
-    if cleaned_data:
-      if cleaned_data.get('save_target') == SaveResultsForm.SAVE_TYPE_TBL:
-        target_table = cleaned_data.get('target_table')
-        if target_table:
-          try:
-            if self.db is not None:
-              name_parts = target_table.split(".")
-              if len(name_parts) == 1:
-                pass
-              elif len(name_parts) == 2:
-                self.target_database, target_table = name_parts
-              else:
-                self._errors['target_table'] = self.error_class([_('Invalid table prefix name')])
-              cleaned_data['target_table'] = target_table # Update table name without the DB prefix
-              self.db.get_table(self.target_database, target_table)
-            self._errors['target_table'] = self.error_class([_('Table already exists')])
-            del cleaned_data['target_table']
-          except Exception:
+    target_table = cleaned_data.get('target_table')
+    if target_table:
+      try:
+        if self.db is not None:
+          name_parts = target_table.split(".")
+          if len(name_parts) == 1:
             pass
-      elif cleaned_data['save_target'] == SaveResultsForm.SAVE_TYPE_DIR:
-        target_dir = cleaned_data['target_dir']
-        if not target_dir.startswith('/'):
-          self._errors['target_dir'] = self.error_class([_('Directory should start with /')])
-        elif self.fs.exists(target_dir):
-          self._errors['target_dir'] = self.error_class([_('Directory already exists.')]) # Overwrite destination directory content
-    else:
-      self._errors['save_target'] = self.error_class([_('Please select a save target.')])
+          elif len(name_parts) == 2:
+            self.target_database, target_table = name_parts
+          else:
+            self._errors['target_table'] = self.error_class([_('Invalid table prefix name')])
+          cleaned_data['target_table'] = target_table # Update table name without the DB prefix
+          self.db.get_table(self.target_database, target_table)
+        self._errors['target_table'] = self.error_class([_('Table already exists')])
+        del cleaned_data['target_table']
+      except Exception:
+        pass
 
     return cleaned_data
 

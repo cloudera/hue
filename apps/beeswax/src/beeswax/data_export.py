@@ -20,6 +20,8 @@
 import logging
 import time
 
+from django.utils.translation import ugettext as _
+
 from desktop.lib import export_csvxls
 
 from beeswax import common, conf
@@ -54,7 +56,10 @@ def upload(path, handle, user, db, fs):
   has_more = True
   start_over = True
 
-  fs.do_as_user(user.username, fs.create, path, overwrite=True)
+  if fs.do_as_user(user.username, fs.exists, path):
+    raise Exception(_("%s already exists.") % path)
+  else:
+    fs.do_as_user(user.username, fs.create, path)
 
   while has_more:
     data, has_more = HS2DataAdapter(handle, db, conf.DOWNLOAD_ROW_LIMIT.get(), start_over=start_over)

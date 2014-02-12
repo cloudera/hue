@@ -67,7 +67,9 @@ urlpatterns += patterns(
   url(r'^api/query/execute/(?P<design_id>\d+)?$', 'execute', name='api_execute'),
   url(r'^api/query/(?P<query_history_id>\d+)/cancel$', 'cancel_query', name='api_cancel_query'),
   url(r'^api/query/(?P<query_history_id>\d+)/close/?$', 'close_operation', name='api_close_operation'),
-  url(r'^api/query/(?P<query_history_id>\d+)/results/save$', 'save_results', name='api_save_results'),
+  url(r'^api/query/(?P<query_history_id>\d+)/results/save/hive/table$', 'save_results_hive_table', name='api_save_results_hive_table'),
+  url(r'^api/query/(?P<query_history_id>\d+)/results/save/hdfs/file$', 'save_results_hdfs_file', name='api_save_results_hdfs_file'),
+  url(r'^api/query/(?P<query_history_id>\d+)/results/save/hdfs/directory$', 'save_results_hdfs_directory', name='api_save_results_hdfs_directory'),
   url(r'^api/watch/json/(?P<id>\d+)$', 'watch_query_refresh_json', name='api_watch_query_refresh_json'),
 
   url(r'^api/table/(?P<database>\w+)/(?P<table>\w+)$', 'describe_table', name='describe_table'),

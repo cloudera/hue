@@ -27,7 +27,7 @@ from beeswax import hive_site
 from beeswax.conf import HIVE_SERVER_HOST, HIVE_SERVER_PORT,\
   BROWSE_PARTITIONED_TABLE_LIMIT
 from beeswax.design import hql_query
-from beeswax.models import QueryHistory, HIVE_SERVER2, BEESWAX
+from beeswax.models import QueryHistory, HIVE_SERVER2, BEESWAX, QUERY_TYPES
 
 from filebrowser.views import location_to_url
 from desktop.lib.django_util import format_preserving_redirect
@@ -91,6 +91,7 @@ class HiveServer2Dbms(object):
   def __init__(self, client, server_type):
     self.client = client
     self.server_type = server_type
+    self.server_name = self.client.query_server['server_name']
 
   def get_table(self, database, table_name):
     # DB name not supported in SHOW PARTITIONS required in Table
@@ -117,7 +118,10 @@ class HiveServer2Dbms(object):
 
 
   def execute_statement(self, hql):
-    query = hql_query(hql)
+    if self.server_name == 'impala':
+      query = hql_query(hql, QUERY_TYPES[1])
+    else:
+      query = hql_query(hql, QUERY_TYPES[0])
     return self.execute_and_watch(query)
 
 
