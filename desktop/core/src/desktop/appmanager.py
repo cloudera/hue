@@ -227,7 +227,7 @@ def load_libs():
   DESKTOP_MODULES.append(DesktopModuleInfo(desktop))
 
 
-def load_apps():
+def load_apps(app_blacklist):
   """Loads the applications from the directories in APP_DIRS.
   Sets DESKTOP_MODULES and DJANGO_APPS globals in this module.
 
@@ -241,9 +241,10 @@ def load_apps():
   DESKTOP_APPS = []
 
   for sdk_app in pkg_resources.iter_entry_points("desktop.sdk.application"):
-    m = sdk_app.load()
-    dmi = DesktopModuleInfo(m)
-    DESKTOP_APPS.append(dmi)
+    if sdk_app.name not in app_blacklist:
+      m = sdk_app.load()
+      dmi = DesktopModuleInfo(m)
+      DESKTOP_APPS.append(dmi)
 
   LOG.debug("Loaded Desktop Applications: " + ", ".join(a.name for a in DESKTOP_APPS))
   DESKTOP_MODULES += DESKTOP_APPS
