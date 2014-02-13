@@ -2115,10 +2115,12 @@ class TestImportWorkflow04(OozieMockBase):
     import_workflow(workflow, f.read())
     f.close()
     workflow.save()
-    assert_equal(2, len(Node.objects.filter(workflow=workflow)))
-    assert_equal(2, len(Link.objects.filter(parent__workflow=workflow)))
+    assert_equal(4, len(Node.objects.filter(workflow=workflow)))
+    assert_equal(4, len(Link.objects.filter(parent__workflow=workflow)))
     assert_equal('done', Node.objects.get(workflow=workflow, node_type='end').name)
     assert_equal('uri:oozie:workflow:0.4', workflow.schema_version)
+    assert_equal('job1.xml', workflow.job_xml)
+    assert_equal('[{"name": "mapred.job.queue.name", "value": "${queueName}"}]', workflow.job_properties)
     workflow.delete(skip_trash=True)
 
 
