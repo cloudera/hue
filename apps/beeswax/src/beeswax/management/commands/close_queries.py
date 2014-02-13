@@ -33,7 +33,7 @@ class Command(BaseCommand):
   0 queries closed.
   """
   args = '<age_in_days> <all> (default is 7)'
-  help = 'Closes the non running Hive queries older than 7 days. If <all> is specified, close the Hive and Impala ones.'
+  help = 'Close finished Hive queries older than 7 days. If \'all\' is specified, also close the Impala ones.'
 
   def handle(self, *args, **options):
     days = int(args[0]) if len(args) >= 1 else 7
@@ -47,7 +47,7 @@ class Command(BaseCommand):
     if close_all:
       queries = HiveServerQueryHistory.objects.all()
 
-    queries = queries.filter(submission_date__gte=datetime.today() - timedelta(days=days))
+    queries = queries.filter(submission_date__lte=datetime.today() - timedelta(days=days))
 
     for query in queries:
       try:
