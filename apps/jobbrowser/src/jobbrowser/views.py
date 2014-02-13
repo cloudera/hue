@@ -240,7 +240,7 @@ def job_attempt_logs_json(request, job, attempt_index=0, name='syslog', offset=0
   if offset and int(offset) >= 0:
     params['start'] = offset
 
-  root = Resource(get_log_client(log_link), urlparse.urlsplit(log_link)[2])
+  root = Resource(get_log_client(log_link), urlparse.urlsplit(log_link)[2], urlencode=False)
 
   try:
     response = root.get(link, params=params)

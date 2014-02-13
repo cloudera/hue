@@ -223,7 +223,7 @@ class Attempt:
 
       try:
         log_link = re.sub('job_[^/]+', self.id, log_link)
-        root = Resource(get_log_client(log_link), urlparse.urlsplit(log_link)[2])
+        root = Resource(get_log_client(log_link), urlparse.urlsplit(log_link)[2], urlencode=False)
         response = root.get(link, params=params)
         log = html.fromstring(response).xpath('/html/body/table/tbody/tr/td[2]')[0].text_content()
       except Exception, e:

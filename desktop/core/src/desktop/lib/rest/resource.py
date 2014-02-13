@@ -28,13 +28,15 @@ class Resource(object):
   """
   Encapsulates a resource, and provides actions to invoke on it.
   """
-  def __init__(self, client, relpath=""):
+  def __init__(self, client, relpath="", urlencode=True):
     """
     @param client: A Client object.
     @param relpath: The relative path of the resource.
+    @param urlencode: percent encode paths.
     """
     self._client = client
     self._path = relpath.strip('/')
+    self._urlencode = urlencode
 
   @property
   def base_url(self):
@@ -71,7 +73,8 @@ class Resource(object):
                                 params=params,
                                 data=data,
                                 headers=headers,
-                                allow_redirects=allow_redirects)
+                                allow_redirects=allow_redirects,
+                                urlencode=self._urlencode)
 
     self._client.logger.debug(
         "%s Got response: %s%s" %

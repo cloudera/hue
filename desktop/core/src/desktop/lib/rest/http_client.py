@@ -112,7 +112,7 @@ class HttpClient(object):
       self._session.headers.update(headers)
     return self._session.headers.copy()
 
-  def execute(self, http_method, path, params=None, data=None, headers=None, allow_redirects=False):
+  def execute(self, http_method, path, params=None, data=None, headers=None, allow_redirects=False, urlencode=True):
     """
     Submit an HTTP request.
     @param http_method: GET, POST, PUT, DELETE
@@ -121,11 +121,13 @@ class HttpClient(object):
     @param data: The data to attach to the body of the request.
     @param headers: The headers to set for this request.
     @param allow_redirects: requests should automatically resolve redirects.
+    @param urlencode: percent encode paths.
 
     @return: The result of urllib2.urlopen()
     """
     # Prepare URL and params
-    path = urllib.quote(smart_str(path))
+    if urlencode:
+      path = urllib.quote(smart_str(path))
     url = self._make_url(path, params)
     if http_method in ("GET", "DELETE"):
       if data is not None:
