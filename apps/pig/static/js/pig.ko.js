@@ -66,7 +66,7 @@ var PigScript = function (pigScript) {
   };
   self.getParameters = function () {
     var params = {};
-    var variables = this.script().match(/\$\D(\w*)/g);
+    var variables = this.script().match(/\$[^\d'"](\w*)/g);
     var macro_defines = this.script().match(/define [^ ]+ \(([^\)]*)\)/gi); // no multiline
     var macro_returns = this.script().match(/returns +([^\{]*)/gi); // no multiline
 
@@ -507,6 +507,7 @@ var PigViewModel = function (props) {
 
   function callRun(script) {
     self.currentScript(script);
+    $(document).trigger("clearLogs");
     $(document).trigger("showLogs");
     $(document).trigger("running");
     $("#submitModal").modal("hide");
