@@ -62,20 +62,22 @@ ${layout.menubar(section='dump_config')}
         </div>
 
         <div class="card card-home">
-            <h2 class="card-heading simple">${_('Configuration Sections and Variables')}</h2>
+          <h2 class="card-heading simple">${_('Configuration Sections and Variables')}</h2>
           <div class="card-body">
             <p>
-            <ul class="nav nav-tabs">
-              % for obj in top_level:
-                <li
-                  % if loop.first:
-                      class="active"
-                  % endif
-                ><a href="#${obj.config.key}Conf" data-toggle="tab">${obj.config.key}</a></li>
-              % endfor
-            </ul>
+              <ul class="nav nav-tabs">
+                % for obj in top_level:
+                  <li
+                    % if loop.first:
+                        class="active"
+                    % endif
+                  >
+                    <a href="#${ obj.config.key }Conf" data-toggle="tab">${ obj.config.key }</a>
+                  </li>
+                % endfor
+              </ul>
 
-            ${showTopLevel(top_level)}
+              ${showTopLevel(top_level)}
 
               <br/>
               <br/>
@@ -85,7 +87,6 @@ ${layout.menubar(section='dump_config')}
         </div>
 
       </div>
-
 
         <%def name="showTopLevel(config_obj, depth=0)">
             <div class="tab-content">
@@ -100,7 +101,7 @@ ${layout.menubar(section='dump_config')}
                         active
                     % endif
                     ">
-                    ${recurse(v, depth + 1)}
+                    ${ recurse(v, depth + 1) }
                   </div>
                 % endfor
             </div>
@@ -109,12 +110,12 @@ ${layout.menubar(section='dump_config')}
         <%def name="recurseList(config_obj, depth=0)">
           <table class="table table-striped recurse">
           % for v in config_obj:
-              <%
-                # Don't recurse into private variables.
-                if v.config.private and not show_private:
-                  continue
-              %>
-              ${recurse(v, depth + 1)}
+            <%
+              # Don't recurse into private variables.
+              if v.config.private and not show_private:
+                continue
+            %>
+            ${ recurse(v, depth + 1) }
           % endfor
           </table>
         </%def>
@@ -126,22 +127,22 @@ ${layout.menubar(section='dump_config')}
               % if is_anonymous(config_obj.config.key):
                 <i>(default section)</i>
               % else:
-                ${config_obj.config.key}
+                ${ config_obj.config.key }
               % endif
               </th>
              % endif
              % if depth == 1:
                 <td style="border-top:0">
              % else:
-                  <td>
+                <td>
              % endif
               % if isinstance(config_obj, BoundContainer):
-                  <p class="dump_config_help"><i>${config_obj.config.help or _('No help available.')}</i></p>
-                  ${recurseList(config_obj.get().values(), depth + 1)}
+                <p class="dump_config_help"><i>${ config_obj.config.help or _('No help available.') }</i></p>
+                ${ recurseList(config_obj.get().values(), depth + 1) }
               % else:
                 <p>${ str(config_obj.get_raw()).decode('utf-8', 'replace') }</p>
-                <p class="dump_config_help"><i>${config_obj.config.help or _('No help available.')}</i></p>
-                <p class="dump_config_default">${_('Default:')} <i>${str(config_obj.config.default).decode('utf-8', 'replace')}</i></p>
+                <p class="dump_config_help"><i>${ config_obj.config.help or _('No help available.') }</i></p>
+                <p class="dump_config_default">${ _('Default:') } <i>${ str(config_obj.config.default).decode('utf-8', 'replace') }</i></p>
               % endif
               </td>
             </tr>

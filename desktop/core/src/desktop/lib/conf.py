@@ -430,8 +430,7 @@ class ConfigSection(Config):
 
     # We sort the configuration for canonicalization.
     for programmer_key, config in sorted(self.members.iteritems(), key=lambda x: x[1].key):
-      config.print_help(out=out,
-                        indent=new_indent)
+      config.print_help(out=out, indent=new_indent)
 
 class UnspecifiedConfigSection(Config):
   """

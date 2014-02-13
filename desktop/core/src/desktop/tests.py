@@ -45,6 +45,7 @@ from desktop.lib.django_util import TruncatingModel
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.test_utils import grant_access
 from desktop.views import check_config, home
+from beeswax.conf import HIVE_SERVER_HOST
 
 
 def setup_test_environment():
@@ -153,10 +154,12 @@ def test_dump_config():
   c = make_logged_in_client()
 
   CANARY = "abracadabra"
-  clear = desktop.conf.HTTP_HOST.set_for_testing(CANARY)
+
+  # Depending on the order of the conf.initialize() in settings, the set_for_testing() are not seen in the global settings variable
+  clear = HIVE_SERVER_HOST.set_for_testing(CANARY)
 
   response1 = c.get(reverse('desktop.views.dump_config'))
-  assert_true(CANARY in response1.content)
+  assert_true(CANARY in response1.content, response1.content)
 
   response2 = c.get(reverse('desktop.views.dump_config'), dict(private="true"))
   assert_true(CANARY in response2.content)
@@ -176,7 +179,7 @@ def test_dump_config():
 
   # Malformed port per HUE-674
   CANARY = "asdfoijaoidfjaosdjffjfjaoojosjfiojdosjoidjfoa"
-  clear = desktop.conf.HTTP_PORT.set_for_testing(CANARY)
+  clear = HIVE_SERVER_HOST.set_for_testing(CANARY)
 
   response1 = c.get(reverse('desktop.views.dump_config'))
   assert_true(CANARY in response1.content, response1.content)
