@@ -762,8 +762,7 @@ ${layout.menubar(section='query')}
     font-style: normal;
   }
 
-  #navigatorTables li {
-    width: 95%;
+  #navigatorTables li div {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1007,11 +1006,11 @@ $(document).ready(function () {
       $(data.split(" ")).each(function (cnt, table) {
         if ($.trim(table) != "") {
           var _table = $("<li>");
-          var metastore_link = "";
+          var _metastoreLink = "";
           % if has_metastore:
-            metastore_link = "<i class='fa fa-eye' title='" + "${ _('View in Metastore Browser') }" + "'></i></a>";
+            _metastoreLink = "<i class='fa fa-eye' title='" + "${ _('View in Metastore Browser') }" + "'></i>";
           % endif
-          _table.html("<a href='javascript:void(0)' class='pull-right'><i class='fa fa-list' title='" + "${ _('Preview Sample data') }" + "' style='margin-left:5px'></i></a><a href='/metastore/table/" + viewModel.database() + "/" + table + "' target='_blank' class='pull-right hide'>" + metastore_link + "<a href='javascript:void(0)' title='" + table + "'><i class='fa fa-table'></i> " + table + "</a><ul class='unstyled'></ul>");
+          _table.html("<a href='javascript:void(0)' class='pull-right'><i class='fa fa-list' title='" + "${ _('Preview Sample data') }" + "' style='margin-left:5px'></i></a><a href='/metastore/table/" + viewModel.database() + "/" + table + "' target='_blank' class='pull-right hide'>" + _metastoreLink + "</a><div><a href='javascript:void(0)' title='" + table + "'><i class='fa fa-table'></i> " + table + "</a><ul class='unstyled'></ul></div>");
 
           _table.data("table", table).attr("id", "navigatorTables_" + table);
           _table.find("a:eq(2)").on("click", function () {
