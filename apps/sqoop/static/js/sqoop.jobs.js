@@ -158,7 +158,6 @@ var jobs = (function($) {
         var table = null;
         $.each(self.connector(), function(index, form) {
           if (form.name() == 'table') {
-            console.log(form.name());
             $.each(form.inputs(), function(index, input) {
               if (input.name() == 'table.tableName') {
                 table = input.value();

@@ -1210,16 +1210,18 @@ $(document).ready(function () {
       });
     },
     "connection/edit-cancel": function() {
-      if (!viewModel.connection().persisted()) {
+      if (viewModel.connection() && !viewModel.connection().persisted()) {
         viewModel.connections.pop();
       }
       // routie('job/edit');
       window.history.go(-2);
     },
     "connection/new": function() {
-      viewModel.newConnection();
+      $(window).one('hashchange', function() {
+        viewModel.newConnection();
+        routie('connection/edit');
+      });
       window.history.back();
-      routie('connection/edit');
     },
     "connection/save": function() {
       viewModel.saveConnection();
