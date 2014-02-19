@@ -116,7 +116,7 @@ ${ commonheader(None, "pig", user) | n,unicode }
               <a href="#"><i class="fa fa-edit"></i> ${ _('Pig') }</a>
             </li>
             <li data-bind="click: editScriptProperties" data-section="properties">
-              <a href="#"><i class="fa fa-reorder"></i> ${ _('Properties') }</a>
+              <a href="#"><i class="fa fa-bars"></i> ${ _('Properties') }</a>
             </li>
             <li data-bind="click: saveScript">
               <a href="#" title="${ _('Save the script') }" rel="tooltip" data-placement="right">
@@ -525,7 +525,7 @@ ${ commonheader(None, "pig", user) | n,unicode }
               </div>
             </div>
           </script>
-          <pre id="withoutLogs">${ _('No available logs.') } <img src="/static/art/spinner.gif"/></pre>
+          <pre id="withoutLogs">${ _('No available logs.') } <img src="/static/art/spinner.gif" data-bind="visible: currentScript().isRunning()"/></pre>
           <pre id="withLogs" class="hide scroll"></pre>
         </div>
       </div>
