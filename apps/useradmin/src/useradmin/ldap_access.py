@@ -166,7 +166,7 @@ class LdapConnection(object):
 
           ldap_info = {
             'dn': dn,
-            'name': data[user_name_attr][0]
+            'username': data[user_name_attr][0]
           }
 
           if 'givenName' in data:
@@ -189,9 +189,6 @@ class LdapConnection(object):
     group_info = []
     if result_data:
       for dn, data in result_data:
-        # Case insensitivity
-        data = CaseInsensitiveDict.from_dict(data)
-
         # Skip Active Directory # refldap entries.
         if dn is not None:
           # Case insensitivity
