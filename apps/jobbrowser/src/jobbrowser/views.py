@@ -36,6 +36,7 @@ from desktop.lib.django_util import render_json, render, copy_query_dict, encode
 from desktop.lib.exceptions import MessageException
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.views import register_status_bar_view
+from hadoop import cluster
 from hadoop.api.jobtracker.ttypes import ThriftJobPriority, TaskTrackerNotFoundException, ThriftJobState
 from hadoop.yarn.clients import get_log_client
 
@@ -102,7 +103,8 @@ def jobs(request):
     'user_filter': user,
     'text_filter': text,
     'retired': retired,
-    'filtered': not (state == 'all' and user == '' and text == '')
+    'filtered': not (state == 'all' and user == '' and text == ''),
+    'is_yarn': cluster.is_yarn()
   })
 
 def massage_job_for_json(job, request):

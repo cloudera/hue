@@ -38,6 +38,7 @@ ${ components.menubar() }
     </%def>
 
     <%def name="creation()">
+      % if not is_yarn:
       <label class="checkbox retired">
         <%
             checked = ""
@@ -46,6 +47,7 @@ ${ components.menubar() }
         %>
         <input id="showRetired" type="checkbox" ${checked}> ${_('Show retired jobs')}
       </label>
+      % endif
       <span class="btn-group">
         <a class="btn btn-status btn-success" data-value="completed">${ _('Succeeded') }</a>
         <a class="btn btn-status btn-warning" data-value="running">${ _('Running') }</a>
