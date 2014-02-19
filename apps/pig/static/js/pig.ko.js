@@ -508,6 +508,8 @@ var PigViewModel = function (props) {
   function callRun(script) {
     self.currentScript(script);
     $(document).trigger("clearLogs");
+    script.isRunning(true);
+    script.actions([]);
     $(document).trigger("showLogs");
     $(document).trigger("running");
     $("#submitModal").modal("hide");
