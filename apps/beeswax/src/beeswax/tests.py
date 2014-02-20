@@ -174,6 +174,25 @@ for x in sys.stdin:
       [ x.profile for x in self.cluster.jt.all_jobs().jobs
         if x.profile.name == "test_query_with_setting" ][0].user)
 
+  def test_lazy_query_status_update(self):
+    QUERY = """
+      SELECT MIN(foo), MAX(foo), SUM(foo) FROM test;
+    """
+    wait_for_query_to_finish(self.client, _make_query(self.client, QUERY, local=False), max=180.0)
+    self._verify_query_state(beeswax.models.QueryHistory.STATE.available)
+
+    # Make sure expired query states are lazily updated.
+    resp = self.client.get('/beeswax/query_history')
+    history = resp.context['page'].object_list[0]
+    self.db.close_operation(history.get_full_object().get_handle())
+    resp = self.client.get("/beeswax/execute/query/%s" % history.id)
+    assert_true(resp.status_code, 302)
+
+    resp = self.client.get('/beeswax/query_history')
+    history = resp.context['page'].object_list[0]
+    assert_equal(beeswax.models.QueryHistory.STATE[history.last_state], beeswax.models.QueryHistory.STATE.expired)
+
+
   def test_basic_flow(self):
     # Minimal server operation
     assert_equal(['default', 'other_db'], self.db.get_databases())

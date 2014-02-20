@@ -50,6 +50,7 @@ function BeeswaxViewModel(server) {
       'rows': [],
       'columns': [],
       'empty': true,
+      'expired': false,
       'explanation': null,
       'url': null,
       'errors': [],
@@ -69,6 +70,8 @@ function BeeswaxViewModel(server) {
     'isFinished': true
   };
 
+  self.design = ko.mapping.fromJS(DESIGN_DEFAULTS);
+
   self.server = ko.observable(server);
   self.databases = ko.observableArray();
   self.selectedDatabase = ko.observable(0);
@@ -76,7 +79,6 @@ function BeeswaxViewModel(server) {
   // Use a view model attribute so that we don't have to override KO.
   // This allows Hue to disable the execute button until the query placeholder dies.
   self.queryEditorBlank = ko.observable(false);
-  self.design = ko.mapping.fromJS(DESIGN_DEFAULTS);
 
   self.canExecute = ko.computed(function() {
     return !self.design.isRunning() && self.design.isFinished();
@@ -126,6 +128,10 @@ function BeeswaxViewModel(server) {
       }
     });
     return ! hasBlank;
+  });
+
+  self.hasResults = ko.computed(function() {
+    return !self.design.results.empty() && !self.design.results.expired();
   });
 
   self.resetQuery = function() {
@@ -183,8 +189,8 @@ function BeeswaxViewModel(server) {
 
   self.updateHistory = function(history) {
     self.design.history.id(history.id);
-    viewModel.design.results.url('/' + viewModel.server() + '/results/' + history.id + '/0?format=json');
-    viewModel.design.watch.url('/' + viewModel.server() + '/api/watch/json/' + history.id);
+    self.design.results.url('/' + self.server() + '/results/' + history.id + '/0?format=json');
+    self.design.watch.url('/' + self.server() + '/api/watch/json/' + history.id);
     if (history.design) {
       self.updateDesign(history.design);
     }
@@ -430,6 +436,8 @@ function BeeswaxViewModel(server) {
     self.design.explain(true);
     self.design.isRunning(true);
     self.design.isFinished(true);
+    self.design.results.expired(false);
+    self.design.results.empty(false);
     self.resetErrors();
 
     var data = {
@@ -471,6 +479,8 @@ function BeeswaxViewModel(server) {
     self.design.explain(false);
     self.design.isRunning(true);
     self.design.isFinished(true);
+    self.design.results.expired(false);
+    self.design.results.empty(false);
     self.resetErrors();
 
     var data = {
@@ -631,6 +641,7 @@ function BeeswaxViewModel(server) {
   self.fetchResults = function() {
     $(document).trigger('fetch.results');
     self.design.errors.removeAll();
+    self.design.results.errors.removeAll();
     var request = {
       url: self.design.results.url(),
       dataType: 'json',

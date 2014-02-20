@@ -317,7 +317,7 @@ ${layout.menubar(section='query')}
   </div>
 
   <div class="card card-small scrollable resultsContainer">
-    <div data-bind="visible: !$root.design.results.empty()">
+    <div data-bind="visible: $root.hasResults()">
       <a id="expandResults" href="javascript:void(0)" title="${_('See results in full screen')}" rel="tooltip"
         class="view-query-results hide pull-right"><h4 style="margin-right: 20px"><i class="fa fa-expand"></i></h4></a>
 
@@ -331,7 +331,7 @@ ${layout.menubar(section='query')}
 
       <a id="download-excel" data-bind="attr: {'href': '/${ app_name }/download/' + $root.design.history.id() + '/xls'}" href="javascript:void(0)" title="${_('Download the results in XLS format')}" rel="tooltip"
         class="view-query-results download hide pull-right"><h4 style="margin-right: 20px"><i class="hfo hfo-file-xls"></i></h4></a>
-   </div>
+    </div>
 
     <div class="card-body">
       <ul class="nav nav-tabs">
@@ -340,9 +340,9 @@ ${layout.menubar(section='query')}
         <li><a href="#log" data-toggle="tab">${_('Log')}</a></li>
         <!-- /ko -->
         <!-- ko if: !design.explain() && !design.isRunning() -->
-        <li data-bind="css: {'hide': $root.design.results.empty()}"><a href="#columns" data-toggle="tab">${_('Columns')}</a></li>
+        <li data-bind="css: {'hide': !$root.hasResults()}"><a href="#columns" data-toggle="tab">${_('Columns')}</a></li>
         <li><a href="#results" data-toggle="tab">${_('Results')}</a></li>
-        <li data-bind="css: {'hide': $root.design.results.empty()}"><a href="#chart" data-toggle="tab">${_('Chart')}</a></li>
+        <li data-bind="css: {'hide': !$root.hasResults()}"><a href="#chart" data-toggle="tab">${_('Chart')}</a></li>
         <!-- /ko -->
         <!-- ko if: design.explain() && !design.isRunning() -->
         <li><a href="#explanation" data-toggle="tab">${_('Explanation')}</a></li>
@@ -365,7 +365,7 @@ ${layout.menubar(section='query')}
           <pre data-bind="text: $root.design.watch.logs().join('\n')"></pre>
         </div>
 
-        <div class="tab-pane" id="columns" data-bind="css: {'hide': $root.design.results.empty()}">
+        <div class="tab-pane" id="columns" data-bind="css: {'hide': !$root.hasResults()}">
           <div data-bind="visible: $root.design.results.columns().length > 10">
             <input id="columnFilter" class="input-xlarge" type="text" placeholder="${_('Filter for column name or type...')}" />
           </div>
@@ -388,7 +388,7 @@ ${layout.menubar(section='query')}
             </div>
           </div>
 
-          <div data-bind="css: {'hide': $root.design.results.empty()}">
+          <div data-bind="css: {'hide': !$root.hasResults()}">
             <table class="table table-striped table-condensed resultTable" cellpadding="0" cellspacing="0" data-tablescroller-enforce-height="true">
               <thead>
               <tr data-bind="foreach: $root.design.results.columns">
@@ -398,12 +398,24 @@ ${layout.menubar(section='query')}
             </table>
           </div>
 
-          <div data-bind="css: {'hide': !$root.design.results.empty()}" id="resultEmpty">
+          <div data-bind="css: {'hide': !$root.design.results.empty() || $root.design.results.expired()}" id="resultEmpty">
             <div class="card card-small scrollable">
               <div class="row-fluid">
                 <div class="span10 offset1 center empty-wrapper">
                   <i class="fa fa-frown-o"></i>
                   <h1>${_('The operation has no results.')}</h1>
+                  <br/>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div data-bind="css: {'hide': !$root.design.results.expired()}" id="resultExpired">
+            <div class="card card-small scrollable">
+              <div class="row-fluid">
+                <div class="span10 offset1 center empty-wrapper">
+                  <i class="fa fa-frown-o"></i>
+                  <h1>${_('The results have expired, rerun the query if needed.')}</h1>
                   <br/>
                 </div>
               </div>
@@ -1182,6 +1194,8 @@ function reinitializeTable(max) {
       $("#results .dataTables_wrapper").jHueScrollUp();
     } else if ($('#resultEmpty').height() > 0) {
       container.height($('#resultEmpty').height());
+    } else if ($('#resultExpired').height() > 0) {
+      container.height($('#resultExpired').height());
     }
 
     if ($("#results .dataTables_wrapper").data('original-height') == 0 && --_max != 0) {
@@ -2288,8 +2302,10 @@ function queryEvents() {
     routie('query/explanation');
   });
   $(document).on('watched.query', function (e, data) {
-    if (data.status && data.status && data.status != 0 && data.status != 2) {
-      viewModel.design.watch.errors.push(data.error || data.message);
+    if (data.status != 2) {
+      if (data.status && data.status && data.status != 0) {
+        viewModel.design.watch.errors.push(data.error || data.message);
+      }
     }
     routie('query/logs');
   });
@@ -2409,6 +2425,13 @@ ko.applyBindings(viewModel);
   $(document).ready(queryEvents);
   $(document).one('fetched.query', function(e) {
     viewModel.watchQueryLoop();
+    cacheQueryTextEvents();
+  });
+% elif action == 'editor-expired-results':
+  $(document).ready(queryEvents);
+  $(document).one('fetched.query', function(e) {
+    viewModel.design.results.expired(true);
+    $(document).trigger('fetched.results', [ [] ]);
     cacheQueryTextEvents();
   });
 % else:
