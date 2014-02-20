@@ -293,4 +293,14 @@ CodeMirror.defineMode("sql", function (config, parserConfig) {
     dateSQL: set("date time timestamp"),
     support: set("ODBCdotTable zerolessFloat")
   });
+
+  CodeMirror.defineMIME("text/x-impalaql", {
+    name: "sql",
+    keywords: set("all and as by case comment create database databases delimited describe distinct drop exists explain external fields format from group having if insert into join like limit lines location not or order overwrite partitioned refresh row schema schemas select show stored table tables terminated union use when where invalidate metadata"),
+    builtin: set("tinyint smallint int bigint boolean float double string timestamp parquetfile sequencefile textfile rcfile"),
+    functions: set("abs acos ascii asin atan avg bin cast ceil ceiling coalesce concat concat_ws count conv cos date_add date_sub datediff day dayname dayofmonth dayofweek degrees e exp find_in_set floor fnv_hash from_unixtime from_utc_timestamp greatest group_concat hex hour if initcap instr isnull lcase least length ln locate log log10 log2 lower lpad ltrim max min minute month ndv negative now nvl parse_url pi pmod positive pow power quotient radians rand regexp_extract repeat reverse round rpad rtrim second sign sin space sqrt substr substring sum tan to_date to_utc_timestamp translate trim ucase unhex unix_timestamp upper user weekofyear year"),
+    atoms: set("false true null"),
+    operatorChars: /^[*+\-%<>!=~&|^]/,
+    dateSQL: set("timestamp")
+  });
 }());
