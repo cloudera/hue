@@ -1353,7 +1353,11 @@ $(document).ready(function () {
     value: queryEditor.value,
     readOnly: false,
     lineNumbers: true,
+    % if app_name == 'impala':
+    mode: "text/x-impalaql",
+    % else:
     mode: "text/x-hiveql",
+    % endif
     extraKeys: {
       "Ctrl-Space": function () {
         CodeMirror.fromDot = false;
