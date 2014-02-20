@@ -18,6 +18,7 @@
 import json
 import logging
 import re
+import sys
 import time
 
 from django import forms
@@ -47,7 +48,7 @@ import beeswax.management.commands.beeswax_install_examples
 from beeswax import common, data_export, models
 from beeswax.models import SavedQuery, QueryHistory
 from beeswax.server import dbms
-from beeswax.server.dbms import expand_exception, get_query_server_config
+from beeswax.server.dbms import expand_exception, get_query_server_config, QueryServerException
 
 
 LOG = logging.getLogger(__name__)
@@ -368,13 +369,23 @@ def execute_query(request, design_id=None, query_history_id=None):
     query_history = authorized_get_query_history(request, query_history_id, must_exist=True)
     design = query_history.design
 
-    if 'on_success_url' in request.GET:
-      if request.GET.get('on_success_url'):
-        action = 'watch-redirect'
+    try:
+      handle, state = _get_query_handle_and_state(query_history)
+
+      if 'on_success_url' in request.GET:
+        if request.GET.get('on_success_url'):
+          action = 'watch-redirect'
+        else:
+          action = 'watch-results'
       else:
-        action = 'watch-results'
-    else:
-      action = 'editor-results'
+        action = 'editor-results'
+    except QueryServerException, e:
+      if 'Invalid query handle' in e.message or 'Invalid OperationHandle' in e.message:
+        query_history.save_state(QueryHistory.STATE.expired)
+        LOG.warn("Invalid query handle", exc_info=sys.exc_info())
+        action = 'editor-expired-results'
+      else:
+        raise e
   else:
     # Check perms.
     authorized_get_design(request, design_id)
@@ -824,12 +835,7 @@ def _get_query_handle_and_state(query_history):
   if handle is None:
     raise PopupException(_("Failed to retrieve query state from the Query Server."))
 
-  query_server = query_history.get_query_server_config()
-
-  if query_server['server_name'] == 'impala' and handle.has_result_set:
-    state = QueryHistory.STATE.available
-  else:
-    state = dbms.get(query_history.owner, query_history.get_query_server_config()).get_state(handle)
+  state = dbms.get(query_history.owner, query_history.get_query_server_config()).get_state(handle)
 
   if state is None:
     raise PopupException(_("Failed to contact Server to check query status."))
