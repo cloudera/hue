@@ -139,7 +139,9 @@ function BeeswaxViewModel(server) {
 
   self.setErrors = function(message, errors) {
     self.resetErrors();
-    self.design.errors.push(message);
+    if (message) {
+      self.design.errors.push(message);
+    }
     if (errors) {
       self.design.query.errors.push.apply(self.design.query.errors, errors.query);
       self.design.settings.errors.push.apply(self.design.settings.errors, errors.settings);
@@ -581,6 +583,7 @@ function BeeswaxViewModel(server) {
     var TIMEOUT = 1000;
     var timer = null;
 
+    self.design.isRunning(true);
     self.design.watch.logs.removeAll();
     self.design.results.rows.removeAll();
     self.design.results.columns.removeAll();
@@ -685,8 +688,13 @@ function BeeswaxViewModel(server) {
         dataType: 'json',
         type: 'POST',
         success: function(data) {
-          self.design.id(data.design_id);
-          $(document).trigger('saved.design', [data.design_id]);
+          if (data.status == 0) {
+            self.design.id(data.design_id);
+            $(document).trigger('saved.design', [data.design_id]);
+          } else {
+            self.setErrors("", data.errors);
+            $(document).trigger('error_save.design', [data.message]);
+          }
         },
         error: function() {
           $(document).trigger('error_save.design');
@@ -744,6 +752,9 @@ function BeeswaxViewModel(server) {
 
   self.saveResults = function() {
     var self = this;
+
+    self.design.isRunning(true);
+    self.resetErrors();
     if (self.design.id()) {
       var data = {
         'database': self.database(),
@@ -770,14 +781,17 @@ function BeeswaxViewModel(server) {
             } else {
               // redirect to metastore app.
               window.location.href = data.success_url;
+              self.design.isRunning(false);
             }
             $(document).trigger('saved.results', data);
           } else {
+            self.design.isRunning(false);
             self.design.results.save.errors(data.errors);
-            $(document).trigger('error_save.results');
+            $(document).trigger('error_save.results', [data.message]);
           }
         },
         error: function(data) {
+          self.design.isRunning(false);
           self.design.results.save.errors(data);
           $(document).trigger('error_save.results');
         },

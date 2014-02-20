@@ -273,7 +273,7 @@ ${layout.menubar(section='query')}
 
             <button data-bind="click: trySaveDesign, css: {'hide': !$root.design.id() || $root.design.id() == -1}" type="button" class="btn hide">${_('Save')}</button>
             <button data-bind="click: saveAsModal" type="button" class="btn">${_('Save as...')}</button>
-            <button data-bind="click: tryExplainQuery" type="button" id="explainQuery" class="btn">${_('Explain')}</button>
+            <button data-bind="click: tryExplainQuery, visible: $root.canExecute" type="button" id="explainQuery" class="btn">${_('Explain')}</button>
             &nbsp; ${_('or create a')} &nbsp;
             <button data-bind="click: createNewQuery" type="button" class="btn">${_('New query')}</button>
             <br/><br/>
@@ -1951,8 +1951,22 @@ $(document).on('server.unmanageable_error', function (e, responseText) {
 
 // Other
 $(document).on('saved.design', function (e, id) {
-  $(document).trigger('info', "${'Query saved.'}");
+  $(document).trigger('info', "${_('Query saved.')}");
   window.location.href = "/${ app_name }/execute/design/" + id;
+});
+$(document).on('error_save.design', function (e, message) {
+  var _message = "${_('Could not save design')}";
+  if (message) {
+    _message += ": " + message;
+  }
+  $(document).trigger('error', _message);
+});
+$(document).on('error_save.results', function (e, message) {
+  var _message = "${_('Could not save results')}";
+  if (message) {
+    _message += ": " + message;
+  }
+  $(document).trigger('error', _message);
 });
 $(document).on('error_cancel.query', function (e, message) {
   $(document).trigger("error", "${ _('Problem: ') }" + message);
