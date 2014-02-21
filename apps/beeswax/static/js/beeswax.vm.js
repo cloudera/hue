@@ -56,8 +56,9 @@ function BeeswaxViewModel(server) {
       'errors': [],
       'save': {
         'errors': null,
-        'type': 'hive-table',
-        'path': null
+        'type': 'hdfs-file',
+        'path': null,
+        'overwrite': true
       }
     },
     'watch': {
@@ -160,7 +161,9 @@ function BeeswaxViewModel(server) {
   };
 
   self.updateDatabases = function(databases) {
-    self.databases(databases);
+    if (databases) {
+      self.databases(databases);
+    }
   };
 
   self.updateDesign = function(design) {
@@ -784,7 +787,8 @@ function BeeswaxViewModel(server) {
         case 'hdfs-file':
         data = {
           'server': self.server(),
-          'path': self.design.results.save.path()
+          'path': self.design.results.save.path(),
+          'overwrite': self.design.results.save.overwrite()
         };
         url = '/' + self.server() + '/api/query/' + self.design.history.id() + '/results/save/hdfs/file';
         break;
@@ -892,6 +896,37 @@ function getFolderBrowseButton(inputElement) {
   return $("<button>").addClass("btn").addClass("fileChooserBtn").text("..").click(function (e) {
     e.preventDefault();
     folderChooser(inputElement);
+  });
+}
+
+function pathChooser(inputElement) {
+  $("#pathchooser").jHueFileChooser({
+    initialPath: inputElement.val(),
+    onFolderChoose:function (folderPath) {
+      if (folderPath[folderPath.length - 1] != '/') {
+        folderPath += '/';
+      }
+      inputElement.val(folderPath + 'results');
+      inputElement.trigger("change");
+      $("#choosePath").modal("hide");
+    },
+    onFileChoose: function (filePath) {
+      inputElement.val(filePath);
+      inputElement.trigger("change");
+      $("#choosePath").modal("hide");
+    },
+    selectFolder: true,
+    createFolder: true,
+    selectFile: true,
+    uploadFile: true
+  });
+  $("#choosePath").modal("show");
+}
+
+function getPathBrowseButton(inputElement) {
+  return $("<button>").addClass("btn").addClass("fileChooserBtn").text("..").click(function (e) {
+    e.preventDefault();
+    pathChooser(inputElement);
   });
 }
 
