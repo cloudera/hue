@@ -160,10 +160,10 @@
   };
 
   function drawHeader(_this) {
-    $(".jHueTableExtenderClonedContainer").remove();
+    $("#" + $(_this.element).attr("id") + "jHueTableExtenderClonedContainer").remove();
     var clonedTable = $(_this.element).clone();
     clonedTable.css("margin-bottom", "0").css("table-layout", "fixed");
-    clonedTable.removeClass("resultTable").find("tbody").remove();
+    clonedTable.removeAttr("id").removeClass("resultTable").find("tbody").remove();
     $(_this.element).find("thead>tr th").each(function (i) {
       var originalTh = $(this);
       clonedTable.find("thead>tr th:eq(" + i + ")").width(originalTh.width()).css("background-color", "#FFFFFF");
@@ -176,7 +176,7 @@
     var clonedTableContainer = $("<div>").width($(_this.element).outerWidth());
     clonedTable.appendTo(clonedTableContainer);
 
-    var clonedTableVisibleContainer = $("<div>").addClass("jHueTableExtenderClonedContainer").width($(_this.element).parent().width()).css("overflow-x", "hidden").css("top", ($(_this.element).parent().offset().top - $(window).scrollTop()) + "px");
+    var clonedTableVisibleContainer = $("<div>").attr("id", $(_this.element).attr("id") + "jHueTableExtenderClonedContainer").addClass("jHueTableExtenderClonedContainer").width($(_this.element).parent().width()).css("overflow-x", "hidden").css("top", ($(_this.element).parent().offset().top - $(window).scrollTop()) + "px");
     clonedTableVisibleContainer.css("position", "fixed");
 
     clonedTableContainer.appendTo(clonedTableVisibleContainer);

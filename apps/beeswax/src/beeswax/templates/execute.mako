@@ -286,36 +286,6 @@ ${layout.menubar(section='query')}
 
   <div id="resizePanel"><a href="javascript:void(0)"><i class="fa fa-ellipsis-h"></i></a></div>
 
-  <div id="recentSection">
-    <ul class="nav nav-tabs" style="margin-bottom: 0">
-      <li class="active"><a href="#recentTab" data-toggle="tab" class="sidetab">${_('Recent queries')}</a></li>
-    </ul>
-    <div class="tab-content">
-      <div class="tab-pane active" id="recentTab">
-        <div class="card card-tab" style="padding-top: 1px;">
-          <div class="card-body">
-            <div id="recentLoader">
-              <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #DDD"></i><!--<![endif]-->
-              <!--[if IE]><img src="/static/art/spinner.gif"/><![endif]-->
-            </div>
-            <table id="recentQueries" class="table table-striped table-condensed datatables" style="padding-left: 0;">
-              <thead>
-                <tr>
-                  <th>${_('Time')}</th>
-                  <th>${_('Query')}</th>
-                  <th>${_('Result')}</th>
-                  <th>&nbsp;</th>
-                </tr>
-              </thead>
-              <tbody>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <div class="card card-small scrollable resultsContainer">
     <div data-bind="visible: $root.hasResults()">
       <a id="expandResults" href="javascript:void(0)" title="${_('See results in full screen')}" rel="tooltip"
@@ -335,6 +305,7 @@ ${layout.menubar(section='query')}
 
     <div class="card-body">
       <ul class="nav nav-tabs">
+        <li class="active recentLi"><a href="#recentTab" data-toggle="tab" style="color:#666;font-weight:bold">${_('Recent queries')}</a></li>
         <li><a href="#query" data-toggle="tab">${_('Query')}</a></li>
         <!-- ko if: !design.explain() -->
         <li><a href="#log" data-toggle="tab">${_('Log')}</a></li>
@@ -350,6 +321,24 @@ ${layout.menubar(section='query')}
       </ul>
 
       <div class="tab-content">
+        <div class="active tab-pane" id="recentTab">
+          <div id="recentLoader">
+            <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #DDD"></i><!--<![endif]-->
+            <!--[if IE]><img src="/static/art/spinner.gif"/><![endif]-->
+          </div>
+          <table id="recentQueries" class="table table-striped table-condensed datatables" cellpadding="0" cellspacing="0" data-tablescroller-enforce-height="true">
+            <thead>
+              <tr>
+                <th>${_('Time')}</th>
+                <th>${_('Query')}</th>
+                <th>${_('Result')}</th>
+                <th>&nbsp;</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
         <div class="tab-pane" id="query">
           <pre data-bind="text: viewModel.design.statement()"></pre>
         </div>
@@ -361,7 +350,7 @@ ${layout.menubar(section='query')}
         <!-- /ko -->
 
         <!-- ko if: !design.explain() -->
-        <div class="active tab-pane" id="log">
+        <div class="tab-pane" id="log">
           <pre data-bind="text: $root.design.watch.logs().join('\n')"></pre>
         </div>
 
@@ -389,7 +378,7 @@ ${layout.menubar(section='query')}
           </div>
 
           <div data-bind="css: {'hide': !$root.hasResults()}">
-            <table class="table table-striped table-condensed resultTable" cellpadding="0" cellspacing="0" data-tablescroller-enforce-height="true">
+            <table id="resultTable" class="table table-striped table-condensed" cellpadding="0" cellspacing="0" data-tablescroller-enforce-height="true">
               <thead>
               <tr data-bind="foreach: $root.design.results.columns">
                 <th data-bind="html: ($index() == 0 ? '&nbsp;' : $data.name), css: { 'sort-numeric': isNumericColumn($data.type), 'sort-date': isDateTimeColumn($data.type), 'sort-string': isStringColumn($data.type)}"></th>
@@ -593,7 +582,7 @@ ${layout.menubar(section='query')}
     <a href="#" class="close" data-dismiss="modal">&times;</a>
     <h3>${_('Save Query Results')}</h3>
   </div>
-  <div class="modal-body">
+  <div class="modal-body" style="padding: 4px">
     <!-- ko if: $root.design.results.save.saveTargetError() -->
       <h4 data-bind="text: $root.design.results.save.saveTargetError()"></h4>
     <!-- /ko -->
@@ -787,6 +776,10 @@ ${layout.menubar(section='query')}
     font-style: normal;
   }
 
+  #navigatorTables {
+    margin: 4px;
+  }
+
   #navigatorTables li div {
     white-space: nowrap;
     overflow: hidden;
@@ -807,14 +800,14 @@ ${layout.menubar(section='query')}
     left: 0;
     width: 100%;
     background-color: #FFFFFF;
-    z-index: 32000;
+    z-index: 100;
   }
 
   .map {
     height: 200px;
   }
 
-  .resultTable td, .resultTable th {
+  #resultTable td, #resultTable th {
     white-space: nowrap;
   }
 
@@ -843,17 +836,13 @@ ${layout.menubar(section='query')}
     margin-top: 20px;
   }
 
-  #recentSection {
-    margin-top: 20px;
-  }
-
-  #recentSection code {
-    cursor: pointer;
-    white-space: normal;
-  }
-
   #recentQueries {
     width: 100%;
+  }
+
+  #recentQueries code {
+    cursor: pointer;
+    white-space: normal;
   }
 
   #navigator .card-body {
@@ -901,6 +890,17 @@ function placeResizePanelHandle() {
   $("#resizePanel a").css("left", $("#resizePanel").position().left + $("#resizePanel").width()/2 - 8);
 }
 
+function reinitializeTableExtenders() {
+  $("#resultTable").jHueTableExtender({
+     fixedHeader: true,
+     includeNavigator: false
+  });
+  $("#recentQueries").jHueTableExtender({
+     fixedHeader: true,
+     includeNavigator: false
+  });
+}
+
 var CURRENT_CODEMIRROR_SIZE = 100;
 
 // Navigator, recent queries
@@ -916,10 +916,7 @@ $(document).ready(function () {
     stop: function(e, ui) {
       $(".jHueTableExtenderClonedContainer").show();
       draggableHelper($(this), e, ui);
-      $(".resultTable").jHueTableExtender({
-         fixedHeader: true,
-         includeNavigator: false
-      });
+      reinitializeTableExtenders();
     }
   });
 
@@ -980,6 +977,7 @@ $(document).ready(function () {
       $("a[data-row-selector='true']").jHueRowSelector();
       $("#recentLoader").hide();
       $("#recentQueries").css("width", "100%");
+      reinitializeTableExtenders();
     });
   }
 
@@ -1142,7 +1140,7 @@ $(document).ready(function () {
   });
 
   $(document).on("click", ".column-selector", function () {
-    var _t = $(".resultTable");
+    var _t = $("#resultTable");
     var _col = _t.find("th:contains(" + $.trim($(this).text().split("(")[0]) + ")");
     _t.find(".columnSelected").removeClass("columnSelected");
     _t.find("tr td:nth-child(" + (_col.index() + 1) + ")").addClass("columnSelected");
@@ -1155,13 +1153,16 @@ $(document).ready(function () {
       window.setTimeout(resizeLogs, 150);
     }
     if ($(e.target).attr("href") == "#results" && $(e.relatedTarget).attr("href") == "#columns") {
-      if ($(".resultTable .columnSelected").length > 0) {
-        var _t = $(".resultTable");
-        var _col = _t.find("th:nth-child(" + ($(".resultTable .columnSelected").index() + 1) + ")");
+      if ($("#resultTable .columnSelected").length > 0) {
+        var _t = $("#resultTable");
+        var _col = _t.find("th:nth-child(" + ($("#resultTable .columnSelected").index() + 1) + ")");
         _t.parent().animate({
           scrollLeft: _col.position().left + _t.parent().scrollLeft() - _t.parent().offset().left - 30
         }, 300);
       }
+    }
+    if ($(e.target).attr("href") == "#results" || $(e.target).attr("href") == "#recentTab") {
+      reinitializeTableExtenders();
     }
   });
 });
@@ -1186,10 +1187,11 @@ function reinitializeTable(max) {
         minHeight: $(window).height() - 150,
         heightAfterCorrection: 0
       });
-      $(".resultTable").jHueTableExtender({
-         fixedHeader: true,
-         includeNavigator: false
+      $("#recentTab .dataTables_wrapper").jHueTableScroller({
+        minHeight: $(window).height() - 150,
+        heightAfterCorrection: 0
       });
+      reinitializeTableExtenders();
       container.height($("#results .dataTables_wrapper").height());
       $("#results .dataTables_wrapper").jHueScrollUp();
     } else if ($('#resultEmpty').height() > 0) {
@@ -1200,6 +1202,11 @@ function reinitializeTable(max) {
 
     if ($("#results .dataTables_wrapper").data('original-height') == 0 && --_max != 0) {
       $("#results .dataTables_wrapper").data('original-height', $("#results .dataTables_wrapper").height());
+      window.setTimeout(fn, 100);
+    }
+
+    if ($("#recentTab .dataTables_wrapper").data('original-height') == 0 && --_max != 0) {
+      $("#recentTab .dataTables_wrapper").data('original-height', $("#recentTab .dataTables_wrapper").height());
       window.setTimeout(fn, 100);
     }
   }
@@ -1442,10 +1449,7 @@ $(document).ready(function () {
     if (CURRENT_CODEMIRROR_SIZE == 100 && codeMirror.lineCount() > 7){
       CURRENT_CODEMIRROR_SIZE = 270;
       codeMirror.setSize("99%", CURRENT_CODEMIRROR_SIZE);
-      $(".resultTable").jHueTableExtender({
-         fixedHeader: true,
-         includeNavigator: false
-      });
+      reinitializeTableExtenders();
     }
   });
 
@@ -1515,6 +1519,9 @@ $(document).ready(function () {
         logGA('results/chart');
         predictGraph();
       }
+      if ($(e.target).attr("href") == "#resultTab") {
+        reinitializeTable();
+      }
     } else {
       reinitializeTable();
     }
@@ -1550,10 +1557,10 @@ $(document).ready(function () {
           var _descCol = $("#blueprintDesc").val() * 1;
           var _lats = [];
           var _lngs = [];
-          $(".resultTable>tbody>tr>td:nth-child(" + _latCol + ")").each(function (cnt) {
+          $("#resultTable>tbody>tr>td:nth-child(" + _latCol + ")").each(function (cnt) {
             _lats.push($.trim($(this).text()) * 1);
           });
-          $(".resultTable>tbody>tr>td:nth-child(" + _lngCol + ")").each(function (cnt) {
+          $("#resultTable>tbody>tr>td:nth-child(" + _lngCol + ")").each(function (cnt) {
             _lngs.push($.trim($(this).text()) * 1);
           });
           //$("#blueprint").addClass("map");
@@ -1564,17 +1571,17 @@ $(document).ready(function () {
             attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
           }).addTo(map);
 
-          $(".resultTable>tbody>tr>td:nth-child(" + _latCol + ")").each(function (cnt) {
+          $("#resultTable>tbody>tr>td:nth-child(" + _latCol + ")").each(function (cnt) {
             if (cnt < 1000) {
               if (_descCol != "-1") {
-                L.marker([$.trim($(this).text()) * 1, $.trim($(".resultTable>tbody>tr:nth-child(" + (cnt + 1) + ")>td:nth-child(" + _lngCol + ")").text()) * 1]).addTo(map).bindPopup($.trim($(".resultTable>tbody>tr:nth-child(" + (cnt + 1) + ")>td:nth-child(" + _descCol + ")").text()));
+                L.marker([$.trim($(this).text()) * 1, $.trim($("#resultTable>tbody>tr:nth-child(" + (cnt + 1) + ")>td:nth-child(" + _lngCol + ")").text()) * 1]).addTo(map).bindPopup($.trim($("#resultTable>tbody>tr:nth-child(" + (cnt + 1) + ")>td:nth-child(" + _descCol + ")").text()));
               }
               else {
-                L.marker([$.trim($(this).text()) * 1, $.trim($(".resultTable>tbody>tr:nth-child(" + (cnt + 1) + ")>td:nth-child(" + _lngCol + ")").text()) * 1]).addTo(map);
+                L.marker([$.trim($(this).text()) * 1, $.trim($("#resultTable>tbody>tr:nth-child(" + (cnt + 1) + ")>td:nth-child(" + _lngCol + ")").text()) * 1]).addTo(map);
               }
             }
           });
-          if ($(".resultTable>tbody>tr>td:nth-child(" + _latCol + ")").length > 1000){
+          if ($("#resultTable>tbody>tr>td:nth-child(" + _latCol + ")").length > 1000){
             $("#chart .alert").removeClass("hide");
           }
 
@@ -1588,17 +1595,17 @@ $(document).ready(function () {
           var _x = $("#blueprintX").val() * 1;
           var _y = $("#blueprintY").val() * 1;
           var _data = [];
-          $(".resultTable>tbody>tr>td:nth-child(" + _x + ")").each(function (cnt) {
+          $("#resultTable>tbody>tr>td:nth-child(" + _x + ")").each(function (cnt) {
             if (cnt < 1000) {
-              _data.push([$.trim($(this).text()), $.trim($(".resultTable>tbody>tr:nth-child(" + (cnt + 1) + ")>td:nth-child(" + _y + ")").text()) * 1]);
+              _data.push([$.trim($(this).text()), $.trim($("#resultTable>tbody>tr:nth-child(" + (cnt + 1) + ")>td:nth-child(" + _y + ")").text()) * 1]);
             }
           });
-          if ($(".resultTable>tbody>tr>td:nth-child(" + _x + ")").length > 1000){
+          if ($("#resultTable>tbody>tr>td:nth-child(" + _x + ")").length > 1000){
             $("#chart .alert").removeClass("hide");
           }
           $("#blueprint").jHueBlueprint({
             data: _data,
-            label: $(".resultTable>thead>tr>th:nth-child(" + _y + ")").text(),
+            label: $("#resultTable>thead>tr>th:nth-child(" + _y + ")").text(),
             type: graphType,
             color: $.jHueBlueprint.COLORS.BLUE,
             isCategories: true,
@@ -1744,7 +1751,7 @@ function addResults(viewModel, dataTable, index, pageSize) {
 
 function resultsTable(e, data) {
   if (!dataTable && viewModel.design.results.columns().length > 0) {
-    dataTable = $(".resultTable").dataTable({
+    dataTable = $("#resultTable").dataTable({
       "bPaginate": false,
       "bLengthChange": false,
       "bInfo": false,
@@ -1755,10 +1762,7 @@ function resultsTable(e, data) {
         "sZeroRecords": "${_('No matching records')}"
       },
       "fnDrawCallback": function (oSettings) {
-        $(".resultTable").jHueTableExtender({
-          fixedHeader: true,
-          includeNavigator: false
-        });
+        reinitializeTableExtenders();
       },
       "aoColumnDefs": [
         {
@@ -1909,6 +1913,12 @@ function tryExecuteQuery() {
   if ($("#results .dataTables_wrapper").length > 0) { // forces results to be up
     $("#results .dataTables_wrapper").scrollTop(0);
   }
+  if ($("#recentQueries .dataTables_wrapper").length > 0) { // forces results to be up
+    $("#recentQueries .dataTables_wrapper").scrollTop(0);
+  }
+  $(".jHueTableExtenderClonedContainer").hide();
+  renderRecent();
+  clickHard('.resultsContainer .nav-tabs a[href="#recentTab"]');
   graphHasBeenPredicted = false;
   if (viewModel.design.isParameterized()) {
     viewModel.fetchParameters();
@@ -2149,6 +2159,7 @@ $(document).ready(function () {
     $('#advanced-settings').show();
     $('#navigator').show();
     $('#queryContainer').show();
+    $('#resizePanel').show();
     $('a[href="#query"]').parent().show();
     if (!$('#querySide').hasClass('span10')) {
       $('#querySide').addClass('span10');
@@ -2159,6 +2170,7 @@ $(document).ready(function () {
     $('#advanced-settings').hide();
     $('#navigator').hide();
     $('#queryContainer').hide();
+    $('#resizePanel').hide();
     $('a[href="#query"]').parent().hide();
     if ($('#querySide').hasClass('span10')) {
       $('#querySide').removeClass('span10');
@@ -2167,47 +2179,42 @@ $(document).ready(function () {
 
   function queryPage() {
     queryPageComponents();
-    $('.resultsContainer').hide();
+    $(".recentLi").siblings().hide();
     $('.resultsContainer .watch-query').hide();
     $('.resultsContainer .view-query-results').hide();
   }
 
   function queryLogPage() {
     queryPageComponents();
-    $('#recentSection').hide();
-    $('.resultsContainer').show();
+    $(".recentLi").siblings().show();
     $('.resultsContainer .watch-query').show();
     $('.resultsContainer .view-query-results').hide();
   }
 
   function queryResultsPage() {
     queryPageComponents();
-    $('#recentSection').hide();
-    $('.resultsContainer').show();
+    $(".recentLi").siblings().show();
     $('.resultsContainer .watch-query').hide();
     $('.resultsContainer .view-query-results').show();
   }
 
   function parametersPage() {
     queryPageComponents();
-    $('#recentSection').hide();
-    $('.resultsContainer').hide();
+    $(".recentLi").siblings().hide();
     $('.resultsContainer .watch-query').hide();
     $('.resultsContainer .view-query-results').hide();
   }
 
   function watchLogsPage() {
     watchPageComponents();
-    $('#recentSection').hide();
-    $('.resultsContainer').show();
+    $(".recentLi").siblings().show();
     $('.resultsContainer .watch-query').show();
     $('.resultsContainer .view-query-results').hide();
   }
 
   function watchResultsPage() {
     watchPageComponents();
-    $('#recentSection').hide();
-    $('.resultsContainer').show();
+    $(".recentLi").siblings().show();
     $('.resultsContainer .watch-query').hide();
     $('.resultsContainer .view-query-results').show();
   }
