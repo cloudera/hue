@@ -167,7 +167,7 @@ ${layout.menubar(section='query')}
             % if expected_first_row != start_row:
                 <div class="alert"><strong>${_('Warning:')}</strong> ${_('Page offset may have incremented since last view.')}</div>
             % endif
-            <table class="table table-striped table-condensed resultTable" cellpadding="0" cellspacing="0" data-tablescroller-min-height-disable="true" data-tablescroller-enforce-height="true">
+            <table id="resultTable" class="table table-striped table-condensed resultTable" cellpadding="0" cellspacing="0" data-tablescroller-min-height-disable="true" data-tablescroller-enforce-height="true">
             <thead>
             <tr>
               <th>&nbsp;</th>

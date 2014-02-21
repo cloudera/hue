@@ -110,7 +110,7 @@ ${ components.menubar() }
                   <pre>${error_message | h}</pre>
                 </div>
               % else:
-                <table class="table table-striped table-condensed sampleTable">
+                <table id="sampleTable" class="table table-striped table-condensed sampleTable">
                   <thead>
                     <tr>
                     % for col in table.cols:

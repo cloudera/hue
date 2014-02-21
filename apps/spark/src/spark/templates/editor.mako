@@ -170,7 +170,7 @@ ${ common.navbar('editor') }
         </div>
           <div data-bind="css: {'hide': rows().length == 0}" class="hide">
             <div class="scrollable">
-              <table class="table table-striped table-condensed resultTable" cellpadding="0" cellspacing="0" data-tablescroller-min-height-disable="true" data-tablescroller-enforce-height="true">
+              <table id="resultTable" class="table table-striped table-condensed resultTable" cellpadding="0" cellspacing="0" data-tablescroller-min-height-disable="true" data-tablescroller-enforce-height="true">
                 <thead>
                   <tr>
                     <th>${ _('Key') }</th>
