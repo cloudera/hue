@@ -16,11 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-try:
-  import json
-except ImportError:
-  import simplejson as json
-
+import json
 import logging
 
 from desktop.lib.exceptions_renderable import PopupException
@@ -29,6 +25,7 @@ from search.api import SolrApi
 from search.conf import SOLR_URL
 from search.models import Collection
 from django.utils.translation import ugettext as _
+
 
 LOG = logging.getLogger(__name__)
 

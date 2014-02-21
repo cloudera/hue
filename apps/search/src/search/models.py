@@ -15,15 +15,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-try:
-  import json
-except ImportError:
-  import simplejson as json
+
+import itertools
+import json
+import logging
+import re
 
 from datetime import datetime
 from lxml import etree
-import re
-import logging
 
 from django.db import models
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
@@ -33,8 +32,8 @@ from mako.template import Template
 from search.api import SolrApi
 from search.conf import SOLR_URL
 
-LOG = logging.getLogger(__name__)
 
+LOG = logging.getLogger(__name__)
 
 
 class Facet(models.Model):
@@ -293,7 +292,7 @@ class Collection(models.Model):
     schema = etree.fromstring(solr_schema)
 
     return sorted([{'name': field.get('name'), 'type': field.get('type')}
-                   for fields in schema.iter('fields') for field in fields.iter('field')])
+                   for fields in schema.iter('fields') for field in itertools.chain(fields.iter('field'), fields.iter('dynamicField'))])
 
   @property
   def properties_dict(self):
