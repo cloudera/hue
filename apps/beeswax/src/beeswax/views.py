@@ -370,7 +370,8 @@ def execute_query(request, design_id=None, query_history_id=None):
     design = query_history.design
 
     try:
-      handle, state = _get_query_handle_and_state(query_history)
+      if query_history.server_id and query_history.server_guid:
+        handle, state = _get_query_handle_and_state(query_history)
 
       if 'on_success_url' in request.GET:
         if request.GET.get('on_success_url'):
