@@ -688,7 +688,7 @@ class HiveServerClientCompatible(object):
     if max_rows is None:
       max_rows = 1000
 
-    if start_over:
+    if start_over and not (self.query_server['server_name'] == 'impala' and self.query_server['querycache_rows'] == 0): # Backward compatibility for impala
       orientation = TFetchOrientation.FETCH_FIRST
     else:
       orientation = TFetchOrientation.FETCH_NEXT
