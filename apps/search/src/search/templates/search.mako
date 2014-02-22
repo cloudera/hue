@@ -28,6 +28,7 @@ import time
 ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
 
 <link rel="stylesheet" href="/search/static/css/search.css">
+<link href="/static/ext/css/hue-filetypes.css" rel="stylesheet">
 <script src="/static/ext/js/moment.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/search/static/js/search.utils.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/jquery/plugins/jquery.flot.min.js" type="text/javascript" charset="utf-8"></script>
@@ -85,8 +86,8 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
       <div class="btn-group download-btn-group" style="margin-left: 15px">
         <button type="button" id="download-btn" class="btn btn-inverse dropdown-toggle" data-toggle="dropdown"><i class="fa fa-download"></i></button>
         <ul class="dropdown-menu" role="menu">
-          <li><a href="javascript:void(0)" id="download-csv"><i class="fa fa-list"></i>&nbsp; CSV</a></li>
-          <li><a href="javascript:void(0)" id="download-xls"><i class="fa fa-th"></i>&nbsp; XLS</a></li>
+          <li><a href="javascript:void(0)" id="download-xls"><i class="hfo hfo-file-xls"></i>&nbsp; ${ _('XLS') }</a></li>
+          <li><a href="javascript:void(0)" id="download-csv"><i class="hfo hfo-file-csv">&nbsp; ${ _('CSV') }</i></a></li>
         </ul>
       </div>
       % endif

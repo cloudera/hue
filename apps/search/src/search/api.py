@@ -50,6 +50,17 @@ class SolrApi(object):
       return (('doAs', self._user ),)
     return (('user.name', DEFAULT_USER), ('doAs', self._user),)
 
+  def _get_json(self, response):
+    if type(response) != dict:
+      # Got 'plain/text' mimetype instead of 'application/json'
+      try:
+        response = json.loads(response)
+      except ValueError, e:
+        # Got some null bytes in the response
+        LOG.error('%s: %s' % (unicode(e), repr(response)))
+        response = json.loads(response.replace('\x00', ''))
+    return response
+
   def query(self, solr_query, hue_core):
     try:
       params = self._get_params() + (
@@ -67,16 +78,7 @@ class SolrApi(object):
           params += (('fq', fq),)
 
       response = self._root.get('%(collection)s/select' % solr_query, params)
-
-      if type(response) != dict:
-        # Got 'plain/text' mimetype instead of 'application/json'
-        try:
-          response = json.loads(response)
-        except ValueError, e:
-          # Got some null bytes in the response
-          LOG.error('%s: %s' % (unicode(e), repr(response)))
-          response = json.loads(response.replace('\x00', ''))
-      return response
+      return self._get_json(response)
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
@@ -143,5 +145,18 @@ class SolrApi(object):
           ('file', 'schema.xml'),
       )
       return self._root.get('%(core)s/admin/file' % {'core': core}, params=params)
+    except RestException, e:
+      raise PopupException(e, title=_('Error while accessing Solr'))
+
+  def fields(self, core, dynamic=False):
+    try:
+      params = self._get_params() + (
+          ('wt', 'json'),
+          ('fl', '*'),
+      )
+      if not dynamic:
+        params += (('show', 'schema'),)
+      response = self._root.get('%(core)s/admin/luke' % {'core': core}, params=params)
+      return self._get_json(response)
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))

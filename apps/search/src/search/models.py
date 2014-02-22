@@ -16,7 +16,6 @@
 # limitations under the License.
 
 
-import itertools
 import json
 import logging
 import re
@@ -285,14 +284,19 @@ class Collection(models.Model):
     return reverse('search:admin_collection', kwargs={'collection_id': self.id})
 
   def fields(self, user):
-    return sorted([field.get('name') for field in self.fields_data(user)])
+    return sorted([str(field.get('name', '')) for field in self.fields_data(user)])
 
   def fields_data(self, user):
-    solr_schema = SolrApi(SOLR_URL.get(), user).schema(self.name)
-    schema = etree.fromstring(solr_schema)
+    schema_fields = SolrApi(SOLR_URL.get(), user).fields(self.name)
+    schema_fields = schema_fields['schema']['fields']
 
-    return sorted([{'name': field.get('name'), 'type': field.get('type')}
-                   for fields in schema.iter('fields') for field in itertools.chain(fields.iter('field'), fields.iter('dynamicField'))])
+    dynamic_fields = SolrApi(SOLR_URL.get(), user).fields(self.name, dynamic=True)
+    dynamic_fields = dynamic_fields['fields']
+
+    schema_fields.update(dynamic_fields)
+
+    return sorted([{'name': str(field), 'type': str(attributes.get('type', ''))}
+                  for field, attributes in schema_fields.iteritems()])
 
   @property
   def properties_dict(self):
