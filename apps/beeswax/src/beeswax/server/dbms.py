@@ -160,7 +160,7 @@ class HiveServer2Dbms(object):
       handle = self.execute_and_wait(query, timeout_sec=5.0)
 
       if handle:
-        result = self.fetch(handle)
+        result = self.fetch(handle, rows=100)
         self.close(handle)
         return result
 
