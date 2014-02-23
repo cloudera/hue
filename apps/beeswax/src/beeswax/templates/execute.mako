@@ -305,15 +305,15 @@ ${layout.menubar(section='query')}
 
     <div class="card-body">
       <ul class="nav nav-tabs">
-        <li class="active recentLi"><a href="#recentTab" data-toggle="tab" style="color:#666;font-weight:bold">${_('Recent queries')}</a></li>
+        <li class="active recentLi"><a href="#recentTab" data-toggle="tab">${_('Recent queries')}</a></li>
         <li><a href="#query" data-toggle="tab">${_('Query')}</a></li>
         <!-- ko if: !design.explain() -->
         <li><a href="#log" data-toggle="tab">${_('Log')}</a></li>
         <!-- /ko -->
-        <!-- ko if: !design.explain() && !design.isRunning() -->
-        <li data-bind="css: {'hide': !$root.hasResults()}"><a href="#columns" data-toggle="tab">${_('Columns')}</a></li>
+        <!-- ko if: !design.explain() -->
+        <li><a href="#columns" data-toggle="tab">${_('Columns')}</a></li>
         <li><a href="#results" data-toggle="tab">${_('Results')}</a></li>
-        <li data-bind="css: {'hide': !$root.hasResults()}"><a href="#chart" data-toggle="tab">${_('Chart')}</a></li>
+        <li><a href="#chart" data-toggle="tab">${_('Chart')}</a></li>
         <!-- /ko -->
         <!-- ko if: design.explain() && !design.isRunning() -->
         <li><a href="#explanation" data-toggle="tab">${_('Explanation')}</a></li>
@@ -340,7 +340,8 @@ ${layout.menubar(section='query')}
           </table>
         </div>
         <div class="tab-pane" id="query">
-          <pre data-bind="text: viewModel.design.statement()"></pre>
+          <pre data-bind="visible: viewModel.design.statement() == ''">${_('There is currently no query to visualize.')}</pre>
+          <pre data-bind="visible: viewModel.design.statement() != '', text: viewModel.design.statement()"></pre>
         </div>
 
         <!-- ko if: design.explain() -->
@@ -351,10 +352,12 @@ ${layout.menubar(section='query')}
 
         <!-- ko if: !design.explain() -->
         <div class="tab-pane" id="log">
-          <pre data-bind="text: $root.design.watch.logs().join('\n')"></pre>
+          <pre data-bind="visible: $root.design.watch.logs().length == 0">${_('There are currently no logs to visualize.')} <img src="/static/art/spinner.gif" data-bind="visible: $root.design.isRunning()"/></pre>
+          <pre data-bind="visible: $root.design.watch.logs().length > 0, text: $root.design.watch.logs().join('\n')"></pre>
         </div>
 
-        <div class="tab-pane" id="columns" data-bind="css: {'hide': !$root.hasResults()}">
+        <div class="tab-pane" id="columns">
+          <pre data-bind="visible: $root.design.results.columns().length == 0">${_('There are currently no columns to visualize.')}</pre>
           <div data-bind="visible: $root.design.results.columns().length > 10">
             <input id="columnFilter" class="input-xlarge" type="text" placeholder="${_('Filter for column name or type...')}" />
           </div>
@@ -388,35 +391,20 @@ ${layout.menubar(section='query')}
           </div>
 
           <div data-bind="css: {'hide': !$root.design.results.empty() || $root.design.results.expired()}" id="resultEmpty">
-            <div class="card card-small scrollable">
-              <div class="row-fluid">
-                <div class="span10 offset1 center empty-wrapper">
-                  <i class="fa fa-frown-o"></i>
-                  <h1>${_('The operation has no results.')}</h1>
-                  <br/>
-                </div>
-              </div>
-            </div>
+            <pre>${_('The operation has no results.')}</pre>
           </div>
 
           <div data-bind="css: {'hide': !$root.design.results.expired()}" id="resultExpired">
-            <div class="card card-small scrollable">
-              <div class="row-fluid">
-                <div class="span10 offset1 center empty-wrapper">
-                  <i class="fa fa-frown-o"></i>
-                  <h1>${_('The results have expired, rerun the query if needed.')}</h1>
-                  <br/>
-                </div>
-              </div>
-            </div>
+            <pre>${_('The results have expired, rerun the query if needed.')}</pre>
           </div>
         </div>
 
-         <div class="tab-pane" id="chart">
-           <div class="alert hide">
+        <div class="tab-pane" id="chart">
+          <pre data-bind="visible: $root.design.results.columns().length == 0">${_('There is currently no data to build a chart on.')}</pre>
+          <div class="alert hide">
             <strong>${_('Warning:')}</strong> ${_('the results on the chart have been limited to 1000 rows.')}
           </div>
-          <div style="text-align: center">
+          <div data-bind="visible: $root.design.results.columns().length > 0" style="text-align: center">
           <form class="form-inline">
             ${_('Chart type')}&nbsp;
             <div class="btn-group" data-toggle="buttons-radio">
@@ -445,7 +433,7 @@ ${layout.menubar(section='query')}
             </span>
           </form>
           </div>
-          <div id="blueprint" class="empty">${_("Please select a chart type.")}</div>
+          <div  data-bind="visible: $root.design.results.columns().length > 0" id="blueprint" class="empty">${_("Please select a chart type.")}</div>
         </div>
         <!-- /ko -->
       </div>
@@ -1574,7 +1562,6 @@ $(document).ready(function () {
           $("#resultTable>tbody>tr>td:nth-child(" + _lngCol + ")").each(function (cnt) {
             _lngs.push($.trim($(this).text()) * 1);
           });
-          //$("#blueprint").addClass("map");
           $("#blueprint").height($("#blueprint").parent().height() - 100);
           map = L.map("blueprint").fitBounds(getMapBounds(_lats, _lngs));
 
@@ -1929,7 +1916,7 @@ function tryExecuteQuery() {
   }
   $(".jHueTableExtenderClonedContainer").hide();
   renderRecent();
-  clickHard('.resultsContainer .nav-tabs a[href="#recentTab"]');
+  clickHard('.resultsContainer .nav-tabs a[href="#log"]');
   graphHasBeenPredicted = false;
   if (viewModel.design.isParameterized()) {
     viewModel.fetchParameters();
@@ -2191,42 +2178,36 @@ $(document).ready(function () {
 
   function queryPage() {
     queryPageComponents();
-    $(".recentLi").siblings().hide();
     $('.resultsContainer .watch-query').hide();
     $('.resultsContainer .view-query-results').hide();
   }
 
   function queryLogPage() {
     queryPageComponents();
-    $(".recentLi").siblings().show();
     $('.resultsContainer .watch-query').show();
     $('.resultsContainer .view-query-results').hide();
   }
 
   function queryResultsPage() {
     queryPageComponents();
-    $(".recentLi").siblings().show();
     $('.resultsContainer .watch-query').hide();
     $('.resultsContainer .view-query-results').show();
   }
 
   function parametersPage() {
     queryPageComponents();
-    $(".recentLi").siblings().hide();
     $('.resultsContainer .watch-query').hide();
     $('.resultsContainer .view-query-results').hide();
   }
 
   function watchLogsPage() {
     watchPageComponents();
-    $(".recentLi").siblings().show();
     $('.resultsContainer .watch-query').show();
     $('.resultsContainer .view-query-results').hide();
   }
 
   function watchResultsPage() {
     watchPageComponents();
-    $(".recentLi").siblings().show();
     $('.resultsContainer .watch-query').hide();
     $('.resultsContainer .view-query-results').show();
   }
