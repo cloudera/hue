@@ -329,9 +329,9 @@ ${layout.menubar(section='query')}
           <table id="recentQueries" class="table table-striped table-condensed datatables" cellpadding="0" cellspacing="0" data-tablescroller-enforce-height="true">
             <thead>
               <tr>
-                <th>${_('Time')}</th>
-                <th>${_('Query')}</th>
-                <th>${_('Result')}</th>
+                <th width="10%">${_('Time')}</th>
+                <th width="85%">${_('Query')}</th>
+                <th width="5%">${_('Result')}</th>
                 <th>&nbsp;</th>
               </tr>
             </thead>
@@ -842,6 +842,10 @@ ${layout.menubar(section='query')}
   #recentQueries code {
     cursor: pointer;
     white-space: normal;
+  }
+
+  #recentQueries tr td:first-child {
+    white-space: nowrap;
   }
 
   #navigator .card-body {
@@ -1866,6 +1870,7 @@ var selectedLine = -1;
 var errorWidgets = [];
 
 function clearErrorWidgets() {
+  $(".jHueTableExtenderClonedContainer").hide();
   $.each(errorWidgets, function(index, errorWidget) {
     errorWidget.clear();
   });
@@ -1902,6 +1907,8 @@ $(document).on('error.query', function () {
   if ($(".queryErrorMessage:hidden").length == $(".queryErrorMessage").length) {
     $(".queryErrorMessage").parent().parent().hide();
   }
+
+  reinitializeTableExtenders();
 });
 
 
@@ -1952,6 +1959,7 @@ $(document).on('saved.results', function() {
 
 // Querying and click events.
 function tryExecuteQuery() {
+  $(".jHueTableExtenderClonedContainer").hide();
   $(".tooltip").remove();
   var query = getHighlightedQuery() || codeMirror.getValue();
   viewModel.design.query.value(query);
@@ -1961,7 +1969,6 @@ function tryExecuteQuery() {
   if ($("#recentQueries .dataTables_wrapper").length > 0) { // forces results to be up
     $("#recentQueries .dataTables_wrapper").scrollTop(0);
   }
-  $(".jHueTableExtenderClonedContainer").hide();
   renderRecent();
   clickHard('.resultsContainer .nav-tabs a[href="#log"]');
   graphHasBeenPredicted = false;
