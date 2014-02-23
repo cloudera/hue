@@ -1267,7 +1267,7 @@ $(document).ready(function () {
     }
   };
 
-  function split_statements(hql) {
+  function splitStatements(hql) {
     var statements = [];
     var current = "";
     var prev = "";
@@ -1298,13 +1298,32 @@ $(document).ready(function () {
     return statements;
   }
 
+  function getStatementAtCursor() {
+    var _pos = codeMirror.indexFromPos(codeMirror.getCursor());
+    var _statements = splitStatements(codeMirror.getValue());
+    var _cumulativePos = 0;
+    var _statementAtCursor = "";
+    var _relativePos = 0;
+    for (var i = 0; i < _statements.length; i++) {
+      if (_cumulativePos + _statements[i].length >= _pos && _statementAtCursor == "") {
+        _statementAtCursor = _statements[i].split("\n").join(" ");
+        _relativePos = _pos - _cumulativePos;
+      }
+      _cumulativePos += _statements[i].length;
+    }
+    return {
+      statement: _statementAtCursor,
+      relativeIndex: _relativePos
+    };
+  }
+
   CodeMirror.commands.autocomplete = function (cm) {
     $(document.body).on("contextmenu", function (e) {
       e.preventDefault(); // prevents native menu on FF for Mac from being shown
     });
 
     var pos = cm.cursorCoords();
-    if ($(".CodeMirror-spinner").length == 0){
+    if ($(".CodeMirror-spinner").length == 0) {
       $("<i class='fa fa-spinner fa-spin CodeMirror-spinner'></i>").appendTo($("body"));
     }
     $(".CodeMirror-spinner").css("top", pos.top + "px").css("left", (pos.left - 4) + "px").show();
@@ -1317,56 +1336,83 @@ $(document).ready(function () {
     else {
       hac_getTables(viewModel.database(), function (tables) {
         CodeMirror.catalogTables = tables;
-        var _beforeArr = split_statements(codeMirror.getRange({line: 0, ch: 0}, {line: codeMirror.getCursor().line, ch: codeMirror.getCursor().ch}).replace(/(\r\n|\n|\r)/gm, " "));
-        var _before = (_beforeArr.length > 0)?_beforeArr[_beforeArr.length - 1].replace(/;+$/, ""):"";
-        var _afterArr = split_statements(codeMirror.getRange({line: codeMirror.getCursor().line, ch: codeMirror.getCursor().ch}, {line: 10000, ch: 10000}).replace(/(\r\n|\n|\r)/gm, " "));
-        var _after = (_afterArr.length > 0)?_afterArr[0].replace(/;+$/, ""):"";
-        CodeMirror.possibleTable = false;
-        CodeMirror.tableFieldMagic = false;
-        if ((_before.toUpperCase().indexOf(" FROM ") > -1 || _before.toUpperCase().indexOf(" TABLE ") > -1 || _before.toUpperCase().indexOf(" STATS ") > -1) && _before.toUpperCase().indexOf(" ON ") == -1 && _before.toUpperCase().indexOf(" WHERE ") == -1 ||
-            _before.toUpperCase().indexOf("REFRESH") > -1 || _before.toUpperCase().indexOf("METADATA") > -1 || _before.toUpperCase().indexOf("DESCRIBE") > -1) {
-          CodeMirror.possibleTable = true;
-        }
-        CodeMirror.possibleSoloField = false;
-        if (_before.toUpperCase().indexOf("SELECT ") > -1 && _before.toUpperCase().indexOf(" FROM ") == -1 && !CodeMirror.fromDot) {
-
-          if (_after.toUpperCase().indexOf("FROM ") > -1) {
-            fieldsAutocomplete(cm, _after);
-          }
-          else {
-            CodeMirror.tableFieldMagic = true;
-            CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
+        var _statementAtCursor = getStatementAtCursor();
+        var _before = _statementAtCursor.statement.substr(0, _statementAtCursor.relativeIndex).replace(/;+$/, "");
+        var _after = _statementAtCursor.statement.substr(_statementAtCursor.relativeIndex).replace(/;+$/, "");
+        if ($.trim(_before).substr(-1) == ".") {
+          var _statement = _statementAtCursor.statement;
+          var _line = codeMirror.getLine(codeMirror.getCursor().line);
+          var _partial = _line.substring(0, codeMirror.getCursor().ch);
+          var _table = _partial.substring(_partial.lastIndexOf(" ") + 1, _partial.length - 1);
+          if (_statement.indexOf("FROM") > -1) {
+            hac_getTableColumns(viewModel.database(), _table, _statement, function (columns) {
+              var _cols = columns.split(" ");
+              for (var col in _cols) {
+                _cols[col] = "." + _cols[col];
+              }
+              CodeMirror.catalogFields = _cols.join(" ");
+              CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
+            });
           }
         }
         else {
-          if (_before.toUpperCase().indexOf("WHERE ") > -1 && !CodeMirror.fromDot && _before.toUpperCase().match(/ ON| GROUP| SORT/) == null) {
-            fieldsAutocomplete(cm, _before);
+          CodeMirror.possibleTable = false;
+          CodeMirror.tableFieldMagic = false;
+          if ((_before.toUpperCase().indexOf(" FROM ") > -1 || _before.toUpperCase().indexOf(" TABLE ") > -1 || _before.toUpperCase().indexOf(" STATS ") > -1) && _before.toUpperCase().indexOf(" ON ") == -1 && _before.toUpperCase().indexOf(" WHERE ") == -1 ||
+              _before.toUpperCase().indexOf("REFRESH") > -1 || _before.toUpperCase().indexOf("METADATA") > -1 || _before.toUpperCase().indexOf("DESCRIBE") > -1) {
+            CodeMirror.possibleTable = true;
+          }
+          CodeMirror.possibleSoloField = false;
+          if (_before.toUpperCase().indexOf("SELECT ") > -1 && _before.toUpperCase().indexOf(" FROM ") == -1 && !CodeMirror.fromDot) {
+
+            if (_after.toUpperCase().indexOf("FROM ") > -1) {
+              fieldsAutocomplete(cm);
+            }
+            else {
+              CodeMirror.tableFieldMagic = true;
+              CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
+            }
           }
           else {
-            CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
+            if (_before.toUpperCase().indexOf("WHERE ") > -1 && !CodeMirror.fromDot && _before.toUpperCase().match(/ ON| GROUP| SORT/) == null) {
+              fieldsAutocomplete(cm);
+            }
+            else {
+              CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
+            }
           }
         }
       });
     }
   }
 
-  function fieldsAutocomplete(cm, value) {
+  function fieldsAutocomplete(cm) {
     CodeMirror.possibleSoloField = true;
     try {
-      var _possibleTables = $.trim(value.substr(value.toUpperCase().indexOf("FROM ") + 4)).split(" ");
+      var _value = getStatementAtCursor().statement;
+      var _from = _value.toUpperCase().indexOf("FROM");
+      if (_from > -1) {
+        var _match = _value.toUpperCase().substring(_from).match(/ ON| WHERE| GROUP| SORT|;/);
+        var _to = _value.length;
+        if (_match) {
+          _to = _match.index;
+        }
+        var _found = _value.substr(_from, _to).replace(/(\r\n|\n|\r)/gm, "").replace(/from/gi, "").replace(/join/gi, ",").split(",");
+      }
+
       var _foundTable = "";
-      for (var i = 0; i < _possibleTables.length; i++) {
-        if ($.trim(_possibleTables[i]) != "" && _foundTable == "") {
-          _foundTable = _possibleTables[i];
+      for (var i = 0; i < _found.length; i++) {
+        if ($.trim(_found[i]) != "" && _foundTable == "") {
+          _foundTable = $.trim(_found[i]).split(" ")[0];
         }
       }
       if (_foundTable != "") {
-        if (hac_tableHasAlias(_foundTable, value)) {
+        if (hac_tableHasAlias(_foundTable, _value)) {
           CodeMirror.possibleSoloField = false;
           CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
         }
         else {
-          hac_getTableColumns(viewModel.database(), _foundTable, value,
+          hac_getTableColumns(viewModel.database(), _foundTable, _value,
               function (columns) {
                 CodeMirror.catalogFields = columns;
                 CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
@@ -1403,11 +1449,12 @@ $(document).ready(function () {
     onKeyEvent: function (e, s) {
       if (s.type == "keyup") {
         if (s.keyCode == 190) {
+          var _statement = getStatementAtCursor().statement;
           var _line = codeMirror.getLine(codeMirror.getCursor().line);
           var _partial = _line.substring(0, codeMirror.getCursor().ch);
           var _table = _partial.substring(_partial.lastIndexOf(" ") + 1, _partial.length - 1);
-          if (codeMirror.getValue().toUpperCase().indexOf("FROM") > -1) {
-            hac_getTableColumns(viewModel.database(), _table, codeMirror.getRange({line: codeMirror.getCursor().line, ch: codeMirror.getCursor().ch}, {line: 10000, ch: 10000}), function (columns) {
+          if (_statement.indexOf("FROM") > -1) {
+            hac_getTableColumns(viewModel.database(), _table, _statement, function (columns) {
               var _cols = columns.split(" ");
               for (var col in _cols) {
                 _cols[col] = "." + _cols[col];
