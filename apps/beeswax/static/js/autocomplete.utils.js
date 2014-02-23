@@ -44,7 +44,7 @@ function hac_hasExpired(timestamp){
 
 function hac_getTableAliases(textScanned) {
   var _aliases = {};
-  var _val = textScanned; //codeMirror.getValue();
+  var _val = textScanned.split("\n").join(" ");
   var _from = _val.toUpperCase().indexOf("FROM ");
   if (_from > -1) {
     var _match = _val.toUpperCase().substring(_from).match(/ ON| WHERE| GROUP| SORT|;/);
