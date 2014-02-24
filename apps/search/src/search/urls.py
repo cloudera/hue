@@ -38,4 +38,6 @@ urlpatterns = patterns('search.views',
   url(r'^admin/collection/(?P<collection_id>\w+)/solr_properties$', 'admin_collection_solr_properties', name='admin_collection_solr_properties'),
   url(r'^admin/collection_delete$', 'admin_collection_delete', name='admin_collection_delete'),
   url(r'^admin/collection_copy$', 'admin_collection_copy', name='admin_collection_copy'),
+  
+  url(r'^install_examples$', 'install_examples', name='install_examples'),
 )

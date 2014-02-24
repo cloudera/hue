@@ -366,9 +366,17 @@ from django.utils.translation import ugettext as _
        </li>
        % endif
        % if 'search' in apps:
-       <li>
-         <a title="${_('Solr Search')}" rel="navigator-tooltip" href="${ url('search:index') }">${_('Search')}</a>
-       </li>
+         <%! from search.search_controller import SearchController %>
+         <% collections = SearchController(user).get_search_collections() %>
+         <li class="dropdown">
+           <a title="${_('Solr Search')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">${_('Search')} <b class="caret"></b></a>
+           ## TODO: no collections yet? /search/admin/collections
+           <ul role="menu" class="dropdown-menu">
+             % for collection in collections:
+             <li><a href="${ url('search:index') }?collection=${ collection.id }"><img src="/search/static/art/icon_search_24.png" /> ${ collection.label }</a></li>
+             % endfor
+           </ul>
+         </li>
        % endif
        % if other_apps:
        <li class="dropdown">

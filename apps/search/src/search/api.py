@@ -17,23 +17,26 @@
 # limitations under the License.
 
 import json
-import urllib
-
 import logging
+import urllib
 
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.rest.http_client import HttpClient, RestException
 from desktop.lib.rest import resource
-from search.conf import EMPTY_QUERY, SECURITY_ENABLED
 from django.utils.translation import ugettext as _
+
+from search.examples import demo_handler
+from search.conf import EMPTY_QUERY, SECURITY_ENABLED
 
 
 LOG = logging.getLogger(__name__)
 
 DEFAULT_USER = 'hue'
 
+
 def utf_quoter(what):
   return urllib.quote(unicode(what).encode('utf-8'), safe='~@#$&()*!+=;,.?/\'')
+
 
 class SolrApi(object):
   """
@@ -53,7 +56,8 @@ class SolrApi(object):
       return (('doAs', self._user ),)
     return (('user.name', DEFAULT_USER), ('doAs', self._user),)
 
-  def _get_json(self, response):
+  @classmethod
+  def _get_json(cls, response):
     if type(response) != dict:
       # Got 'plain/text' mimetype instead of 'application/json'
       try:
@@ -64,6 +68,7 @@ class SolrApi(object):
         response = json.loads(response.replace('\x00', ''))
     return response
 
+  @demo_handler
   def query(self, solr_query, hue_core):
     try:
       params = self._get_params() + (

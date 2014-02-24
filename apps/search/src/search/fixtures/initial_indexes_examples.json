@@ -1,0 +1,113 @@
+[
+  {
+    "pk": 1, 
+    "model": "search.facet", 
+    "fields": {
+      "data": "{\"dates\": [], \"fields\": [{\"uuid\": \"f6618a5c-bbba-2886-1886-bbcaf01409ca\", \"verbatim\": \"\", \"isVerbatim\": false, \"label\": \"Location\", \"field\": \"user_location\", \"type\": \"field\"}], \"charts\": [{\"end\": \"NOW\", \"uuid\": \"4883871c-0cea-8547-de60-7166d498098a\", \"verbatim\": \"\", \"start\": \"NOW-12DAYS/DAYS\", \"isVerbatim\": false, \"label\": \"Posted\", \"field\": \"created_at\", \"gap\": \"+1DAYS\", \"type\": \"chart\"}], \"properties\": {\"sort\": \"count\", \"mincount\": 1, \"isEnabled\": true, \"limit\": 10}, \"ranges\": [{\"end\": 100, \"uuid\": \"32b5227e-11e3-36e2-a87c-82e9598271b1\", \"verbatim\": \"\", \"start\": 0, \"isVerbatim\": false, \"label\": \"Retweets\", \"field\": \"retweet_count\", \"gap\": 10, \"type\": \"range\"}], \"order\": [\"f6618a5c-bbba-2886-1886-bbcaf01409ca\", \"32b5227e-11e3-36e2-a87c-82e9598271b1\"]}", 
+      "enabled": true
+    }
+  }, 
+  {
+    "pk": 2, 
+    "model": "search.facet", 
+    "fields": {
+      "data": "{\"dates\": [], \"fields\": [{\"uuid\": \"0928186d-906e-d613-030c-74370abba6e8\", \"verbatim\": \"\", \"isVerbatim\": false, \"label\": \"Open\", \"field\": \"open\", \"type\": \"field\"}], \"charts\": [], \"properties\": {\"sort\": \"count\", \"mincount\": 1, \"isEnabled\": true, \"limit\": 10}, \"ranges\": [{\"end\": \"6\", \"uuid\": \"14eaa166-06e2-51fe-5966-8606735597f0\", \"verbatim\": \"\", \"start\": 0, \"isVerbatim\": false, \"label\": \"Stars\", \"field\": \"stars\", \"gap\": \"1\", \"type\": \"range\"}, {\"end\": 100, \"uuid\": \"baca0e23-264e-30d5-f573-8b305dd65f7e\", \"verbatim\": \"\", \"start\": 0, \"isVerbatim\": false, \"label\": \"Review count\", \"field\": \"review_count\", \"gap\": 10, \"type\": \"range\"}], \"order\": [\"14eaa166-06e2-51fe-5966-8606735597f0\", \"0928186d-906e-d613-030c-74370abba6e8\", \"baca0e23-264e-30d5-f573-8b305dd65f7e\"]}", 
+      "enabled": true
+    }
+  }, 
+  {
+    "pk": 3, 
+    "model": "search.facet", 
+    "fields": {
+      "data": "{\"dates\": [], \"fields\": [{\"uuid\": \"d8a71e24-fd82-fdff-b719-bfb75d08f00a\", \"verbatim\": \"\", \"isVerbatim\": false, \"label\": \"Level\", \"field\": \"status\", \"type\": \"field\"}, {\"uuid\": \"f8ec2454-5f0a-bf80-ebee-7b1a985b0be6\", \"verbatim\": \"\", \"isVerbatim\": false, \"label\": \"Host\", \"field\": \"host\", \"type\": \"field\"}], \"charts\": [{\"end\": \"NOW\", \"uuid\": \"e257d0a9-0bee-1a9f-3a05-bce548001b6a\", \"verbatim\": \"\", \"start\": \"NOW-12DAYS/DAYS\", \"isVerbatim\": false, \"label\": \"Timestamp\", \"field\": \"timestamp\", \"gap\": \"+1DAYS\", \"type\": \"chart\"}], \"properties\": {\"sort\": \"count\", \"mincount\": 1, \"isEnabled\": true, \"limit\": 10}, \"ranges\": [], \"order\": [\"d8a71e24-fd82-fdff-b719-bfb75d08f00a\", \"f8ec2454-5f0a-bf80-ebee-7b1a985b0be6\"]}", 
+      "enabled": true
+    }
+  }, 
+  {
+    "pk": 1, 
+    "model": "search.result", 
+    "fields": {
+      "data": "{\"extracode\": \"\\n      \\n<style type=\\\"text/css\\\">\\nem {\\n  font-weight: bold;\\n  background-color: yellow;\\n}\\n.avatar {\\n  margin: 10px;\\n}\\n.created {\\n  margin-top: 10px;\\n  color: #CCC;\\n}\\n.openTweet {\\n  float: right;\\n  margin: 10px;\\n}\\n</style>\\n      \\n    \", \"highlighting\": [\"text\"], \"properties\": {\"highlighting_enabled\": true}, \"template\": \"\\n      \\n<div class=\\\"row-fluid\\\">\\n  <div class=\\\"row-fluid\\\">\\n    <div class=\\\"row-fluid\\\">\\n      <div class=\\\"span1\\\">\\n        <img src=\\\"http://twitter.com/api/users/profile_image/{{user_screen_name}}\\\" class=\\\"avatar\\\">\\n      </div>\\n      <div class=\\\"span11\\\">\\n        <a href=\\\"https://twitter.com/{{user_screen_name}}/status/{{id}}\\\" class=\\\"btn openTweet\\\">\\n          <i class=\\\"fa fa-twitter\\\"></i>\\n        </a>\\n        <b>{{user_name}}</b>\\n        <br>\\n        {{text}}\\n        <br>\\n        <div class=\\\"created\\\">{{#fromnow}}{{created_at}}{{/fromnow}}</div>\\n      </div>\\n    </div>\\n    <br>\\n  </div>\\n</div>\\n      \\n    \"}"
+    }
+  }, 
+  {
+    "pk": 2, 
+    "model": "search.result", 
+    "fields": {
+      "data": "{\"extracode\": \"\\n      \\n<style type=\\\"text/css\\\">\\nem {\\n  background-color: #eeeeee;\\n  padding: 3px;\\n  font-weight:bold;\\n}\\n.placeMap {\\n  cursor: pointer;\\n}\\n.stars {\\n  color: #F9B049;\\n}\\n.result-row h4 {\\n  margin-top: 0;\\n}\\n.result-row {\\n  margin-bottom: 20px;\\n}\\n.review {\\n  padding-bottom: 10px;\\n}\\n</style>\\n\\n<script type=\\\"text/javascript\\\" charset=\\\"utf-8\\\">\\n  $(document).ready(function(){\\n    $('#mapModal').modal({\\n      show: false\\n    });\\n    $(document).on(\\\"click\\\", \\\".placeMap\\\", function(){\\n   \\t  var _detMap = \\\"http://maps.googleapis.com/maps/api/staticmap?center=\\\"+ $(this).data(\\\"lat\\\") +\\\",\\\"+ $(this).data(\\\"lng\\\") +\\\"&zoom=14&size=540x360&sensor=false&markers=color:red%7Ccolor:red%7C\\\"+ $(this).data(\\\"lat\\\") +\\\",\\\"+ $(this).data(\\\"lng\\\") +\\\"&\\\";\\n  \\t  $(\\\"#mapModal\\\").find(\\\"h3\\\").text($(this).data(\\\"name\\\"));\\n      $(\\\"#mapModal\\\").find(\\\"p\\\").html(\\\"<div class='muted'>\\\"+ $(this).data(\\\"address\\\") + \\\"</div><img src='\\\"+ _detMap +\\\"'>\\\");\\n      $(\\\"#mapModal\\\").modal(\\\"show\\\");\\n    });\\n    $(\\\".stars\\\").each(function(){\\n  \\t  var _h = \\\"\\\";\\n  \\t  for (var i=0;i<$(this).data(\\\"stars\\\")*1;i++){\\n        _h += '<i class=\\\"fa fa-star\\\"></i>';\\n  \\t  }\\n  \\t  for (var i=$(this).data(\\\"stars\\\")*1;i<5;i++){\\n        _h += '<i class=\\\"fa fa-star-o\\\"></i>';\\n  \\t  }\\n  \\t  $(this).html(_h);\\n    });\\n    hellipsify();\\n  });\\n\\n  function hellipsify() {\\n  var MAX_LENGTH = 255;\\n  $(\\\".hellipsify\\\").each(function () {\\n    var _this = $(this);\\n    if (_this.text().length > MAX_LENGTH) {\\n      var _oText = _this.text();\\n      $(this).html(_oText.substr(0, MAX_LENGTH - 1) + \\\"...\\\");\\n      $(\\\"<a>\\\").text(\\\"read more\\\").css(\\\"cursor\\\", \\\"pointer\\\").click(function(){\\n  \\t    _this.html(_oText);\\n  \\t  }).appendTo($(this));\\n      }\\n  });\\n}\\n</script>\\n\\n\\n<div id=\\\"mapModal\\\" class=\\\"modal hide fade\\\">\\n  <div class=\\\"modal-header\\\">\\n    <button type=\\\"button\\\" class=\\\"close\\\" data-dismiss=\\\"modal\\\" aria-hidden=\\\"true\\\">x</button>\\n    <h3></h3>\\n  </div>\\n  <div class=\\\"modal-body\\\">\\n    <p></p>\\n  </div>\\n  <div class=\\\"modal-footer\\\">\\n    <a href=\\\"#\\\" class=\\\"btn\\\" data-dismiss=\\\"modal\\\" aria-hidden=\\\"true\\\">Close</a>\\n  </div>\\n</div>\\n\\n    \", \"highlighting\": [\"text\"], \"properties\": {\"highlighting_enabled\": true}, \"template\": \"\\n      \\n<div class=\\\"row-fluid\\\">\\n  <div class=\\\"row-fluid\\\">\\n    <div class=\\\"span1\\\">\\n      <img class=\\\"placeMap\\\" data-name=\\\"{{name}}\\\" data-address=\\\"{{full_address}}\\\" data-lat=\\\"{{latitude}}\\\" data-lng=\\\"{{longitude}}\\\" src=\\\"http://maps.googleapis.com/maps/api/staticmap?center={{latitude}},{{longitude}}&amp;zoom=14&amp;size=100x100&amp;sensor=false&amp;markers=color:red%7Ccolor:red%7C{{latitude}},{{longitude}}&amp;\\\">\\n    </div>\\n    <div class=\\\"span11\\\">\\n      <h4>{{name}} <span class=\\\"muted\\\">- {{full_address}}</span></h4><h5><span class=\\\"stars\\\" data-stars=\\\"{{stars}}\\\"></span> <span class=\\\"muted\\\"> out of {{review_count}} reviews</span></h5>{{date}} <br><div class=\\\"review hellipsify\\\">{{text}}</div><span class=\\\"label label-success\\\">{{useful}} find this useful</span> <span class=\\\"label label-info\\\">{{cool}} find this cool</span> <span class=\\\"label label-warning\\\">{{funny}} find this funny</span>\\n    </div>\\n  </div>\\n  <br>\\n</div>\\n      \\n    \"}"
+    }
+  }, 
+  {
+    "pk": 3, 
+    "model": "search.result", 
+    "fields": {
+      "data": "{\"extracode\": \"\\n      \\n<style type=\\\"text/css\\\">\\nem {\\n  background-color: yellow;\\n  font-weight: bold;\\n}\\n.result-row {\\n  padding: 10px!important;\\n}\\n.result-row:nth-child(odd) {\\n  background-color: #F9F9F9!important;\\n}\\n.label {\\n  margin-left: 10px;\\n}\\n.syslog {\\n  font-family: monospace;\\n}\\n.timestamp, .host {\\n  color:#999;\\n}\\n.host {\\n  padding-left: 10px;\\n  font-weight: bold;\\n}\\n.logalert, .logerror, .logcrit, .logemerg {\\n  background-color:#B9484A;\\n}\\n.logwarn {\\n  background-color:#F89406;\\n}\\n.loginfo, .lognotice {\\n  background-color:#3A87AD;\\n}\\n</style>\\n      \\n    \", \"highlighting\": [\"log_content\"], \"properties\": {\"highlighting_enabled\": true}, \"template\": \"\\n      \\n<div class=\\\"row-fluid\\\">\\n  <div class=\\\"span12\\\">\\n    <span class=\\\"timestamp\\\">{{timestamp}}</span>\\n    <span class=\\\"host\\\">{{host}}</span>\\n    <span class=\\\"label log{{status}}\\\">{{status}}</span>\\n  </div>\\n</div>\\n\\n<div class=\\\"row-fluid\\\">\\n  <div class=\\\"span12 syslog\\\">\\n    {{log_content}}\\n  </div>\\n</div>\\n      \\n    \"}"
+    }
+  }, 
+  {
+    "pk": 1, 
+    "model": "search.sorting", 
+    "fields": {
+      "data": "{\"fields\": [], \"properties\": {\"is_enabled\": false}}"
+    }
+  }, 
+  {
+    "pk": 2, 
+    "model": "search.sorting", 
+    "fields": {
+      "data": "{\"fields\": [{\"asc\": false, \"field\": \"stars\", \"include\": true, \"order\": \"DESC\", \"label\": \"stars\"}], \"properties\": {\"is_enabled\": true}}"
+    }
+  }, 
+  {
+    "pk": 3, 
+    "model": "search.sorting", 
+    "fields": {
+      "data": "{\"fields\": [{\"asc\": false, \"field\": \"timestamp\", \"include\": true, \"order\": \"DESC\", \"label\": \"Timestamp\"}], \"properties\": {\"is_enabled\": true}}"
+    }
+  }, 
+  {
+    "pk": 1, 
+    "model": "search.collection", 
+    "fields": {
+      "sorting": 1, 
+      "name": "twitter", 
+      "facets": 1, 
+      "enabled": true, 
+      "label": "Twitter Demo", 
+      "is_core_only": false, 
+      "result": 1, 
+      "cores": "{\"router\": \"compositeId\", \"shards\": {\"shard1\": {\"range\": \"80000000-7fffffff\", \"state\": \"active\", \"replicas\": {\"core_node1\": {\"core\": \"twitter_shard1_replica1\", \"state\": \"active\", \"base_url\": \"http://runreal:8983/solr\", \"leader\": \"true\", \"node_name\": \"runreal:8983_solr\"}}}}}", 
+      "properties": "{\"autocomplete\": false}"
+    }
+  }, 
+  {
+    "pk": 2, 
+    "model": "search.collection", 
+    "fields": {
+      "sorting": 2, 
+      "name": "yelp", 
+      "facets": 2, 
+      "enabled": true, 
+      "label": "Yelp Demo", 
+      "is_core_only": false, 
+      "result": 2, 
+      "cores": "{\"router\": \"compositeId\", \"shards\": {\"shard1\": {\"range\": \"80000000-7fffffff\", \"state\": \"active\", \"replicas\": {\"core_node1\": {\"core\": \"yelp_shard1_replica1\", \"state\": \"active\", \"base_url\": \"http://runreal:8983/solr\", \"leader\": \"true\", \"node_name\": \"runreal:8983_solr\"}}}}}", 
+      "properties": "{\"autocomplete\": false}"
+    }
+  }, 
+  {
+    "pk": 3, 
+    "model": "search.collection", 
+    "fields": {
+      "sorting": 3, 
+      "name": "log", 
+      "facets": 3, 
+      "enabled": true, 
+      "label": "Logfiles Demo", 
+      "is_core_only": false, 
+      "result": 3, 
+      "cores": "{\"router\": \"compositeId\", \"shards\": {\"shard1\": {\"range\": \"80000000-7fffffff\", \"state\": \"active\", \"replicas\": {\"core_node1\": {\"core\": \"log_shard1_replica1\", \"state\": \"active\", \"base_url\": \"http://runreal:8983/solr\", \"leader\": \"true\", \"node_name\": \"runreal:8983_solr\"}}}}}", 
+      "properties": "{\"autocomplete\": false}"
+    }
+  }
+]

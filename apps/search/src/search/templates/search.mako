@@ -61,20 +61,13 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
     <strong>${_("Search")}</strong>
     <div class="input-append">
       <div class="selectMask">
-        % if len(hue_collections) > 1:
-        <i class="fa fa-caret-down" style="float:right;margin-top: 8px; margin-left: 5px"></i>
-        % endif
         <span class="current-collection"></span>
         <div id="collectionPopover" class="hide">
         <ul class="unstyled">
           % if user.is_superuser:
-            % for collection in hue_collections:
-              <li><a class="dropdown-collection" href="#" data-value="${ collection.id }" data-settings-url="${ collection.get_absolute_url() }">${ collection.label }</a></li>
-            % endfor
+            <li><a class="dropdown-collection" href="#" data-value="${ hue_collection.id }" data-settings-url="${ hue_collection.get_absolute_url() }">${ hue_collection.label }</a></li>
           % else:
-            % for collection in hue_collections:
-              <li><a class="dropdown-collection" href="#" data-value="${ collection.id }">${ collection.label }</a></li>
-            % endfor
+            <li><a class="dropdown-hue_collection" href="#" data-value="${ hue_collection.id }">${ hue_collection.label }</a></li>
           % endif
         </ul>
         </div>
@@ -423,10 +416,8 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
       % if user.is_superuser:
         $(".change-settings").attr("href", $(this).data("settings-url"));
       % endif
-      $.cookie("hueSearchLastCollection", collectionId, {expires: 90});
       $("form").find("input[type='hidden']").val("");
       $("form").submit();
-      $(".selectMask").popover("hide");
     });
 
     $("#download-csv").on("click", function(e) {
@@ -454,14 +445,6 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
       _html += "</ul>";
       return _html;
     }
-
-    % if len(hue_collections) > 1:
-    $(".selectMask").popover({
-      html: true,
-      content: getCollectionPopoverContent(),
-      placement: "bottom"
-    });
-    % endif
 
     $("#recordsPerPage").change(function () {
       $("input[name='rows']").val($(this).val());
