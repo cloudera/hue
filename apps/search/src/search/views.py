@@ -38,21 +38,16 @@ from search.search_controller import SearchController
 
 from django.utils.encoding import force_unicode
 
+
 LOG = logging.getLogger(__name__)
 
 
 def initial_collection(request, hue_collections):
-  initial_collection = request.COOKIES.get('hueSearchLastCollection', hue_collections[0].id)
-  try:
-    Collection.objects.get(id=initial_collection)
-  except:
-    initial_collection = hue_collections[0].id
-
-  return initial_collection
+  return hue_collections[0].id
 
 
 def index(request):
-  hue_collections = Collection.objects.filter(enabled=True)
+  hue_collections = SearchController(request.user).get_search_collections()
 
   if not hue_collections:
     if request.user.is_superuser:
@@ -95,14 +90,13 @@ def index(request):
     'error': error,
     'solr_query': solr_query,
     'hue_collection': hue_collection,
-    'hue_collections': hue_collections,
     'current_collection': collection_id,
     'json': json,
   })
 
 
 def download(request, format):
-  hue_collections = Collection.objects.filter(enabled=True)
+  hue_collections = SearchController(request.user).get_search_collections()
 
   if not hue_collections:
     raise PopupException(_("No collection to download."))
@@ -385,5 +379,21 @@ def query_suggest(request, collection_id, query=""):
     result['status'] = 0
   except Exception, e:
     result['message'] = unicode(str(e), "utf8")
+
+  return HttpResponse(json.dumps(result), mimetype="application/json")
+
+
+def install_examples(request):
+  result = {'status': -1, 'message': ''}
+
+  if request.method != 'POST':
+    result['message'] = _('A POST request is required.')
+  else:
+    try:
+      #pig_setup.Command().handle_noargs()
+      result['status'] = 0
+    except Exception, e:
+      LOG.exception(e)
+      result['message'] = str(e)
 
   return HttpResponse(json.dumps(result), mimetype="application/json")

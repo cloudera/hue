@@ -116,7 +116,7 @@ $.jHueTour({
     },
     {
       "name": "impalavshive",
-      "desc": "${_("Fast SQL qith Impala")}",
+      "desc": "${_("Fast SQL with Impala")}",
       "path": "/impala",
       "video": "http://player.vimeo.com/video/75493693",
       "blog": "http://gethue.tumblr.com/post/62452792255/fast-sql-with-the-impala-query-editor"

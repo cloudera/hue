@@ -29,7 +29,7 @@
   <div class="search-bar" style="height: 30px">
     % if not hasattr(caller, "no_navigation"):
       <div class="pull-right" style="margin-top: 4px; margin-right: 20px">
-        <a href="${ url('search:index') }"><i class="fa fa-share"></i> ${ _('Search page') }</a> &nbsp; &nbsp;
+        <a href="${ url('search:index') }?collection=${ hue_collection.id }"><i class="fa fa-share"></i> ${ _('Search page') }</a> &nbsp; &nbsp;
         <a href="${ url('search:admin_collections') }"><i class="fa fa-sitemap"></i> ${ _('Collection manager') }</a>
       </div>
     % endif
@@ -78,7 +78,7 @@
 
     <li class="nav-header">${_('Collection')}</li>
       <li class="${ utils.is_selected(section, 'properties') }">
-        <a href="${ url('search:admin_collection_properties', collection_id=hue_collection.id) }"><i class="fa fa-reorder"></i> ${_('Properties')}</a>
+        <a href="${ url('search:admin_collection_properties', collection_id=hue_collection.id) }"><i class="fa fa-list"></i> ${_('Properties')}</a>
       </li>
       <li>
         <a href="${ url('search:index') }?collection=${ hue_collection.id }"><i class="fa fa-search"></i> ${ _('Search it') }</a>

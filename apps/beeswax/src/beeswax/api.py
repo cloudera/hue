@@ -17,7 +17,6 @@
 
 import json
 import logging
-import os
 
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, Http404

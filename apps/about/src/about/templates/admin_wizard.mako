@@ -107,11 +107,11 @@ ${ header.menubar() }
                 </a>
               </li>
           % endif
-          % if 'jobsub' in app_names:
+          % if 'search' in app_names:
               <li>
                 <a href="#" class="installBtn" data-loading-text="${ _('Installing...') }"
-                   data-sample-url="${ url('oozie:install_examples') }">
-                  <i class="fa fa-download"></i> ${ apps['jobsub'].nice_name }
+                   data-sample-url="${ url('search:install_examples') }">
+                  <i class="fa fa-download"></i> ${ apps['search'].nice_name }
                 </a>
               </li>
           % endif
@@ -128,6 +128,14 @@ ${ header.menubar() }
                 <a href="#" class="installBtn" data-loading-text="${ _('Installing...') }"
                    data-sample-url="${ url('pig:install_examples') }">
                   <i class="fa fa-download"></i> ${ apps['pig'].nice_name }
+                </a>
+              </li>
+          % endif
+          % if 'jobsub' in app_names:
+              <li>
+                <a href="#" class="installBtn" data-loading-text="${ _('Installing...') }"
+                   data-sample-url="${ url('oozie:install_examples') }">
+                  <i class="fa fa-download"></i> ${ apps['jobsub'].nice_name }
                 </a>
               </li>
           % endif

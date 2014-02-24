@@ -37,6 +37,10 @@ class SearchController(object):
   def __init__(self, user):
     self.user = user
 
+  def get_search_collections(self):
+    # TODO perms
+    return Collection.objects.filter(enabled=True)
+
   def get_new_collections(self):
     try:
       solr_collections = SolrApi(SOLR_URL.get(), self.user).collections()
@@ -73,7 +77,7 @@ class SearchController(object):
       hue_collection, created = Collection.objects.get_or_create(name=attrs['name'], solr_properties=core, is_enabled=True, is_core_only=True, user=self.user)
       return hue_collection
     else:
-      raise PopupException(_('Collection type does not exit: %s') % attrs)
+      raise PopupException(_('Collection type does not exist: %s') % attrs)
 
   def delete_collection(self, collection_id):
     id = collection_id

@@ -79,7 +79,7 @@ def job_not_assigned(request, jobid, path):
     except ApplicationNotRunning, e:
       result['status'] = 1
     except Exception, e:
-      result['message'] = _('Error polling job %s: e') % (jobid, e)
+      result['message'] = _('Error polling job %s: %s') % (jobid, e)
 
     return HttpResponse(encode_json_for_js(result), mimetype="application/json")
   else:
