@@ -1735,7 +1735,7 @@ $(document).ready(function () {
     generateGraph($.jHueBlueprint.TYPES.MAP)
   });
 
-  $("#log pre").scroll(function () {
+  $("#log pre:eq(1)").scroll(function () {
     if ($(this).scrollTop() + $(this).height() + 20 >= $(this)[0].scrollHeight) {
       logsAtEnd = true;
     }
@@ -1745,11 +1745,12 @@ $(document).ready(function () {
   });
 
   viewModel.design.watch.logs.subscribe(function(val){
-    var _logsEl = $("#log pre");
+    var _logsEl = $("#log pre:eq(1)");
 
     if (logsAtEnd && _logsEl[0]) {
       _logsEl.scrollTop(_logsEl[0].scrollHeight - _logsEl.height());
     }
+    window.setTimeout(resizeLogs, 10);
   });
 
   viewModel.design.results.columns.subscribe(function(val){
@@ -1762,8 +1763,8 @@ $(document).ready(function () {
 
 function resizeLogs() {
   // Use fixed subtraction since logs aren't always visible.
-  $("#log").height($(window).height() - $("#log pre").offset().top - 10);
-  $("#log pre").css("overflow", "auto").height($(window).height() - $("#log pre").offset().top - 50);
+  $("#log").height($(window).height() - $("#log pre:eq(1)").offset().top - 10);
+  $("#log pre:eq(1)").css("overflow", "auto").height($(window).height() - $("#log pre:eq(1)").offset().top - 50);
 }
 
 // Result Datatable
