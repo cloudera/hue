@@ -1144,7 +1144,10 @@ $(document).ready(function () {
 
   $(document).on("click", ".column-selector", function () {
     var _t = $("#resultTable");
-    var _col = _t.find("th:contains(" + $.trim($(this).text().split("(")[0]) + ")");
+    var _text = $.trim($(this).text().split("(")[0]);
+    var _col = _t.find("th").filter(function() {
+      return $.trim($(this).text()) == _text;
+    });
     _t.find(".columnSelected").removeClass("columnSelected");
     _t.find("tr td:nth-child(" + (_col.index() + 1) + ")").addClass("columnSelected");
     $("a[href='#results']").click();
