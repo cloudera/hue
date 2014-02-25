@@ -33,6 +33,7 @@ from search.conf import SOLR_URL
 from search.data_export import download as export_download
 from search.decorators import allow_admin_only
 from search.forms import QueryForm, CollectionForm
+from search.management.commands import search_setup
 from search.models import Collection, augment_solr_response
 from search.search_controller import SearchController
 
@@ -390,7 +391,7 @@ def install_examples(request):
     result['message'] = _('A POST request is required.')
   else:
     try:
-      #pig_setup.Command().handle_noargs()
+      search_setup.Command().handle_noargs()
       result['status'] = 0
     except Exception, e:
       LOG.exception(e)
