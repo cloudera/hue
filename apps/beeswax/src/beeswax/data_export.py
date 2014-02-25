@@ -30,7 +30,7 @@ from beeswax import common, conf
 LOG = logging.getLogger(__name__)
 
 _DATA_WAIT_SLEEP = 0.1                  # Sleep 0.1 sec before checking for data availability
-FETCH_ROWS = 10
+FETCH_SIZE = 1000
 
 
 def download(handle, format, db):
@@ -76,12 +76,12 @@ def HS2DataAdapter(handle, db, max_rows=0, start_over=True):
 
   First line should be the headers.
   """
-  fetch_rows = max_rows if max_rows > -1 else FETCH_ROWS
 
-  results = db.fetch(handle, start_over=start_over, rows=fetch_rows)
+  results = db.fetch(handle, start_over=start_over, rows=FETCH_SIZE)
+
   while not results.ready:
     time.sleep(_DATA_WAIT_SLEEP)
-    results = db.fetch(handle, start_over=start_over, rows=fetch_rows)
+    results = db.fetch(handle, start_over=start_over, rows=FETCH_SIZE)
 
   data = [results.cols()]
 
@@ -95,7 +95,7 @@ def HS2DataAdapter(handle, db, max_rows=0, start_over=True):
       break
 
     if results.has_more:
-      results = db.fetch(handle, start_over=False, rows=fetch_rows)
+      results = db.fetch(handle, start_over=False, rows=FETCH_SIZE)
     else:
       results = None
 
