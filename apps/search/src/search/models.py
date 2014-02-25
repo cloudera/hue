@@ -318,6 +318,17 @@ class Collection(models.Model):
     properties_['autocomplete'] = autocomplete
     self.properties = json.dumps(properties_)
 
+  @property
+  def icon(self):
+    if self.name == 'twitter_demo':
+      return '/search/static/art/icon_twitter.png'
+    elif self.name == 'yelp_demo':
+          return '/search/static/art/icon_yelp.png'
+    elif self.name == 'log_demo':
+          return '/search/static/art/icon_logs.png'
+    else:
+          return '/search/static/art/icon_search_24.png'
+
 
 def get_facet_field_format(field, type, facets):
   format = ""
