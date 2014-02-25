@@ -390,7 +390,15 @@ AUTH = ConfigSection(
                                "The HTTP header in the request is converted to a key by converting "
                                "all characters to uppercase, replacing any hyphens with underscores "
                                "and adding an HTTP_ prefix to the name. So, for example, if the header "
-                               "is called Remote-User that would be configured as HTTP_REMOTE_USER"))
+                               "is called Remote-User that would be configured as HTTP_REMOTE_USER")),
+    IGNORE_USERNAME_CASE = Config("ignore_username_case",
+                                  help=_("Ignore the case of usernames when searching for existing users in Hue."),
+                                  type=coerce_bool,
+                                  default=False),
+    FORCE_USERNAME_LOWERCASE = Config("force_username_lowercase",
+                                      help=_("Force usernames to lowercase when creating new users from LDAP."),
+                                      type=coerce_bool,
+                                      default=False)
 ))
 
 LDAP = ConfigSection(
