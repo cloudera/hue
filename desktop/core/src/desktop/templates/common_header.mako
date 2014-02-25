@@ -291,11 +291,17 @@ from django.utils.translation import ugettext as _
     <li id="jHueTourFlagPlaceholder"></li>
     <li><a title="${_('Sign out')}" rel="navigator-tooltip" href="/accounts/logout/"><i class="fa fa-sign-out"></i></a></li>
   </ul>
-      % endif
+  % else:
+  <ul class="nav nav-pills" style="margin-right: 40px">
+    <li id="jHueTourFlagPlaceholder"></li>
+  </ul>
+  % endif
   </div>
     <a class="brand nav-tooltip pull-left" title="${_('About Hue')}" rel="navigator-tooltip" href="/about"><img src="/static/art/hue-logo-mini-white.png" data-orig="/static/art/hue-logo-mini-white.png" data-hover="/static/art/hue-logo-mini-white-hover.png"/></a>
      <ul class="nav nav-pills pull-left">
+       % if user.is_authenticated():
        <li><a title="${_('My documents')}" rel="navigator-tooltip" href="${ url('desktop.views.home') }" style="padding-bottom:2px!important"><i class="fa fa-home" style="font-size: 19px"></i></a></li>
+       % endif
        <%
          query_apps = count_apps(apps, ['beeswax', 'impala', 'rdbms', 'pig', 'jobsub', 'spark']);
        %>

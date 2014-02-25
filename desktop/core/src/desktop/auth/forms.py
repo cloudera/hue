@@ -25,8 +25,8 @@ class AuthenticationForm(AuthAuthenticationForm):
   """
   Adds appropriate classes to authentication form
   """
-  username = CharField(label=_t("Username"), max_length=30, widget=TextInput(attrs={'class': 'input-large', 'maxlength': 30}))
-  password = CharField(label=_t("Password"), widget=PasswordInput(attrs={'class': 'input-large', 'maxlength': 30}))
+  username = CharField(label=_t("Username"), max_length=30, widget=TextInput(attrs={'maxlength': 30, 'placeholder': _t("Username")}))
+  password = CharField(label=_t("Password"), widget=PasswordInput(attrs={'maxlength': 30, 'placeholder': _t("Password")}))
 
 
 class UserCreationForm(AuthUserCreationForm):
