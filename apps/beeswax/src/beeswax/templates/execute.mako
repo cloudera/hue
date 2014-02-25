@@ -287,7 +287,7 @@ ${layout.menubar(section='query')}
   <div id="resizePanel"><a href="javascript:void(0)"><i class="fa fa-ellipsis-h"></i></a></div>
 
   <div class="card card-small scrollable resultsContainer">
-    <div data-bind="visible: $root.hasResults()">
+    <div data-bind="visible: !design.explain() && $root.hasResults()">
       <a id="expandResults" href="javascript:void(0)" title="${_('See results in full screen')}" rel="tooltip"
         class="view-query-results hide pull-right"><h4 style="margin-right: 20px"><i class="fa fa-expand"></i></h4></a>
 
@@ -1766,8 +1766,10 @@ $(document).ready(function () {
 
 function resizeLogs() {
   // Use fixed subtraction since logs aren't always visible.
-  $("#log").height($(window).height() - $("#log pre:eq(1)").offset().top - 10);
-  $("#log pre:eq(1)").css("overflow", "auto").height($(window).height() - $("#log pre:eq(1)").offset().top - 50);
+  if ($("#log pre:eq(1)").length > 0) {
+    $("#log").height($(window).height() - $("#log pre:eq(1)").offset().top - 10);
+    $("#log pre:eq(1)").css("overflow", "auto").height($(window).height() - $("#log pre:eq(1)").offset().top - 50);
+  }
 }
 
 // Result Datatable
