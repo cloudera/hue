@@ -113,6 +113,13 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
 </div>
 % else:
 <div class="container results">
+
+% if 'is_demo' in response['responseHeader']:
+ <div class="alert alert-warn">
+  ${ _('A demo index is used. In order to be interactive, please ') } <a href="">${ _('create the indexes') }</a> ${ _(' in Solr.') }
+ </div>
+% endif 
+
   <div id="mainContent" class="row hide">
     % if response and 'response' in response and 'docs' in response['response'] and len(response['response']['docs']) > 0 and 'normalized_facets' in response:
       <% shown_facets = 0 %>
