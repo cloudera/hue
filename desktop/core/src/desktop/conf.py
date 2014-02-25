@@ -189,6 +189,7 @@ SMTP = ConfigSection(
       key="password",
       help=_("The password for the SMTP user."),
       type=str,
+      private=True,
       default=""
     ),
 
@@ -234,6 +235,7 @@ DATABASE = ConfigSection(
     PASSWORD=Config(
       key='password',
       help=_('Database password.'),
+      private=True,
       type=str,
       default='',
     ),
@@ -419,6 +421,7 @@ LDAP = ConfigSection(
                    help=_("The distinguished name to bind as, when importing from LDAP.")),
     BIND_PASSWORD=Config("bind_password",
                    default=None,
+                   private=True,
                    help=_("The password for the bind user.")),
     SEARCH_BIND_AUTHENTICATION=Config("search_bind_authentication",
                    default=True,

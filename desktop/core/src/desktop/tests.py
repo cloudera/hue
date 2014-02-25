@@ -194,6 +194,10 @@ def test_dump_config():
   finally:
     finish()
 
+  # Not showing some passwords
+  response = c.get(reverse('desktop.views.dump_config'))
+  assert_false('bind_password' in response.content)
+
   # Login as someone else
   client_not_me = make_logged_in_client(username='not_me', is_superuser=False, groupname='test')
   grant_access("not_me", "test", "desktop")
