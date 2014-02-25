@@ -17,6 +17,7 @@
 
 from nose.tools import assert_true, assert_false, assert_equal
 
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.test.client import Client
 from desktop import conf
@@ -61,6 +62,99 @@ class TestLoginWithHadoop(PseudoHdfsTestBase):
     assert_true('/beeswax' in response.content, response.content)
     # Custom login process should not do 'http-equiv="refresh"' but call the correct view
     # 'Could not create home directory.' won't show up because the messages are consumed before
+
+
+class TestRemoteUserLogin(object):
+  reset = []
+
+  def setUp(self):
+    self.backends = settings.AUTHENTICATION_BACKENDS
+    settings.AUTHENTICATION_BACKENDS = ('desktop.auth.backend.RemoteUserDjangoBackend',)
+    self.reset.append( conf.AUTH.BACKEND.set_for_testing('desktop.auth.backend.RemoteUserDjangoBackend') )
+    self.reset.append( conf.AUTH.REMOTE_USER_HEADER.set_for_testing('REMOTE_USER') )
+    self.c = Client()
+
+  def tearDown(self):
+    User.objects.all().delete()
+    settings.AUTHENTICATION_BACKENDS = self.backends
+    for finish in self.reset:
+      finish()
+
+  def test_normal(self):
+    response = self.c.get('/accounts/login/')
+    assert_equal(200, response.status_code, "Expected ok status.")
+    assert_false(response.context['first_login_ever'])
+
+    assert_equal(0, len(User.objects.all()))
+    response = self.c.post('/accounts/login/', {}, **{"REMOTE_USER": "foo3"})
+    assert_equal(200, response.status_code, "Expected ok status.")
+    assert_equal(1, len(User.objects.all()))
+    assert_equal('foo3', User.objects.all()[0].username)
+
+  def test_ignore_case(self):
+    self.reset.append( conf.AUTH.IGNORE_USERNAME_CASE.set_for_testing(True) )
+
+    response = self.c.get('/accounts/login/')
+    assert_equal(200, response.status_code, "Expected ok status.")
+    assert_false(response.context['first_login_ever'])
+
+    response = self.c.post('/accounts/login/', {}, **{"REMOTE_USER": "foo3"})
+    assert_equal(200, response.status_code, "Expected ok status.")
+    assert_equal(1, len(User.objects.all()))
+    assert_equal('foo3', User.objects.all()[0].username)
+
+    response = self.c.post('/accounts/login/', {}, **{"REMOTE_USER": "FOO3"})
+    assert_equal(200, response.status_code, "Expected ok status.")
+    assert_equal(1, len(User.objects.all()))
+    assert_equal('foo3', User.objects.all()[0].username)
+
+    response = self.c.post('/accounts/login/', {}, **{"REMOTE_USER": "FOO4"})
+    assert_equal(200, response.status_code, "Expected ok status.")
+    assert_equal(2, len(User.objects.all()))
+    assert_equal('FOO4', User.objects.all()[1].username)
+
+    response = self.c.post('/accounts/login/', {}, **{"REMOTE_USER": "foo4"})
+    assert_equal(200, response.status_code, "Expected ok status.")
+    assert_equal(2, len(User.objects.all()))
+    assert_equal('FOO4', User.objects.all()[1].username)
+
+  def test_force_lower_case(self):
+    self.reset.append( conf.AUTH.FORCE_USERNAME_LOWERCASE.set_for_testing(True) )
+
+    response = self.c.get('/accounts/login/')
+    assert_equal(200, response.status_code, "Expected ok status.")
+    assert_false(response.context['first_login_ever'])
+
+    response = self.c.post('/accounts/login/', {}, **{"REMOTE_USER": "foo3"})
+    assert_equal(200, response.status_code, "Expected ok status.")
+    assert_equal(1, len(User.objects.all()))
+    assert_equal('foo3', User.objects.all()[0].username)
+
+    response = self.c.post('/accounts/login/', {}, **{"REMOTE_USER": "FOO3"})
+    assert_equal(200, response.status_code, "Expected ok status.")
+    assert_equal(1, len(User.objects.all()))
+    assert_equal('foo3', User.objects.all()[0].username)
+
+  def test_ignore_case_and_force_lower_case(self):
+    response = self.c.post('/accounts/login/', {}, **{"REMOTE_USER": "FOO3"})
+    assert_equal(200, response.status_code, "Expected ok status.")
+    assert_equal(1, len(User.objects.all()))
+    assert_equal('FOO3', User.objects.all()[0].username)
+
+    self.reset.append( conf.AUTH.FORCE_USERNAME_LOWERCASE.set_for_testing(True) )
+    self.reset.append( conf.AUTH.IGNORE_USERNAME_CASE.set_for_testing(True) )
+
+    # Previously existing users should not be forced to lower case.
+    response = self.c.post('/accounts/login/', {}, **{"REMOTE_USER": "FOO3"})
+    assert_equal(200, response.status_code, "Expected ok status.")
+    assert_equal(1, len(User.objects.all()))
+    assert_equal('FOO3', User.objects.all()[0].username)
+
+    # New users should be forced to lowercase.
+    response = self.c.post('/accounts/login/', {}, **{"REMOTE_USER": "FOO4"})
+    assert_equal(200, response.status_code, "Expected ok status.")
+    assert_equal(2, len(User.objects.all()))
+    assert_equal('foo4', User.objects.all()[1].username)
 
 
 class TestLogin(object):
