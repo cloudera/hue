@@ -377,7 +377,7 @@ from django.utils.translation import ugettext as _
              <a title="${_('Solr Search')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">${_('Search')} <b class="caret"></b></a>
              <ul role="menu" class="dropdown-menu">
                % for collection in collections:
-               <li><a href="${ url('search:index') }?collection=${ collection.id }"><img src="/search/static/art/icon_search_24.png" /> ${ collection.label }</a></li>
+               <li><a href="${ url('search:index') }?collection=${ collection.id }"><img src="${ collection.icon }"/> ${ collection.label }</a></li>
                % endfor
              </ul>
            </li>
