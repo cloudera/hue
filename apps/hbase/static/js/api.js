@@ -31,9 +31,9 @@ var API = {
         $_POST[key] = arguments[i].slice(15);
         arguments[i] = key;
       }
-      url += '/' + arguments[i];
+      url += '/' + encodeURIComponent(arguments[i]);
     }
-    var queryObject = {url:url, method:'POST', startTime: new Date().getTime(), status:'running...'}
+    var queryObject = {url:url, method:'POST', startTime: new Date().getTime(), status:'running...'};
     var handler = $.post(url, $_POST).error(function(response) {
       $(document).trigger("error", JSON.parse(response.responseText).message);
     });

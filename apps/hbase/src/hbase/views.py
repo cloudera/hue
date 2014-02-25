@@ -21,6 +21,7 @@ import json
 import logging
 import re
 import StringIO
+import urllib
 
 from avro import schema, datafile, io
 
@@ -61,8 +62,9 @@ def api_router(request, url): # On split, deserialize anything
         data[i] = deserialize(item) # Sets local binding, needs to set in data
     return data
 
+  decoded_url_params = [urllib.unquote(arg) for arg in re.split(r'(?<!\\)/', url.strip('/'))]
   url_params = [safe_json_load((arg, request.POST.get(arg[0:16], arg))[arg[0:15] == 'hbase-post-key-'])
-                for arg in re.split(r'(?<!\\)/', url.strip('/'))] # Deserialize later
+                for arg in decoded_url_params] # Deserialize later
 
   if request.POST.get('dest', False):
     url_params += [request.FILES.get(request.REQUEST.get('dest'))]
