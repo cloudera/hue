@@ -1724,8 +1724,37 @@ def test_split_statements():
   assert_equal(["select * where id == '10'"], hql_query("select * where id == '10';").statements)
   assert_equal(['select', "select * where id == '10;' limit 100"], hql_query("select; select * where id == '10;' limit 100;").statements)
   assert_equal(['select', "select * where id == \"10;\" limit 100"], hql_query("select; select * where id == \"10;\" limit 100;").statements)
-  assert_equal(['select', "select * where id == '\\'10;' limit 100"], hql_query("select; select * where id == '\\'10;' limit 100;").statements)
   assert_equal(['select', "select * where id == '\"10;\"\"\"' limit 100"], hql_query("select; select * where id == '\"10;\"\"\"' limit 100;").statements)
+  query = """CREATE DATABASE IF NOT EXISTS functional;
+DROP TABLE IF EXISTS functional.alltypes;
+CREATE EXTERNAL TABLE IF NOT EXISTS functional.alltypes (
+id int COMMENT 'Add a comment',
+bool_col boolean,
+tinyint_col tinyint,
+smallint_col smallint,
+int_col int,
+bigint_col bigint,
+float_col float,
+double_col double,
+date_string_col string,
+string_col string,
+timestamp_col timestamp)
+PARTITIONED BY (year int, month int)
+ROW FORMAT delimited fields terminated by ','  escaped by '\\'
+STORED AS TEXTFILE
+LOCATION '/user/admin/alltypes/alltypes';
+
+USE functional;
+ALTER TABLE alltypes ADD IF NOT EXISTS PARTITION(year=2009, month=1);
+ALTER TABLE alltypes ADD IF NOT EXISTS PARTITION(year=2009, month=2);"""
+  assert_equal(['CREATE DATABASE IF NOT EXISTS functional',
+                'DROP TABLE IF EXISTS functional.alltypes',
+                "CREATE EXTERNAL TABLE IF NOT EXISTS functional.alltypes (\nid int COMMENT 'Add a comment',\nbool_col boolean,\ntinyint_col tinyint,\nsmallint_col smallint,\nint_col int,\nbigint_col bigint,\nfloat_col float,\ndouble_col double,\ndate_string_col string,\nstring_col string,\ntimestamp_col timestamp)\nPARTITIONED BY (year int, month int)\nROW FORMAT delimited fields terminated by ','  escaped by '\\'\nSTORED AS TEXTFILE\nLOCATION '/user/admin/alltypes/alltypes'",
+                'USE functional',
+                'ALTER TABLE alltypes ADD IF NOT EXISTS PARTITION(year=2009, month=1)',
+                'ALTER TABLE alltypes ADD IF NOT EXISTS PARTITION(year=2009, month=2)'
+              ],
+              hql_query(query).statements, hql_query(query).statements)
 
 
 class MockHiveServerTable(HiveServerTable):
