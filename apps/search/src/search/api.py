@@ -17,6 +17,7 @@
 # limitations under the License.
 
 import json
+import urllib
 
 import logging
 
@@ -31,6 +32,8 @@ LOG = logging.getLogger(__name__)
 
 DEFAULT_USER = 'hue'
 
+def utf_quoter(what):
+  return urllib.quote(unicode(what).encode('utf-8'), safe='~@#$&()*!+=;,.?/\'')
 
 class SolrApi(object):
   """
@@ -75,7 +78,7 @@ class SolrApi(object):
       fqs = solr_query['fq'].split('|')
       for fq in fqs:
         if fq:
-          params += (('fq', fq),)
+          params += (('fq', urllib.unquote(utf_quoter(fq))),)
 
       response = self._root.get('%(collection)s/select' % solr_query, params)
       return self._get_json(response)

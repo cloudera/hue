@@ -18,6 +18,7 @@
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 from django.utils.dateparse import parse_datetime
+from search.api import utf_quoter
 import urllib
 import math
 import time
@@ -138,7 +139,7 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
             %if found_value != "":
               <% shown_facets += 1 %>
               <li class="nav-header">${fld['label']}</li>
-              <li><strong>${ found_value }</strong> <a href="?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${urllib.quote_plus('|'.join(remove_list))}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}"><i class="fa fa-times"></i></a></li>
+              <li><strong>${ found_value }</strong> <a href="?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${utf_quoter('|'.join(remove_list))}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}"><i class="fa fa-times"></i></a></li>
             %endif
           % endif
         % endfor
@@ -162,24 +163,24 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
             % for group, count in macros.pairwise(fld['counts']):
               % if count > 0 and group != "" and found_value == "" and loop.index < 100:
                 % if fld['type'] == 'field':
-                  <li class="facetItem"><a href='?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${ urllib.quote_plus(solr_query['fq']) }|${ fld['field'] }:"${ urllib.quote_plus(group.encode('ascii', 'xmlcharrefreplace')) }"${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}'>${group}</a> <span class="counter">(${ count })</span></li>
+                  <li class="facetItem"><a href='?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${ utf_quoter(solr_query['fq']) }|${ fld['field'] }:"${utf_quoter(group)}"${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}'>${group}</a> <span class="counter">(${ count })</span></li>
                 % endif
                 % if fld['type'] == 'range':
-                  <li class="facetItem"><a href='?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${ urllib.quote_plus(solr_query['fq']) }|${ fld['field'] }:["${ group }" TO "${ str(int(group) + int(fld['gap']) - 1) }"]${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}'>${ group } - ${ str(int(group) + int(fld['gap']) - 1) }</a> <span class="counter">(${ count })</span></li>
+                  <li class="facetItem"><a href='?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${ utf_quoter(solr_query['fq']) }|${ fld['field'] }:["${ group }" TO "${ str(int(group) + int(fld['gap']) - 1) }"]${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}'>${ group } - ${ str(int(group) + int(fld['gap']) - 1) }</a> <span class="counter">(${ count })</span></li>
                 % endif
                 % if fld['type'] == 'date':
-                  <li class="facetItem dateFacetItem"><a href='?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${ urllib.quote_plus(solr_query['fq']) }|${ fld['field'] }:[${ group } TO ${ group }${ urllib.quote_plus(fld['gap']) }]${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}'><span class="dateFacet" data-format="${fld['format']}">${ group }<span class="dateFacetGap hide">${ fld['gap'] }</span></span></a> <span class="counter">(${ count })</span></li>
+                  <li class="facetItem dateFacetItem"><a href='?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${ utf_quoter(solr_query['fq']) }|${ fld['field'] }:[${ group } TO ${ group }${ utf_quoter(fld['gap']) }]${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}'><span class="dateFacet" data-format="${fld['format']}">${ group }<span class="dateFacetGap hide">${ fld['gap'] }</span></span></a> <span class="counter">(${ count })</span></li>
                 % endif
               % endif
               % if found_value != "" and loop.index < 100:
                 % if fld['type'] == 'field' and '"' + group + '"' == found_value:
-                  <li class="facetItem"><strong>${ group }</strong> <a href="?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${urllib.quote_plus('|'.join(remove_list))}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}"><i class="fa fa-times"></i></a></li>
+                  <li class="facetItem"><strong>${ group }</strong> <a href="?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${utf_quoter('|'.join(remove_list))}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}"><i class="fa fa-times"></i></a></li>
                 % endif
                 % if fld['type'] == 'range' and '["' + group + '" TO "' + str(int(group) + int(fld['gap']) - 1) + '"]' == found_value:
-                  <li class="facetItem"><strong>${ group } - ${ str(int(group) + int(fld['gap']) - 1) }</strong> <a href="?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${urllib.quote_plus('|'.join(remove_list))}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}"><i class="fa fa-times"></i></a></li>
+                  <li class="facetItem"><strong>${ group } - ${ str(int(group) + int(fld['gap']) - 1) }</strong> <a href="?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${utf_quoter('|'.join(remove_list))}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}"><i class="fa fa-times"></i></a></li>
                 % endif
                 % if fld['type'] == 'date' and found_value.startswith('[' + group + ' TO'):
-                  <li class="facetItem"><strong><span class="dateFacet" data-format="${fld['format']}">${ group }<span class="dateFacetGap hide">${ fld['gap'] }</span></span></strong> <a href="?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${urllib.quote_plus('|'.join(remove_list))}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}"><i class="fa fa-times"></i></a></li>
+                  <li class="facetItem"><strong><span class="dateFacet" data-format="${fld['format']}">${ group }<span class="dateFacetGap hide">${ fld['gap'] }</span></span></strong> <a href="?collection=${ current_collection }&query=${ solr_query['q'] }&fq=${utf_quoter('|'.join(remove_list))}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}"><i class="fa fa-times"></i></a></li>
                 % endif
               % endif
             % endfor
@@ -275,7 +276,7 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
           %>
           % if int(solr_query["start"]) > 0:
             <li>
-              <a title="${_('Previous Page')}" href="?collection=${ current_collection }&query=${solr_query["q"]}&fq=${urllib.quote_plus(solr_query["fq"])}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}&rows=${solr_query["rows"]}&start=${previous}">${_('Previous Page')}</a>
+              <a title="${_('Previous Page')}" href="?collection=${ current_collection }&query=${solr_query["q"]}&fq=${utf_quoter(solr_query["fq"])}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}&rows=${solr_query["rows"]}&start=${previous}">${_('Previous Page')}</a>
             </li>
           % endif
           % for page in range(pagination_start, pagination_end):
@@ -285,13 +286,13 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
                class="active"
              %endif
                 >
-              <a href="?collection=${ current_collection }&query=${solr_query["q"]}&fq=${urllib.quote_plus(solr_query["fq"])}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}&rows=${solr_query["rows"]}&start=${(int(page)-1)*int(solr_query["rows"])}">${page}</a>
+              <a href="?collection=${ current_collection }&query=${solr_query["q"]}&fq=${utf_quoter(solr_query["fq"])}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}&rows=${solr_query["rows"]}&start=${(int(page)-1)*int(solr_query["rows"])}">${page}</a>
             </li>
             %endif
           % endfor
           % if end_record < int(response["response"]["numFound"]):
             <li>
-              <a title="Next page" href="?collection=${ current_collection }&query=${solr_query["q"]}&fq=${urllib.quote_plus(solr_query["fq"])}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}&rows=${solr_query["rows"]}&start=${next}">${_('Next Page')}</a>
+              <a title="Next page" href="?collection=${ current_collection }&query=${solr_query["q"]}&fq=${utf_quoter(solr_query["fq"])}${solr_query.get("sort") and '&sort=' + solr_query.get("sort") or ''}&rows=${solr_query["rows"]}&start=${next}">${_('Next Page')}</a>
             </li>
           % endif
         </ul>
