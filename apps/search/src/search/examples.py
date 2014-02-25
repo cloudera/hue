@@ -29,7 +29,7 @@ def demo_handler(view_fn):
       return view_fn(request, *args, **kwargs)
     except Exception, e:
       from search.api import SolrApi
-      if '/solr/twitter/select' in str(e): #_demo        
+      if '/solr/twitter_demo/select' in str(e):      
         return SolrApi._get_json(TWITTER_SEARCH_RESPONSE)
       elif '/solr/yelp_demo/select' in str(e):        
         return SolrApi._get_json(YELP_SEARCH_RESPONSE)      
@@ -39,9 +39,9 @@ def demo_handler(view_fn):
         raise e
   return decorator
 
-# TODO: add alert about fake request
 
-# Adding "is_demo" property
+# Adding "is_demo" property to each request
+
 TWITTER_SEARCH_RESPONSE = """{
   "responseHeader":{
     "status":0,
