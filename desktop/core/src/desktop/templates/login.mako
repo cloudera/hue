@@ -14,182 +14,191 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-from desktop import conf
-from django.utils.translation import ugettext as _
+  from desktop import conf
+  from django.utils.translation import ugettext as _
+  from desktop.views import commonheader, commonfooter
 %>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  %if first_login_ever:
-    <title>${_('Hue - Sign up')}</title>
-  %else:
-    <title>${_('Hue - Sign in')}</title>
-  %endif
+${ commonheader("Welcome to Hue", "login", user, "50px") | n,unicode }
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="">
-  <meta name="author" content="">
+<style type="text/css">
+  body {
+    background-color: #FFF;
+  }
 
-  <link href="/static/ext/css/bootplus.css" rel="stylesheet">
-  <link href="/static/ext/css/font-awesome.min.css" rel="stylesheet">
-  <link href="/static/css/hue3.css" rel="stylesheet">
-
-  <style type="text/css">
-    % if conf.CUSTOM.BANNER_TOP_HTML.get():
-      body {
-        display: none;
-        padding-top: 120px;
-      }
-      .banner {
-        height: 40px;
-        width: 100%;
-        padding: 0;
-        position: fixed;
-        top: 0;
-        background-color: #F9F9F9;
-        z-index: 1033;
-      }
-      .navigator {
-        top: 30px!important;
-      }
-    % else:
-      body {
-        display: none;
-        padding-top: 80px;
-      }
-    % endif
-  </style>
-
-  <style type="text/css">
-    #logo {
-      display: block;
-      margin-left: auto;
-      margin-right: auto;
-      margin-bottom: 30px
+  @-webkit-keyframes spinner {
+    from {
+      -webkit-transform: rotateY(0deg);
     }
-
-    .login-content {
-      width: 400px;
-      display: block;
-      margin-left: auto;
-      margin-right: auto;
+    to {
+      -webkit-transform: rotateY(-360deg);
     }
+  }
 
-    .login-content label {
-      margin-bottom: 20px;
-      font-size: 16px;
-    }
+  #logo {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 10px;
+    background: #FFF url("/static/art/hue-login-logo-ellie.png") 50% 14px no-repeat;
+    width: 130px;
+    height: 130px;
+    -webkit-border-radius: 65px;
+    -moz-border-radius: 65px;
+    border-radius: 65px;
+    border: 1px solid #EEE;
+  }
 
-    .login-content input[type='text'], .login-content input[type='password'] {
-      width: 90%;
-      margin-top: 10px;
-      font-size: 18px;
-    }
+  #logo.waiting {
+    -webkit-animation-name: spinner;
+    -webkit-animation-timing-function: linear;
+    -webkit-animation-iteration-count: infinite;
+    -webkit-animation-duration: 2s;
+    -webkit-transform-style: preserve-3d;
+  }
 
-    .login-content input {
-      width: 100%;
-      padding: 10px 16px;
-    }
+  .login-content {
+    width: 360px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
 
-    hr {
-      border-top-color: #DEDEDE;
-    }
+  .input-prepend {
+    width: 100%;
+  }
 
-    ul.errorlist li {
-      font-size: 13px;
-      font-weight: normal;
-      font-style: normal;
-    }
+  .input-prepend .add-on {
+    min-height: 38px;
+    line-height: 38px;
+    color: #999;
+  }
 
-    input.error {
-      border-color: #b94a48;
-      -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-      -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-      box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-    }
+  .login-content input {
+    width: 85%;
+    min-height: 38px;
+    font-size: 18px;
+  }
 
-    .well {
-      border: 1px solid #D8D8D8;
-      border-radius: 3px 3px 3px 3px;
-    }
+  .login-content .input-prepend.error input, .login-content .input-prepend.error .add-on {
+    border-top-color: #dd4b39;
+    border-bottom-color: #dd4b39;
+  }
 
-    .footer {
-      position: fixed;
-      bottom: 0;
-      background-color: #338BB8;
-      height: 4px;
-      width: 100%;
-    }
-  </style>
-</head>
+  .login-content .input-prepend.error input {
+    border-right-color: #dd4b39;
+  }
 
-<body>
+  .login-content .input-prepend.error .add-on {
+    border-left-color: #dd4b39;
+  }
 
-% if conf.CUSTOM.BANNER_TOP_HTML.get():
-  <div id="banner-top" class="banner">
-    ${ conf.CUSTOM.BANNER_TOP_HTML.get() | n,unicode }
-  </div>
-% endif
+  .login-content input[type='submit'] {
+    height: 44px;
+    min-height: 44px;
+    font-weight: normal;
+    text-shadow: none;
+  }
+
+  hr {
+    border-top-color: #DEDEDE;
+  }
+
+  ul.errorlist {
+    text-align: left;
+    margin-top: -4px;
+    margin-bottom: 4px;
+  }
+
+  ul.errorlist li {
+    font-size: 13px;
+    font-weight: normal;
+    font-style: normal;
+  }
+
+  input.error {
+    border-color: #b94a48;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  }
+
+  .well {
+    border: 1px solid #D8D8D8;
+    border-radius: 3px 3px 3px 3px;
+    background-color: #F7F7F7;
+  }
+
+  .footer {
+    position: fixed;
+    bottom: 0;
+    background-color: #338BB8;
+    height: 6px;
+    width: 100%;
+  }
+
+  h3 {
+    color: #666;
+    font-size: 24px;
+    font-weight: 400;
+    margin-bottom: 20px;
+  }
+</style>
 
 
 <div class="footer"></div>
 
-<div class="navigator">
-  <div class="pull-right">
-    <ul class="nav nav-pills">
-      <li id="jHueTourFlagPlaceholder"></li>
-    </ul>
-  </div>
-  <a class="brand nav-tooltip pull-left" href="#"><img src="/static/art/hue-logo-mini-white.png"
-                                                       data-orig="/static/art/hue-logo-mini-white.png"
-                                                       data-hover="/static/art/hue-logo-mini-white-hover.png"/></a>
-  <ul class="nav nav-pills pull-left hide" id="visit">
-    <li><a title="${_('Visit gethue.com')}" href="http://gethue.com">${_('Fell asleep? Visit us on gethue.com instead!')} <i class="fa fa-external-link-circle"></i></a></li>
-  </ul>
-</div>
-
-
 <div class="container">
   <div class="row">
-    <div class="login-content">
-      <form method="POST" action="${action}" class="well">
-        <img id="logo" src="/static/art/hue-login-logo.png" data-orig="/static/art/hue-login-logo.png"
-             data-hover="/static/art/hue-login-logo-skew.png"/>
-        <label
-          % if backend_name == 'OAuthBackend':
-            class="hide"
-          % endif
-            ><i class="fa fa-user"></i> ${_('Username')}
-          ${ form['username'] | n,unicode }
-          ${ form['username'].errors | n,unicode }
-        </label>
-        <label
-          % if backend_name in ('AllowAllBackend', 'OAuthBackend'):
-            class="hide"
-          % endif
-            ><i class="fa fa-lock"></i> ${_('Password')}
-          ${ form['password'] | n,unicode }
-          ${ form['password'].errors | n,unicode }
-        </label>
+    <div class="login-content center">
+      <div id="logo"></div>
 
-        %if login_errors:
-            <div class="alert alert-error" style="text-align: center">
-              <strong><i class="fa fa-exclamation-triangle"></i> ${_('Error!')}</strong> ${_('Invalid username or password.')}
-            </div>
+      <form method="POST" action="${action}" class="well">
+
+        %if first_login_ever:
+          <h3>${_('Create your Hue account')}</h3>
+        %else:
+          <h3>${_('Sign in to continue to Hue')}</h3>
         %endif
 
         %if first_login_ever:
-            <div class="alert alert-block">
-              <i class="fa fa-exclamation-triangle"></i>
+          <div class="alert alert-block">
             ${_('Since this is your first time logging in, pick any username and password. Be sure to remember these, as')}
-              <strong>${_('they will become your Hue superuser credentials.')}</strong>.
-            </div>
-            <hr/>
-            <input type="submit" class="btn btn-large btn-primary" value="${_('Sign up')}"/>
+            <strong>${_('they will become your Hue superuser credentials.')}</strong>.
+          </div>
+        %endif
+
+        <div class="input-prepend
+          % if backend_name == 'OAuthBackend':
+            hide
+          % endif
+        ">
+          <span class="add-on"><i class="fa fa-user"></i></span>
+          ${ form['username'] | n,unicode }
+        </div>
+
+        ${ form['username'].errors | n,unicode }
+
+        <div class="input-prepend
+          % if backend_name in ('AllowAllBackend', 'OAuthBackend'):
+            hide
+          % endif
+        ">
+          <span class="add-on"><i class="fa fa-lock"></i></span>
+          ${ form['password'] | n,unicode }
+        </div>
+        ${ form['password'].errors | n,unicode }
+
+        %if login_errors:
+          <div class="alert alert-error" style="text-align: center">
+            <strong><i class="fa fa-exclamation-triangle"></i> ${_('Error!')}
+            </strong> ${_('Invalid username or password.')}
+          </div>
+        %endif
+        <hr/>
+        %if first_login_ever:
+          <input type="submit" class="btn btn-large btn-primary" value="${_('Create account')}"/>
         %else:
-            <hr/>
-            <input type="submit" class="btn btn-large btn-primary" value="${_('Sign in')}"/>
+          <input type="submit" class="btn btn-large btn-primary" value="${_('Sign in')}"/>
         %endif
         <input type="hidden" name="next" value="${next}"/>
       </form>
@@ -197,41 +206,24 @@ from django.utils.translation import ugettext as _
   </div>
 </div>
 
-<script src="/static/ext/js/jquery/jquery-2.0.2.min.js"></script>
 <script>
   $(document).ready(function () {
-    // prevents framebusting and clickjacking
-    if (self == top){
-      $("body").show();
-    }
-    else {
-      top.location = self.location;
-    }
-
-    var _skew = -1;
-    $("[data-hover]").on("mouseover", function () {
-      var _this = $(this);
-      _skew = window.setTimeout(function () {
-        _this.attr("src", _this.data("hover"));
-        $("#visit").removeClass("hide");
-      }, 3000);
-    });
-
-    $("[data-hover]").on("mouseout", function () {
-      $(this).attr("src", $(this).data("orig"));
-      window.clearTimeout(_skew);
+    $("form").on("submit", function () {
+      window.setTimeout(function () {
+        $("#logo").addClass("waiting");
+      }, 1000);
     });
 
     % if backend_name == 'AllowAllBackend':
-        $('#id_password').val('password');
+      $('#id_password').val('password');
     % endif
 
     % if backend_name == 'OAuthBackend':
-        $("input").css({"display": "block", "margin-left": "auto", "margin-right": "auto"});
-        $("input").bind('click', function () {
-          window.location.replace('/login/oauth/');
-          return false;
-        });
+      $("input").css({"display": "block", "margin-left": "auto", "margin-right": "auto"});
+      $("input").bind('click', function () {
+        window.location.replace('/login/oauth/');
+        return false;
+      });
     % endif
 
     $("ul.errorlist").each(function () {
@@ -239,5 +231,5 @@ from django.utils.translation import ugettext as _
     });
   });
 </script>
-</body>
-</html>
+
+${ commonfooter(messages) | n,unicode }

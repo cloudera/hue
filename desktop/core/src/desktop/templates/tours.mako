@@ -20,6 +20,13 @@ from django.utils.translation import ugettext as _
 <script type="text/javascript">
 $.jHueTour({
   "tours":[
+    {
+      "name": "thehueblog",
+      "desc": "${_("The Hue Blog")}",
+      "path": "/",
+      "video": "",
+      "blog": "http://blog.gethue.com"
+    },
     {"name": "huehomedoc", "desc": "${_("Get started!")}", "path": "/home", "steps": [
       {"arrowOn": ".currentApp", "expose": ".navbar-fixed-top", "title": "${_("Your new home.")}", "content": "${_("This is where you can access all your documents and you can tag them per project. Your home is always reachable from any part of Hue, just click on the house icon on the top navigator bar.")}", "placement": "bottom", "onShown": "", "waitForAction": false, "left": 90},
       {"arrowOn": ".sidebar-nav", "expose": ".sidebar-nav", "title": "${_("Actions and projects")}", "content": "${_("From here you can create new documents or see a specific project or any trashed document for instance.")}", "placement": "right", "onShown": "", "waitForAction": false},
