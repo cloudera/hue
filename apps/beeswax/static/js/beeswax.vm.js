@@ -610,7 +610,6 @@ function BeeswaxViewModel(server) {
         var failed = data.isFailure  || data.status != 0;
         if (data.isSuccess || failed) {
           clearTimeout(timer);
-          self.design.isRunning(false);
 
           if (data.log) {
             self.design.watch.logs(data.log.split("\n"));
