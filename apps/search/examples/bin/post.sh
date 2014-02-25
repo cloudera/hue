@@ -14,12 +14,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-URL=http://localhost:8983/solr/$$c/update
+URL=http://localhost:8983/solr
 
-for c in (twitter, yelp, log); do
-  echo Posting file $c to $URL
+for c in "log_demo"; do
+  u="$URL/$c/update"
+  echo Posting file $c to $u
   FILE=../collections/solr_configs_$c/index_data.xml
-  curl $URL --data-binary @$FILE -H 'Content-type:application/xml'
+  curl $u --data-binary @$FILE -H 'Content-type:application/xml'
+  echo
+done
+
+for c in "twitter_demo" "yelp_demo"; do
+  u="$URL/$c/update"
+  echo Posting file $c to $u
+  FILE=../collections/solr_configs_$c/index_data.csv
+  curl $u --data-binary @$FILE -H 'Content-type:text/csv'
   echo
 done
 

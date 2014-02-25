@@ -70,7 +70,7 @@
     "model": "search.collection", 
     "fields": {
       "sorting": 1, 
-      "name": "twitter", 
+      "name": "twitter_demo", 
       "facets": 1, 
       "enabled": true, 
       "label": "Twitter Demo", 
@@ -85,7 +85,7 @@
     "model": "search.collection", 
     "fields": {
       "sorting": 2, 
-      "name": "yelp", 
+      "name": "yelp_demo", 
       "facets": 2, 
       "enabled": true, 
       "label": "Yelp Demo", 
@@ -100,7 +100,7 @@
     "model": "search.collection", 
     "fields": {
       "sorting": 3, 
-      "name": "log", 
+      "name": "log_demo", 
       "facets": 3, 
       "enabled": true, 
       "label": "Logfiles Demo", 
