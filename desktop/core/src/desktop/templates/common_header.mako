@@ -119,6 +119,12 @@ from django.utils.translation import ugettext as _
 
   </script>
 
+  <!--[if lt IE 9]>
+  <script type="text/javascript">
+    location.href = "${ url('desktop.views.unsupported') }";
+  </script>
+  <![endif]-->
+
   <script src="/static/js/hue.utils.js"></script>
   <script src="/static/ext/js/jquery/jquery-2.0.2.min.js"></script>
   <script src="/static/js/jquery.migration.js"></script>

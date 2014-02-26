@@ -238,6 +238,10 @@ def threads(request):
 def jasmine(request):
   return render('jasmine.mako', request, None)
 
+@login_notrequired
+def unsupported(request):
+  return render('unsupported.mako', request, None)
+
 def index(request):
   if request.user.is_superuser and request.COOKIES.get('hueLandingPage') != 'home':
     return redirect(reverse('about:index'))

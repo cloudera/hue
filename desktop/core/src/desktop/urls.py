@@ -70,6 +70,9 @@ dynamic_patterns += patterns('desktop.views',
   # Jasmine
   (r'^jasmine', 'jasmine'),
 
+  # Unsupported browsers
+  (r'^boohoo$','unsupported'),
+
   # Top level web page!
   (r'^$', 'index'),
 )
