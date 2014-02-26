@@ -125,6 +125,16 @@ from django.utils.translation import ugettext as _
   </script>
   <![endif]-->
 
+  <script type="text/javascript">
+    // check if it's a Firefox < 7
+    var _UA = navigator.userAgent.toLowerCase();
+    for (var i = 1; i < 7; i++) {
+      if (_UA.indexOf("firefox/" + i + ".") > -1) {
+        location.href = "${ url('desktop.views.unsupported') }";
+      }
+    }
+  </script>
+
   <script src="/static/js/hue.utils.js"></script>
   <script src="/static/ext/js/jquery/jquery-2.0.2.min.js"></script>
   <script src="/static/js/jquery.migration.js"></script>

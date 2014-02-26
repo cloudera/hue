@@ -90,9 +90,9 @@
 
 <h3>${_('It looks like you are running an older browser. What about upgrading to the latest')}</h3>
 
-<a href="http://www.google.com/chrome/‎">Google Chrome</a> |
-<a href="http://www.mozilla.org/firefox/‎">Mozilla Firefox</a> |
-<a href="http://windows.microsoft.com/en-us/internet-explorer/browser-ie‎">Microsoft Internet Explorer</a>
+<a href="http://www.google.com/chrome/">Google Chrome</a> |
+<a href="http://www.mozilla.org/firefox/">Mozilla Firefox</a> |
+<a href="http://windows.microsoft.com/en-us/internet-explorer/browser-ie">Microsoft Internet Explorer</a>
 
 </body>
 </html>
