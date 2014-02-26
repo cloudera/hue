@@ -47,7 +47,7 @@ ${layout.menubar(section='query')}
           </ul>
           <select data-bind="options: databases, value: database" class="input-medium chosen-select" name="query-database" data-placeholder="${_('Choose a database...')}"></select>
           <input id="navigatorSearch" type="text" placeholder="${ _('Table name...') }" style="width:90%; margin-top: 20px"/>
-          <span id="navigatorNoTables">${_('The selected database has no tables.')}</span>
+          <div id="navigatorNoTables">${_('The selected database has no tables.')}</div>
           <ul id="navigatorTables" class="unstyled"></ul>
           <div id="navigatorLoader">
             <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #DDD"></i><!--<![endif]-->
@@ -329,9 +329,9 @@ ${layout.menubar(section='query')}
           <table id="recentQueries" class="table table-striped table-condensed datatables" cellpadding="0" cellspacing="0" data-tablescroller-enforce-height="true">
             <thead>
               <tr>
-                <th width="10%">${_('Time')}</th>
-                <th width="85%">${_('Query')}</th>
-                <th width="5%">${_('Result')}</th>
+                <th>${_('Time')}</th>
+                <th>${_('Query')}</th>
+                <th>${_('Result')}</th>
                 <th>&nbsp;</th>
               </tr>
             </thead>
@@ -794,6 +794,10 @@ ${layout.menubar(section='query')}
     display: none;
   }
 
+  #navigatorNoTables {
+    padding: 6px;
+  }
+
   .tooltip.left {
     margin-left: -13px;
   }
@@ -961,9 +965,9 @@ $(document).ready(function () {
       "bInfo": false,
       "bFilter": false,
       "aoColumns": [
-        { "sWidth" : "10%"},
-        { "sWidth" : "85%"},
-        { "sWidth" : "5%", "bSortable": false },
+        { "sWidth" : "100px"},
+        null,
+        { "sWidth" : "80px", "bSortable": false },
         { "bSortable": false, "sWidth" : "4px" }
       ],
       "aaSorting": [
@@ -989,14 +993,16 @@ $(document).ready(function () {
     recentQueries.fnClearTable();
     $.getJSON("${ url(app_name + ':list_query_history') }?format=json&"+Math.random(), function(data) {
       if (data && data.queries) {
+        var _rows = [];
         $(data.queries).each(function(cnt, item){
-          recentQueries.fnAddData([
+          _rows.push([
             '<span data-time="' + item.timeInMs + '">' + item.timeFormatted + '</span>',
             '<code style="cursor:pointer">' + item.query + '</code>',
             (item.resultsUrl != "" ? '<a href="' + item.resultsUrl + '" data-row-selector-exclude="true">${_('See results...')}</a>': ''),
             (item.designUrl != "" ? '<a href="' + item.designUrl + '" data-row-selector="true">&nbsp;</a>': '')
           ]);
         });
+        recentQueries.fnAddData(_rows);
       }
       $("a[data-row-selector='true']").jHueRowSelector();
       $("#recentLoader").hide();
@@ -1288,6 +1294,10 @@ $(document).ready(function () {
   % endif
 
   CodeMirror.onAutocomplete = function (data, from, to) {
+    if (data.indexOf("(") > -1){
+      codeMirror.setCursor({line: from.line, ch: from.ch + data.length - 1});
+      codeMirror.execCommand("autocomplete");
+    }
     if (CodeMirror.tableFieldMagic) {
       codeMirror.replaceRange(" ", from, from);
       codeMirror.setCursor(from);
@@ -1392,8 +1402,7 @@ $(document).ready(function () {
           }
           CodeMirror.possibleSoloField = false;
           if (_before.toUpperCase().indexOf("SELECT ") > -1 && _before.toUpperCase().indexOf(" FROM ") == -1 && !CodeMirror.fromDot) {
-
-            if (_after.toUpperCase().indexOf("FROM ") > -1) {
+            if (_after.toUpperCase().indexOf("FROM ") > -1 || $.trim(_before).substr(-1) == "(") {
               fieldsAutocomplete(cm);
             }
             else {
@@ -1402,7 +1411,7 @@ $(document).ready(function () {
             }
           }
           else {
-            if (_before.toUpperCase().indexOf("WHERE ") > -1 && !CodeMirror.fromDot && _before.toUpperCase().match(/ ON| GROUP| SORT/) == null) {
+            if (_before.toUpperCase().indexOf("WHERE ") > -1 && !CodeMirror.fromDot && _before.toUpperCase().match(/ ON| LIMIT| GROUP| SORT/) == null) {
               fieldsAutocomplete(cm);
             }
             else {
@@ -1420,7 +1429,7 @@ $(document).ready(function () {
       var _value = getStatementAtCursor().statement;
       var _from = _value.toUpperCase().indexOf("FROM");
       if (_from > -1) {
-        var _match = _value.toUpperCase().substring(_from).match(/ ON| WHERE| GROUP| SORT|;/);
+        var _match = _value.toUpperCase().substring(_from).match(/ ON| LIMIT| WHERE| GROUP| SORT|;/);
         var _to = _value.length;
         if (_match) {
           _to = _match.index;

@@ -103,7 +103,7 @@
     }
 
     function gatherCompletions(obj) {
-      if (obj.indexOf(".") == 0) {
+      if (obj.indexOf(".") == 0 || obj.indexOf("(") == 0) {
         forEach(catalogFieldsL, maybeAdd);
       }
       else {
