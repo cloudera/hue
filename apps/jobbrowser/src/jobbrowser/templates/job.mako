@@ -423,7 +423,7 @@ $(document).ready(function () {
 
   function callJobDetails() {
     isUpdating = true;
-    $.getJSON("?format=json&rnd=" + Math.random(), function (data) { // Need to add random to prevent the cached of IE9
+    $.getJSON("?format=json", function (data) {
       if (data != null && data.job != null) {
         updateJob(data.job);
         updateFailedTasks(data.failedTasks);

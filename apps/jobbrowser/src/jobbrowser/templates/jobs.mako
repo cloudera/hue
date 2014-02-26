@@ -267,7 +267,7 @@ ${ components.menubar() }
     }
 
     function callJobDetails(job, finish) {
-      $.getJSON(job.url + "?format=json&rnd=" + Math.random(), function (data) {
+      $.getJSON(job.url + "?format=json", function (data) {
         if (data != null && data.job) {
           var jobTableNodes = jobTable.fnGetNodes();
           var _foundRow = null;
@@ -304,7 +304,6 @@ ${ components.menubar() }
       if ($("#showRetired").is(":checked")) {
         _url += "&retired=on";
       }
-      _url += "&rnd=" + Math.random(); // thanks IE!
       $.getJSON(_url, callback);
     }
 

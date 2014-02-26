@@ -991,7 +991,7 @@ $(document).ready(function () {
   renderRecent = function() {
     $("#recentLoader").show();
     recentQueries.fnClearTable();
-    $.getJSON("${ url(app_name + ':list_query_history') }?format=json&"+Math.random(), function(data) {
+    $.getJSON("${ url(app_name + ':list_query_history') }?format=json", function(data) {
       if (data && data.queries) {
         var _rows = [];
         $(data.queries).each(function(cnt, item){
