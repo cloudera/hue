@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<!-- saved from url=(0030)http://cloudera.github.io/hue/ -->
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta charset="UTF-8">
+  
+  <title>Hue - The UI for Apache Hadoop</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="./gethue.com_files/bootstrap.css" type="text/css">
+  <link rel="stylesheet" href="./gethue.com_files/bootstrap-responsive.css" type="text/css">
+  <link rel="stylesheet" href="./gethue.com_files/font-awesome.min.css" type="text/css">
+  <link rel="stylesheet" href="./gethue.com_files/strip.css" type="text/css">
+  <link rel="stylesheet" href="./gethue.com_files/strip-responsive.css" type="text/css">
+  <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,700,600" rel="stylesheet">
+  <link href="./gethue.com_files/css" rel="stylesheet" type="text/css">
+<style type="text/css"></style></head>
+<body>
+
+<section class="container" id="home">
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <div class="container">
+        <a href="http://cloudera.github.io/hue/#home" class="brand"><img src="./gethue.com_files/hue-logo.png"></a>
+        <ul class="nav">
+          <li><a href="http://cloudera.github.io/hue/#home">Home</a></li>
+          <li><a href="http://cloudera.github.io/hue/#tour">Applications</a></li>
+          <li><a href="http://gethue.tumblr.com/tagged/release">Releases</a></li>
+          <li><a href="http://gethue.tumblr.com/">Tutorials</a></li>
+          <li><a href="http://twitter.com/gethue/" target="_blank"><i class="icon-twitter icon-large"></i></a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</section>
+
+<section class="container">
+  <div class="row">
+    <header class="highlight span12">
+      <h2><strong>Hue</strong>, the open source Apache Hadoop UI.</h2>
+      <div>
+        <div id="playBtn" class="container"><i class="icon-play-circle"></i></div>
+        <img id="feature-screenshot" src="./gethue.com_files/shot.png" alt="screenshot">
+      </div>
+      <p>
+        <a id="downloadBtn" href="javascript:void(0)" class="big-btn big-btn-blue" data-original-title=""><i class="icon-download"></i> Download Hue</a>
+        <a href="https://github.com/cloudera/hue" target="_blank" class="big-btn big-btn-black"><i class="icon-github"></i> View on Github</a>
+      </p>
+
+      <p><strong>Hue</strong> features a File Browser for HDFS, a Job Designer/Browser for MapReduce, query editors for
+        Hive, Pig, Cloudera Impala, Solr Search, Sqoop2 and an HBase browser.<br>
+        It also ships with an Oozie Application for creating workflows, various Shells and a collection of Hadoop API.
+      </p>
+
+        <form action="http://gethue.createsend.com/t/i/s/jihrk/" method="post" id="subFormUp" style="vertical-align: middle; margin-top: 20px">
+            Get the latest news about Hue in your inbox!
+            <input type="text" class="input-medium" name="cm-jihrk-jihrk" id="jihrk-jihrk" placeholder="Your email" style="margin-top: 8px; margin-left: 10px">
+            <a id="subscribeBtnUp" class="btn" value="Subscribe"><i class="icon-envelope icon-large"></i> Subscribe</a>
+        </form>
+
+    </header>
+  </div>
+  <div class="row">
+    <div class="offset3 span6">
+      <hr class="shadow-line">
+    </div>
+  </div>
+</section>
+<section class="container" id="tour">
+  <div class="highlight row">
+    <div id="myCarousel" class="carousel slide">
+      <div class="carousel-inner">
+
+        <div class="item active">
+          <p>
+            <img src="./gethue.com_files/beeswax.png" alt="beeswax hive ui">
+          </p>
+          <article class="carousel-caption">
+            <h3><strong>Beeswax Hive UI</strong></h3>
+
+            <p class="center-align">
+              The Beeswax application enables you to perform queries on Apache Hive, a SQL like data warehousing system
+              designed to work with Hadoop.
+              You can run and manage Hive queries and download the results in a Microsoft Office Excel worksheet file or
+              a comma-separated values file.
+            </p>
+          </article>
+        </div>
+
+        <div class="item">
+          <p>
+            <img src="./gethue.com_files/search.png" alt="Search">
+          </p>
+          <article class="carousel-caption">
+            <h3><strong>Search</strong></h3>
+
+            <p class="center-align">
+              Search from Solr, Solr Cloud and Cloudera Search and customizable the results with your own style
+              and facets. Multiple indexes are supported, as well as query highlighting, sorting.
+            </p>
+          </article>
+        </div>
+
+        <div class="item">
+          <p>
+            <img src="./gethue.com_files/oozieeditor.png" alt="oozie dashboard editor">
+          </p>
+          <article class="carousel-caption">
+            <h3><strong>Oozie Editor / Dashboard</strong></h3>
+
+            <p class="center-align">
+              The Oozie Editor/Dashboard application allows you to define Oozie workflow/coordinator/bundle
+              applications, run them, and view their information, logs and stop, pause, rerun them.
+            </p>
+          </article>
+        </div>
+
+        <div class="item">
+          <p>
+            <img src="./gethue.com_files/hbase.png" alt="HBase">
+          </p>
+          <article class="carousel-caption">
+            <h3><strong>HBase Browser</strong></h3>
+
+            <p class="center-align">
+              The HBase Browser application is tailored for quickly browsing huge tables and accessing any content.
+              You can also create new tables, add data, modify existing cells and filter data with the autocompleting search bar.
+            </p>
+          </article>
+        </div>
+
+        <div class="item">
+          <p>
+            <img src="./gethue.com_files/pig.png" alt="pig editor">
+          </p>
+          <article class="carousel-caption">
+            <h3><strong>Pig Editor</strong></h3>
+
+            <p class="center-align">The Pig Editor lets you edit your Pig script with autocompletion and syntax
+              highlighting.
+              Logs and results are displayed within this one-page app for a better interactivity. You can save your
+              scripts or look at the already submitted ones.</p>
+          </article>
+        </div>
+
+        <div class="item">
+          <p>
+            <img src="./gethue.com_files/impala.png" alt="Impala">
+          </p>
+          <article class="carousel-caption">
+            <h3><strong>Impala</strong></h3>
+
+            <p class="center-align">With its syntax hightlighting and autocomplete editor, the Impala application is tailored for quick data analysis.
+              It will showcase the differences between Impala and Hive, especially its rapidity.</p>
+          </article>
+        </div>
+
+        <div class="item">
+          <p>
+            <img src="./gethue.com_files/metastore.png" alt="metastore">
+          </p>
+          <article class="carousel-caption">
+            <h3><strong>Metastore Manager</strong></h3>
+
+            <p class="center-align">You can list and manage Hive tables and switch between databases easily.
+              Table creation is available through a wizard as well as statistics, data loading and partition creation.
+            </p>
+          </article>
+        </div>
+
+        <div class="item">
+          <p>
+            <img src="./gethue.com_files/fb.png" alt="file browser">
+          </p>
+          <article class="carousel-caption">
+            <h3><strong>File Browser</strong></h3>
+
+            <p class="center-align">The File Browser application lets you browse, upload and manipulate files and directories in
+              the
+              Hadoop Distributed File System (HDFS).</p>
+          </article>
+        </div>
+
+        <div class="item">
+          <p>
+            <img src="./gethue.com_files/shell.png" alt="shell">
+          </p>
+          <article class="carousel-caption">
+            <h3><strong>Shell</strong></h3>
+
+            <p class="center-align">The Hue Shell application provides access to the Pig and HBase command-line shells.
+              The Shell application is designed to have the same look and feel as a Unix terminal.
+              In addition to the shells configured by default, it is possible to include almost any process that exposes
+              a command-line interface as an option in this Hue application.</p>
+          </article>
+        </div>
+
+        <div class="item">
+          <p>
+            <img src="./gethue.com_files/jobdesigner.png" alt="job designer">
+          </p>
+          <article class="carousel-caption">
+            <h3><strong>Job Designer</strong></h3>
+
+            <p class="center-align">The Job Designer application enables you to create and submit Hadoop MapReduce jobs
+              to the Hadoop cluster.
+              You can include variables with your jobs to enable you and other users to enter values for the variables
+              when they run your job.
+              The Job Designer supports MapReduce, streaming, and Java jobs.</p>
+          </article>
+        </div>
+        <div class="item">
+          <p>
+            <img src="./gethue.com_files/jobbrowser.png" alt="job browser">
+          </p>
+          <article class="carousel-caption">
+            <h3><strong>Job Browser</strong></h3>
+
+            <p class="center-align">
+              The Job Browser application lets you to examine the Hadoop MapReduce jobs running on your Hadoop cluster.
+              Job Browser presents the job and tasks in layers.
+              The top layer is a list of jobs, and you can link to a list of that job's tasks.
+              You can then view a
+              task's attempts and the properties of each attempt, such as state, start and end time, and output
+              size. To troubleshoot failed jobs, you can also view the logs of each attempt in one click.
+            </p>
+          </article>
+        </div>
+        <div class="item">
+          <p>
+            <img src="./gethue.com_files/useradmin.png" alt="user admin">
+          </p>
+          <article class="carousel-caption">
+            <h3><strong>User Admin</strong></h3>
+
+            <p class="center-align">
+              The User Admin application lets an administrator add, delete, and manage Hue user accounts and groups, and
+              configure group permissions.
+              The permissions allow users, based on their group membership, to launch Hue applications and use
+              application features.
+              You can add users and groups individually, or import them from an LDAP directory.
+            </p>
+          </article>
+        </div>
+      </div>
+      <a class="left carousel-control" href="http://cloudera.github.io/hue/#myCarousel" data-slide="prev">‹</a>
+      <a class="right carousel-control" href="http://cloudera.github.io/hue/#myCarousel" data-slide="next">›</a>
+    </div>
+  </div>
+</section>
+<section class="section-box shadow">
+  <div class="container">
+    <div class="row">
+      <article class="span4 center-align">
+        <img src="./gethue.com_files/elephant.gif" alt="hadoop" class="overable">
+
+        <h3>Explore Hadoop.</h3>
+
+        <p>
+          Hue is a starting point for exploration and real time interaction with <a href="http://hadoop.apache.org/" target="_blank">Apache Hadoop</a>.
+        </p>
+
+        <p>
+          Hue's target is the Hadoop user experience and lets users avoid the command line interface and have them focus
+          on getting results faster and sooner.
+        </p>
+      </article>
+      <article class="span4 center-align">
+        <img src="./gethue.com_files/mature.gif" alt="mature" class="overable">
+
+        <h3>A mature application.</h3>
+
+        <p>
+          <strong>Hue</strong> is a <a href="http://gethue.tumblr.com/tagged/release">mature</a> web-based application used from fortune 500 companies to
+          startups, students and data scientist/analysts.
+        </p>
+
+        <p>
+          Hue 2.5 is the latest and it was released on July 15th, 2013. For more info about the releases, <a href="http://gethue.tumblr.com/tagged/release">click here</a>.
+        </p>
+
+      </article>
+      <article class="span4 center-align">
+
+        <img src="./gethue.com_files/sdk.gif" alt="sdk" class="overable">
+
+        <h3>Build your own app.</h3>
+
+        <p>
+          <strong>Hue</strong> comes with an <a href="http://cloudera.github.io/hue/docs-2.5.0/sdk/sdk.html" target="_blank">SDK</a> that lets you
+          reuse Hue's libraries so you can start building apps on top of Hadoop.
+        </p>
+
+        <p>
+          Clone the project with <a href="http://git-scm.com/">Git</a> and start building awesome software for Hadoop:
+        </p><pre>$ git clone git://github.com/cloudera/hue</pre>
+        <p></p>
+
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="container">
+  <div class="row">
+    <div class="offset3 span6">
+
+    </div>
+  </div>
+  <div class="row">
+    <div class="highlight span12">
+      <h3 class="subhead">It's easy to enter the <strong>Hue</strong> world</h3>
+
+      <div class="container">
+        <div class="row">
+          <article class="span4 center-align">
+            <h3>Hue Users</h3>
+
+            <p>
+              You can discuss about your ideas, ask your questions or make us aware of bugs online on the <a href="http://groups.google.com/a/cloudera.org/group/hue-user" target="_blank">Hue User Google
+              Group</a> or
+              in real life, joining one of the regular <a href="http://hue.meetup.com/" target="_blank">Hue Meetups</a>.
+            </p>
+          </article>
+          <article class="span4 center-align">
+            <h3>Hue Developers</h3>
+
+            <p>
+              If you want to show us what you've built or encounter problems while using the SDK, feel free to write on
+              the <a href="http://groups.google.com/a/cloudera.org/group/hue-dev" target="_blank">Hue Dev Google
+              Group</a>. <br>
+              You can see the what the <a href="https://issues.cloudera.org/browse/HUE" target="_blank">current
+              backlog</a> looks like and have a look at the <a href="https://review.cloudera.org/dashboard/?view=to-group&group=hue" target="_blank">Code
+              Reviews</a> for the issues.
+            </p>
+          </article>
+          <article class="span4 center-align">
+            <h3>Cloudera's CDH</h3>
+
+            <p>
+              The quickest way to get a general feeling of <strong>Hue</strong> is through <a href="https://ccp.cloudera.com/display/CDH4DOC/CDH4+Quick+Start+Guide" target="_blank">Cloudera's
+              Distribution for Apache Hadoop (CDH)</a>. <br>
+              There are several <a href="https://ccp.cloudera.com/display/SUPPORT/Cloudera+QuickStart+VM" target="_blank">Quick start Virtual Machines</a> available for you.
+            </p>
+          </article>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="container footer-box">
+  <hr class="shadow-line">
+  <nav class="links">
+    <a id="downloadBtnFooter" class="btn btn-mini" href="javascript:void(0)" data-original-title=""><i class="icon-download icon-large"></i> Download Hue</a>
+    <a class="btn btn-mini" href="https://github.com/cloudera/hue" target="_blank"><i class="icon-github icon-large"></i> View on Github</a>
+    <a class="btn btn-mini" href="http://twitter.com/gethue/" target="_blank"><i class="icon-twitter icon-large"></i>
+      Follow @gethue</a>
+    <form action="http://gethue.createsend.com/t/i/s/jihrk/" method="post" id="subForm" style="display:inline">
+    <input type="text" class="input-medium" name="cm-jihrk-jihrk" id="jihrk-jihrk" placeholder="Your email" style="margin-top: 8px; margin-left: 10px">
+    <a id="subscribeBtn" class="btn btn-mini" value="Subscribe"><i class="icon-envelope-alt icon-large"></i> Subscribe</a>
+      </form>
+  </nav>
+  <p><strong>Hue</strong> is open source and released under the <a class="normal" href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank">Apache License, version 2.0</a>.</p>
+</footer>
+
+<div id="video" class="modal hide fade" style="width: 930px;margin-left: -465px;">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3>Welcome to the Hue cinema.</h3>
+  </div>
+  <div class="modal-body">
+    <div style="float: left; width: 705px"><iframe id="videoFrame" src="about:blank" width="700" height="350" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen=""></iframe></div>
+    <div style="float: left; width: 187px">
+      <ul class="videoList unstyled">
+        <li class="active" data-video="http://player.vimeo.com/video/68257054">Hue 2.4 and the search app</li>
+        <li data-video="http://player.vimeo.com/video/66661052">The Pig Editor</li>
+        <li data-video="http://player.vimeo.com/video/66732338">A new UI for Oozie</li>
+        <li data-video="http://player.vimeo.com/video/64825639">What's new in Hue 2.3</li>
+        <li data-video="http://player.vimeo.com/video/63859033">The Yelp dataset challenge</li>
+        <li data-video="http://player.vimeo.com/video/63343487">HDFS File Operations Made Easy with Hue</li>
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript" async="" src="./gethue.com_files/ga.js"></script><script src="./gethue.com_files/jquery-1.8.1.min.js"></script>
+<script src="./gethue.com_files/bootstrap.min.js"></script>
+<script src="./gethue.com_files/jquery.scrollup.js"></script>
+
+<script type="text/javascript" charset="utf-8">
+  $.fn.preload = function () {
+    this.each(function () {
+      $("<img/>")[0].src = this;
+    });
+  }
+
+  $(document).ready(function () {
+    var CURRENT = "http://cloudera.github.com/hue/releases/2.5.0/hue-2.5.0.tgz";
+    var _lastSeenVideo = $("#videoFrame").attr("src");
+
+    $("#subscribeBtn").click(function() {
+        $("#subForm").submit();
+    });
+    $("#subscribeBtnUp").click(function() {
+      $("#subFormUp").submit();
+    });
+    $("#playBtn i").click(function(){
+      $("#video").modal("show");
+    });
+    $("#video").on("hide", function(){
+      $("#videoFrame").attr("src", "about:blank").attr("src", _lastSeenVideo);
+    });
+    $(".videoList li").on("click", function(){
+      $(".videoList li").removeClass("active");
+      $(this).addClass("active");
+      $("#videoFrame").attr("src", $(this).data("video") + "?autoplay=1");
+      _lastSeenVideo = $(this).data("video");
+    });
+    $("#downloadBtn").popover({
+        html: true,
+        placement: 'left',
+        trigger: 'click',
+        title: 'How to get Hue?',
+        content: '<ul class="nav nav-list"><li><a href="'+ CURRENT +'">Download the .tgz release</a></li>' +
+            '<li><a href="http://archive.cloudera.com/cdh4/one-click-install/">Install with CDH (recommended)</a></li>' +
+            '<li class="muted">Pick your distribution, architecture and install the package. Install the \'hue\' component and its dependencies.</li>' +
+            '<li><a href="http://www.apache.org/dyn/closer.cgi/bigtop/bigtop-0.6.0/">Install with Apache Bigtop</a></li>' +
+            '<li class="muted">Pick a repo from \'repos\' and add it to your package list. Install the \'hue\' component and its dependencies.</li>' +
+            '<li><a href="https://ccp.cloudera.com/display/SUPPORT/Cloudera+QuickStart+VM">Try it on Cloudera\'s Quickstart VM</a></li>' +
+            '</ul> '
+      });
+
+    $("#downloadBtn").click(function() {
+      $("body, html").animate({scrollTop: $(this).offset().top + ($(this).height()/2) - ($(window).height()/2)}, 300);
+    });
+
+    $("#downloadBtnFooter").popover({
+        html: true,
+        placement: 'top',
+        trigger: 'click',
+        title: 'How to get Hue?',
+        content: '<ul class="nav nav-list"><li><a href="' + CURRENT + '">Download the .tgz release</a></li>' +
+            '<li><a href="http://archive.cloudera.com/cdh4/one-click-install/">Install with CDH (recommended)</a></li>' +
+            '<li class="muted">Pick your distribution, architecture and install the package. Install the \'hue\' component and its dependencies.</li>' +
+            '<li><a href="http://www.apache.org/dyn/closer.cgi/bigtop/bigtop-0.6.0/">Install with Apache Bigtop</a></li>' +
+            '<li class="muted">Pick a repo from \'repos\' and add it to your package list. Install the \'hue\' component and its dependencies.</li>' +
+            '<li><a href="https://ccp.cloudera.com/display/SUPPORT/Cloudera+QuickStart+VM">Try it on Cloudera\'s Quickstart VM</a></li>' +
+            '</ul> '
+      });
+
+
+    $(['static/images/elephant_over.gif', 'static/images/mature_over.gif', 'static/images/sdk_over.gif']).preload();
+    $(".overable").each(function () {
+      var _originalSrc = $(this).attr("src");
+      $(this).hover(function () {
+        $(this).attr("src", _originalSrc.substring(0, _originalSrc.length - 4) + "_over.gif");
+      }, function () {
+        $(this).attr("src", _originalSrc);
+      });
+    });
+    $.jHueScrollUp();
+
+  });
+</script>
+
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-37637545-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function () {
+    var ga = document.createElement('script');
+    ga.type = 'text/javascript';
+    ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+
+<a id="jHueScrollUpAnchor" href="javascript:void(0)"><i class="icon-chevron-up"></i></a></body></html>

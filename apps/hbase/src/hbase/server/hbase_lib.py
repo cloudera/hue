@@ -16,7 +16,6 @@
 # limitations under the License.
 
 import logging
-import re
 import sys,os
 
 from thrift import Thrift
@@ -29,7 +28,6 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../../../gen-py'))
 from hbased import Hbase as thrift_hbase
 from hbased import ttypes
 
-from desktop.lib.exceptions_renderable import PopupException
 
 LOG = logging.getLogger(__name__)
 

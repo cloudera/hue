@@ -30,10 +30,10 @@ from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 
 from desktop.lib.django_util import render
-from desktop.lib.exceptions_renderable import PopupException
 
 from hbase import conf
 from hbase.api import HbaseApi
+from hbase.management.commands import hbase_setup
 from server.hbase_lib import get_thrift_type
 
 LOG = logging.getLogger(__name__)
@@ -115,3 +115,19 @@ def api_dump(response):
       return cleaned
 
   return HttpResponse(json.dumps({ 'data': clean(response), 'truncated': True, 'limit': trunc_limit }), content_type="application/json")
+
+
+def install_examples(request):
+  result = {'status': -1, 'message': ''}
+
+  if request.method != 'POST':
+    result['message'] = _('A POST request is required.')
+  else:
+    try:
+      hbase_setup.Command().handle_noargs()
+      result['status'] = 0
+    except Exception, e:
+      LOG.exception(e)
+      result['message'] = str(e)
+
+  return HttpResponse(json.dumps(result), mimetype="application/json")

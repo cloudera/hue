@@ -28,7 +28,7 @@ from django.utils.encoding import smart_str
 from desktop.lib import thrift_util
 from desktop.lib.exceptions_renderable import PopupException
 
-from hbase.server.hbase_lib import get_thrift_attributes, get_thrift_type, get_client_type
+from hbase.server.hbase_lib import get_thrift_type, get_client_type
 from hbase import conf
 
 LOG = logging.getLogger(__name__)
@@ -107,7 +107,7 @@ class HbaseApi(object):
 
   def getTableList(self, cluster):
     client = self.connectCluster(cluster)
-    return [{'name': name,'enabled': client.isTableEnabled(name)} for name in client.getTableNames()]
+    return [{'name': name, 'enabled': client.isTableEnabled(name)} for name in client.getTableNames()]
 
   def getRows(self, cluster, tableName, columns, startRowKey, numRows, prefix=False):
     client = self.connectCluster(cluster)
