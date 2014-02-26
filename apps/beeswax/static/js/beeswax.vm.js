@@ -596,7 +596,7 @@ function BeeswaxViewModel(server) {
   };
 
   self.watchQueryLoop = function(fn) {
-    var TIMEOUT = 1000;
+    var TIMEOUT = 100;
     var timer = null;
 
     self.design.isRunning(true);
@@ -631,6 +631,7 @@ function BeeswaxViewModel(server) {
             // scroll logs
           }
 
+          TIMEOUT = Math.min(TIMEOUT + 100, 2000);
           timer = setTimeout(_fn, TIMEOUT);
         }
       });
