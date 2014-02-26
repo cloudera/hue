@@ -20,13 +20,9 @@ import json
 import logging
 import re
 
-from datetime import datetime
-from lxml import etree
-
 from django.db import models
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 from django.core.urlresolvers import reverse
-from mako.template import Template
 
 from search.api import SolrApi
 from search.conf import SOLR_URL
