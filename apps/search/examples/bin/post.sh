@@ -16,24 +16,13 @@
 
 URL=http://localhost:8983/solr
 
-for c in "log_demo"; do
-  u="$URL/$c/update"
-  echo Posting file $c to $u
-  FILE=../collections/solr_configs_$c/index_data.xml
-  curl $u --data-binary @$FILE -H 'Content-type:application/xml'
-  echo
-done
-
-for c in "twitter_demo" "yelp_demo"; do
+for c in "log_demo" "twitter_demo" "yelp_demo"; do
   u="$URL/$c/update"
   echo Posting file $c to $u
   FILE=../collections/solr_configs_$c/index_data.csv
   curl $u --data-binary @$FILE -H 'Content-type:text/csv'
   echo
 done
-
-#send the commit command to make sure all the changes are flushed and visible
-#curl $URL --data-binary '<commit softCommit=true/>' -H 'Content-type:application/xml'
 
 curl "$URL?softCommit=true"
 echo

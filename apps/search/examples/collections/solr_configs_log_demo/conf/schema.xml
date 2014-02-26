@@ -109,8 +109,8 @@
    <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="timestamp" type="tdate" indexed="true" stored="true" />
    <field name="host" type="string" indexed="true" stored="true" />
-   <field name="status" type="string" indexed="true" stored="true" />
-   <field name="log_content" type="text_general" indexed="true" stored="true" />
+   <field name="process" type="string" indexed="true" stored="true" />
+   <field name="message" type="text_general" indexed="true" stored="true" />
 
    <!-- tika metadata -->
    <field name="content_type" type="lowercase" indexed="true" stored="true" />

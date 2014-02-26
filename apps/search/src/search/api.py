@@ -86,6 +86,7 @@ class SolrApi(object):
           params += (('fq', urllib.unquote(utf_quoter(fq))),)
 
       response = self._root.get('%(collection)s/select' % solr_query, params)
+
       return self._get_json(response)
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
