@@ -21,7 +21,7 @@ from django.contrib.auth.models import User
 from django.test.client import Client
 from django.conf import settings
 
-from desktop import conf
+from desktop import conf, middleware
 from desktop.auth.backend import rewrite_user
 from desktop.lib.django_test_util import make_logged_in_client
 from hadoop.test_base import PseudoHdfsTestBase
@@ -133,14 +133,17 @@ class TestRemoteUserLogin(object):
   reset = []
 
   def setUp(self):
+    User.objects.all().delete()
+    self.reset.append( conf.AUTH.BACKEND.set_for_testing('desktop.auth.backend.RemoteUserDjangoBackend') )
+    self.reset.append( conf.AUTH.REMOTE_USER_HEADER.set_for_testing('REMOTE_USER') ) # Set for middlware
     self.backends = settings.AUTHENTICATION_BACKENDS
     settings.AUTHENTICATION_BACKENDS = ('desktop.auth.backend.RemoteUserDjangoBackend',)
-    self.reset.append( conf.AUTH.BACKEND.set_for_testing('desktop.auth.backend.RemoteUserDjangoBackend') )
-    self.reset.append( conf.AUTH.REMOTE_USER_HEADER.set_for_testing('REMOTE_USER') )
+    self.remote_user_middleware_header = middleware.HueRemoteUserMiddleware.header
+    middleware.HueRemoteUserMiddleware.header = conf.AUTH.REMOTE_USER_HEADER.get() # Set for middlware
     self.c = Client()
 
   def tearDown(self):
-    User.objects.all().delete()
+    middleware.HueRemoteUserMiddleware.header = self.remote_user_middleware_header
     settings.AUTHENTICATION_BACKENDS = self.backends
     for finish in self.reset:
       finish()
