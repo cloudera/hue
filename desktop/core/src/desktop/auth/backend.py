@@ -374,6 +374,8 @@ class LdapBackend(object):
         user.groups.add(default_group)
         user.save()
 
+      if desktop.conf.LDAP.SYNC_GROUPS_ON_LOGIN.get():
+        self.import_groups(user)
       return user
 
     return None
@@ -382,6 +384,9 @@ class LdapBackend(object):
     user = self._backend.get_user(user_id)
     user = rewrite_user(user)
     return user
+
+  def import_groups(self, user):
+    import_ldap_users(user.username, sync_groups=True, import_by_dn=False)
 
   @classmethod
   def manages_passwords_externally(cls):
