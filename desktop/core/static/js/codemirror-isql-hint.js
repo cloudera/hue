@@ -72,7 +72,7 @@
   var impalaSQLKeywordsU = impalaSQLKeywords.split(" ");
   var impalaSQLKeywordsL = impalaSQLKeywords.toLowerCase().split(" ");
 
-  var impalaSQLKeywordsAfterTables = "JOIN ON WHERE";
+  var impalaSQLKeywordsAfterTables = "JOIN ON WHERE ORDER BY ASC DESC LIMIT";
   var impalaSQLKeywordsAfterTablesU = impalaSQLKeywordsAfterTables.split(" ");
   var impalaSQLKeywordsAfterTablesL = impalaSQLKeywordsAfterTables.toLowerCase().split(" ");
 
@@ -103,7 +103,7 @@
     }
 
     function gatherCompletions(obj) {
-      if (obj.indexOf(".") == 0) {
+      if (obj.indexOf(".") == 0 || obj.indexOf("(") == 0) {
         forEach(catalogFieldsL, maybeAdd);
       }
       else {
