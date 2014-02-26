@@ -233,8 +233,11 @@ ${ header.menubar() }
       % else:
         <p>
         </br>
-        &nbsp;&nbsp;&nbsp;${ _('Learn more about Hue and Hadoop on') } <a href="http://gethue.com" target="_blank">http://gethue.com</a>
+        &nbsp;&nbsp;&nbsp;${ _('Learn more about Hue and Hadoop on') } <a href="http://gethue.com" target="_blank">http://gethue.com</a>.
         </p>
+        <div class="form-actions">
+          <div class="pull-right muted">${ _('Hue and the Hue logo are trademarks of Cloudera, Inc.') }</div>
+        </div>
       % endif
 
     </div>
