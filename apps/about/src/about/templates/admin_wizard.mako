@@ -123,6 +123,14 @@ ${ header.menubar() }
                 </a>
               </li>
           % endif
+          % if 'hbase' in app_names:
+              <li>
+                <a href="#" class="installBtn" data-loading-text="${ _('Installing...') }"
+                   data-sample-url="${ url('hbase:install_examples') }">
+                  <i class="fa fa-download"></i> ${ apps['hbase'].nice_name }
+                </a>
+              </li>
+          % endif
           % if 'pig' in app_names:
               <li>
                 <a href="#" class="installBtn" data-loading-text="${ _('Installing...') }"
