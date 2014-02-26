@@ -63,6 +63,7 @@ function BeeswaxViewModel(server) {
     },
     'watch': {
       'logs': [],
+      'jobUrls': [],
       'url': null,
       'errors': []
     },
@@ -459,6 +460,7 @@ function BeeswaxViewModel(server) {
       success: function(data) {
         if (data.status == 0) {
           self.design.watch.logs.removeAll();
+          self.design.watch.jobUrls.removeAll();
           self.design.statement(data.statement);
           self.design.results.rows.removeAll();
           self.design.results.columns.removeAll();
@@ -544,6 +546,7 @@ function BeeswaxViewModel(server) {
       success: function(data) {
         if (data.status == 0) {
           self.design.watch.logs.removeAll();
+          self.design.watch.jobUrls.removeAll();
           self.design.statement(data.statement);
           self.design.watch.url(data.watch_url);
           self.design.results.url('/' + self.server() + '/results/' + data.id + '/0?format=json');
@@ -601,6 +604,7 @@ function BeeswaxViewModel(server) {
 
     self.design.isRunning(true);
     self.design.watch.logs.removeAll();
+    self.design.watch.jobUrls.removeAll();
     self.design.results.rows.removeAll();
     self.design.results.columns.removeAll();
     self.resetErrors();
@@ -614,6 +618,7 @@ function BeeswaxViewModel(server) {
           if (data.log) {
             self.design.watch.logs(data.log.split("\n"));
             // scroll logs
+            self.design.watch.jobUrls(data.jobUrls);
           }
           if (!failed) {
             $(document).trigger('stop_watch.query');
@@ -629,6 +634,7 @@ function BeeswaxViewModel(server) {
           if (data.log) {
             self.design.watch.logs(data.log.split("\n"));
             // scroll logs
+            self.design.watch.jobUrls(data.jobUrls);
           }
 
           TIMEOUT = Math.min(TIMEOUT + 100, 2000);
@@ -819,6 +825,7 @@ function BeeswaxViewModel(server) {
               // watch this ID.
               self.design.watch.url(data.watch_url);
               self.design.watch.logs.removeAll();
+              self.design.watch.jobUrls.removeAll();
               self.watchQueryLoop(redirect_fn);
             } else {
               // redirect to metastore app.
