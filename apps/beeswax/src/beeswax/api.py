@@ -17,6 +17,7 @@
 
 import json
 import logging
+import re
 
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, Http404
@@ -70,8 +71,9 @@ def error_handler(view_fn):
         'message': message,
       }
 
-      if 'database is locked' in message or 'Invalid query handle' in message or 'not JSON serializable' in message:
+      if re.search('database is locked|Invalid query handle|not JSON serializable', message, re.IGNORECASE):
         response['status'] = 2 # Frontend will not display this type of error
+        LOG.warn('error_handler silencing the exception: %s' % e)
 
       return HttpResponse(json.dumps(response), mimetype="application/json", status=200)
   return decorator
