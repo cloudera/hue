@@ -22,10 +22,14 @@ from django.test.client import Client
 from django.conf import settings
 
 from desktop import conf, middleware
-from desktop.auth.backend import rewrite_user
+from desktop.auth import backend
+from django_auth_ldap import backend as django_auth_ldap_backend
 from desktop.lib.django_test_util import make_logged_in_client
 from hadoop.test_base import PseudoHdfsTestBase
 from hadoop import pseudo_hdfs4
+
+from useradmin import ldap_access
+from useradmin.tests import LdapTestConnection
 
 
 class TestLoginWithHadoop(PseudoHdfsTestBase):
@@ -67,25 +71,33 @@ class TestLoginWithHadoop(PseudoHdfsTestBase):
 
 
 class TestLdapLogin(PseudoHdfsTestBase):
+  reset = []
+
   @classmethod
   def setup_class(cls):
     PseudoHdfsTestBase.setup_class()
 
-    from desktop.auth import backend
-    cls.ldap_backend = backend.LdapBackend
-    backend.LdapBackend = MockLdapBackend
-    MockLdapBackend.__name__ = 'LdapBackend'
+    cls.backend = django_auth_ldap_backend.LDAPBackend
+    django_auth_ldap_backend.LDAPBackend = MockLdapBackend
 
-    cls.old_backend = settings.AUTHENTICATION_BACKENDS
+    # Need to recreate LdapBackend class with new monkey patched base class
+    reload(backend)
+
+    cls.old_backends = settings.AUTHENTICATION_BACKENDS
     settings.AUTHENTICATION_BACKENDS = ("desktop.auth.backend.LdapBackend",)
 
   @classmethod
   def teardown_class(cls):
-    from desktop.auth import backend
-    backend.LdapBackend = cls.ldap_backend
+    django_auth_ldap_backend.LDAPBackend = cls.backend
 
-    settings.AUTHENTICATION_BACKENDS = cls.old_backend
-    MockLdapBackend.__name__ = 'MockLdapBackend'
+    # Need to recreate LdapBackend class with old base class
+    reload(backend)
+
+    settings.AUTHENTICATION_BACKENDS = cls.old_backends
+
+  def tearDown(self):
+    for finish in self.reset:
+      finish()
 
   def setUp(self):
     # Simulate first login ever
@@ -127,6 +139,82 @@ class TestLdapLogin(PseudoHdfsTestBase):
     assert_true('/beeswax' in response.content, response.content)
     # Custom login process should not do 'http-equiv="refresh"' but call the correct view
     # 'Could not create home directory.' won't show up because the messages are consumed before
+
+  def test_login_ignore_case(self):
+    self.reset.append(conf.LDAP.IGNORE_USERNAME_CASE.set_for_testing(True))
+
+    response = self.c.post('/accounts/login/', {
+        'username': "LDAP1",
+        'password': "ldap1"
+    })
+    assert_equal(302, response.status_code, "Expected ok redirect status.")
+    assert_equal(1, len(User.objects.all()))
+    assert_equal('LDAP1', User.objects.all()[0].username)
+
+    self.c.logout()
+
+    response = self.c.post('/accounts/login/', {
+        'username': "ldap1",
+        'password': "ldap1"
+    })
+    assert_equal(302, response.status_code, "Expected ok redirect status.")
+    assert_equal(1, len(User.objects.all()))
+    assert_equal('LDAP1', User.objects.all()[0].username)
+
+  def test_login_force_lower_case(self):
+    self.reset.append(conf.LDAP.FORCE_USERNAME_LOWERCASE.set_for_testing(True))
+
+    response = self.c.post('/accounts/login/', {
+        'username': "LDAP1",
+        'password': "ldap1"
+    })
+    assert_equal(302, response.status_code, "Expected ok redirect status.")
+    assert_equal(1, len(User.objects.all()))
+
+    self.c.logout()
+
+    response = self.c.post('/accounts/login/', {
+        'username': "ldap1",
+        'password': "ldap1"
+    })
+    assert_equal(302, response.status_code, "Expected ok redirect status.")
+    assert_equal(1, len(User.objects.all()))
+    assert_equal('ldap1', User.objects.all()[0].username)
+
+  def test_login_force_lower_case_and_ignore_case(self):
+    self.reset.append(conf.LDAP.IGNORE_USERNAME_CASE.set_for_testing(True))
+    self.reset.append(conf.LDAP.FORCE_USERNAME_LOWERCASE.set_for_testing(True))
+
+    response = self.c.post('/accounts/login/', {
+        'username': "LDAP1",
+        'password': "ldap1"
+    })
+    assert_equal(302, response.status_code, "Expected ok redirect status.")
+    assert_equal(1, len(User.objects.all()))
+    assert_equal('ldap1', User.objects.all()[0].username)
+
+    self.c.logout()
+
+    response = self.c.post('/accounts/login/', {
+        'username': "ldap1",
+        'password': "ldap1"
+    })
+    assert_equal(302, response.status_code, "Expected ok redirect status.")
+    assert_equal(1, len(User.objects.all()))
+    assert_equal('ldap1', User.objects.all()[0].username)
+
+  def test_import_groups_on_login(self):
+    self.reset.append(conf.LDAP.SYNC_GROUPS_ON_LOGIN.set_for_testing(True))
+    ldap_access.CACHED_LDAP_CONN = LdapTestConnection()
+
+    response = self.c.post('/accounts/login/', {
+      'username': "curly",
+      'password': "ldap1"
+    })
+    assert_equal(302, response.status_code, "Expected ok redirect status.")
+    assert_equal(1, len(User.objects.all()))
+    # The two curly are a part of in LDAP and the default group.
+    assert_equal(3, User.objects.all()[0].groups.all().count(), User.objects.all()[0].groups.all())
 
 
 class TestRemoteUserLogin(object):
@@ -254,14 +342,12 @@ class TestLogin(object):
 
 
 class MockLdapBackend(object):
+  def get_or_create_user(self, username, ldap_user):
+    return User.objects.get_or_create(username)
+
   def authenticate(self, username=None, password=None):
-    user, created = User.objects.get_or_create(username=username)
+    user, created = self.get_or_create_user(username, None)
     return user
 
   def get_user(self, user_id):
-    return rewrite_user(User.objects.get(id=user_id))
-
-  @classmethod
-  def manages_passwords_externally(cls):
-    return True
-LdapBackend = MockLdapBackend
+    return User.objects.get(id=user_id)
