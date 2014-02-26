@@ -352,8 +352,13 @@ ${layout.menubar(section='query')}
 
         <!-- ko if: !design.explain() -->
         <div class="tab-pane" id="log">
-          <pre data-bind="visible: $root.design.watch.logs().length == 0">${_('There are currently no logs to visualize.')} <img src="/static/art/spinner.gif" data-bind="visible: $root.design.isRunning()"/></pre>
-          <pre data-bind="visible: $root.design.watch.logs().length > 0, text: $root.design.watch.logs().join('\n')"></pre>
+          <div style="position:relative">
+            <ul data-bind="foreach: $root.design.watch.jobUrls" class="unstyled jobs-overlay">
+              <li><a data-bind="text: $.trim($data.name), attr: { href: $data.url }" target="_blank"></a></li>
+            </ul>
+            <pre data-bind="visible: $root.design.watch.logs().length == 0">${_('There are currently no logs to visualize.')} <img src="/static/art/spinner.gif" data-bind="visible: $root.design.isRunning()"/></pre>
+            <pre data-bind="visible: $root.design.watch.logs().length > 0, text: $root.design.watch.logs().join('\n')"></pre>
+          </div>
         </div>
 
         <div class="tab-pane" id="columns">
@@ -863,6 +868,22 @@ ${layout.menubar(section='query')}
 
   #navigator .nav-list > li.white, #navigator .nav-list .nav-header {
     margin: 0;
+  }
+
+  .jobs-overlay {
+    background-color: #FFF;
+    opacity: 0.8;
+    position: absolute;
+    top: 10px;
+    right: 15px;
+  }
+
+  .jobs-overlay li {
+    padding: 5px;
+  }
+
+  .jobs-overlay:hover {
+    opacity: 1;
   }
 
 </style>
