@@ -143,6 +143,11 @@ from django.utils.translation import ugettext as _
 
   <script type="text/javascript" charset="utf-8">
     $(document).ready(function () {
+      // forces IE's ajax calls not to cache
+      if ($.browser.msie) {
+        $.ajaxSetup({ cache: false });
+      }
+
       // prevents framebusting and clickjacking
       if (self == top){
         $("body").css({
@@ -183,7 +188,7 @@ from django.utils.translation import ugettext as _
       window.setTimeout(checkJobBrowserStatus, 10);
 
       function checkJobBrowserStatus(){
-        $.getJSON("/${apps['jobbrowser'].display_name}/?format=json&state=running&user=${user.username}&rnd="+Math.random(), function(data){
+        $.getJSON("/${apps['jobbrowser'].display_name}/?format=json&state=running&user=${user.username}", function(data){
           if (data != null){
             if (data.length > 0){
               $("#jobBrowserCount").removeClass("hide").text(data.length);
