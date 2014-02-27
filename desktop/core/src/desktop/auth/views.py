@@ -70,7 +70,7 @@ def get_current_users():
 def first_login_ever():
   backends = get_backends()
   for backend in backends:
-    if isinstance(backend, AllowFirstUserDjangoBackend) and backend.is_first_login_ever():
+    if hasattr(backend, 'is_first_login_ever') and backend.is_first_login_ever():
       return True
   return False
 
