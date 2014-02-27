@@ -591,6 +591,20 @@ HTTP_500_DEBUG_MODE = Config(
   default=True
 )
 
+AUDIT_EVENT_LOG_DIR = Config(
+  key="audit_event_log_dir",
+  help=_("The directory where to store the auditing logs. Auditing is disable if the value is empty."),
+  type=str,
+  default=""
+)
+
+AUDIT_LOG_MAX_FILE_SIZE = Config(
+  key="audit_log_max_file_size",
+  help=_("Size in KB/MB/GB for audit log to rollover."),
+  type=str,
+  default="100MB"
+)
+
 DJANGO_SERVER_EMAIL = Config(
   key='django_server_email',
   help=_('Email address that internal error messages should send as.'),

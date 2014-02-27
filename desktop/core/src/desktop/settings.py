@@ -106,11 +106,12 @@ MIDDLEWARE_CLASSES = [
     # The order matters
     'desktop.middleware.EnsureSafeMethodMiddleware',
     'desktop.middleware.DatabaseLoggingMiddleware',
+    'desktop.middleware.AuditLoggingMiddleware',
     'django.middleware.common.CommonMiddleware',
     'desktop.middleware.SessionOverPostMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'desktop.middleware.SpnegoMiddleware',
+    'desktop.middleware.SpnegoMiddleware',    
     'desktop.middleware.HueRemoteUserMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'babeldjango.middleware.LocaleMiddleware',

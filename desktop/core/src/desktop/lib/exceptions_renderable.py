@@ -27,6 +27,7 @@ from django.utils.encoding import force_unicode
 # Need full import statement
 import desktop.lib.django_util
 
+
 class PopupException(Exception):
   """
   Middleware will render this exception; and the template
