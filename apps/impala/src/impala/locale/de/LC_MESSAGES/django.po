@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-08-02 20:43-0700\n"
+"POT-Creation-Date: 2014-02-10 09:18-0800\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: de <LL@li.org>\n"
@@ -26,19 +26,28 @@ msgid "Port of the Impala Server."
 msgstr "Port des Impala-Servers."
 
 #: src/impala/conf.py:40
-#, fuzzy
-msgid "Beeswax or Hive Server 2 Thrift API used. Choices are: 'beeswax' or 'hiveserver2'."
-msgstr "Beeswax- oder Hive Server 2-Thrift-API verwendet. Zur Auswahl stehen: \"beeswax\" oder \"hiveserver2\"."
-
-#: src/impala/conf.py:45
 msgid "Kerberos principal name for Impala. Typically 'impala/hostname.foo.com'."
-msgstr "Kerberos-Hauptname für Impala. Typischerweise 'impala/hostname.foo.com'."
+msgstr "Kerberos-Hauptname für Impala. Typischerweise \"impala/hostname.foo.com\"."
 
-#: src/impala/conf.py:63
+#: src/impala/conf.py:46
+msgid "Turn on/off impersonation mechanism when talking to Impala."
+msgstr "Imitationsmechanismus aktivieren/deaktivieren, wenn mit Impala kommuniziert wird."
+
+#: src/impala/conf.py:52
+msgid "Number of initial rows of a resultset to ask Impala to cache in order to support re-fetching them for downloading them. Set to 0 for disabling the option and backward compatibility."
+msgstr "Zahl der Ausgangszeilen eines Ergebnissatzes, um Impala aufzufordern, sie zwischenzuspeichern, damit sie wieder abgerufen und heruntergeladen werden können. Legen Sie hier 0 fest, um die Option und Rückwärtskompatibilität zu deaktivieren."
+
+#: src/impala/conf.py:72
 msgid "No available Impalad to send queries to."
-msgstr "Kein Impalad zum Senden von Abfragen verfügbar."
+msgstr "Impalad zum Senden von Abfragen nicht verfügbar."
 
-#: src/impala/views.py:35
-msgid "A POST request is required."
-msgstr "Eine POST-Anforderung ist erforderlich."
-
+#~ msgid ""
+#~ "Beeswax or Hive Server 2 Thrift "
+#~ "API used. Choices are: 'beeswax' or "
+#~ "'hiveserver2'."
+#~ msgstr ""
+#~ "Beeswax- oder Hive Server 2-Thrift-API"
+#~ " verwendet. Zur Auswahl stehen: \"beeswax\""
+#~ " oder \"hiveserver2\"."
+#~ msgid "A POST request is required."
+#~ msgstr "Eine POST-Anforderung ist erforderlich."

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-08-02 20:43-0700\n"
+"POT-Creation-Date: 2014-02-10 09:18-0800\n"
 "PO-Revision-Date: 2012-11-07 13:06-0800\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -16,6 +16,14 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
+
+#: src/hadoop/conf.py:59
+msgid "NameNode logical name."
+msgstr "NameNode 逻辑名称。"
+
+#: src/hadoop/conf.py:90
+msgid "JobTracker logical name."
+msgstr "JobTracker 逻辑名称。"
 
 #: src/hadoop/fs/hadoopfs.py:282
 #, python-format
@@ -70,93 +78,91 @@ msgstr "文件 %s 已删除"
 msgid "Delete failed: %s"
 msgstr "删除失败：%s"
 
-#: src/hadoop/fs/webhdfs.py:303 src/hadoop/fs/webhdfs.py:330
-msgid "Trash is not enabled."
-msgstr "未启用垃圾桶。"
-
-#: src/hadoop/fs/webhdfs.py:306
+#: src/hadoop/fs/webhdfs.py:303
 #, python-format
 msgid "File %s is not in trash"
 msgstr "文件 %s 不在垃圾桶中"
 
-#: src/hadoop/fs/webhdfs.py:320
+#: src/hadoop/fs/webhdfs.py:317
 #, python-format
 msgid "Path %s already exists."
 msgstr "路径 %s 已存在。"
 
-#: src/hadoop/fs/webhdfs.py:348
+#: src/hadoop/fs/webhdfs.py:342
 #, python-format
 msgid "Mkdir failed: %s"
 msgstr "Mkdir 失败：%s"
 
-#: src/hadoop/fs/webhdfs.py:362
+#: src/hadoop/fs/webhdfs.py:356
 #, python-format
 msgid "Rename failed: %s -> %s"
 msgstr "重命名失败：%s -> %s"
 
-#: src/hadoop/fs/webhdfs.py:368 src/hadoop/fs/webhdfs.py:372
+#: src/hadoop/fs/webhdfs.py:362 src/hadoop/fs/webhdfs.py:366
 #, python-format
 msgid "'%s' is not a directory"
 msgstr "“%s”不是目录"
 
-#: src/hadoop/fs/webhdfs.py:486
+#: src/hadoop/fs/webhdfs.py:480
 #, python-format
 msgid "Copy src '%s' does not exist"
 msgstr "复制源“%s”不存在"
 
-#: src/hadoop/fs/webhdfs.py:488
+#: src/hadoop/fs/webhdfs.py:482
 #, python-format
 msgid "Copy src '%s' is a directory"
 msgstr "复制源“%s”为目录"
 
-#: src/hadoop/fs/webhdfs.py:490
+#: src/hadoop/fs/webhdfs.py:484
 #, python-format
 msgid "Copy dst '%s' is a directory"
 msgstr "复制目标“%s”为目录"
 
-#: src/hadoop/fs/webhdfs.py:553
+#: src/hadoop/fs/webhdfs.py:551
 #, python-format
 msgid "File not found: %s"
 msgstr "未找到文件：%s"
 
-#: src/hadoop/fs/webhdfs.py:569
+#: src/hadoop/fs/webhdfs.py:567
 #, python-format
 msgid "Destination file %s exists and is not a directory."
 msgstr "目标文件 %s 存在，但不是目录。"
 
-#: src/hadoop/fs/webhdfs.py:612
+#: src/hadoop/fs/webhdfs.py:610
 #, python-format
 msgid "Failed to create '%s'. HDFS did not return a redirect"
 msgstr "无法创建“%s”。HDFS 未返回重定向"
 
-#: src/hadoop/fs/webhdfs.py:679
+#: src/hadoop/fs/webhdfs.py:677
 #, python-format
 msgid "Is a directory: '%s'"
 msgstr "为目录：“%s”"
 
-#: src/hadoop/fs/webhdfs.py:697
+#: src/hadoop/fs/webhdfs.py:695
 msgid "Invalid argument to seek for whence"
 msgstr "用于寻找位置的自变量无效"
 
-#: src/hadoop/fs/webhdfs.py:717
+#: src/hadoop/fs/webhdfs.py:715
 msgid "File not open for writing"
 msgstr "未打开要写入的文件"
 
-#: src/hadoop/fs/webhdfs.py:763
+#: src/hadoop/fs/webhdfs.py:761
 msgid "Filesystem root '/' should be owned by 'hdfs'"
 msgstr "文件系统根目录“/”应归属于“hdfs”"
 
-#: src/hadoop/fs/webhdfs.py:766
+#: src/hadoop/fs/webhdfs.py:764
 msgid "Failed to access filesystem root"
 msgstr "无法访问文件系统根目录"
 
-#: src/hadoop/fs/webhdfs.py:775
+#: src/hadoop/fs/webhdfs.py:773
 #, python-format
 msgid "Failed to create temporary file \"%s\""
 msgstr "无法创建临时文件“%s”"
 
-#: src/hadoop/fs/webhdfs.py:792
+#: src/hadoop/fs/webhdfs.py:790
 #, python-format
 msgid "Failed to remove temporary file \"%s\""
 msgstr "无法删除临时文件“%s”"
 
+#~ msgid "Trash is not enabled."
+#~ msgstr "未启用垃圾桶。"

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-01-16 13:47-0800\n"
+"POT-Creation-Date: 2014-02-10 09:18-0800\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -19,60 +19,53 @@ msgstr ""
 
 #: src/spark/api.py:61 src/spark/views.py:109
 msgid "Requires a POST"
-msgstr ""
+msgstr "POST が必要"
 
 #: src/spark/api.py:84
 msgid "Requires a DELETE"
-msgstr ""
+msgstr "DELETE が必要"
 
 #: src/spark/api.py:120 src/spark/api.py:175
 msgid "A POST request is required."
 msgstr "POST 要求が必要です。"
 
 #: src/spark/api.py:162
-#, fuzzy, python-format
+#, python-format
 msgid "There was an error with your query: %s"
-msgstr "要求に関するエラーがあります: %s。"
+msgstr "クエリでエラーが発生しました：%s"
 
 #: src/spark/api.py:205
-#, fuzzy
 msgid "A GET request is required."
-msgstr "POST 要求が必要です。"
+msgstr "GET 要求が必要です。"
 
 #: src/spark/api.py:234
 msgid "Missing application jar list."
-msgstr ""
+msgstr "アプリケーションの jar リストがありません。"
 
 #: src/spark/conf.py:28
 msgid "URL of the Spark Job Server."
-msgstr ""
-
-#: src/spark/conf.py:56
-#, fuzzy
-msgid "The app won't work without a running Job Server"
-msgstr "実行中の Oozie Server が存在しない場合、アプリが機能しません"
+msgstr "Spark Job Server の URL です。"
 
 #: src/spark/decorators.py:34
 msgid "An error happened with the Spark Server"
-msgstr ""
+msgstr "Spark Server でエラーが発生しました"
 
 #: src/spark/forms.py:25
-#, fuzzy
 msgid "Script parameters"
-msgstr "スクリプト変数"
+msgstr "スクリプトパラメータ"
 
-#: src/spark/forms.py:27 src/spark/templates/editor.mako:79
+#: src/spark/forms.py:27 src/spark/templates/editor.mako:80
 #: src/spark/templates/list_jobs.mako:36
 msgid "Class path"
-msgstr ""
+msgstr "クラスパス"
 
 #: src/spark/views.py:94
 msgid "Delete context(s)?"
-msgstr ""
+msgstr "コンテキストを削除しますか？"
 
 #: src/spark/templates/common.mako:38
 msgid "Spark Igniter"
-msgstr ""
+msgstr "Spark Igniter"
 
 #: src/spark/templates/common.mako:41
 msgid "Editor"
@@ -82,7 +75,7 @@ msgstr "エディタ"
 #: src/spark/templates/list_applications.mako:23
 #: src/spark/templates/list_applications.mako:29
 msgid "Applications"
-msgstr ""
+msgstr "アプリケーション"
 
 #: src/spark/templates/common.mako:45
 msgid "Dashboard"
@@ -90,20 +83,19 @@ msgstr "ダッシュボード"
 
 #: src/spark/templates/common.mako:46 src/spark/templates/list_contexts.mako:29
 msgid "Contexts"
-msgstr ""
+msgstr "コンテキスト"
 
 #: src/spark/templates/common.mako:47
 msgid "Uploads"
-msgstr ""
+msgstr "アップロード"
 
 #: src/spark/templates/common.mako:59 src/spark/templates/editor.mako:59
 #: src/spark/templates/list_contexts.mako:41
-#, fuzzy
 msgid "Create context"
-msgstr "作成日"
+msgstr "コンテキストを作成"
 
-#: src/spark/templates/common.mako:64 src/spark/templates/editor.mako:132
-#: src/spark/templates/editor.mako:220
+#: src/spark/templates/common.mako:64 src/spark/templates/editor.mako:133
+#: src/spark/templates/editor.mako:221
 #: src/spark/templates/list_applications.mako:45
 #: src/spark/templates/list_contexts.mako:48
 msgid "Name"
@@ -111,219 +103,210 @@ msgstr "名前"
 
 #: src/spark/templates/common.mako:70
 msgid "Num cpu cores"
-msgstr ""
+msgstr "CPU コア数"
 
 #: src/spark/templates/common.mako:76
 msgid "Memory per node"
-msgstr ""
+msgstr "ノードあたりのメモリ"
 
 #: src/spark/templates/common.mako:84 src/spark/templates/common.mako:114
-#: src/spark/templates/editor.mako:234
+#: src/spark/templates/editor.mako:235
 #: src/spark/templates/list_contexts.mako:85
 msgid "Cancel"
 msgstr "キャンセル"
 
 #: src/spark/templates/common.mako:85
-#, fuzzy
 msgid "Create"
-msgstr "作成日"
+msgstr "作成"
 
 #: src/spark/templates/common.mako:96
 msgid "Upload application"
-msgstr ""
+msgstr "アプリケーションをアップロード"
 
 #: src/spark/templates/common.mako:99
 msgid "One class of the jar should implement SparkJob."
-msgstr ""
+msgstr "jar の 1 つのクラスに Spark ジョブを実装する必要があります。"
 
 #: src/spark/templates/common.mako:101
 msgid "Local jar file"
-msgstr ""
+msgstr "ローカル jar ファイル"
 
-#: src/spark/templates/common.mako:107 src/spark/templates/editor.mako:63
-#, fuzzy
+#: src/spark/templates/common.mako:107 src/spark/templates/editor.mako:64
 msgid "App name"
-msgstr "スクリプト名"
+msgstr "アプリ名"
 
 #: src/spark/templates/common.mako:115
 msgid "Upload"
-msgstr ""
+msgstr "アップロード"
 
 #: src/spark/templates/editor.mako:23
 msgid "Query"
-msgstr ""
+msgstr "クエリ"
 
-#: src/spark/templates/editor.mako:39 src/spark/templates/editor.mako:486
+#: src/spark/templates/editor.mako:39 src/spark/templates/editor.mako:487
 msgid "Application name"
-msgstr ""
+msgstr "アプリケーション名"
 
 #: src/spark/templates/editor.mako:48
 msgid "Application description"
-msgstr ""
+msgstr "アプリケーションの説明"
 
 #: src/spark/templates/editor.mako:58
 #: src/spark/templates/list_applications.mako:36
 msgid "Upload app"
-msgstr ""
+msgstr "アプリをアップロード"
 
-#: src/spark/templates/editor.mako:66
+#: src/spark/templates/editor.mako:67
 msgid "Missing, add one?"
-msgstr ""
+msgstr "ありません。追加しますか？"
 
-#: src/spark/templates/editor.mako:83 src/spark/templates/list_contexts.mako:23
+#: src/spark/templates/editor.mako:84 src/spark/templates/list_contexts.mako:23
 #: src/spark/templates/list_jobs.mako:37
 msgid "Context"
-msgstr ""
+msgstr "コンテキスト"
 
-#: src/spark/templates/editor.mako:86
+#: src/spark/templates/editor.mako:87
 msgid "Automatic"
-msgstr ""
+msgstr "自動"
 
-#: src/spark/templates/editor.mako:92
-#, fuzzy
+#: src/spark/templates/editor.mako:93
 msgid "Create one?"
-msgstr "作成日"
+msgstr "作成しますか？"
 
-#: src/spark/templates/editor.mako:115
+#: src/spark/templates/editor.mako:116
 msgid "Parameters"
 msgstr "パラメータ"
 
-#: src/spark/templates/editor.mako:121
+#: src/spark/templates/editor.mako:122
 msgid "Your application has the following error(s):"
-msgstr ""
+msgstr "アプリケーションに次のエラーがあります："
 
-#: src/spark/templates/editor.mako:127
+#: src/spark/templates/editor.mako:128
 msgid "No parameters defined yet."
-msgstr ""
+msgstr "パラメータがまだ定義されていません。"
 
-#: src/spark/templates/editor.mako:133 src/spark/templates/editor.mako:176
+#: src/spark/templates/editor.mako:134 src/spark/templates/editor.mako:177
 msgid "Value"
 msgstr "値"
 
-#: src/spark/templates/editor.mako:147
+#: src/spark/templates/editor.mako:148
 msgid "Delete"
 msgstr "削除"
 
-#: src/spark/templates/editor.mako:153
+#: src/spark/templates/editor.mako:154
 msgid "Add"
 msgstr "追加"
 
-#: src/spark/templates/editor.mako:159
-#, fuzzy
-msgid "Executing..."
-msgstr "実行を停止します。"
-
 #: src/spark/templates/editor.mako:160
-#, fuzzy
-msgid "Execute"
-msgstr "削除"
+msgid "Executing..."
+msgstr "実行中..."
 
-#: src/spark/templates/editor.mako:162 src/spark/templates/editor.mako:235
+#: src/spark/templates/editor.mako:161
+msgid "Execute"
+msgstr "実行"
+
+#: src/spark/templates/editor.mako:163 src/spark/templates/editor.mako:236
 msgid "Save"
 msgstr "保存"
 
-#: src/spark/templates/editor.mako:163
+#: src/spark/templates/editor.mako:164
 msgid "Save as..."
-msgstr ""
+msgstr "名前を付けて保存..."
 
-#: src/spark/templates/editor.mako:164
+#: src/spark/templates/editor.mako:165
 msgid "or create a"
-msgstr ""
+msgstr "クエリを説明"
 
-#: src/spark/templates/editor.mako:164
+#: src/spark/templates/editor.mako:165
 msgid "New application"
-msgstr ""
+msgstr "新規アプリケーション"
 
-#: src/spark/templates/editor.mako:166
+#: src/spark/templates/editor.mako:167
 msgid "Download"
-msgstr ""
+msgstr "ダウンロード"
 
-#: src/spark/templates/editor.mako:175
+#: src/spark/templates/editor.mako:176
 msgid "Key"
-msgstr ""
+msgstr "キー"
 
-#: src/spark/templates/editor.mako:188
+#: src/spark/templates/editor.mako:189
 msgid "The server returned no results."
-msgstr ""
+msgstr "サーバーから結果が返されませんでした。"
 
-#: src/spark/templates/editor.mako:215
+#: src/spark/templates/editor.mako:216
 msgid "Save your query"
-msgstr ""
+msgstr "クエリを保存"
 
-#: src/spark/templates/editor.mako:226
-#, fuzzy
+#: src/spark/templates/editor.mako:227
 msgid "Description"
-msgstr "新しいスクリプト"
+msgstr "説明"
 
-#: src/spark/templates/editor.mako:242
+#: src/spark/templates/editor.mako:243
 msgid "Choose a file"
 msgstr "ファイルを選択"
 
-#: src/spark/templates/editor.mako:378
+#: src/spark/templates/editor.mako:379
 msgid "Did you know?"
 msgstr "便利な使い方"
 
-#: src/spark/templates/editor.mako:480
-#, fuzzy
+#: src/spark/templates/editor.mako:481
 msgid "This field is required."
-msgstr "POST 要求が必要です。"
+msgstr "このフィールドは必須です。"
 
-#: src/spark/templates/editor.mako:493
-#, fuzzy
+#: src/spark/templates/editor.mako:494
 msgid "Empty description"
-msgstr "スクリプトをコピー"
+msgstr "空の説明"
 
-#: src/spark/templates/editor.mako:499
+#: src/spark/templates/editor.mako:500
 msgid "Application saved successfully!"
-msgstr ""
+msgstr "アプリケーションが正常に保存されました。"
 
-#: src/spark/templates/editor.mako:527
+#: src/spark/templates/editor.mako:528
 #: src/spark/templates/list_applications.mako:93
 #: src/spark/templates/list_contexts.mako:131
 #: src/spark/templates/list_jobs.mako:96
-#, fuzzy
 msgid "No data available"
-msgstr "利用可能なログがありません。"
+msgstr "利用可能なデータがありません"
 
-#: src/spark/templates/editor.mako:528
+#: src/spark/templates/editor.mako:529
 #: src/spark/templates/list_applications.mako:94
 #: src/spark/templates/list_contexts.mako:132
 #: src/spark/templates/list_jobs.mako:97
 msgid "No matching records"
-msgstr ""
+msgstr "一致するレコードがありません"
 
-#: src/spark/templates/editor.mako:579
+#: src/spark/templates/editor.mako:580
 msgid "Server error occured: "
-msgstr ""
+msgstr "サーバーエラーが発生しました： "
 
-#: src/spark/templates/editor.mako:582
+#: src/spark/templates/editor.mako:583
 msgid "Unmanageable server error occured: "
-msgstr ""
+msgstr "管理不能なサーバーエラーが発生しました： "
 
 #: src/spark/templates/list_applications.mako:33
 #: src/spark/templates/list_contexts.mako:33
 msgid "Search for name"
-msgstr ""
+msgstr "名前を検索"
 
 #: src/spark/templates/list_applications.mako:46
 msgid "Upload time"
-msgstr ""
+msgstr "アップロード時間"
 
 #: src/spark/templates/list_applications.mako:53
 msgid "Click to open and execute"
-msgstr ""
+msgstr "クリックして、開いて実行"
 
 #: src/spark/templates/list_contexts.mako:36
 msgid "Delete forever"
-msgstr ""
+msgstr "完全に削除"
 
 #: src/spark/templates/list_contexts.mako:37
 msgid "Delete selected"
-msgstr ""
+msgstr "選択したものを削除"
 
 #: src/spark/templates/list_contexts.mako:82
 msgid "Confirm action"
-msgstr ""
+msgstr "アクションを確認"
 
 #: src/spark/templates/list_contexts.mako:86
 msgid "Yes"
@@ -331,11 +314,11 @@ msgstr "はい"
 
 #: src/spark/templates/list_contexts.mako:208
 msgid "Delete the selected contexts?"
-msgstr ""
+msgstr "選択したコンテキストを削除しますか？"
 
 #: src/spark/templates/list_jobs.mako:23 src/spark/templates/list_jobs.mako:29
 msgid "Jobs"
-msgstr ""
+msgstr "ジョブ"
 
 #: src/spark/templates/list_jobs.mako:34
 msgid "Status"
@@ -343,18 +326,19 @@ msgstr "ステータス"
 
 #: src/spark/templates/list_jobs.mako:35
 msgid "Job id"
-msgstr ""
+msgstr "ジョブ ID"
 
 #: src/spark/templates/list_jobs.mako:38
 msgid "Start time"
-msgstr ""
+msgstr "開始時間"
 
 #: src/spark/templates/list_jobs.mako:39
 msgid "Duration"
-msgstr ""
+msgstr "期間"
 
 #: src/spark/templates/list_jobs.mako:51
-#, fuzzy
 msgid "Click to open"
-msgstr "クリックして表示"
+msgstr "クリックして開く"
 
+#~ msgid "The app won't work without a running Job Server"
+#~ msgstr "実行中の Oozie Server が存在しない場合、アプリが機能しません"

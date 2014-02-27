@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-08-02 20:43-0700\n"
+"POT-Creation-Date: 2014-02-10 09:18-0800\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -26,19 +26,25 @@ msgid "Port of the Impala Server."
 msgstr "Impala 服务器端口。"
 
 #: src/impala/conf.py:40
-#, fuzzy
-msgid "Beeswax or Hive Server 2 Thrift API used. Choices are: 'beeswax' or 'hiveserver2'."
-msgstr "已使用 Beeswax 或 Hive Server 2 Thrift API。选择是：'beeswax' 或 'hiveserver2'。"
-
-#: src/impala/conf.py:45
 msgid "Kerberos principal name for Impala. Typically 'impala/hostname.foo.com'."
 msgstr "Impala 的 Kerberos 主体名称。通常为“impala/hostname.foo.com”。"
 
-#: src/impala/conf.py:63
+#: src/impala/conf.py:46
+msgid "Turn on/off impersonation mechanism when talking to Impala."
+msgstr "与 Impala 对话时打开/关闭模拟机制。"
+
+#: src/impala/conf.py:52
+msgid "Number of initial rows of a resultset to ask Impala to cache in order to support re-fetching them for downloading them. Set to 0 for disabling the option and backward compatibility."
+msgstr "要求 Impala 缓存的结果集初始行数，用于支持重新获取这些结果并进行下载。设置为 0 将禁用选项和向后兼容性。"
+
+#: src/impala/conf.py:72
 msgid "No available Impalad to send queries to."
-msgstr "没有可向其发送查询的 Impalad。"
+msgstr "没有可向其发送请求的 Impalad。"
 
-#: src/impala/views.py:35
-msgid "A POST request is required."
-msgstr "需要 POST 请求。"
-
+#~ msgid ""
+#~ "Beeswax or Hive Server 2 Thrift "
+#~ "API used. Choices are: 'beeswax' or "
+#~ "'hiveserver2'."
+#~ msgstr "已使用 Beeswax 或 Hive Server 2 Thrift API。选择是：'beeswax' 或 'hiveserver2'。"
+#~ msgid "A POST request is required."
+#~ msgstr "需要 POST 请求。"

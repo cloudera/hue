@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-08-02 20:43-0700\n"
+"POT-Creation-Date: 2014-02-10 09:18-0800\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -26,19 +26,28 @@ msgid "Port of the Impala Server."
 msgstr "Impala 서버의 포트입니다."
 
 #: src/impala/conf.py:40
-#, fuzzy
-msgid "Beeswax or Hive Server 2 Thrift API used. Choices are: 'beeswax' or 'hiveserver2'."
-msgstr "Beeswax 또는 Hive Server 2 Thrift API를 사용 중입니다. 'beeswax' 또는 'hiveserver2' 중에서 선택할 수 있습니다."
-
-#: src/impala/conf.py:45
 msgid "Kerberos principal name for Impala. Typically 'impala/hostname.foo.com'."
 msgstr "Impala의 Kerberos 원칙 이름입니다. 일반적으로 'impala/hostname.foo.com'입니다."
 
-#: src/impala/conf.py:63
+#: src/impala/conf.py:46
+msgid "Turn on/off impersonation mechanism when talking to Impala."
+msgstr "Impala와 통신할 때 가장 메커니즘을 켭니다/끕니다."
+
+#: src/impala/conf.py:52
+msgid "Number of initial rows of a resultset to ask Impala to cache in order to support re-fetching them for downloading them. Set to 0 for disabling the option and backward compatibility."
+msgstr "첫 행 다운로드를 위한 다시 가져오기를 지원하기 위해 Impala에 캐시하도록 요청하는 resultset의 첫 행 수입니다. 이 옵션 및 이전 버전과의 호환성을 사용하지 않으려면 0으로 설정합니다."
+
+#: src/impala/conf.py:72
 msgid "No available Impalad to send queries to."
-msgstr "쿼리를 전송할 사용 가능한 Impalad가 없습니다."
+msgstr "쿼리를 보낼 사용 가능한 Impalad가 없습니다."
 
-#: src/impala/views.py:35
-msgid "A POST request is required."
-msgstr "POST 요청이 필요합니다."
-
+#~ msgid ""
+#~ "Beeswax or Hive Server 2 Thrift "
+#~ "API used. Choices are: 'beeswax' or "
+#~ "'hiveserver2'."
+#~ msgstr ""
+#~ "Beeswax 또는 Hive Server 2 Thrift "
+#~ "API를 사용 중입니다. 'beeswax' 또는 'hiveserver2'"
+#~ " 중에서 선택할 수 있습니다."
+#~ msgid "A POST request is required."
+#~ msgstr "POST 요청이 필요합니다."

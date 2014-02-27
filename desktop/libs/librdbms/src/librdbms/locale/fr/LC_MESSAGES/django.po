@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-08-02 20:43-0700\n"
+"POT-Creation-Date: 2014-02-10 09:18-0800\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -17,28 +17,95 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/impala/conf.py:29
-msgid "Host of the Impala Server."
-msgstr "Hôte du serveur Impala."
+#: src/librdbms/conf.py:26
+msgid "RDBMS server configurations."
+msgstr "Configurations du serveur RDBMS."
 
-#: src/impala/conf.py:34
-msgid "Port of the Impala Server."
-msgstr "Port du serveur Impala."
+#: src/librdbms/conf.py:28
+msgid "RDBMS server configuration."
+msgstr "Configuration du serveur RDBMS."
 
-#: src/impala/conf.py:40
-#, fuzzy
-msgid "Beeswax or Hive Server 2 Thrift API used. Choices are: 'beeswax' or 'hiveserver2'."
-msgstr "API Thrift de Beeswax ou Hive Server 2 utilisée. Les choix possibles sont : \"beeswax\" ou \"hiveserver2\"."
+#: src/librdbms/conf.py:32
+msgid "Nice name of server."
+msgstr "Nom de serveur correct."
 
-#: src/impala/conf.py:45
-msgid "Kerberos principal name for Impala. Typically 'impala/hostname.foo.com'."
-msgstr "Nom Kerberos principal pour Impala. En général 'impala/nomhôte.foo.com'."
+#: src/librdbms/conf.py:38
+msgid "Database name or path to database file. If provided, then choosing other databases will not be permitted."
+msgstr "Nom de la base de données ou chemin d'accès au fichier de la base de données. S'il est fourni, il ne sera pas possible de choisir une autre base de données."
 
-#: src/impala/conf.py:63
-msgid "No available Impalad to send queries to."
-msgstr "Aucun Impalad disponible pour l'envoi de requêtes."
+#: src/librdbms/conf.py:44
+msgid "Database engine, such as postgresql_psycopg2, mysql, or sqlite3."
+msgstr "Moteur de base de données, tel que  postgresql_psycopg2, mysql ou sqlite3."
 
-#: src/impala/views.py:35
-msgid "A POST request is required."
-msgstr "Requête POST requise."
+#: src/librdbms/conf.py:50
+msgid "Database username."
+msgstr "Nom d'utilisateur de la base de données."
 
+#: src/librdbms/conf.py:56
+msgid "Database password."
+msgstr "Mot de passe de la base de données."
+
+#: src/librdbms/conf.py:62
+msgid "Database host."
+msgstr "Hôte de la base de données."
+
+#: src/librdbms/conf.py:68
+msgid "Database port."
+msgstr "Port de la base de données."
+
+#: src/librdbms/conf.py:74
+msgid "Database options to send to the server when connecting."
+msgstr "Options de base de données à envoyer au serveur lors de la connexion."
+
+#: src/librdbms/conf.py:90
+msgid "Database name should not be empty for the SQLite backend."
+msgstr "Le nom de la base de données ne doit pas être vide pour le serveur principal SQLite."
+
+#: src/librdbms/conf.py:92
+msgid "Database name should not be empty for the Oracle backend. It should be the SID of your database."
+msgstr "Le nom de la base de données ne doit pas être vide pour le serveur principal Oracle. Il doit correspondre au SID de votre base de données."
+
+#: src/librdbms/conf.py:94
+msgid "Database name should not be empty for the PostgreSQL backend."
+msgstr "Le nom de la base de données ne doit pas être vide pour le serveur principal PostgreSQL."
+
+#: src/librdbms/design.py:110
+msgid "No server!"
+msgstr "Pas de serveur !"
+
+#: src/librdbms/design.py:112
+msgid "No database!"
+msgstr "Aucune base de données."
+
+#: src/librdbms/server/mysql_lib.py:80
+#, python-format
+msgid "Database '%s' is not allowed. Please use database '%s'."
+msgstr "La base de données '%s' n'est pas autorisée. Veuillez utiliser la base de données '%s'."
+
+#: src/librdbms/server/mysql_lib.py:107
+#, python-format
+msgid "Cannot locate the %s database. Are you sure your configuration is correct?"
+msgstr "Impossible de localiser la base de données %s. Etes-vous sûr que votre configuration est correcte ?"
+
+#~ msgid "Host of the Impala Server."
+#~ msgstr "Hôte du serveur Impala."
+#~ msgid "Port of the Impala Server."
+#~ msgstr "Port du serveur Impala."
+#~ msgid ""
+#~ "Beeswax or Hive Server 2 Thrift "
+#~ "API used. Choices are: 'beeswax' or "
+#~ "'hiveserver2'."
+#~ msgstr ""
+#~ "API Thrift de Beeswax ou Hive "
+#~ "Server 2 utilisée. Les choix possibles"
+#~ " sont : \"beeswax\" ou \"hiveserver2\"."
+#~ msgid ""
+#~ "Kerberos principal name for Impala. "
+#~ "Typically 'impala/hostname.foo.com'."
+#~ msgstr ""
+#~ "Nom Kerberos principal pour Impala. En"
+#~ " général 'impala/nomhôte.foo.com'."
+#~ msgid "No available Impalad to send queries to."
+#~ msgstr "Aucun Impalad disponible pour l'envoi de requêtes."
+#~ msgid "A POST request is required."
+#~ msgstr "Requête POST requise."

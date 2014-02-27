@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-08-02 20:43-0700\n"
+"POT-Creation-Date: 2014-02-10 09:18-0800\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -26,19 +26,28 @@ msgid "Port of the Impala Server."
 msgstr "Puerto del servidor Impala."
 
 #: src/impala/conf.py:40
-#, fuzzy
-msgid "Beeswax or Hive Server 2 Thrift API used. Choices are: 'beeswax' or 'hiveserver2'."
-msgstr "Se utiliza la API Thrift de Beeswax o de Hive Server 2. Las opciones son: 'beeswax' o 'hiveserver2'."
-
-#: src/impala/conf.py:45
 msgid "Kerberos principal name for Impala. Typically 'impala/hostname.foo.com'."
 msgstr "Nombre de la entidad de seguridad de Kerberos para Hue. Normalmente 'hue/hostname.foo.com'."
 
-#: src/impala/conf.py:63
+#: src/impala/conf.py:46
+msgid "Turn on/off impersonation mechanism when talking to Impala."
+msgstr "Activar/desactivar mecanismo de suplantación al hablar con Impala."
+
+#: src/impala/conf.py:52
+msgid "Number of initial rows of a resultset to ask Impala to cache in order to support re-fetching them for downloading them. Set to 0 for disabling the option and backward compatibility."
+msgstr "Número de filas iniciales de un conjunto de resultados que se le solicitará a Impala que almacene en caché para poder volver a capturarlos y descargarlos. Se establece en 0 para desactivar la opción y tener compatibilidad con versiones anteriores."
+
+#: src/impala/conf.py:72
 msgid "No available Impalad to send queries to."
 msgstr "No hay ningún Impalad disponible al que enviar las consultas."
 
-#: src/impala/views.py:35
-msgid "A POST request is required."
-msgstr "Se necesita una solicitud POST."
-
+#~ msgid ""
+#~ "Beeswax or Hive Server 2 Thrift "
+#~ "API used. Choices are: 'beeswax' or "
+#~ "'hiveserver2'."
+#~ msgstr ""
+#~ "Se utiliza la API Thrift de "
+#~ "Beeswax o de Hive Server 2. Las"
+#~ " opciones son: 'beeswax' o 'hiveserver2'."
+#~ msgid "A POST request is required."
+#~ msgstr "Se necesita una solicitud POST."

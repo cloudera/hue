@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VERSIÓN DEL PROYECTO\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-01-16 13:47-0800\n"
+"POT-Creation-Date: 2014-02-10 09:18-0800\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: NOMBRE COMPLETO <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -19,60 +19,53 @@ msgstr ""
 
 #: src/spark/api.py:61 src/spark/views.py:109
 msgid "Requires a POST"
-msgstr ""
+msgstr "Se necesita una solicitud POST"
 
 #: src/spark/api.py:84
 msgid "Requires a DELETE"
-msgstr ""
+msgstr "Se necesita una solicitud DELETE"
 
 #: src/spark/api.py:120 src/spark/api.py:175
 msgid "A POST request is required."
 msgstr "Se necesita una solicitud POST."
 
 #: src/spark/api.py:162
-#, fuzzy, python-format
+#, python-format
 msgid "There was an error with your query: %s"
-msgstr "Se ha producido un error en la solicitud: %s."
+msgstr "Se ha producido un error en la consulta: %s"
 
 #: src/spark/api.py:205
-#, fuzzy
 msgid "A GET request is required."
-msgstr "Se necesita una solicitud POST."
+msgstr "Se necesita una solicitud GET."
 
 #: src/spark/api.py:234
 msgid "Missing application jar list."
-msgstr ""
+msgstr "Falta la lista de jar de la aplicación."
 
 #: src/spark/conf.py:28
 msgid "URL of the Spark Job Server."
-msgstr ""
-
-#: src/spark/conf.py:56
-#, fuzzy
-msgid "The app won't work without a running Job Server"
-msgstr "La aplicación no funcionará sin un servidor Oozie en ejecución"
+msgstr "URL del servidor de jobs de Spark."
 
 #: src/spark/decorators.py:34
 msgid "An error happened with the Spark Server"
-msgstr ""
+msgstr "Se ha producido un error con el servidor de Spark"
 
 #: src/spark/forms.py:25
-#, fuzzy
 msgid "Script parameters"
-msgstr "Variables de la secuencia de comandos"
+msgstr "Parámetros de secuencia de comandos"
 
-#: src/spark/forms.py:27 src/spark/templates/editor.mako:79
+#: src/spark/forms.py:27 src/spark/templates/editor.mako:80
 #: src/spark/templates/list_jobs.mako:36
 msgid "Class path"
-msgstr ""
+msgstr "Ruta de clase"
 
 #: src/spark/views.py:94
 msgid "Delete context(s)?"
-msgstr ""
+msgstr "¿Eliminar contextos?"
 
 #: src/spark/templates/common.mako:38
 msgid "Spark Igniter"
-msgstr ""
+msgstr "Spark Igniter"
 
 #: src/spark/templates/common.mako:41
 msgid "Editor"
@@ -82,7 +75,7 @@ msgstr "Editor"
 #: src/spark/templates/list_applications.mako:23
 #: src/spark/templates/list_applications.mako:29
 msgid "Applications"
-msgstr ""
+msgstr "Aplicaciones"
 
 #: src/spark/templates/common.mako:45
 msgid "Dashboard"
@@ -90,20 +83,19 @@ msgstr "Panel"
 
 #: src/spark/templates/common.mako:46 src/spark/templates/list_contexts.mako:29
 msgid "Contexts"
-msgstr ""
+msgstr "Contextos"
 
 #: src/spark/templates/common.mako:47
 msgid "Uploads"
-msgstr ""
+msgstr "Cargas"
 
 #: src/spark/templates/common.mako:59 src/spark/templates/editor.mako:59
 #: src/spark/templates/list_contexts.mako:41
-#, fuzzy
 msgid "Create context"
-msgstr "Creado el"
+msgstr "Crear contexto"
 
-#: src/spark/templates/common.mako:64 src/spark/templates/editor.mako:132
-#: src/spark/templates/editor.mako:220
+#: src/spark/templates/common.mako:64 src/spark/templates/editor.mako:133
+#: src/spark/templates/editor.mako:221
 #: src/spark/templates/list_applications.mako:45
 #: src/spark/templates/list_contexts.mako:48
 msgid "Name"
@@ -111,219 +103,210 @@ msgstr "Nombre"
 
 #: src/spark/templates/common.mako:70
 msgid "Num cpu cores"
-msgstr ""
+msgstr "Núm. núcleos de CPU"
 
 #: src/spark/templates/common.mako:76
 msgid "Memory per node"
-msgstr ""
+msgstr "Memoria por nodo"
 
 #: src/spark/templates/common.mako:84 src/spark/templates/common.mako:114
-#: src/spark/templates/editor.mako:234
+#: src/spark/templates/editor.mako:235
 #: src/spark/templates/list_contexts.mako:85
 msgid "Cancel"
 msgstr "Cancelar"
 
 #: src/spark/templates/common.mako:85
-#, fuzzy
 msgid "Create"
-msgstr "Creado el"
+msgstr "Crear"
 
 #: src/spark/templates/common.mako:96
 msgid "Upload application"
-msgstr ""
+msgstr "Cargar aplicación"
 
 #: src/spark/templates/common.mako:99
 msgid "One class of the jar should implement SparkJob."
-msgstr ""
+msgstr "Una clase de jar debe implementar un job de Spark."
 
 #: src/spark/templates/common.mako:101
 msgid "Local jar file"
-msgstr ""
+msgstr "Archivo jar local"
 
-#: src/spark/templates/common.mako:107 src/spark/templates/editor.mako:63
-#, fuzzy
+#: src/spark/templates/common.mako:107 src/spark/templates/editor.mako:64
 msgid "App name"
-msgstr "Nombre de la secuencia de comandos"
+msgstr "Nombre de la aplicación"
 
 #: src/spark/templates/common.mako:115
 msgid "Upload"
-msgstr ""
+msgstr "Cargar"
 
 #: src/spark/templates/editor.mako:23
 msgid "Query"
-msgstr ""
+msgstr "Consulta"
 
-#: src/spark/templates/editor.mako:39 src/spark/templates/editor.mako:486
+#: src/spark/templates/editor.mako:39 src/spark/templates/editor.mako:487
 msgid "Application name"
-msgstr ""
+msgstr "Nombre de la aplicación"
 
 #: src/spark/templates/editor.mako:48
 msgid "Application description"
-msgstr ""
+msgstr "Descripción de la aplicación"
 
 #: src/spark/templates/editor.mako:58
 #: src/spark/templates/list_applications.mako:36
 msgid "Upload app"
-msgstr ""
+msgstr "Cargar aplicación"
 
-#: src/spark/templates/editor.mako:66
+#: src/spark/templates/editor.mako:67
 msgid "Missing, add one?"
-msgstr ""
+msgstr "Faltan. ¿Agregar uno?"
 
-#: src/spark/templates/editor.mako:83 src/spark/templates/list_contexts.mako:23
+#: src/spark/templates/editor.mako:84 src/spark/templates/list_contexts.mako:23
 #: src/spark/templates/list_jobs.mako:37
 msgid "Context"
-msgstr ""
+msgstr "Contexto"
 
-#: src/spark/templates/editor.mako:86
+#: src/spark/templates/editor.mako:87
 msgid "Automatic"
-msgstr ""
+msgstr "Automático"
 
-#: src/spark/templates/editor.mako:92
-#, fuzzy
+#: src/spark/templates/editor.mako:93
 msgid "Create one?"
-msgstr "Creado el"
+msgstr "¿Crear uno?"
 
-#: src/spark/templates/editor.mako:115
+#: src/spark/templates/editor.mako:116
 msgid "Parameters"
 msgstr "Parámetros"
 
-#: src/spark/templates/editor.mako:121
+#: src/spark/templates/editor.mako:122
 msgid "Your application has the following error(s):"
-msgstr ""
+msgstr "La aplicación tiene los siguientes errores:"
 
-#: src/spark/templates/editor.mako:127
+#: src/spark/templates/editor.mako:128
 msgid "No parameters defined yet."
-msgstr ""
+msgstr "No se han definido parámetros todavía."
 
-#: src/spark/templates/editor.mako:133 src/spark/templates/editor.mako:176
+#: src/spark/templates/editor.mako:134 src/spark/templates/editor.mako:177
 msgid "Value"
 msgstr "Valor"
 
-#: src/spark/templates/editor.mako:147
+#: src/spark/templates/editor.mako:148
 msgid "Delete"
 msgstr "Eliminar"
 
-#: src/spark/templates/editor.mako:153
+#: src/spark/templates/editor.mako:154
 msgid "Add"
 msgstr "Agregar"
 
-#: src/spark/templates/editor.mako:159
-#, fuzzy
-msgid "Executing..."
-msgstr "Detener ejecución."
-
 #: src/spark/templates/editor.mako:160
-#, fuzzy
-msgid "Execute"
-msgstr "Eliminar"
+msgid "Executing..."
+msgstr "Ejecutando..."
 
-#: src/spark/templates/editor.mako:162 src/spark/templates/editor.mako:235
+#: src/spark/templates/editor.mako:161
+msgid "Execute"
+msgstr "Ejecutar"
+
+#: src/spark/templates/editor.mako:163 src/spark/templates/editor.mako:236
 msgid "Save"
 msgstr "Guardar"
 
-#: src/spark/templates/editor.mako:163
+#: src/spark/templates/editor.mako:164
 msgid "Save as..."
-msgstr ""
+msgstr "Guardar como..."
 
-#: src/spark/templates/editor.mako:164
+#: src/spark/templates/editor.mako:165
 msgid "or create a"
-msgstr ""
+msgstr "o crear"
 
-#: src/spark/templates/editor.mako:164
+#: src/spark/templates/editor.mako:165
 msgid "New application"
-msgstr ""
+msgstr "Nueva aplicación"
 
-#: src/spark/templates/editor.mako:166
+#: src/spark/templates/editor.mako:167
 msgid "Download"
-msgstr ""
+msgstr "Descargar"
 
-#: src/spark/templates/editor.mako:175
+#: src/spark/templates/editor.mako:176
 msgid "Key"
-msgstr ""
+msgstr "Clave"
 
-#: src/spark/templates/editor.mako:188
+#: src/spark/templates/editor.mako:189
 msgid "The server returned no results."
-msgstr ""
+msgstr "El servidor no ha devuelto ningún resultado."
 
-#: src/spark/templates/editor.mako:215
+#: src/spark/templates/editor.mako:216
 msgid "Save your query"
-msgstr ""
+msgstr "Guardar la consulta"
 
-#: src/spark/templates/editor.mako:226
-#, fuzzy
+#: src/spark/templates/editor.mako:227
 msgid "Description"
-msgstr "Nueva secuencia de comandos"
+msgstr "Descripción"
 
-#: src/spark/templates/editor.mako:242
+#: src/spark/templates/editor.mako:243
 msgid "Choose a file"
 msgstr "Seleccionar un archivo"
 
-#: src/spark/templates/editor.mako:378
+#: src/spark/templates/editor.mako:379
 msgid "Did you know?"
 msgstr "¿Lo sabía?"
 
-#: src/spark/templates/editor.mako:480
-#, fuzzy
+#: src/spark/templates/editor.mako:481
 msgid "This field is required."
-msgstr "Se necesita una solicitud POST."
+msgstr "Este campo es obligatorio."
 
-#: src/spark/templates/editor.mako:493
-#, fuzzy
+#: src/spark/templates/editor.mako:494
 msgid "Empty description"
-msgstr "Copiar esta secuencia de comandos"
+msgstr "Descripción vacía"
 
-#: src/spark/templates/editor.mako:499
+#: src/spark/templates/editor.mako:500
 msgid "Application saved successfully!"
-msgstr ""
+msgstr "Aplicación guardada correctamente."
 
-#: src/spark/templates/editor.mako:527
+#: src/spark/templates/editor.mako:528
 #: src/spark/templates/list_applications.mako:93
 #: src/spark/templates/list_contexts.mako:131
 #: src/spark/templates/list_jobs.mako:96
-#, fuzzy
 msgid "No data available"
-msgstr "No hay registros disponibles."
+msgstr "No hay datos disponibles"
 
-#: src/spark/templates/editor.mako:528
+#: src/spark/templates/editor.mako:529
 #: src/spark/templates/list_applications.mako:94
 #: src/spark/templates/list_contexts.mako:132
 #: src/spark/templates/list_jobs.mako:97
 msgid "No matching records"
-msgstr ""
+msgstr "No hay registros coincidentes"
 
-#: src/spark/templates/editor.mako:579
+#: src/spark/templates/editor.mako:580
 msgid "Server error occured: "
-msgstr ""
+msgstr "Se ha producido un error del servidor: "
 
-#: src/spark/templates/editor.mako:582
+#: src/spark/templates/editor.mako:583
 msgid "Unmanageable server error occured: "
-msgstr ""
+msgstr "Se ha producido un error de servidor que no se puede gestionar: "
 
 #: src/spark/templates/list_applications.mako:33
 #: src/spark/templates/list_contexts.mako:33
 msgid "Search for name"
-msgstr ""
+msgstr "Buscar nombre"
 
 #: src/spark/templates/list_applications.mako:46
 msgid "Upload time"
-msgstr ""
+msgstr "Momento de la carga"
 
 #: src/spark/templates/list_applications.mako:53
 msgid "Click to open and execute"
-msgstr ""
+msgstr "Haga clic para abrir y ejecutar"
 
 #: src/spark/templates/list_contexts.mako:36
 msgid "Delete forever"
-msgstr ""
+msgstr "Eliminar permanentemente"
 
 #: src/spark/templates/list_contexts.mako:37
 msgid "Delete selected"
-msgstr ""
+msgstr "Eliminar selección"
 
 #: src/spark/templates/list_contexts.mako:82
 msgid "Confirm action"
-msgstr ""
+msgstr "Confirmar acción"
 
 #: src/spark/templates/list_contexts.mako:86
 msgid "Yes"
@@ -331,11 +314,11 @@ msgstr "Sí"
 
 #: src/spark/templates/list_contexts.mako:208
 msgid "Delete the selected contexts?"
-msgstr ""
+msgstr "¿Eliminar los contextos seleccionados?"
 
 #: src/spark/templates/list_jobs.mako:23 src/spark/templates/list_jobs.mako:29
 msgid "Jobs"
-msgstr ""
+msgstr "Jobs"
 
 #: src/spark/templates/list_jobs.mako:34
 msgid "Status"
@@ -343,18 +326,19 @@ msgstr "Estado"
 
 #: src/spark/templates/list_jobs.mako:35
 msgid "Job id"
-msgstr ""
+msgstr "ID de job"
 
 #: src/spark/templates/list_jobs.mako:38
 msgid "Start time"
-msgstr ""
+msgstr "Hora de inicio"
 
 #: src/spark/templates/list_jobs.mako:39
 msgid "Duration"
-msgstr ""
+msgstr "Duración"
 
 #: src/spark/templates/list_jobs.mako:51
-#, fuzzy
 msgid "Click to open"
-msgstr "Haga clic para ver"
+msgstr "Haga clic para abrir"
 
+#~ msgid "The app won't work without a running Job Server"
+#~ msgstr "La aplicación no funcionará sin un servidor Oozie en ejecución"

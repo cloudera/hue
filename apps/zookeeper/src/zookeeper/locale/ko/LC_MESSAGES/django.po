@@ -3,12 +3,11 @@
 # This file is distributed under the same license as the Hue project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-08-26 10:59-0700\n"
+"POT-Creation-Date: 2014-02-10 09:18-0800\n"
 "PO-Revision-Date: 2013-08-26 11:01-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -18,226 +17,253 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
+#: src/zookeeper/views.py:75
+msgid "Could not correctly connect to Zookeeper."
+msgstr "Zookeeper에 올바르게 연결할 수 없습니다."
+
 #: src/zookeeper/templates/clients.mako:24
 msgid "Clients"
-msgstr ""
+msgstr "클라이언트"
 
-#: src/zookeeper/templates/clients.mako:39
-msgid "Host"
-msgstr ""
-
-#: src/zookeeper/templates/clients.mako:40
-msgid "Port"
-msgstr ""
+#: src/zookeeper/templates/clients.mako:29 src/zookeeper/templates/tree.mako:30
+#: src/zookeeper/templates/view.mako:29
+msgid "Clusters"
+msgstr "클러스터"
 
 #: src/zookeeper/templates/clients.mako:41
-msgid "Interest Ops"
-msgstr ""
+msgid "Host"
+msgstr "호스트"
 
 #: src/zookeeper/templates/clients.mako:42
-msgid "Queued"
-msgstr ""
+msgid "Port"
+msgstr "포트"
 
 #: src/zookeeper/templates/clients.mako:43
-msgid "Received"
-msgstr ""
+msgid "Interest Ops"
+msgstr "관심 있는 Ops"
 
 #: src/zookeeper/templates/clients.mako:44
+msgid "Queued"
+msgstr "대기"
+
+#: src/zookeeper/templates/clients.mako:45
+msgid "Received"
+msgstr "받음"
+
+#: src/zookeeper/templates/clients.mako:46
 msgid "Sent"
-msgstr ""
+msgstr "보냄"
 
-#: src/zookeeper/templates/create.mako:35
+#: src/zookeeper/templates/create.mako:29 src/zookeeper/templates/edit.mako:30
+msgid "Home"
+msgstr "홈"
+
+#: src/zookeeper/templates/create.mako:36
 msgid "New Znode"
-msgstr ""
+msgstr "새 Znode"
 
-#: src/zookeeper/templates/create.mako:44
+#: src/zookeeper/templates/create.mako:45
 msgid "Create Znode"
-msgstr ""
+msgstr "Znode 생성"
 
-#: src/zookeeper/templates/create.mako:45 src/zookeeper/templates/edit.mako:45
-#: src/zookeeper/templates/tree.mako:114
+#: src/zookeeper/templates/create.mako:46 src/zookeeper/templates/edit.mako:46
+#: src/zookeeper/templates/tree.mako:115
 msgid "Cancel"
-msgstr ""
+msgstr "취소"
 
-#: src/zookeeper/templates/edit.mako:36
+#: src/zookeeper/templates/edit.mako:37
 msgid "Edit Znode"
-msgstr ""
+msgstr "Znode 편집"
 
-#: src/zookeeper/templates/edit.mako:44
+#: src/zookeeper/templates/edit.mako:45
 msgid "Save"
-msgstr ""
+msgstr "저장"
 
 #: src/zookeeper/templates/index.mako:24 src/zookeeper/templates/view.mako:24
 msgid "View"
-msgstr ""
+msgstr "보기"
 
 #: src/zookeeper/templates/index.mako:36
-msgid "Cluster"
-msgstr ""
+msgid "There are currently no clusters to browse."
+msgstr "현재 검색할 클러스터가 없습니다."
 
 #: src/zookeeper/templates/index.mako:39
+msgid "Please contact your administrator to solve this."
+msgstr "이 문제를 해결하려면 관리자에게 문의하십시오."
+
+#: src/zookeeper/templates/index.mako:52
 msgid "Znode Hierarchy"
-msgstr ""
+msgstr "Znode 계층 구조"
 
-#: src/zookeeper/templates/index.mako:44 src/zookeeper/templates/view.mako:123
-#: src/zookeeper/templates/view.mako:147
+#: src/zookeeper/templates/index.mako:57 src/zookeeper/templates/view.mako:125
+#: src/zookeeper/templates/view.mako:149
 msgid "Node"
-msgstr ""
+msgstr "노드"
 
-#: src/zookeeper/templates/index.mako:45
+#: src/zookeeper/templates/index.mako:58
 msgid "Role"
-msgstr ""
+msgstr "역할"
 
-#: src/zookeeper/templates/index.mako:46
+#: src/zookeeper/templates/index.mako:59
 msgid "Avg Latency"
-msgstr ""
+msgstr "평균 지연 시간"
 
-#: src/zookeeper/templates/index.mako:47 src/zookeeper/templates/view.mako:66
+#: src/zookeeper/templates/index.mako:60 src/zookeeper/templates/view.mako:68
 msgid "Watch Count"
-msgstr ""
+msgstr "워치 수"
 
-#: src/zookeeper/templates/index.mako:48 src/zookeeper/templates/view.mako:40
+#: src/zookeeper/templates/index.mako:61 src/zookeeper/templates/view.mako:42
 msgid "Version"
-msgstr ""
+msgstr "버전"
 
 #: src/zookeeper/templates/shared_components.mako:29
 msgid "Go to cluster"
-msgstr ""
+msgstr "클러스터로 이동"
 
-#: src/zookeeper/templates/tree.mako:43 src/zookeeper/templates/view.mako:87
+#: src/zookeeper/templates/shared_components.mako:81
+msgid "ZooKeeper Browser"
+msgstr "ZooKeeper 브라우저"
+
+#: src/zookeeper/templates/tree.mako:44 src/zookeeper/templates/view.mako:89
 msgid "Znodes"
-msgstr ""
+msgstr "Znode"
 
-#: src/zookeeper/templates/tree.mako:50
+#: src/zookeeper/templates/tree.mako:51
 msgid "No children available"
-msgstr ""
-
-#: src/zookeeper/templates/tree.mako:53
-msgid "Add"
-msgstr ""
+msgstr "하위 항목을 이용할 수 없음"
 
 #: src/zookeeper/templates/tree.mako:54
+msgid "Add"
+msgstr "추가"
+
+#: src/zookeeper/templates/tree.mako:55
 #, python-format
 msgid "Are you sure you want to delete %s?"
-msgstr ""
+msgstr "%s을(를) 삭제하시겠습니까?"
 
-#: src/zookeeper/templates/tree.mako:54
+#: src/zookeeper/templates/tree.mako:55
 msgid "Remove current ZNode"
-msgstr ""
+msgstr "현재 ZNode 제거"
 
 #: src/zookeeper/templates/tree.mako:63
 msgid "Text"
-msgstr ""
+msgstr "텍스트"
 
-#: src/zookeeper/templates/tree.mako:64 src/zookeeper/templates/tree.mako:66
+#: src/zookeeper/templates/tree.mako:64
+msgid "Base64"
+msgstr "Base64"
+
+#: src/zookeeper/templates/tree.mako:65 src/zookeeper/templates/tree.mako:67
 msgid "Stats"
-msgstr ""
+msgstr "상태"
 
-#: src/zookeeper/templates/tree.mako:73
-msgid "Edit as Base64"
-msgstr ""
-
-#: src/zookeeper/templates/tree.mako:77
+#: src/zookeeper/templates/tree.mako:74
 msgid "Edit as Text"
-msgstr ""
+msgstr "텍스트로 편집"
 
-#: src/zookeeper/templates/tree.mako:108
+#: src/zookeeper/templates/tree.mako:78
+msgid "Edit as Base64"
+msgstr "Base64로 편집"
+
+#: src/zookeeper/templates/tree.mako:109
 msgid "Delete Znode?"
-msgstr ""
+msgstr "Znode를 삭제하시겠습니까?"
 
-#: src/zookeeper/templates/tree.mako:115
+#: src/zookeeper/templates/tree.mako:116
 msgid "Yes, delete it!"
-msgstr ""
+msgstr "예, 삭제합니다!"
 
-#: src/zookeeper/templates/view.mako:35 src/zookeeper/templates/view.mako:98
+#: src/zookeeper/templates/view.mako:37 src/zookeeper/templates/view.mako:100
 msgid "Key"
-msgstr ""
+msgstr "키"
 
-#: src/zookeeper/templates/view.mako:36 src/zookeeper/templates/view.mako:99
+#: src/zookeeper/templates/view.mako:38 src/zookeeper/templates/view.mako:101
 msgid "Value"
-msgstr ""
-
-#: src/zookeeper/templates/view.mako:45
-msgid "Latency"
-msgstr ""
+msgstr "값"
 
 #: src/zookeeper/templates/view.mako:47
-msgid "Min:"
-msgstr ""
-
-#: src/zookeeper/templates/view.mako:48
-msgid "Avg:"
-msgstr ""
+msgid "Latency"
+msgstr "지연 시간"
 
 #: src/zookeeper/templates/view.mako:49
+msgid "Min:"
+msgstr "최소:"
+
+#: src/zookeeper/templates/view.mako:50
+msgid "Avg:"
+msgstr "평균:"
+
+#: src/zookeeper/templates/view.mako:51
 msgid "Max:"
-msgstr ""
-
-#: src/zookeeper/templates/view.mako:54
-msgid "Packets"
-msgstr ""
-
-#: src/zookeeper/templates/view.mako:55
-msgid "Sent:"
-msgstr ""
+msgstr "최대:"
 
 #: src/zookeeper/templates/view.mako:56
+msgid "Packets"
+msgstr "패킷"
+
+#: src/zookeeper/templates/view.mako:57
+msgid "Sent:"
+msgstr "보냄:"
+
+#: src/zookeeper/templates/view.mako:58
 msgid "Received:"
-msgstr ""
+msgstr "받음:"
 
-#: src/zookeeper/templates/view.mako:61
+#: src/zookeeper/templates/view.mako:63
 msgid "Outstanding Requests"
-msgstr ""
+msgstr "대기 중인 요청"
 
-#: src/zookeeper/templates/view.mako:71
+#: src/zookeeper/templates/view.mako:73
 msgid "Open FD Count"
-msgstr ""
+msgstr "열린 FD 수"
 
-#: src/zookeeper/templates/view.mako:76
+#: src/zookeeper/templates/view.mako:78
 msgid "Max FD Count"
-msgstr ""
+msgstr "최대 FD 수"
 
-#: src/zookeeper/templates/view.mako:88
+#: src/zookeeper/templates/view.mako:90
 msgid "View Znode Hierarchy"
-msgstr ""
+msgstr "Znode 계층 구조 보기"
 
-#: src/zookeeper/templates/view.mako:94
+#: src/zookeeper/templates/view.mako:96
 msgid "General"
-msgstr ""
+msgstr "일반"
 
-#: src/zookeeper/templates/view.mako:103
+#: src/zookeeper/templates/view.mako:105
 msgid "ZNode Count"
-msgstr ""
+msgstr "ZNode 수"
 
-#: src/zookeeper/templates/view.mako:108
+#: src/zookeeper/templates/view.mako:110
 msgid "Ephemerals Count"
-msgstr ""
+msgstr "사용 후 삭제 수"
 
-#: src/zookeeper/templates/view.mako:113
+#: src/zookeeper/templates/view.mako:115
 msgid "Approximate Data Size"
-msgstr ""
+msgstr "대략적인 데이터 크기"
 
-#: src/zookeeper/templates/view.mako:122 src/zookeeper/templates/view.mako:146
+#: src/zookeeper/templates/view.mako:124 src/zookeeper/templates/view.mako:148
 msgid "Client Connections"
-msgstr ""
+msgstr "클라이언트 연결"
 
-#: src/zookeeper/templates/view.mako:123
+#: src/zookeeper/templates/view.mako:125
 msgid "leader"
-msgstr ""
+msgstr "리더"
 
-#: src/zookeeper/templates/view.mako:129
+#: src/zookeeper/templates/view.mako:131
 msgid "Followers"
-msgstr ""
+msgstr "팔로워"
 
-#: src/zookeeper/templates/view.mako:133
+#: src/zookeeper/templates/view.mako:135
 msgid "Synced Followers"
-msgstr ""
+msgstr "동기화된 팔로워"
 
-#: src/zookeeper/templates/view.mako:137
+#: src/zookeeper/templates/view.mako:139
 msgid "Pending Syncs"
-msgstr ""
+msgstr "대기 중인 동기화 수"
 
-#: src/zookeeper/templates/view.mako:147
+#: src/zookeeper/templates/view.mako:149
 msgid "follower"
-msgstr ""
+msgstr "팔로워"
 
+#~ msgid "Cluster"
+#~ msgstr ""

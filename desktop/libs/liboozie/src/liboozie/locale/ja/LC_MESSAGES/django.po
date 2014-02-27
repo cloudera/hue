@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-08-02 20:43-0700\n"
+"POT-Creation-Date: 2014-02-10 09:18-0800\n"
 "PO-Revision-Date: 2012-11-07 13:08-0800\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -37,30 +37,31 @@ msgstr "Oozie サーバーが利用できません"
 msgid "Oozie Share Lib not installed in default location."
 msgstr "Oozie 共有ライブラリがデフォルトの場所にインストールされていません。"
 
-#: src/liboozie/submittion.py:68
+#: src/liboozie/submittion.py:73
 #, python-format
 msgid "Submission already submitted (Oozie job id %s)"
 msgstr "サブミット済みのサブミッションです（Oozie ジョブ ID %s）"
 
-#: src/liboozie/submittion.py:147
-msgid "Failed to access deployment directory."
-msgstr "配置ディレクトリにアクセスできませんでした。"
+#: src/liboozie/submittion.py:139
+#, python-format
+msgid "Failed to create deployment directory: %s"
+msgstr "配置ディレクトリを作成できませんでした：%s"
 
-#: src/liboozie/submittion.py:204
+#: src/liboozie/submittion.py:235
 #, python-format
 msgid "Path is not a directory: %s."
 msgstr "パスはディレクトリではありません：%s。"
 
-#: src/liboozie/submittion.py:209
+#: src/liboozie/submittion.py:240
 #, python-format
 msgid "Error accessing directory '%s': %s."
 msgstr "ディレクトリ '%s' へのアクセス中にエラーが発生しました：%s。"
 
-#: src/liboozie/types.py:356
+#: src/liboozie/types.py:360
 msgid "Insufficient permission."
 msgstr "パーミッションが不十分です。"
 
-#: src/liboozie/types.py:357
+#: src/liboozie/types.py:361
 #, python-format
 msgid "Permission denied. User %(username)s cannot modify user %(user)s's job."
 msgstr "パーミッションが拒否されました。ユーザー %(username)s はユーザー %(user)s のジョブを変更できません。"

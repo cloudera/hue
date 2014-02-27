@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-09-04 18:05-0700\n"
+"POT-Creation-Date: 2014-02-10 09:18-0800\n"
 "PO-Revision-Date: 2012-11-07 13:08-0800\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: de <LL@li.org>\n"
@@ -17,59 +17,67 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/libsaml/conf.py:51
-msgid ""
-"Xmlsec1 binary path. This program should be executable by the user "
-"running Hue."
-msgstr ""
+#: src/libsaml/conf.py:46
+msgid "Xmlsec1 binary path. This program should be executable by the user running Hue."
+msgstr "Xmlsec1-Binärpfad. Dieses Programm sollte von dem Benutzer verwendet werden können, der Hue ausführt."
 
-#: src/libsaml/conf.py:57
+#: src/libsaml/conf.py:52
+msgid "Entity ID for Hue acting as service provider. Can also accept a pattern where '<base_url>' will be replaced with server URL base."
+msgstr "Entitäts-ID für Hue fungiert als Dienstanbieter. Es kann auch ein Muster akzeptiert werden, dessen \"<base_url>\" durch die Server-URL-Datenbank ersetzt wird."
+
+#: src/libsaml/conf.py:58
 msgid "Create users from IdP on login."
-msgstr ""
+msgstr "Benutzer bei der Anmeldung aus IdP erstellen."
 
-#: src/libsaml/conf.py:64
-msgid ""
-"Attribute map directory contains files that map SAML attributes to "
-"pysaml2 attributes."
-msgstr ""
+#: src/libsaml/conf.py:65
+msgid "Attribute map directory contains files that map SAML attributes to pysaml2 attributes."
+msgstr "Attributzuordnungsverzeichnis enthält Dateien, durch die SAML-Attribute den pysaml2-Attributen zugeordnet werden."
 
-#: src/libsaml/conf.py:71
+#: src/libsaml/conf.py:72
 msgid "Allow responses that are initiated by the IdP."
-msgstr ""
+msgstr "Antworten zulassen, die durch IdP initiiert werden."
 
-#: src/libsaml/conf.py:77
+#: src/libsaml/conf.py:78
 msgid "Required attributes to ask for from IdP."
-msgstr ""
+msgstr "Erforderliche Attribute, die bei IdP abgefragt werden."
 
-#: src/libsaml/conf.py:83
+#: src/libsaml/conf.py:84
 msgid "Optional attributes to ask for from IdP."
-msgstr ""
+msgstr "Optionale Attribute, die von IdP abgerufen werden sollen."
 
-#: src/libsaml/conf.py:89
-msgid ""
-"IdP metadata in the form of a file. This is generally an XML file "
-"containing metadata that the Identity Provider generates."
-msgstr ""
+#: src/libsaml/conf.py:90
+msgid "IdP metadata in the form of a file. This is generally an XML file containing metadata that the Identity Provider generates."
+msgstr "IdP-Metadaten in Form einer Datei. Dies ist normalerweise eine XML-Datei, die Metadaten enthält, die vom Identity Provider generiert werden."
 
-#: src/libsaml/conf.py:95
-msgid ""
-"key_file is the name of a PEM formatted file that contains the private "
-"key of the Hue service. This is presently used both to encrypt/sign "
-"assertions and as client key in a HTTPS session."
-msgstr ""
+#: src/libsaml/conf.py:96
+msgid "key_file is the name of a PEM formatted file that contains the private key of the Hue service. This is presently used both to encrypt/sign assertions and as client key in a HTTPS session."
+msgstr "\"key_file\" ist der Name einer PEM-formatierten Datei, die den privaten Schlüssel des Hue-Dienstes enthält. Dieser wird derzeit zum Verschlüsseln/Signieren von Bestätigungen und als Client-Schlüssel in einer HTTPS-Sitzung verwendet."
 
-#: src/libsaml/conf.py:101
-msgid ""
-"This is the public part of the service private/public key pair. cert_file"
-" must be a PEM formatted certificate chain file."
-msgstr ""
+#: src/libsaml/conf.py:102
+msgid "This is the public part of the service private/public key pair. cert_file must be a PEM formatted certificate chain file."
+msgstr "Dies ist der öffentliche Teil des Schlüsselpaars für private/öffentliche Verwendung. \"cert_file\" muss eine PEM-formatierte Zertifikatkettendatei sein."
 
-#: src/libsaml/conf.py:107
-msgid ""
-"A mapping from attributes in the response from the IdP to django user "
-"attributes."
-msgstr ""
+#: src/libsaml/conf.py:108
+msgid "A mapping from attributes in the response from the IdP to django user attributes."
+msgstr "Eine Zuordnung von Attributen in der Antwort von IdP an Django-Benutzerattribute."
 
-#~ msgid "Allow imperfect responses."
-#~ msgstr ""
+#: src/libsaml/conf.py:114
+msgid "Have Hue initiated authn requests be signed and provide a certificate."
+msgstr "Lassen Sie von Hue initiierte Authentifizierungsanforderungen signieren und geben Sie ein Zertifikat an."
+
+#: src/libsaml/conf.py:120
+msgid "Have Hue initiated logout requests be signed and provide a certificate."
+msgstr "Lassen Sie von Hue initiierte Abmeldeanforderungen signieren und geben Sie ein Zertifikat an."
+
+#: src/libsaml/conf.py:126
+msgid "Username can be sourced from 'attributes' or 'nameid'"
+msgstr "Der Benutzername kann aus \"attributes\" oder \"nameid\" entnommen werden."
+
+#: src/libsaml/conf.py:132
+msgid "Performs the logout or not."
+msgstr "Führt die Anmeldung durch oder nicht."
+
+#: src/libsaml/conf.py:138
+msgid "username_source not configured properly. SAML integration may not work."
+msgstr "username_source ist nicht korrekt konfiguriert. SAML-Integration ist vielleicht nicht möglich."
 

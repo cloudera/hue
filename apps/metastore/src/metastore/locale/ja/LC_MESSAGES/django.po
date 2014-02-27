@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-08-02 20:43-0700\n"
+"POT-Creation-Date: 2014-02-10 09:18-0800\n"
 "PO-Revision-Date: 2012-07-30 18:51-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -17,119 +17,143 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/metastore/forms.py:48
+#: src/metastore/forms.py:46
 #: src/metastore/templates/describe_partitions.mako:48
 msgid "Path"
 msgstr "パス"
 
-#: src/metastore/forms.py:49
+#: src/metastore/forms.py:47
 msgid "Overwrite?"
 msgstr "上書きしますか。"
 
-#: src/metastore/forms.py:62
+#: src/metastore/forms.py:60
 #, python-format
 msgid "%(column_name)s (partition key with type %(column_type)s)"
 msgstr "%(column_name)s（%(column_type)s タイプのパーティションキー）"
 
-#: src/metastore/views.py:49
+#: src/metastore/views.py:47
 msgid "You are not allowed to modify the metastore."
-msgstr "metastore の変更は許可されていません。"
+msgstr "メタストアの変更は許可されません。"
 
-#: src/metastore/views.py:49
+#: src/metastore/views.py:47
 msgid "You have metastore:read_only_access permissions"
-msgstr "metastore:read_only_access パーミッションがあります。"
+msgstr "metastore:read_only_access パーミッションがあります"
 
-#: src/metastore/views.py:90
+#: src/metastore/views.py:88
 #, python-format
 msgid "Failed to remove %(databases)s.  Error: %(error)s"
 msgstr "%(databases)s を削除できませんでした。エラー：%(error)s"
 
-#: src/metastore/views.py:91 src/metastore/views.py:184
-msgid "Beeswax Error"
-msgstr "Beeswax のエラー"
+#: src/metastore/views.py:89 src/metastore/views.py:141
+#: src/metastore/views.py:189
+msgid "Hive Error"
+msgstr "Hive エラー"
 
-#: src/metastore/views.py:93
+#: src/metastore/views.py:91
 msgid "Do you really want to delete the database(s)?"
 msgstr "データベースを削除してもよろしいですか?"
 
-#: src/metastore/views.py:183
+#: src/metastore/views.py:188
 #, python-format
 msgid "Failed to remove %(tables)s.  Error: %(error)s"
 msgstr "%(tables)s を削除できませんでした。エラー：%(error)s"
 
-#: src/metastore/views.py:186
+#: src/metastore/views.py:191
 msgid "Do you really want to delete the table(s)?"
 msgstr "テーブルを削除してもよろしいですか?"
 
-#: src/metastore/views.py:200 src/metastore/views.py:210
+#: src/metastore/views.py:205 src/metastore/views.py:215
 msgid "Cannot read table"
 msgstr "テーブルを読み取ることができません"
 
-#: src/metastore/views.py:232
+#: src/metastore/views.py:237
 msgid "Can't load the data: "
 msgstr "データを読み込むことができません： "
 
-#: src/metastore/views.py:253
+#: src/metastore/views.py:258
 #, python-format
 msgid "Table '%(table)s' is not partitioned."
 msgstr "テーブル '%(table)s' はパーティション化されていません。"
 
-#: src/metastore/templates/components.mako:24
+#: src/metastore/views.py:295
+msgid "Column analysis not supportet yet"
+msgstr "列の分析はまだサポートされていません"
+
+#: src/metastore/views.py:297
+msgid "A POST request is required"
+msgstr "POST 要求が必要です"
+
+#: src/metastore/templates/components.mako:30
+msgid "Metastore Manager"
+msgstr "Metastore Manager"
+
+#: src/metastore/templates/components.mako:44
 #: src/metastore/templates/databases.mako:23
-#: src/metastore/templates/databases.mako:26
 msgid "Databases"
 msgstr "データベース"
 
-#: src/metastore/templates/databases.mako:34
+#: src/metastore/templates/confirm.mako:24
+#: src/metastore/templates/databases.mako:87
+#: src/metastore/templates/tables.mako:99
+msgid "Confirm action"
+msgstr "アクションを確認"
+
+#: src/metastore/templates/confirm.mako:32
+#: src/metastore/templates/databases.mako:91
+#: src/metastore/templates/tables.mako:103
+msgid "Yes"
+msgstr "はい"
+
+#: src/metastore/templates/confirm.mako:33
+msgid "No"
+msgstr "いいえ"
+
+#: src/metastore/templates/databases.mako:32
+msgid "actions"
+msgstr "アクション"
+
+#: src/metastore/templates/databases.mako:33
 msgid "Create a new database"
 msgstr "新しいデータベースを作成"
 
-#: src/metastore/templates/databases.mako:42
+#: src/metastore/templates/databases.mako:45
 msgid "Search for database name"
-msgstr "データベース名の検索"
+msgstr "データベース名を検索"
 
-#: src/metastore/templates/databases.mako:47
+#: src/metastore/templates/databases.mako:50
 msgid "Drop the selected databases"
 msgstr "選択したデータベースをドロップ"
 
-#: src/metastore/templates/databases.mako:47
-#: src/metastore/templates/describe_table.mako:69
-#: src/metastore/templates/tables.mako:59
+#: src/metastore/templates/databases.mako:50
+#: src/metastore/templates/describe_table.mako:65
+#: src/metastore/templates/tables.mako:61
 msgid "Drop"
 msgstr "ドロップ"
 
-#: src/metastore/templates/databases.mako:55
+#: src/metastore/templates/databases.mako:59
 msgid "Database Name"
 msgstr "データベース名"
 
-#: src/metastore/templates/databases.mako:82
-#: src/metastore/templates/tables.mako:95
-msgid "Confirm action"
-msgstr "アクションの確認"
-
-#: src/metastore/templates/databases.mako:85
-#: src/metastore/templates/describe_table.mako:152
-#: src/metastore/templates/tables.mako:98
+#: src/metastore/templates/databases.mako:90
+#: src/metastore/templates/describe_table.mako:179
+#: src/metastore/templates/tables.mako:102
 #: src/metastore/templates/popups/load_data.mako:60
 msgid "Cancel"
 msgstr "キャンセル"
 
-#: src/metastore/templates/databases.mako:86
-#: src/metastore/templates/tables.mako:99
-msgid "Yes"
-msgstr "はい"
-
-#: src/metastore/templates/databases.mako:118
-#: src/metastore/templates/describe_table.mako:184
+#: src/metastore/templates/databases.mako:123
 #: src/metastore/templates/describe_table.mako:209
-#: src/metastore/templates/tables.mako:131
+#: src/metastore/templates/describe_table.mako:234
+#: src/metastore/templates/sample.mako:64
+#: src/metastore/templates/tables.mako:135
 msgid "No data available"
 msgstr "利用可能なデータがありません"
 
-#: src/metastore/templates/databases.mako:119
-#: src/metastore/templates/describe_table.mako:185
+#: src/metastore/templates/databases.mako:124
 #: src/metastore/templates/describe_table.mako:210
-#: src/metastore/templates/tables.mako:132
+#: src/metastore/templates/describe_table.mako:235
+#: src/metastore/templates/sample.mako:65
+#: src/metastore/templates/tables.mako:136
 msgid "No matching records"
 msgstr "一致するレコードがありません"
 
@@ -138,31 +162,27 @@ msgstr "一致するレコードがありません"
 msgid "Table Partitions: %(tableName)s"
 msgstr "テーブルパーティション：%(tableName)s"
 
-#: src/metastore/templates/describe_partitions.mako:27
-msgid "Partitions"
-msgstr "パーティション"
-
-#: src/metastore/templates/describe_partitions.mako:35
-#: src/metastore/templates/describe_table.mako:63
+#: src/metastore/templates/describe_partitions.mako:32
+#: src/metastore/templates/describe_table.mako:59
 #: src/metastore/templates/tables.mako:42
 msgid "Actions"
 msgstr "アクション"
 
-#: src/metastore/templates/describe_partitions.mako:36
+#: src/metastore/templates/describe_partitions.mako:33
 msgid "Show Table"
 msgstr "テーブルを表示"
 
-#: src/metastore/templates/describe_partitions.mako:68
-msgid "Table has no partitions."
-msgstr "テーブルにパーティションがありません。"
+#: src/metastore/templates/describe_partitions.mako:69
+#, python-format
+msgid "The table %s has no partitions."
+msgstr "テーブル %s にパーティションがありません。"
 
 #: src/metastore/templates/describe_table.mako:26
-#: src/metastore/templates/tables.mako:56
+#: src/metastore/templates/tables.mako:58
 msgid "View"
 msgstr "表示"
 
 #: src/metastore/templates/describe_table.mako:28
-#: src/metastore/templates/describe_table.mako:55
 msgid "Table"
 msgstr "テーブル"
 
@@ -171,32 +191,33 @@ msgstr "テーブル"
 msgid "%s : %s"
 msgstr "%s : %s"
 
-#: src/metastore/templates/describe_table.mako:36
+#: src/metastore/templates/describe_table.mako:37
+#: src/metastore/templates/describe_table.mako:145
 msgid "Name"
 msgstr "名前"
 
-#: src/metastore/templates/describe_table.mako:37
+#: src/metastore/templates/describe_table.mako:38
 msgid "Type"
 msgstr "タイプ"
 
-#: src/metastore/templates/describe_table.mako:38
+#: src/metastore/templates/describe_table.mako:39
 msgid "Comment"
 msgstr "コメント"
 
-#: src/metastore/templates/describe_table.mako:65
+#: src/metastore/templates/describe_table.mako:61
 msgid "Import Data"
 msgstr "データをインポート"
 
-#: src/metastore/templates/describe_table.mako:67
-#: src/metastore/templates/tables.mako:57
+#: src/metastore/templates/describe_table.mako:63
+#: src/metastore/templates/tables.mako:59
 msgid "Browse Data"
 msgstr "データを参照"
 
-#: src/metastore/templates/describe_table.mako:71
+#: src/metastore/templates/describe_table.mako:67
 msgid "View File Location"
 msgstr "ファイルの場所を表示"
 
-#: src/metastore/templates/describe_table.mako:73
+#: src/metastore/templates/describe_table.mako:69
 msgid "Show Partitions"
 msgstr "パーティションの表示"
 
@@ -216,15 +237,24 @@ msgstr "パーティション列"
 msgid "Sample"
 msgstr "サンプル"
 
-#: src/metastore/templates/describe_table.mako:108
+#: src/metastore/templates/describe_table.mako:91
+msgid "Properties"
+msgstr "プロパティ"
+
+#: src/metastore/templates/describe_table.mako:109
+#: src/metastore/templates/sample.mako:25
 msgid "Error!"
 msgstr "エラーが発生しました。"
 
-#: src/metastore/templates/describe_table.mako:145
+#: src/metastore/templates/describe_table.mako:146
+msgid "Value"
+msgstr "値"
+
+#: src/metastore/templates/describe_table.mako:172
 msgid "Drop Table"
 msgstr "テーブルのドロップ"
 
-#: src/metastore/templates/describe_table.mako:153
+#: src/metastore/templates/describe_table.mako:180
 msgid "Yes, drop this table"
 msgstr "はい、このテーブルをドロップします"
 
@@ -232,12 +262,7 @@ msgstr "はい、このテーブルをドロップします"
 msgid "Tables"
 msgstr "テーブル"
 
-#: src/metastore/templates/tables.mako:27
-#, python-format
-msgid "Database %s"
-msgstr "データベース %s"
-
-#: src/metastore/templates/tables.mako:34
+#: src/metastore/templates/tables.mako:35
 msgid "database"
 msgstr "データベース"
 
@@ -249,22 +274,26 @@ msgstr "ファイルから新しいテーブルを作成"
 msgid "Create a new table manually"
 msgstr "手動で新しいテーブルを作成"
 
-#: src/metastore/templates/tables.mako:52
+#: src/metastore/templates/tables.mako:54
 msgid "Search for table name"
 msgstr "テーブル名を検索"
 
-#: src/metastore/templates/tables.mako:56
-#: src/metastore/templates/tables.mako:57
+#: src/metastore/templates/tables.mako:58
+#: src/metastore/templates/tables.mako:59
 msgid "Browse the selected table"
 msgstr "選択したテーブルを参照"
 
-#: src/metastore/templates/tables.mako:59
+#: src/metastore/templates/tables.mako:61
 msgid "Delete the selected tables"
 msgstr "選択したテーブルを削除"
 
-#: src/metastore/templates/tables.mako:67
+#: src/metastore/templates/tables.mako:70
 msgid "Table Name"
 msgstr "テーブル名"
+
+#: src/metastore/templates/tables.mako:149
+msgid "Oops, no database found!"
+msgstr "データベースが見つかりません。"
 
 #: src/metastore/templates/util.mako:66
 msgid "Unsaved Query"
@@ -290,3 +319,9 @@ msgstr "データを読み込むと、データの場所からテーブルの保
 msgid "Submit"
 msgstr "サブミット"
 
+#~ msgid "Beeswax Error"
+#~ msgstr "Beeswax のエラー"
+#~ msgid "Partitions"
+#~ msgstr "パーティション"
+#~ msgid "Database %s"
+#~ msgstr "データベース %s"
