@@ -24,13 +24,13 @@ import os
 
 """
 The project directory structure:
-    root/                               <-- Project root (build root, run root)
-        desktop/                        <-- Desktop root
-            apps/...
+    root/                                 <-- Project root (build root, run root)
+        apps/                             <-- Apps root
+            beeswax/
+        desktop/                          <-- Desktop root
             core/
-              src/desktop/lib/paths.py  <-- You're reading this file
-              ...
-            core-apps/...
+                src/desktop/lib/paths.py  <-- You're reading this file
+                ...
         ext/
             thirdparty/...
 """
@@ -64,6 +64,13 @@ def get_desktop_root(*append):
   Returns the directory for Desktop.
   """
   return __get_root("desktop", *append)
+
+
+def get_apps_root(*append):
+  """
+  Returns the directory for apps.
+  """
+  return __get_root("apps", *append)
 
 
 def get_thirdparty_root(*append):
