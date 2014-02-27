@@ -3,12 +3,11 @@
 # This file is distributed under the same license as the Hue project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-08-26 10:59-0700\n"
+"POT-Creation-Date: 2014-02-10 09:18-0800\n"
 "PO-Revision-Date: 2013-08-26 11:01-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: pt <LL@li.org>\n"
@@ -18,226 +17,253 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
+#: src/zookeeper/views.py:75
+msgid "Could not correctly connect to Zookeeper."
+msgstr "Não foi possível ligar correctamente ao Zookeeper."
+
 #: src/zookeeper/templates/clients.mako:24
 msgid "Clients"
-msgstr ""
+msgstr "Clientes"
 
-#: src/zookeeper/templates/clients.mako:39
-msgid "Host"
-msgstr ""
-
-#: src/zookeeper/templates/clients.mako:40
-msgid "Port"
-msgstr ""
+#: src/zookeeper/templates/clients.mako:29 src/zookeeper/templates/tree.mako:30
+#: src/zookeeper/templates/view.mako:29
+msgid "Clusters"
+msgstr "Clusters"
 
 #: src/zookeeper/templates/clients.mako:41
-msgid "Interest Ops"
-msgstr ""
+msgid "Host"
+msgstr "Anfitrião"
 
 #: src/zookeeper/templates/clients.mako:42
-msgid "Queued"
-msgstr ""
+msgid "Port"
+msgstr "Porta"
 
 #: src/zookeeper/templates/clients.mako:43
-msgid "Received"
-msgstr ""
+msgid "Interest Ops"
+msgstr "Operações de interesse"
 
 #: src/zookeeper/templates/clients.mako:44
+msgid "Queued"
+msgstr "Em fila"
+
+#: src/zookeeper/templates/clients.mako:45
+msgid "Received"
+msgstr "Recebido"
+
+#: src/zookeeper/templates/clients.mako:46
 msgid "Sent"
-msgstr ""
+msgstr "Enviado"
 
-#: src/zookeeper/templates/create.mako:35
+#: src/zookeeper/templates/create.mako:29 src/zookeeper/templates/edit.mako:30
+msgid "Home"
+msgstr "Início"
+
+#: src/zookeeper/templates/create.mako:36
 msgid "New Znode"
-msgstr ""
+msgstr "Novo Znode"
 
-#: src/zookeeper/templates/create.mako:44
+#: src/zookeeper/templates/create.mako:45
 msgid "Create Znode"
-msgstr ""
+msgstr "Criar Znode"
 
-#: src/zookeeper/templates/create.mako:45 src/zookeeper/templates/edit.mako:45
-#: src/zookeeper/templates/tree.mako:114
+#: src/zookeeper/templates/create.mako:46 src/zookeeper/templates/edit.mako:46
+#: src/zookeeper/templates/tree.mako:115
 msgid "Cancel"
-msgstr ""
+msgstr "Cancelar"
 
-#: src/zookeeper/templates/edit.mako:36
+#: src/zookeeper/templates/edit.mako:37
 msgid "Edit Znode"
-msgstr ""
+msgstr "Editar Znode"
 
-#: src/zookeeper/templates/edit.mako:44
+#: src/zookeeper/templates/edit.mako:45
 msgid "Save"
-msgstr ""
+msgstr "Guardar"
 
 #: src/zookeeper/templates/index.mako:24 src/zookeeper/templates/view.mako:24
 msgid "View"
-msgstr ""
+msgstr "Ver"
 
 #: src/zookeeper/templates/index.mako:36
-msgid "Cluster"
-msgstr ""
+msgid "There are currently no clusters to browse."
+msgstr "Actualmente, não há clusters para navegar."
 
 #: src/zookeeper/templates/index.mako:39
+msgid "Please contact your administrator to solve this."
+msgstr "Contacte o seu administrador para resolver este problema."
+
+#: src/zookeeper/templates/index.mako:52
 msgid "Znode Hierarchy"
-msgstr ""
+msgstr "Hierarquia Znode"
 
-#: src/zookeeper/templates/index.mako:44 src/zookeeper/templates/view.mako:123
-#: src/zookeeper/templates/view.mako:147
+#: src/zookeeper/templates/index.mako:57 src/zookeeper/templates/view.mako:125
+#: src/zookeeper/templates/view.mako:149
 msgid "Node"
-msgstr ""
+msgstr "Nó"
 
-#: src/zookeeper/templates/index.mako:45
+#: src/zookeeper/templates/index.mako:58
 msgid "Role"
-msgstr ""
+msgstr "Função"
 
-#: src/zookeeper/templates/index.mako:46
+#: src/zookeeper/templates/index.mako:59
 msgid "Avg Latency"
-msgstr ""
+msgstr "Latência méd."
 
-#: src/zookeeper/templates/index.mako:47 src/zookeeper/templates/view.mako:66
+#: src/zookeeper/templates/index.mako:60 src/zookeeper/templates/view.mako:68
 msgid "Watch Count"
-msgstr ""
+msgstr "Contagem de observação"
 
-#: src/zookeeper/templates/index.mako:48 src/zookeeper/templates/view.mako:40
+#: src/zookeeper/templates/index.mako:61 src/zookeeper/templates/view.mako:42
 msgid "Version"
-msgstr ""
+msgstr "Versão"
 
 #: src/zookeeper/templates/shared_components.mako:29
 msgid "Go to cluster"
-msgstr ""
+msgstr "Ir para cluster"
 
-#: src/zookeeper/templates/tree.mako:43 src/zookeeper/templates/view.mako:87
+#: src/zookeeper/templates/shared_components.mako:81
+msgid "ZooKeeper Browser"
+msgstr "ZooKeeper Browser"
+
+#: src/zookeeper/templates/tree.mako:44 src/zookeeper/templates/view.mako:89
 msgid "Znodes"
-msgstr ""
+msgstr "Znodes"
 
-#: src/zookeeper/templates/tree.mako:50
+#: src/zookeeper/templates/tree.mako:51
 msgid "No children available"
-msgstr ""
-
-#: src/zookeeper/templates/tree.mako:53
-msgid "Add"
-msgstr ""
+msgstr "Sem subordinados disponíveis"
 
 #: src/zookeeper/templates/tree.mako:54
+msgid "Add"
+msgstr "Adicionar"
+
+#: src/zookeeper/templates/tree.mako:55
 #, python-format
 msgid "Are you sure you want to delete %s?"
-msgstr ""
+msgstr "Tem certeza de que deseja eliminar %s?"
 
-#: src/zookeeper/templates/tree.mako:54
+#: src/zookeeper/templates/tree.mako:55
 msgid "Remove current ZNode"
-msgstr ""
+msgstr "Remover ZNode actual"
 
 #: src/zookeeper/templates/tree.mako:63
 msgid "Text"
-msgstr ""
+msgstr "Texto"
 
-#: src/zookeeper/templates/tree.mako:64 src/zookeeper/templates/tree.mako:66
+#: src/zookeeper/templates/tree.mako:64
+msgid "Base64"
+msgstr "Base64"
+
+#: src/zookeeper/templates/tree.mako:65 src/zookeeper/templates/tree.mako:67
 msgid "Stats"
-msgstr ""
+msgstr "Estatísticas"
 
-#: src/zookeeper/templates/tree.mako:73
-msgid "Edit as Base64"
-msgstr ""
-
-#: src/zookeeper/templates/tree.mako:77
+#: src/zookeeper/templates/tree.mako:74
 msgid "Edit as Text"
-msgstr ""
+msgstr "Editar como texto"
 
-#: src/zookeeper/templates/tree.mako:108
+#: src/zookeeper/templates/tree.mako:78
+msgid "Edit as Base64"
+msgstr "Editar como Base64"
+
+#: src/zookeeper/templates/tree.mako:109
 msgid "Delete Znode?"
-msgstr ""
+msgstr "Eliminar Znode?"
 
-#: src/zookeeper/templates/tree.mako:115
+#: src/zookeeper/templates/tree.mako:116
 msgid "Yes, delete it!"
-msgstr ""
+msgstr "Sim, eliminar!"
 
-#: src/zookeeper/templates/view.mako:35 src/zookeeper/templates/view.mako:98
+#: src/zookeeper/templates/view.mako:37 src/zookeeper/templates/view.mako:100
 msgid "Key"
-msgstr ""
+msgstr "Chave"
 
-#: src/zookeeper/templates/view.mako:36 src/zookeeper/templates/view.mako:99
+#: src/zookeeper/templates/view.mako:38 src/zookeeper/templates/view.mako:101
 msgid "Value"
-msgstr ""
-
-#: src/zookeeper/templates/view.mako:45
-msgid "Latency"
-msgstr ""
+msgstr "Valor"
 
 #: src/zookeeper/templates/view.mako:47
-msgid "Min:"
-msgstr ""
-
-#: src/zookeeper/templates/view.mako:48
-msgid "Avg:"
-msgstr ""
+msgid "Latency"
+msgstr "Latência"
 
 #: src/zookeeper/templates/view.mako:49
+msgid "Min:"
+msgstr "Mín:"
+
+#: src/zookeeper/templates/view.mako:50
+msgid "Avg:"
+msgstr "Méd:"
+
+#: src/zookeeper/templates/view.mako:51
 msgid "Max:"
-msgstr ""
-
-#: src/zookeeper/templates/view.mako:54
-msgid "Packets"
-msgstr ""
-
-#: src/zookeeper/templates/view.mako:55
-msgid "Sent:"
-msgstr ""
+msgstr "Máx:"
 
 #: src/zookeeper/templates/view.mako:56
+msgid "Packets"
+msgstr "Pacotes"
+
+#: src/zookeeper/templates/view.mako:57
+msgid "Sent:"
+msgstr "Enviados:"
+
+#: src/zookeeper/templates/view.mako:58
 msgid "Received:"
-msgstr ""
+msgstr "Recebidos:"
 
-#: src/zookeeper/templates/view.mako:61
+#: src/zookeeper/templates/view.mako:63
 msgid "Outstanding Requests"
-msgstr ""
+msgstr "Pedidos pendentes"
 
-#: src/zookeeper/templates/view.mako:71
+#: src/zookeeper/templates/view.mako:73
 msgid "Open FD Count"
-msgstr ""
+msgstr "Abrir contador FD"
 
-#: src/zookeeper/templates/view.mako:76
+#: src/zookeeper/templates/view.mako:78
 msgid "Max FD Count"
-msgstr ""
+msgstr "Contagem máx. FD"
 
-#: src/zookeeper/templates/view.mako:88
+#: src/zookeeper/templates/view.mako:90
 msgid "View Znode Hierarchy"
-msgstr ""
+msgstr "Ver hierarquia Znode"
 
-#: src/zookeeper/templates/view.mako:94
+#: src/zookeeper/templates/view.mako:96
 msgid "General"
-msgstr ""
+msgstr "Geral"
 
-#: src/zookeeper/templates/view.mako:103
+#: src/zookeeper/templates/view.mako:105
 msgid "ZNode Count"
-msgstr ""
+msgstr "Contagem ZNode"
 
-#: src/zookeeper/templates/view.mako:108
+#: src/zookeeper/templates/view.mako:110
 msgid "Ephemerals Count"
-msgstr ""
+msgstr "Contador de efémeros"
 
-#: src/zookeeper/templates/view.mako:113
+#: src/zookeeper/templates/view.mako:115
 msgid "Approximate Data Size"
-msgstr ""
+msgstr "Tamanho aproximado de dados"
 
-#: src/zookeeper/templates/view.mako:122 src/zookeeper/templates/view.mako:146
+#: src/zookeeper/templates/view.mako:124 src/zookeeper/templates/view.mako:148
 msgid "Client Connections"
-msgstr ""
+msgstr "Ligações de cliente"
 
-#: src/zookeeper/templates/view.mako:123
+#: src/zookeeper/templates/view.mako:125
 msgid "leader"
-msgstr ""
+msgstr "líder"
 
-#: src/zookeeper/templates/view.mako:129
+#: src/zookeeper/templates/view.mako:131
 msgid "Followers"
-msgstr ""
+msgstr "Seguidores"
 
-#: src/zookeeper/templates/view.mako:133
+#: src/zookeeper/templates/view.mako:135
 msgid "Synced Followers"
-msgstr ""
+msgstr "Seguidores sincronizados"
 
-#: src/zookeeper/templates/view.mako:137
+#: src/zookeeper/templates/view.mako:139
 msgid "Pending Syncs"
-msgstr ""
+msgstr "Sincronizações pendentes"
 
-#: src/zookeeper/templates/view.mako:147
+#: src/zookeeper/templates/view.mako:149
 msgid "follower"
-msgstr ""
+msgstr "seguidor"
 
+#~ msgid "Cluster"
+#~ msgstr ""

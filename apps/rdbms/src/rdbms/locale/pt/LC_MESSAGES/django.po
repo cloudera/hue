@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-08-02 20:43-0700\n"
+"POT-Creation-Date: 2014-02-10 09:18-0800\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: pt <LL@li.org>\n"
@@ -17,28 +17,205 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/impala/conf.py:29
-msgid "Host of the Impala Server."
-msgstr "Anfitrião do Impala Server."
-
-#: src/impala/conf.py:34
-msgid "Port of the Impala Server."
-msgstr "Porta do servidor Impala."
-
-#: src/impala/conf.py:40
-#, fuzzy
-msgid "Beeswax or Hive Server 2 Thrift API used. Choices are: 'beeswax' or 'hiveserver2'."
-msgstr "Beeswax ou Hive Server 2 Thrift API utilizado. As opções são: \"beeswax\" ou \"hiveserver2\"."
-
-#: src/impala/conf.py:45
-msgid "Kerberos principal name for Impala. Typically 'impala/hostname.foo.com'."
-msgstr "Nome principal do Kerberos para o Impala. Normalmente \"impala/hostname.foo.com\"."
-
-#: src/impala/conf.py:63
-msgid "No available Impalad to send queries to."
-msgstr "Sem Impala disponível para enviar consultas."
-
-#: src/impala/views.py:35
+#: src/rdbms/api.py:129 src/rdbms/api.py:174 src/rdbms/api.py:257
 msgid "A POST request is required."
 msgstr "É necessário um pedido POST."
 
+#: src/rdbms/api.py:161 src/rdbms/api.py:199
+msgid "There was an error with your query."
+msgstr "Ocorreu um erro com a sua consulta."
+
+#: src/rdbms/api.py:284
+msgid "A GET request is required."
+msgstr "É necessário um pedido GET."
+
+#: src/rdbms/api.py:325
+msgid "Server specified doesn't exist."
+msgstr "O servidor especificado não existe."
+
+#: src/rdbms/api.py:331
+msgid "No databases are available. Permissions could be missing."
+msgstr "Não estão disponíveis bases de dados. Podem estar em falta permissões."
+
+#: src/rdbms/forms.py:23 src/rdbms/templates/common.mako:30
+#: src/rdbms/templates/execute.mako:62
+msgid "Query Editor"
+msgstr "Editor de consultas"
+
+#: src/rdbms/views.py:98
+#, python-format
+msgid "Invalid design type %(type)s"
+msgstr "Tipo de design inválido %(type)s"
+
+#: src/rdbms/templates/common.mako:27
+msgid "DB Query"
+msgstr "Consulta DB"
+
+#: src/rdbms/templates/common.mako:31
+msgid "My Queries"
+msgstr "As minhas consultas"
+
+#: src/rdbms/templates/common.mako:32
+msgid "Saved Queries"
+msgstr "Consultas guardadas"
+
+#: src/rdbms/templates/common.mako:33
+msgid "History"
+msgstr "Histórico"
+
+#: src/rdbms/templates/error.mako:23 src/rdbms/templates/execute.mako:23
+msgid "Query"
+msgstr "Consultar"
+
+#: src/rdbms/templates/error.mako:34
+msgid "There are currently no databases configured."
+msgstr "Actualmente, não está configurada nenhuma base de dados."
+
+#: src/rdbms/templates/error.mako:35
+msgid "Please go to your Hue configuration and add a database under the \"rdbms\" section."
+msgstr "Aceda à sua configuração Hue e adicione uma base de dados dentro da secção \"rdbms\"."
+
+#: src/rdbms/templates/execute.mako:33
+msgid "Server"
+msgstr "Servidor"
+
+#: src/rdbms/templates/execute.mako:46
+msgid "Database"
+msgstr "Base de dados"
+
+#: src/rdbms/templates/execute.mako:70 src/rdbms/templates/execute.mako:734
+msgid "Query name"
+msgstr "Nome da consulta"
+
+#: src/rdbms/templates/execute.mako:82
+msgid "Query description"
+msgstr "Descrição da consulta"
+
+#: src/rdbms/templates/execute.mako:93
+msgid "Your query has the following error(s):"
+msgstr "A sua consulta tem o(s) seguinte(s) erro(s):"
+
+#: src/rdbms/templates/execute.mako:102
+msgid "Execute"
+msgstr "Executar"
+
+#: src/rdbms/templates/execute.mako:103 src/rdbms/templates/execute.mako:196
+msgid "Save"
+msgstr "Guardar"
+
+#: src/rdbms/templates/execute.mako:104
+msgid "Save as..."
+msgstr "Guardar como..."
+
+#: src/rdbms/templates/execute.mako:105
+msgid "Explain"
+msgstr "Explicar"
+
+#: src/rdbms/templates/execute.mako:106
+msgid "or create a"
+msgstr "ou criar uma"
+
+#: src/rdbms/templates/execute.mako:106
+msgid "New query"
+msgstr "Nova consulta"
+
+#: src/rdbms/templates/execute.mako:132
+msgid "The server returned no results."
+msgstr "O servidor não devolveu resultados."
+
+#: src/rdbms/templates/execute.mako:152
+msgid "Double click on a table name or field to insert it in the editor"
+msgstr "Faça duplo clique num nome ou campo da tabela para o inserir no editor"
+
+#: src/rdbms/templates/execute.mako:153
+msgid "Manually refresh the table list"
+msgstr "Actualizar manualmente a lista da tabela"
+
+#: src/rdbms/templates/execute.mako:154
+msgid "Navigator"
+msgstr "Navigator"
+
+#: src/rdbms/templates/execute.mako:157
+msgid "Table name..."
+msgstr "Nome da tabela..."
+
+#: src/rdbms/templates/execute.mako:158
+msgid "The selected database has no tables."
+msgstr "A base de dados seleccionada não tem tabelas."
+
+#: src/rdbms/templates/execute.mako:176
+msgid "Save your query"
+msgstr "Guarde a sua consulta"
+
+#: src/rdbms/templates/execute.mako:181
+msgid "Name"
+msgstr "Nome"
+
+#: src/rdbms/templates/execute.mako:187
+msgid "Description"
+msgstr "Descrição"
+
+#: src/rdbms/templates/execute.mako:195
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: src/rdbms/templates/execute.mako:333
+msgid "Example: SELECT * FROM tablename, or press CTRL + space"
+msgstr "Exemplo: SELECT * FROM nome de tabela, ou prima CTRL + espaço"
+
+#: src/rdbms/templates/execute.mako:526
+msgid "Did you know?"
+msgstr "Sabia?"
+
+#: src/rdbms/templates/execute.mako:607
+msgid "No query provided to save."
+msgstr "Nenhuma consulta fornecida para guardar."
+
+#: src/rdbms/templates/execute.mako:728
+msgid "This field is required."
+msgstr "Este campo é obrigatório."
+
+#: src/rdbms/templates/execute.mako:741
+msgid "Empty description"
+msgstr "Descrição vazia"
+
+#: src/rdbms/templates/execute.mako:747
+msgid "Query saved successfully!"
+msgstr "Consulta guardada com êxito!"
+
+#: src/rdbms/templates/execute.mako:783
+msgid "No data available"
+msgstr "Não existem dados disponíveis"
+
+#: src/rdbms/templates/execute.mako:784
+msgid "No matching records"
+msgstr "Não existem registos correspondentes"
+
+#: src/rdbms/templates/execute.mako:822
+msgid "Server error occured: "
+msgstr "Ocorreu erro no servidor: "
+
+#: src/rdbms/templates/execute.mako:825
+msgid "Unmanageable server error occured: "
+msgstr "Ocorreu erro não gerível no servidor: "
+
+#~ msgid "Host of the Impala Server."
+#~ msgstr "Anfitrião do Impala Server."
+#~ msgid "Port of the Impala Server."
+#~ msgstr "Porta do servidor Impala."
+#~ msgid ""
+#~ "Beeswax or Hive Server 2 Thrift "
+#~ "API used. Choices are: 'beeswax' or "
+#~ "'hiveserver2'."
+#~ msgstr ""
+#~ "Beeswax ou Hive Server 2 Thrift "
+#~ "API utilizado. As opções são: "
+#~ "\"beeswax\" ou \"hiveserver2\"."
+#~ msgid ""
+#~ "Kerberos principal name for Impala. "
+#~ "Typically 'impala/hostname.foo.com'."
+#~ msgstr ""
+#~ "Nome principal do Kerberos para o "
+#~ "Impala. Normalmente \"impala/hostname.foo.com\"."
+#~ msgid "No available Impalad to send queries to."
+#~ msgstr "Sem Impala disponível para enviar consultas."

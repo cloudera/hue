@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-08-02 20:43-0700\n"
+"POT-Creation-Date: 2014-02-10 09:18-0800\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -17,28 +17,200 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/impala/conf.py:29
-msgid "Host of the Impala Server."
-msgstr "Impala 服务器主机。"
-
-#: src/impala/conf.py:34
-msgid "Port of the Impala Server."
-msgstr "Impala 服务器端口。"
-
-#: src/impala/conf.py:40
-#, fuzzy
-msgid "Beeswax or Hive Server 2 Thrift API used. Choices are: 'beeswax' or 'hiveserver2'."
-msgstr "已使用 Beeswax 或 Hive Server 2 Thrift API。选择是：'beeswax' 或 'hiveserver2'。"
-
-#: src/impala/conf.py:45
-msgid "Kerberos principal name for Impala. Typically 'impala/hostname.foo.com'."
-msgstr "Impala 的 Kerberos 主体名称。通常为“impala/hostname.foo.com”。"
-
-#: src/impala/conf.py:63
-msgid "No available Impalad to send queries to."
-msgstr "没有可向其发送查询的 Impalad。"
-
-#: src/impala/views.py:35
+#: src/rdbms/api.py:129 src/rdbms/api.py:174 src/rdbms/api.py:257
 msgid "A POST request is required."
 msgstr "需要 POST 请求。"
 
+#: src/rdbms/api.py:161 src/rdbms/api.py:199
+msgid "There was an error with your query."
+msgstr "您的查询存在错误。"
+
+#: src/rdbms/api.py:284
+msgid "A GET request is required."
+msgstr "需要 GET 请求。"
+
+#: src/rdbms/api.py:325
+msgid "Server specified doesn't exist."
+msgstr "指定服务器不存在。"
+
+#: src/rdbms/api.py:331
+msgid "No databases are available. Permissions could be missing."
+msgstr "无可用数据库。可能缺少权限。"
+
+#: src/rdbms/forms.py:23 src/rdbms/templates/common.mako:30
+#: src/rdbms/templates/execute.mako:62
+msgid "Query Editor"
+msgstr "查询编辑器"
+
+#: src/rdbms/views.py:98
+#, python-format
+msgid "Invalid design type %(type)s"
+msgstr "无效设计类型 %(type)s"
+
+#: src/rdbms/templates/common.mako:27
+msgid "DB Query"
+msgstr "DB 查询"
+
+#: src/rdbms/templates/common.mako:31
+msgid "My Queries"
+msgstr "我的查询"
+
+#: src/rdbms/templates/common.mako:32
+msgid "Saved Queries"
+msgstr "保存的查询"
+
+#: src/rdbms/templates/common.mako:33
+msgid "History"
+msgstr "历史记录"
+
+#: src/rdbms/templates/error.mako:23 src/rdbms/templates/execute.mako:23
+msgid "Query"
+msgstr "查询"
+
+#: src/rdbms/templates/error.mako:34
+msgid "There are currently no databases configured."
+msgstr "当前没有已配置的数据库。"
+
+#: src/rdbms/templates/error.mako:35
+msgid "Please go to your Hue configuration and add a database under the \"rdbms\" section."
+msgstr "请转到您的 Hue 配置并在“rdbms”部分下方添加数据库。"
+
+#: src/rdbms/templates/execute.mako:33
+msgid "Server"
+msgstr "服务器"
+
+#: src/rdbms/templates/execute.mako:46
+msgid "Database"
+msgstr "数据库"
+
+#: src/rdbms/templates/execute.mako:70 src/rdbms/templates/execute.mako:734
+msgid "Query name"
+msgstr "查询名称"
+
+#: src/rdbms/templates/execute.mako:82
+msgid "Query description"
+msgstr "查询描述"
+
+#: src/rdbms/templates/execute.mako:93
+msgid "Your query has the following error(s):"
+msgstr "您的查询有下列错误："
+
+#: src/rdbms/templates/execute.mako:102
+msgid "Execute"
+msgstr "执行"
+
+#: src/rdbms/templates/execute.mako:103 src/rdbms/templates/execute.mako:196
+msgid "Save"
+msgstr "保存"
+
+#: src/rdbms/templates/execute.mako:104
+msgid "Save as..."
+msgstr "另存为..."
+
+#: src/rdbms/templates/execute.mako:105
+msgid "Explain"
+msgstr "解释"
+
+#: src/rdbms/templates/execute.mako:106
+msgid "or create a"
+msgstr "或创建一个"
+
+#: src/rdbms/templates/execute.mako:106
+msgid "New query"
+msgstr "新查询"
+
+#: src/rdbms/templates/execute.mako:132
+msgid "The server returned no results."
+msgstr "服务器未返回结果。"
+
+#: src/rdbms/templates/execute.mako:152
+msgid "Double click on a table name or field to insert it in the editor"
+msgstr "双击表名或字段以将其插入编辑器中"
+
+#: src/rdbms/templates/execute.mako:153
+msgid "Manually refresh the table list"
+msgstr "手动刷新表列表"
+
+#: src/rdbms/templates/execute.mako:154
+msgid "Navigator"
+msgstr "Navigator"
+
+#: src/rdbms/templates/execute.mako:157
+msgid "Table name..."
+msgstr "表名..."
+
+#: src/rdbms/templates/execute.mako:158
+msgid "The selected database has no tables."
+msgstr "所选数据库没有表。"
+
+#: src/rdbms/templates/execute.mako:176
+msgid "Save your query"
+msgstr "保存您的查询"
+
+#: src/rdbms/templates/execute.mako:181
+msgid "Name"
+msgstr "名称"
+
+#: src/rdbms/templates/execute.mako:187
+msgid "Description"
+msgstr "描述"
+
+#: src/rdbms/templates/execute.mako:195
+msgid "Cancel"
+msgstr "取消"
+
+#: src/rdbms/templates/execute.mako:333
+msgid "Example: SELECT * FROM tablename, or press CTRL + space"
+msgstr "示例：SELECT * FROM 表名，或按 CTRL + 空格键"
+
+#: src/rdbms/templates/execute.mako:526
+msgid "Did you know?"
+msgstr "您知道吗？"
+
+#: src/rdbms/templates/execute.mako:607
+msgid "No query provided to save."
+msgstr "没有提供要保存的查询。"
+
+#: src/rdbms/templates/execute.mako:728
+msgid "This field is required."
+msgstr "此字段为必填字段。"
+
+#: src/rdbms/templates/execute.mako:741
+msgid "Empty description"
+msgstr "空描述"
+
+#: src/rdbms/templates/execute.mako:747
+msgid "Query saved successfully!"
+msgstr "查询已成功保存！"
+
+#: src/rdbms/templates/execute.mako:783
+msgid "No data available"
+msgstr "没有可用数据"
+
+#: src/rdbms/templates/execute.mako:784
+msgid "No matching records"
+msgstr "没有匹配记录"
+
+#: src/rdbms/templates/execute.mako:822
+msgid "Server error occured: "
+msgstr "发生服务器错误： "
+
+#: src/rdbms/templates/execute.mako:825
+msgid "Unmanageable server error occured: "
+msgstr "发生无法管理的服务器错误： "
+
+#~ msgid "Host of the Impala Server."
+#~ msgstr "Impala 服务器主机。"
+#~ msgid "Port of the Impala Server."
+#~ msgstr "Impala 服务器端口。"
+#~ msgid ""
+#~ "Beeswax or Hive Server 2 Thrift "
+#~ "API used. Choices are: 'beeswax' or "
+#~ "'hiveserver2'."
+#~ msgstr "已使用 Beeswax 或 Hive Server 2 Thrift API。选择是：'beeswax' 或 'hiveserver2'。"
+#~ msgid ""
+#~ "Kerberos principal name for Impala. "
+#~ "Typically 'impala/hostname.foo.com'."
+#~ msgstr "Impala 的 Kerberos 主体名称。通常为“impala/hostname.foo.com”。"
+#~ msgid "No available Impalad to send queries to."
+#~ msgstr "没有可向其发送查询的 Impalad。"

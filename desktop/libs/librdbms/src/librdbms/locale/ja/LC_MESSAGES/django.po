@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-08-02 20:43-0700\n"
+"POT-Creation-Date: 2014-02-10 09:18-0800\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -17,28 +17,93 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/impala/conf.py:29
-msgid "Host of the Impala Server."
-msgstr "Impala Server のホストです。"
+#: src/librdbms/conf.py:26
+msgid "RDBMS server configurations."
+msgstr "RDBMS サーバーの設定です。"
 
-#: src/impala/conf.py:34
-msgid "Port of the Impala Server."
-msgstr "Impala Server のポートです。"
+#: src/librdbms/conf.py:28
+msgid "RDBMS server configuration."
+msgstr "RDBMS サーバーの設定です。"
 
-#: src/impala/conf.py:40
-#, fuzzy
-msgid "Beeswax or Hive Server 2 Thrift API used. Choices are: 'beeswax' or 'hiveserver2'."
-msgstr "Beeswax または Hive Server 2 Thrift API を使用します。選択肢には 'beeswax' と 'hiveserver2' があります。"
+#: src/librdbms/conf.py:32
+msgid "Nice name of server."
+msgstr "サーバーの適切な名前です。"
 
-#: src/impala/conf.py:45
-msgid "Kerberos principal name for Impala. Typically 'impala/hostname.foo.com'."
-msgstr "Impala の Kerberos プリンシパル名。普通は 'impala/hostname.foo.com' です。"
+#: src/librdbms/conf.py:38
+msgid "Database name or path to database file. If provided, then choosing other databases will not be permitted."
+msgstr "データベース名、またはデータベースファイルへのパスです。指定されている場合、その他のデータベースを選択することは許可されません。"
 
-#: src/impala/conf.py:63
-msgid "No available Impalad to send queries to."
-msgstr "クエリ送信先に利用できる Impalad はありません。"
+#: src/librdbms/conf.py:44
+msgid "Database engine, such as postgresql_psycopg2, mysql, or sqlite3."
+msgstr "postgresql_psycopg2、mysql、sqlite3 などのデータベースエンジンです。"
 
-#: src/impala/views.py:35
-msgid "A POST request is required."
-msgstr "POST 要求が必要です。"
+#: src/librdbms/conf.py:50
+msgid "Database username."
+msgstr "データベースのユーザー名です。"
 
+#: src/librdbms/conf.py:56
+msgid "Database password."
+msgstr "データベースのパスワードです。"
+
+#: src/librdbms/conf.py:62
+msgid "Database host."
+msgstr "データベースのホストです。"
+
+#: src/librdbms/conf.py:68
+msgid "Database port."
+msgstr "データベースのポートです。"
+
+#: src/librdbms/conf.py:74
+msgid "Database options to send to the server when connecting."
+msgstr "接続時にサーバーに送信するデータベースオプションです。"
+
+#: src/librdbms/conf.py:90
+msgid "Database name should not be empty for the SQLite backend."
+msgstr "SQLite バックエンドのデータベース名は空にできません。"
+
+#: src/librdbms/conf.py:92
+msgid "Database name should not be empty for the Oracle backend. It should be the SID of your database."
+msgstr "Oracle バックエンドのデータベース名は空にできません。データベースの SID にする必要があります。"
+
+#: src/librdbms/conf.py:94
+msgid "Database name should not be empty for the PostgreSQL backend."
+msgstr "PostgreSQL バックエンドのデータベース名は空にできません。"
+
+#: src/librdbms/design.py:110
+msgid "No server!"
+msgstr "サーバーがありません。"
+
+#: src/librdbms/design.py:112
+msgid "No database!"
+msgstr "データベースがありません。"
+
+#: src/librdbms/server/mysql_lib.py:80
+#, python-format
+msgid "Database '%s' is not allowed. Please use database '%s'."
+msgstr "データベース '%s' は使用できません。データベース '%s' を使用してください。"
+
+#: src/librdbms/server/mysql_lib.py:107
+#, python-format
+msgid "Cannot locate the %s database. Are you sure your configuration is correct?"
+msgstr "%s データベースが見つかりません。設定は正しいですか？"
+
+#~ msgid "Host of the Impala Server."
+#~ msgstr "Impala Server のホストです。"
+#~ msgid "Port of the Impala Server."
+#~ msgstr "Impala Server のポートです。"
+#~ msgid ""
+#~ "Beeswax or Hive Server 2 Thrift "
+#~ "API used. Choices are: 'beeswax' or "
+#~ "'hiveserver2'."
+#~ msgstr ""
+#~ "Beeswax または Hive Server 2 Thrift "
+#~ "API を使用します。選択肢には 'beeswax' と 'hiveserver2' "
+#~ "があります。"
+#~ msgid ""
+#~ "Kerberos principal name for Impala. "
+#~ "Typically 'impala/hostname.foo.com'."
+#~ msgstr "Impala の Kerberos プリンシパル名。普通は 'impala/hostname.foo.com' です。"
+#~ msgid "No available Impalad to send queries to."
+#~ msgstr "クエリ送信先に利用できる Impalad はありません。"
+#~ msgid "A POST request is required."
+#~ msgstr "POST 要求が必要です。"

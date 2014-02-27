@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-08-02 20:43-0700\n"
+"POT-Creation-Date: 2014-02-10 09:18-0800\n"
 "PO-Revision-Date: 2012-07-30 18:50-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -17,46 +17,56 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
+#: src/search/api.py:81 src/search/api.py:94 src/search/api.py:105
+#: src/search/api.py:118 src/search/api.py:127 src/search/api.py:137
+#: src/search/api.py:147
+msgid "Error while accessing Solr"
+msgstr "Solr へのアクセス中のエラー"
+
 #: src/search/conf.py:25
 msgid "URL of the Solr Server."
-msgstr "Solr サーバーの URL。"
+msgstr "Solr サーバーの URL です。"
 
 #: src/search/conf.py:30
 msgid "Query sent when no term is entered."
-msgstr "用語が入力されないときはクエリが送信されます。"
+msgstr "用語が入力されずにクエリが送信されました。"
+
+#: src/search/conf.py:35
+msgid "Whether Solr requires client to perform Kerberos authentication."
+msgstr "Solr が Kerberos 認証の実行をクライアントに要求するかどうかの指定です。"
 
 #: src/search/decorators.py:32
 msgid "Permission denied. You are not an Administrator."
 msgstr "パーミッションが拒否されました。管理者ではありません。"
 
-#: src/search/forms.py:70
+#: src/search/forms.py:95
 #, python-format
 msgid "No live Solr collection or core by the name %s."
-msgstr "%s という名前のライブ Solr コレクションまたはコアはありません。"
+msgstr "名前が %s のライブ Solr コレクションまたはコアがありません。"
 
-#: src/search/models.py:247
+#: src/search/models.py:267
 msgid "Solr index name pointing to"
-msgstr "次を指す Solr インデックス名"
+msgstr "Solr インデックス名が指している先"
 
-#: src/search/models.py:248
+#: src/search/models.py:268
 msgid "Friendlier name in UI"
 msgstr "UI のわかりやすい名前"
 
-#: src/search/models.py:250
+#: src/search/models.py:270
 msgid "Collection with cores data"
-msgstr "コアデータによるコレクション"
+msgstr "コアデータを含むコレクション"
 
-#: src/search/models.py:250
+#: src/search/models.py:270
 msgid "Solr json"
-msgstr "Solr json"
+msgstr "Solr JSON"
 
-#: src/search/models.py:252 src/search/templates/layout.mako:81
+#: src/search/models.py:272 src/search/templates/layout.mako:81
 msgid "Properties"
 msgstr "プロパティ"
 
-#: src/search/models.py:253
+#: src/search/models.py:273
 msgid "Hue properties (e.g. results by pages number)"
-msgstr "Hue のプロパティ（例：ページ番号による結果）"
+msgstr "Hue プロパティ（例：ページ番号による結果）"
 
 #: src/search/search_controller.py:79
 #, python-format
@@ -67,52 +77,59 @@ msgstr "コレクションタイプが存在しません：%s"
 msgid " (Copy)"
 msgstr " （コピー）"
 
-#: src/search/views.py:76
+#: src/search/views.py:84
 msgid "There is no collection to search."
-msgstr "検索するコレクションはありません。"
+msgstr "検索するコレクションがありません。"
 
-#: src/search/views.py:128
-msgid "Error"
-msgstr "エラー"
+#: src/search/views.py:108
+msgid "No collection to download."
+msgstr "ダウンロードするコレクションがありません。"
 
-#: src/search/views.py:140
-msgid "Imported successfully"
-msgstr "正常にインポートされました"
+#: src/search/views.py:126 src/search/views.py:128
+#, python-format
+msgid "Could not download search results: %s"
+msgstr "検索結果をダウンロードできませんでした：%s"
 
-#: src/search/views.py:140
-msgid "Imported with errors: "
-msgstr "インポートされ次のエラーが発生しました： "
+#: src/search/views.py:176
+msgid "Collection(s) or core(s) imported successfully!"
+msgstr "コレクションまたはコアが正常にインポートされました。"
 
-#: src/search/views.py:170 src/search/views.py:184
+#: src/search/views.py:179
+msgid "There was an error importing the collection(s) or core(s)"
+msgstr "コレクションまたはコアのインポート中にエラーが発生しました"
+
+#: src/search/views.py:182
+msgid "Collection(s) or core(s) partially imported"
+msgstr "コレクションまたはコアが部分的にインポートされました"
+
+#: src/search/views.py:220 src/search/views.py:234
 msgid "POST request required."
 msgstr "POST 要求が必要です。"
 
-#: src/search/views.py:209
+#: src/search/views.py:260
 #, python-format
 msgid "Errors on the form: %s."
-msgstr "フォームのエラー：%s。"
+msgstr "フォーム %s のエラー"
 
 #: src/search/templates/admin_collection_facets.mako:25
 #: src/search/templates/admin_collection_highlighting.mako:25
-#: src/search/templates/admin_collection_highlighting.mako:138
+#: src/search/templates/admin_collection_highlighting.mako:140
 #: src/search/templates/admin_collection_properties.mako:27
 #: src/search/templates/admin_collection_sorting.mako:25
 #: src/search/templates/admin_collection_template.mako:25
 #: src/search/templates/admin_collections.mako:25
 #: src/search/templates/no_collections.mako:25
-#: src/search/templates/search.mako:25
+#: src/search/templates/search.mako:28 src/search/templates/search.mako:59
 msgid "Search"
 msgstr "検索"
 
 #: src/search/templates/admin_collection_facets.mako:29
-#: src/search/templates/admin_collection_highlighting.mako:29
-#: src/search/templates/admin_collection_sorting.mako:29
-msgid "Search Admin - "
-msgstr "管理者の検索 - "
+msgid "Facets for"
+msgstr "次のファセット"
 
 #: src/search/templates/admin_collection_facets.mako:46
-#: src/search/templates/admin_collection_highlighting.mako:42
-#: src/search/templates/admin_collection_sorting.mako:47
+#: src/search/templates/admin_collection_highlighting.mako:43
+#: src/search/templates/admin_collection_sorting.mako:48
 msgid "Enabled"
 msgstr "有効"
 
@@ -122,15 +139,15 @@ msgstr "ファセット"
 
 #: src/search/templates/admin_collection_facets.mako:50
 msgid "Facets provide an intuitive way to filter the results."
-msgstr "ファセットを使用すると、直観的な方法で結果をフィルタできます。"
+msgstr "ファセットは、結果をフィルタ処理する直感的な方法を提供します。"
 
 #: src/search/templates/admin_collection_facets.mako:51
 msgid "Different types of facets can be added on the following steps."
-msgstr "次の手順で別のタイプのファセットを追加できます。"
+msgstr "次の手順で各種のファセットを追加できます。"
 
 #: src/search/templates/admin_collection_facets.mako:52
 msgid "Facets are currently disabled."
-msgstr "ファセットは現在無効です。"
+msgstr "ファセットは現在無効になっています。"
 
 #: src/search/templates/admin_collection_facets.mako:58
 msgid "Step 1: General"
@@ -149,274 +166,332 @@ msgid "Step 4: Date Facets"
 msgstr "手順 4：日付ファセット"
 
 #: src/search/templates/admin_collection_facets.mako:62
-msgid "Step 5: Facets Order"
-msgstr "手順 5：ファセットの順序"
+msgid "Step 5: Graphical Facet"
+msgstr "手順 5：グラフィカルファセット"
 
-#: src/search/templates/admin_collection_facets.mako:67
+#: src/search/templates/admin_collection_facets.mako:63
+msgid "Step 6: Facets Order"
+msgstr "手順 6：ファセットの順序"
+
+#: src/search/templates/admin_collection_facets.mako:68
 msgid "Limit"
 msgstr "制限"
 
-#: src/search/templates/admin_collection_facets.mako:73
+#: src/search/templates/admin_collection_facets.mako:74
 msgid "Mincount"
-msgstr "Mincount"
+msgstr "最小カウント"
 
-#: src/search/templates/admin_collection_facets.mako:79
+#: src/search/templates/admin_collection_facets.mako:80
 msgid "Sort"
 msgstr "ソート"
 
-#: src/search/templates/admin_collection_facets.mako:91
-msgid "There are currently no field Facets defined."
+#: src/search/templates/admin_collection_facets.mako:92
+msgid "There are currently no field facets defined."
 msgstr "現在、定義されているフィールドファセットはありません。"
 
-#: src/search/templates/admin_collection_facets.mako:102
-#: src/search/templates/admin_collection_facets.mako:129
-#: src/search/templates/admin_collection_facets.mako:163
-#: src/search/templates/admin_collection_sorting.mako:72
+#: src/search/templates/admin_collection_facets.mako:103
+#: src/search/templates/admin_collection_facets.mako:130
+#: src/search/templates/admin_collection_facets.mako:164
+#: src/search/templates/admin_collection_facets.mako:208
+#: src/search/templates/admin_collection_sorting.mako:74
 msgid "Field"
 msgstr "フィールド"
 
-#: src/search/templates/admin_collection_facets.mako:104
-#: src/search/templates/admin_collection_facets.mako:131
-#: src/search/templates/admin_collection_facets.mako:165
-#: src/search/templates/admin_collection_sorting.mako:74
+#: src/search/templates/admin_collection_facets.mako:105
+#: src/search/templates/admin_collection_facets.mako:132
+#: src/search/templates/admin_collection_facets.mako:166
+#: src/search/templates/admin_collection_facets.mako:210
+#: src/search/templates/admin_collection_sorting.mako:76
 msgid "Label"
 msgstr "ラベル"
 
-#: src/search/templates/admin_collection_facets.mako:108
+#: src/search/templates/admin_collection_facets.mako:109
 msgid "Add to Field Facets"
 msgstr "フィールドファセットに追加"
 
-#: src/search/templates/admin_collection_facets.mako:109
+#: src/search/templates/admin_collection_facets.mako:110
 msgid "The field you are trying to add is already in the list."
-msgstr "追加しようとしているフィールドは、すでにリストに存在しています。"
+msgstr "追加しようとしているフィールドはすでにリストにあります。"
 
-#: src/search/templates/admin_collection_facets.mako:115
-msgid "There are currently no Range Facets defined."
+#: src/search/templates/admin_collection_facets.mako:116
+msgid "There are currently no range facets defined."
 msgstr "現在、定義されている範囲ファセットはありません。"
 
-#: src/search/templates/admin_collection_facets.mako:135
+#: src/search/templates/admin_collection_facets.mako:136
+#: src/search/templates/admin_collection_facets.mako:214
 msgid "Start"
 msgstr "開始"
 
-#: src/search/templates/admin_collection_facets.mako:137
+#: src/search/templates/admin_collection_facets.mako:138
+#: src/search/templates/admin_collection_facets.mako:216
 msgid "End"
 msgstr "終了"
 
-#: src/search/templates/admin_collection_facets.mako:139
+#: src/search/templates/admin_collection_facets.mako:140
+#: src/search/templates/admin_collection_facets.mako:218
 msgid "Gap"
-msgstr "ギャップ"
+msgstr "間隔"
 
-#: src/search/templates/admin_collection_facets.mako:143
+#: src/search/templates/admin_collection_facets.mako:144
 msgid "Add to Range Facets"
 msgstr "範囲ファセットに追加"
 
-#: src/search/templates/admin_collection_facets.mako:149
-msgid "There are currently no Date Facets defined."
+#: src/search/templates/admin_collection_facets.mako:150
+msgid "There are currently no date facets defined."
 msgstr "現在、定義されている日付ファセットはありません。"
 
-#: src/search/templates/admin_collection_facets.mako:170
+#: src/search/templates/admin_collection_facets.mako:171
 msgid "Range from"
-msgstr "範囲の始まり"
+msgstr "範囲開始"
 
-#: src/search/templates/admin_collection_facets.mako:174
+#: src/search/templates/admin_collection_facets.mako:175
 msgid "before today until"
-msgstr "今日より前で次まで"
+msgstr "本日より前（規定）"
 
-#: src/search/templates/admin_collection_facets.mako:178
+#: src/search/templates/admin_collection_facets.mako:179
 msgid "before today. Goes up by increments of"
-msgstr "今日より前で、次ごとにさかのぼる"
+msgstr "本日より前です。次の値ずつ増加します"
 
-#: src/search/templates/admin_collection_facets.mako:183
+#: src/search/templates/admin_collection_facets.mako:184
 msgid "Date format"
-msgstr "日付形式"
+msgstr "日付フォーマット"
 
-#: src/search/templates/admin_collection_facets.mako:187
+#: src/search/templates/admin_collection_facets.mako:188
 msgid "Add to Date Facets"
 msgstr "日付ファセットに追加"
 
-#: src/search/templates/admin_collection_facets.mako:193
+#: src/search/templates/admin_collection_facets.mako:194
+msgid "There is currently no graphical facet defined. Remember, you can add just one field as graphical facet."
+msgstr "現在、定義されているグラフィカルファセットはありません。ただし、グラフィカルファセットとして追加できるフィールドは 1 つのみです。"
+
+#: src/search/templates/admin_collection_facets.mako:215
+msgid "ie. 0"
+msgstr "ie. 0"
+
+#: src/search/templates/admin_collection_facets.mako:215
+msgid "ie. NOW-12HOURS/MINUTES"
+msgstr "ie. NOW-12HOURS/MINUTES"
+
+#: src/search/templates/admin_collection_facets.mako:217
+msgid "ie. 100"
+msgstr "ie. 100"
+
+#: src/search/templates/admin_collection_facets.mako:217
+msgid "ie. NOW"
+msgstr "ie. NOW"
+
+#: src/search/templates/admin_collection_facets.mako:219
+msgid "ie. 10"
+msgstr "ie. 10"
+
+#: src/search/templates/admin_collection_facets.mako:219
+msgid "ie. +30MINUTES"
+msgstr "ie. +30MINUTES"
+
+#: src/search/templates/admin_collection_facets.mako:220
+msgid "If empty this will be treated as a simple Field Facet."
+msgstr "空の場合、これは単純なフィールドファセットとして処理されます。"
+
+#: src/search/templates/admin_collection_facets.mako:220
+msgid "Read more about facets..."
+msgstr "ファセットの詳細..."
+
+#: src/search/templates/admin_collection_facets.mako:223
+msgid "Set as Graphical Facet"
+msgstr "グラフィカルファセットとして設定"
+
+#: src/search/templates/admin_collection_facets.mako:224
+#: src/search/templates/admin_collection_facets.mako:225
+msgid "You can add just one field as graphical facet"
+msgstr "グラフィカルファセットとして追加できるフィールドは 1 つのみです"
+
+#: src/search/templates/admin_collection_facets.mako:231
 msgid "There are currently no Facets defined."
 msgstr "現在、定義されているファセットはありません。"
 
-#: src/search/templates/admin_collection_facets.mako:221
+#: src/search/templates/admin_collection_facets.mako:259
 msgid "Back"
 msgstr "戻る"
 
-#: src/search/templates/admin_collection_facets.mako:222
+#: src/search/templates/admin_collection_facets.mako:260
 msgid "Next"
 msgstr "次へ"
 
-#: src/search/templates/admin_collection_facets.mako:223
-#: src/search/templates/admin_collection_highlighting.mako:60
-#: src/search/templates/admin_collection_properties.mako:72
-#: src/search/templates/admin_collection_sorting.mako:88
-#: src/search/templates/admin_collection_template.mako:286
+#: src/search/templates/admin_collection_facets.mako:261
+#: src/search/templates/admin_collection_highlighting.mako:61
+#: src/search/templates/admin_collection_properties.mako:75
+#: src/search/templates/admin_collection_sorting.mako:93
+#: src/search/templates/admin_collection_template.mako:276
 msgid "Save"
 msgstr "保存"
 
-#: src/search/templates/admin_collection_facets.mako:233
+#: src/search/templates/admin_collection_facets.mako:272
 msgid "Format Help"
-msgstr "書式のヘルプ"
+msgstr "フォーマットのヘルプ"
 
-#: src/search/templates/admin_collection_facets.mako:237
+#: src/search/templates/admin_collection_facets.mako:276
 msgid "You can specify here how you want the date to be formatted."
-msgstr "日付を書式設定する方法はここで指定できます。"
+msgstr "ここに日付のフォーマット方法を指定できます。"
 
-#: src/search/templates/admin_collection_facets.mako:239
+#: src/search/templates/admin_collection_facets.mako:278
 msgid "Use a predefined format:"
-msgstr "次の定義済み形式を使用："
+msgstr "事前定義済みフォーマットを使用："
 
-#: src/search/templates/admin_collection_facets.mako:273
+#: src/search/templates/admin_collection_facets.mako:312
 msgid "or any combination of these fields:"
 msgstr "またはこれらのフィールドの任意の組み合わせ："
 
-#: src/search/templates/admin_collection_facets.mako:279
+#: src/search/templates/admin_collection_facets.mako:318
 msgid "Token"
 msgstr "トークン"
 
-#: src/search/templates/admin_collection_facets.mako:280
+#: src/search/templates/admin_collection_facets.mako:319
 msgid "Output"
 msgstr "出力"
 
-#: src/search/templates/admin_collection_facets.mako:283
+#: src/search/templates/admin_collection_facets.mako:322
 msgid "Relative time"
 msgstr "相対時間"
 
-#: src/search/templates/admin_collection_facets.mako:285
+#: src/search/templates/admin_collection_facets.mako:324
 msgid "9 hours ago"
 msgstr "9 時間前"
 
-#: src/search/templates/admin_collection_facets.mako:288
+#: src/search/templates/admin_collection_facets.mako:327
 msgid "Month"
 msgstr "月"
 
-#: src/search/templates/admin_collection_facets.mako:305
+#: src/search/templates/admin_collection_facets.mako:344
 msgid "Jan Feb ... Nov Dec"
-msgstr "1 月 2 月 ... 11 月 12 月"
+msgstr "1 月、2 月 ... 11 月、12 月"
 
-#: src/search/templates/admin_collection_facets.mako:310
+#: src/search/templates/admin_collection_facets.mako:349
 msgid "January February ... November December"
-msgstr "1 月 2 月 ... 11 月 12 月"
+msgstr "1 月、2 月 ... 11 月、12 月"
 
-#: src/search/templates/admin_collection_facets.mako:313
+#: src/search/templates/admin_collection_facets.mako:352
 msgid "Day of Month"
-msgstr "月の日付"
+msgstr "通算日付（月）"
 
-#: src/search/templates/admin_collection_facets.mako:320
+#: src/search/templates/admin_collection_facets.mako:359
 msgid "1st 2nd ... 30th 31st"
-msgstr "1 日 2 日 ... 30 日 31 日"
+msgstr "1 日目、2 日目 ... 30 日目、31 日目"
 
-#: src/search/templates/admin_collection_facets.mako:328
+#: src/search/templates/admin_collection_facets.mako:367
 msgid "Day of Year"
-msgstr "年の日付"
+msgstr "通算日付（年）"
 
-#: src/search/templates/admin_collection_facets.mako:335
+#: src/search/templates/admin_collection_facets.mako:374
 msgid "1st 2nd ... 364th 365th"
-msgstr "1 日目 2 日目 ... 364 日目 365 日目"
+msgstr "1 日目、2 日目 ... 364 日目、 365 日目"
 
-#: src/search/templates/admin_collection_facets.mako:343
+#: src/search/templates/admin_collection_facets.mako:382
 msgid "Day of Week"
-msgstr "曜日"
+msgstr "通算日付（週）"
 
-#: src/search/templates/admin_collection_facets.mako:350
+#: src/search/templates/admin_collection_facets.mako:389
 msgid "0th 1st ... 5th 6th"
-msgstr "0 番目 1 番目... 5 番目 6 番目"
+msgstr "0 日目、1 日目 ... 5 日目、6 日目"
 
-#: src/search/templates/admin_collection_facets.mako:355
+#: src/search/templates/admin_collection_facets.mako:394
 msgid "Sun Mon ... Fri Sat"
-msgstr "日 月 ... 金 土"
+msgstr "日、月 ... 金、土"
 
-#: src/search/templates/admin_collection_facets.mako:360
+#: src/search/templates/admin_collection_facets.mako:399
 msgid "Sunday Monday ... Friday Saturday"
-msgstr "日曜日 月曜日 ... 金曜日 土曜日"
+msgstr "日曜日、月曜日 ... 金曜日、土曜日"
 
-#: src/search/templates/admin_collection_facets.mako:363
+#: src/search/templates/admin_collection_facets.mako:402
 msgid "Week of Year"
-msgstr "年の週"
+msgstr "年単位の週"
 
-#: src/search/templates/admin_collection_facets.mako:370
-#: src/search/templates/admin_collection_facets.mako:385
+#: src/search/templates/admin_collection_facets.mako:409
+#: src/search/templates/admin_collection_facets.mako:424
 msgid "1st 2nd ... 52nd 53rd"
-msgstr "1 週目 2 週目 ... 52 週目 53 週目"
+msgstr "1 番目、2 番目 ... 52 番目、53 番目"
 
-#: src/search/templates/admin_collection_facets.mako:378
+#: src/search/templates/admin_collection_facets.mako:417
 msgid "ISO Week of Year"
-msgstr "年の ISO 週"
+msgstr "ISO 週／年"
 
-#: src/search/templates/admin_collection_facets.mako:393
+#: src/search/templates/admin_collection_facets.mako:432
 msgid "Year"
 msgstr "年"
 
-#: src/search/templates/admin_collection_facets.mako:413
+#: src/search/templates/admin_collection_facets.mako:452
 msgid "Hour"
 msgstr "時"
 
-#: src/search/templates/admin_collection_facets.mako:433
+#: src/search/templates/admin_collection_facets.mako:472
 msgid "Minute"
 msgstr "分"
 
-#: src/search/templates/admin_collection_facets.mako:443
+#: src/search/templates/admin_collection_facets.mako:482
 msgid "Second"
 msgstr "秒"
 
-#: src/search/templates/admin_collection_facets.mako:453
+#: src/search/templates/admin_collection_facets.mako:492
 msgid "Fractional Second"
-msgstr "秒の小数部"
+msgstr "小数秒"
 
-#: src/search/templates/admin_collection_facets.mako:473
+#: src/search/templates/admin_collection_facets.mako:512
 msgid "Unix Timestamp"
-msgstr "Unix タイムスタンプ"
+msgstr "UNIX タイムスタンプ"
 
-#: src/search/templates/admin_collection_facets.mako:482
+#: src/search/templates/admin_collection_facets.mako:521
 msgid "Close"
 msgstr "閉じる"
 
-#: src/search/templates/admin_collection_facets.mako:559
+#: src/search/templates/admin_collection_facets.mako:598
 msgid "There was an error parsing your input"
 msgstr "入力を解析中にエラーが発生しました"
 
-#: src/search/templates/admin_collection_facets.mako:821
+#: src/search/templates/admin_collection_facets.mako:942
 msgid "Facets updated"
 msgstr "ファセットが更新されました"
 
-#: src/search/templates/admin_collection_facets.mako:825
-#: src/search/templates/admin_collection_highlighting.mako:116
-#: src/search/templates/admin_collection_sorting.mako:194
-#: src/search/templates/admin_collection_template.mako:652
+#: src/search/templates/admin_collection_facets.mako:946
+#: src/search/templates/admin_collection_highlighting.mako:118
+#: src/search/templates/admin_collection_sorting.mako:211
+#: src/search/templates/admin_collection_template.mako:692
 msgid "Error: "
 msgstr "エラー： "
 
-#: src/search/templates/admin_collection_facets.mako:906
+#: src/search/templates/admin_collection_facets.mako:1036
 msgid "This field is required."
 msgstr "このフィールドは必須です。"
 
-#: src/search/templates/admin_collection_highlighting.mako:45
+#: src/search/templates/admin_collection_highlighting.mako:29
+msgid "Highlighting for"
+msgstr "次を反転表示"
+
+#: src/search/templates/admin_collection_highlighting.mako:46
 msgid "Highlighting"
 msgstr "反転表示"
 
-#: src/search/templates/admin_collection_highlighting.mako:46
+#: src/search/templates/admin_collection_highlighting.mako:47
 msgid "Highlights the query keywords matching some of the fields below."
-msgstr "下記のフィールドと一致するクエリキーワードを反転表示します。"
+msgstr "次のフィールドの一部に一致するクエリキーワードを反転表示します。"
 
-#: src/search/templates/admin_collection_highlighting.mako:49
+#: src/search/templates/admin_collection_highlighting.mako:50
 msgid "Highlighting is currently disabled."
 msgstr "反転表示は現在無効です。"
 
-#: src/search/templates/admin_collection_highlighting.mako:113
+#: src/search/templates/admin_collection_highlighting.mako:115
 msgid "Updated"
 msgstr "更新済み"
 
-#: src/search/templates/admin_collection_highlighting.mako:137
+#: src/search/templates/admin_collection_highlighting.mako:139
 msgid "Select all"
 msgstr "すべて選択"
 
-#: src/search/templates/admin_collection_highlighting.mako:139
+#: src/search/templates/admin_collection_highlighting.mako:141
 msgid "No fields found."
 msgstr "フィールドが見つかりません。"
 
 #: src/search/templates/admin_collection_properties.mako:43
-msgid "Customize "
-msgstr "カスタマイズ "
+msgid "Properties of"
+msgstr "次のプロパティ"
 
 #: src/search/templates/admin_collection_properties.mako:54
 #: src/search/templates/layout.mako:79
@@ -431,195 +506,228 @@ msgstr "スキーマ"
 msgid "Indexes"
 msgstr "インデックス"
 
-#: src/search/templates/admin_collection_properties.mako:77
-#: src/search/templates/admin_collection_properties.mako:81
+#: src/search/templates/admin_collection_properties.mako:71
+msgid "Autocomplete and suggest queries"
+msgstr "クエリをオートコンプリートおよび提案"
+
+#: src/search/templates/admin_collection_properties.mako:80
+#: src/search/templates/admin_collection_properties.mako:84
 msgid "Loading..."
 msgstr "読み込み中..."
 
-#: src/search/templates/admin_collection_properties_solr_properties.mako:38
+#: src/search/templates/admin_collection_properties_solr_properties.mako:30
 msgid "Property"
 msgstr "プロパティ"
 
-#: src/search/templates/admin_collection_properties_solr_properties.mako:39
+#: src/search/templates/admin_collection_properties_solr_properties.mako:31
 msgid "Value"
 msgstr "値"
 
-#: src/search/templates/admin_collection_sorting.mako:50
-#: src/search/templates/admin_collection_sorting.mako:76
+#: src/search/templates/admin_collection_sorting.mako:29
+msgid "Sorting for"
+msgstr "次をソート"
+
+#: src/search/templates/admin_collection_sorting.mako:51
+#: src/search/templates/admin_collection_sorting.mako:78
 msgid "Sorting"
 msgstr "ソート"
 
-#: src/search/templates/admin_collection_sorting.mako:51
-msgid "Specify on which fields and order the results are sorted by default."
-msgstr "結果をデフォルトでソートするフィールドと順序を指定します。"
-
 #: src/search/templates/admin_collection_sorting.mako:52
-msgid "The sorting is a combination of the fields, from left to right."
-msgstr "ソートは、左から右へのフィールドの組み合わせです。"
+msgid "Specify on which fields and order the results are sorted by default."
+msgstr "結果をソートするデフォルトのフィールドおよび順序を指定します。"
 
 #: src/search/templates/admin_collection_sorting.mako:53
-msgid "Sorting is currently disabled."
-msgstr "ソートは現在無効です。"
+msgid "The sorting is a combination of the \"Default sorting\" fields, from left to right."
+msgstr "ソートは、複数の「デフォルトソート」フィールドを左から右へと組み合わせたものです。"
 
-#: src/search/templates/admin_collection_sorting.mako:59
+#: src/search/templates/admin_collection_sorting.mako:54
+msgid "Sorting is currently disabled."
+msgstr "ソートは現在無効になっています。"
+
+#: src/search/templates/admin_collection_sorting.mako:60
 msgid "There are currently no fields defined."
 msgstr "現在、定義されているフィールドはありません。"
 
-#: src/search/templates/admin_collection_sorting.mako:83
+#: src/search/templates/admin_collection_sorting.mako:67
+msgid "Default sorting"
+msgstr "デフォルトソート"
+
+#: src/search/templates/admin_collection_sorting.mako:84
+msgid "Include in default sorting"
+msgstr "デフォルトソートに含める"
+
+#: src/search/templates/admin_collection_sorting.mako:88
 msgid "Add to Sorting"
 msgstr "ソートに追加"
 
-#: src/search/templates/admin_collection_sorting.mako:191
+#: src/search/templates/admin_collection_sorting.mako:208
 msgid "Sorting updated"
 msgstr "ソートが更新されました"
 
-#: src/search/templates/admin_collection_template.mako:138
-msgid "Template Editor "
-msgstr "テンプレートエディタ "
+#: src/search/templates/admin_collection_template.mako:140
+msgid "Snippet editor for"
+msgstr "次のスニペットエディタ"
 
-#: src/search/templates/admin_collection_template.mako:147
+#: src/search/templates/admin_collection_template.mako:149
 msgid "Visual Editor"
-msgstr "ビジュアルエディタ"
+msgstr "Visual Editor"
 
-#: src/search/templates/admin_collection_template.mako:148
+#: src/search/templates/admin_collection_template.mako:150
 msgid "Preview"
 msgstr "プレビュー"
 
-#: src/search/templates/admin_collection_template.mako:149
+#: src/search/templates/admin_collection_template.mako:151
 msgid "Source"
 msgstr "ソース"
 
-#: src/search/templates/admin_collection_template.mako:150
+#: src/search/templates/admin_collection_template.mako:152
 msgid "Advanced"
 msgstr "詳細"
 
-#: src/search/templates/admin_collection_template.mako:171
-#: src/search/templates/admin_collection_template.mako:226
-msgid "Available Fields"
-msgstr "利用可能なフィールド"
+#: src/search/templates/admin_collection_template.mako:162
+msgid "Cloud Template"
+msgstr "クラウドテンプレート"
 
-#: src/search/templates/admin_collection_template.mako:175
-#: src/search/templates/admin_collection_template.mako:203
-#: src/search/templates/admin_collection_template.mako:230
-#: src/search/templates/admin_collection_template.mako:258
+#: src/search/templates/admin_collection_template.mako:167
+msgid "Layout"
+msgstr "レイアウト"
+
+#: src/search/templates/admin_collection_template.mako:174
+#: src/search/templates/admin_collection_template.mako:220
+msgid "Available Fields"
+msgstr "使用可能なフィールド"
+
+#: src/search/templates/admin_collection_template.mako:178
+#: src/search/templates/admin_collection_template.mako:202
+#: src/search/templates/admin_collection_template.mako:224
+#: src/search/templates/admin_collection_template.mako:248
 msgid "Click on this button to add the field"
-msgstr "フィールドを追加するにはこのボタンをクリックします"
+msgstr "このボタンをクリックしてフィールドを追加"
 
 #: src/search/templates/admin_collection_template.mako:186
-#: src/search/templates/admin_collection_template.mako:241
+#: src/search/templates/admin_collection_template.mako:232
 msgid "Available Functions"
-msgstr "利用可能な関数"
+msgstr "使用可能な関数"
+
+#: src/search/templates/admin_collection_template.mako:189
+msgid "Formats date or timestamp in DD-MM-YYYY"
+msgstr "日付またはタイムスタンプを DD-MM-YYYY でフォーマット"
 
 #: src/search/templates/admin_collection_template.mako:190
-msgid "Formats date or timestamp in DD-MM-YYYY"
-msgstr "DD-MM-YYYY で日付またはタイムスタンプを書式設定"
+msgid "Formats date or timestamp in HH:mm:ss"
+msgstr "日付またはタイムスタンプを HH:mm:ss でフォーマット"
 
 #: src/search/templates/admin_collection_template.mako:191
-msgid "Formats date or timestamp in HH:mm:ss"
-msgstr "HH:mm:ss で日付またはタイムスタンプを書式設定"
+msgid "Formats date or timestamp in DD-MM-YYYY HH:mm:ss"
+msgstr "日付またはタイムスタンプを DD-MM-YYYY HH:mm:ss でフォーマット"
 
 #: src/search/templates/admin_collection_template.mako:192
-msgid "Formats date or timestamp in DD-MM-YYYY HH:mm:ss"
-msgstr "DD-MM-YYYY HH:mm:ss で日付またはタイムスタンプを書式設定"
+#: src/search/templates/admin_collection_template.mako:238
+msgid "Formats a date in the full format"
+msgstr "日付を完全な形式でフォーマット"
 
 #: src/search/templates/admin_collection_template.mako:193
-#: src/search/templates/admin_collection_template.mako:248
-msgid "Formats a date in the full format"
-msgstr "フル フォーマットで日付を書式設定"
+#: src/search/templates/admin_collection_template.mako:239
+msgid "Formats a date as a Unix timestamp"
+msgstr "日付を UNIX タイムスタンプとしてフォーマット"
 
 #: src/search/templates/admin_collection_template.mako:194
-#: src/search/templates/admin_collection_template.mako:249
-msgid "Formats a date as a Unix timestamp"
-msgstr "Unix タイムスタンプとして日付を書式設定"
+msgid "Formats a Unix timestamp as Ns, Nmin, Ndays... ago"
+msgstr "UNIX タイムスタンプを Ns、Nmin、Ndays... 前としてフォーマット"
 
 #: src/search/templates/admin_collection_template.mako:195
-msgid "Formats a Unix timestamp as Ns, Nmin, Ndays... ago"
-msgstr "Unix タイムスタンプを Ns、Nmin、Ndays... 前として書式設定"
+#: src/search/templates/admin_collection_template.mako:241
+msgid "Downloads and embed the file in the browser"
+msgstr "ブラウザでファイルをダウンロードして埋め込む"
 
 #: src/search/templates/admin_collection_template.mako:196
-#: src/search/templates/admin_collection_template.mako:251
-msgid "Downloads and embed the file in the browser"
-msgstr "ファイルをダウンロードしてブラウザに埋め込み"
+#: src/search/templates/admin_collection_template.mako:242
+msgid "Downloads the linked file"
+msgstr "リンクされたファイルをダウンロード"
 
 #: src/search/templates/admin_collection_template.mako:197
-#: src/search/templates/admin_collection_template.mako:252
-msgid "Downloads the linked file"
-msgstr "リンクされたファイルをダウンロードします"
-
-#: src/search/templates/admin_collection_template.mako:198
-#: src/search/templates/admin_collection_template.mako:253
+#: src/search/templates/admin_collection_template.mako:243
 msgid "Preview file in File Browser"
 msgstr "File Browser でファイルをプレビュー"
 
-#: src/search/templates/admin_collection_template.mako:199
-#: src/search/templates/admin_collection_template.mako:254
+#: src/search/templates/admin_collection_template.mako:198
+#: src/search/templates/admin_collection_template.mako:244
 msgid "Truncate a value after 100 characters"
-msgstr "100 文字の以後の値を切り捨て"
+msgstr "値を 100 文字で切り捨てる"
+
+#: src/search/templates/admin_collection_template.mako:199
+#: src/search/templates/admin_collection_template.mako:245
+msgid "Truncate a value after 250 characters"
+msgstr "値を 250 文字で切り捨てる"
 
 #: src/search/templates/admin_collection_template.mako:200
-#: src/search/templates/admin_collection_template.mako:255
-msgid "Truncate a value after 250 characters"
-msgstr "250 文字の以後の値を切り捨て"
-
-#: src/search/templates/admin_collection_template.mako:201
-#: src/search/templates/admin_collection_template.mako:256
-msgid "Truncate a value after 500 characters"
-msgstr "500 文字の以後の値を切り捨て"
-
-#: src/search/templates/admin_collection_template.mako:245
-msgid "Formats a date in the DD-MM-YYYY format"
-msgstr "DD-MM-YYYY 形式で日付を書式設定"
-
 #: src/search/templates/admin_collection_template.mako:246
+msgid "Truncate a value after 500 characters"
+msgstr "値を 500 文字で切り捨てる"
+
+#: src/search/templates/admin_collection_template.mako:235
+msgid "Formats a date in the DD-MM-YYYY format"
+msgstr "日付を DD-MM-YYYY 形式でフォーマット"
+
+#: src/search/templates/admin_collection_template.mako:236
 msgid "Formats a date in the HH:mm:ss format"
-msgstr "HH:mm:ss 形式で日付を書式設定"
+msgstr "日付を HH:mm:ss 形式でフォーマット"
 
-#: src/search/templates/admin_collection_template.mako:247
+#: src/search/templates/admin_collection_template.mako:237
 msgid "Formats a date in the DD-MM-YYYY HH:mm:ss format"
-msgstr "DD-MM-YYYY HH:mm:ss 形式で日付を書式設定"
+msgstr "日付を DD-MM-YYYY HH:mm:ss 形式でフォーマット"
 
-#: src/search/templates/admin_collection_template.mako:250
+#: src/search/templates/admin_collection_template.mako:240
 msgid "Shows the relative time"
-msgstr "相対時間の表示"
+msgstr "相対時間を表示"
 
-#: src/search/templates/admin_collection_template.mako:277
+#: src/search/templates/admin_collection_template.mako:267
 msgid "Here you can define custom CSS classes or Javascript functions that you can use in your template."
-msgstr "ここで、カスタム CSS クラスまたはテンプレートで利用できる Javascript 関数を定義できます。"
+msgstr "ここで、テンプレートで使用できるカスタム CSS クラスまたは Javascript 関数を定義できます。"
 
-#: src/search/templates/admin_collection_template.mako:292
-#: src/search/templates/admin_collection_template.mako:402
+#: src/search/templates/admin_collection_template.mako:282
+#: src/search/templates/admin_collection_template.mako:392
 msgid "Insert layout"
-msgstr "レイアウトの挿入"
+msgstr "レイアウトを挿入"
 
-#: src/search/templates/admin_collection_template.mako:401
-#: src/search/templates/admin_collections.mako:97
+#: src/search/templates/admin_collection_template.mako:391
+#: src/search/templates/admin_collection_template.mako:407
+#: src/search/templates/admin_collections.mako:100
 msgid "Cancel"
 msgstr "キャンセル"
 
-#: src/search/templates/admin_collection_template.mako:622
-msgid "Start with this!"
-msgstr "これから開始します。"
+#: src/search/templates/admin_collection_template.mako:399
+msgid "Load a template"
+msgstr "テンプレートをロードする"
 
-#: src/search/templates/admin_collection_template.mako:623
+#: src/search/templates/admin_collection_template.mako:408
+msgid "Load template"
+msgstr "テンプレートをロード"
+
+#: src/search/templates/admin_collection_template.mako:662
+msgid "Start with this!"
+msgstr "ここから始めます。"
+
+#: src/search/templates/admin_collection_template.mako:663
 msgid "You can add a layout from here"
 msgstr "ここからレイアウトを追加できます"
 
-#: src/search/templates/admin_collection_template.mako:649
+#: src/search/templates/admin_collection_template.mako:689
 msgid "Template updated"
 msgstr "テンプレートが更新されました"
 
 #: src/search/templates/admin_collections.mako:31
 #: src/search/templates/layout.mako:32
 msgid "Search page"
-msgstr "ページの検索"
+msgstr "検索ページ"
 
 #: src/search/templates/admin_collections.mako:33
 msgid "Collection Manager"
-msgstr "コレクションマネージャ"
+msgstr "Collection Manager"
 
 #: src/search/templates/admin_collections.mako:41
 msgid "Filter collections by name..."
-msgstr "名前ごとのフィルタコレクション..."
+msgstr "コレクションを名前でフィルタ..."
 
 #: src/search/templates/admin_collections.mako:45
 msgid "Import"
@@ -630,80 +738,90 @@ msgid "There are currently no collections defined."
 msgstr "現在、定義されているコレクションはありません。"
 
 #: src/search/templates/admin_collections.mako:52
-msgid "Click on Import to add one or more."
-msgstr "1 つ以上追加するには、［インポート］をクリックします。"
+msgid "Click here to add"
+msgstr "ここをクリックして追加"
 
-#: src/search/templates/admin_collections.mako:68
+#: src/search/templates/admin_collections.mako:52
+msgid "one or more."
+msgstr "1 つまたは複数です。"
+
+#: src/search/templates/admin_collections.mako:70
 msgid "Click to edit"
 msgstr "クリックして編集"
 
-#: src/search/templates/admin_collections.mako:70
+#: src/search/templates/admin_collections.mako:72
 msgid "Copy"
 msgstr "コピー"
 
-#: src/search/templates/admin_collections.mako:71
+#: src/search/templates/admin_collections.mako:73
 msgid "Delete"
 msgstr "削除"
 
-#: src/search/templates/admin_collections.mako:82
+#: src/search/templates/admin_collections.mako:85
 msgid "Import Collections and Cores"
-msgstr "コレクションおよびコアのインポート"
+msgstr "コレクションおよびコアをインポート"
 
-#: src/search/templates/admin_collections.mako:87
+#: src/search/templates/admin_collections.mako:90
 msgid "Collections"
 msgstr "コレクション"
 
-#: src/search/templates/admin_collections.mako:88
-msgid "All available collections from the Solr URL in hue.ini have been imported."
-msgstr "hue.ini にある Solr URL から利用できるすべてのコレクションがインポートされました。"
-
 #: src/search/templates/admin_collections.mako:91
+msgid "All available collections from the Solr URL in hue.ini have been imported."
+msgstr "hue.ini の Solr URL から使用可能なコレクションはすべてインポートされています。"
+
+#: src/search/templates/admin_collections.mako:94
 msgid "Cores"
 msgstr "コア"
 
-#: src/search/templates/admin_collections.mako:92
+#: src/search/templates/admin_collections.mako:95
 msgid "All available cores from the Solr URL in hue.ini have been imported."
-msgstr "hue.ini にある Solr URL から利用できるすべてのコアがインポートされました。"
+msgstr "hue.ini の Solr URL から使用可能なコアはすべてインポートされています。"
 
-#: src/search/templates/admin_collections.mako:98
+#: src/search/templates/admin_collections.mako:101
 msgid "Import Selected"
-msgstr "選択済みのインポート"
+msgstr "選択したものをインポート"
 
-#: src/search/templates/admin_collections.mako:114
+#: src/search/templates/admin_collections.mako:117
 msgid "Confirm Delete"
 msgstr "削除を確認"
 
-#: src/search/templates/admin_collections.mako:117
+#: src/search/templates/admin_collections.mako:120
 msgid "Are you sure you want to delete this collection?"
 msgstr "このコレクションを削除してもよろしいですか？"
 
-#: src/search/templates/admin_collections.mako:120
+#: src/search/templates/admin_collections.mako:123
 msgid "No"
 msgstr "いいえ"
 
-#: src/search/templates/admin_collections.mako:121
+#: src/search/templates/admin_collections.mako:124
 msgid "Yes"
 msgstr "はい"
 
+#: src/search/templates/admin_collections.mako:213
 #: src/search/templates/admin_collections.mako:216
-msgid "Collections imported successfully."
-msgstr "コレクションが正常にインポートされました。"
+msgid "Imported: "
+msgstr "インポートされました： "
 
-#: src/search/templates/admin_collections.mako:228
-msgid "Collection deleted successfully."
-msgstr "コレクションが正常に削除されました。"
+#: src/search/templates/admin_collections.mako:216
+#: src/search/templates/admin_collections.mako:219
+msgid "Not imported: "
+msgstr "インポートされていません： "
 
 #: src/search/templates/admin_collections.mako:232
-msgid "Collection copied successfully."
-msgstr "コレクションが正常にコピーされました。"
+msgid "Collection deleted successfully."
+msgstr "コレクションは正常に削除されました。"
 
-#: src/search/templates/layout.mako:33 src/search/templates/search.mako:48
+#: src/search/templates/admin_collections.mako:236
+msgid "Collection copied successfully."
+msgstr "コレクションは正常にコピーされました。"
+
+#: src/search/templates/layout.mako:33 src/search/templates/search.mako:55
 msgid "Collection manager"
-msgstr "コレクションマネージャ"
+msgstr "Collection Manager"
 
 #: src/search/templates/layout.mako:40
 msgid "Search Admin"
-msgstr "管理者の検索"
+msgstr "Search Admin"
 
 #: src/search/templates/layout.mako:84
 msgid "Search it"
@@ -715,7 +833,7 @@ msgstr "テンプレート"
 
 #: src/search/templates/layout.mako:89
 msgid "1. Snippet"
-msgstr "1. Snippet"
+msgstr "1. スニペット"
 
 #: src/search/templates/layout.mako:92
 msgid "2. Facets"
@@ -732,11 +850,11 @@ msgstr "4. 反転表示"
 #: src/search/templates/macros.mako:197
 #, python-format
 msgid "Retweeted %s times"
-msgstr "%s 回リツイート済み"
+msgstr "リツイート数 %s"
 
 #: src/search/templates/macros.mako:207
 msgid "Reply"
-msgstr "返信"
+msgstr "リプライ"
 
 #: src/search/templates/macros.mako:213
 msgid "Retweet"
@@ -744,35 +862,87 @@ msgstr "リツイート"
 
 #: src/search/templates/no_collections.mako:47
 msgid "It seems there is nothing to search on ..."
-msgstr "検索対象がありません..."
+msgstr "検索対象はないようです ..."
 
-#: src/search/templates/search.mako:47
+#: src/search/templates/search.mako:54
 msgid "Customize this collection"
-msgstr "このコレクションのカスタマイズ"
+msgstr "このコレクションをカスタマイズ"
 
-#: src/search/templates/search.mako:141
-msgid "Sort by"
-msgstr "ソートの基準"
-
-#: src/search/templates/search.mako:150
+#: src/search/templates/search.mako:211
 #, python-format
-msgid "Showing %s - %s of %s results"
-msgstr "%s 件の結果の %s - %s を表示"
+msgid "Page %s of %s. Showing %s results (%s seconds)"
+msgstr "ページ %s／%s です。%s の結果を示しています（%s 秒）"
 
-#: src/search/templates/search.mako:187
-msgid "Beginning of List"
-msgstr "リストの先頭"
-
-#: src/search/templates/search.mako:190
+#: src/search/templates/search.mako:277
 msgid "Previous Page"
 msgstr "前のページ"
 
-#: src/search/templates/search.mako:195
+#: src/search/templates/search.mako:293
 msgid "Next Page"
 msgstr "次のページ"
 
-#: src/search/templates/search.mako:204
-#, python-format
-msgid "Your search - %s - did not match any documents."
-msgstr "検索 - %s - と一致するドキュメントはありませんでした。"
+#: src/search/templates/search.mako:302
+msgid "Your search"
+msgstr "検索内容"
 
+#: src/search/templates/search.mako:302
+#, python-format
+msgid "did not match any documents."
+msgstr "一致するドキュメントがありませんでした。"
+
+#: src/search/templates/search.mako:304
+msgid "Suggestions:"
+msgstr "提案："
+
+#: src/search/templates/search.mako:306
+msgid "Make sure all words are spelled correctly."
+msgstr "すべての語句が正しく入力されていることを確認してください。"
+
+#: src/search/templates/search.mako:307
+msgid "Try different keywords."
+msgstr "別のキーワードを試してみてください。"
+
+#: src/search/templates/search.mako:308
+msgid "Try more general keywords."
+msgstr "より一般的なキーワードを試してみてください。"
+
+#: src/search/templates/search.mako:309
+msgid "Try fewer keywords."
+msgstr "キーワードの数を減らしてみてください。"
+
+#: src/search/templates/search.mako:361
+msgid "Show"
+msgstr "表示"
+
+#: src/search/templates/search.mako:361
+msgid "more..."
+msgstr "詳細..."
+
+#: src/search/templates/search.mako:655
+msgid "The graphical facets works just with numbers or dates. Please choose another field."
+msgstr "グラフィカルファセットは数値または日付についてのみ動作します。別のフィールドを選択してください。"
+
+#: src/search/templates/search.mako:659
+msgid "There was an error initializing the graphical facet component."
+msgstr "グラフィカルファセットコンポーネントの初期化中にエラーが発生しました。"
+
+#~ msgid "Error"
+#~ msgstr "エラー"
+#~ msgid "Imported successfully"
+#~ msgstr "正常にインポートされました"
+#~ msgid "Imported with errors: "
+#~ msgstr "インポートされ次のエラーが発生しました： "
+#~ msgid "Search Admin - "
+#~ msgstr "管理者の検索 - "
+#~ msgid "Customize "
+#~ msgstr "カスタマイズ "
+#~ msgid "Template Editor "
+#~ msgstr "テンプレートエディタ "
+#~ msgid "Click on Import to add one or more."
+#~ msgstr "1 つ以上追加するには、［インポート］をクリックします。"
+#~ msgid "Sort by"
+#~ msgstr "ソートの基準"
+#~ msgid "Showing %s - %s of %s results"
+#~ msgstr "%s 件の結果の %s - %s を表示"
+#~ msgid "Beginning of List"
+#~ msgstr "リストの先頭"

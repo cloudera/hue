@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-08-02 20:43-0700\n"
+"POT-Creation-Date: 2014-02-10 09:18-0800\n"
 "PO-Revision-Date: 2013-07-13 20:35-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -17,197 +17,336 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/hbase/api.py:46
+#: src/hbase/api.py:47
 #, python-format
 msgid "Api Error: %s"
 msgstr "Api 오류: %s"
 
-#: src/hbase/api.py:76
+#: src/hbase/api.py:69
+#, python-format
+msgid "Cluster configuration %s isn't formatted correctly."
+msgstr "클러스터 구성 %s의 형식이 올바르지 않습니다."
+
+#: src/hbase/api.py:80
 #, python-format
 msgid "Cluster by the name of %s does not exist in configuration."
-msgstr "%s 이름별 클러스타가 구성에 존재하지 않습니다."
+msgstr "이름이 %s인 클러스터가 구성에 없습니다."
 
-#: src/hbase/templates/app.mako:49
+#: src/hbase/templates/app.mako:35
+msgid "HBase Browser"
+msgstr "HBase 브라우저"
+
+#: src/hbase/templates/app.mako:66
 msgid "There are no tables matching the search criteria."
 msgstr "검색 기준과 일치하는 테이블이 없습니다."
 
-#: src/hbase/templates/app.mako:62
+#: src/hbase/templates/app.mako:79
 msgid "Refresh Row"
 msgstr "행 새로 고침"
 
-#: src/hbase/templates/app.mako:64
+#: src/hbase/templates/app.mako:81
 msgid "Delete Row"
 msgstr "행 삭제"
 
-#: src/hbase/templates/app.mako:68 src/hbase/templates/app.mako:221
+#: src/hbase/templates/app.mako:85 src/hbase/templates/app.mako:247
 msgid "Toggle Collapse Selected"
-msgstr "선택 항목 축소 전환"
+msgstr "선택한 항목 축소 전환"
 
-#: src/hbase/templates/app.mako:69 src/hbase/templates/app.mako:222
+#: src/hbase/templates/app.mako:86 src/hbase/templates/app.mako:248
 msgid "Select All Visible"
-msgstr "모든 표시 선택"
+msgstr "모두 표시 선택"
 
-#: src/hbase/templates/app.mako:75
+#: src/hbase/templates/app.mako:92
 msgid "Add New Column/Cell"
 msgstr "새 열/셀 추가"
 
-#: src/hbase/templates/app.mako:87
+#: src/hbase/templates/app.mako:104
 msgid "Full Editor"
 msgstr "전체 편집기"
 
-#: src/hbase/templates/app.mako:99
-msgid "Notice:"
-msgstr "알림:"
+#: src/hbase/templates/app.mako:120
+msgid "No rows to display."
+msgstr "표시할 행이 없습니다."
 
-#: src/hbase/templates/app.mako:99
-msgid " entries may be truncated with limit set at"
-msgstr " 항목이 제한 설정으로 생략되었을 수도 있습니다."
-
-#: src/hbase/templates/app.mako:99
-msgid "items per set."
-msgstr "세트당 항목 수."
-
-#: src/hbase/templates/app.mako:102
-msgid "Query executed in"
-msgstr "쿼리 실행 위치:"
-
-#: src/hbase/templates/app.mako:102
-msgid "fetching"
-msgstr "가져오는 중"
-
-#: src/hbase/templates/app.mako:102
-msgid "rows"
-msgstr "행"
-
-#: src/hbase/templates/app.mako:109
+#: src/hbase/templates/app.mako:126
 msgid "Sort By"
-msgstr "정렬 기준:"
+msgstr "정렬 기준"
 
-#: src/hbase/templates/app.mako:143
+#: src/hbase/templates/app.mako:140
+msgid "Home"
+msgstr "홈"
+
+#: src/hbase/templates/app.mako:145
+msgid "Switch Cluster"
+msgstr "클러스터 전환"
+
+#: src/hbase/templates/app.mako:164
 msgid "Search for Table Name"
 msgstr "테이블 이름 검색"
 
-#: src/hbase/templates/app.mako:146
+#: src/hbase/templates/app.mako:167
 msgid "Enable"
 msgstr "설정"
 
-#: src/hbase/templates/app.mako:148
+#: src/hbase/templates/app.mako:169
 msgid "Disable"
 msgstr "해제"
 
-#: src/hbase/templates/app.mako:151
+#: src/hbase/templates/app.mako:172
 msgid "Drop"
 msgstr "삭제"
 
-#: src/hbase/templates/app.mako:154
+#: src/hbase/templates/app.mako:175
 msgid "New Table"
 msgstr "새 테이블"
 
-#: src/hbase/templates/app.mako:173
+#: src/hbase/templates/app.mako:194
 msgid "Create New Table"
 msgstr "새 테이블 생성"
 
-#: src/hbase/templates/app.mako:177
+#: src/hbase/templates/app.mako:198
 msgid "Table Name"
 msgstr "테이블 이름"
 
-#: src/hbase/templates/app.mako:178
+#: src/hbase/templates/app.mako:199
 msgid "Column Families"
 msgstr "열 패밀리"
 
-#: src/hbase/templates/app.mako:182
-#, fuzzy
+#: src/hbase/templates/app.mako:203
 msgid "Additional Column Family"
 msgstr "추가 열 패밀리"
 
-#: src/hbase/templates/app.mako:185 src/hbase/templates/app.mako:275
-#: src/hbase/templates/app.mako:296 src/hbase/templates/app.mako:334
-#: src/hbase/templates/app.mako:365
+#: src/hbase/templates/app.mako:206 src/hbase/templates/app.mako:305
+#: src/hbase/templates/app.mako:328 src/hbase/templates/app.mako:369
+#: src/hbase/templates/app.mako:401
 msgid "Cancel"
 msgstr "취소"
 
-#: src/hbase/templates/app.mako:186
+#: src/hbase/templates/app.mako:207
 msgid "Submit"
 msgstr "제출"
 
-#: src/hbase/templates/app.mako:197
-#, fuzzy
-msgid "row_key, row_key_prefix* + scan_length, row_key [family:col1, family2:col2, family3:]"
-msgstr "행_키, 행_키_접두사* + 스캔_길이, 행_키 [패밀리:col1, 패밀리2:col2, 패밀리3:]"
+#: src/hbase/templates/app.mako:219
+msgid "row_key, row_prefix* +scan_len [col1, family:col2, fam3:, col_prefix* +3, fam: col2 to col3] {Filter1() AND Filter2()}"
+msgstr "row_key, row_prefix* +scan_len [col1, family:col2, fam3:, col_prefix* +3, fam: col2 to col3] {Filter1() AND Filter2()}"
 
-#: src/hbase/templates/app.mako:217
+#: src/hbase/templates/app.mako:229
+msgid "Autocomplete Suggestions:"
+msgstr "제시된 자동 완성 항목:"
+
+#: src/hbase/templates/app.mako:241
+msgid "Toggle Grid"
+msgstr "눈금선 설정/해제"
+
+#: src/hbase/templates/app.mako:243
 msgid "Toggle Select All Rows"
 msgstr "모든 행 선택 전환"
 
-#: src/hbase/templates/app.mako:217
+#: src/hbase/templates/app.mako:243
 msgid "All"
 msgstr "모두"
 
-#: src/hbase/templates/app.mako:224
+#: src/hbase/templates/app.mako:250
 msgid "Drop Columns"
 msgstr "열 삭제"
 
-#: src/hbase/templates/app.mako:238
-msgid "Displaying"
-msgstr "표시 중"
+#: src/hbase/templates/app.mako:265
+msgid "Fetched"
+msgstr "가져옴"
 
-#: src/hbase/templates/app.mako:242
+#: src/hbase/templates/app.mako:268
 msgid "starting from"
-msgstr "시작:"
+msgstr "시작 날짜"
 
-#: src/hbase/templates/app.mako:247
-msgid "Add Query Field"
-msgstr "쿼리 필드 추가"
+#: src/hbase/templates/app.mako:273
+msgid "in"
+msgstr "이내"
 
-#: src/hbase/templates/app.mako:248
-msgid "Go"
-msgstr "이동"
+#: src/hbase/templates/app.mako:273
+msgid "seconds"
+msgstr "초"
 
-#: src/hbase/templates/app.mako:252
+#: src/hbase/templates/app.mako:274
+msgid "Entries after"
+msgstr "뒤에 오는 항목"
+
+#: src/hbase/templates/app.mako:274
+msgid "were truncated."
+msgstr "잘렸습니다."
+
+#: src/hbase/templates/app.mako:279
 msgid "Drop Rows"
 msgstr "행 삭제"
 
-#: src/hbase/templates/app.mako:254
+#: src/hbase/templates/app.mako:281
+msgid ".CSV, .TSV, etc..."
+msgstr ".CSV, .TSV 등..."
+
+#: src/hbase/templates/app.mako:281
+msgid "Bulk Upload"
+msgstr "대량 업로드"
+
+#: src/hbase/templates/app.mako:282
 msgid "New Row"
 msgstr "새 행"
 
-#: src/hbase/templates/app.mako:263
+#: src/hbase/templates/app.mako:293
 msgid "Insert New Row"
 msgstr "새 행 삽입"
 
-#: src/hbase/templates/app.mako:268
+#: src/hbase/templates/app.mako:298
 msgid "Row Key"
 msgstr "행 키"
 
-#: src/hbase/templates/app.mako:272
+#: src/hbase/templates/app.mako:302
 msgid "Add Field"
 msgstr "필드 추가"
 
-#: src/hbase/templates/app.mako:284
+#: src/hbase/templates/app.mako:316
 msgid "Create New Column"
 msgstr "새 열 생성"
 
-#: src/hbase/templates/app.mako:290
+#: src/hbase/templates/app.mako:322
 msgid "Column Name"
 msgstr "열 이름"
 
-#: src/hbase/templates/app.mako:292 src/hbase/templates/app.mako:293
+#: src/hbase/templates/app.mako:324 src/hbase/templates/app.mako:325
 msgid "Cell Value"
 msgstr "셀 값"
 
-#: src/hbase/templates/app.mako:335
+#: src/hbase/templates/app.mako:329 src/hbase/templates/app.mako:370
+msgid "Upload"
+msgstr "업로드"
+
+#: src/hbase/templates/app.mako:341
+msgid "Edit Cell"
+msgstr "셀 편집"
+
+#: src/hbase/templates/app.mako:357
+msgid "Cell History:"
+msgstr "셀 기록:"
+
+#: src/hbase/templates/app.mako:371
 msgid "Save"
 msgstr "저장"
 
-#: src/hbase/templates/app.mako:337
+#: src/hbase/templates/app.mako:373
 msgid "OK"
 msgstr "확인"
 
-#: src/hbase/templates/app.mako:366
+#: src/hbase/templates/app.mako:402 src/hbase/templates/app.mako:420
 msgid "Confirm"
 msgstr "확인"
 
-#~ msgid "entries truncated"
-#~ msgstr "잘린 항목"
-#~ msgid "at"
-#~ msgstr ":"
+#: src/hbase/templates/app.mako:414
+msgid "Confirm Delete"
+msgstr "삭제 확인"
+
+#: src/hbase/templates/app.mako:415
+msgid "Delete row "
+msgstr "행 삭제 "
+
+#: src/hbase/templates/app.mako:416
+msgid "? (This cannot be undone)"
+msgstr "?(이 작업은 실행 취소할 수 없음)"
+
+#: src/hbase/templates/app.mako:417
+msgid "Are you sure you want to drop this column?"
+msgstr "이 열을 삭제하시겠습니까?"
+
+#: src/hbase/templates/app.mako:418
+msgid "enable"
+msgstr "설정"
+
+#: src/hbase/templates/app.mako:419
+msgid "disable"
+msgstr "해제"
+
+#: src/hbase/templates/app.mako:421
+msgid "Are you sure you want to"
+msgstr "이 테이블을"
+
+#: src/hbase/templates/app.mako:422
+msgid "this table?"
+msgstr "하시겠습니까?"
+
+#: src/hbase/templates/app.mako:423
+msgid "End Query"
+msgstr "쿼리 종료"
+
+#: src/hbase/templates/app.mako:424
+msgid "Prefix Scan"
+msgstr "접두사 검색"
+
+#: src/hbase/templates/app.mako:425
+msgid "Start Scan"
+msgstr "검색 시작"
+
+#: src/hbase/templates/app.mako:426
+msgid "Start Select Columns"
+msgstr "열 선택 시작"
+
+#: src/hbase/templates/app.mako:427
+msgid "End Column/Family"
+msgstr "끝 열/패밀리"
+
+#: src/hbase/templates/app.mako:428
+msgid "End Select Columns"
+msgstr "열 선택 끝"
+
+#: src/hbase/templates/app.mako:429
+msgid "Start FilterString"
+msgstr "FilterString 시작"
+
+#: src/hbase/templates/app.mako:430
+msgid "End FilterString"
+msgstr "FilterString 끝"
+
+#: src/hbase/templates/app.mako:431
+msgid "Row Key Value"
+msgstr "행 키 값"
+
+#: src/hbase/templates/app.mako:432
+msgid "Length of Scan or Row Key"
+msgstr "스캔 또는 행 키 길이"
+
+#: src/hbase/templates/app.mako:433
+msgid "Column Family: Column Name"
+msgstr "열 패밀리: 열 이름"
+
+#: src/hbase/templates/app.mako:434
+msgid "Rows starting with"
+msgstr "다음으로 시작하는 행"
+
+#: src/hbase/templates/app.mako:435
+msgid "String"
+msgstr "문자열"
+
+#: src/hbase/templates/app.mako:436
+msgid "Integer"
+msgstr "정수"
+
+#: src/hbase/templates/app.mako:437
+msgid "Column Range"
+msgstr "열 범위"
+
+#~ msgid "Notice:"
+#~ msgstr "알림:"
+#~ msgid " entries may be truncated with limit set at"
+#~ msgstr " 항목이 제한 설정으로 생략되었을 수도 있습니다."
+#~ msgid "items per set."
+#~ msgstr "세트당 항목 수."
+#~ msgid "Query executed in"
+#~ msgstr "쿼리 실행 위치:"
+#~ msgid "rows"
+#~ msgstr "행"
+#~ msgid ""
+#~ "row_key, row_key_prefix* + scan_length, "
+#~ "row_key [family:col1, family2:col2, family3:]"
+#~ msgstr "행_키, 행_키_접두사* + 스캔_길이, 행_키 [패밀리:col1, 패밀리2:col2, 패밀리3:]"
+#~ msgid "Displaying"
+#~ msgstr "표시 중"
+#~ msgid "Add Query Field"
+#~ msgstr "쿼리 필드 추가"
+#~ msgid "Go"
+#~ msgstr "이동"
