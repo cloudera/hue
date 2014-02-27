@@ -528,7 +528,7 @@ ${layout.menubar(section='query')}
 <div id="chooseFolder" class="modal hide fade">
   <div class="modal-header">
     <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${_('Choose a folder')}</h3>
+    <h3>${_('Select a directory')}</h3>
   </div>
   <div class="modal-body">
     <div id="folderchooser">
@@ -541,7 +541,7 @@ ${layout.menubar(section='query')}
 <div id="choosePath" class="modal hide fade">
   <div class="modal-header">
     <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${_('Choose a path')}</h3>
+    <h3>${_('Select a file or directory')}</h3>
   </div>
   <div class="modal-body">
     <div id="pathchooser">
@@ -582,6 +582,12 @@ ${layout.menubar(section='query')}
 
 
 <div id="saveResultsModal" class="modal hide fade">
+  <div class="loader">
+    <div class="overlay"></div>
+    <!--[if !IE]><!--><i class="fa fa-spinner fa-spin"></i><!--<![endif]-->
+    <!--[if IE]><img class="spinner" src="/static/art/spinner-big-inverted.gif"/><![endif]-->
+  </div>
+
   <div class="modal-header">
     <a href="#" class="close" data-dismiss="modal">&times;</a>
     <h3>${_('Save Query Results')}</h3>
@@ -605,24 +611,12 @@ ${layout.menubar(section='query')}
               &nbsp;${ _('In an HDFS file') }
             </label>
             <span data-bind="visible: $root.design.results.save.type() == 'hdfs-file'">
-              <input data-bind="value: $root.design.results.save.path" type="text" name="target_file" placeholder="${_('Results location')}" class="pathChooser">
+              <input data-bind="value: $root.design.results.save.path" type="text" name="target_file" placeholder="${_('Path to CSV file')}" class="pathChooser">
             </span>
             <label class="radio" data-bind="visible: $root.design.results.save.type() == 'hdfs-file'">
               <input data-bind="checked: $root.design.results.save.overwrite" type="checkbox" name="overwrite">
               ${ _('Overwrite') }
             </label>
-          </div>
-        </div>
-        <div data-bind="css: {'error': $root.design.results.save.targetDirectoryError()}" class="control-group hide advanced">
-          <div class="controls">
-            <label class="radio">
-              <input data-bind="checked: $root.design.results.save.type" type="radio" name="save-results-type" value="hdfs-directory">
-              &nbsp;${ _('In an HDFS directory') }
-            </label>
-            <span data-bind="visible: $root.design.results.save.type() == 'hdfs-directory'">
-              <input data-bind="value: $root.design.results.save.path" type="text" name="target_dir" placeholder="${_('Results location')}" class="folderChooser">
-              <i class="fa fa-question-circle" id="hdfs-directory-help"></i>
-            </span>
           </div>
         </div>
         <div data-bind="css: {'error': $root.design.results.save.targetTableError()}" class="control-group">
@@ -636,17 +630,29 @@ ${layout.menubar(section='query')}
             </span>
           </div>
         </div>
+        <div data-bind="css: {'error': $root.design.results.save.targetDirectoryError()}" class="control-group hide advanced">
+          <div class="controls">
+            <label class="radio">
+              <input data-bind="checked: $root.design.results.save.type" type="radio" name="save-results-type" value="hdfs-directory">
+              &nbsp;${ _('Big Query in HDFS') }
+            </label>
+            <span data-bind="visible: $root.design.results.save.type() == 'hdfs-directory'">
+              <input data-bind="value: $root.design.results.save.path" type="text" name="target_dir" placeholder="${_('Path to directory')}" class="folderChooser">
+              <i class="fa fa-question-circle" id="hdfs-directory-help"></i>
+            </span>
+          </div>
+        </div>
       </fieldset>
     </form>
     <div id="hdfs-directory-help-content" class="hide">
-      <p>${ _("Use this option if you have a large result. It will rerun the entire query.") }</p>
+      <p>${ _("Use this option if you have a large result. It will rerun the entire query and save the results to the chosen HDFS directory.") }</p>
     </div>
   </div>
   <div class="modal-footer">
     <a id="save-results-advanced" href="javascript:void(0)" class="pull-left">${ _('Show advanced fields') }</a>
     <a id="save-results-simple" href="javascript:void(0)" class="pull-left hide">${ _('Hide advanced fields') }</a>
     <button class="btn" data-dismiss="modal">${_('Cancel')}</button>
-    <button data-bind="click: trySaveResults" class="btn btn-primary">${_('Save')}</button>
+    <button data-bind="click: trySaveResults" class="btn btn-primary disable-feedback">${_('Save')}</button>
   </div>
 </div>
 
@@ -888,6 +894,39 @@ ${layout.menubar(section='query')}
 
   .jobs-overlay:hover {
     opacity: 1;
+  }
+
+  #saveResultsModal .overlay {
+    background: black; opacity: 0.5;
+    position: absolute;
+    top: 0px;
+    right:0px;
+    left: 0px;
+    bottom: 0px;
+    z-index: 100;
+  }
+
+  #saveResultsModal .loader {
+    text-align: center;
+    position: absolute;
+    top: 0px;
+    right:0px;
+    left: 0px;
+    bottom: 0px;
+  }
+
+  #saveResultsModal i.fa-spinner, #saveResultsModal img.spinner {
+    margin-top: -30px;
+    margin-left: -30px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 101;
+  }
+
+  #saveResultsModal i.fa-spinner {
+    font-size: 60px;
+    color: #DDD;
   }
 
 </style>
@@ -1978,11 +2017,20 @@ function trySaveAsDesign() {
 }
 
 function saveResultsModal() {
+  $("#saveResultsModal .loader").hide();
   $('#saveResultsModal').modal('show');
 }
 
 function trySaveResults() {
-  viewModel.saveResults();
+  var deferred = viewModel.saveResults();
+  if (deferred) {
+    $("#saveResultsModal button.btn-primary").button('loading');
+    $("#saveResultsModal .loader").show();
+    deferred.done(function() {
+      $("#saveResultsModal button.btn-primary").button('reset');
+      $("#saveResultsModal .loader").hide();
+    });
+  }
   logGA('results/save');
 }
 
