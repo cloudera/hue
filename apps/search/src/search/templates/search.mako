@@ -89,6 +89,19 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
   </form>
 </div>
 
+% if 'is_demo' in response['responseHeader']:
+  <div class="container-fluid">
+    <div class="row-fluid">
+      <div class="span12">
+        <div class="alert alert-warn">
+          ${ _('A demo index is used. In order to be interactive, please ') } <a href="http://gethue.tumblr.com/post/78012277574/tutorial-demo-the-search-on-hadoop-examples" target="_blank">${ _('create the indexes') }</a> ${ _(' in Solr.') }
+        </div>
+      </div>
+    </div>
+  </div>
+% endif
+
+
 <div id="loader" class="row" style="text-align: center;margin-top: 20px">
   <!--[if lte IE 9]>
       <img src="/static/art/spinner-big.gif" />
@@ -113,12 +126,6 @@ ${ commonheader(_('Search'), "search", user, "90px") | n,unicode }
 </div>
 % else:
 <div class="container results">
-
-% if 'is_demo' in response['responseHeader']:
- <div class="alert alert-warn">
-  ${ _('A demo index is used. In order to be interactive, please ') } <a href="">${ _('create the indexes') }</a> ${ _(' in Solr.') }
- </div>
-% endif 
 
   <div id="mainContent" class="row hide">
     % if response and 'response' in response and 'docs' in response['response'] and len(response['response']['docs']) > 0 and 'normalized_facets' in response:
