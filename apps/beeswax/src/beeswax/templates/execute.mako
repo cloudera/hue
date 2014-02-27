@@ -1308,26 +1308,24 @@ $(document).ready(function () {
   function splitStatements(hql) {
     var statements = [];
     var current = "";
-    var prev = "";
-    var between_quotes = null;
+    var betweenQuotes = null;
     for (var i = 0, len = hql.length; i < len; i++) {
       var c = hql[i];
       current += c;
-      if ($.inArray(c, ['"', "'"]) > -1 && prev != "\\") {
-        if (between_quotes == c) {
-          between_quotes = null;
+      if ($.inArray(c, ['"', "'"]) > -1) {
+        if (betweenQuotes == c) {
+          betweenQuotes = null;
         }
-        else if (between_quotes == null) {
-          between_quotes = c;
+        else if (betweenQuotes == null) {
+          betweenQuotes = c;
         }
       }
       else if (c == ";") {
-        if (between_quotes == null) {
+        if (betweenQuotes == null) {
           statements.push(current);
           current = "";
         }
       }
-      prev = c;
     }
 
     if (current != "" && current != ";") {
