@@ -846,7 +846,7 @@ function BeeswaxViewModel(server) {
         data: data,
         cache: false
       };
-      $.ajax(request);
+      return $.ajax(request);
     }
   };
 
@@ -913,7 +913,7 @@ function pathChooser(inputElement) {
       if (folderPath[folderPath.length - 1] != '/') {
         folderPath += '/';
       }
-      inputElement.val(folderPath + 'results');
+      inputElement.val(folderPath + 'results.csv');
       inputElement.trigger("change");
       $("#choosePath").modal("hide");
     },
@@ -925,7 +925,7 @@ function pathChooser(inputElement) {
     selectFolder: true,
     createFolder: true,
     selectFile: true,
-    uploadFile: true
+    uploadFile: false
   });
   $("#choosePath").modal("show");
 }
