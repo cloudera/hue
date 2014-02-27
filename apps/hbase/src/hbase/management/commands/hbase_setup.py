@@ -16,10 +16,13 @@
 # limitations under the License.
 
 import logging
+import os
 from datetime import datetime, timedelta
 
 from django.core.management.base import NoArgsCommand
 from django.utils.translation import ugettext as _
+
+from desktop.lib.paths import get_apps_root
 
 from hbased.ttypes import AlreadyExists
 from hbase.api import HbaseApi
@@ -51,7 +54,8 @@ class Command(NoArgsCommand):
       pass
 
   def load_analytics_table(self, api, cluster_name):
-    api.bulkUpload(cluster_name, 'analytics_demo', open('apps/hbase/example/analytics/hbase-analytics.tsv'))
+    table_data = os.path.join(get_apps_root(), 'hbase', 'example', 'analytics', 'hbase-analytics.tsv')
+    api.bulkUpload(cluster_name, 'analytics_demo', open(table_data))
 
   def create_binary_table(self, api, cluster_name):
     try:
@@ -68,7 +72,7 @@ class Command(NoArgsCommand):
     api.putRow(cluster_name, 'document_demo', tomorrow, {'doc:version': '<xml>I like HBase</xml>'})
     api.putRow(cluster_name, 'document_demo', tomorrow, {'doc:version': '<xml>I LOVE HBase</xml>'})
 
-    root='apps/hbase/example/documents'
+    root = os.path.join(get_apps_root(), 'hbase', 'example', 'documents')
 
     api.putRow(cluster_name, 'document_demo', today, {'doc:img': open(root + '/hue-logo.png', "rb").read()})
     api.putRow(cluster_name, 'document_demo', today, {'doc:html': open(root + '/gethue.com.html', "rb").read()})
