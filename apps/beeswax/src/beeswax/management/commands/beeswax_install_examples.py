@@ -24,6 +24,7 @@ from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 
 from desktop.models import Document
+from hadoop import cluster
 
 import beeswax.conf
 
@@ -102,6 +103,7 @@ class SampleTable(object):
     self.filename = data_dict['data_file']
     self.hql = data_dict['create_hql']
     self.query_server = get_query_server_config(app_name)
+    self.app_name = app_name
 
     # Sanity check
     self._data_dir = beeswax.conf.LOCAL_EXAMPLES_DATA_DIR.get()
@@ -117,7 +119,7 @@ class SampleTable(object):
 
   def create(self, django_user):
     """
-    Create in Hive. Raise InstallException on failure.
+    Create table in the Hive Metastore.
     """
     LOG.info('Creating table "%s"' % (self.name,))
     db = dbms.get(django_user, self.query_server)
@@ -142,17 +144,35 @@ class SampleTable(object):
 
   def load(self, django_user):
     """
-    Load data into table. Raise InstallException on failure.
+    Upload data to HDFS home of user then load (aka move) it into the Hive table (in the Hive metastore in HDFS).
     """
     LOAD_HQL = \
       """
-      LOAD DATA local INPATH
+      LOAD DATA INPATH
       '%(filename)s' OVERWRITE INTO TABLE %(tablename)s
       """
 
+    fs = cluster.get_hdfs()
+
+    if self.app_name == 'impala':
+      # Because Impala does not have impersonation on by default, we use a public destination for the upload.
+      from impala.conf import IMPERSONATION_ENABLED
+      if not IMPERSONATION_ENABLED.get():
+        tmp_public = '/tmp/public_hue_examples'
+        fs.do_as_user(django_user, fs.mkdir, tmp_public, '0777')
+        hdfs_root_destination = tmp_public
+    else:
+      hdfs_root_destination = fs.do_as_user(django_user, fs.get_home_dir)
+
+    hdfs_destination = os.path.join(hdfs_root_destination, self.name)
+
+    LOG.info('Uploading local data %s to HDFS table "%s"' % (self.name, hdfs_destination))
+    fs.do_as_user(django_user, fs.copyFromLocal, self._contents_file, hdfs_destination)
+
     LOG.info('Loading data into table "%s"' % (self.name,))
-    hql = LOAD_HQL % dict(tablename=self.name, filename=self._contents_file)
+    hql = LOAD_HQL % {'tablename': self.name, 'filename': hdfs_destination}
     query = hql_query(hql)
+
     try:
       results = dbms.get(django_user, self.query_server).execute_and_wait(query)
       if not results:
