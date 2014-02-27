@@ -107,6 +107,9 @@ def show_tables(request, database=None):
 
   databases = db.get_databases()
 
+  if database not in databases:
+    database = 'default'
+
   if request.method == 'POST':
     db_form = DbForm(request.POST, databases=databases)
     if db_form.is_valid():
