@@ -15,12 +15,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from desktop.lib.django_test_util import make_logged_in_client
-from desktop.lib.test_utils import add_permission
+import json
+import os
+import tempfile
+
 from django.conf import settings
+from nose.tools import assert_equal, assert_false, assert_true
+
 import desktop.conf
 
-from nose.tools import assert_equal
+from desktop.conf import AUDIT_EVENT_LOG_DIR
+from desktop.lib.django_test_util import make_logged_in_client
+from desktop.lib.test_utils import add_permission
 
 
 def test_jframe_middleware():
@@ -86,6 +92,48 @@ def test_ensure_safe_method_middleware():
     assert_equal(405, response.status_code)
   finally:
     done()
+
+
+def test_audit_logging_middleware_enable():
+  c = make_logged_in_client(username='test_audit_logging_middleware_enable', is_superuser=False)
+
+  # Make sure we enable it with a file path
+  log_tmp = tempfile.NamedTemporaryFile("w+t") # Get a tempfile path
+  log_path = log_tmp.name
+  log_tmp.close()
+  reset = AUDIT_EVENT_LOG_DIR.set_for_testing(log_path)
+  settings.MIDDLEWARE_CLASSES.append('desktop.middleware.AuditLoggingMiddleware') # Re-add middleware
+
+  try:
+    # Check if we audit correctly
+    response = c.get("/beeswax/")
+    assert_true('audited' in response, response)
+
+    audit = open(log_path).readlines()
+    for line in audit:
+      audit_json = json.loads(line)
+      audit_record = audit_json.values()[0]
+      assert_equal('test_audit_logging_middleware_enable', audit_record['user'], audit_record)
+      assert_equal('/beeswax/', audit_record['url'], audit_record)
+
+  finally:
+    settings.MIDDLEWARE_CLASSES.pop()
+    reset()
+    try:
+      os.remove(log_tmp)
+    except:
+      pass
+
+def test_audit_logging_middleware_disable():
+  c = make_logged_in_client(username='test_audit_logging_middleware_disable', is_superuser=False)
+
+  reset = AUDIT_EVENT_LOG_DIR.set_for_testing('')
+  try:
+    # No middleware yet
+    response = c.get("/oozie/")
+    assert_false('audited' in response, response)
+  finally:
+    reset()
 
 
 def test_ensure_safe_redirect_middleware():

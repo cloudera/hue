@@ -22,6 +22,8 @@ import re
 import tempfile
 import kerberos
 
+from datetime import datetime
+
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import REDIRECT_FIELD_NAME, BACKEND_SESSION_KEY, authenticate, load_backend, login
@@ -46,6 +48,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.log.access import access_log, log_page_hit
 from desktop import appmanager
 from hadoop import cluster
+from desktop.log import get_audit_logger
 
 
 LOG = logging.getLogger(__name__)
@@ -343,6 +346,43 @@ class LoginAndPermissionMiddleware(object):
       return HttpResponseRedirect("%s?%s=%s" % (settings.LOGIN_URL, REDIRECT_FIELD_NAME, urlquote(request.get_full_path())))
 
 
+class JsonMessage(object):
+  def __init__(self, **kwargs):
+    self.kwargs = kwargs
+
+  def __str__(self):
+    return json.dumps(self.kwargs)
+
+
+class AuditLoggingMiddleware(object):
+
+  def __init__(self):
+    from desktop.conf import AUDIT_EVENT_LOG_DIR
+
+    if not AUDIT_EVENT_LOG_DIR.get():
+      LOG.info('Unloading AuditLoggingMiddleware')
+      raise exceptions.MiddlewareNotUsed
+
+  def process_response(self, request, response):
+    try:
+      audit_logger = get_audit_logger()
+      audit_logger.debug(JsonMessage(**{
+          datetime.utcnow().strftime('%s'): {
+            'user': request.user.username  if hasattr(request, 'user') else 'anonymous',
+            "status": response.status_code,
+            "impersonator": None,
+            "ip_address": request.META.get('REMOTE_ADDR'),
+            "authorization_failure": response.status_code == 401,
+            "service": get_app_name(request),
+            "url": request.path,
+          }
+      }))
+      response['audited'] = True
+    except Exception, e:
+      LOG.error('Could not audit the request: %s' % e)
+    return response
+
+
 class SessionOverPostMiddleware(object):
   """
   Django puts session info in cookies, which is reasonable.
@@ -600,6 +640,7 @@ class SpnegoMiddleware(object):
       pass
     return username
 
+
 class HueRemoteUserMiddleware(RemoteUserMiddleware):
   """
   Middleware to delegate authentication to a proxy server. The proxy server
@@ -615,6 +656,7 @@ class HueRemoteUserMiddleware(RemoteUserMiddleware):
     if not 'RemoteUserDjangoBackend' in desktop.conf.AUTH.BACKEND.get():
       LOG.info('Unloading HueRemoteUserMiddleware')
       raise exceptions.MiddlewareNotUsed
+
 
 class EnsureSafeMethodMiddleware(object):
   """

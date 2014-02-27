@@ -15,11 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-Desktop logging configuration and library package that is independent from Django.
-This module contains basic setup functions for logging.
-"""
-
 import logging
 import logging.config
 import os
@@ -28,9 +23,12 @@ import re
 import sys
 
 from cStringIO import StringIO
+from logging.handlers import RotatingFileHandler
 
 from desktop.lib.paths import get_desktop_root
 from desktop.log import formatter
+from desktop.log.formatter import MessageOnlyFormatter
+
 
 DEFAULT_LOG_DIR = 'logs'
 LOG_FORMAT = '[%(asctime)s] %(module)-12s %(levelname)-8s %(message)s'
@@ -39,6 +37,7 @@ DATE_FORMAT = '%d/%b/%Y %H:%M:%S %z'
 CONF_RE = re.compile('%LOG_DIR%|%PROC_NAME%')
 
 _log_dir = None
+
 
 def _read_log_conf(proc_name, log_dir):
   """
@@ -69,10 +68,28 @@ def _read_log_conf(proc_name, log_dir):
 def _find_console_stream_handler(logger):
   """Find a StreamHandler that is attached to the logger that prints to the console."""
   for handler in logger.handlers:
-    if isinstance(handler, logging.StreamHandler) and \
-            handler.stream in (sys.stderr, sys.stdout):
+    if isinstance(handler, logging.StreamHandler) and handler.stream in (sys.stderr, sys.stdout):
       return logger
   return None
+
+
+class AuditHandler(RotatingFileHandler):
+  pass
+
+
+def get_audit_logger():
+  from desktop.conf import AUDIT_EVENT_LOG_DIR, AUDIT_LOG_MAX_FILE_SIZE
+
+  audit_logger = logging.getLogger('audit')
+  if not filter(lambda hclass: isinstance(hclass, AuditHandler), audit_logger.handlers): # Don't add handler twice
+    size, unit = int(AUDIT_LOG_MAX_FILE_SIZE.get()[:-2]), AUDIT_LOG_MAX_FILE_SIZE.get()[-2:]
+    maxBytes = size * 1024 ** (1 if unit == 'KB' else 2 if unit == 'MB' else 3)
+
+    audit_handler = AuditHandler(AUDIT_EVENT_LOG_DIR.get(), maxBytes=maxBytes, backupCount=50)
+    audit_handler.setFormatter(MessageOnlyFormatter())
+    audit_logger.addHandler(audit_handler)
+
+  return audit_logger
 
 
 def chown_log_dir(uid, gid):
@@ -83,6 +100,7 @@ def chown_log_dir(uid, gid):
   """
   if _log_dir is None:
     return False
+
   try:
     os.chown(_log_dir, uid, gid)
     for entry in os.listdir(_log_dir):
@@ -123,6 +141,7 @@ def basic_logging(proc_name, log_dir=None):
   _log_dir = log_dir
 
   log_conf = _read_log_conf(proc_name, log_dir)
+
   if log_conf is not None:
     logging.config.fileConfig(log_conf)
     root_logger = logging.getLogger()
@@ -161,9 +180,11 @@ def basic_logging(proc_name, log_dir=None):
 def fancy_logging():
   """Configure logging into a buffer for /logs endpoint."""
   from log_buffer import FixedBufferHandler
+
   BUFFER_SIZE = 10 * 1024 * 1024 # This is the size in characters, not bytes
   buffer_handler = FixedBufferHandler(BUFFER_SIZE)
   _formatter = formatter.Formatter(LOG_FORMAT, DATE_FORMAT)
+
   # We always want to catch all messages in our error report buffer
   buffer_handler.setLevel(logging.DEBUG)
   buffer_handler.setFormatter(_formatter)
