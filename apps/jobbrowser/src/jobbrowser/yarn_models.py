@@ -101,7 +101,11 @@ class Job:
 
   @property
   def counters(self):
-    return self.api.counters(self.id)['jobCounters']
+    counters = self.api.counters(self.id)
+    if counters:
+      return counters['jobCounters']
+    else:
+      return None
 
   @property
   def full_job_conf(self):

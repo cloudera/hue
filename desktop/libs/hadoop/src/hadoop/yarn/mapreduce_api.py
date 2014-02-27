@@ -71,7 +71,13 @@ class MapreduceApi(object):
 
   def counters(self, job_id):
     app_id = job_id.replace('job', 'application')
-    return self._root.get('%(app_id)s/ws/%(version)s/mapreduce/jobs/%(job_id)s/counters' % {'app_id': app_id, 'job_id': job_id, 'version': _API_VERSION}, headers={'Accept': _JSON_CONTENT_TYPE})
+    response = self._root.get('%(app_id)s/ws/%(version)s/mapreduce/jobs/%(job_id)s/counters' % {'app_id': app_id, 'job_id': job_id, 'version': _API_VERSION}, headers={'Accept': _JSON_CONTENT_TYPE})
+    # If it hits the job history server, it will return HTML.
+    # Simply return None in this case because there isn't much data there.
+    if isinstance(response, basestring):
+      return None
+    else:
+      return response
 
   def tasks(self, job_id):
     app_id = job_id.replace('job', 'application')
