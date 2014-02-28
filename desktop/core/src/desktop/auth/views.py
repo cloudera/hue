@@ -36,7 +36,6 @@ from django.utils.translation import ugettext as _
 from hadoop.fs.exceptions import WebHdfsException
 from useradmin.views import ensure_home_directory
 
-from desktop.auth.backend import AllowFirstUserDjangoBackend
 from desktop.auth.forms import UserCreationForm, AuthenticationForm
 from desktop.lib.django_util import render
 from desktop.lib.django_util import login_notrequired

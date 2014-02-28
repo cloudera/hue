@@ -13,11 +13,13 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
+
 <%!
   from desktop import conf
   from django.utils.translation import ugettext as _
   from desktop.views import commonheader, commonfooter
 %>
+
 ${ commonheader("Welcome to Hue", "login", user, "50px") | n,unicode }
 
 <style type="text/css">
