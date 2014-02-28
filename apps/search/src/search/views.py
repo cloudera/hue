@@ -268,6 +268,7 @@ def admin_collection_properties(request, collection_id):
 def admin_collection_template(request, collection_id):
   hue_collection = Collection.objects.get(id=collection_id)
   solr_collection = SolrApi(SOLR_URL.get(), request.user).collection_or_core(hue_collection)
+  sample_data = {}
 
   if request.method == 'POST':
     hue_collection.result.update_from_post(request.POST)
@@ -282,12 +283,22 @@ def admin_collection_template(request, collection_id):
   solr_query['start'] = 0
   solr_query['facets'] = 0
 
-  response = SolrApi(SOLR_URL.get(), request.user).query(solr_query, hue_collection)
+  try:
+    response = SolrApi(SOLR_URL.get(), request.user).query(solr_query, hue_collection)
+    sample_data = json.dumps(response["response"]["docs"])
+  except PopupException, e:
+    message = e
+    try:
+      message = json.loads(e.message.message)['error']['msg'] # Try to get the core error
+    except:
+      pass
+    request.error(_('No preview available, some facets are invalid: %s') % message)
+    LOG.exception(e)
 
   return render('admin_collection_template.mako', request, {
     'solr_collection': solr_collection,
     'hue_collection': hue_collection,
-    'sample_data': json.dumps(response["response"]["docs"]),
+    'sample_data': sample_data,
   })
 
 
