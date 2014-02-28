@@ -15,10 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-try:
-  import json
-except ImportError:
-  import simplejson as json
+import json
 import posixpath
 
 from django.db import models
@@ -80,6 +77,11 @@ class PigScript(Document):
 
   def get_absolute_url(self):
     return reverse('pig:index') + '#edit/%s' % self.id
+
+  @property
+  def use_hcatalog(self):
+    script = self.dict['script']
+    return 'org.apache.hcatalog.pig.HCatStorer' in script or 'org.apache.hcatalog.pig.HCatLoader' in script
 
 
 def create_or_update_script(id, name, script, user, parameters, resources, hadoopProperties, is_design=True):

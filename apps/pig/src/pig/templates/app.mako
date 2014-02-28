@@ -349,7 +349,7 @@ ${ commonheader(None, "pig", user) | n,unicode }
           <br/>
           <br/>
 
-          <h4>${ _('Parameters') } &nbsp; <i id="parameters-dyk" class="fa fa-question-circle"></i></h4>
+          <h4>${ _('Pig parameters') } &nbsp; <i id="parameters-dyk" class="fa fa-question-circle"></i></h4>
           <div id="parameters-dyk-content" class="hide">
             <ul style="text-align: left;">
               <li>input /user/data</li>

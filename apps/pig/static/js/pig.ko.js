@@ -546,7 +546,8 @@ var PigViewModel = function (props) {
       function (data) {
         $(document).trigger("stopped");
         $("#stopModal").modal("hide");
-      }, "json");
+      }, "json"
+    );
   }
 
   function callCopy(script) {
