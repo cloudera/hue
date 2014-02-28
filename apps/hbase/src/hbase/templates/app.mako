@@ -82,7 +82,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
           % endif
         </span>
         <span class="smartview-row-controls pull-right">
-          <button class="btn" data-bind="click: $data.toggleSelectedCollapse, enable: $data.selected().length > 0, clickBubble: false" data-toggle="tooltip" title="${_('Toggle Collapse Selected')}"><i data-bind="css: { 'fa': true, 'fa-resize-small': !$data.isCollapsed(), 'fa-resize-full': $data.isCollapsed() }"></i></button>
+          <button class="btn" data-bind="click: $data.toggleSelectedCollapse, enable: $data.selected().length > 0, clickBubble: false" data-toggle="tooltip" title="${_('Toggle Collapse Selected')}"><i data-bind="css: { 'fa': true, 'fa-compress': !$data.isCollapsed(), 'fa-expand': $data.isCollapsed() }"></i></button>
           <button class="btn" data-bind="click: $data.toggleSelectAllVisible, enable: $data.displayedItems().length > 0, clickBubble: false" data-toggle="tooltip" title="${_('Select All Visible')}"><i class="fa fa-check-square-o"></i></button>
           <input type="text" placeholder="${('Filter Column Names/Family')}" data-bind="value: $data.searchQuery, valueUpdate: $data.items().length < 100 ? 'afterkeydown' : 'change', clickBubble: false"/>
           ${sortBtn('$data.sortDropDown')}
@@ -244,7 +244,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
               ${sortBtn('views.tabledata.sortDropDown')}
             </span>
             <span class="smartview-row-controls pull-right" data-bind="if: views.tabledata.items().length > 0 && views.tabledata.selected().length > 0">
-              <button class="btn" data-bind="click: views.tabledata.batchSelectedAlias.bind(null, 'toggleSelectedCollapse'), clickBubble: false" data-toggle="tooltip" title="${_('Toggle Collapse Selected')}"><i class="fa fa-resize-small"></i></button>
+              <button class="btn" data-bind="click: views.tabledata.batchSelectedAlias.bind(null, 'toggleSelectedCollapse'), clickBubble: false" data-toggle="tooltip" title="${_('Toggle Collapse Selected')}"><i class="fa fa-compress"></i></button>
               <button class="btn" data-bind="click: views.tabledata.batchSelectedAlias.bind(null, 'toggleSelectAllVisible'), clickBubble: false" data-toggle="tooltip" title="${_('Select All Visible')}"><i class="fa fa-check-square-o"></i></button>
               % if user.is_superuser:
                 <button class="btn" data-bind="enable: views.tabledata.items()[0].selected().length > 0, click: views.tabledata.items()[0].dropSelected, clickBubble: false"><i class="fa fa-trash-o"></i> ${_('Drop Columns')}</button>

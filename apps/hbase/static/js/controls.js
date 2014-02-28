@@ -175,7 +175,7 @@ var SmartViewModel = function(options) {
 
   self.lastReloadTime = ko.observable(1);
 
-  self.searchQuery.subscribe(function goToRow(value) //make this as nice as the renderfucnction and split into two, also fire not down on keyup events
+  self.searchQuery.subscribe(function(value) //make this as nice as the render function and split into two, also fire not down on keyup events
   {
     if(app.station() != 'table')
       return;
@@ -269,9 +269,14 @@ var SmartViewModel = function(options) {
 
   self.columnQuery = ko.observable("");
   self.columnQuery.subscribe(function(query) {
-    $(self.items()).each(function() {
-      table_search(query);
-    });
+    var dataRowFilter = function(index, data_row) {
+      data_row.searchQuery(query);
+    };
+    if (self.selected().length > 0) {
+      $.each(self.selected(), dataRowFilter);
+    } else {
+      $.each(self.items(), dataRowFilter);
+    }
   });
 
   self.rows = ko.computed(function() {
@@ -518,10 +523,16 @@ var SmartViewDataRow = function(options) {
     return self;
   };
 
+  self.deselectAllVisible = function(){
+    for(t=0; t<self.displayedItems().length; t++)
+      self.displayedItems()[t].isSelected(false);
+    return self;
+  };
+
   self.toggleSelectAllVisible = function() {
     if(self.selected().length != self.displayedItems().length)
       return self.selectAllVisible();
-    return self.deselectAll();
+    return self.deselectAllVisible();
   };
 
   self.push = function(item) {

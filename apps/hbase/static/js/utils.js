@@ -258,7 +258,7 @@ function logGA(postfix) {
 
 function table_search(value) {
   routie(app.cluster() + '/' + app.views.tabledata.name() +'/query/' + value);
-};
+}
 
 function getEditablePosition(contentEditable, trimWhitespaceNodes) {
   var el = contentEditable;

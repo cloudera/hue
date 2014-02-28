@@ -102,7 +102,10 @@ ko.applyBindings(app);
 
 routed = false;
 routie({
-  ':cluster/:table/query/:query': function(cluster, table, query) {
+    ':cluster/:table/query': function(cluster, table) {
+      routie(cluster + '/' + table);
+    },
+    ':cluster/:table/query/:query': function(cluster, table, query) {
       logGA('query_table');
       $.totalStorage('hbase_cluster', cluster);
       app.station('table');
@@ -127,21 +130,26 @@ routie({
       routed = true;
     },
     ':cluster': function(cluster) {
-      if ($.inArray(cluster, app.clusterNames()) == -1) {
-        routie('');
-      } else {
-        logGA('view_cluster');
-        $.totalStorage('hbase_cluster', cluster);
-        app.station('cluster');
-        app.cluster(cluster);
-        app.pageTitle(cluster);
-        Views.render('clusterview');
-        resetSearch();
-        resetElements();
-        app.views.tabledata.name('');
-        app.views.tables.reload();
-        routed = true;
-      }
+      var redirect = app.clusters.subscribe(function(data) {
+        if ($.inArray(cluster, app.clusterNames()) == -1) {
+          routie('');
+        } else {
+          logGA('view_cluster');
+          $.totalStorage('hbase_cluster', cluster);
+          app.station('cluster');
+          app.cluster(cluster);
+          app.pageTitle(cluster);
+          Views.render('clusterview');
+          resetSearch();
+          resetElements();
+          app.views.tabledata.name('');
+          app.views.tables.reload();
+          routed = true;
+        }
+        redirect.dispose();
+      });
+      resetElements();
+      routed = true;
     },
     'error': function() {
       logGA('error');
