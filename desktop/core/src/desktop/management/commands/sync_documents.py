@@ -25,6 +25,7 @@ from desktop.models import Document
 class Command(NoArgsCommand):
 
   def handle_noargs(self, **options):
-    logging.info('Creating document objects...')
+    logging.info('Running syncing document command.')
+    self.stdout.write('Syncing document objects...\n')
     Document.objects.sync()
-    logging.info('Documents created.')
+    self.stdout.write('Documents synced.\n')

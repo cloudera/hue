@@ -334,7 +334,7 @@ class DocumentManager(models.Manager):
     # Delete documents with no object
     try:
       for doc in Document.objects.all():
-        if doc.content_type is None:
+        if doc.content_type is None or doc.content_object is None:
           doc.delete()
     except Exception, e:
       LOG.warn(force_unicode(e))
