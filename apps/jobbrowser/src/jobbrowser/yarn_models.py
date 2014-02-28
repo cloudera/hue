@@ -159,7 +159,11 @@ class Task:
   def attempts(self):
     # We can cache as we deal with history server
     if not hasattr(self, '_attempts'):
-      self._attempts = [Attempt(self, attempt) for attempt in self.job.api.task_attempts(self.job.id, self.id)['taskAttempts']['taskAttempt']]
+      task_attempts = self.job.api.task_attempts(self.job.id, self.id)['taskAttempts']
+      if task_attempts:
+        self._attempts = [Attempt(self, attempt) for attempt in task_attempts['taskAttempt']]
+      else:
+        self._attempts = []
     return self._attempts
 
   @property

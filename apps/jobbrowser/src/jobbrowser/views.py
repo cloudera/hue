@@ -279,7 +279,7 @@ def job_single_logs(request, job):
     if recent_tasks:
       task = recent_tasks[0]
 
-  if task is None:
+  if task is None or not task.taskAttemptIds:
     raise PopupException(_("No tasks found for job %(id)s.") % {'id': job.jobId})
 
   return single_task_attempt_logs(request, **{'job': job.jobId, 'taskid': task.taskId, 'attemptid': task.taskAttemptIds[-1]})

@@ -182,6 +182,11 @@ class Job(models.Model):
   def get_parameters(self):
     return json.loads(self.parameters)
 
+  def add_parameter(self, name, value):
+    oozie_parameters = self.get_parameters()
+    oozie_parameters.append({"name": name, "value": value})
+    self.parameters = json.dumps(oozie_parameters)
+
   @property
   def parameters_escapejs(self):
     return self._escapejs_parameters_list(self.parameters)

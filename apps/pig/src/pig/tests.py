@@ -22,7 +22,7 @@ import time
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
-from nose.tools import assert_true, assert_equal
+from nose.tools import assert_true, assert_equal, assert_false
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
@@ -127,6 +127,25 @@ class TestMock(TestPigBase):
   def test_create_script(self):
     pig_script = self.create_script()
     assert_equal('Test', pig_script.dict['name'])
+
+  def test_check_hcatalogs_sharelib(self):
+    api = get(None, None, self.user)
+    pig_script = self.create_script()
+
+    # Regular
+    wf = api._create_workflow(pig_script, '[]')
+    assert_false({'name': u'oozie.action.sharelib.for.pig', 'value': u'pig,hcatalog'} in wf.find_all_parameters(), wf.find_all_parameters())
+
+    # With HCat
+    pig_script.update_from_dict({
+        'script':"""
+           a = LOAD 'sample_07' USING org.apache.hcatalog.pig.HCatLoader();
+           dump a;
+    """})
+    pig_script.save()
+
+    wf = api._create_workflow(pig_script, '[]')
+    assert_true({'name': u'oozie.action.sharelib.for.pig', 'value': u'pig,hcatalog'} in wf.find_all_parameters(), wf.find_all_parameters())
 
   def test_editor_view(self):
     response = self.c.get(reverse('pig:app'))
