@@ -190,7 +190,8 @@ class HbaseApi(object):
       if fs:
         fs = " AND (" + fs.strip() + ")"
       filterstring = "(ColumnPaginationFilter(%i,0) AND PageFilter(%i))" % (limit, limit) + (fs or "")
-      scan = get_thrift_type('TScan')(startRow=smart_str(query['row_key']), stopRow=None, timestamp=None, columns=[smart_str(column) for column in (query['columns'] or columns)], caching=None, filterString=filterstring, batchSize=None)
+      scan_columns = [smart_str(column.strip(':')) for column in query['columns']] or [smart_str(column.strip(':')) for column in columns]
+      scan = get_thrift_type('TScan')(startRow=smart_str(query['row_key']), stopRow=None, timestamp=None, columns=scan_columns, caching=None, filterString=filterstring, batchSize=None)
       scanner = client.scannerOpenWithScan(tableName, scan, None)
       aggregate_data += client.scannerGetList(scanner, query['scan_length'])
     return aggregate_data
