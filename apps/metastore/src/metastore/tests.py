@@ -78,8 +78,9 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     response = self.client.get("/metastore/tables/default")
     assert_true("test" in response.context["tables"])
 
+    # Should default to "default" database
     response = self.client.get("/metastore/tables/not_there")
-    assert_false("test" in response.context["tables"])
+    assert_true("test" in response.context["tables"])
 
     # And have detail
     response = self.client.get("/metastore/table/default/test")
