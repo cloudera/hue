@@ -84,11 +84,11 @@ from django.utils.translation import ugettext as _
           base_url = url('filebrowser.views.view', path=path_enc)
         %>
         % if view['mode'] == "binary":
-          <li><a href="${base_url}?offset=${view['offset']}&length=${view['length']}&mode=text&compression=${view['compression']}"><i class="fa fa-font"></i> ${_('View as text')}</a></li>
+          <li><a href="${base_url}?mode=text&compression=${view['compression']}"><i class="fa fa-font"></i> ${_('View as text')}</a></li>
         % endif
 
         % if view['mode'] == "text":
-          <li><a href="${base_url}?offset=${view['offset']}&length=${view['length']}&mode=binary&compression=${view['compression']}"><i class="fa fa-barcode"></i> ${_('View as binary')}</a></li>
+          <li><a href="${base_url}?mode=binary&compression=${view['compression']}"><i class="fa fa-barcode"></i> ${_('View as binary')}</a></li>
         % endif
 
         % if view['compression'] != "gzip" and path.endswith('.gz'):
