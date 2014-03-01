@@ -157,7 +157,8 @@ var SmartViewModel = function(options) {
           return -1;
         return 0;
       }
-    }
+    },
+    canWrite: false
   }, options);
   ListViewModel.apply(this, [options]); //items: [ListView.items[],ListView.items[]]
 
@@ -413,7 +414,8 @@ var SmartViewDataRow = function(options) {
           return -1;
         return 0;
       }
-    }
+    },
+    canWrite: false
   }, options);
   DataRow.apply(self,[options]);
   ListViewModel.apply(self,[options]);

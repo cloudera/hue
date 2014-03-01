@@ -20,3 +20,7 @@ ICON = '/hbase/static/art/icon_24.png'
 
 REQUIRES_HADOOP = False
 IS_URL_NAMESPACED = True
+
+PERMISSION_ACTIONS = (
+  ("write", "Allow writing in the HBase app."),
+)

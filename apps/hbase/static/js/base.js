@@ -28,6 +28,7 @@ var ListViewModel = function(options) {
   options = ko.utils.extend(_defaults,options);
   BaseModel.apply(this,[options]);
 
+  self.canWrite = ko.observable(options.canWrite);
   self.items = ko.observableArray(options.items);
   self.sortDropDown = new SortDropDownView({sortFields: options.sortFields, target: self.items});
   self.selectAll = function(){
