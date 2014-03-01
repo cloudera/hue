@@ -23,15 +23,15 @@ import re
 import StringIO
 import urllib
 
-from avro import schema, datafile, io
+from avro import datafile, io
 
-from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 
 from desktop.lib.django_util import render
 
 from hbase import conf
+from hbase.settings import DJANGO_APPS
 from hbase.api import HbaseApi
 from hbase.management.commands import hbase_setup
 from server.hbase_lib import get_thrift_type
@@ -39,8 +39,13 @@ from server.hbase_lib import get_thrift_type
 LOG = logging.getLogger(__name__)
 
 
+def has_write_access(user):
+  return user.is_superuser or user.has_hue_permission(action="write", app=DJANGO_APPS[0])
+
 def app(request):
-  return render('app.mako', request, {})
+  return render('app.mako', request, {
+    'can_write': has_write_access(request.user)
+  })
 
 # action/cluster/arg1/arg2/arg3...
 def api_router(request, url): # On split, deserialize anything

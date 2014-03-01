@@ -89,7 +89,9 @@ ${ commonheader(None, "hbase", user) | n,unicode }
           % if user.is_superuser:
             <button class="btn" data-bind="enable: $data.selected().length > 0, click: $data.dropSelected, clickBubble: false"><i class="fa fa-trash-o"></i> Drop Columns</button>
           % endif
+          % if can_write:
           <a href="#new_column_modal" data-bind="click:function(){app.focusModel($data);launchModal('new_column_modal', $data);}" class="btn" title="${_('Add New Column/Cell')}"><i class="fa fa-plus"></i></a>
+          % endif
         </span>
       </h5>
       <ul class="smartview-cells" data-bind="event: {scroll: onScroll}">
@@ -102,7 +104,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
               <a class="corner-btn btn" data-bind="click: $data.drop, clickBubble: false"><i class="fa fa-trash-o"></i></a>
             % endif
             <a class="corner-btn btn" data-bind="visible: $data.editing(), event: { mousedown: function(){launchModal('cell_edit_modal',{content:$data, mime: detectMimeType($data.value())})} }"><i class="fa fa-pencil"></i> ${_('Full Editor')}</a>
-            <pre data-bind="text: ($data.value().length > 146 ? $data.value().substring(0, 144)+'...' : $data.value()).replace(/(\r\n|\n|\r)/gm,''), click: $data.value().length > 146 ? function(){launchModal('cell_edit_modal',{content:$data, mime: detectMimeType($data.value())})} : function(){$data.editing(true)}, clickBubble: false, visible: !$data.isLoading() && !$data.editing()"></pre>
+            <pre data-bind="text: ($data.value().length > 146 ? $data.value().substring(0, 144)+'...' : $data.value()).replace(/(\r\n|\n|\r)/gm,''), click: editCell($data), clickBubble: false, visible: !$data.isLoading() && !$data.editing()"></pre>
             <textarea data-bind="visible: !$data.isLoading() && $data.editing(), hasfocus: $data.editing, value: $data.value, click:function(){}, clickBubble: false"></textarea>
             <img src="/static/art/spinner.gif" data-bind="visible: $data.isLoading() " />
           </div>
@@ -171,9 +173,11 @@ ${ commonheader(None, "hbase", user) | n,unicode }
           </span>
           <button class="btn" data-bind="enable: views.tables.selected().length > 0, click: views.tables.dropSelected"><i class="fa fa-trash-o"></i> ${_('Drop')}</button>
         % endif
+        % if can_write:
         <span class="pull-right">
           <a href="#new_table_modal" role="button" data-bind="click: function(){app.focusModel(app.views.tables);}" class="btn" data-toggle="modal"><i class='fa fa-plus-circle'></i> ${_('New Table')}</a>
         </span>
+        % endif
       </div>
     </div>
 
@@ -278,8 +282,10 @@ ${ commonheader(None, "hbase", user) | n,unicode }
             % if user.is_superuser:
               <a class="btn" data-bind="enable: views.tabledata.selected().length > 0, click: views.tabledata.dropSelected"><i class="fa fa-trash-o"></i> ${_('Drop Rows')}</a>
             % endif
+            % if can_write:
             <a id="bulk-upload-btn" class="btn fileChooserBtn" data-toggle="tooltip" title="${_('.CSV, .TSV, etc...')}" aria-hidden="true"><i class="fa fa-upload"></i> ${_('Bulk Upload')}</a>
             <a href="#new_row_modal" data-bind="click:function(){app.focusModel(app.views.tabledata);launchModal('new_row_modal')}" role="button" class="btn btn-primary" data-callback=""><i class='fa fa-plus-circle'></i> ${_('New Row')}</a>
+            % endif
           </span>
         </div>
     </div>
@@ -442,6 +448,8 @@ function i18n(text) {
     return i18n_cache[text];
   return text;
 };
+
+canWrite = ${ str(can_write).lower() };
 </script>
 <script src="/static/ext/js/datatables-paging-0.1.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/ext/js/knockout-min.js" type="text/javascript" charset="utf-8"></script>

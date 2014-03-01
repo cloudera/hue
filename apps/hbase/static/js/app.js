@@ -49,7 +49,7 @@ var AppViewModel = function() {
           callback();
       });
     }}),
-    tabledata: new SmartViewModel({el: 'views.tabledata', reload: function(callback) //move inside SmartViewModel class?
+    tabledata: new SmartViewModel({'canWrite': canWrite, el: 'views.tabledata', reload: function(callback) //move inside SmartViewModel class?
     {
       var t_self = this;
       function getColumnFamilies() {
@@ -67,7 +67,7 @@ var AppViewModel = function() {
           var keys = Object.keys(data);
           var items = [];
           for(var i=0; i<keys.length; i++) {
-            var row = new SmartViewDataRow({items: [], row:data[keys[i]].row, reload: function(options) {
+            var row = new SmartViewDataRow({'canWrite': canWrite, items: [], row:data[keys[i]].row, reload: function(options) {
               var self = this;
               options = (options == null) ? {} : options;
               options = ko.utils.extend({
