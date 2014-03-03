@@ -202,14 +202,15 @@ class DocumentManager(models.Manager):
 
     return [job.content_object for job in docs if job.content_object]
 
-  def available_docs(self, model_class, user):
-    trash = DocumentTag.objects.get_trash_tag(user=user)
-    history = DocumentTag.objects.get_history_tag(user=user)
+  def available_docs(self, model_class, user, with_history=False):
+    exclude = [DocumentTag.objects.get_trash_tag(user=user)]
+    if not with_history:
+      exclude.append(DocumentTag.objects.get_history_tag(user=user))
 
-    return Document.objects.get_docs(user, model_class).exclude(tags__in=[trash, history]).order_by('-last_modified')
+    return Document.objects.get_docs(user, model_class).exclude(tags__in=exclude).order_by('-last_modified')
 
-  def available(self, model_class, user):
-    docs = self.available_docs(model_class, user)
+  def available(self, model_class, user, with_history=False):
+    docs = self.available_docs(model_class, user, with_history)
 
     return [doc.content_object for doc in docs if doc.content_object]
 

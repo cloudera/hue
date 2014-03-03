@@ -55,7 +55,7 @@ def dashboard(request):
   pig_api = api.get(request.fs, request.jt, request.user)
 
   jobs = pig_api.get_jobs()
-  hue_jobs = Document.objects.available(PigScript, request.user)
+  hue_jobs = Document.objects.available(PigScript, request.user, with_history=True)
   massaged_jobs = pig_api.massaged_jobs_for_json(request, jobs, hue_jobs)
 
   return HttpResponse(json.dumps(massaged_jobs), mimetype="application/json")
@@ -144,7 +144,7 @@ def copy(request):
   pig_script.doc.get().can_edit_or_exception(request.user)
 
   existing_script_data = pig_script.dict
-  
+
   owner = request.user
   name = existing_script_data["name"] + _(' (Copy)')
   script = existing_script_data["script"]
@@ -159,11 +159,11 @@ def copy(request):
       'parameters': parameters,
       'resources': resources,
       'hadoopProperties': hadoopProperties
-  })  
+  })
   script_copy.save()
 
   copy_doc = pig_script.doc.get().copy(name=name, owner=owner)
-  script_copy.doc.add(copy_doc)   
+  script_copy.doc.add(copy_doc)
 
   response = {
     'id': script_copy.id,
