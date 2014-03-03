@@ -133,6 +133,9 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
           % else:
             <li><a href="javascript:void(0)" class="edit-tags" style="line-height:24px"><i class="fa fa-plus-circle"></i> ${_('There are currently no projects. Click here to add one now!')}</a></li>
           % endif
+          <li class="nav-header tag-header">
+            ${_('Shared with me')} <div class="edit-tags" style="display: inline;margin-left: 6px" ><i class="fa fa-tags"></i></div>
+          </li>
         </ul>
       </div>
 
@@ -253,14 +256,17 @@ $(document).ready(function () {
     JSON_USERS_GROUPS = data;
     dropdown = [];
     map = {};
+
     $.each(JSON_USERS_GROUPS.users, function (i, user) {
       map[user.username] = user;
       dropdown.push(user.username);
     });
+
     $.each(JSON_USERS_GROUPS.groups, function (i, group) {
       map[group.name] = group;
       dropdown.push(group.name);
     });
+
     $("#documentShareAdd").typeahead({
       source: function (query, process) {
         process(dropdown);
