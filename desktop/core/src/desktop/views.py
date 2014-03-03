@@ -15,8 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
+import itertools
 import json
+import logging
 import os
 import sys
 import tempfile
@@ -50,7 +51,10 @@ LOG = logging.getLogger(__name__)
 
 
 def home(request):
-  docs = Document.objects.get_docs(request.user).order_by('-last_modified')[:1000]
+  docs = itertools.chain(
+      Document.objects.get_docs(request.user).order_by('-last_modified').exclude(tags__tag__in=['history'])[:500],
+      Document.objects.get_docs(request.user).order_by('-last_modified').filter(tags__tag__in=['history'])[:100]
+  )
   tags = DocumentTag.objects.get_tags(user=request.user)
 
   apps = appmanager.get_apps_dict(request.user)
