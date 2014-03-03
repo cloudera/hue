@@ -30,9 +30,6 @@ var AppViewModel = function() {
       return cluster_config.name;
     });
   });
-  API.query('getClusters').done(function(data) {
-    app.clusters(data);
-  });
   self.search = new tagsearch();
 
   self.views = {
@@ -91,7 +88,13 @@ var AppViewModel = function() {
       });
     }})
   };
-}
+
+  self.initialize = function() {
+    return API.query('getClusters').done(function(data) {
+      app.clusters(data);
+    });
+  };
+};
 
 var app = new AppViewModel();
 
@@ -101,36 +104,36 @@ ko.applyBindings(app);
 //routing
 
 routed = false;
-routie({
-    ':cluster/:table/query': function(cluster, table) {
-      routie(cluster + '/' + table);
-    },
-    ':cluster/:table/query/:query': function(cluster, table, query) {
-      logGA('query_table');
-      $.totalStorage('hbase_cluster', cluster);
-      app.station('table');
-      app.search.cur_input(query);
-      Router.setTable(cluster, table);
-      resetElements();
-      Views.render('dataview');
-      app.views.tabledata._reloadcfs(function(){
-        app.search.evaluate();
-        app.views.tabledata.searchQuery(query);
-      });
-      routed = true;
-    },
-    ':cluster/:table': function(cluster, table) {
-      logGA('view_table');
-      $.totalStorage('hbase_cluster', cluster);
-      Router.setTable(cluster, table);
-      resetSearch();
-      resetElements();
-      app.station('table');
-      Views.render('dataview');
-      routed = true;
-    },
-    ':cluster': function(cluster) {
-      var redirect = app.clusters.subscribe(function(data) {
+app.initialize().done(function() {
+  routie({
+      ':cluster/:table/query': function(cluster, table) {
+        routie(cluster + '/' + table);
+      },
+      ':cluster/:table/query/:query': function(cluster, table, query) {
+        logGA('query_table');
+        $.totalStorage('hbase_cluster', cluster);
+        app.station('table');
+        app.search.cur_input(query);
+        Router.setTable(cluster, table);
+        resetElements();
+        Views.render('dataview');
+        app.views.tabledata._reloadcfs(function(){
+          app.search.evaluate();
+          app.views.tabledata.searchQuery(query);
+        });
+        routed = true;
+      },
+      ':cluster/:table': function(cluster, table) {
+        logGA('view_table');
+        $.totalStorage('hbase_cluster', cluster);
+        Router.setTable(cluster, table);
+        resetSearch();
+        resetElements();
+        app.station('table');
+        Views.render('dataview');
+        routed = true;
+      },
+      ':cluster': function(cluster) {
         if ($.inArray(cluster, app.clusterNames()) == -1) {
           routie('');
         } else {
@@ -146,36 +149,32 @@ routie({
           app.views.tables.reload();
           routed = true;
         }
-        redirect.dispose();
-      });
-      resetElements();
-      routed = true;
-    },
-    'error': function() {
-      logGA('error');
-      routed = true;
-    },
-    '': function(){
-      var redirect = app.clusters.subscribe(function(data) {
+        resetElements();
+        routed = true;
+      },
+      'error': function() {
+        logGA('error');
+        routed = true;
+      },
+      '': function(){
         var cluster = $.totalStorage('hbase_cluster');
         if (cluster != null && $.inArray(cluster, app.clusterNames()) > -1) {
           routie(cluster);
-        }
-        else {
+        } else {
           routie(data[0].name);
         }
-        redirect.dispose();
-      });
-      resetElements();
-      routed = true;
-    },
-    '*': function() {
-      logGA('');
-      if(!routed)
-        history.back();
-      routed = false;
-    }
+        resetElements();
+        routed = true;
+      },
+      '*': function() {
+        logGA('');
+        if(!routed)
+          history.back();
+        routed = false;
+      }
+  });
 });
+
 
 $.fn.renderElement = function(data){utils.renderElement($(this,data))};
 
