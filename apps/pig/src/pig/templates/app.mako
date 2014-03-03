@@ -1113,7 +1113,7 @@ ${ commonheader(None, "pig", user) | n,unicode }
       refreshLogs();
       logsRefreshInterval = window.setInterval(function () {
         refreshLogs();
-      }, 1000);
+      }, 500);
     });
 
     $(document).on("stopLogsRefresh", function () {
