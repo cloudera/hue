@@ -24,5 +24,5 @@ MENU_INDEX = 20
 IS_URL_NAMESPACED = True
 
 PERMISSION_ACTIONS = (
-  ("read_only_access", "read_only_access: No DDL permitted, need the app access too."),
+  ("write", "Allow DDL operations. Need the app access too."),
 )

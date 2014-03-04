@@ -47,7 +47,7 @@ def check_has_write_access_permission(view_func):
   """
   def decorate(request, *args, **kwargs):
     if not has_write_access(request.user):
-      raise PopupException(_('You are not allowed to modify the metastore.'), detail=_('You have metastore:read_only_access permissions'))
+      raise PopupException(_('You are not allowed to modify the metastore.'), detail=_('You have must have metastore:write permissions'), error_code=301)
 
     return view_func(request, *args, **kwargs)
   return wraps(view_func)(decorate)
@@ -310,4 +310,4 @@ def analyze_table(request, database, table, column=None):
 
 
 def has_write_access(user):
-  return user.is_superuser or not user.has_hue_permission(action="read_only_access", app=DJANGO_APPS[0])
+  return user.is_superuser or user.has_hue_permission(action="write", app=DJANGO_APPS[0])
