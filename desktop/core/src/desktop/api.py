@@ -33,7 +33,7 @@ LOG = logging.getLogger(__name__)
 
 def list_docs(request):
   docs = Document.objects.get_docs(request.user).order_by('-last_modified')[:1000]
-  return HttpResponse(json.dumps(massaged_documents_for_json(docs)), mimetype="application/json")
+  return HttpResponse(json.dumps(massaged_documents_for_json(docs, request.user)), mimetype="application/json")
 
 
 def list_tags(request):
@@ -41,11 +41,11 @@ def list_tags(request):
   return HttpResponse(json.dumps(massaged_tags_for_json(tags, request.user)), mimetype="application/json")
 
 
-def massaged_documents_for_json(documents):
-  return [massage_doc_for_json(doc) for doc in documents]
+def massaged_documents_for_json(documents, user):
+  return [massage_doc_for_json(doc, user) for doc in documents]
 
 
-def massage_doc_for_json(doc):
+def massage_doc_for_json(doc, user):
   perms = doc.list_permissions()
   return {
       'id': doc.id,
@@ -62,6 +62,7 @@ def massage_doc_for_json(doc):
         }
       },
       'owner': doc.owner.username,
+      'isMine': doc.owner.username == user.username,
       'lastModified': doc.last_modified.strftime("%x %X"),
       'lastModifiedInMillis': time.mktime(doc.last_modified.timetuple())
     }
@@ -75,9 +76,11 @@ def massaged_tags_for_json(tags, user):
     massaged_tag = {
       'id': tag.id,
       'name': tag.tag,
+      'owner': tag.owner.username,
       'isTrash': tag.id == trash.id,
       'isHistory': tag.id == history.id,
-      'isExample': tag.tag == DocumentTag.EXAMPLE
+      'isExample': tag.tag == DocumentTag.EXAMPLE,
+      'isMine': tag.owner.username == user.username
     }
     ts.append(massaged_tag)
 
@@ -123,7 +126,7 @@ def update_tags(request):
     request_json = json.loads(request.POST['data'])
     try:
       doc = DocumentTag.objects.update_tags(request.user, request_json['doc_id'], request_json['tag_ids'])
-      response['doc'] = massage_doc_for_json(doc)
+      response['doc'] = massage_doc_for_json(doc, request.user)
       response['status'] = 0
     except Exception, e:
       response['message'] = force_unicode(e)
@@ -162,7 +165,7 @@ def update_permissions(request):
       doc.sync_permissions(data)
       response['message'] = _('Permissions updated!')
       response['status'] = 0
-      response['doc'] = massage_doc_for_json(doc)
+      response['doc'] = massage_doc_for_json(doc, request.user)
     except Exception, e:
       response['message'] = force_unicode(e)
   else:
