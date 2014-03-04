@@ -190,10 +190,10 @@ from django.template.defaultfilters import escape, escapejs
       <div class="pull-left" style="color: #DDDDDD;font-size: 116px;margin: 10px; margin-right: 20px"><i class="fa fa-flag-checkered"></i></div>
       <div style="margin: 10px">
       <p>
-        ${_('There is one or more tours available for this page. These tours were created to guide you around.')}
+        ${_('There are one or more tours available for this page. These tours were created to guide you around.')}
       </p>
       <p>
-        ${_('You can see the list of the tours by clicking on the checkered flag icon on top right of this page.')} <span class="badge badge-info"><i class="fa fa-flag-checkered"></i></span>
+        ${_('You can see the list of tours by clicking on the checkered flag icon at the top right of this page.')} <span class="badge badge-info"><i class="fa fa-flag-checkered"></i></span>
       </p>
         </div>
     </div>

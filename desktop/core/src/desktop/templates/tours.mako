@@ -73,6 +73,34 @@ $.jHueTour({
       "blog": "http://gethue.tumblr.com/post/66351828212/new-search-feature-graphical-facets"
     },
     {
+      "name": "impalasentry",
+      "desc": "${_("Use Impala with Sentry")}",
+      "path": "/impala",
+      "video": "",
+      "blog": "http://gethue.tumblr.com/post/70206086469/use-the-impala-app-with-sentry-for-real-security"
+    },
+    {
+      "name": "ooziefb",
+      "desc": "${_("Submit Oozie jobs directly from HDFS")}",
+      "path": "/(oozie|filebrowser)",
+      "video": "http://player.vimeo.com/video/80749790",
+      "blog": "http://gethue.tumblr.com/post/68781982681/hadoop-tutorial-submit-any-oozie-jobs-directly-from"
+    },
+    {
+      "name": "jbyarn",
+      "desc": "${_("A Job Browser for Yarn")}",
+      "path": "/jobbrowser",
+      "video": "http://player.vimeo.com/video/84027054",
+      "blog": "http://gethue.tumblr.com/post/73219285865/using-hadoop-mr2-and-yarn-with-an-alternative-job"
+    },
+    {
+      "name": "jbyarnsecurity",
+      "desc": "${_("Security with Yarn")}",
+      "path": "/jobbrowser",
+      "video": "http://player.vimeo.com/video/85922379",
+      "blog": "http://gethue.tumblr.com/post/77939687768/secure-your-yarn-cluster-and-access-the-jobs"
+    },    
+    {
       "name": "sentry",
       "desc": "${_("Hive Query editor with HiveServer2")}<br/>${_("and Sentry")}",
       "path": "/(beeswax|impala)",
@@ -108,11 +136,32 @@ $.jHueTour({
       "blog": "http://gethue.tumblr.com/post/60376973455/hadoop-tutorials-ii-1-prepare-the-data-for-analysis"
     },
     {
+      "name": "hue35",
+      "desc": "${_("What's new in Hue 3.5")}",
+      "path": "/(about|home)",
+      "video": "",
+      "blog": "http://gethue.tumblr.com/post/69115755563/hue-3-5-and-its-redesign-are-out"
+    },
+    {
       "name": "saml",
       "desc": "${_("SSO with SAML")}",
       "path": "/(useradmin|about)",
       "video": "http://player.vimeo.com/video/76063637",
       "blog": "http://gethue.tumblr.com/post/62273866476/sso-with-hue-new-saml-backend"
+    },
+    {
+      "name": "ldaphowto",
+      "desc": "${_("Integrating your company with LDAP: How To")}",
+      "path": "/(useradmin|about)",
+      "video": "",
+      "blog": "http://gethue.tumblr.com/post/75499679342/making-hadoop-accessible-to-your-employees-with-ldap"
+    },
+    {
+      "name": "sparkapp",
+      "desc": "${_("A new Spark UI")}",
+      "path": "/(spark)",
+      "video": "http://player.vimeo.com/video/78887745",
+      "blog": "http://gethue.tumblr.com/post/71963991256/a-new-spark-web-ui-spark-app"
     },
     {
       "name": "impalavshive",
@@ -194,7 +243,7 @@ $.jHueTour({
      {
        "name": "hue25",
        "desc": "${_("What's new in Hue 2.5")}",
-       "path": "/home",
+       "path": "/(about|home)",
        "video": "http://player.vimeo.com/video/70955652",
        "blog": "http://gethue.tumblr.com/post/55581863077/hue-2-5-and-its-hbase-app-is-out"
      },

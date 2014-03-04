@@ -5,41 +5,69 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 <link rel="stylesheet" type="text/css" href="commonltr.css"/>
-<title>Cloudera Impala Query UI</title>
+<title>Impala Query UI</title>
 </head>
 <body id="topic_5"><a name="topic_5"><!-- --></a>
 
 
 
-  <h1 class="title topictitle1">Cloudera Impala Query UI </h1>
+  <h1 class="title topictitle1">Impala Query UI </h1>
 
 
   <div class="body conbody">
 
-    <p class="p"> The Cloudera Impala Query UI application enables you to perform queries
-      on Apache Hadoop data stored in HDFS or HBase using Cloudera Impala. For information about
-      Cloudera Impala, see <a class="xref" href="../../../../content/support/en/documentation/cloudera-impala/cloudera-impala-documentation-v1-latest.html" target="_blank">Installing and
-        Using Cloudera Impala</a>. You can create, run, and manage queries, and download the
+    <p class="p"> The Impala Query UI application enables you to perform queries
+      on Apache Hadoop data stored in HDFS or HBase using Impala. For information about
+      Impala, see <a class="xref" href="http://impala.io" target="_blank">Installing and
+        Using Impala</a>. You can create, run, and manage queries, and download the
       results in a Microsoft Office Excel worksheet file or a comma-separated values file. </p>
-
-
   </div>
+
+<span>Hue, </span><a href="http://gethue.com"><span>the Hadoop UI</span></a><span>, has been supporting </span><a href="https://github.com/cloudera/impala"><span>Impala</span></a><span> closely since its first version and brings fast interactive queries within your browser. If not familiar with </span><a href="http://blog.cloudera.com/blog/2012/10/cloudera-impala-real-time-queries-in-apache-hadoop-for-real/"><span>Impala</span></a><span>, we recommend you to check the documentation of the fastest </span><a href="http://www.cloudera.com/content/support/en/documentation/cloudera-impala/cloudera-impala-documentation-v1-latest.html"><span>SQL engine</span></a><span> for Hadoop.</span></p>
+
+<h1><span>Impala App</span></h1>
+<p><span>Most of Hive SQL is compatible with Impala and we are going to compare the queries of </span><a href="http://gethue.tumblr.com/post/60376973455/hadoop-tutorials-ii-1-prepare-the-data-for-analysis"><span>episode one</span></a><span> in both Hive and Impala applications. Notice that this comparison is not 100% scientific but it demonstrates what would happen in common cases.</span></p>
+<p><br/><span></span></p>
+<p><iframe frameborder="0" height="495" src="http://player.vimeo.com/video/75493693" width="900"></iframe></p>
+<p><span>Using Impala through the Hue app is easier in many ways than using it through the command-line impala-shell. For example, table names, databases, columns, built-in functions are auto-completable and the syntax highlighting shows the potential typos in your queries. Multiple queries or a selected portion of a query can be executed from the editor. Parameterized queries are supported and the user will be prompted for values at submission time. Impala queries can be saved and shared between users or deleted and then restored from trash in case of mistakes. </span></p>
+<p><br/><span></span></p>
+<p><span>Impala uses the same Metastore as Hive so you can browse tables with the </span><a href="http://gethue.tumblr.com/post/56804308712/hadoop-tutorial-how-to-access-hive-in-pig-with"><span>Metastore app</span></a><span>. You can also pick a database with a drop-down in the editor. After submission, progress and logs are reported and you can browse the result with infinite scroll or download the data with your browser.</span></p>
+
+<h1><span>Query speed comparison </span></h1>
+<p><span>Let’s start with the Hue examples as they are easily accessible. They are very small but show the lightning speed of Impala and the inefficiency of the series of MapReduce jobs created by Hive.</span></p>
+
+<p><span>Make sure the Hive and Impala examples are installed in Hue and then in each app, go to ‘</span><span>Saved Queries</span><span>’, copy the query ‘</span><span>Sample: Top salaries</span><span>’ and submit it.</span></p>
+
+<p><span>Then we are back to our Yelp data. Let’s take the query from </span><a href="http://gethue.tumblr.com/post/60376973455/hadoop-tutorials-ii-1-prepare-the-data-for-analysis"><span>episode one</span></a><span> and execute it in both apps:</span></p>
+
+<pre class="code">SELECT r.business_id, name, SUM(cool) AS coolness
+FROM review r JOIN business b
+ON (r.business_id = b.business_id)
+WHERE categories LIKE '%Restaurants%'
+AND `date` = '$date'
+GROUP BY r.business_id, name
+ORDER BY coolness DESC
+LIMIT 10
+</pre>
+<p><span> </span></p>
+<p><span>Again, you can see the benefits of Impala’s </span><a href="http://www.cloudera.com/content/cloudera-content/cloudera-docs/Impala/latest/Installing-and-Using-Impala/ciiu_concepts.html"><span>architecture and optimization</span></a><span>.</span></p>
+<p><span> </span></p>
 
 
   <div class="topic concept nested1" xml:lang="en-US" lang="en-US" id="topic_5_1"><a name="topic_5_1"><!-- --></a>
 
-    <h2 class="title topictitle2">Cloudera Impala Query UI and Installation and Configuration
+    <h2 class="title topictitle2">Impala Query UI and Installation and Configuration
     </h2>
 
 
     <div class="body conbody">
 
-      <p class="p"> The Cloudera Impala Query UI application is one of the applications
+      <p class="p"> The Impala Query UI application is one of the applications
         installed as part of Hue. <span class="ph">For information about installing and configuring Hue,
         see Hue Installation in <a class="xref" href="http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/CDH4-Installation-Guide.html" target="_blank">http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/CDH4-Installation-Guide.html</a>.</span></p>
 
 
-      <p class="p"> The Cloudera Impala Query UI assumes an existing Cloudera Impala
+      <p class="p"> The Impala Query UI assumes an existing Impala
         installation. The Hue installation instructions include the configuration necessary for
         Impala. You can view the current configuration from the <strong class="ph b">Settings</strong> tab. </p>
 
@@ -52,13 +80,13 @@
 
   <div class="topic concept nested1" xml:lang="en-US" lang="en-US" id="topic_5_2"><a name="topic_5_2"><!-- --></a>
 
-    <h2 class="title topictitle2">Starting Cloudera Impala Query UI
+    <h2 class="title topictitle2">Starting Impala Query UI
     </h2>
 
 
     <div class="body conbody">
 
-      <p class="p">Click the <strong class="ph b">Cloudera Impala Query UI</strong>
+      <p class="p">Click the <strong class="ph b">Impala Query UI</strong>
         icon (<img class="image" src="/impala/static/art/icon_impala_24.png"/>) in the navigation bar at the top of the Hue browser page. </p>
 
 
@@ -80,7 +108,7 @@
 
       <p class="p"> When you change the metastore using one of these applications, you must click the
           <span class="ph uicontrol">Refresh</span> button under METASTORE CATALOG in the pane to the left of
-        the Query Editor to make the metastore update visible to the Cloudera Impala server. </p>
+        the Query Editor to make the metastore update visible to the Impala server. </p>
 
     </div>
 
@@ -99,7 +127,7 @@
 <li class="li">Click <strong class="ph b">Step 2:
             Examples</strong>.</li>
 
-        <li class="li">Click <strong class="ph b">Cloudera Impala Query
+        <li class="li">Click <strong class="ph b">Impala Query
           UI</strong>.</li>
 
       </ol>
@@ -116,10 +144,10 @@
 
     <div class="body conbody">
 
-      <p class="p"> The Query Editor view lets you create queries in the Cloudera Impala
+      <p class="p"> The Query Editor view lets you create queries in the Impala
         Query Language, which is based on the Hive Standard Query Language (HiveQL) and described in
-        the Cloudera Impala Language Reference topic in <a class="xref" href="http://www.cloudera.com/content/cloudera-content/cloudera-docs/Impala/latest/Installing-and-Using-Impala/Installing-and-Using-Impala.html" target="_blank">Installing and
-          Using Cloudera Impala</a>. </p>
+        the Impala Language Reference topic in <a class="xref" href="http://www.cloudera.com/content/cloudera-content/cloudera-docs/Impala/latest/Installing-and-Using-Impala/Installing-and-Using-Impala.html" target="_blank">Installing and
+          Using Impala</a>. </p>
 
       <p class="p">You can name and save your queries to use later. </p>
 
@@ -127,7 +155,7 @@
         or return later to find the queries in the <strong class="ph b">History</strong> view. </p>
 
       <p class="p">In the box to the left of the Query field, you can select a database,
-        override the default Cloudera Impala settings, enable users to enter parameters at run-time.
+        override the default Impala settings, enable users to enter parameters at run-time.
         See <a class="xref" href="#topic_5_3_2">Advanced Query Settings</a> for details on using these settings. </p>
 
 
@@ -283,11 +311,11 @@
                 </td>
 
                 <td class="entry" valign="top" width="75%" headers="d7221e313 ">
-                  <div class="p">Override Cloudera Impala default settings. To configure a
+                  <div class="p">Override Impala default settings. To configure a
                     new setting: <a name="topic_5_3_2__ol_k5v_hcc_zj"><!-- --></a><ol class="ol" id="topic_5_3_2__ol_k5v_hcc_zj">
                       <li class="li">Click <strong class="ph b">Add</strong>.</li>
 
-                      <li class="li">For <strong class="ph b">Key</strong>, enter a Cloudera Impala
+                      <li class="li">For <strong class="ph b">Key</strong>, enter a Impala
                         configuration variable name. </li>
 
                       <li class="li">For <strong class="ph b">Value</strong>, enter the value you want to
