@@ -15,18 +15,56 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django.contrib.auth.forms import AuthenticationForm as AuthAuthenticationForm, UserCreationForm as AuthUserCreationForm
-from django.forms import CharField, TextInput, PasswordInput
-from django.utils.translation import ugettext_lazy as _t
+import datetime
 
+from django.conf import settings
+from django.contrib.auth.models import User
+from django.contrib.auth.forms import AuthenticationForm as AuthAuthenticationForm, UserCreationForm as AuthUserCreationForm
+from django.forms import CharField, TextInput, PasswordInput, ValidationError
+from django.utils.safestring import mark_safe
+from django.utils.translation import ugettext_lazy as _t, ugettext as _
+
+from desktop import conf
 
 
 class AuthenticationForm(AuthAuthenticationForm):
   """
   Adds appropriate classes to authentication form
   """
+  error_messages = {
+    'invalid_login': _t("Invalid username or password."),
+    'inactive': _t("Account deactivated. Please contact an administrator."),
+  }
+
   username = CharField(label=_t("Username"), max_length=30, widget=TextInput(attrs={'maxlength': 30, 'placeholder': _t("Username"), "autofocus": "autofocus"}))
   password = CharField(label=_t("Password"), widget=PasswordInput(attrs={'placeholder': _t("Password")}))
+
+  def clean(self):
+    if conf.AUTH.EXPIRES_AFTER.get() > -1:
+      try:
+        user = User.objects.get(username=self.cleaned_data.get('username'))
+
+        expires_delta = datetime.timedelta(seconds=conf.AUTH.EXPIRES_AFTER.get())
+        if user.is_active and user.last_login + expires_delta < datetime.datetime.now():
+          if user.is_superuser:
+            if conf.AUTH.EXPIRE_SUPERUSERS.get():
+              user.is_active = False
+              user.save()
+          else:
+            user.is_active = False
+            user.save()
+
+        if not user.is_active:
+          if settings.ADMINS:
+            raise ValidationError(mark_safe(_("Account deactivated. Please contact an <a href=\"mailto:%s\">administrator</a>.") % settings.ADMINS[0][1]))
+          else:
+            raise ValidationError(self.error_messages['inactive'])
+      except User.DoesNotExist:
+        # Skip because we couldn't find a user for that username.
+        # This means the user managed to get their username wrong.
+        pass
+
+    return super(AuthenticationForm, self).clean()
 
 
 class UserCreationForm(AuthUserCreationForm):

@@ -22,6 +22,7 @@ except:
   pass
 
 import cgi
+import datetime
 import logging
 import urllib
 
@@ -40,7 +41,8 @@ from desktop.auth.forms import UserCreationForm, AuthenticationForm
 from desktop.lib.django_util import render
 from desktop.lib.django_util import login_notrequired
 from desktop.log.access import access_warn, last_access_map
-from desktop.conf import OAUTH, DEMO_ENABLED
+from desktop.conf import AUTH, OAUTH, DEMO_ENABLED
+
 
 LOG = logging.getLogger(__name__)
 

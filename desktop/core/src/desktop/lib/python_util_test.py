@@ -16,9 +16,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import datetime
+
 from nose.tools import assert_true, assert_equal, assert_not_equal
 
-from desktop.lib.python_util import CaseInsensitiveDict
+from desktop.lib.python_util import CaseInsensitiveDict, timedelta_to_string
 
 
 class TestPythonUtil(object):

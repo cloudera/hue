@@ -314,13 +314,19 @@ class TestRemoteUserLogin(object):
 
 
 class TestLogin(object):
+  reset = []
+
   def setUp(self):
     # Simulate first login ever
     User.objects.all().delete()
     self.c = Client()
 
+  def tearDown(self):
+    for finish in self.reset:
+      finish()
+
   def test_bad_first_user(self):
-    finish = conf.AUTH.BACKEND.set_for_testing("desktop.auth.backend.AllowFirstUserDjangoBackend")
+    self.reset.append( conf.AUTH.BACKEND.set_for_testing("desktop.auth.backend.AllowFirstUserDjangoBackend") )
 
     response = self.c.get('/accounts/login/')
     assert_equal(200, response.status_code, "Expected ok status.")
@@ -330,15 +336,65 @@ class TestLogin(object):
     assert_equal(200, response.status_code, "Expected ok status.")
     assert_true('This value may contain only letters, numbers and @/./+/-/_ characters.' in response.content, response)
 
-    finish()
-
   def test_non_jframe_login(self):
     client = make_logged_in_client(username="test", password="test")
     # Logout first
     client.get('/accounts/logout')
     # Login
     response = client.post('/accounts/login/', dict(username="test", password="test"), follow=True)
-    assert_true(any(["admin_wizard.mako" in _template.filename for _template in response.template]), response.template) # Go to superuser wizard
+    assert_true(any(["admin_wizard.mako" in _template.filename for _template in response.template]), response.content) # Go to superuser wizard
+
+  def test_login_expiration(self):
+    """ Expiration test without superusers """
+    old_settings = settings.ADMINS
+    self.reset.append( conf.AUTH.BACKEND.set_for_testing("desktop.auth.backend.AllowFirstUserDjangoBackend") )
+    self.reset.append( conf.AUTH.EXPIRES_AFTER.set_for_testing(0) )
+    self.reset.append( conf.AUTH.EXPIRE_SUPERUSERS.set_for_testing(False) )
+
+    client = make_logged_in_client(username="test", password="test")
+    client.get('/accounts/logout')
+    user = User.objects.get(username="test")
+
+    # Login successfully
+    try:
+      user.is_superuser = True
+      user.save()
+      response = client.post('/accounts/login/', dict(username="test", password="test"), follow=True)
+      assert_equal(200, response.status_code, "Expected ok status.")
+
+      client.get('/accounts/logout')
+
+      # Login fail
+      settings.ADMINS = [('test', 'test@test.com')]
+      user.is_superuser = False
+      user.save()
+      response = client.post('/accounts/login/', dict(username="test", password="test"), follow=True)
+      assert_equal(200, response.status_code, "Expected ok status.")
+      assert_true('Account deactivated. Please contact an <a href="mailto:test@test.com">administrator</a>' in response.content, response.content)
+
+      # Failure should report an inactive user without admin link
+      settings.ADMINS = []
+      response = client.post('/accounts/login/', dict(username="test", password="test"), follow=True)
+      assert_equal(200, response.status_code, "Expected ok status.")
+      assert_true("Account deactivated. Please contact an administrator." in response.content, response.content)
+    finally:
+      settings.ADMINS = old_settings
+
+  def test_login_expiration_with_superusers(self):
+    """ Expiration test with superusers """
+    self.reset.append( conf.AUTH.BACKEND.set_for_testing("desktop.auth.backend.AllowFirstUserDjangoBackend") )
+    self.reset.append( conf.AUTH.EXPIRES_AFTER.set_for_testing(0) )
+    self.reset.append( conf.AUTH.EXPIRE_SUPERUSERS.set_for_testing(True) )
+
+    client = make_logged_in_client(username="test", password="test")
+    client.get('/accounts/logout')
+    user = User.objects.get(username="test")
+
+    # Login fail
+    user.is_superuser = True
+    user.save()
+    response = client.post('/accounts/login/', dict(username="test", password="test"), follow=True)
+    assert_equal(200, response.status_code, "Expected unauthorized status.")
 
 
 class MockLdapBackend(object):

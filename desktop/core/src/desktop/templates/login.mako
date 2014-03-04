@@ -192,8 +192,16 @@ ${ commonheader("Welcome to Hue", "login", user, "50px") | n,unicode }
 
         %if login_errors:
           <div class="alert alert-error" style="text-align: center">
-            <strong><i class="fa fa-exclamation-triangle"></i> ${_('Error!')}
-            </strong> ${_('Invalid username or password.')}
+            <strong><i class="fa fa-exclamation-triangle"></i> ${_('Error!')}</strong>
+            <br />
+            <br />
+            % if form.errors:
+              % for error in form.errors:
+                ${ form.errors[error]|unicode,n }
+              % endfor
+            % else:
+              <strong>${_('Invalid username or password.')}</strong>
+            % endif
           </div>
         %endif
         <hr/>

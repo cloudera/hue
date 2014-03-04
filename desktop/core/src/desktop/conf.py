@@ -405,7 +405,16 @@ AUTH = ConfigSection(
     FORCE_USERNAME_LOWERCASE = Config("force_username_lowercase",
                                       help=_("Force usernames to lowercase when creating new users from LDAP."),
                                       type=coerce_bool,
-                                      default=False)
+                                      default=False),
+    EXPIRES_AFTER = Config("expires_after",
+                            help=_("Users will expire after they have not logged in for 'n' amount of seconds."
+                                   "A negative number means that users will never expire."),
+                            type=int,
+                            default=-1),
+    EXPIRE_SUPERUSERS = Config("expire_superusers",
+                                help=_("Apply 'expires_after' to superusers."),
+                                type=coerce_bool,
+                                default=True)
 ))
 
 LDAP = ConfigSection(

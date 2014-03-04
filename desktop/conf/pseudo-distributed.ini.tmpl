@@ -153,6 +153,13 @@
     # Only supported in remoteUserDjangoBackend.
     ## force_username_lowercase=false
 
+    # Users will expire after they have not logged in for 'n' amount of seconds.
+    # A negative number means that users will never expire.
+    ## expires_after=-1
+
+    # Apply 'expires_after' to superusers.
+    ## expire_superusers=true
+
   # Configuration options for connecting to LDAP and Active Directory
   # -------------------------------------------------------------------
   [[ldap]]

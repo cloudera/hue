@@ -154,7 +154,7 @@ class AllowFirstUserDjangoBackend(django.contrib.auth.backends.ModelBackend):
       if user.is_active:
         user = rewrite_user(user)
         return user
-      return None
+      return user
 
     if self.is_first_login_ever():
       user = find_or_create_user(username, password)
@@ -412,7 +412,7 @@ class LdapBackend(object):
         self.import_groups(user)
       return user
 
-    return None
+    return user
 
   def get_user(self, user_id):
     user = self._backend.get_user(user_id)
