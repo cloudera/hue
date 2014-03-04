@@ -45,7 +45,7 @@ ${layout.menubar(section='dump_config')}
     <div class="container-fluid">
       <div class="row-fluid">
         <div class="well">
-        ${_('Configuration files located in')} <code>${conf_dir}</code>
+        ${_('Configuration files located in')} <code style="color: #338BB8">${conf_dir}</code>
         </div>
 
         <div class="card card-home">

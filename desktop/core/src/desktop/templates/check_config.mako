@@ -17,7 +17,7 @@
 from desktop.lib.conf import BoundConfig
 from django.utils.translation import ugettext as _
 %>
-    ${_('Configuration files located in')} <code>${conf_dir}</code>
+    ${_('Configuration files located in')} <code style="color: #338BB8">${conf_dir}</code>
 
     <br/><br/>
     % if error_list:
